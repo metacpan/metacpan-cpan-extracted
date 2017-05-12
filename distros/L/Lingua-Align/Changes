@@ -1,0 +1,23 @@
+Revision history for Perl extension Lingua::Align.
+
+0.04  Mon Dec 10 19:24:14 CET 2012
+
+ - smaller changes to make the distribution cleaner for CPAN
+
+0.03  Sat Dec  8 20:40:44 CET 2012
+
+ - some POD cleanup
+ - fix in Makefile
+ - examples moved
+ - minor bug-fixes
+
+0.02  May 04 2010
+
+  - some kind of pre-release with basic documentation and lot's of
+    experimental stuff
+
+0.01  Tue Mar 31 17:32:40 2009
+
+  - initial version
+
+

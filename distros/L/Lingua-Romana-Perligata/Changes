@@ -1,0 +1,49 @@
+Mon Dec 11 13:37:12 EST 2000
+
+    Original version
+
+0.50    Thu May  3 13:54:34 2001
+
+    - Fixed handling of 'posterus', 'ultimus' etc.
+
+    - Fixed handling of 'si' (thanks James)
+
+    - Added 'itera' for 'x' (thanks James)
+
+    - Added the 'dictum sic..cis' construct for q{...} (thanks Peter)
+
+    - Added "consocia" for &, "interseca" for |, and "discerne" for ^.
+
+    - Add "cum" as precedence disambiguator
+
+    - Fixed "sere" so that it doesn't space what it joins (thanks Philip)
+
+    - Numerous documentation patches (thanks Todd and Philip)
+
+    - Added "come" to convert numbers to roman numerals (thanks Anselm)
+
+    - Added roman numerals up to 9,999,999,999 (thanks Anselm)
+
+
+
+0.6  Thu Jul  7 10:32:48 2016
+
+    - Several POD nits fixed (thanks Audrey, Ken, timeless, and Daniel)
+
+    - General improvements to handling genitives
+
+    - Made source code (largely) case-insensitive
+
+    - General update, clean, and tidy
+
+
+0.007  Sun Nov 27 08:07:52 2016
+
+    - Updated for compatibility with Perl 5.25+
+      (thanks Pali!)
+
+
+0.601  Mon Nov 28 07:28:07 2016
+
+    - Fixed release numbering
+      (thanks Alexandr!)

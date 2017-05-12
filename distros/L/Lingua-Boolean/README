@@ -1,0 +1,166 @@
+NAME
+    Lingua::Boolean - DEPRECATED module to comprehensively parse boolean
+    response strings
+
+VERSION
+    version 0.008
+
+SYNOPSIS
+        use Lingua::Boolean; # NO! Don't use it - use Lingua::Boolean::Tiny
+
+        # Use functional/procedural interface
+        print "Do it? ";
+        chomp(my $response = <>);
+        if ( boolean $response ) {   # YES, y, OK, 1...
+            print "OK, doing it.\n";
+        }
+        else {                      # no, N, 0...
+            print "OK, not doing it.\n";
+        }
+
+        # Once more, with feeling
+        print "Fait-le? ";
+        chomp($response = <>);
+        if ( boolean $response, 'fr' ) {    # OUI
+            print "OK, on le fait.\n";
+        }
+        else {                              # non
+            print "OK, on ne le fait pas.\n";
+        }
+
+        # Or, use OO interface
+        my $bool = Lingua::Boolean->new('en');
+        print "Do it? ";
+        chomp($response = <>);
+        if ($bool->boolean($response)) {
+            print "OK, doing it!\n";
+        }
+        else {
+            print "OK, not doing it.\n";
+        }
+
+DESCRIPTION
+    This module is deprecated. It began as an experiment with the concept,
+    as well as API design. The experiment worked -- we proved that this
+    module has a bad interface. If you are still interested in the
+    conceptual experiment, give Lingua::Boolean::Tiny a try.
+
+    Does that string look like they said "true" or "false"? To know, you
+    have to check a lot of things. "Lingua::Boolean" attempts to do that in
+    a single module, and do so for multiple languages.
+
+METHODS
+    "Lingua::Boolean" provides both functional/procedural and
+    object-oriented interfaces. Everything described below is an object
+    method, but can also be called as a function. "boolean()" is exported by
+    default, and can be called that way - everything else requires the
+    fully-qualified name.
+
+        use Lingua::Boolean;
+        my @languages = Lingua::Boolean::languages();
+        print boolean('yes') . "\n"; # boolean is exported by default
+
+  import
+    Calling "import()" will, obviously, import subs into your namespace. By
+    default, "Lingua::Boolean" imports the sub "boolean()". All other subs
+    should be accessed with the object-oriented interface, or use the fully
+    qualified name.
+
+  new
+    "new()" creates a new "Lingua::Boolean" object. You can optionally give
+    it the code for the language you'll be working with, and only that
+    language will be loaded. If you do so, you needn't pass the language to
+    every call to "boolean()":
+
+        use Lingua::Boolean qw();
+        my $bool = Lingua::Boolean->new('fr');
+        print ($bool->boolean('oui') ? "TRUE\n" : "FALSE\n");
+
+    Otherwise, "boolean()" accept the language code as the second parameter:
+
+        use Lingua::Boolean qw();
+        my $bool = Lingua::Boolean->new();
+        print ($bool->boolean('oui', 'fr') ? "TRUE\n" : "FALSE\n");
+
+  boolean
+    "boolean()" tries to determine if the string *looks* true or *looks*
+    false, and returns true or false accordingly. If both tests fail, dies.
+    By default, uses *en*; pass a language code as the second parameter to
+    check another language. Croaks if the language is unknown to
+    "Lingua::Boolean" (or the "Lingua::Boolean" object, if used as an object
+    method).
+
+        use Lingua::Boolean qw();
+        my $bool = Lingua::Boolean->new();
+        print ($bool->boolean('yes') ? "TRUE\n" : "FALSE\n");
+
+    If you specify the language in the constructor, you needn't specify it
+    in the call to "boolean()":
+
+        use Lingua::Boolean qw();
+        my $bool = Lingua::Boolean->new('fr');
+        print ($bool->boolean('OUI') ? "TRUE\n" : "FALSE\n");
+
+    This sub is exported by default, and can be used functionally:
+
+        use Lingua::Boolean;
+        print (boolean('yes') ? "TRUE\n" : "FALSE\n");
+
+  languages
+    "languages()" returns the list of languages that "Lingua::Boolean" knows
+    about.
+
+        use Lingua::Boolean;
+        my @languages = Lingua::Boolean::languages(); # qw(English Français ...)
+
+    When called as an object method, returns the languages that that object
+    knows about:
+
+        use Lingua::Boolean qw();
+        my $bool = Lingua::Boolean->new('fr');
+        my @languages = $bool->languages(); # qw(Français)
+
+  langs
+    "langs()" returns the list of language *codes* that "Lingua::Boolean"
+    knows about.
+
+        use Lingua::Boolean;
+        my @lang_codes = Lingua::Boolean::langs(); # qw(en fr ...)
+
+    When called as an object method, returns the languages that that object
+    knows about:
+
+        use Lingua::Boolean qw();
+        my $bool = Lingua::Boolean->new('fr');
+        my @lang_codes = $bool->langs(); # qw(fr)
+
+EXPORTS
+    By default, "Lingua::Boolean" exports "boolean()". All other methods
+    must be fully qualified - or use the object-oriented interface.
+
+AVAILABILITY
+    The project homepage is <http://metacpan.org/release/Lingua-Boolean/>.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/Lingua::Boolean/>.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/doherty/Lingua-Boolean> and may be cloned from
+    <git://github.com/doherty/Lingua-Boolean.git>
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at <https://github.com/doherty/Lingua-Boolean/issues>.
+
+AUTHOR
+    Mike Doherty <doherty@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Mike Doherty.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

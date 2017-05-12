@@ -1,0 +1,15 @@
+This file documents changes to any external interactions with the Lock::Server
+
+1.7 - added a SHUTDOWN method for a client to be able to shut down the lock server.
+      This is configurable.
+
+1.6 - added a PING method to test if the server is up. This can be used to
+      check if the server needs relaunching.
+ 
+1.3 - added configurable retry ability for lock clients
+
+1.1 - Make the server restful. Added run method which doesn't fork and return.
+      Make sure the socket communications are utf-8.
+
+
+1.0 - API laid out

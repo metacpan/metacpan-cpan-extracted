@@ -1,0 +1,9 @@
+^MYMETA\.
+^Build$
+^Build.bat$
+^_build
+^blib
+^LWP-Protocol-AnyEvent-http-.*
+~$
+^.git/
+.*.bak$

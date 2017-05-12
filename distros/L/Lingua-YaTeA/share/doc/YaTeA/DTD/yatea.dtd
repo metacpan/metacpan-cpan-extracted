@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+
+<!--                    Term Extraction Results                    -->
+<!ELEMENT  TERM_EXTRACTION_RESULTS
+                        (LIST_TERM_CANDIDATES,LIST_WORDS?)            >
+
+<!--                    List of the term candidates                -->
+<!ELEMENT  LIST_TERM_CANDIDATES
+                        (TERM_CANDIDATE+)                            >
+
+<!--                    Term candidate                             -->
+<!ELEMENT  TERM_CANDIDATE
+                        (ID,FORM, LEMMA?, MORPHOSYNTACTIC_FEATURES?,
+                         HEAD, NUMBER_OCCURRENCES, LIST_OCCURRENCES,
+                         TERM_CONFIDENCE, TERM_WEIGHTS, 
+			 LIST_RELIABLE_ANCHORS?,
+                         LOG_INFORMATION,
+                         (SYNTACTIC_ANALYSIS|
+                         SYNTACTIC_ANALYSIS_COORD)?) >
+
+<!--                                                               -->
+<!--        ============================================           -->
+
+<!--                    List of words                              -->
+<!ELEMENT  LIST_WORDS   (WORD+)                                      >
+
+<!--                    Word                                       -->
+<!ELEMENT  WORD         (ID, FORM, LEMMA, MORPHOSYNTACTIC_FEATURES,
+                         NUMBER_OCCURRENCES, LIST_OCCURRENCES)       >
+
+<!--                    Identifier                                 -->
+<!ELEMENT  ID           (#PCDATA)                                    >
+
+<!--                    Inflectional form of a term or a word      -->
+<!ELEMENT  FORM         (#PCDATA)                                    >
+
+<!--                    Lemma                                      -->
+<!--                    Canonical form of term  or a word          -->
+<!ELEMENT  LEMMA        (#PCDATA)                                    >
+
+<!--                    morphosyntactic_features                   --> 
+<!ELEMENT  MORPHOSYNTACTIC_FEATURES 
+                        (SYNTACTIC_CATEGORY, TYPE?, GENDER?, 
+                         NUMBER?, CASE?, MOOD_VFORM?, TENSE?,
+                         PERSON?, DEGREE?, POSSESSOR?, 
+                         FORMATION?)                                 > 
+
+<!--                    type                                       -->
+<!--                    applicable for nouns, verbs, adjectives,
+                        pronouns, determiners, adverbs,
+                        adpositions, conjunctions, numerals        -->
+<!ELEMENT  TYPE                                                      
+			(#PCDATA)				     >
+
+<!--                    gender                                     -->
+<!--                    applicable for nouns, verbs, adjectives,
+                        pronouns, determiners, numerals            -->
+<!ELEMENT  GENDER                                    
+			(#PCDATA)                                    >
+
+<!--                    number                                     -->
+<!--                    applicable for nouns, verbs, adjectives,
+                        pronouns, determiners, numerals            -->
+<!ELEMENT  NUMBER                                           
+			(#PCDATA)                                    >
+
+<!--                    case                                       -->
+<!--                    applicable for nouns, adjectives,
+                        pronouns, determiners, numerals            -->
+<!ELEMENT  CASE                                    
+			(#PCDATA)                                    >
+
+<!--                    mood_vform                                 -->
+<!--                    applicable for verbs                       -->
+<!ELEMENT  MOOD_VFORM                              
+			(#PCDATA)                                    >
+
+<!--                    tense                                      -->
+<!--                    applicable for verbs                       -->
+<!ELEMENT  TENSE                                   
+			(#PCDATA)                                    >
+
+<!--                    person                                     -->
+<!--                    applicable for verbs, pronouns, determiners-->
+<!ELEMENT  PERSON                                  
+			(#PCDATA)                                    >
+
+<!--                    degree                                     -->
+<!--                    applicable for adjectives, adverbs         -->
+<!ELEMENT  DEGREE                                  
+			(#PCDATA)                                    >
+
+<!--                    possessor                                  -->
+<!--                    applicable for pronouns, determiners       -->
+<!ELEMENT  POSSESSOR                               
+			(#PCDATA)                                    >
+
+<!--                    formation                                  -->
+<!--                    applicable for adpositions                 -->
+<!ELEMENT  FORMATION                               
+			(#PCDATA)                                    >
+
+<!--                    syntactic_category                         --> 
+<!--                    Multext POS categories                     -->
+<!--                    Noun (N), Verb (V), Adjective (A), Pronoun
+                        (P), Determiner (D), Article (T), Adverb
+                        (R), Adposition (S) Conjunction (C),
+                        Numerals (M), Interjection (I), Unique (U)
+                        Resiual (X), Abbreviation (Y)              -->
+<!ELEMENT  SYNTACTIC_CATEGORY 
+                        (#PCDATA)                                    > 
+
+<!--                    Syntactic Analysis                         -->
+<!--                    of terms without coordination              -->
+<!ELEMENT  SYNTACTIC_ANALYSIS
+                        (HEAD, PREP?, DETERMINER?, MODIFIER)         >
+
+<!--                    Head of the term identifier                -->
+<!ELEMENT  HEAD         (#PCDATA)                                    >
+
+<!--                    Preposition                                -->
+<!ELEMENT  PREP         (#PCDATA)                                    >
+
+<!--                    Determiner                                 -->
+<!ELEMENT  DETERMINER   (#PCDATA)                                    >
+
+<!--                    Modifier identifier of the head 
+                        of the term                                -->
+<!ELEMENT  MODIFIER     (#PCDATA)                                    >
+
+<!--         POSITION   BEFORE or AFTER                            -->
+<!ATTLIST  MODIFIER
+             POSITION   (BEFORE | AFTER)                   #REQUIRED >
+
+<!--                    Syntactic analysis of terms with
+                        coordination                               -->
+<!ELEMENT  SYNTACTIC_ANALYSIS_COORD
+                        (LEFT_TERM, COORDINATION, RIGHT_TERM)        >
+
+<!--                    Left Term identifier                       -->
+<!ELEMENT  LEFT_TERM    (#PCDATA)                                    >
+
+<!--                    Right Term identifier                      -->
+<!ELEMENT  RIGHT_TERM   (#PCDATA)                                    >
+
+<!--                    Coordination                               -->
+<!ELEMENT  COORDINATION (#PCDATA)                                    >
+
+<!--                    Number of Occurrences                      -->
+<!ELEMENT  NUMBER_OCCURRENCES
+                        (#PCDATA)                                    >
+
+<!--                    List of the occurrences of the terms       -->
+<!ELEMENT  LIST_OCCURRENCES
+                        (OCCURRENCE+)                                  >
+<!--                    Occurrence information                     -->
+<!ELEMENT  OCCURRENCE   (ID, MNP?, DOC, SENTENCE, START_POSITION,
+                         END_POSITION, OCCURRENCE_CONFIDENCE?)       >
+
+<!--                    Information the term is a maximal          -->
+<!--                    noun phrase (appear if it is )             -->
+<!ELEMENT  MNP          (#PCDATA)                                    >
+
+
+<!--                    Sentence identifier                        -->
+<!ELEMENT  SENTENCE     (#PCDATA)                                    >
+
+<!--                    Document identifier                        -->
+<!ELEMENT  DOC          (#PCDATA)                                    >
+
+<!--                    Start position of the term                 -->
+<!ELEMENT  START_POSITION
+                        (#PCDATA)                                    >
+
+<!--                    End position of the term                   -->
+<!ELEMENT  END_POSITION (#PCDATA)                                    >
+
+<!--                    Confidence of the occurrence of the term   -->
+<!ELEMENT  OCCURRENCE_CONFIDENCE
+                        (#PCDATA)                                    >
+
+<!--                    Confidence of the term                     -->
+<!ELEMENT  TERM_CONFIDENCE
+                        (#PCDATA)                                    >
+<!--              Weight associated to the term                    -->
+<!ELEMENT  TERM_WEIGHTS
+                        (WEIGHT+)                                    >
+
+<!--                    one of the term wieght                     -->
+<!ELEMENT  WEIGHT        
+                        (#PCDATA)                                    >
+
+<!--                   name of the term wieght                     -->
+<!ATTLIST  WEIGHT
+             name       CDATA                             #REQUIRED  >
+
+<!--                    List of the confidence slots               -->
+<!ELEMENT  LIST_RELIABLE_ANCHORS
+                        (RELIABLE_ANCHOR+)                           >
+
+<!--                    Confidence slot information                -->
+<!ELEMENT  RELIABLE_ANCHOR
+                        (ID, FORM?, ORIGIN?)                          >
+
+<!--                    Log information                            -->
+<!ELEMENT  LOG_INFORMATION
+                        (#PCDATA)                                    >
+
+<!--                    Origin of the reliable anchor              -->
+<!ELEMENT  ORIGIN       (#PCDATA)                                    >
+

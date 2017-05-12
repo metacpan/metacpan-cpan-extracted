@@ -1,0 +1,11 @@
+<Sect1 id="MatchPS">
+<Title><Literal>MatchPS</Literal>: The Perl-like matching interface
+<IndexTerm><Primary>MatchPS library (misc syslib)</Primary></IndexTerm>
+</Title>
+
+<para>The <literal>MatchPS</literal> library is no longer available,
+please use <ulink
+url="../base/Text.Regex.html"><literal>Text.Regex</literal></ulink>
+instead.</para>
+
+</Sect1>

@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+use 5.10.0;
+use strict;
+use warnings;
+use Benchmark qw(:all);
+use Log::LTSV::Instance;
+
+my $_obj = bless {
+    cval => 1.
+}, 'TEST';
+my $_hash  = {
+    ha => 1,
+    hb => 2,
+};
+my $_array = [ 1, 2 ];
+
+my $loaf = {
+    obj   => $_obj,
+    hash  => $_hash,
+    array => $_array,
+};
+
+my $raw = {
+    'obj._class_' => ref $_obj,
+    'obj.cval'    => $_obj->{cval},
+    'hash.ha'     => 1,
+    'hash.hb'     => 2,
+    'array.0'     => 1,
+    'array.1'     => 2,
+};
+
+my $logger = Log::LTSV::Instance->new( logger => sub { } );
+
+timethese(200_000, {
+    loaf => sub { $logger->info($loaf) },
+    raw  => sub { $logger->info($raw)  },
+});
+

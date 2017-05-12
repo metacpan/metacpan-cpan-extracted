@@ -1,0 +1,72 @@
+                            Log::LogLite
+                            Log::NullLogLite
+
+  Copyright (c) 2001-2002 Ockham Technology N.V. & Rani Pinchuk.  
+  All rights reserved.  
+  This package is free software; you can redistribute it and/or 
+  modify it under the same terms as Perl itself.
+
+DESCRIPTION
+  
+  The Log::LogLite class helps us create simple logs for our
+  application. The Lite suffix refers mainly to the ease of use of
+  this class, although the class is quite simple anyway.
+
+  Example for the use of the class:
+
+    use Log::LogLite;
+    my $LOG_DIRECTORY = "/where/ever/our/log/file/should/be";
+    my $ERROR_LOG_LEVEL = 6;
+
+    # create new Log::LogLite object
+    my $log = new Log::LogLite($LOG_DIRECTORY."/error.log", $ERROR_LOG_LEVEL);
+
+    ...
+
+    # we had an error
+    $log->write("Could not open the file ".$file_name.": $!", 4);
+
+  The line that is added to the log file might look like:
+    [09/02/2001 13:02:07] <4> Could not open the file bla: no such file
+
+  The Log::NullLogLiteThe class is derived from the `Log::LogLite'
+  class and implement the Null Object pattern to let us to use the
+  `Log::LogLite' class with null `Log::LogLite' objects.  We might
+  want to do that if we use a `Log::LogLite' object in our code, and
+  we do not want always to actually define a `Log::LogLite' object
+  (i.e. not always we want to write to a log file). In such a case we
+  will create a `Log::NullLogLite' object instead of the
+  `Log::LogLite' object, and will use that object instead.  The object
+  has all the methods that the `Log::LogLite' object has, but those
+  methods do nothing. Thus our code will continue to run without any
+  change, yet we will not have to define a log file path for the
+  `Log::LogLite' object, and no log will be created.  
+
+PREREQUISITES
+
+  IO::LockedFile 
+
+INSTALLATION
+
+  Follow the standard installation procedure for Perl modules, which is to
+  type the following commands:
+
+          perl Makefile.PL
+          make
+          make test
+          make install
+
+  You'll probably need to do the last as root.  
+
+AUTHOR NOTES
+
+  Thess classes are used for quite a long time in our company.
+  Yet, it is very new in CPAN. If there are problems, suggestions 
+  or comments - please email me.
+
+Rani Pinchuk
+rani@cpan.org
+
+
+
+

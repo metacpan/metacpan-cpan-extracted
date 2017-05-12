@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+README.pod
+dist.ini
+lib/Lingua/Translate/InterTran.pm
+t/00_compile.t
+t/99_pod.t
+t/release-pod-syntax.t

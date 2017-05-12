@@ -1,0 +1,456 @@
+=head1 NAME
+
+Lego::Ldraw - Perl extension for parsing, modifying, translating and
+displaying Ldraw files
+
+=head1 SYNOPSIS
+
+  use Lego::Ldraw;
+
+  my $l = Ldraw->new_from_file($ARGV[0]);
+  # do things...
+
+=head1 DESCRIPTION
+
+Ldraw is a CAD drawing program for Lego models. It stores data in text
+files with a suffix of ldr or dat.
+
+This extension provides a basis for quickly  parsing, modifying, translating and
+displaying them.
+
+=head1 METHODS
+
+=head2 Model methods
+
+=head3 new
+
+  $ldraw_model = Lego::Ldraw->new;
+
+Creates a new Lego::Ldraw object
+
+=head3 new_from_file
+
+  $ldraw_model = Lego::Ldraw->new_from_file("car.ldr");
+
+Creates a new Lego::Ldraw object from a file
+
+=head3 copy
+
+ $ldraw_model = Lego::Ldraw->new_from_file("car.ldr");
+ $clone = $ldraw_model->copy
+
+Creates a cloned object
+
+=head3 add
+
+  $ldraw_line = Lego::Ldraw::Line->new
+  $ldraw_model->add($ldraw_line)
+
+=head3 splice
+
+  $ldraw_model->splice($ldraw_line, $offset, $length)
+  $ldraw_model->splice($another_ldraw_model, $offset, $length)
+
+Inserts a line or a model at an offset, substituting lines if $length is specified.  
+
+=head3 lines
+
+  @lines = $ldraw_model->lines
+
+Returns the lines of a model file as Lego::Ldraw::Line objects
+
+=head3 stringify
+
+  $ldraw = $ldraw_model->stringify
+
+Returns the object as a string. The string is a valid Ldraw file.
+
+=head3 length
+
+  $len = $ldraw_model->length
+
+Returns the number of lines in the model, excluding empty ones.
+
+=head3 subparts
+
+  @subparts = $ldraw_model->subparts
+
+Returns the parts which compose a model, excluding primitives (i.e:
+only lines of types 2, 3, 4, and 5).
+
+=head3 colors
+
+  @colors = $ldraw_model->colors
+
+Returns the colors of parts in the model. Does not recurse into the subparts.
+
+=head3 file
+  
+  $file = $ldraw_model->file
+
+Returns the path of the file that was read into the model. Defaults to
+empty for models that were created from scratch.
+
+=head3 name
+
+  $name = $ldraw_model->name
+
+Returns the basename of the file that was read into the model. Defaults to
+empty for models that were created from scratch.
+
+=head3 dir
+
+  $dir = $ldraw_model->dir
+
+Returns the directory containing  the file that was read into the model. Defaults to
+empty for models that were created from scratch.
+
+=head3 tree
+
+  $tree = $ldraw_model->tree
+
+Returns a HoH of parts and colors contained in the model.
+
+=head3 parts
+
+ @parts = $ldraw_model->parts
+
+Returns a list of the parts used in the model.
+
+=head3 description
+
+ $description = $ldraw_model->description
+
+Returns the description of the model. This is the first comment line in the file.
+
+=head3 partsdirs
+
+See same method in Line methods
+
+=head3 basedir
+
+See same method in Line methods
+
+=head3 build_tree
+
+  $ldraw_model->build_tree( \&callback, \&test );
+
+Traverses the model tree, exploding every part into subparts on the
+way if &test($part) returns true, and executing &callback on every
+part traversed.
+
+Used mostly in translators, to explode the model into primitives and
+translate them into some other format: see the Lego::Ldraw::POV source
+for an example.
+
+=head2 Line methods
+
+=head3 new
+
+  $ldraw_line = Lego::Ldraw::Line->new;
+
+Creates a new Lego::Ldraw::Line object.
+
+=head3 new_from_string
+
+  $ldraw_line = Lego::Ldraw::Line->new_from_string('1 1 200 4 170 1 0 0 0 1 0 0 0 1 3004.dat');
+
+Creates a new Lego::Ldraw::Line object from a string.
+
+=head3 new_from_part_name
+
+  $ldraw_line = Lego::Ldraw::Line->new_from_part_name('3004.dat');
+
+Creates a new Lego::Ldraw::Line object from a part name. The part is centered on the origin.
+
+=head3 field access functions
+
+  $x = $ldraw_line->x;
+  $color = $ldraw_line->color;
+  $part = $ldraw_line->part;
+
+Ldraw line field values can be accessed with the relevant methods. See
+the Ldraw specification page at
+L<http://www.ldraw.org/modules.php?op=modload&name=News&file=article&sid=45>
+
+=head3 name
+
+=head3 copy
+
+  $copy = $line->copy;
+
+Clones the Line object
+
+=head3 fields
+
+  @fields = $line->fields;
+
+Returns the Line object fields
+
+=head3 description
+
+Returns the part's description, as listed in the Parts.lst generated at installation.
+
+=head3 values
+
+  @vals = $line->values(qw/x y z/);
+
+Returns the values of the specified fields, or of all fields if none is specified.
+
+=head3 coords
+
+  @xyz = $line->coords
+
+Returns the values of all coordinate points on the line (x, y, z if
+its type is 1, more x1, y1, z1 etc. in other cases).
+
+=head3 points
+
+  $points = $line->points;
+
+Returns the number of points that define the line: 1 for a part (type 1), 2 for a line, etc..
+
+=head3 transform_matrix
+
+  @matrix = $line->transform_matrix
+
+Returns the transform matrix (i.e.: fields x, y, z and a to i) of a
+part (type 1). Returns undef in all other cases.
+
+=head3 point
+
+  ($x2, $y2, $z2) = $line->point(2)
+
+Returns the coordinates of the specified point for the line, or the
+coordinates of the part for a line of type 1.
+
+=head3 format
+
+  $string = $line->format
+
+Returns a nicely formatted string of the line's fields. Coordinates
+are rounded at 2 decimals.
+
+=head3 eval
+
+  $line->eval('%x += 2 if %color == 3');
+  $line->eval('&normalize if %x > 12');
+
+This function enables complex on-the-fly edits to a line. First all
+strings beginning with % in the argument are translated into field
+accessors. Then all strings beginning with & in the argument are
+transformed into methods. Then the string is evaluated, thus editing
+the line.
+
+For example:
+
+  $line->eval('%x += 2 if %color == 3');
+
+translates into:
+
+  $line->x += 2 if $line->color == 3;
+
+and 
+
+  $line->eval('&normalize if %x > 12');
+
+translates into 
+
+  $line->normalize if $line->x > 12;
+
+=head3 normalize
+
+  $line->normalize
+
+Re-centers the line on the origin and deletes all rotations.
+
+=head3 partfile
+
+  $filename = $line->partfile;
+
+Returns the full path to the file corresponding to the line's part.
+
+=head3 explode
+
+  $ldraw_model = $line->explode;
+
+Returns a Lego::Ldraw object of the corresponding to the line's part. 
+
+=head3 transform
+
+  $line->transform($another_line)
+
+Traslates and rotates the line with the transformation matrix of the
+Lego::Ldraw::Line object passed as an argument.
+
+Tipically used in:
+
+  $ldraw = $line->explode;
+  for (@$ldraw) {
+    $_->transform($line)	
+  }
+
+which provides a mechanism to reduce a model to its primitives.
+
+=head3 stringify
+
+=head3 config
+
+=head3 basedir
+
+=head3 partsdirs
+
+=head3 primitives
+
+=head1 DISPLAY AND TRANSLATION
+
+=head2 Pov-ray translation
+
+Rudimentary support for Ldraw to Pov-ray translation is provided:
+
+  use Lego::Ldraw;
+  use Lego::Ldraw::POV;
+
+  $\ = "\n";
+
+  my $l = Lego::Ldraw->new_from_file($ARGV[0]);
+
+  print $l->POVdesc;
+
+Features here are very much in flux and can be changed without notice.
+
+=head2 OpenGL display
+
+Rudimentary support for OpenGL display of Ldraw models is provided:
+
+  use Lego::Ldraw;
+  use Lego::Ldraw::Display;
+
+  $, = " "; $\ = "\n";
+
+  my $l = Lego::Ldraw->new_from_file($ARGV[0]);
+  print $l->dir;
+
+  $d = Lego::Ldraw::Display->new(300, 400, $l);
+  $d->init;
+
+=head3 Requirements
+
+This part requires the OpenGL package that can be found at
+L<http://www.bribes.org/perl/wopengl.html>. Install the ppm binary
+provided by entering the following command  at the console:
+
+  ppm install http://www.bribes.org/perl/ppm/OpenGL.ppd
+
+Despite my efforts, Linux is not supported.
+
+=head3 Callbacks
+
+There is also limited callback support: import OpenGL constants, and
+use the bindspec method to bind callbacks. For example:
+
+  use OpenGL qw/ :all /;
+
+  # code omitted very much like above
+
+  $d->bindspec(GLUT_KEY_UP,   GLUT_ACTIVE_SHIFT, sub { shift->{lookat}->[1] -= 5; });
+  $d->bindspec(GLUT_KEY_DOWN, GLUT_ACTIVE_SHIFT, sub { shift->{lookat}->[1] += 5; });
+
+  # etc.
+
+These features are likely to change to provide support for Tk
+interaction.
+
+=head3 Interaction with other event loops
+
+  use Lego::Ldraw;
+  use Lego::Ldraw::Display;
+  use Tk;
+
+  my $l = Lego::Ldraw->new_from_file($ARGV[0]);
+  print $l->dir;
+
+  $d = Lego::Ldraw::Display->new(300, 400, $l);
+
+  $MW = MainWindow->new;
+
+  # more Tk stuff here...
+  $idle = sub { $MW->update };
+
+  $d->init($idle);
+
+You can pass a reference to a sub as the first argument to the init
+method, and the sub will be executed during OpenGL's idle cycle. the
+example above shows how to use Tk in conjunction with the OpenGL
+display.
+
+=head3 Camera and lookat positioning
+
+  use Lego::Ldraw;
+  use Lego::Ldraw::Display;
+  use Tk;
+
+  my $l = Lego::Ldraw->new_from_file($ARGV[0]);
+  print $l->dir;
+
+  $d = Lego::Ldraw::Display->new(300, 400, $l);
+
+  $MW = MainWindow->new;
+
+  # more Tk stuff here...
+  $idle = sub { $MW->update };
+
+  $d->init($idle);
+  $d->move('camera', 's', 'z', +12);
+
+You can move the camera and the point it's looking at (lookat) with the "move" method.
+
+  $d->move($point, $movement_type, $axis, $distance)
+
+C<$point> is either 'camera' or 'lookat'.
+
+C<$movement_type> is either 'x' for axial (move along an axis) or 's' for
+spherical, which moves on a sphere around the reference point. The
+reference point is the camera if you move lookat and lookat if you
+move the camera.
+
+C<$axis> determines the axis along which you move and it can be 'x' 'y' or 'z'.
+
+
+=head1 TO DO
+
+=over
+
+=item * Matrix correction for singular matrixes in POV
+
+=item * Better header generation in POV
+
+=item * Better color handling in Display and POV
+
+=item * Perl macro comments in POV
+
+=back
+
+=head1 SEE ALSO
+
+Ldraw, the start of it all: L<http://www.ldraw.org/index.php>
+
+Pov-ray: L<http://www.povray.org/>
+
+L3P, a more mature Ldraw to pov-ray translator: L<http://www.hassings.dk/l3/l3p.html>
+
+=head1 AUTHOR
+
+Simone Cesano
+
+=head1 THANKS
+
+Thanks to Lars C. Hassing for letting me use his primitives in the Lego::Ldraw::POV module.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 by Simone Cesano
+
+The primitives the Lego::Ldraw::POV module are Copyright (C) 1998-2001 Lars C. Hassing
+
+=cut

@@ -1,0 +1,63 @@
+{
+   "abstract" : "extract components of a street address, presented as a text string",
+   "author" : [
+      "Kim Ryan <kimryan at cpan org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4208",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-EN-AddressParse",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "Test::Pod" : "1.04"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.08",
+            "Lingua::EN::NameParse" : "1.24",
+            "Locale::SubCountry" : "1.41",
+            "Parse::RecDescent" : "1",
+            "Test::Pod::Coverage" : "1.04",
+            "locale" : "1",
+            "strict" : "1.04",
+            "utf8" : "1.09",
+            "warnings" : "1.12"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::EN::AddressParse" : {
+         "file" : "lib/Lingua/EN/AddressParse.pm",
+         "version" : "1.26"
+      },
+      "Lingua::EN::AddressParse::Grammar" : {
+         "file" : "lib/Lingua/EN/AddressParse/Grammar.pm",
+         "version" : "1.26"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/kimryan/Lingua-EN-AddressParse"
+      }
+   },
+   "version" : "1.26",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

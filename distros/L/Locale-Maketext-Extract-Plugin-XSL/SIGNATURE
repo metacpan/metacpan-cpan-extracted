@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 68f7f8243bc7878db17afc551f5c326beabcdcce .cvsignore
+SHA1 a4dcbbcefdb2fef706ec9f485403dc9ddd3e6ae8 .project
+SHA1 17deddc2c6b9c0063e7ff8bb1f7b3b77549a3f7a Build.PL
+SHA1 8a87319de5db84b80eb588c031abdf5df3591f91 Changes
+SHA1 0173fb16867aab0655dfcd171a46217bf34fba80 MANIFEST
+SHA1 37afe7ccf37212cf149df9eb04364333310e4bee META.yml
+SHA1 bc9b396fb6a7f39eef90e3767016669a480778ce Makefile.PL
+SHA1 f744115e7fb16ab3b91de618fa74f39546bd2cc8 README
+SHA1 8171e61a3e3a08a748f0efa5a641c573029c21d1 examples/xgettext-xsl.pl
+SHA1 844fb4d54d664aa6f2ca48cecdd22e0e5e9534f6 lib/Locale/Maketext/Extract/Plugin/XSL.pm
+SHA1 c6e28ae17fd3e9e63674c52054a094807efba295 t/00-load.t
+SHA1 4e45d5f0b0b6293e7619ce554ffdebdb207602bd t/01-Locale-Maketext-Extract-Plugin-XSL.t
+SHA1 41533fbd463e42d2ecf1e119eca910c16809d13e t/distribution.t
+SHA1 ceaaf5be69f354f3e1c9a39b2277717c7246dc64 t/i18ntest.xsl
+SHA1 7ef941e0b8c4465f84dbd8215a1b72cf17019030 t/perlcritic.t
+SHA1 763194737b5310910fb731b851f6f709e8ff8c6c t/perlcriticrc
+SHA1 c26c5d4531effe5859ca35271645bfec5db7ff5c t/perltidy.conf
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 214e164271d24f30a9ccd281544c7ec7f7bce94e t/pod-spell.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+SHA1 4aeb184c9bed26ab6c3be1ebdb8470c0cb353b1f t/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk4ZlWwACgkQeM3QI14qZogVzACgrl3rNvhQZjRA/Bkoz6RpR/UB
+6qgAoLLAuHj7sNhMTxOy2RVSGRw9bCLf
+=PK75
+-----END PGP SIGNATURE-----

@@ -1,0 +1,26 @@
+---
+abstract: 'Manage LXC containers.'
+author:
+  - 'Spydemon <jsaipakoimetr@spyzone.fr>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-LXC
+requires:
+  Backticks: '0'
+  Carp: '0'
+  Exporter: '0'
+  File::Copy: '0'
+  File::Temp: '0'
+  IPC::Run: '0'
+  Moo: '0'
+  constant: '0'
+  perl: v5.0.0
+version: '1.0002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

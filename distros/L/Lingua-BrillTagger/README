@@ -1,0 +1,55 @@
+    Lingua::BrillTagger Perl module
+    =================================
+
+This module provides a Perl interface to the natural-language
+part-of-speech written by Eric Brill as part of his Ph.D. work at the
+University of Pennsylvania.  It may be downloaded from
+http://www.cs.jhu.edu/~brill/RBT1_14.tar.Z
+
+Please see the documentation of Lingua::BrillTagger for details on how
+to use the perl interface.
+
+
+INSTALLATION
+
+In order to install this module, you must first install the Brill
+tagger, including the modifications in the Tagger.patch file (included
+with the Lingua::BrillTagger distribution).  This will provide a
+"libbrill.a" library (or whatever the equivalent filename is on your
+system against which the perl module will be linked.
+
+After installing the Brill tagger, follow the standard procedure for
+installing new-style perl modules:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install  (may need to be done as root)
+
+If the headers and/or library aren't in a location where your compiler
+will find them by itself, in the first step you can tell it where they
+are like so:
+
+  perl Build.PL --extra_compiler_flags "-I/foo/include -Wall" \
+                --extra_linker_flags   "-L/foo/lib -lbrill"
+
+DEPENDENCIES
+
+As described above, this module requires a patched version of the
+Brill tagger.  Installation requires Module::Build version 0.21 and
+Test::More (any version), but they are not used after installation.
+
+
+COPYRIGHT AND LICENCE
+
+The Lingua::BrillTagger perl interface is copyright (C) 2004-2005 Thomson
+Legal & Regulatory, and written by Ken Williams.  It is free software;
+you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+The Brill Tagger is copyright (C) 1993 by the Massachusetts Institute
+of Technology and the University of Pennsylvania - you will find full
+copyright and license information in its distribution.  The
+Tagger.patch file distributed here is granted under the same license
+terms as the tagger code itself.
+

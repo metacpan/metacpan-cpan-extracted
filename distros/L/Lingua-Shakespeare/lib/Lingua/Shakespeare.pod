@@ -1,0 +1,279 @@
+=head1 NAME
+
+Lingua::Shakespeare -- Perl in a Shakespeare play
+
+=head1 SYNOPSIS
+
+  use Lingua::Shakespeare;
+
+  The Infamous Hello World Program.
+
+  Romeo, a young man with a remarkable patience.
+  Juliet, a likewise young woman of remarkable grace.
+  Ophelia, a remarkable woman much in dispute with Hamlet.
+  Hamlet, the flatterer of Andersen Insulting A/S.
+
+
+		      Act I: Hamlet's insults and flattery.
+
+		      Scene I: The insulting of Romeo.
+
+  [Enter Hamlet and Romeo]
+
+  Hamlet:
+   You lying stupid fatherless big smelly half-witted coward!
+   You are as stupid as the difference between a handsome rich brave
+   hero and thyself! Speak your mind!
+
+  etc...
+
+=head1 DESCRIPTION
+
+Lingua::Shakespeare makes it possible to write perl programs that are as poetic as
+a Shakespeare play.
+
+=head1 LANGUAGE
+
+The language is referred to as SPL (Shakespeare Programming Language)
+
+=head2 Title
+
+The first line of every SPL program is the title. Or actually, everything up
+until the first period is the title, whether it's one line, three lines, or
+half a line. You're generally free to insert space and newlines wherever you
+want in the code, but we urge you to please indent tastefully.
+
+The title serves only aesthetic purposes. From the parser's point of view,
+it's a comment.
+
+=head2 Dramatis Personae
+
+The next few lines are a list of all characters in the play. Think of them as
+variables, capable of holding a signed integer value. You must declare every
+character you intend to use, or the program won't compile.
+
+A declaration consists of a name, followed by a description of the character
+(which is ignored by the parser). You can't pick just any name, however; you
+must use a real Shakespeare character name, such as Romeo, Juliet, or the
+Ghost (Hamlet's deceased father).
+
+=head2 Acts and Scenes
+
+The purpose of acts and scenes is to divide the play into smaller parts. A
+play consists of one or more acts, each act consists of one or more scenes,
+and each scene consists of lines (where the characters say something) and
+enter and exit statements, which cause characters to get on and off the stage.
+
+Acts and scenes are numbered with roman numerals. They begin with the word
+``Act'' or ``Scene'', then the number, and then a description of what happens
+in that act or scene. Just as with the title and the character descriptions,
+these descriptions are ignored by the parser.
+
+Besides being beautiful and descriptive, acts and scenes also serve as labels,
+which can be jumped to using goto statements. There are no gotos in the Hello
+World program, however, so we'll talk about that later.
+
+=head2 Enter, Exit and Exeunt
+
+To be able to speak their lines, characters must be on stage. The character
+they address as ``you'' (or ``thou'' or any other second-person pronoun) must
+also be on stage. But if there is yet another character on stage, it's not
+clear which one is intended. This is frowned upon by the parser.
+
+Enter Enter and Exit5. These directives cause characters to get on and off
+stage. ``Enter'' is followed by a list of one or more characters. ``Exit'' is
+followed by exactly one character. The plural of Exit is ``Exeunt'', which is
+followed by a list of at least two characters - or none, in which case
+everyone leaves.
+
+An Enter directive given to a character already on stage, or the other way
+around, will cause a runtime error.
+
+=head2 Lines
+
+A line consists of the name of a character, a colon, and one or more
+sentences. In the Hello World program, only two kinds of sentences are used:
+output, which causes output to the screen, and statements, which cause the
+second person to assume a certain value.
+
+
+=head2 Constants
+
+First, we'll explain how constants (that is, constant numbers, such as 17 and
+4711) are expressed.
+
+Any noun is a constant with the value 1 or , depending on whether it's nice or
+not. For example, ``flower'' has the value 1 because flowers are nice, but
+``pig'' has the value  because pigs are dirty (which doesn't prevent most
+people from eating them). Neutral nouns, such as ``tree'', count as 1 as well.
+
+By prefixing a noun with an adjective, you multiply it by two. Another
+adjective, and it is multiplied by two again, and so on. That way, you can
+easily construct any power of two or its negation. From there, it's easy to
+construct arbitrary integers using basic arithmetic, such as ``the sum of  and'',
+where  and  are themselves arbitrary integers.
+
+For example, ``the difference between the square of the difference between my
+little pony and your big hairy hound and the cube of your sorry little
+codpiece''. Substituting the simple constants with numbers, we get ``the
+difference between the square of the difference between 2 and 4 and the cube
+of -4''. Now, since the difference between 2 and 4 is , and the cube of  is ,
+this is equal to ``the difference between the square of  and ''. The square of
+is , and the difference of 4 and  is 60. Thus, ``the difference between the
+square of the difference between my little pony and your big hairy hound and
+the cube of your sorry little codpiece'' means 60.
+
+As you see, this way of writing constants gives you much more poetic freedom
+than in other programming languages.
+
+
+
+=head2 Assignment of Values
+
+
+Now, how do we use those numbers? Well, just have a look at the two statements
+``You lying stupid fatherless big smelly half-witted coward!'' and ``You are
+as stupid as the difference between a handsome rich brave hero and thyself!''
+
+The first one is simple: A second person pronoun, followed by a number. The
+effect of this statement is to assign the value of that number (in this case,
+) to the character being spoken to. Think ``''.
+
+The second one is slightly more complicated. For starters, what is the value
+of ``thyself''? That's not a noun, that's a reflexive pronoun. It's value is
+the current value of the character being spoken to. So the number in the
+second statement is , where  is the value of the character being spoken to.
+And just as you might expect from your experience with English, the second
+statement is just another assignment. Think `` = 8 - ''. Being ``as bas as'',
+``as good as'', or as [any adjective] as something else, means being equal to
+that something.
+
+
+
+=head2 Output
+
+
+The other kind of sentence used in the Hello World program is output. There
+are two different output sentences, ``Open your heart'' and ``Speak your
+mind''. The first causes the character being spoken to to output her or his
+value in numerical form, and the other, being more literal, outputs the
+corresponding letter, digit, or other character, according to the character
+set being used by your computer.
+
+In this program, we use only the second form. The whole program is a long
+sequence of constructing a number, writing the corresponding character,
+constructing the next number, writing the corresponding character, and so on.
+
+
+=head1 AUTHOR
+
+Ported to Perl by Graham Barr
+
+=head1 ACKNOWLEGEMENTS
+
+I wish I could take credit for the development of the Shakespeare Programming Language, but I cannot. It was the conception of  Kalle Hasselstrom and Jon Aslund. See
+L<http://shakespearelang.sourceforge.net/report/shakespeare/>
+
+=head1 COPYRIGHT
+
+The Shakespeare Programming Language is
+
+  Copyright (C) 1993-1996, Nikos Drakos, Computer Based Learning Unit, University of Leeds. 
+  Copyright (C) 1997-1999, Ross Moore, Mathematics Department, Macquarie University, Sydney.
+
+=head1 HELLO WORLD EXAMPLE
+
+
+  use Lingua::Shakespeare;
+
+  The Infamous Hello World Program.
+
+  Romeo, a young man with a remarkable patience.
+  Juliet, a likewise young woman of remarkable grace.
+  Ophelia, a remarkable woman much in dispute with Hamlet.
+  Hamlet, the flatterer of Andersen Insulting A/S.
+
+
+		      Act I: Hamlet's insults and flattery.
+
+		      Scene I: The insulting of Romeo.
+
+  [Enter Hamlet and Romeo]
+
+  Hamlet:
+   You lying stupid fatherless big smelly half-witted coward!
+   You are as stupid as the difference between a handsome rich brave
+   hero and thyself! Speak your mind!
+
+   You are as brave as the sum of your fat little stuffed misused dusty
+   old rotten codpiece and a beautiful fair warm peaceful sunny summer's
+   day. You are as healthy as the difference between the sum of the
+   sweetest reddest rose and my father and yourself! Speak your mind!
+
+   You are as cowardly as the sum of yourself and the difference
+   between a big mighty proud kingdom and a horse. Speak your mind.
+
+   Speak your mind!
+
+  [Exit Romeo]
+
+		      Scene II: The praising of Juliet.
+
+  [Enter Juliet]
+
+  Hamlet:
+   Thou art as sweet as the sum of the sum of Romeo and his horse and his
+   black cat! Speak thy mind!
+
+  [Exit Juliet]
+
+		      Scene III: The praising of Ophelia.
+
+  [Enter Ophelia]
+
+  Hamlet:
+   Thou art as lovely as the product of a large rural town and my amazing
+   bottomless embroidered purse. Speak thy mind!
+
+   Thou art as loving as the product of the bluest clearest sweetest sky
+   and the sum of a squirrel and a white horse. Thou art as beautiful as
+   the difference between Juliet and thyself. Speak thy mind!
+
+  [Exeunt Ophelia and Hamlet]
+
+
+		      Act II: Behind Hamlet's back.
+
+		      Scene I: Romeo and Juliet's conversation.
+
+  [Enter Romeo and Juliet]
+
+  Romeo:
+   Speak your mind. You are as worried as the sum of yourself and the
+   difference between my small smooth hamster and my nose. Speak your
+   mind!
+
+  Juliet:
+   Speak YOUR mind! You are as bad as Hamlet! You are as small as the
+   difference between the square of the difference between my little pony
+   and your big hairy hound and the cube of your sorry little
+   codpiece. Speak your mind!
+
+  [Exit Romeo]
+
+		      Scene II: Juliet and Ophelia's conversation.
+
+  [Enter Ophelia]
+
+  Juliet:
+   Thou art as good as the quotient between Romeo and the sum of a small
+   furry animal and a leech. Speak your mind!
+
+  Ophelia:
+   Thou art as disgusting as the quotient between Romeo and twice the
+   difference between a mistletoe and an oozing infected blister! Speak
+   your mind!
+
+  [Exeunt]
+
+=cut

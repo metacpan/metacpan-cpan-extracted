@@ -1,0 +1,61 @@
+                             Locale::KeyedText
+                                  README
+---------------------------------------------------------------------------
+
+by Darren Duncan <darren@DarrenDuncan.net>
+
+PREFACE
+
+This distribution features the Perl 5 module named "Locale::KeyedText"; see
+the file lib/Locale/KeyedText.pm for the main documentation, which is in
+POD format, plus the Dependencies and Copyright.  The distribution also
+includes a Changes file to say what changes already happened, and a TODO
+file to say what changes have yet to happen.  The file INSTALL should help
+with installation issues.  The examples/ directory contains several small
+programs you can try out and see what Locale::KeyedText can do.  Read below
+for how to get support or keep up to date.
+
+KEEPING UP TO DATE
+
+My module set is constantly under development.  The canonical copies are
+all linked to through my personal website, "http://www.darrenduncan.net/",
+or through my business website, "http://www.muldis.com/".
+
+For those of you that are interested in the bleeding edge of development, I
+have all parts of the Locale::KeyedText project in one or more public
+repositories.  The Perl 5 Locale::KeyedText project is in a Git repository
+whose public clone url is "git://github.com/muldis/Locale-KeyedText-Perl5.git" and
+whose web information url is at "http://github.com/muldis/Locale-KeyedText-Perl5".
+The Perl 6 Locale::KeyedText project used to be in a Subversion repository for
+the Perl 6 Pugs project but the host domain pugscode.org has since expired.
+
+You can download slightly older versions of all of my modules from the
+public CPAN archives at "http://www.cpan.org/authors/id/D/DU/DUNCAND/", or
+on my own web server at "http://www.darrenduncan.net/d/perl/".
+
+CPAN also extracts the POD from modules and maintains that documentation in
+an organized and searchable fashion.  Their main search site is at
+"http://search.cpan.org", and my own DUNCAND author page is at
+"http://search.cpan.org/search?author=DUNCAND".
+
+The main CPAN search site url for Locale::KeyedText for Perl 5 is
+"http://search.cpan.org/dist/Locale-KeyedText/"; that is the url you should
+link to presently if you want something to consider the "home page" of
+Locale::KeyedText; it is best to refer people there by default.
+
+You can download my oldest tarred and gzipped distributions from BACKPAN,
+at "http://history.perl.org/backpan/authors/id/D/DU/DUNCAND/", or from my
+web server, at "http://www.darrenduncan.net/d/perl/archives/", right back
+to the libdwg 1.0, first released on 2000 July 23.
+
+SUPPORT
+
+Currently I don't have any support arranged with other people, lists,
+newsgroups, or otherwise.  Feel free to ask me if you can't figure things
+out on your own, or another person whom you know has used this.  I may
+start a mailing list for support issues later, so that users of this module
+can help each other with it.
+
+FIN
+
+Share and Enjoy!

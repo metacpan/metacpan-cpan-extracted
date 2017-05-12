@@ -1,0 +1,60 @@
+{
+   "abstract" : "Using TreeTagger from Perl",
+   "author" : [
+      "Aris Xanthos <aris.xanthos@unil.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-TreeTagger",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0.19",
+            "Test::More" : "0",
+            "Test::More::UTF8" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Which" : "0",
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Temp" : "0.19",
+            "Moose" : "0",
+            "Path::Class" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::TreeTagger" : {
+         "file" : "lib/Lingua/TreeTagger.pm",
+         "version" : "0.08"
+      },
+      "Lingua::TreeTagger::TaggedText" : {
+         "file" : "lib/Lingua/TreeTagger/TaggedText.pm",
+         "version" : "0.02"
+      },
+      "Lingua::TreeTagger::Token" : {
+         "file" : "lib/Lingua/TreeTagger/Token.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ]
+   },
+   "version" : "0.08"
+}

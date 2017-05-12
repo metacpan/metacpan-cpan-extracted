@@ -1,0 +1,220 @@
+SYNOPSIS
+
+     my $log_formatter = Log::Sprintf->new({
+       category => 'DeployMethod',
+       format   => '[%L][%p][%c] %m',
+     });
+    
+     $log_formatter->sprintf({
+       line     => 123,
+       package  => 'foo',
+       priority => 'trace',
+       message  => 'starting connect',
+     });
+
+    Or to add or override flags, make a subclass and use it instead:
+
+     package SuprLogr;
+     use base 'Log::Sprintf';
+    
+     sub codes {
+       return {
+         c => 'coxyx',
+         x => 'xylophone',
+       }
+     }
+    
+     sub coxyx { 'COXYX' }
+    
+     sub xylophone { 'doink' }
+
+    and elsewhere...
+
+     my $log_formatter = SuprLogr->new({ format => '[%c][%x] %m' });
+    
+     $log_formatter->sprintf({ message => 'GOGOGO' });
+
+DESCRIPTION
+
+    This module is meant as a mostly drop in replacement for the log
+    formatting system that Log::log4perl uses; it doesn't bring in all of
+    the weight of Log::log4perl and allows you to add new flags in
+    subclasses.
+
+DIFFERENCES FROM LOG4PERL
+
+    Instead of %p{1} for a single character priority, this uses %{1}p.
+    Similarly, instead of %m{chomp} for a message with a trailing newline
+    removed, this uses %{chomp}m.
+
+METHODS
+
+ new
+
+     my $log_formatter = Log::Sprintf->new({
+       category     => 'WebServer',
+       format       => '[%L][%C] %m',
+       priority     => 'trace',
+     })
+
+    returns a freshly instantiated Log::Sprintf object. Currently it has
+    the following options, none of which are required.
+
+  arguments
+
+      * format - the format to use for logging. See "formats" for what's
+      available.
+
+      * category - what category we are logging to
+
+      * priority - the priority or level we are logging to (trace, debug,
+      etc)
+
+      * package - the package you are logging from
+
+      * date - the date the log happened
+
+      * file - the file you are logging from
+
+      * host - the host you are logging from
+
+      * line - the line you are logging from
+
+      * subroutine - the subroutine you are logging from
+
+      * pid - the pid you are logging from
+
+      * priority - the priority (level) you are logging at
+
+      * milliseconds_since_start - milliseconds since program start
+
+      * milliseconds_since_last_log - milliseconds since previous log
+
+      * stacktrace - full stacktrace
+
+  formats
+
+      * C - "package"
+
+      * c - "category"
+
+      * d - "date", in the format of localtime or gmtime
+
+      * F - "file"
+
+      * H - "host"
+
+      * L - "line"
+
+      * l - "location"
+
+      * M - "subroutine"
+
+      * m - "message"
+
+      * {chomp}m - "message", but with any trailing newline removed
+
+      * n - "newline"
+
+      * P - "pid"
+
+      * p - "priority"
+
+      * {1}p - "priority", but just the first character
+
+      * r - "milliseconds_since_start"
+
+      * R - "milliseconds_since_last_log"
+
+      * T - "stacktrace", an arrayref of arrayrefs in the format of
+      caller($x), ordered by deeper to shallower in the trace
+
+ sprintf
+
+    Takes the exact same arguments as "new" with the additional message
+    argument. Returns a formatted string. Note that if a flag is included
+    in your format but its corresponding value is not included in the call
+    to sprintf you will get lots of warnings.
+
+ format
+
+    Returns the current format
+
+SUBCLASSING
+
+    This module was designed from the start to be subclassed. All you need
+    to know to subclass it (to add or change formatting codes) is that the
+    codes subroutine should be defined in your subclass, and should return
+    a hashref where keys are codes and values are the names of methods your
+    class defines to fill in the values of those codes.
+
+MESSAGE METHODS
+
+ milliseconds_since_start
+
+    returns milliseconds since instantiation
+
+ milliseconds_since_last_log
+
+    returns milliseconds since last log
+
+ line
+
+    returns line
+
+ file
+
+    returns file
+
+ package
+
+    returns package
+
+ subroutine
+
+    returns subroutine
+
+ category
+
+    returns category
+
+ message
+
+    returns message; if passed "chomp" it will remove a trailing newline
+    from message
+
+ priority
+
+    returns priority; if passed a true value it will only return the first
+    character
+
+ date_str
+
+    returns date formatted as YYYY-MM-DD HH:MM:SS
+
+ host
+
+    returns host
+
+ location
+
+    returns location (as in "$subroutine $file:$line")
+
+ newline
+
+    returns newline
+
+ pid
+
+    returns process id
+
+SEE ALSO
+
+    Log::Log4perl
+
+      this module has a lot of really neat ideas
+
+    Log::Structured
+
+    you can use this module to fill in the values for "sprintf"
+

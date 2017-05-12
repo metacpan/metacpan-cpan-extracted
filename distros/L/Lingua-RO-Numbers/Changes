@@ -1,0 +1,80 @@
+Revision history for Lingua-RO-Numbers
+
+0.21    2017-01-10
+        - Changed the license from `perl` to `artistic_2`.
+        - Other meta changes.
+
+0.20    2015-01-15
+        - Minor fix for numbers greater than 10**27 (now they are reported correctly)
+
+0.19    2014-11-27
+        - Fixed a bug for string numbers like '8.0' (now returns 'opt' instead of undef)
+        - Fixed bug for infinity; now it is returned correctly.
+
+0.18    2014-07-25
+        - Text for ro_to_number() is now UTF-8 decoded.
+        - Fixed an infinite loop for text like "unu virgula zero"
+
+0.17    2014-06-29
+        - POD fixes.
+
+0.16    2014-06-20
+        - Added the ro_to_number() function which converts a Romanian text into its numeric value.
+
+0.15    2013-05-01
+        - Bug-fix: the 'thousands_separator' string should not be added at the end of a number.
+
+0.14    2013-06-23
+        - Removed the kwalitee test.
+        - Added the META.json file.
+
+0.13    2013-06-09
+        - Removed the requirement of the 'encoding' pragma.
+
+0.12    2013-06-09
+        - Removed the usage of the deprecated 'encoding' pragma.
+
+0.11    2013-03-15
+        - Added kwalitee test.
+        - Converted releases dates to W3CDTF.
+        - Added META.yml file.
+
+0.10    2013-03-13
+        - Added support for Object-Oriented functionality.
+        - Added support for customizable options.
+        - Fixed deep-recursion for number which is, actually, "NaN".
+        - Added support for 'inf'.
+        - Doesn't returns a list in list context, but a string.
+
+0.09    2013-02-14
+        - Added 'encoding' to dependencies in Build.PL
+
+0.08    2013-02-08
+        - Great unification:
+            Joined the code for floating points smaller than zero,
+              with the code for floating points greater than zero.
+
+0.07    2013-02-06
+        - doesn't use 'parent' anymore.
+
+0.06    2013-02-04
+        - Added more tests.
+        - Changed from 'un miliard o sută nouăzeci și opt de milioane trei sute mii'
+                   to  'un miliard o sută nouăzeci și opt de milioane trei sute de mii'
+
+0.05    2013-02-03
+        - Corrected 1_500_083 from 'un milion cinci sute mii optzeci și trei'
+                                to 'un milion cinci sute de mii optzeci și trei'
+
+0.04    2013-02-03
+        - Corrected 112_000 from 'o sută doisprezece de mii'
+                              to 'o sută doisprezece mii'
+
+0.03    2013-02-02
+        - Require perl>=5.006 in Build.PL
+
+0.02    2013-02-02
+        - Changed 'saptesprezece' to 'șaptesprezece'
+
+0.01    2013-02-01
+        - First version, released on an unsuspecting world.

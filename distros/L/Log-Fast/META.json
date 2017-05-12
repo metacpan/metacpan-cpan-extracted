@@ -1,0 +1,77 @@
+{
+   "abstract" : "Fast and flexible logger",
+   "author" : [
+      "Alex Efros <powerman@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Fast",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Distribution" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Socket" : "0",
+            "Sys::Syslog" : "0.29",
+            "Time::HiRes" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Fast" : {
+         "file" : "lib/Log/Fast.pm",
+         "version" : "v2.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/powerman/perl-Log-Fast/issues"
+      },
+      "homepage" : "https://github.com/powerman/perl-Log-Fast",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/powerman/perl-Log-Fast.git",
+         "web" : "https://github.com/powerman/perl-Log-Fast"
+      }
+   },
+   "version" : "v2.0.0"
+}
+

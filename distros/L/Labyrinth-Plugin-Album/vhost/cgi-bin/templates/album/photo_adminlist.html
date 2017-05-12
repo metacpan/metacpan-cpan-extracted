@@ -1,0 +1,38 @@
+[% 
+    title = 'Photos Admin' ;
+
+    crumb2_name = 'Gallery' ;
+    crumb2_href = '/album-admin' ;
+    crumb1_name = title ;
+%]
+
+<div class="boxer">
+<p>[% thanks_message %]</p>
+<p><a href="[% cgipath %]/pages.cgi?act=album-photoadd"><img src="[% webpath %]/images/icons/add.gif" alt="add a photo" /></a> - Add a Photo</p>
+</div>
+
+<div class="boxer">
+<table class="blocker">
+<tr>
+<td class="bold">Image No.</td>
+<td class="bold">Thumbnail</td>
+<td class="bold">Photo</td>
+<td class="bold">Tagline</td>
+<td class="bold">Actions</td>
+</tr>
+[% FOREACH record = records %]
+<tr>
+<td>[% record.photoid %]</td>
+<td>[% record.thumb %]</td>
+<td>[% record.image %]</td>
+<td>[% record.tagline %]</td>
+<td nowrap><a href="[% cgipath %]/pages.cgi?act=album-photoedit&amp;iid=[% record.photoid %]">Edit</a> /
+    <a href="[% cgipath %]/pages.cgi?act=album-photodelete&amp;iid=[% record.photoid %]">Delete</a></td>
+</tr>
+[% END %]
+</table>
+</div>
+
+<div class="boxer">
+<p><a href="[% cgipath %]/pages.cgi?act=album-photoadd"><img src="[% webpath %]/images/icons/add.gif" alt="add a photo" /></a> - Add a Photo</p>
+</div>

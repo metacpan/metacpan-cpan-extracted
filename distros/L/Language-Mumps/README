@@ -1,0 +1,23 @@
+MUMPS Implementation in Perl
+This package implements a MUMPS to Perl compiler.
+A script for interpreting and running MUMPS programs is now supplied.
+Soon: an Apache perl module for MUMPS embedded web pages.
+Note: this is a beta version, expect bugs.
+The standard library is based on MumpsVM, another free MUMPS
+implementation.
+This package is free for use but not modification. This includes
+production commercial use.
+Please report bugs to [see below].
+
+See the file INSTALL.
+
+Ariel Brosh,
+Petach Tikva,
+Israel.
+
+---
+
+This distribution is currently maintained by Steffen Mueller.
+Please report bugs to smueller@cpan.org
+
+Please note the licensing terms set by Ariel Brosh in the above text!

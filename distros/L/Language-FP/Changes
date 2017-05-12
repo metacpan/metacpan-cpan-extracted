@@ -1,0 +1,19 @@
+Revision history for Perl extension Language::FP.
+
+0.01  Sun May 26 11:13:03 2002
+	- original version; created by h2xs 1.21 with options
+		-AXP FP
+
+0.02  Tue May 28 22:19:48 PDT 2002
+	- fixed floating-point parsing
+	- fixed arithmetic only handling positive numbers
+	- more tests
+	- fixed operator !=, <=, >= (reorder regex branches)
+	- changed if-then, while to no longer require parens
+	- better error messages.
+	- bind symbols (or fail) at parse time.
+
+0.03  Sat Jun  1 21:23:19 PDT 2002
+	- separated parser from compiler.
+	- new "Big Heinous Eval" compiler (see code).  Much faster.
+	- delayed most initialization.

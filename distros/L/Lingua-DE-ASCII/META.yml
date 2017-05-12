@@ -1,0 +1,23 @@
+---
+abstract: 'Perl extension to convert german umlauts to and from ascii'
+author:
+  - 'Janek Schleicher <bigj@kamelfreund.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-DE-ASCII
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

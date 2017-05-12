@@ -1,0 +1,33 @@
+Revision history for Log-Dispatch-FileWriteRotate
+
+0.05    2016-10-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Log::Dispatch::FileRotate.
+
+
+0.04    2016-01-19 (PERLANCAR)
+
+        - No functional changes.
+
+        - Bump prereq version File::Write::Rotate to 0.29 [RT#110234].
+
+
+0.03    2015-01-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update to File::Write::Rotate 0.28 which checks arguments to its
+	  constructor.
+
+
+0.02    2013-11-11 (SHARYANTO)
+
+        - No functional changes. Rebuild with MakeMaker instead of
+          Module::Build.
+
+
+0.01    2012-12-26 (SHARYANTO)
+
+        - First version.

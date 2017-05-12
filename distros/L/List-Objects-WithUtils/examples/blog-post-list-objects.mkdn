@@ -1,0 +1,285 @@
+Topic: Easy list ops with List-Objects-WithUtils
+Date: 2013-03-26
+
+Hmm.. I should sort these hash items. Okay, I've got my _sort_ and _map_
+... but I want to sort these objects by `->name` ...
+oh, right, _List::UtilsBy_!
+But I want to iterate five of them at a time ... 
+uh, hmm, is natatime in _List::Util_ or _List::MoreUtils_? 
+
+Ah, screw it:
+
+    use List::Objects::WithUtils;
+
+    my $hash = hash(%previous);
+    my $iter = $hash->values
+                ->sort_by(sub { $_->name })
+                ->natatime(5);
+
+    while (my @objs = $iter->()) {
+      ...
+    }
+
+But now I want to take a slice from
+this hash and create a new hash ... ah, fook, what was the syntax again?
+Hum. I could shove the keys I want in `@keys` ... but if any of those keys
+don't exist in the old hash, I don't want them to be set to `undef` in the new
+hash, so I need some kind of loop ...
+
+Ah, never mind:
+
+    my $newhash = $hash->sliced(qw/foo bar baz/);
+
+There we are!
+
+## A modern approach to list types
+
+[List::Objects::WithUtils](http://metacpan.org/release/List-Objects-WithUtils)
+exists to eliminate that whole train of thought by providing a
+object-oriented interface to list types (arrays and hashes).
+
+Aside from
+providing native behavior like element manipulation, `sort`, `map`, 
+`grep`, and so forth, you also get the most commonly useful utilities from
+[List::Util](http://metacpan.org/module/List::Util),
+[List::MoreUtils](http://metacpan.org/module/List::MoreUtils),
+[List::UtilsBy](http://metacpan.org/module/List::UtilsBy),
+and
+[Syntax::Keyword::Junction](http://metacpan.org/module/Syntax::Keyword::Junction).
+
+This post covers the raw basics and the things I use most frequently. See the
+[List::Objects::WithUtils documentation on
+metacpan](http://metacpan.org/release/List-Objects-WithUtils) for usage
+details.
+
+#### The basics
+
+Getting going is pretty easy; where I might declare an array:
+
+    my @array = qw/ a b c /;
+
+... or an ARRAY:
+
+    my $array = [qw/ a b c /];
+
+I can just use `array()`:
+
+    my $array = array(qw/ a b c /);
+
+(Since these are ARRAY-type objects, code that previously treated $array as an
+ARRAY ref will Just Work so long as it checks 'reftype' where most people
+might use 'ref' -- porting my old code went pretty smoothly.)
+
+Later on, if I need a plain list back out, I can get `all` elements:
+
+    for my $item ($array->all) {
+      ...
+    }
+
+... or perhaps just find out how many elements the array has:
+
+    if ( $array->count > 2 ) {
+      ...
+    }
+
+I can retrieve a specific index via `get`:
+
+    my $second = $array->get(1);
+
+... or change it via `set`:
+
+    $array->set( 1, 'newval' );
+
+The usual array operations work basically as-expected:
+
+    $array->push('d');
+    my $last  = $array->pop;
+
+    $array->unshift('z');
+    my $first = $array->shift;
+
+I can `splice` or `delete` items:
+
+    $array->delete(2);
+    $array->splice( 0, 1 );
+
+... and transform lists into strings via `join`:
+
+    my $str = $array->join('');
+
+Working with hashes is much the same; all the expected operations are
+available. I can create my hash using the expected syntax:
+
+    my $hash = hash(
+      a => 'foo',
+      b => 'bar',
+      c => 'baz',
+    );
+
+Adding or setting hash elements works essentially as-expected:
+
+    $hash->set(d => 'pie');
+
+... but `set` can also take a sequence of pairs, which is great for
+combining hashes:
+
+    $hash->set(
+      e => 'cake',
+      f => 'banana',
+    );
+
+    # From a plain Perl hash:
+    $hash->set( %old );
+    
+    # From a hash():
+    $hash->set( $old->export );
+
+Hash operations like `keys` and `values` return a list, which is of course
+presented as an array() object.
+
+That means it's easy to use chained operations to, say, sort by either key or
+value:
+
+    my @bykey = $hash->keys->sort->all;
+
+    # By value, unique values only.
+    my @byval = $hash->values->uniq->sort->all;
+
+Since `sort` takes a sub, I could sort by a hash element, say:
+
+    my $sorted = array(
+      hash( foo => 1 ),
+      hash( foo => 2 ),
+      hash( foo => 3 ),
+    )->sort(sub {
+      $_[0]->get('foo') cmp $_[1]->get('foo')
+    });
+
+... but since `sort_by` is available, it would be much cleaner to do:
+
+    $array->sort_by(sub { $_->get('foo') });
+
+(Note the `$_` -- `sort_by` operates on a topicalizer.)
+
+List operations returning new lists makes for pretty chaining:
+
+    my @all = 
+      $array->grep(sub { $_[0] =~ /foo/ })
+            ->uniq
+            ->sort
+            ->map(sub { uc $_[0] })
+            ->all;
+
+How about a Schwartzian (with a little extra overhead, granted)?
+
+    my $sorted = 
+      array(qw/ abcd ab abc a /)
+        ->map(sub { [ $_[0], length $_[0] ] })
+        ->sort(sub { $_[0]->[1] <=> $_[1]->[1] })
+        ->map(sub { $_[0]->[0] })
+
+(This is pointless because we have `sort_by` available (see above), but it's a
+well-known idiom with which we can demonstrate chaining.)
+
+#### Junctions
+
+One of the most common things I do with a list is apply `grep` to find stuff
+-- but sometimes I'm not all that overly interested in _what_ I found, only
+whether or not it is present.
+
+I could, of course, use `grep` and check for found elements:
+
+    if ( array(1 .. 10)->grep(sub { $_[0] == 4 })->has_any ) {
+      ...
+    }
+
+... or I could turn to `has_any` or `first` for the same purpose, which could
+be more efficient on account of terminating after the first successful hit:
+
+    if ( array(1,2,3)->has_any(sub { $_ == 4 }) ) { }
+
+    if ( array(1,2,3)->first(sub { $_ == 4}) )    { }
+
+Still, this is a bit ugly; I just want to know if any items meet a certain
+criteria, and typing 'sub { ... }' every five minutes gets to be silly.
+
+Fortunately, the default `array` class happens to consume
+[List::Objects::WithUtils::Role::WithJunctions](http://metacpan.org/module/List::Objects::WithUtils::Role::WithJunctions),
+giving us easy access to
+[Syntax::Keyword::Junction](http://metacpan.org/module/Syntax::Keyword::Junction)
+goodness.
+
+Calling `any_items` returns the overloaded `any` junction. Our check might
+look more like:
+
+    if ( array(1,2,3)->any_items == 4 ) {
+      ...
+    }
+
+    if ( array('a', 'b', 'c')->any_items eq 'b' ) {
+      ...
+    }
+
+You also get `all_items` for free:
+
+    if ( array(1,2,3)->all_items > 0 ) {
+      ...
+    }
+
+#### Slices
+
+Traditional slice syntax isn't so bad when using a normal `@array` or `%hash`:
+
+    my @array = ( 'a' .. 'z' );
+    my @first = @array[0 .. 5];
+
+    my %hash   = ( foo => 'bar', baz => 'foo', bar => 'baz' );
+    # Values for wanted keys:
+    my @foobar = @hash{'foo','bar'};
+
+It starts to get a little more interesting when dealing with references:
+
+    my @first  = @{ $array }[0 .. 5];
+    my @foobar = @{ $hash }{'foo','bar'}
+
+... and downright obnoxious when I'd like to turn a piece of a hash into a new
+hash, for example:
+
+    my %newhash = map {;
+      exists $hash->{$_} ? ( $_ => $hash->{$_} ) : ()
+    } 'foo', 'bar';
+
+Instead of all that, I can just use `->sliced`, which works on both `array`
+and `hash` objects. Now that array example looks more like this:
+
+    my $array = array( 'a' .. 'z' );
+    my $slice = $array->sliced( 0 .. 5 );
+
+Unlike `->splice`, `->sliced` leaves the existing array alone and returns a
+new array-type object containing the values requested.
+
+A sliced() hash returns a new hash object:
+
+    my $newhash = $hash->sliced('foo', 'bar');
+
+When using `->sliced`, keys that don't exist in the old hash won't be created
+with undefined values in the new hash.
+
+In a similar vein, sometimes it's convenient to be able to get all the items
+before the one matching some condition:
+
+    my $before = $array->items_before(sub { $_ eq 'd' });
+
+... or after it:
+
+    my $after = $array->items_after(sub { $_ eq 't' });
+
+We can make our hash manipulation rather shorter and a bit prettier:
+
+    my $hash = hash( foo => 'bar', baz => 'foo', bar => 'baz' );
+
+A get() that returns a list of values returns an array object:
+
+    my @foobar  = $hash->get('foo', 'bar')->all;
+
+There's plenty more. See the official documentation.

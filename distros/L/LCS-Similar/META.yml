@@ -1,0 +1,34 @@
+---
+abstract: 'allow differences in the compared elements of Longest Common Subsequence (LCS) Algorithm'
+author:
+  - 'Helmut Wollmersdorfer <helmut.wollmersdorfer@gmail.com>'
+build_requires:
+  LCS: '0'
+  Test::Deep: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LCS-Similar
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/wollmers/LCS-Similar/issues
+  homepage: https://github.com/wollmers/LCS-Similar
+  repository: https://github.com/wollmers/LCS-Similar.git
+version: '0.03'
+x_contributors:
+  - 'Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'

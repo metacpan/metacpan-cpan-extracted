@@ -1,0 +1,66 @@
+NAME
+
+    LWPx::Profile - Basic Timing of HTTP Requests
+
+VERSION
+
+    version 0.2
+
+SYNOPSIS
+
+            use LWP::UserAgent;
+            use LWPx::Profile;
+            
+            my $ua = LWP::UserAgent;
+            
+            LWPx::Profile::start_profile();
+            foreach my $url (@sites) {
+                    $ua->get($url);
+            }
+            my $results = LWPx::Profile::stop_profile;
+
+DESCRIPTION
+
+    This module provides a basic profiling framework for looking at how
+    long HTTP requests with LWP took to complete. The data structure
+    returned by stop_profile is a hashref of request-string => stats pairs.
+    For example:
+
+            'GET http://www.google.com/
+            User-Agent: libwww-perl/6.08
+    
+            ' => {
+                    'shortest_duration' => '0.111438989639282',
+                    'time_of_first_sample' => '1424211134.8376',
+                    'longest_duration' => '0.202037811279297',
+                    'count' => 3,
+                    'total_duration' => '0.436195850372314',
+                    'time_of_last_sample' => '1424211135.07221',
+                    'first_duration' => '0.202037811279297'
+            };
+
+    In this example, there have been three requests for
+    http://www.google.com/.
+
+TODO
+
+      * The docs are pretty middling at the moment.
+
+AUTHORS
+
+        Chris Reinhardt
+        crein@cpan.org
+        
+
+COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+
+    LWP::UserAgent, perl(1)
+

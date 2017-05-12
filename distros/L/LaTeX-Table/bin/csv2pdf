@@ -1,0 +1,293 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use autodie qw(open close);
+use English qw( -no_match_vars );
+use Getopt::Long;
+use Pod::Usage;
+use Carp;
+
+use Text::CSV;
+use File::Basename;
+use Cwd;
+
+use Template;
+
+use LaTeX::Table;
+use LaTeX::Encode;
+use LaTeX::Driver;
+
+use version; our $VERSION = qv('1.0.6');
+
+my ( $infile, $outfile, $outfiletex, $help, $man, $version );
+
+my $sep_char     = q{,};
+my $latex_encode = 0;
+my $landscape    = 0;
+my $outputlatex  = 0;
+my $theme        = 0;
+my $title        = 0;
+my $coldef       = 0;
+my $header       = 0;
+
+my $options_ok = GetOptions(
+    'in=s'         => \$infile,
+    'out=s'        => \$outfile,
+    'sep_char=s'   => \$sep_char,
+    'latex_encode' => \$latex_encode,
+    'landscape'    => \$landscape,
+    'outputlatex'  => \$outputlatex,
+    'theme=s'      => \$theme,
+    'title=s'      => \$title,
+    'coldef=s'     => \$coldef,
+    'header=s'     => \$header,
+    'help|?'       => \$help,
+    'version|v'    => \$version,
+    'man'          => \$man,
+) or pod2usage(2);
+
+if ($version) {
+    print "$PROGRAM_NAME $VERSION\n" or croak q{Can't print to stdout.};
+    exit;
+}
+
+if ($man) {
+    pod2usage( -exitstatus => 0, -verbose => 2 );
+}
+if ( $help || !defined $infile ) {
+    pod2usage(1);
+}
+if ( !defined $outfile ) {
+    $outfile = q{./} . fileparse( $infile, qw(csv txt dat) ) . 'pdf';
+    $outfiletex = fileparse( $infile, qw(csv txt dat) ) . 'tex';
+}
+else {
+    $outfiletex = fileparse( $outfile, qw(pdf) ) . 'tex';
+}
+
+my $csv = Text::CSV->new(
+    {   binary           => 1,
+        sep_char         => $sep_char,
+        allow_whitespace => 1
+    }
+);
+
+my @header;
+my @data;
+
+if ($header) {
+    my $status = $csv->parse($header);
+    @header = [ $csv->fields() ];
+}
+
+my $line_number = 0;
+
+open my $IN, '<', $infile;
+while ( my $line = <$IN> ) {
+    chomp $line;
+    my $status = $csv->parse($line);
+    if ( !$header && $line_number == 0 ) {
+        @header = [ $csv->fields() ];
+    }
+    else {
+        push @data, [ $csv->fields() ];
+    }
+    $line_number++;
+}
+close $IN;
+
+my $table = LaTeX::Table->new(
+    {   header    => \@header,
+        data      => \@data,
+        type      => 'longtable',
+        tabletail => q{ },
+        ( $theme ? ( theme => $theme ) : () ),
+        filename          => $outfiletex,
+        center            => 0,
+        width_environment => 'tabularx',
+        coldef            => $coldef,
+        callback          => sub {
+            my ( $row, $col, $value, $is_header ) = @_;
+            if ($latex_encode) {
+                return latex_encode($value);
+            }
+            return $value;
+        },
+    }
+);
+
+$table->generate;
+
+my $latex_code = create_latex_code();
+
+if ($outputlatex) {
+    print $latex_code or croak q{Can't print to stdout.};
+}
+
+my $drv = LaTeX::Driver->new(
+    source => \$latex_code,
+    output => $outfile,
+    format => 'pdf',
+);
+
+my $ok = $drv->run;
+
+sub create_latex_code {
+
+    my $template_obj = Template->new();
+
+    my %template_vars = (
+        LANDSCAPE => $landscape ? '[landscape]'            : 0,
+        TITLE     => $title     ? '\title{' . $title . '}' : 0,
+        TABLECODE => '\LTXtable{\textwidth}{'
+            . getcwd() . q{/}
+            . $outfiletex . '}',
+    );
+
+    my $template = << 'EOT'
+\documentclass[%IF LANDSCAPE %][% LANDSCAPE %][% END %]{article}
+[% IF LANDSCAPE %]\usepackage[landscape]{geometry}
+[% END %]\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{ltxtable}
+\usepackage{longtable}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{helvet}
+[% IF TITLE %][% TITLE %][% END %]
+\begin{document}
+[% IF TITLE %]\maketitle
+[% END %][% TABLECODE %]
+\end{document};
+EOT
+        ;
+    my $code;
+
+    $template_obj->process( \$template, \%template_vars, \$code )
+        or croak $template_obj->error;
+
+    return $code;
+}
+
+__END__
+
+=head1 NAME
+
+csv2pdf - A simple but yet powerful LaTeX::Table example application.
+
+=head1 SYNOPSIS
+
+csv2pdf [OPTIONS] --in in.csv [--out out.pdf]
+
+=head1 OPTIONS
+
+=over
+
+=item C<--sep_char>
+
+The separator character. Default comma ','.
+
+=item C<--latex_encode>
+
+Use L<LaTeX::Encode>.
+
+=item C<--landscape>
+
+Output the PDF in landscape orientation.
+
+=item C<--theme>
+
+The table theme. See L<LaTeX::Table>. Default I<Meyrin>.
+
+=item C<--coldef>
+
+The column definition, e.g. 'llp{5cm}'. If unset, guessed by L<LaTeX::Table>.
+
+=item C<--title>
+
+If set, then uses the specified string as title.
+
+=item C<--header>
+
+Instead of the first line, use the specified string as header.
+
+  --header "Header A, Header B, Header C"
+
+The separator character must be the same as in the file. If unset, then the
+first line is used as header.
+
+=item C<--outputlatex>
+
+Prints the LaTeX code to STDOUT.
+
+=item C<--man>
+
+Display manpage.
+
+=item C<--version>
+
+Print version number of this software.
+
+=back
+
+=head1 DESCRIPTION
+
+Converts a CSV file to PDF. Requires LaTeX. 
+
+=head1 EXAMPLE
+
+  csv2pdf --landscape  --theme Redmond --in examples/imdbtop40.dat
+  
+=head1 CONFIGURATION AND ENVIRONMENT
+
+C<csv2pdf> does not support configuration files or environment variables.
+
+=head1 DEPENDENCIES
+
+LaTeX.
+
+L<autodie>, L<Carp>, L<Cwd>, L<File::Basename>, L<Getopt::Long>, L<LaTeX::Driver>, L<LaTeX::Encode>, L<LaTeX::Table>, L<Pod::Usage>, L<Template>, L<Text::CSV>
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported. 
+
+Please report any bugs or feature requests to
+C<bug-latex-table@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>. 
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2006-2010, C<< <limaone@cpan.org> >>. 
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut
+
+# vim: ft=perl sw=4 ts=4 expandtab

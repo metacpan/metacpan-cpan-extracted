@@ -1,0 +1,24 @@
+
+  Lingua::TreeTagger::Installer
+ -------------------------------
+
+ This small module (erm, installation script) downloads TreeTagger [1],
+ TreeTagger perl scripts and TreeTagger language parameters,
+ installing them on your system.
+
+ Please note that the COPYRIGHT statement of this installation tool is
+ NOT the same as TreeTagger license. Please read TreeTagger liecense[2].
+
+ Note that the files under extrafiles are copyrighted accordingly with
+ TreeTagger license. They should not be distributed in this manner,
+ but I will keep them here while the original TreeTagger packages do
+ not include them.
+
+
+ I would like to thank you Micheal Schwern for all his help converting
+ ExtUtils::MakeMaker initial script to Module::Build.
+
+
+
+ [1] http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger/
+ [2] http://www.ims.uni-stuttgart.de/~schmid/Tagger-Licence

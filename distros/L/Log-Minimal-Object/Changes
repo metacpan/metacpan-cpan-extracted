@@ -1,0 +1,11 @@
+Revision history for Perl extension Log-Minimal-Object
+
+0.02 2014-05-20T13:23:24Z
+
+    - This change provides a constant of the default trace level of this module
+      (provides Log::Minimal::Object::DEFAULT_TRACE_LEVEL)
+
+0.01 2014-05-20T00:58:11Z
+
+    - original version
+

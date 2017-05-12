@@ -1,0 +1,53 @@
+Revision history for Lingua-EN-Number-Format-MixWithWords
+
+0.08    2016-06-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Replace Exporter::Lite with Exporter.
+
+	- Remove unneeded POD section.
+
+
+0.07     2013-09-11 (SHARYANTO)
+
+         - No functional changes. Fudge a couple of tests on rounding large
+           numbers due to failure on many systems [CT].
+
+
+0.06     2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core in 5.19.
+
+
+0.05    2012-03-23 (SHARYANTO)
+
+        - No functional changes. Remove dependency on old module Sub::Spec.
+
+
+0.04    2011-10-25 (SHARYANTO)
+
+        - No functional changes. Fix test [ct].
+
+
+0.03    2011-09-21 (SHARYANTO)
+
+        - No functional changes. Add alias package MixWithWords::EN.
+
+
+0.02    2011-09-16 (SHARYANTO)
+
+        [NEW FEATURES + INCOMPATIBLE CHANGES]
+
+        - Add required 'scale' option to support short & long scale names
+          [requested by Lars Dɪᴇᴄᴋᴏᴡ].
+
+        - Internal: refactor common code to Lingua::Base::NFM.
+
+        - Fix overflow problem with Number::Format.
+
+
+0.01    2011-09-15 (SHARYANTO)
+
+        - First release.

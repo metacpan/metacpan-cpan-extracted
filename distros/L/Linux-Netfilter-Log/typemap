@@ -1,0 +1,38 @@
+TYPEMAP
+struct nflog_handle*        nflog_handle
+struct perl_nflog_group*    perl_nflog_group
+uint8_t                     T_UV
+uint16_t                    T_UV
+uint32_t                    T_UV
+
+INPUT
+nflog_handle
+	if(sv_isobject($arg)
+		&& sv_derived_from($arg, \"Linux::Netfilter::Log\")
+		&& SvTYPE(SvRV($arg)) == SVt_PVMG)
+	{
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	}
+	else{
+		croak(\"${Package}::$func_name() -- $var is not a Linux::Netfilter::Log\");
+	}
+
+OUTPUT
+nflog_handle
+	sv_setref_pv( $arg, "Linux::Netfilter::Log", (void*)$var );
+
+INPUT
+perl_nflog_group
+	if(sv_isobject($arg)
+		&& sv_derived_from($arg, \"Linux::Netfilter::Log::Group\")
+		&& SvTYPE(SvRV($arg)) == SVt_PVMG)
+	{
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	}
+	else{
+		croak(\"${Package}::$func_name() -- $var is not a Linux::Netfilter::Log::Group\");
+	}
+
+OUTPUT
+perl_nflog_group
+	sv_setref_pv( $arg, "Linux::Netfilter::Log::Group", (void*)$var );

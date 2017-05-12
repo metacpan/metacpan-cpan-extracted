@@ -1,0 +1,163 @@
+Revision history for Perl extension Lemonldap::NG::Handler.
+
+See http://jira.ow2.org/browse/LEMONLDAP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel&allVersions=true
+for newer revisions
+
+0.91  Mon Jun 29 11:54:02 2009
+	- CDA in core
+	- AuthBasic now use SOAP
+	- POST requests generation (used to post login/password in non
+	  compatible applications)
+	- logs written in PerlLogHandler
+	- Sympa auto login handler
+	- Double session mechanism (1 secured and the other not)
+
+0.9   Thu Dec 25 8:43:55 2008
+	- Configuration now managed by Lemonldap::NG::Common::Conf
+	- Custom functions
+	- Status now couns only past minutes, not current one
+	- Protection management in Handler/CGI
+
+0.89  Mon Aug 25 21:59:34 2008
+	- Bug in default condition: rules are always "deny" or "accept"
+	- More examples
+	- New file : AuthBasic.pm
+
+0.88  Fri jun 6 14:58:41 2008
+	- Status.pm test failed in jail
+
+0.87  Tue may 9 22:32:44 2008
+	- Remove Apache2::compat dependency
+	- New status module
+
+0.86  Mon apr 7 14:52:30 2008
+	- logout bug : logout_sso target was not running (Closes: #308856 /
+	  forge.objectweb.org)
+
+0.85  Fri feb 8 17:50:25 2008
+	- local overload was not taken in account
+	- little bugs in redirections
+
+0.84  Mon Jul 30 21:26:19 2007
+	- New parameter to fix port in redirections.
+
+0.83  Sun Jul 22 22:19:12 2007
+	- New logout system : URL can now be declared in Manager
+	  interface
+
+0.82  Fri Jun 1 6:52:43 2007
+	- Little bug: SharedConf.pm needs Manager::Conf and not Manager
+
+0.81  Fri Apr 15 7:15:56 2007
+	- More tests
+
+0.8   Thu Apr 12 7:08:08 2007
+	- Little bug in unprotect function (Handler::Simple)
+	- New feature: Lemonldap::NG::Handler::CGI
+
+0.77  Wed Mar 22 7:18:48 2007
+	- logout system
+	- $date is now available in rules
+	- Closes bug #306761 / forge.objectweb.org
+
+0.76  Fri Mar 9 7:14:42 2007
+	- Little bug correction
+	- Delete of DBI.pm which is not more in use
+
+0.75  Sat Feb 24 16:36:56 2007
+	- Adding cross-domain-authentication support
+	- local configuration overrides global configuration
+
+0.74  Sun Feb 4 19:27:34 2007
+	- unprotect system documentation
+	- remove warning on Apache-1.3 ($ENV{MOD_PERL_API_VERSION} does not exist)
+
+0.73  Thu Jan 4 15:34:22 2007
+	- In VirtualHost context, PerlInitHandler is an alias for
+	  PerlPostReadRequestHandler. So by encoding characters (%40 for 'a'),
+	  users can bypass some restrictions.
+	  Now PerlInitHandler is replaced by PerlHeaderParserHandler, so
+	  Lemonldap::NG is called after URI translation phase.
+	- Correction of a bug in internal redirections: now internal
+	  redirections are not examined: for example, http://test.example.com/
+	  is internaly redirected to /index.pl, but only the first request (/)
+	  is tested.
+
+0.72  Thu Jan 4 9:24:18 2007
+	- Correction in apache-1.3 configuration example file
+
+0.71  Sun Dec 31 13:47:49 2006
+	- Bug corrections in Vhosts: default header does not work
+	                             Safe does not work because lmSetHeaderIn
+	                                   was not shared
+	- Example correction
+
+0.7   Tue Dec 19 19:09:09 2006
+	- config is now shared with Lemonldap::NG::Manager::Conf
+	- use Safe for locationRules and exportedHeaders 'eval'
+
+0.63  Sun Dec 17 14:54:14 2006
+	- bug corrections
+
+0.621 Tue Dec 5 20:12:12 2006
+	- move Handler.pod to Handler.pm to avoid CPAN bug
+	- remove mod_perl dependency
+
+0.62  Fri Nov 3 8:08:37 2006
+	- correction in documentation
+	- add mod_perl in PREREQ_PM (CPAN tester failed)
+
+0.61  Thu Nov 2 16:53:03 2006
+	- little correction in documentaion
+	- wrong version number in Handler/SharedConf/DBI.pm
+
+0.6   Thu Nov 2 15:16:56 2006
+	- Bug correction in Proxy.pm
+	- New documentation
+	- Handler.pm becomes Handler/Simple.pm
+	- Tested with 40.000 users
+
+0.5   Tue Oct 17 15:35:28 2006
+	- Bug correction in Proxy.pm
+	- First running release under Apache2
+
+0.4   Mon Oct 17 15:00:20 2006
+	- Bug corrections in Apache2 support
+
+0.3   Sat Oct 14 14:54:56 2006
+	- Bug correction in both Apache 1 and 2 support
+
+0.2   Mon Oct 9 17:32:20 2006
+	- Introducing Apache2 support
+
+0.11  Fri Oct 6 17:24:00 2006
+	- bugs corrections
+
+0.1   Thu Oct 5 19:00:00 2006
+	- new package: Lemonldap::NG::Handler::SharedConf::DBI including
+	a complete shared system based on a shared DB
+
+0.06  Thu Jul 13 19:21:00 2006
+	- comments and little correction in Handler.pm
+	- bug correction in SharedConf.pm
+
+0.05  Fri Jul 29 17:32:00 2005
+	- bug correction in Vhost.pm
+
+0.04  Fri Jul 29 16:02:00 2005
+	- bug correction in SharedConf.pm
+
+0.03  Wed Jul 27 21:00:00 2005
+	- bug correction in Handler.pm: &conditionSub returned nothing except
+	for default configuration
+	- modification in SharedConf.pm : adding (undocumented)
+	functionnalities to be able to dinamically update configuration
+
+0.02  Sat Jul 2 10:35:00 2005
+	- bug corrections
+	- Vhost.pm modification: add header personalization per virtual host
+
+0.01  Thu Jun 23 17:36:59 2005
+	- original version; created by h2xs 1.23 with options
+		-AXn Lemonldap::NG::Handler
+

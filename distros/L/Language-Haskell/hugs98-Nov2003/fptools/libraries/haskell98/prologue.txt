@@ -1,0 +1,3 @@
+This package contains the Haskell 98 Standard and FFI Standard Libraries. For
+more information on the Haskell 98 Standard Libraries, please see the Haskell 98
+Library Report, here: <http://www.haskell.org/onlinelibrary/>.

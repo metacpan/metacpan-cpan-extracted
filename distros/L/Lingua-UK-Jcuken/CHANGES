@@ -1,0 +1,3 @@
+#  1.04  2008/02/26 use Encode instead of Text::Iconv
+#  1.02  2007/02/04 Quality update (Test::Pod, Test::Pod::Coverage)
+#  1.01  2006/11/15 Initial revision

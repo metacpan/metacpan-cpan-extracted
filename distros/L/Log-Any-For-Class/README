@@ -1,0 +1,18 @@
+SYNOPSIS
+
+     use Log::Any::For::Class qw(add_logging_to_class);
+     add_logging_to_class(classes => [qw/My::Class My::SubClass/]);
+     # now method calls to your classes are logged, by default at level 'trace'
+
+DESCRIPTION
+
+    Most of the things that apply to Log::Any::For::Package also applies to
+    this module, since this module uses add_logging_to_package() as its
+    backend.
+
+SEE ALSO
+
+    Log::Any::For::Package
+
+    Log::Any::For::DBI, an application of this module.
+

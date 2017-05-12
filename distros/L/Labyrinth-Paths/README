@@ -1,0 +1,30 @@
+Labyrinth-Paths
+==============
+
+Allow Labyrinth to manipulate given CGI paths into internal variables.
+
+INSTALLATION
+
+See the INSTALL file for full instructions.
+
+DEPENDENCIES
+
+The Labyrinth-Paths distribution requires the following Perl modules to be 
+installed:
+
+  JSON::XS
+  Labyrinth
+  Labyrinth::Variables
+
+AUTHOR
+
+  Barbie, <barbie@missbarbell.co.uk> for Miss Barbell Productions,
+  <http://www.missbarbell.co.uk/>
+
+COPYRIGHT & LICENSE
+
+  Copyright (C) 2015 Barbie for Miss Barbell Productions
+  All Rights Reserved.
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic License 2.0.

@@ -1,0 +1,170 @@
+#!perl
+#
+# This mkheader script makes two C header files,
+# $FmH_File and $ToH_File (see below their values).
+# These files are used to build Lingua::JA::MacJapanese.
+#
+use 5.006001;
+use Carp;
+use strict;
+use warnings;
+
+my $MapFile  = "japanese.map";
+my $AddFile  = "addition.map";
+my $EncName  = 'macja';
+
+###################
+
+my $TypeSC = "struct mbc_contra";
+my $TypeBC = 'STDCHAR'; # byte string
+my $TypeMC = 'U16';     # multibyte char
+my $TypeWC = 'U16';     # Unicode scalar value
+my $TypeSL = 'U8';      # length of Unicode sequence from a multibyte char
+
+my $FmH_File = "fm${EncName}.h";
+my $ToH_File = "to${EncName}.h";
+
+my (%FmMbc, %ToMbc, %ToMbcC, %Contra);
+
+sub qstring {
+    return sprintf '"%s"', join '', map sprintf("\\x%02x", $_), @_;
+}
+
+sub split_into_char {
+    use bytes;
+    my $uni = pack('U*', @_);
+    my $len = length($uni);
+    my @ary;
+    for(my $i = 0; $i < $len; ++$i) {
+	push @ary, ord(substr($uni,$i,1));
+    }
+    return @ary;
+}
+
+###################
+
+for my $f ($AddFile, $MapFile) {
+    open IN, "<$f" or die "$f $!";
+    binmode IN;
+
+    while (<IN>) {
+	next if /^#/;
+	next if /^\s*$/;
+
+	my @t = split;
+	my $mc = hex $t[0];
+	next if ! $t[1];
+
+	my @uv = map hex, split /\+/, $t[1];
+
+	for my $u (@uv) {
+	    $u > 0xffff and die "$u > 0xffff in $u";
+	}
+
+	if ($f eq $MapFile) {
+	    my($lb,$tb) = unpack('CC', pack 'n', $mc);
+	    $FmMbc{$lb}{$tb} = [ @uv ];
+	}
+
+	if (@uv == 1) {
+	    my($row,$cel) = unpack('CC', pack 'n', $uv[0]);
+	    $ToMbc{$row}{$cel} = $mc;
+	}
+	else {
+	    my $base = shift @uv;
+	    my($row,$cel) = unpack('CC', pack 'n', $base);
+	    $ToMbcC{$row}{$cel} ++;
+	    push @{ $Contra{$base} }, [ $mc, split_into_char(@uv) ];
+	}
+    }
+    close IN or die "$f can't be closed.\n";
+}
+
+###################
+
+open FM, ">$FmH_File" or die "$FmH_File $!" or die;
+binmode FM;
+
+foreach my $lb (sort { $a <=> $b } keys %FmMbc) {
+    print FM "$TypeBC* fm_${EncName}_${lb} [256] = {\n";
+    for (my $tb = 0; $tb < 256; $tb++) {
+	my @uv = defined $FmMbc{$lb}{$tb} ? @{ $FmMbc{$lb}{$tb} } : ();
+	my @c = split_into_char(@uv);
+	my $str = qstring(@c);
+	my $len = @c;
+	print FM @uv ? "\t($TypeBC*)$str" : "\tNULL";
+	print FM ','  if $tb != 255;
+	print FM "\n" if $tb % 8 == 7;
+    }
+    print FM "};\n\n";
+}
+
+print FM "$TypeBC** fm_${EncName} [256] = {\n";
+for (my $lb = 0; $lb < 256; $lb++) {
+    print FM defined $FmMbc{$lb} ? "fm_${EncName}_$lb" : "NULL";
+    print FM ','  if $lb != 255;
+    print FM "\n" if $lb % 4 == 3;
+}
+print FM "};\n\n";
+
+close FM or die "$FmH_File can't be closed.\n";
+
+###################
+
+open TO, ">$ToH_File" or die "$ToH_File $!" or die;
+binmode TO;
+
+print TO "$TypeSC { $TypeSL len; $TypeBC* string; $TypeMC mchar; };\n\n";
+
+foreach my $uv (sort { $a <=> $b } keys %Contra) {
+    my @list = sort { @$b <=> @$a } @{ $Contra{$uv} };
+			# ordered from longest
+
+    print TO "$TypeSC to_${EncName}_u${uv}_contra [] = {\n";
+    foreach my $ele (@list) {
+	my ($mc, @c) = @$ele;
+	my $str = qstring(@c);
+	my $len = @c;
+	print TO "\t{ ($TypeSL)$len, ($TypeBC*)$str, ($TypeMC)$mc },\n";
+    }
+    print TO "{0,NULL,0}\n};\n\n";
+}
+
+foreach my $suffix ("", "_contra") {
+    my $hash = $suffix ?  \%ToMbcC : \%ToMbc;
+    my $type = $suffix ? "$TypeSC*" : $TypeMC;
+
+    foreach my $row (sort { $a <=> $b } keys %$hash) {
+	print TO "$type to_${EncName}_${row}${suffix} [256] = {\n";
+	for (my $cel = 0; $cel < 256; $cel++) {
+	    my $uv = $row * 256 + $cel;
+	    if ($suffix) {
+		printf TO "\t%s",
+		    defined $hash->{$row}{$cel}
+			? "to_${EncName}_u${uv}_contra"
+			: "NULL";
+	    } else {
+		printf TO "\t%d",
+		    defined $hash->{$row}{$cel} ? $hash->{$row}{$cel} : 0;
+	    }
+	    print TO ','  if $cel != 255;
+	    print TO "\n" if $cel % 8 == 7;
+	}
+	print TO "};\n\n";
+    }
+
+    print TO "$type* to_${EncName}${suffix} [256] = {\n";
+    for (my $row = 0; $row < 256; $row++) {
+	print TO "\t", defined $hash->{$row}
+	    ? "to_${EncName}_${row}${suffix}" : "NULL";
+	print TO ','  if $row != 255;
+	print TO "\n" if $row % 8 == 7;
+    }
+    print TO "};\n\n\n";
+}
+
+close TO or die "$ToH_File can't be closed.\n";
+
+1;
+__END__
+

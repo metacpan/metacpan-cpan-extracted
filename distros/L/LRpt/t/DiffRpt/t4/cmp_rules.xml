@@ -1,0 +1,20 @@
+<comparing_rules>
+    <sales>
+        <sonum   if_no_value = "skip_and_warn" />
+        <stor_id if_no_value = "skip_and_warn" />
+        <ponum   if_no_value = "use_default" 
+                 default = "DFLTV" />
+        <sdate   if_no_value = "use_default_and_warn" 
+                 default = "DFLTVW" />
+    </sales>
+    <titleauthors>
+        <au_id    if_no_value = "skip_and_warn" />
+        <title_id if_no_value = "skip_and_warn" />
+        <au_ord   if_no_value = "skip" />
+        <royaltyshare if_no_value = "use_default_and_warn"
+                      default = "TDFLT" />
+    </titleauthors>
+</comparing_rules>
+
+
+

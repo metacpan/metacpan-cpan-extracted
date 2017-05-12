@@ -1,0 +1,189 @@
+NAME
+    LinkEmbedder - Embed / expand oEmbed resources and other URL / links
+
+SYNOPSIS
+      use LinkEmbedder;
+
+      my $embedder = LinkEmbedder->new;
+      my $link     = $embedder->get("http://xkcd.com/927");
+      print $link->html;
+
+DESCRIPTION
+    LinkEmbedder is a module that can expand an URL into a rich HTML snippet
+    or simply to extract information about the URL.
+
+    Note that this module is currently EXPERIMENTAL. It will replace
+    Mojolicious::Plugin::LinkEmbedder when it gets stable.
+
+    These web pages are currently supported:
+
+    * <http://imgur.com/>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=http://imgur.com/galler
+      y/ohL3e>
+
+    * <https://instagram.com/>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=https://www.instagram.c
+      om/p/BSRYg_Sgbqe/>
+
+      Instagram need some additional JavaScript. Please look at
+      <https://github.com/jhthorsen/linkembedder/blob/master/examples/embedd
+      er.pl> and <https://www.instagram.com/developer/embedding/> for more
+      information.
+
+    * <https://appear.in/>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=https://appear.in/link-
+      embedder-demo>
+
+    * <https://gist.github.com>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=https://gist.github.com
+      /jhthorsen/3738de6f44f180a29bbb>
+
+    * <https://github.com>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=https://github.com/jhth
+      orsen/linkembedder/blob/master/t/basic.t>
+
+    * <https://ix.io>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=http://ix.io/fpW>
+
+    * <https://maps.google.com>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=https%3A%2F%2Fwww.googl
+      e.no%2Fmaps%2Fplace%2FOslo%2C%2BNorway%2F%4059.8937806%2C10.645035…m4!
+      1s0x46416e61f267f039%3A0x7e92605fd3231e9a!8m2!3d59.9138688!4d10.752245
+      4>
+
+    * <https://metacpan.org>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=https://metacpan.org/po
+      d/Mojolicious>
+
+    * <http://paste.opensuse.org>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=http://paste.opensuse.o
+      rg/2931429>
+
+    * <http://paste.scsys.co.uk>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=http://paste.scsys.co.u
+      k/557716>
+
+    * <http://pastebin.com>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=https://pastebin.com/V5
+      gZTzhy>
+
+    * <https://www.spotify.com/>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=spotify:track:0aBi2bHHO
+      f3ZmVjt3x00wv>
+
+    * <https://ted.com>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=https://www.ted.com/tal
+      ks/jill_bolte_taylor_s_powerful_stroke_of_insight>
+
+    * <https://travis-ci.org>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=https://travis-ci.org/N
+      ordaaker/convos/builds/47421379>
+
+    * <https://twitter.com>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=https://twitter.com/jht
+      horsen/status/786688349536972802>
+
+      Twitter need some additional JavaScript. Please look at
+      <https://github.com/jhthorsen/linkembedder/blob/master/examples/embedd
+      er.pl> and <https://dev.twitter.com/web/javascript/initialization> for
+      more information.
+
+    * <https://vimeo.com>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=https://vimeo.com/15403
+      8415>
+
+    * <https://youtube.com>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=https%3A%2F%2Fwww.youtu
+      be.com%2Fwatch%3Fv%3DOspRE1xnLjE>
+
+    * <https://www.xkcd.com/>
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=http://xkcd.com/927>
+
+    * HTML
+
+      Any web page will be parsed, and "og:", "twitter:", meta tags and
+      other significant elements will be used to generate a oEmbed response.
+
+      Example:
+      <http://home.thorsen.pm/demo/link-embedder?url=http://www.aftenposten.
+      no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-61779
+      4b.html>
+
+    * Images
+
+      URLs that looks like an image is automatically converted into an img
+      tag.
+
+    * Video
+
+      URLs that looks like a video resource is automatically converted into
+      a video tag.
+
+ATTRIBUTES
+  ua
+      $ua = $self->ua;
+
+    Holds a Mojo::UserAgent object.
+
+  url_to_link
+      $hash_ref = $self->url_to_link;
+
+    Holds a mapping between host names and link class to use.
+
+METHODS
+  get
+      $self = $self->get($url, sub { my ($self, $link) = @_; });
+      $link = $self->get($url);
+
+    Used to construct a new LinkEmbedder::Link object and retrieve
+    information about the URL.
+
+  serve
+      $self = $self->serve(Mojolicious::Controller->new, $url);
+
+    Used as a helper for Mojolicious web applications to reply to an oEmbed
+    request.
+
+AUTHOR
+    Jan Henning Thorsen
+
+COPYRIGHT AND LICENSE
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+

@@ -1,0 +1,52 @@
+Lingua::Translate version 0.08
+==============================
+
+This module performs natural language translation using Babelfish
+(http://altavista.babelfish.com/) or Systran (http://www.systran.org/)
+
+If the test suite (`make test') fails, it may be because Babelfish is
+overloaded, down or unreachable.  I'm in two minds as to whether or
+not this is a bug :-).  Given that most users won't have a configured
+SysTran server available, the test script for that works in a
+different way and doesn't have the same problem.
+
+Note: this module hasn't been tested with the real version of the
+SysTrans translation software in a long time, it is quite possible
+that the software has changed in an incompatible way since this module
+was written.  In particular, the server at the time assumed an
+ISO-8859-1 character encoding, so won't work with non-European
+languages.  However, the babelfish server works fine.
+
+INSTALLATION
+
+To install this module, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Core Functionality:
+   Pod::Constants, 0.15 or later.
+   Unicode::MapUTF8
+
+Lingua::Translate::Babelfish backend:
+   LWP::UserAgent
+
+Lingua::Translate::SysTran backend:
+   IO::Socket::INET (standard)
+
+The module will cope without Unicode::MapUTF8, but no attempt will be
+made to convert strings passed to and from the back end - the
+Babelfish back-end uses UTF-8, whereas the SysTran back-end uses
+ISO-8859-1.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002, 2004, 2005, Sam Vilain.  All rights reserved.
+This module is free software; you may use it under the same terms as
+Perl itself.

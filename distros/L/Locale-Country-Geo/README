@@ -1,0 +1,48 @@
+NAME
+    Locale::Country::Geo - Module for country geographic location data
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        use Locale::Country::Geo;
+        my ($lat, $lon) = Locale::Country::Geo->geolocation('tw');
+
+METHODS
+  geolocation
+AUTHOR
+    clkao, "<clkao at clkao.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-locale-country-geo at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Locale-Country-Geo>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Locale::Country::Geo
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Locale-Country-Geo>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Locale-Country-Geo>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Locale-Country-Geo>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Locale-Country-Geo>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2007 clkao, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,23 @@
+Revision history for Perl extension Linux-Socket-Accept4
+
+0.05 2015-01-18T02:27:08Z
+    - Support FreeBSD(10.0 or higher). Thanks maxatome.
+      (syohex)
+
+0.04 2014-11-17T04:38:27Z
+    - Fixed SV type issue for older Perl(< 5.11)
+      (syohex)
+
+0.03 2014-11-10T12:26:28Z
+    - Fixed memory leak issue
+      (kazeburo)
+
+0.02 2013-10-05T09:32:00Z
+
+    - Fixed configuration issue
+      (syohex)
+
+0.01 2013-10-04T06:28:22Z
+
+    - original version
+

@@ -1,0 +1,44 @@
+Labyrinth-Plugin-Survey
+=======================
+
+Labyrinth is a Website Management Framework. This distribution enables Labyrinth
+to manage access to the YAPC Surveys databases and data for various YAPC and 
+Perl Workshop events throughout the year.
+
+These first few releases are based on several improvements made during the 
+early part of 2014. This is still progressing, however, the code is stable
+enough now to be reused.
+
+Improvements will come in the form of:
+
+1) migrating the toolkit scripts code into modules (this has started with the
+   Act::API module, but more is to be done).
+2) make more use of config files for dates, rooms, etc.
+3) more documentation.
+4) more tests.
+5) more API calls to/from Act.
+6) more API calls from other sources.
+
+If you would like to help in any of the above, please use RT or GitHub to
+post bugs, patches and pull requests.
+
+INSTALLATION
+
+See the INSTALL file for full instructions.
+
+DEPENDENCIES
+
+  Labyrinth
+
+AUTHOR
+
+  Barbie, <barbie@missbarbell.co.uk> for Miss Barbell Productions,
+  <http://www.missbarbell.co.uk/>
+
+COPYRIGHT & LICENSE
+
+  Copyright (C) 2006-2014 Barbie for Miss Barbell Productions
+  All Rights Reserved.
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic License 2.0.

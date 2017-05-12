@@ -1,0 +1,7 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Lingua/DEU/Num2Word.pm
+t/Num2Word.t

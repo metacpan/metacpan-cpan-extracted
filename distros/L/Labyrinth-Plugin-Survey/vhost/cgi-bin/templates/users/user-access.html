@@ -1,0 +1,46 @@
+<h2>Member Access</h2>
+
+<div class="boxer">
+<table class="blocker">
+        <tr><td valign="top">User</td>
+            <td valign="top">&nbsp;</td>
+            <td valign="top">[% nickname %] / [% realname %]</td>
+        </tr>
+        <tr><td valign="top">Base Access</td>
+            <td valign="top">&nbsp;</td>
+            <td valign="top">[% baseaccess %]</td>
+        </tr>
+</table>
+</div>
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name='act' value='user-groups' />
+<input type="hidden" name='userid' value="[% data.userid %]" />
+
+<div class="boxer">
+<table class="blocker">
+        <tr><td class="blockhead" valign="top">Group</td>
+            <td class="blockhead" valign="top">Access</td>
+            <td class="blockhead" valign="top">Actions</td>
+        </tr>
+
+[% FOREACH item = primary %]
+        <tr><td valign="top">[% item.groupname %]</td>
+            <td valign="top">[% item.ddaccess %]</td>
+            <td valign="top"><a href="[% cgipath %]/pages.cgi?act=user-delgrp&amp;indexid=[% item.indexid %]">Delete</a></td>
+        </tr>
+[% END %]
+
+<tr><td><hr /></td></tr>
+
+[% FOREACH item = secondary %]
+        <tr><td valign="top">[% item.groupname %]</td>
+            <td valign="top">[% item.ddaccess %]</td>
+            <td valign="top"><a href="[% cgipath %]/pages.cgi?act=user-delgrp&amp;indexid=[% item.indexid %]">Delete</a></td>
+        </tr>
+[% END %]
+</table>
+</div>
+
+<p align="center"><input type="submit" name="submit" value='UPDATE' /></p>
+</form>

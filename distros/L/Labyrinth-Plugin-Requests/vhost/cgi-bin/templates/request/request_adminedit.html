@@ -1,0 +1,66 @@
+[%
+    IF data.requestid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Request' ;
+
+    crumb2_name = 'Request' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=req-admin' ;
+    crumb1_name = editmode ;
+%]
+
+[% IF user.access > 4 ; THEN ; master = 1 ; END %]
+
+<form action="[% cgipath %]/pages.cgi" method="post">
+<input type="hidden" name="act" value="req-save" />
+<input type="hidden" name="requestid" value="[% data.requestid %]" />
+<input type="hidden" name='doaction' value='' />
+<input type="hidden" name="recordid" value='' />
+
+[% IF thanks %]<p>Request saved successfully.[% END %]
+<p>Fields marked * are mandatory fields and must be completed. Fields marked + are optional fields, but at least one must be completed.</p>
+
+[% IF errmess %]
+[% IF errmess == 1 %]
+<p class="alert">There are invalid or missing fields, as noted by the <span class="red">&empty;</span> symbol.</p>
+[% ELSE %]
+<p class="alert">[% errmess %]</p>
+[% END %]
+[% END %]
+
+<div class="box">
+<table class="blocker">
+<tr><th>Section *</th>
+    <th class="alert">[% date.section_err %]</th>
+    <td><input type="text" name="section" size="32" value="[% data.section %]" /></td></tr>
+<tr><th>Command *</th>
+    <th class="alert">[% date.command_err %]</th>
+    <td><input type="text" name="command" size="32" value="[% data.command %]" /></td></tr>
+<tr><th>Actions</th>
+    <th class="alert">[% date.actions_err %]</th>
+    <td><input type="text" name="actions" size="32" value="[% data.actions %]" /></td></tr>
+<tr><th>Layout +</th>
+    <th class="alert">[% date.layout_err %]</th>
+    <td><input type="text" name="layout" size="32" value="[% data.layout %]" /></td></tr>
+<tr><th>Content +</th>
+    <th class="alert">[% date.content_err %]</th>
+    <td><input type="text" name="content" size="32" value="[% data.content %]" /></td></tr>
+<tr><th>OnSuccess +</th>
+    <th class="alert">[% date.onsuccess_err %]</th>
+    <td><input type="text" name="onsuccess" size="32" value="[% data.onsuccess %]" /></td></tr>
+<tr><th>OnError +</th>
+    <th class="alert">[% date.onerror_err %]</th>
+    <td><input type="text" name="onerror" size="32" value="[% data.onerror %]" /></td></tr>
+<tr><th>OnFailure +</th>
+    <th class="alert">[% date.onfailure_err %]</th>
+    <td><input type="text" name="onfailure" size="32" value="[% data.onfailure %]" /></td></tr>
+<tr><th>Secure</th>
+    <th class="alert">[% data.secure_err %]</th>
+    <td>[% data.ddsecure %]</td></tr>
+<tr><th>Rewrite</th>
+    <th class="alert">[% date.rewrite_err %]</th>
+    <td><input type="text" name="rewrite" size="32" value="[% data.rewrite %]" /></td></tr>
+</table>
+</div>
+
+<p class="smalltext"><input type="submit" value='Save Request' />
+
+</form>

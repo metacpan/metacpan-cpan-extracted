@@ -1,0 +1,50 @@
+Copyright (C) 2014-2017 by Marian HackMan Marinov
+
+Linux-Setns
+========================
+
+setns is used to change the current namespace of the process by specifying a file descriptor to a currently available namespace.
+
+So you must provide a file descriptor and a type (CLONE_ALL, CLONE_NEWIPC, CLONE_NEWNET, CLONE_NEWPID, CLONE_NEWUSER, CLONE_NEWUTS and CLONE_NEWCGROUP).
+
+On successfull execution your process will now be in the desired namespace.
+In case of failure, error message is printed to STDOUT.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module does not require any 3rd party libraries, but it does require your machine to have SYS_setns in <sys/syscall.h> for build.
+And also it requires fairly recent kernel to work.
+
+The interface to setns() changed between 0.05 and 1.00.
+
+Version before 1.00 does not work on machines with older glibc.
+
+CLONE_NEWCGROUP is available only on 4.6 and newer kernels.
+
+BUGS AND SUGGESTIONS
+	contact me at hackman at cpan.org
+
+REPOSITORY
+	http://github.com/hackman/linux-setns
+
+COPYRIGHT AND LICENCE
+
+This code is under GPLv2.
+A proper copy of the license can be found in the LICENSE file located in the current directory.
+
+Copyright (C) 2014-2017 by Marian HackMan Marinov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

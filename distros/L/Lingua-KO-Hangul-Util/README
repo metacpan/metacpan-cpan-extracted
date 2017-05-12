@@ -1,0 +1,55 @@
+Lingua/KO/Hangul/Util version 0.27
+==================================
+
+SYNOPSIS
+
+  use Lingua::KO::Hangul::Util qw(:all);
+
+  decomposeSyllable("\x{AC00}");          # "\x{1100}\x{1161}"
+  composeSyllable("\x{1100}\x{1161}");    # "\x{AC00}"
+  decomposeJamo("\x{1101}");              # "\x{1100}\x{1100}"
+  composeJamo("\x{1100}\x{1100}");        # "\x{1101}"
+
+  getHangulName(0xAC00);                  # "HANGUL SYLLABLE GA"
+  parseHangulName("HANGUL SYLLABLE GA");  # 0xAC00
+
+INSTALLATION
+
+Perl 5.6.1 or later is required.
+Perl 5.8.1 or later is recommended.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you have a C compiler and want to use XSUB,
+type the following (!! "enableXS" must run before "Makefile.PL" !!):
+
+   perl enableXS
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you decide to install pure Perl (i.e. non-XS) after trying
+to build XSUB, type the following:
+
+   make clean
+   perl disableXS
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENSE
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+
+Copyright(C) 2001, 2003, 2005, SADAHIRO Tomoyuki. Japan.
+All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

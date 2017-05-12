@@ -1,0 +1,26 @@
+Changes
+lib/Lingua/PT/PLNbase.pm
+Makefile.PL
+MANIFEST
+README
+t/00_segmenter1.t
+t/00_segmenter2.t
+t/01_tokenizer1.t
+t/01_tokenizer2.t
+t/01_tokenizer3.t
+t/02_accents.t
+t/03_fsegmenter1.t
+t/ftext1
+t/ftext1.out1
+t/ftext1.out2
+t/tests.tok
+t/tests2.tok
+t/tok3.abr
+t/tests3.tok
+t/ftext1.out3
+t/ftext1.out4
+META.yml                                 Module meta-data (added by MakeMaker)
+scripts/sentences
+t/pod-coverage.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

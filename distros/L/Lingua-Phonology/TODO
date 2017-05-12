@@ -1,0 +1,52 @@
+Wishlist from 0.01:
+
+* Have better handling of suprasegmentals, rather than the hackish,
+unintuitive way it's done now. Ideally, we should be able to specify which
+segment is the head of a suprasegmental group (like a syllable or foot),
+and let the suprasegment have properties of its own unrelated to the
+segments beneath it.
+
+* Provide a library of functions to be used in rules. These should provide
+simple implementations of common linguistic processes, like assimilate(),
+dissimilate(), etc. [Implemented in 0.11]
+
+* Someday in the far future, add Optimality Theory to the module.
+
+=============================
+
+Wishlist from 0.11:
+
+* Allow users to define their own codereferences for number_form and text_form
+in Features
+
+* Improve the Rules module for speed. Avoid the current bad implementation of
+deleting and altering segments.
+
+* Improve the Symbols module for speed. [Implemented in 0.2]
+
+* Rewrite the defaults for Features and Symbols so that we don't need the
+open_defaults function anymore (why didn't I just do this in the first place?).
+[Implemented in 0.2]
+
+* Allow for diacritics in the Symbols module. [Implemented in 0.2]
+
+* Create a shell mode(?).
+
+* Create a loadfile method for Rules. This will be a major challenge, given the
+complexity of a rule. [Implemented in 0.3]
+
+==============================
+
+Wishlist from 0.2:
+
+* Most of the things from 0.11 are still unimplemented (and perhaps should stay that way?)
+
+=============================
+
+Wishlist from 0.3:
+
+* Have a better way to handle segments in rules
+
+* Expand the capabilities of the linguistic rules parser (include variables)
+
+* Speed up the Rules module

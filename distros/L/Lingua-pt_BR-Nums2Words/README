@@ -1,0 +1,57 @@
+NAME
+    Lingua::pt_BR::Nums2Words - Takes a number and gives back its written
+    form in Brazilian Portuguese
+
+SYNOPSIS
+      use Lingua::pt_BR::Nums2Words ('num2word');
+
+      print num2word(91)        # prints 'noventa e um'
+      print num2word('19')      # prints 'dezenove'
+
+      print num2word(1000)      # prints 'mil'
+      print num2word(1001)      # prints 'mil e um'
+      print num2word(1_001_001) # prints 'um milhão, mil e um'
+      print num2word(1_001_250) # prints 'um milhão, mil duzentos e cinquenta'
+
+DESCRIPTION
+    Takes a number and gives back its written form in Brazilian Portuguese.
+
+    Note: 1000 will produce 'mil', and not 'um mil'.
+
+METHODS
+  num2word( $number )
+    Receives a number and returns it written in words.
+
+        my $written_number = nums2words(991);
+        print $written_number        # prints 'novecentos e noventa e um'
+
+INTERNALS
+    These methods should not be used directly (unless you know what you're
+    doing). They are documented here just for the sake of completeness.
+
+  _make_triads( $number )
+    Receives a number, splits it in triads (according to the following
+    examples) and returns a list of triads. Examples: 123 turns to the list
+    (123). 12345 turns to the list (12, 345). 1234567 turns to the list (1,
+    234, 567).
+
+  _solve_triads( @triads )
+    Receives a list of triads, calls the function _solve_triad in each of
+    them and apply the "megas" (millions, billions, trillions).
+
+  _solve_triad( $number )
+    Receives a number with one to three digits (a triad) and returns it
+    written in words.
+
+SEE ALSO
+    Lingua::PT::Nums2Words for pt_PT Portuguese.
+
+AUTHOR
+    Gil Magno <gils@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2015 by Gil Magno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.20.1 or, at
+    your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,47 @@
+=============================
+Changes from v0.34 to 0.35
+* Removed the graph() method from Features.pm
+* Removed the experimental result property of Rules.pm
+
+=============================
+Changes from v0.3 to 0.32
+* Added ability to load linguistic rules with add_rule
+* Added Word.pm to make rules more robust
+* Made the linguistic rule grammar stricter
+* Added more tests
+* Fixed documentation bugs
+
+=============================
+Changes from v0.25 to 0.3
+* Added loadfile() methods to all major classes with XML support
+* Added Common.pm
+* Added RuleParser.pm
+* Reworked Segment class heirarchy
+* Modified the Symbols::spell algorithm
+* Expanded test suite
+* Fixed innumerable small bugs
+
+=============================
+Changes from v0.2 to v0.25
+* Resolved conflicts between Syllable.pm and Rules.pm 
+* Added RuleSegment.pm
+* Added two minor methods to the Syllable class
+
+=============================
+Changes from v0.11 to 0.2
+* Removed Defaults.pm
+* Removed files default.features and default.segments (now included with their modules)
+* Added Boundary.pm
+* Modified the spelling algorithm for better speed (75%-125% better, in fact)
+* Added new symbols to the default set
+* Various minor documentation fixes
+* Various other code tweaks
+
+=============================
+Changes from v0.01 to v0.11
+* Added Syllable.pm
+* Added Functions.pm
+* Modified the rule algorithm for better speed
+* Added new features and symbols
+* Updated/edited documentation
+* Vastly expanded the test suite

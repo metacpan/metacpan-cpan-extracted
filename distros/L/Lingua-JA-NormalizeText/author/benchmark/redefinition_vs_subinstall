@@ -1,0 +1,54 @@
+Perl Ver.: v5.18.1
+ok 1
+ok 2
+1..2
+                 Rate redefinition   subinstall
+redefinition 162218/s           --         -55%
+subinstall   362123/s         123%           --
+
+
+Perl Ver.: v5.18.1
+ok 1
+ok 2
+1..2
+                 Rate redefinition   subinstall
+redefinition 286347/s           --         -15%
+subinstall   338115/s          18%           --
+
+
+Perl Ver.: v5.18.1
+ok 1
+ok 2
+1..2
+                 Rate redefinition   subinstall
+redefinition 218452/s           --          -9%
+subinstall   238933/s           9%           --
+
+
+Perl Ver.: 
+ok 1
+ok 2
+1..2
+                 Rate redefinition   subinstall
+redefinition 260905/s           --         -26%
+subinstall   352748/s          35%           --
+
+
+Perl Ver.: 
+ok 1
+ok 2
+1..2
+                 Rate redefinition   subinstall
+redefinition 193730/s           --         -35%
+subinstall   295821/s          53%           --
+
+
+Perl Ver.: 
+ok 1
+ok 2
+1..2
+                 Rate redefinition   subinstall
+redefinition 135993/s           --         -49%
+subinstall   267338/s          97%           --
+
+

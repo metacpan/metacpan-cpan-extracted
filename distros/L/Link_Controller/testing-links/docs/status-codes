@@ -1,0 +1,51 @@
+The negociation with the server can be very strange becuase servers
+can lie and because it isn't always clear what to do.  
+
+	When something starts to require payment 
+	(generally warn because people will probably want to switch
+	their links over to a free source of the same information)
+
+	When something says unauthorised
+	(some servers don't like to say which is which)
+
+As for the rest, I'm not too sure what all of them mean.. 
+
+
+	       100 => 'Continue',
+	       101 => 'Switching Protocols',
+pass	       200 => 'OK',
+pass	       201 => 'Created',
+pass (strange) 202 => 'Accepted',
+pass (warn?)   203 => 'Non-Authoritative Information',
+fail	       204 => 'No Content',
+pass	       205 => 'Reset Content',
+pass	       206 => 'Partial Content',
+pass	       300 => 'Multiple Choices',
+redirect       301 => 'Moved Permanently',
+pass (warn?)   302 => 'Moved Temporarily',
+redirect       303 => 'See Other',
+pass (strange) 304 => 'Not Modified',
+pass (warn)    305 => 'Use Proxy',
+fail	       400 => 'Bad Request',
+fail (warn)    401 => 'Unauthorized',
+fail/ (warn)   402 => 'Payment Required',
+fail	       403 => 'Forbidden',
+fail	       404 => 'Not Found',
+fail	       405 => 'Method Not Allowed',
+fail	       406 => 'Not Acceptable',
+fail?	       407 => 'Proxy Authentication Required',
+retry->fail    408 => 'Request Timeout',
+fail?	       409 => 'Conflict',
+fail?	       410 => 'Gone',
+fail	       411 => 'Length Required',
+fail	       412 => 'Precondition Failed',
+fail	       413 => 'Request Entity Too Large',
+fail	       414 => 'Request-URI Too Large',
+pass (warn)    415 => 'Unsupported Media Type',
+fail (warn)    500 => 'Internal Server Error',
+fail (warn)    501 => 'Not Implemented',
+fail? (warn)   502 => 'Bad Gateway',
+fail->retry?   503 => 'Service Unavailable',  #can mean too busy??
+fail	       504 => 'Gateway Timeout',
+fail (warn)    505 => 'HTTP Version Not Supported',
+

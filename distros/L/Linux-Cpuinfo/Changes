@@ -1,0 +1,58 @@
+Revision history for Perl extension Linux::Cpuinfo.
+
+0.01  Sun Jun 17 12:38:49 2001
+	- original version; created by h2xs 1.21 with options
+		-AXn Linux::Cpuinfo -b 5.5.3
+
+1.1   Sun Jun 17 13:22:33 BST 2001
+         Released version.
+
+1.2   Sun Jun 17 22:28:47 BST 2001
+         Had totally cocked up and forgot most of the documentation
+
+1.3   Tue Sep 11 08:15:06 BST 2001
+          
+         * Proper support for SMP thanks to Tels
+         * Tests against various CPUs thanks to various people
+         * Start of attempt to document for more processors 
+
+1.4    Tue Jan 29 21:48:31 GMT 2002
+
+         * Fixed subtleties caused by not closing CPUINFO
+
+1.5    Mon Jun 10 13:16:40 BST 2002
+
+         * Allowed control of whether the attribute accessors croak or
+           return undef if the attribute is not present in the CPU
+
+1.6   Thu Jun 24 16:36:14 BST 2004
+
+         * Fixed typo in the example of num_cpus
+
+1.7   Mon Sep 27 13:08:44 BST 2004
+
+         * Changes from Tels
+         * Reorganized source and tests
+
+1.8	Sat Oct 26 21:10:31 BST 2013
+
+	      * Change email address
+         * Add github details for a more sharing decade
+
+1.9	Sun 31 Aug 16:28:09 BST 2014
+	 
+	      * Fix the signature
+
+1.10	Sun 31 Aug 17:00:08 BST 2014
+
+	      * Skip those stupid generated meta files
+
+1.11  Sun  7 Jun 15:16:18 BST 2015
+
+			* Test against all know cpuinfos
+			* use 'our' instead of 'use vars'
+			* Backport fix for dodgy arm kernels from p6 version
+
+1.12  Sun  7 Jun 16:08:13 BST 2015
+
+			* Remove signature check

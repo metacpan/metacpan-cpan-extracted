@@ -1,0 +1,51 @@
+<math xmlns="http://www.w3.org/1998/Math/MathML" id="p2.m1" class="ltx_Math" alttext="1+2=3" display="inline">
+  <semantics>
+    <apply id="p2.m1.7" xref="p2.m1.7.pmml">
+      <eq id="p2.m1.1" xref="p2.m1.1.pmml"/>
+      <apply id="p2.m1.5" xref="p2.m1.5.pmml">
+        <plus id="p2.m1.2" xref="p2.m1.2.pmml"/>
+        <cn type="integer" id="p2.m1.3" xref="p2.m1.3.pmml">1</cn>
+        <cn type="integer" id="p2.m1.4" xref="p2.m1.4.pmml">2</cn>
+      </apply>
+      <cn type="integer" id="p2.m1.6" xref="p2.m1.6.pmml">3</cn>
+    </apply>
+    <annotation-xml encoding="application/openmath+xml">
+      <OMOBJ xmlns="http://www.openmath.org/OpenMath">
+        <OMA>
+          <OMS cd="latexml" name="equals"/>
+          <OMA>
+            <OMS cd="latexml" name="plus"/>
+            <OMI>1</OMI>
+            <OMI>2</OMI>
+          </OMA>
+          <OMI>3</OMI>
+        </OMA>
+      </OMOBJ>
+    </annotation-xml>
+    <annotation-xml encoding="MathML-Presentation">
+      <mrow id="p2.m1.7.pmml" xref="p2.m1.7">
+        <mrow id="p2.m1.5.pmml" xref="p2.m1.5">
+          <mn id="p2.m1.3.pmml" xref="p2.m1.3">1</mn>
+          <mo id="p2.m1.2.pmml" xref="p2.m1.2">+</mo>
+          <mn id="p2.m1.4.pmml" xref="p2.m1.4">2</mn>
+        </mrow>
+        <mo id="p2.m1.1.pmml" xref="p2.m1.1">=</mo>
+        <mn id="p2.m1.6.pmml" xref="p2.m1.6">3</mn>
+      </mrow>
+    </annotation-xml>
+    <annotation-xml encoding="application/x-latexml">
+      <XMath xmlns="http://dlmf.nist.gov/LaTeXML">
+        <XMApp id="p2.m1.7.xm" fragid="p2.m1.7.xm">
+          <XMTok meaning="equals" role="RELOP" id="p2.m1.1.xm" fragid="p2.m1.1.xm">=</XMTok>
+          <XMApp id="p2.m1.5.xm" fragid="p2.m1.5.xm">
+            <XMTok meaning="plus" role="ADDOP" id="p2.m1.2.xm" fragid="p2.m1.2.xm">+</XMTok>
+            <XMTok meaning="1" role="NUMBER" id="p2.m1.3.xm" fragid="p2.m1.3.xm">1</XMTok>
+            <XMTok meaning="2" role="NUMBER" id="p2.m1.4.xm" fragid="p2.m1.4.xm">2</XMTok>
+          </XMApp>
+          <XMTok meaning="3" role="NUMBER" id="p2.m1.6.xm" fragid="p2.m1.6.xm">3</XMTok>
+        </XMApp>
+      </XMath>
+    </annotation-xml>
+    <annotation encoding="application/x-tex">1+2=3</annotation>
+  </semantics>
+</math>

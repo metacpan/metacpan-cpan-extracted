@@ -1,0 +1,25 @@
+---
+abstract: 'Log4perl for graylog2'
+author:
+  - 'Jason Pope <cowholio4@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Log4perl-Layout-GELF
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Compress::Gzip: 2.00
+  JSON::XS: 2.30
+  Log::Log4perl: 1.33
+  Test::More: 0
+version: 0.03

@@ -1,0 +1,88 @@
+NAME
+    LWP::UserAgent::Snapshot - modifies the behaviour of "LWP::UserAgent" to
+    record and playback data.
+
+SYNOPSIS
+      use WWW::Mechanize;
+      use LWP::UserAgent::Snapshot;
+
+      @WWW::Mechanize::ISA = ('LWP::UserAgent::Snapshot');
+
+      my $mech = WWW::Mechanize->new;
+
+      $mech->record_to("data_dir"); # turn on recording to data_dir/
+
+      # naviate some web pages
+
+      WWW::Mechanize->record_to(undef); # turn off recording
+      WWW::Mechanize->mock_from("data_dir"); # turn on playback
+
+      # Navigating the same urls should now work as before, but without
+      # any network access. This is useful for testing.
+
+DESCRIPTION
+    If this subclass of "LWP::UserAgent" is inserted into the @ISA
+    inheritance list of "WWW::Mechanize", it allows it to record request and
+    response data to a set of files, then play back responses from that
+    data.
+
+    For suggestions on the use of this class in testing, see
+    LWP::UserAgent::Snapshot::UsageGuide.
+
+CLASS METHODS
+  "$class->record_to($dir)"
+    If $dir is supplied, turns on recording to that directory. Otherwise,
+    turns off recording.
+
+  "$class->mock_from($dir)"
+    If $dir is supplied, turns on playback from that directory. Otherwise,
+    turns off playback.
+
+PUBLIC INSTANCE METHODS
+  "$response = $obj->simple_request($request)"
+    Overrides "LWP::UserAgent->simple_request" and implements the
+    recording/playback mechanism, when enabled.
+
+CAVEATS
+    Because we associate each URL visited with its content as downloaded on
+    the first visit, this means we assume the website does not change - in
+    particular, that a given URL's content does not depend on when it's
+    visited, by what route, or other stateful information.
+
+SEE ALSO
+    WWW::Mechanize and LWP::UserAgent for general information.
+
+    Similar tools include the unix "wget" command.
+
+AUTHOR
+    Nick Woolley "<cpan.wu-lee@noodlefactory.co.uk>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2008, Nick Woolley "<cpan.wu-lee@noodlefactory.co.uk>".
+    All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

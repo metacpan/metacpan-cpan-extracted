@@ -1,0 +1,22 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# erste Kapitel
+
+msgid "foo"
+msgstr "oof"
+
+# Übersetzung für bar
+msgid "bar"
+msgstr "rab"
+
+# zweite Kapitel
+
+msgid "baz"
+msgstr "zab"
+
+
+# etwas zu machen

@@ -1,0 +1,108 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Lab::VISA::Installation - Installation guide for Lab::VISA
+
+=head1 Installation on Windows
+
+=over
+
+=item * Install a B<32-bit version>  of L<Strawberry Perl|http://strawberryperl.com/download/5.20.3.3/strawberry-perl-5.20.3.3-32bit.msi>. Note
+that version 5.22 is not supported (see the comments below). 
+
+=item * Install NI-VISA and the drivers required for your instruments. E.g. for GPIB you need the NI IEEE-488.2 driver.
+
+=item * Build and install with
+
+ cpanm Lab::VISA
+
+=item * Have fun!
+
+=back
+
+=head2 Notes
+
+On 64-bit windows one needs a 32-bit version of perl with GNU binutils version
+<= 2.24. Otherwise linking with the NI-VISA library will fail. The reason for this
+are the following bugs in the GNU binutils:
+
+=over
+
+=item * L<binutils bug 16598|https://sourceware.org/bugzilla/show_bug.cgi?id=16598>
+
+=item * L<binutils bug 17910|https://sourceware.org/bugzilla/show_bug.cgi?id=17910>
+
+=back
+
+These are fixed in the most recent version of the binutils. Once this version
+(2.26) is included in Strawberry Perl, it should be possible to use a 64-bit
+version of perl.
+
+It is not possible to use either 32-bit or 64-bit versions of Strawberry Perl 5.22 as this version uses binutils 2.25. 
+
+=head1 Installation on Linux
+
+As a Linux user you will probably be able to figure out things yourself.
+Here is a rough outline:
+
+=over
+
+=item
+
+Before you start, you must have the VISA library by National Instrument 
+installed. If you plan to use GPIB connections (which is very likely), 
+you must also have the necessary drivers (NI-488.2) for your GPIB 
+adapter card installed. Refer to National Instruments' very good documentation for additional information:
+
+L<http://digital.ni.com/softlib.nsf/webcategories/85256410006C055586256BBB002C0E91?opendocument&node=132060_US>
+
+=item
+
+In file C<Makefile.PL> adapt the LIBS and INC settings according to your installation. This is what worked for me:
+
+    'LIBS'         => ['-lvisa'],
+    'INC'          => '-I/usr/local/vxipnp/linux/include/',
+
+=item
+
+Then do the usual
+
+    perl Makefile.PL
+    make
+    make install
+
+=back
+
+=head1 Testing the installation
+
+Here is a quick test program that you can run with perl -Mblib test.pl:
+
+    #!/usr/bin/perl
+    
+    use Lab::VISA;
+    
+    my ($status, $sesn) = Lab::VISA::viOpenDefaultRM();
+    
+    printf "status: %x (%s)\n", $status, (($status == $Lab::VISA::VI_SUCCESS) ? "success" : "no success");
+    print "sesn: $sesn\n";
+    
+    my ($status, $findList, $retcnt, $instrDesc) = Lab::VISA::viFindRsrc($sesn, "ASRL1::INSTR"); 
+    
+    printf "status: %x (%s)\n", $status, (($status == $Lab::VISA::VI_SUCCESS) ? "success" : "no success");
+    print "findList: $findList\n";
+    print "retcnt: $retcnt\n";
+    print "instrDesc: $instrDesc\n";
+    
+    __END__
+
+=head1 COPYRIGHT AND LICENCE
+
+  (c) 2010,2011 Daniel Schröer, Andreas K. Hüttel, Daniela Taubert, and others.
+      2012      Andreas K. Hüttel
+      2016      Simon Reinhardt, Andreas K. Hüttel
+
+=cut
+

@@ -1,0 +1,58 @@
+
+			README for Language::Basic 
+
+Language::Basic is a Perl module implementation of the BASIC computer language
+It allows you to run BASIC programs or translate them to Perl scripts.
+Note that it implements 80's-era BASIC. Think Applesoft or GW-BASIC.
+
+WARNING: don't let the RCS version number fool you. This is an ALPHA RELEASE.
+
+--------------------------------------------------------------------------------
+Mini-FAQ:
+
+Q. How do I install it?
+A1. tar zvxf Language::Basic-*.*.gz
+    perl Makefile.PL; make
+    Optionally, "make test" and "make install"
+A2. See the INSTALL file for more details
+
+Q. What's new?
+A. See (the top of) the CHANGES file
+
+Q. What exciting changes are planned for the future?
+A1. More BASIC functionality, better error checking and documentation,
+    and the evil secret project, Ye Eldritch Triangle of Interpretation
+A2. See the TODO file
+
+--------------------------------------------------------------------------------
+Included Stuff:
+
+Perl scripts (in scripts/ directory until you make install):
+- basic.pl runs BASIC programs from the command line 
+- termbasic.pl is a Term::Readline application that lets you write code
+  one line at a time and then run it.
+- basic2pl.pl translates BASIC programs into Perl. (It's not
+   pretty, but it's not as bad as you might think, either.)
+
+Documentation is included as POD in the .pm files. There's also a
+description of the currently supported BASIC syntax in the 
+Language::Basic::Syntax pod page. Documentation will be turned into man
+pages by make, and installed by make install.
+
+Gregory Yob's classic BASIC adventure game, Hunt the Wumpus, is included for
+your playing pleasure. (The game was apparently written before they invented
+software licenses. I hope he doesn't mind my distributing it.) Translating it
+to Perl, and comparing it with the Perl Power Tools wump(6) port, are exercises
+left to the reader.
+
+--------------------------------------------------------------------------------
+
+I welcome comments, criticisms, bug reports, bug fixes, and ideas.  (But please
+check the BUGS section of the Language::Basic man page before sending in bug
+reports.) Actual patches are even more welcome. Also, feel free to send along
+any fun/interesting BASIC programs you have lying around.
+
+Enjoy!
+
+-Amir Karger
+akarger@cpan.org

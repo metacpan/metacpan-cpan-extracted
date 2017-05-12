@@ -1,0 +1,6 @@
+Revision history for Perl extension Lingua::En::Victory.
+
+0.01  Thu Dec 11 12:48:08 2003
+	- original version; created by h2xs 1.22 with options
+		-A -X -n Lingua::En::Victory
+

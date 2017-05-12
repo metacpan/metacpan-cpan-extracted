@@ -1,0 +1,15 @@
+blib*
+Makefile
+Makefile.old
+Build
+_build*
+pm_to_blib*
+*.tar.gz
+.lwpcookies
+LWP-Protocol-virtual-*
+cover_db
+LWP-Protocol-virtual-0.01.tar.gz
+pm_to_blib
+MANIFEST.bak
+blib/
+Makefile

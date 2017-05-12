@@ -1,0 +1,26 @@
+Revision history for Perl module Lingua::ZH::HanConvert
+
+0.12 Sun Sep 23 15:47:24 UTC 2001
+
+	- Fixed bug in documentation.
+
+0.11 Sun Sep 23 09:36:46 UTC 2001
+
+	- Changed subroutines to improve execution speed.
+	
+	- Made documentation more clear.
+
+	- Added command-line conversion scripts trad2simp and simp2trad.
+
+0.10 Sat Sep 22 07:38:30 UTC 2001
+
+	- Added support and data for one-to-many mappings.
+	
+	- Added "use v5.6.0;" to prevent silent failure on earlier versions.
+	
+	- Fixed test.pl to use UTF-8 literals - make test was failing.
+
+
+0.01  Thu Jul 12 11:34:04 UTC 2001
+
+	- original version

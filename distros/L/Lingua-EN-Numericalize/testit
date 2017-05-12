@@ -1,0 +1,13 @@
+#!/usr/bin/perl -w
+
+use lib 'blib/lib';
+use Lingua::EN::Numericalize;
+
+$\ = $/;
+$Lingua::EN::Numericalize::debug = 1;
+
+exit print "$ARGV[0] => ". str2nbr(shift) if @ARGV;
+
+while (<>) {
+	print "$_ => " . str2nbr();
+	}

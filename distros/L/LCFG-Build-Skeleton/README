@@ -1,0 +1,127 @@
+==== NAME ====
+
+LCFG::Build::Skeleton - Tools for generating new LCFG projects
+
+==== DESCRIPTION ====
+
+This module handles the creation of the skeleton of an LCFG software
+project. Typically, it prompts the user to answer a set of standard
+questions and then generates the necessary files from a set of
+templates. These generated files include the necessary metadata, build
+files and, for LCFG components, example code. It can also add the new
+project into the revision-control system of choice.
+
+More information on the LCFG build tools is available from the website
+http://www.lcfg.org/doc/buildtools/
+
+==== DEPENDENCIES ====
+
+This module needs perl 5.8.1 or newer (that's for Moose nothing in
+this code needs it).
+
+To build this module you will need the following:
+
+        Module::Build
+
+To use this module you will need the following:
+
+        LCFG::Build::PkgSpec >= 0.0.23
+        LCFG::Build::VCS >= 0.0.20
+        Moose >= 0.57
+        MooseX::Getopt >= 0.13
+        Template Toolkit >= 2.14
+        UNIVERSAL::require
+        YAML::Syck >= 0.98
+
+==== INSTALLATION ====
+
+Make sure you have the dependencies installed first! (see DEPENDENCIES above)
+
+If you don't know how to install these, try using the CPAN module, an easy
+way of auto-installing modules from the Comprehensive Perl Archive Network,
+where the above modules reside. Do "perldoc perlmodinstall" or "perldoc
+CPAN" for more information.
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+Or, if you're on a platform (like DOS or Windows) that doesn't like the "./"
+notation, you can do this:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+In order to install somewhere other than the default, such as in a directory
+under your home directory, like "/home/fred/perl" go
+
+   perl Build.PL --install_base /home/fred/perl
+
+as the first step instead.
+
+This will install the files underneath /home/fred/perl.
+
+You will also need to ensure the lcfgbuild templates are installed
+into a writable location. So you will normally need something like:
+
+   ./Build --install_base /home/fred/perl \
+           --install_path templates=/home/fred/lcfgbuild/templates
+
+If they are not in the standard location the LCFG::Build::Skeleton
+module needs to know where the templates are stored. You can override
+the default location with the LCFG_BUILD_TMPLDIR environment variable,
+for example:
+
+        export LCFG_BUILD_TMPLDIR=/home/fred/lcfgbuild/templates
+
+You will also need to make sure that you alter the PERL5LIB variable
+to find the modules, and the PATH variable to find the script.
+
+Therefore you will need to change: your path, to include
+/home/fred/perl/script (where the script will be)
+
+        export PATH=/home/fred/perl/script:${PATH}
+
+the PERL5LIB variable to add /home/fred/perl/lib
+
+        export PERL5LIB=/home/fred/perl/lib:${PERL5LIB}
+
+If you want to install in a temporary install directory (such as if you are
+building a package) then instead of going
+
+   perl Build install
+
+go
+
+   perl Build install destdir=/my/temp/dir
+
+and it will be installed there, with a directory structure under
+/my/temp/dir the same as it would be if it were installed plain. Note that
+this is NOT the same as setting --install_base, because certain things are
+done at build-time which use the install_base info.
+
+See "perldoc perlrun" for more information on PERL5LIB, and see "perldoc
+Module::Build" for more information on installation options.
+
+==== PROBLEMS AND FEEDBACK ====
+
+There are no known bugs in this application. Please report any
+problems to bugs@lcfg.org, feedback and patches are also always very
+welcome.
+
+==== AUTHOR ====
+
+Stephen Quinney <squinney@inf.ed.ac.uk>
+
+==== COPYRIGHT AND LICENCE ====
+
+Copyright (C) 2008 University of Edinburgh
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GPL, version 2 or later.
+

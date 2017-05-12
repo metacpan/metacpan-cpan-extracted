@@ -1,0 +1,326 @@
+NAME
+    RCX
+
+SYNOPSIS
+       use LOGO::RCX;
+
+       $rcx = new LEGO::RCX();
+
+       #
+       # Turn motor A on for 10 seconds, then turn
+       # it off
+       #
+     
+       $rcx->motorOn( "A" );
+
+       sleep( 10 );
+
+       $rcx->motorOff( "A" );
+
+DESCRIPTION
+    This module allows one to communicate with the Lego
+    MindStorms(R) RCX brick from a workstation through the IR tower.
+
+    The internals of this module are based of the rcx.tcl by Peter
+    Pletcher <peterp@autobahn.org> and Laurent Demailly
+    <L@Demailly.com>. I have hower made my external interface to
+    this module OO based, and changed the way a few things are done.
+
+    Without there tcl module I would have never been able to
+    complete this in a timely manner. Thanks guys.
+
+METHODS
+    ping() or alive()
+        Check to see if RCX is on and responding. A defined value on
+        the return means it is alive, an undef means it is not
+        alive.
+
+    motorOn( motors )
+        Turns motor(s) on
+
+        Motors are specifed in string format eg: "A" eg: "bc"
+
+    motorOff( motors )
+        Turns motor(s) off
+
+        Motors are specifed in string format eg: "A" eg: "bc"
+
+    motorFloat( motors )
+        Floats motor(s) output
+
+        Motors are specifed in string format eg: "A" eg: "bc"
+
+    motorPower( motors, power )
+        Sets the motors power to value from 0-7
+
+        Motors are specifed in string format eg: "A" eg: "bc"
+
+    motorDir( motors, direction
+        Sets the motors direction which can be "forward", "reverse",
+        or "toggle"
+
+        Motors are specifed in string format eg: "A" eg: "bc"
+
+    beep( sound );
+        Plays on of the following sounds
+
+          0  Blip
+          1  Beep beep
+          2  Downward tones
+          3  Upward tones
+          4  Low buzz
+          5  Fast upward tones
+
+    tone( frequence, duration )
+        Plays a tone of a specific frequency for a length of
+        duration
+
+        frequency is in Hz and duration is in 1/100th of a second.
+
+    display( display )
+        Selects the display for the RCX.
+
+        The valid display values are:
+
+          0 Watch
+          1 Sensor 1 
+          2 Sensor 2 
+          3 Sensor 3 
+          4 Motor A 
+          5 Motor B 
+          6 Motor C 
+
+    powerOff()
+        Powers the RCX off.
+
+    powerDelay( delay )
+        Sets the power off delay time for the RCX. The delay is
+        measured in minutes. A 0 value tells the RCX to never power
+        off, and vuture powerOff() calls will fail.
+
+    program( program_number )
+        Sets the RCX to be on the specified program number. The
+        valid program_number values ares 1-5.
+
+    watch( hour, minutes)
+        Sets the RCX's watch to hour house and minute mintutes. hour
+        is 0-23 and minutes is 0-59.
+
+    messageSet( message )
+        Set a message in the RCX. Valid message values are 0-255.
+
+    start( task|name ) || start()
+        Starts a specific task running. If no task is specified it
+        defaults to task 0. Valid task values are 0-9.
+
+        If the loadNQClist method has been called then you can
+        specify a task name
+
+    stop( task|name ) || stop();
+        Stops a specific task. If no task is specified it will stop
+        all running tasks.
+
+        If the loadNQClist method has been called then you can
+        specify a task name
+
+    call( subnumber|name )
+        Call a subroutine.
+
+        If the loadNQClist method has been called then you can
+        specify a subroutine name.
+
+    clearTimer( timer )
+        This will clear the selected RCX timer. The timer values are
+        from 0-3.
+
+    clearSensor( sensor_number )
+        This will clear the counter associated with sensor_number
+        sensor.
+
+    setSensorType( sensor_number, sensor_type )
+        This will set the sensor sensor_number's type to
+        sensor_type. The type value can be any one of the following.
+
+         $SENSOR_TYPE_RAW
+         $SENSOR_TYPE_TOUCH
+         $SENSOR_TYPE_TEMPERATURE
+         $SENSOR_TYPE_LIGHT
+         $SENSOR_TYPE_ROTATION
+
+    setSensorMode( sensor_number, sensor_mode, [ slope ] )
+        This will set the sensor sensor_number's mode to
+        sensor_mode, with said slope. If slope is omited it defaults
+        to 0. This is like NQC.
+
+        The mode value can be any one of the following.
+
+         $SENSOR_MODE_RAW
+         $SENSOR_MODE_BOOL
+         $SENSOR_MODE_EDGE
+         $SENSOR_MODE_PULSE
+         $SENSOR_MODE_PERCENT
+         $SENSOR_MODE_CELSIUS
+         $SENSOR_MODE_FAHRENHEIT
+         $SENSOR_MODE_ROTATION
+
+    setSensor( sensor_number, sensor_kind )
+        This will set the sensor sensor_number's kind to
+        sensor_kind. This is like the NQC function SetSensor.
+
+        The kind value can be any one of the following.
+
+         $SENSOR_TOUCH
+         $SENSOR_LIGHT
+         $SENSOR_ROTATION
+         $SENSOR_CELSIUS
+         $SENSOR_FAHRENHEIT
+         $SENSOR_PULSE
+         $SENSOR_EDGE
+
+    getReg( register ) | getVar( variable )
+        Get the value of a variable/register (the same thing) in the
+        RCX. The register/variable can be from 0-31.
+
+        If the loadNQClist method has been called then you can
+        specify a variable name instead of a number.
+
+    setReg( register, value ) | setVar( variable, value );
+        Set the value of a variable/register (the same thing) in the
+        RCX to value. The register/variable can be from 0-31.
+
+        If the loadNQClist method has been called then you can
+        specify a variable name instead of a number.
+
+    addReg( register, value ) | addVar( register, value )
+        Add value to a register and store back in register.
+
+    subReg( register, value ) | subVar( register, value )
+        Subtract value from a register and store back in register.
+
+    mulReg( register, value ) | mulVar( register, value )
+        Multiply value to a register and store back in register.
+
+    divReg( register, value ) | divVar( register, value )
+        Divide value into a register and store back in register.
+
+    andReg( register, value ) | andVar( register, value )
+        And value with a register and store back in register.
+
+    orReg( register, value ) | orVar( register, value )
+        Or value with a register and store back in register.
+
+    getSensor( sensor_number )
+        Get value of a sensor sensor_number. sensor_number can be 1-
+        3.
+
+    getSensorType( sensor_number )
+        Get type of a sensor sensor_number. sensor_number can be 1-
+        3.
+
+    getSensorMode( sensor_number )
+        Get mode of a sensor sensor_number. sensor_number can be 1-
+        3.
+
+    getSensorRaw( sensor_number )
+        Get raw value of a sensor sensor_number. sensor_number can
+        be 1-3.
+
+    getSensorBool( sensor_number )
+        Get boolean value of a sensor sensor_number. sensor_number
+        can be 1-3.
+
+    setTXRange( range )
+        Set the Transmit range of the RCX. Ranges are eithor "short"
+        or "long"
+
+    deleteAllTasks()
+        Delete all tasks in current program
+
+    deleteTask( task )
+        Delete <task> task in current program.
+
+        If the loadNQClist method has been called then you can
+        specify a task name.
+
+    deleteAllSubs()
+        Delete a subroutines in current program
+
+    deleteSub( sub )
+        Delete all subroutines in current program
+
+        If the loadNQClist method has been called then you can
+        specify a subroutine name.
+
+    getBattery()
+        Returns the battery voltage in volts.
+
+    getVersion()
+        Returns the version of the ROM and Firmware in the following
+        order. ( $ROMMajor, $ROMMinor, $FIRMMajor, $FIRMMinor );
+
+    setCommTimeout( timeout )
+        Sets the timeout in seconds for all commands sent to the
+        RCX. Default is 2 seconds.
+
+    uploadDatalog()
+        Returns an array of the datalog. Each item in the data log
+        has two elements in the array. The first is the type of data
+        being loged, and the second is the value of the data. The
+        different types are listed as follows (taken from
+        http://graphics.stanford.edu/~kekoa/rcx/opcodes.html
+
+            0x00-0x1f
+                    Variable value (source 0, variables 0..31) 
+            0x20-0x23
+                    Timer value (source 1, timers 0..3) 
+            0x40-0x42
+                    Sensor reading (source 9, sensors 0..2) 
+            0x80
+                    Clock reading (source 14) 
+
+    loadNQClist( nqc_list_file_name )
+        This method will read in a list file produced by nqc version
+        2.0. It parses out the variable, task, and subrouting
+        information to allow you to use names in the related calls
+        instead of just the numbers. This will also allow the fredom
+        to move things around with out impacting the code.
+
+NOTES
+    I have developed this software under Linux. I know it works
+    there.
+
+AUTHORS
+    John C. Quillan quillan@cox.net
+
+MODIFICATION HISTORY
+     01/29/2000   VER 0.5   First Version
+     02/04/2000   VER 0.6   Removed some commented code
+                            Added posix serial code.
+     02/06/2000   VER 0.7   Added the alive/ping method
+                            Added the time out for communications.
+                            Added the setCommTimeout method
+                            Added the uploadDatalog method
+     02/22/2000   VER 0.8   Fixed wrong named method in NQC translation
+                            Added getVersion                 
+                            Added clearSensor
+                            Started sensor config code
+                            Moved package RCX to Lego::RCX
+                            Made a real perl module with Makefile.PL
+                            Added div,mul,add,sub,and,or
+                              variable
+                            Added setTXRange
+                            Added deleteAllTasks and deleteAllSubs
+                            Added deleteTask and deleteSub
+     02/29/2000   VER 0.9   Moved package from Lego::RCX to LEGO::RCX
+                            Added setSensor, setSensorMode, setSensorType
+                            Fixed / 1000 bug in getReg.
+                            Fixed bug in pattern matches that was not catching
+                             0x0a characters.  Now a single line match.
+
+     04/16/2000   VER 1.00  Clean up source a little bit.
+                            Made README more descriptive for CPAN users.
+                            Fixed some typo in the pod documentation for the
+                             usage. Sorry for any problems this may have
+                             caused.
+                            Fixed a typo in the warning.
+                            Added a few samples to start off with

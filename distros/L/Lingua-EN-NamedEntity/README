@@ -1,0 +1,40 @@
+NAME
+    Lingua::EN::NamedEntity - Basic Named Entity Extraction algorithm
+
+SYNOPSIS
+      use Lingua::EN::NamedEntity;
+      my @entities = extract_entities($some_text);
+
+DESCRIPTION
+    "Named entities" is the NLP jargon for proper nouns which represent
+    people, places, organizations, and so on. This module provides a very
+    simple way of extracting these from a text. If we run the
+    "extract_entities" routine on a piece of news coverage of recent UK
+    political events, we should expect to see it return a list of hash
+    references looking like this:
+
+      { entity => 'Mr Howard', class => 'person', scores => { ... }, },
+      { entity => 'Ministry of Defence', class => 'organisation', ... },
+      { entity => 'Oxfordshire', class => 'place', ... },
+
+    The additional "scores" hash reference in there breaks down the various
+    possible classes for this entity in an open-ended scale.
+
+    Naturally, the more text you throw at this, the more accurate it
+    becomes.
+
+  EXPORT
+    "extract_entities"
+
+AUTHOR
+    Simon Cozens, "simon@kasei.com"
+    
+    Maintained by Alberto Simões, "ambs@cpan.org"
+
+COPYRIGHT AND LICENSE
+    Copyright 2004 by Alberto Simões
+    Copyright 2003 by Simon Cozens
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

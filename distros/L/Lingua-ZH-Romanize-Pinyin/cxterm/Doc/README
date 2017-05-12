@@ -1,0 +1,246 @@
+
+CXTERM 5.0 -- A Chinese Terminal Emulator for X Window System
+-------------------------------------------------------------
+
+----------
+0. WHAT IS IT?
+
+  A terminal emulator for X11, just like "xterm", but with the
+  capability of displaying and inputting Chinese.
+
+  Compared with the previous versions, cxterm 5.0 has a much more
+  powerful input engine.  The basic idea is to use an "input-method-
+  independent conversion module" and a "post-processing" technique
+  to reduce the candidate set.  (See document Doc/input.doc, "Hanzi
+  input in cxterm version 5.0".)  Other minor improvements include 
+  scripts for easy installation (also does X fonts installation),
+  a popup window for easier run-time configuration, more input
+  methods, etc.
+
+  It supports GB, Big5, JIS, and KS encoding.  HZ support is through
+  "hztty", a separated program avaliable from
+	ftp://ftp.cs.purdue.edu/pub/ygz/hztty.tar.gz
+
+----------
+1. REQUIREMENTS
+
+  In short, you need a Unix account to hold the cxterm software and
+  a display that allows you to open X windows from your Unix account.
+
+  A) Hardware:  any hardware that supports Unix and X window
+
+    Examples: 
+      Workstations:  Sun, HP, DEC station, IBM RT or RS, SGI.
+      High-end PCs:  386/486/Pentium PC with VGA (or better) or Mac.
+      X terminal:    Visual X Terminal, NCD, HP/X.
+
+      X terminal users must have access to the Unix back-end server
+      machines.
+
+    Disk space:
+      About 6M disk space is needed for the source, and additional 10M
+      is needed to build all the binaries.  The final binaries take
+      about 3M-5M (depends on the configuration and machine type).
+
+  B) Software:  Unix operating system and X Window System.
+
+    X window version must be at least X11R4.  Other compatible window
+    systems include: OpenWindow 3.x, DECwindow, XFree86, etc.
+
+    Your system must come with all the necessary files to support X
+    application development, which include all the header files and
+    link libraries for X11, Xt, Xaw, Xmu, and Xext.  Although these
+    are included in the standard release from X Consortium, some
+    companies do not include them in their systems (e.g. AIXwindow).
+    If you have such an incomplete X window, you have three choices:
+    1) request the whole X development environment from your vendor,
+    2) get the complete X window from ftp.x.org and build it yourself,
+    3) find someone generous to give you a pre-compiled cxterm in the
+    platform.
+
+    386/486/Pentium PC users must run Lunix or other Unix operating
+    systems (e.g., SCO, UNIX386, BSD386/386bsd) and XFree86.  Cxterm
+    will not run in DOS or Windows or Window NT.
+
+    Macintosh users must run A/UX (no Macintosh OS), DECstation users
+    must run OSF/1 or Ultrix (no VMS), IBM RT/RS must run AIX (no OS/2).
+
+    X terminal font installation may require root privilege.  Check
+    with system manager.
+
+  C) Fair amount of expertise on UNIX and X11.
+
+    Unix or X11 newbie may feel difficulty in installing cxterm.  If
+    someone can set it up for you, it is easy to use.
+
+
+----------
+2. HOW TO INSTALL THE SOFTWARE
+
+  A) Get cxterm source code from the Internet.
+
+     If you view this document under WWW, just click here:
+     <A HREF="ftp://ftp.cs.purdue.edu/pub/ygz/cxterm-5.0.tar.gz">
+     <code>ftp://ftp.cs.purdue.edu/pub/ygz/cxterm-5.0.tar.gz</code></A>
+
+     Or use ftp to get cxterm from a ftp site near you.  The master
+     ftp site for cxterm is ftp.cs.purdue.edu: /pub/ygz/.  An example
+     ftp session is:
+
+	csh%  ftp ftp.cs.purdue.edu
+	username:  anonymous
+	password:  <your-e-mail-address>
+
+	ftp>  binary
+	ftp>  cd /pub/ygz
+	ftp>  get cxterm-5.0.tar.gz
+	ftp>  bye
+
+  B) Unpack the source code archive:
+
+	csh%  gzip -dc cxterm-5.0.tar.gz | tar xvf -
+	csh%  cd cxterm-5.0
+
+     If you don't have gzip, get it from a GNU ftp site (e.g.
+     prep.ai.mit.edu:/pub/gnu/gzip*).   (If you find some ftp site
+     that has cxterm-5.0.tar.Z, use "zcat" instead of "gzip -dc".)
+
+  C) Just type
+
+	csh%  ./config.sh
+
+     and follow the instructions.  Good luck! 
+
+  D) After installation ...
+
+     Try to run cxterm (see 3).  If everything goes where and when you
+     decide that you don't need the cxterm source code any more, you
+     may remove the cxterm source code tree by:
+
+	csh%  cd ..
+	csh%  rm cxterm-5.0.tar.gz
+	csh%  rm -rf cxterm-5.0
+
+----------
+3. HOW TO RUN CXTERM
+
+  The cxterm installation script should have tried to set up everything
+  for you.  What you need is probably to make sure that directory you
+  choose for cxterm binaries are in the PATH.
+
+  If you are a new user, or not quite understand X resources or X font
+  paths, etc., simply use the command "CXterm".
+
+  To run cxterm with GB encoding, type:		CXterm -gb &
+  with Big5, type:				CXterm -big5 &
+  with Japanese (JIS), type:			CXterm -jis &
+  with Korean (KS), type:			CXterm -ks &
+
+  Experienced user can use "cxterm" directly, but first make sure that
+  the X resource was kept in the right place by ./config.sh, and
+  remember to put the font path to your X window startup file
+  (usually ~/.xinitrc or ~/.xsession).  See cxterm(1) (or the file
+  cxterm/cxterm.man) for cxterm options.
+
+  Read "Doc/input.doc" on how to input Chinese in cxterm.
+
+----------
+4. COPYRIGHTS AND TERMS
+
+  This copyright and permission notice outlines the rights and
+  restrictions covering most parts of this distribution of cxterm.
+  The part of cxterm source code that was actually xterm source code
+  from "X11R6/xc/programs/xterm" is also copyrighted by X Consortium.
+  Files that carried over from the xterm source without change are
+  exempted from this notice.  Some individual files, such as the fonts
+  and input dictionaries, may also be covered by other copyrights.
+
+
+    CXTERM 5.0   (C) 1995 BY YONGGUANG ZHANG.
+    X11R6 CXTERM (C) 1994 BY YONGGUANG ZHANG.
+    X11R5 CXTERM (C) 1991 BY YONGGUANG ZHANG AND MAN-CHI PONG.
+    X11R4 CXTERM (C) 1990 BY MAN-CHI PONG AND YONGGUANG ZHANG.
+
+  Permission to retain, use, modify, copy, and distribute CXTERM 5.0
+  in source or binary and its documentation (hereafter, the Software)
+  for noncommercial purpose is hereby granted to you without a fee,
+  provided that this entire copyright and permission notice appear in
+  all such copies, that no charge be associated with such copies,
+  that distribution of derivative works (including value-added
+  distributions such as with additional input dictionaries or fonts)
+  include clarification that such added or derived parts are not from
+  the original Software, and that the names of the author(s) not be
+  used to endorse or promote such works.
+
+  Any commercial use of the Software requires a license directly from
+  the author(s).  Please contact the author(s) to negotiate an
+  appropriate license.  Commercial use includes integration of all or
+  part of the binary or source code covered by this permission
+  notices into a product for sale or license to third parties on your
+  behalf, or distribution of the binary or source code to third
+  parties that need it to utilize a product sold or licensed on your
+  behalf.
+
+  THE AUTHOR(S) OF THE SOFTWARE MAKE NO REPRESENTATIONS ABOUT THE
+  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED "AS
+  IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.  THE AUTHOR(S) SHALL NOT
+  BE LIABLE FOR ANY DAMAGES SUFFERED BY THE USERS OF THE SOFTWARE.
+
+  By using or downloading the Software, you agree to abide by the
+  copyright law and all other applicable laws, and the terms of this
+  permission notice.  You may be held legally responsible for any
+  copyright infringement that is caused or encouraged by your failure
+  to abide by these terms.  The author(s) shall have the right to
+  change this notice for future release of the Software.
+
+  For more information on copyright and licensing issues, contact
+  the author(s) at:
+
+	YONGGUANG ZHANG
+	P.O.BOX 8472
+	CALABASAS, CA 91372-8472
+
+  Or e-mail <c-xterm@cs.purdue.edu>.
+
+----------
+5. SUPPORTS
+
+  Cxterm 5.0 is tested or known to work in the following platform:
+  - Sun SPARCstation (or Sun 3) with SunOS 4.x or Solaris 2.x
+    (X11R4 / X11R5 / X11R6 / OpenWindow 3.0)
+  - SGI IRIS with IRIX 4.x or 5.x (X11R5 / X11R6)
+  - DEC Alpha with OSF/1 (DECwindow)
+  - PC (386/486/Pentium) with Linux (XFree86 2.1 / XFree86 3.1)
+
+  In case you have a problem with cxterm, read Doc/CXTERM.FAQ first
+  to see if there is already a solution for you.  I will continue
+  update the CXTERM.FAQ.  The latest version of the FAQ can be ftp'ed
+  or viewed from WWW at "ftp://ftp.cs.purdue.edu/pub/ygz/CXTERM.FAQ".
+
+  Since the most-likely problem is that your system configuration is
+  a little bit different, people within your department, such as the
+  system manager or local Unix/X guru are the best source of help.
+  Outsiders like us usually do not have any insight about your system
+  and are often helpless.
+
+  If you must seek help from outside, be sure to obtain as much detail
+  as possible.  Include such information as the machine name and model,
+  the operating system name and version, the window system name and
+  version, the output of "xdpyinfo" and "xset q", and the script that
+  shows how you do it and how it fails.  Send them to the author(s)
+  at <c-xterm@cs.purdue.edu>, or post them to such newsgroups as
+  alt.chinese.computing.
+
+  Send your comments, bugs, and suggestions to <c-xterm@cs.purdue.edu>
+
+  Future development of cxterm will be announced in CCNET-L and 
+  related newsgroups including alt.chinese.computing.
+
+---------
+
+YONGGUANG ZHANG
+HUGHES RESEARCH LABORATORIES
+MALIBU, CA 90265-4799
+ygz@isl.hrl.hac.com
+
+c-xterm@cs.purdue.edu

@@ -1,0 +1,24 @@
+==================================================
+Changes from 2015-08-26 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.006 at 2016-08-25 13:31:16 +0000
+------------------------------------------
+
+  Change: d2dbd8bc0f25380925c5da3e8cae2c991d47a17c
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-25 14:27:10 +0000
+
+    No dist zilla in travis. Use caching 
+
+  Change: d23b7ee617fea00ef3a69130d977dd516b011e6b
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-08-25 14:19:54 +0000
+
+    Test that using this with Safe >= 2.35 doesnt kill the signal
+    handling 
+
+================================================
+Plus 5 releases after 2015-08-26 00:00:00 +0000.
+================================================

@@ -1,0 +1,85 @@
+{
+   "abstract" : "LTSV logger",
+   "author" : [
+      "Hiroyoshi Houchi <git@hixi-hyi.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-LTSV-Instance",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::RotateLogs" : "0",
+            "Hash::Flatten" : "0",
+            "Time::Piece" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::Deep" : "0",
+            "Test::Deep::Matcher" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Log::LTSV::Instance" : {
+         "file" : "lib/Log/LTSV/Instance.pm",
+         "version" : "0.06"
+      },
+      "Log::LTSV::Instance::Flatten" : {
+         "file" : "lib/Log/LTSV/Instance/Flatten.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hixi-hyi/p5-Log-LTSV-Instance/issues"
+      },
+      "homepage" : "https://github.com/hixi-hyi/p5-Log-LTSV-Instance",
+      "repository" : {
+         "url" : "git://github.com/hixi-hyi/p5-Log-LTSV-Instance.git",
+         "web" : "https://github.com/hixi-hyi/p5-Log-LTSV-Instance"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "Naoki Yaguchi <murooka.1129.x50@gmail.com>"
+   ]
+}

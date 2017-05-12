@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# USAGE: sta2phrases sta-align-file.xml
+#
+# simple script to extract all aligned phrases from the tree alignments
+#
+
+use strict;
+use FindBin;
+use lib $FindBin::Bin.'/../lib';
+use Lingua::Align::Corpus::Parallel::STA;
+use File::Basename;
+
+use vars qw($opt_a $opt_v $opt_x);
+use Getopt::Std;
+getopts('avx:');
+
+
+my $algfile = shift(@ARGV);
+my $corpus=new Lingua::Align::Corpus::Parallel::STA(-alignfile => $algfile);
+binmode(STDOUT,":encoding(utf8)");
+
+my %srctree=();
+my %trgtree=();
+my $links;
+
+while ($corpus->next_alignment(\%srctree,\%trgtree,\$links)){
+
+    foreach my $sn ($corpus->{SRC}->get_all_nodes(\%srctree)){
+	next if (not exists $links->{$sn});
+	my @src = $corpus->{SRC}->get_leafs(\%srctree,$sn);
+	next if ($opt_x && (@src > $opt_x));
+	my @srcid = $corpus->{SRC}->get_leafs(\%srctree,$sn,'id');
+	foreach my $tn (keys %{$links->{$sn}}){
+	    print "($sn,$tn) " if ($opt_v);
+	    my @trg = $corpus->{TRG}->get_leafs(\%trgtree,$tn);
+	    next if ($opt_x && (@trg > $opt_x));
+	    my @trgid = $corpus->{TRG}->get_leafs(\%trgtree,$tn,'id');
+	    print join (" ",@src);
+	    print ' ||| ';
+	    print join (" ",@trg);
+	    print ' ||| ';
+	    if ($opt_a){
+		my @alg=();
+		for my $s (0..$#srcid){
+		    for my $t (0..$#trgid){
+			if (exists $links->{$srcid[$s]}){
+			    if (exists $links->{$srcid[$s]}->{$trgid[$t]}){
+				push(@alg,$s.'-'.$t);
+			    }
+			}
+		    }
+		}
+		print join (" ",@alg);
+	    }
+	    print "\n";
+	}
+    }
+    print '';
+}
+
+__END__
+
+=head1 NAME
+
+sta2phrases - extract aligned phrases from aligned treebanks
+
+=head1 SYNOPSIS
+
+    sta2phrases alignments.xml
+
+=head1 DESCRIPTION
+
+C<sta2moses> runs through all node alignments and extracts pairs of phrases (yield of source and target language subtree) and prints those phrases in Moses compatible format. These phrases can then be used in phrase-based SMT if you like.
+
+
+=head1 SEE ALSO
+
+L<Lingua::Align::Trees>, L<Lingua::treealign>
+ 
+
+=head1 AUTHOR
+
+Joerg Tiedemann, E<lt>jorg.tiedemann@lingfil.uu.seE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Joerg Tiedemann
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

@@ -1,0 +1,206 @@
+/* General settings */
+
+@media print { #menuleft, #menu, #menuright, #sponsor { display: none; } }
+
+ul {
+	list-style-type: square;
+	list-style-position: inside;
+}
+
+li {
+	margin-bottom: 7px;
+}
+
+a {
+  text-decoration:none; font-weight: bold;
+}
+
+a img {
+	border: none;
+}
+
+/* Layout */
+
+/* Text formating */
+
+.important {
+	border: 1px dotted #535353;
+	background-color: #DFF2F8;
+	background-image: url(/images/important.gif);
+	background-repeat: no-repeat;
+	background-position: left top;
+	font-style: italic;
+	padding: 5px 5px 5px 40px;
+}
+
+.small {
+	color: #535353;
+	font-size: 0.8em;
+}
+
+/* Spezielle Formate */
+
+.newsbox {
+	border: 1px dotted #535353;
+	padding: 10px;
+	font-size: 0.9em;
+	margin-left: 0px;
+	margin-bottom: 10px;
+}
+
+.newsbox h3  {
+	margin: 20px 0px 10px -5px;
+}
+
+.locationbox {
+	font-size: 0.9em;
+	margin: 5px 0px 0px 0px;
+	border-bottom: 1px dotted #535353;
+}
+
+.toplocation {
+	color: #22b5d7;
+	font-weight: 800;
+	font-style: italic;
+	margin-right: 5px;
+}
+
+.locationbox h3, .locationbox h4 {
+	margin: 0px 0px 0px 0px ;
+	color: black;
+}
+
+.locationbox img {
+	float: right;
+	position: relative;
+	margin-left: 5px;
+}
+
+.locationbox p {
+	padding-left: 15px;
+}
+
+.alert {
+	color: yellow;
+}
+
+/* Survey Div */
+
+#survey-content {
+  padding-top: 10px;
+}
+
+#survey {
+	margin-top: 10px;
+}
+
+#survey hr {
+	height: 1px;
+	background-color: #000;
+	border: 0px;
+}
+
+/* Survey Tables */
+
+#survey table.usertable {
+}
+
+#survey table {
+	border: 0px solid #535353;
+	border-spacing: 2px;
+	border-collapse: collapse;
+	empty-cells:show;
+}
+
+#survey table.grid td {
+	border: 1px solid #747474;
+}
+
+#survey table td {
+	vertical-align: top;
+	text-align: center;
+	width: 100px;
+}
+
+#survey fieldset {
+	border: none;
+	border: 1px solid #535353;
+}
+
+
+#survey table table {
+	border: none;
+	border-collapse: separate;
+	border-spacing: 3px;
+}
+
+#survey table table td {
+	vertical-align: top;
+	width: 100px;
+}
+
+
+#survey fieldset table {
+	border: none;
+}
+
+#survey th {
+		background-color: #747474;
+		color: white;
+    padding: 2px 5px;
+}
+
+#survey .highlight {
+		background-color: #DFF2F8;
+}
+
+.section {
+	font-weight: 400;
+}
+
+.question {
+	font-weight: 800;
+	font-style: italic;
+  margin-top:10px;
+}
+
+.greyrow {
+	background-color: #eee;
+}
+
+
+/* Amendments to work with the survey layout */
+
+#main-body    { width: 530px; float: left; }
+#right-column { width: 170px; }
+#left-column  { width: 726px; }
+.sidebar      { width: 170px; padding: 10px 0px; }
+
+.strike   { text-decoration: line-through; }
+.seen     { color: #666; }
+.clear    { clear: both; }
+
+#footer         { margin: 10px 0; border-top: 1px solid #333; font-size: 8pt; }
+#footer-left    { float: left; padding: 10px 0; }
+#footer-right   { float: right; padding: 10px 0; }
+#footer-text    { margin: 0 auto; width: 700px; border: 0px solid #f00; padding: 10px 10px 20px 10px; text-align: center; }
+#footer a       { text-decoration: none; font-weight: bold; }
+
+#menu           { font-size: 11pt; }
+
+#menu ul {
+  margin:0;
+  padding:10px 0 0 10px;
+  list-style:none;
+}
+#menu li {
+  display:inline;
+  margin:0;
+  padding:0 5px;
+}
+#menu a {
+  text-decoration: none;
+}
+
+#closed { color: #0f0; }
+.intro { color: #caebef; }

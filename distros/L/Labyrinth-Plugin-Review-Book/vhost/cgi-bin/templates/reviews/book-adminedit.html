@@ -1,0 +1,155 @@
+[% IF preedit %]
+
+<h2>New Review</h2>
+
+    <p>
+      <a href="[% cgipath %]/pages.cgi?act=reviews-admin">manage reviews</a>
+    | <a href="[% cgipath %]/pages.cgi?act=reviews-typesadmin">manage review types</a>
+    | <a href="[% cgipath %]/pages.cgi?act=reviews-radmin">manage retailers</a>
+    </p>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name='act' value='reviews-preedit' />
+<input type="hidden" name='reviewid' value='[% data.reviewid %]' />
+
+<div class="boxer">
+<table class="blocker">
+        <tr>
+            <td class="blockbody">Reviewer *</td>
+            <td class="blockbody">[% data.reviewer_err %]</td>
+            <td class="blockbody">[% data.ddreviewers %]</td>
+        </tr>
+        <tr>
+            <td class="blockbody">Review Type *</td>
+            <td class="blockbody">[% data.reviewtypeid_err %]</td>
+            <td class="blockbody">[% data.ddrevtypes %]</td>
+        </tr>
+        <tr>
+            <td class="blockbody">Review Date *</td>
+            <td class="blockbody">[% data.postdate_err %]</td>
+            <td class="blockbody"><input type="text" name="postdate" value='[% data.postdate %]' size="20" /> (DD/MM/YYYY)</td>
+        </tr>
+        <tr>
+            <td class="blockbody">Product Code *</td>
+            <td class="blockbody">[% data.itemcode_err %]</td>
+            <td class="blockbody"><input type="text" name="itemcode" value='[% data.itemcode %]' size="20" /></td>
+        </tr>
+</table>
+</div>
+<p align="center"><input type="submit" value='Submit' /></p>
+</form>
+
+[% ELSE %]
+
+[% INCLUDE "public/tinymce.html" %]
+
+<h2>Review Edit</h2>
+
+    <p>
+      <a href="[% cgipath %]/pages.cgi?act=reviews-admin">manage reviews</a>
+    | <a href="[% cgipath %]/pages.cgi?act=reviews-typesadmin">manage review types</a>
+    | <a href="[% cgipath %]/pages.cgi?act=reviews-radmin">manage retailers</a>
+    </p>
+
+[% IF thanks %]
+<p><strong>Review saved successfully.
+[% IF user.access < 3 %]
+Your submission is now held in the approval queue and will be dealt with as soon as 
+possible. Thanks for contributing to the site.
+[% END %]
+</strong></p>
+[% END %]
+<p>Fields marked * are mandatory fields and must be completed.</p>
+
+[% IF errmess %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name='act' value='reviews-save' />
+<input type="hidden" name='reviewid' value='[% data.reviewid %]' />
+
+<div class="boxer">
+<table class="blocker">
+        <tr>
+            <td>Reviewer *</td>
+            <td>[% data.reviewer_err %]</td>
+            <td>[% data.ddreviewers %]</td>
+        </tr>
+        <tr>
+            <td nowrap="nowrap">Review Type *</td>
+            <td>[% data.reviewtypeid_err %]</td>
+            <td>[% data.ddrevtypes %]</td>
+        </tr>
+        <tr>
+            <td nowrap="nowrap">Review Date *</td>
+            <td>[% data.postdate_err %]</td>
+            <td><input type="text" name="postdate" value="[% data.postdate %]" size="20" /> (DD/MM/YYYY)</td>
+        </tr>
+        <tr>
+            <td>Product Code *</td>
+            <td>[% data.itemcode_err %]</td>
+            <td><input type="text" name="itemcode" value="[% data.itemcode %]" size="20" /></td>
+        </tr>
+        <tr>
+            <td>Item Title *</td>
+            <td>[% data.title_err %]</td>
+            <td><input type="text" name="title" value="[% data.title %]" size="70" /></td>
+        </tr>
+        <tr>
+            <td>Brand *</td>
+            <td>[% data.brand_err %]</td>
+            <td><input type="text" name="brand" value="[% data.brand %]" size="70" /></td>
+        </tr>
+        <tr>
+            <td>Retailer *</td>
+            <td>[% data.retailerid_err %]</td>
+            <td>
+                [% IF !data.retailerid %]<p class="alert">Unknown Publisher '[% data.retailer %]'</p>[% END %]
+                [% data.ddretailers %]</td>
+        </tr>
+        <tr>
+            <td>Item Link *</td>
+            <td>[% data.itemlink_err %]</td>
+            <td><input type="text" name="itemlink" value="[% data.itemlink %]" size="70" /></td>
+        </tr>
+        <tr>
+            <td>Image Link</td>
+            <td>[% data.image_link_err %]</td>
+            <td><input type="file" name="image_link" size="60" />
+                <input type="hidden" name="imageid" value="[% data.imageid %]" />
+                [% IF data.image_link %]<br /><img src="[% webpath %]/[% data.image_link %]" />[% END %]
+            </td>
+        </tr>
+        <tr>
+            <td>Additional Links</td>
+            <td>[% data.additional_err %]</td>
+            <td><input type="text" name="additional" value="[% data.additional %]" size="70" />
+                <p>Additional links should be added as "Name1=URL1,Name2=URL2", with commas and equals being encoded within the name or URL.
+            </td>
+        </tr>
+<!--
+        <tr>
+            <td>Snippet</td>
+            <td>[% data.snippet_err %]</td>
+            <td><textarea name="snippet" rows="5" cols="[% cols %]">[% data.snippet %]</textarea></td>
+        </tr>
+-->
+        <tr>
+            <td>Body *</td>
+            <td>[% data.body_err %]</td>
+            <td><textarea name="body" rows="10" cols="[% cols %]">[% data.body %]</textarea></td>
+        </tr>
+        <tr>
+            <td>Publish *</td>
+            <td>[% data.publish_err %]</td>
+            <td>[% data.ddpublish %]</td>
+		</tr>
+</table>
+</div>
+<p align="center"><input type="submit" value='Submit' /></p>
+</form>
+
+[% INCLUDE "reviews/reviews-adminview.html" %]
+
+[% END %]

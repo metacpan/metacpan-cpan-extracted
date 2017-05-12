@@ -1,0 +1,81 @@
+Revision history for Lingua-FreeLing3
+
+0.09    Sun Jan 12 16:11:02 WET 2014
+        - more changes on freeling 3.1 API;
+        - this release breaks compatibility with 3.0!
+
+0.08    Thu Jun  6 14:25:33 WEST 2013
+        - fix issues with freeling 3.1-alfa
+
+0.07    Sun Apr  7 14:59:23 WEST 2013
+        - fix issue with version numbers
+
+0.06    Sun Apr  7 14:55:08 WEST 2013
+        ::Sentence.pm return trees only if they were computed.
+        - support freeling 3.1-alfa
+
+0.05    Wed Jan  2 21:20:10 WET 2013
+        - Better documentation on FL3 synopsis;
+        - Fixed bug when dumping parse tree;
+
+0.04    Sun Nov 25 15:07:43 WET 2012
+        - ExtUtils::PkgConfig is dying when it shouldn't.
+
+0.03    Tue Nov 20 14:52:21 WET 2012
+        - Added Config::AutoConf dependency that was missing.
+
+0.02    Fri Nov  9 16:02:38 WET 2012
+        - Added Dictionary interface
+
+0.01    Thu Oct 25 18:33:43 WEST 2012
+        - Released for official FreeLing 3.0 release.
+        - There is no guarantee backward support to FL3 beta versions.
+
+0.01_07 Tue Jun  5 14:11:56 WEST 2012
+        - ::EAGLES supports portuguese and spanish.
+        - FL3 includes word and sentence constructors.
+
+0.01_06 Wed May  2 14:21:19 WEST 2012
+        - ::EAGLES created, much to do.
+        - ::Config created for accessing config files.
+        - SWIG fixes
+
+0.01_05 Wed Mar 28 15:33:18 WEST 2012
+        - ::DepTxala changed to match new FL API.
+        - ::NEC tested and working.
+        - ::Word with further methods.
+        - SWIG fixes
+
+0.01_04 Thu Feb 23 12:42:18 WET 2012
+        - ::Sentence now has more constructor hypothesis.
+        - ::Document with push/length/paragraphs? methods.
+        - ::Paragraph with push/length/paragraphs? methods.
+
+0.01_03 Sat Feb 18 17:32:57 WET 2012
+        - FL3 now also includes:
+          - morph/hmm/relax/chart/txala/nec
+
+0.01_02 Thu Feb 16 17:10:25 WET 2012
+        - Added a new shortcut module, FL3, including:
+          - splitter/tokenizer
+        - Added
+          - Lingua::FreeLing3::DepTree            (kind of OK)
+
+0.01_01 Wed Feb 15 16:09:54 WET 2012
+        - First version, from Lingua::FreeLing3 version 0.01_03
+        - Includes:
+          - Lingua::FreeLing3::NEC               (not working)
+          - Lingua::FreeLing3::DepTxala       (not functional)
+          - Lingua::FreeLing3::ChartParser        (kind of OK)
+          - Lingua::FreeLing3::ParseTree          (kind of OK)
+          - Lingua::FreeLing3::Paragraph           (mostly OK)
+          - Lingua::FreeLing3::Document            (mostly OK)
+          - Lingua::FreeLing3::RelaxTagger         (mostly OK)
+          - Lingua::FreeLing3::Tokenizer                  (OK)
+          - Lingua::FreeLing3::Splitter                   (OK)
+          - Lingua::FreeLing3::HMMTagger           (mostly OK)
+          - Lingua::FreeLing3::MorphAnalyzer       (mostly OK)
+          - Lingua::FreeLing3::Word::Analysis      (mostly OK)
+          - Lingua::FreeLing3::Word                (mostly OK)
+          - Lingua::FreeLing3::Sentence            (mostly OK)
+

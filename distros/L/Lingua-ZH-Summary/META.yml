@@ -1,0 +1,21 @@
+---
+name: Lingua-ZH-Summary
+version: 0.03
+author:
+  - 'Cheng-Lung Sung <clsung@FreeBSD.org>'
+abstract: Extract summary from Chinese text
+license: perl
+resources:
+  license: ~
+requires:
+  Net::YASA: 0
+build_requires:
+  Test::More: 0
+provides:
+  Lingua::ZH::Summary:
+    file: lib/Lingua/ZH/Summary.pm
+    version: 0.03
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

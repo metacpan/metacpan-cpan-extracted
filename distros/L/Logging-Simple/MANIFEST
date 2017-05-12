@@ -1,0 +1,36 @@
+Changes
+lib/Logging/Simple.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-0_critic.t
+t/00-1_load.t
+t/00-2_init.t
+t/01-file.t
+t/02-timestamp.t
+t/03-print.t
+t/04-levels.t
+t/05-display.t
+t/06-dyn_methods.t
+t/07-labels.t
+t/08-_sub_names.t
+t/09-_generate_entry.t
+t/10-child.t
+t/11-child_cleanup.t
+t/12-verify_output.t
+t/13-log_only.t
+t/14-fatal.t
+t/15-disable_all.t
+t/base/child.log
+t/base/four.log
+t/base/one.log
+t/base/parent.log
+t/base/three.log
+t/base/two.log
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/testrules.yml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

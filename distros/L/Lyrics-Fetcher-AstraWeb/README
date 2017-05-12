@@ -1,0 +1,41 @@
+Lyrics-Fetcher-AstraWeb README
+====================================
+
+Lyrics::Fetcher::AstraWeb, as the name suggests, fetches lyrics
+from lyrics.astraweb.com.
+
+It is intended to be used as a fetcher by Lyrics::Fetcher, but
+can be used on its own if you desire.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  WWW::Mechanize
+  
+Calling Lyrics::Fetcher::AstraWeb via Lyrics::Fetcher->fetch() is
+recommended, but you can call Lyrics::Fetcher::LyricWiki->fetch() directly
+if you want to do so.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-08 by David Precious
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+AUTHOR
+
+Written by David Precious <davidp@preshweb.co.uk>

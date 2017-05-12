@@ -1,0 +1,13 @@
+COPYING
+Changes
+DATR2XML.pm
+XML-XSLT/DATR1.0.dtd
+XML-XSLT/datr.xml
+XML-XSLT/datr.xsl
+XML-XSLT/datrHTML.xsl
+XML-XSLT/prolog.xsl
+MANIFEST
+Makefile.PL
+README.txt
+test.pl
+thanks.txt

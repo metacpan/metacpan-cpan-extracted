@@ -1,0 +1,15 @@
+Revision history for Perl extension Lingua::DE::Num2Word.
+
+0.03    2004-06-21
+        - update documentation
+        - fix multiple declaration of the same variable in the same scope
+        - added release dates to the Changes file
+
+0.02    2004-06-09
+        - fix 16/17 bug
+        - fix hundred+zero bug
+        - code cleanup
+
+0.01    2002-07-15
+        - original version;
+        - number to text conversion for whole numbers from 0 up to 999 999 999

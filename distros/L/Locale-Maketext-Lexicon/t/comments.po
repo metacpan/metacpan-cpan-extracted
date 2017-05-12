@@ -1,0 +1,25 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Test App 0.01\n"
+"POT-Creation-Date: 2008-08-01 14:20+0200\n"
+"PO-Revision-Date: 2008-08-01 14:21+0200\n"
+"Last-Translator: <cosimo@cpan.org>\n"
+"Language-Team: Italian <cosimo@cpan.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Some user comment
+#: comments.t:1
+msgid "A random string to check that comments work"
+msgstr "Una stringa casuale per controllare che i commenti funzionino"
+
+#: comments.t:2
+#, fuzzy
+msgid "Fuzzy flag"
+msgstr "Fuzzy flag trans"
+
+#: comments.t:3
+#, fuzzy
+msgid "Fuzzy plus marker %1"
+msgstr "Fuzzy plus marker %1 trans"

@@ -1,0 +1,135 @@
+/*** Structure ***/
+@CHARSET "ISO-8859-1";
+
+#scanContents {
+
+}
+
+#quartz-content #list-body #scanContents .scanButton {
+	width: 60px ;
+	padding: 5px ;
+}
+#quartz-content #list-body #scanContents .scanButton a {
+	text-decoration: none ;
+}
+
+
+#quartz-content #list-body #scanContents ol {
+	clear: both ;
+}
+
+#quartz-content #list-body #scanContents .scanInfo {
+	clear: both ;
+}
+
+#quartz-content #list-body #scanContents ol li {
+	display: inline ;
+	float: left ;
+	position: relative ;
+	text-align: center ;
+	height: 1.5em ;
+	line-height: 1.2em ;
+	
+	background: none ;	
+}
+
+/* Frequency section */
+#quartz-content #list-body #scanContents #freqs ol li {
+	width: 150px ;
+	height: 2.8em ;
+	line-height: 2.8em ;
+	font-size: 18px ;
+}
+
+#quartz-content #list-body #scanContents .scanFreq {
+	margin: 10px auto ;
+	padding: 5px ;
+	height: 1.2em ;
+	line-height: 1.2em ;
+	width: 120px ;
+	
+	border-radius: 10px ;
+-moz-border-radius: 10px;
+-webkit-border-radius: 10px;
+-o-border-radius: 10px;
+border-top-right-radius: 10px;
+border-top-left-radius: 10px;
+border-bottom-right-radius: 10px;
+border-bottom-left-radius: 10px;
+	
+	background-position: center ;
+}
+
+/* Channels section */
+#quartz-content #list-body #scanContents #chans ol li {
+	margin: 2px 4px 2px 4px ;
+}
+#quartz-content #list-body #scanContents #chans ol li .scanLCN {
+	width: 60px ;
+	text-align: right ;
+}
+#quartz-content #list-body #scanContents #chans ol li .scanChan {
+	width: 350px ;
+	text-align: left ;
+}
+#quartz-content #list-body #scanContents #chans ol li .scanType {
+	width: 80px ;
+}
+#quartz-content #list-body #scanContents #chans ol li .scanNet {
+	width: 350px ;
+	text-align: left ;
+}
+
+#quartz-content #list-body #scanContents #chans  #scanChanHead ol li {
+}
+
+
+/* Section headings */
+#quartz-content #list-body #scanContents .scanHead {
+
+	padding-top: 20px ;
+	padding-bottom: 5px ;
+	margin-bottom: 10px ;
+	background-position: left bottom ;
+	background-repeat: no-repeat ;
+}
+
+
+/* Progress bar */
+#quartz-content #list-body #scanContents #progress {
+	float: left ;
+}
+
+#quartz-content #list-body #scanContents #progress ol li {
+	vertical-align: middle ;
+	margin: 10px auto ;
+	padding: 5px ;
+	height: 1.6em ;
+}
+
+#quartz-content #list-body #scanContents #progress .progressWrap {
+	width: 300px ;
+
+	border-radius: 10px ;
+-moz-border-radius: 10px;
+-webkit-border-radius: 10px;
+-o-border-radius: 10px;
+border-top-right-radius: 10px;
+border-top-left-radius: 10px;
+border-bottom-right-radius: 10px;
+border-bottom-left-radius: 10px;
+
+	height: 1.2em ;
+}
+
+#quartz-content #list-body #scanContents #progress .progressInner {
+
+	width : 0%;
+	height: 0.9em ;
+
+	position: absolute ;
+	
+	top: 0.4em ;
+	left: 15px ;
+}
+

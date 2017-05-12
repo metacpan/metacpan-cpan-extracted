@@ -1,0 +1,28 @@
+Revision history for Perl extension Lingua::EN::Namegame.
+
+0.01  Fri Dec 27 20:39:45 PST 2002
+	- original version; created by h2xs 1.21 with options
+		-XA -n Lingua::EN::NameGame
+
+0.02  Sun Dec 29 10:08:43 PST 2002
+	- second version; cleaning up typos; expecially NameGame -> Namegame
+
+0.03  Mon Dec 30 10:14:48 PST 2002
+	- reformatted some POD documentation for better HTML appearance
+	- modified POD documentation slightly in attempt to determine why
+	  "=for html" sections for AUTHOR and COPYRIGHT are coming out empty
+	- removed explicit dependency on Regexp::Common
+		(name2verse_nonprofane.pl needs it, but not the Module)
+	- made tests of name2verse_nonprofane.pl conditional on presence of
+	  Regexp::Common
+
+0.04  Wed Jan  1 10:27:33 PST 2003
+	- fixed typo in comment in test.pl
+	- one last try to get =for html sections processed correctly after upload
+
+0.05  Wed Jan  1 14:56:50 PST 2003
+	- Okay, I gave up on trying to get the "=for html" sections displayed
+	  after upload, and converted them all to straight text. Sigh! 8-{
+
+
+

@@ -1,0 +1,421 @@
+NAME
+    LaTeX::TikZ - Perl object model for generating PGF/TikZ code.
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+        use LaTeX::TikZ;
+
+        # A couple of lines
+        my $hline = Tikz->line(-1 => 1);
+        my $vline = Tikz->line([ 0, -1 ] => [ 0, 1 ]);
+
+        # Paint them in red
+        $_->mod(Tikz->color('red')) for $hline, $vline;
+
+        # An octogon
+        use Math::Complex;
+        my $octo = Tikz->closed_polyline(
+         map Math::Complex->emake(1, ($_ * pi)/4), 0 .. 7
+        );
+
+        # Only keep a portion of it
+        $octo->clip(Tikz->rectangle(-0.5*(1+i), 2*(1+i)));
+
+        # Fill it with dots
+        $octo->mod(Tikz->pattern(class => 'Dots'));
+
+        # Create a formatter object
+        my $tikz = Tikz->formatter(scale => 5);
+
+        # Put those objects all together and print them
+        my $seq = Tikz->seq($octo, $hline, $vline);
+        my ($head, $decl, $body) = $tikz->render($seq);
+        print "$_\n" for map @$_, $head, $decl, $body;
+
+DESCRIPTION
+    This module provides an object model for TikZ, a graphical toolkit for
+    LaTeX. It allows you to build structures representing geometrical
+    figures, apply a wide set of modifiers on them, transform them globally
+    with functors, and print them in the context of an existing TeX
+    document.
+
+CONCEPTS
+    Traditionally, in TikZ, there are two ways of grouping paths together :
+
+    *   either as a *sequence*, where each path is drawn in its own line :
+
+            \draw (0cm,0cm) -- (0cm,1cm) ;
+            \draw (0cm,0cm) -- (1cm,0cm) ;
+
+    *   or as an *union*, where paths are all drawn as one line :
+
+            \draw (0cm,0cm) -- (0cm,1cm) (0cm,0cm) -- (1cm,0cm) ;
+
+    This distinction is important because there are some primitives that
+    only apply to paths but not to sequences, and vice versa.
+
+    Figures are made of path or sequence *sets* assembled together in a
+    tree.
+
+    *Modifiers* can be applied onto any set to alter the way in which it is
+    generated. The two TikZ concepts of *clips* and *layers* have been
+    unified with the modifiers.
+
+INTERFACE
+  Containers
+   "union"
+        Tikz->union(@kids)
+
+    Creates a LaTeX::TikZ::Set::Union object out of the paths @kids.
+
+        # A path made of two circles
+        Tikz->union(
+               Tikz->circle(0, 1),
+               Tikz->circle(1, 1),
+              )
+            ->mod(
+               Tikz->fill('red'),
+               'even odd rule',
+              );
+
+   "path"
+        Tikz->path(@kids)
+
+    A synonym for "union".
+
+   "join"
+        Tikz->join($connector, @kids)
+
+    Creates a LaTeX::TikZ::Set::Chain object that joins the paths @kinds
+    with the given $connector which can be, according to "connector" in
+    LaTeX::TikZ::Set::Chain, a string, an array reference or a code
+    reference.
+
+        # A stair
+        Tikz->join('-|', map [ $_, $_ ], 0 .. 5);
+
+   "chain"
+        Tikz->chain($kid0, $link0, $kid1, $link1, ... $kidn)
+
+    Creates a LaTeX::TikZ::Set::Chain object that chains $kid0 to $kid1 with
+    the string $link0, $kid1 to $kid2 with $link1, and so on.
+
+        # An heart-like shape
+        Tikz->chain([ 0, 1 ]
+         => '.. controls (-1, 1.5)    and (-0.75, 0.25) ..' => [ 0, 0 ]
+         => '.. controls (0.75, 0.25) and (1, 1.5)      ..' => [ 0, 1 ]
+        );
+
+   "seq"
+        Tikz->seq(@kids)
+
+    Creates a LaTeX::TikZ::Set::Sequence object out of the sequences or
+    paths @kids.
+
+        my $bag = Tikz->seq($sequence, $path, $circle, $raw, $point);
+
+  Elements
+    Those are the building blocks of your geometrical figure.
+
+   "point"
+        Tikz->point($point)
+
+    Creates a LaTeX::TikZ::Set::Point object by coercing $point into a
+    LaTeX::TikZ::Point. The following rules are available :
+
+    *   If $point isn't given, the point defaults to "(0, 0)".
+
+            my $origin = Tikz->point;
+
+    *   If $point is a numish Perl scalar, it is treated as "($point, 0)".
+
+            my $unit = Tikz->point(1);
+
+    *   If two numish scalars $x and $y are given, they result in the point
+        "($x, $y)".
+
+            my $one_plus_i = Tikz->point(1, 1);
+
+    *   If $point is an array reference, it is parsed as "($point->[0],
+        $point->[1])".
+
+            my $i = Tikz->point([ 0, 1 ]);
+
+    *   If $point is a Math::Complex object, the
+        LaTeX::TikZ::Point::Math::Complex class is automatically loaded and
+        the point is coerced into "($point->Re, $point->Im)".
+
+            my $j = Tikz->point(Math::Complex->emake(1, 2*pi/3));
+
+    You can define automatic coercions from your user point types to
+    LaTeX::TikZ::Point by writing your own
+    "LaTeX::TikZ::Point::My::User::Point" class. See
+    LaTeX::TikZ::Meta::TypeConstraint::Autocoerce for the rationale and
+    LaTeX::TikZ::Point::Math::Complex for an example.
+
+   "line"
+        Tikz->line($from => $to)
+
+    Creates a LaTeX::TikZ::Set::Line object between the points $from and
+    $to.
+
+        my $x_axis = Tikz->line(-5 => 5);
+        my $y_axis = Tikz->line([ 0, -5 ] => [ 0, 5 ]);
+
+   "polyline"
+        Tikz->polyline(@points)
+
+    Creates a LaTeX::TikZ::Set::Polyline object that links the successive
+    elements of @points by segments.
+
+        my $U = Tikz->polyline(
+         Tikz->point(0, 1),
+         Tikz->point(0, 0),
+         Tikz->point(1, 0),
+         Tikz->point(1, 1),
+        );
+
+   "closed_polyline"
+        Tikz->closed_polyline(@points)
+
+    Creates a LaTeX::TikZ::Set::Polyline object that cycles through
+    successive elements of @points.
+
+        my $diamond = Tikz->closed_polyline(
+         Tikz->point(0, 1),
+         Tikz->point(-1, 0),
+         Tikz->point(0, -2),
+         Tikz->point(1, 0),
+        );
+
+   "rectangle"
+        Tikz->rectangle($from => $to)
+        Tikz->rectangle($from => { width => $width, height => $height })
+
+    Creates a LaTeX::TikZ::Set::Rectangle object with opposite corners $from
+    and $to, or with anchor point $from and dimensions $width and $height.
+
+        my $square = Tikz->rectangle(
+         Tikz->point,
+         Tikz->point(2, 1),
+        );
+
+   "circle"
+        Tikz->circle($center, $radius)
+
+    Creates a LaTeX::TikZ::Set::Circle object of center $center and radius
+    $radius.
+
+        my $unit_circle = Tikz->circle(0, 1);
+
+   "arc"
+        Tikz->arc($from => $to, $center)
+
+    Creates a LaTeX::TikZ::Set structure that represents an arc going from
+    $from to $to with center $center.
+
+        # An arc. The points are automatically coerced into LaTeX::TikZ::Set::Point objects
+        my $quarter = Tikz->arc(
+         [ 1, 0 ] => [ 0, 1 ],
+         [ 0, 0 ]
+        );
+
+   "arrow"
+        Tikz->arrow($from => $to)
+        Tikz->arrow($from => dir => $dir)
+
+    Creates a LaTeX::TikZ::Set structure that represents an arrow going from
+    $from towards $to, or starting at $from in direction $dir.
+
+        # An horizontal arrow
+        my $arrow = Tikz->arrow(0 => 1);
+
+   "raw"
+        Tikz->raw($content)
+
+    Creates a LaTeX::TikZ::Set::Raw object that will instantiate to the raw
+    TikZ code $content.
+
+  Modifiers
+    Modifiers are applied onto sets by calling the "->mod" method, like in
+    "$set->mod($mod)". This method returns the $set object, so it can be
+    chained.
+
+   "clip"
+        Tikz->clip($path)
+
+    Creates a LaTeX::TikZ::Mod::Clip object that can be used to clip a given
+    sequence by the (closed) path $path.
+
+        my $box = Tikz->clip(
+         Tikz->rectangle(0 => [ 1, 1 ]),
+        );
+
+    Clips can also be directly applied to sets with the "->clip" method.
+
+        my $set = Tikz->circle(0, 1.5)
+                      ->clip(Tikz->rectangle([-1, -1] => [1, 1]));
+
+   "layer"
+        Tikz->layer($name, above => \@above, below => \@below)
+
+    Creates a LaTeX::TikZ::Mod::Layer object with name $name and optional
+    relative positions @above and @below.
+
+        my $layer = Tikz->layer(
+         'top'
+         above => [ 'main' ],
+        );
+
+    The default layer is "main".
+
+    Layers are stored into a global hash, so that when you refer to them by
+    their name, you get the existing layer object.
+
+    Layers can also be directly applied to sets with the "->layer" method.
+
+        my $dots = Tikz->rectangle(0 => [ 1, 1 ])
+                       ->mod(Tikz->pattern(class => 'Dots'))
+                       ->layer('top');
+
+   "scale"
+        Tikz->scale($factor)
+
+    Creates a LaTeX::TikZ::Mod::Scale object that scales the sets onto which
+    it apply by the given $factor.
+
+        my $circle_of_radius_2 = Tikz->circle(0 => 1)
+                                     ->mod(Tikz->scale(2));
+
+   "width"
+        Tikz->width($line_width)
+
+    Creates a LaTeX::TikZ::Mod::Width object that sets the line width to
+    $line_width when applied.
+
+        my $thick_arrow = Tikz->arrow(0 => 1)
+                              ->mod(Tikz->width(5));
+
+   "color"
+        Tikz->color($color)
+
+    Creates a LaTeX::TikZ::Mod::Color object that sets the line color to
+    $color (given in the "xcolor" syntax).
+
+        # Paint the previous $thick_arrow in red.
+        $thick_arrow->mod(Tikz->color('red'));
+
+   "fill"
+        Tikz->fill($color)
+
+    Creates a LaTeX::TikZ::Mod::Fill object that fills the interior of a
+    path with the solid color $color (given in the "xcolor" syntax).
+
+        my $red_box = Tikz->rectangle(0 => { width => 1, height => 1 })
+                          ->mod(Tikz->fill('red'));
+
+   "pattern"
+        Tikz->pattern(class => $class, %args)
+
+    Creates a LaTeX::TikZ::Mod::Pattern object of class $class and arguments
+    %args that fills the interior of a path with the specified pattern.
+    $class is prepended with "LaTeX::TikZ::Mod::Pattern" when it doesn't
+    contain "::". See LaTeX::TikZ::Mod::Pattern::Dots and
+    LaTeX::TikZ::Mod::Pattern::Lines for two examples of pattern classes.
+
+        my $hatched_circle = Tikz->circle(0 => 1)
+                                 ->mod(Tikz->pattern(class => 'Lines'));
+
+   "raw_mod"
+        Tikz->raw_mod($content)
+
+    Creates a LaTeX::TikZ::Mod::Raw object that will instantiate to the raw
+    TikZ mod code $content.
+
+        my $homemade_arrow = Tikz->line(0 => 1)
+                                 ->mod(Tikz->raw_mod('->')) # or just ->mod('->')
+
+  Helpers
+   "formatter"
+        Tikz->formatter(%args)
+
+    Creates a LaTeX::TikZ::Formatter object that can render a
+    LaTeX::TikZ::Set tree.
+
+        my $tikz = Tikz->formatter;
+        my ($header, $declarations, $seq1_body, $seq2_body) = $tikz->render($set1, $set2);
+
+   "functor"
+        Tikz->functor(@rules)
+
+    Creates a LaTeX::TikZ::Functor anonymous subroutine that can be called
+    against LaTeX::TikZ::Set trees to clone them according to the given
+    rules. @rules should be a list of array references whose first element
+    is the class/role to match against and the second the handler to
+    execute.
+
+        # The default is a clone method
+        my $clone = Tikz->functor;
+        my $dup = $set->$clone;
+
+        # A translator
+        my $translate = Tikz->functor(
+         'LaTeX::TikZ::Set::Point' => sub {
+          my ($functor, $set, $x, $y) = @_;
+
+          $set->new(
+           point => [
+            $set->x + $x,
+            $set->y + $y,
+           ],
+           label => $set->label,
+           pos   => $set->pos,
+          );
+         },
+        );
+        my $shifted = $set->$translate(1, 1);
+
+        # A mod stripper
+        my $strip = Tikz->functor(
+         '+LaTeX::TikZ::Mod' => sub { return },
+        );
+        my $naked = $set->$strip;
+
+DEPENDENCIES
+    Mouse 0.80 or greater.
+
+    Sub::Name.
+
+    Math::Complex, Math::Trig.
+
+    Scalar::Util, List::Util, Task::Weaken.
+
+SEE ALSO
+    PGF/TikZ - <http://pgf.sourceforge.net>.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
+
+BUGS
+    Please report any bugs or feature requests to "bug-latex-tikz at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=LaTeX-TikZ>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc LaTeX::TikZ
+
+COPYRIGHT & LICENSE
+    Copyright 2010,2011,2012,2013,2014,2015 Vincent Pit, all rights
+    reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

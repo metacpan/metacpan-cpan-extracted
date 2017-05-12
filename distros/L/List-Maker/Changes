@@ -1,0 +1,49 @@
+Revision history for List-Maker
+
+0.0.1  Tue Oct 18 22:54:56 2005
+       Initial release.
+
+
+
+0.0.2  Fri Feb 17 17:02:57 2006
+       No changes logged
+
+
+0.0.3  Wed Mar  8 10:28:42 2006
+
+    * Added missing README synopsis (thanks Colin)
+
+
+0.0.4  Sat Feb  9 11:08:51 2008
+
+    * Made globbing magical only in those source files that explicitly load
+      the module (thanks Steffen)
+
+    * Documented <NdR>, <NrM>, and <^N> syntaxes
+
+
+0.0.5  Wed Feb 20 15:14:40 2008
+
+    * Added in missing test module
+
+
+0.001_000  Sun Oct 31 08:24:33 2010
+
+    * Fixed a POD nit in the "conjoin" example
+
+    * Made module lexically scoped under 5.10 and later
+
+
+0.002_000  Thu Nov  4 06:27:15 2010
+
+    * Added :pick and :roll post-selectors
+
+
+0.003_000  Sat Oct 29 11:59:25 2011
+
+    * Fixed core and overloading behaviour (thanks Father Chrysostomos)
+
+
+0.005  Thu Apr 24 08:57:25 2014
+
+    * Fixed behaviour under 5.18+

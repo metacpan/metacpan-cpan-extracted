@@ -1,0 +1,22 @@
+The MakeRPM script attempts to build RPMs of the
+Lab::Measurement system.
+
+Many of these actions are simply invoking Build (or Build.PL,
+if it complains that things have changed).
+
+First it finds the current version number of Lab::Measurement,
+and updates perl-Lab-Measurement.spec with the current
+version number.
+
+Next, it updates the MANIFEST, then creates the
+Lab-Measurement-(version).tar.gz archive file.
+
+Finally, it runs rpmbuild with the .tar.gz archive
+file to build both the installation and the source RPMS
+in whatever your default "rpmbuild" directory is.
+
+See documention on rpmbuild and set your $HOME/.rpmmacros %_topdir
+appropriately for the directories where RPMs are build and
+stored.
+
+

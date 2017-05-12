@@ -1,0 +1,2 @@
+# test that configure-link-controller can handle the non existence of 
+# /etc/link-controller.pl

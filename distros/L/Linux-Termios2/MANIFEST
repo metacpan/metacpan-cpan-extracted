@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Linux/Termios2.pm
+lib/Linux/Termios2.xs
+MANIFEST			This list of files
+t/00use.t
+t/99pod.t
+typemap
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

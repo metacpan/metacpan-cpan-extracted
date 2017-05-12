@@ -1,0 +1,9 @@
+- Implement PATCH?
+- Plugins reload, restart, unload
+- Agent reload, restart and unload plugins API/CLI
+- Lim::CLI Ask(text, cb)/Confirm(text, cb)
+- Schema cache settings
+- Lim::Util::DBI on_error
+- Lim::Util::DBI pod
+- hosts cache in Lim::Util::resolve_hosts
+- Retry initiating transports

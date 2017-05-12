@@ -1,0 +1,244 @@
+{
+    "ReadAnalysis2": {
+        "analysis" : [
+            {
+                "created" : 1,
+                "updated" : 2,
+                "summary" : {
+                    "notice" : null,
+                    "warning" : null,
+                    "critical" : null,
+                    "error" : null
+                },
+                "id" : "test-id-1",
+                "status" : "reserved",
+                "progress" : 0,
+                "url" : "/zonalizer/1/analysis/test-id-1",
+                "fqdn" : "test1.com.",
+                "ipv4" : 1,
+                "ipv6" : 1
+            },
+            {
+                "progress" : 10,
+                "status" : "queued",
+                "id" : "test-id-2",
+                "summary" : {
+                    "error" : null,
+                    "critical" : null,
+                    "notice" : null,
+                    "warning" : null
+                },
+                "updated" : 3,
+                "created" : 2,
+                "ipv6" : 1,
+                "ipv4" : 1,
+                "fqdn" : "test2.com.",
+                "url" : "/zonalizer/1/analysis/test-id-2"
+            },
+            {
+                "id" : "test-id-3",
+                "summary" : {
+                    "error" : null,
+                    "critical" : null,
+                    "warning" : null,
+                    "notice" : null
+                },
+                "updated" : 4,
+                "created" : 3,
+                "progress" : 100,
+                "status" : "done",
+                "ipv4" : 1,
+                "fqdn" : "test3.com.",
+                "url" : "/zonalizer/1/analysis/test-id-3",
+                "ipv6" : 1
+            },
+            {
+                "ipv4" : 1,
+                "fqdn" : "test4.com.",
+                "url" : "/zonalizer/1/analysis/test-id-4",
+                "ipv6" : 1,
+                "id" : "test-id-4",
+                "summary" : {
+                    "warning" : null,
+                    "notice" : null,
+                    "critical" : null,
+                    "error" : null
+                },
+                "updated" : 5,
+                "created" : 4,
+                "progress" : 20,
+                "status" : "failed"
+            },
+            {
+                "updated" : 6,
+                "created" : 5,
+                "id" : "test-id-5",
+                "summary" : {
+                    "critical" : null,
+                    "error" : null,
+                    "notice" : null,
+                    "warning" : null
+                },
+                "status" : "stopped",
+                "progress" : 30,
+                "url" : "/zonalizer/1/analysis/test-id-5",
+                "ipv4" : 1,
+                "fqdn" : "test5.com.",
+                "ipv6" : 1
+            },
+            {
+                "ipv4" : 1,
+                "fqdn" : "test6.com.",
+                "url" : "/zonalizer/1/analysis/test-id-6",
+                "ipv6" : 1,
+                "id" : "test-id-6",
+                "summary" : {
+                    "critical" : null,
+                    "error" : null,
+                    "notice" : null,
+                    "warning" : null
+                },
+                "updated" : 7,
+                "created" : 6,
+                "progress" : 40,
+                "status" : "unknown"
+            }
+        ]
+    },
+    "ReadAnalysis3": {
+        "analysis" : [
+            {
+                "created" : 1,
+                "updated" : 2,
+                "summary" : {
+                    "notice" : null,
+                    "warning" : null,
+                    "critical" : null,
+                    "error" : null
+                },
+                "id" : "test-id-1",
+                "status" : "reserved",
+                "progress" : 0,
+                "url" : "/zonalizer/1/analysis/test-id-1",
+                "fqdn" : "test1.com.",
+                "ipv4" : 1,
+                "ipv6" : 1
+            },
+            {
+                "progress" : 10,
+                "status" : "queued",
+                "id" : "test-id-2",
+                "summary" : {
+                    "error" : null,
+                    "critical" : null,
+                    "notice" : null,
+                    "warning" : null
+                },
+                "updated" : 3,
+                "created" : 2,
+                "ipv6" : 1,
+                "ipv4" : 1,
+                "fqdn" : "test2.com.",
+                "url" : "/zonalizer/1/analysis/test-id-2"
+            }
+        ],
+        "paging": {
+            "cursors": {
+                "after": "test-id-2",
+                "before": "test-id-1"
+            },
+            "next": "/zonalizer/1/analysis?limit=2&after=test-id-2"
+        }
+    },
+    "ReadAnalysis4": {
+        "analysis" : [
+            {
+                "id" : "test-id-3",
+                "summary" : {
+                    "error" : null,
+                    "critical" : null,
+                    "warning" : null,
+                    "notice" : null
+                },
+                "updated" : 4,
+                "created" : 3,
+                "progress" : 100,
+                "status" : "done",
+                "ipv4" : 1,
+                "fqdn" : "test3.com.",
+                "url" : "/zonalizer/1/analysis/test-id-3",
+                "ipv6" : 1
+            },
+            {
+                "ipv4" : 1,
+                "fqdn" : "test4.com.",
+                "url" : "/zonalizer/1/analysis/test-id-4",
+                "ipv6" : 1,
+                "id" : "test-id-4",
+                "summary" : {
+                    "warning" : null,
+                    "notice" : null,
+                    "critical" : null,
+                    "error" : null
+                },
+                "updated" : 5,
+                "created" : 4,
+                "progress" : 20,
+                "status" : "failed"
+            }
+        ],
+        "paging": {
+            "cursors": {
+                "after": "test-id-4",
+                "before": "test-id-3"
+            },
+            "previous": "/zonalizer/1/analysis?limit=2&before=test-id-3",
+            "next": "/zonalizer/1/analysis?limit=2&after=test-id-4"
+        }
+    },
+    "ReadAnalysis5": {
+        "analysis" : [
+            {
+                "updated" : 6,
+                "created" : 5,
+                "id" : "test-id-5",
+                "summary" : {
+                    "critical" : null,
+                    "error" : null,
+                    "notice" : null,
+                    "warning" : null
+                },
+                "status" : "stopped",
+                "progress" : 30,
+                "url" : "/zonalizer/1/analysis/test-id-5",
+                "ipv4" : 1,
+                "fqdn" : "test5.com.",
+                "ipv6" : 1
+            },
+            {
+                "ipv4" : 1,
+                "fqdn" : "test6.com.",
+                "url" : "/zonalizer/1/analysis/test-id-6",
+                "ipv6" : 1,
+                "id" : "test-id-6",
+                "summary" : {
+                    "critical" : null,
+                    "error" : null,
+                    "notice" : null,
+                    "warning" : null
+                },
+                "updated" : 7,
+                "created" : 6,
+                "progress" : 40,
+                "status" : "unknown"
+            }
+        ],
+        "paging": {
+            "cursors": {
+                "after": "test-id-6",
+                "before": "test-id-5"
+            },
+            "previous": "/zonalizer/1/analysis?limit=2&before=test-id-5"
+        }
+    }
+}

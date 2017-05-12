@@ -1,0 +1,2 @@
+define abc "123"
+echo $abc

@@ -1,0 +1,21 @@
+---
+abstract: 'Boolean wrapper lazy'
+author:
+  - 'Tiago Peczenyj <tiago.peczenyj@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lazy-Bool
+requires:
+  perl: 5.010000
+resources:
+  bugtracker: https://github.com/peczenyj/Lazy-Bool/issues
+  homepage: https://github.com/peczenyj/Lazy-Bool
+  repository: git://github.com/peczenyj/Lazy-Bool.git
+version: 0.06

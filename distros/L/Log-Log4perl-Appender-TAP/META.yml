@@ -1,0 +1,28 @@
+---
+abstract: 'Append to TAP output'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Log::Log4perl: '0'
+  Test2::Suite: '0.000030'
+  Test::More: '0.94'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Log4perl-Appender-TAP
+requires:
+  Log::Log4perl: '0'
+  Test2: '1.302015'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plicease/Log-Log4perl-Appender-TAP/issues
+  homepage: http://perl.wdlabs.com/Log-Log4perl-Appender-TAP
+  repository: git://github.com/plicease/Log-Log4perl-Appender-TAP.git
+version: '0.03'

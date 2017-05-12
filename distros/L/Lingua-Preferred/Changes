@@ -1,0 +1,122 @@
+2003-12-14 12:00  ed
+
+	* Preferred.pm, README: Version 0.2.4.
+
+2003-12-14 11:56  ed
+
+	* Preferred.pm, test.pl: Accept 'C' to mean pick the first
+	  available language.
+
+2003-04-12 15:58  ed
+
+	* Preferred.pm, README: Version 0.2.3.
+
+2003-04-12 15:54  ed
+
+	* Makefile.PL, Preferred.pm, test.pl: Use Log::TraceMessages if
+	  it's installed, but don't require it.
+
+2003-01-18 09:41  ed
+
+	* mkdist: Updated for CVS instead of RCS.
+
+2003-01-18 09:38  ed
+
+	* MANIFEST: Added README to file list.
+
+2003-01-18 09:37  ed
+
+	* Preferred.pm, README: Bug fix suggested by Juergen Appel to
+	  handle language strings with @ in them (stuff after the @ is
+	  ignored).
+
+	  Updated version to 0.2.2, and noted in the README that this
+	  module is a dead end.
+
+2002-09-24 18:15  ed
+
+	* Preferred.pm, README: Version 0.2.1.
+
+2002-09-24 08:16  ed
+
+	* README: Added copyright information.
+
+2002-09-01 14:55  ed
+
+	* Preferred.pm, README: Updated my email address.
+
+2002-02-01 17:23  ed
+
+	* Preferred.pm, README, test.pl: Version 0.2: added
+	  acceptable_lang() to return a yes or no answer about whether one
+	  language is okay.
+
+2002-01-28 17:17  ed
+
+	* README, Preferred.pm: Version 0.1.2.
+
+2002-01-28 17:17  ed
+
+	* Preferred.pm: Fixed print to stdout when trace enabled (d'oh!).
+
+2001-11-28 13:27  ed
+
+	* Preferred.pm: Version 0.1.1.
+
+2001-11-28 13:27  ed
+
+	* README: Updated for version 0.1.1.
+
+2001-11-28 13:25  ed
+
+	* Makefile.PL: Added Log::TraceMessages as a prerequisite (spotted
+	  by cpan-testers).
+
+2001-02-21 16:36  ed
+
+	* mkdist: Remove Makefile.old for tidiness.  I suppose I should
+	  just get things out of the RCS directory as needed.
+
+2001-02-21 16:35  ed
+
+	* mkdist: Remove pm_to_blib also - it screws things up if it's
+	  lying around
+
+2001-02-21 16:30  ed
+
+	* README: Initial blurb
+
+2001-02-21 16:25  ed
+
+	* README: Initial revision
+
+2001-02-19 14:27  ed
+
+	* test.pl: Revised test case for en_* to reflect new semantics
+
+2001-02-19 14:26  ed
+
+	* Preferred.pm: Change semantics of en_* - it no longer implies
+	  'en'
+
+2001-02-16 13:39  ed
+
+	* Preferred.pm: Fix synopsis
+
+2001-02-16 13:38  ed
+
+	* test.pl: Fix number-of-tests printing; add warnings and strict
+
+2001-02-16 12:37  ed
+
+	* test.pl: Wrote a few test cases
+
+2001-02-16 12:37  ed
+
+	* Preferred.pm: First working version
+
+2001-02-14 11:41  ed
+
+	* MANIFEST, Makefile.PL, Preferred.pm, test.pl, mkdist: Initial
+	  revision
+

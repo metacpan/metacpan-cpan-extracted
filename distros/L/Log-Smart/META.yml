@@ -1,0 +1,18 @@
+--- 
+abstract: "Messages for smart logging to the file "
+author: 
+  - Kazuhiro Shibuya, C<< <k42uh1r0 at gmail.com> >>
+distribution_type: module
+generated_by: Module::Install version 0.70
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Log-Smart
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  perl: 5.8.0
+version: 0.009

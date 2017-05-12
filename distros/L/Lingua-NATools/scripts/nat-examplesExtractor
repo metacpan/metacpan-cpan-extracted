@@ -1,0 +1,361 @@
+#!/usr/bin/perl -s
+
+use warnings;
+use strict;
+
+use POSIX qw(locale_h);
+use IPC::Open2;
+
+setlocale(LC_CTYPE, "pt_PT");
+use locale;
+use Data::Dumper;
+use Lingua::NATools;
+use Lingua::NATools::Matrix;
+use Lingua::NATools::Client;
+use DBI;
+use Memoize;
+use Text::NSP::Measures::3D::MI::ll qw/!calculateStatistic !getStatisticName/;
+use Text::NSP::Measures::2D::MI::ll qw/!calculateStatistic !getStatisticName/;
+
+memoize('countTri');
+memoize('countBi');
+memoize('LLR2');
+memoize('LLR3');
+
+our($local, $crp, $rules, $h, $swap, $server, $port, $langs, $chunk,$out, $conf, $attraction);
+
+sub usage {
+  print "nat-examplesExtractor: extracts translation examples and terminology
+                       from a NATools corpus.
+
+    nat-examplesExtractor [options] <offset> <length> <file1> <file2>
+    nat-examplesExtractor [options] -local=ID -chunk=n
+
+        -out=file         (where to put output data)
+        -conf=natrc       (where is the NATools config file)
+
+        -langs=pt..en     (use system rule file)
+        -rules=rules.txt  (rule file)
+        -swap             (swap rules languages order)
+
+        -local=corpdir    (local directory with the PTD)
+        -chunk=n          (to process a local chunk for a local corpus)
+        -attraction       (compute attraction metrics, requires n-grams)
+
+        -crp=corpusID     (to use with a remote server)
+        -server=127.0.0.1 (to use with a remote server)
+        -port=4000        (to use with a remote server)
+\n";
+  print "For more help, please run 'perldoc nat-examplesExtractor'\n";
+  exit;
+}
+
+usage() if $h;
+usage() if scalar(@ARGV) != 4 && scalar(@ARGV) != 0;
+usage() if scalar(@ARGV) == 0 && (!$local || !$chunk);
+usage() if scalar(@ARGV) == 4 && $chunk;
+
+my ($offset, $length, $f1, $f2);
+
+if ($chunk) {
+    usage() unless $local;
+    ($offset, $length, $f1, $f2) = (0, 100_000,
+                                    sprintf("%s/source.%03d",$local,$chunk),
+                                    sprintf("%s/target.%03d",$local,$chunk));
+    if (!$out) {
+        $out = sprintf("%s/examples.%03d",$local,$chunk);
+    }
+
+} else {
+    ($offset, $length, $f1, $f2) = @ARGV;
+}
+
+my ($S2dbh, $S3dbh);
+my ($T2dbh, $T3dbh);
+if ($attraction) {
+    die "Can't compute attraction metrics with remote server (ATM)\n" unless $local;
+
+    die "Can't open S.2.sqlite\n" unless -f "$local/S.2.sqlite";
+    die "Can't open S.3.sqlite\n" unless -f "$local/S.3.sqlite";
+    die "Can't open T.2.sqlite\n" unless -f "$local/T.2.sqlite";
+    die "Can't open T.3.sqlite\n" unless -f "$local/T.3.sqlite";
+
+    $S2dbh = DBI->connect("dbi:SQLite:dbname=$local/S.2.sqlite","","");
+    $T2dbh = DBI->connect("dbi:SQLite:dbname=$local/T.2.sqlite","","");
+    $S3dbh = DBI->connect("dbi:SQLite:dbname=$local/S.3.sqlite","","");
+    $T3dbh = DBI->connect("dbi:SQLite:dbname=$local/T.3.sqlite","","");
+}
+
+my $user_conf = Lingua::NATools::user_conf($conf);
+
+local $/ = "\n\$\n";
+open F1, $f1 or die "Can't open [$f1]\n";
+open F2, $f2 or die "Can't open [$f2]\n";
+
+my ($s1,$s2);
+
+my $serverObj;
+if ($local) {
+    print STDERR "Loading corpus from '$local'\n";
+    $serverObj = Lingua::NATools::Client->new(local => $local);
+} else {
+    my %ops;
+    $ops{PeerAddr} = $server if $server;
+    $ops{PeerPort} = $port   if $port;
+    $serverObj = Lingua::NATools::Client->new(%ops);
+    $serverObj->set_corpus($crp);
+}
+
+if ($langs) {
+    ($user_conf->{sourcelang}, $user_conf->{targetlang}) = split /\.\./, $langs;
+} else {
+    ($user_conf->{sourcelang}, $user_conf->{targetlang}) = ($serverObj->attribute("source-language"),
+                                                            $serverObj->attribute("target-language"));
+}
+
+$user_conf->{sourcelang} = lc($user_conf->{sourcelang});
+$user_conf->{targetlang} = lc($user_conf->{targetlang});
+
+($rules, $swap) = Lingua::NATools::find_rules($user_conf->{sourcelang}, $user_conf->{targetlang}) if (!$rules);
+$rules = Lingua::NATools::PatternRules->parseFile($rules) if $rules;
+$rules = invrules($rules) if $swap && $rules;
+
+my $morph_needs = _analyse_rules($rules);
+$user_conf->{MORPH} = [[undef, undef],[undef, undef]];
+
+if ($morph_needs->[0]) {
+    if (exists( $user_conf->{lc($user_conf->{sourcelang})."-morphological-analyser"} )) {
+        my ($outFH, $inFH);
+        open2($outFH,$inFH, $user_conf->{lc($user_conf->{sourcelang})."-morphological-analyser"});
+        ($user_conf->{MORPH}[0][0], $user_conf->{MORPH}[0][1]) = ($outFH, $inFH);
+    }
+}
+if ($morph_needs->[1]) {
+    if (exists( $user_conf->{lc($user_conf->{targetlang})."-morphological-analyser"} )) {
+        my ($outFH, $inFH);
+        open2($outFH, $inFH, $user_conf->{lc($user_conf->{targetlang})."-morphological-analyser"});
+        ($user_conf->{MORPH}[1][0], $user_conf->{MORPH}[1][1]) = ($outFH, $inFH);
+    }	
+}
+
+if ($out) {
+    open OUT, ">$out" or die "Can't open $out\n";
+    select OUT;
+    $|=1;
+}
+
+print STDERR "Skipping $offset...\n" if $offset;
+
+while (defined($s1 = <F1>) && defined($s2 = <F2>) && $length) {
+
+    if ($offset) { $offset--; next }
+
+    print STDERR "$length\n" unless ($length % 100);
+    $length--;
+
+    chomp $s1;
+    chomp $s2;
+
+    my @x = split /\s+/, $s1;
+    next if @x > 100;
+
+    my @y = split /\s+/, $s2;
+    next if @y > 100;
+
+    my $matrix = Lingua::NATools::Matrix->new($serverObj, $rules, $s1, $s2, $user_conf);
+    $matrix->findDiagonal;
+
+    ## print STDERR Dumper($matrix);
+
+    for my $b (@{$matrix->{patterns}}) {
+        my $x = $matrix->dump_block($b);
+        if ($attraction) {
+            my $ss = mwLLR($S2dbh, $S3dbh, split /\s+/,$x->[0]);
+            my $tt = mwLLR($T2dbh, $T3dbh, split /\s+/,$x->[1]);
+            printf "%s\t%.3f\t%s\t%.3f\t%s\t%.3f\n",
+              $b->{id}, $b->{prob}, $x->[0], $ss, $x->[1], $tt;
+        }
+        else {
+            print $x->[0], " =!",$b->{id},"!= ", $x->[1], "\n";
+        }
+    }
+
+#  my $blocks = $matrix->grep_blocks;
+#  my $bs = $matrix->combine_blocks($blocks, 1);
+
+#  for my $b (@$bs) {
+#    my $x = $matrix->dump_block($b);
+#    print $x->[0], " === ", $x->[1], "\n";
+#  }
+#  print "\n";
+}
+
+close OUT if $out;
+
+sub invrules { ## Passar esta funcao para o modulo PatternRules
+  my $r = shift;
+  for(@$r){
+    ($_->[0], $_->[1]) = ($_->[1], $_->[0]);
+  }
+  return $r
+}
+
+
+sub mwLLR {
+    my $bi = shift;
+    my $tri = shift;
+    my $words = join(" ", @_);
+    my $w1 = shift @_;
+    my $w2 = shift @_;
+    if (@_) {
+        my $w3 = shift @_;
+        my $min = LLR3($tri, $w1, $w2, $w3);
+        while (@_) {
+            ($w1, $w2) = ($w2, $w3);
+            $w3 = shift @_;
+
+            my $nt = LLR3($tri, $w1, $w2, $w3);
+            $min = $nt if $nt < $min;
+        }
+        # printf STDERR "[%s] = %.3f\n", $words, $min;
+        return $min
+    }
+    else {
+        my $ans = LLR2($bi, $w1, $w2);
+        # printf STDERR "[%s] = %.3f\n", $words, $ans;
+        return $ans;
+    }
+}
+
+sub LLR2 {
+    my ($dbh, $w1, $w2) = @_;
+    my $n11 = countBi($dbh,  $w1,   $w2);
+    my $n1p = countBi($dbh,  $w1);
+    my $np1 = countBi($dbh,  undef, $w2);
+    my $npp = countBi($dbh);
+    my $yy = Text::NSP::Measures::2D::MI::ll::calculateStatistic( n11 => $n11,
+                                                                  n1p => $n1p,
+                                                                  np1 => $np1,
+                                                                  npp => $npp );
+    return $yy || 0;
+}
+
+sub LLR3 {
+    my ($dbh, $w1, $w2, $w3) = @_;
+    my $n111 = countTri($dbh, $w1, $w2, $w3);
+    my $n1pp = countTri($dbh, $w1);
+    my $np1p = countTri($dbh, undef, $w2);
+    my $npp1 = countTri($dbh, undef, undef, $w3);
+    my $n11p = countTri($dbh, $w1, $w2, undef);
+    my $n1p1 = countTri($dbh, $w1, undef, $w3);
+    my $np11 = countTri($dbh, undef, $w2, $w3);
+    my $nppp = countTri($dbh);
+
+    my $yy = Text::NSP::Measures::3D::MI::ll::calculateStatistic( n111=>$n111,
+                                                                  n1pp=>$n1pp,
+                                                                  np1p=>$np1p,
+                                                                  npp1=>$npp1,
+                                                                  n11p=>$n11p,
+                                                                  n1p1=>$n1p1,
+                                                                  np11=>$np11,
+                                                                  nppp=>$nppp );
+    return $yy || 0;
+}
+
+sub countBi {
+    my ($dbh, $w1, $w2) = @_;
+
+    my $sql = "SELECT SUM(occs) FROM bigrams WHERE ";
+
+    $sql .= "w1 = ? AND " if $w1;
+    $sql .= "w2 = ? AND " if $w2;
+
+    $sql =~ s! (WHERE|AND) $!;!;
+
+    my @ops = grep { defined($_) } ($w1, $w2);
+
+    my $sth = $dbh->prepare($sql);
+    $sth->execute( @ops );
+    my ($t) = $sth->fetchrow_array;
+    $t ||= 0;
+    return $t;
+}
+
+sub countTri {
+    my ($dbh, $w1, $w2, $w3) = @_;
+
+    my $sql = "SELECT SUM(occs) FROM trigrams WHERE ";
+
+    $sql .= "w1 = ? AND " if $w1;
+    $sql .= "w2 = ? AND " if $w2;
+    $sql .= "w3 = ? AND " if $w3;
+
+    $sql =~ s! (WHERE|AND) $!;!;
+
+    my @ops = grep { defined($_) } ($w1, $w2, $w3);
+
+    my $sth = $dbh->prepare($sql);
+    $sth->execute( @ops );
+    my ($t) = $sth->fetchrow_array;
+    $t ||= 0;
+    return $t;
+}
+
+
+sub _analyse_rules {
+    my $rules = shift;
+
+    # l1 or l2 needs morphological analyser
+    my ($l1, $l2) = (0,0);
+    for my $rule (@$rules) {
+        last if $l1 && $l2;
+        for (@{$rule->[0]}) {
+            last if $l1;
+            $l1 = 1 if (exists($_->{var}) && (exists($_->{props}{pre}) ||
+                                              exists($_->{props}{preg})));
+        }
+        for (@{$rule->[1]}) {
+            last if $l2;
+            $l2 = 1 if (exists($_->{var}) && (exists($_->{props}{pre}) ||
+                                              exists($_->{props}{preg})));
+        }
+    }
+    return [$l1,$l2];
+}
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-examplesExtractor: extracts translation examples and terminology from a NATools corpus.
+
+=head1 SYNOPSIS
+
+   nat-examplesExtractor <offset> <length> <file1> <file2>
+   nat-examplesExtractor -local=cp -rules=f.rul 0 100 cp/source.001 cp/target.001
+
+=head1 DESCRIPTION
+
+This command is the example and terminology extractor. In fact it
+still needs a lot of work and for now I really suggest you to contact
+me for more details.
+
+=head1 Options
+
+ -rules=file
+ -local=directory
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2009 by Alberto Manuel Brandão Simões
+
+=cut

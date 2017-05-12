@@ -1,0 +1,16 @@
+This "scripts" directory contains a couple of scripts that are not
+intended for installation.
+
+The "build-character-table" script probes the tables of HTML entities
+to UTF-8 characters (%entity2char) in HTML::Entities and the table of
+HTML entities to LaTeX encodings in Pod::LaTeX.  From that information
+and some local overrides it builds a UTF-8 character to LaTeX
+representation, which it prints out as a version of the
+LaTeX::Encode::EncodingTable module, which I use to compare against
+the current version in "../lib".  I incorporate any changes that I notice.
+
+The "format-encoding-reference" script probes the encoding table and
+creates a LaTeX document (with the help of LaTeX::Table) and formats
+it with LaTeX::Driver to create a dvi document that shows all the
+characters that are encoded with their Unicode values in hex, their
+LaTeX encoding and their formatted representation.

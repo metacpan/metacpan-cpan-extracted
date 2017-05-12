@@ -1,0 +1,74 @@
+Changes for Labyrinth-Plugin-Album
+==================================
+
+1.12    2015-03-16
+        - added functional tests for Children, Selection & PageSelect methods.
+          (Pages)
+        - added missing test data files.
+
+1.11    2015-03-15
+        - added functional tests for View, Random, Gallery & Albums methods.
+          (Photos)
+        - fixed logic bug in Albums method.
+
+1.10    2015-03-14
+        - bugfix, don't save non-existent metadata!
+
+1.09    2015-03-07
+        - When uploading an image for an album, there will be no delete
+          requests. As such, don't perform them and get SQL erros!
+
+1.08    2015-01-09
+        - add lightbox links to the edit page template.
+        - avoid browser caching of images on edit page by using a timesamp.
+        - added thumbnails fix script, where uploaded images need thumbnails
+          re-creating.
+
+1.07    2014-10-21
+        - fixed license fields in META.json to be lists.
+        - extended META and functional test suite.
+        - added Labyrinth::Test::Harness to pre-requisites.
+        - suppress warnings (Pages).
+        - fixed several logic errors (Photos).
+
+1.06    2014-04-16
+        - fixed distribution name in META.
+
+1.05    2013-10-20
+        - fixed XHTML tags.
+        - added button classes.
+        - updated titles and breadcrumbs.
+        - added slideshow template and javascript.
+        - add functionality to list multiple albums/photos.
+
+1.04    2013-02-10
+        - added cover photo feature.
+        - added config support for image and thmbnail sizes.
+        - update field validation.
+        - default lowered to PUBLISHER.
+        - fixed hide gallery album.
+        - allow deletion of archive photos from filesystem.
+        - allow photos to be moved between albums.
+        - now requires Labyrinth Core 5.14.
+        - added LICENSE file.
+        - added INSTALL file.
+
+1.03    2013-01-06
+        - aded hits dispatch and template files.
+        - change file dates changed to meet W3CDTF standards.
+        - updated test suite.
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+1.02    2012-01-25
+        - allow config settings of maxphotowidth & maxphotoheight for photos, 
+          and  maxthumbwidth & maxthumbheight for thumbnails.
+        - set a default of 0 for parentid.
+
+1.01    2012-01-08
+        - check we have an accessible directory to store photos
+        - added missing modules in metadata provides.
+
+1.00    2012-01-04
+        - first official release

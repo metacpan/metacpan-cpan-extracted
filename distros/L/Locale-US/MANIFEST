@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+codes.dat
+kruft.txt
+kruft2codes.pl
+lib/Locale/US.pm
+t/1.t
+META.json                                Module JSON meta-data (added by MakeMaker)

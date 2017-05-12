@@ -1,0 +1,27 @@
+---
+abstract: "Tie to LMDB (OpenLDAP's Lightning Memory-Mapped Database)"
+author:
+  - 'Salvador Ortiz <sog@msg.com.mx>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LMDB_File
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.010000'
+resources:
+  repository: git://github.com/salortiz/LMDB_File.git
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

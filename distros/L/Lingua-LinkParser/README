@@ -1,0 +1,109 @@
+==================================================================
+
+  Lingua::LinkParser 1.17
+  Copyright 2000-2014 by Danny Brian
+
+  This program is free software; you can redistribute it and/or 
+  modify it under the same terms as Perl itself.
+
+==================================================================
+
+LINUX USERS:
+
+   There is a namespace compatability conflict documented at:
+
+     http://rt.cpan.org/NoAuth/Bug.html?id=4428
+
+   If you get segfaults or "dictionary creation" errors, follow the advice 
+   of Alan Buckeridge:
+
+     There's a routine called 'advance' in the file 'read-dict.c' in the
+     parser's source directory.  By replacing each occurrence of "advance"
+     with something else (I used "ad_vance") and recompiling the parser, I
+     was able to 'make' and 'make test' for Lingua::LinkParser.
+
+   This has fixed the problem in all cases, as far as I'm aware. Thanks Alan.
+
+DESCRIPTION
+
+   To quote the Link Grammar documentation, "the Link Grammar Parser 
+   is a syntactic parser of English, based on link grammar, an original 
+   theory of English syntax. Given a sentence, the system assigns to it 
+   a syntactic structure, which consists of set of labeled links 
+   connecting pairs of words." Version 1.10 of this module implements the 
+   4.x parser API currently maintained by AbiSource and available 
+   from http://www.abisource.com/projects/link-grammar/ .
+
+REQUIREMENTS
+
+   To install Lingua::LinkParser you must have already downloaded, 
+   compiled and installed the Link Parser package. This package is tested 
+   compatible with at least link-grammar 4.8.x.
+
+   This module has been compiled and tested with Perl 5.12 on Linux 
+   and on OS X.
+
+INSTALLATION
+
+   Before you build this package, it is highly recommended that you install 
+   the link parser package with 'make install', which will put the libs, 
+   headers, and dictionary files in standard locations. This build no longer
+   prompts for package directories, so if you want to build with non-standard
+   locations, you'll need to edit Makefile.PL to make that happen. In particular,
+   pay attention to the INCLUDE parameter.
+
+   To begin installation type:
+
+      perl Makefile.PL
+
+   Once the Makefile is written, you can build and test with:
+
+      make
+      make test
+
+   The test will load the parser dictionary files and parse a sample
+   sentence. If they do not, back up and figure out why before
+   installation. To install:
+
+      make install
+
+BUILD PROBLEMS
+
+   On Linux, the make displays several warnings about redefined macros -
+   these messages may be ignored.
+
+   I have noticed recently that Perls >= 5.8.8 on newer Linux installs do
+   not write the Makefile properly. After perl Makefile.PL, be sure your 
+   resulting Makefile has the block:
+
+     # --- MakeMaker const_loadlibs section:
+     # Lingua::LinkParser might depend on some other libraries:
+     # See ExtUtils::Liblist for details
+     #
+     EXTRALIBS = -llink-grammar
+     LDLOADLIBS = -llink-grammar
+     BSLOADLIBS =
+     LD_RUN_PATH = /usr/local/lib
+
+  Or include the path to your libs. You also need to have the lib path in your 
+  /etc/ld.so.conf, and to run ldconfig afterwards. If anybody knows why MakeMaker
+  isn't writing the above for the Makefile, please let me know.
+
+DOCUMENTATION
+
+   Full documentation is available in pod format within the .pm file:
+
+      perldoc Lingua::LinkParser
+
+   The scripts in 'scripts/' demonstrate a general overview of the 
+   functionality.
+
+TODO
+
+   I need to add quite a few tests. I'd like there to be a large test suite 
+   of sentences.
+  
+AUTHOR
+
+   Danny Brian <danny@brians.org>
+

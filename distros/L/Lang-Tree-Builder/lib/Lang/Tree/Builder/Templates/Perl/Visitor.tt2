@@ -1,0 +1,132 @@
+# WARNING: [% warning %] DO NOT EDIT! YOUR EDITS WILL BE LOST!
+
+package [% visitor.name %];
+use strict;
+use warnings;
+
+=head1 NAME
+
+[% visitor.name %] - abstract visitor class.
+
+=head1 SYNOPSYS
+
+  package [% visitor.name %]::MyVisitor;
+  use base qw([% visitor.name %]);
+
+  sub new { ... }
+  sub visit[% data.classes.first.lastpart %] { ... } # etc.
+
+=head1 METHODS
+
+Individual methods are described below.
+
+=head2 new
+
+  my $visitor = new [% visitor.name %](%params);
+
+The default new method just blesses its params into a hashref. You can
+override this if needed.
+
+=cut
+
+sub new {
+    my ($class, %params) = @_;
+    bless { %params }, $class;
+}
+
+=head2 combine
+
+  $self->combine(@parts);
+
+The default visitor method for each node calls this C<combine> method
+on the result of calling C<accept> on each of the components of the node.
+The default version of the C<combine> method merely collects those
+results into a listref and returns that. You may of course override this
+method to do something different, or nothing at all.
+
+=cut
+
+sub combine {
+    my ($self, @parts) = @_;
+    return [@parts];
+}
+
+[% FOREACH class IN data.classes %]
+[% IF class.is_concrete %]
+=head2 visit[% class.lastpart %]
+
+  $visitor->visit[% class.lastpart %]($[% class.lastpart.uncamel %]);
+
+Called by the C<[% class.name %]>'s C<accept> method.
+If you override this, then
+[% IF class.args.size -%]
+you can use the following accessor methods on C<$[% class.lastpart.uncamel %]>.
+
+[%- FOREACH arg IN class.args %]
+  [%- IF arg.is_substantial %]
+  $[% class.lastpart.uncamel %]->[% arg.argname.getMethod %]()->accept($self);
+  [%- ELSE %]
+  [% UNLESS arg.is_scalar %]# WARNING: no known implementation for [% arg.name %][% END %]
+  $[% class.lastpart.uncamel %]->[% arg.argname.getMethod %]();
+  [%- END %]
+[%- END %]
+
+[% INCLUDE "ExplainArgs.tt2" condition="returns" type="get" %]
+[%- ELSE -%]
+be aware that C<$[% class.lastpart.uncamel %]> has no component fields.
+[%- END %]
+
+The default method here does
+
+  return $self->combine(
+  [%- FOREACH arg IN class.args %]
+      [%- IF arg.is_substantial %]
+      $[% class.lastpart.uncamel %]->[% arg.argname.getMethod %]()->accept($self),
+      [%- ELSE %]
+      $[% class.lastpart.uncamel %]->[% arg.argname.getMethod %](),
+      [%- END %]
+  [%- END %]
+  );
+
+[%- FOREACH arg IN class.args %]
+[%- UNLESS arg.is_substantial %]
+[% UNLESS arg.is_scalar %]WARNING: There is no description of [% arg.name %]
+in the treebuilder config,
+it is assumed to be defined elsewhere.[% END %]
+[%- END %]
+[%- END %]
+
+=cut
+
+sub visit[% class.lastpart %] {
+    my ($self, $[% class.lastpart.uncamel %]) = @_;
+
+    return $self->combine(
+    [%- FOREACH arg IN class.args %]
+        [%- IF arg.is_substantial %]
+        $[% class.lastpart.uncamel %]->[% arg.argname.getMethod %]()->accept($self),
+        [%- ELSE %]
+        [% UNLESS arg.is_scalar %]# WARNING: no known implementation for [% arg.name %][% END %]
+        $[% class.lastpart.uncamel %]->[% arg.argname.getMethod %](),
+        [%- END %]
+    [%- END %]
+    );
+}
+[% END %]
+[% END %]
+
+=head1 AUTHOR
+
+[% warning %]
+
+=head1 SEE ALSO
+
+The generated tree node classes:
+[%- FOREACH class IN data.classes %]
+L<[% class.name %]>,
+[%- END %]
+and the API that makes them available: L<[% api.name %]>.
+
+=cut
+
+1;

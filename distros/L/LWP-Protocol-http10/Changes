@@ -1,0 +1,17 @@
+_______________________________________________________________________________
+2012-02-18 LWP-Protocol-http10 6.03
+
+Restore perl-5.8.1 compatiblity.
+
+
+
+
+_______________________________________________________________________________
+2011-04-09 LWP-Protocol-http10 6.02
+
+Initial release of LWP-Protocol-http10 as a separate distribution. There are no code
+changes besides setting the version number since libwww-perl-6.01.
+
+The LWP::Protocol::http10 module used to be bundled with the libwww-perl
+distribution, but it was unbundled in v6.02 as part of general cleanup for
+the 6-series.  LWP::Protocol::http10 is deprecated.

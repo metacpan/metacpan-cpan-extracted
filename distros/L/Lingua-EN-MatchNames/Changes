@@ -1,0 +1,30 @@
+Revision history for Perl extension Lingua::EN::MatchNames.
+
+1.36 Fri 27 Feb 2015 01:14:09 PM PST 
+  * Upgraded ExtUtils::MakeMaker and repackaged (no functionality changes)
+
+1.35 Sun 22 Feb 2015 10:03:53 PM PST 
+  * Added github repo to dist metadata and pod
+
+1.34 Sat 21 Feb 2015 11:42:52 PM PST 
+  * version parity with Lingua::EN::Nickname
+
+1.33 Sat 21 Feb 2015 10:05:04 PM PST 
+  * version parity with Lingua::EN::Nickname
+
+1.31 Mon Feb 16 10:43:54 2015 
+  * corrected email
+  * added to github: https://github.com/brianary/Lingua-EN-MatchNames
+
+20150213
+  * added license
+
+20000530
+  * minor documentation fix
+
+19991222
+  * re-release to stay synched with Lingua::EN::Nickname
+
+19991202
+  * original release version; created by h2xs 1.19
+

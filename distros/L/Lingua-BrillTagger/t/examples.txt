@@ -1,0 +1,103 @@
+# These examples come from the Collins parser distribution.  They have
+# been run through the original Brill tagger to get the proper
+# tagging.
+Pierre NNP Vinken NNP , , 61 CD years NNS old JJ , , will MD join VB the DT board NN as IN a DT nonexecutive JJ director NN Nov. NNP 29 CD . .
+Mr. NNP Vinken NNP is VBZ chairman NN of IN Elsevier NNP N.V. NNP , , the DT Dutch JJ publishing NN group NN . .
+Rudolph NNP Agnew NNP , , 55 NN years NNS old JJ and CC former JJ chairman NN of IN Consolidated NNP Gold NNP Fields NNP PLC NNP , , was VBD named VBN a DT nonexecutive JJ director NN of IN this DT British JJ industrial JJ conglomerate NN . .
+A DT form NN of IN asbestos NN once RB used VBD to TO make VB Kent NNP cigarette NN filters NNS has VBZ caused VBN a DT high JJ percentage NN of IN cancer NN deaths NNS among IN a DT group NN of IN workers NNS exposed VBN to TO it PRP more JJR than IN 30 CD years NNS ago RB , , researchers NNS reported VBD . .
+The DT asbestos NN fiber NN , , crocidolite NN , , is VBZ unusually RB resilient JJ once RB it PRP enters VBZ the DT lungs NNS , , with IN even RB brief JJ exposures NNS to TO it PRP causing VBG symptoms NNS that WDT show VBP up IN decades NNS later RB , , researchers NNS said VBD . .
+Lorillard NNP Inc. NNP , , the DT unit NN of IN New NNP York-based JJ Loews NNP Corp. NNP that WDT makes VBZ Kent NNP cigarettes NNS , , stopped VBD using VBG crocidolite NN in IN its PRP$ Micronite NN cigarette NN filters NNS in IN 1956 CD . .
+Although IN preliminary JJ findings NNS were VBD reported VBN more JJR than IN a DT year NN ago RB , , the DT latest JJS results NNS appear VBP in IN today NN 's POS New NNP England NNP Journal NNP of IN Medicine NNP , , a DT forum NN likely JJ to TO bring VB new JJ attention NN to TO the DT problem NN . .
+A DT Lorillard NNP spokewoman NN said VBD , , `` `` This DT is VBZ an DT old JJ story NN . .
+We PRP 're VBP talking VBG about IN years NNS ago RB before IN anyone NN heard VBN of IN asbestos NN having VBG any DT questionable JJ properties NNS . .
+There EX is VBZ no DT asbestos NN in IN our PRP$ products NNS now RB . . '' ''
+Neither CC Lorillard NNP nor CC the DT researchers NNS who WP studied VBD the DT workers NNS were VBD aware JJ of IN any DT research NN on IN smokers NNS of IN the DT Kent NNP cigarettes NNS . .
+`` `` We PRP have VBP no DT useful JJ information NN on IN whether IN users NNS are VBP at IN risk NN , , '' '' said VBD James NNP A. NNP Talcott NNP of IN Boston NNP 's POS Dana-Farber NNP Cancer NNP Institute NNP . .
+Dr. NNP Talcott NNP led VBD a DT team NN of IN researchers NNS from IN the DT National NNP Cancer NNP Institute NNP and CC the DT medical JJ schools NNS of IN Harvard NNP University NNP and CC Boston NNP University NNP . .
+The DT Lorillard NNP spokeswoman NN said VBD asbestos NN was VBD used VBN in IN `` `` very RB modest JJ amounts NNS '' '' in IN making VBG paper NN for IN the DT filters NNS in IN the DT early JJ 1950s CD and CC replaced VBN with IN a DT different JJ type NN of IN filter NN in IN 1956 CD . .
+From IN 1953 CD to TO 1955 CD , , 9.8 CD billion CD Kent NNP cigarettes NNS with IN the DT filters NNS were VBD sold VBN , , the DT company NN said VBD . .
+Among IN 33 CD men NNS who WP worked VBD closely RB with IN the DT substance NN , , 28 CD have VBP died VBN -- : more JJR than IN three CD times VBZ the DT expected VBN number NN . .
+Four CD of IN the DT five CD surviving VBG workers NNS have VBP asbestos-related JJ diseases NNS , , including VBG three CD with IN recently RB diagnosed VBN cancer NN . .
+The DT total NN of IN 18 CD deaths NNS from IN malignant JJ mesothelioma NN , , lung NN cancer NN and CC asbestosis NN was VBD far RB higher JJR than IN expected VBN , , the DT researchers NNS said VBD . .
+`` `` The DT morbidity NN rate NN is VBZ a DT striking JJ finding NN among IN those DT of IN us PRP who WP study VBP asbestos-related JJ diseases NNS , , '' '' said VBD Dr. NNP Talcott NNP . .
+The DT percentage NN of IN lung NN cancer NN deaths NNS among IN the DT workers NNS at IN the DT West NNP Groton NNP , , Mass. NNP , , paper NN factory NN appears VBZ to TO be VB the DT highest JJS for IN any DT asbestos NN workers NNS studied VBN in IN Western JJ industrialized VBN countries NNS , , he PRP said VBD . .
+The DT plant NN , , which WDT is VBZ owned VBN by IN Hollingsworth NNP & CC Vose NNP Co. NNP , , was VBD under IN contract NN with IN Lorillard NNP to TO make VB the DT cigarette NN filters NNS . .
+The DT finding VBG probably RB will MD support VB those DT who WP argue VBP that IN the DT U.S. NNP should MD regulate VB the DT class NN of IN asbestos NN including VBG crocidolite NN more RBR stringently RB than IN the DT common JJ kind NN of IN asbestos NN , , chrysotile NN , , found VBD in IN most RBS schools NNS and CC other JJ buildings NNS , , Dr. NNP Talcott NNP said VBD . .
+The DT U.S. NNP is VBZ one CD of IN the DT few RB industrialized VBN nations NNS that WDT does VBZ n't RB have VB a DT higher JJR standard NN of IN regulation NN for IN the DT smooth JJ , , needle-like JJ fibers NNS such JJ as IN crocidolite NN that WDT are VBP classified VBN as IN amphobiles NNS , , according VBG to TO Brooke NNP T. NNP Mossman NNP , , a DT professor NN of IN pathlogy NN at IN the DT University NNP of IN Vermont NNP College NNP of IN Medicine NNP . .
+More RBR common JJ chrysotile NN fibers NNS are VBP curly JJ and CC are VBP more RBR easily RB rejected VBN by IN the DT body NN , , Dr. NNP Mossman NNP explained VBD . .
+In IN July NNP , , the DT Environmental NNP Protection NNP Agency NNP imposed VBD a DT gradual JJ ban NN on IN virtually RB all DT uses NNS of IN asbestos NN . .
+By IN 1997 CD , , almost RB all DT remaining VBG uses NNS of IN cancer-causing JJ asbestos NN will MD be VB outlawed VBN . .
+About IN 160 CD workers NNS at IN a DT factory NN that WDT made VBD paper NN for IN the DT Kent NNP filters NNS were VBD exposed VBN to TO asbestos NN in IN the DT 1950s CD . .
+Areas NNS of IN the DT factory NN were VBD particularly RB dusty JJ where WRB the DT crocidolite NN was VBD used VBN . .
+Workers NNS dumped VBD large JJ burlap NN sacks NNS of IN the DT imported VBN material NN into IN a DT huge JJ bin NN , , poured VBD in IN cotton NN and CC acetate NN fibers NNS and CC mechanically RB mixed VBN the DT dry JJ fibers NNS in IN a DT process NN used VBN to TO make VB filters NNS . .
+Workers NNS described VBN `` `` clouds NNS of IN blue JJ dust NN '' '' that WDT hung VBD over IN parts NNS of IN the DT factory NN , , even RB though IN exhaust NN fans NNS ventilated VBD the DT area NN . .
+`` `` There EX 's VBZ no DT question NN that IN some DT of IN those DT workers NNS and CC managers NNS contracted VBD asbestos-related JJ diseases NNS , , '' '' said VBD Darrell NNP Phillips NNP , , vice NN president NN of IN human JJ resources NNS for IN Hollingsworth NNP & CC Vose NNP . .
+`` `` But CC you PRP have VBP to TO recognize VB that IN these DT events NNS took VBD place NN 35 CD years NNS ago RB . .
+It PRP has VBZ no DT bearing NN on IN our PRP$ work NN force NN today NN . .
+Yields NNS on IN money-market JJ mutual JJ funds NNS continued VBD to TO slide VB , , amid IN signs VBZ that IN portfolio NN managers NNS expect VBP further JJ declines NNS in IN interest NN rates NNS . .
+The DT average JJ seven-day JJ compound NN yield NN of IN the DT 400 CD taxable JJ funds NNS tracked VBN by IN IBC NNP 's POS Money NNP Fund NNP Report NNP eased VBD a DT fraction NN of IN a DT percentage NN point NN to TO 8.45 CD % NN from IN 8.47 CD % NN for IN the DT week NN ended VBN Tuesday NNP . .
+Compound JJ yields NNS assume VBP reinvestment NN of IN dividends NNS and CC that IN the DT current JJ yield NN continues VBZ for IN a DT year NN . .
+Average JJ maturity NN of IN the DT funds NNS ' POS investments NNS lengthened VBN by IN a DT day NN to TO 41 CD days NNS , , the DT longest JJS since IN early JJ August NNP , , according VBG to TO Donoghue NNP 's POS . .
+Longer JJR maturities NNS are VBP thought VBN to TO indicate VB declining VBG interest NN rates NNS because IN they PRP permit VBP portfolio NN managers NNS to TO retain VB relatively RB higher JJR rates NNS for IN a DT longer RB period NN . .
+Shorter JJR maturities NNS are VBP considered VBN a DT sign NN of IN rising VBG rates NNS because IN portfolio NN managers NNS can MD capture VB higher JJR rates NNS sooner RBR . .
+The DT average JJ maturity NN for IN funds NNS open JJ only RB to TO institutions NNS , , considered VBN by IN some DT to TO be VB a DT stronger JJR indicator NN because IN those DT managers NNS watch VBP the DT market NN closely RB , , reached VBD a DT high JJ point NN for IN the DT year NN -- : 33 CD days NNS . .
+Nevertheless RB , , said VBD Brenda NNP Malizia NNP Negus NNP , , editor NN of IN Money NNP Fund NNP Report NNP , , yields NNS `` `` may MD blip VB up IN again RB before IN they PRP blip VBP down RB '' '' because IN of IN recent JJ rises NNS in IN short-term JJ interest NN rates NNS . .
+The DT yield NN on IN six-month JJ Treasury NNP bills NNS sold VBN at IN Monday NNP 's POS auction NN , , for IN example NN , , rose VBD to TO 8.04 CD % NN from IN 7.90 CD % NN . .
+Despite IN recent JJ declines NNS in IN yields NNS , , investors NNS continue VBP to TO pour VB cash NN into IN money NN funds NNS . .
+Assets NNS of IN the DT 400 CD taxable JJ funds NNS grew VBN by IN $ $ 1.5 CD billion CD during IN the DT latest JJS week NN , , to TO $ $ 352.7 CD billion CD . .
+Typically RB , , money-fund JJ yields NNS beat VBP comparable JJ short-term JJ investments NNS because IN portfolio NN managers NNS can MD vary VB maturities NNS and CC go VB after IN the DT highest JJS rates NNS . .
+The DT top JJ money NN funds NNS are VBP currently RB yielding VBG well RB over IN 9 CD % NN . .
+Dreyfus NNP World-Wide NNP Dollar NN , , the DT top-yielding JJ fund NN , , had VBD a DT seven-day JJ compound NN yield NN of IN 9.37 CD % NN during IN the DT latest JJS week NN , , down RB from IN 9.45 CD % NN a DT week NN earlier RBR . .
+It PRP invests VBZ heavily RB in IN dollar-denominated JJ securities NNS overseas JJ and CC is VBZ currently RB waiving VBG management NN fees NNS , , which WDT boosts VBZ its PRP$ yield NN . .
+The DT average JJ seven-day JJ simple JJ yield NN of IN the DT 400 CD funds NNS was VBD 8.12 CD % NN , , down RB from IN 8.14 CD % NN . .
+The DT 30-day JJ simple JJ yield NN fell VBD to TO an DT average JJ 8.19 CD % NN from IN 8.22 CD % NN ; : the DT 30-day JJ compound NN yield NN slid VBD to TO an DT average JJ 8.53 CD % NN from IN 8.56 CD % NN . .
+J.P. NNP Bolduc NNP , , vice NN chairman NN of IN W.R. NNP Grace NNP & CC Co. NNP , , which WDT holds VBZ a DT 83.4 CD % NN interest NN in IN this DT energy-services NNS company NN , , was VBD elected VBN a DT director NN . .
+He PRP succeeds VBZ Terrence NNP D. NNP Daniels NNP , , formerly RB a DT W.R. NNP Grace NNP vice NN chairman NN , , who WP resigned VBD . .
+W.R. NNP Grace NNP holds VBZ three CD of IN Grace NNP Energy NNP 's POS seven CD board NN seats NNS . .
+Pacific NNP First NNP Financial NNP Corp. NNP said VBD shareholders NNS approved VBD its PRP$ acquisition NN by IN Royal NNP Trustco NNP Ltd. NNP of IN Toronto NNP for IN $ $ 27 CD a DT share NN , , or CC $ $ 212 CD million CD . .
+The DT thrift NN holding VBG company NN said VBD it PRP expects VBZ to TO obtain VB regulatory JJ approval NN and CC complete VB the DT transaction NN by IN year-end NN . .
+McDermott NNP International NNP Inc. NNP said VBD its PRP$ Babcock NNP & CC Wilcox NNP unit NN completed VBD the DT sale NN of IN its PRP$ Bailey NNP Controls NNP Operations NNP to TO Finmeccanica NNP S.p NNP . . A. NNP for IN $ $ 295 CD million CD . .
+Finmeccanica NNP is VBZ an DT Italian JJ state-owned JJ holding NN company NN with IN interests NNS in IN the DT mechanical JJ engineering NN industry NN . .
+Bailey NNP Controls NNP , , based VBN in IN Wickliffe NNP , , Ohio NNP , , makes VBZ computerized JJ industrial JJ controls NNS systems NNS . .
+It PRP employs VBZ 2,700 CD people NNS and CC has VBZ annual JJ revenue NN of IN about RB $ $ 370 CD million CD . .
+The DT federal JJ government NN suspended VBD sales NNS of IN U.S. NNP savings NNS bonds NNS because IN Congress NNP has VBZ n't RB lifted VBN the DT ceiling NN on IN government NN debt NN . .
+Until IN Congress NNP acts NNS , , the DT government NN has VBZ n't RB any DT authority NN to TO issue VB new JJ debt NN obligations NNS of IN any DT kind NN , , the DT Treasury NNP said VBD . .
+The DT government NN 's POS borrowing NN authority NN dropped VBD at IN midnight NN Tuesday NNP to TO $ $ 2.80 CD trillion CD from IN $ $ 2.87 CD trillion CD . .
+Legislation NN to TO lift VB the DT debt NN ceiling NN is VBZ ensnarled VBN in IN the DT fight NN over IN cutting VBG capital-gains NNS taxes NNS . .
+The DT House NNP has VBZ voted VBN to TO raise VB the DT ceiling NN to TO $ $ 3.1 CD trillion CD , , but CC the DT Senate NNP is VBZ n't RB expected VBN to TO act VB until IN next JJ week NN at IN the DT earliest JJS . .
+The DT Treasury NNP said VBD the DT U.S. NNP will MD default VB on IN Nov. NNP 9 CD if IN Congress NNP does VBZ n't RB act VB by IN then RB . .
+Clark NNP J. NNP Vitulli NNP was VBD named VBN senior JJ vice NN president NN and CC general JJ manager NN of IN this DT U.S. NNP sales NNS and CC marketing NN arm NN of IN Japanese JJ auto NN maker NN Mazda NNP Motor NNP Corp NNP . .
+In IN the DT new JJ position NN he PRP will MD oversee VB Mazda NNP 's POS U.S. NNP sales NNS , , service NN , , parts NNS and CC marketing NN operations NNS . .
+Previously RB , , Mr. NNP Vitulli NNP , , 43 CD years NNS old JJ , , was VBD general JJ marketing NN manager NN of IN Chrysler NNP Corp. NNP 's POS Chrysler NNP division NN . .
+He PRP had VBD been VBN a DT sales NNS and CC marketing NN executive NN with IN Chrysler NNP for IN 20 CD years NNS . .
+When WRB it PRP 's VBZ time NN for IN their PRP$ biannual JJ powwow NN , , the DT nation NN 's POS manufacturing NN titans NNS typically RB jet VBP off IN to TO the DT sunny JJ confines NNS of IN resort NN towns NNS like IN Boca NNP Raton NNP and CC Hot NNP Springs NNP . .
+Not RB this DT year NN . .
+The DT National NNP Association NNP of IN Manufacturers NNPS settled VBD on IN the DT Hoosier NNP capital NN of IN Indianapolis NNP for IN its PRP$ fall NN board NN meeting NN . .
+And CC the DT city NN decided VBD to TO treat VB its PRP$ guests NNS more JJR like IN royalty NN or CC rock NN stars NNS than IN factory NN owners NNS . .
+The DT idea NN , , of IN course NN : : to TO prove VB to TO 125 CD corporate JJ decision NN makers NNS that IN the DT buckle NN on IN the DT Rust NNP Belt NNP is VBZ n't RB so RB rusty JJ after IN all DT , , that IN it PRP 's VBZ a DT good JJ place NN for IN a DT company NN to TO expand VB . .
+On IN the DT receiving VBG end NN of IN the DT message NN were VBD officials NNS from IN giants NNS like IN Du NNP Pont NNP and CC Maytag NNP , , along IN with IN lesser JJR knowns NNS like IN Trojan NNP Steel NNP and CC the DT Valley NNP Queen NNP Cheese NNP Factory NN . .
+For IN starters NNS , , the DT executives NNS joined VBD Mayor NNP William NNP H. NNP Hudnut NNP III NNP for IN an DT evening NN of IN the DT Indianapolis NNP Symphony NNP Orchestra NNP and CC a DT guest NN pianist-comedian NN Victor NNP Borge NNP . .
+Champagne NNP and CC dessert NN followed VBD . .
+The DT next JJ morning NN , , with IN a DT police NN escort NN , , busloads NNS of IN executives NNS and CC their PRP$ wives NNS raced VBD to TO the DT Indianapolis NNP Motor NNP Speedway NNP , , unimpeded JJ by IN traffic NN or CC red JJ lights NNS . .
+The DT governor NN could MD n't RB make VB it PRP , , so RB the DT lieutenant NN governor NN welcomed VBD the DT special JJ guests NNS . .
+A DT buffet NN breakfast NN was VBD held VBN in IN the DT museum NN , , where WRB food NN and CC drinks NNS are VBP banned VBN to TO everyday JJ visitors NNS . .
+Then RB , , in IN the DT guests NNS ' POS honor NN , , the DT speedway NN hauled VBD out RP four CD drivers NNS , , crews NNS and CC even RB the DT official NN Indianapolis NNP 500 CD announcer NN for IN a DT 10-lap JJ exhibition NN race NN . .
+After IN the DT race NN , , Fortune NNP 500 CD executives NNS drooled VBD like IN schoolboys NNS over IN the DT cars NNS and CC drivers NNS . .
+No DT dummies NNS , , the DT drivers NNS pointed VBD out IN they PRP still RB had VBD space NN on IN their PRP$ machines NNS for IN another DT sponsor NN 's POS name NN or CC two CD . .
+Back JJ downtown NN , , the DT execs NNS squeezed VBN in IN a DT few JJ meetings NNS at IN the DT hotel NN before IN boarding VBG the DT buses NNS again RB . .
+This DT time NN , , it PRP was VBD for IN dinner NN and CC dancing NN -- : a DT block NN away RB . .
+Under IN the DT stars NNS and CC moons NNS of IN the DT renovated VBN Indiana NNP Roof NNP ballroom NN , , nine CD of IN the DT hottest JJS chefs NNS in IN town NN fed VBD them PRP Indiana NNP duckling NN mousseline NN , , lobster NN consomme NN , , veal NN mignon NN and CC chocolate NN terrine NN with IN a DT raspberry JJ sauce NN . .
+Knowing VBG a DT tasty JJ -- : and CC free JJ -- : meal NN when WRB they PRP eat VBP one CD , , the DT executives NNS gave VBD the DT chefs NNS a DT standing VBG ovation NN . .
+More RBR than IN a DT few JJ CEOs NNS say VBP the DT red-carpet JJ treatment NN tempts VBZ them PRP to TO return VB to TO a DT heartland NN city NN for IN future NN meetings NNS . .
+But CC for IN now RB , , they PRP 're VBP looking VBG forward RB to TO their PRP$ winter NN meeting NN -- : Boca NNP in IN February NNP . .
+South NNP Korea NNP registered VBD a DT trade NN deficit NN of IN $ $ 101 CD million CD in IN October NNP , , reflecting VBG the DT country NN 's POS economic JJ sluggishness NN , , according VBG to TO government NN figures NNS released VBD Wednesday NNP . .
+Preliminary JJ tallies NNS by IN the DT Trade NNP and CC Industry NNP Ministry NNP showed VBD another DT trade NN deficit NN in IN October NNP , , the DT fifth JJ monthly JJ setback NN this DT year NN , , casting VBG a DT cloud NN on IN South NNP Korea NNP 's POS export-oriented JJ economy NN . .
+Exports NNS in IN October NNP stood VBD at IN $ $ 5.29 CD billion CD , , a DT mere JJ 0.7 CD % NN increase NN from IN a DT year NN earlier RBR , , while IN imports NNS increased VBN sharply RB to TO $ $ 5.39 CD billion CD , , up IN 20 CD % NN from IN last JJ October NNP . .
+South NNP Korea NNP 's POS economic JJ boom NN , , which WDT began VBD in IN 1986 CD , , stopped VBD this DT year NN because IN of IN prolonged VBN labor NN disputes NNS , , trade NN conflicts NNS and CC sluggish JJ exports NNS . .
+Government NN officials NNS said VBD exports NNS at IN the DT end NN of IN the DT year NN would MD remain VB under IN a DT government NN target NN of IN $ $ 68 CD billion CD . .
+Despite IN the DT gloomy JJ forecast NN , , South NNP Korea NNP has VBZ recorded VBN a DT trade NN surplus NN of IN $ $ 71 CD million CD so RB far RB this DT year NN . .
+From IN January NNP to TO October NNP , , the DT nation NN 's POS accumulated VBN exports NNS increased VBN 4 CD % NN from IN the DT same JJ period NN last JJ year NN to TO $ $ 50.45 CD billion CD . .
+Imports NNS were VBD at IN $ $ 50.38 CD billion CD , , up IN 19 CD % NN . .
+Newsweek NNP , , trying VBG to TO keep VB pace NN with IN rival JJ Time NNP magazine NN , , announced VBD new JJ advertising NN rates NNS for IN 1990 CD and CC said VBD it PRP will MD introduce VB a DT new JJ incentive NN plan NN for IN advertisers NNS . .
+The DT new JJ ad NN plan NN from IN Newsweek NNP , , a DT unit NN of IN the DT Washington NNP Post NNP Co. NNP , , is VBZ the DT second JJ incentive NN plan NN the DT magazine NN has VBZ offered VBN advertisers NNS in IN three CD years NNS . .
+Plans NNS that WDT give VBP advertisers NNS discounts NNS for IN maintaining VBG or CC increasing VBG ad NN spending NN have VBP become VBN permanent JJ fixtures NNS at IN the DT news NN weeklies NNS and CC underscore VBP the DT fierce JJ competition NN between IN Newsweek NNP , , Time NNP Warner NNP Inc. NNP 's POS Time NNP magazine NN , , and CC Mortimer NNP B. NNP Zuckerman NNP 's POS U.S. NNP News NNP & CC World NNP Report NNP . .

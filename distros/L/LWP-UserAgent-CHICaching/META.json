@@ -1,0 +1,96 @@
+{
+   "abstract" : "LWP::UserAgent with caching based on CHI",
+   "author" : [
+      "Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "LWP-UserAgent-CHICaching",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0",
+            "LWP::UserAgent" : "0",
+            "Moo" : "1.006000",
+            "Types::Standard" : "0",
+            "Types::URI" : "0",
+            "perl" : "5.006000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "LWP::Protocol::PSGI" : "0",
+            "Plack::Request" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "LWP::UserAgent::CHICaching" : {
+         "file" : "lib/LWP/UserAgent/CHICaching.pm",
+         "version" : "0.04"
+      },
+      "LWP::UserAgent::Role::CHICaching" : {
+         "file" : "lib/LWP/UserAgent/Role/CHICaching.pm",
+         "version" : "0.04"
+      },
+      "LWP::UserAgent::Role::CHICaching::SimpleKeyGen" : {
+         "file" : "lib/LWP/UserAgent/Role/CHICaching/SimpleKeyGen.pm",
+         "version" : "0.04"
+      },
+      "LWP::UserAgent::Role::CHICaching::SimpleMungeResponse" : {
+         "file" : "lib/LWP/UserAgent/Role/CHICaching/SimpleMungeResponse.pm",
+         "version" : "0.04"
+      },
+      "LWP::UserAgent::Role::CHICaching::VaryNotAsterisk" : {
+         "file" : "lib/LWP/UserAgent/Role/CHICaching/VaryNotAsterisk.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kjetilk/p5-lwp-useragent-chicaching/issues"
+      },
+      "homepage" : "https://metacpan.org/release/LWP-UserAgent-CHICaching",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kjetilk/p5-lwp-useragent-chicaching.git",
+         "web" : "https://github.com/kjetilk/p5-lwp-useragent-chicaching"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/project"
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27202"
+}

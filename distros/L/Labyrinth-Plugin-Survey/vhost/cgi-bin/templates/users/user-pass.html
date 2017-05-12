@@ -1,0 +1,41 @@
+<h2>Change Password</h2>
+
+[% IF errmess %]<p class="alert">[% errmess %]</p>[% END %]
+
+<div class="box">
+    <p>Please use the following rules to create your new password:</p>
+    <ul>
+    <li>Passwords should be [% minpasslen %] - [% maxpasslen %] characters in length.</li>
+    <li>Use more than one type from the upper case, lower case, numeral and symbol character types, e.g. 'Myword', 'smallword2' and 'L!TTLE' would all be fine.</li>
+    <li>Use at least 3 unique characters, i.e 'Eeeeee' is not allowed.</li>
+    <li>No whitespace characters allowed.</li>
+    </ul>
+</div>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name='act' value='user-chng' />
+<input type="hidden" name='item' value='[% item %]' />
+
+<div class="boxer">
+<table class="blocker">
+        <tr><td>User</td>
+            <td></td>
+            <td><b>[% user.name %]</b></td>
+        </tr>
+        <tr><td width="150">Current Password</td>
+            <td width="10"></td>
+            <td><input type="password" name="effect1" size="20" /></td>
+        </tr>
+        <tr><td>New Password</td>
+            <td></td>
+            <td><input type="password" name="effect2" size="20" /></td>
+        </tr>
+        <tr><td>Retype New Password</td>
+            <td></td>
+            <td><input type="password" name="effect3" size="20" /></td>
+        </tr>
+</table>
+</div>
+
+<p align="center"><input type="submit" name="submit" value='UPDATE' /></p>
+</form>

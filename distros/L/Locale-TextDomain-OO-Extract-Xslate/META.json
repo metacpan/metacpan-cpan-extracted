@@ -1,0 +1,43 @@
+{
+   "abstract" : "Extract messages from Text::Xslate templates for translation with Locale::TextDomain::OO",
+   "author" : [
+      "Heiko Jansen <hjansen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Locale-TextDomain-OO-Extract-Xslate",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Locale::TextDomain::OO::Extract" : "0",
+            "Moo" : "0",
+            "Path::Tiny" : "0",
+            "Text::Xslate" : "0",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/heikojansen/locale-textdomain-oo-extract-xslate.git",
+         "web" : "https://github.com/heikojansen/locale-textdomain-oo-extract-xslate"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

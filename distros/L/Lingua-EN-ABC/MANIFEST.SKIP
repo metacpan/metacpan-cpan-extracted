@@ -1,0 +1,23 @@
+build\.pl
+blib/.*
+.gitignore
+.git/.*
+Makefile$
+pm_to_blib
+MYMETA..*
+.*\.bak
+^Lingua-EN-ABC-[0-9.]/$
+^Lingua-EN-ABC-[0-9.]\.tar\.gz$
+# Template for POD
+^lib/Lingua/EN/ABC\.pod\.tmpl$
+# Files containing sources of information, don't need to go to CPAN
+^sources/.*$
+^examples/.*-out\.txt$
+^abc\.txt$
+^xt/.*$
+# Build files
+^make-data-pod\.pl$
+^make-json\.pl$
+^make-pod\.pl$
+# Misc script
+^read-respell\.pl$

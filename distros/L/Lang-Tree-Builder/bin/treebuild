@@ -1,0 +1,341 @@
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Lang::Tree::Builder;
+
+=head1 NAME
+
+treebuild - command-line interface to Lang::Tree::Builder
+
+=head1 SYNOPSIS
+
+  $ treebuild [-o <dir>] [-p <prefix>] [-l <lang>] [<config>]
+
+C<treebuild> takes a configuration file, either from standard input
+or from the command line, and generates a set of classes from it.
+It is intended to make it easy to generate a large set of interrelated
+classes. My specific requirement when writing it was to have it
+create all the classes I would need to be able to construct abstract syntax
+trees.
+
+Although billed as a command line interface to C<Lang::Tree::Builder>,
+you probably won't need to use the C<Lang::Tree::Builder> API directly
+as it does nothing that this script can't tell it to do.
+
+The generated classes are made useful by two features. Firstly an
+api is also generated which provides shorthands for the class constructors.
+Secondly the generated classes all support the Visitor pattern, and a
+base visitor class and/or interface is also generated as a convenience.
+
+=head2 Options
+
+=over 4
+
+=item C<-o dir>
+
+Generate classes under C<dir>. A common use of this would be C<-o lib>.
+
+=item C<-p prefix>
+
+Prepend the literal C<prefix> to all generated class names. For
+example given a config containing C<ClassA>, C<ClassB> etc, a prefix
+of C<-p Foo::> would produce output classes C<Foo::ClassA> etc,
+wheras C<-p Foo> would produce C<FooClassA> etc. Even if you're
+generating classes for a language other than Perl, you still need to
+use the Perl-style C<::> separator for namespace components.
+
+=item C<-l lang>
+
+Generate classes for a language other than Perl. Currently supported
+values for C<lang> are:
+
+=over 4
+
+=item Perl
+
+=item PHP
+
+=back
+
+To add support for other languages, look in the distribution for
+C<lib/Tree/Builder/Templates>, create a new directory named
+after the target language in there, copy the templates from
+C<lib/Tree/Builder/Templates/Perl> into it, and edit them
+appropriately. You may also need to add functionality to
+C<lib/Tree/Builder/Class.pm> to support your templates.
+If you do add methods there, you should add them to
+C<Lang::Tree::Builder::Args> too.
+Don't forget when you've finished to add the new language to the list
+of supported languages here!
+
+See L<Template::Manual> for details of the
+C<Template::Toolkit> used to process the templates.
+
+=back
+
+=head2 Format of the config file
+
+The config file is free-form. Whitespace (including newlines) is
+not significant except to separate tokens. Comments run from a hash
+(C<#>) to the end of the line. Each entry in the file has the same
+general form, best explained with some examples:
+
+  # a comment
+  abstract Expr()
+  abstract Expr Bool()
+  Expr Op::Plus(Expr left,
+                Expr right)
+  Expr Op::Minus(Expr left,
+                 Expr right)
+  Expr Op::Times(Expr left,
+                 Expr right)
+  Expr Op::Divide(Expr left,
+                  Expr right)
+  Expr Op::And(Expr, Expr)
+  Expr Number(scalar value)
+  ExprList(Expr, ExprList)
+  ExprList EmptyExprList()
+
+The above is saying:
+
+=over 4
+
+=item C<abstract Expr()>
+
+there is an abstract class called C<Expr>
+
+=item C<abstract Expr Bool()>
+
+there is an abstract class called C<Bool> that inherits from C<Expr>.
+
+=item C<Expr Op::Plus(Expr left, Expr right)>
+
+there is a concrete class called C<Op::Plus> that inherits from C<Expr>,
+and its constructor takes an C<Expr> called C<left> and an C<Expr>
+called C<right> as arguments.
+
+=item C<Expr Op::Minus(Expr left, Expr right)>
+
+=item C<Expr Op::Times(Expr left, Expr right)>
+
+=item C<Expr Op::Divide(Expr left, Expr right)>
+
+more of the same.
+
+=item C<Expr Op::And(Expr, Expr)>
+
+there is a concrete class called C<Op::And> that inherits from C<Expr>,
+and its constructor takes two unnamed C<Expr> as arguments.
+
+=item C<Expr Number(scalar value)>
+
+there is a concrete class called C<Number> which inherits from C<Expr>
+and its constructor takes a simple scalar called C<value> as argument.
+
+=item C<ExprList(Expr, ExprList)>
+
+there is a concrete class called C<ExprList> whose constructor takes
+an C<Expr> and another C<ExprList> as argument.
+
+=item C<ExprList EmptyExprList()>
+
+there is a concrete class called C<EmptyExprList> which is an
+C<ExprList> and its constructor takes no arguments.
+
+=back
+
+=head2 Output Files
+
+Assume the above config exists in a file called C<example.tb>, and
+that the following command is run:
+
+  $ treebuild -o ./test -p Foo:: -l Perl example.tb
+
+This will create the directory C<./test>, and inside there will
+create the following files:
+
+=over 4
+
+=item C<Foo/Expr.pm>
+
+Code implementing an abstract C<Foo::Expr> class (because the
+config declared C<Expr> to be abstract). Being abstract, this class
+has only a C<new()> method, and that will C<die> if ever it is called.
+
+=item C<Foo/Bool.pm>
+
+Code implementing an abstract C<Foo::Bool> class which inherits
+from C<Expr>. It also has a poisoned C<new()> method.
+
+=item C<Foo/Op/Plus.pm>
+
+=item C<Foo/Op/Minus.pm>
+
+=item C<Foo/Op/Times.pm>
+
+=item C<Foo/Op/Divide.pm>
+
+Code implementing a C<Foo::Op::Plus> class, a C<Foo::Op::Minus>
+class, etc. Each of these classes are declared to inherit from
+C<Foo::Expr>. They each have a C<new()> method that accepts two
+arguments. Both arguments to C<new()> are required to inherit from
+C<Foo::Expr>.  These arguments correspond to the C<(Expr left,
+Expr right)> components of the config.  Each of the generated classes
+also provides two accessor methods: C<getLeft()> and C<getRight()>
+for retrieving the values, and an C<accept()> method which supports
+the visitor pattern, see below.
+
+=item C<Foo/Op/And.pm>
+
+Code implementing a C<Foo::Op::And> class. In this case, because
+the config did not name the arguments to the constructor but only the
+types, the fields will be named after the types of the arguments.
+Also, because these names are not unique, they will be suffixed by
+an incrementing number. Therefore the accessor methods will be
+called C<getExpr1()> and C<getExpr2()>.  In other respects it is
+the same as the C<Foo::Op::Times> class and its siblings.
+
+=item C<Foo/Number.pm>
+
+Code implementing a C<Foo::Number> class. As specified in the
+config, it inherits from C<Expr> and its constructor accepts a
+single simple scalar value (not a reference). It provides a single
+C<getValue()> accessor (because the config stated C<(scalar value)>,
+and an C<accept()> method.
+
+=item C<Foo/ExprList.pm>
+
+Code implementing a C<Foo::ExprList> class. The class in this case
+does not inherit from C<Foo::Expr>. Its C<new()> method accepts
+another C<Foo::ExprList> and a C<Foo::Expr> as argument, and it
+has accessor methods C<getExprList()> and C<getExpr()>. As usual it
+also has an C<accept()> method (more on that later).
+
+=item C<Foo/EmptyExprList.pm> class.
+
+Code implementing a C<Foo::EmptyExprList> class. This class is
+defined to inherit from C<Foo:ExprList> and its constructor takes
+no arguments.  Likewise it has no accessor methods, but still
+provides an C<accept()> method.
+
+=item C<Foo/API.pm>
+
+Code implementing a C<Foo::API> class. This class performs a couple
+of functions. Firstly it includes (with C<use>) all of the other
+classes generated so is a useful one-stop-shop for ensuring they
+are all loaded (well actually it doesn't bother C<use>-ing the
+abstract classes, on the assumption that a concrete class will have
+loaded them). The second job it does is to provide a shorthand for
+each of the concrete classes constructors. In the case of our
+example, it will create subroutines C<Plus()>, C<Minus()>, C<Times()>,
+C<Divide()>, C<And()>, C<Number()>, C<ExprList()> and C<EmptyExprList()>.
+It puts all of these on its C<@EXPORT_OK> list and makes them
+available via the shorthand C<:all> import tag. That means you can
+write things like:
+
+  use Foo::API qw(:all);
+  my $exprlist = ExprList(Plus(Number(2),
+                               Times(Number(3),
+                                     Number(4))),
+                          ExprList(Number(5),
+                                   EmptyExprList()));
+
+rather than the much more verbose:
+
+  use Foo::API;
+  my $exprlist =
+      Foo::ExprList->new(
+          Foo::Op::Plus->new(
+              Foo::Number->new(2),
+              Foo::Op::Times->new(
+                  Foo::Number->new(3),
+                  Foo::Number->new(4)
+              )
+          ),
+          Foo::ExprList->new(
+              Foo::Number->new(5),
+              Foo::EmptyExprList->new()
+          )
+      );
+
+=item C<Foo/Visitor.pm>
+
+Code implementing a C<Foo::Visitor> class. As noted above, each
+of the concrete classes defined in the config will have an C<accept()>
+method.  That C<accept()> method takes a C<$visitor> as argument
+and calls a specific method on it, passing itself as argument. For
+example the C<accept()> method of C<Foo::Op::Plus> will look
+something like:
+
+  sub accept {
+      my ($self, $visitor) = @_;
+      $visitor->visitPlus($self);
+  }
+
+Similarily the C<ExprList>'s C<accept()> will call C<visitExprList($self)>,
+etc.
+
+The C<Foo::Visitor> class generated here provides default implementations
+for all of these methods.  It also provides a default C<combine>
+method that aggregates the results.  It is intended that you inherit
+from this and override whatever you need to.
+
+=back
+
+Some effort has been made to generate extensive inline pod documentation
+for all generated classes, in some ways better than the documentation
+for the generator! I suggest copying the above config and running
+C<treebuild> on it, as in the example, then running perldoc on the
+generated files.
+
+=head1 AUTHOR
+
+  Bill Hails <me@billhails.net>
+
+=head1 SEE ALSO
+
+L<Lang::Tree::Builder::Args>,
+L<Lang::Tree::Builder::Class>,
+L<Lang::Tree::Builder::Data>,
+L<Lang::Tree::Builder::Parser>,
+L<Lang::Tree::Builder::Scalar>,
+L<Lang::Tree::Builder::Tokenizer> and last but not least
+L<Lang::Tree::Builder> itself.
+
+=cut
+
+my $progname = $0;
+$progname =~ s#.*/##;
+
+my $usage = <<EOU;
+use: $progname [-p <prefix>] [-o <dir>] [-h] [<config>]
+     -p <prefix>   prepend literal <prefix> to all generated class names.
+     -o <dir>      generate output under <dir>
+     -l <lang>     generate classes for language <lang>
+     -h            display this help (do perldoc $progname for the full story)
+<config> will be read from standard input if not supplied on the command line.
+A value of '-' for <config> will also cause standard input to be read.
+EOU
+
+my $opts = {};
+getopts('p:o:l:', $opts) || die $usage;
+
+$opts->{h} ||= 0;
+if ($opts->{h}) {
+    print $usage;
+    exit(0);
+}
+$opts->{p} ||= '';
+$opts->{o} ||= '.';
+$opts->{l} ||= 'Perl';
+my $config = shift || '-';
+
+my $builder = Lang::Tree::Builder->new(
+    prefix => $opts->{p},
+    dir    => $opts->{o},
+    lang   => $opts->{l}
+);
+
+$builder->build($config);

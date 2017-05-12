@@ -1,0 +1,128 @@
+Revision history for Log-Dispatchouli
+
+2.015     2016-10-17 15:42:54-04:00 America/New_York
+        - Log::Dispatchouli subclass can now provide its own proxy_class
+          method to use something other than Log::Dispatchouli::Proxy
+
+2.014     2016-10-14 18:28:36-04:00 America/New_York
+        - non-trial release of v2.013
+
+2.013     2016-07-30 16:34:57-04:00 America/New_York (TRIAL RELEASE)
+        - minor optimizations to callbacks (thanks, Olivier Mengué)
+
+2.012     2014-11-30 08:49:01-05:00 America/New_York
+          avoid a newly-introduced warning on older perls (thanks, Christopher
+          J. Madsen)
+
+2.011     2014-11-29 08:50:45-05:00 America/New_York
+          some optimizations in timestamp and pid logging (thanks, Olivier
+          Mengué)
+
+2.010     2014-07-28 22:24:23-04:00 America/New_York
+          add the file_format option (thanks, Randy Stauner)
+
+2.009     2014-01-11 14:14:11-05:00 America/New_York
+          load the Proxy class earlier, to get it loaded prefork
+
+2.008     2013-09-26 20:39:11 America/New_York
+          fix test for JSON::PP, which doesn't always follow orders about
+          spaces!  (thanks, Dagfinn Ilmari Mannsåker!)
+
+2.007     2013-09-25 22:12:22 America/New_York
+          doc fixes and tests (thanks George Hartzell and Randy Stauner)
+
+2.006     2013-04-05 15:02:05 America/New_York
+          put the ->info, ->fatal, ->debug methods on proxies, too
+          (thanks George Hartzell)
+
+2.005     2011-04-07 23:16:40 America/New_York
+          add log_file and log_path options
+
+2.004     2011-01-21 15:52:41 America/New_York
+          BUG FIX:  it is okay to replace the default logger, always
+
+2.003     2011-01-21 13:14:43 America/New_York
+          add config_id to allow faking Global equality when testing
+
+2.002     2011-01-14 17:51:16 America/New_York
+          add env_value and env_prefix methods
+
+2.001     2011-01-13 12:45:05 America/New_York
+          greatly expanded tests and documentation for L::D::Global
+
+          L::D now has "string_flogger" method to provide an alternate flogger
+
+2.000     2010-11-23 18:48:53 America/New_York
+
+1.102350  2010-08-23 08:55:17 America/New_York
+          fix a bug in generating tempdirs for file logging (thanks, Sawyer X)
+
+1.102220  2010-08-10 11:09:30 America/New_York
+          added logger muting (mute, unmute, clear_muted, etc.)
+          new_tester turns off log_pid by default
+          internal simplification of Proxy
+
+1.100712  2010-03-12 21:43:13 America/New_York
+          add the quiet_fatal argument to suppress apparent double-logging to
+          standard output and error streams
+
+1.100711  2010-03-12 18:11:41 America/New_York
+
+1.100710  2010-03-12 09:51:32 America/New_York
+          add the Log::Dispatchouli::Proxy system
+          get_prefix now always returns a scalar (undef, not ())
+
+1.100691  2010-03-10 17:10:53 America/New_York
+          just like 1.100690, but passes its own tests!
+
+1.100690  2010-03-10 14:24:59 America/New_York
+          remove obsolete "list_name" alias to prefix
+          object-level prefix no longer automatically ends in ": "
+
+1.100681  2010-03-09 23:02:11 America/New_York
+          rerelease with a tarball that isn't totally insane
+
+1.100680  2010-03-09 22:47:23 America/New_York
+          rewrite all log_ methods in terms of ->log
+          ->log now includes the code formerly in the internal ->_log_at
+          add a new per-message prefix system
+          old-style prefix (to be removed) now handle multi-line messages
+
+          * new prefix system is not yet documented, pending experimentation
+
+1.100670  2010-03-08 19:15:30 America/New_York
+          make env vars in code match env vars in docs
+
+1.100660  2010-03-07 22:00:58 America/New_York
+          add clear_events method
+          loggers made with new_tester log to_self
+
+1.100630  2010-03-04 18:41:13 America/New_York
+          some more docs
+          switch to Dist::Zilla for dist maintenance
+          declare some previously missing prereqs
+
+1.008     2010-02-22
+          ->fatal now redispatches to ->log_fatal
+
+1.007     2010-02-22
+          ** THIS BREAKS BACKCOMPAT IN A TINY WAY **
+          ->debug now means ->log_debug
+          ->is_debug and ->set_debug replace the old ->debug
+          ->log_info is replaced by ->info
+
+1.006     2010-02-21
+          add is_debug, is_info, is_fatal
+          log_fatal logs as 'error' level
+          change the way the undocumented "prefix" system works
+
+1.005     2010-02-12
+          make Makefile.PL prereq match actual required versions
+
+1.004     2010-02-10
+          allow multiple arguments to ->log and friends
+          allow user to disable logging of pid
+
+1.003     2009-01-15
+          relax a test that was complaining for no good reason
+

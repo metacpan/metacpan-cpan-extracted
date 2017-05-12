@@ -1,0 +1,39 @@
+---
+abstract: 'Effortless record-keeping and enhanced reproducibility. Set it and forget it... until you need it!'
+author:
+  - 'Michael F. Covington <mfcovington@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4206, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Reproducible
+provides:
+  Log::Reproducible:
+    file: lib/Log/Reproducible.pm
+    version: v0.12.4
+recommends:
+  Devel::Cover: '0'
+  Module::Loaded: '0'
+  Text::Diff: '0'
+requires:
+  Config: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  IPC::Open3: '0'
+  List::MoreUtils: '0'
+  POSIX: '0'
+  YAML::Old: '0'
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mfcovington/Log-Reproducible
+version: v0.12.4

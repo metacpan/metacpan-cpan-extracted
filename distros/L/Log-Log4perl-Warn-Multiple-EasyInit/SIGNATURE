@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f4e52b535d030bffe32443d4819c7df0fd24aa43 Changes
+SHA1 2a26f86001318a1afdf7b3aa074c56e67b66b826 LICENSE
+SHA1 228b3acebb7cfc391826fb7145ebf34ba300be2c MANIFEST
+SHA1 950ff218c753ef88c03f8986bddbafd3dd9dd031 META.yml
+SHA1 af231025aa46e588b7baabba5a485e027d1a5049 Makefile.PL
+SHA1 f6c46de99cbca1cbaf589d67e63b9ff136b40d64 README
+SHA1 8aaf5b5704f3764e7957082eb07acc36f34eec44 dist.ini
+SHA1 c948c6d37f853e083c9af4e276df8507d01a2c55 lib/Log/Log4perl/Warn/Multiple/EasyInit.pm
+SHA1 b799f7ead17df40adaf5517ef971e399b0f9226e script/multiple_init.pl
+SHA1 9ccab36c320f436a4492916cb7f7aa0ae2e3bc64 t/00.multiple_init.t
+SHA1 b05fb110a27aedc4f29bdff84d10e5eb3708e6d6 t/lib/bar.pm
+SHA1 0bfa5b4f9191df6c1b244659f8900d271d79155c t/lib/baz.pm
+SHA1 da7ff9f6bb387fd8213daf54b6a4d7b7b8d3f4d4 t/lib/foo.pm
+SHA1 2d26e337767472c96644329c419064190ebeec25 t/lib/l4ptrapper.pm
+SHA1 27e44774664088e1dcb7bea8567b12f6958e6ee9 t/lib/quux.pm
+SHA1 bf8570ef6888d79ca6a0c9e21b206b904b0775e2 t/release-distmeta.t
+SHA1 0068bf52fc88b39cc6509199f19a77890edb9bb0 t/release-has-version.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk2KehAACgkQh4j7xTiFuxG7JQCfTkUF8lLC5jsZwqBbsyjltI1n
+v3QAn3WFlr1Eie3emeDGSX/mdbnWM+Ix
+=wD4k
+-----END PGP SIGNATURE-----

@@ -1,0 +1,23 @@
+---
+abstract: 'map of common English spelling errors'
+author:
+  - 'Rohan McGovern <rohan@mcgovern.id.au>'
+build_requires:
+  Test::More: 0
+  Test::Warn: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-EN-CommonMistakes
+provides:
+  Lingua::EN::CommonMistakes:
+    file: lib/Lingua/EN/CommonMistakes.pm
+    version: 20130425
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 20130425

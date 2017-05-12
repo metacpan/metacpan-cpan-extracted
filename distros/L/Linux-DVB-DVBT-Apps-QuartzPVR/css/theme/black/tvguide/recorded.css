@@ -1,0 +1,47 @@
+#recordedContents {
+
+/*
+	border: 4px solid white ;
+*/
+	
+}
+
+#quartz-content #list-body #recordedContents .recProgs li {
+	background: none ;
+}
+
+
+
+#quartz-content #list-body #recordedContents .recProg {
+	background-color: #333 ;
+}
+
+#quartz-content #list-body #recordedContents .recHead {
+	color: white ;
+	background-image: url("../images/headline.png") ;
+}
+
+
+#quartz-content #list-body #recordedContents .recCaption {
+	color: white ;
+}
+
+#quartz-content #list-body #recordedContents .fileNotPresent {
+	color: red ;
+}
+
+/* Popup information */
+.popupContent .update {
+	color: yellow ;
+	font-style: italic ;
+}
+
+.popupContent .fileName {
+	color: yellow ;
+	font-weight: bold ;
+}
+
+.popupContent .fileNotPresent {
+	color: red ;
+}
+

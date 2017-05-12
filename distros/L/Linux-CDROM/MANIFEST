@@ -1,0 +1,13 @@
+CDROM.xs
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+typemap
+t/Linux-CDROM.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Linux/CDROM.pm
+lib/Linux/CDROM/Cookbook.pm
+META.yml                                 Module meta-data (added by MakeMaker)

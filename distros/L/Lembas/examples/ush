@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010;
+use Carp;
+
+use Getopt::Long;
+
+our $VERSION = 0.001;
+$|++;
+
+my $horns;
+
+my $result = GetOptions("horns=i" => \$horns);
+
+say "This is unicorn-shell version $VERSION";
+say "You have asked for a shell with $horns horn(s)";
+
+say 'Copyright (C) 2013 Fabrice Gabolde <fga@cpan.org>';
+say 'This program comes with ABSOLUTELY NO WARRANTY.';
+say 'This is free software, and you are welcome to redistribute it';
+say 'under certain conditions.';
+
+say 'Starting REPL...';
+
+my $prompt = "\n"; #.'\\'x$horns . '> ';
+
+print $prompt;
+
+while (<STDIN>) {
+
+    chomp(my $command = $_);
+    eval $command;
+    print $prompt;
+
+}

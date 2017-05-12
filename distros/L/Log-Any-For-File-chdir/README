@@ -1,0 +1,20 @@
+SYNOPSIS
+
+     use Log::Any::For::File::chdir;
+     use File::chdir;
+    
+     $CWD = "foo";
+     ...
+     $CWD = "bar";
+     ...
+
+    Now everytime $CWD is set, the directory name will be logged. To see
+    the log messages at the screen, use this for example:
+
+     % TRACE=1 perl -MLog::Any::Adapter=Screen -MLog::Any::For::File::chdir -MFile::chdir -e'$CWD = "foo"; ...'
+     [File::chdir] chdir(foo)
+
+SEE ALSO
+
+    File::chdir
+

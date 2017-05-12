@@ -1,0 +1,144 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my ( $help, $man );
+my $directinput = 0;
+my $verbose = 0;
+
+my $format = "%s => %s\n";
+my $terminal = 0;
+
+GetOptions(
+	   'help|?' => \$help,
+	   man      => \$man,
+	   directinput => \$directinput,
+	   'verbose+' => \$verbose,
+	   'format=s' => \$format,
+	   'terminal!' => \$terminal,
+  ) or pod2usage(2);
+pod2usage(1) if ($help);
+pod2usage( -exitstatus => 0, -verbose => 2 ) if ($man);
+
+# we wouldn't need the elaborate codeblock below if passing \*ARGV as
+# a filehandle worked properly outside of while (<>). (but see perldoc
+# perltodo). But code that operates on a filehandle (e.g.
+# Lingua::Treebank) needs this block.
+
+{
+    if (@ARGV == 0) {
+	push @ARGV, '-';
+    }
+    for (@ARGV) {
+	if ($_ eq '-' and -t STDIN and not $directinput) {
+	    pod2usage "STDIN requested, but hooked to a live TTY;" .
+	      " perhaps you want the --directinput option?"
+	  }
+
+	open my $fh, $_
+	  or die "Couldn't open '$_': $!\n";
+
+	use Lingua::Treebank;
+
+	my @utterances = Lingua::Treebank->from_penn_fh($fh);
+
+	foreach (@utterances) {
+	    # $_ is a Lingua::Treebank::Const now
+	    my @edges = $_->edges();
+	    if (not $terminal) {
+		@edges = grep {not /::/} @edges;
+	    }
+	    print join (" ", @edges), "\n";
+	}
+
+	close $fh or die "Couldn't close '$_': $!\n";
+	warn "done reading from $_\n" if $verbose;
+    }
+}
+
+__END__
+
+=head1 NAME
+
+  list-edges - reads penn treebanks, prints out all edges found in each tree, one tree per line
+
+=head1 SYNOPSIS
+
+  list-edges [options] [file ...]
+
+  Options:
+     -help        brief help message
+     -man         full documentation
+    --verbose     more verbose to STDERR
+    --directinput allow TTY to STDIN
+
+    --format FORMAT provide a different output format
+
+    --terminal    include (exclude) terminal expansions
+    --noterminal  default is --noterminal
+
+=head2 Sample output
+
+  $ echo "(S (NP (DET the) (NN dog)) (VP (VBD ran)))" | ./list-edges --terminal
+  DET::the,0,1 NN::dog,1,2 NP,0,2 VBD::ran,2,3 VP,2,3
+
+=head1 OPTIONS
+
+=over
+
+=item B<--help>
+
+=item B<-?>
+
+Show this help message.
+
+=item B<--man>
+
+Show the manual page for this script.
+
+=item B<--directinput>
+
+By default, if there is a human-operated TTY on STDIN, this script
+issues a usage message and exits (this is so users can run
+C<list-edges> and get the usage message).  If you really want to type
+trees by hand on STDIN, add the B<--directinput> flag.
+
+=item B<--verbose>
+
+Repeatable option. Report more of what we're doing.
+
+=item B<--terminal>
+
+=item B<--noterminal>
+
+Whether or not to print the edges indicating terminal items.
+
+=item B<--format> FORMAT
+
+doesn't currently do anything
+
+=back
+
+=head1 DESCRIPTION
+
+This program lists all edges in the trees presented, one tree per
+line. Edges are LABEL,INDEX,INDEX where INDEX values come from between
+the words (0-based).
+
+=head2 CAVEATS
+
+The trees must be in Penn treebank format.
+
+=head2 TO DO
+
+None that I know of.
+
+=head1 AUTHOR
+
+Jeremy G. Kahn E<lt>jgk@ssli.ee.washington.eduE<gt>
+
+=cut

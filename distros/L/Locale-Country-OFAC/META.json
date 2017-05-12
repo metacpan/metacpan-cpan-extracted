@@ -1,0 +1,73 @@
+{
+   "abstract" : "Module to look up OFAC Sanctioned Countries",
+   "author" : [
+      "Daniel Culver"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Locale-Country-OFAC",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::Kwalitee" : "1.12",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "List::Util" : "0",
+            "Readonly" : "1.04",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Readonly" : "1.04",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dculver1986/locale-country-ofac/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Locale-Country-OFAC",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dculver1986/locale-country-ofac.git",
+         "web" : "https://github.com/dculver1986/locale-country-ofac"
+      }
+   },
+   "version" : "1.1.0"
+}
+

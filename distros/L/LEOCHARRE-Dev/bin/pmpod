@@ -1,0 +1,387 @@
+#!/usr/bin/perl
+use strict;
+use vars qw(@POD_SECTIONS_PM @POD_SECTIONS_CLI @POD_SECTIONS_WHITEPAPER $VERSION
+@ABS_IN_PM @ABS_IN_CLI $ABS_IN_PM_COUNT $ABS_IN_CLI_COUNT %_datahash @infiles);
+use Cwd;
+# use Smart::Comments '###';
+use base 'LEOCHARRE::CLI';
+my $o = gopts('d');
+
+sub count;
+
+
+
+@POD_SECTIONS_PM = (qw(NAME SYNOPSIS DESCRIPTION METHODS SUBROUTINES CAVEATS CHANGES TODO BUGS AUTHOR REQUIREMENTS VERSION COPYRIGHT LICENSE DISCLAIMER ), 'SEE ALSO');
+
+@POD_SECTIONS_CLI = (qw(NAME DESCRIPTION),'OPTION FLAGS','PARAMETERS','ARGUMENTS',
+   'USAGE EXAMPLES','AUTHOR','REQUIREMENTS','SEE ALSO');
+
+@POD_SECTIONS_WHITEPAPER;
+
+resolve_infiles();
+
+render_pod_for_infiles();
+
+
+
+
+
+
+sub usage {
+   return qq{$0 - generate pod automatically from source
+
+Generate for a script:
+
+   $0 ./bin/script
+   $0 ./bin/script.pl
+
+For pm
+
+   $0 ./lib/Mod.pm
+
+   };
+   }
+
+sub resolve_infiles {
+   
+   @infiles = @{argv_aspaths()};
+   my $totalin = count @infiles;
+   #debug("total in start $totalin");
+
+   #my $ext = group_by_ext(\@infiles);
+   #@#BS_IN_CLI = grep { file_is_perl_script($_) } ( @{$ext->{__NONE__}}, @{$ext->{pl}} );   
+   #@ABS_IN_PM  = grep { ext_is(pm => $_) } @infiles;
+
+   map { ext_is('pm', $_) } @infiles;
+
+   @ABS_IN_CLI = grep_ext( pl => @infiles),  grep_ext( undef => @infiles );
+   @ABS_IN_PM  = grep_ext( 'pm' , @infiles );
+
+   $ABS_IN_CLI_COUNT = count @ABS_IN_CLI;
+   $ABS_IN_PM_COUNT  = count @ABS_IN_PM;
+
+   debug("cli: $ABS_IN_CLI_COUNT , pm: $ABS_IN_PM_COUNT");
+   1;
+
+}
+
+
+
+sub group_by_ext {
+   my $ls = shift;
+   my %ext;
+
+   for my $filename (\$ls){
+      my $ext = '__NONE__';
+      if( $filename=~/\.(\w{1,5})$/ ){
+         $ext = lc($1);
+      }
+
+      push @{$ext{$ext}}, $filename;      
+   }
+
+   if (wantarray){
+      my @arefs;
+      for my $ext( sort keys %ext){
+         push @arefs, $ext{$ext};         
+      }
+      return @arefs;
+   }
+
+   return \%ext;
+}
+
+sub ext_is {
+   my($ext,$path) = (@_);
+   $path or die('missing path arg');
+
+   $ext=~s/^\.+//;
+   #debug("ext_is() $ext, path $path");
+   if (defined $ext){
+      return $path=~/\.$ext$/i ? 1 : 0;
+   }
+
+   #no ext
+   return $path=~/\.\w{1,5}$/ ? 0 : 1;
+}
+
+sub grep_ext {
+   my $ext = shift;
+
+   my @new = grep { ext_is($ext,$_) } @_;
+   #debug("ext $ext , @_, @new");
+   return @new;
+
+}
+
+
+
+sub file_is_perl_script {
+    slurp($_[0]) =~ /\#\![^\s]+perl\b/;
+}
+
+sub file_scriptname {
+   my $abs = shift;
+   file_is_perl_script($abs) or return;
+   $abs=~s/^.+\/+//;
+   return $abs;
+}
+
+sub file_pmname {
+   my $abs = shift;
+   my $slurp = slurp($abs);
+   if( $slurp=~/\bpackage ([^\s\;]+)\;/ ){
+      return $1;
+   }
+   return;
+}
+
+sub count {
+
+   #if (wantarray){ # then many ?
+   #}
+
+
+   my $c = scalar @_;
+   return $c if $c > 1;
+
+   my $arg = shift;
+   defined $arg or return 0;
+   
+
+
+   if (my $r = ref $arg ){
+      if ($r eq 'ARRAY'){
+         return scalar @$arg;
+      }
+      elsif ( $r eq 'HASH' ){
+         return scalar keys %$arg;
+      }
+   }
+   
+   return 1;
+
+   #sub refcount {
+   #   my $thing = shift
+   #   my $r = ref $thing or die("'$thing' not a ref");
+   #   return scalar @$thing if $r eq 'ARRAY';
+   #   return scalar %$thing if $r eq 'HASH';
+    #  return 1;
+
+   #}
+
+}
+
+
+sub slurp {
+   my $abs = shift;
+   -f $abs or die("!-f $abs");
+   local $/;
+   open(FI, '<',$abs) or die($!);
+   my $t = <FI>;
+   close FI;
+   return $t;
+}
+
+
+
+sub pod_output_from_datahash {
+   my %data = @_;
+
+   my $POD = "\n__END__\n\n=pod\n\n";
+
+   SECTION : for my $SECTION ( @{$data{sections}} ){ # sections holds order also
+         my $val = $data{$SECTION};
+
+         $val ||= get_default_section_val($SECTION);
+         $val or next SECTION;
+
+         $POD.="=head1 $SECTION\n\n";
+
+         if ($val){
+            $val=~s/\s+$//;
+            $POD.="$val\n\n";
+         }
+         
+   }
+
+   $POD.="=cut\n\n";
+
+
+
+
+
+
+
+}
+
+
+sub get_default_section_val {
+   my $section_name = shift;
+
+   
+   # could be read in from conf file
+   my %default_section_val = (
+      AUTHOR => 'Leo Charre leocharre at cpan dot org',
+      BUGS => 'Please contact the AUTHOR for any issues, suggestions, bugs etc.',
+      COPYRIGHT => 'Copyright (c) Leo Charre. All rights reserved.',
+      LICENSE => qq|This program is free software; you can redistribute it and/or modify it under the same terms and conditions as Perl itself.
+
+This means that you can, at your option, redistribute it and/or modify it under either the terms the GNU Public License (GPL) version 1 or later, or under the Perl Artistic License.
+
+See http://dev.perl.org/licenses/|,
+      DISCLAIMER => qq|THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Use of this software in any way or in any form, source or binary, is not allowed in any country which prohibits disclaimers of any implied warranties of merchantability or fitness for a particular purpose or any disclaimers of a similar nature.
+
+IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT LIMITED TO, LOST PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE|,
+   
+   
+   
+   
+   );
+
+   my $v = $default_section_val{$section_name};
+   $v ||= '';
+
+   return $v;
+}
+
+
+sub generate_data_hash {
+   my $abs = shift;
+
+      my %data = ( 
+         abs_path => $abs ,
+      );
+
+
+   if ($abs=~/\.pm$/i){
+      $data{is_script} = 0;
+      $data{is_pm} = 1;
+      $data{NAME} = file_pmname($abs);  
+      $data{sections} = \@POD_SECTIONS_PM;
+   }
+
+   elsif(file_is_perl_script($abs)){
+      $data{is_script} = 1;
+      $data{is_pm} = 0;
+      $data{NAME} = file_scriptname($abs);
+      $data{sections} = \@POD_SECTIONS_CLI;
+      
+   }
+
+   
+
+
+
+   if ( grep { /METHODS/ } @{$data{sections}} ){
+      $data{METHODS} = pod_subs($abs);
+   }
+   if ( grep { /OPTIONS|PARAMETERS/ } @{$data{sections}} ){
+      
+     my($podopt, $podpar) = pod_opts($abs);
+     $data{'OPTION FLAGS'} = $podopt if $podopt;
+     $data{PARAMETERS} = $podpar if $podpar;
+
+
+   }
+   if( $::DEBUG ){
+      ### %data
+   }
+
+   return \%data;
+}
+
+
+sub pod_opts {
+   my $abs = shift;
+
+   my ($opt,$method) = optstring($abs);
+   debug( "optstring $abs : $opt");
+   $opt or return;
+
+   my( $pod_OPTION_FLAGS, $pod_PARAMETERS);
+
+   if ($method eq 'gopts'){# it hard wires -d and -h etc
+      $pod_OPTION_FLAGS.="   -h help\n   -v version and exit\n   -d debug on\n";
+      $opt=~s/d|h|v//g;
+   }
+
+
+
+   while( $opt=~/([a-z]\:?)/gi ){
+      my $o = $1;
+      if ($o=~/\:$/){
+         #$pod_PARAMETERS=~/PARAMETERS/ or $pod_PARAMETERS = "=head1 PARAMETERS\n\n";
+         $pod_PARAMETERS.="   -$o argument\n";
+      }
+      else {
+         #$pod_OPTION_FLAGS=~/OPTION FLAGS/ or $pod_OPTION_FLAGS = "=head1 OPTION FLAGS\n\n";
+         $pod_OPTION_FLAGS.="   -$o\n";
+      }
+   }
+   
+
+
+   if ($pod_OPTION_FLAGS){ $pod_OPTION_FLAGS.="\n"; }
+   if ($pod_PARAMETERS){ $pod_PARAMETERS.="\n"; }
+
+   return ($pod_OPTION_FLAGS, $pod_PARAMETERS);
+
+}
+
+sub optstring {
+   my $abs = shift;
+   my $txt = slurp($abs);
+
+   my $opt_string;
+   my $method;
+   my $r_opts = qr/^[a-zA-Z:]+$/;
+
+   if( $txt=~/gopts\(\s*['"]([a-zA-Z\:]+)['"]\s*\)/ ){
+      $opt_string = $1;
+      $method = 'gopts';
+   }
+   elsif( $txt=~/Getopt::Std::Strict\s*['"]([a-zA-Z\:]+)['"]/ ){
+      $opt_string = $1;
+      $method='';
+   }
+   return ($opt_string,$method);
+}
+
+
+sub pod_subs {
+   my $abs = shift;
+
+   my @subs = grep { !/^_/ } split( /\n/,`pmsubs '$abs'`);
+
+   my $pod;
+   for my $sub (@subs){
+      $pod.="=head2 $sub()\n\n";
+   }
+
+   return $pod;    
+
+
+}
+
+
+sub get_data_hash {
+   my $abs = shift;
+   $_datahash{$abs} ||= generate_data_hash($abs);
+   return $_datahash{$abs};      
+}
+
+
+
+sub render_pod_for_infiles { 
+
+   for my $abs (@infiles){
+      my $datahash = get_data_hash($abs) or next;
+      my $pod = pod_output_from_datahash(%$datahash);
+      print $pod;
+      print "\n\n";
+   }
+
+}

@@ -1,0 +1,31 @@
+---
+abstract: 'Check the grammar of Irish language text'
+author:
+  - 'Kevin P. Scannell <kscanne@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.112621'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-GA-Gramadoir
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Zip: 1.06
+  Carp: 0
+  Encode: 0
+  ExtUtils::MakeMaker: 6.03
+  File::Spec: 0.83
+  Getopt::Long: 2.32
+  Memoize: 0.52
+  Storable: 2.04
+  String::Approx: 3.19
+  Term::ANSIColor: 1.05
+version: 0.70

@@ -1,0 +1,106 @@
+   _     _                                     _   _          
+  | |   (_)_ __   __ _ _   _  __ _   _ _      | | / \     _ _ 
+  | |   | | '_ \ / _` | | | |/ _` | (_|_)  _  | |/ _ \   (_|_)
+  | |___| | | | | (_| | |_| | (_| |  _ _  | |_| / ___ \   _ _ 
+  |_____|_|_| |_|\__, |\__,_|\__,_| (_|_)  \___/_/   \_\ (_|_)
+                 |___/                                        
+    ____       _           _                     _____                    
+   / ___| __ _(_)_ __ __ _(_) __ _  ___    _ _  |  ___|   _ _________   _ 
+  | |  _ / _` | | '__/ _` | |/ _` |/ _ \  (_|_) | |_ | | | |_  /_  / | | |
+  | |_| | (_| | | | | (_| | | (_| | (_) |  _ _  |  _|| |_| |/ / / /| |_| |
+   \____|\__,_|_|_|  \__,_|_|\__, |\___/  (_|_) |_|   \__,_/___/___|\__, |
+                             |___/                                  |___/ 
+
+
+This is the README for Lingua::JA::Gairaigo::Fuzzy version 0.07.
+
+Lingua::JA::Gairaigo::Fuzzy is a "module" for the Perl computer programming
+language, a library of computer code to install on a computer.  This
+document contains four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+Lingua::JA::Gairaigo::Fuzzy - variant spellings of foreign words in
+Japanese
+
+Given two Japanese gairaigo words (katakana words), guess whether they
+are the same word. Japanese language is somewhat inconsistent in how
+it writes foreign loan words. For example "motor" can be モーター or
+モータ from the English "motor", or モートル from Dutch "motor".
+This
+module attempts to guess whether two loanwords refer to the same
+thing.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?Lingua::JA::Gairaigo::Fuzzy
+    * http://metacpan.org/release/Lingua-JA-Gairaigo-Fuzzy
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc Lingua::JA::Gairaigo::Fuzzy
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.8.9 or later.
+
+To install the module from CPAN, use
+
+    cpan Lingua::JA::Gairaigo::Fuzzy
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm Lingua::JA::Gairaigo::Fuzzy
+
+To install the module from the source file,
+Lingua-JA-Gairaigo-Fuzzy-0.07.tar.gz, follow this sequence of commands:
+
+    tar xfz Lingua-JA-Gairaigo-Fuzzy-0.07.tar.gz
+    cd Lingua-JA-Gairaigo-Fuzzy-0.07
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/Lingua-JA-Gairaigo-Fuzzy/issues>,
+
+or if you want to alter the source code of Lingua::JA::Gairaigo::Fuzzy, try
+the public repository on github at 
+
+<https://github.com/benkasminbullock/Lingua-JA-Gairaigo-Fuzzy>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Tue Jan 10 08:23:26 2017.
+
+-----------------------------------------------------------------------------

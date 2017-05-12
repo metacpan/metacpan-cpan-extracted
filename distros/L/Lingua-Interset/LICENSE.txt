@@ -1,0 +1,4 @@
+This software is copyright by Univerzita Karlova v Praze (Charles University in Prague);
+portions (such as individual tagset drivers) are copyright by various authors from the community.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.

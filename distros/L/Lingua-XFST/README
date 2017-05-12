@@ -1,0 +1,17 @@
+This is Lingua::XFST, version 0.1.
+
+Lingua::XFST is a (bare minimum) Perl interface to the Xerox finite state
+libraries. Full access to the C API is available through
+Lingua::XFST::Privates, but this requires knowledge on how the C library
+works, and how SWIG generated interfaces work.
+
+Having the Xerox library installed is (obviously) a prerequisite to get this
+module working. If you don't already have it, you can download it from
+http://fsmbook.com/. The libraries have to be available both to the linker,
+and the privates/Makefile.PL script. This latter tries to be clever and looks
+at LD_LIBRARY_PATH (DYLD_LIBRARY_PATH on OS X) to find the proper path, but if
+setting the proper env var doesn't work you may have to hack
+privates/Makefile.PL directly (this is an early version, after all).
+
+The source repository is available at https://github.com/arnsholt/Lingua-XFST,
+patches (and pull requests!), bug reports, feedback welcome.

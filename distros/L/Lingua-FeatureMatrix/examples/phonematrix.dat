@@ -1,0 +1,170 @@
+# (any line beginning with an octothorpe/sharp/pound-sign is a
+# comment, but the octothorpe'd better be on the first line)
+
+# This configuration defines the phoneset of English, using
+# (roughly) the DARPAbet as our phone symbols
+
+# implicatures
+
+# note that although some of the implicatures are language universal,
+# most of these are specific to English. I make no suggestion that
+# these are accurate or even complete.
+
+( +low => -high )
+( +high => -low )
+
+( +front => [ +vow -back ] )
+( +back => [ +vow -front ] )
+# but -front doesn't imply +back
+
+( +high => [ -low +vow -cons ] )
+( +low => [ -high +vow -cons ] )
+
+( +tense => +vow )
+( -tense => +vow )
+
+( +vow => [+voice +son -nas] )
+
+( [ -voice ] => [ -vow -son -nas ] )
+
+
+( +stop => [ +cons -son -vow -nas ] )
+( +fric => [ +cons -son -vow -nas ] )
+
+( +nas => [+cons -vow +voice +son -stop -fric] )
+( +liq => [+voice +son] )
+
+# ( +nas => +cons )
+( +lab => [ +cons *liq -pal ] )
+
+# no labial affricates in English, also no labiodental stops
+( [+lab +stop] => [-fric] )
+( [+lab +stop -fric] => [-dent] )
+# labial *nasals are also not dental
+( [+lab +nas] => [-dent])
+
+# furthermore, labial fricatives are actually labiodental
+( [+lab +fric] => [ +dent ])
+
+# affricates are all palatal
+( [ +stop +fric ] => [ +pal ] )
+
+# no alveolar affricates
+( [+alv +stop] => [-fric] )
+
+# velars, alveolars, and palatals never share a place of articulation
+# with others.
+( +alv => [ +cons *liq -dent -lab -vel -pal] )
+( +vel => [ +cons *liq -dent -lab -pal -alv ] )
+( +pal =>  [ +cons *liq -dent -lab -vel -alv ] )
+
+# dentals, though, can sometimes be labial as well
+( +dent => [ +cons *liq -pal -vel -alv ])
+# labials are not velar, alveolar, or palatal but might be dental
+( [ +lab ] => [ *liq -vel -alv -pal ])
+
+# liquids are available only very narrowly:
+( +liq => [ +cons -vow -dent -stop -fric -nas -vel +alv -pal -lab ] )
+
+# also no velar fricatives in English
+( +vel => -fric )
+
+( +fric => [+cons] )
+
+# non-palatal fricatives are never affricates
+( [ -pal +fric ] => [-stop] )
+
+([ -son ] => [ -nas ])
+
+
+# star here indicates "ungrammatical" for a given feature
+( +cons => [ *tense *high *low ] )
+( +vow => [ *vel *alv *stop *fric *liq *dent *lab *pal] )
+
+
+# vowels and glides are the only ones what can talk about front and back
+( [ -vow ] => [ *front *back ])
+
+
+
+# just the English consonants
+
+# note +vow is implied by use of +front and +back
+    Y [ +cons +front ]
+    W [ +cons +back ]
+
+    P [ +stop -voice +lab ]
+    B [ +stop +voice +lab ]
+
+    T [ +stop -voice +alv ]
+    D [ +stop +voice +alv ]
+
+    K [ +stop -voice +vel ]
+    G [ +stop +voice +vel ]
+
+    CH [ +stop +fric -voice ]
+    J  [ +stop +fric +voice ]
+
+    SH [ -stop +fric +pal -voice ]
+    ZH [ -stop +fric +pal +voice ]
+
+    S [ +fric +alv -voice ]
+    Z [ +fric +alv +voice ]
+
+    F [ +fric +lab -voice ]
+    V [ +fric +lab +voice ]
+
+    TH [ +fric +dent -lab -voice ]
+    DH [ +fric +dent -lab +voice ]
+
+    M [ +nas +lab ]
+
+    N [ +nas +alv ]
+
+    NG [ +nas +vel ]
+
+    R [ +liq ]
+    L [ +liq ]
+
+    HH [ -stop -voice +vel ]
+
+
+# filters to use in accessing these features by feature-class
+
+class VOW => [ +vow ]
+
+class CONS => [ +cons ]
+
+class STOP => [ +stop ]
+
+class VOICED => [ +voice ]
+
+class VOICELESS => [ -voice ]
+
+class CONS_VCD => [ +cons +voice ]
+
+class CONS_VLS => [ +cons -voice ]
+
+class CONS_SON => [ +cons +son ]
+
+class SIBILANT => [ +fric -dent ]
+
+class FRIC => [ +fric ]
+
+class FRIC_VCD  => [ +fric +voice ]
+
+class FRIC_VLS  => [ +fric -voice ]
+
+class O_STOP => [ +stop -nas ]
+
+class O_STOP_VCD => [ +stop -nas +voice ]
+
+class O_STOP_VLS => [ +stop -nas -voice ]
+
+class AFF => [ +stop +fric ]
+
+class NASAL => [ +nas ]
+
+class LIQUID => [ +liq ]
+
+class GLIDE => [ +cons +vow ]

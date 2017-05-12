@@ -1,0 +1,26 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Lingua/HPSG.pm
+lib/Lingua/HPSG/Feature.pm
+lib/Lingua/HPSG/Feature/Agreement.pm
+lib/Lingua/HPSG/Feature/Expression.pm
+lib/Lingua/HPSG/Feature/Valance.pm
+lib/Lingua/HPSG/FeatureStructure.pm
+lib/Lingua/HPSG/FeatureStructure/Expression.pm
+lib/Lingua/HPSG/FeatureStructure/Expression/Agreement.pm
+lib/Lingua/HPSG/FeatureStructure/Expression/Phrase.pm
+lib/Lingua/HPSG/FeatureStructure/Expression/Valance.pm
+lib/Lingua/HPSG/FeatureStructure/Expression/Word.pm
+lib/Lingua/HPSG/FeatureStructure/PartOfSpeech.pm
+lib/Lingua/HPSG/FeatureStructure/PartOfSpeech/Adjective.pm
+lib/Lingua/HPSG/FeatureStructure/PartOfSpeech/Conjunction.pm
+lib/Lingua/HPSG/FeatureStructure/PartOfSpeech/Determiner.pm
+lib/Lingua/HPSG/FeatureStructure/PartOfSpeech/Noun.pm
+lib/Lingua/HPSG/FeatureStructure/PartOfSpeech/Preposition.pm
+lib/Lingua/HPSG/FeatureStructure/PartOfSpeech/Verb.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

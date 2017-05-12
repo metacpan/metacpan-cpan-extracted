@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Lingua/LO/Romanize.pm
+lib/Lingua/LO/Romanize/Word.pm
+lib/Lingua/LO/Romanize/Syllable.pm
+lib/Lingua/LO/Romanize/Types.pm
+t/00-load.t
+t/01-romanization.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

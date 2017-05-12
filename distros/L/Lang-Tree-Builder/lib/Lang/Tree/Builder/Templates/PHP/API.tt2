@@ -1,0 +1,32 @@
+<?php
+
+# [% warning %]
+
+[% FOREACH class IN data.classes -%]
+[% IF class.is_concrete -%]
+require_once("[% class.name("/") %].php");
+[% END -%]
+[% END -%]
+require_once("[% visitor.name("/") %].php");
+
+[% FOREACH class IN data.classes -%]
+[% IF class.is_concrete %]
+
+/**
+[%- FOREACH arg IN class.args %]
+ * @param [% arg.name("_") %] $[% arg.argname %]
+[%- END %]
+ * @return [% class.name("_") %] a new [% class.name("_") %]
+ */
+function [% class.lastpart %]([% FOREACH arg IN class.args -%]
+                                    [%- arg.name("_") %] $[% arg.argname -%]
+                                    [%- LAST IF loop.last %][% ", " %]
+                                [%- END %]) {
+    return new [% class.name("_") %]([% FOREACH arg IN class.args -%]$[% arg.argname -%]
+                                    [%- LAST IF loop.last %][% ", " %]
+                                [%- END %]);
+}
+[% END -%]
+[% END %]
+
+?>

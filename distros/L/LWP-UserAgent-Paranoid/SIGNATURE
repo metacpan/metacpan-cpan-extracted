@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b2eae71aa134f096d1c323ca751e49779f80e805 Changes
+SHA1 3671fbb552a6dd762e9abd54c3ea2632f01ec02e MANIFEST
+SHA1 8f1cf3152194e5d7a511c0ad8d50e2526eb5347e MANIFEST.SKIP
+SHA1 1874d5706cc2357a2fc87e50e464791dea399099 META.yml
+SHA1 62f9f513112c2429a4035687e872cf8edfc6e865 Makefile.PL
+SHA1 273fbff0aae947a49cba54fb62de0f2b9c019f62 README
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 aa3d04ce3ff8573e450139dceea20b96692263cc lib/LWP/UserAgent/Paranoid.pm
+SHA1 51f13a53920ac85a4f4cf686d49464618edaec3a lib/LWP/UserAgent/Paranoid/Compat.pm
+SHA1 7f18e4fbb053584599acbe0ecc1b668148d3d807 lib/LWP/UserAgent/Paranoid/Test.pm
+SHA1 54951a9210952f72b964f1b5caecc536d789689e t/alarm.t
+SHA1 1aa6e7ed58264de6ac8698e906e023fbc75d6967 t/basic.t
+SHA1 1df83dcf85f7e7086a2b6a0b6ccc1d6f6aaadbfc t/compat/00-all.t
+SHA1 f3262eaa541065eeb5f5579223ebee1fe9053c57 t/compat/40-largefiles.t
+SHA1 1d3d6db585a0f06a53fba16d62342f816116a067 t/compat/40-slowserver.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFVB7Jjsea4n7ROSqERAqIZAKCta2fScgvaozOwHNoEIs36BVyKbgCgi8gk
+8YyIoxSyVNG9o7kgBnpX7Vo=
+=bpNh
+-----END PGP SIGNATURE-----

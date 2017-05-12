@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+README
+lib/LEOCHARRE/BogusFile.pm
+t/00.t
+t/99.cleanup.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,54 @@
+SYNOPSIS
+
+     use LWP::UserAgent::Patch::LogResponse
+         -log_response_header  => 1, # default 1
+         -log_response_body    => 1, # default 0
+         -decode_response_body => 1, # default 1, turn off, e.g. to get raw gzipped content
+     ;
+    
+     # now all your LWP HTTP responses are logged
+
+    Sample script and output:
+
+     % TRACE=1 perl -MLog::Any::App -MLWP::UserAgent::Patch::LogResponse \
+       -MLWP::Simple -e'get "http://localhost:5000/"'
+     [261] HTTP response header:
+     200 OK
+     Date: Mon, 20 Aug 2012 07:47:46 GMT
+     Server: HTTP::Server::PSGI
+     Content-Length: 13
+     Content-Type: text/plain
+     Client-Date: Mon, 20 Aug 2012 07:47:46 GMT
+     Client-Peer: 127.0.0.1:5000
+     Client-Response-Num: 1
+
+DESCRIPTION
+
+    This module patches LWP::UserAgent (which is used by LWP::Simple,
+    WWW::Mechanize, among others) so that HTTP responses are logged using
+    Log::Any.
+
+    Response body is logged in category LWP_Response_Body.* so it can be
+    separated. For example, to dump response body dumps to directory
+    instead of file:
+
+     use Log::Any::App '$log',
+        -category_level => {LWP_Response_Body => 'off'},
+        -dir            => {
+            path           => "/path/to/dir",
+            level          => 'off',
+            category_level => {LWP_Response_Body => 'trace'},
+        };
+
+FAQ
+
+ Why not subclass?
+
+    By patching, you do not need to replace all the client code which uses
+    LWP (or WWW::Mechanize, etc).
+
+SEE ALSO
+
+    Use Net::HTTP::Methods::Patch::LogRequest to log raw HTTP requests
+    being sent to servers.
+

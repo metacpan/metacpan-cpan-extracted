@@ -1,0 +1,10 @@
+Revision history for Perl extension Lingua::DE::TypoGenerator.
+
+0.02  Fri Jan 05 20:45:22 2006
+	- removed some perl errors in strict mode
+	- downgraded perl requirement to 5.8.0
+
+0.01  Thu Dec 14 23:39:22 2006
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Lingua::DE::TypoGenerator
+

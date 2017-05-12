@@ -1,0 +1,134 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+logfile-tail - output (cat) file from the last saved position
+
+=cut
+
+use strict;
+use warnings FATAL => 'all';
+
+use Getopt::Long ();
+use Logfile::Tail ();
+
+=head1 SYNOPSIS
+
+    logfile-tail [ --status=status-directory | --status=status-file ] logfile
+    logfile-tail --help
+
+=cut
+
+sub usage {
+	my $exit = shift // 0;
+	my $usage = "Usage: $0 [--status=DIR | --status=FILE] logfile | --help\n";
+	if ($exit) {
+		print STDERR $usage;
+	} else {
+		print $usage;
+	}
+	exit $exit;
+}
+
+my $status_path;
+Getopt::Long::GetOptions('status=s' => \$status_path, 'help' => sub { usage() }) or exit 1;
+if (@ARGV != 1) {
+	usage(2);
+}
+
+my %attr = ();
+if (defined $status_path) {
+	if (-f $status_path) {
+		$attr{status_file} = $status_path;
+		if ($status_path =~ m!^/!) {
+			$attr{status_dir} = '/';
+		} else {
+			$attr{status_dir} = '.';
+		}
+	} else {
+		$attr{status_dir} = $status_path;
+	}
+}
+
+my $logfile_name = shift;
+my @the_warning;
+$SIG{'__WARN__'} = sub {
+	push @the_warning, @_;
+};
+
+my $logfile = new Logfile::Tail(
+	$logfile_name,
+	'r',
+	\%attr,
+) or do {
+	if (@the_warning) {
+		s/\n(.)/$1/g for @the_warning;
+		s/\n// for @the_warning;
+		print STDERR "Error while reading [$logfile_name]: @the_warning: $!\n";
+	} else {
+		print STDERR "Error reading [$logfile_name]: $!\n";
+	}
+	exit 3;
+};
+
+while (defined(my $line = $logfile->getline())) {
+	print $line;
+}
+
+1;
+
+=head1 DESCRIPTION
+
+When processing log files, you want to continue reading where you
+left out the last time. The B<logfile-tail> program uses the
+B<Logfile::Tail> module internally to store the position last
+seen for the log file and retrieve it upon the subsequent
+invocation.
+
+The program also handles rotated files -- if the log file was
+rotated since the last read, it is detected and the rest of the
+rotated file is read first, before proceeding to the newer
+rotate file or to the current log file.
+
+The content is printed to the standard output.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --status=STATUS DIRECTORY | --status=STATUS FILE
+
+The parameter specifies either the status file which is used
+to store the position, or directory which will hold the status file.
+The file has to already exist (albeit empty) for the path to be
+recognized as status file, otherwise it is considered to be
+a status directory path.
+
+=item --help
+
+Short usage is printed.
+
+=back
+
+=head1 EXAMPLES
+
+    # output data from Apache's access_log
+    logfile-tail /var/log/httpd/access_log
+
+    logfile-tail --status /var/run/apache/logfile-tail error_log
+
+=head1 AUTHOR
+
+Copyright (C) 2011 by Jan Pazdziora
+
+=head1 LICENSE
+
+This module is free software.  You can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+

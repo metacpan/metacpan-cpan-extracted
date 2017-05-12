@@ -1,0 +1,26 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+lib/Lingua/LO/NLP.pm
+lib/Lingua/LO/NLP/Analyze.pm
+lib/Lingua/LO/NLP/Data.pm
+lib/Lingua/LO/NLP/Romanize.pm
+lib/Lingua/LO/NLP/Romanize/PCGN.pm
+lib/Lingua/LO/NLP/Romanize/IPA.pm
+lib/Lingua/LO/NLP/Syllabify.pm
+t/001_load.t
+t/analyze.t
+t/manifest.t
+t/pod.t
+t/pod-coverage.t
+t/data.t
+t/lib/Lingua/LO/NLP/Romanize/Faulty.pm
+t/nlp.t
+t/romanize-ipa.t
+t/romanize-pcgn.t
+t/romanize.t
+t/syllabify.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

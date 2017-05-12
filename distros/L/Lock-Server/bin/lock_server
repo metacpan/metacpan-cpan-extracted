@@ -1,0 +1,133 @@
+#!/usr/bin/env perl
+
+##########################################
+# This program launches the lock server. #
+##########################################
+
+use strict;
+use warnings;
+no  warnings 'uninitialized';
+use vars qw($VERSION);
+
+use Daemon::Daemonize qw/ :all /;
+use Data::Dumper;
+
+use lib '/home/wolf/proj/Yote/LockServer/lib';
+use Lock::Server;
+
+$SIG{ __DIE__ } = sub { 
+    Carp::confess( @_ );
+};
+
+#
+# Override options and find command 
+#
+my $cmd = 'start';
+while( @ARGV ) {
+    $_ = shift @ARGV;
+
+    if( /^-?-?(\?|help)/i ) {
+        print "lock_server <options> start|run|stop|restart\n";
+        exit;
+    } elsif( /^(start|run|stop|restart|status)$/ ) {
+        $cmd = $_;
+    } else {
+        print STDERR "Unknown argument '$_'\n";
+    }
+}
+
+my $pidfile = "/var/run/lockserver.pid";
+
+if( $cmd eq 'stop' ) {
+    if( my $pid = check_pidfile( $pidfile ) ) {
+        print "Stopping $0 ( $pid )\n";
+        kill 'INT', $pid;
+        sleep 2;
+        print "Done\n";
+        exit;
+    }    
+    print "lock server not running\n";
+    exit;
+}
+
+if( $cmd eq 'start' ) {
+    if( check_pidfile( $pidfile ) ) {
+        print "lock server already running\n";
+        exit;
+    }
+    start_lockserver();
+    exit;
+}
+
+if( $cmd eq 'run' ) {
+    run_lockserver();
+    print STDERR Data::Dumper->Dump(["RANRAN"]);
+}
+
+if( $cmd eq 'restart' ) {
+    if( my $pid = check_pidfile( $pidfile ) ) {
+        print "Stopping $0\n";
+        kill 'INT', $pid;
+        sleep 4;
+        print "Done\n";
+    }    
+    start_lockserver();
+    exit;
+}
+
+if( $cmd eq 'status' ) {
+    print check_pidfile( $pidfile ) ? "lock server running\n" : "lock server not running\n";
+    exit;
+}
+
+# ------------------------------------------------------------------
+
+sub run_lockserver {
+    my $serv = new Lock::Server;
+    $serv->run;
+}
+
+sub start_lockserver {
+
+    daemonize( close => 0, run => sub {
+        write_pidfile( $pidfile );
+        my $serv = new Lock::Server;
+        $serv->run;
+               } );
+
+} #start_lockserver
+__END__
+
+=head1 NAME
+
+lock_server - Turn on and off the Lock Server Daemon
+
+=head1 SYNOPSIS
+
+
+
+=head1 DESCRIPTION
+
+
+=head1 FILES
+
+=head1 BUGS
+
+There are no known bugs, but since this software is Beta or below, bugs are highly likely 
+to exist. Please inform the author if bugs are encountered.
+
+=head1 AUTHOR
+
+Eric Wolf
+coyocanid@gmail.com
+http://madyote.com
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2011-2016 Eric Wolf
+
+This module is free software; it can be used under the same terms as perl
+itself.
+
+=cut
+

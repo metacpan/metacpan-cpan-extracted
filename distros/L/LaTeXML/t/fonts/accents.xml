@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <section refnum="1" xml:id="S1">
+    <title><tag close=" ">1</tag>Testing Accents</title>
+    <para xml:id="S1.p1">
+      <tabular class="ltx_guessed_headers" vattach="middle">
+        <thead>
+          <tr>
+            <td border="r" thead="column row"/>
+            <td align="center" thead="column">a</td>
+            <td align="center" thead="column">o</td>
+            <td align="center" thead="column">A</td>
+            <td align="center" thead="column">O</td>
+            <td align="center" thead="column">ı</td>
+            <td align="center" border="r" thead="column">ao</td>
+            <td thead="column"/>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td align="center" border="r t" thead="row">‘</td>
+            <td align="center" border="t">à</td>
+            <td align="center" border="t">ò</td>
+            <td align="center" border="t">À</td>
+            <td align="center" border="t">Ò</td>
+            <td align="center" border="t">ì</td>
+            <td align="center" border="r t">ào</td>
+            <td align="center" border="t">à</td>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row">’</td>
+            <td align="center">á</td>
+            <td align="center">ó</td>
+            <td align="center">Á</td>
+            <td align="center">Ó</td>
+            <td align="center">í</td>
+            <td align="center" border="r">áo</td>
+            <td align="center">á</td>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row"><verbatim font="typewriter">^</verbatim></td>
+            <td align="center">â</td>
+            <td align="center">ô</td>
+            <td align="center">Â</td>
+            <td align="center">Ô</td>
+            <td align="center">î</td>
+            <td align="center" border="r">âo</td>
+            <td align="center">â</td>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row">”</td>
+            <td align="center">ä</td>
+            <td align="center">ö</td>
+            <td align="center">Ä</td>
+            <td align="center">Ö</td>
+            <td align="center">ï</td>
+            <td align="center" border="r">äo</td>
+            <td align="center">ä</td>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row"><verbatim font="typewriter">~</verbatim></td>
+            <td align="center">ã</td>
+            <td align="center">õ</td>
+            <td align="center">Ã</td>
+            <td align="center">Õ</td>
+            <td align="center">ĩ</td>
+            <td align="center" border="r">ão</td>
+            <td align="center">ã</td>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row">=</td>
+            <td align="center">ā</td>
+            <td align="center">ō</td>
+            <td align="center">Ā</td>
+            <td align="center">Ō</td>
+            <td align="center">ī</td>
+            <td align="center" border="r">āo</td>
+            <td align="center">ā</td>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row">.</td>
+            <td align="center">ȧ</td>
+            <td align="center">ȯ</td>
+            <td align="center">Ȧ</td>
+            <td align="center">Ȯ</td>
+            <td align="center">i̇</td>
+            <td align="center" border="r">ȧo</td>
+            <td align="center">ȧ</td>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row">u</td>
+            <td align="center">ă</td>
+            <td align="center">ŏ</td>
+            <td align="center">Ă</td>
+            <td align="center">Ŏ</td>
+            <td align="center">ĭ</td>
+            <td align="center" border="r">ăo</td>
+            <td align="center">ǎ</td>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row">v</td>
+            <td align="center">ǎ</td>
+            <td align="center">ǒ</td>
+            <td align="center">Ǎ</td>
+            <td align="center">Ǒ</td>
+            <td align="center">ǐ</td>
+            <td align="center" border="r">ǎo</td>
+            <td align="center">â</td>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row">H</td>
+            <td align="center">a̋</td>
+            <td align="center">ő</td>
+            <td align="center">A̋</td>
+            <td align="center">Ő</td>
+            <td align="center">i̋</td>
+            <td align="center" border="r">a̋o</td>
+            <td align="center">a̋</td>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row">t</td>
+            <td align="center">a͡</td>
+            <td align="center">o͡</td>
+            <td align="center">A͡</td>
+            <td align="center">O͡</td>
+            <td align="center">i͡</td>
+            <td align="center" border="r">a͡o</td>
+            <td/>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row">c</td>
+            <td align="center">a̧</td>
+            <td align="center">o̧</td>
+            <td align="center">A̧</td>
+            <td align="center">O̧</td>
+            <td align="center">i̧</td>
+            <td align="center" border="r">a̧o</td>
+            <td align="center">a̧</td>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row">d</td>
+            <td align="center">ạ</td>
+            <td align="center">ọ</td>
+            <td align="center">Ạ</td>
+            <td align="center">Ọ</td>
+            <td align="center">ị</td>
+            <td align="center" border="r">ạo</td>
+            <td align="center">ạ</td>
+          </tr>
+          <tr>
+            <td align="center" border="r" thead="row">b</td>
+            <td align="center">a̱</td>
+            <td align="center">o̱</td>
+            <td align="center">A̱</td>
+            <td align="center">O̱</td>
+            <td align="center">i̱</td>
+            <td align="center" border="r">a̱o</td>
+            <td align="center">ā</td>
+          </tr>
+        </tbody>
+      </tabular>
+    </para>
+  </section>
+</document>

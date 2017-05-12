@@ -1,0 +1,13 @@
+====
+TODO
+====
+
+We will closely follow LMDB's development towards version 1.0, and accordingly adjust
+LMDB_File.
+
+We plan the following read-map for LMDB_File 1.0, in no particular order:
+
+- Implement the perldbmfilter(1) API?
+- Complete documentation
+- Tested multi-threading support
+- Complete the test harness

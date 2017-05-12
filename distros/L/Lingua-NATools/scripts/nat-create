@@ -1,0 +1,258 @@
+#!/usr/bin/perl -s
+
+# NATools - Package with parallel corpora tools
+# Copyright (C) 2002-2012  Alberto Simões
+#
+# This package is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+
+
+use strict;
+use warnings;
+
+use POSIX qw(locale_h);
+setlocale(LC_CTYPE, "pt_PT");
+use locale;
+
+use Lingua::NATools;
+use Lingua::NATools::Lexicon;
+use Lingua::NATools::Config;
+use Cwd;
+
+our ($tmx, $d, $q, $langs, $tokenize, $id, $ngrams, $h, $noEM, $ipfp,
+     $samplea, $sampleb, $i, $v, $csize);
+
+if ($h || !@ARGV) {
+  print "nat-create: creates a NATools corpus, and extracts its PTD.\n\n";
+  print "\tnat-create [-q] [-langs=L1..L2] [-tokenize] [-ngrams]\n";
+  print "\t           [-csize=70000]\n";
+  print "\t           [-noEM] [-ipfp[=5]] [-samplea[=10]] [-sampleb[=10]]\n";
+  print "\t           [-id=ID] [-i] <corpusL1> <corpusL2>\n\n";
+  print "\tnat-create [-q] [-langs=L1..L2] [-tokenize] [-ngrams]\n";
+  print "\t           [-csize=70000]\n";
+  print "\t           [-noEM] [-ipfp[=5]] [-samplea[=10]] [-sampleb[=10]]\n";
+  print "\t           [-id=ID] [-i] -tmx <tmx>\n\n";
+  print "For more help, please run 'perldoc nat-create'\n";
+  exit
+}
+
+my @files = @ARGV;
+my @langs = ();
+
+my @cleanup = ();
+
+if ($tmx) {
+    $tmx = $files[0];
+    print STDERR "Loading TMX file.\n";
+    if ($langs) {
+        @files = Lingua::NATools::tmx2files({ verbose => $v}, $tmx, split /\.\./, $langs);
+    } else {
+        @files = Lingua::NATools::tmx2files({ verbose => $v}, $tmx);		
+    }
+    die "Error loading TMX file or the specified languages does not exist\n" unless @files &&
+      defined($files[0]) && defined($files[1]);
+
+    for (@files) {
+        if (m!\Q$tmx\E-(.+)!) {
+            push @langs, $1;
+        } else {
+            die "weird file name... $_";
+        }
+    }
+    if ($langs && $langs =~ m!([a-z-]+)\.\.([a-z-]+)!i){
+        @langs = (lc $1,lc $2) ;
+        @files = ("$tmx-$langs[0]","$tmx-$langs[1]");
+    }
+
+    push @cleanup, @files;
+}
+
+### Define file names
+my ($crp1, $crp2) = @files[0..1];
+my $defaultname   = $id || "$crp1-$crp2";
+my $currentdir    = getcwd;
+
+### Check if we have specific languages defined.
+@langs = ($1, $2) if $langs && $langs =~ m!([a-z-]+)\.\.([a-z-]+)!i;
+
+## FIXME => use 'prompt'.
+unless ($q || $id) {
+    print "Name for the corpus directory: \n";
+    $defaultname = <STDIN>;
+    chomp($defaultname);
+
+    $defaultname ||= "unamed_corpus";
+}
+
+my $self = Lingua::NATools->init({ csize => $csize || undef },
+                                 $currentdir, $defaultname, @langs);
+
+$self->{tokenize} = 1 if $tokenize;
+$self->codify({ log_file    => "$defaultname/nat.log",
+				verbose     => $v,
+                ignore_case => $i}, $crp1, $crp2);
+
+$self->index_invindexes(1);
+
+$self->index_ngrams(1) if $ngrams;
+
+if ($noEM) {
+    $self->align_all({EM => 1});
+} elsif ($samplea) {
+    $self->align_all({samplea => $samplea});
+} elsif ($sampleb) {
+    $self->align_all({sampleb => $sampleb});
+} else {
+    $self->align_all({ipfp => $ipfp});
+}
+
+$self->make_dict;
+$self->dump_ptd();
+
+unlink for @cleanup;
+
+### TODO: Criar método NAT com isto
+my $x = $self->homedir;
+
+my $Slex = Lingua::NATools::Lexicon->new("$x/source.lex");
+my $Ssize = $Slex->size;
+$self->{conf}->param("source-forms", $Ssize);
+$Slex->close;
+
+
+my $Tlex = Lingua::NATools::Lexicon->new("$x/target.lex");
+my $Tsize = $Tlex->size;
+$self->{conf}->param("target-forms", $Tsize);
+$Tlex->close;
+
+$self->{conf}->write($self->{conf}->param("cfg"));
+
+
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-create - Command line tool to create NATools Corpora Objects
+
+=head1 SYNOPSIS
+
+   nat-create <file1.nat> <file2.nat>
+
+   nat-create -tmx <file.tmx>
+
+=head1 DESCRIPTION
+
+This is the basic command used to create a NATools Corpora Object from
+the command line.
+
+A NATools Corpora Object is a ditectory with:
+
+=over 4
+
+=item *
+
+the configuration file ("nat.cnf" - metadata information)
+
+=item *
+
+the corpus
+
+=item *
+
+the corpus indexes
+
+=item *
+
+the probabilistic translation dictionaries ("source-target.dmp", "target-source.dmp")
+
+=item *
+
+the (bi,tri,tetra)grams databases  ("source.ngrams", "target.ngrams")
+
+=back
+
+=head2 Known Switches
+
+=over 4
+
+=item tokenize
+
+The C<-tokenize> flag can be used to force NATools to tokenize the
+texts. Note that at the moment a Portuguese tokenizer is used for all
+languages. This might change in the future.
+
+=item id
+
+The C<-id=name> flag can be used to force NATools Corpora name. By default
+the name is read interactively.
+
+=item q
+
+The C<-q> flag can be used to force quiet mode.  In thic case, the
+name is extracted from the file-names.
+
+=item lang
+
+The C<-lang=PT..EN> flag can be used to force languages.
+
+=item ngrams
+
+The C<-ngrams> flag can be set to force NATools to create ngrams
+indexes.
+
+=item noEM
+
+The C<-noEM> flag is used to bypass the EM-Algorithm (useful for debug
+purposes, mainly).
+
+=item ipfp
+
+The C<-ipfp> flag is mutually exclusive with C<-noEM>, C<-samplea> and
+C<-sampleb>. It defines that the EM-Algorithm to be used is the IPFP
+one. Optional numeric argument is the number of iterations. Defaults
+to 5.
+
+=item samplea
+
+The C<-samplea> flag is mutually exclusive with C<-noEM>, C<-ipfp> and
+C<-sampleb>. It defines that the EM-Algorithm to be used is the Sample
+A one. Optional numeric argument is the number of iterations. Defaults
+to 10.
+
+=item sampleb
+
+The C<-sampleb> flag is mutually exclusive with C<-noEM>, C<-ipfp> and
+C<-samplea>. It defines that the EM-Algorithm to be used is the Sample
+B one. Optional numeric argument is the number of iterations. Defaults
+to 10.
+
+=back
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2011 by Alberto Manuel Brandão Simões
+
+=cut

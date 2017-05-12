@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Lingua/JA/DocumentFrequency/AozoraBunko.pm
+minil.toml
+share/df.st
+t/00_compile.t
+t/01_basic.t
+t/02_df.t
+t/03_number_of_documents.t
+xt/01_synopsis_expectation.t
+META.yml
+MANIFEST

@@ -1,0 +1,26 @@
+# Comments at the top of the file.
+msgid ""
+msgstr ""
+"Project-Id-Version: Demo of a .po file\n"
+"PO-Revision-Date: 1975-01-30 00:00 +0000\n"
+"Last-Translator: Thomas Thurman <marnanel@cpan.org>\n"
+"Language-Team: test <test@example.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "This is a message"
+msgstr "This is a translation"
+
+msgid "This message has no translation yet"
+msgstr ""
+
+#, fuzzy
+msgid "This message is interesting"
+msgstr "but the translation is possibly wrong"
+
+#, fuzzy
+#: src/test.c:177
+msgid "This message came from a specific line"
+msgstr "in a source file, and is fuzzy"
+

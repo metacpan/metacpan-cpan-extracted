@@ -1,0 +1,52 @@
+#!perl -w
+
+use strict;
+use Linux::Input::Info;
+
+=head1 NAME
+
+lsdevinput - list information from all devices connected to /dev/input/event*
+
+=head1 USAGE
+
+	% lsdevinput
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Copyright 2005, Simon Wistow
+
+=head1 SEE ALSO
+
+Gerd Knorr's input utils from http://dl.bytesex.org/cvs-snapshots/
+
+=cut 
+
+for (0..32) {
+
+	my $i = Linux::Input::Info->new($_);
+    printf "/dev/input/event%d", $_;
+
+    unless (defined $i) {
+			print ": No such device\n\n";
+			last;
+	} 
+
+	printf "\n";
+    printf "\tbustype  : %s\n",   $i->bustype;
+    printf "\tvendor   : 0x%x\n", $i->vendor;
+    printf "\tproduct  : 0x%x\n", $i->product;
+    printf "\tversion  : %d\n",   $i->version;
+    printf "\tname     : %s\n",   $i->name;
+    printf "\tuniq     : %s\n",   $i->uniq;
+    printf "\tphys     : %s\n",   $i->phys;
+    printf "\tbits ev  :";
+    printf " %s", $i->ev_name($_) for $i->bits;
+    printf "\n";
+	printf "\n\n";
+
+}
+

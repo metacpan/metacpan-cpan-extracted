@@ -1,0 +1,7 @@
+Revision history for Log-Dispatch-DesktopNotification
+
+0.02      2015-01-18 23:28:13Z
+          - fix prereqs used when installed non-interactively (RT#84753)
+
+0.01      2009-02-07 02:52:53Z
+          - Initial release.

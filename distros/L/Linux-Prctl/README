@@ -1,0 +1,69 @@
+Linux::Prctl -- Control process attributes through prctl
+========================================================
+
+The linux prctl function allows you to control specific characteristics of a
+process' behaviour. Usage of the function is fairly messy though, due to
+limitations in C and linux. This module provides a nice non-messy interface.
+
+Besides prctl, this library also wraps libcap for complete capability handling.
+
+INSTALLATION
+
+You can download the latest code from http://github.com/seveas/Linux-Prctl
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   (Some tests need root privileges, run 'sudo make test' if you trust me)
+   make install
+
+DEPENDENCIES
+
+Linux kernel 2.6.18 or newer. Some functions are only available in later
+kernels, this is documented per function. libcap-dev (Debian) or libcap-devel
+(Fedora) is a required package too.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011,2012 by Dennis Kaarsemaker
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+---------------------------------------------------------------------
+
+The documentation is heavily based on the linux manpages prctl and
+capabilities, which is covered by the following license:
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one
+
+Since the Linux kernel and libraries are constantly changing, this
+manual page may be incorrect or out-of-date.  The author(s) assume no
+responsibility for errors or omissions, or for damages resulting from
+the use of the information contained herein.  The author(s) may not
+have taken the same level of care in the production of this manual,
+which is licensed free of charge, as they might when working
+professionally.
+
+Formatted or processed versions of this manual, if unaccompanied by
+the source, must acknowledge the copyright and authors of this work.
+License.

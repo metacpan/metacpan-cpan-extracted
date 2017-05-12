@@ -1,0 +1,14 @@
+<sect1 id="sec-CError">
+  <title><literal>CError</literal></title>
+  <indexterm><primary><literal>CError</literal></primary></indexterm>
+
+  <para>This module has moved to <ulink url="../base/Foreign.C.Error.html"><literal>Foreign.C.Error</literal></ulink> in the
+  hierarchical libraries.</para>
+</sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: sgml ***
+     ;;; sgml-parent-document: ("../../doc/hslibs.sgml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

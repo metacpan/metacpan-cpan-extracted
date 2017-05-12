@@ -1,0 +1,20 @@
+ChangeLog
+lib/Locale/Maketext/Lexicon/Slurp.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/basic.t
+t/files/de/cat
+t/files/de/dog
+t/files/de/hello
+t/files/en/cat
+t/files/en/dog
+t/files/en/hello
+t/files/others/fi/bar
+t/files/others/fi/foo
+t/files/others/fr/bar
+t/files/others/fr/foo
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

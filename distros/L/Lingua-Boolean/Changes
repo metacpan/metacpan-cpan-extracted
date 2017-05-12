@@ -1,0 +1,29 @@
+Revision history for Perl module Lingua-Boolean
+
+0.008     2013-11-09
+  - Silence smartmatch warnings
+  - Don't use Module::Pluggable to do a dynamic search for languages
+  - Deprecate this module in favour of Lingua::Boolean::Tiny
+
+0.007     2012-11-25
+  - minor POD fix
+  - Test suite updates
+
+0.006     2011-04-22
+  - Packaging changes only
+
+0.005     2010-11-28
+  - Use Perl_5 license: your choice of GPL or Artistic
+
+0.004     2010-11-28
+  - Use String::Trim to provide a trim function
+
+0.003     2010-10-31
+  - Require Perl 5.10.1 - RT#62574: Fails on perl 5.10.0
+
+0.002     2010-10-25
+  - Updated documentation
+  - Specified encoding in POD
+
+0.001     2010-10-24
+  - Initial version

@@ -1,0 +1,10 @@
+MANIFEST.bak
+Makefile.old
+Makefile$
+^examples/robots.db
+^examples/repeatscache.db
+tar.gz$
+^blib
+^pm_to_blib
+.svn/
+CVS/

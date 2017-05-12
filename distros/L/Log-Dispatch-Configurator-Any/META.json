@@ -1,0 +1,53 @@
+{
+   "abstract" : "Configurator implementation with Config::Any",
+   "author" : [
+      "Oliver Gorwits <oliver@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200013, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Dispatch-Configurator-Any",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Config::Any" : "0.15",
+            "Log::Dispatch" : "2.23",
+            "Log::Dispatch::Configurator" : 0,
+            "Sys::Syslog" : "0.25"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config::Tiny" : 0,
+            "Log::Dispatch::Config" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Dispatch-Configurator-Any"
+      },
+      "homepage" : "https://github.com/ollyg/Log-Dispatch-Configurator-Any/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ollyg/Log-Dispatch-Configurator-Any.git",
+         "web" : "https://github.com/ollyg/Log-Dispatch-Configurator-Any"
+      }
+   },
+   "version" : "1.122640"
+}
+

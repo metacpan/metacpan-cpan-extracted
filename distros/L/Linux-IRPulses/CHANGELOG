@@ -1,0 +1,13 @@
+Revision history for perl module UAV::Pilot
+
+0.6 2016-03-06
+
+- Add handle_line()
+
+0.5 2016-03-03
+
+- A version string of 0.477239189510332 broke the CPAN indexer. You win, CPAN indexer.
+
+0.477239189510332 2016-03-02
+
+- Initial release

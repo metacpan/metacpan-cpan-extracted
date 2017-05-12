@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+
+<!--
+
+  Transliteration definitions for Greeklish: Greek to Latin.
+
+  This transliteration definitions follow the most common form of Greeklish,
+  which is basically a phonetic transcription. As there is no authoritive
+  standard, the transliteration is done based on the tables provided by
+  Wikipedia. See below.
+
+  Copyright (C) 2007-2008 Alex Linke <alinke@lingua-systems.com>
+  Copyright (C) 2009 Lingua-Systems Software GmbH
+
+  See http://en.wikipedia.org/wiki/Greeklish as an introduction.
+
+  See http://de.wikipedia.org/wiki/Greeklish#Transkriptions-Schemata for
+  the transliteration table that is used as a base.
+
+-->
+
+
+<translit>
+
+    <!-- meta data -->
+
+    <name>Greeklish</name>
+
+    <desc>Greeklish (Phonetic), Greek to Latin</desc>
+
+    <reverse>false</reverse>
+
+
+    <!-- set of transliteration rules -->
+
+
+    <rules>
+
+
+        <!-- digraphs -->
+
+        <rule>
+            <from>&#x03B5;&#x03B9;</from>   <!-- ει -->
+            <to>i</to>
+        </rule>
+        <rule>
+            <from>&#x03AD;&#x03B9;</from>   <!-- έι -->
+            <to>i</to>
+        </rule>
+        <rule>
+            <from>&#x03B5;&#x03AF;</from>   <!-- εί -->
+            <to>i</to>
+        </rule>
+
+        <rule>
+            <from>&#x03B5;&#x03C5;</from>   <!-- ευ -->
+            <to>ef</to>			    <!-- or "ev" -->
+        </rule>
+        <rule>
+            <from>&#x03AD;&#x03C5;</from>   <!-- έυ -->
+            <to>ef</to>
+        </rule>
+        <rule>
+            <from>&#x03B5;&#x03CD;</from>   <!-- εύ -->
+            <to>ef</to>
+        </rule>
+
+        <rule>
+            <from>&#x03BF;&#x03C5;</from>   <!-- ου -->
+            <to>u</to>
+        </rule>
+        <rule>
+            <from>&#x03BF;&#x03CD;</from>   <!-- ού -->
+            <to>u</to>
+        </rule>
+        <rule>
+            <from>&#x03CC;&#x03C5;</from>   <!-- όυ -->
+            <to>u</to>
+        </rule>
+
+
+        <!-- characters in (Greek) alphabetical order -->
+
+        <rule>
+            <from>&#x0391;</from>   <!-- Α -->
+            <to>A</to>
+        </rule>
+        <rule>
+            <from>&#x03B1;</from>   <!-- α -->
+            <to>a</to>
+        </rule>
+        <rule>
+            <from>&#x0386;</from>   <!-- Ά -->
+            <to>A</to>
+        </rule>
+        <rule>
+            <from>&#x03AC;</from>   <!-- ά -->
+            <to>a</to>
+        </rule>
+
+        <rule>
+            <from>&#x0392;</from>   <!-- Β -->
+            <to>V</to>
+        </rule>
+        <rule>
+            <from>&#x03B2;</from>   <!-- β -->
+            <to>v</to>
+        </rule>
+
+        <rule>
+            <from>&#x0393;</from>   <!-- Γ -->
+            <to>Y</to>		    <!-- or "Gh" -->
+        </rule>
+        <rule>
+            <from>&#x03B3;</from>   <!-- γ -->
+            <to>y</to>		    <!-- or "gh" -->
+        </rule>
+
+        <rule>
+            <from>&#x0394;</from>   <!-- Δ -->
+            <to>D</to>
+        </rule>
+        <rule>
+            <from>&#x03B4;</from>   <!-- δ -->
+            <to>d</to>
+        </rule>
+
+        <rule>
+            <from>&#x0395;</from>   <!-- Ε -->
+            <to>E</to>
+        </rule>
+        <rule>
+            <from>&#x03B5;</from>   <!-- ε -->
+            <to>e</to>
+        </rule>
+        <rule>
+            <from>&#x0388;</from>   <!-- Έ -->
+            <to>E</to>
+        </rule>
+        <rule>
+            <from>&#x03AD;</from>   <!-- έ -->
+            <to>e</to>
+        </rule>
+
+        <rule>
+            <from>&#x0396;</from>   <!-- Ζ -->
+            <to>Z</to>
+        </rule>
+        <rule>
+            <from>&#x03B6;</from>   <!-- ζ -->
+            <to>z</to>
+        </rule>
+
+        <rule>
+            <from>&#x0397;</from>   <!-- Η -->
+            <to>I</to>
+        </rule>
+        <rule>
+            <from>&#x03B7;</from>   <!-- η -->
+            <to>i</to>
+        </rule>
+        <rule>
+            <from>&#x0389;</from>   <!-- Ή -->
+            <to>I</to>
+        </rule>
+        <rule>
+            <from>&#x03AE;</from>   <!-- ή -->
+            <to>i</to>
+        </rule>
+
+        <rule>
+            <from>&#x0398;</from>   <!-- Θ -->
+            <to>Th</to>
+        </rule>
+        <rule>
+            <from>&#x03B8;</from>   <!-- θ -->
+            <to>th</to>
+        </rule>
+
+        <rule>
+            <from>&#x0399;</from>   <!-- Ι -->
+            <to>I</to>
+        </rule>
+        <rule>
+            <from>&#x03B9;</from>   <!-- ι -->
+            <to>i</to>
+        </rule>
+        <rule>
+            <from>&#x038A;</from>   <!-- Ί -->
+            <to>I</to>
+        </rule>
+        <rule>
+            <from>&#x03AF;</from>   <!-- ί -->
+            <to>i</to>
+        </rule>
+        <rule>
+            <from>&#x03AA;</from>   <!-- Ϊ -->
+            <to>I</to>
+        </rule>
+        <rule>
+            <from>&#x03CA;</from>   <!-- ϊ -->
+            <to>i</to>
+        </rule>
+        <rule>
+            <from>&#x0390;</from>   <!-- ΐ -->
+            <to>i</to>
+        </rule>
+
+        <rule>
+            <from>&#x039A;</from>   <!-- Κ -->
+            <to>K</to>
+        </rule>
+        <rule>
+            <from>&#x03BA;</from>   <!-- κ -->
+            <to>k</to>
+        </rule>
+
+        <rule>
+            <from>&#x039B;</from>   <!-- Λ -->
+            <to>L</to>
+        </rule>
+        <rule>
+            <from>&#x03BB;</from>   <!-- λ -->
+            <to>l</to>
+        </rule>
+
+        <rule>
+            <from>&#x039C;</from>   <!-- Μ -->
+            <to>M</to>
+        </rule>
+        <rule>
+            <from>&#x03BC;</from>   <!-- μ -->
+            <to>m</to>
+        </rule>
+
+        <rule>
+            <from>&#x039D;</from>   <!-- Ν -->
+            <to>N</to>
+        </rule>
+        <rule>
+            <from>&#x03BD;</from>   <!-- ν -->
+            <to>n</to>
+        </rule>
+
+        <rule>
+            <from>&#x039E;</from>   <!-- Ξ -->
+            <to>X</to>		    <!-- or "Ks" -->
+        </rule>
+        <rule>
+            <from>&#x03BE;</from>   <!-- ξ -->
+            <to>x</to>		    <!-- or "ks" -->
+        </rule>
+
+        <rule>
+            <from>&#x039F;</from>   <!-- Ο -->
+            <to>O</to>
+        </rule>
+        <rule>
+            <from>&#x03BF;</from>   <!-- ο -->
+            <to>o</to>
+        </rule>
+        <rule>
+            <from>&#x038C;</from>   <!-- Ό -->
+            <to>O</to>
+        </rule>
+        <rule>
+            <from>&#x03CC;</from>   <!-- ό -->
+            <to>o</to>
+        </rule>
+
+        <rule>
+            <from>&#x03A0;</from>   <!-- Π -->
+            <to>P</to>
+        </rule>
+        <rule>
+            <from>&#x03C0;</from>   <!-- π -->
+            <to>p</to>
+        </rule>
+
+        <rule>
+            <from>&#x03A1;</from>   <!-- Ρ -->
+            <to>R</to>
+        </rule>
+        <rule>
+            <from>&#x03C1;</from>   <!-- ρ -->
+            <to>r</to>
+        </rule>
+
+        <rule>
+            <from>&#x03A3;</from>   <!-- Σ -->
+            <to>S</to>
+        </rule>
+        <rule>
+            <from>&#x03C3;</from>   <!-- σ -->
+            <to>s</to>
+        </rule>
+
+        <rule>
+            <from>&#x03A4;</from>   <!-- Τ -->
+            <to>T</to>
+        </rule>
+        <rule>
+            <from>&#x03C4;</from>   <!-- τ -->
+            <to>t</to>
+        </rule>
+
+        <rule>
+            <from>&#x03A5;</from>   <!-- Υ -->
+            <to>I</to>
+        </rule>
+        <rule>
+            <from>&#x03C5;</from>   <!-- υ -->
+            <to>i</to>
+        </rule>
+        <rule>
+            <from>&#x038E;</from>   <!-- Ύ -->
+            <to>I</to>
+        </rule>
+        <rule>
+            <from>&#x03CD;</from>   <!-- ύ -->
+            <to>i</to>
+        </rule>
+        <rule>
+            <from>&#x03AB;</from>    <!-- Ϋ -->
+            <to>I</to>
+        </rule>
+        <rule>
+            <from>&#x03CB;</from>   <!-- ϋ -->
+            <to>i</to>
+        </rule>
+        <rule>
+            <from>&#x03B0;</from>   <!-- ΰ -->
+            <to>i</to>
+        </rule>
+
+        <rule>
+            <from>&#x03A6;</from>   <!-- Φ -->
+            <to>F</to>
+        </rule>
+        <rule>
+            <from>&#x03C6;</from>   <!-- φ -->
+            <to>f</to>
+        </rule>
+
+        <rule>
+            <from>&#x03A7;</from>   <!-- Χ -->
+            <to>H</to>		    <!-- or "Kh" -->
+        </rule>
+        <rule>
+            <from>&#x03C7;</from>   <!-- χ -->
+            <to>h</to>		    <!-- or "kh" -->
+        </rule>
+
+        <rule>
+            <from>&#x03A8;</from>   <!-- Ψ -->
+            <to>Ps</to>
+        </rule>
+        <rule>
+            <from>&#x03C8;</from>   <!-- ψ -->
+            <to>ps</to>
+        </rule>
+
+        <rule>
+            <from>&#x03A9;</from>   <!-- Ω -->
+            <to>O</to>
+        </rule>
+        <rule>
+            <from>&#x03C9;</from>   <!-- ω -->
+            <to>o</to>
+        </rule>
+        <rule>
+            <from>&#x038F;</from>   <!-- Ώ -->
+            <to>O</to>
+        </rule>
+        <rule>
+            <from>&#x03CE;</from>   <!-- ώ -->
+            <to>o</to>
+        </rule>
+
+        <rule>
+            <from>&#x03C2;</from>   <!-- ς -->
+            <to>s</to>
+        </rule>
+
+
+        <!-- Punctation marks -->
+
+        <rule>
+            <from>&#x037E;</from>   <!-- GREEK QUESTION MARK, EROTIMATIKO -->
+            <to>?</to>
+            <context>
+                <after>\b</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>;</from>	    <!-- preferred for EROTIMATIKO -->
+            <to>?</to>
+            <context>
+                <after>\b</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>&#x00B7;</from>   <!-- MIDDLE DOT, Greek ano teleia -->
+            <to>;</to>
+        </rule>
+
+        <rule>
+            <from>&#x203F;</from>   <!-- UNDERTIE, Greek enotikon -->
+            <to>-</to>
+        </rule>
+
+
+        <!-- Diacritic marks -->
+
+        <rule>
+            <from>&#x0384;</from>   <!-- GREEK TONOS (spacing) -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0385;</from>   <!-- GREEK DIALYTIKA TONOS (spacing) -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0342;</from>   <!-- COMBINING GREEK PERISPOMENI -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0343;</from>   <!-- COMBINING GREEK KORONIS -->
+            <to></to>
+        </rule>
+
+        <rule>			    <!-- Psili -->
+            <from>&#x0313;</from>   <!-- COMBINING COMMA ABOVE -->
+            <to></to>
+        </rule>
+
+        <rule>			    <!-- Dasia -->
+            <from>&#x0314;</from>   <!-- COMBINING REVERSED COMMA ABOVE -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0345;</from>   <!-- COMBINING GREEK YPOGEGRAMMENI -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0345;</from>   <!-- GREEK YPOGEGRAMMENI -->
+            <to></to>
+        </rule>
+
+
+    </rules>
+
+</translit>
+
+
+<!--
+  vim: sts=4 sw=4 ai et
+-->

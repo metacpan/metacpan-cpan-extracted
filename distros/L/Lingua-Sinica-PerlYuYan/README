@@ -1,0 +1,51 @@
+NAME
+    Lingua::Sinica::PerlYuYan - 中書珨 - Perl in Classical Chinese in Perl
+
+VERSION
+    our $VERSION = 1257439830.94865; # 2009年11月 6日 周五 00時50分39秒 CST
+
+SYNOPSIS
+        # The Sieve of Eratosthenes - 埃拉托斯芬篩法
+        use Lingua::Sinica::PerlYuYan;
+
+          用籌兮用嚴。井涸兮無礙
+        。印曰最高矣  又道數然哉。
+        。截起吾純風  賦小入大合。
+        。習予吾陣地  並二至純風。
+        。當起段賦取  加陣地合始。
+        。陣地賦篩始  繫繫此雜段。
+        。終陣地兮印  正道次標哉。
+        。輸空接段點  列終註泰來。
+
+DESCRIPTION
+    This module makes it possible to write Perl programs in Classical
+    Chinese poetry in Perl.
+
+    說此經者，能以珨文言文珨。
+
+    (If one *has* to ask "Why?", please refer to Lingua::Romana::Perligata
+    for related information.)
+
+    (闕譯，以待來者。)
+
+    This module uses the single-character property of Chinese to
+    disambiguate between keywords, so one may elide whitespaces much like in
+    real Chinese writings.
+
+    The vocabulary is in the 文言 (literary text) mode, not the common 白話
+    (spoken text) mode with multisyllabic words.
+
+    "Lingua::Sinica::PerlYuYan::translate()" (or simply as "譯()") translates
+    a string containing English programs into Chinese.
+
+SEE ALSO
+    Filter::Simple::Compile, Lingua::Romana::Perligata
+
+CC0 1.0 Universal
+    To the extent possible under law, 唐鳳 has waived all copyright and
+    related or neighboring rights to Lingua-Sinica-PerlYuYan.
+
+    This work is published from Taiwan.
+
+    <http://creativecommons.org/publicdomain/zero/1.0>
+

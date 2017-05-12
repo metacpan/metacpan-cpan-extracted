@@ -1,0 +1,45 @@
+# Lingua::JA::Romanize::* modules Changes
+
+2008/01/15 (0.22)
+    - Makefile.PL updated to skip error on DictJA->update()
+      http://cpantesters.perl.org/show/Lingua-JA-Romanize-Japanese.html#Lingua-JA-Romanize-Japanese-0.21
+    - Use of uninitialized value in unpack at Kana.pm
+
+2008/01/14 (0.21)
+    - L::J::R::Kana updated to pass test on Perl 5.10.0
+      http://kawa.at.webry.info/200801/article_11.html
+
+2008/01/13 (0.20)
+    - Subversion on Google Code Project Hosting
+      http://linuga-romanize.googlecode.com/svn/trunk/Lingua-JA-Romanize-Japanese/
+    - L::J::R::Kana::Hepburn added
+    - L::J::R::Base splited
+    - L::J::R::MeCab uses dictionary_info() method to see charset.
+    - L::J::R::MeCab requires MeCab 0.94 or above.
+    - L::J::R::MeCab tested with MeCab 0.96.
+    - all modules treats utf8 flag transparently
+
+2007/07/29 (0.15)
+    - L::J::R::DictJA uses ExtUtils::MakeMaker::prompt().
+    - L::J::R::Japanese changes its internal HASH structure.
+    - L::J::R::MeCab supports mecab-0.95 with ipadic-2.7.0-20070610.
+
+2006/11/06 (0.14)
+    - test scripts updated for tests passed.
+    - MeCab 0.93 with ipadic-2.7.0-20060707 tested.
+
+2006/05/08 (0.13)
+    - new sub classes: MeCab::UTF8 in Lingua::JA::Romanize::MeCab
+    - t/03_juman.t tests $PATH to find juman command.
+    - t/04_mecab.t supports dictionary charset detection.
+    - perltidy-ed.
+
+2006/04/04 (0.12)
+    - new module: Lingua::JA::Romanize::Juman
+    - new module: Lingua::JA::Romanize::MeCab
+
+2006/03/26 (0.11)
+    - first release
+
+# http://www.kawa.net/works/perl/romanize/romanize-e.html       (English)
+# http://www.kawa.net/works/perl/romanize/romanize.html#history (Japanese)

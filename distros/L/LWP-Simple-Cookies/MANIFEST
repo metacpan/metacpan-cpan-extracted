@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+SIGNATURE
+lib/LWP/Simple/Cookies.pm
+t/1.t

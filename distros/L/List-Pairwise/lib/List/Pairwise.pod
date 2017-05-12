@@ -1,0 +1,284 @@
+=head1 NAME
+
+List::Pairwise - map/grep arrays and hashes pairwise
+
+=head1 SYNOPSIS
+
+    use List::Pairwise qw(mapp grepp);
+    
+    my %hash = (
+        foo => 4,
+        bar => 2, 
+        baz => 6,
+    );
+ 
+    my @list = %hash;
+    
+    # increment values in-place
+    mapp {++$b} %hash;
+    
+    # copy with modifications on keys
+    %hash = mapp {lc($a) => $b} %hash
+    
+    # iterate pairwise
+    mapp {
+        print "$a: $b\n"
+    } %hash;
+    
+    # reverse array pairs in-place
+    mapp { ($a, $b) = ($b, $a) } @list;
+    
+    # list "keys" and "values"
+    my @keys = mapp {$a} @list;
+    my @values = mapp {$b} @list;
+    
+    # grep hash subset
+    my %subset1 = grepp {$a =~ /^ba/} %hash;
+    my %subset2 = grepp {$b < 5} %hash;
+
+=head1 DESCRIPTION
+
+C<List::Pairwise> provides functions to map and grep lists two elements at a time,
+setting $a and $b to each pair instead of setting $_ to each element.
+
+As of version 1.01, List::Pairwise now tries to use the newly implemented XS
+functions pairmap, pairgrep, pairfirst and pairs from List::Util 1.31 and up,
+resulting in a major speedup.
+
+New code should now preferably use List::Util functions directly, with the added
+benefit of relying on a Perl core module.
+
+B</!\> as of version 1.03 List::Pairwise does not use List::Util, because version up
+to the current one (1.39) presents a strange bug where a key can get undefined after
+an assignement (see t/listutil.t with paimap instead of mapp) B</!\>
+
+=over 4
+
+=item mapp BLOCK LIST
+
+=item map_pairwise BLOCK LIST
+
+Evaluates the BLOCK for each pair of LIST (locally
+setting $a and $b to each pair) and returns the list value composed
+of the results of each such evaluation.
+In scalar context, returns the total number of elements so generated (not pairs).
+Evaluates BLOCK in list context, so each element of LIST may
+produce zero, one, or more elements in the returned value.
+
+Note that $a and $b are aliases to the list elements, so they can be used to
+modify the elements of the LIST, exept for hash keys ($a when LIST is a hash).
+
+C<mapp> is optimized in void context, and can thus be used to iterate lists
+pairwise.
+
+C<map_pairwise> is an alias for C<mapp>.
+
+keys/values emulation (only slower):
+
+    my @keys = mapp {$a} %hash;
+    my @keys = mapp {$a} @list;   # same
+    my @values = mapp {$b} %hash;
+    my @values = mapp {$b} @list; # same
+
+copy (only slower):
+
+    my %b = mapp {$a, $b} %hash;
+
+modify values in-place:
+
+    mapp {$b = lc($b)} %hash;
+    mapp {$b = lc($b)} @list; # same
+
+modifying hash keys in-place does not work with a hash:
+
+    mapp {$a = lc($a)} %hash;          # wrong
+    my %b = mapp {lc($a) => $b} %hash; # ok
+    %hash = mapp {lc($a) => $b} %hash; # also ok (copy)
+
+modify array "keys" in-place does work:
+
+    mapp {$a = lc($a)} @list;
+
+modify keys and copy:
+
+    %hash = mapp {lc($a) => $b} %hash;
+    @hash = mapp {lc($a) => $b} @list; # same
+
+reverse hash (does not work in-place):
+
+    my %reverse_a = mapp {$b, $a} %hash;
+
+reverse array pairs in-place:
+
+    mapp { ($a, $b) = ($b, $a) } @list;
+
+each emulation, iterating a list pairwise:
+
+    mapp {
+        print "$a: $b\n";
+    } %hash;
+
+    mapp {
+        print "$a: $b\n";
+    } @list;
+
+=item grepp BLOCK LIST
+
+=item grep_pairwise BLOCK LIST
+
+Evaluates the BLOCK in scalar context for each pair of LIST (locally
+setting $a and $b to each pair) and returns the list value
+consisting of those pairs for which the expression evaluated
+to true.
+In scalar context, returns the number of valid pairs, ie the
+number of times the expression was true.
+
+So this equality stands:
+
+    (grepp BLOCK LIST) == 1/2 * scalar(my @list = (grepp BLOCK LIST))
+
+Note that $a and $b are aliases to the list elements, so they can be used to
+modify the elements of the LIST, exept for hash keys ($a when LIST is a hash).
+
+C<grep_pairwise> is an alias for C<grepp>.
+
+grep hash subset:
+
+    my %subset1 = grepp {$a =~ /^ba/} %hash;
+    my %subset2 = grepp {$b < 5} %hash;
+
+grep specific values:
+
+    my @values = mapp {$b} grepp {$a =~ /^ba/} %hash;
+
+This does not work:
+
+    values grepp {$a =~ /^ba/} %hash;
+
+values() and keys() expect a hash, whereas grepp returns a list
+
+=item firstp BLOCK LIST
+
+=item first_pairwise BLOCK LIST
+
+Evaluates the BLOCK in scalar context for each pair of LIST (locally
+setting $a and $b to each pair) and returns the first pair for
+which the expression evaluated to true.
+In scalar context, returns 1 if a valid pair was found.
+
+C<firstp> can be used to iterate lists pairwise as does C<mapp>, but with
+the additional option of using the value returned by the BLOCK as a C<last>
+statement
+
+    my $i;
+    firstp {
+        print "$a: $b\n";
+        ++$i==5 # last after 5 iterations
+    } %hash;
+
+=item lastp BLOCK LIST
+
+=item last_pairwise BLOCK LIST
+
+Evaluates the BLOCK in scalar context for each pair of LIST (locally
+setting $a and $b to each pair) and returns the last pair for
+which the expression evaluated to true.
+In scalar context, returns 1 if a valid pair was found.
+
+=item pair LIST
+
+Returns a list of pairs as array references.
+
+    my @pairs = pair @list;
+    my @pairs = mapp {[$a, $b]} @list; # same, but slower
+
+C<pair> can be used in combination with sort, map and grep to do ordered
+hash-like manipulations in long chains/streams:
+
+    my @ranges =
+        sort { $a->[0] <=> $b->[0] or $a->[1] <=> $b->[1] }
+        grep { $_->[0] < $_->[1] }
+        pair
+        /\b(\d+)-(\d+)\b/g
+    ;
+
+=back
+
+=head1 EXPORTS
+
+Nothing by default.
+Functions can be imported explicitely
+
+    use List::Pairwise qw(mapp grepp first_pairwise);
+
+You can use the :all tag to import all functions, including *_pairwise aliases
+
+    use List::Pairwise qw(:all);
+
+=head1 CAVEATS
+
+In prior versions, List::Pairwise function did croak when given a list with an odd
+number of elements. This is not the case anymore: a warning will now be emitted if
+warnings of the 'misc' category are enabled, and the last pair will be completed
+with an undefined value.
+The old behavior can be restored by making these misc warnings FATAL:
+
+    use warnings FATAL => 'misc';
+
+
+=head1 TEST COVERAGE
+
+As of List::Pairwise version 0.28:
+
+    ---------------------------- ------ ------ ------ ------ ------ ------ ------
+    File                           stmt   bran   cond    sub    pod   time  total
+    ---------------------------- ------ ------ ------ ------ ------ ------ ------
+    lib/List/Pairwise.pm          100.0  100.0  100.0  100.0  100.0   88.0  100.0
+    t/01load.t                    100.0    n/a    n/a  100.0    n/a    0.6  100.0
+    t/context.t                   100.0    n/a    n/a  100.0    n/a    0.6  100.0
+    t/coverage.pl                 100.0  100.0    n/a  100.0    n/a    4.2  100.0
+    t/firstp.t                    100.0    n/a    n/a  100.0    n/a    1.2  100.0
+    t/grepp.t                     100.0    n/a    n/a  100.0    n/a    1.2  100.0
+    t/lastp.t                     100.0    n/a    n/a  100.0    n/a    1.2  100.0
+    t/mapp.t                      100.0    n/a    n/a  100.0    n/a    1.4  100.0
+    t/pair.t                      100.0    n/a    n/a  100.0    n/a    1.6  100.0
+    Total                         100.0  100.0  100.0  100.0  100.0  100.0  100.0
+    ---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+=head1 SEE ALSO
+
+L<List::Util>, L<List::MoreUtils>, C<grep>, C<map>
+
+=head1 ACKNOWLEDGMENT
+
+The author wishes to thank:
+
+=over 4
+
+=item * Johan Lodin for the C<pair> idea and implementation, as well as numerous other
+contributions (see changelog)
+
+=item * Andreas J. Koenig for his advices on documentation and his insight on how to
+keep perl 5.10 compatibility
+
+=item * Slaven Rezic for discovering the issues that module has with pre-5.6 versions
+of perl
+
+=item * Paul "LeoNerd" Evans for having implemented XS versions of these functions in
+the core module L<List::Util>
+
+=back
+
+=head1 AUTHOR
+
+Thomas Drugeon, E<lt>tdrugeon@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 by Thomas Drugeon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -1,0 +1,32 @@
+/*======================================================================
+ CSS for ltxMojo's web editing frontend */
+.editarea
+{
+    width:95%;
+    height:500px;
+    border:1px solid #999999;
+    margin:5px 0;
+    padding:3px;
+    margin-left:5px;
+    margin-right:5px;
+}
+.bodyslogan {
+    text-align:center;
+    font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    font-weight:bold;
+    font-style:italic;
+    font-size:15px;
+}
+#ace-editor
+{
+    height: 600px;
+    width: 780px;
+    font-size:12px;
+    word-wrap: break-word;
+    white-space: pre-line;
+    border:1px solid #999999;
+    margin:5px 0;
+    padding:3px;
+    margin-left:5px;
+    margin-right:5px;
+}

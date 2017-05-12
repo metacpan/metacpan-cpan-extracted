@@ -1,0 +1,13 @@
+Changelog for LWP::UserAgent::OfflineCache module
+
+Version/date/description
+
+0.01  2009-05-24 
+         - A caching user agent developed by Luke Closs Net::Parliament::UserAgent
+
+0.02  2010-08-24
+         - The module was renamed to LWP::UserAgent::OfflineCache
+				 - Log4perl support was added
+				 - Support gzip in Accept-Encoding HTTP request was added
+				 - some Moose-like adjustments
+				 

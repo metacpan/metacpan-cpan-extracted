@@ -1,0 +1,10 @@
+Revision history for Locale-Set
+
+0.77    2014-12-10 (PERLANCAR)
+
+        - Rename from SHARYANTO-Locale-Util to Locale-Set.
+
+
+0.76    2014-08-06 (SHARYANTO)
+
+        - First release, split from SHARYANTO-Utils to reduce dependencies.

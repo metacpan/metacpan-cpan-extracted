@@ -1,0 +1,60 @@
+{
+   "abstract" : "A L<Lingua::Translate|Lingua::Translate> backend for InterTran.",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-Translate-InterTran",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "utils"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::UserAgent" : 0,
+            "Lingua::Translate" : 0,
+            "URI" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Lingua-Translate-InterTran@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-Translate-InterTran"
+      },
+      "homepage" : "http://search.cpan.org/dist/Lingua-Translate-InterTran/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/lingua-translate-intertran.git",
+         "web" : "http://github.com/hinrik/lingua-translate-intertran"
+      }
+   },
+   "version" : "0.05",
+   "x_authority" : "cpan:HINRIK"
+}
+

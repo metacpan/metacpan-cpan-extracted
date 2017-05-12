@@ -1,0 +1,17 @@
+Revision history for Log::Message::JSON
+
+0.30.01 Sun Apr 13 22:30:04 2014 +0100
+        Maintenance update: change "name" field in META.yml
+
+0.30.00 Wed Feb 20 22:42:01 2013 +0100
+        Added caching results of stringification.
+        Fixed POD coverage test.
+        Added more tests.
+
+0.03    Sat Dec 29 19:40:48 2012 +0100
+        Added possibility of providing odd number of elements in "pair list"
+        call form.
+
+0.01    Thu Dec 27 23:53:29 CET 2012
+        Initial version.
+

@@ -1,0 +1,279 @@
+NAME
+    Lazy::Utils - Utility functions
+
+VERSION
+    version 1.16
+
+SYNOPSIS
+    Utility functions
+
+            use Lazy::Utils;
+         
+            trim($str);
+            ltrim($str);
+            rtrim($str);
+            file_get_contents($path, $prefs);
+            file_put_contents($path, $contents, $prefs);
+            shellmeta($s, $nonquoted);
+            system2($cmd, @argv);
+            bash_readline($prompt);
+            cmdargs($prefs, @argv);
+            whereis($name, $path);
+            file_cache($tag, $expiry, $subref);
+            get_pod_text($file_name, $section, $exclude_section);
+            term_readline($prompt, $default, $history, $in, $out);
+            term_readkey($in);
+
+DESCRIPTION
+    Collection of utility functions all of exported by default
+
+  Functions
+   trim($str)
+    trims given string
+
+    $str: *string will be trimed*
+
+    return value: *trimed string*
+
+   ltrim($str)
+    trims left given string
+
+    $str: *string will be trimed*
+
+    return value: *trimed string*
+
+   rtrim($str)
+    trims right given string
+
+    $str: *string will be trimed*
+
+    return value: *trimed string*
+
+   file_get_contents($path, $prefs)
+    gets all contents of file in string type
+
+    $path: *path of file*
+
+    $prefs: *preferences in HashRef, by default undef*
+
+        utf8: *opens file-handle as :utf8 mode, by default 0*
+
+    return value: *file contents in string type, otherwise undef because of
+    errors*
+
+   file_put_contents($path, $contents, $prefs)
+    puts all contents of file in string type
+
+    $path: *path of file*
+
+    $contents: *file contents in string type*
+
+    $prefs: *preferences in HashRef, by default undef*
+
+        utf8: *opens file-handle as :utf8 mode, by default 0*
+
+    return value: *success 1, otherwise undef*
+
+   shellmeta($s, $nonquoted)
+    escapes metacharacters of interpolated shell string
+
+    $s: *interpolated shell string*
+
+    $nonquoted: *also escapes whitespaces and * character for non-quoted
+    interpolated shell string, by default 0*
+
+    return value: *escaped string*
+
+   system2($cmd, @argv)
+    _system($cmd, @argv) *WILL BE DEPRECATED*
+
+    alternative implementation of perls core system subroutine that executes
+    a system command
+
+    $cmd: *command*
+
+    @argv: *command line arguments*
+
+    return value: *exit code of command. 511 if fatal error occurs*
+
+    returned $?: *return code of wait call like on perls system call*
+
+    returned $!: *system error message like on perls system call*
+
+   bash_readline($prompt)
+    bashReadLine($prompt) *WILL BE DEPRECATED*
+
+    reads a line from STDIN using Bash
+
+    $prompt: *prompt, by default ''*
+
+    return value: *line*
+
+   cmdargs([$prefs, ]@argv)
+    commandArgs([$prefs, ]@argv) *WILL BE DEPRECATED*
+
+    cmdArgs([$prefs, ]@argv) *WILL BE DEPRECATED*
+
+    resolves command line arguments
+
+    valuableArgs is off, eg;
+
+            --opt1 --opt2=val2 cmd param1 param2 param3
+            -opt1 -opt2=val2 cmd param1 param2 param3
+            -opt1 -opt2=val2 cmd param1 -- param2 param3
+            -opt1 cmd param1 -opt2=val2 param2 param3
+            -opt1 cmd param1 -opt2=val2 -- param2 param3
+            cmd -opt1 param1 -opt2=val2 param2 param3
+            cmd -opt1 param1 -opt2=val2 -- param2 param3
+
+    valuableArgs is on, eg;
+
+            -opt1 -opt2=val2 cmd param1 param2 param3
+            -opt1 -opt2 val2 cmd param1 param2 param3
+            -opt1 -opt2 -- cmd param1 param2 param3
+            cmd -opt1 -opt2 val2 param1 param2 param3
+            cmd -opt1 -opt2 -- param1 param2 param3
+            cmd param1 -opt1 -opt2 val2 param2 param3
+            cmd param1 -opt1 -opt2 -- param2 param3
+
+    $prefs: *preferences in HashRef, optional*
+
+        valuableArgs: *accepts option value after option if next argument is
+        not an option, by default 0*
+
+        noCommand: *use first parameter instead of command, by default 0*
+
+        optionAtAll: *DEPRECATED: now, it is always on. accepts options
+        after command or first parameter otherwise evaluates as parameter,
+        by default 0*
+
+    @argv: *command line arguments*
+
+    return value: eg;
+
+            { --opt1 => '', --opt2 => 'val2', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
+            { -opt1 => '', -opt2 => 'val2', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
+            { -opt1 => '', -opt2 => '', command => 'cmd', parameters => ['param1', 'param2', 'param3'] }
+
+   whereis($name, $path)
+    whereisBin($name, $path) *WILL BE DEPRECATED*
+
+    searches valid binary in search path
+
+    $name: *binary name*
+
+    $path: *search path, by default
+    "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"*
+
+    return value: *array of binary path founded in search path*
+
+   file_cache($tag, $expiry, $subref)
+    fileCache($tag, $expiry, $subref) *WILL BE DEPRECATED*
+
+    gets most recent cached value in file cache by given tag and caller
+    function if there is cached value in expiry period. Otherwise tries to
+    get current value using $subref, puts value in cache and cleanups old
+    cache values.
+
+    $tag: *tag for cache*
+
+    $expiry: *cache expiry period*
+
+        <0: *always gets most recent cached value if there is any cached
+        value. Otherwise tries to get current value using $subref, puts and
+        cleanups.*
+
+        =0: *never gets cached value. Always tries to get current value
+        using $subref, puts and cleanups.*
+
+        >0: *gets most recent cached value in cache if there is cached value
+        in expiry period. Otherwise tries to get current value using
+        $subref, puts and cleanups.*
+
+    $subref: *sub reference in CodeRef to get current value*
+
+    return value: *cached or current value, otherwise undef if there isn't
+    cached value and current value doesn't get*
+
+   get_pod_text($file_name, $section, $exclude_section)
+    getPodText($file_name, $section, $exclude_section) *WILL BE DEPRECATED*
+
+    gets a text of pod contents in given file
+
+    $file_name: *file name of searching pod, by default running file*
+
+    $section: *searching head1 section of pod, by default undef gets all of
+    contents*
+
+    $exclude_section: *excludes section name, by default undef*
+
+    return value: *text of pod in string or array by line, otherwise undef
+    if an error occurs*
+
+   term_readline($prompt, $default, $history, $in, $out)
+    reads a line from terminal
+
+    $prompt: *prompt, by default ''*
+
+    $default: *initial value of line, by default ''*
+
+    $history: *lines history in ArrayRef, by default undef*
+
+    $in: *terminal input file handle, by default \*STDIN*
+
+    $out: *terminal output file handle, by default \*STDOUT*
+
+    return value: *line*
+
+   term_readkey($in)
+    reads key from terminal
+
+    $in: *terminal input file handle, by default \*STDIN*
+
+    return value: *key in string type*
+
+INSTALLATION
+    To install this module type the following
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+    from CPAN
+
+            cpan -i Lazy::Utils
+
+DEPENDENCIES
+    This module requires these other modules and libraries:
+
+    *   JSON
+
+    *   Pod::Simple::Text
+
+    *   Term::ReadKey
+
+REPOSITORY
+    GitHub <https://github.com/orkunkaraduman/Lazy-Utils>
+
+    CPAN <https://metacpan.org/release/Lazy-Utils>
+
+AUTHOR
+    Orkun Karaduman <orkunkaraduman@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2017 Orkun Karaduman <orkunkaraduman@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program. If not, see <http://www.gnu.org/licenses/>.
+

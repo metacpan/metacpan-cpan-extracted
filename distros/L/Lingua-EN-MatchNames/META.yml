@@ -1,0 +1,28 @@
+---
+abstract: 'Smart matching for human names.'
+author:
+  - 'Brian Lalonde (brian@webcoder.info)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-EN-MatchNames
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Lingua::EN::NameParse: 0
+  Lingua::EN::Nickname: 0
+  String::Approx: 0
+  Text::Metaphone: 0
+  Text::Soundex: 0
+resources:
+  repository: https://github.com/brianary/Lingua-EN-MatchNames.git
+version: 1.36

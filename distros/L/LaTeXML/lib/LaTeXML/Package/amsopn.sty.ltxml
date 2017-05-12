@@ -1,0 +1,62 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  amsopn                                                             | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+#**********************************************************************
+# See amsldoc
+#**********************************************************************
+
+DefPrimitive('\DeclareMathOperator OptionalMatch:* {Token}{}', sub {
+    my ($stomach, $star, $cs, $text) = @_;
+    DefMathI($cs, undef, Invocation(T_CS('\operatorname'), $star, $text),
+      scriptpos => ($star ? \&doScriptpos : 'post'),
+      role => 'OPFUNCTION',    # or FUNCTION or TRIGFUNCTION or.. ?  but Something!
+      font => { family => 'serif', series => 'medium', shape => 'upright' }); });
+
+# See p.18
+# New functions (most are already in TeX)
+DefMath('\injlim', "inj lim",
+  role => 'LIMITOP', meaning => 'injective-limit',
+  scriptpos => \&doScriptpos);
+DefMath('\projlim', "proj lim",
+  role => 'LIMITOP', meaning => 'projective-limit',
+  scriptpos => \&doScriptpos);
+
+DefMath('\varlimsup', '\overline{\operatorname{lim}}',
+  role => 'LIMITOP', meaning => 'limit-supremum');
+DefMath('\varliminf', '\underline{\operatorname{lim}}',
+  role => 'LIMITOP', meaning => 'limit-infimum');
+DefMath('\varinjlim', '\underrightarrow{\operatorname{lim}}',
+  role => 'LIMITOP', meaning => 'injective-limit');
+DefMath('\varprojlim', '\underleftarrow{\operatorname{lim}}',
+  role => 'LIMITOP', meaning => 'projective-limit');
+
+# Hmm... OPERATOR or LIMITOP ??
+DefConstructor('\operatorname OptionalMatch:* {}',
+  "<ltx:XMWrap role='OPERATOR' scriptpos='?#1(mid)(post)'>#2</ltx:XMWrap>",
+  bounded => 1, requireMath => 1,
+  font => { family => 'serif', series => 'medium', shape => 'upright' });
+DefConstructor('\operatornamewithlimits {}',
+  "<ltx:XMWrap role='OPERATOR' scriptpos='mid'>#1</ltx:XMWrap>",
+  bounded => 1, requireMath => 1,
+  font => { family => 'serif', series => 'medium', shape => 'upright' });
+
+DefMacro('\nolimits@',     '\nolimits');
+DefMacro('\nmlimits@',     '\displaylimits');
+DefMacro('\qopname{}{}{}', '\mathop{#3}\csname n#2limits@\endcsname');
+
+#**********************************************************************
+1;

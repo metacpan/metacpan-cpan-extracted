@@ -1,0 +1,16 @@
+____________________________________________________________________________
+[  3688] By: autrijus                              on 2003/01/20  07:23:48
+        Log: * oops, missed a colon.
+	   ! t/1-basic.t
+____________________________________________________________________________
+[  3687] By: autrijus                              on 2003/01/20  07:22:40
+        Log: * This be 0.01, the "don't think about unicode yet"
+	       edition.
+             * add some tests.
+	   + t/1-basic.t
+	   ! Summarize.pm
+____________________________________________________________________________
+[  3686] By: autrijus                              on 2003/01/20  07:16:38
+        Log: * Simple summarizer based on Lingua::EN::Summarize.
+	   + MANIFEST Makefile.PL README Summarize.pm
+	   + t/0-signature.t

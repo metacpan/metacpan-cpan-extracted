@@ -1,0 +1,18 @@
+Build.PL
+Makefile.PL
+MANIFEST
+README
+CHANGES
+t/Ldraw.t
+lib/Lego/Ldraw.pm
+lib/Lego/Ldraw.pod
+lib/Lego/Ldraw/Line.pm
+lib/Lego/Ldraw/Display.pm
+lib/Lego/Ldraw/colors.yml
+lib/Lego/Ldraw/primitives.yml
+lib/Lego/Ldraw/POV.pm
+examples/display.pl
+examples/lsed.pl
+examples/lsed.bat
+examples/pov.pl
+META.yml                                 Module meta-data (added by MakeMaker)

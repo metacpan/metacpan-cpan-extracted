@@ -1,0 +1,22 @@
+Revision history for Perl extension Lingua::RU::Antimat.
+
+1.00 28.02.2003 Added possibility to detect slang if number '6' is used instead of letter 'б', or number '0' instead of letter 'O'.  Corrected wrong detecting slang for "я б от", "страхует". 
+
+0.20 07.08.2001 Added several masks for removing and detecting complex
+slang.
+
+0.04 25.06.2001 Corrected wrong detecting slang for "них у", "
+нее было", "нее была", "нее был", "я б".
+Word "трахнуло" no more considered as slang.
+
+0.03 21.06.2001 Corrected wrong detecting slang for "о тебе".
+
+0.02 18.06.2001 Added several new words and corrected wrong detecting slang for words
+'я бы' and 'питер'.
+
+0.01  Wed Jun  6 17:18:25 2001
+	- original version; created by h2xs 1.21 with options
+		-X -n Lingua::RU::Antimat
+
+
+

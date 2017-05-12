@@ -1,0 +1,38 @@
+---
+abstract: 'convert Onbiki into Boin'
+author:
+  - 'YANUTETSU <yanutetsu@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-JA-Onbiki
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Lingua::JA::Onbiki:
+    file: lib/Lingua/JA/Onbiki.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/yanutetsu/Lingua-JA-Onbiki/issues
+  homepage: https://github.com/yanutetsu/Lingua-JA-Onbiki
+  repository: git://github.com/yanutetsu/Lingua-JA-Onbiki.git
+version: '0.01'
+x_contributors:
+  - 'Satoshi Yanuma <satoshi.yanuma@etimestech.jp>'

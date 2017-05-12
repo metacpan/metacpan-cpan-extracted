@@ -1,0 +1,24 @@
+Changes
+devel/gen_modules.plx
+lib/Lingua/StopWords.pm
+lib/Lingua/StopWords/DA.pm
+lib/Lingua/StopWords/DE.pm
+lib/Lingua/StopWords/EN.pm
+lib/Lingua/StopWords/ES.pm
+lib/Lingua/StopWords/FI.pm
+lib/Lingua/StopWords/FR.pm
+lib/Lingua/StopWords/HU.pm
+lib/Lingua/StopWords/IT.pm
+lib/Lingua/StopWords/NL.pm
+lib/Lingua/StopWords/NO.pm
+lib/Lingua/StopWords/PT.pm
+lib/Lingua/StopWords/RU.pm
+lib/Lingua/StopWords/SV.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/1-basic.t
+t/2-utf8.t
+t/98-TestPod.t
+t/99-TestPodCoverage.t

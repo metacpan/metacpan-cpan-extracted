@@ -1,0 +1,236 @@
+Revision history for List::BinarySearch
+
+0.25 2014-12-02
+  - Microoptimization: Cache caller() out of loops. (Part of GH Issue 2).
+  - Improve math to avoid possibility of overflow.
+    (https://en.wikipedia.org/wiki/Binary_search_algorithm#Arithmetic
+    and part of GH issue #2.)
+
+0.24 2014-12-02
+  - Fix SYNOPSIS typos in L::BS and L::BS::PP (Closes GH issue #1).
+
+0.23 2014-12-01
+  - Remove some diagnostics code.
+
+0.22 2014-12-01
+  - Comment reason why we goto &Exporter::import rather than calling SUPER::.
+  - Make it easier to manage distribution version numbering.
+  - Shift bugs/feature requests from RT to GitHub issues.
+  - Recommend List::BinarySearch::XS v0.06 (was v0.05).
+
+0.21 2014-12-01
+  - Improve logic for overriding 'import' on pre-Perl 5.20.
+
+0.20 2014-02-20
+  - This time really do fix version numbers. ;)
+
+0.18 2014-02-05
+  - Fix version numbers.
+  
+0.17 2013-11-05
+  - Custom wrapper for import() that touches $a and $b in caller's
+    namespace for Perl versions < 5.020, to squelch "used only
+    once" warnings.  This issue will be fixed in Perl 5.20.
+
+0.16 2013-10-28
+  - Fixed POD typo (bug in example).
+
+0.15 2013-09-27
+  - Removed unnecessary max==min test in L::BS::PP::binsearch (save a cycle:
+    just an efficiency improvement).
+
+0.14 2013-09-26
+  - NEW API IS NOW STABLE: DEPRECATED FUNCTIONS HAVE BEEN REMOVED.
+  - List::BinarySearch::XS will now be used as an optional default dependency.
+  - In interactive mode, CPAN installers will prompt for permission to use 
+    this dependency.  Default action is yes.
+  - Set LBS_NO_XS to prevent installing the XS module, or answer 'no' in
+    installer's interactive mode.
+  - Test coverage is now 100%.
+
+0.13_001 2013-09-24
+  - DEVELOPERS RELEASE -- Testing Makefile's optional dependency code.
+  - Added meta spec version and git repo to META information.
+  - Updated examples/bsearch.pl to use binsearch
+  - Makefile.PL prompts to add List::BinarySearch::XS dependency.
+    (In non-interactive environment, this defaults to yes.)
+    See POD for additional configuration information.
+  - META_MERGE => recommends => List::BinarySearch::XS, for those clients
+    that understand the 'recommends' semantics from META spec 2.0.
+
+0.13 2013-09-17
+  - TRANSITIONAL PUBLIC RELEASE -- DEPRECATED FUNCTIONS WILL BE REMOVED SOON!
+  - Minimum Perl version supported is now 5.8.  Earlier Perl versions weren't
+    compatible with this module's use of prototypes.
+  - Additional coverage tests added: 100% branch and 98% conditional coverage
+    of non-deprecated functions. (Don't worry about a single untestable
+    condition in non-critical code.)
+  - Fixed version number inconsistency (while bumping to 0.13).
+
+0.12 2013-09-05
+  - TRANSITIONAL PUBLIC RELEASE
+  - Many of the old functions have been deprecated and should be removed from
+    user code in favor of the new binsearch, binsearch_pos, or binsearch_range
+    functions, which are easier to use, faster, and will cure acne.
+  - POD revisions.
+  - Establish interoperability with List::BinarySearch::XS; Install this
+    module, install List::BinarySearch::XS, and when you use List::BinarSearch
+    it will automatically upgrade to the XS functions for high performance if
+    they're available.
+  - THIS IS YOUR ONLY WARNING: Version 0.20 will remove deprecated functions;
+    see the POD for tips on simple migration to the new syntax.
+
+0.11_003 2013-09-04
+  - DEVELOPER'S RELEASE
+  - Strengthened language on deprecation of obsolete functions.
+  - Improvements to isa tests.
+  - Fixed a typo in the POD demonstrating comparator complexity for complex
+    datastructures (see, it bit me too).
+  - Restore Perl 5.6 compatibility for the pure-Perl implementation.
+
+0.11_002 2013-09-03
+  - DEVELOPER'S RELEASE
+  - POD revisions to recommend installing List::BinarySearch::XS
+  - Updates to tests, including tests to verify we get the correct
+    binsearch implementation depending on availability of XS module.
+  - Split pure-Perl implementations of binsearch and binsearch_pos
+    into List::BinarySearch::PP, included with distribution.
+  - List::BinarySearch will now use List::BinarySearch::XS for 
+    binsearch and binsearch_pos implementations, or the ::PP module
+    (included) if the ::XS hasn't been installed.
+    (May be overridden by setting $ENV{List_BinarySearch_PP} true.)
+
+0.11_001 2013-08-20
+  - DEVELOPER'S RELEASE
+  - Deprecated all existing functions under their current names.
+  - Three new functions: binsearch, binsearch_pos, binsearch_range. These
+    replace bsearch_custom, bsearch_custom_pos, and bsearch_custom_range.
+    The others will not be replaced, as they can be created using the more
+    generalized functions.
+  - Major documentation changes.
+  - Announce upcoming List::BinarySearch::XS that when installed will be a
+    silent and automatic performance upgrade.
+  - $a and $b now permitted in place of $_[0] and $_[1].  The old @_ paramater
+    passing has been deprecated.
+  - The next major release, v0.12 will formally deprecate according to
+    the list above.
+
+0.11 2012-11-02
+  - "Changes" now CPAN::Changes::Spec compliant.
+  - t/09-changes.t added to verify spec compliance.
+
+0.10 2012-10-25
+  - API ADDITION: Added bsearch_custom_range function.
+  - Added explanation and example to POD on how to handle lists 
+    sorted according to the Unicode Collation Algorithm 
+    (Unicode::Collate).
+  - Added tests for bsearch_custom_range.
+      
+0.09 2012-05-30
+  - BinarySearch.pm is now B::Lint friendly.
+  - Added an examples/ directory.
+
+0.08 2012-05-09
+  - API IS STABLE.
+  - Applied improvements to Makefile.PL from lessons learned in other
+    more cranky modules.
+  - Improved Kwalitee for Makefile.PL
+  - Improved minimum Perl version handling (still 5.6.0).
+  - Added t/13-kwalitee.t
+  - Improved Perl::Critic compliance in test suite and Makefile.PL.
+  - Minor bugfixes t/00-boilerplate.t
+
+0.07 2012-05-05
+  - API ADDITION: Added bsearch_custom_pos function.
+  - API DELETION: Removed bsearch_general, and bsearch_general_range.
+    They were redundant, and prone to user-error.
+  - POD improvement: Added a quick reference to aid in selecting the
+    most appropriate search function from the several choices.
+  - Added bsearch_custom_pos.
+  - Removed confusing and redundant _general functions.
+  - Improved testing on the _pos and _range functions.
+
+0.06 2012-05-04
+  - API CHANGES -- SEE BELOW.
+  - Added five functions:
+      bsearch_str_pos - Return value always gives an insert-position.
+      bsearch_num_pos - Return value always gives an insert-position.
+      bsearch_str_range - Return a range.
+      bsearch_num_range - Return a range.
+      bsearch_general_range - Given a pair of targets returns a range
+                              of element indices between (inclusive).
+  - The _general functions are deprecated and will be removed from next
+    release.
+  - Tests added for five new functions.
+
+0.05 2012-05-01
+  - POD corrections
+  - POD Example code.
+  - POD Spelling.
+
+
+0.04 2012-04-30
+  - POD corrections (Thanks to Corion).
+
+
+0.03 2012-04-30
+  - POD corrections.
+
+0.02 2012-04-30
+  - Stable release.  API may only break compatibility after a
+    deprecation cycle.
+  - bsearch_arrayref gets prototypes and becomes bsearch_str,
+    and bsearch_num.
+  - bsearch_transform_arrayref becomes bsearch_transform.
+  - bsearch_custom is born.
+  - bsearch_list is gone.
+  - All functions now have prototypes to gain the familiar
+    user-interface of List::Util and List::MoreUtils.
+  - A few POD typos fixed.
+  - Many POD changes to clarify text and simplify examples.
+  - Several logic paths were unrolled to eliminate relatively expensive
+    subroutine calls inside of tight loops.
+
+0.01_005 2012-04-28
+  - Beta testing.  API may change.
+  - Developer's release.
+  - Breaks compatibility with previous API.
+  - Order of args for bsearch_arrayref and bsearch_transform_arrayref
+    rearranged to match bsearch_list.
+  - Fixed a few POD formatting issues.
+  - Changed Test::More dependency from '0' to '0.98' to assure a version
+    of subtest() that doesn't fail under Perl 5.10.0.
+  - POD changes to reflect updated API.
+  - Test t/11-search.t modified to support API changes.
+  - Reworded a few portions of the POD for (hopefully) better clarity.
+
+0.01_004 2012-04-27
+  - Beta testing.  API may change.
+  - Developer's release.
+  - Breaks compatibility with previous API.
+  - Changed bsearch_array() to bsearch_arrayref()
+  - Added bsearch_transform_arrayref(), and supporting POD and tests.
+  - See API CHANGES.
+  - Added a few more tests to 11-search.t.
+
+0.01_003 2012-04-25
+  - Beta testing.  API may change.
+  - Developer's release.
+  - Removed //= from bsearch_array() to establish backward compatibility
+    with Perl 5.8.0 and older.
+
+0.01_002 2012-04-25
+  - Beta testing. API may change.
+  - Developer's release.
+  - Fixed a coderef detection bug in bsearch_list().
+  - Many POD revisions.
+  - Completed 11-search.t tests.
+  - Many test suite revisions.
+  - List/BinarySearch.pm is now Perl::Critic level 2 compliant.
+  - Test suite is Perl::Critic level 4 compliant.
+
+0.01_001 2012-04-23
+  - Beta testing.  API may change.
+  - Developer's release.
+  - Initial release to CPAN.
+  - Unstable -- Seeking smoke test results.

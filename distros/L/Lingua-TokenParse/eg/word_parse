@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+# Usage: ./$0 [-v][-c] word
+use strict;
+use warnings;
+use Data::Dumper; $Data::Dumper::Indent = $Data::Dumper::Terse = 1;
+use Lingua::TokenParse;
+use Net::Dict;
+
+$|++;
+my $halt = 15;
+
+my $p = Lingua::TokenParse->new(
+    # Crude but effective:
+    verbose      => ($ARGV[0] && $ARGV[0] eq '-v' ? shift : 0),
+    lexicon_file => ($ARGV[0] && $ARGV[0] eq '-c' ? shift : 'eg/lexicon.db'),
+    word => shift || 'antibiologically',
+    constraints => [
+        qr/(?:^|\.)[^aeiouyAEIOUY]+(?:\.|$)/,  # no all-consonant frags.
+    ],
+);
+#use Data::Dumper;die Dumper([keys%{$p->lexicon}]);
+
+# Go fish.
+unless( keys %{ $p->lexicon } ) {
+    my $host = 'dict.org';
+    die "Analyze a word of $p->{word_length}? Better not.\n"
+        if $p->{word_length} >= $halt;
+    warn "Looking up '$p->{word}' parts at $host...\n";# if $p->verbose;
+    # Retrieve our cached lexicon.
+    $p->lexicon_cache( lexicon_file => 'eg/lexicon.db' );
+    my $dict = Net::Dict->new( $host );
+    for my $part ( @{ $p->build_parts } ) {
+        my $response = $dict->define( $part ) || next;
+        print "..response for $part\n";# if $p->verbose;
+        for( map { $_->[1] } @$response ) {
+            if( /prefix|suffix/ ) {
+                print "\tmatches /prefix|suffix/\n";# if $p->verbose;
+                push @{ $p->{lexicon}{$part} }, $_;
+            }
+        }
+    }
+}
+
+$p->parse;  # Calculate familiarity.
+#$p->build_parts;
+#$p->build_definitions;
+#$p->build_combinations;
+#$p->build_knowns;
+my @knowns = $p->output_knowns;
+warn Dumper(
+#    $p->parts,
+#    [sort keys %{$p->definitions}],
+#    $p->combinations,
+#    $p->knowns,
+    [ @knowns[0 .. 10] ],
+);

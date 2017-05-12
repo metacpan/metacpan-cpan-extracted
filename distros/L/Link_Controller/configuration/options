@@ -1,0 +1,36 @@
+%opts = (
+
+"infostructure" => [ \&maketrue,
+		     "Work on an infostructure not all links." ],
+
+    "file-base" => [ \&maketrue,
+		     "Use the given directory as the place where files for the " . 
+                     "infostructure are stored",
+		     "DIRECTORY" ]
+
+ "infostr-base" => [ \&maketrue,
+		     "Use the given directory as the place where files for the " . 
+                     "infostructure are stored",
+		     "URL" ]
+
+ "infostr-name" => [ \&makevalue,
+		     "Check on links in the given infostructure (or default).",
+		     "NAME" ],
+
+   "link-index" => [ \&makevalue,
+		     "Use the given file as an index of pages with given link (CDB format)",
+		     "FILE" ],
+
+   "page-index" => [ \&makevalue,
+		     "Use the given file as an index of links on a given page (CDB format)",
+
+		     "FILE" ],
+
+"link-database" => [ \&makevalue,
+		     "Set the database file (DB File format) for link " . 
+		     "information.",
+		     "FILE" ],
+
+       }
+
+

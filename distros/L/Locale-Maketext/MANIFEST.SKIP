@@ -1,0 +1,9 @@
+^MANIFEST\.bak$
+Makefile(\.old)?$
+\.rej$
+CVS
+blib
+~
+.git
+.gitignore$
+Makefile$

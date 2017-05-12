@@ -1,0 +1,8 @@
+you must be root to run full-run.t (otherwise you can't start the web
+server)
+
+the web server user has to be able to read the files in the included
+web tree.  This means that all directories in the path must be
+permission 755 (try moving the distribution directory to /tmp if your
+home directory isn't readable to others)
+

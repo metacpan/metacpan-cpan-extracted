@@ -1,0 +1,72 @@
+[% INCLUDE "public/tinymce.html" %]
+
+        <div id="pageTitle">
+          <div id="pageTitleIcon">
+            <img src="/images/layout/presentations-60px-shadow.png" alt="" />
+          </div>
+          <div id="pageTitleDetails">
+            <h1>Submit A Presentation</h1>
+            <!--<h3><a href="[% cgipath %]/pages.cgi?act=zine-submit">Submit a presentation</a></h3>-->
+            <!--<h4>.. other text ..</h4>-->
+          </div>
+          <div id="breadcrumb">
+          [% IF user.access > 1 %]
+            <a href="/cgi-bin/pages.cgi?act=home-admin">Admin</a> &gt; <a href="/cgi-bin/pages.cgi?act=zine-admin">Newsletters</a> &gt; Submit
+          [% ELSE %]
+            <a href="/">Home</a> &gt; <a href="/talks/main">Newsletters</a> &gt; Submit
+          [% END %]
+          </div>
+        </div>
+
+        <div id="pageContent">
+
+<p>Fields marked * are mandatory fields and must be completed.</p>
+
+[% IF thanks %]<p>Presentation saved successfully.</p>[% END %]
+[% IF errmess %]<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>[% END %]
+
+<form method=post action="[% cgipath %]/pages.cgi" name="EDIT" enctype="multipart/form-data">
+<input type="hidden" name="act" value="zine-store" />
+<input type="hidden" name="recordid" value='' />
+<input type="hidden" name="section" value="[% section %]" />
+<input type="hidden" name="articleid" value="[% article.data.articleid %]" />
+<input type="hidden" name="postdate" value="[% article.data.postdate %]" />
+<input type="hidden" name="imageid" value="[% article.data.imageid %]" />
+<input type="hidden" name="quickname" value="talk[% article.data.articleid %]" size="20" />
+<input type="hidden" name="publish" value="1" />
+<input type="hidden" name="doaction" value="" />
+
+<div class="boxer">
+<table class="blocker">
+<tr><td width="100">Title *</td>
+    <td width="10" class="alert">[% article.data.title_err %]</td>
+    <td><input type="text" name="title" value="[% article.data.title %]" size="50" /></td>
+</tr>
+[% IF user.access > 1 %]
+<tr><td>Author</td>
+    <td class="alert">[% article.data.userid_err %]</td>
+    <td>[% authors %]</td>
+</tr>
+[% END %]
+<tr><td>Presentation *</td>
+    <td class="alert">[% article.data.MEDIA2_err %]</td>
+    <td><input type="file" id="file" name="MEDIA2" value="" size="50" /></td>
+</tr>
+<tr><td>Abstract *</td>
+    <td class="alert">[% article.data.TEXT1_err %]</td>
+    <td><textarea name="TEXT1" rows="20" cols="75"></textarea></td>
+</tr>
+<tr><td>Topics</td>
+    <td class="alert">[% article.data.metadata_err %]</td>
+    <td><input type="text" id="metadata" name="metadata" value="[% article.data.metadata %]" size="50" />
+    Enter tags separated by spaces.</td>
+</tr>
+</table>
+</div>
+
+<p align="center"><input type="submit" value="Submit" /></p>
+<p align="center">Please note that once you submit, you will not be able to edit your submission.</p>
+
+</form>
+
+        </div>

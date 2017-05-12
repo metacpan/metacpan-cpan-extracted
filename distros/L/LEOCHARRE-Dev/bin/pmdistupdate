@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+use strict;
+use vars qw($VERSION);
+use LEOCHARRE::Dev ':all';
+use Getopt::Std::Strict 'dhvcmMCaV';
+use LEOCHARRE::Dir ':all';
+use Cwd;
+use Carp;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.11 $ =~ /(\d+)/g;
+
+init();
+
+opts_selected() or $opt_a = 1;
+$opt_a and @OPT{qw/c m M C A V/} = qw/1 1 1 1 1 1/;
+
+(@ARGV and scalar @ARGV) or (push @ARGV, './');
+my @distros = grep { is_pmdist($_) } @ARGV;
+scalar @distros or die("No target distros.\n");
+do_one_distro($_) for @distros;
+
+exit;
+
+sub opts_selected {
+   my $x;
+   map { $x += $OPT{$_} } qw/c m M C A V/;
+   debug("opts? $x");
+   $x;
+}
+
+
+sub do_one_distro {
+   my $dist = shift;
+   debug("DISTRO: $dist");
+
+   $opt_c and cleanup_distro($dist);
+   $opt_m and update_manifest($dist);
+   $opt_M and update_makefile($dist);
+   $opt_C and update_changes($dist);
+   $opt_a and update_cvs($dist);
+
+   1;
+}
+
+sub usage {
+   qq{$0 [OPTION]... PATH...
+Update a perl cvs distro
+
+   -d       debug
+   -h       help
+   -v       version
+
+   -c       cleanup
+   -C       update changefile, if present
+   -m       update manifest
+   -M       upadte makefile
+   -V       cvs commit -m ''
+   -a       do all
+
+The default is do all.
+
+It's implied that the target distro in in cvs.
+
+AUTHOR
+Leo Charre leocharre at cpan dot org
+
+SEE ALSO
+LEOCHARRE::Dev - parent package
+}}
+
+
+sub update_makefile {
+   my $dist = shift;
+   chdir $dist or die("Cannot chdir into $dist, $!");
+   `pmmakefile > Makefile.PL`;
+   print "+ makefile\n";
+}
+
+sub update_manifest {
+   my $dist = shift;
+   chdir $dist or die("Cannot chdir into $dist, $!");
+   `pmmanifest > MANIFEST`;
+   print "+ manifest\n";
+}
+
+sub update_cvs {
+   my $dist = shift;
+   chdir $dist or die("Cannot chdir into $dist, $!");
+   `cvs commit -m ''`;
+   print "+ cvs\n";
+}
+
+
+sub update_changes {
+   my $dist = shift;
+   chdir $dist or die("Cannot chdir into $dist, $!");
+   
+   if( my @changes = grep { /^changes$/i }  lsf($dist) ){
+      debug("changefile: @changes");
+      if( scalar @changes == 1 ) {
+         `pmchanges > $changes[0]`;
+      }
+      else {
+         warn("more than one changes file: @changes");
+      }
+   }
+   print "+ changes\n";
+}
+
+
+sub cleanup_distro {
+   my $dist = shift;
+   chdir $dist 
+      or die("Can't chdir into $dist");
+
+   print "+ cleanup\n";
+
+   -d "$dist/t" 
+      or debug("No t/ dir to look for 99 cleanup script in")
+      and return;
+
+
+   if( my @cleanup = grep { /^99/ and /cleanup/i } lsf("$dist/t") ){
+
+      debug("found cleanup script @cleanup");
+
+      scalar @cleanup== 1 
+         or warn("Found more than one cleanup script in $dist")
+         and return;
+      
+
+      my $s = $cleanup[0];
+
+      if ($s=~/\.t$|\.pl/ or $s!~/\./ ){ # assume perl
+         debug("perl cleanup");
+         system( 'perl', "$dist/t/$s") ==0 
+            or warn("error pl? $!")
+            and return 0;
+         return 1;
+      }
+      elsif( $s=~/\.sh/ ){
+         system('sh',$s) ==0 
+            or warn("error sh? $!")
+            and return 0; 
+         return 1;
+      }
+
+      warn("Dunno what to do with $s\n");
+      return 0;
+   }
+   return;
+}
+
+
+sub init {
+   $opt_h and print usage() and exit;
+   $opt_v and print $VERSION and exit;
+}
+
+sub debug { $opt_d and warn(" = $0  @_\n"); 1 }

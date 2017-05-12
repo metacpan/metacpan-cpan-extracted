@@ -1,0 +1,26 @@
+---
+abstract: 'Log::Dispatch wrapper around Log::Syslog::Fast'
+author:
+  - 'Adam Thomason <athomason@cpan.org>'
+build_requires:
+  IO::Select: 0
+  IO::Socket::INET: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Dispatch-Log-Syslog-Fast
+requires:
+  Carp: 0
+  Log::Dispatch: 0
+  Log::Syslog::Constants: 1.02
+  Log::Syslog::Fast: 0.58
+  Params::Validate: 0
+  Sys::Hostname: 0
+  parent: 0
+version: 1.02

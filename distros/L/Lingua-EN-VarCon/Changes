@@ -1,0 +1,15 @@
+Revision history for Perl extension Lingua::EN::VarCon
+
+1.00 Sun  1 Sep 2006
+	- Converting to production version
+	- Fixing some kwalitee points
+
+0.03 Mon  4 Sep 2006
+	- Upgrading to Module::Install 0.64
+
+0.02 Sun  7 May 2006
+	- No functional changes
+	- Upgrading to Module::Install 0.62 final
+
+0.01 Sat 25 Mar 2006
+	- First implementation

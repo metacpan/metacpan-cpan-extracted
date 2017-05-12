@@ -1,0 +1,24 @@
+2003-01-08 12:25  simon
+
+	* Keywords.pm, MANIFEST, Makefile.PL, SIGNATURE: Massive speedups
+	by removing Text::Sentence stuff.  Also add SIGNATURE.
+
+2003-01-08 11:25  simon
+
+	* Keywords.pm, Makefile.PL: It was a nice idea, but I don't believe
+	it was useful.
+
+2002-12-11 10:42  simon
+
+	* Keywords.pm, MANIFEST, test.pl: Failing your own tests is really
+	dumb.
+
+2002-12-11 10:40  simon
+
+	* Keywords.pm, test.pl: Tweak algorithm a little.
+
+2002-09-01 19:06  simon
+
+	* Changes, Keywords.pm, MANIFEST, Makefile.PL, test.pl: Bring T::S
+	under version control.
+

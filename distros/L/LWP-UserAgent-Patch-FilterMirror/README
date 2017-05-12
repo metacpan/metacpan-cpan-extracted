@@ -1,0 +1,6 @@
+SYNOPSIS
+
+     use LWP::UserAgent::Patch::FilterMirror -filter => sub { ... };
+     # use LWP::UserAgent's mirror() as usual
+     # ...
+

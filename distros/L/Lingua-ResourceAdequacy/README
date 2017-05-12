@@ -1,0 +1,53 @@
+Lingua-ResourceAdequacy version 0.1
+==================================
+
+Lingua-ResourceAdequacy provides measures to estimate the adequacy of
+a terminological resource regarding a textual corpus, i.e. whether a
+terminological resource can be used on a specialised textual corpus.
+
+(see MANIFEST for all the files)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or if you don't have the "make" program:
+
+   perl Build.PL
+   Build
+   Build test
+   Build install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Test::Pod
+ Test::More
+ Test::Pod::Coverage
+ Test::Simple
+ Module::Build
+
+DOCUMENTATION
+
+[Ninova&al2005] Goritsa Ninova, Adeline Nazarenko, Thierry Hamon et
+Sylvie Szulman. "Comment mesurer la couverture d'une ressource
+terminologique pour un corpus ?" TALN 2005. pages 293-302. 6-12 juin
+2005. Dourdan, France.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Thierry Hamon
+
+This library and this program are free software; you can redistribute
+them and/or modify it under the same terms as Perl itself, either Perl
+version 5.8.6 or, at your option, any later version of Perl 5 you may
+have available.
+
+

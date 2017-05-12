@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+#######################################################################
+#
+# The LCFG @LCFG_NAME@ Component
+#
+# @LCFG_AUTHOR@
+# Version @LCFG_VERSION@ : @LCFG_DATE@
+#
+#@MSG@
+#
+#######################################################################
+
+use strict;
+use warnings;
+
+use v5.10;
+
+our $VERSION = '@LCFG_VERSION@';
+
+use LCFG::Component::[% pkgspec.name | ucfirst %];
+
+##########################################################################
+# Dispatch methods
+##########################################################################
+
+LCFG::Component::[% pkgspec.name | ucfirst %]->new()->Dispatch();
+

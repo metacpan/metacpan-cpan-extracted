@@ -1,0 +1,410 @@
+Thanks go to the following for their correspondance:
+
+	Gerald Gazdar <geraldg@cogs.susx.ac.uk>
+	Mike Brown <mike@skew.org>
+	Francis Norton <francis@redrice.com>
+	Joshua Allen <joshuaa@microsoft.com>
+	Roger Evans <Roger.Evans@itri.brighton.ac.uk>
+	Mike Kay <Michael.Kay@icl.com>
+	Ken Holman <gkholman@cranesoftwrights.com>
+
+=====================================================================
+Credits....
+=====================================================================
+
+
+Subject: Re: Indexing Tree Elements
+Date: Fri, 07 Jul 2000 09:16:55 -0400
+From: "G. Ken Holman" <gkholman@cranesoftwrights.com>
+Reply-To: xsl-list@mulberrytech.com
+To: xsl-list@mulberrytech.com
+
+At 00/07/07 13:14 +0100, David Carlisle wrote:
+> > is it possible that it may compare its attributes with the attributes
+> > of the previous document-tree node of the same level?
+>
+><xsl:if test="@foo = preceding-sibling::*/@foo">
+>  'tis the same
+></xsl:if>
+
+I'm sorry if this sounds pedantic, but because the second argument is a
+node list, the above expression will be true if *any* of the preceding
+siblings nodes has an attribute named "foo" of the equal value.
+
+To check the immediately preceding element for an attribute named "foo", I
+would think one would use:
+
+   <xsl:if test="@foo = preceding-sibling::*[1]/@foo">
+
+To check the the closest (in proximity) preceding element with an attribute
+named "foo", I would think one would use:
+
+   <xsl:if test="@foo = preceding-sibling::*[@foo][1]/@foo">
+
+I hope this helps and is considered constructive.
+
+................. Ken
+
+T:\ftemp>type foo.xsl
+<?xml version="1.0"?><!--foo.xsl-->
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                 version="1.0">
+
+<xsl:template match="/">                         <!--root rule-->
+   <xsl:for-each select="//test[last()]">
+@foo = preceding-sibling::*/@foo: <xsl:choose>
+     <xsl:when test="@foo = preceding-sibling::*/@foo">
+       <xsl:text>yes</xsl:text>
+     </xsl:when>
+     <xsl:otherwise>no</xsl:otherwise>
+   </xsl:choose>
+@foo = preceding-sibling::*[1]/@foo: <xsl:choose>
+     <xsl:when test="@foo = preceding-sibling::*[1]/@foo">
+       <xsl:text>yes</xsl:text>
+     </xsl:when>
+     <xsl:otherwise>no</xsl:otherwise>
+   </xsl:choose>
+@foo = preceding-sibling::*[@foo][1]/@foo: <xsl:choose>
+     <xsl:when test="@foo = preceding-sibling::*[@foo][1]/@foo">
+       <xsl:text>yes</xsl:text>
+     </xsl:when>
+     <xsl:otherwise>no</xsl:otherwise>
+   </xsl:choose>
+   <xsl:text> (</xsl:text>
+   <xsl:value-of select="preceding-sibling::*[@foo][1]/@foo"/>
+   <xsl:text>)</xsl:text>
+   </xsl:for-each>
+</xsl:template>
+
+</xsl:stylesheet>
+
+T:\ftemp>type foo.xml
+<?xml version="1.0"?>
+<doc>
+  <test foo="x">a</test>
+  <test foo="y">b</test>
+  <test        >c</test>
+  <test foo="z">d</test>
+  <test        >e</test>
+  <test foo="x">f</test>
+</doc>
+T:\ftemp>xt foo.xml foo.xsl
+<?xml version="1.0" encoding="utf-8"?>
+
+@foo = preceding-sibling::*/@foo: yes
+@foo = preceding-sibling::*[1]/@foo: no
+@foo = preceding-sibling::*[@foo][1]/@foo: no (z)
+T:\ftemp>rem
+
+--
+G. Ken Holman                    mailto:gkholman@CraneSoftwrights.com
+Crane Softwrights Ltd.             http://www.CraneSoftwrights.com/s/
+Box 266, Kars, Ontario CANADA K0A-2E0   +1(613)489-0999   (Fax:-0995)
+Web site: XSL/XML/DSSSL/SGML services, training, libraries, products.
+Book: Practical Transformation Using XSLT and XPath ISBN1-894049-04-7
+Next instructor-led training:    2000-09-19/20,2000-10-03,2000-10-04,
+-                                    2000-10-05,2000-11-13,2001-01-27
+
+ XSL-List info and archive:  http://www.mulberrytech.com/xsl/xsl-list
+
+=====================================================================
+
+
+X-Envelope-Sender: owner-xsl-list@mulberrytech.com
+Return-Path: <owner-xsl-list@mulberrytech.com>
+Received: from bigfoot.com (bflitemail6.bigfoot.com [208.156.39.206])
+        by shaggy.lineone.net (8.10.2/8.8.8) with SMTP id e661kIr23535
+        for <lee.goddard@lineone.net>; Thu, 6 Jul 2000 02:46:19 +0100 (BST)
+Received: from web1-1.ability.net ([216.32.69.6])
+        by BFLITEMAIL5.bigfoot.com (LiteMail v2.43(BFLITEMAIL5)) with SMTP id 05Jul2000_BFLITEMAIL5_26813_58833129;
+        Wed, 05 Jul 2000 21:48:38 -0400 EST
+Received: from mulberrytech.com
+        by web1-1.ability.net (8.9.3/8.9.1) with ESMTP id VAA12560      Wed, 5 Jul 2000 21:46:36 -0400 (EDT)
+Received: (from majordom@localhost)
+        by mulberrytech.com (8.8.5/8.8.5) id VAA12558
+        Wed, 5 Jul 2000 21:46:36 -0400 (EDT)
+Message-ID: <1E18203C3402B84882243054A7E7DC9307E546@red-pt-02.redmond.corp.microsoft.com>
+From: Joshua Allen <joshuaa@microsoft.com>
+To: "'xsl-list@mulberrytech.com'" <xsl-list@mulberrytech.com>
+Subject: RE: Schema Element Definiton Order
+Date: Wed, 5 Jul 2000 18:15:01 -0700
+X-Mailer: Internet Mail Service (5.5.2651.58)
+Sender: owner-xsl-list@mulberrytech.com
+Precedence: bulk
+Reply-To: xsl-list@mulberrytech.com
+X-Mozilla-Status: 8011
+X-Mozilla-Status2: 00000000
+X-UIDL: 4be90c7c1277834cf17395f591827fb5
+
+XDR was a predecessor to XML Schema developed with DataChannel and others,
+and Microsoft is just as involved and supportive of XML Schema as we were
+with XDR.  XML Schema is still not ratified, and we like everyone else are
+supporting the standard as it evolves.  BTW, Lee specifically mentions
+MSXML3, which does have XSLT support.  The older parser that shipped with
+IE5 had more limited support based on earlier drafts.  There is an XSLT
+stylesheet at
+http://msdn.microsoft.com/downloads/webtechnology/xml/xsltconv.asp which
+will convert older stylesheets to the new XSLT format.
+
+-J
+
+> -----Original Message-----
+> From: David Carlisle [mailto:davidc@nag.co.uk]
+> Sent: Wednesday, July 05, 2000 5:57 AM
+> To: xsl-list@mulberrytech.com
+> Subject: Re: Schema Element Definiton Order
+>
+>
+>
+> > But aren't XML schema's XSL elements?
+>
+> No, they are XML elements, XSL is the stylesheet and transformation
+> language for XML.
+> the DLL used by default in internet explorer 5 (msxml) does include
+> an XML parser, an XDR (XDR=Microsoft flavoured XML schema) validator,
+> and an XSL system (or at least Microsoft implementation of an
+> early XSLT
+> draft). But these are all essentially different functionalities and
+> languages even though they are packaged up in one library in that
+> implementation.
+>
+>
+> David
+>
+>
+>  XSL-List info and archive:  http://www.mulberrytech.com/xsl/xsl-list
+>
+
+
+ XSL-List info and archive:  http://www.mulberrytech.com/xsl/xsl-list
+
+
+
+
+=====================================================================
+
+
+Subject:
+        Re: DATR/XML
+   Date:
+        Tue, 4 Jul 2000 23:26:22 +0100
+   From:
+        Roger.Evans@itri.brighton.ac.uk
+     To:
+        lee.goddard@bigfoot.com
+    CC:
+        geraldg@cogs.susx.ac.uk, Adam.Kilgarriff@itri.brighton.ac.uk, Roger.Evans@itri.brighton.ac.uk
+
+
+
+
+Hello Lee,
+
+concede-admin very conveniently hit both myself and Adam, so Gerald does
+not need to take any further action.
+
+Gerald mentioned your work to me last time we spoke and I'm very much
+looking forward to seeing the results.
+
+I'm sending by separate email the postscript version of the (single)
+paper that was the basis of the two presentations you mentioned. Please
+not however that this is an UNPUBLISHED PROJECT-INTERNAL document and
+should not be cited or distributed without the authors' express
+permission (this is not because its secret, but because it will probably
+change form, title and maybe even authorship before it does get
+published somehow.)
+
+best wishes
+
+Roger
+
+
+
+======================================================================
+
+
+Subject:
+            Re: XML into Prolog
+       Date:
+            Tue, 04 Jul 2000 09:50:17 +0100
+      From:
+            Francis Norton <francis@redrice.com>
+        To:
+            Lee Goddard <lee.goddard@bigfoot.com>
+ References:
+            1 , 2
+
+
+
+
+Took a look at DATR - wow, a very powerful, very simple model. I bet you
+could have implemented most of XML-Schema in it at a fraction of the
+complexity. Has it been used much outside linguistics?
+
+How are you getting on with the XSLT? What you're attempting sounds very
+do-able - especially if you have a copy of Mike Kay's book...
+
+Let me know if you have any interesting problems - it's a while since I
+coughed up for my copy of LPA Micro Prolog (for DOS!) but with hindsight
+it was a really useful non-procedural skill, probably still paying off
+whenever I bump into another non-procedural language - like XSLT itself.
+
+Anyway, I like debugging interesting programming problems...
+
+(Hmmm... presumably you could do a *certain* amount just by using XSLT
+as the target language as well as the transform language)
+
+Francis.
+
+ps - you anything to do with the Concede people who seem to be doing
+SGML/XML -> DATR at the University of Brighton
+(http://www.itri.brighton.ac.uk/projects/concede/DR0.2.1_no_pointers.html)
+- are they neighbours?
+
+Lee Goddard wrote:
+>
+> Francis Norton wrote:
+> >
+> > Hi Lee,
+> >
+> > Just thought you might be interested in this link
+> > (http://www.swi.psy.uva.nl/projects/SWI-Prolog/packages/sgml/sgml2pl.html)
+> > to a preliminary XML-to-Prolog implementation.
+> >
+> > Francis.
+> > --
+> > Francis Norton.
+> >
+> > Defy Convention? Deify Convention!
+>
+> Hey, that's both useful and frustrating!  Thanks very much, really!
+> I'm actually taking something called DATR into XML into PROLOG, so
+> maybe there's still something for me to do.
+>
+> Thanks again,
+> lee
+>
+> --
+> Lee Goddard  <l.goddard@sussex>
+> Research Centre for Cognitive Science,
+> University of Sussex, Brighton UK
+
+--
+Francis Norton.
+
+Defy Convention? Deify Convention!
+
+
+======================================================================
+
+
+
+Subject: Re: Iteration
+Date: Sat, 1 Jul 2000 15:44:01 -0600 (MDT)
+From: Mike Brown <mike@skew.org>
+Reply-To: xsl-list@mulberrytech.com
+To: xsl-list@mulberrytech.com
+
+> I'm trying to use XSL to parse XML to PROLOG, and cannot find
+> a means of iterating over every element.
+
+<xsl:template match="/">
+  <xsl:apply-templates select="//*"/>
+</xsl:template>
+
+<xsl:template match="*">
+  <!-- stuff to do for each element here -->
+</xsl:template>
+
+or, since //foo is inefficient,
+
+<xsl:template match="/">
+  <xsl:apply-templates/>
+</xsl:template>
+
+<xsl:template match="*">
+  <!-- stuff to do for each element here -->
+  <!-- when done, go process this element's child elements -->
+  <xsl:apply-templates select="*"/>
+</xsl:template>
+
+<xsl:template match="text()|comment()|processing-instruction|@*"/>
+
+> Is it possible, say,
+> to use XSL without additional ECMA/VB-/J-/JavaScript scripting
+> to display every element and it's attributes?
+
+Replace <!-- stuff to do... --> with the appropriate code, depending on
+the output you want. Example:
+
+<xsl:value-of select="concat(name(),': ',text(),'&#xA;')"/>
+<xsl:for-each select="@*">
+  <xsl:value-of select="concat('   ',name(),': ',text(),'&#xA;')"/>
+</xsl:for-each>
+
+would give you something like:
+
+element1: text1
+  attribute1a: value1a
+  attribute1b: value1b
+element2: text2
+  attribute2a: value2a
+element3: text3
+
+etc.
+
+   - Mike
+____________________________________________________________________
+Mike J. Brown, software engineer at         My XML/XSL resources:
+webb.net in Denver, Colorado, USA           http://www.skew.org/xml/
+
+ XSL-List info and archive:  http://www.mulberrytech.com/xsl/xsl-list
+
+
+
+
+
+
+
+X-Envelope-Sender: roger.evans@itri.brighton.ac.uk
+Return-Path: <roger.evans@itri.brighton.ac.uk>
+Received: from bigfoot.com (bflitemail6.bigfoot.com [208.156.39.206])
+        by shaggy.lineone.net (8.10.2/8.8.8) with SMTP id e64MRHr02495
+        for <lee.goddard@lineone.net>; Tue, 4 Jul 2000 23:27:17 +0100 (BST)
+Received: from drake ([194.81.196.76])
+        by BFLITEMAIL4.bigfoot.com (LiteMail v2.43(BFLITEMAIL4)) with SMTP id 04Jul2000_BFLITEMAIL4_40615_165995068;
+        Tue, 04 Jul 2000 18:29:51 -0400 EST
+Received: from cook ([194.81.196.75] helo=cook.itri.brighton.ac.uk)
+        by drake with smtp (Exim 3.14 #1)
+        id 139bA8-0001EE-00; Tue, 04 Jul 2000 23:27:28 +0100
+Date: Tue, 4 Jul 2000 23:26:22 +0100
+Message-Id: <200007042226.XAA04060@cook.itri.brighton.ac.uk>
+From: Roger.Evans@itri.brighton.ac.uk
+To: lee.goddard@bigfoot.com
+Subject: Re: DATR/XML
+Cc: geraldg@cogs.susx.ac.uk, Adam.Kilgarriff@itri.brighton.ac.uk,
+   Roger.Evans@itri.brighton.ac.uk
+X-Mozilla-Status: 8013
+X-Mozilla-Status2: 00000000
+X-UIDL: 2f6444e6ef2fcef98da8770389c0ad9d
+
+Hello Lee,
+
+concede-admin very conveniently hit both myself and Adam, so Gerald does
+not need to take any further action.
+
+Gerald mentioned your work to me last time we spoke and I'm very much
+looking forward to seeing the results.
+
+I'm sending by separate email the postscript version of the (single)
+paper that was the basis of the two presentations you mentioned. Please
+not however that this is an UNPUBLISHED PROJECT-INTERNAL document and
+should not be cited or distributed without the authors' express
+permission (this is not because its secret, but because it will probably
+change form, title and maybe even authorship before it does get
+published somehow.)
+
+best wishes
+
+Roger
+

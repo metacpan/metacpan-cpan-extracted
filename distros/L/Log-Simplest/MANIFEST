@@ -1,0 +1,9 @@
+README
+Changes
+Makefile.PL
+MANIFEST               - this file
+t/Log-Simplest.t       - test script. Executed from 'make test'
+lib/Log/Simplest.pm    - module itself
+examples/example.pl    - simple examples of module use
+examples/simplest.pl
+META.yml                                 Module meta-data (added by MakeMaker)

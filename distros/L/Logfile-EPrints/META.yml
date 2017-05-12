@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                Logfile-EPrints
+version:             1.20
+abstract:            Process Web log files for institutional repositories
+license:             ~
+author:              
+    - Timothy D Brody <tdb01r@ecs.soton.ac.uk>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0.1
+    Date::Parse:                   0.1
+    Encode:                        0.1
+    Geo::IP::PurePerl:             1.17
+    LWP::UserAgent:                0.1
+    SDBM_File:                     0.1
+    Socket:                        0.1
+    Text::CSV_XS:                  0.1
+    URI:                           0.1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,66 @@
+Launcher-Cascade
+
+This module provides a framework to launch processes, test whether they
+succeeded or not and report on that. Each process is modeled as an object and
+can depend on other processes to start, i.e., a process will not be started
+until all the processes it depends upon have successfully been started.
+
+Process launchers must be implemented as Launcher::Cascade::Base objects (or
+subclassses thereof). Their launch() method will actually launch the process,
+and their test() method will check whether it succeeded or not. Each launcher
+can be made to depend on one or more other launchers: it will then refuse to
+launch() until the others have been test()ed successfully.
+
+All the launchers should be given to a Launcher::Cascade::Container, which will
+run them in turn and test their status when applicable, until either all of the
+Launchers have succeeded or one of them has failed.
+
+The distribution provides Launcher::Cascade::FileReader to ease the launching
+of external (and possibly remote, by means of ssh) commands and the reading of
+files. FileReaders should be used in launch() or test() methods of launchers.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Launcher::Cascade
+    perldoc Launcher::Cascade::Base
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Launcher-Cascade
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Launcher-Cascade
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Launcher-Cascade
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Launcher-Cascade
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Cédric Bouvier
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

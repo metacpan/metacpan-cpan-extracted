@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head><!-- Document Metadata -->
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Language" content="en" />
+
+	<!-- Syndication -->
+	<link rel="icon" type="image/png" href="images/favicon.png" />
+
+	<title>[% yapc_name %] Survey Results - YAPC Conference Surveys</title>
+	<link rel="icon" type="image/png" href="/images/favicon.png" />
+
+	<!-- CSS stylesheets -->
+	<!-- <link rel="stylesheet" type="text/css" href="css/results.css"> -->
+	<link rel="stylesheet"    type="text/css"  href="/css/style.css" />
+	<link rel="stylesheet"	  type="text/css"  href="/css/lightbox.css" media="screen" />
+
+	<script type="text/javascript" src="/js/prototype.js"></script>
+	<script type="text/javascript" src="/js/scriptaculous.js?load=effects,builder"></script>
+	<script type="text/javascript" src="/js/lightbox.js"></script>
+
+<script type="text/javascript">
+<!--
+
+function toggleLayer( whichLayer )
+{
+  var elem, vis;
+  if( document.getElementById ) // this is the way the standards work
+    elem = document.getElementById( whichLayer );
+  else if( document.all ) // this is the way old msie versions work
+    elem = document.all[whichLayer];
+  else if( document.layers ) // this is the way nn4 works
+    elem = document.layers[whichLayer];
+  vis = elem.style;
+  // if the style.display value is blank we try to figure it out here
+  if(vis.display==''&&elem.offsetWidth!=undefined&&elem.offsetHeight!=undefined)
+    vis.display = (elem.offsetWidth!=0&&elem.offsetHeight!=0)?'block':'none';
+  vis.display = (vis.display==''||vis.display=='block')?'none':'block';
+}
+
+-->
+</script>
+
+<!--
+
+	Original layout design by <a href="http://www.animatedbanner.com/">AnimatedBanner.com</a>.
+	Additional modifications by Barbie for Miss Barbell Productions.
+
+-->
+
+</head>
+<body>
+<div id="container">
+
+	<div id="header">
+		<span class="quotes1">
+		<h1>YAPC Conference Surveys</h1>
+		<h2>[% yapc_name %] Survey Results</h2>
+		</span>
+	</div>
+
+	<div id="content">
+
+		<div class="corona">
+			<b class="top"><b class="b1"></b><b class="b2"></b><b class="b3"></b><b class="b4"></b><b class="b5"></b></b>
+
+			<div class="float-right">
+				<h2 class="noprint">Contents:</h2>
+				<ul>
+[% sect = 0 %]
+[% FOREACH section = survey.sections %]
+[% sect = sect + 1 %]
+				<li><span class="black"><a href="#sect[% sect %]">[% section.label %]</a></span></li>
+[% END %]
+				</ul>
+				<div class="linkcent">
+				<a href="/index.html">Return to Surveys Listings</a>
+				</div>
+			</div>
+
+			<div class="boxcontent">
+
+<h1>[% yapc_name %] - Survey Results</h1>
+
+<p>The following survey results are a simple presentation of the raw data. 
+No attempt has been made to analyse the data and compare with previous
+years. See forthcoming PDFs for more in depth analysis.</p> 
+
+<p>Click on pie charts to view larger image version.</p>
+
+[% sect = 0 %]
+[% FOREACH section = survey.sections %]
+[% sect = sect + 1 %]
+<a name="sect[% sect %]" ></a>
+<h2>[% section.label %]</h2>
+
+[% IF section.preamble %]<p>[% section.preamble %]</p>[% END %]
+[% FOREACH question = section.questions %]
+[% IF question.status != 'hidden' %]
+<h3>[% question.label %]</h3>
+
+[% IF question.multipart %]
+[% FOREACH q = question.multipart %]
+[% INCLUDE "survey/results-survey-question.html" %]
+[% END %]
+
+[% ELSE %]
+[% q = question %]
+[% INCLUDE "survey/results-survey-question.html" %]
+
+[% END %]
+[% END %]
+[% END %]
+[% IF section.footnote %]<p>[% section.footnote %]</p>[% END %]
+
+[% END %]
+
+</div>
+</body>
+</html>

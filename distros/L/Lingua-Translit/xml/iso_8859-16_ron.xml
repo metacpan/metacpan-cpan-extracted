@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+
+<!--
+
+  Transliteration definitions for Romanian diacritics.
+
+  Copyright (C) 2015 Ștefan Suciu <stefbv70@gmail.com>
+
+-->
+
+
+<translit>
+
+    <name>ISO 8859-16 RON</name>
+    <desc>Romanian with appropriate diacritics</desc>
+    <reverse>true</reverse>
+
+    <!-- set of transliteration rules -->
+    <!--
+    This transliteration is a simple mapping of characters with
+    diacritics with cedilla below to the same character with diacritic
+    using comma below in hex notation of Unicode codepoints
+    (SR ISO/CEI 8859-16:2006 Latin10)
+    (Letter names according to the Unicode Standard 5.0)
+    Abbreviations:
+    LCL = LATIN CAPITAL LETTER
+    LSL = LATIN SMALL LETTER
+    -->
+    <rules>
+
+        <rule>
+            <from>&#x015E;</from>     <!-- LCL S WITH CEDILLA -->
+            <to>&#x0218;</to>          <!-- LCL S WITH COMMA BELOW -->
+        </rule>
+
+        <rule>
+            <from>&#x015F;</from>     <!-- LSL S WITH CEDILLA -->
+            <to>&#x0219;</to>          <!-- LSL S WITH COMMA BELOW -->
+        </rule>
+
+        <rule>
+            <from>&#x0162;</from>     <!-- LCL T WITH CEDILLA -->
+            <to>&#x021A;</to>          <!-- LCL T WITH COMMA BELOW -->
+        </rule>
+
+        <rule>
+            <from>&#x0163;</from>     <!-- LSL T WITH CEDILLA -->
+            <to>&#x021B;</to>          <!-- LSL T WITH COMMA BELOW -->
+        </rule>
+
+    </rules>
+
+</translit>
+
+<!--
+  vim: sts=4 sw=4 ai et
+-->

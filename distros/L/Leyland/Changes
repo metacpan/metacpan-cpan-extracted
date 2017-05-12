@@ -1,0 +1,82 @@
+Revision history for Leyland
+
+1.000002  2014-04-13 15:40:47+03:00 Asia/Jerusalem
+	* Bugfix: certain attributes had the default option as scalar instead of coderef (Moo)
+	* Bugfix: specified requirement for Plack was wrong, as the tests require v1.0029
+	  (thanks Graham Knop)
+
+1.000001  2014-02-25 18:28:01 Asia/Jerusalem
+	* Small pod fix
+
+1.000000  2014-02-25 18:13:44 Asia/Jerusalem
+	* Moose has been replaced with Moo. As Moo is Moose compatible, Leyland apps
+	  can still continue using Moose if they so wish.
+	* Calling forward() with no method now only forwards to GET routes, not
+	  to the first route matched.
+	* The json attribute in Leyland::Context now holds a JSON object, not
+	  a JSON::Any object.
+	* Leyland.pm now properly inherits Plack::Component, and has a to_app()
+	  method. The handle() method has been renamed to call() appropriately.
+	* Changed the way setup() and config works. The setup() method is now used
+	  to set Leyland configuration options. It is expected to return a hash-ref
+	  with the configuration options. Application-specific configurations are
+	  still to be provided to the application class in the config attribute. This
+	  attribute is not used by Leyland at all, but available for the application
+	  as needed. With the setup() method now used for configuration purposes, any
+	  application initializations to perform should be moved to Moo(se)'s BUILD method.
+	* Added the ability to set the default return MIME for routes instead of text/html.
+	* Using Devel::Declare::Magic directly as per the deprecation from Devel::Declare.
+	* The leyland command line utility has been removed, you should now scaffold manually.
+	* Logging now comes from Plack middlewares. Leyland::Logger is now a
+	  simple wrapper around the middleware used (providing the same syntax as previous
+	  versions). A default logger that prints to standard output/error is provided.
+	* The location of the views directory can now be changed by providing the "view_dir"
+	  configuration option.
+	* Simple tests have been created.
+	* Plain text exceptions are no longer returned with Dumper.
+	* No more Wikipedia descriptions for HTTP status codes in exceptions.
+
+0.001007  2011-07-04 22:50:33 Asia/Jerusalem
+	- Bugfix: response object now does not get text/html content
+	  type on initialization as it is not necessarily true
+	- Bugfix: when running a leyland app the initial summary table prints
+	  route regexes as-is since perl 5.14 changes the way regex variables
+	  are printed stringwise
+	- When an exception is thrown and app is running on the deployment
+	  environment, if client accepts html and exception was not defined
+	  an html template - leyland lets Plack's StackTrace middleware
+	  handle the exception and print a nice stack trace
+
+0.001006  2011-06-24 23:30:19 Asia/Jerusalem
+	- When forwarding internally (with $c->forward), requests to pass
+	  requests are now honored
+	- Forcing MooseX::ClassAttribute version 0.24 as previous versions
+	  seem to cause problems
+
+0.001005  2011-06-02 23:42:27 Asia/Jerusalem
+	- Fixed bugs when loading app-specific view classes [thanks Sebastian Knapp (@giftnuss)]
+	- Small documentation fixes
+
+0.001004  2011-05-09 19:55:59 Asia/Jerusalem
+	- Fixed bug with passing requests (using $c->pass)
+	- When on the development environment, Leyland let's exceptions
+	  that do not define MIME templates be handled by Plack's nice
+	  stacktrace middleware (which is automatically enabled on the
+	  development environment)
+
+0.001003  2011-04-22 22:29:11 Asia/Jerusalem
+	- Developers can now create routes that return any media type
+	  by setting "returns '*/*'" in the route declaration
+	- The check for returned content's type (ascii or binary) now falls
+	  back to simple match against qr!^text/! when mime type isn't found
+
+0.001002  2011-04-22 03:00:35 Asia/Jerusalem
+	- Leyland will not automatically encode('UTF-8') when output is binary
+	- Some more documentation fixes
+
+0.001001  2011-04-19 17:47:23 Asia/Jerusalem
+	- Added Leyland::Manual::FAQ which was missing from the initial release
+	- Many fixes (mostly typos) to the manual
+
+0.001     2011-04-19 05:28:27 Asia/Jerusalem
+	- Initial release

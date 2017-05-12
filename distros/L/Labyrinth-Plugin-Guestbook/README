@@ -1,0 +1,30 @@
+Labyrinth-Plugin-Guestbook
+==========================
+
+Labyrinth is a Website Management Framework. This distribution enables Labyrinth
+to manage MP3s, which can be attributed to releases.
+
+This distribution contains the Guestbook handling functionality used as part
+of your website based on Labyrinth. This includes the templates, SQL, parameter 
+validation and dispatch tables.
+
+INSTALLATION
+
+See the INSTALL file for full instructions.
+
+DEPENDENCIES
+
+  Labyrinth
+
+AUTHOR
+
+  Barbie, <barbie@missbarbell.co.uk> for Miss Barbell Productions,
+  <http://www.missbarbell.co.uk/>
+
+COPYRIGHT & LICENSE
+
+  Copyright (C) 2002-2015 Barbie for Miss Barbell Productions
+  All Rights Reserved.
+
+  This module is free software; you can redistribute it and/or
+  modify it under the Artistic License 2.0.

@@ -1,0 +1,8 @@
+lib/Log/AndError/Constants.pm
+lib/Log/AndError.pm
+Changes
+MANIFEST
+README
+Makefile.PL
+t/2log.t
+t/1const.t

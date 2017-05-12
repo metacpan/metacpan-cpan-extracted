@@ -1,0 +1,36 @@
+[% 
+    title = wikihash.pagename _ ' (History)';
+
+    crumb2_name = wikihash.pagename ;
+    crumb2_href = '/wiki/' _ wikihash.pagename;
+    crumb1_name = 'History' ;
+%]
+
+<form action="[% cgipath %]/pages.cgi" method="post" name="wikidiff" id="wikidiff">
+<input type="hidden" name="act"      value="wiki-diff" />
+<input type="hidden" name="pagename" value="[% wikihash.pagename %]" />
+
+<ul id="pagehistory">
+[% first = 1 %]
+[% FOREACH item = wikihash.history %]
+[% IF first %][% current = item.version %][% END %]
+<li>
+    [% IF first %](cur)[% ELSE %]<a href="[% cgipath %]/pages.cgi?act=wiki-diff&amp;pagename=[% wikihash.pagename %]&amp;diff1=[% item.version %]&amp;diff2=[% current %]">(cur)</a>[% END %]
+    [% IF item.version == 1 %](last)[% ELSE %]<a href="[% cgipath %]/pages.cgi?act=wiki-diff&amp;pagename=[% wikihash.pagename %]&amp;diff1=[% item.version - 1 %]&amp;diff2=[% item.version %]">(last)</a>[% END %]
+    <input type="radio" name="diff1" value="[% item.version %]" [% IF first %]style="visibility:hidden"[% ELSE %][% IF current == item.version + 1 %]checked="checked"[% END %][% END %] onclick="diffcheck()" />
+    <input type="radio" name="diff2"  value="[% item.version %]" [% IF first %]checked="checked"[% ELSE %]style="visibility:hidden"[% END %] onclick="diffcheck()" />
+    [% item.postdate %] ([% item.realname %])[% IF item.comment %] => "[% item.comment %]"[% END %] (version [% item.version %])
+    [% IF first %][% IF user.access == 5 %]<input type="submit" onclick="setRollback()" value="ROLLBACK" />[% END %][% END %]</li>
+[% first = 0 %]
+[% END %]
+</ul>
+
+    <input type="submit" value='Compare Versions' />
+
+</form>
+
+<script language="javascript" type="text/javascript">
+<!--
+onload = diffcheck();
+//-->
+</script>

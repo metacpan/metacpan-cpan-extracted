@@ -1,0 +1,16 @@
+#!perl -T
+use 5.006;
+use strict;
+use warnings FATAL => 'all';
+use Test::More;
+use lib 'lib';
+use Lingua::Sindarin::Dictionary;
+
+plan tests => 2;
+
+$d = Lingua::Sindarin::Dictionary->new( dict => 'english-sindarin');
+
+cmp_ok ($d->search("writer"), 'eq', "tegilbor (noun) literally.... one who specializes in calligraphy", "english-sindarin");
+
+cmp_ok ($d->search("amdir"), 'eq', "hope based on reason (noun)", "sindarin-english");
+

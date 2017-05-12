@@ -1,0 +1,8 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+
+# analogue of printf(1)
+
+use Lisp::Fmt;
+pfmt( @ARGV );
+

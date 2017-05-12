@@ -1,0 +1,29 @@
+README for Log::Common
+by Martin Hamilton <martinh@gnu.org>
+and Jon Knight <jon@net.lut.ac.uk>
+
+You install the module by running these commands:
+
+   perl Makefile.PL
+   make
+   make install
+
+Please report any bugs/suggestions to <roads-liaison@bristol.ac.uk>
+
+Copyright (c) 1998, Martin Hamilton and Jon Knight.  All rights
+reserved.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+
+This module is part of the ROADS software.  For more information, see
+
+  <URL:http://www.roads.lut.ac.uk/>
+
+It was developed by the Department of Computer Studies at Loughborough
+University of Technology, as part of the ROADS project.  This work was
+funded by the Joint Information Systems Committee (JISC) of the Higher
+Education Funding Councils under the UK Electronic Libraries Programme
+(eLib), the European Commission DESIRE project, and the TERENA
+development programme.
+

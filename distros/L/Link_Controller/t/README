@@ -1,0 +1,19 @@
+Please write more tests for everything.  They help progress
+considerably in software development.
+
+-----------------------------------------------------------
+particularly, we need a test of the system for configuring CGIs..
+
+set up scripts
+
+(echo /home/httpd/that.cgi; echo 'asd:'; echo; echo; echo ) | PERL_DL_NONLAZY=1 /usr/bin/perl -I ../lib/  -I/usr/lib/perl5/5.00503/i386-linux -I/usr/lib/perl5/5.00503 configure-link-cgi.pl 
+
+(echo /home/httpd/that.cgi; echo 'asd:'; echo; echo; echo ) | PERL_DL_NONLAZY=1 /usr/bin/perl -I ../lib/  -I/usr/lib/perl5/5.00503/i386-linux -I/usr/lib/perl5/5.00503 configure-link-cgi.pl --fixer
+
+then use them 
+-----------------------------------------------------------
+
+
+and one for testing repairing links
+
+and one for 

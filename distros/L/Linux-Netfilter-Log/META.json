@@ -1,0 +1,49 @@
+{
+   "abstract" : "Linux netfilter logging (libnetfilter_log) wrapper",
+   "author" : [
+      "Daniel Collins <daniel.collins@smoothwall.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Linux-Netfilter-Log",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::H2PM" : "0.03",
+            "Module::Build" : "0.2806"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      }
+   },
+   "provides" : {
+      "Linux::Netfilter::Log" : {
+         "file" : "lib/Linux/Netfilter/Log.pm",
+         "version" : "1.0"
+      },
+      "Linux::Netfilter::Log::Group" : {
+         "file" : "lib/Linux/Netfilter/Log/Group.pm"
+      },
+      "Linux::Netfilter::Log::Packet" : {
+         "file" : "lib/Linux/Netfilter/Log/Packet.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.0"
+}

@@ -1,0 +1,156 @@
+{
+   "abstract" : "Bringing loggers and listeners together",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>",
+      "David Golden <dagolden@cpan.org>",
+      "Doug Bell <preaction@cpan.org>",
+      "Daniel Pittman <daniel@rimspace.net>",
+      "Stephen Thirlwall <sdt@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Log-Any",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "Log::Any::Manager::_Guard"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "IO::File" : "0",
+            "Sys::Syslog" : "0",
+            "Test::Builder" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Any" : {
+         "file" : "lib/Log/Any.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Adapter" : {
+         "file" : "lib/Log/Any/Adapter.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Adapter::Base" : {
+         "file" : "lib/Log/Any/Adapter/Base.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Adapter::File" : {
+         "file" : "lib/Log/Any/Adapter/File.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Adapter::Null" : {
+         "file" : "lib/Log/Any/Adapter/Null.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Adapter::Stderr" : {
+         "file" : "lib/Log/Any/Adapter/Stderr.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Adapter::Stdout" : {
+         "file" : "lib/Log/Any/Adapter/Stdout.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Adapter::Syslog" : {
+         "file" : "lib/Log/Any/Adapter/Syslog.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Adapter::Test" : {
+         "file" : "lib/Log/Any/Adapter/Test.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Adapter::Util" : {
+         "file" : "lib/Log/Any/Adapter/Util.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Manager" : {
+         "file" : "lib/Log/Any/Manager.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Proxy" : {
+         "file" : "lib/Log/Any/Proxy.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Proxy::Null" : {
+         "file" : "lib/Log/Any/Proxy/Null.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Proxy::Test" : {
+         "file" : "lib/Log/Any/Proxy/Test.pm",
+         "version" : "1.049"
+      },
+      "Log::Any::Test" : {
+         "file" : "lib/Log/Any/Test.pm",
+         "version" : "1.049"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/preaction/Log-Any/issues"
+      },
+      "homepage" : "https://github.com/preaction/Log-Any",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/preaction/Log-Any.git",
+         "web" : "https://github.com/preaction/Log-Any"
+      }
+   },
+   "version" : "1.049",
+   "x_authority" : "cpan:PREACTION",
+   "x_contributors" : [
+      "bj5004 <bartosz.jakubski@hurra.com>",
+      "cm-perl <cm-perl@users.noreply.github.com>",
+      "Lucas Kanashiro <kanashiro.duarte@gmail.com>",
+      "Maros Kollar <maros.kollar@geizhals.at>",
+      "Maxim Vuets <maxim.vuets@booking.com>",
+      "mephinet <mephinet@gmx.net>",
+      "Philipp Gortan <philipp.gortan@apa.at>",
+      "Stephen Thirlwall <sdt@dr.com>",
+      "Stephen Thirlwall <stephen.thirlwall@strategicdata.com.au>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
+}
+

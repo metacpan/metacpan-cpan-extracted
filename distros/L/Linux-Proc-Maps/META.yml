@@ -1,0 +1,51 @@
+---
+abstract: 'Read and write /proc/[pid]/maps files'
+author:
+  - 'Charles McGarvey <chazmcgarvey@brokenzipper.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Path::Tiny: '0'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - linux
+  - proc
+  - procfs
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-Proc-Maps
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Linux::Proc::Maps:
+    file: lib/Linux/Proc/Maps.pm
+    version: '0.002'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::Spec::Functions: '0'
+  namespace::clean: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/chazmcgarvey/Linux-Proc-Maps/issues
+  homepage: https://github.com/chazmcgarvey/Linux-Proc-Maps
+  repository: https://github.com/chazmcgarvey/Linux-Proc-Maps.git
+version: '0.002'
+x_authority: cpan:CCM
+x_serialization_backend: 'YAML::Tiny version 1.69'

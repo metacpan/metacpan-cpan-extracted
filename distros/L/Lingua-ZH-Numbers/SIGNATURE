@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a7e3987ff7124d832aea0d36613d85eca013121f Changes
+SHA1 6f79e475a9a6f3898e51e28abe254a9c7cf16475 MANIFEST
+SHA1 f489dd2f57e9c23a2131339f5faeaa828cf1f7dd META.yml
+SHA1 da4497f86a0b7e7097f59e1970c58439180e7638 Makefile.PL
+SHA1 9593a3549b3cce464cebc9d4cc803ab04054e6db README
+SHA1 70167f0c4fe8eda21309675d92ff9ed0affbc8ad inc/Module/Install.pm
+SHA1 f0d2e3bd1c59057783c09cd91f8520de97c7b9b3 inc/Module/Install/Base.pm
+SHA1 e8bb64413dfd4f6e585ab4044bee1723a2c9eb92 inc/Module/Install/Can.pm
+SHA1 fdda1313f55011a27a7c5dcdc5d580c862125039 inc/Module/Install/Fetch.pm
+SHA1 2e7337f5a52849b9340b21cadcea3d1e843340df inc/Module/Install/Makefile.pm
+SHA1 0498bcc5507c0f656774bdcbdd5014ed4d67366a inc/Module/Install/Metadata.pm
+SHA1 af0f1005ac10fa88979d21f8459d46e0a065a4a1 inc/Module/Install/Win32.pm
+SHA1 239c6e05cda397db72b339377949f715b39f6b37 inc/Module/Install/WriteAll.pm
+SHA1 26b2fab636a9d401f2f1fa5ffe30416853eab28f lib/Lingua/ZH/Numbers.pm
+SHA1 40cd1c2a6f33ae2ca76d9e6139dae4b09fe9ab09 lib/Lingua/ZH/Numbers/Currency.pm
+SHA1 bfee5fe6451cc2bea9bb0cd5bcd54009524d91f2 t/0-signature.t
+SHA1 3519b60e7feacd012c19711f9a7c22047edcadbe t/1-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (Darwin)
+
+iD8DBQFBPyUttLPdNzw1AaARAtCtAJ4o+33o3xXLf3rQf5mrFkE+mSFoHwCeNOJE
+kCKROzA63p4rPf32dhpApJA=
+=Fi1N
+-----END PGP SIGNATURE-----

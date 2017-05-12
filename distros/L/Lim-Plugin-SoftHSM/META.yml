@@ -1,0 +1,37 @@
+--- #YAML:1.0
+name:               Lim-Plugin-SoftHSM
+version:            0.14
+abstract:           SoftHSM management plugin for Lim
+author:
+    - Jerry Lundström <lundstrom.jerry@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    common::sense:  3
+    Digest::SHA:    5
+    Getopt::Long:   2
+    Lim:            0.16
+    Pod::Usage:     1
+    Scalar::Util:   1
+    Test::More:     0
+requires:
+    common::sense:  3
+    Digest::SHA:    5
+    Getopt::Long:   2
+    Lim:            0.16
+    Pod::Usage:     1
+    Scalar::Util:   1
+resources:
+    bugtracker:  http://github.com/jelu/lim-plugin-softhsm/issues
+    homepage:    http://github.com/jelu/lim-plugin-softhsm/wiki
+    repository:  http://github.com/jelu/lim-plugin-softhsm
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

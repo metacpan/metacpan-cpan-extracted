@@ -1,0 +1,8 @@
+Build.PL
+lib/Log/ProgramInfo.pm
+Changes
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-my_test.t

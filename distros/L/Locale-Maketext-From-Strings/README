@@ -1,0 +1,147 @@
+NAME
+    Locale::Maketext::From::Strings - Parse Apple .strings files
+
+VERSION
+    0.03
+
+SYNOPSIS
+      use Locale::Maketext::From::Strings;
+
+      my $strings = Locale::Maketext::From::Strings->new(
+                      path => '/path/to/strings',
+                      namespace => 'MyApp::I18N',
+                      out_dir => 'lib',
+                    );
+
+      $strings->load; # in memory
+      $strings->generate; # to disk
+
+DESCRIPTION
+    This module will parse ".strings" file used in the Apple world and
+    generate in memory perl-packages used by the Locale::Maketext module.
+
+  Formatting rules
+    This module can parse most of the formatting mentioned here:
+    <http://blog.lingohub.com/developers/2013/03/i18n-resource-file-formats-
+    ios-strings-files/>.
+
+    *   Key-value pairs are delimited with the equal character (=), and
+        terminated by a semicolon (;).
+
+    *   Keys and values are surrounded by double quotes (").
+
+    *   Place-holders look can be: %.2f, %d, %1$s:
+
+          qr{\%[\d|\.]*\$*\d*[dsf]\b}
+
+    *   Comments start at the beginning of the line and span the whole line.
+
+    *   Multi-line comments are enclosed in /* */.
+
+    *   Single-line comments start with double slashes (//).
+
+    *   The specification says it expect UTF-16LE encoding by default, but
+        this module expect UTF-8 instead.
+
+        NOTE! This might change in future release. Pass "encoding" to
+        constructor if you want to be sure about the value.
+
+  Example file
+    This could be the content of "i18n/en.strings":
+
+      /* comments in .strings files
+      can be multi line,
+      single line */
+      // or combination of the two
+      "hello_user" = "Hello %1$s";
+
+      "Sample data" = "sample %s %d %.3f data";
+
+      // keys and values can be spread to multiple lines
+      "welcome_message" = "Welcome back,
+      we have missed you";
+
+    TIP! Adding the default value on the left side (instead of hello_user
+    and welcome_message) works better with Locale::Maketext since it will
+    use that as fallback if translation is missing.
+
+ATTRIBUTES
+  encoding
+    Holds the encoding used when reading the ".strings" files. Defaults to
+    "UTF-8".
+
+  namespace
+    Package name of where to "generate" or "load" code into. Default to the
+    caller namespace.
+
+  out_dir
+    Directory to where files should be written to. Defaults to "lib".
+
+  path
+    Path to ".strings" files. Defaults to "i18n".
+
+METHODS
+  new
+      $self = Locale::Maketext::From::Strings->new(%attributes);
+      $self = Locale::Maketext::From::Strings->new($attributes);
+
+    Object constructor.
+
+  generate
+      Locale::Maketext::From::Strings->generate($namespace);
+      $self->generate;
+
+    This method will write the I18N code to disk. Use this when the "load"
+    time goes up.
+
+    NOTE! This method does not check for existing files - they will be
+    overwritte without warning.
+
+    Example one-liners:
+
+      $ perl -MLocale::Maketext::From::Strings=generate -e1 MyApp::I18N
+      $ perl -Ilib -E'say +(require MyApp::I18N)->get_handle(shift)->maketext(@ARGV);' en "some key" ...
+
+  load
+      Locale::Maketext::From::Strings->load($path);
+      $self->load;
+
+    Will parse "language.strings" files from "path" and generage in-memory
+    packages in the given "namespace".
+
+    Example Mojolicious app:
+
+      package MyApp;
+      use Locale::Maketext::From::Strings;
+      use base 'Mojolicious';
+
+      sub startup {
+        my $self = sihft;
+        my $default_lang = 'en';
+
+        Locale::Maketext::From::Strings->load($self->home->rel_dir('i18n'));
+
+        $self->helper(l => sub {
+          my $c = shift;
+          $c->stash->{i18n} ||= MyApp::I18N->get_handle($c->session('lang'), $default_lang);
+          $c->stash->{i18n}->maketext(@_);
+        });
+      }
+
+    See also Mojolicious::Plugin::I18N.
+
+  parse
+      $data = $self->parse($file);
+
+    Will parse $file and store the key value pairs in $data.
+
+  import
+    See "generate" for example one-liner.
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

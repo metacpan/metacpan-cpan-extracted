@@ -1,0 +1,67 @@
+Linux-DVB-DVBT 
+==============
+
+Linux::DVB::DVBT is a package that provides an object interface to any installed Freeview 
+tuner cards fitted to a Linux PC. The package supports initial set up (i.e. frequency scanning),
+searching for the latest electronic program guide (EPG), and selecting a channel for recording
+the video to disk.
+
+Example scripts have been provided in the package which illustrate the expected use of the package (and
+are useable programs in themselves). For futher details please see 'perldoc Linux::DVB::DVBT'.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+LARGE FILE SUPPORT
+
+I've added the appropriate compile options to enable the module to be compiled with large file support. These options will be enabled
+if your Perl build supports it (set in your config.pm when Perl was installed). Without this, recordings were limited to 2G (approx 2 hours).
+
+If you find you still have problems recording large files, then you can always use dvbt-ffrec (instead of dvbt-record). This gets ffmpeg to
+do the work of creating the file (and transcoding it to mpeg format).
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+use File::Basename ;
+use File::Path ;
+use File::Spec ;
+use POSIX qw(strftime);
+
+
+DOCUMENTATION
+
+Along with the installed perldoc, you can optionally create the Doxygen HTML files for the C library. 
+This will be of little interest to general Perl users of the module, but may be of interest to developers
+or those that are trying to debug a problem with the module's interaction with their tuner.
+
+Just run
+
+	make doxygen
+	
+This will create HTML files in ./doxygen/html, the file ./doxygen/html/index.html is the top-level.
+
+DEBUG
+
+If you have any problems, particularly with scanning, please re-run with debug set to 15 and send me the
+log file (see my CPAN email). I'll try to fix the problem as soon as possible.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Steve Price
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

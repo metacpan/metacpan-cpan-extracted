@@ -1,0 +1,70 @@
+Revision history for Log-Deep
+
+0.3.5   2015-07-27
+        Updating for release of version 0.3.5
+        Added missing file (Ivan Wills)
+        Converted to Path::Tiny (Ivan Wills)
+        Fixed boilerplate (Ivan Wills)
+        Changed to test README.pod (Ivan Wills)
+
+0.3.4   2015-06-27
+        Updating for release of version 0.3.4
+        Switched tests to Test::Warnings (Ivan Wills)
+        Updated dependencies (Ivan Wills)
+        Fixed accedental test (Ivan Wills)
+        Updated boilerplate test (Ivan Wills)
+        Removed built files (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Build changes (Ivan Wills)
+
+0.3.3   2014-08-19
+        Updated to latest standard (Ivan Wills)
+        Removed no longer used dependency File::Slurp, and moved not required dependencies to recommends (Ivan Wills)
+        Removed File::Slurp dependency (Ivan Wills)
+        Cleaned up tests (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        Updated ignores (Ivan Wills)
+        Added configure requires section (Ivan Wills)
+        More ignore sorting (Ivan Wills)
+        Updated version number for next release (Ivan Wills)
+        Fixed missing use English statement (Ivan Wills)
+
+0.3.2   2010-08-02
+        Fixed some test failures for author tests
+
+0.3.1   2010-07-20
+        Added new dependencies
+        Added checks for log lines that are too long to process
+        Added truncating stack trace if too large
+        Fixed missing required modules
+        Updated package files to latest standard
+        Added more error checking code
+        Refactored data handling code into seperate functions
+        Trying harder to get full log lines
+        Sorted out some edge cases with displaying extra data
+        Forgot to release 0.3.0 :-)
+        Fixed typos
+        Updated/Fixed the documentation
+        upped version number
+        Added missing files
+        Removed optional modules
+        Added code to try to reduce the cpu usage of reading log files and reduce the warning messages produced
+        Added File package to load tests
+        Added code to try to better guarentee log messages get written to file, updated test up use that code
+        Cleaned up code/build files
+        Refactored out the file and line code into seperate modules and fixed the tests
+
+0.2.0   2009-05-23
+        Many stability improvements
+        Improved test coverage, particularly of Log::Deep::Read
+        Improved Documentation
+0.1.0   2009-05-16
+        Catalyst API compatibly synchronisation
+0.0.6   2009-05-11
+        Minor bug fix
+0.0.5   2009-05-12
+        Stuff happened
+0.0.1   2009-05-
+        First version, released on an unsuspecting world.
+

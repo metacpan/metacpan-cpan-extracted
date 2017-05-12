@@ -1,0 +1,4 @@
+name = "Log-Dispatch-Gelf"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/basic.pl
+lib/Log/Dispatch/Gtk2/Notify.pm
+lib/Log/Dispatch/Gtk2/Notify/Types.pm
+t/basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

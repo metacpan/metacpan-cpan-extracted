@@ -1,0 +1,27 @@
+Revision history for Perl extension Linux::Unshare.
+
+1.1   Mon Jan  1 00:38:33 2017
+    - updated copyright year
+    - fixed an error in the META.[json|yml] (I had mistakenly changed the name of the module to Linux::Setns in the json and yml files)
+
+1.00  Tue Nov  1 05:20:19 2016
+    - Added CLONE_NEWCGROUP flag
+
+0.05  
+    - Added CLONE_CONATAINER and CLONE_NEWUSER
+	- Added tests for CLONE_NEWUSER and CLONE_CONTAINER
+	- META.yml: Added repository and lincense resources to the meta description
+	- Makefile.PL: Added CLONE_NEWUSER
+	- Unshare.xs: Added CLONE_CONTAINER definition, which include CLONE_NEWNS, CLONE_NEWIPC, CLONE_NEWUTS, CLONE_NEWNET, CLONE_NEWUSER, CLONE_NEWPID
+
+0.04  Mon Jul 28 13:11:06 2014
+    - Added Marian as co-author of the module.
+	- Updated the README to include Marian
+	- Copyright updated to include Marian
+	- Added script for building the archive out of the current dir
+	- Added script to easily bump the version of the package
+    - README: Added the copyright notice to the top of the file as it is required by the perl distribution standard
+	- README: Removed the version from this file
+0.03  Thu Jul 24 08:08:58 2014
+    - Added tests for CLONE_FILES, CLONE_NEWUTS, CLONE_SYSVSEM, CLONE_NEWIPC, CLONE_NEWNET
+

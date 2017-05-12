@@ -1,0 +1,118 @@
+NAME
+
+Lingua::EN::AddressParse - extract components of a street address from free format text
+
+SYNOPSIS
+
+    use Lingua::EN::AddressParse;
+
+    my %args =
+    (
+      country     => 'US',
+      auto_clean  => 1,
+      force_case  => 1,
+      abbreviate_subcountry => 0,
+      abbreviated_subcountry_only => 1,
+      force_post_code => 0
+    );
+
+    my $address = Lingua::EN::AddressParse->new(%args);
+    $error = $address->parse("40 1/2 N OLD MASSACHUSETTS AVE APT 3B Washington Valley Washington 98100: HOLD MAIL");
+       
+    print $address->report;       
+       
+        Country address format  'US'
+        Address type            'suburban'
+        Non matching part       'HOLD MAIL '
+        Error                   '1'
+        Error descriptions      'non matching section : HOLD MAIL '
+        Warning                 '1'
+        Warning description     ''
+        Case all                '40 1/2 N Old Massachusetts Ave Apt 3B Washington Valley WA 98100'
+        COMPONENTS              ''
+        base_street_name        'Old Massachusetts'
+        post_code               '98100'
+        property_identifier     '40 1/2'
+        street_direction_prefix 'N'
+        street_name             'N Old Massachusetts'
+        street_type             'Ave'
+        sub_property_identifier '3B'
+        sub_property_type       'Apt'
+        subcountry              'WA'
+        suburb                  'Washington Valley'       
+
+    %address_components = $address->components;
+    print $address_components{sub_property_type};       # APT
+    print $address_components{sub_property_identifier}; # 3B
+    print $address_components{property_identifier};     # 40 1/2
+   
+    %address_properties = $address->properties;
+    print $address_properties{type};            # suburban
+    print $address_properties{non_matching};    # : HOLD MAIL
+
+    $correct_casing = $address->case_all;
+
+
+=head1 DESCRIPTION
+
+This module takes as input a suburban, rural or postal address in free format
+text such as,
+
+    3080 28TH AVE N ST PETERSBURG, FL 33713-3810
+    12 1st Avenue N Suite # 2 Somewhere CA 12345 USA
+    C/O JOHN, KENNETH JR POA 744 WIND RIVER DR SYLVANIA, OH 43560-4317
+
+    9 Church Street, Abertillery, Mid Glamorgan NP13 1DA
+    27 Bury Street, Abingdon, Oxfordshire OX14 3QT
+
+    2A LOW ST KEW NSW 2123
+    12/3-5 AUBREY ST MOUNT VICTORIA VICTORIA 3133
+    "OLD REGRET" WENTWORTH FALLS NSW 2782 AUSTRALIA
+    GPO Box K318, HAYMARKET, NSW 2000
+
+ 
+and attempts to parse it. If successful, the address is broken
+down into it's components and useful functions can be performed such as :
+
+    converting upper or lower case values to title case (2A Low St Kew NSW 2123)
+    extracting the addresses individual components      (2A,Low,St,KEW,NSW,2123)
+    determining the type of format the address is in    ('suburban')
+
+
+If the address cannot be parsed you have the option of cleaning the address
+of bad characters, or extracting any portion that was parsed and the portion
+that failed.
+
+This module can be used for analysing and improving the quality of
+lists of residential and postal addresses.
+
+
+HOW TO INSTALL
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    
+    or
+    
+    perl Build.PL
+    build
+    build test
+    build install
+
+AUTHOR
+
+AddressParse was written by Kim Ryan <<kimryan at cpan d o t org>
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2016 Kim Ryan. All rights reserved.
+
+This program is free software; you can redistribute it
+and/or modify it under the terms of the Perl Artistic License
+(see http://www.perl.com/perl/misc/Artistic.html).
+
+
+
+

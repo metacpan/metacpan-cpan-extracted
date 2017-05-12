@@ -1,0 +1,85 @@
+		   Building Hugs on Win32 platforms
+		  ----------------------------------
+
+Last updated: 11/03/2003
+
+* Building Hugs sources + libraries
+
+- As the _build_ environment is Unix-slanted, you first 
+  need to have the following toolchains installed on your
+  Windows platform:
+  
+    * Install a recent version of the cygwin 
+      toolchain from
+  
+        http://www.cygwin.com/
+     
+    * Install the mingw tools:
+
+        http://www.mingw.org/
+
+    * Arrange for the mingw/bin directory to appear before
+      the cygwin directories in your PATH.
+
+- check out the Hugs sources following instructions
+  at http://cvs.haskell.org/
+
+- cd into the toplevel hugs98 directory.
+- check out the fptools library code:
+
+    foo$ make fptools
+    ..
+
+- preprocess the library sources for use by Hugs;
+
+    foo$ make pp-fptools HAPPY=/path/to/happy \
+                         FIND=/usr/bin/find \
+			 HSC2HS=/path/to/hsc2hs \
+
+
+  FIND is set explicitly to avoid picking up the Microsoft's
+  'find' utility. There's no need to set HSC2HS or HAPPY
+  if 'hsc2hs' and 'happy' is available via your PATH setting.
+  
+  'hsc2hs' comes with GHC
+  
+  'happy' is the Happy parser generator available via
+  http://haskell.org/happy/
+
+- Compile up the Hugs sources:
+
+    foo$ make EXTRA_CONFIGURE_OPTS=--build=i386-unknown-mingw32
+
+- assuming that went OK, compile up some FFI stub libraries:
+
+    foo$ cd src
+    foo$ make ffi_libraries
+
+- test the bits:
+
+    foo$ export HUGSDIR=/path/to/hugs98/hugsdir
+    foo$ ./hugs
+
+
+* Building the Hugs sources using MSVC
+
+- To compile the interpreter using an MS VC++ compiler, you need
+  to copy msc/{config,options,platform}.h into the src/ directory:
+
+    foo$ cd /path/to/hugs98/src/
+    foo$ cp msc/config.h msc/options.h msc/platform.h .
+    foo$ nmake -f msc/Makefile
+
+  (Using 'make' would also work.)
+
+* Building WinHugs using MSVC
+
+- Same deal as when compiling Hugs using MSVC, but this time
+  use the winhugs/ subdirectory:
+
+    foo$ cd /path/to/hugs98/src/
+    foo$ cp winhugs/config.h winhugs/options.h winhugs/platform.h .
+    foo$ nmake -f winhugs/Makefile
+
+  (Using 'make' would also work.)
+

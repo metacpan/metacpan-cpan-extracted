@@ -1,0 +1,15 @@
+Revision history for Perl extension Lingua::RU::Charset.
+
+0.01 1999-10-16
+
+	- implemented koi2win, win2koi, koi2alt, alt2koi, koi2iso, iso2koi,
+	  koi2mac, mac2koi, koi2rus, koi2lc, koi2uc, win2lc, win2uc, alt2lc,
+	  alt2uc, iso2lc, iso2uc, mac2lc, mac2uc
+	  
+0.02 1999-10-31
+
+        - fixed the functions above
+	- added uni2lc, uni2uc
+	- the "perl Makefile.PL PREFIX=/home/alex" installation method does 
+	  not work  on my computer, but it seems to be the problem of the 
+	  Debian 2.1 Linux (you can still copy the Charset.pm manually)

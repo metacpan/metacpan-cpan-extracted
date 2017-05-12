@@ -1,0 +1,35 @@
+0.06 2015-10-22T11:27:41+02:00
+ [Common]
+ - Move author tests to xt/ directory.
+
+ [Log::FreeSWITCH::Line]
+ - Add SEE ALSO section to doc.
+
+ [Log::FreeSWITCH::Line::Data]
+ - Improve and fix SEE ALSO section in doc.
+
+0.05 2015-05-19T17:02:04+02:00
+ [Common]
+ - Update Module::Install to 1.16 version.
+
+ [Log::FreeSWITCH::Line]
+ - Add tests.
+ - Improve parse() subroutine to parse time without miliseconds.
+ - Remove warning in serialize() with data object without message.
+
+0.04 2015-01-09T07:42:44+01:00
+ [Log::FreeSWITCH::Line::Data]
+ - Fix test dependency for DateTime module.
+
+0.03 2015-01-08T19:59:22+01:00
+ [Common]
+ - Fix dependencies, which breaks tests (bad Error::Pure::Always).
+
+0.02 2015-01-08T01:30:56+01:00
+ [Log::FreeSWITCH::Line::Data]
+ - Add missing VERSION.
+ - Add tests.
+ - Fix time without miliseconds.
+
+0.01 2015-01-04T11:16:34+01:00
+ - First version.

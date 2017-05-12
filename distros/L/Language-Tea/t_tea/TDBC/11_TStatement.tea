@@ -1,0 +1,14 @@
+
+define a [new TConnection "uma.base.de.dados" "user" "pass"]
+
+define b [$a statement]
+
+define c [$b execute "select * fromo qq coisa"]
+define d [$b getFetchSize]
+define e [$b getMoreResults]
+define f [$b getResultSet]
+define g [$b query "select * from xotas"]
+$b setFetchSize 12
+define i [$b update "update * "]
+
+$b close

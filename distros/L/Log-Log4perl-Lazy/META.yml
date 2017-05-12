@@ -1,0 +1,25 @@
+---
+abstract: 'Lazily evaluate logging arguments'
+author:
+  - 'Mahiro Ando <mahiro@cpan.org>'
+build_requires:
+  Test::More: 0
+  Test::Output: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.132620'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Log4perl-Lazy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Log::Log4perl: 1.42
+  Params::Lazy: 0.005
+  perl: 5.008
+version: 0.02

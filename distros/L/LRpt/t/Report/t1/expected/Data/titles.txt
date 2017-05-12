@@ -1,0 +1,1 @@
+title_id	title	type	pub_id	price	advance	ytd_sales	contract	notes	pubdate

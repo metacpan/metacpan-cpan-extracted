@@ -1,0 +1,63 @@
+Revision history for Perl extension Logfile::EPrints.
+
+1.20
+	- Simplified bracketed logs parsing (single regexp)
+	- Will now croak if a date is unparseable
+	- Fixed some undef warnings so they carp
+
+1.19
+	- Deprecated Institution.pm and moved its functionality into Hit
+	- Moved all of the methods from ::Combined into ::Hit
+	- Now returns *gmtime* from datetime, to be consistent with utime (should fix failed test cases on non-GMT machines)
+	- Replaced initialise_geo_ip with load_country_db, now requires a filename
+	- Added organisation/load_org_db methods to look up the organisation name from Maxmind
+	- Added requirement for Encode (used by org database)
+
+1.18
+	- Replaced DB_File with SDBM_File in RobotsTxt filter
+	- Modified Repeated filter to use an SDBM_File for persistent storage
+	- Tightened up test cases for RobotsTxt and Repeated
+
+1.17
+	- Fix bug in Geo::IP usage (->open rather than ->new)
+	- Search the @INC path for robots.pm and search_engines.pm
+	- Warn on non-page DSpace log request
+
+1.16
+	- Fix warning in Session on non fulltext/abstract hits
+	- Handle old-style eprints URLs of /archive/0000XXXX/YY/
+
+1.15
+	- Use Geo::IP::PurePerl or Geo::IP
+	- Added class method to explicitly open the GeoIP database
+	- Don't require HTTP::OAI - to use Parser::OAI you will need to use() it
+	- If a fulltext request is preceeded by an abstract request in the same session and for the same object (based on $hit->identifier) add the abstract request to $hit->{abstract_referrer}
+
+1.14
+    - Completely removed Logfile::EPrints::arXiv to fix test errors
+
+1.13
+	- Added Logfile::EPrints::Filter::Debug class
+	- Added alpha 'session' support: see Logfile::EPrints::Filter::Session
+	- Sessions are groups of requests by the same address upto 10 minutes apart
+	- Added MaxPerSession filter to ignore requests in the same session beyond a maximum number
+	- Added Filter base class (Logfile::EPrints::Filter)
+	- Added Logfile::EPrints::Hit::Negate to trigger removal of requests that already went through a filter (alpha)
+	
+1.12
+	- Fixes to arXiv log support
+	- Get IP address on demand Logfile::EPrints::Hit
+	- Added test case for IP address lookup (based on localhost)
+	- Added a basic mapping for DSpace logs
+	- Moved all mapping modules into Logfile::EPrints::Mapping::*
+
+1.06
+	- Shifted all modules into the Logfile::EPrints
+	  namespace
+	- Added 'Period' filter module, to skip over leading
+	  records
+
+1.00  Thu Mar 10 14:34:24 2005
+	- original version; created by h2xs 1.23 with options
+		-v 1.00 -X -n EPrints::ParseLog
+

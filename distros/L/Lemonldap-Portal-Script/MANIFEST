@@ -1,0 +1,18 @@
+Changes
+eg/complet_example.pl
+eg/parsing_example.pl
+eg/robot_apache_conf.templ
+eg/robot_cookies.templ
+eg/robot_data.templ
+eg/robot_entete.templ
+eg/robot_header.templ
+eg/robot_question.templ
+eg/robot_redirection.templ
+eg/robot_response.templ
+eg/robot_suite.templ
+lib/Lemonldap/Portal/Script.pm
+Makefile.PL
+MANIFEST
+README
+t/Lemonldap-Portal-Script.t
+META.yml                                 Module meta-data (added by MakeMaker)

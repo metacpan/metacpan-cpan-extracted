@@ -1,0 +1,97 @@
+=encoding utf8
+
+=head1 NAME
+
+Lingua::RU::Money::XS - Perl extension for digit conversion to corresponding
+money sum in Russian.
+
+=begin HTML
+
+<div id="images">
+	<img src="https://travis-ci.org/igormunkin/Lingua-RU-Money-XS.svg?branch=master" alt="Travis CI Build status (master)"/>
+	<img src="https://coveralls.io/repos/github/igormunkin/Lingua-RU-Money-XS/badge.svg?branch=master" alt="Coverage Status (master)"/>
+	<img src="https://img.shields.io/cpan/v/Lingua-RU-Money-XS.svg" alt="Cpan version"/>
+	<img src="https://img.shields.io/cpan/l/Lingua-RU-Money-XS.svg" alt="Cpan licence"/>
+</div>
+
+=end HTML
+
+=head1 SYNOPSIS
+
+  use Lingua::RU::Money::XS qw(rur2words);
+  print rur2words(123456789012345.00)
+  # outputs "сто двадцать три триллиона четыреста пятьдесят шесть миллиардов семьсот восемьдесят девять миллионов двенадцать тысяч триста сорок пять рублей 00 копеек"
+
+=head1 DESCRIPTION
+
+=head2 SUBROUTINES
+
+=over 4
+
+=item B<Lingua::RU::Money::XS::rur2words>
+
+C<rur2words> returns a given as number money sum in words, i.e. I<5.16> converts
+to I<пять рублей 16 копеек>. The target charset is B<UTF-8>.
+
+B<Caution>: Current implementation of C<rur2words> follows the Perl philosophy -
+anyway the given argument will be casted to C<double>.
+
+B<Caution>: Due to previous caution there are several constraints, making
+conversion impossible. These constraints divide input values into 4 groups
+listed below
+
+=over 8
+
+=item I<amount less than 0>
+
+Conversion for specified values make no sense. Thus, C<rur2words> croaks for all
+these values.
+
+=item I<amount between 0 and 1e12>
+
+Any value in this range converts correctly with the specified accuracy.
+
+=item I<amount between 1e12 and 1e15>
+
+Due to the lack for significant digits after the radix point for some values in
+this range, kopeck value is calculated inaccurate. It simply is replaced with
+the 0 with the corresponding warning.
+
+=item I<amount greater or equal than 1e15>
+
+Conversion for these values is impossible due to the type overflow. C<rur2words>
+also croaks for all these values.
+
+=back
+
+=back
+
+=head2 EXPORT
+
+Nothing is exported by default.
+
+=head2 SUPPORTED VERSIONS OF PERL
+
+Please note that this module works only on Perl 5.16.0 and newer.
+
+=head1 AUTHOR
+
+Igor Munkin, E<lt>imun@cpan.orgE<gt>
+
+=head1 ACKNOWLEDGEMENTS
+
+Mons Anderson - The original idea, rationale and motivation
+
+=head1 BUGS
+
+Feel free to report your bugs by mailing to E<lt>imun@cpan.orgE<gt> or via
+L<https://github.com/igormunkin/Lingua-RU-Money-XS/issues>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Igor Munkin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.0 or,
+at your option, any later version of Perl 5 you may have available.
+

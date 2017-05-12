@@ -1,0 +1,67 @@
+Revision history for Perl extension Lingua::JA::Regular::Unicode
+
+0.13 2016-12-14T00:46:07Z
+
+    - Added replacement characters
+      \x{2019} and \x{201d}
+      (K)
+
+0.12 2013-05-07T05:05:56Z
+
+    - Refactoring prereqs.
+      (tokuhirom)
+
+0.11 2013-05-07T04:53:41Z
+
+    - return undef if argument is undef.
+      (tokuhirom)
+
+0.10
+
+    - doc enhancements
+
+0.09
+
+    - bug fix on perl 5.16.0.
+      https://github.com/tokuhirom/p5-lingua-ja-regular-unicode/issues/1
+      (reported by pawa++)
+
+0.08
+
+    - fixed deps, agian
+
+0.07
+
+    - fixed deps
+
+0.06
+
+    - modernize packaging
+
+0.05
+
+    - fixed synopsis(reported by tomita++)
+
+0.04
+
+    - added alnum_h2z function(walf443++)
+
+0.03
+
+    - this module requires perl 5.8.1.
+      dankogai-san says "tr/// on 5.8.0 is buggy!"
+
+0.02
+
+    - added space_h2z method
+    - pinpoint optimize(thanks to abe++)
+
+0.01_02
+
+        - added katakana_z2h
+        - added katakana_h2z
+        - added katakana2hiragana
+
+0.01_01  Fri Oct 17 16:35:25 2008
+        - development release
+

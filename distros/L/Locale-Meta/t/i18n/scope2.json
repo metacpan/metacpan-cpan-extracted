@@ -1,0 +1,12 @@
+{
+  "en_gb": {
+    "color": {
+      "trans": "colour"
+    }
+  },
+  "en": {
+    "color": {
+      "trans": "color"
+    }
+  }
+}

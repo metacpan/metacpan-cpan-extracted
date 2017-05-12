@@ -1,0 +1,139 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature 'say';
+use Liquibase::Git;
+use Getopt::Long::Descriptive;
+
+# PODNAME: liquibase-git
+
+
+
+my ($opt, $usage) = describe_options(
+  '%c %o',
+  ['username|u=s',          'the username', { required => 1 }],
+  ['password|p=s',          'the password', { required => 1 }],
+  ['db=s',                  'the name of the database', { required => 1 }],
+  ['hostname|h=s',          'the db host', { required => 1 }],
+  ['git-changeset-dir|d=s', 'the RELATIVE (not absolute) changeset directory inside the app git repo eg liquibase/mydb', { required => 1 }],
+  ['git-changeset-file|c=s','the xml file in the changeset-dir-leaf directory dictating which changes to apply', { required => 1 }],
+  ['git-repo|r=s',          'the git repo containing the db changeset', { required => 1 }],
+  ['git-identifier|i=s',    'a git tag, branch or commit on which to base the changes',
+                              { default => 'master'}],
+  ['db-type|t=s',           'the type of the database - postgresql or mysql', { required => 1 }],
+  ['classpath|j:s',         'the classpath for the JDBC' ],
+  ['action|a=s',            '"update" or "updateSQL"',
+                              { default => 'updateSQL' }, one_of => [qw/update updateSQL/]],
+);
+
+my %params = (
+  username            => $opt->username,
+  password            => $opt->password,
+  db                  => $opt->db,
+  hostname            => $opt->hostname,
+  git_changeset_dir   => $opt->git_changeset_dir,
+  git_changeset_file  => $opt->git_changeset_file,
+  git_repo            => $opt->git_repo,
+  git_identifier      => $opt->git_identifier,
+  db_type             => $opt->db_type,
+  action              => $opt->action,
+);
+
+$params{classpath} = $opt->classpath if $opt->classpath;
+
+my $liquibase = Liquibase::Git->new(
+ %params
+);
+
+if ($params{action} eq 'update'){
+  $liquibase->update;
+}
+else {
+  $liquibase->updateSQL;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+liquibase-git
+
+=head1 VERSION
+
+version 0.0.1
+
+=head1 DESCRIPTION
+
+Assume you have an app with:
+* git repo https://github.com/foo/myapp.git
+  containing a liquibase changeset
+* a database mydb-db1
+* a database host db1.myapp.com
+
+The following CLI
+
+  $ liquibase-git \
+     --username liquibase \
+     --password foobar \
+     --db mydb-db1 \
+     --hostname db1.myapp.com \
+     --git-repo https://github.com/foo/myapp.git \
+     --git-changeset-dir db/db1 \
+     --git-identifier master \
+     --db-type postgresql \
+     --changeset-file changeset.xml \
+     --action update
+
+applies the sql changes defined by
+
+  https://github.com/foo/myapp.git:db/db1/changeset.xml
+
+on the database mydb-db1.
+
+  --action updateSQL
+
+simply outputs the SQL which would be run.
+
+If no action is defined, updateSQL is the default.
+
+__THIS IS A DEVELOPMENT RELEASE. MAY CHANGE WITHOUT NOTICE__.
+
+=head2 CLI
+
+  liquibase-git [parameters]
+
+=head3 parameters
+
+  -u --username               the username
+  -p --password               the password
+     --db                     the name of the database
+  -h --hostname               the db host
+  -d --git-changeset-dir      the RELATIVE (not absolute) changeset
+                              directory inside the app git repo eg
+                              liquibase/mydb
+  -c --git-changeset-file     the xml file in the changeset-dir-leaf
+                              directory dictating which changes to apply
+  -r --git-repo               the git repo containing the db changeset
+  -i --git-identifier         a git tag, branch or commit on which to
+                              base the changes
+  -t --db-type                the type of the database - postgresql or
+                              mysql
+  -j --classpath              the jar file in support of db-type
+
+=head1 AUTHOR
+
+Andrew Solomon <andrew.solomon@net-a-porter.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Net-a-Porter.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

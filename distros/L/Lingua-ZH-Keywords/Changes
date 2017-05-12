@@ -1,0 +1,58 @@
+____________________________________________________________________________
+[  3723] By: autrijus                              on 2003/01/20  22:15:45
+        Log: * 0.04.
+	   ! Keywords.pm
+____________________________________________________________________________
+[  3716] By: autrijus                              on 2003/01/20  18:22:48
+        Log: * the 'One' proves to be a single-word stopper.
+	   ! Keywords.pm
+____________________________________________________________________________
+[  3714] By: autrijus                              on 2003/01/20  18:08:46
+        Log: * try again.
+	   ! Keywords.pm
+____________________________________________________________________________
+[  3713] By: autrijus                              on 2003/01/20  18:07:50
+        Log: * keywords() was not exported at all. duh.
+	   ! Keywords.pm
+____________________________________________________________________________
+[  3704] By: autrijus                              on 2003/01/20  15:02:52
+        Log: * changes and signatures.
+	   ! Changes SIGNATURE
+____________________________________________________________________________
+[  3703] By: autrijus                              on 2003/01/20  15:02:12
+        Log: * This be 0.03.
+             * both 5.6.1 and 5.8 pass tests here.
+	   ! Keywords.pm t/2-utf8.t
+____________________________________________________________________________
+[  3702] By: autrijus                              on 2003/01/20  14:55:50
+        Log: * 0.03.
+             * double oops! juxtaposed refcount and freq. 
+	   ! Keywords.pm
+____________________________________________________________________________
+[  3701] By: autrijus                              on 2003/01/20  14:55:35
+        Log: * oops! didn't fix the utf8 test.
+	   ! t/2-utf8.t
+____________________________________________________________________________
+[  3700] By: autrijus                              on 2003/01/20  14:53:57
+        Log: * changes and signatures.
+	   ! Changes SIGNATURE
+____________________________________________________________________________
+[  3699] By: autrijus                              on 2003/01/20  14:50:03
+        Log: * 0.02.
+             * Tie-breaking algorithm (freq, then lexical order)
+	       employed
+             to solve dependency on hash ordering.
+	   ! Keywords.pm t/1-basic.t
+____________________________________________________________________________
+[  3692] By: autrijus                              on 2003/01/20  11:15:45
+        Log: * oops, should've run podchecker first.
+	   ! Keywords.pm
+____________________________________________________________________________
+[  3691] By: autrijus                              on 2003/01/20  11:09:21
+        Log: * changes and signatures.
+	   + Changes SIGNATURE
+____________________________________________________________________________
+[  3690] By: autrijus                              on 2003/01/20  11:08:53
+        Log: * Lingua::ZH::Keywords 0.01.
+	   + Keywords.pm MANIFEST Makefile.PL README
+	   + t/0-signature.t t/1-basic.t t/2-utf8.t

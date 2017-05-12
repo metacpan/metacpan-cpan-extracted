@@ -1,0 +1,187 @@
+#!/usr/bin/perl
+#
+# lw4ToODS
+#
+
+
+=head1 NAME
+
+lw4ToODS - Convert a Lightwright 4 file into an OpenDcument Spreadsheet.
+
+=head1 SYNOPSIS
+
+lw4ToODS lightwright_file.lw4 [opendoc_sheet.ods]
+
+=head1 DESCRIPTION
+
+Creates an OpenOffice.org spreadsheet file and populates its first sheet
+from a Lightwright 4 file, creating a simple header to delineate values.
+If no ODS file is specified, the name of the Lightwright file with the .ods
+extension will be used.
+
+The OpenOffice spreadsheet is created. Any file with the same name is
+replaced.
+
+=head1 SEE ALSO
+
+LW4::Reader
+OpenOffice::OODoc
+
+Lightwright software and documentation is available through John McKernon
+Software at http://www.mckernon.com
+
+=head1 AUTHOR
+
+Tony Tambasco, E<lt>tambascot(at)yahoo{dot}comE<gt>
+
+This library is not developed by or with, or endorsed by John McKernon
+Software, nor is the author affiliated with John McKernon Software in
+any way. 
+
+If you have questions about Lightwright software itself, or would like
+to purchase Lightwright, please contact John McKernon at
+E<lt>help2006(at)mckernon{dot}comE<gt> or visit his website:
+http://www.mckernon.com
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009 by Tony Tambasco
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This library is not developed by or with, or endorsed by John McKernon
+Software, nor is the author affiliated with John McKernon Software in
+any way. 
+
+"Lightwright" is copyright 1999 - 2003 by John McKernon Software, all
+rights reserved. 
+
+=cut
+
+use strict;
+#use warnings;
+use LW4::Reader qw ( read_header read_item_info );
+use OpenOffice::OODoc;
+
+my ($lw4_file, $ods_file) = @ARGV;
+
+# Make sure we at least have a Lightwright file to convert.
+
+die "Usage : lw4ToOSD <lw4 input file> [<ods output file>]\n"
+  if (!$lw4_file);
+
+# If no name was specified for the OSD file, generate it based on the
+# Lightwright file.
+
+if (!$ods_file) {
+  my @temp_buff = split /\//, $lw4_file;
+  my $base_name = $temp_buff[-1];
+  @temp_buff = split /\./, $base_name;
+  $ods_file = "$temp_buff[0]\.ods";
+}
+
+# Read in the Lightwright file.
+
+open my $lw4_file_fh, "$lw4_file" or die "Couldn't open $lw4_file:   $!\n";
+
+my $lw4_header               = read_header($lw4_file_fh);
+my $lw4_item_info_AoH     = read_item_info($lw4_file_fh);
+
+# The number of rows is the number of items in the file, plus some
+# space for a simple header.
+
+my $num_rows = ($lw4_header->{num_fixtures} + 4);
+
+# Create the OSD spreadsheet, and populate it with values from the
+# Lightwright file. 
+
+my $ods_doc = odfDocument(file   => $ods_file,
+			  create => 'spreadsheet',);
+
+# Set table to desired size
+
+$ods_doc->expandTable(0, $num_rows, 10);
+
+my $sheet = 0;
+
+# Create some basic header info.
+
+$ods_doc->updateCell($sheet, 0, 0, $lw4_header->{show_name});
+$ods_doc->updateCell($sheet, 1, 0, $lw4_header->{sub_head_1});
+$ods_doc->updateCell($sheet, 0, 2, $lw4_header->{save_date});
+$ods_doc->updateCell($sheet, 1, 2, $lw4_header->{save_time});
+
+$ods_doc->updateCell($sheet, 3, 0, "Unit Number");
+$ods_doc->updateCell($sheet, 3, 1, "Unit Type");
+$ods_doc->updateCell($sheet, 3, 2, "Wattage");
+$ods_doc->updateCell($sheet, 3, 3, "Color");
+$ods_doc->updateCell($sheet, 3, 4, "Channel");
+$ods_doc->updateCell($sheet, 3, 5, "Circuit");
+$ods_doc->updateCell($sheet, 3, 6, "Dimmer");
+$ods_doc->updateCell($sheet, 3, 7, "Position");
+$ods_doc->updateCell($sheet, 3, 8, "Purpose");
+$ods_doc->updateCell($sheet, 3, 9, "Pattern");
+
+
+# Populate the spreadsheet
+
+my $current_row = 4;
+
+for (my $i = 0; $i < $lw4_header->{num_fixtures}; $i++) {
+
+  # Cells that contain data we want to sort numerically need to
+  # be set to a floating point style manually.
+  my $cell = $ods_doc->getCell($sheet, $current_row, 0);
+  $ods_doc->cellValueType($cell, 'float');
+  $ods_doc->updateCell($sheet, $current_row, 0, 
+		       $lw4_item_info_AoH->[$i]->{unit});
+  
+  $ods_doc->updateCell($sheet, $current_row, 1,
+		       $lw4_item_info_AoH->[$1]->{type});
+
+  $cell = $ods_doc->getCell($sheet, $current_row, 2);
+  $ods_doc->cellValueType($cell, 'float');
+  $ods_doc->updateCell($sheet, $current_row, 2,
+		       $lw4_item_info_AoH->[$i]->{watts});
+  
+  $ods_doc->updateCell($sheet, $current_row, 3,
+		       $lw4_item_info_AoH->[$i]->{color});
+
+  $cell = $ods_doc->getCell($sheet, $current_row, 4);
+  $ods_doc->cellValueType($cell, 'float');
+  $ods_doc->updateCell($sheet, $current_row, 4,
+		       $lw4_item_info_AoH->[$i]->{channel});
+
+  $cell = $ods_doc->getCell($sheet, $current_row, 5);
+  $ods_doc->cellValueType($cell, 'float');
+  $ods_doc->updateCell($sheet, $current_row, 5,
+		       $lw4_item_info_AoH->[$i]->{circuit});
+
+  $cell = $ods_doc->getCell($sheet, $current_row, 6);
+  $ods_doc->cellValueType($cell, 'float');
+  $ods_doc->updateCell($sheet, $current_row, 6,
+		       $lw4_item_info_AoH->[$i]->{dimmer});
+  
+  $ods_doc->updateCell($sheet, $current_row, 7,
+		       $lw4_item_info_AoH->[$i]->{position});
+
+  $ods_doc->updateCell($sheet, $current_row, 8,
+		       $lw4_item_info_AoH->[$i]->{purpose});
+
+  $ods_doc->updateCell($sheet, $current_row, 9,
+		       $lw4_item_info_AoH->[$i]->{pattern});
+
+  $current_row++;
+
+}
+
+
+# Save the spreadsheet.
+$ods_doc->save;
+
+
+
+
+
+

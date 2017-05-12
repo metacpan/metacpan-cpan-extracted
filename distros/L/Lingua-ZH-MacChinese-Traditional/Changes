@@ -1,0 +1,19 @@
+Revision history for Perl module Lingua::ZH::MacChinese::Traditional.
+
+0.20  Sun Jul 31 20:19:58 2011
+    - fix the tarball with world writable files.
+
+0.04  Tue Jun  5 21:56:41 2007
+    - mkheader, split_into_char() - avoid unpack('C*') on unicode.
+
+0.03  Sat Apr 16 20:01:55 2005
+    - added mappings for 0x83-0x9F to C1 controls according to updated
+      CHINTRAD.TXT in www.unicode.org.
+    - added META.yml.
+    - added t/argu.t.
+
+0.02  Sat Oct 25 20:41:47 2003
+    - added addition.map, though no mapping is added.
+
+0.01  Sun Sep 28 11:26:01 2003
+    - original version;

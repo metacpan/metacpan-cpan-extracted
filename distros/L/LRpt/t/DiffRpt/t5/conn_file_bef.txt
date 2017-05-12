@@ -1,0 +1,20 @@
+#########################################################################
+#
+# $Id: conn_file_bef.txt,v 1.1 2006/09/10 18:44:29 pkaluski Exp $
+# $Name: Stable_0_16 $
+#
+# $Log: conn_file_bef.txt,v $
+# Revision 1.1  2006/09/10 18:44:29  pkaluski
+# Added new test for chunking. Modified all tests to accommodate new parameters layout.
+#
+# Revision 1.1  2006/01/14 12:43:07  pkaluski
+# New tool design
+#
+#
+#
+#########################################################################
+
+$dbh = DBI->connect( "DBI:CSV:csv_sep_char=\t;f_dir=t/DiffRpt/dbschema2",
+                        { RaiseError => 1 }
+                       );
+

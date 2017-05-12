@@ -1,0 +1,13 @@
+Revision history for Perl extension Lingua::JA::Romaji.
+
+0.01  Mon Jun 17 14:16:05 2002
+	- original version; created by h2xs 1.21 with options
+		-n Lingua::JA::Romaji -A -X
+
+0.02  Tue Jun 17 19:19:03 2002
+        Boneheaded errors fixed. 
+	testro program added.  
+        /v[aeiou/ ``hiragana'' added.
+
+0.03  Thu Jun 20 14:30:16 2002
+	Forgot the LICENSE statement in the README.

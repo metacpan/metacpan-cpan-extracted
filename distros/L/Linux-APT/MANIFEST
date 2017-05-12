@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Linux-APT.t
+lib/Linux/APT.pm
+META.yml                                 Module meta-data (added by MakeMaker)

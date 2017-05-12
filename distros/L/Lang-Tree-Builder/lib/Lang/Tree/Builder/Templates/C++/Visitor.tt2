@@ -1,0 +1,27 @@
+// [% warning %]
+
+class [% visitor.name("::") %] {
+
+[%- FOREACH class IN data.classes %]
+[%- IF class.is_concrete %]
+    /**
+     * @param [% class.name("::") %]* [% class.lastpart.uncamel %] a [% class.name("_") %] node
+     * @return array an array of the values returned by visiting each component.
+     */
+    void* visit([% class.name("::") %] *[% class.lastpart.uncamel %]) {
+        return this.combine(
+    [%- FOREACH arg IN class.args %]
+        [%- IF arg.is_substantial %]
+            [% class.lastpart.uncamel %]->[% arg.argname.getMethod %]()->accept(this)
+        [%- ELSE %]
+        [%- UNLESS arg.is_scalar %]// WARNING: no known implementation for [% arg.name %][% END %]
+            [% class.lastpart.uncamel %]->[% arg.argname.getMethod %]()
+        [%- END %]
+        [%- LAST IF loop.last %],
+    [%- END %]
+        );
+    }
+
+[%- END %]
+[%- END %]
+};

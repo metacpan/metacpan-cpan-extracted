@@ -1,0 +1,5 @@
+
+
+- add blacklists for additional language pairs
+- add a parameter to limit the size of blacklists
+- support other character encodings

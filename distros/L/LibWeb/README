@@ -1,0 +1,344 @@
+-*- README -*-
+
+$Id: README,v 1.9 2000/07/19 20:31:56 ckyc Exp $
+
+LibWeb-0.02 - A Perl library/toolkit for building Web applications.
+
+Copyright (c) 2000 Colin Kong.
+
+See LibWeb::Core, COPYING and LICENSE for usage and distribution rights.
+
+ ____________________________________________________________________
+|                                                                    |
+|                           CONTENTS                                 |
+|--------------------------------------------------------------------|
+|                                                                    |
+|	* Dependencies of libweb                                     |
+|                                                                    |
+|       * Features                                                   |
+|                                                                    |
+|	* Installation                                               |
+|                                                                    |
+|       * A note on ``make test''                                    |
+|                                                                    |
+|       * After installation: running sample scripts                 |
+|                                                                    |
+|	* Security issues					     |
+|                                                                    |
+|	* Uninstallation                                             |
+|                                                                    |
+|	* If you have problems                                       |
+|                                                                    |
+|____________________________________________________________________|    
+
+
+DEPENDENCIES OF LIBWEB
+----------------------
+The following non-standard perl's libraries are required,
+
+
+* Digest
+
+	http://search.cpan.org/search?dist=Digest-MD5
+
+* Crypt::CBC
+
+	http://search.cpan.org/search?dist=Crypt-CBC
+
+* Crypt::Blowfish (recommended)
+
+	http://search.cpan.org/search?dist=Crypt-Blowfish
+
+  or Crypt::DES
+
+	http://search.cpan.org/search?dist=Crypt-DES
+
+  or Crypt::IDEA
+
+	http://search.cpan.org/search?dist=Crypt-IDEA
+
+* DBI
+
+	http://search.cpan.org/search?dist=DBI
+
+* the specific DBD for your database, e.g. Msql-Mysql
+
+	http://search.cpan.org/search?dist=Msql-Mysql-modules
+
+* Mail::Sendmail, you definitely need this if your server doesn't have
+  sendmail (most unix servers have sendmail)
+
+	http://search.cpan.org/search?dist=Mail-Sendmail
+
+You need none of the above mentioned libraries if you are not going to
+use the user/session management and database APIs of LibWeb, namely
+LibWeb::Admin, LibWeb::Crypt, LibWeb::Database, LibWeb::Digest and
+LibWeb::Session.
+
+LibWeb currently does not have mod_perl support.
+
+
+FEATURES
+--------
+LibWeb is a Perl library/toolkit for building community web
+site/applications.
+
+Features:
+
+* Members and sessions management (authentication via cookies),
+
+* concise, database independent and easy to use database API with
+  enhanced MySQL support (planning),
+
+* template-driven, dynamic HTML page generation without using
+  PHP/ASP/SSI/Javascript, and
+
+* HTML widgets and themes.
+
+
+INSTALLATION
+------------
+In short, on your command line,
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+This will install the LibWeb package to standard locations
+on your machine.  You can check the values of these standard
+variables on your system with
+
+	perl '-V:install.*'
+
+And to check the sequence in which the library directories
+are searched by perl, run
+
+	perl -le 'print join $/, @INC'
+
+If the above doesn't work for you (for instance, you do not have make
+on your machine), try:
+
+	cp -R LibWeb /usr/local/lib/perl5
+	[ or cp it to other standard perl place on your machine ]
+
+If the above still doesn't work for you (for instance, you do not have
+shell access to your server), try upload the whole thing and its
+contents of the directory called ``LibWeb'' via ftp or any other means
+that are available to you to your server.
+
+For installing into non-standard location, use the PREFIX and
+LIB attribute.  PREFIX and LIB can be used to set several
+INSTALL* attributes in one go.  The quickest way to install
+LibWeb into a non-standard place might be (I recommend this)
+
+	perl Makefile.PL LIB=~/path_to/my_lib
+
+This will install the module's architecture-independent files
+into ~/path_to/my_lib, the architecture-dependent files
+into ~/path_to/my_lib/$archname/auto.
+
+Another way to specify many INSTALL directories with a single
+parameter is PREFIX.
+
+	perl Makefile.PL PREFIX=~
+
+This will replace the string specified by $Config{prefix} in
+all $Config{install*} values.
+
+Read Perl's Config, ExtUtils::MakeMaker and ExtUtils::MM_Unix
+manpage for more information.
+
+
+A NOTE ON ``make test''
+-----------------------
+``make test'' may generate some non-test or dependencies related
+error messages if perl cannot find/load any necessary perl
+library.  By default, ``make test'' will look for modules in
+these locations,
+
+1. '..','../blib/lib','../blib/arch' (with respect to ./t), and
+2. the standard @INC.
+	
+To check the standard @INC in which the library directories
+are searched by perl, run
+
+	perl -le 'print join $/, @INC'
+
+``make test'' simply prepends 1. to the standard @INC.
+
+If 1 and 2 do not cover the paths into which you have installed perl's
+standard library and LibWeb's dependencies (e.g. Crypt::Blowfish and
+DBI ...etc.  See the DEPENDENCIES section of this README for more
+information), you have to change the ``use lib ...'' line on top of
+every ./t/*.t test script either manually or perform the following
+stunt (replace YOUR_LIB_PATH according to your needs),
+
+	perl -i -p -e "s|use lib |use lib 'YOUR_LIB_PATH',|;" ./t/*.t
+
+then you can run or re-run ``make test''.
+
+If your perl is too old, for example, 5.004_04 built, you may get the
+following kind of error messages,
+
+	Ambiguous use of...
+
+This is probably harmless and you can still use LibWeb.
+
+
+AFTER INSTALLATION: RUNNING SAMPLE SCRIPTS
+------------------------------------------
+Eight samples can be found in ./eg,
+
+o MyHTML.pm
+o MyTheme.pm
+o USER_LOG.sql
+o USER_PROFILE.sql
+o dot_lwrc
+o lm.cgi
+o lw.cgi
+o style.css
+
+To use LibWeb and run the sample scripts,
+
+1. You must first edit dot_lwrc, chmod 600 it and make it Web
+inaccessible.  Depends on the user as which you run your web server
+and cgi scripts, the web server may not have enough privilege to read
+your 600 chmoded dot_lwrc, if this is the case, try chmod 640 or 644
+(but you run the risk of exposing the security sensitive data in your
+dot_lwrc; please e-mail me if there is a better way to solve the
+problem, thanks in advance).
+
+2. This step can be ignored if you are not going to use the
+users/sessions management and database APIs of LibWeb (namely
+LibWeb::Admin, LibWeb::Crypt, LibWeb::Database, LibWeb::Digest and
+LibWeb::Session).  Create the USER_PROFILE and USER_LOG table.  For
+example if your database is MySQL and `your_db_name' is your
+database's name,
+
+	mysql -p your_db_name < USER_LOG.sql
+	mysql -p your_db_name < USR_PROFILE.sql
+
+This will create both the USER_LOG AND USER_PROFILE tables. If you
+want to otherwise change the table names, edit these scripts before
+creating the tables and also you have to edit LibWeb's rc file
+accordingly since `USER_LOG' and `USER_PROFILE' are the defaults in
+the rc file.  If you have enough privilege, you should create a
+separate database for LibWeb and then create the two tables.
+
+3. After you have configured the rc file (e.g. dot_lwrc) and created
+the database tables, you should edit `lw.cgi', upload it to your
+cgi-bin, chmod 755 it and run it by using a browser.  What to edit in
+`lw.cgi'?  First, edit the first line so that it points to the perl
+interpreter on your server; for example, replace
+
+	#!/usr/bin/perl -w
+
+with
+
+	#!/usr/local/bin/perl -w
+
+and finally edit several variables between the line ``# Begin edit.'' 
+and the line ``# End edit.''.
+
+4. `lm.cgi' is a sample login script.  Edit and run it as you have
+done with `lw.cgi'.  `lm.cgi' can be invoked via a browser in two main
+ways, one for logging in and another for logging out,
+
+	http://www.your_site.org/cgi-bin/lm.cgi
+
+and
+
+	http://www.your_site.org/cgi-bin/lm.cgi?.a=logout
+
+5. MyHTML.pm is a sample perl class.  It demonstrates how to (ISA)
+make a sub-class of LibWeb::HTML::Default to customize the HTML
+display of Libweb applications.  Read the man page for
+LibWeb::HTML::Default for details.
+
+6. MyTheme.pm is a sample perl class.  It demonstrated how to (ISA)
+make a sub-class of LibWeb::Themes::Default to write your own theme.
+
+7. style.css is for cascading style sheet layout for your Web pages.
+I picked this one as an example because it makes your Web pages look
+good under both Linux's and Windows's Web browsers.  It is a modified
+version of the style sheet used at www.freebsdzine.org.
+
+Source codes for other full-blown LibWeb applications are available at
+
+	http://leaps.sourceforge.net
+
+
+SECURITY ISSUES
+---------------
+LibWeb's user and session management (authentication via cookie) is
+vulnerable to the recently found ``redirect'' attack.  The only fix I
+can think of is to check the referer of HTTP header rigorously.
+However this is not implemented in LibWeb-0.01 because ``referer'' can
+easily be faked too.  Hopefully this can be resolved in future releases.
+A discussion of the ``redirect'' attack is available at
+
+	http://lwn.net/2000/features/Redirect.phtml
+
+You should frequently change the values for following attributes in
+the rc file,
+
+	MAC_KEY
+	CIPHER_KEY
+	DIGEST_KEY
+
+If people know the values of all these keys, they can create a bogus
+authentication cookie themselves and fool the LibWeb's authentication
+scheme.  So change these values frequently as you would with any
+password.  I do not know how long those keys should be since it's not
+very clearly documented in the Crypt and Digest modules used by
+LibWeb.  For my site, I make them reasonably long (no rigorous
+definition).  I would really appreciate any comment and suggestion on
+that and other not yet addressed security issues.
+
+
+UNINSTALLATION
+--------------
+In short, on your command line (after ``make install''),
+
+	make uninstall
+
+if you have installed LibWeb into standard place (i.e. you
+have typed `perl Makefile.PL'), or
+
+	make Uninstall
+
+if you have installed LibWeb into non-standard places (i.e.
+you have typed something like
+`perl Makefile.PL LIB=~/path_to/my_lib').
+
+I believe in both cases an apology will be printed to you
+saying that you have to remove the installed files manually.
+Hopefully this will be resolved in next release of LibWeb.
+I am sorry.  Any good perl modules packager?
+
+
+IF YOU HAVE PROBLEMS
+--------------------
+First, read the FAQ and messages on message boards at
+
+	http://libweb.sourceforge.net
+
+If you can't fix it your self please post details to
+
+	libweb-devel@lists.sourceforge.net
+
+You can also cc them to me at
+
+	colin.kong@toronto.edu
+
+Please include IF POSSIBLE:
+
+1. A complete log of a complete build, e.g.:
+
+    perl Makefile.PL           (do a make realclean first)
+    make
+    make test
+    make test TEST_VERBOSE=1   (if any of the t/* tests fail)
+
+2. The output of perl -V

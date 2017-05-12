@@ -1,0 +1,32 @@
+---
+abstract: 'Xslate format parser'
+author:
+  - 'Kazuhiro Osawa E<lt>yappo {@} shibuya {dot} plE<gt>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4004, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Locale-Maketext-Extract-Plugin-Xslate
+no_index:
+  directory:
+    - inc
+provides:
+  Locale::Maketext::Extract::Plugin::Xslate:
+    file: lib/Locale/Maketext/Extract/Plugin/Xslate.pm
+    version: v0.0.3
+requires:
+  Locale::Maketext::Extract: 0
+  Text::Xslate: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.3

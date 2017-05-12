@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/double-vdso
+t/single-vdso
+t/smaps
+t/smaps64
+t/smaps-VmFlags
+t/01.t
+t/02.t
+t/03.t
+t/04.t
+t/06-VmFlags.t
+lib/Linux/Smaps.pm
+mk_README.sh
+perl-Linux-Smaps.spec
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Language/SIOD.pm
+lib/Language/SIOD_in.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+mzscheme.i
+README
+SIGNATURE			Public-key signature (added by MakeMaker)
+siod.h
+siod.html
+siod.i
+siod.README.txt
+siod_wrap.c
+siodp.h
+slib.c
+sliba.c
+slibu.c
+t/1-basic.t

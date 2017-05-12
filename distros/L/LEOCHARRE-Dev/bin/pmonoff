@@ -1,0 +1,162 @@
+#!/usr/bin/perl
+use strict;
+use LEOCHARRE::CLI2 ':all', 'm:oxw';
+use File::Trash qw/trash restore/;
+
+argv_files_count() or die("missing code files argument");
+
+$opt_o or $opt_x or die("missing on or off flag");
+$opt_m or die("missing module name");
+$opt_m=~/^[a-zA-Z]/ or die("bad module name");
+
+
+
+FILE: for my $abs( argv_files() ){
+   
+   my $mime = `file '$abs'`;
+   chomp $mime;
+   
+   my $isperl=0;
+   
+   if ($mime=~/perl/i){
+      $isperl=1;
+   }
+   else {
+      $abs=~/\.pl$|\.PL$|\.t$|\.pm$/ and $isperl = 1;
+   }
+
+   $isperl or debug("Not perl file: '$abs', skipping.") and next FILE;
+
+   my $lines = listslurp($abs);
+   
+   my $end = (scalar @$lines) - 1;
+   $end or die("no lines in $abs?");
+
+   my $changes=0;
+   
+   for my $index(0 .. $end ){
+      ($lines->[$index]=~/^__END__|^=/) and last;
+      if ( $opt_o ){
+         ($lines->[$index]=~s/^\s*#\s*(use \Q$opt_m\E.*)/$1/) and $changes++;
+      }
+      elsif ( $opt_x ){
+         ($lines->[$index]=~s/^\s*(use \Q$opt_m\E.*)/# $1/) and $changes++;
+      }
+   }
+   
+   $changes or debug("No changes to $abs");
+
+   if ($opt_w){
+      $changes or next FILE;
+      debug("w flag overrite- is on, $changes changes to '$abs'.");
+      
+      
+      my $abs_old = trash($abs)
+         or die("Cannot move file $abs");
+      
+      
+      if ( open(MOD,'>',$abs) ){
+         print MOD @$lines;
+         close MOD;
+         warn("Saved '$abs', backup sent to: '$abs_old'");
+         
+         next FILE;         
+      }
+      else {
+         restore($abs_old) or warn("Could not restore '$abs_old'!");
+         die("Could not open file for writing! $!");
+      }  
+   }
+
+   print @$lines;
+}
+
+
+exit;
+
+
+sub listslurp {
+   my $abs = shift;
+   open(IN, '<', $abs ) or die("cannot open $abs, $!");
+   my @lines = <IN>;
+   close IN;
+   return \@lines;
+}
+   
+
+
+
+
+
+
+sub usage {q/pmonoff [OPTION].. [FILE]..
+This alters code.
+It searches for a module and looks for use statments, and turns them on or off.
+Prints to stdout.
+This is useful for Smart::Comments for example.
+
+   -h          help
+   -m string   module name
+   -o          turn on
+   -x          turn off
+   -v          version
+   -d          debug
+   -w          backup old file and overrite changes instead of stdout
+
+Try 'man pmonoff' for more info.
+/}
+
+
+
+
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pmonoff - alter code to use or not use modules
+
+=head1 DESCRIPTION
+
+This alters code.
+It searches for a module and looks for use statments, and turns them on or off.
+Prints to stdout.
+This is useful for Smart::Comments for example.
+
+=head1 USAGE
+
+pmonoff [OPTION].. [FILE]..
+
+=head1 OPTIONS
+
+   -h          help
+   -m string   module name
+   -o          turn on
+   -x          turn off
+   -v          version
+   -d          debug
+   -w          backup old file and overrite changes instead of stdout
+
+=head1 EXAMPLE USAGE
+
+Show code with Smart::Comments off, print to stdout.
+   pmonoff -m Smart::Comments -x ./lib/My/Module.pm
+   
+Make sure Smart::Comments off, if changes made, save the file, make a backup of the original.
+   pmonoff -w -m Smart::Comments -x ./lib/My/Module.pm
+
+Find all files here, and change them if they are perl files and a change is made , backs up
+
+   find ./lib ./bin ./t -type f -exec perl bin/pmonoff -m Smart::Comments -x -w '{}' \;
+   
+=head1 SEE ALSO
+
+LEOCHARRE::Dev - parent package
+
+=cut
+
+   

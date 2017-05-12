@@ -1,0 +1,118 @@
+Revision history for Perl extension LUGS::Events::Parser.
+
+0.10  2012-06-09  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.09_01  2012-06-02  <schubiger@cpan.org>
+
+ - Strip from html/text before rewriting tags.
+
+0.09  2012-05-04  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.08_02  2012-04-30  <schubiger@cpan.org>
+
+ - Purge remaining tags without attribute values.
+
+ - Document the purge_tags feature.
+
+ - Exclude rewritten angle bracket pairs from being purged.
+
+ - Strip text only from attribute values or text not within tags.
+
+ - Initialize purge_tags / strip_text options.
+
+ - Add test files for purge_tags / strip_text options.
+
+ - Replace use of tmpnam() with tempfile().
+
+ - List File::Temp in build_requires.
+
+ - Process each event for testing ungrouped.
+
+ - Use here documents in tests instead of string concat.
+
+0.08_01  2012-03-03  <schubiger@cpan.org>
+
+ - Don't decode entities for attribute values while parsing.
+
+0.08  2012-01-08  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.07_02  2012-01-07  <schubiger@cpan.org>
+
+ - Implement validation of tag handlers and drop Data::Schema
+   as dependency.
+
+0.07_01  2012-01-03  <schubiger@cpan.org>
+
+ - Allow for weekday/day to be omitted in the events file.
+
+ - Make the regular field matching regex less strict.
+
+0.07  2011-10-26  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.06_01  2011-09-15  <schubiger@cpan.org>
+
+ - Simplify replacing the content of a field when filtering.
+
+ - Match 1 or more times for greedy event capturing groups.
+
+0.06  2011-05-28  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.05_02  2011-05-23  <schubiger@cpan.org>
+
+ - Skip documentation tests for non-release testing.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+ - Call use_ok() in a loop instead of hard-coding the calls.
+
+0.05_01  2011-05-19  <schubiger@cpan.org>
+
+ - Fix generating an unique anchor when multiple events take place;
+   add some tests.
+
+0.05  2010-11-19  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.04_01  2010-07-31  <schubiger@cpan.org>
+
+ - Decode entities with HTML::Entities instead of with HTML::Parser;
+   this fixes broken rewriting when entities are present.
+
+ - Add tests for the entities rewrite fix.
+
+ - Reword some bits of the documentation.
+
+ - Don't force explicit scalar context where an implicit one exists.
+
+ - Omit blessing into a reference within the ::Event constructor.
+
+ - Update broken license link.
+
+0.04 Thu Aug 27 13:38:21 CEST 2009
+
+ - Add HTML filtering capability and according tests.
+
+0.03 Fri Oct 10 21:09:11 CEST 2008
+
+ - Added a method to retrieve the unique event anchor.
+
+0.02 Sun Mar  9 19:30:40 CET 2008
+
+ - Splitted each package within the main module into their own class.
+
+ - Reformatted the documentation.
+
+0.01 Sun Mar  9 15:19:28 CET 2008
+
+ - Initial version.

@@ -1,0 +1,299 @@
+#
+# ParsingPatternParser.yp
+# 
+#  used to generate Lingua::YaTeA::ParsingPatternParser.pm
+#
+#  Use: yapp -m 'Lingua::Ogmios::NLPWrappers::PatternParser' -o lib/Lingua/Ogmios/NLPWrappers/PatternParser.pm lib/Lingua/Ogmios/NLPWrappers/PatternParser.yp
+#
+# Parse::Yapp input grammar for parsing the yatea PArsint patterns
+#
+#
+#
+%{
+    use Data::Dumper;
+    use warnings;
+
+    my $node_set = [];
+    my $node;
+    my @node_stack;
+    my @uncomplete;
+    my @parse;
+
+    my $action;
+
+
+    my $num_content_words;
+    my @pos_sequence;
+    my $priority;
+
+    my $distance;
+
+    my $pos_sequence;
+    my $pattern;
+    my $parse;
+    my $num_line = 1;
+%}
+
+%%
+
+input:  #empty
+        |   input line  { # print STDERR "INPUT $_[2] \n";
+         }
+;
+
+line:   '\n' { $_[1] }
+        |  pattern DISTANCE ACTION '\n' { 
+#   	     print STDERR "=>$_[1] ($action)\n";
+  	     $_[0]->YYData->{PPRS}->addSynPattern($node_set, $action, $distance);
+	     @$node_set = ();
+	 }
+        | {  #print STDERR "START\n"; 
+	     $node = $node_set;
+          } SYN_DEP phrase DISTANCE ACTION '\n' { 
+	      push @$node, shift @$node;
+#   	     print "++>$_[1] ($action)\n";
+  	     $_[0]->YYData->{PPRS}->addSynPattern($node_set, $action, $distance);
+	     @$node_set = ();
+	 }
+	|  error '\nline:' { $_[0]->YYErrok }
+;
+
+# patternaction: {print STDERR "start\n";
+#               }
+#               pattern ACTION
+#     |	error '\patternaction: ' { $_[0]->YYErrok }
+# ;
+
+pattern:  {  #print STDERR "START\n"; 
+	     $node = $node_set;
+          }
+    | pattern SEMTYPE
+    | pattern CHUNK
+    | pattern REGEXP
+    | pattern POSTAG
+    | pattern TERM
+    | pattern TERMCONTENT
+    | pattern WORD
+    | error '\npattern: ' { $_[0]->YYErrok }
+;
+
+ACTION: ACTION_SEQ {
+      $action = $_[1];
+#        print STDERR "ACTION: $action\n";
+      }
+      | error '\nACTION: ' { $_[0]->YYErrok }
+;
+
+DISTANCE: DISTANCE_SEQ {
+      $distance = $_[1];
+#        print STDERR "DISTANCE: $distance\n";
+      }
+      | error '\nDISTANCE: ' { $_[0]->YYErrok }
+;
+
+SEMTYPE: SEMTYPE_TAG {
+                  # print STDERR "SEMTYPE $_[1]\n";
+		push @$node, {'type' => 'semtype',
+			      'semtype' => $_[1]};
+	   }
+           |	error '\nSEMTYPE: ' { $_[0]->YYErrok }
+;
+
+POSTAG: POSTAG_TAG {
+#                 print STDERR "POSTAG $_[1]\n";
+		push @$node, {'type' => 'postag',
+		    'postag' => $_[1]};
+	   }
+           |	error '\nPOSTAG: ' { $_[0]->YYErrok }
+;
+
+REGEXP: REGEXP_SEQ {
+#                 print STDERR "REGEXP $_[1]\n";
+		push @$node, {'type' => 'word_re',
+			      'word_re' => $_[1]};
+	   }
+           |	error '\nREGEXP: ' { $_[0]->YYErrok }
+;
+
+WORD: WORD_SEQ {
+#                 print STDERR "WORD $_[1]\n";
+		push @$node, {'type' => 'word',
+			      'word' => $_[1]};
+	   }
+           |	error '\nWORD: ' { $_[0]->YYErrok }
+;
+
+TERM: TERM_SEQ {
+#                 print STDERR "TERM $_[1]\n";
+		push @$node, {'type' => 'term',
+			      'term' => $_[1]};
+	   }
+           |	error '\nTERM: ' { $_[0]->YYErrok }
+;
+
+TERMCONTENT: TERMCONTENT_SEQ {
+#                 print STDERR "TERMCONTENT $_[1]\n";
+		push @$node, {'type' => 'termContent',
+			      'termContent' => $_[1]};
+	   }
+           |	error '\nTERM_CONTENT: ' { $_[0]->YYErrok }
+;
+
+SYN_DEP: SYNDEP_SEQ {
+#                 print STDERR "SYNDEP $_[1]\n";
+		push @$node, {'type' => 'syndep',
+			      'syndep' => $_[1]};
+	   }
+           |	error '\nSYNDEP: ' { $_[0]->YYErrok }
+;
+
+
+
+CHUNK: OPEN_CHUNK { my $nodetmp = [];
+		    push @node_stack, $node;
+		    push @$node, {'type' => 'chunk',
+				  'chunk' => $nodetmp };
+		    $node = $nodetmp;
+                  } SYN_DEP phrase CLOSE_CHUNK {
+# 		      print STDERR "CHUNK $_[3]\n";
+  		      push @$node, shift @$node;
+		      $node = pop @node_stack;
+	    }
+	     |	error '\nCHUNK: ' { $_[0]->YYErrok }
+;
+
+
+phrase: {# print STDERR "phrase\n";
+}
+       | phrase REGEXP
+       | phrase SEMTYPE
+       | phrase POSTAG
+       | phrase TERM
+       | phrase TERMCONTENT
+       | phrase WORD 
+       | error '\nphrase: ' { $_[0]->YYErrok }
+;
+
+%%
+
+
+
+sub _Error {
+        exists $_[0]->YYData->{ERRMSG}
+    and do {
+        print $_[0]->YYData->{ERRMSG};
+        delete $_[0]->YYData->{ERRMSG};
+        return;
+    };
+    print STDERR "Syntax error.\n";
+    print "Syntax error.\n";
+}
+
+sub _Lexer {
+    my($parser)=shift;
+
+    my $fh = $parser->YYData->{FH};
+
+    my $semtype = '(@semtype\(([^\)]+)\))';
+    my $openchunk = '(\[)';
+    my $closechunk = '(\])';
+    my $syn_dep = '(@syndep\(([^\)]+)\))';
+    my $postag = '(@postag\(([^\)]+)\))';
+#     my $regexp = '(@re_begin(.*?)@re_end)';
+    my $regexp = '(@word_re(\(.*?\))@)';
+    my $termcontent = '(@term\(([^\)]+)\))';
+    my $term = '(@term@)';
+    my $word = '([^ \|\n\]]+)';
+    my $action = '(\|\|\s*([^\n]+))';
+    my $distance = '(\|\|\s*([0-9]+))';
+
+    $parser->YYData->{INPUT}
+    or  $parser->YYData->{INPUT} = <$fh>
+    or  return('', undef); 
+
+    $parser->YYData->{INPUT} =~ s/^[ \t]*#.*//;
+    $parser->YYData->{INPUT} =~ s/^[ \t]*//;
+
+#      warn "==>" .  $parser->YYData->{INPUT} . ";\n";
+#     print "==>" .  $parser->YYData->{INPUT} . ";\n";
+
+    for ($parser->YYData->{INPUT}) {
+        s/^$semtype\s*// and return ('SEMTYPE_TAG', $2);
+        s/^$openchunk\s*// and return ('OPEN_CHUNK', $1);
+	s/^$closechunk// and return('CLOSE_CHUNK', $1);
+	s/^$syn_dep// and return('SYNDEP_SEQ', $2);
+	s/^$postag// and return('POSTAG_TAG', $2);
+	s/^$regexp// and return('REGEXP_SEQ', $2);
+	s/^$termcontent// and return('TERMCONTENT_SEQ', $2);
+	s/^$term// and return('TERM_SEQ', $1);
+	s/^$distance// and return('DISTANCE_SEQ', $2);
+	s/^$action// and return('ACTION_SEQ', $2);
+	s/^$word// and return('WORD_SEQ', $1);
+       s/^(.)//s  and return($1,$1);
+    }
+}
+
+# sub Run {
+#     my($self)=shift;
+#     $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error );
+# }
+
+# my($parsingpattern)=new ParsingPatternParser;
+# $parsingpattern->Run;
+
+
+__END__
+
+=head1 NAME
+
+Lingua::YaTeA::ParsingPatternParser - Perl extension for parsing the file containing the parsing patterns (based on Parse::Yapp)
+
+=head1 SYNOPSIS
+
+  use Lingua::YaTeA::ParsingPatternParser;
+
+  my $fh = FileHandle->new("<$file_path");
+
+  my $parser = Lingua::YaTeA::ParsingPatternParser->new();
+
+  $parser->YYData->{PPRS} = $this;
+  $parser->YYData->{FH} = $fh;
+  $parser->YYData->{CANDIDATES} = $tag_set->getTagList("CANDIDATES");
+  $parser->YYData->{PREPOSITIONS} = $tag_set->getTagList("PREPOSITIONS");
+  $parser->YYData->{DETERMINERS} = $tag_set->getTagList("DETERMINERS");
+
+  $parser->YYParse(yylex => \&Lingua::YaTeA::ParsingPatternParser::_Lexer, yyerror => \&Lingua::YaTeA::ParsingPatternParser::_Error);
+
+=head1 DESCRIPTION
+
+
+=head1 METHODS
+
+
+=head2 new()
+
+
+=head2 _Lexer()
+
+
+=head2 _Error()
+
+
+
+=head1 SEE ALSO
+
+
+
+=head1 AUTHOR
+
+Thierry Hamon <thierry.hamon@limsi.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by Thierry Hamon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Log-Cabin.t
+lib/Log/Cabin.pm
+lib/Log/Cabin/Foundation.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,24 @@
+List::Util::WeightedRoundRobin version 0.3
+==========================================
+
+Please see the example scripts for more information and 
+usage instructions.
+
+INSTALLATION
+ 
+To install this module type the following:
+ 
+   perl Makefile.PL
+   make
+   make test
+   make install
+ 
+DEPENDENCIES
+ 
+This module requires these other modules and libraries:
+ 
+  none
+ 
+COPYRIGHT AND LICENCE
+ 
+Copyright (C) 2009 Alistair Francis <opensource@alizta.com>

@@ -1,0 +1,184 @@
+Revision history for Perl extension Linux::DVB::DVBT.
+
+2.20 Wed Jul 27 11:24:00 2016
+	- Test fix: Modified tests to manually check results (since the HAS randomisation causes Test::More is_deeply() to fail!)
+
+2.19 Mon Mar 18 14:20:00 2013
+	- Added proper support for decoding the AC3 and E-AC3 audio pids during scan, where the descriptors are within a private data section
+	- Added timeout option to scan (to allow for changing the default tuning timeout during scanning)
+
+2.18 Fri Nov 18 11:32:00 2012
+	- Bug fix: fixed bug introduced to record() as part of fixing multiplex usage
+
+2.17 Sun Nov 18 19:49:00 2012
+	- Updated dvbt-strength to report error if adapter is not found
+	- Added support for multi-language subtitles (thanks to rainbowcrypt)
+	- Bug fix: corrected operation of record() so that it starts with a clean 
+	  multiplex record (previously it was re-using an existing set and overwriting
+	  previously recorded files) 
+	- Bug fix: corrected buffer over run caused by device names overflowing structure 
+
+2.16 Fri Oct 28 17:01:00 2011
+	- Fixed problem in EPG reporting where the program duration was being incorrectly calculated due to change from British Summer Time to GMT
+
+2.15 Sun Oct 16 17:13:00 2011
+	- Fixed bug in mpeg_parse_psi_string() - comparison of first byte was being incorrectly sign extended and the byte
+	  treated as a signed int (rather than unsigned). This caused the string to be incorrectly decoded and iconv_string()
+	  to segfault
+	- Fixed small epg memory leak
+	
+2.14 Wed Oct 12 12:57:00 2011
+	- Handle extra cases for component descriptor (0x50) to gather HD-TV information
+	- Strip out invalid frequencies from scan results (e.g. when scan doesn't return information on a seen frequency)
+	- Strip out invalid chars from epg (e.g. encrypted HD). Ensures downstream programs (JSON) are not corrupted.
+
+2.13 Thu Sep 29 15:57:00 2011
+	- Typo!
+
+2.12 Thu Sep 29 15:44:00 2011
+	- Added support for DVB-T2 channels (both in scanning and recording). All supplied scripts should now
+	  correctly handle HD channels (which are shown as 'hd-tv' type).
+
+2.11 Wed Sep 14 11:34:00 2011
+	- Added ability to scan based on country code rather than frequency file (similar to w_scan)
+	- Added a '-countries' option to dvbt-scan to show a list of valid country codes.
+	- Now saves the tuning settings embedded in the configuration file so re-scans can be run
+	  with no arguments
+	- Updated device list gathering to report only DVB-T devices (with the option to report all
+	  discovered devices).
+	- Added extra type and frequency information to device list
+	- Now handles SYMLINK devices so that user can nail the device to a fixed adapter number (using udev)
+	- Added 'adapter' field that accepts a string in the format <adapter_num>:<frontend_num> (e.g. 100:1)
+	  to simplify specifying the device adapter/frontend numbers in command line scripts.
+
+2.10 Wed Aug 10 16:26:00 2011
+	- Added timeslip recording (track start/end/both of program when recording)
+	- Improved handling for multiple recordings from the same multiplex
+	- Added more information into multiplex info HASH
+	- Added better parsing of program EPG text
+	- Now uses underlying transport stream parsing provided by Linux::DVB::DVBT::TS
+
+2.09 Wed Apr 13 11:26:00 2011
+	- Bug fix of dvbt-tsid-qual
+	- Now using new Makeutils.pm helper package to create Makefile
+	- Bolted in dvb_ts_lib to provide transport stream decoding for future features
+
+2.08 Tue Mar 25 12:46:00 2011
+	- re-write of scan routine to better handle the case where multiple frequencies (TSIDs) contain
+	  the same channels. Also handles channel renaming properly now. 
+	- Fixed bug with multiplex recording where frontend is not retuned if the same script records from
+	  a new TSID
+	- Added better channel checking in dvbt-chans script (for the --extra-check option)
+	- Added -list and -del options to dvbt-chans script
+	- Added new script 'dvbt-tsid-qual' to show multiplex channel quality (or error levels)
+	
+
+2.07 Mon Mar 1 10:06:00 2011
+	- Re-organised to co-exist with Linux::DVB::DVBT::TS and Linux::DVB::DVBT::Advert
+	- Modified so that buffer overflows (i.e. code not keeping up with video stream) is
+	  silently ignored. Keeps track of all overflows in recording stats.
+	- Added option to display ffmpeg output in dvbt-multirec script
+
+2.06 Tue Jan 18 08:17:00 2011
+	- Fixed type rename to pidtype where used by example scripts
+	- Fixed issue where incorrect transponder bandwidth is broadcast in the network information. Now
+	  uses, in order of preference: the readback information from the tuner, frequency file information,
+	  "automatic" settings (where possible), the broadcast NI 
+
+2.05 Wed Apr 21 12:00:00 2010
+	- Corrected typo in dvbt-strength script
+	- Fixed trsncode command escaping
+	- Modified so that it's easier to add extra SI pids into the recording
+	- Corrected bug when adding SI tables
+
+2.04 Fri Apr 16 09:00:00 2010
+	- Fixed error in dvbt-chans : file length with -extra-check was too large
+	- Re-write of low-level epg functions to speed up the process (and stop lock ups)
+	- Fixed errors in epg : loop checks were wrong (also increased buffer size)
+	- Now sort the config files by tsid & pnr
+	- Fixed error message when recording fails (attempted byte was reporting the pointer not the value)
+	- Fixed bug in regexp of Utils::fix_episodes that required a word before the episode number
+	- Split XS file into more manageable chunks
+	- Fixed setting inversion parameter : use AUTO value where possible (rather than 0) 
+	  (Reported as [rt.cpan.org #56362] Does not work with DiBcom 3000P/M-C DVB-T)
+	- Corrected tuning timeout
+	- Modified Ffmpeg module to allow other transcode commands to be added to the command list
+		
+2.03 Mon Apr 06 16:10:00 2010
+	- Fixed error when recording to .ts file (transcoding should just check length)
+	
+2.02 Mon Apr 06 08:48:00 2010
+	- Default to now add SI tables otherwise ffmpeg does not recognise the video stream encoding
+	- Various bug fixes to multiplex recording
+	- Minor pod tweaks
+	
+2.01 Mon Mar 22 12:20:00 2010
+	- Added proper support for subtitles (now automatically records the PAT & PMT when required)
+	- Fixes to module version numbers!
+	- Minor pod tweaks
+	
+2.00 Fri Mar 19 12:20:00 2010
+	- Major re-write to add multiplex recording capability
+	- Added TVAnytime reqporting in epg 
+	- Added subtitle stream pid to config files
+	- Fixed bug in scan where frequency reported is less than the minimum required for DVB-T.
+
+1.09 Thu Dec 17 09:23:00 2009
+	- Fixed scan for the case where the centre frequency information is not correctly(?) transmitted by the broadcaster (i.e. Italy).
+	  Module now (attempts to!) works out the frequency based on the program information gathered.
+
+
+1.08 Thu Nov 19 12:00:00 2009
+	- Added large file support (>2G) for recording. This is a compile time option that is enabled if your Perl build supports it.
+	  If this is not supported on your system, then use dvbt-ffrec to get ffmpeg to handle the large recordings
+	  (NOTE: This applies to recordings of approx 2hours or more)
+
+1.07 Mon Nov 16 12:00:00 2009
+	- Bug fix to scan. New code accounts for tuner cards that readback with the wrong frequency.
+
+1.06 Tue Nov 03 08:00:00 2009
+	- Major re-write of scanning logic to make it more robust (also checks signal strengths to choose best
+	  transmitter when more than one is available for the same multiplex).
+	- Added copious debug facilities to scan logic (including Hi-res timer!). If you have any problems with scanning
+	  please re-run with '-verbose 15 -debug 15', direct stderr into a file, and send me the file.
+	- Corrected some assumptions about the tuner hardware and frequency files (thanks to Arthur Gidlow for his help with this one)
+
+1.05 Mon Oct 12 11:09:00 2009
+	- Fixed typo in epg() method that caused program ids to be created using tsid-pnr rather than lcn
+	- Corrected dvbt-ffrec to enclose output filename in quote
+	- Numerous fixes to scan and epg related to multiple frequency handling (thanks to Thomas Rehn for his help in debugging)
+
+1.04 Fri Oct 02 10:00:00 2009
+	- I've finally worked out how to gather the logical channel number information for all of the channels.
+	- Added 'merge' option flag to allow scan results to be merged with previous (default is to overwrite previous)
+	- Now removes any channels that are not tv or radio; do not have a channel name; do not have the correct audio/video stream ids
+	- Added dvbt-chans utility script
+	
+1.03  Wed Sept 30 12:30:00 2009
+	- Corrected XS so that EPG strings are correctly terminated
+	- Fixed genre string copying
+
+1.02  Mon Sept 21 09:30:00 2009
+	- Handle the case where a channel scans to have no name (use it's PR number instead)
+
+1.01  Sat Jul 04 12:30:00 2009
+	- Bug fix: corrected dvbt-devices script
+
+1.00  Thu Jul 03 12:30:00 2009
+	- Added default channel names for EPG
+	- Fixed bug in epg() creating channel list
+	- Added web check for later version
+
+0.03  Fri Jan 23 12:30:00 2009
+	- bug fix in channel name "fuzzy" find
+	- improved/corrected documentation
+	- updated makefile to install scripts
+	- changed dvbt-scan to generate output during scan
+
+0.02  Wed Dec 10 12:46:56 2008
+	- Small modifications to build files to allow compile on x64 and FreeBSD
+
+0.01  Wed Oct 15 19:46:56 2008
+	- original version; created by h2xs 1.23 with options
+		-O -n Linux::DVB::DVBT -A Linux-DVB-DVBT/dvb_lib/dvb_lib.h
+

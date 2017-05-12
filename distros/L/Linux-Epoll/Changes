@@ -1,0 +1,44 @@
+Revision history for Linux-Epoll
+
+0.012     2014-12-09 21:55:14+01:00 Europe/Amsterdam
+          Keep callbacks alive during the entire loop
+
+0.011     2014-09-03 02:46:21+02:00 Europe/Amsterdam
+          Fix a stack corruption issue
+
+0.010     2014-04-18 17:28:38CEST+0200 Europe/Amsterdam
+          Get rid of unused argument to new
+
+0.009     2014-03-28 21:53:04EET+0200 Europe/Bucharest
+          Import required functionality from ppport for <5.14
+
+0.008     2014-03-20 22:50:07CET+0100 Europe/Amsterdam
+          Shipped with updated ppport.h
+
+0.007     2012-08-16 15:58:24 Europe/Amsterdam
+          Accept hashref as extra argument to new
+          Cover over segfaulting perl bug
+
+0.006     2012-06-30 13:22:31 Europe/Amsterdam
+          Fix rounding issue in timeout
+          Be more permissive with EINTR and EPERM
+
+0.005     2012-06-29 17:04:09 Europe/Amsterdam
+          Don't expose bitmasks anymore
+          Don't retry on EINTR
+
+0.004     2012-02-18 21:52:56 Europe/Amsterdam
+          Fixed compilation issue on multiplicity perls
+
+0.003     2011-09-15 01:23:13 Europe/Amsterdam
+          Converted to Dist::Zilla
+          Handle 5.15.3's new POSIX::SigSet representation
+          Fix strerror_r usage wrt GNU vs POSIX
+
+0.002   2010-11-29
+        Fixed event_bits_to_hash
+        Added event_bits_to_names
+
+0.001   2010-11-16
+        First version, released on an unsuspecting world.
+

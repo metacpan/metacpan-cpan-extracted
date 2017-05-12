@@ -1,0 +1,83 @@
+This describes how to install Lim, it is preferred to be installed with the
+packages.
+
+INSTALL WITH PACKAGES
+
+Packages and install instructions for Debian, Ubuntu and EPEL are found on
+https://jelu.github.com/lim/ .
+
+Debian packages are built on Debian 6 (squeeze) for that distribution and for
+Debian 7 (wheezy), Debian testing (jessie) and Debian unstable (sid).
+Ubuntu packages are built in launchpad for Ubuntu 10.04 LTS (lucid), Ubuntu
+12.04 LTS (precise), Ubuntu 12.10 (quantal) and Ubuntu 13.04 (raring).
+EPEL packages are built on CentOS 6.4 and should hopefully work on all other
+distributions based on RedHat 6 as CentOS 6.4 is.
+
+INSTALL MANUALLY
+
+1. Install Perl modules
+
+Easiest way to install manually is to install from CPAN but if you don't want to
+do that then see to it that all the required modules are installed first (check
+Makefile.PL) then run:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+2. Setup etc/lim
+
+Copy the etc/lim directory to your systems etc and change the access to the
+directories to your liking (ssl/private is rather important!).
+
+    cp -r etc/lim /etc/
+
+3. Generate SSL keys
+
+Lim's current way of authenticating is done by certifications, generate a self
+signed certification for Lim to use or if you have other means to generate
+these certifications just put the files in the correct place and with the same
+filename (or reconfigure it /etc/lim/agent.d/lim-rpc-tls.yaml).
+
+    openssl genrsa -out /etc/lim/ssl/private/lim-agentd.key 4096
+    openssl req -new -batch \
+      -subj "/CN=Lim Agent Daemon/emailAddress=lim@`hostname -f`" \
+      -key /etc/lim/ssl/private/lim-agentd.key \
+      -out /etc/lim/ssl/private/lim-agentd.csr
+    openssl x509 -req -days 3650 -in /etc/lim/ssl/private/lim-agentd.csr \
+      -signkey /etc/lim/ssl/private/lim-agentd.key \
+      -out /etc/lim/ssl/private/lim-agentd.crt
+    cp /etc/lim/ssl/private/lim-agentd.crt /etc/lim/ssl/certs/lim-agentd.pem
+    c_rehash /etc/lim/ssl/certs
+
+4. Setup Management Console files (optional)
+
+Copy the HTML files for the Management Console to your systems usr share, you
+can place these files anywhere you like but if its not in this location you must
+also reconfigure it in /etc/lim/agent.d/lim-rpc-protocol-http.yaml.
+
+    mkdir -p /usr/share/lim
+    cp -r html /usr/share/lim/
+
+5. Start lim-agentd
+
+There is currently no generic start up script for the Lim Agent Daemon, packages
+includes start up scripts tailored for the specific distributions.
+
+To run the Lim Agent Daemon in the foreground you can use the follow example:
+
+    lim-agentd --foreground
+
+Otherwise please see the man page for lim-agentd for what options are available.
+
+ONCE INSTALLED
+
+The Lim Agent Daemon will listen to any IP-address you have on port 5353 as
+default, you can configure this in /etc/lim/agent.yaml. Please see the
+lim-agentd man page how the URI's are built.
+
+You will be able to access any of the API protocols you have and the Management
+Console on that port. If you are running the default, which is HTTPS, you will
+need to generate a certificate to use in your browser and place the public part
+in /etc/lim/ssl/certs and run c_rehash to be allowed access.

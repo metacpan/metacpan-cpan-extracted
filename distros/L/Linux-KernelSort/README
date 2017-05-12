@@ -1,0 +1,35 @@
+Linux::KernelSort version 0.01
+==============================
+
+Linux::KernelSort is intended to sort a list of kernel versions into
+ascending order.  It also provides the capability to compare
+two kernel versions and determine if one version is newer, older,
+or the same as the other version.  NOTE:  Currently only the
+2.6.x kernel series (including -rc's, -git's, and -mm's) are
+properly evaluated.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+For more information on how to use KernelSort, see the pod
+documentation via the command
+
+    perldoc Linux-KernelSort
+
+or , after installation, view the man pages with
+
+    man Linux-KernelSort
+
+COPYRIGHT AND LICENCE
+
+Linux-KernelSort is Copyright (c) 2006, by Leann Ogasawara.
+All rights reserved. You may distribute this code under the terms
+of either the GNU General Public License or the Artistic License,
+as specified in the Perl README file.
+

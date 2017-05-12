@@ -1,0 +1,71 @@
+# WARNING: [% warning %] DO NOT EDIT! YOUR EDITS WILL BE LOST!
+
+package [% printer.name %];
+use strict;
+use warnings;
+use base qw([% visitor.name %]);
+
+=head1 NAME
+
+[% printer.name %] - example visitor class that will print the AST.
+
+=head1 SYNOPSYS
+
+  use [% printer.name %];
+
+=head1 METHODS
+
+Methods are as described in C<[% visitor.name %]>.
+
+=cut
+
+sub combine {
+    my ($self, $name, @parts) = @_;
+    if (@parts) {
+      return "$name(" . join(', ', @parts) . ')';
+    } else {
+      return $name;
+    }
+}
+
+[% FOREACH class IN data.classes %]
+[% IF class.is_concrete %]
+
+sub visit[% class.lastpart %] {
+    my ($self, $[% class.lastpart.uncamel %]) = @_;
+
+    return $self->combine(
+        '[% class.lastpart %]',
+        [%- FOREACH arg IN class.args %]
+            [%- IF arg.is_substantial %]
+                $[% class.lastpart.uncamel %]
+                ->[% arg.argname.getMethod %]()
+                ->accept($self),
+            [%- ELSE %]
+                '"'
+                . $[% class.lastpart.uncamel %]
+                  ->[% arg.argname.getMethod %]()
+                . '"',
+            [%- END %]
+        [%- END %]
+    );
+}
+[% END %]
+[% END %]
+
+=head1 AUTHOR
+
+[% warning %]
+
+=head1 SEE ALSO
+
+The generated tree node classes:
+[%- FOREACH class IN data.classes %]
+L<[% class.name %]>,
+[%- END %]
+The base visitor class: L<[% visitor.name %],
+and the API that makes them available: L<[% api.name %]>.
+
+=cut
+
+1;

@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Test::More 'no_plan';
+
+use Log::Dispatch::Config::TestLog(
+	file => {
+		class =>  "Log::Dispatch::Binlog::File",
+		format => "%m",
+	},
+);
+
+pass("foo");
+
+Log::Dispatch::Config->instance->debug("moose");
+
+fail("blah");
+
+Log::Dispatch::Config->instance->notice("elk");
+

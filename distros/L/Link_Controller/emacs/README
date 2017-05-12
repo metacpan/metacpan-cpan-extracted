@@ -1,0 +1,46 @@
+This is a mode which will make link-controller very easy to use from
+within emacs.  What it does is opens up a dired window on the output
+from check-all.  
+
+typically to use it you'll do something like this
+
+	M-x load-file [type the filename] <ret>
+	M-x link-report-dired --redirect <ret>  ;you can use other arguments
+
+The other arguments which make it generate the correct format are
+supplied automatically.
+
+You can then move about the list of broken links and under each one,
+you can open any of the files the link happens in simply by pressing
+'f' or with the second mouse button if you are using a mouse.  
+
+Once you have loaded the file with the broken links, you might want to
+fix all of the broken links in that file.  Try using
+
+	M-x compile check-page [filename]
+
+You can then move through the list of suspicious links with 
+
+	M-`
+
+(that's a real back quote, not an apostrophe) or by using mouse
+buttons etc.  Fix them as you go along.
+
+-------------------------------------------------------------------------
+
+To be honest, I have very little clue how I did this.  I took the
+find-dired file and cut out those bits too strongly related to find.
+Then I stuck back in the bits that it seemed to need to work.
+Finally, for very little apparent reason, it worked.
+
+Improvements possible. (emacs hackers go for it)
+
+	The broken link appears above the list of files.  We should
+	open on the first occurence of that link (or at least do it
+	optionally) 
+
+	The directory logic probably isn't.  Make it.
+
+	We should have code to signal to the link system when an
+	edited file is changed, so it can update information from that
+	file.

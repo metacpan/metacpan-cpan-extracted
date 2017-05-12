@@ -1,0 +1,28 @@
+---
+abstract: 'subclass of LWP::UserAgent that protects you from harm'
+author:
+  - 'Wes Young <wes@barely3am.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWPx-ParanoidAgent
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LWP::UserAgent: '0'
+  Net::DNS: '0'
+  Time::HiRes: '0'
+resources:
+  bugtracker: https://github.com/csirtgadgets/lwpx-paranoidagent/issues
+  homepage: https://github.com/csirtgadgets/LWPx-ParanoidAgent
+  repository: https://github.com/csirtgadgets/LWPx-ParanoidAgent.git
+version: '1.12'

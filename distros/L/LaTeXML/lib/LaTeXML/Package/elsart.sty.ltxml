@@ -1,0 +1,30 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  elsart.sty                                                         | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+# Generally ignorable options
+foreach my $option (qw(12pt 11pt 10pt oneside twoside onecolumn twocolumn
+  symbold ussrhead nameyear doublespacing reviewcopy)) {
+  DeclareOption($option, undef); }
+
+DeclareOption("seceqn", sub { AssignValue('@seceqn' => 1); });
+DeclareOption("secthm", sub { AssignValue('@secthm' => 1); });
+DeclareOption("amsthm", sub { AssignValue('@amsthm' => 1); });
+
+ProcessOptions();
+RequirePackage('elsart_support');
+
+1;

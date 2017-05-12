@@ -1,0 +1,12 @@
+Changes
+INSTALL
+MANIFEST
+MANIFEST.SKIP
+Build.PL
+lib/LWPx/TimedHTTP.pm
+t/01automagic.t
+t/02manual.t
+t/03https.t
+Makefile.PL
+META.yml
+META.json

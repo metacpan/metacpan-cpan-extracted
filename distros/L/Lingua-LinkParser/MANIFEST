@@ -1,0 +1,27 @@
+Changes
+lib/Lingua/LinkParser.pm
+lib/Lingua/LinkParser/Definitions.pm
+lib/Lingua/LinkParser/Dictionary.pm
+lib/Lingua/LinkParser/Linkage.pm
+lib/Lingua/LinkParser/Linkage/Sublinkage.pm
+lib/Lingua/LinkParser/Linkage/Sublinkage/Link.pm
+lib/Lingua/LinkParser/Linkage/Word.pm
+lib/Lingua/LinkParser/Sentence.pm
+lib/Lingua/LinkParser/Simple.pm
+LinkParser.xs
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+scripts/bigstructanddefs.pl
+scripts/constituent-tree.pl
+scripts/constituent.pl
+scripts/grammarregex.pl
+scripts/linksanddomains.pl
+scripts/parse.pl
+scripts/postscript.pl
+scripts/words.pl
+t/Lingua-LinkParser-Definitions.t
+t/Lingua-LinkParser.t
+typemap
+META.json                                Module JSON meta-data (added by MakeMaker)

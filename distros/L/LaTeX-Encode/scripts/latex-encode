@@ -1,0 +1,95 @@
+#!/usr/bin/perl
+# $Id: latex-encode 28 2012-08-30 20:00:09Z andrew $
+
+use strict;
+
+use LaTeX::Encode;
+use Getopt::Long;
+use Pod::Usage;
+
+my ($list_packages, $help, $man);
+
+GetOptions('packages' => \$list_packages,
+           'help|?'   => \$help,
+           'man'      => \$man)
+    or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+
+if ($list_packages) {
+    my $text     = join(qr{}, <>);
+    my $packages = {};
+    latex_encode($text, $packages);
+    foreach my $package (sort keys %$packages) {
+        print "$package\n";
+    }
+}
+else {
+    while (<>) {
+        print latex_encode($_);
+    }
+}
+
+__END__
+
+=head1 NAME
+
+latex-encode - LaTeX-encode data 
+
+=head1 USAGE
+
+  latex-encode [options] <utf8-file >latex-file
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<-packages|-p>
+
+rather than output the LaTeX-encoded version of the input, C<latex-encode> outputs a list
+of the LaTeX packages that are required to typeset the encoded version of the input, one
+package per line
+
+=item C<-help|?>
+
+output a help string
+
+=item C<-man>
+
+display the man page for latex-encode
+
+=back
+
+=head1 DESCRIPTION
+
+This script converts utf-8 characters in its input to their LaTeX encodings using the
+C<LaTeX::Encode> module, unless the C<-packages> option is given, in which case it outputs
+a list of the LaTeX packages required to typeset the encoded bersion of the input.
+
+=head1 DIAGNOSTICS
+
+=head1 EXIT STATUS
+
+=head1 CONFIGURATION
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Andrew Ford E<lt>a.ford@ford-mason.co.ukE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 Andrew Ford.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

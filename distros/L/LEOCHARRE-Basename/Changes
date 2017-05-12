@@ -1,0 +1,45 @@
+2010-08-12 16:20  leo
+
+	* lib/LEOCHARRE/Basename.pm: fixed undeclared dep on t/99 for
+	  Smart::Comments
+
+2010-08-12 16:14  leo
+
+	* t/99-cleanup.t: 2010-04-28 15:23  cvs
+
+		  * lib/LEOCHARRE/Basename.pm: added abs_path_or_die() and
+		    abs_loc_or_die()
+
+	  2010-04-13 12:09  cvs
+
+		  * lib/LEOCHARRE/Basename.pm: had an error on sub export
+	  in
+		    %EXPORT_TAGS
+
+	  2010-04-12 15:23  cvs
+
+		  * MANIFEST, lib/LEOCHARRE/Basename.pm, t/03-more.t: added
+		    abs_dir_or_die and abs_file_or_die also added aliases
+	  basename()
+		    and dirname()
+
+	  2010-04-07 16:03  cvs
+
+		  * lib/LEOCHARRE/Basename.pm, t/01-filename-ext.t:
+	  extended
+		    filename_ext() to optionally take list of possible
+	  matches, a
+		    regex ref, a list ref
+
+	  2010-03-25 14:25  cvs
+
+		  * MANIFEST, Makefile.PL, README,
+	  lib/LEOCHARRE/Basename.pm, t/00.t:
+		    Initial revision
+
+2010-08-12 16:14  leo
+
+	* MANIFEST, Makefile.PL, README, lib/LEOCHARRE/Basename.pm, t/00.t,
+	  t/01-filename-ext.t, t/03-more.t, t/99-cleanup.t: Initial
+	  revision
+

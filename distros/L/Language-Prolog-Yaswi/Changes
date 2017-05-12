@@ -1,0 +1,103 @@
+Revision history for Perl extension Language::Prolog::Yaswi.
+
+0.21  Jul 5, 2012
+        - search for swi-prolog as swipl, swi-prolog and pl
+        - include PLLDFLAGS in compilation
+
+0.20  Jul 5, 2012
+        - solve building issue when libswipl is a statically compiled
+          library (bug report by Stephen Cookson)
+
+0.19  Aug 24, 2011
+        - SWI-Prolog library name got changed at 5.10 from pl to
+          swipl, the correct name is now detected from the runtime
+          (bug report by Stephen Cookson)
+
+0.18  Jul 9, 2009
+        - Detect Ubuntu/Debian system and default to 'swipl'
+          executable
+	- Correct bug in Makefile.PL LIBS parameter generation
+
+0.17  Jun 06, 2009
+        - work around for bug in SWI-Prolog package for Debian/Ubuntu
+          on amd64
+        - 64bit cleanup
+        - corrected some errors in the documentation (reported by
+          William Kisman)
+	- do not use deprecated %_ printf/croak template
+
+0.16  Jun 08, 2008
+        - opaque marshalling was not working on latest versions (bug
+          reported by William Kisman).
+        - tests for opaque objects added
+
+0.15  May 30, 2008
+        - module updated to compile under perl 5.10.0 (bug reported by
+          William Kisman).
+
+0.14  Nov 24 2006
+        - pod error corrected
+
+0.13  Nov 24 2006
+        - new experimental unicode support, now it is possible to pass
+          unicode data back and forward through the Perl/Prolog
+          interface.
+        - commodity function swi_retractall added
+
+0.12  Sep 25 2006
+        - CLONE was not expecting arguments (bug reported by Yohann
+          Thomas).
+        - improved docs.
+
+0.10  Jun 25 2006
+        - use DynaLoader instead of XSLoader and make symbols
+          available to other modules so that Prolog C extensions can
+          be used.
+	- add pod testing
+	- pod errors corrected
+
+0.09  Feb 2 2005
+	- add support for swi_inline_module.
+	- corrected bug on code converting perl scalars to prolog
+	  modules.
+	- export globs instead of scalars for :context items so they
+	  can be properly localized
+	- remove useless context module support
+	- handle iopaques properly
+	- removed some bad prototypes
+
+0.08  Feb 22 2005
+	- documents swi_eval and swi_parse
+
+0.07  Feb 21 2005
+	- map nil on swi_vars
+	- swi_vars returns first var mapped on scalar context
+	- swi_find_all returns first result on scalar context
+
+0.06  Feb 13 2005
+	- convert perl magic values correctly
+	- some remaining debugging output supressed
+	- conversion of perl types to prolog rewritten
+	- support por SWI-Prolog versions 5.4.x
+
+0.05  Wed Jan 29 2003
+	- corrections to the docs.
+
+0.04  Wed Jan 29 2003
+	- segv-handling seems to work so the recommendation to
+	  compile prolog without it has been removed.
+	- swi_init and swi_cleanup functions added.
+	- thread support added.
+	- documentation changes.
+
+0.03  Thu Jan 23 2003
+	- ported to MS Windows.
+	- problems with missing include headers corrected.
+
+0.02  Wed Jan 22 2003
+	- cleaned up for CPAN distribution.
+
+0.01  Thu Jan  9 17:20:27 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Language::Prolog::Yaswi
+

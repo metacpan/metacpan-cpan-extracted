@@ -1,0 +1,30 @@
+Linux/LVM version 0.17
+======================
+
+This module was written so that I could create my own disk allocation
+reports.  I got tired of looking at vgdisplay's and lvdisplay's, so 
+now I can manipulate the data easily and produce customized reports.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module has no other dependencies.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Chad Kerner
+0.15.01 and above by Ray Morris
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

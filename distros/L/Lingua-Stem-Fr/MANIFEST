@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/Lingua-Stem-Fr.t
+lib/Lingua/Stem/Fr.pm
+META.yml                                 Module meta-data (added by MakeMaker)

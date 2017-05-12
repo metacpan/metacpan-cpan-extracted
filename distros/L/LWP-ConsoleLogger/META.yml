@@ -1,0 +1,80 @@
+---
+abstract: 'LWP tracing and debugging'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  Capture::Tiny: '0'
+  HTML::FormatText::WithLinks: '0'
+  HTTP::Request: '0'
+  Log::Dispatch::Array: '0'
+  Path::Tiny: '0'
+  Plack::Handler::HTTP::Server::Simple: '0.016'
+  Plack::Test: '0'
+  Plack::Test::Agent: '0'
+  Test::FailWarnings: '0'
+  Test::Fatal: '0'
+  Test::LWP::UserAgent: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Test::Needs: '0'
+  Test::RequiresInternet: '0'
+  URI::file: '0'
+  WWW::Mechanize: '0'
+  perl: '5.013010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-ConsoleLogger
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+recommends:
+  HTML::FormatText::Lynx: '23'
+requires:
+  Class::Method::Modifiers: '0'
+  Data::Printer: '0.36'
+  DateTime: '0'
+  HTML::Restrict: '0'
+  HTTP::Body: '0'
+  HTTP::CookieMonster: '0'
+  JSON::MaybeXS: '1.003005'
+  LWP::UserAgent: '0'
+  List::AllUtils: '0'
+  Log::Dispatch: '2.56'
+  Module::Load::Conditional: '0'
+  Moo: '0'
+  MooX::StrictConstructor: '0'
+  Parse::MIME: '0'
+  String::Trim: '0'
+  Sub::Exporter: '0'
+  Term::Size::Any: '0'
+  Text::SimpleTable::AutoWidth: '0.09'
+  Try::Tiny: '0'
+  Types::Common::Numeric: '0'
+  Types::Standard: '0'
+  URI::Query: '0'
+  URI::QueryParam: '0'
+  XML::Simple: '0'
+  perl: '5.013010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/oalders/lwp-consolelogger/issues
+  homepage: https://github.com/oalders/lwp-consolelogger
+  repository: https://github.com/oalders/lwp-consolelogger.git
+version: '0.000035'
+x_contributors:
+  - 'Andy Jack <github@veracity.ca>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'simbabque <simbabque@cpan.org>'
+  - 'Varadinsky <varadinsky@yahoo.com>'
+  - 'Сергей Романов <sromanov-dev@yandex.ru>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

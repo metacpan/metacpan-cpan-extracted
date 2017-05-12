@@ -1,0 +1,44 @@
+Revision history for Perl module Lingua::Stem::UniNE
+
+0.08 2014-08-26
+ - Added a workaround for Perl v5.13.10–v5.16.0 bug RT#113750 which caused the
+   Persian (fa) stemmer to clobber $_ due to its use of the charnames pragma
+   which uses the buggy re pragma
+
+0.07 2014-05-14
+ - Remove support for Perl v5.19.4–v5.19.11 due to Perl core regex bug fixed in
+   RT#121778 [issue #6]
+ - Integrate Travis CI, Devel::Cover, and Coveralls with GitHub repo
+   [issue #8], [issue #9]
+
+0.06 2014-02-14
+ - Fixed fatal interpolation bug in Perl ≤5.16.x [issue #5]
+
+0.05 2014-02-13
+ - Added aggressive attribute which defaults to false [issue #1]
+ - Added light and aggressive German (de) stemmers
+ - Added aggressive Czech (cs) stemmer
+ - Modified light Czech (cs) stemmer to also remove -ete -eti
+ - Restored Unicode case folding and normalization because they’re required for
+   proper stemming using the current regular expressions
+ - Removed in-place stemming of arrayrefs in favor
+   Lingua::Stem::Any->stem_in_place
+
+0.04 2013-04-26
+ - Moved Unicode case folding and normalization out of Lingua::Stem::UniNE and
+   into Lingua::Stem::Any
+ - Deprecated in-place stemming of arrayrefs, which will be removed in a future
+   release, in favor of the stem_in_place method of Lingua::Stem::Any
+
+0.03 2013-04-12
+ - Fixed mojibake in the abstract of META.json and META.yml
+
+0.02 2013-04-08
+ - First public release to CPAN
+ - Significantly improved test coverage
+ - Fixed Persian bugs discovered by new tests
+
+0.01 2013-04-04
+ - First release
+ - Languages supported: Bulgarian (bg), Czech (cs), Persian (fa)
+ - Code reviewed and tested by Kurt Starsinic

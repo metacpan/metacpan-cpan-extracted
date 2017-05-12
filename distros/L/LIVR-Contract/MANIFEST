@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/LIVR/Contract.pm
+lib/LIVR/Contract/Exception.pm
+MANIFEST			This list of files
+README.pod
+t/01-base.t
+t/lib/LIVRContractSimpleClassExample.pm
+Makefile.PL
+META.yml
+META.json

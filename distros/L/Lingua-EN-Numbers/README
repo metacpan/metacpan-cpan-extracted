@@ -1,0 +1,8 @@
+Lingua::EN::Numbers
+
+This is a module for converting numbers into
+their English equivalents, like turning 42 into "forty-two".
+
+As of version 1.02, this module is now maintained by Neil Bowers.
+Apart from a small bugfix, the code remains all the work of Sean Burke.
+

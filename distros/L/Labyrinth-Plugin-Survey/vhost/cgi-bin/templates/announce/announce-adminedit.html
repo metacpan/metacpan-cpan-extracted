@@ -1,0 +1,82 @@
+<p> 
+    <input type="button" onclick="parent.location='/'" value="back to surveys" />
+    <input type="button" onclick="parent.location='/anno/admin'" value="back to announcement admin" />
+</p>
+
+<h2>Announcement Admin<h2>
+
+<h3>[% IF data.announceid %]Edit[% ELSE %]Add[% END %] Announcement</h3>
+
+<div class="newsbox">
+<form method="post" action="/anno/save">
+<input type="hidden" name="act" value="anno-save" />
+<input type="hidden" name="announceid" value="[% data.announceid %]" />
+
+[% IF thanks == 1 %]<p><b>Announcement saved successfully.</b></p>
+[% ELSIF thanks == 2 %]<p><b>[% mailsent %] announcement[% IF mailsent > 1 ; THEN ; 's' ; END %] sent successfully.</b></p>
+[% ELSIF thanks == 3 %]<p><b>Sorry, no announcements were sent.</b></p>
+[% END %]
+[% IF errmess %]
+[% IF errmess == 1 %]
+<p class="alert">There are invalid or missing fields, as noted by the <span class="red">&empty;</span> symbol.
+[% ELSE %]
+<p class="alert">[% errmess %]
+[% END %]
+[% END %]
+
+<table class="blocker">
+<tr><th valign="top" width="150">From *</th>
+    <td class="red">[% data.hFrom_err %]</td>
+    <td><input type="text" name="hFrom" size="32" value="[% data.hFrom %]" /></td></tr>
+<tr><th valign="top">Subject&nbsp;*</th>
+    <td class="red">[% data.hSubject_err %]</td>
+    <td><input type="text" name="hSubject" size="32" value="[% data.hSubject %]" /></td></tr>
+<tr><th valign="top">Body *</th>
+    <td class="red">[% data.body_err %]</td>
+    <td><textarea name="body" rows="20" cols="60">[% data.body %]</textarea>
+        <p>Note: The following substitution variables can be used within the From, Subject or Body of the announcement:</p>
+        <ul>
+        <li>ENAME - user's registered name</li>
+        <li>EMAIL - user's registered email address</li>
+        <li>ECODE - user's personalised survey keycode</li>
+        <li>YAPC_CONF - <b>[% yapc_name %]</b></li>
+        <li>YAPC_HOST - <b>[% yapc_host %]</b></li>
+        <li>YAPC_CITY - <b>[% yapc_city %]</b></li>
+        <li>YAPC_MAIL - <b>[% yapc_mail %]</b></li>
+        <li>YAPC_HTTP - Official: <b>[% yapc_http %]</b></li>
+        <li>YAPC_SURV - Survey: <b>[% yapc_surv %]</b></li>
+        <li>TALK_OPEN - Conference Start Date: <b>[% talks_open %]</b></li>
+        <li>YAPC_OPEN - Suvery Start Date: <b>[% survey_open %]</b></li>
+        <li>YAPC_CLOSE - Survey End Date: <b>[% survey_close %]</b></li>
+        </ul>
+    </td></tr>
+<tr><th valign="top">Publish *</th>
+    <td class="red">[% data.publish_err %]</td>
+    <td>[% data.ddpublish %]</td></tr>
+</table>
+
+<p align="center"><input type="submit" value="Save Announcement" />
+
+</form>
+</div>
+
+[% IF data.announceid %]
+<h3>Send Options</h3>
+
+<div class="newsbox">
+<table class="blocker">
+<tr><th width="200">Already Sent</th><td>[% IF data.sent > 0 %]<a href="[% cgipath %]/pages.cgi?act=anno-resend&amp;announceid=[% data.announceid %]">[% data.sent %]</a>[% ELSE %]0[% END %]</td></tr>
+<tr><th>Not Sent</th><td>[% IF data.unsent > 0 %]<a href="[% cgipath %]/pages.cgi?act=anno-unsent&amp;announceid=[% data.announceid %]">[% data.unsent %]</a>[% ELSE %]0[% END %]</td></tr>
+<tr><th>Completed Survey</th><td>[% IF data.done > 0 %]<a href="[% cgipath %]/pages.cgi?act=anno-done&amp;announceid=[% data.announceid %]">[% data.done %]</a>[% ELSE %]0[% END %]</td></tr>
+<tr><th>Not Completed Survey</th><td>[% IF data.undone > 0 %]<a href="[% cgipath %]/pages.cgi?act=anno-undone&amp;announceid=[% data.announceid %]">[% data.undone %]</a>[% ELSE %]0[% END %]</td></tr>
+</table>
+
+<p align="center">
+<input type="button" onclick="parent.location='[% cgipath %]/pages.cgi?act=anno-sendall&amp;announceid=[% data.announceid %]'" value="Send All" />
+<input type="button" onclick="parent.location='[% cgipath %]/pages.cgi?act=anno-sendnew&amp;announceid=[% data.announceid %]'" value="Send New" />
+<input type="button" onclick="parent.location='[% cgipath %]/pages.cgi?act=anno-sendnot&amp;announceid=[% data.announceid %]'" value="Send Not Taken" />
+</p>
+
+</div>
+
+[% END %]

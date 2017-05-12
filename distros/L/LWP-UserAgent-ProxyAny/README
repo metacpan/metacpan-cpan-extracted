@@ -1,0 +1,74 @@
+LWP::UserAgent::ProxyAny version 1.01
+========================
+
+Extended LWP::UserAgent, which supports both HTTP_PROXY and IE proxy setting.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This script requires these other modules and libraries:
+    LWP
+
+Optional modules:
+    Win32::TieRegistry
+
+SYNOPSIS
+    use LWP::UserAgent::ProxyAny;
+
+    my $ua = LWP::UserAgent::ProxyAny->new;
+    $ua->env_proxy;       # visit url with HTTP_PROXY or Win32 IE proxy settings
+
+    my $response = $ua->get('http://sourceforge.net/projects/bookbot');
+    if ($response->is_success) {
+	    print $response->content;  # or whatever
+    }
+    else {
+	    die $response->status_line;
+    }
+
+    # Or set proxy by specified name
+
+    $ua->set_proxy_by_name("No");              # No Proxy
+    $ua->set_proxy_by_name("Default");         # $ua->env_proxy
+    $ua->set_proxy_by_name("127.0.0.1:8080");  # set proxy as http://127.0.0.1:8080
+
+DESCRIPTION
+    This class is an extended LWP UserAgent, which can support both
+    traditional HTTP_PROXY settings and proxy settings of Microsoft Windows
+    Internet Explorer.
+
+    $ua->env_proxy
+    Read proxy settings from HTTP_PROXY or CGI_HTTP_PROXY or win32 IE proxy
+    settings.
+
+    $ua->set_proxy_by_name($name)
+    Set proxy settings from $name.
+    $name = "No";         # No Proxy
+    $name = "Default";    # $ua->env_proxy
+    $name = "Others...";  # set proxy as http://Others...
+
+    my $ie_proxy_server = $this->get_ie_proxy( $ie_proxy_no )
+    Return current IE proxy settings and set $ie_proxy_no as proxy override
+    settings.
+
+BUGS, REQUESTS, COMMENTS
+    Please report any requests, suggestions or bugs via
+    http://sourceforge.net/projects/bookbot
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=LWP-UserAgent-ProxyAny
+
+SEE ALSO
+    LWP::UserAgent
+
+COPYRIGHT AND LICENSE
+    Copyright 2003-2004 Qing-Jie Zhou <qjzhou@hotmail.com>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

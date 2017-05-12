@@ -1,0 +1,79 @@
+Revision history for Perl extension Log::Dispatch::Config.
+
+1.04  Thu Apr 14 14:55:20 PDT 2011
+        - Fix 02_log.t RT:62438
+
+1.03  Thu Feb  4 21:05:21 PST 2010
+        - Make tests pass on win32 (frew)
+
+1.02  Wed Aug  8 13:46:16 PDT 2007
+        - Added a functionality to reuse existing AppConfig object
+          (Thanks to Ben H Kram)
+
+1.01  Tue Apr 30 14:06:06 JST 2002
+	- remove untie() to shut up bleadperl
+
+1.00  Fri Apr 12 03:20:40 JST 2002
+	- Fixed doc
+	- Code cleanup (refactoring, s/die/croak/g etc.)
+	* now requires Log::Dispatch 2.00
+
+0.12  Fri Jan 18 05:08:22 JST 2002
+	* No check on config mtime by default
+	  New class method: configure_and_watch()
+	  (Thanks to Hiroyuki Oyama <oyama@cpan.org>)
+	- Added documentation for subclassing/wrapping
+	- Code clean up, revised configurator API docs
+
+0.11  Sun Jan  6 18:01:48 JST 2002
+	- format code now becomes one-way parser
+
+0.10  Thu Jan  3 11:12:40 JST 2002
+	- Fixed Y2002 bug :( in t/08_datetime.t
+	  (Thanks to Matt Sergeant <matt@sergeant.org>)
+
+0.09  Thu Dec 27 15:01:12 JST 2001
+	- Fixed unnecessary quotes with 'format' in pods
+	- Clean up format_to_cb code
+	- '%%' is replaced by '%'
+	* [API change] $CallerDepth defaults to 0
+	- caller() code is now independent of L::D implementation
+	  (Thanks to Dave Rolsky <autarch@urth.org>)
+
+0.08  Sat Dec 22 15:58:20 JST 2001
+	- Added dependency on File::Temp in Makefile.PL
+	  (Thanks to Matt Sergeant <matt@sergeant.org>)
+	- Workaround against broken base.pm
+
+0.07  Wed Dec 19 01:46:00 JST 2001
+	- forgot to update MANIFEST
+	* Added $Log::Dispatch::Config::CallerDepth variable
+	- Call caller() function only when necessary
+	  (Thanks to Matt Sergeant <matt@sergeant.org>)
+
+0.06  Tue Dec 18 21:27:51 JST 2001
+	* Added Log::Dispatch::Configurator
+	  (Thanks to Matt Sergeant <matt@sergeant.org>)
+	* [API change] Added Date/Time format configuration
+	  (Thanks to Matt Sergeant)
+	- [API change] Deprecated ${XXX} style format
+	- Switched to fully qualified variable from use vars (for inheritance)
+	* Allows .ini style grouping in AppConfig
+
+0.05  Thu Dec  6 19:05:11 JST 2001
+	- CVS glitches in Makefile.PL (replacement of the RCS keyword ..)
+
+0.04  Thu Dec  6 18:33:50 JST 2001
+	* Now inherits from Log::Dispatch.
+	* [API change] Added Log::Dispatch::Config->instance
+
+0.03  Tue Dec  4 11:33:15 JST 2001
+	- fixed 03_reload.t not to segfault
+	  (Thanks to Matt Sergeant <matt@sergeant.org>)
+
+0.02  Sun Nov 18 23:56:31 JST 2001
+	- fixed varlist() regex
+
+0.01  Sat Nov 17 18:15:34 2001
+	- original version; created by h2xs 1.19
+

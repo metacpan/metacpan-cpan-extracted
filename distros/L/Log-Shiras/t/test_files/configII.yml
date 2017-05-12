@@ -1,0 +1,11 @@
+---
+filename: test.csv
+format_string: '%{date_time}P(m=>''ymd'')s,%{filename}Ps,%{inside_sub}Ps,%{line}Ps,%s,%s,%s'
+header: Date,File,Subroutine,Line,Data1,Data2,Data3
+package: Log::File::Shiras
+roles:
+- Log::Shiras::Report::ShirasFormat
+- Log::Shiras::Report::TieFile
+superclasses:
+- Log::Shiras::Report
+  

@@ -1,0 +1,369 @@
+package List::Filter::Project;
+
+=head1 NAME
+
+List::Filter::Project - Documentation for the List::Filter packages
+
+=head1 SYNOPSIS
+
+See L<List::Filter>.
+
+=head1 DESCRIPTION
+
+The List::Filter project is all about using lists of regular expressions
+to filter lists of strings, using any of a number of methods of application:
+for example "each item must match all the patterns" or "each item must match
+one of the patterns" or perhaps "the first item must match the first pattern,
+the second the second, and so on".
+
+A mechanism for shared storage of filters is provided (which
+defaults to L<YAML> files, but allows the use of L<DBI>), and the
+system is very (perhaps, "pathologically") extensible in multiple
+ways.
+
+=head2 concepts
+
+Here a "filter" is a named list of patterns, and a way of
+applying them.  I sometimes call this a "search profile" or
+"profile" (but it is to be hoped that they will be less buggy and
+useless than the ones in use by the US government).
+
+And in addition to "filters", there is a variant of them called "transforms":
+these are lists of pattern and replacement strings, ala perl's substitutions
+(s///).
+
+The way that a "filter" gets applied by default is a combination of some
+specified perl pattern modifiers and the name of a routine used to apply it,
+which we call it's "method".
+
+The default storage location of defined filters is very simple: just a yaml file
+stored in a dot directory in the users home directory. Typically:
+
+   ~/.list-filter/filters.yaml
+
+or
+
+   ~/.list-filter/transforms.yaml
+
+It is possible to have a defined "storage path" however: a list of multiple
+locations that will be searched for filters.  This storage path may include
+storage locations of different types.  Notably, a DBI type is supported,
+which allows the usage of any storage back-end with a DBD driver.
+
+=head2 motivations
+
+The initial intended application of these modules is to act as a toolkit for the
+creation of programmer's command-line utilities.  In particular, I wanted a way
+of implementing an "omit" feature (ignore "uninteresting" names in a file
+listing) that could be easily shared between applications and also be easily
+modified by a user.
+
+=head1 Examples
+
+For example of how to use List::Filter and it's relatives, see
+L<relate> and L<List::Filter::App::Relate>.
+
+=head1 Extension mechanisms
+
+=head2 creating new filters
+
+If the default YAML storage file is in use, a user can create a
+new filter most easily just by editing the YAML file.  An existing
+record can be copied and then edited, with a new name assigned
+to it.  The "save_filters_when_used" feature of the storage
+handler (L<List::Filter::Storage>) is a simple way of making
+sure the user has a supply of examples to work with.
+
+Note that a saved filter can also be modified I<without> changing
+it's name, which is a way of implementing a variant definition
+for a standard filter.
+
+
+=head2 creating new filter methods
+
+Adding new filter methods requires adding an Exporter-based
+module in the List:Filter:Filters::* tree and placing the name of
+the method in that module's @EXPORT array.
+
+Note that despite the fact that these methods are inside an
+Exporter- based module, they are in fact OOP methods which will
+become available to the Dispatcher class.
+
+Each of these routines should begin with a "my $self = shift;"
+line (even though $self will most likely not be used throughout
+the body of the method).
+
+The second argument to the method will be the filter argument,
+and it is up to the author of this method to choose how to apply the
+list of regular expressions (and regexp modifiers) supplied inside
+this filter.  The filter is expected to work on the array of items
+supplied as the third argument (aref), and to pass on the selections
+from the list as the result aref.
+
+Filter methods have, as an optional fourth argument, an options hashref.
+This can be used to pass additional parameters into any
+"method" routine you might write, however you need to avoid
+a small number of reserved words in that namespace:
+
+=over
+
+=item method
+
+Method is intended to be used when there's a need to override the
+default method specified inside the filter.
+
+=item extra
+
+A hashref put aside for future use, to avoid creating any
+additional "reserved words".
+
+=back
+
+In summary, each exported filter method routine should begin with:
+
+  my $self            = shift;
+  my $filter          = shift;  # object (href based)
+  my $items           = shift;  # aref
+  my $opt             = shift;  # href of options (which is itself optional)
+
+And each exported filter method should return an array reference.
+
+=head3 filter peculiarities
+
+A list of peculiarities that might seem confusing at first:
+
+=over
+
+=item *
+
+Each filter object has a method name, but this is only the
+*default* way of applying the filter.  The Dispatcher will
+typically use that method name to apply the filter -- though it
+can use a different one, if specified.
+
+=item *
+
+The filter object itself is passed to the method (which is
+simpler that having to extract the 'terms' and 'modifiers' fields
+and passing them on separately), but after that the "method"
+field of the filter is essentially vestigial.
+
+When you write a method to apply a filter, you will not usually
+do anything with the method field.
+
+=item *
+
+The methods defined in List::Filter::Filters::* modules are actual OOP
+methods, but they are methods of the List::Filter::Dispatcher class, which
+means that it's difficult to use inheritance with these methods to share
+common code or to write variant versions.  The author of a family of
+of filter methods might be advised to create a new class of utility object
+which these methods can use to share resources, something like
+L<List::Filter::Transform::Internal>
+
+=back
+
+
+=head2 supporting additional storage formats
+
+As of this writing, there are four supported storage formats,
+only two of which are likely to be of interest to the client
+coder: "YAML", and "DBI".  (The other two are "CODE" and "MEM"
+which have some internal uses.)
+
+For each storage format there's a corresponding module in this
+name space:
+
+  List::Filter::Storage::*
+
+New formats can be supported by adding an appropriate "plug-in"
+module.
+
+A plug-in module should:
+
+=over
+
+=item *  be based on L<List::Filter::StorageBase>
+
+=item *  implement the methods "init, "lookup", "save" and "list_filters".
+
+=back
+
+The "init" routine should be designed to work with a
+L<Class::Base> and L<Hash::Util> based OOP system as described in
+L</"General Implementation"> below.  It may be as simple as:
+
+   sub init {
+     my $self = shift;
+     my $args = shift;
+     unlock_keys( %{ $self } );
+
+     $self->SUPER::init( $args );
+
+     lock_keys( %{ $self } );
+     return $self;
+   }
+
+
+
+The names of the plug-in's object data have an obvious DBI bias,
+but these may be used in any way that seems appropriate:
+"connect_to", "owner", "password", and "attributes".
+
+For example, in the case of YAML, "connect_to" is assigned the path
+to a yaml file, or in the case of MEM, it's assigned a reference to
+a data structure (and "owner" and "password" are unused).
+
+There is also the "extra" hashref, which can be used for
+additional miscellaneous pieces of information.
+
+To see how information is passed in to these format plug-ins, see
+the "storage" attribute of L<List::Filter::Storage>.
+
+
+=head2 libraries of standard filters
+
+As of this writing, there are two libraries of standard filters
+that ships with this code: L<List::Filter::Library::FileSystem>
+and L<List::Filter::Library::FileExtensions>.
+
+Additional libraries of filters may be added in the future.
+All are expected to appear in the same namespace:
+
+  List::Filter::Library::*
+
+Each library module is expected to implement a routine called:
+I<define_filters_href>, which returns a filter data structure.
+This is a hashref of hashref, which might be thought of as a
+collection of filters keyed by name.  The inner hashref
+has the fields: 'description', 'method', 'modifiers', and most
+importantly, 'terms', which is an array reference of perl regular
+expressions.
+
+There is an analogous collection of 'transform" libraries:
+List::Filter::Transform::Library::*.  As of this writing,
+this package contains one such library of transforms:
+L<List::Filter::Transform::Library::FileSystem>.
+
+
+=head1 General Implementation
+
+=head2 Class::Base and Hash::Util
+
+This project is based on L<Class::Base> which provides a simple
+"new" routine, that calls an initialization routine called
+"init".  The purpose of this separation is so that a child class
+can have an "init" that invokes "SUPER::init", combining the init
+routines of both parent and child.
+
+Note: there is no leading underscore on "init", though many people
+would use one to indicate it's an "internal" routine.  This doesn't
+bother me myself: I have mixed feelings about that leading
+underscore convention (internal to what?  The boundary moves
+depending on what you're doing).
+
+Each init has been written using the L<Hash::Util> functions lock_keys
+and unlock_keys, to prevent the accidental creation of new fields of
+object data outside of these "init" routines.
+
+=head2 hard-coded accessors
+
+The AUTOLOAD trick for generating object accessors on the fly has
+not been used for this project; instead, accessor code has been
+automatically generated from templates.  Using AUTOLOAD slows down
+accessors at least on the first invocation, and for interactive
+applications with short-lived objects (e.g. L<App::Relate>) that
+can be a problem.
+
+=head2 accessor naming convention
+
+The accessor naming convention: setters are named with the
+traditional "set_" prepended to the field name, but getters just
+use the field name without any prefix ("mutators" are not used,
+because they don't allow setting a value to undef, and in general
+they've gone out of fashion).  Thus the most common case gets the
+simplest syntax:
+
+  $self->set_data( $data );
+
+  my $data = $self->data;
+
+You might think of these as "mutators" with the "set_" feature
+removed.
+
+=head2 attitude toward inheritance
+
+Inheritance has been used in several places as a convenient way
+of sharing common code, though I've tried not to over do it, and
+in principle I tend to agree that it's a better idea to rely on
+aggregation.
+
+A number of parts in this design, shall we say, push the limits of
+good taste in object-oriented design: for example, rather than
+implement an object class for each type of filter (so that each
+knows precisely how to apply themselves) a less rigid approach has
+been taken where each filter knows a default "method" of
+application, but can be used in other ways.
+
+There are also some funky code-smells in the storage system, where
+both "filter" objects and the variant "transform" objects can be
+saved and retrieved using the same code, which needs to be told the
+class (i.e. the type) of what it's saving and retrieving if it's
+not working with the default List::Filter type.
+
+Additionally, the storage handler interface may seem somewhat
+contorted: the goal was to provide a simple interface to client
+code for doing the simplest, most common thing (using yaml files).
+So instead of having the client coder pass in an array of storage
+objects, the storage interface expects a list of parameters that
+the storage handler must then try to make sense of.  Internally,
+this L<does> become an array of storage objects; and while access
+to these objects is available (via the "storage_objects" accessor),
+it is not expected that the client coder will often need to get at
+them directly.
+
+In general, my hope is that for normal uses, the more contorted
+features of these interfaces will be hidden away from the client
+coder, but that if heavier needs arise, there will be a way to
+satisfy them.
+
+
+=head1 SEE ALSO
+
+L<List::Filter>
+L<List::Filter::App::Relate>
+L<List::Filter::Dispatcher>
+L<List::Filter::Filters::Relate>
+L<List::Filter::Filters::Standard>
+L<List::Filter::Internal>
+L<List::Filter::Library::FileSystem>
+L<List::Filter::Storage>
+L<List::Filter::Storage::DBI>
+L<List::Filter::Storage::MEM>
+L<List::Filter::Storage::CODE>
+L<List::Filter::Storage::YAML>
+L<List::Filter::StorageBase>
+L<List::Filter::Regexps>
+L<List::Filter::Transform>
+L<List::Filter::Transform::Internal>
+
+L<App::Relate>
+L<relate>
+
+=head1 AUTHOR
+
+Joseph Brenner, E<lt>doom@kzsu.stanford.eduE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 by Joseph Brenner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 BUGS
+
+None reported... yet.
+
+=cut

@@ -1,0 +1,17 @@
+Revision history for Log-Tree
+
+0.18  2016-11-04
+      Use IO::Interactive::Tiny instead of IO::Interactive
+
+0.17  2015-08-30
+      Add suffix method.
+
+0.16  2013-12-04
+      Add logging to stdout in non-interactive mode.
+
+0.15	2012-12-02
+      Replace the config module.
+
+0.14	2012-11-25
+      First public version, released on an unsuspecting world.
+

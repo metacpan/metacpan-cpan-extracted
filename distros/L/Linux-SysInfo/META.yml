@@ -1,0 +1,34 @@
+---
+abstract: 'Perl interface to the sysinfo(2) Linux system call.'
+author:
+  - 'Vincent Pit <perl@profvince.com>'
+build_requires:
+  Exporter: 0
+  ExtUtils::MakeMaker: 0
+  Test::More: 0
+  XSLoader: 0
+  base: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Linux-SysInfo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: 0
+  XSLoader: 0
+  base: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Name=Linux-SysInfo
+  homepage: http://search.cpan.org/dist/Linux-SysInfo/
+  license: http://dev.perl.org/licenses/
+  repository: http://git.profvince.com/?p=perl%2Fmodules%2FLinux-SysInfo.git
+version: 0.14

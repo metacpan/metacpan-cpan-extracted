@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                List-Rotation-Cycle
+version:             1.009
+abstract:            Cycle through a list of values via a singleton object implemented as closure. 
+license:             perl
+author:              
+    - pelagic
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Memoize:                       0
+    Carp:                          0
+    warnings:                      0
+build_requires:
+    Test::More:                    0
+    Module::Signature:             0
+    Test::Pod:                     0
+    Test::Pod::Coverage:           0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

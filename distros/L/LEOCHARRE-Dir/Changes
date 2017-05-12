@@ -1,0 +1,39 @@
+2009-04-22 10:35  cvs
+
+	* MANIFEST, lib/LEOCHARRE/Dir.pm, lib/LEOCHARRE/Dir.pod, t/00.t:
+	  moved documentation to .pod file altered test to accomodate lack
+	  of 'touch'
+
+2008-12-08 16:03  cvs
+
+	* lib/LEOCHARRE/Dir.pm, t/00.t: there was a major bug, lsd() was
+	  returning all file entries, including regular files, instead of
+	  actually just directories.
+
+2008-10-01 17:05  cvs
+
+	* lib/LEOCHARRE/Dir.pm, t/00.t: Made some improvements to error
+	  handling.
+
+2008-09-15 19:03  cvs
+
+	* lib/LEOCHARRE/Dir.pm: changed lsd subs to use readdir() instead
+	  of testing for -d
+
+2008-09-08 19:47  cvs
+
+	* lib/LEOCHARRE/Dir.pm, t/00.t: fixed some warnings
+
+2008-07-15 14:10  cvs
+
+	* lib/LEOCHARRE/Dir.pm: cleaned up documentation
+
+2008-07-15 14:07  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/Dir.pm, t/00.t: Initial
+	  revision
+
+2008-07-15 14:07  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/Dir.pm, t/00.t: init import
+

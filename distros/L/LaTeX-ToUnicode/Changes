@@ -1,0 +1,17 @@
+Changes for LaTeX::ToUnicode
+
+0.05    2016-11-23 02:28:35+00:00
+        Compatibility with perl 5.25 (Alexandr Ciornii)
+
+0.04    2015-12-25 19:16:41+00:00
+        Macrons are handled properly
+
+0.03    2010-10-18 18:04:14
+        Specify minimal perl version (5.8.0)  for UTF-8 support
+
+0.02    2010/07/09
+        Handle accents with \i
+        Add script used to generate accents table
+
+0.01    2010/07/09
+        First release.

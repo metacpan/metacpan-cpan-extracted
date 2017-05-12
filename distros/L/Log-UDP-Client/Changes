@@ -1,0 +1,20 @@
+Revision history for Log-UDP-Client
+
+0.20.2    2017-01-05 17:19:36+01:00 Europe/Oslo
+
+    - Fixed version number in main module file.
+
+0.20.1    2017-01-05 17:06:42+01:00 Europe/Oslo
+
+    - Added missing test dependency Data::Serializer::JSON
+
+0.20.0    2010-09-27 19:00:42 Europe/Oslo
+
+	- Added perl minimum version.
+	- Migrated from Module::Install to Dist::Zilla
+	- Now uses Semantic Versioning (http://semver.org/)
+	- Hopefully 0.20.0 is equiv. to 0.02 (old-style)
+
+0.01    2009-05-12
+
+    - Initial version.

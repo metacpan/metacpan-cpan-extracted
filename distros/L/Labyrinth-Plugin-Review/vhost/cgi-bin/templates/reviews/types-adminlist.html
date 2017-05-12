@@ -1,0 +1,37 @@
+<h2>Review Types Admin</h2>
+
+    <p>
+      <a href="[% cgipath %]/pages.cgi?act=reviews-admin">manage reviews</a>
+    | <a href="[% cgipath %]/pages.cgi?act=reviews-typesadmin">manage review types</a>
+    | <a href="[% cgipath %]/pages.cgi?act=reviews-radmin">manage retailers</a>
+    </p>
+
+<div class="boxer">
+[% IF thanks_message %]<p>[% thanks_message %][% END %]
+<p>Click on a type name to edit it's content.
+<p><a href="[% cgipath %]/pages.cgi?act=reviews-typesadd">create a new review type</a>
+</div>
+
+<form name="datalist" method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name='act' value='reviews-typesadmin' />
+
+<div class="boxer">
+<table class="blocker">
+<tr>
+    <th>Review Type Name</th>
+    <th>Review Type Abbrieviation</th>
+    <th>Select</th>
+</tr>
+[% FOREACH record = data %]
+<tr>
+    <td nowrap><a href="[% cgipath %]/pages.cgi?act=reviews-typesedit&amp;reviewtypeid=[% record.reviewtypeid %]">[% record.typename %]</a></td>
+    <td>[% record.typeabbr %]</td>
+    <td><input type="checkbox" name="LISTED" value="[% record.reviewtypeid %]" /></td>
+</tr>
+[% END %]
+</table>
+</div>
+
+<p>
+<input type="submit" name='doaction' value='Delete' />
+</form>

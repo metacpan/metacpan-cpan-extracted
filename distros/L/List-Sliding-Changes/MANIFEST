@@ -1,0 +1,18 @@
+.cvsignore
+Changes
+example/Example.pl
+example/log.txt
+lib/List/Sliding/Changes.pm
+Makefile.PL
+MANIFEST
+MANIFEST.skip
+README
+t/02-Added-Lines.t
+t/03-Repeated-Lines.t
+t/99-manifest.t
+t/99-pod.t
+t/99-todo.t
+t/99-unix-text.t
+t/99-versions.t
+t/embedded-List-Sliding-Changes.t
+META.yml                                 Module meta-data (added by MakeMaker)

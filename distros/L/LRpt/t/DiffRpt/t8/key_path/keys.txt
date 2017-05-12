@@ -1,0 +1,17 @@
+#########################################################################
+#
+# $Id: keys.txt,v 1.1 2006/09/17 07:59:59 pkaluski Exp $
+# $Name: Stable_0_16 $
+#
+# $Log: keys.txt,v $
+# Revision 1.1  2006/09/17 07:59:59  pkaluski
+# Added tests for new command line switches and environment variables
+#
+#
+#
+#########################################################################
+
+select_name: text_num 
+key_columns: Text2,Text1,Numeric4:8
+%%
+

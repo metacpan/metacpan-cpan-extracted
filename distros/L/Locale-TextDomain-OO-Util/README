@@ -1,0 +1,35 @@
+Locale-TextDomain-OO-Util version 3.006
+=======================================
+
+Utils for Perl OO Interface to Uniforum Message Translation
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Carp
+    Clone
+    English
+    Safe
+    charnames
+    namespace::autoclean
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2014 - 2017,
+Steffen Winkler
+steffenw at cpan.org.
+All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it
+under the same terms as Perl itself.

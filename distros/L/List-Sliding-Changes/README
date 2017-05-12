@@ -1,0 +1,39 @@
+List::Sliding::Changes version 0.02
+==================================
+
+This is a module faciliating merging two lists, where
+one list is a sliding window possibly containing
+new elements and the other list contains the known
+elements.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More for the tests
+
+I tried hard to avoid the dependencies on Test::Inline, and I use
+some cheap modified pod2test script to enable prerequisite checking
+for my synopsis code - so if you rebuild the Test::Inline examples,
+these tests might fail because of prerequisites not met.
+
+The synopsis uses the following additional modules :
+
+  Tie::File
+
+  Finance::Banking::Postbank_de
+
+COPYRIGHT AND LICENCE
+
+This module may be used under the same terms as Perl itself.
+
+Copyright (C) 2003 Max Maischein <corion@cpan.org>

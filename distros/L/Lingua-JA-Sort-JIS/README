@@ -1,0 +1,44 @@
+Lingua::JA::Sort::JIS version 0.10
+================
+
+SYNOPSIS
+
+Lingua::JA::Sort::JIS - compares and sorts strings encoded in UTF-8
+
+OOP:
+    use Lingua::JA::Sort::JIS;
+    $jis = Lingua::JA::Sort::JIS->new($level, $class)
+    @sorted = $jis->jsort(@strings);
+
+    # $level : the collation level, 1 to 5.
+    # $class : the kanji class, 1 to 3.
+
+not-OOP:
+    use Lingua::JA::Sort::JIS qw(jsort)
+    @sorted = jsort(@strings);
+
+  * In the not-OOP syntax, you are not allowed to change
+    $level and $class for the present.
+    Instead of it, use msort, bsort, xsort, fsort.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+perl
+
+COPYRIGHT AND LICENSE
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+
+Copyright(C) 2001, 2007. SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

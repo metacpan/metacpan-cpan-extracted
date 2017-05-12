@@ -1,0 +1,284 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Abstract class representing a directory.
+ *
+ * A "file" within a Folder might be a real file on disk -- or it might be a
+ * RAM buffer.  Similarly, Delete() might delete a file from the file system, or
+ * a key-value pair from a hash, or something else.
+ *
+ * The archetypal implementation of Folder,
+ * [](cfish:FSFolder), represents a directory on
+ * the file system holding a collection of files.
+ */
+public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
+
+    String *path;
+    Hash   *entries;
+
+    /** Abstract initializer.
+     */
+    inert nullable Folder*
+    init(Folder *self, String *path);
+
+    public void
+    Destroy(Folder *self);
+
+    /** Getter for `path` member var.
+     */
+    String*
+    Get_Path(Folder *self);
+
+    /** Setter for `path` member var.
+     */
+    void
+    Set_Path(Folder *self, String *path);
+
+    /** Open an OutStream, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return NULL on failure.
+     *
+     * @param path A relative filepath.
+     * @return an OutStream.
+     */
+    incremented nullable OutStream*
+    Open_Out(Folder *self,  String *path);
+
+    /** Open an InStream, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return NULL on failure.
+     *
+     * @param path A relative filepath.
+     * @return an InStream.
+     */
+    incremented nullable InStream*
+    Open_In(Folder *self, String *path);
+
+    /** Open a FileHandle, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return NULL on failure.
+     *
+     * @param path A relative filepath.
+     * @param flags FileHandle flags.
+     * @return a FileHandle.
+     */
+    incremented nullable FileHandle*
+    Open_FileHandle(Folder *self, String *path, uint32_t flags);
+
+    /** Open a DirHandle or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return NULL on failure.
+     *
+     * @param path Path to a subdirectory, relative to the Folder's path.  If
+     * empty or NULL, returns a DirHandle for this Folder.
+     * @return a DirHandle.
+     */
+    incremented nullable DirHandle*
+    Open_Dir(Folder *self, String *path = NULL);
+
+    /** Create a subdirectory.
+     *
+     * @param path A relative filepath.
+     * @return true on success, false on failure (sets the global error object
+     * returned by [](cfish:cfish.Err.get_error)).
+     */
+    bool
+    MkDir(Folder *self, String *path);
+
+    /** List all local entries within a directory.  Set the global error
+     * object returned by [](cfish:cfish.Err.get_error) and return NULL if
+     * something goes wrong.
+     *
+     * @param path A relative filepath optionally specifying a subdirectory.
+     * @return an unsorted array of filenames.
+     */
+    incremented nullable Vector*
+    List(Folder *self, String *path = NULL);
+
+    /** Recursively list all files and directories in the Folder.
+     *
+     * @param path A relative filepath optionally specifying a subdirectory.
+     * @return an unsorted array of relative filepaths.
+     */
+    incremented nullable Vector*
+    List_R(Folder *self, String *path = NULL);
+
+    /** Indicate whether an entity exists at `path`.
+     *
+     * @param path A relative filepath.
+     * @return true if `path` exists.
+     */
+    bool
+    Exists(Folder *self, String *path);
+
+    /** Indicate whether a directory exists at `path`.
+     *
+     * @param path A relative filepath.
+     * @return true if `path` is a directory.
+     */
+    bool
+    Is_Directory(Folder *self, String *path);
+
+    /** Delete an entry from the folder.
+     *
+     * @param path A relative filepath.
+     * @return true if the deletion was successful.
+     */
+    bool
+    Delete(Folder *self, String *path);
+
+    /** Delete recursively, starting at `path`
+     *
+     * @param path A relative filepath specifying a file or subdirectory.
+     * @return true if the whole tree is deleted successfully, false if any
+     * part remains.
+     */
+    bool
+    Delete_Tree(Folder *self, String *path);
+
+    /** Rename a file or directory, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return false on failure.  If an entry
+     * exists at `to`, the results are undefined.
+     *
+     * @param from The filepath prior to renaming.
+     * @param to The filepath after renaming.
+     * @return true on success, false on failure.
+     */
+    abstract bool
+    Rename(Folder *self, String *from, String *to);
+
+    /** Create a hard link at path `to` pointing at the existing
+     * file `from`, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return false on failure.
+     *
+     * @return true on success, false on failure.
+     */
+    abstract bool
+    Hard_Link(Folder *self, String *from, String *to);
+
+    /** Read a file and return its contents.
+     *
+     * @param path A relative filepath.
+     * @param return the file's contents.
+     */
+    incremented Blob*
+    Slurp_File(Folder *self, String *path);
+
+    /** Collapse the contents of the directory into a compound file.
+     */
+    void
+    Consolidate(Folder *self, String *path);
+
+    /** Given a filepath, return the Folder representing everything except
+     * the last component.  E.g. the 'foo/bar' Folder for '/foo/bar/baz.txt',
+     * the 'foo' Folder for 'foo/bar', etc.
+     *
+     * If `path` is invalid, because an intermediate directory
+     * either doesn't exist or isn't a directory, return NULL.
+     */
+    nullable Folder*
+    Enclosing_Folder(Folder *self, String *path);
+
+    /** Return the Folder at the subdirectory specified by `path`.
+     * If `path` is NULL or an empty string, return this Folder.
+     * If the entity at `path` either doesn't exist or isn't a
+     * subdirectory, return NULL.
+     *
+     * @param path A relative filepath specifying a subdirectory.
+     * @return A Folder.
+     */
+    nullable Folder*
+    Find_Folder(Folder *self, String *path);
+
+    /** Perform implementation-specific initialization.  For example: FSFolder
+     * creates its own directory.
+     */
+    abstract void
+    Initialize(Folder *self);
+
+    /** Verify that operations may be performed on this Folder.
+     *
+     * @return true on success.
+     */
+    abstract bool
+    Check(Folder *self);
+
+    /** Close the folder and release implementation-specific resources.
+     */
+    abstract void
+    Close(Folder *self);
+
+    /** Open a FileHandle for a local file, or set the global error object
+     * returned by [](cfish:cfish.Err.get_error) and return NULL on failure.
+     */
+    abstract incremented nullable FileHandle*
+    Local_Open_FileHandle(Folder *self, String *name, uint32_t flags);
+
+    /** Open an InStream for a local file, or set the global error object
+     * returned by [](cfish:cfish.Err.get_error) and return NULL on failure.
+     */
+    incremented nullable InStream*
+    Local_Open_In(Folder *self, String *name);
+
+    /** Open a DirHandle to iterate over the local entries in this Folder, or
+     * set the global error object returned by [](cfish:cfish.Err.get_error)
+     * and return NULL on failure.
+     */
+    abstract incremented nullable DirHandle*
+    Local_Open_Dir(Folder *self);
+
+    /** Create a local subdirectory.
+     *
+     * @param name The name of the subdirectory.
+     * @return true on success, false on failure (sets the global error object
+     * returned by [](cfish:cfish.Err.get_error))
+     */
+    abstract bool
+    Local_MkDir(Folder *self, String *name);
+
+    /** Indicate whether a local entry exists for the supplied
+     * `name`.
+     *
+     * @param name The name of the local entry.
+     */
+    abstract bool
+    Local_Exists(Folder *self, String *name);
+
+    /** Indicate whether a local subdirectory exists with the supplied
+     * `name`.
+     *
+     * @param name The name of the local subdirectory.
+     */
+    abstract bool
+    Local_Is_Directory(Folder *self, String *name);
+
+    /** Return the Folder object representing the specified directory, if such
+     * a directory exists.
+     *
+     * @param name The name of a local directory.
+     * @return a Folder.
+     */
+    abstract nullable Folder*
+    Local_Find_Folder(Folder *self, String *name);
+
+    /** Delete a local entry.
+     *
+     * @param name The name of the entry to be deleted.
+     * @return true if the deletion was successful.
+     */
+    abstract bool
+    Local_Delete(Folder *self, String *name);
+}
+
+

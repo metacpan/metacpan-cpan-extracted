@@ -1,0 +1,118 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+changelist - go through a changelist of url updates applying them
+
+=head1 DESCRIPTION
+
+The fundamental link change notification looks something like this
+
+  BeginLinkChange1
+  Original: http://www.goober.com/fred/
+  New: http://www.goooober.com/wilma/
+  End
+
+That is a bunch of Usenet/internet mail style headers sandwiched
+between a start and end token.
+
+Note that there are other possible fields (any value).  Reserved ones include:-
+
+  Time - the time the change took place
+  ContentSummary - mechanical content summary
+  Description - explanation of why the change took place
+  Signature - PGP siguatures of all fields other than the signature its self.
+
+New versions of the format (signified by a new number at the end of
+the start token) can be completely different and no attempt should be
+made to parse an unrecognised one.
+
+Versions which are backwards compatible will be signalled by having a minor
+version number at the end of the major version
+
+  BeginLinkChange1
+  Original: http://www.goober.com/fred/
+  New: http://www.goooober.com/wilma/
+  End
+
+These should be parsed, but any extra fields should be ignored.  In later
+major versions, the correct action in this case could change.
+
+=cut
+
+use Getopt::Mixed 1.006, 'nextOption';
+Getopt::Mixed::init( "version V>version",
+		     "usage help>usage h>usage",
+		     "verbose:i v>verbose", 
+		     "title=s t>title");
+
+$::verbose=0;
+my $option;
+my $value;
+my $asEntered;
+while (($option, $value, $asEntered) = nextOption()) {
+  if ($option eq "usage") {
+    usage();
+    exit();
+  } elsif ($option eq "version" ) {
+    version();
+    exit();
+  } elsif ($option eq "verbose" ) {
+    if ( $value eq "" ) {
+      $::verbose=4;
+    } else {
+      $::verbose=$value;
+    }
+  }
+}
+
+sub usage() {
+  print <<EOF;
+changelist.pl [arguments] changelist-filename url-base <file¦directory> [<file¦directory>...]
+  --version -V                print version info
+  --usage --help -h           print usage info
+  --verbose -v                debugging messages
+  --title=[title] -t [title]  title of fortune entries with printf escapes
+
+Read a link changelist and apply all of the changes in it to a directory
+structure.
+EOF
+}
+
+sub version() {
+  print <<'EOF';
+changelist version 
+$Id: changelist.pl.idea,v 1.1.1.1 1997/04/20 15:27:39 mikedlr Exp $
+EOF
+}
+
+#command-line-end
+
+die "missing file or directory arguments, giving up\n" unless @ARGV;
+
+LINKCHANGE: while (<>) {
+  next unless m/^BeginLinkChange1/;
+  my $change;
+  my $count=0;
+  while (<>) {
+    $count++;
+    if (m/^End/) {
+      applychange($change);
+      next LINKCHAGE ;
+    } else {
+      $change = $change . $_;
+    }
+  }
+  die "linkchange not completed";
+}
+print STDERR "Start of output\n";
+print Dumper(\%::lsm_database);
+
+sub applychange {
+  my $original = shift;
+  my $new = shift;
+  
+  foreach (@_) {
+#    pagefixer($filename)
+  }
+}

@@ -1,0 +1,44 @@
+Revision history for Lexical-Failure
+
+0.000001  Fri Feb  1 16:02:07 2013
+       Initial release.
+
+
+
+
+0.000002  Mon Jul 29 07:32:42 2013
+          No changes logged
+
+
+0.000003  Mon Jul 29 07:41:50 2013
+
+    - Reformatted test modules to make them invisible to CPAN indexer
+
+
+
+0.000004  Fri Aug  2 18:49:10 2013
+
+    - Fixed 'make test' bug
+      (Many thanks, Doran and Vincent!)
+
+
+0.000005  Mon Dec 30 08:23:01 2013
+
+    - Fixed POD linking bugs (thanks, Darin!)
+    - Undid workarounds for out-by-one line-number errors
+      in Keyword::Simple v0.01 (now require v0.02)
+
+
+0.000006  Sat May  3 10:59:58 2014
+
+    - Fixed documentation typos (thanks, Laurent)
+
+    - Coded around mysterious problems with Test::Effects under 5.19+
+      (thanks Slaven!)
+
+
+0.000007  Thu Nov 13 16:09:17 2014
+
+    - Simplified and sharpened t/inner_scalar.t
+      which also removed the requirement for PadWalker
+      (thanks Father C!)

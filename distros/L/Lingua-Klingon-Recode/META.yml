@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: Lingua-Klingon-Recode
+version: 1.02
+author:
+  - Philip Newton, E<lt>pne@cpan.orgE<gt>
+abstract: Convert Klingon words between different encodings
+license: bsd
+requires:
+  Carp: 0
+  perl: 5.005_03
+build_requires:
+  Module::Build: 0
+  Test::Differences: 0
+  Test::More: 0.19
+provides:
+  Lingua::Klingon::Recode:
+    file: lib/Lingua/Klingon/Recode.pm
+    version: 1.02
+generated_by: Module::Build version 0.25

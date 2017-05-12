@@ -1,0 +1,29 @@
+---
+abstract: 'Part-of-speech tagger for English natural language processing.'
+author:
+  - 'Maciej Ceglowski and Aaron Coburn <maciej@ceglowski.com>, <aaron@coburncuadrado.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-EN-Tagger
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Spec: 0.84
+  HTML::Parser: 3.45
+  HTML::Tagset: 3.20
+  Lingua::Stem: 0.81
+  Memoize: 1.01
+  Memoize::ExpireLRU: 0.55
+  Storable: 2.10
+  perl: 5.008001
+version: 0.28

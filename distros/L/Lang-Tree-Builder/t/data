@@ -1,0 +1,2 @@
+Parent::ClassA ClassA(ArgA, ArgA, scalar foo_bar)
+

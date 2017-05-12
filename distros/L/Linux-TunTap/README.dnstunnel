@@ -1,0 +1,100 @@
+[This document was originally written so as to more clearly define the
+specification for a fuzzy idea I had. It seems also pass as a
+reasonable description of how to perform DNS tunneling and the
+techinical limitations and hurdles.]
+
+How does the DNS tunnel work?
+
+There are three hosts involved in DNS tunneling, the client, the server, and
+the DNS server. We will call these hosts A, B, and D.
+
+The client is the box on the inside of a walled garden or other restricted
+setup that does not allow the required level of Internet access. It is one
+endpoint of the tunnel.
+
+The walled garden normally provides a DNS server for clients in the walled
+garden to look up names of services within the walled garden. This host will
+often also perform DNS queries on the public Internet.
+
+The server is a host on the outside. It acts as an authoritative DNS server
+and participates in the public Internet's DNS by having appropriate NS
+records pointing at it.
+
+When A wants to send an IP packet to B, it will encode the IP packet into a
+DNS name. This name will be within the domain that B is authoritative
+for. It will then send a TXT query for that name to D. As D is a recursive
+resolver, it will (after following the DNS delegation chain) ask B. B then
+decodes the DNS name to extract the packet.
+
+The encoded DNS hostname has to fall within the usual conventions for DNS
+queries. Since it is not an A, MX or NS query, the limitations on characters
+in hostnames as per RFC822 and HOSTS.TXT formats does not apply, but the
+limitations on name length, DNS packet size (512 bytes) and length of a
+component do apply.
+
+A scheme that fits the requirements is one where the packet is base64
+encoded, a period inserted every 31 characters, and the DNS domain appended.
+The MTU is usually around 150-160 characters.
+
+Host D is going to expect a response to the DNS query. Thus, B has to
+respond to it within a reasonable timeout. Assuming D is running BIND, this
+means that D has to receive a reply to a query within five seconds of D
+sending it. This would imply that B has about 1-2 seconds to decide what to
+return - this provides a return channel.
+
+When B wants to send an IP packet to A, it will encode the IP packet into a
+TXT response and return that to D in response to a previous DNS query. D
+will then return it to A.
+
+The encoded DNS hostname has to fall within the usual conventions for DNS
+responses. The important one is the size of the DNS response, which as the
+response contains the DNS query, will be reduced in size by the size of any
+query it might be responding to.
+
+A scheme that fits the requirements is one where the packet is base64
+encoded. The MTU is slightly more than for the forward channel, but for
+sanity should probably be kept the same.
+
+This boils down to A being able to send packets to B as often as it likes,
+but B can only send packets to A in response to a packet sent from A, and B
+has to send packets to A in response to a packet from A, even if it has
+nothing to say.
+
+As it happens, TCP handshaking will mostly ensure this works. A will send a
+query (e.g. a HTTP request) and B will reply (with the web page). TCP flow
+control will ensure there's packets being bounced both ways even when
+traffic is only flowing one way down a TCP connection.
+
+But there will be occasions where B wants to send to A but there's no query
+waiting to be answered. So A has to periodically send null queries to check.
+
+The algorithm is thus as follows:
+
+Server:
+
+The server initiates processing when it receives a packet from the client.
+The packet is decoded and handed to the kernel.
+
+The kernel is then queried for how many packets are queued waiting to go
+out. If there's a packet, it returns that in response to a query, otherwise
+it'll wait a while to see if one turns up. A suitable delay is 2s. If
+there's none after that time, an empty response is sent. Either way, it also
+includes in the response the number of packets left in its queue, so that
+the client knows how many queries it needs to make to clear it.
+
+Client:
+
+The client initiates processing when it receives a packet from the kernel, a
+response from the server, or just periodically on a heartbeat.
+
+Packets from the kernel are encoded and sent to the server immediately.
+
+Packets from the server are decoded and sent to the kernel immediately. If
+the server indicates that it has more packets to send, null queries are made
+immediately to collect them.
+
+When otherwise quiet, periodic null queries are made to see if there's any
+queued up data on the server. The delay depends on how long the client is
+happy to delay inbound connections for. This probably should not be more
+than about 60s.
+

@@ -1,0 +1,27 @@
+---
+abstract: 'Numbers to words in russian (without currency, but with specified gender)'
+author:
+  - 'Polina Shubina <925043@gmail.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Test::More::UTF8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-RU-Num2Word
+requires:
+  Carp: '0'
+  perl: '5.008009'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/regru/lingua-ru-num2word/issues
+  homepage: https://metacpan.org/release/Lingua-RU-Num2Word
+  repository: git://github.com/regru/lingua-ru-num2word.git
+version: '0.04'

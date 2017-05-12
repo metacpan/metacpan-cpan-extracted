@@ -1,0 +1,28 @@
+Linux-Distribution version 0.01
+===============================
+
+This is a simple module that uses Linux::Distribution to guess the linux
+distribution and then uses the correct commands to list all the packages
+on the system and then output them in one of three formats:  native, csv,
+and xml.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module dependends on modules Linux::Distribution and XML::Writer.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Judith Lebzelter <judith@osdl.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

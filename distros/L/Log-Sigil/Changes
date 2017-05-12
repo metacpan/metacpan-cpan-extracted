@@ -1,0 +1,44 @@
+Revision history for Perl extension Log::Sigil
+
+1.02    Sun Nov 10 23:24:16 JST 2013
+        - use Dist::Zilla
+1.01    Sun Mar 17 23:11:14 JST 2013
+        - tidy up module, use only one function that is swarn.
+0.15    Sat Aug 20 14:26:52 2011
+        - Need perl 5.8.0 or later
+0.14    Sat Aug 13 13:18:10 2011
+        - autodie joins corelist at 5.10, so i use or die instead.
+0.13    Sat Aug 13  9:34:10 2011
+        - Fix a bug that makes hash-ref on Readonly.
+0.12    Sat Aug  6 16:35:00 2011
+        - Change test using from IO::Scalar to open.
+0.11    foo bar baz 2011
+        - Fix a bug that ignores new's arguments.
+        - Add bias, and quiet attributes.
+        - Add sayf, and warnf methods.
+0.10    Sun Jun 12 19:57:00 2011
+        - Fix a bug that prints invalid warnings suffix.
+          The suffix likes 'foo at main.pl line 8.'.
+0.09    Thu Jun  7 23:28:00 2011
+        - Add requirement module to Makefile.PL, it is Test::Output
+0.08    Sat Jun  4 18:28:00 2011
+        - 'new' returns instance but carps.
+        - Fix a some bugs, but i don't remember those.
+0.07    Sun May 16 00:33:00 2011
+        - Fix a 'requires' bug in Makefile.PL.
+0.06    Sun May 16 00:27:00 2011
+        - Suppot subroutine level change.  When caller subroutine changes,
+          this repots it as reset sigil.
+        - new will be croak, use 'instance' instead.
+0.05    Sun May 15 23:44:00 2011
+        - Fix a bug in multi messages, that prints odd suffix.
+        - Supports $, var.
+0.04    Sun May 15 00:21:00 2011
+        - Fix a bug in multi messages, that prints all messages are formated.
+          Needs only first message is formated.
+0.03    Sat May 14 23:55:00 2011
+        - Supports more than one message in say, warn, and dump.
+0.02    Sat May 14 22:50:00 2011
+        - Add a dump method
+0.01    Fri Apr 29 04:33:57 2011
+        - original version

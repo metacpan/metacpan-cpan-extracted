@@ -1,0 +1,31 @@
+---
+abstract: 'A modernish default lightweight logger'
+author:
+  - 'Kent Fredric C<kentnl@cpan.org>'
+build_requires:
+  Log::Contextual: '0'
+  Term::ANSIColor: '2.01'
+  Test::Differences: '0'
+  Test::More: '0.89'
+  Test::Needs: '0.002000'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.013, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Contextual-WarnLogger-Fancy
+provides:
+  Log::Contextual::WarnLogger::Fancy:
+    file: lib/Log/Contextual/WarnLogger/Fancy.pm
+    version: '0.002000'
+requires:
+  Term::ANSIColor: '2.01'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/kentnl/Log-Contextual-WarnLogger-Fancy/issues
+  repository: https://github.com/kentnl/Log-Contextual-WarnLogger-Fancy
+version: '0.002000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

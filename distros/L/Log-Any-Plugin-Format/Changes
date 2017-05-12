@@ -1,0 +1,10 @@
+Revision history for Log::Any::Plugin::Format
+
+0.02      2017-05-07 12:07:02+01:00 Europe/London
+
+  * Fixed:
+    * Add missing dependencies to META
+
+0.01      2017-05-06 21:24:57+01:00 Europe/London
+  
+  * Initial release

@@ -1,0 +1,113 @@
+Revision history for Perl extension Logging::Simple
+
+1.04    2017-03-31
+        - applied another PR from Mohammad Anwar that corrects another one of my
+          oversights in the Makefile.PL (thanks again!)
+
+1.03    2017-03-30
+        - PR merged that fixed the repository name in Makefile.PL (thanks
+          Mohammad S Anwar!)
+
+1.02    2017-03-29
+        - renamed repo from p5-logging-simple to logging-simple (closes #33)
+        - changed the last die() call to croak() (closes #32)
+        - fix broken link in POD (closes #31)
+        - POD fix (closes #30)
+        - added example of using a memory file (scalar ref) as the log file
+          (closes #27)
+
+1.01    20160421
+        - removed all mapping to the standard syslog labels
+        - all logging is done by the numbered subs only (_0()-_7())
+        - we now allow custom labels through labels() (closes #22)
+        - cleaned up POD
+
+0.10_01 20160326
+        - added t/testrules.yml, for some reason, on some CPAN Testers, the
+          tests were being run out of order, effectively breaking them
+
+0.09    20160322
+        - we can now log specific levels only by prepending the level with a
+          '=' in the call to level() (closes #21)
+        - added more tests to ensure multi-hierarchy children objects do the
+          right thing (closes #19)
+        - added fatal(), which uses confess() (closes #18)
+        - level -1 added, which disables all logging at all levels altogether,
+          can be sent into new(), or set in level() (closes #8)
+
+0.08    20160321
+        - added custom_display(), send in whatever you want to prepend the log
+          entry with, and disable with 0 (closes #23)
+        - several POD fixes/updates
+
+0.07    20160318
+        - fix undef issue in child() if the parent didn't have a name
+        - added tests to ensure subs run only at appropriate levels (parent and
+          children) (closes #9)
+        - fixed repo/bug links due to repo name change
+
+0.06    20160317
+        - renamed to Logging::Simple due to search.cpan.org name clash
+
+0.05    20160317
+        - 100% test coverage
+        - POD completed
+        - file is now set to append by default (as opposed to write)
+          (closes #20)
+
+0.04    20160316
+        - add more tests for new(display => 0/1) and display(0/1)
+        - new 'name' param and method, for use in display (closes #14)
+        - new _translate() method, refactored code to use it
+        - renamed labels() to levels()
+        - changed timestamp() to use Time::HiRes and gather microseconds for
+          log timestamp
+        - added child(), returns a new object with all parents settings, with
+          'name' param concatenated
+
+0.03    20160316
+        - added tests for _generate_entry() (closes #5)
+        - added tests in t/06 for correct message returns
+        - we can now set level via LS_LEVEL environment variable at any time
+          (closes #1)
+        - display() and 'display' param in new() now accepts either a 0 or 1 to
+          disable/enable all outputs (closes #11)
+
+0.02    20160316
+        - added display(), allows selecting various tags in print output
+        - added print(), if disabled, log message will be returned as a string
+        - added _build(), helper method to generate the log entry
+        - Travis-CI, coveralls.io integration (closes #3)
+        - test files for POD and critic (closes #4)
+        - emerg(), crit(), warn() and err() short names along with full name
+          methods
+        - new() allows print param
+        - added _sub_names(), returns entire list of dynamic subs
+        - added _level_value(), returns the numeric value of a single level
+          (closes #7)
+        - test print attr in new() (closes #6)
+        - initial code refactoring, uses methods for setters/getters in new()
+          instead of attrs directly
+
+0.01    20160315
+        - initial version
+        - cloned (manually) from Log::Basic and renamed to Logging::Simple
+        - added file() and level() methods
+        - renamed now() to time()
+        - added tests for load and init
+        - added tests for file()
+        - file() with a param of 0 (zero), closes the current handle
+        - limit param and method can take either the partial name of the level,
+          or the appropriate integer
+        - file() now acts appropriately if no filename is sent in
+        - added labels(), returns the list of level mappings
+        - added display(), allows selecting various tags in print output
+        - added print(), if disabled, log message will be returned as a string
+        - added _build(), helper method to generate the log entry
+        - Travis-CI, coveralls.io integration (closes #3)
+        - test files for POD and critic (closes #4)
+        - emerg(), crit(), warn() and err() short names along with full name
+          methods
+        - new() allows print param
+
+

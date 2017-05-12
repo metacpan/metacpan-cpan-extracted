@@ -1,0 +1,46 @@
+# This file is an example of a language translation file.
+#
+# - Blank lines and lines begining with a '#' are ignored.
+# - It supports multiple languages / dialects within a single file.
+#
+
+
+#
+# Translate to Autralian dialect, for case of 'no selections'
+#
+key = Select [_1] colors.
+language = en_au
+expression = _1 == 0
+priority = 1
+translation = Dont select any colours.
+
+
+#
+# Translate to Autralian dialect, for case of 'one selection'
+#
+key = Select [_1] colors.
+language = en_au
+expression = _1 == 1
+priority = 1
+translation = Select one colour.
+
+
+#
+# Translate to Autralian dialect, for remaining values of _1.
+#
+# Note that since we dont care what the program value is, we dont need
+# to supply and expression or priority (defaults to zero priority).
+#
+key = Select [_1] colors.
+language = en_au
+translation = Please select [_1] colours.
+
+
+#
+# Translate to Chinese - no need for singular vs plural
+#
+key = Select [_1] colors.
+language = cn
+translation = FIXME
+
+

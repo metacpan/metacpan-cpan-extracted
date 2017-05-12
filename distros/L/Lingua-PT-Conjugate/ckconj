@@ -1,0 +1,104 @@
+#!/usr/bin/perl -I . -I ../.. -w 
+
+# 
+# ckonj
+# Author          : Etienne Grossmann
+# Created On      : May     1997
+# Last Modified On: January 1998
+# Language        : Perl
+# Status          : Use with caution!
+# 
+# (C) Copyright 1998 Etienne Grossmann
+# 
+
+use Lingua::PT::Conjugate qw( conjug codify env_is_utf8 verify %verb $vlist $cpat $vpat
+                             $wpat $letter ); 
+import Lingua::PT::Accent_iso_8859_1 qw(iso2asc asc2iso);
+
+if (env_is_utf8())
+{
+	binmode (STDOUT, ":utf8");
+}
+
+if (! %verb)
+{
+    die "No way of continuing without \%verb ! ";
+}
+
+$rfile = "reference" unless $rfile;
+
+die  "file $rfile not found" unless open (VF,"<$rfile");
+{
+    binmode (VF, ":utf8");
+    my @vf = <VF>;
+    close VF;
+    $rs =  join("",@vf); 
+    $rs =~ s/\#.*\n*//mg;
+    $rs =~ s/\-+//mg;
+    $rs .= "\ndummy:";
+}
+
+$ret_value = 0;                  # For the moment, nothing failed
+
+$codified = 0;
+
+if(defined($ARGV[0]) && -e $ARGV[0]){
+    $rfile = $ARGV[0];
+    codify($vlist) unless    $codified == 1; 
+    $codified = 1;
+    shift @ARGV;
+} 
+@ARGV= sort @ARGV ;
+$ok_list = "";
+while( $v = shift @ARGV ){
+    if($v eq "all"){		# Add all known verbs to @ARGV
+        codify($vlist) unless $codified;
+        push( @ARGV, keys(%verb) );
+#        push( @ARGV, keys(%{$verb->{defectivos}}) );
+        @ARGV=sort @ARGV;
+        next;
+    }
+    if( $v =~ /^defectivos[123]?$/){ 
+        next;
+    }
+    if($v){
+        $v=asc2iso($v) if $v=~/[\"\'\^\\\~]/ ;
+        $x = $v;
+#        print "$v ";
+        $x =~ s/\\/\./g; 
+#        print "x is >$x<\nrs is >$rs<\n";
+        $rs =~ / \b( $x \s* : [^:]*) (\b$wpat+ \s* :) /mx ;#'"
+#        print "x  $x, $1, $2\n";
+        $w = $1;
+	# print "Found Reference >>$w<<\n";
+    } else {
+        print "empty <$v>\n";
+        $w="";
+        next;
+    }
+    if( !$w ){
+        $absent_list .= "$v ";
+        next;
+    } 
+    $res = Lingua::PT::Conjugate::verify($w);
+    if($res =~ /^OK/){
+        $ok_list .= "$v "; 
+    } else {
+        $ret_value = 1;
+        print "Complaint :\n$res\n";
+    }
+} 
+print "THESE VERBS ARE OK                      >>$ok_list<<\n";
+print "NOT IN REFERENCE FILE (no error found)  >>$absent_list<<\n" 
+    if $absent_list;
+
+# use Data::Dumper;
+# $Data::Dumper::Useqq=1;
+# $Data::Dumper::Terse=1;
+
+# print "Abolir:\n" ;
+# print Dumper( $verb{abolir} ) ;
+# print conjug(abolir)  ;
+# print "Def",$verb{defectivos}->{abolir},"\n" ;
+# print Dumper( $verb{defectivos} );
+exit($ret_value)

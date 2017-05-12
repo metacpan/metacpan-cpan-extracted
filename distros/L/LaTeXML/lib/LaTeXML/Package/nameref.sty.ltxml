@@ -1,0 +1,34 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  nameref                                                           | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+# We want to display the actual "name" of the labeled structure (e.g. \section),
+#   which is accessible via show="title"
+DefConstructor('\nameref Semiverbatim',
+  "<ltx:ref class='ltx_refmacro_nameref' show='title' labelref='#label' _force_font='true'/>",
+  properties => sub { (label => CleanLabel($_[1])); });
+
+DefMacro('\Nameref', '\nameref');    #\def\Nameref#1{‘\nameref{#1}’ on page~\pageref{#1}}
+
+DefMacro('\Sectionformat{}{}', '#1');
+
+DefMacro('\Ref', '\ref');            # can be improved if "varioref.sty" is loaded?
+
+DefMacro('\slabel', '\label'); #The original nameref docs say: "Overload an AMS LaTEX command, which uses \newlabel. Sigh!"
+
+DefMacro('\vnameref', '\nameref');    # We can improve if we had \vpageref
+
+1;

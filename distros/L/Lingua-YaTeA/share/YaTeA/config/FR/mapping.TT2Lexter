@@ -1,0 +1,180 @@
+# abréviations
+ABR => NomXX
+# adjectifs 
+ADJ => Adj??
+# adverbes
+ADV => Adv
+KON => CCoord
+# déterminants
+DET:ART => Det??
+# DET(def):f:s => DetFS
+# DET(def):m:s => DetMS
+# DET(def):_:p => Det?P
+# DET(def):_:s => Det?S
+# DET(indef):_:_ => Det??
+# DET(indef):m:s => DetMS
+# DET(indef):_:p => Det?P
+DET:indef => Det??
+DET => Det??
+DET:POS => Det??
+# JY, Gy (unité de dose), ...
+INT => Nom
+# noms propres
+NAM => NomXX
+# Noms communs
+NOM => Nom??
+# numéraux
+NUM => Num
+# noms propres
+# NPR => NomXX
+#  ponctuation
+PUN => Typo
+# PON => Typo
+# PON:comma => Typo
+# PON:sep => Typo
+# de, des, à, pour, sur, en
+PRP => Prep
+PRP:det => Prep
+PRE => Prep
+PRE:1st => Prep
+PRE:2nd => Prep
+# PRE:det:2nd => Prep
+# PRE(det):m:s => Prep
+# PRE(det):_:p => Prep
+# y, en
+# PRO(clit):3p:m:s:_ => Pro
+# PRO(clit):_p:_:_:{a|o} => Pro
+PRO => Pro
+# celle, ceux, ce, cet, cette, ces, c', celui-ci
+PRO:DEM => Pro??
+# PRO:DEM => Pro
+# PRO(demo:attr):3p:f:p:_ => Pro
+# PRO(demo:attr):3p:f:s:_ => Pro
+# PRO(demo:attr):3p:m:p:_ => Pro
+# PRO(demo:attr):3p:m:s:_ => Pro
+# PRO(demo:attr):3p:_:_:n => Pro
+# PRO(demo:pred):3p:f:p:_ => Pro
+# PRO(demo:pred):3p:f:s:_ => Pro
+# PRO(demo:pred):3p:m:p:_ => Pro
+# PRO(demo:pred):3p:m:s:_ => Pro
+# PRO(demo:pred):3p:_:_:n => Pro
+# PRO(demo:pred):3p:_:s:_ => Pro
+# tout, tous, toutes, toute, quelques, aucun, chacun
+PRO => Pro
+PRO:IND => Pro
+# qui, quel, quelle, quelles, quels, où, laquelle
+# PRO(inter):_:_ => Det??
+# PRO(inter):f:p => DetFP
+# PRO(inter):f:s => DetFS
+# PRO(inter):m:p => DetMP
+# PRO(inter):m:s => DetMS
+# moi, je, vous, les, lui, l', nous
+PRO:PER => Pro??
+# PRO(pers:clit):1p:_:p:_ => Pro?P
+# PRO(pers:clit):1p:_:s:{a|d} => Pro?S
+# PRO(pers:clit):2p:_:p:_ => Pro?P
+# PRO(pers:clit):2p:_:s:{a|d} => Pro?S
+# PRO(pers:clit):3p:f:s:a => ProFS
+# PRO(pers:clit):3p:m:s:a => ProMS
+# PRO(pers:clit):3p:_:p:a => Pro?P
+# PRO(pers:clit):3p:_:p:d => Pro?P
+# PRO(pers:clit):3p:_:s:a => Pro?S
+# PRO(pers:clit):3p:_:s:{d|o} => Pro?S
+# je, vous, nous, on, elle, il, on, 
+# PRO(pers:conj):1p:_:p:_ => Pro?P
+# PRO(pers:conj):1p:_:s:n => Pro?S
+# PRO(pers:conj):2p:_:p:_ => Pro?P
+# PRO(pers:conj):2p:_:s:n => Pro?S
+# PRO(pers:conj):3p:f:p:{n|d|o} => ProFP
+# PRO(pers:conj):3p:f:s:{n|d|o} => ProFS
+# PRO(pers:conj):3p:m:p:n => ProMP
+# PRO(pers:conj):3p:m:s:n => ProMS
+# PRO(pers:conj):3p:_:s:n => Pro?S
+# PRO(pers:disj):1p:_:p:_ => Pro?P
+# PRO(pers:disj):1p:_:s:_ => Pro?S
+# PRO(pers:disj):2p:_:p:_ => Pro?P
+# PRO(pers:disj):2p:_:s:_ => Pro?S
+# PRO(pers:disj):3p:f:p:{n|d|o} => ProFP
+# PRO(pers:disj):3p:f:s:{n|d|o} => ProFS
+# PRO(pers:disj):3p:m:p:{n|d|o} => ProMP
+# PRO(pers:disj):3p:_:s:{d|o} => Pro?S
+# PRO(pers:refl):1p:_:p:_ => Pro?P
+# PRO(pers:refl):1p:_:s:_ => Pro?S
+# PRO(pers:refl):1p:_:s:{a|d} => Pro?S
+# PRO(pers:refl):2p:_:p:_ => Pro?P
+# PRO(pers:refl):2p:_:s:_ => Pro?S
+# PRO(pers:refl):2p:_:s:{a|d} => Pro?S
+# PRO(pers:refl):3p:_:_:{a|d} => Pro??
+# PRO(pers:refl):3p:f:p:_ => ProFP
+# PRO(pers:refl):3p:f:s:_ => ProFS
+# PRO(pers:refl):3p:m:p:_ => ProMP
+# PRO(pers:refl):3p:m:s:_ => ProMS
+# ses, son, etc.
+PRO:POS => Det??
+# PRO(poss):3p:f:p:_ => DetFP
+# PRO(poss):3p:f:s:_ => DetFS
+# PRO(poss):3p:m:p:_ => DetMP
+# PRO(poss):3p:m:s:_ => DetMS
+# PRO(poss):3p:_:p:_ => Det?P
+# PRO(poss):3p:_:p:d => Det?P
+# dont, qui, où, que, laquelle, 
+PRO:REL => ProRel
+# PRO(rela):_:_ => ProRel??
+# PRO(rela):f:p => ProRelFP
+# PRO(rela):f:s => ProRelFS
+# PRO(rela):m:p => ProRelMP
+# PRO(rela):m:s => ProRelMS
+# 
+# PRP:det => Prep
+# PRP => Prep
+# nouvelle ponctuation
+# PUN => Typo
+PUN:cit => Typo
+SENT => Typo
+# &, +, %, 
+SYM => Typo
+# Verbe indicatif présent
+VER:pres => VCONJ
+# Verbe indicatif imparfait
+VER:impe => VCONJ
+#
+VER:impf => VCONJ
+# Verbe imperatif
+VER:impe => VCONJ
+#
+VER:futu => VCONJ
+#
+VER:simp => VCONJ
+#
+# Verbe conditionnel présent
+VER:pres => VCONJ
+# Verbe conditionnel passé
+#
+VER:simp => VCONJ
+#
+# # verbes auxiliaires conjugués
+VER:aux:cond => VCONJ
+VER:aux:futu => VCONJ
+VER:aux:impf => VCONJ
+VER:aux:infi => VCONJ
+VER:aux:pper => VCONJ
+VER:aux:pper => VCONJ
+VER:aux:ppre => VCONJ
+VER:aux:pres => VCONJ
+VER:aux:simp => VCONJ
+VER:aux:subi => VCONJ
+VER:aux:subp => VCONJ
+VER:cond => VCONJ
+# # infinitifs
+VER:infi => VINF
+# # participes passés
+#
+VER:pper => Ppa??
+VER => Ppa??
+#
+# # présents
+VER:ppre => VCONJ
+# Verbe subjonctif présent
+VER:subp => VCONJ
+# Verbe subjonctif imparfait
+VER:subi => VCONJ

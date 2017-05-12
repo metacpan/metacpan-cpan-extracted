@@ -1,0 +1,75 @@
+NAME
+    Log::Log4perl::Filter::CallerMatch - Filter Log4perl messages based on
+    call frames
+
+VERSION
+    version 1.200
+
+DESCRIPTION
+    This Log4perl custom filter checks the call stack using caller() and
+    filters the subroutine and package using user-provided regular
+    expressions. You can specify a specific call frame to test against, or
+    have the filter iterate through a range of call frames.
+
+ATTRIBUTES
+  StringToMatch
+    A perl5 regular expression, matched against the log message.
+
+  AcceptOnMatch
+    Defines if the filter is supposed to pass or block the message on a
+    match ("true" or "false").
+
+  PackageToMatch
+    A perl5 regular expression, matched against the 1st item in the array
+    returned by caller() (e.g. "package")
+
+  SubToMatch
+    A perl5 regular expression, matched against the 4th item in the array
+    returned by caller() (e.g. "subroutine")
+
+  CallFrame
+    The call frame to use when requesting information from caller(). (e.g.
+    $i in caller($i)
+
+  MinCallFrame
+    The first call frame tested against when iterating through a series of
+    call frames. Ignored if CallFrame specified.
+
+  MaxCallFrame
+    The last call frame tested against when iterating through a series of
+    call frames. Ignored if CallFrame specified.
+
+METHODS
+  new
+    Constructor. Refer to Log::Log4perl::Filter for more information
+
+  ok
+    Decides whether log message should be accepted or not. Refer to
+    Log::Log4perl::Filter for more information
+
+USAGE
+     # log.conf
+     log4perl.logger = ALL, A1
+     log4perl.appender.A1        = Log::Log4perl::Appender::TestBuffer
+     log4perl.appender.A1.Filter = MyFilter
+     log4perl.appender.A1.layout = Log::Log4perl::Layout::SimpleLayout
+
+     log4perl.filter.MyFilter                = Log::Log4perl::Filter::CallerMatch
+     log4perl.filter.MyFilter.SubToMatch     = WebGUI::Session::ErrorHandler
+     log4perl.filter.MyFilter.PackageToMatch = Flux::
+     log4perl.filter.MyFilter.StringToMatch  = Operand1
+
+SEE ALSO
+    Log::Log4perl::Filter, Log::Log4perl::Filter::StringMatch,
+    Log::Log4perl::Filter::LevelMatch, Log::Log4perl::Filter::LevelRange,
+    Log::Log4perl::Filter::Boolean
+
+AUTHOR
+    Patrick Donelan <pdonelan@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Patrick Donelan.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,42 @@
+Version 0.003003
+ - Extend the "broken 'fatal' workaround" to future Log::Any versions
+   since the author of Log::Any has rejected my fix.
+
+Version 0.003002
+ - Fix distfile (no code changes, module version unchanged)
+
+Version 0.003001
+ - Extended 'fatal' workaround to apply to Log::Any version 1.032,
+   which is still broken.
+
+Version 0.003
+ - Tap into Test::Builder methods to deliver diag() and note() through
+   their usual path.  (fixes indenting for subtests)  Falls back to
+   generating TAP strings if Test::Builder is not loaded.
+ - Fix for 'fatal' not printing the right prefix with Log::Any >= 0.9
+ - Deprecated 'dumper' attribute since it can't be supported on
+   Log::Any >= 0.9
+
+Version 0.002
+ - Trap exceptions in debugf and tracef
+ - Trapped exceptions in debug* trace* are now reported using ->warn
+ - New filter level 'all' suppresses all messages
+ - Filter levels are now stored in symbolic form, for useful inspection by
+   end-users
+ - Invalid filter levels from environment variables no longer throw exceptions
+   (only warn).  Filters from constructor args still do.
+ - Fixed bug in filter="level+N" notation
+ - Print helpful TAP comment about available environment variables on startup
+ - Support for all log levels, rather than artifical cap at critical/fatal
+ - Better support for subclassing (BEGIN block broken into reusable functions)
+ - Publish default_dumper method instead of the _default_dumper function
+
+Version 0.001
+ - Basic support for all logging methods, prefixing all output with
+   the canonical name of the log level other than 'info', and writing
+   each line with a comment prefix.
+ - Warning and higher go to STDERR like Test::More::diag, and Notice
+   and below go to STDOUT like Test::More::note
+ - Default filter is debug and below.
+ - Support for custom dumpers, used for non-scalars passed to 'debug'
+   or 'trace' or any of the formatting '*f()' functions.

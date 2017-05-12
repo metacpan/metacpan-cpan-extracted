@@ -1,0 +1,16 @@
+$a = {
+    'casa' => {
+        count => 100,
+        trans => {
+            home => 0.25,
+            house => 0.25,
+        },
+    },
+    'gato' => {
+        count => 150,
+        trans => {
+            cat => 1,
+        },
+    },
+};
+

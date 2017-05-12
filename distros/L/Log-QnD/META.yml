@@ -1,0 +1,20 @@
+---
+abstract: 'Log::QnD - Quick and dirty logging system'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: Log-QnD
+provides:
+    Log::QnD:
+        file: lib/Log/QnD.pm
+        version: 0.17
+requires:
+    Class::PublicPrivate: 0
+    File::ReadBackwards: 0
+    IO::Scalar: 0
+    JSON: 0
+    String::Util: 0
+    Test: 0
+    perl: 5.003
+version: 0.17

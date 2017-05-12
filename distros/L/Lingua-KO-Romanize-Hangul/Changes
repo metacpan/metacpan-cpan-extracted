@@ -1,0 +1,13 @@
+# Lingua::KO::Romanize::* modules Changes
+
+2008/01/14 (0.20)
+    - follows the Revised Romanization of Korean standard
+      http://en.wikipedia.org/wiki/Revised_romanization_of_Korean
+    - treats utf8 flag transparently
+    - tests added: t/00_pod.t t/02_many.t t/11_utf8.t
+
+2006/04/04 (0.12)
+	- chars() method added
+
+2006/03/26 (0.11)
+	- first release

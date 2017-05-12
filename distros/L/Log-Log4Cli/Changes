@@ -1,0 +1,43 @@
+Revision history for Log-Log4Cli
+
+0.17    2017-05-01
+        docs improved
+        refactoring
+
+0.16    2017-04-14
+        use die if die_* invoked in eval block
+
+0.15    2017-03-24
+        color for notice changed to bold white
+
+0.14    2016-10-16
+        pod corrected
+
+0.13    2016-10-16
+        tests corrected (win must pass as well)
+        docs slightly corrected
+
+0.12    2016-09-27
+        tests significantly improved
+        get rid of eval_fatal (ambigous)
+
+0.11    2016-08-18
+        Docs corrected
+        loglevel tests added
+
+0.10    2016-06-26
+        eval_fatal() and log_notice() added
+        refactoring
+
+0.09    2016-06-17
+        die_notice() added
+
+0.08    2016-06-11
+        Sufficient documentation added.
+
+0.07    2016-05-17
+        Main functionality implemented.
+        prestable
+
+0.01    2016-05-04
+        Inital commit, draft.

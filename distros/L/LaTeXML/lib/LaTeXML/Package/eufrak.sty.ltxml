@@ -1,0 +1,24 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  eufrak                                                             | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+# Only defines \mathfrak to use the Euler Fraktur font
+DefConstructor('\EuFrak{}', '#1', bounded => 1, requireMath => 1,
+  font => { family => 'fraktur', series => 'medium', shape => 'upright' });
+DefConstructor('\mathfrak{}', '#1', bounded => 1, requireMath => 1,
+  font => { family => 'fraktur', series => 'medium', shape => 'upright' });
+
+1;

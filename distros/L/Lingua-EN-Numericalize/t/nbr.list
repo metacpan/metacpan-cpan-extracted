@@ -1,0 +1,134 @@
+#   This file is used for regression testing.  Each line below contains
+#   an input and a result, separated by an equals sign with the result
+#   first.  Empty lines are allowed and comments are ignored.
+
+#   ordinal numbers
+
+0		= zero
+1		= one
+2       = two
+3		= three
+4       = four
+5       = five
+6       = six
+7       = seven
+8       = eight
+9       = nine
+10      = ten
+11      = eleven
+12      = twelve
+1000	= thousand
+
+#   teens and tys
+
+13      = thirteen
+15		= fifteen
+20      = twenty
+40      = fourty
+
+#   cardinal numbers
+
+1		= first
+2		= second
+3		= third
+9		= ninth
+43      = fourtythird
+59		= fifty-ninth
+60      = sixtieth
+1		= 1st
+2		= 2nd
+3		= 3rd
+4		= 4th
+1000000	= millionth
+4023	= 4023rd
+
+#   abbreviations
+
+1000    	= 1k
+2000000 	= 2m
+3000000000	= 3B
+
+#   conjoined terms
+
+42      = fortytwo
+42		= fortysecond
+100		= onehundred
+1000    = onethousand
+
+#   composite numbers
+
+1000	= one thousand
+1000	= 1 thousand
+1001	= thousand one
+2001	= two thousand one
+2001	= two thousand and one
+
+3124    = three thousand one hundred and twenty four
+3124    = three thousand hundred twenty four
+3124    = 3 thousand 1 hundred 24
+3124    = three 1000 hundred 24
+
+798681	= seven hundred ninety eight thousand six hundred eighty-one
+798000	= 798 thousand
+306172	= three hundred six thousand, one hundred seventy two
+306172	= 3 hundred and six thousand, one hundred and seventy-2
+42524	= fourty-two thousand five hundred twenty-four
+153		= one hundred fifty three
+88		= eighty-eight
+3424	= thirty-four hundred twenty-four
+11059	= eleven thousand and fifty-nine
+9622000	= nine million, six hundred and twenty-two thousand
+5600000	= fifty-six hundred thousand
+167		= one hundred and sixty-seventh
+5500	= two hundred and fifty three hundred
+65065065065	= sixty-five thousand sixty-five million sixty-five thousand and sixty-five
+
+#   colloquial terms
+
+12		= dozen
+48		= four dozen
+13		= baker's dozen
+13		= bakers dozen
+13		= baker dozen
+39		= three baker's dozens
+288		= two gross
+288		= two grosses
+
+#   common misspellings
+
+40      = fourty
+111     = eleventy-one
+4000	= four thousands
+
+#   numeric values
+
+-1		    = -1
+1000524		= 1000,524
+999.3333333	= 999.3333333
+30303.30303	= 30303.30303
+65569565609	= 65569565609
+-12211.1133	= -12,211.1133
+
+#   very large numbers
+
+11011011011	= eleven billion eleven million eleven thousand eleven
+90		= four score and ten
+501000000	= five hundred and one million
+
+1000000	    = million
+1000000		= million
+1000000000	= billion
+1000000000000	= trillion
+1e+15		= quadrillion
+1e+18		= quintillion
+1e+21		= sextillion
+1e+24		= septillion
+1e+27		= octillion
+1e+30		= nonillion
+1e+33		= decillion
+1e+51		= hexillion
+1e+63		= vigintillion
+1e+87		= quattuordecilliard
+1e+100	    = googol
+2e+101	    = score of googoles
+1e+303		= centillion

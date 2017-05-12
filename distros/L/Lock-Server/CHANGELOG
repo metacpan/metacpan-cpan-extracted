@@ -1,0 +1,80 @@
+1.75 - added dependency of Daemon::Daemonize
+1.74 - added bin/lock_server to manifest so it installs
+1.7  - added shtudown ability for lock client
+	
+1.6  - added ping ability for lock client
+	
+1.3  - added configurable retry ability for lock clients
+
+1.2 	Updates for tests
+	
+1.1  - Make the server restful. Added run method which doesn't fork and return.
+       Make sure the socket communications are utf-8.
+	
+1.04 - added license, version and changelog files to manifest
+
+1.03 - added use warnings, the license file and the changelog file.
+	
+1.02 - updated the min perl version needed
+
+1.01 - removed unneeded use statement
+
+1.0 - basic API laid out
+
+	use DB::DataStore;
+	
+	$store = DB::DataStore->open( directory );
+	my $id = $store->stow( textOrBinData );
+	my $val = $store->fetch( $id );
+	$id2 = $store->next_id;
+	$store->stow( moreData, $id2 );
+	
+	$store->recycle( $id );
+	my $new_id = $store->next_id; # $new_id == $id
+
+	------------------------------------------
+
+	use DB::DataStore; #provides DB::DataStore::FixedStore
+	
+	my $perlPackTemplate = "LII";
+	my $store1 = DB::DataStore::FixedStore->open( $perlPackTemplate, $filename );
+
+
+	my $size = 33; #must be given when the template does not have a determinate size
+	my $store2 = DB::DataStore::FixedStore->open( "A*", $filename2, $size );
+
+	my $recycle_store = DB::DataStore::FixedRecycleStore->open( "L", $filename3 );
+
+	$store1->put_record( 1, [ 2342342432432, 12, 324 ] );
+	my( $long, $int1, $int2 ) = @{ $store1->get_record( 1 ) };
+
+	print $store->entry_count; # prints '1'
+	
+	my $removed_last = $store->pop;
+
+	print $store->entry_count; # prints '0'	
+
+	$store1->put_record( 1, [ 453242,2,12 ] );
+	
+	my $newid = $store->push( $data_to_put_at_end ); #newid == 2
+
+	my $min_entry_count = 12;
+	if( $store->entry_count < $min_entry_count ) {
+	   $store->ensure_entry_count( $min );
+	   # store now has 2 filled and 10 empty entries
+	}
+
+	$store->empty;
+	$store->entry_count == 0;
+
+	$store->unlink_store; #file removed
+
+	$recycle_store->put_record( 1, [ 12 ] );
+	$recycle_store->put_record( 2, [ 88 ] );
+	$recycle_store->put_record( 3  [ 99 ] );
+	
+	my $next_id = $recycle_store->next_id; # $next_id == 4
+
+	$recycle_store->recycle( 2 );
+
+	my $new_next_id = $recycle_store->next_id # $new_next_id == 2

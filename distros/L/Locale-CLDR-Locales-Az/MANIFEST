@@ -1,0 +1,11 @@
+Build.PL
+lib/Locale/CLDR/Locales/Az.pm
+lib/Locale/CLDR/Locales/Az/Cyrl.pm
+lib/Locale/CLDR/Locales/Az/Cyrl/Az.pm
+lib/Locale/CLDR/Locales/Az/Latn.pm
+lib/Locale/CLDR/Locales/Az/Latn/Az.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+META.yml
+META.json

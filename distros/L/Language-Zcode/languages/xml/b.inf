@@ -1,0 +1,113 @@
+Global G0;
+Array arr -> 256;
+!Global g2;
+
+[ Main i j;
+
+!    i = 1;
+!    @print_num 1;
+
+    ! arithmetic
+    @add 1 2 -> i; @print_num i; @print_char ' ';
+    @add 1 65533 -> i; @print_num i; @print_char ' ';
+    @add 65535 65534 -> i; @print_num i; @print_char ' ';
+    @add 32767 2 -> i; @print_num i; @print_char ' ';
+    @add i 2 -> i; @print_num i; @print_char ' ';
+
+    @sub 3 2 -> i; @print_num i; @print_char ' ';
+    @mul 3 4 -> i; @print_num i; @print_char ' ';
+    @new_line;
+
+    ! Non-local vars
+    @add 25 22 -> G0;
+    @print_num G0; @print_char ' ';
+    i = 3;
+    @add 25 i -> G0;
+    @print_num G0; @print_char ' ';
+    @add 36 1 -> sp;
+    @print_num sp; @print_char ' ';
+    @add G0 i -> sp;
+    @print_num sp; @print_char ' ';
+    @push 20;
+    @push 21;
+    @push 22;
+    @add sp sp -> sp;
+    @print_num sp; @print_char ' ';
+    @pull i;
+    @print_num i; @print_char ' ';
+    @sub 1 3 -> sp;
+    @print_num sp; @print_char ' ';
+    @new_line;
+
+    ! Indirect variable opcodes
+    j = i; @print_num j; @print_char ' ';
+
+    ! Memory
+    @storeb arr 2 1;
+    @storeb arr 3 5;
+    j = 1;
+    @loadw arr j -> i; @print_num i; @print_char ' ';
+    @storew arr 2 519; ! 2*0x100 + 7
+    @loadb arr 4 -> i; @print_num i; @print_char ' ';
+    @loadb arr 5 -> j; @print_num j; @print_char ' ';
+
+    @push 17; @push 18; @push 19;
+!    @pop; # v3
+    @pull i;
+    @print_num i; @print_char ' ';
+    @print " aha ";
+
+    ! prints
+    @add 65 3 -> i;
+    @print_char i; ! prints 'D'
+    @new_line;
+
+    ! bit ops
+    @or 3 6 -> i; ! 7
+    @print_num i;
+    @and 3 7 -> i;
+    @print_num i;
+    ! i is 3 again for comparisons below
+
+    ! jumps
+    jump foo;
+    @print_num 0;
+    .foo;
+    @jz 1 ?foo1;
+    @print_num 1; ! should print
+    .foo1;
+    @jz 1 ?~foo2;
+    @print_num 1; ! shouldn't print
+    .foo2;
+    @jg i 1 ?foo3;
+    @print_num 0;
+    .foo3;
+    @jg i 1 ?~foo4;
+    @print_num 1;
+    .foo4;
+    @jl i 1 ?foo5;
+    @print_num 1;
+    .foo5;
+    @jl i 1 ?~foo6;
+    @print_num 0;
+    .foo6;
+    @new_line;
+    
+    ! subs
+    @call_2n test_call 3;
+    @call_2s test_call 3 -> j;
+    @call_vn2 test_call 3 4 5 6 7 8;
+    @call_vs2 test_call 3 4 5 6 7 8 -> j;
+
+    ! quit
+    @quit;
+
+];
+
+[ test_call a b c d e f g h i j k;
+   @print_num a;
+   @print_num d;
+   b = c; e = f; g = h; i = j; k = 1;
+   @print_char ' ';
+   @ret 7;
+];

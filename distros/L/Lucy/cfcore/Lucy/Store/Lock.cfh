@@ -1,0 +1,174 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/**
+ * Abstract class representing an interprocess mutex lock.
+ *
+ * The Lock class produces an interprocess mutex lock.  The default subclass
+ * uses dot-lock files, but alternative implementations are possible.
+ *
+ * Each lock must have a name which is unique per resource to be locked.  Each
+ * lock also has a "host" id which should be unique per machine; it is used to
+ * help clear away stale locks.
+ */
+
+public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
+
+    Folder      *folder;
+    String      *name;
+    String      *lock_path;
+    String      *host;
+    int32_t      timeout;
+    int32_t      interval;
+
+    /** Abstract initializer.
+     *
+     * @param folder A Folder.
+     * @param name String identifying the resource to be locked, which must
+     * consist solely of characters matching [-_.A-Za-z0-9].
+     * @param host A unique per-machine identifier.
+     * @param timeout Time in milliseconds to keep retrying before abandoning
+     * the attempt to [](cfish:.Obtain) a lock.
+     * @param interval Time in milliseconds between retries.
+     */
+    public inert Lock*
+    init(Lock *self, Folder *folder, String *name,
+         String *host, int32_t timeout = 0, int32_t interval = 100);
+
+    /** Returns true if the Lock is shared, false if the Lock is exclusive.
+     */
+    public abstract bool
+    Shared(Lock *self);
+
+    /** Call [](cfish:.Request) once per `interval` until [](cfish:.Request) returns
+     * success or the `timeout` has been reached.
+     *
+     * @return true on success, false on failure (sets the global error object
+     * returned by [](cfish:cfish.Err.get_error)).
+     */
+    public bool
+    Obtain(Lock *self);
+
+    /** Make one attempt to acquire the lock.
+     *
+     * The semantics of [](cfish:.Request) differ depending on whether [](cfish:.Shared) returns
+     * true.  If the Lock is [](cfish:.Shared), then [](cfish:.Request) should not fail if
+     * another lock is held against the resource identified by
+     * `name` (though it might fail for other reasons).  If it is
+     * not [](cfish:.Shared) -- i.e. it's an exclusive (write) lock -- then other locks
+     * should cause [](cfish:.Request) to fail.
+     *
+     * @return true on success, false on failure (sets the global error object
+     * returned by [](cfish:cfish.Err.get_error)).
+     */
+    public abstract bool
+    Request(Lock *self);
+
+    /** Release the lock.
+     */
+    public abstract void
+    Release(Lock *self);
+
+    /** Indicate whether the resource identified by this lock's name is
+     * currently locked.
+     *
+     * @return true if the resource is locked, false otherwise.
+     */
+    public abstract bool
+    Is_Locked(Lock *self);
+
+    /** Release all locks that meet the following three conditions: the lock
+     * name matches, the host id matches, and the process id that the lock
+     * was created under no longer identifies an active process.
+     */
+    public abstract void
+    Clear_Stale(Lock *self);
+
+    String*
+    Get_Name(Lock *self);
+
+    String*
+    Get_Host(Lock *self);
+
+    String*
+    Get_Lock_Path(Lock *self);
+
+    public void
+    Destroy(Lock *self);
+}
+
+class Lucy::Store::LockFileLock nickname LFLock
+    inherits Lucy::Store::Lock {
+
+    String *link_path;
+
+    inert incremented LockFileLock*
+    new(Folder *folder, String *name, String *host,
+        int32_t timeout = 0, int32_t interval = 100);
+
+    public inert LockFileLock*
+    init(LockFileLock *self, Folder *folder, String *name,
+         String *host, int32_t timeout = 0, int32_t interval = 100);
+
+    public bool
+    Shared(LockFileLock *self);
+
+    public bool
+    Request(LockFileLock *self);
+
+    public void
+    Release(LockFileLock *self);
+
+    public bool
+    Is_Locked(LockFileLock *self);
+
+    public void
+    Clear_Stale(LockFileLock *self);
+
+    /** Delete a given lock file which meets these conditions...
+     *
+     *    - lock name matches.
+     *    - host id matches.
+     *
+     * If delete_mine is false, don't delete a lock file which matches this
+     * process's pid.  If delete_other is false, don't delete lock files which
+     * don't match this process's pid.
+     */
+    bool
+    Maybe_Delete_File(LockFileLock *self, String *filepath,
+                      bool delete_mine, bool delete_other);
+
+    public void
+    Destroy(LockFileLock *self);
+}
+
+/** Lock exception.
+ *
+ * LockErr is a subclass of [Err](cfish:cfish.Err) which indicates
+ * that a file locking problem occurred.
+ */
+public class Lucy::Store::LockErr inherits Clownfish::Err {
+
+    inert incremented LockErr*
+    new(String *message);
+
+    inert LockErr*
+    init(LockErr *self, String *message);
+}
+
+

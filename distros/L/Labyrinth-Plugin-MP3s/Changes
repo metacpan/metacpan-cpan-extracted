@@ -1,0 +1,9 @@
+Changes for Labyrinth-Plugin-MP3s
+=================================
+
+1.01    2014-12-23
+        - fixed license fields in META.json to be lists.
+        - extended META test suite.
+
+1.00    2014-05-03
+        - first official release

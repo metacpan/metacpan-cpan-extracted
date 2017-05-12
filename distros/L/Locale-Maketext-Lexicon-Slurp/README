@@ -1,0 +1,25 @@
+Locale::Maketext::Lexicon::Slurp version 0.01
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+    Moose
+    File::Basename
+    Path::Class
+    Locale::Maketext
+    Locale::Maketext::Lexicon
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Infinity Interactive
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

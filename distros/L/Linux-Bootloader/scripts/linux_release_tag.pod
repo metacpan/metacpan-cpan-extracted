@@ -1,0 +1,51 @@
+=head1 NAME
+
+linux_release_tag - prints kernel version of a Linux kernel Makefile
+
+=head1 SYNOPSIS
+
+linux_release_tag [ MAKEFILE ] [ FORMAT ]
+
+=head1 DESCRIPTION
+
+This script extracts the version information from a Linux kernel
+makefile and prints it according to the format specification indicated
+by FORMAT (which, by default, prints something in the form of
+'2.6.24-rc13-git42'.)
+
+MAKEFILE must be a path to a valid kernel Makefile.  If not specified,
+it defaults to /usr/src/linux/Makefile.
+
+FORMAT is a string containing one or more of the following tags, which
+are substituted by the relevant items from the kernel makefile:
+
+  %v - VERSION
+  %p - PATCHLEVEL
+  %s - SUBLEVEL
+  %e - EXTRAVERSION
+  %n - NAME
+
+If not specified, FORMAT defaults to "%v.%p.%s%e".
+
+=head1 SEE ALSO
+
+L<crucible>, L<WWW::PkgFind>, L<Test::Parser>, L<Linux::Distribution>
+
+=head1 AUTHOR
+
+Bryce Harrington  [bryce at osdl dot org]
+
+=head1 COPYRIGHT
+
+Copyright (C) 2006 Bryce Harrington and Open Source Development Labs
+All Rights Reserved.
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.10 $
+
+=cut
+

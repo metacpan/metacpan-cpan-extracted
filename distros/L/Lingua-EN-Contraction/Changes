@@ -1,0 +1,11 @@
+0.1
+
+Initial version, basically a subroutine originally found in Lingua::EN::Conjugate
+
+0.1xxx
+
+various bug fixes
+
+0.104
+
+removed "use diagnostics"

@@ -1,0 +1,24 @@
+---
+name: Log-Dispatch-Wx
+version: 0.01
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+abstract: Object for logging through Wx::Log*
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Log::Dispatch: 2.11
+  Test::More: 0.48
+  Wx: 0.16
+  perl: 5.6
+build_requires:
+  Module::Build: 0.26
+provides:
+  Log::Dispatch::Wx:
+    file: lib/Log/Dispatch/Wx.pm
+    version: 0.01
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

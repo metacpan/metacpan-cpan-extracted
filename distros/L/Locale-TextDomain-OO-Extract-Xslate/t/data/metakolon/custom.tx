@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+%% "Just some text" | loc
+<html>
+  <head>
+    <title>[% i10n_me("Page title") %]</title>
+  </head>
+  <body>
+    <p>
+    <!-- filters with multiple arguments aren't supported yet in xslate, so we
+         only need to test the basic case
+         https://github.com/xslate/p5-Text-Xslate/issues/121
+    -->
+%% for $books -> $book {
+      <em>[% "Book named 'Moby Dick'." | loc %]</em>
+      <br/>
+%% }
+      [% i10n_me("Text with umlauts: äöüß.")  %]
+      [% "Text with umlauts: äöüß." | __ %]
+      [% __px("some context", "Text with {variable}.", variable => $param.variable) %]
+      <br/>
+    </p>
+  </body>
+</html>

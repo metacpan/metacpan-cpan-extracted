@@ -1,0 +1,25 @@
+libraries: 
+$VAR1 = [
+          'List::Filter::Transform::Library::FileSystem'
+        ];
+
+
+=head1 Standard transform list (defined in code libraries)
+
+
+=head2 List::Filter::Transform::Library::FileSystem
+
+=over
+
+
+=item :dwim_upcaret
+
+leading '^' converted to \b, unless it's '^/' or '^~'
+
+
+=back
+
+=cut
+
+
+

@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Lingua-PT-Inflect
+version:      0.06
+version_from: Inflect.pm
+installdirs:  site
+requires:
+    Lingua::PT::Hyphenate:         1.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,27 @@
+---
+abstract: 'Simplified interface to Log::Message'
+author:
+  - 'Jos Boumans <kane[at]cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Message-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Log::Message: 0
+  Test::More: 0
+  if: 0
+resources:
+  repository: git://github.com/jib/log-message-simple.git
+version: 0.10

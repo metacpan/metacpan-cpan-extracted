@@ -1,0 +1,72 @@
+{
+    "id": "test-id-1",
+    "type": "analyze",
+    "fqdn": "test1.com.",
+    "space": "",
+    "status": "reserved",
+    "progress": 0,
+    "created": 1,
+    "updated": 2,
+    "ipv4": 1,
+    "ipv6": 1
+}
+{
+    "id": "test-id-2",
+    "type": "analyze",
+    "fqdn": "test2.com.",
+    "space": "",
+    "status": "queued",
+    "progress": 10,
+    "created": 2,
+    "updated": 3,
+    "ipv4": 1,
+    "ipv6": 1
+}
+{
+    "id": "test-id-3",
+    "type": "analyze",
+    "fqdn": "test3.com.",
+    "space": "",
+    "status": "done",
+    "progress": 100,
+    "created": 3,
+    "updated": 4,
+    "ipv4": 1,
+    "ipv6": 1
+}
+{
+    "id": "test-id-4",
+    "type": "analyze",
+    "fqdn": "test4.com.",
+    "space": "",
+    "status": "failed",
+    "progress": 20,
+    "created": 4,
+    "updated": 5,
+    "ipv4": 1,
+    "ipv6": 1
+}
+{
+    "id": "test-id-5",
+    "type": "analyze",
+    "fqdn": "test5.com.",
+    "space": "",
+    "status": "stopped",
+    "progress": 30,
+    "created": 5,
+    "updated": 6,
+    "ipv4": 1,
+    "ipv6": 1
+}
+{
+    "id": "test-id-6",
+    "type": "analyze",
+    "fqdn": "test6.com.",
+    "space": "",
+    "status": "unknown",
+    "progress": 40,
+    "created": 6,
+    "updated": 7,
+    "ipv4": 1,
+    "ipv6": 1
+}

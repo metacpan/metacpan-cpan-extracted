@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+%% "Just some text" | __
+<html>
+  <head>
+    <title>[% "Page title" | __ %]</title>
+  </head>
+  <body>
+    <p>
+    <!-- filters with multiple arguments aren't supported yet in xslate, so we
+         only need to test the basic case
+    -->
+%% for $books -> $book {
+      <em>[% "Book named 'Moby Dick'." | __x %]</em>
+      <br/>
+%% }
+      [% "Text with umlauts: äöüß." | __ %]
+      <br/>
+    </p>
+  </body>
+</html>

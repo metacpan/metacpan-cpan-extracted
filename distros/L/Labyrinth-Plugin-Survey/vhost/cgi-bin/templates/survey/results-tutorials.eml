@@ -1,0 +1,59 @@
+[% USE String -%]
+Content-Type: text/plain; charset=utf-8
+To: "[% users.$user.name %]" <[% IF debug ; THEN ; email ; ELSE ; user ; END %]>
+From: Barbie <barbie@missbarbell.co.uk>
+Date: [% emaildate %]
+
+Subject: [% iname %] - Talk & Tutorial Evaluations
+
+Hi,
+
+In this email, please find the feedback received from the surveys available for [% iname %]. 
+
+An Explanation of the Tables:
+
+For the table matrix below, each row represents the question asked of the respondee, with the columns representing the rating given, graded from 1 to 10, where 1 represents a low rating and 10 a high one. The values in each cell represent the number of respondees who rated the question with a particular value.
+
+Due to space restrictions, the text of each question has been truncated. The full text for the questions are as below:
+
+[% done_choices = 0 ; inx = 0 -%]
+[% FOREACH course = users.$user.talk.keys -%]
+[% IF ! done_choices -%]
+[% FOREACH choice = users.$user.talk.$course.choices -%]
+* [% inx = inx + 1 ; 'Q' _ inx _ ': ' _ choice -%]
+
+[% END -%]
+[% END -%]
+[% done_choices = 1 -%]
+
+
+[% users.$user.talk.$course.title %]:
+
+[% IF users.$user.talk.$course.responses -%]
+--------------------------------------------------------
+| [% str = String.new('Qu'); str.left(2); opt = 1; FOREACH option = users.$user.talk.$course.options %] | [% str = String.new(option); str.right(2);opt = opt + 1; END %] |
+--------------------------------------------------------
+[% inx = 0; FOREACH choice = users.$user.talk.$course.choices; inx = inx + 1 -%]
+| [% str = String.new('Q' _ inx) ; str.truncate(2).left(2); opt = 1; FOREACH option = users.$user.talk.$course.options %] | [% str = String.new(users.$user.talk.$course.matrix.$inx.$opt); str.right(2); opt = opt + 1; END %] |
+[% END -%]
+--------------------------------------------------------
+
+[% FOREACH inx = users.$user.talk.$course.feedback.keys.sort -%]
+[% IF users.$user.talk.$course.feedback.$inx.value -%]
+[% users.$user.talk.$course.feedback.$inx.label -%]
+
+
+[% users.$user.talk.$course.feedback.$inx.value -%]
+
+[% END -%]
+[% END -%]
+[% ELSE -%]
+Sorry, no responses were submitted for this talk.
+
+[% END -%]
+[% END -%]
+Regards,
+Barbie.
+--
+YAPC Conference Surveys <http://yapc-surveys.org>
+QA Hackathons <http://qa-hackathon.org>

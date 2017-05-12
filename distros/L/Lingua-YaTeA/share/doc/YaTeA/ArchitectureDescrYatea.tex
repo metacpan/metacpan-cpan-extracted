@@ -1,0 +1,453 @@
+\section{General Description}
+The software \YaTeA aims at extracting noun phrases that look like
+terms from a corpus. It provides their syntactic analysis
+in a head-modifier format. 
+As an input, the term extractor requires a corpus which has been
+segmented into 
+words and sentences, lemmatized and tagged with part-of-speech (POS)
+information. The implementation of this term extractor allows to process large corpora.
+%% The input data is a corpus annotated with
+%% part-of-speech (POS) tags and lemmas. 
+%% It takes a morpho-syntactically
+%% tagged corpus as an input and exploits configuration files defined by
+%% the user.
+It is  not dependent on a specific language
+in the sense that all linguistic features can be modified or created
+for a new language, sub-language or tagset. % This allows to use any
+% part-of-speech tagset.
+In the experiments described here, we used the
+Genia
+tagger\footnote{http://www-tsujii.is.s.u-tokyo.ac.jp/GENIA/tagger/} \cite{Tsuruoka&al2005}
+which is specifically designed for
+biomedical corpora.
+
+%The tool is implemented in Perl. 
+
+The main strategy of analysis of the term candidates is
+based on the exploitation of simple parsing patterns and endogenous disambiguation. Exogenous disambiguation is also made
+possible for the identification and the analysis of term candidates by the use of external resources, \textit{i.e.} lists of
+testified terms. 
+
+This section includes the presentation of  both endogenous and
+exogenous disambiguation strategies. We also describe the whole
+extraction process implemented in \YaTeA.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% The term extractor aims at identifying and extracting noun phrases
+%% which are potential terms ({\em i.e. } term candidates). Moreover each
+%% term candidate is syntactically analysed in order to identify head and
+%% modifier components. In that respect, it provides the syntactic head
+%% of the term which is used in the syntactic parse step of the whole NLP
+%% chain. Before parsing, terms identified in the corpus are simplified by their
+%% syntactic head in order to decrease the complexity of the sentences.
+
+%% We plan to set a confidence degree to each step of the term
+%% analysis. 
+
+
+\subsection{Endogenous and exogenous disambiguation}
+\label{sec:endogenous}
+
+Endogenous disambiguation consists in the exploitation of intermediate
+chunking and parsing results for the parsing of a given Maximal Noun Phrase
+(MNP). This feature
+allows the parse of complex noun phrases using a limited number of
+simple parsing patterns (80 patterns containing a maximum of 3
+content words in the experiments described below). All the MNPs
+corresponding to parsing patterns %  or testified terms
+are
+parsed first. In a second step, remaining unparsed MNPs are processed
+using the results of the first step as \emph{islands of reliability}. 
+An \emph{island of reliability} is a subsequence
+(contiguous or not) of a MNP that corresponds %% This subsequence
+to % a testified term or
+a shorter term candidate that was
+parsed during the first step of the parsing process. This subsequence along with its internal analysis is used as
+an anchor in the parsing of the MNP. Islands are used to simplify the
+POS sequence of the MNP for which no parsing pattern was found. The subsequence covered by the island is
+reduced to its syntactic head. In addition,   
+% As a consequence,
+islands increase the degree of reliability of the parse as shown in Figure \ref{fig:endogenous}.  When no resource is provided and as there is no parsing pattern defined for the complete POS sequence "NN NN NN of NN" corresponding to the term candidate "Northern blot analysis of cwlH", the progressive method is applied. In such a case, the TC is bracketed from the right to the left, which results in a poor quality analysis. When considering the island of reliability "northern blot analysis", the correct bracketing is found.
+\begin{figure}[!htbp]
+\centering
+  %% \textbf{differential pattern of cot gene expression}\\
+%%   \textbf{JJ NN of NN NN NN}\\
+%%   ISLANDS: \\
+%%   - cot gene : head = gene\\
+%%   - gene expression : head = expression\\
+%%   REDUCED POS SEQUENCE:   JJ NN of NN\\
+%%   PARSE using islands:  ( ( differential  pattern ) of  ( ( cot gene )
+%%   expression ) ) \\
+%%    PARSE without using islands: *( differential ( pattern of ( cot
+  %%    ( gene  expression ) )\\
+  % \includegraphics[scale=0.6]{endogenous}
+%   \caption{Endogenous disambiguation for parsing} 
+\includegraphics[scale=0.6]{exogenous}
+  \caption{Effect of an isalnd of reliability}
+  \label{fig:endogenous}
+\end{figure}
+%% The identification and the syntactic analysis of the terms is similar
+%% to those used in the French term extractor Lexter \cite{lexter}:
+%% identification of maximal noun phrases, analysis in head and modifer
+%% of the noun phrase components. [J'AIME PAS TROP CETTE PHRASE]
+%% The implementation of this term extractor allows to process large corpora.
+%% The tool can be adapted to the corpus and a language thanks to the
+%% configurable files defining the chunking and analysis of the input
+%% data. In that respect, any part-of-speech tagset can be used.
+%% We implement an endogenous  syntactic disambiguation of the terms
+%% which uses  clues in the corpora to produce the best parse(s) for a term.
+%% Exogeneous disambiguation is also made possible by using existing
+%% terminologies (\textit{i.e.} testified terms) as an input of the extractor.
+%% An index of reliability is assigned to each parse.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\subsection{Exogenous disambiguation}
+%\label{sec:exogenous}
+\YaTeA allows exogenous dismabiguation,  \textit{i.e.} the exploitation of existing (attested) terminologies to
+assist the chunking, parsing and extraction steps. 
+
+During chunking, sequences of words corresponding to testified terms
+are identified. They cannot be further split or deleted. Their POS tags and
+lemmas can be corrected according to those associated to the testified term. 
+If a MNP corresponds to a testified term for which a parse exists
+(provided by the user or computed using parsing patterns), it is
+recorded as a term candidate with the highest score of reliability.
+Similarly to endogenous disambiguation, subsequences of MNPs
+corresponding to testified terms are used to simplify the POS sequence
+of the MNP and augment the quality of the parse%  (Figure \ref{fig:exogenous})
+.
+\subsection{Term candidate extraction process}\label{sec:term-extr-proc}
+A noun phrase is extracted from the corpus and considered a term candidate if at least one
+parse is found for it. This is performed in three main steps,
+\emph{chunking}, \textit{i.e.} construction of a list of Maximal Noun
+Phrases (MNPs) from the corpus, \emph{parsing}, \textit{i.e.} attempts
+to find at least one syntactic parse for each MNP and, finally,
+\emph{extraction} of term candidates.
+The result of the term extraction process is two lists of noun phrases:  one
+contains parsed MNPs, called \emph{term candidates}, the other
+contains MNPs for which no parse was found. Both lists are proposed to
+the user through a validation interface\footnote{ongoing development}.
+
+%  We assume that the terms are
+% part of the parsed maximal noun phrases and thus consider each
+% internal node of the syntactic tree of a MNP as a
+% potential term, i.e. a term candidate.
+
+% Linguistic data defined by the user are used in the chunking and parsing steps as well as
+% existing terminologies when provided.
+
+
+
+
+% The term extractor has three steps: (1) the chuncking (identification of
+% the maximal noun phrases), (2) the analysis of the term candidates fully
+% covered by at least one parsing pattern (defined maximal noun phrases), and (3) the
+% analysis of the remaining terms (under-defined  maximal noun phrases)
+% using the results of step 2.
+
+% It requires several types of information:
+% \begin{itemize}
+% \item chunking frontiers, used to identify the maximal noun phrases;
+
+% \item cleaning frontiers, used to remove words (\emph{e.g.} determiners) that
+%   cannot be in a start or final position of a term;
+
+
+% \item chunking exceptions, used to prevent the corpus
+%   from chunking in some specific cases;
+
+
+% \item forbidden structures, used to identifiy the word or 
+%   tag sequences that cannot appear in a term;
+
+% \item parsing patterns.
+
+% \end{itemize}
+ 
+
+%\paragraph{Description of the extraction steps}~\\
+
+
+
+
+\begin{enumerate}
+
+\item \textbf{Chunking}: the corpus is chunked into maximal
+  noun phrases. %% as shown in bold in the following examples. 
+%%   \begin{figure}
+%%   To understand the \textbf{role of the pro sequence} in controlling
+%%   \textbf{sigmaK activity}, we have constructed \textbf{NH2-terminal
+%%     truncations of pro-sigmaK} and characterized their behavior in
+%%   vitro at the \textbf{gerE promoter}.\\
+%%   \textbf{Bacillus subtilis Spo0A} activates \textbf{transcription} from both \textbf{sigmaA-} and \textbf{sigmaH-dependent promoters}.
+%% \end{figure}
+
+  The POS tags associated to the words of the corpus are used to delimit the MNPs
+according to the resources provided by the user: chunking
+frontiers and exceptions, forbidden structures and potentially, testified terms. 
+
+The \emph{chunking frontiers} are tags or words that are not allowed to
+  appear in MNPs, e.g. verbs (VBG) or prepositions (IN)\footnote{The Penn TreeBank
+  tagset was used for the experiments}. \emph{Chunking exceptions} are
+used to refine frontiers. For instance, \textit{"of"} is a
+  frontier exception to prepositions,  \textit{"many"} and
+  \textit{"several"} exceptions to adjectives. \emph{Forbidden
+    structures} %  stand as 
+  are 
+  exceptions for more complex structures and are used to prevent from
+  extracting sequences that look like terms (syntactically valid) but
+  are known not to be terms or parts of terms like \textit{"of course"}.
+  MNPs and subparts of MNPs corresponding to testified terms (when available) are
+  protected and cannot be modified using the chunking data. For
+  instance, the tag FW is \textit{a priori} not allowed in MNPs. However, if a
+  MNP is equal to or contains the testified term \textit{"in/IN vitro/FW"}, it will be kept as such.
+\item \textbf{Parsing} of the MNPs: for each identified MNP type,
+  different parsing methods are applied in decreasing order of
+  reliability. Once a method succeeds in parsing the MNP, the parsing
+  process comes to an end. Still, one method can compute several
+  parses for the same MNP, making the parsing non deterministic if desired. 
+  We consider 5 different parsing methods:
+  \begin{itemize}
+  \item \textsc{monolexical}: the MNP contains only one word;
+  \item \textsc{tt-covered}: the MNP inflected or lemmatized form
+    corresponds to a testified term (TT);
+ %  \item \textsc{tt-combination}: the MNP inflected or lemmatized form
+%     corresponds to the combination of several testified terms (TT);
+  \item \textsc{pattern-covered}: the POS sequence of the MNP corresponds to a
+    parsing pattern provided by user;
+  \item \textsc{progressive}: the MNP is progressively reduced at its left and
+    right ends by the application of parsing patterns. Islands of
+    reliability from term candidates or testified terms are also used to reduce the MNP sequence of the MNP to allow the application of parsing patterns.
+  \end{itemize}
+\item \textbf{Extraction} of term candidates: MNPs that received a
+  parse in the preceding processing step are consider as term
+  candidates. Statistical measures will further be implemented to
+  order MNPs according to their likelihood to be a term in order to
+  facilitate their validation by the user. 
+ % Currently, the noun phrases containing a coordination are identified
+%  and moved apart.
+%%   A maximal noun phrase is valid if and only if it contains at least
+%%   one element defined by the user (currently a common noun).
+%%   When a new MNP is created, the parsing method
+%% \item \textbf{Analysis of the fully defined noun phrases}: this first analysis
+%%  aims at parsing the maximal noun phrases that match a parsing
+%%   pattern defined by the user (see \ref{ress}). Those maximal noun phrases are
+%%   named ``defined term candidates''. For each maximal noun phrase,
+%%   the potential parsing trees are selected. A copy is instantiated with
+%%   the information specific to the term.
+%% \item \textbf{Analysis of the under-defined noun phrases}:after the first
+%%   parsing step, the remaining unparsed maximal noun phrases (named
+%%   ``under-defined term candidate''are processed in a specific way to
+%%   identify islands of reliability. 
+%%   In that respect, we intend to
+%%   identify in each maximal noun phrase all the subparts corresponding
+%%   to an already parsed term at the first step or to  a testified term. 
+%%   Those subparts can be noncontiguous. The matching is carried
+%%   out either with the inflected forms, either with the lemmatized
+%%   forms. These subparts are considered as islands of reliability.
+%%   If an entire maximal noun phrase matches the
+%%   lemmatized form of an already parsed term, the parsing process of
+%%   this maximal noun phras is complete.
+%%   In the case of a maximal noun phrase containing at least two islands
+%%   of reliability, we intend to merge them to get a wider island. If
+%%   the resulting island fully covers the maximal noun phrase, the
+%%   parsing is complete.
+%%   If the analysis is not complete, we intend to simplify the parsed
+%%   parts of the maximal noun phrases. In that respect, the sub-terms
+%%   corresponding to the islands of reliability are simplified by their
+%%   syntactic heads. We then intend to identify parsing patterns in the simplified
+%%   noun phrase. The direction of search depends on the analysis
+%%   direction defined for the corpus language.  The part corresponding
+%%   to the found pattern is simplified by its head and the process is 
+%%   repeated until only one element (the final head) remains in the maximal 
+%%   noun phrase.
+\end{enumerate}
+%% The maximal noun phrases that remain unparsed are moved
+%% appart. We consider that those are illformed chunks that cannot
+%% contain portential terms.
+% \section{Input format}
+% \label{sec:input-format}
+% \subsection{Corpus}
+% As an input, the term extractor requires a corpus which has been
+% segmented in words and sentences, lemmatized and tagged with
+% part-of-speech (POS)
+% The tool is implemented in Perl. It takes a morpho-syntactically
+% tagged corpus as an input and exploits configuration files defined by
+% the user.
+
+\subsection{Overall architecture}\label{sec:overall-architecture}
+
+Figure \ref{general} shows the overall architecture of the term
+extractor. 
+
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.6]{generalExtracteur}
+\caption{Overall architecture}\label{general}
+\end{figure}
+
+\sloppy
+
+\begin{enumerate}
+\item File management: The name and location of the input and output files required in the
+  processing are gathered in a specific hash table (\texttt{files}).
+
+\item Option management: The program first read the options provided
+  by the user in the command line, and then, those defined in both
+  files \texttt{LinguisticOptions\_LANG} and
+  \texttt{MiscellaneousOptions\_LANG}
+
+
+\item Parsing pattern loading: the file \texttt{ParsingPatterns\_LANG} containing the definition of
+  the parsing patterns is read. Then a parsing tree is built for each
+  pattern (see structure \ref{pattern}) thanks to a Lex parser. Tags
+  allowed to appear in MNPs are also read from this file. Figure
+ \ref{ChargePat} shows this module.
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale=0.7]{chargementPatrons}
+\caption{Loading of parsing patterns}\label{ChargePat}
+\end{center}
+\end{figure}
+
+\item Loading the testified terms: if terminological resources are specified by the user in the
+  command line, files containing testified terms are loaded. Testified
+  terms can be provided along with their internal analysis or as a
+  plain list. In the latter case, the list of testified terms is first 
+  processed by the morpho-syntactic tagger, then parsed using the
+  parsing patterns. Testified terms will further be used to chunk the
+  corpus and to analyse term candidates. Figure \ref{fig:chargeTT} shows the module.
+
+  \begin{figure}[!htbp]
+    \begin{center}
+    \includegraphics[scale=0.5]{chargementTAtt}
+    \caption{Loading of testified terms}
+    \label{fig:chargeTT}
+\end{center}
+  \end{figure}
+
+\item Reading and chunking of the corpus: the input corpus is read and
+  loaded in a hash table. Each hash element refers to a line. The
+  corpus is chunked into maximal noun phrases by using the information
+  related to the chunking frontiers, cleaning frontiers, exception
+  frontiers, the forbidden structures %(see \ref{ress}) 
+  and the testified terms if specified. Figure \ref{Decoup} shows the module. 
+ %  Currently, the noun phrases containing a coordination are identified 
+%   and moved apart.
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale=0.55]{decoupage}
+\caption{Corpus loading and chunking}\label{Decoup}
+\end{center}
+\end{figure}
+
+\item Analysis of the fully defined noun phrases: a first analysis
+  aims at parsing the maximal noun phrases either matching a testified
+  term or a parsing
+  pattern defined in the input. %(see \ref{ress})
+  Those maximal noun phrases are
+  named ``defined maximal noun phrases''. For each maximal noun phrase,
+  the potential parsing trees are selected. A copy is instantiated with
+  the information specific to the term, then creating a term candidate
+  (TC) (see the structure \ref{TC})
+  using a Lex parser. This module is described in Figure
+  \ref{ANaDef}.
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale=0.6]{analyseDefinis}
+\caption{Parsing of fully defined terms}\label{ANaDef}
+\end{center}
+\end{figure}
+
+\item Analysis of the under defined noun phrases: after the first
+  parsing step, the remaining unparsed maximal noun phrases (named
+  ``under-defined maximal noun phrases''are processed in a specific way to
+  identify islands of reliability. In that respect, we intend to
+  identify in each maximal noun phrase all the subparts corresponding
+  to an already parsed term at the first step or to  a testified
+  term. Those subparts (islands) can be broken, \textit{i.e.}  non contiguous. The matching is carried
+  out either with the inflected forms or with the lemmatized
+  forms. These subparts are considered as islands of reliability.
+  %(see
+  % Figure \ref{CherIlo})
+ %  If an entire maximal noun phrase matches the
+%   lemmatized form of an already parsed term, the parsing process of
+%   this maximal noun phrase is complete.
+
+
+  In the case of a maximal noun phrase containing at least two islands
+  of reliability, we intend to merge them to get a wider island. If
+  the resulting island fully covers the maximal noun phrase, the
+  parsing is complete.
+
+  If the analysis is not complete, we intend to simplify the parsed
+  parts of the maximal noun phrases. In that respect, the sub-terms
+  corresponding to the islands of reliability are simplified by their
+  syntactic heads. We then intend to identify parsing patterns on the
+  edges of the simplified
+  noun phrase. The direction of search depends on the analysis
+  direction defined for the corpus language and on the parsing direction and level of
+  priority of the selected parsing patterns.  The part corresponding
+  to a pattern is simplified by its head and the process is 
+  repeated until only one word (the final head) remains in the maximal 
+  noun phrase. Figures
+  \ref{ANaSSDef}, \ref{CherIlo}, \ref{SatetMaj}, \ref{PlaceIns}  et \ref{AnProg}
+  show the module and the function calls.
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale=0.5]{analyseSSDefinis}
+\caption{Parsing of under defined terms}\label{ANaSSDef}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale=0.6]{ChercheIlots}
+\caption{Islands of reliability Search}\label{CherIlo}
+\end{center}
+\end{figure}
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale=0.5]{SatureEtMAJ}
+\caption{Saturation of islands of reliability}\label{SatetMaj}
+\end{center}
+\end{figure}
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale=0.6]{PlaceInsert}
+\caption{Insertion in an island}\label{PlaceIns}
+\end{center}
+\end{figure}
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale=0.55]{AnalyseProgressive}
+\caption{Progressive analysis}\label{AnProg}
+\end{center}
+\end{figure}
+
+
+\item Printing of the results: several functions have been implemented
+  to print information of various kinds: the extracted term candidates and
+  their parsing, the extracted term candidates and
+  their syntactic head, the unanalysed maximal noun phrases, the
+  maximal noun phrases resulting of the chuuking step, the parsing
+  patterns with theirs trees. We also implement functions to print
+  data structures: parsing tree and node of a parsing tree. This part
+  of the program is presented in Figure \ref{Affich}.
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale=0.6]{affichage}
+\caption{Result display}\label{Affich}
+\end{center}
+\end{figure}
+\end{enumerate}
+\fussy

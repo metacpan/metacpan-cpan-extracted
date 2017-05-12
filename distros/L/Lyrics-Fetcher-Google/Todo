@@ -1,0 +1,5 @@
+TODO list for Perl module Lyrics::Fetcher::Google
+
+- Parse the HTML in a more modular, less fragile way
+
+

@@ -1,0 +1,29 @@
+---
+abstract: 'Shorten text to minimum syllables using hash table lookup and vowel deletion'
+author:
+  - 'Jari Aalto <jari.aalto@cante.net>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-EN-Squeeze
+requires:
+  Carp: '0'
+  English: '0'
+  Exporter: '0'
+  Scalar::Util: '0'
+  SelfLoader: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilbowers/Lingua-EN-Squeeze
+  repository: https://github.com/neilbowers/Lingua-EN-Squeeze.git
+version: '2016.01'

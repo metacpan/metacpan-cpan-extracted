@@ -1,0 +1,31 @@
+[% 
+    title = wikihash.pagename _ ' (Edit)';
+
+    crumb2_name = wikihash.pagename ;
+    crumb2_href = '/wiki/' _ wikihash.pagename;
+    crumb1_name = 'Edit' ;
+%]
+
+[% IF wikihash.content %][% ELSE %]
+<p>This page has no content, please feel free to add something ...</p>
+[% END %]
+
+<form action="[% cgipath %]/pages.cgi" method="post">
+<input type="hidden" name="act"      value="wiki-save" />
+<input type="hidden" name="pagename" value="[% wikihash.pagename %]" />
+
+<textarea id="wikitext" name="content" rows="20" cols="88">[% wikihash.content %]</textarea>
+<br /><br />
+Change Comment: <input type="text" name="comment" value="" size="40" />
+<br /><br />
+
+    <input type="submit" value='Save Page' />
+    <input type="button" value='Preview' onclick="this.form.act.value='wiki-view';this.form.submit()" />
+
+</form>
+
+[% IF wikihash.html %]
+<br /><br />
+<h1 class="pagetitle">[% wikihash.pagename %] (Preview)</h1>
+[% INCLUDE "wiki/wiki_page.html" %]
+[% END %]

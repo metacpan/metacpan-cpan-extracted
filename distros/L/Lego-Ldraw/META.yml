@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name: Lego-Ldraw
+version: 0.5.7.1
+author: ~
+abstract: ~
+license: perl
+requires:
+  Math::MatrixReal: 0
+  Math::Trig: 0
+  Math::VectorReal: 0
+  Template: 0
+  YAML: 0
+provides:
+  Lego::Ldraw:
+    file: lib/Lego/Ldraw.pm
+    version: 0.5.7.1
+  Lego::Ldraw::Display:
+    file: lib/Lego/Ldraw/Display.pm
+  Lego::Ldraw::Line:
+    file: lib/Lego/Ldraw/Line.pm
+  Lego::Ldraw::POV:
+    file: lib/Lego/Ldraw/POV.pm
+generated_by: Module::Build version 0.2604

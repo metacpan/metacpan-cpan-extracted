@@ -1,0 +1,141 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Limper::Extending - how to make Limper more useful
+
+=head1 VERSION
+
+version 0.013
+
+=head1 DESCRIPTION
+
+B<Limper> is B<really> simple, and meant to have only the features needed.
+This hopes to show how to extend it and make it more useful in a manageable
+way.
+
+=head1 EXAMPLE
+
+Basic outline of a package that extends B<Limper>:
+
+  package Limper::Plugin::Foo;
+
+  use base 'Limper';
+  use 5.10.0;
+  use strict;
+  use warnings;
+
+  package        # newline because Dist::Zilla::Plugin::PkgVersion and PAUSE indexer
+    Limper;
+
+  use Fizz;
+  use Buzz;
+
+  push @Limper::EXPORT, qw/foo/;
+  push @Limper::EXPORT_OK, qw/bar/;
+
+  hook after => sub { ... }
+
+  sub bar { ... }
+
+  sub foo { ... }
+
+  1;
+
+And then in your app:
+
+  use 5.10.0;
+  use strict;
+  use warnings;
+
+  use Limper::Plugin::Foo;
+  use Limper;   # this must come after all extensions
+
+  get '/foo' => sub { foo };
+
+  limp;
+
+If you also want to be able to send static content, then C<use
+Limper::SendFile> as well in your app.
+
+B<NOTE>: Using other plugins in your plugin currently may have unintended
+side-effects if something else wants to use that plugin, too.  This should
+be tested.
+
+=head1 LAYOUT
+
+Your plugin should always start with the following, replacing "Foo" with the
+name of your choice.  Limper supports down to 5.10.0 (and will not go
+lower).
+
+  package Limper::Plugin::Foo;
+
+  use base 'Limper';
+  use 5.10.0;
+  use strict;
+  use warnings;
+
+  package        # newline because Dist::Zilla::Plugin::PkgVersion and PAUSE indexer
+    Limper;
+
+All code specific to your plugin follows the above.
+
+=head1 NAMESPACES
+
+Modules added to the B<Limper::> sub-namespaces should be reasonably generic
+components which are useful as building blocks and not just simply using
+B<Limper>.  See L<Limper::Passphrase> for an example of what should B<not>
+be a plugin.
+
+If you are writing an interface to connect B<Limper> to a particular web
+server or protocol, put it under the B<Limper::Engine::> namespace (like
+L<Limper::Engine::PSGI>).
+
+If it's an otherwise typical plugin that just creates new fucntions and
+possibly uses hooks, put it under the B<Limper::Plugin::> namespace.  If
+your plugin is extending another plugin (with a tight logical relationship,
+not just requiring it), it should probably be named under that plugin's
+namespace.
+
+It's not wrong to be polite and mention your plugin's name and purpose to
+whoever owns the direct parent namespace before publishing (or even
+creating) it.
+
+There are plugins listed directly under the B<Limper::> namespace, but
+please B<do not> name your plugin like this without explicit permission from
+me.  This is reserved for features I deem are core to a robust framework but
+should not be in Limper proper, or that I maintain, as well as documentation
+and whatnot.  If you feel your plugin really should be named B<Limper::Foo>
+instead of B<Limper::Plugin::Foo>, contact me (perhaps Limper should have
+another sub-namespace?).  I'm not even sure if L<Limper::SendFile> and
+L<Limper::SendJSON> should be named as such or moved under
+B<Limper::Plugin::>.
+
+B<DO NOT USE> the B<Limper::> namespace to build a new web application or
+whatnot.  It's like naming your application under CGI:: namespace if it's
+supposed to run on CGI and that is a really bad choice and would confuse
+people badly.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Ashley Willis E<lt>ashley+perl@gitable.orgE<gt>
+
+B<rabcyr> on irc and L<twitter|https://twitter.com/rabcyr>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 SEE ALSO
+
+Actual examples:
+
+L<Limper::Engine::PSGI>
+
+L<Limper::SendFile>
+
+L<Limper::SendJSON>
+
+=cut

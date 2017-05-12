@@ -1,0 +1,17 @@
+---
+name: Locale-Maketext-Extract-DBI
+version: 0.01
+author:
+  - Brian Cassidy <bricas@cpan.org>
+abstract: Extract translation keys from a database
+license: perl
+requires:
+  DBI: 0
+  Locale::Maketext::Lexicon: 0
+build_requires:
+  Test::More: 0
+provides:
+  Locale::Maketext::Extract::DBI:
+    file: lib/Locale/Maketext/Extract/DBI.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

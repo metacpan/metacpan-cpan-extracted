@@ -1,0 +1,67 @@
+#!/usr/nikola/bin/perl -w
+use warnings;
+use strict;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $man = 0;
+my $help = 0;
+## Parse options and print usage if there is a syntax error,
+## or if usage was explicitly requested.
+GetOptions('help|?' => \$help, man => \$man) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-verbose => 2) if $man;
+
+## If no arguments were given, then allow STDIN to be used only
+## if it's not connected to a terminal (otherwise print usage)
+pod2usage("$0: No files given.")  if ((@ARGV == 0) && (-t STDIN));
+
+use Lingua::Treebank;
+
+FILE:
+while (<>) {
+    chomp;
+    my $side = Lingua::Treebank::Const->new()->from_penn_string($_);
+    print $side->as_penn_text(), "\n";
+}
+
+__END__
+
+=head1 NAME
+
+tree-inflate - transform a one-tree-per-line treebank into something
+   human-readable
+
+=head1 SYNOPSIS
+
+ tree-inflate [options] [file or STDIN]
+
+ Options:
+   -help            brief help message
+   -man             full documentation
+
+=head1 OPTIONS
+
+=over
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+Reads one-tree-per-line from STDIN or indicated files, reformats the
+trees according to a Penn standard (spreading daughters to the next
+line, applying indenting, etc) and prints them to STDOUT.
+
+Handy with I<less> etc for spot-checking trees stored in one-per-line
+format.
+
+=cut

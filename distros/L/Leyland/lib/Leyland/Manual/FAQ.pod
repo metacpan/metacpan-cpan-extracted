@@ -1,0 +1,80 @@
+=head1 NAME
+
+Leyland::Manual::FAQ - Frequently asked questions about Leyland
+
+=head1 HOW CAN I MAKE MY APP ANSWER "OPTIONS" REQUESTS?
+
+The HTTP C<OPTIONS> request method is used by clients to ask a server what
+are the HTTP methods they can perform on a certain resource (or URI path
+if you will). The server is supposed to answer with the response header
+"Allow", containing a list of valid methods, like "GET, POST, PUT".
+
+The good news for you is that L<Leyland> already does this automatically for
+you. When it receives an C<OPTIONS> request to a certain resource, it finds
+out all methods supported by it, and returns a proper answer to the client.
+
+=head1 HOW CAN I MAKE MY APP ANSWER "HEAD" REQUESTS?
+
+The HTTP C<HEAD> request method is exactly similar to C<GET>, except only
+the response headers are returned, without the response body. If you want
+to add support for HEAD requests in your Leyland applications, add the
+L<Head|Plack::Middleware::Head> Plack middleware to C<app.psgi>.
+
+=head1 WHY ARE YOU NOT USING PLACK'S LOGGING MIDDLEWARES?
+
+Since v1.0.0, Leyland does! Look at L<Leyland::Manual::Logging> for more info.
+
+=head1 WHAT'S NEXT?
+
+Refer to L<Leyland::Manual::Upgrading> for information about upgrading Leyland
+for existing applications, or L<return to the table of contents|Leyland::Manual/"TABLE OF CONTENTS">.
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Leyland at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Leyland::Manual::FAQ
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Leyland>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Leyland>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Leyland/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

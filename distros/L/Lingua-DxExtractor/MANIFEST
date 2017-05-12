@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Lingua-DxExtractor.t
+lib/Lingua/DxExtractor.pm
+META.yml                                 Module meta-data (added by MakeMaker)

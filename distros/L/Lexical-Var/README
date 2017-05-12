@@ -1,0 +1,68 @@
+NAME
+
+Lexical::Var - static variables without namespace pollution
+
+DESCRIPTION
+
+This module implements lexical scoping of static variables and
+subroutines.  Although it can be used directly, it is mainly intended
+to be infrastructure for modules that manage namespaces.
+
+This module influences the meaning of single-part variable names that
+appear directly in code, such as "$foo".  Normally, in the absence of any
+particular declaration, or under the effect of an "our" declaration, this
+would refer to the scalar variable of that name located in the current
+package.  A "Lexical::Var" declaration can change this to refer to any
+particular scalar, bypassing the package system entirely.  A variable
+name that includes an explicit package part, such as "$main::foo", always
+refers to the variable in the specified package, and is unaffected by this
+module.  A symbolic reference through a string value, such as "${'foo'}",
+also looks in the package system, and so is unaffected by this module.
+
+The types of name that can be influenced are scalar ("$foo"), array
+("@foo"), hash ("%foo"), subroutine ("&foo"), and glob ("*foo").
+A definition for any of these names also affects code that logically
+refers to the same entity, even when the name is spelled without its
+usual sigil.  For example, any definition of "@foo" affects element
+references such as "$foo[0]".  Barewords in filehandle context actually
+refer to the glob variable.  Bareword references to subroutines, such as
+"foo(123)", only work on Perl 5.11.2 and later; on earlier Perls you
+must use the "&" sigil, as in "&foo(123)".
+
+Where a scalar name is defined to refer to a constant (read-only) scalar,
+references to the constant through the lexical namespace can participate
+in compile-time constant folding.  This can avoid the need to check
+configuration values (such as whether debugging is enabled) at runtime.
+
+A name definition supplied by this module takes effect from the end
+of the definition statement up to the end of the immediately enclosing
+block, except where it is shadowed within a nested block.  This is the
+same lexical scoping that the "my", "our", and "state" keywords supply.
+Definitions from Lexical::Var and from "my"/"our"/"state" can shadow
+each other.  These lexical definitions propagate into string "eval"s,
+on Perl versions that support it (5.9.3 and later).
+
+This module only manages variables of static duration (the kind of
+duration that "our" and "state" variables have).  To get a fresh variable
+for each invocation of a function, use "my".
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2009, 2010, 2011, 2012, 2013
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

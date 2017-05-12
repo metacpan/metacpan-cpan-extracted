@@ -1,0 +1,6 @@
+TYPEMAP
+
+IxpClient *   T_PTRREF
+IxpCFid *     T_PTRREF
+IxpStat *     T_PTRREF
+IxpMsg *      T_PTRREF

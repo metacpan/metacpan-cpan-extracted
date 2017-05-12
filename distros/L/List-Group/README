@@ -1,0 +1,48 @@
+NAME
+    List::Group - Group a list of data structures to your specifications.
+
+SYNOPSIS
+      use List::Group qw[group];
+      my @list  = qw[cat dog cow rat];
+      my @group = group @list, cols => 2;
+
+      foreach my $row ( @group ) {
+        print "@{$row}\n";
+      }
+
+DESCRIPTION
+    A simple module that currently allows you to group a list by columns or
+    rows.
+
+  Functions
+    "group" *listref*, *args*
+              my @table = group \@list, cols => 2;
+
+            This function returns a list-of-lists containing the elements of
+            *listref* passed as the first argument. The remaining arguments
+            detail how to group the elements. Available groupings are
+            "cols", and "rows". Each of these groupings accept a single
+            digit as a value, the number of "cols" or "rows" to create.
+
+            The following is what @table would look like from the previous
+            example.
+
+              my @list  = qw[cat dog mouse rat];
+              my @table = group \@list, cols => 2;
+
+              print Dumper \@table;
+              __END__
+
+              $VAR1 = [
+                [ 'cat', 'dog' ],
+                [ 'mouse', 'rat' ]
+              ];
+
+AUTHOR
+            Casey West, <casey@geeknest.com>.
+
+COPYRIGHT
+              Copyright (c) 2004 Casey West.  All rights reserved.
+              This module is free software; you can redistribute it and/or modify it
+              under the same terms as Perl itself.
+

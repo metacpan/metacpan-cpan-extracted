@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+Traditional.pm
+Traditional.xs
+addition.map
+chintrad.map
+mkheader
+t/argu.t
+t/test.t

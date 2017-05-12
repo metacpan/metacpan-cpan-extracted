@@ -1,0 +1,46 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+ <table class="table table-striped">
+   <thead>
+     <tr>
+       <th trspan="postUrl"></th>
+       <th trspan="postTargetUrl"></th>
+       <th trspan="jqueryUrl"></th>
+       <th trspan="jqueryFormSelector"></th>
+       <th trspan="jqueryButtonSelector"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="s in currentNode.nodes">
+        <td>
+          <input class="form-control" ng-model="s.title"/>
+        </td>
+        <td>
+          <input class="form-control" ng-model="s.data.target"/>
+        </td>
+        <td>
+          <input class="form-control" ng-model="s.data.jqueryUrl"/>
+        </td>
+        <td>
+          <input class="form-control" ng-model="s.data.formSelector"/>
+        </td>
+        <td>
+          <input class="form-control" ng-model="s.data.buttonSelector"/>
+        </td>
+        <td>
+          <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"/>
+          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newPost'})"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "title": "newPost",
+  "icon": "plus-sign"
+}]
+</script>
+

@@ -1,0 +1,83 @@
+=head1 Lingua::DE::Wortschatz
+
+This is a full featured client for the webservices at
+<http://wortschatz.uni-leipzig.de>. The script "wsws.pl" is a command
+line client that uses this lib. It is contained in this distribution.
+
+The webservices at <http://wortschatz.uni-leipzig.de> provide access to
+a database of the german word pool. Available services include tools to
+reduce words to base form, find synonyms, significant neighbours,
+example sentences and more. All public services at
+<http://wortschatz.uni-leipzig.de> are available.
+
+=head1 INSTALLATION
+
+Download and unpack the distribution, switch to the distribution
+directory and type
+
+ perl Build.PL
+ perl Build
+ perl Build test
+ perl Build install
+
+This will install the Lingua::DE::Wortschatz.pm module and the command line
+script wsws.pl.
+
+Use
+
+ perldoc wsws.pl
+ perldoc Lingua::DE::Wortschatz
+
+to find further information on usage.
+
+=head1 CHANGES
+
+=head2 Lingua-DE-Wortschatz-1.27
+
+ * documentation updates
+ * removed method use_service_xml
+ * minor changes to code
+
+=head2 Lingua-DE-Wortschatz-1.26
+
+ * wortschatz.uni-leipzig seems partially broken at the moment
+   (reported by Hans-Jürgen Schönig)
+ * server errors now cause client to die
+ * added test but commented out tests that fail at the moment
+ * minor updates to documentation
+
+=head2 Lingua-DE-Wortschatz-1.25
+
+ * fixed service Frequencies (bug reported by Simon Clematide)
+ * minor updates to documentation
+
+=head2 Lingua-DE-Wortschatz-1.24
+
+ * added the two new services Sachgebiet and Kreuzwortraetsel
+   (pointed out by Andreas)
+
+=head2 Lingua-DE-Wortschatz-1.23
+
+ * added README again (was missing in last release)
+
+=head2 Lingua-DE-Wortschatz-1.21009
+
+ * added passthrough makefile to Build.PL
+   to simplify installation with CPAN tool
+
+=head2 Lingua-DE-Wortschatz-1.21008
+
+ * Added README
+ * Updates to documentation
+ * Beautification of dump
+
+=head2 Lingua-DE-Wortschatz-1.21007
+
+ * Initial release.
+
+=head1 AUTHOR/COPYRIGHT
+
+Copyright 2005 - 2008 Daniel Schröer (L<schroeer@cpan.org>).
+
+This program is free software;
+you can redistribute it and/or modify it under the same terms as Perl itself.

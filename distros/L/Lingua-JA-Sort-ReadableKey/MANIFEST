@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Lingua-JA-Sort-ReadableKey.t
+lib/Lingua/JA/Sort/ReadableKey.pm
+META.yml                                 Module meta-data (added by MakeMaker)

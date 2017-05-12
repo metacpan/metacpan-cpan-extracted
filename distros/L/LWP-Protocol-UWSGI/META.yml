@@ -1,0 +1,27 @@
+---
+abstract: 'uwsgi support for LWP'
+author:
+  - 'Nikolas Shulyakovskiy <shulyakovskiy@mail.ru>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-Protocol-UWSGI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LWP: '0'
+  LWP::Protocol: '0'
+  LWP::Protocol::http: '0'
+  Net::HTTP: '0'
+  URI: '0'
+  URI::Escape::XS: '0'
+version: v1.1.8

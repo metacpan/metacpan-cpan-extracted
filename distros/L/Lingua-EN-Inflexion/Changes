@@ -1,0 +1,45 @@
+Revision history for Lingua-EN-Inflexion
+
+0.000001  Wed May 14 16:41:49 2014
+       Initial release.
+
+
+
+0.000002  Tue Jul 22 19:32:11 2014
+          No changes logged
+
+
+0.000003  Tue May  5 16:11:33 2015
+
+    * Patched POD nits
+
+
+0.000004  Fri May  8 07:03:02 2015
+
+    * Silenced backwards incompatible experimental warnings about
+      smartmatching under Perl 5.18 and later
+      (Thanks Alexandr and Karen)
+
+
+
+0.000005  Sat May 21 08:14:35 2016
+
+    * Fixed "horses" --> "horse", etc.
+
+    * Fixed pod nit ("one-to-to")
+
+    * Fixed inflect() behaviour when not count set
+      (now consistently defaults to singular as intended)
+
+    * Fixed internal error in Nouns.pm (thanks Michael!)
+
+
+0.000006  Tue Aug 30 17:50:43 2016
+
+    * Fixed minor documentation bugs
+
+
+0.000007  Sun Dec 18 08:36:03 2016
+
+    * Completed name change of module
+      (thanks, Smylers and NeilB!)

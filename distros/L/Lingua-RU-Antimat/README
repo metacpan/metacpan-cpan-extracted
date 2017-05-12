@@ -1,0 +1,30 @@
+Lingua/RU/Antimat version 1.00
+==============================
+
+
+Lingua::RU::Antimat - Perl Module for removal Russian slang from chat, guestbooks, etc.
+
+Check Lingua::RU::Antimat web site at http://www.tcen.ru/antimat. 
+There you will find Russian documentation, tutorial, etc.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+FileHandle
+
+COPYRIGHT AND LICENCE
+
+Copyright 2001-2003 Ilya Soldatkin. All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

@@ -1,0 +1,48 @@
+List::Regexp module
+===================
+
+The module provides a function that builds a regular expression that will
+match any string from the input list of strings.  The generated expression
+is much more efficient than the equivalent regexp obtained by mere
+concatenation of all strings from the list with a '|' as separator.
+
+Three kinds of regular expressions can be generated: Perl regexps (the
+default), POSIX extended, and Emacs-style.
+
+Additionally, the generated regexp can be restricted to match whole words
+only, or words appearing on a line alone.
+
+The module is inspired by the GNU Emacs regexp-opt function.
+
+Example of its usage:
+
+  use List::Regexp;
+  my $rx = regexp_opt(@strings);
+  .
+  .
+  .
+  if ($input =~ qr/$rx/) {
+    .
+    .
+    .
+  }
+
+regexp-opt utility
+==================
+
+This utilitiy offers a command line interface to the module.  It collects
+its arguments and prints out a regular expression that will match any of
+them.  E.g.:
+
+  $ regexp-opt --word string test stringent 
+  \<(string(ent)?|test)\>
+
+Copying
+=======
+This package is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+See http://www.gnu.org/licenses.
+

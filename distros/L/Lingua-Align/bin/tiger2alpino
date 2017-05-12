@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# USAGE: tiger2alpino tiger.xml output-base
+#
+# output-base ..... path/to/filebase for output files
+#                   (this script will generate one file per sentence)
+#
+
+use strict;
+use FindBin;
+use lib $FindBin::Bin.'/../lib';
+use Lingua::Align::Corpus::Treebank;
+use Lingua::Align::Corpus::Treebank::AlpinoXML;
+
+my $file = shift(@ARGV);
+my $base = shift(@ARGV) || 'alpino';
+
+my $tiger=new Lingua::Align::Corpus::Treebank(-file => $file,-type => 'tiger');
+my $alpino=new Lingua::Align::Corpus::Treebank::AlpinoXML;
+
+my %tree=();
+
+while ($tiger->next_sentence(\%tree)){
+    my $id = $tree{ID};
+    open F,">$base-$id.xml" || die "cannot open $base-$id.xml\n";
+    binmode(F,":encoding(ISO-8859-1)");
+    print F $alpino->print_tree(\%tree);
+    close F;
+#    print "\n";
+}
+

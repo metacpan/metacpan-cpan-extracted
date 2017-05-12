@@ -1,0 +1,16 @@
+Revision history for Perl extension Lib::IXP.
+
+0.12 Tue Jan 20 19:24:44 CET 2015
+   - update: copyright notice
+   - update: Kwalitee
+
+0.11 Thu Jun  3 16:06:59 CEST 2010
+   - bugfix: t/*.t were not in SVN
+   - bugfix: double free corruption
+   => https://rt.cpan.org/Public/Bug/Display.html?id=46049
+   => Thanks to sbz for catching this
+   - update: copyright notice
+
+0.10 Mon Dec 15 22:39:33 CET 2008
+   - first public release
+

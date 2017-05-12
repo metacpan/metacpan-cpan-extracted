@@ -1,0 +1,28 @@
+____________________________________________________________________________
+[  6772] By: autrijus                              on 2003/06/27  04:42:27
+        Log: * Tulan W. Hu pointed out that non-Chinese strings
+             should also have an empty variant.
+	   ! HanDetect.pm t/1-basic.t
+____________________________________________________________________________
+[  6232] By: autrijus                              on 2003/06/01  15:51:44
+        Log: * changes and signatures.
+	   ! Changes SIGNATURE
+____________________________________________________________________________
+[  6230] By: autrijus                              on 2003/06/01  15:46:41
+        Log: * This be 0.03.
+             * thanks for doggy for pointing out the failing tests.
+	   + META.yml
+	   ! HanDetect.pm t/1-basic.t
+____________________________________________________________________________
+[  6228] By: autrijus                              on 2003/06/01  15:36:58
+        Log: * 0.02.
+	   ! Changes MANIFEST SIGNATURE
+____________________________________________________________________________
+[  3924] By: autrijus                              on 2003/01/27  20:58:16
+        Log: * changes and signatures.
+	   + Changes SIGNATURE
+____________________________________________________________________________
+[  3923] By: autrijus                              on 2003/01/27  20:55:42
+        Log: * 0.01, the first CPAN version of Lingua::ZH::HanDetect.
+	   + HanDetect.pm MANIFEST Makefile.PL README
+	   + t/0-signature.t t/1-basic.t

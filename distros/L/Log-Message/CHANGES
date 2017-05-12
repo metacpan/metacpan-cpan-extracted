@@ -1,0 +1,22 @@
+Changes for 0.08    Thu Apr 25 23:20:08 BST 2013
+=================================================
+* Open configuration file for reading only. RT#84844
+  (Petr Pisar)
+
+Changes for 0.06    Wed Jan 23 12:21:48 GMT 2013
+=================================================
+* Add deprecate usage to warn if module is loaded
+  from corelib. Log::Message is leaving core with
+  v5.20.0, but will still be available from CPAN.
+
+Changes for 0.04    Fri Jan  7 21:41:00 GMT 2011
+=================================================
+* Apply blead patch from Peter Acklam
+
+Changes for 0.02    Sat Dec 13 18:35:01 CET 2008
+=================================================
+* Users of 0.01 need not upgrade
+* Log::Message is a core module, so the Makefile.PL
+  should reflect this and install into the 'core'
+  directory, instead of 'site'
+* Quell minor warning in t/02.t

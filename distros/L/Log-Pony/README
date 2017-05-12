@@ -1,0 +1,162 @@
+NAME
+    Log::Pony - Yet another simple logger class
+
+SYNOPSIS
+        my $logger = Log::Pony->new(
+            log_level => $ENV{MYAPP_LOG_LEVEL} || 'info',
+        );
+        $logger->info("Payed by her");
+        $logger->warn("A unexpected things happend!");
+        $logger->critical("Ouch! Disk full!");
+        $logger->debug("Through here...");
+
+DESCRIPTION
+    Log::Pony is simple logger class.
+
+    THIS IS A DEVELOPMENT RELEASE. API MAY CHANGE WITHOUT NOTICE.
+
+    Log::Pony provides
+
+    Flexible logging level
+    Flexible output
+
+MOTIVATION
+    I need a simple, flexible, OO-ish, customizable, and thin logger class,
+    but I can't find any module on CPAN.
+
+METHODS
+    my $logger = Log::Pony->new(%args)
+        Create new Log::Pony instance.
+
+        Mandatory parameter for this method is log_level. You can on specify
+        the log level by constructor.
+
+        Optionaly, you can pass color parameter. It enables colorize for
+        default "$logger->process" method. You can access this parameters
+        value by "$logger->color()".
+
+        And other parameters passed to "$logger->init(%args)" method.
+
+    my $level = $logger->log_level() : Str
+        Get a current log level in string.
+
+    $logger->color() : Bool
+        Returns color parameter passed at constructor.
+
+    $logger->log($level, $format, @args);
+        This method format log message by sprintf by $format and @args.
+
+        And output log by "$logger->process($level, $message)".
+
+    $logger->debug(@msg)
+        Shorthand for "$logger->log('DEBUG', @msg)".
+
+    $logger->info(@msg)
+        Shorthand for "$logger->log('INFO', @msg)".
+
+    $logger->warn(@msg)
+        Shorthand for "$logger->log('WARN', @msg)".
+
+    $logger->critical(@msg)
+        Shorthand for "$logger->log('CRITICAL', @msg)".
+
+EXTEND THIS CLASS
+    You can extend this class by inheritance.
+
+    Hook "$logger->init(%args)"
+        You can hook "$logger->init(%args)".
+
+        This method is a hook point to extend your logger class. Default
+        implementation of this method does no operation.
+
+        Here is an example code:
+
+            pckage My::Logger;
+            use parent qw/Log::Pony/;
+
+            sub init {
+                my ($self, %args) = @_;
+                my $rotate_logs = File::RotateLogs->new(
+                    %args
+                );
+                $self->{rotate_logs} = $rotate_logs;
+            }
+
+            sub process {
+                my ($self, $level, $message) = @_;
+                $self->{rotate_logs}->print($message);
+            }
+
+        Log::Pony pass arguments without 'log_level' to "$logger->init". You
+        can setup your logger class at this hook point.
+
+    "$logger->process($level, $message)"
+        The method to output log message to any device. You can output,
+        e-mailing, send to syslog, or string to DB at this point.
+
+        Default implementation is here:
+
+            sub process {
+                my ($self, $level, $message) = @_;
+                my $time = $self->time();
+                my $trace = $self->trace_info();
+                print STDERR "$time [$level] $message $trace\n";
+            }
+
+        You can call following methods to get information:
+
+        $self->time()
+            Get a current time in localtime in following format;
+
+                2004-04-01T12:00:00
+
+        $self->trace_info()
+            Get a trace information in following format:
+
+                at my/script.pl line 15
+
+            You can add this trace information folloing log message, then
+            you can debug more easily.
+
+        $self->colorize($level: Str, $message: Str) : Str
+            Colorize your message for readability.
+
+            $level is string indicates level name. $message is string to
+            colorize.
+
+            *Return value*: Colorized $message.
+
+CUSTOMIZING LOGGING LEVELS
+    You can customize logging level by following methods.
+
+    You need to inherit from Log::Pony to customize logging level.
+
+    MyLogger->set_levels(@levels);
+            MyLogger->set_levels(qw/debug info warn crit emergency/);
+
+        You can set levels by this method.
+
+        You need pass the levels as first is whatever thing, last is
+        important.
+
+        This methods non existent method automatically. In this case, you
+        can call "$logger->emergency($msg)" method after this definition.
+
+    MyLogger->set_colors(@colors);
+            __PACKAGE__->set_colors(   'red on_white', 'green', 'black on_yellow', 'black on_red', 'red on_black');
+
+        Set colors for each levels. You should put order of colors are same
+        as levels.
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+
+SEE ALSO
+    Log::Dispatch, Log::Minimal
+
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

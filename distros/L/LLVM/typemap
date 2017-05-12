@@ -1,0 +1,23 @@
+Module					T_LLVM_REF
+Type					T_LLVM_REF
+Value					T_LLVM_REF
+BasicBlock				T_LLVM_REF
+Builder					T_LLVM_REF
+PassManager				T_LLVM_REF
+
+GenericValue				T_LLVM_REF
+ExecutionEngine				T_LLVM_REF
+
+Target					T_LLVM_REF
+TargetMachine				T_LLVM_REF
+
+OUTPUT
+T_LLVM_REF
+	sv_setref_pv($arg, \"LLVM::${type}\", (void *) $var);
+
+INPUT
+T_LLVM_REF
+	if (sv_isobject($arg) && sv_derived_from($arg, \"LLVM::${type}\"))
+		$var = INT2PTR($type, SvIV((SV *) SvRV($arg)));
+	else
+		Perl_croak(aTHX_ \"$var is not of type LLVM::${type}\");

@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - 'Pavel Andryushin <vrag867@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Any-Adapter-Multiplexor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  Log::Any::Adapter::Stdout: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/vrag86/Log-Any-Adapter-Multiplexor/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/vrag86/Log-Any-Adapter-Multiplexor.git
+version: '0.03'

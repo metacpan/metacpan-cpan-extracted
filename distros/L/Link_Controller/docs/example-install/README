@@ -1,0 +1,59 @@
+Here are all of the important installation files used in the Scottish
+Climbing Archive install of link controller.  They serve as a real
+example of how to use link-controller to keep links on your pages
+under control.
+
+We run a relatively small installation on a multi-user system based on
+RedHat 6.2.  We have to build our own version of perl and install that
+along with all of the cdb programs in our own `bin' directory.  This
+means that we have to be careful with paths when running programs.
+
+crontab - our crontab which runs testing hourly and the rest of the
+	programs daily.
+
+dot-link-control.pl - our .link-control.pl file.
+
+	- all of our files are hardcoded into the /home/sca/linkdata
+	  directory
+
+	- we run the cgi programs in various experimental ways
+
+	- we have one infostructure which we check 
+
+		- we don't want to know about links inside the 
+		  leitheatre section since we only lend space to
+		  them for occasional internal use.
+
+		- we don't give the system any special privilages
+		  so we tell it to avoid password protected areas
+
+		- we keep some pages of oldstuff where we 
+		  deliberately leave links to places which don't
+		  exist any more
+
+infostrucs - a very simple infostrucs file which just points to the
+	infostructure in our .link-control.pl file.
+
+logrotate - I keep complete logs of the verbose output of all of the
+	programs from the cron jobs.  Using logrotate allows me to 
+	make sure that the logs are deleted correctly.  
+
+		- compress the files so they take less space
+
+		- use delaycompress since test-link may be running
+		  when we do logrotate, but there's no reason to 
+		  kill it.
+
+		- 10 days logs normally has enough information to
+		  track most interesting cases
+
+mail-link-report - the only file that's been edited (I changed the mail addresses
+	to avoid any junkmail..)
+	- every day we get a message about any newly broken links
+
+run-extract-links - our cron doesn't set paths so we do it in this script
+
+run-test-links  -  set paths + control the run time
+
+we don't have a very huge set of links so our test-links program runs
+for a maximum of a few minutes an hour.

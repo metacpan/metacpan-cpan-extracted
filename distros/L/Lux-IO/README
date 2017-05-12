@@ -1,0 +1,35 @@
+This is Perl module Lux::IO.
+
+INSTALLATION
+
+Lux::IO installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Lux::IO
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Lux::IO documentation is available as in POD. So you can do:
+
+    % perldoc Lux::IO
+
+to read the documentation online with your favorite pager.
+
+AUTHOR
+
+Kentaro Kuribayashi <kentaro@cpan.org>
+
+Copyright (c) Kentaro Kuribayashi <kentaro@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,313 @@
+# -*- cperl -*-
+
+%%
+
+all         : rules                       { $_[1] }
+            | rules PERL                  { push @{$_[1]}, {perl => $_[2]}; $_[1] };
+
+rules       : rules rule ';'              { push @{$_[1]}, new_rule($_[2]); $_[1]  }
+            | rule ';'                    { [ new_rule($_[1]) ] };
+
+rule        : '[' VAR ']' lang '=' lang   { [ $_[4], $_[6] , $_[2] ] };
+
+lang        : item                        { [$_[1]] }
+            | lang item                   { push @{$_[1]}, $_[2]; $_[1] };
+
+item        : '(' lang ')' '[' props ']'  { +{ rule => $_[2], props => $_[5] } }
+            | '(' lang ')' '.' VAR        { +{ rule => $_[2], predicate => $_[5] } }
+            | VAR '[' props ']'           { +{ var  => $_[1], props => $_[3] } }
+            | VAR '.' VAR                 { +{ var  => $_[1], predicate => $_[3] } }
+            | VAR                         { +{ var  => $_[1] } }
+            | strs                        { +{ str  => $_[1] } };
+
+strs        : STR                         { [ $_[1] ] }
+            | strs '|' STR                { push @{$_[1]}, $_[3]; $_[1] };
+
+props       : prop                        { $_[1] }
+            | props ',' prop              { +{%{$_[1]}, %{$_[3]}} };
+
+prop        : VAR '='  VAR                { +{ preeq => {$_[1] => $_[3]} } }
+            | VAR '='  STR                { +{ preeq => {$_[1] => $_[3]} } }
+            | VAR '<-' VAR                { +{ pre => {$_[1] => $_[3]} } }
+            | VAR '<-' STR                { +{ pre => {$_[1] => $_[3]} } }
+			| VAR '<-' REG                { +{ preg => {$_[1] => $_[3]} } }
+            | VAR '->' VAR                { +{ pos => {$_[1] => $_[3]} } }
+            | VAR '->' STR                { +{ pos => {$_[1] => $_[3]} } };
+
+%%
+
+#
+#[
+# { rule => { recursive... }, props => { pre => "...", pos => "..." } },
+# { rule => { recursive... }, predicate => "code" },
+# { var  => "...", props => { pre => "...", pos => "..." } },
+# { var  => "...", predicate => "code" }
+# { str  => "..." },
+#]
+#
+
+use Data::Dumper;
+
+my $File;
+
+sub parseFile {
+  my $self = shift;
+  my $file = shift || undef;
+	die "Lingua::NATools::PatternRules: no file specified on 'parseFile'\n" unless $file;
+	print STDERR "Parsing rules file: [$file]\n";
+  my $p = Lingua::NATools::PatternRules->new();
+  init_lex($file);
+  $p->YYParse( yylex   => \&yylex,
+	       yyerror => \&yyerror);
+}
+
+sub yyerror {
+  if ($_[0]->YYCurtok) {
+    printf STDERR ('Error: a "%s" (%s) was fond where %s was expected'."\n",
+		   $_[0]->YYCurtok, $_[0]->YYCurval, $_[0]->YYExpect)
+  } else {
+    print  STDERR "Expecting one of ",join(", ",$_[0]->YYExpect),"\n";
+  }
+}
+
+sub init_lex{
+  my $file = shift;
+  local $/;
+  undef $/;
+
+  if ($file) {
+    open F, $file or die "$!";
+    $File = <F>;
+    close F;
+  } else {
+    $File = <>
+  }
+}
+
+sub yylex{
+  for($File){
+    # Advance spaces and comments
+    1 while (s!^(\s+|\#.*)!!g);
+
+    # Get final code section
+    s!^%%\s*\n(.*)$!!s and return ("PERL", $1);
+
+    # EOF
+    return ("","") if $_ eq "";
+
+    # Tokens
+	s!^(/[^/]+/)!!             and return ("REG", eval "qr$1");
+    s!^([_\w]+)!!              and return ("VAR", $1);
+    s!^\"([^\"]+)\"!!          and return ("STR", $1);
+    s!^([|;.,=\]\[\)\(])!!     and return ($1, $1);
+    s!^(->)!!                  and return ($1, $1);
+    s!^(<-)!!                  and return ($1, $1);
+    print STDERR "Unexpected symbols: '$File'\n" ;
+  }
+}
+
+sub save {
+  my $file = shift;
+  return 1;
+}
+
+sub strings {
+  my $self = shift;
+  return [_string($self->[0]),
+	  _string($self->[1])]
+}
+
+sub _length {
+  my $side = shift;
+  my $length = 0;
+
+  for (@$side) {
+    if (exists($_->{rule})) {
+      $length += _length($_->{rule});
+    } elsif (exists $_->{var}) {
+      ++$length
+    } elsif (exists $_->{str}) {
+      ++$length
+    }
+  }
+  return $length
+}
+
+sub _string {
+  my $side = shift;
+  my $str = [];
+  for (@$side) {
+    if (exists($_->{rule})) {
+      my $s = _string($_->{rule});
+      push @$str, @$s;
+    } elsif (exists $_->{var}) {
+      push @$str, $_->{var}
+    } elsif (exists $_->{str}) {
+      push @$str, join("|",map{"\"$_\""} @{$_->{str}});
+    }
+  }
+  return $str;
+}
+
+sub asString {
+  my $self = shift;
+  my $x = $self->strings;
+  return join(" ", @{$x->[0]})." = ".join(" ", @{$x->[1]})
+}
+
+sub matrix {
+  my $self = shift;
+  my $strings = $self->strings;
+
+  my @str1 = @{$strings->[0]};
+  my @str2 = @{$strings->[1]};
+  my $name = $self->[2];
+
+  my $mat = [];
+
+  for my $l (@str2) {
+    push @$mat, [
+		 map { $_ eq $l ? "P" : "0"} @str1
+		];
+  }
+  return $mat;
+}
+
+sub matrix_dump {
+  my ($s,$mat) = @_;
+  print "[\n";
+  for my $l (@$mat) {
+    print "[",join(",", map { "'$_'" } @$l),"],\n"
+  }
+  print "]\n";
+}
+
+
+sub infer {
+  my ($self, $sentence1, $sentence2) = @_;
+
+  my @sen1 = split /\s+/, $sentence1;
+  my @sen2 = split /\s+/, $sentence2;
+
+  my ($res1, $res2) = ({},{});
+
+  $self->_infer(\@sen1,$self->[0],$res1);
+  $self->_infer(\@sen2,$self->[1],$res2);
+
+  return [$res1,$res2];
+}
+
+
+
+sub _infer {
+  my ($self, $sentence, $rule, $result) = @_;
+
+  for (@$rule) {
+    if (exists($_->{rule})) {
+
+      if (exists($_->{props}) && exists($_->{props}{pos})) {
+	my $length = _length($_->{rule});
+	my @s = @$sentence;
+	my $word = join(" ",(@s[0..$length-1]));
+	push @{$result->{$word}}, $_->{props}{pos}
+      }
+
+      $sentence = $self->_infer($sentence, $_->{rule}, $result);
+
+    } elsif (exists $_->{var}) {
+      my $word = shift @$sentence;
+      if (exists($_->{props}) && exists($_->{props}{pos})) {
+	push @{$result->{$word}}, $_->{props}{pos}
+      }
+
+    } elsif (exists $_->{str}) {
+      shift @$sentence;
+    }
+  }
+
+  return $sentence;
+}
+
+sub _predicates {
+  my $self = shift;
+  my $rule = shift;
+  my $offset = shift || 0;
+
+  my @predicates = ();
+  for (@$rule) {
+    if (exists($_->{rule})) {
+      ## recurse
+      my $length = _length($_->{rule});
+      if ($_->{predicate}) {
+	push @predicates, {index => $offset,
+			   length => $length,
+			   predicate => $_->{predicate}};
+      }
+      push @predicates, $self->_predicates($_->{rule},$offset);
+    } elsif (exists($_->{predicate})) {
+      push @predicates, {index => $offset,
+			 length => 1,
+			 predicate => $_->{predicate}};
+    } else {
+      # nothing
+    }
+    $offset++
+  }
+  return @predicates;
+}
+
+
+sub predicates {
+  my $self = shift;
+
+  return [[$self->_predicates($self->[0])],
+	  [$self->_predicates($self->[1])]]
+}
+
+
+
+sub text_rules {
+  my $self = shift;
+  my $strings = $self->strings;
+  my $rules = [{},{}];
+
+  my @str1 = @{$strings->[0]};
+  my @str2 = @{$strings->[1]};
+
+  my $pos = 0;
+  for my $x (@str1) {
+    if ($x =~ m!^\"!) {
+      $rules->[0]{$pos} = [map{clean($_)} split /\|/, $x];
+    }
+    $pos ++;
+  }
+
+  $pos = 0;
+  for my $x (@str2) {
+    if ($x =~ m!^\"!) {
+      $rules->[1]{$pos} = [map{clean($_)} split /\|/, $x];
+    }
+    $pos ++;
+  }
+
+  return $rules;
+}
+
+sub new_rule {
+  my $obj = shift;
+  return bless $obj => "Lingua::NATools::PatternRules"
+}
+
+sub name {
+  my $self = shift;
+  $self->[2];
+}
+
+sub clean {
+  my $x = shift;
+  $x =~ s!^"!!;
+  $x =~ s!"$!!;
+  return $x;
+}
+
+1;

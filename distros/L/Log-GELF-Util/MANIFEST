@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Log/GELF/Util.pm
+minil.toml
+t/00_compile.t
+t/01_utilities.t
+t/02_validate.t
+t/03_encode.t
+t/04_compress.t
+t/05_chunked.t
+META.yml
+MANIFEST

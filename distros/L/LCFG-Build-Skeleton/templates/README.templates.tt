@@ -1,0 +1,17 @@
+Put your templates into this directory and name them with either a
+'.tt' or '.tmpl' suffix (and with or without a .cin suffix beyond
+that). To clarify, all of these are ok:
+
+foo.tt
+bar.tt.cin
+baz.tmpl
+quux.tmpl.cin
+
+The templates will be installed into the directory defined (in CMake
+terms) as "${LCFGDATA}/${LCFG_NAME}" which, for a component named "wibble",
+would normally be /usr/lib/lcfg/conf/wibble.
+
+As usual, any '.cin' suffix will be stripped off the filename as part
+of the build-time template completion process.
+
+

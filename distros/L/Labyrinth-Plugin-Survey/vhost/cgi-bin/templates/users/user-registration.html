@@ -1,0 +1,97 @@
+<h2>Member Registration</h2>
+<p>Fields marked '*' are mandatory fields and must be completed.</p>
+
+<form method=post action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name='act' value='user-save' />
+<input type="hidden" name='userid' value='0' />
+
+<div class="boxer">
+<table class="blocker">
+		<tr><td width="150">Nickname</td>
+			<td width="10">[% data.nickname_err %]</td>
+			<td><input type="text" name="nickname" value='[% data.nickname %]' size="20" /><br />
+			If left blank, your realname will be used.
+				If your usual nickname is taken, it may be that we have
+				pre-registered you. Please email
+				<a href='mailto:webmaster@missbarbell.co.uk'>webmaster@missbarbell.co.uk</a> 
+				if you think this is the case.</td>
+		</tr>
+		<tr><td>Real Name *</td>
+			<td>[% data.realname_err %]</td>
+			<td><input type="text" name="realname" value='[% data.realname %]' size="40" /></td>
+		</tr>
+		<tr><td>Email *</td>
+			<td>[% data.email_err %]</td>
+			<td><input type="text" name="email" value='[% data.email %]' size="40" /><br />
+			Your email address will NOT be publically visible or passed to any third party. It is required to send you a site password, and as your login.</td>
+		</tr>
+		<tr><td>Announcements</td>
+			<td>[% data.announce_err %]</td>
+			<td><input type="checkbox" name="announce" [% data.announce %] /><br />
+				Please check the box if you wish to receive personal emailed 
+				announcements and newsletters regarding the YAPC::Europe::2006
+				conference.</td>
+		</tr>
+		<tr><td>About Me</td>
+			<td>[% data.aboutme_err %]</td>
+			<td><textarea name="aboutme" rows="5" cols="50">[% data.aboutme %]</textarea></td>
+		</tr>
+</table>
+</div>
+
+<div class="boxer">
+<table class="blocker">
+		<tr><td width="150">Image</td>
+			<td width="10">[% data.image_err %]</td>
+			<td><input type="file" name="image" />
+			<img src="[% webpath %]/[% data.link %]" border="0" alt="[% data.tag %]" />
+			<input type="hidden" name='imageid' value='[% data.imageid %]' /></td>
+		</tr>
+</table>
+</div>
+
+<div class="boxer">
+<table class="blocker">
+		<tr><td width="150">Country of Residence</td>
+			<td width="10">[% data.front_err %]</td>
+			<td>[% locationselect %]</td>
+			<td>Other:</td>
+			<td><input type="text" name="location" value='[% data.location %]' /></td>
+		</tr>
+		<tr>
+			<td>Perl Monger Group(s)</td>
+			<td>[% data.mongerid_err %]</td>
+			<td>[% mongerselect %]</td>
+			<td>Other:</td>
+			<td><input type="text" name="monger" value='[% data.monger %]' /></td>
+		</tr>
+		<tr>
+			<td>use.perl Journal</td>
+			<td>[% data.useperl_err %]</td>
+			<td colspan="3"><input type="text" name="useperl" value='[% data.useperl %]' /></td>
+		</tr>
+		<tr>
+			<td>Perl Monks Node</td>
+			<td>[% data.perlmonks_err %]</td>
+			<td colspan="3"><input type="text" name="perlmonks" value='[% data.perlmonks %]' /></td>
+		</tr>
+		<tr>
+			<td>IRC</td>
+			<td>[% data.irc_err %]</td>
+			<td colspan="3"><input type="text" name="irc" value='[% data.irc %]' /></td>
+		</tr>
+		<tr>
+			<td>ICQ</td>
+			<td>[% data.icq_err %]</td>
+			<td colspan="3"><input type="text" name="icq" value='[% data.icq %]' /></td>
+		</tr>
+		<tr>
+			<td>AIM</td>
+			<td>[% data.aim_err %]</td>
+			<td colspan="3"><input type="text" name="aim" value='[% data.aim %]' /></td>
+		</tr>
+</table>
+</div>
+
+<p align="center"><input type="submit" name="submit" value='REGISTER' /></p>
+</form>

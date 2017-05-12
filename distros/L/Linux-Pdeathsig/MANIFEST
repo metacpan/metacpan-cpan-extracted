@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+Pdeathsig.xs
+ppport.h
+README
+t/Linux-Pdeathsig.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Linux/Pdeathsig.pm
+META.yml                                 Module meta-data (added by MakeMaker)

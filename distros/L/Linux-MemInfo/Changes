@@ -1,0 +1,13 @@
+Revision history for Perl extension Linux::MemInfo.
+
+0.01  Fri Apr  4 09:43:12 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Linux::MemInfo
+
+0.02  Mon Apr  7 09:43:12 2003
+	- Documented the program and put in text for the man
+          page.
+
+0.03  Thu Apr 10 07:24:12 2003
+	- Minor modification to the regular expression syntax.
+

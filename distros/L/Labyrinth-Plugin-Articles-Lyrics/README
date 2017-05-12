@@ -1,0 +1,32 @@
+Labyrinth-Plugin-Articles-Lyrics
+================================
+
+Labyrinth is a Website Management Framework. This distribution enables Labyrinth
+to provide lyrics or poems as collections, which can be attributed to releases.
+
+This distributions contains the lyrics handling functionality used as part
+of the Music Suite of modules, which are used to implement a band/music website
+using Labyrinth. This includes the templates, SQL, parameter validation and 
+dispatch tables.
+
+INSTALLATION
+
+See the INSTALL file for full instructions.
+
+DEPENDENCIES
+
+  Labyrinth
+  Labyrinth::Plugin::Articles
+
+AUTHOR
+
+  Barbie, <barbie@missbarbell.co.uk> for Miss Barbell Productions,
+  <http://www.missbarbell.co.uk/>
+
+COPYRIGHT & LICENSE
+
+  Copyright (C) 2002-2015 Barbie for Miss Barbell Productions
+  All Rights Reserved.
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

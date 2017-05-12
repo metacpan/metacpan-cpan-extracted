@@ -1,0 +1,35 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Std;
+use File::Basename;
+use Linux::Fuser;
+
+my $opts = {};
+
+getopts("u",$opts) or usage();
+
+my $fuser = Linux::Fuser->new();
+
+@ARGV or usage();
+
+foreach my $file ( @ARGV )
+{
+   print "$file:\t";
+   foreach my $proc ($fuser->fuser($file))
+   {
+      print $proc->pid(),$opts->{u} ? '(' . $proc->user() .')' : '',"\t";
+
+   }
+   print "\n";
+}
+
+sub usage
+{
+   my $me = basename($0);
+   warn <<EOU;
+$me: USAGE: $me [-u] filename ...
+   -u    display owner of the process in output
+EOU
+   exit 0;
+}

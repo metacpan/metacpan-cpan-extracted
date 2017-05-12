@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <style type="text/css"></style>
+        <!-- depends on -->
+        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script type="text/javascript" src="https://api.metacpan.org/source/STEFFENW/Locale-TextDomain-OO-Util-3.005/javascript/Locale/TextDomain/OO/Util/Constants.js"></script>
+        <script type="text/javascript" src="https://api.metacpan.org/source/STEFFENW/Locale-TextDomain-OO-Util-3.005/javascript/Locale/TextDomain/OO/Util/JoinSplitLexiconKeys.js"></script>
+        <script type="text/javascript" src="https://api.metacpan.org/source/STEFFENW/Locale-Utils-PlaceholderNamed-1.001/javascript/Locale/Utils/PlaceholderNamed.js"></script>
+        <!--script type="text/javascript" src="https://api.metacpan.org/source/STEFFENW/Locale-Utils-PlaceholderBabelFish-0.001/javascript/Locale/Utils/PlaceholderBabelFish.js"></script-->
+        <script type="text/javascript" src="../../../Locale-Utils-PlaceholderBabelFish/trunk/javascript/Locale/Utils/PlaceholderBabelFish.js"></script>
+        <!-- the lexicon -->
+        <script type="text/javascript">
+            // normally external filled from JSON (defined empty, header only)
+            var localeTextDomainOOLexicon = {
+                // fake an empty lexicon without domain and category
+                'en::'                   : { '' : { 'plural' : 'n != 1' } },
+                'de::'                   : { '' : { 'plural' : 'n != 1' } },
+                // fake an empty lexicon for mydomain
+                'en::mydomain'           : { '' : { 'plural' : 'n != 1' } },
+                'de::mydomain'           : { '' : { 'plural' : 'n != 1' } },
+                // fake an empty lexicon for mycategory
+                'en:mycategory:'         : { '' : { 'plural' : 'n != 1' } },
+                'de:mycategory:'         : { '' : { 'plural' : 'n != 1' } },
+                // fake an empty lexicon for mydomain and mycategory
+                'en:mycategory:mydomain' : { '' : { 'plural' : 'n != 1' } },
+                'de:mycategory:mydomain' : { '' : { 'plural' : 'n != 1' } }
+            };
+        </script>
+        <script type="text/javascript" src="./Locale/TextDomain/OO.js"></script>
+        <script type="text/javascript" src="./Locale/TextDomain/OO/Plugin/Expand/Gettext/Loc.js"></script>
+        <script type="text/javascript" src="./Locale/TextDomain/OO/Plugin/Expand/Gettext/Loc/DomainAndCategory.js"></script>
+        <script type="text/javascript" src="./Locale/TextDomain/OO/Plugin/Expand/BabelFish/Loc.js"></script>
+        <script type="text/javascript">
+            var ltdoo = new localeTextDomainOO({
+                plugins  : [
+                    'localeTextDomainOOExpandGettextLocDomainAndCategory',
+                    'localeTextDomainOOExpandGettextLocDomainAndCategory',
+                    'localeTextDomainOOExpandBabelFishLoc'
+                ],
+                lexicon  : localeTextDomainOOLexicon,
+//              language : '@{[ $language_tag ]}', // server side from Perl
+                language : 'de', // fake static
+                filter   : function(translation) { // optional filter
+                    return 'filtered: ' + translation;
+                },
+                logger   : function (message, argMap) { // optional logger
+                    console.log(message);
+                    return;
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <h1>version 1.023</h1>
+        <script type="text/javascript">
+            var gettext = [
+                'loc_: '      + ltdoo.loc_('translation test'),
+                'loc_n 1: '   + ltdoo.loc_n('translation test', 'translation tests', 1),
+                'loc_n 2: '   + ltdoo.loc_n('translation test', 'translation tests', 2),
+                'loc_p: '     + ltdoo.loc_p('myctxt', 'translation test'),
+                'loc_np 1: '  + ltdoo.loc_np('myctxt', 'translation test', 'translation tests', 1),
+                'loc_np 2: '  + ltdoo.loc_np('myctxt', 'translation test', 'translation tests', 2),
+                'loc_x: '     + ltdoo.loc_x('translation test with {digit :num} and {char}', {digit : 0, char : 'Ä'}),
+                'loc_nx 1: '  + ltdoo.loc_nx('translation {n :num} test', 'translation {n :num} tests', 1, {n : 1}),
+                'loc_nx 2: '  + ltdoo.loc_nx('translation {n :num} test', 'translation {n :num} tests', 2, {n : 2}),
+                'loc_px: '    + ltdoo.loc_px('myctxt', 'translation test with {digit :num} and {char}', {digit : 0, char : 'Ä'}),
+                'loc_npx 1: ' + ltdoo.loc_npx('myctxt', 'translation {n :num} test', 'translation {n :num} tests', 1, {n : 1}),
+                'loc_npx 2: ' + ltdoo.loc_npx('myctxt', 'translation {n :num} test', 'translation {n :num} tests', 2, {n : 2})
+            ];
+            document.writeln('<h1>Gettext, filter puts "filtered: " in front</h1><p>');
+            jQuery.each(
+                gettext,
+                function (index, row) {
+                    document.writeln(row + '<br />');
+                }
+            );
+            document.writeln('</p>');
+
+            var gettextN = [
+                [ 'Nloc_: ',      [ ltdoo.Nloc_('translation test') ] ],
+                [ 'Nloc_n 1: ',   [ ltdoo.Nloc_n('translation test', 'translation tests', 1) ] ],
+                [ 'Nloc_n 2: ',   [ ltdoo.Nloc_n('translation test', 'translation tests', 2) ] ],
+                [ 'Nloc_p: ',     [ ltdoo.Nloc_p('myctxt', 'translation test') ] ],
+                [ 'Nloc_np 1: ',  [ ltdoo.Nloc_np('myctxt', 'translation test', 'translation tests', 1) ] ],
+                [ 'Nloc_np 2: ',  [ ltdoo.Nloc_np('myctxt', 'translation test', 'translation tests', 2) ] ],
+                [ 'Nloc_x: ',     [ ltdoo.Nloc_x('translation test with {digit :num} and {char}', {digit : 0, char : 'Ä'}) ] ],
+                [ 'Nloc_nx 1: ',  [ ltdoo.Nloc_nx('translation {n :num} test', 'translation {n :num} tests', 1, {n : 1}) ] ],
+                [ 'Nloc_nx 2: ',  [ ltdoo.Nloc_nx('translation {n :num} test', 'translation {n :num} tests', 2, {n : 2}) ] ],
+                [ 'Nloc_px: ',    [ ltdoo.Nloc_px('myctxt', 'translation test with {digit :num} and {char}', {digit : 0, char : 'Ä'}) ] ],
+                [ 'Nloc_npx 1: ', [ ltdoo.Nloc_npx('myctxt', 'translation {n :num} test', 'translation {n :num} tests', 1, {n : 1}) ] ],
+                [ 'Nloc_npx 2: ', [ ltdoo.Nloc_npx('myctxt', 'translation {n :num} test', 'translation {n :num} tests', 2, {n : 2}) ] ]
+            ];
+            document.writeln('<h1>Gettext, no translation</h1><p>');
+            jQuery.each(
+                gettextN,
+                function (index, row) {
+                    document.writeln(row[0] + row[1].join(', ') + '<br />');
+                }
+            );
+            document.writeln('</p>');
+
+            var gettextDomain = [
+                'loc_d: '      + ltdoo.loc_d('mydomain', 'translation test'),
+                'loc_dn 1: '   + ltdoo.loc_dn('mydomain', 'translation test', 'translation tests', 1),
+                'loc_dn 2: '   + ltdoo.loc_dn('mydomain', 'translation test', 'translation tests', 2),
+                'loc_dp: '     + ltdoo.loc_dp('mydomain', 'myctxt', 'translation test'),
+                'loc_dnp 1: '  + ltdoo.loc_dnp('mydomain', 'myctxt', 'translation test', 'translation tests', 1),
+                'loc_dnp 2: '  + ltdoo.loc_dnp('mydomain', 'myctxt', 'translation test', 'translation tests', 2),
+                'loc_dx: '     + ltdoo.loc_dx('mydomain', 'translation test with {digit :num} and {char}', {digit : 0, char : 'Ä'}),
+                'loc_dnx 1: '  + ltdoo.loc_dnx('mydomain', 'translation {n :num} test', 'translation {n :num} tests', 1, {n : 1}),
+                'loc_dnx 2: '  + ltdoo.loc_dnx('mydomain', 'translation {n :num} test', 'translation {n :num} tests', 2, {n : 2}),
+                'loc_dpx: '    + ltdoo.loc_dpx('mydomain', 'myctxt', 'translation test with {digit :num} and {char}', {digit : 0, char : 'Ä'}),
+                'loc_dnpx 1: ' + ltdoo.loc_dnpx('mydomain', 'myctxt', 'translation {n :num} test', 'translation {n :num} tests', 1, {n : 1}),
+                'loc_dnpx 2: ' + ltdoo.loc_dnpx('mydomain', 'myctxt', 'translation {n :num} test', 'translation {n :num} tests', 2, {n : 2})
+            ];
+            document.writeln('<h1>Gettext, for mydomain, filter puts "filtered: " in front</h1><p>');
+            jQuery.each(
+                gettextDomain,
+                function (index, row) {
+                    document.writeln(row + '<br />');
+                }
+            );
+            document.writeln('</p>');
+
+            var gettextDomainN = [
+                [ 'Nloc_d: ',      [ ltdoo.Nloc_d('mydomain', 'translation test') ] ],
+                [ 'Nloc_dn 1: ',   [ ltdoo.Nloc_dn('mydomain', 'translation test', 'translation tests', 1) ] ],
+                [ 'Nloc_dn 2: ',   [ ltdoo.Nloc_dn('mydomain', 'translation test', 'translation tests', 2) ] ],
+                [ 'Nloc_dp: ',     [ ltdoo.Nloc_dp('mydomain', 'myctxt', 'translation test') ] ],
+                [ 'Nloc_dnp 1: ',  [ ltdoo.Nloc_dnp('mydomain', 'myctxt', 'translation test', 'translation tests', 1) ] ],
+                [ 'Nloc_dnp 2: ',  [ ltdoo.Nloc_dnp('mydomain', 'myctxt', 'translation test', 'translation tests', 2) ] ],
+                [ 'Nloc_dx: ',     [ ltdoo.Nloc_dx('mydomain', 'translation test with {digit :num} and {char}', {digit : 0, char : 'Ä'}) ] ],
+                [ 'Nloc_dnx 1: ',  [ ltdoo.Nloc_dnx('mydomain', 'translation {n :num} test', 'translation {n :num} tests', 1, {n : 1}) ] ],
+                [ 'Nloc_dnx 2: ',  [ ltdoo.Nloc_dnx('mydomain', 'translation {n :num} test', 'translation {n :num} tests', 2, {n : 2}) ] ],
+                [ 'Nloc_dpx: ',    [ ltdoo.Nloc_dpx('mydomain', 'myctxt', 'translation test with {digit :num} and {char}', {digit : 0, char : 'Ä'}) ] ],
+                [ 'Nloc_dnpx 1: ', [ ltdoo.Nloc_dnpx('mydomain', 'myctxt', 'translation {n :num} test', 'translation {n :num} tests', 1, {n : 1}) ] ],
+                [ 'Nloc_dnpx 2: ', [ ltdoo.Nloc_dnpx('mydomain', 'myctxt', 'translation {n :num} test', 'translation {n :num} tests', 2, {n : 2}) ] ]
+            ];
+            document.writeln('<h1>Gettext, for mydomain, no translation</h1><p>');
+            jQuery.each(
+                gettextDomainN,
+                function (index, row) {
+                    document.writeln(row[0] + row[1].join(', ') + '<br />');
+                }
+            );
+            document.writeln('</p>');
+
+            var gettextCategory = [
+                'loc_c: '      + ltdoo.loc_c('translation test', 'mycategory'),
+                'loc_cn 1: '   + ltdoo.loc_cn('translation test', 'translation tests', 1, 'mycategory'),
+                'loc_cn 2: '   + ltdoo.loc_cn('translation test', 'translation tests', 2, 'mycategory'),
+                'loc_cp: '     + ltdoo.loc_cp('myctxt', 'translation test', 'mycategory'),
+                'loc_cnp 1: '  + ltdoo.loc_cnp('myctxt', 'translation test', 'translation tests', 1, 'mycategory'),
+                'loc_cnp 2: '  + ltdoo.loc_cnp('myctxt', 'translation test', 'translation tests', 2, 'mycategory'),
+                'loc_cx: '     + ltdoo.loc_cx('translation test with {digit :num} and {char}', 'mycategory', {digit : 0, char : 'Ä'}),
+                'loc_cnx 1: '  + ltdoo.loc_cnx('translation {n :num} test', 'translation {n :num} tests', 1, 'mycategory', {n : 1}),
+                'loc_cnx 2: '  + ltdoo.loc_cnx('translation {n :num} test', 'translation {n :num} tests', 2, 'mycategory', {n : 2}),
+                'loc_cpx: '    + ltdoo.loc_cpx('myctxt', 'translation test with {digit :num} and {char}', 'mycategory', {digit : 0, char : 'Ä'}),
+                'loc_cnpx 1: ' + ltdoo.loc_cnpx('myctxt', 'translation {n :num} test', 'translation {n :num} tests', 1, 'mycategory', {n : 1}),
+                'loc_cnpx 2: ' + ltdoo.loc_cnpx('myctxt', 'translation {n :num} test', 'translation {n :num} tests', 2, 'mycategory', {n : 2})
+            ];
+            document.writeln('<h1>Gettext, for mycategory, filter puts "filtered: " in front</h1><p>');
+            jQuery.each(
+                gettextCategory,
+                function (index, row) {
+                    document.writeln(row + '<br />');
+                }
+            );
+            document.writeln('</p>');
+
+            var gettextCategoryN = [
+                [ 'Nloc_c: ',      [ ltdoo.Nloc_c('translation test', 'mycategory') ] ],
+                [ 'Nloc_cn 1: ',   [ ltdoo.Nloc_cn('translation test', 'translation tests', 1, 'mycategory') ] ],
+                [ 'Nloc_cn 2: ',   [ ltdoo.Nloc_cn('translation test', 'translation tests', 2, 'mycategory') ] ],
+                [ 'Nloc_cp: ',     [ ltdoo.Nloc_cp('myctxt', 'translation test', 'mycategory') ] ],
+                [ 'Nloc_cnp 1: ',  [ ltdoo.Nloc_cnp('myctxt', 'translation test', 'translation tests', 1, 'mycategory') ] ],
+                [ 'Nloc_cnp 2: ',  [ ltdoo.Nloc_cnp('myctxt', 'translation test', 'translation tests', 2, 'mycategory') ] ],
+                [ 'Nloc_cx: ',     [ ltdoo.Nloc_cx('translation test with {digit :num} and {char}', 'mycategory', {digit : 0, char : 'Ä'}) ] ],
+                [ 'Nloc_cnx 1: ',  [ ltdoo.Nloc_cnx('translation {n :num} test', 'translation {n :num} tests', 1, 'mycategory', {n : 1}) ] ],
+                [ 'Nloc_cnx 2: ',  [ ltdoo.Nloc_cnx('translation {n :num} test', 'translation {n :num} tests', 2, 'mycategory', {n : 2}) ] ],
+                [ 'Nloc_cpx: ',    [ ltdoo.Nloc_cpx('myctxt', 'translation test with {digit :num} and {char}', 'mycategory', {digit : 0, char : 'Ä'}) ] ],
+                [ 'Nloc_cnpx 1: ', [ ltdoo.Nloc_cnpx('myctxt', 'translation {n :num} test', 'translation {n :num} tests', 1, 'mycategory', {n : 1}) ] ],
+                [ 'Nloc_cnpx 2: ', [ ltdoo.Nloc_cnpx('myctxt', 'translation {n :num} test', 'translation {n :num} tests', 2, 'mycategory', {n : 2}) ] ]
+            ];
+            document.writeln('<h1>Gettext, for mycategory, no translation</h1><p>');
+            jQuery.each(
+                gettextCategoryN,
+                function (index, row) {
+                    document.writeln(row[0] + row[1].join(', ') + '<br />');
+                }
+            );
+            document.writeln('</p>');
+
+            var gettextDomainCategory = [
+                'loc_dc: '      + ltdoo.loc_dc('mydomain', 'translation test', 'mycategory'),
+                'loc_dcn 1: '   + ltdoo.loc_dcn('mydomain', 'translation test', 'translation tests', 1, 'mycategory'),
+                'loc_dcn 2: '   + ltdoo.loc_dcn('mydomain', 'translation test', 'translation tests', 2, 'mycategory'),
+                'loc_dcp 1: '   + ltdoo.loc_dcp('mydomain', 'myctxt', 'translation test', 'mycategory'),
+                'loc_dcnp 1: '  + ltdoo.loc_dcnp('mydomain', 'myctxt', 'translation test', 'translation tests', 1, 'mycategory'),
+                'loc_dcnp 2: '  + ltdoo.loc_dcnp('mydomain', 'myctxt', 'translation test', 'translation tests', 2, 'mycategory'),
+                'loc_dcx: '     + ltdoo.loc_dcx('mydomain', 'translation test with {digit :num} and {char}', 'mycategory', {digit : 0, char : 'Ä'}),
+                'loc_dcnx 1: '  + ltdoo.loc_dcnx('mydomain', 'translation {n :num} test', 'translation {n :num} tests', 1, 'mycategory', {n : 1}),
+                'loc_dcnx 2: '  + ltdoo.loc_dcnx('mydomain', 'translation {n :num} test', 'translation {n :num} tests', 2, 'mycategory', {n : 2}),
+                'loc_dcpx: '    + ltdoo.loc_dcpx('mydomain', 'myctxt', 'translation test with {digit :num} and {char}', 'mycategory', {digit : 0, char : 'Ä'}),
+                'loc_dcnpx 1: ' + ltdoo.loc_dcnpx('mydomain', 'myctxt', 'translation {n :num} test', 'translation {n :num} tests', 1, 'mycategory', {n : 1}),
+                'loc_dcnpx 2: ' + ltdoo.loc_dcnpx('mydomain', 'myctxt', 'translation {n :num} test', 'translation {n :num} tests', 2, 'mycategory', {n : 2})
+            ];
+            document.writeln('<h1>Gettext, for mydomain and my category, filter puts "filtered: " in front</h1><p>');
+            jQuery.each(
+                gettextDomainCategory,
+                function (index, row) {
+                    document.writeln(row + '<br />');
+                }
+            );
+            document.writeln('</p>');
+
+            var gettextDomainCategoryN = [
+                [ 'Nloc_dc: ',      [ ltdoo.Nloc_dc('mydomain', 'translation test', 'mycategory') ] ],
+                [ 'Nloc_dcn 1: ',   [ ltdoo.Nloc_dcn('mydomain', 'translation test', 'translation tests', 1, 'mycategory') ] ],
+                [ 'Nloc_dcn 2: ',   [ ltdoo.Nloc_dcn('mydomain', 'translation test', 'translation tests', 2, 'mycategory') ] ],
+                [ 'Nloc_dcp 1: ',   [ ltdoo.Nloc_dcnp('mydomain', 'myctxt', 'translation test', 'mycategory') ] ],
+                [ 'Nloc_dcnp 1: ',  [ ltdoo.Nloc_dcnp('mydomain', 'myctxt', 'translation test', 'translation tests', 1, 'mycategory') ] ],
+                [ 'Nloc_dcnp 2: ',  [ ltdoo.Nloc_dcnp('mydomain', 'myctxt', 'translation test', 'translation tests', 2, 'mycategory') ] ],
+                [ 'Nloc_dcx: ',     [ ltdoo.Nloc_dcx('mydomain', 'translation test with {digit :num} and {char}', 'mycategory', {digit : 0, char : 'Ä'}) ] ],
+                [ 'Nloc_dcnx 1: ',  [ ltdoo.Nloc_dcnx('mydomain', 'translation {n :num} test', 'translation {n :num} tests', 1, 'mycategory', {n : 1}) ] ],
+                [ 'Nloc_dcnx 2: ',  [ ltdoo.Nloc_dcnx('mydomain', 'translation {n :num} test', 'translation {n :num} tests', 2, 'mycategory', {n : 2}) ] ],
+                [ 'Nloc_dcpx: ',    [ ltdoo.Nloc_dcpx('mydomain', 'myctxt', 'translation test with {digit :num} and {char}', 'mycategory', {digit : 0, char : 'Ä'}) ] ],
+                [ 'Nloc_dcnpx 1: ', [ ltdoo.Nloc_dcnpx('mydomain', 'myctxt', 'translation {n :num} test', 'translation {n :num} tests', 1, 'mycategory', {n : 1}) ] ],
+                [ 'Nloc_dcnpx 2: ', [ ltdoo.Nloc_dcnpx('mydomain', 'myctxt', 'translation {n :num} test', 'translation {n :num} tests', 2, 'mycategory', {n : 2}) ] ]
+            ];
+            document.writeln('<h1>Gettext, for mydomain and category, no translation</h1><p>');
+            jQuery.each(
+                gettextDomainCategoryN,
+                function (index, row) {
+                    document.writeln(row[0] + row[1].join(', ') + '<br />');
+                }
+            );
+            document.writeln('</p>');
+
+            var babelFish = [
+                [ 'loc_b: '  + ltdoo.loc_b('translation test') ],
+                [ 'loc_b: '  + ltdoo.loc_b('translation test #{count}', {'count' : 1}) ],
+                [ 'loc_b: '  + ltdoo.loc_b('translation test #{count :num}', {'count' : 2}) ],
+                [ 'loc_b: '  + ltdoo.loc_b('translation ((test|tests))', 1) ],
+                [ 'loc_b: '  + ltdoo.loc_b('translation ((test|tests))', {'count' : 2}) ],
+                [ 'loc_b: '  + ltdoo.loc_b('translation ((test|tests)):num', {'num' : 3}) ],
+                [ 'loc_bp: ' + ltdoo.loc_bp('myctxt', 'translation test') ],
+                [ 'loc_bp: ' + ltdoo.loc_bp('myctxt', 'translation test #{count}', {'count' : 1}) ],
+                [ 'loc_bp: ' + ltdoo.loc_bp('myctxt', 'translation test #{count :num}', {'count' : 2}) ],
+                [ 'loc_bp: ' + ltdoo.loc_bp('myctxt', 'translation ((test|tests))', 1) ],
+                [ 'loc_bp: ' + ltdoo.loc_bp('myctxt', 'translation ((test|tests))', {'count' : 2}) ],
+                [ 'loc_bp: ' + ltdoo.loc_bp('myctxt', 'translation ((test|tests)):num', {'num' : 3}) ]
+            ];
+            document.writeln('<h1>BabelFish, filter puts "filtered: " in front</h1><p>');
+            jQuery.each(
+                babelFish,
+                function (index, row) {
+                    document.writeln(row + '<br />');
+                }
+            );
+            document.writeln('</p>');
+            var babelFishN = [
+                [ 'Nloc_b: ',  [ ltdoo.Nloc_b('translation test') ] ],
+                [ 'Nloc_b: ',  [ ltdoo.Nloc_b('translation ((test|tests))', 1) ] ],
+                [ 'Nloc_b: ',  [ ltdoo.Nloc_b('translation ((test|tests))', {'count' : 1}) ] ],
+                [ 'Nloc_bp: ', [ ltdoo.Nloc_bp('myctxt', 'translation test') ] ],
+                [ 'Nloc_bp: ', [ ltdoo.Nloc_bp('myctxt', 'translation ((test|tests))', 2 ) ] ],
+                [ 'Nloc_bp: ', [ ltdoo.Nloc_bp('myctxt', 'translation ((test|tests))', {'count' : 2} ) ] ]
+            ];
+            document.writeln('<h1>BabelFish, no translation</h1><p>');
+            jQuery.each(
+                babelFishN,
+                function (index, row) {
+                    document.writeln(row[0] + row[1].join(', ') + '<br />');
+                }
+            );
+            document.writeln('</p>');
+        </script>
+    </body>
+</html>

@@ -1,0 +1,7 @@
+Revision history for Log-Log4perl-Layout-GELF
+
+0.02    2011-07-19 12:00
+	Fixed dependencies and test files
+0.01    2011-07-19 08:00
+        First version, released on an unsuspecting world.
+

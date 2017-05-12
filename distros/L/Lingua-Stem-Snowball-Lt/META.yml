@@ -1,0 +1,23 @@
+---
+name: Lingua-Stem-Snowball-Lt
+version: 0.03
+author:
+  - 'Linas Valiukas <linas dot valiukas at gmail dot com>, Marvin Humphrey <marvin at rectangular dot com>'
+abstract: Perl interface to Snowball stemmer for the Lithuanian language.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Test::More: 0
+  perl: 5.6.2
+build_requires:
+  ExtUtils::CBuilder: 0
+  ExtUtils::ParseXS: 0
+provides:
+  Lingua::Stem::Snowball::Lt:
+    file: lib/Lingua/Stem/Snowball/Lt.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

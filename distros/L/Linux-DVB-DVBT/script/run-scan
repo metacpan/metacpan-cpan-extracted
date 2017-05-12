@@ -1,0 +1,78 @@
+#!/bin/bash
+
+VERSION='1.001'
+
+#==[ Setup ]===================================================================
+
+if [ "$1" == "" ]
+then
+	echo Error: You must specify a frequency file to use
+	exit 1
+fi
+
+FREQFILE=$1
+NAME=$(basename $1)
+DEBUG=$2
+VERBOSE=$2
+if [ "$2" == "" ]
+then
+	DEBUG=15
+	VERBOSE=15
+fi
+
+
+#==[ Functions ]===================================================================
+
+doscan()
+{
+	mkdir -p $NAME/config
+	rm $NAME/config/*
+	perl -Mblib script/dvbt-scan -clean -check -debug $DEBUG -verbose $VERBOSE -cfg $NAME/config $FREQFILE >$NAME/scan.txt 2>&1
+}
+
+
+#------------------------------------------------------------
+dopkg() 
+{
+	rm $NAME.tar.gz
+	tar cvfz $NAME.tar.gz $NAME
+
+	if [ ! -f $NAME.tar.gz ]
+	then
+		echo Failed to create tarball of results
+		exit 2
+	fi
+}
+
+#------------------------------------------------------------
+build() 
+{
+	perl Makefile.PL;
+	make clean; 
+	perl Makefile.PL;
+	rm *.o; 
+	rm */*.o; 
+	rm */*.a; 
+	make 
+}
+
+########################################################################
+# MAIN
+########################################################################
+
+	## Build final version
+	echo "Building ..."
+	build
+
+	## Perform the scan
+	echo "Scanning ..."
+	doscan 
+
+	## Package up
+	echo "Packaging results ..."
+	dopkg 
+
+	## Send the mail
+	echo "Sending email ..."
+	date | mail -a $NAME.tar.gz -s "Scan results for $NAME" linux@quartz-net.co.uk
+

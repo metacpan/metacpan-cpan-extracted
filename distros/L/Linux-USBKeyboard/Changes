@@ -1,0 +1,24 @@
+Revision history for Linux-USBKeyboard
+
+0.04 2009-12-07
+
+  * made XS compatible with 5.8.8 (RT #49729)
+
+0.03 2009-03-23
+
+  * allow arguments of busnum and devnum for finding keyboards
+
+0.02 2008-08-29
+
+  * drop libhid and use libusb directly
+
+  * new open_keys() mode for e.g. "F1" and such
+
+  * added some fun bits in the 'toys/' directory
+
+0.01 2007-10-11
+
+  * first public release
+
+vim:ts=2:sw=2:et:sta
+

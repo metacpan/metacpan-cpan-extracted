@@ -1,0 +1,911 @@
+=pod
+
+=head1 NAME
+
+List::Parseable - routines to work with lists containing a simple language
+
+=head1 DESCRIPTION
+
+This module allows you to treat a list (which can be expressed as an
+actual perl list, or as a string which will be parsed to form a list)
+as a simple program which returns a value. This allows you to do
+several tasks that I run into frequently.
+
+A task that occurs often is to have a config file or a data file which
+is read in by the program. Most of the time, the data stored in these
+files is fully defined at the time it is read in, but occasionally,
+the data that you want is more complex, and is best determined at
+run time.
+
+One obvious way to do this is to build extra logic into the program
+that understands the data stored in the file and which can do
+additional operations such as supplying missing values, checking
+data validity, etc., but often, building a knowledge of the exact
+format of the data file is not desired. It leads to added complexity
+in the program, and usually, the types of checks and manipulations
+that are done are very repetitive.
+
+This module can be used to bypass some of these issues.
+
+=over 4
+
+=item B<Creating complex values>
+
+If you need to set a variable in a config file or a data file to some
+value which can only be determined at runtime, or which is best
+defined as some definition based on other values is the config file,
+the value can be set to a list which is interpreted using this module.
+That way, the actual value can be determined at runtime using a simple
+program.
+
+=item B<Supplying missing data>
+
+Defaults for missing values can be supplied.
+
+=item B<Describing valid data>
+
+If you want to describe validity checks for data or config files,
+this can be done using this module. A piece of data can be defined
+as well as a flag which will be evaluated based on the value currently
+in the config file. If the data is invalid, the flag will be set
+accordingly.
+
+A description of the data can be written as a list which, when
+evaluated, will return true if a piece of data meets the validity
+requirements described there.
+
+=back
+
+All of this could be done by nesting actual perl code and running eval
+on it, but it is usually desirable to do things in a much safer
+way. Also, it is rarely necessary to have the full power (and
+complexity) of the perl language in this case.
+
+=head1 ROUTINES
+
+=over 4
+
+=item B<new>
+
+  use List::Parseable;
+  $obj = new List::Parseable;
+
+Creates a new List::Parseable object.
+
+=item B<version>
+
+  $version = $obj->version();
+
+Check the module version.
+
+=item B<list, string>
+
+  $obj->list(NAME,LIST);
+  $obj->string(NAME,STRING);
+
+The list function takes the arguments and stores them in the object
+under the given NAME.
+
+The string function takes a single string argument and converts it
+to a list (string parsing rules are described below).
+
+=item B<eval>
+
+  $val = $obj->eval(NAME);
+
+This must be called after the list or string method is used to store a
+list under the given name. It parses the list using the list parsing
+rules described below.
+
+=item B<errors>
+
+  $obj->errors(OPTION,OPTION,...)
+
+When a list is used in any of the operations described below, some of
+the elements may not be valid for that operation. This option tells
+how to handle these errors. Allowed values for OPTION are:
+
+  exit    : the program halts with an error
+  return  : the routine returns an empty set or element
+            (depending on type of return value)
+  ignore  : the value is ignored (removed from the list)
+            and the operation continues
+
+NOTE: exactly one of the above options may be given. It defaults to
+"ignore".
+
+In addition, the following options may be included:
+
+  stderr   : send a warning about invalid elements to stderr
+  stdout   : send a warning about invalid elements to stdout
+  both     : sends wanring message to both stdout and stderr
+  quiet    : never send warnings
+
+The default is quiet.
+
+=item B<vars>
+
+  $obj->vars(HASH);
+
+This takes a hash of the form VAR => VAL where each VAR is the name of
+a variable, and each VAL is either a scalar or a list reference (which
+may be nested list references and scalars).
+
+It stores these in the object for use in the "getvar" and other
+variable operations described below.
+
+=back
+
+=head1 LIST PARSING RULES
+
+List parsing consists of two steps.
+
+First, every element is examined. If it is a scalar, it is left
+untouched duiring the first step. If it is a list reference, the
+list of values is first parsed using the same rules as the parent
+list. In this way, nested lists are parsed to any level. As an
+example of this, the list:
+
+  (count a b)
+
+would evaluate to a scalar "2" after the second step (since a list
+who's first element is "count" evaluates to the number of elements in
+the list), so the nested structure:
+
+  (foo (count a b) 3 (count x))
+
+is identical to:
+
+  (foo 2 3 1)
+
+after the first step is complete on the main list.
+
+For the second step of parsing, the list is examined again. It
+must consist of zero or more operations (each of which is one
+of the strings described below) followed by zero or more arguments,
+each of which can be either a list reference or a scalar. The
+types of arguments allowed depend on the operation.
+
+Arguments start with the first element which is not a known
+operation. Alternately, if one of the elements is "--", that
+element signals the end of the operations and the start of
+the arguments (but is otherwise ignored).
+
+For example, if "foo" and "bar" are known operations, then
+
+  (foo bar a b)
+
+has two operations and two arguments. This is equivalent to:
+
+  (foo bar -- a b)
+
+The list:
+
+  (foo -- bar a b)
+
+has one operation and three arguments since "bar" is not treated
+as an operation in this case.
+
+Only the first occurence of "--" are treated this way, and only if
+it follows a set of operations. For example:
+
+  (foo a -- bar b)
+
+contains one operation (foo) and 4 arguments (a, --, bar, b).
+
+If no operation is included, it defaults to the "scalar" operation, so
+
+  (scalar a b)
+  (a b)
+
+are equivalent.
+
+If a list includes multiple operations, they are handled one at a time,
+starting with the right most. For example:
+
+  (foo bar a b)
+
+is equivalent to:
+
+  (foo (bar a b))
+
+=head1 STRING PARSING RULES
+
+When parsing a string, sets of list delimiters are checked for. Valid
+list delimeters are:
+
+   parenthese ()
+   brackets   []
+   braces     {}
+
+The list delimiters may be separated from the list elements by
+whitespace, but this is optional except in cases where the first
+element in the list begins with a punctuation mark. In this case,
+the list delimiter must be followed by space. Any string that
+starts with a punctuation mark which immediately follows the left
+list delimiter is treated as an element delimiter.`q
+
+Elements in a list are typically separated by spaces, but including
+an element delimiter can change this. An element delimiter is a
+character or string attached to the left list delimiter. The element
+delimiter MUST start some punctuation mark, but it is not allowed
+to start with "\" which is treated specially.
+
+For example, the list (a b c) can be written in the following ways:
+
+  '( a b c )'
+  '(a b c)'
+  '[ a b c ]'
+  '{: a:b:c }'
+
+Any combination of list delimiters can be used to create nested lists:
+
+  '(a (b c) [: d:e ] )'
+
+There is currently no "quoting" mechanism, so there is no way to
+include the element delimiter in an element, so if an element can
+contain a space, some other element delimiter must be used. In other
+words, to make a list: ("this", "is a", "special list"), use:
+
+  '(: this:is a:special list)'
+
+In order to include any list delimiter in an element, the left list
+delimiter must be followed immediately with an "\". It may then be
+followed by any element delimiter. Everything up to the closing
+list delimiter is treated as part of the list of elements. No
+nested lists can be created. For example:
+
+  '( (a) (\ x ] ) [\: b:) ] )'
+
+is the list:
+
+  ( [ 'a' ],
+    [ 'x', ']' ],
+    [ 'b', ')' ] )
+
+In order to include a parentheses (either left or right) in a list,
+use one of the other list delimiters with the "\" option.
+
+=head1 KNOWN OPERATIONS
+
+In the following operations, lists of elements may be either scalars
+or list references, but in most cases, some types of elements may not
+be valid. In the event of an invalid element, the behavior is dictated
+by the results of the "errors" method.
+
+The following basic operations are known:
+
+=over 4
+
+=item B<(scalar ELE0 ELE1 ...), (list ELE0 ELE1 ...)>
+
+These two operations determine how to treat the results of the parsing.
+Most operations take a list of scalars as arguments, but some take
+multiple lists. These require that the "list" operation be used.
+
+For example:
+
+  (foo (scalar a b) (list c d))
+
+after parsing all of the sublists is eqivalent to:
+
+  (foo a b [ c d ])
+
+where [ c d ] is a list reference.
+
+All element types are allowed.
+
+=back
+
+The following operations take a list and return a scalar based
+on the list:
+
+=over 4
+
+=item B<(count ELE0 ELE1 ...)>
+
+The count operation counts the number of arguments and returns it.
+
+  (count a b) => 2
+  (count (list a b) c) => 2
+
+All element types are allowed.
+
+=item B<(countval VAL ELE0 ELE1 ...)>
+
+This returns the number of times VAL appears in the list. VAL must be a
+scalar.
+
+  (countval a a b a) => 2
+
+All elements should be scalars.
+
+=item B<(minval ELE0 ELE1 ...), (maxval ELE0 ELE1 ...)>
+
+This returns the numerical value who's value is the least or greatest.
+
+  (minval 5 7 8) => 5
+  (maxval 5 7 8) => 8
+
+All elements should be numeric scalars.
+
+=item B<(nth N ELE0 ELE1 ...)>
+
+This returns the Nth element of the list. Elements are numbered 0 to M
+or -(M+1) to -1.
+
+The first element must be an integer or nothing is returned. All
+element types are allowed for the remaining arguments.
+
+=item B<(case TEST0 VAL0 ... TESTN VALN [DEFAULT_VAL])>
+
+All TEST elements must be scalars or nothing is returned. Values
+can be any type.
+
+Tests are evaluated, one at a time, and the first one that evaluates
+as true provides the return value.
+
+If no test is true, the default value is returned. If no default is
+provided, nothing is returned.
+
+=item B<(indexval VAL ELE0 ELE1 ...), (rindexval VAL ELE0 ELE1 ...)>
+
+This returns the index of the first/last occurence of VAL in the
+list or -1 if it doesn't appear.
+
+VAL must be a scalar. All other elements should be scalars.
+
+=item B<(join ELE0 ELE1 ...), (join delim DEL ELE0 ELE1 ...)>
+
+This joins all elements into a single string. By default, a
+space is used, but this can be overridden by including the "delim"
+word as the first element in the list followed by the delimiter.
+DEL can be the keywork "_null_" which means to join them with
+no delimiter, "_space_" to join them with a space, or "_nl_" to
+join them with a newline, or "_tab_" to join with a tab.
+
+DEL must be scalar. All others should be scalars.
+
+=item B<( + ELE0 ELE1 ...), ( * ELE0 ELE1 ...)>
+
+These return the result of adding or multiplying all of the
+elements.
+
+All elements should be numbers.
+
+=item B<( - ELE0 ELE1 ), ( / ELE0 ELE1 )>
+
+These perform the subtraction (ELE0 - ELE1) or division (ELE0/ELE1).
+All elements must be numbers, and in the division case, ELE1 must not
+be zero.
+
+=back
+
+The following returns true or false (1 or 0) based on the list:
+
+=over 4
+
+=item B<(mintrue N ELE0 ELE1 ...), (maxtrue N ELE0 ELE1 ...)>
+
+Returns true if at least (or at most) N of the elements evaluate to true.
+
+All elements should be scalars.
+
+=item B<(minfalse N ELE0 ELE1 ...), (maxfalse N ELE0 ELE1 ...)>
+
+Similar to mintrue/maxtrue but tests for false values.
+
+All elements should be scalars.
+
+=item B<(numtrue N ELE0 ELE1 ...), (numfalse N ELE0 ELE1 ...)>
+
+Returns true if exactly N of the elements evaluate to true (or false).
+
+All elements should be scalars.
+
+=item B<(and ELE0 ELE1 ...)>
+
+Returns true if all elements evaluate to true.
+
+All elements should be scalars.
+
+=item B<(or ELE0 ELE1 ...)>
+
+Returns true if any element evaluates to true.
+
+All elements should be scalars.
+
+=item B<(not ELE0 ELE1 ...)>
+
+Returns true if all elements evaluate to false.
+
+All elements should be scalars.
+
+=item B<(member VAL ELE0 ELE1 ...)>
+
+Returns true if any element in the list is equal to the value.
+
+All elements should be scalars. The first element MUST be a scalar
+or nothing can be returned.
+
+=item B<(absent VAL ELE0 ELE1 ...)>
+
+Returns true if no element in the list is equal to the value.
+
+All elements should be scalars. The first element MUST be a scalar
+or nothing can be returned.
+
+=item B<( > ELE0 ELE1 ); also >= == <= < !=>
+
+This compares ELE0 and ELE1 numerically. It returns true if ELE0
+is greater than ELE1. The other common mathematcial operations:
+>=, =, <=, <, != are also available.
+
+Note that space is required after the opening list delimiter in
+order to not confuse them with element delimiters.
+
+Exactly two numerical elements are required in all cases.
+
+=item B<( gt ELE0 ELE1 ); also ge eq le lt ne>
+
+This compares ELE0 and ELE1 alphabetically. It returns true if ELE0 is
+greater than ELE1. The other common string operations: ge, eq, le,
+lt, ne are also available.
+
+Exactly two scalar elements are required in all cases.
+
+=item B<(if TEST), (if TEST VAL1), (if TEST VAL1 VAL2)>
+
+This checks to see if TEST evaluates to true. If it is true,
+it returns VAL1 if it is included or true otherwise. If it
+is false, it returns VAL2 if itis include or false otherwise.
+
+TEST must be a scalar. The other values can be any type.
+
+=item B<(is_equal LIST0 LIST1)>
+
+This takes two list references (which should contain only scalars)
+and checks to make sure that the elements are equal (order is ignored).
+If they are, true is returned. Otherwise, false is.
+
+If either argument is not a list reference, or if either list contains
+non-scalars, nothing is returned.
+
+=item B<(not_equal LIST0 LIST1)>
+
+Similar to is_equal, but returns true if the two lists are different.
+
+=item B<(iff ELE0 ELE1 ...)>
+
+This returns true if all elements are true or all are false. It
+returns false if they are a mixture of true and false.
+
+=item B<(range NUM X Y); also rangeL rangeR rangeLR>
+
+These check to make sure that NUM is in the range X to Y. All three
+must be numeric, and X must be less than (or equal) to Y.
+
+It returns true in the following cases:
+
+  range    X <= NUM <= Y
+  rangeL   X <  NUM <= Y
+  rangeR   X <= NUM <  Y
+  rangeLR  X <  NUM <  Y
+
+and false otherwise.
+
+=back
+
+The following manipulate a list.
+
+=over 4
+
+=item B<(flatten ELE0 ELE1 ...)>
+
+This takes all elements (which may be scalars or nested list references)
+and returns a flat list with all of the elements from any level.
+
+All element types are allowed.
+
+=item B<(union ELE0 ELE1 ...)>
+
+This combines all of the members of all of the elements (which may be
+scalars or nested lists) into a single list of elements. Only the top
+level is flattened. So:
+
+  (union a [b] [ [c], [d] ]) => (a b [c] [d])
+
+All element types are allowed.
+
+=item B<(sort ELE0 ELE1 ...)>
+
+This returns the list sorted alphabetically. The list is flattened
+first.
+
+All elements should be scalars.
+
+=item B<(sort_by_method METHOD LIST ARG1 ARG2 ...)>
+
+This returns the list sorted by the method given. The method can be
+any method in the Sort::DataTypes module. LIST must be a list
+produced by the (list ELE0 ELE1 ...) operation.
+
+The first element (METHOD) must be a valid method and LIST must be a list
+reference or nothing can be returned. Other arguments must be valid for
+the sort method, but are not checked in advance.
+
+=item B<(unique ELE0 ELE1 ...)>
+
+This removes duplicate elements and returns a list of unique elements.
+
+All elements should be scalars.
+
+=item B<(compact ELE0 ELE1 ...)>
+
+This removes all empty ("") elements and returns a flat list of all
+remaining elements.
+
+All elements should be scalars.
+
+=item B<(true ELE0 ELE1 ...)>
+
+This removes all elements that evaluate to false and returns a flat
+list of all remaining elements.
+
+All elements should be scalars.
+
+=item B<(pop ELE0 ELE1 ...), (shift ELE0 ELE1 ...)>
+
+This removes the last/first element from the list and returns the
+resulting list.
+
+All element types are allowed.
+
+=item B<(pad LENGTH ELE0 ELE1 ...)>
+
+This takes a list of elements and pads it to the right with spaces
+until it is LENGTH characters long. If LENGTH is negative, it will pad
+to the left.
+
+The first argument must be an integer or nothing will be returned.
+All others should be scalars.
+
+=item B<(padchar LENGTH CHAR ELE0 ELE1 ...)>
+
+This is identical to (pad ...) but it will pad with an arbitrary
+character (the 2nd argument).
+
+The first arguement must be an integer and the 2nd argument must be a
+single character or nothing will be returned. Other elements should be
+scalars.
+
+=item B<(column N LIST0 LIST1 ...)>
+
+This returns a list of the Nth element of each of the listrefs. All
+arguments (except for the first) must be listrefs.
+
+=item B<(reverse ELE0 ELE1 ...)>
+
+This returns the reverse of the list.
+
+All element types are allowed.
+
+=item B<(rotate N ELE0 ELE1 ...)>
+
+This rotates the list of element N times. If N is positive, a single
+rotation is to remove the first element and put it on the end. If N
+is negative, a single rotation is to remove the last element and move
+it to the first.
+
+N must be an integer or nothing is returned. All element types are
+allowed for the list.
+
+=item B<(delete VAL ELE0 ELE1 ...)>
+
+This removes all occurences of VAL from the list.
+
+VAL must be a scalar or nothing is returned.  All other elements
+should be scalars.
+
+=item B<(clear ELE0 ELE1 ...)>
+
+This clears all elements from the list and returns an empty list.
+
+=item B<(append STRING ELE0 ELE1 ...), (prepend STRING ELE0 ELE1 ...)>
+
+These append or prepend a string to all elements in the list.
+
+The first element must be a scalar. All others should be scalars.
+
+=item B<(splice LIST N LEN [ELE0 ELE1 ...])>
+
+This deletes LEN elements from LIST starting at element N and inserts
+the ELE elements in their place.
+
+LIST must be a list reference, N and LEN must be integers (LEN must
+be zero or positive). The remaining elements can be any type.
+
+=item B<(slice N LEN ELE0 ELE1 ...)>
+
+This returns the slice of the list of elements starting with the
+Nth element and including LEN number of elements.
+
+N and LEN must be integers (LEN must be zero or positive). The
+remaining elements can be any type.
+
+=item B<(fill LIST N LEN VAL)>
+
+This sets elements in LIST. The first argument is required, and must
+be a list reference. All other arguments are optional.  Elements are
+numbered 0 to M or -(M+1) to -1. It is valid to refer to elements
+with an index greater than M (these are elements which will be added
+on to the right of the list), or less than -(M+1) (these are elements
+which will be added to the left.
+
+If N is given, it must be an integer. This is the index of the first
+element of the list to change.
+
+If LEN is given, it must be an integer. This is the number of elements
+to change starting at the Nth element and moving right. If it is
+negative, it is the number of elements to change starting with the Nth
+element and moving left. If LEN is zero,the list is unmodified.
+
+If VAL is set, all elements to be changed will be set to it. Otherwise,
+they will be set to "".
+
+The elements to be set depend on N and LEN (and M). The following
+table describes the changes for cases where LEN is not given.
+L refers to an index to the left of the list, R refers to an
+index to the right of the list, and C refers to an index in the list.
+
+  N   
+  === 
+
+  A   If both N and LEN are omitted, the entire list is
+      filled with "".
+
+  L   This adds blank elements to the left of the list
+      out to (and including) the Lth element. Existing
+      elements are unmodified.
+
+  C   This sets from Cth element to the end of the list
+      to "".
+
+  R   This adds blank elements to the right of the list
+      out to (and including) the Rth element. Existing
+      elements are unmodified.
+
+For cases where LEN is given, N and LEN explicitly define
+the start and stop elements to modify. Either or both
+elements can be to the left of the list or to the right
+of the list.
+    
+All elements in the (N,LEN) range are set to the value. If LEN
+goes past the end of the list, additional elements are added and
+set to that value. If N points to elements before the list,
+additional elements are added to the left.
+
+One possible confusion is when the operation is used to fill
+elements which are outside of the list entirely. For example if
+LIST contains:
+
+  (a a a)
+
+and N is 4, LEN is 2, VAL is b, the resulting list is:
+
+  (a a a "" b b)
+
+(so an empty element was added to get the list out to the portion
+that was being set).
+
+=item B<(difference LIST0 LIST1), (d_difference LIST0 LIST1)>
+
+These take two lists and removes all elements in the second list from
+the first (and return the new list). The difference between the two is
+how duplicate entries are handled. In the first call, all duplicates
+are removed. In the second call, only one instance per element in the
+second list is removed.
+
+  (difference [list a a b c] [list a]) => (b c)
+  (d_difference [list a a b c] [list a]) => (a b c)
+
+=item B<(intersection LIST0 LIST1), (d_intersection LIST0 LIST1)>
+
+This takes two lists and finds the intersection of the two.  The
+intersection are the elements that are in both lists. In the first
+call, duplicates are ignored returning only a single instance of the
+intersection. In the second call, duplicates may be included in the
+intersection.
+
+  (intersection [list a a b c] [list a a a b]) => (a b)
+  (d_intersection [list a a b c] [list a a a b]) => (a a b)
+
+=item B<(symdiff LIST0 LIST1), (d_symdiff LIST0 LIST1)>
+
+This takes the symmetric difference between two lists. The symmetric
+difference are elements that are in either list but not both. Again,
+duplicates are allowed in the second call.
+
+  (symdiff [list a a b c] [list a a a b]) => (c)
+  (d_symdiff [list a a b c] [list a a a b]) => (a c)
+
+=back
+
+The following variable operations are known:
+
+=over 4
+
+=item B<(getvar VAR)>
+
+This returns the value of a variable named VAR. VAR must be a valid
+variable name or nothing is returned.
+
+=item B<(setvar VAR VAL)>
+
+This sets the variable VAR to the given value (which may be a list or
+a scalar).
+
+Returns VAL.
+
+=item B<(default VAR VAL)>
+
+This sets the values of VAR to VAL unless VAR already has a value.
+
+Returns the value of VAR.
+
+=item B<(unsetvar VAR)>
+
+Removes VAR from the defined variables.
+
+Returns nothing.
+
+=item B<(shiftvar VAR), (popvar VAR)>
+
+These shift or pop a value from the variable. Nothing is returned if
+the operation is not valid. Otherwise, the shifted/popped value is
+returned.
+
+=item B<(unshiftvar VAR VAL), (pushvar VAR VAL)>
+
+These add a new element to the start or end of the given variable. If
+the variable refers to a scalar, it will be converted to a list.
+
+Nothing is returned.
+
+=back
+
+=head1 EXAMPLES
+
+=over 4
+
+=item B<Reading a config file>
+
+A simple config file might contain a two types of lines. The first type
+would be lines which actually set a config variable to a value:
+
+  Var = Val
+
+and the second type would be lines which use this module to set more
+complex values:
+
+  Var : ( ... )
+
+You might read the file, one line at a time, in the following way:
+
+  use List::Parseable;
+  $lp     = new List::Parseable;
+  %CONFIG = ();
+
+  @lines  = ...;        # @lines contains the lines from the config file
+
+  foreach $line (@lines) {
+    if      ($line =~ /^\s*(\S+)\s*=\s*(.*?)\s*$/) {
+       set_value($1,$2);
+    } elsif ($line =~ /^\s*(\S+)\s*:\s*(.*?)\s*$/) {
+       parse_value($1,$2);
+    }
+  }
+
+  # This stores a value in a variable. The value is stored in both
+  # a global config hash and in the List::Parseable object so that
+  # the config values can be used in setting complex values.
+  #
+  sub set_value {
+     my($var,$val) = @_;
+
+     $::CONFIG{$var} = $val;
+     $lp->vars($var,$val);
+  }
+
+  # Set a complex variable using List::Parseable.
+  #
+  sub parse_value {
+     my($var,$str) = @_;
+     $lp->string("curr",$str);
+     my ($val) = $lp->eval("curr");
+     set_value($var,$val);
+  }
+
+=item B<Setting a complex value>
+
+If you have a config file with three values: ValA, ValB, and Ave, and
+you want Ave to be the average of ValA and ValB, but you don't want to
+build this into the program that reads the data, you could have the
+following (using the program in the example for reading a config file):
+
+  ValA = 7
+  ValB = 9
+  Ave  : ( / ( + (getvar ValA) (getvar ValB) ) 2 )
+
+=item B<Supplying a missing value>
+
+If you have a config file and you want to provide defaults for missing
+values, you can do the following:
+
+  ValA = suppliedA
+  ValA : (default ValA defaultA)
+  ValB : (default ValB defaultB)
+
+This will result in the ValA being 'suppliedA' and ValB being 'defaultB'.
+
+=back
+
+=head1 BACKWARDS INCOMPATABILITIES
+
+=over 4
+
+=item B<1.01 no longer uses <> as list delimiters>
+
+In order to simplify the use of the <, <=, >, and >= operators,
+the <> symbols will no longer be used as list delimiters.
+
+=back
+
+=head1 BUGS AND QUESTIONS
+
+If you find a bug in this module, please send it directly to me (see
+the AUTHOR section below).  Alternately, you can submit it on CPAN. This
+can be done at the following URL:
+
+   http://rt.cpan.org/Public/Dist/Display.html?Name=List-Parseable
+
+Please do not use other means to report bugs (such as usenet newsgroups,
+or forums for a specific OS or linux distribution) as it is impossible
+for me to keep up with all of them.
+
+When filing a bug report, please include the following information:
+
+=over 4
+
+=item B<*>
+
+The version of the module you are using.  You can get this by using
+the script:
+
+        use List::Parseable;
+        $obj = new List::Parseable;
+        print $obj->version(),"\n";
+
+=item B<*>
+
+The output from "perl -V"
+
+=back
+
+If you have a problem using the module that perhaps isn't a bug (can't
+figure out the syntax, etc.), you're in the right place.  Go right back to
+the top of this manual and start reading.  If this still doesn't answer
+your question, mail me directly.
+
+=head1 KNOWN PROBLEMS
+
+None at this point.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)

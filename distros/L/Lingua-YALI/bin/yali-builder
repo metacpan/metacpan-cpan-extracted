@@ -1,0 +1,133 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: Script for building language models
+# PODNAME: yali-builder
+
+use strict;
+use warnings;
+
+use Lingua::YALI::Builder;
+use Lingua::YALI;
+
+use Getopt::Long;
+use Pod::Usage;
+use Carp;
+use File::Basename;
+
+our $VERSION = '0.015'; # VERSION
+
+my $output_file = undef;
+my $file_list = undef;
+my $input_file = undef;
+my $count = undef;
+my $ngram = 4;
+my $help = 0;
+
+my $result = GetOptions("filelist=s" => \$file_list,
+                     "input|i=s"   => \$input_file,
+                     "output|o=s"   => \$output_file,
+                     "count|c=i" => \$count,
+                     "ngram|n=i"  => \$ngram,
+                     "help|h"  => \$help
+) || pod2usage( -exitval => 105);
+
+if ($help) {
+    pod2usage(-exitval => 0);
+}
+
+# reading input from STDIN is default
+if ( ! defined($input_file) && ! defined($file_list) ) {
+    $input_file = "-";
+}
+
+# it is incorrect when parameter filelist and input are specified
+if ( defined($input_file) && defined($file_list) ) {
+    pod2usage(-exitval => 101, -msg     => "Options --filelist and --input can not be specified in the same time.");
+}
+
+# output file is required
+if ( ! defined($output_file) ) {
+    pod2usage(-exitval => 101, -msg     => "Output file --output has to be specified.");
+}
+
+# check parameter range
+if ( defined($count) && $count < 1 ) {
+    pod2usage(-exitval => 101, -msg     => "The number of n-grams --count has to be positive. $count was used.");
+}
+
+if ( $ngram < 1 ) {
+    pod2usage(-exitval => 101, -msg     => "The n-gram size --ngram has to be positive. $ngram was used.");
+}
+
+# construct builder
+my $builder = Lingua::YALI::Builder->new(ngrams=>[$ngram]);
+
+# train models from input
+if ( defined($input_file) ) {
+    if ( $input_file eq "-" ) {
+        $builder->train_handle(\*STDIN);
+    } else {
+        $builder->train_file($input_file);
+    }
+} elsif ( defined($file_list) ) {
+    my $fh_list = undef;
+    if ( $file_list eq "-" ) {
+        $fh_list = \*STDIN;
+    } else {
+        open($fh_list, "<", $file_list) or croak $!;
+    }
+    while ( <$fh_list> ) {
+        chomp;
+        $builder->train_file($_);
+    }
+}
+
+# store results
+$builder->store($output_file, $ngram, $count);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yali-builder - Script for building language models
+
+=head1 VERSION
+
+version 0.015
+
+=head1 SYNOPSIS
+
+yali-builder [options]
+
+Train models for language identification with yali-identifier.
+
+Options:
+
+ -i, --input=F         input file. When F is -, read standard input (default -).
+     --filelist=F      input files are read from F. When F is -, read them from standard input.
+ -o, --output=F        output file
+ -n, --ngram=N         n-gram size (default 4)
+ -c, --count           the number of n-grams
+ -h, --help            prints documentation
+
+More examples are available at L<http://search.cpan.org/perldoc?Lingua%3A%3AYALI%3A%3AExamples>
+
+Version: 0.015 (2014-05-04)
+
+=head1 AUTHOR
+
+Martin Majlis <martin@majlis.cz>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Martin Majlis.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

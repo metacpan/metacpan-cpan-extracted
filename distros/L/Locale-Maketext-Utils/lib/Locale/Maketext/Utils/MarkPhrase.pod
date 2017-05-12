@@ -1,0 +1,95 @@
+=encoding utf-8
+
+=head1 NAME
+
+Locale::Maketext::Utils::MarkPhrase - explicitly mark a phrase as translatable
+
+
+=head1 SYNOPSIS
+
+    use Locale::Maketext::Utils::MarkPhrase;
+    
+    # $result = 'Hello World';
+    $result = translatable('Hello World');
+
+=head1 DESCRIPTION
+
+Let’s say you typically harvest phrases from your code by looking for calls to maketext() or lextext().
+
+Sometimes you need to have a string in code that does not have your locale system in place so you can’t use maketext() or lextext() for that purpose. 
+
+If you made fake ones you’d either have untranslated/uncompiled results or the consumer of the result would have to figure out if it’s good or if still needs processing.
+
+Thats ugly and overly complex no matter how you slice it. A simple solution is to have a marker function that parsers can look for that passes the original string to the consumer for normal handling.
+
+That small, simple solution is what this module aims to provide.
+
+=head1 INTERFACE
+
+=head2 translatable()
+
+The function translatable() is exported when the module is import()ed.
+
+Takes one argument, the string to translate.
+
+Returns the same exact string unmodified.
+
+This is one of the things that L<Text::Extract::MaketextCallPhrases>.
+
+=head1 DIAGNOSTICS
+
+Throws no wnarings or errors of its own.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+  
+Locale::Maketext::Utils::MarkPhrase requires no configuration files or environment variables.
+
+=head1 DEPENDENCIES
+
+None.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-locale-maketext-utils-mock@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 AUTHOR
+
+Daniel Muey  C<< <http://drmuey.com/cpan_contact.pl> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2012, Daniel Muey C<< <http://drmuey.com/cpan_contact.pl> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

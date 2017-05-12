@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Lyrics-Fetcher-Google
+version:      0.02
+version_from: 
+installdirs:  site
+requires:
+    HTML::LinkExtractor:           
+    HTML::TokeParser::Simple:      
+    LWP::UserAgent:                
+    Lyrics::Fetcher:               0.3.1
+    Net::Google:                   0.53
+    String::Similarity:            
+    Test::Simple:                  0.44
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,27 @@
+<DefaultConfig>
+    CONFIG_DIR = "/usr/share/BioYaTeA/config/"
+    LOCALE_DIR = "/usr/share/BioYaTeA/locale/"
+#
+    RESULT_REP = $PWD/RESULTS
+</DefaultConfig>
+<OPTIONS>
+    MESSAGE_DISPLAY = EN
+    language = EN
+    xmlout = 1
+    XML-corpus-raw = 1
+    printChunking = 1
+    suffix = "default"
+    TC-for-BioLG = 0
+    TT-for-BioLG = 0
+    debug = 1
+    termList = "multi"
+#    termino = /home/saubin/tt.ttg
+    TTG-style-term-candidates = "multi"
+    monolexical-included = 0
+    monolexical-all = 1
+    match-type = "if"
+    bootstrap = 1
+    XML-corpus-for-BioLG = 0
+    annotate-only = 0
+</OPTIONS>
+

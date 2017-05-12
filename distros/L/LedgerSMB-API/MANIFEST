@@ -1,0 +1,21 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+INSTALL
+lib/LedgerSMB/API.pm
+lib/LedgerSMB/API/OSCommerce.pm
+t/tmpl/00-load.t
+t/tmpl/10-lsmb-api.t
+t/tmpl/12-lsmb-api-ic-inventory.t
+t/tmpl/13-lsmb-api-ic-part.t
+t/tmpl/15-lsmb-api-ic-assy.t
+t/tmpl/16-lsmb-api-ct-vendor.t
+t/tmpl/17-lsmb-api-oe-po.t
+t/tmpl/21-lsmb-api-ct-customer.t
+t/tmpl/22-lsmb-api-oe.t
+t/tmpl/boilerplate.t
+t/tmpl/pod-coverage.t
+t/tmpl/pod.t
+

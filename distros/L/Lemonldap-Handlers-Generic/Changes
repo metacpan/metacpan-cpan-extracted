@@ -1,0 +1,30 @@
+Revision history for Perl extension Lemonldap::Handlers::Generic.
+
+2.00  Fri Oct  7 13:47:41 2005
+	- original version; created by h2xs 1.23 with options
+		-XAn Lemonldap::Handlers::Generic
+
+
+2.01 Wed Dec 28 10:00:00 2005
+       -minor changes in doc  
+3.0.0 Tue Jul 04 10:00:00 2006
+       - great modification from DGI 
+3.1.0  Tue  Mar 01 10:00:00 2007
+       - definitive version 
+3.1.1  Mar 15 2007        
+       - litles correction 
+3.1.2  Mar 27 2007        
+       - Add RowPolicy 
+3.3.0  May 25 2007        
+       - Correct bug on empty post request  
+3.4.0  Jun 25 2007        
+3.5.0  Jul 16 2007       
+       - Correct  malformed location header used by LWP.
+3.5.1  Sep 22  2007
+       - add parameters in order to rewrite html  with LWP engine.
+3.5.2  Sep 22  2007
+       - correct syntax
+3.5.3  Oct 24 2007
+       - add management timeout in case of CDA 
+       - add sourceredirection and targetredirection (location header)       
+       

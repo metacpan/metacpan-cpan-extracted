@@ -1,0 +1,47 @@
+Labyrinth-Plugin-Core
+=====================
+
+This collection of modules form the core plugins used by the Labyrinth Web 
+Framework.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these modules:
+
+  Clone
+  Config::IniFiles
+  Digest::MD5
+  File::Copy
+  File::Basename
+  Image::Size
+  Labyrinth
+  Time::Local
+  URI::Escape
+
+For testing the module requires these modules:
+
+  IO::File
+  Test::More
+
+For optional testing the module would like these modules:
+
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2002-2015 Barbie for Miss Barbell Productions
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

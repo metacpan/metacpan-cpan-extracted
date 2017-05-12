@@ -1,0 +1,26 @@
+Revision history for Log-AutoDump
+
+0.11    remove abort()
+
+0.10    fix abort()
+
+0.09    implement autoflush to keep Catalyst happy
+        also implement about() to work with catalyst static simple plugin
+
+0.08    include the pid in the prefix
+
+0.07    flexible sorting and quoting keys
+
+0.06    dump depth is local
+
+0.05    datestamp filename is not default
+
+0.04    24 April 2012 - datestamping of filename and fixed minor bugs
+
+0.03    Tiny POD changes
+
+0.02    POD
+
+0.01    19 April 2012 - Initial release
+
+

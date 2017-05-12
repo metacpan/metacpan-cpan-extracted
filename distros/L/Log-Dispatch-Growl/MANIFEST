@@ -1,0 +1,13 @@
+Build.PL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Log/Dispatch/Growl.pm
+t/00_compile.t
+t/03_log.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

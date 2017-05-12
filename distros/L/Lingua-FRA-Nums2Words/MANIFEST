@@ -1,0 +1,7 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Lingua/FRA/Nums2Words.pm
+t/Nums2Words.t

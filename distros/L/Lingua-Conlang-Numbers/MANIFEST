@@ -1,0 +1,19 @@
+Build.PL
+Changes
+example.pl
+lib/Lingua/Conlang/Numbers.pm
+lib/Lingua/EO/Numbers.pm
+lib/Lingua/EO/Numbers/EO.pod
+lib/Lingua/JBO/Numbers.pm
+lib/Lingua/TLH/Numbers.pm
+lib/Lingua/TokiPona/Numbers.pm
+MANIFEST			This list of files
+META.yml
+README
+t/conlang.t
+t/eo.t
+t/jbo.t
+t/pod-coverage.t
+t/pod.t
+t/tlh.t
+t/tokipona.t

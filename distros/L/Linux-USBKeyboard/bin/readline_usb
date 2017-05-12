@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2007 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+readline_usb - read lines from a usb "keyboard"
+
+=cut
+
+package bin::readline_usb;
+
+use Linux::USBKeyboard;
+use YAML;
+
+sub main {
+  my (@args) = @_;
+
+  @args or die "usage $0 <profile>\n";
+  my %conf = load_config(@args);
+  my $kb = Linux::USBKeyboard->open(%conf);
+  $| = 1;
+  while(my $line = <$kb>) {
+    print $line;
+  }
+}
+
+sub load_config {
+  my ($conf_name) = @_;
+  my $conf_dir = $ENV{HOME} . '/.usbkeyboard/';
+  unless(-d $conf_dir) {
+    (-e $conf_dir) or die "no '$conf_dir' directory";
+    die "'$conf_dir' is not a directory";
+  }
+
+  my $file = $conf_dir . $conf_name . '.yml';
+  (-e $file) or die "'$file' -- no such file";
+  my $conf = YAML::LoadFile($file);
+  return(%$conf);
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::readline_usb::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::readline_usb';

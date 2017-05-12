@@ -1,0 +1,223 @@
+#!/usr/bin/perl
+
+use strict;
+use utf8;
+use Getopt::Long qw(:config auto_version);
+use Data::Dumper;
+use Locale::PO;
+use Locale::Memories;
+use File::Find::Rule;
+use File::Path;
+use List::Util qw(shuffle);
+use Encode;
+
+our $VERSION = $Locale::Memories::VERSION;
+
+my $locale_pattern = qr{[a-z][a-z][a-z]?(?:_[a-z][a-z])?}i;
+
+sub get_po_encoding {
+    my $file = shift;
+    my $encoding;
+    open my $fh, '<', $file or die $!;
+    while (my $line = <$fh>) {
+	if ($line =~ m{"Content-Type: text/plain; charset=([\w\d\-_]+)\b}) {
+	    $encoding = $1;
+	}
+    }
+    $encoding = 'utf8' if !$encoding;
+    close $fh;
+    return $encoding;
+}
+
+sub load_po_data {
+    my $file = shift;
+    die "$file is not a regular file" if !-f $file;
+    my %msg;
+
+    print "Loading data from $file\n";
+    $file =~ m{\A.+[^a-zA-Z_](${locale_pattern})\.po\z};
+    if (!$1) {
+	warn "$file is not a recognized name";
+	next;
+    }
+    my $locale = lc $1;
+    my $encoding = get_po_encoding($file);
+    my $aref;
+    eval {
+	$aref = Locale::PO->load_file_asarray($file);
+    };
+    if (!$@ && @{$aref}) {
+	@{$aref} = grep { $_->{msgid} ne q[""] } @{$aref};
+	unshift @{$aref},
+	    Locale::PO->new(-msgid => '',
+			    -msgstr =>
+			    join q//, map { "$_\\n" }
+			    "Project-Id-Version: blah",
+			    "Report-Msgid-Bugs-To: http://blahblah",
+			    "POT-Creation-Date: xxxx-xx-xx xx:xx+xxxx",
+			    "PO-Revision-Date: xxxx-xx-xx xx:xx+xxxx",
+			    "Last-Translator: Your name <blah\@blah.com>",
+			    "Language-Team: ",
+			    "MIME-Version: 1.0",
+			    "Content-Type: text/plain; charset=UTF-8",
+			    "Content-Transfer-Encoding: 8bit");
+	for my $m (@{$aref}) {
+	    if ($m->{msgid}) {
+		eval {
+		    Encode::from_to($m->{msgid}, $encoding, 'utf8');
+		    Encode::from_to($m->{msgstr}, $encoding, 'utf8');
+		};
+		if (!$@) {
+		    push @{$msg{$locale}}, $m;
+		}
+	    }
+	}
+    }
+    return %msg;
+}
+
+sub build_memories {
+    my ($lm, @memory_dirs) = @_;
+    local $Data::Dumper::Terse = 1;
+    local $Data::Dumper::Indent = 0;
+    for my $k (shuffle(File::Find::Rule->file
+		       ->name('*.po')->in(@memory_dirs))) {
+	my %msg = load_po_data($k);
+	for my $locale (keys %msg) {
+	    for my $m (@{$msg{$locale}}) {
+# 		print join q/ /, $locale, $m->{msgid}, $m->{msgstr}, $/;
+ 		$lm->index_msg($locale, $m->{msgid}, $m->{msgstr});
+	    }
+	}
+    }
+}
+
+sub translate_po_data {
+    my ($lm, $input_path, $output_dir) = @_;
+
+    if (-e $output_dir && !-d $output_dir) {
+	die "$output_dir already exists and it is not a directory";
+    }
+    elsif (!-d $output_dir) {
+	mkdir $output_dir or die $!;
+    }
+
+    my @input_files = File::Find::Rule->file->name('*.po')->in($input_path);
+    for my $file (@input_files) {
+	print "Translating $file\n";
+	$file =~ m{\A.+[^a-zA-Z_](${locale_pattern})\.po\z};
+	if (!$1) {
+	    warn "$file is not a recognized name";
+	    next;
+	}
+	my $locale = lc $1;
+	my $encoding = get_po_encoding($file);
+	my $aref;
+	eval {
+	    $aref = Locale::PO->load_file_asarray($file);
+	};
+	if (!$@ && @{$aref}) {
+	    for my $m (@{$aref}) {
+		eval {
+		    Encode::from_to($m->{msgid}, $encoding, 'utf8');
+		    Encode::from_to($m->{msgstr}, $encoding, 'utf8');
+		};
+		if (!$@) {
+		    my $msg_ref = $lm->translate_msg($locale, $m->{msgid});
+		    if (ref $msg_ref && $msg_ref->[1]) {
+			$m->{msgstr} = $msg_ref->[1];
+			$m->{comment}
+			    .= "Translated from ($file): '$msg_ref->[0]'";
+		    }
+		}
+	    }
+	    $file =~ m{$input_path/(.+)/.+?\.po\z};
+	    my $output_subpath = $1;
+	    mkpath([$output_dir . '/' . $output_subpath], 0, 0755);
+	    my $output_file = $output_dir . '/' . $output_subpath
+		. '/' .$locale . '.po';
+	    Locale::PO->save_file_fromarray($output_file, $aref);
+	}
+    }
+}
+
+sub main {
+    my @memory_dirs;
+    my ($input_path, $output_dir, $index_path);
+
+    exec 'perldoc', $0 if !@ARGV;
+
+    GetOptions(q{memory|m=s@} => \@memory_dirs,
+	       q{input|i=s} => \$input_path,
+	       q{output_dir|o=s} => \$output_dir,
+	       q{index_path|p=s} => \$index_path);
+    die "Please specify input path" if !$input_path;
+    die "Please specify output dir" if !$output_dir;
+
+    my $lm = Locale::Memories->new({index_path => $index_path});
+    if (@memory_dirs) {
+	build_memories($lm, @memory_dirs);
+    }
+    elsif ($index_path) {
+ 	$lm->load_index($index_path);
+    }
+    else {
+	die "Please specify translation memories" if !@memory_dirs;
+    }
+    translate_po_data($lm, $input_path, $output_dir);
+}
+
+main;
+
+1;
+__END__
+
+=pod
+
+=head1 NAME
+
+pomagic - L10N Message Translator
+
+=head1 SYNOPSIS
+
+  % pomagic -m translation memories
+            -p index path
+            -i input data
+            -o output data
+
+=head1 DESCRIPTION
+
+This tool builds up translation memory index and translates messages into
+localized versions.
+
+                        pomagic + Translation memories
+   The untranslated --------------------------------------> The translated
+
+PO file names must have locale code patterns, such as 'my_app_zh_tw.po'.
+
+=head2 OPTIONS
+
+=head3 m
+
+pomagic searches for all .po files under specified paths. This option
+can be used multiple times.
+
+=head3 p
+
+index path
+
+=head3 i
+
+Input data. Can be either a .po file or a directory having .po files.
+
+=head3 o
+
+Output directory
+
+=head1 COPYRIGHT
+
+Copyright (c) 2007 Yung-chung Lin. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=cut

@@ -1,0 +1,218 @@
+=encoding utf8
+
+=head1 NAME
+
+Log::Report::Lexicon::Index - search through available translation files
+
+=head1 SYNOPSIS
+
+ my $index = Log::Report::Lexicon::Index->new($directory);
+ my $fn    = $index->find('my-domain', 'nl_NL.utf-8');
+
+=head1 DESCRIPTION
+
+This module handles the lookup of translation files for a whole
+directory tree.  It is lazy loading, which means that it will only
+build the search tree when addressed, not when the object is
+created.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Log::Report::Lexicon::Index-E<gt>B<new>($directory, %options)
+
+Create an index for a certain directory.  If the directory does not
+exist or is empty, then the object will still be created.
+
+All files the $directory tree which are recognized as an translation table
+format which is understood will be listed.  Momentarily, those are:
+
+=over
+
+=item . files with extension "po", see L<Log::Report::Lexicon::POTcompact|Log::Report::Lexicon::POTcompact>
+
+=item . [0.993] files with extension "mo", see L<Log::Report::Lexicon::MOTcompact|Log::Report::Lexicon::MOTcompact>
+
+=back
+
+[0.99] Files which are in directories which start with a dot (hidden
+directories) and files which start with a dot (hidden files) are skipped.
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<directory>()
+
+Returns the directory name.
+
+=back
+
+=head2 Search
+
+=over 4
+
+=item $obj-E<gt>B<addFile>( $basename, [$absolute] )
+
+Add a certain file to the index.  This method returns the $absolute
+path to that file, which must be used to access it.  When not explicitly
+specified, the $absolute path will be calculated.
+
+=item $obj-E<gt>B<find>($textdomain, $locale)
+
+Lookup the best translation table, according to the rules described
+in chapter L</DETAILS>, below.
+
+Returned is a filename, or C<undef> if nothing is defined for the
+$locale (there is no default on this level).
+
+=item $obj-E<gt>B<index>()
+
+For internal use only.
+Force the creation of the index (if not already done).  Returns a hash
+with key-value pairs, where the key is the lower-cased version of the
+filename, and the value the case-sensitive version of the filename.
+
+=item $obj-E<gt>B<list>( $domain, [$extension] )
+
+Returned is a list of filenames which is used to update the list of
+MSGIDs when source files have changed.  All translation files which
+belong to a certain $domain are listed.
+
+The $extension filter can be used to reduce the filenames further, for
+instance to select only C<po> or only C<mo> files, and ignore readme's.
+Use an string, without dot and interpreted case-insensitive, or a
+regular expression.
+
+example: 
+
+  my @l = $index->list('my-domain');
+  my @l = $index->list('my-domain', 'po');
+  my @l = $index->list('my-domain', qr/^readme/i);
+
+=back
+
+=head1 DETAILS
+
+It's always complicated to find the lexicon files, because the perl
+package can be installed on any weird operating system.  Therefore,
+you may need to specify the lexicon directory or alternative directories
+explicitly.  However, you may also choose to install the lexicon files
+in between the perl modules.
+
+=head2 merge lexicon files with perl modules
+
+By default, the filename which contains the package which contains the
+textdomain's translator configuration is taken (that can be only one)
+and changed into a directory name.  The path is then extended with C<messages>
+to form the root of the lexicon: the top of the index.  After this,
+the locale indication, the lc-category (usually LC_MESSAGES), and
+the C<textdomain> followed by C<.po> are added.  This is exactly as
+C<gettext(1)> does, but then using the PO text file instead of the MO
+binary file.
+
+B<. Example: lexicon in module tree>
+
+My module is named C<Some::Module> and installed in
+some of perl's directories, say C<~perl5.8.8>.  The module is defining
+textdomain C<my-domain>.  The translation is made into C<nl-NL.utf-8>
+(locale for Dutch spoken in The Netherlands, utf-8 encoded text file).
+
+The default location for the translation table is under
+ ~perl5.8.8/Some/Module/messages/
+
+for instance
+ ~perl5.8.8/Some/Module/messages/nl-NL.utf-8/LC_MESSAGES/my-domain.po
+
+There are alternatives, as described in L<Log::Report::Lexicon::Index|Log::Report::Lexicon::Index>,
+for instance
+ ~perl5.8.8/Some/Module/messages/my-domain/nl-NL.utf-8.po
+ ~perl5.8.8/Some/Module/messages/my-domain/nl.po
+
+=head2 Locale search
+
+The exact gettext defined format of the locale is
+  language[_territory[.codeset]][@modifier]
+The modifier will be used in above directory search, but only if provided
+explicitly.
+
+The manual C<info gettext> determines the rules.  During the search,
+components of the locale get stripped, in the following order:
+
+=over 4
+
+=item 1. codeset
+
+=item 2. normalized codeset
+
+=item 3. territory
+
+=item 4. modifier
+
+=back
+
+The normalized codeset (character-set name) is derived by
+
+=over 4
+
+=item 1. Remove all characters beside numbers and letters.
+
+=item 2. Fold letters to lowercase.
+
+=item 3. If the same only contains digits prepend the string "iso".
+
+=back
+
+To speed-up the search for the right table, the full directory tree
+will be indexed only once when needed the first time.  The content of
+all defined lexicon directories will get merged into one tree.
+
+=head2 Example
+
+My module is named C<Some::Module> and installed in some of perl's
+directories, say C<~perl5>.  The module is defining textdomain
+C<my-domain>.  The translation is made into C<nl-NL.utf-8> (locale for
+Dutch spoken in The Netherlands, utf-8 encoded text file).
+
+The translation table is taken from the first existing of these files:
+  nl-NL.utf-8/LC_MESSAGES/my-domain.po
+  nl-NL.utf-8/LC_MESSAGES/my-domain.po
+  nl-NL.utf8/LC_MESSAGES/my-domain.po
+  nl-NL/LC_MESSAGES/my-domain.po
+  nl/LC_MESSAGES/my-domain.po
+
+Then, attempts are made which are not compatible with gettext.  The
+advantage is that the directory structure is much simpler.  The idea
+is that each domain has its own locale installation directory, instead
+of everything merged in one place, what gettext presumes.
+
+In order of attempts:
+  nl-NL.utf-8/my-domain.po
+  nl-NL.utf8/my-domain.po
+  nl-NL/my-domain.po
+  nl/my-domain.po
+  my-domain/nl-NL.utf8.po
+  my-domain/nl-NL.po
+  my-domain/nl.po
+
+Filenames may get mutulated by the platform (which we will try to hide
+from you [please help improve this]), and are treated case-INsensitive!
+
+=head1 SEE ALSO
+
+This module is part of Log-Report-Lexicon distribution version 1.06,
+built on September 21, 2016. Website: F<http://perl.overmeer.net/log-report/>
+
+=head1 LICENSE
+
+Copyrights 2007-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7be3240f76dee00d081de8e17e5509bba63c48a1 Build.PL
+SHA1 96935b60a30992f279c3f5ec3d3d2a97f22fc454 Changes
+SHA1 4a5871f916adaf6e49f2a2c64223bbddd3c6e5f5 LICENSE
+SHA1 26396bd6d6f52aeb177a8df3c1174b0fbf8cbb9b MANIFEST
+SHA1 1c43b331b52da2cfe1c7423e7666162d0dfacbe1 META.yml
+SHA1 6b2a3178f2428d742842cb66b9df56caba4bc838 README
+SHA1 6e2cc793b60c7bf789e3fe655f87132e3ec5cb44 cpanfile
+SHA1 566b36703f33cb209398873eca168ed550e9add1 lib/Log/Radis.pm
+SHA1 d5a5ba418c361522c33a61de5e6465a645b34458 t/00-all.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 d361ce075754a8cc9307cfdd64e2729986714579 t/author-pod-coverage.t
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 d8a904a35375aca0e02c9150fb1945c53bdeb7e0 t/release-kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXhfIGAAoJEJVzeMw4kNooKsIP/RDR8xr++Kbf900ToGXNiG3C
+/xfUODTYHLVM5+9Xyb/3xAnzcSYHnJuDVnGRzO6VfxPo8kGdmMGFt7z/qGxtQeBB
+9rO46LIO4/tF4pJXt38WzAvib+YJF8vi/3+hPu2LyD46JI2C7UNJIwrRHyJAWSbK
+79E+6jmdjGbNWeq8LWhW8V9Wy3J3UDO8ydvCELJGc/d8N0d6s8VwBKSq3nA6Q6w1
+VaAkcsVJMNPdcw5EuchT2JBg+Bd5Kwl0mI3w+505SDv0G/gDXytiLBzl4iOibYUv
+MlQ0KYeCq93vuLlekX3lZE1xDdvzu8l7nqEi7rA4p9iGNcz+fb+JZPWyzVc+IpzG
+TgcQ/UPZ7vrppR9loOH+rk85dbJ+1/3NHD/d8kS5UrLU/LyE43dVoNLOfRERtUpc
+pMNFAuQCSIQAKfi4V4PJzJcik/odywU10atuaU6AHCEojjr+NLHbSyfyiZ7lih7Q
+/7nbfHTLW877UvGs4gVLOSyCBBC1fXsBchabQbWJvpPLeljwsqNkuNok45mhimQD
+0xaJ+ofoYCp4q0PBn+gDHBD0mZ4h7BiD2mjhPeJ4FxmbYlEPgs1F/AciROuEhJsT
+vIvPkeGIjG+h8uNzOPqI5cW8B+SHHrv1/FBu1KZAUflHSPzS4jG7jzYJv90UQnbr
+Ka0lPq4DDmLV8ZmRLOMe
+=1drk
+-----END PGP SIGNATURE-----

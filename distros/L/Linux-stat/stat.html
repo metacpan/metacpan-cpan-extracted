@@ -1,0 +1,170 @@
+<HTML>
+<HEAD>
+<TITLE>Linux::stat - parse /proc/stat</TITLE>
+<LINK REV="made" HREF="mailto:root@porky.devel.redhat.com">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#OPTIONS">OPTIONS</A>
+	<LI><A HREF="#FILES">FILES</A>
+	<LI><A HREF="#REQUIRES">REQUIRES</A>
+	<LI><A HREF="#SEE_ALSO">SEE ALSO</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+Linux::stat - parse /proc/stat
+
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+<P>
+<PRE>  use Linux::stat;
+</PRE>
+<P>
+<PRE>  my $stat = Linux::stat-&gt;new( [ stat =&gt; &quot;path to /proc/stat&quot; ] );
+  my $hashref = $stat-&gt;stat();
+</PRE>
+<P>
+or
+
+<P>
+<PRE>  my $hashref = Linux::stat::stat( [ &quot;path to /proc/stat&quot; ] );
+</PRE>
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+<STRONG>Linux::stat</STRONG> is a simple Perl module which parses <STRONG>/proc/stat</STRONG> file. Info is arranged in hash reference with descriptive keys.
+
+<P>
+<STRONG>Linux::stat</STRONG> was written on RedHat Linux 7.2, kernel 2.4.7 and tested on RedHat 6.2,
+kernel 2.2.14. It is expected to work with other versions as well, but this
+depends on Linux configuration and kernel version.
+
+<P>
+Output data can be easily previewed with <STRONG>Data::VarPrint</STRONG> package, available at CPAN.
+
+<P>
+Output fields (some of these are unavailable on kernels older than 2.4):
+
+<DL>
+<DT><STRONG><A NAME="item_boot_timestamp">boot_timestamp</A></STRONG><DD>
+<P>
+Timestamp (number of seconds since epoch) when the system was booted
+
+<DT><STRONG><A NAME="item_context_switch">context_switch</A></STRONG><DD>
+<P>
+Context switch, used by Linux job scheduler; for more info check Linux
+kernel sources: kernel/sched.c (look for kstat.context_swtch)
+
+<DT><STRONG><A NAME="item_cpu">cpu, cpu0, cpu1,...</A></STRONG><DD>
+<P>
+Overall and per-CPU time: <STRONG>user</STRONG>, <STRONG>nice</STRONG>, <STRONG>system</STRONG>, <STRONG>idle</STRONG>
+
+
+
+<DT><STRONG><A NAME="item_disks">disks</A></STRONG><DD>
+<P>
+Disks I/O (for each partition):
+
+<DL>
+<DT><STRONG><A NAME="item_disk">disk - disk number (0 for /dev/hda, 1 for /dev/hdb,...)</A></STRONG><DD>
+<DT><STRONG><A NAME="item_io">io - total number of I/O requests</A></STRONG><DD>
+<DT><STRONG><A NAME="item_major">major - major disk number (partition number on the disk)</A></STRONG><DD>
+<DT><STRONG><A NAME="item_read_count">read_count - number of reads from disk</A></STRONG><DD>
+<DT><STRONG><A NAME="item_read_sectors">read_sectors - number of sectors read from disk</A></STRONG><DD>
+<DT><STRONG><A NAME="item_write_count">write_count - number of writes to disk</A></STRONG><DD>
+<DT><STRONG><A NAME="item_write_sectors">write_sectors - number of sectors written to disk</A></STRONG><DD>
+</DL>
+<DT><STRONG><A NAME="item_disks_io">disks_io</A></STRONG><DD>
+<P>
+Overall disk I/O info; same fields as in <STRONG>disks</STRONG> (of course, except for
+<STRONG>disk</STRONG> and <STRONG>major</STRONG>)
+
+<DT><STRONG><A NAME="item_interrupts">interrupts</A></STRONG><DD>
+<P>
+Number for interrupts for each IRQ
+
+<DT><STRONG><A NAME="item_interrupts_total">interrupts_total</A></STRONG><DD>
+<P>
+Total number of interrupts (same as sum of all numbers in <STRONG>interrupts</STRONG>)
+
+<DT><STRONG><A NAME="item_kstat">kstat.*</A></STRONG><DD>
+<P>
+Not parsed, just added to hash
+
+<DT><STRONG><A NAME="item_pages_in">pages_in</A></STRONG><DD>
+<P>
+Number of pages read
+
+<DT><STRONG><A NAME="item_pages_out">pages_out</A></STRONG><DD>
+<P>
+Number of pages written
+
+<DT><STRONG><A NAME="item_swap_pages_in">swap_pages_in</A></STRONG><DD>
+<P>
+Number of pages read from swap
+
+<DT><STRONG><A NAME="item_swap_pages_out">swap_pages_out</A></STRONG><DD>
+<P>
+Number of pages written to swap
+
+<DT><STRONG><A NAME="item_total_forks">total_forks</A></STRONG><DD>
+<P>
+Number of processes run since boot
+
+<DT><STRONG><A NAME="item_uptime">uptime</A></STRONG><DD>
+<P>
+System uptime in seconds (same as sum of all four times for <STRONG>cpu</STRONG>)
+
+</DL>
+<P>
+All not-recognized fields are just passed on without parsing.
+
+<P>
+<HR>
+<H1><A NAME="OPTIONS">OPTIONS</A></H1>
+<P>
+Currently, the only option available is <STRONG>stat</STRONG> which is path to 
+<STRONG>/proc/stat</STRONG> in case this changes for some reason.
+
+<P>
+<HR>
+<H1><A NAME="FILES">FILES</A></H1>
+<P>
+<STRONG>/proc/stat</STRONG> CPU, disk and some other information
+
+<P>
+<HR>
+<H1><A NAME="REQUIRES">REQUIRES</A></H1>
+<P>
+Perl 5.000
+
+<P>
+<HR>
+<H1><A NAME="SEE_ALSO">SEE ALSO</A></H1>
+<P>
+<CODE>perl(1)</CODE>
+
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+Vedran Sego, <A HREF="mailto:vsego@math.hr">vsego@math.hr</A>
+
+</BODY>
+
+</HTML>

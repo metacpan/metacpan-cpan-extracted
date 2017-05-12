@@ -1,0 +1,7 @@
+1.1.0 2015-02-11
+  - Added is_region_sanctioned method
+  - Added support for Crimea region
+  - Updated documentation
+0.1.0 2014-06-10
+  - Added get_sanction_by_code method
+  - Added Documentation

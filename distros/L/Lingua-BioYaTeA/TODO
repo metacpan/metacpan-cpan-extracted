@@ -1,0 +1,5 @@
+- Change name of Zorana in Ratkovic.
+
+- Correcting the Input (TreeTagger Output) to be always conformed (use a method defined in YaTeA - todo)
+
+- Put the hardcoded data related to the pre-processing in configuration files

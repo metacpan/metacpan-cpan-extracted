@@ -1,0 +1,59 @@
+
+                             LaTeX::Driver
+
+                             Version 0.07
+
+                            13 October 2007
+
+           Copyright (C) 2007 Andrew Ford.  All Rights Reserved
+
+          This is free software; you can redistribute it and/or
+             modify it under the same terms as Perl itself.
+
+             $Id: INSTALL 68 2007-10-12 22:59:52Z andrew $
+
+
+QUICK INSTALL
+-------------
+
+The latest version of the LaTeX::Driver module can be retrieved from:
+
+    http://www.cpan.org/modules/by-module/LaTeX-Driver/
+
+To install the module
+
+    tar zxf LaTeX-Driver-0.06.tar.gz
+    cd LaTeX-Driver-0.06
+    perl Makefile.PL
+    make
+    make test
+    make install    
+
+The Makefile.PL will prompt for the location of the LaTeX binaries. If
+it can locate the binaries then the paths will be given as defaults.
+If neither the latex nor the pdflatex binary can be found and no paths
+are given for these programs then Makefile.PL will ask whether you
+want to continue with the installation (as the module depends on there
+being a functional tex installation present on the system).
+
+For further details, see the sections below on CONFIGURATION, BUILDING
+AND TESTING, and INSTALLATION.
+
+
+PREREQUISITES
+-------------
+
+The LaTeX::Driver module is written entirely in Perl and should run on
+any platform on which Perl is available (currently only Linux has been
+tested).  It requires Perl 5.006 or later.
+
+The following CPAN modules are used:
+
+    Class::Accessor
+    Cwd                 from PathTools
+    Exception::Class
+    File::Slurp
+    File::Spec          from PathTools
+    IO::File	        from IO
+
+There are no known dependencies on particular versions of these modules.

@@ -1,0 +1,17 @@
+Revision history for Perl extension Lemonldap::Config::Parameters.
+
+2.0.0  Fri Oct  7 14:19:09 2005
+	- original version; created by h2xs 1.23 with options
+		-XAn Lemonldap::Config::Parameters
+3.0.0  Thu Jun 29 15:08:00 2006
+        - bigbang in parameters
+3.1.0  Wed  Oct 25 15:08:00 2006
+        - add new parameters
+        - giving up compatibility with old modperl API.
+3.1.1 Fri  Mar 16 13:05:15 2007
+        - increase management of cache
+3.2.1  Sep 22  2007
+       - add parameters in order to rewrite html  with LWP engine.
+3.2.2  Otc 24  2007
+       - add parameters in order to manage Timeout in CDA context.
+       - add sourceredirection and targetredirection in order to rewrite location header. 

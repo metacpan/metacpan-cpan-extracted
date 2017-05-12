@@ -1,0 +1,47 @@
+Changes				Change Log
+lib/Lingua/GA/Gramadoir.pm	Module implementation
+lib/Lingua/GA/Gramadoir/Languages.pm	Localization parent
+lib/Lingua/GA/Gramadoir/Languages/af.pm	Afrikaans localization
+lib/Lingua/GA/Gramadoir/Languages/cy.pm	Welsh localization
+lib/Lingua/GA/Gramadoir/Languages/da.pm	Danish localization
+lib/Lingua/GA/Gramadoir/Languages/de.pm	German localization
+lib/Lingua/GA/Gramadoir/Languages/en_us.pm	English localization (default)
+lib/Lingua/GA/Gramadoir/Languages/eo.pm	Esperanto localization
+lib/Lingua/GA/Gramadoir/Languages/fi.pm	Finnish localization
+lib/Lingua/GA/Gramadoir/Languages/fr.pm	French localization
+lib/Lingua/GA/Gramadoir/Languages/ga.pm	Irish localization
+lib/Lingua/GA/Gramadoir/Languages/id.pm	Indonesian localization
+lib/Lingua/GA/Gramadoir/Languages/mn.pm	Mongolian localization
+lib/Lingua/GA/Gramadoir/Languages/nl.pm	Dutch localization
+lib/Lingua/GA/Gramadoir/Languages/ro.pm	Romanian localization
+lib/Lingua/GA/Gramadoir/Languages/sk.pm	Slovak localization
+lib/Lingua/GA/Gramadoir/Languages/sv.pm	Swedish localization
+lib/Lingua/GA/Gramadoir/Languages/vi.pm	Vietnamese localization
+lib/Lingua/GA/Gramadoir/Languages/zh.pm	Chinese localization
+Makefile.PL			Makefile generator
+MANIFEST			This list of files
+# META.yml			Package info for CPAN
+README				Install, Copyright/License info
+scripts/gram-ga.pl		Command-line interface
+scripts/groo-ga.pl		OpenOffice.org interface
+share/3grams.bs			3-gram statistics
+share/earraidi.bs		Misspellings & replacements
+share/eile.bs			Alternate forms & replacements
+share/focail0.bs		Main lexicon; highest freq.
+share/focail1.bs		"     "
+share/focail2.bs		"     "        .
+share/focail3.bs		"     "        .
+share/focail4.bs		"     "        .
+share/focail5.bs		"     "
+share/focail6.bs		"     "     lowest freq.
+share/gramadoir.el		Emacs Lisp interface
+share/gramadoir.sxw		OpenOffice sample document and macro
+share/gramadoir.vim		Vim interface
+share/messages.bs		Macros for output messages
+share/morph.bs			Morphological rules
+share/nocombo.bs		Words that don't form compounds
+share/pos.bs			Part-of-speech tags
+share/token.bs			Tokenization rules
+t/Lingua-GA-Gramadoir.t		Test suite
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

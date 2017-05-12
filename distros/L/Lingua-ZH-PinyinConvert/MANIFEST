@@ -1,0 +1,13 @@
+Changes
+MANIFEST			This list of files
+Makefile.PL
+PerlIO-via-PinyinConvert/Changes
+PerlIO-via-PinyinConvert/Makefile
+PerlIO-via-PinyinConvert/Makefile.PL
+PerlIO-via-PinyinConvert/PinyinConvert.pm
+PerlIO-via-PinyinConvert/README
+PinyinConvert.pm
+README
+t/convert.t
+t/hanyu-to-tongyong.t
+t/tongyong-to-hanyu.t

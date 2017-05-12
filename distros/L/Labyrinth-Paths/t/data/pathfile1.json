@@ -1,0 +1,3 @@
+{ "paths": [
+    { "path": "/page/(\\d+)", "variables": [ "pageid" ], "cgiparams": { "act": "home-page" }, "settings": { "test": 1 } }
+] }

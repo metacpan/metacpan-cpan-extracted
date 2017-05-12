@@ -1,0 +1,69 @@
+Revision history for Lingua-Identify-CLD
+
+0.10    Tue Nov  1 16:50:11 WET 2016
+		- Fix data file to compile with latest gcc (Thanks to JJOAO)
+
+0.09    Sun Sep  7 21:39:42 WEST 2014
+        - Added identify-cld binary
+
+0.08	Fri Mar 28 17:06:17 WET 2014
+        - Fix issue when compiling with Clang (Thanks to Linas Valiukas)
+
+0.07    Fri Jun 14 21:20:21 WEST 2013
+        - Get rid of standalone library, prepare just the Perl library
+          itself. (Thanks to Ash Berlin @ SocialFlow)
+
+0.06    Thu Dec  6 11:59:37 WET 2012
+        - added is_reliable (thanks to Caine Tighe)
+
+0.05    Fri Oct 12 17:47:43 WEST 2012
+        - added language-id and confidence output when in array context
+          (thanks to Joerg Tiedemann)
+
+0.04    Fri Jun  8 22:18:52 WEST 2012
+        - Fix POD encoding and POD tests.
+
+0.03    Mon Feb 20 21:07:46 WET 2012
+        - Release as stable
+
+0.03_01 Sat Jan 14 16:32:06 WET 2012
+        - Support Debian GNU/kFreeBSD.    
+
+0.02    Fri Jan 13 14:42:30 WET 2012
+        - Support options in the 'identify' method
+        - Added support to isPlainText
+
+0.02_07 Tue Jan 10 17:07:07 WET 2012    
+        - Added debuging info output.
+        - Added more language tests.
+
+0.02_06 Fri Jan  6 22:20:38 WET 2012
+        - fixed DragonFly BSD support.
+
+0.02_05 Fri Jan  6 21:30:38 WET 2012
+        - trying my luck with DragonFly BSD.
+        - adding tld hint support, first step.
+
+0.02_04 Wed Jan  4 21:31:01 WET 2012
+        - trying my luck with PPC darwin
+
+0.02_03 Mon Jan  2 18:18:27 WET 2012
+        - trying my luck for NetBSD (again).
+          Probably good idea to depend on ExtUtils::CppGuess
+
+0.02_02 Sun Jan  1 15:24:34 WET 2012
+        - patched testing procedure to handle Solaris
+
+0.02_01 Sun Jan  1 13:48:20 WET 2012
+        - patched cld code to handle Net-BSD
+
+0.01    Sat Dec 31 14:05:00 WET 2011
+        - added a cleaner interface (still simple, but ready to grow)
+        - added tests for some usual languages
+
+0.01_02 Sat Dec 31 13:16:32 WET 2011
+        - fixed installation procedure (hopefully)
+
+0.01_01 Fri Dec 30 19:59:36 WET 2011
+        - stupidiest interface possible to Compact Language Detection library
+

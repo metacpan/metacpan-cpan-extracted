@@ -1,0 +1,9 @@
+Revision history for Perl extension Lingua::ES::Syllabify.
+
+0.01  Mon Aug  4 18:35:02 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n Lingua::ES::Syllabify
+
+0.9  Mon Sep 14 22:06:02 2009
+	- first public version
+

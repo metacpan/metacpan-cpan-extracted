@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+use strict;
+use base 'LEOCHARRE::CLI';
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /(\d+)/g;
+
+
+my $o = gopts('b');
+
+
+print _code() and exit if $o->{b};
+
+
+
+
+
+sub usage {
+   return qq{
+$0
+
+OPTION FLAGS
+   
+   -b    blank module and pod output
+   -h    help
+   };
+}
+
+
+sub _code_version {
+   return q{$VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /(\d+)/g;};
+}
+
+sub _code  {
+   
+  
+
+   #my @lines = map { s/^\s(?=\S)// ; $_ } <DATA>;
+   _data()
+   #my $code 
+   #return $code;
+
+   
+
+}
+
+
+
+
+
+
+
+#__DATA__
+sub _data { q|package ;
+use vars qw($VERSION); 
+$VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /(\d+)/g;
+
+1;
+
+=pod
+
+=head1 NAME
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 CAVEATS
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2009 Leo Charre. All rights reserved.
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+   
+=cut
+|}

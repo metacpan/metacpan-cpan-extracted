@@ -1,0 +1,25 @@
+Changes
+lib/LibCAS/Client.pm
+lib/LibCAS/Client/Response.pm
+lib/LibCAS/Client/Response/AuthenSuccess.pm
+lib/LibCAS/Client/Response/Error.pm
+lib/LibCAS/Client/Response/Failure.pm
+lib/LibCAS/Client/Response/ProxySuccess.pm
+lib/LibCAS/Client/Response/Success.pm
+lib/LibCAS/ModPerl2.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-boilerplate.t
+t/10-Response.t
+t/11-Error.t
+t/12-Failure.t
+t/13-Success.t
+t/14-AuthenSuccess.t
+t/15-ProxySuccess.t
+t/20-CAS.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

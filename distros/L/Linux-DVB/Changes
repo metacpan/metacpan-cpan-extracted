@@ -1,0 +1,40 @@
+Revision history for Perl extension Linux::DVB
+
+1.03 Sun Jun 14 15:38:50 CEST 2015
+	- fix typo (reported by Kent Fredric).
+
+1.02 Sun Jun 14 11:51:37 CEST 2015
+	- remove bogus INC => "-I/usr/src/linux/include" from Makefile.PL
+          (reported by Kent Fredric).
+        - added stability canary support.
+
+1.01 Mon May 24 03:52:33 CEST 2010
+	- diseqc_cmd was broken (patch by Damjan Marion).
+
+1.0  Thu Apr 17 06:46:11 CEST 2008
+        - applied patches and ideas by Mark Buechler to make it compile
+          again with current kernels.
+	- remove fec_inner from QAM.
+        - add support for diseqc ioctls.
+
+0.4  Tue Apr 12 03:02:24 CEST 2005
+	- incompatibly changed (fixed, improved) datetime decoding functions.
+
+0.3  Mon Apr 11 23:13:42 CEST 2005
+        - implemented $frontend->set and updated eg/extract-si.
+        - patch by Magnus Schmidt that adds more descriptor decodings.
+        - updated dvbapi document url.
+        - slightly improved documentation.
+        - make decode_si more resistent against protocol errors, by
+          dropping sections with syntax_indicator=0, more robustly skip
+          illegal frames.
+
+0.2   Thu Mar  3 21:10:52 CET 2005
+	- fix version mismatch.
+
+0.02  Thu Mar  3 18:00:52 CET 2005
+	- change of contact address.
+
+0.01  Mon Sep  6 08:24:43 CEST 2004
+	- original version; created by copying Convert-Scalar.
+

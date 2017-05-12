@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Lingua/JA/Dakuon.pm
+t/00_compile.t
+t/01_dakuon.t
+t/02_handakuon.t
+t/03_dakuon_normalize.t
+t/04_handakuon_normalize.t
+t/05_dakouon_all_normalize.t
+t/06_regexp.t
+t/Util.pm
+META.yml
+MANIFEST

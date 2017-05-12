@@ -1,0 +1,4 @@
+To see examples for this distribution, it is recommended you read the test 
+scripts included under ./t. After all this is quite a simple module.
+
+Pelagic

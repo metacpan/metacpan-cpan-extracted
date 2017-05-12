@@ -1,0 +1,8 @@
+# A list of channel name aliases of the format:
+#     alias name = broadcast channel name
+# This allows you to keep using the same channel name (for example in a PVR application) 
+#
+
+FOUR = Channel 4    
+Beeb duo = BBC TWO     
+Beeb two= BBC TWO         

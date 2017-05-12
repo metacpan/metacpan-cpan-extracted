@@ -1,0 +1,99 @@
+Revision history for Perl extension Log::Info.
+
+2.00  Sun Dec 19  8:56AM GMT 2010
+ 	- Log::Info is now a wrapper around Log::Log4perl.  This is intended
+	  as a migration path.  New users should just use Log::Log4perl
+	  instead.  Existing users should start migrating.  t/log4perl.t has
+	  examples of mixed use.
+
+1.22  Wed Feb 24  5:50PM GMT 2010
+	- Log::Info::Fork no longer works well with arbitrary file descriptors.
+	  rather than fixing, I've demoted the test as prelude to integrating
+	  with IPC::System or IPC::Run.
+        - tweak single-die.t to work with modern Carp installs
+	- migrate syslog.t to xt/ (because it writes to syslog, which upsets
+	  people running syslog reapers)
+
+1.21  Sat Feb  5  5:24PM GMT 2005
+	- Return log level from enable_file_channel (relative to LOG_INFO-1)
+
+1.20  Sat Feb  5  2:30PM GMT 2005
+	- correct enable_file_channel to consider a single numeric arg as a log level
+	  rather than a file
+
+1.19  Fri May 30  6:52PM GMT 2003
+	- Correct bug in _log_to_file causing filehandles to get consumed at
+	  a rate of one per log message!
+
+1.18  Wed Mar 19  4:34PM GMT 2003
+	- Don't check exitcode of 'date' in TRANS_CDT
+
+1.17  Wed Jan 22  5:26PM GMT 2003
+	- Fixes for perl 5.8.0
+	- Don't perform t/single-die.t, t/trap.t without IPC-Run, since the
+	  non-IPC-Run loop has some timing issues
+
+1.16  Fri Dec 20 12:00PM GMT 2002
+	- Another bugfix to the redefine warnings
+
+1.15  Thu Dec 19 11:38PM GMT 2002
+	- Remove reliance on IPC::Run in test suite
+
+1.14  Wed Dec 18 12:21PM GMT 2002
+	- Various patches to work with Solaris
+	- Remove fork_log export from Log::Info::Fork
+
+1.13  Thu Dec  5  6:07PM GMT 2002
+	- Fix multiple stderr messages for die, warn etc.
+
+1.12  Thu Dec  5 11:59AM GMT 2002
+	- Fix bug with multiple :trap import complaining of redefined die
+
+1.11  Mon Dec  2  3:05PM GMT 2002
+	- Minor POD correction courtesy of Mike Castle <dalgoda@ix.netcom.com>
+	- Test Fixes
+	- Slight change to log levels in Log::Info::Fork
+
+1.10  Fri Aug  2  5:47PM GMT 2002
+	- Override, rather than hook, trap_warn_die
+
+1.09  Tue Jul 23 11:58PM GMT 2002
+	- Remove IPC::Run from requirements
+	- Add level-spec handling to enable_file_channel
+
+1.08  Wed Jun 19 11:49PM GMT 2002
+	- SINK_TERM_PROGRESS; use linear ETA, update at least every five 
+          seconds (if called often enough), update after every message
+	- Buglet in Logf when confused by incoming fixed ($_ in q!! literal 
+	  replaced)
+
+1.07  Mon Mar 11  2:43PM GMT 2002
+	- Add hook to enable_file_channel for using SINK_TERM_PROGRESS
+
+1.06  Sun Mar 10  7:20PM GMT 2002
+	- Add TRANS_CDT
+	- Add SINK_TERM_PROGRESS
+
+1.05  Thu Feb 21 11:21AM GMT 2002
+	- Fix Bug #006
+	- Fix Bug #007
+
+1.04  Fri Feb 15  2:49PM GMT 2002
+	- Add trap_warn_die subr and tests
+
+1.03  Mon Dec 24 12:22PM GMT 2001
+	- Fix Bug #005
+	- Fix Bug #004
+
+1.02  Fri Dec  7  8:47AM GMT 2001
+	- Fix Bug #003 (hopefully; untested)
+
+1.01  Mon Dec  3  5:23PM GMT 2001
+	- Fix bug #001
+	- Fix bug #002
+
+1.00  Mon Nov 26 10:19PM GMT 2001
+	- original version
+	- includes FILE, FH, SYSLOG, SUBR logging
+	- includes default logging channels
+	- includes test suite (basic, errors, file, sinks, syslog, trans)

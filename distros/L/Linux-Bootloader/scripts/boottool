@@ -1,0 +1,379 @@
+#!/usr/bin/perl -I ../lib
+
+use lib '../lib';
+use Getopt::Long;
+use Pod::Usage;
+use Linux::Bootloader;
+use Linux::Bootloader::Detect;
+
+
+my %params;
+
+GetOptions(
+           \%params,
+           "bootloader-probe",      # Prints the bootloader in use on the system
+           "arch-probe:s",          # Prints the arch of the system
+           "bootloader=s",
+           "config_file=s",
+           "add-kernel=s",
+           "remove-kernel=s",
+           "update-kernel=s",
+           "title=s",
+           "args=s",
+           "remove-args=s",
+           "initrd=s",
+           "root=s",
+           "savedefault=s",
+           "position=s",
+           "info=s",
+           "debug=i",
+           "set-default=s",
+           "make-default",
+           "force",
+           "boot-once",
+           "install",
+	   "module=s@", 
+           "default",
+           "help",
+           "man",
+           "version|V",
+           "xen",
+           ) or pod2usage(-verbose => 1, -exitstatus => 0);
+
+pod2usage(-verbose => 2, -exitstatus => 0) if ($params{man});
+pod2usage(-verbose => 1, -exitstatus => 0) if ($params{help});
+pod2usage(-verbose => 0, -exitstatus => 0) if ! defined(%params);
+
+if ($params{version}) {
+    print "$0 version 1.1\n";
+}
+
+### Bootloader / Arch Detection ###
+
+my $detected_bootloader;
+my $detected_architecture;
+
+if (defined $params{'bootloader-probe'}) {
+  our $opt_bootloader      = 0;
+  $detected_bootloader = Linux::Bootloader::Detect::detect_bootloader()
+    || warn "Could not detect bootloader\n";
+  print "$detected_bootloader\n";
+  exit 0;
+} elsif (defined $params{'arch-probe'}) {
+  our $opt_arch    = 0;
+  $detected_architecture = Linux::Bootloader::Detect::detect_architecture( $params{'arch-probe'} )
+    || warn "Could not detect architecture\n";
+  print "$detected_architecture\n";
+  exit 0;
+} elsif (defined $params{bootloader}) {
+  $detected_bootloader = $params{bootloader};
+} else {
+  #$detected_bootloader = 'grub';
+  $detected_bootloader = Linux::Bootloader::Detect::detect_bootloader()
+    || warn "Could not detect bootloader\n";
+}
+
+
+### Load Module ###
+
+my $bootloader;
+if ($detected_bootloader =~ m/^(grub|elilo|lilo|yaboot)$/) {
+  $bootloader = new Linux::Bootloader($params{config_file});
+} else { 
+  die "ERROR: Bootloader $detected_bootloader not recognized!\n";
+}
+
+
+### Check Config ###
+
+if (! -r $bootloader->{config_file}) { die "Can't read config file.\n"; }
+
+if (defined $params{'debug'}) {
+  $bootloader->debug($params{'debug'});
+}
+
+if (defined $params{'add-kernel'}) {
+  $bootloader->read();
+  $bootloader->add(%params);
+  $bootloader->write();
+  $bootloader->install() unless $detected_bootloader eq 'grub';
+
+} elsif (defined $params{'remove-kernel'}) {
+  $bootloader->read();
+  $bootloader->remove($params{'remove-kernel'});
+  $bootloader->write();
+  $bootloader->install() unless $detected_bootloader eq 'grub';
+
+} elsif (defined $params{'update-kernel'}) {
+  $bootloader->read();
+  $bootloader->update(%params);
+  $bootloader->write();
+  $bootloader->install() unless $detected_bootloader eq 'grub';
+
+} elsif (defined $params{info}) {
+  $bootloader->read();
+  $bootloader->print_info($params{info});
+
+} elsif (defined $params{'set-default'}) {
+  $bootloader->read();
+  $bootloader->set_default($params{'set-default'});
+  $bootloader->write();
+  $bootloader->install() unless $detected_bootloader eq 'grub';
+
+} elsif (defined $params{'default'}) {
+  $bootloader->read();
+  print $bootloader->get_default() . "\n";
+
+} elsif (defined $params{'boot-once'} && defined $params{'title'}) {
+  if ($detected_bootloader =~ /^lilo|^elilo|^grub/) {
+    $bootloader->boot_once($params{title});
+  } else {
+    warn "WARNING: $detected_bootloader does not have boot-once support.\n";
+    warn "Setting as default instead.\n";
+    $bootloader->read();
+    $bootloader->set_default($params{'title'});
+    $bootloader->write();
+  } 
+}
+
+ 
+__END__
+
+
+=head1 NAME
+
+boottool - tool for modifying bootloader configuration
+
+=head1 SYNOPSIS
+
+boottool [--bootloader-probe] [--arch-probe]
+         [--add-kernel=<kernel_path>] [--title=<kernel_title>] [--position=<#|start|end>]
+         [--root=<root_path>] [--args=<kernel_args>] [--initrd=<initrd_path>]
+         [--make-default] [--force] [--boot-once] [--install]
+         [--bootloader=<grub|lilo|elilo|yaboot>] [--config-file=</path/to/config>]
+         [--remove-kernel=<#|title|start|end>] [--module=<module>]
+         [--update-kernel=<#|title>] [--remove-args=<args>]
+         [--info=<all|default|#>] [--default]
+         [--help] [--debug=<0..5>] [--set-default=<#>]
+
+=head1 DESCRIPTION
+
+Boottool allows scripted modification of bootloader configuration files.
+Grub, Lilo, Elilo, and Yaboot are currently supported.
+When adding a kernel, any options not specified are copied from default.
+
+=head1 OPTIONS
+
+=head2 GENERAL OPTIONS
+
+These can be used with any of the commands to override defaults or
+autodetection.  They are not typically needed.
+
+=over 8
+
+=item B<--bootloader>=I<string>
+
+Manually specify the bootloader to use.  By default, boottool will
+automatically try to detect the bootloader being used.
+
+=item B<--config_file>=I<string>
+
+Specifies the path and name of the bootloader config file, overriding
+autodetection of this file.
+
+=back
+
+=head2 INFORMATIONAL OPERATIONS
+
+These operations return information about the system, without making
+alterations to any files.
+
+=over 8
+
+=item B<--bootloader-probe>
+
+Prints the bootloader in use on the system and exits.
+
+=item B<--arch-probe>
+
+Prints the arch of the system and exits.
+
+=item B<--info>=I<string>
+
+Display information about the bootloader entry at the given position number.
+Also accepts 'all' or 'default'.
+
+=item B<--default>
+
+Prints the current default kernel for the bootloader.
+
+=back
+
+=head2 KERNEL OPERATIONS
+
+These operations result in modifications to system configuration files.
+Only one of these operations may be called.  See KERNEL MODIFICATION
+PARAMETERS (below) for specifying what the operations should do.
+
+=over 8
+
+=item B<--add-kernel>=I<string>
+
+Adds a new kernel with the given path.
+
+=item B<--update-kernel>=I<string>
+
+Updates an existing kernel with the given position number or title.
+Used with --args or --remove-args.
+
+=item B<--module>=I<string>
+
+This option adds modules to the new kernel. It only works with Grub Bootloader.
+For more module options just add another --module parameter
+
+=item B<--remove-kernel>=I<string>
+
+Removes the bootloader entry with the given position or title.
+Also accepts 'start' or 'end'.
+
+=item B<--set-default>=I<integer>
+
+Updates the bootloader to set the default boot entry to given given
+position or title.
+
+=item B<--boot-once>
+
+Causes the bootloader to boot the kernel specified by --title just one
+time, then fall back to the default.  This option doesn't work
+identically on all architectures.
+
+=back
+
+=head2 KERNEL MODIFICATION PARAMETERS
+
+These parameters can be used with the kernel operations listed above, to 
+specify how the operations should work.
+
+=over 8
+
+=item B<--title>=I<string>
+
+The title or label to use for the bootloader entry.
+
+=item B<--args>=I<string>
+
+Arguments to be passed to the kernel at boot.
+
+=item B<--remove-args>=I<string>
+
+Arguments to be removed from an existing entry.
+Used with --update-kernel.
+
+=item B<--initrd>=I<string>
+
+The initrd image path to use in the bootloader entry.
+
+=item B<--root>=I<string>
+
+The device where the root partition is located.
+
+=item B<--savedefault>=I<string>
+
+The number to use in the savedefault section
+
+=item B<--position>=I<string>
+
+Insert bootloader entry at the given position number, counting from 0.
+Also accepts 'start' or 'end'.  This is only useful when using the
+--add-kernel operation.
+
+=item B<--make-default>
+
+Specifies that the bootloader entry being added should be set to the
+default.
+
+=item B<--install>
+
+Causes bootloader to update and re-install the bootloader file.
+
+=back
+
+
+=head2 OTHER OPTIONS
+
+=over 8
+
+=item B<-V, --version>
+
+Prints the version and exits.
+
+=item B<-h, --help>
+
+Prints a brief help message with option summary.
+
+=item B<--man>
+
+Prints a manual page (detailed help).  Same as `perdoc tgen`
+
+=item B<-D, --debug N>
+
+Prints debug messages.  This expects a numerical argument corresponding
+to the debug message verbosity.
+
+=back
+
+=head1 PREREQUISITES
+
+C<Linux::Bootloader>
+
+C<Getopt::Long>
+
+C<Pod::Usage>
+
+=head1 COREQUISITES
+
+boottool works with any bootloader supported by Linux::Bootloader,
+including the following:
+
+C<Lilo>
+
+C<Grub>
+
+C<Yaboot>
+
+C<Elilo>
+
+Obviously, at least one bootloader must be installed for this to be of
+any use.  ;-)
+
+=head1 BUGS
+
+Send bug reports to L<http://sourceforge.net/projects/crucible/>
+
+=head1 VERSION
+
+1.0
+
+=head1 SEE ALSO
+
+L<crucible>, L<WWW::PkgFind>, L<Test::Parser>, L<Linux::Distribution>
+
+=head1 AUTHOR
+
+Jason N.
+
+L<http://www.osdl.org/|http://www.osdl.org/>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2006 Open Source Development Labs
+All Rights Reserved.
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.10 $
+
+=cut

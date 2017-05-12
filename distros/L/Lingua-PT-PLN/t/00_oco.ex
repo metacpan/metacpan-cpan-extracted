@@ -1,0 +1,500 @@
+<p n=20591>
+Os governos da Noruega, Suíça, Canadá e México instituiram bolsas de
+estudo nos respectivos países para cidadãos portugueses, a decorrerem
+durante o ano lectivo de 92/93 -- excepto no caso do México, cujas bolsas
+respeitam ao corrente ano lectivo. Os interessados podem obter
+informações detalhadas, tal como os impressos de candidatura e
+apresentação, junto da Direcção dos Serviço das Relações Culturais
+Bilaterais do Ministério dos Negócios Estrangeiros, no Largo do Relvas,
+1354, Lisboa.
+
+<p n=20592>
+A greve dos trabalhadores não-docentes do Conservatório de Música do
+Porto, iniciada na passada quarta-feira, fez com que este estabelecimento
+permanecesse encerrado desde então. O motivo da paralisação prende-se com
+o facto de os trabalhadores não-docentes do Conservatório esperarem,
+desde 1983, a definição da sua carreira profissional. Após várias
+tentativas junto das entidades competentes no sentido de resolver o
+problema, o Sindicato de Trabalhadores da Função Pública do Norte e os
+trabalhadores em greve decidiram enviar uma carta ao Ministro da Educação
+«acusando de incúria todas as entidades com poderes e competência na
+matéria e que, até agora, pouco ou nenhum interesse demonstraram em
+possibilitar uma solução para o problema».
+
+<p n=20593>
+Após quatro anos de negociações, foi constituida a Associação Nacional de
+Estudantes de Direito (ANED). A criação formal da ANED teve lugar na sede
+da Associação Académica da Universidade Internacional, onde estiveram
+representantes das quatro associações académicas organizadoras:
+Universidade Internacional, Universidade Lusíada, Universidade Moderna e
+Universidade Autónoma. Na altura foram redigidos os estatutos da ANED,
+insitituição que passa a representar mais de metade dos estudantes de
+Direito.
+
+<p n=20594>
+«Novas Perspectivas no Ensino da Geometria» foi o tema escolhido para um
+seminário que vai ser organizado pela Universidade Portucalense, no
+Porto, nos próximos dias 14 e 15, nas suas instalações. Durante os dois
+dias vão ser debatidos assuntos como «Capacidades Geométricas», «Os
+computadores e a Geometria», «A experiência do ensino da Geometria no
+Ensino Básico», «Arte e Geometria» e « «Convivência com a Geometria ao
+longo de 50 anos». Para as palestras foram convidados Augusto Lopes,
+Maria Elfrida Ralha, Maciel Barbosa, Augusta Neves, Conceição Almeida,
+Abílio Fonseca, Fátima Gomes, Margarida Silva, Machado Moura, Josep
+Fortuny e Rogério Nunes.
+
+<p n=20595>
+A Federação Nacional de Professores (Fenprof) subscreve a greve nacional
+da administração pública marcada para o dia 18 de Fevereiro proposta pela
+frente de sindicatos afecta à CGTP, UGT e por sindicatos independentes. A
+decisão foi tomada ontem pelo secretariado da Fenprof, reunido em
+Albufeira, no decorrer da Segunda Conferência Nacional do segundo e
+terceiro ciclos do ensino básico e do ensino secundário, que terminou
+naquela cidade.
+
+<p n=20596>
+Esta reunião em Albufeira, para além de uma «reflexão global» sobre os
+problemas do ensino,teve também como objectivo propor soluções para as
+carências com que os docentes se confrontam no dia-a-dia e que, para além
+de uma indefinição de carreiras, se traduzem numa má imagem que a classe
+tem junto da opinião pública.
+
+<p n=20597>
+É um pequeno caderno de 48 páginas e o seu objectivo é esclarecer os
+candidatos ao ensino superior sobre a Prova Geral de Acesso (PGA), cuja
+primeira chamada terá lugar na próxima segunda-feira, dia 3 de Fevereiro.
+
+<p n=20598>
+A primeira secção inclui um texto seguido de seis questões de resposta
+fechada (em que os examinandos apenas têm que escolher uma de entre as
+várias respostas formuladas, assinalando a sua escolha com uma bola) e
+duas de resposta aberta. Cada uma das seis perguntas fechadas tem cinco
+respostas alternativas. Nas questões de resposta aberta, será pedido aos
+alunos para fazerem uma síntese do texto ou de parte dele, condensando as
+ideias-chave num mínimo de palavras. Outro tipo de pergunta desta
+primeira secção será o alargamento de texto, em que o candidato fará uma
+introdução ou um final coerente com o ponto de vista do autor.
+
+<p n=20599>
+Apenas trinta por cento dos alunos do Ensino Secundário terão a
+disciplina de História no seu currículo. Temas como a «cidade no mundo
+antigo», «senhorio e feudalidade», «fenómeno urbano na dinâmica
+conjuntural dos Séculos treze a quinze», «tensões políticas e equilíbrios
+geoestratégicos da Segunda Guerra Mundial aos nossos dias» farão parte
+dos três anos daquele nível de ensino.
+
+<p n=20600>
+«Se antes já era difícil cumprir os programas, agora, com as metodologias
+propostas, será ainda mais difícil», referiu um professor da província,
+com quinze anos de ensino, mas que preferiu o anonimato. «Perdeu-se uma
+boa oportunidade para renovar os programas de alto a baixo. Vão manter-se
+os bocejos na sala de aula, quando se falar da Grécia, do Egipto, da
+Idade Média. Seria mais atractivo para os alunos, fornecer-lhe a
+compreensão dos grandes problemas actuais.»
+
+<p n=20601>
+O Instituto Superior de Humanidades e Tecnologias celebrou um protocolo
+com o Sindicato de Professores do Primeiro Ciclo do Ensino Básico para a
+realização de cursos de formação contínua e estudos superiores
+especializados na área da educação. Através deste protocolo, o instituto
+desenvolverá um plano de cursos de formação contínua sobre a reforma do
+sistema educativo, exclusivamente dedicado aos sócios daquele sindicato.
+
+<p n=20602>
+A falta de professores qualificados de Matemática foi um dos aspectos
+preocupantes do panorama do ensino da disciplina em Portugal que ocupou
+as atenções dos docentes da área presentes num encontro em Torres Novas.
+Os professores fizeram sentir em diversas intervenções a falta de
+estabilidade dos grupos de professores de Matemática, que sofrem
+substituições quase constantes, devido ao abandono da profissão por parte
+de muitos dos docentes. No encontro foi divulgado um estudo ainda não
+publicado pelo Gabinete de Estudos e Planeamento do Ministério da
+Educação português, segundo o qual, entre 14 países, Portugal ficou em
+penúltimo lugar no nível de conhecimentos matemáticos e de ciências dos
+alunos da «4ª classe» e do 8º ano. Os professores presentes reivindicaram
+mais acções de formação, foram unânimes na aceitação do uso das
+calculadoras e consideraram «incompreensível a não tomada em
+consideração, pelo Ministério da educação, das posições da SPM e da
+Associação de Professores de Matemática».
+
+<p n=20603>
+Vítor de Sá, professor jubilado da Faculdade de Letras do Porto, doou à
+Universidade do Minho os direitos de autor relativos às obras que
+constituem a sua bibliografia e uma verba em dinheiro, que se destinam a
+permitir a criação de um Prémio de História Contemporânea. Este galardão,
+no valor de 300 mil escudos -- atribuídos periodicamente pela Universidade
+do Minho, através do seu Conselho Cultural --, pretende incentivar a
+investigação, no âmbito da História Contemporânea, de Portugal a partir
+de 1820. O professor doou ainda à Universidade um conjunto de documentos
+de natureza histórica, política e literária, resultantes da sua
+actividade de investigação e intervenção pública.
+
+<p n=20604>
+Largamente anunciado pelo Ministério da Educação foi também o facto de
+1991 ter sido o primeiro ano em que o número de vagas ultrapassou o
+número de candidatos: quase 59 mil alunos para 61 mil e 500 vagas. O
+busílis é que quase metade destas vagas -- 29 mil -- estiveram no ensino
+superior privado, cujo número de escolas e de cursos aumentou
+astronomicamente nos últimos dois anos.
+
+<p n=20605 assunto=desporto>
+Com o patrocínio da Câmara Municipal de Penafiel, o Departamento de
+Ciências Históricas da Universidade Portucalense editou um estudo de
+Fernanda Maia sobre o tema «O Mosteiro do Bustelo: Propriedade e Produção
+no Antigo Regime (1638-1670 e 1710-1821)». Trata-se de uma investigação
+para tese de mestrado no âmbito de um programa da Faculdade de Letras do
+Porto, destinado à elaboração de monografias temáticas sobre casas e
+instituições religiosas de Entre-Douro e Minho.
+
+<p n=20606>
+Nuno Manuel Vasconcelos Tavares Moreira foi nomeado pró-reitor da
+Universidade de Trás-os-Montes e Alto Douro (UTAD). Nuno Moreira
+substitui, na área da Documentação e Extensão e também na direcção do
+Boletim «Campus», Artur Cristóvão que, a seu pedido, deixou aquelas
+funções. O novo pró-reitor da UTAD nasceu em 1954, na Póvoa de Varzim, e
+licenciou-se como Engenheiro Agónomo no ano de 76 pelo Instituto Superior
+de Agronomia da Universidade Técnica de Lisboa. Desde então tem-se
+dedicado à investigação na área da produção e utilização de forragens e
+pastagens, tendo-se doutorado em 1986.
+
+<p n=20607>
+Um grupo de alunos de uma escola secundária do Porto conseguiu que uma
+professora os ajudasse a prepararem-se para a PGA. Durante meses,
+informaram-se sobre a actualidade e aperfeiçoaram o domínio da língua.
+Mas agora, às portas do exame, duvidam de tudo o que aprenderam e
+acreditam, simplesmente, que a sorte será a chave do sucesso. Como eles,
+mais 122.000 estudantes vivem as últimas horas de angústia antes da
+grande prova.
+
+<p n=20608>
+Entre todos os professores da escola, foi Dália Dias, da disciplina de
+Português, quem deu a resposta afirmativa: disponibilizou as manhãs de
+quinta-feira para os ajudar a «desdramatizar a prova». E, uma vez
+acabadas as aulas, os jovens sentem que estas foram proveitosas: dominam
+melhor os temas da actualidade e compreendem melhor o tratamento dos
+textos, mas o certo é que continuam a mostrar-se perturbados com a
+chegada da PGA. Não se trata tanto de temer a avaliação, mas antes do
+receio de encarar directamente todo o ambiente que se criou à volta da
+prova. «Mandam-nos entrar, meia hora antes, para uma sala onde estão três
+professores. Mesmo que se queira, não conseguimos ficar descontraídos»,
+diz uma aluna de Humanísticas.
+
+<p n=20609>
+«Il faut croire que les images font peur», tinha dito Hervé Guibert. As
+hesitações da TF1 comprovaram-no. Guibert podia escrever sobre o seu sida
+e tornar-se sujeito de um sucesso editorial, personagem eminentemente
+mediática, mas nem por isso o processo de exposição pública deixava de
+trazer uma parte maldita, o escândalo do impudor com que se colocava no
+espaço público o mais dolorosamente privado dos factos da «convivência»
+com um intruso, o vírus que no seu corpo lhe ia trazer a morte. Um
+«escândalo» que ganhava forma na passagem da escrita às imagens.
+
+<p n=20610>
+Se precedente houve, foi «Lightning Over Water», a morte de Nick Ray
+filmada pelo próprio e Wim Wenders, caso único na história do cinema e
+caso polémico precisamente por alegado «voyeurismo mórbido». Era um
+exemplo que podia ainda ser entendido, como caso terminal de uma certa
+mitologia cinematográfica. No caso de Guibert, a passagem do privado ao
+público, sendo extremamente pessoal, não deixa de ser «transmissível». O
+acto impúdico não é perceptível apenas como o concreto processo de uma
+pessoa, porque supõe desafiar o espectador para o que ele preferiria não
+ver, aquele mas também os muitos outros casos de sida que existem na sua
+proximidade. Os gestos quotidianos, do difícil levantar, de tão fracos
+que estão os músculos, aos encontros clínicos, são tanto mais o contrário
+da banalidade quanto sabemos, sem margens para dúvidas, que a eles
+correspondem os de muitos outros doentes. O escândalo toma então a sua
+mais dolorosa dimensão social no modo como se persiste em manter na
+invisibilidade do anonimato as evidências multiplicadas do tabu, da
+morte.
+
+<p n=20611>
+Quem viu Hervé Guibert na televisão, meses antes do seu fim previsto, em
+directo, com a sua imagem evanescente e distanciado dela como um
+marciano, terá experimentado, como eu, uma sensação intolerável de
+fascínio mórbido e de desamparo cultural. Puro exibicionismo, no limite
+da gratuidade escandalosa, ou tentativa desesperada para diluir o pânico
+diante da sua morte inscrita no corpo, aprisionando o mais arcaico dos
+nossos fantasmas no espectáculo da sua própria manifestação? Se a pulsão
+de que a literatura nasce não é mais que encenação reiterada da diferença
+que separa a vida da morte, impedindo a vida de gozar a sua potencial
+eternidade, a «experiência» a que Hervé Guibert se submeteu como objecto
+e sujeito concerne e perturba, na sua essência, não só a nossa costumada
+relação com a morte mas também com a literatura. Hervé Guibert tentou não
+só dizer, de maneira minimal, o discurso de um corpo em estado de agonia
+branca, exangue como o seu rosto translúcido, mas apagar com ele a
+distância que separa a vida da morte, espaço-tempo sem enunciação no
+interior do qual a literatura nasce. Escrever, re-escrever a morte, em
+vez de escrever sobre ela, obrigá-la a integrar-se sem resíduo na imagem
+ou na palavra que não fala dela senão por alusão ao corpo onde já está
+escrita, é a primeira vitória sensível da «literatura» sobre a morte ou a
+apoteose da sua impossibilidade?
+
+<p n=20612>
+Em «La Pudeur et l'Impudeur», o escritor francês Hervé Guibert filma a
+sua própria morte. Guibert morreu de sida. O filme, que deveria ter
+passado na televisão francesa no passado dia 17 de Janeiro, foi adiado e
+passou enfim anteontem. «As regras `tranquilizantes' da emissão
+televisiva, sobretudo num canal de larga audiência como a TF1,
+conjugam-se dificilmente com a terrível verdade de um corpo que vai
+definhando, que vai tomando um aspecto «cadavérico'», escreve nestas
+páginas Augusto M. Seabra. E Eduardo Lourenço comenta, por seu turno:
+«Falando de si como mortal, de tal modo que a consciência disso e o
+`suspense' atroz da sua morte coincidissem, Hervé Guibert dissolve-se na
+sua própria imortalidade.» Parece -- diz Tereza Coelho - que Guibert
+gostava de negociar: trouxe da FNAC onze cassetes para este filme pelo
+preço de dez. «Mas com a morte não há negociação possível, a não ser
+esta, provavelmente: registar.» Foi o que ele fez neste filme, como já
+fizera nos livros.
+
+<p n=20613>
+A Europália Portugal teve 1.238.700 visitantes, menos 400 mil que a
+Europália Japão, em 1989, e que a Europália Áustria, em 1987, e menos 300
+mil que a Europália Espanha, em 1985. O maior afluxo de visitantes
+acorreu, como nos festivais anteriores, às exposições, que Portugal
+organizou num número muito menor que os países que o antecederam na
+Bélgica. Do programa português constavam 19 exposições, ao passo que o
+Japão organizou 59, a Áustria 48 e a Espanha 43. Daí que tenham visitado
+as exposições da Europália Portugal 690.961 pessoas, um pouco mais de
+metade do que as que foram ver as exposições das duas Europálias
+anteriores. Quanto ao saldo financeiro da Europália Portugal, ainda é
+cedo para se saber, só em Maio. A proposta de Orçamento do Estado prevê
+que o saldo final da Europália seja integrado no Fundo de Fomento
+Cultural, da Secretaria de Estado da Cultura.
+
+<p n=20614>
+Assim, ao Novo Grupo e Teatro Experimental de Cascais foram atribuídos os
+subsídios máximos, no valor de 61.050 contos. Para os outros grupos
+principais -- Comuna, Cornucópia, Grupo de Teatro Hoje e Cendrev --, os
+subsídios são 44.400 contos. Todas estas companhias têm contratos
+bianuais, ou seja, receberam apoio mediante uma proposta de programação
+que inclui a estreia de, pelo menos, cinco obras durante dois anos.
+
+<p n=20615>
+O filme ao princípio durava doze horas. Depois foi montado, e reduzido a
+uma hora. Chama-se «La Pudeur ou l'Impudeur», e pode ser visto como uma
+versão de «Le Protocole Compassionnel» (Gallimard), o segundo dos
+livros-sida de Hervé Guibert (o primeiro, «A L'Ami qui ne m'a pas Sauvé
+la Vie», tinha sido publicado um ano e meio antes, em 1990, também na
+Gallimard).
+
+<p n=20616>
+«Le Protocole Compassionnel» não foi o último livro publicado -- depois
+disso, surgiu «Mon Valet et Moi», e «Vice», um texto recuperado. Há
+livros de Hervé Guibert -- «Des Aveugles», «Vous m'Avez Fait Former des
+Fantômes», «Mes Parents» (todos publicados na Minuit) que o deveriam
+imediatamente ter feito entrar na categoria dos «grandes escritores», se
+fosse uma categoria apropriada para colocar alguém que nunca poderia ser
+popular -- sempre foi demasiado perverso e demasiado sofisticado para
+isso. Uma espécie de Thomas Bernhard revisto por um Sade contemporâneo.
+Os dois livros-sida não são diferentes dos outros -- se exceptuarmos a
+morte, porque são os livros de um moribundo. Mostrando a morte, surgiu
+algo como um humanismo particular, inflexível, o mesmo das fotografias de
+Eugene Smith. Hervé Guibert refere uma fotografia da série das vítimas da
+poluição de Minamata, em que uma enfermeira se curva para um homem a
+morrer. Os limites dos homens: os direitos que têm e os preços a pagar.
+
+<p n=20617>
+A DIRECÇÃO da Associação Portuguesa de Escritores (APE) manifesta, num
+comunicado à imprensa ontem distribuído, a sua preocupação com a
+aplicação da taxa positiva do Imposto sobre o Valor Acrescentado (IVA) ao
+livro, até agora sujeito a taxa zero. Esta aplicação «constitui uma prova
+do pouco ou nenhum respeito que os poderes públicos nutrem pelos
+escritores e pelos seus leitores -- o mesmo é dizer pela Cultura», lê-se
+no comunicado. Caso a aplicação da taxa positiva do IVA ao livro seja
+aprovada pela Assembleia da República --o que os escritores recusam
+admitir -- «os livros serão mais caros, os escritores mais pobres e menor
+o número de leitores». A APE apela ao «bom-senso dos poderes públicos, e
+de todos aqueles que podem influenciar a acção governativa, no sentido de
+evitar mais este atentado ao progresso cultural do povo português».
+
+<p n=20618>
+Diz-se «Contradições» e é um programa onde «se tenta tratar assuntos da
+História» «com tradições». Um programa que prefere «os protagonistas e as
+testemunhas», a especialistas. «Há a preocupação de fazer um vaivém.
+Falar de coisas mais próximas e coisas mais longínquas», diz o seu
+editor.
+
+<p n=20619>
+O controverso filme de Hervé Guibert «La Pudeur ou l'Impudeur» foi
+finalmente difundido anteontem à noite, no primeiro canal da TF1. A obra,
+realizada e interpretada pelo escritor nos meses que antecederam a sua
+morte, estava inicialmente programada para 17 de Janeiro, mas, objecto de
+viva polémica, a sua exibição acabaria por ser cancelada à última hora.
+
+<p n=20620>
+Tudo isto se apresentaria demasiado forte para certas franjas da
+sociedade francesa, que alertaram o Conselho Nacional da Sida (CNS) --
+entidade que intervém no campo da prevenção contra propagação da doença.
+
+<p n=20621>
+As cerca de três mil pessoas que na noite de anteontem encheram o Coliseu
+do Porto para ouvir Maria João Pires, num concerto comemorativo do
+primeiro centenário da Associação dos Industriais da Construção Civil e
+Obras Públicas do Norte, tiveram de esperar por um breve «encore» da
+pianista para escutar a ansiada interpretação de Mozart.
+
+<p n=20622>
+Neste cenário, será que a pianista, perante um público tão vasto quanto
+heterogéneo, não ousou tocar o «seu Mozart» -- sobretudo por se tratar de
+uma sonata?
+
+<p n=20623>
+O Prémio de Arquitectura da secção portuguesa da Associação Internacional
+de Críticos de Arte, AICA 91, vai ser atribuído a Henrique Chicó pelo
+projecto de recuperação de um edifício antigo situado no cruzamento da
+rua Braancamp com a rua Castilho, ao Marquês de Pombal, em Lisboa. O
+projecto de Chicó manteve a fachada antiga do edifício, agora restaurada.
+Acima da fachada, pintada de azul, vê-se uma construção moderna em que o
+vidro é predominante. Um edifício como que «nasce» dentro de outro. O
+júri, presidido por José Augusto-França, director do Centro de Arte
+Moderna da Gulbenkian, reconhece que o projecto de Henrique Chicó «é
+passível de polémica «mas que, no entanto, aborda o problema da
+integração do pré-existente no actual». A pintora Ana Viera vai receber o
+Prémio AICA para as Artes Plásticas, pela exposição «Diário de Cinco
+Dias». A decisão de atribuir este Prémio a Ana Viera relaciona-se com o
+seu trabalho de «pesquisa sobre a construção e desconstrução do espaço
+organizando um discurso pictórico e criador de temporalidades». Os
+prémios AICA nasceram de um protocolo entre a Secretaria de Estado da
+Cultura e a Associação Internacional de Críticos de Arte.
+
+<p n=20624>
+As três associações representativas dos agentes de navegação existentes
+em Portugal chegaram a acordo para a constituição da Federação Portuguesa
+dos Agentes de Navegação (Fepan). Uma equipa de técnicos das três
+associações, que representam cada uma a sua área geográfica -- Norte,
+Centro e Sul --, está a preparar os estatutos da futura organização, que
+poderá ser constituída durante o primeiro trimestre do corrente ano.
+
+<p n=20625>
+Cerca de 100 empresas transitárias reunidas no Luso, no dia 25 de
+Janeiro, consideraram que a terminologia de facturação elaborada pelas
+associações de transitários portugueses (APAT), espanhóis e italianos,
+que mereceu a aprovação de princípio do comité de ligação europeia dos
+transitários, deverá ser posta em prática com a brevidade possível pelas
+empresas do sector.
+
+<p n=20626>
+O movimento do porto de Leixões baixou em 1991 quase 600 mil toneladas em
+relação ao ano anterior, segundo dados da própria Administração dos
+Portos do Douro e Leixões. Enquanto, em 1990, o movimento total foi de
+cerca de 12 milhões de toneladas, no ano passado só 11,5 milhões
+utilizaram esta estrutura portuária.
+
+<p n=20627>
+Um conjunto de diversas associações empresariais ligadas à actividade
+portuária constituiu um grupo de trabalho para preparar um pacote de
+propostas para a reestruturação do sector, que será apresentado ao
+ministro do Mar durante este mês. Entre as entidades que o integram
+incluem-se o Conselho Português de Carregadores, a Associação Nacional de
+Utentes de Cais Concessionados, a Câmara de Armadores e a Associação de
+Agentes de Navegação do Centro.
+
+<p n=20628>
+No porto de Lisboa, os operadores portuários, quando necessitam de
+contratar pessoal junto da Comissão Coordenadora de Trabalho Portuário,
+têm de fazer a sua requisição até às nove horas da manhã do dia anterior,
+o que, na opinião de Mário Rosa Lopes, representa muitas vezes despesas
+acrescidas. «Porque», conforme explica, «não podem prever a hora exacta
+de chegada dos navios e, quando estes se atrasam, têm de pagar aos
+trabalhadores requisitados, e actualmente os custos ultrapassam os 30 mil
+escudos por dia.»
+
+<p n=20629>
+Dois mil automóveis de dez marcas diferentes foram descarregados na
+semana passada no cais «roll-on/roll-off» do porto de Setúbal, vindos da
+Alemanha, Holanda e França. O seu transporte foi efectuado pelo navio
+liberiano Barcelona, com 6823 toneladas de arqueação bruta, pertencente à
+firma alemã VAG Transport.
+
+<p n=20630>
+O terminal vai ocupar 15 hectares e as suas obras contemplam a edificação
+de um cais com 420 metros de extensão, além de três pontos de atracação.
+Será por aqui que os navios do tipo «roll-on/roll-off» (que permitem a
+movimentação dos automóveis pelos seus próprios meios, graças a uma
+rampa) procederão à exportação dos 180 mil veículos anuais a produzir em
+Palmela.
+
+<p n=20631>
+A Corrida dos Sinos, amanhã, em Mafra, que contará com a presença de
+alguns dos nossos melhores fundistas, entre os mais de dois mil inscritos
+é o acontecimento dominante deste fim-de-semana. Entretanto, já está à
+venda o «Anuário da Corrida», indispensável a todos os corredores (para
+mais detalhes, ver «Saídas» no suplemento Fim de Semana do próximo dia 7)
+
+<p n=20632>
+Andebol -- «Nacional» da I Divisão: Sporting-A. Funchal, às 16h; S.
+Mamede-Benfica, às 18h; Belenenses-E. Avenida, às 18h; ABC-TAP, às 18h;
+FC Porto-V. Setúbal, às 19h; F. Holanda-Académica, às 21h, no Pav. Sta.
+Maria Maior, em Viana do Castelo.
+
+<p n=20633>
+Quando, em Outubro do ano passado, as eleições no Benfica ganharam mais
+espaço na comunicação social portuguesa, Alexandre Alves adiantou a sua
+disponibilidade para concorrer ao acto eleitoral. Colocava apenas uma
+condição: que Jorge de Brito não se candidatasse.
+
+<p n=20634>
+«O meu objectivo era alertá-lo para para o tipo de gestão que ele fazia,
+que não é gestão nenhuma. O Benfica não está a ser gerido e não merece o
+tratamento que tem. Eu tinha a noção exacta de que ele não tinha
+condições para ser presidente do Benfica.
+
+<p n=20635>
+A reflexão epistemológica surge sempre a propósito das crises de tal ou
+tal ciência e estas crises resultam sempre de uma incapacidade dos
+métodos anteriores, para serem ultrapassadas graças à intervenção de
+novos métodos. A educação física, como é sabido, atravessa uma crise que
+não se resume unicamente à sua dimensão de escola pública, mas a toda a
+vida escolar onde não se deve isolar indisciplinarmente, mas sim
+conseguir um estudo horizontal que pode ir da multidisciplinaridade à
+interdisciplinaridade metodológica. Se a memória não me atraiçoa, nunca
+verifiquei qualquer tentativa conseguida de um trabalho aprofundado por
+quem tem o poder e muito menos numa informação ou consulta aos
+intervenientes principais, professores e alunos.
+
+<p n=20636>
+Manuel Sérgio na sua tese de doutoramento «Para uma Epistemologia da 
+Motricidade Humana» apresenta-nos um trabalho de grande coerência global,
+que vai desde a sua fundamentação, em que manifesta um notável à-vontade
+no domínio dos autores de referência do pensamento filosófico, passando
+pela metodologia que vai do corte epistemológico, até à descrição e
+análise dos resultados alicerçado num grande saber reflexivo sobre a
+realidade empírica, individual e social, fazendo realçar a problemática
+do real e a definição de problemas.
+
+<p n=20637>
+A 2.ª Expedição Lisboa-Bissau arrancará no próximo dia 6 de Fevereiro, às
+11 horas, da Torre de Belém, como estava previsto. Depois dos
+impedimentos levantados pela Líbia quanto à passagem da caravana, as
+Organizações Aventura foram agradavelmente surpreendidas com a repentina
+abertura da Argélia que, concedendo os vistos necessários, viabilizou a
+passagem da expedição, a caminho de Bissau.
+
+<p n=20638>
+Hoje, entre as 9 e as 13horas, os sócios do Vitória de Guimarães são
+chamados a mais um acto eleitoral, desta vez apenas de confirmação da
+reeleição dos presidentes dos três órgãos directivos do clube, dado que
+só apareceu uma lista. Pimenta Machado será assim reeleito, tal como
+António Fernandes (Conselho Fiscal) e António Xavier (Assembleia Geral).
+Os vice-presidentes, directores e vogais são escolhidos apenas depois das
+eleições. A grande meta para este novo mandato é a 3ª fase do complexo
+desportivo do clube, nomeadamente o pavilhão gimnodesportivo do clube,
+que dispõe de uma verba de 100 mil contos inscrita no PIDDAC. Mas a
+remodelação da bancada velha e a construção de uma pista de atletismo
+parecem estar também nos planos de Pimenta Machado. Em Guimarães, porém,
+empresta-se a Pimenta Machado a grande ambição de ser presidente da
+Câmara e não há muito houve mais uma polémica na cidade quando Ribeiro da
+Silva, governador civil e um dos patriarcas do PSD local, declarou a uma
+rádio que «Pimenta Machado não tem perfil para presidente da Câmara» e
+que não vai «ao futebol enquanto o presidente do clube for ele». São as
+guerras políticas locais, de equilíbrios sempre difíceis mas que Pimenta
+Machado vai mantendo com o candidato à presidência do Conselho Fiscal a
+ser um homem identificado com o PS e o da AG um antigo presidente da
+Câmara pelo PSD.
+
+<p n=20639>
+O Rali das Camélias, uma das provas de maiores tradições no «Nacional» de
+Ralis, não se realizará este ano. Depois do clube organizador, o Arte e
+Sport, ter pedido um adiamento da prova que se deveria realizar no
+próximo fim-de-semana, na zona de Sintra, a Comissão Desportiva Nacional
+acabou por decidir pela sua anulação. No entender da entidade federativa,

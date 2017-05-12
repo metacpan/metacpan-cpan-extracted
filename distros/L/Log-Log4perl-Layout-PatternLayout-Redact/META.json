@@ -1,0 +1,64 @@
+{
+   "abstract" : "Add stack traces without sensitive information in Log::Log4perl logs.",
+   "author" : [
+      "Guillaume Aubert <aubertg@cpan.org>",
+      "Kate Kirby <kate@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Log4perl-Layout-PatternLayout-Redact",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Perl6::Slurp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Carp::Parse::Redact" : "1.001000",
+            "Data::Validate::Type" : "0",
+            "Log::Log4perl" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Log4perl::Layout::PatternLayout::Redact" : {
+         "file" : "lib/Log/Log4perl/Layout/PatternLayout/Redact.pm",
+         "version" : "v1.2.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=log-log4perl-layout-patternlayout-redact"
+      },
+      "homepage" : "https://metacpan.org/release/Log-Log4perl-Layout-PatternLayout-Redact",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/katekirby/Log-Log4perl-Layout-PatternLayout-Redact.git"
+      }
+   },
+   "version" : "v1.2.2"
+}

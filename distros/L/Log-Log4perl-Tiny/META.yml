@@ -1,0 +1,34 @@
+---
+abstract: 'mimic Log::Log4perl in one single module'
+author:
+  - 'Flavio Poletti <polettix@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Log4perl-Tiny
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/polettix/Log-Log4perl-Tiny/issues
+  homepage: https://github.com/polettix/Log-Log4perl-Tiny
+  repository: https://github.com/polettix/Log-Log4perl-Tiny.git
+version: 1.4.0
+x_contributors:
+  - 'Flavio Poletti <flavio@polettix.it>'
+  - 'Matt <code@deployable.org>'
+  - 'user <user@debian.localdomain>'

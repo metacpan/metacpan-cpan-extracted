@@ -1,0 +1,41 @@
+---
+abstract: 'DEPRECATED module to comprehensively parse boolean response strings'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.3601
+  Test::Builder: 0.94
+  Test::More: 0.94
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-Boolean
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  Carp: 0
+  Exporter: 0
+  Module::Load: 0
+  String::Trim: 0
+  boolean: 0.21
+  experimental: 0
+  perl: 5.010001
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/doherty/Lingua-Boolean/issues
+  homepage: http://metacpan.org/release/Lingua-Boolean/
+  repository: git://github.com/doherty/Lingua-Boolean.git
+version: 0.008

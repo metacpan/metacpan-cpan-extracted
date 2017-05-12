@@ -1,0 +1,180 @@
+#!/usr/bin/perl
+use strict ;
+use File::Basename ;
+use Pod::Usage ;
+use Getopt::Long qw/:config no_ignore_case/ ;
+
+++$! ;
+
+# Script illustrating the use of the Linux::DVB::DVBT package for recording channels
+
+use Linux::DVB::DVBT ;
+
+our $VERSION = "1.000" ;
+
+	my ($help, $man, $DEBUG, $VERBOSE, $config, $adap) ;
+	GetOptions('v|verbose=s' => \$VERBOSE,
+			   'debug=s' => \$DEBUG,
+			   'h|help' => \$help,
+			   'man' => \$man,
+			   'cfg=s' => \$config,
+			   'a|adap|dvb=i' => \$adap,
+			   ) or pod2usage(2) ;
+
+
+    pod2usage(1) if $help;
+    pod2usage(-verbose => 2) if $man;
+    pod2usage("$0: No arguments given.")  if (@ARGV == 0) ;
+    pod2usage("$0: No filename given.")  if (@ARGV <= 1) ;
+    pod2usage("$0: No duration given.")  if (@ARGV <= 2) ;
+
+	Linux::DVB::DVBT->debug($DEBUG) ;
+	Linux::DVB::DVBT->verbose($VERBOSE) ;
+
+	## Create dvb. 
+	## NOTE: With default object settings, the application will
+	## die on *any* error, so there is no error checking in this script
+	##
+	my $dvb = Linux::DVB::DVBT->new(
+		'adapter_num' 	=> $adap,
+	) ;
+	
+	$dvb->config_path($config) if $config ;
+	
+	my ($channel, $file, $duration) = @ARGV ;
+
+	## Convert duration to seconds
+	my $seconds = Linux::DVB::DVBT::Utils::timesec2secs($duration) ;
+	
+	## Select the channel
+	$dvb->select_channel($channel) ;
+	
+	## Add si tables
+	add_si_tables($dvb, $channel, $seconds) ;
+	
+	## Record using ffmpeg
+	my ($name, $dir) = (fileparse($file, '\..*'))[0,1] ;
+	my $dev = $dvb->dvr_name ;
+	system("ffmpeg -i $dev -vcodec copy -acodec copy -async 1 -t $duration -y '$dir/$name.mpeg'")==0 or die "Error: failed to record : $!" ;
+
+	exit 0 ;
+
+#--------------------------------------------------------------------------------------------------------------------
+# ffmpeg now needs this extra SI table information. The follwoing code is pulled out from DVBT.pm....
+#
+sub add_si_tables
+{
+	my ($dvb, $file, $seconds) = @_ ;
+	
+	## Set up the multiplex info for this single file
+
+	# get entry for this file (or create it)
+	my $href = $dvb->_multiplex_file_href($file) ;
+	
+	# set time
+	$href->{'duration'} = $seconds ;
+	
+	# set total length
+	$dvb->{_multiplex_info}{'duration'} = $seconds ;
+			
+	# set demux filter info
+	push @{$href->{'demux'}}, @{$dvb->{_demux_filters}};
+
+	# get tsid
+	my $frontend_href = $dvb->frontend_params() ;
+	my $tsid = $frontend_href->{'tsid'} ;
+	
+	## Add in SI tables (if required) to the multiplex info
+	my $error = $dvb->_add_required_si($tsid) ;
+	
+	## ensure pid lists match the demux list
+	$dvb->_update_multiplex_info($tsid) ;
+
+}
+
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+=head1 OBSOLETE
+
+This script just got a lot more complicated because ffmpeg now needs the SI tables to be
+able to decode the transport stream correctly. I would B<STRONGLY> advise you use one of 
+the other recording scripts. This script will no longer be supported.
+
+=head1 NAME
+
+dvbt-ffrec - Record a program to file
+
+=head1 SYNOPSIS
+
+dvbt-ffrec [options] channel filename duration
+
+Options:
+
+       -debug level         set debug level
+       -verbose level       set verbosity level
+       -help                brief help message
+       -man                 full documentation
+       -a <num>             Use adapter <num>
+       
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Set verbosity level. Higher values show more information.
+
+=item B<-debug>
+
+Set debug level. Higher levels show more debugging information (only really of any interest to developers!)
+
+=item B<-a>
+
+Specify which adapter number to use
+
+
+=back
+
+=head1 DESCRIPTION
+
+Script that uses the perl Linux::DVB::DVBT package to provide DVB-T adapter functions.
+
+This script differs from B<dvbt-record> in that it illustrates the use of the DVR device by using it as an input
+to ffmpeg. Here, ffmpeg is used to take the raw transport stream data and encapsulate it into an mpeg file.
+
+Obviously, ffmpeg needs to be installed on the system for this script to work!
+
+Specify the channel name to record, the filename of the recorded file (which may include a directory path
+and the directories will be created as needed), and the duration of the recording. Note that the filename will be converted
+to end with .mpeg extension.
+
+The duration may be specified either as an integer number of minutes, or in HH:MM format (for hours & minutes), or in
+HH:MM:SS format (for hours, minutes, seconds).
+
+The program uses a "fuzzy" search to match the specified channel name with the name broadcast by the network.
+The case of the name is not important, and neither is whitespace. The search also checks for both numeric and
+name instances of a number (e.g. "1" and "one").
+
+For example, the following are all equivalent and match with the broadcast channel name "BBC ONE":
+
+    bbc1
+    BbC One
+    b b c    1  
+
+
+For full details of the DVBT functions, please see:
+
+   perldoc Linux::DVB::DVBT
+ 
+=cut

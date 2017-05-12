@@ -1,0 +1,10 @@
+ed_id	ed_lname	ed_fname	ed_pos	phone	address	city	state	zip	ed_boss
+321-55-8906	DeLongue	Martinella	project	415 843-2222	3000 6th St.	Berkeley	CA	94710	993-86-0420
+527-72-3246	Greene	Morningstar	copy	615 297-2723	22 Graybar House Rd.	Nashville	TN	37215	826-11-9034
+712-45-1867	del Castillo	Innes	copy	615 996-8275	2286 Cram Pl. #86	Ann Arbor	MI	48105	826-11-9034
+777-02-9831	Samuelson	Bernard	project	415 843-6990	27 Yosemite	Oakland	CA	94609	993-86-0420
+777-66-9902	Almond	Alfred	copy	312 699-4177	1010 E. Devon	Chicago	IL	60018	826-11-9034
+826-11-9034	Himmel	Eleanore	project	617 423-0552	97 Bleaker	Boston	MA	02210	993-86-0420
+885-23-9140	Rutherford-Hayes	Hannah	project	301 468-3909	32 Rockbill Pike	Rockbill	MD	20852	993-86-0420
+993-86-0420	McCann	Dennis	acquisition	301 468-3909	32 Rockbill Pike	Rockbill	MD	20852	\N
+943-88-7920	Kaspchek	Christof	acquisition	415 549-3909	18 Severe Rd.	Berkeley	CA	94710	\N

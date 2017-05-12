@@ -1,0 +1,42 @@
+#! /bin/sh
+
+cd /usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/src/unix
+
+echo 'Compiling ../../hugsdir/libraries/Foreign/C/Error.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/Foreign/C +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/base/include +L/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/base/cbits/errno.c Foreign.C.Error
+echo 'Compiling ../../hugsdir/libraries/Foreign/Marshal/Alloc.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/Foreign/Marshal +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/base/include Foreign.Marshal.Alloc
+echo 'Compiling ../../hugsdir/libraries/Foreign/Marshal/Utils.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/Foreign/Marshal +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/base/include Foreign.Marshal.Utils
+echo 'Compiling ../../hugsdir/libraries/System/Posix/Internals.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/base/include +L/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/base/cbits/PrelIOUtils.c +L/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/base/cbits/dirUtils.c +L/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/base/cbits/consUtils.c System.Posix.Internals
+echo 'Compiling ../../hugsdir/libraries/System/Posix/Signals.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/base/include System.Posix.Signals
+echo 'Compiling ../../hugsdir/libraries/Text/Regex/Posix.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/Text/Regex +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/base/include Text.Regex.Posix
+echo 'Compiling ../../hugsdir/libraries/Network/BSD.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/Network +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/network/include Network.BSD
+echo 'Compiling ../../hugsdir/libraries/Network/Socket.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/Network +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/network/include +L/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/network/cbits/HsNet.c +L/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/network/cbits/initWinSock.c +L/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/network/cbits/ancilData.c +L/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/network/cbits/winSockErr.c Network.Socket
+echo 'Compiling ../../hugsdir/libraries/System/Posix/Directory.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/include System.Posix.Directory
+echo 'Compiling ../../hugsdir/libraries/System/Posix/DynamicLinker/Prim.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix/DynamicLinker +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/include System.Posix.DynamicLinker.Prim
+echo 'Compiling ../../hugsdir/libraries/System/Posix/Env.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/include System.Posix.Env
+echo 'Compiling ../../hugsdir/libraries/System/Posix/Files.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/include System.Posix.Files
+echo 'Compiling ../../hugsdir/libraries/System/Posix/Process.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/include +L/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/cbits/HsUnix.c +L/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/cbits/execvpe.c System.Posix.Process
+echo 'Compiling ../../hugsdir/libraries/System/Posix/Resource.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/include System.Posix.Resource
+echo 'Compiling ../../hugsdir/libraries/System/Posix/Temp.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/include System.Posix.Temp
+echo 'Compiling ../../hugsdir/libraries/System/Posix/Terminal.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/include System.Posix.Terminal
+echo 'Compiling ../../hugsdir/libraries/System/Posix/Time.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/include System.Posix.Time
+echo 'Compiling ../../hugsdir/libraries/System/Posix/Unistd.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/include System.Posix.Unistd
+echo 'Compiling ../../hugsdir/libraries/System/Posix/User.hs'
+../ffihugs +G -98 -P../../hugsdir/libraries: +L-I../../hugsdir/libraries/System/Posix +L-I../../hugsdir/libraries +L-I../../hugsdir/include +L-I/usr/home/autrijus/local/member/autrijus/Language-Haskell/hugs98-Nov2003/fptools/libraries/unix/include System.Posix.User

@@ -1,0 +1,26 @@
+Revision history for Perl extension Localizer
+
+0.05 2014-06-16T08:15:47Z
+
+    - L::S::Gettext: Do not write multi byte string as string literal in eval string.
+      This is same behaviour with L::S::Maketext.
+      (tokuhirom)
+
+
+0.04 2014-03-25T13:18:29Z
+
+    - Added `#line` for generated code.
+      (tokuhirom)
+
+0.03 2014-02-18T04:30:17Z
+
+    - split scanner related things to the Localizer-Scanner dist.
+
+0.02 2014-02-17T10:21:35Z
+
+    - remove trash from core dist.
+
+0.01 2014-02-17T10:11:20Z
+
+    - original version
+

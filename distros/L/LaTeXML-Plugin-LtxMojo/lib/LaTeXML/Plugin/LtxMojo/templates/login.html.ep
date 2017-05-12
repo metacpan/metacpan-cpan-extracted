@@ -1,0 +1,15 @@
+% layout 'default';
+% title 'Login';
+<div style="margin:10px;">
+<h2>Login</h2>
+<%= form_for login => begin %>
+  <% if (param 'name') { %>
+   <b>Wrong name or password, please try again.</b><br>
+  <% } %>
+  Name:<br>
+  <%= text_field 'name' %><br>
+  Password:<br>
+  <%= password_field 'pass' %><br>
+  <%= submit_button 'Login' %>
+<% end %>
+</div>

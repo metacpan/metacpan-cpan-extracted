@@ -1,0 +1,24 @@
+<div class="newsbox">
+
+[% IF errmess %]
+
+<p>[% errmess %]</p>
+
+[% ELSE %]
+
+<p>Sorry, you have entered an invalid code. This may be because your session 
+has timed out. Please use your encoded link supplied with your email for the 
+surveys to restart your session, ensuring that the correct code is being 
+entered, as some email clients use wrapping characters (e.g. '+') which may 
+need to be removed. If this symptom persists, please contact the
+<a href="mailto:[% administrator %]">administrator</a>.</p>
+
+<p><a href="/">Return to the survey home page</a></p>
+
+<p>
+Best regards,<br />
+[% yapc_host %]<br />
+[% yapc_city %]</p>
+
+[% END %]
+</div>

@@ -1,0 +1,17 @@
+Revision history for Log-Dispatch-Table
+
+0.032     2013-09-21 15:58:01 Asia/Tokyo
+        - update packaging, metadata
+
+0.031     2006-11-14
+        - packaging improvements
+
+0.03      2005-12-19
+        - fixed missing prereqs
+
+0.02      2005-12-17
+        - fixed missing semicolon in test
+
+0.01      2005-11-04
+        - First version, released on an unsuspecting world.
+

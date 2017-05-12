@@ -1,0 +1,7 @@
+Revision history for Perl extension List-Flatten-Recursive
+
+0.103460  2010-12-12 01:37:17 PST8PDT
+    - Removed unnecessary dependency on Perl v5.10
+
+0.103420  2010-12-07 19:40:06 PST8PDT
+    - First release on CPAN

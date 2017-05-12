@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d0282e537d609f27420e89c6c6ba5fdcbf01acac Build.PL
+SHA1 f7adc8f77e876cf6a1dc4c711af5098d3dcc255d Changes
+SHA1 4a5871f916adaf6e49f2a2c64223bbddd3c6e5f5 LICENSE
+SHA1 9f03b655e0e120dd0ed4bb90171fec98b1123783 MANIFEST
+SHA1 075280c0dac6bcc1b70fbed9a7760268d90a9224 META.yml
+SHA1 9b730a02224e27ee2e2704a905a4b058956fd465 README
+SHA1 7644e45bbfe653f8504a8daaeb61b0be1681d453 cpanfile
+SHA1 b41d469a77e32a3931fad34a7418ed82d3ffff52 lib/Log/Stack.pm
+SHA1 1aa22866215fb8bb0211939910115fb62be8c96b perlcritic.rc
+SHA1 81db59b9cd6b702b4c4d2596e34ccea495da7916 t/00-all.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 d361ce075754a8cc9307cfdd64e2729986714579 t/author-pod-coverage.t
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 d8a904a35375aca0e02c9150fb1945c53bdeb7e0 t/release-kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXJcouAAoJEJVzeMw4kNooN/0P/1TF0h2b+BGqOXHO6lMZKnPj
+aT+jCCZ0OPa7hwJ5PuqHXzsjhBIoVsWHfCpbJ/jZpuDJESap8OHoFIPM3o/WIoLE
+yIIsbdkD8ifivdxZ3FhIr+3Ie0fo/ak2T5ymscxsf53jEQlDGMBeyPH96AOQHdur
+jvYqrdjdx+2nuxwO3PnjJ6z2ELqaRG7KC0V7vZBIjvnTOqlnHw3wedUttO+RDOLz
+2g+PY2HzcTECvLMx+1kcKq65QY/5AJYQJGBU1jk02O4BqTqPURtX4rDCwm8Twh0Y
+tmPryo1W6G0RT0lwFJIlpcbBgwyQi8a4Eo/yyE7ZXxOOrEJ1SlIHDkCMBefFKEhB
+/6BXtXl+P5h38A7AK28cgjZnAHZWO2RJLrcic034I2ysby5ystoJM7QB2jG8CnJY
+JQPlyFketWBRD8e3auRScordves59toE3icDnlIpl0UtU5XcWylg+JfCIwBbymT6
+ieAmbSDKXFPjGboq2Tmqcqjf/odOQmatVDGfi/ZcGeYWlBEuFRsfGGfeoX9PO7Oo
+RQEjlymy2SxLJaqVAkuVIPj2Ot95KDn1y4Mdeb1tlRPR6O3Tt4Pn9MhAzsSD+aGX
+r2YgWRD0ct/DvZnKvsN4o8dRbPfmYYCdao7U1bVB6L2XRSP+7Pdc1xdJmVVoR6z0
+3gN+8ErZaQojunxF72SM
+=EigF
+-----END PGP SIGNATURE-----

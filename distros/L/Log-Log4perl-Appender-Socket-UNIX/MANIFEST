@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Log/Log4perl/Appender/Socket/UNIX.pm
+examples/listener.pl
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/1_load.t

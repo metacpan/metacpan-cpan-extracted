@@ -1,0 +1,3 @@
+# little script which correctly runs link-controller for hourly use..
+PATH=$HOME/bin:$PATH
+extract-links --verbose

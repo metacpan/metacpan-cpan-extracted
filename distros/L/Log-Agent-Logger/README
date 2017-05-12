@@ -1,0 +1,59 @@
+                        Log::Agent::Logger 0.2.00
+                 Copyright (c) 2000, Raphael Manfredi
+                 Copyright (c) 2015, Mark Rogaski
+
+------------------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the Artistic License, a copy of which can be
+    found with perl.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    Artistic License for more details.
+------------------------------------------------------------------------
+
+       *** This is alpha software -- use at your own risks ***
+
+Name           DSLI  Description                                  Info
+-----------    ----  -------------------------------------------- -----
+Log::Agent     ----  A general logging framework                  RAM
+::Logger       adpO  Application-level logging interface          RAM
+
+
+The Log::Agent::Logger module is an extension of Log::Agent that brings
+an application-level logging API.
+
+It is separated from Log::Agent itself because it has dependencies
+on other CPAN modules that Log::Agent cannot afford to have:
+everyone with a plain stock Perl distribution must be able to simply
+install Log::Agent and start using it.
+
+SYNOPSIS
+     require Log::Agent::Logger;
+
+     my $log = Log::Agent::Logger->make(
+         -channel    => $chan,
+         -max_prio   => 'info',
+         -min_prio   => 'emerg',
+     );
+     $log->error("can't open file %s: $!", $file);
+     $log->warning("can't open file $file: $!");
+
+DESCRIPTION
+    The `Log::Agent::Logger' class defines a generic interface for
+    application logging. It must not be confused with the interface
+    provided by Log::Agent, which is meant to be used by re-usable
+    modules that do not wish to commit on a particular logging method,
+    so that they remain true building blocks.
+
+    By contrast, `Log::Agent::Logger' explicitely requests an object to
+    be used, and that object must commit upon the logging channel to be
+    used, at creation time.
+
+    Optionally, minimum and maximum priority levels may be defined
+    (and changed dynamically) to limit the messages to effectively
+    log, depending on the advertised priority. The standard syslog(3)
+    priorities are used.
+
+-- Raphael Manfredi <Raphael_Manfredi@pobox.com>

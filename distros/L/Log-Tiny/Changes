@@ -1,0 +1,14 @@
+Revision history for Log-Tiny
+
+1.0     Sun Dec 27 2015 22:00 UTC
+        * Support multiple instances of Log::Tiny
+        * Fix tests, add strict/warnings to all tests
+
+0.9     Sun Nov  7 2010 16:00 UTC
+        * Fix bug with "caller sub" format
+        * Add more tests
+        * Added "Category" overrides
+
+0.01    Wed Aug 29 2007 19:30 UTC
+        Initial release
+

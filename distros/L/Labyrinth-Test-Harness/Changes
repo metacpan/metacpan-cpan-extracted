@@ -1,0 +1,46 @@
+Changes for the Labyrinth-Test-Harness
+======================================
+
+1.10	2015-03-08
+        - added error handling around creating database from SQL files.
+        - added _set_error method to simplify all error handling.
+
+1.09	2015-03-04
+        - fixed skip test count.
+
+1.08	2015-03-02
+        - add settings hash to refresh method, and associated accessors.
+
+1.07	2014-12-06
+        - upgraded to Labyrinth-5.29 due to filter problems.
+
+1.06	2014-11-23
+        - elevated Test::Database to required.
+        - fixed abstract in distribution files.
+
+1.05	2014-11-15
+        - Windows cannot delete directories/files while processing.
+
+1.04	2014-11-09
+        - missing prequisite Class::Accessor::Fast in META.yml.
+
+1.03	2014-10-27
+        - fixed login method.
+
+1.02	2014-10-27
+        - added ability to set environment variables, or default to settings 
+          that allow Labyrinth to work in a test environment.
+        - added login method, to auto-login a named user.
+
+1.01	2014-10-16
+        - fixed copying vhost files, if directory not supplied.
+        - extended functional test suite and files.
+        - added abilility to not perform cleanup when object goes out of scope.
+        - prep now accepts a hash of options.
+          - 'sql' list sql files.
+          - files copies additional files into test environment.
+          - config allows addition configuration in the config file.
+        - added copy_file.
+
+1.00	2014-10-08
+        - first official release

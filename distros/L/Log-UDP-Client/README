@@ -1,0 +1,199 @@
+NAME
+    Log::UDP::Client - A simple way to send structured log messages via UDP
+
+VERSION
+    version 0.20.2
+
+SYNOPSIS
+        use Log::UDP::Client;
+
+        # Send the simple scalar to the server
+        Log::UDP::Client->new->send("Hi");
+
+        # Log lots of messages
+        my $logger = Log::UDP::Client->new(server_port => 15000);
+        my $counter=0;
+        while(++$counter) {
+            $logger->send($counter);
+            last if $counter >= 1000;
+        }
+
+        # Send some debugging info
+        $logger->send({
+            pid     => $$,
+            program => $0,
+            args    => \@ARGV,
+        });
+
+        # Use of JSON serializer
+        my $logger = Log::UDP::Client->new( serializer_module => 'JSON' );
+
+        # Will emit { "message" => "Hi" } because JSON want to wrap stuff into a hashref
+        $logger->send("Hi");
+
+        # Use of custom serializer
+        use Storable qw(freeze);
+        my $logger = Log::UDP::Client->new (
+            serializer => sub {
+                return nfreeze( \( $_[0] ) );
+            },
+        );
+
+DESCRIPTION
+    This module enables you to send a message (simple string or complicated
+    object) over an UDP socket to a listening server. The message will be
+    encoded with a serializer module (default is Storable).
+
+ATTRIBUTES
+  server_address : Str
+    IP address or hostname for the server you want to send the messages to.
+    This field can be changed after instantiation. Default is 127.0.0.1.
+
+  server_port : Int
+    Port for the server you plan to send the messages to. This field can be
+    changed after instantiation. Default is port 9999.
+
+  throws_exception : Bool
+    If errors are encountered, should we throw exception or just return?
+    Default is return. Set to true for exceptions. You can change this flag
+    after instantiation.
+
+  socket : IO::Socket::INET
+    Read-only field that contains the socket used to send the messages.
+
+METHODS
+  send($message)
+    Instance method that actually encodes and transmits the specified
+    message over UDP to the listening server. Will die if throw_exception is
+    set to true and some kind of transmission error occurs. The message will
+    be serialized by the instance-defined serializer. Returns true on
+    success.
+
+INHERITED METHODS
+    *   deserialize
+
+    *   deserializer
+
+    *   serialize
+
+    *   serializer
+
+    *   serializer_module
+
+    All of these methods are inherited from Data::Serializable. Read more
+    about them there.
+
+SEE ALSO
+    *   Moose
+
+    *   Storable
+
+    *   JSON::XS
+
+    *   IO::Socket::INET
+
+SUPPORT
+  Perldoc
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Log::UDP::Client
+
+  Websites
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+    *   MetaCPAN
+
+        A modern, open-source CPAN search engine, useful to view POD in HTML
+        format.
+
+        <http://metacpan.org/release/Log-UDP-Client>
+
+    *   Search CPAN
+
+        The default CPAN search engine, useful to view POD in HTML format.
+
+        <http://search.cpan.org/dist/Log-UDP-Client>
+
+    *   RT: CPAN's Bug Tracker
+
+        The RT ( Request Tracker ) website is the default bug/issue tracking
+        system for CPAN.
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-UDP-Client>
+
+    *   AnnoCPAN
+
+        The AnnoCPAN is a website that allows community annotations of Perl
+        module documentation.
+
+        <http://annocpan.org/dist/Log-UDP-Client>
+
+    *   CPAN Ratings
+
+        The CPAN Ratings is a website that allows community ratings and
+        reviews of Perl modules.
+
+        <http://cpanratings.perl.org/d/Log-UDP-Client>
+
+    *   CPAN Forum
+
+        The CPAN Forum is a web forum for discussing Perl modules.
+
+        <http://cpanforum.com/dist/Log-UDP-Client>
+
+    *   CPANTS
+
+        The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+        of a distribution.
+
+        <http://cpants.perl.org/dist/overview/Log-UDP-Client>
+
+    *   CPAN Testers
+
+        The CPAN Testers is a network of smokers who run automated tests on
+        uploaded CPAN distributions.
+
+        <http://www.cpantesters.org/distro/L/Log-UDP-Client>
+
+    *   CPAN Testers Matrix
+
+        The CPAN Testers Matrix is a website that provides a visual overview
+        of the test results for a distribution on various Perls/platforms.
+
+        <http://matrix.cpantesters.org/?dist=Log-UDP-Client>
+
+    *   CPAN Testers Dependencies
+
+        The CPAN Testers Dependencies is a website that shows a chart of the
+        test results of all dependencies for a distribution.
+
+        <http://deps.cpantesters.org/?module=Log::UDP::Client>
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests by email to
+    "bug-log-udp-client at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Log-UDP-Client>. You
+    will be automatically notified of any progress on the request by the
+    system.
+
+  Source Code
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    <http://github.com/robinsmidsrod/Log-UDP-Client>
+
+      git clone git://github.com/robinsmidsrod/Log-UDP-Client.git
+
+AUTHOR
+    Robin Smidsrï¿½d <robin@smidsrod.no>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by Robin Smidsrï¿½d.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

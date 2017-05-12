@@ -1,0 +1,61 @@
+\documentclass{article}
+%\includeonly{chap1, chap3}
+
+\usepackage{pstricks}
+
+\usepackage{verbatim}
+
+\usepackage{latexsym}
+
+\usepackage{colortbl}
+
+\usepackage{moreverb}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{ntheorem}
+\usepackage{makeidx}
+\makeindex
+
+\newtheorem{definition}{Definition}[section]
+
+   \def\YaTeA{{\rmfamily Y\kern-.36em%
+    \lower.7ex\hbox{A}\kern-.25em%
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.08emA}~}
+
+
+%\usepackage{graphics}
+\begin{document}
+
+\title{\YaTeA\ Technical Documentation}
+
+\author{Sophie Aubin, Thierry Hamon\\LIPN - Universit\'e Paris 13 /
+  UMR CNRS 7030\\99, avenue Jean-Baptiste Clément 
+93430 Villetaneuse \\firstname.lastname@lipn.univ-paris13.fr}
+
+
+\maketitle
+
+\pagebreak
+
+\tableofcontents
+
+\include{ArchitectureDescrYatea}
+\include{DataDescrYatea}
+\include{FuntionDescrYatea}
+\include{UserManualForTechDoc}
+
+\newpage
+\bibliographystyle{th-realfullname}
+\bibliography{th-biblio}
+
+\newpage
+
+~
+
+\newpage
+\appendix
+\section{DTD for the XML display}\label{sec:dtd-xml-display}
+
+\lstinputlisting{DTD/yatea.dtd}
+\printindex
+\end{document}

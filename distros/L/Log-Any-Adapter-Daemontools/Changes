@@ -1,0 +1,28 @@
+Version 0.101
+ - Enable autoflush on output handles
+
+Version 0.100002
+ - dumper is no longer supported due to Log::Any
+ - filter is deprecated in favor of log_level
+ - New shared Config allows changing log level on the fly without
+   re-attaching all adapters
+ - New 'argv', 'env', and 'signals' features for common Unix behavior
+ - Optimized log-level squelching with adapter subclasses
+ - Customizable formatting, optimized via dynamic compilation
+ - Customizable output handle/coderef or even writer coderef
+
+Version 0.002
+ - This module no longer prefixes info() messages with "info:", so that
+   info messages are equivalent to printing the text.
+ - Changed STDERR to STDOUT, since most logging tools actually connect
+   STDOUT to the logger.
+ - No longer join message parts with a space, and just concatenate them.
+   This matches better with other logging back-ends.
+
+Version 0.001
+ - Basic support for all logging methods, prefixing all output with
+   the canonical name of the log level.
+ - Default filter is info and below.
+ - Support for custom dumpers, used for non-scalars passed to 'debug'
+   or 'trace' or any of the formatting '*f()' functions.
+ - Embedded newlines converted to properly prefixed log lines.

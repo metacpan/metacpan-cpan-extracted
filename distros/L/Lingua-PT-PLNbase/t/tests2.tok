@@ -1,0 +1,324 @@
+#1 = tokenização simples
+
+era uma vez
+
+era
+uma
+vez
+
+#2 = hifen no meio de uma palavra
+
+foi numa sexta-feira santa
+
+foi
+numa
+sexta-feira
+santa
+
+#3 = hifen mesmo :)
+
+parece-me chato - na verdade
+
+parece-me
+chato
+-
+na
+verdade
+
+#4 = mais que um ponto
+
+de certeza??
+
+de
+certeza
+??
+
+#5 = horas
+
+o comboio parte às 2:30 da tarde
+
+o
+comboio
+parte
+às
+2:30
+da
+tarde
+
+#6 = pontuação
+
+uma; duas; três: três casas no Gerês
+
+uma
+;
+duas
+;
+três
+:
+três
+casas
+no
+Gerês
+
+#7 = reticencias
+
+Era uma vez... uma baleia gorda!
+
+Era
+uma
+vez
+...
+uma
+baleia
+gorda
+!
+
+#8 = [...] cortes
+
+Depois de [...] comeu uma batata quente
+
+Depois
+de
+[...]
+comeu
+uma
+batata
+quente
+
+#9 = email
+
+Envie a correspondência para me@there.com
+
+Envie
+a
+correspondência
+para
+me@there.com
+
+#10 = email.email
+
+Envie a correspondência para not.me@there.com.
+
+Envie
+a
+correspondência
+para
+not.me@there.com
+.
+
+#11 = URL - http
+
+Visite http://www.linguateca.pt para mais informações.
+
+Visite
+http://www.linguateca.pt
+para
+mais
+informações
+.
+
+#12 = duas frases simples
+
+O João comeu a maçã da Maria. A Maria ficou zangada.
+
+O
+João
+comeu
+a
+maçã
+da
+Maria
+.
+A
+Maria
+ficou
+zangada
+.
+
+#13 = Abreviatura
+
+Era o Sr. Joaquim!
+
+Era
+o
+Sr.
+Joaquim
+!
+
+#14 = Abrevitaturas
+
+O Pe. Joaquim foi visitar o Arq. Taveira que mora na Av. 25 de Abril.
+
+O
+Pe.
+Joaquim
+foi
+visitar
+o
+Arq.
+Taveira
+que
+mora
+na
+Av.
+25
+de
+Abril
+.
+
+#15 = Extracto do Público
+
+Um comando de 17 pessoas equipadas com cintos de explosivos tomou hoje de assalto uma escola em Beslan (Ossétia do norte) onde se encontram cerca de 200 crianças e 40 adultos, no dia em que recomeçam as aulas naquela região russa.
+
+Um
+comando
+de
+17
+pessoas
+equipadas
+com
+cintos
+de
+explosivos
+tomou
+hoje
+de
+assalto
+uma
+escola
+em
+Beslan
+(
+Ossétia
+do
+norte
+)
+onde
+se
+encontram
+cerca
+de
+200
+crianças
+e
+40
+adultos
+,
+no
+dia
+em
+que
+recomeçam
+as
+aulas
+naquela
+região
+russa
+.
+
+# 16 - Noticia Público Desporto
+
+Jacques Rogge, presidente do Comité Olímpico Internacional (COI), encerrou Atenas 2004 com um discurso virado para o combate ao "doping".
+
+Jacques
+Rogge
+,
+presidente
+do
+Comité
+Olímpico
+Internacional
+(
+COI
+)
+,
+encerrou
+Atenas
+2004
+com
+um
+discurso
+virado
+para
+o
+combate
+ao
+«
+doping
+»
+.
+
+# 17 - SIGLA
+
+Texto a falar dos U.S.A.
+
+Texto
+a
+falar
+dos
+U.S.A.
+
+# 18 - SIGLA -- com espaços
+
+Texto a falar dos U. S. A.
+
+Texto
+a
+falar
+dos
+U.
+S.
+A.
+
+# 19 - Texto com ^M
+
+Texto com
+carriage returns.
+
+Texto
+com
+carriage
+returns
+.
+
+# 20 - ingles...
+
+We're I'm I'll
+
+We
+'re
+I
+'m
+I
+'ll
+
+# 21 - Francês...
+
+d'Almeida l'ennemie
+
+d'
+Almeida
+l'
+ennemie
+
+# 22 - aspas variadas
+
+'era uma vez' "um gato" ou mesmo `dois gatos'.
+
+«
+era
+uma
+vez
+»
+«
+um
+gato
+»
+ou
+mesmo
+«
+dois
+gatos
+»
+.
+

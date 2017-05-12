@@ -1,0 +1,35 @@
+---
+abstract: 'extract the components of a person or couples full name, presented as a text string'
+author:
+  - 'Kim Ryan <kimryan at cpan org>'
+build_requires:
+  Test::More: '0.94'
+  Test::Pod: '1.04'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4208, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-EN-NameParse
+provides:
+  Lingua::EN::NameParse:
+    file: lib/Lingua/EN/NameParse.pm
+    version: '1.36'
+  Lingua::EN::NameParse::Grammar:
+    file: lib/Lingua/EN/NameParse/Grammar.pm
+    version: '1.36'
+requires:
+  Parse::RecDescent: '1'
+  Test::Pod::Coverage: '1.04'
+  locale: '1'
+  strict: '1.04'
+  utf8: '1.09'
+  warnings: '1.12'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/kimryan/Lingua-EN-NameParse
+version: '1.36'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -1,0 +1,12 @@
+0.03 2015-09-23T23:30:47+02:00
+ - Add tests for Lego::Part class.
+ - Move author tests to xt/ directory.
+
+0.02 2015-08-24T11:31:45+02:00
+ - Add SEE ALSO section in doc.
+ - Add minimal version of Perl.
+ - Add missing English dependency.
+ - Update Module::Install to 1.16 version.
+
+0.01 2015-03-04T00:48:41+01:00
+ - First version.

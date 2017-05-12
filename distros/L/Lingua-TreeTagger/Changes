@@ -1,0 +1,36 @@
+Revision history for TreeTagger
+
+0.01    2010-09-11
+        First version, released on an unsuspecting world.
+
+        2010-09-18
+        Fixed installation issues (essentially removed Build.PL dependencies).
+        
+0.02    2011-02-02
+        Slight revision of the documentation (fixed an error in the Synopsis
+        and made a few cosmetic changes).
+        
+0.03    2011-03-24
+        Fixed a bug which prevented the use of abbreviation files with default
+        tokenizer.
+        
+0.04    2012-05-26
+        Added unicode support thanks to a patch submitted by Tara Andrews
+        
+0.05    2012-08-27
+        Fixed a bug in t\utf8.t which prevented build and install when the
+        utf8 tokenizer script wasn't available (thanks Alberto Simoes!).
+        
+0.06    2013-01-07
+        Applied a patch provided by Alberto Simoes (thanks again!) in order
+        for the module's Build.PL to detect files where
+        Lingua::TreeTagger::Installer puts them.
+
+0.07    2014-11-03
+        Fixed TreeTagger.pm to match Moose's new enum definition syntax,
+        as kindly suggested by Zoffix Znet and Hiroyuki Yamanaka.
+
+0.08    2015-11-04
+        Modified test files to reflect the fact that utf8 parameters are now
+        standard, made xml serialization more robust, fixed issues in tests
+        and POD (patches kindly contributed by Alberto Simoes).

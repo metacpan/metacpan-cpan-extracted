@@ -1,0 +1,46 @@
+not time plan associated - not even an order implied.
+
+
+* infrastructure:
+=================
+
+- move Language::Befunge::libs::* to Language::Befunge::Libs::* (or
+whatever) (medium)
+
+
+* distribution:
+===============
+
+- sign module using Module::Signature (minor)
+
+
+* befunge:
+==========
+
+- write a real befunge debugger (medium or major)
+
+- profile some runs of typical befunge programs to spot the
+bottlenecks.  fix them. (medium or major)
+
+- implement resource limits (laheyspace sandboxing, instruction
+restriction)
+
+
+* laheyspace:
+=============
+
+- write subclasses of Language::Befunge::LaheySpace, for different
+  needs:
+    . speed (major)
+    . multidim (major)
+    . etc
+
+
+* tests:
+========
+
+- maybe walk through tests and clean them. (medium)
+
+- perform test coverage and fill in the blanks. using Module::Builder
+would help on this one. (medium)
+

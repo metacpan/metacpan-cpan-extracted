@@ -1,0 +1,35 @@
+---
+abstract: 'Retrieve frequency values and frequency-based lists for words from Subtitles Corpora'
+author:
+  - 'Roderick Garton <rgarton@cpan.org>'
+build_requires:
+  Array::Compare: '2.11'
+  FindBin: '1.51'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.421'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Norms-SUBTLEX
+provides:
+  Lingua::Norms::SUBTLEX:
+    file: lib/Lingua/Norms/SUBTLEX.pm
+    version: '0.05'
+requires:
+  Config: '0'
+  English: '1.05'
+  File::RandomLine: '0.20'
+  File::Slurp: '9999.19'
+  File::Spec: '3.40'
+  Lingua::Orthon: '0.01'
+  Readonly: '1.03'
+  Statistics::Lite: '3.6'
+  String::Util: '1.24'
+  Text::CSV::Separator: '0.20'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.05'

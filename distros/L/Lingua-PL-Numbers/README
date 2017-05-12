@@ -1,0 +1,26 @@
+Lingua::PL::Numbers version 1.0
+===============================
+
+Please see the example scripts for more information and 
+usage instructions.
+
+INSTALLATION
+ 
+To install this module type the following:
+ 
+   perl Makefile.PL
+   make
+   make test
+   make install
+ 
+DEPENDENCIES
+ 
+This module requires these other modules and libraries:
+ 
+  carp
+ 
+COPYRIGHT AND LICENCE
+ 
+Put the correct copyright and licence information here.
+ 
+Copyright (C) 2003 Henrik Steffen <cpan@topconcepts.de>

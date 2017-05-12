@@ -1,0 +1,75 @@
+#!/usr/bin/perl -w
+#========================================================================
+#
+# latex2pdf
+#
+# DESCRIPTION
+#   Script for processing and rendering a template document using the 
+#   Perl Template Toolkit. 
+#
+# AUTHOR
+#   Andrew Ford <a.ford@ford-mason.co.uk>
+#
+# COPYRIGHT
+#   Copyright (C) 2007 Andrew Ford.  All Rights Reserved.
+#
+#   This module is free software; you can redistribute it and/or
+#   modify it under the same terms as Perl itself.
+#
+#------------------------------------------------------------------------
+#
+# $Id: latex2pdf 59 2007-09-28 14:39:34Z andrew $
+#
+#========================================================================
+
+use strict;
+use warnings;
+
+use LaTeX::Driver::FilterProgram;
+
+LaTeX::Driver::FilterProgram->execute(format => 'pdf');
+
+exit(0);
+
+__END__
+
+=head1 NAME
+
+latex2pdf - script to convert LaTeX file to PDF
+
+=head1 SYNOPSIS
+
+  latex2pdf [OPTIONS] [-o output] [sourcefile]
+
+=head1 DESCRIPTION
+
+C<latex2pdf> is a simple script to invoke the C<LaTeX::Driver> module
+to convert a LaTeX file to PDF.
+
+TO BE EXPANDED
+
+
+=head1 AUTHOR
+
+Andrew Ford E<lt>A.Ford@ford-mason.co.ukE<gt>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2007 Andrew Ford.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+
+=cut
+
+# Local Variables:
+# mode: perl
+# perl-indent-level: 4
+# indent-tabs-mode: nil
+# End:
+#
+# vim: expandtab shiftwidth=4:

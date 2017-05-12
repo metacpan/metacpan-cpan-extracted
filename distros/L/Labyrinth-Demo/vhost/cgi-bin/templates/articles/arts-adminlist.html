@@ -1,0 +1,56 @@
+[% 
+    title = "Article List" ;
+%]
+
+<div class="boxer">
+
+<p>Click on an article's 'Quick Name' to edit or create additional content.</p>
+
+    <form method="POST" name="SEARCH" id="SEARCH" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name="act" value="arts-admin" />
+    <p>Search by Title: <input type="text" name="searchname" />
+    [% ddpublish %] <input type="submit" value="GO" /></p>
+    <p>
+      <a href="pages.cgi?act=arts-admin">view all</a>
+    | <a href="pages.cgi?act=arts-add">create a new article</a></p>
+    </form>
+</div>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="arts-admin" />
+
+<div class="boxer">
+<table class="blocker">
+<tr>
+    <th>Quick Name</th>
+    <th>Title</th>
+    <th>Status</th>
+    <th>Select</th>
+</tr>
+
+[% IF data %]
+[% FOREACH item = data %]
+
+<tr>
+    <td><a href="pages.cgi?act=arts-edit&amp;articleid=[% item.articleid %]">[% item.quickname %]</a></td>
+    <td>[% item.title %]</td>
+    <td>[% item.publishstate %]</td>
+    <td><input type="checkbox" name="LISTED" value="[% item.articleid %]" /></td>
+</tr>
+
+[% END %]
+
+[% ELSE %]
+<tr><td colspan="5" align="center">No articles listed.</td></tr>
+[% END %]
+
+</table>
+</div>
+
+<p>
+<input type="hidden" name="recordid" value='' />
+<input type="hidden" name='doaction' value='' />
+<input type="button" value='Promote' onClick="doSubmit('Promote',0)" />
+<input type="button" value='Copy'    onClick="doOnlyOne('Copy')" />
+<input type="button" value='Delete'  onClick="doSubmit('Delete',0)" /></p>
+</form>

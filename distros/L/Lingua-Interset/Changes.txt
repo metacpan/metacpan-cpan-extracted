@@ -1,0 +1,863 @@
+3.004     2017-02-08 15:25:24+01:00 Europe/Prague
+
+Features:
+* In line with Universal Dependencies v2, added value 'vnoun' of feature
+  'verbform' (verbal noun). The value 'ger' is still available but slightly
+  deprecated (if something is traditionally called gerund but can be plausibly
+  called verbal noun, it should be labeled 'vnoun').
+
+
+
+3.003     2017-01-18 07:27:27+01:00 Europe/Prague
+
+Fixes:
+* Reading (setting) old feature-value pairs politeness=inf|pol and converting
+  them internally to polite=infm|form.
+
+
+
+3.002     2017-01-16 20:30:08+01:00 Europe/Prague
+
+Features:
+* In line with Universal Dependencies v2, value 'gen' of feature 'numtype'
+  (generic numeral) has been removed. The known examples should be either
+  'card' or 'mult'.
+
+
+
+
+3.001     2017-01-16 13:42:21+01:00 Europe/Prague
+
+Features:
+* In line with Universal Dependencies v2, the feature 'foreign' has again just
+  one value. The values 'fscript' and 'tscript' had been used only in
+  el::conll. They are now preserved in the 'other' feature.
+
+
+
+3.000     2017-01-15 11:04:26+01:00 Europe/Prague
+
+Drivers:
+* FO::Setur
+* PT::Freeling
+* UG::Udt
+
+Features:
+* New value 'aug' of feature 'degree': augmentative, opposite of diminutive.
+  Used for nouns in the Freeling tagset for Portuguese.
+* Feature 'animateness' renamed to 'animacy'. Affected drivers:
+  xx::multext
+  cs::pdt
+  eu::conll
+  fa::conll
+  hsb::sorokin
+  nl::cgn
+  pl::ipipan
+  ru::syntagrus
+  sk::snk
+  ta::tamiltb
+* Feature 'definiteness' renamed to 'definite'. Affected drivers:
+  xx::multext
+  ar::padt ar::conll ar::conll2007
+  bg::conll
+  da::conll
+  de::smor
+  el::conll
+  fo::setur
+  he::conll
+  hu::conll
+  it::conll
+  nl::cgn nl::conll
+  pt::conll pt::cintil
+  ro::rdt
+  sl::conll
+  sv::mamba sv::parole sv::suc
+* Feature 'negativeness' renamed to 'polarity'. Affected drivers:
+  xx::multext
+  ar::padt ar::conll ar::conll2007
+  bg::conll
+  bn::conll
+  ca::conll2009
+  cs::pdt cs::ajka cs::pmk cs::pmkkr
+  de::stts de::smor
+  el::conll
+  et::puudepank
+  fi::turku
+  he::conll
+  hu::conll
+  ja::conll
+  mt::mlss
+  pl::ipipan
+  sk::snk
+  sl::conll
+  ta::tamiltb
+  tr::conll
+  zh::conll
+* Feature 'politeness' renamed to 'polite'. Features 'abspoliteness',
+  'ergpoliteness' and 'datpoliteness' renamed similarly. Affected drivers:
+  ca::conll2009
+  cs::pmk
+  da::conll
+  eu::conll
+  hi::conll
+  ja::conll
+  nl::cgn
+  pt::freeling
+  ta::tamiltb
+  ur::conll
+  zh::conll
+* Renamed and new feature values:
+  * abspolite=infm instead of abspolite=inf
+  * abspolite=form instead of abspolite=pol
+  * abspolite=elev
+  * abspolite=humb
+  * animacy=hum
+  * aspect=prosp instead of aspect=pro
+  * datpolite=infm instead of datpolite=inf
+  * datpolite=form instead of datpolite=pol
+  * datpolite=elev
+  * datpolite=humb
+  * definite=cons instead of definite=red
+  * ergpolite=infm instead of ergpolite=inf
+  * ergpolite=form instead of ergpolite=pol
+  * ergpolite=elev
+  * ergpolite=humb
+  * polite=infm instead of polite=inf
+  * polite=form instead of polite=pol
+  * polite=elev
+  * polite=humb
+  * verbform=conv instead of verbform=trans
+
+Interface:
+* Added new methods:
+  * is_construct() is true if definite=cons
+  * is_converb() is true if verbform=conv
+  * is_elevating() is true if polite=elev
+  * is_formal() is true if polite=form
+  * is_human() is true if animacy=hum
+  * is_humbling() is true if polite=humb
+
+Fixes:
+* MUL::Upos: the tag CONJ changed to CCONJ in Universal Dependencies v2.
+  The driver now reads both CONJ and CCONJ but writes only CCONJ.
+
+
+
+2.052     2016-06-22 14:37:30+02:00 Europe/Prague
+
+Drivers:
+* HSB::Sorokin
+
+Fixes:
+* MUL::Google: now includes the tags AUX and PNOUN that were used in Universal
+  Dependency Treebanks v2.0.
+* CA::Conll2009 (and derived ES::Conll2009) now convert numeral pronouns and
+  determiners to definite numerals, i.e. the 'prontype' feature is empty.
+
+
+
+2.051     2016-02-12 22:00:32+01:00 Europe/Prague
+
+Drivers:
+* RO::Multext
+
+Features:
+* New value 'emp' of feature 'prontype': emphatic pronoun. There are
+  similarities with reflexive and demonstrative pronouns/determiners.
+  Example: "himself" as in "He himself did it." Czech "sám", Romanian "însuși".
+
+Interface:
+* Shifted semantics of pronoun-related is_*() methods of the FeatureStructure
+  class, added two new methods:
+  is_pronominal() is true if prontype is not empty. It includes pronouns,
+      determiners, quantifiers and pronominal adverbs. This is what the
+      is_pronoun() method did previously.
+  is_pronoun() is true if is_pronominal() && is_noun()
+  is_noun() therefore includes nouns and pronouns (does not check prontype)
+  is_determiner() is true if is_pronominal() && is_adjective()
+  is_adjective() therefore includes adjectives and determiners
+  is_article() is true if prontype values contain 'art'; it is assumed that the
+      pos is then 'adj' but it is not tested.
+
+Fixes:
+* EU::Conll: still used the deprecated feature 'subpos'.
+* FeatureStructure->set_upos() should not reset non-empty prontype to 'prn'.
+
+
+
+2.050     2015-09-30 21:09:39+02:00 Europe/Prague
+
+Interface:
+* The set() method of FeatureStructure now accepts feature values that had to
+  be renamed in the past: degree=comp and number=plu. When someone tries to set
+  these values, they will be translated to the new values before storing. Thus
+  they will not be returned by any of the get*() methods. No exception will be
+  thrown when setting feature values that were valid in the past. Hence
+  Interset should finally be backward-compatible with data stored in files.
+  Feature values that were never valid will still trigger an exception.
+* Added over 70 new is_*() methods in FeatureStructure. Some feature values
+  have more than one method if there are two competing terms. Others still
+  do not have any method: either because the feature is marginal or because
+  the name is ambiguous.
+
+
+
+2.049     2015-09-29 14:55:59+02:00 Europe/Prague
+
+Features:
+* Value 'comp' of feature 'degree' changed to 'cmp'.
+  This was actually a bug. Universal Features (in Universal Dependencies) define
+  this value as Cmp, not Comp. The divergence between UD and Interset existed
+  unnoticed for about a year.
+
+
+
+2.048     2015-09-04 15:05:51+02:00 Europe/Prague
+
+Drivers:
+* LA::It
+
+
+
+2.047     2015-08-29 18:19:17+02:00 Europe/Prague
+
+Interface:
+* FeatureStructure has a new serialization method as_string_conllx() that
+  returns feature-value pairs in a form suitable for the FEATS column of the
+  CoNLL-X file format.
+* FeatureStructure has a new method get_nonempty_features(). It returns the
+  list of names of features whose values are not empty.
+
+
+
+2.046     2015-08-25 16:49:06+02:00 Europe/Prague
+
+Drivers:
+* MT::Mlss
+
+Fixes:
+* PL::Ipipan: two new tags for abbreviations (see the Polish Treebank).
+* FeatureStructure::add_ufeatures() treats unknown language-specific features
+  more correctly and does not trigger warnings any more.
+
+
+
+2.045     2015-08-11 23:37:14+02:00 Europe/Prague
+
+Fixes:
+* PL::Ipipan: the 'conj' tag split to 'conj' and 'comp' (see the Polish Treebank).
+
+
+
+2.044     2015-08-07 22:42:01+02:00 Europe/Prague
+
+Drivers:
+* SL::Multext
+
+Fixes:
+* FeatureStructure::get($feature) should never return undef.
+  It now returns the empty value instead.
+
+
+
+2.043     2015-07-17 16:51:12+02:00 Europe/Prague
+
+Interface:
+* FeatureStructure has new methods to remove the value of a feature:
+  generic clear($feature) and specific for each feature, e.g. clear_pos().
+  Until now the only method was to set the empty value ('').
+
+Fixes:
+* Improved documentation of FeatureStructure::get_ufeatures() and add_ufeatures()
+  (these are methods, not static functions!)
+
+
+
+2.042     2015-07-08 14:43:31+02:00 Europe/Prague
+
+Drivers:
+* LA::Itconll
+
+Fixes:
+* Fixed bug in get_ufeatures(): Foreign=Foreign (was mistakenly Foreign=Yes).
+* Removed the FeatureStructure::is_valid() method. It is not needed since 2.019
+  when we disallowed setting unknown features or values.
+
+
+
+2.041     2015-02-27 16:07:10+01:00 Europe/Prague
+
+Drivers:
+* ZH::Conll
+
+
+
+2.040     2015-02-26 13:44:07+01:00 Europe/Prague
+
+Drivers:
+* TR::Conll
+
+
+
+2.039     2015-02-24 15:54:15+01:00 Europe/Prague
+
+Drivers:
+* TA::Tamiltb
+* TE::Conll
+* UR::Conll
+
+
+
+2.038     2015-02-23 08:06:54+01:00 Europe/Prague
+
+Drivers:
+* RO::Rdt
+* RU::Syntagrus
+* SK::Snk
+* SL::Conll
+
+
+
+2.037     2015-02-20 17:39:15+01:00 Europe/Prague
+
+Drivers:
+* PT::Conll
+
+
+
+2.036     2015-02-13 12:42:55+01:00 Europe/Prague
+
+Drivers:
+* PL::Ipipan
+
+
+
+2.035     2015-02-11 12:23:30+01:00 Europe/Prague
+
+Drivers:
+* NO::Conll
+* NL::Cgn: added the old tag for adverbs, BW() (besides the new tag, BIJW()).
+
+
+
+2.034     2015-02-10 22:27:41+01:00 Europe/Prague
+
+Interface:
+* FeatureStructure has new methods is_interrogative() and is_relative().
+
+Features:
+* New value 'dim' of the feature 'degree': diminutive. Applicable to multiple languages, systematically needed in Dutch.
+* New feature 'position' for the position (usage) of Dutch adjectives.
+
+Drivers:
+* Fixed NL::Cgn. Extended list of tags; encoding now includes features.
+
+
+
+2.033     2015-02-08 00:02:03+01:00 Europe/Prague
+
+Interface:
+* New class Lingua::Interset::Converter implements conversion between two physical tagsets including caching.
+
+Drivers:
+* NL::Conll
+* NL::Cgn
+
+
+
+2.032     2015-01-26 23:27:27+01:00 Europe/Prague
+
+Interface:
+* Fixed alphabetical ordering in FeatureStructure->get_ufeatures().
+
+Drivers:
+* Fixed MUL::Uposf. Decoding was incorrect for features that are named differently in UD and in Interset.
+* SV::Mamba
+* SV::Conll
+* SV::Parole
+* SV::Suc
+
+
+
+2.031     2015-01-24 12:35:52+01:00 Europe/Prague
+
+Interface:
+* FeatureStructure has new method add_ufeatures() that performs the dual operation to get_ufeatures().
+
+Features:
+* New value 'gdv' of the feature 'verbform': Latin gerundive (as opposed to the gerund, verbform=ger).
+
+Drivers:
+* LA::Conll
+
+
+
+2.030     2015-01-21 14:45:58+01:00 Europe/Prague
+
+Features:
+* New value 'light' of the feature 'verbtype': light/support verb in Japanese ("suru") and other languages.
+
+Drivers:
+* JA::Conll
+
+
+
+2.029     2015-01-07 11:05:40+01:00 Europe/Prague
+
+Fixes:
+* Fixed several bugs in classification of numerals in Tagset::CS::Pdt.
+
+
+
+2.028     2014-12-20 13:21:11+01:00 Europe/Prague
+
+Drivers:
+* IT::Conll
+
+
+
+2.027     2014-12-10 22:34:10+01:00 Europe/Prague
+
+Drivers:
+* HU::Conll
+
+Interface:
+* FeatureStructure has new methods is_active() and is_passive().
+
+
+
+2.026     2014-12-05 18:56:03+01:00 Europe/Prague
+
+Drivers:
+* HI::Conll
+* DE::Smor
+
+Interface:
+* FeatureStructure has new method set_other_subfeature().
+
+
+
+2.025     2014-11-24 17:43:29+01:00 Europe/Prague
+
+Features:
+* New value 'int' of the feature 'voice': intensive voice/aspect (the PIEL binyan) in Hebrew.
+
+Drivers:
+* HE::Conll
+
+
+
+2.024     2014-11-21 17:24:35+01:00 Europe/Prague
+
+Features:
+* New value 'opt' of the feature 'mood': optative mood in Ancient Greek and Turkish, to express wishes:
+  "May you have a long life!" "If only I were rich!"
+* New value 'des' of the feature 'mood': desiderative mood in Turkish: "He wants to come."
+* New value 'nec' of the feature 'mood': necessitative mood in Turkish: "He must come. He should come."
+* New value 'mid' of the feature 'voice': middle voice in Ancient Greek. (The mediopassive voice can be expressed as 'mid|pass'.)
+* New value 'rcp' of the feature 'voice': reciprocal (Turkish "karıştı", "tutuştular")
+* New value 'cau' of the feature 'voice': causative (Turkish "karıştırıyor" ("is confusing"))
+
+Drivers:
+* GRC::Conll
+
+
+
+2.023     2014-11-21 10:44:50+01:00 Europe/Prague
+
+Drivers:
+* FI::Turku
+
+
+
+2.022     2014-11-18 22:56:53+01:00 Europe/Prague
+
+Features:
+* New value 'exc' of the feature 'prontype': exclamative determiner or pronoun (e.g. "WHAT a surprise!")
+
+Drivers:
+* FA::Conll
+
+
+
+2.021     2014-11-17 01:04:13+01:00 Europe/Prague
+
+Features:
+* New features for the multi-argument agreement of Basque synthetic verbs:
+  * absperson, absnumber, abspoliteness
+  * ergperson, ergnumber, ergpoliteness, erggender
+  * datperson, datnumber, datpoliteness, datgender
+
+Drivers:
+* ET::Puudepank
+* EU::Conll
+
+Interface:
+* FeatureStructure has new methods is_masculine(), is_feminine(), is_neuter(), is_common_gender(),
+  is_negative(), is_affirmative(), is_auxiliary(), is_modal(), is_gerund(), is_conditional(),
+  is_cardinal(), is_ordinal(), is_personal_pronoun().
+* New method Atom::merge_atoms() helps create a big atom to decode unnamed features.
+
+
+
+2.020     2014-10-31 17:34:17+01:00 Europe/Prague
+
+Features:
+* Two new values of the feature 'foreign':
+  * 'fscript' = foreign word in foreign script
+  * 'tscript' = foreign word transcribed from a foreign script
+
+Drivers:
+* EL::Conll
+
+
+
+2.019     2014-10-30 22:30:13+01:00 Europe/Prague
+
+Interface:
+* FeatureStructure::set($feature, $value) now dies if either the feature or the value is unknown.
+* Default setters (e.g. set_gender()) now call set($feature, $value), so they can take multivalues
+  in all forms and referenced arrays (if any) are deeply copied, not shared.
+* Default getters (e.g. gender()) now always return scalars. Multivalues are joined by vertical bars.
+  This is the same behavior as with the get_joined($feature) method.
+* Exception: The 'other' feature can still contain anything (usually a hash reference)
+  and its getter ($fs->other()) will return exactly that anything, not necessarily a scalar.
+
+
+
+2.018     2014-10-17 14:51:14+02:00 Europe/Prague
+
+Drivers:
+* PT::Cintil
+
+Interface:
+* FeatureStructure has new methods is_comparative() and is_superlative().
+
+
+
+2.017     2014-10-13 16:07:59+02:00 Europe/Prague
+
+Features:
+* Value 'art' (article) moved from feature 'adjtype' to 'prontype'. Adjtype becomes deprecated.
+* Value 'det' (determiner) of 'adjtype' removed. Determiners are now recognized by pos=adj + non-empty value of 'prontype'.
+
+Interface:
+* FeatureStructure has new method is_article().
+
+
+
+2.016     2014-10-11 21:46:09+02:00 Europe/Prague
+
+Features:
+* Feature 'number', value 'plu' (plural) changed to 'plur' to reflect the Universal Dependencies / Features.
+
+
+
+2.015     2014-10-10 18:23:36+02:00 Europe/Prague
+
+Drivers:
+* DE::Stts
+* DE::Conll
+* DE::Conll2009
+* MUL::Uposf
+
+Fixes:
+* Fixed a bug in Atom::list(). Previously, tags were taken from encode but not from decode map.
+* FeatureStructure has new method get_ufeatures() for the universal features.
+
+
+
+2.014     2014-10-06 22:10:01+02:00 Europe/Prague
+
+Drivers:
+* MUL::Upos
+
+Interface:
+* FeatureStructure has new methods set_upos() and get_upos() for the universal POS tags.
+
+
+
+2.013     2014-10-04 22:40:48+02:00 Europe/Prague
+
+Drivers:
+* DA::Conll
+
+
+
+2.012     2014-09-29 17:43:18+02:00 Europe/Prague
+
+Fixes:
+* Lingua::Interset::find_drivers() no longer fails if a subfolder of an %INC path is not readable.
+
+
+
+2.011     2014-09-23 22:40:14+02:00 Europe/Prague
+
+Drivers:
+* CA::Conll2009
+* ES::Conll2009
+
+
+
+2.010     2014-08-15 20:14:29+02:00 Europe/Prague
+
+Interface:
+* New importable functions in the main package: find_tagsets() and hash_drivers().
+
+Drivers:
+* BN::Conll
+* MUL::Google
+
+
+
+2.009     2014-08-11 17:20:03+02:00 Europe/Prague
+
+Features:
+* New feature 'morphpos' (it existed in Interset 1 for sk::snk but it did not make it to Interset 2 so far).
+
+Drivers:
+* JA::Ipadic
+
+
+
+2.008     2014-08-01 11:14:23+02:00 Europe/Prague
+
+Drivers:
+* BG::Conll
+
+
+
+2.007     2014-07-25 14:01:06+02:00 Europe/Prague
+
+Drivers:
+* AR::Padt
+* AR::Conll
+* AR::Conll2007
+
+
+
+2.006     2014-07-18 15:50:40+02:00 Europe/Prague
+
+Interface:
+* New methods for the 'other' feature: get_other_subfeature() and is_other().
+* Fixed treatment of the 'other' feature in atoms.
+
+Drivers:
+* CS::Pmk
+* CS::Pmkkr
+* HR::Multext
+
+
+
+2.005     2014-07-11 17:10:37+02:00 Europe/Prague
+
+Interface:
+* FeatureStructure method merge_hash() renamed to merge_hash_hard() and added new method merge_hash_soft().
+* Similarly, Atom method decode_and_merge() split to decode_and_merge_hard() and decode_and_merge_soft().
+
+Features:
+* New value of feature 'advtype': 'sta' (adverb of state, e.g. Czech "horko", "zima", "volno", "nanic").
+
+Drivers:
+* CS::Ajka
+* CS::Cnk
+
+
+
+2.004     2014-07-04 16:29:33+02:00 Europe/Prague
+
+Interface:
+* New attribute encode_default of class SimpleAtom.
+
+Features:
+* Three new values of feature 'style': 'rare' (rare), 'poet' (poetic), and 'expr' (expressive, emotional).
+
+Drivers:
+* CS::Multext
+
+
+
+2.003     2014-06-27 23:23:33+02:00 Europe/Prague
+
+Architecture:
+* New classes Atom and SimpleAtom are special cases of Tagset driver, designed as sub-drivers for individual surface features.
+
+Interface:
+* FeatureStructure::multiset() renamed to add().
+* Added various new is_...() methods in FeatureStructure.
+* is_noun() and similar methods should now work also with arrays of values.
+* The generic set() method of FeatureStructure will no longer allow multiple occurrences of the same value if multiple values are set.
+* New method FeatureStructure::matches() (for those familar with Treex: this is the $node->match_iset() method).
+
+Feature changes:
+* New numtype 'sets' for number of sets of things (Czech "čtvery boty" = "four pairs of shoes").
+* New conjtype 'oper' for mathematical operators (Czech "krát" = "times").
+* New feature 'nametype' for classification of named entities, used in the Czech CoNLL tagsets.
+
+Drivers:
+* EN::Penn – the -ing verb forms (VBG) now set the progressive aspect, instead of imperfect.
+* CS::Pdt
+* CS::Conll
+* CS::Conll2009
+
+
+
+2.002     2014-06-20 17:49:14+02:00 Europe/Prague
+
+Architecture change:
+* Tagset drivers moved one level down so that we can clearly distinguish them from other modules.
+  Lingua::Interset::EN::Penn became Lingua::Interset::Tagset::EN::Penn.
+
+Feature changes:
+* pos value 'prep' (preposition) renamed to 'adp' (adposition).
+* the remaining values of the subpos feature dissolved into advtype and two
+  new features, adpostype and parttype.
+
+Drivers:
+* EN::Penn – fixed bug in decoding of VBP.
+* EN::Conll
+* EN::Conll2009
+  (Both are trivially derived from EN::Penn.)
+
+Interface:
+* Various tools for driver testing
+* Empty implementations of decode(), encode() and list() in the Tagset class will now throw an exception if called.
+* Slightly changed semantics of the set...() and get...() methods in the FeatureStructure class.
+
+Improved documentation of the modules.
+
+
+
+2.001     2014-06-13 17:56:05+02:00 Europe/Prague
+
+Complete rewrite of Interset. The old Perl interface was not object-oriented.
+The modules resided under the “tagset” namespace (yes, all lowercase). The new
+modules are object-oriented (using Moose) and the new namespace is Lingua::
+Interset. And it is available at the CPAN.
+
+There are the following modules:
+* Lingua::Interset
+* Lingua::Interset::FeatureStructure
+* Lingua::Interset::Tagset
+* Lingua::Interset::OldTagsetDriver
+* Lingua::Interset::Trie
+
+Drivers:
+* Initially, only the 'en::penn' driver has been ported to Interset 2 (see the
+  module Lingua::Interset::EN::Penn). The other drivers will be ported
+  gradually. In the meantime, the old implementations (tagset::*) can be
+  accessed through a wrapper class, Lingua::Interset::OldTagsetDriver.
+  (The wrapper is shipped together with Interset 2 but the old drivers are not.
+  They are still downloadable from the Interset wiki.)
+
+Feature changes:
+* Several new features were split from the subpos feature: nountype, adjtype,
+  verbtype and conjtype. This is a logical extension of the previously created
+  prontype, advtype etc.
+* The features tense and subtense have been merged. Their separation in the
+  early years of Interset was driven by problems with encoding tagsets that
+  lacked specialized tenses; later on however, Interset got the algorithms for
+  strict encoding and feature replacement. Now there are other features whose
+  values form a hierarchy, so it seems logical to treat tenses the same way.
+
+
+
+-------------------------------------------------------------------------------
+Interset 2 (above) is distributed through the CPAN as Lingua::Interset and its
+versions are tracked rigorously. Versions < 2 vere numbered less rigorously and
+there were fewer official releases. (Though internally, I was using Subversion
+since fall 2007 to spring 2014, and there are SVN revision numbers.)
+
+As many other projects, Interset has gone through its “Dark Age” when it was
+not yet clear whether it would eventually be published. There was no
+distinction between versions and releases, and versions were not numbered
+anyway. However, there were some milestones, which are described below and
+which I have numbered for convenience.
+
+
+
+1.2
+
+27 June 2011. New drivers: Prague Spoken Corpus (Pražský mluvený korpus, PMK)
+long and short tags (cs::pmkdl and cs::pmkkr). Arabic CoNLL 2007 slightly
+differs from CoNLL 2006, so there is now ar::conll2007.
+
+New test: For all tags in all drivers now must hold that deleting the value of
+the other feature does not lead to an unknown tag. This should greatly improve
+chances of finding permitted feature combinations when converting from one
+tagset to another.
+
+New usage: Interset in Treex (TectoMT).
+
+
+
+1.1
+
+8 September 2009. Three new incarnations of Czech, English and German CoNLL
+tagsets, reflecting the 2009 changes in format. Most interestingly, German
+tags now contain morphosyntactic features. Thanks to Saša Rosen, who tries to
+use DZ Interset together with a multi-language parallel corpus called
+Intercorp, we also created a driver for the IPI PAN Polish corpus, which in
+turn caused one systemic change: o-tags (those setting the other feature) can
+now be ignored when the driver is scanning the possible feature-value
+combinations. And there is a new web interface to DZ Interset.
+
+
+
+1.0
+
+February 2009. Petr Pořízka and Markus Schäfer used DZ Interset in MorphCon, a
+GUI tool for conversion of Czech morphological tags. They wrote a driver for
+the Czech ajka tagset (a morphological analyzer from Masaryk University, Brno).
+MorphCon has been presented at a bohemistic conference in Brno (see
+References). Dan added a driver for the Czech tags of the Multext East
+multilingual corpus.
+
+Various maintenance changes took place, too. Version control has been migrated
+to network-accessible (though not publicly accessible) SVN repository, together
+with Trac project management interface. Website now includes information on
+licensing, references and this version history. From now on, I intend to
+distinguish revisions from numbered releases.
+
+
+
+0.5
+
+May 2008. DZ Interset was first presented at the Language Resoruces and
+Evaluation Conference (LREC) in Marrakech, Morocco (see References). At that
+time, new drivers for the German Stuttgart-Tübingen Tagset and the Portuguese
+Floresta/CoNLL tagset (extremly noisy, huh!) were present.
+
+At the time around LREC, a major change in the feature pool started to
+crystallize. The diametrically different approaches to tagging of pronouns and
+determiners led me to remove these categories from the top-level part-of-speech
+set and transform them to special cases of nouns and adjectives. Such approach
+had already been taken a year before for Bulgarian but now I wanted to unify it
+across languages. In the end of 2008, all drivers already reflected the changed
+policy. The state of pronouns may further change in future, as this is a rather
+controversial issue. On the other hand, a similar change may be needed for
+numerals, too.
+
+
+
+0.2
+
+Spring 2007. I struggled to convert tagsets of several CoNLL shared task
+treebanks in order to improve the accuracy of a parser that relied on
+understanding the information in the tags. It became apparent how big the
+differences between various tagging approaches are. Also, some corpora
+contained tags that were noisy or not very well defined. Arabic, Bulgarian,
+Chinese, Czech and English CoNLL tagsets were added (Czech and English are just
+reformatted PDT and Penn tags, respectively).
+
+
+
+0.1
+
+Summer 2006. My first unified approach to conversions among the Prague
+Dependency Treebank tagset, Penn TreeBank tagset, Swedish Mamba tagset (CoNLL
+2006 treebank), Danish Parole tagset (CoNLL 2006 treebank), and the tagset of
+the Swedish adaptation of Jan Hajič's tagger. Tag conversions were crucial part
+of my experiments with cross-language parser adaptation (see References). My
+thanks go to Philip Resnik for the early comments during our discussions at the
+University of Maryland.

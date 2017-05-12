@@ -1,0 +1,395 @@
+
+/**********************************************************/
+
+#quartz-body {
+  padding: 5px 10px ;
+  text-align:left;
+}
+
+#quartz-content div div {
+  padding:0;
+  margin-bottom:0;
+}
+
+a {
+  text-decoration:none;
+}
+
+a:active,
+a:hover {
+  text-decoration:underline;
+}
+
+#quartz-content .listings {
+  clear:both;
+  padding-right:8px;
+}
+
+#quartz-content .listings .ft {
+  clear:both;
+  padding:0 0 8px 8px;
+  background-position:bottom left;
+}
+
+#quartz-content .listings .hd div div {
+  padding:0;
+  /*background:none;*/
+}
+
+#quartz-content h1 {
+  font-size:152%;
+}
+
+
+#quartz-content .listings .bd {
+  overflow:hidden;
+  padding-top:6px;
+  clear: both;
+}
+
+/* This ensures heading is not floated to left */
+#quartz-content .ft::after,
+#quartz-content .listings .bd::after,
+#quartz-content .listings .hd div::after {
+  content:".";
+  display:block;
+  height:0;
+  font-size:0;
+  clear:both;
+  visibility:hidden;
+}
+
+#quartz-content .ft,
+#quartz-content .listings .bd,
+#quartz-content .listings .hd div {
+  display:block;
+}
+
+#qtv-listings h1 a:focus {
+  text-decoration:underline;
+}
+
+#qtv-listings .hd h1,
+#qtv-listings .hd h2 {
+  float:left;
+  font-size:100%;
+  margin:9px 0;
+  padding:0 0 6px;
+}
+
+#qtv-listings.listings .hd h2 {
+  color:inherit;
+  font-size:122%;
+  margin:0;
+  padding:8px 0 0;
+}
+
+#qtv-listings h1 .channel {
+  font-size:128%;
+  font-weight:bold;
+}
+
+#qtv-listings .grid h2 {
+  clear:left;
+  float:left;
+  font-size:100%;
+  height:3.90em;
+}
+
+#qtv-listings .grid h2 img {
+  border:0;
+  display:block;
+  margin-bottom:4px;
+}
+
+#qtv-listings .grid h2 .channel-name {
+  display:block;
+  font-size:85%;
+  font-size:150%;
+  font-weight:bold;
+  padding:0.5em 3px 0;
+}
+
+#qtv-listings .grid h2 .channel-name span {
+  display:block;
+  margin:2px 0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+/*  width:96px;*/
+width: inherit;
+}
+
+#qtv-listings .grid .channel,
+#qtv-listings .grid .sched {
+  margin:2px 0 2px;
+}
+
+#qtv-listings .grid .channel ol,
+#qtv-listings .grid .sched ol {
+  margin-right:2px;
+}
+
+#qtv-listings .grid li {
+  display:inline;
+  float:left;
+  height:3.90em;
+  position:relative;
+}
+
+#qtv-listings .grid li .record span.record {
+  padding: 0 0.5em 0;
+}
+
+#qtv-listings .grid li a {
+  border:1px solid black;
+/*  border-width:0 1px; */
+  display:block;
+  height:95%;
+  line-height:1.25;
+  margin-left:-1px;
+  overflow:hidden;
+  padding-top:4px;
+  z-index:1;
+}
+
+#qtv-listings .grid li a .wrap {
+  display:block;
+  height:100%;
+  margin:0 4px 4px;
+  overflow:hidden;
+}
+
+#qtv-listings .grid li a:focus,
+#qtv-listings .grid li a:hover {
+  text-decoration:none;
+}
+
+#qtv-listings .grid li .summary {
+  display:block;
+  font-size:93%;
+  font-weight:bold;
+  line-height:1.25;
+  position:static;
+}
+
+#qtv-listings .grid li a span {
+  line-height:inherit;
+}
+
+
+/*-------------------------------------------------------------*/
+/* Category */
+#qtv-listings .grid li .category {
+  font-size:85%;
+  line-height:1.37;
+  position:static;
+}
+
+
+/*-------------------------------------------------------------*/
+/* Timebar */
+
+#qtv-listings .time,
+#qtv-listings .timesel {
+  clear:left;
+}
+
+#qtv-listings .time li,
+#qtv-listings .timesel li {
+  border-right:1px solid black;
+  font-size:93%;
+  font-weight:bold;
+  height:auto;
+  padding:0;
+}
+
+#qtv-listings .time ol li.first {
+  border-left:1px solid black;
+}
+
+#qtv-listings .grid .time a:focus,
+#qtv-listings .grid .time a:hover,
+#qtv-listings .grid .timesel a:focus,
+#qtv-listings .grid .timesel a:hover {
+  /*background:none;*/
+}
+
+#qtv-listings .grid .time a,
+#qtv-listings .grid .time li span {
+  border:0;
+  display:inline;
+  line-height:2;
+  margin:0 4px;
+  padding:0;
+  position:static;
+}
+
+#qtv-listings .channel ol:after,
+#qtv-listings .sched ol:after,
+#qtv-listings .grid:after,
+#qtv-listings .time ol:after,
+#qtv-listings .timesel ol:after {
+  clear:both;
+  content:".";
+  display:block;
+  height:0;
+  visibility:hidden;
+}
+
+
+#qtv-listings .channel ol,
+#qtv-listings .sched ol,
+#qtv-listings .grid,
+#qtv-listings .time ol,
+#qtv-listings .timesel ol {
+  display:inline-block;
+  display:block;
+}
+
+#qtv-listings .grid .channel ol,
+#qtv-listings .grid .sched ol {
+clear : both ;
+}
+
+/* IE?
+#qtv-listings .grid .sched,
+#qtv-listings .grid div.sched li,
+*/
+
+/* Schedule */
+#qtv-listings .grid div.sched,
+#qtv-listings .grid div.sched li {
+  height: 1em;
+}
+
+#qtv-listings .grid div.sched ol li h2 {
+  font-size: 80%;
+  margin-left: 0px ;
+  height: 1em;
+}
+
+
+#qtv-listings .grid .timesel a,
+#qtv-listings .grid .timesel li span {
+  border:0;
+  display:inline;
+  line-height:1.1em;
+  margin:0 4px;
+  padding:0;
+  position:static;
+}
+
+
+#qtv-listings .timesel li {
+/*	height: 1.1em ;*/
+}
+
+
+
+/* day selecter */
+#qtv-listings .timesel li.day {
+	text-align: center;
+	padding: 0px ;
+	margin: 0px ;
+}
+
+#qtv-listings .timesel li a.day {
+	padding: 0px ;
+	margin: 0px ;
+}
+
+#qtv-listings .grid .timesel li.label a span {
+	font-size: 120% ;
+}
+
+/* hour selecter */
+#qtv-listings .timesel li.hour {
+	text-align: center;
+	padding: 0px ;
+	margin: 0px ;
+}
+
+
+#qtv-listings .timesel li a.hour {
+	padding: 0px ;
+	margin: 0px ;
+}
+
+
+/*--------------------------*/
+/* Select program recording */
+
+/* Record: Current setting */
+.popupContent ul.recprog li {
+    margin-top: 3px ;
+}
+
+.popupContent ul.recprog li img {
+    vertical-align: middle ;
+}
+
+
+/* Record: Tabbed menu of different types of recording */
+.popupContent ul.recprog li ul.rectype {
+	margin: 1em 0.1em ;
+	display: block ;
+    border-bottom: 1px solid white ;
+    padding: 2px 5px ;
+}
+
+.popupContent ul.recprog li ul.rectype li.recopt {
+    display: inline ;
+    padding: 2px 5px ;
+    
+    /* tab sep */
+    margin: 0 0 0 5px ;
+}
+
+/* Record: List of options */
+.popupContent ul.recprog li ul.recsel {
+	margin-top: 0.5em ;
+}
+
+.popupContent ul.recprog li ul.recsel li.recradio {
+    height: 2em ;
+}
+
+.popupContent ul.recprog li ul.recsel li img {
+    vertical-align: middle ;
+}
+
+.popupContent ul.recprog li ul.recsel li.recradio a {
+    text-decoration: none ;
+}
+
+
+
+
+/*-----------------------------------*/
+/* Select program recording priority */ 
+
+/* Priority: Current setting */
+.popupContent ul.priprog li {
+    margin-top: 3px ;
+    height: 2em ;
+}
+
+.popupContent ul.priprog li img {
+    vertical-align: middle ;
+}
+
+
+/* Priority: List of options */
+.popupContent ul.priprog li ul li.priradio {
+    height: 2em ;
+}
+
+.popupContent ul.priprog li ul li img {
+    vertical-align: middle ;
+}
+
+.popupContent ul.priprog li ul li.priradio a {
+    text-decoration: none ;
+}
+

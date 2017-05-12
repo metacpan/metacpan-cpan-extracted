@@ -1,0 +1,22 @@
+Revision history for Perl extension Lingua::RU::Number.
+
+0.6   Thu Feb 12 18:14:34 FET 2015
+    - cyrillic text converted to UTF-8
+
+0.05  Tue Jul 31 23:05:12 MSK 2012
+    - added required license notices
+
+0.04  Tue, 07 Jul 2009 14:22:56 +0400
+    - typo fixed
+    - added 'require Autoloader;'
+    - added test for number 11
+
+0.03  Mon Oct  16 10:27:00 2003
+	- bug fixed. (sums like *.28 was not spelled correctly)
+
+0.02  Mon Oct  28 10:27:00 2002
+	- '56 cents(kopeek)' bug fixed. (sums like *.56 was not parsed correctly)
+
+0.01  Thu Jun  6 15:41:10 2002
+	- original version; created by h2xs 1.1.1.1
+

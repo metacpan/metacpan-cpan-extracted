@@ -1,0 +1,16 @@
+Revision history for Perl extension Log::Stamper
+
+0.031   Mon Jan 14 11:33:55 JST 2013
+    [NO CODE CHANGES]
+        - fixed MANIFEST
+
+0.03    Mon Jan 14 10:06:54 JST 2013
+    [NO CODE CHANGES]
+        - added document: example code for callback method
+
+0.02    Sun Jan 13 02:57:35 JST 2013
+    [NEW FEATURE]
+        - implemented callback method for filtering the formatted string
+
+0.01    Sun Jan 13 02:48:07 JST 2013
+        - original version

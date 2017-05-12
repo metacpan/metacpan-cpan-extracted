@@ -1,0 +1,25 @@
+
+define a [new TConnection "uma.base.de.dados" "user" "pass"]
+
+define stat [$a statement]
+
+define rSet [$stat query "Select * from xotas"]
+define a1 [$rSet getColumnCount]
+define a2 [$rSet getColumnName 1]
+define a3 [$rSet getDate "OLA"]
+define a4 [$rSet getFloat 4]
+define a5 [$rSet getInt 3]
+define a6 [$rSet getString "IO"]
+define a7 [$rSet hasMoreRows]
+define a8 [$rSet hasRows]
+
+define a9 [$rSet skip 8]
+
+while {$rSet next} {
+    echo [$rSet getString 1]
+}
+
+$rSet close
+
+$stat close
+$a close

@@ -1,0 +1,80 @@
+{
+   "abstract" : "Return the document frequency in Aozora Bunko",
+   "author" : [
+      "pawa <pawapawa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-JA-DocumentFrequency-AozoraBunko",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::ShareDir" : "1.00",
+            "Storable" : "2.51",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.99"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::JA::DocumentFrequency::AozoraBunko" : {
+         "file" : "lib/Lingua/JA/DocumentFrequency/AozoraBunko.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pawa-/Lingua-JA-DocumentFrequency-AozoraBunko/issues"
+      },
+      "homepage" : "https://github.com/pawa-/Lingua-JA-DocumentFrequency-AozoraBunko",
+      "repository" : {
+         "url" : "git://github.com/pawa-/Lingua-JA-DocumentFrequency-AozoraBunko.git",
+         "web" : "https://github.com/pawa-/Lingua-JA-DocumentFrequency-AozoraBunko"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:PAWAPAWA",
+   "x_contributors" : [
+      "pawa <pawa@pawafuru.com>"
+   ]
+}

@@ -1,0 +1,41 @@
+Labyrinth-Plugin-Release
+========================
+
+Labyrinth is a Website Management Framework. This distribution enables Labyrinth
+to manage Discographies, or Bibliographies, which can be attributed to releases.
+
+This distribution contains the main release handling functionality used as part
+of the Music Suite of modules, which are used to implement a band/music website
+using Labyrinth. This includes the templates, SQL, parameter validation and 
+dispatch tables.
+
+NOTES
+
+This distribution is currently under development, and is subject to frequent
+change.
+
+INSTALLATION
+
+See the INSTALL file for full instructions.
+
+DEPENDENCIES
+
+  Clone
+  Labyrinth
+  Labyrinth-Plugin-Core
+  Labyrinth-Plugin-Articles-Lyrics
+  Labyrinth-Plugin-Articles-Profiles
+  Labyrinth-Plugin-MP3s
+
+AUTHOR
+
+  Barbie, <barbie@missbarbell.co.uk> for Miss Barbell Productions,
+  <http://www.missbarbell.co.uk/>
+
+COPYRIGHT & LICENSE
+
+  Copyright (C) 2002-2014 Barbie for Miss Barbell Productions
+  All Rights Reserved.
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

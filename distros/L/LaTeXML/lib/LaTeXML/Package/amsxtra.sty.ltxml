@@ -1,0 +1,35 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  amsxtra                                                            | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+#**********************************************************************
+# See amsldoc
+
+DefMacro('\sphat', Tokens(T_SUPER, T_OTHER('^')));
+DefMacro('\spcheck', '^{\vee}');
+DefMacro('\sptilde', Tokens(T_SUPER, T_OTHER('~')));
+DefMacro('\spdot',   '^{\dot}');
+DefMacro('\spddot',  '^{\dot\dot}');
+DefMacro('\spdddot', '^{\dot\dot\dot}');
+DefMacro('\spbreve', '^{\smile}');                     # close enough?
+
+# Oh what the heck...
+DefMacro('\fracwithdelims[]{}{}{}{}', '\left#2\frac{#4}{#5}\right#3');
+# I can't quite figure out what the point of this one is,
+# and can't find documentation.
+DefMacro('\accentedsymbol{}{}', '\def\#1{$#2}');
+#**********************************************************************
+1;

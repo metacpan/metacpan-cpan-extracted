@@ -1,0 +1,19 @@
+Version 0.10 - 2017-04-06
+  (All changes fully backward-compatible)
+  Logger
+    * changed '->progress' to '->at', with sticky fraction denominator,
+      and changed "maximum" language to "total", to match parser.
+    * add '->inc' method
+  Parser
+    * optional 'sticky_message' feature can now hold onto message text
+      from previous log lines.
+
+Version 0.03 - 2016-12-24
+  Add RenderTTY module to display progress on a terminal.
+  Fixed a bug in Parser that clobbered $_.
+  Renamed a few attributes in Parser.  Not backward compatible,
+    but I doubt anyone has found this module on CPAN yet.
+  Some doc improvements.
+
+Version 0.01 - 2016-12-16
+  Initial release

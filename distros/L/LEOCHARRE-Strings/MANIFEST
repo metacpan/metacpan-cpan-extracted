@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+README
+lib/LEOCHARRE/Strings.pm
+t/00.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/LWP/UserAgent/ProxyHopper/Base.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/kwalitee.t
+examples/get.pl
+Makefile.PL
+META.yml
+META.json

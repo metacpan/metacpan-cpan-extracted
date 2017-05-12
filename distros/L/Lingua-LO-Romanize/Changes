@@ -1,0 +1,38 @@
+Revision history for Lingua-LO-Romanize
+
+0.10	Tue Dec 11 19:48:26 EST 2012
+        Added '=encoding utf-8' so that POD tests doesn't fail
+
+0.09    Sat  9 Apr 2011 09:34:44 HST
+        Quoted hash keys as they broke with perl 5.13.x
+
+0.08    Wed Jun  3 09:17:25 CDT 2009
+        More POD documentation.
+        Minor bug fixes.
+
+0.07    Tue Jun  2 22:55:54 CDT 2009
+        Fixed error with dividing syllables starting with ຫ
+
+0.06    Tue Jun  2 21:26:44 CDT 2009
+        More POD documentation
+        Minor bug fixes.
+
+0.05    Tue Jun  2 15:01:59 CDT 2009
+        Fixed word boundaries
+        
+0.04    Tue Jun  2 11:06:14 CDT 2009
+        Adjustments in documentation
+        More tests
+        
+0.03    Mon Jun  1 21:24:48 CDT 2009
+        Minor bug fixes
+        More tests
+        Added META.yml
+        Added method syllable_array
+        
+0.02    Mon Jun  1 16:46:07 CDT 2009
+        Fixed unicode in documentation
+        
+0.01    Mon Jun  1 11:25:45 CDT 2009
+        First version, released to CPAN.
+

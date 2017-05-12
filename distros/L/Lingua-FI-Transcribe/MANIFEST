@@ -1,0 +1,5 @@
+lib/Lingua/FI/Transcribe.pm
+Makefile.PL
+MANIFEST
+README
+t/english.t

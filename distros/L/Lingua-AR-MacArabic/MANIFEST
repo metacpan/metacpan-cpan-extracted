@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+MacArabic.pm
+MacArabic.xs
+addition.map
+arabic.map
+mkheader
+t/argu.t
+t/test.t

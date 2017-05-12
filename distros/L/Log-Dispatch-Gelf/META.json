@@ -1,0 +1,86 @@
+{
+   "abstract" : "Log::Dispatch plugin for Graylog's GELF format.",
+   "author" : [
+      "Miroslav Tynovsky <tynovsky@avast.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Dispatch-Gelf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON::XS" : "2.0"
+         },
+         "requires" : {
+            "Log::Dispatch" : "0",
+            "Log::GELF::Util" : "0.90",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON" : "0",
+            "Mock::Quick" : "1.107",
+            "Test::Exception" : "0.31",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Dispatch::Gelf" : {
+         "file" : "lib/Log/Dispatch/Gelf.pm",
+         "version" : "v1.3.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/avast/log-dispatch-gelf/issues"
+      },
+      "homepage" : "https://github.com/avast/log-dispatch-gelf",
+      "repository" : {
+         "url" : "git://github.com/avast/log-dispatch-gelf.git",
+         "web" : "https://github.com/avast/log-dispatch-gelf"
+      }
+   },
+   "version" : "1.3.0",
+   "x_contributors" : [
+      "Jan Seidl <seidl@avast.com>",
+      "Adam Clarke <adam.clarke@strategicdata.com.au>",
+      "tynovsky <tynovsky@seznam.cz>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

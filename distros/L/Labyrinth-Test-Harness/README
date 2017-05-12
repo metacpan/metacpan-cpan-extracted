@@ -1,0 +1,31 @@
+Labyrinth-Test-Harness
+======================
+
+This distribution contains a test harness for plugins of the
+Labyrinth Web Framework.
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Labyrinth
+
+AUTHOR
+  Barbie, <barbie@missbarbell.co.uk> for Miss Barbell Productions.
+
+COPYRIGHT AND LICENCE
+
+  Copyright (C) 2014-2015 Barbie for Miss Barbell Productions
+  All Rights Reserved.
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

@@ -1,0 +1,201 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# $Id: lcfg-reltool.in 29146 2015-11-06 15:07:48Z squinney@INF.ED.AC.UK $
+# $Source: /var/cvs/dice/LCFG-Build-Tools/bin/lcfg-reltool.in,v $
+# $Revision: 29146 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Tools/LCFG_Build_Tools_0_6_6/bin/lcfg-reltool.in $
+# $Date: 2015-11-06 15:07:48 +0000 (Fri, 06 Nov 2015) $
+
+our $VERSION = '0.6.6';
+
+use LCFG::Build::Tools;
+
+LCFG::Build::Tools->run;
+
+__END__
+
+=head1 NAME
+
+lcfg-reltool - LCFG source release control tool
+
+=head1 VERSION
+
+This documentation refers to lcfg-reltool version 0.6.6
+
+=head1 SYNOPSIS
+
+    lcfg-reltool release --dir ~/cvs/lcfg-foo
+
+    lcfg-reltool minorversion --quiet
+
+    lcfg-reltool rpm
+
+=head1 DESCRIPTION
+
+=head1 COMMANDS
+
+There are two built-in commands:
+
+=over 4
+
+=item help [command name]
+
+If you call the C<help> command with no arguments it will list all the
+supported commands. If you also specify a particular command name it
+will show all the available command-line options for that specfic
+command.
+
+=item commands
+
+This command gives a list of all available commands.
+
+=back
+
+The following commands are each implemented with a separate Perl
+module. For full documentation you need to read the perldoc for the
+specific module. They are all in the C<LCFG::Build::Tool> namespace.
+
+=over 4
+
+=item checkmacros - L<LCFG::Build::Tool::CheckMacros>
+
+Checks the usage of substitution macros in your project.
+
+=item release - L<LCFG::Build::Tool::MicroVersion>
+
+Increment by one the third (smallest) part of the version field and
+tag the project. This will also reset the release field to 1. For
+example, version 1.2.3 would become 1.2.4 and the release field would
+go from 5 to 1.
+
+=item minorversion - L<LCFG::Build::Tool::MinorVersion>
+
+Increment by one the second (middle) part of the version and tag the
+project.  This will also reset the third part of the version to 0
+(zero) and the release field to 1. For example, version 1.2.3 would
+become 1.3.0 and the release field would go from 5 to 1.
+
+=item majorversion - L<LCFG::Build::Tool::MajorVersion>
+
+Increment by one the first (largest) part of the version and tag the
+project. This will also reset the second and third parts of the
+version to 0 (zero) and the release field to 1. For example, version
+1.2.3 would become 2.0.0 and the release field would go from 5 to 1.
+
+=item devpack - L<LCFG::Build::Tool::DevPack>
+
+Builds a gzipped source tar file from the development source tree for
+the project. This will include all local files which have been added
+to the specified working directory for the project.
+
+=item pack - L<LCFG::Build::Tool::Pack>
+
+Builds a gzipped source tar file from the tagged source tree which
+matches the version specified in the LCFG build tools metadata file,
+C<lcfg.yml>, in the specified working directory.
+
+=item devrpm - L<LCFG::Build::Tool::DevRPM>
+
+Builds a gzipped source tar file, source RPM and binary RPMs from the
+development source tree for the project. This will include all local
+files which have been added to the specified working directory for the
+project.
+
+=item rpm - L<LCFG::Build::Tool::RPM>
+
+Builds a gzipped source tar file, source RPM and binary RPMs from the
+tagged source tree which matches the version specified in the LCFG
+build tools metadata file, C<lcfg.yml>, in the specified working
+directory.
+
+=item srpm - L<LCFG::Build::Tool::SRPM>
+
+Builds a gzipped source tar file and source RPM from the tagged source
+tree which matches the version specified in the LCFG build tools
+metadata file, C<lcfg.yml>, in the specified working directory.
+
+=item ospkg - L<LCFG::Build::Tool::OSXPkg>
+
+Builds a gzipped source tar file and binary MacOSX packages from the
+tagged source tree which matches the version specified in the LCFG
+build tools metadata file, C<lcfg.yml>, in the specified working
+directory.
+
+=item devospkg - L<LCFG::Build::Tool::DevOSXPkg>
+
+Builds a gzipped source tar file and binary MacOSX packages from the
+development source tree for the project. This will include all local
+files which have been added to the specified working directory for the
+project.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+This version-control tool is driven by the LCFG build system meta-file
+(C<lcfg.yml>) which MUST exist in the project source directory. This
+meta-file uses YAML syntax. The minimum contents is something like
+this:
+
+ name: foo
+ version: 1.2.3
+ vcs:
+   type: CVS
+
+See LCFG::Build::PkgSpec for the full details of the possible
+options. After a successful version update using the tool you may
+notice that the file gains some extra fields with their default
+values. The fields will become sorted into alphabetical order to
+minimise the differences in the contents between repeated runs of the
+tool. Also, a YAML header will be added at the top of the file, this
+is not required by this specific tool and can be safely ignored.
+
+Some of the tools use template files, by default it is assumed that
+the standard template directory is
+C</usr/local/share/lcfgbuild/templates> on MacOSX and
+C</usr/share/lcfgbuild/templates> on all other platforms.
+You can override this using the LCFG_BUILD_TMPLDIR environment
+variable. If you have done a local (i.e. non-root) install of this
+module then this will almost certainly be necessary.
+
+=head1 EXIT STATUS
+
+After successfully running a command it will exit with code zero. An
+error will result in a non-zero error code.
+
+=head1 DEPENDENCIES
+
+This script uses L<LCFG::Build::Tools> which is L<Moose> powered and
+the L<MooseX::App::Cmd> module is used to handle the command-line
+interface.
+
+This application also requires an L<LCFG::Build::VCS> module which
+supports your choice of version control system,
+e.g. L<LCFG::Build::VCS::CVS> for CVS.
+
+=head1 PLATFORMS
+
+This is the list of platforms on which we have tested this
+software. We expect this software to work on any Unix-like platform
+which is supported by Perl.
+
+Fedora12, Fedora13, ScientificLinux5, ScientificLinux6, MacOSX7
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this application. Please report any
+problems to bugs@lcfg.org, feedback and patches are also always very
+welcome.
+
+=head1 AUTHOR
+
+Stephen Quinney <squinney@inf.ed.ac.uk>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (C) 2008 University of Edinburgh. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GPL, version 2 or later.
+
+=cut

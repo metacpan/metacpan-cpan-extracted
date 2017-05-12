@@ -1,0 +1,232 @@
+#!/usr/bin/perl
+use strict ;
+use Pod::Usage ;
+use Getopt::Long qw/:config no_ignore_case/ ;
+use File::Basename ;
+use File::Path ;
+
+use Data::Dumper ;
+
+++$! ;
+
+use Linux::DVB::DVBT::TS ;
+
+our $VERSION = '1.000' ;
+
+    my $progname = basename $0 ;
+
+	my ($help, $man, $DEBUG, $VERBOSE, $dbg_ts, $outdir) ;
+	my $colour = 0 ;
+	my $start = 1 ;
+	my $num_images = 1 ;
+	GetOptions('v|verbose=i' => \$VERBOSE,
+			   'debug=i' => \$DEBUG,
+			   'dbg-ts=i' => \$dbg_ts,
+			   'h|help' => \$help,
+			   'man' => \$man,
+			   'o|out' => \$outdir,
+			   'c|colour' => \$colour,
+			   'n|num=i' => \$num_images,
+			   'ss|start=i' => \$start,
+			   ) or pod2usage(2) ;
+
+
+    pod2usage(1) if $help;
+    pod2usage(-verbose => 2) if $man;
+    pod2usage("$0: No arguments given.")  if (@ARGV == 0) ;
+    pod2usage("$0: No input filename given.")  if (@ARGV < 1) ;
+	
+	my $filename = $ARGV[0] ;
+	
+	if ($outdir)
+	{
+		mkpath([$outdir], $DEBUG, 0755) ;
+	}
+	else
+	{
+		$outdir = '.' ;
+	}
+
+	## First get general information (including file duration)
+	my %info = info($filename, {
+		'debug'			=> $dbg_ts,
+	}) ;
+	if ($info{'error'})
+	{
+		print "Error: $info{'error'}\n" ;
+		exit 1 ;
+	}
+	printf "Video duration: %02d:%02d:%02d\n", $info{'duration'}{'hh'}, $info{'duration'}{'mm'}, $info{'duration'}{'ss'} ;
+	
+	my $base = fileparse($filename, '\..*') ;
+	
+	## Now process the file
+	my $settings_href = {
+		'debug'			=> $dbg_ts,
+		'user_data'		=> {
+			'num_images'	=> $num_images,
+			'frame_count'	=> 0,
+			'start_frame'	=> $start,
+			'outname'		=> "$outdir/$base%03d.ppm",
+		},
+	} ;
+	if ($colour)
+	{
+		$settings_href->{'mpeg2_rgb_callback'} = \&colour_callback ;
+	}
+	else
+	{
+		$settings_href->{'mpeg2_callback'} = \&grey_callback ;
+	}
+	parse($filename, $settings_href) ;
+
+	
+
+#=================================================================================
+# CALLBACKS
+#=================================================================================
+
+#---------------------------------------------------------------------------------
+#
+sub write_ppm
+{
+	my ($name, $frame, $width, $height, $data) = @_ ;
+
+	my $fname = sprintf(${name}, $frame) ;
+	print "Saving $fname...\n" ;
+	
+    open(my $ppmfile, ">", $fname) or die "Error: Unable to write $fname : $!" ;
+    binmode $ppmfile ;
+    
+    printf $ppmfile "P6\n%d %d\n255\n", $width, $height ;
+    print $ppmfile $data ;
+    
+    close (ppmfile);
+}
+
+#---------------------------------------------------------------------------------
+# $data is 1 byte per pixel; $width columns by $height rows
+#
+sub grey_callback
+{
+	my ($tsreader, $info_href, $width, $height, $data, $user_data_href) = @_ ;
+
+	## process
+	if ($info_href->{'framenum'} >= $user_data_href->{'start_frame'})
+	{
+		## make a greyscale image
+		my $grey_data ;
+		foreach (split //, $data)
+		{
+			$grey_data .= $_ . $_ . $_ ;
+		}
+	
+		## save image
+		write_ppm($user_data_href->{'outname'}, $user_data_href->{'frame_count'},
+			$width, $height, 
+			$grey_data, 
+		) ;
+		
+			
+		## update frame count
+		++$user_data_href->{'frame_count'} ;
+	}
+	
+	## check for end
+	if ($user_data_href->{'frame_count'} > $user_data_href->{'num_images'})
+	{
+		Linux::DVB::DVBT::TS::parse_stop($tsreader) ;
+	}
+}
+
+#---------------------------------------------------------------------------------
+# $data is 3 bytes per pixel (red, green, blue); $width columns by $height rows
+#
+sub colour_callback
+{
+	my ($tsreader, $info_href, $width, $height, $data, $user_data_href) = @_ ;
+
+	## process
+	if ($info_href->{'framenum'} >= $user_data_href->{'start_frame'})
+	{
+		## save image
+		write_ppm($user_data_href->{'outname'}, $user_data_href->{'frame_count'},
+			$width, $height, 
+			$data, 
+		) ;
+			
+		## update frame count
+		++$user_data_href->{'frame_count'} ;
+	}
+	
+	## check for end
+	if ($user_data_href->{'frame_count'} > $user_data_href->{'num_images'})
+	{
+		Linux::DVB::DVBT::TS::parse_stop($tsreader) ;
+	}
+}
+
+
+
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+=head1 NAME
+
+dvbt-ts-pics - Extract images from transport stream file
+
+=head1 SYNOPSIS
+
+dvbt-ts-pics [options] filename
+
+Options:
+
+       -debug level         set debug level
+       -verbose level       set verbosity level
+       -help                brief help message
+       -man                 full documentation
+       -out <path>          Specify images result directory
+       -c                   Save colour images (rather than greyscale)
+       -n <num>             Save <num> images (rather than just 1)
+       -start <frame>       Specify the first frame number to save
+       
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Set verbosity level. Higher values show more information.
+
+=item B<-debug>
+
+Set debug level. Higher levels show more debugging information (only really of any interest to developers!)
+
+=back
+
+=head1 DESCRIPTION
+
+Script that uses the perl Linux::DVB::DVBT::TS package to provide transport stream video file functions.
+ 
+Parses the transport stream file, saving one (or more) video images in PPM file format.
+
+
+=head1 FURTHER DETAILS
+
+For full details of the DVBT functions, please see L<Linux::DVB::DVBT::TS>:
+
+   perldoc Linux::DVB::DVBT::TS
+ 
+=cut
+
+	

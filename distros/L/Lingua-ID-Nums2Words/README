@@ -1,0 +1,18 @@
+SYNOPSIS
+
+     use Lingua::ID::Nums2Words qw(nums2words nums2words_simple);
+    
+     print nums2words(123);        # seratus dua puluh tiga
+     print nums2words_simple(123); # satu dua tiga
+
+DESCRIPTION
+
+    This module provides two functions, nums2words and nums2words_simple,
+    to convert number to Indonesian verbage. Popular Indonesian term for
+    this kind of library is "terbilang", or roughly "spelled amount" in
+    English.
+
+SEE ALSO
+
+    Lingua::ID::Words2Nums
+

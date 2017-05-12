@@ -1,0 +1,12 @@
+#!perl -T
+use Test::More;
+use Test::Exception;
+use ok( 'Locale::CLDR' );
+my $locale;
+
+diag( "Testing Locale::CLDR v0.29.0, Perl 5.018002, D:\strawberry\perl\bin\perl.exe" );
+use ok Locale::CLDR::Locales::Ug, 'Can use locale file Locale::CLDR::Locales::Ug';
+use ok Locale::CLDR::Locales::Ug::Any::Cn, 'Can use locale file Locale::CLDR::Locales::Ug::Any::Cn';
+use ok Locale::CLDR::Locales::Ug::Any, 'Can use locale file Locale::CLDR::Locales::Ug::Any';
+
+done_testing();

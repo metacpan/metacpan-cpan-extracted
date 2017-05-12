@@ -1,0 +1,49 @@
+NAME
+
+    Lexical::Util - utilities for lexical item manipulation
+
+VERSION
+
+    0.7
+
+SYNOPSIS
+
+    use Lexical::Util qw(frame_to_cvref lexalias ref_to_lexical);
+
+    $cvref = frame_to_cvref($level);
+    lexalias($cvref, '$name', \$variable);
+    $ref = ref_to_lexical($cvref, '$name');
+
+DESCRIPTION
+
+    Lexical::Util is a module containing some common routines used by
+    modules dealing with the lexical variables of routines other than
+    their own. They are taken from various sources, including PadWalker,
+    Perl6::Binding, and Lexical::Alias. This module is used in version
+    0.7 and greater of Perl6::Binding, as well as in the
+    Object::Variables and Sub::Declaration packages, to prevent
+    duplication of code.
+
+    This package should not be needed or used by end users.
+
+    Note: this module uses the CvPADLIST and CvDEPTH macros, which are
+    listed in perlintern and not part of the perl API. They work in the
+    versions I've been able to test on (5.6.1 and 5.8.4), but may change
+    in the future. To avoid possible problems, this module tests to see
+    that the Perl version is less than 5.9.0.
+
+INSTALLATION
+
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+COPYRIGHT AND LICENCE
+
+    Copyright 2004 Kevin Michael Vail
+
+    This program is free software. It may be copied and/or redistributed
+    under the same terms as Perl itself.

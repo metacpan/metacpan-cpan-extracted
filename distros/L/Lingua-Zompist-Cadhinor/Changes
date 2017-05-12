@@ -1,0 +1,34 @@
+Revision history for Perl extension Lingua::Zompist::Cadhinor.
+
+0.92 2002-05-20
+	- Forgot to update Changes & README for version 0.91.
+	No changes to code or tests in this version.
+
+0.91 2002-05-20
+	- Added TAS, MUKH, CAI, ZA to the forms recognised by
+	noun()
+	- Added dynamic imperatives (which do not trigger sound
+	changes)
+	- Correctly treat imperatives of verbs which have a
+	separate remote stem
+
+0.90 2002-05-19
+	- minor documentation nits. No changes to code or tests.
+
+0.04 2001-11-15
+	- minor documentation nits. No changes to code or tests.
+
+0.03 2001-11-14
+	- fixed -ER and -IR conjugations (the endings had become
+	interchanged in a couple of cases)
+	- tests with the new paradigmatic verbs: since LIUBEC, LAUDAN,
+	LEILEN, and NURIR are irregular, they were a poor choice. Mark
+	fixed that and I followed suit in my tests. (Actually, truth be
+	told, he only fixed three of those; I persuaded him to trade
+	LIUBEC for DUMEC.)
+
+0.02 2001-10-28
+        - minor documentation fix (three functions had been left undocumented)
+
+0.01 2001-10-27
+	- original version; copied from Lingua::Zompist::Verdurian

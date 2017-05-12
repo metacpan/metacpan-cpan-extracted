@@ -1,0 +1,15 @@
+{
+    "files"    : [
+        "app.json",
+        "site/style.css"
+    ],
+    "folders"  : [
+        "templates/content/organic",
+        "templates/content/store"
+    ],
+    "uploads"  : [
+        "site/images"
+    ],
+    "password" : "foo",
+    "salt"     : "something-random"
+}

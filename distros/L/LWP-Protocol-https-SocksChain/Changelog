@@ -1,0 +1,24 @@
+
+1.8
+	cleanup LWP::Debug ( Bug fixed: 51786 )
+
+1.7
+	Cleanup for LWP::Debug::trace
+
+1.6
+	Added client certificate support ( thanks Andrew Deryabin )
+
+1.5
+	Support IO::Socket::SSL > 0.97
+
+1.4
+	Fix deprecursion bug
+
+1.3
+	Fix KeepAlive connection support
+
+	Fix global redefinition $^W
+
+1.2
+	Change POD documentation
+

@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.41.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 743393921e1475c38d2dc6fa830b6fd2199d93e9 AUTHORS
+SHA1 871a502aeed0c334b7639614dda251ea1095cb20 Changes
+SHA1 b6ce571f315531f7f270bceaf43546568871ca64 MANIFEST
+SHA1 b8ccd318eac53261bc76bdadbc68e8b6d58a262f MANIFEST.SKIP
+SHA1 b45911cb47fc4ec57bac9acd3505de09d4d37825 META.yml
+SHA1 309965a38bc4eb303097e7c17c45deb70d886a19 Makefile.PL
+SHA1 fe9729d764fd7aca9d861fa408284dd7133a2050 README
+SHA1 4a245258c3f6df9f0b63731d2a5331c925b99e99 TaBE.xs
+SHA1 9479cd21d9b22cae1dd989e88310563a02fe039a inc/Module/Install.pm
+SHA1 726a6420b06d98e409bc105cc22f632855bbe3ed inc/Module/Install/Base.pm
+SHA1 1ae0b64895f73745680a2c2950053f64ccc116cc inc/Module/Install/Can.pm
+SHA1 4a14ef5459b12494099913bcadf0f5be446f4491 inc/Module/Install/Compiler.pm
+SHA1 d097dedadac0edcafbee3a14c262e24089f5795e inc/Module/Install/Fetch.pm
+SHA1 9dc6e65553c7e70f57287ecbf2e072611bf2b27f inc/Module/Install/Makefile.pm
+SHA1 7b45ddc2699f9d248a6a3c0e873f16d48f732878 inc/Module/Install/Metadata.pm
+SHA1 8ee248d67d4c61a4f01e6a96c41afbd93be4c9ef inc/Module/Install/Win32.pm
+SHA1 3c099dd7fb73a49bcc489b152c3ca3c7a1b36427 inc/Module/Install/WriteAll.pm
+SHA1 d60bbb16da52f4ad02b4cf1aed70c772a2537a59 lib/Lingua/ZH/TaBE.pm
+SHA1 b8b76e40ef700b2dec432593c3883b0c11636aff ppport.h
+SHA1 7d01be3f755bf669db851e6dd0c8b8086dbe9a9d t/1-basic.t
+SHA1 bafcc73082e998e2b53fc44c181e4f78ec27fdfa typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (FreeBSD)
+
+iD8DBQFDtjU3tLPdNzw1AaARAizaAJ9O0iOoPQgcmEg9OFhgydBm0r/UmwCfQOv0
+FgOwjy1Qz4nWpN71iflQXNA=
+=iOJx
+-----END PGP SIGNATURE-----

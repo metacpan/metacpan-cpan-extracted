@@ -1,0 +1,121 @@
+=pod
+
+=head1 NAME
+
+Linux::Sysfs::Driver - sysfs drivers
+
+=head1 SYNOPSIS
+
+    my $driver = Linux::Sysfs::Driver->open('pci', 'tg3');
+
+    my @attrs   = $driver->get_attrs;
+    my @devices = $driver->get_devices;
+
+    $driver->close;
+
+=head1 DESCRIPTION
+
+Drivers are represented in sysfs under the /sys/bus/xxx/drivers (xxx being the
+bus type, such as "pci", "usb, and so on).
+
+=head1 METHODS
+
+=over
+
+=item B<open>
+
+    my $driver = Linux::Sysfs::Driver->open($bus_name, $name);
+
+Given the name of the bus, C<$bus_name>, on which to look for, this method
+locates a given driver and returns a Linux::Sysfs::Driver instance
+corresponding to the requested device or undef, if no matching driver was
+found.
+
+=item B<open_path>
+
+    my $driver = Linux::Sysfs::Driver->open_path($path);
+
+Opens driver at specific C<$path>. Returns a Linux::Sysfs::Driver instance on
+success or undef on failure.
+
+=item B<close>
+
+    $driver->close;
+
+Closes and cleans up C<$driver>.
+
+=item B<get_attr>
+
+=item B<get_attribute>
+
+    my $attr = $driver->get_attribute($name);
+
+Searches supplied C<$driver>'s attributes by C<$name> and returns the
+corresponding Linux::Sysfs::Attribute instance or undef, of no matching
+attribute was found.
+
+=item B<get_attrs>
+
+=item B<get_attributes>
+
+    my @attrs = $driver->get_attributes;
+
+Takes a C<$driver> and returns a list of Linux::Sysfs::Attribute instances for
+the driver.
+
+=item B<get_devices>
+
+    my @devices = $driver->get_devices;
+
+Returns a list of Linux::Sysfs::Device instances that use this C<$driver>.
+
+=item B<get_module>
+
+    my $module = $driver->get_module;
+
+Returns the module that the C<$driver> is using.
+
+=item B<name>
+
+    my $name = $driver->name;
+
+Returns the C<$driver>'s name.
+
+=item B<path>
+
+    my $path = $driver->path;
+
+Returns the C<$driver>'s full path in sysfs.
+
+=item B<bus>
+
+    my $bus_name = $driver->bus;
+
+Returns the name of the bus on which the C<$device> is registered.
+
+=back
+
+=head1 AUTHOR
+
+Florian Ragwitz E<lt>rafl@debian.orgE<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Florian Ragwitz, all rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Library General Public License as published
+by the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307
+USA.
+
+=cut

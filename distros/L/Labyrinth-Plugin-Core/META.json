@@ -1,0 +1,124 @@
+{
+    "name": "Labyrinth-Plugin-Core",
+    "version": "5.19",
+    "abstract": "Labyrinth Website Management Framework Core Plugins",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "web",
+        "cgi",
+        "framework"
+    ],
+
+    "prereqs" : {
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Clone": "0",
+                "Config::IniFiles": "0",
+                "Data::Pageset": "0",
+                "Digest::MD5": "0",
+                "File::Copy": "0",
+                "File::Basename": "0",
+                "Image::Size": "0",
+                "Labyrinth": "5.27",
+                "Time::Local": "0",
+                "URI::Escape": "0"
+            }
+        }
+    },
+
+    "provides": {
+        "Labyrinth::Plugin::Articles": {
+            "file": "lib/Labyrinth/Plugin/Articles.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::Articles::Sections": {
+            "file": "lib/Labyrinth/Plugin/Articles/Sections.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::Articles::Site": {
+            "file": "lib/Labyrinth/plugin/Articles/Site.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::Content": {
+            "file": "lib/Labyrinth/Plugin/Content.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::Core": {
+            "file": "lib/Labyrinth/Plugin/Core.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::Folders": {
+            "file": "lib/Labyrinth/Plugin/Folders.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::Groups": {
+            "file": "lib/Labyrinth/Plugin/Groups.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::Hits": {
+            "file": "lib/Labyrinth/Plugin/Hits.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::Images": {
+            "file": "lib/Labyrinth/Plugin/Images.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::Inbox": {
+            "file": "lib/Labyrinth/Plugin/Inbox.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::Menus": {
+            "file": "lib/Labyrinth/Plugin/Menus.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::News": {
+            "file": "lib/Labyrinth/Plugin/News.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::Users": {
+            "file": "lib/Labyrinth/Plugin/Users.pm",
+            "version": "5.19"
+        },
+        "Labyrinth::Plugin::Users::Info": {
+            "file": "lib/Labyrinth/Plugin/Users/Info.pm",
+            "version": "5.19"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Labyrinth-Plugin-Core" },
+        "repository": {
+            "url": "git://github.com/barbie/labyrinth-plugin-core.git",
+            "web": "http://github.com/barbie/labyrinth-plugin-core",
+            "type": "git"
+        }
+    }
+}

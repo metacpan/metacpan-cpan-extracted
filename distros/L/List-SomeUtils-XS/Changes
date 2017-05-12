@@ -1,0 +1,23 @@
+0.52     2016-05-06
+
+- Contains XS code changes from List::MoreUtils 0.415 ...
+- fix RT#75727 - after's XS implementation call XSRETURN(-1) when it
+  doesn't find an element (2nd patch provided by Reini Urban,
+  regression test provided by Tony Cook)
+- fix RT#113117 - XS's minmax() sometimes return undef (perl >= 5.20),
+  thanks PERLANCAR and SREZIC
+- explicit test for thesis in RT#110998 - XS implementation of pairwise
+  fails with memory allocation error when there are more return values
+  than in original lists -- thesis is proven wrong
+- efficiency improvements by bulk88
+- improve some tests to get clearer reports
+
+
+0.51     2016-02-27
+
+- Fix warnings that could occur when loading this module.
+
+
+0.50     2016-02-27
+
+- First release upon an unsuspecting world.

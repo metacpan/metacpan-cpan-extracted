@@ -1,0 +1,6 @@
+TODO list for Perl module Log::Log4perl::ConfigByInifile
+
+- Submit a parameter so that section [log4perl] can 
+  also have a different name.
+
+

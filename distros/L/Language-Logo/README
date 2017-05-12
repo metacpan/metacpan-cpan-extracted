@@ -1,0 +1,34 @@
+Language-Logo version 0.01
+==========================
+
+To install Language::Logo, please refer to the section titled "INSTALLATION".
+The documentation can be obtained with the command "perldoc Language::Logo".
+
+INSTALLATION
+
+To install Language::Logo type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Data::Dumper
+  IO::Select
+  IO::Socket
+  Sys::Hostname
+  Tk
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by John C. Norton
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

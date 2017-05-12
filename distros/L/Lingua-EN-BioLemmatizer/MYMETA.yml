@@ -1,0 +1,28 @@
+---
+abstract: "Perl interface to the University of Colorado's BioLemmatizer"
+author:
+  - 'Tom Christiansen <tchrist@perl.com>'
+build_requires:
+  Test::Exception: 0.31
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-EN-BioLemmatizer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 1.08
+  Devel::Peek: 1.03
+  Errno: 1.1
+  IPC::Open2: 1.02
+  Scalar::Util: 1.19
+version: 0.1

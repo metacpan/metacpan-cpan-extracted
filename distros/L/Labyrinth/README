@@ -1,0 +1,125 @@
+Labyrinth
+=========
+
+A Website Management Framework - extensible websites in a box.
+
+Labyrinth began life in 2002, with a small set of plugins to enable various 
+features of web site management. The core set of plugins are now available as 
+the Labyrinth-Plugin-Core package, with this Core package providing the core 
+functionality that drives the Labyrinth framework system.
+
+The intention for Labyrinth was always to make building simple websites easy.
+The idea of a "website in a box" that has subsequently been used by other
+website applications in other languages. Sadly Perl has fell way behind with 
+this, and Labyrinth ultimately still aims to provide several solutions to the
+kinds of websites people want to implement quickly, such as blogs, wikis and
+basic content sites. 
+
+The fact that Labyrinth can be extended further and build on the core structure
+for virtually any website you may want is its target audience. Labyrinth wasn't
+built for complex corporate websites, and there are many other applications and
+frameworks available if that is what you want.
+
+Labyrinth also tries to keep it simple, so that it is fairly quick to get
+going, without the need for several weeks of design. 
+
+Please note the tests for this code is very basic. If you wish to help me out
+and can add to the test suite, please feel free.
+
+INSTALLATION
+
+See the INSTALL file for full instructions.
+
+DEPENDENCIES
+
+The core Labyrinth distribution requires the following Perl modules to be 
+installed:
+
+  Archive::Extract
+  CGI
+  CGI::Cookie
+  Config::IniFiles
+  Cwd
+  Data::Dumper
+  Data::FormValidator
+  Data::FormValidator::Constraints::Upload
+  Data::FormValidator::Constraints::Words
+  Data::FormValidator::Filters::Demoroniser
+  Data::Phrasebook
+  Data::Phrasebook::Loader::Ini
+  DateTime
+  DBD::mysql
+  DBI
+  Digest::MD5
+  Encode::ZapCP1252
+  File::Basename
+  File::Copy
+  File::Path
+  File::Slurp
+  File::Spec::Functions
+  HTML::TagCloud
+  Image::Size
+  IO::File
+  JSON::XS
+  Log::LogLite
+  MIME::Lite
+  MIME::Lite::TT::HTML
+  MIME::Types
+  Module::Pluggable
+  Regexp::Assemble
+  Regexp::Common
+  Session::Token
+  Template
+  Text::Wrap
+  Time::Local
+  URI::Escape
+  WWW::Mechanize
+
+In addition the following are used within the core application for RSS support.
+However, the RSS feed is ran from a independent script and necessary for the 
+running of a website.
+
+  XML::Atom
+  XML::Atom::Feed
+  XML::Atom::Entry
+  XML::RSS
+
+Note RSS support and functionality is likely to be abstracted out to a plugin
+in the future.
+
+ADDITIONAL FILES
+
+Additional files are needed to enable Labyrinth and any installed plugins to 
+work correctly. These files consist of SQL, HTML template and configuration 
+files, together with some basic CSS and Javascript files.
+
+Please see the Labyrinth-Demo package for an example set of these files.
+
+However, these files are only the beginning, and to implement your website, 
+you will need to update the appropriate files to use your own layout design.
+
+ADDITION INFORMATION
+
+Although Labyrinth has long been in development, documentation has not been a 
+priority. As such much of the documentation you may need to understand how to 
+use Labyrinth is the code itself. If you have the inclination, documentation 
+patches would be very gratefully received.
+
+The Labyrinth website [1] will eventually feature a documentation site, wiki 
+and other features which are intended to provide you with the information to 
+use and extend Labyrinth as you wish.
+
+[1] http://labyrinth.missbarbell.co.uk
+
+AUTHOR
+
+  Barbie, <barbie@missbarbell.co.uk> for Miss Barbell Productions,
+  <http://www.missbarbell.co.uk/>
+
+COPYRIGHT & LICENSE
+
+  Copyright (C) 2002-2015 Barbie for Miss Barbell Productions
+  All Rights Reserved.
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

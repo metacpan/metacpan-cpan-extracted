@@ -1,0 +1,16 @@
+MANIFEST
+Makefile.PL
+README
+Changes
+LICENSE
+lib/Locale/Maketext/Lexicon/Getcontext.pm
+t/00-load.t
+t/10-parse.t
+t/po/off-common/en.po
+t/po/off-common/fr.po
+t/po/off-common/he.po
+t/po/off-common/ja.po
+xt/dist-check.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

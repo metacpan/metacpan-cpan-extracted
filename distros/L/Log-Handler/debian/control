@@ -1,0 +1,26 @@
+Source: liblog-handler-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 8),
+ perl
+Build-Depends-Indep: libdbi-perl,
+ libemail-date-perl,
+ libmro-compat-perl,
+ libparams-validate-perl,
+ libtest-pod-coverage-perl,
+ libtest-pod-perl
+Maintainer: Jonny Schulz <js@bloonix.de>
+Standards-Version: 3.9.3
+Homepage: http://www.bloonix.de/
+
+Package: liblog-handler-perl
+Architecture: all
+Depends: ${perl:Depends},
+ liblog-handler-perl
+Suggests: libconfig-general-perl,
+ libdbi-perl,
+ libemail-date-perl,
+ libmro-compat-perl,
+ libyaml-perl
+Description: Log messages to several outputs.
+ Log::Handler is an easy-to-use Perl module for logging, debugging, and tracing.

@@ -1,0 +1,318 @@
+Revision history for Perl extension Locale::Maketext::Utils.
+
+0.42  Fri Apr 15 09:40:53 2016
+    - numf() return 0 on undef from CLDR
+    - add i_ tags to get_asset (since they can't be had from the Locales obj)
+    - TODO w/ output,url typing
+    - lextext() should return the phrase itself if not found in the lexicon
+    - rt 109027: Update 4 tests to work w/ DateTime::Locale v1.01
+
+0.41  Wed Jan 15 09:15:05 2014
+    - Add missing dep in 0.40 test
+
+0.40  Mon Jan 13 10:37:52 2014
+    - fix phrase-syntax check's number-of-args bug:
+      add g flag to arg count argument builder regexp in order to get
+       an array with enough items to fit with the BN count
+       (manifested by uninitialized value warnings in some circumstances)
+    - add amp() to embedded method list
+
+0.39  Sat Dec 28 15:22:33 2013
+    - bump 0.38 prereq to ensure consistent behavior (1fff2ef8-6eac-11e3-91a4-85750ba9aafd)
+
+0.38  Thu Dec 26 17:40:06 2013
+    - improve punycode logic
+    - improve makethis_base() semantics
+    - POD create_method
+    - POD explaining internal mock object
+    - add list_and_quoted() and list_or_quoted() BN methods
+
+0.37  Mon Nov 18 21:50:34 2013
+    - change makevar glob from \* to \& due to binary issues
+    - Handle output,url-with-trailing-var ambiguity
+    - Add href to ignore attribute list of output,url
+    - HTML5-ify output,acronym: bootstrap style
+    - make L::M::_langtag_munging() CLDR aware by overriding buggy I18N::LangTags panic
+    - make set_context() return context (like other context methods)
+        - add empty RV support to all set_context methods
+        - more context tests
+    - rt 79490 - Make context detection smarter via Web::Detect
+    - filter spiff ups:
+        - added pod to begin/end checks suggesting [comment]/[asis] as a possible solution
+        - bare vars:
+            - allow for beginning quoted value: “[_1]” is blah blah blah.
+            - allow for bare-var’s
+            - kill needless uninit value warnings
+            - do not consider BV at the beginning or end of a parenthesized chunk of text to be bare
+            - consider BV immediately next to alphanumeric to be bare var still
+            - title case fix && end not extra
+    - support emb methods in output URL link text
+        - add url emb to display text that does not come from html or plain keys
+    - rt 85588 - makevar() should also, alternatively, accept an array ref (i.e. for easier use in TT)
+    - rt 76706 - silence test warnings from way deep down
+    - rt 79727 - use more readily installable punycode module
+    - update min req versions of Locale::Maketext and Locales to latest
+    - ???
+
+0.36  Mon Aug 13 12:28:55 2012
+    - rt 78889 - add blurb about source/target phrases to new_source()/new_target() POD
+    - Update MarkPhrase POD to reference lextext() instead of the deprecated text()
+    - Add makevar() method
+    - Alias makevar() correctly
+    - new() to new_source() in tests
+    - Promote Escapes, BeginUpper, and Consider’s bare-variable check to default filters.
+    - Improve Filters’ “Normalization” and “Rationale” POD sections. (includes rt 78749 and rt 80066)
+    - Utils.pm subset of rt 81300 and comment fixups
+    - Make BeginUpper filter a warning
+    - Make Ellipsis filter a warning
+    - rt 81243: expand medial ellipsis check to handle being at the beginning or end of a parenthesized chunk of text
+    - rt 81243 (sort of): allow punctuation after trailing ellipsis
+    
+0.35  Thu Aug  9 15:30:52 2012
+    - rt 78871 - rename normalizing object constructors
+    - rt 78748 - ellipsis typo
+    - rt 78603 - handle undef value to normalize()
+    - rt 78073 - POD typo
+    - rt 78870 - rename lexicon lookup method for less ambiguity
+    
+0.34  Mon Jun 25 20:12:28 2012
+    - rt 78036: silence uninit warnings during normalize()
+    - rt 78032: minor output,url tweaks
+    - rt 77669: typo
+    - rt 77923: translation normalization, cPanel legacy normalization (including the translation variation) 
+
+0.33  Fri Jun  1 11:12:31 2012
+    - Add 0.32 output()s to 'meth' type in Phrase.pm
+    
+0.32  Thu May 31 17:32:19 2012
+    - rt 77527: add Test::Warn as a dependency
+    - Added output() amp, lt, gt, apos, quot, shy
+    - Added L::M::U::MarkPhrase::translatable()
+        - Updated rt 77538 to look for that
+        
+0.31  Thu Apr 26 15:57:43 2012
+    - rt 76607: POD typo
+    - rt 76778: Support format_for() in datetime()
+    - Add initial Locale::Maketext::Utils::Phrase phrase-object-precursor functions
+        - t/*.phrase_object_precursor_functions.t
+    - Use those functions to improve the Consider filter (t/07.phrase_norm.t && t/08.cpanel_norm.t still pass)
+    - Added overlooked t/pod.t
+    - Added _TILDE_ placeholder.
+
+0.30  Mon Apr 16 10:43:23 2012
+    - rt 76601: 'Has one check that falls under "extra filters" currently.' should be under 'Consider' not 'Compiles'
+
+0.29  Fri Apr 13 14:11:56 2012
+    - rt 76507: Make “multiple invalid initial, medial, or final ellipsis” modifications more useful
+
+0.28  Wed Apr 11 08:52:46 2012
+    - have default for Norm.pm's maketext_object be a mock obj (class is problematic per code comment)
+        - change get_maketext_object_or_package() to get_maketext_object
+    - Add Locale::Maketext::Utils::Mock
+    - rt 76491:POD: remove sentence erroneously left in place in 0.27 update
+    - spiff up 'Ellipsis' to account for i.e., e.g., && bracket notation w/ concurrent ,, to denote empty string
+    - fix WS regex
+
+0.27  Mon Apr  9 13:20:29 2012
+    - rt 76332: non-bytes string (non-perl) U notation check fix
+    - rt 76360: Add a filter for phrase compiles OK
+    - Add 'run_extra_filters' to object
+        - 'run_extra_filters'-ify EndPunc, BeginUpper, Escape, and "Bare Variable" in Consider
+
+0.26  Thu Mar 29 12:40:23 2012
+    - Add cPanel normalization "recipe": Locale::Maketext::Utils::Phrase::cPanel
+    - fix POD in …::Norm::Markup …::Norm::EndPunc
+    - rt 76146: add filter for escapes
+    
+0.25  Thu Mar 22 12:39:55 2012
+    - adjust output,url regex in 'Consider' filter to capture the first arg instead of all args for the example
+    
+0.24  Thu Mar 22 09:29:55 2012
+    - rt 75979: Do not use /p so that it will work on perls older than 5.10
+    - rt 75919: POD normalize_maketext_string() spiff ups
+
+0.23  Fri Mar 16 11:32:43 2012
+    - fix clipped get_asset() POD example
+    - fix various POD spelling/verbiage issues
+    - rt 75739: Code moment in Locale/Maketext/Utils.pm: it's to its
+    - rt 75737: POD better sentence in Locale::Maketext::Utils::Phrase::Norm
+    - comment out special chr output_ENT tags until approved && POD/test can be sprinted along w/ them
+    - call both object's cache flushing methods by the same name
+    - change output_segment, output_fragment to output_block and output_inline respectively
+    - Added TODO data to POD for BeginUpper and EndPunc filters
+    - Added tests to ensure that EndPunc … in character class is caught
+
+0.22  Sun Mar 11 23:07:00 2012
+    - rt 75651 Add “=encoding utf-8” to POD of Locale::Maketext::Utils::Phrase::Norm
+    - document quant() max decimal place
+    - add _* support to embedded arg check in _compile()
+    - updated required Locale::Maketext and Locales.pm version to the latest
+    - Added t/07.phrase_norm.t from 0.21 to the manifest and thus the tarball
+
+0.21  Fri Mar  2 11:31:57 2012
+    - only do embedded methods when the string is defined and has a ( in it
+    - added output_segment, output_fragment, and output_img
+    - Added get_asset(), get_asset_file(), and get_asset_dir()
+    - used 'cache' key for, well, caching data. Added flush_cache() to enable working w/ it
+    - Allow embedded args in output,url’s 'html' and 'plain' values
+    - Added numf() to list of embeddable methods
+    - add &shy; for chr(173) in html context so its visible
+    - Initial Locale::Maketext::Utils::Phrase::Norm and company
+    - Put conceptual L::M::U::Phrase::Core in tarball–not tested, may change drastically or go away completely
+    - added "arbitrary attributes" to appropriate output methods: 
+        e.g. key,value,pairs,that,add,clarity,to,phrase[,_N] 
+            - where _N is a hashref of key/value pairs important to the caller but essentially irrelevant to the meaning
+    - rt 74127: Change a test to use like() to (hopefully) pass on the oddball machine and if not have more useful output
+    - rt 74125: POD typo
+    - rt 74126: removed note-to-self left in Changelog for 0.20 
+    - rt 74603: Pass max decimal length to quant() used in format_bytes()
+    - rt 74604: Add max decimal length to format_bytes
+    - rt 74337: handle '' arg, fix datetime() POD, added current_year()
+    - perltidy all
+
+0.20  Thu Jan 12 23:32:03 CST 2012
+    - Removed $Onesided
+    - add 'use_external_lex_cache' support
+    - finally moved datetime() to CLDR
+    - removed needless import of L::M
+    - $Encoding to alias creation
+    - commented out strict/warnings for production at request of sponsor
+    - remove use of glob(), unadvertised maketext() that provided range support, _maketext() that implemented _external_lex_cache
+    - support array ref in join() and list()
+    - deprecate list()
+    - support embedded args in boolean(), output_class(), output_underline(), output_strong(), output_em()
+    - support embedded methods in output() method calls
+    - improve output_chr(), output_url(), format_bytes()
+    - fix dep
+    - Update CPAN version w/ new methods (and tests and POD) that have been in production outside of CPAN for a while.
+    - the methods include:
+        - get_language_tag_name()
+        - get_html_dir_attr()
+        - get_locale_display_pattern()
+        - get_language_tag_character_orientation()
+        - text()
+        - comment() - rt 54102
+        - is_future()
+        - is_defined()
+        - output_encode_puny()
+        - output_decode_puny()
+        - output_asis_for_tests()
+        - output_attr()
+        - output_abbr()
+        - output_acronym()
+        - output_sup()
+        - output_sub()
+        - get_locales_obj(), 
+        - makethis()
+        - makethis_base()
+        - output_nbsp()
+        - asis(), output_asis()
+       
+        - set_context(), set_context_html(), set_context_ansi(), set_context_plain()
+        - context_is(), context_is_html(), context_is_ansi(), context_is_plain()
+        - get_context()
+        - maketext_html_context(), maketext_ansi_context(), maketext_plain_context()
+        
+        - list_and(), list_or(), quant(), numerate(), numf()  - rt 69270
+
+0.19  Mon May 24 23:11:15  2010
+    - add updated Locales useage
+
+0.18  Tue Sep 15 21:40:54 2009
+    - updated datetime() tests to take into account DateTime::Locale rt 49724
+    - update # of tie hash tests to avoid spurious failure
+    - added [output, chr, ...]
+    - added [output, class, ...]
+
+0.17  Tue Jun  9 10:24:54 2009
+    - $Onesided-ness respect 'use_external_lex_cache'
+    - 'add_lex_hash_silent_if_already_added' boolean
+
+0.16  Mon Jun  8 10:08:03 2009
+    - move all no()s outside of loops
+    - add support for use_external_lex_cache (see Locale::Maketext's https://rt.cpan.org/Ticket/Display.html?id=46738 )
+    - change test's BAILOUT to SKIP to avoid false failures
+    
+0.15  Wed Jun  3 16:01:29 2009
+    - Dropped need for Locale::Maketext::Pseudo
+    - removed env_ functions (use Locale::Maketext::Pseudo explicitly if you want them)
+      - note: exporting was broken so they were always called w/ full NS if they were used, should facilitate fast search/replace resolution of code using it.
+              if you used these functions you will need to:
+                 a) make sure you $script uses Locale::Maketext::Pseudo
+                 b) perl -pi -e 's/Locale::Maketext::Utils::env_/Locale::Maketext::Pseudo::env_/g' $script
+
+0.14  Tue May 19 23:11:55 2009
+    - Makefile.PL PREREQ_PM Locales::Base 0.03 and removed version.pm
+    - make_alias() base to @ISA and also include aliasing %Lexicon, $VERSION, $Onesided
+    - fixed scoping of a test that caused issues in later tests on some systems
+    - added notes in POD about Locales::Language 0.03
+    - Address eval {} setting $! spuriously-for-our-purposes
+    
+0.13  Sat May 16 20:21:57 2009
+    - drop 'use version'
+    - 'use base' to @ISA
+    - POD to .pod file
+    - removed undocumented, experimental, and ultimately a bad idea AUTOLOAD tag behavior
+    - get_handle() is now an argument based singleton
+    - POD removed items from TODO that were done in this version (noted below)
+    - $Onesided will now be lookup-on-demand-lexicon safe (part of the todo 'Specific support of lexicon management w/ non-hash based lexicons')
+    - added bracket notation methods
+        boolean()
+        output() - (part of the todo 'possibly some formatters (would need to associate an output object of some kind though...)')
+    - added utility methods:
+        get_language_class()        
+        add_lexicon_override_hash() - "Tie::Hash::ReadonlyStack compat Lexicon only" (part of the todo 'Specific support of lexicon management w/ non-hash based lexicons')
+        add_lexcion_fallback_hash() - "Tie::Hash::ReadonlyStack compat Lexicon only" (part of the todo 'Specific support of lexicon management w/ non-hash based lexicons')
+        del_lexicon_hash()          - "Tie::Hash::ReadonlyStack compat Lexicon only" (part of the todo 'Specific support of lexicon management w/ non-hash based lexicons')
+        get_base_class_dir()     - "Standard .pm layout only" (part of the todo 'Better drop in modular lexicon support/documentation')
+        list_available_locales() - "Standard .pm layout only" (part of the todo 'Better drop in modular lexicon support/documentation')
+    - POD 'Tie::Hash::ReadonlyStack compat Lexicon' (part of the todo 'Specific support of lexicon management w/ non-hash based lexicons')
+    - POD "Standard" .pm layout (part of the todo 'Better drop in modular lexicon support/documentation')
+    - added "native" name lookup hash to lang_names_hashref() in array context
+
+0.0.12
+    - -DateTime key (and the idea of special keys.. yuck!) dropped, should be bracket method
+    - add example range support (hopefully will be core to avoid the mis-lookup issue) - See rt 37955
+    - numf w/ decimal truncation support (hopefully will be core eventually) - See rt 36136
+    - add datetime(), join(), list(), format_bytes(), convert()
+
+0.0.11  Fri Jul 25 19:19:24 2008
+    - make tests work with variations of Locales::Base
+
+0.0.10  Thu Jul 23 10:33:47 2008
+    - fix makefile entry
+    
+0.0.9  Tue Oct 16 22:47:04 2007
+	- make test case insensitiive in case that ever changes
+	- more sensible -DateTime format (why have SQL datetime when we want language!)
+	
+0.0.8  Sat Oct 13 14:13:37 2007
+    - Minor POD fixup
+    - '-DateTime' key to all %Lexicons's
+
+0.0.7  Sun Mar  4 19:50:57 2007
+	- added env_* functions
+    - changed get() and say() '||' logic to ternaries
+	- added $ENV{'maketext_obj'} support
+	
+0.0.6  Wed Nov  8 23:08:18 2006
+	- Added say(), get(), and AUTOLOAD(). Made $Onesided hashes retain the value of keys whose value is not ''
+	
+0.0.5  Wed Sep 14 11:33:57 2006
+    - re bundled without Mac's ._ files in the tarball
+
+0.0.4 Fri Jul 28 18:44:12 2006
+	- added $Onesided
+	- added make_alias
+
+0.0.3 Fri Jul  7 16:04:40 2006
+	- Fixed up POD
+	- added [loadable_]lang_names_hashref()
+	
+0.0.2  Wed Jul  5 22:29:50 2006
+	- added $Encoding support
+	
+0.0.1  Tue Jul  4 18:14:34 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Locale::Maketext::Utils
+

@@ -1,0 +1,19 @@
+Changes
+lib/LJ/Schedule.pm
+lib/LJ/Schedule/Post.pm
+lib/LJ/Schedule/Post/Simple.pm
+lib/LJ/Schedule/Vcal.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/01schedule.t
+t/02vcal.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/test1.ini
+t/test2.vcal
+t/test2.vcal.dst
+t/test2.vcal.ics

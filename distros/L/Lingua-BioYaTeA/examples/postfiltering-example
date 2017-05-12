@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use File::Basename;
+use Lingua::BioYaTeA::PostProcessing;
+
+my $man = 0;
+my $help = 0;
+
+my %options;
+my $log;
+
+# &GetOptions(\%options, 
+# 	    "help|?|h", 
+# 	    "man|m", 
+# 	    "configuration|c=s", 
+# 	    "input-file|i=s", 
+# 	    "output-file|o=s") 
+#     or pod2usage(2);
+
+# unless (&GetOptions(\%options,"help", "man", "configuration=s")	
+# 	&& (scalar @ARGV == 2)
+# 	&& (defined $options{'configuration'})
+# 	&& (!defined $options{'help'})
+# 	&& (!defined $options{'h'})
+# 	&& (!defined $options{'man'})
+# 	&& (!defined $options{'m'})
+# 	) {
+#     pod2usage(1);
+# }
+
+# pod2usage(-exitstatus => 0, -verbose => 2) if $options{'man'};
+# pod2usage(1) if ($options{'help'} or (!$options{'input-file'} or !$options{'output-file'} or (!$options{'configuration'})));
+
+
+$options{'input-file'} = "sampleBio1-output.xml";
+$options{'output-file'} = "sampleBio1-bioyatea-out-pp.xml";
+$options{'configuration'} = "post-processing-filtering.conf";
+
+
+my $postProc = Lingua::BioYaTeA::PostProcessing->new(\%options);
+
+my ($second,$minute,$hour,$day,$month,$year,$weekday,$yearday,$isdailysavingtime) = localtime(time);
+$year += 1900;
+
+$postProc->logfile(dirname($postProc->output_file) . '/term-filtering-tmp-' . "date-$year-$month-${day}_${hour}_$minute" . '.log');
+$postProc->_printOptions(\*stderr);
+$postProc->load_configuration;
+$postProc->defineTwigParser;
+$postProc->filtering;
+$postProc->printResume;
+$postProc->rmlog;
+

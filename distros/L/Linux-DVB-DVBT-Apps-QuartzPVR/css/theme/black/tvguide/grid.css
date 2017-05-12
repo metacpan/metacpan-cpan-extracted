@@ -1,0 +1,270 @@
+/*
+
+
+Background Images:
+
+Channel name background : 	lschn.png
+
+normal program : 			lsgrd.png
+recorded program : 			lsgrd-rec.png
+
+timebar : 					lstbb.png
+
+*/
+
+/**********************************************************/
+
+#quartz-content div div {
+  background:#000;
+}
+
+/** Sets the main program text colour **/
+a {
+  color:#00D5FB;
+}
+
+#quartz-content .listings .ft,
+#quartz-content .listings .hd,
+#quartz-content h1,
+#quartz-content h2 {
+  color:#474747;
+}
+
+#quartz-content h2 a,
+#quartz-content h2 span {
+  /* channel name colour AND title */
+  color:#F2FD00;
+}
+
+#qtv-listings .hd h1,
+#qtv-listings .hd h2 {
+  color:#000;
+}
+
+#qtv-listings h1 a:focus {
+  color:#474747;
+}
+
+#qtv-listings h1 .channel,
+#qtv-listings h1 .sched {
+  color:#474747;
+}
+
+/* Channel name */
+#qtv-listings .grid h2 {
+  background:#000 url(../images/lschn.png) repeat-x top center;
+}
+
+#qtv-listings .grid .channel ol,
+#qtv-listings .grid .sched ol {
+  background:#000;
+}
+
+#qtv-listings .grid .none {
+  background:#000 ;
+}
+
+/* normal program */
+#qtv-listings .grid li {
+  background:#000 url(../images/lsgrd.png) repeat-x top center;
+}
+
+/* recorded program */
+#qtv-listings .grid li .record {
+  background:#000 url(../images/lsgrd-rec.png) repeat-x top center;
+}
+
+#qtv-listings .grid li .multirec {
+  background:#000 url(../images/lsgrd-mrec.png) repeat-x top center;
+}
+
+#qtv-listings .grid li .iplay {
+  background:#000 url(../images/lsgrd-iplay.png) repeat-x top center;
+}
+
+#qtv-listings .grid li .overlap {
+  background:#FFFF00 ;
+}
+
+#qtv-listings .grid li a {
+  border:1px solid #000;
+}
+
+#qtv-listings .grid li a:focus,
+#qtv-listings .grid li a:hover {
+  background-color:#000;
+  border-top:1px solid #fff;
+  border-bottom:1px solid #fff;
+}
+
+#qtv-listings .grid li a.record:focus,
+#qtv-listings .grid li a.record:hover {
+  background:#000;
+  border:1px solid #f00;
+}
+
+#qtv-listings .grid li a.multirec:focus,
+#qtv-listings .grid li a.multirec:hover {
+  background:#000;
+  border:1px solid yellow;
+}
+
+
+/* don't "select" padding */
+#qtv-listings .grid li a.pad:focus,
+#qtv-listings .grid li a.pad:hover {
+  background:#000 url(../images/lsgrd.png) repeat-x top center;
+}
+
+
+/*-------------------------------------------------------------*/
+/* Timebar */
+
+#qtv-listings .time li {
+  color:#fff;
+  background:#000 ;
+  border-right:1px solid #fff;
+}
+
+#qtv-listings .time ol li.first {
+  border-left:1px solid #fff;
+}
+
+
+#qtv-listings .grid .time a:focus,
+#qtv-listings .grid .time a:hover,
+#qtv-listings .grid .timesel a:focus,
+#qtv-listings .grid .timesel a:hover {
+  background:none;
+}
+
+#qtv-listings .grid .time a,
+#qtv-listings .grid .time li span {
+  color:#eee;
+}
+
+#qtv-listings .grid .timesel a,
+#qtv-listings .grid .timesel li span {
+  color:#eee;
+}
+
+
+#qtv-listings .timesel li {
+  color:#fff;
+  background:#000 ;
+}
+
+/* Schedule */
+#qtv-listings .grid div.sched ol li h2 {
+  color: #F2FD00;
+}
+
+
+/* Day select */
+#qtv-listings .timesel li.day {
+  background:#000 ;
+  border: 0;
+  border: 1px solid #fff;
+  background:#000 url(../images/lstbb.png) repeat-x top center;
+}
+
+#qtv-listings .grid .timesel li .daysel {
+  background:#fff ;
+  border: 1px solid #fff;
+}
+
+#qtv-listings .grid .timesel li .daysel span {
+	color: #000 ;
+}
+
+/* Hour select */
+#qtv-listings .timesel li.hour {
+  background:#000 ;
+  border: 0;
+  border: 1px solid #fff;
+  background:#000 url(../images/lstbb.png) repeat-x top center;
+}
+
+#qtv-listings .grid .timesel li .hoursel {
+  background:#fff ;
+  border: 1px solid #fff;
+}
+
+#qtv-listings .grid .timesel li .hoursel span {
+	color: #000 ;
+}
+
+/* am/pm */
+#qtv-listings .timesel ol li h4 {
+	border-bottom: 1px solid #fff ;
+}
+
+
+/*--------------------------*/
+/* Select program recording */
+
+/* Record: Current setting */
+
+/* Record: Tabbed menu of different types of recording */
+.popupContent ul.recprog li ul.rectype {
+    border-bottom: 1px solid white ;
+}
+
+.popupContent ul.recprog li ul.rectype li.recopt {
+    border: 1px solid white ;
+    color: black ;
+    background: white ;
+}
+
+/* selected tab */
+.popupContent ul.recprog li ul.rectype li.sel {
+    border-bottom: 1px solid black ;
+    color: white ;
+    background: black ;
+}
+
+
+
+/* Record: List of options */
+
+.popupContent ul.recprog li ul.recsel li.sel {
+    background: #000055 ;
+}
+
+.popupContent ul.recprog li ul.recsel li.recradio:hover {
+    background: #009999 ;
+}
+
+
+
+
+/*-----------------------------------*/
+/* Select program recording priority */ 
+.popupContent ul.priprog:hover {
+	border-top: 1px solid white ;
+}
+
+.popupContent ul.priprog li:hover > ul {
+    /* display: block; - change to use javascript */
+    color: white ;
+    
+	border-top: 1px solid white ;
+}
+
+/* Priority: Current setting */
+
+/* Priority: List of options */
+.popupContent ul.priprog li ul li.priradio {
+    background: #000022 ;
+    border-bottom: 1px solid #cccccc ;
+}
+
+.popupContent ul.priprog li ul li.sel {
+    background: #000055 ;
+}
+
+.popupContent ul.priprog li ul li.priradio:hover {
+    background: #009999 ;
+}
+
+

@@ -1,0 +1,78 @@
+NAME
+    Lingua::ZH::Romanize::Pinyin - Romanization of Standard Chinese language
+
+SYNOPSIS
+        use Lingua::ZH::Romanize::Pinyin;
+
+        my $conv = Lingua::ZH::Romanize::Pinyin->new();
+        my $roman = $conv->char( $hanji );
+        printf( "<ruby><rb>%s</rb><rt>%s</rt></ruby>", $hanji, $roman );
+
+        my @array = $conv->string( $string );
+        foreach my $pair ( @array ) {
+            my( $raw, $ruby ) = @$pair;
+            if ( defined $ruby ) {
+                printf( "<ruby><rb>%s</rb><rt>%s</rt></ruby>", $raw, $ruby );
+            } else {
+                print $raw;
+            }
+        }
+
+DESCRIPTION
+    Pinyin is a phonemic notation for Chinese characters.
+
+  $conv = Lingua::ZH::Romanize::Pinyin->new();
+    This constructer methods returns a new object with its dictionary
+    cached.
+
+  $roman = $conv->char( $hanji );
+    This method returns romanized letters of a Hanji character. It returns
+    undef when $hanji is not a valid Hanji character. The argument's
+    encoding must be UTF-8. Both of Simplified Chinese and Traditional
+    Chinese are allowed.
+
+  $roman = $conv->chars( $string );
+    This method returns romanized letters of Hanji characters.
+
+  @array = $conv->string( $string );
+    This method returns a array of referenced arrays which are pairs of a
+    Hanji chacater and its romanized letters.
+
+        $array[0]           # first Chinese character's pair (array)
+        $array[1][0]        # secound Chinese character itself
+        $array[1][1]        # its romanized letters
+
+DICTIONARY
+    This module internally uses a mapping table from Hanji to roman which is
+    based on "PY.tit" which is distributed with "cxterm".
+
+MODULE DEPENDENCY
+    Storable module is required.
+
+UTF-8 FLAG
+    This treats utf8 flag transparently.
+
+SEE ALSO
+    Lingua::ZH::Romanize::Cantonese for romanization of Cantonese
+
+    Lingua::JA::Romanize::Japanese for romanization of Japanese
+
+    Lingua::KO::Romanize::Hangul for romanization of Korean
+
+    http://www.kawa.net/works/perl/romanize/romanize-e.html
+
+    http://linuga-romanize.googlecode.com/svn/trunk/Lingua-ZH-Romanize-Pinyi
+    n/
+
+COPYRIGHT
+    Copyright (c) 2003-2008 Yusuke Kawasaki. All rights reserved.
+
+LICENSE
+    Any commercial use of the Software requires a license directly from the
+    author(s). Please contact the author(s) to negotiate an appropriate
+    license. Commercial use includes integration of all or part of the
+    binary or source code covered by this permission notices into a product
+    for sale or license to third parties on your behalf, or distribution of
+    the binary or source code to third parties that need it to utilize a
+    product sold or licensed on your behalf.
+

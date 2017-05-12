@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+Sugar.pm
+t/1.t
+t/2_pods.t

@@ -1,0 +1,46 @@
+LWP-ConnCache-Resolving version 0.01
+====================================
+
+This module can be used to add resolution to standard LWP::ConnCache.
+
+It might be useful if you have multiple hostnames that result in the same
+logical connection which can be interchangably used for all of them
+(either have the same IP address or connect to the same farm of load
+balanced servers, for example).
+
+WARNING: be careful with HTTP load balancers which sometimes use Host
+header to keep connection to different backend servers - this connection
+might not be reusable for request with different Host headers even if
+hostname resolves to the same IP address.
+
+Module itself does not define a resolution mechanism leaving it to the
+user to define (I'll probably write DNS resolver as pre-canned module
+in the future).
+
+For code examples see module documentation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires:
+
+  LWP::ConnCache
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Sergey Chernyshev <sergeyche@cpan.org> 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

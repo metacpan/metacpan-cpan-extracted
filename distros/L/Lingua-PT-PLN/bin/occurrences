@@ -1,0 +1,81 @@
+#!/usr/bin/perl -w -s
+
+use Lingua::PT::PLN;
+
+our($log, $utf8, $i, $csv);
+
+my $file;
+my $dfile = 0;
+if (@ARGV) {
+	$file = shift;
+} else {
+	$file = "/tmp/_$$";
+	open F, ">$file" or die "Can't create temporary file: $!";
+	print F while <>;
+	close F;
+	$dfile = 1;
+}
+
+my %ops=();
+$ops{log}        = $log   if $log;
+$ops{encoding}   = 'utf8' if $utf8;
+$ops{ignorecase} = 1      if $i;
+$ops{csv}        = 1      if $csv;
+
+my %o = oco({%ops},$file);
+
+binmode STDOUT, ":utf8" if $utf8;
+for (sort { $o{$b}<=>$o{$a} } keys %o) {
+	if ($csv) {
+		printf("\"%s\",%d\n",$_,$o{$_});
+	} else {
+		printf("%20s %d\n",$_,$o{$_});
+	}
+}
+
+unlink $file if $dfile;
+
+=encoding UTF-8
+
+=head1 NAME
+
+
+occurrences - Calculate a histogram of word occurrences count
+
+=head1 SYNOPSIS
+
+   occurrences [-utf8] [-log] [-i] [-csv] <file>
+
+=head1 DESCRIPTION
+
+This script count different words and prints a final report ordered by
+word count.
+
+Supported options:
+
+=over 4
+
+=item C<-utf8>
+
+Input is in UTF-8.
+
+=item C<-log>
+
+Show occurrence counts in logarithmic scale.
+
+=back
+
+=head1 SEE ALSO
+
+Lingua::PT::PLN
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008-2015 by Projecto Natura
+
+=cut
+

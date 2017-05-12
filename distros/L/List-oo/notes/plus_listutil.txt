@@ -1,0 +1,10 @@
+A thought started by this thread
+
+  http://use.perl.org/comments.pl?sid=30935&cid=46697
+
+What if you could do
+
+  use List:oo qw(:+); # or maybe something less happy
+
+And have that trigger a loading of List::Util with an autoload (or some
+other mapping) of those functions to methods?

@@ -1,0 +1,18 @@
+% Test input file for checking forward references.
+% Do not make gratuitous changes here as the text is checked by the
+% test script 14-makeindex.t.
+
+\documentclass{article}
+\date{20 September 2007}
+\author{A.N. Other}
+\title{Simple Test Document 11}
+\begin{document}
+\maketitle
+
+This is a test document containing a forward reference.
+
+See page~\pageref{pagetwo}.
+\par
+\pagebreak
+This is the second page\label{pagetwo}.
+\end{document}

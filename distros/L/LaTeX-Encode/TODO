@@ -1,0 +1,29 @@
+#================================================== -*- indented-text -*-
+#
+# TODO
+#
+# DESCRIPTION
+#   TODO list for the LaTeX-Encode package, containing known bugs,
+#   limitations, planned enhancements, long term visions and a few
+#   whacky ideas.
+#
+# AUTHOR
+#   Andrew Ford   <a.ford@ford-mason.co.uk>
+#
+#------------------------------------------------------------------------
+# $Id: TODO 25 2012-08-29 06:35:46Z andrew $
+#========================================================================
+
+* add more unit tests
+
+* improve documentation (article about manipulating LaTeX with Perl)
+
+* verbatim mode - don't take "<" and ">" from math mode (or any other
+  characters that do not have standard fixed width).
+
+* add box character with four hex digits for unrecognized Unicode characters (with option
+  to display such a box, a specific replacement character or nothing for unrecognized
+  characters).
+
+* options for preferring different implementation of symbols
+

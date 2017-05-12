@@ -1,0 +1,17 @@
+Changes
+lib/Lexical/Hints.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/compile_time_hints.t
+t/dump.t
+t/global_hints.t
+t/rename.t
+t/run_time_set_hints.t
+t/scope_nesting.t
+tlib/Test_Compiletime_Hints.pm
+tlib/Test_Global_Hints.pm
+tlib/Test_Manual_Hints.pm
+tlib/Test_Renaming.pm
+META.yml                                 Module meta-data (added by MakeMaker)

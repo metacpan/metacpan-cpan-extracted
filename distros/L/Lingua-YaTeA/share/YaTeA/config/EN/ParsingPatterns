@@ -1,0 +1,168 @@
+
+#Parse	Priority	Direction
+( JJR<=M> NN<=H> )	1	RIGHT
+( JJS<=M> NN<=H> )	1	RIGHT
+( JJ<=M> NN<=H> )	1	RIGHT
+( VBG<=M> NN<=H> )	1	RIGHT
+( NP<=M> NN<=H> )	2	RIGHT
+( NPS<=M> NN<=H> )	1	RIGHT
+( FW<=M> NN<=H> )	1	RIGHT
+( NN<=M> NN<=H> )	1	RIGHT
+( NNS<=M> NN<=H> )	1	RIGHT
+
+( JJR<=M> NNS<=H> )	1	RIGHT
+( JJS<=M> NNS<=H> )	1	RIGHT
+( JJ<=M> NNS<=H> )	1	RIGHT
+( VBG<=M> NNS<=H> )	1	RIGHT
+( FW<=M> NNS<=H> )	1	RIGHT
+( NN<=M> NNS<=H> )	1	RIGHT
+( NNS<=M> NNS<=H> )	1	RIGHT
+( NP<=M> NNS<=H> )	1	RIGHT
+( NPS<=M> NNS<=H> )	1	RIGHT
+
+( JJR<=M> NP<=H> )	1	RIGHT
+( JJS<=M> NP<=H> )	1	RIGHT
+( JJ<=M> NP<=H> )	1	RIGHT
+( VBG<=M> NP<=H> )	1	RIGHT
+( FW<=M> NP<=H> )	1	RIGHT
+( NN<=M> NP<=H> )	1	RIGHT
+( NNS<=M> NP<=H> )	1	RIGHT
+( NP<=M> NP<=H> )	2	RIGHT
+( NPS<=M> NP<=H> )	1	RIGHT
+
+( JJR<=M> NPS<=H> )	1	RIGHT
+( JJS<=M> NPS<=H> )	1	RIGHT
+( JJ<=M> NPS<=H> )	1	RIGHT
+( VBG<=M> NPS<=H> )	1	RIGHT
+( FW<=M> NPS<=H> )	1	RIGHT
+( NN<=M> NPS<=H> )	1	RIGHT
+( NNS<=M> NPS<=H> )	1	RIGHT
+( NP<=M> NPS<=H> )	1	RIGHT
+( NPS<=M> NPS<=H> )	1	RIGHT
+
+#( FW<=M> FW<=H> )	1	RIGHT
+
+
+( NN<=H> CD<=M> )	1	LEFT
+( NNS<=H> CD<=M> )	1	LEFT
+( NP<=H> CD<=M> )	1	LEFT
+( NPS<=H> CD<=M> )	1	LEFT
+
+
+( JJ<=M> ( JJ<=M> NNS<=H> )<=H> )	1	RIGHT
+( JJ<=M> ( JJ<=M> NN<=H> )<=H> )	1	RIGHT
+( JJ<=M> ( JJ<=M> NP<=H> )<=H> )	1	RIGHT
+
+
+( NN<=H> of NN<=M> )	1	LEFT
+( NN<=H> of NNS<=M> )	1	LEFT
+( NN<=H> of NP<=M> )	1	LEFT
+( NN<=H> of NPS<=M> )	1	LEFT
+
+
+( NN<=H> of DT NN<=M> )	1	LEFT
+( NN<=H> of DT NNS<=M> )	1	LEFT
+( NN<=H> of DT NP<=M> )	1	LEFT
+( NN<=H> of DT NPS<=M> )	1	LEFT
+
+( NNS<=H> of NN<=M> )	1	LEFT
+( NNS<=H> of NNS<=M> )	1	LEFT
+( NNS<=H> of NP<=M> )	1	LEFT
+( NNS<=H> of NPS<=M> )	1	LEFT
+
+
+( NNS<=H> of DT NN<=M> )	1	LEFT
+( NNS<=H> of DT NNS<=M> )	1	LEFT
+( NNS<=H> of DT NP<=M> )	1	LEFT
+( NNS<=H> of DT NPS<=M> )	1	LEFT
+
+
+( NP<=H> of NN<=M> )	1	LEFT
+( NP<=H> of DT NN<=M> )	1	LEFT
+
+
+( NP<=H> of NNS<=M> )	1	LEFT
+( NP<=H> of DT NNS<=M> )	1	LEFT
+
+
+( NP<=H> of DT NP<=M> )	1	LEFT
+#
+
+
+
+# TEST:
+#( NN<=M> ( NN<=M> NN<=H> )<=H> )	1	RIGHT
+
+# ( ( JJ<=M> NN<=H> )<=H> of NN<=M> )	1	LEFT
+# ( ( JJ<=M> NN<=H> )<=H> of DT NN<=M> )	1	LEFT
+# ( ( JJ<=M> NN<=H> )<=H> of NNS<=M> )	1	LEFT
+# ( ( JJ<=M> NN<=H> )<=H> of DT NNS<=M> )	1	LEFT
+
+
+# ( NN<=H> of ( NN<=M> NP<=H> )<=M> )	1	LEFT
+# ( NN<=H> of ( NN<=M> NN<=H> )<=M> )	1	LEFT
+#( NN<=H> of ( CD<=M> NN<=H> )<=M> )	1	LEFT
+#( NN<=H> of ( CD<=M> NNS<=H> )<=M> )	1	LEFT
+#( NN<=H> of ( NN<=M> NNS<=H> )<=M> )	1	LEFT
+
+#( JJ<=M> ( NN<=M> NN<=H> )<=H> )	1	RIGHT
+#( VBG<=M> ( NN<=M> NN<=H> )<=H> )	1	RIGHT
+
+#( JJ<=M> ( NN<=M> NNS<=H> )<=H> )	1	RIGHT
+#( VBG<=M> ( NN<=M> NNS<=H> )<=H> )	1	RIGHT
+
+
+# ( ( JJ<=M> NNS<=H> )<=H> of NN<=M> )	1	LEFT
+# ( ( JJ<=M> NNS<=H> )<=H> of DT NN<=M> )	1	LEFT
+# ( ( JJ<=M> NNS<=H> )<=H> of NNS<=M> )	1	LEFT
+# ( ( JJ<=M> NNS<=H> )<=H> of DT NNS<=M> )	1	LEFT
+# ( NNS<=H> of ( NN<=M> NP<=H> )<=M> )	1	LEFT
+# ( NNS<=H> of ( NN<=M> NN<=H> )<=M> )	1	LEFT
+# ( NNS<=H> of ( NN<=M> NNS<=H> )<=M> )	1	LEFT
+#( NNS<=H> of ( CD<=M> NN<=H> )<=M> )	1	LEFT
+#( NNS<=H> of ( CD<=M> NNS<=H> )<=M> )	1	LEFT
+#( VBG<=M> ( NN<=M> NNS<=H> )<=H> )	1	RIGHT
+
+
+# ( NP<=H> of ( NP<=M> NN<=H> )<=M> )	1	LEFT
+# ( NP<=H> of ( NP<=M> NNS<=H> )<=M> )	1	LEFT
+
+#( JJ<=M> of NP<=H> )	1	RIGHT
+
+#( JJ<=M> ( NN<=M> NN<=H> )<=H> )	1	RIGHT
+
+
+
+#( RBS<=M> JJ<=H> )	1	RIGHT
+
+# special patterns
+#NN downstream of NN
+( NN<=H> ( JJ<=H> of NN<=M> )<=M> )	1	LEFT
+( NNS<=H> ( JJ<=H> of NN<=M> )<=M> )	1	LEFT
+
+# homology/similarity/response to (the) NN
+( NN<=H> to NN<=M> )	1	LEFT
+( NN<=H> to NNS<=M> )	1	LEFT
+( NN<=H> to DT NN<=M> )	1	LEFT
+( NN<=H> to DT NNS<=M> )	1	LEFT
+
+# terminator common to lytD
+#( NN<=H> ( JJ<=H> to NN<=M> )<=M> )	1
+#( NN<=H> ( JJ<=H> to NNS<=M> )<=M> )	1
+#( NN<=H> ( JJ<=H> to DT NNS<=M> )<=M> )	1	LEFT
+#( NN<=H> ( JJ<=H> to DT NN<=M> )<=M> )	1	LEFT
+#
+#( NNS<=H> ( JJ<=H> to NN<=M> )<=M> )	1
+#( NNS<=H> ( JJ<=H> to NNS<=M> )<=M> )	1
+#( NNS<=H> ( JJ<=H> to DT NNS<=M> )<=M> )	1	LEFT
+#( NNS<=H> ( JJ<=H> to DT NN<=M> )<=M> )	1	LEFT
+
+# test: a supprimer
+#( NN<=H> of ( JJ<=M> NNS<=H> )<=M> )	1	LEFT
+#( JJ<=M> ( NN<=M> NNS<=H> )<=H> )	1	LEFT
+#( NN<=H> NN<=M> )	1	LEFT
+
+# test
+#( ( JJ<=M> NNS<=H> )<=H> of ( JJ<=M> NN<=H> )<=M> )	1	LEFT
+#( NN<=H> NNS<=M> )	2	LEFT
+#( NN<=M> ( NN<=M> NN<=H> )<=H> )	1	RIGHT

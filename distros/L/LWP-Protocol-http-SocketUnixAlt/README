@@ -1,0 +1,54 @@
+NAME
+    LWP::Protocol::http::SocketUnixAlt - Speak HTTP through Unix sockets
+
+VERSION
+    version 0.0204
+
+SYNOPSIS
+      use LWP::Protocol::http::SocketUnixAlt;
+      LWP::Protocol::implementor( http => 'LWP::Protocol::http::SocketUnixAlt' );
+      ...
+
+DESCRIPTION
+    LWP::Protocol::http::UnixSocketAlt is a fork of Florian Ragwitz's
+    LWP::Protocol::http::SocketUnix 0.02. It fixes a few issues including:
+
+    *   remedy 'No Host options provided' error
+
+        As suggested in https://rt.cpan.org/Public/Bug/Display.html?id=65670
+
+    *   allow specifying URI path
+
+        Currently using "//" as separator, e.g.:
+        "http:path/to/unix.socket//uri/path"
+
+SEE ALSO
+    LWP, LWP::Protocol
+
+    HTTP::Daemon::UNIX
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/LWP-Protocol-http-SocketUnixAlt>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-LWP-Protocol-http-SocketUnixAlt>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=LWP-Protocol-http-Soc
+    ketUnixAlt>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

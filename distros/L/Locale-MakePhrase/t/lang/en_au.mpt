@@ -1,0 +1,12 @@
+
+key = hi there
+translation = Hello
+
+key = Select [_1] colours
+expression = _1 == 1
+priority = 1
+translation = Select one colour.
+
+key = Select [_1] colours
+translation = Please select [_1] colours.
+

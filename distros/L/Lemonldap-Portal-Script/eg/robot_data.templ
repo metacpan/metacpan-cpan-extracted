@@ -1,0 +1,18 @@
+[% PROCESS prepare_data %]
+
+
+
+[% BLOCK prepare_data %]
+###  echange numero [%numero%]            ###
+###  preparation des variables d un post  ###
+my @tab_param=();
+[% FOREACH item IN  list_DATA.keys.sort %]
+my $[% item %]= shift || "[% list_DATA.$item %]" ;
+my $nom = "[% item %]";
+$nom=~ s/__/\./g;
+push @tab_param,$nom;
+push @tab_param,$[% item %];
+
+[% END %] 
+[% END %]
+

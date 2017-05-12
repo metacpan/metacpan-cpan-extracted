@@ -1,0 +1,30 @@
+---
+abstract: "interface to Linux's socket packet filtering"
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  ExtUtils::CChecker: 0.02
+  ExtUtils::H2PM: 0.03
+  Module::Build: 0
+  Module::Build::Compat: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::CChecker: 0.02
+  Module::Build: 0
+  Module::Build::Compat: 0
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Linux-SocketFilter
+provides:
+  Linux::SocketFilter:
+    file: lib/Linux/SocketFilter.pm
+    version: 0.04
+  Linux::SocketFilter::Assembler:
+    file: lib/Linux/SocketFilter/Assembler.pm
+    version: 0.04
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

@@ -1,0 +1,13 @@
+$Id: Changes 2461 2009-03-20 05:05:25Z dk $
+$URL: svn://svn/dmytro/Development/perl/modules/Log-Simplest/trunk/Changes $
+$Author: dk $
+
+Revision history for Perl extension Log::Simplest.
+
+1.0  Fri Mar 20 12:16:25 2009  First public release.
+
+    Although I have been using this module for quite a while in my
+    scripts, I have never though about publishing it in theу
+    wild. Finally I have decided to write little bit longer POD
+    description and put it on CPAN.
+

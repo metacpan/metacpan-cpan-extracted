@@ -1,0 +1,49 @@
+Lingua-AR-Word version 1.5.3
+======================
+
+For every word coming from the input file, this module is able to take out the stem and display the ArabTeX encoding of the Arabic word.
+If you may need to build up your own Arabic-to-X Dictionary, have a look at Lingua::AR::Db.
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires no other modules, just Perl >=5.
+
+
+MODULES
+
+Lingua::AR::Word
+	this will create the Word object
+
+Lingua::AR::Word::Stem
+	this will return the stem of a word
+
+Lingua::AR::Word::Encode
+	this will return the ArabTeX encoding of a word
+
+NOTES
+
+->Everything (script code and data) works ONLY if raw data is encoded in Unicode (utf8 or UTF-8). Other representations will lead to errors or wrong results.
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Andrea Benazzo
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

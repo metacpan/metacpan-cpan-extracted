@@ -1,0 +1,11 @@
+Revision history for Perl extension Lingua::BrillTagger.
+
+0.02  Thu Mar 31 13:49:42 CST 2005
+
+ - Added the README and Tagger.patch files, which are essential and
+   were accidentally left out of the 0.01 distribution. [Luke Valenty]
+
+0.01  Thu Jul 22 15:33:08 2004
+
+ - original version
+

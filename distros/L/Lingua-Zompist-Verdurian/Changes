@@ -1,0 +1,45 @@
+# vim:set noet ts=8 ai:
+
+Revision history for Perl extension Lingua::Zompist::Verdurian.
+
+0.91  Mon 2002-05-20
+	- Added 'keep_accents' feature (Note: this will cause
+	some words to come out differently)
+
+0.90  Mon 2002-05-20
+	- 'vyozha' is masculine (unlike Cadhinor VIOCTA)
+	- Added ta, mu, ca, za to 'noun'
+	Getting close to a 1.0 release!
+	(TODO: add keep_accents) DONE 2002-05-20
+
+0.06  Sun 2002-04-21
+	- Changed the future to insert the -i- only for Cl and
+	Cr, not for other second consonants. Added one test
+	for this.
+
+0.05  Thu 2002-04-11
+	- Slight doc tweaks (it still thought it was version
+	0.03, and 'esneu' was still in the docs).
+	No changes to code or tests.
+
+0.04  Tue 2002-04-02
+	- Changed past tense of 'esan' from 'esneu' to 'esnu'
+	- Slightly modified the licence (changed 'regents' to
+	'copyright holders')
+	- Added a couple of tests for inserted -i- in the past
+	tense (this still needs more tests, though, and also
+	in izhcrifel.t) Update 2002-04-11: more tests added.
+	- made 'didha' masculine
+	- more tests for inserted -i-
+
+0.03  Thu 2001-11-15
+	- minor documentation nits. No changes to code or tests.
+
+0.02  Wed 2001-11-14
+	- added participle for 'kies' after an email from Mark;
+	also fixed participle for 'dan'.
+
+0.01  Sun Oct 21 17:00:59 2001
+	- original version; created by h2xs 1.21 with options
+		-A -X -b 5.5.0 -n Lingua::Zompist::Verdurian
+

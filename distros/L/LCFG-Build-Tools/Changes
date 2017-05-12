@@ -1,0 +1,1319 @@
+2016-07-12  SVN: new release
+
+	* Release: 0.6.6
+
+2016-07-12 12:58  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: Fixed lcfg_add_perl_tree and
+	  lcfg_add_perl_module to handle cmake binary and source
+	  directories being different
+
+2016-07-12 12:17  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: Some more tweaking of cmake macros to
+	  support having a BINARY_DIR which is different from the
+	  SOURCE_DIR
+
+2016-06-10 15:34  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.6.5
+
+2016-06-10 15:34  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, templates/build.cmake.tt: Fixed call to lcfg_add_man in
+	  lcfg_pod2man so that it works correctly when the binary and
+	  source directories are not the same place
+
+2015-11-14 15:28  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.6.4
+
+2015-11-14 15:28  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, t/02_macros.t: fixed test
+
+2015-11-14 15:04  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.6.3
+
+2015-11-14 15:03  squinney@INF.ED.AC.UK
+
+	* META.json.in, META.yml.in, lcfg.yml: Tweaked metadata so that it
+	  will be indexed on cpan
+
+2015-11-12 10:13  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.6.2
+
+2015-11-12 10:11  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, META.json.in, META.yml.in,
+	  lib/LCFG/Build/Tool.pm.in, lib/LCFG/Build/Tool/CheckMacros.pm.in,
+	  lib/LCFG/Build/Tool/DevOSXPkg.pm.in,
+	  lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in,
+	  lib/LCFG/Build/Tool/MajorVersion.pm.in,
+	  lib/LCFG/Build/Tool/MicroVersion.pm.in,
+	  lib/LCFG/Build/Tool/MinorVersion.pm.in,
+	  lib/LCFG/Build/Tool/OSXPkg.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/SRPM.pm.in,
+	  lib/LCFG/Build/Tool/Submit.pm.in, lib/LCFG/Build/Tools.pm.in,
+	  lib/LCFG/Build/Utils.pm.in, lib/LCFG/Build/Utils/OSXPkg.pm.in,
+	  lib/LCFG/Build/Utils/RPM.pm.in: Replaced LCFG_VERSION with
+	  LCFG_PERL_VERSION in perl modules to ensure the version string is
+	  always safe
+
+2015-11-12 10:05  squinney@INF.ED.AC.UK
+
+	* templates/lcfg.cmake.tt: Set CMAKE_INSTALL_NAME_DIR to
+	  /usr/local/lib for MacOSX, closes
+	  https://bugs.lcfg.org/show_bug.cgi?id=911
+
+2015-11-06 16:03  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.6.1
+
+2015-11-06 16:02  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, lcfg.yml, lcfg_config_osx.yml: Added a different
+	  lcfg_config.yml file for use on MacOSX where all paths should be
+	  in /usr/local
+
+2015-11-06 15:22  squinney@INF.ED.AC.UK
+
+	* templates/lcfg.cmake.tt: Dropped hardwiring of the INSTALL_PREFIX
+	  to be /usr for Darwin
+
+2015-11-06 15:21  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/OSXPkg.pm.in: Dropped the full paths for
+	  cmake, make and pkgbuild, just rely on them being found somewhere
+	  in the PATH
+
+2015-11-06 15:08  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.6.0
+
+2015-11-06 15:07  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, bin/lcfg-reltool.in, lcfg.yml,
+	  lib/LCFG/Build/Tools.pm.in, lib/LCFG/Build/Utils.pm.in,
+	  t/02_macros.t: Altered LCFG::Build::Utils to check in both
+	  /usr/local/share/lcfgbuild and /usr/share/lcfgbuild for the
+	  necessary templates and data files. This means that the tools
+	  should now work on the latest MacOSX. See
+	  https://bugs.lcfg.org/show_bug.cgi?id=907 for details.
+
+2015-06-24 10:32  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.5.1
+
+2015-06-24 10:32  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, META.json.in, META.yml.in: reduced dependency on
+	  Module::Build to 0.38
+
+2015-06-24 10:23  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.5.0
+
+2015-06-24 10:21  squinney@INF.ED.AC.UK
+
+	* META.json.in, META.yml.in, lcfg.yml: updated meta-data
+
+2015-06-24 10:21  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, LCFG-Build-Tools.spec, mapping_config.yml: added
+	  mapping for new perl_version method, needs newer version of
+	  LCFG::Build::PkgSpec
+
+2015-06-24 10:10  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/OSXPkg.pm.in: Fix filtering for pkgbuild,
+	  closes: https://bugs.lcfg.org/show_bug.cgi?id=881, thanks to
+	  Kenny MacDonald for the patch
+
+2014-10-31 10:52  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.4.5
+
+2014-10-31 10:52  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/OSXPkg.pm.in: Fixed exit with a warning
+	  about the tmp dir, bug#791
+
+2014-07-02 07:38  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.4.4
+
+2014-07-02 07:38  squinney@INF.ED.AC.UK
+
+	* templates/lcfg.cmake.tt: Added CentOS support
+
+2014-07-01 16:05  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.4.3
+
+2014-07-01 16:05  squinney@INF.ED.AC.UK
+
+	* LCFG-Build-Tools.spec: Added missing build dep
+
+2014-07-01 16:01  squinney@INF.ED.AC.UK
+
+	* templates/lcfg.cmake.tt: Added support for detecting RHEL release
+
+2014-04-01 14:43  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.4.2
+
+2014-04-01 14:43  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: fixed missing closing brackets
+
+2014-04-01 14:42  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.4.1
+
+2014-04-01 14:42  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: only attempt to install a man page
+	  created using pod2man if it actually generated a file
+
+2013-10-11 12:54  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.4.0
+
+2013-10-11 12:53  squinney@INF.ED.AC.UK
+
+	* LCFG-Build-Tools.spec, META.yml.in, Makefile.PL, lcfg.yml,
+	  lib/LCFG/Build/Tool.pm.in: Converted the detection of the
+	  revision control system to use the new auto_detect methods
+	  provided by the LCFG::Build::VCS modules in version 0.2.0. This
+	  should fix auto-detection for svn 1.7 and newer, see
+	  https://bugs.lcfg.org/show_bug.cgi?id=685
+
+2013-05-14 08:12  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/CheckMacros.pm.in: Added new macros to the
+	  basic list
+
+2013-05-14 08:09  squinney@INF.ED.AC.UK
+
+	* lcfg_config.yml: Added BOOTSTAMP and RELEASEFILE. This is
+	  primarily for building the LCFG client but other things might
+	  benefit as well
+
+2012-05-18 17:03  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.3.1
+
+2012-05-18 17:03  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, LCFG-Build-Tools.spec, META.yml.in, Makefile.PL,
+	  README: Added the missing dependency on the Readonly module
+
+2012-05-18 16:54  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.3.0
+
+2012-05-18 16:54  squinney@INF.ED.AC.UK
+
+	* ., LCFG-Build-Tools.spec, MANIFEST, META.yml.in, lcfg.yml,
+	  lib/LCFG/Build/Tool/DevOSXPkg.pm.in,
+	  lib/LCFG/Build/Tool/OSXPkg.pm.in,
+	  lib/LCFG/Build/Utils/MacOSX.pm.in,
+	  lib/LCFG/Build/Utils/OSXPkg.pm.in, t/01_load.t: Implemented
+	  creating Apple Packages via the built in "pkgbuild" tool.
+	  This initial commit can only process projects that use CMake to
+	  build
+	  and install. Thanks go to Kenny MacDonald for adding this new
+	  functionality. This change closes
+	  https://bugs.lcfg.org/show_bug.cgi?id=565
+
+2011-12-22 15:26  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.2.2
+
+2011-12-22 15:26  squinney@INF.ED.AC.UK
+
+	* templates/lcfg.cmake.tt: Applied patch to fix MacOSX support, see
+	  bug#304 for details
+
+2011-11-09 12:47  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.2.1
+
+2011-11-09 12:46  squinney@INF.ED.AC.UK
+
+	* lcfg_config.yml, lib/LCFG/Build/Tool/CheckMacros.pm.in: Added
+	  LCFGRUN which is a macro which refers to a directory where
+	  component run files can be stored. Currently this is the same as
+	  LCFGTMP for backwards-compatibility reasons
+
+2011-03-03 20:36  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.2.0
+
+2011-03-03 20:30  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/RPM.pm.in: The parsing and formatting of the
+	  changelogs has been completely rewritten to make it more robust
+
+2011-03-02 12:20  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.1.6
+
+2011-03-02 12:20  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, templates/lcfg.cmake.tt: Fixed SL6 support, rather
+	  annoyingly they have decided to change their LSB distributor ID
+	  string
+
+2011-02-18 13:30  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.1.5
+
+2011-02-18 13:30  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/Submit.pm.in: Fixed submit tool typos
+
+2011-02-17 18:15  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml, lib/LCFG/Build/Tool/Submit.pm.in:
+	  LCFG-Build-Tools release: 0.1.4
+
+2011-02-17 18:13  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool.pm.in: Fixed typo
+
+2011-02-17 18:11  squinney@INF.ED.AC.UK
+
+	* templates/lcfg.cmake.tt: need to escape double-quotes in cmake
+	  strings
+
+2011-02-17 17:01  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/DevRPM.pm.in, lib/LCFG/Build/Tool/RPM.pm.in:
+	  Added docs about the new --sign option
+
+2011-02-16 14:40  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool.pm.in, lib/LCFG/Build/Tool/DevRPM.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Utils/RPM.pm.in:
+	  Added ability to pass the --sign option through to rpmbuild from
+	  the devrpm and rpm commands. This resolves
+	  https://bugs.lcfg.org/show_bug.cgi?id=387
+
+2010-10-11 12:51  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.1.3
+
+2010-10-11 12:45  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Tool/DevRPM.pm.in: Set the build
+	  directory so that we can keep the build directory when making
+	  devel packages. This makes it easier to examine what has been
+	  generated
+
+2010-10-11 12:44  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils/RPM.pm.in: Allow the calling code to specify
+	  the rpm BUILD directory
+
+2010-07-20 13:13  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.1.2
+
+2010-07-20 13:13  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/Pack.pm.in, lib/LCFG/Build/Utils.pm.in:
+	  Report the full path to the generated tar file when using pack
+	  and devpack. This fixes https://bugs.lcfg.org/show_bug.cgi?id=293
+
+2010-07-20 13:08  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.1.1
+
+2010-07-20 13:08  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/Pack.pm.in, lib/LCFG/Build/Tool/Submit.pm.in:
+	  Added a new tool for submitting packages which have been built
+	  using build tools
+
+2010-07-20 13:08  squinney@INF.ED.AC.UK
+
+	* templates/lcfg.cmake.tt: Improved the setting of the cpack vendor
+	  field a bit more. Note this does not including the string
+	  reversal code from https://bugs.lcfg.org/show_bug.cgi?id=304, I'm
+	  not feeling brave enough today
+
+2010-07-12 15:48  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.1.0
+
+2010-07-12 15:48  squinney@INF.ED.AC.UK
+
+	* lcfg.yml: Noted Fedora 13 support
+
+2010-07-12 15:47  squinney@INF.ED.AC.UK
+
+	* mapping_config.yml, templates/lcfg.cmake.tt: Reworked how
+	  CPACK_PACKAGE_VENDOR gets set so that it can be controlled from
+	  CMakeLists.txt
+
+2010-07-12 15:44  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Tool/DevRPM.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/SRPM.pm.in,
+	  lib/LCFG/Build/Tools.pm.in, lib/LCFG/Build/Utils/RPM.pm.in:
+	  Completely reimplemented how RPMs get built to avoid a dependency
+	  on RPM4 which does not work with newer versions of rpmlib
+
+2010-07-12 15:42  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: fixed the conditional which prevents
+	  the inclusion of *.cin templates for template files
+
+2010-07-12 15:41  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Utils.pm.in: Fixed a bug where we did not return
+	  to the previous working directory after building the source tar
+	  file
+
+2010-07-12 14:49  squinney@INF.ED.AC.UK
+
+	* LCFG-Build-Tools.spec: Added build-requirement on
+	  perl(Test::More)
+
+2010-07-12 12:31  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, templates/lcfg.cmake.tt: implemented most of patch to
+	  improve MacOSX support from
+	  https://bugs.lcfg.org/show_bug.cgi?id=304
+
+2010-07-12 12:30  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: Added support for isntalling the
+	  meta-files (README and ChangeLog) on MacOSX. This is done with
+	  the new lcfg_add_meta() macro. This is not necessary on
+	  Fedora/Redhat as it is handled in the specfile
+
+2010-07-12 12:28  squinney@INF.ED.AC.UK
+
+	* mapping_config.yml: map vendor to CPACK_PACKAGE_VENDOR
+
+2010-07-12 11:24  squinney@INF.ED.AC.UK
+
+	* mapping_config.yml: Added translation of major, minor and micro
+	  version fields into the relevant cpack variables. This fixes
+	  https://bugs.lcfg.org/show_bug.cgi?id=303
+
+2010-02-19 12:02  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.0.61
+
+2010-02-19 12:01  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: Now allowing any files to be in the
+	  templates directory, previous restrictions were causing pain
+
+2010-02-19 11:37  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.0.60
+
+2010-02-19 11:37  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, templates/build.cmake.tt: Rewrote the
+	  lcfg_add_templates() macro so that it supports including a tree
+	  of templates rather than just looking one-level deep
+
+2010-02-19 10:30  squinney@INF.ED.AC.UK
+
+	* templates/lcfg.cmake.tt: Added detection of Fedora platforms.
+	  Thanks to Chris Cooke for the patch, this fixes:
+	  https://bugs.lcfg.org/show_bug.cgi?id=219
+
+2010-02-10 14:39  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.0.59
+
+2010-02-10 14:39  squinney@INF.ED.AC.UK
+
+	* templates/build.cmake.tt: Fixed small bug in Perl-module tree
+	  handling where it would also include the nagios tree when it
+	  exists
+
+2010-01-18 18:09  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.0.58
+
+2010-01-18 18:09  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tools.pm.in: Use the new
+	  'allow_any_unambiguous_abbrev' option in App::Cmd rather than our
+	  hacky approach of overriding an internal method
+
+2010-01-18 18:08  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool/CheckMacros.pm.in,
+	  lib/LCFG/Build/Tool/DevOSXPkg.pm.in,
+	  lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in,
+	  lib/LCFG/Build/Tool/MajorVersion.pm.in,
+	  lib/LCFG/Build/Tool/MicroVersion.pm.in,
+	  lib/LCFG/Build/Tool/MinorVersion.pm.in,
+	  lib/LCFG/Build/Tool/OSXPkg.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/SRPM.pm.in:
+	  The run() method is now named execute()
+
+2010-01-18 18:07  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, LCFG-Build-Tools.spec, META.yml.in, Makefile.PL,
+	  README: Upgrade to version 0.06 of MooseX::App::Cmd
+
+2009-07-03 14:19  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.0.57
+
+2009-07-03 14:17  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Tool.pm.in: quiet attribute was missing the
+	  relevant metaclass specification
+
+2009-04-09 07:53  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.0.56
+
+2009-04-09 07:53  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/LCFG/Build/Utils.pm.in: Fixed a problem with not
+	  copying the mode when translating files prior to packing. Only
+	  affects packages using the translate_before_pack option which is
+	  not standard
+
+2009-03-13 15:50  squinney@INF.ED.AC.UK
+
+	* Changes, lcfg.yml: LCFG-Build-Tools release: 0.0.55
+
+2009-03-13 15:49  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, LCFG-Build-Tools.spec, META.yml.in, Makefile.PL,
+	  README, lib/LCFG/Build/Tools.pm.in,
+	  lib/LCFG/Build/Utils/RPM.pm.in: switched from Date::Format to
+	  DateTime
+
+2009-03-11 13:26  squinney@INF.ED.AC.UK
+
+	* bin/lcfg-reltool.in, lib/LCFG/Build/Tool.pm.in,
+	  lib/LCFG/Build/Tool/CheckMacros.pm.in,
+	  lib/LCFG/Build/Tool/DevOSXPkg.pm.in,
+	  lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in,
+	  lib/LCFG/Build/Tool/MajorVersion.pm.in,
+	  lib/LCFG/Build/Tool/MicroVersion.pm.in,
+	  lib/LCFG/Build/Tool/MinorVersion.pm.in,
+	  lib/LCFG/Build/Tool/OSXPkg.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/SRPM.pm.in,
+	  lib/LCFG/Build/Tools.pm.in, lib/LCFG/Build/Utils.pm.in,
+	  lib/LCFG/Build/Utils/MacOSX.pm.in,
+	  lib/LCFG/Build/Utils/RPM.pm.in: Set svn:keywords on the
+	  LCFG::Build::Tools Perl modules and scripts
+
+2009-03-09 16:43  squinney
+
+	* lcfg.yml: Removed hardwired version-control type from lcfg.yml to
+	  allow future transfer to subversion
+
+2009-02-18 14:53  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.54
+
+2009-02-18 14:53  squinney
+
+	* templates/build.cmake.tt: fixed small error in lcfg_pod2man
+
+2009-02-18 12:36  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.53
+
+2009-02-18 12:36  squinney
+
+	* lcfg.yml, templates/build.cmake.tt, templates/lcfg.cmake.tt:
+	  Split the pod2man stuff into its own lcfg_pod2man() macro so it
+	  can be called separately without installing the pod file into the
+	  @LCFGPOD@ directory
+
+2009-02-02 14:38  squinney
+
+	* lib/LCFG/Build/Utils/RPM.pm.in: added check that the specfile was
+	  successfully parsed
+
+2009-01-30 14:11  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.52
+
+2009-01-30 14:10  squinney
+
+	* lcfg.yml, templates/lcfg.cmake.tt: Use CPack for MacOSX package
+	  building
+
+2009-01-30 14:10  squinney
+
+	* lib/LCFG/Build/Utils/MacOSX.pm.in: We do not need to generate
+	  plist files for MacOSX, CPack will handle it all
+
+2008-12-11 14:43  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.51
+
+2008-12-11 14:42  squinney
+
+	* lib/LCFG/Build/Tool.pm.in: Added basic auto-detection of the
+	  version control system
+
+2008-12-10 16:22  squinney
+
+	* templates/build.cmake.tt: Automatically create CONFIGDIR for
+	  components
+
+2008-12-05 12:48  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.50
+
+2008-12-05 12:47  squinney
+
+	* lcfg.yml, templates/build.cmake.tt: Second attempt to handle
+	  automatically installing templates
+
+2008-12-05 12:05  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.49
+
+2008-12-05 12:05  squinney
+
+	* templates/build.cmake.tt: Added support for automatically
+	  installing templates found in a templates directory
+
+2008-11-27 19:45  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.48
+
+2008-11-27 19:45  squinney
+
+	* templates/build.cmake.tt: Fixed nagios module path
+
+2008-11-18 14:30  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.47
+
+2008-11-18 14:30  squinney
+
+	* templates/build.cmake.tt: Added cmake macros
+	  lcfg_add_nagios_module() to do-the-right-thing with LCFG nagios
+	  configuration modules and lcfg_add_nagios_support() to call that
+	  for every module it finds in the nagios directory for a project.
+	  lcfg_add_nagios_support() is called for every component project,
+	  if there is not a nagios directory then it achieves nothing.
+
+2008-11-18 14:12  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.46
+
+2008-11-18 14:12  squinney
+
+	* templates/lcfg.cmake.tt: Improved the fix for the OS_VERSION
+	  detection. It now behaves the same as the old buildtools. There
+	  is a new variable naemd OS_ID which gives the complete
+	  (arch-specific) name of the platform
+
+2008-11-11 10:14  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.45
+
+2008-11-11 10:14  squinney
+
+	* templates/lcfg.cmake.tt: Fixed OS_VERSION macro for 64bit linux
+	  platforms
+
+2008-10-29 15:22  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.44
+
+2008-10-29 15:21  squinney
+
+	* lib/LCFG/Build/Tool/RPM.pm.in: Fixed abstract for
+	  LCFG::Build::Tool::RPM
+
+2008-10-29 15:20  squinney
+
+	* lib/LCFG/Build/Tool/SRPM.pm.in: Fixed abstract for
+	  LCFG::Build::Tool::SRPM
+
+2008-10-28 10:42  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.43
+
+2008-10-28 10:42  squinney
+
+	* templates/cmake.tt: Slightly altered cmake.tt template so that it
+	  is more generic
+
+2008-10-27 09:04  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.42
+
+2008-10-27 09:04  squinney
+
+	* MANIFEST: Fixed MANIFEST
+
+2008-10-27 09:03  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.41
+
+2008-10-27 09:02  squinney
+
+	* META.yml.in, bin/lcfg-reltool.in,
+	  lib/LCFG/Build/Tool/MajorVersion.pm.in,
+	  lib/LCFG/Build/Tool/MicroVersion.pm.in,
+	  lib/LCFG/Build/Tool/MinorVersion.pm.in,
+	  lib/LCFG/Build/Tool/Release.pm.in, lib/LCFG/Build/Tools.pm.in,
+	  t/01_load.t: Renamed LCFG::Build::Tool::Release as
+	  LCFG::Build::Tool::MicroVersion
+
+2008-10-08 13:41  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.40
+
+2008-10-08 13:40  squinney
+
+	* lib/LCFG/Build/Tool/CheckMacros.pm.in: Added a new
+	  --fix_deprecated option to the CheckMacros tool to replace any
+	  usage of deprecated macros in the scanned files with the modern
+	  equivalent
+
+2008-10-03 12:55  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.39
+
+2008-10-03 12:54  squinney
+
+	* lib/LCFG/Build/Tool/CheckMacros.pm.in, templates/build.cmake.tt:
+	  Added a new CMake variable - LCFG_TMPLDIR which is the
+	  component-specific template location. Also added a new CMake
+	  macro - lcfg_add_template() to install template files into that
+	  location
+
+2008-10-03 12:53  squinney
+
+	* templates/lcfg.cmake.tt: Fixed the setting of the OS_VERSION
+	  CMake variable on Scientific Linux machines
+
+2008-09-12 14:07  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.38
+
+2008-09-12 14:05  squinney
+
+	* Build.PL.in, LCFG-Build-Tools.spec, META.yml, META.yml.in,
+	  Makefile.PL, lcfg.yml, lib/LCFG/Build/Tool.pm.in,
+	  lib/LCFG/Build/Tool/CheckMacros.pm.in,
+	  lib/LCFG/Build/Tool/DevOSXPkg.pm.in,
+	  lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in,
+	  lib/LCFG/Build/Tool/MajorVersion.pm.in,
+	  lib/LCFG/Build/Tool/MinorVersion.pm.in,
+	  lib/LCFG/Build/Tool/OSXPkg.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/Release.pm.in,
+	  lib/LCFG/Build/Tool/SRPM.pm.in, lib/LCFG/Build/Tools.pm.in,
+	  lib/LCFG/Build/Utils.pm.in, lib/LCFG/Build/Utils/MacOSX.pm.in,
+	  lib/LCFG/Build/Utils/RPM.pm.in: Lots of documentation
+	  improvements. Various work on making the file and directory path
+	  handling more platform-independent
+
+2008-09-09 10:38  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.37
+
+2008-09-09 10:38  squinney
+
+	* lcfg.yml, lib/LCFG/Build/Tool.pm.in,
+	  lib/LCFG/Build/Tool/CheckMacros.pm.in,
+	  lib/LCFG/Build/Tool/DevOSXPkg.pm.in,
+	  lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in,
+	  lib/LCFG/Build/Tool/MajorVersion.pm.in,
+	  lib/LCFG/Build/Tool/MinorVersion.pm.in,
+	  lib/LCFG/Build/Tool/OSXPkg.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/Release.pm.in,
+	  lib/LCFG/Build/Tool/SRPM.pm.in, lib/LCFG/Build/Tools.pm.in: Use
+	  make_immutable for each Moose class. According to the docs this
+	  should provide a good speed-up in code loading
+
+2008-09-09 09:59  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.36
+
+2008-09-09 09:59  squinney
+
+	* lcfg.yml, lib/LCFG/Build/Tool/DevOSXPkg.pm.in,
+	  lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in,
+	  lib/LCFG/Build/Tool/OSXPkg.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/SRPM.pm.in,
+	  lib/LCFG/Build/Utils.pm.in, lib/LCFG/Build/Utils/MacOSX.pm.in,
+	  lib/LCFG/Build/Utils/RPM.pm.in: Removed the genmeta options from
+	  the package building tools. Used Module::Pluggable to add a new
+	  LCFG::Build::Utils plugins() method which lists all available
+	  Utils sub-classes. Switched generate_metadata() and build() to be
+	  methods to make it easier to test for existence and call without
+	  a string eval
+
+2008-09-08 13:24  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.35
+
+2008-09-08 13:22  squinney
+
+	* bin/lcfg-reltool.in, lib/LCFG/Build/Tool.pm.in,
+	  lib/LCFG/Build/Tool/CheckMacros.pm.in,
+	  lib/LCFG/Build/Tool/DevOSXPkg.pm.in,
+	  lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in,
+	  lib/LCFG/Build/Tool/MajorVersion.pm.in,
+	  lib/LCFG/Build/Tool/MinorVersion.pm.in,
+	  lib/LCFG/Build/Tool/OSXPkg.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/Release.pm.in,
+	  lib/LCFG/Build/Tool/SRPM.pm.in, lib/LCFG/Build/Tools.pm.in,
+	  lib/LCFG/Build/Utils.pm.in, lib/LCFG/Build/Utils/MacOSX.pm.in,
+	  lib/LCFG/Build/Utils/RPM.pm.in: Lots of documentation
+	  improvements
+
+2008-09-08 12:33  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.34
+
+2008-09-08 12:32  squinney
+
+	* LCFG-Build-Tools.spec, MANIFEST, lcfg.yml: Now using the new
+	  support for removing input files after substitution. Also
+	  corrected a couple of bits in the specfile.
+
+2008-09-08 12:26  squinney
+
+	* lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/Pack.pm.in, lib/LCFG/Build/Utils.pm.in,
+	  lib/LCFG/Build/Utils/RPM.pm.in: Added support for removing input
+	  files after macro substitution has been completed. Also switched
+	  the source tar file generation sequence so that the packing
+	  happens last which allows the inclusion of generated metadata
+	  files
+
+2008-09-08 12:24  squinney
+
+	* lib/LCFG/Build/Tools.pm.in: Added some high-level documentation
+	  to LCFG::Build::Tools
+
+2008-09-08 12:23  squinney
+
+	* LCFG-Build-Tools.spec: Improved specfile
+
+2008-09-08 12:23  squinney
+
+	* Build.PL.in, Makefile.PL, README: Updated perl build files
+
+2008-09-08 12:22  squinney
+
+	* MANIFEST: Updated package MANIFEST
+
+2008-09-02 11:35  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.33
+
+2008-09-02 11:34  squinney
+
+	* lcfg.yml, lib/LCFG/Build/Utils/MacOSX.pm.in,
+	  templates/build.cmake.tt: Fixed a problem with pod2man not
+	  working if the group argument, which gets passed into the
+	  --center option, was not specified
+
+2008-08-07 12:05  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.32
+
+2008-08-07 12:05  squinney
+
+	* Build.PL.in, LCFG-Build-Tools.spec, MANIFEST, lcfg.yml,
+	  lib/LCFG/Build/Tool.pm.in, lib/LCFG/Build/Tool/CheckMacros.pm.in,
+	  lib/LCFG/Build/Tool/DevOSXPkg.pm.in,
+	  lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in,
+	  lib/LCFG/Build/Tool/MajorVersion.pm.in,
+	  lib/LCFG/Build/Tool/MinorVersion.pm.in,
+	  lib/LCFG/Build/Tool/OSXPkg.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/Release.pm.in,
+	  lib/LCFG/Build/Tool/SRPM.pm.in, lib/LCFG/Build/Tools.pm.in,
+	  lib/LCFG/Build/Utils.pm.in, lib/LCFG/Build/Utils/MacOSX.pm.in,
+	  lib/LCFG/Build/Utils/RPM.pm.in, t/02_macros.t, t/macros.tmpl,
+	  t/macros.txt: Lots of small changes to satisfy perltidy and
+	  perlcritic
+
+2008-08-06 15:49  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.31
+
+2008-08-06 15:49  squinney
+
+	* LCFG-Build-Tools.spec, t, t/01_load.t: Added a basic test to
+	  check that all Perl modules are loadable. Also added all the
+	  necessary build dependencies so this check can be carried out in
+	  a chroot
+
+2008-08-06 14:25  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.30
+
+2008-08-06 14:24  squinney
+
+	* Build.PL.in, LCFG-Build-Tools.spec, MANIFEST, lcfg.yml,
+	  lib/LCFG/Build/Tool/DevOSXPkg.pm.in,
+	  lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/OSXPkg.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Utils.pm.in, lib/LCFG/Build/Utils/MacOSX.pm.in,
+	  templates/Description.plist.tmpl, templates/Info.plist.tmpl:
+	  Added basic MacOSX support, stubs for the ospkg and devospkg
+	  command modules are now supplied
+
+2008-08-05 14:29  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.29
+
+2008-08-05 14:29  squinney
+
+	* lib/LCFG/Build/Tool/CheckMacros.pm.in: Added a new checkmacros
+	  command
+
+2008-07-30 20:17  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.28
+
+2008-07-30 20:16  squinney
+
+	* lib/LCFG/Build/Tool/SRPM.pm.in: overrode sourceonly and deps
+	  attributes from LCFG::Build::Tool::SRPM so they don't show up as
+	  options for the srpm command
+
+2008-07-30 20:14  squinney
+
+	* lib/LCFG/Build/Tool/RPM.pm.in: Removed srpm method from
+	  LCFG::Build::Tool::RPM as it is no longer needed
+
+2008-07-30 20:00  squinney
+
+	* bin/lcfg-reltool.in: switch lcfg-reltool to using
+	  LCFG::Build::Tools and updated the docs a bit
+
+2008-07-30 19:59  squinney
+
+	* lib/LCFG/Build/Tool/SRPM.pm.in: Added the srpm command for
+	  convenience
+
+2008-07-30 19:58  squinney
+
+	* lib/LCFG/Build/Tools.pm.in: Documented override of the App::Cmd
+	  _prepare_command method in LCFG::Build::Tools
+
+2008-07-30 19:34  squinney
+
+	* lib/LCFG/Build/Tools.pm.in: attempt to handle abbreviated command
+	  names
+
+2008-07-30 18:53  squinney
+
+	* lib/LCFG/Build/Tool/Release.pm.in: Fixed
+	  LCFG::Build::Tool::Release run method
+
+2008-07-30 18:48  squinney
+
+	* lib/LCFG/Build/Tool/Release.pm.in: Document why the resultsdir is
+	  overridden in LCFG::Build::Tool::Release
+
+2008-07-30 18:19  squinney
+
+	* lib/LCFG/Build/Tool/MajorVersion.pm.in,
+	  lib/LCFG/Build/Tool/MinorVersion.pm.in: Fixed overrides
+
+2008-07-30 18:17  squinney
+
+	* lib/LCFG/Build/Tool.pm.in, lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/Pack.pm.in: Moved resultsdir option to the
+	  top-level LCFG::Build::Tool class
+
+2008-07-30 18:08  squinney
+
+	* lib/LCFG/Build/Tool/MajorVersion.pm.in,
+	  lib/LCFG/Build/Tool/MinorVersion.pm.in,
+	  lib/LCFG/Build/Tool/Release.pm.in: Added majorversion and
+	  minorversion tools
+
+2008-07-30 16:31  squinney
+
+	* templates/build.cmake.tt: Removed lcfg_add_doc CMake macro as it
+	  is unnecessary
+
+2008-07-30 16:30  squinney
+
+	* lib/LCFG/Build/Tool.pm.in, lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/Release.pm.in:
+	  Added documentation for the commands and the options
+
+2008-07-30 16:28  squinney
+
+	* LCFG-Build-Tools.spec: Added requirement for
+	  perl(MooseX::App::Cmd) to the specfile
+
+2008-07-30 15:24  squinney
+
+	* lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/Release.pm.in:
+	  Converted to MooseX::App::Cmd
+
+2008-07-30 14:47  squinney
+
+	* lib/LCFG/Build/Tool.pm.in, lib/LCFG/Build/Tools.pm.in: Switched
+	  to using App::Cmd
+
+2008-07-25 12:49  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.27
+
+2008-07-25 12:48  squinney
+
+	* lcfg.yml, templates/build.cmake.tt, templates/lcfg.cmake.tt:
+	  Added handling of logrotate files. Improved handling of bin and
+	  sbin files
+
+2008-07-25 12:44  squinney
+
+	* lcfg_config.yml: Added INITDIR macro
+
+2008-07-22 15:44  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.26
+
+2008-07-22 15:43  squinney
+
+	* templates/lcfg.cmake.tt: Set MSG variable
+
+2008-07-22 10:40  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.25
+
+2008-07-22 10:39  squinney
+
+	* templates/lcfg.cmake.tt: Added ICONDIR, SCRIPTDIR, HAS_PROC and
+	  BOOTCOMP cmake variables. Also added bash detection
+
+2008-07-22 10:34  squinney
+
+	* templates/build.cmake.tt: Fixed cmake lcfg_add_schema macro so it
+	  works for all values
+
+2008-07-18 13:19  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.24
+
+2008-07-18 13:18  squinney
+
+	* templates/build.cmake.tt: Split out from lcfg_add_pod() an
+	  lcfg_add_man() macro
+
+2008-07-18 10:59  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.23
+
+2008-07-18 10:59  squinney
+
+	* templates/lcfg.cmake.tt: Added LIBDIR and LIBSECURITYDIR
+	  variables. Also now handle the correct setting of PERL_LIBDIR and
+	  PERL_ARCHDIR based on whether the builder wants site or vendor
+	  locations.
+
+2008-07-18 10:57  squinney
+
+	* templates/build.cmake.tt: Added support for installing perl
+	  modules with lcfg_add_perl_module() and lcfg_add_perl_tree().
+
+2008-07-17 15:16  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.22
+
+2008-07-17 15:16  squinney
+
+	* lcfg.yml, templates/build.cmake.tt: Improved handling of POD
+	  files
+
+2008-07-15 10:51  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.21
+
+2008-07-15 10:50  squinney
+
+	* lib/LCFG/Build/Utils/RPM.pm.in: Rewrote the build method in
+	  Utils::RPM to avoid using RPM4::Spec::rpmbuild which appears to
+	  be weirdly broken
+
+2008-07-11 14:22  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.20
+
+2008-07-11 14:20  squinney
+
+	* templates/build.cmake.tt, templates/lcfg.cmake.tt: Added
+	  detection of the perl executable and fixed usage of lsb detection
+	  for linux
+
+2008-07-11 14:19  squinney
+
+	* lib/LCFG/Build/Utils.pm.in: Fixed find_trans_files to return
+	  relative paths
+
+2008-07-10 09:15  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.19
+
+2008-07-10 09:14  squinney
+
+	* bin/lcfg-reltool.in, lib/LCFG/Build/Tool/RPM.pm.in,
+	  lib/LCFG/Build/Utils/RPM.pm.in: Added a shortcut command for
+	  building an srpm. Added some error handling for when rpmbuild
+	  fails
+
+2008-07-10 09:06  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.18
+
+2008-07-10 09:05  squinney
+
+	* lcfg.yml, lib/LCFG/Build/Utils.pm.in: Rewrote
+	  LCFG::Build::Utils::translate_string() so that it only
+	  substitutes known macros. It is also now much easier to extend
+	  with new macro styles. Changed the behaviour of
+	  LCFG::Build::Utils::translate_macro() so it returns undef for an
+	  unknown macro
+
+2008-07-09 15:56  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.17
+
+2008-07-09 15:56  squinney
+
+	* lib/LCFG/Build/Tool/DevRPM.pm.in, lib/LCFG/Build/Tool/RPM.pm.in:
+	  Fixed mistake with printing out the binary RPM filenames in
+	  Tool::RPM and Tool::DevRPM
+
+2008-07-09 14:21  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.16
+
+2008-07-09 14:20  squinney
+
+	* lcfg.yml, lib/LCFG/Build/Tool/DevRPM.pm.in,
+	  lib/LCFG/Build/Tool/Pack.pm.in: Fixed bug where Tool::Pack used
+	  the devel-tree metadata file instead of that from the tagged-tree
+
+2008-07-08 09:57  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.15
+
+2008-07-08 09:54  squinney
+
+	* lib/LCFG/Build/Tool/DevRPM.pm.in, lib/LCFG/Build/Tool/RPM.pm.in:
+	  This time the logging of results from Tool::RPM and Tool::DevRPM
+	  might actually be correct...
+
+2008-07-08 09:45  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.14
+
+2008-07-08 09:44  squinney
+
+	* lib/LCFG/Build/Tool/DevPack.pm.in,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in, lib/LCFG/Build/Tool/Pack.pm.in,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/Release.pm.in,
+	  lib/LCFG/Build/Tools.pm.in: Various documentation improvements
+
+2008-07-08 09:28  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.13
+
+2008-07-08 09:28  squinney
+
+	* lib/LCFG/Build/Tool/DevRPM.pm.in, lib/LCFG/Build/Tool/RPM.pm.in:
+	  Fixed log messages in Tool::RPM and Tool::DevRPM
+
+2008-07-08 09:21  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.12
+
+2008-07-08 09:21  squinney
+
+	* LCFG-Build-Tools.spec: Fixed specfile so that *.in files do not
+	  get included
+
+2008-07-08 09:19  squinney
+
+	* LCFG-Build-Tools.spec: Added into the specfile a list of Perl
+	  module dependencies which get missed by the automatic Perl dep
+	  finder since they are loaded through 'require' rather than 'use'
+
+2008-07-07 14:33  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.11
+
+2008-07-07 14:32  squinney
+
+	* lib/LCFG/Build/Utils, lib/LCFG/Build/Utils/RPM.pm.in: Forgot to
+	  add the Utils::RPM module into CVS
+
+2008-07-07 14:30  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.10
+
+2008-07-07 14:29  squinney
+
+	* Build.PL, Build.PL.in, bin/lcfg-reltool, bin/lcfg-reltool.in,
+	  lib/LCFG/Build/Tool.pm, lib/LCFG/Build/Tool.pm.in,
+	  lib/LCFG/Build/Tool/DevPack.pm,
+	  lib/LCFG/Build/Tool/DevPack.pm.in, lib/LCFG/Build/Tool/DevRPM.pm,
+	  lib/LCFG/Build/Tool/DevRPM.pm.in, lib/LCFG/Build/Tool/Pack.pm,
+	  lib/LCFG/Build/Tool/Pack.pm.in, lib/LCFG/Build/Tool/RPM.pm,
+	  lib/LCFG/Build/Tool/RPM.pm.in, lib/LCFG/Build/Tool/Release.pm,
+	  lib/LCFG/Build/Tool/Release.pm.in, lib/LCFG/Build/Tools.pm,
+	  lib/LCFG/Build/Tools.pm.in, lib/LCFG/Build/Utils,
+	  lib/LCFG/Build/Utils.pm, lib/LCFG/Build/Utils.pm.in: Lots more
+	  documentation of modules. Moved various files to .in versions for
+	  macro substitution
+
+2008-07-07 12:00  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.9
+
+2008-07-07 11:59  squinney
+
+	* Build.PL, lib/LCFG/Build/Utils.pm, lib/LCFG/Build/Utils/RPM.pm:
+	  Documented LCFG::Build::Utils and LCFG::Build::Utils::RPM, also
+	  tidied code to satisfy perllint and perlcritic
+
+2008-07-07 08:49  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.8
+
+2008-07-07 08:49  squinney
+
+	* lcfg.yml, lib/LCFG/Build/Tool.pm, lib/LCFG/Build/Tool/Release.pm,
+	  lib/LCFG/Build/Utils.pm, lib/LCFG/Build/Utils/RPM.pm: Extracted
+	  metafile templating from Utils::RPM to Utils so it can be used
+	  anywhere. Added a couple of missing module dependencies and
+	  tidied up a couple of sections
+
+2008-06-30 15:40  squinney
+
+	* lib/LCFG/Build/Tools: removed LCFG::Build::Tools::Release as it
+	  has been renamed to LCFG::Build::Tool::Release
+
+2008-06-25 14:51  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.7
+
+2008-06-25 14:50  squinney
+
+	* LCFG-Build-Tools.spec: Fixed prep stage in specfile
+
+2008-06-25 14:48  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.6
+
+2008-06-25 14:48  squinney
+
+	* LCFG-Build-Tools.spec: Moved from static specfile to using macros
+
+2008-06-25 14:41  squinney
+
+	* Changes, lcfg.yml: Release: 0.0.5
+
+2008-06-25 14:41  squinney
+
+	* lib/LCFG/Build/Tool/DevRPM.pm, lib/LCFG/Build/Tool/Pack.pm,
+	  lib/LCFG/Build/Tool/RPM.pm: Added various extra release tools
+	  modules
+
+2008-06-25 14:40  squinney
+
+	* Changes, LCFG-Build-Tools.spec, MANIFEST, META.yml, Makefile.PL,
+	  bin/lcfg-buildrpm, bin/lcfg-buildtool, bin/lcfg-gencmake,
+	  bin/lcfg-reltool, lcfg.yml, lib/LCFG/Build/Tool.pm,
+	  lib/LCFG/Build/Tool/DevPack.pm, lib/LCFG/Build/Tool/Release.pm,
+	  lib/LCFG/Build/Tools.pm, lib/LCFG/Build/Utils.pm,
+	  lib/LCFG/Build/Utils/RPM.pm: Release: 0.0.4
+
+2008-06-04 16:13  squinney
+
+	* Build.PL, MANIFEST, MANIFEST.SKIP, META.yml, Makefile.PL, README,
+	  bin/lcfg-reltool, lcfg.yml, lib/LCFG/Build/Tool,
+	  lib/LCFG/Build/Tool.pm, lib/LCFG/Build/Tool/DevPack.pm,
+	  lib/LCFG/Build/Tool/Release.pm, lib/LCFG/Build/Tools/Release.pm,
+	  lib/LCFG/Build/Utils, lib/LCFG/Build/Utils.pm,
+	  lib/LCFG/Build/Utils/RPM.pm: Added lots more code
+
+2008-06-04 16:11  squinney
+
+	* lib/LCFG/Build/Tools.pm: Renamed LCFG::Build::Tools to
+	  LCFG::Build::Tool
+
+2008-06-04 15:17  squinney
+
+	* lib/LCFG/Build/Tools/RPM.pm: removed file
+
+2008-05-28 14:31  squinney
+
+	* Changes, bin/lcfg-reltool, lcfg.yml, lib/LCFG/Build/Tools.pm,
+	  lib/LCFG/Build/Tools/Release.pm: Release: 0.0.3
+
+2008-05-13 11:00  squinney
+
+	* LCFG-Build-Tools.spec, bin/lcfg-buildtool, bin/lcfg-reltool,
+	  lib/LCFG/Build/Tools.pm, lib/LCFG/Build/Tools/RPM.pm,
+	  templates/build.cmake.tt, templates/lcfg.cmake.tt: Moved
+	  lcfg-reltool to this package to simplify dependencies
+
+2008-05-08 08:51  squinney
+
+	* Changes, LCFG-Build-Tools.spec, bin/lcfg-buildrpm,
+	  lib/LCFG/Build/Tools, lib/LCFG/Build/Tools/RPM.pm: Added more
+	  stuff
+
+2008-05-08 08:29  squinney
+
+	* bin/lcfg-gencmake, lcfg.yml, lib/LCFG/Build/Tools.pm,
+	  mapping_config.yml, templates/build.cmake.tt, templates/cmake.tt,
+	  templates/lcfg.cmake.tt: Added lots of stuff
+
+2008-05-06 16:02  squinney
+
+	* lcfg.yml: Release: 0.0.2
+
+2008-05-06 16:02  squinney
+
+	* bin, bin/lcfg-buildtool, bin/lcfg-gencmake, lcfg.yml,
+	  lcfg_config.yml, lib, lib/LCFG, lib/LCFG/Build,
+	  lib/LCFG/Build/Tools.pm, mapping_config.yml, templates,
+	  templates/build.cmake.tt, templates/cmake.tt,
+	  templates/lcfg.cmake.tt: Added lots of files to CVS
+
+2008-05-06 16:02  
+
+	* .: Standard project directories initialized by cvs2svn.
+

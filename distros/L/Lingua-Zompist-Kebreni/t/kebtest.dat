@@ -1,0 +1,1428 @@
+
+Trying combination 
+kanu --> kanu
+kenu --> kenu
+kinu --> kinu
+konu --> konu
+kynu --> kynu
+kuny --> kuny
+diru --> diru
+sudy --> sudy
+pabadu --> pabadu
+pocsu --> pocsu
+kulsy --> kulsy
+es'u --> es'u
+pansyru --> pansyru
+mimu --> mimu
+cih'cu --> cih'cu
+
+Trying combination perfective
+kanu --> kuna
+kenu --> kune
+kinu --> kuni
+konu --> kuno
+kynu --> kuny
+kuny --> kynu
+diru --> duri
+sudy --> sydu
+pabadu --> pabuda
+pocsu --> pucso
+kulsy --> kylsu
+es'u --> us'e
+pansyru --> pansury
+mimu --> mumi
+cih'cu --> cuh'ci
+
+Trying combination volitional
+kanu --> agenu
+kenu --> egenu
+kinu --> igenu
+konu --> ogenu
+kynu --> ygenu
+kuny --> ugenu
+diru --> ideru
+sudy --> uzedu
+pabadu --> abebadu
+pocsu --> obecsu
+kulsy --> ugelsu
+es'u --> eves'u
+pansyru --> abensyru
+mimu --> imemu
+cih'cu --> iceh'cu
+
+Trying combination volitional perfective
+kanu --> agune
+kenu --> egune
+kinu --> igune
+konu --> ogune
+kynu --> ygune
+kuny --> ugune
+diru --> idure
+sudy --> uzude
+pabadu --> abebuda
+pocsu --> obucse
+kulsy --> ugulse
+es'u --> evus'e
+pansyru --> abensury
+mimu --> imume
+cih'cu --> icuh'ce
+
+Trying combination make_polite polite
+kanu --> karynu
+kenu --> kerynu
+kinu --> kirynu
+konu --> korynu
+kynu --> kyrynu
+kuny --> kuriny
+diru --> diryru
+sudy --> suridy
+pabadu --> pabarydu
+pocsu --> pocrysu
+kulsy --> kulrisy
+es'u --> natu
+pansyru --> pansyryru
+mimu --> mirymu
+cih'cu --> cih'rycu
+
+Trying combination make_polite perfective polite
+kanu --> kurina
+kenu --> kurine
+kinu --> kurini
+konu --> kurino
+kynu --> kuriny
+kuny --> kyrynu
+diru --> duriri
+sudy --> syrydu
+pabadu --> paburida
+pocsu --> pucriso
+kulsy --> kylrysu
+es'u --> nuta
+pansyru --> pansuriry
+mimu --> murimi
+cih'cu --> cuh'rici
+
+Trying combination make_polite volitional polite
+kanu --> agerynu
+kenu --> egerynu
+kinu --> igerynu
+konu --> ogerynu
+kynu --> ygerynu
+kuny --> ugerynu
+diru --> ideryru
+sudy --> uzerydu
+pabadu --> abebarydu
+pocsu --> obecrysu
+kulsy --> ugelrysu
+es'u --> anetu
+pansyru --> abensyryru
+mimu --> imerymu
+cih'cu --> iceh'rycu
+
+Trying combination make_polite volitional perfective polite
+kanu --> agurine
+kenu --> egurine
+kinu --> igurine
+konu --> ogurine
+kynu --> ygurine
+kuny --> ugurine
+diru --> idurire
+sudy --> uzuride
+pabadu --> abeburida
+pocsu --> obucrise
+kulsy --> ugulrise
+es'u --> anute
+pansyru --> abensuriry
+mimu --> imurime
+cih'cu --> icuh'rice
+
+Trying combination benefactive
+kanu --> keni
+kenu --> keni
+kinu --> keni
+konu --> keni
+kynu --> kini
+kuny --> kyni
+diru --> deri
+sudy --> sydi
+pabadu --> pabedi
+pocsu --> pecsi
+kulsy --> kylsi
+es'u --> es'i
+pansyru --> pansiri
+mimu --> memi
+cih'cu --> ceh'ci
+
+Trying combination benefactive perfective
+kanu --> kine
+kenu --> kine
+kinu --> kine
+konu --> kine
+kynu --> kini
+kuny --> kiny
+diru --> dire
+sudy --> sidy
+pabadu --> pabide
+pocsu --> picse
+kulsy --> kilsy
+es'u --> is'e
+pansyru --> pansiri
+mimu --> mime
+cih'cu --> cih'ce
+
+Trying combination benefactive volitional
+kanu --> egeni
+kenu --> egeni
+kinu --> egeni
+konu --> egeni
+kynu --> igeni
+kuny --> ygeni
+diru --> ederi
+sudy --> yzedi
+pabadu --> abebedi
+pocsu --> ebecsi
+kulsy --> ygelsi
+es'u --> ehes'i
+pansyru --> abensiri
+mimu --> ememi
+cih'cu --> eceh'ci
+
+Trying combination benefactive volitional perfective
+kanu --> egine
+kenu --> egine
+kinu --> egine
+konu --> egine
+kynu --> igine
+kuny --> ygine
+diru --> edire
+sudy --> yzide
+pabadu --> abebide
+pocsu --> ebicse
+kulsy --> ygilse
+es'u --> ehis'e
+pansyru --> abensiri
+mimu --> emime
+cih'cu --> ecih'ce
+
+Trying combination make_polite benefactive polite
+kanu --> kerini
+kenu --> kerini
+kinu --> kerini
+konu --> kerini
+kynu --> kirini
+kuny --> kyrini
+diru --> deriri
+sudy --> syridi
+pabadu --> paberidi
+pocsu --> pecrisi
+kulsy --> kylrisi
+es'u --> neti
+pansyru --> pansiriri
+mimu --> merimi
+cih'cu --> ceh'rici
+
+Trying combination make_polite benefactive perfective polite
+kanu --> kirine
+kenu --> kirine
+kinu --> kirine
+konu --> kirine
+kynu --> kirini
+kuny --> kiriny
+diru --> dirire
+sudy --> siridy
+pabadu --> pabiride
+pocsu --> picrise
+kulsy --> kilrisy
+es'u --> nite
+pansyru --> pansiriri
+mimu --> mirime
+cih'cu --> cih'rice
+
+Trying combination make_polite benefactive volitional polite
+kanu --> egerini
+kenu --> egerini
+kinu --> egerini
+konu --> egerini
+kynu --> igerini
+kuny --> ygerini
+diru --> ederiri
+sudy --> yzeridi
+pabadu --> abeberidi
+pocsu --> ebecrisi
+kulsy --> ygelrisi
+es'u --> eneti
+pansyru --> abensiriri
+mimu --> emerimi
+cih'cu --> eceh'rici
+
+Trying combination make_polite benefactive volitional perfective polite
+kanu --> egirine
+kenu --> egirine
+kinu --> egirine
+konu --> egirine
+kynu --> igirine
+kuny --> ygirine
+diru --> edirire
+sudy --> yziride
+pabadu --> abebiride
+pocsu --> ebicrise
+kulsy --> ygilrise
+es'u --> enite
+pansyru --> abensiriri
+mimu --> emirime
+cih'cu --> ecih'rice
+
+Trying combination benefactive dir2
+kanu --> kenini
+kenu --> kenini
+kinu --> kenini
+konu --> kenini
+kynu --> kinini
+kuny --> kynini
+diru --> deniri
+sudy --> synidi
+pabadu --> pabenidi
+pocsu --> pecnisi
+kulsy --> kylnisi
+es'u --> enis'i
+pansyru --> pansiniri
+mimu --> menimi
+cih'cu --> ceh'nici
+
+Trying combination benefactive perfective dir2
+kanu --> kinine
+kenu --> kinine
+kinu --> kinine
+konu --> kinine
+kynu --> kinini
+kuny --> kininy
+diru --> dinire
+sudy --> sinidy
+pabadu --> pabinide
+pocsu --> picnise
+kulsy --> kilnisy
+es'u --> inis'e
+pansyru --> pansiniri
+mimu --> minime
+cih'cu --> cih'nice
+
+Trying combination benefactive volitional dir2
+kanu --> egenini
+kenu --> egenini
+kinu --> egenini
+konu --> egenini
+kynu --> igenini
+kuny --> ygenini
+diru --> edeniri
+sudy --> yzenidi
+pabadu --> abebenidi
+pocsu --> ebecnisi
+kulsy --> ygelnisi
+es'u --> ehenis'i
+pansyru --> abensiniri
+mimu --> emenimi
+cih'cu --> eceh'nici
+
+Trying combination benefactive volitional perfective dir2
+kanu --> eginine
+kenu --> eginine
+kinu --> eginine
+konu --> eginine
+kynu --> iginine
+kuny --> yginine
+diru --> edinire
+sudy --> yzinide
+pabadu --> abebinide
+pocsu --> ebicnise
+kulsy --> ygilnise
+es'u --> ehinis'e
+pansyru --> abensiniri
+mimu --> eminime
+cih'cu --> ecih'nice
+
+Trying combination make_polite benefactive dir2 polite
+kanu --> kenirini
+kenu --> kenirini
+kinu --> kenirini
+konu --> kenirini
+kynu --> kinirini
+kuny --> kynirini
+diru --> deniriri
+sudy --> syniridi
+pabadu --> pabeniridi
+pocsu --> pecnirisi
+kulsy --> kylnirisi
+es'u --> neniti
+pansyru --> pansiniriri
+mimu --> menirimi
+cih'cu --> ceh'nirici
+
+Trying combination make_polite benefactive perfective dir2 polite
+kanu --> kinirine
+kenu --> kinirine
+kinu --> kinirine
+konu --> kinirine
+kynu --> kinirini
+kuny --> kiniriny
+diru --> dinirire
+sudy --> siniridy
+pabadu --> pabiniride
+pocsu --> picnirise
+kulsy --> kilnirisy
+es'u --> ninite
+pansyru --> pansiniriri
+mimu --> minirime
+cih'cu --> cih'nirice
+
+Trying combination make_polite benefactive volitional dir2 polite
+kanu --> egenirini
+kenu --> egenirini
+kinu --> egenirini
+konu --> egenirini
+kynu --> igenirini
+kuny --> ygenirini
+diru --> edeniriri
+sudy --> yzeniridi
+pabadu --> abebeniridi
+pocsu --> ebecnirisi
+kulsy --> ygelnirisi
+es'u --> eneniti
+pansyru --> abensiniriri
+mimu --> emenirimi
+cih'cu --> eceh'nirici
+
+Trying combination make_polite benefactive volitional perfective dir2 polite
+kanu --> eginirine
+kenu --> eginirine
+kinu --> eginirine
+konu --> eginirine
+kynu --> iginirine
+kuny --> yginirine
+diru --> edinirire
+sudy --> yziniride
+pabadu --> abebiniride
+pocsu --> ebicnirise
+kulsy --> ygilnirise
+es'u --> eninite
+pansyru --> abensiniriri
+mimu --> eminirime
+cih'cu --> ecih'nirice
+
+Trying combination antiben
+kanu --> kona
+kenu --> kona
+kinu --> kyna
+konu --> kona
+kynu --> kuna
+kuny --> kona
+diru --> dyra
+sudy --> soda
+pabadu --> paboda
+pocsu --> pocsa
+kulsy --> kolsa
+es'u --> os'a
+pansyru --> pansura
+mimu --> myma
+cih'cu --> cyh'ca
+
+Trying combination antiben perfective
+kanu --> kano
+kenu --> kano
+kinu --> kany
+konu --> kano
+kynu --> kanu
+kuny --> kano
+diru --> dary
+sudy --> sado
+pabadu --> pabado
+pocsu --> pacso
+kulsy --> kalso
+es'u --> as'o
+pansyru --> pansaru
+mimu --> mamy
+cih'cu --> cah'cy
+
+Trying combination antiben volitional
+kanu --> ogena
+kenu --> ogena
+kinu --> ygena
+konu --> ogena
+kynu --> ugena
+kuny --> ogena
+diru --> ydera
+sudy --> ozeda
+pabadu --> abeboda
+pocsu --> obecsa
+kulsy --> ogelsa
+es'u --> ohes'a
+pansyru --> abensura
+mimu --> ymema
+cih'cu --> yceh'ca
+
+Trying combination antiben volitional perfective
+kanu --> ogane
+kenu --> ogane
+kinu --> ygane
+konu --> ogane
+kynu --> ugane
+kuny --> ogane
+diru --> ydare
+sudy --> ozade
+pabadu --> abebado
+pocsu --> obacse
+kulsy --> ogalse
+es'u --> ohas'e
+pansyru --> abensaru
+mimu --> ymame
+cih'cu --> ycah'ce
+
+Trying combination make_polite antiben polite
+kanu --> korina
+kenu --> korina
+kinu --> kyrina
+konu --> korina
+kynu --> kurina
+kuny --> korina
+diru --> dyrira
+sudy --> sorida
+pabadu --> paborida
+pocsu --> pocrisa
+kulsy --> kolrisa
+es'u --> nota
+pansyru --> pansurira
+mimu --> myrima
+cih'cu --> cyh'rica
+
+Trying combination make_polite antiben perfective polite
+kanu --> karino
+kenu --> karino
+kinu --> kariny
+konu --> karino
+kynu --> karynu
+kuny --> karino
+diru --> dariry
+sudy --> sarido
+pabadu --> pabarido
+pocsu --> pacriso
+kulsy --> kalriso
+es'u --> nato
+pansyru --> pansaryru
+mimu --> marimy
+cih'cu --> cah'ricy
+
+Trying combination make_polite antiben volitional polite
+kanu --> ogerina
+kenu --> ogerina
+kinu --> ygerina
+konu --> ogerina
+kynu --> ugerina
+kuny --> ogerina
+diru --> yderira
+sudy --> ozerida
+pabadu --> abeborida
+pocsu --> obecrisa
+kulsy --> ogelrisa
+es'u --> oneta
+pansyru --> abensurira
+mimu --> ymerima
+cih'cu --> yceh'rica
+
+Trying combination make_polite antiben volitional perfective polite
+kanu --> ogarine
+kenu --> ogarine
+kinu --> ygarine
+konu --> ogarine
+kynu --> ugarine
+kuny --> ogarine
+diru --> ydarire
+sudy --> ozaride
+pabadu --> abebarido
+pocsu --> obacrise
+kulsy --> ogalrise
+es'u --> onate
+pansyru --> abensaryru
+mimu --> ymarime
+cih'cu --> ycah'rice
+
+Trying combination antiben dir2
+kanu --> konina
+kenu --> konina
+kinu --> kynina
+konu --> konina
+kynu --> kunina
+kuny --> konina
+diru --> dynira
+sudy --> sonida
+pabadu --> pabonida
+pocsu --> pocnisa
+kulsy --> kolnisa
+es'u --> onis'a
+pansyru --> pansunira
+mimu --> mynima
+cih'cu --> cyh'nica
+
+Trying combination antiben perfective dir2
+kanu --> kanino
+kenu --> kanino
+kinu --> kaniny
+konu --> kanino
+kynu --> kaninu
+kuny --> kanino
+diru --> daniry
+sudy --> sanido
+pabadu --> pabanido
+pocsu --> pacniso
+kulsy --> kalniso
+es'u --> anis'o
+pansyru --> pansaniru
+mimu --> manimy
+cih'cu --> cah'nicy
+
+Trying combination antiben volitional dir2
+kanu --> ogenina
+kenu --> ogenina
+kinu --> ygenina
+konu --> ogenina
+kynu --> ugenina
+kuny --> ogenina
+diru --> ydenira
+sudy --> ozenida
+pabadu --> abebonida
+pocsu --> obecnisa
+kulsy --> ogelnisa
+es'u --> ohenis'a
+pansyru --> abensunira
+mimu --> ymenima
+cih'cu --> yceh'nica
+
+Trying combination antiben volitional perfective dir2
+kanu --> oganine
+kenu --> oganine
+kinu --> yganine
+konu --> oganine
+kynu --> uganine
+kuny --> oganine
+diru --> ydanire
+sudy --> ozanide
+pabadu --> abebanido
+pocsu --> obacnise
+kulsy --> ogalnise
+es'u --> ohanis'e
+pansyru --> abensaniru
+mimu --> ymanime
+cih'cu --> ycah'nice
+
+Trying combination make_polite antiben dir2 polite
+kanu --> konirina
+kenu --> konirina
+kinu --> kynirina
+konu --> konirina
+kynu --> kunirina
+kuny --> konirina
+diru --> dynirira
+sudy --> sonirida
+pabadu --> pabonirida
+pocsu --> pocnirisa
+kulsy --> kolnirisa
+es'u --> nonita
+pansyru --> pansunirira
+mimu --> mynirima
+cih'cu --> cyh'nirica
+
+Trying combination make_polite antiben perfective dir2 polite
+kanu --> kanirino
+kenu --> kanirino
+kinu --> kaniriny
+konu --> kanirino
+kynu --> kanirynu
+kuny --> kanirino
+diru --> daniriry
+sudy --> sanirido
+pabadu --> pabanirido
+pocsu --> pacniriso
+kulsy --> kalniriso
+es'u --> nanito
+pansyru --> pansaniryru
+mimu --> manirimy
+cih'cu --> cah'niricy
+
+Trying combination make_polite antiben volitional dir2 polite
+kanu --> ogenirina
+kenu --> ogenirina
+kinu --> ygenirina
+konu --> ogenirina
+kynu --> ugenirina
+kuny --> ogenirina
+diru --> ydenirira
+sudy --> ozenirida
+pabadu --> abebonirida
+pocsu --> obecnirisa
+kulsy --> ogelnirisa
+es'u --> onenita
+pansyru --> abensunirira
+mimu --> ymenirima
+cih'cu --> yceh'nirica
+
+Trying combination make_polite antiben volitional perfective dir2 polite
+kanu --> oganirine
+kenu --> oganirine
+kinu --> yganirine
+konu --> oganirine
+kynu --> uganirine
+kuny --> oganirine
+diru --> ydanirire
+sudy --> ozaniride
+pabadu --> abebanirido
+pocsu --> obacnirise
+kulsy --> ogalnirise
+es'u --> onanite
+pansyru --> abensaniryru
+mimu --> ymanirime
+cih'cu --> ycah'nirice
+
+Trying combination subordinate
+kanu --> kaunte
+kenu --> keunte
+kinu --> kiunte
+konu --> kounte
+kynu --> kyunte
+kuny --> kuynte
+diru --> diurte
+sudy --> suytte
+pabadu --> pabautte
+pocsu --> pocuste
+kulsy --> kulyste
+es'u --> eus'te
+pansyru --> pansyurte
+mimu --> miunte
+cih'cu --> cih'ucte
+
+Trying combination perfective subordinate
+kanu --> kuante
+kenu --> kuente
+kinu --> kuinte
+konu --> kuonte
+kynu --> kuynte
+kuny --> kyunte
+diru --> duirte
+sudy --> syutte
+pabadu --> pabuatte
+pocsu --> pucoste
+kulsy --> kyluste
+es'u --> ues'te
+pansyru --> pansuyrte
+mimu --> muinte
+cih'cu --> cuh'icte
+
+Trying combination volitional subordinate
+kanu --> ageunte
+kenu --> egeunte
+kinu --> igeunte
+konu --> ogeunte
+kynu --> ygeunte
+kuny --> ugeunte
+diru --> ideurte
+sudy --> uzeutte
+pabadu --> abebautte
+pocsu --> obecuste
+kulsy --> ugeluste
+es'u --> eheus'te
+pansyru --> abensyurte
+mimu --> imeunte
+cih'cu --> iceh'ucte
+
+Trying combination volitional perfective subordinate
+kanu --> aguente
+kenu --> eguente
+kinu --> iguente
+konu --> oguente
+kynu --> yguente
+kuny --> uguente
+diru --> iduerte
+sudy --> uzuette
+pabadu --> abebuatte
+pocsu --> obuceste
+kulsy --> uguleste
+es'u --> ehues'te
+pansyru --> abensuyrte
+mimu --> imuente
+cih'cu --> icuh'ecte
+
+Trying combination make_polite polite subordinate
+kanu --> karyunte
+kenu --> keryunte
+kinu --> kiryunte
+konu --> koryunte
+kynu --> kyryunte
+kuny --> kuriynte
+diru --> diryurte
+sudy --> suriytte
+pabadu --> pabaryutte
+pocsu --> pocryuste
+kulsy --> kulriyste
+es'u --> nautte
+pansyru --> pansyryurte
+mimu --> miryunte
+cih'cu --> cih'ryucte
+
+Trying combination make_polite perfective polite subordinate
+kanu --> kuriante
+kenu --> kuriente
+kinu --> kuriinte
+konu --> kurionte
+kynu --> kuriynte
+kuny --> kyryunte
+diru --> duriirte
+sudy --> syryutte
+pabadu --> paburiatte
+pocsu --> pucrioste
+kulsy --> kylryuste
+es'u --> nuatte
+pansyru --> pansuriyrte
+mimu --> muriinte
+cih'cu --> cuh'riicte
+
+Trying combination make_polite volitional polite subordinate
+kanu --> ageryunte
+kenu --> egeryunte
+kinu --> igeryunte
+konu --> ogeryunte
+kynu --> ygeryunte
+kuny --> ugeryunte
+diru --> ideryurte
+sudy --> uzeryutte
+pabadu --> abebaryutte
+pocsu --> obecryuste
+kulsy --> ugelryuste
+es'u --> aneutte
+pansyru --> abensyryurte
+mimu --> imeryunte
+cih'cu --> iceh'ryucte
+
+Trying combination make_polite volitional perfective polite subordinate
+kanu --> aguriente
+kenu --> eguriente
+kinu --> iguriente
+konu --> oguriente
+kynu --> yguriente
+kuny --> uguriente
+diru --> idurierte
+sudy --> uzuriette
+pabadu --> abeburiatte
+pocsu --> obucrieste
+kulsy --> ugulrieste
+es'u --> anuette
+pansyru --> abensuriyrte
+mimu --> imuriente
+cih'cu --> icuh'riecte
+
+Trying combination benefactive subordinate
+kanu --> keinte
+kenu --> keinte
+kinu --> keinte
+konu --> keinte
+kynu --> kiinte
+kuny --> kyinte
+diru --> deirte
+sudy --> syitte
+pabadu --> pabeitte
+pocsu --> peciste
+kulsy --> kyliste
+es'u --> eis'te
+pansyru --> pansiirte
+mimu --> meinte
+cih'cu --> ceh'icte
+
+Trying combination benefactive perfective subordinate
+kanu --> kiente
+kenu --> kiente
+kinu --> kiente
+konu --> kiente
+kynu --> kiinte
+kuny --> kiynte
+diru --> dierte
+sudy --> siytte
+pabadu --> pabiette
+pocsu --> piceste
+kulsy --> kilyste
+es'u --> ies'te
+pansyru --> pansiirte
+mimu --> miente
+cih'cu --> cih'ecte
+
+Trying combination benefactive volitional subordinate
+kanu --> egeinte
+kenu --> egeinte
+kinu --> egeinte
+konu --> egeinte
+kynu --> igeinte
+kuny --> ygeinte
+diru --> edeirte
+sudy --> yzeitte
+pabadu --> abebeitte
+pocsu --> ebeciste
+kulsy --> ygeliste
+es'u --> eheis'te
+pansyru --> abensiirte
+mimu --> emeinte
+cih'cu --> eceh'icte
+
+Trying combination benefactive volitional perfective subordinate
+kanu --> egiente
+kenu --> egiente
+kinu --> egiente
+konu --> egiente
+kynu --> igiente
+kuny --> ygiente
+diru --> edierte
+sudy --> yziette
+pabadu --> abebiette
+pocsu --> ebiceste
+kulsy --> ygileste
+es'u --> ehies'te
+pansyru --> abensiirte
+mimu --> emiente
+cih'cu --> ecih'ecte
+
+Trying combination make_polite benefactive polite subordinate
+kanu --> keriinte
+kenu --> keriinte
+kinu --> keriinte
+konu --> keriinte
+kynu --> kiriinte
+kuny --> kyriinte
+diru --> deriirte
+sudy --> syriitte
+pabadu --> paberiitte
+pocsu --> pecriiste
+kulsy --> kylriiste
+es'u --> neitte
+pansyru --> pansiriirte
+mimu --> meriinte
+cih'cu --> ceh'riicte
+
+Trying combination make_polite benefactive perfective polite subordinate
+kanu --> kiriente
+kenu --> kiriente
+kinu --> kiriente
+konu --> kiriente
+kynu --> kiriinte
+kuny --> kiriynte
+diru --> dirierte
+sudy --> siriytte
+pabadu --> pabiriette
+pocsu --> picrieste
+kulsy --> kilriyste
+es'u --> niette
+pansyru --> pansiriirte
+mimu --> miriente
+cih'cu --> cih'riecte
+
+Trying combination make_polite benefactive volitional polite subordinate
+kanu --> egeriinte
+kenu --> egeriinte
+kinu --> egeriinte
+konu --> egeriinte
+kynu --> igeriinte
+kuny --> ygeriinte
+diru --> ederiirte
+sudy --> yzeriitte
+pabadu --> abeberiitte
+pocsu --> ebecriiste
+kulsy --> ygelriiste
+es'u --> eneitte
+pansyru --> abensiriirte
+mimu --> emeriinte
+cih'cu --> eceh'riicte
+
+Trying combination make_polite benefactive volitional perfective polite subordinate
+kanu --> egiriente
+kenu --> egiriente
+kinu --> egiriente
+konu --> egiriente
+kynu --> igiriente
+kuny --> ygiriente
+diru --> edirierte
+sudy --> yziriette
+pabadu --> abebiriette
+pocsu --> ebicrieste
+kulsy --> ygilrieste
+es'u --> eniette
+pansyru --> abensiriirte
+mimu --> emiriente
+cih'cu --> ecih'riecte
+
+Trying combination benefactive dir2 subordinate
+kanu --> keniinte
+kenu --> keniinte
+kinu --> keniinte
+konu --> keniinte
+kynu --> kiniinte
+kuny --> kyniinte
+diru --> deniirte
+sudy --> syniitte
+pabadu --> pabeniitte
+pocsu --> pecniiste
+kulsy --> kylniiste
+es'u --> eniis'te
+pansyru --> pansiniirte
+mimu --> meniinte
+cih'cu --> ceh'niicte
+
+Trying combination benefactive perfective dir2 subordinate
+kanu --> kiniente
+kenu --> kiniente
+kinu --> kiniente
+konu --> kiniente
+kynu --> kiniinte
+kuny --> kiniynte
+diru --> dinierte
+sudy --> siniytte
+pabadu --> pabiniette
+pocsu --> picnieste
+kulsy --> kilniyste
+es'u --> inies'te
+pansyru --> pansiniirte
+mimu --> miniente
+cih'cu --> cih'niecte
+
+Trying combination benefactive volitional dir2 subordinate
+kanu --> egeniinte
+kenu --> egeniinte
+kinu --> egeniinte
+konu --> egeniinte
+kynu --> igeniinte
+kuny --> ygeniinte
+diru --> edeniirte
+sudy --> yzeniitte
+pabadu --> abebeniitte
+pocsu --> ebecniiste
+kulsy --> ygelniiste
+es'u --> eheniis'te
+pansyru --> abensiniirte
+mimu --> emeniinte
+cih'cu --> eceh'niicte
+
+Trying combination benefactive volitional perfective dir2 subordinate
+kanu --> eginiente
+kenu --> eginiente
+kinu --> eginiente
+konu --> eginiente
+kynu --> iginiente
+kuny --> yginiente
+diru --> edinierte
+sudy --> yziniette
+pabadu --> abebiniette
+pocsu --> ebicnieste
+kulsy --> ygilnieste
+es'u --> ehinies'te
+pansyru --> abensiniirte
+mimu --> eminiente
+cih'cu --> ecih'niecte
+
+Trying combination make_polite benefactive dir2 polite subordinate
+kanu --> keniriinte
+kenu --> keniriinte
+kinu --> keniriinte
+konu --> keniriinte
+kynu --> kiniriinte
+kuny --> kyniriinte
+diru --> deniriirte
+sudy --> syniriitte
+pabadu --> pabeniriitte
+pocsu --> pecniriiste
+kulsy --> kylniriiste
+es'u --> neniitte
+pansyru --> pansiniriirte
+mimu --> meniriinte
+cih'cu --> ceh'niriicte
+
+Trying combination make_polite benefactive perfective dir2 polite subordinate
+kanu --> kiniriente
+kenu --> kiniriente
+kinu --> kiniriente
+konu --> kiniriente
+kynu --> kiniriinte
+kuny --> kiniriynte
+diru --> dinirierte
+sudy --> siniriytte
+pabadu --> pabiniriette
+pocsu --> picnirieste
+kulsy --> kilniriyste
+es'u --> niniette
+pansyru --> pansiniriirte
+mimu --> miniriente
+cih'cu --> cih'niriecte
+
+Trying combination make_polite benefactive volitional dir2 polite subordinate
+kanu --> egeniriinte
+kenu --> egeniriinte
+kinu --> egeniriinte
+konu --> egeniriinte
+kynu --> igeniriinte
+kuny --> ygeniriinte
+diru --> edeniriirte
+sudy --> yzeniriitte
+pabadu --> abebeniriitte
+pocsu --> ebecniriiste
+kulsy --> ygelniriiste
+es'u --> eneniitte
+pansyru --> abensiniriirte
+mimu --> emeniriinte
+cih'cu --> eceh'niriicte
+
+Trying combination make_polite benefactive volitional perfective dir2 polite subordinate
+kanu --> eginiriente
+kenu --> eginiriente
+kinu --> eginiriente
+konu --> eginiriente
+kynu --> iginiriente
+kuny --> yginiriente
+diru --> edinirierte
+sudy --> yziniriette
+pabadu --> abebiniriette
+pocsu --> ebicnirieste
+kulsy --> ygilnirieste
+es'u --> eniniette
+pansyru --> abensiniriirte
+mimu --> eminiriente
+cih'cu --> ecih'niriecte
+
+Trying combination antiben subordinate
+kanu --> koante
+kenu --> koante
+kinu --> kyante
+konu --> koante
+kynu --> kuante
+kuny --> koante
+diru --> dyarte
+sudy --> soatte
+pabadu --> paboatte
+pocsu --> pocaste
+kulsy --> kolaste
+es'u --> oas'te
+pansyru --> pansuarte
+mimu --> myante
+cih'cu --> cyh'acte
+
+Trying combination antiben perfective subordinate
+kanu --> kaonte
+kenu --> kaonte
+kinu --> kaynte
+konu --> kaonte
+kynu --> kaunte
+kuny --> kaonte
+diru --> dayrte
+sudy --> saotte
+pabadu --> pabaotte
+pocsu --> pacoste
+kulsy --> kaloste
+es'u --> aos'te
+pansyru --> pansaurte
+mimu --> maynte
+cih'cu --> cah'ycte
+
+Trying combination antiben volitional subordinate
+kanu --> ogeante
+kenu --> ogeante
+kinu --> ygeante
+konu --> ogeante
+kynu --> ugeante
+kuny --> ogeante
+diru --> ydearte
+sudy --> ozeatte
+pabadu --> abeboatte
+pocsu --> obecaste
+kulsy --> ogelaste
+es'u --> oheas'te
+pansyru --> abensuarte
+mimu --> ymeante
+cih'cu --> yceh'acte
+
+Trying combination antiben volitional perfective subordinate
+kanu --> ogaente
+kenu --> ogaente
+kinu --> ygaente
+konu --> ogaente
+kynu --> ugaente
+kuny --> ogaente
+diru --> ydaerte
+sudy --> ozaette
+pabadu --> abebaotte
+pocsu --> obaceste
+kulsy --> ogaleste
+es'u --> ohaes'te
+pansyru --> abensaurte
+mimu --> ymaente
+cih'cu --> ycah'ecte
+
+Trying combination make_polite antiben polite subordinate
+kanu --> koriante
+kenu --> koriante
+kinu --> kyriante
+konu --> koriante
+kynu --> kuriante
+kuny --> koriante
+diru --> dyriarte
+sudy --> soriatte
+pabadu --> paboriatte
+pocsu --> pocriaste
+kulsy --> kolriaste
+es'u --> noatte
+pansyru --> pansuriarte
+mimu --> myriante
+cih'cu --> cyh'riacte
+
+Trying combination make_polite antiben perfective polite subordinate
+kanu --> karionte
+kenu --> karionte
+kinu --> kariynte
+konu --> karionte
+kynu --> karyunte
+kuny --> karionte
+diru --> dariyrte
+sudy --> sariotte
+pabadu --> pabariotte
+pocsu --> pacrioste
+kulsy --> kalrioste
+es'u --> naotte
+pansyru --> pansaryurte
+mimu --> mariynte
+cih'cu --> cah'riycte
+
+Trying combination make_polite antiben volitional polite subordinate
+kanu --> ogeriante
+kenu --> ogeriante
+kinu --> ygeriante
+konu --> ogeriante
+kynu --> ugeriante
+kuny --> ogeriante
+diru --> yderiarte
+sudy --> ozeriatte
+pabadu --> abeboriatte
+pocsu --> obecriaste
+kulsy --> ogelriaste
+es'u --> oneatte
+pansyru --> abensuriarte
+mimu --> ymeriante
+cih'cu --> yceh'riacte
+
+Trying combination make_polite antiben volitional perfective polite subordinate
+kanu --> ogariente
+kenu --> ogariente
+kinu --> ygariente
+konu --> ogariente
+kynu --> ugariente
+kuny --> ogariente
+diru --> ydarierte
+sudy --> ozariette
+pabadu --> abebariotte
+pocsu --> obacrieste
+kulsy --> ogalrieste
+es'u --> onaette
+pansyru --> abensaryurte
+mimu --> ymariente
+cih'cu --> ycah'riecte
+
+Trying combination antiben dir2 subordinate
+kanu --> koniante
+kenu --> koniante
+kinu --> kyniante
+konu --> koniante
+kynu --> kuniante
+kuny --> koniante
+diru --> dyniarte
+sudy --> soniatte
+pabadu --> paboniatte
+pocsu --> pocniaste
+kulsy --> kolniaste
+es'u --> onias'te
+pansyru --> pansuniarte
+mimu --> myniante
+cih'cu --> cyh'niacte
+
+Trying combination antiben perfective dir2 subordinate
+kanu --> kanionte
+kenu --> kanionte
+kinu --> kaniynte
+konu --> kanionte
+kynu --> kaniunte
+kuny --> kanionte
+diru --> daniyrte
+sudy --> saniotte
+pabadu --> pabaniotte
+pocsu --> pacnioste
+kulsy --> kalnioste
+es'u --> anios'te
+pansyru --> pansaniurte
+mimu --> maniynte
+cih'cu --> cah'niycte
+
+Trying combination antiben volitional dir2 subordinate
+kanu --> ogeniante
+kenu --> ogeniante
+kinu --> ygeniante
+konu --> ogeniante
+kynu --> ugeniante
+kuny --> ogeniante
+diru --> ydeniarte
+sudy --> ozeniatte
+pabadu --> abeboniatte
+pocsu --> obecniaste
+kulsy --> ogelniaste
+es'u --> ohenias'te
+pansyru --> abensuniarte
+mimu --> ymeniante
+cih'cu --> yceh'niacte
+
+Trying combination antiben volitional perfective dir2 subordinate
+kanu --> oganiente
+kenu --> oganiente
+kinu --> yganiente
+konu --> oganiente
+kynu --> uganiente
+kuny --> oganiente
+diru --> ydanierte
+sudy --> ozaniette
+pabadu --> abebaniotte
+pocsu --> obacnieste
+kulsy --> ogalnieste
+es'u --> ohanies'te
+pansyru --> abensaniurte
+mimu --> ymaniente
+cih'cu --> ycah'niecte
+
+Trying combination make_polite antiben dir2 polite subordinate
+kanu --> koniriante
+kenu --> koniriante
+kinu --> kyniriante
+konu --> koniriante
+kynu --> kuniriante
+kuny --> koniriante
+diru --> dyniriarte
+sudy --> soniriatte
+pabadu --> paboniriatte
+pocsu --> pocniriaste
+kulsy --> kolniriaste
+es'u --> noniatte
+pansyru --> pansuniriarte
+mimu --> myniriante
+cih'cu --> cyh'niriacte
+
+Trying combination make_polite antiben perfective dir2 polite subordinate
+kanu --> kanirionte
+kenu --> kanirionte
+kinu --> kaniriynte
+konu --> kanirionte
+kynu --> kaniryunte
+kuny --> kanirionte
+diru --> daniriyrte
+sudy --> saniriotte
+pabadu --> pabaniriotte
+pocsu --> pacnirioste
+kulsy --> kalnirioste
+es'u --> naniotte
+pansyru --> pansaniryurte
+mimu --> maniriynte
+cih'cu --> cah'niriycte
+
+Trying combination make_polite antiben volitional dir2 polite subordinate
+kanu --> ogeniriante
+kenu --> ogeniriante
+kinu --> ygeniriante
+konu --> ogeniriante
+kynu --> ugeniriante
+kuny --> ogeniriante
+diru --> ydeniriarte
+sudy --> ozeniriatte
+pabadu --> abeboniriatte
+pocsu --> obecniriaste
+kulsy --> ogelniriaste
+es'u --> oneniatte
+pansyru --> abensuniriarte
+mimu --> ymeniriante
+cih'cu --> yceh'niriacte
+
+Trying combination make_polite antiben volitional perfective dir2 polite subordinate
+kanu --> oganiriente
+kenu --> oganiriente
+kinu --> yganiriente
+konu --> oganiriente
+kynu --> uganiriente
+kuny --> oganiriente
+diru --> ydanirierte
+sudy --> ozaniriette
+pabadu --> abebaniriotte
+pocsu --> obacnirieste
+kulsy --> ogalnirieste
+es'u --> onaniette
+pansyru --> abensaniryurte
+mimu --> ymaniriente
+cih'cu --> ycah'niriecte
+
+Trying combination whodoes
+kanu --> kaneu
+kenu --> keneu
+kinu --> kineu
+konu --> koneu
+kynu --> kyneu
+kuny --> kuneu
+diru --> direu
+sudy --> sudeu
+pabadu --> pabadeu
+pocsu --> pocseu
+kulsy --> kulseu
+es'u --> es'eu
+pansyru --> pansyreu
+mimu --> mimeu
+cih'cu --> cih'ceu
+
+Trying combination whodoesf
+kanu --> kanec
+kenu --> kenec
+kinu --> kinec
+konu --> konec
+kynu --> kynec
+kuny --> kunec
+diru --> direc
+sudy --> sudec
+pabadu --> pabadec
+pocsu --> pocsec
+kulsy --> kulsec
+es'u --> es'ec
+pansyru --> pansyrec
+mimu --> mimec
+cih'cu --> cih'cec
+
+Trying combination participle
+kanu --> kaina
+kenu --> keina
+kinu --> kiena
+konu --> koina
+kynu --> kyina
+kuny --> kuina
+diru --> diera
+sudy --> suida
+pabadu --> pabaida
+pocsu --> pocisa
+kulsy --> kulisa
+es'u --> eis'a
+pansyru --> pansyira
+mimu --> miema
+cih'cu --> cih'ica
+
+Trying combination action
+kanu --> kani
+kenu --> kani
+kinu --> keni
+konu --> kani
+kynu --> keni
+kuny --> koni
+diru --> deri
+sudy --> sodi
+pabadu --> pabadi
+pocsu --> pacsi
+kulsy --> kolsi
+es'u --> as'i
+pansyru --> panseri
+mimu --> memi
+cih'cu --> ceh'ci

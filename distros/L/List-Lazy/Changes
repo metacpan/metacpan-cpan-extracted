@@ -1,0 +1,33 @@
+Revision history for List-Lazy
+
+0.3.0 2017-01-19
+ [ENHANCEMENTS]
+ - Generators can now produce sub-lazy lists.
+
+ [STATISTICS]
+ - code churn: 5 files changed, 44 insertions(+), 10 deletions(-)
+
+0.2.0 2016-11-27
+ [BUG FIXES]
+ - Sub prototypes were declared before the signatures (not good). Bumped
+   minimal Perl to 5.22. [GH#1]
+
+ [ENHANCEMENTS]
+ - Add 'batch' method. [GH#2]
+
+ [STATISTICS]
+ - code churn: 5 files changed, 54 insertions(+), 7 deletions(-)
+
+0.1.0 2016-11-25
+ [ENHANCEMENTS]
+ - new method 'spy' added.
+ - $::a and $::b are now '$a' and '$b'.
+
+ [STATISTICS]
+ - code churn: 5 files changed, 66 insertions(+), 7 deletions(-)
+
+0.0.1 2016-11-25
+ - First version, unleashed on an unsuspecting world.
+
+ [STATISTICS]
+ - code churn: 2 files changed, 25 insertions(+), 1 deletion(-)

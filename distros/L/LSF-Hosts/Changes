@@ -1,0 +1,8 @@
+Revision history for Perl extension LSF::Hosts.
+
+0.01  Tue Dec 20 10:44:27 2005
+	- original version
+
+0.02  Mon Apr 23 15:54:18 2007
+	- Changed the Makefile.pl
+

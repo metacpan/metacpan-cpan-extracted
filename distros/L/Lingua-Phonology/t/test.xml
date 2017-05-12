@@ -1,0 +1,103 @@
+<?xml version="1.0" standalone="yes" ?>
+<phonology name="Test" >
+
+    <features>
+        <feature name="ROOT" type="privative" >
+            <child name="Child 1" />
+            <child name="Child 2" />
+        </feature>
+        <feature name="Child 1" type="privative" />
+        <feature name="Child 2" type="privative" >
+            <child name="privative" />
+            <child name="binary" />
+            <child name="scalar" />
+        </feature>
+        <feature name="Child 3" type="privative" >
+            <parent name="ROOT" />
+            <parent name="Child 1" />
+        </feature>
+        <feature name="privative" type="privative" />
+        <feature name="binary" type="binary" />
+        <feature name="scalar" type="scalar" />
+    </features>
+
+    <symbols>
+        <symbol label="A" >
+            <feature name="binary" value="+" />
+        </symbol>
+        <symbol label="B" >
+            <feature name="privative" value="1" />
+        </symbol>
+        <symbol label="C" >
+            <feature name="scalar" value="2" />
+        </symbol>
+        <symbol label="D" >
+            <feature name="binary" value="1" />
+            <feature name="privative" value="*" />
+        </symbol>
+    </symbols>
+
+    <!-- The parameters here don't add up to anything, but they test every
+    parameter differently from the default -->
+    <syllable>
+        <no_onset />
+        <set_complex_onset />
+        <coda />
+        <complex_coda />
+        <min_son_dist value="3" />
+        <max_edge_son value="3" />
+        <min_nucl_son value="1" />
+        <direction value ="leftward" />
+        <sonorous>
+            <feature name="binary" score="2" />
+            <feature name="privative" score="1" />
+        </sonorous>
+        <clear_seg>
+            not -1:BOUNDARY
+        </clear_seg>
+        <end_adjoin>
+            -1:value('Child 1')
+        </end_adjoin>
+        <begin_adjoin>
+            2:scalar
+        </begin_adjoin>
+    </syllable>
+
+    <rules>
+		<!-- This rule tests "raw" rules, which have plain perl as their contents -->
+		<rule name="Raw">
+			<tier value="Child 2" />
+			<domain value="Child 1" />
+			<direction value="leftward" />
+			<filter type="plain">$_[0]->privative(1)</filter>
+			<where type="plain">$_[0]->scalar</where>
+			<do type="plain">$_[0]->binary(0)</do>
+			<result type="plain">$_[0]->value('Child 2', 1)</result>
+		</rule>
+
+		<!-- This rule tests "extended" rules, which allow n:method shortcuts -->
+        <rule name="Extended">
+			<tier value="Child 2" />
+			<domain value="Child 1" />
+			<direction value="leftward" />
+			<filter>0:privative(1)</filter>
+			<where>0:scalar</where>
+			<do>0:binary(0)</do>
+			<result>0:value('Child 2', 1)</result>
+		</rule>
+
+        <order>
+            <block>
+                <rule name="Raw" />
+                <rule name="Extended" />
+            </block>
+            <block>
+                <rule name="Extended" />
+            </block>
+        </order>
+        <persist>
+            <rule name="Raw" />
+            <rule name="Raw" />
+        </persist>
+    </rules>
+</phonology>

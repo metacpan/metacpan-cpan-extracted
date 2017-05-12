@@ -1,0 +1,9 @@
+# Etiquettes morpho-syntaxiques autorisees
+#
+!!PREPOSITIONS = ((du)|(d)|(à)|(de)|(en)|(au)|(ayant eu)|(des)|(par)|(et)|(ou))!!
+#
+!!CANDIDATES = ((article)|(première)|(premières)|(type)|(A------)|(A--m---)|(A---s--)|(A---p--)|(A--ms--)|(A--mp--)|(A--fs--)|(A--fp--)|(Nc-s--)|(Nc-p--)|(Ncms--)|(Ncfs--)|(Ncmp--)|(Ncfp--)|(Np----)|(Nc----)|(Ncm---)|(ABR)|(NUM)|(Vmps-sm--)|(Vmps-sf--)|(Vmps-pm--)|(Vmps-pf--)|(Vmpp-----))!!
+#
+!!DETERMINERS = ((Da3ms---)|(Da3fs---)|(Da3-s---)|(Da3-p---))!!
+#
+!!COORDINATIONS = ((et))!!

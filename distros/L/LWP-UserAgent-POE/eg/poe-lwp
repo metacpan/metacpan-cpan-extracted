@@ -1,0 +1,14 @@
+#!/usr/local/bin/perl -w
+use strict;
+use LWP::UserAgent::POE;
+
+my $ua = LWP::UserAgent::POE->new();
+my $resp = $ua->get( "http://www.yahoo.com" );
+
+if($resp->is_success()) {
+    print $resp->content();
+} else {
+    print "Error: ", $resp->message(), "\n";
+}
+
+POE::Kernel->run();

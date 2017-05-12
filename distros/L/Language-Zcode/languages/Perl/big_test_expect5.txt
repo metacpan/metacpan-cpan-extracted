@@ -1,0 +1,168 @@
+
+
+Pick a name for commands. 
+Yes.
+Recording commands to big_test.cmd.
+
+
+Jumps [1]: jump.je..........jg.......jl.......jz...offsets..
+Variables [31]: push/pull..store.load.dec.......inc.......
+    dec_chk...........inc_chk.........
+Arithmetic ops [69]: add.......sub.......
+    mul........div...........mod...........
+Logical ops [113]: not....and.....or.....art_shift........log_shift........
+Memory [143]: loadw.loadb..storeb..storew...
+Subroutines [151]: call_1s.call_2s..call_vs2...call_vs.....ret.
+    call_1n.call_2n..call_vn..call_vn2..
+    rtrue.rfalse.ret_popped.
+    Computed call....
+    check_arg_count................
+Objects [193]: get_parent....get_sibling.......get_child......jin.......
+    test_attr......set_attr....clear_attr....set/clear/test_attr..
+    get_next_prop......get_prop_len/get_prop_addr....
+    get_prop..........put_prop..........
+    remove..insert.......
+    Spec1.0 length-64 props...........
+Indirect Opcodes [283]: load..................store.........................
+    pull...............inc...............dec...............
+    inc_chk...............dec_chk...............
+Misc [401]: test...random.verify.piracy.
+
+Opening input stream. Use input file big_test.in
+Playing back commands from big_Test.in...
+Non-interactive read [407]
+Type the phrase between > and < (not counting those chars).
+Spacing must be exactly the same, but it's case-insensitive.
+
+>ask hitchhiker's about babel fish<
+>ask Hitchhiker's ABOUT bAbel fish
+..................
+> hello,sailor. <
+> hello,Sailor. 
+...............
+><
+>
+...
+>type"012 345 678 9!? _#' /\- :()"<
+>type"012 345 678 9!? _#' /\- :()"
+.................................
+
+
+Header (No tests)
+    interpreter 0 P ()
+    Flags on: color, boldface, italic, fixed-space, transcripting on, 
+    Flags off: pictures, sound, timer, fixed-pitch on, redraw pending, using
+pictures, using undo, using mouse, using colors, using sound, using menus, 
+    Screen size: 80x40; in 1x1 units: 80x40
+    Default color: white on black
+Print opcodes [476]: Tests should look like... '[Test] opcode (stuff): stuff'
+print_num (0, 1, -1, 32767,-32768, -1): 0, 1, -1, 32767, -32768, -1
+[482] print_char (abcd): abcd
+This string should be on its own line.
+[487] new_line:
+
+There should be an empty line above this line.
+print_ret (should have newline after this)
+.
+print_addr (Hello.): Hello.
+
+print_paddr (A long string that Inform will put in high memory):
+A long string that Inform will put in high memory
+Abbreviations (I love 'xyzzy' [two times]): I love 'xyzzy'  I love 'xyzzy'
+
+[494] print_obj (Test Object #1Test Object #2): Test Object #1Test Object #2
+This is an extremely long string which should definitely get wrapped even if
+you have a whole lot of columns in your particular output device, whatever it
+may be.
+Test paging functionality
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+
+Closing Output Streams [498]
+Command recording stopped.
+
+Only to stream 2.
+Stream 1 and 2 again.

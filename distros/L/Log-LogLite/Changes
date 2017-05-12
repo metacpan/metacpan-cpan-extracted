@@ -1,0 +1,24 @@
+Revision history for Perl extension Log::LogLite.
+
+0.82 Tue Sep 24 14:23:49 CEST 2002
+       - Just fixed the copyright notice
+
+0.81 Thu Jan 31 13:16:52 CET 2002
+       - Fixed that the log file will not be opened already locked. 
+	 Thanks to Tilman Mueller-Gerbes!
+
+0.8  Thu Jan  3 14:57:22 CET 2002
+       - For the new year, I got lucky, and found out the obvious: 
+	 there is a function called "caller" build in Perl. 
+	 So no more use of the annoying Devel::CallerItem! 
+         Besides, I upgraded the VERSION number to 0.8, because we 
+	 use this class for quite a time now, and had no problems.
+ 
+0.3  Mon Jul  2 21:30:35 CEST 2001
+       - OK, now it is written correctly - the log file is opened when
+         we construct the object. It is locked everytime we write into
+         it, and it is closed in the destructor. Thanks Rob Napier for
+         guiding me to do it that way.
+
+0.2  Fri Feb  9 15:21:28 CET 2001
+       - first distribution on CPAN

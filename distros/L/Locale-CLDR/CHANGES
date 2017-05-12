@@ -1,0 +1,162 @@
+Revision history for Locale-CLDR
+All dates are in ISO 8601 Format
+
+0.0.1 2014-03-29
+	- Released to CPAN
+
+0.0.2 2014-04-12
+	- This version now passes all tests on CPAN
+
+0.0.3 201-04-12
+	- This corrects a mistake in the upload of the previous version
+
+0.0.4 2014-04-12
+	- Fix bug causing some of the data files not to be correctly generated
+	- Fixed count attributes for currency fall back
+	- Fixed test scripts to match new corrected data
+	
+0.0.5 2014-04-19
+	- Added Documentation for undocumented public functions
+
+0.25.0 2014-04-26
+	- Changed revision format to be API.CLDR Revision.Release
+	- Added Unicode extensions to the locale codes for numbers
+		and calendars
+	- Added tests for the extension code
+	- Added documentation for the extension code
+	
+0.25.1 2014-05-18
+	- Updates and fixes to documentation
+	- Change week data code so we no longer return a hash of all the data but
+		now take a territory id and return the data specifically for that territory
+	- Fixed up week data and calendar preferences to use territory containment 
+	- Added currency data to the number formatting code
+	- Added tests for the above changes
+	- Allow for use with Perl 5.10 and above
+	- Fixed tests to handle Perl 5.10 and above
+	
+0.25.2 2014-06-02
+	- Added Pluralisation rules
+	- Added warning when falling back to the likely territory when getting a default currency.
+	- Added plural range code
+    - Added tests for above
+
+0.25.3 2014-06-12
+	- Rule Based Number Formatting
+
+0.25.4 2014-06-20
+	- Fixes to bugs found in the rule base number formatting
+
+0.26.0
+	- Broken release
+
+0.26.1
+	- Broken release
+
+0.26.2 2014-11-29
+	- CLDR version 26 release.
+	- Break data into bundles so you don't have to download all the data
+	- Fix some spelling mistakes in the documentation
+	- Fix bugs in the Rule based number formatting
+
+0.26.3
+	- Fixes for the En Distribution
+
+0.26.4 2014-12-21
+	- Test fixes in the BG Distribution
+	
+0.26.5 2014-12-26
+	- Fixed currency symbols with a . in them being confused with the decimal separator.
+	- Fixed overrides and currency tests for BG language
+
+0.26.6 2014-12-29
+	- Fixed tests in the base distribution to use en_US as the locale
+	
+0.26.7 2014-12-30
+	- Added tests for French distribution
+	- Fixed bug in calendars not falling back to Gregorian
+	- Given all currency tests a locale with a region identifier
+	- Added tests for the Breton language
+
+0.26.8 2015-01-09
+	- Added tests for all units in base distribution
+	- Added compound units for different lengths
+	- Added precomputed divisors for compound units
+	- Fixed all_units method to return all the unit identifiers
+	- Added unit_name method to get the localised name of a unit
+	- Added time separator
+	- Added minimum grouping digits
+	- Added plural forms for rule based number formatting
+
+0.26.9 2015-01-20
+	- Added tests for Catalan.
+	- Fixed a bug in Paper and Measurement systems that would crash a script using the module
+		if no territory was given to the locale.
+
+0.27.0 2015-04-07
+	first draft with the CLDR v27 data
+	Added month patterns
+	Added cyclic names
+	Bumped year in copyright message
+	Fixed package inheritance to use the parent package data in the supplemental data
+	Fixed tests to handle new data set
+
+0.27.1 2015-05-03
+	Added Welsh as a Language Pack
+
+0.27.2 2015-07-16
+	Added basic collation
+	Added dummy Locale::CLDR::Transformations package to get CPAN to index the transformations Pack
+
+0.27.3 2015-07-18
+	Added missing required modules
+	Added dummy code for building Bundles
+	Removed code to generate a Makefile.PL
+	Fixed incorrect name for data pack distributions
+	
+0.28.0 2015-10-08
+	Removed generated data from the header of each file as this has been removed from the CLDR data
+	Updated valid languages etc to use the new file format
+	Added alias to unit names
+	Added coordinate unit types
+	Updated Unit tests
+
+0.28.1 2015-10-25
+	Change all references of territories to regions to match the CLDR documentation. This includes method names.
+	Change minimum Perl version to 5.10.1 as tests for 5.10.0 won't run
+	Added currency_format() method to get the currency format for the locale
+	Added default currency format and locale id override
+	Added tests for currency formats
+	Added format_currency() to the number formatter to supply all the defaults for the locale to format_number()
+	Fix Number Formatter to corectly handle the - sign on negative numbers
+	Fix Number Formatter to corectly handle the + sign on posative numbers
+	Fix Number formatter to corectly split the number format into negative and positive
+	Removed the generation of negative number formats in the Locale data when the negative format is 
+		simpley -<posative format>.
+	Updated tests to feflect the above change
+	Cleaned up variable names in test files
+
+0.28.2 2015-11-12
+	Some SEO work on the build scripts
+	Fixed incorrectly named Unicode block in collation code
+	Added default currency override
+	Added tests for default currency override
+	Fixed not numeric in == warning for Plural Rules
+	Added Danish language pack
+
+0.28.3 2016-02-10
+	Added first day of week override
+	Added tests for above
+	Added maketext emulation and tests
+	Pushed all language packs
+
+0.29.0 2016-04-29
+	Now using CLDR version 29
+	Fixed bug in version line of base Transliteration Package
+	Fixed text in meta description of Transliteration Package
+	Moved from using Moose to Moo
+	Removed Deprecated regions
+	Added Region bundles and distributions
+	Added some Rusian tests
+	Fixed generation of day period rules
+	Transliteration now requires script identifiers rather than script names

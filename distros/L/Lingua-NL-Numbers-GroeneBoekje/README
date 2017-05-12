@@ -1,0 +1,18 @@
+Lingua::NL::Numbers::GroeneBoekje converts numeric values to their
+Dutch written equivalent, according to the guidelines as defined in
+the "Groene Boekje". For example:
+
+  twee
+  twintig
+  tweeëntwintig
+  tweehonderd
+  tweehonderdtweeëntwintig
+  tweeëntwintighonderd
+  tweeduizend tweehonderdtwintig
+  twee miljoen tweehonderdtwintigduizend tweehonderdtweeëntwintig
+
+See also http://woordenlijst.org/leidraad/6/9/ (dutch).
+
+Build as usual.
+
+

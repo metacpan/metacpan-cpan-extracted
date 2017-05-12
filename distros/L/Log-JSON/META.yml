@@ -1,0 +1,48 @@
+---
+abstract: 'Log data to a file as JSON'
+author:
+  - 'Eric Johnson <cpan at iijo dot org>'
+build_requires:
+  Directory::Scratch: 0
+  File::Find: 0
+  File::Slurp: 0
+  File::Temp: 0
+  Test::More: 0
+  Test::Most: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-JSON
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Log::JSON:
+    file: lib/Log/JSON.pm
+    version: 0.001
+requires:
+  Carp: 0
+  DateTime: 0
+  English: 0
+  JSON: 0
+  Moose: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class::File: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/kablamo/Log-JSON/issues
+  homepage: https://github.com/kablamo/Log-JSON
+  repository: https://github.com/kablamo/Log-JSON.git
+version: 0.001

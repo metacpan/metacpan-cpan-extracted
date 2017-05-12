@@ -1,0 +1,59 @@
+Lingua::EN::Grammarian version 0.000005
+
+This module provides a data-driven grammar checker for English text.
+
+It builds a list of potential grammar problems from templates specified
+in two files ('grammarian_errors' and 'grammarian_cautions') and
+locates any such problems in a text string. Because the module is
+data-driven, it is easy for even non-technical users to refine or
+augment the rules used to identify grammatical problems.
+
+Each problem discovered is reported as an object, whose methods can then
+be called to retrieve the corresponding substring of the original text,
+its location within the original text, a description of the problem, and
+a suggested remediation for it.
+
+The module classifies grammatical problems as either "errors" or
+"cautions". Errors are grammatical usages that are unequivocally wrong,
+such as "I gone home", "principle ingredient", "laying low", "their are
+it's collar", "its comprised from", "she do try and learns the words"
+"them have be quite unique", etc.
+
+Cautions are words or phrases that are not inherently wrong, but which
+are commonly confused or misapplied. For example: "affect" vs "effect",
+"infer" vs "imply", "beg the question" vs "raise the question",
+"indict" vs "indite", "less" vs "fewer", "disburse" vs "disperse", etc.
+
+Note that Lingua::EN::Grammarian is not a spell-checker.
+Neither errors nor cautions contain words that have been misspelt;
+they are composed of words that have been misused.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

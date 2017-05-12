@@ -1,0 +1,18 @@
+severity=1
+verbose=11
+
+[-Documentation::RequirePodSections]
+[-Documentation::RequirePodLinksIncludeText]
+
+[-Miscellanea::RequireRcsKeywords]
+
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+
+[InputOutput::RequireBriefOpen]
+lines = 15
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/release/perltidyrc
+
+[Documentation::PodSpelling]
+stop_words = LaTeX xtabular multi longtable ctable sc tt undef namespace Meyrin emacs ltpretty CSV csv PDF pdf STDIN STDOUT maincaption resized extrarowheight manpage afterwards CTAN API getters latextable tex xtab multirow textwidth htb Monospace scriptsize footnotesize mpxtabular lrcr resizebox resize MULTI tabletail multicolumn tabletailmsg lastfoot MULTICOLUMNS Multicolumns coldef Carlisle Wybo Dekker ANDREWF Lapo Mori ANSGAR

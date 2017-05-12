@@ -1,0 +1,18 @@
+Revision history for Locale::POFileManager
+
+0.05  2013-01-09
+    Fix for changes in blead (hash randomization)
+
+0.04  2011-10-09
+    Doc cleanups
+
+0.03  2010-02-24
+    Rewrite to use Locale::Maketext::Lexicon rather than Locale::PO. This
+    removes the ability to modify existing translations (modifications are
+    append-only now), but should make everything else more robust.
+
+0.02  2010-02-21
+    Depend on File::Temp 0.19 for the newdir method
+
+0.01  2010-02-19
+    Initial release

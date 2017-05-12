@@ -1,0 +1,32 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  alltt                                                              | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+#**********************************************************************
+
+DefEnvironment('{alltt}', "<ltx:verbatim font='#font'>#body</ltx:verbatim>",
+  font => { family => 'typewriter', series => 'medium', shape => 'upright' },
+  beforeDigest => sub {
+    map { AssignCatcode($_ => CC_OTHER) } '$', '&', '#', '^', '_', '%', '~';
+    AssignCatcode(" " => 13);
+    Let(T_ACTIVE(" "), '\space');
+    AssignValue(PRESERVE_NEWLINES => 1);
+    # \@noligs: This SHOULD inhibit ligature substitution! (eg quotes, dots, etc!!!)
+    # \frenchspacing\@vobeyspaces
+  });
+
+#**********************************************************************
+1;

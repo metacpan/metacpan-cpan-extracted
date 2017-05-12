@@ -1,0 +1,14 @@
+^(build|make-pod)\.pl$
+^Makefile$
+^\.git.*$
+^blib/.*
+^MYMETA\..*
+^pm_to_blib$
+^Lingua-EN-PluralToSingular-[0-9\.]+.*$
+.*\.pod\.tmpl$
+# Script to make the list of -men words.
+^men\.pl$
+^grecian
+^examples/.*-out\.txt$
+^xt/.*\.t$
+\.gitignore

@@ -1,0 +1,48 @@
+README                           The main README file
+MANIFEST                         This list
+CHANGELOG.md                     List of changes
+Makefile.PL                      Generic Makefile template
+Agent.pm                         Main agent, default interface
+Agent/Channel.pm                 Ancestor for all channels
+Agent/Channel/File.pm            File logging channel
+Agent/Channel/Handle.pm          I/O handle logging channel
+Agent/Channel/Syslog.pm          Syslog logging channel
+Agent/Driver.pm                  Ancestor for all drivers
+Agent/Driver/Datum.pm            Intercepting driver for Devel::Datum
+Agent/Driver/Default.pm          Default logging driver
+Agent/Driver/File.pm             File driver
+Agent/Driver/Fork.pm             Fork to split output to multiple drivers
+Agent/Driver/Mail.pm             Email driver
+Agent/Driver/Silent.pm           Silent driver
+Agent/Driver/Syslog.pm           Syslog driver
+Agent/File/Native.pm             A native file handle
+Agent/File_Pool.pm               Pool of file logging channels for sharing
+Agent/Formatting.pm              Log formatting routines
+Agent/Message.pm                 A log message
+Agent/Prefixer.pm                Log prefixer (name, pid)
+Agent/Priorities.pm              Priority manipulation routines
+Agent/Stamping.pm                Log timestamping routines
+Agent/Tag.pm                     Ancestor for message tags
+Agent/Tag/Callback.pm            Add dynamically computed tags to messages
+Agent/Tag/Caller.pm              Computes and formats caller information
+Agent/Tag/Priority.pm            Add priority/level information to messages
+Agent/Tag/String.pm              Add constant string to messages
+Agent/Tag_List.pm                Holds list of user-defined tags
+t/caller.t                       Test caller information
+t/carp.pl                        Library for tests
+t/carp_default.t                 Test logcarp() and logxcarp() with defaults
+t/carp_file.t                    Test logcarp() and logxcarp() to file
+t/carp_fork.t                    Test logcarp() and logxcarp() to fork
+t/carp_multiline.t               Test logcarp() and logxcarp() with newlines
+t/carp_silent.t                  Test logcarp() and logcroak() with silent
+t/code.pl                        Library for tests
+t/common.pl                      Library for tests
+t/default.t                      Test default settings and driver
+t/default_exp.t                  Test default settings, explicit logconfig()
+t/file.t                         Test file driver
+t/fork.t                         Test driver fork
+t/format.t                       Test the sprintf compatibility of logxxx()
+t/priority.t                     Test -priority setting in logconfig()
+t/tag_callback.t                 Test log message tag via callback
+t/tag_string.t                   Test log message tag via string
+META.json                        Module meta-data

@@ -1,0 +1,1102 @@
+Environ. Sci. Technol. 2003, 37, 343-351
+
+Real-Time PCR Quantification of
+Nitrifying Bacteria in a Municipal
+Wastewater Treatment Plant
+G E R D A H A R M S , †,§ A L I C E C . L A Y T O N , †,§
+H E B E M . D I O N I S I , †,§
+I G R I D R . G R E G O R Y , †,§
+V I C T O R I A M . G A R R E T T , †,§
+S H A W N A . H A W K I N S , ‡,§
+K E V I N G . R O B I N S O N , ‡,§ A N D
+G A R Y S . S A Y L E R * ,†,§
+Department of Microbiology, Department of Civil and
+Environmental Engineering, and Center for Environmental
+Biotechnology, The University of Tennessee,
+Knoxville, Tennessee, 37996
+
+Real-time PCR assays using TaqMan or Molecular
+Beacon probes were developed and optimized for the
+quantification of total bacteria, the nitrite-oxidizing bacteria
+Nitrospira, and Nitrosomonas oligotropha-like ammonia
+oxidizing bacteria (AOB) in mixed liquor suspended solids
+(MLSS) from a municipal wastewater treatment plant
+(WWTP) using a single-sludge nitrification process. The
+targets for the real-time PCR assays were the 16S rRNA
+genes (16S rDNA) for bacteria and Nitrospira spp. and
+the amoA gene for N. oligotropha. A previously reported
+assay for AOB 16S rDNA was also tested for its application
+to activated sludge. The Nitrospira 16S rDNA, AOB 16S
+rDNA, and N. oligotropha-like amoA assays were loglinear over 6 orders of magnitude and the bacterial 16S
+rDNA real-time PCR assay was log-linear over 4 orders
+of magnitude with DNA standards. When these real-time
+PCR assays were applied to DNA extracted from MLSS,
+dilution of the DNA extracts was necessary to prevent
+PCR inhibition. The optimal DNA dilution range was
+broad for the bacterial 16S rDNA (1000-fold) and
+Nitrospira 16S rDNA assays (2500-fold) but narrow for
+the AOB 16S rDNA assay (10-fold) and N. oligotrophalike amoA real-time PCR assay (5-fold). In twelve MLSS
+samples collected over one year, mean cell per L
+values were 4.3 ( 2.0 × 1011 for bacteria, 3.7 ( 3.2 ×
+1010 for Nitrospira, 1.2 ( 0.9 × 1010 for all AOB, and
+7.5 ( 6.0 × 109 for N. oligotropha-like AOB. The percent
+of the nitrifying population was 1.7% N. oligotropha-like
+AOB based on the N. oligotropha amoA assay, 2.9% total
+AOB based on the AOB 16S rDNA assay, and 8.6% nitriteoxidizing bacteria based on the Nitrospira 16S rDNA assay.
+Ammonia-oxidizing bacteria in the wastewater treatment
+plant were estimated to oxidize 7.7 ( 6.8 fmol/hr/cell based
+on the AOB 16S rDNA assay and 12.4 ( 7.3 fmol/hr/cell
+based on the N. oligotropha amoA assay.
+* Corresponding author phone: (865)974-8080; fax: (865)974-8086;
+e-mail: sayler@utk.edu.
+† Department of Microbiology.
+‡ Department of Civil and Environmental Engineering.
+§ Center for Environmental Biotechnology.
+10.1021/es0257164 CCC: $25.00
+Published on Web 12/04/2002
+
+© 2003 American Chemical Society
+
+1. Introduction
+Chemolithotrophic nitrification is a two-step process involving two groups of bacteria: ammonia-oxidizing bacteria
+(AOB) oxidize NH3 to NO2- and nitrite-oxidizing bacteria
+(NOB) oxidize NO2- to NO3- (1). Nitrification is an important
+process in biogeochemical nitrogen cycling and in controlling
+effluent toxicity in wastewater treatment. The physiological
+activity and abundance of these organisms in wastewater
+processing is critical in the design and operation of waste
+treatment systems, particularly since these organisms display
+low growth rate and high sensitivity to environmental
+disturbances and inhibitors (2). An important aspect of
+activity relates to reactor design. Single sludge wastewater
+treatment designs accomplish nitrification concurrent with
+removal of carbonaceous oxygen demand in one reactor;
+activated sludge in these reactors contains both heterotrophs
+and nitrifiers that necessarily compete for resources such as
+oxygen (3). Single sludge reactors are a dominant design in
+the United States (4). Alternatively, nitrification can be
+accomplished using a series of reactors, the first dedicated
+to carbonaceous oxygen demand removal and the second to
+nitrification. To date, molecular quantification of nitrifying
+populations in activated sludge from full-scale wastewater
+treatment plants (WWTPs) has been performed on samples
+obtained from facilities with high nitrogen loads (5) or twostage reators (6, 7). Given that single-sludge nitrification
+processes may contain fewer nitrifiers and are more susceptible to plant upsets, attempts at quantification of nitrifiers
+in these plants is warranted.
+In recent studies, a competitive Polymerase Chain Reaction (cPCR) procedure was developed to quantify nitrifying
+bacteria by PCR amplification of ammonia monooxygenase
+(amoA) and Nitrospira spp. 16S rRNA genes (16S rDNA),
+respectively (8, 9). The cPCR procedure is a well established
+quantitative method that has been used to enumerate both
+culturable and nonculturable organisms, including nitrifying
+bacteria (10-13). This method relies on the measurement of
+PCR products at the endpoint, after gel electrophoresis, and
+it has a log-linear detection range of only 2 to 3 orders of
+magnitude (14, 15). The cPCR technique is robust due to the
+presence of a stringent internal control. However, cPCR is
+difficult to use in routine process monitoring of populations
+in wastewater treatment processes because it is labor- and
+cost-intensive with low throughput.
+In the current study, real-time PCR was investigated for
+applications in monitoring nitrifying populations in wastewater treatment because it combines high throughput with
+high analytical sensitivity and precision, offering a dynamic
+detection range of 6 orders of magnitude or more (15, 16).
+Although real-time PCR has been widely applied in medical
+research, its application to environmental research has been
+slower (17-21). In real-time PCR, amplicons are detected by
+measurement of a fluorescence signal without post-PCR
+sample processing such as gel electrophoresis (Figure 1).
+Several different fluorescent probes can be used in real-time
+PCR including TaqMan (22) or Molecular Beacon (23, 24). A
+TaqMan probe is a linear oligonucleotide complementary to
+a target nucleic acid sequence, with a fluorophore attached
+to the 5′end and a quencher to the 3′end (22) (Figure 1). The
+TaqMan probe is cleaved by the 5′ exonuclease activity of
+Taq DNA polymerase as the primer is extended, resulting in
+the separation of the reporter dye from quencher dye and
+an increase in fluorescence signal emitted by the reporter.
+In each cycle, additional reporter dye molecules are cleaved,
+resulting in an increase in fluorescence intensity proportional
+to the amount of amplicon produced (22). In contrast, a
+VOL. 37, NO. 2, 2003 / ENVIRONMENTAL SCIENCE & TECHNOLOGY
+
+9
+
+343
+
+FIGURE 1. Schematic representation of the quantification of specific targets from mixed-liquor suspended solids (MLSS) samples. After
+DNA extraction, the DNA template is used in real-time PCR assays. (A) TaqManprobe assay. A TaqMan probe is a linear oligonucleotide
+probe complementary to the target sequence, with a fluorescent dye (green circle, F) attached to the 5′end and a quencher (blue triangle,
+Q) to the 3′end. The proximity of these two dyes quenches the signal. Steps: (1) Denaturation of the DNA at 95 °C separates the template.
+(2) Annealing of primers (usually 18-22 nucleotides) and probe to target DNA at temperatures of 50 °C to 60 °C. (3) Extension and synthesis
+of the DNA strand results in the 5′ exonuclease activity by Taq DNA polymerase (red oval, P) separating the fluorescent dye from the
+quencher resulting in an increase in fluorescence. Steps 2 and 3 are often performed simultaneously. The spectrofluorimetric thermal
+cycler measures the relative fluorescence at the end of step 3 (eye). Steps 1-3 are repeated 45 to 50 times. In each cycle, additional
+reporter dye molecules are cleaved, resulting in an increase in fluorescence intensity proportional to the amount of amplicon produced
+(22, 43). (B) Molecular beacon assay. A Molecular beacon probe has a stem and loop structure. The loop section of the probe is
+complementary to the target and the stem results from the annealing of artificially designed arm sequences (23, 24, 43). A fluorescent
+dye (green circle, F) and a quencher (blue triangle, Q) are attached to the arm sequences. Step: (1) Denaturation at 95 °C results in the
+separation of the template DNA and separation of the stem on the molecular beacon probe, separating the quencher from the dye allowing
+fluorescence. (2) Annealing at 60 °C allows the probe to hybridize to the template resulting in fluorescence. Alternatively, if the probe
+does not hybridize with the template the stem-and-loop structure is reformed and fluorescence is quenched. The relative fluorescence
+is measured at the beginning of this step (eye) and is proportional to the number of target sequences. (3) Extension and synthesis of DNA
+at 72 °C results in dissociation of the probe from the target and fluorescence is quenched. Steps 1-3 are repeated 45 to 50 times. The
+final output for both assays shows relative fluorescence as a function of cycle number. Amplification curves for template concentrations
+between 107 and 10 copies per PCR reaction are shown (left to right). The threshold is calculated as 10 times the standard deviation of
+the background fluorescence (dashed line). The point where the fluorescence signal crosses the threshold is the threshold cycle (CT) (dotted
+line) and is lower when more copies of the template are present at the beginning of the reaction.
+344
+
+9
+
+ENVIRONMENTAL SCIENCE & TECHNOLOGY / VOL. 37, NO. 2, 2003
+
+TABLE 1. Primers and Probes Used in This Study
+assay
+
+target
+
+primer/probea
+
+sequence (5′-3′)b
+
+TM (°C)c
+
+reference
+
+1055f
+1392r
+16STaq1115
+amoNo550D2f
+amoNo754r
+amoNoTaq729
+
+5′-ATGGCTGTCGTCAGCT-3′
+5′-ACGGGCGGTGTGTAC-3′
+5′-(6-FAM)-CAACGAGCGCAACCC-(TAMRA)-3′
+5′-TCAGTAGCYGACTACACMGG-3′
+5′-CTTTAACATAGTAGAAAGCGG-3′
+5′-(6-FAM)-CCAAAGTACCACCATACGCAG(TAMRA)-3′
+5′-GGAGRAAAGCAGGGGATCG-3′
+5′-GGAGGAAAGTAGGGGATCG-3′
+5′-CGTCCTCTCAGACCARCTACTG-3′
+5′-(6-FAM)-CAACTAGCTAATCAGRCATCRGCCGCTC-(TAMRA)-3′
+5′-CCTGCTTTCAGTTGCTACCG-3′
+5′-GTTTGCAGCGCTTTGTACCG-3′
+5′-(6-FAM)-AGCACTCTGAAAGGACTGCCCAGG(TAMRA)-3′
+5′-(6-FAM)-GCTGCACC|AGCACTCTGAAAGGACTGCCCAGG|GGTGCAGC-(DABCYL)-3′
+
+57.7
+58.9
+62.9
+55.4
+55.0
+64.1
+
+(25)
+(26)
+this study
+this study
+this study
+this study
+
+63.5
+62.3
+62.8
+71.0
+
+(20)
+(20)
+(20)
+(20)
+
+64.7
+67.8
+73.9
+
+( 9)
+( 9)
+this study
+
+bacterial
+16S rDNA
+
+bacterial
+16S rDNA
+
+N. oligotrophalike amoA
+
+N. oligotropha
+amoA gene
+
+AOB
+
+ammonia-oxidizing
+bacterial
+16S rDNA
+
+CTO 189fA/B
+CTO 189fC
+RT1r
+TMP1
+
+Nitrospira
+16S rDNA
+
+Nitrospira spp.
+16S rDNA
+
+NSR1113f
+NSR1264r
+NSR1143Taq
+NSR1143Beac
+
+this study
+
+a Primer/probe abbreviations: f ) forward primer, r ) reverse primer, Taq ) TaqMan probe, Beac ) beacon probe. b 5′-Fluorophore-probequencher-3′ in case of TaqMan probe; 5′-fluorophore-arm|probe|arm-quencher-3′ in case of Molecular Beacon. 6-FAM ) 6-carboxyfluorescein;
+TAMRA ) carboxytetramethylrhodamine; DABCYL ) 4-(4-dimethylaminophenyl)azo)benzoic acid. c Melting temperatures were calculated using
+the oligo calculator from Sigma Genosys (http://www.genosys.com/cgi-win/oligo_calconly.exe; Sigma Genosys, The Woodlands, TX).
+
+Molecular Beacon probe has a stem and loop structure, with
+the loop section of the probe complementary to the target
+and the stem formed by the annealing of an artificially
+designed arm sequence (24). A fluorescent dye and a
+quencher are attached to both ends of the molecule (Figure
+1). When free in solution the Molecular Beacon adopts a
+hairpin structure, which results in fluorophore quenching.
+In the presence of a complementary target, the hairpin
+structure unfolds and the separation of the fluorophore and
+the quencher leads to emission of fluorescence. Using either
+a TaqMan or a Molecular Beacon probe the threshold cycle
+of a sample is inversely proportional to the logarithm of the
+amount of template DNA initially added to the PCR reaction
+for both types of probe (22-24). Although the design,
+chemistry and portion of the PCR cycle in which fluorescence
+is detected differ for these two probes, similar results should
+be obtained in the enumeration of molecules.
+The primary objectives of the current study were to
+develop methods and to quantify ammonia-oxidizing bacteria
+and nitrite-oxidizing bacteria (Nitrospira) in a single-stage
+type municipal WWTP. Real-time PCR assays for Nitrospira
+16S rDNA and Nitrosomonas oligotropha amoA genes were
+developed from existing cPCR assays for monitoring nitrifying
+bacteria, and a real-time PCR assay developed to enumerate
+AOB 16S rDNA in soil (20) was applied to mixed-liquor
+suspended solids (MLSS). A bacterial 16S rDNA TaqMan assay
+was also developed to monitor total biomass in the MLSS
+samples. Secondary objectives of this study were to compare
+real-time PCR assays using different probe designs (molecular
+beacon versus TaqMan), compare real-time PCR assays
+directed toward ribosomal RNA genes versus catabolic genes
+(amoA), and validate real-time PCR assays by comparison
+with previous data in copies per liter obtained by dot-blot
+hybridization and competitive PCR. The results of this study
+indicate that real-time PCR can be implemented as a tool to
+facilitate molecular monitoring and quantification of critical
+sub-populations, such as nitrifying bacteria, in wastewater
+treatment processes.
+
+(NH4+-N) removal designed with average and peak flow
+capacities of 40 million gallons per day (MGD) and 70 MGD,
+respectively. In the year 2000, this single stage reactor system
+was operated at an average solids retention time of 12 days.
+The reactor system consists of six identical basins arranged
+in parallel, each basin being 183 feet long, 32 feet wide, and
+unusually deep at 33 feet. The basins are in turn sub-divided
+into five compartments in series along the flow path. Each
+compartment is aerated with ceramic fine bubble diffusers
+that provide for complete mixing. The basins are fed via a
+common influent channel. Gravity overflow from the basins
+first combines and then splits to flow to a series of circular
+clarifiers. MLSS samples were collected from the upwell at
+the center of one of the clarifiers prior to the effluent flow
+entering the clarifier quiescent zone. Reactor specific flow
+and influent ammonia data along with plant effluent data
+was obtained. The mean influent BOD5 was 302 (( 47) mg/L,
+and mean mixed-liquor volatile suspended solids (MLVSS)
+was 1971 ( 178 mg/L over the one-year period. The mean
+monthly influent temperature for the year was 17 °C, with
+a low of 9 °C and a high of 25 °C. Genomic DNA was extracted
+in triplicate from 2 mL of MLSS samples using a FastDNA kit
+(BIO 101, Vista, CA) with minor modifications as described
+by Dionisi et al. (9).
+
+2. Methodology
+
+Real-Time PCR Assays. Real-time PCR assays were
+developed for the quantification of bacterial 16S rDNA, Nitrospira spp. 16S rDNA, and N. oligotropha-like amoA. Three
+TaqMan probes, 16sTaq1115, amoNoTaq729, and NSR1143Taq, were designed (Table 1) using the guidelines provided
+by Applied Biosystems (http://home.appliedbiosystems.com;
+Applied Biosystems, Foster City, CA). The primers and probes
+were synthesized by Sigma Genosys (Sigma Genosys, The
+Woodlands, TX). A Molecular Beacon probe, NSR1143Beac,
+was designed using the guidelines provided at http://
+www.molecular-beacons.org/protocol.html and synthesized
+by Stratagene (Stratagene, La Jolla, CA). The optimal artificial
+arm sequences were determined by using the Zuker DNA
+folding program (mfold) (http://bioinfo.math.rpi.edu/∼mfold/
+dna/form1/cgi).
+
+Samples. MLSS samples were collected monthly for one year
+from a local municipal WWTP treating mainly municipal
+wastewater. The WWTP employs single stage reactors for
+carbon (biological oxygen demand (BOD5)) and nitrogen
+
+The real-time PCR assay for AOB used two forward primers
+CTO 189A/B and CTO189C, one reverse primer RT1r and the
+TaqMan probe TMP1 (Table 1) as described by Hermansson
+and Lindgren (20).
+VOL. 37, NO. 2, 2003 / ENVIRONMENTAL SCIENCE & TECHNOLOGY
+
+9
+
+345
+
+Real-Time PCR for Quantification of Bacterial 16S rDNA.
+Bacterial 16S rDNA was amplified using primers 1055f (25)
+and 1392r (26) (Table 1). The TaqMan probe 16STaq1115
+was modified from the 1114f primer (26). The PCR mix with
+a total volume of 25 µL contained Platinum Quantitative PCR
+SuperMix-UDG (Life Technologies, Inc., Gaithersburg, MD)
+with 5 mM MgCl2, 15 pmol primers 1055f and 1392r, 6.25
+pmol TaqMan probe 16STaq1115, 3.2 to 7.0 ng of sample
+DNA or dilutions of plasmid pCR2.1 vector (Invitrogen,
+Carlsbad, CA) carrying a 16S rRNA gene for Nitrospira
+(GenBank accession number AF420301) (9) as standard (from
+4.5 × 103 to 4.5 × 108 copies of the 16S rDNA gene). The PCR
+program was 3 min at 50 °C, 10 min at 95 °C, 45 cycles at 95
+°C for 30 s, 50 °C for 60 s, and 72 °C for 20 s.
+Real-Time PCR for Quantification of Nitrospira 16S
+rDNA. The Nitrospira 16S rDNA primers NSR1113f and
+NSR1264r (Table 1) were previously designed and tested using
+genomic DNA extracted from municipal and industrial MLSS
+as templates (9). The TaqMan probe NSR1143Taq (Table 1)
+was derived from a conserved sequence region between the
+primers NSR1113f and NSR1264r. The probe portion of the
+Molecular Beacon NSR1143Beac (Table 1) is identical to that
+one used in the TaqMan probe. The probe region of
+NSR1143Beac has a TM of 68.0 °C, and the stem region has
+a TM of 70.2 °C (with 5.0 mM MgCl2).
+Real-time PCR assays using NSR1143Taq were performed
+in a total volume of 25 µL with 5 mM MgCl2, Platinum
+SuperMix, 15 pmol of primers NSR1113f and NSR1264r, 6.25
+pmol TaqMan probe NSR1143Taq, and 3.2 to 7.0 ng of sample
+DNA or 30 to 3 × 107 copies of the standard (151 bp fragment
+of Nitrospira 16S rDNA from AF420301) (9). PCR amplification
+consisted of 2 min at 50 °C, 10 min at 95 °C, 55 cycles at 95
+°C for 30 s, 63 °C for 60 s.
+The Molecular Beacon assay contained Platinum SuperMix with 5 mM MgCl2, 25 pmol of primers NSR1113f and
+NSR1264r, 8.5 pmol Molecular Beacon probe NSR1143Beac,
+3.2 to 7.0 ng of sample DNA or 30 to 3 × 106 copies of standard
+DNA in 25 µL. PCR amplification consisted of 5 min at 95 °C,
+55 cycles at 95 °C for 30 s, 60 °C for 60 s, and 72 °C for 10 s.
+Real-Time PCR for Quantification of N. oligotrophalike amoA Gene. The primers amoNo550D2f and amoNo754r
+(Table 1) were designed to target the amoA gene of ammoniaoxidizing bacteria found in the full-scale municipal WWTP
+(9) based on alignment of amoA gene sequences using the
+CLUSTAL W program (27). Alignments consisted of amoA
+sequences from clonal libraries obtained from the WWTP
+(9), four bench-scale municipal wastewater treatment systems (8), and amoA sequences available in GenBank (28).
+The forward primer amoNo550D2f contained two degenerate
+bases in order to amplify all amoA clones from the libraries,
+as well as N. urea (AJ388585) and N. oligotropha (AF272406)
+amoA genes. The TaqMan probe amoNoTaq729 was derived
+from a conserved sequence region within the primer pair
+amoNo550D2f and amoNo754r (Table 1). The 25 µL PCR
+mix contained TaqMan Universal PCR Master Mix (PE
+Applied Biosystems, Foster City, CA) with 7.5 pmol primers
+amoNo550D2f and amoNo754r, 6.25 pmol TaqMan probe
+amoNoTaq729, 0.3 to 0.7 ng of sample DNA. Standards
+consisted of the plasmid pCR2.1 carrying the M-20 amoA
+gene (GenBank accession number AF420299) (9) adjusted to
+10 to 1.0 × 107 copies per PCR. PCR amplification consisted
+of 3 min at 50 °C, 10 min at 95 °C, 55 cycles at 95 °C for 30 s,
+56 °C for 60 s.
+Real-Time PCR for Quantification of AOB 16S rRNA
+Gene. Real-time PCR assays were performed as described by
+Hermansson and Lindgren (20) in a total volume of 25 µL
+with Universal PCR Master Mix (PE Applied Biosystems), 7.5
+pmol of a 2:1 ratio of primers CTO 189fA/B and CTO 189fC,
+7.5 pmol of the reverse primer RT1r, 3.125 pmol TaqMan
+probe TMP1, and 0.3 to 0.7 ng of sample DNA or 60 to 6 ×
+346
+
+9
+
+ENVIRONMENTAL SCIENCE & TECHNOLOGY / VOL. 37, NO. 2, 2003
+
+107 copies of the standard (Nitrosomonas europea 16S rDNA
+cloned into pCR2.1). PCR amplification consisted of 2 min
+at 50 °C, 10 min at 95 °C, 40 cycles at 95 °C for 30 s, 60 °C
+for 60 s.
+Acquisition and Data Analysis. Real-time PCR assays for
+bacterial 16S rDNA and Nitrospira 16S rDNA were run on a
+Bio-Rad iCycler with the iCycler iQ fluorescence detector
+and iCycler software version 2.3 (Bio-Rad, Hercules, CA).
+Plate well factors were determined prior to each PCR run to
+normalize background fluorescence intensities from each
+single well. amoA and AOB 16S rDNA real-time PCR assays
+were run using a DNA Engine Opticon Continuous fluorescence Detection System (MJ Research, Waltham, MA). The
+threshold was determined by the computer software as 10
+times the standard deviation of the background fluorescence
+averaged over at least 5 cycles at the start of the run. The
+threshold cycle (CT) of each PCR reaction was automatically
+determined by detecting the cycle at which the fluorescence
+exceeded the calculated threshold. For the Molecular Beacon
+probe, the data window was adjusted to capture roughly
+10% of all data, chosen among the data points in the beginning
+area of the annealing step. During each PCR run, the CT
+values obtained from the DNA standards were used for the
+construction of standard curves.
+Data for bacterial 16S rDNA, Nitrospira 16S rDNA, and N.
+oligotropha-like amoA was previously collected for the same
+set of samples used in this study using dot-blots and
+hybridization with a P32 labeled universal 16S rDNA probe
+and competitive PCR assays for the Nitrospira 16S rDNA and
+amoA genes (9). These data were compared to the data
+obtained by real-time PCR for each gene using paired samples
+t-tests. Paired samples t-tests compute the differences
+between the values of the two variables for each case and
+tests whether the average differs from zero (SPSS version
+11.01, SPSS Inc., Chicago, IL). The null hypothesis was that
+there were no significant differences between the copies/L
+on each sample date obtained by the real-time PCR assay
+and the analogous competitive PCR assay or dot-blot
+hybridization.
+Application of Real-Time PCR Assays to MLSS Samples.
+All real-time PCR assays were performed using three replicates per sample, and all PCR runs included control reactions
+without template. The effect of sample concentration on PCR
+performance was determined using dilutions of sample DNA
+(initial concentration of 50 ng/µL) containing 5 pg to 50 ng
+in sterile water followed by real-time PCR analysis for 16S
+rDNA, Nitrospira 16S rDNA, AOB 16S rDNA, and N. oligotropha-like amoA as described above.
+Gene copies were initially calculated by comparison of
+threshold cycles obtained in each PCR run from known
+standard DNA concentrations. To reduce variability between
+PCR runs, data were recalculated using a second standard
+curve generated from 11 standard curves for bacterial 16S
+rDNA (r2 ) 0.94), 22 standard curves for Nitrospira 16S rDNA
+(r2 ) 0.84), 3 standard curves for AOB 16S rDNA (r2 ) 0.98),
+and 5 standard curves for N. oligotropha amoA (r2 ) 0.90).
+In the case of the Nitrospira 16S rDNA and bacterial 16S
+rDNA assays, one universal standard curve was applied for
+calculations, because both assays were shown to function
+alike with standard plasmid AF420301 as template (Figure 2).
+
+3. Results
+Development and Optimization of Real-Time PCR Assays.
+The real-time PCR assays were validated using known
+concentrations of standard DNA. The linear range of detection
+for the real-time PCR assay for bacterial 16S rDNA was 4
+orders of magnitude, from 4.5 × 104 to 4.5 × 108 copies per
+PCR and the detection limit for this assay was 4.5 × 103 target
+DNA copies. The linear range of detection for the real-time
+PCR assays for Nitrospira 16S rDNA, N. oligotropha amoA,
+
+FIGURE 2. Comparison of bacterial 16S rDNA and Nitrospira 16S
+rDNA real-time PCR TaqMan assays. The plasmid containing
+Nitrospira 16S rDNA was used as the target for both assays. The
+dashed line represents the 95% confidence interval. Error bars
+indicate the standard deviation of 3 PCRs and are smaller than the
+symbols.
+and AOB 16S rDNA were at least 6 orders of magnitude, from
+30 to 3.0 × 107, 10 to 1.0 × 107, and 60 to 6 × 107 copies per
+PCR, respectively. The regression coefficient (r2) values for
+standard curves for all real-time PCR assays in each run were
+always above 0.90. In addition, copies per PCR calculated for
+the standard plasmid AF420301 by the bacterial 16S rDNA
+and Nitrospira 16S rDNA assays were highly correlated and
+demonstrated a linear relationship (r2 ) 0.97) with a slope
+of 1.14, indicating that the assays for bacterial 16S rDNA and
+Nitrospira 16S rDNA were functioning alike (Figure 2).
+Application of Real-Time TaqMan PCR Assays to WWTP
+Samples. In environmental samples, PCR techniques can be
+biased by the presence of inhibitory compounds that copurify with the DNA or low target concentrations in a high
+background of heterologous DNA (15, 29). Inhibition effects
+by the environmental samples on the real-time PCR assays
+were tested using serial dilutions of genomic DNA extracted
+from MLSS. PCR amplification was completely inhibited in
+the undiluted sample at 50 ng per PCR assay for all four
+real-time PCR assays and also in diluted samples containing
+10 ng per PCR assay for the bacterial 16S rDNA and the N.
+oligotropha-like amoA assays. CT values were proportional
+to DNA at concentrations ranging from 5 pg to 5 ng for the
+bacterial 16S rDNA (r2 ) 0.98, slope ) -3.87), at concentrations ranging from 5 pg to 5 ng for the Nitrospira 16S rDNA
+(r2 ) 0.98, slope ) -3.45), at concentrations from 250 pg to
+2.5 ng for the AOB 16S rDNA (r2 ) 0.98, slope ) -3.15), and
+at concentrations ranging from 200 pg to 1 ng for the N.
+oligotropha-like amoA assay (r2 ) 0.97, slope ) - 3.01) (Figure
+3A). In the no-template control reactions no CT values were
+obtained for the Nitrospira 16S rDNA, AOB 16S rDNA, and
+N. oligotropha-like amoA assays. In the no template control
+reactions using the 16S rDNA assay a CT value of 29.7 ( 0.43
+was obtained. Conversion of the CT value to copies per PCR
+based on the standard curve indicated that there were 3.8 (
+0.9 × 103 copies bacterial 16S rDNA in the control reaction
+without sample DNA. This background value may result from
+bacterial DNA contamination of the Taq enzyme or other
+reagents in the PCR mix. The MLSS sample containing greater
+than 5 pg DNA per PCR assay was 20-fold higher than the
+detection limit (Figure 3B) so the effect of background
+contamination on the calculated value would be less than
+5% in the most dilute samples. Conversion of the CT values
+to copies per PCR for the other 3 assays indicated that the
+detection limit for quantifying these targets in MLSS samples
+were 180 copies for Nitrospira 16S rDNA, 1.2 × 103 for N.
+oligotropha-like amoA, and 2.6 × 103 AOB 16S rDNA assays
+(Figure 3 B).
+
+FIGURE 3. (A) Threshold cycle (CT) measurements in diluted DNA
+from a MLSS sample and (B) calculated copies of target genes in
+diluted DNA from a MLSS sample. TaqMan real-time PCR assays
+shown are Bacterial 16S rDNA (b), N. oligotropha-like amoA gene
+(1), AOB 16S rDNA (3), and Nitrospira 16S rDNA (9). Error bars
+indicate the standard deviation of 3 PCRs.
+Comparison of TaqMan and Molecular Beacon Probes
+in the Nitrospira 16S rDNA Real-Time PCR Assay. Fluorescence obtained with NSR1143Taq was twice as high as
+the fluorescence obtained with NSR1143Beac (Figure 4a),
+indicating a higher signal-to-noise ratio using the TaqMan
+probe. The r2 values of standard curves obtained using
+NSR1143Beac and NSR1143Taq were similar, ranging from
+0.97 to 0.99 and 0.92 to 0.99, respectively. When MLSS samples
+were analyzed using both probes, the copies obtained with
+the Molecular Beacon probe were up to 12.5 times lower
+than those obtained with the TaqMan probe, except for the
+last 3 samples in which the values were almost equivalent
+(Figure 4b). Nitrospira 16S rDNA copies per liter in the
+municipal WWTP ranged from 1.7 × 1010 to 1.2 × 1011 using
+the TaqMan probe and from 2 × 109 to 2.1 × 1011 using the
+Molecular Beacon probe. In a paired t-test the differences
+in results obtained by the Molecular Beacon probe and the
+TaqMan probe assays were not significant (t ) -0.125, p )
+0.903) (Table 2).
+Validation of N. oligotropha amoA, Nitrospira 16S
+rDNA, and Bacterial 16S rDNA Real-Time PCR Assays. To
+verify the specificity of the amoA primers, PCR product
+obtained with genomic DNA extracted from MLSS of the
+municipal WWTP as template was cloned and sequenced as
+described previously (9). Amplification of genomic DNA from
+suspended solids using the primers amoNo550D2f and
+amoNo754r produced a product with the expected size of
+approximately 205 bp (data not shown). In a clonal library,
+VOL. 37, NO. 2, 2003 / ENVIRONMENTAL SCIENCE & TECHNOLOGY
+
+9
+
+347
+
+FIGURE 4. (A) Measurements of Nitrospira 16S rDNA copies during
+real-time PCR using TaqMan probe NSR1143Taq (9) or molecular
+beacon probe NSR1143Beac (b) in DNA extracted from MLSS. The
+fluorescence intensity was measured during the annealing step of
+each temperature cycle. No-template controls are shown as (0)
+and (O) for the TaqMan and molecular beacon probes, respectively.
+Error bars indicate the standard deviation of 3 reactions. The dashed
+line represents the threshold value (42 RFU) calculated for the
+molecular beacon assay. The threshold value for the TaqMan assay
+was 20 RFU. (B) Nitrospira 16S rDNA copies per liter as determined
+by real-time PCR using TaqMan probe NSR1143Taq (9) or Molecular
+Beacon probe NSR1143Beac (b) in DNA extracted from MLSS.
+
+TABLE 2. Comparison of Real-Time PCR Assays with Other
+Molecular Methods Using Paired Samples t-Test
+
+compared groups
+microbial 16S dot-blota
+vs bacterial 16S TMb
+amoAc TM vs amoA cPCRd
+Ntspaf TM vs Ntspa cPCR
+Ntspa MBg vs Ntspa cPCR
+
+mean
+paired
+differences
+
+t
+
+df
+
+significance
+(2-tailed)
+
+2.2 × 1013 10.79h 11
+
+0.000
+
+1.5 × 1010 4.324h 11
+1.4 × 1010 1.456 11
+1.5 × 1010 0.813 11
+
+0.001
+0.173
+0.433
+
+a dot-blot ) dot-blot hybridization. b TM ) TaqMan based real-time
+PCR assay. c amoA ) N. oligotropha-like amoA. d cPCR ) competitive
+quantitative PCR. e AOB ) ammonia-oxidizing bacteria 16S rDNA.
+f Ntspa ) Nitrospira spp. 16S rDNA. g MB ) Molecular Beacon based
+real-time PCR assay. h Significant at the prescribed R.
+
+23 randomly selected clones were identified as amoA
+sequences. These sequences were 89-94% similar to clone
+M20 and 92-94% similar to clone M379, which were amoA
+clone sequences previously isolated from this WWTP (9). N.
+oligotropha-like amoA gene copies ranged from 2.6 × 109 to
+4.3 × 1010 per L MLSS of the municipal WWTP. In contrast,
+348
+
+9
+
+ENVIRONMENTAL SCIENCE & TECHNOLOGY / VOL. 37, NO. 2, 2003
+
+no amplification was observed when DNA isolated from
+an industrial WWTP, where no N. oligotropha-like amoA
+sequences were detected (9), was used as template (data not
+shown).
+Paired samples t-tests were used to determine whether
+gene copies obtained in the real-time PCR assays were
+equivalent to the values previously obtained using dot-blot
+hybridization and competitive PCR assays for Nitrospira 16S
+rDNA and N. oligotropha-like amoA (Table 2). The mean
+bacterial 16S rDNA copies per liter previously obtained by
+dot-blot hybridization was 2.3 ( 0.7 × 1013 (9). In this study,
+the average 16S rDNA copies per liter obtained by real-time
+PCR was 1 order of magnitude lower at 1.6 ( 0.7 × 1012 and
+the differences in values obtained by these two methods
+were statistically significant (Table 2). The mean Nitrospira
+16S rDNA copies per liter previously obtained by competitive
+PCR was 2.4 ( 1.3 × 1010 compared to 3.7 ( 3.2 × 1010 and
+3.9 ( 6.4 × 1010 copies per liter obtained using the Nitrospira
+TaqMan and Molecular Beacon assays, respectively. The
+differences in the values obtained by the three assays were
+not statistically significant (Table 2). The mean values
+obtained using the N. oligotropha-like amoA competitive PCR
+and the real-time PCR were 3.4 ( 2.3 × 108 and 1.5 ( 1.2 ×
+1010 copies per liter, respectively. The differences in the mean
+values obtained by the two assays were statistically significant
+and may reflect the differences in the primers used for the
+two assays.
+Calculation of Cells/Liter from Copies/Liter and Ammonia-Oxidizing Activity in MLSS Samples. The number of
+total bacteria, AOB, N. oligotropha-like AOB and Nitrospira
+cells per liter MLSS were calculated from copies per liter
+using several assumptions regarding gene copies per cell
+(Table 3, Figure 5). First, the average 16S rDNA copies per
+genome in bacterial cells were assumed to be 3.6 copies based
+on the average 16S rDNA copies found in cultured bacteria
+(30). Second, one cell of N. oligotropha was assumed to
+contain 2 copies amoA based on the copies reported for N.
+europaea (31). Third, both AOB and Nitrospira were assumed
+to contain 1 copy 16S rDNA per cell based on copies 16S
+rDNA found in Nitrobacter and the AOB Nitrosomonas and
+Nitrosospira (32, 33).
+In the 12 monthly samples, total bacteria ranged from
+2.3 × 1011 to 8.4 × 1011 and Nitrospira spp. ranged from
+1.7 × 1010 to 1.2 × 1011 cells per liter MLSS and were relatively
+constant through the year (Figure 5). The number of
+ammonia-oxidizing bacteria as determined using the AOB
+16S rDNA and N. oligotropha amoA assays were not as
+constant with a drop in AOB in the August, September and
+October samples (Figure 5). Although the number of AOB
+calculated using the 16S rDNA assay were about 2-fold the
+values calculated using the amoA assays, the assays were
+significantly correlated with a Pearsons coefficient of 0.901.
+Ammonia-oxidizing activity per cell‚hour was calculated
+from the AOB cell number and WWTP plant data using the
+following formula:
+
+activity )
+
++
+(NH+ - NH+ - NH4OUT) × Q
+4IN
+4UP
+AOB
+
+NH4+IN is the average ammonia concentration (measured
+in mg nitrogen/L) in the secondary influent into the WWTP
+reactor. NH4+OUT is the average ammonia concentration in
+the plant effluent. NH4+UP is used to account for ammonia
+assimilation, because ammonia is removed by both assimilation into cells for cell growth and by autotrophic
+ammonia oxidation by AOB, and equals 0.20×NH4+SI. Ammonia assimilation values of 0.1 and 0.2 were previously
+used by Daims et al. (6, 34). In this WWTP an ammonia
+assimilation value of 0.3 was estimated based on a Monte
+Carlo analysis (35) using the steady-state ASM1 model (36).
+
+TABLE 3. Conversion of Copies/L to Cells/L, Cells/g, and Percent of Biomass
+target cellsa
+
+copies/L
+
+cells/Lb
+
+cells/gc
+
+% biomassd
+
+bacteria 16S rDNA
+N. oligotropha amoA
+AOB 16S rDNA
+Nitrospira 16S rDNA
+
+1.6 ( 0.7 × 1012
+1.5 ( 1.2 × 1010
+1.2 ( 0.9 × 1010
+3.7 ( 3.2 × 1010
+
+4.3 ( 2.0 × 1011
+7.5 ( 6.0 × 109
+1.2 ( 0.9 × 1010
+3.7 ( 3.2 × 1010
+
+2.2 ( 0.97 × 1011
+3.8 ( 3.0 × 109
+6.1 ( 4.7 × 109
+1.9 ( 1.6 ×1010
+
+100
+1.7
+2.9
+8.6
+
+a Values are averaged for all 12 samples. b Cells/L ) copies/L ÷ gene copy number/cell. Assumed gene copy number/cell is 3.6 for bacterial
+16S rDNA, 1 for Nitrospira 16S rDNA, and 2 for amoA gene. c Cells/g ) cells/L ÷ 1.97 g/L (mean mixed liquor volatile suspended solids (MLVSS)).
+d Bacterial 16S rDNA provides normalization for comparison to the subpopulations and is set at 100%.
+
+FIGURE 5. Total bacteria (b), N. oligotropha (1), AOB (3), Nitrospira
+(9) cells per L MLSS in a municipal WWTP determined using the
+bacterial 16S rDNA, N. oligotropha amoA, AOB 16S rDNA and
+Nitrospira real-time PCR Taqman assays. Error bars indicate the
+standard deviation of 3 reactions. Quantitative detection limits for
+each assay were as follows: bacterial 16S rDNA, 1.0 ×1010, N.
+oligotropha-like amoA, 1.5 × 109, AOB 16S rDNA 2.6 × 109 and
+Nitrospira 16S rDNA, 9 × 107 cells per L.
+An intermediate value of 0.2 was used for activity calculations.
+Q is the average influent flowrate to the WWTP reactor (L/
+hr). AOB is the total AOB cell number in the basin as
+determined by real-time PCR.
+Mean monthly ammonia-oxidizing activity based on the
+N. oligotropha amoA cell calculations ranged from 3.5 to
+56.2 fmol/hr/cell. The highest activity value, which was
+greater than twice the standard deviation of the data set, was
+excluded resulting in a mean activity of 12.4 ( 7.3 fmol/
+hr/cell. The mean ammonia-oxidizing activity based on the
+AOB 16S rDNA cell values was 7.7 ( 6.8 fmol/hr/cell.
+
+4. Discussion
+Real-time PCR using a fluorescent internal probe combines
+high throughput with high analytical sensitivity for the
+detection of specific genes present in low concentrations in
+complex and variable DNA mixtures, such as those extracted
+from environmental samples. The log-linear detection range
+using standards in the real-time PCR assays was very broad,
+with up to 6 orders of magnitude and detection limits of 10
+to 60 copies for the Nitrospira 16S rDNA, 16S AOB rDNA, and
+N. oligotropha amoA assays. These values were comparable
+to other real-time PCR assays (15-20). The bacterial 16S rDNA
+assay showed a log-linear detection range across 4 orders of
+magnitude. The higher detection limit (4.5 × 103 copies per
+PCR) in the bacterial assay was comparable to the detection
+limit for other bacterial real-time PCR assays (21, 37). These
+high detection limits in bacteria real-time PCR assays are
+generally attributed to DNA contamination of the Taq DNA
+polymerase enzyme or other sources such as water and
+plasticware (37). The high detection limit in the bacterial
+real-time PCR assay did not affect the use of this assay in
+DNA extracted from MLSS because these samples contained
+approximately 108 bacterial 16S rDNA copies per µg of DNA.
+
+The bacterial 16S rDNA real-time PCR assay was designed
+to be a broad-based assay for the estimation of total bacterial
+biomass in the MLSS. This assay may also serve as an internal
+standard, since bacterial 16S rDNA in the MLSS remained
+relatively constant. Although the PCR primers and probes
+used in this study have zero base pair mismatches with more
+than 9000 bacterial 16S rDNA sequences found in GenBank,
+the number of bacterial cells calculated needs to be considered an estimate because some bacterial strains/and or
+species may not hybridize to the primers or probes and thus
+may not be detected. The cell/L values obtained using the
+real-time PCR assay were 10-fold less than those obtained
+by dot-blots using a single probe. This may result from the
+reduction of background due to the combined specificity
+levels of the primers and probe used for the 16S rDNA assay.
+In addition the probe 1392r used for the dot-blot hybridizations (9) is a universal probe that hybridizes to eukaryotic
+DNA found in the MLSS and measures total microbial
+population including both eukaryotic and bacterial cells. The
+bacterial real-time PCR assay used in this study has not been
+compared to other bacterial 16S rDNA real-time PCR assays
+(21, 37, 38).
+Application of PCR assays to environmental samples is
+complicated by several factors such as low concentration of
+targets and the possible presence of PCR inhibitors. The
+inhibitory effects of complex genomic DNA at concentrations
+of 10 to 50 ng/ul and other PCR inhibitors can be minimized
+by dilution of the DNA extracts. However, over-dilution may
+result in low total DNA and target concentrations resulting
+in high variability and potential over- or under-estimation
+of the target. In this study, the acceptable DNA per PCR range
+varied between the assays with the bacterial 16S rDNA and
+Nitrospira 16S rDNA assays producing similar results over a
+broad DNA concentration range (1000 to 2500-fold). In
+contrast, the N. oligotropha-like amoA and AOB 16S rDNA
+assay produced consistent results over a narrow DNA
+concentration range (5 to 10-fold). These results suggest that
+in DNA extracts from environmental samples real-time PCR
+assays may need to be performed using several dilutions.
+Other factors that may affect real-time PCR assays are a loss
+in fluorescence signal due to a large excess of complex DNA
+or an overestimation of target DNA due to limited probe
+specificity (15).
+The design of specific PCR assays for Nitrospira 16S rDNA
+was straightforward because regions of the Nitrospira 16S
+rDNA are well conserved between Nitrospira species and
+distinct from nearest phylogenetic groups (39, 40). The
+primers used for the Nitrospira real-time PCR assays in this
+study were previously demonstrated to be specific for
+Nitrospira sp. in the cPCR assay (9). The Molecular Beacon
+and TaqMan probes were designed using the same target
+sequence used in the cPCR assay. The differences in values
+obtained previously in individual MLSS samples using cPCR
+and more recently using the Molecular Beacon and TaqMan
+real-time PCR assays were statistically insignificant. This
+suggests that quantitative PCR methods are robust and that
+real-time PCR assays can be adapted from cPCR assays. Slight
+differences in numbers obtained with cPCR and real-time
+VOL. 37, NO. 2, 2003 / ENVIRONMENTAL SCIENCE & TECHNOLOGY
+
+9
+
+349
+
+PCR using the TaqMan probes have also been reported for
+the quantification of Mycobacterium tuberculosis DNA in
+sputum (41).
+In contrast to the Nitrospira assay, designing a real-time
+PCR assay to detect AOB is more complicated for two reasons.
+First, wastewater treatment plants may contain multiple
+species of AOB (28). Second, most AOB are phylogenetically
+closely related to other activated sludge bacteria within the
+beta-subdivision class of Proteobacteria.
+Both the 16S rDNA and amoA gene provide well-studied
+genetic markers for the characterization of AOB (28). DNA
+probes and primers targeting AOB 16S rDNA have been used
+to detect essentially all known beta-subdivision AOB species
+(2, 5-7, 11, 12, 28). The 16S rDNA assay described by
+Hermansson and Lindgren (20) is broad based and can
+quantify a range of AOB species including N. oligotropha,
+the presumptive AOB species at this WWTP. One potential
+problem with probes and primers designed to target AOB
+16S rDNA is that they may hybridize with closely related
+non-AOB species resulting in false positives. Indeed, BLAST
+analysis of the primers and probe used in the AOB 16S rDNA
+assay indicated that one of the degenerate permutations of
+each of the RT1r and TMP1 sequences had zero mismatches
+to Ralstonia eutropha, a non-AOB species. However, in realtime PCR assays, 3 oligonucleotides (2 primers and 1 probe)
+must bind for efficient amplification and detection, so the
+effect of nonspecific hybridization by one primer or probe
+is reduced.
+The amoA gene can be used as an alternative phylogenetic
+marker or target molecule for the detection of AOB (28). The
+amoA gene is found only in AOB and thus serves as a more
+specific marker than the 16S rDNA. However, the amoA gene
+has higher sequence variability between AOB than the 16S
+rDNA, thus making it more difficult to design a single assay
+to detect all ammonia oxidizing bacteria. In this study, the
+real-time PCR assay was designed to detect N. oligotrophalike bacteria because it was the only AOB previously found
+within the municipal WWTP used in this study (9). The
+primers amoNo550D2f and amoNo754r were redesigned from
+the previously published cPCR primers based on additional
+sequence information obtained from amoA clonal libraries
+made to MLSS obtained from a bioreactor system (8). The
+specificity of the primer pair was confirmed by additional
+sequence analysis of clonal libraries obtained after PCR
+amplification and cloning of the product. When compared
+to the cPCR assay, the real-time PCR with the redesigned
+primers detected about 50-fold more amoA copies in the
+municipal MLSS samples. The specificity of the N. oligotropha-like amoA real-time PCR assay was confirmed by
+the lack of amplification found in industrial MLSS samples
+which lack N. oligotropha but contain N. nitrosa AOB (9).
+Because the AOB 16S rDNA assay has the potential to
+produce false positives and the N. oligotropha amoA assay
+has the potential to produce false negatives, the use of the
+two assays in these samples provides complimentary data
+for the detection of AOB. The 16S rDNA assay and the amoA
+assay were highly correlated and both assays indicated a
+drop in AOB during August, September, and October
+suggesting that both assays were useful for AOB quantification. The reason for the drop in AOB is unclear as the percent
+nitrification remained constant and there was no apparent
+link to the basin temperature. The AOB cell numbers
+calculated by the 16S rDNA assay were approximately 2-fold
+higher than the N. oligotropha cell numbers using the amoA
+assay. Although AOB have not been cultured from this plant,
+these results suggest that N. oligotropha-like AOB comprise
+at least 50% of the AOB population in this WWTP.
+The percent of the AOB population determined using
+either the AOB 16S rDNA assay (2.9%) or the N. oligotropha
+amoA assay (1.7%) were 3-4-fold lower than reported for an
+350
+
+9
+
+ENVIRONMENTAL SCIENCE & TECHNOLOGY / VOL. 37, NO. 2, 2003
+
+activated sludge sample obtained from the second stage of
+a 2-stage WWTP measured by fluorescence in situ hybridization (FISH) (8.4%) (6). Additionally, the AOB percent was
+approximately 2-3-fold lower than reported for a sludge
+sample from an industrial plant connected to a rendering
+factory (7%) (7). Differences in the percent of ammoniaoxidixing bacteria between these studies may reflect the
+differences in the operation and design of the WWTPs, e.g.
+single-sludge nitrification versus two-stage rectors or sludge
+with a high nitrogen load. Alternatively, the differences may
+reflect differences in the methods, FISH versus real-time PCR.
+Interestingly, the percent Nitrospira (8.6%) calculated in this
+study is consistent with values obtained by FISH in the sludge
+from an industrial plant connected to a rendering factory at
+9% to 12% Nitrospira population (7, 40).
+The ammonia-oxidizing activity per cell per hour was
+calculated based on the estimated number of ammoniaoxidizing cells in the basin and the estimated amount of
+ammonia oxidized per hour. The estimated ammoniaoxidizing rate of 7.7 fmol/hr/cell based on AOB 16S rDNA,
+or 12.4 fmol/hr/cell based on the N. oligotropha amoA, were
+in the range of values reported using FISH (2.3 ( 0.4 fmol/
+hr/cell) (6), a cPCR assay (16 to 43 fmol/hr/cell) (34) and for
+pure cultures (4 to 23 fmol/hr/cell) (42). Given that the
+estimated ammonia-oxidizing rates are in the expected range,
+it is likely that the real-time PCR assays used in this study
+detects one of, if not, the major organisms mediating
+ammonia oxidation in the WWTP under study.
+The results of this study indicate that real-time PCR
+technology is a valuable tool for quantification of uncultivable
+or difficult to culture microbes in environmental samples,
+offering high throughput, analytical sensitivity, and precision.
+The bacterial 16S rDNA assay and the Nitrospira 16S rDNA
+assays described in the study and the previously published
+AOB 16S rDNA may have broad utility to other wastewater
+treatment plants and environmental samples. The N. oligotropha amoA assay will be more useful in wastewater systems
+where the N. oligotropha is a known member of the AOB
+population. The amoA assay may also prove useful in
+developing mRNA based reverse transcriptase real-time PCR
+assays to measure physiological responses of N. oligotropha
+to changes in environmental conditions.
+
+Acknowledgments
+This work was funded by a Water Environment Research
+Foundation research grant (WERF project #98-CTS-2) and
+by the University of Tennessee, Waste Management Research
+and Education Institute. H.D. is a recipient of a postdoctoral
+fellowship from CONICET. We thank Arthur Meyers of
+Eastman Chemical Company (Kingsport, TN) for technical
+advice and Neil Quigley at the Molecular Biology Resource
+Facility (University of Tennessee, Knoxville, TN) for DNA
+sequencing. We thank Knoxville Utilities Board (KUB,
+Knoxville, TN) for providing samples.
+
+Literature Cited
+(1) Bock, E.; Koops, H.-P.; Ahlers, B.; Harms, H. In The prokaryotes,
+2nd ed.; Balows, A., Truper, H. G., Dworkin, M., Harder, W.,
+¨
+Schleifer, K.-H., Eds.; Springer-Verlag: New York, 1992; Vol. I,
+Chapter 17, pp 414-430.
+(2) Okabe, S.; Satoh, H.; Watanabe, Y. Appl. Environ. Microbiol.
+1999, 65, 3182-3191.
+(3) Rittman, B. E.; McCarty, P. L. In Environmental Biotechnology:
+Principles and Applications; McGraw-Hill Companies, Inc.: New
+York, 2001; Chapter 9, pp 470-496.
+(4) U.S. Environmental Protection Agency. 1993. EPA/625/R-93/
+010.
+(5) Wagner, M.; Rath, G.; Amann, R.; Koops, H. P.; Schleifer, K. H.
+Sys. Appl. Microbiol. 1995, 18, 251-264.
+(6) Daims, H.; Ramsing, N. B.; Schleifer, K.-H.; Wagner, M. Appl.
+Environ. Microbiol. 2001, 67, 5810-5818.
+
+(7) Juretschko, S.; Loy, A.; Lehner, A.; Wagner, M. Sys. Appl.
+Microbiol. 2002, 25, 84-99.
+(8) Dionisi, H. M.; Layton, A. C.; Robinson, K. G.; Brown, J. R.;
+Gregory, I. R.; Parker, J. J.; Sayler, G. S. Water Environ. Res. 2002,
+74, 462-469.
+(9) Dionisi, H. M.; Layton, A. C.; Harms, G.; Gregory, I. R.; Robinson,
+K. G.; Sayler, G. S. Appl. Environ. Microbiol. 2002, 68, 245-253.
+(10) Johnsen, K.; Enger, Ø.; Jacobsen, C. S.; Thirup, L.; Torsvik, V.
+Appl. Environ. Microbiol. 1999, 65, 1786-1789.
+(11) Kowalchuk, G. A.; Naoumenko, Z. S.; Derikx, P. J. L.; Felske, A.;
+Stephen, J. R.; Arkhipchenko, I. A. Appl. Environ. Microbiol.
+1999, 65, 396-403.
+(12) Mendum, T. A.; Sockett, R. E.; Hirsch, P. R. Appl. Environ.
+Microbiol. 1999, 65, 4155-4162.
+(13) Stephen, J. R.; Chang, Y.-J.; Macnaughton, S. J.; Kowalchuk, G.
+A.; Leung, K. T.; Flemming, C. A.; White, D. C. Appl. Environ.
+Microbiol. 1999, 65, 95-101.
+(14) Zimmermann, K.; Mannhalter, J. W. BioTechniques 1996, 21,
+268-279.
+(15) Becker, S.; Boger, P.; Oehlmann, R.; Ernst, A. Appl. Environ.
+¨
+Microbiol. 2000, 66, 4945-4953.
+(16) Heid, C. A.; Stevens, J.; Livak, K. J.; Williams, P. M. Genome Res.
+1996, 6, 986-994.
+(17) Becker, S.; Fahrbach; M., Boger; P.; Ernst, A. Appl. Environ.
+¨
+Microbiol. 2002, 68, 4486-4494.
+(18) Bowers, H. A.; Tengs, T.; Glasgow, H. B., Jr.; Burkholder, J. M.;
+Rublee, P. A.; Oldach, D. W. Appl. Environ. Microbiol. 2000, 66,
+4641-4648.
+(19) Gruntzig, V.; Nold, S. C.; Zhou, J.; Tiedje, J. M. Appl. Environ.
+¨
+Microbiol. 2001, 67, 760-768.
+(20) Hermansson, A.; Lindgren, P.-E. Appl. Environ. Microbiol. 2001,
+67, 972-976.
+(21) Suzuki, M. T.; Taylor, L. T.; DeLong, E. F. Appl. Environ. Microbiol.
+2000, 66, 4605-4614.
+(22) Livak, K. J.; Flood, S. J. A.; Marmaro, J.; Giusti, W.; Deetz, K. PCR
+Methods Applications 1995, 4, 357-362.
+(23) Tyagi, S.; Kramer, F. R. Nat. Biotechnol. 1996, 14, 303-308.
+(24) Broude, N. E. Trends Biotechnol. 2002, 6, 249-256.
+(25) Ferris, M. J.; Muyzer, G.; Ward, D. M. Appl. Environ. Microbiol.
+1996, 62, 340-346.
+(26) Lane, D. J. In Nucleic Acid Techniques in Bacterial Systematics;
+Stackebrandt, E., Goodfellow, M., Eds.; John Wiley & Sons:
+Chichester, West Sussex, 1991; pp 115-148.
+
+(27) Thompson, J. D.; Higgens, D. G.; Gibson, T. J. Nucleic Acids Res.
+1994, 22, 4673-4680.
+(28) Purkhold, U.; Pommerening- Roser, A.; Juretschko, S.; Schmid,
+¨
+M. C.; Koops, H.-P.; Wagner, M. Appl. Environ. Microbiol. 2000,
+66, 5368-5382.
+(29) Chandler, D. P. J. Ind. Microbiol. Biotechnol. 1998, 21, 128-140.
+(30) Klappenbach, J. A.; Saxman, P. R.; Cole, J. R.; Schmidt, T. M.
+Nucleic Acids Res. 2001, 29, 181-184.
+(31) McTavish, H.; Fuchs, J. A.; Hooper, A. B. J. Bacteriol. 1993, 175,
+2436-2444.
+(32) Navarro, E.; Fernandez, M. P.; Grimont, F.; Clays-Josserand, A.;
+Bardin, R. Int. J. Syst. Bacteriol. 1992, 42, 554-560.
+(33) Aakra, A.; Utaker, J. B.; Nes, I. F. Int. J. Sys. Bacteriol. 1999, 49,
+123-130.
+(34) Daims, H.; Purkhold, U.; Bjerrum, L.; Arnold, E.; Wilderer, P. A.;
+Wagner, M. Water Sci. Technol. 2000, 43, 9-18.
+(35) Cox, C. D. Integration of uncertainty and water quality
+considerations in the design of activated sludge plants. WEFTEC
+2000 Annual Conference Proceeedings, Session 55, CD-ROM,
+Water Environmental Federation, 2000.
+(36) Henze, M.; Grady, C. P. L.; Gujer, W.; Marais, G. v. R.; Matsuo,
+T. Activated Sludge Model No. 1. IAWPRC Scientific and Technical Report, No. 1, IAWPRC, London, 1987; ISSN: 1010-707X.
+(37) Corless, C. E.; Guiver, M.; Borrow, R.; Edwards-Jones, V.;
+Kaczmarski, E. B.; Fox, A. J. J. Clin. Microbiol. 2000, 38, 17471752.
+(38) Lyons, S. R.; Griffen, A. L.; Leys, E. J. J. Clin. Microbiol. 2000, 38,
+2362-2365.
+(39) Burrell, P. C.; Keller, J.; Blackall, L. L. Appl. Environ. Microbiol.
+1998, 64, 1878-1883.
+(40) Juretschko, S.; Timmermann, G.; Schmid, M. C.; Schleifer, K.H.; Pommerening-Roser, A.; Koops, H.-P.; Wagner, M. Appl.
+¨
+Environ. Microbiol. 1998, 64, 3042-3051.
+(41) Desjardin, L. E.; Chen, Y.; Perkins, M. D.; Teixeira, L.; Cave, M.
+D.; Eisenach, K. D. J. Clin. Microbiol. 1998, 36, 1964-1968.
+(42) Belser, L. W. Annu. Rev. Microbiol. 1979, 33, 309-333.
+(43) Bustin, S. A. J. Mol Endocrinol. 2000, 25, 169-193.
+
+Received for review April 12, 2002. Revised manuscript received October 1, 2002. Accepted October 18, 2002.
+ES0257164
+
+VOL. 37, NO. 2, 2003 / ENVIRONMENTAL SCIENCE & TECHNOLOGY
+
+9
+
+351
+
+

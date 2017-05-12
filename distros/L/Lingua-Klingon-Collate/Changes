@@ -1,0 +1,20 @@
+# vim:set noet ts=8 ai list lcs=tab\:^» tw=72:
+
+Revision history for Perl extension Lingua::Klingon::Collate.
+
+1.03	Mon 2004-05-17
+	- enable collating for multi-word strings thanks to the change
+	  in version 1.02
+	- update tests to test these
+	- updated copyright date in README
+
+1.02	Sun 2004-05-09
+	- ng --> ng(?!h) to make parsing a bit easier
+
+1.01	Mon 2003-09-22
+	- changed documentation to add a + in the example for "strunxfrm
+	  sort strxfrm" and to use @words rather than @transformed.
+
+1.0	Sat 2003-09-20
+	- original version
+

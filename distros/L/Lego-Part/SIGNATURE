@@ -1,0 +1,66 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 60daf1e5a947658b7040c5a03ba3c3831e8aa55c Changes
+SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
+SHA1 90ab34c2ba3f5cd611bf7c30bb31548cb4546649 MANIFEST
+SHA1 d092eb04a1763e1e49f811645610caaa944ca679 META.yml
+SHA1 27b61c65af19791ece63da7b2ec3c39acc26d45d Makefile.PL
+SHA1 8a3c4d560270de34bc0b4b6034c69b8791a44b0b Part.pm
+SHA1 c5e67344913974b87f3a6bd23a837f3a33f4baf5 Part/Action.pm
+SHA1 b35825f7d557dcb27fb0d4ce451d985e54324ea3 Part/Transfer.pm
+SHA1 823ca83af5d336de77ce5d540259cfb0edf78476 README
+SHA1 3507bb986931110cf321d56f3e0ae3c530926b8d examples/ex1.pl
+SHA1 86f5afccc8163295dafcd8894d13c8f5b46d15b7 examples/ex2.pl
+SHA1 f5754e7bb4636fa07dcc7eec5b65a72f1a81cfe3 examples/ex3.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 ef291a6d01fd89bda533559633e9e27987143a6a t/Lego-Part-Action/01-use.t
+SHA1 99a017e9df04636fffe9d5e54bbc12e9b1884eca t/Lego-Part-Action/02-version.t
+SHA1 748ecd1ee800027ae8c4ae2aa16fb34fc7759a0b t/Lego-Part-Transfer/01-use.t
+SHA1 24db27e9dc4ca1e017430037cf12d012184d6f1e t/Lego-Part-Transfer/02-version.t
+SHA1 e1414619a964d84b7f8c1f43f399cdf4fbb169c1 t/Lego-Part/01-use.t
+SHA1 0ce2fe0976645b6af98d6978e4a88a7356468112 t/Lego-Part/02-version.t
+SHA1 91d95e976c406fa0a5239e68cd947b3c4c44cf39 t/Lego-Part/03-new.t
+SHA1 6b85058de591ffa70aa2f855d9edd7c94a463fbe t/Lego-Part/04-color.t
+SHA1 91671d14442b87dda869e2a3877944bceea817d2 t/Lego-Part/05-design_id.t
+SHA1 c2b3bf78d4755caee67394be028bfd690d5b6908 t/Lego-Part/06-element_id.t
+SHA1 a1ddd7521443f0338bacf4c56947bc67c79667fa xt/Lego-Part-Action/01-pod_coverage.t
+SHA1 77883fe505c74236ee29212afe8d037acbb6a4b8 xt/Lego-Part-Action/02-pod.t
+SHA1 be8445a8ef8daa101b66ae925f8f140cf4483524 xt/Lego-Part-Transfer/01-pod_coverage.t
+SHA1 b82b5af36332e155348dadc75073dff80d2df61b xt/Lego-Part-Transfer/02-pod.t
+SHA1 8b4525b0514058f36e7eace5bc458ee62a1977b1 xt/Lego-Part/01-pod_coverage.t
+SHA1 7168be3a4f298e1695191cdf87968d78b873a60f xt/Lego-Part/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWAxoKAAoJEJe+XXKaIuTltQcIAMCASqUORwB0H7hPgjylYTFG
+sQKlX18zKkkjeGUHU7DLd3hDOsiNMN1st6LK9lye1TyAm1MchosfAliVCzVCwm1y
+mpY+iLRB9ms6PYchXTUjoh5TCASH/itjQMPnwRDRO4yuEp1I/TFG939PA4fOaadK
+0ENHroEC784MrLmxe8Kxfa7LEO0L3Oc7TRYRvH9TplMr9lBkODSempm2ceY7AEx2
+NyOwf08BGnfnEWsMAQ+5k/CwKlEk9ZklbSwFfjsxI48+Dph1BHKJkzDcLtG1QLmC
+6OvUEp6J8Nu8qIR8ul0T+ju67fjHE+kDABqHTey5j05lNmcZkaraadHAiih38zA=
+=N2wq
+-----END PGP SIGNATURE-----

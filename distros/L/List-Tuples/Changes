@@ -1,0 +1,23 @@
+commit aa8aaa0aef72f7c0e0478c5830021f5f4c8e12d0 (refs/heads/master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Jan 14 18:34:08 2009 +0100
+
+    FIXED: dependencies
+
+commit 0fcabb2c53995dac352b1c3cc291db1d0610067e
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 29 16:54:02 2008 +0100
+
+    CHANGED: removed author test dependency
+
+commit c0c89b68adcc22c123e97febe212dafce6e1fc76
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 29 16:49:12 2008 +0100
+
+    FIXED: missing module
+
+commit 328f83194f789ebd270dba9adf8f52923b743771
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 29 16:47:13 2008 +0100
+
+    ADDED: Initial commit

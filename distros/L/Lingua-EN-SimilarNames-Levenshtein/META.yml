@@ -1,0 +1,29 @@
+---
+abstract: 'Compare Names for Similar Spelling'
+author:
+  - 'Mateu X. Hunter C<hunter@missoula.org>'
+  - 'Mateu X Hunter'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Leaner: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-EN-SimilarNames-Levenshtein
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Math::Combinatorics: 0
+  MooseX::Declare: 0
+  Text::LevenshteinXS: 0
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.10

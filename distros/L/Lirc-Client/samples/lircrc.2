@@ -1,0 +1,49 @@
+begin
+  prog = lirc-client-test
+  remote = test-remote
+  button = play
+  config = PLAY
+end
+begin
+  prog = lirc-client-test
+  remote = test-remote
+  button = pause
+  config = PAUSE
+end
+begin 
+  prog = lirc-client-test
+  remote = test-remote
+  button = enter_mode1
+  mode = lirc-client-test
+end
+begin lirc-client-test
+    begin
+      prog = lirc-client-test
+      remote = test-remote
+      button = pause
+      config = MODE1_PAUSE
+    end
+    begin
+      prog = lirc-client-test
+      remote = test-remote
+      button = exit_mode1
+      flags = mode
+    end
+end lirc-client-test
+begin 
+  prog = lirc-client-test
+  remote = *
+  button = button_1
+  config = BUTTON_1
+end
+begin 
+  prog = lirc-client-test
+  button = button_2
+  config = BUTTON_2
+end
+begin 
+  prog = lirc-client-test
+  remote = test-remote-2
+  button = *
+  config = TEST-REMOTE-2
+end

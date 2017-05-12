@@ -1,0 +1,74 @@
+{
+   "abstract" : "An object-oriented representation of locale information.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Locale-Object",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Module::Build" : "0.21",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "DateTime" : "0.3",
+            "DateTime::TimeZone" : "0.4",
+            "Scalar::Util" : "1.1",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Locale::Object" : {
+         "file" : "lib/Locale/Object.pm",
+         "version" : "0.79"
+      },
+      "Locale::Object::Continent" : {
+         "file" : "lib/Locale/Object/Continent.pm",
+         "version" : "0.78"
+      },
+      "Locale::Object::Country" : {
+         "file" : "lib/Locale/Object/Country.pm",
+         "version" : "0.78"
+      },
+      "Locale::Object::Currency" : {
+         "file" : "lib/Locale/Object/Currency.pm",
+         "version" : "0.78"
+      },
+      "Locale::Object::Currency::Converter" : {
+         "file" : "lib/Locale/Object/Currency/Converter.pm",
+         "version" : "0.78"
+      },
+      "Locale::Object::DB" : {
+         "file" : "lib/Locale/Object/DB.pm",
+         "version" : "0.78"
+      },
+      "Locale::Object::Language" : {
+         "file" : "lib/Locale/Object/Language.pm",
+         "version" : "0.78"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.79"
+}

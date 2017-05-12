@@ -1,0 +1,84 @@
+Linux-RTC-Ioctl
+
+v0.8
+
+Provides access to the Linux RTC driver (Real Time Clock), using one of
+the RTC device files in a Linux system:
+    - /dev/rtc
+    - /dev/rtc0
+    - /dev/rtc1
+    - ...
+
+Note /dev/rtc is now usually a symlink to /dev/rtc0
+
+Beware the RTC should not be used directly for usual timer or date and
+time services, but rather it is a low level hardware device that is
+mostly managed by the OS. To access the RTC device file, usually you
+need to be root or to be given permissions on the file.
+
+The main feature you might be interested in is the wake-up alarm, that
+on most hardware can pull the computer out of suspend / stand-by mode or
+even out of shut down (power-on by alarm clock).
+
+The RTC runs in a time zone that is independent of the system time zone,
+as it can be either GMT or the local time zone. Most Linux distributions
+install with GMT by default, to prevent problems with the transition to
+and from daylight saving time (DST or summer time).
+
+Functionality from this module is based on access to the system device
+files (/dev/rtc, /dev/rtcN), so the file must be readable for you in
+order to use the RTC device.
+
+Module is written according to the available driver documentation for
+the RTC Linux kernel driver, found at
+    https://www.kernel.org/doc/Documentation/rtc.txt
+
+Uses the ioctl interface (as opposed to the sysfs or procfs interfaces).
+
+Linux::RTC::Ioctl is an extension module that will require a C compiler
+and the <linux/rtc.h> system header for installation.
+
+Source code repository can be found on github:
+    https://github.com/terminatorul/Linux-RTC-Ioctl
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Linux::RTC::Ioctl
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Linux-RTC-Ioctl
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Linux-RTC-Ioctl
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Linux-RTC-Ioctl
+
+    Search CPAN
+        http://search.cpan.org/dist/Linux-RTC-Ioctl/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2016 Timothy Madden
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+

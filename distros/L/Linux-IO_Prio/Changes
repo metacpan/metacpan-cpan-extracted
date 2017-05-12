@@ -1,0 +1,14 @@
+Revision history for Perl extension Linux::IO_Prio.
+
+0.01  Mon Nov  7 18:15:36 2011
+	- original version; created by h2xs 1.23 with options
+		-b5.10.0 -AX Linux::IO_Prio --skip-autoloader
+
+0.02 Mon Dec 5 10:22:12 2011
+  - fix t/implemented.t to cope with missing syscall.ph
+	- try to load sys/syscall.ph as well
+	- only run t/implemented.t on Linux
+  
+0.03 Mon Dec 12 13:59:12 2011
+  - fix syscall arguments on non-Linux OS
+  - rework tests: most combined into t/api.t

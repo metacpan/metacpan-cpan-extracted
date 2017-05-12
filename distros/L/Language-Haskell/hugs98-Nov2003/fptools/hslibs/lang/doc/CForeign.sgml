@@ -1,0 +1,8 @@
+<Sect1 id="sec-CForeign">
+<Title><literal>CForeign</literal><IndexTerm><Primary>CForeign</Primary></IndexTerm>
+</Title>
+
+  <para>This module has moved to <ulink url="../base/Foreign.C.html"><literal>Foreign.C</literal></ulink> in the
+  hierarchical libraries.</para>
+
+</Sect1>

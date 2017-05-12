@@ -1,0 +1,23 @@
+Locale-CLDR
+
+Please note that this code requires Perl 5.10.1 and above in the main. There are some parts that require
+Perl 5.18 and if you are using Unicode in Perl you really should be using Perl 5.18 or later
+
+The general overview of the project is to convert the XML of the CLDR into a large number of small Perl
+modules that can be loaded from the main Local::CLDR when needed to do what ever localisation is required.
+
+Note that the API is not yet fixed. I'll try and keep things that have tests stable but any thing else 
+is at your own risk.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+Locale Data
+This is a locale data package, you will need the Locale::CLDR package to get it to work, which if you are using the 
+CPAN client should have been installed for you.

@@ -1,0 +1,100 @@
+Revision history for Locale-Country-Multilingual
+
+0.25     2014-08-22
+
+- Moved to Dist::Zilla.
+
+0.24     2014-08-18
+
+- Updated to CLDR v25.
+
+0.23     2009-04-15
+
+- created fr.dat from CLDR sources, which handles bug reported by
+  MIVKOVIC (RT 45031)
+
+0.22     2008-12-30
+
+- demonstrate the use of use_io_layer in SYNOPSIS
+- add CLDR license
+- again no code changes in this release
+
+0.21     2008-12-29
+
+- documentation of development path (Bernhard Graf)
+- change from Module::Build over to Module::Install (Bernhard Graf)
+- no code changes in this release
+
+0.20     2008-12-29
+
+- Incompatibility change: country2code() returns codes in capital
+  letters as defined by ISO-3166 (Bernhard Graf)
+
+0.11     2008-12-28
+
+- skip tests for pod and use_io_layer for Perls < 5.8.0 (Bernhard Graf)
+- new dat files: Afrikaans, Amharic, Arabic, Azerbaijani, Belarusian,
+  Bulgarian, Bengali, Catalan, Czech, Welsh, Danish, Dzongkha, Greek,
+  Esperanto, Estonian, Basque, Persian, Finnish, Faroese, Irish,
+  Galician, Gujarati, Hebrew, Hindi, Croatian, Hungarian, Armenian,
+  Indonesian, Sichuan Yi, Icelandic, Georgian, Central Khmer, Kannada,
+  Korean, Lingala, Lao, Lithuanian, Latvian, Macedonian, Malayalam,
+  Mongolian, Malay, Maltese, Burmese, Norwegian Bokmål, Nepali, Dutch,
+  Norwegian Nynorsk, Polish, Pushto, Romanian, Russian, Northern Sami,
+  Slovak, Slovenian, Somali, Albanian, Serbian, Swedish, Swahili,
+  Tamil, Telugu, Thai, Tonga, Turkish, Ukrainian, Urdu, Uzbek,
+  Vietnamese (Bernhard Graf)
+
+0.10     2008-10-31
+
+- fixed "use constant" to work with older Perls (Bernhard Graf)
+- described language fallback mechanism (Bernhard Graf)
+- no lowercased names from all_country_names() anymore (Bernhard Graf)
+- documentation for all_country_codes() (Bernhard Graf)
+- changed date format here to YYYY-MM-DD (Bernhard Graf)
+
+0.09     2008-10-30
+
+- added a DESCRIPTION (Bernhard Graf)
+- "languages" cn and tw are now deprecated (Bernhard Graf)
+- language names may be amended by a region (Bernhard Graf)
+- renamed cn.dat to zh.dat and tw.dat to zh-tw.dat (Bernhard Graf)
+- language loading fallback from "xx_YY" to "xx" (Bernhard Graf)
+
+0.08     2008-10-28
+
+- set explicit utf-8 encoding for POD (Bernhard Graf)
+- try to fix cn.dat and tw.dat (Bernhard Graf)
+
+0.07     2008-10-27
+
+- added correct Unicode support (Bernhard Graf)
+- updated and fixed some errors in country data files (Bernhard Graf)
+- tie language data to the class, not the instance (Bernhard Graf)
+- possibility to preload language files at compile time (Bernhard Graf)
+- added method assert_lang() to check availability (Bernhard Graf)
+- changed from hashes to arrays where possible (Bernhard Graf)
+- documentation (Bernhard Graf)
+- tests for new features (Bernhard Graf)
+
+0.06     2008-08-11
+
+- Thanks to Andreas Marienborg for Norwegian dat file. (Fayland Lam)
+
+0.05     2008-05-23
+
+- Thanks to michele ongaro for Japanese dat files. (Fayland Lam)
+
+0.04     2008-05-22
+
+- Thanks to michele ongaro for Italian/Spanish/Portuguese/German/French
+  dat files. (Fayland Lam)
+
+0.03     2007-12-21
+
+- add tw.dat (Fayland Lam)
+
+0.01     2007-01-13
+
+- First version, released on an unsuspecting world. (Fayland Lam)
+

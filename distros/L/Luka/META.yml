@@ -1,0 +1,27 @@
+abstract: Exception handling and reporting framework
+author: 'Toni Prug <toni@irational.org>'
+build_requires:
+  Net::FTP: 0
+distribution_type: module
+generated_by: Module::Install version 0.630
+license: gpl
+name: Luka
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Std: 0
+  Config::IniFiles: 0
+  Error: 0
+  Exception::Class: 1.21
+  Mail::SendEasy: 0
+  Sub::Uplevel: 0
+  Sys::Hostname: 0
+  Sys::Hostname::Long: 0
+  Sys::Syslog: 0
+  Test::Exception: 0
+  Test::More: 0
+  What::MTA: 0
+  version: 0
+version: 1.07

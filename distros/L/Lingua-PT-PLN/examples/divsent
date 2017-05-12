@@ -1,0 +1,90 @@
+#!/usr/bin/perl -w -s
+use Lingua::PT::PLN;
+use strict;
+
+our ($l,$p,$ptag,$stag,$ftag,$n);
+
+my $opt={
+ psep=> ($p? '</p>' : ($l ? "\n" : '')),
+ stag=> $stag || "s",
+ ptag=> $ptag || ($p ? "p" : ""),
+ ftag=> $ftag || "",
+ norm=> $n    || '' ,
+ justp=> $p,
+};
+
+for my $file (@ARGV) {procFile($opt,$file)}
+
+sub procFile{
+  my $opt=shift;
+  my $file=shift;
+  local $/=$opt->{psep} || '';
+  open(F,$file) or die("cant open $file\n");
+  print "\n<$opt->{ftag} id='$file'>\n" if $opt->{ftag};
+  while(<F>){
+    chomp;
+    s{.*<p\b.*?>}{}s        if $opt->{justp};
+    $_=norm($_)             if $opt->{norm};
+    print "<$opt->{ptag}>\n"  if $opt->{ptag};
+    print Lingua::PT::PLN::xmlsentences({st=>$opt->{stag}},$_),"\n";
+    print "</$opt->{ptag}>\n" if $opt->{ptag};
+  }
+  print "</$opt->{ftag}>\n" if $opt->{ftag};
+  close F;
+}
+
+sub norm{
+ my $a=shift;
+ $a =~ s/\s*\n\s*|\s\s+/ /g;
+ $a =~ s/^\s+|\s+$//g;
+ $a;
+}
+
+
+__END__
+
+=head1 NAME
+
+divsent - a perl script to mark sentences
+
+=head1 SYNOPSIS
+
+ divsent file+
+ divsent -stag=phrase   file+
+ divsent -ptag=par      file+
+ divsent -ftag=f        file+
+
+=head1 DESCRIPTION
+
+Given a set of files it makes a (almost) XML file with the sentences
+marked.
+
+Optionally you can also mark the paragraphs and the files (see options
+C<ptag> and C<ftag>)
+
+=head1 Options
+
+C<-p>   -- Paragraphs in the input text follow HTML notation (<p>)
+
+C<-stag=tagname>  -- define the tag name for sentences (def. s)
+
+C<-ptag=tagname>  -- define the tag name for paragraphs (def. none)
+
+C<-ftag=tagname>  -- define the tag name for files (def. none). Filename
+is include as C<id> attribute.
+
+C<-n>  -- simple normalize the output
+
+C<-l>  -- Each line is a different paragraph
+
+=head1 AUTHOR
+
+J.Joao Almeida, jj@di.uminho.pt
+
+=head1 SEE ALSO
+
+Lingua::PT::PLN(3pm)
+
+perl(1).
+
+=cut      

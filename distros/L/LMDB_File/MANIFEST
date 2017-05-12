@@ -1,0 +1,19 @@
+Changes
+LMDB.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+TODO
+LICENSE
+typemap
+t/00-basic.t
+t/01-environment.t
+t/02-named.t
+t/03-fastmode.t
+t/04-bigone.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/LMDB_File.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

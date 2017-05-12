@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Log::Unrotate;
+
+=head1 NAME
+
+unrotate - reads lines from log using Log::Unrotate and given pos file
+
+=head1 VERSION
+
+version 1.32
+
+=head1 SYNOPSIS
+
+unrotate [-n 5] [-c] file.pos [file.log]
+
+  options:
+    -i              print all info about posfile
+    -c              commit position file before exit
+    -n LIMIT        read only LIMIT lines
+
+
+=head1 DESCRIPTION
+
+This script reads lines from log associated with given position file and prints them to stdout.
+
+=cut
+
+use Getopt::Long 2.33;
+use Pod::Usage;
+
+my $limit;
+my $commit;
+my $info;
+
+GetOptions(
+    'i'         => \$info,
+    'n=i'       => \$limit,
+    'c|commit'    => \$commit,
+) or pod2usage(2);
+pod2usage(2) if @ARGV == 0 or @ARGV > 2;
+
+my $pos = shift @ARGV;
+my $log = shift @ARGV; # may be undefined
+
+my $reader = Log::Unrotate->new({
+  log => $log,
+  pos => $pos,
+});
+
+if ($info) {
+    my $lag = $reader->lag;
+    my $log_number = $reader->log_number;
+    my $log_name = $reader->log_name;
+    print "log: $log_name\n";
+    print "current log: $log_name".($log_number ? ".$log_number" : "")."\n";
+    print "lag: $lag\n";
+    exit;
+}
+
+my $processed = 0;
+while (my $line = $reader->read()) {
+    print $line;
+    $processed++;
+    last if $limit and $processed >= $limit;
+}
+
+$reader->commit() if $commit;
+
+=head1 AUTHORS
+
+Andrei Mishchenko C<druxa@yandex-team.ru>, Vyacheslav Matjukhin C<mmcleric@yandex-team.ru>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2006-2010 Yandex LTD. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>
+
+=head1 SEE ALSO
+
+L<Log::Unrotate>
+
+=cut

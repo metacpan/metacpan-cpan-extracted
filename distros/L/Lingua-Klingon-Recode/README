@@ -1,0 +1,91 @@
+Lingua::Klingon::Recode version 1.02
+====================================
+
+Lingua::Klingon::Recode is a module which allows you to convert Klingon
+strings between various encodings, for example, from the so-called
+"XIFAN HOL" encoding to the standard "tlhIngan Hol" encoding.
+
+It currently supports the following encodings:
+
+- "tlhIngan Hol" - the standard transliteration
+  - This includes two variants "tlhingan hol" and "TLHINGAN HOL" which
+    use only lower-case and upper-case letters, respectively; however,
+    their use is discouraged since this confuses the letters 'q' and
+    'Q'. Also, the letter sequence "ngh" or "NGH" cannot be
+    disambiguated as ng+H or n+gh; it will be treated as the former.
+    (For example, the tlhingan hol string "monghom" and the TLHINGAN HOL
+    string "MONGHOM" are always interpreted as the tlhIngan Hol string
+    "mongHom" [little neck?], never as the tlhIngan Hol string
+    "monghom" [capital group?].)
+
+- "XIFAN HOL" - another fairly common transliteration, this is the
+  encoding of at least one Klingon font. Also available in lower-case
+  ("xifan hol") and in versions that use 'z'/'Z' instead of "'" for the
+  apostrophe ("XIFAN HOL DAJAXZAZ" / "xifan hol dajaxzaz").
+
+- "uhmal gnj" - an encoding that enables Klingon text to sort correctly
+  (that is, is an uhmal gnj character comes before another, then the
+  corresponding "letter" in the standard transliteration comes before
+  the other in the usual sort order). This encoding uses only the 26
+  letters of the lower-case Roman alphabet; it is also available in an
+  upper-case form "UHMAL GNJ".
+
+CHANGES SINCE THE LAST VERSION
+
+Update tests to test "Q" vs. "q".
+
+For changes in previous versions, see the file "Changes".
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+For compatibility, there is also a Makefile.PL provided; this is a
+wrapper around Build.PL.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More (v0.19 or higher)
+  Test::Differences
+  Module::Build
+
+These modules are only required to test and install the module; no further
+modules are needed at run time.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003, 2004 by Philip Newton.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer. 
+
+  * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+  * Neither the name of Philip Newton nor the names of its contributors
+    may be used to endorse or promote products derived from this
+    software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

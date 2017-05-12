@@ -1,0 +1,22 @@
+Changes
+example/01_my_translator_utf-8.pl
+'example/LocaleData/untranslated de_utf-8.po'
+lib/Locale/Utils/Autotranslator.pm
+lib/Locale/Utils/Autotranslator/ApiMymemoryTranslatedNet.pm
+MANIFEST			This list of files
+README
+t/01_autotranslation_utf-8.t
+t/02_api_error_utf-8.t
+t/03_before_translation_break_utf-8.t
+t/04_after_translation_break_utf-8.t
+t/21_api_mymemory_translated_net_utf-8.t
+t/31_test_examples_utf-8.t
+t/chars.t
+'t/LocaleData/untranslated de_utf-8.po'
+t/perl_critic.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_build.t
+Makefile.PL
+META.yml
+META.json

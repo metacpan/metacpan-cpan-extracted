@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+move-file - move an html file from one place to another (NOT IMPLEMENTED)
+
+=head1 WARNING
+
+B<This program is not yet implemented.. feel free>.
+
+=head1 DESCRIPTION
+
+This program moves a file or diretory tree from one place to another
+and then corrects all of the links which need to be corrected.
+
+=cut
+
+die "not yet implemented sorry";
+#1 we move the file
+#2 we correct the links in all of the other files
+#3 we correct the link within the structure
+

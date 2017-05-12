@@ -1,0 +1,25 @@
+
+
+ - recheck pod2man existence
+
+
+ TODO Items for Lingua::Jspell
+---------------------------------------------------------------------
+
+ - Before a stable release I would like that Ken Williams make a public
+   release of ExtUtils::CBuilder that compiles correctly under 
+   Windows. This would make me happy!
+
+ - Make jbuild and jspell link to the built dynamic library.
+
+ - Add tests for all the tools. Not sure if they should rely on the
+   Portuguese dictionary (in which case we need to download it before
+   than we are doing now) or in a small hand-made dictionary for test
+   purposes. Probably the second approach needs more work but might be
+   more efficient.
+
+ - The dictionary installation procedure requires LWP::Simple and
+   Archive::Any. Probably these two modules should be made a
+   requirement so no user ends up installing the module without a
+   dictionary to test it with.
+

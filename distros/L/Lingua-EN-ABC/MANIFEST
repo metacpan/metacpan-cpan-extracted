@@ -1,0 +1,14 @@
+Changes
+examples/synopsis.pl
+lib/Lingua/EN/ABC.pm
+lib/Lingua/EN/ABC.pod
+lib/Lingua/EN/ABC/abc.json
+lib/Lingua/EN/ABC/Data.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+script/econv
+t/Lingua-EN-ABC.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

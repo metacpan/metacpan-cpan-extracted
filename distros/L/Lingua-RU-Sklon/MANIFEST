@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/Lingua/RU/Sklon.pm
+README
+t/tests1.t
+META.yml                                 Module meta-data (added by MakeMaker)

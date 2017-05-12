@@ -1,0 +1,47 @@
+---
+abstract: 'Perl interface to the Jspell morphological analyser.'
+author:
+  - 'Alberto SimÃµes <ambs@cpan.org>'
+  - 'JosÃ© JoÃ£o Almeida <jj@di.uminho.pt">'
+  - 'Ulisses Pinto'
+build_requires:
+  Config::AutoConf: '0.14'
+  ExtUtils::CBuilder: '0.27'
+  ExtUtils::LibBuilder: '0.01'
+  Module::Build: '0.3603'
+  Test::More: '0'
+configure_requires:
+  Config::AutoConf: '0.14'
+  ExtUtils::CBuilder: '0.27'
+  ExtUtils::LibBuilder: '0.01'
+  Module::Build: '0.3603'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Jspell
+provides:
+  Lingua::Jspell:
+    file: lib/Lingua/Jspell.pm
+    version: '1.92'
+  Lingua::Jspell::DictManager:
+    file: lib/Lingua/Jspell/DictManager.pm
+    version: '1.92'
+  Lingua::Jspell::EAGLES:
+    file: lib/Lingua/Jspell/EAGLES.pm
+    version: '1.92'
+requires:
+  Archive::Any: '0.0932'
+  Data::Compare: '1.22'
+  ExtUtils::Manifest: '0'
+  File::Copy: '0'
+  IPC::Open2: '0'
+  LWP::Simple: '0'
+  YAML: '0.72'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://natura.di.uminho.pt/svn/main/Lingua/Jspell/
+version: '1.92'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

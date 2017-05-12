@@ -1,0 +1,27 @@
+Labyrinth-Plugin-CPAN
+=====================
+
+Labyrinth is a Website Management Framework. This distribution enables Labyrinth
+to manage access to the CPAN Testers databases and data about CPAN releases and
+testers.
+
+INSTALLATION
+
+See the INSTALL file for full instructions.
+
+DEPENDENCIES
+
+  Labyrinth
+
+AUTHOR
+
+  Barbie, <barbie@missbarbell.co.uk> for Miss Barbell Productions,
+  <http://www.missbarbell.co.uk/>
+
+COPYRIGHT & LICENSE
+
+  Copyright (C) 2008-2016 Barbie for Miss Barbell Productions
+  All Rights Reserved.
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic License 2.0.

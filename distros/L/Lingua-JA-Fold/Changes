@@ -1,0 +1,41 @@
+Revision history for Perl extension Lingua::JA::Fold.
+
+0.08  2008-03-19 21:38:00 JST
+	- Mr. Watanabe a.k.a. 'heppoko-kyoro' has reported to me a bug.
+	  The bug can occur with traditional folding. When the last folded
+	  string has only a half-width '0', the letter will disappear.
+	  Thanks to kyoro, the bug has been fixed.
+
+0.07  2004-01-04 14:27:10 JST
+	- A serious bug had been found and has been fixed.
+	  That bug arose on the v0.05 bug-fixing for deletion of empty
+	  lines, and also influenced on v0.06.
+	  With that bug, a text to fold which has last line without newline
+	  ending will fall into endless loop.
+	  The bug was a result from a fault of a line-splitting routine.
+	  Now with 0.07, the bug was fixed.
+
+0.06  2004-01-02 23:38:43 JST
+	- All methods have been changed to functions.
+
+0.05  2004-01-01 18:09:09 JST
+	- A bug that empty lines had been ignored was fixed.
+	- An output string is now as Unicode Wide Character.
+
+0.04  2003-04-15 09:23:35 JST
+	- Added prototype to the functions.
+
+0.03  2003-04-13 19:27:33 JST
+	- New method fold_ex() has been implemented!
+	  With fold_ex(), you can reflect the 'forbidden marks rule'.
+	- A bug newline character at the last line is removed was fixed.
+
+0.02  2003-04-03 01:57:32 JST
+	- The manner about handling for UTF-8 has changed.
+	- Users encouraged to `use utf8;' pragma in their source code.
+
+0.01  2003-04-02
+	- the first public release
+
+0.00  2003-03-26
+	- original version

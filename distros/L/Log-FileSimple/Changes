@@ -1,0 +1,11 @@
+Revision history for Perl extension Log::FileSimple
+
+00.02  (2003-09-01)
+===================
+- Added 'autoflush' option to Log::FileSimple constructor for 
+  enabling/disabling autoflush.
+  (thanks to Peter Jansen [pjansen/at/citadel_dot_com] for suggestion)
+
+00.01  (2003-07-22)
+===================
+- original version

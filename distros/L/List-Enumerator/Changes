@@ -1,0 +1,6 @@
+2010-12-06  SATOH Hiroh <cho45@lowreal.net>
+
+	* use strict, use warnings
+
+
+vim:ft=changelog:

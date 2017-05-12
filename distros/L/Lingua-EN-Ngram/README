@@ -1,0 +1,29 @@
+
+
+README
+
+This module is designed to extract n-grams from texts and list them
+according to frequency and/or T-Score.
+
+To elaborate, the purpose of Lingu::EN::Ngram is to: 1) pull out all of
+the ngrams (multi-word phrases) in a given text, and 2) list these
+phrases according to their frequency. Using this module is it possible
+to create lists of the most common phrases in a text as well as order
+them by their probable occurance, thus implying significance. This
+process is useful for the purposes of textual analysis and "distant
+reading".
+
+The two-word phrases (bigrams) are also listable by their T-Score. The
+T-Score, as well as a number of the module's other methods, is
+calculated as per Nugues, P. M. (2006). An introduction to language
+processing with Perl and Prolog: An outline of theories, implementation,
+and application with special consideration of English, French, and
+German. Cognitive technologies. Berlin: Springer.
+
+Finally, the intersection method enables the developer to find ngrams
+common in an arbitrary number of texts. Use this to look for common
+themes across a corpus.
+
+-- 
+Eric Lease Morgan <eric_morgan@infomotions.com>
+September 12, 2010

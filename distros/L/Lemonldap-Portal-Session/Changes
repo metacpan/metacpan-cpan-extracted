@@ -1,0 +1,7 @@
+Revision history for Perl extension Lemonldap::Portal::Session.
+
+0.01  Mon Jul 18 11:09:24 2005
+	- original version; created by h2xs 1.23 with options
+		-XAn Lemonldap::Portal::Session
+0.02  Fri  Jun 22  2007
+        - correct bug when a multivalued attribute is a single line in ldap entrie

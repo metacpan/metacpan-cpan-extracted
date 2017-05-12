@@ -1,0 +1,34 @@
+# -*- cperl -*-
+
+=head1 NAME
+
+nat-ipfp - one of the three possible EM-Algorithm implementations of NATools
+
+=head1 SYNOPSIS
+
+ nat-ipfp <steps> <crp1> <crp2> <mat-in> <mat-out>
+
+=head1 DESCRIPTION
+
+This program is not intended to be used independently. It is used
+internally by C<nat-these> script.
+
+IPFP is an iterative method for the EM-Algorithm. To use it, you must
+supply the number of times the method should iterate, both corpus
+files (created by C<nat-pre>), the sparse co-ocurrence matrix file
+(created by C<nat-initmat>) and the file name where the enhanced
+matrix should be placed.
+
+=head1 SEE ALSO
+
+NATools, nat-samplea, nat-sampleb
+
+=head1 COPYRIGHT
+
+ Copyright (C)2002-2003 Alberto Simoes and Jose Joao Almeida
+ Copyright (C)1998 Djoerd Hiemstra
+
+ GNU GENERAL PUBLIC LICENSE (LGPL) Version 2 (June 1991)
+
+=cut
+

@@ -1,0 +1,11 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+binmode STDIN, ":encoding(UTF-8)";
+binmode STDOUT, ":encoding(UTF-8)";
+use Lingua::JA::Name::Splitter 'split_kanji_name';
+while (<>) {
+    chomp;
+    my ($family, $given) = split_kanji_name ($_);
+    print "$family $given\n";
+}

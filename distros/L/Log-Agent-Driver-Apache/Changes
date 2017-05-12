@@ -1,0 +1,10 @@
+Revision history for Perl extension Log::Agent::Apache.
+
+0.001  Sat Sep 10 01:19:11 2005
+	- original version; created by h2xs 1.23 with options
+		-X Log::Agent::Driver::Apache
+
+0.001  Sat Sep 10 01:19:11 2005
+	- write gave an error when logdbg() was used without arguments.
+
+

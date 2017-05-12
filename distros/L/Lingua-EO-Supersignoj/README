@@ -1,0 +1,110 @@
+Lingua::EO::Supersignoj
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or use CPANPLUS to automate the process.
+
+Module documentation:
+NAME
+    Lingua::EO::Supersignoj - Convert Esperanto characters
+
+SYNOPSIS
+        use Lingua::EO::Supersignoj;
+
+        my $transkodigilo = Lingua::EO::Supersignoj->nova(
+            de => 'fronte',
+            al => 'X',
+            u  => 'u*'
+        );
+        print $transkodigilo->transkodigu('Mia ^suoj estas ankau* en la ^cambro.');
+        # prints: Mia sxuoj estas ankaux en la cxambro.
+    
+        my $transkodigilo = Lingua::EO::Supersignoj->nova(de => 'X');
+
+        for (qw(X x H h poste fronte apostrofoj iso unikodo)) {
+            $transkodigilo->al = $_;
+            print $transkodigilo->transkodigu(
+                'Laux Ludoviko Zamenhof bongustas ' .
+                'fresxa cxecxa mangxajxo kun spicoj.'
+            );
+        }
+    
+DESCRIPTION
+    Esperanto has 6 letters that ASCII doesn't have. These characters do
+    exist in Unicode and ISO-8859-3. This object orientated module makes
+    conversion easier.
+
+  Constructor
+    nova        Returns a converter object. Takes name => value pairs to
+                populate object properties.
+
+  Properties
+    de          The character set to convert from. Must be one of the sets
+                listed below.
+
+    al          The character set to convert to. Must be one of the sets
+                listed below.
+
+    u           An alternative collection of surrogates for u with a caron
+                to be converted. Must be either a single scalar or an array
+                reference.
+
+                If any alternative for u-caron or U-caron is given, the ones
+                from the source character set are not used.
+
+                To leave u's alone, assign a reference to an empty array:
+                "$objekto->u = [];".
+
+    U           Same as "u", but for uppercase U.
+
+  Method
+    transkodigu Takes one or more strings to convert and returns a list of
+                converted strings.
+
+                Converts from "X" if "$objekto->de" has not been set.
+
+                Converts to "unikodo" if "$objekto->al" has not been set.
+
+CHARACTER SETS
+    The character sets are array references in
+    %Lingua::EO::Supersignoj::cxapeloj. Feel free to add your own.
+
+    h           Ch ch Gh gh Hh hh Jh jh Sh sh Uw uw
+
+    H           CH ch GH gh HH hh JH jh SH sh UW uw
+
+    x           Cx cx Gx gx Hx hx Jx jx Sx sx Ux ux
+
+    X           CX cx GX gx HX hx JX jx SX sx UX ux
+
+    poste       C^ c^ G^ g^ H^ h^ J^ j^ S^ s^ U^ u^
+
+    fronte      ^C ^c ^G ^g ^H ^h ^J ^j ^S ^s ^U ^u
+
+    apostrofoj  C' c' G' g' H' h' J' j' S' s' U' u'
+
+    iso         198 230 216 248 166 182 172 188 222 254 221 253
+                (iso-8859-3/9)
+
+    unikodo     264 265 284 285 292 293 308 309 348 349 364 365
+
+TODO / KNOWN ISSUES
+    There currently is no way to define an alternative u-caron to convert
+    to.
+
+    Since converting bare "u" without diacritic would require a word list,
+    this module does not provide such functionality.
+
+AUTHOR
+    Juerd <juerd@cpan.org> <http://juerd.nl/>
+
+SEE ALSO
+    perl, encoding, perlunicode.
+

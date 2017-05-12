@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+TODO
+lib/Log/Dispatch/Channels.pm
+t/000-load.t
+t/001-channels-and-outputs.t
+t/002-logging.t
+t/003-errors.t
+t/004-exceptions.t
+t/lib/Log/Dispatch/ToString.pm

@@ -1,0 +1,22 @@
+---
+abstract: 'Translate L10N messages automatically'
+author:
+  - 'Yung-chung Lin (henearkrxern@gmail.com)'
+distribution_type: module
+generated_by: 'Module::Install version 0.71'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Locale-Maketext-AutoTranslate
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTML::Entities: 0
+  Locale::Maketext::Extract: 0
+  Locale::Maketext::Lexicon: 0
+  Moose: 0
+  REST::Google::Translate: 0
+version: 0.1

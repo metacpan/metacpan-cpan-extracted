@@ -1,0 +1,24 @@
+This file documents the revision history for Perl extension Log::Any::Adapter::Mojo.
+
+0.06 2012-02-25 00:00:00
+     - add Log::Any as prereq
+     - Log::Any::Adapter 0.07 as prereq
+
+0.05 2012-02-20 00:00:00
+     - Updated to deal with Mojolicious' changes in Mojo::Log.
+
+0.04 2011-09-29 00:00:00
+     - Updated testcases to deal with Mojolicious' change to simplified default log
+       format in 1.53
+
+0.03 2011-05-05 00:00:00
+     - Fixed Test hangs on BSD systems (SREZIC) (Now really fixed)
+
+0.02 2011-05-05 00:00:00
+     - Fixed regex that matches test output
+     - Fixed Test hangs on BSD systems (SREZIC)
+       (https://rt.cpan.org/Public/Bug/Display.html?id=67950)
+     - Fixed license.
+
+0.01 2011-04-25 00:00:00
+     - First release.

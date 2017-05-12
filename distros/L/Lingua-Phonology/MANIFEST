@@ -1,0 +1,33 @@
+MANIFEST
+CHANGES
+README
+TODO
+Makefile.PL
+Phonology.pm
+Phonology/Common.pm
+Phonology/Features.pm
+Phonology/FileFormatPOD.pm
+Phonology/Functions.pm
+Phonology/Rules.pm
+Phonology/RuleParser.pm
+Phonology/Segment.pm
+Phonology/Segment/Rules.pm
+Phonology/Segment/Tier.pm
+Phonology/Segment/Boundary.pm
+Phonology/Syllable.pm
+Phonology/Symbols.pm
+Phonology/Word.pm
+t/00phono.t
+t/01features.t
+t/02segment.t
+t/03symbols.t
+t/04rules.t
+t/05functions.t
+t/06syllable.t
+t/07loadfile.t
+t/08lingrules.t
+t/09word.t
+t/test.xml
+t/test_rules.xml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

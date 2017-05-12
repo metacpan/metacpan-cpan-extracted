@@ -1,0 +1,31 @@
+---
+abstract: 'Language-independent TF-IDF calculator.'
+author:
+  - 'Koichi SATOH <sekia@cpan.org>'
+build_requires:
+  Test::More: 0
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120921'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-TFIDF
+requires:
+  Algorithm::LossyCount: 0
+  Carp: 0
+  Encode: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Mouse::Util::TypeConstraints: 0
+  Smart::Args: 0
+  Text::MeCab: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/sekia/Lingua-TFIDF/issues
+  repository: git://github.com/sekia/Lingua-TFIDF.git
+version: 0.01

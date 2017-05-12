@@ -1,0 +1,18 @@
+<Sect1 id="sec-Parsec">
+<Title><Literal>Parsec</Literal>: Parsing combinators
+<IndexTerm><Primary>Parsec</Primary></IndexTerm>
+</Title>
+
+  <para>The <literal>Parsec</literal> library has been moved to the
+  hierarchical libraries; it can be found in
+  <ulink url="../base/Text.ParserCombinators.Parsec.html"><literal>Text.ParserCombinators.Parsec</literal></ulink> in the
+  <literal>base</literal> package.</para>
+
+</Sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: sgml ***
+     ;;; sgml-parent-document: ("../../doc/hslibs.sgml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

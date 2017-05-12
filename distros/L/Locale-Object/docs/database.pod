@@ -1,0 +1,150 @@
+=head1 NAME
+
+database.pod - documentation for the Locale::Object database
+
+=head2 THE DATABASE
+
+The database of locale information used by the L<Locale::Object> modules uses L<DBD::SQLite>, and contains several tables.
+
+=head3 the "country" table
+
+    CREATE TABLE country (
+        code_alpha2           char(2),
+        code_alpha3           char(3),
+        code_numeric          smallint,
+        name                  char(100),
+        dialing_code          smallint,
+        utc_offset_main       char(5),
+        utc_offsets_all       char(50),
+        PRIMARY KEY           (code_alpha2)
+    );
+
+=over 4
+
+=item * C<code_alpha2> , C<code_alpha3>, C<code_numeric> and C<name> are data from ISO 3166 - see L<http://ftp.ics.uci.edu/pub/ietf/http/related/iso3166.txt>.
+
+=item * C<dialing_code> is an International Direct Dialing code - see L<http://kropla.com/dialcode.htm>.
+
+=item * C<utc_offset_main> is the time offset of the time zone of the country's capital from UTC, expressed decimally in hours. C<utc_offsets_all> is a comma-separated list of offsets for all time zones that the country falls across, listed from west to east. If there is only one value this will match C<utc_offset_main>.
+
+=back
+
+=head3 the "currency" table
+
+    CREATE TABLE currency (
+        country_code   char(2),
+        name           char(100),
+        code           char(3),
+        code_numeric   smallint,
+        symbol         char(20),
+        subunit        char(100),
+        subunit_amount smallint,
+        PRIMARY KEY  (country_code)
+    );
+
+=over 4
+
+=item * C<country_code> contains ISO 3166 two-letter country codes, as in the previous table.
+
+=item * C<name> and C<code> contain ISO 4217 three-letter codes and names for world currencies - see L<http://fx.sauder.ubc.ca/iso4217.html>.
+
+=item * C<symbol>, C<subunit> and C<subunit_amount> contain currency symbols, subunits (such as cents) and the amounts of subunits that comprise a single currency unit (such as 100 [cents in a dollar]). This data was sourced from L<http://fx.sauder.ubc.ca/currency_table.html> and L<http://www.wazu.jp/gallery/Test_CurrencySymbols.html>.
+
+=back
+
+=head3 the "continent" table
+    
+    CREATE TABLE continent (
+        country_code char(2),
+        name         char(13),
+        PRIMARY KEY  (country_code)
+    );
+
+=over 4
+
+=item *C<country_code> contains ISO 3166 two-letter codes again, and C<name> contains associated continent names (Africa, Asia, Europe, North America, Oceania and South America). Sourced from L<http://www.worldatlas.com/cntycont.htm>.
+
+=back
+
+=head3 the "language" table
+    
+    CREATE TABLE language (
+        code_alpha2  char(2),
+        code_alpha3  char(3),
+        name         char(100),
+        PRIMARY KEY  (code_alpha2)
+    );
+
+=over 4
+
+=item * C<code_alpha2> contains 2-letter ISO 639-1 language codes. See  L<http://www.loc.gov/standards/iso639-2/englangn.html>.
+
+=item * C<code_alpha3> contains 3-letter ISO 639-2. There two parts of ISO 639-2, B (for 'bibliographic') and T (for 'terminology'), which differ in 23 instances out of the full list of 464 codes. For simplicity, this module uses the ISO 639-2/T versions. For more information, see the URL above and also L<http://www.loc.gov/standards/iso639-2/develop.html>.
+
+=item * C<name> contains the standard names of languages in English as defined by ISO 639.
+
+=back
+
+=head3 the "language_mappings" table
+
+    CREATE TABLE language_mappings (
+        id           char(4),
+        country      char(2),
+        language     char(3),
+        official     boolean,
+        PRIMARY KEY (id)
+    );
+    
+An example section of this table:
+
+    ID   COUNTRY  LANGUAGE  OFFICIAL
+    at_0   at       ger      true
+    at_1   at       slv      false
+    at_2   at       hrv      false
+    at_3   at       hun      false
+
+What this tells us is that in Austria, four languages are spoken: German, Slovenian, Croatian (Hrvatska) and Hungarian, and that only German is an official language of Austria. The mappings are ranked in order of prevalence of language, official languages first, followed by non-official. Please note that this is approximate at best. 
+
+My original source for the language-country mappings was L<http://www.infoplease.com/ipa/A0855611.html>. However, there is no clear origin for this list, which occurs in several places on the Web, and it required some serious rationalization before data was able to be usefully extracted for it.
+ 
+In addition to the preceding, the following sources were invaluable:
+
+=over 4
+
+=item * Nationmaster - L<http://www.nationmaster.com/>
+
+=item * Ethnologue - L<http://www.ethnologue.com/>
+
+=item * Wikipedia - L<http://en.wikipedia.org/>
+
+=back
+
+=head3 the "timezone" table
+
+    CREATE TABLE timezone (
+        country_code          char(2),
+        timezone              char(50),
+        is_default            boolean
+    );
+
+An example section of this table:
+
+    COUNTRY_CODE  TIMEZONE           IS_DEFAULT
+         br       America/Recife       false     
+         br       America/Fortaleza    false
+         br       America/Belem        false
+         br       America/Noronha      true
+
+=over 4
+
+=item * C<country_code> contains ISO 3166 two-letter country codes.
+
+=item * C<timezone> contains time zone names as defined in the Olson database. See L<http://www.twinsun.com/tz/tz-link.htm> for more than you ever wanted to know about this.
+
+=item * C<is_default> contains a boolean value indicating whether the time zone in question is default in the country. For countries with more than one time zone, a value of 'true' indicates the time zone covers the nation's capital.
+
+=back
+
+The data for this table was sourced from L<http://s.keim.free.fr/tz/tznames/>.
+
+=cut

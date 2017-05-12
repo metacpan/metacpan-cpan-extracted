@@ -1,0 +1,61 @@
+[% 
+    htmltitle = 'Gallery' ;
+    title = 'Gallery' ;
+
+    crumb1_name = 'Gallery' ;
+    lightbox = 1 ;
+%]
+
+<div class="boxer">
+
+  <p>Recently uploaded or updated galleries are marked with a <span class="red">*</span>.
+  To help find a specific gallery select the month or year to better refine the list.</p>
+
+  <form method="post" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name="act" value="album-main" />
+    <input type="hidden" name="latest" value="0" />
+    <p>[% ddmonths %][% ddyears %] <input type="submit" class="gobutton" value="GO" /></p>
+  </form>
+  <form method="post" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name="act" value="album-search" />
+    <p>Photo Meta Search: <input type="text" name="metadata" value="" /> <input type="submit" class="gobutton" value="GO" /></p>
+  </form>
+  <p>
+    <a href="[% cgipath %]/pages.cgi?act=album-main&amp;latest=1">Latest Updates</a> |
+    <a href="[% cgipath %]/pages.cgi?act=hits-photos">Top Fifty Photo Hits</a>
+  </p>
+</div>
+
+<div class="boxer">
+[% IF album.records %]
+<table width="95%">
+[% orderno = 0 %]
+[% FOREACH record = records %]
+[% IF orderno % 5 == 0 %]
+<tr>
+[% END %]
+
+[% IF record.thumb == "/images/icons/format-video.jpg" %]
+<td><a href="[% picpath %]/photos/[% record.image %]" title="video"><img src="[% record.thumb %]" border="0" height="100" /></a>
+    [% IF record.tagline %]<br />[% record.tagline %][% END %]
+</td>
+[% ELSE %]
+<td><a href="[% docroot %]/photo/[% record.id %]" rel="lightbox[[% record.pageid %]]" title="[% record.tagline %]"><img src="[% picpath %]/photos/[% record.thumb %]" border="0" height="100" /></a>
+    [% IF record.tagline %]<br />[% record.tagline %][% END %]
+    [% IF record.pageid %]
+    <br />(<a href="[% docroot %]/album/[% record.pageid %]">[% record.title %]</a>)
+    [% END %]
+</td>
+[% END %]
+
+[% orderno = orderno + 1 %]
+[% IF orderno % 5 == 0 %]
+</tr>
+[% END %]
+[% END %]
+</table>
+[% ELSE %]
+<p>Unfortunately the images for this gallery have either been deleted or hidden. 
+If the latter then they may become viewable at some point in the future.</p>
+[% END %]
+</div>

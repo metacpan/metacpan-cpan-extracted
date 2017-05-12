@@ -1,0 +1,132 @@
+{
+   "abstract" : "a library for language analysis with FreeLing3.",
+   "author" : [
+      "Alberto SimÃµes <ambs@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-FreeLing3",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Config::AutoConf" : "0.20",
+            "ExtUtils::CBuilder" : "0.280205",
+            "File::Copy" : "0",
+            "Test::Warn" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config::AutoConf" : "0.20",
+            "ExtUtils::CBuilder" : "0.280205",
+            "ExtUtils::Mkbootstrap" : "0",
+            "ExtUtils::PkgConfig" : "1.12",
+            "File::Copy" : "0",
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "FL3" : {
+         "file" : "lib/FL3.pm",
+         "version" : "0.03"
+      },
+      "Lingua::FreeLing3" : {
+         "file" : "lib/Lingua/FreeLing3.pm",
+         "version" : "0.09"
+      },
+      "Lingua::FreeLing3::ChartParser" : {
+         "file" : "lib/Lingua/FreeLing3/ChartParser.pm",
+         "version" : "0.01"
+      },
+      "Lingua::FreeLing3::Config" : {
+         "file" : "lib/Lingua/FreeLing3/Config.pm",
+         "version" : "0.1"
+      },
+      "Lingua::FreeLing3::DepTree" : {
+         "file" : "lib/Lingua/FreeLing3/DepTree.pm",
+         "version" : "0.01"
+      },
+      "Lingua::FreeLing3::DepTxala" : {
+         "file" : "lib/Lingua/FreeLing3/DepTxala.pm",
+         "version" : "0.01"
+      },
+      "Lingua::FreeLing3::Dictionary" : {
+         "file" : "lib/Lingua/FreeLing3/Dictionary.pm",
+         "version" : "0.01"
+      },
+      "Lingua::FreeLing3::Document" : {
+         "file" : "lib/Lingua/FreeLing3/Document.pm",
+         "version" : "0.01"
+      },
+      "Lingua::FreeLing3::EAGLES" : {
+         "file" : "lib/Lingua/FreeLing3/EAGLES.pm",
+         "version" : "0.1"
+      },
+      "Lingua::FreeLing3::HMMTagger" : {
+         "file" : "lib/Lingua/FreeLing3/HMMTagger.pm",
+         "version" : "0.03"
+      },
+      "Lingua::FreeLing3::MorphAnalyzer" : {
+         "file" : "lib/Lingua/FreeLing3/MorphAnalyzer.pm",
+         "version" : "0.01"
+      },
+      "Lingua::FreeLing3::NEC" : {
+         "file" : "lib/Lingua/FreeLing3/NEC.pm",
+         "version" : "0.01"
+      },
+      "Lingua::FreeLing3::Paragraph" : {
+         "file" : "lib/Lingua/FreeLing3/Paragraph.pm",
+         "version" : "0.03"
+      },
+      "Lingua::FreeLing3::ParseTree" : {
+         "file" : "lib/Lingua/FreeLing3/ParseTree.pm",
+         "version" : "0.02"
+      },
+      "Lingua::FreeLing3::RelaxTagger" : {
+         "file" : "lib/Lingua/FreeLing3/RelaxTagger.pm",
+         "version" : "0.01"
+      },
+      "Lingua::FreeLing3::Sentence" : {
+         "file" : "lib/Lingua/FreeLing3/Sentence.pm",
+         "version" : "0.03"
+      },
+      "Lingua::FreeLing3::Splitter" : {
+         "file" : "lib/Lingua/FreeLing3/Splitter.pm",
+         "version" : "0.02"
+      },
+      "Lingua::FreeLing3::Tokenizer" : {
+         "file" : "lib/Lingua/FreeLing3/Tokenizer.pm",
+         "version" : "0.01"
+      },
+      "Lingua::FreeLing3::Word" : {
+         "file" : "lib/Lingua/FreeLing3/Word.pm",
+         "version" : "0.04"
+      },
+      "Lingua::FreeLing3::Word::Analysis" : {
+         "file" : "lib/Lingua/FreeLing3/Word/Analysis.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.09"
+}

@@ -1,0 +1,44 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  keyval                                                             | #
+# | Implementation of keyval for LaTeXML                                | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+# Should define some macros that connect to KeyVal ?
+
+# This doesn't really do anything useful; what keyval wants is to evaluate $code!!!
+DefPrimitive('\define@key{}{}[]{}', sub {
+    my ($stomach, $keyset, $key, $default, $code) = @_;
+    $keyset = ToString($keyset);
+    $key    = ToString($key);
+    DefKeyVal($keyset, $key, '', ToString($default));
+    # And define macros, just incase..
+    DefMacroI('\KV@' . $keyset . '@' . $key,
+      LaTeXML::Core::Parameters->new(LaTeXML::Core::Parameter->new('Plain', '{}')),
+      $code,
+      scope => 'global');
+    DefMacroI('\KV@' . $keyset . '@' . $key . '@default', undef,
+      Tokens(T_CS('\KV@' . $keyset . '@' . $key), T_BEGIN, $default->unlist, T_END),
+      scope => 'global')
+      if $default;
+    return; });
+
+# \setkeys{keyset}{keyvals}
+DefMacro('\setkeys{}', sub {
+    my ($gullet, $keyset) = @_;
+    my ($values) = ReadParameters($gullet, 'RequiredKeyVals:' . ToString($keyset));
+    $values->revert; });    # and it will be expanded/digested as needed(?)
+
+#======================================================================
+1;

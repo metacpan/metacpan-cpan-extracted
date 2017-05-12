@@ -1,0 +1,270 @@
+#!/usr/bin/perl -s
+
+use strict;
+use warnings;
+use Data::Dumper;
+
+use File::Spec::Functions;
+
+use Lingua::NATools::Config;
+use Lingua::NATools::Corpus;
+use Lingua::NATools::Lexicon;
+
+our ($h, $d, $r, $encode, $debug);
+
+if ($h || !@ARGV) {
+    print "nat-makeCWB: Dumps a NATools corpus in a format suitable to be imported in CWB\n\n";
+    print "   nat-makeCWB [-encode=<CWBName> -d=<CWBCrpDir> [-r=<CWBRegistry>]] <NatCrpDir>\n\n";
+    print "For more help, please run 'perldoc nat-makeCWB'\n";
+    exit;
+}
+
+if (($encode && !$d) || ($d && !$encode)) {
+    print "-d and -encode options should be used together.\n";
+    exit;
+}
+
+$r ||= $ENV{CORPUS_REGISTRY};
+if (!$r) {
+    chomp($r = `cwb-config -r`);
+}
+if ($encode && (!$r || !(-d $r))) {
+    print "Could not detect a suitable CWB registry directory.\n";
+}
+my $dir = shift;
+
+create_cqp_files($dir);
+encode_and_align_corpus($encode, $d, $r, $dir) if ($encode);
+delete_tmps() if $encode && !$debug;
+
+# ** THE END **
+
+sub delete_tmps {
+    unlink "source.cqp";
+    unlink "target.cqp";
+    unlink "align.txt";
+}
+
+sub RUN {
+    my $command = shift;
+    print STDERR "Running [$command]\n";
+    `$command`;
+}
+
+sub encode_and_align_corpus {
+    my ($cname, $cdir, $rdir, $natdir) = @_;
+    $cname = lc $cname;
+    my $name;
+
+    my $natcfg = Lingua::NATools::Config->new(catfile($natdir, "nat.cnf"));
+    my $source_lang = $natcfg->param("source-language");
+    my $target_lang = $natcfg->param("target-language");
+
+    $name = "${cname}_source";
+    print STDERR "Encoding source corpus\n";
+    mkdir "$cdir/$name";
+    RUN("cwb-encode -d $cdir/$name -f source.cqp -R $rdir/$name -P natid -S tu+id");
+    RUN("cwb-regedit " . uc($name) . " :prop language " . $source_lang);
+    RUN("cwb-make -V " . uc($name));
+
+    $name = "${cname}_target";
+    print STDERR "Encoding target corpus\n";
+    mkdir "$cdir/$name";
+    RUN("cwb-encode -d $cdir/$name -f target.cqp -R $rdir/$name -P natid -S tu+id");
+    RUN("cwb-regedit " . uc($name) . " :prop language " . $target_lang);
+    RUN("cwb-make -V " . uc($name));
+
+    print STDERR "Importing alignment\n";
+    RUN("cwb-align-import -v align.txt");
+    RUN("cwb-align-import -v -inverse align.txt");
+}
+
+
+sub create_cqp_files {
+    my $NATDir = shift;
+    die "Path does not exists\n" unless -d $NATDir;
+
+    my $sourcelexicon = "$NATDir/source.lex";
+    die "$sourcelexicon file not available\n" unless -f $sourcelexicon;
+    print STDERR "Loading source lexicon\n";
+    my $SL = Lingua::NATools::Lexicon->new($sourcelexicon);
+
+    my $targetlexicon = "$NATDir/target.lex";
+    die "$sourcelexicon file not available\n" unless -f $sourcelexicon;
+    print STDERR "Loading target lexicon\n";
+    my $TL = Lingua::NATools::Lexicon->new($targetlexicon);
+
+    my $conffile = "$NATDir/nat.cnf";
+    die "NATools configuration file not available\n" unless -f $conffile;
+    my $config = Lingua::NATools::Config->new($conffile);
+    my $nchunks = $config->param('nr-chunks');
+    print STDERR "Processing $nchunks chunks\n";
+
+    our $i;
+    open SO, ">source.cqp" or die "Can't create cqp outfile\n";
+    open TO, ">target.cqp" or die "Can't create cqp outfile\n";
+
+    open ALIGN, ">align.txt"  or die "Can't create temporary alignment file\n";
+
+    printf ALIGN "%s\t%s\ttu\tid_{id}\n", uc($encode."_source"), uc($encode."_target") if $encode;
+
+    for my $c (1..$nchunks) {
+        my $source = sprintf("%s/source.%03d.crp", $NATDir, $c);
+        my $target = sprintf("%s/target.%03d.crp", $NATDir, $c);
+        die "$source file not available.\n" unless -f $source;
+        die "$target file not available.\n" unless -f $target;
+
+        print STDERR "Opening $source and $target.\n";
+        my $SC = Lingua::NATools::Corpus->new($source);
+        die unless $SC;
+
+        my $TC = Lingua::NATools::Corpus->new($target);
+        die unless $TC;
+
+        my $tot = $SC->sentences_nr;
+        my $txt;
+
+        print STDERR " - $tot sentences [0%]";
+        my $j = 1;
+        ++$i;
+
+        print SO "<tu id='$i'>\n";
+        print TO "<tu id='$i'>\n";
+        print ALIGN "id_$i\tid_$i\n";
+
+
+        my $sentenceS = $SC->first_sentence;
+        $txt = join("\n", merge($sentenceS,
+                                   split /\s+/, $SL->ids_to_sentence(@$sentenceS)));
+        $txt =~ s/</&lt;/g;
+        $txt =~ s/</&gt;/g;
+        print SO $txt;
+
+        my $sentenceT = $TC->first_sentence;
+        $txt = join("\n", merge($sentenceT,
+                                   split /\s+/, $TL->ids_to_sentence(@$sentenceT)));
+        $txt =~ s/</&lt;/g;
+        $txt =~ s/</&gt;/g;
+        print TO $txt;
+
+        print SO "\n</tu>\n";
+        print TO "\n</tu>\n";
+
+        while ($j < $tot) {
+            $i++;
+            $j++;
+
+            print SO "<tu id='$i'>\n";
+            print TO "<tu id='$i'>\n";
+            print ALIGN "id_$i\tid_$i\n";
+
+            $sentenceS = $SC->next_sentence;
+            $txt = join("\n", merge($sentenceS,
+                                    split /\s+/, $SL->ids_to_sentence(@$sentenceS)));
+            $txt =~ s/</&lt;/g;
+            $txt =~ s/</&gt;/g;
+            print SO $txt;
+
+            $sentenceT = $TC->next_sentence;
+            $txt = join("\n", merge($sentenceT,
+                                    split /\s+/, $TL->ids_to_sentence(@$sentenceT)));
+            $txt =~ s/</&lt;/g;
+            $txt =~ s/</&gt;/g;
+            print TO $txt;
+
+            print STDERR sprintf("\r - %d sentences [%.2f%%]", $tot, $j/$tot*100) unless $j % 100;
+
+            print SO "\n</tu>\n";
+            print TO "\n</tu>\n";
+
+        }
+        print STDERR sprintf("\r - %d sentences [100.00%%]\n", $tot);
+
+        $SC->free;
+        $TC->free;
+    }
+
+    print STDERR "Exported $i translation units\n";
+
+    close SO;
+    close TO;
+    close ALIGN;
+}
+
+sub merge {
+    my $l1 = shift;
+    my $ii = 0;
+    my $el;
+    my @res;
+    while ($el = shift) {
+        push @res, sprintf("%s\t%s", $el, $l1->[$ii++]);
+    }
+    return @res;
+}
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-makeCWB - Dumps a NATools corpus in a format suitable to be imported in CWB
+
+=head1 SYNOPSIS
+
+  nat-makeCWB [-encode=<CWBName> -d=<CWBCrpDir> [-r=<CWBRegistry>]] <NatCrpDir>
+
+=head1 DESCRIPTION
+
+This small scripts exports a NATools corpus directory to a pair of
+files that can be easily imported in Corpus WorkBench (CWB).
+
+By default nat-makeCWB processes a NATools corpora dir an creates a
+pair of files, source.cqp and target.cqp that can be later imported
+into CWB using cwb-align-import.
+
+Flags:
+
+=over 4
+
+=item -encode
+
+If this option is used then nat-makeCWB will try to use cwb tools to
+create the aligned corpus. This option should be follows by the
+corpora name. The corpora creates will nem named C<< name_source >>
+and C<< name_target >> respectively.
+
+This option should be used in conjunction with option C<< -d >>.
+
+The CWB registry directory will be guessed using C<< cwb-config >> or
+C<< CORPUS_REGISTRY >> environment variable. To use other path, please
+specify it with -r.
+
+
+=item -d
+
+This option is required when using C<< -encode >>. It specifies CWB corpus 
+directory (without the corpus name).
+
+=item -r
+
+Use this option to force a registry path other than the system default.
+
+=item -debug
+
+Use this option if you need to debug the temporary files. If this
+option is supplied they will not be deleted.
+
+=back
+
+=head1 SEE ALSO
+
+NATools, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Alberto Manuel Brandão Simões
+
+=cut

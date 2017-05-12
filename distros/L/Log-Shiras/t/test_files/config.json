@@ -1,0 +1,57 @@
+{
+   "reports" : {
+      "log_file" : [
+         {
+            "roles" : [
+               "Log::Shiras::Report::ShirasFormat",
+               "Log::Shiras::Report::TieFile"
+            ],
+            "format_string" : "%{date_time}P(m=>'ymd')s,%{filename}Ps,%{inside_sub}Ps,%{line}Ps,%s,%s,%s",
+            "filename" : "test.csv",
+            "superclasses" : [
+               "Log::Shiras::Report"
+            ],
+            "header" : "Date,File,Subroutine,Line,Data1,Data2,Data3",
+            "package" : "Log::File::Shiras"
+         }
+      ],
+      "phone_book" : [
+         {
+            "roles" : [
+               "Log::Shiras::Report::ShirasFormat",
+               "Log::Shiras::Report::TieFile"
+            ],
+            "format_string" : "%s,%s,%s",
+            "filename" : "phone.csv",
+            "superclasses" : [
+               "Log::Shiras::Report"
+            ],
+            "header" : "Name,Area_Code,Number",
+            "package" : "Phone::Report"
+         }
+      ]
+	},
+	"name_space_bounds" : {
+		"main" : {
+			"UNBLOCK" : {
+				"log_file" : "warn"
+			},
+			"test_sub" : {
+				"UNBLOCK" : {
+					"log_file" : "debug"
+				}
+			}
+		},
+		"Activity" : {
+			"call_someone" : {
+				"UNBLOCK" : {
+					"log_file" : "trace",
+					"phone_book" : "eleven"
+				}
+			}
+		}
+	},
+	"buffering" : {
+		"log_file" : 1
+	}
+}

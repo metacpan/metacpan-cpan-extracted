@@ -1,0 +1,92 @@
+NAME
+    Log::Journald - Send messages to a systemd journal
+
+SYNOPSIS
+      use Log::Journald;
+      use Sys::Syslog qw/:macros/;
+
+      # Easy.
+      journald_log(LOG_INFO, "Hello from PID $$!");
+
+      # Send arbitrary fields, even binary data
+      Log::Journald::send(PRIORITY => LOG_INFO,
+           MESSAGE => "Hello from PID $$!",
+           PERL_PACKAGE => __PACKAGE__,
+           _YOLO => "SW\x00AG");
+           or warn "Could not send log: $!";
+
+      # Raw
+      Log::Journald::sendv('PRIORITY=6',
+           "MESSAGE=Hello from PID $$!");
+
+    Please consider this an alpha quality code, whose API can change at any
+    time, until we reach version 1.00.
+
+DESCRIPTION
+    This module wraps sd-journal(3) APIs for easy use in Perl. It makes it
+    possible to easily use systemd-journald.service(8)'s structured logging
+    capabilities and includes location of the logging point in the source
+    code in the messages.
+
+    Backends for Log::Dispatch and Log::Log4perl exist: Use
+    Log::Dispatch::Journald and Log::Log4perl::Appender::Journald
+    respectively.
+
+SUBROUTINES
+    journal_log PRIORITY MESSAGE
+        Log a message at given priority. Exported by default.
+
+        Returns true upon success, false while setting $! on failure.
+
+    send KEY VALUE ...
+        Log a message with given key-value pairs. "MESSAGE" and "PRIORITY"
+        keys are mandatory. See systemd.journal-fields(7) for list and
+        description of known fields.
+
+        Returns true upon success, false while setting $! on failure.
+
+    sendv STRING ...
+        Same as above, apart from that instead of key and value pair,
+        strings that contain key and value concatenated with "=" are
+        expected. This avoids an extra copy and might me slightly more
+        efficient.
+
+        Returns true upon success, false while setting $! on failure.
+
+SEE ALSO
+    *   Sys::Syslog -- Traditiona logging mechanism. The module provides
+        useful macros.
+
+    *   sd-journal(3) -- Description of C language API for journal.
+
+    *   systemd-journald.service(8) -- Manual of the journal service.
+
+    *   Log::Dispatch::Journald -- Log::Dispatch backend.
+
+    *   Log::Log4perl::Appender::Journald -- Log::Log4perl appender.
+
+BUGS
+    "journal_log()" terminates the message at a NUL byte. You need to use
+    another interface to log binary data.
+
+    To get priority constants, you still need to include Sys::Syslog.
+
+    There's no way to override caller depth. Therefore if you add a wrapper
+    for any of this module's interfaces, you'll get the location of the
+    wrapper in the messages.
+
+    A way to disable or override inclusion of code location would be nice.
+
+COPYRIGHT
+    Copyright 2014 Lubomir Rintel
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHORS
+    Lubomir Rintel, <lkundrak@v3.sk>
+
+    The code is hosted on GitHub
+    <http://github.com/lkundrak/perl-Log-Journald>. Bug fixes and feature
+    enhancements are always welcome.
+

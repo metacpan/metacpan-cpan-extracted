@@ -1,0 +1,142 @@
+<!--DATR1.0.dtd - DATR in XML: VERSION 1.0
+	Copyright (C) Lee Goddard, 1/6/00 and after. All Rights Reserved.
+	This DTD is supplied under the GNU PUBLIC LICENSE (www.gnu.org).
+-->
+
+<!-- The root element DATR may contain exactly one each of HEADER, OPENING
+     CLOSING elements, and one or many EQUATION elements.
+     Elements must appear in the order: HEADER, OPENING, EQUATION, CLOSING.  -->
+<!ELEMENT DATR (HEADER?,OPENING?,EQUATION*,CLOSING?)>
+
+<!-- A COMMENT can only contain character data -->
+<!ELEMENT COMMENT (NMTOKENS)>
+
+<!-- The HEADER can only contain one or several META elements -->
+<!ELEMENT HEADER (META+)>
+
+<!-- The META element may not wrap other elements -->
+<!ELEMENT META		EMPTY>
+<!-- AS HTML, the META element's two attributes are 'name' and 'content'
+     which may only contain only character data -->
+<!ATTLIST META		name	CDATA #REQUIRED
+					content	CDATA #REQUIRED >
+
+<!-- OPENING and CLOSING elements may contain any number of
+     LOAD, VARS, RESET, ATOM or NODE, SHOW elements
+     Note that ATOM may be included in the body but that
+     NODE is unquite. -->
+<!ELEMENT OPENING 	(LOAD|VARS|RESET|ATOM|NODE|SHOW|COMMENT|DELETE)*>
+<!ELEMENT CLOSING	(LOAD|VARS|RESET|ATOM|NODE|SHOW|COMMENT|DELETE)*>
+
+<!-- The NODE element may not wrap other elements, and
+     must contain a 'value' attribute of character data.
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT NODE 		EMPTY>
+<!ATTLIST NODE		value	CDATA #REQUIRED
+					comment CDATA #IMPLIED>
+
+<!-- The LOAD element may not wrap other elements, and
+     must contain a 'filename' attribute of character data.
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT LOAD 		EMPTY>
+<!ATTLIST LOAD		filename CDATA #REQUIRED
+					comment  CDATA #IMPLIED>
+
+<!-- The VARS element may not wrap other elements, and
+     must contain a 'range' attribute of character data and whitespace.
+     (The whitespace may be used to delimit range values.)
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT VARS 		EMPTY>
+<!ATTLIST VARS		name	CDATA #REQUIRED
+					range	NMTOKENS #REQUIRED
+					comment CDATA #IMPLIED>
+
+<!-- The RESET element may not wrap other elements, and
+     may contain a 'value' attribute of character data.
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT RESET 	EMPTY>
+<!ATTLIST RESET		value	CDATA #IMPLIED
+					comment CDATA #IMPLIED>
+
+<!-- The DELETE element may not wrap other elements, and
+     may contain a 'value' attribute of character data.
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT DELETE 	EMPTY>
+<!ATTLIST DELETE	value	CDATA #IMPLIED
+					comment CDATA #IMPLIED>
+
+<!-- The SHOW element may not wrap other elements, and
+     must contain a 'value' attribute of character data.
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT SHOW      EMPTY>
+<!ATTLIST SHOW      value	CDATA #REQUIRED
+					comment CDATA #IMPLIED>
+
+
+<!-- The EQUATION element may wrap any combination of the following
+     elements: ATOM, QUOTEDATOM, PATH, QUOTEDPATH, NODEPATH, QUOTEDNODEPATH.
+     It must contain a 'name' attribute of character data.
+     It has a 'path' attribute that defaults to empty, and
+     a type attribute that may take a value of either DEFINE or
+     EXTEND (in upper case only), and which defaults to DEFINE.
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT EQUATION 	(ATOM|QUOTEDATOM|PATH|QUOTEDPATH|NODEPATH|QUOTEDNODEPATH|COMMENT|QUERY)*>
+<!ATTLIST EQUATION	name	CDATA #REQUIRED
+					path	CDATA ""
+					type	(DEFINE|EXTEND) "DEFINE"
+					comment	CDATA #IMPLIED>
+
+<!-- Empty element to represent the ? of DATR  -->
+<!ELEMENT QUERY 	EMPTY>
+
+<!-- The ATOM element may not wrap other elements, and
+     must contain a 'value' attribute of character data.
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT ATOM		EMPTY>
+<!ATTLIST ATOM		value	CDATA #REQUIRED
+					comment	CDATA #IMPLIED >
+
+<!-- The QUOTEDATOM element may not wrap other elements, and
+     must contain a 'value' attribute of character data.
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT QUOTEDATOM	EMPTY>
+<!ATTLIST QUOTEDATOM	value	CDATA #REQUIRED
+						comment	CDATA #IMPLIED >
+
+<!-- The PATH element may wrap any or none of the following elements,
+	 in any order or combination:
+     ATOM, QUOTEDATOM, PATH, QUOTEDPATH, NODEPATH, QUOTEDNODEPATH.
+     It must contain a 'value' attribute of character data.
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT PATH			(ATOM|QUOTEDATOM|PATH|QUOTEDPATH|NODEPATH|QUOTEDNODEPATH)*>
+<!ATTLIST PATH			value	CDATA #REQUIRED
+						comment	CDATA #IMPLIED >
+
+<!-- The QUOTEDPATH element may wrap any or none of the following elements,
+     in any order or combination:
+     ATOM, QUOTEDATOM, PATH, QUOTEDPATH, NODEPATH, QUOTEDNODEPATH.
+     it must contain a 'value' attribute of character data.
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT QUOTEDPATH	(ATOM|QUOTEDATOM|PATH|QUOTEDPATH|NODEPATH|QUOTEDNODEPATH)*>
+<!ATTLIST QUOTEDPATH	value	CDATA #REQUIRED
+						comment	CDATA #IMPLIED >
+
+<!-- The NODEPATH element may wrap any or none of the following elements,
+     in any order or combination:
+     ATOM, QUOTEDATOM, PATH, QUOTEDPATH, NODEPATH, QUOTEDNODEPATH.
+     it must contain a 'value' attribute of character data.
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT NODEPATH		(ATOM|QUOTEDATOM|PATH|QUOTEDPATH|NODEPATH|QUOTEDNODEPATH)*>
+<!ATTLIST NODEPATH		value	CDATA #REQUIRED
+						comment	CDATA #IMPLIED >
+
+<!-- The QUOTEDNODEPATH element may wrap any or none of the following elements,
+     in any order or combination:
+     ATOM, QUOTEDATOM, PATH, QUOTEDPATH, NODEPATH, QUOTEDNODEPATH.
+     it must contain a 'value' attribute of character data.
+     May also contain a 'comment' attribute of character data. -->
+<!ELEMENT QUOTEDNODEPATH (ATOM|QUOTEDATOM|PATH|QUOTEDPATH|NODEPATH|QUOTEDNODEPATH)*>
+<!ATTLIST QUOTEDNODEPATH value   CDATA #REQUIRED
+						 comment CDATA #IMPLIED >
+
+<!-- doc end -->

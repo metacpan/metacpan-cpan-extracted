@@ -1,0 +1,13 @@
+Version 0.030
+
+Fixlink has been restored to full functionality.  
+
+It is now possible to check web pages behind basic authentication.
+See the section describing this in the manual.  Don't use this unless
+you understand fully the security implications.
+
+Version 0.028
+
+Configuration of infostructures is now done in a separate file.
+Please see configuration section of the manual for details of how to
+do this.

@@ -1,0 +1,1248 @@
+=encoding utf-8
+
+=head1 NAME
+
+Locale::Maketext::Utils - Adds some utility functionality and failure handling to Local::Maketext handles
+
+=head1 SYNOPSIS
+
+In MyApp/Localize.pm:
+
+    package MyApp::Localize;
+    use Locale::Maketext::Utils; 
+    use base 'Locale::Maketext::Utils'; 
+  
+    our $Encoding = 'utf-8'; # see below
+    
+    # no _AUTO
+    our %Lexicon = (...
+
+Make all the language Lexicons you want. (no _AUTO)
+
+Then in your script:
+ 
+   my $lang = MyApp::Localize->get_handle('fr');
+
+Now $lang behaves like a normal Locale::Maketext handle object but there are some new features, methods, and failure handling which are described below.
+
+=head1 our $Encoding
+
+If you set your class's $Encoding variable the object's encoding will be set to that.
+
+   my $enc = $lh->encoding(); 
+
+$enc is $MyApp::Localize::fr::Encoding || $MyApp::Localize::Encoding || encoding()'s default
+
+=head1 Argument based singleton
+
+The get_handle() method returns an argument based singleton. That means the overhead of initializing an object and compiling parts of the lexicon being used only happen once even if get_handle() is called several times with the same arguments.
+
+=head1 Lexicon hashes that are "read only"
+
+Sometimes you want your lexicon to be a tied hash that is read only which would be fatal when storing a compiled key's value (e.g. L<GDBM_File>).
+
+To faciltate that (without needing other special tie()s as per L</"Tie::Hash::ReadonlyStack compat Lexicon">) you can simply init() your handle with:
+
+  $lh->{'use_external_lex_cache'} = 1;
+
+That will cause all compiled strings to be stored in the object instead of back in the lexicon.
+
+=head1 Aliasing
+
+In your package you can create an alias with this:
+
+   __PACKAGE__->make_alias($langs, 1);
+   or
+   MyApp::Localize->make_alias([qw(en en_us i_default)], 1);
+   
+   __PACKAGE__->make_alias($langs);
+   or
+   MyApp::Localize::fr->make_alias('fr_ca');
+   
+Where $langs is a string or a reference to an array of strings that are the aliased language tags.
+
+You must set the second argument to true if __PACKAGE__ is the base class.
+
+The reason is there is no way to tell if the pakage name is the base class or not.
+
+This needs done before you call get_handle() or it will have no effect on your object really.
+
+Ideally you'd put all calls to this in the main lexicon to ensure it will apply to any get_handle() calls.
+
+Alternatively, and at times more ideally, you can keep each module's aliases in them and then when setting your obj require the module first.
+
+=head1 METHODS
+
+=head2 Deprecated for clarity:
+
+These are deprecated because they are ambiguous names (i.e. used in other places by other things) and thus L<problematic when harvesting phrases|Text::Extract::MaketextCallPhrases>.
+
+=head3 $lh->print($key, @args);
+
+Shortcut for
+
+    print $lh->maketext($key, @args);
+
+=head3 $lh->fetch($key, @args);
+
+Alias for 
+
+    $lh->maketext($key, @args);
+
+=head3 $lh->say($key, @args);
+
+Like $lh->print($key, @args); except appends $/ || \n
+
+=head3 $lh->get($key, @args);
+
+Like $lh->fetch($key, @args); except appends $/ || \n
+
+=head2 $lh->get_base_class()
+
+Returns the base class of the object. So if $lh is a MyApp::Localize::fr object then it returns MyApp::Localize
+
+=head2 $lh->get_language_class()
+
+Returns the language class of the object. So if $lh is a MyApp::Localize::fr object then it returns MyApp::Localize::fr
+
+=head2 $lh->get_language_tag()
+
+Returns the real language name space being used, not language_tag()'s "cleaned up" one
+
+=head2 $lh->langtag_is_loadable($lang_tag)
+
+Returns 0 if the argument is not a language that can be used to get a handle.
+
+Returns the language handle if it is a language that can be used to get a handle.
+
+=head2 $lh->lang_names_hashref()
+
+This returns a hashref whose keys are the language tags and the values are the 
+name of language tag in $lh's native langauge.
+
+It can be called several ways:
+
+=over 4
+
+=item * Give it a list of tags to lookup
+
+    $lh->lang_names_hashref(@lang_tags)
+
+=item * Have it search @INC for Base/Class/*.pm's 
+
+    $lh->lang_names_hashref() # IE no args
+
+=item * Have it search specific places for Base/Class/*.pm's 
+
+    local $lh->{'_lang_pm_search_paths'} = \@lang_paths; # array ref of directories
+    $lh->lang_names_hashref() # IE no args
+
+=back
+
+The module it uses for lookup (L<Locales::Language>) is only required when this method is called. Make sure you have the latest verison of L<Locales> as 0.04 (i.e. L<Locales::Base> 0.03) is buggy!
+
+The module it uses for lookup (L<Locales::Language>) is currently limited to two character codes but we try to handle it gracefully here.
+
+In array context it will build and return an additional hashref with the same keys whose values are the language name in the langueage itself.
+
+Does not ensure that the tags are loadable, to do that see below.
+
+=head2 $lh->loadable_lang_names_hashref()
+
+Exactly the same as $lh->lang_names_hashref() (because it calls that method...) except it only contains tags that are loadable.
+
+Has additional overhead of calling $lh->langtag_is_loadable() on each key. So most likely you'd use this on a single specific place (a page to choose their language setting for instance) instead of calling it on every instance your script is run.
+
+=head2 $lh->append_to_lexicons( $lexicons_hashref );
+
+This method allows modules or script to append to the object's Lexicons. Consider using L</"Tie::Hash::ReadonlyStack compat Lexicon"> instead.
+
+Each key is the language tag whose Lexicon you will prepend its value, a hashref, to.
+
+So assuming the key is 'fr', then this is the lexicon that gets appended to:
+
+__PACKAGE__::fr::Lexicon
+
+The only exception is if the key is '_'. In that case the main package's Lexicon is appended to:
+
+__PACKAGE__::Lexicon
+
+    $lh->append_to_lexicons({
+        '_' => {
+            'Hello World' => 'Hello World',
+        },
+        'fr' => {
+            'Hello World' => 'Bonjour Monde',
+        }, 
+    });
+
+=head2 $lh->remove_key_from_lexicons($key)
+
+Removes $key from every lexicon. Consider using L</"Tie::Hash::ReadonlyStack compat Lexicon"> instead.
+
+What is removed is stored in $lh->{'_removed_from_lexicons'}
+
+If defined, $lh->{'_removed_from_lexicons'} is a hashref whose keys are the index number of the $lh->_lex_refs() arrayref.
+
+The value is the key and the value that that lexicon had.
+
+This is used internally to remove _AUTO keys so that the failure handler below will get used
+
+=head2 $lh->get_locales_obj()
+
+Return a L<Locales> object suitable for the object (or the optional locale tag argument). 
+
+If the locale tag can not be loaded it tries the super (if any) then $lh->{'fallback_locale} (if set) and its super (if any) before defaulting to 'en'.
+
+L<Locales> is where all the CLDR data and logic comes from.
+
+=head2 $lh->get_language_tag_name();
+
+Takes 2 optional arguments: 
+
+=over 4
+
+=item 1. A locale tag whose name you want (defaults to the object's locale). 
+
+=item 2. A locale tag whose language you want the name to be in (defaults to the object's locale).
+
+=back 
+
+These names are defined by the CLDR.
+
+=head2 $lh->get_html_dir_attr()
+
+With no argument, returns the object locale’s character orientation as a string suitable for HTML’s dir attribute.
+
+Given a CLDR character orientation string it will return a string suitable for HTML’s dir attribute.
+
+Given a locale tag and second argument of true (specifying that the first argument is a tag not a CLDR character orientation string ) it returns that locale’s character orientation as a string suitable for HTML’s dir attribute.
+
+The character orientation comes from CLDR.
+
+=head2 $lh->get_locale_display_pattern()
+
+Returns the locale display pattern for the object or the tag given as the ofrst optional argument.
+
+The pattern comes from the CLDR.
+
+=head2 $lh->get_language_tag_character_orientation()
+
+Returns the character orientation string for the object or the tag given as the first optional argument.
+
+The string comes from the CLDR.
+
+=head2 $lh->lextext('Your key here.')
+
+Get the lexicon’s text of 'Your key here.' without compiling it (in other words all bracket notation is still in tact).
+
+The results are suitable for the first arg to makethis().
+
+=head3 $lh->text('Your key here.')–deprecated for clarity
+
+Deprecated name of $lh->lextext().
+
+It is deprecated because it is an ambiguous name (i.e. used in other places by other things) and thus L<problematic when harvesting phrases|Text::Extract::MaketextCallPhrases>.
+
+=head2 $lh->makethis()
+
+Like maketext() but does not lookup the phrase in the lexicon and compiles the phrase exactly as given.
+
+=head2 $lh->makethis_base()
+
+Like makethis() but uses the base class as the phrase compiler instead of the object.
+
+This is usful in testing when you want consistent semantics on arbitrary objects.
+
+=head2 $lh->makevar()
+
+This is an alias to maketext(). Its sole purpose is to be used to semantically indicate that the source code does not contain a translatable string in the call to maketext().
+
+For example:
+
+    $lh->maketext('Hello World') 
+    
+It is easy to tell that we need to provide translations for 'Hello World'. But given:
+
+    $lh->maketext($api_rv->{'string'}) 
+
+It is not easy to determine what $api_rv->{'string'} is in order to pass it on to the translation team.
+
+However if we do that like this:
+
+     my $string = translatable('Hello World'); # See Locale::Maketext::Utils::MarkPhrase
+     …
+     $lh->makevar($api_rv->{'string'})
+
+Then the parser can simply ignore the call to makevar() and find the value it is interested in via translatable()
+
+Additionally, since makevar() is meant to work with variables it also has the distinction of taking an array ref, as its only arg, that contains the arguments you’d normally pass to make*().
+
+This makes it easier/possible to do something like this:
+
+    $locale->makevar(@mystuff)
+
+in, say, Template Toolkit syntax.
+
+For example, if 'api_mt_result' is [ 'You have [quant,_1,user,users].', 42 ] you could do:
+
+    [% locale.makevar(api_mt_result) %]
+
+instead of something hacky and convoluted like:
+
+    [%- SET item_list = [] -%]
+    [%- FOREACH i IN api_mt_result; item_list.push(i.json); END -%]
+    [% '\[% locale.makevar(' _ item_list.join(", ") _ ') %\]' | evaltt %]
+
+=head2 $lh->get_asset()
+
+Helps you find an asset for a locale based on the locale's fallback.
+
+Takes a code ref and an optional locale tag (default to the object's locale).
+
+The code ref is passed a locale tag (from the list of the locale's fallbacks).
+
+The first tag that returns a defined value halts the loop and that value is returned.
+
+    my $foo = $lh->get_asset(sub {
+        my ($tag) = @_;
+        return "foo+$tag" if Foo->has_locale($tag);
+        return;
+    });
+
+=head2 $lh->get_asset_file()
+
+Takes a path to look for with %s where the locale tag should be. The first locale (in the object's locale's fallback list) whose path passes -f gets the path returned. Does a return; if none are found.
+
+    my $template = $lh->get_asset_file('…/.locale/%s.tt'); # …/.locale/fr.tt
+
+The optional second argument is a string to return when the path passes -f.
+
+    my $js = $lh->get_asset_file('…/.locale/%s.css','http://example.com/locale_css/%s.css'); # http://example.com/locale_css/fr.css
+
+=head2 $lh->get_asset_dir()
+
+Same as get_asset_file() but the path must pass -d.
+
+=head2 $lh->delete_cache()
+
+Delete the internal cache. Returns the hashref that was removed.
+
+You can pass it a key and only that is removed (i.e. instead of the entire cache).
+
+    my $get_asset_file_cache = $lh->delete_cache('get_asset_file');  # only delete the cached data for get_asset_file()
+    
+    my $entire_cache = $lh->delete_cache();# delete the entire cache
+    
+Currently this applies to 'get_asset_file', 'get_asset_dir', 'makethis', and 'makethis_base'.
+
+=head1 Automatically _AUTO'd Failure Handling with hooks
+
+This module sets fail_with() so that failure is handled for every Lexicon you define as if _AUTO was set and in addition you can use the hooks below.
+
+This functionality is turned off if:
+
+=over 4
+
+=item * _AUTO is set on the Lexicon (and it was not removed internally for some strange reason)
+
+=item * you've changed the failure function with $lh->fail_with() (If you do change it be sure to restore your _AUTO's inside $lh->{'_removed_from_lexicons'})
+
+=back
+
+The result is that a key is looked for in the handle's Lexicon, then the default Lexicon, then the handlers below, and finally the key itself (Again, as if _AUTO had been set on the Lexicon).
+I find this extremely useful and hope you do as well :)
+
+=head2 $lh->{'_get_key_from_lookup'}
+
+If lookup fails this code reference will be called with the arguments ($lh, $key, @args)
+
+It can do whatever you want to try and find the $key and return the desired string.
+
+   return $string_from_db;
+
+If it fails it should simply:
+
+   return;
+
+That way it will continue on to the part below:
+
+=head2 $lh->{'_log_phantom_key'}
+
+If $lh->{'_get_key_from_lookup'} is not a code ref, or $lh->{'_get_key_from_lookup'} returned undef then this method is called with the arguments ($lh, $key, @args) right before the failure handler does its _AUTO wonderfulness.
+
+=head1 Improved Bracket Notation
+
+=head2 numf()
+
+This uses the decimal format defined in CLDR to format the number. That means there is no need to subclass or define special data per class.
+
+It takes an additional argument to specify the maximum number of decimal places you want.
+
+=head2 numerate()
+
+CLDR plural rule aware version of the L<Locale::Maketext> numerate(). That means there is no need to subclass.
+
+See L<Locales::DB::Docs::PluralForms> for locale specific arguments.
+
+=head2 quant()
+
+CLDR plural rule aware version of the L<Locale::Maketext> quant(). 
+
+That means there is no need to subclass, you need to specify all arguments (except the always optional “Special Zero” argument that some locales have)
+
+See L<Locales::DB::Docs::PluralForms> for locale specific arguments.
+
+e.g. Key is 'en', value is 'ru':
+
+    '… [quant,_1,one category text,other category text,special_zero text] …' => '… [quant,_1,one category text,few category text,many category text,other category text] …'
+
+You can use '%s' to specify the position of the number. Other wise it is prepended with a space (except “Special Zero” which won't contain the number.)
+
+The number is formatted via numf() with a max decimal place of 3.
+
+You can pass in an array ref instead of the number in order to pass in a max decimal places value. The first item is the number, the second item is the max decimal places.
+
+    maketext('The average monthly rainfall is [quant,_1,inch,inches].', $n); # … is 42.869 inches.
+    maketext('The average monthly rainfall is [quant,_1,inch,inches].', [$n,2]); # … is 42.87 inches.
+
+=head1 Additional bracket notation methods
+
+=head2 join()
+
+Joins the given arguments with the first argument:
+
+   [join,-,_*], @numbers becomes 1-2-3-4-5
+   [join,,_*], @numbers becomes 12345
+   [join,~,,_*], @numbers becomes 1,2,3,4,5
+   [join,~, ,_*], @numbers becomes 1, 2, 3, 4, 5
+
+Array ref arguments are expanded:
+
+   $lh->maketext('… [join,-,_1,2] …', [1,2,3],4); # … 1-2-3-4 …
+
+=head2 list_and()
+
+Take a list of arguments (like join–array ref arguments are expanded) and format it per the locale's CLDR list pattern for and.
+
+   You chose [list_and,_1]., \@pals
+   
+   You chose Rhiannon.
+   You chose Rhiannon and Parker.
+   You chose Rhiannon, Parker, and Char.
+   You chose Rhiannon, Parker, Char, and Bean.
+
+See L<Locales/get_list_and()> for more information.
+
+=head2 list_or()
+
+Same as list_and but with or-lists. See L<Locales/get_list_or()> for more information and an important caveat.
+
+=head2 list_and_quoted()
+
+Like list_and() but all values are quoted via the CLDR to disambiguate them.
+
+=head2 list_or_quoted()
+
+Like list_or() but all values are quoted via the CLDR to disambiguate them.
+
+=head3 list()–deprecated
+
+Creates a phrased list "and/or" style:
+
+  You chose [list,and,_*]., @pals
+  
+  You chose Rhiannon.
+  You chose Rhiannon and Parker.
+  You chose Rhiannon, Parker, and Char.
+  You chose Rhiannon, Parker, Char, and Bean.
+
+The 'and' above is by default an '&':
+
+  You chose [list,,_*]
+
+  You chose Rhiannon, Parker, & Char
+
+A locale can set that but I recommend being explicit in your lexicons so the translators will know what you're trying to say:
+
+   [list,and,_*]
+   [list,or,_*]
+
+A locale can also control the seperator and "oxford" comma character (IE empty string for no oxford comma)
+
+The locale can do this by setting some variables in the same manner you'd set 'numf_comma' to 
+change how numf() behaves for a class without having to write an almost identical method.
+
+The variables are (w/ defaults shown):
+
+  $lh->{'list_seperator'}   = ', ';
+  $lh->{'oxford_seperator'} = ',';
+  $lh->{'list_default_and'} = '&';
+
+Array ref arguments are expanded.
+
+=head2 datetime()
+
+Allows you to get datetime output formatted for the current locale.
+
+    'Right now it is [datetime]'
+
+It can take 2 arguments which default to DateTime->now and 'date_format_long' respectively.
+
+The first argument  tells the function what point in time you want. The values can be:
+
+=over 4
+
+=item * A L<DateTime> object
+
+=item * A hashref of arguments suitable for DateTime->new()
+
+=item * An epoch suitable for DateTime->from_epoch()'s 'epoch' field.
+
+Uses UTC as the time zone
+
+=item * A time zone suitable for L<DateTime> constructors' 'time_zone' field
+
+The current time is used.
+
+Passing it an empty string will result in UTC being used.
+
+=item * An epoch and time zone as above joined together by a colon
+
+A colon followed by nothing will result in UTC
+
+=back
+
+The second tells it what format you'd like that point in time stringified. The values can be:
+
+=over 4
+
+=item * A coderef that returns a string suitable for DateTime->format_cldr()
+
+=item * A string that is the name of a L<DateTime::Locale> *_format_* method
+
+=item * A string suitable for DateTime->format_cldr()
+
+=back
+
+=head2 current_year()
+
+CLDR version of current year. i.e. Shortcut to [datetime,,YYYY].
+
+=head2 format_bytes()
+
+Convert byte count to human readable format. Does not require external modules.
+
+   'You have used [format_bytes,_1] of your alloted space.', $bytes
+
+Accepts an optional argument for max number of decimal places, default is 2.
+
+=head2 convert()
+
+Shortcut to L<Math::Units> convert() 
+
+  'The fish was [convert,_1,_2,_3]" long', $feet,'ft','in'
+
+=head2 boolean()
+
+This method allows you to choose a word or phrase to use based on a boolean.
+
+The first argument is the boolean value which should be true, false, or undefined. The next arguments are the string to use for a true value, the string to use for a false value and an optional value for an undefined value (if none is given undefined uses the false value).
+
+  'You [boolean,_1,have won,didn't win] a new car.'
+
+  'You [boolean,_1,have won,didn't win,have not entered our contest to win] a new car.'
+
+   $lh->maketext(q{Congratulations! It's a [boolean,_1,girl,boy]!}, $is_a_girl);
+   
+It can have “embedded args”:
+
+    'You must specify a value[boolean,_1, for the “_1” field].
+
+=head2 is_defined()
+
+This method allows you to choose a word or phrase to use based on definedness.
+
+The first argument is the value which should be defined or undefined. 
+
+The next arguments are: the string to use for a defined value, the string to use for a undefined value and an optional string for a defined value  that is false (if none is given undefined uses the undefined value).
+
+It can have “embedded args”.
+
+    'Sorry, [is_defined,_2,“_2” is an invalid,you must specify a valid] value for “[_1]”.' 'domain', $domain
+    # Sorry, “localhost” is an invalid value for “domain”.
+    # Sorry, you must specify a valid value for “domain”.
+
+=head2 is_future()
+
+The first argument is the same as the first argument to datetime(). Then comes the string for future and the string for false.
+
+    Your session [is_future,_1,will expire,expired] on [datetime,_1,date_format_medium].
+
+=head2 comment()
+
+Embed comments in your phrases.
+
+    'The transmogrifier has been constipulated to level “[_1]”[comment,The argument is the variable name containing the superposition of the golden ratio’s decimal place in relation to π as mildegredaded by the authoritative falloosifier.].'
+    # The transmogrifier has been constipulated to level “☺”.
+
+=head2 asis()
+
+Include non-translatable text in your phrase, e.g. a proper name.
+
+   'Thanks you for contacting [asis,Feel Good Inc.].'
+   
+This is a short-name alias to 'output,asis' so it can have embedded methods like any output() method.
+
+   'Thanks you for contacting [asis,Foo chr(38) Barsup(®)].'
+   
+Does not support embedded args.
+
+=head2 output()
+
+When you output a phrase you might mark it up by wrapping the string in, say, <p> tags. You wouldn't inlcude HTML *in* the key itself for a number of obvious reasons (HTML is not human, HTML is not the only possible output you may ever want, etc):
+
+    print $lh->maketext('<p class="ok">Good news everyone!</p>'); # WRONG DO NOT DO THIS  !!
+    
+    print q{<p class="ok">} . $lh->maketext('Good news everyone!') . "</p>"; # good
+
+What about when you want to format something inside the string? For example, you want to be sure certain words stand out. Or the argument is a URL that you want to be a link?
+
+Again, you don't want to add formatting inside the string so what do you do? You use the output() method.
+
+This method allows you to specify various output types. Those types allows a key to specify how a word or phrase should be output without having to understand or anticipate every possible context it might be used in.
+
+   'What ever you do, do [output,strong,NOT] cut the blue wire!'
+   
+   'Your addon domain [output,underline,_1] has been setup.' 
+
+=head3 Default output methods.
+
+Each output method name is the second argument to output. e.g. if the output method is 'xyz' you'd use it like this [output,xyz,…] and define a new one like this 'sub output_xyz { … }'.
+
+All output() methods support embedded methods: sub(), sup(), chr(), amp(), and numf(). Note: sub(), sup(), and numf() are simplified in that they only work with one argument.
+
+These default bare bones methods support 3 contexts: HTML, ANSI, and plain text. See L</output() context> below.
+
+Feel free to over ride them if they do not suit your needs.
+
+The terminal control codes were ripped from L<Term::ANSIColor> but the module itself is not used.
+
+=over 4 
+
+=item * underline()
+
+Underline the string: 
+
+    'You [output,underline,must] be on time from now on.'
+
+For HTML it uses a span tag w/ CSS, for text it uses the standard terminal control code 4.
+
+Allows embedded arguments in the string.
+
+Supports L</"Arbitrary name/value attribute list">.
+
+=item * strong()
+
+Make the string strong: 
+
+    'You [output,strong,do not] want to feed the velociraptors.'
+
+For HTML it uses a <strong>, for text it uses the standard terminal control code 1.
+
+Allows embedded arguments in the string.
+
+Supports L</"Arbitrary name/value attribute list">.
+
+=item * em()
+
+Add emphasis to the string: 
+
+    'We [output,em,want] you to succeed.'
+
+For HTML it uses a <em>, for text it uses the standard terminal control code 3. (This may change in the future. See the blurb about "not all displays are ISO 6429-compliant" at L<Term::ANSIColor/NOTES>.)
+
+Allows embedded arguments in the string.
+
+Supports L</"Arbitrary name/value attribute list">.
+
+=item * url()
+
+Handle URLs appropriately:
+
+In its simplest form you pass it a URL and the text:
+
+   'Visit [output,url,_1,CPAN] today.', 'http://search.cpan.org'
+
+in HTML context you get: Visit E<lt>a href="http://search.cpan.org"E<gt>CPANE<lt>/aE<gt> today.
+
+in non-HTML context you get: Visit CPAN (http://search.cpan.org) today.
+
+It is more flexible by using a special hash.
+
+   'You must [output,url,_1,html,click here,plain,go to] to complete your registration.'
+
+The arguments after the method name ('output') and the output type ('url') are: the URL, a hash of values to use in determining the string that the URL is turned into.
+
+The main keys are 'html' and 'plain' (the latter is used for both 'plain' and 'ansi' contexts). Their values are the string to use in conjuction with the context's rendering of the value. Embedded arguments are supported in those values:
+
+    'You must [output,url,_1,html,click on the _2 icon,plain,go to] to complete your registration.', $URL, '<img …/>'
+
+For HTML it uses a plain anchor tag. You can specify _type => 'offsite' to the arguments and it will have 'target="_blank" class="offsite"' as attributes. Again, feel free to create your own if this does not suit your needs.
+
+   [output,url,_1,html,click here,_type,offsite,…]
+
+For text the URL is appended unless it had embedded args and the string contains the URL after those arguments are applied. 
+
+   'You should [output,url,plain:visit _1 soon,…].'
+   
+becomes 'You should visit http://search.cpan.org soon.' and 
+
+   'You should [output,url,_1,plain,visit,…].'
+
+becomes 'You should visit http://search.cpan.org.'
+
+Both 'html' and 'plain' fallback to the URL itself if no value is given:
+
+   My favorite site is [output,url,_1,_type,offsite].
+   
+   text: My favorite site is http://search.cpan.org.
+   
+   html: My favorite site is <a target="_blank" class="offsite" href="http://search.cpan.org">http://search.cpan.org</a>.
+
+This method can be used also when the context has different types of values. For example, a web based UI might have a URL but via command line there is an equivalent command to run.
+
+   'To unlock this account [output,url,_1,plain,execute `%s` via SSH,html,click here].'
+
+Tips:
+
+=over 4
+
+=item * Pass the URL in as an argument so that if the URL changes your phrase won't. That also lends itself to reusability.
+
+=item * Try to use context agnostic verbiage. 
+
+e.g. Click [output,url,_1,here] for the documentation.
+
+It won't look right in a terminal (e.g. Click here (http://….) for the documentation.) thus it takes away reusability.
+
+=back
+
+Supports L</"Arbitrary name/value attribute list">.
+
+The display text (whether from arg (i.e. simple form) or from “html” or “plain” keys) can have embedded methods.
+
+=item * chr()
+
+Output the character represented by the given number. It is a wrapper around perl's built-in L<chr> function that also encodes the value into the handle's encoding if it's over 127, and outputs as appropriate for the UI.
+
+    $lh->maketext('I [output,chr,60]3 ascii art!');
+
+For text you get 'I <3 ascii art!'
+
+For HTML you get 'I &lt;3 ascii art!'
+
+=item * class()
+
+Output the given string as a certain class of text. Since terminals have no concept of a styling classes we currently just make it bold. You could create your own 'sub output_class' that has a map of your project's standard visual CSS classes to ANSIColor escape sequences to use.
+
+    $lh->maketext('The user [output,class,_1,highlight,contrast] was updated.', $user);
+
+For text you get 'The user bob was updated.' with 'bob' wrapped in the standard terminal control code 1.
+
+For HTML you get 'The user <span class="highlight contrast">bob</span> was updated.'
+
+=item * encode_puny()
+
+    $lh->maketext('The ascii safe version of your domain is “[output,encode_puny,_1]”.', $domain);
+
+If the string is already punycode it will return the string as-is.
+
+If there are any problems encoding the string it will return 'Error: invalid string for punycode'.
+
+=item * decode_puny()
+
+    $lh->maketext('The unicode version of your domain is “[output,decode_puny,_1]” is really cool.', $domain);
+
+If the string is not punycode it will return the string as-is.
+
+If there are any problems decoding the string it will return 'Error: invalid punycode'.
+
+=item * asis_for_tests()
+
+Returns the given string as-is. Named so as to explicitly indicate a testing state.
+
+Allows embedded arguments in the string.
+
+=item * attr()
+
+Alias for inline()
+
+=item * inline()
+
+Allows assigning attributes to part of a string.
+
+The first argument is the string. The rest are outlined in L</"Arbitrary name/value attribute list">.
+
+Allows embedded arguments in the string.
+
+In HTML context it is a span tag.
+
+=item * block()
+
+Same as inline() except, in HTML context, it uses a div instead of span.
+
+The div should conceptually be an inline-div for positioning part of a string and not for document stucture. (Bracket notation is not a template system!)
+
+When we get real world examples of this I'll update the POD. For now you probably really want output,inline or output,sub or output,sup.
+
+=item * img()
+
+Output an image. In non-HTML context the ALT text is what is output.
+
+The arguments are the images src and alt (alt default to src but don't do that). 
+
+    '[output,img,big_brother.png,Big Brother] is watching you!'
+
+Allows embedded arguments in the alt string.
+
+Supports L</"Arbitrary name/value attribute list"> except 'src' and 'alt' which will be ignored if given.
+
+=item * abbr()
+
+Takes 2 arguments: the abbreviated form and the non-abbreviated form. 
+
+    [output,abbr,Abbr.,Abbreviation]
+
+Supports L</"Arbitrary name/value attribute list"> except 'title' which will be ignored if given.
+
+Best for truncation type abbreviations. (Mnemonic: abbr is a truncated word itself)
+
+If you want to further pin down the type of abbreviation is is you can specify a more specific class (e.g. end-clip, blend, numeronym, begin-clip, phonogram, contraction,  portmanteau, apheresis, aphesis, etc).
+
+=item * acronym()
+
+Takes 2 arguments: the acronym and what it stands for. 
+
+   [output,acronym,SCUBA,Self Contained Underwater Breathing Apparatus]
+
+Supports L</"Arbitrary name/value attribute list"> except 'title' which will be ignored if given.
+
+Best for initial type abbreviations. (Typically all caps)
+
+To be HTML5 compat it outputs <abbr> with a class of “initialism” (like bootstrap).
+
+If you want to further pin down the type of abbreviation is is you can specify a more specific class (e.g. acronym, hybrid, acrostic, alphabetism, backronym, macronym, recursive, context, composite, etc).
+
+If you do pass in a class value “initialism” is still retained.
+
+=item * sup()
+
+Super script the argument. 
+
+   [output,sup,X]
+
+Allows embedded arguments in the string.
+
+Supports L</"Arbitrary name/value attribute list">.
+
+=item * sub()
+
+Sub script the argument.
+
+   [output,sub,X]
+
+Allows embedded arguments in the string.
+
+Supports L</"Arbitrary name/value attribute list">.
+
+=item * nbsp()
+
+Convenience method to get a non breaking space character (not the HTML entity, the character–works the same as the entity ina browser).
+
+Helps to visually indicate you intend a non breaking space when it is required.
+
+   'foo[output,nbsp]bar' vs 'foo bar'
+
+=item * amp()
+
+[output,amp] is a shortcut to [output,chr,38]
+
+=item * lt()
+
+[output,lt] is a shortcut to [output,chr,60]
+
+=item * gt()
+
+[output,gt] is a shortcut to [output,chr,62]
+
+=item * apos()
+
+[output,apos] is a shortcut to [output,chr,39]
+
+=item * quot()
+
+[output,quot] is a shortcut to [output,chr,34]
+
+=item * shy()
+
+[output,shy] is a shortcut to [output,chr,173]
+
+=item * asis()
+
+   [output,asis,…]
+
+Alias for L</asis()>.
+
+=back 
+
+=head3 Adding your own output methods
+
+Output methods can be created (and overridden) simply by defining a method prefixed by output_ followed by the output type. For example in your lexicon class you would:
+
+   sub output_de_profanitize {
+       my ($lh, $word_or_phrase, $level, $substitute) = @_;
+       
+       return get_clean_text({
+          'lang' => $lh->get_language_tag(),
+          'text' => $word_or_phrase,
+          'level' => $level,
+          'character' => $substitute,
+       });
+   }
+   
+Then you can use this in your lexicon key:
+
+   'Quote of the day "[output,de_profanitize,_1,9,*]"'
+
+Your class can do whatever you like to determine the context and is by no means limited to 'plain' and 'html'  types. Keys that are not context names (i.e. _type) should be preceded by an underscore.
+
+=head2 Arbitrary name/value attribute list
+
+Methods that support this feature are able to accept additional arguments treated as name/value pair attributes.
+
+The idea is to embed ones that will likely not change and hopefully add to the meaning of the string.
+
+    Your hair [output,inline,is on fire,class,urgent]!
+    
+After that list (or instead of it) a single hashref can be passed in. The intent here is to be able to do any arbitrary name/value that the caller might want to use but is likely to change and/or adds little meaning if any to the string.
+
+=head2 output() context
+
+Context as used here means what type of output we want based on where it will be happening at.
+
+'html' will do output suitable for use in HTML code.
+
+'ansi' will do output suitable for a terminal.
+
+'plain' will do output without any sort of formatting.
+
+=over 4
+
+=item * set_context()
+
+Set the context. If no arguments are given it will set it to 'html' or 'ansi' based on L<IO::Interactive::Tiny>.
+
+This happens automatically if needed so you shouldn't have to call it unless you want to change it.
+
+Otherwise it accepts 'html', 'ansi', or 'plain'.
+
+Returns the context that it sets it to (or an empty string if you pass in a second true argument).
+
+=item * get_context()
+
+Takes no arguments.
+
+Returns 'html', 'ansi', or 'plain'. Calls $lh->set_context() if it has not been set yet.
+
+=item * set_context_html()
+
+Takes no arguments. Sets the contect to 'html'.
+
+Returns the context it was set to previously (or an empty string if you pass in a second true argument) on success, false otherwise.
+
+=item * set_context_ansi()
+
+Takes no arguments. Sets the contect to 'ansi'.
+
+Returns the context it was set to previously (or an empty string if you pass in a second true argument) on success, false otherwise.
+
+=item * set_context_plain()
+
+Takes no arguments. Sets the contect to 'plain'.
+
+Returns the context it was set to previously (or an empty string if you pass in a second true argument) on success, false otherwise.
+
+=item * context_is()
+
+Takes one argument and returns true if that is what the context currently is.
+
+=item * context_is_html()
+
+Takes no arguments. Returns true if that is what the context is currently 'html'.
+
+=item * context_is_ansi()
+
+Takes no arguments. Returns true if that is what the context is currently 'ansi'.
+
+=item * context_is_plain()
+
+Takes no arguments. Returns true if that is what the context is currently 'plain'.
+
+=item * maketext_html_context()
+
+Does maketext() under the 'html' context regardless of what the current context is.
+
+=item * maketext_ansi_context()
+
+Does maketext() under the 'ansi' context regardless of what the current context is.
+
+=item * maketext_plain_context()
+
+Does maketext() under the 'plain' context regardless of what the current context is.
+
+=back
+
+=head1 Project example
+
+Main Class:
+
+    package MyApp::Localize;
+    use Locale::Maketext::Utils; 
+    use base 'Locale::Maketext::Utils'; 
+
+    our $Encoding = 'utf-8'; 
+    
+    __PACKAGE__->make_alias([qw(en en_us i_default)], 1);
+
+    our %Lexicon = (
+        'Hello World' => 'Hello World', # $Onesided used to allow for 'Hello World' => '',
+    );
+    
+    1;
+
+French class: 
+
+    package MyApp::Localize::fr;
+    use base 'MyApp::Localize';
+    our %Lexicon = (
+        'Hello World' => 'Bonjour Monde',
+    );
+    
+    # not only is this too late to be of any use
+    # but it's pointless as it already in essence happens since a failed NS 
+    # lookup tries the superordinate (in this case 'fr') before moving on 
+    # __PACKAGE__->make_alias('fr_ca');
+    
+    sub init {
+        my ($lh) = @_;
+        $lh->SUPER::init();
+        $lh->{'numf_comma'} = 1; # Locale::Maketext numf()
+        return $lh;
+    }
+    
+    1;
+
+=head2 Standard" .pm layout
+
+In the name of consistency I recommend the following "Standard" namespace/file layout. 
+
+You put all of your locales in MainNS::language_code
+
+You put any utility functions/methods in MainNS::Utils and/or MainNS::Utils::*
+
+So assuming a main class of MyApp::Localize the files && name spaces would be:
+
+   MyApp/Localize.pm                MyApp::Localize
+   MyApp/Localize/Utils.pm          MyApp::Localize::Utils
+   MyApp/Localize/Utils/Etc.pm      MyApp::Localize::Utils::Etc
+   MyApp/Localize/Utils/AndSoOn.pm  MyApp::Localize::Utils::AndSoOn
+   MyApp/Localize/fr.pm             MyApp::Localize::fr
+   MyApp/Localize/it.pm             MyApp::Localize::it
+   MyApp/Localize/es.pm             MyApp::Localize::es
+   ...
+
+If you choose to use this paradigm you'll have two additional methods available:
+
+=head3 $lh->get_base_class_dir() 
+
+Returns the directory that correspnds to the base class's name space. 
+
+Again, assuming a main class of MyApp::Localize it'd be '/usr/lib/whatever/MyApp/Localize'
+
+=head3 $lh->list_available_locales()
+
+Returns a list of locales available. These are based on the .pm files in $lh->get_base_class_dir() that are not 'Utils.pm'.
+
+They are returned in the order glob() returns them. (i.e. no particular order)
+
+Assuming the file layout above you'd get something like (fr, it, es, ...)
+
+This would be useful for creating a menu of available languages to choose from:
+
+   my ($current_lookup, $native_lookup) = $lh->lang_names_hashref('en', $lh->list_available_locales());
+   
+   # since our main lexicon only has aliases (i.e. no .pm file): 
+   #    we want the main language on top and we only want one of the aliases: the superordinate
+   for my $langtag ('en', sort $lh->list_available_locales()) {
+       if ($current_lookup->{$langtag} eq $native_lookup->{$langtag}) {
+           # do menu entry like "Current $current_lookup->{$langtag} ($langtag)" # Currently English (en)
+       }
+       else {
+          # do menu entry like "$current_lookup->{$langtag} :: $native_lookup->{$langtag} :: ($langtag)" # Italian :: Italiano (it)
+      }
+   }
+
+=head2 Tie::Hash::ReadonlyStack compat Lexicon
+
+Often you'll want to add things to the lexicon. Perhaps a server's local version of a few strings or a context specific lexicon and using append_to_lexicons() and remove_key_from_lexicons() is too cumbersome.
+
+Buy making your lexicon a L<Tie::Hash::ReadonlyStack> hash we can do just that.
+
+First we make our main lexicon:
+
+    use Tie::Hash::ReadonlyStack;
+    
+    tie %MyApp::Localize::Lexicon, 'Tie::Hash::ReadonlyStack', \%actual_lexicon;
+
+'%actual_lexicon' can be a normal hash or a specially tied hash (e.g. a GDBM_READER L<GDBM_File> hash)
+
+Next we add the server admin's overrides:
+
+  $lh->add_lexicon_override_hash($tag, 'server', \%server);
+  
+When we init a user we add their override:
+
+  $lh->add_lexicon_override_hash($tag, 'user', \%user);
+
+Then we start a request and add request specific keys (perhaps a small lexicon package included with the module that implements the functionality for the current request) to fallback on if they do not exist:
+
+  $lh->add_lexicon_fallback_hash($tag, 'request', \%request);
+  
+After the request we don't need that last one any more so we remove it:
+
+  $lh->del_lexicon_hash($tag, 'request');
+  
+When the user context goes out of scope out we clean up theirs as well:
+
+  $lh->del_lexicon_hash($tag, 'user');
+  
+If you choose to use this paradigm (via L<Tie::Hash::ReadonlyStack> or a class implementing the methods in use below) you'll have three additional methods availble:
+
+These methods all returns false if the lexicon is not tied to an object that implements the method necessary to do this. Otherwise they return whatever the tied class's method returns
+
+=head3 add_lexicon_override_hash()
+
+This adds a hash to be checked before any others currently in the stack.
+
+Takes 2 or 3 arguments. The language tag whose lexicon we are adding to, a short identifier string, and a reference to a hash. If the language tag is not specified or not in use in the current object the main lexicon is the one it gets asssigned to.
+
+   # $lh is 'fr' and the main language is english, both are tied to Tie::Hash::ReadonlyStack
+   
+   $lh->add_lexicon_override_hash('fr', 'user', \%user_fr); # updated the 'fr' lexicon
+   $lh->add_lexicon_override_hash('user', \%user_en); # updates main lexicon since no language was specified
+   $lh->add_lexicon_override_hash('it', 'user', \%user_it); # updates main lexicon since 'it' is not in use in the handle 
+
+Uses L<Tie::Hash::ReadonlyStack/add_lookup_override_hash()> under the hood.
+
+=head3 add_lexcion_fallback_hash()
+
+Like L</add_lexicon_override_hash()> except that it adds the hash after any others currently in the stack.
+
+Uses L<Tie::Hash::ReadonlyStack/add_lookup_fallback_hash()> under the hood.
+
+=head4 $lh->{'add_lex_hash_silent_if_already_added'}
+
+That attribute when true (e.g. set in init()) will cause the add_lexicon* methods to return true if the given name has been added before it tries to add them (which will return false since they exist already)
+
+Care must be taken that you're not using the same identifier with different hashes or you some lexicons will simply not be added.
+
+A better approach is to design your stack modifying logic so it doesn't try to add uplicate entries. This option is really only inteneded for debugging and testing.
+
+=head3 del_lexicon_hash()
+
+This deletes a hash added via add_lexicon_override_hash() or add_lexicon_fallback_hash() from the stack.
+
+Its arguments are the langtag and the short identifier string.
+
+If langtag is not specified or is an '*' then it is removed from all lexicons in use.
+
+If the specified langtag is not in use in the current object it gets removed from the main lexicon.
+
+   $lh->del_lexicon_hash('fr', 'user'); # remove 'user' from the 'fr' lexicon
+   $lh->del_lexicon_hash('*', 'user'); # remove 'user' from all the handle's lexicons
+   $lh->del_lexicon_hash('user'); # remove 'user' from all the handle's lexicons
+   $lh->del_lexicon_hash('it', 'user'); # remove 'user' from the main lexicon since 'it' is not in use
+
+Uses L<Tie::Hash::ReadonlyStack/del_lookup_hash()> under the hood.
+
+=head1 Phrase Utils
+
+See L<Locale::Maketext::Utils::Phrase::Norm> for pragmatic examination and normalization of maketext phrase.
+
+See L<Locale::Maketext::Utils::Phrase::cPanel> for the same but via a cPanel recipe.
+
+See L<Locale::Maketext::Utils::Mock> for a mock object you can use for testing phrases.
+
+See L<Locale::Maketext::Utils::MarkPhrase> for a lightweight way to mark phrases in source code as translatable.
+
+=head1 ENVIRONMENT
+
+$ENV{'maketext_obj'} gets set to the language object on initialization ( for functions to use, see "FUNCTIONS" below ) unless $ENV{'maketext_obj_skip_env'} is true
+
+=head2 FUNCTIONS
+
+L<Locale::Maketext::Pseudo> has some exportable functions that make use of $ENV{'maketext_obj'} to do things like:
+
+    use Locale::Maketext::Pseudo qw(env_maketext);
+    
+    ...
+    
+    env_maketext("Hello, my name is [_1]", $name); # use real object if we have one otherwise use pseudo object
+
+=head1 SEE ALSO
+
+L<Locale::Maketext>, L<Locales::Language>, L<Locale::Maketext::Pseudo>, L<Text::Extract::MaketextCallPhrases>
+
+If you use L</$lh->lang_names_hashref()> or L</$lh->loadable_lang_names_hashref()> make sure you have the latest verison of L<Locales> as 0.04 (i.e. L<Locales::Base> 0.03) is buggy!
+
+=head1 TODO
+
+Audit that “Arbitrary name/value attribute list” is being used everywhere it makes sense to and that each use of it is documented.
+
+Add in currently beta datetime_duration() (L<DateTime::Format::Span/LOCALIZATION of DateTime::Format modules> and company)
+
+Add in currently beta currency(), currency_convert()
+
+Add more tests for v0.20: The changes have been in production outside of CPAN for a while, this was just a release to bring the CPAN verison up to date.
+
+=for notes to self
+    $amount, $iso4217, $format
+    Identical: we like specifics though...
+    en: [currency,_1] fr: [currency_convert,_1]  #error if no $iso4217 for class
+    en: [currency,_1,USD] fr: [currency_convert,_1,USD]
+    en: [currency,_1,USD] fr: [currency_convert,_1,USD,FRF]
+    en: [currency,_1,USD,FMT_SYMBOL] fr: [currency_convert,_1,USD,FRF,FMT_SYMBOL]
+    my $iso = $_[1] || $_[0]->get_ISO4217();
+    Locale::Currency::Format->can($_[3]);
+    my $format = $_[3] || Locale::Currency::Format::FMT_SYMBOL();
+    return Locale::Currency::Format::curreny_format($iso, $amount, $format) || $Locale::Currency::Format::error;
+    currency_convert($amount, $from, $to, $format); # Finance::Currency::Convert
+
+=head1 SUGGESTIONS
+
+If you have an idea for a method that would fit into this module just let me know and we'll see what can be done
+
+=head1 AUTHOR
+
+Daniel Muey, L<http://drmuey.com/cpan_contact.pl>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2011 cPanel, Inc. C<< <copyright@cpanel.net> >>. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -1,0 +1,13 @@
+requires "Importer" => "0.013";
+requires "Lexical::SealRequireHints" => "0.006";
+requires "XSLoader" => "0";
+requires "parent" => "0";
+requires "perl" => "5.012000";
+
+on 'test' => sub {
+  requires "Test2::Suite" => "0.000050";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};

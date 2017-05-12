@@ -1,0 +1,74 @@
+1.12    2016-09-29
+	- Fix to work with Net::DNS 1.03 (RT#108745)
+	  Net::DNS::bgsend()/bgread() API changed in a backward-incompatible
+	  way in 1.03. Deal with either a IO::Select object or a socket, as it
+	  was before.  (Cosimo Streppone <cosimo@cpan.org>)
+    - fixed: https://github.com/csirtgadgets/LWPx-ParanoidAgent/issues/18
+    - fixed: https://github.com/csirtgadgets/LWPx-ParanoidAgent/issues/14
+
+1.11	2014-
+	- fixed read-timeout issue: https://github.com/csirtgadgets/LWPx-ParanoidAgent/issues/7
+
+1.10	2013-11-11
+	- fixed: https://github.com/csirtgadgets/LWPx-ParanoidAgent/issues/3
+	- fixed: https://github.com/csirtgadgets/LWPx-ParanoidAgent/issues/4
+
+1.09:   2013-05-02
+	- released
+	- Makefile.PL updated
+
+1.08_02:    2013-04-29
+	- removed TLS test for now, some cpan testers reporting issues with the configuration, seems pointless given the Makefile
+
+1.08_01:    2013-04-26
+	- removed some of the tests that seem to fail on congested machines (eg: cpantesters).
+
+1.08:       2013-03-30
+	- [SREZIC] added mirror support: https://rt.cpan.org/Ticket/Display.html?id=44569
+
+1.07:  2009-08-05
+	- Skip the whole test when it can't bind to the specified private IP
+	  (Tatsuhiko Miyagawa)
+	- Fix the way to get LWP error when it's set to X-Died instead of $@
+	  (Zbigniew Lukasiak)
+
+1.06:  2009-07-17
+	- explicitly load deprecated module LWP::Debug, now that it's not
+	  loaded by default.  (Tatsuhiko Miyagawa <miyagawa@gmail.com>)
+
+1.05:  2009-06-21
+	- patch from Alessio Signorini <alessio.signorini@spryte.it> to
+	  quiet a warning that could be triggered
+
+1.04:  2008-10-30
+	- fix tests to no longer rely on my DNS servers, which had since migrated
+	  to EasyDNS which doesn't allow the types of malicious records I was
+	  testing for.  instead, switch to a mock object resolver.
+	  (Brad Fitzpatrick, brad@danga.com)
+
+1.03:  2006-08-21
+	- run under taint mode (Curtis Jewell <perl@csjewell.fastmail.us>)
+
+        - block 192.0.2.0/24 and 192.88.99.0/24 (Robby Griffin <rmg@terc.edu>)
+
+1.02:  2005-05-24
+	- block 0.0.0.0/8 as well (Andy Thomas <andy.thomas2@gmail.com>)
+
+1.01:  2005-05-23
+	- more POD docs (constructor and method calls)
+
+	- be aware of all forms of IP address (a, a.b, a.b.c, a.b.c.d)
+	  where all of a, b, c, and d can be in decimal, octal, or hex.
+	  (thanks to Martin Atkins and Timwi for pointing this out) pass
+	  in the canonicalized version of the IP address to the bad hosts
+	  checker.
+
+1.00:  2005-05-20
+ 	- fix holes pointed out by Martin Atkins (led to me doing all the
+	  Net::DNS and manual resolving work)
+
+	- bundle the test script by adding a local webserver mode to it,
+	  rather than using an xinetd script
+
+0.99:  2005-05-19
+	- initial release

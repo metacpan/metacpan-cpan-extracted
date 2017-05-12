@@ -1,0 +1,51 @@
+[% 
+    htmltitle = 'Guestbook' ;
+    title = htmltitle ;
+
+    crumb1_name = 'Guestbook' ;
+%]
+
+<div class="boxer">
+[% IF thanks == 1 %]
+<p>Your message has been saved and is now pending moderation.</p>
+<p>Should everything be okay, your message will appear on this 
+page as soon as a moderator has approved it. Sorry for this inconvience, but with the rise in "comment spam", we have 
+taken this measure to reduce the amount of unwanted and inappropriate messages that have previously appeared here.</p>
+[% ELSIF thanks == 3 %]
+<p>Sorry you have previously tried to send "comment spam" to this Guestbook, as such your message has been automatically 
+removed. If you feel that has been done in error, please contact the site administrator to rectify the situation.</p>
+[% END %]
+
+<p>If you would like to leave a message, simply click <a href="/guest/write">ADD A MESSAGE</a> and leave your 
+mossive.</p>
+<p>Please note that your message may not appear straight away, due to moderation, so please be patient. Also note that 
+any inappropriate content will be removed.</p>
+</div>
+
+[% FOREACH item = data %]
+<hr width="50%" />
+
+<div class="boxer">
+<p>
+<strong>
+	posted by
+	[% IF item.email %]<a href="mailto:[% item.email %]"><em>[% item.realname %]</em></a>
+	[% ELSE %]<em>[% item.realname %]</em>
+	[% END %]
+
+	[% IF item.url %][<a href="[% item.url %]">url</a>][% END %]
+
+	[% IF item.city %]
+		(from [% item.city %][% IF item.country %], [% item.country %][% END %])
+	[% ELSE %]
+		[% IF item.country %](from [% item.country %]) [% END %]
+	[% END %]
+	on [% item.postdate %]
+	</strong><br />
+	[% item.comments %]</p>
+[% END %]
+</div>
+
+<hr width="50%" />
+[% doaction = 'guest-read' %]
+[% INCLUDE "public/pager.html" %]

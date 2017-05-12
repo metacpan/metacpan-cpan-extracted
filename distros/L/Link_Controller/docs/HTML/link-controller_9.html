@@ -1,0 +1,124 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on February, 3  2002 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Using LinkController: Robot Behaviour</TITLE>
+
+<META NAME="description" CONTENT="Using LinkController: Robot Behaviour">
+<META NAME="keywords" CONTENT="Using LinkController: Robot Behaviour">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC32"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_8.html#SEC31"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_10.html#SEC33"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_8.html#SEC25"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_10.html#SEC33"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1> A. Robots and Sensible Behaviour </H1>
+<!--docid::SEC32::-->
+<P>
+
+The most important thing about a program like this is to realise that if
+you set it up incorrectly and used it in the wrong way, you could upset
+a large number of people who have set up their web servers in the
+assumption that they would be used normally by human beings browsing
+through on Netscape.
+</P><P>
+
+It is true that LinkController is very careful to limit resource usage
+on remote sites, but the other site may not know that or may have a real
+reason not to want their pages visited too often.  
+</P><P>
+
+Probably it's true that the only safe way forward is for every WWW site
+to begin to set up robot defences and detect when someone starts to
+download from them at an unreasonable rate and then cut off the person
+doing the downloading.  I suggest that you don't make people have to do
+this to protect themselves against you for at least two reasons.
+</P><P>
+
+<UL>
+<LI>
+respect for the person's time
+<LI>
+a wish not to be the person who is cut off
+</UL>
+<P>
+
+There are probably many other reasons, but that's one for the good side
+in you and one for the selfish.  What more do you need.
+</P><P>
+
+For suggestions about what constitutes `correct' behaviour, it's worth
+seeing the Robots World Wide Web page.
+<A HREF="http://www.robotstxt.org/wc/robots.html">http://www.robotstxt.org/wc/robots.html</A>
+</P><P>
+
+There are a number of points which make LinkController relatively safe
+as a link.  These are all related to the design and limitations on
+<CODE>test-link</CODE>.  
+</P><P>
+
+<UL>
+<LI>
+<CODE>test-link</CODE> does <EM>not</EM> recurs.  It only tests links that
+are specifically listed in the schedule database.
+<LI>
+There is a limit to the number of links that will be tested in one run.
+This defaults to 1000, but can be configured.  
+<LI>
+The schedule for link testing is designed to spread the testing of links
+across time
+<LI>
+The testing system will not test links at a given site faster than a
+certain rate.
+</UL>
+<P>
+
+The last limitation is inherited from the <CODE>LWP::RobotUA</CODE> module and
+the documentation for that covers the details of how it works.
+<CODE>test-link</CODE> tries to re-order testing of links as needed so that
+a limit on the rate of visits to one site does not cause a limit on
+overall testing speed.
+</P><P>
+
+<A NAME="Uncheckable Links"></A>
+<HR SIZE="6">
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_8.html#SEC25"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_10.html#SEC33"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Michael De La Rue</I> on <I>February, 3  2002</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

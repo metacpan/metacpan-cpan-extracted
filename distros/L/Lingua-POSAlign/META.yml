@@ -1,0 +1,12 @@
+name: Lingua-POSAlign
+version: 0.01
+abstract: POS tag alignment tool for texts
+author: Yung-chung Lin <xern@cpan.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.34

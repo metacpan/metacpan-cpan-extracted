@@ -1,0 +1,43 @@
+---
+abstract: 'use JSON natively with LWP objects'
+author:
+  - 'Sam Kington <skington@cpan.org>'
+build_requires:
+  FindBin: '0'
+  HTTP::Message: '6.04'
+  HTTP::Request::Common: '6.07'
+  JSON::MaybeXS: '0'
+  LWP: '0'
+  LWP::Protocol: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  if: '0'
+  lib: '0'
+  parent: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-JSON-Tiny
+requires:
+  Encode: '0'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '6.07'
+  HTTP::Response: '0'
+  JSON::MaybeXS: '0'
+  LWP: '0'
+  LWP::UserAgent: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/skington/lwp-json-tiny
+  repository: https://github.com/skington/lwp-json-tiny.git
+version: '0.010'
+x_serialization_backend: 'YAML::Tiny version 1.69'

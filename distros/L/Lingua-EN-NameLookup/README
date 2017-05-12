@@ -1,0 +1,26 @@
+
+Lingua::EN::NameLookup - a simple dictionary search and manipulation class.
+
+Synopsis
+
+        use Lingua::EN::NameLookup;
+        $dict = new Lingua::EN::NameLookup;
+        $dict->load("mydict.dat");
+        $res = $dict->lookup("FOO");
+        $res = $dict->ilookup("Foo");
+        $dict->add("Bar");
+        $dict->dump("mynewdict.dat");
+
+Description
+
+This class provides the ability to search and manipulate a simple dictionary.
+It was originally designed for checking surnames encountered during the
+preparation of census indices. It works best with small data sets and where the
+names in the data set generate many distinct soundex values. The dictionary is
+maintained in memory and hence the memory usage depends on the number of names.
+
+See the the documentation for full details. This module requires Text::Soundex to be installed on your system.
+
+Copyright (c) 2002 Pete Barlow <pbarlow@cpan.org>. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

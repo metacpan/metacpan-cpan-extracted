@@ -1,0 +1,27 @@
+Revision history for Lexical-Hints
+
+0.000001  Fri Mar 22 18:59:30 2013
+       Initial release.
+
+
+
+0.000002  Fri Jul 26 07:20:31 2013
+          No changes logged
+
+
+0.000003  Fri Jul 26 11:38:36 2013
+
+    - Fix for Perl 5.18+ madness (thanks Peter!)
+
+
+
+0.000004  Sun Jul 28 06:41:32 2013
+
+    - Tweaked to run under 5.10 (thanks James!)
+
+
+
+0.000005  Mon Jul 29 06:56:50 2013
+
+    - Doc tweak to abstract (thanks Rik)
+

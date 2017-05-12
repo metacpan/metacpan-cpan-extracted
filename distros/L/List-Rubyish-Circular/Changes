@@ -1,0 +1,13 @@
+Revision history for Perl extension List::Rubyish::Circular
+
+0.04    Sun Apr 10 11:53:49 2011
+        - cycle/rcycle operations are now destructive
+
+0.03    Sun Apr 10 00:57:30 2011
+        - added a prerequisite module
+
+0.02    Sun Apr 10 00:10:19 2011
+        - fixed documentation errors
+
+0.01    Sat Apr  9 22:45:47 2011
+        - original version

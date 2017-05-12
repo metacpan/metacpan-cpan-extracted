@@ -1,0 +1,2781 @@
+#!/usr/bin/perl
+use strict ;
+use File::Basename ;
+use Pod::Usage ;
+use Getopt::Long qw/:config no_ignore_case/ ;
+
+++$! ;
+
+use Linux::DVB::DVBT ;
+
+our $VERSION = "1.002" ;
+
+our $START_RECORD = '@@START@@' ;
+our $END_RECORD   = '@@END@@' ;
+our $log_file ;
+
+	my $progname = basename($0) ;
+
+	my ($help, $man, $DEBUG, $VERBOSE, $adap, $list_countries, $config, $clean) ;
+	my ($DEBUG_PERL, $DEBUG_DVB) ;
+	my ($status, $use_config) ;
+	GetOptions('v|verbose=i' => \$VERBOSE,
+			   'debug=i' => \$DEBUG,
+			   'dbg-perl=i' => \$DEBUG_PERL,
+			   'dbg-dvb=i' => \$DEBUG_DVB,
+			   'h|help' => \$help,
+			   'man' => \$man,
+
+			   'clean' => \$clean,
+			   'a|adap|dvb=s' => \$adap,
+			   'countries' => \$list_countries,
+			   'cfg=s' => \$config,
+			   'usecfg' => \$use_config,
+			   
+			   'log=s' => \$log_file,
+			   'status' => \$status,
+			   
+			   ) or pod2usage(2) ;
+
+    pod2usage(1) if $help;
+    pod2usage(-verbose => 2) if $man;
+    
+    
+    ## Just show country list?
+    if ($list_countries)
+    {
+    	my @countries = Linux::DVB::DVBT::Freq::country_list() ;
+    	print "Supported countries:\n" ;
+    	foreach my $aref (@countries)
+    	{
+    		my ($code, $country) = @$aref ;
+    		print "$code : $country\n" ;
+    	}
+    
+    	exit 0 ;
+    }
+    
+    ## Show status
+    if ($status)
+    {
+    	show_status() ;
+    	exit 0 ;
+    }
+
+
+	##==========================================================================
+	## RUN SCAN
+
+	## Check for a running scan
+	my ($pid, $status_aref) = read_status() ;
+	if ($pid < 0)
+	{
+		# clear out status file
+		write_log({}, 0) ;
+	}
+	    
+    ## Run scan
+	$DEBUG_PERL = $DEBUG if ($DEBUG_PERL < $DEBUG) ;
+	$DEBUG_DVB = $DEBUG if ($DEBUG_DVB < $DEBUG) ;
+
+	Linux::DVB::DVBT->debug($DEBUG_PERL) ;
+	Linux::DVB::DVBT->dvb_debug($DEBUG_DVB) ;
+	Linux::DVB::DVBT->verbose($VERBOSE) ;
+
+	## Create dvb
+	## NOTE: With default object settings, the application will
+	## die on *any* error, so there is no error checking in this script
+	##
+	my $dvb = Linux::DVB::DVBT->new(
+		'adapter'				=> $adap,
+		'scan_cb_start'			=> \&scan_cb,
+		'scan_cb_end'			=> \&scan_cb,
+		'scan_cb_loop_start'	=> \&scan_cb,
+		'scan_cb_loop_end'		=> \&scan_cb,
+	) ;
+
+	## see if frontend is currently busy
+	my $frontend_busy = $dvb->is_busy() ;
+	if ($frontend_busy)
+	{
+		print "Fontend busy!\n" ;
+		
+		## Finish off
+		my %info = (
+			'complete'				=> 1,
+			'estimated_percent'		=> 0,
+			'busy'					=> 1,
+		) ;
+		write_log(\%info, 0) ;
+		exit 1 ;
+	}	
+
+	# set options
+	$dvb->config_path($config) if $config ;
+	if ($clean)
+	{
+		$dvb->merge(0) ;
+	}
+
+	# check for any previous scan
+	my $last_tuning_href = $dvb->get_tuning_info() ;
+	my $got_previous = 0 ;
+	if (exists($last_tuning_href->{'freqfile'}) && keys %{$last_tuning_href->{'freqfile'}})
+	{
+		$got_previous = 1 ;
+	}
+Linux::DVB::DVBT::prt_data("Existing tuning info=", $last_tuning_href) if $DEBUG>=10 ;
+	
+	# check args
+    if ((@ARGV == 0) && !$got_previous)
+    {
+    	print "$0: No frequency file given, and no previous scans completed.\n" ;
+    	pod2usage(-verbose => 2) ;
+    }
+
+	
+	## check how we'll be scanning	
+	my $scan_type = "" ;
+	my $freqfile ;
+	my $country ;
+	if (@ARGV > 0)
+	{
+		if (length $ARGV[0] == 2)
+		{
+			$country = uc $ARGV[0] ;
+			$scan_type = "country" ;
+		}
+		else
+		{
+			$freqfile = $ARGV[0] ;
+			$scan_type = "file" ;
+		}
+	}
+	
+	if ($use_config && $got_previous)
+	{
+		$scan_type = "previous" ;
+	}
+
+	# check args
+    if (!$scan_type)
+    {
+    	print "$0: No frequency file given, and no previous scans completed.\n" ;
+    	pod2usage(-verbose => 2) ;
+    }
+	
+	
+	## Check for a running scan
+	if ($pid < 0)
+	{
+		## Run scan
+		if ($scan_type eq 'country')
+		{
+			print STDERR "Scanning frequencies for $country. Please wait, this will take some time...\n" ;
+			$dvb->scan_from_country($country) ;
+		}
+		elsif ($scan_type eq 'file')
+		{
+			print STDERR "Scanning frequencies from $freqfile...\n" ;
+			$dvb->scan_from_file($freqfile) ;
+		}
+		elsif ($scan_type eq 'previous')
+		{
+			# use previous scan frequencies
+			print STDERR "Using previous scan results to set frequency list...\n" ;
+			$dvb->scan_from_previous() ;
+		}
+	}
+	else
+	{
+		## show status
+		show_status() ;
+   		exit 0 ;
+	}
+
+#	if ($country)
+#	{
+#		print STDERR "Scanning frequencies for $country. Please wait, this will take some time...\n" ;
+#		$dvb->scan_from_country($country) ;
+#	}
+#	else
+#	{
+#		## Check for a running scan
+#		if ($pid < 0)
+#		{
+#			## Run scan
+#			if (@ARGV > 0)
+#			{
+#				$freqfile = $ARGV[0] ;
+#				$dvb->scan_from_file($freqfile) ;
+#			}
+#			else
+#			{
+#				# use previous scan frequencies
+#				print STDERR "Using previous scan results to set frequency list...\n" ;
+#				$dvb->scan_from_previous() ;
+#			}
+#		}
+#		else
+#		{
+#			## show status
+#			show_status() ;
+#    		exit 0 ;
+#		}
+#		
+#	}
+
+	## Finish off
+	my %info = (
+		'complete'				=> 1,
+		'estimated_percent'		=> 100,
+		'scan_info'				=> $dvb->tuning(),
+	) ;
+	write_log(\%info, 0) ;
+	exit 0 ;
+
+
+
+#=================================================================================
+
+#---------------------------------------------------------------------------------
+sub write_log
+{
+	my ($info_href, $append) = @_ ;
+	
+	$info_href ||= {} ;
+	
+	my $curr_freq = 0 ;
+	my $percent = 0 ;
+	my $busy = 0 ;
+	if (exists($info_href->{'estimated_percent'}))
+	{
+		$percent = $info_href->{'estimated_percent'} ;
+	}
+	if (exists($info_href->{'current_freq'}) && $info_href->{'current_freq'})
+	{
+		$curr_freq = $info_href->{'current_freq'} ;
+	}
+	if (exists($info_href->{'busy'}))
+	{
+		$busy = $info_href->{'busy'} ;
+	}
+	
+	# Write out record - build in memory then write once
+	my @record = ($START_RECORD) ;
+	push @record, "PID = $$" ;
+	push @record, "BUSY = $busy" ;
+	push @record, "PERCENT = $percent" ;
+	push @record, "FREQ = $curr_freq" ;
+	
+	if (exists($info_href->{'scan_info'}))
+	{
+		## Channels
+		if (exists($info_href->{'scan_info'}{'pr'}))
+		{
+			push @record, "CHANNELS:" ;
+			my $progs_href = $info_href->{'scan_info'}{'pr'} ;
+			foreach my $prog (sort { $progs_href->{$a}{'lcn'} <=> $progs_href->{$b}{'lcn'} } keys %$progs_href)
+			{
+				push @record, sprintf(":%d:$prog:%d:%s:%s:", 
+					$progs_href->{$prog}{'lcn'}, 
+					$progs_href->{$prog}{'tsid'},
+					$progs_href->{$prog}{'net'},
+					($progs_href->{$prog}{'type'} == 1 ? "tv" : "radio"),
+					) ;
+			}
+		}
+		
+		## Frequencies
+		if (exists($info_href->{'scan_info'}{'freqs'}))
+		{
+			push @record, "FREQS:" ;
+			my $freqs_href = $info_href->{'scan_info'}{'freqs'} ;
+			foreach my $freq (sort { $a <=> $b } keys %$freqs_href)
+			{
+				push @record, sprintf(":$freq:%d:%d:%d:", 
+					$freqs_href->{$freq}{'seen'}, 
+					$freqs_href->{$freq}{'tuned'}, 
+					($freq==$curr_freq ? 1 : 0),
+					) ;
+			}
+		}
+		elsif (exists($info_href->{'scan_info'}{'freq_file'}))
+		{
+			push @record, "FREQS:" ;
+			my $freqs_href = $info_href->{'scan_info'}{'freq_file'} ;
+			foreach my $freq (sort { $a <=> $b } keys %$freqs_href)
+			{
+				push @record, sprintf(":$freq:%d:%d:%d:", 
+					0, 
+					0,
+					($freq==$curr_freq ? 1 : 0),
+					) ;
+			}
+		}
+		elsif (exists($info_href->{'tuning_list'}))
+		{
+			push @record, "FREQS:" ;
+			my $freqs_aref = $info_href->{'tuning_list'} ;
+			
+			if ($curr_freq)
+			{
+				my %freqs = map {  $_->{'frequency'} => 1 }  @$freqs_aref ;
+				if (!exists($freqs{$curr_freq}))
+				{
+					push @$freqs_aref, {
+						'frequency'	=> $curr_freq,
+					} ;
+				}
+			}
+			
+			foreach my $freq_href (sort { $a->{'frequency'} <=> $b->{'frequency'} } @$freqs_aref)
+			{
+				my $freq = $freq_href->{'frequency'} ;
+				push @record, sprintf(":$freq:%d:%d:%d:", 
+					0, 
+					0, 
+					($freq==$curr_freq ? 1 : 0),
+					) ;
+			}
+		}
+	}
+
+	if ($info_href->{'complete'})
+	{
+		push @record, "COMPLETE = $info_href->{complete}" ;
+	}
+	push @record, $END_RECORD ;
+	
+	my $record = join("\n", @record) ;
+	my $mode = $append ? ">>" : ">" ;
+	open my $fh, "$mode$log_file" or die "Error: unable to write log $log_file" ;
+	print $fh "$record\n" ;
+	close $fh ;
+}	
+	
+
+#---------------------------------------------------------------------------------
+#
+#$info_href = {
+#          'done_freqs' => 6,
+#          'estimated_percent' => 100,
+#          'total_freqs' => 6
+#          'current_freq' => 538000000
+#
+#          'scan_info' => {
+#                           'freqfile' => {
+#                                           '538000000' => {
+#                                                            'guard_interval' => 0,
+#                                                            'transmission' => 0,
+#                                                            'code_rate_high' => 0,
+#                                                            'tuned' => 1,
+#                                                            'strength' => 65535,
+#                                                            'frequency' => 538000000,
+#                                                            'modulation' => 0,
+#                                                            'seen' => 1,
+#                                                            'bandwidth' => 8,
+#                                                            'code_rate_low' => 0,
+#                                                            'hierarchy' => 0,
+#                                                            'inversion' => 2
+#                                                          },
+#                                           ...
+#                                         },
+#                           'lcn' => {
+#                                      '12290' => {
+#                                                   '15520' => {
+#                                                                'service_type' => 2,
+#                                                                'visible' => 1,
+#                                                                'lcn' => 795
+#                                                              },
+#                                          			...
+#                                                 }
+#                                    },
+#                           'ts' => {
+#                                     '12290' => {
+#                                                  'tsid' => 12290,
+#                                                  'transmission' => 0,
+#                                                  'guard_interval' => 0,
+#                                                  'code_rate_high' => 0,
+#                                                  'tuned' => 1,
+#                                                  'net' => 'Oxon & Bucks .',
+#                                                  'strength' => 50619,
+#                                                  'netid' => 12387,
+#                                                  'frequency' => 713833000,
+#                                                  'modulation' => 0,
+#                                                  'seen' => 1,
+#                                                  'bandwidth' => 8,
+#                                                  'code_rate_low' => 0,
+#                                                  'hierarchy' => 0,
+#                                                  'inversion' => 2
+#                                                },
+#                                      ...
+#                                   },
+#                           'pr' => {
+#                                     'Gems TV' => {
+#                                                    'video' => 2401,
+#                                                    'lcn' => 43,
+#                                                    'tsid' => 20480,
+#                                                    'pmt' => 725,
+#                                                    'name' => 'Gems TV',
+#                                                    'ca' => 0,
+#                                                    'net' => 'Coloured Rocks',
+#                                                    'audio' => 2402,
+#                                                    'teletext' => 0,
+#                                                    'subtitle' => 0,
+#                                                    'pcr' => 2401,
+#                                                    'type' => 1,
+#                                                    'pnr' => 24448,
+#                                                    'audio_details' => 'eng:2402'
+#                                                  },
+#									...
+#                                   },
+#                           'freqs' => {
+#                                        '730167000' => {
+#                                                         'code_rate_high' => 0,
+#                                                         'transmission' => 0,
+#                                                         'guard_interval' => 0,
+#                                                         'tuned' => 1,
+#                                                         'strength' => 65535,
+#                                                         'modulation' => 0,
+#                                                         'seen' => 1,
+#                                                         'bandwidth' => 8,
+#                                                         'code_rate_low' => 0,
+#                                                         'inversion' => 2,
+#                                                         'hierarchy' => 0
+#                                                       },
+#										...
+#                                      }
+#                         },
+#          'tuning_list' => [],
+#        };
+#										
+#
+sub scan_cb
+{
+	my ($info_href) = @_ ;
+	
+	write_log($info_href, 1) ;
+}	
+
+#---------------------------------------------------------------------------------
+sub read_status
+{
+	my $pid = -1 ;
+	my @saved ;
+	
+print "read_status($log_file)\n" if $DEBUG ;
+	
+   	if ( -f $log_file)
+   	{
+		# Load in file and read last complete record
+		open my $fh, "<$log_file" or die "Error: unable to read log $log_file" ;
+		my $line ;
+		my @current ;
+		my $started = 0 ;
+		while (defined($line = <$fh>))
+		{
+			chomp $line ;
+			
+			if (!$started)
+			{
+				$started=1 if ($line eq $START_RECORD) ;
+			}
+			else
+			{
+				if ($line eq $END_RECORD)
+				{
+					@saved = @current ;
+					@current = () ;
+					$started = 0 ;
+				}
+				else
+				{
+					push @current, $line ;
+				}
+			}
+			
+			## Check line
+			if ($line =~ /PID\s*=\s*(\d+)/)
+			{
+				$pid = $1 ;
+			}		
+		}
+		close $fh ;
+	}	
+
+print " + status pid = $pid\n" if $DEBUG ;
+	
+	## Check for running scan
+	if ($pid >= 0)
+	{
+		# got pid so check it's valid & running
+		my $tmp_pid = $pid ;
+		$pid = -1 ;
+		
+		if ( -f "/proc/$tmp_pid/cmdline")
+		{
+			if (open my $fh, "/proc/$tmp_pid/cmdline")
+			{
+				my @a=split "\000", <$fh>;
+				close $fh ;
+				
+				foreach my $f (@a)
+				{
+					if ($f =~ /$progname/)
+					{
+						# Found it and it's still running
+				   		push @saved, "RUNNING = 1" ;
+						$pid = $tmp_pid ;
+						last ;
+					}
+				}
+			}
+		}
+	}
+
+print " + proc pid = $pid\n" if $DEBUG ;
+	
+	if ($pid < 0)
+	{
+		# not running so ensure it's reported as finished
+   		push @saved, "COMPLETE = 1" ;
+   	}
+	
+	return ($pid, \@saved) ;
+}	
+	
+	
+	
+#---------------------------------------------------------------------------------
+sub show_status
+{
+	my ($pid, $status_aref) = read_status() ;
+
+	## Process latest complete record
+	if (@$status_aref)
+	{
+		print "<?php\n" ;
+		print "\$STATUS = array(\n" ;
+		my $inarray = 0 ;
+		foreach my $line (@$status_aref)
+		{
+			# VAR = Value
+			if ($line =~ /^\s*(\w+)\s*=\s*(\S.*)/)
+			{
+				print "), \n" if $inarray ;
+				$inarray=0 ;
+				print "'$1' => '$2',\n" ;
+			}
+			
+			# NAME:
+			elsif ($line =~ /^\s*(\w+)\s*:/)
+			{
+				print "), \n" if $inarray ;
+				print "'$1' => array(\n" ;
+				$inarray = 1 ;
+			}
+			
+			# :field1:field2:...
+			elsif ($line =~ /^\s*:(.*)/)
+			{
+				my @fields = split(/:/, $1) ;
+				
+				print ",\n  " if $inarray>1 ;
+				print "array(\"" . join('","', @fields) . "\")" ;
+				$inarray++ ;
+			}
+		}
+		print ") \n" if $inarray ;
+		print "'_END_' => 1); \n" ;
+		print "?>\n\n" ;
+	}	
+	
+}	
+	
+	
+	
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+=head1 NAME
+
+dvbt-qpvr-scan - Scan DVB-T channels for Quartz PVR
+
+=head1 SYNOPSIS
+
+dvbt-scan [options] [ <frequency file | country code> ]
+
+Options:
+
+       -debug level         set debug level
+       -verbose level       set verbosity level
+       -help                brief help message
+       -man                 full documentation
+       -a|dvb adap          use adapter number
+       -countries           list country codes
+       -usecfg              use config for frequencies
+       
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Set verbosity level. Higher values show more information.
+
+=item B<-debug>
+
+Set debug level. Higher levels show more debugging information (only really of any interest to developers!)
+
+=item B<-a>
+
+Use if you wish to specify which one of multiple DVB adapters to use (useful if you are recording on the default adapter).
+
+=item B<-countries>
+
+Does not run a scan, instead it lists all the supported country codes (i.e. those country codes that have information for used DVB-T frequencies).
+
+=item B<-usecfg>
+
+If this flag is specified, the scan will attempt to use the information stored in the configuration files
+rather than any specified country code or frequency file. If no frequency information is available in
+the configuration files, then it falls back to using the specified frequency input.  
+
+=back
+
+=head1 DESCRIPTION
+
+Script that uses the perl Linux::DVB::DVBT package to provide DVB-T adapter functions.
+ 
+Runs the frequency scanning function to search for Freeview channels. Stores the channel information 
+into configuration files.
+
+If this program is run as root then the configuration files are stored under B</etc/dvb> and are available
+for any user. Otherwise they are stored in B<$HOME/.tv> for just the user.
+
+The command line argument specified must be either a frequency file or a country code. Alternatively, iff a scan has been performed before,
+then specifying no argument causes the scan to reuse the previously saved frequencies. Note that this only works for scans performed by
+version 2.11 (and upwards) of the Linux::DVB::DVBT module.
+
+The frequency file is usually something like: B</usr/share/dvb/dvb-t/uk-Oxford>
+
+The file contents should be something like:
+
+   # Oxford
+   # T freq bw fec_hi fec_lo mod transmission-mode guard-interval hierarchy
+   T 578000000 8MHz 2/3 NONE QAM64 2k 1/32 NONE
+
+Frequency files are provided by the 'dvb' rpm package available for most distros. Alternatively, if you have kaffeine installed, look in
+$HOME/.kde/share/apps/kaffeine/dvb-t. If all else fails you can always get them from my CPAN web space: 
+
+http://www.cpan.org/authors/id/S/SD/SDPRICE/Files/dvb-t.tar.gz
+
+To determine which file to use, check http://www.ukfree.tv/transmitters.php and enter your postcode. 
+
+Alternatively a country code (compliant with ISO 3166-1) can be specified and a (longer!) scan of all valid frequencies for that country
+will be performed. For example, to scan in the UK use:
+
+	$ dvbt-scan GB
+	
+For reference, a scan of 6 frequencies stored in a frequency file takes approximately 4 minutes. A scan based on the UK country code (which
+consists of 57 frequencies) takes approximately 24 minutes. 
+
+
+For full details of the DVBT functions, please see:
+
+   perldoc Linux::DVB::DVBT
+ 
+=cut
+
+	
+$VAR1 = '=== scan_cb_end ===';
+$VAR2 = {
+          'done_freqs' => 6,
+          'scan_info' => {
+                           'freqfile' => {
+                                           '538000000' => {
+                                                            'guard_interval' => 0,
+                                                            'transmission' => 0,
+                                                            'code_rate_high' => 0,
+                                                            'tuned' => 1,
+                                                            'strength' => 65535,
+                                                            'frequency' => 538000000,
+                                                            'modulation' => 0,
+                                                            'seen' => 1,
+                                                            'bandwidth' => 8,
+                                                            'code_rate_low' => 0,
+                                                            'hierarchy' => 0,
+                                                            'inversion' => 2
+                                                          },
+                                           '730167000' => {
+                                                            'guard_interval' => 0,
+                                                            'transmission' => 0,
+                                                            'code_rate_high' => 0,
+                                                            'tuned' => 1,
+                                                            'strength' => 65535,
+                                                            'frequency' => 730167000,
+                                                            'modulation' => 0,
+                                                            'seen' => 1,
+                                                            'bandwidth' => 8,
+                                                            'code_rate_low' => 0,
+                                                            'hierarchy' => 0,
+                                                            'inversion' => 2
+                                                          },
+                                           '721833000' => {
+                                                            'guard_interval' => 0,
+                                                            'transmission' => 0,
+                                                            'code_rate_high' => 0,
+                                                            'tuned' => 1,
+                                                            'strength' => 49995,
+                                                            'frequency' => 721833000,
+                                                            'modulation' => 0,
+                                                            'seen' => 1,
+                                                            'bandwidth' => 8,
+                                                            'code_rate_low' => 0,
+                                                            'hierarchy' => 0,
+                                                            'inversion' => 2
+                                                          },
+                                           '850000000' => {
+                                                            'guard_interval' => 0,
+                                                            'transmission' => 0,
+                                                            'code_rate_high' => 0,
+                                                            'tuned' => 1,
+                                                            'strength' => 49067,
+                                                            'frequency' => 850000000,
+                                                            'modulation' => 0,
+                                                            'seen' => 1,
+                                                            'bandwidth' => 8,
+                                                            'code_rate_low' => 0,
+                                                            'hierarchy' => 0,
+                                                            'inversion' => 2
+                                                          },
+                                           '713833000' => {
+                                                            'guard_interval' => 0,
+                                                            'transmission' => 0,
+                                                            'code_rate_high' => 0,
+                                                            'tuned' => 1,
+                                                            'strength' => 50619,
+                                                            'frequency' => 713833000,
+                                                            'modulation' => 0,
+                                                            'seen' => 1,
+                                                            'bandwidth' => 8,
+                                                            'code_rate_low' => 0,
+                                                            'hierarchy' => 0,
+                                                            'inversion' => 2
+                                                          },
+                                           '578000000' => {
+                                                            'guard_interval' => 0,
+                                                            'transmission' => 0,
+                                                            'code_rate_high' => 0,
+                                                            'tuned' => 1,
+                                                            'strength' => 65535,
+                                                            'frequency' => 578000000,
+                                                            'modulation' => 0,
+                                                            'seen' => 1,
+                                                            'bandwidth' => 8,
+                                                            'code_rate_low' => 0,
+                                                            'hierarchy' => 0,
+                                                            'inversion' => 2
+                                                          }
+                                         },
+                           'lcn' => {
+                                      '12290' => {
+                                                   '15520' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 795
+                                                              },
+                                                   '16096' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 34
+                                                              },
+                                                   '14688' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 727
+                                                              },
+                                                   '15728' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 192
+                                                              },
+                                                   '15200' => {
+                                                                'service_type' => 24,
+                                                                'visible' => 1,
+                                                                'lcn' => 92
+                                                              },
+                                                   '16032' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 72
+                                                              },
+                                                   '16224' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 307
+                                                              },
+                                                   '15552' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 17
+                                                              },
+                                                   '14752' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 724
+                                                              },
+                                                   '14720' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 728
+                                                              },
+                                                   '14816' => {
+                                                                'service_type' => 24,
+                                                                'visible' => 1,
+                                                                'lcn' => 104
+                                                              },
+                                                   '15952' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 27
+                                                              },
+                                                   '14976' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 26
+                                                              },
+                                                   '15232' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 93
+                                                              },
+                                                   '16048' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 10
+                                                              },
+                                                   '15424' => {
+                                                                'service_type' => 24,
+                                                                'visible' => 1,
+                                                                'lcn' => 189
+                                                              },
+                                                   '12992' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 31
+                                                              },
+                                                   '16288' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 309
+                                                              },
+                                                   '14272' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 23
+                                                              },
+                                                   '13120' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 16
+                                                              },
+                                                   '14784' => {
+                                                                'service_type' => 24,
+                                                                'visible' => 1,
+                                                                'lcn' => 101
+                                                              },
+                                                   '14498' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 38
+                                                              },
+                                                   '15680' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 191
+                                                              },
+                                                   '12928' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 30
+                                                              }
+                                                 },
+                                      '8199' => {
+                                                  '8448' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 28
+                                                            },
+                                                  '8362' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 33
+                                                            },
+                                                  '8263' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 3
+                                                            },
+                                                  '8577' => {
+                                                              'service_type' => 24,
+                                                              'visible' => 1,
+                                                              'lcn' => 103
+                                                            },
+                                                  '8325' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 6
+                                                            },
+                                                  '8642' => {
+                                                              'service_type' => 24,
+                                                              'visible' => 1,
+                                                              'lcn' => 102
+                                                            },
+                                                  '8452' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 13
+                                                            },
+                                                  '8500' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 5
+                                                            },
+                                                  '8384' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 4
+                                                            },
+                                                  '8442' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 14
+                                                            }
+                                                },
+                                      '4171' => {
+                                                  '5824' => {
+                                                              'service_type' => 4,
+                                                              'visible' => 1,
+                                                              'lcn' => 708
+                                                            },
+                                                  '4544' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 9
+                                                            },
+                                                  '4287' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 2
+                                                            },
+                                                  '5760' => {
+                                                              'service_type' => 4,
+                                                              'visible' => 1,
+                                                              'lcn' => 707
+                                                            },
+                                                  '4288' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 7
+                                                            },
+                                                  '6016' => {
+                                                              'service_type' => 4,
+                                                              'visible' => 1,
+                                                              'lcn' => 710
+                                                            },
+                                                  '4171' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 1
+                                                            },
+                                                  '4736' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 81
+                                                            },
+                                                  '4352' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 80
+                                                            },
+                                                  '6784' => {
+                                                              'service_type' => 4,
+                                                              'visible' => 1,
+                                                              'lcn' => 702
+                                                            },
+                                                  '4672' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 71
+                                                            },
+                                                  '5632' => {
+                                                              'service_type' => 4,
+                                                              'visible' => 1,
+                                                              'lcn' => 705
+                                                            },
+                                                  '4608' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 70
+                                                            },
+                                                  '5696' => {
+                                                              'service_type' => 4,
+                                                              'visible' => 1,
+                                                              'lcn' => 706
+                                                            },
+                                                  '5888' => {
+                                                              'service_type' => 4,
+                                                              'visible' => 1,
+                                                              'lcn' => 701
+                                                            },
+                                                  '6848' => {
+                                                              'service_type' => 4,
+                                                              'visible' => 1,
+                                                              'lcn' => 703
+                                                            },
+                                                  '6720' => {
+                                                              'service_type' => 4,
+                                                              'visible' => 1,
+                                                              'lcn' => 700
+                                                            },
+                                                  '5952' => {
+                                                              'service_type' => 4,
+                                                              'visible' => 1,
+                                                              'lcn' => 709
+                                                            },
+                                                  '4416' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 105
+                                                            },
+                                                  '7168' => {
+                                                              'service_type' => 2,
+                                                              'visible' => 1,
+                                                              'lcn' => 301
+                                                            },
+                                                  '6912' => {
+                                                              'service_type' => 4,
+                                                              'visible' => 1,
+                                                              'lcn' => 704
+                                                            }
+                                                },
+                                      '20480' => {
+                                                   '23040' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 49
+                                                              },
+                                                   '24320' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 47
+                                                              },
+                                                   '22272' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 19
+                                                              },
+                                                   '23872' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 193
+                                                              },
+                                                   '24128' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 98
+                                                              },
+                                                   '22208' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 11
+                                                              },
+                                                   '24000' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 32
+                                                              },
+                                                   '24064' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 87
+                                                              },
+                                                   '23936' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 25
+                                                              },
+                                                   '22464' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 37
+                                                              },
+                                                   '24384' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 36
+                                                              },
+                                                   '22400' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 95
+                                                              },
+                                                   '23712' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 20
+                                                              },
+                                                   '22244' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 44
+                                                              },
+                                                   '22336' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 29
+                                                              },
+                                                   '24256' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 97
+                                                              },
+                                                   '22080' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 82
+                                                              },
+                                                   '24448' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 43
+                                                              },
+                                                   '22592' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 723
+                                                              },
+                                                   '22226' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 46
+                                                              }
+                                                 },
+                                      '16384' => {
+                                                   '18304' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 710
+                                                              },
+                                                   '17024' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 81
+                                                              },
+                                                   '20224' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 42
+                                                              },
+                                                   '16960' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 71
+                                                              },
+                                                   '19584' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 303
+                                                              },
+                                                   '18112' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 708
+                                                              },
+                                                   '18048' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 707
+                                                              },
+                                                   '18176' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 701
+                                                              },
+                                                   '17984' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 706
+                                                              },
+                                                   '17920' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 705
+                                                              },
+                                                   '18496' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 700
+                                                              },
+                                                   '18240' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 709
+                                                              },
+                                                   '16832' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 9
+                                                              },
+                                                   '18624' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 703
+                                                              },
+                                                   '18560' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 702
+                                                              },
+                                                   '18688' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 704
+                                                              },
+                                                   '20160' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 41
+                                                              }
+                                                 },
+                                      '24576' => {
+                                                   '27584' => {
+                                                                'service_type' => 24,
+                                                                'visible' => 1,
+                                                                'lcn' => 99
+                                                              },
+                                                   '28320' => {
+                                                                'service_type' => 24,
+                                                                'visible' => 1,
+                                                                'lcn' => 110
+                                                              },
+                                                   '28288' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 48
+                                                              },
+                                                   '27040' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 712
+                                                              },
+                                                   '26560' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 711
+                                                              },
+                                                   '25664' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 18
+                                                              },
+                                                   '25728' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 21
+                                                              },
+                                                   '28160' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 725
+                                                              },
+                                                   '28384' => {
+                                                                'service_type' => 24,
+                                                                'visible' => 1,
+                                                                'lcn' => 112
+                                                              },
+                                                   '28224' => {
+                                                                'service_type' => 24,
+                                                                'visible' => 1,
+                                                                'lcn' => 306
+                                                              },
+                                                   '26304' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 722
+                                                              },
+                                                   '26240' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 714
+                                                              },
+                                                   '27840' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 40
+                                                              },
+                                                   '27904' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 96
+                                                              },
+                                                   '27136' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 15
+                                                              },
+                                                   '28352' => {
+                                                                'service_type' => 24,
+                                                                'visible' => 1,
+                                                                'lcn' => 111
+                                                              },
+                                                   '27712' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 89
+                                                              },
+                                                   '28032' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 24
+                                                              },
+                                                   '28096' => {
+                                                                'service_type' => 24,
+                                                                'visible' => 1,
+                                                                'lcn' => 108
+                                                              },
+                                                   '26368' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 718
+                                                              },
+                                                   '25792' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 12
+                                                              },
+                                                   '26688' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 716
+                                                              },
+                                                   '26176' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 713
+                                                              },
+                                                   '27520' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 94
+                                                              },
+                                                   '27616' => {
+                                                                'service_type' => 24,
+                                                                'visible' => 1,
+                                                                'lcn' => 199
+                                                              },
+                                                   '26624' => {
+                                                                'service_type' => 4,
+                                                                'visible' => 1,
+                                                                'lcn' => 715
+                                                              },
+                                                   '27456' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 85
+                                                              },
+                                                   '25920' => {
+                                                                'service_type' => 2,
+                                                                'visible' => 1,
+                                                                'lcn' => 22
+                                                              }
+                                                 }
+                                    },
+                           'ts' => {
+                                     '12290' => {
+                                                  'tsid' => 12290,
+                                                  'transmission' => 0,
+                                                  'guard_interval' => 0,
+                                                  'code_rate_high' => 0,
+                                                  'tuned' => 1,
+                                                  'net' => 'Oxon & Bucks .',
+                                                  'strength' => 50619,
+                                                  'netid' => 12387,
+                                                  'frequency' => 713833000,
+                                                  'modulation' => 0,
+                                                  'seen' => 1,
+                                                  'bandwidth' => 8,
+                                                  'code_rate_low' => 0,
+                                                  'hierarchy' => 0,
+                                                  'inversion' => 2
+                                                },
+                                     '8199' => {
+                                                 'tsid' => 8199,
+                                                 'transmission' => 0,
+                                                 'guard_interval' => 0,
+                                                 'code_rate_high' => 0,
+                                                 'tuned' => 1,
+                                                 'net' => 'Oxon & Bucks .',
+                                                 'strength' => 49067,
+                                                 'netid' => 12387,
+                                                 'frequency' => 850000000,
+                                                 'modulation' => 0,
+                                                 'seen' => 1,
+                                                 'bandwidth' => 8,
+                                                 'code_rate_low' => 0,
+                                                 'hierarchy' => 0,
+                                                 'inversion' => 2
+                                               },
+                                     '4171' => {
+                                                 'tsid' => 4171,
+                                                 'transmission' => 0,
+                                                 'guard_interval' => 0,
+                                                 'code_rate_high' => 0,
+                                                 'tuned' => 1,
+                                                 'net' => 'Oxon & Bucks .',
+                                                 'strength' => 65535,
+                                                 'netid' => 12387,
+                                                 'frequency' => 730167000,
+                                                 'modulation' => 0,
+                                                 'seen' => 1,
+                                                 'bandwidth' => 8,
+                                                 'code_rate_low' => 0,
+                                                 'hierarchy' => 0,
+                                                 'inversion' => 2
+                                               },
+                                     '20480' => {
+                                                  'tsid' => 20480,
+                                                  'transmission' => 0,
+                                                  'guard_interval' => 0,
+                                                  'code_rate_high' => 0,
+                                                  'net' => '',
+                                                  'tuned' => 1,
+                                                  'strength' => 65535,
+                                                  'netid' => 12387,
+                                                  'frequency' => 578000000,
+                                                  'modulation' => 0,
+                                                  'seen' => 1,
+                                                  'bandwidth' => 8,
+                                                  'code_rate_low' => 0,
+                                                  'hierarchy' => 0,
+                                                  'inversion' => 2
+                                                },
+                                     '16384' => {
+                                                  'tsid' => 16384,
+                                                  'transmission' => 0,
+                                                  'guard_interval' => 0,
+                                                  'code_rate_high' => 0,
+                                                  'tuned' => 1,
+                                                  'net' => 'Oxon & Bucks .',
+                                                  'strength' => 49995,
+                                                  'netid' => 12387,
+                                                  'frequency' => 721833000,
+                                                  'modulation' => 0,
+                                                  'seen' => 1,
+                                                  'bandwidth' => 8,
+                                                  'code_rate_low' => 0,
+                                                  'hierarchy' => 0,
+                                                  'inversion' => 2
+                                                },
+                                     '24576' => {
+                                                  'tsid' => 24576,
+                                                  'transmission' => 0,
+                                                  'guard_interval' => 0,
+                                                  'code_rate_high' => 0,
+                                                  'net' => '',
+                                                  'tuned' => 1,
+                                                  'strength' => 65535,
+                                                  'netid' => 12387,
+                                                  'frequency' => 538000000,
+                                                  'modulation' => 0,
+                                                  'seen' => 1,
+                                                  'bandwidth' => 8,
+                                                  'code_rate_low' => 0,
+                                                  'hierarchy' => 0,
+                                                  'inversion' => 2
+                                                }
+                                   },
+                           'aliases' => {},
+                           'pr' => {
+                                     'Gems TV' => {
+                                                    'video' => 2401,
+                                                    'lcn' => 43,
+                                                    'tsid' => 20480,
+                                                    'pmt' => 725,
+                                                    'name' => 'Gems TV',
+                                                    'ca' => 0,
+                                                    'net' => 'Coloured Rocks',
+                                                    'audio' => 2402,
+                                                    'teletext' => 0,
+                                                    'subtitle' => 0,
+                                                    'pcr' => 2401,
+                                                    'type' => 1,
+                                                    'pnr' => 24448,
+                                                    'audio_details' => 'eng:2402'
+                                                  },
+                                     'BBC Radio 3' => {
+                                                        'video' => 0,
+                                                        'lcn' => 703,
+                                                        'tsid' => 16384,
+                                                        'pmt' => 717,
+                                                        'name' => 'BBC Radio 3',
+                                                        'ca' => 0,
+                                                        'net' => 'BBC',
+                                                        'audio' => 438,
+                                                        'teletext' => 0,
+                                                        'subtitle' => 0,
+                                                        'pcr' => 438,
+                                                        'type' => 2,
+                                                        'pnr' => 18624,
+                                                        'audio_details' => 'eng:438'
+                                                      },
+                                     'BBC TWO' => {
+                                                    'video' => 201,
+                                                    'lcn' => 2,
+                                                    'tsid' => 4171,
+                                                    'pmt' => 200,
+                                                    'name' => 'BBC TWO',
+                                                    'ca' => 0,
+                                                    'net' => 'BBC',
+                                                    'audio' => 202,
+                                                    'teletext' => 0,
+                                                    'subtitle' => 205,
+                                                    'pcr' => 201,
+                                                    'type' => 1,
+                                                    'pnr' => 4287,
+                                                    'audio_details' => 'eng:202 eng:206'
+                                                  },
+                                     'Really' => {
+                                                   'video' => 2111,
+                                                   'lcn' => 20,
+                                                   'tsid' => 20480,
+                                                   'pmt' => 718,
+                                                   'name' => 'Really',
+                                                   'ca' => 0,
+                                                   'net' => 'UKTV',
+                                                   'audio' => 2112,
+                                                   'teletext' => 0,
+                                                   'subtitle' => 2113,
+                                                   'pcr' => 2111,
+                                                   'type' => 1,
+                                                   'pnr' => 23712,
+                                                   'audio_details' => 'eng:2112 eng:2114'
+                                                 },
+                                     '5 USA' => {
+                                                  'video' => 6689,
+                                                  'lcn' => 31,
+                                                  'tsid' => 12290,
+                                                  'pmt' => 276,
+                                                  'name' => '5 USA',
+                                                  'ca' => 0,
+                                                  'net' => 'five',
+                                                  'audio' => 6690,
+                                                  'teletext' => 0,
+                                                  'subtitle' => 6694,
+                                                  'pcr' => 6689,
+                                                  'type' => 1,
+                                                  'pnr' => 12992,
+                                                  'audio_details' => 'eng:6690 eng:6691'
+                                                },
+                                     '4Music' => {
+                                                   'video' => 101,
+                                                   'lcn' => 18,
+                                                   'tsid' => 24576,
+                                                   'pmt' => 1001,
+                                                   'name' => '4Music',
+                                                   'ca' => 0,
+                                                   'net' => '',
+                                                   'audio' => 102,
+                                                   'teletext' => 0,
+                                                   'subtitle' => 103,
+                                                   'pcr' => 101,
+                                                   'type' => 1,
+                                                   'pnr' => 25664,
+                                                   'audio_details' => 'eng:102'
+                                                 },
+                                     'Premier Radio' => {
+                                                          'video' => 0,
+                                                          'lcn' => 725,
+                                                          'tsid' => 24576,
+                                                          'pmt' => 1040,
+                                                          'name' => 'Premier Radio',
+                                                          'ca' => 0,
+                                                          'net' => 'London Christian Radio Ltd',
+                                                          'audio' => 1601,
+                                                          'teletext' => 0,
+                                                          'subtitle' => 0,
+                                                          'pcr' => 1601,
+                                                          'type' => 2,
+                                                          'pnr' => 28160,
+                                                          'audio_details' => 'eng:1601'
+                                                        },
+                                     'More 4' => {
+                                                   'video' => 590,
+                                                   'lcn' => 14,
+                                                   'tsid' => 8199,
+                                                   'pmt' => 270,
+                                                   'name' => 'More 4',
+                                                   'ca' => 0,
+                                                   'net' => 'Channel 4 TV',
+                                                   'audio' => 591,
+                                                   'teletext' => 0,
+                                                   'subtitle' => 593,
+                                                   'pcr' => 590,
+                                                   'type' => 1,
+                                                   'pnr' => 8442,
+                                                   'audio_details' => 'eng:591 eng:592'
+                                                 },
+                                     'BBC R1X' => {
+                                                    'video' => 0,
+                                                    'lcn' => 701,
+                                                    'tsid' => 16384,
+                                                    'pmt' => 708,
+                                                    'name' => 'BBC R1X',
+                                                    'ca' => 0,
+                                                    'net' => 'BBC',
+                                                    'audio' => 434,
+                                                    'teletext' => 0,
+                                                    'subtitle' => 0,
+                                                    'pcr' => 434,
+                                                    'type' => 2,
+                                                    'pnr' => 18176,
+                                                    'audio_details' => 'eng:434'
+                                                  },
+                                     'Film4' => {
+                                                  'video' => 701,
+                                                  'lcn' => 15,
+                                                  'tsid' => 24576,
+                                                  'pmt' => 1008,
+                                                  'name' => 'Film4',
+                                                  'ca' => 0,
+                                                  'net' => 'Channel 4 TV',
+                                                  'audio' => 702,
+                                                  'teletext' => 0,
+                                                  'subtitle' => 703,
+                                                  'pcr' => 701,
+                                                  'type' => 1,
+                                                  'pnr' => 27136,
+                                                  'audio_details' => 'eng:702 eng:704'
+                                                },
+                                     'QUEST' => {
+                                                  'video' => 6929,
+                                                  'lcn' => 38,
+                                                  'tsid' => 12290,
+                                                  'pmt' => 362,
+                                                  'name' => 'QUEST',
+                                                  'ca' => 0,
+                                                  'net' => 'DNE',
+                                                  'audio' => 6930,
+                                                  'teletext' => 0,
+                                                  'subtitle' => 6934,
+                                                  'pcr' => 6929,
+                                                  'type' => 1,
+                                                  'pnr' => 14498,
+                                                  'audio_details' => 'eng:6930'
+                                                },
+                                     'CBBC Channel' => {
+                                                         'video' => 301,
+                                                         'tsid' => 4171,
+                                                         'lcn' => 70,
+                                                         'pmt' => 700,
+                                                         'name' => 'CBBC Channel',
+                                                         'ca' => 0,
+                                                         'net' => 'BBC',
+                                                         'audio' => 302,
+                                                         'teletext' => 0,
+                                                         'subtitle' => 305,
+                                                         'pcr' => 301,
+                                                         'type' => 1,
+                                                         'pnr' => 4608,
+                                                         'audio_details' => 'eng:302 eng:306'
+                                                       },
+                                     'Smash Hits!' => {
+                                                        'video' => 0,
+                                                        'lcn' => 712,
+                                                        'tsid' => 24576,
+                                                        'pmt' => 1030,
+                                                        'name' => 'Smash Hits!',
+                                                        'ca' => 0,
+                                                        'net' => 'Bauer',
+                                                        'audio' => 1501,
+                                                        'teletext' => 0,
+                                                        'subtitle' => 0,
+                                                        'pcr' => 1501,
+                                                        'type' => 2,
+                                                        'pnr' => 27040,
+                                                        'audio_details' => 'eng:1501'
+                                                      },
+                                     'Create & Craft' => {
+                                                           'video' => 2301,
+                                                           'tsid' => 20480,
+                                                           'lcn' => 36,
+                                                           'pmt' => 724,
+                                                           'name' => 'Create & Craft',
+                                                           'ca' => 0,
+                                                           'net' => 'Ideal Shopping Direct Plc',
+                                                           'audio' => 2302,
+                                                           'teletext' => 0,
+                                                           'subtitle' => 0,
+                                                           'pcr' => 2301,
+                                                           'type' => 1,
+                                                           'pnr' => 24384,
+                                                           'audio_details' => 'eng:2302'
+                                                         },
+                                     'CITV' => {
+                                                 'video' => 6833,
+                                                 'tsid' => 12290,
+                                                 'lcn' => 72,
+                                                 'pmt' => 359,
+                                                 'name' => 'CITV',
+                                                 'ca' => 0,
+                                                 'net' => 'ITV',
+                                                 'audio' => 6834,
+                                                 'teletext' => 0,
+                                                 'subtitle' => 6838,
+                                                 'pcr' => 6833,
+                                                 'type' => 1,
+                                                 'pnr' => 16032,
+                                                 'audio_details' => 'eng:6834 eng:6835'
+                                               },
+                                     'Channel 5' => {
+                                                      'video' => 540,
+                                                      'lcn' => 5,
+                                                      'tsid' => 8199,
+                                                      'pmt' => 289,
+                                                      'name' => 'Channel 5',
+                                                      'ca' => 0,
+                                                      'net' => 'five',
+                                                      'audio' => 541,
+                                                      'teletext' => 0,
+                                                      'subtitle' => 543,
+                                                      'pcr' => 540,
+                                                      'type' => 1,
+                                                      'pnr' => 8500,
+                                                      'audio_details' => 'eng:541 eng:542'
+                                                    },
+                                     'BBC R5L' => {
+                                                    'video' => 0,
+                                                    'lcn' => 705,
+                                                    'tsid' => 16384,
+                                                    'pmt' => 704,
+                                                    'name' => 'BBC R5L',
+                                                    'ca' => 0,
+                                                    'net' => 'BBC',
+                                                    'audio' => 430,
+                                                    'teletext' => 0,
+                                                    'subtitle' => 0,
+                                                    'pcr' => 430,
+                                                    'type' => 2,
+                                                    'pnr' => 17920,
+                                                    'audio_details' => 'eng:430'
+                                                  },
+                                     'Challenge' => {
+                                                      'video' => 201,
+                                                      'lcn' => 46,
+                                                      'tsid' => 20480,
+                                                      'pmt' => 727,
+                                                      'name' => 'Challenge',
+                                                      'ca' => 0,
+                                                      'net' => 'BSkyB',
+                                                      'audio' => 202,
+                                                      'teletext' => 0,
+                                                      'subtitle' => 204,
+                                                      'pcr' => 201,
+                                                      'type' => 1,
+                                                      'pnr' => 22226,
+                                                      'audio_details' => 'eng:202 eng:203'
+                                                    },
+                                     'Absolute Radio' => {
+                                                           'video' => 0,
+                                                           'lcn' => 727,
+                                                           'tsid' => 12290,
+                                                           'pmt' => 390,
+                                                           'name' => 'Absolute Radio',
+                                                           'ca' => 0,
+                                                           'net' => 'TIML Radio',
+                                                           'audio' => 6082,
+                                                           'teletext' => 0,
+                                                           'subtitle' => 0,
+                                                           'pcr' => 6082,
+                                                           'type' => 2,
+                                                           'pnr' => 14688,
+                                                           'audio_details' => 'eng:6082'
+                                                         },
+                                     'Magic' => {
+                                                  'video' => 0,
+                                                  'lcn' => 715,
+                                                  'tsid' => 24576,
+                                                  'pmt' => 1028,
+                                                  'name' => 'Magic',
+                                                  'ca' => 0,
+                                                  'net' => '',
+                                                  'audio' => 1801,
+                                                  'teletext' => 0,
+                                                  'subtitle' => 0,
+                                                  'pcr' => 1801,
+                                                  'type' => 2,
+                                                  'pnr' => 26624,
+                                                  'audio_details' => 'eng:1801'
+                                                },
+                                     'Kiss' => {
+                                                 'video' => 0,
+                                                 'lcn' => 713,
+                                                 'tsid' => 24576,
+                                                 'pmt' => 1021,
+                                                 'name' => 'Kiss',
+                                                 'ca' => 0,
+                                                 'net' => '',
+                                                 'audio' => 1101,
+                                                 'teletext' => 0,
+                                                 'subtitle' => 0,
+                                                 'pcr' => 1101,
+                                                 'type' => 2,
+                                                 'pnr' => 26176,
+                                                 'audio_details' => 'eng:1101'
+                                               },
+                                     'The Hits Radio' => {
+                                                           'video' => 0,
+                                                           'lcn' => 711,
+                                                           'tsid' => 24576,
+                                                           'pmt' => 1027,
+                                                           'name' => 'The Hits Radio',
+                                                           'ca' => 0,
+                                                           'net' => '',
+                                                           'audio' => 1701,
+                                                           'teletext' => 0,
+                                                           'subtitle' => 0,
+                                                           'pcr' => 1701,
+                                                           'type' => 2,
+                                                           'pnr' => 26560,
+                                                           'audio_details' => 'eng:1701'
+                                                         },
+                                     'Dave' => {
+                                                 'video' => 401,
+                                                 'lcn' => 19,
+                                                 'tsid' => 20480,
+                                                 'pmt' => 704,
+                                                 'name' => 'Dave',
+                                                 'ca' => 0,
+                                                 'net' => 'UKTV',
+                                                 'audio' => 402,
+                                                 'teletext' => 0,
+                                                 'subtitle' => 403,
+                                                 'pcr' => 401,
+                                                 'type' => 1,
+                                                 'pnr' => 22272,
+                                                 'audio_details' => 'eng:402 eng:404'
+                                               },
+                                     'Yesterday' => {
+                                                      'video' => 301,
+                                                      'lcn' => 12,
+                                                      'tsid' => 24576,
+                                                      'pmt' => 1003,
+                                                      'name' => 'Yesterday',
+                                                      'ca' => 0,
+                                                      'net' => 'UKTV',
+                                                      'audio' => 302,
+                                                      'teletext' => 0,
+                                                      'subtitle' => 303,
+                                                      'pcr' => 301,
+                                                      'type' => 1,
+                                                      'pnr' => 25792,
+                                                      'audio_details' => 'eng:302 eng:304'
+                                                    },
+                                     'Food Network' => {
+                                                         'video' => '2311',
+                                                         'lcn' => '49',
+                                                         'tsid' => 20480,
+                                                         'pmt' => '714',
+                                                         'name' => 'Food Network',
+                                                         'ca' => '0',
+                                                         'net' => 'Food Network',
+                                                         'audio' => '2312',
+                                                         'teletext' => '0',
+                                                         'subtitle' => '0',
+                                                         'pcr' => '2311',
+                                                         'type' => '1',
+                                                         'pnr' => 23040,
+                                                         'audio_details' => 'eng:2312'
+                                                       },
+                                     'BBC Asian Net.' => {
+                                                           'video' => 0,
+                                                           'lcn' => 709,
+                                                           'tsid' => 16384,
+                                                           'pmt' => 709,
+                                                           'name' => 'BBC Asian Net.',
+                                                           'ca' => 0,
+                                                           'net' => 'BBC',
+                                                           'audio' => 435,
+                                                           'teletext' => 0,
+                                                           'subtitle' => 0,
+                                                           'pcr' => 435,
+                                                           'type' => 2,
+                                                           'pnr' => 18240,
+                                                           'audio_details' => 'eng:435'
+                                                         },
+                                     'Q' => {
+                                              'video' => 0,
+                                              'lcn' => 716,
+                                              'tsid' => 24576,
+                                              'pmt' => 1029,
+                                              'name' => 'Q',
+                                              'ca' => 0,
+                                              'net' => '',
+                                              'audio' => 1901,
+                                              'teletext' => 0,
+                                              'subtitle' => 0,
+                                              'pcr' => 1901,
+                                              'type' => 2,
+                                              'pnr' => 26688,
+                                              'audio_details' => 'eng:1901'
+                                            },
+                                     'BBC Radio 4' => {
+                                                        'video' => 0,
+                                                        'lcn' => 704,
+                                                        'tsid' => 16384,
+                                                        'pmt' => 718,
+                                                        'name' => 'BBC Radio 4',
+                                                        'ca' => 0,
+                                                        'net' => 'BBC',
+                                                        'audio' => 439,
+                                                        'teletext' => 0,
+                                                        'subtitle' => 0,
+                                                        'pcr' => 439,
+                                                        'type' => 2,
+                                                        'pnr' => 18688,
+                                                        'audio_details' => 'eng:439'
+                                                      },
+                                     'talkSPORT' => {
+                                                      'video' => 0,
+                                                      'lcn' => 723,
+                                                      'tsid' => 20480,
+                                                      'pmt' => 706,
+                                                      'name' => 'talkSPORT',
+                                                      'ca' => 0,
+                                                      'net' => 'talkSPORT',
+                                                      'audio' => 1101,
+                                                      'teletext' => 0,
+                                                      'subtitle' => 0,
+                                                      'pcr' => 1101,
+                                                      'type' => 2,
+                                                      'pnr' => 22592,
+                                                      'audio_details' => 'eng:1101'
+                                                    },
+                                     'Sky News' => {
+                                                     'video' => 101,
+                                                     'lcn' => 82,
+                                                     'tsid' => 20480,
+                                                     'pmt' => 701,
+                                                     'name' => 'Sky News',
+                                                     'ca' => 0,
+                                                     'net' => 'Sky',
+                                                     'audio' => 102,
+                                                     'teletext' => 0,
+                                                     'subtitle' => 103,
+                                                     'pcr' => 101,
+                                                     'type' => 1,
+                                                     'pnr' => 22080,
+                                                     'audio_details' => 'eng:102 eng:104'
+                                                   },
+                                     'BBC 6 Music' => {
+                                                        'video' => 0,
+                                                        'lcn' => 707,
+                                                        'tsid' => 16384,
+                                                        'pmt' => 706,
+                                                        'name' => 'BBC 6 Music',
+                                                        'ca' => 0,
+                                                        'net' => 'BBC',
+                                                        'audio' => 432,
+                                                        'teletext' => 0,
+                                                        'subtitle' => 0,
+                                                        'pcr' => 432,
+                                                        'type' => 2,
+                                                        'pnr' => 18048,
+                                                        'audio_details' => 'eng:432'
+                                                      },
+                                     'Al Jazeera Eng' => {
+                                                           'video' => '2371',
+                                                           'lcn' => '89',
+                                                           'tsid' => 24576,
+                                                           'pmt' => '1033',
+                                                           'name' => 'Al Jazeera Eng',
+                                                           'ca' => '0',
+                                                           'net' => 'Al Jazeera International Ltd',
+                                                           'audio' => '2372',
+                                                           'teletext' => '0',
+                                                           'subtitle' => '0',
+                                                           'pcr' => '2371',
+                                                           'type' => '1',
+                                                           'pnr' => 27712,
+                                                           'audio_details' => 'eng:2372'
+                                                         },
+                                     'ITV2 +1' => {
+                                                    'video' => 6529,
+                                                    'lcn' => 27,
+                                                    'tsid' => 12290,
+                                                    'pmt' => 388,
+                                                    'name' => 'ITV2 +1',
+                                                    'ca' => 0,
+                                                    'net' => 'ITV',
+                                                    'audio' => 6530,
+                                                    'teletext' => 0,
+                                                    'subtitle' => 6534,
+                                                    'pcr' => 6529,
+                                                    'type' => 1,
+                                                    'pnr' => 15952,
+                                                    'audio_details' => 'eng:6530 eng:6531'
+                                                  },
+                                     'E4+1' => {
+                                                 'video' => 501,
+                                                 'lcn' => 29,
+                                                 'tsid' => 20480,
+                                                 'pmt' => 705,
+                                                 'name' => 'E4+1',
+                                                 'ca' => 0,
+                                                 'net' => 'Channel 4 TV',
+                                                 'audio' => 502,
+                                                 'teletext' => 0,
+                                                 'subtitle' => 503,
+                                                 'pcr' => 501,
+                                                 'type' => 1,
+                                                 'pnr' => 22336,
+                                                 'audio_details' => 'eng:502 eng:504'
+                                               },
+                                     'Russia Today' => {
+                                                         'video' => 2101,
+                                                         'lcn' => 85,
+                                                         'tsid' => 24576,
+                                                         'pmt' => 1016,
+                                                         'name' => 'Russia Today',
+                                                         'ca' => 0,
+                                                         'net' => 'Information TV',
+                                                         'audio' => 2102,
+                                                         'teletext' => 0,
+                                                         'subtitle' => 2103,
+                                                         'pcr' => 2101,
+                                                         'type' => 1,
+                                                         'pnr' => 27456,
+                                                         'audio_details' => 'eng:2102 eng:2104'
+                                                       },
+                                     'ITV2' => {
+                                                 'video' => 530,
+                                                 'lcn' => 6,
+                                                 'tsid' => 8199,
+                                                 'pmt' => 258,
+                                                 'name' => 'ITV2',
+                                                 'ca' => 0,
+                                                 'net' => 'ITV',
+                                                 'audio' => 531,
+                                                 'teletext' => 0,
+                                                 'subtitle' => 533,
+                                                 'pcr' => 530,
+                                                 'type' => 1,
+                                                 'pnr' => 8325,
+                                                 'audio_details' => 'eng:531 eng:532'
+                                               },
+                                     'price-drop tv' => {
+                                                          'video' => 611,
+                                                          'lcn' => 37,
+                                                          'tsid' => 20480,
+                                                          'pmt' => 707,
+                                                          'name' => 'price-drop tv',
+                                                          'ca' => 0,
+                                                          'net' => 'sit-up limited',
+                                                          'audio' => 612,
+                                                          'teletext' => 0,
+                                                          'subtitle' => 0,
+                                                          'pcr' => 611,
+                                                          'type' => 1,
+                                                          'pnr' => 22464,
+                                                          'audio_details' => 'eng:612'
+                                                        },
+                                     'Channel 4+1' => {
+                                                        'video' => 580,
+                                                        'lcn' => 13,
+                                                        'tsid' => 8199,
+                                                        'pmt' => 268,
+                                                        'name' => 'Channel 4+1',
+                                                        'ca' => 0,
+                                                        'net' => 'Channel 4 TV',
+                                                        'audio' => 581,
+                                                        'teletext' => 0,
+                                                        'subtitle' => 583,
+                                                        'pcr' => 580,
+                                                        'type' => 1,
+                                                        'pnr' => 8452,
+                                                        'audio_details' => 'eng:581 eng:582'
+                                                      },
+                                     'BBC ONE' => {
+                                                    'video' => 101,
+                                                    'lcn' => 1,
+                                                    'tsid' => 4171,
+                                                    'pmt' => 100,
+                                                    'name' => 'BBC ONE',
+                                                    'ca' => 0,
+                                                    'net' => 'BBC',
+                                                    'audio' => 102,
+                                                    'teletext' => 0,
+                                                    'subtitle' => 105,
+                                                    'pcr' => 101,
+                                                    'type' => 1,
+                                                    'pnr' => 4171,
+                                                    'audio_details' => 'eng:102 eng:106'
+                                                  },
+                                     'BBC Radio 4 Ex' => {
+                                                           'video' => 0,
+                                                           'lcn' => 708,
+                                                           'tsid' => 16384,
+                                                           'pmt' => 707,
+                                                           'name' => 'BBC Radio 4 Ex',
+                                                           'ca' => 0,
+                                                           'net' => 'BBC',
+                                                           'audio' => 433,
+                                                           'teletext' => 0,
+                                                           'subtitle' => 0,
+                                                           'pcr' => 433,
+                                                           'type' => 2,
+                                                           'pnr' => 18112,
+                                                           'audio_details' => 'eng:433'
+                                                         },
+                                     'Home' => {
+                                                 'video' => 6417,
+                                                 'tsid' => 12290,
+                                                 'lcn' => 26,
+                                                 'pmt' => 292,
+                                                 'name' => 'Home',
+                                                 'ca' => 0,
+                                                 'net' => 'five',
+                                                 'audio' => 6418,
+                                                 'teletext' => 0,
+                                                 'subtitle' => 6422,
+                                                 'pcr' => 6417,
+                                                 'type' => 1,
+                                                 'pnr' => 14976,
+                                                 'audio_details' => 'eng:6418'
+                                               },
+                                     'Sky Sports 1' => {
+                                                         'video' => 202,
+                                                         'lcn' => 41,
+                                                         'tsid' => 16384,
+                                                         'pmt' => 701,
+                                                         'name' => 'Sky Sports 1',
+                                                         'ca' => 1,
+                                                         'net' => 'BT plc',
+                                                         'audio' => 403,
+                                                         'teletext' => 0,
+                                                         'subtitle' => 602,
+                                                         'pcr' => 202,
+                                                         'type' => 1,
+                                                         'pnr' => 20160,
+                                                         'audio_details' => 'eng:403 eng:404'
+                                                       },
+                                     'bid tv' => {
+                                                   'video' => 6273,
+                                                   'lcn' => 23,
+                                                   'tsid' => 12290,
+                                                   'pmt' => 269,
+                                                   'name' => 'bid tv',
+                                                   'ca' => 0,
+                                                   'net' => 'Sit-Up Ltd',
+                                                   'audio' => 6274,
+                                                   'teletext' => 0,
+                                                   'subtitle' => 0,
+                                                   'pcr' => 6273,
+                                                   'type' => 1,
+                                                   'pnr' => 14272,
+                                                   'audio_details' => 'eng:6274'
+                                                 },
+                                     'ITV4' => {
+                                                 'video' => 601,
+                                                 'lcn' => 24,
+                                                 'tsid' => 24576,
+                                                 'pmt' => 1037,
+                                                 'name' => 'ITV4',
+                                                 'ca' => 0,
+                                                 'net' => 'ITV',
+                                                 'audio' => 602,
+                                                 'teletext' => 0,
+                                                 'subtitle' => 603,
+                                                 'pcr' => 601,
+                                                 'type' => 1,
+                                                 'pnr' => 28032,
+                                                 'audio_details' => 'eng:602 eng:604'
+                                               },
+                                     'ITV1' => {
+                                                 'video' => 520,
+                                                 'lcn' => 3,
+                                                 'tsid' => 8199,
+                                                 'pmt' => 256,
+                                                 'name' => 'ITV1',
+                                                 'ca' => 0,
+                                                 'net' => 'ITV',
+                                                 'audio' => 521,
+                                                 'teletext' => 0,
+                                                 'subtitle' => 523,
+                                                 'pcr' => 520,
+                                                 'type' => 1,
+                                                 'pnr' => 8263,
+                                                 'audio_details' => 'eng:521 eng:522'
+                                               },
+                                     'QVC Beauty' => {
+                                                       'video' => 2391,
+                                                       'tsid' => 24576,
+                                                       'lcn' => 48,
+                                                       'pmt' => 1042,
+                                                       'name' => 'QVC Beauty',
+                                                       'ca' => 0,
+                                                       'net' => 'QVC',
+                                                       'audio' => 2392,
+                                                       'teletext' => 0,
+                                                       'subtitle' => 0,
+                                                       'pcr' => 2391,
+                                                       'type' => 1,
+                                                       'pnr' => 28288,
+                                                       'audio_details' => 'eng:2392'
+                                                     },
+                                     'E4' => {
+                                               'video' => 570,
+                                               'lcn' => 28,
+                                               'tsid' => 8199,
+                                               'pmt' => 267,
+                                               'name' => 'E4',
+                                               'ca' => 0,
+                                               'net' => 'Channel 4 TV',
+                                               'audio' => 571,
+                                               'teletext' => 0,
+                                               'subtitle' => 573,
+                                               'pcr' => 570,
+                                               'type' => 1,
+                                               'pnr' => 8448,
+                                               'audio_details' => 'eng:571 eng:572'
+                                             },
+                                     'BBC R5SX' => {
+                                                     'video' => 0,
+                                                     'lcn' => 706,
+                                                     'tsid' => 16384,
+                                                     'pmt' => 705,
+                                                     'name' => 'BBC R5SX',
+                                                     'ca' => 0,
+                                                     'net' => 'BBC',
+                                                     'audio' => 431,
+                                                     'teletext' => 0,
+                                                     'subtitle' => 0,
+                                                     'pcr' => 431,
+                                                     'type' => 2,
+                                                     'pnr' => 17984,
+                                                     'audio_details' => 'eng:431'
+                                                   },
+                                     'ITV3' => {
+                                                 'video' => 6881,
+                                                 'lcn' => 10,
+                                                 'tsid' => 12290,
+                                                 'pmt' => 378,
+                                                 'name' => 'ITV3',
+                                                 'ca' => 0,
+                                                 'net' => 'ITV',
+                                                 'audio' => 6882,
+                                                 'teletext' => 0,
+                                                 'subtitle' => 6886,
+                                                 'pcr' => 6881,
+                                                 'type' => 1,
+                                                 'pnr' => 16048,
+                                                 'audio_details' => 'eng:6882 eng:6883'
+                                               },
+                                     'G.O.L.D.' => {
+                                                     'video' => '6497',
+                                                     'lcn' => '17',
+                                                     'tsid' => 12290,
+                                                     'pmt' => '300',
+                                                     'name' => 'G.O.L.D.',
+                                                     'ca' => '0',
+                                                     'net' => 'five',
+                                                     'audio' => '6498',
+                                                     'teletext' => '0',
+                                                     'subtitle' => '6502',
+                                                     'pcr' => '6497',
+                                                     'type' => '1',
+                                                     'pnr' => 15552,
+                                                     'audio_details' => 'eng:6498'
+                                                   },
+                                     'ITV1 +1' => {
+                                                    'video' => 600,
+                                                    'lcn' => 33,
+                                                    'tsid' => 8199,
+                                                    'pmt' => 290,
+                                                    'name' => 'ITV1 +1',
+                                                    'ca' => 0,
+                                                    'net' => 'ITV',
+                                                    'audio' => 601,
+                                                    'teletext' => 0,
+                                                    'subtitle' => 603,
+                                                    'pcr' => 600,
+                                                    'type' => 1,
+                                                    'pnr' => 8362,
+                                                    'audio_details' => 'eng:601 eng:602'
+                                                  },
+                                     'Heart' => {
+                                                  'video' => 0,
+                                                  'lcn' => 728,
+                                                  'tsid' => 12290,
+                                                  'pmt' => 391,
+                                                  'name' => 'Heart',
+                                                  'ca' => 0,
+                                                  'net' => 'Global Radio',
+                                                  'audio' => 6098,
+                                                  'teletext' => 0,
+                                                  'subtitle' => 0,
+                                                  'pcr' => 6098,
+                                                  'type' => 2,
+                                                  'pnr' => 14720,
+                                                  'audio_details' => 'eng:6098'
+                                                },
+                                     'BBC Radio 1' => {
+                                                        'video' => 0,
+                                                        'lcn' => 700,
+                                                        'tsid' => 16384,
+                                                        'pmt' => 715,
+                                                        'name' => 'BBC Radio 1',
+                                                        'ca' => 0,
+                                                        'net' => 'BBC',
+                                                        'audio' => 436,
+                                                        'teletext' => 0,
+                                                        'subtitle' => 0,
+                                                        'pcr' => 436,
+                                                        'type' => 2,
+                                                        'pnr' => 18496,
+                                                        'audio_details' => 'eng:436'
+                                                      },
+                                     'Pick TV+1' => {
+                                                      'video' => '201',
+                                                      'lcn' => '44',
+                                                      'tsid' => 20480,
+                                                      'pmt' => '719',
+                                                      'name' => 'Pick TV+1',
+                                                      'ca' => '0',
+                                                      'net' => 'BSkyB',
+                                                      'audio' => '202',
+                                                      'teletext' => '0',
+                                                      'subtitle' => '204',
+                                                      'pcr' => '201',
+                                                      'type' => '1',
+                                                      'pnr' => 22244,
+                                                      'audio_details' => 'eng:202 eng:203'
+                                                    },
+                                     'SMOOTH RADIO' => {
+                                                         'video' => 0,
+                                                         'lcn' => 718,
+                                                         'tsid' => 24576,
+                                                         'pmt' => 1024,
+                                                         'name' => 'SMOOTH RADIO',
+                                                         'ca' => 0,
+                                                         'net' => 'GMG',
+                                                         'audio' => 1401,
+                                                         'teletext' => 0,
+                                                         'subtitle' => 0,
+                                                         'pcr' => 1401,
+                                                         'type' => 2,
+                                                         'pnr' => 26368,
+                                                         'audio_details' => 'eng:1401'
+                                                       },
+                                     'BBC World Sv.' => {
+                                                          'video' => 0,
+                                                          'lcn' => 710,
+                                                          'tsid' => 16384,
+                                                          'pmt' => 719,
+                                                          'name' => 'BBC World Sv.',
+                                                          'ca' => 0,
+                                                          'net' => 'BBC',
+                                                          'audio' => 440,
+                                                          'teletext' => 0,
+                                                          'subtitle' => 0,
+                                                          'pcr' => 440,
+                                                          'type' => 2,
+                                                          'pnr' => 18304,
+                                                          'audio_details' => 'eng:440'
+                                                        },
+                                     'CBeebies' => {
+                                                     'video' => 201,
+                                                     'tsid' => 16384,
+                                                     'lcn' => 71,
+                                                     'pmt' => 703,
+                                                     'name' => 'CBeebies',
+                                                     'ca' => 0,
+                                                     'net' => 'BBC',
+                                                     'audio' => 401,
+                                                     'teletext' => 0,
+                                                     'subtitle' => 601,
+                                                     'pcr' => 201,
+                                                     'type' => 1,
+                                                     'pnr' => 16960,
+                                                     'audio_details' => 'eng:401 eng:402'
+                                                   },
+                                     'Pick TV' => {
+                                                    'video' => 301,
+                                                    'lcn' => 11,
+                                                    'tsid' => 20480,
+                                                    'pmt' => 703,
+                                                    'name' => 'Pick TV',
+                                                    'ca' => 0,
+                                                    'net' => 'Sky',
+                                                    'audio' => 302,
+                                                    'teletext' => 0,
+                                                    'subtitle' => 303,
+                                                    'pcr' => 301,
+                                                    'type' => 1,
+                                                    'pnr' => 22208,
+                                                    'audio_details' => 'eng:302 eng:304'
+                                                  },
+                                     'VIVA' => {
+                                                 'video' => 201,
+                                                 'lcn' => 21,
+                                                 'tsid' => 24576,
+                                                 'pmt' => 1002,
+                                                 'name' => 'VIVA',
+                                                 'ca' => 0,
+                                                 'net' => 'MTV Europe',
+                                                 'audio' => 202,
+                                                 'teletext' => 0,
+                                                 'subtitle' => 203,
+                                                 'pcr' => 201,
+                                                 'type' => 1,
+                                                 'pnr' => 25728,
+                                                 'audio_details' => 'eng:202'
+                                               },
+                                     'BBC THREE' => {
+                                                      'video' => '301',
+                                                      'lcn' => '7',
+                                                      'tsid' => 4171,
+                                                      'pmt' => '300',
+                                                      'name' => 'BBC THREE',
+                                                      'ca' => '0',
+                                                      'net' => 'BBC',
+                                                      'audio' => '302',
+                                                      'teletext' => '0',
+                                                      'subtitle' => '305',
+                                                      'pcr' => '301',
+                                                      'type' => '1',
+                                                      'pnr' => 4288,
+                                                      'audio_details' => 'eng:302 eng:306'
+                                                    },
+                                     'QVC' => {
+                                                'video' => 6049,
+                                                'lcn' => 16,
+                                                'tsid' => 12290,
+                                                'pmt' => 267,
+                                                'name' => 'QVC',
+                                                'ca' => 0,
+                                                'net' => 'QVC',
+                                                'audio' => 6050,
+                                                'teletext' => 0,
+                                                'subtitle' => 0,
+                                                'pcr' => 6049,
+                                                'type' => 1,
+                                                'pnr' => 13120,
+                                                'audio_details' => 'eng:6050'
+                                              },
+                                     'BBC NEWS' => {
+                                                     'video' => 501,
+                                                     'lcn' => 80,
+                                                     'tsid' => 4171,
+                                                     'pmt' => 500,
+                                                     'name' => 'BBC NEWS',
+                                                     'ca' => 0,
+                                                     'net' => 'BBC',
+                                                     'audio' => 502,
+                                                     'teletext' => 0,
+                                                     'subtitle' => 505,
+                                                     'pcr' => 501,
+                                                     'type' => 1,
+                                                     'pnr' => 4352,
+                                                     'audio_details' => 'eng:502'
+                                                   },
+                                     'Kerrang!' => {
+                                                     'video' => 0,
+                                                     'lcn' => 722,
+                                                     'tsid' => 24576,
+                                                     'pmt' => 1023,
+                                                     'name' => 'Kerrang!',
+                                                     'ca' => 0,
+                                                     'net' => '',
+                                                     'audio' => 1301,
+                                                     'teletext' => 0,
+                                                     'subtitle' => 0,
+                                                     'pcr' => 1301,
+                                                     'type' => 2,
+                                                     'pnr' => 26304,
+                                                     'audio_details' => 'eng:1301'
+                                                   },
+                                     '301' => {
+                                                'video' => 901,
+                                                'lcn' => 301,
+                                                'tsid' => 4171,
+                                                'pmt' => 900,
+                                                'name' => '301',
+                                                'ca' => 0,
+                                                'net' => 'BBC',
+                                                'audio' => 951,
+                                                'teletext' => 0,
+                                                'subtitle' => 0,
+                                                'pcr' => 901,
+                                                'type' => 1,
+                                                'pnr' => 7168,
+                                                'audio_details' => 'eng:951 und:952'
+                                              },
+                                     'ESPN' => {
+                                                 'video' => '6801',
+                                                 'lcn' => '34',
+                                                 'tsid' => 12290,
+                                                 'pmt' => '357',
+                                                 'name' => 'ESPN',
+                                                 'ca' => '0',
+                                                 'net' => 'ESPN',
+                                                 'audio' => '6802',
+                                                 'teletext' => '0',
+                                                 'subtitle' => '0',
+                                                 'pcr' => '6801',
+                                                 'type' => '1',
+                                                 'pnr' => 16096,
+                                                 'audio_details' => 'eng:6802'
+                                               },
+                                     '5*' => {
+                                               'video' => 6673,
+                                               'lcn' => 30,
+                                               'tsid' => 12290,
+                                               'pmt' => 275,
+                                               'name' => '5*',
+                                               'ca' => 0,
+                                               'net' => 'five',
+                                               'audio' => 6674,
+                                               'teletext' => 0,
+                                               'subtitle' => 6678,
+                                               'pcr' => 6673,
+                                               'type' => 1,
+                                               'pnr' => 12928,
+                                               'audio_details' => 'eng:6674 eng:6675'
+                                             },
+                                     'BBC Radio 2' => {
+                                                        'video' => 0,
+                                                        'lcn' => 702,
+                                                        'tsid' => 16384,
+                                                        'pmt' => 716,
+                                                        'name' => 'BBC Radio 2',
+                                                        'ca' => 0,
+                                                        'net' => 'BBC',
+                                                        'audio' => 437,
+                                                        'teletext' => 0,
+                                                        'subtitle' => 0,
+                                                        'pcr' => 437,
+                                                        'type' => 2,
+                                                        'pnr' => 18560,
+                                                        'audio_details' => 'eng:437'
+                                                      },
+                                     'BBC FOUR' => {
+                                                     'video' => '401',
+                                                     'lcn' => '9',
+                                                     'tsid' => 4171,
+                                                     'pmt' => '400',
+                                                     'name' => 'BBC FOUR',
+                                                     'ca' => '0',
+                                                     'net' => 'BBC',
+                                                     'audio' => '402',
+                                                     'teletext' => '0',
+                                                     'subtitle' => '405',
+                                                     'pcr' => '401',
+                                                     'type' => '1',
+                                                     'pnr' => 4544,
+                                                     'audio_details' => 'eng:402 eng:406'
+                                                   },
+                                     'Ideal World' => {
+                                                        'video' => 501,
+                                                        'lcn' => 22,
+                                                        'tsid' => 24576,
+                                                        'pmt' => 1005,
+                                                        'name' => 'Ideal World',
+                                                        'ca' => 0,
+                                                        'net' => '',
+                                                        'audio' => 502,
+                                                        'teletext' => 0,
+                                                        'subtitle' => 0,
+                                                        'pcr' => 501,
+                                                        'type' => 1,
+                                                        'pnr' => 25920,
+                                                        'audio_details' => 'eng:502'
+                                                      },
+                                     'Channel 4' => {
+                                                      'video' => 560,
+                                                      'lcn' => 4,
+                                                      'tsid' => 8199,
+                                                      'pmt' => 264,
+                                                      'name' => 'Channel 4',
+                                                      'ca' => 0,
+                                                      'net' => 'Channel 4 TV',
+                                                      'audio' => 561,
+                                                      'teletext' => 0,
+                                                      'subtitle' => 563,
+                                                      'pcr' => 560,
+                                                      'type' => 1,
+                                                      'pnr' => 8384,
+                                                      'audio_details' => 'eng:561 eng:562'
+                                                    },
+                                     'heat' => {
+                                                 'video' => 0,
+                                                 'lcn' => 714,
+                                                 'tsid' => 24576,
+                                                 'pmt' => 1022,
+                                                 'name' => 'heat',
+                                                 'ca' => 0,
+                                                 'net' => '',
+                                                 'audio' => 1201,
+                                                 'teletext' => 0,
+                                                 'subtitle' => 0,
+                                                 'pcr' => 1201,
+                                                 'type' => 2,
+                                                 'pnr' => 26240,
+                                                 'audio_details' => 'eng:1201'
+                                               },
+                                     'Sky Sports 2' => {
+                                                         'video' => 204,
+                                                         'lcn' => 42,
+                                                         'tsid' => 16384,
+                                                         'pmt' => 711,
+                                                         'name' => 'Sky Sports 2',
+                                                         'ca' => 1,
+                                                         'net' => 'BT plc',
+                                                         'audio' => 411,
+                                                         'teletext' => 0,
+                                                         'subtitle' => 603,
+                                                         'pcr' => 204,
+                                                         'type' => 1,
+                                                         'pnr' => 20224,
+                                                         'audio_details' => 'eng:411 eng:412'
+                                                       },
+                                     'Capital FM' => {
+                                                       'video' => 0,
+                                                       'lcn' => 724,
+                                                       'tsid' => 12290,
+                                                       'pmt' => 392,
+                                                       'name' => 'Capital FM',
+                                                       'ca' => 0,
+                                                       'net' => 'Global Radio',
+                                                       'audio' => 6114,
+                                                       'teletext' => 0,
+                                                       'subtitle' => 0,
+                                                       'pcr' => 6114,
+                                                       'type' => 2,
+                                                       'pnr' => 14752,
+                                                       'audio_details' => 'eng:6114'
+                                                     },
+                                     'BBC Parliament' => {
+                                                           'video' => 205,
+                                                           'lcn' => 81,
+                                                           'tsid' => 16384,
+                                                           'pmt' => 714,
+                                                           'name' => 'BBC Parliament',
+                                                           'ca' => 0,
+                                                           'net' => 'BBC',
+                                                           'audio' => 421,
+                                                           'teletext' => 0,
+                                                           'subtitle' => 605,
+                                                           'pcr' => 205,
+                                                           'type' => 1,
+                                                           'pnr' => 17024,
+                                                           'audio_details' => 'eng:421'
+                                                         }
+                                   },
+                           'freqs' => {
+                                        '730167000' => {
+                                                         'code_rate_high' => 0,
+                                                         'transmission' => 0,
+                                                         'guard_interval' => 0,
+                                                         'tuned' => 1,
+                                                         'strength' => 65535,
+                                                         'modulation' => 0,
+                                                         'seen' => 1,
+                                                         'bandwidth' => 8,
+                                                         'code_rate_low' => 0,
+                                                         'inversion' => 2,
+                                                         'hierarchy' => 0
+                                                       },
+                                        '538000000' => {
+                                                         'code_rate_high' => 0,
+                                                         'transmission' => 0,
+                                                         'guard_interval' => 0,
+                                                         'tuned' => 1,
+                                                         'strength' => 65535,
+                                                         'modulation' => 0,
+                                                         'seen' => 1,
+                                                         'bandwidth' => 8,
+                                                         'code_rate_low' => 0,
+                                                         'inversion' => 2,
+                                                         'hierarchy' => 0
+                                                       },
+                                        '721833000' => {
+                                                         'code_rate_high' => 0,
+                                                         'transmission' => 0,
+                                                         'guard_interval' => 0,
+                                                         'tuned' => 1,
+                                                         'strength' => 49995,
+                                                         'modulation' => 0,
+                                                         'seen' => 1,
+                                                         'bandwidth' => 8,
+                                                         'code_rate_low' => 0,
+                                                         'inversion' => 2,
+                                                         'hierarchy' => 0
+                                                       },
+                                        '850000000' => {
+                                                         'code_rate_high' => 0,
+                                                         'transmission' => 0,
+                                                         'guard_interval' => 0,
+                                                         'tuned' => 1,
+                                                         'strength' => 49067,
+                                                         'modulation' => 0,
+                                                         'seen' => 1,
+                                                         'bandwidth' => 8,
+                                                         'code_rate_low' => 0,
+                                                         'inversion' => 2,
+                                                         'hierarchy' => 0
+                                                       },
+                                        '578000000' => {
+                                                         'code_rate_high' => 0,
+                                                         'transmission' => 0,
+                                                         'guard_interval' => 0,
+                                                         'tuned' => 1,
+                                                         'strength' => 65535,
+                                                         'modulation' => 0,
+                                                         'seen' => 1,
+                                                         'bandwidth' => 8,
+                                                         'code_rate_low' => 0,
+                                                         'inversion' => 2,
+                                                         'hierarchy' => 0
+                                                       },
+                                        '713833000' => {
+                                                         'code_rate_high' => 0,
+                                                         'transmission' => 0,
+                                                         'guard_interval' => 0,
+                                                         'tuned' => 1,
+                                                         'strength' => 50619,
+                                                         'modulation' => 0,
+                                                         'seen' => 1,
+                                                         'bandwidth' => 8,
+                                                         'code_rate_low' => 0,
+                                                         'inversion' => 2,
+                                                         'hierarchy' => 0
+                                                       }
+                                      }
+                         },
+          'tuning_list' => [],
+          'estimated_percent' => 100,
+          'total_freqs' => 6
+        };

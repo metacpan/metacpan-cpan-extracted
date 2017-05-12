@@ -1,0 +1,22 @@
+.cvsignore
+.project
+Build.PL
+Changes
+examples/xgettext-xsl.pl
+lib/Locale/Maketext/Extract/Plugin/XSL.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01-Locale-Maketext-Extract-Plugin-XSL.t
+t/distribution.t
+t/i18ntest.xsl
+t/perlcritic.t
+t/perlcriticrc
+t/perltidy.conf
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+t/signature.t
+SIGNATURE    Added here by Module::Build

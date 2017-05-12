@@ -1,0 +1,121 @@
+=pod
+
+=head1 NAME
+
+Linux::Sysfs::Attribute - sysfs attributes
+
+=head1 SYNOPSIS
+
+    my $attr = Linux::Sysfs::Attributes->open($path);
+
+    if ($attr->can_read) {
+        $attr->read;
+        printf "%s: %s\n", $attr->name, $attr->value;
+    }
+
+    if ($attr->can_write) {
+        printf "Writing %s to %s at %s\n",
+               $new_value, $attr->name, $attr->path;
+        $attr->write($new_value);
+    }
+
+    $attr->close;
+
+=head1 DESCRIPTION
+
+A file in sysfs represents a device or driver attribute Attributes can be read
+only, write only, or read and write. File data can be ASCII and binary.
+
+=head1 METHODS
+
+=over
+
+=item B<open>
+
+    my $attr = Linux::Sysfs::Attribute->open($path);
+
+Opens up a file in sysfs and creates a Linux::Sysfs::Attribute instance. File
+isn't read with this function. C<$path> is the File/Attribute's path. Returns a
+Linux::Sysfs::Attribute object on success or undef on failure.
+
+=item B<close>
+
+    $attr->close;
+
+Cleans up and closes sysfs_attribute structure.
+
+=item B<read>
+
+    $attr->read or die 'read failed';
+
+Reads the supplied attribute. Since the maximum transfer from a sysfs attribute
+is a pagesize, function reads in up to a page from the file and stores it in
+Linux::Sysfs::Attribute object to be retrieved with C<$attr-E<gt>value>.
+Returns something true on success or something false on failure.
+
+=item B<write>
+
+    $attr->write($value) or die 'write failed';
+
+Writes to the supplied attribute. Function validates if the given attribute is
+writable, and writes the new value to the attribute. The user needs to supply
+the C<$value> to be written. Returns something true on success or something
+false on failure.
+
+=item B<value>
+
+    my $value = $attr->value;
+
+Returns the value of the attribute. You need to call B<read()> or B<write()>
+first to use this method.
+
+=item B<can_read>
+
+	my $can_read = $attr->can_read;
+
+Returns something true if the attribute is readable, false otherwise.
+
+=item B<can_write>
+
+	my $can_write = $attr->can_write;
+
+Returns something true if the attribute is writable, false otherwise.
+
+=item B<name>
+
+	my $name = $attr->name;
+
+Returns the attributes name.
+
+=item B<path>
+
+    my $path = $attr->path;
+
+The path returned by this method represents the file/attribute's full path.
+
+=back
+
+=head1 AUTHOR
+
+Florian Ragwitz E<lt>rafl@debian.orgE<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Florian Ragwitz, all rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Library General Public License as published
+by the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307
+USA.
+
+=cut

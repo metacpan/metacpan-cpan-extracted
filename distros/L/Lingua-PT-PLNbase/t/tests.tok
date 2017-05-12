@@ -1,0 +1,161 @@
+#1 = tokenização simples
+
+era uma vez
+
+era
+uma
+vez
+
+#2 = hifen no meio de uma palavra
+
+foi numa sexta-feira santa
+
+foi
+numa
+sexta-feira
+santa
+
+#3 = hifen mesmo :)
+
+parece-me chato - na verdade
+
+parece-me
+chato
+-
+na
+verdade
+
+#4 = mais que um ponto
+
+de certeza??
+
+de
+certeza
+??
+
+#5 = horas
+
+o comboio parte às 2:30 da tarde
+
+o
+comboio
+parte
+às
+2:30
+da
+tarde
+
+#6 = pontuação
+
+uma; duas; três: três casas no Gerês
+
+uma
+;
+duas
+;
+três
+:
+três
+casas
+no
+Gerês
+
+#12 = duas frases simples
+
+O João comeu a maçã da Maria. A Maria ficou zangada.
+
+O
+João
+comeu
+a
+maçã
+da
+Maria
+.
+A
+Maria
+ficou
+zangada
+.
+
+#15 = Extracto do Público
+
+Um comando de 17 pessoas equipadas com cintos de explosivos tomou hoje de assalto uma escola em Beslan (Ossétia do norte) onde se encontram cerca de 200 crianças e 40 adultos, no dia em que recomeçam as aulas naquela região russa.
+
+Um
+comando
+de
+17
+pessoas
+equipadas
+com
+cintos
+de
+explosivos
+tomou
+hoje
+de
+assalto
+uma
+escola
+em
+Beslan
+(
+Ossétia
+do
+norte
+)
+onde
+se
+encontram
+cerca
+de
+200
+crianças
+e
+40
+adultos
+,
+no
+dia
+em
+que
+recomeçam
+as
+aulas
+naquela
+região
+russa
+.
+
+# 16 - Noticia Público Desporto
+
+Jacques Rogge, presidente do Comité Olímpico Internacional (COI), encerrou Atenas 2004 com um discurso virado para o combate ao "doping".
+
+Jacques
+Rogge
+,
+presidente
+do
+Comité
+Olímpico
+Internacional
+(
+COI
+)
+,
+encerrou
+Atenas
+2004
+com
+um
+discurso
+virado
+para
+o
+combate
+ao
+«
+doping
+»
+.

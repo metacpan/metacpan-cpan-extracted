@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml package="xcolor" options="table,dvipsnames"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <section refnum="1" xml:id="S1">
+    <title><tag close=" ">1</tag>Introduction</title>
+    <para xml:id="S1.p1">
+      <itemize xml:id="I1">
+        <item xml:id="I1.i1">
+          <tag>•</tag>
+          <para xml:id="I1.i1.p1">
+            <p><text width="20.0pt"><rule color="#0000FF" height="6.5pt" width="20.0pt"/></text>; A 75% tint <text width="20.0pt"><rule color="#4040FF" height="6.5pt" width="20.0pt"/></text>.</p>
+          </para>
+        </item>
+        <item xml:id="I1.i2">
+          <tag>•</tag>
+          <para xml:id="I1.i2.p1">
+            <p>“use hsb definitions”</p>
+          </para>
+        </item>
+        <item xml:id="I1.i3">
+          <tag>•</tag>
+          <para xml:id="I1.i3.p1">
+            <p>40% <text width="20.0pt"><rule color="#00FF00" height="6.5pt" width="20.0pt"/></text> + 60% <text width="20.0pt"><rule color="#FFFF00" height="6.5pt" width="20.0pt"/></text> = <text width="20.0pt"><rule color="#99FF00" height="6.5pt" width="20.0pt"/></text></p>
+          </para>
+        </item>
+        <item xml:id="I1.i4">
+          <tag>•</tag>
+          <para xml:id="I1.i4.p1">
+            <p>Complement: <text width="20.0pt"><rule color="#6600FF" height="6.5pt" width="20.0pt"/></text></p>
+          </para>
+        </item>
+        <item xml:id="I1.i5">
+          <tag>•</tag>
+          <para xml:id="I1.i5.p1">
+            <p>3<Math mode="inline" tex="\times" text="*" xml:id="I1.i5.p1.m1">
+                <XMath>
+                  <XMTok meaning="times" role="MULOP">×</XMTok>
+                </XMath>
+              </Math><text width="20.0pt"><rule color="#6600FF" height="6.5pt" width="20.0pt"/></text>
++ 2<Math mode="inline" tex="\times" text="*" xml:id="I1.i5.p1.m2">
+                <XMath>
+                  <XMTok meaning="times" role="MULOP">×</XMTok>
+                </XMath>
+              </Math><text width="20.0pt"><rule color="#00FF00" height="6.5pt" width="20.0pt"/></text>
++ 1<Math mode="inline" tex="\times" text="*" xml:id="I1.i5.p1.m3">
+                <XMath>
+                  <XMTok meaning="times" role="MULOP">×</XMTok>
+                </XMath>
+              </Math><text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text>
+= <text width="20.0pt"><rule color="#915580" height="6.5pt" width="20.0pt"/></text></p>
+          </para>
+        </item>
+        <item xml:id="I1.i6">
+          <tag>•</tag>
+          <para xml:id="I1.i6.p1">
+            <p><text width="20.0pt"><rule color="#00E6FF" height="6.5pt" width="20.0pt"/></text></p>
+          </para>
+        </item>
+        <item xml:id="I1.i7">
+          <tag>•</tag>
+          <para xml:id="I1.i7.p1">
+            <p><text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#FFFF00" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#00FF00" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#00FFFF" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#0000FF" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#FF00FF" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text>.</p>
+          </para>
+        </item>
+        <item xml:id="I1.i8">
+          <tag>•</tag>
+          <para xml:id="I1.i8.p1">
+            <p><text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#FFFF00" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#00FF00" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#00FFFF" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#0000FF" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#FF00FF" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text></p>
+          </para>
+        </item>
+        <item xml:id="I1.i9">
+          <tag>•</tag>
+          <para xml:id="I1.i9.p1">
+            <p><text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#FF8000" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#FFFF00" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#00FF00" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#0000FF" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#FF00FF" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text></p>
+          </para>
+        </item>
+      </itemize>
+    </para>
+  </section>
+  <section refnum="2" xml:id="S2">
+    <title><tag close=" ">2</tag>Global</title>
+    <para xml:id="S2.p1">
+      <p><text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text> <text width="20.0pt"><rule color="#0000FF" height="6.5pt" width="20.0pt"/></text> <text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text></p>
+    </para>
+    <para xml:id="S2.p2">
+      <p><text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text> <text width="20.0pt"><rule color="#0000FF" height="6.5pt" width="20.0pt"/></text> <text width="20.0pt"><rule color="#0000FF" height="6.5pt" width="20.0pt"/></text></p>
+    </para>
+  </section>
+  <section refnum="3" xml:id="S3">
+    <title><tag close=" ">3</tag>XGlobal</title>
+    <para xml:id="S3.p1">
+      <p>fuu is red: <text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text>
+baz is green: <text width="20.0pt"><rule color="#00FF00" height="6.5pt" width="20.0pt"/></text>
+
+
+Now, fuu is purple: <text width="20.0pt"><rule color="#BF0040" height="6.5pt" width="20.0pt"/></text>
+and baz is orange: <text width="20.0pt"><rule color="#FF8000" height="6.5pt" width="20.0pt"/></text>
+
+
+Now, fuu is pink: <text width="20.0pt"><rule color="#FFBFBF" height="6.5pt" width="20.0pt"/></text>
+and baz is yellow: <text width="20.0pt"><rule color="#FFFF00" height="6.5pt" width="20.0pt"/></text>
+Now, baz is orange again: <text width="20.0pt"><rule color="#FF8000" height="6.5pt" width="20.0pt"/></text>
+but, fuu is still pink: <text width="20.0pt"><rule color="#FFBFBF" height="6.5pt" width="20.0pt"/></text>
+Now, baz is green again: <text width="20.0pt"><rule color="#00FF00" height="6.5pt" width="20.0pt"/></text>
+and, fuu is <emph>still</emph> pink: <text width="20.0pt"><rule color="#FFBFBF" height="6.5pt" width="20.0pt"/></text></p>
+    </para>
+  </section>
+  <section refnum="4" xml:id="S4">
+    <title><tag close=" ">4</tag>Color Sets</title>
+    <para xml:id="S4.p1">
+      <p><text width="20.0pt"><rule color="#FFE6E6" height="6.5pt" width="20.0pt"/></text>
+<text width="20.0pt"><rule color="#E6E6FF" height="6.5pt" width="20.0pt"/></text>
+<text width="20.0pt"><rule color="#E6FFE6" height="6.5pt" width="20.0pt"/></text></p>
+    </para>
+  </section>
+  <section refnum="5" xml:id="S5">
+    <title><tag close=" ">5</tag>Color Series</title>
+    <para xml:id="S5.p1">
+      <p><text color="#0000FF">Test<text width="10.0pt"><rule color="#0000FF" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#3333CC" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#666699" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#999966" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#CCCC33" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#FFFF00" height="6.5pt" width="10.0pt"/></text>Test</text></p>
+    </para>
+    <para xml:id="S5.p2">
+      <p><text color="#0000FF">Test<text width="10.0pt"><rule color="#0000FF" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#666699" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#CCCC33" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#3333CC" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#999966" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#FFFF00" height="6.5pt" width="10.0pt"/></text>Test</text></p>
+    </para>
+    <para xml:id="S5.p3">
+      <p><text color="#0000FF">Test<text width="10.0pt"><rule color="#666699" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#666699" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#666699" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#666699" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#666699" height="6.5pt" width="10.0pt"/></text><text width="10.0pt"><rule color="#666699" height="6.5pt" width="10.0pt"/></text>Test</text></p>
+    </para>
+  </section>
+  <section refnum="6" xml:id="S6">
+    <title><tag close=" ">6</tag>Blending</title>
+    <para xml:id="S6.p1">
+      <p>No blend: <text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#00FF00" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#0000FF" height="6.5pt" width="20.0pt"/></text></p>
+    </para>
+    <para xml:id="S6.p2">
+      <p>With blend: <text width="20.0pt"><rule color="#FF8000" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#80FF00" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#808080" height="6.5pt" width="20.0pt"/></text></p>
+    </para>
+    <para xml:id="S6.p3">
+      <p>Again 
+With blend: <text width="20.0pt"><rule color="#FF8000" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#80FF00" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#808080" height="6.5pt" width="20.0pt"/></text></p>
+    </para>
+    <para xml:id="S6.p4">
+      <p>Again Starred 
+With blend: <text width="20.0pt"><rule color="#FFBF00" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#BFFF00" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#BFBF40" height="6.5pt" width="20.0pt"/></text></p>
+    </para>
+    <para xml:id="S6.p5">
+      <p>Reset 
+No blend: <text width="20.0pt"><rule color="#FF0000" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#00FF00" height="6.5pt" width="20.0pt"/></text><text width="20.0pt"><rule color="#0000FF" height="6.5pt" width="20.0pt"/></text></p>
+    </para>
+  </section>
+  <section refnum="7" xml:id="S7">
+    <title><tag close=" ">7</tag>Boxes</title>
+    <para xml:id="S7.p1">
+      <p><text backgroundcolor="#808080" color="#E6E6E6">Light within Gray</text></p>
+    </para>
+    <para xml:id="S7.p2">
+      <p>vs. <text backgroundcolor="#808080" color="#E6E6E6">Light within Gray</text></p>
+    </para>
+    <para xml:id="S7.p3">
+      <p><text backgroundcolor="#FF0000" color="#00FF00" framecolor="#0000FF" framed="rectangle">Green in Red surrounded by Blue</text></p>
+    </para>
+    <para xml:id="S7.p4">
+      <p><text backgroundcolor="#00FFFF" color="#FFFF00" framecolor="#FF00FF" framed="rectangle">Yellow in Cyan surrounded by Magenta</text></p>
+    </para>
+    <para xml:id="S7.p5">
+      <p><rule color="white" depth="4.3pt" framecolor="#FF8000" framed="rectangle" height="8.6pt" width="100.0pt"/></p>
+    </para>
+  </section>
+  <section refnum="8" xml:id="S8">
+    <title><tag close=" ">8</tag>Arithmetic</title>
+    <para xml:id="S8.p1">
+      <p>A=5.0pt;B=10;
+A=A*B = 50.0pt;</p>
+    </para>
+    <para xml:id="S8.p2">
+      <p>A=5.0pt;
+A=10*A=50.0pt;
+A=A/10=5.0pt.</p>
+    </para>
+    <para xml:id="S8.p3">
+      <p>A=5.0pt;
+A=100*A=500.0pt;
+A=A/100=5.0pt.</p>
+    </para>
+    <para xml:id="S8.p4">
+      <p>10*13 = 130;
+100*13 = 1300.</p>
+    </para>
+    <para xml:id="S8.p5">
+      <p>A=10*13 = 130pt;
+A=100*13 = 1300pt;</p>
+    </para>
+  </section>
+  <section refnum="9" xml:id="S9">
+    <title><tag close=" ">9</tag>Colored Tables</title>
+    <para xml:id="S9.p1">
+      <tabular class="ltx_guessed_headers" vattach="middle">
+        <thead>
+          <tr backgroundcolor="#BFFFBF">
+            <td align="left" border="t" thead="column"><text backgroundcolor="#BFFFBF">test</text></td>
+            <td align="left" border="t" thead="column"><text backgroundcolor="#BFFFBF">row 1</text></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr backgroundcolor="#FFFF80">
+            <td align="left" border="t"><text backgroundcolor="#FFFF80">test</text></td>
+            <td align="left" border="t"><text backgroundcolor="#FFFF80">row 2</text></td>
+          </tr>
+          <tr backgroundcolor="#BFBFFF">
+            <td align="left" border="t"><text backgroundcolor="#BFBFFF">
+test</text></td>
+            <td align="left" border="t"><text backgroundcolor="#BFBFFF">row 3</text></td>
+          </tr>
+          <tr backgroundcolor="#FFFF80">
+            <td align="left" border="t"><text backgroundcolor="#FFFF80">test</text></td>
+            <td align="left" border="t"><text backgroundcolor="#FFFF80">row 4</text></td>
+          </tr>
+          <tr backgroundcolor="#BFFFBF">
+            <td align="left" border="t"><text backgroundcolor="#BFFFBF">test</text></td>
+            <td align="left" border="t"><text backgroundcolor="#BFFFBF">row 5</text></td>
+          </tr>
+          <tr>
+            <td align="left" border="t">test</td>
+            <td align="left" border="t">row 6</td>
+          </tr>
+          <tr>
+            <td align="left" border="t">test</td>
+            <td align="left" border="t">row 7</td>
+          </tr>
+          <tr backgroundcolor="#FFFF80">
+            <td align="left" border="t"><text backgroundcolor="#FFFF80">test</text></td>
+            <td align="left" border="t"><text backgroundcolor="#FFFF80">row 8</text></td>
+          </tr>
+          <tr backgroundcolor="#BFFFBF">
+            <td align="left" backgroundcolor="#FFE0E0" border="b t"><text backgroundcolor="#FFE0E0">test</text></td>
+            <td align="left" border="b t"><text backgroundcolor="#BFFFBF">row 9</text></td>
+          </tr>
+        </tbody>
+      </tabular>
+    </para>
+  </section>
+  <section refnum="10" xml:id="S10">
+    <title><tag close=" ">10</tag>Color Compararisons</title>
+    <para xml:id="S10.p1">
+      <tabular class="ltx_guessed_headers" vattach="middle">
+        <tbody>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif bold" fontsize="90%">color</text></td>
+            <td align="left"><text font="sansserif bold" fontsize="90%">rgb</text></td>
+            <td align="left"><text font="sansserif bold" fontsize="90%">cmyk</text></td>
+            <td align="left"><text font="sansserif bold" fontsize="90%">hsb</text></td>
+            <td align="left"><text font="sansserif bold" fontsize="90%">HTML</text></td>
+            <td align="left"><text font="sansserif bold" fontsize="90%">gray</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">red</text></td>
+            <td align="left"><text backgroundcolor="#FF0000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 0 0</text></td>
+            <td align="left"><text backgroundcolor="#FF0000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 1 1 0</text></td>
+            <td align="left"><text backgroundcolor="#FF0000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 1 1</text></td>
+            <td align="left"><text backgroundcolor="#FF0000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> FF0000</text></td>
+            <td align="left"><text backgroundcolor="#4D4D4D" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.3</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">green</text></td>
+            <td align="left"><text backgroundcolor="#00FF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 1 0</text></td>
+            <td align="left"><text backgroundcolor="#00FF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 0 1 0</text></td>
+            <td align="left"><text backgroundcolor="#00FF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.3333 1 1</text></td>
+            <td align="left"><text backgroundcolor="#00FF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 00FF00</text></td>
+            <td align="left"><text backgroundcolor="#969696" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.59</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">blue</text></td>
+            <td align="left"><text backgroundcolor="#0000FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 1</text></td>
+            <td align="left"><text backgroundcolor="#0000FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 1 0 0</text></td>
+            <td align="left"><text backgroundcolor="#0000FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.6667 1 1</text></td>
+            <td align="left"><text backgroundcolor="#0000FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0000FF</text></td>
+            <td align="left"><text backgroundcolor="#1C1C1C" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.11</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">cyan</text></td>
+            <td align="left"><text backgroundcolor="#00FFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 1 1</text></td>
+            <td align="left"><text backgroundcolor="#00FFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 0 0 0</text></td>
+            <td align="left"><text backgroundcolor="#00FFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5 1 1</text></td>
+            <td align="left"><text backgroundcolor="#00FFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 00FFFF</text></td>
+            <td align="left"><text backgroundcolor="#B3B3B3" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.7</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">magenta</text></td>
+            <td align="left"><text backgroundcolor="#FF00FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 0 1</text></td>
+            <td align="left"><text backgroundcolor="#FF00FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 1 0 0</text></td>
+            <td align="left"><text backgroundcolor="#FF00FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.8333 1 1</text></td>
+            <td align="left"><text backgroundcolor="#FF00FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> FF00FF</text></td>
+            <td align="left"><text backgroundcolor="#696969" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.41</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">yellow</text></td>
+            <td align="left"><text backgroundcolor="#FFFF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 1 0</text></td>
+            <td align="left"><text backgroundcolor="#FFFF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 1 0</text></td>
+            <td align="left"><text backgroundcolor="#FFFF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.1667 1 1</text></td>
+            <td align="left"><text backgroundcolor="#FFFF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> FFFF00</text></td>
+            <td align="left"><text backgroundcolor="#E3E3E3" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.89</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">orange</text></td>
+            <td align="left"><text backgroundcolor="#FF8000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 0.5 0</text></td>
+            <td align="left"><text backgroundcolor="#FF8000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0.5 1 0</text></td>
+            <td align="left"><text backgroundcolor="#FF7F00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.0833 1 1</text></td>
+            <td align="left"><text backgroundcolor="#FF8000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> FF8000</text></td>
+            <td align="left"><text backgroundcolor="#989898" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.595</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">violet</text></td>
+            <td align="left"><text backgroundcolor="#800080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5 0 0.5</text></td>
+            <td align="left"><text backgroundcolor="#800080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0.5 0 0.5</text></td>
+            <td align="left"><text backgroundcolor="#7F0080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.8333 1 0.5</text></td>
+            <td align="left"><text backgroundcolor="#800080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 800080</text></td>
+            <td align="left"><text backgroundcolor="#343434" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.205</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">purple</text></td>
+            <td align="left"><text backgroundcolor="#BF0040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.75 0 0.25</text></td>
+            <td align="left"><text backgroundcolor="#BF0040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0.75 0.5 0.25</text></td>
+            <td align="left"><text backgroundcolor="#BF0040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.9444 1 0.75</text></td>
+            <td align="left"><text backgroundcolor="#BF0040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> BF0040</text></td>
+            <td align="left"><text backgroundcolor="#404040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.2525</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">brown</text></td>
+            <td align="left"><text backgroundcolor="#BF8040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.75 0.5 0.25</text></td>
+            <td align="left"><text backgroundcolor="#BF8040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0.25 0.5 0.25</text></td>
+            <td align="left"><text backgroundcolor="#BF7F40" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.0833 0.6667 0.75</text></td>
+            <td align="left"><text backgroundcolor="#BF8040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> BF8040</text></td>
+            <td align="left"><text backgroundcolor="#8C8C8C" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5475</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">pink</text></td>
+            <td align="left"><text backgroundcolor="#FFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 0.75 0.75</text></td>
+            <td align="left"><text backgroundcolor="#FFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0.25 0.25 0</text></td>
+            <td align="left"><text backgroundcolor="#FFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0.25 1</text></td>
+            <td align="left"><text backgroundcolor="#FFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> FFBFBF</text></td>
+            <td align="left"><text backgroundcolor="#D2D2D2" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.825</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">olive</text></td>
+            <td align="left"><text backgroundcolor="#808000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5 0.5 0</text></td>
+            <td align="left"><text backgroundcolor="#808000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 1 0.5</text></td>
+            <td align="left"><text backgroundcolor="#7F8000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.1667 1 0.5</text></td>
+            <td align="left"><text backgroundcolor="#808000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 808000</text></td>
+            <td align="left"><text backgroundcolor="#636363" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.39</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">black</text></td>
+            <td align="left"><text backgroundcolor="#000000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0</text></td>
+            <td align="left"><text backgroundcolor="#000000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0 1</text></td>
+            <td align="left"><text backgroundcolor="#000000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0</text></td>
+            <td align="left"><text backgroundcolor="#000000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 000000</text></td>
+            <td align="left"><text backgroundcolor="#000000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">darkgray</text></td>
+            <td align="left"><text backgroundcolor="#404040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.25 0.25 0.25</text></td>
+            <td align="left"><text backgroundcolor="#404040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0 0.75</text></td>
+            <td align="left"><text backgroundcolor="#404040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0.25</text></td>
+            <td align="left"><text backgroundcolor="#404040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 404040</text></td>
+            <td align="left"><text backgroundcolor="#404040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.25</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">gray</text></td>
+            <td align="left"><text backgroundcolor="#808080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5 0.5 0.5</text></td>
+            <td align="left"><text backgroundcolor="#808080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0 0.5</text></td>
+            <td align="left"><text backgroundcolor="#808080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0.5</text></td>
+            <td align="left"><text backgroundcolor="#808080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 808080</text></td>
+            <td align="left"><text backgroundcolor="#808080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">lightgray</text></td>
+            <td align="left"><text backgroundcolor="#BFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.75 0.75 0.75</text></td>
+            <td align="left"><text backgroundcolor="#BFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0 0.25</text></td>
+            <td align="left"><text backgroundcolor="#BFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0.75</text></td>
+            <td align="left"><text backgroundcolor="#BFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> BFBFBF</text></td>
+            <td align="left"><text backgroundcolor="#BFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.75</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">white</text></td>
+            <td align="left"><text backgroundcolor="#FFFFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 1 1</text></td>
+            <td align="left"><text backgroundcolor="#FFFFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0 0</text></td>
+            <td align="left"><text backgroundcolor="#FFFFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 1</text></td>
+            <td align="left"><text backgroundcolor="#FFFFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> FFFFFF</text></td>
+            <td align="left"><text backgroundcolor="#FFFFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1</text></td>
+          </tr>
+          <tr>
+            <td align="left" border="t" thead="row"><text font="sansserif" fontsize="90%">-red</text></td>
+            <td align="left" border="t"><text backgroundcolor="#00FFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 1 1</text></td>
+            <td align="left" border="t"><text backgroundcolor="#00FFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 0 0 0</text></td>
+            <td align="left" border="t"><text backgroundcolor="#00FFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5 1 1</text></td>
+            <td align="left" border="t"><text backgroundcolor="#00FFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 00FFFF</text></td>
+            <td align="left" border="t"><text backgroundcolor="#B3B3B3" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.7</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-green</text></td>
+            <td align="left"><text backgroundcolor="#FF00FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 0 1</text></td>
+            <td align="left"><text backgroundcolor="#FF00FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 1 0 0</text></td>
+            <td align="left"><text backgroundcolor="#FF00FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.8333 1 1</text></td>
+            <td align="left"><text backgroundcolor="#FF00FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> FF00FF</text></td>
+            <td align="left"><text backgroundcolor="#696969" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.41</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-blue</text></td>
+            <td align="left"><text backgroundcolor="#FFFF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 1 0</text></td>
+            <td align="left"><text backgroundcolor="#FFFF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 1 0</text></td>
+            <td align="left"><text backgroundcolor="#FFFF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.1667 1 1</text></td>
+            <td align="left"><text backgroundcolor="#FFFF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> FFFF00</text></td>
+            <td align="left"><text backgroundcolor="#E3E3E3" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.89</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-cyan</text></td>
+            <td align="left"><text backgroundcolor="#FF0000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 0 0</text></td>
+            <td align="left"><text backgroundcolor="#FF0000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 1 1 0</text></td>
+            <td align="left"><text backgroundcolor="#FF0000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 1 1</text></td>
+            <td align="left"><text backgroundcolor="#FF0000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> FF0000</text></td>
+            <td align="left"><text backgroundcolor="#4D4D4D" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.3</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-magenta</text></td>
+            <td align="left"><text backgroundcolor="#00FF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 1 0</text></td>
+            <td align="left"><text backgroundcolor="#00FF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 0 1 0</text></td>
+            <td align="left"><text backgroundcolor="#00FF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.3333 1 1</text></td>
+            <td align="left"><text backgroundcolor="#00FF00" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 00FF00</text></td>
+            <td align="left"><text backgroundcolor="#969696" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.59</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-yellow</text></td>
+            <td align="left"><text backgroundcolor="#0000FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 1</text></td>
+            <td align="left"><text backgroundcolor="#0000FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 1 0 0</text></td>
+            <td align="left"><text backgroundcolor="#0000FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.6667 1 1</text></td>
+            <td align="left"><text backgroundcolor="#0000FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0000FF</text></td>
+            <td align="left"><text backgroundcolor="#1C1C1C" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.11</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-orange</text></td>
+            <td align="left"><text backgroundcolor="#0080FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0.5 1</text></td>
+            <td align="left"><text backgroundcolor="#0080FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 0.5 0 0</text></td>
+            <td align="left"><text backgroundcolor="#0080FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5833 1 1</text></td>
+            <td align="left"><text backgroundcolor="#0080FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0080FF</text></td>
+            <td align="left"><text backgroundcolor="#676767" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.405</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-violet</text></td>
+            <td align="left"><text backgroundcolor="#80FF80" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5 1 0.5</text></td>
+            <td align="left"><text backgroundcolor="#80FF80" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5 0 0.5 0</text></td>
+            <td align="left"><text backgroundcolor="#80FF80" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.3333 0.5 1</text></td>
+            <td align="left"><text backgroundcolor="#80FF80" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 80FF80</text></td>
+            <td align="left"><text backgroundcolor="#CBCBCB" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.795</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-purple</text></td>
+            <td align="left"><text backgroundcolor="#40FFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.25 1 0.75</text></td>
+            <td align="left"><text backgroundcolor="#40FFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.75 0 0.25 0</text></td>
+            <td align="left"><text backgroundcolor="#40FFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.4444 0.75 1</text></td>
+            <td align="left"><text backgroundcolor="#40FFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 40FFBF</text></td>
+            <td align="left"><text backgroundcolor="#BFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.7475</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-brown</text></td>
+            <td align="left"><text backgroundcolor="#4080BF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.25 0.5 0.75</text></td>
+            <td align="left"><text backgroundcolor="#4080BF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5 0.25 0 0.25</text></td>
+            <td align="left"><text backgroundcolor="#4080BF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5833 0.6667 0.75</text></td>
+            <td align="left"><text backgroundcolor="#4080BF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 4080BF</text></td>
+            <td align="left"><text backgroundcolor="#737373" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.4525</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-pink</text></td>
+            <td align="left"><text backgroundcolor="#004040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0.25 0.25</text></td>
+            <td align="left"><text backgroundcolor="#004040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.25 0 0 0.75</text></td>
+            <td align="left"><text backgroundcolor="#004040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5 1 0.25</text></td>
+            <td align="left"><text backgroundcolor="#004040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 004040</text></td>
+            <td align="left"><text backgroundcolor="#2D2D2D" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.175</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-olive</text></td>
+            <td align="left"><text backgroundcolor="#8080FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5 0.5 1</text></td>
+            <td align="left"><text backgroundcolor="#8080FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5 0.5 0 0</text></td>
+            <td align="left"><text backgroundcolor="#8080FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.6667 0.5 1</text></td>
+            <td align="left"><text backgroundcolor="#8080FF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 8080FF</text></td>
+            <td align="left"><text backgroundcolor="#8E8E8E" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.555</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-black</text></td>
+            <td align="left"><text backgroundcolor="#FFFFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1 1 1</text></td>
+            <td align="left"><text backgroundcolor="#FFFFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0 0</text></td>
+            <td align="left"><text backgroundcolor="#FFFFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 1</text></td>
+            <td align="left"><text backgroundcolor="#FFFFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> FFFFFF</text></td>
+            <td align="left"><text backgroundcolor="#FFFFFF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 1</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-darkgray</text></td>
+            <td align="left"><text backgroundcolor="#BFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.75 0.75 0.75</text></td>
+            <td align="left"><text backgroundcolor="#BFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0 0.25</text></td>
+            <td align="left"><text backgroundcolor="#BFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0.75</text></td>
+            <td align="left"><text backgroundcolor="#BFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> BFBFBF</text></td>
+            <td align="left"><text backgroundcolor="#BFBFBF" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.75</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-gray</text></td>
+            <td align="left"><text backgroundcolor="#808080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5 0.5 0.5</text></td>
+            <td align="left"><text backgroundcolor="#808080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0 0.5</text></td>
+            <td align="left"><text backgroundcolor="#808080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0.5</text></td>
+            <td align="left"><text backgroundcolor="#808080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 808080</text></td>
+            <td align="left"><text backgroundcolor="#808080" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.5</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-lightgray</text></td>
+            <td align="left"><text backgroundcolor="#404040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.25 0.25 0.25</text></td>
+            <td align="left"><text backgroundcolor="#404040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0 0.75</text></td>
+            <td align="left"><text backgroundcolor="#404040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0.25</text></td>
+            <td align="left"><text backgroundcolor="#404040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 404040</text></td>
+            <td align="left"><text backgroundcolor="#404040" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.25</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-white</text></td>
+            <td align="left"><text backgroundcolor="#000000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0</text></td>
+            <td align="left"><text backgroundcolor="#000000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0 1</text></td>
+            <td align="left"><text backgroundcolor="#000000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0 0</text></td>
+            <td align="left"><text backgroundcolor="#000000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 000000</text></td>
+            <td align="left"><text backgroundcolor="#000000" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0</text></td>
+          </tr>
+          <tr>
+            <td align="left" border="t" thead="row"><text font="sansserif" fontsize="90%">JungleGreen</text></td>
+            <td align="left" border="t"><text backgroundcolor="#03FF7A" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.01 1 0.48</text></td>
+            <td align="left" border="t"><text backgroundcolor="#03FF7A" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.99 0 0.52 0</text></td>
+            <td align="left" border="t"><text backgroundcolor="#03FF7A" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.4125 0.99 1</text></td>
+            <td align="left" border="t"><text backgroundcolor="#03FF7A" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 03FF7A</text></td>
+            <td align="left" border="t"><text backgroundcolor="#A5A5A5" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.6458</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">DarkOrchid</text></td>
+            <td align="left"><text backgroundcolor="#9933CC" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.6 0.2 0.8</text></td>
+            <td align="left"><text backgroundcolor="#9933CC" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.4 0.8 0.2 0</text></td>
+            <td align="left"><text backgroundcolor="#9933CC" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.7778 0.75 0.8</text></td>
+            <td align="left"><text backgroundcolor="#9933CC" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 9933CC</text></td>
+            <td align="left"><text backgroundcolor="#626262" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.386</text></td>
+          </tr>
+          <tr>
+            <td align="left" border="t" thead="row"><text font="sansserif" fontsize="90%">-JungleGreen</text></td>
+            <td align="left" border="t"><text backgroundcolor="#FC0085" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.99 0 0.52</text></td>
+            <td align="left" border="t"><text backgroundcolor="#FC0085" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0 0.99 0.47 0.01</text></td>
+            <td align="left" border="t"><text backgroundcolor="#FC0085" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.9125 1 0.99</text></td>
+            <td align="left" border="t"><text backgroundcolor="#FC0085" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> FC0085</text></td>
+            <td align="left" border="t"><text backgroundcolor="#5A5A5A" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.3542</text></td>
+          </tr>
+          <tr>
+            <td align="left" thead="row"><text font="sansserif" fontsize="90%">-DarkOrchid</text></td>
+            <td align="left"><text backgroundcolor="#66CC33" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.4 0.8 0.2</text></td>
+            <td align="left"><text backgroundcolor="#66CC33" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.4 0 0.6 0.2</text></td>
+            <td align="left"><text backgroundcolor="#66CC33" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.2778 0.75 0.8</text></td>
+            <td align="left"><text backgroundcolor="#66CC33" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 66CC33</text></td>
+            <td align="left"><text backgroundcolor="#9D9D9D" class="ltx_phantom" font="sansserif" fontsize="90%" framecolor="black" framed="rectangle">XX</text><text font="sansserif" fontsize="90%"> 0.614</text></td>
+          </tr>
+        </tbody>
+      </tabular>
+    </para>
+  </section>
+</document>

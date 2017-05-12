@@ -1,0 +1,227 @@
+{
+    "name": "Labyrinth",
+    "version": "5.32",
+    "abstract": "Labyrinth Website Management Framework",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "web",
+        "cgi",
+        "framework"
+    ],
+
+    "prereqs" : {
+        "test" : {
+            "requires": {
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Database": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Archive::Extract": "0",
+                "CGI": "0",
+                "CGI::Cookie": "0",
+                "Config::IniFiles": "0",
+                "Data::Dumper": "0",
+                "Data::FormValidator": "0",
+                "Data::FormValidator::Constraints::Upload": "0",
+                "Data::FormValidator::Constraints::Words": "0",
+                "Data::FormValidator::Filters::Demoroniser": "0",
+                "Data::Phrasebook": "0",
+                "Data::Phrasebook::Loader::Ini": "0",
+                "DateTime": "0",
+                "DBD::mysql": "0",
+                "DBI": "0",
+                "Digest::MD5": "0",
+                "Encode::ZapCP1252": "0",
+                "Exporter": "0",
+                "File::Basename": "0",
+                "File::Copy": "0",
+                "File::Path": "2.08",
+                "File::Slurp": "0",
+                "File::Spec::Functions": "0",
+                "File::Temp": "0.2304",
+                "HTML::Entities": "0",
+                "HTML::TagCloud": "0.34",
+                "Image::Size": "0",
+                "IO::File": "0",
+                "JSON::XS": "0",
+                "Log::LogLite": "0",
+                "MIME::Lite": "0",
+                "MIME::Lite::TT::HTML": "0",
+                "MIME::Types": "0",
+                "Module::Pluggable": "0",
+                "Regexp::Assemble": "0",
+                "Regexp::Common": "0",
+                "Session::Token": "0",
+                "Template": "0",
+                "Text::Wrap": "0",
+                "Time::Local": "0",
+                "URI::Escape": "0",
+                "WWW::Mechanize": "0",
+                "XML::Atom": "0",
+                "XML::Atom::Feed": "0",
+                "XML::Atom::Entry": "0",
+                "XML::RSS": "0"
+            }
+        }
+    },
+
+    "provides": {
+        "Labyrinth": {
+            "file": "lib/Labyrinth.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Audit": {
+            "file": "lib/Labyrinth/Audit.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Constraints": {
+            "file": "lib/Labyrinth/Constraints.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Constraints::Emails": {
+            "file": "lib/Labyrinth/Constraints/Emails.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::CookieLib": {
+            "file": "lib/Labyrinth/CookieLib.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::DBUtils": {
+            "file": "lib/Labyrinth/DBUtils.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::DIUtils": {
+            "file": "lib/Labyrinth/DIUtils.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::DIUtils::Base": {
+            "file": "lib/Labyrinth/DIUtils/Base.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::DTUtils": {
+            "file": "lib/Labyrinth/DTUtils.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Filters": {
+            "file": "lib/Labyrinth/Filters.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Globals": {
+            "file": "lib/Labyrinth/Globals.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Groups": {
+            "file": "lib/Labyrinth/Groups.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::IPAddr": {
+            "file": "lib/Labyrinth/IPAddr.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Inbox": {
+            "file": "lib/Labyrinth/Inbox.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::MLUtils": {
+            "file": "lib/Labyrinth/MLUtils.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Mailer": {
+            "file": "lib/Labyrinth/Mailer.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Media": {
+            "file": "lib/Labyrinth/Media.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Metadata": {
+            "file": "lib/Labyrinth/Metadata.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Phrasebook": {
+            "file": "lib/Labyrinth/Phrasebook.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Plugin::Base": {
+            "file": "lib/Labyrinth/Plugin/Base.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Plugins": {
+            "file": "lib/Labyrinth/Plugins.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Query::CGI": {
+            "file": "lib/Labyrinth/Query/CGI.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::RSS": {
+            "file": "lib/Labyrinth/RSS.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Request": {
+            "file": "lib/Labyrinth/Request.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Session": {
+            "file": "lib/Labyrinth/Session.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Support": {
+            "file": "lib/Labyrinth/Support.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Users": {
+            "file": "lib/Labyrinth/Users.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Variables": {
+            "file": "lib/Labyrinth/Variables.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Writer": {
+            "file": "lib/Labyrinth/Writer.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Writer::Parser::TT": {
+            "file": "lib/Labyrinth/Writer/Parser/TT.pm",
+            "version": "5.32"
+        },
+        "Labyrinth::Writer::Render::CGI": {
+            "file": "lib/Labyrinth/Writer/Render/CGI.pm",
+            "version": "5.32"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Labyrinth" },
+        "repository": {
+            "url": "git://github.com/barbie/labyrinth.git",
+            "web": "http://github.com/barbie/labyrinth",
+            "type": "git"
+        }
+    }
+}

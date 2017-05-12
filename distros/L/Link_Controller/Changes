@@ -1,0 +1,47 @@
+Release 0.037 
+
+	Bugfix for checking of incorrect links which get into the
+	database somehow.
+
+
+Release 0.036
+
+	Any reference to "URL" in link-report has been changed to
+	"URI".  Most references to "URL" in extract link have been
+	changed over to "URI".  Gradually this will be corrected
+	throughout LinkController wherever appropriate.  The reason is
+	that sometimes the difference between URI and URL will be
+	important and it's confusing to use them correctly in some
+	places and not in others.  This is more important than the
+	fact that URL is the better known term.
+
+	There is a new plain URI report from link-report designed for
+	interfacing to other programs.
+
+	Reporting from a URI list file (--url-file) now defaults to
+	only reporting interesting links.  Before it reported all
+	links.
+
+Release 0.035
+
+	Reporting based on the indexes is now the default (old
+	-I/--infostructure option).  Use the -N option to see the
+	complete listig of broken links in the database.
+
+	advanced infostructure prune_re feature now tested and working
+	see manual for how to use it.
+
+Release 0.034
+
+	Many functionality and bug fixes.
+
+	link-report --long-list now uses infostructure definitions so
+	options interface somewhat changed (--url-base and --file-base
+	options don't exist right now)
+
+Release 0.029
+
+	We now use an infostrucs file for storing definitions of where
+	the web pages are and what directories they map to.  This allows
+	us to handle multiple sets of web pages at a time including ones
+	which don't have a directory equivalent.

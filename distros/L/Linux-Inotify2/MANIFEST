@@ -1,0 +1,12 @@
+README
+MANIFEST
+COPYING
+Changes
+Makefile.PL
+Inotify2.pm
+Inotify2.xs
+eg/simple
+eg/event
+t/00_load.t
+t/01_inotify.t
+META.json                                Module meta-data (added by MakeMaker)

@@ -1,0 +1,46 @@
+{
+   "abstract" : "Portuguese language stemming",
+   "author" : [
+      "xern <xern@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lingua-PT-Stemmer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Lingua-PT-Stemmer",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Lingua-PT-Stemmer.git",
+         "web" : "https://github.com/neilb/Lingua-PT-Stemmer"
+      }
+   },
+   "version" : "0.02"
+}
+

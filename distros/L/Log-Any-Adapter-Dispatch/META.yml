@@ -1,0 +1,46 @@
+---
+abstract: 'Adapter to use Log::Dispatch with Log::Any'
+author:
+  - 'Jonathan Swartz <swartz@pobox.com>'
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0.20'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Any-Adapter-Dispatch
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Log::Any::Adapter::Dispatch:
+    file: lib/Log/Any/Adapter/Dispatch.pm
+    version: '0.08'
+requires:
+  Log::Any::Adapter: '0'
+  Log::Dispatch: '2.26'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/preaction/perl-log-any-adapter-dispatch/issues
+  homepage: https://github.com/preaction/perl-log-any-adapter-dispatch
+  repository: https://github.com/preaction/perl-log-any-adapter-dispatch.git
+version: '0.08'
+x_authority: cpan:PREACTION
+x_contributors:
+  - 'Jens Rehsack <sno@netbsd.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,15 @@
+Revision history for Log-Log4perl-Filter-CallerMatch
+
+1.200     2010-11-06 00:09:07 America/New_York
+    * Now works with Log::Log4perl::Filter::Boolean
+    * Updated to use new Dist::Zilla::PluginBundle::PDONELAN
+
+1.101060  2010-04-16 16:52:00 EST5EDT
+    * Improved tests
+
+1.100830  2010-03-24 14:48:48 EST5EDT
+    * Switched to Dist::Zilla
+        
+0.01    Date/time
+    * First version, released on an unsuspecting world.
+

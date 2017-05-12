@@ -1,0 +1,7 @@
+Changes 	for revision history
+Fold.pm 	to fold a Japanese text, and more...
+Makefile.PL	to create Makefile
+MANIFEST	(this file)
+README  	for short descriptions about install
+t/1.t   	a test script for Lingua::JA::Fold
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,51 @@
+{
+   "abstract" : "convert \"3/4\" into \"three quarters\", etc",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lingua-EN-Fractions",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Lingua::EN::Numbers" : "0",
+            "parent" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "open" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Lingua-EN-Fractions",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Lingua-EN-Fractions.git",
+         "web" : "https://github.com/neilb/Lingua-EN-Fractions"
+      }
+   },
+   "version" : "0.08"
+}
+

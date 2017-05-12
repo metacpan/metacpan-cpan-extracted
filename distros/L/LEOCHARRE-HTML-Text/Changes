@@ -1,0 +1,22 @@
+2009-08-13 14:47  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/HTML/Text.pm,
+	  t/05-wget-w32safe-slurpmod.t: Made so If you slurp a url on
+	  win32, it works ok. (Submitted).. This is the first time I add
+	  something to work with windows software, but it was submitted. I
+	  almost feel dirty I don't want to think about it.
+
+2009-08-12 17:04  cvs
+
+	* bin/html2txt, lib/LEOCHARRE/HTML/Text.pm: The documentation was
+	  not showing proper example usage, thanks to Gordon Van Amburg.
+
+2008-11-21 11:03  cvs
+
+	* bin/html2txt: added some help to cli
+
+2008-11-14 13:38  cvs
+
+	* bin/.html2txt.swp, bin/html2txt, lib/LEOCHARRE/HTML/Text.pm:
+	  Initial revision
+

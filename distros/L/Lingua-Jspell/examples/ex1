@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+use strict;
+#undef $/;
+#$/='';
+
+use Lingua::Jspell::DictManager;
+
+my $dict = Lingua::Jspell::DictManager::init("microdic");
+
+# $dict->for_this_cat_I_want_only_these_flags('nc', 'fp');
+# $dict->add_flag("p","linha","carro",...);
+# $dict->add_word(map { chomp; +{word=>$_,flags=>'p',CAT=>'nc',G=>'m'}} <DATA>);
+
+while(<DATA>){
+  print $_;
+  chomp;
+  $dict->add_word({word=>$_,flags=>'p',CAT=>'nc',G=>'m',comment=>"==#"})
+}
+
+#$dict->foreach_word( sub{ print toword( @_),"\n" } );
+#$dict->modeach_word( sub{ toword( @_[0,1,2],"==!") } );
+
+install_dic({name=>"test"}, "from:port" , "microdic");
+
+# remflag("f.dic","p","linha","carro",...);
+__DATA__
+gato
+rato
+piriquito
+leão
+crocodilo
+piopardo
+gambuzino

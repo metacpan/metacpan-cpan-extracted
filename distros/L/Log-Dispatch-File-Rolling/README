@@ -1,0 +1,79 @@
+Log/Dispatch/File/Rolling version 1.09
+======================================
+
+--------
+Abstract
+--------
+
+This module subclasses Log::Dispatch::File for logging to date/time
+stamped files. It uses flock to ensure being safe in a multitasking
+environment. It recognizes a fork() and will reopen the logfile, if
+configured so even with a process specific filename.
+
+------------
+Requirements
+------------
+
+This module requires Log::Dispatch::File, included in the Log::Dispatch
+distribution and Log::Log4perl::DateFormat, included in the
+Log::Log4perl distribution. It has only be tested with the versions as
+stated in Makefile.PL, if you find it works with earlier versions, too,
+please send me a email. Thank you.
+
+------------------
+Basic Installation
+------------------
+
+Log::Dispatch::File::Rolling may be installed through the CPAN shell in
+the usual manner:
+
+  # perl -MCPAN -e 'install Log::Dispatch::File::Rolling'
+
+You can also read this README from the CPAN shell:
+
+  # perl -MCPAN -e shell
+  cpan> readme Log::Dispatch::File::Rolling
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install Log::Dispatch::File::Rolling
+
+-------------------
+Manual Installation
+-------------------
+
+Log::Dispatch::File::Rolling can also be installed manually.  The latest
+CPAN version can be found at <http://www.cpan.org/modules/by-
+authors/id/J/JA/JACOB/> or in a similarly named directory at your
+favorite CPAN mirror.
+
+Downloading and unpacking the distribution are left as exercises for the
+reader.  To build and test it:
+
+   perl Makefile.PL
+   make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+
+On Win32 systems, replace "make" in the above commands with "nmake". The
+nmake utility can be downloaded from
+http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-
+US/Nmake15.exe
+
+---------------------
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright (C) 2003, 2004, 2007, 2010, 2013 M. Jacob <jacob@j-e-b.net>
+
+Based on:
+  Log::Dispatch::File::Stamped by Eric Cholet <cholet@logilune.com>
+  Log::Dispatch::FileRotate by Mark Pfeiffer, <markpf@mlp-consulting.com.au>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

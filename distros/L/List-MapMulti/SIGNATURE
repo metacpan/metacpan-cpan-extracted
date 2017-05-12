@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 a3bee63c79ae458f767c381160e8f669503664a6 COPYRIGHT
+SHA1 27be301485dd3a90ddfa06bce56f7bc4d73c957f CREDITS
+SHA1 6b25796f1561d70b3094ee8e5b6c7fb00e6df2ee Changes
+SHA1 751e3ddef706c670723155c5df503fbaf3fec39a INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 cc32b93a8ba61a7c172c1c9b982896e22dd101cb MANIFEST
+SHA1 3340b22a2212f9ef2b90b59d147f466a4ad9aeb2 META.json
+SHA1 2fc58d62c6df7e75687669666e034fe2efd167c4 META.yml
+SHA1 cc10fea65f10d37fcf32e0aa8549057e0f907629 Makefile.PL
+SHA1 5f0b44209158ae6388058d5d5ff1b7d76e3585aa README
+SHA1 60a85609e9bcbbde1e47c15e766f87137949d247 dist.ini
+SHA1 08384f03fd095ad17dcaa786d61e82f18da59ddc doap.ttl
+SHA1 d0bc14adcee295cdf27b664e47fc729efb494151 examples/cards-iterator.pl
+SHA1 4e3d07e0f7fc6a8f9f08194025822be24efefe9d examples/cards-mapm.pl
+SHA1 955718cc776ffd2b2247ec5103321f9e8f75ba00 lib/List/MapMulti.pm
+SHA1 1f1dc8d6c46a690146280ece2b491df04e351dcc t/01basic.t
+SHA1 09cece96431f06f3219e8965cfdfe5c76c6a1002 t/02mmap.t
+SHA1 060eba3868a09fb3290ceb6c10aa7e52b982f335 t/03iterator.t
+SHA1 23e0a0093e70461abc29068848ea628f75c0a692 t/04ab.t
+SHA1 fb56f6a40909bf4cf7d75e9198517aa3d09b6179 t/05manylists.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQ0BsACgkQzr+BKGoqfTkXOwCgq21OIy2Q/fl23nPn1yWihaxk
+91MAn3x7FpxWUMks0Z3i+mXxYBliIgvM
+=Cn6g
+-----END PGP SIGNATURE-----

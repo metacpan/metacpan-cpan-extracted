@@ -1,0 +1,13 @@
+Build.bat
+Build.PL
+Changes
+lib/Lingua/EN/Conjugate.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/testconj.t
+t/boilerplate.t
+t/pod.t
+script/en_conj.pl
+

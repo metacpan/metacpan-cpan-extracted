@@ -1,0 +1,19 @@
+Build.PL
+Changes
+INSTALL
+lib/Lingua/Stem/UniNE/BG.pm
+lib/Lingua/Stem/UniNE/CS.pm
+lib/Lingua/Stem/UniNE/DE.pm
+lib/Lingua/Stem/UniNE/FA.pm
+lib/Lingua/Stem/UniNE.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-stemmer.t
+t/bg.t
+t/cs.t
+t/de.t
+t/fa.t

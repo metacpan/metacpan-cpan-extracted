@@ -1,0 +1,162 @@
+/*------------------------------------------------------------------------------------*/
+/*** Dialog box ***/
+
+/* Main container */
+.dialog {   
+	color: #fff;
+	border: 2px outset #888;   
+	background: #000 url('../images/lsgrd.png') repeat-x ;   
+}
+
+/* Title bar */
+.dialog > .head {   
+}
+
+.dialog > .head img {   
+}
+
+/* Contents */
+.dialog .cont {   
+
+	border: 2px inset #888; 
+}
+
+
+/* Each row entry in contents */
+.dialog .row {   
+	border : 1px solid black;
+}
+
+.dialog .row div {
+}
+.dialog .row .label {
+}
+
+
+/* Bottom button bar */
+.dialog > .buttonbar {   
+}
+
+.dialog > .buttonbar .centre {   
+}
+
+
+/* Any button */
+.dialog a.button {
+	color: #fff;
+	border: 1px inset #888;   
+	background: #000 url('../images/lsgrd.png') repeat-x ;   
+}
+
+.dialog a.button:focus,
+.dialog a.button:hover {
+    background: #fff;
+    color: #000;
+}
+
+
+.dialog .buttonend {
+	border: 1px solid #000;
+}
+
+
+/*------------------------------------------------------------------------------------*/
+
+/* Message box */
+
+/* OLD
+#msgbox {
+  background: #C4E2BA ;
+  color: #226D00 ;
+  border: ridge 8px #226D00 ;
+}
+
+#msgbox .button a {
+  background: #226D00 ;
+  color: #C4E2BA ;
+  border: groove 2px #226D00 ;
+}
+
+#msgbox .button a:focus,
+#msgbox .button a:hover {
+  background: #C4E2BA ;
+  color: #226D00 ;
+}
+*/
+
+/* Based on Dialog */
+
+/* Main container */
+.msgbox {   
+	color: #fff;
+	border: 2px outset #888;   
+	background: #000 url('../images/lsgrd.png') repeat-x ;   
+}
+
+/* Title bar */
+.msgbox > .head {   
+	border-bottom: 1px solid #888;
+}
+
+.msgbox > .head img {   
+}
+
+/* Contents */
+.msgbox .cont {   
+
+	/*border: 2px inset #888; */
+}
+
+
+/* Each row entry in contents */
+.msgbox .row {   
+	border : 1px solid black;
+}
+
+.msgbox .row div {
+}
+.msgbox .row .label {
+}
+
+
+/* Bottom button bar */
+.msgbox > .buttonbar {   
+}
+.msgbox > .buttonbar .centre {   
+}
+
+
+/* Any button */
+.msgbox a.button {
+	color: #fff;
+	border: 1px inset #888;   
+	background: #000 url('../images/lsgrd.png') repeat-x ;   
+}
+
+.msgbox a.button:focus,
+.msgbox a.button:hover {
+    background: #fff;
+    color: #000;
+}
+
+
+.msgbox .buttonend {
+	border: 1px solid #000;
+}
+
+#message.msgbox {
+	color : white ;
+}
+
+#info.msgbox {
+	color : cyan ;
+}
+
+#warn.msgbox {
+	color : yellow ;
+}
+
+#error.msgbox {
+	color : red ;
+}
+

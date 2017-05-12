@@ -1,0 +1,39 @@
+# -*- cperl -*-
+
+=head1 NAME
+
+nat-postbin - A translator from dictionary file to the Perl readable format.
+
+=head1 SYNOPSIS
+
+ nat-postbin <matdic-in> <lex1> <lex2> <out-dic1> <out-dic2>
+
+=head1 DESCRIPTION
+
+This command is not intended to be used independently.
+
+C<nat-postbub> reads the dictionary created with C<nat-mat2dic> and
+lexicon files created by the C<nat-pre> tool, to write two dictionary
+files on a very small binary format.
+
+The internal format can change a lot, so please use NATools to manage
+these files.
+
+The format is a gzipped binary file. First 32 bits unsigned integer is
+the number of entries in the dictionary. Follows a sequence of
+MAXENTRY size, with pairs of translation identifier (32 bits unsigned
+integer) and probability (32 bits float).
+
+=head1 SEE ALSO
+
+nat-pre, nat-mat2dic and remaining NATools documentation.
+
+=head1 COPYRIGHT
+
+ Copyright (C)2002-2003 Alberto Simoes and Jose Joao Almeida
+ Copyright (C)1998 Djoerd Hiemstra
+
+ GNU GENERAL PUBLIC LICENSE (LGPL) Version 2 (June 1991)
+
+=cut
+

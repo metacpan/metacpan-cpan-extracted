@@ -1,0 +1,73 @@
+Revision history for Perl extension Locale::Geocode
+
+1.20 - Mon Feb 9 19:10:35 CST 2009
+ - add new ext_enable and ext_disable methods for selectively enabling
+   or disabling only the specified subset of all supported extensions
+ - add new "ust" extention for united states territories.  this
+   extension is ALWAYS on unless you explicitly disable it, thus it
+   retains compatibility with previous releases.
+ - rewrite ext method so that the extension list is constructed in a
+   more straightforward fashion.  while the behavior of the ext method
+   was never fully documented, the behavior now is, for multiple flags
+   for the same extension (ie, qw(usm -usm usm))), the most recent
+   element in the list is the one that is honored.
+
+1.11 - Thu Aug 28 18:51:23 CDT 2008
+ - fix specifying extension configuration at instantiation
+ - added new divisions_sorted method to Locale::Geocode::Territory to
+   return the divisions sorted by the specified meta
+
+1.10 - Wed Jun 18 10:56:58 CDT 2008
+ - allow specifying the extension configuration at instantiation
+ - add new extension "usps" that includes three soverign nations that
+   the United States Postal Service recognizes as domestic state
+   abbreviations
+ - change "Micronesia" to "Federated States of Micronesia" to avoid
+   confusion with the region known as Micronesia, which includes seven
+   distinct territories
+ - use feedback-enabled test macros (cmp_ok, is, etc) where appropriate
+ - replace all occurrences of ISO-3166-1 with ISO 3166-1
+
+1.01 - Mon Jun 9 14:38:39 CDT 2008
+ - include Module::Install (forgot to add it to the manifest)
+
+1.0 - Tue Mar 4 13:09:33 CST 2008
+ - initial release to CPAN
+
+0.12 - 2007-11-07 14:50:16 -0600
+ - allow comparing Locale::Geocode::Territory objects
+
+0.11 - 2007-10-03 17:02:38
+ - add convenience methods to Locale::Geocode for sorting territories
+
+0.10 - 2007-09-24 12:20:27
+ - set some FIPS codes for various US territories
+
+0.09 - 2007-03-06 16:39:27 -0600 (Tue, 06 Mar 2007) | 2 lines
+ - allow LGT to lookup by zero-based index
+
+0.08 - 2007-03-01 12:21:47
+ - for the sake of brevity, replace 'United States of America' with
+   'United States'
+
+0.07 - 2007-02-14 18:42:28
+ - don't return undef when lookup fails
+
+0.06 - 2007-02-07 16:16:54
+ - fix Locale::Geocode import
+
+0.05 - 2007-02-02 14:54:30
+ - force usage of XML::SAX::Expat in Locale::Geocode
+
+0.04 - 2007-01-31 18:56:18
+ - stringify support/tests
+
+0.03 - 2007-01-31 18:47:06
+ - fixes and more test cases
+
+0.02 - 2007-01-30 18:36:31
+ - polish
+
+0.01 - 2007-01-29 19:15:41
+ - initial revision
+

@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+use base 'LEOCHARRE::CLI';
+use strict;
+use Cwd;
+my $o = gopts();
+
+
+sub slurp {
+   my $abs = shift;
+   local $/;
+   open(FI,'<',$abs) or die;
+   my$t = <FI>;
+   close FI;
+   return $t;
+}
+
+my %blocks;
+
+my $d = $ARGV[0] || cwd(); # TODO line is here
+debug($d);
+
+my @f = split( /\n/, `find '$d' -type f`);
+
+FILE: for my $abs ( @f ){
+   my $line_num = 0;
+   open(FI,'<',$abs) or warn("cant open for reading $abs, $!") and next FILE;
+
+   debug($abs);
+
+   my $block_num = 0;
+   my $block_is_open = 0; # TODO another line but this one continues in the next line
+   # which is this one
+
+   while( my $line = <FI> ){
+
+      if( $line=~/#\s*(TODO.+)/ ){
+         $block_num++;
+         $blocks{$abs}{$block_num}{content}.=$1;
+         $blocks{$abs}{$block_num}{linenum} = $line_num;
+         $block_is_open =1;
+      }
+      elsif( $line=~/^\s*#(.+)/ ){
+         if ($block_is_open){
+            $blocks{$abs}{$block_num}{content}.=$1;
+         }
+      }
+      else{
+         $block_is_open = 0;
+      }
+
+      $line_num++;
+   }
+
+}
+
+
+for my $abs ( sort keys %blocks ){
+   print "==========================\n# $abs\n\n";
+   
+   for my $blocknum ( sort keys %{$blocks{$abs}} ){
+      my $content = $blocks{$abs}{$blocknum}{content};
+      my $linenum   = $blocks{$abs}{$blocknum}{linenum};
+
+      print "# block $blocknum, line $linenum :\n\n";
+      print "$content\n\n";
+
+   }
+}
+
+
+
+
+
+
+
+__END__
+#!/bin/sh
+
+
+
+find $1 -type f | xargs grep '# TODO';
+
+
+#split( /\n/, `find '$PATH' -type f | xargs grep '# TODO'` );

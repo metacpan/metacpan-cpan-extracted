@@ -1,0 +1,39 @@
+Linux-Seccomp version 0.001
+===========================
+
+Secure Computing (seccomp) is Linux's system call filtering mechanism.
+This system can operate in two modes: I<strict>, where only a very
+small number of system calls are allowed and the more modern I<filter>
+(or seccomp mode 2) which permits advanced filtering of system calls.
+This module is only concerned with the latter.
+
+Linux::Seccomp is a Perl interface to the
+L<libseccomp|https://github.com/seccomp/libseccomp> library which
+provides a simple way to use seccomp mode 2.
+
+It should be mentioned that this module is not production-ready at the
+moment -- work needs to be done to port the libseccomp testsuite and
+the documentation needs to be improved.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module has no dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

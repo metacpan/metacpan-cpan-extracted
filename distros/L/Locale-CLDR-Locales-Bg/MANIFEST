@@ -1,0 +1,27 @@
+Build.PL
+lib/Locale/CLDR/Locales/Bg.pm
+lib/Locale/CLDR/Locales/Bg/Any.pm
+lib/Locale/CLDR/Locales/Bg/Any/Bg.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/02-Locale-Names.t
+t/03-Measurement-Systems.t
+t/04-Code-Patterns.t
+t/05-Orientation.t
+t/06-Segmentation.t
+t/07-Exempler-Characters.t
+t/08-Elipsis.t
+t/09-Delimiters.t
+t/10-Measurement-System.t
+t/11-Numbers.t
+t/12-Units.t
+t/14-Lists.t
+t/15-Calendars.t
+t/16-Names.t
+t/17-DateTime.t
+t/18-Overrides.t
+t/19-Currency.t
+t/20-Plurals.t
+META.yml
+META.json

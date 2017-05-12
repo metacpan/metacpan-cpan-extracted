@@ -1,0 +1,17 @@
+Build.PL
+lib/Locale/CLDR/Locales/Sr.pm
+lib/Locale/CLDR/Locales/Sr/Cyrl.pm
+lib/Locale/CLDR/Locales/Sr/Cyrl/Ba.pm
+lib/Locale/CLDR/Locales/Sr/Cyrl/Me.pm
+lib/Locale/CLDR/Locales/Sr/Cyrl/Rs.pm
+lib/Locale/CLDR/Locales/Sr/Cyrl/Xk.pm
+lib/Locale/CLDR/Locales/Sr/Latn.pm
+lib/Locale/CLDR/Locales/Sr/Latn/Ba.pm
+lib/Locale/CLDR/Locales/Sr/Latn/Me.pm
+lib/Locale/CLDR/Locales/Sr/Latn/Rs.pm
+lib/Locale/CLDR/Locales/Sr/Latn/Xk.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+META.yml
+META.json

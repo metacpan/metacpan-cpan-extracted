@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/LWP-Protocol-http-SocketUnix.t
+lib/LWP/Protocol/http/SocketUnix.pm

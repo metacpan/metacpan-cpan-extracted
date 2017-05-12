@@ -1,0 +1,35 @@
+[% 
+    IF data.articleid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Lyrics' ;
+    htmltitle = title ;
+
+    crumb3_name = 'Admin' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=home-admin' ;
+    crumb2_name = 'Lyrics' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=lyric-admin' ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+[% IF thanks %]<p>Lyric saved successfully.</p>[% END %]
+<p>Fields marked * are mandatory fields and must be completed.</p>
+
+<p>Please note that when initially selecting images from the Photo Gallery, the loaded image wlll be the
+current raw size. Once the page is saved the image will be resized to the appropriate dimensions. In the
+width and height boxes, you may leave these blank or set to 0 to use the default settings; raw image size
+to a max of 400x400 pixels.</p>
+
+[% IF errmess %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+[% IF errmess == 2 %]
+<p class="alert">Please note that the title must be unqiue.</p>
+[% END %]
+[% END %]
+
+<form method=post action="[% cgipath %]/pages.cgi" name="EDIT" enctype="multipart/form-data">
+<input type="hidden" name="act" value="lyric-save" />
+[% INCLUDE "articles/arts-adminblock.html" %]
+</form>
+
+[% INCLUDE "articles/arts-preview.html" %]

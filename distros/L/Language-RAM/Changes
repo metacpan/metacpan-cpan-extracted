@@ -1,0 +1,10 @@
+Revision history for Language-RAM
+
+0.012   2015-11-24
+        Fix errors with older perl versions
+
+0.011   2015-11-19
+        Fix IP in memory snapshots
+
+0.01    2015-11-18
+        RAM module and script

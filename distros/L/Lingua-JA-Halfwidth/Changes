@@ -1,0 +1,21 @@
+Revision history for Lingua-JA-Halfwidth
+
+0.0.1  Mon Jul 20 15:06:57 2009
+       Initial release.
+
+0.0.2  Mon Jul 21 08:56:17 2009
+       modify pod ( SYNOPSIS and so on )
+
+0.0.3  Mon Jul 21 15:02:04 2009
+       add Test::Perl::Critic in Makefile.PL
+
+0.0.4  Mon Jul 23 23:28:29 2009
+       add auto_install() in Makefile.PL
+
+0.0.5  Mon Jul 26 09:37:14 2009
+       Module::Install 0.91 => 0.87
+       Because auto_install() can't run.
+
+0.0.6  Mon Jul 26 13:28:19 2009
+       remove Build.PL from MANIFEST
+

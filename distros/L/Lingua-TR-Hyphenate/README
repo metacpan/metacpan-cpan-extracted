@@ -1,0 +1,22 @@
+Lingua/TR/Hyphenate version 0.01
+================================
+
+This module provides an implementation of a hyphenator
+for Turkish. The algorithm is deterministic and can be
+found at http://www.ripe.net/home/engin/heceler.html
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Engin Gunduz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,15 @@
+.*
+!.gitignore
+Makefile*
+!Makefile.PL
+META.yml
+blib
+build
+inc
+pm_to_blib
+MANIFEST*
+!MANIFEST.SKIP
+*.bs
+cover_db
+Debian_CPANTS.txt
+Lingua-EO-Orthography-*

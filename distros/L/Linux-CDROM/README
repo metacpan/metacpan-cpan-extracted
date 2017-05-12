@@ -1,0 +1,34 @@
+Linux-CDROM version 0.02
+=========================
+
+This module gives you access to your CDROM (and possibly DVD) drives on
+Linux. It implements most of the ioctls defined in linux/cdrom.h.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    none, but a working C compiler
+
+AUTHOR
+
+Tassilo von Parseval, tassilo.von.parseval@rwth-aachen.de
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005 by Tassilo von Parseval
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,28 @@
+---
+abstract: 'transliterate the Latin to Shavian alphabets'
+author:
+  - 'Thomas Thurman <tthurman@gnome.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.11
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-EN-Alphabet-Shaw
+no_index:
+  directory:
+    - share
+    - share
+    - inc
+    - t
+requires:
+  DBD::SQLite: 0
+  DBI: 0
+  File::ShareDir: 0
+  HTML::Parser: 0
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.6

@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long;
+use List::MoreUtils qw(none);
+use Lingua::RU::OpenCorpora::Tokenizer::Updater;
+
+my @modes = qw(vectors hyphens exceptions prefixes);
+
+GetOptions(
+    \my %opts,
+    'help',
+    'force',
+    'quiet',
+    'all',
+    @modes,
+);
+usage(2) if $opts{help};
+usage() if none { $opts{$_} } @modes, 'all';
+
+my $updater = Lingua::RU::OpenCorpora::Tokenizer::Updater->new;
+
+for my $mode (@modes) {
+    if($opts{$mode} or $opts{all}) {
+        my $available_method  = "${mode}_update_available";
+        my $update_method     = "update_$mode";
+
+        my $current = "${mode}_current";
+        my $latest  = "${mode}_latest";
+
+        if($updater->$available_method($opts{force})) {
+            print "$mode: ", $updater->{$current}, ' -> ', $updater->{$latest}, $/ unless $opts{quiet};
+            $updater->$update_method;
+        }
+        else {
+            print "No update available for $mode $/" unless $opts{quiet};
+        }
+    }
+}
+
+sub usage { pod2usage(-verbose => $_[0]) }
+
+__END__
+
+=head1 NAME
+
+opencorpora-update-tokenizer - download newer data for tokenizer
+
+=head1 DESCRIPTION
+
+OpenCorpora tokenizer uses pre-calculated data stored in local files. This tool is used to update those files. Files are downloaded from OpenCorpora servers.
+
+=head1 SYNOPSIS
+
+opencorpora-update-tokenizer <mode> [options]
+
+=head2 MODES
+
+=over 4
+
+=item --vectors
+
+Update vectors file
+
+=item --hyphens
+
+Update hyphens file
+
+=item --prefixes
+
+Update prefixes file
+
+=item --exceptions
+
+Update exceptions file
+
+=item --all
+
+Update all files
+
+=back
+
+=head2 OPTIONS
+
+=over 4
+
+=item --force
+
+Force update even if you already have up-to-date data
+
+=item --quiet
+
+Suppress any informational messages
+
+=item --help
+
+Show this message
+
+=back

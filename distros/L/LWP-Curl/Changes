@@ -1,0 +1,73 @@
+Revision history for Perl module LWP::Curl
+
+0.14 2016-01-05
+    - Fix rt #108499 and rt #109813
+
+0.13 2015-10-15
+    - Working with Net::Curl instead of WWW::Curl, now works on OSX by Mark Allen (mrallen1)
+      This was the rt #86413
+
+0.11.1 2012-06-25
+
+    - The get() method now checks the underlying response code,
+      and only returns success if the request really was successful.
+      This makes all tests pass cleanly.
+    - In Makefile.PL the runtime required modules were listed as
+      build requirements. Changed them to be runtime requirements.
+    - Data::Dumper wasn't listed as a runtime requirement.
+    - Bugfix: rt #77727: -T in test scripts causes test failures
+
+
+0.10 2012-04-10 
+
+    - removed cookie_jar method and doc for it,
+      as they were cut&paste from proxy method
+    - reformatted this file according to CPAN::Changes::Spec
+    - get() wasn't croak'ing for non 2xx status codes, which was causing
+      some of the tests to fail
+    - Removed debug from test
+
+0.09 2011-07-10
+
+    - Bugfix: "When $lwpcurl->proxy('') is called, it is simply ignored" by David Oliveira
+
+0.08 2011-04-11
+
+    - Just change the version, because 0.07-1 isn't a valid version :/
+
+0.07-1 2011-03-09
+
+    - $lwp->proxy working :) and some bug fixed resolved
+    - Tests improvements
+
+0.07 2011-03-09
+
+    - Forgot change the Change :/
+
+0.06 2009-01-12
+
+    - Resolved a litle bug when get method does not return anything
+
+0.05 2008-12-12
+
+    - Removed get test
+    - Dependency WWW::Curl::Easy added, thanks to Daniel Mantovani
+
+0.04 2008-12-05
+
+    - wrong get test
+
+0.03 2008-12-04
+
+    - $lwpcurl->post working! :)
+    - Auto url encode
+
+0.02 2008-12-03
+
+    - Some language problems
+    - Fix two perlcritic warnings
+
+0.01 2008-12-03
+
+    - First version, released on an unsuspecting world.
+

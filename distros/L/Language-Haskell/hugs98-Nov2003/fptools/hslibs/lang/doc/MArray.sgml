@@ -1,0 +1,15 @@
+<sect1 id="sec-MArray">
+  <title><literal>MArray</literal></title>
+  <indexterm><primary><literal>MArray</literal></primary><secondary>module</secondary></indexterm>
+  
+  <para>This module has moved to <ulink url="../base/Data.Array.MArray.html"><literal>Data.Array.MArray</literal></ulink> in the
+  hierarchical libraries.</para>
+
+</sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: sgml ***
+     ;;; sgml-parent-document: ("../../doc/hslibs.sgml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

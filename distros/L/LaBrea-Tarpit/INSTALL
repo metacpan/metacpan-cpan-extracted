@@ -1,0 +1,199 @@
+
+The latest version of this distribution can be found at:
+
+http://www.bizsystems.com/downloads/
+
+Installation:
+
+	What you need:
+
+	Net::Whois::IP version 0.35
+	LaBrea version 2.4b3 or higher
+	  LaBrea2_4b3.tgz is included with this distribution (works well)
+	  for labrea version 2.5-stable-1, apply the patch
+	  in the 'labrea_patches' directory to adjust
+	  bandwidth reporting for bytes/second
+
+	LaBrea::Tarpit	distribution
+	  LaBrea/examples/daemon.pl
+	  LaBrea/examples/tell_me.pl
+	  LaBrea/DShield/examples/mail_dshield.pl
+	  LaBrea/Get/examples/web_scan.pl
+	  LaBrea/Report/examples/LocalTrojans.pl
+	  LaBrea/Report/examples/whois.plx
+	  LaBrea/Report/examples/html_report.plx
+	    or
+	  Labrea/Report/examples/paged_report.plx
+
+Where do they go, who owns them:
+
+  root	daemon.pl, tell_me.pl, mail_dshield.pl
+  web	xxx_report.plx LocalTrojans.pl
+	web_scan.pl whois.plx
+
+	daemon.pl   ->	startup rc files
+		make sure you shutdown with 
+		kill -15 ... see below
+
+	tell_me.pl  ->	root cron jobs
+	mail_dshield.pl
+
+	web_scan.pl -> web/user cron job
+	xxx_report  -> web cgi script
+		put images and LocalTrojans.pl
+		where the report can find them
+	whois.plx   -> web cgi script
+		put in the same directory
+		as xxx_report
+
+Get, build and install:
+
+	Net::Whois::IP version 0.35
+	from cpan.org
+
+	LaBrea version 2.4b3 or higher 
+	from www.hackbusters.net
+
+Install LaBrea::Tarpit
+
+	tar -xzvf LaBrea-Tarpit-X.XX.tgz
+	cd LaBrea-Tarpit-X.XX
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Configuring 'daemon.pl'
+
+	cp examples/daemon.pl to your daemon startup area
+	cd (daemon startup area)
+
+	Edit the 'config' settings in 'daemon.pl' to conform
+	to you system then make an entry in your startup
+	files to run 'daemon.pl' at boot time.
+
+	Make sure that you use 
+
+	kill -15 (SIG_TERM)
+
+	to manually shut down the daemon so it perserves it's 
+	cache information for reboot.
+
+	Normal system shutdown typically does this 
+	automatically.
+
+Configuring 'html_report' or paged_report
+
+	To use, copy the contents of the 'examples' directory
+	to an appropriate directory on your web server. Then
+	edit html_report.xxx or paged_report.xxx to provide 
+	the path relative to your document root to the 'images' 
+	directory or './' if it is the same as the report script.
+
+	paged_report.xxx and html_report.xxx will not run as they
+	are presently configured without this change.
+
+	If you have mod_perl installed, you can run the report
+	whois scripts as-is, otherwise rename the 'xxx' portion 
+	'cgi'.
+
+	make a subdirectory 'tmp' with permissions writable
+	by the webserver for the report page cache.
+
+	Adjust any configuration settings that deviate from
+	this "standard" installation. 
+
+	##########################################################
+
+    To analyze syslog files do this:
+
+	perl html_report.plx syslog_file/path/name > some_html_page.html
+
+	the report module will preload the memory cache from 
+
+	$look_n_feel->{cache}
+
+	then add the contents of the syslog file specified on the
+	command line, write the html file and re-write the 
+	memory cache file.
+
+	##########################################################
+
+    To add FILE CACHEing, set the values below. This is now mandatory
+	for paged_report.plx and html_report.plx. 
+
+	$look_n_feel	-> {html_cache_file}
+			-> {html_expire}
+
+  ****  WARNING  ####
+
+	The directory that the cache file resides in 
+	MUST be writable by the web server
+
+  ###################
+
+	The web server to fetch the report from the 
+	html_cache_file rather than generate a new report 
+	each time. This is useful to reduce or eliminate the 
+	effects of a denial of service attack on the report 
+	generator page. It does a lot of crank turning and 
+	can eat up CPU resources if there are many hits at 
+	the same time.
+
+localTrojans.pl
+
+	A file containing a list of Trojan ports and their descriptions.
+	please feel free to update this file as you learn of new
+	trojan ports. A copy of any new information would be appreciated.
+
+mail_dshield.pl
+
+	Not much to do to get this to work. 
+
+	Copy "mail_dshield.pl" 
+
+	to the root directory.
+
+	Configure EITHER smtp or a sendmail equivalent.
+
+	Set your DShield UserID, and mail address
+
+	Adjust the PATH to the dshield cache directory, it
+	should be the same as what you've configured for the
+	LaBrea::Tarpit::daemon. 
+
+	Run periodically from cron, it's smart enough to delete
+	its old files and hang on to the ones that don't get
+	sent for a retry.
+
+web_scan.pl
+
+	Copy ./Get/examples/web_scan.pl and ./Get/examples/other_sites.txt
+
+	to your web site home directory.
+
+	Run this cron job hourly or daily to retrieve stats from other
+	sites using LaBrea::Tarpit.
+
+	This example assumes that html_report.plx resides in ./public_html
+
+ # MIN HOUR DAY MONTH DAYOFWEEK   COMMAND
+ 30 * * * * ./web_scan.pl ./other_sites.txt ./public_html/tmp/site_stats
+
+tell_me.pl
+
+	Copy ./examples/tell_me.pl 
+
+	to your root directory and configure
+
+	Run this cron job daily to generate an email to yourself showing
+	the hosts that are older than "AGE" days that are stuck in the
+	tarpit. You might want to send the ISP a notice about the rogue host.
+
+ # MIN HOUR DAY MONTH DAYOFWEEK   COMMAND
+ 30 * * * * ./tell_me.pl 60  # default      
+
+	You can also run it from the command line to send the
+	same e-mail or edit the file to produce text instead.
+
+enjoy... michael@bizsystems.com

@@ -1,0 +1,74 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Lab::Measurement::Installation - Installation guide for Lab::Measurement
+
+=head1 Introduction
+
+Since Lab::Measurement does not contain any device driver code itself, its installation is 
+pretty straightforward. However, before you can actually use it, you will have to install
+a driver binding back-end, such as Lab::VISA or Linux-GPIB, plus its dependencies. Please 
+see the documentation of these packages for more details.
+
+=head1 Installation on Windows
+
+=over
+
+=item * Install L<Strawberry Perl|http://strawberryperl.com/download/5.20.3.3/strawberry-perl-5.20.3.3-32bit.msi>. If you want to use NI-VISA, see the comments on supported perl versions in L<Lab::VISA's installation guide|http://labmeasurement.de/docs/VISA-Installation.html>
+
+=item * Install gnuplot (not mandatory)
+
+=over
+
+=item * L<Download|http://sourceforge.net/project/showfiles.php?group_id=2055>, extract and put it somewhere
+
+=item * Add directory containing C<pgnuplot.exe> to path:
+My Computer => Properties => Advanced => Environment Variables
+
+=back
+
+=item * Build and install:
+
+ cpanm Lab::Measurement
+
+=item * If you need the NI-VISA backend for your instruments follow L<Lab::VISA's installation guide|http://labmeasurement.de/docs/VISA-Installation.html>
+
+=item * Have fun!
+
+=back
+
+=head1 Installation on Linux
+
+=over
+
+=item * Install cpanminus, make, gcc and gnuplot
+(you can use your package manager).
+
+=item * If you want to use GPIB, you need the
+L<Linux-GPIB|http://linux-gpib.sourceforge.net> drivers, library
+and Perl bindings. See the short installation and configuration guide in
+L<Lab::Measurement::Backends>.
+
+=item * Install Lab::Measurement (as root):
+
+ cpanm Lab::Measurement
+
+=item * Have fun!
+
+=back
+
+=head2 Notes
+
+If you want to install Lab::Measurement into your home directory you can use
+the L<local::lib> package.
+
+=head1 COPYRIGHT AND LICENCE
+
+ (c) 2010, 2011 Daniel Schröer, Andreas K. Hüttel, Daniela Taubert, and others.
+     2012       Andreas K. Hüttel
+
+=cut
+

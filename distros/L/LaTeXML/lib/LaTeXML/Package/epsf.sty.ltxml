@@ -1,0 +1,63 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  epsf                                                               | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+#**********************************************************************
+# (See  LaTeXML::Post::Graphics for suggested postprocessing)
+# Provides alternative argument syntax.
+RawTeX(<<'EOTeX');
+\newif\ifepsfatend
+\newif\ifepsfdraft
+\newif\ifepsfframe
+\newif\ifepsfshow
+\epsfshowtrue
+\newif\ifepsfshowfilename
+\newif\ifepsfverbose
+\newdimen\epsfframemargin
+\newdimen\epsfframethickness
+\newdimen\epsfxsize
+\newdimen\epsfysize
+\newdimen\pspoints
+\pspoints = 1bp
+\epsfxsize = 0pt
+\epsfysize = 0pt
+\epsfframemargin = 0pt
+\epsfframethickness = 0.4pt
+EOTeX
+
+DefPrimitive('\epsfclipon',  sub { AssignValue(epsf_clip => 1); return; });
+DefPrimitive('\epsfclipoff', sub { AssignValue(epsf_clip => 0); return; });
+DefConstructor('\epsfbox[] Semiverbatim', sub {
+    my ($document, $bb, $graphic) = @_;
+    my $clip = LookupValue('epsf_clip');
+    my $options = ($clip ? ($bb ? "viewport=$bb, clip" : "clip") : '');
+    $graphic = ToString($graphic); $graphic =~ s/^\s+//; $graphic =~ s/\s+$//;
+    my @candidates = pathname_findall($graphic, types => ['*'], paths => LookupValue('GRAPHICSPATHS'));
+    if (my $base = LookupValue('SOURCEDIRECTORY')) {
+      @candidates = map { pathname_relative($_, $base) } @candidates; }
+    $document->insertElement('ltx:graphics', undef, graphic => $graphic,
+      candidates => join(',', @candidates), options => $options); });
+
+Let('\epsfgetlitbb', '\epsfbox');
+Let('\epsfnormal',   '\epsfbox');
+Let('\epsffile',     '\epsfbox');
+
+DefPrimitive('\epsfgetbb Semiverbatim', undef);
+DefPrimitive('\epsfframe',              undef);    # Ignore (?), and process the arg.
+
+#**********************************************************************
+1;
+

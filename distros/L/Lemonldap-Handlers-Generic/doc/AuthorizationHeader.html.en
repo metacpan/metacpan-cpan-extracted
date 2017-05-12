@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Lemonldap::Handlers::AuthorizationHeader  - Plugin  for Lemonldap sso system</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#overlay">Overlay</a></li>
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<center> <H1> Lemonldap::Handlers::AuthorizationHeader </H1></center><p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<pre>
+    Lemonldap::Handlers::AuthorizationHeader  - Plugin  for Lemonldap sso system</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<pre>
+ AuthorizationHeader is the default header builder  manager  of lemonldap  websso framework .</pre>
+<pre>
+ 
+ see <a href="http://lemonldap.sf.net">http://lemonldap.sf.net</a> for more infos .</pre>
+<p>
+</p>
+<h2><a name="overlay">Overlay</a></h2>
+<p>If you want use your own header  method you must use PLUGINHEADER parameter like this :
+  in httpd.conf : perlsetvar lemonldappluginheader MyModule</p>
+<pre>
+ Your module must accept  3 parameters : config (all the hash of config ) , dn and sting of role (profil) .</pre>
+<pre>
+ Your module must provide the 'get' and 'forge'  methods .
+ 
+ Those methods work with HEADER parameter which tells what will be the  header (NONE value for no header)</pre>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>Lemonldap(3), Lemonldap::Portal::Standard</p>
+<p><a href="http://lemonldap.sourceforge.net/">http://lemonldap.sourceforge.net/</a></p>
+<p>``Writing Apache Modules with Perl and C'' by Lincoln Stein &amp; Doug
+MacEachern - O'REILLY</p>
+<dl>
+<dt><strong><a name="item_eric_german_2c__3cgermanlinux_40yahoo_2efr_3e">Eric German, &lt;<a href="mailto:germanlinux@yahoo.fr">germanlinux@yahoo.fr</a>&gt;</a></strong><br />
+</dt>
+<dt><strong><a name="item_isabelle_serre_2c__3cisabelle_2eserre_40justice_2e">Isabelle Serre, &lt;<a href="mailto:isabelle.serre@justice.gouv.fr">isabelle.serre@justice.gouv.fr</a>&gt;</a></strong><br />
+</dt>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright (C) 2004 by Eric German &amp; Isabelle Serre</p>
+<p>Lemonldap originaly written by Eric german who decided to publish him in 2003
+under the terms of the GNU General Public License version 2.</p>
+<dl>
+<dt><strong><a name="item_this_package_is_under_the_gnu_general_public_licen">This package is under the GNU General Public License, Version 2.</a></strong><br />
+</dt>
+<dt><strong><a name="item_the_primary_copyright_holder_is_eric_german_2e">The primary copyright holder is Eric German.</a></strong><br />
+</dt>
+<dt><strong><a name="item_portions_are_copyrighted_under_the_same_license_as">Portions are copyrighted under the same license as Perl itself.</a></strong><br />
+</dt>
+<dt><strong><a name="item_portions_are_copyrighted_by_doug_maceachern_and_li">Portions are copyrighted by Doug MacEachern and Lincoln Stein.
+This library is under the GNU General Public License, Version 2.</a></strong><br />
+</dt>
+<dt><strong><a name="item_ahmadi">Portage under Apache2 is made with help of : Ali Pouya and 
+Shervin Ahmadi (MINEFI/DGI)</a></strong><br />
+</dt>
+</dl>
+<pre>
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 dated June, 1991.</pre>
+<pre>
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.</pre>
+<pre>
+  A copy of the GNU General Public License is available in the source tree;
+  if not, write to the Free Software Foundation, Inc.,
+  59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+</pre>
+
+</body>
+
+</html>

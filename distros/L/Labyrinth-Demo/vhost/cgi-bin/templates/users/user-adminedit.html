@@ -1,0 +1,79 @@
+[% 
+    IF users.data.userid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = 'User ' _ editmode _ ': ' _ data.realname ;
+
+    IF ! users.data.userid ; THEN ; newuser = 1 ; END ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+[% IF thanks %]<p>User saved successfully.</p>[% END %]
+<p>Fields marked '*' are mandatory fields and must be completed.</p>
+
+[% IF errmess %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name="act" value="user-save" />
+<input type="hidden" name="userid" value="[% IF users.data.userid %][% users.data.userid %][% ELSE %]0[% END %]" />
+
+<table>
+<tr><th width="150">Email *</th>
+    <th class="alert">[% users.data.email_err %]</th>
+    <td><input type="text" name="email" value="[% users.data.email %]" size="50" /></td>
+</tr>
+[% IF newuser %]
+<tr><th>Password *</th>
+    <th class="alert">[% users.data.effect_err %]</th>
+    <td><input type="text" name="effect" value="[% users.data.effect %]" size="50" /></td>
+</tr>
+[% END %]
+
+<tr><th>Display Name *</th>
+    <th class="alert">[% users.data.realname_err %]</th>
+    <td><input type="text" name="realname" value="[% users.data.realname %]" size="50" /></td>
+</tr>
+<tr><th>Tag</th>
+    <th class="alert">[% users.data.nickname_err %]</th>
+    <td><input type="text" name="nickname" value="[% users.data.nickname %]" size="20" /></td>
+</tr>
+<tr><th>Web Page</th>
+    <th class="alert">[% users.data.url_err %]</th>
+    <td><input type="text" name="url" value="[% users.data.url %]" size="50" /></td>
+</tr>
+<tr><th>Avatar</th>
+    <th class="alert">[% users.data.image_err %]</th>
+    <td><input type="file" name="image" />
+[% IF users.data.link %]
+    <img src="[% webpath %]/[% users.data.link %]" alt="[% users.data.tag %]" />
+[% END %]
+    <input type="hidden" name="imageid" value="[% users.data.imageid %]" /></td>
+</tr>
+<tr><th>About Me</th>
+    <th class="alert">[% users.data.aboutme_err %]</th>
+    <td><textarea name="aboutme" rows="10" cols="50">[% users.data.aboutme %]</textarea></td>
+</tr>
+<tr><th>Search</th>
+    <th class="alert">[% users.data.search_err %]</th>
+    <td><input type="checkbox" name="search" value="1"[% IF users.data.search %] checked="checked"[% END %] /></td>
+</tr>
+<tr><th>Default Access</th>
+    <th class="alert">[% users.data.accessid_err %]</th>
+    <td>[% users.data.ddaccess %]</td>
+</tr>
+<tr><th>Realm</th>
+    <th class="alert">[% users.data.realm_err %]</th>
+    <td>[% users.data.ddrealms %]</td>
+</tr>
+ <tr><td colspan="2"></td><td><input type="submit" name="submit" value="UPDATE" /></td></tr>
+</table>
+
+[% IF newuser %][% ELSE %]
+<p align="center">
+[ <a href="[% cgipath %]/pages.cgi?act=user-adminpass&amp;userid=[% users.data.userid %]">change password</a>
+| <a href="[% cgipath %]/pages.cgi?act=user-acl&amp;userid=[% users.data.userid %]">change access rights</a> ]</p>
+[% END %]
+
+</form>
+

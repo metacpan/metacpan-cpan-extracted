@@ -1,0 +1,90 @@
+--- #YAML:1.0
+rbg:
+  0:  pigment { rgb <0.301961,0.301961,0.301961> }
+  1:  pigment { rgb <0.0823529,0.376471,0.976471> }
+  10: pigment { rgb <0.862745,1,0.0392157> }
+  11: pigment { rgb <0.65098,0.94902,1> }
+  12: pigment { rgb <1,0.603922,0.129412> }
+  13: pigment { rgb <1,0.654902,0.811765> }
+  14: pigment { rgb <1,0.905882,0.211765> }
+  15: pigment { rgb <1,1,1> }
+  17: pigment { rgb <0.4,0.941176,0.6> }
+  18: pigment { rgb <1,1,0.501961> }
+  19: pigment { rgb <0.8,0.666667,0.4> }
+  2:  pigment { rgb <0.117647,0.627451,0.227451> }
+  20: pigment { rgb <0.878431,0.8,0.941176> }
+  21: pigment { rgb <0.878431,1,0.690196> }
+  22: pigment { rgb <0.6,0.2,0.6> }
+  23: pigment { rgb <0.298039,0,0.8> }
+  25: pigment { rgb <1,0.4,0> }
+  26: pigment { rgb <1,0.2,0.6> }
+  27: pigment { rgb <0.678431,0.866667,0.313726> }
+  28: pigment { rgb <0.8,0.666667,0.4> }
+  3:  pigment { rgb <0,0.654902,0.627451> }
+  32: pigment { rgb <0.301961,0.301961,0.301961> #if (QUAL > 1) filter 0.85 #end }
+  33: pigment { rgb <0.0823529,0.376471,0.976471> #if (QUAL > 1) filter 0.85 #end }
+  34: pigment { rgb <0.117647,0.627451,0.227451> #if (QUAL > 1) filter 0.85 #end }
+  35: pigment { rgb <0,0.654902,0.627451> #if (QUAL > 1) filter 0.85 #end }
+  36: pigment { rgb <0.968627,0.160784,0.054902> #if (QUAL > 1) filter 0.85 #end }
+  37: pigment { rgb <0.627451,0.313726,0.498039> #if (QUAL > 1) filter 0.85 #end }
+  38: pigment { rgb <0.564706,0.337255,0.184314> #if (QUAL > 1) filter 0.85 #end }
+  39: pigment { rgb <0.682353,0.682353,0.682353> #if (QUAL > 1) filter 0.85 #end }
+  4:  pigment { rgb <0.968627,0.160784,0.054902> }
+  40: pigment { rgb <0.47451,0.47451,0.45098> #if (QUAL > 1) filter 0.85 #end }
+  41: pigment { rgb <0.313726,0.313726,1> #if (QUAL > 1) filter 0.85 #end }
+  42: pigment { rgb <0.862745,1,0.0392157> #if (QUAL > 1) filter 0.85 #end }
+  43: pigment { rgb <0.65098,0.94902,1> #if (QUAL > 1) filter 0.85 #end }
+  44: pigment { rgb <1,0.603922,0.129412> #if (QUAL > 1) filter 0.85 #end }
+  45: pigment { rgb <1,0.654902,0.811765> #if (QUAL > 1) filter 0.85 #end }
+  46: pigment { rgb <1,0.905882,0.211765> #if (QUAL > 1) filter 0.85 #end }
+  47: pigment { rgb <1,1,1> #if (QUAL > 1) filter 0.85 #end }
+  5:  pigment { rgb <0.627451,0.313726,0.498039> }
+  57: pigment { rgb <1,0.4,0> #if (QUAL > 1) filter 0.85 #end }
+  6:  pigment { rgb <0.564706,0.337255,0.184314> }
+  7:  pigment { rgb <0.682353,0.682353,0.682353> }
+  8:  pigment { rgb <0.47451,0.47451,0.45098> }
+  9:  pigment { rgb <0.313726,0.313726,1> }
+  383: pigment { rgb <0.9,0.9,0.9> }
+colordecl:
+  metallic: |
+    #declare [% color_name %] = material {
+    	texture {
+    		[% color_def %]
+    		finish {
+    			ambient 0.25
+    			diffuse 0.6
+    			#if (QUAL > 1)
+    				brilliance 5
+    				metallic
+    				specular 0.80
+    				roughness 1/100
+    				reflection 0.65
+    			#end
+    		}
+    		#if (BUMPS & (QUAL>1)) normal { BUMPNORMAL } #end
+    	}
+    }
+  normal: |
+    #declare [% color_name %] = material {
+    	texture {
+    		[% color_def %]
+    		finish { ambient AMB diffuse DIF }
+    		#if (QUAL > 1)
+    			finish { phong 0.5 phong_size 40 reflection 0.2 }
+    			finish { refraction 1 ior 1.25 }
+    			#if (BUMPS) normal { BUMPNORMAL } #end
+    		#end
+    	}
+    	#if (QUAL > 1) interior { ior 1.25 } #end
+    }
+  transparent: |
+    #declare [% color_name %] = material {
+    	texture {
+    		[% color_def %]
+    		finish { ambient AMB diffuse DIF }
+    		#if (QUAL > 1)
+    			finish { phong 0.5 phong_size 40 reflection 0.08 }
+    			#if (BUMPS) normal { BUMPNORMAL } #end
+    		#end
+    	}
+    }

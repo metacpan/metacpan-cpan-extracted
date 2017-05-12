@@ -1,0 +1,4 @@
+Lingua::TH::Segmentation::wc T_PTROBJ
+Lingua::TH::Segmentation::vector T_PTROBJ
+guchar* T_PV
+gchar* T_PV

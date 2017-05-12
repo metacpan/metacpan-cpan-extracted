@@ -1,0 +1,47 @@
+[% 
+    title = 'Releases: ' _ [% release.data.title %];
+    htmltitle = title ;
+
+    crumb3_name = 'Home' ;
+    crumb3_href = '/' ;
+    crumb2_name = 'Releases' ;
+    crumb2_href = '/release-list' ;
+    crumb1_name = [% release.data.title %] ;
+%]
+
+<div class="release">
+	[% IF release.data.link %]
+  <div class="rightbox">
+  <img src="[% webpath %]/[% release.data.link %]" alt="[% release.data.tag %]" align="right" />
+  </div>
+	[% END %]
+
+  <p><b>[% release.title %]</b> ([% release.postyear %])</p>
+
+	[% IF release.lyrics %]
+	<ol>
+    [% FOREACH lyric = release.lyrics %]
+    <li><a href="/lyric/item?articleid=[% lyric.articleid %]">[% lyric.title %]</a></li>
+    [% END %]
+  </ol>
+  <p><a href="/release-lyrics/[% release.articleid %]">View all Lyrics</a></p>
+	[% ELSE %]
+	<p>No tracks listed for this release.</p>
+	[% END %]
+
+  [% IF release.profiles %]
+	<ol>
+    [% FOREACH profile = release.profiles %]
+    <li><a href="/who-item?articleid=[% profile.articleid %]">[% profile.title %]</a></li>
+    [% END %]
+  </ol>
+  <p><a href="/release-profiles/[% release.articleid %]">View all Profiles</a></p>
+	[% END %]
+
+  <div class="clearboth"></div>
+  <hr />
+
+	[% block = release.body %]
+	[% INCLUDE "articles/arts-block.html" %]
+
+</div>

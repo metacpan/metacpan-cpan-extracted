@@ -1,0 +1,377 @@
+NAME
+    Lingua::StanfordCoreNLP - A Perl interface to Stanford's CoreNLP tool
+    set.
+
+SYNOPSIS
+     # Note that Lingua::StanfordCoreNLP can't be instantiated.
+     use Lingua::StanfordCoreNLP;
+
+     # Create a new NLP pipeline (make corefs bidirectional)
+     my $pipeline = new Lingua::StanfordCoreNLP::Pipeline(1);
+
+     # Get annotator properties:
+     my $props = $pipeline->getProperties();
+
+     # These are the default annotator properties:
+     $props->put('annotators', 'tokenize, ssplit, pos, lemma, ner, parse, dcoref');
+
+     # Update properties:
+     $pipeline->setProperties($props);
+
+     # Process text
+     # (Will output lots of debug info from the Java classes to STDERR.)
+     my $result = $pipeline->process(
+        'Jane looked at the IBM computer. She turned it off.'
+     );
+
+     my @seen_corefs;
+
+     # Print results
+     for my $sentence (@{$result->toArray}) {
+        print "\n[Sentence ID: ", $sentence->getIDString, "]:\n";
+        print "Original sentence:\n\t", $sentence->getSentence, "\n";
+
+        print "Tagged text:\n";
+        for my $token (@{$sentence->getTokens->toArray}) {
+           printf "\t%s/%s/%s [%s]\n",
+                  $token->getWord,
+                  $token->getPOSTag,
+                  $token->getNERTag,
+                  $token->getLemma;
+        }
+
+        print "Dependencies:\n";
+        for my $dep (@{$sentence->getDependencies->toArray}) {
+           printf "\t%s(%s-%d, %s-%d) [%s]\n",
+                  $dep->getRelation,
+                  $dep->getGovernor->getWord,
+                  $dep->getGovernorIndex,
+                  $dep->getDependent->getWord,
+                  $dep->getDependentIndex,
+                  $dep->getLongRelation;
+        }
+
+        print "Coreferences:\n";
+        for my $coref (@{$sentence->getCoreferences->toArray}) {
+           printf "\t%s [%d, %d] <=> %s [%d, %d]\n",
+                  $coref->getSourceToken->getWord,
+                  $coref->getSourceSentence,
+                  $coref->getSourceHead,
+                  $coref->getTargetToken->getWord,
+                  $coref->getTargetSentence,
+                  $coref->getTargetHead;
+
+           print "\t\t(Duplicate)\n"
+              if(grep { $_->equals($coref) } @seen_corefs);
+
+           push @seen_corefs, $coref;
+        }
+     }
+
+DESCRIPTION
+    This module implements a "StanfordCoreNLP" pipeline for annotating text
+    with part-of-speech tags, dependencies, lemmas, named-entity tags, and
+    coreferences.
+
+    (Note that the archive contains the CoreNLP annotation models, which is
+    why it's so darn big. Also note that versions before 0.10 have slightly
+    different API:s than 0.10+.)
+
+INSTALLATION
+    The following should do the job:
+
+     $ perl Build.PL
+     $ ./Build test
+     $ sudo ./Build install
+
+PREREQUISITES
+    Lingua::StanfordCoreNLP consists mainly of Java code, and thus needs
+    Inline::Java installed to function.
+
+ENVIRONMENT
+    Lingua::StanfordCoreNLP can use the following environmental variables
+
+  LINGUA_CORENLP_JAR_PATH
+    Directory containing the CoreNLP jar-files. Normally,
+    Lingua::StanfordCoreNLP expects LINGUA_CORENLP_JAR_PATH to contain the
+    following files:
+
+     stanford-corenlp-VERSION.jar
+     stanford-corenlp-VERSION-models.jar
+     joda-time.jar
+     jollyday.jar
+     xom.jar
+
+    (Where VERSION is 1.3.4 or the value of LINGUA_CORENLP_VERSION.) If your
+    filenames are different, you can add "*.jar" to the end of the path, to
+    make Lingua::StanfordCoreNLP use all the jar-files in
+    LINGUA_CORENLP_JAR_PATH.
+
+  LINGUA_CORENLP_VERSION
+    Version of jar-files in LINGUA_CORENLP_JAR_PATH.
+
+  LINGUA_CORENLP_JAVA_ARGS
+    Arguments to pass to JVM (via Inline::Java). Defaults to "-Xmx2000m"
+    (increase max memory to 2000 MB).
+
+EXPORTED CLASS
+    Lingua::StanfordCoreNLP exports the following Java-classes via
+    Inline::Java:
+
+  Lingua::StanfordCoreNLP::Pipeline
+    The main interface to "StanfordCoreNLP". This class is the only one you
+    can instantiate yourself. It is, basically, a perlified
+    be.fivebyfive.lingua.stanfordcorenlp.Pipeline.
+
+    new
+    new($bidirectionalCorefs)
+        Creates a new "Lingua::StanfordCoreNLP::Pipeline" object. The
+        optional boolean parameter $bidirectionalCorefs makes coreferences
+        bidirectional; that is to say, the coreference is added to both the
+        source and the target sentence of all coreferences (if the source
+        and target sentence are different). $silent and $bidirectionalCorefs
+        default to false.
+
+    getProperties
+        Returns a "java.util.Properties" object containing annotator
+        options. By default it contains a single entry, "annotators", which
+        has the value "tokenize, ssplit, pos, lemma, ner, parse, dcoref".
+
+    setProperties($prop)
+        Updates annotator options. Expects a "java.util.Properties" object.
+        If you call this after having called "process", you will have to
+        call "initPipeline" to update the annotator.
+
+    getPipeline
+        Returns a reference to the "StanfordCoreNLP" pipeline used for
+        annotation. You probably won't want to touch this.
+
+    initPipeline
+        Reinitializes the "StanfordCoreNLP" pipeline used for annotation.
+
+    process($str)
+        Process a string. Returns a
+        "Lingua::StanfordCoreNLP::PipelineSentenceList".
+
+JAVA CLASSES
+    In addition, Lingua::StanfordCoreNLP indirectly exports the following
+    Java-classes, all belonging to the namespace
+    "be.fivebyfive.lingua.stanfordcorenlp":
+
+  PipelineItem
+    Abstract superclass of
+    "Pipeline{Coreference,Dependency,Sentence,Token}". Contains ID and
+    methods for getting and comparing it.
+
+    getID
+        Returns a "java.util.UUID" object which represents the item's ID.
+
+    getIDString
+        Returns the ID as a string.
+
+    identicalTo($b)
+        Returns true if $b has an identical ID to this item.
+
+  PipelineCoreference
+    An object representing a coreference between head-word W1 in sentence S1
+    and head-word W2 in sentence S2. Note that both sentences and words are
+    zero-indexed, unlike the default outputs of Stanford's tools.
+
+    getSourceSentence
+        Index of sentence S1.
+
+    getTargetSentence
+        Index of sentence S2.
+
+    getSourceHead
+        Index of word W1 (in S1).
+
+    getTargetHead
+        Index of word W2 (in S2).
+
+    getSourceToken
+        The "PipelineToken" representing W1.
+
+    getTargetToken
+        The "PipelineToken" representing W2.
+
+    equals($b)
+        Returns true if this "PipelineCoreference" matches $b --- if their
+        "getSourceToken" and "getTargetToken" have the same ID. Note that it
+        returns true even if the orders of the coreferences are reversed (if
+        "$a->getSourceToken->getID == $b->getTargetToken->getID" and
+        "$a->getTargetToken->getID == $b->getSourceToken->getID").
+
+    toCompactString
+        A compact String representation of the coreference ---
+        "Word/Sentence:Head <=> Word/Sentence:Head".
+
+    toString
+        A String representation of the coreference --- "Word/POS-tag
+        [sentence, head] <=> Word/POS-tag [sentence, head]".
+
+  PipelineDependency
+    Represents a dependency in the Stanford Typed Dependency format. For
+    example, in the fragment "Walk hard", "Walk" is the governor and "hard"
+    is the dependent in the relationship "advmod" ("hard" is an adverbial
+    modifier of "Walk").
+
+    getGovernor
+        The governor in the relation as a "PipelineToken".
+
+    getGovernorIndex
+        The index of the governor within the sentence.
+
+    getDependent
+        The dependent in the relation as a "PipelineToken".
+
+    getDependentIndex
+        The index of the dependent within the sentence.
+
+    getRelation
+        Short name of the relation.
+
+    getLongRelation
+        Long description of the relation.
+
+    toCompactString
+    toCompactString($includeIndices)
+    toString
+    toString($includeIndices)
+        Returns a String representation of the dependency ---
+        "relation(governor-N, dependent-N) [description]". "toCompactString"
+        does not include description. The optional parameter $includeIndices
+        controls whether governor and dependent indices are included, and
+        defaults to true. (Note that unlike those of, e.g., the Stanford
+        Parser, these indices start at zero, not one.)
+
+  PipelineSentence
+    An annotated sentence, containing the sentence itself, its dependencies,
+    pos- and ner-tagged tokens, and coreferences.
+
+    getSentence
+        Returns a string containing the original sentence
+
+    getTokens
+        A "PipelineTokenList" containing the POS- and NER-tagged and
+        lemmaized tokens of the sentence.
+
+    getDependencies
+        A "PipelineDependencyList" containing the dependencies found in the
+        sentence.
+
+    getCoreferences
+        A "PipelineCoreferenceList" of the coreferences between this and
+        other sentences.
+
+    toCompactString
+    toString
+        A String representation of the sentence, its coreferences,
+        dependencies, and tokens. "toCompactString" separates fields by
+        "\n", whereas "toString" separates them by "\n\n".
+
+  PipelineToken
+    A token, with POS- and NER-tag and lemma.
+
+    getWord
+        The textual representation of the token (i.e. the word).
+
+    getPOSTag
+        The token's Part-of-Speech tag.
+
+    getNERTag
+        The token's Named-Entity tag.
+
+    getLemma
+        The lemma of the the token.
+
+    toCompactString
+    toCompactString($lemmaize)
+        A compact String representation of the token --- "word/POS-tag". If
+        the optional argument $lemmaize is true, returns "lemma/POS-tag".
+
+    toString
+        A String representation of the token --- "word/POS-tag/NER-tag
+        [lemma]".
+
+  PipelineList
+  PipelineCoreferenceList
+  PipelineDependencyList
+  PipelineSentenceList
+  PipelineTokenList
+    "PipelineList" is a generic list class which extends
+    "java.Util.ArrayList". It is in turn extended by
+    "Pipeline{Coreference,Dependency,Sentence,Token}List" (which are the
+    list-types that "Pipeline" returns). Note that all lists are
+    zero-indexed.
+
+    joinList($sep)
+    joinListCompact($sep)
+        Returns a string containing the output of either the "toString" or
+        "toCompactString" methods of the elements in "PipelineList",
+        separated by $sep.
+
+    toArray
+        Return the elements of the list as an array-reference.
+
+    toHashMap
+        Return the list as a "java.util.HashMap<String,PipelineItem>", with
+        items' stringified ID:s as keys.
+
+    toCompactString
+    toString
+        Returns the elements of the "PipelineList" as a string containing
+        the output of either their "toCompactString" or "toString" methods,
+        separated by the default separator (which is "\n" for all lists
+        except "PipelineTokenList" which uses " ").
+
+TODO
+    *   Add representative mention to PipelineCoreference.
+
+    *   Make build system also compile "LinguaSCNLP.jar".
+
+REQUESTS & BUGS
+    Please file any issues, bug-reports, or feature-requests at
+    <https://github.com/raisanen/lingua-stanfordcorenlp>.
+
+AUTHORS
+    Kalle Räisänen <kal@cpan.org>.
+
+COPYRIGHT
+  Lingua::StanfordCoreNLP (Perl bindings)
+    Copyright © 2011-2013 Kalle Räisänen.
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or (at
+    your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+    General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+  Stanford CoreNLP tool set
+    Copyright © 2010-2012 The Board of Trustees of The Leland Stanford
+    Junior University.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, see <http://www.gnu.org/licenses/>.
+
+SEE ALSO
+    <http://nlp.stanford.edu/software/corenlp.shtml>,
+    Text::NLP::Stanford::EntityExtract, NLP::StanfordParser, Inline::Java.
+

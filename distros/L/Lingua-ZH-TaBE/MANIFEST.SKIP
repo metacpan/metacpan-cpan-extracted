@@ -1,0 +1,8 @@
+#defaults
+^MANIFEST.bak$
+^Makefile$
+^Makefile.old$
+^blib/
+^blibdirs$
+^pm_to_blib$
+^TaBE.(?!pm|xs).*$

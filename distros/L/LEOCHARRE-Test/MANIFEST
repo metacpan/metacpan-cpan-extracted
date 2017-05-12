@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/LEOCHARRE/Test.pm
+t/00.t
+t/01_mysqld.t
+META.yml                                 Module meta-data (added by MakeMaker)

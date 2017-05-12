@@ -1,0 +1,27 @@
+LibJIT version 0.03
+===================
+
+Perl bindings for GNU LibJIT.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Perl 5.20.2.
+LibJIT GIT at a8293e141b, maybe later.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Vickenty Fesunov.
+
+The library is distributed under the terms of the GNU Lesser General
+Public License.  See the LICENSE file for details.

@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+example.pl
+stat.3
+stat.html
+stat.pm
+test.pl

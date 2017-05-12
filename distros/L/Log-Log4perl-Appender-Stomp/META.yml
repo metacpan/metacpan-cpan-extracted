@@ -1,0 +1,15 @@
+---
+abstract: 'Log messages via STOMP'
+author:
+  - 'Adam Flott <adam@npjh.com>'
+generated_by: 'Dist::Zilla version 1.100160'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Log4perl-Appender-Stomp
+requires:
+  ExtUtils::MakeMaker: 6.11
+  Log::Log4perl: 0
+  Net::Stomp: 0
+version: 1.000

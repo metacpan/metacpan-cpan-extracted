@@ -1,0 +1,6 @@
+exec_prefix=[% EXECPREFIX %]
+libdir=[% LIBDIR %]
+
+Name: Jspell
+Description: Morphological analyser
+Version: [% VERSION %]

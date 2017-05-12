@@ -1,0 +1,164 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use File::Basename;
+use File::Spec::Functions;
+use Lingua::Jspell::DictManager;
+use Lingua::Jspell::ConfigData;
+
+my $libdir = catfile(Lingua::Jspell::ConfigData->config('libdir'),"jspell");
+
+my ($exists, $listall, $dicdir, $name, $mkname);
+my $result = GetOptions("list-dics"   => \$listall,
+                        "gen-yaml=s"  => \$mkname,
+                        "install=s"   => \$name,
+                        "dic-dir"     => \$dicdir,
+                        "installed=s" => \$exists);
+
+my @dics = map { basename($_) } <$libdir/*hash>;
+
+if ($dicdir) {
+    print "$libdir\n";
+}
+
+elsif ($listall) {
+    if (@dics) {
+        print (map "$_\n", @dics);
+    }
+}
+
+elsif ($exists) {
+    if (grep {$_ eq "$exists.hash"} @dics) {
+        print "yes\n";
+    } else {
+        print "no\n";
+        exit(1);
+    }
+}
+
+elsif ($name) {
+    ## install_yaml_dic("$name.yaml") if -f "$name.yaml";
+    my @file = @ARGV;
+    my @dic  = ();
+    my @y = (name => $name);
+
+    my $aff = "";
+    my $hash ="";
+
+    for(@ARGV){
+        push @dic, $_ if /\.dic$/;
+        $hash = $_    if /\.hash$/;
+        $aff  = $_    if /\.dic$/    || /from:/;
+    }
+    if (-f "$name.yaml")             { push @y , yaml => "$name.yaml";  }
+    if (-f "$name.irr")              { push @y , irr  => "$name.irr" ;  }
+    if ($hash)                       { push @y , hash =>  $hash      ;  }
+    if (not @dic and -f "name.dic")  { push @dic ,"name.dic"         ;  }
+    if (not $aff and -f "name.$aff") { $aff = "$name.aff"            ;  }
+
+    # Mais cedo ou mais tarde o install_dic deve retornar 0 ou 1...
+    exit (install_dic( {@y}, $aff, @dic));
+}
+
+elsif ($mkname) {
+
+    die "'$mkname.yaml' already exists\n" if -f "$mkname.yaml";
+
+    open F, ">$mkname.yaml" or die "Error: $!\n";
+    print F qq{
+META:
+ IDS: [$mkname]
+ SRC: [$mkname.dic, $mkname.aff]
+ TAG:
+   CAT:
+     nc: [G, N, GR]
+     adj: [G, N, GR]
+     a_nc: [G, N, GR]
+     adv: [SUBCAT]
+     card:
+     v:
+       T:
+         vpp: [G, P, N]
+         '-': [P, N]
+     '-': [C, G, P, N]
+ PROPS:
+};
+    close F;
+}
+
+else {
+    print " jspell-dict [-list-dics]
+                        [-dic-dir]
+                        [-installed <dict>]
+                        [-gen-yaml f.yaml]
+\n";
+}
+
+=encoding utf-8
+
+=head1 NAME
+
+jspell-dict - Command line tool to manage Jspell dictionaries
+
+=head1 SYNOPSIS
+
+  jspell-dict -list-dics
+
+  jspell-dict -dir
+
+  jspell-dict -installed
+
+  jspell-dict -gen-yaml name     # make name.yaml
+
+
+=head1 DESCRIPTION
+
+This is a simple interface to manage Jspell dictionaries. Main flags are used to:
+
+=over 4
+
+=item C<--list-dics>
+
+List installed dictionaries
+
+=item C<--install=name>
+
+install jspell dictionary from name.yaml, name.aff name.dic
+
+ jspell-dict -intall name          (name.yaml, name.aff, name.dic)
+ jspell-dict -intall name from:port d1.dic       (aff from language Port)
+ jspell-dict -intall name a.aff d1.dic d1.dic    (2 dictionaries)
+
+=item C<--gen-yaml=name>
+
+Generates the YAML skeleton
+
+=item C<--dic-dir>
+
+Shows the directory where dictionaries should be installed
+
+=item C<--installed=E<lt>dictE<gt>>
+
+Returns a boolean value (for the operating system) stating if some
+dictionary is installed.
+
+=back
+
+
+=head1 SEE ALSO
+
+jspell(1), jbuild(1), Lingua::Jspell(3) and perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007-2010 by Projecto Natura
+
+=cut
+

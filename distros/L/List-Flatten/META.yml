@@ -1,0 +1,19 @@
+---
+name: List-Flatten
+version: 0.01
+author:
+  - 'Darko Obradovic <dobradovic@gmx.de>'
+abstract: Interpolate array references in a list
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+provides:
+  List::Flatten:
+    file: lib/List/Flatten.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

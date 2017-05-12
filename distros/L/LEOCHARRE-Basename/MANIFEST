@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/LEOCHARRE/Basename.pm
+t/00.t
+t/01-filename-ext.t
+t/03-more.t
+t/99-cleanup.t
+META.yml                                 Module meta-data (added by MakeMaker)

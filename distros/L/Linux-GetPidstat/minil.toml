@@ -1,0 +1,4 @@
+name = "Linux-GetPidstat"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

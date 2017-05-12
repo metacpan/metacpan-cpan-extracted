@@ -1,0 +1,102 @@
+#!/usr/bin/perl -s
+
+use warnings;
+use strict;
+use XML::DT;
+
+our ($h);
+
+print usage() if $h;
+
+my $filename;
+while ($filename = shift) {
+
+    my %file;
+    my %seg;
+    my $i = 0;
+
+    print STDERR "Processing $filename..";
+    my %handler = (
+                   -default => sub{ "" },
+
+                   seg => sub{ "$c" },
+                   tuv => sub{
+                       my $fd;
+                       $v{lang} = $v{'xml:lang'} if exists($v{'xml:lang'});
+                       print STDERR "." unless ($i++%500);
+                       $seg{$v{lang}}++;
+                       unless (exists($file{"$filename-$v{lang}"})) {
+                           my $x;
+                           open $x, ">:utf8", "$filename-$v{lang}" or die "Cannot open $filename-$v{lang}";
+                           $file{"$filename-$v{lang}"} = $x;
+                       }
+                       $fd = $file{"$filename-$v{lang}"};
+                       myprint($fd, $c);
+                   },
+                  );
+
+    dt($filename, %handler);
+    print STDERR " done\n";
+
+    for (keys %seg) {
+        print STDERR "$_: $seg{$_} segments\n";
+    }
+    for (keys %file) {
+        close $file{$_};
+    }
+}
+
+sub myprint{
+    my ($f,$tu) = @_;
+    for ($tu){
+        s/<.*?>/ /gs;
+        s/[\|\$]/ /gs;
+        s/(\w)([.;,!:?«»"])/$1 $2/g;
+        s/([.;,!:?«»"])(\w)/$1 $2/g;
+        s/\s\s+|^\s+|\s+$/ /g;
+    }
+    print {$f} "$tu\n\$\n";
+}
+
+
+sub usage {
+    print "nat-tmx2pair: splits a TMX file into several files, one for each language\n\n";
+    print "\tnat-tmx2pair <file.tmx>\n\n";
+    print "For more help, please run 'perldoc nat-tmx2pair'\n";
+    exit (0);
+}
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-tmx2pair - splits a TMX file into several files, one for each language
+
+=head1 SYNOPSIS
+
+ nat-tmx2pair f.tmx
+
+=head1 DESCRIPTION
+
+This script takes a TMX file and outputs n different files, one for
+each language with translation units separated by dollar signs
+(NATools standard input format).
+
+The files creates are based on the tmx filename, with the language tag
+appended in the end.
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1).
+
+=head1 AUTHOR
+
+Alberto Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2012 by Alberto Manuel Brandão Simões
+
+=cut

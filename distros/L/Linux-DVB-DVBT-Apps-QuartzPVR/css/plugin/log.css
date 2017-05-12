@@ -1,0 +1,38 @@
+/*
+   License version 1.0
+   This software is licensed to Steve Price (c) 2007
+   None of this may be reproduced (in part or full) or used 
+   without the author's prior written consent.
+*/
+/*==================================================================*/
+/* DEBUG
+==================================================================*/
+#debug_log {
+	color: black;
+	background: white ;
+	text-align: left;
+	cursor: pointer ;
+	padding: 0.5em 0 0.5em 0.5em ;
+	margin: 0.1em ;
+	clear: both ;
+	height: 300px;
+	overflow: auto ;
+	width: 80%;
+	font-size: 70% ;
+
+}
+
+#debug_log .debug_message {
+	color: green;
+	border-bottom: solid black 1px;
+}
+
+#debug_log .warning_message {
+	color: blue;
+}
+
+#debug_log .error_message {
+	color: red;
+}
+
+

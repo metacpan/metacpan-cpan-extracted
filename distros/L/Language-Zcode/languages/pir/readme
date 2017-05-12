@@ -1,0 +1,11 @@
+Examples for compiling Z-code files to PIR (Parrot Intermediate Representation)
+-------------------------------------------------------------------------------
+
+b.inf		Simple Inform file
+b.z5		Compiled b.inf
+b_expected.pir	What you should get with "plotz.pl b.z5 pir"
+hello_expected.pir	What you should get with plotz.pl ..\hello.z5
+
+PIR translation is, to put it mildly, a work in progress. Almost nothing
+works, except for what's in b.inf.
+

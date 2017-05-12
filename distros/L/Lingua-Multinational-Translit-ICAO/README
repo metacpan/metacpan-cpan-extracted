@@ -1,0 +1,35 @@
+NAME
+    Lingua::Multinational::Translit::ICAO -- Multinational characters
+    transliteration into ICAO Doc 9303
+
+SYNOPSIS
+     use Lingua::Multinational::Translit::ICAO qw/ ml2icao /;
+
+     print ml2icao('word', 'iso-8859-1');
+
+DESCRIPTION
+    Lingua::Multinational::Translit::ICAO can be used for transliteration of
+    multinational characters in conformance with ICAO Doc 9303
+    Recommendations.
+
+METHODS
+  ml2icao ( $string, [ $encoding ])
+    This method converts $string from multinational character set to ICAO
+    transliteration.
+
+    Optional $encoding parameter allows to specify $string's encoding
+    (default is 'utf-8')
+
+AUTHORS
+    Serguei Trouchelle <stro@railways.dp.ua>
+
+COPYRIGHT
+    Copyright (c) 2007 Serguei Trouchelle. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Lingua::Cyrillic::Translit::ICAO -- Cyrillic characters transliteration
+    into ICAO Doc 9303
+

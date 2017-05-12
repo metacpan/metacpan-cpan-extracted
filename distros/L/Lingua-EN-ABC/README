@@ -1,0 +1,99 @@
+   _     _                                 _____ _   _       
+  | |   (_)_ __   __ _ _   _  __ _   _ _  | ____| \ | |  _ _ 
+  | |   | | '_ \ / _` | | | |/ _` | (_|_) |  _| |  \| | (_|_)
+  | |___| | | | | (_| | |_| | (_| |  _ _  | |___| |\  |  _ _ 
+  |_____|_|_| |_|\__, |\__,_|\__,_| (_|_) |_____|_| \_| (_|_)
+                 |___/                                       
+      _    ____   ____ 
+     / \  | __ ) / ___|
+    / _ \ |  _ \| |    
+   / ___ \| |_) | |___ 
+  /_/   \_\____/ \____|
+                       
+
+
+This is the README for Lingua::EN::ABC version 0.06.
+
+Lingua::EN::ABC is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains four
+sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+Lingua::EN::ABC - American, British, and Canadian English
+
+This module offers functions to convert between the spellings and
+vocabulary of American, British, and Canadian versions of English.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following websites:
+
+    * http://search.cpan.org/perldoc?Lingua::EN::ABC
+    * http://metacpan.org/release/Lingua-EN-ABC
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your computer
+using
+
+    perldoc Lingua::EN::ABC
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.6.1 or later.
+
+To install the module from CPAN, use
+
+    cpan Lingua::EN::ABC
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm Lingua::EN::ABC
+
+To install the module from the source file, Lingua-EN-ABC-0.06.tar.gz, follow
+this sequence of commands:
+
+    tar xfz Lingua-EN-ABC-0.06.tar.gz
+    cd Lingua-EN-ABC-0.06
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can report a
+bug at 
+
+<https://github.com/benkasminbullock/Lingua-EN-ABC/issues>,
+
+or if you want to alter the source code of Lingua::EN::ABC, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/Lingua-EN-ABC>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Wed Aug 31 13:25:07 2016.
+
+-----------------------------------------------------------------------------

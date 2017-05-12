@@ -1,0 +1,37 @@
+<p> 
+    <input type="button" onclick="parent.location='/'" value="back to surveys" />
+    <input type="button" onclick="parent.location='/anno/add'" value="create a new announcement" />
+</p>
+
+<h2>Announcement Admin</h2>
+
+<div class="newsbox">
+[% IF thanks_message %]<p>[% thanks_message %]</p>[% END %]
+<p>Click on an announcement subject to edit it's content.</p>
+</div>
+
+<div class="newsbox">
+<form name="datalist" method="post" action="/anno/admin">
+<table class="blocker" width="100%">
+<tr>
+    <th>ID</th>
+    <th>Subject</th>
+    <th>Select</th>
+</tr>
+[% IF data %]
+[% FOREACH record = data %]
+<tr>
+    <td>[% record.announceid %]</td>
+    <td nowrap><a href="[% cgipath %]/pages.cgi?act=anno-edit&amp;announceid=[% record.announceid %]">[% record.hSubject %]</a></td>
+    <td><input type="checkbox" name="LISTED" value="[% item.announceid %]" /></td>
+</tr>
+[% END %]
+[% ELSE %]
+<tr><td colspan="3" align="center">No announcements found</td></tr>
+[% END %]
+</table>
+
+<p>
+<input type="submit" name='doaction' value='Delete' />
+</form>
+</div>

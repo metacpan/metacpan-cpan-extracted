@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Lingua::Jspell;
+
+my %targets = _get_targets();
+
+my $target = shift;
+
+die "unknown $target\n" if $target && !exists($targets{$target});
+die "Target not defined. Valid targets are ",join(", ", keys %targets),"\n" unless $target;
+
+$targets{$target}->(@ARGV);
+
+sub _get_targets {
+	return (
+			visl => \&_visl,
+		);
+}
+
+sub _visl {
+	my $DIC = Lingua::Jspell->new("pt"); ## FIXME - make this an option
+
+	while (<>) {
+		while (m!\W+|\w+(-\w+)*!g) {
+			my $word = $&;
+
+			next if $word =~ /^\s+$/;
+			print "<\"$word\">\n";
+			
+			my @a = $DIC->fea($word);
+			if (@a) {
+				for my $a (@a) {
+					print "\t$a->{rad}  $a->{CAT}";
+					for my $k (keys %$a) {
+						next if $k eq "rad" || $k eq "CAT";
+						print "  $k=$a->{$k}";
+					}
+					print "\n";
+				}
+			}
+			else {
+				print "\t$word  UNK\n"
+			}
+		}
+	}
+}

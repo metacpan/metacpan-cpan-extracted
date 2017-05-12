@@ -1,0 +1,8 @@
+Revision history for Perl extension NameParse.
+
+0.02  2004-03-08
+	- Fixed some holes pertaining to -ij endings
+	- Added test cases
+	
+0.01  2004-03-04	
+	- initial version

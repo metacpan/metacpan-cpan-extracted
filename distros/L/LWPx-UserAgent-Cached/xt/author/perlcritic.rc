@@ -1,0 +1,24 @@
+severity = brutal
+verbose = 8
+exclude = CodeLayout::ProhibitHashBarewords Perl::Critic::Policy::Documentation::RequirePODUseEncodingUTF8 Editor::RequireEmacsFileVariables Modules::RequirePerlVersion Tics::ProhibitLongLines Documentation::RequirePodLinksIncludeText
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/author/perltidy.rc
+
+[Compatibility::PerlMinimumVersionAndWhy]
+above_version = 5.012
+[Compatibility::PodMinimumVersion]
+above_version = 5.012
+
+[Documentation::PodSpelling]
+stop_words = datastore namespace accessor Perldoc perldoc
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+script_sections = NAME | USAGE | DESCRIPTION | CONFIGURATION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+
+[Subroutines::ProhibitCallsToUndeclaredSubs]
+exempt_subs = Moo::has Moo::extends
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <para xml:id="p1">
+    <quote>
+      <p>A Quote!</p>
+    </quote>
+  </para>
+  <para xml:id="p2">
+    <quote>
+      <p>MY<break/>
+A Quote!</p>
+    </quote>
+  </para>
+  <para xml:id="p3">
+    <quote>
+      <p>1<break/>
+A Quote!</p>
+    </quote>
+  </para>
+  <para xml:id="p4">
+    <quote>
+      <p>ONE<break/>
+A Quote!</p>
+    </quote>
+  </para>
+</document>

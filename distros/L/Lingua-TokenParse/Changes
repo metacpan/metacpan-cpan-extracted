@@ -1,0 +1,157 @@
+Revision history for Perl extension Lingua::TokenParse.
+
+0.01  Thu Apr  3 20:03:39 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Lingua::TokenParse
+
+0.02  Fri Apr 4 2003
+    - Fixed an undefined value used in the successor method.
+    - Enhanced and fixed documentation.
+
+0.03  Sat Apr 5 2003
+    - Handled prefix and suffix hyphens.
+    - Enhanced documentation.
+    - Made a handy eg/sample script that uses a dict server.
+
+0.04  Tue Apr 8 2003
+    - Removed the misleading ..okay broken code to concatinate
+      unknown fragments in the build_knowns method.
+    - Added the entirely crucial, and sorely lacking, reset_parse
+      method.
+    - Added an attribute and build method for the fragment
+      definitions in the knowns hash.
+    - Enhanced the eg/ directory.
+    - Updated the documentation.
+    - Updated the test suite.
+
+0.05  Wed Apr 9 2003
+    - Added a trim_knowns method to concatinate unknowns and remove
+      "already seen" combinations.
+    - Added a parse method to call the individual parsing methods.
+    - Updated documentation.
+    - Updated eg/ samples.
+    - Repaired the broken test suite.
+
+0.06  Thu Apr 10 2003
+    - Made the output_knowns method show the fragment definitions.
+    - Added the token_parse CGI to the eg/ directory.
+
+0.07  Thu Apr 10 2003
+    - Moved the publically unnecessary reset_parse method to the parse
+      method.
+    - Updated the documentation and eg/sample0, accordingly.
+
+0.07.1  Thu Apr 10 2003
+    - Cleaned up code!
+
+0.08  Sun Apr 13 2003
+    - Removed documentation of the (probably) unnecessary
+      _reset_parse method.
+    - Cleaned up code a bit, again.
+    - Made the output_knowns method return a string, instead of
+      printing it.  Oops.
+    - Updated documentation, of course.
+    - Added the output_knowns method to the test suite.
+    - Updated eg/sample0 (accordance with the module's SYNOPSIS).
+    - Added an eg/README file to describe the sample programs.
+
+0.08.1  Mon Apr 14 2003
+    - Refactored eg/dict_fetch and made it vastly more simple.
+    - Fixed documentation.
+
+0.08.2  Mon Apr 14 2003
+    - Ack!  I left the lexicon and a debugging script in my eg/
+      directory.  : (
+
+0.09  Sun Apr 20 2003
+    - Made the fragment definition separator an object attribute and
+      changed it to a "+" by default, in the constructor.
+    - Added eg/set_entry and updated eg/README accordingly.
+    - Skipped already seen combinations in the build_combinations()
+      and trim_knowns methods.
+    - Made the known combination score a two dimensional measure and
+      fixed the output_knowns(), accordingly.
+    - Added a friendly, explanatory header to the scalar output of the
+      the output_knowns method.
+    - Fixed and updated documentation.
+    - Fixed the call to output_knowns() in the eg/ programs.
+    - Removed the unused @parsed array and made the other (two)
+      globals used by the build_combinations method into object
+      attributes.
+
+0.10  Sun Apr 29 2003
+    - Added user defined, regular expression trimming support.
+    - Updated eg/sample0 and the test script, appropriately.
+    - Fixed and enhanced documentation.
+
+0.10.1  Mon Apr 28 2003
+    - Fixed and enhanced documentation.
+
+0.10.2  Mon Apr 28 2003
+    - Made the constructor accept a separator argument.
+    - Updated the eg/sample0 program.
+    - Whoops.  Added the forgotten eg/set_entry to the MANIFEST.
+    - Fixed documentation as usual...
+
+0.11  Thu May 1 2003
+    - Made the trim_knowns method work for "defined but false"
+      lexicon entries.
+    - Updated documentation.
+    - Updated eg/sample0 accordingly.
+    - Repaired dates in the Changes file.
+
+0.12  Thu May 1 2003
+    - Made accessors for the "known but not defined" and unknown
+      fragment definitions used by the output_knowns method.
+    - Added documentation sections accordingly.
+    - Cleaned documentation a bit, of course.
+
+0.12.1  Mon Jun 16 2003
+    - Death to variables named $flag!!
+
+0.12.2  Mon Jun 16 2003
+    - Repaired documentation.
+
+0.12.3  Fri Jul 11 2003
+    - Excised the unnecessary =head1 ABSTRACT section.
+
+0.13  Fri Feb 6 2004
+    - Cleaned up and enhanced POD.
+    - Normalized my slightly goofy distribution tree.
+
+0.14  Sat May 15 2004
+    - Implemented lucs' "binary arithmetic cheat" solution.
+      Yay lucs++ !
+    - Updated POD accordingly.
+
+0.1401 Sat May 15 2004
+    - Ack!  I forgot to update the Makefile.PL and require the
+      Math::BaseCalc module.
+    - Removed old_build_combinations().
+
+0.15 Sun May 16 2004
+    - Cleaned out pre-0.14 forgotten poo.
+    - Simplified construction and initialization.
+    - Changed "rules" to "constraints".
+    - Moved constraint exclusion to build_combinations().
+    - Excluded definitions of 'undef'.
+    - Trimmed and updated documentation.
+    - Trimmed and enhanced test script.
+
+0.1501 Sat May 29 2004
+    - Fixed POD Big Time.
+    - Cleaned extraneous poo from the eg/ directory.
+
+0.16 Wed Aug 4 2004
+    - Added lexicon caching ala Storable.
+    - Added verbose statements all around.
+    - Removed the st00pid editor fold markers.
+    - Removed the overkill-sample code in the eg/ directory.
+    - Added a verbose() accessor.
+    - Cleaned up POD.
+    - Added constraint checking to the build_parts() method.
+    - Got rid of the unnecessary trim_knowns() method.
+
+0.1601 Sat Aug 7 2004
+    - Cleaned up POD a bit - no functional changes.
+    - Added lexicon_cache tests.

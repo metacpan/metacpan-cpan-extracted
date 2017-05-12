@@ -1,0 +1,30 @@
+ Lingua::PT::Abbrev version 0.05
+=================================
+
+An abbreviations dictionary manager for NLP
+
+
+ABSTRACT
+
+This module handles a built-in abbreviations dictionary, and a user
+customized abbreviations dictionary. It provides handy functions for
+NLP processing.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENSE
+
+Copyright 2004-2005 Alberto Simões, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,22 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use Unicode::UTF8 qw/valid_utf8 decode_utf8/;
+use Lingua::Guess;
+use File::Slurper 'read_binary';
+my $lg = Lingua::Guess->new ();
+for my $file (@ARGV) {
+    if (! -f $file) {
+	warn "Cannot find file '$file'.\n";
+	next;
+    }
+    my $text = read_binary ($file);
+    if (! valid_utf8 ($text)) {
+	warn "File '$file' does not contain valid UTF-8";
+	next;
+    }
+    $text = decode_utf8 ($text);
+    my $guess = $lg->simple_guess ($text);
+    print "'$file' looks like $guess.\n";
+}
+

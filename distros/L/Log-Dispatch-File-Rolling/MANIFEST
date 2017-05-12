@@ -1,0 +1,16 @@
+Makefile.PL
+MANIFEST
+README
+Changes
+lib/Log/Dispatch/File/Rolling.pm
+t/1.t
+t/2.t
+t/3.t
+t/4.t
+t/5.t
+t/6.t
+META.yml
+t/7testpod.t
+t/8coverage.t
+t/9reopenfh.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,46 @@
+1.122640  2012-09-20 13:33:11 Europe/London
+
+  * Remove YAML::XS dependency from requirements
+
+1.122530  2012-09-09 16:05:25 Europe/London
+
+  * POD fix
+  * Use YAML::XS instead of YAML::Tiny for test
+
+1.110690  2011-03-10 20:22:36 Europe/London
+
+  * port to Dist::Zilla
+  * add dependency on Log::Dispatch 2.23 (rt.cpan #49103)
+
+liblog-dispatch-configurator-any-perl (1.0005) UNRELEASED; urgency=low
+
+  * Set min version of Config::Any to 0.15 so we get flatten_to_hash, use_ext 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 28 Jul 2009 12:02:55 +0100
+
+liblog-dispatch-configurator-any-perl (1.0004) UNRELEASED; urgency=low
+
+  * stupid-head, I had flatten_to_hash on but was still checking for ARRAY
+  * fixes to test plans, and YAML::Tiny tests skip if missing
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 13 Apr 2009 02:14:45 +0100
+
+liblog-dispatch-configurator-any-perl (1.0003) UNRELEASED; urgency=low
+
+  * Fix MANIFEST to include test config files 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat, 27 Dec 2008 12:41:05 +0000
+
+liblog-dispatch-configurator-any-perl (1.0002) UNRELEASED; urgency=low
+
+  * Fix to ptee docs so the YAML is actually valid YAML
+  * Add examples dir with that YAML config
+  * Add THANKS section to pod
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Fri, 26 Dec 2008 21:50:40 +0000
+
+liblog-dispatch-configurator-any-perl (1.0001) UNRELEASED; urgency=low
+
+  * Initial release.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Fri, 26 Dec 2008 16:08:31 +0000

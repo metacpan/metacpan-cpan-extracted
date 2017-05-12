@@ -1,0 +1,29 @@
+---
+abstract: 'attached color for Log::Dispatch::Screen'
+author:
+  - 'Kazuhiro Osawa <yappo <at> shibuya <döt> pl>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Dispatch-Screen-Color
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Filter::Util::Call: 0
+  Log::Dispatch: 0
+  Params::Validate: 0
+  Term::ANSIColor: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/yappo/p5-Log-Dispatch-Screen-Color.git
+version: 0.04

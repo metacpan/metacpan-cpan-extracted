@@ -1,0 +1,12 @@
+
+define a [new TConnection "uma.base.de.dados" "user" "pass"]
+
+define b [$a prepare "ola"]
+
+define ff [$b execute ]
+define c [$b query]
+$b setDate 2 [new TDate 2008 12 22]
+$b setFloat 1 33.3
+$b setInt 4 11
+$b setString 5 "OLA"
+define d [$b update]

@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+use strict;
+use vars qw($o $VERSION @SUBS @PATH);
+use base 'LEOCHARRE::CLI';
+#use Smart::Comments '###';
+use LEOCHARRE::Dir ':all';
+use Cwd;
+use Carp;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.1 $ =~ /(\d+)/g;
+
+init();
+
+for (@PATH){ dopath($_); }
+
+
+exit;
+
+
+
+sub usage {
+   qq{pmsub path subname
+
+Find where a sub is defined.
+
+   -h help
+   -v version and exit
+
+USAGE EXAPLES
+
+   $0 get_this
+   $0 ./lib/DMS _ap_that
+
+LEOCHARRE::Dev - parent package
+
+
+}}
+
+sub init {
+   $o = gopts();
+
+   for my $arg (@ARGV){
+      if ($arg=~/^[_a-z][_a-z0-9]+$/){
+         push @SUBS, $arg;
+      }
+      else {
+         push @PATH, $arg;
+      }
+   }
+   
+   unless( @PATH and scalar @PATH ){
+      push @PATH,  cwd .'/lib';
+   }
+
+   ### @PATH
+   ### @SUBS
+
+   @PATH and scalar @PATH or die("missing path arg\n");
+   @SUBS and scalar @SUBS or die("missing subs arg\n");
+   
+
+}
+
+sub dopath {
+   my $path = shift;
+
+   for my $sub (@SUBS){
+      my $cmd = "find '$path' -type f | xargs grep 'sub $sub'";
+
+      for my $line ( grep { !/\.swp/} split(/\n/,`$cmd`) ){
+         my($path,$text) = split(/\:/, $line);
+         
+         print "vim '$path'\t\t# $text\n";
+         
+      }
+   }
+}

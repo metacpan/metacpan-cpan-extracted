@@ -1,0 +1,6 @@
+name = "Log-Minimal-Object"
+badges = ["travis", "coveralls"]
+authority="cpan:MOZNION"
+
+module_maker="ModuleBuildTiny"
+

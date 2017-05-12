@@ -1,0 +1,8 @@
+* qqu - soqquadro
+* z support is very basic, make it smarter.
+* semi-vowel i support is very basic, make it smarter.
+* sci onyl works properly in the middle of the word and assumes that i is not a vowel.
+* support x
+* Tsere and segol are not differentiated
+* Do something clever with accented letters
+* The algorithm was not very thoroughly planned, so there may be a few conditions that could be simplified.

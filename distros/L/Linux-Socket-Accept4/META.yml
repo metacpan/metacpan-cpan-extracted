@@ -1,0 +1,45 @@
+---
+abstract: 'accept4(2) bindings for Perl5'
+author:
+  - fb7ee91d9b089b78786fbb>
+build_requires:
+  Test::More: '0.98'
+  Test::TCP: '2.01'
+configure_requires:
+  Devel::CheckCompiler: '0.04'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-Socket-Accept4
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Linux::Socket::Accept4:
+    file: lib/Linux/Socket/Accept4.pm
+    version: '0.05'
+requires:
+  Exporter: '0'
+  parent: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Linux-Socket-Accept4/issues
+  homepage: https://github.com/tokuhirom/Linux-Socket-Accept4
+  repository: git://github.com/tokuhirom/Linux-Socket-Accept4.git
+version: '0.05'
+x_contributors:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'Maxime Soulé <btik-git@scoubidou.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'

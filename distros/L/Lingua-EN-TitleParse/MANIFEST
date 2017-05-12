@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Lingua-EN-TitleParse.t
+lib/Lingua/EN/TitleParse.pm

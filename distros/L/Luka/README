@@ -1,0 +1,436 @@
+NAME
+    Luka - Exception handling and reporting framework
+
+SYNOPSIS
+        use Error qw(:try);
+        use Luka;
+      
+    try {
+
+            $ftp->login("someuser", "somepass") ||
+                throw Luka::Exception::External
+                    ( error => $ftp->message . $@, id => "login",
+                      context => "FTP error: couldn't login", severity => 3,
+                      args => "user=someuser,pass=somepass" );
+            
+    } catch Luka::Exception with {
+
+            my $e = shift;
+            $e->report;
+            return 17;
+
+         } catch Error with {
+
+            my $e = shift;
+            $e->report;
+            return 18;      
+
+         };
+
+DESCRIPTION
+    Luka is an exception handling and reporting framework. It's useful to
+    look at it as an event handling framework.
+
+    It comes from operational understanding of networks.
+
+    Scenario that Luka is addressing is following: on a network with
+    multiple hosts running multiple applications, it is very difficult to
+    track operational status of all the functionality that those
+    applications and hosts are meant to deliver. In order to make it easier,
+    we decided to specify the error handling and reporting data model that
+    each component delivering functionality has to conform to. What is a
+    component? In most cases, it is a script, often run from cronjob, in
+    some cases it is a class in an application. In all cases, a component
+    has to successfully complete a task on which functionality of an
+    application, or entire network, relies on.
+
+    It is common practice that programmers choose their way of handling
+    errors and reporting. Luka is an attempt to standardize that process.
+    Its primary goal is to make it easier for smaller number of people to
+    keep larger number of applications and networks running.
+
+    Policy on script error handling that Luka suggests:
+
+    NO ERROR CODES are used, instead exceptions are thrown
+        Already a common practice, especially in applications/components
+        that are not small.
+
+    Standard set of error english names is established (network connection
+    error)
+        As opposed to each network library, for example, having it's own way
+        to report connection error.
+
+    Page for each component (script/class) documenting relevant details
+        Already a common practice. Luka suggests that link to page
+        describing all possible errors, along with dependencies and
+        schedules (for components that run regularly), should exist. It is
+        part of the Luka event data model.
+
+    EACH time an error occurs following MUST be attempted:
+
+        1. Capture defined data set
+        2. Log summary to to system log
+        3. attempt delivery to end points
+
+  Example config
+      [global]
+      debug=0
+      single_char_error_code=E
+      single_char_success_code=I
+      doc_base=http://localhost/
+      email_domain=lists.mydomain.org
+      syslogopt=pid,nowait
+      syslogfacility=daemon
+      expected_ip=10.1.8
+
+      [myscript.pl]
+      on_success=Task completed
+      doc=LukaTests
+      about=this library does something useful
+      from=root@localhost
+      cc=me@mydomain.org
+      nomail=0
+
+  Example of error report
+    On an error caught, in syslog:
+
+      Feb 26 15:34:39 localhost myscript.pl[1298]: Luka initiating... 
+      Feb 26 15:34:39 localhost myscript.pl[1298]: Error at line 20: Net::FTP: Bad hostname 'bla.org' at myscript.pl line 324.  
+      Feb 26 15:34:39 localhost myscript.pl[1298]: Error report sent to myscript.pl@lists.mydomain.org,me@mydomain.org
+
+    Email headers:
+
+      From: root@localhost
+      To: myscript.pl@lists.mydomain.org
+      Cc: me@mydomain.org
+      Subject: [galeb][2006-2-26T15:34:42][E] Net::FTP: Bad hostname 'bla.org'
+
+    Event (used verbatim in email body):
+
+      this library does something useful
+
+      http://localhost/LukaTests#ftp_object_creation
+
+      host=galeb
+      hosterr=
+      ipaddr=10.1.8.18
+      time=2006-2-26T15:34:42
+      script=myscript.pl
+      path=/home/toni/dev/cvs/perl/modules/luka
+      line=245
+      pid=1298
+      severity=3
+      context=FTP error: couldn't create object
+      args=ftp.false
+      id=ftp_object_creation
+      error=Net::FTP: Bad hostname 'bla.org' 
+
+      Trace begun at myscript.pl line 245
+      main::__ANON__ at /usr/local/share/perl/5.8.7/Error.pm line 372
+      eval {...} at /usr/local/share/perl/5.8.7/Error.pm line 371
+      Error::subs::try at myscript.pl line 255
+      main::ftp_luka_catch at myscript.pl line 123
+      main::__ANON__ at /usr/local/share/perl/5.8.7/Test/Exception.pm line 281
+      eval {...} at /usr/local/share/perl/5.8.7/Test/Exception.pm line 281
+      Test::Exception::lives_and at myscript.pl line 124
+
+  Example of success report
+    On a captured report, in syslog:
+
+      Feb 26 15:34:22 localhost myscript.pl[1273]: Luka initiating... 
+      Feb 26 15:34:22 localhost myscript.pl[1273]: Success report sent to myscript.pl@lists.mydomain.org,me@mydomain.org
+
+    Email headers:
+
+      From: root@localhost
+      To: myscript.pl@lists.mydomain.org
+      Cc: me@mydomain.org
+      Subject: [galeb][2006-2-26T15:34:22][I] Task completed
+
+    Event (used verbatim in email body):
+
+      this library does something useful
+
+      http://localhost/LukaTests
+
+      host=galeb
+      hosterr=
+      ipaddr=10.1.8.18
+      time=2006-2-26T15:34:22
+      script=myscript.pl
+      pid=1273
+
+LUKA EVENT DATA MODEL
+  Structure
+      ABOUT COMPONENT
+      \n
+      DOC
+      \n
+      attribute=value
+      attribute=value
+      attribute=value
+      attribute=attribute=value,attribute=value
+      attribute=value
+      \n
+      \n
+      STACKTRACE
+
+  Fields
+        ABOUT COMPONENT Comes from config file component section.
+
+        DOC Location of the documentation. Can be URL, or some other
+        protocol address. Can be specific to the error reported, or
+        component general. Comes from config file component section.
+
+        host - Name of the host where the event originates from. Collected.
+
+        hosterr - Name of the services that Luka couldn't use as expected on
+        the host. Collected. The only possible value is, at the moment,
+        *syslogd*.
+
+        ipaddr - IP address of the host. Collected. When multiple IPs
+        present (most cases), regular expression matching one from the
+        configuration file field "expected_ip" will be chosen.
+
+        time - Timestamp, conforming to RFC3339 "Date and Time on the
+        Internet: Timestamps", see <http://www.ietf.org/rfc/rfc3339.txt>.
+        Example: "2006-2-26T15:34:42". Constructed out of host time.
+
+        script - Name of the component that generated event. Collected.
+
+        pid - Process ID of the component that generated the event.
+        Collected from the host.
+
+        path - Path to the component that generated event. Collected. Error
+        event only.
+
+        line - Line number where event generation occurred. Collected. Error
+        event only. Error event only.
+
+        severity - Severity level of the event (ambiguous, see TODO
+        section). Supplied by the programmer at the location of event
+        creation. Error event only.
+
+        context - Descriptive text, context of the event. Specific to the
+        functionality that components performs from the user perspective,
+        rather than from the strictly technical perspective of programming
+        libraries. Supplied by the programmer at the location of event
+        creation. Error event only.
+
+        args - Arguments relevant for the event generated (passed to the
+        function, object). Supplied by the programmer at the location of
+        event creation. Error event only.
+
+        id - ID of the event. Supplied by the programmer at the location of
+        event creation. Matches the documentation for the component. Error
+        event only.
+
+        error - Technical text of the error. Supplied by the programmer at
+        the location of event creation. Supplement to the "context" field,
+        from the technical perspective, can contain error text returned by
+        used programming library. Error event only.
+
+METHODS
+  report
+    Luka report to syslog what happens by default.
+
+      Aug 26 11:27:49 localhost myscript.pl[1038]: Error at line 46: Net::FTP: Bad hostname
+      'ftp.bla.bla' at myscript.pl line 80.  
+
+      Aug 26 11:27:49 localhost myscript.pl[1038]: Error report sent to myscript.pl@lists.mydomain.org
+
+  report_success( $message )
+    If the $message is not supplied, value of the field "on_success" from
+    the component section of Luka configuration file will be used.
+
+DIAGNOSTICS
+    "Luka system not functional for '%s' script. Couldn't read its section
+    '%s' in config file '%s'"
+        Throws Luka::Exception::Program exception. Luka can not deliver
+        event if section for given script is missing in given config.
+        Sections are by default named by the script name.
+
+    "Luka system disabled. Couldn't read its config file '%s': %s"
+        Throws Luka::Exception::Program exception. Luka can not do anything
+        if its config file is missing or can not be parsed. However, if
+        syslogd is running, it will place a warning in syslog:
+
+          Feb 26 12:26:59 localhost Luka::Conf[30438]: Luka system disabled. Couldn't read its config file 'bla.txt':
+          Failed to open bla.txt: No such file or directory at lib/Luka/Conf.pm line 63
+
+    "Couldn't report by email to:%s;cc:%s;from:%s"
+        Throws Luka::Exception::External. If MTA is not running, or if Luka
+        can not connect to it, stdout will receive:
+
+          ERROR: Can't connect to localhost:25
+          Couldn't report by email to:test@localhost;cc:toni@localhost;from:root@localhost
+
+        In the syslog, warning will be:
+
+          Feb 26 13:42:08 localhost myscript.pl[3071]: Couldn't report by email: to: myscript.pl@lists.mydomain.org,
+          cc: me@mydomain.org, from: root@localhost 
+
+          Feb 26 13:42:08 localhost myscript.pl[3071]: Mail system reported: ERROR: Can't connect to localhost:25
+
+CONFIGURATION
+  global section
+    Single section, applies to the host on which Luka runs.
+
+      [global]
+      debug=0
+      single_char_error_code=E
+      single_char_success_code=I
+      doc_base=http://localhost/
+      email_domain=lists.mydomain.org
+      syslogopt=pid,nowait
+      syslogfacility=daemon
+      expected_ip=10.1.8
+
+    Fields:
+
+        debug - Turns debugging mode on when set to 1.
+
+        single_char_error_code - Delivery field. Single character error
+        code. Default is "E". In email delivery, part of header SUBJECT
+        field.
+
+        single_char_success_code - Delivery field. Single character success
+        code. Default is "I". In email delivery, part of header SUBJECT
+        field.
+
+        doc_base - Event field. Base part of the DOC field in the event data
+        model.
+
+        email_domain Delivery field. Email. Domain part of the header TO
+        field.
+
+        syslogopt *$logopt* options passed to Sys::Syslog's *openlog*
+        function
+
+        syslogfacility *$facility* option passed to Sys::Syslog's *openlog*
+        function
+
+        expected_ip Event field. See above IPADDR field in the event data
+        model. Luka discovers IPs on the host. Since multiple IPs are
+        present in most cases, regular expression matching one from this
+        configuration file field *expected_ip* will be selected. This would
+        be a drawback on a host with many interfaces, and solution with
+        fixed IP would be a lot more efficient in that case.
+
+  component sections
+    One or more sections, applies to components programmed to use Luka.
+
+      [myscript.pl]
+      on_success=Task completed
+      doc=LukaTests
+      about=this library does something useful
+      from=root@localhost
+      cc=me@mydomain.org
+      nomail=0
+
+    Fields:
+
+        on_success - Delivery field. In email delivery, part of header
+        SUBJECT field.
+
+        doc - Event field. Component part of the DOC field in the event data
+        model.
+
+        about - Event field. See above COMPONENT field in the event data
+        model.
+
+        from - Delivery field. Email. Header FROM field.
+
+        cc - Delivery field. Email. Header CC field.
+
+        nomail - If set to 1, event will not be delivered via email.
+
+DEPENDENCIES
+    *   Error - implementation of try/catch syntax
+
+    *   Exception::Class - easy definition of hierarchy of exception classes
+
+    *   Config::IniFiles - config file handling
+
+    *   Sys::Syslog - writing to syslog
+
+    *   Sys::Hostname - determining hostname
+
+    *   Sys::Hostname::Long - determining hostname
+
+    *   Mail::SendEasy - sending reports by email
+
+    *   Class::Std - inside/out classes builder
+
+INCOMPATIBILITIES
+    Mod-perl, due to use of Class::Std. I wasn't aware of Class::Std
+    limitations at the time of writing Luka. There are other implementations
+    of inside-out classes on CPAN that should be used as replacements in of
+    next releases of Luka. At the moment, best candidate seems to be
+    Object::InsideOut.
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to "bug-luka@rt.cpan.org", or
+    through the web interface at <http://rt.cpan.org>.
+
+TODO
+    mod-perl compatibility
+        Migration from Class::Std to Object::InsideOut, or some other
+        inside-out class.
+
+    severity definitions
+        Severity needs defining, according to appropriate existing standard.
+
+    date-time format, timezone missing
+        Timezone needs adding to the date-time (RFC 3339) format.
+
+    report delivery mechanism abstraction
+        Reporting is also event delivery, and event delivery can be done in
+        many ways. Currently, email is hardcoded as a delivery mechanism.
+        Instead, reporting delivery has to be configurable. It could be done
+        via dynamic loading (from a value in the config) of class
+        implementing desired mechanism.
+
+    reporting to syslog config setting
+        It is default now that Luka method "report" uses syslog for short
+        reporting. It should be made optional, in global, and script,
+        setting. Global config setting should be default; individual script
+        setting should override it.
+
+    event delivery on missing component section
+        When a section for component is missing in the config file,
+        exception is thrown (see DIAGNOSTICS above). Instead, event should
+        still be delivered, as long as relevant details about the
+        destination of delivery are in the global part of the Luka
+        configuration file.
+
+    improve documentation
+        Documentation needs careful re-reading and improving. Any comments
+        on this especially appreciated.
+
+ACKNOWLEDGEMENTS
+    Ideas for underlining premises of Luka came out of discussions with Bill
+    Hulley.
+
+AUTHOR
+    Toni Prug <toni@irational.org>
+
+COPYRIGHT
+    Copyright (c) 2006. Toni Prug. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+    See <http://www.gnu.org/licenses/gpl.html>
+

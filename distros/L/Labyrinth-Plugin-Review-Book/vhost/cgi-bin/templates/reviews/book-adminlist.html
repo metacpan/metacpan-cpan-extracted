@@ -1,0 +1,67 @@
+<h2>Reviews Admin</h2>
+
+    <p>
+      <a href="[% cgipath %]/pages.cgi?act=reviews-admin">manage reviews</a>
+    | <a href="[% cgipath %]/pages.cgi?act=reviews-typesadmin">manage review types</a>
+    | <a href="[% cgipath %]/pages.cgi?act=reviews-radmin">manage retailers</a>
+    </p>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name='act' value='reviews-admin' />
+
+<div class="boxer">
+<div class="blocker">
+    <table>
+    <tr><td align="right">Search by Title:</td><td><input type="text" name="searchtitle" value="[% searchtitle %]" /></td></tr>
+    <tr><td align="right">by Brand:</td><td><input type="text" name="searchbrand" value="[% searchbrand %]" /></td></tr>
+    <tr><td align="right">by Type:</td><td>[% ddrevtypes %]</td></tr>
+    <tr><td align="right">by Reviewer:</td><td>[% ddreviewers %]</td></tr>
+    <tr><td align="right">by Publisher:</td><td>[% ddpublishers %]</td><td><input type="submit" value='GO' /></td></tr>
+    </table>
+    <p>
+      <a href="[% cgipath %]/pages.cgi?act=reviews-admin">view all</a>
+    | <a href="[% cgipath %]/pages.cgi?act=reviews-add">add a review</a>
+    </p>
+</div>
+</div>
+
+<div class="boxer">
+<table class="blocker">
+<tr>
+    <th>When</th>
+    <th>Type</th>
+    <th>Reviewer</th>
+    <th>Title</th>
+    <th>Publisher</th>
+    <th>Status</th>
+    <th>Select</th>
+</tr>
+
+[% IF data %]
+[% FOREACH item = data %]
+
+<tr>
+    <td>[% item.postdate %]</td>
+    <td>[% item.typeabbr %]</td>
+    <td>[% item.realname %]</td>
+    <td>[% IF item.publish == 4 %]<a href="[% cgipath %]/pages.cgi?act=reviews-view&amp;reviewid=[% item.reviewid %]">[% item.title %]</a>
+        [% ELSE %]<a href="[% cgipath %]/pages.cgi?act=reviews-edit&amp;reviewid=[% item.reviewid %]">[% item.title %]</a>[% END %]</td>
+    <td>[% item.publisher %]</td>
+    <td>[% item.publishstate %]</td>
+    <td><input type="checkbox" name="LISTED" value="[% item.reviewid %]" /></td>
+</tr>
+
+[% END %]
+[% ELSE %]
+<tr><td colspan="4" align="center">No reviews currently available.</td></tr>
+[% END %]
+
+</table>
+</div>
+
+<p align="right">
+<input type="hidden" name="doaction" value="" />
+<input type="hidden" name="recordid" value="" />
+<input type="button" value='Copy'   onClick="doOnlyOne('Copy')" />
+<input type="button" value='Delete' onClick="doSubmit('Delete',0)" />
+</p></form>

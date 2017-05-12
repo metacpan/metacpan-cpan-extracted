@@ -1,0 +1,29 @@
+Revision history for Perl extension Language::AttributeGrammar.
+
+0.01  Sun Sep 25 21:44:06 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Attribute::Grammar -b 5.6.1
+
+0.02  Mon Sep 26 20:29:00 2005
+	- added nicer error handling
+
+0.03  Mon Sep 26 21:57:00 2005
+	- added support for ROOT
+
+0.04  Tue Sep 27 01:41:00 2005
+	- added a test for nonlinear attributes and an appropriate 
+	  error message.
+
+0.05  Wed Sep 28 00:57:00 2005
+	- added the prefix option
+
+0.06  xxx
+	- added some basic sanitty tests, and tests for errors.
+
+0.07  Wed Oct 19 00:46:00 2005
+	- complete rewrite in a way that is more memory efficient,
+	  breaking the interface.  See documentation for details.
+
+0.08  Wed Mar 22 13:34:34 2006
+	- fixed perlmonks bug regarding dynamically creating nodes
+	- added a couple tests relating to garbage collection

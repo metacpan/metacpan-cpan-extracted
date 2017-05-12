@@ -1,0 +1,45 @@
+Lingua::EN::Semtags::Engine 0.01
+==============================
+
+   Lingua::EN::Semtags::Engine uses Lingua::EN::Tagger and 
+   WordNet::QueryData to extract semantic tags (semtags) from 
+   English text.  Semtags are words which reflect the semantic 
+   essence of the text (similar to topic keywords).
+
+   Lingua::EN::Semtags::Engine was designed and developed to 
+   solve a particular problem I was facing.
+
+   Problem: a user is processing blog post titles and needs to 
+   programmatically determine the posts' semantic context.
+
+   Solution: the user feeds a blog post title to 
+   Lingua::EN::Semtags and gets back a set of semtags which can 
+   be used for further processing (e.g., web searches).
+
+   Example: a blog post title like "BBtv: Graffiti Research Lab, 
+   the movie" (boingboing.net, Posted by Xeni Jardin, April 24, 
+   2008 8:00 AM) would produce the following semtags: 
+   [DECORATION WORKPLACE SHOW].
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This modules depends on the following PMs:
+
+   WordNet::QueryData 1.46
+   Lingua::EN::Tagger 0.11
+
+COPYRIGHT AND LICENCE
+
+   Copyright © 2008 Igor Myroshnichenko. All rights reserved.
+
+   This library is free software; you can redistribute it 
+   and/or modify it under the same terms as Perl itself.

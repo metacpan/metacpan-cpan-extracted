@@ -1,0 +1,336 @@
+#!/usr/bin/perl
+use strict ;
+use Pod::Usage ;
+use Getopt::Long qw/:config no_ignore_case/ ;
+
+++$! ;
+
+use Linux::DVB::DVBT ;
+
+our $VERSION = "1.005" ;
+
+
+	my ($help, $man, $DEBUG, $VERBOSE, $config, $clean, $merge, $check, $noprune, $adap, $list_countries) ;
+	my ($allow_duplicates, $prefer_more_chans) ;
+	my ($DEBUG_PERL, $DEBUG_DVB) ;
+	my $timeout = 90 ;
+	GetOptions('v|verbose=i' => \$VERBOSE,
+			   'debug=i' => \$DEBUG,
+			   'dbg-perl=i' => \$DEBUG_PERL,
+			   'dbg-dvb=i' => \$DEBUG_DVB,
+			   'h|help' => \$help,
+			   'man' => \$man,
+
+			   'a|adap|dvb=s' => \$adap,
+			   'countries' => \$list_countries,
+
+			   'clean' => \$clean,
+			   'merge' => \$merge,
+			   'cfg=s' => \$config,
+			   'noprune' => \$noprune,
+			   'check' => \$check,
+			   'dup=i' => \$allow_duplicates,
+			   'more_chans=i' => \$prefer_more_chans,
+			   'timeout=i' => \$timeout,
+			   ) or pod2usage(2) ;
+
+	# force checking on
+	$check = 1 ;
+
+    pod2usage(1) if $help;
+    pod2usage(-verbose => 2) if $man;
+    
+    
+    ## Just show country list?
+    if ($list_countries)
+    {
+    	my @countries = Linux::DVB::DVBT::Freq::country_list() ;
+    	print "Supported countries:\n" ;
+    	foreach my $aref (@countries)
+    	{
+    		my ($code, $country) = @$aref ;
+    		print "$code : $country\n" ;
+    	}
+    
+    	exit 0 ;
+    }
+    
+    
+	$DEBUG_PERL = $DEBUG if ($DEBUG_PERL < $DEBUG) ;
+	$DEBUG_DVB = $DEBUG if ($DEBUG_DVB < $DEBUG) ;
+
+	$VERBOSE ||= 1 ;
+	Linux::DVB::DVBT->debug($DEBUG_PERL) ;
+	Linux::DVB::DVBT->dvb_debug($DEBUG_DVB) ;
+	Linux::DVB::DVBT->verbose($VERBOSE) ;
+
+	## Create dvb
+	## NOTE: With default object settings, the application will
+	## die on *any* error, so there is no error checking in this script
+	##
+	my $dvb = Linux::DVB::DVBT->new(
+		'adapter'	=> $adap,
+		'timeout'	=> $timeout,
+	) ;
+
+	# set options
+	$dvb->set('prune_channels' => 0) if $noprune ;
+	$dvb->config_path($config) if $config ;
+	if (defined($clean))
+	{
+		$dvb->merge(0) if $clean ;
+	}
+	elsif (defined($merge))
+	{
+		$dvb->merge($merge) ;
+	}
+	
+	$dvb->scan_allow_duplicates($allow_duplicates) if defined($allow_duplicates) ;
+	$dvb->scan_prefer_more_chans($prefer_more_chans) if defined($prefer_more_chans) ;
+
+	# check for any previous scan
+	my $last_tuning_href = $dvb->get_tuning_info() ;
+	my $got_previous = 0 ;
+	if (exists($last_tuning_href->{'freqfile'}) && keys %{$last_tuning_href->{'freqfile'}})
+	{
+		$got_previous = 1 ;
+	}
+Linux::DVB::DVBT::prt_data("Existing tuning info=", $last_tuning_href) if $DEBUG>=10 ;
+	
+	# check args
+    if ((@ARGV == 0) && !$got_previous)
+    {
+    	print "$0: No frequency file given.\n" ;
+    	pod2usage(-verbose => 2) ;
+    }
+
+	
+	
+	## Do the scan
+	my $freqfile ;
+	my $country ;
+	if (length $ARGV[0] == 2)
+	{
+		$country = uc $ARGV[0] ;
+	}
+	
+	
+	if ($country)
+	{
+		print STDERR "Scanning frequencies for $country. Please wait, this will take some time...\n" ;
+		$dvb->scan_from_country($country) ;
+	}
+	else
+	{
+		if (@ARGV > 0)
+		{
+			$freqfile = $ARGV[0] ;
+			$dvb->scan_from_file($freqfile) ;
+		}
+		else
+		{
+			# use previous scan frequencies
+			print STDERR "Using previous scan results to set frequency list...\n" ;
+			$dvb->scan_from_previous() ;
+		}
+	}
+
+
+	## All done, just show the results
+	my $tuning_href = $dvb->get_tuning_info() ;
+	my $channels_aref = $dvb->get_channel_list() ;
+	
+	my $ok = 1 ;
+	print STDERR "Chans\n" ;
+	my ($tv, $radio)=(0,0) ;
+	foreach my $ch_href (@$channels_aref)
+	{
+		my $chan = $ch_href->{'channel'} ;
+		my $tsid = $tuning_href->{'pr'}{$chan}{'tsid'} ;
+		my $checkstr = "" ;
+		if ($check)
+		{
+			$checkstr .= " ..." ;
+			if (exists($tuning_href->{'ts'}{$tsid}))
+			{
+				$checkstr .= "ok" ;
+			}
+			else
+			{
+				$checkstr .= "FAILED" ;
+				$ok = 0 ;
+			}
+		}
+		
+		my $freqstr = "" ;
+		if ($VERBOSE)
+		{
+			$freqstr = sprintf "%10d Hz", $tuning_href->{'ts'}{$tsid}{'frequency'} ;
+		}
+		printf STDERR "%3d : %-40s %6s-%-5d $ch_href->{type} $freqstr $checkstr\n", 
+			$ch_href->{'channel_num'},
+			$chan,
+			$tuning_href->{'pr'}{$chan}{'tsid'},
+			$tuning_href->{'pr'}{$chan}{'pnr'} ;
+		
+		if ($ch_href->{type} =~ /tv/)
+		{
+			++$tv ;
+		}
+		else
+		{
+			++$radio ;
+		}
+	}
+	printf STDERR "Found %d channels (%d tv, %d other)\n", $tv+$radio, $tv, $radio ;	
+	if ($check)
+	{
+		print STDERR $ok ? "Passed checks\n" : "FAILED checks\n" ;
+		if ($tv+$radio == 0)
+		{
+			$ok = 0 ;
+			print STDERR "Failed to find any channels\n" ;
+		}
+		
+		if (!$ok)
+		{
+			my $ARG = "" ;
+			if ($country)
+			{
+				$ARG = "$country" ;
+			}
+			else
+			{
+				if (@ARGV > 0)
+				{
+					$ARG = $freqfile ;
+				}
+			}
+			
+		
+			print STDERR <<"ERRMSG" ;
+                                                                                                                        
+=======================================================================================                                 
+Sorry, but your scan failed. Please either contact me or raise a bug report at:                                         
+    http://rt.cpan.org/Public/Bug/Report.html?Queue=Linux-DVB-DVBT.                                                     
+                                                                                                                        
+It would be most helpful if you can attach a debug log of your scan. To do this run:                                    
+                                                                                                                        
+ # dvbt-scan -debug 15 -verbose 15 $ARG >scan.log 2>&1                                                             
+ # tar cvfz scan.log.tar.gz scan.log                                                                                    
+                                                                                                                        
+then attach the scan.log.tar.gz file to your email or bug report.                                                       
+                                                                                                                        
+Thanks.                                                                                                                 
+=======================================================================================                                 
+                                                                                                                        
+ERRMSG
+		}
+	}
+
+	
+	
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+=head1 NAME
+
+dvbt-scan - Initialise DVBT channels
+
+=head1 SYNOPSIS
+
+dvbt-scan [options] [ <frequency file | country code> ]
+
+Options:
+
+       -debug level         set debug level
+       -verbose level       set verbosity level
+       -help                brief help message
+       -man                 full documentation
+       -clean               perform a clean scan
+       -a|dvb adap          use adapter number
+       -countries           list country codes
+       
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Set verbosity level. Higher values show more information.
+
+=item B<-debug>
+
+Set debug level. Higher levels show more debugging information (only really of any interest to developers!)
+
+=item B<-clean>
+
+Start a clean scan (i.e. don not merge this scan with previous results). Normally you'll want to merge (the default) so that you scan
+in the morning and evening to pick up all the channels (since some are only broadcast morning or evening). However, after a frequency 
+change it is best to start from scratch again by using this option. 
+
+=item B<-a>
+
+Use if you wish to specify which one of multiple DVB adapters to use (useful if you are recording on the default adapter).
+
+=item B<-countries>
+
+Does not run a scan, instead it lists all the supported country codes (i.e. those country codes that have information for used DVB-T frequencies).
+
+=back
+
+=head1 DESCRIPTION
+
+Script that uses the perl Linux::DVB::DVBT package to provide DVB-T adapter functions.
+ 
+Runs the frequency scanning function to search for Freeview channels. Stores the channel information 
+into configuration files.
+
+If this program is run as root then the configuration files are stored under B</etc/dvb> and are available
+for any user. Otherwise they are stored in B<$HOME/.tv> for just the user.
+
+The command line argument specified must be either a frequency file or a country code. Alternatively, iff a scan has been performed before,
+then specifying no argument causes the scan to reuse the previously saved frequencies. Note that this only works for scans performed by
+version 2.11 (and upwards) of the Linux::DVB::DVBT module.
+
+The frequency file is usually something like: B</usr/share/dvb/dvb-t/uk-Oxford>
+
+The file contents should be something like:
+
+   # Oxford
+   # T freq bw fec_hi fec_lo mod transmission-mode guard-interval hierarchy
+   T 578000000 8MHz 2/3 NONE QAM64 2k 1/32 NONE
+
+Frequency files are provided by the 'dvb' rpm package available for most distros. Alternatively, if you have kaffeine installed, look in
+$HOME/.kde/share/apps/kaffeine/dvb-t. If all else fails you can always get them from my CPAN web space: 
+
+http://www.cpan.org/authors/id/S/SD/SDPRICE/Files/dvb-t.tar.gz
+
+To determine which file to use, check http://www.ukfree.tv/transmitters.php and enter your postcode. 
+
+Alternatively a country code (compliant with ISO 3166-1) can be specified and a (longer!) scan of all valid frequencies for that country
+will be performed. For example, to scan in the UK use:
+
+	$ dvbt-scan GB
+	
+For reference, a scan of 6 frequencies stored in a frequency file takes approximately 4 minutes. A scan based on the UK country code (which
+consists of 57 frequencies) takes approximately 24 minutes. 
+
+
+For full details of the DVBT functions, please see:
+
+   perldoc Linux::DVB::DVBT
+ 
+=cut
+
+	

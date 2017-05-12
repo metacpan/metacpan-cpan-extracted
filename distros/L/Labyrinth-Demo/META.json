@@ -1,0 +1,64 @@
+{
+    "name": "Labyrinth-Demo",
+    "version": "1.04",
+    "abstract": "Labyrinth Website Management Framework - Demo Website",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "web",
+        "cgi",
+        "framework"
+    ],
+
+    "prereqs" : {
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+              "perl": "5.006",
+              "Labyrinth": "5.29",
+              "Labyrinth::Plugin::Core": "5.18"
+            }
+        }
+    },
+
+    "provides": {
+        "Labyrinth::Demo": {
+            "file": "lib/Labyrinth/Demo.pm",
+            "version": "1.04"
+        }
+    },
+    "no_index": {
+        "directory": ["t","vhost"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Labyrinth-Demo" },
+        "repository": {
+            "url": "git://github.com/barbie/labyrinth-demo.git",
+            "web": "http://github.com/barbie/labyrinth-demo",
+            "type": "git"
+        }
+    }
+}

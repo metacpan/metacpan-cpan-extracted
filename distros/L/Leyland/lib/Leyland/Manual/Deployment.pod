@@ -1,0 +1,83 @@
+=head1 NAME
+
+Leyland::Manual::Deployment - How to deploy Leyland applications
+
+=head1 QUICK-STARTING YOUR APPLICATION
+
+Since Leyland is L<Plack> based, running and deploying your applications
+is easy. During development and testing, the quickest way to start your
+application is to change into the application's directory and run L<plackup>
+with no arguments (or with the name of your PSGI file). This will start
+the application under the "development" Plack environment, listening on
+port 5000, so you'd be able to point your web browser to L<http://localhost:5000/>
+and start testing your app.
+
+=head1 DEPLOYING YOUR APPLICATION
+
+When your application is ready for prime time, Plack's standalone web
+server is not a good choice for deployment. When that time comes, you'll
+have a lot of choices for deploying your applications. You can use FastCGI
+with L<Plack::Handler::FCGI>, or L<Starman> with L<Plack::Handler::Starman>,
+or L<Starlet|Plack::Handler::Starlet>, or L<SCGI|Plack::Handler::SCGI>,
+or L<Mongrel2|Plack::Handler::Mongrel2>, or basically anything under the
+C<Plack::Handler::*> family. Keep in mind, however, that Leyland applications
+are not non-blocking nor asynchronous, so you can't use L<Feersum> or
+L<Twiggy> or other non-blocking servers (at least not yet).
+
+To learn about deploying your application, refer to L<plackup> and your
+handler of choice.
+
+=head1 WHAT'S NEXT?
+
+Read L<Leyland::Manual::Extending> to learn how to extend Leyland and
+possibly help with development, or L<return to the table of contents|Leyland::Manual/"TABLE OF CONTENTS">.
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Leyland at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Leyland::Manual::Deployment
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Leyland>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Leyland>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Leyland/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

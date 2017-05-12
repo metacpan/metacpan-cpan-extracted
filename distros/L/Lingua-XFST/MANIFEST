@@ -1,0 +1,14 @@
+lib/Lingua/XFST.pm
+lib/Lingua/XFST/Network.pm
+lib/Lingua/XFST/Privates.pm
+lib/Lingua/XFST/Privates.pod
+privates/xfsm_api.h
+privates/xfsm_wrap.c
+privates/Makefile.PL
+t/00-privates.t
+t/01-net.t
+t/latin.fst
+MANIFEST
+Makefile.PL
+README
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,15 @@
+[% 
+    htmltitle = article.data.title ;
+    title = htmltitle ;
+
+    crumb2_name = 'Lyics' ;
+    crumb2_href = '/lyric/list' ;
+    crumb1_name = article.data.title ;
+%]
+
+[% IF article.body %]
+    [% block = article.body %]
+    [% INCLUDE "articles/arts-block.html" %]
+[% ELSE %]
+    <p>Lyrics currently unavailable.</p>
+[% END %]

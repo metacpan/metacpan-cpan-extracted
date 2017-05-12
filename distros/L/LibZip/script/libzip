@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+
+
+use Getopt::Long;  
+use strict ;
+
+our $VERSION = '1.0' ;
+
+print "\n*** Perl $] $^O ***\n\n" ;
+
+########  
+# HELP #
+########
+
+if ( $ARGV[0] =~ /^-+h/i || !@ARGV ) {
+
+  my ($script) = ( $0 =~ /([^\\\/]+)$/s );
+
+print qq`________________________________________________________________________________
+
+LibZip - $LibZip::VERSION
+________________________________________________________________________________
+
+
+OPTIONS:
+
+  -allowopts    Allow the Perl options.
+  -compile|o    Compile the file.
+  -file|f       Define the 2nd file for the options pack, perlbin and lib.
+  -gui          Create GUI (non console) executable (Win32 only).
+  -icon         Set the icon of the executable (Win32 only).
+  -keepsrc      Keep sources created for compilation.
+  -lib|l        Create a lib in this directory.
+  -lzw          Apply LZW compression to the package.
+  -obetter|ob   Compile the file with all the options that can compress better.
+  -overwrite    Overwrite already existent files.
+  -pack|p       Create a package.
+  -perlbin|pb   Create a binary from a package.
+  -striplib     Strip POD from libs.
+  -upx          UPX the PerlLib binary.
+  -upxlib       UPX binaries from the lib.zip
+
+EXAMPLES:
+
+  COMPILE:
+    libzip -o file.pl
+    ## Creates file.exe (combine -pack, -perlbin and -lib autoamtically).
+
+  CREATE A PACKAGE FROM SCRIPT:
+    libzip.bat -p file.pack -f file.pl
+    ## Creates file.pack (used to create the executable) with file.pl inside.
+
+  CREATE LIB.ZIP:
+    libzip -l lib.zip -f libzip.modules
+    ## Create a library (lib.zip) with the modules in the file libzip.modules
+
+  CREATE BINATY:
+    libzip -perlbin script.pack -f script.exe
+    ## Create the binary from the package.
+
+  FULL EXAMPLE:
+
+    libzip -o script.pl -allowopts vVw -lzw -upx -upxlib -striplib -keepsrc -overwrite
+
+(C) Copyright 2000-2004, Graciliano M. P. <gm\@virtuasites.com.br>
+________________________________________________________________________________
+`;
+
+exit;
+}
+
+########
+# INIT #
+########
+
+  my %OPTS ;
+  GetOptions(\%OPTS, qw[
+    pack|p=s perlbin|pb=s lib|l=s
+    compile|o=s obetter|ob=s file|f=s
+    icon=s gui! allowopts=s
+    overwrite! keepsrc!
+    upx! upxlib!
+    lzw! striplib!
+  ]) ;
+
+###########
+# OBETTER #
+###########
+
+if ( $OPTS{obetter} ) {
+  $OPTS{compile} = delete $OPTS{obetter} ;
+  $OPTS{upx} = $OPTS{upxlib} = $OPTS{lzw} = $OPTS{striplib} = 1 ;
+}
+
+print "OPTIONS:\n" ;
+
+foreach my $Key ( sort keys %OPTS ) {
+print "         $Key = $OPTS{$Key}\n" ;
+}
+print "\n" ;
+
+###########
+# PACKAGE #
+###########
+
+if ( $OPTS{pack} ) { opt_pack($OPTS{pack} , $OPTS{file} ) ;}
+
+sub opt_pack {
+  my ( $pack , $file ) = @_ ;
+  require LibZip::Build::Package ;
+  my $src = LibZip::Build::Package::source( $file , %OPTS ) ;
+  LibZip::Build::MyZlibCompress::save($pack , $src) ;
+  
+  print "LibZip package created at $pack\n" ;
+}
+
+###########
+# PERLBIN #
+###########
+
+if ( $OPTS{perlbin} ) { opt_pack($OPTS{perlbin} , $OPTS{file} , %OPTS ) ;}
+
+sub opt_perlbin {
+  my ( $perlbin , $file , %OPTS ) = @_ ;
+  require LibZip::Build::PerlBin ;
+  my ($new_bin , $exe_dir) = LibZip::Build::PerlBin::perl2bin( $perlbin , $file , %OPTS ) ;
+  print "LibZip converted $perlbin to binary $new_bin\n" ;
+  return( $new_bin , $exe_dir ) ;
+}
+
+###########
+# COMPILE #
+###########
+
+if ( $OPTS{compile} ) {
+  my $pack = "$OPTS{compile}.pack" ;
+  opt_pack( $pack , $OPTS{compile} ) ;
+  my ( $exe_name , $exe_dir ) = opt_perlbin($pack , undef , overwrite => 1 , %OPTS ) ;
+
+  my $modules = "$exe_dir/libzip.modules" ;
+  my $modules_skip = "$exe_dir/libzip.skip" ;
+  opt_lib( "$exe_dir/lib.zip" , $modules , $modules_skip ) if -s $modules ;
+
+  unlink($pack) if !$OPTS{keepsrc} ;
+}
+
+#######
+# LIB #
+#######
+
+if ( $OPTS{lib} ) { opt_lib($OPTS{lib} , $OPTS{file} ) ;}
+
+sub opt_lib {
+  my ( $lib , $file , $skip ) = @_ ;
+  $file ||= 'libzip.modules' ;
+  
+  if ( !$skip ) {
+    $skip = $file ;
+    $skip =~ s/\.\w+$/.skip/ ;
+  }
+
+  require LibZip::Build::CreateLib ;
+  LibZip::Build::CreateLib::TO_UPX(1) if $OPTS{upxlib} ;
+  LibZip::Build::CreateLib::STRIP_LIB(1) if $OPTS{striplib} ;
+  LibZip::Build::CreateLib::create_lib($lib , $file , $skip) ;
+
+  print "Lib created at $lib\n" ;
+}
+
+#######
+# END #
+#######
+

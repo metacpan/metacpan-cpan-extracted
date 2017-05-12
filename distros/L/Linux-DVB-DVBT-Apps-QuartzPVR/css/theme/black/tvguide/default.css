@@ -1,0 +1,28 @@
+/*
+
+
+Background Images:
+
+Channel name background : 	lschn.png
+
+normal program : 			lsgrd.png
+recorded program : 			lsgrd-rec.png
+
+timebar : 					lstbb.png
+
+*/
+
+body {
+  background: #000 ;
+}
+
+/*==================================================================*/
+/* LOADING/WAITING window
+==================================================================*/
+
+/* looks better with transparent background! */
+.loading {
+	/* background : black ; */
+}
+
+

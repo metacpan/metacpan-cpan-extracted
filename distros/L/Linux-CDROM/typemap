@@ -1,0 +1,48 @@
+CDROM *		    CDROM_O
+CDROM_ADDR *	    CDROM_ADDR_O
+CDROM_SUBCHANNEL *  CDROM_SUBCHANNEL_O
+CDROM_TOCENTRY *    CDROM_TOCENTRY_O
+
+OUTPUT
+CDROM_O
+    sv_setref_pv( $arg, CLASS, (void*)$var );
+CDROM_ADDR_O
+    sv_setref_pv( $arg, "Linux::CDROM::Addr", (void*)$var );
+CDROM_SUBCHANNEL_O
+    sv_setref_pv( $arg, "Linux::CDROM::Subchannel", (void*)$var );
+CDROM_TOCENTRY_O
+    sv_setref_pv( $arg, "Linux::CDROM::TocEntry", (void*)$var );
+
+INPUT
+CDROM_O
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+CDROM_ADDR_O
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+CDROM_SUBCHANNEL_O
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+CDROM_TOCENTRY_O
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+

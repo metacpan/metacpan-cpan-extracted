@@ -1,0 +1,109 @@
+=pod
+
+=head1 NAME
+
+LEOCHARRE::Dir - my subs for general directory needs
+
+=head1 SYNOPSIS
+
+   use LEOCHARRE::Dir ':all';
+   
+   my $dir        = reqdir("./make_sure_dir_is_here");
+   
+   my @ls         = ls($dir);
+   
+   my @files      = lsf($dir);
+   
+   my @dirs       = lsd($dir);
+   
+   my @abs_dirs   = lsda($dir);
+   
+   my @abs_files  = lsfa($dir);
+   
+   my @abs_all    = lsa($dir);
+
+=head1 DESCRIPTION
+
+Reading directories, etc. Made to be simple, clean cut.
+
+=head1 SUBS
+
+None are exported by default.
+
+=head2 ls()
+
+Argument is path to dir.
+Returns list array with all files, including dirs files and symlinks, etc.
+
+=head2 lsa()
+
+Same as ls(), but paths are absolute.
+
+=head2 lsf()
+
+Argument is path to dir.
+Returns list array with all files.
+
+=head2 lsfa()
+
+Same as lsf(), but paths are absolute.
+
+=head2 lsd()
+
+Argument is path to dir.
+Returns list array with all dirs.
+
+=head2 lsda()
+
+Same as lsd(), but paths are absolute.
+
+=head2 lsr()
+
+Argument is path to dir.
+Returns paths relative to ENV DOCUMENT ROOT.
+Slash at front is included.
+ENV DOCUMENT ROOT must be set or dies.
+If none in list, returns undef;
+If it is not within ENV DOCUMENT ROOT, returns undef.
+This uses Cwd::abs_path thus it resolves symlinks, this cgi-bin may not be within
+DOCUMENT ROOT, note.
+Returns array list.
+
+=head2 lsfr()
+
+Like lsr() but returns files.
+
+=head2 lsdr()
+
+Like lsr() but returns dirs.
+
+=head2 reqdir()
+
+Argument is path to dir.
+Requires that the dir exist, if not there, creates.
+Returns abs path to dir requested.
+
+=head1 BUGS
+
+Please contact the AUTHOR.
+
+=head1 SEE ALSO
+
+L<Cwd>
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+

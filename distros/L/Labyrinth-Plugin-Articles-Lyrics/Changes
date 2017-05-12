@@ -1,0 +1,16 @@
+Changes for the Labyrinth-Plugin-Articles-Lyrics
+================================================
+
+1.03    2015-02-03
+        - fixed date calculations in tests.
+
+1.02    2014-11-16
+        - added missing test pre-requisite.
+        - upgraded Labyrinth & Core Plugins.
+
+1.01    2014-11-06
+        - fixed license fields in META.json to be lists.
+        - extended META and functional test suite.
+
+1.00    2014-04-25
+        - first official release

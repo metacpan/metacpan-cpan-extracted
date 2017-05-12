@@ -1,0 +1,63 @@
+4 <U>
+5 <G>
+6 <H>
+8 <T>
+12 <S>
+16 <P>
+18 <P h="y">
+20 <O>
+22 <O em="y">
+24 <R>
+28 <C>
+32 <Q>
+36 <I>
+40 <D>
+44 <Y>
+64 <N pl="n" gnt="n">
+65 <N pl="n" gnt="d">
+66 <N pl="n" gnt="n" h="y">
+67 <N pl="n" gnt="d" h="y">
+72 <N pl="n" gnt="n" gnd="f">
+74 <N pl="n" gnt="n" gnd="f" h="y">
+76 <N pl="n" gnt="n" gnd="m">
+78 <N pl="n" gnt="n" gnd="m" h="y">
+88 <N pl="n" gnt="y" gnd="f">
+90 <N pl="n" gnt="y" gnd="f" h="y">
+92 <N pl="n" gnt="y" gnd="m">
+94 <N pl="n" gnt="y" gnd="m" h="y">
+96 <N pl="y" gnt="n">
+97 <N pl="y" gnt="d">
+98 <N pl="y" gnt="n" h="y">
+99 <N pl="y" gnt="d" h="y">
+104 <N pl="y" gnt="n" gnd="f">
+106 <N pl="y" gnt="n" gnd="f" h="y">
+108 <N pl="y" gnt="n" gnd="m">
+110 <N pl="y" gnt="n" gnd="m" h="y">
+112 <N pl="y" gnt="y">
+114 <N pl="y" gnt="y" h="y">
+120 <N pl="y" gnt="y" gnd="f">
+122 <N pl="y" gnt="y" gnd="f" h="y">
+124 <N pl="y" gnt="y" gnd="m">
+126 <N pl="y" gnt="y" gnd="m" h="y">
+127 <F>
+128 <A pl="n" gnt="n">
+130 <A pl="n" gnt="n" h="y">
+152 <A pl="n" gnt="y" gnd="f">
+156 <A pl="n" gnt="y" gnd="m">
+160 <A pl="y" gnt="n">
+176 <A>
+192 <V p="n" t="ord">
+193 <V p="n" t="láith">
+194 <V cop="y">
+195 <V p="n" t="caite">
+196 <V p="n" t="fáist">
+197 <V p="n" t="gnáth">
+198 <V p="n" t="coinn">
+199 <V p="n" t="foshuit">
+200 <V p="y" t="ord">
+201 <V p="y" t="láith">
+203 <V p="y" t="caite">
+204 <V p="y" t="fáist">
+205 <V p="y" t="gnáth">
+206 <V p="y" t="coinn">
+207 <V p="y" t="foshuit">

@@ -1,0 +1,31 @@
+* Think about defining the local domain
+
+We don't need to use the robot protection rules within our own local
+area network.  We should be allowed to explain what this means to the
+robot. 
+
+* Robot ignore rules
+
+Sometimes we either have specific permission from a site, or it's our
+own site and we want to ignore the robot rules there..  I guess this
+could just be added to the robot rules at that site?
+
+* Complex Robot Rules
+
+The original momspider would insert a five minute break inbetween
+every tenth(?) request to the same site.  This has been got rid of.
+Why?  Why was it there originally?
+
+* Bundle meta info up with links
+
+For almost every link, it should be an error to have empty data, but
+some might be expected to have this (for example something which
+records this days high scores on a game noone has played yet) there
+should be a way of warning the link checker about this.
+
+* Build in content checking
+
+Sometimes when your neighbours change their pages you want to be able
+to check up on them.  Maybe he's secretly changed to being a yellow
+tiddly wink supporter when you're referencing him from the blue page.
+You want to have rapid warning of this kind of thing...

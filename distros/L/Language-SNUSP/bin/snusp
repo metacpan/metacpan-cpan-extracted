@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use Language::SNUSP;
+
+Language::SNUSP->run(@ARGV);

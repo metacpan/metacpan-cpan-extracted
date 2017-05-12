@@ -1,0 +1,63 @@
+---
+abstract: 'The authentication portal part of Lemonldap::NG Web-SSO system.'
+author:
+  - 'Xavier Guimard <x.guimard@free.fr>, ClÃ©ment Oudot <clement@oodo.net>, Thomas Chemineau <thomas.chemineau@gmail.com>, Mikael Ates <mikael.ates@univ-st-etienne.fr>'
+build_requires:
+  AuthCAS: '0'
+  HTTP::Message: '0'
+  IO::String: '0'
+  LWP: '0'
+  MIME::Lite: '0'
+  Net::OpenID::Consumer: '0'
+  Net::OpenID::Server: '0'
+  SOAP::Lite: '0'
+  String::Random: '0'
+  Test::Pod: '1'
+  XML::LibXML: '0'
+  XML::LibXSLT: '0'
+  XML::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lemonldap-NG-Portal
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  AuthCAS: '0'
+  DBI: '0'
+  Glib: '0'
+  HTTP::Message: '0'
+  LWP: '0'
+  LWP::Protocol::https: '0'
+  Lasso: v2.3.0
+  Lemonldap::NG::Handler: v1.4.11
+  MIME::Lite: '0'
+  Net::Facebook::Oauth2: '0'
+  Net::OpenID::Consumer: '0'
+  Net::OpenID::Server: '0'
+  Net::Twitter: '0'
+  SOAP::Lite: '0'
+  String::Random: '0'
+  URI: '0'
+  Web::ID: '0'
+  XML::LibXML: '0'
+  XML::LibXSLT: '0'
+  XML::Simple: '0'
+requires:
+  Authen::Captcha: '0'
+  CGI: '3.08'
+  Clone: '0'
+  HTML::Template: '0'
+  Lemonldap::NG::Common: v1.4.11
+  Net::LDAP: '0.38'
+  Regexp::Assemble: '0'
+  Unicode::String: '0'
+version: v1.4.11
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

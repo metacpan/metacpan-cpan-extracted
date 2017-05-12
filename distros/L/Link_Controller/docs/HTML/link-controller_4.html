@@ -1,0 +1,281 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on February, 3  2002 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Using LinkController: Advanced Configuration</TITLE>
+
+<META NAME="description" CONTENT="Using LinkController: Advanced Configuration">
+<META NAME="keywords" CONTENT="Using LinkController: Advanced Configuration">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC8"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_3.html#SEC7"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC9"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_3.html#SEC3"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1> 3. Advanced Configuration </H1>
+<!--docid::SEC8::-->
+<P>
+
+There are various advanced ways to configure LinkController.  These are
+mostly not needed for simple checking of a small collection of web
+pages.  For larger sites and special situations however, they may well
+make life much easier.
+</P><P>
+
+<BLOCKQUOTE><TABLE BORDER=0 CELLSPACING=0> 
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_4.html#SEC9">3.1 Advanced Infostructure Configuration</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Advanced control of checking</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_4.html#SEC10">3.2 Authorisation Configuration</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Checking pages which require basic authentication.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_4.html#SEC11">3.3 Configuring CGI Programs</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Setting up LinkController's web interface</TD></TR>
+</TABLE></BLOCKQUOTE>
+<P>
+
+<A NAME="Advanced Infostructure Configuration"></A>
+<HR SIZE="6">
+<A NAME="SEC9"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC8"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC10"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC8"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC8"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 3.1 Advanced Infostructure Configuration </H2>
+<!--docid::SEC9::-->
+<P>
+
+Using more advanced configuration it is possible to skip over certain
+resources when we are doing link extraction and to ignore some of the
+links.  You may want to skip over this section initially and come back
+to it only when you find that there are links or pages being checked
+that you would rather avoid.
+</P><P>
+
+For this section, we assume that you already know how to make basic Perl
+code.  If not, then please read through the Perl manual pages
+<SAMP>`perl'</SAMP>, <SAMP>`perlsyn'</SAMP> and <SAMP>`perldata'</SAMP>.  You may find that the
+examples given below are sufficient to get you started.
+</P><P>
+
+In order to get <CODE>extract-links</CODE> to extract links using an
+advanced infostructure, you must use the <CODE>advanced</CODE> keyword. In the
+infostructure file.  Infostructures not listed there will be ignored,
+but won't cause any harm.
+</P><P>
+
+Advanced configuration is in the <TT>`.link-controller.pl'</TT>
+configuration file by making definitions into the <CODE>%::infostrucs</CODE>
+hash.  These look like the following
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>$::infostrucs{http://www.mypages.org/} = {
+   mode =&#62; "directory";
+   file_base =&#62; "/home/myself/www",
+   prune_re =&#62; "^(/home/myself/www/statistics)" #ignore referrals
+              . "|(cgi-bin)", #do CGIs separately
+   resource_exclude_re =&#62; "\.secret$", #secrets shouldn't stay secret
+   link_exclude_re =&#62; "^http://([a-z]+\.)+example\.com", 
+};
+
+$::infostrucs{http://www.mypages.org/cgi-bin/} = {
+   mode =&#62; "www";
+   resource_exclude_re =&#62; "query", #query space is infinite!!
+};
+</pre></td></tr></table></P><P>
+
+There are a number of keywordss that can be used.  
+</P><P>
+
+<DL COMPACT>
+<DT><SAMP>`mode'</SAMP>
+<DD><A NAME="IDX25"></A>
+This decides how to download the links.  Either <SAMP>`www'</SAMP> or
+<SAMP>`directory'</SAMP>.
+<DT><SAMP>`file_base'</SAMP>
+<DD><A NAME="IDX26"></A>
+If defined, this defines the directory which matches the URL where the
+infostructure is based.  This must be defined if the mode is set to
+directory.
+<DT><SAMP>`resource_include_re'</SAMP>
+<DD><A NAME="IDX27"></A>
+If defined, this regular expression must be matched by the <EM>URL</EM>
+for every resource before links will be extracted from it.
+<DT><SAMP>`resource_exclude_re'</SAMP>
+<DD><A NAME="IDX28"></A>
+If defined, this regular expression must <EM>not</EM> be matched by the
+<EM>URL</EM> for every resource before links will be extracted from it.
+<DT><SAMP>`link_include_re'</SAMP>
+<DD><A NAME="IDX29"></A>
+If defined, this regular expression must be matched by every <EM>URL</EM>
+found before it will be extracted and saved.
+<DT><SAMP>`link_exclude_re'</SAMP>
+<DD><A NAME="IDX30"></A>
+If defined, this regular expression must <EM>not</EM> be matched by every
+<EM>URL</EM> found before it will be extracted and saved.
+<DT><SAMP>`prune_re'</SAMP>
+<DD><A NAME="IDX31"></A>
+Used only in directory mode, this will completely exclude all files and
+sub-directories of directories matched by the regular expression.
+</DL>
+<P>
+
+N.B. the exclude and include regular expressions can be used together.
+For a match, the include regular expression must match and the exclude
+must not match.  In other words excludes override includes.
+</P><P>
+
+In order for the infostructure to be used by <CODE>extract-links</CODE> an
+entry must still be made in the <TT>`infostrucs'</TT> file.  For this use the
+<CODE>advanced</CODE> keyword.  The second argument is a URL used to look up
+the definition in the $::infostrucs hash.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>advanced   http://www.mypages.org/
+advanced   http://www.mypages.org/cgi-bin/
+</pre></td></tr></table></P><P>
+
+The URL used here must match <EM>exactly</EM> the one used in the hash.
+It is important to note that <SAMP>`directory'</SAMP> and <SAMP>`www'</SAMP> definitions
+in the <TT>`infostrucs'</TT> file will override any advanced configuration
+given.
+</P><P>
+
+<A NAME="Authorisation Configuration"></A>
+<HR SIZE="6">
+<A NAME="SEC10"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC9"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC11"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC8"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC8"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 3.2 Authorisation Configuration </H2>
+<!--docid::SEC10::-->
+<P>
+
+One problem when checking links, especially within an intranet situation
+is that some pages can be protected with basic authentication.  In order
+to extract links from those pages or to simply know that they are there,
+we have to get through that authentication.  By using the advanced
+Authorisation Configuration we can give LinkController authority to
+access these pages and allow link checking to work as normal.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=display><pre style="font-family: serif"><EM>Using this method to allow LinkController to work in an
+environment with authentication is inherently a security issue since
+authentication tokens must be stored, effectively in plaintext, in
+files.  This risk may, however, not be much higher than the one that you
+currently accept, so this can be useful</EM>
+</pre></td></tr></table></P><P>
+
+We can store the authentication tokens simply in the %::credentials hash
+which we can create in the <TT>`.link-controller.pl'</TT> configuration file.
+The keys in the hash are the exact realm string which will be sent by
+the web server.  Each value of this hash is a hash with a pair of keys.
+The <SAMP>`credentials'</SAMP> key should be associated to the authentication
+token.  The <SAMP>`uri_re'</SAMP> key should be a regular expression which
+matches the web pages you want to visit.  For security reasons it
+shouldn't match any others.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>$::credentials = {
+  my_realm =&#62; { uri_re =&#62; "https://myhost.example.com",
+                credential =&#62; "my_secret" }
+} );
+</pre></td></tr></table></P><P>
+
+As a sanity check, every <SAMP>`uri_re'</SAMP> will be tried on
+<SAMP>`http://3133t3hax0rs.rhere.com'</SAMP> and
+<SAMP>`http://3133t3hax0rs.rhere.com/secretstuff/www.goodplace.com/'</SAMP>.  If
+the expression matches then the credentials will be ignored.  If you
+know enough to do this safely then you should definitely know how to get
+past this check.  The owners of the domain <SAMP>`3133t3hax0rs.rhere.com'</SAMP>
+will just have to hack the code..
+</P><P>
+
+For more discussion about the security risks and how to mitigate them
+see the file <TT>`authorisation.pod'</TT> included with the LinkController
+distribution.  If you didn't understand the security risk from the above
+description then probably you should consider avoiding using this
+mechanism.
+</P><P>
+
+<A NAME="Configuring CGI Programs"></A>
+<HR SIZE="6">
+<A NAME="SEC11"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC10"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC8"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC8"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 3.3 Configuring CGI Programs </H2>
+<!--docid::SEC11::-->
+<P>
+
+The CGI programs use the same configuration variables as the other
+programs, however, to avoid any confusion and related security problems,
+a perl script should be written which has the configuration variables
+hard wired in then runs the appropriate CGI program.
+<CODE>configure-link-cgi</CODE> is a program designed to set up such a
+script.  
+</P><P>
+
+<STRONG>FIXME:</STRONG> this section needs to be rewritten.
+</P><P>
+
+<A NAME="Using LinkController"></A>
+<HR SIZE="6">
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC8"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Michael De La Rue</I> on <I>February, 3  2002</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

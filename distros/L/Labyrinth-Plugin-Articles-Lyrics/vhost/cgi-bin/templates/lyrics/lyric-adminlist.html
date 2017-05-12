@@ -1,0 +1,51 @@
+[% 
+    title = 'Lyrics Admin' ;
+    htmltitle = title ;
+
+    crumb2_name = 'Admin' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=home-admin' ;
+    crumb1_name = 'Lyrics' ;
+%]
+
+<p>Click on an lyric's 'Title' to edit or create additional content.</p>
+
+<form action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="lyric-admin" />
+<input type="hidden" name="sectionid" value="[% sectionid %]" />
+<p>Search by Title: <input type="text" name="searchname" />
+[% stockselect %] <input type="submit" value="GO" />
+|   <a href="[% cgipath %]/pages.cgi?act=lyric-admin">view all</a>
+|   <a href="[% cgipath %]/pages.cgi?act=lyric-add&amp;sectionid=[% sectionid %]">create a new lyric</a></p>
+
+<div class="admin">
+<table>
+<tr>
+    <th>Title</th>
+    <th>Status</th>
+    <th>Select</th>
+</tr>
+
+[% FOREACH item = data %]
+
+<tr>
+    <td><a href="[% cgipath %]/pages.cgi?act=lyric-edit&amp;articleid=[% item.articleid %]">[% item.title %]</a></td>
+    <td>[% item.publishstate %]</td>
+    <td><input type="checkbox" name="LISTED" value="[% item.articleid %]" /></td>
+</tr>
+
+[% END %]
+
+[% IF norecs %]
+<tr><td colspan="3" align="center">No lyrics listed.</td></tr>
+[% END %]
+
+</table>
+</div>
+
+<p>
+<input type="hidden" name='doaction' value='' />
+<input type="hidden" name='recordid' value='' />
+<input type="button" value='Promote' onClick="doSubmit('Promote',0)" />
+<input type="button" value='Copy'    onClick="doOnlyOne('Copy',0)" />
+<input type="button" value='Delete'  onClick="doSubmit('Delete',0)" /></p>
+</form>

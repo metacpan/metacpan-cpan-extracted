@@ -1,0 +1,28 @@
+#include "config.h"
+
+Package {
+	name		= "data",
+#ifdef INSTALLING
+	import_dirs	= [ "$libdir/hslibs-imports/data" ],
+#else
+	import_dirs	= [ "$libdir/hslibs/data"
+			  , "$libdir/hslibs/data/edison"
+			  , "$libdir/hslibs/data/edison/Assoc"
+			  , "$libdir/hslibs/data/edison/Coll"
+			  , "$libdir/hslibs/data/edison/Seq" ],
+#endif
+	source_dirs	= [],
+#ifdef INSTALLING
+	library_dirs	= [ "$libdir" ],
+#else
+	library_dirs	= [ "$libdir/hslibs/data" ],
+#endif
+	hs_libraries	= [ "HSdata" ],
+	extra_libraries	= [],
+	include_dirs	= [],
+	c_includes	= [],
+	package_deps	= [ "haskell98", "lang", "util" ],
+	extra_ghc_opts	= [],
+	extra_cc_opts	= [],
+	extra_ld_opts	= []
+}

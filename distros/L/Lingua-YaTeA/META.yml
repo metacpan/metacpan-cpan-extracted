@@ -1,0 +1,218 @@
+---
+abstract: 'Perl extension for extracting terms from a corpus and providing a syntactic analysis in a head-modifier format.'
+author:
+  - 'Thierry Hamon <thierry.hamon@univ-paris13.fr> and Sophie Aubin <sophie.aubin@lipn.univ-paris13.fr>'
+build_requires:
+  Module::Build: 0.28
+  Test::More: 0.62
+configure_requires:
+  File::chmod: 0
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-YaTeA
+provides:
+  Lingua::YaTeA:
+    file: lib/Lingua/YaTeA.pm
+    version: 0.622
+  Lingua::YaTeA::AnnotationMark:
+    file: lib/Lingua/YaTeA/AnnotationMark.pm
+    version: 0
+  Lingua::YaTeA::ChunkingDataSet:
+    file: lib/Lingua/YaTeA/ChunkingDataSet.pm
+    version: 0
+  Lingua::YaTeA::ChunkingDataSubset:
+    file: lib/Lingua/YaTeA/ChunkingDataSubset.pm
+    version: 0
+  Lingua::YaTeA::Corpus:
+    file: lib/Lingua/YaTeA/Corpus.pm
+    version: 0
+  Lingua::YaTeA::Document:
+    file: lib/Lingua/YaTeA/Document.pm
+    version: 0
+  Lingua::YaTeA::DocumentSet:
+    file: lib/Lingua/YaTeA/DocumentSet.pm
+    version: 0
+  Lingua::YaTeA::Edge:
+    file: lib/Lingua/YaTeA/Edge.pm
+    version: 0
+  Lingua::YaTeA::File:
+    file: lib/Lingua/YaTeA/File.pm
+    version: 0
+  Lingua::YaTeA::FileSet:
+    file: lib/Lingua/YaTeA/FileSet.pm
+    version: 0
+  Lingua::YaTeA::ForbiddenStructure:
+    file: lib/Lingua/YaTeA/ForbiddenStructure.pm
+    version: 0
+  Lingua::YaTeA::ForbiddenStructureAny:
+    file: lib/Lingua/YaTeA/ForbiddenStructureAny.pm
+    version: 0
+  Lingua::YaTeA::ForbiddenStructureMark:
+    file: lib/Lingua/YaTeA/ForbiddenStructureMark.pm
+    version: 0
+  Lingua::YaTeA::ForbiddenStructureSet:
+    file: lib/Lingua/YaTeA/ForbiddenStructureSet.pm
+    version: 0
+  Lingua::YaTeA::ForbiddenStructureStartOrEnd:
+    file: lib/Lingua/YaTeA/ForbiddenStructureStartOrEnd.pm
+    version: 0
+  Lingua::YaTeA::IndexSet:
+    file: lib/Lingua/YaTeA/IndexSet.pm
+    version: 0
+  Lingua::YaTeA::InternalNode:
+    file: lib/Lingua/YaTeA/InternalNode.pm
+    version: 0
+  Lingua::YaTeA::Island:
+    file: lib/Lingua/YaTeA/Island.pm
+    version: 0
+  Lingua::YaTeA::IslandSet:
+    file: lib/Lingua/YaTeA/IslandSet.pm
+    version: 0
+  Lingua::YaTeA::Lexicon:
+    file: lib/Lingua/YaTeA/Lexicon.pm
+    version: 0
+  Lingua::YaTeA::LexiconItem:
+    file: lib/Lingua/YaTeA/LexiconItem.pm
+    version: 0
+  Lingua::YaTeA::LinguisticItem:
+    file: lib/Lingua/YaTeA/LinguisticItem.pm
+    version: 0
+  Lingua::YaTeA::Message:
+    file: lib/Lingua/YaTeA/Message.pm
+    version: 0
+  Lingua::YaTeA::MessageSet:
+    file: lib/Lingua/YaTeA/MessageSet.pm
+    version: 0
+  Lingua::YaTeA::MonolexicalPhrase:
+    file: lib/Lingua/YaTeA/MonolexicalPhrase.pm
+    version: 0
+  Lingua::YaTeA::MonolexicalTermCandidate:
+    file: lib/Lingua/YaTeA/MonolexicalTermCandidate.pm
+    version: 0
+  Lingua::YaTeA::MonolexicalTestifiedTerm:
+    file: lib/Lingua/YaTeA/MonolexicalTestifiedTerm.pm
+    version: 0
+  Lingua::YaTeA::MonolexicalUnit:
+    file: lib/Lingua/YaTeA/MonolexicalUnit.pm
+    version: 0
+  Lingua::YaTeA::MultiWordPhrase:
+    file: lib/Lingua/YaTeA/MultiWordPhrase.pm
+    version: 0
+  Lingua::YaTeA::MultiWordTermCandidate:
+    file: lib/Lingua/YaTeA/MultiWordTermCandidate.pm
+    version: 0
+  Lingua::YaTeA::MultiWordTestifiedTerm:
+    file: lib/Lingua/YaTeA/MultiWordTestifiedTerm.pm
+    version: 0
+  Lingua::YaTeA::MultiWordUnit:
+    file: lib/Lingua/YaTeA/MultiWordUnit.pm
+    version: 0
+  Lingua::YaTeA::Node:
+    file: lib/Lingua/YaTeA/Node.pm
+    version: 0
+  Lingua::YaTeA::NodeSet:
+    file: lib/Lingua/YaTeA/NodeSet.pm
+    version: 0
+  Lingua::YaTeA::Occurrence:
+    file: lib/Lingua/YaTeA/Occurrence.pm
+    version: 0
+  Lingua::YaTeA::Option:
+    file: lib/Lingua/YaTeA/Option.pm
+    version: 0
+  Lingua::YaTeA::OptionSet:
+    file: lib/Lingua/YaTeA/OptionSet.pm
+    version: 0
+  Lingua::YaTeA::ParsingPattern:
+    file: lib/Lingua/YaTeA/ParsingPattern.pm
+    version: 0
+  Lingua::YaTeA::ParsingPatternParser:
+    file: lib/Lingua/YaTeA/ParsingPatternParser.pm
+    version: 0
+  Lingua::YaTeA::ParsingPatternRecord:
+    file: lib/Lingua/YaTeA/ParsingPatternRecord.pm
+    version: 0
+  Lingua::YaTeA::ParsingPatternRecordSet:
+    file: lib/Lingua/YaTeA/ParsingPatternRecordSet.pm
+    version: 0
+  Lingua::YaTeA::PatternLeaf:
+    file: lib/Lingua/YaTeA/PatternLeaf.pm
+    version: 0
+  Lingua::YaTeA::Phrase:
+    file: lib/Lingua/YaTeA/Phrase.pm
+    version: 0
+  Lingua::YaTeA::PhraseSet:
+    file: lib/Lingua/YaTeA/PhraseSet.pm
+    version: 0
+  Lingua::YaTeA::RootNode:
+    file: lib/Lingua/YaTeA/RootNode.pm
+    version: 0
+  Lingua::YaTeA::Sentence:
+    file: lib/Lingua/YaTeA/Sentence.pm
+    version: 0
+  Lingua::YaTeA::SentenceSet:
+    file: lib/Lingua/YaTeA/SentenceSet.pm
+    version: 0
+  Lingua::YaTeA::TagSet:
+    file: lib/Lingua/YaTeA/TagSet.pm
+    version: 0
+  Lingua::YaTeA::TermCandidate:
+    file: lib/Lingua/YaTeA/TermCandidate.pm
+    version: 0
+  Lingua::YaTeA::TermLeaf:
+    file: lib/Lingua/YaTeA/TermLeaf.pm
+    version: 0
+  Lingua::YaTeA::TestifiedTerm:
+    file: lib/Lingua/YaTeA/TestifiedTerm.pm
+    version: 0
+  Lingua::YaTeA::TestifiedTermMark:
+    file: lib/Lingua/YaTeA/TestifiedTermMark.pm
+    version: 0
+  Lingua::YaTeA::TestifiedTermParser:
+    file: lib/Lingua/YaTeA/TestifiedTermParser.pm
+    version: 0
+  Lingua::YaTeA::TestifiedTermSet:
+    file: lib/Lingua/YaTeA/TestifiedTermSet.pm
+    version: 0
+  Lingua::YaTeA::Tree:
+    file: lib/Lingua/YaTeA/Tree.pm
+    version: 0
+  Lingua::YaTeA::Trigger:
+    file: lib/Lingua/YaTeA/Trigger.pm
+    version: 0
+  Lingua::YaTeA::TriggerSet:
+    file: lib/Lingua/YaTeA/TriggerSet.pm
+    version: 0
+  Lingua::YaTeA::WordFromCorpus:
+    file: lib/Lingua/YaTeA/WordFromCorpus.pm
+    version: 0
+  Lingua::YaTeA::WordOccurrence:
+    file: lib/Lingua/YaTeA/WordOccurrence.pm
+    version: 0
+  Lingua::YaTeA::XMLEntities:
+    file: lib/Lingua/YaTeA/XMLEntities.pm
+    version: 0
+requires:
+  Config::General: 2.3
+  Data::Dumper: 0
+  Encode: 0
+  File::Compare: 0
+  File::Path: 0
+  Getopt::Long: 0
+  Module::Build::Compat: 0
+  NEXT: 0
+  POSIX: 0
+  Parse::Yapp: 0
+  Pod::Usage: 0
+  Scalar::Util: 0
+  Test::More: 0.62
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.622

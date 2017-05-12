@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# USAGE: sta2penn sta-align-file.xml
+#
+#
+
+use strict;
+use FindBin;
+use lib $FindBin::Bin.'/../lib';
+use Lingua::Align::Corpus::Parallel::STA;
+use Lingua::Align::Corpus::Treebank::Penn;
+use File::Basename;
+
+my $algfile = shift(@ARGV);
+my $corpus=new Lingua::Align::Corpus::Parallel::STA(-alignfile => $algfile);
+my $base=basename($algfile);
+$base=~s/\.xml//;
+
+my $srcfile=$base.'.penn.src';
+my $trgfile=$base.'.penn.trg';
+
+open SRC,">$srcfile" || die "cannot open $srcfile\n";
+open TRG,">$trgfile" || die "cannot open $trgfile\n";
+binmode(SRC,":encoding(utf8)");
+binmode(TRG,":encoding(utf8)");
+
+my %srctree=();
+my %trgtree=();
+my @srcids=();
+my @trgids=();
+my $links;
+
+my $penn=new Lingua::Align::Corpus::Treebank::Penn;
+
+while ($corpus->next_alignment(\%srctree,\%trgtree,\$links)){
+
+    print SRC $penn->print_tree(\%srctree,\@srcids);
+    print SRC "\n";
+    print TRG $penn->print_tree(\%trgtree,\@trgids);
+    print TRG "\n";
+
+    my @DublinAlg=();
+    my @StaAlg=();
+    foreach my $s (0..$#srcids){
+	foreach my $t (0..$#trgids){
+	    if (exists $$links{$srcids[$s]}{$trgids[$t]}){
+		my $sd=$s+1;my $td=$t+1;
+		push(@DublinAlg,$sd.' '.$td);
+		push(@StaAlg,$srcids[$s].':'.$trgids[$t].':'.$$links{$srcids[$s]}{$trgids[$t]});
+	    }
+	}
+    }
+    print join(' ',@DublinAlg);
+    print "\n";
+    print join(' ',@StaAlg);
+    print "\n\n";
+
+    @srcids=();
+    @trgids=();
+
+}
+
+close SRC;
+close TRG;

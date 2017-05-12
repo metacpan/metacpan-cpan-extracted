@@ -1,0 +1,14 @@
+Revision history for Perl extension Lingua::EU::Numbers.
+
+
+0.03  Wed Dec 18, 2002
+      Fixed a typo in the synopsis (thanks to Abigail and Roman Vasicek
+      who noticed that mistake).
+
+0.02  Tues Dec 17, 2002
+      Updated the README file  
+
+0.01  Mon Dec  9 16:53:21 2002
+      Original version; created by h2xs 1.22 with options
+		-X -A -n Lingua::EU::Numbers
+

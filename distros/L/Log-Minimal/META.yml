@@ -1,0 +1,48 @@
+---
+abstract: 'Minimal but customizable logger.'
+author:
+  - 'Masahiro Nagano <kazeburo {at} gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Minimal
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Log::Minimal:
+    file: lib/Log/Minimal.pm
+    version: 0.19
+requires:
+  Data::Dumper: 0
+  Scalar::Util: 0
+  Term::ANSIColor: 0
+resources:
+  bugtracker: https://github.com/kazeburo/Log-Minimal/issues
+  homepage: https://github.com/kazeburo/Log-Minimal
+  repository: git://github.com/kazeburo/Log-Minimal.git
+version: 0.19
+x_contributors:
+  - 'sugyan <sugi1982@gmail.com>'
+  - 'tokuhirom <tokuhirom@gmail.com>'
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'
+  - 'hisaichi5518 <hisaichi5518@gmail.com>'
+  - 'moznion <moznion@gmail.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'

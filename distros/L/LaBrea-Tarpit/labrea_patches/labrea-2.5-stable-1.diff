@@ -1,0 +1,20 @@
+--- src/utils.c.orig    Tue Nov 11 16:30:57 2003
++++ src/utils.c Tue Nov 11 16:31:53 2003
+@@ -375,7 +375,7 @@
+   ctl.totalbytes -= ctl.past[HIST_MIN];
+   for(i = HIST_MIN; i; i--)
+     ctl.past[i] = ctl.past[i - 1];
+-  ctl.past[0] = ctl.currentbytes / ONE_K; /* Convert to Kbytes */
++  ctl.past[0] = ctl.currentbytes;
+   ctl.totalbytes += ctl.past[0];
+   ctl.currentbytes = 0;
+ 
+@@ -383,7 +383,7 @@
+   avgbw = ctl.totalbytes / ((HIST_MIN+1)*60);
+ 
+   if (ctl.logging & FL_LOG_BDWTH_SYSLOG) {
+-    util_print(NORMAL, "Current average bw: %i (Kb/sec)", avgbw << 3);
++    util_print(NORMAL, "Current average bw: %i (bytes/sec)", avgbw << 3);
+   }
+      
+   /*

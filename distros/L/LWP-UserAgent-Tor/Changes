@@ -1,0 +1,12 @@
+Revision history for LWP-UserAgent-Tor
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.04    Data/time
+        - made default ports more flexible
+        - use Proc::Background for tor proccess
+0.05    Data/time
+        - let module work with a Tor binary that was included in a Tor Browser distribution
+0.06    Data/time
+        - use DataDirectory option, this makes it possible to run mutliple tor procs
+        - get rid of ControlListenaddress option

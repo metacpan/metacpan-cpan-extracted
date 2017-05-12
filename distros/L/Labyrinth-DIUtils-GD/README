@@ -1,0 +1,47 @@
+Labyrinth-DIUtils-GD
+====================
+
+Handles the driver software for GD image manipulation within the Labyrinth Web
+Framework. If using within Labyrinth, do not use this module directly, access
+should be used via Labyrinth::DIUtils.
+
+However, the module can be use in isolation.
+
+SYNOPSIS
+    use Labyrinth::DIUtils::GD;
+
+    # if using Labyrinth.
+    Labyrinth::DIUtils::Tool('GD');
+
+    my $hook = Labyrinth::DIUtils::GD->new($file);
+    my $hook = $hook->rotate($degrees);       # 90, 180, 270
+    my $hook = $hook->reduce($xmax,$ymax);
+    my $hook = $hook->thumb($thumbnail,$square);
+
+INSTALLATION
+
+See the INSTALL file for full instructions.
+
+DEPENDENCIES
+
+    GD
+    IO::File
+
+Note that although this distribution is intended to be used within the 
+Labyrinth Web Framework, it doesn't require any part of the framework,
+and can be used independently.
+
+See also Perldoc.
+
+AUTHOR
+
+  Barbie, <barbie@missbarbell.co.uk> for Miss Barbell Productions,
+  <http://www.missbarbell.co.uk/>
+
+COPYRIGHT & LICENSE
+
+  Copyright (C) 2002-2014 Barbie for Miss Barbell Productions
+  All Rights Reserved.
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

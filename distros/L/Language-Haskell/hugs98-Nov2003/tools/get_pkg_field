@@ -1,0 +1,54 @@
+-- Extract a field from a package description
+-- (Not quite right: should also follow package dependencies)
+
+module Main(main) where
+
+import System.Environment
+import System.Exit
+import System.IO
+
+import Package
+import ParsePkgConf
+
+main = do
+	args <- getArgs
+	case args of
+	    [field, arg] -> get_field field arg
+	    _ -> do
+		progName <- getProgName
+		hPutStrLn stderr
+		    ("usage: " ++ progName ++ " field package-file")
+		exitFailure
+
+get_field :: String -> FilePath -> IO ()
+get_field field pkg_file = do
+	def <- readFile pkg_file
+	let pkg = parseOnePackageConfig def
+	case lookup field fields of
+	    Just fn -> putStrLn (fn pkg)
+	    Nothing -> do
+		progName <- getProgName
+		hPutStrLn stderr
+		    (progName ++ ": unknown field '" ++ field ++ "'")
+		exitFailure
+
+fields :: [(String, PackageConfig -> String)]
+fields = [
+	("name",		name),
+	("auto",		show . auto),
+	("import_dirs",		getStringList . import_dirs),
+	("source_dirs",		getStringList . source_dirs),
+	("library_dirs",	getStringList . library_dirs),
+	("hs_libraries",	getStringList . hs_libraries),
+	("extra_libraries",	getStringList . extra_libraries),
+	("include_dirs",	getStringList . include_dirs),
+	("c_includes",		getStringList . c_includes),
+	("package_deps",	getStringList . package_deps),
+	("extra_ghc_opts",	getStringList . extra_ghc_opts),
+	("extra_cc_opts",	getStringList . extra_cc_opts),
+	("extra_ld_opts",	getStringList . extra_ld_opts),
+	("framework_dirs",	getStringList . framework_dirs),
+	("extra_frameworks",	getStringList . extra_frameworks)]
+
+getStringList :: [String] -> String
+getStringList = unwords . filter (not . null)

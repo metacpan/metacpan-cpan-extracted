@@ -1,0 +1,141 @@
+#!/usr/bin/perl
+use strict;
+use base 'LEOCHARRE::CLI';
+
+my $o = gopts('m:s:');
+
+my $subname = $o->{s};
+my $modname = $o->{m};
+$subname or $modname or die('missing -s subname or -m modname');
+
+my $abs_d = dirarg_orcwd() or die;
+my @files = grep { !/CVS/ } files($abs_d);
+$#files or warn("no files in $abs_d") and exit;
+
+
+if ($subname){
+   debug("subname: $subname");
+   
+   my @have = grep { file_has_text($_,qr/\b$subname\(|\>$subname\b/) } @files;
+   printlist(@have);
+}
+
+
+elsif ($modname){
+   debug("modname: $modname");
+
+   my @have = grep { file_has_text($_,qr/use $modname\W|require $modname\W/s) }@files;
+
+   printlist(@have);
+}
+
+else {
+   
+   print usage();
+
+}
+
+exit;
+
+
+
+
+
+sub usage {
+   return qq{
+$0 - find where a module is being used
+DESCRIPTION
+
+Find out what file in a hierarchy is using certain module or sub.
+
+PARAMETERS
+
+   -m module name in question
+   -s subroutine name in question
+
+
+USAGE EXAMPLES
+
+
+   $0 -m Hot::Tamale ./lib
+   $0 -s abs_chmod ./lib
+   
+};
+}
+
+
+
+# subs
+
+
+
+sub printlist {
+   
+   my @items;
+
+   while(my $element = shift ){
+      defined $element or next;
+      if (ref $element eq 'ARRAY'){
+         for(@$element){
+            push @items,$_;
+         }
+      }
+      elsif(ref $element eq 'HASH'){
+         while( my ($k,$v) = each %$element){
+            push @items,"$k: $v";
+         }
+      }
+      else {
+         push @items, $element;
+      }
+   }
+
+   local $" = "\n";
+   print "@items\n";
+   return 1;
+}
+
+
+sub file_has_text{
+   my $abs = shift;
+   -f $abs or die("not file $abs");
+   -T $abs or debug("file $abs is not text file") and return 0;
+   my $match = shift;
+   my $txt = slurp($abs);
+   debug( "$abs length content: ".length($txt));
+   return $txt=~/$match/ ? 1 : 0;
+}
+
+
+sub slurp {
+   my $absf = shift;
+   -f $absf or die;
+   local $/;
+   open(FILE,'<',$absf) or die($!);
+   my $content = <FILE>;
+   close FILE;
+   return $content;
+}
+
+
+sub files {
+   my $d = shift;
+   my @f = split( /\n/, `find '$d' -type f`);
+   return @f;
+}
+
+
+
+
+sub dirarg_orcwd {
+   my $d = $ARGV[0];   
+   
+   require Cwd;
+   defined $d or $d = './';
+   
+   my $absd = Cwd::abs_path($d) or warn("cant resolve $d with Cwd::abs_path") and return;
+   -d $absd or warn("$d is not dir") and return;
+   return $absd;
+}
+
+

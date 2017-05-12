@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Lingua-ZH-WordSegmenter
+version:      0.01
+version_from: lib/Lingua/ZH/WordSegmenter.pm
+installdirs:  site
+requires:
+    Encode:                        2.18
+    Test::More:                    0.64
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

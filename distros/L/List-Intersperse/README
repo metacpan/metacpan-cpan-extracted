@@ -1,0 +1,21 @@
+DESCRIPTION
+-----------
+List::Intersperse - Intersperse / unsort / disperse a list
+
+This module provides functions that evenly distribute elements of a list. 
+Elements that are considered equal are spaced as far apart from each other 
+as possible.
+
+INSTALLATION
+------------
+This is a simple module. The typical installation routine should work fine.
+
+  perl Makefile.PL
+  make test
+  make install
+
+COPYRIGHT
+---------
+Copyright (c) 2001 Tim R. Ayers and John Porter. All rights reserved. This 
+program is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.

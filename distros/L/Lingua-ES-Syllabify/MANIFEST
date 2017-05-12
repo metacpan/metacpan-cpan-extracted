@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Lingua-ES-Syllabify.t
+lib/Lingua/ES/Syllabify.pm

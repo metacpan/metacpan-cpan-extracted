@@ -1,0 +1,35 @@
+---
+abstract: parameters for logfile rotation
+author:
+  - 'Mark Rogaski <mrogaski@cpan.org>'
+build_requires: {}
+configure_requires:
+  Compress::Zlib: 0.4
+  File::Copy: 0
+  Getargs::Long: 0.103
+  LockFile::Simple: 0.202
+  Log::Agent: 0.201
+  Module::Build: 0
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Agent-Rotate
+provides:
+  Log::Agent::File::Rotate:
+    file: lib/Log/Agent/File/Rotate.pm
+  Log::Agent::Rotate:
+    file: lib/Log/Agent/Rotate.pm
+    version: 1.200
+requires:
+  Compress::Zlib: 0.4
+  Getargs::Long: 0.103
+  LockFile::Simple: 0.202
+  Log::Agent: 0.201
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: 1.200
+x_serialization_backend: YAML version 1.15

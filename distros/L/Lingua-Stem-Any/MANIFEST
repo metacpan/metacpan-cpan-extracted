@@ -1,0 +1,18 @@
+Build.PL
+Changes
+INSTALL
+lib/Lingua/Stem/Any.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/cache.t
+t/exceptions.t
+t/stemmer.t
+xt/author/changes.t
+xt/author/kwalitee.t
+xt/author/pod-coverage.t
+xt/author/pod.t
+xt/author/spelling.t

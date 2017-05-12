@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Lingua-AR-Word.t
+lib/Lingua/AR/Word.pm
+lib/Lingua/AR/Word/Stem.pm
+lib/Lingua/AR/Word/Encode.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

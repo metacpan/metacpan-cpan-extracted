@@ -1,0 +1,11 @@
+MANIFEST
+CHANGES
+Makefile.PL
+README
+lib/Lyrics/Fetcher/AstraWeb.pm
+t/1.t
+t/2-pod.t
+t/3-pod-coverage.t
+eg/example.pl
+eg/example-direct.pl
+META.yml                                 Module meta-data (added by MakeMaker)

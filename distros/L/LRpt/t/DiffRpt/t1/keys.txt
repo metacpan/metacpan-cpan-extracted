@@ -1,0 +1,23 @@
+#########################################################################
+#
+# $Id: keys.txt,v 1.2 2006/01/14 12:46:07 pkaluski Exp $
+# $Name: Stable_0_16 $
+#
+# $Log: keys.txt,v $
+# Revision 1.2  2006/01/14 12:46:07  pkaluski
+# New tool design
+#
+# Revision 1.3  2006/01/07 23:50:44  pkaluski
+# Unit test for new tool chain implemented. Session manager not needed any more.
+#
+#
+#########################################################################
+
+name: ed_fname
+key: ed_fname = 'Martinella'
+%%
+name: title_id
+key: title_id = 'PS2091'
+%%
+
+

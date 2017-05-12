@@ -1,0 +1,18 @@
+Revision history for Log-Any-Adapter-Fille
+
+0.05    2015-06-02
+        - Minor fixes
+
+0.04    2015-06-02
+        - Documentation was written
+
+0.03    2015-05-29
+        - Capture of output to STDERR was removed from the module
+
+0.02    2015-05-27
+        - As in the module Log::Any minimum version of Perl 5.008001 is specified
+        - Part of documentation in POD format is added.
+        - Parameter META_MERGE is added in the file Makefile.PL
+
+0.01    2015-05-26
+        - First version, released on an unsuspecting world

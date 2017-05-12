@@ -1,0 +1,32 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <table class="table">
+    <!-- Format -->
+    <tr>
+      <th><span trspan="format"></span></th>
+      <td>
+      <select disabled="disabled" class="form-control" id="sasselect" ng-model="currentNode.data[0]">
+        <option value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect">HTTP Redirect</option>
+        <option value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST">HTTP POST</option>
+        <option value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact">HTTP Artifact</option>
+        <option value="urn:oasis:names:tc:SAML:2.0:bindings:SOAP">SOAP</option>
+      </select>
+      </td>
+    </tr>
+    <!-- URL -->
+    <tr>
+      <th><span trspan="url"></th>
+      <td><input id="saninput" class="form-control" ng-model="currentNode.data[1]"/></td>
+    </tr>
+    <!-- Return URL -->
+    <tr>
+      <th><span trspan="returnUrl"></span></th>
+      <td><input id="sasinput" class="form-control" ng-model="currentNode.data[2]"/></td>
+    </tr>
+  </table>
+</div>
+<script type="text/menu">
+[]
+</script>

@@ -1,0 +1,38 @@
+---
+abstract: 'unified Linux virtualization wrapper'
+author:
+  - 'Dominik Schulz <dominik.schulz@gauner.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Linux-Virt
+requires:
+  Carp: 0
+  Config::Yak::OrderedPlugins: 0.18
+  Config::Yak::RequiredConfig: 0
+  English: 0
+  File::Blarf: 0
+  Log::Tree::RequiredLogger: 0
+  Moose: 0
+  Sys::FS: 0
+  Sys::Run: 0
+  Try::Tiny: 0
+  XML::Simple: 0
+  feature: 0
+  mro: 0
+  namespace::autoclean: 0
+  perl: 5.010_000
+resources:
+  bugtracker: https://github.com/gittex/Linux-Virt/issues
+  repository: git://github.com/gittex/Linux-Virt.git
+version: 0.15
+x_authority: cpan:TEX

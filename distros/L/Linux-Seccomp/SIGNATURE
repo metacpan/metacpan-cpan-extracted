@@ -1,0 +1,280 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 86b095235815478bd5757bbbcecc5f470b208fa3 Changes
+SHA1 efcc957f6fa20ddfbe12b0ae52c1e658f4e547cd MANIFEST
+SHA1 267d72514381bdc59efac9ea8b97103b3e98da35 META.json
+SHA1 8a5c154fb1bc73487bcd93c124d240dac8d0efb2 META.yml
+SHA1 f643e48cf80d703275399c62dcea96c89b5f6bf6 Makefile.PL
+SHA1 2883e17860b31c39b9e5f7c9e86b8d887a68866a README
+SHA1 9886dd1c055648b6b4fc70acf67ac803a2e3e6f1 Seccomp.xs
+SHA1 c63b0422cbad4e456f6011547ad9997f7fe384aa fallback/const-c.inc
+SHA1 7d64cd53b3b07a91725702a574da5b9c84ea02dd fallback/const-xs.inc
+SHA1 788a9d531738ee5dc41ff3099f5e8682ea80888e lib/Linux/Seccomp.pm
+SHA1 b27b3cf305b41f9d6bd9b440d68fe305ac8f4fce libseccomp/CHANGELOG
+SHA1 58e4a95629eaee62a2e02d4373f02d168ae9ec61 libseccomp/CREDITS
+SHA1 4c04c844a5cb16b3629d0052f1304b7a565bd4a8 libseccomp/LICENSE
+SHA1 654050545990008528bc1f8f05fdce8950bc45fa libseccomp/Makefile.am
+SHA1 8151bc015e5bceb76a7b2eb09c55f54bb1e63cfa libseccomp/Makefile.in
+SHA1 c9a583f9117afb0cc96e6ea7761c4ca9ec965232 libseccomp/README
+SHA1 cf2f70a0c12fb1eabb91e91120721ed46328ed7b libseccomp/SUBMITTING_PATCHES
+SHA1 e1ee47566d2d560e720720fcd4e3a99ba496030f libseccomp/aclocal.m4
+SHA1 97820fbbfe9e0175a575766253c326e5a1a7a9e1 libseccomp/build-aux/ar-lib
+SHA1 ba05b9b5706647c270b76d9bad66485c1a61720e libseccomp/build-aux/compile
+SHA1 e6976fff8bbf4a8f7bb2779e06927c8615a35ef7 libseccomp/build-aux/config.guess
+SHA1 f8608a5b1cc70c7d40bb88afa27594e0e84f3ea0 libseccomp/build-aux/config.sub
+SHA1 71e07f3be78211e06de8267a4d1eb417ecd56705 libseccomp/build-aux/depcomp
+SHA1 664bbfb27be6eb13791003c4114d95a9c3d51ea1 libseccomp/build-aux/install-sh
+SHA1 05f94057a5f4f50f3f84e10c4fc234a253431e5c libseccomp/build-aux/ltmain.sh
+SHA1 30f869911496d5fb2ed58516f7f99735e0d076e0 libseccomp/build-aux/missing
+SHA1 4f364fdb7f4f218177d7eed8e14584e9de0f12c5 libseccomp/configure
+SHA1 341e9996b117526ac9ee25b83b0c27537005435c libseccomp/configure.ac
+SHA1 48ca4615bba88d9adf54409cfe4fe0dbaf74613b libseccomp/configure.h.in
+SHA1 1e2b3ae02303bd6851a4efd50ddd23590359af9c libseccomp/doc/Makefile.am
+SHA1 6d37ff9036f19cba1a260fd9259c055cf0b90dea libseccomp/doc/Makefile.in
+SHA1 e88f87fd373c7c1b3134c2adfa473ca21ba286a3 libseccomp/doc/man/man1/scmp_sys_resolver.1
+SHA1 bb2706642937a2b48c78247f38309f89c71f2a44 libseccomp/doc/man/man3/seccomp_arch_add.3
+SHA1 9128ed63e7cfdb9b44621a45942aa0553d1adbcc libseccomp/doc/man/man3/seccomp_arch_exist.3
+SHA1 9128ed63e7cfdb9b44621a45942aa0553d1adbcc libseccomp/doc/man/man3/seccomp_arch_native.3
+SHA1 9128ed63e7cfdb9b44621a45942aa0553d1adbcc libseccomp/doc/man/man3/seccomp_arch_remove.3
+SHA1 9128ed63e7cfdb9b44621a45942aa0553d1adbcc libseccomp/doc/man/man3/seccomp_arch_resolve_name.3
+SHA1 7005b6e6d63c61b3540f7aa6fa8bfdd8260ffbf1 libseccomp/doc/man/man3/seccomp_attr_get.3
+SHA1 7e2a9115659c4464013ad068b2fdfaf707715c19 libseccomp/doc/man/man3/seccomp_attr_set.3
+SHA1 fa051595ddce251801b8d7401fa87489f4e0cebb libseccomp/doc/man/man3/seccomp_export_bpf.3
+SHA1 f69e933f8763c3e7f11f61e9002647ae0220511c libseccomp/doc/man/man3/seccomp_export_pfc.3
+SHA1 99e41bf8a3dfd2bdcafd017686895a979b483090 libseccomp/doc/man/man3/seccomp_init.3
+SHA1 174a6ff3e6b03dd5fa7ca78c24995b7bc65a1e3a libseccomp/doc/man/man3/seccomp_load.3
+SHA1 966a90ca28b3d4975b842a6be96f561a3942af0f libseccomp/doc/man/man3/seccomp_merge.3
+SHA1 d80a5097236ffb1f7334e2b86d2da5a54c051bd5 libseccomp/doc/man/man3/seccomp_release.3
+SHA1 f468ab7611b031cb1a67ffee06802bd2748c7f0b libseccomp/doc/man/man3/seccomp_reset.3
+SHA1 17c86b15c1e6b1acefa60ce6548d8e56b02f4028 libseccomp/doc/man/man3/seccomp_rule_add.3
+SHA1 e968cf3f3da455c0f848b6aa8c8b9ad49897e3b0 libseccomp/doc/man/man3/seccomp_rule_add_array.3
+SHA1 e968cf3f3da455c0f848b6aa8c8b9ad49897e3b0 libseccomp/doc/man/man3/seccomp_rule_add_exact.3
+SHA1 e968cf3f3da455c0f848b6aa8c8b9ad49897e3b0 libseccomp/doc/man/man3/seccomp_rule_add_exact_array.3
+SHA1 979f129bed4e0ea4601344399ad5fd1246fd32ce libseccomp/doc/man/man3/seccomp_syscall_priority.3
+SHA1 445f18dbc242595e2caaa98e7d332a009ef2cb6a libseccomp/doc/man/man3/seccomp_syscall_resolve_name.3
+SHA1 f1376a28609fabf66388d686a552f4cf11f69a7f libseccomp/doc/man/man3/seccomp_syscall_resolve_name_arch.3
+SHA1 f1376a28609fabf66388d686a552f4cf11f69a7f libseccomp/doc/man/man3/seccomp_syscall_resolve_name_rewrite.3
+SHA1 f1376a28609fabf66388d686a552f4cf11f69a7f libseccomp/doc/man/man3/seccomp_syscall_resolve_num_arch.3
+SHA1 31e2eda445bcb8425b0974fa88ab9fb4d36aaed6 libseccomp/doc/man/man3/seccomp_version.3
+SHA1 375e1017819e40b072a05b348f113c9830a1df15 libseccomp/include/Makefile.am
+SHA1 44366de4dce387c6e2c33ba32085d46acf91e405 libseccomp/include/Makefile.in
+SHA1 0c498bd0f463dcff422a964b0ad767e44de0e22b libseccomp/include/seccomp.h
+SHA1 85f9878ea8c6e54659925b2292956061b32f7fc8 libseccomp/include/seccomp.h.in
+SHA1 599d30facd585f77490acba11290408ff0401541 libseccomp/libseccomp.pc.in
+SHA1 83b9d05bea9e61b1086a912d71b7f4f9904f9f41 libseccomp/m4/libtool.m4
+SHA1 9cd35d79da7776af14f21b259c64f130fa1a3536 libseccomp/m4/ltoptions.m4
+SHA1 2028bffadfd9b989bcc63da90596101fe4ec20b9 libseccomp/m4/ltsugar.m4
+SHA1 3aae847c163fa6cc7c8241a3a49f98705538d55f libseccomp/m4/ltversion.m4
+SHA1 e21f085615f98d3751690c1615923e89160d5783 libseccomp/m4/lt~obsolete.m4
+SHA1 5eae1455a8b406b14836f8ae2773f338224eac68 libseccomp/src/Makefile.am
+SHA1 7498b7723f227fb31eacaf0abbaf9d4481b5e90c libseccomp/src/Makefile.in
+SHA1 9c7797f91e2b45890c29b1fff060ec2093f68939 libseccomp/src/api.c
+SHA1 a82b32b5eb87dfa545712819fbf6d72b1d1d24e1 libseccomp/src/arch-aarch64-syscalls.c
+SHA1 3b297817023eba5e472f6facafe8c21d43c1049f libseccomp/src/arch-aarch64.c
+SHA1 2a80ab2d703590d4585af2fde6ce127918aeddc4 libseccomp/src/arch-aarch64.h
+SHA1 6bbf3ec5f495260815bdce06e39509f3e083378c libseccomp/src/arch-arm-syscalls.c
+SHA1 36e97e6f6af97f347e7601be7c7da6d70bcbbd0d libseccomp/src/arch-arm.c
+SHA1 7058aca3eaba94c4dfc20758c2b14309397b7ab4 libseccomp/src/arch-arm.h
+SHA1 d29006313e7423cc1c10695a74c03a8f8a2e952e libseccomp/src/arch-mips-syscalls.c
+SHA1 bed2d15aeec4bdebe070705548484fd00fa37637 libseccomp/src/arch-mips.c
+SHA1 0318720ade9024f6e879aaff298ce6de2dd0d8f2 libseccomp/src/arch-mips.h
+SHA1 3c330cc55a79b1fc3d8a7bf7d68be50217c5ef9b libseccomp/src/arch-mips64-syscalls.c
+SHA1 685c414eb56739e7f82db3fe23062cba55867627 libseccomp/src/arch-mips64.c
+SHA1 471b298b599ee472cc79aae4100169d4cef1f3d6 libseccomp/src/arch-mips64.h
+SHA1 f5c7e4dd00c482c111daab1140a0c3cede9b0e60 libseccomp/src/arch-mips64n32-syscalls.c
+SHA1 0832b37dee84059ea6736132a948152286eca3da libseccomp/src/arch-mips64n32.c
+SHA1 760f3039facc7e6067fea4e4427f1a2039d14865 libseccomp/src/arch-mips64n32.h
+SHA1 6f298f8ab4c5ab1dd08191cc9a4252b192ec33ff libseccomp/src/arch-ppc-syscalls.c
+SHA1 a1ef0a819e30e2f2b02651bb55d68326735ce3aa libseccomp/src/arch-ppc.c
+SHA1 31454dad2c48fd2471a35a7e41b9daecf8524c3f libseccomp/src/arch-ppc.h
+SHA1 202b38ae467ceceb21248253105f4be75ecdc358 libseccomp/src/arch-ppc64-syscalls.c
+SHA1 d6e0526fafbb3264710d2d2d50f1bd657e06ecac libseccomp/src/arch-ppc64.c
+SHA1 ad7971ed1e28cd6a51eb2bd4ef57395de325cbd9 libseccomp/src/arch-ppc64.h
+SHA1 720da986d97baeb007b6711c96e82b1e32d2b016 libseccomp/src/arch-s390-syscalls.c
+SHA1 6242f0b08eb3143d44e552e78bb6c6d7b61f3005 libseccomp/src/arch-s390.c
+SHA1 0c5f043de0f79e36253cdff475933e9b2f592d39 libseccomp/src/arch-s390.h
+SHA1 48b1c44b0a4574da4753086fd1d91002609ceabc libseccomp/src/arch-s390x-syscalls.c
+SHA1 653618183f3945a79a0b535eb02ec526b3278a8a libseccomp/src/arch-s390x.c
+SHA1 4f0fe504961c2c9a96a1363ef7b0e9f5a70d9cb8 libseccomp/src/arch-s390x.h
+SHA1 d10bece934bc337c8b0d7f3b7dfd40788c31fd77 libseccomp/src/arch-syscall-check.c
+SHA1 0dcb9f144b812d42f5b6747b8038ddb54734e74e libseccomp/src/arch-syscall-dump.c
+SHA1 4ec07d5eb89897d2b1f3316bdb81e404f06f8f84 libseccomp/src/arch-syscall-validate
+SHA1 add3defda5a2cb83525724f82b0db7eaf6f70038 libseccomp/src/arch-x32-syscalls.c
+SHA1 080ef474f104637bdb9451c44cadd28cd498470c libseccomp/src/arch-x32.c
+SHA1 eb9ed7a989389219a76a0cafdf34a7b819aac573 libseccomp/src/arch-x32.h
+SHA1 4b10c958b53760bb87b810dafde6231b17ba2967 libseccomp/src/arch-x86-syscalls.c
+SHA1 a8280a5efbaf0063daa48e6213b8f47d0b792a03 libseccomp/src/arch-x86.c
+SHA1 31eeaf4315bdcfdc982fcbf1f2c966e07cda90b1 libseccomp/src/arch-x86.h
+SHA1 2730878c88210162422721721d13daa729b31a8b libseccomp/src/arch-x86_64-syscalls.c
+SHA1 861f46c53bd578b4c3919728d860140b133d239c libseccomp/src/arch-x86_64.c
+SHA1 6f044b1d4b29cfc972c2fb89e6ae5e06e802b7d6 libseccomp/src/arch-x86_64.h
+SHA1 bc2cfbdadb2dde76f334449997b1f1c91a651198 libseccomp/src/arch.c
+SHA1 2f6251820f3f08f51038a13c0eb90564d79ba816 libseccomp/src/arch.h
+SHA1 ece4b59b32a07b8ec09cb41442f4c236bfe2b2df libseccomp/src/db.c
+SHA1 1eb58f92e9d0f3781d4b2018e3a7ff3da0b1b14f libseccomp/src/db.h
+SHA1 c3ad278c6135944d8bc7af8a20a478db81cc521d libseccomp/src/gen_bpf.c
+SHA1 10943102e08998fc7b8cfacc42d48e59937888e6 libseccomp/src/gen_bpf.h
+SHA1 762ddffd418abd85c148dfd44b5d33fdf809bdc3 libseccomp/src/gen_pfc.c
+SHA1 e53b0eec46110d758a341dc8876f77b06c0dd737 libseccomp/src/gen_pfc.h
+SHA1 72d212623483c875ea2da796c3b58380f81716fb libseccomp/src/hash.c
+SHA1 8b8117811b8e2b2e454ad4ceea40605a006ba358 libseccomp/src/hash.h
+SHA1 6a0a1fc413914dad266cfed29f0d656ffe67b16a libseccomp/src/python/Makefile.am
+SHA1 cbb74209100c5df89f25617c5e1aba6d926a4a43 libseccomp/src/python/Makefile.in
+SHA1 d65d644804585826d2ee316c931f472211b6c4ae libseccomp/src/python/libseccomp.pxd
+SHA1 7367d1be409e1abd9ff16efaa54d652ea9208973 libseccomp/src/python/seccomp.pyx
+SHA1 4c34df7e162533d35edd454ed24f746b3d42ea05 libseccomp/src/python/setup.py
+SHA1 66b4a50f0f80d938dab2f34a5b18397e43960843 libseccomp/src/system.c
+SHA1 abae513f1c56c5fa88bda0d3f6eb60538105e272 libseccomp/src/system.h
+SHA1 940da9e78977d067e085ac6922a65f6fa262161c libseccomp/tests/01-sim-allow.c
+SHA1 e794f582c5227196c2a7fc9b73e7c72bd0a368eb libseccomp/tests/01-sim-allow.py
+SHA1 2ee80c03c824a7e7f93004f4ac11eea9aa5f987d libseccomp/tests/01-sim-allow.tests
+SHA1 d2fc6bd65a2f012d575403e64f55fd33ee0b5430 libseccomp/tests/02-sim-basic.c
+SHA1 975dedc1edb67efe79232aefb8275fda8146eea3 libseccomp/tests/02-sim-basic.py
+SHA1 99d01af6768ac3b04da484398d39f36ecab97d54 libseccomp/tests/02-sim-basic.tests
+SHA1 0b283e205708c5700c6fec2af22698c071ae8763 libseccomp/tests/03-sim-basic_chains.c
+SHA1 724cf9f1162a7545fdbf2951858f1ffb431a71f6 libseccomp/tests/03-sim-basic_chains.py
+SHA1 807891ee8b76be9c6bba0b6540aeb173f1b7a100 libseccomp/tests/03-sim-basic_chains.tests
+SHA1 f8bcefbbcc0b7207095f4d8d968e5a5bda643f5c libseccomp/tests/04-sim-multilevel_chains.c
+SHA1 3f410160cbbd81a7a35c8a7fdf9ac20fc87b6f52 libseccomp/tests/04-sim-multilevel_chains.py
+SHA1 1f69e3b6f71de18c507ba06d70825704a9698b8f libseccomp/tests/04-sim-multilevel_chains.tests
+SHA1 146a97f1132b59a08e9737664e2dcb8e4c66724d libseccomp/tests/05-sim-long_jumps.c
+SHA1 5958b34875f64145200f3fbcea833cee2a42be28 libseccomp/tests/05-sim-long_jumps.py
+SHA1 a6db829245abd880af3c4a98d93ef77bb3e4a363 libseccomp/tests/05-sim-long_jumps.tests
+SHA1 c269846d674006a6f8411bccd4927486a262401e libseccomp/tests/06-sim-actions.c
+SHA1 41b7a53ba2cb555f7a18253799c727f893693284 libseccomp/tests/06-sim-actions.py
+SHA1 a0446cd252dc8c911ab44b981d0a947f2321cb80 libseccomp/tests/06-sim-actions.tests
+SHA1 34a63eee26b128aa74b2e8cb68789ad8f969cacd libseccomp/tests/07-sim-db_bug_looping.c
+SHA1 9259bd36660f9487d78bd134d503d08481f425c1 libseccomp/tests/07-sim-db_bug_looping.py
+SHA1 19a335ba8afd442b32782d778288ed71d5b258b9 libseccomp/tests/07-sim-db_bug_looping.tests
+SHA1 820dbe1c09a95481a98d2de33b74b3c718e17bff libseccomp/tests/08-sim-subtree_checks.c
+SHA1 2e49dfc39f3c7d399fbfd25c0bc33772ff70c5df libseccomp/tests/08-sim-subtree_checks.py
+SHA1 475a69992b0423b1db4d3af76083bbbaf47509e3 libseccomp/tests/08-sim-subtree_checks.tests
+SHA1 bf5d7928590f2e62894b490f072617c76704ddf9 libseccomp/tests/09-sim-syscall_priority_pre.c
+SHA1 ab5251b94b8d1891f2b207be8363b4b95d2406f1 libseccomp/tests/09-sim-syscall_priority_pre.py
+SHA1 5890f622a1d0531336c3a329dab7296e20063d67 libseccomp/tests/09-sim-syscall_priority_pre.tests
+SHA1 3fc8e46ce4d467a42bbcfa16cc17227ae391e1e0 libseccomp/tests/10-sim-syscall_priority_post.c
+SHA1 84f9f36bcdcf6339697a612dc8476bef0ce51758 libseccomp/tests/10-sim-syscall_priority_post.py
+SHA1 abda60d42fbe783e61085b3e6c27382830c4174d libseccomp/tests/10-sim-syscall_priority_post.tests
+SHA1 936a6028d87edd7843b7fabe09b6d6b04b01ebea libseccomp/tests/11-basic-basic_errors.c
+SHA1 0003d155bd156b8699691dadb4743346c019bb2f libseccomp/tests/11-basic-basic_errors.py
+SHA1 8d16d83a5227dc73baa874303ebc093dc0e6844e libseccomp/tests/11-basic-basic_errors.tests
+SHA1 41004d02ef4ede45b127ad892d90465be63af695 libseccomp/tests/12-sim-basic_masked_ops.c
+SHA1 071d25724c8e95fb50b2243265de8df607cd1f1d libseccomp/tests/12-sim-basic_masked_ops.py
+SHA1 e537ea3e6ae19e8c141048711bf260c364751e99 libseccomp/tests/12-sim-basic_masked_ops.tests
+SHA1 c492896e5a8a3a2b1ec8ae9b9afb0e1aa4bfe752 libseccomp/tests/13-basic-attrs.c
+SHA1 996e0797947e76fc551964a2ab9309d8240e6fcb libseccomp/tests/13-basic-attrs.py
+SHA1 45e7d801fd9b1009a9aaa3ab92c764eda4d8047c libseccomp/tests/13-basic-attrs.tests
+SHA1 7ed57830320b07bfbba4c9e0e4ba63a6cfc6ae8a libseccomp/tests/14-sim-reset.c
+SHA1 c714d88057f0af1262183166f10975708c28ed3a libseccomp/tests/14-sim-reset.py
+SHA1 7aee822bc8ebb12e4730328caf9a037a08e28540 libseccomp/tests/14-sim-reset.tests
+SHA1 4d03036e667049cedae2e6f0710b8be89cbc52b9 libseccomp/tests/15-basic-resolver.c
+SHA1 86bbdc4f87e310fd9bb5c7e3cd7b64ced27b164b libseccomp/tests/15-basic-resolver.py
+SHA1 bb2d1de4639dd4fc7505d22d3eb12823405316a1 libseccomp/tests/15-basic-resolver.tests
+SHA1 3e74b691b536bddb32403086dc73f63235777275 libseccomp/tests/16-sim-arch_basic.c
+SHA1 52a8b35d46e8f81567fc20e65946cc84de4d6f4d libseccomp/tests/16-sim-arch_basic.py
+SHA1 e925646b3b18976168e5ae18b67fff2bb528bec7 libseccomp/tests/16-sim-arch_basic.tests
+SHA1 5ba4a4e6280aa5847262aa9d2ece5b11f9e5b6c5 libseccomp/tests/17-sim-arch_merge.c
+SHA1 dc6027f024ac319423efad88a94cdfb1ebbcec34 libseccomp/tests/17-sim-arch_merge.py
+SHA1 2fda8ebd44d4a197ae1c7da0d5a3cb55c913db1e libseccomp/tests/17-sim-arch_merge.tests
+SHA1 bb21afb8e7bc3cffd7b9ad99d3d9cfd492d9f160 libseccomp/tests/18-sim-basic_whitelist.c
+SHA1 2ac82178ca49b397c4d51387845198caa827f751 libseccomp/tests/18-sim-basic_whitelist.py
+SHA1 3d6bd3b628d67929c3fa14e1479f955ba7e495cb libseccomp/tests/18-sim-basic_whitelist.tests
+SHA1 efef55ba4e91d8a76c781c41505cea6856970018 libseccomp/tests/19-sim-missing_syscalls.c
+SHA1 ec072cee2c4147366865cafdd6f7374d63f0c9d3 libseccomp/tests/19-sim-missing_syscalls.py
+SHA1 c9a4c56c240667f4a3ce1595b7ee191cac48f484 libseccomp/tests/19-sim-missing_syscalls.tests
+SHA1 c9113d3d5ddd092e1ec5bf6db5a47cb0d5da19aa libseccomp/tests/20-live-basic_die.c
+SHA1 6c6efbb826e6e469b493b3f946f65dba04b9ef80 libseccomp/tests/20-live-basic_die.py
+SHA1 2e28eee8d56ef35af4a77096a856a504b17e5e0e libseccomp/tests/20-live-basic_die.tests
+SHA1 3b0710fdd60b6932ee6de5078f59dbb0d7d2901b libseccomp/tests/21-live-basic_allow.c
+SHA1 4b11d9bf69d9df137d263859829a8f4dcd701d51 libseccomp/tests/21-live-basic_allow.py
+SHA1 d1d3e0c3871b2fdeea46e81e02d4a3791c1bce91 libseccomp/tests/21-live-basic_allow.tests
+SHA1 32f15ce2ee8fc204080a474c5d2d0dcde38257e3 libseccomp/tests/22-sim-basic_chains_array.c
+SHA1 ab41747f7ff51ce97f1da216a1396543aebf19bd libseccomp/tests/22-sim-basic_chains_array.py
+SHA1 759fd075dba87fd5f22ebd1c475da95e2e586e4e libseccomp/tests/22-sim-basic_chains_array.tests
+SHA1 76218ad865e64f82e2aa5458730cfdd9e5f88d7b libseccomp/tests/23-sim-arch_all_le_basic.c
+SHA1 9c9f7aebb83302790c18663c2ee2eebefab9072c libseccomp/tests/23-sim-arch_all_le_basic.py
+SHA1 3b3d9355423c8c226bd0a3d07ad9ded7a51c4a20 libseccomp/tests/23-sim-arch_all_le_basic.tests
+SHA1 02ed61cbf67f310193c812cfdc680c5c7b49010b libseccomp/tests/24-live-arg_allow.c
+SHA1 57a8231eaab12b4063af4ef32d1e25fd0c2d0198 libseccomp/tests/24-live-arg_allow.py
+SHA1 cbf4d715596a261349c6cd4193de5f3007557ed4 libseccomp/tests/24-live-arg_allow.tests
+SHA1 b79a59c7a55e2ff587ee7ff2596b3895e1cb2c42 libseccomp/tests/25-sim-multilevel_chains_adv.c
+SHA1 d54bdd64b7b6a024c86e4bf063882c01808d935e libseccomp/tests/25-sim-multilevel_chains_adv.py
+SHA1 1fbbf0ff09084820ffa748c49e9b7f6b2bf184e6 libseccomp/tests/25-sim-multilevel_chains_adv.tests
+SHA1 a3395d86caabdf46e59d2a13b8a8ef946a62ba8d libseccomp/tests/26-sim-arch_all_be_basic.c
+SHA1 b8bc5404aecc9ad881162c58324fb9324ff74637 libseccomp/tests/26-sim-arch_all_be_basic.py
+SHA1 9f485e5d84bbef4eaf3b22c73798a9676272d78b libseccomp/tests/26-sim-arch_all_be_basic.tests
+SHA1 58ca9520508598b11caeffbce5fef2bfa9ad7f8b libseccomp/tests/27-sim-bpf_blk_state.c
+SHA1 aedebe8a9147439e5ceb33bcccd24432518f0f8a libseccomp/tests/27-sim-bpf_blk_state.py
+SHA1 01134c5c9d7963487d8656754d86abd7708a1fa0 libseccomp/tests/27-sim-bpf_blk_state.tests
+SHA1 ad2145e369870c5203b54b94ff4e262459f13ee2 libseccomp/tests/28-sim-arch_x86.c
+SHA1 a18694dd4b8691e37e26aa4f2a410a01a1e9e247 libseccomp/tests/28-sim-arch_x86.py
+SHA1 5d9947f0bce6eb4c4a4cb1aa3349a536a0b7a2f4 libseccomp/tests/28-sim-arch_x86.tests
+SHA1 82327d4949183ee98290a632225b9fd3a5cb0180 libseccomp/tests/29-sim-pseudo_syscall.c
+SHA1 70aa7d2d3d76dcc95d318fcff7b76175f4ca3db7 libseccomp/tests/29-sim-pseudo_syscall.py
+SHA1 715cc26133005af589cd56ce5b8ae4ea469e87f7 libseccomp/tests/29-sim-pseudo_syscall.tests
+SHA1 c58603cc51bc40d2c537a85d2192625115e989a7 libseccomp/tests/30-sim-socket_syscalls.c
+SHA1 0cb96f20262cd8e515bccbe9186cb2b4059fa995 libseccomp/tests/30-sim-socket_syscalls.py
+SHA1 a482152d30bf60eda0bb25f6c069a3d4a21b68f2 libseccomp/tests/30-sim-socket_syscalls.tests
+SHA1 73bdfaf4a0ce1e7a3e772f18af01058b9e483aad libseccomp/tests/31-basic-version_check.c
+SHA1 34abf35fe32a0a86746d4f8c48a727cfeb62e91f libseccomp/tests/31-basic-version_check.py
+SHA1 507fba5e1abd95f1791abc649a84d3c945377790 libseccomp/tests/31-basic-version_check.tests
+SHA1 156e7d5d91585f990827c3afcaccf9af8d999857 libseccomp/tests/32-live-tsync_allow.c
+SHA1 09fdde131f681de443528dd61ccb0ec56a412054 libseccomp/tests/32-live-tsync_allow.py
+SHA1 e0e7a15307252111d9f6aa4387de4a99bffb5229 libseccomp/tests/32-live-tsync_allow.tests
+SHA1 435a89e6e6048c65dd7785e2ca0aa4370e40edc9 libseccomp/tests/33-sim-socket_syscalls_be.c
+SHA1 5b379296a4a57f3aa047a8b219f6617106014019 libseccomp/tests/33-sim-socket_syscalls_be.py
+SHA1 302ebce35c060d2e8f598f72827bdfb40a9774ed libseccomp/tests/33-sim-socket_syscalls_be.tests
+SHA1 41a1da1f894414d84650ef556f1f0ad560f96995 libseccomp/tests/Makefile.am
+SHA1 7620cbc3b279368d5507c7e1ead1651f94b0525d libseccomp/tests/Makefile.in
+SHA1 d97d9fc4348926db80f0eadbb08c416eda95f987 libseccomp/tests/miniseq.c
+SHA1 9256d53d44cd1e72f8ea44704ceb6654dfda5308 libseccomp/tests/regression
+SHA1 735699e2adfb57b80db155242d233150e856fa56 libseccomp/tests/testdiff
+SHA1 1bb5dc6ffe7f40230c775f0c8fd44397dcd0ef45 libseccomp/tests/testgen
+SHA1 ba6a411eab33ddb01e5a51b8832d33c9481b48d4 libseccomp/tests/util.c
+SHA1 9f2746b4804d6acbd9e12fc3b0dcba764ede3d05 libseccomp/tests/util.h
+SHA1 b9b3082f15ec1ac9b5de9cf32deb27acb2bcb793 libseccomp/tests/util.py
+SHA1 019d330fdf88ebcbd3f698cf4a8651215e749903 libseccomp/tests/valgrind_test.supp
+SHA1 e81d1010cc0eb6c370ebf8ed88b84ed5d09388f9 libseccomp/tools/Makefile.am
+SHA1 edb4e91f215113db8d42f67363cffed726681b20 libseccomp/tools/Makefile.in
+SHA1 89492de62e7acf46cf87e7d4e3c2bf2da9c33e64 libseccomp/tools/bpf.h
+SHA1 973644d02af2056cd96544fa5aacd866e45e5801 libseccomp/tools/check-syntax
+SHA1 ddd6e4bcc2f948b8500e723595fe6ae4d5d40103 libseccomp/tools/scmp_app_inspector
+SHA1 1890ef3e2e7f663963c4aa796a639e278b4c5903 libseccomp/tools/scmp_arch_detect.c
+SHA1 25917a8b90c174d3a1fbddbaaf9f7120bb0265f0 libseccomp/tools/scmp_bpf_disasm.c
+SHA1 0710c9ebd1c196580f379035293cf62359b04875 libseccomp/tools/scmp_bpf_sim.c
+SHA1 ae817529146699df3ca9c9abbc33380b9682f68f libseccomp/tools/scmp_sys_resolver.c
+SHA1 e0be7405cdbcbb00a89dcca6f6172bd327a24177 libseccomp/tools/util.c
+SHA1 49737b3df3f196917fca243cdb05319c79487a1c libseccomp/tools/util.h
+SHA1 6cc0c499d6455a065638460d6e9e07212e7739c7 ppport.h
+SHA1 c0184804152bc625ef6dab59cfca38eb7cc5265c t/Linux-Seccomp.t
+SHA1 9ab49271d661cd5ded8a020113b3a380f4a72b3a typemap
+-----BEGIN PGP SIGNATURE-----
+
+iQItBAEBCgAXBQJYOGHEEBxtYXJpdXNAaWV2YWwucm8ACgkQygQ1vl7Bs2LuyQ/9
+Enkp7OQi993PK3fBhMeKGYnFGVW3vpb6T/3rqNCrVMgP+WIt0SfkwcrD0RH1CVuG
+g/H1qWU6gZs0W6VwpffDRRE6rqL6Qylc0xpq0T76zN1MBS1Z47OOFjXwiD6rFlMV
+96doYJcq5e7hWrNBk2MJRPAbQ9ehZO1ijiRNYIXlnEjoYbgbIdWIzYlV34B3g8YK
+HETIoQZAlcy8lKEEsSFVrlccSvHohlNHMVl90HKjGF0gGTugocOZkWoIi9hh64n8
+93TS8AIJBZdoEHfitFa9Ym7JtsU3jGjGjCMeySfTQnALK2//zEia3UG1/y59uFIJ
+cEyHNmzQVF44EKjUyFEgkfl4sqrD1qf6xCX5U+CmORV70F6ACpKGQbFCpSwz1iXG
+DtG6FqE0VAy45p4lhALKsA6/zZUGe1/WeF7zhqI2djBNG9Pix4x/CKgXdQiGGeu2
+yy9u4AzyVUX2JJzmXUM/4Hg181N18sW4xkdutuRyopSZhn69tBIgrtbKzbphIxC/
+u7EuZDDM7Ej406B8+EV0d7U8LeEa4uKGcC1Q4s/3SJJJcuB/VK9G4GCcalizELyy
+t0l0awYOtACcprbkIHmR6K3aOvBozxFdjzvXplykFulvS2eB5Wc0zECmdYF2CjzL
+m07l4jgbNQD+H2SaSNMPWBypK9FT9k74VE0jeSNgsgY=
+=KoRb
+-----END PGP SIGNATURE-----

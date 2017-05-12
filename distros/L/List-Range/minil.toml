@@ -1,0 +1,6 @@
+name = "List-Range"
+badges = ["travis", "codecov"]
+authority="cpan:KARUPA"
+
+module_maker="ModuleBuildTiny"
+

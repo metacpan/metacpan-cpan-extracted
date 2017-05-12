@@ -1,0 +1,176 @@
+#!/usr/bin/perl -s  ### NOT WITH -w
+
+use locale;
+
+my $pt1 = '##PT1##'; #/usr/lib/mbrola/pt1/pt1';
+
+# use vars qw{ $debug $raw $esd $t $l $q $show $notags};
+our ($debug, $raw, $esd, $play, $sndplay, $t, $l, $k, $q, $show, $notags,
+     $cebolinha, $porto, $viseu, $spain, $lamego, $sotaque, $aplay,
+     $wav,
+     $help, $h);
+
+my $default = '##PLAYER##'; # play...
+$default = "play" if $default =~ m!##player##!i; # Hack O:-)
+$default = "raw" if $raw;
+$default = "sndplay" if $sndplay;
+$default = "esd" if $esd;
+$default = "aplay" if $aplay;
+
+use Lingua::PT::Speaker;
+
+$t = $t || 1.5;
+Lingua::PT::Speaker::debug() if $debug;
+
+if ($h || $help) {
+  print " Usage:\n";
+  print "\t-play     use play to output sound\n";
+  print "\t-aplay    use aplay to output sound (alsa)\n";
+  print "\t-raw      use rawplay to output sound\n";
+  print "\t-esd      use esound daemon to output sound\n";
+  print "\t-utf8     utf8\n";
+  print "\t-sndplay  use sndplay to output sound\n";
+  print "\t-h(elp)   this help screen\n";
+  print "\t-notags   remove HTML-like tags from text\n";
+  print "\t-wav=file.wav  output sound to this specific wav file\n";
+  print "\t-q|-k     keep temporary wav file\n";
+  print "\n";
+  print "\t-spain\n";
+  print "\t-viseu\n";
+  print "\t-porto\n";
+  print "\t-lamego\n";
+  print "\t-cebolinha\n";
+  print "\t-sotaque cebolinha,porto   list of accents\n";
+  exit;
+}
+
+my $tmp="/tmp/_$$";
+
+$/="" if  $l;
+
+if(@ARGV && $ARGV[0] =~ /\.pho$/) { 
+   if($wav){
+      `##MBROLA## -t $t $pt1 $ARGV[0] $wav`; 
+      ## FIX ME -- use global player
+      `play $wav`; 
+   }
+   else{
+      `##MBROLA## -t $t $pt1 $ARGV[0] $tmp.wav`; 
+      ## FIX ME -- use global player
+      `play $tmp.wav`; 
+      unlink( "$tmp.wav") unless($q);
+   }
+   exit 0;
+}
+
+if($utf8){binmode(STDIN,":utf8")};
+
+while($line = <>) {
+  $line =~ s/[«»"']//g;
+  $line =~ s![\[\]]!,!g;
+  $line =~ s!([^_])\(!$1,!g;
+  $line =~ s!\)([^_])!,$1!g;
+  $line =~ s!\<.*?\>!!g if $notags;
+  $line =~ s!_{3,}! barra horizontal !g;
+#  $line =~ s!\~! til !g;
+#  $line =~ s!=! igual !g;
+#  $line =~ s!\*! asterisco !g;
+#  $line =~ s!\<! menor !g;
+#  $line =~ s!\>! maior !g;
+#  $line =~ s!\|! barra !g;
+#  $line =~ s!\#! cardinal !g;
+#  $line =~ s!! . nova página. !g;
+
+  next unless $line =~ /\w/;
+
+  print $line if $show;
+
+  my @sotaque= split(",",$sotaque) || ();
+  push @sotaque, 'cebolinha' if ($cebolinha);
+  push @sotaque, 'porto' if ($porto);
+  push @sotaque, 'lamego' if ($lamego);
+  push @sotaque, 'spain' if ($spain);
+  push @sotaque, 'viseu' if ($viseu);
+
+  speak({special => \@sotaque,
+	 output => "$tmp.pho"}, $line);
+
+  if ($wav) {
+    `##MBROLA## -t $t $pt1 $tmp.pho $wav`;
+    unlink ( "$tmp.pho" ) unless $q;
+  }
+
+  elsif ($default =~ m!rawplay$!) {
+    `##MBROLA## -t $t $pt1 $tmp.pho -.raw|rawplay`;
+    unlink( "$tmp.pho") unless $q;
+  }
+
+  elsif ($default =~ m!esdplay$!) {
+    `##MBROLA## -t $t $pt1 $tmp.pho $tmp.wav`;
+    `esdplay $tmp.wav`; 
+    unlink( "$tmp.pho","$tmp.wav") unless $q;
+  }
+
+  elsif ($default =~ m!sndplay$!) {
+    `##MBROLA## -t $t $pt1 $tmp.pho $tmp.wav`;
+    `sndplay $tmp.wav`;
+    unlink( "$tmp.pho","$tmp.wav") unless $q;
+  }
+
+  elsif ($default =~ m!^play$!) {
+    `##MBROLA## -t $t $pt1 $tmp.pho $tmp.wav`;
+    `play $tmp.wav`;
+    unlink( "$tmp.pho","$tmp.wav") unless $q;
+  }
+
+  elsif ($default =~ m!^aplay$!) {
+    `##MBROLA## -t $t $pt1 $tmp.pho $tmp.wav`;
+    `aplay -q $tmp.wav`;
+    unlink( "$tmp.pho","$tmp.wav") unless $q;
+  }
+}
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+pt-speak - perl script to read texts using Mbrola and Lingua::PT::Speaker
+
+=head1 SYNOPSIS
+
+ pt-speak [options] (text|file.pho|file.wav)*
+
+ options:
+    -debug        show the intermediate TTS results
+    -l            paragraph is a empty line (def: \n)
+    -t=0.9        read faster (def=1.5)
+    -notags       dont read html like tags
+    -raw          use raw player
+    -esd          use esd sound
+    -aplay        use aplay (ALSA mixer)
+    -utf8         encoding = utf8 (default = latin1)
+    -q|-k         dont remove /tmp/... temp. files
+    -show         show the current line (for debug)
+    -sotaque=cebolinha,porto
+    -porto        to ask for Porto's sotaque
+    -wav=out.wav  to create a wave file
+
+=head1 DESCRIPTION
+
+Translates a Portuguese text to a .wav file and says it using 
+Mbrola speech synthesizer.
+
+=head1 AUTHOR
+
+J.Joao Almeida, jj@di.uminho.pt
+Alberto Simões, ambs@cpan.org
+
+=head1 SEE ALSO
+
+Lingua::PT::Speaker(3).
+perl(1).
+mbrola(1).
+
+=cut      

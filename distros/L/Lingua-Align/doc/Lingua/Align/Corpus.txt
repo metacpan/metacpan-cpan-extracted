@@ -1,0 +1,40 @@
+NAME
+    Lingua::Align::Corpus - reading corpus data
+
+Description
+    Read corpus data in various formats. Default format = plain text, 1
+    sentence per line. For other types (parsed corpora etc): Use the "-type"
+    flag.
+
+SYNOPSIS
+      use Lingua::Align::Corpus;
+
+      my $corpus = new Lingua::Align::Corpus(-file => $corpusfile);
+
+      my @words=();
+      while ($corpus->next_sentence(\@words)){
+        print "\n",$corpus->current_id,"> ";
+        print $treebank->print_sentence(\%tree);
+      }
+
+      my $treebank = new Lingua::Align::Corpus(-file => $corpusfile,
+                                               -type => 'TigerXML');
+
+      my %tree=();
+      while ($treebank->next_sentence(\%tree)){
+        print $treebank->print_sentence(\%tree);
+        print "\n";
+      }
+
+DESCRIPTION
+SEE ALSO
+AUTHOR
+    Joerg Tiedemann, <jorg.tiedemann@lingfil.uu.se>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Joerg Tiedemann
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+use strict;
+use base 'LEOCHARRE::CLI';
+
+my $o = gopts();
+
+sub usage {
+   return qq{
+$0 - get outline from file containing pod
+
+USAGE EXAMPLE
+
+   $0 ./lib/PModule.pm
+
+   };
+}
+
+
+my $f = argv_aspaths() or die('missing file args');
+
+for my $file(@$f){
+   my $o = outline($file);
+   print STDERR "\n\n$file\n\n" if ( scalar @$f > 1 );
+   print $o;
+}
+
+
+
+sub outline {
+   my $abs = shift;
+   -f $abs or die("file $abs not on disk");
+   my $cmd = "cat '$abs' | " 
+      .q{grep '=head' | sed 's/=head1 /\n/' | sed 's/=head2 /  /' |}
+      .q{sed 's/=head3 /    /' | sed 's/=head4 /      /'};
+
+   debug("command: [$cmd]");
+   my $out = `$cmd`;
+   return $out;
+}

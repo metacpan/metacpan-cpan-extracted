@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+script/lustre-info.pl
+t/Lustre-Info.t
+lib/Lustre/Info.pm
+lib/Lustre/Info/OST.pm
+lib/Lustre/Info/MDT.pm
+lib/Lustre/Info/Export.pm
+META.yml                                 Module meta-data (added by MakeMaker)

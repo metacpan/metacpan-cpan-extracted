@@ -1,0 +1,59 @@
+NAME
+    LWP::UserAgent::ProgressBar - An LWP user agent that can display a
+    progress bar
+
+VERSION
+    version 1.100810
+
+SYNOPSIS
+        my $url = 'http://...';
+        my $response = LWP::UserAgent::ProgressBar->new->get_with_progress($url);
+        $response->is_success or die "couldn't get $url\n";
+        my $content = $response->content;
+
+DESCRIPTION
+    This class is a subclass of LWP::UserAgent that provides one additional
+    method, described below.
+
+METHODS
+  get_with_progress
+    Takes the same arguments as LWP::UserAgent's "get()", but overrides the
+    ":content_cb" and ":read_size_hint" arguments. During download, a
+    progress bar is displayed.
+
+  post_with_progress
+    Takes the same arguments as LWP::UserAgent's "post()", but overrides the
+    ":content_cb" and ":read_size_hint" arguments. During download, a
+    progress bar is displayed.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=LWP-UserAgent-Progress
+    Bar>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/LWP-UserAgent-ProgressBar/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/LWP-UserAgent-ProgressBar/>. Instead of
+    sending patches, please fork this project using the standard git and
+    github infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

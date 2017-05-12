@@ -1,0 +1,241 @@
+=head1 NAME
+
+Logfile - Perl extension for generating reports from logfiles
+
+=head1 SYNOPSIS
+
+  use Logfile::Cern;
+
+  $l = new Logfile::Cern  File  => 'cache.log.gz', 
+                          Group => [Domain,File,Hour];
+  $l->report(Group => File,   Sort => Records);
+  $l->report(Group => Domain, Sort => Bytes);
+  $l->report(Group => Hour, List => [Bytes, Records]);
+
+  use Logfile::Wftp;
+
+  [...]
+
+=head1 DESCRIPTION
+
+The Logfile extension will help you to generate various reports from
+different server logfiles. In general there is no restriction as to what
+information you extract from the logfiles.
+
+=head2 Reading the files
+
+The package can be customized by subclassing C<Logfile>.
+
+A subclass should provide a function C<next> which reads the next
+record from the file handle C<$self-E<gt>{Fh}> and returns an object of
+type C<Logfile::Record>. In addition a function C<norm> may be
+specified to normalize the various record fields.
+
+Here is a shortened version of the C<Logfile::Cern> class:
+
+  package Logfile::Cern;
+  @ISA = qw ( Logfile::Base ) ;
+
+  sub next {
+      my $self = shift;
+      my $fh = $self->{Fh};
+
+      *S = $fh;
+      my ($line,$host,$user,$pass,$rest,$date,$req,$code,$bytes);
+
+      ($host,$user,$pass,$rest) = split ' ', $line, 4;
+      ($rest =~ s!\[([^\]]+)\]\s*!!) && ($date = $1);
+      ($rest =~ s!\"([^\"]+)\"\s*!!) && ($req = (split ' ', $1)[1]);
+      ($code, $bytes) = split ' ', $rest;
+      Logfile::Record->new(Host  => $host,
+                           Date  => $date,
+                           File  => $req,
+                           Bytes => $bytes);
+  }
+
+As stated above, in general you are free to choose the fields you
+enter in the record. But:
+
+=over 5
+
+=item B<Date>
+
+should be a valid date string. For conversion to the seconds elapsed
+since the start of epoch the modules F<GetDate> and F<Date::DateParse>
+are tried. If both cannot be C<use>ed, a crude build-in module is
+used.
+
+The record constructor replaces B<Date> by the date in C<yymmdd>
+form to make it sortable. Also the field B<Hour> is padded in.
+
+=item B<Host>
+
+Setting B<Host> will also set field B<Domain> by the verbose name of
+the country given by the domain suffix of the fully qualified
+domain name (hostname.domain). C<foo.bar.PG> will be mapped to C<Papua
+New>. Host names containing no dot will be assigned to the domain
+B<Local>. IP numbers will be assigned to the domain
+B<Unresolved>. Mapping of short to long domain names is done in the
+B<Net::Country> extension which might be useful in other contexts:
+
+  use Net::Country;
+  $germany = Net::Country::Name('de');
+
+=item B<Records>
+
+is always set to 1 in the C<Record> constructor. So this field gives
+the number of successful returns from the C<next> function.
+
+=back
+
+Here is the shortened optional C<norm> method:
+
+  sub norm {
+      my ($self, $key, $val) = @_;
+
+      if ($key eq File) {
+          $val =~ s/\?.*//;                             # remove query
+          $val =~ s!%([\da-f][\da-f])!chr(hex($1))!eig; # decode escapes
+      }
+      $val;
+  }
+
+The constructor reads in a logfile and builds one or more indices.
+
+  $l = new Logfile::Cern  File => 'cache.log.gz', 
+                          Group => [Host,Domain,File,Hour,Date];
+
+There is little space but some time overhead in generating additional
+indexes. If the B<File> parameter is not given, B<STDIN> is used. The
+Group parameter may be a field name or a reference to a list of field
+names. Only the field names given as constructor argument can be used
+for report generation.
+
+=head2 Report Generation
+
+The Index to use for a report must be given as the B<Group>
+parameter. Output is sorted by the index field unless a B<Sort>
+parameter is given. Also the output can be truncated by a B<Top>
+argument or B<Limit>.
+
+The report generator lists the fields B<Bytes> and B<Records> for a
+given index. The option B<List> may be a single field name or a
+reference to an array of field names. It specifies which field should
+be listed in addition to the B<Group> field. B<List> defaults to
+B<Records>.
+
+  $l->report(Group => Domain, List => [Bytes, Records])
+
+Output is sorted by the B<Group> field unless overwritten by a B<Sort>
+option. Default sorting order is increasing for B<Date> and B<Hour>
+fields and decreasing for all other Fields. The order can be reversed
+using the B<Reverse> option.
+
+
+This code
+
+  $l->report(Group => File, Sort => Records, Top => 10);
+
+prints:
+
+  File                          Records 
+  =====================================
+  /htbin/SFgate               30 31.58% 
+  /freeWAIS-sf/*              22 23.16% 
+  /SFgate/SFgate               8  8.42% 
+  /SFgate/SFgate-small         7  7.37% 
+  /icons/*                     4  4.21% 
+  /~goevert                    3  3.16% 
+  /journals/SIGMOD             3  3.16% 
+  /SFgate/ciw                  2  2.11% 
+  /search                      1  1.05% 
+  /reports/96/                 1  1.05% 
+
+Here are other examples. Also take a look at the F<t/*> files.
+
+  $l->report(Group => Domain, Sort => Bytes);
+
+  Domain                  Records 
+  ===============================
+  Germany               12 12.63% 
+  Unresolved             8  8.42% 
+  Israel                34 35.79% 
+  Denmark                4  4.21% 
+  Canada                 3  3.16% 
+  Network                6  6.32% 
+  US Commercial         14 14.74% 
+  US Educational         8  8.42% 
+  Hong Kong              2  2.11% 
+  Sweden                 2  2.11% 
+  Non-Profit             1  1.05% 
+  Local                  1  1.05% 
+  
+  $l->report(Group => Hour, List => [Bytes, Records]);
+
+  Hour            Bytes          Records 
+  ======================================
+  07      245093 17.66%        34 35.79% 
+  08      438280 31.59%        19 20.00% 
+  09      156730 11.30%        11 11.58% 
+  10      255451 18.41%        16 16.84% 
+  11      274521 19.79%        10 10.53% 
+  12       17396  1.25%         5  5.26% 
+
+
+=head2 Report options
+
+=over 5
+
+=item B<Group> C<=E<gt>> I<field>
+
+Mandatory. I<field> must be one of the fields passed to the constructor.
+
+=item B<List> C<=E<gt>> I<field>
+
+=item B<List> C<=E<gt>> [I<field>, I<field>]
+
+List the subtotals for I<field>s. Defaults to B<Records>.
+
+=item B<Sort> C<=E<gt>> I<field>.
+
+Sort output by I<field>. By default, B<Date> and B<Hour> are sorted in increasing order, whereas all
+  other fields are sorted in decreasing order.
+
+=item B<Reverse> C<=E<gt> 1> 
+
+Reverse sorting order.
+
+=item B<Top> C<=E<gt>> I<number>
+
+Print only the first I<number> subtotals.
+
+=item B<Limit> C<=E<gt>> I<number>
+
+Print only the subtotals with B<Sort> field greater than I<number>
+(less than number if sorted in increasing order).
+
+=back
+
+Currently reports are simply printed to STDOUT.
+
+=head1 AUTHOR
+
+Ulrich Pfeifer E<lt>F<pfeifer@wait.de>E<gt>
+
+=head1 NEWS
+
+Fixed strict refs bug for perl 5.005.
+
+Fixed bug in fallback to included date parsing reported by James
+Downs.
+
+Fixed y2k bug as suggested by Fred Korz.  I chose the two digit
+version to be a backward compatible as possible.  The C<20> will be
+obvious a few years from now ;-) Output columns should now be
+separated by whitespace in any case.
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut

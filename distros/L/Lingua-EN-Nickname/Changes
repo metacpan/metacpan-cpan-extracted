@@ -1,0 +1,45 @@
+Revision history for Perl extension Lingua::EN::Nickname.
+
+1.36 Fri 27 Feb 2015 01:12:57 PM PST 
+  * Upgraded ExtUtils::MakeMaker and repackaged (no functionality changes)
+
+1.35 Sun 22 Feb 2015 10:03:45 PM PST 
+  * Added github repo to dist metadata and pod
+
+1.34 Sat 21 Feb 2015 11:43:16 PM PST 
+  * corrected test count
+
+1.33 Sat 21 Feb 2015 10:04:48 PM PST 
+  * added tests to cover CPAN bug #76536
+
+1.31 Mon 16 Feb 2015 10:45:43 AM PST 
+  * added to github: https://github.com/brianary/Lingua-EN-Nickname
+
+1.23
+  * added license
+
+1.17
+  * refresh to try and fix zip permissions
+
+20091129
+  * added many names suggested by Arthur
+
+20090517
+  * split Ronald from Roland
+
+20031006
+  * added hash existence checks to minimize warnings
+
+20000530
+  * re-release to stay synched with Lingua::EN::Nickname
+
+19991222
+  * negative look-behind assertion replaced by character class
+    for backwards compatibility 
+
+19991214
+  * re-release to fix tarball 
+
+19991213
+  * original release version; created by h2xs 1.19
+

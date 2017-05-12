@@ -1,0 +1,61 @@
+
+    Locale::MakePhrase - rule-based language translation support
+
+
+DESCRIPTION
+
+This module attempts to solve one of the most perplexing problems
+with multi-language support within programs -> the ability to
+translate any input phrase (with or without arguments) into any
+output phrase, by using a technique which I have coined the term
+'linguistic rule evalution'.
+
+
+DOCUMENTATION
+
+The documentation is contained within the Perl POD format within
+MakePhrase modules.
+
+
+DEPENDENCIES
+
+This group of modules requires:
+  - perl 5.8 (since it uses UTF-8 internally)
+  - I18N::LangTags 0.21
+
+Optionally requires:
+  - DBD::Pg for PostgreSQL database support
+
+
+INSTALLATION
+
+Usually you just need to do a:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or, if you are retrieving this module using the CPAN command shell:
+
+  cpan
+  install Locale::MakePhrase
+
+
+CONTACT
+
+There is no mailing list at the moment.  You can contact the author
+by emailing your bugs/questions to: mathew@users.sf.net
+
+
+LICENSE
+
+This module was written by Mathew Robertson L<mailto:mathew@users.sf.net>
+for RedSheriff Limited L<http://www.redsheriff.com>.  Copyright (C) 2004
+
+This module is licensed under GNU Library General Public License, version 2.1
+You should have received a copy of this with this modules' distribution.
+
+This module is distributed WITHOUT ANY WARRANTY WHATSOEVER, in the
+hope that it will be useful to others.
+

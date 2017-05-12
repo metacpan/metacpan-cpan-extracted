@@ -1,0 +1,45 @@
+Revision history for Perl extension LWP::UserAgent::WithCache.
+
+0.12  Fri Oct 14 13:41:29 PDT 2011
+	- Fixed "Expires" header handling logic
+	- implemented 304 Not Modified response handler to return cached response object
+	- Thanks to Chris Cherry https://github.com/ctcherry for reporting bugs and reviewing changes
+
+0.11  Tue Mar 24 13:44:00 PDT 2009
+	- pulled from tokuhirom/lwp-useragent-withcache to fix a bug filling undef hash values into Cache::FileCache constructor option (Thanks tokuhirom!)
+
+0.10  Fri Dec  5 17:52:33 PST 2008
+	- RT:41474 fixed typo in PREREQ_PM
+	- RT:41475 SYNOPSIS: File::HomeDir->my_home insted of $HOME
+	- RT:41476 supported non-ref hash in the new() method
+
+0.09  Thu Dec  4 19:27:11 PST 2008
+	- #41430 use File::HomdDir->my_home and to get the cache dir
+
+0.08  Thu Dec  4 19:18:21 PST 2008
+	- skipped
+
+0.07  Thu Dec  4 19:08:47 PST 2008
+	- skipped
+
+0.06  Mon Oct 8 23:35:13 2007
+	- added a tiny test for request()
+
+0.05  Mon Oct 8 20:56:01 2007
+	- fixed #16374: UserAgent should not cache HEAD requests
+
+0.04  Mon Oct 8 20:50:01 2007
+	- fixed #16377: Responses without "Expires" header are not retrieved from cache
+
+0.03  Wed Feb 23 10:39:06 2004
+	- handle Etag, If-None-Match and Expires headers
+	- modify cache data structre
+	- only cache with HTTP_OK response
+
+0.02  Thu Sep 30 08:29:06 2004
+	- Fixed cache object updating
+
+0.01  Wed Sep 29 17:24:06 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n LWP::UserAgent::WithCache
+

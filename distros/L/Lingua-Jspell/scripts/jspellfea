@@ -1,0 +1,19 @@
+#!/usr/bin/perl -s 
+use strict;
+use warnings;
+use Lingua::Jspell;
+
+our ($tag, $tagrad,$p,$d);
+
+$d ||= "port";
+
+my $pt = Lingua::Jspell->new($d);
+$pt->setmode({flags => 1});     # show  feature "flag" in output
+
+while(<>){
+  chop;
+  if($tag){  print join(" ",$pt->featags($_)). "\n"}
+  elsif($tagrad){  print join(" ",$pt->featagsrad($_)). "\n"}
+  elsif($p)    {  print Lingua::Jspell::any2str([$pt->fea($_)],"compact") . "\n"}
+  else    {  print Lingua::Jspell::any2str([$pt->fea($_)],"f1") . "\n"}
+}

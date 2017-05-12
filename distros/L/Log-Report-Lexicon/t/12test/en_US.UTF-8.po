@@ -1,0 +1,55 @@
+#. Header generated with Log::Report::Lexicon::POT 0.0
+msgid ""
+msgstr ""
+"Project-Id-Version: my-domain 0.01\n"
+"Report-Msgid-Bugs-To:\n"
+"POT-Creation-Date: 2013-12-12 08:37+0100\n"
+"PO-Revision-Date: 2013-12-12 08:37+0100\n"
+"Last-Translator: Mark Overmeer\n"
+"Language-Team:\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: t/11ppiexp.t:60
+msgctxt "gender=female style=formal"
+msgid "Dear Sir,"
+msgid_plural "Dear Sirs,"
+msgstr[0] "Dear Lady,"
+msgstr[1] "Dear Ladies,"
+
+#: t/11ppiexp.t:60
+msgctxt "gender=male style=formal"
+msgid "Dear Sir,"
+msgid_plural "Dear Sirs,"
+msgstr[0] ""
+msgstr[1] ""
+
+#: t/11ppiexp.t:60
+msgctxt "gender=female style=informal"
+msgid "Dear Sir,"
+msgid_plural "Dear Sirs,"
+msgstr[0] "Hi love,"
+msgstr[1] "Hi darlin's,"
+
+#: t/11ppiexp.t:60
+msgctxt "gender=male style=informal"
+msgid "Dear Sir,"
+msgid_plural "Dear Sirs,"
+msgstr[0] "Dear friend,"
+msgstr[1] "Hi friends,"
+
+#: t/11ppiexp.t:63
+msgid "no context {where}"
+msgstr "out of context {where}"
+
+#: t/11ppiexp.t:57
+msgctxt "gender=female"
+msgid "{name} forgot his key"
+msgstr "{name} forgot her key"
+
+#: t/11ppiexp.t:57
+msgctxt "gender=male"
+msgid "{name} forgot his key"
+msgstr ""

@@ -1,0 +1,52 @@
+NAME
+    List::Extract - grep and splice combined
+
+SYNOPSIS
+        use List::Extract 'extract';
+
+        my @keywords = qw/
+             foo
+            !bar
+             baz
+        /;
+
+        my @exclude = extract { s/^!// } @keywords;
+
+        print "Keywords: @keywords\n";
+        print "Exclude: @exclude\n";
+
+        __END__
+        Keywords: foo baz
+        Exclude: bar
+
+DESCRIPTION
+    "List::Extract" exports a "grep"-like routine called "extract" that both
+    returns and extracts the elements that tests true. It's "grep" and
+    "splice" combined.
+
+EXPORTED FUNCTIONS
+    Nothing is exported by default. The :ALL tag exports everything that can
+    be exported.
+
+    $count = extract BLOCK ARRAY
+    @extracted = extract BLOCK ARRAY
+        Removes the elements from array for which "BLOCK" returns true. In
+        list context the elements are returned in original order. In scalar
+        context the number of removed elements is returned.
+
+        In "BLOCK" the elements in "ARRAY" will be accessible through $_.
+        Modifications to $_ will be preserved in the returned list, but
+        discarded for elements left in the array.
+
+AUTHOR
+    Johan Lodin <lodin@cpan.org>
+
+COPYRIGHT
+    Copyright 2007-2008 Johan Lodin. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    List::Part
+

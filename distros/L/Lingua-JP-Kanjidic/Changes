@@ -1,0 +1,6 @@
+Revision history for Perl extension Lingua::JP::Kanjidic.
+
+0.01  Thu Jul 22 16:57:53 2004
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.0 -AX -n Lingua::JP::Kanjidic
+

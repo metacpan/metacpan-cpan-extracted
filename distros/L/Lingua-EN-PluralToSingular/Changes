@@ -1,0 +1,85 @@
+Revision history for perl module Lingua::EN::PluralToSingular
+
+0.19 2017-02-11
+
+* More "es" to "e" words (causes)
+* More exceptions (nucleus, synchronous).
+
+0.18 2016-02-08
+
+* Add support for more plurals ending in -i
+
+0.17 2015-12-02
+
+* Add singulars for some obsolete plurals
+
+0.16 2015-10-15
+
+* Restore README
+* Add a SEE ALSO section about other Perl modules
+
+0.15 2015-10-15
+
+* Add more -oe words like "canoes" and -ie words like "cuties".
+
+0.14 2014-08-05
+
+* Add "people/person"
+
+0.13 2014-07-16
+
+* Add "is_plural" function.
+
+0.12 2014-01-15
+
+* More non-plurals marked, e.g. "mrs", "sometimes", "Hades", "clothes"
+* "dwarves" added
+* Documentation clarified about "ourselves".
+
+0.11 2014-01-14
+
+* More singular words ending in "s" added.
+* Fixed "horses"/"tenses" bug
+
+0.10 2013-10-18
+
+* More words ending in "s" added to "@not_plural".
+
+0.09 2013-10-17
+
+* "Boxes", "prefixes" now corrected.
+
+0.08 2013-09-20
+
+* Expand list of words ending in "s" which are not plural (@not_plural)
+* Expand list of "oes" words which have singulars ending in "oe" (@oes).
+* Expand list of "ies" words which have singulars ending in "ie" (@ies).
+* Expand list of "ves" words
+
+0.07 2013-09-19
+
+* Ignore words of one or two letters ("as", "is", etc.)
+
+0.06 2013-03-26
+
+* More irregular plurals and words ending in "s" which are not plural.
+
+0.05 2013-03-26
+
+* Documentation to separate file
+* Ignore apostrophe-s
+
+0.04 2012-07-25
+
+* consonant+s + es forms
+
+0.03 2012-04-13
+
+* No user-visible changes
+
+0.02 2012-04-13
+
+* No user-visible changes
+
+0.01 2012-04-13
+

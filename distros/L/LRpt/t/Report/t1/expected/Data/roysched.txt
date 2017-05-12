@@ -1,0 +1,5 @@
+title_id	lorange	hirange	royalty
+MC2222	0	2000	0.10
+MC2222	2001	4000	0.12
+MC2222	4001	8000	0.14
+MC2222	8001	12000	0.16

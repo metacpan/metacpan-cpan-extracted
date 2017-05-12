@@ -1,0 +1,119 @@
+<report>
+    <authors>
+        <statement><![CDATA[select * from authors]]></statement>
+        <header>
+            <au_id/>
+            <au_lname/>
+            <au_fname/>
+            <phone/>
+            <address/>
+            <city/>
+            <state/>
+            <zip/>
+        </header>
+        <data>
+            <equal>
+                <au_id>213-46-8915</au_id>
+                <au_lname>Green</au_lname>
+                <au_fname>Marjorie</au_fname>
+                <phone>415 986-7020</phone>
+                <address>309 63rd St. #411</address>
+                <city>Oakland</city>
+                <state>CA</state>
+                <zip>94618</zip>
+            </equal>
+            <equal>
+                <au_id>238-95-7766</au_id>
+                <au_lname>Carson</au_lname>
+                <au_fname>Cheryl</au_fname>
+                <phone>415 548-7723</phone>
+                <address>589 Darwin Ln.</address>
+                <city>Berkeley</city>
+                <state>CA</state>
+                <zip>94705</zip>
+            </equal>
+        </data>
+    </authors>
+    <editors>
+        <statement><![CDATA[select * from editors where ed_fname = 'Martinella']]></statement>
+        <header>
+            <ed_id/>
+            <ed_lname/>
+            <ed_fname/>
+            <ed_pos/>
+            <phone/>
+            <address/>
+            <city/>
+            <state/>
+            <zip/>
+            <ed_boss/>
+        </header>
+        <data>
+            <equal>
+                <ed_id>321-55-8906</ed_id>
+                <ed_lname>DeLongue</ed_lname>
+                <ed_fname>Martinella</ed_fname>
+                <ed_pos>project</ed_pos>
+                <phone>415 843-2222</phone>
+                <address>3000 6th St.</address>
+                <city>Berkeley</city>
+                <state>CA</state>
+                <zip>94710</zip>
+                <ed_boss>993-86-0420</ed_boss>
+            </equal>
+        </data>
+    </editors>
+    <roysched>
+        <statement><![CDATA[select * from roysched where title_id = 'PS2091']]></statement>
+        <header>
+            <title_id/>
+            <lorange/>
+            <hirange/>
+            <royalty/>
+        </header>
+        <data>
+            <equal>
+                <title_id>PS2091</title_id>
+                <lorange>0</lorange>
+                <hirange>1000</hirange>
+                <royalty>0.10</royalty>
+            </equal>
+            <equal>
+                <title_id>PS2091</title_id>
+                <lorange>1001</lorange>
+                <hirange>5000</hirange>
+                <royalty>0.12</royalty>
+            </equal>
+            <equal>
+                <title_id>PS2091</title_id>
+                <lorange>5001</lorange>
+                <hirange>50000</hirange>
+                <royalty>0.14</royalty>
+            </equal>
+        </data>
+    </roysched>
+    <titleauthors>
+        <statement><![CDATA[select * from titleauthors where title_id = 'PS2091']]></statement>
+        <header>
+            <au_id/>
+            <title_id/>
+            <au_ord/>
+            <royaltyshare/>
+        </header>
+        <data>
+            <equal>
+                <au_id>899-46-2035</au_id>
+                <title_id>PS2091</title_id>
+                <au_ord>2</au_ord>
+                <royaltyshare>0.50</royaltyshare>
+            </equal>
+            <equal>
+                <au_id>998-72-3567</au_id>
+                <title_id>PS2091</title_id>
+                <au_ord>1</au_ord>
+                <royaltyshare>0.50</royaltyshare>
+            </equal>
+        </data>
+    </titleauthors>
+</report>
+

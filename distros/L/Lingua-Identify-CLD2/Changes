@@ -1,0 +1,16 @@
+Change log for Lingua::Identify::CLD2
+
+0.03
+  - Switched CLD2 tables from 'full' to 'chrome_2'. This reduces number of languages
+    recognized (from 160+ to 80+), but improves the accuracy for the remaining ones.
+  - Removed CLD2::GenConstants module and ULScript* related functions.
+
+0.02
+  - Changed API to accept hash of options as second parameter.
+  - Fixed return value.
+  - Fixed LanguageCloseSet to accept string language codes (in addition to integer numbers).
+  - Croak on invalid UTF-8.
+
+0.01  Mon Jun 08 10:41:00 2015
+  - Initial release to CPAN.
+

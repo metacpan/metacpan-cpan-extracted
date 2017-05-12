@@ -1,0 +1,29 @@
+Revision history for Lingua-PT-Hyphenate
+
+1.05  Sat Apr 03 11:41:00 2005
+	- added some .t files to the MANIFEST (last version add missed
+	  them)
+
+1.04  Mon Nov 01 13:07:00 2004
+	- improved documentation (some explanation of the algorithm)
+	- added pod.t and pod-coverage.t to the tests directory
+
+1.03  Wed Sep 22 00:01:29 2004
+	- minor changes in the documentation
+	- Perl required version is now 5.006 (was 5.008)
+
+1.02  Fri Sep 17 22:42:29 2004
+	- added META.yml
+	- added object interface
+
+1.01  Mon May 19 23:37:58 2004
+	- corrected rules.
+
+1.00  Mon May 15 00:16:58 2004
+	- now working based on rules. treated special cases as uppercased
+	  words, empty words, non words, etc.
+
+0.01  Mon May 10 21:08:58 2004
+	- first release ready. still doesn't treat all cases
+	- original version; created by h2xs 1.22 with options
+		-XAn Lingua::PT::Hyphenate

@@ -1,0 +1,27 @@
+Changelog
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/List/Pairwise.pm
+lib/List/Pairwise.pod
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01load.t
+t/context.t
+t/coverage.pl
+t/firstp.t
+t/grepp.t
+t/lastp.t
+t/listutil.t
+t/mapp.t
+t/pair.t
+t/warn1.t
+t/warn2.t
+t/warn3.t
+t/warn4.t

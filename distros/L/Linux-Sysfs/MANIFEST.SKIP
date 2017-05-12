@@ -1,0 +1,17 @@
+^_darcs/
+^\.cvsignore$
+^MANIFEST\.bak$
+^Linux-Sysfs-
+\.bs$
+\.hsc$
+\.o$
+^xs/.*\.c$
+\.sw\w$
+^Makefile.old$
+^Makefile$
+^pm_to_blib$
+^svn-commit\.tmp$
+\.svn
+^t/config\.pl$
+\bblib/
+#defaults

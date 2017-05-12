@@ -1,0 +1,50 @@
+{
+   "abstract" : "Importer + Lexical subs/vars.",
+   "author" : [
+      "Chad Granum <exodist@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lexical-Importer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Importer" : "0.013",
+            "Lexical::SealRequireHints" : "0.006",
+            "XSLoader" : "0",
+            "parent" : "0",
+            "perl" : "5.012000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Suite" : "0.000050"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/exodist/Lexical-Importer/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/exodist/Lexical-Importer"
+      }
+   },
+   "version" : "0.000005",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

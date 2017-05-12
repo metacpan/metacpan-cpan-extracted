@@ -1,0 +1,58 @@
+---
+name: Lingua-IT-Ita2heb
+version: 0.01
+author:
+  - 'Amir E. Aharoni <amir.aharoni@mail.huji.ac.il>'
+abstract: transliterate Italian words into vocalized Hebrew.
+license: artistic_2
+resources:
+  homepage: https://github.com/amire80/ita2heb
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: https://github.com/amire80/ita2heb
+build_requires:
+  Test::More: 0
+requires:
+  Carp: 0
+  List::MoreUtils: 0
+  Moose: 0
+  Readonly: 0
+  base: 0
+  charnames: 0
+  lib: 0
+  open: 0
+  perl: 5.010
+  strict: 0
+  utf8: 0
+  vars: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0.36
+provides:
+  Lingua::IT::Ita2heb:
+    file: lib/Lingua/IT/Ita2heb.pm
+    version: 0.01
+  Lingua::IT::Ita2heb::LettersSeq:
+    file: lib/Lingua/IT/Ita2heb/LettersSeq.pm
+    version: 0.01
+  Lingua::IT::Ita2heb::LettersSeq::IT:
+    file: lib/Lingua/IT/Ita2heb/LettersSeq/IT.pm
+    version: 0.01
+  Lingua::IT::Ita2heb::LettersSeq::IT::ToHeb:
+    file: lib/Lingua/IT/Ita2heb/LettersSeq/IT/ToHeb.pm
+  Lingua::IT::Ita2heb::Role::Constants:
+    file: lib/Lingua/IT/Ita2heb/Role/Constants.pm
+    version: 0.01
+  Lingua::IT::Ita2heb::Role::Constants::Hebrew:
+    file: lib/Lingua/IT/Ita2heb/Role/Constants/Hebrew.pm
+    version: 0.01
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+keywords:
+  - hebrew
+  - italian
+  - languages
+  - natural
+  - nlp
+  - transliteration

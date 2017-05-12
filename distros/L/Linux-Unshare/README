@@ -1,0 +1,46 @@
+Copyright (C) 2014-2017 by Marian Marinov
+
+Linux-Unshare
+==========================
+
+  Linux::Unshare - Perl interface for Linux unshare system call.
+
+
+This trivial module provides interface to the Linux unshare system call. It
+also provides the CLONE_* constants that are used to specify which kind of
+unsharing must be performed. Note that some of these are still not implemented
+in the Linux kernel, and others are still experimental.
+
+The unshare system call allows a process to 'unshare' part of the process
+context which was originally shared using clone(2).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module does not require any 3rd party libraries, but it does require your machine to have the <sched.h> for build.
+And also it requires fairly recent kernel to work.
+
+BUGS AND SUGGESTIONS
+    contact me at hackman at cpan.org
+
+REPOSITORY
+    http://github.com/hackman/linux-unshare
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Boris Sukholitko
+Copyright (C) 2014-2017 by Marian Marinov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

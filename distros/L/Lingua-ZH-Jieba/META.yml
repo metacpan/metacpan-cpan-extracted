@@ -1,0 +1,55 @@
+---
+abstract: 'Perl wrapper for CppJieba (Chinese text segmentation)'
+author:
+  - 'Stephan Loyd <stephanloyd9@gmail.com>'
+build_requires:
+  Data::Dumper: '0'
+  Path::Tiny: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.03'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-ZH-Jieba
+provides:
+  Lingua::ZH::Jieba:
+    file: lib/Lingua/ZH/Jieba.pm
+    version: '0.003'
+  Lingua::ZH::Jieba::Jieba:
+    file: lib/Lingua/ZH/Jieba.pm
+    version: '0.003'
+  Lingua::ZH::Jieba::KeywordExtractor:
+    file: lib/Lingua/ZH/Jieba.pm
+    version: '0.003'
+  Lingua::ZH::Jieba::vector_keyword:
+    file: lib/Lingua/ZH/Jieba.pm
+    version: '0.003'
+  Lingua::ZH::Jieba::vector_s:
+    file: lib/Lingua/ZH/Jieba.pm
+    version: '0.003'
+  Lingua::ZH::Jieba::vector_wordpos:
+    file: lib/Lingua/ZH/Jieba.pm
+    version: '0.003'
+  Lingua::ZH::Jiebac:
+    file: lib/Lingua/ZH/Jieba.pm
+    version: '0.003'
+requires:
+  DynaLoader: '0'
+  Exporter: '0'
+  File::ShareDir: '0'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/stphnlyd/perl5-jieba.git
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.69'

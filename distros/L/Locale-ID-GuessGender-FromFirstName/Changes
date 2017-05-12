@@ -1,0 +1,38 @@
+Revision history for Locale-ID-GuessGender-FromFirstName
+
+0.06    2016-03-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Remove prereq JSON (REST::Google now uses JSON::Any which
+	  it already lists as prereq).
+
+
+0.05    2014-05-26 (SHARYANTO)
+
+        - No functional changes.
+
+        - App 'use experimental smartmatch' for perl 5.18+.
+
+
+0.04     2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core in 5.19.
+
+
+0.03    2011-02-21 (SHARYANTO)
+
+        - require 5.10+
+
+
+0.02    2010-12-27 (SHARYANTO)
+
+        - Add REST::Google's missing dependency: JSON
+
+        - Update tests
+
+
+0.01    2010-05-13 (SHARYANTO)
+
+        - First release

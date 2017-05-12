@@ -1,0 +1,88 @@
+Revision history for Perl CPAN module Lingua::En::Fathom
+
+1.19 15 Sep 2016
+    Set github as repository
+
+1.18 7 Apr 2015
+    removed indirect object notation for 'new' method
+    Fix for #102898, no minimim version set for warnings in Build.PL, to support very old versions of Perl
+    
+1.17 20 Mar 2015
+    Added prerequiste moudule to Build.PL
+
+1.16 20 Mar 2015
+    Removed tests that depended on Lingua::EN::Syllable results. Any changes to this
+    required module will break test results.
+    Added Build.PL
+
+1.15 6 Aug 2011
+    Removed use of diagnostic pragma in main.t, seems to cause errors for CPAN testers
+
+1.14 31 May 2011
+    Changed main.t to use 'like' instead of 'if' when testing for floating
+    point numbers. This means tests are independent of machine precision
+
+1.13 30 May 2011
+    Added more tests to main.t
+    Upgraded all tests to use Test::More module
+    Thanks to Kirk Kimmel for theses changes
+    
+1.12 13 Apr 2008
+    Minor fixes
+    
+1.11 08 Apr 2007
+    Fixed bug in generation of META.yml
+
+1.10 07 Apr 2007
+    Improved documentation
+
+1.09 11 Jul 2005
+    Improved documentation
+    Updated distribution to current CPAN requirements 
+
+1.08 13 Feb 2004
+    Improved documentation
+
+1.07 02 Apr 2002
+    Improved documentation
+    Added more abbreviations to _analyse_words
+
+1.06 04 Jan 2002
+    Fixed error in calculation of Fog index, thanks to Trevor Jenkins
+    Added method to get num_complex_words
+    Added demo_recurse.pl
+
+1.05 19 May 2001
+    Renamed _analyse_line subroutine to _analyse_words
+    Moved duplicated code from analyse_file & analyse_block to analyse_line subroutine
+    Extended list of allowable abbreviations, such as "Pty. Ltd., etc."
+    Added method to get syllables_per_word
+    Added method to get words_per_sentence
+
+1.04 23 Feb 2001
+    _initialize now resets readability indices and num_paragraphs
+    Sentence count is no longer tricked by quotes before a full stop
+    Optional argument on analyse_block and analyse_file to allow stats to accumulate
+
+
+1.03 07 Jan 2001:
+    Added documentation of 'report' method
+
+
+1.02 15 Mar 2000:
+    Added paragraph count
+    Fixed error in test 2 of test script (word count was 38, not 39)
+
+1.01 12 Mar 2000:
+    Added stricter test for hyphenated words
+    Added more statistics to report
+    Accounted for name prefixes (Mr., Dr. etc ) in sentences
+    Improved documentation
+
+    Changed Fog index calculation to use percentage of complex words
+    instead of total number of complex words. Thanks to Steve Grantz
+
+    Allowed for sentences ending in '?' and '!' as well
+    as '.' Thanks to Steve Grantz for spotting this limitation.
+
+1.00 23 Jan 2000: First Release

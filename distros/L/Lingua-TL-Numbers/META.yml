@@ -1,0 +1,26 @@
+---
+abstract: 'Convert numbers into Tagalog words'
+author:
+  - 'Sherwin Daganato <sherwin@daganato.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-TL-Numbers
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: 0
+resources:
+  bugtracker: https://github.com/sherwind/Lingua-TL-Numbers/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/sherwind/Lingua-TL-Numbers.git
+version: 0.02

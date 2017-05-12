@@ -1,0 +1,15 @@
+---
+name: Lingua-BrillTagger
+version: 0.02
+author:
+  - Ken Williams, <kwilliams@cpan.org>
+abstract: Natural-language tokenizing and part-of-speech tagging
+license: perl
+build_requires:
+  Module::Build: 0.21
+  Test::More: 0
+provides:
+  Lingua::BrillTagger:
+    file: lib/Lingua/BrillTagger.pm
+    version: 0.02
+generated_by: Module::Build version 0.2608

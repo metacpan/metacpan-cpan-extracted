@@ -1,0 +1,109 @@
+ChangeLog Summary
+
+Version 0.60->0.70
+  * Massive expansion of lexicon, especially handling of non-standard
+    spellings for Caighdeánaitheoir
+  * Nearly double the number of grammatical rules
+  * Small bug fixes
+
+Version 0.51->0.60
+  * Lexicon additions, improvements, and bug fixes (some unnecessary
+    inflections removed)
+  * Rule set more than tripled in size, now covering a wide range of Irish
+    grammar, including nearly all rules concerning missing or unnecessary
+    initial mutations
+  * Simplification of the tagset, some regular expression optimizations,
+    less dependence on part-of-speech macros, and the restructuring of a few
+    slow rules lead to another 5% speed improvement despite the massively
+    larger rule set
+  * Added warnings for many "dangerous pairs" based on corpus analysis
+  * Now correctly tokenizes numerals, including years, ordinals like "5ú",
+    and plurals like "1950í".
+  * Many morphological rules added for treating pre-standard orthography;
+    together with work on the replacement file, these allow An Gramadóir to
+    be used as a "normalizer" for indexing, information retrieval, etc.
+
+Version 0.50->0.51
+  * Lexicon additions and improvements
+  * Improved error trapping
+  * Improved Perl code generation (consistent use of non-capturing
+    parentheses, etc.) giving 5% speed improvement.
+  * Perl implementation of developer options "--brill", "--freq", "--ambig"
+    distributed in the language pack gramadoir-ga-0.51.
+  * Added "--no-unigram" option to gram-ga.pl
+  * POD documentation for gram-ga.pl
+
+Version 0.4->0.50
+  * Complete rewrite of core engine entirely in Perl
+  * Default output encoding is now utf8; added a "--aschod" option to change
+    this
+  * The default is now to report all spelling errors in a sentence (was at
+    most two)
+  * Added a complete morphological analyzer which greatly improves the error
+    messages when words are not found in the lexicon.
+  * The morphology engine also improves handling of late capitals so words
+    like "d'Fhoras", "Sean-Nós" are passed over silently as correct now.
+    Also, since the lowered version of a word like "hAire" is not
+    automatically searched (since the capitalized version is in the
+    lexicon), this gets the correct, unambiguous masculine POS tag. Or in
+    "bPáirtí Glas", the first word is now recognized unambiguously as a noun
+    which then has the added benefit of allowing "Glas" to be correctly
+    recognized as an adjective.
+  * Line numbers are now given where the error occurs (was the line number
+    of the beginning of the sentence containing the error).
+  * Non-standard words are now tagged so as to be reported as misspellings
+    when the "--litriu" flag is given.
+  * Doubled words only reported when there is no intervening punctuation;
+    the two words together are now marked up as the erroneous text.
+  * Bug from unescaped "$" in bash version goes away with perl
+  * Global highlighting bug fixed (e.g. "re" in "gach re" caused the "re" in
+    "toibreacha" to be highlighted also).
+  * No more "uimhir" line number attribute in intermediate XML
+  * Use character entities "&quot;", etc. in "--api", "--html", and "--xml"
+    output
+  * Added "--api" command line option which generates XML output suitable
+    for use as an interface to other programs
+  * Added command line options "--aschur", "--dath", "--comheadan"
+  * I cracked and added English versions of the long command-line options
+  * Improvements (adding to .neamhshuim) and bug fixes to Vim interface
+  * Afrikaans localization
+
+Version 0.3->0.4
+  * Rule set more than double the size (improved generation of Perl code
+    means no loss in efficiency, in fact a 15% improvement)
+  * "tag 2-gram" rules added that flag unlikely part-of-speech combinations
+  * Complete Brill-like rule-based tagger added with 331 disambiguation
+    rules followed by a default unigram tagger
+  * Added developer options "--brill", "--ilchiall", "--minic", and
+    "--no-unigram" useful for developing the tagger
+  * Module for "chunking" of set phrases added
+  * Language-dependent modules added for recognizing abbreviations; improves
+    sentence segmentation
+  * Added "--aspell" option which makes suggestions for misspelled words
+  * Modularized more language-specific material (tolower, macro files, etc.)
+  * Flagging of repeated words
+  * Flagging of extremely rare words (which sometimes disguise misspellings)
+  * Dutch, French, Mongolian, Romanian, and Slovak localizations
+  * Now builds and runs cleanly in a UTF-8 locale
+  * Vim interface gramadoir.vim included
+  * Minor bug fixes
+
+Version 0.2->0.3
+  * Optional native language support with GNU gettext (with translations to
+    Irish and German included)
+  * Added ability to specify text encoding via "--ionchod" command line
+    option
+  * Modularized language-specific material; added trivial English port and
+    the "--teanga" command line option
+  * Ported to build cleanly under Mac OS X
+  * Added new (mostly grammar) rules
+  * Minor bug fixes
+  * New "extras" in tarball: emacs interface, complete CVS ChangeLog
+
+Version 0.1->0.2
+  * Added the "replacement file" containing non-standard forms
+  * Added user "ignore file" and "--iomlan" command line option
+  * Added new disambiguation and grammar rules
+  * More robust handling of exceptional input text
+  * Minor bug fixes
+

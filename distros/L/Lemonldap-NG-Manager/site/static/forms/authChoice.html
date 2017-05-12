@@ -1,0 +1,39 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title" trspan="authChain"></h3>
+  </div>
+  <table class="table table-striped">
+    <tbody>
+      <tr>
+        <td trspan="name"></td>
+        <td>
+          <input class="form-control" ng-model="currentNode.title">
+        </td>
+      </tr>
+      <tr ng-repeat="i in [[0,'authentication'],[1,'userDB'],[2,'passwordDB']]">
+        <td trspan="{{i[1]}}"></td>
+        <td>
+          <select id="selectform" class="form-control" ng-model="currentNode.data[i[0]]" ng-change="execFilters(_findScopeByKey('authParams'))">
+            <option ng-repeat="item in _findContainer().select[i[0]]" ng-selected="item.k==currentNode.data[i[0]]" value="{{item.k}}">{{item.v}}</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td trspan="url"></td>
+        <td>
+          <input class="form-control" ng-model="currentNode.data[3]">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "action": "newAuthChoice",
+  "title": "newChain",
+  "icon": "plus-sign"
+},{
+  "title": "deleteEntry",
+  "icon": "minus-sign"
+}]
+</script>

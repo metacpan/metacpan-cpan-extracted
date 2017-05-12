@@ -1,0 +1,33 @@
+Maximum UDP packet size. Set to 8192 bytes.
+
+The handler that is used to process each message as it is received.
+
+The address you want to listen on.
+
+The port you want to listen on.
+
+The listening socket used for communication.
+
+Starts the server and listens for incoming datagrams on the specified socket.
+
+Initializes the `get_datagram` event on `server_socket`.
+
+Will execute the coderef in `handler` with the deserialized message as the
+first argument.
+
+# SYNOPSIS
+
+    use Log::UDP::Server;
+
+    my $server = Log::UDP::Server->new( handler => sub { warn( $_[0] ); } );
+    $server->run();
+
+# DESCRIPTION
+
+This module enables you to receive a message (simple string or complicated object)
+over a UDP socket. An easy way to send a structured message is to use Log::UDP::Client.
+The message received will automatically be handled by the specified callback.
+
+# INHERITED METHODS
+
+All of these methods are inherited from [Data::Serializable](http://search.cpan.org/perldoc?Data::Serializable). Read more about them there.

@@ -1,0 +1,73 @@
+NAME
+
+    Lingua::EN::Number::IsOrdinal - detect if English number is ordinal or
+    cardinal
+
+SYNOPSIS
+
+        use Lingua::EN::Number::IsOrdinal 'is_ordinal';
+    
+        ok is_ordinal('first');
+    
+        ok !is_ordinal('one');
+    
+        ok is_ordinal('2nd');
+    
+        ok !is_ordinal('2');
+
+DESCRIPTION
+
+    This module will tell you if a number, either in words or as digits, is
+    a cardinal or ordinal number
+    <http://www.ego4u.com/en/cram-up/vocabulary/numbers/ordinal>.
+
+    This is useful if you e.g. want to distinguish these types of numbers
+    found with Lingua::EN::FindNumber and take different actions.
+
+FUNCTIONS
+
+ is_ordinal
+
+    Takes a number as English words or digits (with or without ordinal
+    suffix) and returns 1 for ordinal numbers and undef for cardinal
+    numbers.
+
+    Checks that the whole parameter is a number using
+    Lingua::EN::FindNumber or a regex in the case of digits, and if it
+    isn't will throw a not a number exception.
+
+    This function can be optionally imported.
+
+METHODS
+
+ _is_ordinal
+
+    Method version of "is_ordinal", this is where the function is actually
+    implemented. Can be overloaded in a subclass.
+
+ _is_number
+
+    Returns 1 if the passed in string is a word-number as detected by
+    Lingua::EN::FindNumber or is a cardinal or ordinal number made of
+    digits and (for ordinal numbers) a suffix. Otherwise returns undef. Can
+    be overloaded in a subclass.
+
+SEE ALSO
+
+      * Lingua::EN::FindNumber
+
+      * Lingua::EN::Words2Nums
+
+      * Lingua::EN::Inflect::Phrase
+
+AUTHOR
+
+    Rafael Kitover <rkitover@cpan.org>
+
+LICENSE
+
+    Copyright 2013-2015 by Rafael Kitover
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

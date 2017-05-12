@@ -1,0 +1,37 @@
+---
+abstract: 'List objects, kitchen sink included'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: List-Objects-WithUtils
+recommends:
+  List::UtilsBy::XS: '0.03'
+  Type::Tiny: '0.022'
+requires:
+  Carp: '0'
+  Class::Method::Modifiers: '0'
+  Exporter: '0'
+  List::Util: '1.33'
+  List::UtilsBy: '0.09'
+  Module::Runtime: '0.013'
+  Role::Tiny: '1.003'
+  Scalar::Util: '0'
+  Type::Tie: '0.004'
+  autobox: '0'
+  overload: '0'
+  parent: '0'
+  strictures: '2'
+resources:
+  repository: git://github.com/avenj/list-objects-withutils.git
+version: '2.028003'

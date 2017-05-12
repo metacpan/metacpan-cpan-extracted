@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+use Carp;
+use strict;
+print "yes i am perl\n";

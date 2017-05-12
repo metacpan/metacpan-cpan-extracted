@@ -1,0 +1,12 @@
+name: Language-MzScheme
+version: 0.09
+abstract: Perl bindings to PLT MzScheme
+author: Autrijus Tang <autrijus@autrijus.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

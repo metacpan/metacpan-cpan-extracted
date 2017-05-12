@@ -1,0 +1,52 @@
+<h2>Reviews</h2>
+
+[% IF user.access >= 2 %]
+<div class="boxer">
+    <div class="admin">
+        <a href="[% cgipath %]/pages.cgi?act=reviews-add">create a review</a>
+    </div>
+</div>
+[% END %]
+
+<div class="boxer">
+    <div class="blocker">
+        <form action="[% cgipath %]/pages.cgi">
+        <input type="hidden" name='act' value='reviews-main' />
+        <table>
+        <tr><td align="right">Search by Title:</td><td><input type="text" name="searchtitle" value="[% searchtitle %]" /></td><td rowspan="4" valign="bottom"><input type="submit" value='GO' /></td></tr>
+        <tr><td align="right">Type:</td><td>[% ddrevtypes %]</td></tr>
+        <tr><td align="right">Reviewer:</td><td>[% ddreviewers %]</td></tr>
+        <tr><td align="right">Retailer:</td><td>[% ddretailers %]</td></tr>
+        </table>
+        </form>
+    </div>
+</div>
+
+<div class="boxer">
+<table class="review">
+<tr>
+    <th>When</th>
+    <th>Type</th>
+    <th>Reviewer</th>
+    <th>Title</th>
+    <th>Retailer</th>
+</tr>
+
+[% IF data %]
+[% FOREACH item = data %]
+
+<tr>
+    <td>[% item.postdate %]</td>
+    <td>[% item.typeabbr %]</td>
+    <td>[% item.realname %]</td>
+    <td><a href="/reviews/[% item.reviewid %]">[% item.title %]</a></td>
+    <td>[% item.retailer %]</td>
+</tr>
+
+[% END %]
+[% ELSE %]
+<tr><td colspan="5" align="center">No reviews currently available.</td></tr>
+[% END %]
+
+</table>
+</div>

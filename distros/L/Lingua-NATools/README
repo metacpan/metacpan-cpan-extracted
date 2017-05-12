@@ -1,0 +1,136 @@
+
+ ]:: NATools ::[
+
+This package is not ready for non-informatic users. 
+
+For instalation intructions see INSTALL
+
+For usage information: 
+  visit http://natools.sf.net
+  or    http://linguateca.di.uminho.pt/natools
+  API informations are also available from this site.
+
+For a demo (Web interface to query and browse parallel corpora):
+  visit http://eremita.di.uminho.pt/natools/nat
+
+For Perl API:
+  visit http://linguateca.di.uminho.pt/natools/
+
+For C API:
+  visit http://linguateca.di.uminho.pt/natools/html/index.html
+
+
+
+____NATools - Getting Started
+
+This page describes the easy way to getting started using NATools. This is not
+the only way to use them, and for full information you should read each tool
+documentation.
+
+=File formats
+
+NATools understands two file formats for corpora: TMX and NATools specific
+format. TMX is a standard, and you can see its specifications at LISA.
+
+Regarding NATools specific format: use two files, one for each language. Each
+translation unit is separated by a line with just a dollar sign ($). Each
+translation unit can span for more than one line. That is not a problem.
+
+Here is a simple example:
+
+ I saw a cat .
+ $
+ The cat was 
+ fat .
+ $
+            
+
+	
+
+ Eu vi um
+ gato .
+ $
+ O gato era gordo .
+ $
+            
+
+Note that both files need to have the same number of translation units, and
+that the texts should be already tokenized.
+
+=Bootstrapping from a TMX file
+
+If you have a TMX file (with just two languages) you can bootstrap the NATools
+alignment process using the nat-create script:
+
+ [foo@bar]$  nat-create -tmx file.tmx
+      
+
+The script will ask you for a name for the corpus. Supply a name without
+spaces. The script will create a directory with that name, where the files for
+the encoded corpus, encoded lexicon and probabilistic translation dictionaries.
+
+=Bootstrapping from a pair of NATools files
+
+To use this method, you need to have a pair of files aligned at sentence level,
+in the format specified above. For the following commands examples, we will
+call these files lang1 and lang2.
+
+You can align them directly using the built-in language identification process:
+
+ [foo@bar]$  nat-create lang1 lang2
+      
+
+You can also specify the languages in case you want speed, or in case the
+language identification process does not guess correctly the languages
+involved. For that, you should use:
+
+ [foo@bar]$  nat-create -langs=PT..EN lang1 lang2
+      
+
+where the -langs switch specify the languages involved in the same order as the
+supplied files (so, lang1 should be Portuguese, and lang2 should be in
+English).
+
+Both methods will ask you for a corpus name. Supply a name without spaces. The
+script will create a directory with that name, where the files for the encoded
+corpus, encoded lexicon and probabilistic translation dictionaries.
+
+=Creating a textual Probabilistic Translation Dictionary file
+
+In some cases it is useful to look at the Probabilistic Translation Dictionary
+(PTD) extracted from the parallel corpus without using the NATools server. For
+this, we can extract the PTD to a textual file (in Perl Data::Dumper format
+which is both legible to the human and to the computer).
+
+Use the nat-dumpDicts command for that. First, change the current directory to
+the directory created by the corpus encoding process, and then execute:
+
+ [foo@bar]$  nat-dumpDicts source.lex source-target.bin target.lex
+target-source.bin > dict.txt
+      
+
+The file dict.txt will be created with the PTD.
+
+=Using nat-server
+
+If you read the installation section, you know that the CGIs work based on a
+server running in your machine. There are other tools that need this server as
+well, so that they are quicker when accessing the corpus.
+
+The server needs a configuration file. The configuration file is simple. Lines
+starting with a sharp (#) are considered to be comments, and thus ignored.
+Other lines should contain absolute paths to directories created by the
+nat-create command (or nat-shell). For instance, if running nat-create you
+created a corpus in the directory /corpora/parallel with name EuroParl, you
+should add the following line to your configuration file:
+
+ /corpora/parallel/EuroParl
+      
+
+The server will then configure each corpus based on the nat.cnf configuration
+file present in each of those corpus directories.
+
+To start the server, use:
+
+ [foo@bar]$  nat-server /path/to/the/config/file.cfg
+      

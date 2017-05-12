@@ -1,0 +1,63 @@
+List-Member version 0.42
+========================
+
+NAME
+    List::Member - PROLOG's member/2: return index of $x in @y.
+
+SYNOPSIS
+      use List::Member;
+      my $target = 'bar';
+      my @look_in = ('foo','baz','bar','etc', 0);
+      warn "It is a member of the list" if member('bar',@look_in) +1;
+      warn "It is a member of the list" if member('bar',@look_in) >= 0;
+      warn "It is a member of the list" if member('ar$',@look_in) >= 0;
+      warn "Zero is a member of the list" if member('0',@look_in) >= 0;
+      warn "It is not a member of list" if member('tikkumolam',@look_in) eq nota_member();
+
+DESCRIPTION
+    A tiny routine to achieve the same effect as PROLOG's "member/2".
+
+    Returns the index of supplied scalar in supplied array, or returns the
+    value of the package's $NEG scalar. This can be over-ridden for the case
+    when the target is the same as the default -1:
+
+            $List::Member::NEG = 'not_a_member';
+
+    In the above case, the first two example calls in the POD would need to
+    be updated.
+
+EXPORT
+            member
+
+THANKS
+    Thanks to Benoit Thillaye du Boulay in France, John Day and Michael D
+    Black in Florida for pointing out bugs in the documentation, and to
+    the Limbic~Region for pointing out the snivelling nits grumbling about
+    the lack of support for 0, without filing a bug report.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+	None
+
+AUTHOR
+    Lee Goddard <lgoddard@cpan.org>
+
+LICENCE AND COPYRIGHT
+    Copyright (C) 2000-2008 Lee Goddard. All Rights Reserved.
+
+    This module is made available under the same terms as Perl.
+
+SEE ALSO
+    perl(1).
+
+
+

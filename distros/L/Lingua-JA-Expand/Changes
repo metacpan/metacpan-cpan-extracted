@@ -1,0 +1,34 @@
+Revision history for Perl extension Lingua::JA::Expand
+
+
+0.01002  2011/7/6
+        - add some PODs. 
+
+0.01001  2011/4/15
+        - add Yahoo Japan API's premium flag
+
+0.00007  2010/11/21
+        - change Yahoo Japan API's XML URL (Version 2)
+        - use XML::LibXML::Simple instead of XML::TreePP
+
+0.00006  2009/10/15
+        - change a rule that module user must set his own 'yahoo_api_appid'.
+          ( remove default app_id 'yahooDemo')
+
+0.00005  2009/09/02
+        - fix a bug
+
+0.00004  2009/09/02
+        - performance tune ( create Lingua::JA::TFIDF object one time )
+ 
+0.00003  2008/10/30
+        - use Lingua::JA::TFIDF
+        - fix a bug (about handling of config data)
+
+0.00002  2008/10/22
+        - add raw_data() method in DataSource class.
+        - transfer config information to any object.
+        - increase NG word in Tokenizer::MeCab.
+
+0.00001  2008/10/16
+        - original version

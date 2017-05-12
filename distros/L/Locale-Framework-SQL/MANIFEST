@@ -1,0 +1,6 @@
+Changes
+lib/Locale/Framework/SQL.pm
+Makefile.PL
+MANIFEST
+README
+t/3.t

@@ -1,0 +1,40 @@
+Version 1.0 -> 1.1
+  * Removed Makefile from the MANIFEST per Graham Barr <gbarr@ti.com>
+  * Replaced test.pl with Graham Barr's <gbarr@ti.com> contributed script.
+  * Fixed an "Use of uninitialized value" warning on $UserScrewUp
+
+Version 1.1 -> 1.11 (released 12/14/1998)
+  * Bugfix in num2usdollars to fix a condition where "ONE DOLLARS" was
+    returned instead of "ONE DOLLAR"
+  * Added &num2word_short_ordinal().  This addition was the suggestion of
+    Kim Ryan <kimaryan@ozemail.com.au>.
+
+Version 1.11 -> 1.12 (released 01/19/2000)
+  * Bugfix in num2word_ordinal() which caused the function to return
+    cardinal words for values 0 through 20.  Thanks to Benjamin Franz
+    <snowhare@nihongo.org> for finding this bug and sending a patch.
+
+Version 1.12 -> 1.13 (released 10/05/2009)
+  * NOTE: There are no functional changes in this release.
+  * Changed the license to the OSI certified Artistic License.
+  * Updated my email address (all listed were out of date).
+  * Fixed verbage/verbiage misspellings in comments and variable names.
+  * Updated POD regarding "short scales" vs. "long scales" -- the
+    American thousands system versus the British millions system --
+    and changed the reference URL to a working one at Wikipedia.
+  * Refactored some code to improve the code style and readability, and
+    to address some criticisms presented by Earle Martin.
+  * Refactored test.pl a bit and added two additional test cases.
+
+Version 1.13 -> 1.14 (released 10/02/2011)
+  * Applied a small bug fix and documentation patch from Mr. Neil Bowers.
+  * Added Lingua::EN::Nums2Words::set_case() and added lowecase tests.
+
+Version 1.14 -> 1.15 (released 07/28/2016)
+  * Fixed num2word_short_ordinal() bug reported by Paul Hackett
+    - https://rt.cpan.org/Public/Bug/Display.html?id=116552
+
+Version 1.14 -> 1.15 (released 07/29/2016)
+  * No functional changes. Incremented the version number due to a
+    CPAN packaging mistake that I make in version 1.15 combined
+    with CPAN not allowing authors to overwrite previous versions.

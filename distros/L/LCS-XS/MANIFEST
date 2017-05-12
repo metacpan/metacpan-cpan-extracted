@@ -1,0 +1,44 @@
+Changes
+Makefile.PL
+MANIFEST			This list of files
+mba/allocator.c
+mba/allocator.h
+mba/bitset.h
+mba/cfg.h
+mba/csv.h
+mba/daemon.h
+mba/dbug.h
+mba/diff.c
+mba/diff.h
+mba/eval.h
+mba/hashmap.h
+mba/hexdump.h
+mba/iterator.h
+mba/linkedlist.h
+mba/misc.h
+mba/msgno.c
+mba/msgno.h
+mba/path.h
+mba/pool.h
+mba/shellout.h
+mba/stack.h
+mba/suba.c
+mba/suba.h
+mba/svcond.h
+mba/svsem.h
+mba/text.h
+mba/time.h
+mba/varray.c
+mba/varray.h
+ppport.h
+README
+README.md
+t/10_basic_lcs.t
+t/basic.t
+XS.pm
+XS.xs
+xt/50_diff_bench.t
+xt/diffBench.t
+xt/split.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

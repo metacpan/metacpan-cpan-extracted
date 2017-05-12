@@ -1,0 +1,163 @@
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lingua::JA::Name::Splitter - split a Japanese name into given and family
+
+=head1 SYNOPSIS
+
+    
+    use utf8;
+    use Lingua::JA::Name::Splitter 'split_kanji_name';
+    my ($family, $given) = split_kanji_name ('風太郎');
+    print ("$family $given\n");
+    
+
+
+produces output
+
+    風 太郎
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Lingua-JA-Name-Splitter-0.08/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents Lingua::JA::Name::Splitter version 0.08
+corresponding to git commit L<c180cc3427768338df4d1462e5ffe9e8c79c134f|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/commit/c180cc3427768338df4d1462e5ffe9e8c79c134f> released on Sat Jan 28 11:08:45 2017 +0900.
+
+This module is based on the L</Enamdict> data released on 2017-01-28.
+
+=head1 DESCRIPTION
+
+This module attempts to split the names of Japanese people into given
+and family names. 
+
+=head1 FUNCTIONS
+
+=head2 split_kanji_name
+
+    my ($family, $given) = split_kanji_name ('渡辺純子');
+
+Native Japanese writing does not use spaces, so names appear as a
+string of characters with no break. This function provides a
+"guesswork" solution for dealing with names. It is a rough guess based
+on a simple algorithm, and thus is suitable for those who need to deal
+with large numbers of names quickly. Its output is not reliable, and
+must be checked by a human.
+
+The heuristic methods used are as follows. The first character is
+assumed to be the family name's, and the last character is assumed to
+be the given name's. When there are more than two characters in the
+name, hiragana are assumed part of the given name. Kanji characters
+are weighted by distance from the beginning of the name. A dictionary
+of probabilities of family or given name kanji is also used to weight
+some characters. The name is then split at the first character which
+seems more likely to be part of the given name.
+
+=head2 split_romaji_name
+
+    my ($first, $last) = split_romaji_name ($name);
+
+Given a string containing a name of a Japanese person in romanized
+form, guess which part is the first and which part is the last name
+using the spaces, capitalization and commas in the name.
+
+Japanese people write their names in a variety of romanized formats,
+such as I<"KATSU, Shintaro">, I<"Shintaro Katsu">, I<"KATSU
+Shintaro">, or even I<"ShintaroKATSU">. This function is intended as a
+"rock breaker" for processing a large number of Japanese names in
+romanized form. Its output needs to be checked by a human.
+
+    
+    use Lingua::JA::Name::Splitter 'split_romaji_name';
+    for my $name ('KATSU, Shintaro', 'Risa Yoshiki') {
+        my ($first, $last) = split_romaji_name ($name);
+        print "$first $last\n";
+    }
+    
+
+
+produces output
+
+    Shintaro Katsu
+    Risa Yoshiki
+
+
+(This example is included as L<F<katsu-yoshiki.pl>|https://api.metacpan.org/source/BKB/Lingua-JA-Name-Splitter-0.08/examples/katsu-yoshiki.pl> in the distribution.)
+
+
+=head1 DEPENDENCIES
+
+=over
+
+=item Carp
+
+L<Carp> is used to report errors.
+
+=item Lingua::JA::Moji
+
+L<Lingua::JA::Moji> is used to process Japanese characters and detect
+romanised Japanese.
+
+=back
+
+=head1 EXPORTS
+
+Nothing is exported by default. L</split_kanji_name> and
+L</split_romaji_name> are exported on demand. An export tag C<:all>
+exports both functions.
+
+    use Lingua::JA::Name::Splitter ':all';
+
+=head1 SEE ALSO
+
+=head2 About Japanese names
+
+For people who've stumbled upon this module by accident and wonder why
+anyone would need a Japanese name splitter, see the L<Sci.lang.japan
+FAQ on Japanese
+names|http://www.sljfaq.org/afaq/names-for-people.html> or the
+L<Wikipedia page on Japanese
+names|http://en.wikipedia.org/wiki/Japanese_name>.
+
+=head2 Enamdict
+
+The Enamdict dictionary of name data used by the module is a project
+of the Electronic Dictionary Research and Development Group (EDRDG).
+Please see L<ENAMDICT/JMnedict Japanese Proper Names Dictionary
+Files|http://www.edrdg.org/enamdict/enamdict_doc.html> for full
+details.
+
+=head2 Build scripts
+
+The following build scripts are used by the module.
+
+
+
+The script which makes the dictionary, L<F<enamdict-counter.pl>|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/blob/c180cc3427768338df4d1462e5ffe9e8c79c134f/enamdict-counter.pl>, is in the module's repository, but it is not provided in the
+distribution itself. The script L<F<failures.pl>|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/blob/c180cc3427768338df4d1462e5ffe9e8c79c134f/failures.pl> counts the
+number of failed matches with Enamdict. The script L<F<test-splitter.pl>|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/blob/c180cc3427768338df4d1462e5ffe9e8c79c134f/test-splitter.pl> is used to compute a probability factor used
+in the module. The module L<F<Enamdict.pm>|https://github.com/benkasminbullock/Lingua-JA-Name-Splitter/blob/c180cc3427768338df4d1462e5ffe9e8c79c134f/Enamdict.pm> handles reading and
+parsing Enamdict.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2012-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

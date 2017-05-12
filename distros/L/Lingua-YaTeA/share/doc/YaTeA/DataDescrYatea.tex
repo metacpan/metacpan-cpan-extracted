@@ -1,0 +1,257 @@
+\section{Description of the data structures}
+\label{sec:decr-data-struct}
+In this section, we describe the objects that are handled in the
+extractor in increasing order of complexity. 
+
+\subsection{lexicon\_item} 
+\label{sec:lexentry}
+\begin{definition}[lexicon\_item]
+: a \emph{lexicon\_item} is a hash table that
+contains  information on a word of the lexicon. All the items of a
+lexicon are gathered 
+in a hash table.  Figure \ref{fig:word} shows the structure of a lexicon\_item. 
+\end{definition}
+
+\begin{itemize}
+\item \texttt{ID}: unique identifier \\(integer) 
+\item \texttt{IF}: inflected form \\(string)
+\item \texttt{POS}: part-of-speech tag\\ (string)
+\item \texttt{LF}: lemmatized form \\(string)
+\item \texttt{LENGTH}: length of the inflected form of the word in characters \\(integer) 
+\item \texttt{FREQUENCY}: number of occurences of the word in the corpus \\(integer) 
+\end{itemize}
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[scale=0.6]{entreeLex}
+  \caption{structure of a lexicon\_item}
+  \label{fig:word}
+\end{figure}
+
+The following basic structures are combined to describe a forest of syntactic trees. Figure \ref{Fig:fforest} shows the relations between such structures.
+
+\subsection{node}\label{node}\index{node!structure}
+\begin{definition}[node]
+: a \emph{node}\index{node|textbf} contains all the information that
+describe one of the two elements of a given level of a syntactic tree. A node is
+linked to potential upper and lower nodes through its FATHER and SONS fields. The node for the structure of parsing pattern is different from the others by the value assigned to the fiels HEAD, MODIFIER, PREP and DET. 
+
+\end{definition}
+
+\subparagraph{For the parsing patterns}
+
+\begin{itemize}
+\item \texttt{LEVEL}: level of the node in the tree\\
+  (integer, root= 0)
+\item \texttt{FATHER}: upper node or
+  ``Null'' if the current node is the root \\(reference to hash or string)
+\item \texttt{LEFT\_SON}: status HEAD or MODIFIER of the left
+  son\\ (string)
+\item \texttt{RIGHT\_SON}: status HEAD or MODIFIER of the
+  right son \\(string)
+\item \texttt{HEAD}: part-of-speech tag or lower
+  node\\ (string or reference to hash)
+\item \texttt{MODIFIER}:  part-of-speech tag or 
+  lower node \\(string or reference to hash)
+\item \texttt{PREP}: part-of-speech tag of kind ``PREP''  (optional)\\ (string)
+\item \texttt{DET}: part-of-speech tag of kind ``DET''  (optional)\\ (string)
+\end{itemize}
+
+\subparagraph{For the term candidates, testified terms and islands of reliability}
+
+\begin{itemize}
+\item \texttt{LEVEL}: level of the node in the tree (integer, root= 0)
+\item \texttt{FATHER}: upper node or ``Null'' if the
+  node is the root\\ (reference to hash or string)
+\item \texttt{LEFT\_SON}: status HEAD or MODIFIER of the left
+  son\\ (string)
+\item \texttt{RIGHT\_SON}: status HEAD or MODIFIER of the right son \\(string)
+\item \texttt{HEAD}: index of a word in the array of
+  WORDS or lower node\\ (integer or reference to hash)
+\item \texttt{MODIFIER}:  index of a word in
+  the array of WORDS or lower node \\(integer or reference to hash)
+\item \texttt{PREP}: index of the word of kind ``PREP''  (optional)\\ (integer)
+\item \texttt{DET}: index of the word of kind ``DET'' (optional)\\ (integer)
+\end{itemize}
+
+
+\subsection{nodes}\label{nodes}\index{nodes!structure}
+\begin{definition}[nodes]
+: \emph{nodes} is an array that contains the syntactic analysis,
+\textit{i.e.} a set of  nodes. The nodes are registered by increasing depth order, the first element of the array being the root node.
+\end{definition}
+
+\subsection{tree}\label{tree}\index{tree@tree!structure}
+\begin{definition}[tree]
+: a \emph{tree} contains all the information
+related to one possible syntactic analysis of a parsing pattern, a testified
+term, a term candidate or an island of reliability. 
+\end{definition}
+
+\begin{itemize}
+\item \texttt{NODES}: array of nodes \\ (reference to array)
+\item \texttt{TREE\_HEAD}: hash table that
+  contains the index of the word that is the syntactic head of the
+  tree (a hash table is used because there can be several heads for a tree in some specific cases
+  of coordination, which is not handled in the current version of the
+  extractor)
+\\ (reference to hash)
+\item \texttt{RELIABILITY}: degree of reliability assigned
+  to the analysis\\ (integer)
+\item \texttt{WORD\_INDEXES} : array of indexes of the words contained in the tree
+\end{itemize}
+
+
+\subsection{forest }\label{forest}\index{forest@forest!structure}
+
+\begin{definition}[forest]
+: a \emph{forest} is an array that contains
+references to one or more syntactic trees. It gives all the possible
+syntactic analyses for a testified term, a term candidate or an island
+of reliability.  
+\end{definition}
+
+\begin{center}
+ \begin{figure}[!htbp]
+ \begin{center}
+ \includegraphics[scale=0.6]{foret.pdf}
+ \caption{structure of a forest }\label{Fig:fforest}
+ \end{center}
+ \end{figure}
+ \end{center}
+
+
+\subsection{parsing pattern}\label{pattern}\index{parsing pattern@parsing pattern!structure}
+\begin{definition}[parsing pattern]
+: a \emph{parsing pattern} is a parenthesized sequence of part-of-speech tags that
+provides the structure in head-modifier components of a term. In
+\YaTeA, parsing patterns are defined for a given language and a given
+tagset in the configurable file \emph{ParsingPatterns\_LANG} where
+\emph{LANG} is the suffix for the language (\emph{EN} for English, \emph{FR} for French, \textit{etc.}).
+\end{definition}
+Figure \ref{pat} shows the structure for a parsing pattern.
+\begin{itemize}
+\item \texttt{PARSING\_PATTERN}: parsing pattern in its parenthesised
+  form as it appears in the first field (Pattern) of the declaration file\\(string)
+\item \texttt{POS\_SEQUENCE}: concatenation of the part-of-speech tags of the pattern, separated by blanks\\(string)
+\item \texttt{PRIORITY}: degree of priority of the pattern\\ (integer)
+\item \texttt{PARSING\_DIRECTION}: direction of application of a
+  pattern: leftmost (LEFT) part or rightmost (RIGHT) part of the MNP or
+  TT\\(string)
+\item \texttt{DECLARATION\_LINE}: index of the line in the declaration file for the pattern\\ (integer)
+\item \texttt{NODES}: array of nodes\\ (reference to array)
+\end{itemize}
+\begin{center}
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale=0.6]{pat_decomp}
+\caption{structure of parsing pattern }\label{pat}
+\end{center}
+\end{figure}
+\end{center}
+
+\subsection{maximal noun phrase}\index{maximal noun phrase!structure}
+\begin{definition}[maximal noun phrase]
+: a \emph{maximal noun phrase} (MNP) is the largest sequence of adjacent words that form a term candidate.  
+\end{definition}
+
+\begin{itemize}
+\item \texttt{WORDS}: array containing the references to the words of the MNP in the corpus lexicon\\ (reference to array)
+\item \texttt{IF}: inflected form of the MNP\\(string)
+\item \texttt{POS}: part-of-speech tags of the MNP\\(string)
+\item \texttt{LF}: lemmatized form of the MNP\\(string)
+\item \texttt{FREQUENCY}: number of occurences of the MNP in the corpus\\ (integer)
+\item \texttt{DOCUMENT}: array containing the index of the documents where the occurences of the MNP appear\\ (reference to array)
+\item \texttt{SENTENCE}: array containing the index of the sentences where the occurences of the MNP appear\\ (reference to array)
+\item \texttt{START\_CHAR}: array containing the index in the sentence
+  of the first character of each occurence of the MNP \\ (reference to array)
+\end{itemize}
+% \begin{center}
+% \begin{figure}[!htbp]
+% \begin{center}
+% \includegraphics[scale =0.6]{gnms.pdf}
+% \caption{structure of maximal noun phrase (MNP)}\label{gnm}
+% \end{center}
+% \end{figure}
+% \end{center}
+
+\subsection{testified term}\label{termeAtteste}\index{testified term @testified
+  term!structure}
+\begin{definition}[testified term]
+  : a \emph{testified term} is a term
+that is provided as an input and is used to perform exogenous
+disambiguation during chunking and term candidate analysis.
+\end{definition}
+%Figure \ref{Fig:TT_str} shows the structure of a testified term (TT).
+\begin{itemize}
+\item \texttt{WORDS}: array containing the references to the words of the MNP in the terminology lexicon\\ (reference to array)
+\item \texttt{IF}: inflected form of the MNP\\(string)
+\item \texttt{POS}: part-of-speech tags of the MNP\\(string)
+\item \texttt{LF}: lemmatized form of the MNP\\(string)
+\item \texttt{IS\_USED}: default value is 0, 1 if the TT is used during the extraction\\ (integer)
+\item \texttt{NEW\_PARSE}: 0 if the TT is declared with its internal
+  analysis. If the internal analysis is not provided as  an input, it is computed by the extractor and this field is set to 1. The analysis is then displayed at the end of the extraction in order to be validated.\\ (integer)
+\item \texttt{FOREST}: set of possible syntactic trees for a TT\\ (reference to array)
+\item \texttt{MISC\_INFO}: array containing miscellaneous information provided with the TT in the declaration file (for instance, the name of the original resource it is extracted from)\\ (reference to array)
+\end{itemize}
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale = 0.6]{TAtt}
+\caption{structure of testified term (TT)}\label{Fig:TT_str}
+\end{center}
+\end{figure}
+
+\subsection{term candidate}\label{TC}\index{term candidate!structure}
+\begin{definition}[term candidate]
+  : a \emph{term candidate} is a maximal noun phrase for which a
+  syntactic analysis exists. It is the result of the extraction and is
+  intended to be validated.
+\end{definition}
+%The structure of a TC is presented in Figure \ref{fct}.
+\begin{itemize}
+\item \texttt{WORDS}: array containing the references to the words of the MNP in the corpus lexicon\\ (reference to array)
+\item \texttt{IF}: inflected form of the TC\\(string)
+\item \texttt{POS}: part-of-speech tags of the TC\\(string)
+\item \texttt{LF}: lemmatized form of the TC\\(string)
+\item \texttt{FOREST}: set of possible syntactic trees for the TC\\ (reference to array)
+\item \texttt{FREQUENCY}: number of occurences of the TC in the corpus\\ (integer)
+\item \texttt{DOCUMENT}: array containing the index of the documents
+  where the occurences of the TC appear\\ (reference to array)
+\item \texttt{SENTENCE}: array containing the
+  index of the sentences where the occurences of the TC appear\\ (reference to array)
+\item \texttt{START\_CHAR}: array containing the index in the sentence
+  of the first character of each occurence of the TC \\ (reference to array)
+\item \texttt{ISLANDS}: hash table with the islands of
+  reliability found for the TC (can be empty)\\ (reference to hash)
+\end{itemize}
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale =0.6]{ct}
+\caption{structure of term candidate (TC)}\label{fct}
+\end{center}
+\end{figure}
+
+\subsection{island of reliability}\label{ILOT}\index{island of reliability@island of reliability!structure}
+\begin{definition}[island of reliability]
+: an \emph{island of reliability} is a subsequence
+(that can be broken, \textit{i.e.} non contiguous) of a term candidate. This subsequence
+corresponds to a testified term or an entire term candidate that was
+analysed in the first step of the analysis using the parsing
+patterns. This subsequence along with its internal analysis is used as
+an anchor in the parsing of the entire term candidate.
+\end{definition}
+The structure of an island of reliability is shown in Figure \ref{filot}.
+\begin{itemize}
+\item \texttt{WORD\_INDEXES}: array of indexes of the words in the array WORDS of the MNP that form it\\ (reference to array)
+\item \texttt{FOREST}: set of possible syntactic trees for the island\\ (reference to array)
+\item \texttt{IS\_UNBROKEN}: index of contiguity of an island: 1 if all the words of the island are contiguous in the MNP, 0 if not\\ (integer)
+\end{itemize}
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[scale =0.6]{ilot}
+\caption{structure of an island of reliability}\label{filot}
+\end{center}
+\end{figure}

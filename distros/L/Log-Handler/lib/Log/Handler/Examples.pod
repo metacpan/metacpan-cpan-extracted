@@ -1,0 +1,494 @@
+=head1 NAME
+
+Log::Handler::Examples - Examples.
+
+=head1 CREATE LOGGER
+
+Quite simple
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+    $log->add( screen => \%options );
+
+Create a application wide logger
+
+    my $log = Log::Handler->create_logger("myapp");
+    $log->add( screen => \%options );
+
+Once created you can use the application logger in all
+modules of your project:
+
+    package MyApp;
+    use Log::Handler;
+
+    my $log = Log::Handler->create_logger("myapp");
+    $log->add( screen => \%options );
+
+    package MyApp::Admin;
+    use Log::Handler;
+
+    my $log = Log::Handler->get_logger("myapp");
+    $log->info("message");
+
+=head1 ADD OUTPUTS
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+
+    $log->add( dbi     => \%options );
+    $log->add( email   => \%options );
+    $log->add( file    => \%options );
+    $log->add( forward => \%options );
+    $log->add( screen  => \%options );
+    $log->add( socket  => \%options );
+
+This is the same like
+
+    $log->add( "Log::Handler::Output::DBI"     => \%options );
+    $log->add( "Log::Handler::Output::Email"   => \%options );
+    $log->add( "Log::Handler::Output::File"    => \%options );
+    $log->add( "Log::Handler::Output::Forward" => \%options );
+    $log->add( "Log::Handler::Output::Screen"  => \%options );
+    $log->add( "Log::Handler::Output::Socket"  => \%options );
+
+=head1 RELOAD THE LOGGER
+
+=head2 Quite simple
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+
+    $log->config(config => "logger.conf");
+
+    $log->reload(config => "logger.conf");
+
+=head2 Reload on HUP
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+
+    $log->config(config => "logger.conf");
+
+    $SIG{HUP} = sub {
+        unless ($log->reload(config => "logger.conf")) {
+            warn "unable to reload configuration";
+            warn $log->errstr;
+        }
+    };
+
+=head2 Validate first
+
+It's possible to make a configuration check before you reload:
+
+    $log->validate(config => "logger.conf")
+        or warn $log->errstr;
+
+=head1 LOG VIA DBI
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+
+    $log->add(
+        dbi => {
+            database   => "database",
+            driver     => "mysql",
+            host       => "127.0.0.1",
+            port       => 3306,
+            user       => "user",
+            password   => "password",
+            table      => "messages",
+            columns    => [ qw/level ctime cdate pid hostname caller progname mtime message/ ],
+            values     => [ qw/%level %time %date %pid %hostname %caller %progname %mtime %message/ ],
+            maxlevel   => "error",
+            minlevel   => "emergency"
+            newline    => 0,
+            message_pattern => "%L %T %D %P %H %C %S %t %m",
+        }
+    );
+
+    $log->error("log an error");
+
+Or with C<dbname>
+
+    $log->add(
+        dbi => {
+            dbname     => "database",
+            driver     => "Pg",
+            host       => "127.0.0.1",
+            port       => 5432,
+            user       => "user",
+            password   => "password",
+            table      => "messages",
+            columns    => [ qw/level ctime cdate pid hostname caller progname mtime message/ ],
+            values     => [ qw/%level %time %date %pid %hostname %caller %progname %mtime %message/ ],
+            maxlevel   => "error",
+            minlevel   => "emergency"
+            newline    => 0,
+            message_pattern => "%L %T %D %P %H %C %S %t %m",
+        }
+    );
+
+Or with C<data_source>
+
+    $log->add(
+        dbi => {
+            data_source => "dbi:SQLite:dbname=database.sqlite",
+            table       => "messages",
+            columns     => [ qw/level ctime cdate pid hostname caller progname mtime message/ ],
+            values      => [ qw/%level %time %date %pid %hostname %caller %progname %mtime %message/ ],
+            maxlevel    => "error",
+            minlevel    => "emergency"
+            newline     => 0,
+            message_pattern => "%L %T %D %P %H %C %S %t %m",
+        }
+    );
+
+=head1 LOG VIA EMAIL
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+
+    $log->add(
+        email => {
+            host     => "mx.bar.example",
+            hello    => "EHLO my.domain.example",
+            timeout  => 30,
+            from     => "bar@foo.example",
+            to       => "foo@bar.example",
+            subject  => "your subject",
+            buffer   => 0,
+            maxlevel => "emergency",
+            minlevel => "emergency",
+            message_pattern => '%L',
+        }
+    );
+
+    $log->emergency("log an emergency issue");
+
+=head1 LOG VIA SENDMAIL
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+
+    $log->add(
+        sendmail => {
+            from     => "bar@foo.example",
+            to       => "foo@bar.example",
+            subject  => "your subject",
+            maxlevel => "error",
+            minlevel => "error",
+            message_pattern => '%L',
+        }
+    );
+
+    $log->emergency("message");
+
+=head1 LOG VIA FILE
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+
+    $log->add(
+        file => {
+            filename => "file1.log",
+            maxlevel => 7,
+            minlevel => 0
+        }
+    );
+
+    $log->error("log an error");
+
+=head1 LOG VIA FORWARD
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+
+    $log->add(
+        forward => {
+            forward_to      => \&my_func,
+            message_pattern => [ qw/%L %T %P %H %C %S %t/ ],
+            message_layout  => "%m",
+            maxlevel        => "info",
+        }
+    );
+
+    $log->info("log a information");
+
+    sub my_func {
+        my $params = shift;
+        print Dumper($params);
+    }
+
+=head1 LOG VIA SCREEN
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+
+    $log->add(
+        screen => {
+            log_to   => "STDERR",
+            maxlevel => "info",
+        }
+    );
+
+    $log->info("log to the screen");
+
+=head1 LOG VIA SOCKET
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+
+    $log->add(
+        socket => {
+            peeraddr => "127.0.0.1",
+            peerport => 44444,
+            maxlevel => "info",
+            die_on_errors => 0,
+        }
+    );
+
+    while ( 1 ) {
+        $log->info("test")
+            or warn "unable to send message: ", $log->errstr;
+        sleep 1;
+    }
+
+=head2 SIMPLE SOCKET SERVER (TCP)
+
+    use strict;
+    use warnings;
+    use IO::Socket::INET;
+    use Log::Handler::Output::File;
+
+    my $sock = IO::Socket::INET->new(
+        LocalAddr => "127.0.0.1",
+        LocalPort => 44444,
+        Listen    => 2,
+    ) or die $!;
+
+    my $file = Log::Handler::Output::File->new(
+        filename => "file.log",
+        fileopen => 1,
+        reopen   => 1,
+    );
+
+    while ( 1 ) {
+        $file->log(message => "waiting for next connection\n");
+
+        while (my $request = $sock->accept) {
+            my $ipaddr = sprintf("%-15s", $request->peerhost);
+            while (my $message = <$request>) {
+                $file->log(message => "$ipaddr - $message");
+            }
+        }
+    }
+
+=head1 DIFFERENT OUTPUTS
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+
+    $log->add(
+        file => {
+            filename => "common.log",
+            maxlevel => 6,
+            minlevel => 5,
+        }
+    );
+
+    $log->add(
+        file => {
+            filename => "error.log",
+            maxlevel => 4,
+            minlevel => 0,
+        }
+    );
+
+    $log->add(
+        email => {
+            host     => "mx.bar.example",
+            hello    => "EHLO my.domain.example",
+            timeout  => 120,
+            from     => "bar@foo.example",
+            to       => "foo@bar.example",
+            subject  => "your subject",
+            buffer   => 0,
+            maxlevel => 0,
+        }
+    );
+
+    # log to common.log
+    $log->info("this is a info message");
+
+    # log to error.log
+    $log->warning("this is a warning");
+
+    # log to error.log and to foo@bar.example
+    $log->emergency("this is a emergency message");
+
+=head1 FILTER MESSAGES
+
+    my $log = Log::Handler->new();
+
+    $log->add(
+        screen => {
+            maxlevel => 6,
+            filter_message => {
+                match1    => "foo",
+                match2    => "bar",
+                match3    => "baz",
+                condition => "(match1 && match2) && !match3"
+            }
+        }
+    );
+
+    $log->info("foo");
+    $log->info("foo bar");
+    $log->info("foo baz");
+
+=head2 FILTER CALLER
+
+This example shows you how it's possilbe to debug messages
+only from a special namespace.
+
+    my $log = Log::Handler->new();
+
+    $log->add(
+        file => {
+            filename => "file1.log",
+            maxlevel => "warning",
+        }
+    );
+
+    $log->add(
+        screen => {
+            maxlevel => "debug",
+            message_layout => "message from %p - %m",
+            filter_caller  => qr/^Foo::Bar\z/,
+        }
+    );
+
+    $log->warning("a warning here");
+
+    package Foo::Bar;
+    $log->info("an info here");
+    1;
+
+=head2 ANOTHER FILTER
+
+    filter_message => "as string"
+
+    filter_message => qr/as regexp/
+
+    filter_message => sub { shift->{message} =~ /as code ref/ }
+
+    # or with conditions
+
+    filter_message => {
+        match1    => "as string",
+        match2    => qr/as regexp/,
+        condition => "match1 || match2",
+    }
+
+    filter_caller => "as string"
+
+    filter_caller => qr/as regexp/
+
+=head1 CONFIG
+
+Examples:
+
+    my $log = Log::Handler->new( config => "logger.conf" );
+
+    # or
+
+    $log->add( config => "logger.conf" );
+
+    # or
+
+    $log->config( config => "logger.conf" );
+
+Example with Config::General.
+
+Script:
+
+    use Log::Handler;
+
+    my $log = Log::Handler->new();
+
+    $log->config( config => "logger.conf" );
+
+Config (logger.conf):
+
+    <file>
+        alias    = common
+        filename = example.log
+        maxlevel = info
+        minlevel = warn
+    </file>
+
+    <file>
+        alias    = error
+        filename = example-error.log
+        maxlevel = warn
+        minlevel = emergency
+    </file>
+
+    <file>
+        alias    = debug
+        filename = example-debug.log
+        maxlevel = debug
+        minlevel = debug
+    </file>
+
+    <screen>
+        log_to   = STDERR
+        dump     = 1
+        maxlevel = debug
+        minlevel = debug
+    </screen>
+
+=head1 CHECK FOR ACTIVE LEVELS
+
+It can be very useful if you want to check if a level is active.
+
+    use Log::Handler;
+    use Data::Dumper;
+
+    my $log = Log::Handler->new();
+
+    $log->add(
+        file => {
+            filename   => "file1.log",
+            maxlevel   => 4,
+        }
+    );
+
+    my %hash = (foo => 1, bar => 2);
+
+Now you want to dump the hash, but not in any case.
+
+    if ( $log->is_debug ) {
+        my $dump = Dumper(\%hash);
+        $log->debug($dump);
+    }
+
+This would dump the hash only if the level debug is active.
+
+=head1 AUTHOR
+
+Jonny Schulz <jschulz.cpan(at)bloonix.de>.
+
+=cut

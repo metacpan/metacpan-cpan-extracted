@@ -1,0 +1,9 @@
+Changes
+lib/Log/Dispatch/ZMQ.pm
+Makefile.PL
+MANIFEST
+README
+t/Log-Dispatch-ZMQ-send.t
+t/Log-Dispatch-ZMQ.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

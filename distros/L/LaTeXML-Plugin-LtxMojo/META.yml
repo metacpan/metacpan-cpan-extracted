@@ -1,0 +1,25 @@
+---
+abstract: "ltxMojo - LaTeXML's web service"
+author:
+  - 'Deyan Ginev <d.ginev@jacobs-university.de>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: LaTeXML-Plugin-LtxMojo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Zip: 0
+  IO::String: 0
+  LaTeXML: v0.8.0
+  Mojolicious: 5.0
+version: 0.4

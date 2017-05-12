@@ -1,0 +1,379 @@
+---
+abstract: '(DEPRECATED) Provide GHTTP support for L<LWP::UserAgent> via L<HTTP::GHTTP>.'
+author:
+  - 'Gisle Aas <gisle@activestate.com>'
+build_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  HTTP::Daemon: '6.0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-Protocol-GHTTP
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  LWP::Protocol::GHTTP:
+    file: lib/LWP/Protocol/GHTTP.pm
+    version: '6.17'
+requires:
+  Carp: '0'
+  HTTP::GHTTP: '1.07'
+  HTTP::Message: '6.0'
+  LWP::UserAgent: '6.15'
+  Try::Tiny: '0.24'
+  base: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC: irc://irc.perl.org/#lwp
+  MailingList: mailto:libwww@perl.org
+  bugtracker: https://github.com/libwww-perl/lwp-protocol-ghttp/issues
+  homepage: https://github.com/libwww-perl/lwp-protocol-ghttp
+  repository: https://github.com/libwww-perl/lwp-protocol-ghttp.git
+version: '6.17'
+x_Dist_Zilla:
+  perl:
+    version: '5.024000'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename:
+            - META.json
+            - Makefile.PL
+            - README.md
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
+      name: '@Starter/GatherDir'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Starter/PruneCruft'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Starter/ManifestSkip'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Starter/MetaConfig'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.008'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000031'
+          version: '0.004'
+      name: '@Starter/MetaProvides::Package'
+      version: '2.004002'
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: '@Starter/MetaNoIndex'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Starter/MetaYAML'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Starter/MetaJSON'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Starter/License'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: '@Starter/ReadmeAnyFromPod'
+      version: '0.163250'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Starter/ExecDir'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Starter/ShareDir'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Starter/PodSyntaxTests'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Test::ReportPrereqs
+      name: '@Starter/Test::ReportPrereqs'
+      version: '0.025'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Starter/MakeMaker'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Starter/Manifest'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Starter/TestRelease'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Starter/RunExtraTests'
+      version: '0.029'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Starter/ConfirmRelease'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Starter/UploadToCPAN'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: Markdown_Readme
+      version: '0.163250'
+    -
+      class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
+      name: Prereqs::FromCPANfile
+      version: '0.08'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: NextRelease
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          'git --version': 2.8.3
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: Git::Contributors
+      version: '0.029'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.54'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          'git --version': 2.8.3
+          repo_root: .
+      name: '@Git/Check'
+      version: '2.041'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%v%n%n%c
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          'git --version': 2.8.3
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Git/Commit'
+      version: '2.041'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: v6.17
+          tag_format: v%v
+          tag_message: v%v
+        Dist::Zilla::Role::Git::Repo:
+          'git --version': 2.8.3
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Git/Tag'
+      version: '2.041'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          'git --version': 2.8.3
+          repo_root: .
+      name: '@Git/Push'
+      version: '2.041'
+    -
+      class: Dist::Zilla::Plugin::Deprecated
+      config:
+        Dist::Zilla::Plugin::Deprecated:
+          all: 1
+          modules: []
+      name: Deprecated
+      version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::CheckChangeLog
+      name: CheckChangeLog
+      version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: CheckChangesHasContent
+      version: '0.010'
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: Test::ChangesHasContent
+      version: '0.010'
+    -
+      class: Dist::Zilla::Plugin::Test::Kwalitee
+      config:
+        Dist::Zilla::Plugin::Test::Kwalitee:
+          filename: xt/release/kwalitee.t
+          skiptest: []
+      name: Test::Kwalitee
+      version: '2.12'
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: Test::Version
+      version: '1.09'
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
+      name: Test::Pod::Coverage::Configurable
+      version: '0.06'
+    -
+      class: Dist::Zilla::Plugin::Test::PodSpelling
+      config:
+        Dist::Zilla::Plugin::Test::PodSpelling:
+          directories:
+            - bin
+            - lib
+          spell_cmd: 'aspell list'
+          stopwords:
+            - libghttp
+          wordlist: Pod::Wordlist
+      name: Test::PodSpelling
+      version: '2.007004'
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromBuild
+      name: CopyFilesFromBuild
+      version: '0.163040'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.008'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '6.008'
+x_contributors:
+  - 'Chase Whitener <capoeirab@cpan.org>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+x_deprecated: 1
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,56 @@
+#!/usr/bin/perl -CIO
+
+use POSIX qw(locale_h);
+setlocale(&POSIX::LC_ALL, "pt_PT");
+use locale;
+
+use jspell;
+use Lingua::PT::ProperNames;
+use strict;
+
+my $pt_dict = jspell::new("port");
+my $en_dict = jspell::new("eng");
+
+my %pnlist=();
+my %pnlistD=();
+
+my $file = shift;
+my $tab = do("tagPnTable"); die("$!$@\n") if ($! or $@);
+
+forPN({in=>$file, sep=>'>', 
+       ## out=>"filename.out", 
+       t=>"double"}, \&procPn,\&procPn2);
+
+sub procPn{my $a=shift;
+    if($a =~ /(\w+)/){
+         my $f=$1;
+         my @a=$pt_dict->fea($f);
+         my %b = onethat({CAT => "np"}, @a);
+         if(%b){if (defined $b{SEM}){"<pn t='$b{SEM}'>$a</pn>"}
+                else                {"<pn t='np??'>$a</pn>"}}
+         elsif(defined $tab->{$f})  {"<pn t='$tab->{$f}'>$a</pn>"}
+         else {
+            @a = $en_dict->fea($f);
+            %b = onethat({CAT => "np"}, @a);
+            if(%b){if (defined $b{SEM}){"<pn L='en' t='$b{SEM}'>$a</pn>"}
+                   else {print STDERR "?? ",n($a)," -- english but no SEM\n";
+                         "<pn t='np??'>$a</pn>"}}
+            else { print STDERR "?? $a is undefined\n";
+               "<pn t='?'>$a</pn>"}}}
+    else {"<pn t='??'>$a</pn>"}
+}
+
+sub procPn2{my $a=shift;
+    if($a =~ /(\w+)/){
+         my @a=$pt_dict->fea($1);
+         my %b = onethat({CAT => "np"}, @a);
+         if(%b || scalar @a == 0){procPn($a)}
+         else{ undef ;}}
+    else {"<pn t='???'>$a</pn>"}
+}
+
+sub n{ my $a=shift;
+ $a =~ s/\s+/ /g;
+ $a =~ s/^ | $//g;
+ $a;
+}

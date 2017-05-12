@@ -1,0 +1,40 @@
+#########################################################################
+#
+# $Id: selects.txt,v 1.1 2006/01/07 23:50:44 pkaluski Exp $
+# $Name: Stable_0_16 $
+#
+# $Log: selects.txt,v $
+# Revision 1.1  2006/01/07 23:50:44  pkaluski
+# Unit test for new tool chain implemented. Session manager not needed any more.
+#
+#
+#########################################################################
+
+name: authors 
+select: select * from authors
+%%
+name: editors 
+select: select * from editors where --ed_fname-- 
+%%
+name: publishers
+select: select * from publishers where --pub_id-- 
+%%
+name: roysched
+select: select * from roysched where --title_id--
+%%
+name: sales
+select: select * from sales where --stor_id--
+%%
+name: salesdetails
+select: select * from salesdetails where --sonum-- and --title_id-- 
+%%
+name: titleauthors
+select: select * from titleauthors where --title_id-- 
+%%
+name: titleditors
+select: select * from titleditors where --ed_id-- or --title_id-- 
+%%
+name: titles
+select: select * from titles where --title--
+%%
+

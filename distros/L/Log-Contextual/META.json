@@ -1,0 +1,56 @@
+{
+   "abstract" : "Simple logging interface with a contextual log",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Log-Contextual",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper::Concise" : "0",
+            "Exporter::Declare" : "0.111",
+            "Moo" : "1.003",
+            "Scalar::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/frioux/Log-Contextual/issues"
+      },
+      "homepage" : "https://github.com/frioux/Log-Contextual",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frioux/Log-Contextual.git",
+         "web" : "https://github.com/frioux/Log-Contextual"
+      }
+   },
+   "version" : "0.007000"
+}
+

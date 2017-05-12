@@ -1,0 +1,88 @@
+0.14    2017-02-07
+
+- Re-release after git pull of some changes.
+
+
+0.13    2017-02-07
+
+- The docs for the subs from List::UtilsBy were repeated twice. Reported by
+  Andy Lester. RT #120123.
+
+
+0.12    2016-10-16
+
+- Nothing from List::UtilsBy was actually being exported, because of a typo
+  and a lack of testing. Reported by Greg Oschwald. GitHub #5.
+
+
+0.11    2016-06-26
+
+- Added List::UtilsBy to the list of included modules. Based on a patch from
+  Yanick Champoux. GH #3.
+
+
+0.10    2016-05-08
+
+- Switched from List::MoreUtils to List::SomeUtils. This should not change any
+  functionality of the module.
+
+- Make the test for subroutine redefined warnings much more
+  specific. Previously tests could fail because of totally unrelated warnings
+  from other modules. Reported by ribasushi. RT #113740.
+
+
+0.09    2014-10-05
+
+- Clarify which of List::Util and List::MoreUtils wins when they both provide
+  the same function. Requested by Karen Etheridge. RT #98560.
+
+
+0.08    2014-04-01
+
+- This version now works with both List::MoreUtils 0.28-0.33 and the latest
+  trial version, 0.400_006. Note that it does not work with earlier versions
+  of 0.400.
+
+
+0.07    2013-10-14
+
+- The last version totally broke all exports from List::MoreUtils. Now there
+  are actual tests for this. Reported by Tatsuhiko Miyagawa. RT #89509.
+
+
+0.06    2013-10-14
+
+- List::Util 1.33 provides some subs that are also provided by
+  List::MoreUtils. This caused subroutine redefeined warnings. List::AllUtils
+  now only imports subs from List::MoreUtils that aren't defined by
+  List::Util. This works with List::Util 1.31+. Reported by Zefram. RT #89467.
+
+
+0.05    2013-08-30
+
+- Really require List::Util 1.31, instead of just saying so in the
+  Changes. Reported by Przemysław Wesołek. RT #88296
+
+
+0.04    2013-08-25
+
+- Updated to require List::Util 1.31, which includes a bunch of new pairwise
+  functions.
+
+
+0.03    2012-02-21
+
+- Updated docs to match List::MoreUtils 0.28+. Reported by ilmari. RT #75196.
+
+
+0.02   2009-09-12
+
+- Added a generated Makefile.PL. Fixes RT #48805.
+
+- Code tweak so that this module will always export everything exported by
+  List::Util, even if that module adds new functions.
+
+
+0.01   2009-01-23
+
+- First version, released on an unsuspecting world.

@@ -1,0 +1,256 @@
+=head1 NAME
+
+Leyland::Manual::Views - Using Leyland view classes
+
+=head1 RESOURCES AND REPRESENTATIONS
+
+RESTful applications are all about resources and representations. Resources
+are what your application provides to the users. Representations are the
+way/format in which these resources are provided to the users. If your
+application is a blogging platform, then (some of) your resources are blog posts/articles.
+These articles can be represented in different ways, mostly HTML when the
+clients are web browsers, but also RSS/Atom when your clients are
+feed readers and maybe even JSON if your platform has some cool AJAX admin
+interface to it.
+
+=head1 DATA SERIALIZATION
+
+Before we approach the subject of views, you should know about Leyland's
+serialization features. Serialization is the process of taking a data structure
+(a Perl data structure in this case) and converting it into a textual format
+such as XML or JSON. The reverse process is called deserialization.
+
+Leyland takes care of both processes by itself. If you have resources for
+which you wish to generate JSON/XML representations, all you need to do
+is define the routes that return these representations as returning those
+formats (with C<returns 'applications/json'> for example, see L<Leyland::Manual::Controllers/"ROUTES">
+for more information), and just return the data structure as-is from the
+route. If the client accepts JSON/XML, Leyland will recognize it and automatically
+serialize the data structure to the proper format and return that to the
+client.
+
+When a client sends your application JSON/XML data, Leyland can (and will,
+unless you explicitly tell it not to) deserialize the data into a Perl
+data structure, which will be available for you via C<< $c->data >>.
+
+If you need finer control over JSON/XML representations, you can still
+use views, which are explained in the following section.
+
+=head1 VIEWS
+
+Views, or templates if you will, are used to build representations. With L<Leyland>,
+you mostly only need to concern yourself with HTML representations,
+though you can create views for XML or JSON or pretty much anything else
+if you so wish.
+
+So a view is, basically, a "blank" representation of a certain resource family or type,
+minus the actual content. When sending a specific resource to a client,
+say a blog article, the content of the article is rendered into the view/template,
+and the output is returned to the client.
+
+Views in a Leyland application reside in the C<views/> directory, located in the top level
+of the application (unless configured otherwise in the C<setup()> method - see L<Leyland::Manual::Applications/"CONFIGURING LEYLAND APPLICATIONS"> for more information).
+In this directory, you might have files like C<article.html>, C<comment.html>, etc.
+
+The code that actually performs the rendering of a representation is the
+template engine, such as L<Tenjin>, L<Template::Toolkit>, L<HTML::Mason>,
+etc. Your view files/templates will be written in the languages of these
+templates, so you should familiarize yourself with the template engine
+of your choice (which is a lie, since Leyland currently only supports
+L<Tenjin>, so you should familiarize yourself with Tenjin; this will change
+in the future, however).
+
+If you're experienced with views and templates, you'd know that different
+resources are almost always rendered inside the same wrapping layout view.
+Layout views are stored in the C<views/layouts/> subdirectory. By default,
+when rendering HTML templates, the C<main.html> layout will be used.
+
+Let's look at a simple example:
+
+	# views/index.html
+	<h1>Hello World</h1>
+
+	# views/layouts/main.html
+	<html>
+		<head><title>Hi there</title></head>
+		<body>[== $_content =]</body>
+	</html>
+
+When a controller renders C<index.html> for output, C<index.html>'s content will
+replace C<[== $_content =]> inside C<layouts/main.html> (this is
+Tenjin specific, other template engines will be different), and the final
+output will be:
+
+	<html>
+		<head><title>Hi there</title></head>
+		<body><h1>Hello World</h1></body>
+	</html>
+
+=head1 RENDERING VIEWS
+
+Rendering views with Leyland is easy. If a certain route only returns
+HTML, you can call the C<template()> method at the end of your route:
+
+	get '^/$' {
+		$c->template('index.html');
+	}
+
+C<template()> takes the name of a template to render, performs the rendering
+and returns the resulting HTML. since the call to C<template()> above is
+the last thing performed in the route, its output will be returned from
+the route. Of course, most templates won't be static like the above example,
+but dynamic like the following example:
+
+	<h1>Hello [== $name =]</h1>
+
+In order to render this template, you need to provide the C<$name> variable.
+There are two ways to pass variables to templates: direct passing, and
+stash passing. The stash is a hash-ref that resides in the context object.
+You can add items to it whenever you wish (before rendering):
+
+	$c->stash->{name} = "Michael";
+	$c->template('index.html');
+
+This is very similar to L<Catalyst>. However, Leyland also gives you the
+ability to pass variables like in L<Dancer>, directly in the call to the
+C<template()> method, like so:
+
+	$c->template('index.html', { name => "Michael" });
+
+You can also combine the two:
+
+	$c->stash->{email} = 'michael at gmail dot com';
+	$c->template('index.html', { name => 'Michael' });
+
+Both C<$email> and C<$name> will be available inside C<index.html>. If,
+however, you pass the same variable twice via both methods, the direct
+method takes precedence:
+
+	$c->stash->{name} = 'Michael';
+	$c->template('index.html', { name => 'Johnny' });
+
+In this case, C<$name> will be "Johnny" in C<index.html>.
+
+=head2 THE LAYOUT TEMPLATE
+
+As written before, by default, Leyland renders views into the C<main.html>
+layout template. If you don't want Leyland to do that, pass C<0> (zero)
+as the third argument to the C<template()> method:
+
+	$c->template('index.html', { name => 'Michael' }, 0);
+
+If you're not passing any variables and still need to pass the 0 flag, do this:
+
+	$c->template('index.html', {}, 0);
+
+If you do want to render into a layout template, but not into the default
+layout template, there are several ways to do that which are very specific
+to Tenjin. I will only detail one of them (which I intend to make consistent
+with other template engines when they become available in Leyland): just
+pass the name of the layout template as the third argument to the
+C<template()> method (where we passed 0 just now):
+
+	$c->template('index.html', {}, 'layouts/my_layout.html');
+
+=head2 MULTIFORMAT ROUTES
+
+What should you do when a route of yours returns both HTML and other formats
+like JSON? You can't just use the C<template()> method, as this will cause
+the clients to receive HTML even when they expect JSON. You can go the
+C<if> route and check what the client wants like this:
+
+	if ($c->want eq 'text/html') {
+		return $c->template('index.html', { article => $article });
+	} elsif ($c->want eq 'application/json') {
+		return $article; # will be automatically serialized
+	}
+
+But Leyland also gives you another option which is easier: you can return
+an array reference with the following structure:
+
+	return [ \%mimes, \%context, $use_layout ];
+
+C<\%mimes> will be a hash-ref with mime types as keys, and the names of
+templates for every mime type as values. C<\%context> holds the variables
+to pass to the templates (or the data structure to serialize). C<$use_layout>
+is optional and is exactly the same as the third argument to C<< $c->template() >>.
+
+For example:
+
+	return [{ 'text/html' => 'index.html' }, $article, 'layouts/my_layout.html'];
+
+When the client wants HTML, Leyland will render the C<index.html> template,
+with the C<$article> hash-ref as the template's context, and into the
+C<layouts/my_layout.html> layout template. If the client wants JSON or
+XML, Leyland will automatically serialize C<$article> to that format.
+
+If, for some reason, you want to render a template of another format,
+like JSON perhaps, add an C<application/json> option to the C<\%mimes>
+hash-ref.
+
+=head2 OBJECTS AND NON-JSON/XML FORMATS
+
+When your routes return Perl data structures, they are expected to be
+hash or array references and should not contain blessed values (i.e. objects),
+though JSON representations will support objects, assuming they are of
+classes that provide a C<TO_JSON()> method.
+
+If a route returns a format that Leyland doesn't natively support, like
+YAML for example, then it is your responsibility to serialize to it, as Leyland
+will not do it for you. Please do so, as Leyland will stubbornly try to encode
+it to JSON otherwise.
+
+=head1 WHAT'S NEXT?
+
+Read L<Leyland::Manual::Models> now to learn how to use and create model classes
+or L<return to the table of contents|Leyland::Manual/"TABLE OF CONTENTS">.
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Leyland at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Leyland::Manual::Views
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Leyland>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Leyland>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Leyland/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

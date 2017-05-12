@@ -1,0 +1,16 @@
+Build.PL
+CHANGELOG.md
+lib/Log/Agent/File/Rotate.pm
+lib/Log/Agent/Rotate.pm
+MANIFEST			This list of files
+README
+t/badconf.t
+t/code.pl
+t/hole.t
+t/mixed.t
+t/normal.t
+t/perm.t
+t/rename.t
+Makefile.PL
+META.yml
+META.json

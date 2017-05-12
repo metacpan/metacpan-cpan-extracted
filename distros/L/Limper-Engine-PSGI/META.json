@@ -1,0 +1,58 @@
+{
+   "abstract" : "PSGI engine for Limper",
+   "author" : [
+      "Ashley Willis <ashley+perl@gitable.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Limper-Engine-PSGI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Limper" : "0.013",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "HTTP::Request" : "0",
+            "Plack::Test" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Limper::Engine::PSGI" : {
+         "file" : "lib/Limper/Engine/PSGI.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "ssh://git@gitable.org/ashley/limper-engine-psgi.git"
+      }
+   },
+   "version" : "0.003"
+}
+

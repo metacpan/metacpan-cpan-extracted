@@ -1,0 +1,6 @@
+Revision history for Perl extension Linux::Pdeathsig.
+
+0.00_01  Thu Jun 10 17:26:38 2010
+	- original version; created by h2xs 1.23 with options
+		-B -n Linux::Pdeathsig sys/prctl.h
+

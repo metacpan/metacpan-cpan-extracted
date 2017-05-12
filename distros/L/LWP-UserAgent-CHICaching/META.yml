@@ -1,0 +1,57 @@
+---
+abstract: 'LWP::UserAgent with caching based on CHI'
+author:
+  - 'Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>'
+build_requires:
+  LWP::Protocol::PSGI: '0'
+  Plack::Request: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-UserAgent-CHICaching
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  LWP::UserAgent::CHICaching:
+    file: lib/LWP/UserAgent/CHICaching.pm
+    version: '0.04'
+  LWP::UserAgent::Role::CHICaching:
+    file: lib/LWP/UserAgent/Role/CHICaching.pm
+    version: '0.04'
+  LWP::UserAgent::Role::CHICaching::SimpleKeyGen:
+    file: lib/LWP/UserAgent/Role/CHICaching/SimpleKeyGen.pm
+    version: '0.04'
+  LWP::UserAgent::Role::CHICaching::SimpleMungeResponse:
+    file: lib/LWP/UserAgent/Role/CHICaching/SimpleMungeResponse.pm
+    version: '0.04'
+  LWP::UserAgent::Role::CHICaching::VaryNotAsterisk:
+    file: lib/LWP/UserAgent/Role/CHICaching/VaryNotAsterisk.pm
+    version: '0.04'
+requires:
+  CHI: '0'
+  LWP::UserAgent: '0'
+  Moo: '1.006000'
+  Types::Standard: '0'
+  Types::URI: '0'
+  perl: '5.006000'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/project
+  bugtracker: https://github.com/kjetilk/p5-lwp-useragent-chicaching/issues
+  homepage: https://metacpan.org/release/LWP-UserAgent-CHICaching
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/kjetilk/p5-lwp-useragent-chicaching.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

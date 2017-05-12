@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Language/Dashrep.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/dashrep_test.t
+Makefile.PL
+META.yml
+META.json

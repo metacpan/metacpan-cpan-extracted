@@ -1,0 +1,39 @@
+Revision history for Perl extension Lingua::JA::Regular
+
+0.09 Tue Nov 28 20:56:50 2006
+    * [Fixed bug] Jcode 2.x(use Encode mode) doesn't operate. 
+    * win, mac methods is first run in regular.
+
+0.08 Tue Jan 27 16:41:53 2004
+    * [Fixed bug] lc -> CORE::lc, uc -> CORE::uc
+      (Thanks to Tatsuhiko Miyagawa)
+
+0.07 Fri Sep 26 17:14:21 2003
+    * [Fixed bug] KATAKANA, HIRAGANA update / deserted character("WO", "PU") 
+    - Lingua::JA::Regular::Table(0.04)
+      (Thanks to Yukiyasu Suda)
+
+0.06 Thu Jul 17 11:51:23 2003
+    * [Fixed bug] CHARACTER_UNDEF_REGEX update
+    - Lingua::JA::Regular::Table(0.03)
+    * [Fixed bug] geta, binay code was not well convertible.
+    * [Fixed POD] Windos -> Windows.  (Thanks to Ryo Okamoto)
+
+0.05  Wed May  7 11:27:41 2003
+    * [Fixed bug] Lingua::JA::Regular::Table there was no
+      "double consonant (in Japanese[SOKUON-MOJI])", it adds.
+    - Lingua::JA::Regular::Table(0.02)
+
+0.04  Fri May  2 16:36:53 2003
+    * Execution of the method  mac() and win() in regular().
+
+0.03  Sun Mar  2 16:45:55 2003
+    * Added to Lingua::JA::Regular::Table::Kanji
+    - Lingua::JA::Regular::Table::Kanji(0.02)
+
+0.02  Thu Feb 27 18:33:59 2003
+    * [Fixed bug] it becomes an error by Perl 5.005_03.
+      (Thanks to Tatsuhiko Miyagawa)
+
+0.01  Thu Feb 27 12:12:38 2003
+    * original version

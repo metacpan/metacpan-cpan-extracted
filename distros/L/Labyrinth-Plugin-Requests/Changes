@@ -1,0 +1,43 @@
+Changes for the Labyrinth-Plugin-Requests
+=========================================
+
+1.08	2015-03-20
+        - switch to using ParamCheck.
+        - upgraded to Labyrinth-5.32.
+        - added missing test prequisite.
+
+1.07	2015-03-18
+        - added more tests around deletion.
+        - added tests for SecureSelect & SecureName.
+
+1.06	2015-03-17
+        - extended functional test suite.
+        - added requestid to request table.
+        - updated phrasebook SQL.
+        - remove redundant option code from delete method.
+        - added test data files.
+
+1.05	2015-01-24
+        - extended META test suite.
+
+1.04	2014-12-27
+        - fixed license fields in META.json to be lists.
+        - added homepage resource to META files.
+
+1.03	2014-07-14
+        - Exporter tag ':default in Labyrinth::Globals no longer used.
+        - now require Labyrinth-5.22.
+
+1.02	2014-04-26
+        - fixed distribution name in META.
+        - added LICENSE file.
+
+1.01	2013-03-30
+        - change file dates changed to meet W3CDTF standards.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - upgraded to Test::CPAN::Meta::JSON for tests.
+        - test suite update.
+
+1.00	2011-01-20
+        - first official release

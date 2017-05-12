@@ -1,0 +1,38 @@
+---
+abstract: 'Gentoo-colored screen logging output'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Term::ANSIColor: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Dispatch-Screen-Gentoo
+provides:
+  Log::Dispatch::Screen::Gentoo:
+    file: lib/Log/Dispatch/Screen/Gentoo.pm
+    version: '0.002'
+recommends:
+  Unicode::UTF8: '0'
+requires:
+  Encode: '0'
+  Log::Dispatch: '0'
+  Module::Runtime: '0'
+  Term::GentooFunctions: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/xsawyerx/log-dispatch-screen-gentoo/issues
+  repository: git://github.com/xsawyerx/log-dispatch-screen-gentoo.git
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

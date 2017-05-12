@@ -1,0 +1,119 @@
+Name:           @LCFG_FULLNAME@
+Summary:        @LCFG_ABSTRACT@
+Version:        @LCFG_VERSION@
+Release:        @LCFG_RELEASE@
+Packager:       @LCFG_AUTHOR@
+License:        @LCFG_LICENSE@
+Group:          LCFG/Components
+Source:         @LCFG_TARNAME@
+BuildArch:	noarch
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+[%- IF skel.lcfg_component == "yes" -%]
+BuildRequires:  lcfg-build-deps
+
+[%- IF skel.lang == "perl" -%]
+BuildRequires:	perl(LCFG::Component)
+Requires:	perl(LCFG::Component)
+[% ELSE %]
+Requires:	lcfg-ngeneric
+[% END -%]
+
+[% ELSE -%]
+
+[%- IF skel.gencmake == "yes" -%]
+BuildRequires:  cmake >= 2.6.0, bash
+[%- IF skel.lang == "perl" %]
+BuildRequires:  perl
+[% END -%]
+[% END -%]
+
+[% END -%]
+
+[%- IF skel.lang == "perl" %]
+Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+[% END -%]
+
+[%- IF skel.lcfg_component == "yes" %]
+[% IF skel.restart == "yes" %]
+Requires(post):	lcfg-utils, lcfg-om
+[% ELSE %]
+Requires:	lcfg-utils, lcfg-om
+[% END %]
+[% END %]
+
+%description
+@LCFG_ABSTRACT@
+
+%prep
+%setup
+
+%build
+[% IF skel.gencmake == "yes" %]
+%cmake -DPERL_INSTALLDIRS:STRING=vendor
+[% END %]
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make install DESTDIR=$RPM_BUILD_ROOT
+
+# Remove empty files (because pod2man on SL6 wrongly creates empty man pages)
+find $RPM_BUILD_ROOT -type f -empty -print0 | xargs --null --no-run-if-empty rm
+
+%{_fixperms} $RPM_BUILD_ROOT/*
+
+[% IF skel.lcfg_component == "yes" AND skel.restart == "yes" %]
+%post
+if [ $1 -eq 2 ] && @LCFGOM@ @LCFG_NAME@ isstarted -q; then
+  echo reconfiguring @LCFG_NAME@ component
+  /usr/sbin/daemon @LCFGOM@ @LCFG_NAME@ configure
+fi
+exit 0
+[% END %]
+
+[% IF skel.lcfg_component == "yes" %]
+%postun
+[ $1 -eq 0 ] && rm -f @LCFGROTATED@/@LCFG_FULLNAME@
+exit 0
+[% END %]
+
+%files
+%defattr(-,root,root)
+%doc ChangeLog README
+[% IF skel.lcfg_component == "yes" %]
+%doc @LCFGMAN@/man@MANSECT@/*
+%doc @LCFGPOD@/*.pod
+@LCFGCOMP@/@LCFG_NAME@
+@LCFGDATA@/@LCFG_NAME@
+@LCFGCLIENTDEF@/@LCFG_NAME@-@LCFG_SCHEMA@.def
+[% END %]
+[%- IF skel.lang == "perl" -%]
+[% IF skel.lcfg_component == "yes" %]
+%{perl_vendorlib}/LCFG/Component/*
+[% ELSE %]
+%{perl_vendorlib}/*
+[% END %]
+[% END %]
+
+[% IF skel.lcfg_component =="yes" %]
+%package defaults-s@LCFG_SCHEMA@
+Summary: Default resources for @LCFG_NAME@
+Group: LCFG/Defaults
+Prefix: @LCFGSERVERDEF@
+BuildArch: noarch
+
+%description defaults-s@LCFG_SCHEMA@
+Default resources for the LCFG file component.
+@LCFGCONFIGMSG@
+
+%files defaults-s@LCFG_SCHEMA@
+%defattr(-,root,root)
+@LCFGSERVERDEF@/@LCFG_NAME@-@LCFG_SCHEMA@.def
+[% END %]
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%changelog
+@LCFG_CHANGELOG@

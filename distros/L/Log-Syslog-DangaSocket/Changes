@@ -1,0 +1,13 @@
+Revision history for Perl extension Log::Syslog::DangaSocket.
+
+1.06  Mon May 24 19:49:01 PDT 2010
+    - Let OS select a listening port
+    - List Danga::Socket as a requirement
+1.05  Fri Jan  8 18:33:41 PST 2010
+	- Support UNIX sockets
+1.04  Fri Jan  8 12:52:20 PST 2010
+	- Add accessors for facility and severity
+1.03  Mon Sep 28 15:17:28 PDT 2009
+	- Better error handling
+1.00  Wed Sep 23 00:55:48 PDT 2009
+	- original version

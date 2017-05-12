@@ -1,0 +1,415 @@
+#! /usr/bin/perl -w
+use strict;
+use 5.010;
+use # Hide from release warnings
+Data::Dump 'dump';
+
+# Structure of the data we're decoding...
+
+open my $target_fh, '>', 'lib/Lingua/EN/Inflexion/Nouns.pm';
+select $target_fh;
+
+my $COMMENT_LINE_PAT = qr{ \A \s* \# }xms;
+my $COMMENT_PAT      = qr{ \# .* }xms;
+my $BLANK_LINE_PAT   = qr{ \A \s* $ }xms;
+my $WS               = qr{ [\s]* }xms;
+my $DATA_PAT         = qr{
+    \A
+      (?: $WS < ([^>]+) > )?    # ...optional category tag
+      $WS ([*-]?) $WS             # ...leading whitespace and optional generic marker
+      (.*?)                     # ...singular word
+      $WS =>                    # ...singular/plural separator
+      $WS ([*-]?) $WS             # ...leading whitespace and optional generic marker
+      (.*?)                     # ...plural of word
+      (?:                       # ...optionally:
+        $WS \|                  #    ...modern/classical separator
+        $WS ([*-]?) $WS           #    ...leading whitespace and optional generic marker
+        (.*?)                   #    ...classical plural of word
+      )?
+    $WS                         # ...trailing whitespace
+    $COMMENT_PAT?               # Optional trailing comment
+    \Z                          # ...trailing whitespace
+}xms;
+
+# The data structures we're building...
+my %modern_plural_of;
+my %classical_plural_of;
+my %singular_of;
+my %singular_word;
+my %plural_word;
+my @tests_singular;
+my @tests_plural;
+my @tests_classical_plural;
+my @tests_is_singular;
+my @tests_is_plural;
+my %tested;
+my %is_ambiguous_plural;
+
+# Access noun data...
+open my $noun_data_fh, '<', 'nouns.lei';
+
+# Collect and categorize data...
+INFLECTION:
+while (my $line = readline $noun_data_fh) {
+
+    # Skip noise...
+    next if $line =~ $COMMENT_LINE_PAT
+         || $line =~ $BLANK_LINE_PAT;
+
+    # Extract data...
+    my ($tag, $is_generic, $sing, $is_pure_generic, $pl1, undef, $pl2)
+        = $line =~ $DATA_PAT
+            or die "Unknown input: $line";
+
+    # Fill in the blanks...
+    $pl1 = $pl2 if $pl1 !~ /\S/;
+    $tag //= q{};
+
+    my ($sing_pat, $pl1_pat, $pl2_pat) = ($sing, $pl1, $pl2);
+
+    # Build pattern tables...
+    if ($is_generic) {
+        # Convert generic marker to regex syntax ('*' -> /.*/, '-' -> /.+/)...
+        $is_generic = $is_generic eq '*' ? '.*' : '.+';
+
+        # Remove generic markers and optional restriction...
+        my $restriction_sing = $sing =~ s{ ( \[.*?\] ) }{}xms ? $1 : q{};
+        my $restriction_pl1  =  $pl1 =~ s{ ( \[.*?\] ) }{}xms ? $1 : q{};
+        my $restriction_pl2  =  $pl2 && $pl2 =~ s{ ( \[.*?\] ) }{}xms ? $1 : q{};
+
+        # Add the modern plural pattern data to the list of generics...
+        push @{$modern_plural_of{pattern}},
+             { from=>"($is_generic$restriction_sing)$sing", to => '${1}'.$pl1,  tag => $tag };
+
+        push @{$singular_of{pattern}},
+             { from=>"($is_generic$restriction_pl1)$pl1",  to => '${1}'.$sing, tag => $tag };
+
+        # Add the classical plural pattern data (if any) to the list of generics...
+        if ($pl2) {
+            push @{$classical_plural_of{pattern}},
+                 { from=>"($is_generic$restriction_sing)$sing", to => '${1}'.$pl2,  tag => $tag };
+
+            push @{$singular_of{pattern}},
+                 { from=>"($is_generic$restriction_pl2)$pl2",  to => '${1}'.$sing, tag => $tag };
+        }
+        else {
+            push @{$classical_plural_of{pattern}},
+                 { from=>"($is_generic$restriction_sing)$sing", to => '${1}'.$pl1,  tag => $tag };
+        }
+    }
+
+    # Handle recursively inflected forms (usually prepositional suffixes)...
+    elsif ($sing =~ m{ \(SING\) | \(PREP\) }xms) {{
+
+        push @{$modern_plural_of{pattern}},
+             { build_recursive({from=>$sing, to => $pl1, from_type=>'singular', to_type=>'modern_plural'}),  tag => $tag, };
+        push @{$singular_of{pattern}},
+             { build_recursive({from=>$pl1,  to => $sing, from_type=>'modern_plural', to_type=>'singular'}),      tag => $tag, };
+
+        $pl2 //= $pl1;
+        push @{$classical_plural_of{pattern}},
+            { build_recursive({from=>$sing, to => $pl2, from_type=>'singular', to_type=>'classical_plural'}), tag => $tag, };
+
+        push @{$singular_of{pattern}},
+                { build_recursive({from=>$pl2,  to => $sing, from_type=>'classical_plural', to_type=>'singular'}),        tag => $tag, };
+        
+        redo if grep { defined && s/-/ /g } $sing, $pl1, $pl2;
+        $is_pure_generic = 1;
+    }}
+
+    if (!$is_pure_generic) {{
+        # If no explicit classical form, classical form is same as modern form...
+        $pl2 ||= $pl1;
+
+        # Build literal tables...
+        $modern_plural_of{literal}{$sing}    //= $pl1;
+        $classical_plural_of{literal}{$sing} //= $pl2;
+        $singular_of{literal}{$pl1}          //= $sing;
+        $singular_of{literal}{$pl2}          //= $sing;
+
+        $singular_word{$sing} //= 1;
+        $plural_word{$pl1}    //= 1;
+        $plural_word{$pl2}    //= 1;
+
+        # Allow hyphenated terms without the hyphens...
+        if ($sing =~ s{-}{ }gxms) {
+             $pl1 =~ s{-}{ }gxms;
+             $pl2 =~ s{-}{ }gxms;
+             redo;
+        }
+    }}
+}
+
+# Add conversions for possessives...
+unshift @{$modern_plural_of{pattern}},
+        { from=>q{(.*?)'s?}, to => q{${continue if !is_singular($1); my
+        $plural = $modern_plural_of->{$1}; \($plural =~ /s$/ ? $plural.q{'} : $plural.q{'s})}},  tag => q{}, };
+
+unshift @{$classical_plural_of{pattern}},
+        { from=>q{(.*?)'s?}, to => q{${continue if !is_singular($1); my
+        $plural = $classical_plural_of->{$1}; \($plural =~ /s$/ ? $plural.q{'} : $plural.q{'s})}},  tag => q{}, };
+
+unshift @{$singular_of{pattern}},
+        { from=>q{(.*?)'s?}, to => q{${continue if !is_plural($1); my $sing = convert_to_singular($1); \($sing =~ /s$/ ? $sing.q{'} : $sing.q{'s})}},  tag => q{}, };
+
+
+# Emit standard header...
+say '##########################################';
+say '## NOTE: This module was autogenerated. ##';
+say '## Contains no user-servicable parts!!! ##';
+say '##########################################';
+say '';
+say 'package Lingua::EN::Inflexion::Nouns;';
+say 'use 5.010; use strict; use warnings; use re q{eval};';
+say 'no if $] >= 5.018, warnings => "experimental::smartmatch";';
+say '';
+
+my ($sec,$min,$hour,$day,$mon,$year) = localtime;
+say 'our $VERSION = ', sprintf("%04d%02d%02d.%02d%02d%02d", $year+1900, $mon+1, $day, $hour, $min, $sec), ';';
+say '';
+
+# Emit tables...
+say 'my $modern_plural_of = ', dump($modern_plural_of{literal}) . ';';
+say '';
+say 'my $classical_plural_of = ', dump($classical_plural_of{literal}) . ';';
+say '';
+say 'my $singular_of = ', dump($singular_of{literal}) . ';';
+say '';
+say 'my $is_plural = {}; @{$is_plural}{values %{$modern_plural_of} } = ();';
+say '                    @{$is_plural}{values %{$classical_plural_of} } = ();';
+say '                    @{$is_plural}{keys %{$singular_of} } = ();';
+say '';
+say 'my $is_singular = {}; @{$is_singular}{values %{$singular_of} } = ();';
+say '                      @{$is_singular}{keys %{$modern_plural_of} } = ();';
+say '                      @{$is_singular}{keys %{$classical_plural_of} } = ();';
+say '';
+
+# Emit preposition pattern...
+say 'my $PREP_PAT = qr{ about | above | across | after | among | around | at | athwart | before | behind | below | beneath | beside | besides | between | betwixt | beyond | but | by | during | except | for | from | in | into | near | of | off | on | onto | out | over | since | till | to | under | until | unto | upon | with }xms;';
+say '';
+
+# Emit pattern-based inflection subroutines...
+emit_converter( 'modern_plural'   , $modern_plural_of{pattern}    );
+say '';
+emit_converter( 'classical_plural', $classical_plural_of{pattern} );
+say '';
+emit_converter( 'singular'        , $singular_of{pattern}         );
+say '';
+
+# Emit pattern-based recognition subroutines...
+my $singulars_ref = [ @{$singular_of{pattern}} ];
+my $plurals_ref   = [ @{$modern_plural_of{pattern}}, @{$classical_plural_of{pattern}} ];
+emit_recognizer( 'plural',    'singular', $plurals_ref, $singulars_ref );
+say '';
+emit_recognizer( 'singular',  'plural',   $singulars_ref, $plurals_ref );
+say '';
+
+# Emit stupid trailing package terminator...
+say '1;';
+
+
+# Generate test files...
+{
+    # 1. is_singular()
+
+    open my $test_file_fh, '>', 't/noun_is_singular.t';
+    select $test_file_fh;
+
+    say 'use Test::More;';
+    say 'use Lingua::EN::Inflexion;';
+    say '';
+
+    for my $singular (keys %singular_word) {
+        say "ok noun(q{$singular})->is_singular  => q{is_singular: '$singular'};";
+    }
+
+    say '';
+    say 'done_testing();';
+}
+{
+    # 2. is_plural()
+
+    open my $test_file_fh, '>', 't/noun_is_plural.t';
+    select $test_file_fh;
+
+    say 'use Test::More;';
+    say 'use Lingua::EN::Inflexion;';
+    say '';
+    
+    for my $plural (keys %plural_word) {
+        say "ok noun(q{$plural})->is_plural  => q{is_plural: '$plural'};";
+    }
+
+    say '';
+    say 'done_testing();';
+}
+{
+    # 3. plural()
+
+    open my $test_file_fh, '>', 't/noun_plural.t';
+    select $test_file_fh;
+
+    say 'use Test::More;';
+    say 'use Lingua::EN::Inflexion;';
+    say '';
+
+    for my $sing (keys %{$modern_plural_of{literal}}) {
+        my $plural = $modern_plural_of{literal}{$sing};
+
+        say "is noun(q{$sing})->plural,   q{$plural}  => q{plural: '$sing' --> '$plural'};";
+        say "is noun(q{$plural})->plural, q{$plural}  => q{plural: '$plural' --> '$plural'};"
+            if !$singular_word{$plural};
+    }
+
+    say '';
+    say 'done_testing();';
+}
+{
+    # 4. classical_plural()
+
+    open my $test_file_fh, '>', 't/noun_classical_plural.t';
+    select $test_file_fh;
+
+    say 'use Test::More;';
+    say 'use Lingua::EN::Inflexion;';
+    say '';
+
+    for my $sing (keys %{$classical_plural_of{literal}}) {
+        my $plural = $classical_plural_of{literal}{$sing};
+
+        say "is noun(q{$sing})->classical->plural,   q{$plural}  => q{classical plural: '$sing' --> '$plural'};";
+        say "is noun(q{$plural})->classical->plural, q{$plural}  => q{classical plural: '$plural' --> '$plural'};"
+            if !$singular_word{$plural};
+    }
+
+    say '';
+    say 'done_testing();';
+}
+{
+    # 5. singular()
+
+    open my $test_file_fh, '>', 't/noun_singular.t';
+    select $test_file_fh;
+
+    say 'use Test::More;';
+    say 'use Lingua::EN::Inflexion;';
+    say '';
+
+    for my $plural (keys %plural_word) {
+        my $sing = $singular_of{literal}{$plural} // next;
+
+        say "is noun(q{$plural})->singular, q{$sing}  => q{singular: '$plural' --> '$sing'};";
+        say "is noun(q{$sing})->singular,   q{$sing}  => q{singular: '$sing' --> '$sing'};"
+            if !$plural_word{$sing};
+    }
+
+    say '';
+    say 'done_testing();';
+}
+
+#====[ Utility subs ]=====================================
+
+sub emit_converter {
+    my ($name, $replacement_suffixes) = @_;
+
+    my $type             = $name =~ /plural/ ? 'plural'                  : 'singular';
+    my $plus_extra_check = $name =~ /plural/ ? ' && !is_singular($word)' : '';
+
+    # Generate subroutine structure...
+    say "sub convert_to_${name} {";
+    say '    my ($word) = @_;';
+    say "    return \$${name}_of->{\$word}    if exists \$${name}_of->{\$word};";
+    say "    return \$${name}_of->{lc \$word} if exists \$${name}_of->{lc \$word};";
+    say "    return \$word                    if is_$type(\$word)$plus_extra_check;";
+    say '    given ($word) {';
+
+    # Generate each alternative replacement pattern...
+    my %generated;
+    for my $replacement_ref ( @{$replacement_suffixes} ) {
+        my $recognizer = '        when (m{\A' . $replacement_ref->{from} . '$}i) { return "' . $replacement_ref->{to} .'"; }';
+        next if $generated{$recognizer}++;
+        say $recognizer;
+    }
+
+    # Subroutine defaults to failure...
+    say '        default { return $_; }';
+    say '    }';
+    say '}';
+}
+
+sub emit_recognizer {
+    my ($name, $compl_name, $negatives_ref, $positives_ref) = @_;
+
+    # Generate subroutine structure...
+    say "sub is_${name} {";
+    say '    my ($word) = @_;';
+    say "    return 1 if exists \$is_${name}\->{\$word};";
+    say "    return 1 if exists \$is_${name}\->{lc \$word};";
+    say "    return 0 if exists \$is_${compl_name}\->{\$word};";
+    say "    return 0 if exists \$is_${compl_name}\->{lc \$word};";
+    say '    given ($word) {';
+
+    # Generate each alternative success pattern...
+    my %generated;
+    for my $replacement_ref ( @{$positives_ref} ) {
+        # Ignore patterns that are marked non-indicative...
+        next if $replacement_ref->{tag} eq 'nonindicative';
+
+        # Otherwise, use them...
+        my $recognizer = '        when (m{\A' . $replacement_ref->{from}
+                       . '$}i) { '.($replacement_ref->{conditional}//q{}).'return 1 }';
+        next if $generated{$recognizer}++;
+        say $recognizer;
+
+    }
+
+    # Subroutine defaults to failure...
+    if ($name eq 'singular') {
+        say '        default { return !is_plural($word); }';
+    }
+    else {
+        say '        default { return $word =~ m{ s \Z }xms; }';
+    }
+    say '    }';
+    say '}';
+}
+
+sub build_recursive {
+    my ($from, $to, $from_type, $to_type) = @{shift()}{'from', 'to', 'from_type', 'to_type'};
+
+    # Replace plurality placeholders with patterns (remembering plurality constraints)...
+    my @replacements;
+    my $conditional = q{};
+    $from =~ s{
+          (?<star>  \*        )
+        | (?<sing>  \(SING\)  )
+        | (?<plur>  \(PL\)    )
+        | (?<prep>  \(PREP\)  )
+    }{
+        my $cap_var = '$' . (@replacements + 1);
+        if ($+{star}) {
+            push @replacements, $cap_var;
+            '(.*?)';
+        }
+        elsif ($+{sing}) {
+            push @replacements, "\${is_singular($cap_var) ? \\convert_to_${to_type}($cap_var) : \\$cap_var}";
+            $conditional = "continue if !is_singular($cap_var);";
+            q{(.*?)};
+        }
+        elsif ($+{plur}) {
+            push @replacements, "\${is_plural($cap_var) ? \\convert_to_${to_type}($cap_var) : \\$cap_var}";
+            $conditional = "continue if !is_plural($cap_var);";
+            q{(.*?)};
+        }
+        elsif ($+{prep}) {
+            push @replacements, $cap_var;
+            '($PREP_PAT)';
+        }
+    }gexms;
+
+    # Replace plurality placeholders with converters (inserting remembered constraints)...
+    $to =~ s{  \*  | \(SING\)  |  \(PL\)  |  \(PREP\)  }
+            { shift @replacements; }gexms;
+
+    return (from=>$from, to=>$to, conditional => $conditional);
+}

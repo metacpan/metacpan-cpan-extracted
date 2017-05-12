@@ -1,0 +1,31 @@
+LIMS::MT_Plate version 1.17
+===========================
+
+LIMS::MT_Plate is an object-oriented Perl module for creating and manipulating microtitre plate objects. It defines a Class of MT_Plate for each microtitre format, which include variables specific to the format and methods that are common to all.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the CPAN module;
+
+  Microarray
+
+Testing requires the following CPAN modules;
+
+  Test::More  Test::Group
+  Test::Differences  Test::Deep  Test::Exception
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Christopher Jones, University College London
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

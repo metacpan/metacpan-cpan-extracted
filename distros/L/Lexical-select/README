@@ -1,0 +1,69 @@
+NAME
+    Lexical::select - provides a lexically scoped currently selected
+    filehandle
+
+VERSION
+    version 0.10
+
+SYNOPSIS
+      use Lexical::select;
+
+      open my $fh, '>', 'fubar' or die "Oh noes!\n";
+
+      {
+        my $lxs = lselect $fh;
+
+        print "Something wicked goes to \$fh \n";
+
+      }
+
+      print "Back on STDOUT\n";
+
+DESCRIPTION
+    Changing the currently selected filehandle with "select" and changing it
+    back to the previously selected filehandle can be slightly tedious.
+    Wouldn't it be great to have something handle this boilerplate,
+    especially in lexical scopes.
+
+    This is where Lexical::select comes in.
+
+    Lexical::select provides the "lselect" function. As demonstrated in the
+    "SYNOPSIS", "lselect" will change the currently selected filehandle to
+    the filehandle of your choice for the duration of the enclosing lexical
+    scope.
+
+    It should be noted that the duration of the selected filehandle is
+    limited to the lexical scope, not the effects of the selected
+    filehandle.
+
+FUNCTIONS
+    Functions exported by default.
+
+    "lselect"
+        Takes one parameter, a "filehandle" that will become the currently
+        selected filehandle for the duration of the enclosing scope.
+
+        Returns an object, which provides the "restore" method.
+
+        You can then either "restore" the currently selected filehandle back
+        manually or let the object fall out of scope, which automagically
+        restores.
+
+METHODS
+    "restore"
+        Explicitly restores the currently selected filehandle back to the
+        original filehandle. This is called automagically when the object is
+        "DESTROY"ed, for instance when the object goes out of scope.
+
+SEE ALSO
+    SelectSaver
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

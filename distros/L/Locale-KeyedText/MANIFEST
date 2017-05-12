@@ -1,0 +1,34 @@
+Changes
+examples/inverter1/MyApp.pl
+examples/inverter1/MyApp/L/Eng.pm
+examples/inverter1/MyApp/L/Fre.pm
+examples/inverter1/MyApp/L/Homer.pm
+examples/inverter1/MyLib.pm
+examples/inverter1/MyLib/L/Eng.pm
+examples/inverter1/MyLib/L/Fre.pm
+examples/inverter2/MyApp.pl
+examples/inverter2/MyApp/L/Homer.pm
+examples/inverter2/MyLib.pm
+INSTALL
+lib/Locale/KeyedText.pm
+lib/Locale/KeyedText.pod
+lib/Locale/KeyedText/L/en.pm
+lib/Locale/KeyedText/Message.pm
+lib/Locale/KeyedText/Translator.pm
+LICENSE/GPL
+LICENSE/LGPL
+Makefile.PL
+MANIFEST
+README
+t/lib/t_LKT_A_L_Eng.pm
+t/lib/t_LKT_A_L_Fre.pm
+t/lib/t_LKT_B_L_Eng.pm
+t/lib/t_LKT_B_L_Fre.pm
+t/lib/t_LKT_Util.pm
+t/LKT_00_Compile.t
+t/LKT_10_MsgProps.t
+t/LKT_20_TrnProps.t
+t/LKT_30_TrnMsg.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

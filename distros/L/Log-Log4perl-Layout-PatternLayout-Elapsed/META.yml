@@ -1,0 +1,27 @@
+---
+abstract: 'Logs the time elapsed between the last log event'
+author:
+  - 'Emmanuel Rodriguez, E<lt>emmanuel.rodriguez@gmail.comE<gt>.'
+build_requires:
+  Log::Log4perl::Appender::TestBuffer: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Log4perl-Layout-PatternLayout-Elapsed
+provides:
+  Log::Log4perl::Layout::PatternLayout::Elapsed:
+    file: lib/Log/Log4perl/Layout/PatternLayout/Elapsed.pm
+    version: '0.07'
+recommends:
+  Time::HiRes: '0'
+requires:
+  Log::Log4perl::Layout::PatternLayout: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.07'

@@ -1,0 +1,37 @@
+Revision history for Perl extension LibZip.
+
+
+0.06  2004-12-11
+      - Enable .pl files in the libzip.modules file.
+      - Check to clean tmp directories in the BEGIN and END of the application.
+        Before was only in the END, and applications that crashes will never clean the directories.
+      - TinyPerl updated.
+      - Perl options alloweds can use modules at lib.zip now.
+        This is important for -c (check syntax)!!!
+
+
+0.05  2004-06-14
+      - Fixed warning for -w
+      - Fixed option --help when -h is enabled.
+      - Sources of TinyPerl in distribution finisheds.
+
+
+0.04  2004-06-14
+      - Enabled/fixed UPX over the executable on Win32.
+      - Fixed original perl option -c for check syntax (when -c is enabled in the exec).
+      - Fixed execution warnings when lib.zip is not found.
+
+
+0.03  2004-06-11
+      - POD fixes & upgrades.
+      - Added support to Win32 icon in the executables.
+      - Added option to create GUI executables (non console).
+
+
+0.02  2004-06-10
+      - LibZip recreated from scratch. Result: smaller and faster binaries.
+
+
+0.01  2003-??-??
+      - original version;
+

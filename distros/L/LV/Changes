@@ -1,0 +1,43 @@
+LV
+==
+
+Created:      2013-11-01
+Home page:    <https://metacpan.org/release/LV>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=LV>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.006	2013-11-03
+
+ [ Packaging ]
+ - Reduce required version of Test::More from 0.62 to 0.47, which is the
+   version that was bundled with Perl 5.006002.
+
+0.005	2013-11-02
+
+ [ Packaging ]
+ - Recommend Sentinel over Variable::Magic.
+
+0.004	2013-11-02
+
+ - Major speed improvements for LV::Backend::Magic.
+ - Major speed improvements for LV::Backend::Sentinel.
+ - Major speed improvements for LV::Backend::Tie.
+
+0.003	2013-11-02
+
+ - Eliminate goto in LV::Backend::Tie, resulting in slight speed
+   improvements.
+   Graham Knop++
+
+0.002	2013-11-02
+
+ [ Documentation ]
+ - Bundle benchmarking script.
+
+ [ Other ]
+ - Major speed improvements for LV::Backend::Magic.
+ - Minor speed improvements for LV::Backend::Tie.
+ - Prefer LV::Backend::Sentinel over LV::Backend::Magic when auto-selecting
+   a backend implementation.
+
+0.001	2013-11-02	Initial release

@@ -1,0 +1,43 @@
+Lingua/FeatureMatrix version 0.01
+=================================
+
+This is a module for quickly writing linguistically interesting
+featureset notations to describe emes (e.g., phonemes, graphemes).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+HELPER MODULES
+
+Lingua/FeatureMatrix/Eme.pm
+which should be part of this distribution. See the MANIFEST.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Class::MethodMaker
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2002 Jeremy Kahn <kahn@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, with the exception that the
+files in the examples/ directory of this distribution (hereafter "the
+examples") have a looser license, as follows:
+
+The examples are completely free from any copying restrictions
+whatsoever, except that they or some derivative of them must form a
+part of further distribution of this module. Use and modify your own
+copy of the examples for whatever purpose you like, including
+commercial or academic application. Keep the examples for yourself,
+share them with others, decorate your desktops with them, whatever.
+
+"'Tsall good."  --Heidi Wall

@@ -1,0 +1,33 @@
+Revision history for Lingua-Identifier
+
+0.01    2014-08-29
+        - Released stable version.
+
+0.01_8  2014-08-28
+        - SWIG code doesn't deal well it tainted variables.
+          Workaround is not taint anything.
+
+0.01_7  2014-08-27
+        - Fixed identify_language script to use new API.
+        - Fixed dependencies issues.
+        - Still debugging...
+
+0.01_6  2014-08-26
+        - Added more debug messages :'(
+
+0.01_5  2014-08-25
+        - Added debug messages.
+        - Bumped Math::Matrix::MaybeGSL version dependency.
+
+0.01_4  2014-08-24
+        - Basic API is now stable.
+        - Build based on Dist::Zilla.
+        - Still wondering what is going on with perl 5.16.3.
+
+0.01_3  2014-08-23
+        - Some CPAN testers did not test because of a warning that is now fixed.
+        - Added some more documentation, and a public method.
+
+0.01_2  2014-08-22
+        - First working version, without documentation, for cpan-testers runs.
+

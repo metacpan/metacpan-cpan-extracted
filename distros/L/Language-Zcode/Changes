@@ -1,0 +1,81 @@
+v0.8	20040914	Jewish New Year (And circa 1-year anniversary of v0.1)
+
+- Lots of POD & cleanup for CPAN release!
+- Added languages directory with examples & support files for PIR/XML/Perl
+- Proof of concept PIR translation kinda supports 35 or so opcodes
+- Proof of concept XSL translation for XML outputs "supports" 20 or so opcodes
+- Tests in t/: 20_parser.t, 40_trans_perl.t, 80_all.t (576 tests)
+- MakeMaker-compatible directory created by h2xs 1.22 with options
+	-AX -b 5.6.0 -n Language::Zcode -v 0.8
+- Directory structure overhaul - more like a real Perl module, now
+- Parser::Perl removes dependence on external txd program
+- 'save' and 'restore' opcodes, using Quetzal format.
+  Language::Zcode now supports all v3 opcodes, and I believe supports ALL
+  v3 functionality except for stream 3!
+
+
+v0.7	20040401	April Fools!
+
+- 'restart' opcode
+- txd is read in one big gulp at the beginning. (In theory, we could now read
+    a file with the necessary info for a given Zfile and not need txd.)
+- rudimentary XML output with XML::Simple (could theoretically be converted 
+  with XSLT's)
+- (Internal) partial refactoring of PlotzPerl::IO input and output streams,
+  replacing a couple Rezrov bugs with many more Plotz bugs.
+- Found out having two kids is hard, and reduces programming time
+
+v0.6	20031119
+
+- win32 UI is mostly working
+- output_stream for streams 2 and 4 is mostly working
+- input stream is mostly working
+- 'read' opcode tested somewhat
+- Stole a whole bunch of code from Games::Rezrov and broke it:
+  output_stream, input_stream, set_window, split_window, erase_window,
+  set_cursor. All implemented but not very tested.
+- Release t8.inf separately as czech 0.8. It's now its own project.
+
+v0.5	20031031
+
+- Zork1.pl runs at least a few turns. So does Planetfall!
+  (Haven't confirmed story is running properly yet, though.)
+- Handle indirect opcodes (load, store, inc, etc.)
+- read (and show_status) implemented but not rigorously tested
+- String abbreviations
+- Improvements to t8.inf: version-dependent code. Works under z3, 4, 5, 8!
+- Fix global variables, bugs related to variables
+- Depend less on txd (only use it for routine addresses)
+- version-specific opcodes
+
+v0.4	20031010
+
+- Object/property/attribute opcodes (15), plus verify and (ha!) piracy
+- Improvements to t7.inf: prints (much better) descriptions of failed tests
+
+v0.3	20031001
+
+- Changed name to plotz! Poly-Lingual Opcode Translation for the Z-machine
+  (because it's now designed to allow output in various languages)
+- Runs t6.inf
+- Many improvements to t6.inf: it now counts passed & failed tests, e.g.
+  and calls (skippable) subs which test sets of functionality.
+- Parsing now uses txd -d, which dumps hexcodes: that means we're one
+  step closer to not needing txd. Parsing also uses the syntax table
+  from the spec to make sure we get the right number of args, etc.
+  (v5 still supported best, though, and other v's may break totally).
+- more ops: store[wb]/load[wb], random, print_addr
+- Made some ops more spec-compliant
+- Hardcode dynamic & static memory into output file
+
+v0.2	20030919
+
+- Runs t4.inf
+- Add some more simple ops (e.g., "new_line". stack ops, e.g., not tested)
+- Move all output-language-specific stuff into language packages
+
+v0.1	20030917
+
+- Initial version
+- Translate arithmetic, variables, subs to Perl
+- Runs t3.inf

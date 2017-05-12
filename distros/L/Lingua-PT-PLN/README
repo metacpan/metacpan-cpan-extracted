@@ -1,0 +1,31 @@
+Lingua::PT::PLN
+===============
+
+- A set of tools for natural language processing of Portuguese.
+  See english installation documentation below. See POD for use
+  instructions!
+
+- Um conjunto de ferramentas para processamento da língua
+  Portuguesa. Ver o POD para mais instruções.
+
+ Alberto Simões    < ambs @ cpan . org >
+ José João Almeida < jj @ di . uminho . pt >
+
+
+ Instalação
+------------
+
+ # perl Makefile.PL
+ # make
+ # make test (opcional)
+ # make install (como administrador --- root)
+
+
+ Installation
+--------------
+
+ # perl Makefile.PL
+ # make
+ # make test (opcional)
+ # make install (as root user)
+

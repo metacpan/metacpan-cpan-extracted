@@ -1,0 +1,31 @@
+Revision history for Perl extension Locale::Utils::PlaceholderNamed.
+
+1.002  Fri Feb 24 17:03:28 2017
+- fixed pod
+
+1.001  Thu Apr 16 07:52:35 2015
+- fixed cpantesters seen things
+
+1.000  Mon Feb  2 08:29:12 2015
+- change boolean attribute name from strict to is_strict
+- added javascript/Locale/Utils/PlaceholderNamed.js
+
+0.006  Mon Oct 27 09:30:31 2014
+- added javascript folder
+
+0.005  Fri Jan 24 12:55:59 2014
+- added methods modifier_code and clear_modifier_code
+- removed Build.PL from distribution
+
+0.004  Tue Oct 22 18:10:13 2013
+- use Moo
+- removed Build.PL from distribution
+
+0.003  Mon Mar 20 20:35:26 2012
+- repared Makefile.PL
+
+0.002  Tue Dec  6 13:00:00 2011
+- removed ppm specials
+
+0.001  Sun Nov 13 08:00:00 2011
+- first version

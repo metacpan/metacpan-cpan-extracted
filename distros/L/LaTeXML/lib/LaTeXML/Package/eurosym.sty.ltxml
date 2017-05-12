@@ -1,0 +1,46 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  eurosym.sty                                                        | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Thanks to Catalin David <c.david@jacobs-university.de>              | #
+# | of the arXMLiv group for initial implementation                     | #
+# |    http://arxmliv.kwarc.info/                                       | #
+# | Released to the Public Domain                                       | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+RawTeX('\newif\if@EURleft\@EURlefttrue');
+DeclareOption('left',      '\@EURlefttrue');
+DeclareOption('right',     '\@EURleftfalse');
+DeclareOption('official',  undef);
+DeclareOption('gen',       undef);
+DeclareOption('gennorrow', undef);
+DeclareOption('genwide',   undef);
+
+ProcessOptions();
+
+DefMacro('\EUR{}', '{\if@EURleft\euro\,\fi#1\if@EURleft\else\,\euro\fi}');
+
+DefMacro('\officialeuro', "\x{20AC}");
+Let('\euro', '\officialeuro');
+
+# People shouldn't be using these, but let's at least avoid errors.
+DefMacro('\eurobars',       '=');
+DefMacro('\eurobarsnarrow', '=');
+DefMacro('\eurobarswide',   '=');
+Let('\geneuro',       '\officialeuro');
+Let('\geneuronarrow', '\officialeuro');
+Let('\geneurowide',   '\officialeuro');
+
+1;

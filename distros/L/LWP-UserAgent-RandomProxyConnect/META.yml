@@ -1,0 +1,22 @@
+---
+abstract: 'A LWP::UserAgent extension for becoming an omnipresent client.'
+author:
+  - 'Hector Valverde <hvalverde@uma.es>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: LWP-UserAgent-RandomProxyConnect
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 5.006
+version: 1.10

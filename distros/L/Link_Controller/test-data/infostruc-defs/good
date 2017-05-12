@@ -1,0 +1,4 @@
+directory http://www.example.com/first /var/www/first
+www http://mixed.example.com/third/some /var/www/third
+www http://dynamic.example.com/second
+www http://dynamic.example.com/second/notso /var/www/notsodynamic

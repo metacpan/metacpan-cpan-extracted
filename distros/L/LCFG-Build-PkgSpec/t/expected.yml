@@ -1,0 +1,22 @@
+--- !!perl/hash:LCFG::Build::PkgSpec 
+abstract: An lcfg component to manage the foo daemon
+author: 
+  - Stephen Quinney <squinney@inf.ed.ac.uk>
+base: lcfg
+date: 02/20/08 12:12:27
+group: LCFG/System
+license: GPL
+name: foo
+orgident: org.lcfg
+platforms: 
+  - Fedora5
+  - Fedora6
+  - ScientificLinux5
+release: 1
+schema: 1
+vcs: 
+  checkcommitted: 1
+  genchangelog: 0
+  type: CVS
+vendor: University of Edinburgh
+version: 1.0.0

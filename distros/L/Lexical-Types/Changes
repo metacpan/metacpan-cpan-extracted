@@ -1,0 +1,137 @@
+Revision history for Lexical-Types
+
+0.15    2015-12-21 15:30 UTC
+        + Chg : The new environment variable to enable thread tests on older
+                perls is PERL_FORCE_TEST_THREADS. Note that this variable
+                should only be turned on by authors.
+        + Chg : A large chunk of boilerplate XS code, which is also used in
+                other XS modules, has been factored out of the main .xs file
+                to a collection of .h files in the xsh subdirectory.
+        + Fix : This module can once again be built with strict C89 compilers.
+        + Fix : Update the Windows ActivePerl + gcc 3.4 workaround for
+                ExtUtils::MakeMaker 7.04. Thanks Christian Walde for reporting
+                and feedback on this issue.
+        + Fix : Segfaults when the module is loaded by several threads (or
+                Windows emulated processes) ran in parallel.
+        + Fix : Test failures of threads tests on systems with harsh resource
+                constraints causing the threads to exit() during run.
+
+0.14    2015-03-14 03:10 UTC
+        + Chg : perl 5.8.4 is now required (instead of 5.8.3).
+        + Fix : [RT #100202] : Fix for 5.21.6-to-be.
+                Thanks Father Chrysostomos for reporting and contributing a
+                patch.
+        + Fix : Be really compatible with the optional OP_PARENT feature.
+        + Tst : $ENV{$Config{ldlibpthname}} is now preserved on all platforms,
+                which will address failures of t/81-threads-teardown.t with
+                unusual compilers (like icc) that link all their compiled
+                objects to their own libraries.
+
+0.13    2014-10-04 23:25 UTC
+        + Add : Support for the PERL_OP_PARENT optional feature introduced in
+                perl 5.21.2.
+        + Doc : The CAVEATS section now warns about the global slowdown during
+                compilation caused by this pragma.
+        + Fix : [RT #86112] : Doesn't hook new PADRANGE op in Perl 5.18.
+                The PADRANGE optimization is now fully supported.
+                Thanks Dagfinn Ilmari Mannsåker for reporting.
+        + Fix : Segfaults in eval in an END block of a Win32 pseudo-fork.
+        + Fix : Segfaults during global destruction of a thread or a
+                pseudo-fork.
+        + Fix : Check functions are now replaced and restored in a thread-safe
+                manner, either by using the wrap_op_checker() function from perl
+                when it is available (starting from perl 5.16) or by taking the
+                OP_REFCNT mutex on older perls.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+        + Tst : Test failures of t/81-threads-teardown.t on Cygwin and Android
+                should have been addressed.
+        + Tst : Threads tests will not fail anymore if resources constraints
+                prevent the system from creating all the required threads.
+        + Upd : Metadata overhaul.
+
+0.12    2011-08-24 16:30 UTC
+        + Fix : The pragma no longer vivifies the "Lexical::Types" entry in the
+                hints hash %^H on perl 5.8.
+
+0.11    2011-02-26 22:00 UTC
+        + Fix : [RT #66164] : Lexical::Types hangs with PPI.
+                This was actually a regression introduced together with the new
+                peephole optimizer strategy, and that caused the pragma to hang
+                on constructs like "for (;;) { ... }".
+                Thanks Chisel Wright for reminding me about this issue.
+
+0.10    2011-01-03 20:35 UTC
+        + Add : The new constant LT_FORKSAFE can be tested to know whether the
+                module will behave nicely when fork()ing. It's currently always
+                true except on Windows where you need perl 5.10.1 for it to be
+                true.
+        + Chg : perl 5.8.3 is now required (instead of 5.8.0).
+        + Fix : Scope leaks under perl 5.8-5.10.0.
+        + Fix : Segmentation faults and misbehaviours in threaded applications.
+        + Fix : Compatibility with perl 5.13.1 and higher.
+        + Fix : Broken linkage on Windows with gcc 3.4, which appears in
+                particular when using ActivePerl's default compiler suite.
+                For those setups, the Lexical::Types shared library will now
+                be linked against the perl dll directly (instead of the import
+                library).
+        + Tst : Threads tests are now only run on perl 5.13.4 and higher.
+                They could segfault randomly because of what seems to be an
+                internal bug of Perl, which has been addressed in 5.13.4.
+                There is also an environment variable that allows you to
+                forcefully run those tests, but it should be set only for
+                author testing and not for end users.
+
+0.09    2010-01-03 00:00 UTC
+        + Fix : Building and testing with blead.
+        + Fix : Unbalanced scopes when skipping a typed declaration.
+        + Fix : Segfaults when Lexical::Types is loaded for the first time from
+                inside a thread.
+        + Fix : Leaks of memory associated with the root interpreter.
+        + Fix : Work around Kwalitee test misfailures.
+        + Opt : Less memory will be used for non-threaded perls version 5.10.0
+                and below, and for threaded perls from version 5.10.1.
+
+0.08    2009-07-04 19:35 UTC
+        + Fix : Don't leak the old op info when a pointer table entry is reused.
+        + Fix : Possibly missed constructs with eval STRING called in a thread.
+
+0.07    2009-07-01 08:45 UTC
+        + Chg : perl 5.8.x on MSWin32 is no longer considered as thread safe.
+        + Fix : Work around a bug in perl 5.10.0 and lower that cause hints to
+                propagate into required files.
+        + Fix : Clean up map entries associated to uncatched OPs.
+
+0.06    2009-05-01 19:00 UTC
+        + Fix : The pragma now properly propagates into threaded eval STRING,
+                effectively making the module thread safe. The new LT_THREADSAFE
+                constant can be used to know whether the module could have been
+                built with thread safety features enabled.
+
+0.05    2009-04-28 21:40 UTC
+        + Fix : Building with PERL_IMPLICIT_SYS set (especially on Win32).
+        + Tst : Dieing in callbacks.
+
+0.04    2009-03-07 15:45 UTC
+        + Chg : Some implementation of pointer table is now used internally.
+                This should make thread safety more robust.
+        + Doc : Cleanups.
+        + Tst : Using Lexical::Types inside the 'as' callback.
+        + Tst : Thread safety.
+
+0.03    2009-03-05 21:15 UTC
+        + Doc : Discuss about using constants for types.
+        + Fix : The PL_ppaddr[OP_PADSV] localization logic was refined so that
+                it is kinder to other modules that replace it.
+        + Tst : "my Str ($x, $y)" and "for my Str $x ()" constructs
+        + Tst : uvar magic, magical tags.
+
+0.02    2009-02-25 16:10 UTC
+        + Add : Returning an empty list from the mangler skips the wrapping of
+                the current typed lexical declaration.
+        + Chg : The package and method names passed to the callbacks are now all
+                read-only.
+
+0.01    2009-02-24 23:20 UTC
+        First version, released on an unsuspecting world.
+

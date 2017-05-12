@@ -1,0 +1,25 @@
+Changes for Labyrinth-DIUtils-GD
+================================
+
+5.08    2014-10-18
+        - fixed license fields in META.json to be lists.
+        - extended META & functional test suite.
+        - switched to using IO::File instead of bare word handles.
+
+5.07    2014-05-04
+        - fixed distribution name in META.
+
+5.06    2013-02-24
+        - updated documentation.
+
+5.05    2013-02-24
+        - change file dates changed to meet W3CDTF standards.
+        - added LICENSE file.
+        - reworked Makefile.PL for clarity.
+        - various META file updates.
+        - updated README, added INSTALL file.
+        - updated and extended test suite.
+        - removed Croak and simplified error handling.
+
+5.04    2011-03-13
+        - abstracted from Labyrinth, as stand alone plugin.

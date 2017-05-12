@@ -1,0 +1,17 @@
+[BuiltinFunctions::RequireBlockGrep]
+severity = 5
+
+[BuiltinFunctions::RequireBlockMap]
+severity = 5
+
+[TestingAndDebugging::ProhibitNoWarnings]
+severity = 5
+
+[ControlStructures::ProhibitUntilBlocks]
+severity = 5
+
+[ControlStructures::ProhibitUnlessBlocks]
+severity = 5
+
+[ControlStructures::ProhibitPostfixControls]
+severity = 5

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Util.xs
+t/Lexical-Util.t
+lib/Lexical/Util.pm
+META.yml                                 Module meta-data (added by MakeMaker)

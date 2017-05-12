@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Log-Accounting-Sendmail
+version: 0.2
+author:
+  - Oliver Maul, oli@42.nu
+abstract: Accounting for sendmail
+license: perl
+requires: {}
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Log::Accounting::Sendmail:
+    file: lib/Log/Accounting/Sendmail.pm
+    version: 0.2
+generated_by: Module::Build version 0.22

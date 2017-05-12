@@ -1,0 +1,18 @@
+Revision history for Perl module Log::Any::Adapter::Redis
+
+1.000 2015-10-04
+    - bump to 1.0; no functional changes
+
+0.004 2015-06-27
+    - fix $VERSION
+
+0.003 2015-06-17
+    - updated prereqs
+
+0.002 2015-06-13
+    - updated documentation
+    - added optional logging of hostname and pid
+    - added logwriter example
+
+0.001 2015-06-13
+    - initial release

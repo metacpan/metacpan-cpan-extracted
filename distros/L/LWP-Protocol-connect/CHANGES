@@ -1,0 +1,244 @@
+==================================================
+Changes from 2013-01-07 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 6.09 at 2014-01-07 12:28:32 +0000
+-----------------------------------------
+
+  Change: 30f3cebcc42d6df3316e9192b486181f48d97dc6
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2014-01-07 04:19:20 +0000
+
+    Merge pull request #5 from olegwtf/master
+
+    IO::Socket::SSL->start_SSL should be used instead of
+    IO::Socket::SSL->new_from_fd 
+
+  Change: c43f1588eeb6580de09d2b26b006776cd92b76c2
+  Author: Oleg G <verdrehung@gmail.com>
+  Date : 2014-01-05 18:23:10 +0000
+
+    use IO::Socket::SSL->start_SSL instead of
+    IO::Socket::SSL->new_from_fd to prevent {io_socket_timeout} erasing 
+
+-----------------------------------------
+version 6.08 at 2013-12-28 16:09:29 +0000
+-----------------------------------------
+
+  Change: eedee661025678e583f23023485dc950d18b79ba
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-12-28 17:09:29 +0000
+
+    -add a VERSION to URI::connect 
+
+  Change: c22429853360a64a12eca65a43e7836213c47422
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-12-28 08:04:35 +0000
+
+    Merge pull request #4 from olegwtf/master
+
+    prevent reconnection and do not change http proxy permanently 
+
+  Change: faa57b61956c688b3e06b2c98f0a43b25bb33b12
+  Author: Oleg G <verdrehung@gmail.com>
+  Date : 2013-12-28 14:13:41 +0000
+
+    we should restore current http proxy after request 
+
+  Change: 67b8b2972f1832014417d65da0788c364bc37338
+  Author: Oleg G <verdrehung@gmail.com>
+  Date : 2013-12-28 14:07:59 +0000
+
+    prevent reconnection for http scheme 
+
+-----------------------------------------
+version 6.07 at 2013-12-27 13:20:31 +0000
+-----------------------------------------
+
+  Change: c32d6c33a9486b5294b0795f6c2bf6fb850ebc81
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-12-27 14:20:31 +0000
+
+    Added support for http scheme. 
+
+  Change: 008611380ef6deeb037198fc38d901ee477dbfca
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-12-27 14:07:46 +0000
+
+    Support for schemes other than https
+
+    -make LWP::Protocol::connect handle schemes other than https
+
+    -move generic CONNECT stuff to a LWP/Protocol/connect/Socket/Base.pm 
+
+-----------------------------------------
+version 6.06 at 2013-09-12 12:30:41 +0000
+-----------------------------------------
+
+  Change: 6e2cf7fdc0abc865b2c370dc6fe713ae334a65d7
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-09-12 14:30:41 +0000
+
+    -run only test only for AUTHOR 
+
+-----------------------------------------
+version 6.05 at 2013-09-05 10:16:18 +0000
+-----------------------------------------
+
+  Change: 28f5629c9e2d02d0ac50f923e3369506b5e7fd10
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-09-05 12:16:18 +0000
+
+    -skip proxy-auth test for ->credentials, wait for next LWP::UA
+    release 
+
+  Change: 13381cf4681cb405f2bb1af09449659ac04a452d
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-09-02 09:46:18 +0000
+
+    -mention proxy auth in POD docs 
+
+  Change: b6cc6e3f62fde606301ce4433bd0ae98560bee66
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-09-02 09:25:15 +0000
+
+    -added test script for proxy auth -use user agent of the request
+    (which has the ->credentials) -if userinfo is set just pass it thru 
+
+  Change: ccbed644c51fbd74bc284e3fa080c6f48876b577
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-30 13:30:41 +0000
+
+    -use LWP::UserAgent instead of NET::HTTP, because it handles
+    authentication 
+
+-----------------------------------------
+version 6.04 at 2013-08-07 11:54:18 +0000
+-----------------------------------------
+
+  Change: 20609163168d1525a80827b6fbc52a26a342591b
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-07 13:54:18 +0000
+
+    -add Test::Exception to test-requires 
+
+-----------------------------------------
+version 6.03 at 2013-07-26 06:39:29 +0000
+-----------------------------------------
+
+  Change: 317b9b702df6f0b50f9e3b9de682dd072844b726
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-26 08:39:29 +0000
+
+    -abort google test when no proxy/connectivity 
+
+-----------------------------------------
+version 6.02 at 2013-07-25 11:41:26 +0000
+-----------------------------------------
+
+  Change: cad058e42a673a4716edbff2104fa06e71b05837
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 13:41:26 +0000
+
+    -more dist::zilla configuration 
+
+  Change: a2e1db3d50ffb4ae5e8f628f06b2e18030642557
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 13:39:13 +0000
+
+    -use Git::NextVersion 
+
+  Change: a8b26c29276dc70dfb1dfabe7db378de15e062db
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 13:36:01 +0000
+
+    -set versions using OurPkgVersion 
+
+  Change: 4309752580bd6f8b451136d3b253cdf3510198fa
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 13:00:50 +0000
+
+    -add metajson/resources to dzil 
+
+-----------------------------------------
+version 6.01 at 2013-07-25 10:50:31 +0000
+-----------------------------------------
+
+  Change: 759debe3a2ba5c14a93b7e51bc2a7176c70d62b6
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 12:50:31 +0000
+
+    -remove github stuff 
+
+  Change: eb6ed4de627e14a3e3b0d65ec05fa20868964879
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 12:49:55 +0000
+
+    Merge branch 'master' of
+    https://github.com/benningm/LWP-Protocol-connect 
+
+  Change: da1d65631577a4721b9aad30bdaa97045e4a091b
+  Author: benningm <me@w3r3wolf.de>
+  Date : 2013-07-25 03:46:05 +0000
+
+    Initial commit 
+
+  Change: 3375528a58d3755c94472066718c769836ae207c
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 12:40:32 +0000
+
+    -add .gitignore file 
+
+  Change: f1ab1531fd08e0d7d26bd02194ebe4d5d6ba2c5f
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 12:38:00 +0000
+
+    -new release 6.01 
+
+  Change: abfe878f3309e31dc54db2f48bbafb911f317c9f
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 12:37:01 +0000
+
+    -reorder dzil modules 
+
+  Change: f7063e4f4243267d01c973c6e6bc58d691bbc381
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 12:17:06 +0000
+
+    -added AutoReqs 
+
+  Change: 073131424040865fd247b715f0fcbce9a480ff0a
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 10:58:18 +0000
+
+    -remove coverage test 
+
+  Change: daf7fe89c2d7b401493ad59af6a41db7f3ef49d2
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 10:54:12 +0000
+
+    -more work on dzil build stuff 
+
+  Change: 51082f6853bc984181b80f67c73a337a2208fe38
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 10:52:09 +0000
+
+    -split into one package per file -added test script to check against
+    google servers -more work on dzil build stuff 
+
+  Change: f58233cc74cef9601751f5904029ab1ffe891a62
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 09:34:06 +0000
+
+    -add basic dist:zilla configuration 
+
+  Change: 0f8daa3d7183ef0fe73d73e603e268469249e4f1
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-07-25 09:22:59 +0000
+
+    -initial import of module 
+
+================
+End of releases.
+================

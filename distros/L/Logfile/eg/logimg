@@ -1,0 +1,52 @@
+#!/bin/perl
+#                              -*- Mode: Perl -*- 
+# lodimg -- 
+# ITIID           : $ITI$ $Header $__Header$
+# Author          : Ulrich Pfeifer
+# Created On      : Thu Apr  4 13:39:23 1996
+# Last Modified By: Ulrich Pfeifer
+# Last Modified On: Fri May 17 13:37:11 1996
+# Language        : Perl
+# Update Count    : 23
+# Status          : Unknown, Use with caution!
+# 
+# (C) Copyright 1996, Universität Dortmund, all rights reserved.
+# 
+# $Locker$
+# $Log$
+# 
+
+$LOGPLOT  = '/home/robots/www/bin/logplot';
+$GIFTRANS = '/usr/local/ls6/bin/sun4-sunos/giftrans';
+$PPMTOGIF = '/usr/local/image-tools/bin/ppmtogif';
+$ARCH     = '/home/robots/www/.smartlog/archive';
+$LOG      = "$ARCH/httpd.log.0.gz";
+$IMGDIR   = '/home/robots/www/pages/icons/log';
+$IMGDIR   = '/home/robots/www/public-html/ir/intern/log';
+
+chdir $IMGDIR or die "Could not chdir to $IMGDIR\n";
+
+system "$LOGPLOT -type SFgate -index Database -log $ARCH/SFgate.log.0.gz -term pbm -out sfgate.ppm";
+mkgif("sfgate");
+
+system "$LOGPLOT -index File -min 10 -take 35 -bar -log $LOG -term pbm -out file1.ppm";
+mkgif("file1");
+system "$LOGPLOT -index File -min 10 -start 35 -bar -log $LOG -term pbm -out file2.ppm";
+mkgif("file2");
+
+system "$LOGPLOT -index File -log $LOG -term pbm -perc -out filep.ppm";
+mkgif("filep");
+
+system "$LOGPLOT -index Domain -log $LOG -term pbm -out domain.ppm";
+mkgif("domain");
+
+system "$LOGPLOT -index Date -bar -log $LOG -term pbm -out date.ppm";
+mkgif("date");
+
+sub mkgif {
+    my $file = shift;
+    
+    system "$PPMTOGIF $file.ppm | $GIFTRANS -t#ffffff > $file.gif";
+    unlink "$file.ppm";
+}
+           

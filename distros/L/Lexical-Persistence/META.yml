@@ -1,0 +1,30 @@
+---
+abstract: 'Persistent lexical variable values for arbitrary calls.'
+author:
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+build_requires:
+  Carp: 1.26
+  Scalar::Util: 1.29
+  Test::More: 0.98
+  constant: 0
+  perl: 5.004
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lexical-Persistence
+requires:
+  Devel::LexAlias: 0.05
+  PadWalker: 1.96
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Lexical-Persistence
+  homepage: http://search.cpan.org/dist/Lexical-Persistence/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rcaputo/lexical-persistence.git
+version: 1.023

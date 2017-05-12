@@ -1,0 +1,770 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml package="bbold"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <section refnum="1" xml:id="S1">
+    <title><tag close=" ">1</tag>Math</title>
+    <para xml:id="S1.p1">
+      <p>Note that some chars don’t actually give the right glyph in math.</p>
+    </para>
+    <para xml:id="S1.p2">
+      <tabular vattach="middle">
+        <tbody>
+          <tr>
+            <td align="center"><Math mode="inline" tex="\mathbb{\Gamma}" text="Gamma" xml:id="S1.p2.m1">
+                <XMath>
+                  <XMTok font="blackboard" name="Gamma" role="UNKNOWN">Γ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{\Delta}" text="Delta" xml:id="S1.p2.m2">
+                <XMath>
+                  <XMTok font="blackboard" name="Delta" role="UNKNOWN">Δ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{\Theta}" text="Theta" xml:id="S1.p2.m3">
+                <XMath>
+                  <XMTok font="blackboard" name="Theta" role="UNKNOWN">Θ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{\Lambda}" text="Lambda" xml:id="S1.p2.m4">
+                <XMath>
+                  <XMTok font="blackboard" name="Lambda" role="UNKNOWN">Λ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{\Xi}" text="Xi" xml:id="S1.p2.m5">
+                <XMath>
+                  <XMTok font="blackboard" name="Xi" role="UNKNOWN">Ξ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{\Pi}" text="Pi" xml:id="S1.p2.m6">
+                <XMath>
+                  <XMTok font="blackboard" name="Pi" role="UNKNOWN">Π</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{\Sigma}" text="Sigma" xml:id="S1.p2.m7">
+                <XMath>
+                  <XMTok font="blackboard" name="Sigma" role="UNKNOWN">Σ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{\Upsilon}" text="Upsilon" xml:id="S1.p2.m8">
+                <XMath>
+                  <XMTok font="blackboard" name="Upsilon" role="UNKNOWN">Υ</XMTok>
+                </XMath>
+              </Math></td>
+          </tr>
+          <tr>
+            <td align="center"><Math mode="inline" tex="\mathbb{\Phi}" text="Phi" xml:id="S1.p2.m9">
+                <XMath>
+                  <XMTok font="blackboard" name="Phi" role="UNKNOWN">Φ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{\Psi}" text="Psi" xml:id="S1.p2.m10">
+                <XMath>
+                  <XMTok font="blackboard" name="Psi" role="UNKNOWN">Ψ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{\Omega}" text="Omega" xml:id="S1.p2.m11">
+                <XMath>
+                  <XMTok font="blackboard" name="Omega" role="UNKNOWN">Ω</XMTok>
+                </XMath>
+              </Math></td>
+            <td/>
+            <td/>
+            <td/>
+            <td/>
+            <td/>
+          </tr>
+          <tr>
+            <td align="center"><Math mode="inline" tex="\mathbb{0}" text="𝟘" xml:id="S1.p2.m12">
+                <XMath>
+                  <XMTok font="blackboard" role="UNKNOWN">𝟘</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{1}" text="𝟙" xml:id="S1.p2.m13">
+                <XMath>
+                  <XMTok font="blackboard" role="UNKNOWN">𝟙</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{2}" text="𝟚" xml:id="S1.p2.m14">
+                <XMath>
+                  <XMTok font="blackboard" role="UNKNOWN">𝟚</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{3}" text="𝟛" xml:id="S1.p2.m15">
+                <XMath>
+                  <XMTok font="blackboard" role="UNKNOWN">𝟛</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{4}" text="𝟜" xml:id="S1.p2.m16">
+                <XMath>
+                  <XMTok font="blackboard" role="UNKNOWN">𝟜</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{5}" text="𝟝" xml:id="S1.p2.m17">
+                <XMath>
+                  <XMTok font="blackboard" role="UNKNOWN">𝟝</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{6}" text="𝟞" xml:id="S1.p2.m18">
+                <XMath>
+                  <XMTok font="blackboard" role="UNKNOWN">𝟞</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{7}" text="𝟟" xml:id="S1.p2.m19">
+                <XMath>
+                  <XMTok font="blackboard" role="UNKNOWN">𝟟</XMTok>
+                </XMath>
+              </Math></td>
+          </tr>
+          <tr>
+            <td align="center"><Math mode="inline" tex="\mathbb{8}" text="𝟠" xml:id="S1.p2.m20">
+                <XMath>
+                  <XMTok font="blackboard" role="UNKNOWN">𝟠</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{9}" text="𝟡" xml:id="S1.p2.m21">
+                <XMath>
+                  <XMTok font="blackboard" role="UNKNOWN">𝟡</XMTok>
+                </XMath>
+              </Math></td>
+            <td/>
+            <td/>
+            <td/>
+            <td/>
+            <td/>
+            <td/>
+          </tr>
+          <tr>
+            <td align="center"><Math mode="inline" tex="\mathbb{@}" text="@" xml:id="S1.p2.m22">
+                <XMath>
+                  <XMTok role="UNKNOWN">@</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{A}" text="𝔸" xml:id="S1.p2.m23">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝔸</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{B}" text="𝔹" xml:id="S1.p2.m24">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝔹</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{C}" text="ℂ" xml:id="S1.p2.m25">
+                <XMath>
+                  <XMTok role="UNKNOWN">ℂ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{D}" text="𝔻" xml:id="S1.p2.m26">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝔻</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{E}" text="𝔼" xml:id="S1.p2.m27">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝔼</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{F}" text="𝔽" xml:id="S1.p2.m28">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝔽</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{G}" text="𝔾" xml:id="S1.p2.m29">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝔾</XMTok>
+                </XMath>
+              </Math></td>
+          </tr>
+          <tr>
+            <td align="center"><Math mode="inline" tex="\mathbb{H}" text="ℍ" xml:id="S1.p2.m30">
+                <XMath>
+                  <XMTok role="UNKNOWN">ℍ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{I}" text="𝕀" xml:id="S1.p2.m31">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕀</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{J}" text="𝕁" xml:id="S1.p2.m32">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕁</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{K}" text="𝕂" xml:id="S1.p2.m33">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕂</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{L}" text="𝕃" xml:id="S1.p2.m34">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕃</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{M}" text="𝕄" xml:id="S1.p2.m35">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕄</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{N}" text="ℕ" xml:id="S1.p2.m36">
+                <XMath>
+                  <XMTok role="UNKNOWN">ℕ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{O}" text="𝕆" xml:id="S1.p2.m37">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕆</XMTok>
+                </XMath>
+              </Math></td>
+          </tr>
+          <tr>
+            <td align="center"><Math mode="inline" tex="\mathbb{P}" text="ℙ" xml:id="S1.p2.m38">
+                <XMath>
+                  <XMTok role="UNKNOWN">ℙ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{Q}" text="ℚ" xml:id="S1.p2.m39">
+                <XMath>
+                  <XMTok role="UNKNOWN">ℚ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{R}" text="ℝ" xml:id="S1.p2.m40">
+                <XMath>
+                  <XMTok role="UNKNOWN">ℝ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{S}" text="𝕊" xml:id="S1.p2.m41">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕊</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{T}" text="𝕋" xml:id="S1.p2.m42">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕋</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{U}" text="𝕌" xml:id="S1.p2.m43">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕌</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{V}" text="𝕍" xml:id="S1.p2.m44">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕍</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{W}" text="𝕎" xml:id="S1.p2.m45">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕎</XMTok>
+                </XMath>
+              </Math></td>
+          </tr>
+          <tr>
+            <td align="center"><Math mode="inline" tex="\mathbb{X}" text="𝕏" xml:id="S1.p2.m46">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕏</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{Y}" text="𝕐" xml:id="S1.p2.m47">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕐</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{Z}" text="ℤ" xml:id="S1.p2.m48">
+                <XMath>
+                  <XMTok role="UNKNOWN">ℤ</XMTok>
+                </XMath>
+              </Math></td>
+            <td/>
+            <td/>
+            <td/>
+            <td/>
+            <td/>
+          </tr>
+          <tr>
+            <td/>
+            <td align="center"><Math mode="inline" tex="\mathbb{a}" text="𝕒" xml:id="S1.p2.m49">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕒</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{b}" text="𝕓" xml:id="S1.p2.m50">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕓</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{c}" text="𝕔" xml:id="S1.p2.m51">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕔</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{d}" text="𝕕" xml:id="S1.p2.m52">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕕</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{e}" text="𝕖" xml:id="S1.p2.m53">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕖</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{f}" text="𝕗" xml:id="S1.p2.m54">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕗</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{g}" text="𝕘" xml:id="S1.p2.m55">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕘</XMTok>
+                </XMath>
+              </Math></td>
+          </tr>
+          <tr>
+            <td align="center"><Math mode="inline" tex="\mathbb{h}" text="𝕙" xml:id="S1.p2.m56">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕙</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{i}" text="𝕚" xml:id="S1.p2.m57">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕚</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{j}" text="𝕛" xml:id="S1.p2.m58">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕛</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{k}" text="𝕜" xml:id="S1.p2.m59">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕜</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{l}" text="𝕝" xml:id="S1.p2.m60">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕝</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{m}" text="𝕞" xml:id="S1.p2.m61">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕞</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{n}" text="𝕟" xml:id="S1.p2.m62">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕟</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{o}" text="𝕠" xml:id="S1.p2.m63">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕠</XMTok>
+                </XMath>
+              </Math></td>
+          </tr>
+          <tr>
+            <td align="center"><Math mode="inline" tex="\mathbb{p}" text="𝕡" xml:id="S1.p2.m64">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕡</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{q}" text="𝕢" xml:id="S1.p2.m65">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕢</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{r}" text="𝕣" xml:id="S1.p2.m66">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕣</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{s}" text="𝕤" xml:id="S1.p2.m67">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕤</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{t}" text="𝕥" xml:id="S1.p2.m68">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕥</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{u}" text="𝕦" xml:id="S1.p2.m69">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕦</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{v}" text="𝕧" xml:id="S1.p2.m70">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕧</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{w}" text="𝕨" xml:id="S1.p2.m71">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕨</XMTok>
+                </XMath>
+              </Math></td>
+          </tr>
+          <tr>
+            <td align="center"><Math mode="inline" tex="\mathbb{x}" text="𝕩" xml:id="S1.p2.m72">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕩</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{y}" text="𝕪" xml:id="S1.p2.m73">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕪</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{z}" text="𝕫" xml:id="S1.p2.m74">
+                <XMath>
+                  <XMTok role="UNKNOWN">𝕫</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\mathbb{-}" text="-" xml:id="S1.p2.m75">
+                <XMath>
+                  <XMTok meaning="minus" role="ADDOP">-</XMTok>
+                </XMath>
+              </Math></td>
+            <td/>
+            <td/>
+            <td/>
+            <td/>
+          </tr>
+        </tbody>
+      </tabular>
+    </para>
+  </section>
+  <section refnum="2" xml:id="S2">
+    <title><tag close=" ">2</tag>Text</title>
+    <para xml:id="S2.p1">
+      <p>Note that some chars don’t actually give the right glyph in text.</p>
+    </para>
+    <para xml:id="S2.p2">
+      <tabular class="ltx_guessed_headers" vattach="middle">
+        <thead>
+          <tr>
+            <td align="center" thead="column row"><text font="blackboard">⟬</text></td>
+            <td align="center" thead="column row"><text font="blackboard">⟭</text></td>
+            <td align="center" thead="column"><text font="blackboard">*</text></td>
+            <td align="center" thead="column"><text font="blackboard">+</text></td>
+            <td align="center" thead="column"><text font="blackboard">,</text></td>
+            <td align="center" thead="column"><text font="blackboard">-</text></td>
+            <td align="center" thead="column"><text font="blackboard">.</text></td>
+            <td align="center" thead="column"><text font="blackboard">/</text></td>
+          </tr>
+          <tr>
+            <td align="center" thead="column row"><text font="blackboard">𝟘</text></td>
+            <td align="center" thead="column row"><text font="blackboard">𝟙</text></td>
+            <td align="center" thead="column"><text font="blackboard">𝟚</text></td>
+            <td align="center" thead="column"><text font="blackboard">𝟛</text></td>
+            <td align="center" thead="column"><text font="blackboard">𝟜</text></td>
+            <td align="center" thead="column"><text font="blackboard">𝟝</text></td>
+            <td align="center" thead="column"><text font="blackboard">𝟞</text></td>
+            <td align="center" thead="column"><text font="blackboard">𝟟</text></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td align="center" thead="row"><text font="blackboard">𝟠</text></td>
+            <td align="center" thead="row"><text font="blackboard">𝟡</text></td>
+            <td align="center"><text font="blackboard">:</text></td>
+            <td align="center"><text font="blackboard">;</text></td>
+            <td align="center"><text font="blackboard">&lt;</text></td>
+            <td/>
+            <td align="center"><text font="blackboard">&gt;</text></td>
+            <td align="center"><text font="blackboard">?</text></td>
+          </tr>
+          <tr>
+            <td align="center" thead="row"><text font="blackboard">@</text></td>
+            <td align="center" thead="row"><text font="blackboard">𝔸</text></td>
+            <td align="center"><text font="blackboard">𝔹</text></td>
+            <td align="center"><text font="blackboard">ℂ</text></td>
+            <td align="center"><text font="blackboard">𝔻</text></td>
+            <td align="center"><text font="blackboard">𝔼</text></td>
+            <td align="center"><text font="blackboard">𝔽</text></td>
+            <td align="center"><text font="blackboard">𝔾</text></td>
+          </tr>
+          <tr>
+            <td align="center" thead="row"><text font="blackboard">ℍ</text></td>
+            <td align="center" thead="row"><text font="blackboard">𝕀</text></td>
+            <td align="center"><text font="blackboard">𝕁</text></td>
+            <td align="center"><text font="blackboard">𝕂</text></td>
+            <td align="center"><text font="blackboard">𝕃</text></td>
+            <td align="center"><text font="blackboard">𝕄</text></td>
+            <td align="center"><text font="blackboard">ℕ</text></td>
+            <td align="center"><text font="blackboard">𝕆</text></td>
+          </tr>
+          <tr>
+            <td align="center" thead="row"><text font="blackboard">ℙ</text></td>
+            <td align="center" thead="row"><text font="blackboard">ℚ</text></td>
+            <td align="center"><text font="blackboard">ℝ</text></td>
+            <td align="center"><text font="blackboard">𝕊</text></td>
+            <td align="center"><text font="blackboard">𝕋</text></td>
+            <td align="center"><text font="blackboard">𝕌</text></td>
+            <td align="center"><text font="blackboard">𝕍</text></td>
+            <td align="center"><text font="blackboard">𝕎</text></td>
+          </tr>
+          <tr>
+            <td align="center" thead="row"><text font="blackboard">𝕏</text></td>
+            <td align="center" thead="row"><text font="blackboard">𝕐</text></td>
+            <td align="center"><text font="blackboard">ℤ</text></td>
+            <td align="center"><text font="blackboard">⟦</text></td>
+            <td/>
+            <td align="center"><text font="blackboard">⟧</text></td>
+            <td/>
+            <td/>
+          </tr>
+          <tr>
+            <td align="center" thead="row"><text font="blackboard">`</text></td>
+            <td align="center" thead="row"><text font="blackboard">𝕒</text></td>
+            <td align="center"><text font="blackboard">𝕓</text></td>
+            <td align="center"><text font="blackboard">𝕔</text></td>
+            <td align="center"><text font="blackboard">𝕕</text></td>
+            <td align="center"><text font="blackboard">𝕖</text></td>
+            <td align="center"><text font="blackboard">𝕗</text></td>
+            <td align="center"><text font="blackboard">𝕘</text></td>
+          </tr>
+          <tr>
+            <td align="center" thead="row"><text font="blackboard">𝕙</text></td>
+            <td align="center" thead="row"><text font="blackboard">𝕚</text></td>
+            <td align="center"><text font="blackboard">𝕛</text></td>
+            <td align="center"><text font="blackboard">𝕜</text></td>
+            <td align="center"><text font="blackboard">𝕝</text></td>
+            <td align="center"><text font="blackboard">𝕞</text></td>
+            <td align="center"><text font="blackboard">𝕟</text></td>
+            <td align="center"><text font="blackboard">𝕠</text></td>
+          </tr>
+          <tr>
+            <td align="center" thead="row"><text font="blackboard">𝕡</text></td>
+            <td align="center" thead="row"><text font="blackboard">𝕢</text></td>
+            <td align="center"><text font="blackboard">𝕣</text></td>
+            <td align="center"><text font="blackboard">𝕤</text></td>
+            <td align="center"><text font="blackboard">𝕥</text></td>
+            <td align="center"><text font="blackboard">𝕦</text></td>
+            <td align="center"><text font="blackboard">𝕧</text></td>
+            <td align="center"><text font="blackboard">𝕨</text></td>
+          </tr>
+          <tr>
+            <td align="center" thead="row"><text font="blackboard">𝕩</text></td>
+            <td align="center" thead="row"><text font="blackboard">𝕪</text></td>
+            <td align="center"><text font="blackboard">𝕫</text></td>
+            <td align="center"><text font="blackboard">-</text></td>
+            <td align="center"><text font="blackboard">|</text></td>
+            <td align="center"><text font="blackboard">–</text></td>
+            <td align="center"><text font="blackboard">``</text></td>
+            <td/>
+          </tr>
+        </tbody>
+      </tabular>
+    </para>
+  </section>
+  <section refnum="3" xml:id="S3">
+    <title><tag close=" ">3</tag>Running</title>
+    <para xml:id="S3.p1">
+      <p><text font="blackboard">𝔸𝕟𝕕 𝕤𝕦𝕔𝕙 𝕒 ⟬𝕤𝕚𝕝𝕝𝕪⟭ 𝕖𝕩𝕒𝕞𝕡𝕝𝕖 𝕠𝕗 𝕥𝕖𝕩𝕥.</text></p>
+    </para>
+  </section>
+  <section refnum="4" xml:id="S4">
+    <title><tag close=" ">4</tag>Font Table</title>
+    <para xml:id="S4.p1">
+      <p>And, note that some of these glyphs don’t have corresponding codepoints
+in Unicode!</p>
+    </para>
+    <para xml:id="S4.p2">
+      <tabular class="ltx_guessed_headers" vattach="middle">
+        <tbody>
+          <tr>
+            <td border="r" thead="row"/>
+            <td align="center">´0</td>
+            <td align="center">´1</td>
+            <td align="center">´2</td>
+            <td align="center">´3</td>
+            <td align="center">´4</td>
+            <td align="center">´5</td>
+            <td align="center">´6</td>
+            <td align="center">´7</td>
+          </tr>
+          <tr>
+            <td align="right" border="r t" thead="row">´0x</td>
+            <td align="center" border="t"><text font="blackboard">ℾ</text></td>
+            <td align="center" border="t"><text font="blackboard">Δ</text></td>
+            <td align="center" border="t"><text font="blackboard">Θ</text></td>
+            <td align="center" border="t"><text font="blackboard">Λ</text></td>
+            <td align="center" border="t"><text font="blackboard">Ξ</text></td>
+            <td align="center" border="t"><text font="blackboard">ℿ</text></td>
+            <td align="center" border="t"><text font="blackboard">⅀</text></td>
+            <td align="center" border="t"><text font="blackboard">Υ</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´1x</td>
+            <td align="center"><text font="blackboard">Φ</text></td>
+            <td align="center"><text font="blackboard">Ψ</text></td>
+            <td align="center"><text font="blackboard">Ω</text></td>
+            <td align="center"><text font="blackboard">α</text></td>
+            <td align="center"><text font="blackboard">β</text></td>
+            <td align="center"><text font="blackboard">ℽ</text></td>
+            <td align="center"><text font="blackboard">δ</text></td>
+            <td align="center"><text font="blackboard">ϵ</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´2x</td>
+            <td align="center"><text font="blackboard">ζ</text></td>
+            <td align="center"><text font="blackboard">η</text></td>
+            <td align="center"><text font="blackboard">θ</text></td>
+            <td align="center"><text font="blackboard">ι</text></td>
+            <td align="center"><text font="blackboard">κ</text></td>
+            <td align="center"><text font="blackboard">λ</text></td>
+            <td align="center"><text font="blackboard">μ</text></td>
+            <td align="center"><text font="blackboard">ν</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´3x</td>
+            <td align="center"><text font="blackboard">ξ</text></td>
+            <td align="center"><text font="blackboard">ℼ</text></td>
+            <td align="center"><text font="blackboard">ρ</text></td>
+            <td align="center"><text font="blackboard">σ</text></td>
+            <td align="center"><text font="blackboard">τ</text></td>
+            <td align="center"><text font="blackboard">υ</text></td>
+            <td align="center"><text font="blackboard">ϕ</text></td>
+            <td align="center"><text font="blackboard">χ</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´4x</td>
+            <td align="center"><text font="blackboard">ψ</text></td>
+            <td align="center"><text font="blackboard">!</text></td>
+            <td align="center"><text font="blackboard">"</text></td>
+            <td align="center"><text font="blackboard">#</text></td>
+            <td align="center"><text font="blackboard">$</text></td>
+            <td align="center"><text font="blackboard">%</text></td>
+            <td align="center"><text font="blackboard">&amp;</text></td>
+            <td align="center"><text font="blackboard">'</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´5x</td>
+            <td align="center"><text font="blackboard">⟬</text></td>
+            <td align="center"><text font="blackboard">⟭</text></td>
+            <td align="center"><text font="blackboard">*</text></td>
+            <td align="center"><text font="blackboard">+</text></td>
+            <td align="center"><text font="blackboard">,</text></td>
+            <td align="center"><text font="blackboard">-</text></td>
+            <td align="center"><text font="blackboard">.</text></td>
+            <td align="center"><text font="blackboard">/</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´6x</td>
+            <td align="center"><text font="blackboard">𝟘</text></td>
+            <td align="center"><text font="blackboard">𝟙</text></td>
+            <td align="center"><text font="blackboard">𝟚</text></td>
+            <td align="center"><text font="blackboard">𝟛</text></td>
+            <td align="center"><text font="blackboard">𝟜</text></td>
+            <td align="center"><text font="blackboard">𝟝</text></td>
+            <td align="center"><text font="blackboard">𝟞</text></td>
+            <td align="center"><text font="blackboard">𝟟</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´7x</td>
+            <td align="center"><text font="blackboard">𝟠</text></td>
+            <td align="center"><text font="blackboard">𝟡</text></td>
+            <td align="center"><text font="blackboard">:</text></td>
+            <td align="center"><text font="blackboard">;</text></td>
+            <td align="center"><text font="blackboard">&lt;</text></td>
+            <td align="center"><text font="blackboard">⋅</text></td>
+            <td align="center"><text font="blackboard">&gt;</text></td>
+            <td align="center"><text font="blackboard">?</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´10x</td>
+            <td align="center"><text font="blackboard">@</text></td>
+            <td align="center"><text font="blackboard">𝔸</text></td>
+            <td align="center"><text font="blackboard">𝔹</text></td>
+            <td align="center"><text font="blackboard">ℂ</text></td>
+            <td align="center"><text font="blackboard">𝔻</text></td>
+            <td align="center"><text font="blackboard">𝔼</text></td>
+            <td align="center"><text font="blackboard">𝔽</text></td>
+            <td align="center"><text font="blackboard">𝔾</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´11x</td>
+            <td align="center"><text font="blackboard">ℍ</text></td>
+            <td align="center"><text font="blackboard">𝕀</text></td>
+            <td align="center"><text font="blackboard">𝕁</text></td>
+            <td align="center"><text font="blackboard">𝕂</text></td>
+            <td align="center"><text font="blackboard">𝕃</text></td>
+            <td align="center"><text font="blackboard">𝕄</text></td>
+            <td align="center"><text font="blackboard">ℕ</text></td>
+            <td align="center"><text font="blackboard">𝕆</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´12x</td>
+            <td align="center"><text font="blackboard">ℙ</text></td>
+            <td align="center"><text font="blackboard">ℚ</text></td>
+            <td align="center"><text font="blackboard">ℝ</text></td>
+            <td align="center"><text font="blackboard">𝕊</text></td>
+            <td align="center"><text font="blackboard">𝕋</text></td>
+            <td align="center"><text font="blackboard">𝕌</text></td>
+            <td align="center"><text font="blackboard">𝕍</text></td>
+            <td align="center"><text font="blackboard">𝕎</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´13x</td>
+            <td align="center"><text font="blackboard">𝕏</text></td>
+            <td align="center"><text font="blackboard">𝕐</text></td>
+            <td align="center"><text font="blackboard">ℤ</text></td>
+            <td align="center"><text font="blackboard">⟦</text></td>
+            <td align="center"><text font="blackboard">\</text></td>
+            <td align="center"><text font="blackboard">⟧</text></td>
+            <td align="center"><text font="blackboard">{</text></td>
+            <td align="center"><text font="blackboard">}</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´14x</td>
+            <td align="center"><text font="blackboard">`</text></td>
+            <td align="center"><text font="blackboard">𝕒</text></td>
+            <td align="center"><text font="blackboard">𝕓</text></td>
+            <td align="center"><text font="blackboard">𝕔</text></td>
+            <td align="center"><text font="blackboard">𝕕</text></td>
+            <td align="center"><text font="blackboard">𝕖</text></td>
+            <td align="center"><text font="blackboard">𝕗</text></td>
+            <td align="center"><text font="blackboard">𝕘</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´15x</td>
+            <td align="center"><text font="blackboard">𝕙</text></td>
+            <td align="center"><text font="blackboard">𝕚</text></td>
+            <td align="center"><text font="blackboard">𝕛</text></td>
+            <td align="center"><text font="blackboard">𝕜</text></td>
+            <td align="center"><text font="blackboard">𝕝</text></td>
+            <td align="center"><text font="blackboard">𝕞</text></td>
+            <td align="center"><text font="blackboard">𝕟</text></td>
+            <td align="center"><text font="blackboard">𝕠</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´16x</td>
+            <td align="center"><text font="blackboard">𝕡</text></td>
+            <td align="center"><text font="blackboard">𝕢</text></td>
+            <td align="center"><text font="blackboard">𝕣</text></td>
+            <td align="center"><text font="blackboard">𝕤</text></td>
+            <td align="center"><text font="blackboard">𝕥</text></td>
+            <td align="center"><text font="blackboard">𝕦</text></td>
+            <td align="center"><text font="blackboard">𝕧</text></td>
+            <td align="center"><text font="blackboard">𝕨</text></td>
+          </tr>
+          <tr>
+            <td align="right" border="r" thead="row">´17x</td>
+            <td align="center"><text font="blackboard">𝕩</text></td>
+            <td align="center"><text font="blackboard">𝕪</text></td>
+            <td align="center"><text font="blackboard">𝕫</text></td>
+            <td align="center"><text font="blackboard">-</text></td>
+            <td align="center"><text font="blackboard">|</text></td>
+            <td align="center"><text font="blackboard">–</text></td>
+            <td align="center"><text font="blackboard">``</text></td>
+            <td align="center"><text font="blackboard">ω</text></td>
+          </tr>
+        </tbody>
+      </tabular>
+    </para>
+  </section>
+</document>

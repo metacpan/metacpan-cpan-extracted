@@ -1,0 +1,33 @@
+Revision history for Lingua-EN-Grammarian
+
+0.000001  Mon Apr  8 14:59:00 2013
+       Initial release.
+
+
+
+0.000002  Fri Jul 26 07:25:48 2013
+          No changes logged
+
+
+0.000003  Fri Jul 26 08:55:43 2013
+
+    Tweaked explanations layout for cautions
+
+
+
+0.000004  Fri Aug  2 18:47:57 2013
+
+    - New cautions
+
+    - Prevented infinite hangs when no config data found
+      and warned as well (thanks Peter!)
+
+
+
+0.000005  Thu Mar 13 08:29:38 2014
+
+    - Added "in (no,any) way, shape, or form"
+      (thanks, Tom)
+
+    - Fixed loading of errors and cautions
+      (thanks, Brian)

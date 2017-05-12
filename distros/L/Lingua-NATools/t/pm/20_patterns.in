@@ -1,0 +1,34 @@
+# PT = EN
+
+[HDI] I "de" D H = H D I;
+
+# Protocolo de transferencia de ficheiros - File Transfer Protocol
+[FTP] P "de" T "de" F = F T P;
+
+[POV] (P "de" V)[CAT -> N] N = N (P "of" V)[CAT -> N];
+
+[A] A "de"|"da"|"do" B = B A;
+
+[TAXI] A B C = C A B;
+
+# [W] A = "will" A;
+
+
+[ABCCBA] (A B).foo C.zbr = C B A;
+
+
+# Abba rule :)
+[ABBA] A B[CAT -> ADJ] = B[CAT -> ADJ] A;
+
+
+
+%%
+
+# And in fact this is not evaluated yet, so it should not complain
+# about syntactic errors.
+
+sub foo {
+}
+
+sub zbr {
+}

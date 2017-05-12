@@ -1,0 +1,37 @@
+--- #YAML:1.0
+name:               Lim-Plugin-DNS
+version:            0.12
+abstract:           DNS Manager plugin for Lim
+author:
+    - Jerry Lundström <lundstrom.jerry@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    common::sense:  3
+    Digest::SHA:    5
+    Fcntl:          1.06
+    Getopt::Long:   2.38
+    Lim:            0.16
+    Scalar::Util:   1
+    Test::More:     0
+requires:
+    common::sense:  3
+    Digest::SHA:    5
+    Fcntl:          1.06
+    Getopt::Long:   2.38
+    Lim:            0.16
+    Scalar::Util:   1
+resources:
+    bugtracker:  http://github.com/jelu/lim-plugin-dns/issues
+    homepage:    http://github.com/jelu/lim-plugin-dns/wiki
+    repository:  http://github.com/jelu/lim-plugin-dns
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

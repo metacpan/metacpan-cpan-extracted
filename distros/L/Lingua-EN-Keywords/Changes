@@ -1,0 +1,13 @@
+Revision history for Perl extension Lingua::EN::Keywords.
+
+2.0   Mon Apr 28 11:21:27 BST 2003
+    - Complete rewrite, uses Lingua::EN::Tagger for the heavy lifting.
+
+1.0   Sun Sep  1 19:05:16 BST 2002
+    - Fix dependency on Text::Sentence (Fixes bug #1420 noticed by
+      Jesse)
+
+0.01  Sun Apr 29 16:59:13 2001
+	- original version; created by h2xs 1.20 with options
+		-AX -n Lingua::EN::Keywords
+

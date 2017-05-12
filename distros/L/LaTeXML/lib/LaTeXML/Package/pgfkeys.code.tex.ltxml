@@ -1,0 +1,509 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  pgfkeys.code.tex                                                   | #
+# | Implementation for LaTeXML                                          | #
+# |---------------------------------------------------------------------| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+#======================================================================
+# Profiling suggests pgfkeys is major costly component running tikz
+# under LaTeXML (but not necessarily LaTeX!).  The strategy here is to
+# "efficiently" implement the core macros (locked from further changes),
+# and then load the TeX implementation of pgfkeys from the tex installation.
+# This fills in any extra macros (that are fast enough as macros).
+# Most importantly, it gets all the built-in key bindings that implement
+# much of the complex logic of pgf keywords.
+# I _think_ this implementation fairly completely captures pgfkeys logic.
+#======================================================================
+# To disable the LaTeXML binding, uncomment the following bit of code
+# InputDefinitions('pgfkeys.code', type => 'tex', noltxml => 1)
+#   || Warn(":missing:pgfkeys.code.tex Couldn't find pgfkeys.code.tex");
+# Info('latexml', 'pgfkeys', undef, "Skipping LaTeXML binding for pgfkeys");
+# 1;
+#
+# __END__
+#
+#======================================================================
+my $PGFKEYS_DEBUG = 0;
+
+# Basic accessors to keys
+sub pgfkeyCS {
+  my ($key) = @_;
+  $key = ToString($key);
+  # Is this a warning of something more fundamental?
+  # (ie. we're insisting on preserving newlines in T_SPACE!)
+  $key =~ s/\n/ /g;
+  return T_CS('\pgfk@' . $key); }
+
+sub pgfkeyLookup {
+  my ($key) = @_;
+  my $kcs = pgfkeyCS($key);
+  return (LookupDefinition($kcs) ? $kcs : ()); }
+
+# Expand like edef does (w.r.t \the)
+sub eExpand {
+  my ($tokens) = @_;
+  local $LaTeXML::NOEXPAND_THE = 1;
+  return Expand($tokens); }
+
+DefPrimitive('\pgfkeyssetvalue{}{}', sub {
+    my ($stomach, $key, $value) = @_;
+    $key = ToString(Expand($key));
+    DefMacroI(pgfkeyCS($key), undef, $value); },
+  locked => 1);
+
+DefPrimitive('\pgfkeysaddvalue{}{}{}', sub {
+    my ($stomach, $key, $before, $after) = @_;
+    $key = ToString(Expand($key));
+    my $cs        = pgfkeyCS($key);
+    my $defn      = LookupDefinition($cs);
+    my $expansion = Tokens($before->unlist,
+      ($defn ? $defn->getExpansion->unlist : ()),
+      $after->unlist);
+    DefMacroI($cs, undef, $expansion); },
+  locked => 1);
+
+DefPrimitive('\pgfkeyslet{} DefToken', sub {
+    my ($stomach, $key, $value) = @_;
+    $key = ToString(Expand($key));
+    Let(pgfkeyCS($key), $value); },
+  locked => 1);
+
+DefPrimitive('\pgfkeysgetvalue{} DefToken', sub {
+    my ($stomach, $key, $cmd) = @_;
+    $key = ToString(Expand($key));
+    Let($cmd, pgfkeyCS($key)); },
+  locked => 1);
+
+DefMacro('\pgfkeysvalueof{}', sub {
+    my ($gullet, $key) = @_;
+    $key = ToString(Expand($key));
+    return (pgfkeyCS($key)); },
+  locked => 1);
+
+DefMacro('\pgfkeysifdefined{}{}{}', sub {
+    my ($gullet, $key, $if, $else) = @_;
+    $key = ToString(Expand($key));
+    (LookupDefinition(pgfkeyCS($key)) ? $if->unlist : $else->unlist); },
+  locked => 1);
+
+DefMacro('\pgfkeysifassignable{}{}{}', sub {
+    my ($gullet, $key, $if, $else) = @_;
+    $key = ToString(Expand($key));
+    (LookupDefinition(pgfkeyCS($key)) || LookupDefinition(pgfkeyCS($key . '/.@cmd'))
+      ? $if->unlist : $else->unlist); },
+  locked => 1);
+
+DefMacro('\pgfkeys@error{}', sub {
+    my ($gullet, $msg) = @_;
+    Warn('unexpected', 'pgfkeys', $gullet,
+      "In package pgfkeys: " . ToString(Expand($msg))); },
+  locked => 1);
+
+#======================================================================
+# Now, here's where it gets interesting!!!!
+
+DefPrimitive('\pgfkeys{}', sub {
+    my ($stomach, $keyvals) = @_;
+    my $savedpath = Expand(T_CS('\pgfkeysdefaultpath'));
+    Let('\pgfkeysdefaultpath', '\pgfkeys@root');
+    my @results = parsePGFKeys($stomach, $keyvals);
+    DefMacroI('\pgfkeysdefaultpath', undef, $savedpath);
+    return @results; },
+  locked => 1);
+
+DefPrimitive('\pgfqkeys{}{}', sub {
+    my ($stomach, $path, $keyvals) = @_;
+    my $savedpath = Expand(T_CS('\pgfkeysdefaultpath'));
+    my $newpath = Tokens(Expand($path)->unlist, T_OTHER('/'));
+    DefMacroI('\pgfkeysdefaultpath', undef, $newpath);
+    my @results = parsePGFKeys($stomach, $keyvals);
+    DefMacroI('\pgfkeysdefaultpath', undef, $savedpath);
+    return @results; },
+  locked => 1);
+
+DefPrimitive('\pgfkeysalso{}', sub {
+    my ($stomach, $keyvals) = @_;
+    my @results = parsePGFKeys($stomach, $keyvals);
+    return @results; },
+  locked => 1);
+
+DefPrimitive('\pgfqkeysalso{}{}', sub {
+    my ($stomach, $path, $keyvals) = @_;
+    my $newpath = Tokens(Expand($path)->unlist, T_OTHER('/'));
+    DefMacroI('\pgfkeysdefaultpath', undef, $newpath);
+    my @results = parsePGFKeys($stomach, $keyvals);
+    return @results; },
+  locked => 1);
+
+DefMacro('\pgfkeys@root',         '/');
+DefMacro('\pgfkeysdefaultpath',   '\pgfkeys@root');
+DefMacro('\pgfkeyscurrentkey',    '');
+DefMacro('\pgfkeyscurrentkeyRAW', '');
+DefMacro('\pgfkeyscurrentpath',   '/');
+DefMacro('\pgfkeyscurrentname',   '');
+
+DefConditional('\ifpgfkeysaddeddefaultpath', undef,
+  locked => 1);
+DefConditional('\ifpgfkeyssuccess', undef,
+  locked => 1);
+
+# Stub things that are only supposed to equal themselves...
+DefMacro('\pgfkeys@mainstop', '\pgfkeys@mainstop',
+  locked => 1);
+DefMacro('\pgfkeys@novalue', '',
+  locked => 1);
+DefMacro('\pgfkeysnovalue', '\pgfkeys@novalue',
+  locked => 1);
+DefMacro('\pgfkeysnovalue@text', '\pgfkeysnovalue',
+  locked => 1);
+DefMacro('\pgfkeysvaluerequired', '\pgfkeysvaluerequired',
+  locked => 1);
+
+# TODO "syntaxhandlers" not yet handled
+# (deals with /first char syntax/ stuff, affecting how key=value is parsed?)
+sub parsePGFKeys {
+  my ($stomach, $keyvals) = @_;
+  my @tokens = $keyvals->unlist;
+  if (@tokens && ($tokens[0]->getCatcode == CC_BEGIN) && ($tokens[-1]->getCatcode == CC_END)) {
+    shift(@tokens); pop(@tokens); }    # unwrap
+  my @results = ();
+  while (@tokens) {
+    while (@tokens && ($tokens[0]->getCatcode == CC_SPACE)) {    # Skip whitespace
+      shift(@tokens); }
+    last unless @tokens;
+
+    #----------------------------------------
+    # First, pull off tokens like <key>=<value>,
+    my @k = ();
+    # pull tokens until '=' or ',' ==> key
+    while (@tokens && !Equals($tokens[0], T_OTHER('=')) && !Equals($tokens[0], T_OTHER(','))) {
+      push(@k, shift(@tokens)); }
+    while (@k && ($k[-1]->getCatcode == CC_SPACE)) {    # Skip whitespace
+      pop(@k); }
+    my $value = undef;
+    # Then if '=', pull tokens until end or , ==> value
+    # If there's an =, then there's a value (possibly empty), otherwise no value given.
+    if (@tokens && Equals($tokens[0], T_OTHER('='))) {    # If '=', explicit value
+      my @v = ();
+      shift(@tokens);                                     # Skip '='
+      while (@tokens && ($tokens[0]->getCatcode == CC_SPACE)) {    # Skip whitespace
+        shift(@tokens); }
+      # Balanced tokens until ','
+      while (@tokens && !Equals($tokens[0], T_OTHER(','))) {
+        if (Equals($tokens[0], T_BEGIN)) {
+          my ($level, $t) = (0, undef);
+          while (defined($t = shift(@tokens))) {
+            my $cc = $t->getCatcode;
+            $level++ if $cc == CC_BEGIN;
+            $level-- if $cc == CC_END;
+            push(@v, $t);
+            last unless $level; } }
+        else {
+          push(@v, shift(@tokens)); } }
+      while (@v && ($v[-1]->getCatcode == CC_SPACE)) {    # pop spaces off of value????
+        pop(@v); }
+      $value = Tokens(@v); }
+    if (@tokens && Equals($tokens[0], T_OTHER(','))) {    # And skip the comma, if we're not at end.
+      shift(@tokens); }                                   # Remove the comma
+    next unless @k;                                       # Ignore empty slots between commas
+
+    #----------------------------------------
+    # Now, get the current key, expanded, and @add@path@as@needed
+    my $key = Expand(Tokens(@k));
+    @k = $key->unlist;
+    DefMacroI(T_CS('\pgfkeyscurrentkeyRAW'), undef, $key);
+    # Separate  the key into the path & name, default the path
+    # Note that this isn't consistently described in pgfkeys.code.tex
+    if (@k && !Equals($k[0], T_OTHER('/'))) {    # If doesn't start with /, add default path
+      Digest(T_CS('\pgfkeysaddeddefaultpathtrue'));
+      my $oldkey = Tokens(@k);
+      unshift(@k, Expand(T_CS('\pgfkeysdefaultpath'))->unlist);
+      $key = Tokens(@k); }
+    else {
+      Digest(T_CS('\pgfkeysaddeddefaultpathfalse')); }
+    DefMacroI(T_CS('\pgfkeyscurrentkey'), undef, $key);
+
+    #----------------------------------------
+    # Finally, start working with the value
+    pgfAssignKey($stomach, ToString($key), $value); }
+  return @results; }
+
+# But first, let's try to deal with filtering...
+DefConditional('\ifpgfkeysfiltercontinue');
+DefConditional('\ifpgfkeysfilteringisactive');
+
+# This sub attempts to capture the behaviour of case 1, 2 and 3
+# including the filtered and restricted variants,
+# and the different all, onlyexisting and fullorexisting behaviours.
+sub pgfAssignKey {
+  my ($stomach, $key, $value) = @_;
+  my $cmdkey;
+  my $filtered = IfCondition(T_CS('\ifpgfkeysfilteringisactive'));
+  # Double # to simulate what \pgfkeys@spdef does
+  DefMacroI(T_CS('\pgfkeyscurrentvalue'), undef,
+    ($value ? Tokens(map { ($_->getCatcode == CC_PARAM ? ($_, $_) : $_) } $value->unlist)
+      : ()));    # (or \pgfkeysnovalue ????
+  if (defined $value) { }    # Got value? ok.
+  elsif (my $def = pgfkeyLookup($key . '/.@def')) {    # else if a default, let to it
+    Let(T_CS('\pgfkeyscurrentvalue'), pgfkeyCS($key . '/.@def')); }
+
+  # Deal with cases where value is required
+  if (XEquals(T_CS('\pgfkeyscurrentvalue'), T_CS('\pgfkeysvaluerequired'))) {    # value REQUIRED!
+    Digest(Tokens(pgfkeyCS('/errors/value required/.@def'), T_CS('\pgfcurrentkey'),
+        T_CS('\pgfkeyscurrentkey'), T_CS('\pgfkeyscurrentvalue'))); }
+  else {
+    # Case 1: a command defined for the key
+    if ($filtered) {
+      # \pgfkeys@cur@is@descendant@of@errors
+      my $check = ($key =~ m|^/errors|);
+      SetCondition(T_CS('\ifpgfkeysfiltercontinue'), $check);
+      print STDERR "[SPECIAL CHECK] '$key' is descendant of '/errors': " . ($check ? 'TRUE' : 'FALSE') . ".\n" if $PGFKEYS_DEBUG;
+      if (IfCondition(T_CS('\ifpgfkeysfiltercontinue'))) {
+        $filtered = 0; } }
+    if ($filtered) { SetCondition(T_CS('\ifpgfkeysfiltercontinue'), 1); }
+    if (pgfkeyLookup($cmdkey = $key . '/.@cmd')) {    # Case 1
+      return if $filtered && testFilterPredicate($key, 1);
+      print STDERR "PROCESSING KEY $key (" . ($filtered ? 'filtered ' : '') . "case 1)\n" if $PGFKEYS_DEBUG;
+      pgfHandleValue($cmdkey, $value); }
+    # Case 2: a normal value assignment.
+    elsif (my $cs = pgfkeyLookup($key)) {
+      return if $filtered && testFilterPredicate($key, 2);
+      print STDERR "PROCESSING KEY $key (" . ($filtered ? 'filtered ' : '') . "case 2)\n" if $PGFKEYS_DEBUG;
+      # Case 2: "extern"
+      if (XEquals(T_CS('\pgfkeyscurrentvalue'), T_CS('\pgfkeysnovalue@text'))) {    # value empty?
+        Digest(pgfkeyCS($key)); }    # Just execute the STORED value!
+      else {
+        Let(pgfkeyCS($key), T_CS('\pgfkeyscurrentvalue')); } }
+    # Case 3: Find a handler
+    else {
+      my ($path, $name) = pgfSplitPath($key);
+      # be ready to branch on whether restricted cases are handled
+      my $restricted = XEquals(T_CS('\pgfkeys@case@three'),
+        T_CS('\pgfkeys@case@three@handle@restricted'));
+      my $handle = (XEquals(T_CS('\pgfkeys@ifexecutehandler'),
+          T_CS('\pgfkeys@ifexecutehandler@handleonlyexisting'))
+        ? 'existing'
+        : (XEquals(T_CS('\pgfkeys@ifexecutehandler'),
+            T_CS('\pgfkeys@ifexecutehandler@handlefullorexisting'))
+          ? 'full'
+          : 'all'));
+      print STDERR "PGF ASSIGN " . ToString($key) . " restricted=" . ($restricted ? 'true' : 'false')
+        . ", handle=$handle\n"
+        if $PGFKEYS_DEBUG && ($restricted || ($handle ne 'all'));
+      if (pgfkeyLookup($cmdkey = '/handlers/' . $name . '/.@cmd')    # a command bound?
+        && (!$restricted || ($handle eq 'all')
+          || (($handle eq 'full') && !IfCondition(T_CS('\ifpgfkeysaddeddefaultpath')))
+          || LookupDefinition(T_CS('\pgfkey@excpt@' . $name))
+          || pgfkeyLookup($path) || pgfkeyLookup($path . '/.@cmd'))) {
+        return if $filtered && testFilterPredicate($key, 3);
+        print STDERR "PROCESSING KEY $key (" . ($filtered ? 'filtered ' : '') . "case 3)\n" if $PGFKEYS_DEBUG;
+        pgfHandleValue($cmdkey, $value); }
+      else {                                                         # Handle unknown
+        if ($restricted) {
+          ($path, $name) = pgfReSplitPath($key);
+          print STDERR "RESPLIT '$key' => '$path' / '$name'\n" if $PGFKEYS_DEBUG; }
+        return if $filtered && testFilterPredicate($key, 0);
+        # Else various handlers for unknown
+        if (pgfkeyLookup($cmdkey = $path . '/.unknown/.@cmd')) {
+          print STDERR "PROCESSING KEY $key (case 0) for $cmdkey\n" if $PGFKEYS_DEBUG;
+          pgfHandleValue($cmdkey, $value); }
+        elsif ($cmdkey = '/handlers/.unknown/.@cmd') {
+          print STDERR "PROCESSING KEY $key (case 0) for $cmdkey\n" if $PGFKEYS_DEBUG;
+          pgfHandleValue($cmdkey, $value); } }
+    } }
+  return; }
+
+sub testFilterPredicate {
+  my ($key, $case) = @_;
+  DefMacroI('\pgfkeyscasenumber', undef, $case);
+  Digest(T_CS('\pgfkeys@key@predicate'));
+  if (!IfCondition(T_CS('\ifpgfkeysfiltercontinue'))) {
+    print STDERR "FILTERED OUT KEY $key (case $case)\n" if $PGFKEYS_DEBUG;
+    Digest(T_CS('\pgfkeys@filtered@handler'));
+    return 1; }
+  return; }
+
+sub pgfSplitPath {
+  my ($key) = @_;
+  my ($path, $name) = ('', $key);
+  if ($key =~ m|^(.*?)/([^/]*)$|) {
+    ($path, $name) = ($1, $2); }
+  DefMacroI(T_CS('\pgfkeyscurrentpath'), undef, TokenizeInternal($path));
+  DefMacroI(T_CS('\pgfkeyscurrentname'), undef, TokenizeInternal($name));
+  return ($path, $name); }
+
+sub pgfReSplitPath {
+  my ($key) = @_;
+  my ($path, $sub, $name) = ('', $key);
+  if ($key =~ m|^(.*?)/([^/]*)/([^/]*)$|) {
+    ($path, $sub, $name) = ($1, $2, $3);
+    if ($path) { $name = $sub . '/' . $name; }
+    else { $path = $path . '/' . $sub; } }
+  DefMacroI(T_CS('\pgfkeyscurrentpath'), undef, TokenizeInternal($path));
+  DefMacroI(T_CS('\pgfkeyscurrentname'), undef, TokenizeInternal($name));
+  return ($path, $name); }
+
+sub pgfHandleValue {
+  my ($key, $value) = @_;
+  Let(T_CS('\pgfkeys@code'), pgfkeyCS(ToString($key)));
+  return Digest(Tokens(T_CS('\expandafter'), T_CS('\pgfkeys@code'),
+      T_CS('\pgfkeyscurrentvalue'), T_CS('\pgfeov'))); }
+
+#======================================================================
+
+our $PGF_1ARG = LaTeXML::Core::Parameters->new(
+  LaTeXML::Core::Parameter->new('Until', 'Until:\pgfeov', extra => [T_CS('\pgfeov')]));
+
+DefMacro('\pgfkeysdef{}{}', sub {
+    my ($gullet, $key, $body) = @_;
+    $key = ToString(Expand($key));
+    DefMacroI(pgfkeyCS($key . '/.@cmd'),  $PGF_1ARG, $body);
+    DefMacroI(pgfkeyCS($key . '/.@body'), undef,     $body); },
+  locked => 1);
+
+DefMacro('\pgfkeysedef{}{}', sub {
+    my ($gullet, $key, $body) = @_;
+    $key = ToString(Expand($key));
+    DefMacroI(pgfkeyCS($key . '/.@cmd'),  $PGF_1ARG, eExpand($body));
+    DefMacroI(pgfkeyCS($key . '/.@body'), undef,     $body); },
+  locked => 1);
+
+DefMacro('\pgfkeysdefargs{}{}{}', sub {
+    my ($gullet, $key, $args, $body) = @_;
+    $key = ToString(Expand($key));
+    my $vargs = Tokens($args->unlist, T_CS('\pgfeov'));
+    DefMacroI(pgfkeyCS($key . '/.@cmd'), parseDefParameters("PGF Key $key", $vargs), $body);
+    DefMacroI(pgfkeyCS($key . '/.@args'), undef, $vargs);
+    DefMacroI(pgfkeyCS($key . '/.@body'), undef, $body); },
+  locked => 1);
+
+DefMacro('\pgfkeysedefargs{}{}{}', sub {
+    my ($gullet, $key, $args, $body) = @_;
+    $key = ToString(Expand($key));
+    my $vargs = Tokens($args->unlist, T_CS('\pgfeov'));
+    DefMacroI(pgfkeyCS($key . '/.@cmd'), parseDefParameters("PGF Key $key", $vargs), eExpand($body));
+    DefMacroI(pgfkeyCS($key . '/.@args'), undef, $vargs);
+    DefMacroI(pgfkeyCS($key . '/.@body'), undef, $body); },
+  locked => 1);
+
+# called by \pgfkeysdefnargs and \pgfkeysedefnargs
+DefMacro('\pgfkeysdefnargs@{}{}{}{}', sub {
+    my ($gullet, $key, $nargs, $body, $def) = @_;
+    $key   = ToString(Expand($key));
+    $nargs = ToString($nargs);
+    $nargs =~ s/^#//;
+    my $args = Tokens(map { (T_PARAM, T_OTHER($_)) } 1 .. $nargs);
+    # Define $key/.@args to pretty print the args (?)
+    DefMacroI(pgfkeyCS($key . '/.@args'), undef, $args);
+    # (e-)Define $key/.@@body as if it were the normal macro with $n args
+    DefMacroI(pgfkeyCS($key . '/.@@body'), parseDefParameters("PGF Key $key", $args),
+      (ToString($def) eq '\edef' ? eExpand($body) : $body));
+    # Define $key/.@cmd itself to indirectly call $key/.@@body
+    DefMacroI(pgfkeyCS($key . '/.@cmd'), $PGF_1ARG, sub {
+        (pgfkeyCS($key . '/.@@body'), $_[1]->unlist); });
+    # Store the body
+    DefMacroI(pgfkeyCS($key . '/.@body'), undef, $body); },
+  locked => 1);
+
+#DefMacro('\pgfkeys@error{}','PackageWarning{pgfkeys}{#1}{}',
+
+# a few more possibly worth?
+# \pgfkeys@try
+# \pgf@keys@utilifnextchar
+# \pgf@keys@utilifnch
+# \pgfkeysaddhandleonlyexistingexception
+
+#======================================================================
+# More filter code needed:
+
+# filtering typically happens within \pgfkeys@install@filter@and@invoke
+# we'll simulate with a start/stop
+sub pgfStartFiltering {
+  if (IfCondition(T_CS('\ifpgfkeysfilteringisactive'))) {
+    Warning('unexpected', 'pgffiltering', $_[0],
+"Sorry, nested calls to key filtering routines are not allowed. (reason: It is not possible to properly restore the previous filtering state after returning from the nested call)"); }
+  SetCondition(T_CS('\ifpgfkeysfilteringisactive'), 1);
+  #  Let('\pgfkeys@case@one', '\pgfkeys@case@one@filtered');
+  #  Let('\pgfkeys@try',      '\pgfkeys@try@filtered');
+  #  Let('\pgfkeys@unknown',  '\pgfkeys@unknown@filtered');
+  return; }
+
+sub pgfStopFiltering {
+  #  Let('\pgfkeys@case@one', '\pgfkeys@orig@case@one');
+  #  Let('\pgfkeys@try',      '\pgfkeys@orig@try');
+  #  Let('\pgfkeys@unknown',  '\pgfkeys@orig@unknown');
+  SetCondition(T_CS('\ifpgfkeysfilteringisactive'), 0);
+  return; }
+
+DefPrimitive('\pgfkeysfiltered{}', sub {
+    my ($stomach, $keyvals) = @_;
+    pgfStartFiltering();
+    my $savedpath = Expand(T_CS('\pgfkeysdefaultpath'));
+    Let('\pgfkeysdefaultpath', '\pgfkeys@root');
+    my @results = parsePGFKeys($stomach, $keyvals);
+    DefMacroI('\pgfkeysdefaultpath', undef, $savedpath);
+    pgfStopFiltering();
+    return @results; },
+  locked => 1);
+
+# How different from \pgfkeysalso ?
+DefPrimitive('\pgfkeysalsofrom{}', sub {
+    my ($stomach, $keyvals) = @_;
+    my @results = parsePGFKeys($stomach, $keyvals);
+    return @results; },
+  locked => 1);
+
+DefPrimitive('\pgfkeysalsofiltered{}', sub {
+    my ($stomach, $keyvals) = @_;
+    pgfStartFiltering();
+    my @results = parsePGFKeys($stomach, $keyvals);
+    pgfStopFiltering();
+    return @results; },
+  locked => 1);
+
+DefPrimitive('\pgfqkeysfiltered{}{}', sub {
+    my ($stomach, $path, $keyvals) = @_;
+    pgfStartFiltering();
+    my $savedpath = Expand(T_CS('\pgfkeysdefaultpath'));
+    my $newpath = Tokens(Expand($path)->unlist, T_OTHER('/'));
+    DefMacroI('\pgfkeysdefaultpath', undef, $newpath);
+    my @results = parsePGFKeys($stomach, $keyvals);
+    DefMacroI('\pgfkeysdefaultpath', undef, $savedpath);
+    pgfStopFiltering();
+    return @results; },
+  locked => 1);
+
+# Maybe these are OK?
+# \pgfkeysiffamilydefined{}{}{}
+# \pgfkeysisfamilyactive{}{}{}
+# \pgfkeysactivatefamily{}
+# \pgfkeysdeactivatefamily{}
+# \pgfkeysactivatefamilies{}{}
+
+# \pgfkeysinterruptkeyfilter, \endpgfkeysinterruptkeyfilter
+
+# \pgfkeysactivatefamiliesandfilteroptions
+# \pgfqkeysactivatefamiliesandfilteroptions
+# \pgfkeysinstallkeyfilter{}{}
+# \pgfkeysinstallkeyfilterhandler
+# \pgfkeyssavekeyfilterstateto
+#======================================================================
+# Finally, load the actual pgfkeys.code.tex
+# in order to pick up any missed definitions
+# and more importantly, to define all the default keys & mechanisms.
+InputDefinitions('pgfkeys.code', type => 'tex', noltxml => 1)
+  || Warn(":missing:pgfkeys.code.tex Couldn't find pgfkeys.code.tex");
+
+#======================================================================
+1;

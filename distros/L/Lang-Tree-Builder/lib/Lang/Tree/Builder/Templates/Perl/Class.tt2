@@ -1,0 +1,223 @@
+# WARNING: [% warning %] DO NOT EDIT! YOUR EDITS WILL BE LOST!
+
+package [% class.name %];
+use strict;
+use warnings;
+[% IF class.parent -%]
+use base qw([% class.parent.name %]);
+[%- END %]
+
+[% IF class.is_abstract %]
+=head1 NAME
+
+[% class.name %] - an abstract tree node
+[%- IF class.parent %], a type of [% class.parent.name %][% END %].
+
+=head1 SYNOPSIS
+
+This class exists only as an abstract type. Any attempt to create an
+instance of C<[% class.name %]> will result in an exception being thrown.
+
+=cut
+
+sub new {
+    die "attempt to create instance of abstract class [% class.name %]\n";
+}
+[% ELSE %]
+
+=head1 NAME
+
+[% class.name %] - a tree node
+[%- IF class.parent %], a type of [% class.parent.name %][% END %].
+
+=head1 SYNOPSIS
+
+  use [% api.name %];
+  my $[% class.lastpart.uncamel %] = [% class.lastpart %](
+    [%- FOREACH arg IN class.args -%]
+        [%- "\$" -%]
+        [%- arg.argname -%]
+        [%- LAST IF loop.last -%]
+        [%- ", " -%]
+    [%- END %]);
+[% FOREACH arg IN class.args %]
+  my $[% arg.argname.uncamel -%]
+ = $[% class.lastpart.uncamel %]->[% arg.argname.getMethod %]();
+[%- END %]
+  $[% class.lastpart.uncamel %]->accept(new [% visitor.name %]());
+
+=head1 METHODS
+
+Individual [% class.name %] methods are described below.
+
+=head2 new
+
+  my $[% class.lastpart %] = new [% class.name %](
+    [%- FOREACH arg IN class.args -%]
+        [%- "\$" %][% arg.argname -%]
+        [%- LAST IF loop.last -%]
+        [%- ", " -%]
+    [%- END %]);
+
+or better:
+
+  use [% api.name %];
+  my $[% class.lastpart %] = [% class.lastpart %](
+    [%- FOREACH arg IN class.args -%]
+        [%- "\$" %][% arg.argname -%]
+        [%- LAST IF loop.last %], [% END %]);
+
+The C<[% class.lastpart %]()> subroutine is provided by
+C<[% api.name %]> to make
+it easier to create instances of C<[% class.name %]>.
+[% IF class.args.sz %]In either case
+[% INCLUDE "ExplainArgs.tt2" %][% END %]
+
+=cut
+
+[% IF class.numargs == 0 %]
+{
+    my $self = 0;
+    sub new {
+        die "wrong number of arguments to [% class.name %]->new()"
+            unless @_ == 1;
+        my ($class) = @_;
+        $self ||= bless {}, $class;
+    }
+}
+[% ELSE %]
+sub new {
+    die "wrong number of arguments to [% class.name %]::new(
+    [%- FOREACH arg IN class.args -%]
+        [%- "\\" %][% "\$" %][% arg.argname.uncamel -%]
+        [%- LAST IF loop.last -%]
+        [%- ", " -%]
+    [%- END %])\n"
+    [%- IF class.args.sz %]
+        unless @_ == [% class.args.sz + 1 %];
+    [%- ELSE %]
+        unless @_ == 1;
+    [%- END %]
+
+    my ($class
+            [%- FOREACH arg IN class.args %]
+                [%- ", \$" -%]
+                [%- arg.argname -%]
+            [%- END %]) = @_;
+
+[%- FOREACH arg IN class.args %]
+[%- IF arg.is_scalar %]
+    die "argument [% arg.argname %] to [% class.lastpart %] is not a simple scalar, it is a ",
+        ref($[% arg.argname %]), "\n"
+        unless defined($[% arg.argname %]) && !ref($[% arg.argname %]);
+[% ELSE %]
+    die "argument [% arg.argname %] to [% class.lastpart %] is not a [% arg.name %], it is a ",
+        (ref($[% arg.argname %]) || 'scalar'), "\n"
+        unless defined($[% arg.argname %])
+               && $[% arg.argname %]->isa('[% arg.name %]');
+[%- END %]
+[%- END %]
+
+    return bless {
+    [%- FOREACH arg IN class.args %]
+        _[% arg.argname %] => $[% arg.argname %],
+    [%- END %]
+    }, $class;
+}
+
+[% END %]
+
+[%- FOREACH arg IN class.args %]
+=head2 [% arg.argname.getMethod %]
+
+  my $[% arg.argname %] = $[% class.lastpart %]->[% arg.argname.getMethod %]();
+
+gets the value of the C<[% arg.argname %]> field,
+which is a [% IF arg.is_scalar %]simple scalar[% ELSE %]C<[% arg.name %]>[% END %].
+
+=cut
+
+sub [% arg.argname.getMethod %] {
+    my ($self) = @_;
+    return $self->{_[% arg.argname %]};
+}
+[% END -%]
+
+=head2 accept
+
+  $[% class.lastpart %]->accept(new [% visitor.name %](), @args);
+
+Accepts a C<[% visitor.name %]> and calls its C<visit[% class.lastpart %]>
+method, passing it C<$self> (i.e. a C<[% class.name %]>) as argument.
+Any additional C<@args> will be passed along unchanged to the visit method.
+
+=cut
+
+sub accept {
+    my ($self, $visitor, @args) = @_;
+    return $visitor->visit[% class.lastpart %]($self, @args);
+}
+
+=head2 eq
+
+   if ($[% class.lastpart %]->eq($other)) {
+       ...
+   }
+
+Returns true if the argument C<$other> is recursively equal to C<$self>.
+
+=cut
+
+sub eq {
+    my ($self, $other) = @_;
+    if (ref($other) eq '[% class.name %]') {
+        return 1
+        [%- FOREACH arg IN class.args %]
+            && [% IF arg.is_scalar %]($self->[% arg.argname.getMethod %] eq $other->[% arg.argname.getMethod %])
+            [% ELSE %]$self->[% arg.argname.getMethod %]->eq($other->[% arg.argname.getMethod %])[% END %]
+        [%- END %]
+    } else {
+        return 0;
+    }
+}
+
+[% END %]
+
+=head2 is[% class.lastpart %]
+
+Returns true.
+
+=cut
+
+sub is[% class.lastpart %] { 1 }
+
+[% FOREACH descendant IN class.descendants %]
+
+=head2 is[% descendant.lastpart %]
+
+Returns false.
+
+=cut
+
+sub is[% descendant.lastpart %] { 0 }
+
+[% END %]
+
+=head1 AUTHOR
+
+[% warning %]
+
+=head1 SEE ALSO
+
+The other generated node classes:
+[%- FOREACH other IN data.classes %]
+[%- NEXT IF class.name == other.name %]
+L<[% other.name %]>,
+[%- END %]
+an abstract visitor that can be subclassed to walk them:
+L<[% visitor.name %]>,
+and the API that makes them available: L<[% api.name %]>.
+
+=cut
+
+1;

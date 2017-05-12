@@ -1,0 +1,57 @@
+NAME
+    Linux::LVM2 - a Linux LVM2 wrapper.
+
+SYNOPSIS
+        use Linux::LVM2;
+        my $LVM = Linux::LVM2::->new();
+
+DESCRIPTION
+    This class wraps the Linux LVM2 subsystem into handy perl classes.
+
+ATTRIBUTES
+  vgs
+    Contains all VGs present at the last update.
+
+  verbose
+    When true, be more verbose.
+
+  logger
+    An instance of Log::Tree.
+
+  sys
+    An instance of Sys::Run.
+
+  fs
+    An instance of Sys::FS.
+
+METHODS
+  _find_vgs
+    Detect all available VGs w/ containing PVs and contained LVs.
+
+  is_lv
+    Returns true if the given vg/lv is a known LV.
+
+  is_vg
+    Returns true if the given vg is a known VG.
+
+  lv_from_dev
+    Translate the given /dev/mapper/... path to a LV object.
+
+  lv_from_path
+    Translate the given fs path to a LV object.
+
+  update
+    Update the internal LVM data-structures.
+
+NAME
+    Linux::LVM2 - Linux LVM2 wrapper.
+
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

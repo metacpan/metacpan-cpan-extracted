@@ -1,0 +1,43 @@
+Revision history for Perl extension CGI::LogCarp.
+
+Note:
+There were some MAJOR changes between 1.05 and 1.11.
+Namely, the syntax of the 'use' statement has change significantly.
+you should now 'use CGI::LogCarp qw( :STDLOG );' to get the STDLOG features,
+and :STDBUG for STDBUG features (debugmsg debugmsgout DEBUGLEVEL etc.).
+
+I'm sorry, but I had to break earlier code in order to do this module
+the way I am doing it now.
+
+1.01 Mon Sep 15 09:04:00 CDT 1997
+  - original version; created by h2xs 1.18
+
+1.02 Sun Jan  4 19:02:26 CST 1998
+  - flubbed the first PAUSE upload
+
+1.03 Sun Jan  4 19:02:26 CST 1998
+  - flubbed the second PAUSE upload
+
+1.04 Sun Jan  4 19:02:26 CST 1998
+  - flubbed the third PAUSE upload
+
+1.05 Tue Jan 13 01:43:16 CST 1998
+  - Namespace fixed.
+
+1.06 Fri Jan 16 22:30:12 CST 1998
+  - DISTNAME in Makefile.PL fixed
+
+1.11 Thu Jul 30 19:15:48 CST 1998
+  - Synchronized to Carp.pm from perl 5.005
+  - Synchronized to CGI::Carp-1.101 from perl 5.005
+  - Support for: mod_perl, cluck
+  - fatalsToBrowser() entity translation order fixed
+  - extra streams now optional via :STDBUG and :STDLOG tags
+  - fixed Symbol.pm to allow programmable "global" symbols
+  - (i.e. always qualify to pkg main)
+  - tests written. testing croak, die and friends fails.
+  - custom error messages implemented
+
+1.12 Thu Aug 13 23:38:02 CDT 1998
+  - some minor fixes
+

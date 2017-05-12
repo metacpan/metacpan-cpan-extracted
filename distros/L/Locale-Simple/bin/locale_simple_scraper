@@ -1,0 +1,90 @@
+#!/usr/bin/env perl
+# PODNAME: locale_simple_scraper
+# ABSTRACT: Command line tool for finding tokens in code
+
+
+use strict;
+use warnings;
+
+use Locale::Simple::Scraper 'scrape';
+
+scrape(@ARGV);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+locale_simple_scraper - Command line tool for finding tokens in code
+
+=head1 VERSION
+
+version 0.019
+
+=head1 SYNOPSIS
+
+  # ignoring specific regexps for the filename
+  # please be aware that you must escape the . and because we use bash here you
+  # must also be aware to escape the \ for escaping the .
+  locale_simple_scraper --ignores \\.build --ignores some/dir
+
+  # only use specific regexps for the filename
+  locale_simple_scraper --only core --only site/something
+
+  # different output parameter, might require more modules
+  locale_simple_scraper --output perl
+  locale_simple_scraper --output yaml
+  locale_simple_scraper --output json
+
+  # supress output of line numbers
+  locale_simple_scraper --no_line_numbers
+
+  # scramble real filename with md5 (for security)
+  locale_simple_scraper --md5
+
+  # setting additional extensions for Javascript (default: js)
+  locale_simple_scraper --js jjs,ajs
+
+  # setting additional extensions for Perl (default: pl, pm, t)
+  locale_simple_scraper --pl ppl,pppl
+
+  # setting additional extensions for Text::Xslate (default: tx)
+  locale_simple_scraper --tx ttx,xxx
+
+=head1 DESCRIPTION
+
+This tool parses all Perl, Python, Javascript and Text::Xslate templates in the
+current directory and subdirectories to find calls to the L<Locale::Simple>
+API.
+
+It gives out on STDERR which files are parsed right now, while it dumps the
+resulting data to the screen. By default it generates a B<.po> file, but you can
+specify via I<--output> to dump B<json>, B<yaml> or a B<perl> data structure.
+
+Be aware that we add the domain as flag in the B<.po> file. So double token
+may appear which only differs through a B<#,> flag.
+
+=head1 SUPPORT
+
+Repository
+
+  http://github.com/Getty/p5-locale-simple
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  http://github.com/Getty/p5-locale-simple/issues
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by DuckDuckGo, Inc. L<http://duckduckgo.com/>, Torsten Raudssus <torsten@raudss.us>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,13 @@
+.svnignore
+bin/fill_test_db.pl
+Build.PL
+Changes
+lib/Locale/Maketext/Lexicon/DBI.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-function.t
+t/lexicon.db
+t/pod.t
+Makefile.PL

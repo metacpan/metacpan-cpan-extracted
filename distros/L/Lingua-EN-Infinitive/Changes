@@ -1,0 +1,76 @@
+Revision history for Perl extension Lingua-EN-Infinitive.
+
+1.14  2017-01-11T08:34:00
+	- Accept pull request https://github.com/ronsavage/Lingua-EN-Infinitive/pull/1,
+		reformatted slightly. Thanx to Mohammad S Anwar.
+
+1.13  2017-01-09T20:18:00
+	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Add scripts/demo.pl. It's a copy, sort of, of t/test.t.
+	- Update the docs in various large and small ways.
+
+1.12  2015-02-18T16:32:00
+	- Rename CHANGES to Changes as perl CPAN::Spec::Changes.
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+
+1.11  2010-02-10T14:02:12
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+1.10  2009-11-13T13:20:00
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.09  2005-10-27T19:40:00
+	- Regenerate META.yml with Module::Build V 0.2611 to correct a faulty
+		META.yml output by V 0.24 which falsely said 'provides: {}',
+		which in turn stopped the PAUSE indexer from finding the module file,
+		which in turn meant this module might be omitted from the master index:
+		ftp://pause.perl.org/pub/PAUSE/modules/01modules.index.html
+
+1.08  2004-07-20T20:43:00
+	- Change Makefile.PL to coexist with Module::Build
+	- Add t/pod.t to test all PODs
+
+1.07  2003-03-23T11:29:00
+	- No source code changes in this version
+	- Patch to stop shipping blib/ directory in Unix distros, because the
+		PAUSE indexer takes this directory to indicate a binary distro,
+		which means it does not index the module, and this in turn means
+		the module is not listed in the CPAN daily update list, etc.
+
+1.06  2002-05-28T18:45:00
+	- Add special code to Infinitive.pm when the suffix is 'ed'.
+		Check for a monosyllable ending in a doubled-consonant.
+		This code is identical to the special code for rule 15
+	- Add some more irregular verbs to the list and test for them
+
+1.05  2002-05-12T13:12:11
+	- Clean up licence and email stuff in all modules, scripts and other docs.
+		Upgrading is not necessary
+
+1.04 19-Jun-2001
+----------------
+o Patch outcome of rule 15 so certain monosyllables are treated specially.
+	Eg swimming => swim and swimm, not swimme and swimm.
+	Thanks to Mike Tsai for drawing this problem to my attention.
+	Previous testing had completely overlooked these types of words.
+o Researching this problem reveals that, unfortunately, American spelling
+	such as traveling => travel is handled correctly but British spelling
+	such as travelling => travel is not.
+
+1.03 26-May-1999
+----------------
+o Ensure POD survives buggy pod2man
+o Ship Readme.txt, the output of pod2text
+
+1.02 19-Apr-1999
+----------------
+o Patch Makefile.pl to support ActivePerl's ppm.
+
+1.01 30-May-1999
+----------------
+o Original version; created by h2xs 1.18
+
+Use h2xs to generate the skeleton for Infinitive.pm.

@@ -1,0 +1,40 @@
+Revision history for Perl extension Locale::TextDomain:OO::Util.
+
+3.006  hu Feb 23 07:22:51 2017
+- extract header key X-Lexicon-Class to lexicon_class
+
+3.005  Wed Jul  1 06:58:29 2015
+- moved patch Safe module code to subroutine patch_safe_module
+  because of problems with version check during auto run
+
+3.004  Mon Jun 29 20:22:59 2015
+- allowed subprojects
+- got some hints from Tom Christiansen
+- added workaround for Safe
+- faked instance without Moo
+
+3.003  Sun Jun 28 07:21:17 2015
+- corrected POD
+
+3.002  Mon Feb  2 20:09:07 2015
+- corrected join_split example
+
+3.001  Mon Nov 10 12:15:32 2014
+- changed join/split JSON parameter handling in a uncompatible way
+  - no difference for JavaScript interface
+  - documented first time the Perl part
+- added method join_message and split_message
+  - no need for JavaScript
+
+2.002  Mon Oct 27 11:13:22 2014
+- added project parameter for lexicon
+- added folder javascript
+
+2.001  Wed Oct 22 18:22:31 2014
+- fixed the wrong version so jump to 2.001
+- added constants for JSON lexicon
+
+0.001  Sat Oct 18 12:54:09 2014
+- first version
+  by moving code from other places because Locale-TextDomain-OO and
+  Locale-TextDomain-OO-Extract need that

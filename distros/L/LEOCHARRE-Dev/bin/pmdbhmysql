@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+use strict;
+use base 'LEOCHARRE::CLI';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$DOC{'INSTALL.mysql'} = << '_MYSQLi_'
+# INSTALL mysql
+# =============
+# To set up a database and user
+
+# In your mysqcl cli
+
+CREATE DATABASE databasename;
+GRANT ALL ON databasename.* TO databaseusername IDENTIFIED BY 'databaseusernamepassword';
+
+
+_MYSQLi_
+
+
+
+
+__END__
+
+=pod
+
+=head1 

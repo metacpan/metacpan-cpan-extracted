@@ -1,0 +1,24 @@
+Revision history for LedgerSMB-API
+
+0.04a   Fri Feb  6 18:11:07 EST 2009
+	First Alpha Release, nicknamed Caveat Emptor
+
+	Following functions seem to work:
+	new_lsmb() 
+	create_new_vendor() 
+	id_existing_vendor() 
+	create_new_customer() 
+	id_existing_customer() 
+	create_new_part() 
+	create_new_purchase_order() 
+	generate_invoice_from_purchase_order() 
+	post_payment_to_ap_invoice() 
+	create_new_sales_order()
+
+	This function exists but is buggy:
+	create_new_assembly() 
+
+
+0.01    Sat Jan 30 23:01:16 EST 2009 
+        First version, released on an unsuspecting world.
+

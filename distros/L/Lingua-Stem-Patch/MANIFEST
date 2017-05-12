@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/Lingua/Stem/Patch.pm
+lib/Lingua/Stem/Patch/EO.pm
+lib/Lingua/Stem/Patch/IO.pm
+lib/Lingua/Stem/Patch/PL.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-stemmer.t
+t/eo.t
+t/eo-aggressive.t
+t/eo-roots.t
+t/io.t
+t/io-aggressive.t
+t/io-roots.t
+t/pl.t

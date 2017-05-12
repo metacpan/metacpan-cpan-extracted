@@ -1,0 +1,8 @@
+Build.PL
+lib/Lingua/EN/Keywords/Yahoo.pm
+MANIFEST			This list of files
+t/00.use.t
+t/01.explicit.t
+t/02.export.t
+META.yml
+Makefile.PL

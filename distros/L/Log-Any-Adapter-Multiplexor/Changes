@@ -1,0 +1,9 @@
+Revision history for Perl extension Log::Any::Adapter::Multiplexor::0.01.
+
+0.01  Wed Apr 26 16:14:56 2017
+	- original version; created by h2xs 1.23 with options
+		-O -X -n Log::Any::Adapter::Multiplexor
+0.02  Thu Apr 27 12:49:00 2017
+	- Added combine method for combine different log levels in one
+
+

@@ -1,0 +1,31 @@
+---
+abstract: 'Language identification for related languages based on blacklists'
+author:
+  - 'Jörg Tiedemann, L<https://bitbucket.org/tiedemann>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-Identify-Blacklists
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  File::Basename: 0
+  File::GetLineMaxLength: 0
+  File::ShareDir: 0
+  Lingua::Identify: 0
+  Lingua::Identify::CLD: 0.05
+  perl: 5.8.0
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+version: 0.04

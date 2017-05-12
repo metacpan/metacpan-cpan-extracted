@@ -1,0 +1,10 @@
+name = "List-UtilsBy-XS"
+badges = ['travis', 'metacpan']
+module_maker="ModuleBuild"
+
+[build]
+build_class = "builder::MyBuilder"
+
+[no_index]
+directory = ['t', 'xt', 'inc', 'share', 'eg', 'examples', 'author', 'benchmark', 'builder']
+

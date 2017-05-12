@@ -1,0 +1,55 @@
+---
+abstract: 'University of Neuchâtel stemmers'
+author:
+  - 'Nick Patch <patch@cpan.org>'
+build_requires:
+  English: 0
+  Pod::Man: 2.04
+  String::Dump: 0.05
+  Test::More: 0.82
+  open: 0
+configure_requires:
+  Module::Build: 0.3622
+  Software::License: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4208, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-Stem-UniNE
+provides:
+  Lingua::Stem::UniNE:
+    file: lib/Lingua/Stem/UniNE.pm
+    version: 0.08
+  Lingua::Stem::UniNE::BG:
+    file: lib/Lingua/Stem/UniNE/BG.pm
+    version: 0.08
+  Lingua::Stem::UniNE::CS:
+    file: lib/Lingua/Stem/UniNE/CS.pm
+    version: 0.08
+  Lingua::Stem::UniNE::DE:
+    file: lib/Lingua/Stem/UniNE/DE.pm
+    version: 0.08
+  Lingua::Stem::UniNE::FA:
+    file: lib/Lingua/Stem/UniNE/FA.pm
+    version: 0.08
+requires:
+  Carp: 0
+  Exporter: 0
+  Moo: 1.001000
+  Unicode::CaseFold: 0
+  Unicode::Normalize: 0
+  charnames: 0
+  namespace::clean: 0
+  parent: 0
+  perl: '>= v5.8.1, != v5.19.4, != v5.19.5, != v5.19.6, != v5.19.7, != v5.19.8, != v5.19.9, != v5.19.10, != v5.19.11'
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/patch/lingua-stem-unine-pm5/issues
+  homepage: https://github.com/patch/lingua-stem-unine-pm5
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/patch/lingua-stem-unine-pm5.git
+version: 0.08

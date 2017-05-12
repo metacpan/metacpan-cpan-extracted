@@ -1,0 +1,55 @@
+List-Categorize is Copyright (C) 2009, Bill Odom <wnodom@cpan.org>.
+
+Categorize list items into a hash of named sublists.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc List::Categorize
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=List-Categorize
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/List-Categorize
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/List-Categorize
+
+    Search CPAN
+        http://search.cpan.org/dist/List-Categorize/
+
+
+COPYRIGHT
+
+Copyright (c) 2009 Bill Odom <wnodom@cpan.org>
+
+
+LICENSE INFORMATION
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0.
+
+This program is distributed in the hope that it will be
+useful, but it is provided "as is" and without any express
+or implied warranties. 
+
+For more details, see the full text
+of the licenses at <http://www.perlfoundation.org/artistic_license_1_0>
+and <http://www.gnu.org/licenses/gpl-2.0.html>.
+

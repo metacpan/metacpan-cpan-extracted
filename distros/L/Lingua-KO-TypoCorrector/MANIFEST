@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Lingua/KO/TypoCorrector.pm
+t/00_compile.t
+t/01_code.t
+META.yml
+MANIFEST

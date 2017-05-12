@@ -1,0 +1,10 @@
+MANIFEST
+Changes
+README
+Makefile.PL
+Pid.pm
+Pid.xs
+t/basic.t
+t/import.t
+t/threaded.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,80 @@
+
+int
+STREAM_BUFFER_SIZE(CLASS)
+        const char* CLASS
+    CODE:
+        RETVAL = LUCENE_STREAM_BUFFER_SIZE;
+    OUTPUT:
+        RETVAL
+
+int
+DEFAULT_TOKEN_BUFFER_SIZE(CLASS)
+        const char* CLASS
+    CODE:
+        RETVAL = LUCENE_DEFAULT_TOKEN_BUFFER_SIZE;
+    OUTPUT:
+        RETVAL
+
+int
+DEFAULT_TERMDOCS_SKIP_INTERVAL(CLASS)
+        const char* CLASS
+    CODE:
+        RETVAL = LUCENE_DEFAULT_TERMDOCS_SKIP_INTERVAL;
+    OUTPUT:
+        RETVAL
+
+int
+SCORE_CACHE_SIZE(CLASS)
+        const char* CLASS
+    CODE:
+        RETVAL = LUCENE_SCORE_CACHE_SIZE;
+    OUTPUT:
+        RETVAL
+
+int
+MAX_WORD_LEN(CLASS)
+        const char* CLASS
+    CODE:
+        RETVAL = LUCENE_MAX_WORD_LEN;
+    OUTPUT:
+        RETVAL
+
+int
+MAX_FIELD_LEN(CLASS)
+        const char* CLASS
+    CODE:
+        RETVAL = LUCENE_MAX_FIELD_LEN;
+    OUTPUT:
+        RETVAL
+
+int
+BOOLEANQUERY_MAXCLAUSECOUNT(CLASS)
+        const char* CLASS
+    CODE:
+        RETVAL = LUCENE_BOOLEANQUERY_MAXCLAUSECOUNT;
+    OUTPUT:
+        RETVAL
+
+int
+IO_BUFFER_SIZE(CLASS)
+        const char* CLASS
+    CODE:
+        RETVAL = LUCENE_IO_BUFFER_SIZE;
+    OUTPUT:
+        RETVAL
+
+int
+SEGMENTTERMENUM_GROWSIZE(CLASS)
+        const char* CLASS
+    CODE:
+        RETVAL = LUCENE_SEGMENTTERMENUM_GROWSIZE;
+    OUTPUT:
+        RETVAL
+
+char*
+CLUCENE_VERSION(CLASS)
+        const char* CLASS
+    CODE:
+        RETVAL = _CL_VERSION;
+    OUTPUT:
+        RETVAL

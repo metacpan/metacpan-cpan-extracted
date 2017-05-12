@@ -1,0 +1,48 @@
+SYNOPSIS
+
+     use Log::Dispatch::FileWriteRotate;
+    
+     my $file = Log::Dispatch::FileWriteRotate(
+         min_level => 'info',
+    
+         # will be passed to File::Write::Rotate
+         dir       => '/var/log',
+         prefix    => 'myapp',
+         suffix    => '.log',
+         period    => 'monthly',
+         size      => 25*1024*1024,
+         histories => 12,
+     );
+    
+     $file->log(level => 'info', message => "Your comment\n");
+
+DESCRIPTION
+
+    This module functions similarly to Log::Dispatch::FileRotate, but uses
+    File::Write::Rotate as backend, thus interoperates more easily with
+    other modules which use File::Write::Rotate as backend, e.g.
+    Tie::Handle::FileWriteRotate or Process::Govern.
+
+METHODS
+
+ new(%args)
+
+    Constructor. This method takes a hash of parameters. The following
+    options are valid: min_level and max_level (see Log::Dispatch
+    documentation); dir, prefix, suffix, period, size, and histories (see
+    File::Write::Rotate).
+
+ log_message(message => STR)
+
+    Send a message to the appropriate output. Generally this shouldn't be
+    called directly but should be called through the log() method (in
+    LLog::Dispatch::Output>).
+
+SEE ALSO
+
+    Log::Dispatch
+
+    File::Write::Rotate
+
+    Log::Dispatch::FileRotate
+

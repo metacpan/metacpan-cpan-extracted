@@ -1,0 +1,36 @@
+---
+abstract: 'Naive Bayes Classifier for Japanese document.'
+author:
+  - 'takeshi miki <miki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.97'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-JA-Categorize
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Algorithm::NaiveBayes: 0
+  CGI: 0
+  Class::Accessor::Fast: 0
+  Class::Data::ConfigHash: 0
+  Filter::Util::Call: 0
+  HTML::Feature: 3.00005
+  HTTP::Request::AsCGI: 0
+  Lingua::JA::Expand: 0
+  Lingua::JA::TFIDF: 0
+  POE: 0
+  POE::Component::Server::HTTP: 0
+  Template: 0
+  YAML: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02002

@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 6048d434f17c66e9a9474a434837c456ccd75677 Build.PL
+SHA1 21b111d6326b92bf1b5ac55a5197b3cff33e7f5f CONTRIBUTORS
+SHA1 e08a28ba01f9e8acc72b61edef6a22fbb224ceec Changes
+SHA1 0d79f316ae4c35088c9b89e0759f3827b04e1bbf LICENSE
+SHA1 79568eae235e238e6ebb2a85486fb2856ce606f8 MANIFEST
+SHA1 caaf2e4902a7752800b3e967f5a77ea970338091 META.json
+SHA1 b7d5b37b7022bf67fe55da996e3b4ca780cb5ad4 dist.ini
+SHA1 2697740b6554ce6ada201cc2e7a791a2d180d4b5 eg/perl-daemon
+SHA1 077dd5f67a4c25c9d887f57e4ec1f15064116bfa eg/perl-daemon.service
+SHA1 16ea569c3bb1dcf5e7911d160134f12eaa4200ab eg/read_journal.pl
+SHA1 babd609bd68b82e01d23f6e8901369197baf3dec eg/tail.pl
+SHA1 401d0bb6694a5046dab57b3764b4755523be9594 eg/write_journal.pl
+SHA1 1b7d4632976d250956d49d509b30bdd2ac5f48e5 inc/Devel/AssertOS.pm
+SHA1 2283c48e73b1e81e157b325618605178f8ab11e6 inc/Devel/AssertOS/Android.pm
+SHA1 03930e5fb644ac12321f9db0554a0a7b0a3d7adf inc/Devel/AssertOS/Linux.pm
+SHA1 52dcb8b2b98363d1e1fdebd5e193bc12c57c220a inc/Devel/CheckOS.pm
+SHA1 5cbc79334175296400aaad9eaf135f81935569c7 inc/My/Builder.pm
+SHA1 625ebc870fa69c6450c5f03f99905a69a0bc3b53 lib/Linux/Systemd.pm
+SHA1 220f52a26adf5757e01f5f41c7d5a1aad76e6dd5 lib/Linux/Systemd/Daemon.pm
+SHA1 0c79e5a21be2e7b284548ce3f7ed0331be07ad57 lib/Linux/Systemd/Daemon.xs
+SHA1 07560bdefb5fca4539babc958073a75016b58ea0 lib/Linux/Systemd/Journal/Read.pm
+SHA1 cd1029be41d67fbf308ed9c2882ce58bc3a91e8a lib/Linux/Systemd/Journal/Read.xs
+SHA1 ff1bba0c39b1437356bcee44c1cca6720721f477 lib/Linux/Systemd/Journal/Write.pm
+SHA1 ed683ccf1b632bfd39a8d692e7990169da5500d4 lib/Linux/Systemd/Journal/Write.xs
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 8e3ca5d133a4d32b82f065db5649f0ff841aac11 t/00-compile.t
+SHA1 f623f4f71067d9ec8756e9169aa57a2e5904774a t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 6cf1fb1ab6972711a7462e93ef17182c4bcba01a t/daemon.t
+SHA1 3045b0fb7082fd7f946f10f40284c8343fd0d5ac t/journal/read.t
+SHA1 f3f5f6fdfd9f45a97941bc8bfb1d0185bef50fa1 t/journal/write.t
+SHA1 15f75a421775dc573403329cac3b451cae19e4b5 typemap
+SHA1 c378a4311e825de744e9c6348dcd8bc06987a62f xt/author/eol.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 ae830338ccf28fd790bdb395310e8861b4eb988d xt/author/no-tabs.t
+SHA1 645cec4fa63cb59f7f59665ed2cf02d48db5c11c xt/author/portability.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 76b8c97d1394305444a752b2e936d3d12260cce3 xt/release/kwalitee.t
+SHA1 d1d7aad8e90f60da78b7872043c416a032472490 xt/release/meta-json.t
+SHA1 bae663945a4380ca95a6ba5d8f5e42d2946e0629 xt/release/minimum-version.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJX6J8eAAoJEBaIEpACW5CUBLcH/2qOk4sN6i9ZX1CWaEvP6d0o
+VDcnevQhKrAce4Yk0kUH0nv9w/HiQF3AuopnkSqCmgH6u093G6GUkWlTGqlrbWrp
+fCvcThDjkqXdKBAC+f/oWHXch3BdVmO/aGTv2T4iUBbD1sjQWWnkKIfE3kMjU48z
+pQv+LntjxQ6uEU6zqZoZpqClgGV7Vh5g8o3I4lNwzF6QnWFYdZ0PHx3uQ6Rxyj65
+uTHWmDIufz3k4yQdYUmRXUGATHZf2gkFySKyyGGGIF64Npc31XnGLa1fxSyVlC+i
+eFp83FX33fNmBg3H17mXaCC6oLTt1gYCrezMH3om6aq6luaxwULUrwvB/QogUjY=
+=7fT9
+-----END PGP SIGNATURE-----

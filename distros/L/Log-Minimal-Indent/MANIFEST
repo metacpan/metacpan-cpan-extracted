@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+cpanfile.snapshot
+lib/Log/Minimal/Indent.pm
+minil.toml
+t/00_compile.t
+t/01_manual.t
+t/02_scope.t
+META.yml
+MANIFEST

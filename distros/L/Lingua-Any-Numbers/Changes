@@ -1,0 +1,96 @@
+Revision history for Perl extension Lingua::Any::Numbers.
+
+0.46 Tue Jul  5 01:18:06 2016
+    => Bump version.
+
+0.45 Wed Oct 24 01:33:26 2012
+    => Untaint sub module searches (Kevin Ryde - RT#80084).
+    => Bundle taint mode versions of tests.
+
+0.44 Sun Sep  9 03:52:37 2012
+    => Fix RT#79465 (Kevin Ryde).
+    => Remove legacy checks.
+
+0.43 Tue Apr  5 02:03:43 2011
+   => Use the right class to fix the test.
+
+0.42 Mon Apr  4 02:44:28 2011
+   => I love when people update their code and break mine.
+         ID module fixed a ws issue after 12 years.
+         Added a detection code for that in the related test.
+         Also cleaned up the related test code a bit.
+
+0.41 Tue Feb  8 23:47:27 2011
+   => Fixed the faker code. Also the PT tests are skipped if one of the modules
+      is missing.
+
+0.40 Mon Oct 11 23:42:16 2010
+   => Unit test fix for Lingua::SV::Numbers.
+   => New function to get the language handler class.
+   => Add Lingua::BG::Numbers to tests.
+   => Now supporting Lingua::PT::Nums2Ords.
+
+0.32 Wed Sep 23 20:38:19 2009
+   => Perl::Critic fixes.
+
+0.31 Tue Jun  2 03:59:10 2009
+   => Cleanup.
+
+0.30 Mon May  4 03:20:01 2009
+   => Add PREREQ: I18N::LangTags::Detect.
+
+0.29 Thu Apr 30 16:59:29 2009
+   => Get rid of version checking test.
+
+0.28 Thu Apr 30 15:18:09 2009
+   => Ooops! Forgot to add Lingua::EN::Numbers prereq after converting the distro.
+
+0.27 Thu Apr 23 19:50:25 2009
+   => Update builder.
+
+0.26 Sat Apr 18 06:01:25 2009
+   => Mention Task::Lingua::Any::Numbers
+   => Update distro tools.
+
+0.25 Tue Feb  3 01:54:04 2009
+   => Added support for:
+         o Lingua::CS::Num2Word
+         o Lingua::DE::Num2Word
+         o Lingua::ES::Numeros
+         o Lingua::ID::Nums2Words
+         o Lingua::NO::Num2Word
+         o Lingua::PT::Nums2Word
+         o Lingua::SV::Num2Word
+   => Updated Pod.
+
+0.24 Mon Jan 12 21:16:22 2009
+   => Added support for Lingua::(Slavic|BG)::Numbers
+   => Re-structured some parts.
+
+0.23 Tue Jul  8 10:55:46 2008
+   => If the language from the locale is not supported, warn & fall back to the
+      default instead of die()ing.
+
+0.22 Mon Jul  7 23:38:41 2008
+   => Note to self: also test Makefile.PL when changed :p
+
+0.21 Mon Jul  7 21:49:28 2008
+   => Implemented locale support (global & parameter)
+          per request from Ted Zlatanov.
+   => Refactored functions.
+
+0.20 Wed Sep 12 00:24:28 2007
+   => Fixed _dummy_oo(). Error reported by brian d foy.
+   => Improved unit tests.
+   => Added option to auto-skip language drivers if they want
+      a newer perl binary.
+   => Added a new macro named SILENT.
+
+0.12 Tue Aug 14 23:11:32 2007
+   => Forgot to remove debugging code.
+
+0.11 Tue Aug 14 23:06:11 2007
+   => Fixed a typo in build tools.
+
+0.10 Sun Aug 12 00:51:53 2007
+   => First release.

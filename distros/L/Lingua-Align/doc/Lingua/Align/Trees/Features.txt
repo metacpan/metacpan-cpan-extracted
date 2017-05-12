@@ -1,0 +1,229 @@
+NAME
+    Lingua::Align::Trees::Features - Perl modules for feature extraction for
+    the Lingua::Align::Trees tree aligner
+
+SYNOPSIS
+      use Lingua::Align::Trees::Features;
+
+      my $FeatString = 'catpos:treespansim:parent_catpos';
+      my $extractor = new Lingua::Align::Trees::Features(
+                              -features => $FeatString);
+
+      my %features = $extractor->features(\%srctree,\%trgtree,
+                                          $srcnode,$trgnode);
+
+
+
+      my $FeatString2 = 'giza:gizae2f:gizaf2e:moses';
+      my $extractor2 = new Lingua::Align::Trees::Features(
+                          -features => $FeatString2,
+                          -lexe2f => 'moses/model/lex.0-0.e2f',
+                          -lexf2e => 'moses/model/lex.0-0.f2e',
+                          -moses_align => 'moses/model/aligned.intersect');
+
+      my %features = $extractor2->features(\%srctree,\%trgtree,
+                                           $srcnode,$trgnode);
+
+DESCRIPTION
+    Extract features from a pair of nodes from two given syntactic trees
+    (source and target language). The trees should be complex hash
+    structures as produced by Lingua::Align::Corpus::Treebank::TigerXML. The
+    returned features are given as simple key-value pairs (%features)
+
+    Features to be used are specified in the feature string given to the
+    constructor ($FeatString). Default is 'inside2:outside2' which refers to
+    2 features, the inside score and the outside score as defined by the
+    Dublin Sub-Tree Aligner (see
+    http://www2.sfs.uni-tuebingen.de/ventzi/Home/Software/Software.html,
+    http://ventsislavzhechev.eu/Downloads/Zhechev%20MT%20Marathon%202009.pdf
+    ). For this you will need the probabilistic lexicons as created by Moses
+    (http://statmt.org/moses/); see the -lexe2f and -lexf2e parameters in
+    the constructor of the second example.
+
+    Features in the feature string are separated by ':'. Feature types can
+    be combined. Possible combinations are:
+
+    product (*)
+        multiply the value of 2 or more feature types, e.g.
+        'inside2*outside2' would refer to the product of inside2 and
+        outside2 scores
+
+    average (+)
+        compute the average (arithmetic mean) of 2 or more features, e.g.
+        'inside2+outside2' would refer to the mean of inside2 and outside2
+        scores
+
+    concatenation (.)
+        merge 2 or more feature keys and compute the average of their
+        scores. This can especially be useful for "nominal" feature types
+        that have several instantiations. For example, 'catpos' refers to
+        the labels of the nodes (category or POS label) and the value of
+        this feature is either 1 (present). This means that for 2 given
+        nodes the feature might be 'catpos_NN_NP => 1' if the label of the
+        source tree node is 'NN' and the label of the target tree node is
+        'NP'. Such nominal features can be combined with real valued
+        features such as inside2 scores, e.g. 'catpos.inside2' means to
+        concatenate the keys of both feature types and to compute the
+        arithmetic mean of both scores.
+
+    We can also refer to parent nodes on source and/or target language side.
+    A feature with the prefix 'parent_' makes the feature extractor to take
+    the corresponding values from the first parent nodes in source and
+    target language trees. The prefix 'srcparent_' takes the values from the
+    source language parent (but the current target language node) and
+    'trgparent_' takes the target language parent but not the source
+    language parent. For example 'parent_catpos' gets the labels of the
+    parent nodes. These feature types can again be combined with others as
+    described above (product, mean, concatenation). We can also use
+    'sister_' features 'children_' features which will refer to the feature
+    with the maximum value among all sister/children nodes, respectively.
+
+  FEATURES
+    The following feature types are implemented in the Tree Aligner:
+
+   lexical equivalence features
+    Lexical equivalence features evaluate the relations between words
+    dominated by the current subtree root nodes (alignment candidates). They
+    all use lexical probabilities usually derived from automatic word
+    alignment (other types of probabilistic lexica could be used as well).
+    The notion of inside words refers to terminal nodes that are dominated
+    by the current subtree root nodes and outside words refer to terminal
+    nodes that are not dominated by the current subtree root nodes. Various
+    variants of scores are possible:
+
+    inside1 (insideST1*insideTS1)
+        This is the unnormalized score of words inside of the current
+        subtrees (see
+        http://ventsislavzhechev.eu/Downloads/Zhechev%20MT%20Marathon%202009
+        .pdf). Lexical probabilities are taken from automatic word alignment
+        (lex-files). NULL links are also taken into account. It is actually
+        the product of insideST1 (probabilities from source-to-target
+        lexicon) and insideTS1 (probabilities from target-to-source lexicon)
+        which also can be used separately (as individual features).
+
+    outside1 (outsideST1*outsideTS1)
+        The same as inside1 but for word pairs outside of the current
+        subtrees. NULL links are counted and scores are not normalized.
+
+    inside2 (insideST2*insideTS2)
+        This refers to the normalized inside scores as defined in the Dublin
+        Subtree Aligner.
+
+    outside2 (outsideST1*outsideTS1)
+        The normalized scores of word pairs outside of the subtrees.
+
+    inside3 (insideST3*insideTS3)
+        The same as inside1 (unnormalized) but without considering NULL
+        links (which makes feature extraction much faster)
+
+    outside3 (outsideST1*outsideTS1)
+        The same as outside1 but without NULL links.
+
+    inside4 (insideST4*insideTS4)
+        The same as inside2 but without NULL links.
+
+    outside4 (insideST4*insideTS4)
+        The same as outside2 but without NULL links.
+
+    maxinside (maxinsideST*maxinsideTS)
+        This is basically the same as inside4 but using "max P(x|y)" instead
+        of "1/|y \SUM P(x|y)" as in the original definition. maxinsideST is
+        using the source-to-target scores and maxinsideTS is using the
+        target-to-source scores.
+
+    maxoutside (maxoutsideST*maxoutsideTS)
+        The same as maxinside but for outside word pairs
+
+    avgmaxinside (avgmaxinsideST*avgmaxinsideTS)
+        This is the same as maxinside but computing the average (1/|x|\SUM_x
+        max P(x|y)) instead of the product (\PROD_x max P(x|y))
+
+    avgmaxoutside (avgmaxoutsideST*avgmaxoutsideTS)
+        The same as avgmaxinside but for outside word pairs
+
+    unioninside (unioninsideST*unioninsideTS)
+        Add all lexical probabilities using the addition rule of independent
+        but not mutually exclusive probabilities
+        (P(x1|y1)+P(x2|y2)-P(x1|y1)*P(x2|y2))
+
+    unionoutside (unionoutsideST*unionoutsideTS)
+        The same as unioninside but for outside word pairs.
+
+   word alignment features
+    Word alignment features use the automatic word alignment directly. Again
+    we distinguish between words that are dominated by the current subtree
+    root nodes (inside) and the ones that are outside. Alignment is binary
+    (1 if two words are aligned and 0 if not) and as a score we usuallty
+    compute the proportion of interlinked inside word pairs among all links
+    involving either source or target inside words. One exception is the
+    moselink feature which is only defined for terminal nodes.
+
+    moses
+        The proportion of interlinked words (from automatic word alignment)
+        inside of the current subtree among all links involving either
+        source or target words inside of the subtrees.
+
+    moseslink
+        Only for terminal nodes: is set to 1 if the twwo words are linked in
+        the automatic word alignment derived from GIZA++/Moses.
+
+    gizae2f
+        Link proportion as for moses but now using the assymmetric GIZA++
+        alignments only (source-to-target).
+
+    gizaf2e
+        Link proportion as for moses but now using the assymmetric GIZA++
+        alignments only (target-to-source).
+
+    giza
+        Links from gizae2f and gizaf2e combined.
+
+   sub-tree features
+    Sub-tree features refer to features that are related to the structure
+    and position of the current subtrees.
+
+    treespansim
+        This is a feature for measuring the "horizontal" similarity of the
+        subtrees under consideration. It is defined as the 1 - the relative
+        position difference of the subtree spans. The relative position of a
+        subtree is defined as the middle of the span of a subtree
+        (begin+end/2) divided by the length of the sentence.
+
+    treelevelsim
+        This is a feature measuring the "vertical" similarity of two nodes.
+        It is defined as 1 - the relative tree level difference. The
+        relative tree level is defined as the distance to the sentence root
+        node divided by the size of the tree (which is the maximum distance
+        of any node in the tree to the sentence root).
+
+    nrleafsratio
+        This is the ratio of the number of leaf nodes dominated by the two
+        candidate nodes. The ratio is defined as the
+        minimum(nr_src_leafs/nr_trg_leafs,nr_trg_leafs/nr_src_leafs).
+
+   annotation/label features
+    "catpos"
+        This feature type extracts node label pairs and gives them the value
+        1. It uses the "cat" attribute if it exists, otherwise it uses the
+        "pos" attribute if that one exists.
+
+    "edge"
+        This feature refers to the pairs of edge labels (relations) of the
+        current nodes to their immediate parent (only the first parent is
+        considered if multiple exist). This is a binary feature and is set
+        to 1 for each observed label pair.
+
+SEE ALSO
+    For the tree structure see Lingua::Align::Corpus::Treebank. For the tree
+    aligner look at Lingua::Align::Trees
+
+AUTHOR
+    Joerg Tiedemann, <j.tiedemann@rug.nl>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Joerg Tiedemann
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

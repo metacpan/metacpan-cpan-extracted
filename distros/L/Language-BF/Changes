@@ -1,0 +1,25 @@
+# Revision history for Perl extension Language::BF.
+#
+# $Id: Changes,v 0.3 2007/11/13 12:31:06 dankogai Exp dankogai $
+#
+$Revision: 0.3 $ $Date: 2007/11/13 12:31:06 $
+! lib/Language/BF.pm
+  * $bf->as_perl changed so it is directly executable.  $bf->as_soruce
+    returns what $bf->as_perl used to return, which is a deparsed
+    coderef.
+  + new method; $bf->new_from_file
+! lib/Language/BF.pm
+  POD typo fixes by Michael Stevens
+  Message-Id: <20060627124221.GA81837@etla.org>
+
+0.02 2006/06/27 10:25:06
+! lib/Language/BF.pm
+  - fixed ',' bug -- supposed to be FIFO but it was implemented as LIFO
+  + New Methods:
+    $bf->parse # alias to $bf->code
+    $bf->as_c
+
+0.01  Mon Jun 26 20:51:26 2006
+	- original version; created by h2xs 1.23 with options
+		-XA Language::BF
+

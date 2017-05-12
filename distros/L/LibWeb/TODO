@@ -1,0 +1,20 @@
+$Id: TODO,v 1.9 2000/07/18 06:33:30 ckyc Exp $
+
+20/07/2000 LibWeb-0.02
+----------------------
+- Add more methods in LibWeb::Themes::Default.  For example, add some
+  HTML form generation templates in LibWeb::Themes::Default.
+
+- Add more methods in LibWeb::Database::Mysql.
+
+- Add some themes.
+
+- Add MyThemes in ./eg.
+
+- Fix LibWeb::CGI OO bugs.
+
+- Fix ``redirect'' security hole.
+
+- Multiple database support.
+
+- Advocate $self->{OS}, $self->{CRLF} and $self->{PATH_SEP}.

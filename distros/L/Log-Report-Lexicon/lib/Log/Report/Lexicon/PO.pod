@@ -1,0 +1,225 @@
+=encoding utf8
+
+=head1 NAME
+
+Log::Report::Lexicon::PO - one translation definition
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+This module is administering one translation object.  Sets of PO
+records are kept in a POT file, implemented in L<Log::Report::Lexicon::POT|Log::Report::Lexicon::POT>.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Log::Report::Lexicon::PO-E<gt>B<new>(%options)
+
+ -Option      --Default
+  automatic     ""
+  comment       []
+  format        []
+  fuzzy         false
+  msgctxt       undef
+  msgid         <required>
+  msgid_plural  undef
+  msgstr        "" or []
+  references    []
+
+=over 2
+
+=item automatic => PARAGRAPH
+
+Automatically added comments.
+See L<addAutomatic()|Log::Report::Lexicon::PO/"Attributes">.
+
+=item comment => PARAGRAPH
+
+Translator added comments.
+See L<addComment()|Log::Report::Lexicon::PO/"Attributes">.
+
+=item format => ARRAY|HASH
+
+See L<format()|Log::Report::Lexicon::PO/"Attributes">.  Either an ARRAY with PAIRS or a HASH with that same
+information.
+
+=item fuzzy => BOOLEAN
+
+The string is not yet translated, some smart guesses may have been made.
+See L<fuzzy()|Log::Report::Lexicon::PO/"Attributes">.
+
+=item msgctxt => STRING
+
+Context string: text around the msgid itself.
+
+=item msgid => STRING
+
+=item msgid_plural => STRING
+
+=item msgstr => STRING|ARRAY-OF-STRING
+
+The translations for the msgid.  When msgid_plural is defined, then an
+ARRAY must be provided.
+
+=item references => STRING|ARRAY-OF-LOCATIONS
+
+The STRING is a blank separated list of LOCATIONS.
+LOCATIONs are of the  form C<filename:linenumber>, for
+instance C<lib/Foo.pm:42>
+See L<addReferences()|Log::Report::Lexicon::PO/"Attributes">
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<addAutomatic>(LIST|ARRAY|STRING)
+
+Add multiple lines to the translator's comment block.  Returns an
+empty string if there are no comments.
+
+=item $obj-E<gt>B<addComment>(LIST|ARRAY|STRING)
+
+Add multiple lines to the translator's comment block.  Returns an
+empty string if there are no comments.
+
+=item $obj-E<gt>B<addFlags>(STRING)
+
+Parse a "flags" line.
+
+=item $obj-E<gt>B<addReferences>(STRING|LIST|ARRAY)
+
+The STRING is a blank separated list of LOCATIONS.  The LIST and
+ARRAY contain separate LOCATIONs.  A LOCATION is of the form
+C<filename:linenumber>.  Returns the internal HASH with references.
+
+=item $obj-E<gt>B<automatic>( [LIST|ARRAY|STRING] )
+
+Returns a STRING which contains the cleaned paragraph of automatically
+added comments.  If an argument is specified, it will replace the current
+comment.
+
+=item $obj-E<gt>B<comment>( [LIST|ARRAY|STRING] )
+
+Returns a STRING which contains the cleaned paragraph of translator's
+comment.  If an argument is specified, it will replace the current
+comment.
+
+=item $obj-E<gt>B<format>( $language | <PAIRS|ARRAY|HASH> )
+
+When one $language is specified, it looks whether a C<$language-format> or
+C<no-$language-format> is present in the line of FLAGS.  This will return
+C<1> (true) in the first case, C<0> (false) in the second case.  It will
+return C<undef> (also false) in case that both are not present.
+
+You can also specify PAIRS: the key is a language name, and the
+value is either C<0>, C<1>, or C<undef>.
+
+example: use of format()
+
+ # getters
+ if($po->format('c')) ...
+ unless($po->format('perl-brace')) ...
+ if(defined $po->format('java')) ...
+
+ # setters
+ $po->format(java => 1);       # results in 'java-format'
+ $po->format(java => 0);       # results in 'no-java-format'
+ $po->format(java => undef);   # results in ''
+
+=item $obj-E<gt>B<fuzzy>( [BOOLEAN] )
+
+Returns whether the translation needs human inspection.
+
+=item $obj-E<gt>B<isActive>()
+
+Returns whether the translation has any references, or is the header.
+
+=item $obj-E<gt>B<keepReferencesTo>($table)
+
+Remove all references which are not found as key in the hash $table.
+Returns the number of references left.
+
+=item $obj-E<gt>B<msgctxt>()
+
+Returns the message context, if provided.
+
+=item $obj-E<gt>B<msgid>()
+
+Returns the actual msgid, which cannot be C<undef>.
+
+=item $obj-E<gt>B<msgstr>( [$index, [STRING]] )
+
+With a STRING, a new translation will be set.  Without STRING, a
+lookup will take place.  When no plural is defined, the $index is
+ignored.
+
+=item $obj-E<gt>B<plural>( [STRING] )
+
+Returns the actual msgid_plural, which can be C<undef>.
+
+=item $obj-E<gt>B<references>( [STRING|LIST|ARRAY] )
+
+Returns an unsorted list of LOCATIONS.  When options are specified,
+then those will be used to replace all currently defined references.
+Returns the unsorted LIST of references.
+
+=item $obj-E<gt>B<removeReferencesTo>($filename)
+
+Remove all the references to the indicate $filename from the list.  Returns
+the number of refs left.
+
+=back
+
+=head2 Parsing
+
+=over 4
+
+=item Log::Report::Lexicon::PO-E<gt>B<fromText>( STRING, [$where] )
+
+Parse the STRING into a new PO object.  The $where string should explain
+the location of the STRING, to be used in error messages.
+
+=item $obj-E<gt>B<toString>(%options)
+
+Format the object into a multi-lined string.
+
+ -Option    --Default
+  nr_plurals  undef
+
+=over 2
+
+=item nr_plurals => INTEGER
+
+If the number of plurals is specified, then the plural translation
+list can be checked for the correct length.  Otherwise, no smart
+behavior is attempted.
+
+=back
+
+=item $obj-E<gt>B<useless>()
+
+[1.02] The message-id has no references anymore B<and> no translations.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Log-Report-Lexicon distribution version 1.06,
+built on September 21, 2016. Website: F<http://perl.overmeer.net/log-report/>
+
+=head1 LICENSE
+
+Copyrights 2007-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

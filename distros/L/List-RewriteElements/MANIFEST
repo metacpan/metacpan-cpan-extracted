@@ -1,0 +1,23 @@
+lib/List/RewriteElements.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/01_load.t
+t/02_list.t
+t/03_file.t
+t/04_body_suppress.t
+t/05_header_rule.t
+t/06_header_suppress.t
+t/07_fixed_width.t
+t/testlib/complex.txt
+t/testlib/fixed.txt
+t/testlib/IO/Capture.pm
+t/testlib/IO/Capture/ErrorMessages.pm
+t/testlib/IO/Capture/Stderr.pm
+t/testlib/IO/Capture/Stdout.pm
+t/testlib/IO/Capture/Tie_STDx.pm
+t/testlib/simple.txt
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

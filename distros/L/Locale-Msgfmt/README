@@ -1,0 +1,43 @@
+Locale-Msgfmt
+
+Locale::Msgfmt is a pure Perl reimplementation of msgfmt from GNU
+gettext-tools.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Locale::Msgfmt
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Locale-Msgfmt
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Locale-Msgfmt
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Locale-Msgfmt
+
+    Search CPAN
+        http://search.cpan.org/dist/Locale-Msgfmt
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Ryan Niebur
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

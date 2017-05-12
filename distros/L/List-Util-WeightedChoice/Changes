@@ -1,0 +1,6 @@
+Revision history for Perl extension List::Util::WeightedChoice.
+
+0.01  Wed Mar 18 08:45:43 2009
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.0 -X --name List::Util::WeightedChoice
+

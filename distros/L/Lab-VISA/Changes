@@ -1,0 +1,52 @@
+History of Lab::VISA
+====================
+
+Lab::VISA 3.05
+  * minor documentation improvements and metadata fixes
+
+Lab::VISA 3.04
+  * minor documentation improvements
+
+Lab::VISA 3.03
+  * improvements to build on 64bit Windows, documentation for Windows installation
+
+Lab::VISA 3.02
+  * remove support for VXI SERVANT ressouces (they are NI specific, and using that
+    code leads to a runtime error in 64bit VISA)
+
+Lab::VISA 3.01
+  * add support for viGpibControlREN
+
+Lab::VISA 3.00
+  * fix remaining non-unicode texts
+
+Lab::VISA 2.95
+  * add support for viReadSTB 
+
+Lab::VISA 2.90
+  * Regenerate wrapper code with swig-2
+  * Unify version number with other lab packages
+
+Lab::VISA 2.07
+  * Removed trailing space in path name in Makefile.PL
+    (Ticket https://rt.cpan.org/Ticket/Display.html?id=62430 reported by Andreas Werner)
+
+Lab::VISA 2.06
+  Update recommended if you experience problems on Linux.
+
+  * Fixed double free() in visa_wrap.c that was causing problems on Linux 
+  * Tidied up Installation.pod
+
+Lab::VISA 2.05
+  Only small documentation fixes. No need to necessarily upgrade.
+  
+  * added this file
+  * added Installation Guide for Windows with ActiveState or Strawberry Perl and Linux
+  * tiny documentation fixes
+  * added homepage and mailing list to META.yml
+
+Lab::VISA 2.04
+  skipped
+
+Lab::VISA 2.03
+  Bugfix version. Please upgrade.

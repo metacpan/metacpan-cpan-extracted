@@ -1,0 +1,25 @@
+
+
+INSTALL
+
+Installing this module (Lingua::EN::Ngram) should be trivial since it
+requires no dependencies:
+
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  $ make install
+
+Once installed (or maybe even before) you should be able to see how it
+works by:
+
+  $ cd bin
+  $ ./ngrams.pl ../etc/walden.txt 5
+  $ ./intersections.pl 5
+
+Enjoy!
+
+-- 
+Eric Lease Morgan <eric_morgan@infomotions.com>
+September 12, 2010
+

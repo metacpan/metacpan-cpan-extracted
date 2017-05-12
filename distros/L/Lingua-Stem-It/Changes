@@ -1,0 +1,14 @@
+0.02  2007-06-08
+
+ - Fixed unclean code which generated warnings (thanks JKEENAN).
+
+ - Fixed a small bug in the algorithm (step 3a).
+ 
+ - Updated documentation.
+
+ - Added more tests.
+
+0.01  2003-03-21
+
+ - original version; created by h2xs 1.20 with options
+   -ACX -n Lingua::Stem::It

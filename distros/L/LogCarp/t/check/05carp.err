@@ -1,0 +1,5 @@
+[Wed Aug 12 02:08:24 1998]  17121 05carp.t ERR: a WARN before in main at t/05carp.t line 35.
+[Wed Aug 12 02:08:24 1998]  17121 05carp.t ERR: a WARN in check at t/myCarp.pm line 7.
+[Wed Aug 12 02:08:24 1998]  17121 05carp.t ERR: a CARP at t/05carp.t line 36
+[Wed Aug 12 02:08:24 1998]  17121 05carp.t ERR: a WARN after in check at t/myCarp.pm line 9.
+[Wed Aug 12 02:08:24 1998]  17121 05carp.t ERR: a WARN after in main at t/05carp.t line 37.

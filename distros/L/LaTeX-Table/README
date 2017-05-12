@@ -1,0 +1,73 @@
+LaTeX-Table version 1.0.6
+
+This module supports multipage tables via the xtab and the longtable package.
+For publication quality tables it utilizes the booktabs package. It also
+supports the tabularx and tabulary packages for nicer fixed-width tables.
+Furthermore, it supports the colortbl package for colored tables optimized for
+presentations.  The powerful new ctable package is supported and especially
+recommended when footnotes are needed. LaTeX::Table ships with some
+predefined, good looking themes.
+
+INSTALLATION
+
+To install this module with CPAN (recommended), just type
+
+    cpan LaTeX::Table
+
+If you have never used the cpan command before, you probably have to answer a
+few configuration questions. This command will automatically install missing
+modules required by LaTeX::Table.
+
+To install this module without CPAN, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+If you get a warning about missing modules, install them manually or use the
+cpan command (see above).
+
+Alternatively, to install with ExtUtils::MakeMaker, you can use the following
+commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Now start the script generate_examples.pl in the examples directory of this
+distibution. 
+
+    perl generate_examples.pl
+    
+This script generates some LaTeX files with some example tables.
+Now please compile these examples with LaTeX and check if all tables look ok:
+
+    pdflatex examples.tex 
+
+PROGRAMS
+
+This module ships with two small utilities. The first, csv2pdf is a CSV to PDF
+converter. It is only about 100 lines of code short and only meant as an 
+example application, but it is already very powerful. It requires Getopt::Long,
+Text::CSV, LaTeX::Encode and LaTeX::Driver, which are not installed during the
+installation of this module. 
+
+The second utility is ltpretty. It takes a lazy formatted LaTeX table from 
+STDIN (typically piped from Vim or emacs) and outputs a completely formatted
+table. This makes this module not only useful for automatically generated
+reports, but also saves a lot of typing work in creating custom tables.
+
+
+DEPENDENCIES
+
+Carp
+Module::Pluggable
+Moose
+MooseX::FollowPBP
+English
+Scalar::Util
+Template
+

@@ -1,0 +1,21 @@
+SYNOPSIS
+
+     use Lingua::ID::Number::Format::MixWithWords qw(format_number_mix);
+    
+     print format_number_mix(num => 1.23e7); # prints "12,3 juta"
+
+DESCRIPTION
+
+    This module formats number with Indonesian names of large numbers
+    (ribu, juta, miliar, triliun, and so on), e.g. 1.23e7 becomes "12,3
+    juta". If number is too small or too large so it does not have any
+    appropriate names, it will be formatted like a normal number.
+
+SEE ALSO
+
+    Lingua::ID::Nums2Words
+
+    Lingua::EN::Number::Format::MixWithWords
+
+    Number::Format
+

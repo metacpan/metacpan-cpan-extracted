@@ -1,0 +1,2 @@
+Before submitting patches please run perltidy with the .perltidyrc included in
+this repository.

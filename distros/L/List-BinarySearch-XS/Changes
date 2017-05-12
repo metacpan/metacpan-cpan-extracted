@@ -1,0 +1,67 @@
+Revision history for Perl extension List::BinarySearch::XS.
+
+0.09 2015-02-05
+  - Fix typo in a link provided in META (Makefile.PL).
+
+0.08 2014-12-15
+  - Microoptimization: Eliminate multiple dereferences of aref_haystack.
+    (bulk88++)
+
+0.07 2014-12-02
+  - Adjust arithmetic to avoid potential of overflow (from GH issue
+    #2 under List::BinarySearch repo.  Also see
+    https://en.wikipedia.org/wiki/Binary_search_algorithm#Arithmetic ).
+  - Switch from RT to GitHub Issues.
+
+0.06 2013-10-28
+  - Fixed typo(bug) in POD example. (RT#89819).
+
+0.05 2013-10-27
+  - Added git repository to META information.
+  - Removed unnecessary max==min test in binsearch (save a cycle or two).
+
+0.04 2013-09-17
+  - Improvements to auto-generated META.* files.
+
+0.03 2013-09-06
+  - Micro-optimization in XS code for binsearch (Consolidated output code
+    into PPCODE section.
+  - Remove "DEV RELEASE" mention in POD.
+
+0.02 2013-09-05
+  - PUBLIC RELEASE
+  - Enough smoke tests have trickled in that I'm comfortable with portability
+    from Perl 5.8.9 through present.  Would like to see more Windows tests, but
+    unofficial reports are that we build and test alright there as well.
+  - Bump version number to 0.02 and release.
+  - This version is compatible as a plugin for List::BinarySearch v0.12.
+
+0.01_005 2013-09-04
+  - Added tests and bugfix for return value of binsearch on "no match" in list
+    context (Should be empty list.  Was a single element of undef).
+    
+0.01_004 2013-08-31
+  - #define cxinc() if PERL_VERSION is less than 5.12 to restore
+    compatibility with pre-5.12.
+
+0.01_003 2013-08-29
+  - Address some issues with backwards compatibility for Perl 5.10/5.8.
+  - Test a fix for Windows.
+  - Test a fix for the cxinc problem.
+  - Make sure all "author" tests are disabled unless RELEASE_TESTING set.
+  
+0.01_002 2013-08-22
+  - Restore compatibility with Perl versions older than 5.16 by changing
+    av_top_index to av_len.  av_top_index is a more sanely named synonym to
+    av_len, but wasn't available until Perl 5.16.
+  - POD corrections.
+
+0.01_001 2013-08-21
+  - Applied code adapted from a binary search utility written with Inline::C.
+  - Adapted POD from List::BinarySearch
+  - Minimal testing added (additional still to be adapted from L::BS).
+
+0.01  2013-08-20
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.8.0 -n List::BinarySearch::XS
+

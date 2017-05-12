@@ -1,0 +1,71 @@
+# A generic translation
+
+key = hi there
+language = en_au
+translation = Hello
+
+
+# Used in the expression/priority test case, for the
+# AU localisation of English; left-to-right and
+# right-to-left
+
+key = Select [_1] colours
+language = en_au
+expression = _1 == 1
+priority = 1
+translation = Select one colour.
+
+key = Select [_1] colours
+language = en_au
+expression = 2 == _1
+priority = 1
+translation = Two colours selected.
+
+key = Select [_1] colours
+language = en_au
+translation = Please select [_1] colours.
+
+
+# Used in the 'undefined argument type' test case
+
+key = Top [_1] paths
+language = en
+priority = 1
+expression = defined(_1) == 1
+translation = Top [_1] paths
+
+key = Top [_1] paths
+language = en
+translation = Top paths
+
+
+# Used in the 'left(...)' test case
+
+key = This is my [_1]
+language = en
+priority = 1
+expression = left(_1,5) eq "house"
+translation = This is my house
+
+key = This is my [_1]
+language = en
+translation = This is my home
+
+
+# Used in the 'substr(...)' test case, 2-arg
+
+key = My name is [_1]
+language = en
+priority = 1
+expression = substr(_1,1) eq "athew"
+translation = My name is Mathew
+
+
+# Used in the 'substr(...)' test case, 3-arg
+
+key = I live in [_1]
+language = en
+priority = 1
+expression = substr(_1,1,2) eq "oz"
+translation = I live in Australia
+

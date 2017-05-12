@@ -1,0 +1,25 @@
+                Usage
+
+                original WWW files (html etc.)
+                   |
+extract-links      |
+                   |
+                link database + indexes
+                   |   \
+build-schedule     |    \ 
+                   |     \
+                schedule  \
+                    \      \
+test-link            \      \
+                  updated link database                      
+                           |
+link-report(.cgi)          |
+                           |
+                        reports
+                           |
+fix-link(.cgi)             |
+                           |
+                     updated files
+
+           
+Figure: Files, programs and their relationships

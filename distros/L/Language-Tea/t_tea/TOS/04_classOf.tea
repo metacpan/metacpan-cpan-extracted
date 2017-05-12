@@ -1,0 +1,32 @@
+
+class teste()
+
+method teste test(){
+    echo "olaaaaaa"
+}
+
+class Triangulo teste(
+    _altura
+    _base
+)
+
+method Triangulo getArea (  ) {
+    / [* $_altura $_base] 2
+}
+
+method Triangulo constructor ( a b ) {
+    set! _altura $a
+    set! _base $b
+}
+
+method Triangulo setDimensoes ( a b ) {
+    set! _altura $a
+    set! _base $b
+}
+
+
+define obj [new Triangulo 1 2]
+
+define e1 [class-of $obj]
+echo [class-get-name $e1]
+

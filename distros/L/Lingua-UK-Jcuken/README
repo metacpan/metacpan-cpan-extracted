@@ -1,0 +1,36 @@
+NAME
+    Lingua::UK::Jcuken -- Conversion between QWERTY and JCUKEN keys in
+    Ukrainian
+
+SYNOPSIS
+     use Lingua::UK::Jcuken qw/ jcu2qwe qwe2jcu /;
+
+     print qwe2jcu('qwerty', 'koi8-r'); # prints "jcuken" in koi8-r
+
+DESCRIPTION
+    Lingua::UK::Jcuken can be used for conversion between two layouts on
+    Ukrainian keyboards.
+
+METHODS
+  jcu2qwe ( $string, [ $encoding ])
+    This method converts $string from Jcuken to Qwerty.
+
+    Optional $encoding parameter allows to specify $string's encoding
+    (default is 'windows-1251')
+
+  qwe2jcu ( $string, [ $encoding ])
+    This method converts $string from Qwerty to Jcuken.
+
+    Optional $encoding parameter allows to specify result encoding (default
+    is 'windows-1251'). It is also used as $string encoding if you have
+    cyrillic in it.
+
+AUTHORS
+    Serguei Trouchelle <stro@railways.dp.ua>
+
+COPYRIGHT
+    Copyright (c) 2006 Serguei Trouchelle. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,16 @@
+use utf8;
+$a = {
+  'house' => {
+      count => 1,
+      trans => {
+          'casa' => 1.000000,
+      }
+  },
+  'cat' => {
+      count => 1,
+      trans => {
+          'gato' => 1.000000,
+          'felino' => 0.400000,
+      }
+  },
+}

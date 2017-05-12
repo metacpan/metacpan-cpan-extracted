@@ -1,0 +1,44 @@
+NAME
+
+Lingua-FR-Ladl - a set of modules to represent, query and investigate the Ladl
+tables, a french linguistic resource, distributed as a set of excel tables.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Class::Std
+List::Util
+List::MoreUtils
+
+and
+
+XML::LibXML if you want to load table data from a gnumeric XML file
+Spreadsheet::ParseExcel if you want to load table data from an excel file
+DBI - if you want to use the DB interface
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Ingrid Falk
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

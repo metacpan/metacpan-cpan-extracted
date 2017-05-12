@@ -1,0 +1,21 @@
+---
+abstract: 'Test components of Slackware Linux for correctness'
+author:
+  - 'TTKCIAR <ttk@ciar.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-Slackware-SystemTests
+requires:
+  File::Valet: '1.00'
+  JSON: '2.00'
+  Test::Differences: '0.60'
+  Test::Most: '0.30'
+  perl: '5.008000'
+version: '0.01'

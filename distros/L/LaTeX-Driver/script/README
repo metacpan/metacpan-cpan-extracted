@@ -1,0 +1,4 @@
+The scripts in this directory provide classic Unix-style filters for
+LaTeX source to dvi, PostScript and PDF output.  The functionality of
+the three scripts is virtually identical so it is abstracted out into
+a module: LaTeX::Driver::FilterProgram.

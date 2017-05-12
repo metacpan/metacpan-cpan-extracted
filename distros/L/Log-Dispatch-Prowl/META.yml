@@ -1,0 +1,18 @@
+---
+abstract: 'Object for logging to the iPhone'
+author:
+  - 'Moritz Onken'
+generated_by: 'Dist::Zilla::Plugin::MetaYAML version 1.092310'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Dispatch-Prowl
+requires:
+  File::Find::Rule: 0
+  Log::Dispatch: 0
+  Test::More: 0.92
+  WebService::Prowl: 0
+resources:
+  repository: http://github.com/monken/p5-log-dispatch-prowl/tree
+version: 1.000

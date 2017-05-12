@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+
+use strict;
+use FindBin;
+use lib $FindBin::Bin.'/../lib';
+use Lingua::Align::Corpus;
+
+use vars qw($opt_i);
+use Getopt::Std;
+getopts('i');
+
+my $infile = shift(@ARGV);
+my $informat = shift(@ARGV);
+my $outformat = shift(@ARGV);
+
+my $corpus = new Lingua::Align::Corpus(-file => $infile,
+				       -skip_indexed => $opt_i,
+				       -type => $informat);
+my $output = new Lingua::Align::Corpus(-type => $outformat,
+				       -single_document => 1);
+
+my %sent=();
+print $output->print_header();
+while ($corpus->next_sentence(\%sent)){
+    print $output->print_tree(\%sent);
+    print "\n";
+}
+print $output->print_tail();
+
+__END__
+
+=head1 NAME
+
+convert_treebank - convert a treebank from one format to another
+
+=head1 SYNOPSIS
+
+    treealign [-i] infile informat outformat > outfile
+
+=head1 DESCRIPTION
+
+This script allows you to convert a treebank to another format. The converted treebank is printed to STDOUT. Currently the following formats are supported:
+
+=over
+
+=item AlpinoXML (alpino)
+
+The XML format used by the Dutch dependency parser Alpino. Use the option [-i] to skip index nodes from that format.
+
+=item PennTreebank (penn)
+
+The bracketing format from the Penn Treebank. Sentences should be separated by empty lines. This can be used to read, for example, the output of the Berkeley Parser.
+
+=item Stanford Parser format (stanford)
+
+This is essentially the same as the PennTreebank format but includes also the depedency relations that can optionally be produced by the Stanford parser. The conversion script tries to attach the relations to the phrase-structure trees. (This is rather experimental and the labeling might be different from what you'd expect -- use with care!).
+
+=item Berkeley Parser format (berkeley)
+
+This is the same as the Penn Treebank format but the Berkeley Parser produces bracketing structures that break the parser.
+
+=item TigerXML (tiger)
+
+This is the TigerXML format which is used as a standard in the TreeAligner (mainly because it is also used in the Stockholm Tree Aligner which allows to visualize and edit the automatic tree alignments).
+
+=back
+
+
+=head1 SEE ALSO
+
+L<Lingua::Align::Corpus>, Lingua::Align::Corpus::Treebank
+ 
+
+=head1 AUTHOR
+
+Joerg Tiedemann, E<lt>jorg.tiedemann@lingfil.uu.seE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Joerg Tiedemann
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

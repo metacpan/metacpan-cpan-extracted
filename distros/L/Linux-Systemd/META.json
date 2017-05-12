@@ -1,0 +1,142 @@
+{
+   "abstract" : "Use the systemd journal",
+   "author" : [
+      "Ioan Rogers <ioanr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Linux-Systemd",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::PkgConfig" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0",
+            "Test::Version" : "1",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "Moo" : "0",
+            "XSLoader" : "0",
+            "perl" : "v5.16.0",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.94",
+            "blib" : "1.01",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ioanrogers/Linux-Systemd/issues"
+      },
+      "homepage" : "http://metacpan.org/release/Linux-Systemd-Journal/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ioanrogers/Linux-Systemd.git",
+         "web" : "https://github.com/ioanrogers/Linux-Systemd"
+      }
+   },
+   "version" : "1.162700",
+   "x_BuiltWith" : {
+      "modules" : {
+         "CPAN::Meta" : "2.150010",
+         "Carp" : "1.40",
+         "Exporter" : "5.72",
+         "ExtUtils::MakeMaker" : "7.24",
+         "ExtUtils::PkgConfig" : "1.15",
+         "File::Basename" : "2.85",
+         "File::Spec" : "3.63",
+         "IO::Handle" : "1.36",
+         "IPC::Open3" : "1.20",
+         "Module::Build" : "0.4220",
+         "Moo" : "2.002004",
+         "Test::CPAN::Meta::JSON" : "0.16",
+         "Test::CheckDeps" : "0.010",
+         "Test::EOL" : "1.6",
+         "Test::Fatal" : "0.014",
+         "Test::Kwalitee" : "1.22",
+         "Test::Mojibake" : "1.1",
+         "Test::More" : "1.302056",
+         "Test::NoTabs" : "1.4",
+         "Test::Portability::Files" : "0.07",
+         "Test::Synopsis" : "0.15",
+         "Test::Vars" : "0.010",
+         "Test::Version" : "2.05",
+         "XSLoader" : "0.24",
+         "blib" : "1.06",
+         "strict" : "1.11",
+         "strictures" : "2.000003",
+         "warnings" : "1.36"
+      },
+      "perl" : {
+         "original" : "v5.24.0",
+         "qv" : 1,
+         "version" : [
+            5,
+            24,
+            0
+         ]
+      },
+      "perl-config" : {
+         "gccversion" : "4.2.1 Compatible Clang 3.8.0 (tags/RELEASE_380/final)",
+         "myarchname" : "x86_64-linux",
+         "osname" : "linux"
+      },
+      "platform" : "linux"
+   },
+   "x_contributors" : [
+      "Ioan Rogers <ioan.rogers@sophos.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}

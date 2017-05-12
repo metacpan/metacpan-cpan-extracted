@@ -1,0 +1,12 @@
+These examples originated from these sources:
+
+* http://c2.com/cgi/wiki?SnuspLanguage
+* http://rosettacode.org/wiki/SNUSP
+
+Indeed the original code for this interpreter came from the c2 wiki.
+
+I have modified things slightly to fix bugs and make the interpreter more
+understandable and maintainable. Most of the tweaks to the examples were simply
+to make the return code be 0.
+
+-- Ingy döt Net

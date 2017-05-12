@@ -1,0 +1,138 @@
+NAME
+    Linux::SysInfo - Perl interface to the sysinfo(2) Linux system call.
+
+VERSION
+    Version 0.14
+
+SYNOPSIS
+        use Linux::SysInfo qw<sysinfo>;
+
+        my $si = sysinfo;
+        print "$_: $si->{$_}\n" for keys %$si;
+
+DESCRIPTION
+    This module is a wrapper around the sysinfo(2) Linux system call. It
+    gives information about the current uptime, load average, memory usage
+    and processes running. Other systems have also this system call (e.g.
+    Solaris), but in most cases the returned information is different.
+
+CONSTANTS
+  "LS_HAS_EXTENDED"
+    This constant is set to 1 if your kernel supports the three extended
+    fields "totalhigh", "freehigh" and "mem_unit" ; and to 0 otherwise.
+
+FUNCTIONS
+  "sysinfo"
+    This function takes no argument. It returns "undef" on failure or a hash
+    reference whose keys are the members name of the "struct sysinfo" on
+    success :
+
+    *   "uptime"
+
+        Seconds elapsed since the system booted.
+
+    *   "load1", "load5", "load15"
+
+        1, 5 and 15 minutes load average.
+
+    *   "totalram"
+
+        Total usable main memory size.
+
+    *   "freeram"
+
+        Available memory size.
+
+    *   "sharedram"
+
+        Amount of shared memory.
+
+    *   "bufferram"
+
+        Memory used by buffers.
+
+    *   "totalswap"
+
+        Total swap space size.
+
+    *   "freeswap"
+
+        Swap space still available.
+
+    *   "procs"
+
+        Number of current processes.
+
+    Prior to Linux 2.3.23 on i386 and 2.3.48 on all other architectures, the
+    memory sizes were given in bytes. Since then, the following members are
+    also available and all the memory sizes are given as multiples of
+    "mem_unit" bytes :
+
+    *   "totalhigh"
+
+        Total high memory size.
+
+    *   "freehigh"
+
+        Available high memory size.
+
+    *   "mem_unit"
+
+        Memory unit size in bytes.
+
+EXPORT
+    The only function of this module, "sysinfo", and the constant
+    "LS_HAS_EXTENDED" are only exported on request. Functions are also
+    exported by the ":funcs" tag, and constants by ":consts".
+
+BINARY COMPATIBILITY
+    If you upgrade your kernel to a greater version than 2.3.23 on i386 or
+    2.3.48 on any other platform, you will need to rebuild the module to
+    access the extended fields.
+
+    Moreover, since the perl hash function has changed after the 5.6
+    version, you will also need to recompile the module if you upgrade your
+    perl from a version earlier than 5.6.
+
+DEPENDENCIES
+    perl 5.6.
+
+    A C compiler. This module may happen to build with a C++ compiler as
+    well, but don't rely on it, as no guarantee is made in this regard.
+
+SEE ALSO
+    The sysinfo(2) man page.
+
+    Sys::Info : Gather information about your system.
+
+    Sys::CpuLoad : Try several different methods to retrieve the load
+    average.
+
+    BSD::getloadavg : Wrapper to the getloadavg(3) BSD system call.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
+
+BUGS
+    Please report any bugs or feature requests to "bug-linux-sysinfo at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Linux-SysInfo>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Linux::SysInfo
+
+    Tests code coverage report is available at
+    <http://www.profvince.com/perl/cover/Linux-SysInfo>.
+
+COPYRIGHT & LICENSE
+    Copyright 2007,2008,2009,2010,2013 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

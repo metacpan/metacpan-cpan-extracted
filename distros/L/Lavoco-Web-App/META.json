@@ -1,0 +1,57 @@
+{
+   "abstract" : "Experimental framework with two constraints: FastCGI and Template::Toolkit.",
+   "author" : [
+      "Rob Brown <rob@intelcompute.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lavoco-Web-App",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "Email::Stuffer" : "0",
+            "Encode" : "0",
+            "FCGI" : "0",
+            "File::Slurp" : "0",
+            "FindBin" : "0",
+            "JSON" : "0",
+            "Log::AutoDump" : "0",
+            "Moose" : "0",
+            "Plack::Handler::FCGI" : "0",
+            "Plack::Request" : "0",
+            "Template" : "0",
+            "Term::ANSIColor" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.06"
+}

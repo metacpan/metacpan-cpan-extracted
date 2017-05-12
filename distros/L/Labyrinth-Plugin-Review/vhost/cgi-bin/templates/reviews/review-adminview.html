@@ -1,0 +1,8 @@
+<h2>[% preview.typename %] Preview</h2>
+
+[% IF preview.publish == 4 %]
+<p>Please note that archived reviews cannot edited.</p>
+[% END %]
+
+[% data = preview %]
+[% INCLUDE "reviews/reviews-item.html" %]

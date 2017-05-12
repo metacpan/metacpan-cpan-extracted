@@ -1,0 +1,33 @@
+Lingua-UK-Translit version 0.10
+===============================
+
+Lingua::UK::Translit - Perl extension for correct transliteration of 
+Ukrainian text in UTF-8 encoding to Latin symbols.
+
+Consists of functions for proper text transliteration.
+Works only with UTF-8 encoding. Returns all symbols in UTF-8 encoding.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  at least perl-5.6.0
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by O. Y. Panchuk
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,39 @@
+% layout 'default';
+% title 'Help';
+<div style="margin:10px;">
+<p>There are several possible routes one can take when using the LaTeXML web server for
+conversion jobs:</p>
+
+<h2>Upload Interface</h2>
+
+Manually upload your TeX sources, or an archive (.zip or .tar.gz)
+containing images and fragment-based setups, at
+our <a href="http://latexml.mathweb.org/upload">upload interface</a>
+at /upload.
+
+<h2>RESTful Convert</h2>
+Alternatively, send an HTTP POST request to /convert, with the following syntax:</li><li>
+<ul><li>
+tex : "the TeX content to convert"
+</li><li>
+profile : "conversion profile - default is <it>standard</it>,
+try <it>fragment</it> for best daemon results"
+</li><li>
+Also useful for converting files that are already hosted online. Just
+send their URL (http://www.example.com/foo.tex) as the "tex" parameter.</li>
+</ul>
+<h3> Command-line examples:</h3>
+<ul><li>Textual fragments:</li>
+<p>curl -d "profile=fragment&tex=\textbf{Hello World}" http://latexml.mathweb.org/convert</p>
+<li>Archive bundles:</li>
+<p> curl --data-binary @somezip.zip http://latexml.mathweb.org/convert -H"Content-Type: multipart/form-data" -H"X-File-Type: application/zip" -H"X-File-Name: somezip.zip" > result.zip
+</p>
+</ul>
+<h2>Classic Setup</h2>
+Try the classic interface at <a href="http://tex2xml.kwarc.info/">http://tex2xml.kwarc.info/</a>
+
+<h2>Contact</h2>
+For questions and requests, please contact
+<a href="http://kwarc.info/people/dginev">Deyan Ginev</a> (d DOT ginev AT jacobs-university.de)
+
+</div>

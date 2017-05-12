@@ -1,0 +1,60 @@
+
+procmail: [26829] Fri Oct 28 17:58:28 2005
+procmail: Assigning "MAILDIR=/home/bepi/Procmail/messages"
+procmail: Assigning "INCLUDERC=/home/bepi/Procmail/rc.spamassassin"
+procmail: Assigning "SPAMASSASSIN_DIR=/usr/local/perl-5.8.7/bin"
+procmail: Assigning "SPAMASSASSIN=/usr/local/perl-5.8.7/bin/spamassassin"
+procmail: No match on "^Subject:.*test"
+procmail: No match on "> 256000"
+procmail: No match on "(^((Original-)?(Resent-)?(To|Cc|Bcc)|(X-Envelope|Apparently(-Resent)?)-To):(.*[^-a-zA-Z0-9_.])?)spam@"
+procmail: Skipped "* < 256000"
+procmail: Match on "< 256000"
+procmail: Locking "spamassassin.lock"
+procmail: Executing "/usr/local/perl-5.8.7/bin/spamassassin"
+[26831] warn: config: created user preferences file: /home/bepi/.spamassassin/user_prefs
+procmail: [26829] Fri Oct 28 17:58:30 2005
+procmail: Unlocking "spamassassin.lock"
+procmail: No match on "^X-Spam-Level: \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*"
+procmail: Locking "/var/spool/mail/bepi.lock"
+procmail: Assigning "LASTFOLDER=/var/spool/mail/bepi"
+procmail: Opening "/var/spool/mail/bepi"
+procmail: Acquiring kernel-lock
+procmail: Unlocking "/var/spool/mail/bepi.lock"
+procmail: Notified comsat: "bepi@9865:/var/spool/mail/bepi"
+From MAILER-DAEMON@koenig.fantagruel.it  Fri Oct 28 17:58:28 2005
+ Subject: Delivery Status Notification (Failure)
+  Folder: /var/spool/mail/bepi						   6974
+
+procmail: [26839] Fri Oct 28 17:58:53 2005
+procmail: Assigning "MAILDIR=/home/bepi/Procmail/messages"
+procmail: Assigning "INCLUDERC=/home/bepi/Procmail/rc.spamassassin"
+procmail: Assigning "SPAMASSASSIN_DIR=/usr/local/perl-5.8.7/bin"
+procmail: Assigning "SPAMASSASSIN=/usr/local/perl-5.8.7/bin/spamassassin"
+procmail: Match on "^Subject:.*test"
+procmail: Locking "IN-testing.lock"
+procmail: Assigning "LASTFOLDER=IN-testing"
+procmail: Opening "IN-testing"
+procmail: Acquiring kernel-lock
+procmail: [26839] Fri Oct 28 17:58:54 2005
+procmail: Unlocking "IN-testing.lock"
+procmail: Notified comsat: "bepi@0:/home/bepi/Procmail/messages/IN-testing"
+From enrico@forget.it  Fri Oct 28 17:58:53 2005
+ Subject: test
+  Folder: IN-testing							   1494
+
+procmail: [26842] Fri Oct 28 17:59:14 2005
+procmail: Assigning "MAILDIR=/home/bepi/Procmail/messages"
+procmail: Assigning "INCLUDERC=/home/bepi/Procmail/rc.spamassassin"
+procmail: Assigning "SPAMASSASSIN_DIR=/usr/local/perl-5.8.7/bin"
+procmail: Assigning "SPAMASSASSIN=/usr/local/perl-5.8.7/bin/spamassassin"
+procmail: Match on "^Subject:.*test"
+procmail: Locking "IN-testing.lock"
+procmail: Assigning "LASTFOLDER=IN-testing"
+procmail: Opening "IN-testing"
+procmail: Acquiring kernel-lock
+procmail: Unlocking "IN-testing.lock"
+procmail: Notified comsat: "bepi@1494:/home/bepi/Procmail/messages/IN-testing"
+From enrico@forget.it  Fri Oct 28 17:59:14 2005
+ Subject: test
+  Folder: IN-testing							   1271
+

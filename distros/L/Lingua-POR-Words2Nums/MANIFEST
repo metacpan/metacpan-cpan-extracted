@@ -1,0 +1,7 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Lingua/POR/Words2Nums.pm
+t/Words2Nums.t

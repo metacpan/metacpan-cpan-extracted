@@ -1,0 +1,14 @@
+
+use File::Copy qw();
+
+if (-f "Util.xs") {
+    print STDERR "Disabling XS in sources...\n";
+
+    die "***** Failed, sources could be inconsistent! *****\n"
+     unless File::Copy::move('MANIFEST',	'MANIFEST.X')
+	and File::Copy::move('MANIFEST.N',	'MANIFEST')
+	and File::Copy::move('Util.pm',		'Util.pmX')
+	and File::Copy::move('Util.xs',		'Util.xsX')
+	and File::Copy::move('Util.pmN',	'Util.pm');
+}
+

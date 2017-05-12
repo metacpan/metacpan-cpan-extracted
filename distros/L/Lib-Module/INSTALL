@@ -1,0 +1,22 @@
+Lib::Module Installation
+
+Lib::Module.pm - Perl library module utilities.
+
+Lib::Module is a non-graphical implementation of some of Tk::Browser's
+library routines.
+
+Installation:
+
+  $ gunzip -c Lib-Module-<version>.tar.gz | tar xvf -
+  $ cd Lib-Module-<version>
+  $ perl Makefile.PL
+  $ make
+  $ su
+    Enter Password:
+  # make install
+
+
+Licensed under the same terms as Perl.  Refer to the file,
+"Artistic," for information.
+
+$Id: INSTALL,v 1.5 2004/03/28 02:24:10 kiesling Exp $

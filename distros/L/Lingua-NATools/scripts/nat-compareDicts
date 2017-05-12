@@ -1,0 +1,311 @@
+#!/usr/bin/perl -s
+
+use warnings;
+use strict;
+use utf8;
+
+our ($full, $html, $stats, $h, $kl);
+
+if ($kl) {
+    require Math::KullbackLeibler::Discrete;
+}
+
+use CGI qw/:standard/;
+use locale;
+
+if ($h) {
+    print STDERR "nat-compareDicts: used to compare two PTDs in Perl dumper format.\n\n";
+    print STDERR "\tnat-compareDicts [-html] [-full] <dic1.dmp> <dic2.dmp>\n\n";
+    print STDERR "For more help, please run 'perldoc nat-compareDicts'\n";
+    exit 1;
+}
+
+my $f1 = shift;
+my $f2 = shift;
+
+print STDERR "Loading [$f1]...";
+my $D1 = do($f1);
+print STDERR "...done\n";
+
+print STDERR "Loading [$f2]...";
+my $D2 = do($f2);
+print STDERR "...done\n";
+
+if ($full) {
+    my @keys = U(keys %$D1, keys %$D2);
+
+    for my $key (sort @keys) {
+        printf "%15s | %5d | %5d\n",
+          $key,
+            ($D1->{$key}{count} || 0),
+              ($D2->{$key}{count} || 0);
+    }
+}
+
+elsif ($html) {
+  my $res;
+
+  my ($count, $average) = (0,0);
+  for my $e (keys %$D1) {
+    next if $e eq "(null)" || $e eq "(none)";
+    next unless exists $D2->{$e};
+    next unless $D1->{$e}{count};
+
+    my @trans = (keys %{$D1->{$e}{trans}}, keys %{$D2->{$e}{trans}});
+    my %x; @x{@trans}=@trans;@trans=keys %x;
+
+    my $diff = 0;
+
+    if ($kl) {
+        $diff = Math::KullbackLeibler::Discrete::kl($D1->{$e}{trans}, $D2->{$e}{trans});
+        $count++;
+        $average+=$diff;
+    } else {
+        for (@trans) {
+            my $x = 100 * exists($D1->{$e}{trans}{$_})?$D1->{$e}{trans}{$_}:0;
+            my $y = 100 * exists($D2->{$e}{trans}{$_})?$D2->{$e}{trans}{$_}:0;
+
+            $diff += abs($x-$y);
+        }
+        $diff *= log( 1
+                      + 0.5 * $D1->{$e}{count}
+                      + 0.5 * $D2->{$e}{count});
+    }
+
+
+    my $best1 = (sort {$D1->{$e}{trans}{$a} <=>
+                       $D1->{$e}{trans}{$b}} keys %{$D1->{$e}{trans}})[-1];
+    $best1||="";
+
+    my $sbest1 = (sort {$D1->{$e}{trans}{$a} <=>
+                          $D1->{$e}{trans}{$b}} keys %{$D1->{$e}{trans}})[-2];
+    $sbest1||="";
+
+    my $prob1 = $D1->{$e}{trans}{$best1} || 0;
+    $prob1*=100;
+    my $sprob1 = $D1->{$e}{trans}{$sbest1} || 0;
+    $sprob1*=100;
+
+    my $best2 = (sort {$D2->{$e}{trans}{$a} <=>
+                       $D2->{$e}{trans}{$b}} keys %{$D2->{$e}{trans}})[-1];
+    $best2||="";
+    my $sbest2 = (sort {$D2->{$e}{trans}{$a} <=>
+                       $D2->{$e}{trans}{$b}} keys %{$D2->{$e}{trans}})[-2];
+    $sbest2||="";
+
+    my $prob2 = $D2->{$e}{trans}{$best2} || 0;
+    $prob2*=100;
+    my $sprob2 = $D2->{$e}{trans}{$sbest2} || 0;
+    $sprob2*=100;
+
+
+    my $count= $D1->{$e}{count};
+
+    next if $count < 10;
+
+    next if $diff < 0.1;
+
+    $res->{$e} = [$diff, $count,
+                  $best1, $prob1, $best2, $prob2,
+                  $sbest1, $sprob1, $sbest2, $sprob2];
+  }
+
+  binmode STDOUT, ":utf8";
+  print "<html><style>
+           th { border-bottom: solid 1px #000 }
+           td { padding: 2px; }
+           .ll { border-left: solid 1px #000; padding-right: 6px; background-color: #d9d9d9; }
+           .r { border-right: solid 1px #000; text-align: right }
+           .l { text-align: right; padding-right: 6px; background-color: #d9d9d9; }
+         </style><table cellspacing=\"0\">\n";
+  if ($kl) {
+      print h1("average KL ", ($average/$count));
+  }
+  print Tr(th([qw/Word Measure Occurrences/,"Best Trans 1","Best % 1","Best Trans 2","Best % 2"]));
+  for (sort { $res->{$b}[0] <=> $res->{$a}[0]} keys %$res) {
+    print Tr(
+	     td({class=>"ll"},$_),
+	     td(sprintf("%.5f", $res->{$_}[0])),
+	     td({class=>"r"},$res->{$_}[1]),
+	     td({class=>"l"}, $res->{$_}[2]),
+	     td({class=>"r"},sprintf("%.4f%%",$res->{$_}[3])),
+	     td({class=>"l"}, $res->{$_}[4]),
+	     td({class=>"r"},sprintf("%.4f%%",$res->{$_}[5]))
+	    );
+    print Tr(
+	     td({class=>"ll"},"&nbsp;"),
+	     td(""),
+	     td({class=>"r"},"&nbsp;"),
+	     td({class=>"l"}, $res->{$_}[6]),
+	     td({class=>"r"},sprintf("%.4f%%",$res->{$_}[7])),
+	     td({class=>"l"}, $res->{$_}[8]),
+	     td({class=>"r"},sprintf("%.4f%%",$res->{$_}[9]))
+	    );
+  }
+  print "</table></html>\n";
+
+} else {
+  my $dir = "->";
+
+  $| = 1;
+
+  while(1) {
+    print "$dir # ";
+    chomp(my $word = <>);
+
+    exit if $word eq "";
+
+    if ($word =~ m!^/(.*)/$!) {
+
+      my $regexp = $1;
+      my $key;
+
+      while ($key = each %$D1) {
+	myDumpSome($key,$D1,$D2) if $key =~ m!$regexp!;
+      }
+
+    } else {
+      myDumpSome($word,$D1,$D2);
+    }
+  }
+}
+
+
+sub load {
+  my $file = shift;
+
+  return (load_("$file/source-target.dmp"),
+	  load_("$file/target-source.dmp"));
+}
+
+sub load_ {
+    my $file = shift;
+
+    if (-e "$file.filtered") {
+        return do "$file.filtered"
+    } else {
+        return do $file;
+    }
+}
+
+sub myDump {
+  my ($word,$structure,$indent) = @_;
+  $indent = $indent ? " " x 28 : "";
+  print "** Word: $word\n";
+  print "** OccurrenceCount: $structure->{count}\n";
+  for (sort {$structure->{trans}{$b} <=> $structure->{trans}{$a}} keys %{$structure->{trans}}) {
+    printf "$indent  %15s: %7.4f %%\n", $_, $structure->{trans}{$_}*100;
+  }
+  print "\n";
+}
+
+
+
+sub myDump2 {
+  my ($word,$A,$B) = @_;
+  print "** Word: $word\n";
+  print "** OccurrenceCount: $A->{count}, $B->{count}\n\n";
+  my @A = sort {$A->{trans}{$b} <=> $A->{trans}{$a}} keys %{$A->{trans}};
+  my @B = sort {$B->{trans}{$b} <=> $B->{trans}{$a}} keys %{$B->{trans}};
+  while(@A || @B) {
+    my $a = shift @A || undef;
+    my $b = shift @B || undef;
+    if ($a && $b) {
+      printf "  %15s: %7.4f %%  %15s: %7.4f %%\n",
+	$a, $A->{trans}{$a}*100,
+	  $b, $B->{trans}{$b}*100;
+    } elsif ($a) {
+      printf "  %15s: %7.4f %%\n",
+	$a, $A->{trans}{$a}*100;
+    } else {
+      printf "  %15s:             %15s: %7.4f %%\n","",$b, $B->{trans}{$b}*100;
+    }
+  }
+
+  print "\n";
+}
+
+
+sub myDumpSome {
+  my ($word,$A, $B) = @_;
+
+  if (exists($A->{$word}) && exists($B->{$word})) {
+
+    print "\n";
+    myDump2($word,$A->{$word},$B->{$word});
+
+  } elsif (exists($A->{$word})) {
+
+    print "\n";
+    myDump($word,$A->{$word});
+
+  } elsif (exists($B->{$word})) {
+
+    print "\n";
+    myDump($word,$B->{$word},1);
+
+  } else {
+
+    print "** Word '$word' not found in any dictionry\n";
+
+ }
+}
+
+
+sub U {
+    my %U;
+    $U{$_}++for@_;
+    keys %U;
+}
+
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-compareDicts - used to compare two PTDs in Perl dumper format.
+
+=head1 SYNOPSIS
+
+  print "\tnat-compareDicts [-stats] [-html] [-full] <dic1.dmp> <dic2.dmp>\n\n";
+
+=head1 DESCRIPTION
+
+This program compares two Probabilistic Translation Dictionaries in
+Perl Dumper format. It can be used in four different ways:
+
+=over 4
+
+=item *
+
+With no switches, a shell will be loaded. In this shell the user can
+entry words, and those words entries in the dictionary willl be shown.
+
+=item *
+
+With the C<-html> switch, an HTML table will be printed to
+STDOUT. This table tries to show entries will less or more differences
+between the two dictionaries.
+
+=item *
+
+The C<-full> switch prints to STDOUT all entries from the dictionaries
+together with some comparison values.
+
+=back
+
+=head1 SEE ALSO
+
+perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2012 by Alberto Manuel Brandão Simões
+
+=cut

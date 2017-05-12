@@ -1,0 +1,115 @@
+=head1 NAME 
+
+=head2 treinar - An Interactive Drilling Program for Portuguese Verbs
+
+=head1 DESCRIPTION 
+
+  treinar [-i] [verb [tense]]
+
+  Will prompt the user to enter the correct forms. It should be quite
+self-explaining (correct me if it isn't). 
+
+  It displays the wanted verb and tense like this, and prompts you for
+the first person singular, "eu". 
+
+
+           ir                  Imperfeito                     
+
+        eu 
+
+
+  Entering the desired form and hitting carriage return <CR> validates
+the entry, and "treinar" prompts you with the next line, e.g.
+
+
+
+           ir                  Imperfeito                     
+
+        eu ia
+        tu
+
+
+  The module Term::Readline is in charge of the input.
+
+  After all relevant persons (eu,tu,ele/ela,n'os and eles/elas) are
+passed, the correct and erroneous forms are shown.
+
+
+           ir                  Imperfeito                     
+
+        eu ia                  OK 
+        tu ias                 OK 
+   ele/ela ia                  OK 
+      n'os iavomomos           Nope : 'iamos
+ eles/elas iam                 OK 
+Appending to .flunked_verbs
+
+
+  The file ~/.flunked.verbs holds the verbs that you have flunked last
+time you were drilled on it. "treinar" chooses verbs and tenses at
+random, either from that file, or from other verbs it knows of. Or
+else, it uses user specified verbs and tenses, which may be entered
+either on the shell command line, or at any moment, by entering a line
+like :
+
+           t ir Imperfeito
+
+  to say that, after I've finished the present verb, I'll want to
+check my skills at conjugating "ir" at tense "imperfecto". "treinar"
+will clear that line, and prompt me to continue the verb I had
+started.
+
+=head2 ACCENTUATION
+
+uses iso 8859-1 characters when the C<-i> option is passed. Entering a
+single "i" on a line will toggle iso-accentuation.
+
+=head2 FIXING THE TENSE
+
+is done by entering line with a "f" followed by a tense, in
+abbreviated form. A single "f" on a line will either fix the tense to
+the current tense, or toggle off fixed-tense-mode.
+
+=head2 QUITTING 
+
+can be done by entering a line with a single "q". (The current verb
+will not be considered as "flunked").
+
+=head2 CORRECTING A PREVIOUS ENTRY
+
+(before having validated the verb's last entry) is done by entering a
+line like  
+
+        c n'os 'iamos
+
+to say that I want the first person plural to be corrected to
+"'iamos".
+
+        c 5 'iamos
+
+will also do.
+
+=head2 PRERIQUISITES
+
+	   Term::ReadLine
+
+
+=head2 BUGS 
+
+  treinar may be fragile, especially since it moves the cursor around
+by  priting the strings "\33\133A", "\33\133B", "\33\133C" and
+"\33\133D". 
+
+  It is not very pedagogic. 
+
+
+=head1 SEE ALSO 
+
+Lingua::PT::Conjugate, conjug.
+
+=head1 VERSION 0.90
+
+=head1 AUTHOR 
+
+Etienne Grossmann, January 1998 [etienne@isr.ist.utl.pt] 
+ 

@@ -1,0 +1,41 @@
+[% 
+    title = 'Category Admin' ;
+
+    crumb3_name = 'Links' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=link-admin' ;
+    crumb2_name = 'Categories' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=link-cadmin' ;
+    crumb1_name = 'Admin' ;
+%]
+
+<h2>[% title %]</h2>
+
+<div class="boxer">
+[% IF thanks_message %]<p>[% thanks_message %]</p>[% END %]
+<p>Click on a category title to edit it's content.</p>
+<p> <a href="[% cgipath %]/pages.cgi?act=link-cadd" title="create a category">create a new category</a>
+|   <a href="[% cgipath %]/pages.cgi?act=link-admin" title="edit links in category">edit links</a></p>
+</div>
+
+<form name="datalist" method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name='act' value='link-cadmin' />
+
+<div class="boxer">
+<table class="blocker">
+<tr>
+    <th>Category</th>
+    <th>Order</th>
+    <th>Select</th>
+</tr>
+[% FOREACH item = data %]
+<tr>
+    <td nowrap><a href="[% cgipath %]/pages.cgi?act=link-cedit&amp;catid=[% item.catid %]" title="edit link category">[% item.category %]</a></td>
+    <td>[% item.orderno %]</td>
+    <td><input type="checkbox" name="LISTED" value="[% item.catid %]" /></td>
+</tr>
+[% END %]
+</table>
+</div>
+
+<p class="alignright"><input type="submit" name='doaction' value='Delete' /></p>
+</form>

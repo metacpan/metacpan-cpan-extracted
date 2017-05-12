@@ -1,0 +1,316 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Lemonldap::Handlers::Generic  - Perl extension for Lemonldap sso system</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#parameters__see_also_doc_folder_">Parameters (see also doc folder)</a></li>
+		<li><a href="#example__a_kiss_example__see_also_eg_folder_">Example (a KISS example, see also eg folder) </a></li>
+		<li><a href="#functions">Functions</a></li>
+		<li><a href="#features">Features</a></li>
+		<ul>
+
+			<ul>
+
+				<li><a href="#more_features">More features</a></li>
+			</ul>
+
+		</ul>
+
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<center> <H1> Lemonldap::Handlers::Generic4a2 </H1></center><p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<pre>
+    Lemonldap::Handlers::Generic  - Perl extension for Lemonldap sso system</pre>
+<pre>
+    Lemonldap::Handlers::Generic4a2 - Handler for Apache2 Lemonldap SSO
+    system
+    
+    Lemonldap::Handlers::Generic4a2SSL - Handler full SSL  Apache2 Lemonldap SSO</pre>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+
+In httpd.conf</pre>
+<pre>
+  .....
+  perltranshandler Lemonldap::Handlers::Generic4a2
+  .....</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<pre>
+ Generic4a2 is the central piece of  websso framework .
+ This module provides several methods but the principal goal of this is the handler function .
+ It can be combined with mod_proxy or mod_rewrite and all other apache's  modules .
+ It provides also an built-in  http proxy with LWP .
+ see <a href="http://lemonldap.sf.net">http://lemonldap.sf.net</a> for more infos .</pre>
+<p>
+</p>
+<h2><a name="parameters__see_also_doc_folder_">Parameters (see also doc folder)</a></h2>
+<pre>
+ A minimal configuration  must provide  infos about :</pre>
+<dl>
+<dt><strong><a name="item_config">config</a></strong><br />
+</dt>
+<dd>
+<pre>
+  LemonldapConfig &quot;/foo/bar/file_config.xml&quot;
+  The filename of the mean XML Config   :It's REQUIRED</pre>
+</dd>
+<dt><strong><a name="item_domain">domain</a></strong><br />
+</dt>
+<dd>
+<pre>
+ LemonldapDomain foo.bar
+ It fixes the value of domain for the  application protected by  this handler (see below)</pre>
+</dd>
+<dt><strong><a name="item_xml_section_in_config">xml section in config</a></strong><br />
+</dt>
+<dd>
+<pre>
+
+ LemonldapHandlerId  &lt;xml section&gt;</pre>
+</dd>
+<dd>
+<pre>
+ It fixes the value of XML section in config</pre>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="example__a_kiss_example__see_also_eg_folder_">Example (a KISS example, see also eg folder)</a></h2>
+<pre>
+
+In httpd.conf</pre>
+<pre>
+ &lt;virtualHost 127.0.0.1:80&gt;
+ servername authen.demo.net
+ PerlModule Apache2::compat
+ PerlModule Bundle::Apache2
+ PerlModule Lemonldap::Handlers::Generic4a2 
+ perltranshandler Lemonldap::Handlers::Generic4a2
+ PerlSetVar LemonldapDomain demo.net
+ PerlSetVar LemonldapConfig /usr/local/apache/conf/application_new.xml
+ PerlSetVar LemonldapHandlerID myintranet
+ proxypass /intranet <a href="http://lemonldap.sourceforge.net">http://lemonldap.sourceforge.net</a>
+ proxypassreverse /intranet  <a href="http://lemonldap.sourceforge.net">http://lemonldap.sourceforge.net</a>
+ documentroot /usr/local/apache/htdocs
+ &lt;/virtualhost&gt;</pre>
+<pre>
+ In /usr/local/apache/conf/application_new.xml
+  &lt;lemonconfig&gt;
+        &lt;domain    id=&quot;demo.net&quot;
+                   Cookie=&quot;lemondemo&quot;
+                   &gt;
+        &lt;handler 
+                id=&quot;myintranet&quot; 
+                DisabledControl=&quot;1&quot;
+               /&gt;  
+        &lt;/domain&gt;
+  &lt;/lemonconfig&gt;</pre>
+<pre>
+   
+ Now you can put <a href="http://authen.demo.net/intranet/">http://authen.demo.net/intranet/</a> in your browser and you will see lemonldap's  site
+ AND now you can control who and where goes on your site .
+  
+ You can pass parameters from httpd.conf with perlsetvar  facilities  or put them in xml file</pre>
+<p>
+</p>
+<h2><a name="functions">Functions</a></h2>
+<dl>
+<dt><strong><a name="item_handler">handler</a></strong><br />
+</dt>
+<dd>
+<pre>
+ It's the mean  function which does all jobs . If the enebledproxy parameter is set to 1  ,this function
+ will push proxy_handler function reference on  the handler's stack . If not it returns DECLINED (mod_proxy will be actived)</pre>
+</dd>
+<dt><strong><a name="item_proxy_handler">proxy_handler</a></strong><br />
+</dt>
+<dd>
+<pre>
+ It's the built-in proxy (LWP)  web embedded  in lemonldap framework . It is  actived by  enabledproxy parameter .
+ Some parameters are about this proxy and its behaviour</pre>
+</dd>
+<dt><strong><a name="item__lemonldap_internal">_lemonldap_internal</a></strong><br />
+</dt>
+<dd>
+<pre>
+  append this keyword at the end of url and you will can see all config for a specific apache's child</pre>
+</dd>
+<dt><strong><a name="item__lemonldap_debug">_lemonldap_debug</a></strong><br />
+</dt>
+<dd>
+<pre>
+  append this keyword at the end of url and you will can see all headers send to host.
+  Available  ONLY with built-in proxy</pre>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="features">Features</a></h2>
+<p>Generic4a2 is build arround perl's modules .</p>
+<p>Those modules are :</p>
+<dl>
+<dt><strong><a name="item_utilities__3a">Utilities :</a></strong><br />
+</dt>
+<dd>
+<pre>
+  collection of function</pre>
+</dd>
+<dt><strong><a name="item_core__3a">Core :</a></strong><br />
+</dt>
+<dd>
+<pre>
+
+  It provides basics services like the cache service, forge header service or authorization service.</pre>
+</dd>
+<dd>
+<pre>
+
+ Core.pm  can use YOUR own services for all this cycle . It's plugger . Lemonldap framework is available 
+ with somes services but you can with Core.pm propose your schemas.
+ News parameters  were added in XML DTD in order to describe the sequence.</pre>
+</dd>
+<dt><strong><a name="item_matrixpolicy__3a">MatrixPolicy :</a></strong><br />
+</dt>
+<dd>
+<pre>
+
+ manage authorization process , based on the hash of session (like preceding version)</pre>
+</dd>
+<dt><strong><a name="item_memsession__3a">Memsession :</a></strong><br />
+</dt>
+<dd>
+<pre>
+
+ manage the backend of session (cache level 3)</pre>
+</dd>
+<dt><strong><a name="item_authorizationheader__3a">AuthorizationHeader :</a></strong><br />
+</dt>
+<dd>
+<pre>
+
+ manage the construction of header</pre>
+</dd>
+<dt><strong><a name="item_rewritehtml__3a">RewriteHTML :</a></strong><br />
+</dt>
+<dd>
+<pre>
+ Rewrite on fly html source in order to ajust somes tags like BASE , href or src
+ Available  ONLY with built-in proxy</pre>
+</dd>
+</dl>
+<p>
+</p>
+<h4><a name="more_features">More features</a></h4>
+<dl>
+<dt><strong><a name="item_authentification">Authentification</a></strong><br />
+</dt>
+<dd>
+<pre>
+
+ Keep in mind  that the handler doesn't know HOW authenticate anybody but only knows WHERE authenticate . 
+ The parameter 'portal' tells it where to send the authentification request.</pre>
+</dd>
+<dt><strong><a name="item_caches">Caches</a></strong><br />
+</dt>
+<dd>
+<pre>
+ Thre are three levels of cache in lemonldap .</pre>
+</dd>
+<dd>
+<pre>
+ *First cache (level 1) is a very KISS  , it's a memory structure in the program .
+ *Next  cache (level 2) is realised by using berkeleyDB hash
+ *Last cache (level 3) is realised by using memcached (see Apache::Session::Memorycached on CPAN)</pre>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>Lemonldap(3), Lemonldap::Portal::Standard</p>
+<p><a href="http://lemonldap.sourceforge.net/">http://lemonldap.sourceforge.net/</a></p>
+<p>``Writing Apache Modules with Perl and C'' by Lincoln Stein &amp; Doug
+MacEachern - O'REILLY</p>
+<dl>
+<dt><strong><a name="item_eric_german_2c__3cgermanlinux_40yahoo_2efr_3e">Eric German, &lt;<a href="mailto:germanlinux@yahoo.fr">germanlinux@yahoo.fr</a>&gt;</a></strong><br />
+</dt>
+<dt><strong><a name="item_isabelle_serre_2c__3cisabelle_2eserre_40justice_2e">Isabelle Serre, &lt;<a href="mailto:isabelle.serre@justice.gouv.fr">isabelle.serre@justice.gouv.fr</a>&gt;</a></strong><br />
+</dt>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright (C) 2004 by Eric German &amp; Isabelle Serre
+
+</p>
+<p>Lemonldap originaly written by Eric german who decided to publish him in 2003
+under the terms of the GNU General Public License version 2.
+
+</p>
+<dl>
+<dt><strong><a name="item_this_package_is_under_the_gnu_general_public_licen">This package is under the GNU General Public License, Version 2.</a></strong><br />
+</dt>
+<dt><strong><a name="item_the_primary_copyright_holder_is_eric_german_2e">The primary copyright holder is Eric German.</a></strong><br />
+</dt>
+<dt><strong><a name="item_portions_are_copyrighted_under_the_same_license_as">Portions are copyrighted under the same license as Perl itself.</a></strong><br />
+</dt>
+<dt><strong><a name="item_portions_are_copyrighted_by_doug_maceachern_and_li">Portions are copyrighted by Doug MacEachern and Lincoln Stein.
+This library is under the GNU General Public License, Version 2.</a></strong><br />
+</dt>
+<dt><strong><a name="item_ahmadi">Portage under Apache2 is made with help of : Ali Pouya and 
+Shervin Ahmadi (MINEFI/DGI)</a></strong><br />
+</dt>
+</dl>
+<pre>
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 dated June, 1991.
+
+</pre>
+<pre>
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+</pre>
+<pre>
+  A copy of the GNU General Public License is available in the source tree;
+  if not, write to the Free Software Foundation, Inc.,
+  59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+</pre>
+
+</body>
+
+</html>

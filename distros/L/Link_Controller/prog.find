@@ -1,0 +1,1 @@
+'(' -type d '(' -name 'old' -o -name 'blib' ')' -prune -false ')' -o -name '*.pl'

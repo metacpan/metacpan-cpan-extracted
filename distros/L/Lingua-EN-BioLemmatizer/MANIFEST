@@ -1,0 +1,12 @@
+Changes
+lib/Lingua/EN/BioLemmatizer.pm
+Makefile.PL
+MANIFEST
+MYMETA.yml
+README
+t/Lingua-EN-BioLemmatizer.t
+t/oo-class.t
+t/oo-object.t
+t/penn.t
+t/procedural.t
+META.yml                                 Module meta-data (added by MakeMaker)

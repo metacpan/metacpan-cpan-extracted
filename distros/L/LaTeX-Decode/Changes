@@ -1,0 +1,21 @@
+Revision history for LaTeX-Decode
+
+0.04    [2015/07/07]
+        * Fix small POD encoding problem
+
+0.03    [2010/08/15]
+        * Allow stripping braces around macros standing for a single char
+        * Added and updated the companion script latex2utf8 which was
+          mistakenly omitted in the previous tarball
+        * implement option --filter in latex2utf8
+        * License is now explicitly Artistic 2.0
+
+0.02    [2010/08/03]
+        Initial upload on CPAN
+
+        [2010/07/24: initial commit of standalone module on github]
+-------------------------------------------------------------------
+0.01    2008/05/23
+        First version was bundled with Biber:
+        see http://biblatex-biber.git.sourceforge.net
+        for complete revision history.

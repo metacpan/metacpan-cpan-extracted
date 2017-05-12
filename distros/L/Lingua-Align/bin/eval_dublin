@@ -1,0 +1,132 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# simple evaluation script to evaluate output 
+# of the Dublin Sub-Tree Aligner
+#
+# USAGE: eval_dublin gold-file < tree-alignments
+#
+#---------------------------------------------------------------------
+# the gold-file has to be in the format produced by the 'sta2penn' script:
+# - 1 line with node ID's corresponding to Dublin Aligner format
+# - 1 line with tree-node IDs from Stockholm-TreeAligner format (optional)
+#   + alignment type (good|fuzzy)
+# - 1 empty line
+#
+# the format is like this:
+#
+# [<sid> <tid> ]*
+# [<snodeid>:<tnodeid>:<type> ]*
+# 
+# example gold file:
+#---------------------------------------------------------------------
+# 1 1 4 2 5 3 7 3
+# s1_502:s1_500:good s1_501:s1_501:good s1_3:s1_1:good s1_4:s1_1:good
+# 
+# 3 18 4 19 19 10
+# s15_500:s15_508:good s15_1:s15_10:good s15_503:s15_501:fuzzy
+#---------------------------------------------------------------------
+#
+
+my $gold=shift(@ARGV);
+
+open F,"<$gold" || die "cannot open $gold";
+
+my @GoldLinks=();
+my $total=0;
+
+my @GoldGoodLinks=();
+my $TotalGood=0;
+
+my @GoldFuzzyLinks=();
+my $TotalFuzzy=0;
+
+while(<F>){
+    chomp;
+
+    my $idx=scalar @GoldLinks;
+    my @links=split(/\s+/);
+    %{$GoldLinks[$idx]}=@links;
+    $total+=(scalar @links/2);
+
+    my $sta=<F>;
+    my @StaLinks=split(/\s+/,$sta);
+    foreach (@StaLinks){
+	my ($s,$t,$type)=split(/\:/);
+	$s=shift(@links);
+	$t=shift(@links);
+	if ($type eq 'good'){
+	    $GoldGoodLinks[$idx]{$s}=$t;
+	    $TotalGood++;
+	}
+	else{
+	    $GoldFuzzyLinks[$idx]{$s}=$t;
+	    $TotalFuzzy++;
+	}
+    }
+    <F>;
+}
+close F;
+
+
+
+my $correct=0;
+my $wrong=0;
+my $correctGood=0;
+
+my $count=0;
+<>;
+<>;
+while(<>){
+    chomp;
+    my %links=split(/\s+/);
+    foreach (keys %links){
+	if (exists $GoldLinks[$count]{$_}){
+	    if ($GoldLinks[$count]{$_} == $links{$_}){
+		$correct++;
+		if (exists $GoldGoodLinks[$count]{$_}){
+		    $correctGood++;
+		}
+	    }
+	    else{$wrong++;}
+	}
+	else{$wrong++;}
+    }
+    $count++;
+    last if (not <>);
+    last if (not <>);
+    last if (not <>);
+}
+
+
+
+print "=======================================\n";
+
+if ($total){
+    my $precision = $correct/($correct+$wrong);
+    my $recall = $correct/($total);
+    my $recallG = 0;
+
+    printf "        precision = %5.2f (%d/%d)\n",
+    $precision*100,$correct,$correct+$wrong;
+    printf "           recall = %5.2f (%d/%d)\n",
+    $recall*100,$correct,$total;
+    if ($TotalGood){
+	$recallG = $correctGood/($TotalGood);
+	printf "    recall (good) = %5.2f (%d/%d)\n",
+	$recallG*100,$correctGood,$TotalGood;
+    }
+
+    print "=======================================\n";
+
+    if ($TotalGood){
+	printf "F (P_all & R_good) = %5.2f\n",
+	200*$precision*$recallG/($precision+$recallG);
+    }
+    printf "F (P_all & R_all)  = %5.2f\n",
+    200*$precision*$recall/($precision+$recall);
+    
+}
+
+
+

@@ -1,0 +1,4 @@
+* globals linkage + visibility
+* more types + const (struct, array, ...)
+* more instructions
+* analysis passes

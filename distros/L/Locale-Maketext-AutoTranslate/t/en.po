@@ -1,0 +1,169 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+
+msgid "Add as friend"
+msgstr ""
+
+
+msgid "All types"
+msgstr ""
+
+
+msgid "Back to Timeline"
+msgstr ""
+
+
+msgid "Block this user"
+msgstr ""
+
+
+msgid "Cancel"
+msgstr ""
+
+
+msgid "Captcha"
+msgstr ""
+
+
+msgid "Captcha is not right."
+msgstr ""
+
+
+msgid "Confirm password"
+msgstr ""
+
+
+msgid "Contact Us"
+msgstr ""
+
+
+msgid "Coordinates"
+msgstr ""
+
+
+msgid "Copy"
+msgstr ""
+
+
+msgid "Create"
+msgstr ""
+
+
+msgid "Create New Event"
+msgstr ""
+
+
+msgid "Create new data"
+msgstr ""
+
+
+msgid "Current Password"
+msgstr ""
+
+
+msgid "Current password"
+msgstr ""
+
+
+msgid "D"
+msgstr ""
+
+
+msgid "Latest Photos"
+msgstr ""
+
+
+msgid "Latitude"
+msgstr ""
+
+
+msgid "Leave blank for no change"
+msgstr ""
+
+
+msgid "Length is between 4 to 20"
+msgstr ""
+
+
+msgid "List nearby"
+msgstr ""
+
+
+msgid "Loading"
+msgstr ""
+
+
+
+
+msgid "Loading %1"
+msgstr ""
+
+
+msgid "Longitude"
+msgstr ""
+
+
+msgid "MSN messenger username"
+msgstr ""
+
+
+
+msgid "Max length is %1"
+msgstr ""
+
+
+msgid "New password"
+msgstr ""
+
+
+msgid "New data"
+msgstr ""
+
+
+msgid "Nickname"
+msgstr ""
+
+
+msgid "No results found."
+msgstr ""
+
+
+msgid "OK"
+msgstr ""
+
+msgid "Sign In with OpenID"
+msgstr ""
+
+msgid "Upload Avatar"
+msgstr ""
+
+
+msgid "Upload photo"
+msgstr ""
+
+
+msgid "Uploading..."
+msgstr ""
+
+
+msgid "User Profile"
+msgstr ""
+
+msgid "You can drag to reschedule"
+msgstr ""

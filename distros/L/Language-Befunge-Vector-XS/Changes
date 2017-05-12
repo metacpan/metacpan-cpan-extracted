@@ -1,0 +1,81 @@
+Revision history for Language::Befunge::Vector::XS.
+
+High-level changelog
+====================
+
+1.1.x   rasterize() method
+1.0.x   module complete
+0.2.x   feature-completeness, clean build errors, 1.0.0-rc
+0.1.x   more robust constructors
+0.0.x   initial work
+
+
+Low-level changelog
+===================
+
+1.1.1 Sat May 22 18:25:19 2010
+ - fix #57722: make it work with test::simple 0.95
+
+1.1.0 Sun Jun  8 10:59:08 CEST 2008
+ - new rasterize() method (courtesy of Mark Glines)
+ - bumped perl requirements to 5.10
+
+**
+
+1.0.0 Sun Feb  3 16:45:41 CET 2008
+ - bumping requirement to 5.8.x
+ - module complete
+
+**
+
+0.2.3 Mon Jan 28 17:14:45 CET 2008
+ - trying to follow ppport.h advices to clean 5.6.x errors
+
+0.2.2 Fri Jan 18 01:22:30 CET 2008
+ - quieting last C warnings remaining
+
+0.2.1 Thu Jan 17 19:51:37 CET 2008
+ - rewrote vector tests (fixed number of tests during rewrite)
+ - newSViv() returns an SV*, not an IV (quieting warnings)
+
+0.2.0 Wed Jan 16 18:34:38 CET 2008
+ - bounds_check() implemented
+ - added missing sanity checks in constructors
+ - no more todo tests
+ - better way of returning without RETVAL
+ - first rc for 1.0.0
+
+**
+
+0.1.3 Wed Jan 16 17:09:41 CET 2008
+ - fixed leftover of RETVAL sillyness
+   (should build/test on more platforms now)
+
+0.1.2 Tue Jan 15 19:46:07 CET 2008
+ - converted rest of AV* to use SV* for objects
+ - new methods:
+    - _add()
+    - _substract()
+    - _invert()
+
+0.1.1 Tue Jan 15 19:19:46 CET 2008
+ - new methods:
+    - get_all_components()
+    - clear()
+    - set_component()
+
+0.1.0 Tue Jan 15 18:23:14 CET 2008
+ - constructors more robust (thx rgs)
+ - new methods:
+    - copy()
+    - _add_inplace()
+    - _substract_inplace()
+ - removed reference to LB::* modules in tests
+
+**
+
+0.0.1 Tue Jan 15 14:52:14 CET 2008
+ - original version
+ - build toolchain in place
+ - constructors + basic accessors
+

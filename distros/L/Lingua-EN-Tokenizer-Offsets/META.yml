@@ -1,0 +1,29 @@
+---
+abstract: 'Finds word (token) boundaries, and returns their offsets.'
+author:
+  - 'André Santos <andrefs@cpan.org>'
+build_requires:
+  Test::Differences: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-EN-Tokenizer-Offsets
+requires:
+  Data::Dump: 0
+  Exporter: 0
+  base: 0
+  feature: 0
+  strict: 0
+  utf8::all: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/andrefs/Lingua-EN-Tokenizer-Offsets/issues
+  homepage: https://github.com/andrefs/Lingua-EN-Tokenizer-Offsets
+  repository: git://github.com/andrefs/Lingua-EN-Tokenizer-Offsets.git
+version: 0.03

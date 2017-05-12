@@ -1,0 +1,69 @@
+LEOCHARRE::Dev - tools to help manage distro development and maintenance
+========================================================================
+
+This package is a collection of modules and scripts to aid in development.
+Most of the functionality is in the set of cli scripts provided in distro,
+these reside under bin/
+
+This distro is a set of tools to help me manage a distro- and development.
+It is in my namespace because a lot of the scripts and methods here are already available in other packages.
+
+I find these set of tools very valuable.
+
+For example, 
+
+   - automatically generate pod from source
+   - analize your distro and tell what modules are deps and what versions are currently installed
+   - auto Makefile.PL and MANIFEST generation
+   - check out what version of a module is installed and if it's the most current on cpan
+   - etc
+
+This package will not likely work well on non POSIX systems.
+
+To install
+
+   perl Makefile.PL
+   make install
+
+DEPENDENCIES
+
+   AppConfig::Std
+   Carp
+   Class::Inspector
+   Cwd
+   DMS
+   Data::Dumper
+   Devel::ModInfo
+   Devel::Symdump
+   Exporter
+   ExtUtils::MakeMaker
+   File::Basename
+   File::Find
+   File::Find::Rule
+   File::Path
+   File::Trash
+   Getopt::Std::Strict
+   HTTP::Request::Common
+   HTTP::Status
+   LEOCHARRE::CLI
+   LEOCHARRE::CLI2
+   LEOCHARRE::Class2
+   LEOCHARRE::DEBUG
+   LEOCHARRE::Dir
+   LEOCHARRE::Test
+   LWP::UserAgent
+   Module::Info
+   Net::FTP
+   Smart::Comments
+   Term::ReadKey
+   Test::Simple
+   Time::Format
+   WWW::CPAN
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Leo Charre leocharre at cpan dot org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

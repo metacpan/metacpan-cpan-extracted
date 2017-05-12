@@ -1,0 +1,22 @@
+========== version history of Log::Report::Optional
+
+Unless noted otherwise, these changes where initiated and applied by
+Mark Overmeer.
+
+version 1.02: Mon 18 Jan 13:53:03 CET 2016
+
+	Improvements:
+	- add ::Util::to_html()
+
+version 1.01: Mon Mar 10 16:10:25 CET 2014
+
+	Fixes:
+	- ::Util cannot use error or __x, mutual dependencies do not work
+	  [Patrick Goldmann]
+
+	Improvements:
+	- changed documentation style
+	- die if Log::Report is used and too old
+
+version 1.00: Sun Jan  5 17:02:42 CET 2014
+	- Split-off from Log::Report

@@ -1,0 +1,321 @@
+Revision history for LaTeX-Table
+
+1.0.6  Mon  Oct 25 2010
+        - eor option (thanks Jens)
+        - POD: Ascii tables of classic themes.
+        - fixed #62016 (thanks Bowen)
+        - ltpretty ignores empty trailing lines
+        - ltpretty test
+        - Evanston theme (Booktabs)
+
+1.0.5  Wed  Aug 25 2010
+        - Set min. version of MooseX::FollowPBP to 0.03 (older versions caused
+          cpan test fails)
+
+1.0.4  Tue  Aug 24 2010
+        - fixed stupid bug in Build.PL (introduced in 1.0.3)
+
+1.0.3  Tue  Aug 24 2010
+        - small code cleanup
+        - added github in Makefile.PL and Build.PL
+        - moved author tests to xt
+        - longtable tests
+        
+1.0.2  Wed  Jul 21 2010
+        - Support for recent Class:MOP (patch from Ansgar, Thanks!!)
+        
+1.0.1  Tue  Mar 2  2010
+        - POD: * CPAN email address
+               * better example for ltpretty 
+               * better explanation how to use a theme module
+        - Bugfixes: * multicolumn shortcut for columns > 9
+                    * ltpretty removed all slashes, not just the trailing ones
+                    * ltpretty removes now leading and trailing spaces in
+                      columns (caused problems with multicolumn shortcut)
+                    
+1.0.0  Tue  Sep 8  2009
+        - Bugfixes: * text_wrap option still generated
+
+0.99_5 Mon  Sep 7  2009
+        - POD cleanup
+        - Bugfixes: * current perlcritic passes
+       
+0.99_4 Fri  Sep 4  2009
+        - Corrected documentation for width_environment option (alignment is
+          possible thanks to fix of #49422)
+          
+0.99_3 Fri  Sep 4  2009
+        - added clearer for alignment options. 
+        - Bugfixes: * Alignment of longtables is wrongly generated (#49422,
+                      thanks Jens)
+
+0.99_2 Sat  Aug 10  2009
+        - Bugfixes: * removed unneccessary no critic (thanks Salvatore)
+                    * min Moose version in Build.PL/Makefile.PL (caused
+                      cpantesters fails)
+
+0.99_1 Sat  Aug 08  2009
+        - code cleanup
+        - POD corrections
+        - removed all deprecated code
+        - Bugfixes: * row id in callback functions sometimes wrong
+                    * perlcritic now passes with Pod::Spelling (thanks Salvatore
+                      and Rafael)
+
+0.9.17 Sat  Jul 26  2009
+        - new option tablelasttail
+        - Template variables documented in TypeI.pm
+        - Code cleanup: * type, colums_like_header, resize, callback,
+                          fontfamily, fontsize, xentrystretch now checked via Moose
+                        * fontfamily, fontsize, table*, xentrystretch now generated 
+                          via Template
+                        * csv2pdf
+                        * Removed old deprecated code from 0.1.0 and 0.8.0
+                          (in the next release - probably 1.0 - I will remove all 
+                          deprecated code!)
+        - Bugfix: csv2pdf --out option broken
+
+0.9.16 Mon  Jul 13  2009
+        - API change: header_sideways was kind of unnecessary.
+        - csv2pdf now uses templates and the longtable and ltxtable packages
+        - Perl::Critic passes with installed Perl::Tidy (thanks Salvatore)
+        - removed Readonly dependency (thanks Wen)
+         
+0.9.15 Fri  May 29  2009
+        - MISSING_VALUE in coldef_strategy
+        - width and longtable
+        - removed deprecated feature textwrap
+        - changed optional requirement from Text::CSV_XS to Text::CSV
+        - csv2pdf: Meyrin default.
+        - POD cleanups
+        
+0.9.14 Tue  Feb 24  2009
+        - Meyrin now default theme
+        - sideways now works also with xtab (lscape package)
+        - longtable package
+        - POD cleanups
+
+0.9.13 Wed  Feb 4   2009
+        - continued, continuedmsg options
+        - Minor Bug fixed: maincaption required caption.
+        - renamed *_LINES to *_RULES
+        - RULES_CMD in themes
+        - examples.pdf nicer
+
+0.9.12 Fri  Jan 30  2009
+        - fontfamily
+        - API change: size renamed to fontsize
+        - custom_template
+        - themes can now define rule width and color (only global)
+        - Muenchen, NYC3, NYC4, Redmond and Redmond2 Themes
+        - Perl-Critic-1.094001 passes
+
+0.9.11 Sat  Jan 3  2009
+        - tabulary package
+        - STUB_ALIGN in themes
+        - POD corrections
+
+0.9.10 Sun  Nov 23 2008
+        - removed unnecessary blanks and spaces in LaTeX output
+        - LaTeX output aligned
+        - Meyrin Theme
+        - POD corrections
+
+0.9.9  Wed  Nov 12 2008
+        - removed Readonly, caused cpantester fails
+        - shortcaption
+        - left
+        - right
+        - moved more code in templates
+        - ctable now uses tabularx
+        - NYC2 theme
+
+0.9.8  Sat  Nov 8  2008
+        - support for the ctable package
+        - sideways option
+        - star option
+
+0.9.7  Wed  Nov 5  2008 (Obama wins :))
+        - Switched to Moose
+        - themes now definable as modules. 
+        - csv2pdf. Lots of new features.
+
+0.9.6  Thu  Oct 7  2008
+        - Bugfix: extracolsep after first column
+        - removed Fatal dependency (which is deprecated)
+        - Standard LONG regex now requires at least two words (thanks to salva on
+          perlmonks)
+        - removed color LaTeX package dependency. xcolor is enough
+
+0.9.5  Thu  Oct 2  2008
+        - POD corrections
+        - new, common exception format for invalid option usage
+        - environment must be true for xtab packages
+        - \belowcaptionskip instead of 10pt in tablehead, caption_top
+        - custom_tabular_environment (e.g. for mpxtabular)
+
+0.9.4  Wed  Oct 1 2008
+        - coldef_strategy: column types can be defined
+        - empty rows in headers now also produce horizontal lines for consistency
+        - now data is only analyzed once (was twice in xtab)
+        - tableheadmsg
+        - Bugfix: latex commands in data counted as line (problem for
+          _MUST_MATCH_ALL)
+        - Bugfix: columns_like_header columns always left-justified  
+        - a few more tests
+
+0.9.3  Fri  Sep 26 2008
+        - leading/trailing spaces in default NUMBER regex allowed
+        - coldef_strategy: suffix _MUST_MATCH_ALL now defines whether the
+          specified type must match all cells in a column (or at least one).
+        - ltpretty: howtos for vim and emacs
+        - EXTRA_ROW_HEIGHT. now NYC theme looks better
+        - header_sideways
+        - API change: * DEFAULT renamed to DEFAULT_COL
+                      * DEFAULT_X renamed to DEFAULT_COL_X
+                      * IS_A_NUMBER renamed to NUMBER
+                      * IS_LONG renamed to LONG and is now a regular
+                        expression
+
+          Sorry, I think it is the last big change before 1.0. It was
+          necessary because I will add the functionality to define column
+          types (like NUMBER and LONG) and this needs a cleaner interface.
+        - Bugfix: first column always left-justified
+        - a few more tests
+
+0.9.2  Thu  Sep 18 2008
+       - POD corrections
+       - added ltpretty. I use it in vim to format my tables with LaTeX::Table
+
+0.9.1  Wed Aug 27  2008
+       - Bugfix: no midrule without header
+       - Bugfix: calculation of column ids (callback, coldef_strategy) now
+                 supports multicolumn shortcuts
+       - Bugfix: specified Latex commands in data (with single column arrays)
+                 counted as rows (problem for DATA_BG_COLOR_ODD/EVEN)
+       - colums_like_header()
+       - more tests
+       - Paris Theme
+       - POD corrections
+
+0.9.0  Sat Aug 23 2008
+       - caption_top
+       - themes can now define header font color and bgcolors
+       - multicol shortcut now automatically adds vertical lines
+       - resizebox
+       - Bugfix: centering now only in std.
+       - Bugfix: callback function could destroy our multicolumn shortcut
+       - Bugfix: callback function in header only applied when HEADER_CENTERED
+                 in theme
+       - API change: text_wrap now deprecated. tabularx produces so much nicer
+         tables and it does not break the callback row ids. If you really think this
+         is useful somehow, drop me a mail
+       
+0.8.0  Thu Aug 21 2008
+       - centering instead of center
+       - Bugfix: callback function overwrote values in arrays
+       - maincaption not bold in Zurich
+       - API change: table_environment now environment, environment can be chosen, e.g.
+         'sidewaystable'
+       - API change: tablepos renamed to position  
+       - API change: tabledef renamed to coldef 
+       - API change: tabledef_strategy renamed to coldef_strategy 
+       - tabularx package
+       - default value for long col now 30
+       - POD updates
+       - examples.pdf better
+
+0.7.0  Tue Aug 19 2008
+       - plain theme
+       - POD updates
+
+0.6.3  Fri Jul 25 2008
+       - commands now printed without formatting
+       - removed the simpsons synopsis
+       - Perl::Critic passes again
+
+0.6.2  Wed Apr 16 2008
+       - made new Perl::Critic happy
+       - Bugfix: \hline in xtab/booktabs
+       
+0.6.1  Tue Mar 04 2008
+       - added kwalitee test
+       - added perl 5.8 dependency
+       - added licence in Makefile.PL
+       - Bugfix: \hline instead of \midrule
+
+0.6.0  Wed Nov 07 2007
+       - support for booktabs.sty
+       - Zurich standard
+       - width
+       - regex IS_A_NUMBER compiled only once (same bug again)
+
+0.5.2  Tue Nov 06 2007
+       - tests produced latextable.tex in /
+       - replaced Regexp::Common with perlfaq4 regexes. MUCH faster now.
+       - new theme Berlin
+       - custom IS_A_NUMBER regex ignored
+       - cvs2pdf: 
+           - support for themes
+           - Berlin default (first column contains data in CSV)
+
+0.5.1  Tue Nov 06 2007
+       - xtab: last page not centered when center=1
+       - csv2pdf:
+           - typos in POD
+           - --man not working
+           - moved to directory bin
+           - removed "continued on next page" tabletail
+           - xentrystretch 0.001 (more rows per page)
+
+0.5.0  Mon Nov 05 2007
+       - die when value in cell is undef (fixes many warnings and funny
+         results)
+       - tabletail should work now  
+       - added csv2pdf
+
+0.4.0  Sat Oct 20 2007
+       - tabledef_strategy
+
+0.3.0  Sat Oct 20 2007
+       - generate() tests data and header
+       - themes test
+       - pod corrections
+
+0.2.1  Fri Oct 19 2007
+       - Bugfix: callback $is_header == 1 in data 
+
+0.2.0  Fri Oct 19 2007
+       - use Text::Wrap for wrapping lines
+       - callback
+       - xtab tests
+
+0.1.1  Thu Sep 20 2007
+       - minor POD corrections
+       - Bugfixes:
+           * perlcritic optional,
+             passes now with severity 1
+             
+0.1.0  Thu Sep 20 2007
+       - API CHANGE: header and data now options
+       - label optional 
+       - caption optional
+       - maincaption optional
+       - custom themes can be set in new()
+       - POD improvements
+       - more tests
+       - table environment optional
+       - added examples.pdf
+       - Bugfixes:
+           * META.yml missing
+           
+0.0.3  Thu Mar  5 2007
+       - t/perlcritic.t: required Test::Perl::Critic
+       
+0.0.2  Wed Feb 28 2007
+       - Added missing dependencies in Build.PL 
+       - Test::Perl::Critic passed
+
+0.0.1  Thu Aug  3 2006
+       Initial release.
+

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution LWP-Protocol-connect,
+version 6.09:
+
+  Provides HTTP/CONNECT proxy support for LWP::UserAgent
+
+This software is copyright (c) 2013 by Markus Benning <me@w3r3wolf.de>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

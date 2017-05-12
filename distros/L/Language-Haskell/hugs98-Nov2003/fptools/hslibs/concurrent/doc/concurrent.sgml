@@ -1,0 +1,17 @@
+<Chapter id="sec-Concurrent">
+<Title>The <literal>concurrent</literal> package: concurrency support
+<IndexTerm><Primary>Concurrent Haskell</Primary></IndexTerm>
+</Title>
+
+<para>The concurrency libraries (and the associated documentation)
+have moved.  See the module <ulink
+url="../base/Control.Concurrent.html"><literal>Control.Concurrent</literal></ulink>
+in the hierarchical libraries.</para>
+</Chapter>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: sgml ***
+     ;;; sgml-parent-document: ("../../doc/hslibs.sgml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

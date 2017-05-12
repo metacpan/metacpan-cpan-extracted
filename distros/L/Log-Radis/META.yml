@@ -1,0 +1,35 @@
+---
+abstract: 'Radis is a graylog logging radio through a redis database'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::Exception: '0.40'
+  Test::Mock::Redis: '0.18'
+  Test::More: '1.001'
+  perl: '5.013002'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.013002'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Radis
+requires:
+  Carp: '0'
+  JSON: '2.90'
+  Moo: '2'
+  Redis: '1.980'
+  Scalar::Util: '0'
+  Sys::Hostname: '0'
+  Time::HiRes: '1.9726'
+  perl: '5.013002'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/zurborg/liblog-radis-perl/issues
+  homepage: https://github.com/zurborg/liblog-radis-perl
+  repository: https://github.com/zurborg/liblog-radis-perl.git
+version: '0.003'

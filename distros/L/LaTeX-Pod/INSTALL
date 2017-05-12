@@ -1,0 +1,14 @@
+To install LaTeX::Pod, type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+Or, if you're on a platform (like DOS or Windows) that
+doesn't like the "./" notation, you can do this:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install

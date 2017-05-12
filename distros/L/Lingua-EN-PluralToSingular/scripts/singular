@@ -1,0 +1,13 @@
+#!/home/ben/software/install/bin/perl
+use lib '/home/ben/projects/Lingua-EN-PluralToSingular/lib';
+use Lingua::EN::PluralToSingular 'to_singular';
+for (@ARGV) {
+    print to_singular ($_);
+    print " ";
+}
+print "\n";
+
+# Local variables:
+# mode: perl
+# End:
+

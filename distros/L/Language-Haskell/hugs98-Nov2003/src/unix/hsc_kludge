@@ -1,0 +1,14 @@
+#! /bin/sh
+
+# In versions prior to GHC 6.0,
+# hsc2hs doesn't allow us to replace the template file, so do it here.
+# (It has a --template option, but it's cumulative.)
+# This is unnecessary for recent versions of hsc2hs.
+
+for file
+do
+	ed - $file >/dev/null <<EOF
+1 s:".*/:"
+w
+EOF
+done

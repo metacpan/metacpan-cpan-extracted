@@ -1,0 +1,30 @@
+Lchown - perl interface to the lchown(2) system call
+
+The Lchown module provides a perl interface to the lchown(2) UNIX system
+call, on systems that support lchown.  The lchown(2) call is used to
+change the ownership and group of symbolic links.
+
+DEPENDENCIES
+
+   The test suite requires the Test::More module, available from CPAN.
+
+   The oldest perl version that I've tested against is 5.00404.
+
+INSTALLATION
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+This module should build and pass tests on systems without the lchown
+system call.  Any lchown call will fail at runtime on such systems.
+
+Since the lchown system call often requires root privileges to make any
+change, most of the tests will be skipped unless "make test" is run as
+root.
+
+Copyright 2003-2009 Nick Cleaton, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

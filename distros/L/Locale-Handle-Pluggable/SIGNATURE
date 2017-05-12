@@ -1,0 +1,30 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c48cdf10f50cc7a5b5375b7a9cff3083e75feed5 MANIFEST
+SHA1 e8482690dad0ff3aaa335aa5b8b650851e504871 MANIFEST.SKIP
+SHA1 3cc9b0b733e02a7aefecd899aa77f75dadc05b6e META.yml
+SHA1 1539b0c919e88a09d0aa7f73e192c680c6640fae Makefile.PL
+SHA1 c786dd3dfefd1337ad18cef18e62b192e4836846 lib/Locale/Handle/Pluggable.pm
+SHA1 a5dc94642f080833870bb56e4172bd830bb5e1ff lib/Locale/Handle/Pluggable/DateTime.pm
+SHA1 6acf9a8f27c30a6dab7722629e90c6f73cdad461 t/basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFIVB+OVCwRwOvSdBgRApG9AJ4i/zPZs2wUrBNNz1L3PiCreAXQgQCffwP+
+ehLLkqZPm9zdR1W/U6kjgFY=
+=XeHO
+-----END PGP SIGNATURE-----

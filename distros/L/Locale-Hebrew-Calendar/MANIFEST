@@ -1,0 +1,13 @@
+Calendar.pm
+Calendar.xs
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+SIGNATURE
+hcom.c
+hdate.c
+hdate.h
+t/0-signature.t
+t/1-basic.t

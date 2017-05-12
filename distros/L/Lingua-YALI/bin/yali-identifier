@@ -1,0 +1,167 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: Script for language identification with custom models
+# PODNAME: yali-identifier
+
+use strict;
+use warnings;
+
+use Lingua::YALI::Identifier;
+use Lingua::YALI;
+
+use Getopt::Long;
+use Pod::Usage;
+use Carp;
+use File::Basename;
+
+our $VERSION = '0.015'; # VERSION
+
+my $file_list = undef;
+my $input_file = undef;
+my $format = "single";
+my $classes_file = undef;
+my $help = 0;
+my $each_line = undef;
+
+my $result = GetOptions("filelist=s" => \$file_list,
+                     "input|i=s"   => \$input_file,      # string
+                     "classes|c=s" => \$classes_file,
+                     "format|f=s"  => \$format,
+                     "each|e"  => \$each_line,
+                     "help|h"  => \$help
+) || pod2usage(-exitval => 105);
+
+if ($help) {
+    pod2usage(-exitval => 0);
+}
+
+# check output format
+if ( $format ne "single" && $format ne "all" && $format ne "all_p" && $format ne "tabbed" ) {
+    pod2usage(-exitval => 101, -msg => "Unsupported format $format.");
+}
+
+# reading input from STDIN is default
+if ( ! defined($input_file) && ! defined($file_list) ) {
+    $input_file = "-";
+}
+
+# it is incorrect when parameter filelist and input are both specified
+if ( defined($input_file) && defined($file_list) ) {
+    pod2usage(-exitval => 101, -msg => "Options --filelist and --input can not be specified in the same time.");
+}
+
+# file list has to be specified
+if ( ! defined($classes_file) ) {
+    pod2usage(-exitval => 101, -msg => "File with classes has to be specified.");
+}
+
+my $identifier = Lingua::YALI::Identifier->new();
+
+# register classes
+my @classes = ();
+open(my $fh_classes, "<", $classes_file) or croak("Not found: $classes_file; " . $!);
+my $class_dir = dirname($classes_file);
+while ( <$fh_classes> ) {
+    chomp;
+
+    # skip empty lines
+    if ( ! $_ ) {
+        next;
+    }
+
+    # check file format
+    my @p = split(/\t/, $_);
+    if ( scalar @p != 2 ) {
+        croak("File with classes has to have 2 columns. Line $. contains " . (scalar @p) . " columns.");
+    }
+
+    # try to fix file name
+    if ( ! -f $p[1] ) {
+        my $prev = $p[1];
+        $p[1] = $class_dir . "/" . $p[1];
+        warn("File $prev does not exist, using $p[1] instead.");
+    }
+
+    # register class
+    push(@classes, $p[0]);
+    $identifier->add_class($p[0], $p[1]);
+}
+
+# identify classes
+if ( defined($input_file) ) {
+    if ( $input_file eq "-" ) {
+        Lingua::YALI::_identify_handle($identifier, \*STDIN, $format, \@classes, $each_line);
+    } else {
+        Lingua::YALI::_identify($identifier, $input_file, $format, \@classes, $each_line);
+    }
+} elsif ( defined($file_list) ) {
+    my $fh_list = undef;
+    my $list_dir = "";
+
+    if ( $file_list eq "-" ) {
+        $fh_list = \*STDIN;
+    } else {
+        open($fh_list, "<", $file_list) or croak("Not found: $file_list\n" . $!);
+        $list_dir = dirname($file_list) . "/";
+    }
+    while ( my $file = <$fh_list> ) {
+        chomp $file;
+        if ( ! -f $file ) {
+            $file = $list_dir . $file;
+        }
+        Lingua::YALI::_identify($identifier, $file, $format, \@classes, $each_line);
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yali-identifier - Script for language identification with custom models
+
+=head1 VERSION
+
+version 0.015
+
+=head1 SYNOPSIS
+
+yali-identifier [options]
+
+Identify languages with models trained by yali-builder.
+
+Options:
+
+ -i, --input=F         input file. When F is -, read standard input.
+     --filelist=F      input files are read from F. When F is -, read them from standard input.
+ -f, --format=FORMAT   output FORMAT
+ -c, --classes=F       file with paths to model. Containing two columns - the first with class, the second one with path to the model.
+ -h, --help            prints documentation
+
+FORMAT:
+
+ single   - prints out only the most probable class
+ all      - prints out all classes sorted according to their probability descendetly
+ all_p    - prints out all classes with probability sorted according to their probability descendetly
+ tabbed   - prints out probabilities of classes separated by tab in order used in --classes
+
+More examples are available at L<http://search.cpan.org/perldoc?Lingua%3A%3AYALI%3A%3AExamples>
+
+Version: 0.015 (2014-05-04)
+
+=head1 AUTHOR
+
+Martin Majlis <martin@majlis.cz>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Martin Majlis.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

@@ -1,0 +1,18 @@
+Revision history for Perl extension Lingua::RU::Money::XS.
+
+0.05  Apr 24 2017
+      Updated distro files
+
+0.04  Apr 20 2017
+      Fixed ticket #121227 (compilation error with threaded perl)
+
+0.03  Apr 18 2017
+      Fixed kopeck conversion and thousandth digit behaviour. Also more tests
+      have been added
+
+0.02  Apr 14 2017
+      Fixed boundary violation and added few tests
+
+0.01  Apr 9 2017
+      The first version, released on an unsuspecting world ;)
+      Acknowledgements to Mons Anderson for many useful advices for this version

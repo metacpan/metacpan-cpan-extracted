@@ -1,0 +1,12 @@
+Changes
+lib/Lingua/ES/Numeros.pm
+Makefile.PL
+MANIFEST
+README
+t/CardinalsTest.pm
+t/OrdinalsTest.pm
+t/t01_init.t
+t/t02_cardinals.t
+t/t03_fractions.t
+t/t04_ordinals.t
+META.yml                                 Module meta-data (added by MakeMaker)

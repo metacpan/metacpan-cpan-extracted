@@ -1,0 +1,29 @@
+// [% warning %]
+
+[% FOREACH class IN data.classes -%]
+[% IF class.is_concrete -%]
+include <[% class.name("/") %]>
+[% END -%]
+[% END -%]
+include <[% visitor.name("/") %]>
+
+[% FOREACH class IN data.classes -%]
+[% IF class.is_concrete %]
+
+/**
+[%- FOREACH arg IN class.args %]
+ * @param [% arg.name("::") %]* [% arg.argname %]
+[%- END %]
+ * @return [% class.name("::") %]* a new [% class.name %]
+ */
+[% class.name("::") %]* [% class.lastpart %]([% FOREACH arg IN class.args -%]
+                                    [%- arg.name("::") %]* [% arg.argname -%]
+                                    [%- LAST IF loop.last %][% ", " %]
+                                [%- END %]) {
+    return new [% class.name("::") %]([% FOREACH arg IN class.args -%]
+                                     [%- arg.argname -%]
+                                    [%- LAST IF loop.last %][% ", " %]
+                                [%- END %]);
+}
+[% END -%]
+[% END %]

@@ -1,0 +1,39 @@
+---
+abstract: 'Locale::Utils::PluralForms - Utils to use plural forms'
+author:
+  - 'Steffen Winkler <steffenw at cpan.org>'
+build_requires:
+  Test::Differences: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Locale-Utils-PluralForms
+provides:
+  Locale::Utils::PluralForms:
+    file: lib/Locale/Utils/PluralForms.pm
+    version: 0.001
+recommends:
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+requires:
+  English: 0
+  HTML::Entities: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  MooseX::StrictConstructor: 0
+  Safe: 0
+  Syntax::Feature::Method: 0
+  namespace::autoclean: 0
+  perl: 5.006
+  syntax: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.001

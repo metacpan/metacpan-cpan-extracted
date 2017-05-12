@@ -1,0 +1,10 @@
+TYPEMAP
+Lux_IO_Btree *       T_LUX_IO_BTREE
+
+OUTPUT
+T_LUX_IO_BTREE
+    XS_STRUCT2OBJ($arg, "Lux::IO::Btree", $var);
+
+INPUT
+T_LUX_IO_BTREE
+    $var = XS_STATE(Lux_IO_Btree*, $arg);

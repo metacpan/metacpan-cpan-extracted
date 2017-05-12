@@ -1,0 +1,20 @@
+Word	WFfreqcount	spell-check OK (1/0)	CUMfreqcount	SUBTLEX	lgSUBTLEX	Google00	Google00cum	Google00pm	lgGoogle00	
+Genaui	1	0	1	0,04	0,301	1	1	0,00017	0,301	
+hinweggewandt	1	1	1	0,04	0,301	1	1	0,00017	0,301	
+Eskimohunden	1	1	1	0,04	0,301	1	1	0,00017	0,301	
+nichtwünschen	1	1	1	0,04	0,301	0	1	0,00017	0,301	
+visités	1	0	1	0,04	0,301	1	1	0,00017	0,301	
+Bundesgenehmigung	1	1	1	0,04	0,301	1	1	0,00017	0,301	
+vergüngen	1	0	1	0,04	0,301	0	1	0,00017	0,301	
+hypotetischer	1	0	1	0,04	0,301	1	1	0,00017	0,301	
+nämJich	1	0	1	0,04	0,301	1	1	0,00017	0,301	
+Frontplatte	2	1	2	0,08	0,477	256	256	0,04231	2,410	
+Postangestellte	2	1	2	0,08	0,477	256	256	0,04231	2,410	
+rackert	2	0	2	0,08	0,477	198	256	0,04231	2,410	
+Schnurlos	2	1	2	0,08	0,477	104	256	0,04231	2,410	
+Brez	2	0	2	0,08	0,477	71	256	0,04231	2,410	
+projezieren	2	0	2	0,08	0,477	241	256	0,04231	2,410	
+vez	2	0	2	0,08	0,477	5799	5957	0,98457	3,775	
+lnsofern	1	0	1	0,04	0,301	5958	5958	0,98474	3,775	
+gefühlsmäßige	6	1	6	0,24	0,845	5645	5958	0,98474	3,775	
+Selbstzweifel	15	1	15	0,59	1,204	5958	5958	0,98474	3,775	

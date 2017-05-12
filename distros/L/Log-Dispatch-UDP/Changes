@@ -1,0 +1,4 @@
+Revision history for Log-Dispatch-UDP
+
+0.01 February 25 2012
+     - Initial release.  You can log stuff to a UDP socket.

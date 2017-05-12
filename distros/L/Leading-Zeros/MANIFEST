@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+demo/demo_no_Leading_Zeros.pl
+demo/demo_use_Leading_Zeros.pl
+demo/demo_use_Leading_Zeros_AS_DECIMALS.pl
+lib/Leading/Zeros.pm
+t/00.load.t
+t/pod-coverage.t
+t/pod.t

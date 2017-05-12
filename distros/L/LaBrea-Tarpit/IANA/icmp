@@ -1,0 +1,81 @@
+NAME
+      LaBrea::Tarpit::Codes
+
+SYNOPSIS
+      use LaBrea::Tarpit::Codes qw (
+            protocol
+            icmp
+            numeric
+      );
+
+      $text   = protocol(number);
+      $number = protocol(text);
+      $text   = icmp(number);
+      $number = icmp(text);
+      $rv     = numeric(scalar);
+
+DESCRIPTION
+    This module is built by Makefile.PL from the text files in the IANA
+    subdirectory (copied from the IANA web site).
+
+    Do not edit the Codes.pm file, changes will be lost.
+
+    $rv = protocol($x);
+          Returns the upper case text name of a protocol
+          number or the protocol number of a text name.
+
+          i.e.  'TCP' = protocol(6);
+                  6   = protocol('Tcp');
+                  (not case sensitive)
+
+          return -1 or 'unknown' if lookup value 
+          is not present in table
+
+    $rv = icmp($x);
+          Returns the upper case text name of an icmp
+          number or the icmp number of the text name.
+
+          i.e.  'ECHO' = icmp(8);
+                   8   = icmp('EcHo');
+                   (not case sensitive)
+
+          return -1 or 'unknown' if lookup value 
+          is not present in table
+
+    $rv = numeric(scalar);
+          Return true if the scalar is a number 
+          0,-n,+n
+            else
+          returns false
+
+EXPORT
+      None by default.
+
+COPYRIGHT
+    Copyright 2002, Michael Robinton & BizSystems This program is free
+    software; you can redistribute it and/or modify it under the terms of
+    the GNU General Public License as published by the Free Software
+    Foundation; either version 2 of the License, or (at your option) any
+    later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+AUTHOR
+    Michael Robinton, michael@bizsystems.com
+
+SEE ALSO
+    perl(1), LaBrea::Tarpit(3), LaBrea::Tarpit::Get(3),
+    LaBrea::Tarpit::Report(3), LaBrea::Tarpit::Util(3),
+    LaBrea::Tarpit::DShield(3)
+
+    EOF
+
+    close C;
+

@@ -1,0 +1,156 @@
+=head1 NAME
+
+Log::FileSimple - A simple tool to write messages and objects dump to log file.
+
+=head1 SYNOPSIS
+
+  use Log::FileSimple;
+  
+  my $log = new Log::FileSimple(  name      => 'Log::FileSimple logs',
+                                  file      => './log.log',
+                                  mask      => -1,
+                                  autoflush => 0,
+                              );
+  my $message;
+  
+  $message    = 'Simple log message';
+  $log->log(  message => $message);
+
+  $message    = 'Another printed message';
+  $log->log(  message => $message, id => 0b1);
+  
+  $log->mask(0b10); # changing mask filter
+  
+  $message    = 'This will not be printed owing to mask';
+  $log->log(  message => $message, id => 0b1);
+  
+  $message    = 'This will be printed';
+  $log->log(  message => $message, id => 0b10);
+  
+  $log->mask(0xFFFF); # enabling all messages log
+  
+  $message    = 'This is a dump of myself';
+  $log->log(  message => $message, objects => [$log]);
+  
+  $message    = 'This is a dump of two structures';
+  $log->log(  message => $message, 
+              objects => [ 
+                            {a => 1, b => 2},
+                            ['one', 'two', 'three']
+                ]
+            );
+
+=head1 DESCRIPTION
+
+The purpose of this module is to give a simple tool to write messages to a log file.
+
+It gives also the possibility to filter what to print and what not to print using a
+filter mask. If the id of the message and-ed with the mask is zero then log will be
+rejected otherwise not.
+
+It's also possible to add a list of objects that will be dumped in log using 
+Data::Dumper module.
+
+Every log have this format:
+
+  =================================================================
+  [Timestamp] => $self->{name}
+  $self->{message}
+  ...dumping of objects...
+  =================================================================
+
+=head1 CLASS INTERFACE
+
+=head2 CONSTRUCTORS
+
+The C<new> constructor return an istance of C<Log::FileSimple> object. It has three
+parameters which you can set here:
+
+  $log = new Log::FileSimple(  
+                               name    => $name,
+                               [ file      => $file ],
+                               [ mask      => $mask ],
+                               [ autoflush => (0|1) ],
+                             );
+
+=over 4 
+
+=item B<PARAMETERS>
+
+=item file
+
+It's the file path of the log. If file exists log will be appended. If file doesn't
+exist it will be created.
+
+=item name
+
+It's the name of log in the case that more process logs to the same file at the same
+time.
+
+=item mask
+
+It's a 32 bit mask that will be used to filter messages. If the id of message and-ed 
+with this value is zero then message will be discarded.
+
+If this value is 0 nothing will be logged.
+
+If this value is C<0xFFFF> or -1 all messages will be logged.
+
+=item autoflush
+
+It's a boolean value that enabled or disabled autoflush of data into
+log file. Default value is 0 that is autoflushing data is disabled.
+
+=back
+
+=head2 PUBLIC METHODS
+
+=over 4
+
+=item log( message => $message , [id => $id], [objects => $objs_arrayref])
+
+Add a log item to log file. 
+
+=over 4
+
+=item message
+
+It's the message string that will be printed in the log item.
+
+=item id
+
+It's an optional message id used if it's necessary to filter message. If omitted
+C<0xFFFF> will be assumed and so message will be always print at least than mask
+is 0.
+
+=item objects
+
+It's an optional reference to an array of objects. Every object in the array will
+be dumped using C<Data::Dumper> module in the log item. 
+
+=back
+
+=back
+
+=head1 DIAGNOSTICS
+
+No diagnostics error returned.
+
+=head1 EXPORT
+
+Nothing exported
+
+
+=head1 REQUIRES 
+
+FileHandle, Data::Dumper
+
+=head1 AUTHOR
+
+Emiliano Bruni, E<lt>info@ebruni.itE<gt>
+
+=head1 SEE ALSO
+
+L<FileHandle> , L<Data::Dumper>
+
+=cut

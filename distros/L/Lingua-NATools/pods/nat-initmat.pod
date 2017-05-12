@@ -1,0 +1,41 @@
+# -*- cperl -*-
+
+=head1 NAME
+
+nat-initmat - initialize a sparse matrix with words co-occurrence.
+
+=head1 SYNOPSIS
+
+ nat-initmat <crp1> <crp2> [<exc1> <exc2>] <matrix>
+
+=head1 DESCRIPTION
+
+This tool is used internally by C<nat-these> and is not intended to be
+used independently. Basically, this tool takes two corpora files
+created by C<nat-pre> and allocates a sparse matrix, where rows
+indexes correspond to word identifiers on the source corpus, and
+column indexes correspond to word identifiers on the target
+corpus. Cells count the words co-occurrence on the same sentence.
+The C<matrix> file is then created with the matrix information.
+
+Optionally, you can pass to the system two exclude lists, as returned
+by the C<nat-words2id> tool. These words will be ignored, and counting
+will not be done for them.
+
+The matrix is saved and can be processed later by EM-Algorithm methods
+IPFP (C<nat-ipfp>), Sample A (C<nat-samplea>) and Sample B
+(C<nat-sampleb>).
+
+=head1 SEE ALSO
+
+nat-words2id, nat-pre, NATools documentation
+
+=head1 COPYRIGHT
+
+ Copyright (C)2002-2009 Alberto Simoes and Jose Joao Almeida
+ Copyright (C)1998 Djoerd Hiemstra
+
+ GNU GENERAL PUBLIC LICENSE (LGPL) Version 2 (June 1991)
+
+=cut
+

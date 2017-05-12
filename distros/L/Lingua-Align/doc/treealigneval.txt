@@ -1,0 +1,125 @@
+NAME
+    treealigneval - a script for computing precision and recall scores for
+    tree aligmnent
+
+SYNOPSIS
+        treealigneval [OPTIONS] gold-standard-file tree-alignment-file
+
+DESCRIPTION
+    Both gold-standard-file and tree-alignment-file should be in Stockholm
+    Tree Aligner Format. Here is an example:
+
+     <?xml version="1.0" ?>
+     <treealign>
+     <head>
+      <alignment-metadata>
+        <date>Tue May  4 16:23:04 2010</date>
+        <author>Lingua-Align</author>
+      </alignment-metadata>
+     </head>
+      <treebanks>
+        <treebank filename="treebanks/en/smultron_en_sophie.xml" id="en"/>
+        <treebank filename="treebanks/sv/smultron_sv_sophie.xml" id="sv"/>
+      </treebanks>
+      <alignments>
+        <align author="Lingua-Align" prob="0.11502659612149206125" type="fuzzy">
+          <node node_id="s105_17" type="t" treebank_id="en"/>
+          <node node_id="s109_23" type="t" treebank_id="sv"/>
+        </align>
+        <align author="Lingua-Align" prob="0.45281832125339427364" type="fuzzy">
+          <node node_id="s105_34" type="t" treebank_id="en"/>
+          <node node_id="s109_15" type="t" treebank_id="sv"/>
+        </align>
+      </alignments>
+     </treealign>
+
+    The "treealigneval" script will read both files and compare the links.
+    It will output precision, recall and F values. Here is an example
+    output:
+
+     --------------------------------------------------------
+             precision (ALL/NT:NT) = 76.27 (1896/2486)
+                recall (ALL/NT:NT) = 77.96 (1896/2432)
+            balanced F (ALL/NT:NT) = 77.10
+     --------------------------------------------------------
+               precision (ALL/T:T) = 73.48 (2626/3574)
+                  recall (ALL/T:T) = 72.48 (2626/3623)
+              balanced F (ALL/T:T) = 72.97
+     --------------------------------------------------------
+           precision (fuzzy/NT:NT) = 15.78 (101/640)
+              recall (fuzzy/NT:NT) = 19.39 (101/521)
+          balanced F (fuzzy/NT:NT) = 17.40
+     --------------------------------------------------------
+             precision (fuzzy/T:T) =  5.40 (50/926)
+                recall (fuzzy/T:T) = 17.36 (50/288)
+            balanced F (fuzzy/T:T) =  8.24
+     --------------------------------------------------------
+            precision (good/NT:NT) = 67.23 (1241/1846)
+               recall (good/NT:NT) = 65.32 (1241/1900)
+           balanced F (good/NT:NT) = 66.26
+     --------------------------------------------------------
+              precision (good/T:T) = 78.32 (2074/2648)
+                 recall (good/T:T) = 62.19 (2074/3335)
+             balanced F (good/T:T) = 69.33
+     =======================================
+      precision (all) = 74.62 (4522/6060)
+         recall (all) = 74.68 (4522/6055)
+        recall (good) = 76.06 (3982/5235)
+       recall (fuzzy) = 65.85 (540/820)
+     =======================================
+     F (P_all & R_all)  = 74.65
+     F (P_all & R_good) = 75.34
+     =======================================
+
+    "NT" refers to non-terminal nodes and "T" refers to terminal nodes
+    (treealigneval uses type attributes in the alignment file to determine
+    if a node is a terminal node or a non-terminal node; if this attribute
+    is not included it assumes that all nodes with an I500 is a terminal
+    node). Precision and recall values for specific link types may be lower
+    than the overall numbers because the proposed link type has to match
+    whereas in the total numbers all proposed links are considered.
+
+  OPTIONS
+    -b firstSentId
+        Start evaluating at this source language sentence ID. If you don't
+        specify -b the evaluation script will use all sentences for which at
+        least one link has been proposed. That means that the scores might
+        be too high because the aligner may just not have aligned anything
+        for in some sentence pairs (usually it will be fine).
+
+    -e lastSentId
+        Stop evaluating at this source language sentence ID. This is for the
+        same reason as for -b.
+
+    -g format
+        This specifies the format of the gold standard file. Default is
+        "sta" (Stockholm Tree Aligner format). Other formats are not really
+        included/tested yet. An alternative would be, for example, the
+        format of the Dublin Subtree Aligner.
+
+    -s format
+        The format of the tree aligmnets proposed by the system. Default is
+        again "sta".
+
+SEE ALSO
+    Lingua::treealign, Lingua::Align::Trees
+
+AUTHOR
+    Joerg Tiedemann
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Joerg Tiedemann
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 368:
+        Unterminated D<...> sequence
+
+        Deleting unknown formatting code D<>
+

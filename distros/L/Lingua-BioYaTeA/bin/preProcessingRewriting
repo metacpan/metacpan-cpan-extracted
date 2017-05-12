@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use File::Basename;
+use Lingua::BioYaTeA::PreProcessing;
+
+my $man = 0;
+my $help = 0;
+
+my %options;
+my $fh;
+
+&GetOptions(\%options, 
+	    "help|?|h", 
+	    "man|m", 
+	    "input-file|i:s", 
+	    "output-file|o:s") 
+    or pod2usage(2);
+
+pod2usage(-exitstatus => 0, -verbose => 2) if $options{'man'};
+pod2usage(1) if ($options{'help'}); #  or (!$options{'input-file'} or !$options{'output-file'})
+
+my $in_list = $options{'input-file'};
+my $out_list = $options{'output-file'};
+
+my $preProc = Lingua::BioYaTeA::PreProcessing->new();
+
+if (defined $out_list) {
+    open($fh, ">$out_list") or die "can not open file $out_list to record corrected file";
+} else {
+    $fh = *stdout;
+}
+$preProc->process_file($in_list, $fh);
+if (defined $out_list) {
+    close($fh);
+}
+=encoding utf8
+
+=head1 NAME
+
+preProcessingRewriting - Perl script for rewriting the POS-tagged terms provided by TreeTagger.
+
+=head1 SYNOPSIS
+
+preProcessingRewriting [-help] [-man] [--configuration file] input_file output_file
+
+=head1 OPTIONS
+
+=over 4
+
+=item    B<--help>, B<-h>, B<-?>              brief help message
+
+=item    B<--man>, B<-m>                   full documentation
+
+=item    I<input_file>, I<-i>              BioYaTeA input file in TreeTagger ouput format
+
+=item    I<output_file>, I<-o>             Rewriting output file (TreeTagger format)
+
+
+=back
+
+=head1 DESCRIPTION
+
+This script performs the pre-processing of the TreeTagger output in
+order to improve the extraction of both terms containing prepositional
+phrases (with TO and AT prepositions) and terms containing participles
+(past participles -ED and gerunds -ING).
+Context-based rules are applied to the POS tags either to trigger the
+extraction of relevant structures or to prevent the extraction of
+irrelevant ones. The modified file becomes a new input file for
+BioYaTeA.
+
+Without specifying the input file, the input data are read on stdin. 
+Without specifying the output file, the ouput data are print on stdout. 
+
+=head1 INPUT/OUTPUT FILE FORMATS
+
+See Documentation in Lingua::YaTeA
+
+
+=head1 EXAMPLES
+
+preProcessingRewriting -i examples/sampleEN.ttg -o examples/sampleEN-prepro
+
+preProcessingRewriting < examples/sampleEN.ttg > examples/sampleEN-prepro
+
+
+=head1 SEE ALSO
+
+Documentation of Lingua::BioYaTeA::PostProcessing, Lingua::BioYaTeA and Lingua::YaTeA 
+
+=head1 AUTHORS
+
+Wiktoria Golik <wiktoria.golik@jouy.inra.fr>, Zorana Ratkovic <Zorana.Ratkovic@jouy.inra.fr>, Robert Bossy <Robert.Bossy@jouy.inra.fr>, Claire Nédellec <claire.nedellec@jouy.inra.fr>, Thierry Hamon <thierry.hamon@univ-paris13.fr>
+
+=head1 LICENSE
+
+Copyright (C) 2012 Wiktoria Golik, Zorana Ratkovic, Robert Bossy, Claire Nédellec and Thierry Hamon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

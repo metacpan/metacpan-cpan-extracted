@@ -1,0 +1,36 @@
+[% 
+    title = page.title ;
+
+    crumb2_name = 'Gallery' ;
+    crumb2_href = '/album-main' ;
+    crumb1_name = page.title ;
+%]
+
+<div class="boxer">
+    [% IF page.summary %]<p>[% page.summary %]</p>[% END %]
+    [% IF photo.toobig %]<p>Right Click and select View Image to see the full size image.</p>[% END %]
+
+    <p align="center"><img src="[% picpath %]/photos/[% photo.image %]" [% IF photo.toobig %]width=[% maxpicwidth %][% END %] alt="[% photo.tagline %]" /></p>
+    [% IF photo.tagline %]<p align="center">[% photo.tagline %]</p>[% END %]
+</div>
+
+<div class="boxer">
+    <p align="center">
+    [% IF photo.prev %]
+        <a href="[% docroot %]/photo/[% photo.prev %]">Prev</a>
+    [% ELSE %]Prev[% END %]
+        | <a href="[% docroot %]/album/[% photo.pageid %]">Index</a> |
+    [% IF photo.next %]
+        <a href="[% docroot %]/photo/[% photo.next %]">Next</a>
+    [% ELSE %]Next[% END %]
+    </p>
+</div>
+
+<div class="boxer">
+<p align="justify">All photos [% copyright %]
+<br />You are free to use these photos for all non-commercial purposes, using a
+<a href="http://creativecommons.org/licenses/by-nc/3.0/">Creative Commons by
+Attribution Non-Commercial License</a>. If you wish to use any photo in
+commercial works, please <a href="mailto:barbie@missbarbell.co.uk">please contact
+me</a> to discuss commercial licensing.</p>
+</div>

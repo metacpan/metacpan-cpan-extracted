@@ -1,0 +1,67 @@
+NAME
+    Lingua::EN::Summarize - A simple tool for summarizing bodies of English
+    text.
+
+SYNOPSIS
+      use Lingua::EN::Summarize;
+      my $summary = summarize( $text );                    # Easy, no? :-)
+      my $summary = summarize( $text, maxlength => 500 );  # 500-byte summary
+      my $summary = summarize( $text, filter => 'html' );  # Strip HTML formatting
+      my $summary = summarize( $text, wrap => 75 );        # Wrap output to 75 col.
+
+DESCRIPTION
+    This is a simple module which makes an unscientific effort at
+    summarizing English text. It recognizes simple patterns which look like
+    statements, abridges them, and concatenates them into something vaguely
+    resembling a summary. It needs more work on large bodies of text, but it
+    seems to have a decent effect on small inputs at the moment.
+
+    Lingua::EN::Summarize exports one function, "summarize()", which takes
+    the text to summarize as its first argument, and any number of optional
+    directives in "name => value" form. The options it'll take are:
+
+    maxlength
+        Specifies the maximum length, in bytes, of the generated summary.
+
+    wrap
+        Prettyprints the summary output by wrapping it to the number of
+        columns which you specify.
+
+    filter
+        Passes the text through a filter before handing it to the
+        summarizer. Currently, only two filters are implemented: ""html"",
+        which uses HTML::TreeBuilder and HTML::FormatText to strip all HTML
+        formatting from a document, and ""easyhtml"", which quickly (and
+        less accurately) strips all HTML from a document using a simple
+        regular expression, if you don't have the abovementioned modules. An
+        ""email"" filter, for converting mail and news messages to
+        easily-summarizable text, is in the works for the next version.
+
+    Unlike the HTML::Summarize module (which is very cool, and worth a
+    look), this module considers its input to be plain English text, and
+    doesn't try to gather any information from the formatting. Thus, without
+    any cues from the document's format, the scheme that HTML::Summarize
+    uses isn't applicable here. The current scheme goes something like this:
+
+    "Filter the text according to the user's "filter" option. Split the text
+    into discrete sentences with the Text::Sentence module, then further
+    split them into clauses on commas and semicolons. Keep only the ones
+    that have a (subject very-simple-verb object) structure. Construct the
+    summary out of the first sentences in the list, staying within the
+    "maxlength" limit, or under 30% of the size of the original text,
+    whichever is smaller."
+
+    Needless to say, this is a very simple and not terribly universally
+    effective scheme, but it's good enough for a first draft, and I'll bang
+    on it more later. Like I said, it's not a scientific approach to the
+    problem, but it's better than nothing, and I don't really need A.I.
+    quality output from it.
+
+AUTHOR
+    Dennis Taylor, <dennis@funkplanet.com>
+
+SEE ALSO
+    HTML::Summarize, Text::Sentence,
+    http://www.vancouvertoday.com/city_guide/dining/reviews/barbers_modern_c
+    lub.html
+

@@ -1,0 +1,13 @@
+language: perl
+perl:
+  - "5.22"
+  - "5.16"
+  - "5.12"
+  - "5.10"
+env:
+  - "HARNESS_OPTIONS=j9 TEST_ONLINE=1"
+install:
+  - "cpanm -n IO::Socket::SSL"
+  - "cpanm -n --installdeps ."
+notifications:
+  email: false

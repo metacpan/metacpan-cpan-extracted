@@ -1,0 +1,17 @@
+---
+name: Lingua-EN-Keywords-Yahoo
+version: 0.5
+author:
+  - 'Original code by Simon Cozens, <simon@cpan.org>'
+  - 'Packaged by Simon Wistow, <simon@thegestalt.org>'
+abstract: Automatically extracts keywords from text using the Yahoo! API
+license: perl
+requires:
+  LWP::UserAgent: 0
+  Test::More: 0
+  XML::Twig: 3.22
+provides:
+  Lingua::EN::Keywords::Yahoo:
+    file: lib/Lingua/EN/Keywords/Yahoo.pm
+    version: 0.5
+generated_by: Module::Build version 0.2611

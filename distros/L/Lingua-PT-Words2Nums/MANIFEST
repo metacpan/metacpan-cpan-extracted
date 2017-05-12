@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Words2Nums.pm
+t/01-conversion_0_10000.t
+t/02-conversion_10001_999999.t
+t/03-conversion_1000000_and_up.t
+META.yml                                 Module meta-data (added by MakeMaker)
+t/pod.t
+t/pod-coverage.t

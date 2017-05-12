@@ -1,0 +1,29 @@
+Revision history for Perl extension SpaceTag::DoCoMo.
+
+0.90  Mon Nov 17 20:52:57 2003
+	- original version; created by h2xs 1.23 with options
+		-A -X -n SpaceTag::DoCoMo
+
+1.00  Sun Jan 18 21:18:53 2004
+	- Change the name of module to: Location::Area::DoCoMo::iArea
+	- add method: getNextArea
+
+1.10  Mon Jun 14 3:23:00 2004 JST
+  - DoCoMo updates area data, so I do so.
+  - Fix some data error
+  - Add maintenance tools
+
+2.00  Fri Jun 25 17:12:00 2004 JST
+  - Change engine from SQLite to flat file & regexp. it's faster.
+  - Some API's name were changed. Old names are also last.
+  - get_nextarea method is shadowed. because, NTT DoCoMo's website includes a lot of errors.
+
+2.01  Mon Jun 28 11:42:06 2004 JST
+  - get_nextarea method is unveiled again. DoCoMo data's inconsistencies are adjusted.
+  - Add adjusted mode of aura data. DoCoMo's aura data contains a lot of inconsistencies,
+     so add adjusted data mode.
+  - Add include_area method.
+
+2.10  Sun Feb 25 12:20:00 2007 JST
+  - Data were updated by data released at Feb 20, 2007.
+    Thank you for Mr. Kunihiko Miyanaga!

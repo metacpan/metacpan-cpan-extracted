@@ -1,0 +1,53 @@
+Revision history for Perl module LabKey::Query
+
+1.05 2015-07-30
+    - Fix SSL errors when using module on MacOSX and connecting 
+      to a LabKey Server with SSLv2 and SSLv3 disabled
+
+1.04 2013-10-08
+    - Rename module from Labkey::Query to LabKey::Query
+
+1.03 2013-03-22
+    - Add optional 'useragent' and 'timeout' options to APIs.
+      The APIs will use 'useragent' to make the request if provided.
+
+1.02 2012-01-17
+    - Support for LABKEY_NETRC environment variable to specify
+      non-standard location for .netrc file
+    - Fix typo in module dependencies (URL changed to URI)      
+
+1.01 2011-11-10
+    - Adds optional netrcFile param to all APIs, which specifies
+      the location of a .netrc file, if not in the home directory
+    - Corrects containerFilter to containerFilterName   
+
+1.00 2011-09-29
+    - Switches selectRows() to use LABKEY.Query.ExtendedSelectRowsResults
+      result format instead of legacy formats
+
+0.09 2011-09-23
+    - Removed accidental Data::Dumper usage in executeSql
+
+0.08 2011-08-02
+    - Added support for parameterized queries for selectRows()  
+    - Internal change in selectRows() to use a URI object for the URL,
+      instead of a string      
+
+0.05 2010-09-01
+    - Added deleteRows() and executeSql().  
+    - Switched all APIs to use single '-containerPath' param
+      instead of '-project' and '-containerPath'     
+
+0.04 2010-08-31
+    - capitalized 'Query' to better follow conventions   
+
+0.03 2010-08-31
+    - typo in documentation  
+
+0.02 2010-08-27
+    - explicitly adds addition dependencies to build script.
+    - fixes build tests
+
+0.01 2010-08-26 10:57:50
+    - original version; created by ExtUtils::ModuleMaker 0.51
+

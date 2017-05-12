@@ -1,0 +1,70 @@
+Lingua::EN::Tagger 
+
+This module uses part-of-speech statistics from the Penn Treebank
+to assign POS tags to English text. The tagger applies a bigram (two-word)
+Hidden Markov Model to guess the appropriate POS tag for a word.  That means
+that the tagger will try to assign a POS tag based on the known POS tags
+for a given word and the POS tag assigned to its predecessor.
+
+The tagger tends to assume unknown words are nouns, but this behavior is 
+configurable.
+
+The POS tagger can also be used to find maximal noun phrases in tagged text.  
+You can also use this module to extract all nouns and/or noun phrases.
+
+
+
+TAG SET
+
+----------------------------------------------------------------
+The set of POS tags used here is a modified version of the
+Penn Treebank tagset. Tags with non-letter characters have been 
+redefined to work better in our data structures. Also, the 
+``Determiner'' tag (DET) has been changed from `DT', in order to
+avoid confusion with the HTML tag, <DT>. 
+-----------------------------------------------------------------
+CC      Conjunction, coordinating               and, or
+CD      Adjective, cardinal number              3, fifteen
+DET     Determiner                              this, each, some
+EX      Pronoun, existential there              there
+FW      Foreign words           
+IN      Preposition / Conjunction               for, of, although, that
+JJ      Adjective                               happy, bad
+JJR     Adjective, comparative                  happier, worse
+JJS     Adjective, superlative                  happiest, worst
+LS      Symbol, list item                       A, A.
+MD      Verb, modal                             can, could, 'll
+NN      Noun                                    aircraft, data
+NNP     Noun, proper                            London, Michael
+NNPS    Noun, proper, plural                    Australians, Methodists
+NNS     Noun, plural                            women, books
+PDT     Determiner, prequalifier                quite, all, half
+POS     Possessive                              's, '
+PRP     Determiner, possessive second           mine, yours
+PRPS    Determiner, possessive                  their, your
+RB      Adverb                                  often, not, very, here
+RBR     Adverb, comparative                     faster
+RBS     Adverb, superlative                     fastest
+RP      Adverb, particle                        up, off, out
+SYM     Symbol                                  *
+TO      Preposition                             to
+UH      Interjection                            oh, yes, mmm
+VB      Verb, infinitive                        take, live
+VBD     Verb, past tense                        took, lived
+VBG     Verb, gerund                            taking, living
+VBN     Verb, past/passive participle           taken, lived
+VBP     Verb, base present form                 take, live
+VBZ     Verb, present 3SG -s form               takes, lives
+WDT     Determiner, question                    which, whatever
+WP      Pronoun, question                       who, whoever
+WPS     Determiner, possessive & question       whose
+WRB     Adverb, question                        when, how, however
+
+PP      Punctuation, sentence ender             ., !, ?
+PPC     Punctuation, comma                      ,
+PPD     Punctuation, dollar sign                $
+PPL     Punctuation, quotation mark left        ``
+PPR     Punctuation, quotation mark right       ''
+PPS     Punctuation, colon, semicolon, elipsis  :, ..., -
+LRB     Punctuation, left bracket               (, {, [
+RRB     Punctuation, right bracket              ), }, ]

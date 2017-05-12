@@ -1,0 +1,61 @@
+NAME
+    Lingua::KO::Romanize::Hangul - Romanization of Korean language
+
+SYNOPSIS
+        use Lingua::KO::Romanize::Hangul;
+
+        my $conv = Lingua::KO::Romanize::Hangul->new();
+        my $roman = $conv->char( $hangul );
+        printf( "<ruby><rb>%s</rb><rt>%s</rt></ruby>", $hangul, $roman );
+
+        my @array = $conv->string( $string );
+        foreach my $pair ( @array ) {
+            my( $raw, $ruby ) = @$pair;
+            if ( defined $ruby ) {
+                printf( "<ruby><rb>%s</rb><rt>%s</rt></ruby>", $raw, $ruby );
+            } else {
+                print $raw;
+            }
+        }
+
+DESCRIPTION
+    Hangul is phonemic characters of the Korean language. This module
+    follows the "Revised Romanization of Korean" which was released on July
+    7, 2000 as the official romanization system in South Korea.
+
+  $conv = Lingua::KO::Romanize::Hangul->new();
+    This constructer methods returns a new object.
+
+  $roman = $conv->char( $hangul );
+    This method returns romanized letters of a Hangul character. It returns
+    undef when $hanji is not a valid Hangul character. The argument's
+    encoding must be UTF-8.
+
+  $roman = $conv->chars( $string );
+    This method returns romanized letters of Hangul characters.
+
+  @array = $conv->string( $string );
+    This method returns a array of referenced arrays which are pairs of a
+    Hangul chacater and its romanized letters.
+
+        $array[0]           # first Korean character's pair (array)
+        $array[1][0]        # secound Korean character itself
+        $array[1][1]        # its romanized letters
+
+UTF-8 FLAG
+    This module treats utf8 flag transparently.
+
+SEE ALSO
+    Lingua::JA::Romanize::Japanese for Japanese
+
+    Lingua::ZH::Romanize::Pinyin for Chinese
+
+    http://www.korean.go.kr/06_new/rule/rule06.jsp
+
+    http://www.kawa.net/works/perl/romanize/romanize-e.html
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 1998-2008 Yusuke Kawasaki. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

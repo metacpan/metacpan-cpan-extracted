@@ -1,0 +1,129 @@
+INSTALLATION INSTRUCTIONS
+=========================
+
+The instructions are basically as per any Perl distribution.
+
+
+INSTALLING AUTOMATICALLY
+------------------------
+
+The easiest way to install is via CPAN, CPANPLUS or cpanminus:
+
+CPAN:
+
+    % perl -MCPAN -e shell                    [as root]
+    > install Labyrinth-Plugin-Survey
+    > quit
+
+CPANPLUS:
+
+    % cpanp
+    > i Labyrinth-Plugin-Survey
+    > q
+
+cpanminus:
+
+    % cpanm Labyrinth-Plugin-Survey
+
+See your local documentation ('perldoc CPAN', 'perldoc CPANPLUS' or 
+'perldoc cpanm') for further instructions on setting up and configuring your
+chosen installer.
+
+
+OBTAINING THE MODULE
+--------------------
+
+The latest release version of Labyrinth-Plugin-Survey can be 
+downloaded from any CPAN site:
+
+    http://www.cpan.org/modules/by-authors/id/B/BA/BARBIE/
+    http://search.cpan.org/dist/Labyrinth-Plugin-Survey/
+
+The release is distributed as a gzipped tar archive file:
+
+    Labyrinth-Plugin-Survey-<version>.tar.gz
+
+where <version> represents the current version number, e.g. 0.01.
+
+To install the module, unpack the distribution archive to
+create an installation directory. Something like this:
+
+    tar zxf Labyrinth-Plugin-Survey-0.01.tar.gz
+
+or
+
+    gunzip Labyrinth-Plugin-Survey-0.01.tar.gz
+    tar xf Labyrinth-Plugin-Survey-0.01.tar
+
+You can then 'cd' into the directory created,
+
+    cd Labyrinth-Plugin-Survey-0.01
+
+
+INSTALLING MANUALLY
+-------------------
+
+The 'make install' (done later) will install the modules and scripts on
+your system. You may need administrator privileges to perform this task.
+Alternately you can install the module to a local directory (see
+ExtUtils::MakeMaker for full details), e.g.
+
+    % perl Makefile.PL PREFIX=/home/me/
+
+Don't forget to update your PERL5LIB environment variable if you do
+this, or add a line to your script to tell Perl where to find the files,
+e.g.
+
+    use lib qw( /home/me/lib/perl5/site_perl/5.6.0 );
+
+If you're not after a custom location, just do:
+
+    % perl Makefile.PL
+
+If you are lacking any of the prerequisite modules, running that
+program will tell you. All prerequisites are available from CPAN.
+
+When you have them all:
+
+    % make && make test
+
+If there are any failures, it's best if you contact me. It may help
+other people who have the same problem.  I don't tend to read the Perl
+newsgroups or PerlMonks, so it's no use posting there.
+
+When you report your trouble, be sure to send me the following
+information;
+    + result of `perl -V'
+    + output from 'make test' - ideally do 'make test TEST_VERBOSE=1 >& errs'
+
+Send those to bug-Labyrinth-Plugin-Survey@rt.cpan.org and I'll 
+get back to you as soon as I'm able.
+
+If it worked, then become root and type:
+
+    # make install
+
+Congratulations. You've just installed the Labyrinth-Plugin-Survey suite of 
+modules.
+
+
+INSTALLING ADDITIONAL FILES
+---------------------------
+
+In addition to the modules within this distribution, are a number of files
+used to provide the website functionality. This includes the template files,
+SQL statements to extend the existing phrasebook, dispatch table files,
+additional parameter validation and javascript files.
+
+All files can be copied directly into the appropriate directories within
+your website directories, except parserules.ini and phrasebook.ini, which
+need to be merged with existing files.
+
+At some point in the future an plugin installer will be available that will
+copy files to the appropriate directories and merge files where required.
+
+
+
+Cheers,
+Barbie.
+http://www.missbarbell.co.uk/

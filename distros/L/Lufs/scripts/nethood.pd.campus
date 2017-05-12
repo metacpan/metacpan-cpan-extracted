@@ -1,0 +1,378 @@
+$VAR1 = {
+          'KEESSERVER' => {
+                            'shares' => [
+                                          'htdocs',
+                                          'createch',
+                                          'kees',
+                                          'upload'
+                                        ],
+                            'ip' => '130.89.169.190'
+                          },
+          'MANIOSUS' => {
+                          'shares' => [
+                                        'pub',
+                                        'upload',
+                                        'maniac',
+                                        'nico'
+                                      ],
+                          'ip' => '130.89.165.179'
+                        },
+          'BLUBJE' => {
+                        'shares' => [
+                                      'info',
+                                      'leonoor',
+                                      'dvd-branden',
+                                      'MOVtoDIVX',
+                                      'dvd-admin',
+                                      'www',
+                                      'pub-up',
+                                      'mp3',
+                                      'archive',
+                                      'upload',
+                                      'root'
+                                    ],
+                        'ip' => '130.89.160.199'
+                      },
+          'LUUKB' => {
+                       'shares' => [
+                                     'Fun',
+                                     'Installs',
+                                     'Films',
+                                     'Ebooks',
+                                     'MP3',
+                                     'ISO'
+                                   ],
+                       'ip' => '130.89.162.5'
+                     },
+          'SIR5' => {
+                      'shares' => [],
+                      'ip' => ''
+                    },
+          'SXW' => {
+                     'shares' => [],
+                     'ip' => '130.89.162.1'
+                   },
+          'BOBJE' => {
+                       'shares' => [
+                                     'Private(pwd)',
+                                     'Upload',
+                                     'Films',
+                                     'Films-DVDR',
+                                     'Cabaret',
+                                     'Info',
+                                     'Series',
+                                     'Games',
+                                     'Install',
+                                     'Music',
+                                     'Charts'
+                                   ],
+                       'ip' => '130.89.163.90'
+                     },
+          'JOHANSCOMPUTER' => {
+                                'shares' => [
+                                              'SharedDocs',
+                                              'Shares'
+                                            ],
+                                'ip' => '130.89.162.163'
+                              },
+          'TERRORHEAD' => {
+                            'shares' => [
+                                          'Shared'
+                                        ],
+                            'ip' => '130.89.161.249'
+                          },
+          'LEVIATHAN' => {
+                           'shares' => [
+                                         'Films',
+                                         'Install',
+                                         'Upload'
+                                       ],
+                           'ip' => '130.89.170.65'
+                         },
+          'ERNIE-' => {
+                        'shares' => [],
+                        'ip' => '130.89.161.227'
+                      },
+          'JP' => {
+                    'shares' => [
+                                  'Games',
+                                  'Films',
+                                  'UPLOAD',
+                                  'Programma\'s',
+                                  'Muziek',
+                                  'TV'
+                                ],
+                    'ip' => '130.89.167.103'
+                  },
+          'DUSHWS1' => {
+                         'shares' => [],
+                         'ip' => '130.89.161.246'
+                       },
+          'FISHERMAN' => {
+                           'shares' => [
+                                         'FTP',
+                                         'ludo',
+                                         'dominic'
+                                       ],
+                           'ip' => '130.89.162.137'
+                         },
+          'BRAINS' => {
+                        'shares' => [
+                                      'share'
+                                    ],
+                        'ip' => '130.89.161.140'
+                      },
+          'KARL' => {
+                      'shares' => [
+                                    'mp3',
+                                    'ogg',
+                                    'clips',
+                                    'films'
+                                  ],
+                      'ip' => '130.89.160.166'
+                    },
+          'TOGUSA' => {
+                        'shares' => [],
+                        'ip' => ''
+                      },
+          'CHIHIRO' => {
+                         'shares' => [
+                                       'Anime',
+                                       'Info',
+                                       'nonymous login'
+                                     ],
+                         'ip' => '130.89.166.2'
+                       },
+          'BACATA' => {
+                        'shares' => [],
+                        'ip' => ''
+                      },
+          'PLAYA' => {
+                       'shares' => [
+                                     'pub',
+                                     'select31',
+                                     'nonymous login'
+                                   ],
+                       'ip' => '130.89.168.21'
+                     },
+          'ABCDEF' => {
+                        'shares' => [
+                                      'public'
+                                    ],
+                        'ip' => '130.89.166.63'
+                      },
+          'WWW' => {
+                     'shares' => [
+                                   'root'
+                                 ],
+                     'ip' => '130.89.175.2'
+                   },
+          'KING' => {
+                      'shares' => [
+                                    'Wave',
+                                    '3 ARE BANNED',
+                                    'Dance-info',
+                                    'Install',
+                                    '1 USERS WITH',
+                                    'Pictures',
+                                    'Movies',
+                                    'Subtitles',
+                                    'Trailers',
+                                    'on_cd',
+                                    'Mp3',
+                                    'Upload',
+                                    'Series',
+                                    '2 NO SHARES'
+                                  ],
+                      'ip' => '130.89.170.238'
+                    },
+          'REN' => {
+                     'shares' => [
+                                   'SharedDocs',
+                                   'movies',
+                                   'downloads',
+                                   'Printer2',
+                                   'Printer'
+                                 ],
+                     'ip' => '130.89.160.205'
+                   },
+          'HARMEN' => {
+                        'shares' => [
+                                      'kerstdiner',
+                                      'Isos',
+                                      'SharedDocs',
+                                      'Download',
+                                      'MP3'
+                                    ],
+                        'ip' => '130.89.168.192'
+                      },
+          'UUUH' => {
+                      'shares' => [
+                                    'SharedDocs',
+                                    'games',
+                                    'films',
+                                    'series'
+                                  ],
+                      'ip' => '130.89.165.130'
+                    },
+          'HARRY31' => {
+                         'shares' => [
+                                       'Losse mp3\'s'
+                                     ],
+                         'ip' => '130.89.162.3'
+                       },
+          'GRINCER' => {
+                         'shares' => [
+                                       'MP3'
+                                     ],
+                         'ip' => '130.89.160.209'
+                       },
+          'TOLWEG' => {
+                        'shares' => [
+                                      'webapps',
+                                      'nonymous login'
+                                    ],
+                        'ip' => '130.89.171.27'
+                      },
+          'HAMMERHEAD' => {
+                            'shares' => [],
+                            'ip' => ''
+                          },
+          'EUPHORIA' => {
+                          'shares' => [
+                                        '!Hello root@h',
+                                        'pub',
+                                        'Porno dicht',
+                                        'upload'
+                                      ],
+                          'ip' => '130.89.169.155'
+                        },
+          'LANFEAR' => {
+                         'shares' => [
+                                       'Upload',
+                                       'Musica',
+                                       'Enterprise',
+                                       '24',
+                                       'Films'
+                                     ],
+                         'ip' => '130.89.163.84'
+                       },
+          'KEUKENKIST' => {
+                            'shares' => [],
+                            'ip' => '130.89.161.246'
+                          },
+          'MANIA' => {
+                       'shares' => [],
+                       'ip' => ''
+                     },
+          'REPUS' => {
+                       'shares' => [
+                                     'Mijn muziek',
+                                     'Share'
+                                   ],
+                       'ip' => '130.89.160.202'
+                     },
+          'PHAETON' => {
+                         'shares' => [
+                                       'SharedDocs',
+                                       'Upload',
+                                       'FINEPRT5',
+                                       'Shares',
+                                       'Printer Bart'
+                                     ],
+                         'ip' => '130.89.184.196'
+                       },
+          'DUSH' => {
+                      'shares' => [],
+                      'ip' => '130.89.161.246'
+                    },
+          'DROPJE' => {
+                        'shares' => [
+                                      'netlogon',
+                                      'profiles',
+                                      'nonymous login'
+                                    ],
+                        'ip' => '130.89.175.15'
+                      },
+          'ZEUS' => {
+                      'shares' => [
+                                    'kingpin',
+                                    'mp3',
+                                    'Upload',
+                                    'ISO'
+                                  ],
+                      'ip' => '130.89.161.247'
+                    },
+          'IOREK1' => {
+                        'shares' => [
+                                      'SharedDocs',
+                                      'Share'
+                                    ],
+                        'ip' => '130.89.164.199'
+                      },
+          'NDR' => {
+                     'shares' => [
+                                   'MP3',
+                                   'FILMS',
+                                   'STAGE 2',
+                                   'STAGE'
+                                 ],
+                     'ip' => '130.89.165.12'
+                   },
+          'ROOT66' => {
+                        'shares' => [
+                                      'muziek',
+                                      'bigband',
+                                      'root66',
+                                      'nonymous login'
+                                    ],
+                        'ip' => '130.89.166.246'
+                      },
+          'DUCKMAN-TM' => {
+                            'shares' => [
+                                          'public',
+                                          'upload',
+                                          'flat',
+                                          'flatpage',
+                                          'ellen',
+                                          'wil',
+                                          'flatupload',
+                                          'brabant',
+                                          'schijf4',
+                                          'vliegtuigen',
+                                          'cdrom'
+                                        ],
+                            'ip' => '130.89.161.232'
+                          },
+          'SUUS' => {
+                      'shares' => [
+                                    'ff',
+                                    'mm',
+                                    'nonymous login'
+                                  ],
+                      'ip' => '130.89.169.108'
+                    },
+          'THIBATS' => {
+                         'shares' => [
+                                       'public'
+                                     ],
+                         'ip' => '130.89.166.63'
+                       },
+          'OMOIKANE' => {
+                          'shares' => [],
+                          'ip' => ''
+                        },
+          'CYCLOPS' => {
+                         'shares' => [
+                                       '!!Hey hoeresl',
+                                       'Upload',
+                                       'ancient',
+                                       'bata',
+                                       'bazmail',
+                                       'amwo',
+                                       'samsam',
+                                       'dump'
+                                     ],
+                         'ip' => '130.89.162.135'
+                       }
+        };

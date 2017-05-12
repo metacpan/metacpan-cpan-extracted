@@ -1,0 +1,68 @@
+<lemonconfig>
+<menu>
+
+     <rubrique id="rb1"
+               name="Applications DGI/DGCP">
+          <appli id="OCT"
+                 name="Intranet commun DGI/DGCP"
+                 url="http:/icc.int.appli.cp/icc/index.php"
+                 >
+          </appli>
+          <appli id="cpc"
+                 name="CPC"
+                 url="http://lancelotcpc.appli.cp/cpc/init.php"
+                 >
+          </appli>
+     </rubrique>
+
+
+<rubrique id="rb2"
+               name="Applications DGCP">
+
+<appli id="Cipex"
+                 name="CIPEX"
+                 url="http://cpausterlitz.bercy.cp/perl/ext/cipex2.pl">
+
+          </appli>
+<appli id="HEL"
+                 name="Application HELIOS3"
+                 url="http://vscpthelios3.appli.cp/"
+                 >
+          </appli>
+
+<appli id="CDR"
+                 name="CADRAN"
+                 url="http://cpcadran.appli.cp/dev/cadran/BDF_MENU_GENERAL.php">
+
+          </appli>
+
+<appli id=""
+                 name="MAG"
+                 url="http://magellan"
+                 >
+          </appli>
+</rubrique>
+</menu>
+<domain    name="appli.cp"
+           cookie=".appli.cp"
+           path ="/"
+           templates_dir="/opt/apache/portailtest/templates"
+           templates_options =  "ABSOLUTE     => '1', INCLUDE_PATH => 'templates_dir'"
+           login ="http://cpportail.appli.cp/portailtest/accueil_obj.pl"
+           menu= "http://cpportail.appli.cp/portailtest/application_new.pl"
+           ldap_server ="10.75.1.22"
+           ldap_port="389"
+           DnManager= "cn=Directory Manager"
+           passwordManager="menaga34"
+           ldap_branch_people="ou=mefi,o=gouv,c=fr"
+           session="memcached"
+          >
+</domain>
+<cache type="IPC"  name="CONF" ttl="1000">
+</cache>
+<session    name="memcached" 
+            type="memcached"
+            servers="['10.69.247.30:11211']">
+</session>
+
+</lemonconfig>

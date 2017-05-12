@@ -1,0 +1,9 @@
+Revision history for Perl extension Lingua::NO::Num2Word.
+
+0.011 Wed Jun 16 15:21:26 2004
+      Removed use of 5.8.2 hard in Makefile.PL. Thanks to Richard Jelinek at Petamem for pointing this out.
+
+0.01  Sun Jun 13 20:25:05 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n Lingua::NO::Num2Word
+

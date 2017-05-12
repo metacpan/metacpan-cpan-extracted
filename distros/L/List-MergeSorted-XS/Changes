@@ -1,0 +1,22 @@
+Revision history for Perl extension List::MergeSorted::XS
+
+1.06  Thu May  9 14:25:05 PDT 2013
+    - Fix parameter name in synopsis. Thanks Yauheni Kryudziuk.
+1.05  Thu Apr 21 12:47:54 PDT 2011
+    - use hash of seen unique values instead of comparing to last to fix corner
+      case where duplicated elements that compare the same but have different
+      unique values may not be deduped correctly
+    - fix use of forced-algorithm in test
+1.04  Tue Mar 15 00:37:22 PDT 2011
+    - use merge's parameter hash instead of package variable for forcing algorithm
+    - pod improvements
+1.03  Tue Dec 14 13:23:24 PST 2010
+    - fix incorrectly spelled instances of uniq_cb
+1.02  Tue Dec 14 11:25:46 PST 2010
+    - fix mis-merged code in _merge
+    - speed up auto codepath by counting elements in XS and not using division
+1.01  Mon Dec 13 21:29:18 PST 2010
+    - add support for deduplication of elements
+    - rename things and rejigger internals
+1.00  Wed Dec  8 13:50:07 PST 2010
+	- initial version

@@ -1,0 +1,26 @@
+ARTISTIC-1.0
+Changes
+GPL-1
+lib/List/MoreUtils.pm
+lib/List/MoreUtils/Contributing.pod
+lib/List/MoreUtils/PP.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/lib/LMU/Test/ab.pm
+t/lib/LMU/Test/Functions.pm
+t/lib/LMU/Test/Import.pm
+t/lib/LMU/Test/XS.pm
+t/lib/Test/LMU.pm
+t/LICENSE
+t/pureperl/ab.t
+t/pureperl/Functions.t
+t/pureperl/Import.t
+t/pureperl/XS.t
+t/xs/ab.t
+t/xs/Functions.t
+t/xs/Import.t
+t/xs/XS.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

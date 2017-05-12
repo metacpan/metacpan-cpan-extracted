@@ -1,0 +1,32 @@
+---
+abstract: 'Pidfile handling to help control processes.'
+author:
+  - 'Dominik Schulz <dominik.schulz@gauner.org>'
+build_requires:
+  Test::MockObject::Universal: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Linux-Pidfile
+requires:
+  Carp: 0
+  File::Blarf: 0
+  Log::Tree::RequiredLogger: 0
+  Moose: 0
+  feature: 0
+  mro: 0
+  namespace::autoclean: 0
+  perl: 5.010_000
+resources:
+  bugtracker: https://github.com/gittex/Linux-Pidfile/issues
+  repository: git://github.com/gittex/Linux-Pidfile.git
+version: 0.16
+x_authority: cpan:TEX

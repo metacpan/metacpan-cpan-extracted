@@ -1,0 +1,79 @@
+char * format					T_PTROBJ
+jit_abi_t					T_ENUM
+jit_block_t					T_PTROBJ
+jit_closure_func				T_PTROBJ
+jit_closure_va_list_t				T_PTROBJ
+jit_constant_t					T_OPAQUE_STRUCT
+jit_constant_t *				T_PTROBJ
+jit_context_t					T_PTROBJ
+jit_crawl_mark_t *				T_PTROBJ
+jit_debugger_breakpoint_id_t			T_IV
+jit_debugger_breakpoint_info_t			T_PTROBJ
+jit_debugger_event_t *				T_PTROBJ
+jit_debugger_hook_func				T_PTROBJ
+jit_debugger_t					T_PTROBJ
+jit_debugger_thread_id_t			T_IV
+jit_exception_func				T_PTROBJ
+jit_float32					T_FLOAT
+jit_float64					T_DOUBLE
+jit_function_t					T_PTROBJ
+jit_insn_iter_t *				T_PTROBJ
+jit_insn_t					T_PTROBJ
+jit_int						T_IV
+jit_int *					T_PTROBJ
+jit_intrinsic_descr_t *				T_PTROBJ
+jit_label_t					T_UV
+jit_label_t *					T_OPAQUEPTR
+jit_long					T_IV
+jit_long *					T_PTROBJ
+jit_memory_manager_t				T_PTROBJ
+jit_meta_free_func				T_PTROBJ
+jit_meta_t					T_PTROBJ
+jit_meta_t *					T_PTROBJ
+jit_nfloat					T_NV
+jit_nint					T_IV
+jit_nuint					T_UV
+jit_nuint *					T_OPAQUEPTR
+jit_objmodel_t					T_PTROBJ
+jit_on_demand_driver_func			T_PTROBJ
+jit_on_demand_func				T_PTROBJ
+jit_prot_t					T_PTROBJ
+jit_readelf_t					T_PTROBJ
+jit_readelf_t *					T_PTROBJ
+jit_stack_trace_t				T_PTROBJ
+jit_type_t					T_PTROBJ
+jit_type_t *					T_PTROBJ
+jit_uint					T_UV
+jit_uint *					T_PTROBJ
+jit_ulong					T_UV
+jit_ulong *					T_OPAQUEPTR
+jit_unwind_context_t *				T_PTROBJ
+jit_value_t					T_PTROBJ
+jit_value_t *					T_PTROBJ
+jit_writeelf_t					T_PTROBJ
+jitom_class_t					T_PTROBJ
+jitom_class_t *					T_PTROBJ
+jitom_field_t					T_PTROBJ
+jitom_field_t *					T_PTROBJ
+jitom_method_t					T_PTROBJ
+jitom_method_t *				T_PTROBJ
+unsigned int *					T_PTROBJ
+void **						T_PTROBJ
+#############################################################################
+INPUT
+T_OPAQUE_STRUCT
+	if (sv_derived_from($arg, \"${ntype}\")) {
+	    STRLEN len;
+	    char  *s = SvPV((SV*)SvRV($arg), len);
+
+	    if (len != sizeof($var))
+		croak(\"Size %d of packed data != expected %d\",
+			len, sizeof($var));
+	    $var = *($type *)s;
+	}
+	else
+	    croak(\"$var is not of type ${ntype}\")
+#############################################################################
+OUTPUT
+T_OPAQUE_STRUCT
+	sv_setref_pvn($arg, \"${ntype}\", (char *)&$var, sizeof($var));

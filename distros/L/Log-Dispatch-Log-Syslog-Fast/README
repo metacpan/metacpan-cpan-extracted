@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Log-Dispatch-Log-Syslog-Fast,
+version 1.02:
+
+  Log::Dispatch wrapper around Log::Syslog::Fast
+
+This software is copyright (c) 2012 by Adam Thomason.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

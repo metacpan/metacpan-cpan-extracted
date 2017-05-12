@@ -1,0 +1,27 @@
+---
+abstract: 'Dispatch log events to HipChat'
+author:
+  - 'Robin Clarke <robin@robinclarke.net>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Dispatch-HipChat
+requires:
+  JSON::XS: 0
+  Log::Dispatch::Output: 0
+  Params::Validate: 0
+  Try::Tiny: 0
+  WebService::HipChat: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/robin13/Log-Dispatch-HipChat
+version: 0.0007

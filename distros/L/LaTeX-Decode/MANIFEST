@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/LaTeX/Decode.pm
+lib/LaTeX/Decode/Data.pm
+bin/latex2utf8
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/decode.t
+META.yml
+META.json

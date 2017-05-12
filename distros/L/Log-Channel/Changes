@@ -1,0 +1,21 @@
+Revision history for Perl extension Log::Channel
+
+0.5   12 Aug 2002
+	- Added Log::Channel::Config, bumped to 0.6; test suite
+	- Configuration should apply to new channels created
+	later, and should handle hierarchy correctly.
+
+0.5   12 Jul 2002
+	- cleaned up internal configuration data structure
+	- merged 'package' and 'topic' into single 'topic'
+	- don't create duplicate channels for same topic
+	- more tests
+	- decoration format string like log4j
+	- commandeering of carp/croak should apply to all subpackages
+
+0.4   28 Jan 2002
+	- added 'commandeer' function
+	- consolidated internal data structures
+
+0.3   22 Jan 2002
+	- created.

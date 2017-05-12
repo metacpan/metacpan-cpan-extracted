@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+#=============================================================================
+# Rotation of OpenID Connect keys
+#
+# This module is written to be used by cron to rotate keys.
+#
+# This is part of LemonLDAP::NG product, released under GPL
+#=============================================================================
+
+use strict;
+
+use Convert::PEM;
+use Crypt::OpenSSL::RSA;
+use Lemonldap::NG::Common::Conf;
+use String::Random qw(random_string);
+
+my $debug = 0;
+
+#=============================================================================
+# Load configuration
+#=============================================================================
+my $lmconf = Lemonldap::NG::Common::Conf->new()
+  or die $Lemonldap::NG::Common::Conf::msg;
+my $conf = $lmconf->getConf();
+
+print "Configuration loaded\n" if $debug;
+
+#=============================================================================
+# Generate new key
+#=============================================================================
+my $rsa    = Crypt::OpenSSL::RSA->generate_key(2048);
+my $key_id = random_string("ssssssssss");
+my $keys   = {
+    'private' => $rsa->get_private_key_string(),
+    'public'  => $rsa->get_public_key_x509_string(),
+    'id'      => $key_id,
+};
+
+print "Private key generated:\n" . $keys->{private} . "\n" if $debug;
+print "Public key generated:\n" . $keys->{public} . "\n"   if $debug;
+print "Key ID generated: " . $keys->{id} . "\n"            if $debug;
+
+#=============================================================================
+# Save configuration
+#=============================================================================
+$conf->{cfgAuthor} = 'Key rotation script';
+
+$conf->{oidcServicePrivateKeySig} = $keys->{private};
+$conf->{oidcServicePublicKeySig}  = $keys->{public};
+$conf->{oidcServiceKeyIdSig}      = $keys->{id};
+
+$lmconf->saveConf($conf) or die $Lemonldap::NG::Common::Conf::msg;
+
+print "Configuration saved\n" if $debug;
+
+exit 0;

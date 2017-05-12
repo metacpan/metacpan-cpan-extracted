@@ -1,0 +1,41 @@
+[% INCLUDE "public/tinymce.html" %]
+
+<h2>Newsletter Edit</h2>
+
+[% IF thanks %]<p>Presentation saved successfully.</p>[% END %]
+<p>Fields marked * are mandatory fields and must be completed.</p>
+
+[% IF errmess %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+[% IF errmess == 2 %]
+<p class="alert">Please note that the title must be unqiue.</p>
+[% END %]
+[% END %]
+
+<form method=post action="[% cgipath %]/pages.cgi" name="EDIT" enctype="multipart/form-data">
+<input type="hidden" name="act" value="zine-save" />
+<input type="hidden" name="doaction" value="" />
+
+[% nomove = 1 ; show.snippet = 1 %]
+[% INCLUDE "articles/arts-adminblock.html" %]
+
+</form>
+
+<!--
+<h2>Preview</h2>
+
+[% IF preview.data.snippet %]
+<div class="boxer">
+<table class="blocker">
+<tr><th>[% preview.data.title %]</th></tr>
+<tr><td>
+[% IF preview.data.link %]<img class="inline" src="[% webpath %]/[% preview.data.link %]" [% IF item.resize %]width="100"[% END %] alt="[% preview.data.tag %]" align="right" style="padding:0 0px 0 4px" />[% END %]
+[% preview.data.snippet %] ... <a href="[% cgipath %]/pages.cgi?act=arts-main&amp;name=[% preview.data.quickname %]" title="read more about [% preview.data.title %]"><i>more</i></a>
+    </td></tr>
+</table>
+</div>
+[% END %]
+
+[% article = preview %]
+[% INCLUDE "articles/arts-item.html" %]
+-->

@@ -1,0 +1,104 @@
+#!/usr/bin/perl -w
+# Time-stamp: <2010-05-14T16:39:18 mxp>
+# Copyright © 2000 Michael Piotrowski.  All Rights Reserved.
+
+=head1 NAME
+
+trainlid - build transition matrix for Lingua::Ident module
+
+=head1 SYNOPSIS
+
+B<trainlid> [-s] I<language_name> < I<training_text> > I<matrix_file>
+
+=head1 DESCRIPTION
+
+B<trainlid> builds a trigram transition matrix for use with the
+B<Lingua::Ident> module.  It reads a training text from standard input
+and outputs a transition matrix with the specified I<language_name> as
+identifier to standard output.
+
+It is recommended that I<language_name> be a POSIX locale name
+constructed from an ISO 639 2-letter language code, possibly extended
+by an ISO 3166 2-letter country code and a character set
+identifier. Example: B<de_DE.iso88591>.
+
+The following options are available:
+
+=over 4
+
+=item B<-s>	Do not print statistics after building the language model.
+
+=back
+
+=head1 AUTHOR
+
+B<trainlid> was developed by Michael Piotrowski <mxp@dynalabs.de>.
+
+=head1 SEE ALSO
+
+Lingua::Ident(3)
+
+=cut
+
+###############################################################################
+
+require 5.004;
+use Getopt::Std;
+
+our $opt_s;   # silent
+
+getopts("s");
+
+while(defined($c = getc))
+{
+   $c =~ s/[\x00-\x1F\x21-\x40\x7B-\x7F]/ /og;
+   $c =  lc($c);
+
+   push @chars, $c;
+   $alphabet{$c} = "";
+
+   $chars = join "", @chars;
+   $chars =~ s/ +/ /og;
+   @chars = split //, $chars;
+
+   $nc++;
+
+   if(@chars == 3)
+   {
+      $trigram = join("", @chars);
+      $matrix{$trigram}++;
+      $bigrams{substr($trigram, 0, 2)}++;
+
+      shift @chars;
+   }
+}
+
+
+$size_of_alphabet = keys(%alphabet);
+print STDERR "alphabet: ", sort(keys(%alphabet)), "\n" unless $opt_s;
+undef %alphabet;
+
+while(($trigram, $count) = each(%matrix))
+{
+    $prob = ($count + 1)/
+	($bigrams{substr($trigram, 0, 2)} + $size_of_alphabet);
+
+    $matrix{$trigram} = $prob;
+}
+
+print "_LANG:", $ARGV[0], "\n";
+print "_NULL:", 1 / $size_of_alphabet, "\n";
+print "#ALPH:$size_of_alphabet\n";
+
+while(($key, $val) = each(%matrix))
+{
+    print "$key:$val\n";
+}
+
+while (($key, $val) = each %bigrams)
+{
+   print "$key;", $val + $size_of_alphabet, "\n";
+}
+
+print STDERR "size of alphabet: $size_of_alphabet\n" unless $opt_s;
+print STDERR "chars total: $nc\n" unless $opt_s;

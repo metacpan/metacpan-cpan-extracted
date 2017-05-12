@@ -1,0 +1,54 @@
+Log::Log4perl::Appender::Fluent
+
+Log::Log4perl appender writing to Fluentd.
+
+Good logging requires today a lot more than in Good Ol' Times[tm]. Each log
+entry should have a structure and be machine-parseable. On the other hand,
+there are lot of logging libraries that don't quite support structured logs
+and only process flat strings.
+
+Log::Log4perl::Appender::Fluent is a Log::Log4perl appender plugin that
+provides output to Fluentd daemon. The plugin supports sending simple string
+messages, but it works way better when is provided with Log::Message::JSON or
+Log::Message::Structured object, because the structure of the message will be
+preserved.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Log::Log4perl::Appender::Fluent
+
+You can also look for information at:
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Log-Log4perl-Appender-Fluent
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Log-Log4perl-Appender-Fluent
+
+    Search CPAN
+        http://search.cpan.org/dist/Log-Log4perl-Appender-Fluent/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Stanislaw Klekot
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

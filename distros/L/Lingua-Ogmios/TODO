@@ -1,0 +1,172 @@
+ bin
+ Build.PL
+ Changes
+ etc
+ examples
+ INSTALL
+ lib
+ LICENSE
+ Makefile.PL
+ MANIFEST
+ README
+ t
+
+
+print Config Variables
+
+document : 
+
+
+Ogmios::Config.pm :
+
+ complete the configuration printing (sub print and _print...)
+
+Omgios.pm :
+
+ sub loadDocuments : 
+   . load several Alvis XML documents together or not
+   . load directory (management of a spool)
+   . load XML documents, non Alvis format
+   . load non XML documents
+
+
+annotation
+
+DONE 1. Loading Configuration of the tools from a Ogmios config  file or a specific one
+
+-> Add required levels in the configuration
+
+DONE 2. Defining or loading organization of the processing from a Ogmios file
+
+-> link to do betweend processing and enabled annotations
+
+3. Defining or loading organization of the processing while running (interactive way)
+
+-> 3. defining a function for nlp processing a document or a set of documents (in the Ogmios.pm file)
+
+4. defining wrapper for Parsing, anaphora resolution
+
+-> Language identification
+
+-> Checking that the wrapper exists
+
+
+xmllint --noout --schema ~/Recherche/Program/Ogmios2/Lingua-Ogmios/etc/ogmios/xsd/enriched-document.xsd 
+
+------------------------------------------------------------------------
+
+ perl -w -Iblib/lib -Iblib/arch t/6-LignuisticProcessing.t
+ perl -w -Ilib t/6-LignuisticProcessing.t  
+ prove -l t/6-LinguisticProcessing.t
+
+------------------------------------------------------------------------
+
+# TODO Check the alignment with sections in TagEN
+
+# put the tool/wrapper Id at the definition level of the tool/wrapper in the configuaraiton file
+
+function/scripts to purge the temporary files and log file
+
+Check Tagen wrapper for french
+
+if there is no point at the end of sentence which is at the end of section (with seperator token), remove sep token
+
+------------------------------------------------------------------------
+
+put all information about token type at the Token Level ou in the
+annotation.pm (currently it is spread in docmuentRecord and token.pm)
+
+------------------------------------------------------------------------
+
+When a lemma, MSfeatures, etC. is addeed check that it is the right object
+
+------------------------------------------------------------------------
+
+Wrappers : 
+
+  Yatea
+  Faster
+  LinkGrammarParser
+  BioLG
+  Bayaphore
+  Flemm
+
+------------------------------------------------------------------------
+
+Add log_id to levels
+
+------------------------------------------------------------------------
+
+use autoload in the module 
+
+------------------------------------------------------------------------
+
+check log information
+
+------------------------------------------------------------------------
+
+no standard output for basic sentence segmentizer
+
+------------------------------------------------------------------------
+
+? modifiy the DTD and the code to accept a mix list of words, phrases,
+tokens as reference of a term ?
+
+------------------------------------------------------------------------
+========================================================================
+
+Problem with Multidocument processing
+  TagEN
+
+ Faster
+ Lexical inclusion
+ SynoTerm
+
+------------------------------------------------------------------------
+
+Scripts for removing log and temporary files
+
+
+Change the reference for the nlp the definition of the NLP line and in
+the definition of the NLP Wrapper (use of an id)
+
+Word Segmentation : transforme the UTF8 coded quote as quote "'" ?
+
+sometimes section recignition goes on too deep recursion (see CS collection)
+
+------------------------------------------------------------------------
+
+review the term referencement : it is potentially impossible to
+rebuild the term form from the reference (to check)
+
+------------------------------------------------------------------------
+
+when loading a level, check if the level exists for each document, not
+just for the first and assuming that all the doucment, it is the same.
+
+
+------------------------------------------------------------------------
+
+POS Tagging and Lemmatisation, if one of the two levels already
+exists, load it and take into account the annotation of the other.
+
+------------------------------------------------------------------------
+
+Word segmentation in French : taking into account the hyphenation, apostrophe
+
+------------------------------------------------------------------------
+
+Number of elements to be computed after the last processing
+
+------------------------------------------------------------------------
+
+\p{Space} => 26 diffrents possible characters ???
+
+------------------------------------------------------------------------
+
+Add the out_stream in the wrappers
+
+------------------------------------------------------------------------
+
+
+compute a position in the text for each element

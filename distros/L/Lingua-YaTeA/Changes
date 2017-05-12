@@ -1,0 +1,127 @@
+Revision history for Perl extension Lingua::YaTeA.
+
+0.622   - Correction of the input if the format is not correct (either
+          incorrect lines are removed, either they are corrected)
+        - Correction in the processing of the testified terms (if the
+          option "TT-for-BioLG" is not set, yatea is usuable).
+        - Add a module dependency for the configuration
+        - Take into account the prefix for the configuration file
+
+0.621   - Add the installation of the FR-Flemm files (which have been
+          forgot before:-(
+        - Add pod directive "=encoding utf8" to manage utf8 encoding
+
+
+0.62    - better management of argument in the script yatea
+	- Correction in utf8 use directive to avoid failure with CPAN
+          tests
+	- correction deprecated code in IndexSet (defined @array)
+
+0.61    - Add use utf8 in the script yatea to avoid failure with CPAN
+          tests
+        - Minor correction in the documentation of the main module
+
+0.6     
+        - Add of installation tests 
+        - Add of examples for French
+        - Integration of the MIG corrections (Node, Testified terms)
+        - Correction in the forbidden structure management (split
+          action)
+        - Add NEXT.pm in the pre-required module list
+        - UTF-8 is used as charset for both configuration files and
+          texts to process
+        - Integration of attested terms (in a bracketed format, can be
+          produced by the bootstrap option)
+        - Option "bootstrap" to generate an output in a bracketed
+          format. This output can be used as a attested resource on a
+          other corpus
+        - Add a defined test in the function appendInclude (but it
+          seems there is still a bug on tree building).
+        - Monolexical term occurrences are identified as MNP when the
+          monolexical oprion is set
+        - Addition of a config set for French based on the POSTagger
+          Flemm (which uses the Multex tagset) and modification of the
+          read method in Corpus.pm (addition opf the parameter
+          language) to normalisze the input (correction of the output
+          of Flemm)
+	- Correction in the input normalization for Flemm
+        - Each printing function can now print results on stdout 
+        - Replace ':' as tag by 'COLUMN'
+        - Add of some Chunking Frontiers as '('
+	- Only the tag is taken into account for sentence_boundary
+          detection
+	- Add Weights section to the DTD and in the XML rendering
+	- Correction: TF-IDF based ranking method is a DDW ranking
+	- Add ROOT as a reference to the term in which the current
+          term is nested
+        - Addition of several term weighting and selection measures
+          (C-Value and variations, iLong, ilnc, iLong, and term
+          autonomy)
+        - Add the status of the term candidate (0 : not a term, 1 :
+          term). By default, term candidate are terms
+        - Add a option for term output style to print only term
+          candidate having the status of term
+        - colors of the terms in the HTML output can be parametrized
+          (option file, options PARSED_COLOR and UNPARSED_COLOR)
+	- new function for printing only list of candidate terms
+          without XML header
+        - Addition of the option XML-corpus-raw, rendering the corpus
+          in XML format with terms. Documents and sentences are
+          identified in the XML files.
+
+
+0.5     - Minor correction in the installation process
+        - for some OS, Config::General returns while setting variables
+          as yatea.rc is on read-inly mode
+
+0.4     - use warnings in all the files
+        - correction of minor bugs
+        - control of the input type in Node.pm,  NodeSet.pm, Tree.pm
+        - bug fix in Tree.pm (method
+          completeDiscontinuousNodes). Initialisation of
+          a variable
+        - carriage returns are deleted in the loaded files (module
+          ForbiddenStructureSet.pm, method CleanInfo, and module
+          ChunkingDataSet.pm, method LoadData,Corpus.pm:WrapBlocks)
+	- addition of the option "TC_MAXIMUM_LENGTH" to allow to limit
+          the length of the extracted term candidates (set in
+          configuration file Options, default is 12 words)
+	- homogeneisation of sub-trees attachement
+	- addition of a TF-IDF based ranking method for extracted term
+          candidates
+        - Workaround for a missing feature in Module::Info : if no
+          prefix is set while running "perl Build.PL", additionnal
+          directories 'etc' and 'conf' are not installed (or well installed)
+        - Modification of Makefile.PL to use the Module::Build (it
+          should be a CPAN.pm-compatible distribution)
+	- Variables CONFIG_REP, LOCALE_REP, RESULT_REP (yatea.rc) are
+          renamed CONFIG_DIR, LOCALE_DIR, RESULT_DIR respectively. 
+	- Variables CONFIG_DIR, LOCALE_DIR, RESULT_DIR (yatea.rc) are
+          automatically set, while the configuration (in Build.PL)
+        - The location of the rc file (yatea.rc) is automatically set,
+          while the configuration (in Build.PL)
+	- documentation of the module TagSet.pm, File.pm and FileSet.pm
+	- Corrections in the LICENSE file
+
+0.3     - removing the .config file
+        - bug fix: check in the hook_node is defined in Node.pm
+        - replacement of the use of the Parse::Lex module by a
+	  module generated from Parse::Yapp
+        - addition of examples in the YaTeA PM
+        - correction of a bug when calculating the offset of the end
+	  char in component of term (especially the left components)
+        - in parseProgressively, taking into account that the unparsed
+	  array can be empty
+
+
+0.2     - correction of bugs (or temporary workaround) in the
+          tree/node management
+        - Removing the file Config.pm (no more necessary)
+          and from Makefile.PL
+        - YaTeA.pm has been moved in Lingua (before it was in Lingua/YaTeA)
+        - Addition of a Build.PL file        
+	- addition of POD tests (pod.t, pod-coverage.t)
+
+0.1  
+	- Version of YaTeA with a CPAN configuration
+

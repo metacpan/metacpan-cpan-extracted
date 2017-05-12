@@ -1,0 +1,53 @@
+{
+   "abstract" : "count the number of syllables in English words",
+   "author" : [
+      "Greg Fast <gdf@imsa.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lingua-EN-Syllable",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::EN::Syllable" : {
+         "file" : "lib/Lingua/EN/Syllable.pm",
+         "version" : "0.30"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Lingua-EN-Syllable",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Lingua-EN-Syllable.git",
+         "web" : "https://github.com/neilb/Lingua-EN-Syllable"
+      }
+   },
+   "version" : "0.30"
+}
+

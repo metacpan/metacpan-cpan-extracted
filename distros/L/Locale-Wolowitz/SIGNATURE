@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 819c10377c4e29dedb1efbc894ac7c22c0d01b02 Changes
+SHA1 8e69a79e875a1aaead594bb0d74cbef0351c3b1f INSTALL
+SHA1 062871100d8097d0f764471ee3465d2cb30dcc11 LICENSE
+SHA1 f4700321fc8b3721b6441b8e748275eda3315dbe MANIFEST
+SHA1 5ae90dd82f92c31131910e10f3362bb1dd834d0d MANIFEST.SKIP
+SHA1 0012b9829100f988ab66ca147497460dd42afd12 META.json
+SHA1 88a1d69c0c4247063c41f7a9f5cdeef480baa886 META.yml
+SHA1 b700ee07f86e559a4294808ef90d284ac08f6a7a Makefile.PL
+SHA1 a387496d13a9984c0870d972e044895fdf1bdd5c README
+SHA1 b5f65f9461cbdeaa1ea103ed363a57a537fe0cba README.md
+SHA1 c8059024206e7eeb90e1fee74821b0f9eb584827 dist.ini
+SHA1 0a360cd86df662175ceef61a0aeda647c55618d1 lib/Locale/Wolowitz.pm
+SHA1 c45c7df44f4f86c73860c00384d1c5c94e42dd53 t/00-load.t
+SHA1 d76d65529e9ab116419d3880120cc2d36efb9de1 t/01-dir.t
+SHA1 3c5a7f424de5135ea75bf4ceb9525449f0110b0b t/02-file.t
+SHA1 393fcb8be6cdcb8cd9b5921a35a7ef8c4987d269 t/03-direct.t
+SHA1 9cc7c5f4c437f1a4132c24c15617cb4c0b0e44cb t/04-loc-for.t
+SHA1 f5137df0af78c3e5042317358aa4f0248c01a413 t/05-more-than-ten.t
+SHA1 f52ede6af79ff5734be5f9555ac64a7bf3933229 t/i18n/i18n.coll.json
+SHA1 4ac0c83266903c79a514a85b78fbec21750cabe1 t/i18n/rev_en.json
+SHA1 560bc7c1ce955fdadf9d04b117f7e9db8c9220ff t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+
+iHUEAREIAB0WIQTYtJGMHsdqxHuiCD1rg4dAAUzXRwUCWJjfWgAKCRBrg4dAAUzX
+R+jqAQCROMXtJlYT6lw2ZEjxpQjJmL3+Cu5Hjrx4HBdOEY6mBwD/TOTRMtRMTH9E
+8tWf4k8Lg0RgnI+shh70Ti4RmX0YUfM=
+=vGib
+-----END PGP SIGNATURE-----

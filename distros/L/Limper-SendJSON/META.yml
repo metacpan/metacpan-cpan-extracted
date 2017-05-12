@@ -1,0 +1,28 @@
+---
+abstract: 'adds a send_json function to Limper'
+author:
+  - 'Ashley Willis <ashley+perl@gitable.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Limper-SendJSON
+provides:
+  Limper::SendJSON:
+    file: lib/Limper/SendJSON.pm
+    version: 0.003
+requires:
+  JSON::MaybeXS: 0
+  Limper: 0.012
+  Try::Tiny: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://gitable.org/ashley/limper-sendjson.git
+version: 0.003

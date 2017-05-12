@@ -1,0 +1,11 @@
+Sing proudly the tale of Lingua::tlhInganHol::yIghun!
+
+20090601  Mon Jun  1 12:48:23 PDT 2009
+  * Remove the weak and ineffectual Makefile.PL!
+  * Update the README!
+  * We will not coddle the weak perl 5.6.x any longer!
+
+
+20090530  Sat May 30 13:55:26 PDT 2009
+  * Lingua::tlhInganHol::yIghun escapes its captor, Damian Conway,
+    and releases itself to CPAN!

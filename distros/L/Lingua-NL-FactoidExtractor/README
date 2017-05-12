@@ -1,0 +1,43 @@
+Lingua-NL-FactoidExtractor version 1.4
+======================================
+
+This module extracts structured facts (factoids) from running text. A factoid is a tuple 
+of four elements: subject, verb, object and modifiers, in which the verb has been 
+lemmatized and the object and modifier slots may be empty. As input, the factoid 
+extractor takes text that has been syntactically parsed with the Dutch parser Alpino. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+USAGE
+
+The script example.pl in this distribution illustrates the use of the module.
+
+DEPENDENCIES
+
+This module requires the Dutch Alpino-parser. Alpino is available under the 
+conditions of the Gnu Lesser General Public License. 
+See http://www.let.rug.nl/vannoord/alp/Alpino/
+
+KNOWN ISSUES
+
+If punctuation such as a full stop or a comma is glued to a word in the Alpino 
+output then this punctuation also ends up in the factoids extracted from the 
+sentence. Work-around is to use a tokenizer that separates punctuation from 
+words by whitespace before parsing the sentence.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Suzan Verberne
+
+This library is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself, either Perl version 5.10.1 or, at your option, 
+any later version of Perl 5 you may have available.
+
+

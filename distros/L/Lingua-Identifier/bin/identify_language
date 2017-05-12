@@ -1,0 +1,43 @@
+#!/usr/bin/perl -s
+
+use Lingua::Identifier;
+
+use warnings;
+use strict;
+
+our ($v);
+
+my $identifier = Lingua::Identifier->new();
+
+## XXX - todo: homogeneizar os dois ramos do IF numa única função?
+
+if (@ARGV) {
+    for my $file (@ARGV) {
+        my %data = $identifier->identify_file($file);
+        my @languages = (sort { $data{$b} <=> $data{$a} } keys %data);
+
+        if ($v) {
+            print "$file:\n";
+            for (@languages) {
+                printf "%s\t%s\n", $_, 100*$data{$_};
+            }
+        } else {
+            print "$file\t$languages[0]\n";
+        }
+    }
+}
+else {
+    my $str = "";
+    binmode STDIN, ":utf8";
+    while (<STDIN>) { $str .= $_; }
+
+    my %data = $identifier->identify($str);
+    my @languages = (sort { $data{$b} <=> $data{$a} } keys %data);
+    if ($v) {
+        for (@languages) {
+            printf "%s\t%s\n", $_, 100*$data{$_};
+        }
+    } else {
+        print "$languages[0]\n";
+    }
+}

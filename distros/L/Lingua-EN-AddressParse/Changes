@@ -1,0 +1,228 @@
+Revision history for Perl CPAN module Lingua::EN::AddressParse
+
+1.26 15 Sep 2016
+    the auto_clean option now standardises more street types, sub property types and identifiers
+    added more street names, types and sub property identifier patterns
+    Directional streets (like East St) given higher matching priority
+    Fixed bug in synopsis example
+    Improved documentation
+
+
+1.25 12 Jul 2016
+    Used github as repository
+    Improved documentation
+
+1.24 11 Jun 2015
+    The case_components method has been removed, only the components method is needed (due to change to using upper case grammar in version 1.22)
+        an optional flag allows for all components to be upper cased
+    Allow for numeric avenues with optional fraction, such as 'Avenue 12 1/2'
+    Added cases such as 'VIA CAPRI', to the street noun pattern
+    Allow for property numbers of form xy.5
+    Extract any building, level, floor data prior to parsing and save as separate attributes
+       
+
+1.23 20 Apr 2015
+    Allowed for 4 word suburb names
+    Introduced street_noun pattern, no need to name all 'The Corso, Avenue...' instances
+    Detect vowels sounds in suburb words
+    No vowel sound in street or suburb now raises a warning, not an error in properties hash
+    Related to the above, added a 'warning_desc' component to address object
+    Sub property portion of identifier now correctly assigned, so '2/24A' has sub_property_id => 2, property_id => 24A
+    Added sub_proprty_type components, such as "Unit", "Apt" etc
+    Allowed for half street numbers, such has '45 1/2 Some St;
+    Refactored some repetitive code sections
+        
+1.22 21 Jan 2015
+    fold all text to upper case prior to parsing, regexp matching is faster if case insensitive
+    use extended regexp (/x) for better readability
+    added many more valid street combinations
+    allowed for prefix before ordinal street, such as "Bay 24th Street"
+    folded 'The Avenue' type of street back into main street grammar, removed street_noun grammar
+    NOTE: component 'street' changed to 'street_name' for clarity
+    added street_direction_prefix component
+    added base_street_name component (street name less direction prefix)
+    auto_clean option now removes full stops, so P.O. Box 12 => PO Box 12, grammar no longer accepts full stops
+
+1.21 14 Oct 2014
+    allowed for more untyped streets such as 'Avenue C', 'State Route 19'
+    more transformations added to the _clean function
+    added more street types
+    removed indirect object notation for 'new' method
+    validate 'country' parameter passed in as an argument to the new method
+
+
+1.20 22 Jul 2014
+    added person's street name such as 'Dr Martin Luther King Jr'
+
+    new component added, po_box_type to describe type of post box,
+      so 'PO BOX 123 Newtown Private Boxes WA 6865' will return
+      suburb of Newtown and po_box_type of Private Boxes
+
+    fixed incorrect error descriptions on parsing error
+    added more sub property identifiers
+    added more street types
+    detect missing mandatory country parameter in arguments to 'new' method
+    auto_clean now removes full stops (as in P.O. Box, Rd. etc), simplifies grammar
+
+1.19 7 Jul 2014
+    auto_clean always cleans string, not just on parsing error
+    during auto_clean, spaces now removed in sub property identifer, such as 1 A Main St -> 1A Main St
+    fixed floor description in sub property identifier
+    added street name such as 'John F Kennedy Boulevard'
+    post codes can now be optional with the force_post_code argument
+    added more 3 word street names
+    added more street types
+    many more auto_clean functions for redundant, missing or malformed characters
+    stopped single letter streets returning 'no vowel sound' error
+    added more tests
+
+
+1.18 19 Sep 2013
+    Fixed test for US suburban address in main.t
+
+1.17 18 Sep 2013
+    Added Build.PL
+    Expanded test coverage to more address formats
+    Expanded auto_clean functions
+    Corrected casing of letters in sub property identifiers, such as Unit 23B (retain B as capital)
+    Allowed for government roads, such as 12 US Highway 19
+    Allowed for single word streets such as Broadway, no street type
+    Allowed for more 3 word street types
+    Added more ordinal street types
+    Allowed post box numbers to be up to 6 digits
+    Added more street types
+    Added more sub property types, unified sub_property grammar
+    Added more street names
+    Improved report method
+    Keep street direction in all capitals when casing components
+    _validate now checks for PO box format
+
+
+1.16 20 Jan 2011
+    Moved AddressGrammar.pm to Lingua::EN::AddressParse::Grammar name space
+    Included tests for Canadian and UK addresses
+
+1.15 17 Jun 2007
+    Added sample pre parser for correcting common errors
+    Added more street types
+    Added more street nouns
+    Added more sub property types
+    Allowed for optional street number, name and type in rural addresses
+    Allowed for up to 5 numbers in property identifier
+    Allowed for street names with up to three words, such as 'Tin Can Bay Road'
+    Allowed for sub building patterns such as 'Level 6 Tower A 123 Main St'
+    Thanks to Kieren Diment for test cases
+
+
+1.14 18 Jul 2005
+    Fixed auto_clean option so that quotes are retained, needed for rural property names
+    Added report method to dump address properties and components
+    Updated distribution to current CPAN requirements
+
+
+1.13 22 Jun 2005
+
+    Added US style sub properties, such as 123 Main St Suite # 12 Somewhere CA 92345
+    Added US style street directional suffix, such as 123 Main St S Somewhere CA 92345
+
+    Added new address type 'road_box'. This allows for box identifier such as RMB,
+    optionally street name and type, then suburb and post code.
+
+    Sub property values are now returned as as separate component sub_property_identifier,
+      not as part of the property_identifier component
+
+    Created a better grammar for property_identifier
+    Removed incorrect validity tests that were not accounting for ordinal street types
+    Fixed auto_clean option so that numbers are retained in ordinal street types!
+    Expanded and improved documentation and comments
+
+
+1.12 07 Mar 2004
+    Removed any sub country descriptive text (in square brackets) that occurs from grammar.
+    This was needed because of an upgrade to the data in Locale-SubCountry
+
+1.11 21 Mar 2002
+    Let user specify country argument to 'new' method as either country
+    code (AU) or full name (AUSTRALIA). Changed documentation to reflect
+    this, altered United Kingdom code from 'UK' (incorrect) to 'GB'
+
+    Fixed bug that was preventing Canadian addresses from parsing
+    Added a test case for each country in main.t
+    Improved report layout in demo.pl to allow for non Australian addresses
+
+1.10 09 Feb 2002
+    Allowed for cases such as "Unit 4 12 Smith St."
+    Improved speed by reordering sequence of street types
+    Added option to only accept short form of sub_country, such as NW
+
+    Thanks to Peter Schendzielorz for the following suggestions:
+    Allowed sub_country names to occur in suburb, such as Victoria Valley VIC
+    Added more street types
+    Added more sub property types
+    Added more post box types
+    Added 'Mt', 'Sir' and 'Dame' to street prefixes, as in Mt Baw Baw Rd
+    Allowed for cases like 'Grand Ridge Road'
+    Allowed for cases like 'Close','Glen', 'St' etc to occur in either street name or street type
+    Allowed for apostrophes and full stops in suburb_word, as in French's Forest
+    Allowed for 3 digits post codes such as 800 (in Northern Territory, Aust)
+    Allowed for box_number to end in a letter
+    Allowed property name to be delimited by single or double quotes
+    Accounted for street types as street names, such as 'The Corso', 'The Parkway'
+
+
+1.05 24 Sep 2001
+    Added more street types
+    Removed duplicated declaration for main.t
+
+1.04 31 Aug 2001
+    Allowed for streets with numbers or single letters (42nd, A, B...)
+    Allowed for ZIP codes of type 12345-6789
+    Thanks to Mike Edwards for noting these limitations
+
+    Added 'Park'to street types, while accounting for cases like
+    'Park Lane, 'Moore Park Road' etc.
+
+    Added extra test case
+    Added street prefixes (like Old, East) back in to simplify grammar
+
+1.03 24 May 2001
+    Allowed for forced abbreviations of sub country
+    Removed POD directives from README
+
+1.02 24 Apr 2001:
+    Placed "my" declaration of loop variables inside foreach statements.
+    NOTE THIS MEANS PERL 5.004 IS NOW THE MINIMUM REQUIREMENT!
+
+    Full names for sub countries now supported (New South Wales as well as NSW)
+    Used look aheads to simplify grammar (thanks to Damian Conway for his help)
+    Removed street prefixes from grammar as they were not needed
+    Returned street type (Road, Lane etc) as a separate element from street
+    Made property identifiers optional for suburban addresses (Low St. Kew VIC 3012 is OK)
+    Initialised values for all components and properties to empty string
+    Stopped warnings generated by uninitialized strings in grammar
+    Only allow country names that match initializing country string
+    Removed space that was occurring between PO Box and following number
+    Added more cases to test file main.t
+    Improved demo.pl
+    Fixed all POD and line terminator errors, thanks to Jason Gallagher
+
+1.01  9 Apr 2001:
+    Fixed "use Locale::SubCountry" call in AddressGrammar
+
+1.00 18 Mar 2001:
+    Upgraded to work with changes to Locale::SubCountry, specifically,
+    US rather than USA being the valid code for initializing US addresses
+
+    Moved grammar definition to AddressGrammar.pm module
+
+0.03 14 May 2000:
+    Added Canadian post codes, thanks to Steve Taylor
+    Replaced commas with spaces, rather than removing them
+    Removed @EXPORT and @EXPORT_OK as they were not needed
+
+0.02 30 Apr 2000:
+    Used Locale::Subcountry for list of states, counties etc
+    Added more UK post code types, thanks to Mark Summerfield
+
+0.01 28 Dec 1999:
+    First Release

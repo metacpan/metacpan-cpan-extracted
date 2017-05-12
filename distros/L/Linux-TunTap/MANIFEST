@@ -1,0 +1,11 @@
+CHANGES
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+README.dnstunnel
+bin/client.pl
+bin/common.pm
+bin/server.pl
+lib/Linux/TunTap.pm
+t/use.t

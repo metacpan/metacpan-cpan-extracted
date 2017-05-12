@@ -1,0 +1,160 @@
+Revision history for Perl extension LJ::Simple.
+
+0.15  Fri Feb 24 23:40:57 GMT 2006
+	- Added tags support to QuickPost()
+	- Added ability to return of results of posting to QuickPost()
+	- Added the GetTags() method to return the list of existing tags
+		available for use
+
+0.14  Wed Oct  5 17:52:45 BST 2005
+	- Added ability to cvs tag to Makefile.PL
+	- Changed certain uses of gmtime() to localtime() when dealing with
+		the retrival of entries and the like so that the expected
+		results are found.
+	- More sanity checking of the arguments passed to sub-routines
+	- Corrected the encoding of values so that the "+" character 
+		actually ends up as a "+" and not a space.
+	- examples/friends-only: Added some sanity checks to ensure that
+		entries which are blank do not get acted on.
+	- Fixed SetProtectPublic() so that it actually works; I'm pretty
+		sure that this used to work so I'm guessing that the LJ
+		flat protocol implementation has changed. Problem noted
+		by Igor Guryanov
+
+0.13  Fri Jul  8 10:35:04 BST 2005
+	- Documentation fix for GetEntries() to note that it will only every
+		return 50 items no matter what mode is used. Added pointer to
+		SyncItems(). SyncItems() documentation updated to add a pointer
+		to the examples/friends-only script.
+	- Correct the version target in Makefile.PL so that the version shown
+		in the README file is correctly updated.
+	- Added the Setprop_taglist() method to set tags in posts
+	- Updated examples/ljpost to include setting of tags
+	- Fixed how the SendRequest() handles the response from the server; it
+		no longer blindly removes \r from the response. Whilst at the
+		moment this is not an issue as the flat protocol is unlikely to
+		contain \r, it could be an issue in the future.
+	- Fixed the test script test.pl to deal with a failure to create the
+		object; correctly handles returning the right number of tests.
+		Problem noted by STEPANOV
+	- Added support for http_proxy and HTTP_PROXY environment variables
+		within the LJ::Simple object creation. The environment
+		variables on only looked at iff the http variable is *not*
+		given during the object creation.
+		Problem noted by STEPANOV
+
+0.12.1  Wed Jan 12 21:13:35 GMT 2005
+	- Minor release for a fix to QuickPost() which caused a runtime error
+		if a subject was set. The documentation was also corrected to
+		show that the entry option is always required.
+
+0.12  Wed Jan  5 23:35:07 GMT 2005
+	- Added the $LJ::Simple::NonBlock hook to allow better integration with
+		GUI programs
+	- Added the $LJ::Simple::ProtoSub hook to allow better integration with
+		GUI programs
+	- The ljpost example script is now placed within the Solaris package
+		the pkg Makefile target builds
+	- Corrected a bug in ljpost which caused it to handle timezones
+		incorrectly.
+	- Added the sending of a User-Agent string
+	- GetEntries() has been fixed so that if it is getting entries from a
+		 shared journal that shared journal name is placed within the
+		 entries returned back in the hash.
+		Bug reported by Stanislav Sinyagin
+	- Re-worked the documentation so its easier to use
+	- Added the SetProtect() routine as a wrapper around the various
+		SetProtect*() routines.
+	- Added the LJ::Simple::QuickPost() routine which allows you to quickly
+		post an entry into LiveJournal without going through the work
+		of object creation et al.
+
+0.11  Wednesday April 14 12:19:02 BST 2004
+	- Re-added the test.pl after people on the CPAN mailing list complained;
+		however the script has been altered so that out of the box it
+		hardly touches the functionality of LJ::Simple thanks to the
+		removal of the test user on www.livejournal.com. If people
+		wish they can place another username and password in the $user
+		and $pass variables in test.pl to run all of the test.pl
+		Bear in mind that I'm not going to be held responsible for
+		what happens to the journal that test.pl is pointed at though.
+	- Added the DefaultPicURL() routine to return the URL to the default
+		icon for the user who logged in. Functionality added at
+		request of Gavin Mogan.
+
+0.10  Saturday March 20 21:28:29 GMT 2004
+	- Added the examples directory in the distribution
+	- Fixed a bug in how the SendRequest() routine parsed the
+		results from the LiveJournal server.
+	- Removed the test.pl script from the distribution as LiveJournal
+		have removed the test user it depended on
+	- Updated the ljpost example with the ability to post restricted posts
+	- Corrected the example code for GetFriendGroups() shown on the manual page
+
+0.09  Friday January  7 11:09:49 GMT 2004
+	- UTF support is now automatically detected
+	- Added support for the getchallenge method to support the new
+	  challenge/response authentication system
+
+0.08  Thursday December 18 11:11:17 GMT 2003
+	- Added a check for zero length responses from the LJ servers
+	- Fix for potential bug relating to unusual responses from LJ
+	  web servers.
+	- Added an example script which will make all of the entries within
+	  a journal at least friends-only
+	- Fixes to documentation
+	- Added the SetProtectPublic() method as requested by Richard Watts.
+
+0.07  Friday September 12 09:49:40 BST 2003
+	- Minor changes to documentation and example code
+	- Corrected the package building Makefile target
+	- Module now works on perl version 5.005_03
+	- Minor documentation change
+	- Increased socket read timeout to 5 minutes
+	- Switched to using version 1 of the LJ protocol
+	- An example directory has been added
+	- Added EditEntry() routine, with thanks to Ben Harris for the
+	  initial code.
+
+0.06  Thursday October  3 14:30 2002
+	- Added GetURL() routine
+	- Added GetItemId() routine
+	- Added GetEntries() routine
+	- Added GetDate() routine
+	- Added GetSubject() routine
+	- Added GetEntry() routine
+	- Added GetProtect() routine
+	- Added Getprop_*() routines
+	- Fixed some POD errors
+
+0.05  Friday September 20 17:16 2002
+	- Added GetFriendGroups() routine
+	- Added GetDayCounts() routine
+	- Added CheckFriends() routine
+	- Added GetFriends() routine
+	- Added various options to the login/new method. The most useful of
+		these is the "fast" option which massively reduces the amount
+		of time taken to login... by not really logging in at all. See
+		the docs for more details.
+	- The GetFriendOf() routine now returns a list sorted by the usernames
+		of the LiveJournals in the list
+
+0.04  Sunday September  1 22:11 2002
+	- Added MemberOf() routine
+	- Added the SyncItems() routine
+	- Added the GetFriendOf() routine
+	- Fixed how request to LJ is encoded; \n was being matched by \s
+	- Fixed SetMood() routine
+	- Fixed Setprop_backdate() routine
+
+0.03  Monday Aug 19 16:44 2002
+	- Ability to delete entry added
+	- First public release
+
+0.02  Tues Jul 20 15:58:00 2002
+	- Major functionality added
+
+0.01  Mon Jul 22 17:19:26 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n LJ::Simple
+

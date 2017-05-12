@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Util.pm
+t/daemon2_cache.t
+t/file_cache.t
+t/labrea_whoami.t
+t/lockf.t
+t/page_is_current.t

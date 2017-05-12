@@ -1,0 +1,104 @@
+=encoding utf8
+
+=head1 NAME / NOMO
+
+Lingua::EO::Numbers::EO - Konverti numerojn al Esperantaj vortoj
+
+=head1 VERSIO
+
+Ĉi tiu dokumento priskribas version 0.03 de Lingua::EO::Numbers.
+
+=head1 SINOPTIKO
+
+    use 5.010;
+    use Lingua::EO::Numbers qw( num2eo );
+
+    for my $nombro (reverse 0 .. 99) {
+        say ucfirst num2eo($nombro), ' boteloj da biero sur la muro.';
+    }
+
+eligo:
+
+    Naŭdek naŭ boteloj da biero sur la muro.
+    Naŭdek ok boteloj da biero sur la muro.
+    Naŭdek sep boteloj da biero sur la muro.
+      ...
+    Nul boteloj da biero sur la muro.
+
+=head1 EKSPLIKO
+
+Ĉi tiu modjulo provizas vin per konverti numerojn en vortojn en Esperanto, kio
+estas konstruita interfacia helpa lingvo, estis verkita de L. L. Zamenhof, kaj
+estis publikigita en 1887.
+
+Ĉi tiu modjulo nun subtenas la norman Esperantan dekuman apartigilon (",") aŭ
+la norman ĝin de Perl (".") kaj ne subtenas kelkmilajn apartigilojn.  La opcio
+por agordi la subtenitajn dekuman kaj kelkmilajn apartigilojn estos adiciita
+en la estonteco.
+
+=head1 FUNKCIOJ
+
+La sekvanta funkcioj estas provizita sed ne estas eksportita implicite.
+
+=over 4
+
+=item num2eo EXPR
+
+Se EXPR ŝajnas kiel numero, la tekste priskribita numero estas liverita.
+Ambaŭ entjeroj kaj reeloj estas subtenita, kio inkluzivas negativajn nombrojn.
+Specialaj valoroj kiel "inf" kaj "NaN" estas ankaŭ subtenita.
+
+=item num2eo_ordinal EXPR
+
+Se EXPR ŝajnas kiel entjero, la tekste priskribita orda numero estas liverita.
+La konduto, kiam doni neentjera valoron, estas nedifinita.
+
+=back
+
+La liverita ĉeno estas kodita de UTF-8. Se EXPR estas valoro, kio ne ŝajnas
+esti numero aŭ ne estas subtenita nun de ĉi tiu modjulo, C<undef> estas
+liverita.
+
+La C<:all> etikedo estas uzebla por importi tutajn funkciojn.
+
+    use Lingua::EO::Numbers qw( :all );
+
+=head1 FARENDAĴOJ
+
+=over 4
+
+=item * subteni eksponencialan grafismon
+
+=item * opcio por agordi la enigjan dekumajn apartigilojn
+
+=item * opcio por agordi la enigjan kelkmilajn apartigilojn
+
+=back
+
+=head1 VIDU ANKAŬ
+
+L<Lingua::EO::Numbers>, L<Lingua::Conlang::Numbers>,
+L<http://bertilow.com/pmeg/gramatiko/nombroj/>, L<utf8>,
+L<Lingua::EO::Orthography>
+
+=head1 AŬTORO
+
+Nick PATCH <patch@cpan.org>
+
+=head1 AGNOSKOJ
+
+MORIYA Masaki (Gardejo) tradukis ĉi tiun dokumenton en Esperanton.
+
+=head1 AŬTORRAJTO KAJ LICENCO
+
+Copyright 2009, 2010 Nick Patch
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+Aŭtorrajto 2009, 2010 Nick PATCH
+
+Ĉi tiu modjulo estas libera programaro; vi povas redistribui ĝin kaj/aŭ modifi
+ĝin laŭ la sama kondiĉo kiel Perl mem.
+
+=cut

@@ -1,0 +1,166 @@
+# PODNAME: Locale::Country::Multilingual::Unicode
+# ABSTRACT: Recommended Usage with Unicode
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Locale::Country::Multilingual::Unicode - Recommended Usage with Unicode
+
+=head1 VERSION
+
+version 0.25
+
+=head1 SYNOPSIS
+
+  use utf8;
+  use Encode::StdIO;
+  use Locale::Country::Multilingual {use_io_layer => 1};
+
+  my $lcm = Locale::Country::Multilingual->new;
+
+  $lcm->set_lang('de');
+  print $lcm->code2country('gb'), "\n";
+
+=head1 DESCRIPTION
+
+You are on a modern computer system, that uses C<utf-8> encoding by
+default. L<Locale::Country::Multilingual> uses language data, that is
+in C<utf-8> too. Everything is fine.... Really?
+
+Try this in your favorite terminal:
+
+  > perl -le 'print "bäh!"'
+  bäh!
+
+Uppercase it:
+
+  > LANG=en_US perl -Mlocale -le 'print uc "bäh!"'
+  BäH!
+
+Wrong! It should have been C<BÄH!>. Though on C<latin1> systems it works.
+Same for C<Österreich> - the German and native name for C<Austria>. If you
+run C<lc()> on it, it won't change.
+
+What happened is, that you write files (and code) in C<utf-8>, a multi-byte
+encoding, but Perl expects C<latin1> (C<iso-8859-1>) B<by default>, a
+single-byte encoding. Provided you C<use locale;> together with an
+appropriate locale (here C<en_US>) in your Perl program, a lowercase
+C<latin1> C<ä> (C<0xe4>) is turned into an uppercase C<Ä> (C<0xc4>) -
+but only if your input comes as C<latin1>.
+
+A C<utf-8> C<ä> is encoded as C<0xc3, 0xa4>. Therefore C<uc()> does not
+detect the two-byte C<ä> as a letter that could be uppercased.
+
+Language files in C<Locale::Country::Multilingual> are in C<utf-8>.
+
+To make everything work the correct workflow is:
+
+=over 4
+
+=item use utf8;
+
+This pragma tells Perl, that all text in your code is actually in C<utf-8>,
+so the Perl interpreter converts it into its internal string format
+correctly. Actually this is only necessary, when you have literals that
+contain non-ASCII characters, e.g. when you code:
+
+  print "Dürüm Döner Kebap\n";
+
+Even if your system does not use C<utf-8> by default, your Perl programs
+should be encoded in C<utf-8>. Use an editor where you can set the
+encoding.
+
+=item Set encoding for input and output
+
+By default Perl converts the internal string representation into C<latin1>
+for input and output. So the above C<print> output would be broken on a
+non-C<latin1> system. For switching C<STDIN>, C<STDOUT> and C<STDERR> to
+C<utf-8>, you can write:
+
+  binmode STDIN, ':utf8';
+  binmode STDOUT, ':utf8';
+  binmode STDERR, ':utf8';
+
+If your system uses another encoding, e.g. C<"euc-jp">, you can switch a
+filehandle to that encoding with:
+
+  binmode FH, ':encoding(euc-jp)';
+
+In a web application don't forget to set the output MIME type as well!
+
+If output goes to a terminal:
+
+  use Encode::StdIO;
+
+This module determines your terminal's encoding - even if it is something
+other than C<utf-8> - and sets the appropriate IO layers for the three
+standard IO handles.
+
+=item Set C<< use_io_layer => 1 >>
+
+There are two places where this option can be specified: Either in C<use>
+or in new:
+
+  use Locale::Country::Multilingual {use_io_layer => 1};
+
+  my $lcm = Locale::Country::Multilingual->new(
+    lang => 'de',
+    use_io_layer => 1,
+  );
+  print uc $lcm->code2country('gb'), "\n";
+
+That should print
+
+  VEREINIGTES KÖNIGREICH GROSSBRITANNIEN UND NORDIRLAND
+
+Wow! Even the C<"ß"> has been converted correctly into C<"SS">.
+
+=back
+
+=head1 NAME
+
+Locale::Country::Multilingual::Unicode - Recommended Usage with Unicode
+
+=head1 SEE ALSO
+
+L<perluniintro|perluniintro>, L<Encode::StdIO|Encode::StdIO>
+
+=head1 AUTHOR
+
+Bernhard Graf C<graf(a)cpan,org>
+
+=head1 COPYRIGHT & LICENSE
+
+This text is in the public domain.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Bernhard Graf <graf@cpan.org>
+
+=item *
+
+Fayland Lam <fayland@gmail.com>
+
+=item *
+
+Greg Oschwald <oschwald@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Fayland Lam.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

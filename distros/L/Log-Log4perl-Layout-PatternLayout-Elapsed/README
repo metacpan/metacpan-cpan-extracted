@@ -1,0 +1,36 @@
+Log-Log4perl-Layout-PatternLayout-Elapsed
+=========================================
+
+This layout is a subclass of Log::Log4perl::Layout::PatternLayout which adds the
+format %R. This format is used to display the time elapsed between two
+consecutive log events. This is new field is tracked by appender which means
+that the times are accurate and independent.
+
+NOTE: Log::Log4perl 1.25 includes already this functionality in
+Log::Log4perl::Layout::PatternLayout. It's suggested that you upgrade your
+version of Log::Log4perl. This module exists in the case where upgrading is not
+an option.
+
+INSTALLATION
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Log::Log4perl
+	Time::HiRes (optional)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Emmanuel Rodriguez
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

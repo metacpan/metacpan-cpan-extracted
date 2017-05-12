@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+
+<!--
+
+  Transliteration definitions for ISO/R 9:1954
+
+  Copyright (C) 2015 Dusan Vuckovic <dusan@dvuckovic.com>
+
+  See http://en.wikipedia.org/wiki/ISO_9 for an introduction.
+
+-->
+
+
+<translit>
+
+    <!-- meta information -->
+
+    <name>ISO/R 9</name>
+    <desc>ISO/R 9:1954, Cyrillic to Latin</desc>
+    <reverse>true</reverse>
+
+
+    <!-- set of transliteration rules -->
+    <!-- Hexnotation of Unicode codepoints, letter names according
+        to Unicode Standard 5.0
+        Abbreviations:
+        CCL = CYRILLIC CAPITAL LETTER
+        CSL = CYRILLIC SMALL LETTER
+        LCL = LATIN CAPITAL LETTER
+        LSL = LATIN SMALL LETTER
+    -->
+
+    <rules>
+
+        <rule>
+            <from>&#x0410;</from>       <!-- CCL A -->
+            <to>&#x0041;</to>           <!-- LCL A -->
+        </rule>
+
+        <rule>
+            <from>&#x0430;</from>       <!-- CSL A -->
+            <to>&#x0061;</to>           <!-- LSL A -->
+        </rule>
+
+        <rule>
+            <from>&#x0411;</from>       <!-- CCL BE -->
+            <to>&#x0042;</to>           <!-- LCL B -->
+        </rule>
+
+        <rule>
+            <from>&#x0431;</from>       <!--CSL BE -->
+            <to>&#x0062;</to>           <!--LSL B -->
+        </rule>
+
+        <rule>
+            <from>&#x0412;</from>       <!--CCL VE -->
+            <to>&#x0056;</to>           <!--LCL V -->
+        </rule>
+
+        <rule>
+            <from>&#x0432;</from>       <!--CSL VE -->
+            <to>&#x0076;</to>           <!--LSL V -->
+        </rule>
+
+        <rule>
+            <from>&#x0413;</from>       <!--CCL GHE -->
+            <to>&#x0047;</to>           <!--LCL G -->
+        </rule>
+
+        <rule>
+            <from>&#x0433;</from>       <!--CSL GHE -->
+            <to>&#x0067;</to>           <!--LSL G -->
+        </rule>
+
+        <rule>
+            <from>&#x0490;</from>       <!--CCL GHE WITH UPTURN -->
+            <to>&#x0047;&#x0300;</to>   <!--LCL G WITH COMBINING GRAVE ACCENT-->
+        </rule>
+
+        <rule>
+            <from>&#x0491;</from>       <!--CSL GHE WITH UPTURN -->
+            <to>&#x0067;&#x0300;</to>   <!--LCL G WITH COMBINING GRAVE ACCENT-->
+        </rule>
+
+        <rule>
+            <from>&#x0414;</from>       <!-- CCL DE -->
+            <to>&#x0044;</to>           <!-- LCL D -->
+        </rule>
+
+        <rule>
+            <from>&#x0434;</from>       <!-- CSL DE -->
+            <to>&#x0064;</to>           <!-- LSL D -->
+        </rule>
+
+        <rule>
+            <from>&#x0403;</from>       <!-- CCL GJE -->
+            <to>&#x01F4;</to>           <!-- LCL G WITH ACUTE -->
+        </rule>
+
+        <rule>
+            <from>&#x0453;</from>       <!-- CSL GJE -->
+            <to>&#x01F5;</to>           <!-- LSL G WITH ACUTE -->
+        </rule>
+
+        <rule>
+            <from>&#x0402;</from>       <!-- CCL DJE -->
+            <to>&#x0110;</to>           <!-- LCL D WITH STROKE -->
+        </rule>
+
+        <rule>
+            <from>&#x0452;</from>       <!-- CSL DJE -->
+            <to>&#x0111;</to>           <!-- LSL D WITH STROKE -->
+        </rule>
+
+        <rule>
+            <from>&#x0415;</from>       <!-- CCL YE -->
+            <to>&#x0045;</to>           <!-- LCL E -->
+        </rule>
+
+        <rule>
+            <from>&#x0435;</from>       <!-- CSL YE -->
+            <to>&#x0065;</to>           <!-- LSL E -->
+        </rule>
+
+        <rule>
+            <from>&#x0401;</from>       <!-- CCL YO -->
+            <to>&#x00CB;</to>           <!-- LCL E WITH DIAERESIS -->
+        </rule>
+
+        <rule>
+            <from>&#x0451;</from>       <!-- CSL YO -->
+            <to>&#x00EB;</to>           <!-- LSL E WITH DIAERESIS -->
+        </rule>
+
+        <rule>
+            <from>&#x0404;</from>       <!-- CCL UKRAINIAN YE -->
+            <to>&#x004A;&#x0065;</to>   <!-- LCL J WITH LSL E -->
+        </rule>
+
+        <rule>
+            <from>&#x0454;</from>       <!-- CSL UKRAINIAN YE -->
+            <to>&#x006A;&#x0065;</to>   <!-- LSL J WITH LSL E -->
+        </rule>
+
+        <rule>
+            <from>&#x0416;</from>       <!-- CCL ZHE -->
+            <to>&#x017D;</to>           <!-- LCL Z WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x0436;</from>       <!-- CSL ZHE -->
+            <to>&#x017E;</to>           <!-- LSL Z WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x0417;</from>       <!-- CCL ZE -->
+            <to>&#x005A;</to>           <!-- LCL Z -->
+        </rule>
+
+        <rule>
+            <from>&#x0437;</from>       <!-- CSL ZE -->
+            <to>&#x007A;</to>           <!-- LSL Z -->
+        </rule>
+
+        <rule>
+            <from>&#x0405;</from>       <!-- CCL DZE -->
+            <to>&#x0044;&#x007A;</to>   <!-- LCL D WITH LSL Z -->
+        </rule>
+
+        <rule>
+            <from>&#x0455;</from>       <!-- CSL DZE -->
+            <to>&#x0064;&#x007A;</to>   <!-- LSL D WITH LSL Z -->
+        </rule>
+
+        <rule>
+            <from>&#x0418;</from>       <!-- CCL I -->
+            <to>&#x0049;</to>           <!-- LCL I -->
+        </rule>
+
+        <rule>
+            <from>&#x0438;</from>       <!-- CSL I -->
+            <to>&#x0069;</to>           <!-- LSL I -->
+        </rule>
+
+        <rule>
+            <from>&#x0406;</from>       <!-- CCL DOTTED I -->
+            <to>&#x0049;</to>           <!-- LCL I -->
+        </rule>
+
+        <rule>
+            <from>&#x0456;</from>       <!-- CSL DOTTED I -->
+            <to>&#x0069;</to>           <!-- LSL I -->
+        </rule>
+
+        <rule>
+            <from>&#x0407;</from>       <!-- CCL YI -->
+            <to>&#x004A;&#x0069;</to>   <!-- LCL J WITH LSL I -->
+        </rule>
+
+        <rule>
+            <from>&#x0457;</from>       <!-- CSL YI -->
+            <to>&#x006A;&#x0069;</to>   <!-- LSL J WITH LSL I -->
+        </rule>
+
+        <rule>
+            <from>&#x0419;</from>       <!-- CCL SHORT I -->
+            <to>&#x004A;</to>           <!-- LCL J -->
+        </rule>
+
+        <rule>
+            <from>&#x0439;</from>       <!-- CSL SHORT I -->
+            <to>&#x006A;</to>           <!-- LSL J -->
+        </rule>
+
+        <rule>
+            <from>&#x0408;</from>       <!-- CCL JE -->
+            <to>&#x004A;</to>           <!-- LCL J -->
+        </rule>
+
+        <rule>
+            <from>&#x0458;</from>       <!-- CSL JE -->
+            <to>&#x006A;</to>           <!-- LSL J -->
+        </rule>
+
+        <rule>
+            <from>&#x041A;</from>       <!-- CCL KA -->
+            <to>&#x004B;</to>           <!-- LCL K -->
+        </rule>
+
+        <rule>
+            <from>&#x043A;</from>       <!-- CSL KA -->
+            <to>&#x006B;</to>           <!-- LSL K -->
+        </rule>
+
+        <rule>
+            <from>&#x041B;</from>       <!-- CCL EL -->
+            <to>&#x004C;</to>           <!-- LCL L -->
+        </rule>
+
+        <rule>
+            <from>&#x043B;</from>       <!-- CSL EL -->
+            <to>&#x006C;</to>           <!-- LSL L -->
+        </rule>
+
+        <rule>
+            <from>&#x0409;</from>       <!-- CCL LJE -->
+            <to>&#x004C;&#x004A;</to>   <!-- LCL L WITH LSL J -->
+            <!--
+                The capital hard sign is very seldom in use.
+                It may be capital, if everything is written in upper
+                case - therefore this context may help to identify the
+                upper case when transliteration is used reverse.
+            -->
+            <context>
+                <after>\p{IsUpper}</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>&#x0409;</from>       <!-- CCL LJE -->
+            <to>&#x004C;&#x006A;</to>   <!-- LCL L WITH LSL J -->
+        </rule>
+
+        <rule>
+            <from>&#x0459;</from>       <!-- CSL LJE -->
+            <to>&#x006C;&#x006A;</to>   <!-- LSL L WITH LSL J -->
+        </rule>
+
+        <rule>
+            <from>&#x041C;</from>       <!-- CCL EM -->
+            <to>&#x004D;</to>           <!-- LCL M -->
+        </rule>
+
+        <rule>
+            <from>&#x043C;</from>       <!-- CSL EM -->
+            <to>&#x006D;</to>           <!-- LSL M -->
+        </rule>
+
+        <rule>
+            <from>&#x041D;</from>       <!-- CCL EN -->
+            <to>&#x004E;</to>           <!-- LCL N -->
+        </rule>
+
+        <rule>
+            <from>&#x043D;</from>       <!-- CSL EN -->
+            <to>&#x006E;</to>           <!-- LSL N -->
+        </rule>
+
+        <rule>
+            <from>&#x040A;</from>       <!-- CCL NJE -->
+            <to>&#x004E;&#x004A;</to>   <!-- LCL N WITH LCL J -->
+            <!--
+                The capital hard sign is very seldom in use.
+                It may be capital, if everything is written in upper
+                case - therefore this context may help to identify the
+                upper case when transliteration is used reverse.
+            -->
+            <context>
+                <after>\p{IsUpper}</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>&#x040A;</from>       <!-- CCL NJE -->
+            <to>&#x004E;&#x006A;</to>   <!-- LCL N WITH LSL J -->
+        </rule>
+
+        <rule>
+            <from>&#x045A;</from>       <!-- CSL NJE -->
+            <to>&#x006E;&#x006A;</to>   <!-- LSL N WITH LSL J -->
+        </rule>
+
+        <rule>
+            <from>&#x041E;</from>       <!-- CCL O -->
+            <to>&#x004F;</to>           <!-- LCL O -->
+        </rule>
+
+        <rule>
+            <from>&#x043E;</from>       <!-- CSL O -->
+            <to>&#x006F;</to>           <!-- LSL O -->
+        </rule>
+
+        <rule>
+            <from>&#x041F;</from>       <!-- CCL PE -->
+            <to>&#x0050;</to>           <!-- LCL P -->
+        </rule>
+
+        <rule>
+            <from>&#x043F;</from>       <!-- CSL PE -->
+            <to>&#x0070;</to>           <!-- LSL P -->
+        </rule>
+
+        <rule>
+            <from>&#x0420;</from>       <!-- CCL ER -->
+            <to>&#x0052;</to>           <!-- LCL R -->
+        </rule>
+
+        <rule>
+            <from>&#x0440;</from>       <!-- CSL ER -->
+            <to>&#x0072;</to>           <!-- LCL R -->
+        </rule>
+
+        <rule>
+            <from>&#x0421;</from>       <!-- CCL ES -->
+            <to>&#x0053;</to>           <!-- LCL S -->
+        </rule>
+
+        <rule>
+            <from>&#x0441;</from>       <!-- CSL ES -->
+            <to>&#x0073;</to>           <!-- LSL S -->
+        </rule>
+
+        <rule>
+            <from>&#x0422;</from>       <!-- CCL TE -->
+            <to>&#x0054;</to>           <!-- LCL T -->
+        </rule>
+
+        <rule>
+            <from>&#x0442;</from>       <!-- CSL TE -->
+            <to>&#x0074;</to>           <!-- LSL T -->
+        </rule>
+
+        <rule>
+            <from>&#x040C;</from>       <!-- CCL KJE -->
+            <to>&#x1E30;</to>           <!-- LCL K WITH ACUTE -->
+        </rule>
+
+        <rule>
+            <from>&#x045C;</from>       <!-- CSL KJE -->
+            <to>&#x1E31;</to>           <!-- LSL K WITH ACUTE -->
+        </rule>
+
+        <rule>
+            <from>&#x040B;</from>       <!-- CCL TSHE -->
+            <to>&#x0106;</to>           <!-- LCL C WITH ACUTE -->
+        </rule>
+
+        <rule>
+            <from>&#x045B;</from>       <!-- CSL TSHE -->
+            <to>&#x0107;</to>           <!-- LSL C WITH ACUTE -->
+        </rule>
+
+        <rule>
+            <from>&#x0423;</from>       <!-- CCL U -->
+            <to>&#x0055;</to>           <!-- LCL U -->
+        </rule>
+
+        <rule>
+            <from>&#x0443;</from>       <!-- CSL U -->
+            <to>&#x0075;</to>           <!-- LSL U -->
+        </rule>
+
+        <rule>
+            <from>&#x040E;</from>       <!-- CCL SHORT U -->
+            <to>&#x016C;</to>           <!-- LCL U WITH BREVE -->
+        </rule>
+
+        <rule>
+            <from>&#x045E;</from>       <!-- CSL SHORT U -->
+            <to>&#x016D;</to>           <!-- LCL U WITH BREVE -->
+        </rule>
+
+        <rule>
+            <from>&#x0424;</from>       <!-- CCL EF -->
+            <to>&#x0046;</to>           <!-- LCL F -->
+        </rule>
+
+        <rule>
+            <from>&#x0444;</from>       <!-- CSL EF -->
+            <to>&#x0066;</to>           <!-- LSL F -->
+        </rule>
+
+        <rule>
+            <from>&#x0425;</from>       <!-- CCL HA -->
+            <to>&#x0048;</to>           <!-- LCL H -->
+        </rule>
+
+        <rule>
+            <from>&#x0445;</from>       <!-- CSL HA -->
+            <to>&#x0068;</to>           <!-- LSL H -->
+        </rule>
+
+        <rule>
+            <from>&#x0426;</from>       <!-- CCL TSE -->
+            <to>&#x0043;</to>           <!-- LCL C -->
+        </rule>
+
+        <rule>
+            <from>&#x0446;</from>       <!-- CSL TSE -->
+            <to>&#x0063;</to>           <!-- LSL C -->
+        </rule>
+
+        <rule>
+            <from>&#x0427;</from>       <!-- CCL CHE -->
+            <to>&#x010C;</to>           <!-- LCL C WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x0447;</from>       <!-- CSL CHE -->
+            <to>&#x010D;</to>           <!-- LSL C WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x040F;</from>       <!-- CCL DZHE -->
+            <to>&#x0044;&#x017D;</to>   <!-- LCL D WITH LCL Z WITH CARON -->
+            <!--
+                The capital Dzhe sign is very seldom in use.
+                It may be capital, if everything is written in upper
+                case - therefore this context may help to identify the
+                upper case when transliteration is used reverse.
+            -->
+            <context>
+                <after>\p{IsUpper}</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>&#x040F;</from>       <!-- CCL DZHE -->
+            <to>&#x0044;&#x017E;</to>   <!-- LCL D WITH LSL Z WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x045F;</from>       <!-- CSL DZHE -->
+            <to>&#x0064;&#x017E;</to>   <!-- LSL D WITH LSL Z WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x0428;</from>       <!-- CCL SHA -->
+            <to>&#x0160;</to>           <!-- LCL S WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x0448;</from>       <!-- CSL SHA -->
+            <to>&#x0161;</to>           <!-- LSL S WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x0429;</from>       <!-- CCL SHCHA -->
+            <to>&#x0160;&#x010C;</to>   <!-- LCL S WITH CARON WITH LSL C WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x0449;</from>       <!-- CSL SHCHA -->
+            <to>&#x0161;&#x010D;</to>   <!-- LSL S WITH CARON WITH LSL C WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x042A;</from>       <!-- CCL HARD SIGN -->
+            <to>&#x0059;</to>           <!-- MODIFIER LETTER DOUBLE PRIME -->
+            <!--
+                The capital hard sign is very seldom in use.
+                It may be capital, if everything is written in upper
+                case - therefore this context may help to identify the
+                upper case when transliteration is used reverse.
+            -->
+            <context>
+                <after>\p{IsUpper}</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>&#x044A;</from>       <!-- CSL HARD SIGN -->
+            <to>&#x0079;</to>           <!-- MODIFIER LETTER DOUBLE PRIME -->
+        </rule>
+
+        <rule>
+            <from>&#x042B;</from>       <!-- CCL YERU -->
+            <to>&#x0059;</to>           <!-- LCL Y -->
+        </rule>
+
+        <rule>
+            <from>&#x044B;</from>       <!-- CSL YERU -->
+            <to>&#x0079;</to>           <!-- LSL Y -->
+        </rule>
+
+        <rule>
+            <from>&#x042C;</from>   <!-- CCL SOFT SIGN -->
+            <to>&#x02B9;</to>       <!-- MODIFIER LETTER PRIME -->
+            <!--
+                The capital Soft sign is very seldom in use.
+                It may be capital, if everything is written in upper
+                case - therefore this context may help to identify the
+                upper case when transliteration is used reverse.
+            -->
+            <context>
+                <after>\p{IsUpper}</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>&#x044C;</from>   <!-- CSL SOFT SIGN -->
+            <to>&#x02B9;</to>       <!-- MODIFIER LETTER PRIME -->
+        </rule>
+
+        <rule>
+            <from>&#x0462;</from>   <!-- CCL YAT -->
+            <to>&#x011A;</to>       <!-- LCL E WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x0463;</from>   <!-- CSL YAT -->
+            <to>&#x011B;</to>       <!-- LSL E WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x042D;</from>   <!-- CCL E -->
+            <to>&#x00C8;</to>       <!-- LCL E WITH GRAVE -->
+        </rule>
+
+        <rule>
+            <from>&#x044D;</from>   <!-- CSL E -->
+            <to>&#x00E8;</to>       <!-- LSL E WITH GRAVE -->
+        </rule>
+
+        <rule>
+            <from>&#x042E;</from>       <!-- CCL YU -->
+            <to>&#x004A;&#x0055;</to>   <!-- LCL J WITH LCL U -->
+            <!--
+                The capital Yu sign is very seldom in use.
+                It may be capital, if everything is written in upper
+                case - therefore this context may help to identify the
+                upper case when transliteration is used reverse.
+            -->
+            <context>
+                <after>\p{IsUpper}</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>&#x042E;</from>       <!-- CCL YU -->
+            <to>&#x004A;&#x0075;</to>   <!-- LCL J WITH LSL U -->
+        </rule>
+
+        <rule>
+            <from>&#x044E;</from>       <!-- CSL YU -->
+            <to>&#x006A;&#x0075;</to>   <!-- LSL J WITH LSL U -->
+        </rule>
+
+        <rule>
+            <from>&#x042F;</from>       <!-- CCL YA -->
+            <to>&#x004A;&#x0041;</to>   <!-- LCL J WITH LCL A -->
+            <!--
+                The capital Ya sign is very seldom in use.
+                It may be capital, if everything is written in upper
+                case - therefore this context may help to identify the
+                upper case when transliteration is used reverse.
+            -->
+            <context>
+                <after>\p{IsUpper}</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>&#x042F;</from>       <!-- CCL YA -->
+            <to>&#x004A;&#x0061;</to>   <!-- LCL J WITH LSL A -->
+        </rule>
+
+        <rule>
+            <from>&#x044F;</from>       <!-- CSL YA -->
+            <to>&#x006A;&#x0061;</to>   <!-- LSL J WITH LSL A -->
+        </rule>
+
+        <rule>
+            <from>&#x046A;</from>       <!-- CCL BIG YUS (HISTORICAL) -->
+            <to>&#x0226;</to>           <!-- LCL A WITH DOT -->
+        </rule>
+
+        <rule>
+            <from>&#x046B;</from>       <!-- CSL BIG YUS (HISTORICAL) -->
+            <to>&#x0227;</to>           <!-- LSL A WITH DOT -->
+        </rule>
+
+        <rule>
+            <from>&#x0472;</from>       <!-- CCL FITA (HISTORICAL) -->
+            <to>&#x1E1E;</to>           <!-- LCL F WITH DOT -->
+        </rule>
+
+        <rule>
+            <from>&#x0473;</from>       <!-- CSL FITA (HISTORICAL) -->
+            <to>&#x1E1F;</to>           <!-- LSL F WITH DOT -->
+        </rule>
+
+        <rule>
+            <from>&#x0474;</from>       <!-- CCL IZHITSA (HISTORICAL) -->
+            <to>&#x1E8E;</to>           <!-- LCL Y WITH DOT -->
+        </rule>
+
+        <rule>
+            <from>&#x0475;</from>       <!-- CSL IZHITSA (HISTORICAL) -->
+            <to>&#x1E8F;</to>           <!-- LSL Y WITH DOT -->
+        </rule>
+
+    </rules>
+
+</translit>

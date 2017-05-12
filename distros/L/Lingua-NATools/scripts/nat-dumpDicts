@@ -1,0 +1,279 @@
+#!/usr/bin/perl -w -s
+
+use strict;
+
+use Lingua::NATools::Dict;
+use Lingua::NATools::Lexicon;
+
+use DBI;
+
+our ($sqlite, $self, $full, $h, $v);
+
+sub debug { print STDERR @_, "\n" if $v }
+
+# OK, we need 1 directory or 4 files
+if ($h || (@ARGV != 1 && @ARGV != 4)) {
+  print "nat-dumpDicts: dump the PTD from a corpus in different formats.\n\n";
+  print "\tnat-dumpDicts -sqlite=<database.sqlite> <corpusDirectory>\n\n";
+  print "\tnat-dumpDicts <corpusDirectory>\n";
+  print "\tnat-dumpDicts -self <corpusDirectory>\n";
+  print "\tnat-dumpDicts -full <lexA> <dicA> <lexB> <dicB>\n\n";
+  print "For more help, please run 'perldoc nat-dumpDicts'\n";
+  exit 0;
+}
+
+my ($lexA, $lexB, $dicA, $dicB, $crpDir);
+
+if ($full) {
+    ($lexA, $dicA, $lexB, $dicB) = @ARGV;
+} else {
+    $crpDir = shift @ARGV;
+    die "$crpDir is not a directory"         unless -d  $crpDir;
+    die "$crpDir is not a NATools directory" unless -f "$crpDir/nat.cnf";
+
+    $lexA = "$crpDir/source.lex";
+    $dicA = "$crpDir/source-target.bin";
+    $lexB = "$crpDir/target.lex";
+    $dicB = "$crpDir/target-source.bin";
+}
+
+for my $file ($lexA, $dicA, $lexB, $dicB) {
+    die "File [$file] not readable!\n" unless -f $file;
+}
+
+debug "Opening source lexicon file.";
+my $LA = Lingua::NATools::Lexicon->new($lexA);
+die "Cannot open lexicon file $lexA\n" unless $LA;
+
+debug "Opening target lexicon file.";
+my $LB = Lingua::NATools::Lexicon->new($lexB);
+die "Cannot open lexicon file $lexB\n" unless $LB;
+
+debug "Opening source-target ditionary.";
+my $ST = Lingua::NATools::Dict::open($dicA);
+die "Error opening dictionary file $dicA\n" unless $ST;
+
+debug "Opening target-source ditionary.";
+my $TS = Lingua::NATools::Dict::open($dicB);
+die "Error opening dictionary file $dicB\n" unless $TS;
+
+if ($sqlite) {
+    unlink $sqlite if -f $sqlite;
+    die "Can't write [$sqlite] file\n" if -f $sqlite;
+
+    my $db = DBI->connect("dbi:SQLite:dbname=$sqlite","","");
+    die "Can't create [$sqlite] file\n" unless $db;
+
+    debug "Creating $sqlite tables.";
+    create_tables($db);
+
+    debug "Filling in source lexicon table.";
+    create_lexicon($db, "source", $LA, $ST);
+    debug "Filling in target lexicon table.";
+    create_lexicon($db, "target", $LB, $TS);
+
+    debug "Filling in source-target dictionary table.";
+    create_dictionary($db, "source_target", $LA, $LB, $ST);
+    debug "Filling in target-source dictionary table.";
+    create_dictionary($db, "target_source", $LB, $LA, $TS);
+
+}
+else {
+    debug "Dumping source-target dictionary.";
+    dump_dictionary("source-target", $ST, $LA, $LB);
+
+    debug "Dumping target-source dictionary.";
+    dump_dictionary("target-source", $TS, $LB, $LA);
+}
+
+debug "Closing lexicon files";
+$LA->close;
+$LB->close;
+
+debug "Closing dictionary files";
+$ST->close;
+$TS->close;
+
+
+
+sub dump_dictionary {
+    my ($name, $id, $LA, $LB) = @_;
+
+    if ($self) {
+        open X, ">:utf8", "$crpDir/$name.dmp" or die "Can't create file: $!";
+        select X;
+    }
+    elsif ($crpDir) {
+        open X, ">:utf8", "$name.dmp" or die "Can't create file: $!";
+        select X;
+    }
+    else {
+        binmode STDOUT, ":utf8";
+    }
+
+    print "use utf8;\n";
+
+    my $n = ($name eq "source-target")?1:2;
+    print "\$DIC$n = {\n";
+    for my $i (1..$id->size) {
+        my $occs = $id->occ($i);
+        my $word = $LA->word_from_id($i);
+        my $vals = $id->vals($i);
+        my %vals = (@{$vals});
+
+        print '"',_quotemeta($word),'" => {',"\n";
+        print "  count => $occs,\n";
+        print "  trans => {\n";
+        for (sort {$vals{$b} <=> $vals{$a}} keys %vals) {
+            printf "    %15s => %.8f,\n", '"'._quotemeta($LB->word_from_id($_)).'"', $vals{$_};
+        }
+        print "    },\n";
+        print "},\n";
+    }
+    print "};\n\n";
+
+    close X if $self || $crpDir;
+}
+
+sub _quotemeta {
+    my $string = shift;
+    $string =~ s/\\/\\\\/g;
+    $string =~ s/\$/\\\$/g;
+    $string =~ s/\@/\\\@/g;
+    $string =~ s/"/\\"/g;
+    return $string;
+}
+
+sub create_dictionary {
+    my ($dbh, $table, $sl, $tl, $dict) = @_;
+    my $sth = $dbh->prepare("INSERT INTO $table VALUES(?,?,?)");
+    my $size = $dict->size;
+    $dbh->begin_work;
+    $dict->for_each(
+                    sub {
+                        my %data = @_;
+                        my $wid = $data{word};
+                        my %trans = @{$data{vals}};
+                        for my $twid (keys %trans) {
+                            $sth->execute($sl->word_from_id($wid),
+                                          $tl->word_from_id($twid),
+                                          $trans{$twid});
+                        }
+                    }
+                   );
+    $dbh->commit;
+}
+
+sub create_lexicon {
+    my ($dbh, $table, $lexicon, $dict) = @_;
+    my $sth = $dbh->prepare("INSERT INTO ${table} VALUES(?,?);");
+    my $size = $lexicon->size;
+    $dbh->begin_work;
+
+    for my $i (1 .. $size) {
+        my $occs = $dict->occ($i);
+        my $word = $lexicon->word_from_id($i);
+        $sth->execute($word, $occs);
+    }
+
+    $dbh->commit;
+}
+
+sub create_tables {
+    my $dbh = shift;
+    my @create_tables =
+      (q{CREATE TABLE source (word VARCHAR(50) PRIMARY KEY NOT NULL,
+                              occurrences INTEGER NOT NULL);},
+       q{CREATE TABLE target (word VARCHAR(50) PRIMARY KEY NOT NULL,
+                              occurrences INTEGER NOT NULL);},
+       q{CREATE TABLE source_target (word VARCHAR(50) NOT NULL,
+                                     trans VARCHAR(50) NOT NULL,
+                                     probability REAL NOT NULL,
+                                     PRIMARY KEY (word, trans));},
+       q{CREATE TABLE target_source (word VARCHAR(50) NOT NULL,
+                                     trans VARCHAR(50) NOT NULL,
+                                     probability REAL NOT NULL,
+                                     PRIMARY KEY (word, trans));},
+      );
+
+    for my $table (@create_tables) {
+        $dbh->do($table);
+    }
+}
+
+
+__END__
+
+=head1 NAME
+
+=encoding utf8
+
+nat-dumpDicts - Command line tool to dump NATools PTDs
+
+=head1 SYNOPSIS
+
+   nat-dumpDicts <natools-dir>
+
+   nat-dumpDicts -self <natools-dir>
+
+=head1 DESCRIPTION
+
+This command is used to dump NATools Probabilistic Translation
+Dictionaries in different formats.  By default a Perl Data::Dumper
+format is used, but other formats are also available, like SQLite database.
+
+=head2 Data::Dumper
+
+To dump a PTD in Perl can be performed in three different ways:
+
+=over 4
+
+=item *
+
+Use it directly with a NATools corpus directory path, and it will
+create two files in the current directory with the dictionaries. They
+will be named C<< source-target.dmp >> and C<< target-source.dmp >>.
+
+B<< Note: >> this process will overwrite any files with those names.
+
+=item *
+
+Use it with the C<< -self >> flag and a NATools corpus directory
+path. The dictionaries will be created inside the NATools corpus
+directory and will be named C<< source-target.dmp >> and C<< target-source.dmp >>.
+
+B<< Note: >> this process will overwrite any files with those names.
+
+=item *
+
+Used mainly for debug purposes, you can also supply four arguments to
+C<< nat-dumpDicts >> (together with the C<< -full >> flag). These arguments
+are the source lexicon file, the source-target binary dictionary file,
+the target lexicon file and finally the target-source binary
+dictionary file. If this all seems strange to you, just do not use it.
+
+   nat-dumpDicts -full <src.lex> <src-tgt.bin> <tgt.lex> <tgt-src.bin>
+
+=back
+
+=head2 SQLite database
+
+When running this command you can supply a C<< -sqlite=databasename >>
+option. In this case, instead of dumping in Perl Data::Dumper format,
+a sqlite database will be created. You can use this option with or
+without the C<< -full >> flag, but there isn't a C<< -self >> option
+as the output filename is supplied in the command line.
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2012 by Alberto Manuel Brandão Simões
+
+=cut

@@ -1,0 +1,41 @@
+0.06 - Fri Jan 20 2011
+	- some changes to handle Unicode more or less properly:
+	normalization, unicode classes in regular expressions
+	- speed optimizations
+	- synced algorithm with current PHP version
+	- changed tests to use empirically found threshold
+	- data update
+
+0.05 - Mon Nov 21 2011
+	- data update
+	- added more POD
+
+0.04 - Sun Nov 20 2011
+	- INCOMPATIBLE CHANGE: refactored files related code (data files now
+	stored as GZip archives rather than plaintext files)
+	- INCOMPATIBLE CHANGE: tokens_bounds() now returns zero-based index of the
+	boundary instead of the position of the character after
+	- data files are now represented with classes and proper API
+	- few small bugfixes
+	- split tests for tokens() and tokens_bounds(), enable tests for the
+	latter
+	- data files now have their own version, independent from module's version
+	- data_dir is now configurable in constructor
+	- other small fixes and improvments
+
+0.03 - Mon Oct 3 2011
+	- few algorithm and documentation bugfixes
+	- fixed updater script and library
+	- new and updated data
+	- now works with perl >= 5.8.5
+	- INCOMPATIBLE CHANGE: tokens() method now takes threshold option which
+	changes its behaviour
+	- INCOMPATIBLE CHANGE: tokens_bounds() method doesn't store tokens anymore
+	- disabled tests for now
+
+0.02 - Fri Sep 9 2011
+	- fixed tests
+	- added Changelog
+
+0.01 - Fri Sep 9 2011
+	- first release

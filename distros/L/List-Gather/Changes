@@ -1,0 +1,45 @@
+Revision history for List-Gather
+
+0.13  2017-04-01 00:30:19Z
+  * fixes for perl 5.25.1 for manipulation of op_sibling (RT#116694; thanks,
+    Dave Mitchell!)
+
+0.12  2015-01-03 20:38:19Z
+  * re-release to fix problematic $VERSION declaration (RT#101095)
+
+0.11  2014-12-28 20:01:49Z
+  * fix failures on non-development perls -- ether is very sorry;
+   thanks Father Chrysostomos! (RT#101157)
+
+0.10  2014-12-28 05:09:20Z
+  * fix failures on perl 5.21.7 (Father Chrysostomos, RT#101157)
+
+0.09  2014-12-27 20:18:03Z
+  * fix failures on perl 5.19.x (Tony Cook, RT#95283)
+
+0.08  2013-07-31 18:44:37Z
+  * Add an experimental statement modifier syntax.
+
+0.07  2013-07-24 22:52:47Z
+  * Give take a meaningful return value.
+
+0.06  2012-02-19 02:45:19Z
+  * Restore compatibility with recent perls providing pad_findmy_pvs
+
+0.05  2012-02-18 23:21:47Z
+  * Minor documentation improvements
+
+0.04  2012-02-18 21:26:42Z
+  * Stop declaring a B::Hooks::EndOfScope dependency in META - the module is
+    only needed on old perls
+  * Improve documentation
+  * Test the bahaviour of return in a given block
+
+0.03  2012-02-18 18:12:32Z
+  * Add more tests for context propagation and exception handling
+
+0.02  2012-02-18 16:54:02Z
+  * Support perl 5.12 in addition to 5.14
+
+0.01  2012-02-18 00:55:38Z  TRIAL
+  * Initial release

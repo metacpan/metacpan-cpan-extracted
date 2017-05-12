@@ -1,0 +1,29 @@
+	failing to 
+
+[Sun Nov  4 16:38:03 2001] [notice] cannot use a full URL in a 401 ErrorDocument directive --- ignoring!
+hi..I do config home is /home/sca at /home/sca//lib/perl5/site_perl/5.6.1/WWW/Link_Controller/Config.pm line 20.
+link variable |/home/sca/link-data/links.db| at fix-link.cgi line 24.
+[Sun Nov  4 16:38:03 2001] fix-link.cgi: Ambiguous call resolved as CORE::close(), qualify as such or use & at /home/sca//lib/perl5/site_perl/5.6.1/CGI/Base.pm line 834.
+[Sun Nov  4 16:38:03 2001] fix-link.cgi: Ambiguous call resolved as CORE::close(), qualify as such or use & at /home/sca//lib/perl5/site_perl/5.6.1/CGI/Base.pm line 1043.
+[Sun Nov  4 16:38:03 2001] fix-link.cgi: Ambiguous call resolved as CORE::read(), qualify as such or use & at /home/sca//lib/perl5/site_perl/5.6.1/CGI/BasePlus.pm line 181.
+[Sun Nov  4 16:38:03 2001] fix-link.cgi: opendir(./../../..): Permission denied at /home/sca/bin/fix-link.cgi line 51
+[Sun Nov  4 16:38:03 2001] fix-link.cgi: using default configuration at /home/sca/bin/fix-link.cgi line 62.
+[Sun Nov  4 16:38:03 2001] fix-link.cgi: Useless use of join or string in void context at /home/sca/bin/fix-link.cgi line 178.
+[Sun Nov  4 16:38:03 2001] fix-link.cgi: parse of fix-link.cgi failed: [Sun Nov  4 16:38:03 2001] fix-link.cgi: arguments missing at /home/sca/bin/fix-link.cgi line 89.
+
+
+	failing to do a substitution..  
+
+[Sun Nov  4 16:59:14 2001] [notice] cannot use a full URL in a 401 ErrorDocument directive --- ignoring!
+hi..I do config home is /home/sca at /home/sca//lib/perl5/site_perl/5.6.1/WWW/Link_Controller/Config.pm line 20.
+link variable |/home/sca/link-data/links.db| at fix-link.cgi line 24.
+[Sun Nov  4 16:59:14 2001] fix-link.cgi: Ambiguous call resolved as CORE::close(), qualify as such or use & at /home/sca//lib/perl5/site_perl/5.6.1/CGI/Base.pm line 834.
+[Sun Nov  4 16:59:14 2001] fix-link.cgi: Ambiguous call resolved as CORE::close(), qualify as such or use & at /home/sca//lib/perl5/site_perl/5.6.1/CGI/Base.pm line 1043.
+[Sun Nov  4 16:59:14 2001] fix-link.cgi: Ambiguous call resolved as CORE::read(), qualify as such or use & at /home/sca//lib/perl5/site_perl/5.6.1/CGI/BasePlus.pm line 181.
+[Sun Nov  4 16:59:14 2001] fix-link.cgi: opendir(./../../..): Permission denied at /home/sca/bin/fix-link.cgi line 51
+[Sun Nov  4 16:59:14 2001] fix-link.cgi: using default configuration at /home/sca/bin/fix-link.cgi line 62.
+[Sun Nov  4 16:59:14 2001] fix-link.cgi: Useless use of join or string in void context at /home/sca/bin/fix-link.cgi line 178.
+got origurl http://www.math.psu.edu/barr/majordomo-faq.html
+got new user
+[Sun Nov  4 16:59:14 2001] fix-link.cgi: parse of fix-link.cgi failed: [Sun Nov  4 16:59:14 2001] fix-link.cgi: called without url to change to
+

@@ -1,0 +1,108 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+inert class Lucy::Util::Freezer {
+
+    /** Store an arbitrary object to the outstream.
+     */
+    inert void
+    freeze(Obj *obj, OutStream *outstream);
+
+    /** Retrieve an arbitrary object from the instream.
+     */
+    inert incremented Obj*
+    thaw(InStream *instream);
+
+    /** Serialize an object to the outstream, but without the context provided
+     * by freeze().
+     */
+    inert void
+    serialize(Obj *obj, OutStream *outstream);
+
+    /** Deserialize an object from the instream, according to the class of the
+     * supplied blank.
+     */
+    inert incremented Obj*
+    deserialize(Obj *obj, InStream *instream);
+
+    /** Return a representation of the object using only scalars, hashes, and
+     * arrays.  Some classes support JSON serialization via dump() and its
+     * companion, load(); for others, dump() is only a debugging aid.
+     * The default simply calls [](cfish:.To_String).
+     */
+    inert incremented Obj*
+    dump(Obj *obj);
+
+    /** Create an object from the output of a call to dump().
+     *
+     * @param dump The output of dump().
+     */
+    inert incremented Obj*
+    load(Obj *dump);
+
+    inert void
+    serialize_string(String *string, OutStream *outstream);
+
+    inert incremented String*
+    deserialize_string(decremented String *string, InStream *instream);
+
+    inert incremented String*
+    read_string(InStream *instream);
+
+    inert void
+    serialize_blob(Blob *blob, OutStream *outstream);
+
+    inert incremented Blob*
+    deserialize_blob(decremented Blob *blob, InStream *instream);
+
+    inert incremented Blob*
+    read_blob(InStream *instream);
+
+    inert void
+    serialize_varray(Vector *array, OutStream *outstream);
+
+    inert incremented Vector*
+    deserialize_varray(decremented Vector *array, InStream *instream);
+
+    inert incremented Vector*
+    read_varray(InStream *instream);
+
+    inert void
+    serialize_hash(Hash *hash, OutStream *outstream);
+
+    inert incremented Hash*
+    deserialize_hash(decremented Hash *hash, InStream *instream);
+
+    inert incremented Hash*
+    read_hash(InStream *instream);
+}
+
+__C__
+#define LUCY_FREEZE(_obj, _outstream) \
+    lucy_Freezer_freeze((Obj*)(_obj), (outstream))
+
+#define LUCY_THAW(_instream) \
+    lucy_Freezer_thaw(instream)
+
+#ifdef LUCY_USE_SHORT_NAMES
+  #define FREEZE                LUCY_FREEZE
+  #define THAW                  LUCY_THAW
+#endif
+__END_C__
+
+

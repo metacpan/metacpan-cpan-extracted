@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 4d75f4e68a617facd637879d1ccf7c70a13849c9 COPYRIGHT
+SHA1 1a7f4f0ed7f702d78ab613cac4d160099dc9c350 CREDITS
+SHA1 f944b0c2f2a1352b39077d405384c36072f799fd Changes
+SHA1 a3ae4f583f47722f2be214a8f525a2178f5973c1 INSTALL
+SHA1 07979035d1028ff22101063841c8b256374467b9 LICENSE
+SHA1 96fc6821b19b086a07ad4d8654b89d7043b427ca MANIFEST
+SHA1 9a96aa4ba607ba6b2e9627a66f19f0a354571588 META.json
+SHA1 7bce9078dad4ce6a3533c177e5de4c286d5d156c META.yml
+SHA1 e68dac955b4869d7bc71334cce16bcd7f337c782 Makefile.PL
+SHA1 ee87640ac0b373db667720868af45d3a290c4cac README
+SHA1 ad22e5dffc9fb0af7ea8ff4294808b6ed0e2e8f9 README.pod
+SHA1 959848056a74404c176766a0604f0359f70464a0 dist.ini
+SHA1 8f3a146c2993d4be8a3556a6784920d7e34eb3b1 doap.ttl
+SHA1 7ee50a3e7f251fc78f6b0d0e0d8bec6c95f31cef lib/LWP/UserAgent/CHICaching.pm
+SHA1 2b4a462c8a2f7c0fc904788ac80c60346979b710 lib/LWP/UserAgent/Role/CHICaching.pm
+SHA1 1a6ecb98de6dc25ca91433138b6e2cf72b4b8c86 lib/LWP/UserAgent/Role/CHICaching/SimpleKeyGen.pm
+SHA1 bcb82358de0ae5fde3e53746c3a4267d6347445d lib/LWP/UserAgent/Role/CHICaching/SimpleMungeResponse.pm
+SHA1 41ab178b26bb150b48d24db9564a2a288eb64640 lib/LWP/UserAgent/Role/CHICaching/VaryNotAsterisk.pm
+SHA1 48d4455bc047d8810c5c52e6ac0a9edd4fc46c9b t/01basic.t
+SHA1 58b1d3aec6280611083c2988a5a8e7b44b405e80 t/maxage.t
+SHA1 ee4f1abef1d1f178588b56396e2df6bb74f3de56 t/vary.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIVAwUBVt1YX3++6N86nkqlAQgnRBAAlpE9xa8vdMzIISLXVBoWuOVQPGPGHQYf
+LVo6yCB+eVHcKC7S5D8Rm87FsosmEulwK5yynrPPjrX0ybYCwXZ76TLjnaQxk/eZ
+PxCu1QuSJf0LZp6FGXSjoihIr5zgZbYo9CN5u0jj4QNJNrb+Eu1v3p7z+0hVkisH
+Why0pv6cD7fZUi8hp3ajxGmSynw0A60VPK+j/RrGH9C7FlMfIlHbit3xmp4lZbbL
+41Ws2PxDeq+CcIELIE55wgCW+xa46B2/+vhFOfXYIRJhOo0gmJ5q5xf4aITTcrb6
+fbbZ1Ht6ZGAR/BpzdWMYBviPdo94lolWT5K3QnYnbil7zrWSHvwz7UqEN9XsoTPu
+dh6k7XBu5J/Ev5EQjwn7XQ/gDYgZKL1pHJGxKUWiNdYoW9sl5yrzOEj+zMdj3RUP
+j5/G3qgPhuYi5C9Q9Cb0aRHqtrmm7/3ua7SuQhSbaUeCdVL44Y2U4xISACXXuqgZ
+jp8YNyLGxmCWS5VEymoPbV0doQxNeqA3wD83u4aE16b6jspzRUD3fSf4Rs9VwtE6
+v8oc+MXQ6iDg8fFvh2IYNMo/QXOLett1t7ADw/zOGkx34tfT2Fxk7FV/p/3hCPbg
+XCcqeBPglQrsuGt0hsn3ltavintwW75yt/LeLClbtGVa5DF175R3GvAgF6BAsaq2
+FiE6PHakfbA=
+=iAPa
+-----END PGP SIGNATURE-----

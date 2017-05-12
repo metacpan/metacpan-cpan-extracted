@@ -1,0 +1,2755 @@
+# Words that inflect singular->plural normally
+# but which are ambiguous when inflected plural->singular...
+# (e.g. "axes"-->"ax" vs "axes"-->"axe" vs "axes"-->"axis")
+# [These need to be at the start so the rest of the inflections defer to them]
+# [The first form in each group is always preferred]
+
+    agendum     =>          |  agenda
+    agend       =>  agends  |  agenda
+
+    axe         => axes
+    ax          => axes
+
+    base        => bases
+    basis       => bases
+
+    blue        => blues
+    blues       => blues
+
+    breech      => breeches
+    breeches    => breeches
+
+    clippers    => clippers
+    clipper     => clippers
+
+    co          =>  coes
+    coe         =>  coes
+
+    coney       => coneys  | conies
+    cony        => conys   | conies
+
+    doe         =>  does
+    do          =>  does
+
+    ellipse     => ellipses
+    ellipsis    => ellipses
+
+    fro         =>  froes
+    froe        =>  froes
+
+    genie       =>  genies    |  genii
+    genius      =>  geniuses  |  genii
+
+    glass       =>  glasses
+    glasses     =>  glasses
+
+    graffiti    => graffiti
+    graffito    => graffiti
+
+    heroon      =>  heroa
+    heroum      =>  heroa
+
+    hoe         =>  hoes
+    ho          =>  hoes
+
+    joe         =>  joes
+    jo          =>  joes
+
+    mew         => mews
+    mews        => mews
+
+    moe         =>  moes
+    mo          =>  moes
+
+    monsignore  =>              |  monsignori
+    monsignor   =>  monsignors  |  monsignori
+
+    pant        => pants
+    pants       => pants
+
+    penny       => pennies  |  pence
+    pence       =>             pence
+
+    pincer      => pincers
+    pincers     => pincers
+
+    po          =>  poes
+    poe         =>  poes
+
+    shears      => shears
+    shear       => shears
+
+    shorts      => shorts
+    short       => shorts
+
+    so          =>  soes
+    soe         =>  soes
+
+   *staff       => *staffs  |  *staves
+   *stave       =>             *staves
+
+    syringe     =>              syringes
+    syrinx      => syrinxes  |  syringes
+
+    testes      => testes
+    testis      => testes
+
+    toe         =>  toes
+    to          =>  toes
+
+    tongs       => tongs
+    tong        => tongs
+
+    yo          =>  yoes
+    yoe         =>  yoes
+
+
+# Singular words ending in "-s" with irregular inflexions...
+
+    Atlas            =>              |  Atlantes
+    atlas            =>  atlases     |  atlantes
+    editio princeps  =>              |  editiones principes
+    eros             =>  eroses      |  erotes
+    gens             =>              |  gentes
+    maecenas         =>  maecenases  |  maecenates
+    mons             =>              |  montes
+    Nenets           =>  Nenets      |  Nentsi
+    paries           =>              |  parietes
+    potestas         =>              |  potestates
+    proferens        =>              |  proferentes
+    secans           =>              |  secantes
+    starets          =>              |  startsy
+    triens           =>              |  trientes
+    venus            =>  venuses     |  veneres
+    yes              =>  yeses       |
+
+
+# Latin imports ending in "-us" that classically inflect to "-era"...
+
+   *genus       =>        | genera
+    glomus      =>        | glomera
+    opus        => opuses |          # Classical should be "opera", but it's ambiguous
+    viscus      =>        | viscera
+
+
+# Compound words (mostly imported) that inflect irregularly (for English)...
+ 
+    agent provocateur      =>                  | agents provocateurs
+    aide-de-camp           =>                  | aides-de-camp
+    ale-wife               => ale-wives        |
+    alto-relievo           => alto-relievos    |
+    amicus curiae          =>                  | amici curiae
+    anti-serum             => anti-serums      | anti-sera
+    auto-de-fe             => auto-de-fes      | autos-de-fes
+    beau geste             => beau gestes      | beaux gestes
+    bel homme              =>                  | beaux hommes
+    bel-esprit             =>                  | beaux esprits
+    belle epoque           => belle epoques    | belles epoques
+    bon mot                => bon mots         | bons mots
+    bon vivant             => bon vivants      | bons vivants
+    bona fides             =>                  | bonis fidebus
+    break-away             => break-aways      | breaks-away
+    brother-german         => brothers-german  | brethren-german
+    caffe macchiato        => caffe macchiatos | caffe macchiati
+    caffe ristretto        => caffe ristrettos | caffe ristretti
+    camera obscura         => camera obscuras  | camerae obscurae
+    carte-de-visite        =>                  | cartes-de-visite
+    casus belli            =>                  | casus belli
+    cheval-de-bataille     =>                  | chevaux-de-bataille
+    collegium musicum      =>                  | collegia musica
+    concerto grosso        =>                  | concerti grossi
+    corpus vile            =>                  | corpora vilia
+    coup d'etat            =>                  | coups d'etat
+    court martial          => court-martials   | courts martial
+    crafts-child           =>                  | crafts-childer
+    cri de coeur           =>                  | cris de coeur
+    cul-de-four            =>                  | culs-de-four
+    cul-de-lampe           =>                  | culs-de-lampe
+    cul-de-sac             =>                  | culs-de-sac
+    editio princeps        =>                  | editiones principes
+    ens rationis           =>                  | entia rationis
+    ens reale              =>                  | entia realia
+    entente cordiale       =>                  | ententes cordiales
+    fait accompli          =>                  | faits accomplis
+    felo-de-se             => felos-de-se      | felones-de-se
+    fidei defensor         =>                  | fidei defensores
+    finger-end             => finger-ends      | fingers-ends
+    flag-staff             => flag-staffs      | flag-staves
+    franc-archer           => franc-archers    | francs-archers
+    fundamentum divisionis =>                  | fundamenta divisionis
+    fungo porcino          =>                  | funghi porchini
+    guardia civil          =>                  | guardias civiles
+    hapax legomenon        => hapax legomenons | hapax legomena
+    hemi-elytrum           =>                  | hemi-elytra
+    idee fixe              =>                  | idees fixes
+    infima species         =>                  | infimae species
+    ipse dixit             =>                  | ipse dixits
+    lex humana             =>                  | leges humanae
+    line-out               => line-outs        | lines-out
+    lord-lieutenant        => lord-lieutenants | lords-lieutenant
+    magnum opus            => magnum opuses    | magna opera
+    malum in se            =>                  | mala in se
+    man-child              => men-children     |
+    man-midwife            => men-midwives     |
+    man-milliner           => man-milliners    | men-milliners
+    man-servant            =>                  | men-servants
+    mater lectionis        =>                  | matres lectionis
+    matinee musicale       =>                  | matinees musicales
+    menage a quatre        =>                  | menages a quatre
+    menage a trois         =>                  | menages a trois
+    messa di voce          =>                  | messe di voce
+    mezzo-rilievo          =>                  | mezzo-rilievos
+    miles gloriosus        =>                  | milites gloriosi
+    milieu interieur       =>                  | milieux interieurs
+    monstre sacre          =>                  | monstres sacres
+    musee imaginaire       =>                  | musees imaginaires
+    musique concrete       =>                  | musiques concretes
+    naya paisa             =>                  | naye paise
+    non-ens                =>                  | nonentia
+    nouveau pauvre         => nouvelle pauvre  | nouveaux pauvres
+    nouveau riche          => nouvelle riche   | nouveaux riches
+    nouvel arrive          =>                  | nouveaux arrives
+    novus homo             =>                  | novi homines
+    opus magnum            =>                  | opera magna
+    parc ferme             =>                  | parcs fermes
+    pied a terre           =>                  | pieds a terre
+    pied noir              =>                  | pieds noirs
+    pina colada            => pina coladas     | pinas coladas
+    plurale tantum         =>                  | pluralia tantum
+    pomme de terre         =>                  | pommes de terre
+    port de bras           =>                  | ports de bras
+    port-a-beul            =>                  | puirt-a-beul
+    portrait parle         =>                  | portraits parles
+    premier danseur        =>                  | premiers danseurs
+    prima ballerina        => prima ballerinas | prime ballerine
+    prima donna            => prima donnas     | prime donne
+    punto blanco           => puntos blancos   | punti blanchi
+    rara avis              => rara avises      | rarae aves
+    rite de passage        =>                  | rites de passage
+    rond de jambe          => rond de jambes   | ronds de jambes
+    route nationale        =>                  | routes nationales
+    ruse de guerre         =>                  | ruses de guerre
+    sanctum sanctorum      =>                  | sancta sanctorum
+    scandalum magnatum     =>                  | scandala magnatum
+    set-off                => set-offs         | sets-off
+    set-out                => set-outs         | sets-out
+    set-to                 => set-tos          | sets-to
+    star-fish              => star-fishes      | star-fish
+    studium generale       =>                  | studia generali
+    suggestio falsi        =>                  | suggestiones falsi
+    summum bonum           =>                  | summa bona
+    summum genus           =>                  | summa genera
+    sum-total              => sum-totals       | sums-total
+    terrae filius          =>                  | terrae filii
+    tete-a-tete            => tete-a-tetes     |
+    tortilla espanola      =>                  | tortillas espanolas
+    tour de force          =>                  | tours de force
+    uomo universale        =>                  | uomini universali
+    varia lectio           =>                  | variae lectiones
+    vers libre             =>                  | vers libres
+    washer-up              => washers-up       |
+    white staff            => white staves     |
+    woman-child            => women-children   |
+    woman-servant          => women-servants   |
+
+
+# Other words with irregular inflexions...
+
+    alan            =>  alans            |  alani
+    atman           =>  atmas            |
+    bajocco         =>                   |  bajocchi
+    bandit          =>  bandits          |  banditti
+    bersagliere     =>                   |  bersaglieri
+    blin            =>  blinis           |  blini
+    blouse          =>  blouses          |
+    brachiopod      =>  brachiopods      |  brachiopoda
+    branchiopod     =>  branchiopods     |  branchiopoda
+    breakaway       =>  breakaways       |  breaksaway
+    brother-german  =>  brothers-german  |  brethren-german
+    calzone         =>  calzones         |  calzoni
+    capo            =>  capos            |  capi
+    caryatid        =>  caryatids        |  caryatides
+    chervonetz      =>                   |  chervontzi
+    cony            =>  conys            |  conies
+    court-martial   =>  court-martials   |  courts-martial
+    curioso         =>  curiosos         |  curiosi
+    devoto          =>  devotos          |  devoti
+    die             =>  dice             |  dies
+    divertimento    =>  divertimentos    |  divertimenti
+    fedai           =>  fedais           |  fedai
+    ganglion        =>  ganglions        |  ganglia
+    giuncus         =>                   |  giunchi
+    glutaeus        =>  glutei           |  glutaei
+    gluteus         =>  glutei           |  glutaei
+    graffiti        =>  graffiti         |
+    graffito        =>  graffiti         |
+    hamadryad       =>  hamadrayads      |  hamadryades
+    hetaera         =>  hetaerae         |  hetairai
+    hetaira         =>  hetaerae         |  hetairai
+    hinaki          =>                   |  hinaki
+    ixodid          =>                   |  ixodides
+    jerry           =>  jerries          |
+    Jerry           =>  Jerrys           |
+    kovsh           =>                   |  kovshi
+    kuvasz          =>                   |  kuvaszok
+    laika           =>                   |  laiki
+    Lapith          =>  Lapiths          |  Lapithae
+    leu             =>                   |  lei
+    likuta          =>                   |  makuta
+    maestro         =>  maestros         |  maestri
+    mare            =>  mares            |  maria
+    mary            =>  maries           |
+    Mary            =>  Marys            |
+    matzah          =>  matzahs          |  matzot
+    modello         =>  modellos         |  modelli
+    money           =>  monies           |
+    monseigneur     =>  monsiegneurs     |  messeigneurs
+    mousetrap       =>  mousetraps       |  micetraps
+    nagaika         =>  nagaikas         |  nagaiki
+    niello          =>  niellos          |  nielli
+    occiput         =>  occiputs         |  occipita
+    octopus         =>  octopuses        |
+    octopus         =>                   |  octopi       # Not correct, but widely used
+    octopus         =>                   |  octopodes    # Not correct either, and rarely used
+    onager          =>  onagers          |  onagri
+    otomi           =>  otomies          |  otomi
+    pecten          =>  pectens          |  pectines
+    penni           =>                   |  pennia
+   *person          =>  people           |  persons
+    plankter        =>  plankton         |
+    platypus        =>  platypuses       |  platypodes
+    ploshchadka     =>                   |  ploshchadki
+    pul             =>  puls             |  puli
+    rezidentsia     =>                   |  rezidentsii
+    ricercar        =>  ricercars        |  ricercari
+    ritardando      =>  ritardandos      |  ritardandi
+    Rom             =>  Roma             |
+    Romany          =>  Romanies         |
+    rubashka        =>  rubashkas        |  rubashki
+    scirrhus        =>  scirrhusses      |  scirrhi
+    scomber         =>  scombri          |
+    sforzato        =>  sforzatos        |  sforzati
+    siglos          =>  sigli            |  sigloi
+    ski             =>  skis             |
+    solfeggio       =>  solfeggios       |  solfeggi
+    squadrist       =>  squadrists       |  squadristi
+    staretz         =>                   |  startzy
+    starosta        =>                   |  starosti
+    stoa            =>  stoas            |  stoai
+    storey          =>  storeys          |
+    tolkach         =>                   |  tolkachi
+    trilby          =>  trilbys          |
+    udarnik         =>                   |  udarniki
+    valuta          =>  valute           |  valuten
+    zloty           =>  zlotys           |  zloty
+
+
+
+# Units that don't inflect...
+
+    *hertz    =>  hertz
+    *lux      =>  lux
+    *siemens  =>  siemens
+
+
+# Currencies that don't inflect...
+
+    kobo   => kobo
+    ngwee  => ngwee
+    quid   => quid
+    thebe  => thebe
+
+
+# Miscellaneous words that inflect normally (but classically don't inflect at all)...
+
+    djinn       => djinns      | djinn
+    Galla       => Gallas      | Galla
+    graben      => grabens     | graben
+    lis         => lisses      | lis
+    listeria    => listerias   | listeria
+    loa         => loas        | loa
+    lox         => loxes       | lox
+    microfiche  => microfiches | microfiche
+    Otomi       => Otomies     | Otomi
+    poise       => poises      | poise
+    Purum       => Purums      | Purum
+    rad         => rads        | rad
+    rem         => rems        | rem
+    shifta      => shiftas     | shifta
+    torma       => tormas      | torma
+    veg         => veges       | veg
+
+
+# Words of Old English or Germanic origin that classically inflect to "-en" or "-ne"...
+
+    anlage      =>  anlages     |  anlagen
+    auslese     =>  ausleses    |  auslesen
+    autobahn    =>  autobahns   |  autobahnen
+   *brother     =>  brothers    |  brethren
+   *child       =>              |  children
+   *cow         =>  cows        |  kine
+    erf         =>  erfs        |  erven
+    knopper     =>  knoppers    |  knoppern
+    konditorei  =>  konditorei  |  konditoreien
+    manchild    =>              |  menchildren
+    ox          =>              |  oxen
+   --ox         =>              |  --oxen
+    romanze     =>              |  romanzen
+    terp        =>  terps       |  terpen
+    vlakte      =>  vlaktes     |  vlakten
+    womanchild  =>              |  womenchildren
+
+
+# German imports that retain their native -en plurals...
+
+    Auslese               =>  Auslesen
+    beerenauslese         =>  beerenauslesen
+    bursch                =>  burschen
+    geisteswissenschaft   =>  geisteswissenschaften
+    herr                  =>  herren
+    lebensform            =>  lebensformen
+   *mensch                =>  *menschen
+    Spaetlese             =>  Spaetlesen
+    trockenbeerenauslese  =>  trockenbeerenauslesen
+    umwelt                =>  umwelten
+    vorstellung           =>  vorstellungen
+
+
+# Russian imports that classically inflect natively...
+
+    apparatchik => apparatchiks | apparatchiki
+    ispravnik => ispravniks | ispravniki
+    subbotnik => subbotniks | subbotniki
+
+
+# Words ending in unvoiced fricatives that classically inflect to voiced...
+
+    beef  => beefs  | beeves
+   *elf   =>        | elves
+   *hoof  => hoofs  | hooves
+   *knife =>        | knives
+   *leaf  =>        | leaves
+   *life  =>        | lives
+   *loaf  =>        | loaves
+   *shelf =>        | shelves
+   *thief =>        | thieves
+    turf  => turfs  | turves
+    wharf => wharfs | wharves
+   *wife  =>        | wives
+   *wolf  =>        | wolves
+
+
+# Words whose suffixes are normally ablaut, but not in these words...
+
+    ataman      =>  atamans
+    Bahaman     =>  Bahamans
+    Burman      =>  Burmans
+    caiman      =>  caimans
+    cayman      =>  caymans
+    ceriman     =>  cerimans
+    crowfoot    =>  crowfoots
+    desman      =>  desmans
+    dolman      =>  dolmans
+    fanfoot     =>  fanfoots
+    farman      =>  farmans
+    flatfoot    =>  flatfoots
+    German      =>  Germans
+    harman      =>  harmans
+    hetman      =>  hetmans
+    Hiroshiman  =>  Hiroshimans
+   *human       =>  humans
+    leman       =>  lemans
+    Liman       =>  Limans
+    lowlife     =>  lowlifes
+    mongoose    =>  mongooses
+    Nakayaman   =>  Nakayamans
+    Norman      =>  Normans
+    Oklahoman   =>  Oklahomans
+    ottoman     =>  ottomans
+    Panaman     =>  Panamans
+    Roman       =>  Romans
+    sabertooth  =>  sabertooths
+    Selman      =>  Selmans
+    shaman      =>  shamans
+    Sonaman     =>  Sonamans
+    switchfoot  =>  switchfoots
+    Tacoman     =>  Tacomans
+    talisman    =>  talismans
+    talouse     =>  talouses
+    tenderfoot  =>  tenderfoots
+    Yakiman     =>  Yakimans
+    Yokohaman   =>  Yokohamans
+    Yuman       =>  Yumans
+
+# Words whose suffixes are ablaut, but not classically...
+
+    yarraman   => yarramen | yarramans
+    dragoman   => dragomen | dragomans
+
+# Words with ablaut plurals...
+
+    *foot       =>  feet
+    *goose      =>  geese
+    *louse      =>  lice
+    *man        =>  men
+    manservant  =>  menservants
+    *mouse      =>  mice
+    *tooth      =>  teeth
+
+
+# Words ending in "-z" and "-ze" that don't double the "z" for the plural...
+
+    batz    =>  batzes
+    blitz   =>  blitzes
+    chintz  =>  chintzes
+    coz     =>  cozes
+    quartz  =>  quartzes
+    snooze  =>  snoozes
+    topaz   =>  topazes
+    waltz   =>  waltzes
+
+
+# Words whose plurals end in "-zzes" but whose singulars end in "-zz"...
+
+   *buzz   => buzzes
+   *fizz   => fizzes
+   *frizz  => frizzes
+   *fuzz   => fuzzes
+   *jazz   => jazzes
+    muzz   => muzzes
+    razz   => razzes
+    sizz   => sizzes
+    zizz   => zizzes
+
+
+# Greek imports ending in "-x" that classically inflect to "-kes"
+
+    larnax  =>         | larnakes
+    kylix   => kylixes | kylikes
+
+
+# Greek imports ending in "-os" that always inflect to "-oi"
+
+    kantharos  =>  kantharoi
+    kernos     =>  kernoi
+    kouros     =>  kouroi
+    mythos     =>  mythoi
+    phallos    =>  phalloi
+    pharmakos  =>  pharmakoi
+    pithos     =>  pithoi
+    stichos    =>  stichoi
+    strategos  =>  strategoi
+    thalamos   =>  thalamoi
+    tholos     =>  tholoi
+    topos      =>  topoi
+
+
+# Greek imports ending in "-s" that classically inflect to "-des"
+
+    aphis       =>                |  aphides
+    apsis       =>                |  apsides
+    caryopsis   =>                |  caryopsides
+    chrysalis   =>  chrysalises   |  chrysalides
+    cinclis     =>                |  cinclides
+    clitoris    =>  clitorises    |  clitorides
+    cuspis      =>                |  cuspides
+    dipsas      =>                |  dipsades
+    ephelis     =>                |  ephelides
+    ephemeris   =>  ephemerises   |  ephemerides
+    epididymis  =>  epididymises  |  epididymides
+    iris        =>  irises        |  irides
+    meliceris   =>                |  melicerides
+    meris       =>                |  merides
+    monas       =>                |  monades
+    monorchis   =>                |  monorchides
+    oxyuris     =>                |  oxyurides
+    parapsis    =>                |  parapsides
+    pes         =>                |  pedes
+    pholas      =>                |  pholades
+   *proboscis   =>  proboscises   |  proboscides
+    proglottis  =>                |  proglottides
+    pycnis      =>                |  pycnides
+    pyralis     =>                |  pyralides
+    tropis      =>                |  tropides
+    vasculitis  =>  vasculitises  |  vasculitides
+
+# Greek imports ending in "-es" that classically inflect to "-ites"
+
+    fomes     =>    |  fomites
+    limes     =>    |  limites
+    satelles  =>    |  satellites
+    stipes    =>    |  stipites
+    termes    =>    |  termites
+
+# Greek imports ending in "-a" that classically inflect to "-ata"
+
+    acroama          =>                    |  acroamata
+    anathema         =>  anathemas         |  anathemata
+    angioma          =>                    |  angiomata
+    astrocytoma      =>  astrocytomas      |  astrocytomata
+   *bema             =>  bemas             |  bemata
+    blastema         =>                    |  blastemata
+    bregma           =>                    |  bregmata
+    carcinoma        =>  carcinomas        |  carcinomata
+    cathisma         =>                    |  cathismata
+    cementoma        =>                    |  cementomata
+    charisma         =>  charismas         |  charismata
+    chromonema       =>                    |  chromonemata
+    cystoma          =>                    |  cystomata
+    desma            =>  desmas            |  desmata
+    diastema         =>                    |  diastemata
+    diploma          =>  diplomas          |  diplomata
+    dogma            =>  dogmas            |  dogmata
+   *drama            =>  dramas            |
+   *edema            =>  edemas            |  edemata
+    emblema          =>                    |  emblememata
+    embryoma         =>                    |  embryomata
+    endothelioma     =>                    |  endotheliomata
+    enema            =>  enemas            |  enemata
+    enigma           =>  enigmas           |  enigmata
+    epithelioma      =>                    |  epitheliomata
+    exanthema        =>                    |  exanthemata
+    fibroma          =>                    |  fibromata
+    glioma           =>                    |  gliomata
+    gliosarcoma      =>                    |  gliosarcomata
+    gumma            =>  gummas            |  gummata
+    haemangioma      =>  haemangiomas      |  haemangiomata
+    hemangeioma      =>  hemangeiomas      |  hemangeiomata
+    hemangioma       =>  hemangiomas       |  hemangiomata
+    hypoderma        =>                    |  hypodermata
+   *lemma            =>  lemmas            |  lemmata
+    leproma          =>  lepromas          |  lepromata
+    lipoma           =>                    |  lipomata
+    loma             =>                    |  lomata
+    lymphangioma     =>                    |  lymphangiomata
+    lymphoma         =>  lymphomas         |  lymphomata
+    magma            =>  magmas            |  magmata
+    malagma          =>                    |  malagmata
+    medulloblastoma  =>  medulloblastomas  |  medulloblastomata
+    melanoma         =>  melanomas         |  melanomata
+    melisma          =>  melismas          |  melismata
+    meningioma       =>  meningiomas       |  meningiomata
+    mesothelioma     =>  mesotheliomas     |  mesotheliomata
+    miasma           =>  miasmas           |  miasmata
+    mycoplasma       =>  mycoplasmas       |  mycoplasmata
+    myeloma          =>  myelomas          |  myelomata
+    myxoma           =>                    |  myxomata
+    neuma            =>  neumas            |  neumata
+    neurinoma        =>  neurinomas        |  neurinomata
+    neuroma          =>                    |  neuromata
+    noema            =>                    |  noemata
+    nomisma          =>                    |  nomismata
+    nucleolonema     =>  nucleolonemas     |  nucleolonemata
+    oedema           =>  oedemas           |  oedemata
+    osteoclastoma    =>  osteoclastomas    |  osteoclastomata
+    osteoma          =>                    |  osteomata
+    papilloma        =>                    |  papillomata
+    paraganglioma    =>  paragangliomas    |  paragangliomata
+    parenchyma       =>                    |  parenchymata
+    phragma          =>                    |  phragmata
+    phyma            =>                    |  phymata
+    plasmoma         =>                    |  plasmomata
+    pragma           =>  pragmas           |  pragmata
+    programma        =>                    |  programmata
+    progymnasma      =>                    |  progymnasmata
+    protonema        =>                    |  protonemata
+    psammoma         =>                    |  psammomata
+    pseudostoma      =>                    |  pseudostomata
+    pteroma          =>                    |  pteromata
+    regma            =>                    |  regmata
+    rhinophyma       =>  rhinophymas       |  rhinophymata
+    rhizoma          =>  rhizomas          |  rhizomata
+   *sarcoma          =>  sarcomas          |  sarcomata
+    schema           =>  schemas           |  schemata
+    schisma          =>                    |  schismata
+    scotoma          =>  scotomas          |  scotomata
+    sema             =>  semas             |  semata
+    soma             =>  somas             |  somata
+    sperma           =>                    |  spermata
+    stemma           =>                    |  stemmata
+    sterigma         =>                    |  sterigmata
+    stigma           =>  stigmas           |  stigmata
+   *stoma            =>  stomas            |  stomata
+    stroma           =>                    |  stromata
+    symplasma        =>                    |  symplasmata
+    syntagma         =>  syntagmas         |  syntagmata
+    syphiloma        =>                    |  syphilomata
+    tagma            =>                    |  tagmata
+    teratoma         =>                    |  teratomata
+    thema            =>                    |  themata
+    toxoplasma       =>                    |  toxoplasmata
+    trauma           =>  traumas           |  traumata
+    treponema        =>                    |  treponemata
+    trichoma         =>                    |  trichomata
+    tuberculoma      =>  tuberculomas      |  tuberculomata
+    xanthoma         =>  xanthomas         |  xanthomata
+    zygoma           =>  zygomas           |  zygomata
+
+
+# Latin imports ending in "-a" that classically inflect to "-ae"...
+
+    abscissa        =>  abscissas        |  abscissae
+    acicula         =>                   |  aciculae
+    actinia         =>  actinias         |  actiniae
+    agape           =>  agapes           |  agapae
+    agora           =>                   |  agorae
+    ala             =>                   |  alae
+    alga            =>                   |  algae
+    alula           =>                   |  alulae
+    alumna          =>                   |  alumnae
+    amoeba          =>  amoebas          |  amoebae
+    amphora         =>                   |  amphorae
+    angustia        =>                   |  angustiae
+    anta            =>                   |  antae
+    antenna         =>  antennas         |  antennae
+    areola          =>                   |  areolae
+    arista          =>                   |  aristae
+    arrha           =>                   |  arrhae
+    asterias        =>                   |  asteriae
+    aurora          =>  auroras          |  aurorae
+    axilla          =>                   |  axillae
+    ballista        =>  ballistas        |  ballistae
+    basilica        =>  basilicas        |  basilicae
+    blemya          =>                   |  blemyae
+    bulla           =>                   |  bullae
+    bursa           =>                   |  bursae
+    cavea           =>                   |  caveae
+    celia           =>                   |  celiae
+    chaeta          =>                   |  chaetae
+    chlamydia       =>  chlamydias       |  chlamydiae
+    choana          =>                   |  choanae
+    chorda          =>                   |  chordae
+    clausula        =>                   |  clausulae
+    clavula         =>                   |  clavulae
+    clepsydra       =>  clepsydras       |  clepsydrae
+    coelia          =>                   |  coeliae
+    columna         =>                   |  columnae
+    coma            =>                   |  comae
+    comatula        =>                   |  comatulae
+    conferva        =>                   |  confervae
+    corona          =>  coronas          |  coronae
+    costa           =>                   |  costae
+    crista          =>                   |  cristae
+    crusta          =>                   |  crustae
+    cyphella        =>                   |  cyphellae
+    differentia     =>                   |  differentiae
+    diporpa         =>                   |  diporpae
+    ephemera        =>  ephemeras        |  ephemerae
+    fabella         =>                   |  fabellae
+    faecula         =>                   |  faeculae
+    familia         =>                   |  familiae
+    fascia          =>  fascias          |  fasciae
+    fauna           =>  faunas           |  faunae
+    favella         =>                   |  favellae
+    favissa         =>                   |  favissae
+    fecula          =>                   |  feculae
+    fenestra        =>                   |  fenestrae
+    fibra           =>                   |  fibrae
+    fibrilla        =>                   |  fibrillae
+    fibula          =>  fibulas          |  fibulae
+    filaria         =>  filarias         |  filariae
+    flora           =>  floras           |  florae
+    formula         =>  formulas         |  formulae
+    fossa           =>                   |  fossae
+    gemma           =>                   |  gemmae
+    gena            =>                   |  genae
+    globigerina     =>                   |  globigerinae
+    gorgonia        =>  gorgonias        |  gorgoniae
+    granula         =>                   |  granulae
+    hemera          =>                   |  hemerae
+    hernia          =>  hernias          |  herniae
+    holothuria      =>  holothurias      |  holothuriae
+    hydra           =>  hydras           |  hydrae
+    hydria          =>                   |  hydriae
+    hyperbola       =>  hyperbolas       |  hyperbolae
+    hypha           =>                   |  hyphae
+    indigena        =>                   |  indigenae
+    insula          =>                   |  insulae
+    intermaxilla    =>                   |  intermaxillae
+    lacinia         =>                   |  laciniae
+    lacuna          =>  lacunas          |  lacunae
+    lamella         =>                   |  lamellae
+    lamina          =>                   |  laminae
+    lapith          =>  lapiths          |  lapithae
+    legionella      =>                   |  legionellae
+    leishmania      =>  leishmanias      |  leishmaniae
+    leptospira      =>                   |  leptospirae
+    linea           =>                   |  lineae
+    lingula         =>                   |  lingulae
+    listerella      =>  listerellas      |  listerellae
+    lyssa           =>                   |  lyssae
+    macula          =>  maculas          |  maculae
+    maxilla         =>                   |  maxillae
+    medusa          =>  medusas          |  medusae
+    melastoma       =>  melastomas       |  melastomae
+    meta            =>                   |  metae
+    miliola         =>                   |  miliolae
+    mimosa          =>  mimosas          |  mimosae
+    minutia         =>  minutias         |  minutiae
+    monota          =>                   |  monotae
+    multigravida    =>  multigravidas    |  multigravidae
+    musa            =>  musas            |  musae
+    mya             =>  myas             |  myae
+    mycorhiza       =>  mycorhizas       |  mycorhizae
+    mycorrhiza      =>  mycorrhizas      |  mycorrhizae
+    naumachia       =>  naumachias       |  naumachiae
+    nebula          =>  nebulas          |  nebulae
+    nerita          =>  neritas          |  neritae
+    neurula         =>                   |  neurulae
+    noctiluca       =>                   |  noctilucae
+   *nova            =>  novas            |  novae
+    noxa            =>                   |  noxae
+    nubecula        =>                   |  nubeculae
+    nympha          =>                   |  nymphae
+    pala            =>                   |  palae
+    palea           =>                   |  paleae
+    palpebra        =>                   |  palpebrae
+    panorpa         =>                   |  panorpae
+    papilla         =>                   |  papillae
+    papula          =>                   |  papulae
+    parabola        =>  parabolas        |  parabolae
+    paraglossa      =>                   |  paraglossae
+    parapleura      =>  parapleura
+    paraselene      =>                   |  paraselenae
+    pasteurella     =>  pasteurellas     |  pasteurellae
+    patera          =>                   |  paterae
+    paxilla         =>                   |  paxillae
+    pecia           =>  pecias           |  peciae
+    pedicellaria    =>                   |  pedicellariae
+    pelta           =>                   |  peltae
+    peninsula       =>  peninsulas       |  peninsulae
+    persona         =>  personas         |  personae
+    phlegmasia      =>                   |  phlegmasiae
+    phoca           =>  phocas           |  phocae
+    phyle           =>                   |  phylae
+    phyllobranchia  =>                   |  phyllobranchiae
+    pinna           =>  pinnas           |  pinnae
+    piscina         =>  piscinas         |  piscinae
+    planula         =>                   |  planulae
+    plasmalemma     =>  plasmalemmas     |  plasmalemmae
+    pleura          =>  pleura           |
+    plica           =>                   |  plicae
+    prepenna        =>                   |  prepennae
+    primigravida    =>                   |  primigravidae
+    procoelia       =>                   |  procoeliae
+    prora           =>                   |  prorae
+    prosa           =>                   |  prosae
+    proscolla       =>                   |  proscollae
+    proseucha       =>                   |  proseuchae
+    prosula         =>                   |  prosulae
+    protoma         =>  protomas         |  protomae
+    pteryla         =>                   |  pterylae
+    pupa            =>                   |  pupae
+    pyla            =>                   |  pylae
+    pyrexia         =>                   |  pyrexiae
+    redia           =>                   |  rediae
+    retinula        =>                   |  retinulae
+    rotula          =>                   |  rotulae
+    ruga            =>                   |  rugae
+    salpa           =>  salpas           |  salpae
+    sarcina         =>                   |  sarcinae
+    sarissa         =>                   |  sarissae
+    saxicava        =>                   |  saxicavae
+    scapula         =>  scapulas         |  scapulae
+    scoria          =>  scorias          |  scoriae
+    secundagravida  =>  secundagravidas  |  secundagravidae
+    secundigravida  =>  secundigravidas  |  secundigravidae
+    secundipara     =>  secundiparas     |  secundiparae
+    semuncia        =>                   |  semunciae
+    sententia       =>                   |  sententiae
+    sequela         =>                   |  sequelae
+    serpula         =>                   |  serpulae
+    serra           =>                   |  serrae
+    sertularia      =>  sertularias      |  sertulariae
+    seta            =>                   |  setae
+    siliqua         =>                   |  siliquae
+    simia           =>                   |  simiae
+    situla          =>  situlas          |  situlae
+    spatha          =>                   |  spathae
+    spermatheca     =>                   |  spermathecae
+    squama          =>                   |  squamae
+    squilla         =>                   |  squillae
+    stalactite      =>  stalactites      |  stalactitae
+    statera         =>                   |  staterae
+    statua          =>  statuas          |  statuae
+    stela           =>  stelas           |  stelae
+    stella          =>                   |  stellae
+    sternebra       =>                   |  sternebrae
+    stigmaria       =>                   |  stigmariae
+    stipula         =>  stipulas         |  stipulae
+    stria           =>                   |  striae
+    striga          =>                   |  strigae
+    striola         =>                   |  striolae
+    strobila        =>                   |  strobilae
+    struma          =>                   |  strumae
+    stryddag        =>                   |  stryddae
+    succinea        =>  succineas        |  succineae
+    summa           =>                   |  summae
+    supernova       =>  supernovas       |  supernovae
+    suprascapula    =>                   |  suprascapulae
+    synaesthesia    =>                   |  synaesthesiae
+    synapticula     =>  synapticulas     |  synapticulae
+    synechia        =>                   |  synechiae
+    synesthesia     =>                   |  synesthesiae
+    synusia         =>                   |  synusiae
+    tabella         =>                   |  tabellae
+    tabula          =>                   |  tabulae
+    taenia          =>  taenias          |  taeniae
+    talea           =>                   |  taleae
+    tegula          =>                   |  tegulae
+    tenia           =>  tenias           |  teniae
+    terebratula     =>  terebratulas     |  terebratulae
+    tessella        =>  tessellas        |  tessellae
+    tessera         =>                   |  tesserae
+    theca           =>                   |  thecae
+    tibia           =>                   |  tibiae
+    tipula          =>                   |  tipulae
+    torula          =>                   |  torulae
+    trabea          =>                   |  trabeae
+    trabecula       =>                   |  trabeculae
+    trachea         =>                   |  tracheae
+    trichina        =>  trichine         |  trichinae
+   *umbra           =>  umbras           |  umbrae
+    uncia           =>                   |  unciae
+    usnea           =>  usneas           |  usneae
+    utricularia     =>                   |  utriculariae
+    uva             =>                   |  uvae
+    vagina          =>  vaginas          |  vaginae
+    vaginula        =>                   |  vaginulae
+    vallecula       =>                   |  valleculae
+    valvula         =>                   |  valvulae
+    vena            =>                   |  venae
+    verruca         =>                   |  verrucae
+    vertebra        =>                   |  vertebrae
+    vesicula        =>                   |  vesiculae
+    virga           =>                   |  virgae
+    vitta           =>                   |  vittae
+    vomica          =>  vomicas          |  vomicae
+    zoaea           =>                   |  zoaeae
+    zoea            =>  zoeas            |  zoeae
+    zooea           =>                   |  zooeae
+
+# Latin imports ending in "-men" that classically inflect to "-mina"...
+
+    foramen       => foramens       | foramina
+    gravamen      =>                | gravamina
+    legumen       => legumens       | legumina
+   *lumen         => lumens         | lumina
+    molimen       =>                | molimina
+    numen         =>                | numina
+    representamen => representamens | representamina
+    stamen        => stamen         | stamina
+    tegmen        =>                | tegmina
+    tentamen      =>                | tentamina
+    velamen       =>                | velamina
+
+
+# Miscellaneous Latin imports that retain classical inflections...
+
+    centumvir  =>             |  centumviri
+    corpus     =>  corpuses   |  corpora
+    duumvir    =>  duumvirs   |  duumviri
+    femur      =>  femurs     |  femora
+    lemur      =>  lemurs     |  lemures
+    septemvir  =>             |  septemviri
+    triumvir   =>  triumvirs  |  triumviri
+
+
+# Latin imports ending in "-um" that classically inflect to "-a"...
+
+    abortorium       =>                 |  abortoria
+    abstractum       =>                 |  abstracta
+    addendum         =>  addendums      |  addenda
+    adminiculum      =>                 |  adminicula
+    adytum           =>                 |  adyta
+    aecidium         =>                 |  aecidia
+    agendum          =>                 |  agenda
+    alluvium         =>  alluviums      |  alluvia
+    ambulacrum       =>                 |  ambulacra
+    amentum          =>                 |  amenta
+    anthodium        =>                 |  anthodia
+    antiserum        =>                 |  antisera
+    antrum           =>                 |  antra
+    apothecium       =>                 |  apothecia
+    appressorium     =>                 |  appressoria
+    apterium         =>                 |  apteria
+    aquarium         =>  aquariums      |  aquaria
+    arboretum        =>                 |  arboreta
+    arcanum          =>                 |  arcana
+    archegonium      =>                 |  archegonia
+    arcosolium       =>                 |  arcosolia
+    argumentum       =>                 |  argumenta
+    ascidium         =>                 |  ascidia
+    asylum           =>  asylums        |  asyla
+    avicularium      =>                 |  avicularia
+    axopodium        =>                 |  axopodia
+    bacterium        =>                 |  bacteria
+    bifolium         =>                 |  bifolia
+    caecum           =>                 |  caeca
+    calamistrum      =>                 |  calamistra
+    candelabrum      =>                 |  candelabra
+    castrum          =>                 |  castra
+    cecidium         =>                 |  cecidia
+    chromidium       =>                 |  chromidia
+    claustrum        =>                 |  claustra
+    cleithrum        =>                 |  cleithra
+    clostridium      =>                 |  clostridia
+    coagulum         =>                 |  coagula
+    coccidium        =>                 |  coccidia
+    collegium        =>                 |  collegia
+    columbarium      =>                 |  columbaria
+    compendium       =>  compendiums    |  compendia
+    confluvium       =>                 |  confluvia
+    conidium         =>                 |  conidia
+    consortium       =>  consortiums    |  consortia
+    contagium        =>                 |  contagia
+    contrafactum     =>                 |  contrafacta
+    corpusculum      =>                 |  corpuscula
+    corrigendum      =>                 |  corrigenda
+    cranium          =>  craniums       |  crania
+    craspedum        =>                 |  craspeda
+    cubiculum        =>                 |  cubicula
+    curriculum       =>  curriculums    |  curricula
+    cystidium        =>                 |  cystidia
+   *datum            =>                 |  data
+    decennium        =>                 |  decennia
+    delirium         =>  deliriums      |  deliria
+    denotatum        =>                 |  denotata
+    dentalium        =>                 |  dentalia
+    depositum        =>  depositums     |  deposita
+    descriptum       =>                 |  descripta
+    desideratum      =>                 |  desiderata
+    designatum       =>                 |  designata
+    dichasium        =>                 |  dichasia
+    dictum           =>  dictums        |  dicta
+    diverticulum     =>                 |  diverticula
+    dolphinarium     =>  dolphinariums  |  dolphinaria
+    emporium         =>  emporiums      |  emporia
+    enconium         =>  enconiums      |  enconia
+    epicardium       =>                 |  epicardia
+    equinoctium      =>  equinoctiums   |  equinoctia
+    equisetum        =>  equisetums     |  equiseta
+    ergastulum       =>                 |  ergastula
+    erratum          =>                 |  errata
+    exemplum         =>                 |  exempla
+    explanandum      =>                 |  explananda
+    explicandum      =>                 |  explicanda
+    extremum         =>  extremums      |  extrema
+    faciendum        =>                 |  facienda
+    flabellum        =>                 |  flabella
+    flagellum        =>                 |  flagella
+    forum            =>  forums         |  fora
+    fraenum          =>                 |  fraena
+    frustulum        =>                 |  frustula
+    frustum          =>  frustums       |  frusta
+    fulcrum          =>                 |  fulcra
+    gametangium      =>                 |  gametangia
+    germarium        =>                 |  germaria
+    glochidium       =>                 |  glochidia
+    gonangium        =>                 |  gonangia
+    gonidium         =>                 |  gonidia
+    gonimium         =>                 |  gonimia
+    gubernaculum     =>                 |  gubernacula
+    gymnasium        =>  gymnasiums     |  gymnasia
+    halteridium      =>                 |  halteridia
+    haustellum       =>                 |  haustella
+    haustorium       =>                 |  haustoria
+    haustrum         =>                 |  haustra
+    hemelytrum       =>                 |  hemelytra
+    honorarium       =>  honorariums    |  honoraria
+    hordeolum        =>                 |  hordeola
+    hormogonium      =>                 |  hormogonia
+    hymenium         =>                 |  hymenia
+    hymnarium        =>                 |  hymnaria
+    hypnum           =>  hypnums        |  hypna
+    idolum           =>                 |  idola
+    ilium            =>                 |  ilia
+    improperium      =>                 |  improperia
+    indicium         =>                 |  indicia
+    individuum       =>  individuums    |  individua
+    indumentum       =>                 |  indumenta
+    indusium         =>                 |  indusia
+    inhalatorium     =>                 |  inhalatoria
+    inoculum         =>                 |  inocula
+    interambulacrum  =>                 |  interambulacra
+    intermedium      =>                 |  intermedia
+    internodium      =>                 |  internodia
+    interregnum      =>  interregnums   |  interregna
+    interstitium     =>  interstitiums  |  interstitia
+    intervallum      =>  intervallums   |  intervalla
+    involucrum       =>                 |  involucra
+    ischium          =>                 |  ischia
+    isidium          =>                 |  isidia
+    judicatum        =>                 |  judicata
+    jugum            =>                 |  juga
+    labrum           =>                 |  labra
+    leprosarium      =>                 |  leprosaria
+    ligamentum       =>                 |  ligamenta
+    lixivium         =>                 |  lixivia
+    lomentum         =>                 |  lomenta
+    lorum            =>                 |  lora
+    lustrum          =>  lustrums       |  lustra
+    manubrium        =>  manubriums     |  manubria
+    mausoleum        =>  mausoleums     |  mausolea
+    maximum          =>  maximums       |  maxima
+    mediastinum      =>                 |  mediastina
+    medium           =>  mediums        |  media
+    megatherium      =>                 |  megatheria
+    memorandum       =>  memorandums    |  memoranda
+    mesothelium      =>                 |  mesothelia
+    millennium       =>  millenniums    |  millennia
+    minimum          =>  minimums       |  minima
+    miracidium       =>                 |  miracidia
+    mithraeum        =>                 |  mithraea
+    momentum         =>  momentums      |  momenta
+    monochasium      =>                 |  monochasia
+    moratorium       =>  moratoriums    |  moratoria
+    mortarium        =>                 |  mortaria
+    municipium       =>                 |  municipia
+    nemathecium      =>                 |  nemathecia
+    nephridium       =>                 |  nephridia
+    nodum            =>                 |  noda
+    oceanarium       =>                 |  oceanaria
+    odeum            =>                 |  odea
+    olfactorium      =>                 |  olfactoria
+    omentum          =>                 |  omenta
+    ommatidium       =>                 |  ommatidia
+    operculum        =>                 |  opercula
+    optimum          =>  optimums       |  optima
+    opusculum        =>                 |  opuscula
+    osculum          =>                 |  oscula
+    osmaterium       =>                 |  osmateria
+    osmeterium       =>                 |  osmeteria
+    ossiculum        =>                 |  ossicula
+    ostium           =>                 |  ostia
+    ovarium          =>                 |  ovaria
+    ovulum           =>                 |  ovula
+    ovum             =>                 |  ova
+    pallium          =>                 |  pallia
+    parapleurum      =>                 |  parapleura
+    patagium         =>                 |  patagia
+    pediluvium       =>                 |  pediluvia
+    pendulum         =>  pendulums      |  pendula
+    perceptum        =>                 |  percepta
+    peridium         =>                 |  peridia
+    perithecium      =>                 |  perithecia
+    peronium         =>                 |  peronia
+    phalangium       =>                 |  phalangia
+    phylum           =>  phylums        |  phyla
+    phyogemmarium    =>                 |  phyogemmaria
+    pinetum          =>  pinetums       |  pineta
+    pistillidium     =>                 |  pistillidia
+    placitum         =>                 |  placita
+    plasmodium       =>                 |  plasmodia
+    plasmolyticum    =>                 |  plasmolytica
+    plectrum         =>                 |  plectra
+    plenarium        =>                 |  plenaria
+    pleurum          =>                 |  pleura
+    poculum          =>                 |  pocula
+    podetium         =>                 |  podetia
+    podium           =>  podiums        |  podia
+    pollinarium      =>                 |  pollinaria
+    pollinium        =>                 |  pollinia
+    polythecium      =>                 |  polythecia
+    portiforium      =>                 |  portiforia
+    postulatum       =>                 |  postulata
+    praecognitum     =>                 |  praecognita
+    precognitum      =>                 |  precognita
+    primordium       =>                 |  primordia
+    principium       =>                 |  principia
+    profluvium       =>                 |  profluvia
+    progymnasium     =>                 |  progymnasia
+    prolabium        =>                 |  prolabia
+    propodium        =>                 |  propodia
+    proprium         =>                 |  propria
+    propylaeum       =>                 |  propylaea
+    proscenium       =>                 |  proscenia
+    prosopium        =>                 |  prosopia
+    prothallium      =>                 |  prothallia
+    pseudopodium     =>                 |  pseudopodia
+    psydracium       =>                 |  psydracia
+    pulmonarium      =>                 |  pulmonaria
+    pulsellum        =>                 |  pulsella
+    punctum          =>                 |  puncta
+    pycnidium        =>                 |  pycnidia
+    pycnium          =>                 |  pycnia
+    pyxidium         =>                 |  pyxidia
+    quaesitum        =>                 |  quaesita
+    quantum          =>  quantums       |  quanta
+    quinquennium     =>                 |  quinquennia
+    referendum       =>  referendums    |  referenda
+    refugium         =>                 |  refugia
+    relatum          =>                 |  relata
+    replum           =>                 |  repla
+    residuum         =>  residuums      |  residua
+    responsum        =>                 |  responsa
+    retinaculum      =>                 |  retinacula
+    rhopalium        =>                 |  rhopalia
+    rhynchodaeum     =>                 |  rhynchodaea
+    rostrum          =>  rostrums       |  rostra
+    sacellum         =>                 |  sacella
+    sacrarium        =>                 |  sacraria
+    sacrum           =>  sacrums        |  sacra
+    sagum            =>                 |  saga
+    salivarium       =>                 |  salivaria
+    sanatorium       =>  sanatoriums    |  sanatoria
+    schistosomulum   =>                 |  schistosomula
+    scholium         =>                 |  scholia
+    scolopidium      =>                 |  scolopidia
+    scriptorium      =>  scriptoriums   |  scriptoria
+    scutellum        =>                 |  scutella
+    scutulum         =>                 |  scutula
+    scutum           =>                 |  scuta
+    seaquarium       =>                 |  seaquaria
+    secretum         =>                 |  secreta
+    seminium         =>                 |  seminia
+    sensedatum       =>                 |  sensedata
+    sensillum        =>                 |  sensilla
+    sensoriolum      =>                 |  sensoriola
+    sensum           =>                 |  sensa
+    septarium        =>                 |  septaria
+    septum           =>                 |  septa
+    sequestrum       =>                 |  sequestra
+    sericterium      =>                 |  sericteria
+    serum            =>  serums         |  sera
+    sestertium       =>                 |  sestertia
+    signum           =>                 |  signa
+    simpulum         =>                 |  simpula
+    simulacrum       =>  simulacrums    |  simulacra
+    sistrum          =>  sistrums       |  sistra
+    solarium         =>                 |  solaria
+    solenium         =>                 |  solenia
+    solstitium       =>                 |  solstitia
+    soralium         =>                 |  soralia
+    soredium         =>                 |  soredia
+    spectrum         =>  spectrums      |  spectra
+    speculum         =>  speculums      |  specula
+    spermarium       =>                 |  spermaria
+    spermatium       =>                 |  spermatia
+    spermogonium     =>                 |  spermogonia
+    sphagnum         =>  sphagnums      |  sphagna
+    spiculum         =>                 |  spicula
+    spiraculum       =>                 |  spiracula
+    spirillum        =>                 |  spirilla
+    sporodochium     =>                 |  sporodochia
+    sputum           =>                 |  sputa
+    stabilimentum    =>                 |  stabilimenta
+    stadium          =>  stadiums       |  stadia
+    staminidium      =>                 |  staminidia
+    sternum          =>  sternums       |  sterna
+    stichidium       =>                 |  stichidia
+    stillicidium     =>                 |  stillicidia
+    stomatium        =>                 |  stomatia
+   *stratum          =>  stratums       |  strata
+    striatum         =>                 |  striata
+    stylopodium      =>                 |  stylopodia
+    subsellium       =>                 |  subsellia
+    subsidium        =>                 |  subsidia
+    substratum       =>  substratums    |  substrata
+    suggestum        =>  suggestums     |  suggesta
+    supercilium      =>                 |  supercilia
+    superstratum     =>                 |  superstrata
+    suppositum       =>                 |  supposita
+    supracleithrum   =>                 |  supracleithra
+    sustentaculum    =>                 |  sustentacula
+    syllabarium      =>                 |  syllabaria
+    sympodium        =>                 |  sympodia
+    symposium        =>  symposiums     |  symposia
+    synangium        =>                 |  synangia
+    synaxarium       =>                 |  synaxaria
+    syncytium        =>                 |  syncytia
+    syndendrium      =>                 |  syndendria
+    synedrium        =>                 |  synedria
+    tablinum         =>                 |  tablina
+    tegmentum        =>                 |  tegmenta
+    telium           =>                 |  telia
+    tenaculum        =>                 |  tenacula
+    tentaculum       =>                 |  tentacula
+    tepidarium       =>                 |  tepidaria
+    terebellum       =>                 |  terebella
+    tergum           =>                 |  terga
+    terrarium        =>  terrariums     |  terraria
+    territorium      =>                 |  territoria
+    tetrasporangium  =>                 |  tetrasporangia
+    thanatorium      =>                 |  thanatoria
+    thelycum         =>                 |  thelyca
+    thyridium        =>                 |  thyridia
+    tintinnabulum    =>                 |  tintinnabula
+    tomium           =>                 |  tomia
+    toxicum          =>                 |  toxica
+    tractellum       =>                 |  tractella
+    trapezium        =>  trapeziums     |  trapezia
+    trichidium       =>                 |  trichidia
+    triclinium       =>                 |  triclinia
+    triforium        =>                 |  triforia
+    triplum          =>                 |  tripla
+    tropaeolum       =>  tropaeolums    |  tropaeola
+    tuberculum       =>                 |  tubercula
+    tympanum         =>                 |  tympana
+    ultimatum        =>  ultimatums     |  ultimata
+    uredinium        =>                 |  uredinia
+    uredium          =>                 |  uredia
+    urodaeum         =>                 |  urodaea
+    urodeum          =>                 |  urodea
+    vacuum           =>  vacuums        |  vacua
+    vasculum         =>  vasculums      |  vascula
+    vehiculum        =>                 |  vehicula
+    velarium         =>                 |  velaria
+    velum            =>  velums         |  vela
+    vestigium        =>                 |  vestigia
+    viaticum         =>                 |  viatica
+    vibraculum       =>                 |  vibracula
+    vinculum         =>                 |  vincula
+    vitellarium      =>                 |  vitellaria
+    vivarium         =>  vivariums      |  vivaria
+    vomitorium       =>  vomitoriums    |  vomitoria
+    zoarium          =>                 |  zoaria
+    zooecium         =>                 |  zooecia
+    zoosporangium    =>                 |  zoosporangia
+    zygantrum        =>                 |  zygantra
+
+# Latin imports ending in "-us" that classically inflect to "-i"
+
+    acarus          =>                  |  acari
+    acinus          =>                  |  acini
+    aculeus         =>                  |  aculei
+    alumnus         =>                  |  alumni
+    alveolus        =>                  |  alveoli
+    aptychus        =>                  |  aptychi
+    aureus          =>                  |  aurei
+   *bacillus        =>                  |  bacilli
+    bronchus        =>                  |  bronchi
+    bulimus         =>                  |  bulimi
+    cactus          =>  cactuses        |  cacti
+    caduceus        =>                  |  caducei
+    calathus        =>                  |  calathi
+    canaliculus     =>                  |  canaliculi
+    cantharus       =>                  |  canthari
+    cardophagus     =>                  |  cardophagi
+    cercus          =>                  |  cerci
+    cistophorus     =>                  |  cistophorori
+    cladus          =>                  |  cladi
+    conductus       =>                  |  conducti
+    congius         =>                  |  congii
+    convolvulus     =>  convolvuluses   |  convolvuli
+    cultellus       =>                  |  cultelli
+    cumulus         =>                  |  cumuli
+    cuniculus       =>                  |  cuniculi
+    cyathus         =>                  |  cyathi
+    cynocephalus    =>                  |  cynocephali
+    cysticercus     =>                  |  cysticerci
+    denarius        =>                  |  denarii
+    diplococcus     =>                  |  diplococci
+    entrochus       =>                  |  entrochi
+    eucalyptus      =>  eucalyptuses    |  eucalypti
+    exencephalus    =>                  |  exencephali
+    famulus         =>                  |  famuli
+    fasciculus      =>                  |  fasciculi
+    faveolus        =>                  |  faveoli
+    flocculus       =>                  |  flocculi
+    floccus         =>                  |  flocci
+    focus           =>  focuses         |  foci
+    fucus           =>                  |  fuci
+    funambulus      =>                  |  funambuli
+    fungus          =>  funguses        |  fungi
+    gastrocnemius   =>                  |  gastrocnemii
+    gladiolus       =>  gladioluses     |  gladioli
+    guttus          =>                  |  gutti
+    gymnotus        =>                  |  gymnoti
+    gyrus           =>                  |  gyri
+    hamulus         =>                  |  hamuli
+    hippocampus     =>                  |  hippocampi
+    hippopotamus    =>  hippopotamuses  |  hippopotami
+    humerus         =>                  |  humeri
+    ichthyosaurus   =>                  |  ichthyosauri
+    incubus         =>  incubuses       |  incubi
+    interradius     =>                  |  interradii
+    isthmus         =>  isthmuses       |  isthmi
+    lactobacillus   =>                  |  lactobacilli
+    lemniscus       =>                  |  lemnisci
+    lentiscus       =>                  |  lentisci
+    limulus         =>                  |  limuli
+    lithodomus      =>                  |  lithodomi
+    lobulus         =>                  |  lobuli
+    lochus          =>                  |  lochi
+    loculus         =>                  |  loculi
+    locus           =>                  |  loci
+    lumbricus       =>                  |  lumbrici
+    macacus         =>                  |  macaci
+    magilus         =>                  |  magili
+    magus           =>                  |  magi
+    malleolus       =>                  |  malleoli
+    malleus         =>                  |  mallei
+    megalosaurus    =>                  |  megalosauri
+    meniscus        =>                  |  menisci
+    metatarsus      =>                  |  metatarsi
+    microcephalus   =>                  |  microcephali
+    micrococcus     =>                  |  micrococci
+    micronucleus    =>                  |  micronuclei
+    modernus        =>                  |  moderni
+    modius          =>                  |  modii
+    modulus         =>  moduluses       |  moduli
+    modus           =>  moduses         |  modi
+    nasutus         =>                  |  nasuti
+    nauplius        =>                  |  nauplii
+    nautilus        =>  nautiluses      |  nautili
+    nidus           =>  niduses         |  nidi
+    nimbus          =>  nimbuses        |  nimbi
+    nodus           =>                  |  nodi
+    nucleolus       =>  nucleoluses     |  nucleoli
+   *nucleus         =>                  |  nuclei
+    nucleus         =>  nucleuses       |  nuclei
+    nuntius         =>                  |  nuntii
+    obelus          =>                  |  obeli
+    obolus          =>                  |  oboli
+    ocellus         =>                  |  ocelli
+    oculus          =>                  |  oculi
+    ophiophagus     =>                  |  ophiophagi
+    palpus          =>                  |  palpi
+    palus           =>                  |  pali
+    papyrus         =>  papyruses       |  papyri
+    parabolanus     =>                  |  parabolani
+    paranucleus     =>                  |  paranuclei
+    penicillus      =>                  |  penicilli
+    perradius       =>                  |  perradii
+    phallus         =>  phalluses       |  phalli
+    pileus          =>                  |  pilei
+    pilus           =>                  |  pili
+    plesiosaurus    =>                  |  plesiosauri
+    pluteus         =>                  |  plutei
+    postnatus       =>                  |  postnati
+    prodromus       =>                  |  prodromi
+    propositus      =>                  |  propositi
+    protarsus       =>                  |  protarsi
+    prothallus      =>                  |  prothalli
+    protococcus     =>                  |  protococci
+    pteropus        =>                  |  pteropi
+    pullus          =>                  |  pulli
+    pyrophorus      =>                  |  pyrophori
+    quinarius       =>                  |  quinarii
+    radius          =>  radiuses        |  radii
+    ramulus         =>                  |  ramuli
+    ramus           =>                  |  rami
+    ranunculus      =>  ranunculuses    |  ranunculi
+    rectus          =>                  |  recti
+    regulus         =>                  |  reguli
+    rhomboideus     =>                  |  rhomboidei
+    rhythmus        =>                  |  rhythmi
+    sacculus        =>                  |  sacculi
+    sarcophagus     =>                  |  sarcophagi
+    scalenus        =>                  |  scaleni
+    scapus          =>                  |  scapi
+    scarabaeus      =>                  |  scarabaei
+    scarus          =>                  |  scari
+    sciolus         =>                  |  scioli
+    scyphus         =>                  |  scyphi
+    senarius        =>                  |  senarii
+    septenarius     =>                  |  septenarii
+    silenus         =>                  |  sileni
+    Silurus         =>                  |  Siluri
+    siphunculus     =>                  |  siphunculi
+    sipunculus      =>                  |  sipunculi
+    solvus          =>                  |  solvi
+    sorus           =>                  |  sori
+    sparus          =>                  |  spari
+    spasmus         =>                  |  spasmi
+    spondylus       =>                  |  spondyli
+    squalus         =>                  |  squali
+    staphylococcus  =>                  |  staphylococci
+    stimulus        =>                  |  stimuli
+    strategus       =>                  |  strategi
+    streptococcus   =>                  |  streptococci
+    strobilus       =>                  |  strobili
+    stylus          =>  styluses        |  styli
+    succubus        =>  succubuses      |  succubi
+    succus          =>                  |  succi
+    sulcus          =>                  |  sulci
+    surculus        =>                  |  surculi
+    syllabus        =>  syllabuses      |  syllabi
+    syncellus       =>                  |  syncelli
+    synthronus      =>                  |  synthroni
+    syrphus         =>                  |  syrphi
+    talus           =>                  |  tali
+    tarsus          =>                  |  tarsi
+    terminus        =>  terminuses      |  termini
+    thalamus        =>                  |  thalami
+    thaumaturgus    =>                  |  thaumaturgi
+    thesaurus       =>  thesauruses     |  thesauri
+    tholus          =>                  |  tholi
+    thymus          =>                  |  thymi
+    thyrsus         =>                  |  thyrsi
+    tornus          =>                  |  torni
+    torulus         =>                  |  toruli
+    torus           =>  toruses         |  tori
+    toxius          =>                  |  toxii
+    tragus          =>                  |  tragi
+    trapezius       =>                  |  trapezii
+    triradius       =>                  |  triradii
+    trochus         =>  trochuses       |  trochi
+    tubulus         =>                  |  tubuli
+    tumulus         =>                  |  tumuli
+    umbilicus       =>  umbilicuses     |  umbilici
+    uncinus         =>                  |  uncini
+    uncus           =>                  |  unci
+    uraeus          =>                  |  uraei
+    uredosorus      =>                  |  uredosori
+    urus            =>  uruses          |  uri
+    uterus          =>  uteruses        |  uteri
+    vagus           =>                  |  vagi
+    vermiculus      =>                  |  vermiculi
+    versiculus      =>                  |  versiculi
+    verticillus     =>                  |  verticilli
+    villus          =>                  |  villi
+    xiphopagus      =>                  |  xiphopagi
+    xystus          =>                  |  xysti
+    zoophorus       =>                  |  zoophori
+    zophorus        =>                  |  zophori
+
+
+# Latin imports ending in "-is" that classically inflect to "-es"...
+
+    axis        =>            |  axes
+    caulis      =>            |  caules
+    didymis     =>            |  didymes
+    follis      =>            |  folles
+    interaxis   =>            |  interaxes
+    pelvis      =>  pelvises  |  pelves
+    penis       =>  penises   |  penes
+    phototaxis  =>            |  phototaxes
+    postpubis   =>            |  postpubes
+    proavis     =>            |  proaves
+    synaxis     =>            |  synaxes
+    syntaxis    =>            |  syntaxes
+    syrtis      =>            |  syrtes
+    taxis       =>            |  taxes
+    tenuis      =>            |  tenues
+    testis      =>            |  testes
+    unguis      =>            |  ungues
+
+
+# Latin imports ending in "-us" that classically don't inflect...
+
+    apparatus   =>  apparatuses   |  apparatus
+    cantus      =>  cantuses      |  cantus
+    coitus      =>  coituses      |  coitus
+    hiatus      =>  hiatuses      |  hiatus
+    ignoramus   =>  ignoramuses   |  ignoramus
+    impetus     =>  impetuses     |  impetus
+    jacobus     =>  jacobuses     |  jacobus
+    meatus      =>  meatuses      |  meatus
+    nexus       =>  nexuses       |  nexus
+    plexus      =>  plexuses      |  plexus
+    prospectus  =>  prospectuses  |  prospectus
+    sinus       =>  sinuses       |  sinus
+    status      =>  statuses      |  status
+    virus       =>  viruses       |
+    virus       =>                |  viri     # Not correct, but occasionally (mis)used
+    virus       =>                |  virii    # Even less defensible, and widely (mis)used
+
+
+# Greek imports ending in "-on" that classically inflect to "-a"...
+
+    anacoluthon        =>  anacoluthons    |  anacolutha
+    anthemion          =>                  |  anthemia
+    aphelion           =>                  |  aphelia
+    asyndeton          =>                  |  asyndeta
+    craspedon          =>                  |  craspeda
+    criterion          =>                  |  criteria
+    enteron            =>                  |  entera
+    epilimnion         =>                  |  epilimnia
+    epimeron           =>                  |  epimera
+    epiphenomenon      =>                  |  epiphenomena
+    epyllion           =>                  |  epyllia
+    euporiston         =>                  |  euporista
+    ganglion           =>  ganglions       |  ganglia
+    hapteron           =>                  |  haptera
+   *hedron             =>  hedrons         |  hedra
+   *helion             =>  helions         |  helia
+    hydraulicon        =>                  |  hydraulica
+    hyperbaton         =>                  |  hyperbata
+    hypolimnion        =>                  |  hypolimnia
+    idolon             =>                  |  idola
+    interphenomenon    =>                  |  interphenomena
+   *legomenon          =>                  |  legomena
+    lepton             =>                  |  lepta
+    lithophyton        =>                  |  lithophyta
+    logion             =>                  |  logia
+    metalimnion        =>                  |  metalimnia
+    metapleuron        =>                  |  metapleura
+    microbion          =>                  |  microbia
+    mitochondrion      =>                  |  mitochondria
+    mixolimnion        =>                  |  mixolimnia
+    monimolimnion      =>                  |  monimolimnia
+    monosyllabon       =>                  |  monosyllaba
+    monoxylon          =>                  |  monoxyla
+    noumenon           =>                  |  noumena
+    octohedron         =>  octohedrons     |  octohedra
+    organon            =>                  |  organa
+    oxybaphon          =>                  |  oxybapha
+    oxymoron           =>  oxymorons       |  oxymora
+    paraganglion       =>                  |  paraganglia
+    parergon           =>                  |  parerga
+    parhelion          =>  parhelions      |  parhelia
+    parison            =>                  |  parisa
+    pedion             =>                  |  pedia
+    perikaryon         =>                  |  perikarya
+   *phenomenon         =>                  |  phenomena
+    pleuron            =>                  |  pleura
+    podion             =>                  |  podia
+    porion             =>                  |  poria
+    prokaryon          =>                  |  prokarya
+    prolegomenon       =>                  |  prolegomena
+    propleuron         =>                  |  propleura
+    propylon           =>  propylons       |  propyla
+    prosencephalon     =>                  |  prosencephala
+    prosodiencephalon  =>                  |  prosodiencephala
+    prototypon         =>  prototypons     |  prototypa
+    protypon           =>                  |  protypa
+    pyramidion         =>  pyramidions     |  pyramidia
+    rhododendron       =>  rhododendrons   |  rhododendra
+    rhombohedron       =>  rhombohedrons   |  rhombohedra
+    spermatoon         =>                  |  spermatoa
+    stasimon           =>  stasimons       |  stasima
+    stephanion         =>  stephanions     |  stephania
+    stomion            =>                  |  stomia
+    synaxarion         =>                  |  synaxaria
+    synedrion          =>                  |  synedria
+    taxon              =>                  |  taxa
+    tetracolon         =>                  |  tetracola
+    tetragrammaton     =>                  |  tetragrammata
+    tetrahedron        =>  tetrahedrons    |  tetrahedra
+    tetrapleuron       =>  tetrapleurons   |  tetrapleura
+    theologoumenon     =>                  |  theologoumena
+    thymiaterion       =>                  |  thymiateria
+    trapezohedron      =>  trapezohedrons  |  trapezohedra
+    troparion          =>                  |  troparia
+    xiphiplastron      =>                  |  xiphiplastra
+    xiphoplastron      =>                  |  xiphoplastra
+    xoanon             =>                  |  xoana
+    zygon              =>                  |  zyga
+
+
+# Spanish imports that classically inflect as in Spanish...
+
+    cargador  =>          | cargadores
+    furfur    =>          | furfures
+    parador   => paradors | paradores
+    temblor   =>          | temblores
+    carmen    => carmens  | carmina
+
+
+# Italian imports that (mostly) inflect classically to "-i"
+
+    albergo         =>                  |  alberghi
+    allargando      =>                  |  allargandi
+    amoretto        =>                  |  amoretti
+    amorino         =>                  |  amorini
+    ballabile       =>                  |  ballabili
+    bozzetto        =>                  |  bozzetti
+    carabiniere     =>                  |  carabinieri
+    cassone         =>  cassones        |  cassoni
+    castrato        =>                  |  castrati
+    centesimo       =>                  |  centesimi
+    chitarrone      =>                  |  chitarroni
+    cognoscente     =>                  |  cognoscenti
+    concetto        =>                  |  concetti
+    condottiere     =>                  |  condottieri
+    conoscente      =>                  |  conoscenti
+    contadino       =>                  |  contadini
+    conversazione   =>  conversaziones  |  conversazioni
+    cornetto        =>                  |  cornetti
+    corno           =>                  |  corni
+    dilettante      =>  dilettantes     |  dilettanti
+    evirato         =>                  |  evirati
+    figurante       =>  figurantes      |  figuranti
+    frate           =>                  |  frati
+    graffito        =>                  |  graffiti
+    grano           =>                  |  grani
+    grissino        =>                  |  grissini
+    improvisatrice  =>                  |  improvisatrici
+    libretto        =>  librettos       |  libretti
+    mafioso         =>                  |  mafiosi
+    modelletto      =>                  |  modelletti
+    mondo           =>                  |  mondi
+    moroso          =>                  |  morosi
+    moscardino      =>                  |  moscardini
+    motoscafo       =>                  |  motoscafi
+    ovolo           =>                  |  ovoli
+    paparrazo       =>                  |  paparrazi
+    pastorale       =>  pastorales      |  pastorali
+    pensiero        =>                  |  pensieri
+    pifferaro       =>                  |  pifferari
+    podere          =>                  |  poderi
+    porcino         =>                  |  porcini
+    putto           =>                  |  putti
+    ragazzo         =>                  |  ragazzi
+    ricordo         =>                  |  ricordi
+    rione           =>                  |  rioni
+    saffo           =>                  |  saffi
+    sbirro          =>                  |  sbirri
+    scudo           =>                  |  scudi
+    scungille       =>                  |  scungilli
+    sestiere        =>                  |  sestieri
+    sgraffiato      =>                  |  sgraffiati
+    soldo           =>                  |  soldi
+    stornello       =>                  |  stornelli
+    strambotto      =>                  |  strambotti
+    tarantato       =>                  |  tarantati
+    tempietto       =>                  |  tempietti
+    tenorino        =>                  |  tenorini
+    terzetto        =>                  |  terzetti
+    tombarolo       =>                  |  tombaroli
+    tondo           =>                  |  tondi
+    Tornese         =>                  |  Tornesi
+    trullo          =>                  |  trulli
+    uomo            =>                  |  uomini
+    vetturino       =>                  |  vetturini
+    viale           =>                  |  viali
+    villino         =>                  |  villini
+    volcanello      =>                  |  volcanelli
+    zeppole         =>                  |  zeppoli
+    zingano         =>                  |  zingani
+
+
+# Italian imports ending in "-a" that classically inflect to "-e"
+
+    ancona      =>             | ancone
+    autostrada  => autostradas | autostrade
+    ballata     =>             | ballate
+    ballerina   => ballerinas  | ballerine
+    bruschetta  =>             | bruschette
+    canzonetta  => canzonettas | canzonette
+    contadina   =>             | contadine
+    crazia      =>             | crazie
+    fermata     => fermatas    | fermate
+    fioritura   =>             | fioriture
+    frottola    =>             | frottole
+    granita     =>             | granite
+    loggia      => loggias     | loggie
+    mafiosa     =>             | mafiose
+    mantelletta =>             | mantellette
+    maremma     =>             | maremme
+    mortadella  => mortadellas | mortadelle
+    paisa       => paisas      | paise
+    pietra      =>             | pietre
+    pizza       => pizzas      | pizze
+    ragazza     =>             | ragazze
+    ricercata   =>             | ricercate
+    scuola      =>             | scuole
+    squadra     =>             | squadre
+    tarantata   =>             | tarantate
+    tazza       =>             | tazze
+    terramara   =>             | terremare
+    trattoria   => trattorias  | trattorie
+    vila        => vilas       | vile
+    villanella  =>             | villanelle
+    violetta    =>             | violette
+    zadruga     => zadrugas    | zadruge
+    zitella     =>             | zitelle
+    zucca       =>             | zucche
+    zuppa       =>             | zuppe
+
+
+# Italian imports that retain their classical inflection to "-i"
+
+    alto           => altos      | alti
+    basso          => bassos     | bassi
+    biscotto       =>            | biscotti
+    contralto      => contraltos | contralti
+    glissando      => glissandos | glissandi
+    panino         =>            | panini
+    piano          => pianos     | piani
+    solo           => solos      | soli
+    soprano        => sopranos   | soprani
+    tempo          => tempos     | tempi
+    vaporetto      => vaporettos | vaporetti
+    virtuoso       => virtuosos  | virtuosi
+
+
+# Words ending in '-oe' which are ambiguous in the plural...
+
+    coe  => coes
+    hoe  => hoes
+    joe  => joes
+    moe  => moes
+    toe  => toes
+
+# Italian and Spanish imports, abbreviations, and other words ending in "-o"
+# that always inflect to "-os"
+
+        ado            =>  ados
+        aficionado     =>  aficionados
+        aggro          =>  aggros
+        albino         =>  albinos
+        allegro        =>  allegros
+        altorelievo    =>  altorelievos
+        ammo           =>  ammos
+        Antananarivo   =>  Antananarivos
+        armadillo      =>  armadillos
+        auto           =>  autos
+        aviso          =>  avisos
+        avocado        =>  avocados
+        Bamako         =>  Bamakos
+        Barquisimeto   =>  Barquisimetos
+        bimbo          =>  bimbos
+        bingo          =>  bingos
+        Biro           =>  Biros
+        bolero         =>  boleros
+        Bolzano        =>  Bolzanos
+        Boto           =>  Botos
+        burro          =>  burros
+        Cairo          =>  Cairos
+        calypso        =>  calypsos
+        canto          =>  cantos
+        cappuccino     =>  cappuccinos
+        casino         =>  casinos
+        cello          =>  cellos
+        Chicago        =>  Chicagos
+        Chimango       =>  Chimangos
+        cilantro       =>  cilantros
+        cochito        =>  cochitos
+        coco           =>  cocos
+        Colombo        =>  Colombos
+        Colorado       =>  Colorados
+        commando       =>  commandos
+        concertino     =>  concertinos
+        condo          =>  condos
+        contango       =>  contangos
+        credo          =>  credos
+        crescendo      =>  crescendos
+        cyano          =>  cyanos
+        demo           =>  demos
+        ditto          =>  dittos
+        Draco          =>  Dracos
+        dynamo         =>  dynamos
+        embryo         =>  embryos
+        Esperanto      =>  Esperantos
+        espresso       =>  espressos
+        euro           =>  euros
+        falsetto       =>  falsettos
+        Faro           =>  Faros
+        fiasco         =>  fiascos
+        Filipino       =>  Filipinos
+        flamenco       =>  flamencos
+        furioso        =>  furiosos
+        generalissimo  =>  generalissimos
+        Gestapo        =>  Gestapos
+        ghetto         =>  ghettos
+        gigolo         =>  gigolos
+        gizmo          =>  gizmos
+        Greensboro     =>  Greensboros
+        gringo         =>  gringos
+        Guaiabero      =>  Guaiaberos
+        guano          =>  guanos
+        gumbo          =>  gumbos
+        gyro           =>  gyros
+        hairdo         =>  hairdos
+        hippo          =>  hippos
+        Idaho          =>  Idahos
+        impetigo       =>  impetigos
+        inferno        =>  infernos
+        info           =>  infos
+        intaglio       =>  intaglios
+        intermezzo     =>  intermezzos
+        intertrigo     =>  intertrigos
+        Iquico         =>  Iquicos
+        jalapeno       =>  jalapenos
+        jumbo          =>  jumbos
+        junto          =>  juntos
+        Kakapo         =>  Kakapos
+        kilo           =>  kilos
+        kimono         =>  kimonos
+        Kinkimavo      =>  Kinkimavos
+        Kokako         =>  Kokakos
+        Kosovo         =>  Kosovos
+        Lesotho        =>  Lesothos
+        libero         =>  liberos
+        libido         =>  libidos
+        lido           =>  lidos
+        Lilo           =>  Lilos
+        limbo          =>  limbos
+        limo           =>  limos
+        lineno         =>  linenos
+        lingo          =>  lingos
+        lino           =>  linos
+        livedo         =>  livedos
+        loco           =>  locos
+        logo           =>  logos
+        lumbago        =>  lumbagos
+        macho          =>  machos
+        macro          =>  macros
+        mafioso        =>  mafiosos
+        magneto        =>  magnetos
+        magnifico      =>  magnificos
+        Majuro         =>  Majuros
+        Malabo         =>  Malabos
+        manifesto      =>  manifestos
+        Maputo         =>  Maputos
+        Maracaibo      =>  Maracaibos
+        memo           =>  memos
+        metro          =>  metros
+        Mexico         =>  Mexicos
+        micro          =>  micros
+        Milano         =>  Milanos
+        Monaco         =>  Monacos
+        mono           =>  monos
+        Montenegro     =>  Montenegros
+        Morocco        =>  Moroccos
+        Muqdisho       =>  Muqdishos
+        mustachio      =>  mustachios
+        myo            =>  myos
+        neutrino       =>  neutrinos
+        Ningbo         =>  Ningbos
+        octavo         =>  octavos
+        oregano        =>  oreganos
+        Orinoco        =>  Orinocos
+        Orlando        =>  Orlandos
+        Oslo           =>  Oslos
+        oto            =>  otos
+        panto          =>  pantos
+        Paramaribo     =>  Paramaribos
+        Pardusco       =>  Parduscos
+        pedalo         =>  pedalos
+        photo          =>  photos
+        pimento        =>  pimentos
+        pinto          =>  pintos
+        pleco          =>  plecos
+        Pluto          =>  Plutos
+        pogo           =>  pogos
+        polo           =>  polos
+        poncho         =>  ponchos
+        Porto          =>  Portos
+        Porto-Novo     =>  Porto-Novos
+        pro            =>  pros
+        psycho         =>  psychos
+        pueblo         =>  pueblos
+        quarto         =>  quartos
+        Quito          =>  Quitos
+        rhino          =>  rhinos
+        rilievo        =>  rilievos
+        risotto        =>  risottos
+        rococo         =>  rococos
+        rondo          =>  rondos
+        Sacramento     =>  Sacramentos
+        saddo          =>  saddos
+        sago           =>  sagos
+        salvo          =>  salvos
+        Santiago       =>  Santiagos
+        Sapporo        =>  Sapporos
+        Sarajevo       =>  Sarajevos
+        scherzando     =>  scherzandos
+        scherzo        =>  scherzos
+        silo           =>  silos
+        sirocco        =>  siroccos
+        sombrero       =>  sombreros
+        staccato       =>  staccatos
+        sterno         =>  sternos
+        stucco         =>  stuccos
+        stylo          =>  stylos
+        sumo           =>  sumos
+        surimono       =>  surimonos
+        Taiko          =>  Taikos
+        techno         =>  technos
+        terrazzo       =>  terrazzos
+        testudo        =>  testudos
+        timpano        =>  timpanos
+        tiro           =>  tiros
+        tobacco        =>  tobaccos
+        Togo           =>  Togos
+        Tokyo          =>  Tokyos
+        torero         =>  toreros
+        Torino         =>  Torinos
+        Toronto        =>  Torontos
+        torso          =>  torsos
+        tremolo        =>  tremolos
+        typo           =>  typos
+        tyro           =>  tyros
+        vaquero        =>  vaqueros
+        vermicello     =>  vermicellos
+        verso          =>  versos
+        vibrato        =>  vibratos
+        violoncello    =>  violoncellos
+        Virgo          =>  Virgos
+        weirdo         =>  weirdos
+        Yamoussoukro   =>  Yamoussoukros
+        yo-yo          =>  yo-yos
+        zero           =>  zeros
+        Zibo           =>  Zibos
+
+
+# Words ending in "-o" that may inflect to "-os" or "-oes"...
+
+        adviso       =>                |  advisoes
+        ambuscado    =>  ambuscados    |  ambuscadoes
+        arango       =>                |  arangoes
+        archipelago  =>  archipelagos  |  archipelagoes
+        barrico      =>                |  barricoes
+        bilbo        =>                |  bilboes
+        bongo        =>  bongos        |  bongoes
+        bravo        =>  bravos        |  bravoes
+        bubo         =>                |  buboes
+        busto        =>  bustos        |  bustoes
+        go           =>                |  goes
+        grotto       =>  grottos       |  grottoes
+        guglio       =>  guglios       |  guglioes
+        hero         =>                |  heroes
+        mango        =>  mangos        |  mangoes
+        medico       =>  medicos       |  medicoes
+        memento      =>  mementos      |  mementoes
+        motto        =>  mottos        |  mottoes
+        pengo        =>  pengo         |  pengoes
+        pingo        =>  pingos        |  pingoes
+        placebo      =>  placebos      |  placeboes
+        po           =>  pos           |  poes
+        politico     =>  politicos     |  politicoes
+        portico      =>  porticos      |  porticoes
+        potato       =>                |  potatoes
+        proviso      =>  provisos      |  provisoes
+        sambo        =>  sambos        |  samboes
+        stiletto     =>                |  stilettoes
+        tango        =>  tangos        |  tangoes
+        tomato       =>                |  tomatoes
+        volcano      =>  volcanos      |  volcanoes
+        waldo        =>  waldos        |  waldoes
+
+
+# Words ending in "-ch" that inflect to "-chs" (instead of "-ches")...
+
+        bath     => baths
+        Czech    => Czechs
+        eunuch   => eunuchs
+        math     => maths
+        mouth    => mouths
+        oath     => oaths
+        path     => paths
+        stomach  => stomachs
+        wreath   => wreaths
+
+
+# Greek imports (via Latin or Spanish) ending in "-o(n)" that classically inflect to "-nes"...
+
+        agon        =>               |  agones
+        ambo        =>  ambos        |  ambones
+        autochthon  =>  autochthons  |  autochthones
+        axon        =>  axons        |  axones
+        bodegon     =>               |  bodegones
+        cardo       =>               |  cardines
+        felo        =>               |  felones
+        imago       =>  imagos       |  imagines
+        lentigo     =>               |  lentigines
+        mucro       =>  mucros       |  mucrones
+        Pangasinan  =>  Pangasinans  |  Pangasinanes
+        pernio      =>               |  perniones
+        phren       =>               |  phrenes
+        porron      =>  porrons      |  porrones
+        reductio    =>               |  reductiones
+        rejon       =>               |  rejones
+        serpigo     =>  serpigoes    |  serpigines
+        somaten     =>               |  somatenes
+        stolo       =>               |  stolones
+        telamon     =>               |  telamones
+        teredo      =>  teredos      |  teredines
+        thraso      =>  thrasoes     |  thrasones
+        turron      =>  turrons      |  turrones
+        umbo        =>  umbos        |  umbones
+        unio        =>  unios        |  uniones
+        ustilago    =>               |  ustilagines
+        vibrio      =>  vibrios      |  vibriones
+
+
+# Greek imports (via Latin) ending in "-x" that classically inflect to "-ges"...
+
+        phalanx => phalanxes | phalanges
+        remex   => remexes   | remiges
+        larynx  =>           | larynges
+        sphinx  => sphinxes  | sphinges
+
+
+# Latin or Greek imports ending in "-x" that classically inflect to "-ces"...
+
+        apex          =>  apexes          |  apices
+        appendix      =>  appendixes      |  appendices
+        auspex        =>                  |  auspices
+        calix         =>                  |  calices
+        carex         =>                  |  carices
+        caudex        =>                  |  caudices
+        cicatrix      =>                  |  cicatrices
+        cimex         =>                  |  cimices
+        codex         =>                  |  codices
+        cortex        =>  cortexes        |  cortices
+        coxendix      =>                  |  coxendices
+        directrix     =>                  |  directrices
+        extispex      =>                  |  extispices
+        falx          =>                  |  falces
+        hallux        =>                  |  halluces
+        haruspex      =>                  |  haruspices
+       *helix         =>                  |  helices
+        imbrex        =>                  |  imbrices
+        index         =>  indexes         |  indices
+        latex         =>  latexes         |  latices
+        limax         =>                  |  limaces
+        mediatrix     =>                  |  mediatrices
+        meretrix      =>                  |  meretrices
+        murex         =>  murexes         |  murices
+        nectocalyx    =>                  |  nectocalyces
+        oratrix       =>                  |  oratrices
+        pinax         =>                  |  pinaces
+        pneumothorax  =>  pneumothoraxes  |  pneumothoraces
+        pollex        =>                  |  pollices
+        pontifex      =>  pontifexes      |  pontifices
+        prosecutrix   =>                  |  prosecutrices
+        pulveratrix   =>                  |  pulveratrices
+        quadratrix    =>                  |  quadratrices
+        radix         =>  radixes         |  radices
+        scolex        =>                  |  scoleces
+        separatrix    =>                  |  separatrices
+        silex         =>                  |  silices
+        simplex       =>  simplexes       |  simplices
+        spadix        =>  spadixes        |  spadices
+        streptothrix  =>                  |  streptothrices
+        suffrutex     =>                  |  suffrutices
+        thorax        =>  thoraxes        |  thoraces
+        tortrix       =>                  |  tortrices
+        tractatrix    =>                  |  tractatrices
+        tractrix      =>                  |  tractrices
+        varix         =>                  |  varices
+        vertex        =>  vertexes        |  vertices
+        vibex         =>                  |  vibices
+        vortex        =>  vortexes        |  vortices
+
+
+
+# Arabic imports ending in "-t" that classically inflect to "-ti"...
+
+        afrit   => afrits  | afriti
+        afreet  => afreets | afreeti
+        efreet  => efreets | efreeti
+
+
+# Hebrew imports that classically inflect by adding "-im"...
+
+        Asherah   => Asherahs  | Asherim
+        baal      => baals     | baalim
+        cherub    => cherubs   | cherubim
+        gaon      => gaons     | gaonim
+        goy       => goys      | goyim
+        kibbutz   => kibbutzes | kibbutzim
+        meshumad  =>           | meshumadim
+        meshummad =>           | meshummadim
+        minyan    =>           | minyanim
+        parnas    =>           | parnassim
+        parnass   =>           | parnassim
+        seraph    => seraphs   | seraphim
+        shochet   =>           | shochetim
+        ulpan     =>           | ulpanim
+        zuz       => zuzzes    | zuzim
+
+
+# Pairs or groups subsumed to a singular that don't inflect...
+
+        britches      =>  britches
+        clippers      =>  clippers
+        gallows       =>  gallows
+        headquarters  =>  headquarters
+        herpes        =>  herpes
+        hijinks       =>  hijinks
+        innings       =>  innings
+        offspring     =>  offspring
+        pajamas       =>  pajamas
+        pants         =>  pants
+        pincers       =>  pincers
+        pliers        =>  pliers
+        proceedings   =>  proceedings
+        pyjamas       =>  pyjamas
+        scissors      =>  scissors
+        shears        =>  shears
+        shorts        =>  shorts
+        testes        =>  testes
+        tongs         =>  tongs
+        trousers      =>  trousers
+
+
+# Inuktitut imports ending in "-uk" that always inflect to "-uit"...
+
+        inuk      => inuit
+        inukshuk  => inukshuit
+
+
+# French imports ending in "-u" that classically inflect to "-ux"...
+
+        aboiteau     =>  aboiteaus     |  aboiteaux
+        bandeau      =>                |  bandeaux
+        bateau       =>                |  bateaux
+        beau         =>  beaus         |  beaux
+        bijou        =>                |  bijoux
+        bordereau    =>                |  bordereaux
+        bureau       =>  bureaus       |  bureaux
+        chapeau      =>                |  chapeaux
+        chateau      =>                |  chateaux
+        cheval       =>                |  chevaux
+        chou         =>                |  choux
+        fabliau      =>                |  fabliaux
+        fricandeau   =>                |  fricandeaux
+        jeu          =>                |  jeux
+        maquereau    =>                |  maquereaux
+        morceau      =>                |  morceaux
+        plateau      =>  plateaus      |  plateaux
+        portmanteau  =>  portmanteaus  |  portmanteaux
+        tableau      =>  tableaus      |  tableaux
+        tonneau      =>  tonneaus      |  tonneaux
+        trousseau    =>  trousseaus    |  trousseaux
+        trumeau      =>                |  trumeaux
+        voeu         =>                |  voeux
+
+
+# (Mainly) French or Latin imports ending in "-s" that (mostly) don't inflect...
+
+        chassis      =>            |  chassis
+        contretemps  =>            |  contretemps
+        corps        =>            |  corps
+        debris       =>            |  debris
+        glacis       =>  glacises  |  glacis
+        haggis       =>            |  haggis
+        louis        =>            |  louis
+        planctus     =>            |  planctus
+        precis       =>            |  precis
+        sedes        =>            |  sedes
+        superficies  =>            |  superficies
+
+
+# French imports ending in "-u" that inflect to "-us"
+
+        menu     =>  menus
+        parvenu  =>  parvenus
+
+
+# French imports ending in "-ieu" that inflect to "-ieus" or "-ieux"
+
+        adieu    =>  adieus    |  adieux
+        lieu     =>  lieus     |  lieux
+        milieu   =>  milieus   |  milieux
+        purlieu  =>  purlieus  |  purlieux
+
+
+# French imports ending in "-eau" that inflect to "-eaus" or "-eaux"
+
+        bandeau      =>  bandeaus      |  bandeaux
+        bateau       =>  bateaus       |  bateaux
+        beau         =>  beaus         |  beaux
+        bureau       =>  bureaus       |  bureaux
+        chapeau      =>  chapeaus      |  chapeaux
+        chateau      =>  chateaus      |  chateaux
+        jambeau      =>  jambeaus      |  jambeaux
+        manteau      =>  manteaus      |  manteaux
+        plateau      =>  plateaus      |  plateaux
+        politbureau  =>  politbureaus  |  politbureaux
+        portmanteau  =>  portmanteaus  |  portmanteaux
+        rideau       =>  rideaus       |  rideaux
+        rondeau      =>  rondeaus      |  rondeaux
+        tableau      =>  tableaus      |  tableaux
+        tonneau      =>  tonneaus      |  tonneaux
+        trousseau    =>  trousseaus    |  trousseaux
+
+# Names of diseases that don't inflect...
+
+        diabetes  => diabetes
+       *measles   => measles
+        mumps     => mumps
+       *pox       => pox
+        rabies    => rabies
+
+
+# Miscellaneous words ending with "-s" that don't inflect...
+
+        corps         => corps
+        jackanapes    => jackanapes
+        leptomonas    => leptomonas
+        news          => news
+        res           => res
+        schizostylis  => schizostylis
+        series        => series
+        species       => species
+
+
+# Herd/cluster lifeforms that classically don't inflect...
+
+       *bass        =>  basses        |  bass
+        bison       =>  bisons        |  bison
+        bream       =>                |  bream
+        buffalo     =>  buffalos      |  buffalo
+        caribou     =>  caribous      |  caribou
+        carp        =>                |  carp
+        cod         =>                |  cod
+        dace        =>  daces         |  dace
+       *deer        =>                |  deer
+        eland       =>  elands        |  eland
+        elk         =>  elks          |  elk
+       *fish        =>                |  fish
+        flounder    =>                |  flounder
+       *fowl        =>  fowls         |  fowl
+        grouse      =>  grouses       |  grouse
+        haddock     =>  haddocks      |  haddock
+        hake        =>  hakes         |  hake
+        halibut     =>  halibuts      |  halibut
+        herring     =>  herrings      |  herring
+        mackerel    =>  mackerels     |  mackerel
+        moose       =>                |  moose
+        pickerel    =>  pickerels     |  pickerel
+        pike        =>  pikes         |  pike
+        rhinoceros  =>  rhinoceroses  |  rhinoceros
+        roe         =>  roes          |  roe
+        salmon      =>                |  salmon
+        seed        =>  seeds         |  seed
+        shad        =>  shads         |  shad
+       *sheep       =>                |  sheep
+        snipe       =>  snipes        |  snipe
+        starfish    =>  starfishes    |  starfish
+        swine       =>  swine         |  swines
+        teal        =>  teals         |  teal
+        trout       =>                |  trout
+        tuna        =>                |  tuna
+        turbot      =>  turbots       |  turbot
+        whiting     =>                |  whiting
+       *wildebeest  =>  wildebeests   |  wildebeest
+        zucchini    =>  zucchinis     |  zucchini
+
+
+# Vehicles that don't inflect...
+
+        *craft          => craft
+
+# Other imports that don't inflect...
+
+        intichiuma  =>  intichiuma
+        paha        =>  paha
+        ri          =>  ri
+        samurai     =>  samurai
+        soshi       =>  soshi
+
+
+# Individuals of nationalities end in "-ese" that don't inflect...
+
+        Achinese      => Achinese
+        Alfurese      => Alfurese
+        Amboinese     => Amboinese
+        Americanese   => Americanese
+        Amoyese       => Amoyese
+        Amoyese       => Amoyese
+        Andamanese    => Andamanese
+        Angolese      => Angolese
+        Annamese      => Annamese
+        Aragonese     => Aragonese
+        Arakanese     => Arakanese
+        Assamese      => Assamese
+        Avignonese    => Avignonese
+        Azerbaijanese => Azerbaijanese
+        Balinese      => Balinese
+        Bengalese     => Bengalese
+        Bernese       => Bernese
+        Bhutanese     => Bhutanese
+        Bolognese     => Bolognese
+        Borghese      => Borghese
+        Borghese      => Borghese
+        Bostonese     => Bostonese
+        Buginese      => Buginese
+        Burmese       => Burmese
+        Calabrese     => Calabrese
+        Camaldolese   => Camaldolese
+        Cantonese     => Cantonese
+        Carlylese     => Carlylese
+        Cassinese     => Cassinese
+        Celanese      => Celanese
+        Ceylonese     => Ceylonese
+        Chinese       => Chinese
+        Congoese      => Congoese
+        Congoese      => Congoese
+        Congolese     => Congolese
+        Dongolese     => Dongolese
+        Faroese       => Faroese
+        Faroese       => Faroese
+        Ferrarese     => Ferrarese
+        Foochowese    => Foochowese
+        Foochowese    => Foochowese
+        Gabunese      => Gabunese
+        Genevese      => Genevese
+        Genevese      => Genevese
+        Genoese       => Genoese
+        Genoese       => Genoese
+        Gilbertese    => Gilbertese
+        Gilbertese    => Gilbertese
+        Goanese       => Goanese
+        Guianese      => Guianese
+        Hainanese     => Hainanese
+        Hararese      => Hararese
+        Harlemese     => Harlemese
+        Havanese      => Havanese
+        Heavenese     => Heavenese
+        Hoosierese    => Hoosierese
+        Hottentotese  => Hottentotese
+        Hottentotese  => Hottentotese
+        Hunanese      => Hunanese
+        Indochinese   => Indochinese
+        Japanese      => Japanese
+        Javanese      => Javanese
+        Johnsonese    => Johnsonese
+        Kanarese      => Kanarese
+        Kiplingese    => Kiplingese
+        Kiplingese    => Kiplingese
+        Kongoese      => Kongoese
+        Kongoese      => Kongoese
+        Kongolese     => Kongolese
+        Lapponese     => Lapponese
+        Lebanese      => Lebanese
+        Leonese       => Leonese
+        Londonese     => Londonese
+        Lorrainese    => Lorrainese
+        Lucchese      => Lucchese
+        Lucchese      => Lucchese
+        Lyonese       => Lyonese
+        Macanese      => Macanese
+        Macassarese   => Macassarese
+        Madurese      => Madurese
+        Malabarese    => Malabarese
+        Maltese       => Maltese
+        Maltese       => Maltese
+        Messinese     => Messinese
+        Milanese      => Milanese
+        Modenese      => Modenese
+        Muranese      => Muranese
+        Nankingese    => Nankingese
+        Nankingese    => Nankingese
+        Navarrese     => Navarrese
+        Nepalese      => Nepalese
+        Niasese       => Niasese
+        Niasese       => Niasese
+        Nicobarese    => Nicobarese
+        Nipponese     => Nipponese
+        Parmese       => Parmese
+        Pekingese     => Pekingese
+        Pekingese     => Pekingese
+        Piedmontese   => Piedmontese
+        Piedmontese   => Piedmontese
+        Pistoiese     => Pistoiese
+        Pistoiese     => Pistoiese
+        Polonese      => Polonese
+        Portuguese    => Portuguese
+        Portuguese    => Portuguese
+        Romagnese     => Romagnese
+        Romanese      => Romanese
+        Sangirese     => Sangirese
+        Sarawakese    => Sarawakese
+        Sarawakese    => Sarawakese
+        Senegalese    => Senegalese
+        Shavese       => Shavese
+        Shavese       => Shavese
+        Shawanese     => Shawanese
+        Siamese       => Siamese
+        Sienese       => Sienese
+        Sikkimese     => Sikkimese
+        Singhalese    => Singhalese
+        Sinhalese     => Sinhalese
+        Sogdianese    => Sogdianese
+        Sudanese      => Sudanese
+        Sundanese     => Sundanese
+        Swahilese     => Swahilese
+        Tenggerese    => Tenggerese
+        Timorese      => Timorese
+        Tirolese      => Tirolese
+        Tocharese     => Tocharese
+        Tonkinese     => Tonkinese
+        Torinese      => Torinese
+        Tyrolese      => Tyrolese
+        Vermontese    => Vermontese
+        Vermontese    => Vermontese
+        Veronese      => Veronese
+        Viennese      => Viennese
+        Vietnamese    => Vietnamese
+        Wenchowese    => Wenchowese
+        Wenchowese    => Wenchowese
+        Whitmanese    => Whitmanese
+        Yengeese      => Yengeese
+        Yunnanese     => Yunnanese
+
+
+# Singular words (mainly Latin and Greek imports) ending in "-s" that inflect to "-ses" (instead of "-sses")...
+
+        abacus      =>  abacuses
+        abortus     =>  abortuses
+        acropolis   =>  acropolises
+        aegis       =>  aegises
+        alias       =>  aliases
+        asbestos    =>  asbestoses
+        bathos      =>  bathoses
+        bias        =>  biases
+        bolus       =>  boluses
+        bronchitis  =>  bronchitises
+        bursitis    =>  bursitises
+        caddis      =>  caddises
+        callus      =>  calluses
+        cannabis    =>  cannabises
+        canvas      =>  canvases
+        chaos       =>  chaoses
+        chorus      =>  choruses
+        cosmos      =>  cosmoses
+        dais        =>  daises
+        digitalis   =>  digitalises
+        epidermis   =>  epidermises
+        ethos       =>  ethoses
+        eyas        =>  eyases
+        flatus      =>  flatuses
+        gas         =>  gases
+        glottis     =>  glottises
+        hubris      =>  hubrises
+        ibis        =>  ibises
+        lens        =>  lenses
+        linctus     =>  linctuses
+        mantis      =>  mantises
+        marquis     =>  marquises
+        metropolis  =>  metropolises
+        moaks       =>  moakses
+        pathos      =>  pathoses
+        polis       =>  polises
+        sassafras   =>  sassafrases
+        trellis     =>  trellises
+
+
+# Miscellaneous uncategorized imported words with native inflexions...
+# (Some of these should probably be under earlier classifications. Patches welcome!)
+
+        aelf          =>  aelfe
+        agrogorod     =>  agrogoroda
+        braccio       =>  braccia
+        capataz       =>  capataces
+        chapplis      =>  chapplies
+        competent     =>  competentes
+        cornu         =>  cornua
+        crus          =>  crura
+        denkmal       =>  denkmaler
+        espanol       =>  espanoles
+        ex            =>  exes
+        felsenmeer    =>  felsenmeere
+        gmina         =>  gminy
+        gousblom      =>  gousblomme
+        guy           =>  guys
+        heft          =>  hefte
+        hoti          =>  hoties
+        hsien         =>  heen
+        interleaf     =>  leaves
+        interrex      =>  interreges
+        juelet        =>  iueles
+        kletterschuh  =>  kletterschuhe
+        lied          =>  lieder
+        macaroni      =>  macaronies
+        matin         =>  matins
+        mezuza        =>  mezuzoth
+        mezuzah       =>  mezuzoth
+        minnelied     =>  minnelieder
+        nachtlokal    =>  nachtlokale
+        nebenkern     =>  nebenkerne
+        nockerl       =>  nockerln
+        ogle          =>  oglys
+        orthoceras    =>  orthocerata
+        pectus        =>  pectora
+        pillie        =>  pilleis
+        poblador      =>  pobladores
+        promerops     =>  promeropes
+        puttony       =>  puttonys
+        radiale       =>  radialia
+        reich         =>  reiche
+        rejoneador    =>  rejoneadores
+        rete          =>  retia
+        rezident      =>  rezidenty
+        rype          =>  ryper
+        sachverhalt   =>  sachverhalte
+        sceat         =>  sceattas
+        sedile        =>  sedilia
+        seecatch      =>  seecatchie
+        senex         =>  senes
+        sezession     =>  sezessionen
+        shomer        =>  shomrim
+        snekkja       =>  snekkjur
+        sol           =>  soles
+        sphex         =>  spheges
+        stirps        =>  stirpes
+        thos          =>  thoes
+        toril         =>  toriles
+        tuber         =>  tuberes
+        vas           =>  vasa
+        vis           =>  vires
+        voorbok       =>  voorbokke
+        vorspiel      =>  vorspiele
+        wanderjahr    =>  wanderjahre
+        wandervogel   =>  wandervogel
+        yuo           =>  yuon
+        zeitgeber     =>  zeitgebers
+
+# Miscellaneous (mostly imported) words with classical native inflections...
+# (Some of these should probably be under earlier classifications. Patches welcome!)
+
+        alguacil       =>  alguacils     |  alguaciles
+        amphipneust    =>  amphipneusts  |  amphipneusta
+        antefix        =>  antifixes     |  antefixa
+        bechuana       =>  bechuanas     |  bechuana
+        bhikshu        =>  bhikshus      |  bhikshook
+        bierstube      =>  bierstubes    |  bierstuben
+        bratwurst      =>  bratwursts    |  bratwurste
+        bylina         =>  bylinas       |  byliny
+        cabaletta      =>  cabalettas    |  cabalette
+        corgi          =>  corgis        |  corgwn
+        corgy          =>  corgys        |  corgwn
+        cremaster      =>  cremasters    |  cremasteres
+        cyclops        =>  cyclopses     |  cyclopes
+        dreikanter     =>  dreikanters   |  dreikanter
+        dumka          =>  dumkas        |  dumky
+        feis           =>  fess          |  feiseanna
+        fly            =>  flies         |  flys
+        frenum         =>  frena         |  fraena
+        galla          =>  gallas        |  galla
+        geisha         =>  geishas       |  geisha
+        intercalarium  =>  intercalaria  |  intercalare
+        iter           =>  iters         |  itinera
+        kar            =>  kars          |  kare
+        karakia        =>  karakias      |  karakia
+        karrenfeld     =>  karrenfelds   |  karrenfelder
+        kioko          =>  kiokos        |  kioko
+        lacunar        =>  lacunars      |  lacunaria
+        lar            =>  lars          |  lares
+        logodaedalus   =>  logodaedali   |  logodaedale
+        maar           =>  maars         |  maare
+        mukim          =>  mukims        |  mukim
+        nenets         =>  nentsi        |  nentsy
+        nymphaeum      =>  nymphea       |  nymphaea
+        nympheum       =>  nymphea       |  nymphaea
+        pangasinan     =>  pangasinans   |  pangasinanes
+        pinon          =>  pinons        |  pinones
+        pipkrake       =>  pipkrakes     |  pipkraker
+        plethron       =>  plethra       |  plether
+        prytanis       =>  prytanes      |  prytan
+        purum          =>  purums        |  purum
+        pyrites        =>  pyritae       |  pirrites
+        raggare        =>  raggares      |  raggare
+        regidor        =>  regidors      |  regidores
+        remous         =>  remous        |  remou
+        rimon          =>  rimonim       |  rimmonim
+        salita         =>  salitas       |  salite
+        sandr          =>  sandrs        |  sandr
+        scazon         =>  scazontes     |  scazons
+        sephardi       =>  sephardim     |  sephardin
+        serir          =>  serirs        |  serir
+        shauri         =>  shauris       |  shauries
+        shawabti       =>  shawabtis     |  shawabtiu
+        silbador       =>  silbadors     |  silbadores
+        sinfonia       =>  sinfonias     |  sinfonie
+        solidus        =>  solidi        |  solidos
+        sotch          =>  sotches       |  sotchs
+        souvlaki       =>  souvlakis     |  souvlakia
+        sphaeridium    =>  sphaeridia    |  sphaerideum
+        starover       =>  starovers     |  starovery
+        stomodaeum     =>  stomodea      |  stomodaea
+        stromodeum     =>  stromodea     |  stromodaea
+        tetanothrum    =>  tetanothra    |  tetanother
+        tsuba          =>  tsubas        |  tsuba
+        tsubo          =>  tsubos        |  tsubo
+        vaalpens       =>  vaalpens      |  vaalpensen
+        varella        =>  varellaes     |  varely
+        veduta         =>  vedutas       |  vedute
+        wadi           =>  wadies        |  wadis
+        wady           =>  wadies        |  wadys
+        zemirah        =>  zemiroth      |  zemirot
+        zita           =>  ziti          |  zite
+
+
+# "General" as a noun (as opposed to a postfix adjective)...
+
+     adjutant general    =>   adjutant generals
+     brigadier general   =>   brigadier generals
+     lieutenant general  =>   lieutenant generals
+     major general       =>   major generals
+    -star general        =>  -star generals
+
+
+# Compound postfix forms require recursive inflection of the core noun(s)...
+# ['(SING)-general' is non-indicative because it includes the above '-star general' form]
+
+   <nonindicative>   (SING)-general   =>  (PL)-general      # E.g. Consul General --> Consuls General
+
+        son-of-a-(SING)  =>  sons-of-(PL)      # E.g. son-of-a-gun   --> sons-of-guns
+        (SING)-(PREP)-*  =>  (PL)-(PREP)-*     # E.g. mother-in-law  --> mothers-in-law
+        (PREP)-(SING)    =>  (PREP)-(PL)       # E.g. of him         --> of them
+        (SING)-errant    =>  (PL)-errant       # E.g. knight-errant  --> knights-errant
+        (SING)-(PREP)    =>  (PL)-(PREP)       # E.g. passer-by      --> passers-by
+
+# Pronouns in the nominative...
+
+        I     => we
+        you   => you
+        they  => they
+        she   => they
+        he    => they
+        it    => they
+        this  => these
+        that  => those
+        one   => some
+
+
+# Pronouns in the accusative...
+
+        me    => us
+        you   => you
+        them  => them
+        her   => them
+        him   => them
+
+
+# Pronouns in the reflexive...
+
+        myself    => ourselves
+        yourself  => yourselves
+        themself  => themselves
+        herself   => themselves
+        himself   => themselves
+        itself    => themselves
+
+
+# Pronouns in the possessive...
+
+        mine    => ours
+        yours   => yours
+        theirs  => theirs
+        hers    => theirs
+        his     => theirs
+        its     => theirs
+
+
+
+# Standard patterns of inflection for other nouns (in increasing order of generality)...
+
+        -[aeiou]o =>  -[aeiou]os |
+        -[aeo]lf  =>             |  -[aeo]lves
+        -[aiy]nx  =>  -[aiy]nxes |  -[aiy]nges
+        -arf      =>             |  -arves
+        -ceps     =>  -ceps      |
+        -[cs]h    =>  -[cs]hes   |
+        -eaf      =>  -eaves     |
+        -eau      =>  -eaus      |  -eaux
+        -ieu      =>  -ieus      |  -ieux
+        -nife     =>  -nives     |
+        -oe       =>  -oes       |
+        -o        =>  -oes       |
+        -quy      =>  -quies     |
+        -[aeiou]y =>  -[aeiou]ys |
+        -ss       =>  -sses      |
+        -orse     =>  -orses     |
+        -o[au]rse =>  -o[au]rses |
+        -[^s]sis  =>             |  -[^s]ses
+        -trix     =>  -trixes    |  -trices
+        -us       =>  -uses      |
+        -x        =>  -xes       |
+        -y        =>  -ies       |
+        -z        =>  -zzes      |
+        -zoon     =>             |  -zoa
+
+# Very general patterns of inflection whose singular forms are not sufficiently indicative of singularity
+
+        <nonindicative>   -s  => -ses
+        <nonindicative>   -   => -s

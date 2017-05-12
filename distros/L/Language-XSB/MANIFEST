@@ -1,0 +1,21 @@
+Base/Base.pm
+Base/Makefile.PL
+Base/Base.h
+Changes
+Config/Config.pm.PL
+Config/Makefile.PL
+Config/xsb_config.O
+Config/xsb_config.P
+Makefile.PL
+MANIFEST
+README
+Register/Register.pm
+Register/Makefile.PL
+xsblib/perlcallxsb.xwam
+xsblib/perlcallxsb.P
+xsblib/Makefile.PL
+t/1Base.t
+t/2XSB.t
+t/3simple.t
+XSB.pm
+META.yml                                 Module meta-data (added by MakeMaker)

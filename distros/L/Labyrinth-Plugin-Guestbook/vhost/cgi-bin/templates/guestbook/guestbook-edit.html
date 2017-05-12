@@ -1,0 +1,63 @@
+[% 
+    IF data.articleid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Profile' ;
+    htmltitle = title ;
+
+    crumb3_name = 'Admin' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=home-admin' ;
+    crumb2_name = 'Profiles' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=who-admin' ;
+    crumb1_name = editmode ;
+%]
+
+<div class="boxer">
+<p>To add your comments to our guestbook, fill in the blanks below. Fields marked with * must be completed. Others are optional. Thanks!</p>
+
+[% IF errmess %]<p>Details were entered incorrectly. Please check the field marked <span class="alert">&empty;</span> and resubmit.</p>[% END %]
+</div>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="guest-update" />
+<input type="hidden" name="loopback" value="[% ipaddr %]" />
+<input type="hidden" name="entryid" value="[% data.entryid %]" />
+
+<div class="admin">
+<table>
+<tr><td colspan="3"><h4>Comment Details</h4></td>
+<tr><th width="100">Your Name *</th>
+    <td width="10"><span class="alert">[% data.realname_err %]</span></td>
+    <td><input type="text" size="32" name="realname" value="[% data.realname %]" /></td></tr>
+<tr><th>City</th>
+    <td><span class="alert">[% data.city_err %]</span></td>
+    <td><input type="text" size="32" name="city"     value="[% data.city %]"	/></td></tr>
+<tr><th>Country</th>
+    <td><span class="alert">[% data.country_err %]</span></td>
+    <td><input type="text" size="32" name="country"  value="[% data.country %]"	/></td></tr>
+<tr><th>Comment *</th>
+    <td><span class="alert">[% data.comments_err %]</span></td>
+    <td>Please note all urls will be removed from your comment.<br />
+        <textarea name="comments" cols="100" rows="10">[% data.comments %]</textarea></td></tr>
+<tr><td></td>
+    <td></td>
+    <td><input type="submit" value="Submit Comment" /> <input type="reset" /></td></tr>
+
+<tr><td colspan="3"><h4>IP Address Details</h4></td>
+<tr><th>IP Address</th>
+    <td></td>
+    <td>[% IF data.ipaddr; data.ipaddr; ELSE %]Not Recorded[% END %]</td></tr>
+<tr><th></th>
+    <td></td>
+    <td>
+          [% IF data.publish < 3 %]
+      <a href="/guest/block?entryid=[% data.entryid %]"><input type="button" value="Block" /></a>
+      <a href="/guest/allow?entryid=[% data.entryid %]"><input type="button" value="Allow" /></a>
+      <a href="/guest/approve?entryid=[% data.entryid %]"><input type="button" value="Approve" /></a>
+      [% ELSE %]
+        Block | Allow | Approve
+      [% END %]
+      <a href="/guest/delete?entryid=[% data.entryid %]"><input type="button" value="Delete" /></a>
+    </td></tr>
+
+</table>
+</div>
+</form>

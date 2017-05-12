@@ -1,0 +1,13 @@
+Revision history for Locale::Meta 
+
+0.002  2017-01-10
+        Fix pod file.
+0.005 2017-02-03
+        Load meta definitions
+0.006 2017-02-03
+        Add prerequisites
+0.007 2017-02-07
+        Update internal structure to support meta
+        definition per key instead per key->language
+0.008 2017-02-08
+        Fix bug.  Update meta info instead of recreate.

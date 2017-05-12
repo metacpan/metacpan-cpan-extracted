@@ -1,0 +1,12 @@
+#!/bin/sh
+PATH=$HOME/bin:$PATH
+STAT_LOG=/home/sca/link-data/new-broken
+WORK=$STAT_LOG.work
+EMAIL="junk@example.com administrator@127.0.0.1"
+if [ -s $STAT_LOG ]
+then
+  mv $STAT_LOG  $WORK
+  sleep 5
+  link-report --broken --url-file=$WORK --infostructure | 
+     mail -s "link-report for `date`" $EMAIL
+fi

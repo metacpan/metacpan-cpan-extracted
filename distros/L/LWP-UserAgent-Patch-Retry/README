@@ -1,0 +1,48 @@
+SYNOPSIS
+
+     use LWP::UserAgent::Patch::Retry -n => 2, -delay => 3;
+
+DESCRIPTION
+
+    This patch adds retries to LWP::UserAgent when response from request is
+    not a success.
+
+    Can be used with WWW::Mechanize because that module uses
+    LWP::UserAgent.
+
+CONFIGURATION
+
+ -n => INT (default: 2)
+
+    Number of retries. Default is 2, which means it will retry twice (so
+    the total number of requests is 3).
+
+ -delay => INT (default: 3)
+
+    Delay between retries, in seconds.
+
+ -criteria => CODE
+
+    Specify custom criteria of whether to retry. Will be passed ($self,
+    $response) and should return 1 if retry should be performed. For
+    example if you do not want to retry on 404 errors:
+
+     use LWP::UserAgent::Patch::Retry
+         -criteria => sub {
+             my ($self, $resp) = @_;
+             return 1 if !$resp->is_success && $resp->code != 404;
+         };
+
+FAQ
+
+ Why not subclass?
+
+    By patching, you do not need to replace all the client code which uses
+    LWP::UserAgent (or WWW::Mechanize, and so on).
+
+SEE ALSO
+
+    LWP::UserAgent::Determined, LWP::UserAgent::ExponentialBackoff
+
+    Retry in general: Retry, Sub::Retry, Perinci::Sub::Property::retry
+

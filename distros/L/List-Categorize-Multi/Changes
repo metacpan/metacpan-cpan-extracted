@@ -1,0 +1,8 @@
+Revision history for List-Categorize-Multi
+
+0.02 25.03.2013
+- forgot dependency on Test::Deep
+
+0.01 22.03.2013
+- Initial version. Borrows heavily from List-Categorize
+

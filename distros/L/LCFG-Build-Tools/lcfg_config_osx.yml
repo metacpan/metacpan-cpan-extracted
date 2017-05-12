@@ -1,0 +1,122 @@
+# Variables describing the standard LCFG layout
+
+BOOTSTAMP:
+  value: /var/run/bootstamp
+  description: "last boot time-stamp marker file"
+  type: file
+LCFGLIB:
+  value: /usr/local/lib/lcfg
+  description: "Base directory for read-only files"
+  type: directory
+LCFGDATA:
+  value: /usr/local/lib/lcfg/conf
+  description: "Directory for templates and other fixed configuration files"
+  type: directory
+LCFGBIN:
+  value: /usr/local/bin
+  description: "Directory for user binaries"
+  type: directory
+LCFGSBIN:
+  value: /usr/local/sbin
+  description: "Directory for system binaries"
+  type: directory
+LCFGCOMP:
+  value: /usr/local/lib/lcfg/components
+  description: "Directory for components"
+  type: directory
+LCFGVAR:
+  value: /var/lcfg
+  description: "Base directory for writeable files"
+  type: directory
+LCFGSTATUS:
+  value: /var/lcfg/status
+  description: "Directory for status files"
+  type: directory
+LCFGLOG:
+  value: /var/lcfg/log
+  description: "Directory for log files"
+  type: directory
+LCFGLOCK:
+  value: /var/lcfg/lock
+  description: "Directory for lock files"
+  type: directory
+LCFGROTATED:
+  value: /etc/logrotate.d
+  description: "Directory for log rotate config files"
+  type: directory
+LCFGRUN:
+  value: /var/lcfg/tmp
+  description: "Directory for component run files"
+  type: directory
+LCFGTMP:
+  value: /var/lcfg/tmp
+  description: "Directory for temporary files"
+  type: directory
+LCFGCONF:
+  value: /var/lcfg/conf
+  description: "Directory for generated files to be preserved between object runs"
+  type: directory
+LCFGDOC:
+  value: /usr/local/lib/lcfg/doc
+  description: "Base directory for documentation"
+  type: directory
+LCFGPDF:
+  value: /usr/local/lib/lcfg/doc/pdf
+  description: "Directory for PDF files"
+  type: directory
+LCFGHTML:
+  value: /usr/local/lib/lcfg/doc/html
+  description: "Directory for HTML files"
+  type: directory
+LCFGBIB:
+  value: /usr/local/lib/lcfg/doc/bib
+  description: "Directory for BIB files"
+  type: directory
+LCFGPOD:
+  value: /usr/local/lib/lcfg/doc/pod
+  description: "Directory for POD files"
+  type: directory
+LCFGSERVERDEF:
+  value: /usr/local/lib/lcfg/defaults/server
+  description: "Directory for default resource files used by server"
+  type: directory
+LCFGCLIENTDEF:
+  value: /usr/local/lib/lcfg/defaults/client
+  description: "Directory for default resource files used by client"
+  type: directory
+LCFGMAN:
+  value: /usr/local/share/man
+  description: "Base directory for man pages"
+  type: directory
+MANSECT:
+  value: 8
+  description: "The manual page section for admin commands"
+  type: string
+LIBMANSECT:
+  value: 3
+  description: "The manual page section for libraries"
+  type: string
+LCFGOM:
+  value: /usr/local/bin/om
+  description: "Location of 'om' program"
+  type: file
+MANDIR:
+  value: /usr/local/share/man/man8
+  description: "The directory for admin man pages"
+  type: directory
+LIBMANDIR:
+  value: /usr/local/share/man/man3
+  description: "The directory for library man pages"
+  type: directory
+LCFGCONFIGMSG:
+  value: ''
+  description: "A message to be appended to package descriptions"
+  type: string
+INITDIR:
+  value: /etc/init.d
+  description: Location of init scripts directory
+  type: directory
+RELEASEFILE:
+  value: /etc/LCFG-RELEASE
+  description: "The LCFG platform release file"
+  type: file

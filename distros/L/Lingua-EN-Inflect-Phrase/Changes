@@ -1,0 +1,61 @@
+Revision history for Lingua-EN-Inflect-Phrase
+
+0.18 2012-12-27 00:09:43
+        - fix meta repository info (RT#82274)
+
+0.17 2012-12-25 14:09:56
+        - fix for ordinal number phrases, 'first release' was singularizing to
+          'first releases' (RT#82242)
+
+0.16  2012-11-05 02:43:34
+        - bump up Lingua::EN::Tagger dep again due to unescaped braces in
+          regexes
+
+0.15  2012-09-27 22:17:00
+        - fix uninitialized warnings on older perls
+
+0.14  2012-09-24 03:56:10
+        - add $prefer_nouns config variable, defaulting to 1, which allows the
+          recognition of phrases such as 'source splits'
+        - much better number handling, in both number and word form
+
+0.13  2012-08-30 05:30:04
+        - bump Lingua::EN::Tagger dep to 0.20 due to unescaped braces in regexes
+
+0.12  2012-01-10 22:44:02
+        - fix "statuses" -> "status"
+
+0.11  2011-12-18 06:25:33
+        - fix "aliases" and "referral logs" (RT#73242)
+
+0.10  2011-10-15 17:17:03
+        - special case "people" and "heroes"
+
+0.09  2011-10-15 14:32:04
+        - fix inflection of "a" to "some"
+
+0.08  2011-10-11 22:31:58
+        - special case the verb "belongs", as the new fallback to verbs was
+          breaking DBIx::Class::Schema::Loader tests.
+
+0.07  2011-10-10 22:07:35
+        - remove special case for "single", as it was wrong
+
+0.06  2011-10-10 22:01:14
+        - handle "negative acknowledges"
+
+0.05  2011-10-10 21:37:57
+        - fix some bugs discovered in String::ToIdentifier::EN
+        - better support for numbers and number words
+
+0.04  2010-03-17 21:30:04
+        - POD improvements
+
+0.03  2010-03-16 20:09:31
+        - clean up code
+
+0.02  2010-03-16 16:28:39
+        - some improvements and fixes for DBIx::Class::Schema::Loader
+
+0.01  2010-03-16 15:16:16
+        - first release

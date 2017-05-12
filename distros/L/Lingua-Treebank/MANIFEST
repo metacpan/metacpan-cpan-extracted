@@ -1,0 +1,44 @@
+# code files
+Treebank.pm
+Const/Const.pm
+
+
+# distribution files
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+Const/Makefile.PL
+README
+
+# Lingua::Treebank test files
+t/1.t
+t/2read.t
+t/30fullsize.t
+
+# Lingua::Treebank::Const test files
+Const/t/01use.t
+Const/t/10iomethods.t
+Const/t/15cycletest.t
+Const/t/20basemethods.t
+Const/t/30querymethods.t
+Const/t/40modmethods.t
+Const/t/50walking.t
+
+# # headed const test files -- keep?
+# HeadedConst/HeadedConst.pm
+# HeadedConst/Makefile.PL
+#	HeadedConst/t/Lingua-Treebank-HeadedConst.t
+
+HeadFinder/HeadFinder.pm
+HeadFinder/Makefile.PL
+HeadFinder/data/ptb.head.charniak
+
+# scripts for general use
+scripts/get-words
+scripts/list-edges
+scripts/list-rewrites
+scripts/tree-collapse
+scripts/tree-inflate
+scripts/vocabulary
+
+META.yml                                 Module meta-data (added by MakeMaker)

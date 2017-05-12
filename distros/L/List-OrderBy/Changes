@@ -1,0 +1,8 @@
+Revision history for Perl extension List::OrderBy.
+
+v0.2 Jan 2013
+  - Fixed permission problems in the tar archive. Thanks to the
+    PAUSE namespace indexer and Slaven Rezic for pointing them out.
+
+v0.1 Jan 2013
+  - Initial Release.

@@ -1,0 +1,55 @@
+DOCBOOK2HTML = @DOCBOOK2HTML@
+DOCBOOK2DVI  = @DOCBOOK2DVI@
+DOCBOOK2PDF  = @DOCBOOK2PDF@
+DOCBOOK2PS   = @DOCBOOK2PS@
+
+ROOT	     = users_guide
+PARTS	     = $(ROOT).sgml haskell98.sgml hugs_ghc.sgml hugs_only.sgml \
+	       introduction.sgml license.sgml miscellaneous.sgml \
+	       options.sgml using_hugs.sgml
+# Options needed for non-SuSE $(DOCBOOK2HTML)
+HTML_OPTS    = --output $(ROOT) -V '%use-id-as-filename%'
+
+# Don't use $(ROOT)/index.html, because depending on $(DOCBOOK2HTML) it
+# could be $(ROOT)/$(ROOT).html instead.
+HTML         = $(ROOT)/license.html
+
+%.sgml: %.xml
+	sed -f xml2sgml.sed $*.xml >$@
+
+all: html dvi ps pdf
+
+clean:
+	$(RM) $(PARTS) $(ROOT).dvi $(ROOT).ps $(ROOT).pdf
+	$(RM) -r $(ROOT)
+
+distclean: clean
+	$(RM) Makefile
+
+html: $(HTML)
+
+dvi: $(ROOT).dvi
+
+ps: $(ROOT).ps
+
+pdf: $(ROOT).pdf
+
+# MEGA-HACK: There is no standard for the options of db2foo, so try to
+# be clever...   :-P
+$(HTML): $(PARTS)
+	rm -rf $(ROOT)
+	test -z '$(DOCBOOK2HTML)' || \
+	  if $(DOCBOOK2HTML) --help | grep -e --output > /dev/null 2>&1 ; then \
+	    $(DOCBOOK2HTML) $(HTML_OPTS) $(ROOT).sgml ; \
+	  else \
+	    $(DOCBOOK2HTML) $(ROOT).sgml ; \
+	  fi
+
+$(ROOT).dvi: $(PARTS)
+	test -z '$(DOCBOOK2DVI)' || $(DOCBOOK2DVI) $(ROOT).sgml
+
+$(ROOT).ps: $(PARTS)
+	test -z '$(DOCBOOK2PS)' || $(DOCBOOK2PS) $(ROOT).sgml
+
+$(ROOT).pdf: $(PARTS)
+	test -z '$(DOCBOOK2PDF)' || $(DOCBOOK2PDF) $(ROOT).sgml

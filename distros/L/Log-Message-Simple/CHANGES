@@ -1,0 +1,29 @@
+Changes for 0.10    Wed Jan 23 08:10:42 GMT 2013
+================================================
+* Add deprecate usage to warn if module is loaded
+  from corelib. Log::Message::Simple is leaving
+  core with v5.20.0, but will still be available
+  on CPAN.
+
+Changes for 0.08    Wed Jan 19 10:22:12 2011
+============================================
+* POD fix from Michael Stevens [rt.cpan.org #64877]
+
+Changes for 0.06    Fri Sep 11 07:17:57 2009
+============================================
+* Abstract fix in POD. Resolves RT #49562
+
+Changes for 0.04    Mon Oct 22 14:10:23 2007
+============================================
+* Documentation nits. Users of 0.02 are not
+  required to upgrade.
+
+Changes for 0.02    Mon May 28 11:46:52 2007
+============================================
+* This is an administrative update only: Users do not
+  need to upgrade.
+* As of perl 5.9.5, Log::Message::Simple is part
+  of core perl and should be installed in the 'perl'
+  dir rather than the 'site' dir.
+* Improve test suite under perl core tests
+* Quell some test warnings

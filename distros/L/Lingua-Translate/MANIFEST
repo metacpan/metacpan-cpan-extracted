@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Lingua/Translate.pm
+lib/Lingua/Translate/Babelfish.pm
+lib/Lingua/Translate/SysTran.pm
+t/01-babelfish.t
+t/02-translate.t
+t/03-systran.t
+META.yml                                 Module meta-data (added by MakeMaker)

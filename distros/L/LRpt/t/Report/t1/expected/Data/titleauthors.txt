@@ -1,0 +1,2 @@
+au_id	title_id	au_ord	royaltyshare
+712-45-1867	MC2222	1	1.00

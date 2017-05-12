@@ -1,0 +1,42 @@
+#! /opt/perl5/bin/perl -w
+# Time-stamp: <2010-05-14T16:45:24 mxp>
+
+use lib './blib/lib', './blib/arch';
+use Lingua::Ident;
+
+$ident = new Lingua::Ident('data/data.de', 'data/data.en', 'data/data.it',
+			   'data/data.fr', 'data/data.ko', 'data/data.zh');
+$sample = "";
+
+# Read the first 128 bytes
+
+READ: while(<>)
+{
+   chomp;
+
+   if (length($sample) < 128)
+   {
+      $sample .= $_ . ' ';
+      $sample =~ s/\s+/ /og;
+   }
+   else
+   {
+      last READ;
+   }
+}
+
+# identify() returns the name of the language with the highest
+# probability.  It returns a string.
+
+$lang = $ident->identify($sample);
+print "Language: $lang\n";
+
+# calculate() gives you access to the actual proabilities for all
+# languages.  It returns a sorted array of arrays.
+
+$probs = $ident->calculate($sample);
+
+foreach (@$probs)
+{
+   printf "%14s (%.4f)\n", $_->[0], $_->[1];
+}

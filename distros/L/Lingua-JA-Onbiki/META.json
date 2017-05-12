@@ -1,0 +1,75 @@
+{
+   "abstract" : "convert Onbiki into Boin",
+   "author" : [
+      "YANUTETSU <yanutetsu@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-JA-Onbiki",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::JA::Onbiki" : {
+         "file" : "lib/Lingua/JA/Onbiki.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanutetsu/Lingua-JA-Onbiki/issues"
+      },
+      "homepage" : "https://github.com/yanutetsu/Lingua-JA-Onbiki",
+      "repository" : {
+         "url" : "git://github.com/yanutetsu/Lingua-JA-Onbiki.git",
+         "web" : "https://github.com/yanutetsu/Lingua-JA-Onbiki"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Satoshi Yanuma <satoshi.yanuma@etimestech.jp>"
+   ]
+}

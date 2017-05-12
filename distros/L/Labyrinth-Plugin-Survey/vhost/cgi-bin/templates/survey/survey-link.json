@@ -1,0 +1,5 @@
+[% IF act.link %]
+{ "success": 1, "link": "[% act.link %]" }
+[% ELSE %]
+{ "success": 0, "error": "user not found, or not registered" }
+[% END %]

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+lib/Lingua/EN/CommonMistakes.pm
+t/00-load.t
+t/10-mistakes.t
+t/changes.t
+t/manifest.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

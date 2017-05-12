@@ -1,0 +1,53 @@
+---
+abstract: 'a l33t interpreter'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Language-l33t
+provides:
+  Language::l33t:
+    file: lib/Language/l33t.pm
+    version: v1.0.1
+  Language::l33t::Operators:
+    file: lib/Language/l33t/Operators.pm
+    version: v1.0.1
+requires:
+  Carp: '0'
+  Const::Fast: '0'
+  IO::Socket::INET: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::HandlesVia: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::MungeHas: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+  experimental: '0'
+  perl: v5.20.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/language-l33t/issues
+  homepage: https://github.com/yanick/language-l33t
+  repository: https://github.com/yanick/language-l33t.git
+version: 1.0.1
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'

@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               LWP-Authen-OAuth
+version:            1.02
+abstract:           generate signed OAuth requests
+author:
+    - Timothy D Brody <tdb2@ecs.soton.ac.uk>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Digest::SHA:     0
+    LWP::UserAgent:  0
+    MIME::Base64:    0
+    Test::More:      0
+    URI:             0
+    URI::Escape:     0
+resources:
+    type:  git
+    url:   git://github.com/timbrody/lwp-authen-oauth.git
+    web:   https://github.com/timbrody/lwp-authen-oauth
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

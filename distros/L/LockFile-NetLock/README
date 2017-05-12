@@ -1,0 +1,71 @@
+Use ftp and directory creation to create mutual exclusion/locking
+that is available cross platform and on a network.  If two
+processes each connect to the same host via ftp and try to create 
+the same directory that does not yet exist then one will create 
+the directory and the other will be notified that it cannot create
+the directory because it is already there.  This locking technique
+is based on an article by Sean M. Burke in the Summer 2002 Perl
+Journal.
+
+Synopsis
+
+    use LockFile::NetLock;
+
+    my $locker = new LockFile::NetLock(
+        'ftp.myhost.com', 'lockdir.lck', 'ftpuser', 'ftppassword'
+    );
+    if ($locker->lock()) {
+        # do work requiring lock
+        $locker->unlock() ||
+            print STDERR $locker->errstr;
+    }
+    else {
+        print STDERR $locker->errstr;
+    }            
+
+    -- OR --
+
+    use LockFile::NetLock qw(lock unlock);
+
+    if (lock qw(ftp.myhost.com lockdir.lck ftpuser ftppassword)) {
+        # do work requiring lock
+        unlock(qw(ftp.myhost.com lockdir.lck)) ||
+            print STDERR $LockFile::NetLock::errstr;
+    }
+    else {
+        print STDERR $LockFile::NetLock::errstr;
+    }
+
+    -- OR even with a .netrc file --
+
+    use LockFile::NetLock qw(lock unlock);
+
+    if (lock qw(ftp.myhost.com lockdir.lck )) {
+        # do work requiring lock
+        unlock(qw(ftp.myhost.com lockdir.lck)) ||
+            print STDERR $LockFile::NetLock::errstr;
+    }
+    else {
+        print STDERR $LockFile::NetLock::errstr;
+    }
+
+
+Installation
+
+-- Standard perl module installation
+perl Makefile.PL
+make
+make test
+make install
+
+See the perlmodinstall document on CPAN for more information on
+installing modules.
+
+It is strongly recommended that users of this module upgrade Net::FTP
+to at least version 2.64.  Earlier versions may make errors in removing
+a lock undetectable.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+

@@ -1,0 +1,30 @@
+Revision history for Perl extension Lingua::PT::Nums2Words.
+
+1.06  Mon Nov 08 19:49:00 2004
+	- moved a few things around
+        - changes in the documentation
+        - added pod.t and pod-coverage to the tests directory
+
+1.05  Wed Sep 22 00:09:00 2004
+	- Perl required version is now 5.006 (was 5.008)
+
+1.04  Thu Sep 16 22:01:00 2004
+	- added META.yml
+
+1.03  Tue May  4 00:55:00 2004
+	- changed / added documentation
+
+1.02  Tue May  4 18:02:00 2004
+	- the module now converts numbers from 0 to 999999999999999
+	- more tests have been added
+
+1.01  Sat May  1 19:20:00 2004
+	- the module now converts numbers from 0 to 999999
+
+1.00  Sat May  1 18:00:00 2004
+	- completed (converts numbers from 0 to 9999)
+
+0.01  Sat May  1 16:57:10 2004
+	- original version; created by h2xs 1.22 with options
+		-XAn Lingua::PT::Nums2Words
+

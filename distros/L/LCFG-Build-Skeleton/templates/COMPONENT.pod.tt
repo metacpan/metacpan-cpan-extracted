@@ -1,0 +1,44 @@
+=head1 NAME
+
+@LCFG_NAME@ - @LCFG_ABSTRACT@
+
+=head1 VERSION
+
+This documentation refers to @LCFG_NAME@ version @LCFG_VERSION@
+
+=head1 DESCRIPTION
+
+%%%TBD%%%
+
+=head1 RESOURCES
+
+=over
+
+=item B< %%%TBD%%% >
+
+%%%TBD%%%
+
+=back
+
+=head1 PLATFORMS
+
+This is the list of platforms on which we have tested this
+software. We expect this software to work on any Unix-like platform
+which is supported by Perl.
+
+@LCFG_PLATFORMS@
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or problems (or praise!) to bugs@lcfg.org,
+feedback and patches are also always very welcome.
+
+=head1 AUTHOR
+
+@LCFG_AUTHOR@
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is distributed under the @LCFG_LICENSE@ license.
+
+=cut

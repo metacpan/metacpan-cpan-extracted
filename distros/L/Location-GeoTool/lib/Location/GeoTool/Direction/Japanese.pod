@@ -1,0 +1,108 @@
+=head1 名前
+
+Location::GeoTool::Direction - 距離・方向を扱うPerlモジュール
+
+=head1 概要
+
+  use Location::GeoTool;
+
+  # 生成
+  $locobj = Location::GeoTool->create_coord('353924.491','1394010.478','wgs84','dmsn');
+  $dirobj = $locobj->direction_point('403614.307','1410133.022','wgs84','dmsn');
+
+  # 属性
+  $dir = $dirobj->direction;        # 11.8035750... [°]
+  $dist = $dirobj->distance;        # 561836.65713... [m]
+  $start = $dirobj->from_point;     # '353924.491','1394010.478','wgs84','dmsn'の
+                                      Location::GeoToolオブジェクト
+  $end = $dirobj->to_point;         # '403614.307','1410133.022','wgs84','dmsn'の...
+
+  # メソッド
+  $revobj = $dirobj->reverse;       # 始点 <-> 終点
+  $midpoint = $dirobj->pivot(0,0.5);# 中点
+  $dirstr = $dirobj->dir_string(4,'jp');
+                                    # 「北」
+
+=head1 説明
+
+=head2 生成
+
+Location::GeoToolのメソッドから生成されます。
+
+  $dirobj = $locobj->direction_point('403614.307','1410133.022','wgs84','dmsn');
+  $dirobj = $locobj->direction_point($another_locobj);
+  $dirobj = $locobj->direction_vector(120,500);
+
+=head2 属性
+
+起点、終点及びその間の方位・距離を属性に持ちます。
+
+=head3 from_point
+
+起点をLocation::GeoToolオブジェクトで返します。
+
+=head3 to_point
+
+終点をLocation::GeoToolオブジェクトで返します。
+
+=head3 direction
+
+起点から終点を見た方位角を、0-360度の方位角(北を0°として東方向周り)で
+します。
+(ただし、生成時のdirection_vectorの引数として負の方角が与えられた場合は、
+そのまま返します。)
+
+=head3 distance
+
+起点から終点までの距離をmで返します。
+
+=head2 メソッド
+
+=head3 reverse
+
+始点と終点を置き換えたLocation::GeoTool::Directionオブジェクトを返します。
+
+=head3 pivot 
+
+  $newobj = $dirobj->pivot($rot,$pow);
+
+始点を中心に、$rot角度だけ方位角を回転し、距離を$pow倍した
+Location::GeoTool::Directionオブジェクトを返します。
+
+=head3 dir_string
+
+  $dirstr = $dirobj->dir_string($denom,$lang);
+
+現在の方位角に相当する方位名を返します。
+$denomは何方位(4,8,16,32)での方位名を得るかを指定します。
+$langは何語での出力を得るか('jp' or 'en')を指定します。
+
+$denomの指定に関しては、例えば$dirobj->directionで241度が帰って
+来るような場合は、
+$denom =  4ならば、$dirobj->dir_string => '西'
+$denom =  8ならば、$dirobj->dir_string => '南西'
+$denom = 16ならば、$dirobj->dir_string => '西南西'
+$denom = 32ならば、$dirobj->dir_string => '南西微西'
+
+日本語での出力はEUCコードで返されます。
+
+=head1 依存
+
+Location::GeoTool
+
+=head1 関連情報
+
+このモジュールは、ここギコ！ウェブサイト　：　http://kokogiko.net/
+にてサポートいたします。
+
+=head1 作者
+
+大塚 恒平, E<lt>nene@kokogiko.netE<gt>
+
+=head1 著作権・ライセンス
+
+Copyright (C) 2004 SpaceTag Inc.,
+
+本ライブラリはフリーソフトであり、Perl本体と同じ条件での再配布・改変が可能です。
+
+=cut

@@ -1,0 +1,8 @@
+Revision history for Perl extension SlidingList::Changes.
+
+0.03 20080427
+  . Fixed test failures, patch by Andreas Koenig
+
+0.01  Wed Jan 29 19:04:31 2003
+	- original version; created by ExtUtils::ModuleMaker 0.204
+

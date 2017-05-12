@@ -1,0 +1,75 @@
+0.010 2016-11-18
+
+    [Bug fix]
+
+        Work on older versions of Perl - don't use unicode_strings in the
+        tests that don't need that feature, and explicitly specify parent
+        as a prerequisite as that wasn't in core until 5.10.1.
+
+0.009 2016-11-14
+
+    [Prerequisites]
+
+        Bump the required version of HTTP::Request::Common to the version
+        that actually allows us to properly call HTTP::Request::Common::post
+        and ...::put.	
+
+0.008 2016-11-12
+
+    [Features]
+
+        New methods LWP::UserAgent::JSON->post_json, put_json and patch_json
+        act as the equivalent of LWP::UserAgent->post, ->put and ->patch (if
+        it actually implemented a patch method, which it doesn't), but if a
+        reference is passed as the parameter after $url, turn it into JSON
+        instead of form-encoding it.
+
+        Should handle Unicode better.
+
+0.007 2015-11-03
+
+    [Features]
+        Always sorts output. Modern Perls (5.18+) have arbitrary hash
+        key ordering, so whatever JSON was spat out by a previous
+        version of your code wouldn't necessarily resemble what you'd
+        produce now. The overhead on my system is single digit
+        microseconds, so this seems like a reasonable default.
+
+        The methods that create JSON objects have been exposed so you
+        can subclass this easily if you want to.
+
+0.006 2015-07-14
+
+    [Documentation]
+        Remove erroneous reference to add_json_content.
+
+0.005 2015-04-20
+
+    [Documentation]
+        Typo fix - thanks CHESNOKOV.
+
+0.004 2015-03-05
+
+    [Features]
+        Make HTTP::Request::JSON->json_content into a mutator, so if
+        you say $request->json_content it returns the current content
+        as decoded from JSON, rather than unhelpfully setting the content
+        to 'null'.
+
+0.003 2015-02-20
+
+    [Prerequisites]
+        This needs a version of HTTP::Message that knows about JSON
+        properly, at least for the tests.
+
+0.002 2015-02-10
+
+    [Features]
+        Added LWP::UserAgent::JSON->rebless_maybe
+
+    [Documentation]
+        Fixed links.
+
+0.001 2015-02-09
+
+    Initial release.

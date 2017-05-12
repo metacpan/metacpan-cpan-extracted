@@ -1,0 +1,25 @@
+Revision history for Perl extension LWP::UserAgent::Cached.
+
+0.06  Wed Sep 10 02:38:48 NOVT 2014
+      - additionally pass $request as third argument to `recache_if' callback
+      - documentation improved a little bit
+
+0.05  Sat Jun 28 12:16:14 NOVT 2014
+      - `last_used_cache' method added
+      - lwp's `parse_head' now always false to prevent problems with encoding for `as_string'
+
+0.04  Sun Feb 10 20:28:09 2013
+      - `on_uncached' option added
+      - small documentation fixes
+
+0.03  Sun Jan 22 22:27:45 2012
+      - `nocache' renamed to `nocache_if' and `recache' to `recache_if'
+      - `last_cached' method added
+      - `cachename_spec' option added
+
+0.02  Wed Jan 4 15:09:00 2012
+      - Makefile.PL fix for tests dependencies
+      - `recache' callback was added
+
+0.01  Mon Jan 2 21:59:07 2012
+      - original version;

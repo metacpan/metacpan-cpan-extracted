@@ -1,0 +1,22 @@
+---
+abstract: 'Lightweight object-oriented miniature Perl assistant.'
+author:
+  - 'Hans Dieter Pearcey <hdp@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Loompa
+no_index:
+  directory:
+    - inc
+    - t
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://svn.opensourcery.com/public/projects/loompa/trunk
+version: 0.51

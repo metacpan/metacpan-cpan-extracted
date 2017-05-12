@@ -1,0 +1,21 @@
+LID LANG       SEnc  OEnc  String             Ordinal              
+--- ----       ----  ----  ------             -------              
+AF  Afrikaans  ascii ascii vyf en viertig     45                   
+BG  Bulgarian  UTF8  UTF8  четиридесет и пет  четиридесет и пети   
+CS  Czech      ?     ascii ètyøicet pìt       45                   
+DE  German     ?     ascii fünfundvierzig     45                   
+EN  English    ascii ascii forty-five         forty-fifth          
+ES  Spanish    UTF8  UTF8  cuarenta y cinco   cuadragésimo quinto  
+EU  Basque     ascii ascii berrogeita bost    berrogeita bostgarren
+FR  French     ascii ?     quarante-cinq      quarante-cinquième   
+HU  Hungarian  UTF8  UTF8  negyvenöt          negyvenötödik        
+ID  Indonesian ascii ascii empat puluh lima   45                   
+IT  Italian    ascii ascii quarantacinque     45                   
+JA  Japanese   UTF8  UTF8  四十五                四十五番                 
+NL  Dutch      ascii ascii vijfenveertig      45                   
+NO  Norwegian  ?     ascii førti fem          45                   
+PL  Polish     ?     ascii czterdzieci piêæ  45                   
+PT  Portuguese ascii ?     quarenta e cinco   quadragésimo quinto  
+SV  Swedish    ascii ascii fyrtiofem          fyrtiofemte          
+TR  Turkish    UTF8  UTF8  kırk beş           kırk beşinci         
+ZH  Chinese    ascii ascii SiShi Wu           45                   

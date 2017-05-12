@@ -1,0 +1,136 @@
+==================================================
+Changes from 2016-04-11 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.007 at 2017-04-11 16:14:27 +0000
+------------------------------------------
+
+  Change: 8685c6697ac808490f256c1e1b3db9b861861453
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-04-11 16:33:09 +0000
+
+    More windows friendly 
+
+  Change: c19233511a813ad62d473b36a6396bd92e4cf507
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-04-11 16:19:17 +0000
+
+    Tests pass with 5.8.9 
+
+  Change: 5e3b30522af11ea9fef1497cd8eb2b6689a0f9c4
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-30 12:12:26 +0000
+
+    Better doc 
+
+------------------------------------------
+version 0.006 at 2017-03-30 09:54:24 +0000
+------------------------------------------
+
+  Change: b5ce014b6bff520c80a4c0b3bba9734c1d094758
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-30 10:54:24 +0000
+
+    Can use macros in persisted evalers 
+
+  Change: 126be7ff649d9ed665f25b5ae01e368cf976d153
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-22 16:53:55 +0000
+
+    Unbound symbol should be name, not var 
+
+------------------------------------------
+version 0.005 at 2017-03-22 12:39:44 +0000
+------------------------------------------
+
+  Change: 2a96cac631ba55c70ac042421026e79134337e7e
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-22 12:39:44 +0000
+
+    Made sure functions are executed in a copy of the current scope in
+    defrosted evalers 
+
+  Change: eb8d6d14e86cd3feca29f14e60691e808b6680fc
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-21 17:29:41 +0000
+
+    Removed uneeded dependencies 
+
+------------------------------------------
+version 0.004 at 2017-03-21 16:09:05 +0000
+------------------------------------------
+
+  Change: 367e6e185ec236883851f4b679c76333736a7660
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-21 16:09:05 +0000
+
+    Implemeted evaler persistence 
+
+  Change: 5cd6edf5a210983c74ee029c02e3a6f1cf91cf03
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-20 17:34:42 +0000
+
+    Removed SocketServer 
+
+  Change: 0ef3f6ddf53f1d68950985bf0f5fb752b671b8cd
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-20 17:31:24 +0000
+
+    Seq is Moosified 
+
+  Change: de12dac4848004b551708d7f36425217f6fcae6b
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-20 17:19:08 +0000
+
+    Atom is Moosified 
+
+  Change: aa4c50e496b81c9a1c18c23b03aa6e3a4b52fbf2
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-20 16:55:36 +0000
+
+    Replaced meta by meta_data wherever possible 
+
+  Change: 039b81653d9e59f3ed326851a81837b4b8dbc0b2
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-20 12:31:58 +0000
+
+    Moved to Moose 
+
+------------------------------------------
+version 0.003 at 2017-03-17 17:49:03 +0000
+------------------------------------------
+
+  Change: d019a637666b3cae7b4e62015f975f3d2cbffcb6
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-17 17:49:03 +0000
+
+    Updated README 
+
+  Change: 0d2ad3707d37a26da68982bbeed2c945d6046c55
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-17 17:45:30 +0000
+
+    Added travis caching 
+
+  Change: d03f5b05c77468a9e61f5f7439b28bdc0608fcd1
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-17 17:39:56 +0000
+
+    Few bug fixes. quote function. Can give code to perl space 
+
+  Change: 1696e28e4e2c0e6d0a18b4eeaa3b6c9fce3a5b46
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-02-24 11:14:24 +0000
+
+    Dist::Zilla doesnt like perl 5.10/5.12 anymore 
+
+  Change: b14f0cb673346ce4c7f4027ad1b51cd261debf7e
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-02-24 10:50:23 +0000
+
+    Added .cseignore 
+
+================================================
+Plus 2 releases after 2016-04-11 00:00:00 +0000.
+================================================

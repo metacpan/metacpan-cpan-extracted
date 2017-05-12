@@ -1,0 +1,32 @@
+/*-------------------------------------------------------------*/
+/* Toolbar */
+
+#quartz-content .listings .hd div #toolbar {
+	background: #000 url('../images/tb.png') repeat-x ;
+}
+
+/*-------------------------------------------------------------*/
+/* Titlebar */
+
+/*
+#quartz-content .listings .hd div #titlebar {
+	background: #000 url('../images/tb.png') repeat-x ;
+}
+#quartz-content .listings .hd div #titlebar {
+	color: yellow ;
+}
+*/
+
+/* Main title */
+#qtv-listings #gridhd {
+  background:#000 url(../images/titlebar.png) repeat-x top center;
+}
+
+#qtv-listings #gridhd h2 {
+/*  background: #000 url('black/tb.png') repeat-x ; */
+
+/*  background:#000 url(../images/popup.png) repeat-x top center;*/
+/*  border: 2px outset #555;*/
+  padding: 0 15px 5px 15px ;
+}
+

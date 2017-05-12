@@ -1,0 +1,422 @@
+NAME
+    Lexical::Attributes - Proper encapsulation
+
+SYNOPSIS
+        use Lexical::Attributes;
+
+        has $.scalar;
+        has $.key ro;
+        has (@.array, %.hash) is rw;
+
+        sub method {
+            $self -> another_method;
+            print $.scalar;
+        }
+
+DESCRIPTION
+    NOTE: This module has changed significantly between releases 1.3 and
+    1.4. Code that works with version 1.3 or earlier *will not* work with
+    version 1.4 or later.
+
+    NOTE: This is experimental software! Certain things will change,
+    specially if they are marked FIXME or mentioned on the TODO list.
+
+    This module was created out of frustration with Perl's default OO
+    mechanism, which doesn't offer good data encapsulation. I designed the
+    technique of *Inside-Out Objects* several years ago, but I was not
+    really satisfied with it, as it still required a lot of typing. This
+    module uses a source filter to hide the details of the Inside-Out
+    technique from the user.
+
+    Attributes, the variables that belong to an object, are stored in
+    lexical hashes, instead of piggy-backing on the reference that makes the
+    object. The lexical hashes, one for each attribute, are indexed using
+    the object. However, the details of this technique are hidden behind a
+    source filter. Instead, attributes are declared in a similar way as
+    lexical variables. Except that instead of "my", a Perl6 keyword, "has"
+    is used. Another thing is borrowed from Perl6, and that's the second
+    sigil. Attributes have a dot separating the sigil from the name of
+    attribute.
+
+  Attributes
+    To declare an attribute, use the Perl6 keyword "has". The simplest way
+    to declare an attribute is:
+
+        has $.colour;    # Gives the object a 'colour' attribute.
+
+    Now your object has an attribute *colour*. Note the way the attribute is
+    written, in a Perl6 style, it has the sigil (a "$"), a period, and then
+    the attribute name. Attribute names are strings of letters, digits and
+    underscores, and cannot start with a digit. Attribute names are
+    case-sensitive. You can use this attribute in the same way as a normal
+    Perl scalar (except for interpolation). Here's a sub that prints out the
+    colour of the object:
+
+        sub print_colour {
+            print $.colour;
+        }
+
+    Array and hash attributes work in a similar way:
+
+        has @.array;   # Gives the object an array attribute.
+        has %.hash;    # Gives the object a hash attribute.
+
+    And you can use them in a similar way as you can with "normal" Perl
+    variables:
+
+        sub first_element {
+            return $.array [0];
+        }
+
+        sub pop_element {
+            return pop @.array;
+        }
+
+        sub last_index {
+            return $#.array;
+        }
+
+        sub gimme_key {
+            my $key = shift;
+            return $.hash {$key};
+        }
+
+        sub gimme_all_keys {
+            return keys %.hash;
+        }
+
+    Note however that you *cannot* have a scalar and an array (or a scalar
+    and a hash, or an array and a hash) with the same name. Using both "has
+    $.key;" and "has @.key;" will result in a warning, and the second (and
+    third, fourth, etc) declaration of the attibute will be ignored.
+
+    If you have several attributes you want to declare, you can use "has" in
+    a similar way as you can "my" and "local". "has" takes a list as
+    argument as well (parenthesis are required):
+
+        has ($.key1, @.key2, %.key3);
+
+    Note that the declaration, that is, the "has" keyword followed by an
+    attribute, or a list of attributes, can be followed by an optional
+    *trait* (as discussed below), must be followed by a semi-colon (after
+    optional whitespace). The following will not work:
+
+        has $.does_not_work = 1;
+
+   Traits
+    Since inspecting and setting the attributes of an object is a commonly
+    requested action, it's possible to give the attributes *traits* that
+    will achieve this. Traits are given by following the "has" declaration
+    with the keyword "is" and the name of the trait (with the keyword being
+    optional). Examples include:
+
+        has $.get_set is rw;
+        has $.get ro;
+        has (@.array, %.hash) is priv;   # Trait applies to both attributes.
+
+    The following traits can be given:
+
+    "pr" or "priv"
+         Using "pr" or "priv" has the same effect as not giving any traits,
+         no accessor for this attribute is generated.
+
+    "ro" This trait generates an accessor for the attribute, with the same
+         name as the attribute.
+
+         For scalar attributes, calling the accessor returns the value of
+         the attribute. Any parameters given to the accessor will be
+         ignored.
+
+          package MyObject;
+          use Lexical::Attributes;
+
+          has $.colour is ro;
+
+          sub new {bless \do {my $obj} => shift}
+          sub some_sub {
+              ...  # Some code that sets the 'colour' attribute.
+          }
+
+          1;
+
+          # Main program
+
+          my $obj = MyObject -> new;
+          $obj -> some_sub (...);
+          print $obj -> colour;   # Prints the colour.
+
+          __END__
+
+         Accessors for arrays and hashes take optional arguments. If no
+         arguments are given, the accessor will return the array or hash in
+         list context (as a list - just as if you'd use an array or hash in
+         list context). In scalar context, the number of elements of the
+         array or hash are returned.
+
+         If one or more arguments are given, the corresponding arguments are
+         returned. Some examples:
+
+          package MyObject;
+          use Lexical::Attributes;
+
+          has @.colours is ro;
+          has %.fruit   is ro;
+
+          sub new  {bless \do {my $obj} => shift}
+          method init {  # See below for discussion of 'method'.
+              @.colours = qw /red white blue green yellow/;
+              %.fruit   = (cherry  =>  'red',
+                           peach   =>  'pink',
+                           apple   =>  'green',
+              );
+              $self;
+          }
+
+          1;
+
+          # Main program
+
+          my $obj  = MyObject -> new -> init;
+
+          local $, = " ";
+
+          print $obj -> colours;         # red white blue green yellow
+          print $obj -> colours (2);     # blue
+          print $obj -> colours (1, 3);  # white green
+
+          print sort $obj -> fruit;      # apple cherry green peach pink red
+          print $obj -> fruit ('cherry');        # red
+          print $obj -> fruit ('apple', 'peach') # green pink
+
+          __END__
+
+    "rw" Attributes with the "rw" trait have two accessors generated for
+         them. One accessor, with the same name as the attribute is used to
+         fetch the value - it's identical to the accessor discussed at
+         above, for "ro" attributes. The second accessor is used to store
+         values; its name will be the name of the attribute, prepended by
+         "set_".
+
+         For scalar values, calling the setting accessor sets the attribute
+         to the first argument. Any other argument are ignored.
+
+          package MyObject;
+          use Lexical::Attributes;
+
+          has $.name is rw;
+          sub new {bless \do {my $var} => shift}
+
+          1;
+
+          # Main program
+          my $obj = MyObject -> new;
+          $obj -> set_name ("Abigail");
+
+          print $obj -> name;   # Prints 'Abigail'.
+
+          __END__
+
+         For aggregates, the situation is a bit more complex. There are four
+         possibilities:
+
+         No arguments
+             If the settable accessor was called without arguments, the
+             array or hash this accessor is associated with is cleared -
+             that is, set to an empty array or hash.
+
+         One argument, a reference of the appropriate type
+             If one argument is given, and the argument is a reference of
+             the appropriate type (a reference to an array for array
+             attributes, and a reference to a hash for hash attributes), the
+             array or hash is set to the given argument. Note that the
+             actual reference is stored - no copies are made.
+
+         One argument, not a reference of the appropriate type
+             In this case, the argument is taken to be an index in the array
+             or hash (so, for array attributes, the argument is cast to an
+             integer if necessary, and to a string for hash attributes), and
+             the corresponding element is deleted, in a similar way "delete"
+             is called on regular arrays and hashes. Note that for arrays,
+             "deleting" something that's in the middle of the array doesn't
+             cause the array to shrink - the element is just undefined.
+
+         More than one argument
+             Then it's assumed a list of key (or index)/value pairs are
+             given. Values are set to the corresponding keys or indices.
+             Arrays and hashes will grow if needed.
+
+          package MyObject;
+          use Lexical::Attributes;
+
+          has @.colours is rw;
+          has %.fruit   is rw;
+
+          sub new {bless \do {my $obj} => shift}
+
+          1;
+
+          # Main program.
+
+          my $obj = MyObject -> new;
+
+          local $, = " ";
+
+          # Set the colours to a specific array.
+          $obj -> set_colours (['red', 'white', 'blue']);
+          print $obj -> colours;      # 'red white blue'.
+          print $obj -> colours (1);  # 'white'.
+
+          # Change colour on index 1.
+          $obj -> set_colours (1, 'yellow');
+          print $obj -> colours;      # 'red yellow blue'.
+
+          # Change/add multiple colours.
+          $obj -> set_colours (1, 'green', 3, 'brown');
+          print $obj -> colours;      # 'red green blue brown'.
+
+          # Delete colour on index 3.
+          $obj -> set_colours (3);
+          print $obj -> colours;      # 'red green blue'.
+
+          # Clear the array.
+          $obj -> set_colour;
+          print $obj -> colours;      # Nothing, array is empty.
+
+
+          # Set the fruits to a specific hash.
+          $obj -> set_fruit ({apple => 'green', cherry => 'red',
+                              peach => 'pink'});
+          print $obj -> fruit;        # 'apple green peach pink cherry red'.
+          print $obj -> fruit ("apple");  # 'green'.
+
+          # Change the colour of the apple.
+          $obj -> set_fruit (apple => 'yellow');
+          print $obj -> fruit;        # 'apple yellow peach pink cherry red'.
+
+          # Change/add multiple fruits.
+          $obj -> set_fruit (apple => 'red', lemon => 'yellow');
+          print $obj -> fruit;        # 'apple red peach pink
+                                      #  cherry red lemon yellow'.
+
+          # Delete a fruit
+          $obj -> set_fruit ("peach");
+          print $obj -> fruit;        # 'apple red cherry red lemon yellow'.
+
+          # Delete all fruits.
+          $obj -> set_fruit;
+          print $obj -> fruit;        # Nothing, hash is empty.
+
+         All settable accessors return the object, regardless of the number
+         or types of arguments. This gives the caller the option of chaining
+         modifications:
+
+          my $obj = Class -> new
+                          -> set_age (25)
+                          -> set_name ("Jane Doe")
+                          -> set_hair_colour ("auburn");
+
+  Methods
+    In order for the module to access the attributes, it needs access to the
+    variable holding the current object. It will assume this variable is
+    called $self. This is not likely to be a problem, as it seems to be
+    quite common to name the variable holding the current object $self.
+
+    To further add the programmer, if a subroutine uses the keyword "method"
+    instead of "sub", it will have a variable called $self, in which the
+    first element of @_ is shifted. Essentially, the line "my $self =
+    shift;" is prepended to the body of the subroutine.
+
+    Subroutines that do not use the keyword "method" are left as is - these
+    subroutines are typically reserved for class methods, or private
+    subroutines.
+
+    Examples:
+
+        # Don't need to declare $self.
+        sub my_method {
+            $.attribute + $self -> other_method;
+        }
+
+    If you do not use the "method" keyword, you do not put the current
+    object into a variable called $self, and you use one of the lexical
+    attributes, your code is unlikely to work.
+
+  DESTROY
+    Since the attributes are stored in lexical hashes, attributes do not get
+    garbage collected via a reference counting mechanism when the object
+    goes out of scope. In order to clean up attribute data, action triggered
+    by the call of "DESTROY" is needed. Hence, this module will insert a
+    "DESTROY" subroutine which will take care of cleaning up the attribute
+    data. It will also propagate calling "DESTROY" methods in any inherited
+    classes.
+
+    If you want to do any other action you'd normally put into "DESTROY",
+    create a method called "DESTRUCT". This method will be called on when
+    the object goes out of scope. The method will be called before
+    attributes values have been cleaned up. There is no need to manually
+    call "DESTRUCT" in inherited classes, as "Lexical::Attributes" will do
+    that for you. In fact, calling "DESTRUCT" in a super class yourself is
+    likely to cause unwanted effects, because that will mean "DESTRUCT" in a
+    superclass is called more than once.
+
+  Inheritance
+    Inheritance just works. Classes using this technique require *nothing*
+    from their super class implementation, and demand *nothing* from the
+    classes that will inherit them. Super classes can use this technique, or
+    traditional hash based objects, or something else entirely. And it's the
+    same for classes that will inherit our classes.
+
+  Interpolation
+    Interpolation of scalars and array is possible in "", ``, "//", "m//",
+    "s///", "qq {}" "qr {}", and "qx {}" strings. There's no interpolation
+    in '', "m''", "s'''", "tr//" nor in "qw {}" strings.
+
+  Overloading
+    Overloading of objects should work in the same way as other types of
+    objects.
+
+TODO
+    o   Compiling a module is slow. This is probably caused by FILTER_ONLY
+        being slow.
+
+    o   Consider more traits. Methods for pop/push/shift/unshift for arrays,
+        and keys/values/each for hashes would be useful. So are
+        getting/setting keys by index.
+
+DEVELOPMENT
+    The current sources of this module are found on github,
+    <git://github.com/Abigail/lexical--attributes.git>.
+
+AUTHOR
+    Abigail, <mailto:lexical-attributes@abigail.be>.
+
+COPYRIGHT and LICENSE
+    This program is copyright 2004, 2005, 2009 by Abigail.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+
+INSTALLATION
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+

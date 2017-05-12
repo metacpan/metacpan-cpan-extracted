@@ -1,0 +1,42 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Logfile::EPrints::RobotsFilter;
+use Logfile::EPrints::Hit;
+
+my $dbh = DBI->connect("...") or die $!;
+
+my $sth = $dbh->prepare($SQL);
+$sth->execute or die $!;
+
+my $filter = Logfile::EPrints::RobotsFilter->new(
+	handler => MyHandler->new,
+);
+
+while(my $row = $sth->fetchrow_hashref)
+{
+	my $hit = Logfile::EPrints::Hit->new(
+		agent => $row->{ referrer_description },
+		%$row,
+	);
+	$filter->hit( $hit );
+}
+
+package MyHandler;
+
+our @COLUMNS = qw( field1 field2 field3 );
+
+sub new { bless {}, shift; }
+
+# INSERT syntax: INSERT INTO <table> [(COLUMN1,COLUMN2)] VALUES (VALUE1,VALUE2)
+sub hit
+{
+	my( $self, $hit ) = @_;
+	print $hit->agent . " is not a robot\n";
+	$dbi->do("INSERT INTO new_table (`".join("`,`",@COLUMNS)."`) VALUES (".join(",",map{"?"}@COLUMNS).")",{},@$hit{@COLUMNS})
+		or die $!;
+}
+
+1;

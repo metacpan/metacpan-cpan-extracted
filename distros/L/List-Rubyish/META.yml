@@ -1,0 +1,26 @@
+---
+abstract: 'Array iterator like the Ruby'
+author:
+  - 'Junya Kondo, <jkondo@hatena.com>,'
+build_requires:
+  Test::Class: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.760'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: List-Rubyish
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

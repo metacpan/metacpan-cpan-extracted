@@ -1,0 +1,5 @@
+echo [if [ echo "if1" ] {
+        if [ echo "if2" ] {
+             echo "then2"
+        }
+     }]

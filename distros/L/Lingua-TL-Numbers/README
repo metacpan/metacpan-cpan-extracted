@@ -1,0 +1,63 @@
+NAME
+    Lingua::TL::Numbers - Convert numbers into Tagalog words
+
+SYNOPSIS
+      use Lingua::TL::Numbers qw(num2tl num2tl_ordinal);
+
+      $words = num2tl(1234);
+      # "isang libo't dalawang daa't tatlumpu't apat"
+
+      $words = num2tl_ordinal(12345);
+      # "panlabindalawang libo't tatlong daa't apatnapu't lima"
+
+      $words = num2tl_ordinal(12345, ika => 1);
+      # "ikalabindalawang libo't tatlong daa't apatnapu't lima"
+
+DESCRIPTION
+    This module provides functions to convert numbers into words in Tagalog,
+    a language of the Philippines.
+
+FUNCTIONS
+    The following functions can be imported from this module. No functions
+    are exported by default.
+
+    $words = num2tl($number)
+        Returns a Tagalog representation of $number.
+
+    $words = num2tl_ordinal($number, %options)
+        Returns an ordinal equivalent of $number in Tagalog. It accepts the
+        following options:
+
+        *       ika
+
+                If set to a true value, ordinal number will be formed by
+                prefixing "ika-" to cardinal number. The default is to use
+                "pang-" prefix.
+
+        *       hypen
+
+                Set to a true value to replace spaces between words with
+                hypens.
+
+REFERENCES
+    Paul Schachter and Fe T. Otanes. *Tagalog Reference Grammar*. University
+    of California Press, 1982.
+    <http://books.google.com/books?id=E8tApLUNy94C>
+
+    Teresita V. Ramos. *Conversational Tagalog: a functional-situational
+    approach*. University of Hawaii Press, 1985.
+    <http://books.google.com/books?id=p1C7-AmU1QsC>
+
+    Teresita V. Ramos. *Tagalog Structures*. University of Hawaii Press,
+    1971. <http://books.google.com/books?id=cc7wUSVhaYwC>
+
+AUTHOR
+    Sherwin Daganato <sherwin@daganato.com>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Lingua::EN::Numbers <http://en.wikipedia.org/wiki/Tagalog>
+

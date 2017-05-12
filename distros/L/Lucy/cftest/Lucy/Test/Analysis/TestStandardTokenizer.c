@@ -1,0 +1,140 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#define C_TESTLUCY_TESTSTANDARDTOKENIZER
+#define TESTLUCY_USE_SHORT_NAMES
+#include "Lucy/Util/ToolSet.h"
+
+#include "Clownfish/TestHarness/TestBatchRunner.h"
+#include "Lucy/Test.h"
+#include "Lucy/Test/Analysis/TestStandardTokenizer.h"
+#include "Lucy/Analysis/StandardTokenizer.h"
+#include "Lucy/Store/FSFolder.h"
+#include "Lucy/Test/TestUtils.h"
+#include "Lucy/Util/Json.h"
+
+TestStandardTokenizer*
+TestStandardTokenizer_new() {
+    return (TestStandardTokenizer*)Class_Make_Obj(TESTSTANDARDTOKENIZER);
+}
+
+static void
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
+    StandardTokenizer *tokenizer = StandardTokenizer_new();
+    Obj *dump  = StandardTokenizer_Dump(tokenizer);
+    StandardTokenizer *clone
+        = (StandardTokenizer*)StandardTokenizer_Load(tokenizer, dump);
+
+    TEST_TRUE(runner,
+              StandardTokenizer_Equals(tokenizer, (Obj*)clone),
+              "Dump => Load round trip");
+
+    DECREF(tokenizer);
+    DECREF(dump);
+    DECREF(clone);
+}
+
+static void
+test_tokenizer(TestBatchRunner *runner) {
+    StandardTokenizer *tokenizer = StandardTokenizer_new();
+
+    String *word = SSTR_WRAP_C(
+                              " ."
+                              "tha\xCC\x82t's"
+                              ":"
+                              "1,02\xC2\xADZ4.38"
+                              "\xE0\xB8\x81\xC2\xAD\xC2\xAD"
+                              "\xF0\xA0\x80\x80"
+                              "a"
+                              "/");
+    Vector *got = StandardTokenizer_Split(tokenizer, word);
+    String *token = (String*)Vec_Fetch(got, 0);
+    char   *token_str = Str_To_Utf8(token);
+    TEST_TRUE(runner,
+              token
+              && Str_is_a(token, STRING)
+              && Str_Equals_Utf8(token, "tha\xcc\x82t's", 8),
+              "Token: %s", token_str);
+    free(token_str);
+    token = (String*)Vec_Fetch(got, 1);
+    token_str = Str_To_Utf8(token);
+    TEST_TRUE(runner,
+              token
+              && Str_is_a(token, STRING)
+              && Str_Equals_Utf8(token, "1,02\xC2\xADZ4.38", 11),
+              "Token: %s", token_str);
+    free(token_str);
+    token = (String*)Vec_Fetch(got, 2);
+    token_str = Str_To_Utf8(token);
+    TEST_TRUE(runner,
+              token
+              && Str_is_a(token, STRING)
+              && Str_Equals_Utf8(token, "\xE0\xB8\x81\xC2\xAD\xC2\xAD", 7),
+              "Token: %s", token_str);
+    free(token_str);
+    token = (String*)Vec_Fetch(got, 3);
+    token_str = Str_To_Utf8(token);
+    TEST_TRUE(runner,
+              token
+              && Str_is_a(token, STRING)
+              && Str_Equals_Utf8(token, "\xF0\xA0\x80\x80", 4),
+              "Token: %s", token_str);
+    free(token_str);
+    token = (String*)Vec_Fetch(got, 4);
+    token_str = Str_To_Utf8(token);
+    TEST_TRUE(runner,
+              token
+              && Str_is_a(token, STRING)
+              && Str_Equals_Utf8(token, "a", 1),
+              "Token: %s", token_str);
+    free(token_str);
+    DECREF(got);
+
+    FSFolder *modules_folder = TestUtils_modules_folder();
+    if (modules_folder == NULL) {
+        SKIP(runner, 1372, "Can't locate test data");
+    }
+    else {
+        String *path = Str_newf("unicode/ucd/WordBreakTest.json");
+        Vector *tests = (Vector*)Json_slurp_json((Folder*)modules_folder, path);
+        if (!tests) { RETHROW(Err_get_error()); }
+
+        for (size_t i = 0, max = Vec_Get_Size(tests); i < max; i++) {
+            Hash *test = (Hash*)Vec_Fetch(tests, i);
+            String *text = (String*)Hash_Fetch_Utf8(test, "text", 4);
+            Vector *wanted = (Vector*)Hash_Fetch_Utf8(test, "words", 5);
+            Vector *got = StandardTokenizer_Split(tokenizer, text);
+            TEST_TRUE(runner, Vec_Equals(wanted, (Obj*)got), "UCD test #%d",
+                      (int)i + 1);
+            DECREF(got);
+        }
+
+        DECREF(tests);
+        DECREF(modules_folder);
+        DECREF(path);
+    }
+
+    DECREF(tokenizer);
+}
+
+void
+TestStandardTokenizer_Run_IMP(TestStandardTokenizer *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 1378);
+    test_Dump_Load_and_Equals(runner);
+    test_tokenizer(runner);
+}
+
+

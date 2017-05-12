@@ -1,0 +1,24 @@
+Lingua/ES/Silabas version 0.01
+==============================
+
+La función silabas($) recibe como argumento una palabra y regresa
+una lista con las sílabas que la componen.
+
+Las sílabas se obtienen a travez de una serie de reglas un tanto
+arbitrarias pero que parecen funcionar en la mayoría de los casos.
+
+INSTALACION
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT
+
+Copyright (C) 2002 Marco Antonio Valenzuela Escárcega
+
+Este módulo es software libre; puede ser distribuido y/o modificado
+bajo los mismos términos que Perl.
+

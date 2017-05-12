@@ -1,0 +1,6 @@
+Standard perl module install process:
+
+	perl Makefile.PL
+	make
+	make test (optional but recommended)
+	make install

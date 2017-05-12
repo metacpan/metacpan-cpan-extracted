@@ -1,0 +1,19 @@
+% Test input file for checking inclusion of other files.
+% Do not make gratuitous changes here as the text is checked by the
+% test script 12-include.t.
+
+\documentclass{article}
+\date{20 September 2007}
+\author{A.N. Other}
+\title{Simple Test Document 12}
+\begin{document}
+\maketitle
+
+% Note: the word file on the next line is spellt "f{}ile" to prevent
+% LaTeX using a ligature.
+
+This is a test document that includes another f{}ile.
+
+\include{testinc}
+%\input{deeply/nested/directory/testinc2}
+\end{document}

@@ -1,0 +1,85 @@
+#!/opt/bin/perl
+
+# extract whatever data available in the currently tuned transponder
+
+# this program is slightly overdesigned as it is was the base for a
+# larger program, it still shows how to react to channel changes
+# and scan pids and decode si info.
+
+my $PID = 18; # epg data and more
+
+use Event;
+use Fcntl;
+use Linux::DVB;
+
+use Data::Dumper;
+
+my $sniff_only = 1; # set to zero to actively tune to a channel
+
+my $fe = new Linux::DVB::Frontend "/dev/dvb/adapter0/frontend0", $sniff_only ? &O_RDONLY : &O_RDWR;
+
+unless ($sniff_only) {
+   $fe->set (
+       frequency   => 426000000,
+       symbol_rate => 6900000,
+       modulation  => QAM_64,
+       fec_inner   => FEC_AUTO,
+       inversion   => INVERSION_AUTO,
+   ) or die "frontend->set: $!";
+}
+
+sub new_demux {
+   new Linux::DVB::Demux "/dev/dvb/adapter0/demux0";
+}
+
+package scanner;
+
+sub new {
+   print "new scanner\n";
+   my $self = bless { };
+
+   $self->{dmx} = ::new_demux;
+   $self->{dmx}->sct_filter ($PID, "", "");
+   $self->{dmx}->buffer (0x10000);
+   $self->{dmx}->start;
+
+   $self->{w} = Event->io (fd => $self->{dmx}->fh, poll => 'r', cb => sub {
+      sysread $self->{dmx}->fh, my $data, 4096;
+      print Data::Dumper::Dumper Linux::DVB::Decode::si $data;
+   });
+}
+
+sub DESTROY {
+   my $self = shift;
+   $self->{w}->cancel;
+}
+
+package main;
+
+my $frequency = -1;
+
+sub status_changed {
+   if ($fe->parameters->{frequency} != $frequency) {
+      $frequency = $fe->parameters->{frequency};
+      undef $scanner;
+   }
+   if ($fe->status & FE_HAS_LOCK) {
+      $scanner ||= new scanner;
+   } else {
+      undef $scanner;
+   }
+}
+
+Event->io (fd => $fe->{fd}, poll => 'e', cb => sub {
+   my $event = $fe->event;
+   # tuning event, status changes not reported
+   status_changed;
+});
+
+Event->timer (interval => 1, cb => sub {
+   #print $fe->status & FE_HAS_LOCK, "\n";
+});
+
+status_changed;
+
+Event::loop;

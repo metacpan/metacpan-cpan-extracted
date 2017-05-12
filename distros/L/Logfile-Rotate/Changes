@@ -1,0 +1,58 @@
+# Revision history for Perl extension Logfile.
+#
+# $Log: Changes,v $
+# Revision 1.4  2000/08/29 03:57:23  paulg
+# Added a range of features requested by Jerrad Pierce
+# <Jerrad.Pierce@networkengines.com>, who also contributed code!  Thanks
+# Jerrard.  These features include an option to use flock or not, preserve
+# file permissions is now optional, and if you have Compress::Zlib then it
+# can be used instead of spawning an external call to gzip.
+#
+# Revision 1.3  1999/03/12 05:28:40  paulg
+# Incrementing revision no.
+#
+# Revision 1.2  1999/03/12 05:25:32  paulg
+# Added an option to stored rotated files in a separate directory.  This
+# feature has been requested before but fortunately Bas Zoetekouw
+# <bas@warande1128.warande.uu.nl>, contributed some code.
+#
+# Revision 1.1.1.1  1999/03/12 00:50:11  paulg
+# importing from cpan to cvs repository as I've changed jobs, and don't
+# have access to my old build tree.  The version numbers are going to 
+# be reset, but this should be ok as the current version on CPAN 1.02.
+# So look at the dates not the serial no. in this file.
+#
+# Revision 1.7  98/03/24  12:52:46  12:52:46  paulg (Paul Gampe)
+# Added reference to Changes file for credits to contributions.
+#
+# Revision 1.6  98/03/24  12:45:29  12:45:29  paulg (Paul Gampe)
+# Switched from File::Copy::copy to File::Copy::move for rotating the old
+# logfiles, to preserve permissions and reduce disk space consumption.  
+# File::Copy::move will try to do a rename.  
+# Suggested by: webmaster <webdata@web-datavision.com>
+# and "Mike Arms (6531)" <marms@sass1633.csua35.sandia.gov>.
+# Added code to copy the current log file permissions to first incremental.
+# Code and concept by: "Mike Arms (6531)" <marms@sass1633.csua35.sandia.gov>.
+#
+# Revision 1.5  98/03/24  12:31:11  12:31:11  paulg (Paul Gampe)
+# Added an argument Signal so that you can get a callback function executed 
+# as soon as the rotation is complete.  Code and ideas contributed by:
+# "M. S. Sriram" <sriram@research.bell-labs.com>, 
+# and Mike Frohme <frohme@memphis.edu>
+#
+# Revision 1.4  98/03/24  10:31:03  10:31:03  paulg (Paul Gampe)
+# bug fix with flock reported by: <webdata@web-datavision.com>
+# 
+# Revision 1.3  98/03/03  14:36:29  14:36:29  paulg (Paul Gampe)
+# Adding copyright section to man page
+# 
+# Revision 1.2  98/02/18  16:03:35  16:03:35  paulg (Paul Gampe)
+# Format fixup to manpage
+# 
+# Revision 1.1  97/12/08  14:32:31  14:32:31  paulg (Paul Gampe)
+# Initial revision
+# 
+# 0.01  Mon Dec  1 14:02:52 1997
+# 	- original version; created by h2xs 1.18
+# 
+#

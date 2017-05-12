@@ -1,0 +1,202 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lingua::Guess - A statistical language guesser
+
+=head1 SYNOPSIS
+
+    
+    use utf8;
+    use Lingua::Guess;
+    my $guesser = Lingua::Guess->new ();
+    my @lines = split (/\n/, <<EOF);
+    This is a test of the language checker
+    Verifions que le détecteur de langues marche
+    Sprawdźmy, czy odgadywacz języków pracuje
+    EOF
+    for my $line (@lines) {
+        my $guess = $guesser->simple_guess ($line);
+        print "'$line' was $guess\n";
+    }
+
+
+produces output
+
+    'This is a test of the language checker' was english
+    'Verifions que le détecteur de langues marche' was french
+    'Sprawdźmy, czy odgadywacz języków pracuje' was polish
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Lingua-Guess-0.01/examples/synopsis.pl> in the distribution.)
+
+
+=head1 DESCRIPTION
+
+This module attempts to guess what human language a piece of text is
+written in.  This is a fork of a module called Language::Guess, which
+was deleted from CPAN by its author.
+
+=head1 METHODS
+
+=head2 new
+
+Make a new object. This takes a hash as argument with the following keys:
+
+=over
+
+=item modeldir
+
+The location of the training data. If this is not supplied, the
+training data supplied with the module is used.
+
+=back
+
+=head2 guess
+
+This method returns arrayref of hashes in the form 
+
+    [{name => NAME, score => SCORE}]
+
+where C<score> represents the likelihood of the language given by
+C<name> as an integer.
+
+=head2 simple_guess
+
+This method returns a one-word string containing the English name of
+the guessed language.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item Carp
+
+L<Carp/croak> is used to report errors.
+
+=item File::Spec::Functions
+
+L<File::Spec::Functions/catfile> is used in reading the training data files.
+
+=item Unicode::Normalize
+
+L<Unicode::Normalize/NFC> is used to normalize inputs.
+
+=item Unicode::UCD
+
+L<Unicode::UCD/charinfo> is used to get information about characters
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Text::Guess::Language>
+
+=item L<Text::Language::Guess>
+
+=item L<Language::Guess|http://cpan.metacpan.org/authors/id/M/MC/MCEGLOWS/> at backpan.perl.org
+
+=back
+
+=head1 BUGS
+
+The module has a number of oddities, which I'll slowly be trying to
+resolve.
+
+=over
+
+=item
+
+The module will instantly decide that something is Korean or Japanese
+if it has just one Korean or Japanese letter in it. That means that,
+for example, if you give it a Wikipedia page to guess the language, it
+will seize upon the text in the interlanguage link and instantly
+proclaim it to be in Korean or Japanese, regardless of how much other
+text there may be.
+
+=item
+
+The guessed language is returned as a lower-case English name of the
+language rather than an ISO language code.
+
+=item
+
+The scores should be fractional probabilities.
+
+=back
+
+=head1 STANDALONE SCRIPT
+
+A standalone script called C<linguaguess> is installed with the
+module. It requires L<Unicode::UTF8> and L<File::Slurper> to be
+installed locally. These modules are not dependencies of
+Lingua::Guess.
+
+=head1 HISTORY
+
+This module used to be called Language::Guess. It was released in
+2004. It was deleted from CPAN at an unknown date, but not before two
+Python forks, L<https://pypi.python.org/pypi/guess-language>, and
+L<https://bitbucket.org/spirit/guess_language> and one C++ fork
+L<https://websvn.kde.org/branches/work/sonnet-refactoring/common/nlp/guesslanguage.cpp>,
+had been created. It was restored to CPAN under the title
+Lingua::Guess by Ben Bullock on 17th April 2017. Changes to the
+original module include
+
+=over
+
+=item Removal of Unicode upgrading
+
+For some reason, the module itself, which contains no non-ASCII, had
+"use utf8;" at the top of it, and the test file, which contained
+various languages, had no "use utf8;". The module was also upgrading
+all input bytes with L<Encode/_utf8_on> rather than using
+L<Encode/decode_utf8>. This behaviour was completely excised from the
+module.
+
+=item Training data moved into module's space
+
+The training data was moved into the module's space using the method
+described in L<Acme::Include::Data>. L</modeldir> was given a default
+value of this directory.
+
+=item Documentation expanded
+
+Most of the methods weren't documented at all in the original module.
+
+=item Bugs fixed
+
+Two eleven year old bugs in the L<bug queue for
+Language::Guess|https://rt.cpan.org/Public/Dist/Display.html?Name=Language-Guess>
+were fixed.
+
+=item train method removed
+
+An undocumented, unused, and untested method called "train" was
+removed from the module.
+
+=back
+
+I have made no attempt to contact the author of the software Maciej
+Ceglowski, nor have I applied for namespace permission before creating
+this fork, but simply renamed it.
+
+=head1 COPYRIGHT
+	
+(c) 2004 National Institute for Technology and Liberal Education
+
+=head1 LICENSE
+
+This software is released under version 2 of the GNU General Public
+License.
+
+=head1 MAINTAINER
+
+This module is maintained by Ben Bullock <bkb@cpan.org>.
+
+=head1 AUTHOR
+	
+Maciej Ceglowski

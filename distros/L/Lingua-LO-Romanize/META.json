@@ -1,0 +1,58 @@
+{
+   "abstract" : "Romanization of Lao language",
+   "author" : [
+      "Joakim Lagerqvist <jokke@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-LO-Romanize",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Moose" : 0,
+            "Moose::Util::TypeConstraints" : 0,
+            "MooseX::AttributeHelpers" : 0,
+            "MooseX::Params::Validate" : 0,
+            "Test::More" : 0,
+            "utf8" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::LO::Romanize" : {
+         "file" : "lib/Lingua/LO/Romanize.pm",
+         "version" : "0.10"
+      },
+      "Lingua::LO::Romanize::Syllable" : {
+         "file" : "lib/Lingua/LO/Romanize/Syllable.pm",
+         "version" : "0.10"
+      },
+      "Lingua::LO::Romanize::Types" : {
+         "file" : "lib/Lingua/LO/Romanize/Types.pm",
+         "version" : "0.10"
+      },
+      "Lingua::LO::Romanize::Word" : {
+         "file" : "lib/Lingua/LO/Romanize/Word.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.10"
+}

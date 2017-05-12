@@ -1,0 +1,139 @@
+#!/usr/bin/perl
+use strict;
+use Cwd;
+use base 'LEOCHARRE::CLI';
+
+
+my $o = gopts('a:');
+
+sub abs_distro {
+
+   $o->{a} ||= './';
+   my $distdir= Cwd::abs_path( $o->{a}) or die;
+   -d $distdir or die("$distdir is not even a directory");
+   -f "$distdir/Makefile.PL" or die("there is no Makefile.PL at '$distdir'");
+   return $distdir;
+}
+
+
+my $abs_loc = abs_distro();
+
+debug("DEBUG ON, distro is $abs_loc");
+
+my $abs_makefile = "$abs_loc/Makefile.PL";
+my $abs_manifest = "$abs_loc/MANIFEST";
+
+mkdir "$abs_loc/inc";
+mkdir "$abs_loc/inc/Devel";
+debug("made dirs");
+
+my @pm = <DATA>;
+open( PMF,'>',"$abs_loc/inc/Devel/AssertEXE.pm") or die($!);
+print PMF @pm;
+close PMF;
+debug("wrote module ".scalar @pm);
+
+_file_prepend( $abs_makefile,
+qq{use lib incu;\nuse Devel::AssertEXE qw(@ARGV);\n});
+
+_file_prepend( $abs_manifest, 'inc/Devel/AssertEXE.pm' );
+
+
+sub _file_prepend {
+   my $abs = shift;
+   my $lineid = " #__assertexe__#\n";
+   my @lines;
+   for my $arg (@_){
+      for( split( /\n/, $arg) ){         
+         push @lines, "$_$lineid";
+      }
+   }
+   defined @lines or die;
+
+   if( open(ORI, '<',$abs)){
+      
+      debug("$abs was there, will read.. ");
+      push @lines, ( grep { !/$lineid/ } <ORI> );
+      close ORI;
+   }
+   open( NEW,'>',$abs) or die($!);
+   print NEW @lines;
+   close NEW;
+   debug("$abs prepended");
+   return $abs;
+}
+
+
+
+sub usage {
+   return qq{
+$0
+
+DECRIPTION
+
+Makes sure your distro checks for system binaries
+
+OPTION FLAGS
+
+   -a abs path to target dist dir, default is cwd
+   -d debug
+
+
+PARAMETERS
+
+List of binary names.
+
+USAGE EXAMPLES
+
+This example will make your Makefil.PL check that the system has  'slocate', 'cat' and 'automake'.
+
+   $0 -a ./My-Distro slocate cat automake
+
+SEE ALSO
+
+LEOCHARRE::Dev
+LEOCHARRE::CLI
+Devel::AssertOS
+use-devel-assertos
+
+   };
+}
+
+
+
+
+
+exit;
+
+
+
+__DATA__
+package Devel::AssertEXE;
+use strict;
+
+
+sub import {
+   shift;
+   die("Devel::AssertEXE needs at least one parameter\n") unless (@_);
+   have_exe_or_exit(@_);
+}
+
+
+sub have_exe_or_exit {
+   for my $exe (@_){
+      have_exe($exe)
+         or exit;
+   }
+}
+
+sub have_exe {
+   my $exe = shift;
+   `which $exe 2> /dev/null`
+      or warn("Cannot find $exe executable.\n")
+      and return;
+   return 1;
+}
+
+
+1;
+

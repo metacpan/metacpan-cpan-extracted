@@ -1,0 +1,62 @@
+{
+   "abstract" : "Yet another logging framework",
+   "author" : [
+      "Christopher M. Fuhrman <cfuhrman@pobox.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Fine",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Email::Sender" : "0.11",
+            "Mail::RFC822::Address" : "0.3",
+            "Pod::Coverage" : "0.19",
+            "Test::Output" : "0.1",
+            "Test::Pod" : "1.14",
+            "Throwable" : "0.10208",
+            "Time::HiRes" : "1.86"
+         },
+         "requires" : {
+            "Sys::Syslog" : "0.13",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Log-Fine"
+      },
+      "license" : [
+         "https://github.com/cfuhrman/log-fine/raw/master/LICENSE"
+      ],
+      "repository" : {
+         "url" : "https://github.com/cfuhrman/log-fine"
+      }
+   },
+   "version" : "0.65"
+}

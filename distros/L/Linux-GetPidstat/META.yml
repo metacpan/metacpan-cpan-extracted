@@ -1,0 +1,58 @@
+---
+abstract: 'Monitor each process metrics avg using each pidfile'
+author:
+  - 'yoheimuta <yoheimuta@gmail.com>'
+build_requires:
+  Data::Section::Simple: '== 0.07'
+  Test::Fatal: '0.014'
+  Test::Mock::Guard: '0.10'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-GetPidstat
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Linux::GetPidstat:
+    file: lib/Linux/GetPidstat.pm
+    version: '0.03'
+  Linux::GetPidstat::Collector:
+    file: lib/Linux/GetPidstat/Collector.pm
+  Linux::GetPidstat::Collector::Parser:
+    file: lib/Linux/GetPidstat/Collector/Parser.pm
+  Linux::GetPidstat::Reader:
+    file: lib/Linux/GetPidstat/Reader.pm
+  Linux::GetPidstat::Writer:
+    file: lib/Linux/GetPidstat/Writer.pm
+  Linux::GetPidstat::Writer::File:
+    file: lib/Linux/GetPidstat/Writer/File.pm
+  Linux::GetPidstat::Writer::Mackerel:
+    file: lib/Linux/GetPidstat/Writer/Mackerel.pm
+requires:
+  Capture::Tiny: '== 0.40'
+  IO::Socket::SSL: '== 2.024'
+  JSON::XS: '== 3.01'
+  Parallel::ForkManager: '== 1.17'
+  Path::Tiny: '== 0.094'
+  Time::Piece::MySQL: '== 0.06'
+  WebService::Mackerel: '== 0.03'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/yoheimuta/Linux-GetPidstat/issues
+  homepage: https://github.com/yoheimuta/Linux-GetPidstat
+  repository: git://github.com/yoheimuta/Linux-GetPidstat.git
+version: '0.03'

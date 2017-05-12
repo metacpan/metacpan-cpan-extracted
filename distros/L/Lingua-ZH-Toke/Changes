@@ -1,0 +1,44 @@
+____________________________________________________________________________
+[  9667] By: autrijus                              on 2004/01/11  12:56:49
+        Log: * This be 0.02.
+             * Fixed synopsis typo, thanks to kcwu.
+             * utf8 histogram now actually works.
+	   ! MANIFEST Makefile.PL README lib/Lingua/ZH/Toke.pm
+____________________________________________________________________________
+[  9664] By: autrijus                              on 2004/01/11  12:18:18
+        Log: * move Toke.pm to a more sensible place.
+	  +> lib/Lingua/ZH/Toke.pm
+	   - Toke.pm
+____________________________________________________________________________
+[  3767] By: autrijus                              on 2003/01/23  21:09:37
+        Log: * draft 1.
+	   ! Toke.pm
+____________________________________________________________________________
+[  3669] By: autrijus                              on 2003/01/19  20:01:12
+        Log: * changes and signatures.
+	   + Changes
+	   ! SIGNATURE
+____________________________________________________________________________
+[  3668] By: autrijus                              on 2003/01/19  19:59:30
+        Log: * oops.
+	   ! Makefile.PL
+____________________________________________________________________________
+[  3667] By: autrijus                              on 2003/01/19  19:57:28
+        Log: * turns out we really need 5.6.1.
+	   + SIGNATURE
+____________________________________________________________________________
+[  3666] By: autrijus                              on 2003/01/19  19:47:11
+        Log: * This be 0.01.
+	   ! Toke.pm
+____________________________________________________________________________
+[  3664] By: autrijus                              on 2003/01/19  19:46:40
+        Log: * some more tests for 5.6 and 5.8.
+	   + t/2-utf8.t t/3-encoding.t
+____________________________________________________________________________
+[  3663] By: autrijus                              on 2003/01/19  19:46:28
+        Log: * basic infrastructure.
+	   + MANIFEST Makefile.PL README t/0-signature.t t/1-basic.t
+____________________________________________________________________________
+[  3661] By: autrijus                              on 2003/01/19  19:06:02
+        Log: * mad toking scientist for a better tomorrow.
+	   + Toke.pm

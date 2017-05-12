@@ -1,0 +1,93 @@
+
+Changelog for Lyrics::Fetcher
+
+
+Legend:
+
+[*] enhanced
+[+] added
+[-] fixed
+
+v0.5.2, 21/12/2010 by David Precious
+[-] Clarify documentation a little, in particular for available_fetchers.
+    This module needs some love.  (As do some of the fetcher modules!)
+
+v0.5.1, 29/02/2008 by David Precious
+[-] Avoid calling Lyrics::Fetcher::Cache as a fetcher module (doh)
+[*] Add fetch() method to L::F::Cache in case it is called mistakenly,
+    as a simple alias to L::F::Cache::get().
+
+v0.5.0, 19/02/2008 by David Precious
+[+] Added caching of already-fetched lyrics
+
+v0.4.1, 07/06/2007 by David Precious
+[-] Annoyingly I'd required Perl 5.8.7 - there's no reason for this module
+    to need anything later than 5.8.0, and it should probably work on some
+    older versions too.  This release should make this module easily accessible
+    to more people (and to ActiveState Perl users), sometime soon I'll get a
+    testing box with older Perls and test on that (anyone care to help? :))
+    Also, moved Lyrics::Fetcher::AstraWeb to its own package, so that this
+    fetcher manager is independent from the various fetchers.
+
+v0.4.0, 27/05/2007 by David Precious
+[+] If no specific fetcher is given to fetch(), it tries all available fetchers
+    until one succeeds.  You can also give it an arrayref of fetchers to try
+    (i.e. try each named fetcher in turn until one returns lyrics).
+    
+[-] AstraWeb fetcher now works again (will probably seperate fetchers from the
+    base package in the next release, so fetchers can be updated without 
+    updating the core Lyrics::Fetcher, and so you can pick and choose which
+    fetchers you'd like to install.   Perhaps I can do a funky Makefile which
+    (for interactive installs at least) asks you which fetchers you'd like, and
+    adds them.)
+    
+[-] Withdrew LyricsNet.pm from the package, as it doesn't seem to work any more,
+    the www.lyrics.net.ua search page we used to use seems to just redirect to
+    their homepage.  When it works again I'll update the module to make it work
+    and release Lyrics::Fetcher::LyricsNet seperately.
+    
+    
+v0.3.2, 25/02/2007 by David Precious
+[-] Taken over maintainership, with kind permission of previous author
+[-] Fix build scripts to avoid the test failures that have been occurring
+[-] Withdrew Lyrics::Fetcher::LyricsTime from the package, as it appears that 
+    www.lyricstime.com is no more (not responding, last successful access by 
+    archive.org is Feb 06, so it's been out for a year :)
+[-] Withdrew Lyrics::Fetcher::LyricsOnDemand from the package, as it no longer
+    works - I think they've changed their site since the module was written
+    (well, it was ~4 years ago!!) so it no longer works.  When I fix it, I'll
+    probably re-release it in its own package, to simplify rolling out updates
+    to fetchers without having to re-release the main Lyrics::Fetcher package.
+
+As the Fetchers may need to be updated often (whenever the site they scrape
+from changes) I think they should be distributed seperately from Lyrics::Fetcher,
+which will not require frequent updates.
+
+I've rolled out this version so that Lyrics::Fetcher should at least install
+properly without failing tests - sometime soon I'll try to add some new features
+(including the option to automatically try all available fetchers) and release
+that as v0.4.0
+
+
+
+[rather long gap in development here]
+
+
+01/9/2003 by reflog
+[*] enchamced make script to support dependencies
+
+27/8/2003 by reflog
+[*] test script is renewed
+[-] updated the modules to represent sites' changes
+[+] error reporting machanizm to the modules
+[+] new sample script read_lyrics.pl that shows a working app that fetches 
+    lyrics from mp3 file or from a playing Xmms
+[*] updated perldoc
+
+
+28/7/2003 by reflog
+[+] Added AstraWeb and LyricsOnDemand engines
+[+] first test script
+
+26/7/2003 by reflog
+[+] Initial version

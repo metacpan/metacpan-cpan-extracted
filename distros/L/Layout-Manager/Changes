@@ -1,0 +1,154 @@
+Revision history for Layout-Manager
+
+0.34
+  _ Remove unnecessary dependency on MooseX::AttributeHelpers
+
+0.33
+  - Tables will no longer expand vertically for no reason, nor will they
+    unnecessarily squash their contents on re-layout. If the container's height
+    is greater than the sum of it's row's minimums then the remainder will
+    be split equally between all rows. This may cause problems, but I've not
+    uncovered any in my tests so far.
+
+0.32
+  - Fix error in docs (RT #60557)
+
+0.31
+  - Fix another warning in Flow
+
+0.30
+  - Fix warning in Flow
+
+0.29
+  - Fix Flow's width and height not taking outside into consideration (argh!)
+
+0.28
+  - Adjust Flow's height/width set style
+  - Fix incorrect test values for compass/17
+  - layout sub-components earlier in Compass (not sure about this one)
+
+0.27
+  - Fix busted minimum_width if north/south based Flows had no width set.
+
+0.26
+  - Rewrite Flow, adding the ability to wrap it's contents. (east & west only)
+  - POD overhaul
+
+0.25
+  - POD fixes
+  - Fix behavior of Compass' nested layout
+  - Set minimum height & width in grid
+  - Change order of Flow layout's super call
+
+0.24
+  - Bump dep version of Graphics::Primitive
+
+0.23
+  - Don't marked laid out components as prepared
+  
+0.22
+  - Teach Grid how to handle dynamic sizing.
+
+0.21
+  - A few POD fixes
+  - Add Grid layout manager
+
+0.20
+  - Move pod tests to t/author
+
+0.19
+  - Dependency Bumps
+
+0.18
+  - Remove overflow attribute
+  - Remove Moose Coverage dependency
+  - Keep up with G:P api changes
+
+0.17
+  - Dep bumps
+  - Flow: Honor margins/padding/borders
+
+0.16
+  - Fix broken tests stemming from changes in Graphics::Primitive's remove
+  - Fix broken center in Compass with multiple center components
+  - Add test for same
+
+0.15
+  - Fix breakage with nested layout managers
+
+0.14
+  - Modify all managers to work with Graphics::Primitive 0.18
+  - Mark components effectively in all managers
+
+0.13
+  - Axis: skip center sizing if there are no center components to lay out
+  - Fix container preparedness marking bug
+
+0.12
+  - Check preparedness of a container before laying it out
+  - Return zero from do_layout if layout was skipped.  Return 1 if layout was
+    executed.
+  - POD
+
+0.11
+  - Add Flow layout manager
+  - Remove cruft from pre-Graphics::Primitive dependency days
+  - Add overflow attribute to Manager
+  - POD updates
+  - Compass: Fix bug that shrank containers with multiple calls to do_layout
+
+0.10
+  - POD
+  - Remove some old cruft
+
+0.09
+  - Bugfixes in Compass wrt padded containers
+  - Add Absolute layout manager
+  - Fix broken Single manager
+  - Add a test container and make component actually be a component
+  - pass the parent container to do_layout
+  - (do_layout) Implement common logic in Manager.pm, implementations
+    call super at top of their override.
+  - (do_layout) if this container has no size, use the parent's
+    inside_bounding_box, this is likely going to change
+  - Comment Compass
+  - Compass: Don't blindly set widths and heights for edges where we don't
+    know the sizes yet, set them to 0 and set the values in the loops
+  - Compass: North and South now run full width, screw that other way
+  - Add Axis
+
+0.08
+  - Remove draw method from Component role
+  - Remove component management from Manager, leave that to
+    Graphics::Primitive container
+  - Remove component role
+  - Respect container's insets and borders in Single and Compass
+  - Fix Compass center positioning
+
+0.07
+  - Add find_component to Manager
+
+0.06
+  - Test visibility
+  - Return number of components removed by remove_component
+  - Watch for empty component slots in implementations
+  - Fix warning by not checking components with no name in remove_component
+
+0.05
+  - Honor Component's visible attribute.
+  - Add make_immutable for moose
+
+0.04
+  - Fix y positioning in Single
+
+0.03
+  - Add MI version because Yuval yelled at me
+  - More pod fixes
+
+0.02
+  - Fix bug in center width calculations for Compass
+  - Hide test package from CPAN
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

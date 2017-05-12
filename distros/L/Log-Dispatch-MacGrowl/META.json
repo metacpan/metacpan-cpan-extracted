@@ -1,0 +1,62 @@
+{
+   "abstract" : "Log messages via Growl",
+   "author" : [
+      "Ryo Okamoto <ryo at aquahill dot net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Dispatch-MacGrowl",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Growl::Tiny" : "v0.0.2"
+         },
+         "requires" : {
+            "Cocoa::Growl" : "0.03",
+            "Log::Dispatch" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Log::Dispatch::MacGrowl" : {
+         "file" : "lib/Log/Dispatch/MacGrowl.pm",
+         "version" : "0.04"
+      },
+      "Log::Dispatch::MacGrowl::Cocoa" : {
+         "file" : "lib/Log/Dispatch/MacGrowl/Cocoa.pm",
+         "version" : "0.01"
+      },
+      "Log::Dispatch::MacGrowl::Mac" : {
+         "file" : "lib/Log/Dispatch/MacGrowl/Mac.pm",
+         "version" : "0.01"
+      },
+      "Log::Dispatch::MacGrowl::Tiny" : {
+         "file" : "lib/Log/Dispatch/MacGrowl/Tiny.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04"
+}

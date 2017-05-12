@@ -1,0 +1,181 @@
+=encoding utf8
+
+=head1 NAME
+
+Log::Report::Extract::PerlPPI - Collect translatable strings from Perl using PPI
+
+=head1 INHERITANCE
+
+ Log::Report::Extract::PerlPPI
+   is a Log::Report::Extract
+
+=head1 SYNOPSIS
+
+ my $ppi = Log::Report::Extract::PerlPPI->new
+  ( lexicon => '/usr/share/locale'
+  );
+ $ppi->process('lib/My/Pkg.pm');  # call for each .pm file
+ $ppi->showStats;                 # optional
+ $ppi->write;
+
+ # See script  xgettext-perl
+ bin/xgettext-perl -p $lexdir @source_dirs
+
+=head1 DESCRIPTION
+
+This module helps maintaining the POT files, updating the list of
+message-ids which are kept in them.  After initiation, the L<process()|Log::Report::Extract::PerlPPI/"Processors">
+method needs to be called with all files which changed since last processing
+and the existing PO files will get updated accordingly.
+
+If no translations exist yet, one C<$lexicon/$domain.po> file will be
+created.  If you want to start a translation, copy C<$lexicon/$domain.po>
+to C<$lexicon/$domain/$lang.po> and edit that file.  You may use
+C<poedit> to edit po-files.  There are many smart translation management
+applications which can hand po-files, for instance Pootle and Weblate.
+
+Do not forget to add the new po-file to your distribution (MANIFEST)
+
+Extends L<"DESCRIPTION" in Log::Report::Extract|Log::Report::Extract/"DESCRIPTION">.
+ 
+=head2 The extraction process
+
+All pm-files need to be processed in one go: no incremental processing!
+
+The Perl source is parsed using PPI, which does understand Perl syntax
+quite well, but does not support all features.
+
+Automatically, the textdomain of the translations is discovered, as
+first parameter of C<use Log::Report>.  You may switch textdomain inside
+one pm-file.
+
+When all files have been processed, during the L<write()|Log::Report::Extract/"Processors">, all existing
+po-files for all discovered textdomains will get updated.  Not only the
+C<$lexicon/$domain.po> template, but also all C<$lexicon/$domain/$lang.po>
+will be replaced.  When a msgid has disappeared, existing translations
+will get disabled, not removed.  New msgids will be added and flagged
+"fuzzy".
+
+=head3 What is extracted?
+
+This script will extract the msgids used in C<__()>, C<__x()>, C<__xn()>,
+and C<__n()> (implemented by L<Log::Report|Log::Report>) For instance
+
+  __x"msgid", @more
+  __x'msgid', @more  <--- no!  syntax error!
+  __x("msgid", @more)
+  __x('msgid', @more)
+  __x(msgid => @more)
+
+Besides, there are some helpers which are no-ops in the code, only to fill
+the po-tables: C<N__()>, C<N__n()>, C<N__()>
+
+=head3 What is not extracted?
+
+B<Not> extracted are the usage of anything above, where the first
+parameter is not a simple string.  Not extracted are
+
+  __x($format, @more)
+  __x$format, @more
+  __x(+$format, _domain => 'other domain', @more)
+  __x($first.$second, @more)
+
+In these cases, you have to use C<N__()> functions to declare the possible
+values of C<$format>.
+
+=head1 METHODS
+
+Extends L<"METHODS" in Log::Report::Extract|Log::Report::Extract/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Log::Report::Extract|Log::Report::Extract/"Constructors">.
+ 
+=over 4
+
+=item Log::Report::Extract::PerlPPI-E<gt>B<new>(%options)
+
+Inherited, see L<Log::Report::Extract/"Constructors">
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in Log::Report::Extract|Log::Report::Extract/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addPot>($domain, $pot, %options)
+
+Inherited, see L<Log::Report::Extract/"Accessors">
+
+=item $obj-E<gt>B<charset>()
+
+Inherited, see L<Log::Report::Extract/"Accessors">
+
+=item $obj-E<gt>B<domains>()
+
+Inherited, see L<Log::Report::Extract/"Accessors">
+
+=item $obj-E<gt>B<index>()
+
+Inherited, see L<Log::Report::Extract/"Accessors">
+
+=item $obj-E<gt>B<pots>($domain)
+
+Inherited, see L<Log::Report::Extract/"Accessors">
+
+=back
+
+=head2 Processors
+
+Extends L<"Processors" in Log::Report::Extract|Log::Report::Extract/"Processors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<cleanup>(%options)
+
+Inherited, see L<Log::Report::Extract/"Processors">
+
+=item $obj-E<gt>B<process>($filename, %options)
+
+Update the domains mentioned in the $filename.  All textdomains defined
+in the file will get updated automatically, but not written before
+all files where processed.
+
+ -Option --Default
+  charset  'iso-8859-1'
+
+=over 2
+
+=item charset => STRING
+
+=back
+
+=item $obj-E<gt>B<showStats>( [$domains] )
+
+Inherited, see L<Log::Report::Extract/"Processors">
+
+=item $obj-E<gt>B<store>( $domain, $filename, $linenr, $context, $msg, [$msg_plural] )
+
+Inherited, see L<Log::Report::Extract/"Processors">
+
+=item $obj-E<gt>B<write>( [$domain] )
+
+Inherited, see L<Log::Report::Extract/"Processors">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Log-Report-Lexicon distribution version 1.06,
+built on September 21, 2016. Website: F<http://perl.overmeer.net/log-report/>
+
+=head1 LICENSE
+
+Copyrights 2007-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

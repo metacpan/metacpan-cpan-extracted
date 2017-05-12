@@ -1,0 +1,6 @@
+Revision history for Perl extension Locale::Maketext::Lexicon::CSV.
+
+0.96  Fri Jan  3 16:02:08 2014
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.14.0 -n Locale::Maketext::Lexicon::CSV
+

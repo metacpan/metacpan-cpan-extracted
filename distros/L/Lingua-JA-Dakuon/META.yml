@@ -1,0 +1,38 @@
+---
+abstract: 'Convert between dakuon/handakuon and seion for Japanese'
+author:
+  - 'Yuto KAWAMURA(kawamuray) <kawamuray.dadada@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.0, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-JA-Dakuon
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Lingua::JA::Dakuon:
+    file: lib/Lingua/JA/Dakuon.pm
+    version: 0.01
+requires:
+  Exporter: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/kawamuray/p5-Lingua-JA-Dakuon/issues
+  homepage: https://github.com/kawamuray/p5-Lingua-JA-Dakuon
+  repository: git://github.com/kawamuray/p5-Lingua-JA-Dakuon.git
+version: 0.01

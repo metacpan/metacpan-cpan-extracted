@@ -1,0 +1,44 @@
+
+VERSION = 05011501
+
+  Last Updated 1-15-05 michael@bizsystems.com
+
+This is a list of other sites that are running LaBrea::Tarpit
+It is used to collect stats from the web sites listed in the 
+'Other Sites' report.
+
+TO ADD YOUR SITE TO THIS LIST
+
+email the exact URL of your report generation file as shown below:
+
+To:	 michael@bizsystems.com
+Subject: LaBrea::Tarpit
+
+http://scans.bizsystems.net/paged_report.plx	(my sites)
+http://probes.bizsystems.net/paged_report.plx
+
+USE THIS FILE as is....
+any line that does not begin exactly with:
+
+   http://url/file.ext
+
+is ignored. Comments may be added after white space on the same line.
+as well as anywhere in the file.
+
+The most recent version of this file is available at:
+
+  http://scans.bizsystems.net/other_sites.txt
+   and
+  http://www.bizsystems.net/downloads/labrea/other_sites.net
+
+and will automatically be updated at your site if you run 
+web_scan.pl in the default mode with AUTO_UPDATE enabled
+
+######## other sites #######
+
+http://www.hackbusters.net/static/summary.html	Tom Liston's site, author of 'labrea' <tliston@premmag.com>
+http://osiris.etee2k.net/cgi-bin/tarpit/html_report.plx	Ed Truitt <ed.truitt@etee2k.net>
+http://www.dmrf.net/cgi-bin/guests.cgi		dlinux@dmrf.net
+http://www.pettingers.net/cgi-bin/paged_report.cgi Charlie Pettinger <web1@pettingers.net>
+http://roo.topnz.ac.nz/LaBrea-Tarpit/paged_report.plx Sartorelli, Kevin <Kevin.Sartorelli@openpolytechnic.ac.nz>
+http://tarpit.assinck.info:82/cgi-bin/paged_report.cgi Henrie Assinck <henrie@assinck.info>

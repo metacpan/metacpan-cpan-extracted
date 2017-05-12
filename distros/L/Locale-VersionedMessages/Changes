@@ -1,0 +1,37 @@
+Written by:
+   Sullivan Beck (sbeck@cpan.org)
+Any suggestions, bug reports, or donations :-) should be sent to me.
+
+0.90  2013-03-13
+  - Initial release (beta)
+
+0.91  2013-03-18
+  - Removed some optional packages from requirement list.
+  - Fixed requirement for Test::Inter so that tests would not fail.
+
+0.92  2013-12-06
+  - Removed a require line for perl 5.10 (earlier versions should work).
+  - Added =encoding to POD files so UTF-8 works.
+  - In the quant substitutions, the format is much nicer now (but is
+      backward compatible).
+  - Added Cancel buttons to the lm_gui.
+  - Message descriptions are now multi-line.
+  - POD files for message sets are now more complete.  POD files are
+      no longer created for lexicons.
+  - Documentation improvements.
+  - Changed HISTORY file to new Changes specification.
+
+0.93  2014-01-29
+  - Fixed pod files to not give any errors.
+  - Added copyright to the generated lexicons.
+  - Cleaned up pod in generated files.
+
+0.94  2014-01-31
+  - Minor release to fix CPAN POD indexing issue (doe not affect the
+    module at all).
+
+0.95  2015-01-05
+  - Put repository on GitHub. Gabor Szabo
+  - Fixed a test which failed with perl 5.21.* .  Slaven Rezic
+
+0.96

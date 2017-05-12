@@ -1,0 +1,45 @@
+---
+abstract: 'convert japanese chars.'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Data::Section::TestBase: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.5, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-JA-Regular-Unicode
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Lingua::JA::Regular::Unicode:
+    file: lib/Lingua/JA/Regular/Unicode.pm
+    version: '0.13'
+requires:
+  Exporter: '5.58'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Lingua-JA-Regular-Unicode/issues
+  homepage: https://github.com/tokuhirom/Lingua-JA-Regular-Unicode
+  repository: git://github.com/tokuhirom/Lingua-JA-Regular-Unicode.git
+version: '0.13'
+x_authority: cpan:TOKUHIROM
+x_contributors:
+  - 'tokuhirom <tokuhirom@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'Keiji, Yoshimi <walf443@gmail.com>'
+  - 'K <x00.x7f@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

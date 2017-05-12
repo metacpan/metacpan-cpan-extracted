@@ -1,0 +1,87 @@
+NAME
+    Loop::Control - FIRST and NEXT functions for loops
+
+VERSION
+    version 1.100861
+
+SYNOPSIS
+        use Loop::Control;
+
+        for (1..10) {
+            FIRST { print "called only in the first iteration" };
+            FIRST { print "also called only in the first iteration" };
+            # do things
+            NEXT { print "called at the end of each iteration" };
+            NEXT { print "also called at the end of each iteration" };
+            # do more things
+            next if rand() < 0.5
+            # the NEXT code will be executed even if the loop is ended with next()
+        }
+
+DESCRIPTION
+    This module provides ways to execute code at certain points in a "for"
+    or "while" loop that are outside the normal control flow. For example,
+    you could have code that executes only during the first iteration of a
+    loop, or code that executes after every iteration of the loop,
+    regardless of how the iteration ended (normally or via "next").
+
+METHODS
+  FIRST
+    Automatically exported, this function is meant to be placed inside a
+    "for" or "while" loop. It takes a code block which it will execute only
+    during the first iteration of the loop. They block is run at the point
+    where the "FIRST" statement occurs. You can specify several "FIRST"
+    blocks in a loop. If the loop is called recursively, each recursion
+    level is treated as a separate loop.
+
+    The block will have additional entries in the call stack, that is,
+    "caller()" will not show the same results as the code that is placed
+    directly in the loop.
+
+  NEXT
+    Automatically exported, this function is meant to be placed inside a
+    "for" or "while" loop. It takes a code block which it will execute after
+    each iteration of the loop, regardless of whether the loop iteration
+    ended normally or via "next". You can specify several "NEXT" blocks in a
+    loop, and they will be run in the reverse order in which they were
+    encountered.
+
+    The block will have additional entries in the call stack, that is,
+    "caller()" will not show the same results as the code that is placed
+    directly in the loop.
+
+  callstack_depth
+    Convenience function that returns the number of levels on the call
+    stack, that is, the maximum number for which "caller($i)" will return
+    data. The number includes the call stack entry for "callstack_depth()"
+    itself. This function is used by "NEXT" and is not exported.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Loop-Control>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <http://search.cpan.org/dist/Loop-Control/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Loop-Control/>. Instead of sending patches,
+    please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2009 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

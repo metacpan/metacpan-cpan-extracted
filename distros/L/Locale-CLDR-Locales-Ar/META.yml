@@ -1,0 +1,125 @@
+---
+abstract: 'Locale::CLDR - Data Package ( Perl localization data for Arabic )'
+author:
+  - 'John Imrie <john.imrie1@gmail.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+  ok: '0'
+configure_requires:
+  Module::Build: '0.40'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+keywords:
+  - locale
+  - CLDR
+  - locale-data-pack
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-CLDR-Locales-Ar
+provides:
+  Locale::CLDR::Locales::Ar:
+    file: lib/Locale/CLDR/Locales/Ar.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any:
+    file: lib/Locale/CLDR/Locales/Ar/Any.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::001:
+    file: lib/Locale/CLDR/Locales/Ar/Any/001.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Ae:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Ae.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Bh:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Bh.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Dj:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Dj.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Dz:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Dz.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Eg:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Eg.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Eh:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Eh.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Er:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Er.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Il:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Il.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Iq:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Iq.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Jo:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Jo.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Km:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Km.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Kw:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Kw.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Lb:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Lb.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Ly:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Ly.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Ma:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Ma.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Mr:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Mr.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Om:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Om.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Ps:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Ps.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Qa:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Qa.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Sa:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Sa.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Sd:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Sd.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::So:
+    file: lib/Locale/CLDR/Locales/Ar/Any/So.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Ss:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Ss.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Sy:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Sy.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Td:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Td.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Tn:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Tn.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Ar::Any::Ye:
+    file: lib/Locale/CLDR/Locales/Ar/Any/Ye.pm
+    version: v0.29.0
+requires:
+  DateTime: '0.72'
+  Locale::CLDR: v0.29.0
+  Moo: '2'
+  MooX::ClassAttribute: '0.011'
+  Type::Tiny: '0'
+  perl: v5.10.1
+  version: '0.95'
+resources:
+  bugtracker: https://github.com/ThePilgrim/perlcldr/issues
+  homepage: https://github.com/ThePilgrim/perlcldr
+  repository: https://github.com/ThePilgrim/perlcldr.git
+version: v0.29.0

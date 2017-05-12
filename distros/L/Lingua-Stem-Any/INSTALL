@@ -1,0 +1,16 @@
+Lingua::Stem::Any Installation
+
+# install via cpanminus
+cpanm Lingua::Stem::Any
+
+# install via CPAN shell
+cpan Lingua::Stem::Any
+
+# install via ActivePerl
+ppm install Lingua::Stem::Any
+
+# install manually
+perl Build.PL
+./Build
+./Build test
+./Build install

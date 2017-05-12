@@ -1,0 +1,403 @@
+[10/Aug/2008:09:00:55	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	5
+[10/Aug/2008:09:11:02	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	1
+[10/Aug/2008:09:13:25	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	8
+[10/Aug/2008:09:21:33	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; InfoPath.1)	5
+[10/Aug/2008:09:22:25	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	7
+[10/Aug/2008:09:23:27	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	9
+[10/Aug/2008:09:26:52	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	3
+[10/Aug/2008:09:27:37	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	8
+[10/Aug/2008:09:31:02	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1	8
+[10/Aug/2008:09:31:09	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; InfoPath.1)	6
+[10/Aug/2008:09:41:46	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	3
+[10/Aug/2008:09:49:32	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	6
+[10/Aug/2008:09:51:37	Mozilla/5.0 (Macintosh; U; PPC Mac OS X 10_5_4; ja-jp) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.20.1	7
+[10/Aug/2008:09:52:19	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	5
+[10/Aug/2008:09:52:31	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	6
+[10/Aug/2008:09:55:35	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727; InfoPath.1; .NET CLR 3.0.04506.30)	9
+[10/Aug/2008:10:03:19	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648)	2
+[10/Aug/2008:10:03:54	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1	6
+[10/Aug/2008:10:04:05	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	8
+[10/Aug/2008:10:05:19	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)	1
+[10/Aug/2008:10:07:59	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1	5
+[10/Aug/2008:10:12:24	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; Media Center PC 4.0)	3
+[10/Aug/2008:10:13:18	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	10
+[10/Aug/2008:10:19:38	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; MSOCD; AtHomeJP0109; SV1)	4
+[10/Aug/2008:10:21:49	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	6
+[10/Aug/2008:10:21:52	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	2
+[10/Aug/2008:10:26:45	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.0.3705)	6
+[10/Aug/2008:10:27:00	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	10
+[10/Aug/2008:10:35:11	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	10
+[10/Aug/2008:10:35:49	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)	6
+[10/Aug/2008:10:38:27	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	10
+[10/Aug/2008:10:40:04	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	4
+[10/Aug/2008:10:40:05	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	5
+[10/Aug/2008:10:41:52	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)	3
+[10/Aug/2008:10:41:59	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	8
+[10/Aug/2008:10:44:44	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	3
+[10/Aug/2008:10:45:53	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	7
+[10/Aug/2008:10:51:30	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727; InfoPath.1)	8
+[10/Aug/2008:10:53:01	Mozilla/4.0 (compatible; MSIE 5.5; Windows 98; Win 9x 4.90)	6
+[10/Aug/2008:10:55:32	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	3
+[10/Aug/2008:10:56:15	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)	5
+[10/Aug/2008:10:56:34	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; FunWebProducts-AskJeevesJapan; SV1)	4
+[10/Aug/2008:11:09:31	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	9
+[10/Aug/2008:11:10:08	Mozilla/5.0 (Macintosh; U; PPC Mac OS X; ja-jp) AppleWebKit/523.12 (KHTML, like Gecko) Version/3.0.4 Safari/523.12	4
+[10/Aug/2008:11:10:30	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322)	3
+[10/Aug/2008:11:10:43	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.1.4322)	4
+[10/Aug/2008:11:11:00	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727; .NET CLR 1.1.4322)	5
+[10/Aug/2008:11:12:15	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1	2
+[10/Aug/2008:11:15:14	Mozilla/4.0 (compatible; MSIE 5.23; Mac_PowerPC)	7
+[10/Aug/2008:11:17:06	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	4
+[10/Aug/2008:11:20:31	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	9
+[10/Aug/2008:11:23:47	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; InfoPath.1)	10
+[10/Aug/2008:11:27:44	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	1
+[10/Aug/2008:11:28:59	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322)	3
+[10/Aug/2008:11:29:41	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)	6
+[10/Aug/2008:11:31:10	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	4
+[10/Aug/2008:11:34:51	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506; InfoPath.2)	8
+[10/Aug/2008:11:36:49	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	6
+[10/Aug/2008:11:37:15	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	9
+[10/Aug/2008:11:38:31	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	5
+[10/Aug/2008:11:40:10	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506; .NET CLR 3.5.21022)	6
+[10/Aug/2008:11:41:04	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)	8
+[10/Aug/2008:11:44:37	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	6
+[10/Aug/2008:11:44:59	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)	7
+[10/Aug/2008:11:47:15	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)	2
+[10/Aug/2008:11:49:33	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)	5
+[10/Aug/2008:11:58:07	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	6
+[10/Aug/2008:12:06:11	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	6
+[10/Aug/2008:12:10:12	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	10
+[10/Aug/2008:12:12:48	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)	5
+[10/Aug/2008:12:12:57	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	5
+[10/Aug/2008:12:14:00	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.1.4322)	7
+[10/Aug/2008:12:28:07	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	9
+[10/Aug/2008:12:28:47	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	4
+[10/Aug/2008:12:30:55	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	6
+[10/Aug/2008:12:31:09	Opera/9.22 (Windows NT 5.1; U; ja)	9
+[10/Aug/2008:12:33:27	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)	2
+[10/Aug/2008:12:43:10	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	7
+[10/Aug/2008:12:43:17	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	7
+[10/Aug/2008:12:45:33	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; YPC 3.2.2; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	6
+[10/Aug/2008:12:47:10	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705)	3
+[10/Aug/2008:12:47:53	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506) Sleipnir/2.8.0	9
+[10/Aug/2008:12:49:45	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506; .NET CLR 1.1.4322) Sleipnir/2.8.0	7
+[10/Aug/2008:12:59:08	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	7
+[10/Aug/2008:13:07:59	Mozilla/5.0 (Windows; U; Windows NT 6.0; ja; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1	3
+[10/Aug/2008:13:10:18	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	5
+[10/Aug/2008:13:12:34	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	8
+[10/Aug/2008:13:14:44	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322)	2
+[10/Aug/2008:13:15:29	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	9
+[10/Aug/2008:13:22:38	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; InfoPath.1; .NET CLR 2.0.50727)	10
+[10/Aug/2008:13:23:27	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.0.3705)	5
+[10/Aug/2008:13:23:35	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 2.0.50727)	5
+[10/Aug/2008:13:24:45	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	7
+[10/Aug/2008:13:26:18	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	2
+[10/Aug/2008:13:30:16	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	10
+[10/Aug/2008:13:34:24	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705)	1
+[10/Aug/2008:13:38:12	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)	9
+[10/Aug/2008:13:38:52	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	6
+[10/Aug/2008:13:39:53	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	9
+[10/Aug/2008:13:40:39	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	8
+[10/Aug/2008:13:41:40	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	2
+[10/Aug/2008:13:52:42	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727) Sleipnir/2.8.0	4
+[10/Aug/2008:13:54:24	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	1
+[10/Aug/2008:13:54:42	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	6
+[10/Aug/2008:13:57:30	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; FunWebProducts-AskJeevesJapan; .NET CLR 1.1.4322; IEMB3)	9
+[10/Aug/2008:14:01:10	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	5
+[10/Aug/2008:14:01:34	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	3
+[10/Aug/2008:14:02:03	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	1
+[10/Aug/2008:14:03:45	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	3
+[10/Aug/2008:14:05:11	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	4
+[10/Aug/2008:14:07:37	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322)	8
+[10/Aug/2008:14:09:54	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506; Tablet PC 2.0; .NET CLR 3.5.21022) Sleipnir/2.8.0	5
+[10/Aug/2008:14:13:32	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	10
+[10/Aug/2008:14:13:51	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	3
+[10/Aug/2008:14:17:27	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	3
+[10/Aug/2008:14:19:36	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322) Sleipnir/2.5.5	1
+[10/Aug/2008:14:19:52	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)	1
+[10/Aug/2008:14:22:12	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; i-NavFourF; .NET CLR 1.1.4322)	6
+[10/Aug/2008:14:22:24	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	7
+[10/Aug/2008:14:25:53	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322)	7
+[10/Aug/2008:14:33:08	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)	1
+[10/Aug/2008:14:36:45	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	5
+[10/Aug/2008:14:43:39	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)	6
+[10/Aug/2008:14:44:47	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	9
+[10/Aug/2008:14:44:48	Mozilla/5.0 (Macintosh; U; PPC Mac OS X; ja-jp) AppleWebKit/312.9 (KHTML, like Gecko) Safari/312.6	8
+[10/Aug/2008:14:45:38	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	4
+[10/Aug/2008:14:49:19	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	6
+[10/Aug/2008:14:56:24	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	10
+[10/Aug/2008:14:57:31	Mozilla/5.0 (Windows; U; Windows NT 6.0; ja; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1	1
+[10/Aug/2008:14:59:12	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	7
+[10/Aug/2008:15:02:28	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; msn Optimized IE build03;JP; .NET CLR 2.0.50727; msn Optimized IE build03;JP)	8
+[10/Aug/2008:15:08:59	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	5
+[10/Aug/2008:15:10:54	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	8
+[10/Aug/2008:15:11:55	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	8
+[10/Aug/2008:15:13:23	Microsoft-WebDAV-MiniRedir/5.1.2600	10
+[10/Aug/2008:15:14:06	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705)	8
+[10/Aug/2008:15:15:04	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)	4
+[10/Aug/2008:15:15:14	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	10
+[10/Aug/2008:15:23:10	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	3
+[10/Aug/2008:15:25:39	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	5
+[10/Aug/2008:15:26:05	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; InfoPath.1)	10
+[10/Aug/2008:15:37:01	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	8
+[10/Aug/2008:15:37:41	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	9
+[10/Aug/2008:15:45:33	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	7
+[10/Aug/2008:15:47:47	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	9
+[10/Aug/2008:15:53:43	Mozilla/5.0 (Macintosh; U; PPC Mac OS X; ja-jp) AppleWebKit/312.9 (KHTML, like Gecko) Safari/312.6	3
+[10/Aug/2008:15:53:58	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322)	9
+[10/Aug/2008:15:57:05	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	9
+[10/Aug/2008:15:57:26	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; InfoPath.1)	7
+[10/Aug/2008:15:58:41	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	6
+[10/Aug/2008:16:11:49	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	2
+[10/Aug/2008:16:12:47	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	1
+[10/Aug/2008:16:14:02	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705)	6
+[10/Aug/2008:16:20:50	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	7
+[10/Aug/2008:16:26:03	Mozilla/5.0 (Macintosh; U; PPC Mac OS X 10_4_11; ja-jp) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.22	5
+[10/Aug/2008:16:30:19	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	7
+[10/Aug/2008:16:30:36	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1	1
+[10/Aug/2008:16:36:24	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; InfoPath.1)	4
+[10/Aug/2008:16:36:49	Mozilla/5.0 (Windows; U; Windows NT 6.0; ja; rv:1.8.1.16) Gecko/20080702 Firefox/2.0.0.16	10
+[10/Aug/2008:16:43:38	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; FunWebProducts; SV1)	9
+[10/Aug/2008:16:45:20	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	3
+[10/Aug/2008:16:49:52	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	3
+[10/Aug/2008:16:49:59	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	5
+[10/Aug/2008:16:51:48	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	5
+[10/Aug/2008:16:52:52	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506; InfoPath.1)	7
+[10/Aug/2008:16:55:49	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	5
+[10/Aug/2008:16:58:54	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	4
+[10/Aug/2008:17:03:55	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	8
+[10/Aug/2008:17:09:21	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)	2
+[10/Aug/2008:17:12:35	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	10
+[10/Aug/2008:17:13:17	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	7
+[10/Aug/2008:17:14:07	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	2
+[10/Aug/2008:17:14:16	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	1
+[10/Aug/2008:17:16:17	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)	9
+[10/Aug/2008:17:29:18	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)	6
+[10/Aug/2008:17:34:40	Mozilla/5.0 (Macintosh; U; PPC Mac OS X 10_4_11; ja-jp) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.22	1
+[10/Aug/2008:17:35:29	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	9
+[10/Aug/2008:17:36:06	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)	10
+[10/Aug/2008:17:44:11	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	9
+[10/Aug/2008:17:51:52	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	10
+[10/Aug/2008:17:54:06	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	1
+[10/Aug/2008:17:54:36	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)	3
+[10/Aug/2008:18:01:37	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.8.1.16) Gecko/20080702 Firefox/2.0.0.16	4
+[10/Aug/2008:18:08:32	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	3
+[10/Aug/2008:18:16:32	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	2
+[10/Aug/2008:18:25:24	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	1
+[10/Aug/2008:18:25:52	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	3
+[10/Aug/2008:18:27:21	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)	8
+[10/Aug/2008:18:31:23	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 3.0.04506.30; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648)	7
+[10/Aug/2008:18:31:52	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; EmbeddedWB 14.52 http://www.Pandora.Tv EmbeddedWB 14.52; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)	10
+[10/Aug/2008:18:32:10	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	9
+[10/Aug/2008:18:33:56	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	4
+[10/Aug/2008:18:34:55	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	10
+[10/Aug/2008:18:35:29	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; Media Center PC 4.0)	4
+[10/Aug/2008:18:37:55	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	6
+[10/Aug/2008:18:43:48	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	2
+[10/Aug/2008:18:44:03	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	8
+[10/Aug/2008:18:45:36	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	4
+[10/Aug/2008:18:47:52	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	8
+[10/Aug/2008:18:48:14	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; FunWebProducts; SV1)	6
+[10/Aug/2008:18:48:21	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; IEMB3; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; InfoPath.1; IEMB3)	3
+[10/Aug/2008:18:50:58	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	5
+[10/Aug/2008:18:54:29	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	1
+[10/Aug/2008:19:00:20	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	10
+[10/Aug/2008:19:00:54	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	4
+[10/Aug/2008:19:08:00	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	6
+[10/Aug/2008:19:10:08	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; QQDownload 1.7; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; IEMB3)	2
+[10/Aug/2008:19:16:12	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	1
+[10/Aug/2008:19:16:24	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	9
+[10/Aug/2008:19:17:17	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	2
+[10/Aug/2008:19:21:45	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	9
+[10/Aug/2008:19:26:29	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506; .NET CLR 1.1.4322)	7
+[10/Aug/2008:19:29:34	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	1
+[10/Aug/2008:19:34:05	Mozilla/4.0 (compatible; MSIE 6.0; Windows 98; Win 9x 4.90)	8
+[10/Aug/2008:19:37:05	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	1
+[10/Aug/2008:19:37:17	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	7
+[10/Aug/2008:19:46:53	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	6
+[10/Aug/2008:19:49:03	Mozilla/5.0 (Macintosh; U; PPC Mac OS X 10_4_11; ja-jp) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.22	9
+[10/Aug/2008:19:56:41	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506; InfoPath.2)	2
+[10/Aug/2008:20:01:15	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648)	1
+[10/Aug/2008:20:06:55	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	10
+[10/Aug/2008:20:11:50	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	4
+[10/Aug/2008:20:13:03	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; Media Center PC 2.8)	4
+[10/Aug/2008:20:25:24	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)	8
+[10/Aug/2008:20:28:25	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	10
+[10/Aug/2008:20:35:44	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)	1
+[10/Aug/2008:20:36:00	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	6
+[10/Aug/2008:20:36:35	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_2; ja-jp) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.1 Safari/525.18	6
+[10/Aug/2008:20:39:54	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	4
+[10/Aug/2008:20:40:40	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	5
+[10/Aug/2008:20:46:04	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; (R1 1.3))	9
+[10/Aug/2008:20:46:19	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	7
+[10/Aug/2008:20:48:48	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705)	5
+[10/Aug/2008:20:53:54	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	5
+[10/Aug/2008:20:55:18	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)	10
+[10/Aug/2008:20:56:36	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1	4
+[10/Aug/2008:21:03:18	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	9
+[10/Aug/2008:21:06:58	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	8
+[10/Aug/2008:21:07:21	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	5
+[10/Aug/2008:21:07:53	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; InfoPath.1)	8
+[10/Aug/2008:21:08:33	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	2
+[10/Aug/2008:21:08:38	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	8
+[10/Aug/2008:21:13:21	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)	2
+[10/Aug/2008:21:18:18	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.8.1.7) Gecko/20070914 Firefox/2.0.0.7	5
+[10/Aug/2008:21:22:51	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727; IEMB3; IEMB3)	5
+[10/Aug/2008:21:30:36	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	4
+[10/Aug/2008:21:30:41	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	2
+[10/Aug/2008:21:30:46	Mozilla/5.0 (Macintosh; U; PPC Mac OS X; ja-jp) AppleWebKit/312.9 (KHTML, like Gecko) Safari/312.6	3
+[10/Aug/2008:21:32:04	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727) Sleipnir/2.7.2	5
+[10/Aug/2008:21:33:39	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	10
+[10/Aug/2008:21:36:28	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1	2
+[10/Aug/2008:21:38:00	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	5
+[10/Aug/2008:21:38:50	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; InfoPath.1)	4
+[10/Aug/2008:21:39:40	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	10
+[10/Aug/2008:21:41:26	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	8
+[10/Aug/2008:21:42:22	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322)	5
+[10/Aug/2008:21:44:05	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	1
+[10/Aug/2008:21:50:13	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	2
+[10/Aug/2008:21:58:44	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)	1
+[10/Aug/2008:21:58:57	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	4
+[10/Aug/2008:22:00:11	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727; .NET CLR 1.1.4322; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648)	4
+[10/Aug/2008:22:01:54	Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; ja; rv:1.8.1.12) Gecko/20080206 Camino/1.5.5 (MultiLang)	2
+[10/Aug/2008:22:04:58	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	6
+[10/Aug/2008:22:05:08	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	7
+[10/Aug/2008:22:07:13	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	9
+[10/Aug/2008:22:10:05	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	9
+[10/Aug/2008:22:10:20	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; InfoPath.2)	3
+[10/Aug/2008:22:12:05	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	10
+[10/Aug/2008:22:12:48	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	8
+[10/Aug/2008:22:13:10	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	8
+[10/Aug/2008:22:14:18	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	5
+[10/Aug/2008:22:19:01	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	2
+[10/Aug/2008:22:19:30	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	1
+[10/Aug/2008:22:25:32	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	4
+[10/Aug/2008:22:29:31	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)	6
+[10/Aug/2008:22:30:46	Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; ja-JP-mac; rv:1.8.1.16) Gecko/20080702 Firefox/2.0.0.16	4
+[10/Aug/2008:22:31:31	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_4_11; ja-jp) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.22	7
+[10/Aug/2008:22:34:20	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727; .NET CLR 1.1.4322)	10
+[10/Aug/2008:22:34:27	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	2
+[10/Aug/2008:22:35:33	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	9
+[10/Aug/2008:22:37:46	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	10
+[10/Aug/2008:22:38:59	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.0.3705)	6
+[10/Aug/2008:22:41:52	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	10
+[10/Aug/2008:22:41:53	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	3
+[10/Aug/2008:22:45:42	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	9
+[10/Aug/2008:22:49:30	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705)	6
+[10/Aug/2008:22:52:59	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; InfoPath.1)	9
+[10/Aug/2008:22:59:01	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	6
+[10/Aug/2008:22:59:18	Mozilla/4.0 (compatible; MSIE 6.0; Windows 98)	9
+[10/Aug/2008:22:59:38	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	9
+[10/Aug/2008:23:00:36	Mozilla/4.0 (compatible; MSIE 6.0; Windows 98; Q312461; (R1 1.5); .NET CLR 1.1.4322)	4
+[10/Aug/2008:23:01:49	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	8
+[10/Aug/2008:23:03:38	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	6
+[10/Aug/2008:23:08:28	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)	1
+[10/Aug/2008:23:08:31	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; WPS; Media Center PC 3.0; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727; Lunascape 4.7.3)	9
+[10/Aug/2008:23:09:31	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	9
+[10/Aug/2008:23:12:40	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	7
+[10/Aug/2008:23:12:46	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)	5
+[10/Aug/2008:23:22:27	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322)	10
+[10/Aug/2008:23:26:00	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	1
+[10/Aug/2008:23:30:39	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	9
+[10/Aug/2008:23:31:45	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	6
+[10/Aug/2008:23:31:51	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	3
+[10/Aug/2008:23:31:52	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	2
+[10/Aug/2008:23:32:00	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	1
+[10/Aug/2008:23:34:03	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506; .NET CLR 1.1.4322)	2
+[10/Aug/2008:23:37:18	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727) Sleipnir/2.7.2	7
+[10/Aug/2008:23:37:38	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	9
+[10/Aug/2008:23:38:46	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	1
+[10/Aug/2008:23:40:03	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	2
+[10/Aug/2008:23:51:35	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	8
+[10/Aug/2008:23:52:45	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	10
+[10/Aug/2008:23:52:48	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	3
+[10/Aug/2008:23:56:23	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	8
+[10/Aug/2008:23:56:51	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	8
+[11/Aug/2008:00:00:20	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727) Sleipnir/2.8.0	4
+[11/Aug/2008:00:03:41	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1	5
+[11/Aug/2008:00:07:07	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	8
+[11/Aug/2008:00:08:04	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322)	4
+[11/Aug/2008:00:14:15	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_4_11; ja-jp) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.22	8
+[11/Aug/2008:00:17:12	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	1
+[11/Aug/2008:00:19:12	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727; InfoPath.2)	3
+[11/Aug/2008:00:21:38	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	2
+[11/Aug/2008:00:24:58	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	5
+[11/Aug/2008:00:29:38	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	9
+[11/Aug/2008:00:36:03	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.8.1.16) Gecko/20080702 Firefox/2.0.0.16	9
+[11/Aug/2008:00:37:23	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	8
+[11/Aug/2008:00:44:41	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)	7
+[11/Aug/2008:00:56:21	Mozilla/5.0 (X11; U; Linux i686; ja; rv:1.8.0.7) Gecko/20060913 Fedora/1.5.0.7-1.fc5 Firefox/1.5.0.7 pango-text	6
+[11/Aug/2008:01:00:57	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_4; ja-jp) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.20.1	8
+[11/Aug/2008:01:01:42	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)	7
+[11/Aug/2008:01:01:48	Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; ja-JP-mac; rv:1.8.1.16) Gecko/20080702 Firefox/2.0.0.16	10
+[11/Aug/2008:01:02:20	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	6
+[11/Aug/2008:01:07:44	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; SpamBlockerUtility 4.8.4; yplus 5.1.04b)	7
+[11/Aug/2008:01:15:34	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	4
+[11/Aug/2008:01:51:37	Mozilla/5.0 (Windows; U; Windows NT 6.0; ja; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1	3
+[11/Aug/2008:01:56:16	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648)	9
+[11/Aug/2008:01:58:22	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	9
+[11/Aug/2008:02:17:57	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	5
+[11/Aug/2008:02:30:29	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727; MEGAUPLOAD 2.0)	2
+[11/Aug/2008:02:37:27	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322)	7
+[11/Aug/2008:02:48:01	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.8.1.16) Gecko/20080702 Firefox/2.0.0.16	1
+[11/Aug/2008:03:07:40	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; Q312461; .NET CLR 1.1.4322)	4
+[11/Aug/2008:03:19:33	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.8.1.16) Gecko/20080702 Firefox/2.0.0.16	10
+[11/Aug/2008:03:26:08	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)	8
+[11/Aug/2008:03:39:24	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	9
+[11/Aug/2008:03:40:29	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)	1
+[11/Aug/2008:03:46:18	Mozilla/5.0 (Windows; U; Windows NT 5.1; ja; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1	6
+[11/Aug/2008:03:54:38	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	10
+[11/Aug/2008:04:06:51	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	1
+[11/Aug/2008:04:11:26	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	3
+[11/Aug/2008:04:12:19	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; InfoPath.1)	4
+[11/Aug/2008:04:28:53	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; InfoPath.1)	9
+[11/Aug/2008:04:49:29	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	2
+[11/Aug/2008:04:59:38	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506; .NET CLR 1.1.4322; .NET CLR 3.5.21022; Tablet PC 2.0)	7
+[11/Aug/2008:05:41:01	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)	9
+[11/Aug/2008:05:52:40	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	2
+[11/Aug/2008:06:02:59	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	3
+[11/Aug/2008:06:13:14	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	6
+[11/Aug/2008:06:26:35	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)	6
+[11/Aug/2008:06:34:25	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	7
+[11/Aug/2008:06:35:16	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	10
+[11/Aug/2008:06:35:21	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)	8
+[11/Aug/2008:06:35:22	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_4; ja-jp) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.20.1	9
+[11/Aug/2008:06:36:49	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)	9
+[11/Aug/2008:06:51:30	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)	5
+[11/Aug/2008:07:04:58	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	7
+[11/Aug/2008:07:05:26	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	1
+[11/Aug/2008:07:06:34	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705)	1
+[11/Aug/2008:07:08:23	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	2
+[11/Aug/2008:07:10:02	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)	1
+[11/Aug/2008:07:12:30	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; InfoPath.1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30)	6
+[11/Aug/2008:07:12:38	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)	10
+[11/Aug/2008:07:20:56	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30) Sleipnir/2.8.0	8
+[11/Aug/2008:07:29:53	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	7
+[11/Aug/2008:07:30:34	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_4; ja-jp) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.20.1	1
+[11/Aug/2008:07:32:26	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.0.3705; .NET CLR 1.1.4322; .NET CLR 2.0.50727; Media Center PC 4.0; IEMB3; .NET CLR 3.0.04506.30; IEMB3)	10
+[11/Aug/2008:07:40:00	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	8
+[11/Aug/2008:07:40:19	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	8
+[11/Aug/2008:07:45:14	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	10
+[11/Aug/2008:07:48:21	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	5
+[11/Aug/2008:07:52:00	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	4
+[11/Aug/2008:07:57:54	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	8
+[11/Aug/2008:08:07:34	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; InfoPath.1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022)	2
+[11/Aug/2008:08:08:57	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)	2
+[11/Aug/2008:08:09:42	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	10
+[11/Aug/2008:08:11:16	Mozilla/5.0 (Windows; U; Windows NT 6.0; ja-JP; rv:1.4) Gecko/20030624 Netscape/7.1 (ax)	10
+[11/Aug/2008:08:12:20	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322)	6
+[11/Aug/2008:08:15:10	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)	6
+[11/Aug/2008:08:16:12	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727)	10
+[11/Aug/2008:08:27:25	Mozilla/5.0 (Macintosh; U; PPC Mac OS X 10_4_11; ja-jp) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.22	5
+[11/Aug/2008:08:27:48	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	8
+[11/Aug/2008:08:37:40	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	6
+[11/Aug/2008:08:41:19	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; InfoPath.1)	3
+[11/Aug/2008:08:46:22	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	6
+[11/Aug/2008:08:46:32	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	3
+[11/Aug/2008:08:48:18	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)	1
+[11/Aug/2008:08:50:15	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	6
+[11/Aug/2008:08:51:31	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727; .NET CLR 1.1.4322)	2
+[11/Aug/2008:08:53:03	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322) Sleipnir/2.8.0	2
+[11/Aug/2008:08:56:08	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)	5
+[11/Aug/2008:08:56:57	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; InfoPath.1)	8
+[11/Aug/2008:08:58:59	Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)	4

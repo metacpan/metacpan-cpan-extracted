@@ -1,0 +1,134 @@
+NAME
+    LaBrea::Tarpit::DShield
+
+SYNOPSIS
+      use LaBrea::Tarpit::DShield qw ( .... );
+
+DESCRIPTION - LaBrea::Tarpit::DShield
+    Module provides mail support to parse and send reports to dshield.org
+
+      $rv = chk_config(\%config);
+      $rv = mail2_Q(\%config,\$message,[subject]);
+      $rv = move2_Q(\$config);
+      $rv = deliver2_DShield(\%config);
+      $rv = process_Q(\%config);
+
+    $rv = chk_config(\%config);
+        Check and adjust default configuration parameters.
+
+        Check for valid e-mail address formats and add leading ./ to DShield
+        file path if needed.
+
+          input:        \%config
+          returns:      false on success
+                        error msg on failure
+
+          Note: UserID is checked in move2_Q
+
+          my $config = {
+            'DShield'   => 'tmp/DShield.cache', # path/to/file
+            'To'        => 'test@dshield.org',  # or report@dshield.org
+            'From'      => 'john.doe@foo.com',
+            'Reply-To'  => 'john.doe@foo.com',  # optional
+          # optional
+            'Obfuscate' => 'complete or partial',
+          # optional - ignore reports about this netblock
+          #     when generating DShield reports
+            'SrcIgnore' => ['10.11.12.0/23','10.11.16.0/23'],
+          # either one or more working SMTP server's
+            'smtp'      => 'iceman.dshield.org,mail.euclidian.com',
+          # or a sendmail compatible mail transport command
+            'sendmail'  => '/usr/lib/sendmail -t -oi',
+         ############ used only by "move2_Q"
+            'UserID'    => '0',                 # DShield UserID
+          };
+
+        Called internally by all routines, it's error codes are returned by
+        them.
+
+    $rv = mail2_Q(\%config,\$message,[subject]);
+          Queue a mail message as specified by 
+          To, From, Reply-To, etc...
+
+          subject is optional
+
+          Must run 'process_Q' or 'deliver2_DShield'
+          to actually mail the message
+
+    $rv = move2_Q(\$config,$debug);
+        Prepare the DShield file for mailing and rename as a Que's file in
+        preparation for mailing.
+
+        UserID, From, To, [Reply-To], and Subject are added to the file and
+        it is renamed qF_unique_string.
+
+        No queue file is generated if the list of connections are empty.
+        This could happen when using the SrcIgnore option.
+
+          input:        \%config,$debug
+          output:       false on success or no action
+                        true = error message
+
+          NOTE:         do not use debug mode with the mail 
+                        address pointing to DShield, 
+                        point it to yourself
+
+          $debug = missing      normal operation
+          $debug = 0            normal operation
+          $debug = 1            do not delete cache file
+          $debug = 2            do not rename q-file
+
+    $rv = deliver2_DShield(\%config,$debug);
+        Alias for process_Q
+
+    $rv = process_Q(\%config,$debug);
+        Attempts to deliver messages in queue using the configured mail
+        agent. Failed attempts are left in the queue, successfull ones are
+        deleted.
+
+          input:        \%config
+          returns:      last error message
+                        or false on success
+
+          NOTE:         do not use debug mode with the mail 
+                        address pointing to the real target, 
+                        point it to yourself
+
+          $debug = missing      normal operation
+          $debug = 0            normal operation
+          $debug = 1            generate mail file suffixed
+                                with .stmp or .sendmail as
+                                appropriate instead of sending
+                                real mail
+          $debug = 2            do not delete input Q file
+
+EXPORT_OK
+                chk_config
+                deliver2_DShield
+                move2_Q
+
+COPYRIGHT
+        Copyright 2002, 2004 Michael Robinton & BizSystems This program is
+        free software; you can redistribute it and/or modify it under the
+        terms of the GNU General Public License as published by the Free
+        Software Foundation; either version 2 of the License, or (at your
+        option) any later version.
+
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+        General Public License for more details.
+
+        You should have received a copy of the GNU General Public License
+        along with this program; if not, write to the Free Software
+        Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+        02111-1307, USA.
+
+AUTHOR
+        Michael Robinton, michael@bizsystems.com
+
+SEE ALSO
+        perl(1), LaBrea::Tarpit(3), LaBrea::Codes(3),
+        LaBrea::Tarpit::Report(3), LaBrea::Tarpit::Get(3),
+        LaBrea::Tarpit::Util(3)
+

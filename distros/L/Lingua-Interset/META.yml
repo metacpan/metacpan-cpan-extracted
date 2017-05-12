@@ -1,0 +1,33 @@
+---
+abstract: 'DZ Interset is a universal morphosyntactic feature set to which all tagsets of all corpora/languages can be mapped.'
+author:
+  - 'Dan Zeman <zeman@ufal.mff.cuni.cz>'
+build_requires:
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.026, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Interset
+requires:
+  Carp: '0'
+  Exporter::Easy: '0'
+  List::MoreUtils: '0'
+  Moose: '2'
+  MooseX::SemiAffordanceAccessor: '0'
+  namespace::autoclean: '0'
+  open: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dan-zeman/interset/issues
+  homepage: http://ufal.mff.cuni.cz/interset
+  repository: https://github.com/dan-zeman/interset
+version: '3.004'

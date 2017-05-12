@@ -1,0 +1,55 @@
+
+                           Linux::Bootloader
+                                  -~-~
+
+This package provides a general mechanism for interacting with different
+bootloaders and their config files, including lilo, grub, elilo, and
+yaboot.  It detects the bootloader in use by the system, parses the
+bootloader's config file, allows in-place modification of the bootloader
+config file, and updating of the bootloader to make it take effect.
+Where possible it also includes some provisions to interact with some
+advanced bootloader functionality such as one-time boots and fallback
+default options.
+
+There are essentially four major pieces in this package.  First is
+Linux::Bootloader itself its subclasses for Grub, Lilo, et al.  These
+provide functionality for modifying the bootloader config files and
+interacting with the bootloaders.  Second is Linux::Bootloader::Detect,
+which is conceptually distinct in that it simply analyzes the system to
+see what bootloader is in use, etc.  Third is boottool, a script that
+taps both of these modules to provide a command line utility for
+modifying bootloaders in a general purpose way.  Fourth are an
+assortment of other little helper scripts for doing related things, such
+as installing kernel files, determining kernel versions, and so forth.
+
+
+
+To install this package, see INSTALL.  
+
+For using it, 'boottool' is what you want if your test harness is not
+written in Perl, or if you have no interest in programmatically
+interacting with your bootloader.  See 'man boottool' to learn how to
+use it, and have fun.
+
+If you want a more programmatic interface, see 'man Linux::Bootloader'
+for a description of the API.  'boottool' may be worth reviewing to see
+how the API is used in practice.
+
+One of the major motivations behind the design of this package was to
+make it easy to add in more bootloaders.  If your bootloader isn't
+represented, you can add it by creating a new class in
+lib/Linux/Bootloader.  If your bootloader is a lilo-derivative, there
+are plenty of helper functions you can reuse; look at how Elilo and
+Yaboot are implemented, as examples.
+
+
+
+Problems, questions, etc. may be sent to crucible-devel@lists.sf.net
+
+Linux-Bootloader is Copyright (c) 2006, by Open Source Development Labs. 
+All rights reserved. You may distribute this code under the terms 
+of either the GNU General Public License or the Artistic License, 
+as specified in the Perl README file.
+
+
+

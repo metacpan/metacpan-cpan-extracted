@@ -1,0 +1,21 @@
+#
+# Just a test of a po file with an entry with flags
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: cosimo@opera.com\n"
+"POT-Creation-Date: 2012-09-03 14:03+0100\n"
+"PO-Revision-Date: 2014-12-14 14:30+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <team@pledgebank.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: test.html:1
+#, fuzzy
+msgid "Some string"
+msgstr "Some translated string"

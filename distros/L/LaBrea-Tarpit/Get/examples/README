@@ -1,0 +1,10 @@
+
+Run examples/web_scan.pl from a cron job hourly or 
+daily to update the statistics from all know sites running
+LaBrea::Tarpit. A report can then be generated showing the activity
+worldwide. 
+
+ # MIN HOUR DAY MONTH DAYOFWEEK   COMMAND
+ 30 * * * * ./web_scan.pl ./other_sites.txt ./tmp/site_stats
+
+See: LaBrea::Tarpit::Report::other_sites

@@ -1,0 +1,77 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  cite                                                               | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+# Ignore the resorting of citations
+# "Compression" of citation lists doesn't make much sense in XML.
+# Likewise, the options aren't much help.
+
+# These macros _could_ be used in formatting the citations,
+# but that seems something better left to whoever is formatting
+# the XML at the end.
+# An alternative would be to store various styling info,
+# but I'll leave that off, for now.
+DefMacro('\citeleft',   '[');
+DefMacro('\citeright',  ']');
+DefMacro('\citedash',   '--');
+DefMacro('\citemid',    ', ');
+DefMacro('\citepunct',  ', ');
+DefMacro('\citeform{}', '#1');
+
+# Copy of natbib's \citet
+DefMacro('\citen OptionalMatch:* [][] Semiverbatim', sub {
+    my ($gullet, $star, $pre, $post, $keys) = @_;
+    my ($style, $open, $close, $ns)
+      = map { LookupValue($_) } qw(CITE_STYLE CITE_OPEN CITE_CLOSE CITE_NOTE_SEPARATOR);
+    if (!$post) { ($pre, $post) = (undef, $pre); }
+    $pre  = undef unless $pre  && $pre->unlist;
+    $post = undef unless $post && $post->unlist;
+    my $author = ($star ? "FullAuthors" : "Authors");
+    if ($style eq 'numbers') {
+      Invocation(T_CS('\@@cite'),
+        Tokens(Explode('citet')),
+        Tokens(    #($pre ? ($pre, T_SPACE) : ()),
+          Invocation(T_CS('\@@bibref'),
+            Tokens(Explode("$author Phrase1NumberPhrase2")),
+            $keys,
+            Invocation(T_CS('\@@citephrase'),
+              Tokens($open, ($pre ? ($pre, T_SPACE) : ()))),
+            Invocation(T_CS('\@@citephrase'),
+              Tokens(($post ? ($ns->unlist, T_SPACE, $post->unlist) : ()), $close->unlist))
+            )))->unlist; }
+    elsif ($style eq 'super') {
+      Invocation(T_CS('\@@cite'),
+        Tokens(Explode('citet')),
+        Tokens(($pre ? ($pre, T_SPACE) : ()),
+          Invocation(T_CS('\@@bibref'),
+            Tokens(Explode("$author Phrase1SuperPhrase2")),
+            $keys, undef, undef)->unlist,
+          ($post ? ($ns, T_SPACE, $post->unlist) : ()))); }
+    else {
+      Invocation(T_CS('\@@cite'),
+        Tokens(Explode('citet')),
+        Invocation(T_CS('\@@bibref'),
+          Tokens(Explode("$author Phrase1YearPhrase2")),
+          $keys,
+          Invocation(T_CS('\@@citephrase'),
+            Tokens($open, ($pre ? ($pre, T_SPACE) : ()))),
+          Invocation(T_CS('\@@citephrase'),
+            Tokens(($post ? ($ns, T_SPACE, $post) : ()), $close)))); }
+});
+
+Let('\citenum',    '\citen');
+Let('\citeonline', '\citen');
+1;

@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Log-Dispatch-XML
+version:      0.01
+version_from: lib/Log/Dispatch/XML.pm
+installdirs:  site
+requires:
+    Log::Dispatch:                 1.16
+    Log::Dispatch::Buffer:         0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

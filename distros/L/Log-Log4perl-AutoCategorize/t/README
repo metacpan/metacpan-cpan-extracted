@@ -1,0 +1,40 @@
+TESTS HERE
+
+
+All tests here send Logger output to logfiles, then slurp them in, and
+test the contents with a bunch of regular expressions.
+
+Most tests here run a separate script, using a system call, ex:
+`perl dflt_stdout.pl > out.basic.stdout 2> out.basic.stderr`
+
+The logfiles all have names like out.$testnum_*, out.$scriptname*,
+and/or out.*.cover, as given in the *.t files and in the various
+log-config sources (files, strings, or default config).
+
+
+01_use.t	use it, verifies no syntax errs
+02_basic.t	`perl dflt_stdout.pl > out.basic.stdout 2> out.basic.stderr`
+		which uses AutoCategorize's default config, and an alias.
+		it does calls to aliased Logger, directly from main, 
+		from subroutines in main, and from package Foo also in sourcefile
+
+03_options.t	runs dflt_stdout.pl, with cmd-line args to turn on basic debug
+04_subclass.t	uses a wrapper, myLogger.pm
+
+05_initstr.t	perl -w tinitstr.pl 2> out.initstr.stderr
+		tests override of default config by use-time option
+
+06_conf_file.t	`perl -w tconf_file.pl 2> out.conf_file.stderr
+		tests override of default config by use-time option
+
+07_coexist.t	uses both Log::Log4perl::get_logger and myLogger (wrapper from 04)
+
+08_options_more.t	test a bunch more debug options
+09_coexist_easy.t	
+
+10_multi_pack.t		
+	test usage by a bunch of modules, each in different classes.
+	they use different aliases, and different debug options.
+
+99_cleanup.t	deletes all out.* files.
+		If you want to inspect them, run the tests individually.

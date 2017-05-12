@@ -1,0 +1,22 @@
+
+this dir contains various versions of functional and performance
+tests.  Functional tests hould eventually be moved to ../t
+
+
+t1.pl - uses Log::Log4perl::Autocategorize, with optimization suppressed
+t2.pl - same as above, turns on optimization
+t0.pl - traditional use of Log::Log4perl, 1 for 1 comparable to above
+
+timeit.sh	- shell script which calls and times t[123].pl
+mylog.t*	- logfiles written by t[123].pl, per their embedded config
+warnings	- side effect of t2.pl
+test-coverage.t* trimmed.* junk.* - output from timeit.sh
+
+t3.pl - cmd-line options for logger debug (compiletime usage)
+tdebug.pl - cmd-line options for logger debug (runtime usage)
+
+tshort.pl - quick run of above (shorter loops)
+perftest.pl - Benchmark based version of timeit.sh
+
+
+

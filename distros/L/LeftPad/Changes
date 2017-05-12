@@ -1,0 +1,21 @@
+Revision history for LeftPad
+
+0.003     2016-04-24 06:35:02-04:00 America/New_York
+
+    [PREREQS]
+
+    - Removes dependency on Carp
+
+0.002     2016-04-24 06:25:36-04:00 America/New_York
+
+    [FIXES]
+
+    - Only uses single pad character if given a pad string.  Empty pad
+      string will pad with space.
+
+    - Returns input unmodified if length is zero or negative.
+
+0.001     2016-04-23 22:23:17-04:00 America/New_York
+
+    - First release
+

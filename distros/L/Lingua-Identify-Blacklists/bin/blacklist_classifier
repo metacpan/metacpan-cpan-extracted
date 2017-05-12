@@ -1,0 +1,186 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+
+
+=encoding UTF-8
+
+=head1 USAGE
+
+=head2 Classification:
+
+   blacklist_classifier [OPTIONS] lang1 lang2 ... < file
+
+=head2 training:
+
+   blacklist_classifier -n [OPTIONS] text1 text2 > blacklist.txt
+   blacklist_classifier [OPTIONS] -t "t1.txt t2.txt ..." lang1 lang2 ...
+
+=head2 run experiments:
+
+   blacklist_classifier -t "t1.txt t2.txt ..." \
+                           -e "e1.txt e2.txt ..." \
+                           lang1 lang2 ...
+
+=head2 command line arguments:
+
+ lang1 lang2 ... are language ID's
+ blacklists are expected in <BlackListDir>/<lang1-lang2.txt
+ t1.txt t2.txt ... are training data files (in UTF-8)
+ e1.txt e2.txt ... are training data files (in UTF-8)
+ the order of languages needs to be the same for training data, eval data
+   as given by the command line arguments (lang1 lang2 ..)
+
+
+ -a <freq> ...... min freq for common words
+ -b <freq> ...... max freq for uncommon words
+ -c <score> ..... min difference score to be relevant
+ -d <dir> ....... directory of black lists
+ -i ............. classify each line separately
+ -m <number> .... use approximately <number> tokens to train/classify
+ -n ............. train a new black list
+ -v ............. verbose mode
+
+ -U ............. don't lowercase
+ -S ............. don't tokenize (use the string as it is)
+ -A ............. don't discard tokens with non-alphabetic characters
+
+=cut
+
+use strict;
+use vars qw($opt_a $opt_b $opt_c $opt_m $opt_n $opt_d $opt_v $opt_i
+            $opt_t $opt_e $opt_F $opt_T $opt_L $opt_U $opt_S $opt_A $opt_M);
+use Getopt::Std;
+use FindBin qw($Bin);
+
+use lib "$Bin/../lib";
+use Lingua::Identify::Blacklists qw/:all/;
+
+
+getopts('a:b:c:d:im:nvt:e:F:T:L:USAM:');
+
+binmode(STDIN,":encoding(UTF-8)");
+binmode(STDOUT,":encoding(UTF-8)");
+binmode(STDERR,":encoding(UTF-8)");
+
+my $min_high = defined $opt_a ? $opt_a : 10;
+my $max_low  = defined $opt_b ? $opt_b : 3;
+my $min_diff = defined $opt_c ? $opt_c : 0.8;
+
+
+$Lingua::Identify::Blacklists::VERBOSE      = 1 if ($opt_v);
+$Lingua::Identify::Blacklists::BLACKLISTDIR = $opt_d if ($opt_d);
+
+unless (-d $Lingua::Identify::Blacklists::BLACKLISTDIR){
+    $Lingua::Identify::Blacklists::BLACKLISTDIR = "$Bin/../share/blacklists";
+}
+
+my %options = ( text_size => $opt_m,
+		min_high => $min_high, 
+		max_low  => $max_low, 
+		min_diff => $min_diff );
+
+
+if ($opt_v){
+    print "use blacklists in $Lingua::Identify::Blacklists::BLACKLISTDIR\n";
+}
+
+# run experiments with a given set of training corpora and 
+# a set of evaluation corpora
+
+if ($opt_e){
+    my @langs = @ARGV;
+    # run an experiment with exponentially increasing training sizes
+    # from $opt_F to $opt_T
+    if ($opt_F && $opt_T && $opt_L){
+        $options{text_size} = $opt_F;
+        while ($options{text_size} < $opt_T){
+            print "train with ca $opt_m tokens\n";
+            &run_experiment($opt_t,$opt_e,\%options,@langs);
+            $options{text_size} *= $opt_L;
+        }
+    }
+    &run_experiment($opt_t,$opt_e,\%options,@langs);
+    exit;
+}
+
+
+# train new black lists
+
+if ($opt_t){
+    my @traindata = split(/\s+/,$opt_t);
+    my @langs = @ARGV;
+    my %trainset = ();
+    for (0..$#langs){ $trainset{$langs[$_]} = $traindata[$_]; }
+    &train( \%trainset, %options );
+}
+elsif ($opt_n){
+    my $file1=shift(@ARGV);
+    my $file2=shift(@ARGV);
+    &train_blacklist( $file1,$file2, %options );
+}
+
+
+# classify
+
+else{
+    my @langs = @ARGV;
+    @ARGV = ();
+    my @predictions = &identify_stdin( langs => \@langs, 
+				       every_line => $opt_i,
+				       %options );
+    print join("\n",@predictions);
+    print "\n";
+}
+
+
+
+
+=head1 AUTHOR
+
+Jörg Tiedemann, L<https://bitbucket.org/tiedemann>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+L<https://bitbucket.org/tiedemann/blacklist-classifier>.  I will be notified,
+and then you'll automatically be notified of progress on your bug as I
+make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Lingua::Identify::Blacklists
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Jörg Tiedemann.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut
+

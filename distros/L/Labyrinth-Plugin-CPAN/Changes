@@ -1,0 +1,33 @@
+Changes for Labyrinth-Plugin-CPAN
+=================================
+
+3.56    2016-04-22
+        - now requires Test-CPAN-Meta-0.19.
+        - added missing prerequisites.
+
+3.55    2015-10-26
+        - added Content file with GetSponsor functionality.
+
+3.54    2015-08-27
+        - added distribution index lookups.
+
+3.53    2014-12-07
+        - skip tests if unable to load a MySQL database.
+
+3.52    2014-11-25
+        - Labyrinth::Test::Harness & Test::Database now prerequisites.
+
+3.51    2014-11-14
+        - fixed license fields in META.json to be lists.
+        - FindTester now properly called as a method.
+        - better argument validation in DBX, GetTesterProfile and OSName.
+        - fixed Rename for pause user names.
+        - extended functional test suite.
+        - specifically store autocomit connections.
+        - better file checks in Configure.
+        - upgraded to Labyrinth-5.27.
+        - upgraded to Labyrinth-Plugin-Core-5.18.
+
+3.50	2014-07-06
+        - abstracted out from CPAN-Testers-WWW-Reports, and
+          CPAN-Testers-WWW-Preferences.

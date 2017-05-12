@@ -1,0 +1,32 @@
+Revision history for Log::Log4perl::Layout::PatternLayout::Elapsed.
+
+0.07 Mon Jul 27 09:20:43 CEST 2015
+	- Fix warnings in unit tests
+
+
+0.06 Sun Apr 11 09:20:21 CEST 2010
+	- Fix the version numbering.
+	- Now using Module::Build.
+
+
+0.05 Sun Mar 28 10:31:02 CEST 2010
+	- Don't clash if Log4perl 1.25 or greater is already installed.
+
+
+0.04  Sun Oct 11 00:19:44 CEST 2009
+	- Update the README and the main documentation
+
+
+0.03  Sat Oct 10 22:52:05 CEST 2009
+	- Module retirement (Log::Log4perl 1.25 includes this feature)
+	- Unit tests no longer perform real sleeps.
+
+
+0.02  Thu Feb  7 21:11:52 2008
+	- Using Module::Install instead of ExtUtils::MakeMake
+	- Added more unit tests
+
+
+0.01  Sat Feb  2 08:43:45 2008
+	- original version; created by h2xs 1.23 with options
+	  -b 5.5.3 -AXc -n Log::Log4perl::Layout::PatternLayout::Elapsed

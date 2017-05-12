@@ -1,0 +1,31 @@
+Revision history for Lingua-Han-Cantonese
+
+0.12  2017-04-27
+    - update unihan database
+
+0.11  2015-11-30
+    - remove MYMETA
+
+0.10  2015-10-10
+    - update unihan database
+
+0.09  2015-05-22
+    - update unihan database
+
+0.08	2013-10-11
+	- update db to '26-Feb-2013 15:49'
+
+0.07    2010-06-07
+	- update to lastest Unihan database
+
+0.06    2008-04-11
+	- require Lingua::Han::Utils 0.10
+
+0.05    2008-04-08
+	- use the recent Unicode.txt
+
+0.04    2006-09-10
+	- Update to Unicode 5.0
+
+0.01    2005-10-17
+	- First version, released on an unsuspecting world.

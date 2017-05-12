@@ -1,0 +1,26 @@
+---
+abstract: 'Importer + Lexical subs/vars.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::Suite: '0.000050'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lexical-Importer
+requires:
+  Importer: '0.013'
+  Lexical::SealRequireHints: '0.006'
+  XSLoader: '0'
+  parent: '0'
+  perl: '5.012000'
+resources:
+  bugtracker: https://github.com/exodist/Lexical-Importer/issues
+  repository: https://github.com/exodist/Lexical-Importer
+version: '0.000005'
+x_serialization_backend: 'YAML::Tiny version 1.69'

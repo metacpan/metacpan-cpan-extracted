@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+use File::Temp qw/tempdir/;
+
+my $dir = shift; # for example: perlufs
+my $td = tempdir;
+my $url = "ssh://datamoeras.org/$dir";
+print "-fstype=lufs,fs=perlfs,quiet,host=Lufs.Svn,uri=$url,root=$td none\n";

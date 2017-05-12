@@ -1,0 +1,69 @@
+Revision history for Perl extension Lingua::Translate::Google.
+
+0.22  Sat Feb  04 14:55:19 2012
+    - bug fix in parameter handling
+
+0.21  Tue Jan  31 19:25:35 2012
+    - fix for "api_key" as a HASH ref bug
+
+0.20  Sat Nov  26 08:32:41 2011
+    - Now based on WWW::Google::Translate
+
+0.15  Fri Aug  12 20:56:31 2011
+    - Fixed to adapt to changes on google.com.
+
+0.14  Sat Jul  01 10:37:11 2011
+    - Updated dependency list: Readonly ver 1.03
+
+0.13  Thu Jun  23 18:24:17 2011
+    - Revised t/04-live_translate.t
+
+0.12  Wed Feb  09 18:27:26 2011
+    - Added a list context return for the translate method.
+
+0.11  Tue May  25 21:02:58 2010
+    - Adopted some corrections offered by Andrew Nugged
+
+0.10  Tue Nov  24 20:59:37 2009
+    - Adapted to changes with Google translate service
+
+0.09  Sun Aug  16 16:08:39 2009
+    - Fixed bug with selecting src 'auto' in the constructor
+    - Fixed a bug with setting options via ->config vs. constructor and ->translate
+    - Option to save or not save the auto detected src lang
+
+0.08  Mon July 10 00:55:44 2009
+    - Again updated dependency list
+
+0.07  Sun July 09 09:50:12 2009
+    - Updated dependency list
+
+0.06  Sun July 19 19:47:28 2009
+    - Fix bug 46057: no accepts src language tag 'auto'
+    - src option for constructor is optional
+    - config function recognizes src and dest options
+
+0.05  Fri Mar 06 23:37:00 2009
+    - Dropped use of Pod::Constants in favor of Readonly due
+      to taint errors when perl with -T.
+    - Dropped use of fallback translation service. It's either
+      googleapis.com or nothing.
+    - Updates to POD.
+    - Eliminated the redefine warning in the test.
+
+0.04  Sat Dec 13 11:38:00 2008
+    - Ensures there is an acceptable referer and warns when
+      faking Google out with it's own URL as the referer. This
+      change fixes the 403 Forbidden errors being returned for the
+      fallback service when no API key is supplied.
+    - Fixed broken available method and added ability to use
+      available to check for availability of a given lang tag.
+
+0.03  Sun Nov 22 12:00:00 2008
+    - Cleaned up the POD
+
+0.02  Wed Nov 20 20:00:00 2008
+    - Repaired malformed archive for re-upload.
+
+0.01  Sun Nov 16 09:58:53 2008
+    - Initial release to CPAN.

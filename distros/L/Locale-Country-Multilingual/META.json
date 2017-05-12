@@ -1,0 +1,70 @@
+{
+   "abstract" : "Map ISO codes to localized country names",
+   "author" : [
+      "Bernhard Graf <graf@cpan.org>",
+      "Fayland Lam <fayland@gmail.com>",
+      "Greg Oschwald <oschwald@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Locale-Country-Multilingual",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Data::Inheritable" : "0",
+            "File::Spec" : "0",
+            "Symbol" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/maxmind/Locale-Country-Multilingual/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Locale::Country::Multilingual",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/maxmind/Locale-Country-Multilingual.git",
+         "web" : "https://github.com/maxmind/Locale-Country-Multilingual"
+      }
+   },
+   "version" : "0.25",
+   "x_contributors" : [
+      "Gregory Oschwald <oschwald@gmail.com>",
+      "Olaf Alders <olaf@wundersolutions.com>"
+   ]
+}
+

@@ -1,0 +1,5 @@
+# Etiquettes morpho-syntaxiques autorisees
+!!CANDIDATES = ((ADJ)|(NOM)|(NAM)|(ABR)|(NUM)|(ABR)|(VER:pper)|(VER:ppre))!!
+!!DETERMINERS = ((DET:ART)|(DET:POS)|(PRO:DEM))!!
+!!PREPOSITIONS = ((des)|(du)|(de)|(à)|(d')|(aux)|(au)|(ayant)|(ayant eu))!!
+!!COORDINATIONS = ((KON))!!

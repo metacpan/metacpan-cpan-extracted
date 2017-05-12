@@ -1,0 +1,26 @@
+TYPEMAP
+LogSyslogFast *     FASTSYSLOGGER_REF
+char *              STRINGMAYBEUNDEF
+
+OUTPUT
+FASTSYSLOGGER_REF
+                    sv_setref_pv( $arg, "Log::Syslog::Fast", (void*)$var );
+STRINGMAYBEUNDEF
+                    if ($var)
+                        $arg = newSVpv($var, 0);
+                    else
+                        warn(\"${Package}::$func_name() -- UNABLE TO RETURN CHAR *\");
+
+INPUT
+FASTSYSLOGGER_REF
+                    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+                        $var = ($type)SvIV((SV*)SvRV($arg));
+                    else {
+                        warn(\"${Package}::$func_name() -- $var is not a blessed SV reference\");
+                        XSRETURN_UNDEF;
+                    }
+STRINGMAYBEUNDEF
+                    if ($arg == &PL_sv_undef)
+                        $var = NULL;
+                    else
+                        $var = (char *)SvPV_nolen($arg);

@@ -1,0 +1,61 @@
+{
+   "abstract" : "handle all aspects of the localization process",
+   "author" : [
+      "Sullivan Beck <sbeck@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Locale-VersionedMessages",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.21"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.21"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Path" : "0",
+            "IO::File" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Inter" : "1.04",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Locale::VersionedMessages" : {
+         "file" : "lib/Locale/VersionedMessages.pm",
+         "version" : "0.95"
+      },
+      "Locale::VersionedMessages::Sets::lm_gui" : {
+         "file" : "lib/Locale/VersionedMessages/Sets/lm_gui.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/SBECK-github/Locale-VersionedMessages"
+      }
+   },
+   "version" : "0.95"
+}

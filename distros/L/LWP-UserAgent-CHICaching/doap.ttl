@@ -1,0 +1,166 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006000"^^doap-deps:CpanId ], [ doap-deps:on "CHI"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Types::URI"^^doap-deps:CpanId ], [ doap-deps:on "LWP::UserAgent"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [
+		doap-deps:on "LWP::Protocol::PSGI"^^doap-deps:CpanId;
+	], [ doap-deps:on "Plack::Request"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/kjetilk/p5-lwp-useragent-chicaching/issues>;
+	doap:category        <http://dbpedia.org/resource/Category:Web_development>;
+	doap:created         "2014-09-03"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:download-page   <https://metacpan.org/release/LWP-UserAgent-CHICaching>;
+	doap:homepage        <https://metacpan.org/release/LWP-UserAgent-CHICaching>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:name            "LWP-UserAgent-CHICaching";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-001>, <http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-002>, <http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-01>, <http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-02>, <http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-03>, <http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-04>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/p5-lwp-useragent-chicaching>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-lwp-useragent-chicaching&serialization=PROV-O#>;
+	];
+	doap:shortdesc       "LWP::UserAgent with caching based on CHI".
+
+<http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "LWP-UserAgent-CHICaching-0.001"^^xsd:string;
+	dc:issued            "2015-02-17"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/LWP-UserAgent-CHICaching-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "Create a Role";
+	dc:identifier        "LWP-UserAgent-CHICaching-0.002"^^xsd:string;
+	dc:issued            "2015-02-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Refactor the code into a Role.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/mstrout>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-001>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/LWP-UserAgent-CHICaching-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-01>
+	a                    doap:Version;
+	rdfs:label           "Improve support for RFC7234";
+	dc:identifier        "LWP-UserAgent-CHICaching-0.01"^^xsd:string;
+	dc:issued            "2015-06-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support large parts of RFC7234.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add Perl version dep for better kwalitee.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Improve distro metadata.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-002>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/LWP-UserAgent-CHICaching-0.01.tar.gz>;
+	doap:revision        "0.01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-02>
+	a                    doap:Version;
+	rdfs:label           "Improve the support for Vary header";
+	dc:identifier        "LWP-UserAgent-CHICaching-0.02"^^xsd:string;
+	dc:issued            "2015-06-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Improve documentation.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "More tests.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Refactor key and logic for Vary headers in roles on their own.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Add Moo version dep for coerce to work.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "New role for simplest keys and Vary treatment.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "New role for when Vary is *.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-01>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/LWP-UserAgent-CHICaching-0.02.tar.gz>;
+	doap:revision        "0.02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-03>
+	a                    doap:Version;
+	rdfs:label           "Fix testing on old Perls";
+	dc:identifier        "LWP-UserAgent-CHICaching-0.03"^^xsd:string;
+	dc:issued            "2015-06-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Skip some tests on old Perl versions, that doesn't support test syntax.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-02>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/LWP-UserAgent-CHICaching-0.03.tar.gz>;
+	doap:revision        "0.03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-04>
+	a                    doap:Version;
+	rdfs:label           "Support manipulated the cached response";
+	dc:identifier        "LWP-UserAgent-CHICaching-0.04"^^xsd:string;
+	dc:issued            "2016-03-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Role to control cache insertion and retrieval";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Make the test test for 2 or 3 second age";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/LWP-UserAgent-CHICaching/v_0-03>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/LWP-UserAgent-CHICaching-0.04.tar.gz>;
+	doap:revision        "0.04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/kjetilk>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2Fp5-lwp-useragent-chicaching&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>.
+
+<http://purl.org/NET/cpan-uri/person/mstrout>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:mst@shadowcat.co.uk>;
+	foaf:name            "Matt S Trout";
+	foaf:nick            "MSTROUT", "mst";
+	foaf:page            <https://metacpan.org/author/MSTROUT>.
+

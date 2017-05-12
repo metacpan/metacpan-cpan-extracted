@@ -1,0 +1,23 @@
+[% IF data.saved %]
+<h3>Responses</h3>
+<table>
+<tr><th>Status</th><th>Name</th><th>Email</th><th>Link</th></tr>
+[% FOREACH item = data.saved %]
+<tr><td>[% item.status %]</td><td>[% item.name %]</td><td>[% item.email %]</td><td>[% item.link %]</td></tr>
+[% END %]
+</table>
+[% ELSE %]
+<p>No users retrieved</p>
+[% END %]
+
+<h3>Summary</h3>
+<table>
+<tr><th>Retrieved </th><td>[% counts.all        || 0 %]</td></tr>
+<tr><th>Enabled   </th><td>[% counts.enabled    || 0 %]</td></tr>
+<tr><th>Found     </th><td>[% counts.found      || 0 %]</td></tr>
+<tr><th>Registered</th><td>[% counts.registered || 0 %]</td></tr>
+<tr><th>Confirmed </th><td>[% counts.confirmed  || 0 %]</td></tr>
+<tr><th>Saved     </th><td>[% counts.saved      || 0 %]</td></tr>
+<tr><th>Users     </th><td>[% counts.users      || 0 %]</td></tr>
+</table>
+

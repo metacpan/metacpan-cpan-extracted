@@ -1,0 +1,69 @@
+{
+    "name": "Labyrinth-Plugin-Articles-Newsletters",
+    "version": "1.00",
+    "abstract": "Newsletters plugin for the Labyrinth framework",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "web",
+        "cgi",
+        "framework"
+    ],
+
+    "prereqs" : {
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Labyrinth::Test::Harness": "1.05",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+              "perl": "5.006",
+              "Encode": "2.49",
+              "Encode::MIME::Header": "2.13",
+              "Labyrinth": "5.28",
+              "Labyrinth::Plugin::Core": "5.18",
+              "Session::Token": "1.008"
+            }
+        }
+    },
+
+    "provides": {
+        "Labyrinth::Plugin::Articles::Newsletters": {
+            "file": "lib/Labyrinth/Plugin/Articles/Newsletters.pm",
+            "version": "1.00"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples","vhost"]
+    },
+
+    "resources": {
+        "homepage": "http://labyrinth.missbarbell.co.uk",
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Labyrinth-Plugin-Articles-Newsletters" },
+        "repository": {
+            "url": "git://github.com/barbie/labyrinth-plugin-articles-newsletters.git",
+            "web": "http://github.com/barbie/labyrinth-plugin-articles-newsletters",
+            "type": "git"
+        }
+    }
+}

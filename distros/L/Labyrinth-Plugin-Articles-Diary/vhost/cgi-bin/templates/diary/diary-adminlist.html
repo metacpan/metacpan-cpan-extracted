@@ -1,0 +1,47 @@
+[% 
+    title = 'List Diary' ;
+    htmltitle = title ;
+
+    crumb1_name = 'Diary' ;
+%]
+
+<div class="boxer">
+<div class="blocker">
+<p> <a href="[% cgipath %]/pages.cgi?act=diary-add">add a diary entry</a>
+    [% IF page.comments %]
+    |   <a href="[% cgipath %]/pages.cgi?act=diary-clist">comment approval ([% page.comments %])</a>
+    [% END %]
+</p>
+</div>
+</div>
+
+<form name="datalist" method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name='act' value='diary-admin' />
+
+<div class="boxer">
+<table class="blocker">
+    <tr><th>Title</th>
+        <th>Comments</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Select</th>
+    </tr>
+
+[% IF data %]
+[% FOREACH item = data %]
+    <tr><td><a href="[% cgipath %]/pages.cgi?act=diary-edit&amp;articleid=[% item.articleid %]">[% item.title %]</a></td>
+        <td>[% item.comments %][% IF item.latest %] DISABLED[% END %]</td>
+        <td>[% item.postdate %]</td>
+        <td>[% item.publishstate %]</td>
+        <td><input type="checkbox" name="LISTED" value="[% item.articleid %]" /></td>
+    </tr>
+[% END %]
+[% ELSE %]
+<tr><td colspan="3" align="center">No diary listed.</td></tr>
+[% END %]
+</table>
+</div>
+
+<p>
+<input type="submit" name='doaction' value='Delete' /></p>
+</form>

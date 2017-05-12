@@ -1,0 +1,24 @@
+---
+abstract: "map ABC's to the LAPD phonetic letter names"
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-Alphabet-Phonetic-LAPD
+requires:
+  Lingua::Alphabet::Phonetic: 0
+  base: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/plicease/Lingua-Alphabet-Phonetic-LAPD/issues
+  homepage: http://search.cpan.org/dist/Lingua-Alphabet-Phonetic-LAPD/
+  repository: git://github.com/plicease/Lingua-Alphabet-Phonetic-LAPD.git
+version: 0.02

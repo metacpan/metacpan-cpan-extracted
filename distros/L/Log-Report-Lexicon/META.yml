@@ -1,0 +1,34 @@
+---
+abstract: 'Log::Report translation table management'
+author:
+  - 'Mark Overmeer'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Report-Lexicon
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: 0
+  Fcntl: 0
+  File::Basename: 0
+  File::Find: 0
+  File::Spec: 0
+  File::Temp: 0
+  IO::File: 0
+  List::Util: 0
+  Log::Report: 1.10
+  POSIX: 0
+  Pod::Usage: 0
+  Scalar::Util: 0
+  Test::More: 0.86
+version: 1.06

@@ -1,0 +1,12 @@
+README
+src_c/stem_UTF_8_lithuanian.c
+src_c/stem_UTF_8_lithuanian.h
+runtime/api.c
+runtime/api.h
+runtime/header.h
+runtime/utilities.c
+libstemmer/libstemmer.c
+libstemmer/libstemmer_utf8.c
+libstemmer/modules.h
+libstemmer/modules_utf8.h
+include/libstemmer.h

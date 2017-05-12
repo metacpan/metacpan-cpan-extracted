@@ -1,0 +1,19 @@
+Changes for Log::Any::Adapter::Journal
+
+0.13 - Tue May  3 10:51:38 EDT 2016
+    Minor fixes to the description in the documentation
+    - Thanks to @jonassmedegaard for the bug report [GH#1]
+    [Minor changes to POD. No need to upgrade.]
+
+0.12 - Sat Apr 30 10:08:13 EDT 2016
+    Adds version requirements for prereqs
+    - Log::Any before 1.00 is failing tests
+    Adds travis-ci config
+    [No need to upgrade unless having installation issues.]
+
+0.11 - Wed Apr 27 11:27:53 EDT 2016
+    Improves documentation
+    [Only changes to POD.]
+
+0.10 - Tue Apr 26 18:41:15 EDT 2016
+    Initial release

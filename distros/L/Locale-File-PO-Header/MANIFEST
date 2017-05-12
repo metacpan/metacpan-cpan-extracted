@@ -1,0 +1,25 @@
+Build.PL
+Changes
+example/11_build_header.pl
+example/12_get_header.pl
+lib/Locale/File/PO/Header.pm
+lib/Locale/File/PO/Header/Base.pm
+lib/Locale/File/PO/Header/ContentTypeItem.pm
+lib/Locale/File/PO/Header/ExtendedItem.pm
+lib/Locale/File/PO/Header/Item.pm
+lib/Locale/File/PO/Header/MailItem.pm
+MANIFEST			This list of files
+META.json
+README
+t/01_use.t
+t/02_exceptions.t
+t/11_build_header.t
+t/12_get_header.t
+t/21_test_examples.t
+t/chars.t
+t/perl_critic.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_build.t
+Makefile.PL
+META.yml

@@ -1,0 +1,20 @@
+Changes
+lib/List/Util/Superpositions.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/10-first.t
+t/10-max.t
+t/10-maxstr.t
+t/10-min.t
+t/10-minstr.t
+t/10-reduce.t
+t/10-shuffle.t
+t/10-sum.t
+t/20-all.t
+t/20-any.t
+t/30-combo.t
+t/pod-coverage.t
+t/pod.t

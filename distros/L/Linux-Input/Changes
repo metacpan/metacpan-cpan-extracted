@@ -1,0 +1,6 @@
+1.03
+  - EV_SYN events were being completely ignored, so I fixed that.
+
+1.02
+  - tried to make the event structure definition portable between 
+    32-bit and 64-bit machines.

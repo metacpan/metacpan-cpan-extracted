@@ -1,0 +1,51 @@
+LaTeX-Decode
+
+The module LaTeX::Decode does (obviously) the opposite of LaTeX::Encode: 
+It converts LaTeX input to Unicode :)
+It also comes with a companion utility script, latex2utf8.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+DEPENDENCIES
+
+  Unicode::Normalize (in core perl) 
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc LaTeX::Decode
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=LaTeX-Decode
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/LaTeX-Decode
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/LaTeX-Decode
+
+    Search CPAN
+        http://search.cpan.org/dist/LaTeX-Decode/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 François Charette
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

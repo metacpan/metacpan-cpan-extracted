@@ -1,0 +1,98 @@
+#!/usr/bin/perl -w -s
+
+use Lingua::NATools::Dict;
+use File::Copy;
+
+our ($h);
+
+usage() if $h;
+usage("Not enough arguments!") if @ARGV < 1;
+
+my $command = shift;
+
+if ($command eq "add") {
+  usage("Wrong syntax for command 'add'") if @ARGV != 2;
+  my $dic1 = shift;
+  my $dic2 = shift;
+
+  if (-f $dic1 && -f $dic2) {
+    my $dict1 = Lingua::NATools::Dict::open($dic1);
+    my $dict2 = Lingua::NATools::Dict::open($dic2);
+    my $dict3 = $dict1->add($dict2);
+    $dict1->close();
+    $dict2->close();
+    $dict3->save($dic1);
+    $dict3->close();
+  } else {
+    if (-f $dic2) {
+      copy($dic2, $dic1);
+    } else {
+      die "File '$dic2' not found\n";
+    }
+  }
+} else {
+  usage("Unknown command '$command'");
+}
+
+
+sub usage {
+  my $message = shift || undef;
+  print "$message\n\n" if $message;
+  print <<"EOT";
+nat-dict: interface for binary PTDs operations.
+
+	nat-dict add <dic1.bin> <dic2.bin>
+
+For more help, please run 'perldoc nat-dict'
+EOT
+  exit;
+}
+
+sub error {
+  my $message = shift;
+  print "$message\n";
+  exit;
+}
+
+
+1;
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-dict - interface for binary PTDs operations.
+
+=head1 SYNOPSIS
+
+	nat-dict add <dic1.bin> <dic2.bin>
+
+=head1 DESCRIPTION
+
+This tool is indented to be an interfce for binary PTDs algebra. At
+the moment is just supports the following commands:
+
+=over 4
+
+=item C<add>
+
+Used to add two binary PTDs. In fact, it accumulates the second
+dictionary in the first one, so be careful using if in case you want
+to preserve the original dictionaries.
+
+=back
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2012 by Alberto Manuel Brandão Simões
+
+=cut

@@ -1,0 +1,48 @@
+--- #YAML:1.0
+name:           Course / Talk Presentation Assessment
+version:        0.01
+abstract:       Presentation Assessment Form
+
+sections:
+  - label: Ratings
+    preamble: Please rate the following, where 1 rates low and 10 rates high.
+    questions:
+      - label:
+        collate: yes
+        type: matrix
+        options:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+          - 8
+          - 9
+          - 10
+        choices:
+          - Your prior knowledge of subject?
+          - Speaker's knowledge of subject?
+          - Speaker's presentation of subject?
+          - Quality of presentation materials?
+          - Overall presentation rating?
+
+  - label: Feedback
+    questions:
+      - label: What aspects of the tutorial or presentation worked really well?
+        type: textarea
+        collate: yes
+      - label: How could the tutorial or presentation be improved?
+        type: textarea
+        collate: yes
+  - label: Anonymous or Named Submission
+    questions:
+      - label: Do you wish to be identified?
+        tag: 1
+        preamble: By default your responses are recorded anonymously. However, some speakers have asked whether they can contact respondees. If you are happy to be identified to the speaker, please check the box below.
+        type: checkbox
+        collate: yes
+        options:
+          - key:    I consent to being identified to the presenter
+            value:  1

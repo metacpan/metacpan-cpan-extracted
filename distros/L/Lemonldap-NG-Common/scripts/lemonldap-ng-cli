@@ -1,0 +1,135 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use POSIX;
+
+my $action;
+
+eval {
+    POSIX::setgid( scalar( getgrnam('__APACHEGROUP__') ) );
+    POSIX::setuid( scalar( getpwnam('__APACHEUSER__') ) );
+};
+
+for ( my $i = 0 ; $i < @ARGV ; $i++ ) {
+    if ( $ARGV[$i] =~ /^-/ ) {
+        $i++;
+        next;
+    }
+    $action = $ARGV[$i];
+    last;
+}
+
+$action ||= "help";
+
+if ( $action =~ /^(?:[gs]et|(?:add|del)Key)$/ ) {
+    eval { require Lemonldap::NG::Manager::Cli; };
+    die 'Manager libraries not available, aborting' if ($@);
+    Lemonldap::NG::Manager::Cli->run(@ARGV);
+}
+elsif ( $action =~ /^(?:info|update-cache)$/ ) {
+    eval { require Lemonldap::NG::Common::Cli; };
+    die "Lemonldap::NG common libraries not available, aborting ($@)" if ($@);
+    Lemonldap::NG::Common::Cli->run(@ARGV);
+}
+else {
+    help();
+}
+
+sub help {
+    print STDERR qq{Usage: $0 <options> action <parameters>
+
+Available actions:
+ - help                          : print this
+ - info                          : get currentconfiguration info
+ - update-cache                  : force configuration cache to be updated
+ - get    <keys>                 : get values of parameters
+ - set    <key> <value>          : set parameter(s) value(s)
+ - addKey <key> <subkey> <value> : add or set a subkey in a parameter
+ - delKey <key> <subkey>         : delete subkey of a parameter
+
+See Lemonldap::NG::Common::Cli(3) or Lemonldap::NG::Manager::CLi(3) for more
+};
+}
+__END__
+
+=head1 NAME
+
+=encoding utf8
+
+lemonldap-ng-cli - Command-line manager for Lemonldap::NG web-SSO system.
+
+=head1 SYNOPSIS
+
+  # Get information about current configuration
+  $ lemonldap-ng-cli info
+
+  # Update local configuration cache
+  $ lemonldap-ng-cli update-cache
+
+  # Get some configuration parameter values
+  $ lemonldap-ng-cli get portal domain cookieName
+
+  # Set some values
+  $ lemonldap-ng-cli set portal http://auth.e.com/ domain e.com
+
+  # add or set a key
+  $ lemonldap-ng-cli addKey macro fullname '$givenName." ".$lastName'
+
+=head1 DESCRIPTION
+
+lemonldap-ng-cli is a command line client that can be used to do some actions
+on Lemonldap::NG configuration. Commands are detailed in
+L<Lemonldap::NG::Manager::Cli> and L<Lemonldap::NG::Common::CLi>
+
+=head1 SEE ALSO
+
+L<Lemonldap::NG::Manager::Cli>, L<Lemonldap::NG::Common::CLi>
+L<http://lemonldap-ng.org/>
+
+=head1 AUTHORS
+
+=over
+
+=item David Coutateur, E<lt>david.jose.delassus@gmail.comE<gt>
+
+=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+
+=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+
+=back
+
+=head1 BUG REPORT
+
+Use OW2 system to report bug or ask for features:
+L<http://jira.ow2.org>
+
+=head1 DOWNLOAD
+
+Lemonldap::NG is available at
+L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
+
+=head1 COPYRIGHT AND LICENSE
+
+=over
+
+=item Copyright (C) 2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+
+=item Copyright (C) 2016 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
+
+=back
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

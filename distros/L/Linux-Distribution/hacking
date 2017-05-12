@@ -1,0 +1,8 @@
+To add new Linux distribution, please send following files:
+/etc/lsb-release
+/etc/*-release
+/etc/*_version
+
+and output of:
+uname -a
+lsb_release -a

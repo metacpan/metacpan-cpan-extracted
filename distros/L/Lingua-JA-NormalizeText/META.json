@@ -1,0 +1,86 @@
+{
+   "abstract" : "All-in-One Japanese text normalizer",
+   "author" : [
+      "pawa <pawapawa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-JA-NormalizeText",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "HTML::Entities" : "3.66",
+            "HTML::Scrubber" : "0.10",
+            "Lingua::JA::Dakuon" : "0",
+            "Lingua::JA::Moji" : "0.32",
+            "Lingua::JA::Regular::Unicode" : "0.11",
+            "Unicode::Normalize" : "1.00",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.99",
+            "Test::Warn" : "0.20"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::JA::NormalizeText" : {
+         "file" : "lib/Lingua/JA/NormalizeText.pm",
+         "version" : "0.50"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pawa-/Lingua-JA-NormalizeText/issues"
+      },
+      "homepage" : "https://github.com/pawa-/Lingua-JA-NormalizeText",
+      "repository" : {
+         "url" : "git://github.com/pawa-/Lingua-JA-NormalizeText.git",
+         "web" : "https://github.com/pawa-/Lingua-JA-NormalizeText"
+      }
+   },
+   "version" : "0.50",
+   "x_contributors" : [
+      "pawa <pawa@dojikko.com>",
+      "pawa <pawa@pawafuru.com>"
+   ]
+}

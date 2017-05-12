@@ -1,0 +1,14 @@
+Build.PL
+ChangeLog
+eg/inotify.pl
+INSTALL
+lib/Linux/Inotify.pm
+lib/Linux/Inotify/Event.pm
+lib/Linux/Inotify/Watch.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/inotify.t

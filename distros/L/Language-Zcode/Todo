@@ -1,0 +1,45 @@
+TODO for v0.9
+- More tests
+- More POD
+- (release Czech 0.9, with save/restore, read)
+- Refactor window /cursor / font stuff, cleanup and break apart IO.pm
+- Explicit LZ::VirtualMachine object contains Memory object, etc., and
+  implements opcodes by calling other classes 
+--- optionally, "use LZ::VM qw('ALL')" creates a default object that 
+    all opcodes use, more like a true Zmachine
+--- LZ::Specs, LZ::Term::* (fix "use Win32" on non-win32 systems hack in IO.pm)
+--- LZ::Memory (contains most of what's in PlotzMemory. Translated program
+    will just call subs in LZ::Memory with, e.g., a ref to the memory string)
+- Add in bugfixes from Games::Rezrov v18, 19
+- Stream 3
+- read_char
+- Build.pl support?
+- Termcap? Curses? (ask ME for help)
+- Tk
+- win32 console retain scroll bar?
+
+maybe for v0.9: z4 (or at least the subset that's already in the code!)
+- buffer_mode
+- set_text_style, erase_window, get/set_cursor, erase_line
+- scan_table
+- tokenize, encode_text, set_font (z5, but they're already coded)
+- (Czech 0.10 tests z4)
+
+TODO for v1.0
+- fix bugs
+- save/restore file?
+- save_undo, restore_undo? (probably in many Inform z5's)
+- bundle all modules into the executable .pl file?
+- Czech 0.11
+
+LATER: z5, other translations, & more
+- better PIR output
+- better XML
+- optimize
+- better ZSCII (at least latin1)
+- print_table, copy_table
+- throw, catch
+- set_colour
+- print_unicode, check_unicode
+- Read Disinform files, put varnames etc. into pl file!
+- CGI, BASIC, Advent in FORTRAN, binary language of moisture vaporators

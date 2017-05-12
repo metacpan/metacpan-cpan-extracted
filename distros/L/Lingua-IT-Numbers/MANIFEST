@@ -1,0 +1,11 @@
+Makefile.PL
+MANIFEST
+README
+t/00_load.t
+t/01_procedural.t
+t/02_object.t
+t/03_options.t
+t/04_overloading.t
+lib/Lingua/IT/Numbers.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+

@@ -1,0 +1,12 @@
+name: authors
+select: select * from authors
+%%
+name: editors
+select: select * from editors where ed_fname = 'Martinella'
+%%
+name: roysched
+select: select * from roysched where title_id = 'PS2091'
+%%
+name: titleauthors
+select: select * from titleauthors where title_id = 'PS2091'
+%%

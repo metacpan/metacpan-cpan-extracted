@@ -1,0 +1,39 @@
+Log-Dispatch-Spread version 0.9
+================================
+Log::Dispatch::Spread is a module, for use primarily with Log::Log4perl,
+for sending log output to a Spread Toolkit message bus.
+
+More information on Spread is available at:
+
+http://www.spread.org
+
+Please note that as of this writing, only Spread 3.x is tested and 
+supported. If you get this module working on 4.x, please let me
+know.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+The 'make test' assumes you have a Spread server up and running on 
+4803@localhost. If you do not, the tests will fail.
+
+DEPENDENCIES
+
+The Spread Toolkit, including server and perl module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Brian Thomas
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

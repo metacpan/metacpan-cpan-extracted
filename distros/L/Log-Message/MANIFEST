@@ -1,0 +1,14 @@
+CHANGES
+lib/Log/Message.pm
+lib/Log/Message/Config.pm
+lib/Log/Message/Handlers.pm
+lib/Log/Message/Item.pm
+Makefile.PL
+MANIFEST
+README
+t/01_Log-Message-Config.t
+t/02_Log-Message.t
+t/conf/config_file
+t/conf/LoadMe.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

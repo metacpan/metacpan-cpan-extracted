@@ -1,0 +1,61 @@
+Index: filesystems/localfs/localfs.c
+===================================================================
+RCS file: /cvsroot/lufs/lufs2/filesystems/localfs/localfs.c,v
+retrieving revision 1.5
+diff -u -r1.5 localfs.c
+--- filesystems/localfs/localfs.c	8 Nov 2003 10:35:30 -0000	1.5
++++ filesystems/localfs/localfs.c	30 Jan 2004 15:21:32 -0000
+@@ -236,6 +236,7 @@
+     fattr->f_nlink = stat.st_nlink;
+     fattr->f_uid = (getuid() == stat.st_uid) ? 1 : 0;
+     fattr->f_gid = (getgid() == stat.st_gid) ? 1 : 0;
++    fattr->f_rdev = stat.st_rdev;
+     fattr->f_size = stat.st_size;
+     fattr->f_atime = stat.st_atime;
+     fattr->f_mtime = stat.st_mtime;
+Index: include/lufs/proto.h
+===================================================================
+RCS file: /cvsroot/lufs/lufs2/include/lufs/proto.h,v
+retrieving revision 1.2
+diff -u -r1.2 proto.h
+--- include/lufs/proto.h	8 Mar 2003 21:45:30 -0000	1.2
++++ include/lufs/proto.h	30 Jan 2004 15:21:32 -0000
+@@ -68,6 +68,7 @@
+     unsigned long	f_nlink;
+     unsigned long	f_uid;
+     unsigned long	f_gid;
++    long long		f_rdev;
+     long long		f_size;
+     unsigned long	f_atime;
+     unsigned long	f_mtime;
+Index: kernel/Linux/2.6/inode.c
+===================================================================
+RCS file: /cvsroot/lufs/lufs2/kernel/Linux/2.6/inode.c,v
+retrieving revision 1.2
+diff -u -r1.2 inode.c
+--- kernel/Linux/2.6/inode.c	30 Oct 2003 00:39:16 -0000	1.2
++++ kernel/Linux/2.6/inode.c	30 Jan 2004 15:21:33 -0000
+@@ -175,6 +175,7 @@
+     inode->i_nlink = fattr->f_nlink;
+     inode->i_uid = fattr->f_uid;
+     inode->i_gid = fattr->f_gid;
++    inode->i_rdev = fattr->f_rdev;
+     inode->i_ctime.tv_sec = fattr->f_ctime;
+     inode->i_mtime.tv_sec = fattr->f_mtime;
+     inode->i_atime.tv_sec = fattr->f_atime;
+Index: lufsd/fsctl.c
+===================================================================
+RCS file: /cvsroot/lufs/lufs2/lufsd/fsctl.c,v
+retrieving revision 1.5
+diff -u -r1.5 fsctl.c
+--- lufsd/fsctl.c	30 Oct 2003 14:53:24 -0000	1.5
++++ lufsd/fsctl.c	30 Jan 2004 15:21:33 -0000
+@@ -233,7 +233,7 @@
+     sprintf(buf, "liblufs-%s.so", fs);
+     TRACE("trying to load %s", buf);
+ 
+-    if(!(dlhandle = dlopen(buf, RTLD_LAZY))){
++    if(!(dlhandle = dlopen(buf, RTLD_LAZY | RTLD_GLOBAL))){
+ 	ERROR(dlerror());
+ 	goto fail;
+     }

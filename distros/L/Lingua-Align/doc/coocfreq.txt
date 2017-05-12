@@ -1,0 +1,118 @@
+NAME
+    coocfreq - count co-occurrence frequencies for arbitrary features of
+    nodes in a parallel treebank
+
+SYNOPSIS
+      coocfreq [OPTIONS]
+
+      # count co-occurrence frequencies between category labels
+      # in the parallel treebank of Sophie's World (Smultron)
+      # and print the results in plain text files 
+
+      coocfreq -a sophie.xml -A sta -x cat -y cat -f cat.src -e cat.trg -c cat.cooc
+
+      # count co-occurrences of 3-letter-suffix + category label of the parent node
+      # of the source language tree with words from the target language tree
+      # results will be stored in src.freq, trg.freq and cooc.freq
+
+      coocfreq -a sophie.xml -A sta -x suffix=3:parent_cat -y word
+
+DESCRIPTION
+    This script counts frequencies and co-occurrence frequencies of source
+    and target language features. It runs through the sentence aligned
+    treebank and combines all node pairs. Note that co-occurrence
+    frequencies in a sentence are " max( srcfreq(srcfeature) ,
+    trgfreq(trgfeature) ) " to ensure Dice scores between 0 and 1!
+
+OPTIONS
+    -f src.freq
+        Specify the name for the source language frequencies. The file will
+        start with a line specifying the source language features used
+        (starting with an initial '#'). All other lines have three TAB
+        separated items: the feature string, a unique ID, and finally the
+        frequency.
+
+         # word
+         learned 682     4
+         stamp   722     3
+         hat     1056    5
+         what    399     20
+         again   220     14
+         of      27      118
+
+    -e trg.freq
+        Specify the name for the target language frequencies. The format is
+        the same as for the source language.
+
+    -c cooc.freq
+        Specify the name for the co-occurrence frequencies. The first two
+        lines specify the names of the files with the source and the target
+        language frequencies and all other lines contain TAB separated
+        source feature ID, target feature ID and co-occurrence frequency.
+        Here is an example:
+
+         # source frequencies: word.src
+         # target frequencies: word.trg
+         127     32      4
+         127     898     3
+         127     31      3
+         127     11      5
+         127     138     6
+         798     9       4
+         1250    1367    3
+
+    -a align-file
+        Name of the alignment file (needs to include sentence alignment
+        information). Parallel corpora without explicit sentence alignment
+        files can also be used. For example, you can leave out this
+        parameter if your parallel corpus is a plain text corpus with two
+        separate files for source and target language and corresponding
+        lines are aligned.
+
+    -A align-file-format
+        This argument specifies the format of the sentence alignment file.
+        For example, it can be OPUS (XCES format used in OPUS) or STA
+        (Stockholm Tree Aligner format).
+
+    -s src-file
+        Source language file of your parallel corpus.
+
+    -S src-file-format
+        Format of the source language file. Default will be "plain text".
+
+    -s trg-file
+        Target language file of your parallel corpus.
+
+    -T trg-file-format
+        Format of the target language file. Default will be "plain text".
+
+    -x srcfeatures
+        Features in the source language. Default feature is 'word' = surface
+        words at each terminal node. All kinds of node attributes and
+        combinations of features and contextual features can be used.
+
+    -y trgfeatures
+        The same as -x but for the target language trees.
+
+    -m freq-threshold
+        The frequency threshold. Default is 2.
+
+    -D  A flag that enables storing the source and target language
+        vocabulary in DB_FILE database files on disk to save memory when
+        counting. This can be useful especially for complex (long) feature
+        strings. Otherwise it doesn't save that much. The co-occurrence
+        matrix is the big problem .....
+
+SEE ALSO
+    Lingua::treealign, Lingua::Align::Trees, Lingua::Align::Features
+
+AUTHOR
+    Joerg Tiedemann, <jorg.tiedemann@lingfil.uu.se>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Joerg Tiedemann
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

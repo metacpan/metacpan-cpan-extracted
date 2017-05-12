@@ -1,0 +1,8 @@
+Changes
+lib/LWP/media.types
+lib/LWP/MediaTypes.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/mediatypes.t
+META.yml                                 Module meta-data (added by MakeMaker)

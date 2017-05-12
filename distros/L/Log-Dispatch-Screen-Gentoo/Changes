@@ -1,0 +1,7 @@
+Changes for Log-Dispatch-Screen-Gentoo
+
+0.002     2017-03-07 15:10:17+01:00 Europe/Amsterdam
+    * Whoops. Screwed up the "optional" part of Unicode::UTF8.
+
+0.001     2017-03-03 23:42:05+01:00 Europe/Amsterdam
+    * Hey, look at that!

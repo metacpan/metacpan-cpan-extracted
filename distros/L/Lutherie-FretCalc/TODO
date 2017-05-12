@@ -1,0 +1,10 @@
+TODO
+
+ - Add fractional calculations
+ - Add fret to fret calculations
+ - Beautify POD and improve documentation
+ - Add features to GUI (fretcalctk)
+ - Add calc methods and tet to cgi
+ - Mountain dulcimer calculations
+ - Enumerate scale lengths: 'Gibson', 'Fender', etc.
+ - Add just intonation calculations

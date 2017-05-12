@@ -1,0 +1,8 @@
+Revision history for Perl extension List::Filter.
+
+0.01  Wed Feb 21 20:26:17 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -nList::Filter -b5.6.0
+
+0.02  Friday June 22, 2007   5:47 PM
+       - fixed PREREQ_PM missing dependency (Test::Trap), revised pod.

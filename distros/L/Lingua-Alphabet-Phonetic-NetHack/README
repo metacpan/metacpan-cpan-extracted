@@ -1,0 +1,19 @@
+If you're sick of your buddies and their militaryspeak Alpha Bravo Charlie,
+use this handy Module to "spell" out your words as NetHack monsters and items!
+
+Or, next time you're on the phone with those confounded technical support nerds,
+use NetHack words to make sure they get your name right!
+
+S as in snake
+m as in mimic
+i as in imp
+t as in trapper
+h as in humanoid
+
+Note 1: Actually, this might not a great idea to use on the telephone, 
+because some NetHack monster names do NOT start with the letter used
+to represent them.  For example, 'y' is a 'light' and 'f' is an 'cat'.
+
+Note 2: Some ASCII characters in NetHack have multiple uses; in those cases, 
+this module only returns one possible use
+(but all characters return a unique term).

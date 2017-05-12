@@ -1,0 +1,23 @@
+---
+abstract: 'Use CSV files as lexicons for Maketext'
+author:
+  - 'David Arnold <david.arnold@online-rewards.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-Maketext-Lexicon-CSV
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Locale::Maketext::Lexicon: '0.96'
+  Text::CSV_XS: '1.02'
+version: '0.96'

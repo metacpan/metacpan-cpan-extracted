@@ -1,0 +1,51 @@
+<h2>Newsletter Subscriber Admin</h2>
+
+<form name="EDIT" id="EDIT" method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="zine-subadmin" />
+
+    <p>Search by Email : <input type="text" name="email" /> <input type="submit" value="GO" /></p>
+    <p><a href="pages.cgi?act=zine-subadmin">view all</a>
+    | <a href="[% cgipath %]/pages.cgi?act=zine-admin">view newsletters</a>
+    </p>
+
+<div class="admin">
+<table>
+<tr>
+    <th>Name</th>
+    <th width="100">Email</th>
+    <th width="100">Code</th>
+    <th width="50">Action</th>
+</tr>
+
+[% IF data %]
+[% FOREACH item = data %]
+<tr>
+    <td>[% item.name %]</td>
+    <td>[% item.email %]</td>
+    <td>[% item.code %]</td>
+    <td><input type="checkbox" name="LISTED" value="[% item.subscriptionid %]" /></td>
+</tr>
+[% END %]
+[% ELSE %]
+<tr><td colspan="4" align="center">Sorry, no subscribers found</td></tr>
+[% END %]
+
+</table>
+
+<p>
+<input type="hidden" name="doaction" value="" />
+<input type="hidden" name="recordid" value="" />
+<input type="button" value="Delete"  onClick="doSubmit('Delete',0)" />
+</p>
+
+</div>
+</form>
+
+<div class="admin">
+<form name="ADD" id="ADD" method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="zine-subbulk" />
+<p>Please enter subscribers in the form "Name,Email", one per line in the box below.</p>
+<textarea name="subscriptions" id="subscriptions"></textarea><br />
+<input type="submit" value="SUBMIT" />
+</form>
+</div>

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Lingua-ES-PhT.t
+lib/Lingua/ES/PhT.pm

@@ -1,0 +1,32 @@
+Revision history for Perl extension Linux::DVB::DVBT::TS.
+
+0.08  Fri Oct 21 08:28:56 2011
+	- Fixed filename buffer that lead to intermittent segfaults
+
+0.07  Wed Jul 20 15:22:00 2011
+	- Added auto-generated parse files to handle all SI tables & descriptors in ETSI 300-468
+	- Improved ts parse file checking and error handling
+		
+0.06  Mon Mar 21 14:34:00 2011
+	- modified makefile to fix building on multiple platforms (lrintf and arch detection)
+		
+0.05  Tue Mar 15 19:45:00 2011
+	- debugging problems with building on multiple platforms (inline & lrintf)
+		
+0.04  Thu Mar 03 12:30:00 2011
+	- updated check for architecture (should now correctly determine)
+	- updated test for lrintf
+		
+0.03  Thu Feb 17 12:09:00 2011
+	- corrected mpeg2audio config.h
+	- updated to display config at beginning of make
+		
+0.02  Tue Feb 08 12:09:00 2011
+	- modified mpegaudiodec.c to use standard int64_t definition
+	- corrected ts_split to properly split on advert boundaries
+		
+0.01  Mon Jan 31 15:59:56 2011
+	- original version
+	- First test of compiling libmpeg2 on various platforms
+		
+

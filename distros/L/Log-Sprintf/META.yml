@@ -1,0 +1,26 @@
+---
+abstract: 'Format strings the way Log::log4perl does, without all the weight'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Sprintf
+requires:
+  String::Formatter: '0.09321'
+  Syntax::Feature::Junction: '0'
+  Time::HiRes: '0'
+  syntax: '0'
+resources:
+  bugtracker: https://github.com/frioux/Log-Sprintf/issues
+  homepage: https://github.com/frioux/Log-Sprintf
+  repository: https://github.com/frioux/Log-Sprintf.git
+version: '0.001003'

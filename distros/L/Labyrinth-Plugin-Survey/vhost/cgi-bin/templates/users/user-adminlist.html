@@ -1,0 +1,80 @@
+<p> 
+    <input type="button" onclick="parent.location='/'" value="back to surveys" />
+</p>
+
+<h1>Users Admin</h1>
+
+<div class="newsbox">
+<div class="blocker">
+    <form method="post" name="usersearch" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name='act' value='user-admin' />
+    <input type="hidden" name='searchall' value='' />
+    <input type="hidden" name='letter' value='' />
+
+    <p>Search by Name: <input type="text" name="searchname" /> <input type="submit" value="GO" /><br />
+    <a href="javascript:suball()">everyone</a> |
+    <a href="[% cgipath %]/pages.cgi?act=user-add">create a new user</a> <br />
+    <a href='javascript:subletter("A")'>A</a>
+    <a href='javascript:subletter("B")'>B</a>
+    <a href='javascript:subletter("C")'>C</a>
+    <a href='javascript:subletter("D")'>D</a>
+    <a href='javascript:subletter("E")'>E</a>
+    <a href='javascript:subletter("F")'>F</a>
+    <a href='javascript:subletter("G")'>G</a>
+    <a href='javascript:subletter("H")'>H</a>
+    <a href='javascript:subletter("I")'>I</a>
+    <a href='javascript:subletter("J")'>J</a>
+    <a href='javascript:subletter("K")'>K</a>
+    <a href='javascript:subletter("L")'>L</a>
+    <a href='javascript:subletter("M")'>M</a>
+    <a href='javascript:subletter("N")'>N</a>
+    <a href='javascript:subletter("O")'>O</a>
+    <a href='javascript:subletter("P")'>P</a>
+    <a href='javascript:subletter("Q")'>Q</a>
+    <a href='javascript:subletter("R")'>R</a>
+    <a href='javascript:subletter("S")'>S</a>
+    <a href='javascript:subletter("T")'>T</a>
+    <a href='javascript:subletter("U")'>U</a>
+    <a href='javascript:subletter("V")'>V</a>
+    <a href='javascript:subletter("W")'>W</a>
+    <a href='javascript:subletter("X")'>X</a>
+    <a href='javascript:subletter("Y")'>Y</a>
+    <a href='javascript:subletter("Z")'>Z</a>
+
+</p></form>
+</div>
+</div>
+
+<div class="newsbox">
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name='act' value='user-delete' />
+
+<table class="blocker" width="100%">
+<tr>
+    <th><a href="[% cgipath %]/pages.cgi?act=user-admin&amp;sorttype=realname&amp;sortseq=[% sortseq %]">Real Name</a></th>
+    <th><a href="[% cgipath %]/pages.cgi?act=user-admin&amp;sorttype=email&amp;sortseq=[% sortseq %]">Email</a></th>
+    <th>Confirmed</th>
+    <th>Select</th>
+</tr>
+
+[% IF users %]
+[% FOREACH item = users %]
+
+<tr>
+    <td>[% item.realname %]</td>
+    <td><a href="[% cgipath %]/pages.cgi?act=user-adminedit&amp;userid=[% item.userid %]">[% item.email %]</a></td>
+    <td>[% item.confirmed %]</td>
+    <td><input type="checkbox" name="LISTED" value="[% item.userid %]" /></td>
+</tr>
+
+[% END %]
+[% ELSE %]
+<tr><td colspan="4" align="center">No users currently available.</td></tr>
+[% END %]
+
+</table>
+
+<p align="right">
+<input type="submit" name='doaction' value='Delete' />
+</p></form>
+</div>

@@ -1,0 +1,43 @@
+
+To add a codeset:
+
+1)  modify harvest data
+
+    add data at the top
+
+    modify do_TYPE function
+
+    add functions named:
+       _init_TYPE_SRC
+       _read_TYPE_SRC
+
+2)  modify data.TYPE.pl
+
+    add a new section
+
+    if there are non-ASCII names, add them to:
+       $Data{TYPE}{SRC}{orig}{name}
+    Otherwise you'll see warnings 'NON-ASCII'
+
+    if there are new names in this list (except for the first codeset
+    of a given TYPE), they must be explicitly allowed by adding them
+    to:
+       $Data{TYPE}{SRC}{new}
+    or:
+       $Data{TYPE}{SRC}{orig}{name}
+    Otherwise you'll see warning 'new name not allowed'
+
+3)  modify lib/Locale/Codes/Constants.pm
+
+    Public Global Variables:
+       @EXPORT
+
+    Constants:
+       use constant
+       $ALL_CODESETS
+
+4)  modify lib/Locale/Codes/TYPE.pod
+
+       Supported code sets
+       SEE ALSO (cite source)
+

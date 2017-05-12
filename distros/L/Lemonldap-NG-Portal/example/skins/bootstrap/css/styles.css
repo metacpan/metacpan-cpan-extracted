@@ -1,0 +1,107 @@
+/* CSS for bootstrap theme */
+
+html,
+body {
+  height: 100%;
+  background: #eee;
+  /* The html and body elements cannot have any padding or margin. */
+}
+
+/* Wrapper for page content to push down footer */
+#wrap {
+  min-height: 100%;
+  height: auto;
+  /* Negative indent footer by its height */
+  margin: 0 auto -80px;
+  /* Pad bottom by footer height */
+  padding: 20px 0 80px;
+}
+
+/* Set the fixed height of the footer here */
+#footer {
+  height: 80px;
+  background-color: #f5f5f5;
+  text-align: center;
+  padding-top: 20px;
+}
+
+.login, .password, .confirm {
+  text-align: center;
+  padding: 20px;
+}
+
+div.form {
+  margin: 0 auto;
+  max-width: 330px;
+}
+
+div.actions {
+  margin: 10px 0 0 0;
+}
+
+div.actions a {
+  margin-top: 10px;
+}
+
+.buttons {
+  text-align: center;
+}
+/* Override bootstrap btn style */
+.btn {
+  white-space: normal;
+}
+
+.btn span.glyphicon {
+  padding-right: 8px;
+}
+
+#appslist, #password, #loginHistory, #logout  {
+  margin-top: 20px;
+}
+
+div.application {
+  height:50px;
+  overflow:hidden;
+}
+
+div.application a, div.application a:hover {
+  text-decoration:none;
+  display:block;
+}
+/*
+div.application img.applogo {
+  width:32px;
+  height:32px;
+  float:left;
+}
+*/
+div.application h4.appname {
+  margin-top:5px;
+}
+
+div.application p.appdesc {
+  color:#aaa;
+  font-style:italic;
+}
+
+p.notifCheck label {
+  margin-left: 5px;
+  margin-top: 3px;
+  display: inline-block;
+}
+
+@media (min-width: 768px) {
+  div.application {
+    height: 80px;
+  }
+  div.application h4.appname {
+    margin:0;
+  }
+  #wrap {
+    margin: 0 auto -60px;
+  }
+  #footer {
+    height: 60px;
+  }
+}
+

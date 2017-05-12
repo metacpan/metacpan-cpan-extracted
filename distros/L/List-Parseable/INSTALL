@@ -1,0 +1,11 @@
+For instructions on installing this, or any other perl module in
+a UNIX environment, please refer to:
+
+   http://faq.perl.org/perlfaq8.html#How_do_I_install_a_m
+
+For instructions in a Windows environment running ActivePerl,
+refer to one of the following (depending on your version of perl):
+
+   http://docs.activestate.com/activeperl/5.6/faq/ActivePerl-faq2.html
+   http://docs.activestate.com/activeperl/5.8/faq/ActivePerl-faq2.html
+   http://docs.activestate.com/activeperl/5.10/faq/ActivePerl-faq2.html

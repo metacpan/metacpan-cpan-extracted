@@ -1,0 +1,91 @@
+Revision history for Perl module Lingua::EN::Squeeze
+
+2016.01 2016-01-21 NEILB
+    - Fixed the abstract line and the SYNOPSIS
+    - Changed doc to have a COPYRIGHT AND LICENSE section, with the
+      expected text for GPL v2 (which is what the doc already said).
+    - Fixed dist.ini so dist metadata will say the license is GPL v2.
+
+2015.01 2015-06-01 NEILB
+    - Renamed ChangeLog to Changes
+    - Switched to Dist::Zilla, in the process moving Squeeze.pm to lib/...
+    - Reformatted this file as per CPAN::Changes::Spec
+
+
+2006.0704 2006-07-04 JARIAALTO
+
+    * README (NOTES): Added new heading to epxlain why running
+      tests display many 'Use of uninitialized value in concatenation (.)'
+      messages.
+
+    * t/test.t: Fixed 'Invalid conversion in sprintf: end of string at
+      t/test.t line 73.' by removing extra '%' from format string.
+
+    * Makefile.PL: Removed version number from line
+      'ExtUtils::MakeMaker 6.25'. (Closes: rt.cpan.org#20278)
+
+    * Squeeze.pm: (%SQZ_WXLATE_HASH): "background" keyword
+      misspelled as "backgreound". (Closes: rt.cpan.org#20278)
+
+
+2005.0216 2005-02-16 JARIAALTO
+
+    * Makefile.PL (ExtUtils::MakeMaker): 1.2 Added META.yml
+      support (rewrote whole file).
+
+    * META.yml: New.
+
+    * t/test.t: 1.1 New. Use `Test::More'.
+
+    * test.pl: Removed.
+
+    * Squeeze.pm: 1.4
+      - Now supports fully object oriented interface too.
+      - Changed License from (Perl/GPL2) to GPL v2 or later.
+        (Top level): Chnaged 'BEGIN{require 5.003}'
+       to 'use 5.003'.
+    (Top level::$debugRegexp): DummyJummy => DummyYummy
+    (SqueezeObjectArg): 1.4 New.
+    (SqueezeText): 1.4 Use `SqueezeObjectArg' to support OO.
+    (SqueezeHashSet): 1.4 Use `SqueezeObjectArg' to support OO.
+    (SqueezeControl): 1.4 Use `SqueezeObjectArg' to support OO.
+    Rearranged `$STATE' variable setting. Removed 'max' from
+    `elseif', because it was already in `if'. `confess'
+    now prints `$ARG'.
+    (SqueezeDebug): 1.4 Use `SqueezeObjectArg' to support OO.
+
+2003.1003 2003-10-03 JARIAALTO
+
+    * Squeeze.pm (SqueezeText): 1.2 Fixed autolaod section by Adding
+      prefix Lingua::EN:: Bug reported by Ian Beckwith
+      <ianb@nessie.mcc.ac.uk>. Fixed all Pod warnings by
+      moving =over tags just above =item tags.
+
+1998.1204 1998-12-04 JARIAALTO
+
+    * Squeeze.pm: v1.19 Lingua-EN-Squeeze-1998.1008.tar.gz released to
+      PAUSE and annouced in comp.lang.perl.announce and c.l.p.modules
+
+1998.1008 1998-10-14 JARIAALTO
+
+    * Squeeze.pm:
+      (sub SqueezeDebug): variable `STATE' --> `state'.
+      Text "end of file" in wrong place.
+      (sub SqueezeControl): use regexp text instead of `eq' MAX MED.
+
+    * Squeeze.pm: v1.21 Lingua-EN-Squeeze-1998.0928.tar.gz
+      has been released to PAUSE and annouced in clp.announce
+
+    * Squeeze.pm
+      Now supports autoload "use SelfLoader". Function have been placed
+      after __DATA__. EXPORTABLE VARIABLES POD now use =item for each variable.
+      (sub SqueezeText): Added conversion 'cally' -> 'cly'
+      (sub SqueezeText): SQZ_ZAP_REGEXP is now used before work conversions.
+
+1998.0925 1998-09-25 JARIAALTO
+
+    * Squeeze.pm: v1.19 Lingua-EN-Squeeze-1998.0925.tar.gz
+      has been released to PAUSE and annouced in clp.announce and clp.modules
+
+    * test.pl (Squeeze::wordXlate,): Commented out the OBJECT test.
+

@@ -1,0 +1,64 @@
+<lemonshibconfig>
+<RequestMapProvider type="Native">
+<RequestMap applicationId="default">
+    <Host  scheme="https" port="443"  name="sp.example.org" >
+		<Path name="secure" 
+                      authType="shiboleth" 
+                      requireSession="true"
+                      exportAssertion="true">
+                 <Path name="admin" applicationId ="foo-admin" />
+                </Path>
+   </Host>
+   <Host  scheme="http"   name="sp2.example.org" >
+		<Path name="secure" 
+                      authType="shiboleth" 
+                      requireSession="false"
+                      exportAssertion="false">
+                 <Path name="admin" applicationId ="divers-admin" />
+                </Path>
+</Host>
+<Host  scheme="http"   name="sp3.example.org" >
+		<Path name="public" applicationId ="foo-public" >
+                      authType="shiboleth" 
+                      requireSession="false"
+                      exportAssertion="false">
+                </Path>
+</Host>
+<Host  scheme="http"   name="sp4.example.org" 
+		      applicationId ="bar-public"
+                      authType="shiboleth" 
+                      requireSession="false"
+                      exportAssertion="false" />
+</RequestMap>    
+</RequestMapProvider>
+<Applications  shire="http://sp.example.org/shire"          
+               IdpURL = "https://idp.exemple.org/sso">
+<Application 
+             id="foo-admin"  
+             providerId="http://sp.example.org/secure/admin" >
+              
+</Application>
+<Application 
+             id="divers-admin"  
+             shire="http://sp2.example.org/shire"
+             providerId="http://sp2.example.org/secure/admin" >
+</Application>
+<Application 
+             id="foo-public"  
+             providerId="http://sp3.example.org/public" >
+</Application>
+<Application 
+             id="bar-public"  
+             providerId="http://sp4.example.org" >
+</Application>
+<Application 
+             id="default"  
+             providerId="http://sp.example.org" 
+             shire="http://sp.example.org/shire"
+           >
+</Application>
+
+</Applications>
+</lemonshibconfig>
+ 
+

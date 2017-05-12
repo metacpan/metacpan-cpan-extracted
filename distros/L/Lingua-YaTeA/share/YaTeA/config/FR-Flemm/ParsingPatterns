@@ -1,0 +1,3540 @@
+############################################################
+# PARSING PATTERNS (patron, priorité, décomposition, sens) #
+############################################################
+#
+##############################
+# noms propres et abréviations
+#
+( ABR<=M> Np----<=H> )	1		RIGHT
+( Np----<=H> ABR<=M> )	1		LEFT
+( Np----<=H> de ABR<=M> )	1		LEFT
+#
+#########
+# '10 cm'
+#
+( NUM<=M> ABR<=H> )	1		RIGHT
+#
+# dans ce qui suit on peut commencer à gérer l'accord en genre et en nombre
+#
+#
+################
+# '90 mm Hg'
+# ( NUM ABR Nc )
+#
+( ABR<=M> Nc----<=H> )	1		RIGHT
+( ABR<=M> Ncm---<=H> )	1		RIGHT
+( ABR<=M> Nc-s--<=H> )	1		RIGHT
+( ABR<=M> Ncms--<=H> )	1		RIGHT
+( ABR<=M> Ncfs--<=H> )	1		RIGHT
+( ABR<=M> Nc-p--<=H> )	1		RIGHT
+( ABR<=M> Ncmp--<=H> )	1		RIGHT
+( ABR<=M> Ncfp--<=H> )	1		RIGHT
+#
+###################
+# 'HTA secondaires'
+#
+( ABR<=H> A------<=M> )	1		LEFT
+( ABR<=H> A--m---<=M> )	1		LEFT
+( ABR<=H> A---s--<=M> )	1		LEFT
+( ABR<=H> A---p--<=M> )	1		LEFT
+( ABR<=H> A--ms--<=M> )	1		LEFT
+( ABR<=H> A--mp--<=M> )	1		LEFT
+( ABR<=H> A--fs--<=M> )	1		LEFT
+( ABR<=H> A--fp--<=M> )	1		LEFT
+#
+( Np----<=H> A------<=M> )	1		LEFT
+( Np----<=H> A--m---<=M> )	1		LEFT
+( Np----<=H> A---s--<=M> )	1		LEFT
+( Np----<=H> A---p--<=M> )	1		LEFT
+( Np----<=H> A--ms--<=M> )	1		LEFT
+( Np----<=H> A--mp--<=M> )	1		LEFT
+( Np----<=H> A--fs--<=M> )	1		LEFT
+( Np----<=H> A--fp--<=M> )	1		LEFT
+#
+#########################################################################
+# (A Nc au Nc de Nc de NUM à NUM ABR de Nc)
+# 'petit fromage au lait de vache de 8 à 9 cm de diamètre' (1 occurrence)
+#
+( NUM<=M> à ( NUM<=M> ABR<=H> )<=H> )	1		RIGHT
+#
+################################
+# (Nc NUM)
+# 'patient diabétique de type 1'
+#
+( Nc----<=H> NUM<=M> )	1		LEFT
+( Ncm---<=H> NUM<=M> )	1		LEFT
+( Nc-s--<=H> NUM<=M> )	1		LEFT
+( Nc-p--<=H> NUM<=M> )	1		LEFT
+( Ncms--<=H> NUM<=M> )	1		LEFT
+( Ncmp--<=H> NUM<=M> )	1		LEFT
+( Ncfs--<=H> NUM<=M> )	1		LEFT
+( Ncfp--<=H> NUM<=M> )	1		LEFT
+#
+################################################################################
+# (NUM Nc)
+# ici on peut contraindre le nombre du nom en fonction de ce qu'on trouve en NUM
+# '35 ans' mais aussi 'deuxième président'
+# RQUE = on ajoute une contrainte dans ForbiddenStructures pour interdire '1 ans'
+#
+( NUM<=M> Nc----<=H> )	1		RIGHT
+( NUM<=M> Ncm---<=H> )	1		RIGHT
+( NUM<=M> Nc-s--<=H> )	1		RIGHT
+( NUM<=M> Ncms--<=H> )	1		RIGHT
+( NUM<=M> Ncfs--<=H> )	1		RIGHT
+( NUM<=M> Nc-p--<=H> )	1		RIGHT
+( NUM<=M> Ncmp--<=H> )	1		RIGHT
+( NUM<=M> Ncfp--<=H> )	1		RIGHT
+#
+###################################################################################
+# (ABR Ncs)
+# RQUE = on contraint le nom à être au singulier (peut être contrexemple plus tard)
+# 'cm de diamètre'
+#
+( ABR<=H> de Nc----<=M> )	1		LEFT
+( ABR<=H> de Ncm---<=M> )	1		LEFT
+( ABR<=H> de Nc-s--<=M> )	1		LEFT
+( ABR<=H> de Ncms--<=M> )	1		LEFT
+( ABR<=H> de Ncfs--<=M> )	1		LEFT
+( ABR<=H> d Nc-s--<=M> )	1		LEFT
+( ABR<=H> d Ncms--<=M> )	1		LEFT
+( ABR<=H> d Ncfs--<=M> )	1		LEFT
+#
+#########################################################################
+# (Nc de ABR)
+# 'meule de 10 cm de diamètre'
+#
+( Nc----<=H> de ABR<=M> )	1		LEFT
+( Ncm---<=H> de ABR<=M> )	1		LEFT
+( Nc-s--<=H> de ABR<=M> )	1		LEFT
+( Nc-p--<=H> de ABR<=M> )	1		LEFT
+( Ncms--<=H> de ABR<=M> )	1		LEFT
+( Ncmp--<=H> de ABR<=M> )	1		LEFT
+( Ncfs--<=H> de ABR<=M> )	1		LEFT
+( Ncfp--<=H> de ABR<=M> )	1		LEFT
+#
+#########################################################################
+# (Ncfs première)
+# (Ncfp premières)
+# 'matière(s) première(s)'
+#
+( Nc-s--<=H> première<=M> )	1		LEFT
+( Ncfs--<=H> première<=M> )	1		LEFT
+( Nc-p--<=H> premières<=M> )	1		LEFT
+( Ncfp--<=H> premières<=M> )	1		LEFT
+#
+#########################################################################
+# 'article 15'
+#
+( article<=H> NUM<=M> )	1		LEFT
+#
+#################
+# déterminant nom (la|l|les|le)
+#
+#( l<=M> Nc-s--<=H> )	1		RIGHT
+#( l<=M> Ncms--<=H> )	1		RIGHT
+#( l<=M> Ncfs--<=H> )	1		RIGHT
+#( l<=M> Nc----<=H> )	1		RIGHT
+#( l<=M> Ncm---<=H> )	1		RIGHT
+#( l<=M> Np----<=H> )	1		RIGHT
+#
+#( le<=M> Nc-s--<=H> )	1		RIGHT
+#( le<=M> Ncms--<=H> )	1		RIGHT
+#( le<=M> Ncm---<=H> )	1		RIGHT
+#( le<=M> Nc----<=H> )	1		RIGHT
+#( le<=M> Np----<=H> )	1		RIGHT
+#
+#( la<=M> Nc-s--<=H> )	1		RIGHT
+#( la<=M> Ncfs--<=H> )	1		RIGHT
+#( la<=M> Nc----<=H> )	1		RIGHT
+#( la<=M> Np----<=H> )	1		RIGHT
+#
+#( les<=M> Nc-p--<=H> )	1		RIGHT
+#( les<=M> Ncmp--<=H> )	1		RIGHT
+#( les<=M> Ncfp--<=H> )	1		RIGHT
+#( les<=M> Nc----<=H> )	1		RIGHT
+#( les<=M> Ncm---<=H> )	1		RIGHT
+#( les<=M> Np----<=H> )	1		RIGHT
+#
+###################
+# ADJECTIFS ET NOMS
+#
+# (A Np)
+#
+( A------<=M> Np----<=H> )	1		RIGHT
+( A--m---<=M> Np----<=H> )	1		RIGHT
+( A---s--<=M> Np----<=H> )	1		RIGHT
+( A---p--<=M> Np----<=H> )	1		RIGHT
+( A--ms--<=M> Np----<=H> )	1		RIGHT
+( A--fs--<=M> Np----<=H> )	1		RIGHT
+( A--mp--<=M> Np----<=H> )	1		RIGHT
+( A--fp--<=M> Np----<=H> )	1		RIGHT
+#
+# (A Nc)
+#
+( A------<=M> Nc----<=H> )	1		RIGHT
+( A--m---<=M> Nc----<=H> )	1		RIGHT
+( A---s--<=M> Nc----<=H> )	1		RIGHT
+( A---p--<=M> Nc----<=H> )	1		RIGHT
+( A--ms--<=M> Nc----<=H> )	1		RIGHT
+( A--mp--<=M> Nc----<=H> )	1		RIGHT
+( A--fs--<=M> Nc----<=H> )	1		RIGHT
+( A--fp--<=M> Nc----<=H> )	1		RIGHT
+( A------<=M> Ncm---<=H> )	1		RIGHT
+( A--m---<=M> Ncm---<=H> )	1		RIGHT
+( A---s--<=M> Ncm---<=H> )	1		RIGHT
+( A---p--<=M> Ncm---<=H> )	1		RIGHT
+( A--ms--<=M> Ncm---<=H> )	1		RIGHT
+( A--mp--<=M> Ncm---<=H> )	1		RIGHT
+( A------<=M> Nc-s--<=H> )	1		RIGHT
+( A--m---<=M> Nc-s--<=H> )	1		RIGHT
+( A---s--<=M> Nc-s--<=H> )	1		RIGHT
+( A--ms--<=M> Nc-s--<=H> )	1		RIGHT
+( A--fs--<=M> Nc-s--<=H> )	1		RIGHT
+( A------<=M> Nc-p--<=H> )	1		RIGHT
+( A--m---<=M> Nc-p--<=H> )	1		RIGHT
+( A---p--<=M> Nc-p--<=H> )	1		RIGHT
+( A--mp--<=M> Nc-p--<=H> )	1		RIGHT
+( A--fp--<=M> Nc-p--<=H> )	1		RIGHT
+( A------<=M> Ncms--<=H> )	1		RIGHT
+( A--m---<=M> Ncms--<=H> )	1		RIGHT
+( A---s--<=M> Ncms--<=H> )	1		RIGHT
+( A--ms--<=M> Ncms--<=H> )	1		RIGHT
+( A------<=M> Ncmp--<=H> )	1		RIGHT
+( A--m---<=M> Ncmp--<=H> )	1		RIGHT
+( A---p--<=M> Ncmp--<=H> )	1		RIGHT
+( A--mp--<=M> Ncmp--<=H> )	1		RIGHT
+( A------<=M> Ncfs--<=H> )	1		RIGHT
+( A---s--<=M> Ncfs--<=H> )	1		RIGHT
+( A--fs--<=M> Ncfs--<=H> )	1		RIGHT
+( A------<=M> Ncfp--<=H> )	1		RIGHT
+( A---p--<=M> Ncfp--<=H> )	1		RIGHT
+( A--fp--<=M> Ncfp--<=H> )	1		RIGHT
+#
+# (Nc A)
+( Nc----<=H> A------<=M> )	1		LEFT
+( Nc----<=H> A--m---<=M> )	1		LEFT
+( Nc----<=H> A---s--<=M> )	1		LEFT
+( Nc----<=H> A---p--<=M> )	1		LEFT
+( Nc----<=H> A--ms--<=M> )	1		LEFT
+( Nc----<=H> A--mp--<=M> )	1		LEFT
+( Nc----<=H> A--fs--<=M> )	1		LEFT
+( Nc----<=H> A--fp--<=M> )	1		LEFT
+( Ncm---<=H> A------<=M> )	1		LEFT
+( Ncm---<=H> A--m---<=M> )	1		LEFT
+( Ncm---<=H> A---s--<=M> )	1		LEFT
+( Ncm---<=H> A---p--<=M> )	1		LEFT
+( Ncm---<=H> A--ms--<=M> )	1		LEFT
+( Ncm---<=H> A--mp--<=M> )	1		LEFT
+( Nc-s--<=H> A------<=M> )	1		LEFT
+( Nc-s--<=H> A--m---<=M> )	1		LEFT
+( Nc-s--<=H> A---s--<=M> )	1		LEFT
+( Nc-s--<=H> A--ms--<=M> )	1		LEFT
+( Nc-s--<=H> A--fs--<=M> )	1		LEFT
+( Nc-p--<=H> A------<=M> )	1		LEFT
+( Nc-p--<=H> A--m---<=M> )	1		LEFT
+( Nc-p--<=H> A---p--<=M> )	1		LEFT
+( Nc-p--<=H> A--mp--<=M> )	1		LEFT
+( Nc-p--<=H> A--fp--<=M> )	1		LEFT
+( Ncms--<=H> A------<=M> )	1		LEFT
+( Ncms--<=H> A--m---<=M> )	1		LEFT
+( Ncms--<=H> A---s--<=M> )	1		LEFT
+( Ncms--<=H> A--ms--<=M> )	1		LEFT
+( Ncmp--<=H> A------<=M> )	1		LEFT
+( Ncmp--<=H> A--m---<=M> )	1		LEFT
+( Ncmp--<=H> A---p--<=M> )	1		LEFT
+( Ncmp--<=H> A--mp--<=M> )	1		LEFT
+( Ncfs--<=H> A------<=M> )	1		LEFT
+( Ncfs--<=H> A---s--<=M> )	1		LEFT
+( Ncfs--<=H> A--fs--<=M> )	1		LEFT
+( Ncfp--<=H> A------<=M> )	1		LEFT
+( Ncfp--<=H> A---p--<=M> )	1		LEFT
+( Ncfp--<=H> A--fp--<=M> )	1		LEFT
+#
+#############################################################################
+# PATRONS DU TYPE NOM_PROPRE (de | d | à | au | aux | du | des) NOM_PROPRE
+#
+( Np----<=H> Np----<=M> )	1		LEFT
+( Np----<=H> de Np----<=M> )	1		LEFT
+( Np----<=H> d Np----<=M> )	1		LEFT
+( Np----<=H> à Np----<=M> )	1		LEFT
+( Np----<=H> au Np----<=M> )	1		LEFT
+( Np----<=H> du Np----<=M> )	1		LEFT
+#
+#
+#############################################################################
+# PATRONS DU TYPE NOM_PROPRE (de | d | à | au | aux | du | des) NOM_COMMUN
+#
+( Np----<=H> Nc----<=M> )	1		LEFT
+( Np----<=H> Ncm---<=M> )	1		LEFT
+( Np----<=H> Nc-s--<=M> )	1		LEFT
+( Np----<=H> Nc-p--<=M> )	1		LEFT
+( Np----<=H> Ncms--<=M> )	1		LEFT
+( Np----<=H> Ncmp--<=M> )	1		LEFT
+( Np----<=H> Ncfs--<=M> )	1		LEFT
+( Np----<=H> Ncfp--<=M> )	1		LEFT
+#
+( Np----<=H> de Nc----<=M> )	1		LEFT
+( Np----<=H> de Ncm---<=M> )	1		LEFT
+( Np----<=H> de Nc-s--<=M> )	1		LEFT
+( Np----<=H> de Nc-p--<=M> )	1		LEFT
+( Np----<=H> de Ncms--<=M> )	1		LEFT
+( Np----<=H> de Ncmp--<=M> )	1		LEFT
+( Np----<=H> de Ncfs--<=M> )	1		LEFT
+( Np----<=H> de Ncfp--<=M> )	1		LEFT
+#
+( Np----<=H> d Nc----<=M> )	1		LEFT
+( Np----<=H> d Ncm---<=M> )	1		LEFT
+( Np----<=H> d Nc-s--<=M> )	1		LEFT
+( Np----<=H> d Nc-p--<=M> )	1		LEFT
+( Np----<=H> d Ncms--<=M> )	1		LEFT
+( Np----<=H> d Ncmp--<=M> )	1		LEFT
+( Np----<=H> d Ncfs--<=M> )	1		LEFT
+( Np----<=H> d Ncfp--<=M> )	1		LEFT
+#
+( Np----<=H> à Nc----<=M> )	1		LEFT
+( Np----<=H> à Ncm---<=M> )	1		LEFT
+( Np----<=H> à Nc-s--<=M> )	1		LEFT
+( Np----<=H> à Nc-p--<=M> )	1		LEFT
+( Np----<=H> à Ncms--<=M> )	1		LEFT
+( Np----<=H> à Ncmp--<=M> )	1		LEFT
+( Np----<=H> à Ncfs--<=M> )	1		LEFT
+( Np----<=H> à Ncfp--<=M> )	1		LEFT
+#
+( Np----<=H> au Nc-s--<=M> )	1		LEFT
+( Np----<=H> au Ncms--<=M> )	1		LEFT
+( Np----<=H> au Nc----<=M> )	1		LEFT
+( Np----<=H> au Ncm---<=M> )	1		LEFT
+#
+( Np----<=H> à Da3fs--- Nc-s--<=M> )	1		LEFT
+( Np----<=H> à Da3fs--- Ncfs--<=M> )	1		LEFT
+( Np----<=H> à Da3fs--- Nc----<=M> )	1		LEFT
+#
+( Np----<=H> à Da3-s--- Nc-s--<=M> )	1		LEFT
+( Np----<=H> à Da3-s--- Ncms--<=M> )	1		LEFT
+( Np----<=H> à Da3-s--- Ncfs--<=M> )	1		LEFT
+( Np----<=H> à Da3-s--- Nc----<=M> )	1		LEFT
+( Np----<=H> à Da3-s--- Ncm---<=M> )	1		LEFT
+#
+( Np----<=H> du Nc-s--<=M> )	1		LEFT
+( Np----<=H> du Ncms--<=M> )	1		LEFT
+( Np----<=H> du Nc----<=M> )	1		LEFT
+( Np----<=H> du Ncm---<=M> )	1		LEFT
+#
+( Np----<=H> de Da3fs--- Nc-s--<=M> )	1		LEFT
+( Np----<=H> de Da3fs--- Ncfs--<=M> )	1		LEFT
+( Np----<=H> de Da3fs--- Nc----<=M> )	1		LEFT
+#
+( Np----<=H> de Da3-s--- Nc-s--<=M> )	1		LEFT
+( Np----<=H> de Da3-s--- Ncms--<=M> )	1		LEFT
+( Np----<=H> de Da3-s--- Ncfs--<=M> )	1		LEFT
+( Np----<=H> de Da3-s--- Nc----<=M> )	1		LEFT
+( Np----<=H> de Da3-s--- Ncm---<=M> )	1		LEFT
+#
+( Np----<=H> au Nc-p--<=M> )	1		LEFT
+( Np----<=H> au Ncmp--<=M> )	1		LEFT
+( Np----<=H> au Ncfp--<=M> )	1		LEFT
+( Np----<=H> au Nc----<=M> )	1		LEFT
+#
+( Np----<=H> du Nc-p--<=M> )	1		LEFT
+( Np----<=H> du Ncmp--<=M> )	1		LEFT
+( Np----<=H> du Ncfp--<=M> )	1		LEFT
+( Np----<=H> du Nc----<=M> )	1		LEFT
+#
+############################################################################################
+# PATRONS DU TYPE NOM_COMMUN (de | d | à | au | aux | du | des) NOM_PROPRE
+#
+# 'Fromageries Gervais'
+#
+( Nc----<=H> Np----<=M> )	1		LEFT
+( Ncm---<=H> Np----<=M> )	1		LEFT
+( Nc-s--<=H> Np----<=M> )	1		LEFT
+( Nc-p--<=H> Np----<=M> )	1		LEFT
+( Ncms--<=H> Np----<=M> )	1		LEFT
+( Ncmp--<=H> Np----<=M> )	1		LEFT
+( Ncfs--<=H> Np----<=M> )	1		LEFT
+( Ncfp--<=H> Np----<=M> )	1		LEFT
+#
+( Nc----<=H> de Np----<=M> )	1		LEFT
+( Ncm---<=H> de Np----<=M> )	1		LEFT
+( Nc-s--<=H> de Np----<=M> )	1		LEFT
+( Nc-p--<=H> de Np----<=M> )	1		LEFT
+( Ncms--<=H> de Np----<=M> )	1		LEFT
+( Ncmp--<=H> de Np----<=M> )	1		LEFT
+( Ncfs--<=H> de Np----<=M> )	1		LEFT
+( Ncfp--<=H> de Np----<=M> )	1		LEFT
+#
+( Nc----<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Ncm---<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Nc-s--<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Nc-p--<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Ncms--<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Ncmp--<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Ncfs--<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Ncfp--<=H> de Da3-s--- Np----<=M> )	1		LEFT
+#
+( Nc----<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Ncm---<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Nc-s--<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Nc-p--<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Ncms--<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Ncmp--<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Ncfs--<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Ncfp--<=H> de Da3fs--- Np----<=M> )	1		LEFT
+#
+# TODO = ( Nc d une Np )
+# TODO = ( Nc d un Np )
+# TODO = ( Nc à une Np )
+# TODO = ( Nc à un Np )
+#
+( Nc----<=H> d Np----<=M> )	1		LEFT
+( Ncm---<=H> d Np----<=M> )	1		LEFT
+( Nc-s--<=H> d Np----<=M> )	1		LEFT
+( Nc-p--<=H> d Np----<=M> )	1		LEFT
+( Ncms--<=H> d Np----<=M> )	1		LEFT
+( Ncmp--<=H> d Np----<=M> )	1		LEFT
+( Ncfs--<=H> d Np----<=M> )	1		LEFT
+( Ncfp--<=H> d Np----<=M> )	1		LEFT
+#
+( Nc----<=H> à Np----<=M> )	1		LEFT
+( Ncm---<=H> à Np----<=M> )	1		LEFT
+( Nc-s--<=H> à Np----<=M> )	1		LEFT
+( Nc-p--<=H> à Np----<=M> )	1		LEFT
+( Ncms--<=H> à Np----<=M> )	1		LEFT
+( Ncmp--<=H> à Np----<=M> )	1		LEFT
+( Ncfs--<=H> à Np----<=M> )	1		LEFT
+( Ncfp--<=H> à Np----<=M> )	1		LEFT
+#
+( Nc-s--<=H> au Np----<=M> )	1		LEFT
+( Ncms--<=H> au Np----<=M> )	1		LEFT
+( Nc----<=H> au Np----<=M> )	1		LEFT
+( Ncm---<=H> au Np----<=M> )	1		LEFT
+#
+( Nc-s--<=H> du Np----<=M> )	1		LEFT
+( Ncms--<=H> du Np----<=M> )	1		LEFT
+( Nc----<=H> du Np----<=M> )	1		LEFT
+( Ncm---<=H> du Np----<=M> )	1		LEFT
+#
+( Nc-p--<=H> au Np----<=M> )	1		LEFT
+( Ncmp--<=H> au Np----<=M> )	1		LEFT
+( Ncfp--<=H> au Np----<=M> )	1		LEFT
+( Nc----<=H> au Np----<=M> )	1		LEFT
+#
+( Nc-p--<=H> du Np----<=M> )	1		LEFT
+( Ncmp--<=H> du Np----<=M> )	1		LEFT
+( Ncfp--<=H> du Np----<=M> )	1		LEFT
+( Nc----<=H> du Np----<=M> )	1		LEFT
+#
+################################################################################
+# PATRONS DU TYPE NOM_COMMUN (en | de | à | d | des | aux | du | au) NOM_COMMUN
+#
+( Nc----<=H> Nc----<=M> )	1		LEFT
+( Nc----<=H> Ncm---<=M> )	1		LEFT
+( Nc----<=H> Nc-s--<=M> )	1		LEFT
+( Nc----<=H> Nc-p--<=M> )	1		LEFT
+( Nc----<=H> Ncms--<=M> )	1		LEFT
+( Nc----<=H> Ncmp--<=M> )	1		LEFT
+( Nc----<=H> Ncfs--<=M> )	1		LEFT
+( Nc----<=H> Ncfp--<=M> )	1		LEFT
+( Ncm---<=H> Nc----<=M> )	1		LEFT
+( Ncm---<=H> Ncm---<=M> )	1		LEFT
+( Ncm---<=H> Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> Nc-p--<=M> )	1		LEFT
+( Ncm---<=H> Ncms--<=M> )	1		LEFT
+( Ncm---<=H> Ncmp--<=M> )	1		LEFT
+( Nc-s--<=H> Nc----<=M> )	1		LEFT
+( Nc-s--<=H> Ncm---<=M> )	1		LEFT
+( Nc-s--<=H> Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> Ncms--<=M> )	1		LEFT
+( Nc-s--<=H> Ncfs--<=M> )	1		LEFT
+( Nc-p--<=H> Nc----<=M> )	1		LEFT
+( Nc-p--<=H> Ncm---<=M> )	1		LEFT
+( Nc-p--<=H> Nc-p--<=M> )	1		LEFT
+( Nc-p--<=H> Ncmp--<=M> )	1		LEFT
+( Nc-p--<=H> Ncfp--<=M> )	1		LEFT
+( Ncms--<=H> Nc----<=M> )	1		LEFT
+( Ncms--<=H> Ncm---<=M> )	1		LEFT
+( Ncms--<=H> Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> Ncms--<=M> )	1		LEFT
+( Ncmp--<=H> Nc----<=M> )	1		LEFT
+( Ncmp--<=H> Ncm---<=M> )	1		LEFT
+( Ncmp--<=H> Nc-p--<=M> )	1		LEFT
+( Ncmp--<=H> Ncmp--<=M> )	1		LEFT
+( Ncfs--<=H> Nc----<=M> )	1		LEFT
+( Ncfs--<=H> Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> Ncfs--<=M> )	1		LEFT
+( Ncfp--<=H> Nc----<=M> )	1		LEFT
+( Ncfp--<=H> Nc-p--<=M> )	1		LEFT
+( Ncfp--<=H> Ncfp--<=M> )	1		LEFT
+#
+( Nc----<=H> de Nc----<=M> )	1		LEFT
+( Nc----<=H> de Ncm---<=M> )	1		LEFT
+( Nc----<=H> de Nc-s--<=M> )	1		LEFT
+( Nc----<=H> de Nc-p--<=M> )	1		LEFT
+( Nc----<=H> de Ncms--<=M> )	1		LEFT
+( Nc----<=H> de Ncmp--<=M> )	1		LEFT
+( Nc----<=H> de Ncfs--<=M> )	1		LEFT
+( Nc----<=H> de Ncfp--<=M> )	1		LEFT
+( Ncm---<=H> de Nc----<=M> )	1		LEFT
+( Ncm---<=H> de Ncm---<=M> )	1		LEFT
+( Ncm---<=H> de Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> de Nc-p--<=M> )	1		LEFT
+( Ncm---<=H> de Ncms--<=M> )	1		LEFT
+( Ncm---<=H> de Ncmp--<=M> )	1		LEFT
+( Ncm---<=H> de Ncfs--<=M> )	1		LEFT
+( Ncm---<=H> de Ncfp--<=M> )	1		LEFT
+( Nc-s--<=H> de Nc----<=M> )	1		LEFT
+( Nc-s--<=H> de Ncm---<=M> )	1		LEFT
+( Nc-s--<=H> de Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> de Nc-p--<=M> )	1		LEFT
+( Nc-s--<=H> de Ncms--<=M> )	1		LEFT
+( Nc-s--<=H> de Ncmp--<=M> )	1		LEFT
+( Nc-s--<=H> de Ncfs--<=M> )	1		LEFT
+( Nc-s--<=H> de Ncfp--<=M> )	1		LEFT
+( Nc-p--<=H> de Nc----<=M> )	1		LEFT
+( Nc-p--<=H> de Ncm---<=M> )	1		LEFT
+( Nc-p--<=H> de Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> de Nc-p--<=M> )	1		LEFT
+( Nc-p--<=H> de Ncms--<=M> )	1		LEFT
+( Nc-p--<=H> de Ncmp--<=M> )	1		LEFT
+( Nc-p--<=H> de Ncfs--<=M> )	1		LEFT
+( Nc-p--<=H> de Ncfp--<=M> )	1		LEFT
+( Ncms--<=H> de Nc----<=M> )	1		LEFT
+( Ncms--<=H> de Ncm---<=M> )	1		LEFT
+( Ncms--<=H> de Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> de Nc-p--<=M> )	1		LEFT
+( Ncms--<=H> de Ncms--<=M> )	1		LEFT
+( Ncms--<=H> de Ncmp--<=M> )	1		LEFT
+( Ncms--<=H> de Ncfs--<=M> )	1		LEFT
+( Ncms--<=H> de Ncfp--<=M> )	1		LEFT
+( Ncmp--<=H> de Nc----<=M> )	1		LEFT
+( Ncmp--<=H> de Ncm---<=M> )	1		LEFT
+( Ncmp--<=H> de Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> de Nc-p--<=M> )	1		LEFT
+( Ncmp--<=H> de Ncms--<=M> )	1		LEFT
+( Ncmp--<=H> de Ncmp--<=M> )	1		LEFT
+( Ncmp--<=H> de Ncfs--<=M> )	1		LEFT
+( Ncmp--<=H> de Ncfp--<=M> )	1		LEFT
+( Ncfs--<=H> de Nc----<=M> )	1		LEFT
+( Ncfs--<=H> de Ncm---<=M> )	1		LEFT
+( Ncfs--<=H> de Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> de Nc-p--<=M> )	1		LEFT
+( Ncfs--<=H> de Ncms--<=M> )	1		LEFT
+( Ncfs--<=H> de Ncmp--<=M> )	1		LEFT
+( Ncfs--<=H> de Ncfs--<=M> )	1		LEFT
+( Ncfs--<=H> de Ncfp--<=M> )	1		LEFT
+( Ncfp--<=H> de Nc----<=M> )	1		LEFT
+( Ncfp--<=H> de Ncm---<=M> )	1		LEFT
+( Ncfp--<=H> de Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> de Nc-p--<=M> )	1		LEFT
+( Ncfp--<=H> de Ncms--<=M> )	1		LEFT
+( Ncfp--<=H> de Ncmp--<=M> )	1		LEFT
+( Ncfp--<=H> de Ncfs--<=M> )	1		LEFT
+( Ncfp--<=H> de Ncfp--<=M> )	1		LEFT
+#
+( Nc----<=H> d Nc----<=M> )	1		LEFT
+( Nc----<=H> d Ncm---<=M> )	1		LEFT
+( Nc----<=H> d Nc-s--<=M> )	1		LEFT
+( Nc----<=H> d Nc-p--<=M> )	1		LEFT
+( Nc----<=H> d Ncms--<=M> )	1		LEFT
+( Nc----<=H> d Ncmp--<=M> )	1		LEFT
+( Nc----<=H> d Ncfs--<=M> )	1		LEFT
+( Nc----<=H> d Ncfp--<=M> )	1		LEFT
+( Ncm---<=H> d Nc----<=M> )	1		LEFT
+( Ncm---<=H> d Ncm---<=M> )	1		LEFT
+( Ncm---<=H> d Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> d Nc-p--<=M> )	1		LEFT
+( Ncm---<=H> d Ncms--<=M> )	1		LEFT
+( Ncm---<=H> d Ncmp--<=M> )	1		LEFT
+( Ncm---<=H> d Ncfs--<=M> )	1		LEFT
+( Ncm---<=H> d Ncfp--<=M> )	1		LEFT
+( Nc-s--<=H> d Nc----<=M> )	1		LEFT
+( Nc-s--<=H> d Ncm---<=M> )	1		LEFT
+( Nc-s--<=H> d Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> d Nc-p--<=M> )	1		LEFT
+( Nc-s--<=H> d Ncms--<=M> )	1		LEFT
+( Nc-s--<=H> d Ncmp--<=M> )	1		LEFT
+( Nc-s--<=H> d Ncfs--<=M> )	1		LEFT
+( Nc-s--<=H> d Ncfp--<=M> )	1		LEFT
+( Nc-p--<=H> d Nc----<=M> )	1		LEFT
+( Nc-p--<=H> d Ncm---<=M> )	1		LEFT
+( Nc-p--<=H> d Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> d Nc-p--<=M> )	1		LEFT
+( Nc-p--<=H> d Ncms--<=M> )	1		LEFT
+( Nc-p--<=H> d Ncmp--<=M> )	1		LEFT
+( Nc-p--<=H> d Ncfs--<=M> )	1		LEFT
+( Nc-p--<=H> d Ncfp--<=M> )	1		LEFT
+( Ncms--<=H> d Nc----<=M> )	1		LEFT
+( Ncms--<=H> d Ncm---<=M> )	1		LEFT
+( Ncms--<=H> d Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> d Nc-p--<=M> )	1		LEFT
+( Ncms--<=H> d Ncms--<=M> )	1		LEFT
+( Ncms--<=H> d Ncmp--<=M> )	1		LEFT
+( Ncms--<=H> d Ncfs--<=M> )	1		LEFT
+( Ncms--<=H> d Ncfp--<=M> )	1		LEFT
+( Ncmp--<=H> d Nc----<=M> )	1		LEFT
+( Ncmp--<=H> d Ncm---<=M> )	1		LEFT
+( Ncmp--<=H> d Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> d Nc-p--<=M> )	1		LEFT
+( Ncmp--<=H> d Ncms--<=M> )	1		LEFT
+( Ncmp--<=H> d Ncmp--<=M> )	1		LEFT
+( Ncmp--<=H> d Ncfs--<=M> )	1		LEFT
+( Ncmp--<=H> d Ncfp--<=M> )	1		LEFT
+( Ncfs--<=H> d Nc----<=M> )	1		LEFT
+( Ncfs--<=H> d Ncm---<=M> )	1		LEFT
+( Ncfs--<=H> d Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> d Nc-p--<=M> )	1		LEFT
+( Ncfs--<=H> d Ncms--<=M> )	1		LEFT
+( Ncfs--<=H> d Ncmp--<=M> )	1		LEFT
+( Ncfs--<=H> d Ncfs--<=M> )	1		LEFT
+( Ncfs--<=H> d Ncfp--<=M> )	1		LEFT
+( Ncfp--<=H> d Nc----<=M> )	1		LEFT
+( Ncfp--<=H> d Ncm---<=M> )	1		LEFT
+( Ncfp--<=H> d Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> d Nc-p--<=M> )	1		LEFT
+( Ncfp--<=H> d Ncms--<=M> )	1		LEFT
+( Ncfp--<=H> d Ncmp--<=M> )	1		LEFT
+( Ncfp--<=H> d Ncfs--<=M> )	1		LEFT
+( Ncfp--<=H> d Ncfp--<=M> )	1		LEFT
+#
+( Nc----<=H> à Nc----<=M> )	1		LEFT
+( Nc----<=H> à Ncm---<=M> )	1		LEFT
+( Nc----<=H> à Nc-s--<=M> )	1		LEFT
+( Nc----<=H> à Nc-p--<=M> )	1		LEFT
+( Nc----<=H> à Ncms--<=M> )	1		LEFT
+( Nc----<=H> à Ncmp--<=M> )	1		LEFT
+( Nc----<=H> à Ncfs--<=M> )	1		LEFT
+( Nc----<=H> à Ncfp--<=M> )	1		LEFT
+( Ncm---<=H> à Nc----<=M> )	1		LEFT
+( Ncm---<=H> à Ncm---<=M> )	1		LEFT
+( Ncm---<=H> à Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> à Nc-p--<=M> )	1		LEFT
+( Ncm---<=H> à Ncms--<=M> )	1		LEFT
+( Ncm---<=H> à Ncmp--<=M> )	1		LEFT
+( Ncm---<=H> à Ncfs--<=M> )	1		LEFT
+( Ncm---<=H> à Ncfp--<=M> )	1		LEFT
+( Nc-s--<=H> à Nc----<=M> )	1		LEFT
+( Nc-s--<=H> à Ncm---<=M> )	1		LEFT
+( Nc-s--<=H> à Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> à Nc-p--<=M> )	1		LEFT
+( Nc-s--<=H> à Ncms--<=M> )	1		LEFT
+( Nc-s--<=H> à Ncmp--<=M> )	1		LEFT
+( Nc-s--<=H> à Ncfs--<=M> )	1		LEFT
+( Nc-s--<=H> à Ncfp--<=M> )	1		LEFT
+( Nc-p--<=H> à Nc----<=M> )	1		LEFT
+( Nc-p--<=H> à Ncm---<=M> )	1		LEFT
+( Nc-p--<=H> à Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> à Nc-p--<=M> )	1		LEFT
+( Nc-p--<=H> à Ncms--<=M> )	1		LEFT
+( Nc-p--<=H> à Ncmp--<=M> )	1		LEFT
+( Nc-p--<=H> à Ncfs--<=M> )	1		LEFT
+( Nc-p--<=H> à Ncfp--<=M> )	1		LEFT
+( Ncms--<=H> à Nc----<=M> )	1		LEFT
+( Ncms--<=H> à Ncm---<=M> )	1		LEFT
+( Ncms--<=H> à Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> à Nc-p--<=M> )	1		LEFT
+( Ncms--<=H> à Ncms--<=M> )	1		LEFT
+( Ncms--<=H> à Ncmp--<=M> )	1		LEFT
+( Ncms--<=H> à Ncfs--<=M> )	1		LEFT
+( Ncms--<=H> à Ncfp--<=M> )	1		LEFT
+( Ncmp--<=H> à Nc----<=M> )	1		LEFT
+( Ncmp--<=H> à Ncm---<=M> )	1		LEFT
+( Ncmp--<=H> à Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> à Nc-p--<=M> )	1		LEFT
+( Ncmp--<=H> à Ncms--<=M> )	1		LEFT
+( Ncmp--<=H> à Ncmp--<=M> )	1		LEFT
+( Ncmp--<=H> à Ncfs--<=M> )	1		LEFT
+( Ncmp--<=H> à Ncfp--<=M> )	1		LEFT
+( Ncfs--<=H> à Nc----<=M> )	1		LEFT
+( Ncfs--<=H> à Ncm---<=M> )	1		LEFT
+( Ncfs--<=H> à Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> à Nc-p--<=M> )	1		LEFT
+( Ncfs--<=H> à Ncms--<=M> )	1		LEFT
+( Ncfs--<=H> à Ncmp--<=M> )	1		LEFT
+( Ncfs--<=H> à Ncfs--<=M> )	1		LEFT
+( Ncfs--<=H> à Ncfp--<=M> )	1		LEFT
+( Ncfp--<=H> à Nc----<=M> )	1		LEFT
+( Ncfp--<=H> à Ncm---<=M> )	1		LEFT
+( Ncfp--<=H> à Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> à Nc-p--<=M> )	1		LEFT
+( Ncfp--<=H> à Ncms--<=M> )	1		LEFT
+( Ncfp--<=H> à Ncmp--<=M> )	1		LEFT
+( Ncfp--<=H> à Ncfs--<=M> )	1		LEFT
+( Ncfp--<=H> à Ncfp--<=M> )	1		LEFT
+#
+( Nc----<=H> en Nc----<=M> )	1		LEFT
+( Nc----<=H> en Ncm---<=M> )	1		LEFT
+( Nc----<=H> en Nc-s--<=M> )	1		LEFT
+( Nc----<=H> en Nc-p--<=M> )	1		LEFT
+( Nc----<=H> en Ncms--<=M> )	1		LEFT
+( Nc----<=H> en Ncmp--<=M> )	1		LEFT
+( Nc----<=H> en Ncfs--<=M> )	1		LEFT
+( Nc----<=H> en Ncfp--<=M> )	1		LEFT
+( Ncm---<=H> en Nc----<=M> )	1		LEFT
+( Ncm---<=H> en Ncm---<=M> )	1		LEFT
+( Ncm---<=H> en Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> en Nc-p--<=M> )	1		LEFT
+( Ncm---<=H> en Ncms--<=M> )	1		LEFT
+( Ncm---<=H> en Ncmp--<=M> )	1		LEFT
+( Ncm---<=H> en Ncfs--<=M> )	1		LEFT
+( Ncm---<=H> en Ncfp--<=M> )	1		LEFT
+( Nc-s--<=H> en Nc----<=M> )	1		LEFT
+( Nc-s--<=H> en Ncm---<=M> )	1		LEFT
+( Nc-s--<=H> en Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> en Nc-p--<=M> )	1		LEFT
+( Nc-s--<=H> en Ncms--<=M> )	1		LEFT
+( Nc-s--<=H> en Ncmp--<=M> )	1		LEFT
+( Nc-s--<=H> en Ncfs--<=M> )	1		LEFT
+( Nc-s--<=H> en Ncfp--<=M> )	1		LEFT
+( Nc-p--<=H> en Nc----<=M> )	1		LEFT
+( Nc-p--<=H> en Ncm---<=M> )	1		LEFT
+( Nc-p--<=H> en Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> en Nc-p--<=M> )	1		LEFT
+( Nc-p--<=H> en Ncms--<=M> )	1		LEFT
+( Nc-p--<=H> en Ncmp--<=M> )	1		LEFT
+( Nc-p--<=H> en Ncfs--<=M> )	1		LEFT
+( Nc-p--<=H> en Ncfp--<=M> )	1		LEFT
+( Ncms--<=H> en Nc----<=M> )	1		LEFT
+( Ncms--<=H> en Ncm---<=M> )	1		LEFT
+( Ncms--<=H> en Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> en Nc-p--<=M> )	1		LEFT
+( Ncms--<=H> en Ncms--<=M> )	1		LEFT
+( Ncms--<=H> en Ncmp--<=M> )	1		LEFT
+( Ncms--<=H> en Ncfs--<=M> )	1		LEFT
+( Ncms--<=H> en Ncfp--<=M> )	1		LEFT
+( Ncmp--<=H> en Nc----<=M> )	1		LEFT
+( Ncmp--<=H> en Ncm---<=M> )	1		LEFT
+( Ncmp--<=H> en Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> en Nc-p--<=M> )	1		LEFT
+( Ncmp--<=H> en Ncms--<=M> )	1		LEFT
+( Ncmp--<=H> en Ncmp--<=M> )	1		LEFT
+( Ncmp--<=H> en Ncfs--<=M> )	1		LEFT
+( Ncmp--<=H> en Ncfp--<=M> )	1		LEFT
+( Ncfs--<=H> en Nc----<=M> )	1		LEFT
+( Ncfs--<=H> en Ncm---<=M> )	1		LEFT
+( Ncfs--<=H> en Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> en Nc-p--<=M> )	1		LEFT
+( Ncfs--<=H> en Ncms--<=M> )	1		LEFT
+( Ncfs--<=H> en Ncmp--<=M> )	1		LEFT
+( Ncfs--<=H> en Ncfs--<=M> )	1		LEFT
+( Ncfs--<=H> en Ncfp--<=M> )	1		LEFT
+( Ncfp--<=H> en Nc----<=M> )	1		LEFT
+( Ncfp--<=H> en Ncm---<=M> )	1		LEFT
+( Ncfp--<=H> en Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> en Nc-p--<=M> )	1		LEFT
+( Ncfp--<=H> en Ncms--<=M> )	1		LEFT
+( Ncfp--<=H> en Ncmp--<=M> )	1		LEFT
+( Ncfp--<=H> en Ncfs--<=M> )	1		LEFT
+( Ncfp--<=H> en Ncfp--<=M> )	1		LEFT
+#
+( Nc----<=H> au Nc-s--<=M> )	1		LEFT
+( Nc----<=H> au Ncms--<=M> )	1		LEFT
+( Nc----<=H> au Nc----<=M> )	1		LEFT
+( Nc----<=H> au Ncm---<=M> )	1		LEFT
+( Ncm---<=H> au Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> au Ncms--<=M> )	1		LEFT
+( Ncm---<=H> au Nc----<=M> )	1		LEFT
+( Ncm---<=H> au Ncm---<=M> )	1		LEFT
+( Nc-s--<=H> au Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> au Ncms--<=M> )	1		LEFT
+( Nc-s--<=H> au Nc----<=M> )	1		LEFT
+( Nc-s--<=H> au Ncm---<=M> )	1		LEFT
+( Nc-p--<=H> au Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> au Ncms--<=M> )	1		LEFT
+( Nc-p--<=H> au Nc----<=M> )	1		LEFT
+( Nc-p--<=H> au Ncm---<=M> )	1		LEFT
+( Ncms--<=H> au Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> au Ncms--<=M> )	1		LEFT
+( Ncms--<=H> au Nc----<=M> )	1		LEFT
+( Ncms--<=H> au Ncm---<=M> )	1		LEFT
+( Ncmp--<=H> au Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> au Ncms--<=M> )	1		LEFT
+( Ncmp--<=H> au Nc----<=M> )	1		LEFT
+( Ncmp--<=H> au Ncm---<=M> )	1		LEFT
+( Ncfs--<=H> au Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> au Ncms--<=M> )	1		LEFT
+( Ncfs--<=H> au Nc----<=M> )	1		LEFT
+( Ncfs--<=H> au Ncm---<=M> )	1		LEFT
+( Ncfp--<=H> au Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> au Ncms--<=M> )	1		LEFT
+( Ncfp--<=H> au Nc----<=M> )	1		LEFT
+( Ncfp--<=H> au Ncm---<=M> )	1		LEFT
+#
+( Nc----<=H> du Nc-s--<=M> )	1		LEFT
+( Nc----<=H> du Ncms--<=M> )	1		LEFT
+( Nc----<=H> du Nc----<=M> )	1		LEFT
+( Nc----<=H> du Ncm---<=M> )	1		LEFT
+( Ncm---<=H> du Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> du Ncms--<=M> )	1		LEFT
+( Ncm---<=H> du Nc----<=M> )	1		LEFT
+( Ncm---<=H> du Ncm---<=M> )	1		LEFT
+( Nc-s--<=H> du Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> du Ncms--<=M> )	1		LEFT
+( Nc-s--<=H> du Nc----<=M> )	1		LEFT
+( Nc-s--<=H> du Ncm---<=M> )	1		LEFT
+( Nc-p--<=H> du Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> du Ncms--<=M> )	1		LEFT
+( Nc-p--<=H> du Nc----<=M> )	1		LEFT
+( Nc-p--<=H> du Ncm---<=M> )	1		LEFT
+( Ncms--<=H> du Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> du Ncms--<=M> )	1		LEFT
+( Ncms--<=H> du Nc----<=M> )	1		LEFT
+( Ncms--<=H> du Ncm---<=M> )	1		LEFT
+( Ncmp--<=H> du Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> du Ncms--<=M> )	1		LEFT
+( Ncmp--<=H> du Nc----<=M> )	1		LEFT
+( Ncmp--<=H> du Ncm---<=M> )	1		LEFT
+( Ncfs--<=H> du Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> du Ncms--<=M> )	1		LEFT
+( Ncfs--<=H> du Nc----<=M> )	1		LEFT
+( Ncfs--<=H> du Ncm---<=M> )	1		LEFT
+( Ncfp--<=H> du Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> du Ncms--<=M> )	1		LEFT
+( Ncfp--<=H> du Nc----<=M> )	1		LEFT
+( Ncfp--<=H> du Ncm---<=M> )	1		LEFT
+#
+( Nc----<=H> au Nc-p--<=M> )	1		LEFT
+( Nc----<=H> au Ncmp--<=M> )	1		LEFT
+( Nc----<=H> au Ncfp--<=M> )	1		LEFT
+( Nc----<=H> au Nc----<=M> )	1		LEFT
+( Ncm---<=H> au Nc-p--<=M> )	1		LEFT
+( Ncm---<=H> au Ncmp--<=M> )	1		LEFT
+( Ncm---<=H> au Ncfp--<=M> )	1		LEFT
+( Ncm---<=H> au Nc----<=M> )	1		LEFT
+( Nc-s--<=H> au Nc-p--<=M> )	1		LEFT
+( Nc-s--<=H> au Ncmp--<=M> )	1		LEFT
+( Nc-s--<=H> au Ncfp--<=M> )	1		LEFT
+( Nc-s--<=H> au Nc----<=M> )	1		LEFT
+( Nc-p--<=H> au Nc-p--<=M> )	1		LEFT
+( Nc-p--<=H> au Ncmp--<=M> )	1		LEFT
+( Nc-p--<=H> au Ncfp--<=M> )	1		LEFT
+( Nc-p--<=H> au Nc----<=M> )	1		LEFT
+( Ncms--<=H> au Nc-p--<=M> )	1		LEFT
+( Ncms--<=H> au Ncmp--<=M> )	1		LEFT
+( Ncms--<=H> au Ncfp--<=M> )	1		LEFT
+( Ncms--<=H> au Nc----<=M> )	1		LEFT
+( Ncmp--<=H> au Nc-p--<=M> )	1		LEFT
+( Ncmp--<=H> au Ncmp--<=M> )	1		LEFT
+( Ncmp--<=H> au Ncfp--<=M> )	1		LEFT
+( Ncmp--<=H> au Nc----<=M> )	1		LEFT
+( Ncfs--<=H> au Nc-p--<=M> )	1		LEFT
+( Ncfs--<=H> au Ncmp--<=M> )	1		LEFT
+( Ncfs--<=H> au Ncfp--<=M> )	1		LEFT
+( Ncfs--<=H> au Nc----<=M> )	1		LEFT
+( Ncfp--<=H> au Nc-p--<=M> )	1		LEFT
+( Ncfp--<=H> au Ncmp--<=M> )	1		LEFT
+( Ncfp--<=H> au Ncfp--<=M> )	1		LEFT
+( Ncfp--<=H> au Nc----<=M> )	1		LEFT
+#
+( Nc----<=H> du Nc-p--<=M> )	1		LEFT
+( Nc----<=H> du Ncmp--<=M> )	1		LEFT
+( Nc----<=H> du Ncfp--<=M> )	1		LEFT
+( Nc----<=H> du Nc----<=M> )	1		LEFT
+( Ncm---<=H> du Nc-p--<=M> )	1		LEFT
+( Ncm---<=H> du Ncmp--<=M> )	1		LEFT
+( Ncm---<=H> du Ncfp--<=M> )	1		LEFT
+( Ncm---<=H> du Nc----<=M> )	1		LEFT
+( Nc-s--<=H> du Nc-p--<=M> )	1		LEFT
+( Nc-s--<=H> du Ncmp--<=M> )	1		LEFT
+( Nc-s--<=H> du Ncfp--<=M> )	1		LEFT
+( Nc-s--<=H> du Nc----<=M> )	1		LEFT
+( Nc-p--<=H> du Nc-p--<=M> )	1		LEFT
+( Nc-p--<=H> du Ncmp--<=M> )	1		LEFT
+( Nc-p--<=H> du Ncfp--<=M> )	1		LEFT
+( Nc-p--<=H> du Nc----<=M> )	1		LEFT
+( Ncms--<=H> du Nc-p--<=M> )	1		LEFT
+( Ncms--<=H> du Ncmp--<=M> )	1		LEFT
+( Ncms--<=H> du Ncfp--<=M> )	1		LEFT
+( Ncms--<=H> du Nc----<=M> )	1		LEFT
+( Ncmp--<=H> du Nc-p--<=M> )	1		LEFT
+( Ncmp--<=H> du Ncmp--<=M> )	1		LEFT
+( Ncmp--<=H> du Ncfp--<=M> )	1		LEFT
+( Ncmp--<=H> du Nc----<=M> )	1		LEFT
+( Ncfs--<=H> du Nc-p--<=M> )	1		LEFT
+( Ncfs--<=H> du Ncmp--<=M> )	1		LEFT
+( Ncfs--<=H> du Ncfp--<=M> )	1		LEFT
+( Ncfs--<=H> du Nc----<=M> )	1		LEFT
+( Ncfp--<=H> du Nc-p--<=M> )	1		LEFT
+( Ncfp--<=H> du Ncmp--<=M> )	1		LEFT
+( Ncfp--<=H> du Ncfp--<=M> )	1		LEFT
+( Ncfp--<=H> du Nc----<=M> )	1		LEFT
+#
+# à ( un | une | l | la )
+#
+( Np----<=H> à Da3ms--- Np----<=M> )	1		LEFT
+( Np----<=H> à Da3ms--- Nc----<=M> )	1		LEFT
+( Np----<=H> à Da3ms--- Ncm---<=M> )	1		LEFT
+( Np----<=H> à Da3ms--- Nc-s--<=M> )	1		LEFT
+( Np----<=H> à Da3ms--- Ncms--<=M> )	1		LEFT
+( Np----<=H> à Da3ms--- Ncfs--<=M> )	1		LEFT
+( Nc----<=H> à Da3ms--- Np----<=M> )	1		LEFT
+( Nc----<=H> à Da3ms--- Nc----<=M> )	1		LEFT
+( Nc----<=H> à Da3ms--- Ncm---<=M> )	1		LEFT
+( Nc----<=H> à Da3ms--- Nc-s--<=M> )	1		LEFT
+( Nc----<=H> à Da3ms--- Ncms--<=M> )	1		LEFT
+( Nc----<=H> à Da3ms--- Ncfs--<=M> )	1		LEFT
+( Ncm---<=H> à Da3ms--- Np----<=M> )	1		LEFT
+( Ncm---<=H> à Da3ms--- Nc----<=M> )	1		LEFT
+( Ncm---<=H> à Da3ms--- Ncm---<=M> )	1		LEFT
+( Ncm---<=H> à Da3ms--- Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> à Da3ms--- Ncms--<=M> )	1		LEFT
+( Ncm---<=H> à Da3ms--- Ncfs--<=M> )	1		LEFT
+( Nc-s--<=H> à Da3ms--- Np----<=M> )	1		LEFT
+( Nc-s--<=H> à Da3ms--- Nc----<=M> )	1		LEFT
+( Nc-s--<=H> à Da3ms--- Ncm---<=M> )	1		LEFT
+( Nc-s--<=H> à Da3ms--- Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> à Da3ms--- Ncms--<=M> )	1		LEFT
+( Nc-s--<=H> à Da3ms--- Ncfs--<=M> )	1		LEFT
+( Ncms--<=H> à Da3ms--- Np----<=M> )	1		LEFT
+( Ncms--<=H> à Da3ms--- Nc----<=M> )	1		LEFT
+( Ncms--<=H> à Da3ms--- Ncm---<=M> )	1		LEFT
+( Ncms--<=H> à Da3ms--- Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> à Da3ms--- Ncms--<=M> )	1		LEFT
+( Ncms--<=H> à Da3ms--- Ncfs--<=M> )	1		LEFT
+( Ncfs--<=H> à Da3ms--- Np----<=M> )	1		LEFT
+( Ncfs--<=H> à Da3ms--- Nc----<=M> )	1		LEFT
+( Ncfs--<=H> à Da3ms--- Ncm---<=M> )	1		LEFT
+( Ncfs--<=H> à Da3ms--- Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> à Da3ms--- Ncms--<=M> )	1		LEFT
+( Ncfs--<=H> à Da3ms--- Ncfs--<=M> )	1		LEFT
+( Nc-p--<=H> à Da3ms--- Np----<=M> )	1		LEFT
+( Nc-p--<=H> à Da3ms--- Nc----<=M> )	1		LEFT
+( Nc-p--<=H> à Da3ms--- Ncm---<=M> )	1		LEFT
+( Nc-p--<=H> à Da3ms--- Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> à Da3ms--- Ncms--<=M> )	1		LEFT
+( Nc-p--<=H> à Da3ms--- Ncfs--<=M> )	1		LEFT
+( Ncmp--<=H> à Da3ms--- Np----<=M> )	1		LEFT
+( Ncmp--<=H> à Da3ms--- Nc----<=M> )	1		LEFT
+( Ncmp--<=H> à Da3ms--- Ncm---<=M> )	1		LEFT
+( Ncmp--<=H> à Da3ms--- Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> à Da3ms--- Ncms--<=M> )	1		LEFT
+( Ncmp--<=H> à Da3ms--- Ncfs--<=M> )	1		LEFT
+( Ncfp--<=H> à Da3ms--- Np----<=M> )	1		LEFT
+( Ncfp--<=H> à Da3ms--- Nc----<=M> )	1		LEFT
+( Ncfp--<=H> à Da3ms--- Ncm---<=M> )	1		LEFT
+( Ncfp--<=H> à Da3ms--- Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> à Da3ms--- Ncms--<=M> )	1		LEFT
+( Ncfp--<=H> à Da3ms--- Ncfs--<=M> )	1		LEFT
+#
+( Np----<=H> à Da3fs--- Np----<=M> )	1		LEFT
+( Np----<=H> à Da3fs--- Nc----<=M> )	1		LEFT
+( Np----<=H> à Da3fs--- Nc-s--<=M> )	1		LEFT
+( Np----<=H> à Da3fs--- Ncfs--<=M> )	1		LEFT
+( Nc----<=H> à Da3fs--- Np----<=M> )	1		LEFT
+( Nc----<=H> à Da3fs--- Nc----<=M> )	1		LEFT
+( Nc----<=H> à Da3fs--- Nc-s--<=M> )	1		LEFT
+( Nc----<=H> à Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncm---<=H> à Da3fs--- Np----<=M> )	1		LEFT
+( Ncm---<=H> à Da3fs--- Nc----<=M> )	1		LEFT
+( Ncm---<=H> à Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> à Da3fs--- Ncfs--<=M> )	1		LEFT
+( Nc-s--<=H> à Da3fs--- Np----<=M> )	1		LEFT
+( Nc-s--<=H> à Da3fs--- Nc----<=M> )	1		LEFT
+( Nc-s--<=H> à Da3fs--- Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> à Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncms--<=H> à Da3fs--- Np----<=M> )	1		LEFT
+( Ncms--<=H> à Da3fs--- Nc----<=M> )	1		LEFT
+( Ncms--<=H> à Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> à Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncfs--<=H> à Da3fs--- Np----<=M> )	1		LEFT
+( Ncfs--<=H> à Da3fs--- Nc----<=M> )	1		LEFT
+( Ncfs--<=H> à Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> à Da3fs--- Ncfs--<=M> )	1		LEFT
+( Nc-p--<=H> à Da3fs--- Np----<=M> )	1		LEFT
+( Nc-p--<=H> à Da3fs--- Nc----<=M> )	1		LEFT
+( Nc-p--<=H> à Da3fs--- Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> à Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncmp--<=H> à Da3fs--- Np----<=M> )	1		LEFT
+( Ncmp--<=H> à Da3fs--- Nc----<=M> )	1		LEFT
+( Ncmp--<=H> à Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> à Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncfp--<=H> à Da3fs--- Np----<=M> )	1		LEFT
+( Ncfp--<=H> à Da3fs--- Nc----<=M> )	1		LEFT
+( Ncfp--<=H> à Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> à Da3fs--- Ncfs--<=M> )	1		LEFT
+#
+( Np----<=H> à Da3-s--- Np----<=M> )	1		LEFT
+( Np----<=H> à Da3-s--- Nc----<=M> )	1		LEFT
+( Np----<=H> à Da3-s--- Ncm---<=M> )	1		LEFT
+( Np----<=H> à Da3-s--- Nc-s--<=M> )	1		LEFT
+( Np----<=H> à Da3-s--- Ncms--<=M> )	1		LEFT
+( Np----<=H> à Da3-s--- Ncfs--<=M> )	1		LEFT
+( Nc----<=H> à Da3-s--- Np----<=M> )	1		LEFT
+( Nc----<=H> à Da3-s--- Nc----<=M> )	1		LEFT
+( Nc----<=H> à Da3-s--- Ncm---<=M> )	1		LEFT
+( Nc----<=H> à Da3-s--- Nc-s--<=M> )	1		LEFT
+( Nc----<=H> à Da3-s--- Ncms--<=M> )	1		LEFT
+( Nc----<=H> à Da3-s--- Ncfs--<=M> )	1		LEFT
+( Ncm---<=H> à Da3-s--- Np----<=M> )	1		LEFT
+( Ncm---<=H> à Da3-s--- Nc----<=M> )	1		LEFT
+( Ncm---<=H> à Da3-s--- Ncm---<=M> )	1		LEFT
+( Ncm---<=H> à Da3-s--- Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> à Da3-s--- Ncms--<=M> )	1		LEFT
+( Ncm---<=H> à Da3-s--- Ncfs--<=M> )	1		LEFT
+( Nc-s--<=H> à Da3-s--- Np----<=M> )	1		LEFT
+( Nc-s--<=H> à Da3-s--- Nc----<=M> )	1		LEFT
+( Nc-s--<=H> à Da3-s--- Ncm---<=M> )	1		LEFT
+( Nc-s--<=H> à Da3-s--- Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> à Da3-s--- Ncms--<=M> )	1		LEFT
+( Nc-s--<=H> à Da3-s--- Ncfs--<=M> )	1		LEFT
+( Ncms--<=H> à Da3-s--- Np----<=M> )	1		LEFT
+( Ncms--<=H> à Da3-s--- Nc----<=M> )	1		LEFT
+( Ncms--<=H> à Da3-s--- Ncm---<=M> )	1		LEFT
+( Ncms--<=H> à Da3-s--- Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> à Da3-s--- Ncms--<=M> )	1		LEFT
+( Ncms--<=H> à Da3-s--- Ncfs--<=M> )	1		LEFT
+( Ncfs--<=H> à Da3-s--- Np----<=M> )	1		LEFT
+( Ncfs--<=H> à Da3-s--- Nc----<=M> )	1		LEFT
+( Ncfs--<=H> à Da3-s--- Ncm---<=M> )	1		LEFT
+( Ncfs--<=H> à Da3-s--- Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> à Da3-s--- Ncms--<=M> )	1		LEFT
+( Ncfs--<=H> à Da3-s--- Ncfs--<=M> )	1		LEFT
+( Nc-p--<=H> à Da3-s--- Np----<=M> )	1		LEFT
+( Nc-p--<=H> à Da3-s--- Nc----<=M> )	1		LEFT
+( Nc-p--<=H> à Da3-s--- Ncm---<=M> )	1		LEFT
+( Nc-p--<=H> à Da3-s--- Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> à Da3-s--- Ncms--<=M> )	1		LEFT
+( Nc-p--<=H> à Da3-s--- Ncfs--<=M> )	1		LEFT
+( Ncmp--<=H> à Da3-s--- Np----<=M> )	1		LEFT
+( Ncmp--<=H> à Da3-s--- Nc----<=M> )	1		LEFT
+( Ncmp--<=H> à Da3-s--- Ncm---<=M> )	1		LEFT
+( Ncmp--<=H> à Da3-s--- Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> à Da3-s--- Ncms--<=M> )	1		LEFT
+( Ncmp--<=H> à Da3-s--- Ncfs--<=M> )	1		LEFT
+( Ncfp--<=H> à Da3-s--- Np----<=M> )	1		LEFT
+( Ncfp--<=H> à Da3-s--- Nc----<=M> )	1		LEFT
+( Ncfp--<=H> à Da3-s--- Ncm---<=M> )	1		LEFT
+( Ncfp--<=H> à Da3-s--- Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> à Da3-s--- Ncms--<=M> )	1		LEFT
+( Ncfp--<=H> à Da3-s--- Ncfs--<=M> )	1		LEFT
+#
+# d ( un | une )
+#
+( Np----<=H> d Da3fs--- Np----<=M> )	1		LEFT
+( Np----<=H> d Da3fs--- Nc----<=M> )	1		LEFT
+( Np----<=H> d Da3fs--- Nc-s--<=M> )	1		LEFT
+( Np----<=H> d Da3fs--- Ncfs--<=M> )	1		LEFT
+( Nc----<=H> d Da3fs--- Np----<=M> )	1		LEFT
+( Nc----<=H> d Da3fs--- Nc----<=M> )	1		LEFT
+( Nc----<=H> d Da3fs--- Nc-s--<=M> )	1		LEFT
+( Nc----<=H> d Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncm---<=H> d Da3fs--- Np----<=M> )	1		LEFT
+( Ncm---<=H> d Da3fs--- Nc----<=M> )	1		LEFT
+( Ncm---<=H> d Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> d Da3fs--- Ncfs--<=M> )	1		LEFT
+( Nc-s--<=H> d Da3fs--- Np----<=M> )	1		LEFT
+( Nc-s--<=H> d Da3fs--- Nc----<=M> )	1		LEFT
+( Nc-s--<=H> d Da3fs--- Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> d Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncms--<=H> d Da3fs--- Np----<=M> )	1		LEFT
+( Ncms--<=H> d Da3fs--- Nc----<=M> )	1		LEFT
+( Ncms--<=H> d Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> d Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncfs--<=H> d Da3fs--- Np----<=M> )	1		LEFT
+( Ncfs--<=H> d Da3fs--- Nc----<=M> )	1		LEFT
+( Ncfs--<=H> d Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> d Da3fs--- Ncfs--<=M> )	1		LEFT
+( Nc-p--<=H> d Da3fs--- Np----<=M> )	1		LEFT
+( Nc-p--<=H> d Da3fs--- Nc----<=M> )	1		LEFT
+( Nc-p--<=H> d Da3fs--- Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> d Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncmp--<=H> d Da3fs--- Np----<=M> )	1		LEFT
+( Ncmp--<=H> d Da3fs--- Nc----<=M> )	1		LEFT
+( Ncmp--<=H> d Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> d Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncfp--<=H> d Da3fs--- Np----<=M> )	1		LEFT
+( Ncfp--<=H> d Da3fs--- Nc----<=M> )	1		LEFT
+( Ncfp--<=H> d Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> d Da3fs--- Ncfs--<=M> )	1		LEFT
+#
+( Np----<=H> d Da3ms--- Np----<=M> )	1		LEFT
+( Np----<=H> d Da3ms--- Nc----<=M> )	1		LEFT
+( Np----<=H> d Da3ms--- Ncm---<=M> )	1		LEFT
+( Np----<=H> d Da3ms--- Nc-s--<=M> )	1		LEFT
+( Np----<=H> d Da3ms--- Ncms--<=M> )	1		LEFT
+( Np----<=H> d Da3ms--- Ncfs--<=M> )	1		LEFT
+( Nc----<=H> d Da3ms--- Np----<=M> )	1		LEFT
+( Nc----<=H> d Da3ms--- Nc----<=M> )	1		LEFT
+( Nc----<=H> d Da3ms--- Ncm---<=M> )	1		LEFT
+( Nc----<=H> d Da3ms--- Nc-s--<=M> )	1		LEFT
+( Nc----<=H> d Da3ms--- Ncms--<=M> )	1		LEFT
+( Nc----<=H> d Da3ms--- Ncfs--<=M> )	1		LEFT
+( Ncm---<=H> d Da3ms--- Np----<=M> )	1		LEFT
+( Ncm---<=H> d Da3ms--- Nc----<=M> )	1		LEFT
+( Ncm---<=H> d Da3ms--- Ncm---<=M> )	1		LEFT
+( Ncm---<=H> d Da3ms--- Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> d Da3ms--- Ncms--<=M> )	1		LEFT
+( Ncm---<=H> d Da3ms--- Ncfs--<=M> )	1		LEFT
+( Nc-s--<=H> d Da3ms--- Np----<=M> )	1		LEFT
+( Nc-s--<=H> d Da3ms--- Nc----<=M> )	1		LEFT
+( Nc-s--<=H> d Da3ms--- Ncm---<=M> )	1		LEFT
+( Nc-s--<=H> d Da3ms--- Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> d Da3ms--- Ncms--<=M> )	1		LEFT
+( Nc-s--<=H> d Da3ms--- Ncfs--<=M> )	1		LEFT
+( Ncms--<=H> d Da3ms--- Np----<=M> )	1		LEFT
+( Ncms--<=H> d Da3ms--- Nc----<=M> )	1		LEFT
+( Ncms--<=H> d Da3ms--- Ncm---<=M> )	1		LEFT
+( Ncms--<=H> d Da3ms--- Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> d Da3ms--- Ncms--<=M> )	1		LEFT
+( Ncms--<=H> d Da3ms--- Ncfs--<=M> )	1		LEFT
+( Ncfs--<=H> d Da3ms--- Np----<=M> )	1		LEFT
+( Ncfs--<=H> d Da3ms--- Nc----<=M> )	1		LEFT
+( Ncfs--<=H> d Da3ms--- Ncm---<=M> )	1		LEFT
+( Ncfs--<=H> d Da3ms--- Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> d Da3ms--- Ncms--<=M> )	1		LEFT
+( Ncfs--<=H> d Da3ms--- Ncfs--<=M> )	1		LEFT
+( Nc-p--<=H> d Da3ms--- Np----<=M> )	1		LEFT
+( Nc-p--<=H> d Da3ms--- Nc----<=M> )	1		LEFT
+( Nc-p--<=H> d Da3ms--- Ncm---<=M> )	1		LEFT
+( Nc-p--<=H> d Da3ms--- Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> d Da3ms--- Ncms--<=M> )	1		LEFT
+( Nc-p--<=H> d Da3ms--- Ncfs--<=M> )	1		LEFT
+( Ncmp--<=H> d Da3ms--- Np----<=M> )	1		LEFT
+( Ncmp--<=H> d Da3ms--- Nc----<=M> )	1		LEFT
+( Ncmp--<=H> d Da3ms--- Ncm---<=M> )	1		LEFT
+( Ncmp--<=H> d Da3ms--- Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> d Da3ms--- Ncms--<=M> )	1		LEFT
+( Ncmp--<=H> d Da3ms--- Ncfs--<=M> )	1		LEFT
+( Ncfp--<=H> d Da3ms--- Np----<=M> )	1		LEFT
+( Ncfp--<=H> d Da3ms--- Nc----<=M> )	1		LEFT
+( Ncfp--<=H> d Da3ms--- Ncm---<=M> )	1		LEFT
+( Ncfp--<=H> d Da3ms--- Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> d Da3ms--- Ncms--<=M> )	1		LEFT
+( Ncfp--<=H> d Da3ms--- Ncfs--<=M> )	1		LEFT
+#
+# de ( l | la )
+#
+( Np----<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Np----<=H> de Da3fs--- Nc----<=M> )	1		LEFT
+( Np----<=H> de Da3fs--- Nc-s--<=M> )	1		LEFT
+( Np----<=H> de Da3fs--- Ncfs--<=M> )	1		LEFT
+( Nc----<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Nc----<=H> de Da3fs--- Nc----<=M> )	1		LEFT
+( Nc----<=H> de Da3fs--- Nc-s--<=M> )	1		LEFT
+( Nc----<=H> de Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncm---<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Ncm---<=H> de Da3fs--- Nc----<=M> )	1		LEFT
+( Ncm---<=H> de Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> de Da3fs--- Ncfs--<=M> )	1		LEFT
+( Nc-s--<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Nc-s--<=H> de Da3fs--- Nc----<=M> )	1		LEFT
+( Nc-s--<=H> de Da3fs--- Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> de Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncms--<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Ncms--<=H> de Da3fs--- Nc----<=M> )	1		LEFT
+( Ncms--<=H> de Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> de Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncfs--<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Ncfs--<=H> de Da3fs--- Nc----<=M> )	1		LEFT
+( Ncfs--<=H> de Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> de Da3fs--- Ncfs--<=M> )	1		LEFT
+( Nc-p--<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Nc-p--<=H> de Da3fs--- Nc----<=M> )	1		LEFT
+( Nc-p--<=H> de Da3fs--- Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> de Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncmp--<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Ncmp--<=H> de Da3fs--- Nc----<=M> )	1		LEFT
+( Ncmp--<=H> de Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> de Da3fs--- Ncfs--<=M> )	1		LEFT
+( Ncfp--<=H> de Da3fs--- Np----<=M> )	1		LEFT
+( Ncfp--<=H> de Da3fs--- Nc----<=M> )	1		LEFT
+( Ncfp--<=H> de Da3fs--- Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> de Da3fs--- Ncfs--<=M> )	1		LEFT
+#
+( Np----<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Np----<=H> de Da3-s--- Nc----<=M> )	1		LEFT
+( Np----<=H> de Da3-s--- Ncm---<=M> )	1		LEFT
+( Np----<=H> de Da3-s--- Nc-s--<=M> )	1		LEFT
+( Np----<=H> de Da3-s--- Ncms--<=M> )	1		LEFT
+( Np----<=H> de Da3-s--- Ncfs--<=M> )	1		LEFT
+( Nc----<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Nc----<=H> de Da3-s--- Nc----<=M> )	1		LEFT
+( Nc----<=H> de Da3-s--- Ncm---<=M> )	1		LEFT
+( Nc----<=H> de Da3-s--- Nc-s--<=M> )	1		LEFT
+( Nc----<=H> de Da3-s--- Ncms--<=M> )	1		LEFT
+( Nc----<=H> de Da3-s--- Ncfs--<=M> )	1		LEFT
+( Ncm---<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Ncm---<=H> de Da3-s--- Nc----<=M> )	1		LEFT
+( Ncm---<=H> de Da3-s--- Ncm---<=M> )	1		LEFT
+( Ncm---<=H> de Da3-s--- Nc-s--<=M> )	1		LEFT
+( Ncm---<=H> de Da3-s--- Ncms--<=M> )	1		LEFT
+( Ncm---<=H> de Da3-s--- Ncfs--<=M> )	1		LEFT
+( Nc-s--<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Nc-s--<=H> de Da3-s--- Nc----<=M> )	1		LEFT
+( Nc-s--<=H> de Da3-s--- Ncm---<=M> )	1		LEFT
+( Nc-s--<=H> de Da3-s--- Nc-s--<=M> )	1		LEFT
+( Nc-s--<=H> de Da3-s--- Ncms--<=M> )	1		LEFT
+( Nc-s--<=H> de Da3-s--- Ncfs--<=M> )	1		LEFT
+( Ncms--<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Ncms--<=H> de Da3-s--- Nc----<=M> )	1		LEFT
+( Ncms--<=H> de Da3-s--- Ncm---<=M> )	1		LEFT
+( Ncms--<=H> de Da3-s--- Nc-s--<=M> )	1		LEFT
+( Ncms--<=H> de Da3-s--- Ncms--<=M> )	1		LEFT
+( Ncms--<=H> de Da3-s--- Ncfs--<=M> )	1		LEFT
+( Ncfs--<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Ncfs--<=H> de Da3-s--- Nc----<=M> )	1		LEFT
+( Ncfs--<=H> de Da3-s--- Ncm---<=M> )	1		LEFT
+( Ncfs--<=H> de Da3-s--- Nc-s--<=M> )	1		LEFT
+( Ncfs--<=H> de Da3-s--- Ncms--<=M> )	1		LEFT
+( Ncfs--<=H> de Da3-s--- Ncfs--<=M> )	1		LEFT
+( Nc-p--<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Nc-p--<=H> de Da3-s--- Nc----<=M> )	1		LEFT
+( Nc-p--<=H> de Da3-s--- Ncm---<=M> )	1		LEFT
+( Nc-p--<=H> de Da3-s--- Nc-s--<=M> )	1		LEFT
+( Nc-p--<=H> de Da3-s--- Ncms--<=M> )	1		LEFT
+( Nc-p--<=H> de Da3-s--- Ncfs--<=M> )	1		LEFT
+( Ncmp--<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Ncmp--<=H> de Da3-s--- Nc----<=M> )	1		LEFT
+( Ncmp--<=H> de Da3-s--- Ncm---<=M> )	1		LEFT
+( Ncmp--<=H> de Da3-s--- Nc-s--<=M> )	1		LEFT
+( Ncmp--<=H> de Da3-s--- Ncms--<=M> )	1		LEFT
+( Ncmp--<=H> de Da3-s--- Ncfs--<=M> )	1		LEFT
+( Ncfp--<=H> de Da3-s--- Np----<=M> )	1		LEFT
+( Ncfp--<=H> de Da3-s--- Nc----<=M> )	1		LEFT
+( Ncfp--<=H> de Da3-s--- Ncm---<=M> )	1		LEFT
+( Ncfp--<=H> de Da3-s--- Nc-s--<=M> )	1		LEFT
+( Ncfp--<=H> de Da3-s--- Ncms--<=M> )	1		LEFT
+( Ncfp--<=H> de Da3-s--- Ncfs--<=M> )	1		LEFT
+#
+#######################
+# NOM PARTICIPE PRESENT
+#
+#
+( Nc----<=H> ( Vmpp-----<=H> Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Ncfp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Nc-p--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Ncmp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Ncfp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Nc-p--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Ncmp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Ncfp--<=M> )<=M> )	1		LEFT
+#
+( Nc----<=H> ( Vmpp-----<=H> de Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Ncfp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Nc-p--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Ncmp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Ncfp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Nc-p--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Ncmp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Ncfp--<=M> )<=M> )	1		LEFT
+#
+( Nc----<=H> ( Vmpp-----<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+#
+( Nc----<=H> ( Vmpp-----<=H> du Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> du Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> du Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> du Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> du Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> du Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> du Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> du Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> du Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> du Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> du Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> du Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> du Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> du Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> du Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> du Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> du Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> du Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> du Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> du Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> du Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> du Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> du Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> du Ncm---<=M> )<=M> )	1		LEFT
+#
+( Nc----<=H> ( Vmpp-----<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> au Ncm---<=M> )<=M> )	1		LEFT
+#
+( Nc----<=H> ( Vmpp-----<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+#
+( Nc----<=H> ( Vmpp-----<=H> d Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> d Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> d Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> d Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> d Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> d Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> d Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> d Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> d Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> d Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> d Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> d Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> d Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> d Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> d Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> d Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> d Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> d Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> d Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> d Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> d Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> d Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> d Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> d Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> d Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> d Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> d Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> d Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> d Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> d Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> d Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> d Ncfp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> d Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> d Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> d Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> d Nc-p--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> d Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> d Ncmp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> d Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> d Ncfp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> d Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> d Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> d Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> d Nc-p--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> d Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> d Ncmp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> d Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> d Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> d Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> d Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> d Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> d Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> d Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> d Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> d Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> d Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> d Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> d Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> d Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> d Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> d Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> d Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> d Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> d Ncfp--<=M> )<=M> )	1		LEFT
+#
+( Nc----<=H> ( Vmpp-----<=H> du Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> du Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> du Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> du Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> du Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> du Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> du Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> du Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> du Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> du Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> du Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> du Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> du Nc-p--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> du Ncmp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> du Ncfp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> du Nc-p--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> du Ncmp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> du Ncfp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> du Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> du Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> du Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> du Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> du Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> du Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> du Nc----<=M> )<=M> )	1		LEFT
+#
+( Nc----<=H> ( Vmpp-----<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> au Nc----<=M> )<=M> )	1		LEFT
+#
+( Np----<=H> ( Vmpp-----<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+#
+( Np----<=H> ( Vmpp-----<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+#
+( Np----<=H> ( Vmpp-----<=H> de Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> de Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> de Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> de Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+#
+( Np----<=H> ( Vmpp-----<=H> de Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> de Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> de Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> de Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> de Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> de Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> de Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> de Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> de Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> de Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> de Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> de Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> de Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> de Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+#
+##############################
+# PARTICIPE_PRESENT DETEMINANT
+#
+( Np----<=H> ( Vmpp-----<=H> Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+#
+( Np----<=H> ( Vmpp-----<=H> Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+#
+( Np----<=H> ( Vmpp-----<=H> Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmpp-----<=H> Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmpp-----<=H> Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmpp-----<=H> Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmpp-----<=H> Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmpp-----<=H> Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmpp-----<=H> Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmpp-----<=H> Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmpp-----<=H> Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmpp-----<=H> Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+#
+#
+#####################
+# NOM PARTICIPE PASSE
+#
+#
+( Nc----<=H> Vmps-sm--<=M> )	1		LEFT
+( Ncm---<=H> Vmps-sm--<=M> )	1		LEFT
+( Nc-s--<=H> Vmps-sm--<=M> )	1		LEFT
+( Ncms--<=H> Vmps-sm--<=M> )	1		LEFT
+#
+( Nc----<=H> Vmps-sf--<=M> )	1		LEFT
+( Nc-s--<=H> Vmps-sf--<=M> )	1		LEFT
+( Ncfs--<=H> Vmps-sf--<=M> )	1		LEFT
+#
+( Nc----<=H> Vmps-pm--<=M> )	1		LEFT
+( Ncm---<=H> Vmps-pm--<=M> )	1		LEFT
+( Nc-p--<=H> Vmps-pm--<=M> )	1		LEFT
+( Ncmp--<=H> Vmps-pm--<=M> )	1		LEFT
+#
+( Nc----<=H> Vmps-pf--<=M> )	1		LEFT
+( Nc-p--<=H> Vmps-pf--<=M> )	1		LEFT
+( Ncfp--<=H> Vmps-pf--<=M> )	1		LEFT
+#
+# (Nc Vmps préposition Nc)
+#
+##############################
+# PARTICIPE MASCULIN SINGULIER
+#
+# 'fromage fabriqué à la ferme'
+#  ( Vmps à N )
+#
+( Nc-s--<=H> ( Vmps-sm--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Np----<=M> )<=M> )	1		LEFT
+#
+# ( Vmps par N )
+# 
+#
+( Nc-s--<=H> ( Vmps-sm--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Np----<=M> )<=M> )	1		LEFT
+#
+# ( Vmps en N )
+#
+( Nc-s--<=H> ( Vmps-sm--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> en Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> en Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> en Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> en Np----<=M> )<=M> )	1		LEFT
+#
+( Nc-s--<=H> ( Vmps-sm--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+#
+( Nc-s--<=H> ( Vmps-sm--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+#
+#############################
+# PARTICIPE FEMININ SINGULIER
+#
+( Nc-s--<=H> ( Vmps-sf--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Np----<=M> )<=M> )	1		LEFT
+#
+( Nc-s--<=H> ( Vmps-sf--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Np----<=M> )<=M> )	1		LEFT
+#
+( Nc-s--<=H> ( Vmps-sf--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> en Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> en Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> en Np----<=M> )<=M> )	1		LEFT
+#
+( Nc-s--<=H> ( Vmps-sf--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+#
+( Nc-s--<=H> ( Vmps-sf--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+#
+#############################
+# PARTICIPE FEMINININ PLURIEL
+#
+( Nc-p--<=H> ( Vmps-pf--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Np----<=M> )<=M> )	1		LEFT
+#
+( Nc-p--<=H> ( Vmps-pf--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Np----<=M> )<=M> )	1		LEFT
+#
+( Nc-p--<=H> ( Vmps-pf--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> en Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> en Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> en Np----<=M> )<=M> )	1		LEFT
+#
+( Nc-p--<=H> ( Vmps-pf--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+#
+( Nc-p--<=H> ( Vmps-pf--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+#
+############################
+# PARTICIPE MASCULIN PLURIEL
+#
+( Nc-p--<=H> ( Vmps-pm--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Np----<=M> )<=M> )	1		LEFT
+#
+( Nc-p--<=H> ( Vmps-pm--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Np----<=M> )<=M> )	1		LEFT
+#
+( Nc-p--<=H> ( Vmps-pm--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> en Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> en Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> en Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> en Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> en Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> en Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> en Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> en Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> en Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> en Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> en Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> en Np----<=M> )<=M> )	1		LEFT
+#
+( Nc-p--<=H> ( Vmps-pm--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> au Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> au Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+#
+( Nc-p--<=H> ( Vmps-pm--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> au Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> au Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> au Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> au Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> au Ncm---<=M> )<=M> )	1		LEFT
+#
+########################################
+#
+#
+( Np----<=H> ( Vmps-sm--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+#
+( Np----<=H> ( Vmps-sm--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> à Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+#
+( Np----<=H> ( Vmps-sm--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3ms--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3ms--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3ms--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3ms--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3ms--- Ncms--<=M> )<=M> )	1		LEFT
+#
+( Np----<=H> ( Vmps-sm--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3fs--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3fs--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3fs--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3fs--- Ncfs--<=M> )<=M> )	1		LEFT
+#
+( Np----<=H> ( Vmps-sm--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3-s--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3-s--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3-s--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3-s--- Nc-s--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3-s--- Ncms--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3-s--- Ncfs--<=M> )<=M> )	1		LEFT
+#
+( Np----<=H> ( Vmps-sm--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sm--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-sf--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pm--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Np----<=H> ( Vmps-pf--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sm--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-sf--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pm--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Nc----<=H> ( Vmps-pf--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-sm--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Ncm---<=H> ( Vmps-pm--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sm--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-s--<=H> ( Vmps-sf--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Ncms--<=H> ( Vmps-sm--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfs--<=H> ( Vmps-sf--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pm--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Nc-p--<=H> ( Vmps-pf--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Ncmp--<=H> ( Vmps-pm--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3-p--- Np----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3-p--- Nc----<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3-p--- Ncm---<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3-p--- Nc-p--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3-p--- Ncmp--<=M> )<=M> )	1		LEFT
+( Ncfp--<=H> ( Vmps-pf--<=H> par Da3-p--- Ncfp--<=M> )<=M> )	1		LEFT
+#
+#
+###############
+# COORDINATIONS
+###############
+#
+#
+# avec 'et' ou 'KON' en conjonction de coordination et/ou en candidat dans TagSet
+#
+# * ( Nc-p--<=H> ( A---p--<=H> et A---p--<=M> )<=M> )	1		LEFT
+# * ( Nc-p--<=H> et Nc-s--<=M> )	1		LEFT
+# * ( Nc-p--<=H> le de la Nc-s--<=M> )	1		LEFT
+# * ( Nc-p--<=H> KON Nc-s--<=M> )	1		LEFT
+#
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# en ayant mis et en préposition et non pas en conjonction de coordination
+# mais ce n'est que pour essai car pas viable quand on tentera les patrons
+# ( nom ( préposition déterminant? nom et préposition déterminant? nom ) )
+# car les séquences suivantes sont refusées par YaTeA dans ParsingPatterns
+# PRP PRP
+# DET DET
+# DET PRP DET
+# PRP DET PRP
+#
+#######################################
+# PATRONS DU TYPE ( N ( A (et|ou) A ) )
+#
+# ici il faut que les trois éléments s'accordent
+#
+( Np----<=H> ( A------<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> et A--fs--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> et A--fp--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--m---<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--m---<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--m---<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--m---<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--m---<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--m---<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---s--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---s--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---s--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---s--<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---s--<=C1> et A--fs--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---p--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---p--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---p--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---p--<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---p--<=C1> et A--fp--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--ms--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--ms--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--ms--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--ms--<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--mp--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--mp--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--mp--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--mp--<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--fs--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--fs--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--fs--<=C1> et A--fs--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--fp--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--fp--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--fp--<=C1> et A--fp--<=C2> )<=M> )	1		LEFT
+#
+( Nc----<=H> ( A------<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> et A--fs--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> et A--fp--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--m---<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--m---<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--m---<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--m---<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--m---<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--m---<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---s--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---s--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---s--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---s--<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---s--<=C1> et A--fs--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---p--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---p--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---p--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---p--<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---p--<=C1> et A--fp--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--ms--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--ms--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--ms--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--ms--<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--mp--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--mp--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--mp--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--mp--<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--fs--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--fs--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--fs--<=C1> et A--fs--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--fp--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--fp--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--fp--<=C1> et A--fp--<=C2> )<=M> )	1		LEFT
+#
+( Ncm---<=H> ( A------<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A------<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A------<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A------<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A------<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A------<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--m---<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--m---<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--m---<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--m---<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--m---<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--m---<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---s--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---s--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---s--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---s--<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---p--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---p--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---p--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---p--<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--ms--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--ms--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--ms--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--ms--<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--mp--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--mp--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--mp--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--mp--<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+#
+( Nc-s--<=H> ( A------<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A------<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A------<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A------<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A------<=C1> et A--fs--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--m---<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--m---<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--m---<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--m---<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A---s--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A---s--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A---s--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A---s--<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A---s--<=C1> et A--fs--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--ms--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--ms--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--ms--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--ms--<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--fs--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--fs--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--fs--<=C1> et A--fs--<=C2> )<=M> )	1		LEFT
+#
+( Ncms--<=H> ( A------<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A------<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A------<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A------<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--m---<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--m---<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--m---<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--m---<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A---s--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A---s--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A---s--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A---s--<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--ms--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--ms--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--ms--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--ms--<=C1> et A--ms--<=C2> )<=M> )	1		LEFT
+#
+( Ncfs--<=H> ( A------<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A------<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A------<=C1> et A--fs--<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A---s--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A---s--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A---s--<=C1> et A--fs--<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A--fs--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A--fs--<=C1> et A---s--<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A--fs--<=C1> et A--fs--<=C2> )<=M> )	1		LEFT
+#
+( Nc-p--<=H> ( A------<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A------<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A------<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A------<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A------<=C1> et A--fp--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--m---<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--m---<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--m---<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--m---<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A---p--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A---p--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A---p--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A---p--<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A---p--<=C1> et A--fp--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--mp--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--mp--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--mp--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--mp--<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--fp--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--fp--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--fp--<=C1> et A--fp--<=C2> )<=M> )	1		LEFT
+#
+( Ncmp--<=H> ( A------<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A------<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A------<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A------<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--m---<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--m---<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--m---<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--m---<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A---p--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A---p--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A---p--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A---p--<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--mp--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--mp--<=C1> et A--m---<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--mp--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--mp--<=C1> et A--mp--<=C2> )<=M> )	1		LEFT
+#
+( Ncfp--<=H> ( A------<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A------<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A------<=C1> et A--fp--<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A---p--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A---p--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A---p--<=C1> et A--fp--<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A--fp--<=C1> et A------<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A--fp--<=C1> et A---p--<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A--fp--<=C1> et A--fp--<=C2> )<=M> )	1		LEFT 
+#
+( Np----<=H> ( A------<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> ou A--fs--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A------<=C1> ou A--fp--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--m---<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--m---<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--m---<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--m---<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--m---<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--m---<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---s--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---s--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---s--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---s--<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---s--<=C1> ou A--fs--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---p--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---p--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---p--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---p--<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A---p--<=C1> ou A--fp--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--ms--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--ms--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--ms--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--ms--<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--mp--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--mp--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--mp--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--mp--<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--fs--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--fs--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--fs--<=C1> ou A--fs--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--fp--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--fp--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Np----<=H> ( A--fp--<=C1> ou A--fp--<=C2> )<=M> )	1		LEFT
+#
+( Nc----<=H> ( A------<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> ou A--fs--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A------<=C1> ou A--fp--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--m---<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--m---<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--m---<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--m---<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--m---<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--m---<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---s--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---s--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---s--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---s--<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---s--<=C1> ou A--fs--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---p--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---p--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---p--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---p--<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A---p--<=C1> ou A--fp--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--ms--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--ms--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--ms--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--ms--<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--mp--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--mp--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--mp--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--mp--<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--fs--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--fs--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--fs--<=C1> ou A--fs--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--fp--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--fp--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Nc----<=H> ( A--fp--<=C1> ou A--fp--<=C2> )<=M> )	1		LEFT
+#
+( Ncm---<=H> ( A------<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A------<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A------<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A------<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A------<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A------<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--m---<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--m---<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--m---<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--m---<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--m---<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--m---<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---s--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---s--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---s--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---s--<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---p--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---p--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---p--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A---p--<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--ms--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--ms--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--ms--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--ms--<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--mp--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--mp--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--mp--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Ncm---<=H> ( A--mp--<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+#
+( Nc-s--<=H> ( A------<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A------<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A------<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A------<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A------<=C1> ou A--fs--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--m---<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--m---<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--m---<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--m---<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A---s--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A---s--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A---s--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A---s--<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A---s--<=C1> ou A--fs--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--ms--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--ms--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--ms--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--ms--<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--fs--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--fs--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Nc-s--<=H> ( A--fs--<=C1> ou A--fs--<=C2> )<=M> )	1		LEFT
+#
+( Ncms--<=H> ( A------<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A------<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A------<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A------<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--m---<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--m---<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--m---<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--m---<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A---s--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A---s--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A---s--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A---s--<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--ms--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--ms--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--ms--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Ncms--<=H> ( A--ms--<=C1> ou A--ms--<=C2> )<=M> )	1		LEFT
+#
+( Ncfs--<=H> ( A------<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A------<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A------<=C1> ou A--fs--<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A---s--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A---s--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A---s--<=C1> ou A--fs--<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A--fs--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A--fs--<=C1> ou A---s--<=C2> )<=M> )	1		LEFT
+( Ncfs--<=H> ( A--fs--<=C1> ou A--fs--<=C2> )<=M> )	1		LEFT
+#
+( Nc-p--<=H> ( A------<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A------<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A------<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A------<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A------<=C1> ou A--fp--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--m---<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--m---<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--m---<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--m---<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A---p--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A---p--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A---p--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A---p--<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A---p--<=C1> ou A--fp--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--mp--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--mp--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--mp--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--mp--<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--fp--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--fp--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Nc-p--<=H> ( A--fp--<=C1> ou A--fp--<=C2> )<=M> )	1		LEFT
+#
+( Ncmp--<=H> ( A------<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A------<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A------<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A------<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--m---<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--m---<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--m---<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--m---<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A---p--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A---p--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A---p--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A---p--<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--mp--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--mp--<=C1> ou A--m---<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--mp--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Ncmp--<=H> ( A--mp--<=C1> ou A--mp--<=C2> )<=M> )	1		LEFT
+#
+( Ncfp--<=H> ( A------<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A------<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A------<=C1> ou A--fp--<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A---p--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A---p--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A---p--<=C1> ou A--fp--<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A--fp--<=C1> ou A------<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A--fp--<=C1> ou A---p--<=C2> )<=M> )	1		LEFT
+( Ncfp--<=H> ( A--fp--<=C1> ou A--fp--<=C2> )<=M> )	1		LEFT 
+#

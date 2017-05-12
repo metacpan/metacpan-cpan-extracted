@@ -1,0 +1,102 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on February, 3  2002 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Using LinkController: Absolute and Relative URIs</TITLE>
+
+<META NAME="description" CONTENT="Using LinkController: Absolute and Relative URIs">
+<META NAME="keywords" CONTENT="Using LinkController: Absolute and Relative URIs">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC34"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_10.html#SEC33"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_12.html#SEC35"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_10.html#SEC33"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_12.html#SEC35"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1> C. Absolute and Relative URIs </H1>
+<!--docid::SEC34::-->
+<P>
+
+LinkController is designed to handle absolute and relative URIs in a
+consistent but sensible fasion, but unfortunately there isn't any
+totally clear correct way.  For link extraction we simply conver
+relative URLs to absolute form.  For link testing, this means that we
+don't ever think of relative URLs.  For link fixing on the other hand
+the situation is more complex.  For this reason there is a
+<CODE>--relative</CODE> option to <CODE>fix-link</CODE>.  
+</P><P>
+
+If we run <CODE>fix-link</CODE> without the <CODE>--relative</CODE> option then we
+only substitute absolute links in the existing document to the link
+given on the command line.  This is safer because the subsitution is
+unlikely to mistake other strings which accidentally match the link.
+</P><P>
+
+If we run <CODE>fix-link</CODE> with the <CODE>--relative</CODE> option on the other
+hand then we will handle relative links.  What this means depends on
+whether the links to be fixed can be expressed as links relative to the
+pages being fixed.  
+</P><P>
+
+If the original (broken) link can be expressed as a relative link then
+we will do substitutions where we find relative links.  If the target
+(corrected) link can be expressed as a relative link then we will always
+substitute broken links with a relative link.  
+</P><P>
+
+Taken together, this means that if a resource has moved to the same
+server as your pages, substitution with the <CODE>--relative</CODE> option
+will correction convert all of your absolute links into relative links
+and if a resource has moved from your server to another then we will
+correctly substitute relative links with absolute links. 
+</P><P>
+
+The only undesirable effect would be if a resource is moved within your
+pages and you have a mixture of relative and absolute links to that
+resource (e.g. for absolute links on page which is mirrored on other
+sites).  In this case, first do substitution without the
+<CODE>--relative</CODE> option and then afterwards with the <CODE>--relative</CODE>
+option.
+</P><P>
+
+<A NAME="Bugs"></A>
+<HR SIZE="6">
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_10.html#SEC33"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_12.html#SEC35"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Michael De La Rue</I> on <I>February, 3  2002</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

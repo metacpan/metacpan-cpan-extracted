@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+use strict;
+use base 'LEOCHARRE::CLI';
+use WWW::CPAN;
+# use Smart::Comments '###';
+my $o = gopts('V');
+
+@ARGV or die('missing arg');
+
+
+my $cpan = WWW::CPAN->new;
+
+my @v = map { get_cpan_version($_) } @ARGV;
+
+print join("\n",@v);
+
+sub usage {
+
+return qq{$0 - get module versions from cpan
+
+OPTION FLAGS
+
+   -V verbose, print meta info to stdout
+
+SEE ALSO
+
+LEOCHARRE::Dev
+
+   };
+}
+
+
+sub get_cpan_version {
+   my $dist = shift;
+   $dist or die('missing arg');
+   my $distname = _arg2distname($dist) or die;
+
+   my $meta = $cpan->fetch_distmeta({ dist => $distname})
+      or print STDERR "cant fetch dist meta for $distname\n" 
+      and return '';
+   if( $o->{V} ){
+      ### $meta
+   }
+
+   my $version = $meta->{version} 
+      or print STDERR "cant get version number for $distname\n"
+      and return '';
+
+   return $version;
+}
+
+sub _arg2distname {
+   my $arg = shift;
+
+   my $namechars = qr/[a-zA-Z0-9]/;
+   my $distchars = qr/[a-zA-Z0-9\:\-\.]/;
+
+   $arg=~/^$distchars+$/ or die("argument $arg doesn't look like a distro name");
+   $arg=~s/\:\:/\-/g;
+   return $arg;
+
+
+}
+

@@ -1,0 +1,19 @@
+Revision history for Limper-SendFile
+
+0.005     2015-12-13 21:33:36-05:00 America/New_York
+
+0.004     2014-10-27 03:12:16+00:00 UTC
+- changes because Limper 0.012
+
+0.003     2014-10-24 02:30:02+00:00 UTC
+- fix test skipping
+- skip tests if MSWin32
+
+0.002     2014-10-19 06:13:37+00:00 UTC
+- add support for 79 mime types (103 file extensions)
+- don't set Content-Type if already set
+- remove File::Slurp dependency, as well as the JSON one that shouldn't have been there
+- explicit Prereqs in dist.ini
+
+0.001     2014-10-17 02:39:39+00:00 UTC
+- initial basic release

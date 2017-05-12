@@ -1,0 +1,10 @@
+Thanks to:
+
+ Djoerd Hiemstra
+for his initial work on Twente Aligner, and for his help and support
+on NATools developing;
+
+
+ Ruben Fonseca <fonseka@gmail.com>
+ Marco Gomes <mpglesi@gmail.com> 
+for their work on the configure script to detect Perl modules.

@@ -1,0 +1,242 @@
+Revision history for Perl CPAN module Lingua::En::NameParse
+
+1.36 15  Jul 2016
+    Added religious title Rev (for Reverand  RT bug #116080
+    Added more military titles
+    Improved documentation
+
+1.35 5 Jul 2016
+    Used github as repository
+    Improved documentation
+
+
+1.34 1 Jun 2016
+    Added military title Pvt (for Private in the USA) RT bug #113972
+
+1.33 22 Apr 2015
+    Removed 'Mr_J_Adam_Smith' name type.  Names that were most likely double surnames were being incorrectly parsed
+        For example 'Mr A Smythe Taylor' was getting middle name of 'Smythe'. Should be picked up as error.
+        Surname should be 'Smythe-Taylor'
+    
+    Fold all text to upper case prior to parsing, regexp matching is faster if case insensitive
+        Note that this means all components are now NameCased by default.
+        The case_components method has been removed as the 'components' method achieves the same outcome
+        The force_case option has been removed
+    
+    non_matching text moved from properties to components
+    
+    Use extended regexp (/x) in grammar for better readability
+    Simplified grammar and removed duplicate definitions
+    Removed all full stops before parsing as this simplifies grammar, so: Mr. A.B. Smith => Mr AB Smith
+    Added more valid prefixes
+    'report' method now tests all functions
+    removed indirect object notation for 'new' method
+    added error and warning description attributes to name object
+    
+
+1.32 11 Nov 2013
+    Removed &s from start of subroutine calls (obsolete syntax)
+    Fixed typo RT bug 88573
+    case_surname does not process undefined or blank input, stops warning message occuring
+
+1.31 24 Jun 2013
+    Wherever program returned 'undef' changed to just a return statement, fix for RT bug 85491
+    Added error handling to synopsis examples
+
+1.30 31 Mar 2011
+    Added component ordering for Mr_J_Adam_Smith name type, thanks to John Hansen
+    Corrected some of the documentation
+    Added more military titles
+
+1.29 23 Jan 2011
+   Corrected documentation of case_components module, thanks to John Hansen
+   Removed invalid space after /Pilot Officer/ in extended titles grammar, thanks to John Hansen
+   Added the 'Mr_J_Adam_Smith' name type, thanks to John Hansen
+   Added the 'John' name type, thanks to Graham Seamen
+   Moved NameGrammar.pm to Lingua::EN::NameParse::Grammar name space
+
+1.28 3 Jan 2011
+   Added more extended titles including Pilot Officer, Count, Duke, Dutchess, Marquess (thanks to Hugh Myers)
+   Allowed T-Bone as a given name (thanks to Hugh Myers)
+   Added name type Mr_John_Adam_Smith (thanks to Chris Brown)
+   Allowed joint names to be reverse cased
+   Fixed bug when printing report on name of unknown type
+   Moved saluation paramters from 'new' to 'salutation' method
+   Allowed for two types of salutation, given_name and title_plus_surname
+
+1.27 4 Jul 2010
+   Changed my cygwin fstab file to use noacl option for default mount points.
+   Before this, the tar tool was creating directories with no read permision.
+
+1.26 3 Jul 2010
+   Made line endings consistent in all files, with Unix style EOL markers
+
+1.25 2 Jul 2010
+   Changed the parse method to match the documentation. It was returning a name
+   object and an error flag, when only the flag was required. Note that this
+   caused no problem if used as documented, the error value was still assigned
+   correctly, and the name object assigned to nothing. Thanks to Chris Prather.
+
+   Added 'use warnings' to modules
+
+1.24 6 Jan 2008
+    Removed one more use to $_  in case_surname subroutine. Thanks to Ben Martin
+
+1.23 23 Nov 2006
+    components method now returns undef if name cannot be parsed. Thanks to Patrick Kane.
+    Stopped assigning to $_  in case_surname subroutine. Thanks to Richard Walker
+    Created examples folder
+    Fixed alignment problem in report method
+    Removed optional title from John_Adam_Smith name type
+
+1.22 12 Jul 2005
+    Added the Mr_John_Smith_&_Ms_Mary_Jones name type
+    Added the John_Smith_&_Mary_Jones name type
+    Added the John_&_Mary_Smith name type
+    Added the A_Smith_&_B_Jones name type
+    Updated distribution to current CPAN requirements
+
+1.21 20 May 2005
+    Fixed bug that was creating a name cased surname of O'sullivan, now O'Sullivan
+    Added report method to dump all name properties and components
+    Added several new suffixes such as PhD
+
+1.20 16 Feb 2004
+    Fixed bug that was preventing some extended titles, such as 'Major General'
+    from working
+
+1.19 27 Dec 2003
+    Fixed bug in rules.t, thanks to Assad Arnaud
+    Added more valid surnames in _valid_name, thanks to Peter Schendzielorz
+
+
+1.18 28 Mar 2002
+    Fixed bug in rules.t, thanks to Assad Arnaud
+    Added more reserved words
+    Added option to use a limited set of common titles (improves speed)
+
+
+1.17 21 Mar 2002:
+    Added option to remove joint names from grammar (100% speed improvement!)
+    NOTE that by default, joint names (Mr & Mrs AB Smith) are not recognized
+
+    Applied correct capitalization to single possessive word, such as French's
+    Added Dalle, dela and dall' to list of Italian surname prefixes
+    Added San to list of Spanish surname prefixes
+    Detect reserved words, such as Pty Ltd in pre parse stage
+
+
+1.16 24 Sep 2001:
+    Minor additions to README file
+
+1.15 25 Jul 2001:
+    Added more complete list to surname_prefs.txt
+
+    Allowed for a surname prefix of Dell', as in Dell'Arte
+
+    Added case_all_reversed method to return name in the format of
+    surname, initials and/or given_names, useful for alphabetical sorting
+
+    Length of given name set to at least 2 characters for name type John_A_Smith
+    Names such as "Al B Jones" now parse correctly
+
+    Length of given name set to at least 2 characters for name type John_Adam_Smith
+    Names such as "Al Brian Jones" now parse correctly
+
+    Created a new token for middle names, at least 2 characters long and a look
+    ahead to exclude prefixes. Names such as "Mary Jo White" and
+    "John Van Der Wald" now parse correctly
+
+
+1.14 19 Jul 2001:
+    Moved prefixes and suffixes back into grammar tree to stop invalid combinations
+    Removed pre parse stage
+    Changed case_surname to correctly capitalize suffixes in roman numeral format
+    Removed POD directives from README
+    Added J_Adam_Smith name type, thanks to Michael Cesar
+
+1.13 25 Apr 2001:
+
+    Initialised values for all parsed name components to empty string
+    Fixed POD errors, thanks to Jason Gallagher
+
+1.12  4 Apr 2001:
+    Allowed for titles in John_Adam_Smith name type (they were  being consumed to early as given names).
+    Fixed some incorrect title regular expressions
+    Added 'dela' to list of surname Italian prefixes
+
+1.11 24 Feb 2001:
+    Fixed bug in Makefile.PL, caused by omission of NameGrammar.pm
+
+1.10 22 Feb 2001:
+    Allowed for apostrophes in given names, like D'Artagnan
+    Fixed bug for suffixes in 'John_Smith' name type
+    Added the John_Adam_Smith name type
+
+    Added correct capitalization of possessive proper names such as
+    Australia's to case_surname. Thanks to Dennis Ingram.
+
+    Precursors and suffixes now detected in pre-parsing stage
+    Removed precursor and suffix tree from grammar
+    Removed Senior and Junior as suffixes, as they are valid surnames
+    Extended range of suffixes in roman numeral format
+    Moved grammar definition to separate module
+
+1.05  7 Jan 2001:
+    Updated README file
+    Added test of lower casing prefixes to rules.t
+
+1.04 10 Dec 2000:
+    Allowed for reversed order names where the surname appears first, followed
+    by a comma and the remaining components of  the name, such as title,
+    first name, initials etc.
+
+1.03 25 Jul 2000:
+    Added suffixes (like Jnr) to most single names
+    Replaced '=head3' because they don't work with perldoc
+    Removed search of @INC array in BEGIN subroutine
+    Thanks to Douglas Wilson for these requests
+
+1.02 19 Apr 2000:
+    Removed title J\.? (abbreviation for Judge) as it clashed  with names such
+    as J A Smith, J. B. Jones etc. Thanks to  Adam Huffman for spotting this bug
+
+1.01 15 Apr 2000:
+    auto_clean option now removes commas from input
+    Improved regular expressions in 'clean' sub, thanks to Mark Summerfield
+
+    Catered for initials with both dots and spaces, such as A. B. Smith, requested by Adam Huffman
+
+1.00 27 Dec 1999:
+    Added user defined file of surname capitalization over rides
+    Allowed for salutations where precursor is not an estate
+
+0.40 14 Sep 1999:
+    Added the Mr_John_A_Smith and John_A_Smith name types
+    Allowed for hyphenated given names
+
+0.30 21 Aug 1999:
+    Allowed for user defined length of initials
+    Added the Mr_John_Smith name type
+    Added the John_Smith name type
+    Surnames with the D' prefix now correctly capitalised
+
+    If a parsed name had no components, the components method returned an odd
+    numbered hash and case_components returned 1. Both these methods now return
+    undef in this situation
+
+0.10 04 Jul 1999:
+    Allowed for lower casing of surname prefixes
+
+0.04 16 May 1999:
+    Added test script for rule ordering
+    Added more titles, improved documentation
+
+0.03 02 May 1999:
+    Altered output of test script to work with Test::Harness
+    Modified &clean to remove single leading or trailing space
+
+0.02 01 May 1999:
+    Added test script, converted source to Unix format
+
+0.01 25 Apr 1999: First Release

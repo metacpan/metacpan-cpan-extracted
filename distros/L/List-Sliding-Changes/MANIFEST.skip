@@ -1,0 +1,10 @@
+^.cvsignore
+^.lwpcookies
+^.releaserc
+^blib/
+^List-Sliding-Changes-.*
+CVS/
+^pm_to_blib
+.tar.gz$
+.old$
+^Makefile$

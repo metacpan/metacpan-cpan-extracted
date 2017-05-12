@@ -1,0 +1,5 @@
+To: "[% name %]" <[% email %]>
+From: [% hFrom %]
+Subject: [% hSubject %]
+
+Dear [% name %],

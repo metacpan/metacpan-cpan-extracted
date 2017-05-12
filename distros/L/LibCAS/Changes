@@ -1,0 +1,10 @@
+Revision history for LibCAS
+
+0.01    2012-07-13
+        First version, released on an unsuspecting world.
+
+0.02	2012-07-16
+		Updated Makefile.PL with some minimum versions (let me know if you are able to get
+		things to successfully run with older version of any of the dependent libraries).
+		Also updated the tests so that they will hopefully find XML-LibXML if it needs to 
+		be built as a dependency.

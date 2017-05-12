@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               LEOCHARRE-Strings
+version:            1.02
+abstract:           Combines string procedures I frequently use
+author:
+    - Leo Charre leocharre at cpan dot org
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                1
+    Exporter:            5
+    Smart::Comments:     1
+    String::Prettify:    1.03
+    String::ShellQuote:  1.03
+    Test::Simple:        0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

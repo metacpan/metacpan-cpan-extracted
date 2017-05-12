@@ -1,0 +1,93 @@
+Lingua-Ogmios version 0.6
+================================
+
+Ogmios is a module implementing a configurable Natural Language
+Processing (NLP) platform. It includes several modules which wrap
+existing NLP toos such Part-of-speech taggers (TreeTagger, GeniaTagge,
+Flemm), term recognizer and term extractor (YaTeA)
+
+Contains this script :
+
+    ogmios-nlp-standalone
+
+(see MANIFEST for all the files)
+
+INSTALLATION
+
+It requires Mdoule::Build version 0.28 (at least) and File::chmod
+
+
+To install this module type the following:
+
+   perl Build.PL
+   Build
+   Build test
+   Build install
+
+Or if you like better the "make" program:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+        Module::Build => 0.28,
+	Getopt::Long
+	Config::General
+	File::MMagic
+	XML::LibXML
+	Lingua::Identify
+	Lingua::YaTeA
+	Alvis::TermTagger
+	Math::Trig
+	Scalar::Util
+	Text::Affixes
+	Text::Ngram
+	XML::Entities
+	Encode
+	Parse::Yapp
+	Test::Pod::Coverage
+	Test::Pod
+	Pod::Usage
+	Data::Dumper
+	Storable
+	Class::Factory::Util
+	File::Basename
+	Test::More
+	Fcntl
+	File::Copy
+	File::Path
+	File::Touch
+	Sys::Hostname
+	Time::HiRes
+	HTML::FormatRTF
+
+ If one of those modules are not installed, download it from
+ http://search.cpan.org and run the installation script (see the
+ README), or use the cpan command (switch as root or administrator
+ account if necessary):
+
+   cpan module
+
+   For instance: cpan Config::General
+
+   It will check the dependencies and install the module. 
+
+DOCUMENTATION
+
+See the documentation in the module (man yatea and man Lingua::Ogmios)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Thierry Hamon
+
+This library and this program are free software; you can redistribute
+them and/or modify it under the same terms as Perl itself, either Perl
+version 5.8.6 or, at your option, any later version of Perl 5 you may
+have available.
+
+

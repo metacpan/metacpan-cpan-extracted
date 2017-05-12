@@ -1,0 +1,42 @@
+{
+   "abstract" : "Use CSV files as lexicons for Maketext",
+   "author" : [
+      "David Arnold <david.arnold@online-rewards.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Locale-Maketext-Lexicon-CSV",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Locale::Maketext::Lexicon" : "0.96",
+            "Text::CSV_XS" : "1.02"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.96"
+}

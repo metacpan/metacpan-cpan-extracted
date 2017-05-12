@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Segmentation.pm
+Segmentation.xs
+typemap
+t/1.t

@@ -1,0 +1,145 @@
+
+
+=encoding utf-8
+
+=head1 NAME
+
+Lingua::KO::Munja - Korean letter conversion
+
+=head1 SYNOPSIS
+
+    
+    use utf8;
+    use Lingua::KO::Munja qw/roman2hangul hangul2roman/;
+    my $roman = hangul2roman ('유사쿠');
+    my $hangul = roman2hangul ('yusaku');
+    print "$roman $hangul\n";
+
+
+produces output
+
+    yusaku 유사쿠
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Lingua-KO-Munja-0.07/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents Lingua::KO::Munja version 0.07
+corresponding to git commit L<867075cabf61c54296f7dce2da81fab473c4d52b|https://github.com/benkasminbullock/Lingua-KO-Munja/commit/867075cabf61c54296f7dce2da81fab473c4d52b> released on Wed Mar 1 18:15:26 2017 +0900.
+
+=head1 DESCRIPTION
+
+Inputs and outputs are in Perl's Unicode formulation.
+
+This is a companion of L<Lingua::JA::Moji>.
+
+=head1 FUNCTIONS
+
+=head2 roman2hangul
+
+    my $hangul = roman2hangul ('munja');
+
+Convert romanized Korean to hangul.
+
+=head2 hangul2roman
+
+    my $roman = hangul2roman ('문자');
+
+Convert hangul to romanized Korean.
+
+=head1 EXTENDED EXAMPLES
+
+    
+    use Data::Kanji::Kanjidic ':all';
+    use Lingua::KO::Munja ':all';
+    my $k = parse_kanjidic ('/home/ben/data/edrdg/kanjidic');
+    my @o = kanjidic_order ($k);
+    my $max = 10;
+    for my $kanji (@o[0..$max]) {
+        my $entry = $k->{$kanji};
+        my $korean = $entry->{W};
+        if (! $korean) {
+            next;
+        }
+        my @hangul = map {roman2hangul ($_)} @$korean;
+        print "$kanji: @hangul\n";
+    }
+
+
+produces output
+
+    亜: 아
+    唖: 아
+    娃: 왜 와
+    阿: 아 옥
+    哀: 애
+    愛: 애
+    挨: 애
+    姶: 압
+    逢: 봉
+    葵: 규
+    茜: 천
+
+
+(This example is included as L<F<kanji2hanja.pl>|https://api.metacpan.org/source/BKB/Lingua-KO-Munja-0.07/examples/kanji2hanja.pl> in the distribution.)
+
+
+=head1 SEE ALSO
+
+=head2 Other CPAN modules
+
+=over
+
+=item L<Lingua::JA::Moji/kana2hangul>
+
+This converts Japanese kana into hangul.
+
+=item L<Lingua::KO::Romanize::Hangul>
+
+This romanises Hangul.
+
+=back
+
+=head2 About Korean romanisation
+
+=over
+
+=item L<Revised Romanization of Korean|https://en.wikipedia.org/wiki/Revised_Romanization_of_Korean>
+
+Wikipedia article on the official form of Korean romanisation.
+
+=back
+
+=head1 EXPORTS
+
+Nothing is exported by default. All the functions can be exported using the tag C<:all>.
+
+    use Lingua::KO::Munja ':all';
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Convert::Moji>
+
+Convert::Moji is used for making the conversions between alphabets.
+
+=back
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+Portions of this are taken from L<Lingua::KO::Romanize::Hangul>,
+version 0.20, by Yusuke Kawasaki, Copyright (c) 1998-2008 Yusuke
+Kawasaki.
+
+The rest is by Ben Bullock.
+
+This program may be copied, used, modified and redistributed under the
+same terms as Perl itself.
+

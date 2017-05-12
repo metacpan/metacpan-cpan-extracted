@@ -1,0 +1,13 @@
+2006-11-27  --  1.1
+
+  * Fixes the set_default_facility() function.
+  * Use AUTOLOAD for wrapping all the Syslog level functions.
+  * Lots of cleaning and POD fixes.
+
+-- Alexis Sukrieh <sukria@sukria.net>
+
+2006-11-20  --  1.0
+
+  * First Release
+
+-- Alexis Sukrieh <sukria@sukria.net>  

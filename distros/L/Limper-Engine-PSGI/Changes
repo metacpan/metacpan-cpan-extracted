@@ -1,0 +1,9 @@
+Revision history for Limper-Engine-PSGI
+
+0.003     2015-12-19 13:11:47-05:00 America/New_York
+
+0.002     2014-10-27 03:11:55+00:00 UTC
+- changes because Limper 0.012
+
+0.001     2014-10-20 05:17:21+00:00 UTC
+- initial release for PSGI support

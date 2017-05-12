@@ -1,0 +1,120 @@
+[% 
+    IF data.pageid ; THEN ; status = 'Edit' ; ELSE ; status = 'Add' ; END ;
+
+    title = status _ ' Gallery Page' ;
+    lightbox = 1 ;
+
+    crumb2_name = 'Gallery' ;
+    crumb2_href = '/album-admin' ;
+    crumb1_name = status ;
+%]
+
+[% INCLUDE "admin/tinymce-short.html" %]
+
+<form action="[% cgipath %]/pages.cgi" method="post" enctype="multipart/form-data">
+<input type="hidden" name="act" value="album-pagesave" />
+<input type="hidden" name="pageid" value="[% data.pageid %]" />
+
+<div class="boxer">
+<h2>[% IF data.pageid %]Edit[% ELSE %]Add[% END %] Gallery Page</h2>
+
+[% IF data.pageid %]
+<p>Please note that only 10 photos can be uploaded at any one time. This is due
+to the time taken on the server to copy your files, create thumbnails and store
+their information in the database. Photos uploaded can be any size, but will be
+resized if necessary to fit within a 1024x1024 pixel square. Thumbnails are
+created to fit within a 100x100 pixel square.</p>
+[% ELSE %]
+<p>Please enter details for the page you wish to create. Once you have
+successfully saved the main details, you will then be able to upload photos for
+the page.</p>
+[% END %]
+</div>
+
+<div class="boxer">
+<table class="blocker">
+<tr><th>Title *</th>
+   <td class="red">[% data.title_err %]</td>
+    <td><input type="text" name="title" value="[% data.title %]" size="32" maxlength="64" /></td></tr>
+<tr><th>Summary</th>
+    <td class="red">[% data.summary_err %]</td>
+    <td><textarea name="summary" rows="10" cols="50">[% data.summary %]</textarea></td></tr>
+<tr><th>Hide</th>
+    <td class="red">[% data.hide_err %]</td>
+    <td><input type="checkbox" name="hide" [% IF data.hide %]checked="checked"[% END %] /></td></tr>
+<tr><th>Year</th>
+    <td class="red">[% data.year_err %]</td>
+    <td>[% data.ddyears %]</td></tr>
+<tr><th>Month</th>
+    <td class="red">[% data.month_err %]</td>
+    <td>[% data.ddmonths %]</td></tr>
+[% IF data.path %]
+<tr><th>Path</th>
+    <td></td>
+    <td>/[% data.path %] (path is
+        [% IF    ! data.exists     %]<span class="alert">missing</span>
+        [% ELSIF ! data.directory  %]<span class="alert">not a directory</span>
+        [% ELSIF ! data.readable   %]<span class="alert">is not readable</span>
+        [% ELSIF ! data.writeable  %]<span class="alert">is not writeable</span>
+        [% ELSIF ! data.executable %]<span class="alert">is not executable</span>
+        [% ELSE %]accessible
+        [% END %]
+        )    
+    </td></tr>
+[% END %]
+</table>
+
+<p class="smalltext"><input type="submit" class="button" value='Save Page' /></p>
+</div>
+
+[% IF data.pageid %]
+<div class="boxer">
+<table class="blocker">
+<tr><th>Order</th>
+    <th>Thumbnail</th>
+    <th>Tagline</th>
+    <th>Cover</th>
+    <th>Hide</th>
+    <th>Delete</th>
+    <th>Actions</th>
+</tr>
+
+[% FOREACH photo = photos %]
+<tr>
+    <td>[% photo.orderno %]</td>
+    <td><a href='[% picpath %]/photos/[% photo.image %]?v=[% timestamp %]' rel="lightbox[[% photo.pageid %]]" ><img src="[% webpath %]/photos/[% photo.thumb %]?v=[% timestamp %]" height="50" border="0" alt="[% photo.tag %]" /></a></td>
+    <td>[% photo.image %]<br /><input type="text" name="TAG[% photo.photoid %]" value="[% photo.tagline %]" /> - Tagline<br /><input type="text" name="META[% photo.photoid %]" value="[% photo.metadata %]" /> - Metadata</td>
+    <td><input type="radio"    name="COVER"  value="[% photo.photoid %]" [% IF photo.cover %]checked="checked"[% END %] /></td>
+    <td><input type="checkbox" name="HIDE" value="[% photo.photoid %]" [% IF photo.hide %]checked="checked"[% END %] /></td>
+    <td><input type="checkbox" name="DELETE" value="[% photo.photoid %]" /></td>
+    <td><a href="[% cgipath %]/pages.cgi?act=album-pageedit&amp;pageid=[% photo.pageid %]&amp;photoid=[% photo.photoid %]&amp;order=up"><img src="[% webpath %]/images/icons/icon_up.gif" alt="up" height="15" /></a>
+        <a href="[% cgipath %]/pages.cgi?act=album-pageedit&amp;pageid=[% photo.pageid %]&amp;photoid=[% photo.photoid %]&amp;order=down"><img src="[% webpath %]/images/icons/icon_down.gif" alt="down" height="15" /></a></td>
+</tr>
+[% END %]
+</table>
+
+<p class="smalltext"><input type="submit" class="button" value='Save Page' /></p>
+</div>
+
+<div class="boxer">
+    <h2>Photo Uploads:</h2>
+    <p>Use the Browse button below to search your hard drive for photos you'd like to upload.
+    Select one photo at a time, which will then appear in the file list box below. You can load up
+    to 10 photos at a time in the file list box. When you have selected the photos you wish to
+    upload, click the Save Page button, and all the selected photos will be uploaded to this page.</p>
+    <script language="javascript" type="text/javascript" src="[% webpath %]/js/multifile.js"></script>
+    <p><input id="FileUpload" type="file" name="file_0" /><br />
+    <!-- This is where the output will appear -->
+    <div id="FileList">File List:</div>
+    <script language="javascript" type="text/javascript">
+        <!-- Create an instance of the multiSelector class, pass it the output target and the max number of files -->
+        var multi_selector = new MultiSelector( document.getElementById( 'FileList' ), 10 );
+        <!-- Pass in the file element -->
+        multi_selector.addElement( document.getElementById( 'FileUpload' ) );
+    </script>
+
+<p class="smalltext"><input type="submit" class="button" value='Save Page' /></p>
+</div>
+[% END %]
+
+</form>

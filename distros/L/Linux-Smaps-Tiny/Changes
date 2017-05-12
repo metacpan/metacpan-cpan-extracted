@@ -1,0 +1,47 @@
+Revision history for Linux::Smaps::Tiny
+
+0.10 2014-12-01 21:26:04
+
+    - Fix test failures under non-C locales, I was matching against
+      strerror(), just don't do that. See RT #95936.
+
+0.09 2012-07-01 15:39:17
+
+    - CPAN RT #78029: fix a memory leak reported by Norbert
+      Buchmüller.
+
+0.08 2011-07-20 19:20:57
+
+    - The 0.07 releas had a bugfix in the XS API. It now actually
+      works as documented when given an argument.
+
+    - Minor documentation nits.
+
+0.07 2011-07-20 19:14:45
+
+    - Check errno right after fopen()
+
+0.06 2011-04-03 19:18:44
+
+    - We now parse smaps with XS code, and fall back to PP if we can't
+      can_cc().
+
+0.05 2011-03-30 10:27:33
+
+    - Add a =cut before the 1; in Tiny.pm
+
+0.04 2011-03-30 09:24:57
+
+    - Update documentation
+
+0.03 2011-03-29 12:52:03
+
+    - Add more information to our die() messages
+
+0.02 2011-03-29 12:18:55
+
+    - Default to /proc/self/smaps, not /proc/$$/smaps
+
+0.01 2011-03-29 09:16:11
+
+    - Initial buggy version

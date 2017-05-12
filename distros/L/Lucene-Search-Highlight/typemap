@@ -1,0 +1,114 @@
+TYPEMAP
+Analyzer *              T_CPP_CLASS
+Query *                 T_CPP_CLASS
+Scorer *                T_CPP_CLASS
+QueryScorer *           T_CPP_CLASS
+Formatter *             T_CPP_CLASS
+SimpleHTMLFormatter *   T_CPP_CLASS
+Highlighter *           T_CPP_CLASS
+
+wchar_t *               T_WCHAR
+const wchar_t *         T_WCHAR
+
+
+
+INPUT
+T_CPP_CLASS
+        // Is $arg an object ? And is it a hash reference ?
+	if (sv_isobject($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV) {
+          // Dereference hash
+	  HV *hv = (HV *) SvRV($arg);
+          // Get C++ object pointer from hash as integer value
+	  SV **sv = hv_fetch(hv, \"_objptr\", 7, 0);
+	  if (sv) {
+            // Transform integer value to pointer value
+	    $var = INT2PTR($type, SvIV(*sv));
+	    if (!$var) {
+              // Pointer shouldn't be zero. Something went wrong. Let's
+              // warn the user and return undef.
+	      warn ( \"${Package}::$func_name(): C++ object pointer is NULL\");
+              XSRETURN_UNDEF;
+            }
+	  } else {
+            // Hash doesn't contain a hash entry for _objptr. Let's 
+            // warn the user and return undef.
+	    warn ( \"${Package}::$func_name(): key _objptr is missing\");
+            XSRETURN_UNDEF;
+          }
+        // $arg is either not an object or a hash reference.
+        // Warn user and return undef.
+	} else {
+	  warn ( \"${Package}::$func_name(): $var is not a blessed hash reference\");
+          XSRETURN_UNDEF;
+        }
+
+T_WCHAR
+        {
+          // Get string length of argument. This works for PV, NV and IV.
+          // The STRLEN typdef is needed to ensure that this will work correctly
+          // in a 64-bit environment.
+          STRLEN arg_len;
+          SvPV($arg, arg_len);
+
+          // Alloc memory for wide char string.  This could be a bit more
+          // then necessary.
+          Newz(0, $var, arg_len + 1, wchar_t);
+
+          U8* src = (U8*) SvPV_nolen($arg);
+          wchar_t* dst = (wchar_t*) $var;
+
+          if (SvUTF8($arg)) {
+            // UTF8 to wide char mapping
+            STRLEN len;
+            while (*src) {
+              *dst++ = utf8_to_uvuni(src, &len);
+              src += len;
+            }
+          } else {
+            // char to wide char mapping
+            while (*src) {
+              *dst++ = (wchar_t) *src++;
+            }
+          }
+          *dst = 0;
+          SAVEFREEPV($var);
+        }
+
+OUTPUT
+T_CPP_CLASS
+        {
+          // Create hash
+          HV* new_hv = newHV(); 
+          // Create reference to hash without increasing its reference count
+          SV* tmp_rv = newRV_noinc((SV*) new_hv);
+          // Store pointer to C++ object as hash entry with key _objptr
+          hv_store(new_hv, "_objptr", 7, newSViv(PTR2IV((void*)$var)), 0);
+          // Bless hash reference as CLASS and copy it to $arg
+          sv_setsv($arg, sv_bless(tmp_rv, gv_stashpv(CLASS,1)));
+          // Remove temporary reference hash by setting ref count to zero
+          SvREFCNT_dec((SV*) tmp_rv);
+          // printf(\"created hash %p for %s\\n\", new_hv, CLASS);
+        }
+
+T_WCHAR
+        {
+          wchar_t* src = (wchar_t*) $var;
+          U8* dst;
+          U8* d;
+
+          // Alloc memory for wide char string.  This is clearly wider
+          // then necessary in most cases but no choice.
+          Newz(0, dst, 3 * wcslen(src) + 1, U8);
+
+          d = dst;
+          while (*src) {
+            d = uvuni_to_utf8(d, *src++);
+          }
+          *d = 0;
+
+          sv_setpv((SV*)$arg, (char*) dst);
+          sv_utf8_decode($arg);
+
+          Safefree(dst);
+        }
+

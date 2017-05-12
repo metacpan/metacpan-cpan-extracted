@@ -1,0 +1,41 @@
+---
+abstract: 'XS implementation of List::UtilsBy'
+author:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.02'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: List-UtilsBy-XS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - benchmark
+    - builder
+provides:
+  List::UtilsBy::XS:
+    file: lib/List/UtilsBy/XS.pm
+    version: '0.05'
+requires:
+  XSLoader: '0.02'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/syohex/p5-List-Utils-By/issues
+  homepage: https://github.com/syohex/p5-List-Utils-By
+  repository: git://github.com/syohex/p5-List-Utils-By.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

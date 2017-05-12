@@ -1,0 +1,374 @@
+# Copyright (c) 2010-2014 Sullivan Beck. All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+=pod
+
+=head1 NAME
+
+Locale::VersionedMessages - handle all aspects of the localization process
+
+=head1 SYNOPSIS
+
+  use Locale::VersionedMessages
+
+  $obj     = new Locale::VersionedMessages;
+  $vers    = $obj->version();
+  $obj->search(LOCALE_LIST);
+
+=head1 DESCRIPTION
+
+Although several modules exist for handling internationalization
+and localization of a program, they are missing functionality for
+dealing with all of the functions to perform the task fully.  Existing
+modules work fine with respect to a programmer who wants to access
+localized messages, but the modules do not contain the necessary
+functions to maintain those messages.
+
+This module (and the programs that are distributed with it) form
+a complete package for handling the localization problem.
+
+At the heart of the localization problem, you have a set of messages.
+These messages may be translated into any number of locales, and a
+programmer can then look up the appropriate message, as it would
+appear in the desired locale.
+
+Any number of sets of messages may be used by a program.  A set of
+messages is best thought of as a set of related messages which might
+be used by any number of programs.  For example, one set of messages
+might be I/O error messages encountered when working with files.
+Another set might be the messages specific to one particular program.
+
+Each set of messages can be translated into the language for any
+number of locales.  Ideally, all messages would be translated into
+all locales, but that is often not the case.  However, every set of
+messages has a default locale (which may not be the same across all
+sets of messages) which MUST have all of the messages in it.
+
+This allows you to look up a message in either the locale you are
+working with, or the default locale if it is not available there.
+
+Unlike most existing localization modules, this module keeps track of
+the version of every message in every locale.  Although this
+information is not typically useful to those programmers who are simply
+looking up messages in the table, it is extremely useful to those
+who are responsible for translating and maintaining the messages.
+
+=head1 METHODS
+
+The following methods are available:
+
+=over 4
+
+=item B<new>
+
+   $obj = new Locale::VersionedMessages;
+
+This creates a new Locale::VersionedMessages object.
+
+=item B<version>
+
+   use Locale::VersionedMessages;
+   $obj = new Locale::VersionedMessages;
+   $vers = $obj->version();
+
+Check the module version.
+
+=item B<err>
+
+   $err = $obj->err();
+
+This returns any error message set during the previous operation.
+
+=item B<set>
+
+   $obj->set(SET0 [,SET1,SET2,...]);
+
+This loads any number of message sets into the object.  You can only look
+up messages from sets that have been loaded.
+
+   @set = $obj->set();
+
+This returns the names of the message sets that have been loaded.  SETi
+is a string containing alphanumeric and underscore characters.
+
+=item B<query_set_default>
+
+=item B<query_set_locales>
+
+=item B<query_set_msgid>
+
+These return information about a message set.
+
+   $locale = $obj->query_set_default();
+
+returns the default locale.
+
+   @locale = $obj->query_set_locales();
+
+returns the list of all locales for which this message set is defined.
+
+   @msgid = $obj->query_set_msgid();
+
+returns a list of all message IDs in this set of messages.  The message
+ID is the label used in the program to access a message.
+
+=item B<search>
+
+This method is used to specify the search order of the locales.
+
+By default, all messages are returned in the default locale of the
+message set (which may not be the same across message sets), but you
+can change this using these methods.
+
+   $obj->search(LOCALE0 [,LOCALE1,LOCALE2,...]);
+
+This specifies the global search order.  This is the default search
+order of locales used for all message sets.  This specifies that, in
+all message sets, the default is to use LOCALE0, followed by LOCALE1,
+LOCALE2, etc.
+
+If the message is not found in any of the locales, the default locale
+for the set will be used.
+
+The global search order can be overridden on a per-set basis.
+
+   $obj->search();
+
+This erases the global default search order.
+
+   $obj->search(SET, LOCALE0 [,LOCALE1,LOCALE2,...]);
+
+This specifies the search order for the given set, overriding the
+global default search order.  It is not necessary that all of the
+locales actually have translations.  Any that don't will be silently
+ignored.
+
+If a message is not found in any of these locales, the default locale for
+the message set will be used.
+
+   $obj->search(SET);
+
+This erases the search order for the given set, so the global search order
+will be used.
+
+For example:
+
+   $obj->search('BUTTONS','en','en_US','en_GB');
+
+would look for a messages in the 'BUTTONS' set in the locales: 'en',
+'en_US', and 'en_GB' in that order.  If a message were not found in
+any of those three, the default locale would be used.
+
+=item B<query_search>
+
+   @locale = $obj->query_search();
+   @locale = $obj->query_search(SET);
+
+This returns the global search order or the search order for the set.
+
+In the second call, the global search order is NOT returned if the
+set-specific search order is not set.
+
+=item B<message>
+
+   $text           = $obj(SET, MSGID [,LOCALE] [,VALUES]);
+   ($text,$locale) = $obj(SET, MSGID [,LOCALE] [,VALUES]);
+
+This method is used to look up a message in the given set and
+substitutes in VALUES (described below in MESSAGE SUBSTITUTIONS).  If
+LOCALE is present, it only looks up the message in that locale.  By
+default, it will look in the search order for that set.
+
+If the message is not found, $text will be the empty string.
+
+In list context, the text will be returned along with the name of
+the locale in which the message was found.
+
+If any error occurs, an empty string will be returned for $text.
+
+=item B<query_msg_locales>
+
+=item B<query_msg_vers>
+
+These return information about a specific message.
+
+   @locale = $obj->query_msg_locales(SET, MSGID);
+
+returns a list of all locales for which this message is defined.  The first
+one will be the default locale.
+
+   $vers = $obj->query_msg_vers(SET, MSGID [,LOCALE]);
+
+returns the version of the message in the given locale.  If LOCALE is
+not given, it defaults to the default locale.  If the message is not defined
+in the locale, a version of 0 is returned.
+
+=back
+
+=head1 MESSAGE SUBSTITUTIONS
+
+When a message is defined, it can have values that will be passed in
+which can be inserted into the message.
+
+Unlike most localization tool kits, the values are passed in by name,
+rather than position in a list, so the substitution looks a bit
+different than other tool kits.
+
+When a message is initially defined, two pieces of information are
+required: the message ID and a list of substitution variables.  Other
+information (such as a description of the message) may also be provided,
+but is not relevant to message substitution.
+
+If one of the substitution variables is named 'foo', then anywhere in the
+message, I can include '[foo...]' and that portion of the message will
+be replaced based on the value of foo that is passed in.
+
+The syntax of the substitution string can be any of the following:
+
+=over 4
+
+=item [foo]
+
+In it's simplest form, the value is simply inserted into the string.
+For example, if the text is defined (in the default lexicon) as:
+
+   Set:        Set1
+   Message ID: Foo value [foo]
+   Text:       The value of foo is [foo].
+
+Then:
+
+   $obj->message('Set1','Foo value [foo]',
+                 'foo' => 'bar');
+      => 'The value of foo is bar.
+
+=item [foo:FORMAT]
+
+The value can be formatted using standard sprintf formats.  Only
+simple formats are allowed, so FORMAT can be something like '%.3f' but
+not 'the number %3d'.  To be exact, FORMAT must be any valid format
+that can be handled by sprintf that takes exactly one argument, so
+something like %% is not allowed, but any %d format is.
+
+   Set:        Set1
+   Message ID: Foo value [foo]
+   Text:       The value of foo is >[foo:%5s]<.
+
+   $obj->message('Set1','Foo value [foo]',
+                 'foo' => 'bar');
+      => 'The value of foo is >  bar<.
+
+=item [foo:quant ...] or [foo:quant:FORMAT ...]
+
+This is for handling plural elements.  These two forms are identical
+except that the number will be formatted using a sprintf format in the
+second case.
+
+The general form of this is:
+
+   [VAL:quant COND1 STRING1 COND2 STRING2 ... DEFAULT_STRING]
+
+Each of the tokens in this form (CONDi, STRINGi, and DEFAULT_STRING)
+can be a string that is wrapped in square brackets, single, or double
+quotes.  So, the string B<foobar> can appear as B<foobar>, B<[foobar]>,
+B<'foobar'>, or B<"foobar">.  If a token starts with a square bracket,
+or a single or double quote, it must be wrapped in one of the others.
+
+Each CONDi is a string involving a correctly specified numerical test.
+It should be noted that the tests are NOT passed to the perl
+interpreter, so the full perl syntax is not supported.  Since tests are
+specified in user (i.e. translator) defined files, passing portions of
+these files to eval would represent a security risk, so instead, the
+condition strings are manually parsed, and only a limited syntax is
+supported.  However, the syntax should be flexible enough to handle all
+real-life cases.
+
+A condition can be a simple test.  Simple tests are all of one of the
+forms:
+
+   NUM <  NUM
+   NUM <= NUM
+   NUM == NUM
+   NUM >= NUM
+   NUM >  NUM
+   NUM != NUM
+
+and each NUM can be:
+
+   _VAL
+   _VAL % DIGITS
+   DIGITS
+
+Note that there are no signs allowed... only positive integers are
+allowed.  Also, parentheses are not allowed inside a simple test
+(though the simple test can be enclosed in parentheses).
+
+Simple tests can also be combined using parentheses and the two
+operators '&&' and '||'.
+
+If COND1 is met, then STRING1 is used.  If COND2 is met, then STRING2
+is used.  If none of the conditions are met, then the DEFAULT_STRING
+is met.
+
+The DEFAULT_STRING is required, and at least one COND and STRING
+should be included (though they are not strictly required... if they
+are not present,t hen the DEFAULT_STRING will always be used.
+
+An actual example might be:
+
+   Set:        Set1
+   Message ID: Number of oranges [n]
+   Text:       I have [n:quant [_n>1] '_n oranges' _n==1 "1 orange" [no oranges]].
+
+and:
+
+   $obj->message('Set1','Number of oranges [n]',1);
+      => 'I have 1 orange.'
+
+   $obj->message('Set1','Number of oranges [n]',3);
+      => 'I have 3 oranges.'
+
+   $obj->message('Set1','Number of oranges [n]',0);
+      => 'I have no oranges.'
+
+Note that it is not required that '_VAL' be included in every one
+of the strings.  It can be included zero, one, or even multiple times
+if desired.
+
+=back
+
+Most whitespace is ignored, so the following are equivalent:
+
+   [foo]
+   [ foo ]
+
+as are:
+
+   [foo:FORMAT]
+   [ foo : FORMAT ]
+
+=head1 KNOWN PROBLEMS
+
+None at this point.
+
+=head1 SEE ALSO
+
+Locale::VersionedMessages::Overview
+     An overview of the internationalization problem with
+     a comparison to other Locale::* modules
+
+lm_gui
+     A GUI tool for creating and maintaining sets of
+     messages and their translation tables.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

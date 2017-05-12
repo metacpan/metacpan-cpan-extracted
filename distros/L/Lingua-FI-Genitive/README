@@ -1,0 +1,32 @@
+Lingua/FI/Genitive version 0.01
+===============================
+
+Finnish Genitive
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+POST-INSTALL
+
+To get information how to use this module type the following:
+   
+   perldoc Lingua::FI::Genitive.pm
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003 Ville Jungman 
+<ville_jungman@hotmail.com, ville.jungman@frakkipalvelunam.fi>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

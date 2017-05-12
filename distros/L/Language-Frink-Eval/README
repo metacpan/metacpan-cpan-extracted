@@ -1,0 +1,83 @@
+NAME
+    Language::Frink
+
+DESCRIPTION
+    This module is a simple wrapper around the Frink interpreter written by
+    Alan Eliasen. As such, it requires a local copy of the Java interpreter
+    and the "frink.jar" file. For more information on Frink, please see
+    <http://futureboy.homeip.net/frinkdocs/>. This module works by starting
+    a JVM as a child process, and sending Frink expressions to it via a
+    pipe, and retrieving the results the same way. Also, this module has the
+    ability to function in a restricted mode it attempts to filter
+    "dangerous" expressions, such as functions that read files from local
+    disk, the network, and also commands that may persistantly change the
+    interpreter state.
+
+    The list of "dangerous" functions and expressions was derived by reading
+    the Frink documentation, and probably is not complete. If you find
+    commands that get through the filter that should, please report them.
+
+    The following functions are not allowed in restricted mode:
+
+    "lines[]"
+    "read[]"
+    "eval[]"
+    "input[]"
+    "select[]"
+    "callJava[]"
+    "newJava[]"
+    "staticJava[]"
+
+    The following language constructs are not allowed in restricted mode:
+
+    Regexes
+    Function Declarations
+    Unit display format
+    Loops
+    Time display format
+    Procedure blocks
+    File inclusion
+    Class Declaration
+
+METHODS
+  "new(Param1 => ..., etc)"
+    This method will create a new Language::Frink object, and start up an
+    external Frink interpreter in a JVM. If it encounters any problems when
+    starting the JVM, then it will call "die".
+
+   CONSTRUCTOR PARAMETERS
+    These parameters are not case sensitive.
+
+    Restricted
+        This is a boolean value. If it is true, then expressions will be
+        filtered to attempt to prevent "dangerous" expressions from being
+        evaluated.
+
+    JavaPath
+        This specifies the entire commandline to run. This defaults to "java
+        -cp frink.jar frink.parser.Frink". If the java interpreter is not in
+        your path, or if the "frink.jar" is not in your current directory,
+        then you will need to change this.
+
+  "eval($expression)"
+    This passes the expression that is given to the Frink interpreter, and
+    returns the results as a string. This may return a single string will
+    multiple embedded newlines. If the interpreter's results end in a
+    newline, then it will be removed before returning, to make processing
+    the common case of a single line result easier. If the object is set to
+    "Restricted" then results will be filtered before evaluation. If it is
+    determined that the expression cannot be evaluated due to policy, then
+    the program will "croak" with an error message describing why.
+
+FILES
+    This module requires a Java interpreter and a local copy of "frink.jar".
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>.
+
+AUTHOR
+    Clayton O'Neill <coneill@oneill.net>
+

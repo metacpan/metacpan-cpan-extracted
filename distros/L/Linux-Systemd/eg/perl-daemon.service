@@ -1,0 +1,8 @@
+[Unit]
+Description = Test service for systemd Perl bindings
+
+[Service]
+Type = notify
+ExecStart = /usr/bin/env perl $PATH_TO/perl-daemon
+ExecReload = /bin/kill -HUP $MAINPID
+WatchdogSec = 30

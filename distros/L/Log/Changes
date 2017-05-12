@@ -1,0 +1,6 @@
+Revision history for Perl extension Log::SelfHistory.
+
+0.01  Sat May 29 18:16:00 2010
+	- original version; created by h2xs 1.23 with options
+		-X -n Log::SelfHistory
+

@@ -1,0 +1,22 @@
+[4107]
+name = Oxford/Bexley
+frequency = 578000000
+bandwidth = 8
+modulation = 16
+hierarchy = 0
+code_rate_high = 34
+code_rate_low = 34
+guard_interval = 32
+transmission = 2
+
+[8199]
+name = Oxford/Bexley
+frequency = 850000000
+bandwidth = 8
+modulation = 64
+hierarchy = 0
+code_rate_high = 23
+code_rate_low = 12
+guard_interval = 32
+transmission = 2
+

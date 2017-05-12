@@ -1,0 +1,54 @@
+<?php
+
+# [% warning %]
+
+[%- IF class.parent %]
+require_once("[% class.parent.name("/") %].php");
+[%- END %]
+[%- UNLESS class.is_abstract %]
+require_once("[% visitor.name("/") %].php");
+[%- END %]
+
+[% IF class.is_abstract %]abstract [% END -%]
+class [% class.name("_") -%]
+[% IF class.parent %] extends [% class.parent.name("_") %][% END %] {
+[% UNLESS class.is_abstract %]
+    [%- FOREACH arg IN class.args %]
+    private $[% arg.argname %];
+    [%- END %]
+
+    /**
+[%- FOREACH arg IN class.args %]
+     * @param [% arg.name("_") %] $[% arg.argname %] the [% arg.argname.camelcase %] component.
+[%- END %]
+     */
+    public function __construct([% FOREACH arg IN class.args -%]
+                                    [%- arg.name("_") %] $[% arg.argname -%]
+                                    [%- LAST IF loop.last %][% ", " %]
+                                [%- END %]) {
+        [%- FOREACH arg IN class.args %]
+        $this->[% arg.argname %] = $[% arg.argname %];
+        [%- END %]
+    }
+
+[%- FOREACH arg IN class.args %]
+    /**
+     * @return [% arg.name("_") %] the [% arg.argname.camelcase %] component.
+     */
+    public function [% arg.argname.getMethod %]() {
+        return $this->[% arg.argname %];
+    }
+[% END -%]
+
+    /**
+     * @param [% visitor.interface("_") %] $visitor an object implementing the
+     *  [% visitor.interface("_") %] interface.
+     * @return mixed whatever the visitor's visit[% class.lastpart %]() method returns.
+     */
+    public function accept([% visitor.interface("_") %] $visitor) {
+        return $visitor->visit[% class.lastpart %]($this);
+    }
+[% END %]
+}
+
+?>

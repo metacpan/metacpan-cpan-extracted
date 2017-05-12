@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/1-basic.t
+t/2-pod.t
+t/3-pod-coverage.t
+lib/Lyrics/Fetcher/AZLyrics.pm
+eg/example.pl
+eg/example-direct.pl
+META.yml                                 Module meta-data (added by MakeMaker)

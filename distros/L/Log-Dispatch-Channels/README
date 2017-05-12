@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution Log-Dispatch-Channels, version
+0.01:
+
+  Adds separate logging channels to Log::Dispatch
+
+This software is copyright (c) 2008 by Jesse Luehrs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as perl itself.
+

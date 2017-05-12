@@ -1,0 +1,45 @@
+{
+   "send_alerts_from":"The Example Website <no-reply@example.com>",
+   "send_404_alerts_to":"you@example.com",
+   "title":"The Example Website",
+   "pages" : [
+      {
+         "path" : "/",
+         "template" : "index.tt",
+         "label" : "Home",
+         "title" : "Your online guide to the online world"
+      },
+      {
+         "path" : "/organic",
+         "template" : "organic.tt",
+         "label" : "Why Example?",
+         "title" : "Why Example?",
+         "heading" : "The Principles of Example Living"
+      },
+      {
+         "path" : "/store",
+         "template" : "store.tt",
+         "label" : "Example Stores",
+         "title" : "Example Stores",
+         "heading":"Example Stores and Online Deals",
+         "pages" : [
+            {
+               "path" : "/store/examples-discounts",
+               "template" : "store.tt",
+               "label" : "Example Farms",
+               "title" : "Example Discount Codes",
+               "heading" : "Example Discount Codes",
+               "merchant" : 1888
+            },
+            {
+               "path" : "/store/other",
+               "template" : "store.tt",
+               "label" : "Other Example Farms",
+               "title" : "Other Discount Codes",
+               "heading" : "Other Discount Codes",
+               "merchant" : 1613
+            }
+         ]
+      }
+   ]
+}

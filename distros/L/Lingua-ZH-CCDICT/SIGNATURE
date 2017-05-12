@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 fd7b38328fd65825ddaaba3b9d86e9b759d91719 Build.PL
+SHA1 9833c863307cba6f3b0be874d28ae4e37f0efe96 CCDICT-README
+SHA1 3e7ba92eebeb5ac6356268ca6dc6edb888620905 Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 0add4b87dde28a78df267950d0754a38b861a9d5 MANIFEST
+SHA1 a3f5ee7cc0a9e3323a8abf6c20fe70c4b0d03ac6 META.yml
+SHA1 bfe255bd257ff3ab2bfddb7093e9afc1e2c1f294 Makefile.PL
+SHA1 1e2f05f53a1ad17f38080288fc0cc954d96a3a69 README
+SHA1 34fa81f3d6e7ce247dbb6d9b37cd7c0fc333d7dd examples/make-bdb-files
+SHA1 91910c0d60125ddc8531fbd61131fca29261dcda lib/Lingua/ZH/CCDICT.pm
+SHA1 6688a7f5c86c1f4ddd35f17d8ec054ae6cf5bec0 lib/Lingua/ZH/CCDICT/Data.pm
+SHA1 92fe457fde01c325bfa5cc3fb32afafaf842eb1a lib/Lingua/ZH/CCDICT/ResultItem.pm
+SHA1 de9f543ac4c184b4776291fb5259d235089ea745 lib/Lingua/ZH/CCDICT/ResultSet.pm
+SHA1 d3d53cd1088a918096cd2b8bbaf1287c27ceebb8 lib/Lingua/ZH/CCDICT/ResultSet/Array.pm
+SHA1 b21d5e6727a2c6bf37c0bca75465e33836672732 lib/Lingua/ZH/CCDICT/ResultSet/BerkeleyDB.pm
+SHA1 83ebe1b3b263844cf6f209441a2b5ffe0b339462 lib/Lingua/ZH/CCDICT/Romanization.pm
+SHA1 6d646141043428d3bfec9b90e562817c15030e26 lib/Lingua/ZH/CCDICT/Romanization/Pinyin.pm
+SHA1 f4b58184c29269c3c2744a2fd2986851c2a764c0 lib/Lingua/ZH/CCDICT/Storage/BerkeleyDB.pm
+SHA1 7956ffda61698f382dc1985d965e8833b360bea0 lib/Lingua/ZH/CCDICT/Storage/InMemory.pm
+SHA1 43f00e28cc30b049c70558508f566848e045dea3 t/01-memory.t
+SHA1 34c33de0b6eb3f0a533a4391a3fd77cc90f2954a t/02-bdb.t
+SHA1 ad4b69ece89e5b90f4d4f35d4ce6f468c4b2d2f9 t/lib/SharedTests.pm
+SHA1 64a793f83603e531666fe96d6034e522c1e9cd36 t/pod-coverage.t
+SHA1 cec881e89926d320475f9de2b7fad02c2169f510 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkqrwzEACgkQIgMCsV8qvRKxUQCdHQQHh4iMs8nq/t+hPSStdlVu
+YZoAoI49S5G0rgHYuDGoRAZ4QTDVULBt
+=ezZP
+-----END PGP SIGNATURE-----

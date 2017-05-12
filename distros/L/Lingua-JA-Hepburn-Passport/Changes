@@ -1,0 +1,8 @@
+Revision history for Perl extension Lingua::JA::Hepburn::Passport
+
+0.02  Sun Dec  9 03:37:15 PST 2007
+        - twekaed docs
+        - changed use encoding "utf-8" to use utf8;
+
+0.01  Sun Sep 24 20:07:41 2006
+        - original version

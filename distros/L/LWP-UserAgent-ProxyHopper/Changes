@@ -1,0 +1,14 @@
+Revision history for LWP-UserAgent-Proxify
+
+0.004   Mar 18, 2008
+        Required version change in Build.PL to install a patched version of another module
+
+0.003   Mar 18, 2008
+        Fixed typo in Build.PL
+
+0.002   Mar 18, 2008
+        Rename issues... 
+
+0.001   Mar 16, 2008
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,30 @@
+Revision history for Log-Dispatch-ArrayWithLimits
+
+0.04    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.03    2014-07-06 (SHARYANTO)
+
+        - [Bugfix] max_elems didn't work because I forgot to set object
+          attribute. Double derp.
+
+        - Use repeated shift() instead of splice() to support
+          threads::shared-array.
+
+
+0.02    2014-07-06 (SHARYANTO)
+
+        - [Bugfix] Typo. First version didn't work, derp.
+
+        - Allow specifying array variable name (e.g. 'My::array' instead of
+          \@My::Array). This makes it possible to use this module from Log4perl
+          configuration, which is a text file.
+
+
+0.01    2014-07-06 (SHARYANTO)
+
+        - First version.

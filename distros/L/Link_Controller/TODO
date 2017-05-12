@@ -1,0 +1,146 @@
+build-schedule should be merged into extract-links.
+
+check that all systems handle file overloads.
+	close should always be checked for return
+	
+handle relative link substitution in the CGIs.  Test relative link
+substitutions alot more.
+
+handle exclusion regular expressions in the infostructure definition.
+
+handle fragments with characters that would otherwise be illegal.
+
+add an option --ignore-system-config to all commands and implement it
+into ReadConf so that we are more safe from the system configurtion
+during testing.
+
+update the example so it really works.  
+
+tests for verify-link-control
+
+test cases where we don't have correctly defined configuration variables
+
+test that mailto urls come with unsupported protocol
+
+perl -e 'use HTTP::Response; $a=bless( {"_method" => "HEAD","_headers" => bless( {"user-agent" => "LinkController/0.0","from" => "mikedlr\@scotclimb.org.uk"}, "HTTP::Headers" ),"_uri" => bless( [bless( do{\\(my $o = "mailto:dwb\@st-and.ac.uk")}, "URI::mailto" ),undef], "URI::URL" ),"_content" => ""}, "HTTP::Request" ),"_headers" => bless( {"client-date" => "Thu, 11 Oct 2001 21:58:12 GMT"}, "HTTP::Headers" ),"_rc" => 400,"_msg" => "Library does not allow method HEAD for \\"mailto:\\" URLs","_content" => ""}, "HTTP::Response"; print $a->as_string()' 
+
+[bless( {'_request' => bless( {'_method' => 'HEAD','_headers' => bless( {'user-agent' => 'LinkController/0.0','from' => 'mikedlr@scotclimb.org.uk'}, 'HTTP::Headers' ),'_uri' => bless( [bless( do{\\(my $o = 'mailto:dwb@st-and.ac.uk')}, 'URI::mailto' ),undef], 'URI::URL' ),'_content' => ''}, 'HTTP::Request' ),'_headers' => bless( {'client-date' => 'Thu, 11 Oct 2001 21:58:12 GMT'}, 'HTTP::Headers' ),'_rc' => 400,'_msg' => 'Library does not allow method HEAD for \\'mailto:\\' URLs','_content' => ''}, 'HTTP::Response' ),1002837492,undef]
+
+we need to remember the titles of pages for use in searching out 
+replacements 
+
+handle correctly cannonicalised URLs.  
+
+	- verify that if we cannonicalise URLs before checking then we
+	  still get correct results
+	- if so, then all links should be cannonicalised as they are read 
+	  into the system.
+	- fix all substitutions during link repairing so that they fix
+	  all possible versions of the link.
+
+robot rules for all protocols
+
+We need to do transactions of some kind in order to allow us to have
+more than one process at a time.  The transactions should be designed
+so that any report can happen very quickly whilst testers lock
+eachother out of the records of the database.  Currently we only do
+write locking of the database.
+
+consider robot rules equivalent for non http protocols.
+
+teach HEAD requests to work for more protocols
+
+news protocols - connect to local news server?  
+ Verify against news control messages?
+
+mailto - connect to remote server? perhaps only check for existence of
+ the MX record.  The problem here is that many mail servers lie about
+ the existence of users they know about to avoid getting junkmail and
+ others are simply relays that relay anything we ask them to, then
+ validity is checked elsewhere.  Definitely we don't want to send a
+ mail unless there is an agreed auto-responder on the other end.
+
+ldap / radius / telnet etc..  connect to the appropriate port if we have
+ a login token maybe use it then disconnect..  What are the implications
+ of using a publically known login token?
+
+Make requires.PL generate the complete set of requires including perl
+modules I provide.
+
+The parameters for standard links (timescale between checks, how long
+we wait before we consider a second failed check has made a link more
+likely to be broken than the last) assume an amature/friendly setup in
+which nothing other than waiting patiently can be done about broken
+servers.  If this software is being used internally, e.g. on an
+intranet in a large company situation, then such possibilities as
+phoning the people running the server exist.  In that case, there
+should be a way of calculating an acceptable downtime for each links
+(obviously, external links, e.g. to the companies customers should be
+treated more tolerantly) and changing all program parameters.  This
+could lead to some links being checked half hourly and signalled
+broken after as short a period as a few hours.  
+
+If the rate of checking gets too high then the link checker could
+become a noticable load on the company network.  This should not
+happen.  The kind of resources that would need this kind of checking
+would typically be noticed anyway, or need a different approach
+(continuous monitoring at the server and upss etc.).  It's still worth
+checking these resources at a slow rate anyway because some forgotten
+dependency could come up when a service is changed.
+
+It would be nice in principle to have logic to cope with the dynamic
+nature of HTML infostructures.
+
+	whenever we change a page we should update the links
+	database and the indices
+
+	we should add a link to the link checking database whenever we
+	put a new link in.
+
+	we don't worry about treating now non-existant links becuase
+	the advantage of keeping them in the database is that
+	immediate warning can be given if they are re-inserted into a
+	page.. 
+
+	Incremental updates where we search for pages newer than our
+	last link extraction might be nice.
+
+	Our indexes of links to and from objects should be updated
+	gradually 
+
+I couldn't do that in the design becuase when I started using DBMs for
+the index databases they turned out to be many megabytes, several
+times larger than the CDB files and so unmanagable.
+
+At the time I started writing this, none of the free SQL databases
+could satisfy the needs of this project.  Now they've improved
+considerably. It would be nice to have an implementation of the Link
+class which was overlayed over SQL storage.
+
+Some of the techniques used in this set of programs seem a little
+brutal (e.g. the fixlink program doesn't really understand html and
+just guesses where to make substitutions..).  Comparative testing
+against other programs would be nice.
+
+Overlay links
+
+It might be nice if people could keep personal information about links
+in their own database.  For example, someone might have a link which
+only exists for six months a year and want to record that it should
+only be worried about at that time.  This would be kept in a DB file
+as hashes which were then overlayed over the original Link, but
+otherwise treated the same.
+
+Possibly give extract-links a robot agent option in case someone wants
+to use it for downloading from the www.  I'm not sure if this is
+encouraging people to do things they shouldn't do or is something that
+should be provided because otherwise people will use it without the
+option.
+
+REGRESSION TESTS
+
+As interesting bugs are fixed they should be added here.  Later
+regression tests should be added which check these cases are working.
+Better yet, bug reports should be made in terms of failed regression
+tests.
+

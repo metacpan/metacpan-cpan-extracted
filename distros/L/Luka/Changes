@@ -1,0 +1,18 @@
+1.06 - Sat Jul 15 03:41:48 2006
+	Module::Install new version
+
+1.07 - Mon Jul 17 22:06:56 2006
+	dependecy on "version" added
+
+1.05 - Fri Jul  7 20:15:11 2006
+	What::MTA dependency was missing
+
+2006-03-06  toni <toni@irational.org> (1.04)
+
+	* fixed bug in test t/10errordie.t, discovering presence of test
+	system user automaticaly.
+ 
+2006-02-27  toni  <toni@irational.org> (1.03)
+
+	* first release
+

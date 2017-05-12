@@ -1,0 +1,1877 @@
+# Japanese translations for Padre.
+# Copyright (C) 2009 The Padre development team as list in Padre.pm
+# This file is distributed under the same license as the Padre package.
+# Kenichi Ishigaki <ishigaki@cpan.org>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-JA-20090504\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-13 18:56+0200\n"
+"PO-Revision-Date: 2009-05-03 03:07+0900\n"
+"Last-Translator: Kenichi Ishigaki <ishigaki@cpan.org>\n"
+"Language-Team: Japanese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Locale.pm:72
+msgid "English (United Kingdom)"
+msgstr "英語(英国)"
+
+#: lib/Padre/Locale.pm:111
+msgid "English (Australian)"
+msgstr "英語(オーストラリア)"
+
+#: lib/Padre/Locale.pm:129
+msgid "Unknown"
+msgstr "不明"
+
+#: lib/Padre/Locale.pm:143
+msgid "Arabic"
+msgstr "アラビア語"
+
+#: lib/Padre/Locale.pm:153
+msgid "Czech"
+msgstr "チェコ語"
+
+#: lib/Padre/Locale.pm:163
+msgid "German"
+msgstr "ドイツ語"
+
+#: lib/Padre/Locale.pm:173
+msgid "English"
+msgstr "英語"
+
+#: lib/Padre/Locale.pm:182
+msgid "English (Canada)"
+msgstr "英語(カナダ)"
+
+#: lib/Padre/Locale.pm:191
+msgid "English (New Zealand)"
+msgstr "英語(ニュージーランド)"
+
+#: lib/Padre/Locale.pm:202
+msgid "English (United States)"
+msgstr "英語(米国)"
+
+#: lib/Padre/Locale.pm:211
+msgid "Spanish (Argentina)"
+msgstr "スペイン語(アルゼンチン)"
+
+#: lib/Padre/Locale.pm:224
+msgid "Spanish"
+msgstr "スペイン語"
+
+#: lib/Padre/Locale.pm:234
+msgid "French (France)"
+msgstr "フランス語(フランス)"
+
+#: lib/Padre/Locale.pm:247
+msgid "French"
+msgstr "フランス語"
+
+#: lib/Padre/Locale.pm:257
+msgid "Hebrew"
+msgstr "ヘブライ語"
+
+#: lib/Padre/Locale.pm:267
+msgid "Hungarian"
+msgstr "ハンガリー語"
+
+#: lib/Padre/Locale.pm:281
+msgid "Italian"
+msgstr "イタリア語"
+
+#: lib/Padre/Locale.pm:291
+msgid "Japanese"
+msgstr "日本語"
+
+#: lib/Padre/Locale.pm:301
+msgid "Korean"
+msgstr "韓国語"
+
+#: lib/Padre/Locale.pm:315
+msgid "Dutch"
+msgstr "オランダ語"
+
+#: lib/Padre/Locale.pm:325
+msgid "Dutch (Belgium)"
+msgstr "オランダ語(ベルギー)"
+
+#: lib/Padre/Locale.pm:334
+msgid "Norwegian (Norway)"
+msgstr "ノルウェー語"
+
+#: lib/Padre/Locale.pm:343
+msgid "Polish"
+msgstr "ポーランド語"
+
+#: lib/Padre/Locale.pm:353
+msgid "Portuguese (Brazil)"
+msgstr "ポルトガル語(ブラジル)"
+
+#: lib/Padre/Locale.pm:363
+msgid "Portuguese (Portugal)"
+msgstr "ポルトガル語(ポルトガル)"
+
+#: lib/Padre/Locale.pm:372
+msgid "Russian"
+msgstr "ロシア語"
+
+#: lib/Padre/Locale.pm:382
+msgid "Chinese"
+msgstr "中国語"
+
+#: lib/Padre/Locale.pm:392
+msgid "Chinese (Simplified)"
+msgstr "中国語(簡体字)"
+
+#: lib/Padre/Locale.pm:402
+msgid "Chinese (Traditional)"
+msgstr "中国語(繁体字)"
+
+#: lib/Padre/Locale.pm:415
+msgid "Klingon"
+msgstr "クリンゴン語"
+
+#: lib/Padre/PluginManager.pm:345
+msgid ""
+"We found several new plugins.\n"
+"In order to configure and enable them go to\n"
+"Plugins -> Plugin Manager\n"
+"\n"
+"List of new plugins:\n"
+"\n"
+msgstr ""
+"新しいプラグインが見つかりました。\n"
+"設定や利用はプラグインメニューの\n"
+"プラグインマネージャーから行ってください\n"
+"\n"
+"新しいプラグイン一覧\n"
+"\n"
+
+#: lib/Padre/PluginManager.pm:355
+msgid "New plugins detected"
+msgstr "新しいプラグインを検出しました"
+
+#: lib/Padre/PluginManager.pm:477
+#, perl-format
+msgid "Plugin:%s - Failed to load module: %s"
+msgstr "プラグイン「%s」 - モジュールをロードできません: %s"
+
+#: lib/Padre/PluginManager.pm:491
+#, perl-format
+msgid ""
+"Plugin:%s - Not compatible with Padre::Plugin API. Need to be subclass of "
+"Padre::Plugin"
+msgstr ""
+"プラグイン「%s」 - Padre::PluginのAPIと互換性がありません。Padre::Pluginのサ"
+"ブクラスではありません"
+
+#: lib/Padre/PluginManager.pm:505
+#, perl-format
+msgid "Plugin:%s - Could not instantiate plugin object"
+msgstr "プラグイン「%s」 - オブジェクトをインスタンス化できません"
+
+#: lib/Padre/PluginManager.pm:517
+#, perl-format
+msgid ""
+"Plugin:%s - Could not instantiate plugin object: the constructor does not "
+"return a Padre::Plugin object"
+msgstr ""
+"プラグイン「%s」 - オブジェクトをインスタンス化できません。コンストラクタが"
+"Padre::Pluginオブジェクトを返しません"
+
+#: lib/Padre/PluginManager.pm:537
+#, perl-format
+msgid "Plugin:%s - Does not have menus"
+msgstr "プラグイン「%s」 - メニューがありません"
+
+#: lib/Padre/PluginManager.pm:756
+msgid "Error when calling menu for plugin"
+msgstr "プラグインのメニューを呼ぶときにエラーが発生しました"
+
+#: lib/Padre/PluginManager.pm:785 lib/Padre/Wx/Main.pm:1396
+msgid "No document open"
+msgstr "開いているドキュメントはありません"
+
+#: lib/Padre/PluginManager.pm:787 lib/Padre/Wx/Main.pm:3461
+msgid "No filename"
+msgstr "ファイル名はありません"
+
+#: lib/Padre/PluginManager.pm:791
+msgid "Could not locate project dir"
+msgstr "プロジェクトディレクトリが見つかりません"
+
+#: lib/Padre/PluginManager.pm:810 lib/Padre/PluginManager.pm:907
+#, perl-format
+msgid ""
+"Failed to load the plugin '%s'\n"
+"%s"
+msgstr ""
+"プラグイン「%s」をロードできません\n"
+"%s"
+
+#: lib/Padre/PluginManager.pm:861 lib/Padre/Wx/Main.pm:2373
+#: lib/Padre/Wx/Main.pm:3155
+msgid "Open file"
+msgstr "ファイルを開く"
+
+#: lib/Padre/PluginManager.pm:881
+#, perl-format
+msgid "Plugin must have '%s' as base directory"
+msgstr "プラグインのベースディレクトリは「%s」でなければなりません"
+
+#: lib/Padre/PluginHandle.pm:71 lib/Padre/Wx/Dialog/PluginManager.pm:468
+msgid "error"
+msgstr "エラー"
+
+#: lib/Padre/PluginHandle.pm:72
+msgid "unloaded"
+msgstr "未ロード"
+
+#: lib/Padre/PluginHandle.pm:73
+msgid "loaded"
+msgstr "ロード済"
+
+#: lib/Padre/PluginHandle.pm:74 lib/Padre/Wx/Dialog/PluginManager.pm:478
+msgid "incompatible"
+msgstr "非互換"
+
+#: lib/Padre/PluginHandle.pm:75 lib/Padre/Wx/Dialog/PluginManager.pm:502
+msgid "disabled"
+msgstr "無効"
+
+#: lib/Padre/PluginHandle.pm:76 lib/Padre/Wx/Dialog/PluginManager.pm:492
+msgid "enabled"
+msgstr "有効"
+
+#: lib/Padre/PluginHandle.pm:171
+#, perl-format
+msgid "Failed to enable plugin '%s': %s"
+msgstr "プラグイン「%s」を有効にできません: %s"
+
+#: lib/Padre/PluginHandle.pm:225
+#, perl-format
+msgid "Failed to disable plugin '%s': %s"
+msgstr "プラグイン「%s」を無効にできません: %s"
+
+#: lib/Padre/Document.pm:680
+#, perl-format
+msgid "Unsaved %d"
+msgstr "未保存 %d"
+
+#: lib/Padre/Document.pm:949 lib/Padre/Document.pm:950
+msgid "Skipped for large files"
+msgstr "大きなファイルでは省略"
+
+#: lib/Padre/TaskManager.pm:541
+#, perl-format
+msgid "%s worker threads are running.\n"
+msgstr "%s個のワーカースレッドが実行中です\n"
+
+#: lib/Padre/TaskManager.pm:544
+msgid "Currently, no background tasks are being executed.\n"
+msgstr "現在実行中のバックグラウンドタスクはありません\n"
+
+#: lib/Padre/TaskManager.pm:550
+msgid "The following tasks are currently executing in the background:\n"
+msgstr "以下のタスクが現在バックグラウンドで実行中です:\n"
+
+#: lib/Padre/TaskManager.pm:556
+#, perl-format
+msgid ""
+"- %s of type '%s':\n"
+"  (in thread(s) %s)\n"
+msgstr ""
+"- %s個の「%s」:\n"
+"  (スレッド数%s)\n"
+
+#: lib/Padre/TaskManager.pm:568
+#, perl-format
+msgid ""
+"\n"
+"Additionally, there are %s tasks pending execution.\n"
+msgstr ""
+"\n"
+"なお%s個のタスクがペンディング中です\n"
+
+#: lib/Padre/Task/SyntaxChecker.pm:179 lib/Padre/Wx/Syntax.pm:96
+#: lib/Padre/Wx/Syntax.pm:97
+msgid "Warning"
+msgstr "警告"
+
+#: lib/Padre/Task/SyntaxChecker.pm:179 lib/Padre/Wx/Syntax.pm:96
+#: lib/Padre/Wx/Syntax.pm:99 lib/Padre/Wx/Main.pm:1481
+#: lib/Padre/Wx/Main.pm:1733 lib/Padre/Wx/Main.pm:2566
+#: lib/Padre/Wx/Dialog/PluginManager.pm:358
+msgid "Error"
+msgstr "エラー"
+
+#: lib/Padre/Task/Outline/Perl.pm:146 lib/Padre/Wx/Outline.pm:58
+msgid "Outline"
+msgstr "アウトライン"
+
+#: lib/Padre/Task/Outline/Perl.pm:180
+msgid "&GoTo Element"
+msgstr "要素に移動する(&G)"
+
+#: lib/Padre/Task/Outline/Perl.pm:192 lib/Padre/Wx/Directory.pm:182
+msgid "Open &Documentation"
+msgstr "ドキュメントを開く(&D)"
+
+#: lib/Padre/Task/PPI/FindUnmatchedBrace.pm:77
+msgid "All braces appear to be matched"
+msgstr "かっこはすべて対応がとれているようです"
+
+#: lib/Padre/Task/PPI/FindUnmatchedBrace.pm:78
+msgid "Check Complete"
+msgstr "チェックが完了しました"
+
+#: lib/Padre/Task/PPI/FindVariableDeclaration.pm:87
+#: lib/Padre/Task/PPI/LexicalReplaceVariable.pm:182
+#: lib/Padre/Document/Perl.pm:511 lib/Padre/Document/Perl.pm:537
+msgid "Current cursor does not seem to point at a variable"
+msgstr "現在のカーソル位置には変数が見つかりません"
+
+#: lib/Padre/Task/PPI/FindVariableDeclaration.pm:89
+#: lib/Padre/Task/PPI/LexicalReplaceVariable.pm:184
+msgid "No declaration could be found for the specified (lexical?) variable"
+msgstr "指定された(レキシカル?)変数の宣言が見つかりません"
+
+#: lib/Padre/Task/PPI/FindVariableDeclaration.pm:91
+#: lib/Padre/Task/PPI/LexicalReplaceVariable.pm:186
+msgid "Unknown error"
+msgstr "原因不明のエラーです"
+
+#: lib/Padre/Task/PPI/FindVariableDeclaration.pm:95
+#: lib/Padre/Task/PPI/LexicalReplaceVariable.pm:190
+msgid "Check Canceled"
+msgstr "チェックはキャンセルされました"
+
+#: lib/Padre/Wx/StatusBar.pm:78
+msgid "L:"
+msgstr "行:"
+
+#: lib/Padre/Wx/StatusBar.pm:78
+msgid "Ch:"
+msgstr "文字:"
+
+#: lib/Padre/Wx/Syntax.pm:66
+msgid "Syntax Check"
+msgstr "構文チェック"
+
+#: lib/Padre/Wx/Syntax.pm:92 lib/Padre/Wx/Syntax.pm:254
+msgid "Line"
+msgstr "行"
+
+#: lib/Padre/Wx/Syntax.pm:255
+msgid "Type"
+msgstr "タイプ"
+
+#: lib/Padre/Wx/Syntax.pm:256 lib/Padre/Wx/Dialog/SessionManager.pm:211
+msgid "Description"
+msgstr "説明"
+
+#: lib/Padre/Wx/ToolBar.pm:41
+msgid "New File"
+msgstr "新しいファイルを開く"
+
+#: lib/Padre/Wx/ToolBar.pm:49 lib/Padre/Wx/Directory.pm:170
+msgid "Open File"
+msgstr "ファイルを開く"
+
+#: lib/Padre/Wx/ToolBar.pm:54
+msgid "Save File"
+msgstr "ファイルを保存する"
+
+#: lib/Padre/Wx/ToolBar.pm:59
+msgid "Close File"
+msgstr "ファイルを閉じる"
+
+#: lib/Padre/Wx/ToolBar.pm:71
+msgid "Undo"
+msgstr "元に戻す"
+
+#: lib/Padre/Wx/ToolBar.pm:77
+msgid "Redo"
+msgstr "やり直す"
+
+#: lib/Padre/Wx/ToolBar.pm:86
+msgid "Cut"
+msgstr "切り取り"
+
+#: lib/Padre/Wx/ToolBar.pm:99
+msgid "Copy"
+msgstr "コピー"
+
+#: lib/Padre/Wx/ToolBar.pm:112
+msgid "Paste"
+msgstr "貼り付け"
+
+#: lib/Padre/Wx/ToolBar.pm:126
+msgid "Select all"
+msgstr "すべてを選択"
+
+#: lib/Padre/Wx/ToolBar.pm:151 lib/Padre/Wx/ToolBar.pm:201
+msgid "Background Tasks are idle"
+msgstr "バックグラウンドタスクはありません"
+
+#: lib/Padre/Wx/ToolBar.pm:211
+msgid "Background Tasks are running"
+msgstr "バックグラウンドタスクが実行中です"
+
+#: lib/Padre/Wx/ToolBar.pm:221
+msgid "Background Tasks are running with high load"
+msgstr "バックグラウンドタスクが高負荷になっています"
+
+#: lib/Padre/Wx/Ack.pm:82
+msgid "Term:"
+msgstr "検索語:"
+
+#: lib/Padre/Wx/Ack.pm:86
+msgid "Dir:"
+msgstr "ディレクトリ:"
+
+#: lib/Padre/Wx/Ack.pm:88
+msgid "Pick &directory"
+msgstr "ﾃﾞｨﾚｸﾄﾘ選択(&d)"
+
+#: lib/Padre/Wx/Ack.pm:90
+msgid "In Files/Types:"
+msgstr "ファイル/タイプ:"
+
+#: lib/Padre/Wx/Ack.pm:96 lib/Padre/Wx/Dialog/Find.pm:137
+msgid "Case &Insensitive"
+msgstr "大文字と小文字を区別しない(&I)"
+
+#: lib/Padre/Wx/Ack.pm:102
+msgid "I&gnore hidden Subdirectories"
+msgstr "隠しディレクトリは無視する(&g)"
+
+#: lib/Padre/Wx/Ack.pm:118
+msgid "Find in Files"
+msgstr "ファイル内を検索"
+
+#: lib/Padre/Wx/Ack.pm:147
+msgid "Select directory"
+msgstr "ディレクトリを選択"
+
+#: lib/Padre/Wx/Ack.pm:281 lib/Padre/Wx/Ack.pm:305
+msgid "Ack"
+msgstr "Ack"
+
+#: lib/Padre/Wx/Right.pm:42
+msgid "Workspace View"
+msgstr "ワークスペースビュー"
+
+#: lib/Padre/Wx/Output.pm:54
+msgid "Output"
+msgstr "出力"
+
+#: lib/Padre/Wx/Editor.pm:709 lib/Padre/Wx/Menu/Edit.pm:66
+msgid "Select all\tCtrl-A"
+msgstr "すべてを選択\tCtrl-A"
+
+#: lib/Padre/Wx/Editor.pm:720 lib/Padre/Wx/Menu/Edit.pm:110
+msgid "&Copy\tCtrl-C"
+msgstr "コピー(&C)\tCtrl-C"
+
+#: lib/Padre/Wx/Editor.pm:732 lib/Padre/Wx/Menu/Edit.pm:122
+msgid "Cu&t\tCtrl-X"
+msgstr "切り取り(&t)\tCtrl-X"
+
+#: lib/Padre/Wx/Editor.pm:744 lib/Padre/Wx/Menu/Edit.pm:134
+msgid "&Paste\tCtrl-V"
+msgstr "貼り付け(&P)\tCtrl-V"
+
+#: lib/Padre/Wx/Editor.pm:761 lib/Padre/Wx/Menu/Edit.pm:205
+msgid "&Toggle Comment\tCtrl-Shift-C"
+msgstr "コメントをトグルする(&T)\tCtrl-Shift-C"
+
+#: lib/Padre/Wx/Editor.pm:766 lib/Padre/Wx/Menu/Edit.pm:215
+msgid "&Comment Selected Lines\tCtrl-M"
+msgstr "選択した行をコメントにする(&C)\tCtrl-M"
+
+#: lib/Padre/Wx/Editor.pm:771 lib/Padre/Wx/Menu/Edit.pm:225
+msgid "&Uncomment Selected Lines\tCtrl-Shift-M"
+msgstr "選択した行をコメントにしない(&U)\tCtrl-Shift-M"
+
+#: lib/Padre/Wx/Editor.pm:789
+msgid "Fold all"
+msgstr "すべて折りたたむ"
+
+#: lib/Padre/Wx/Editor.pm:796
+msgid "Unfold all"
+msgstr "すべて展開する"
+
+#: lib/Padre/Wx/Editor.pm:809 lib/Padre/Wx/Menu/Window.pm:34
+msgid "&Split window"
+msgstr "ウィンドウを分割する(&S)"
+
+#: lib/Padre/Wx/Editor.pm:1149
+msgid "You must select a range of lines"
+msgstr "行を選択してください"
+
+#: lib/Padre/Wx/Editor.pm:1165
+msgid "First character of selection must be a non-word character to align"
+msgstr "選択範囲の最初の文字は英数字以外にしてください"
+
+#: lib/Padre/Wx/Directory.pm:52 lib/Padre/Wx/Directory.pm:143
+msgid "Directory"
+msgstr "ディレクトリ"
+
+#: lib/Padre/Wx/Menubar.pm:72
+msgid "&File"
+msgstr "ファイル(&F)"
+
+#: lib/Padre/Wx/Menubar.pm:73 lib/Padre/Wx/Dialog/Snippets.pm:26
+msgid "&Edit"
+msgstr "編集(&E)"
+
+#: lib/Padre/Wx/Menubar.pm:74
+msgid "&Search"
+msgstr "検索(&S)"
+
+#: lib/Padre/Wx/Menubar.pm:75
+msgid "&View"
+msgstr "表示(&V)"
+
+#: lib/Padre/Wx/Menubar.pm:76
+msgid "&Run"
+msgstr "実行(&R)"
+
+#: lib/Padre/Wx/Menubar.pm:77
+msgid "Pl&ugins"
+msgstr "プラグイン(&u)"
+
+#: lib/Padre/Wx/Menubar.pm:78
+msgid "&Window"
+msgstr "ウィンドウ(&W)"
+
+#: lib/Padre/Wx/Menubar.pm:79
+msgid "&Help"
+msgstr "ヘルプ(&H)"
+
+#: lib/Padre/Wx/Menubar.pm:96
+msgid "E&xperimental"
+msgstr "実験(&x)"
+
+#: lib/Padre/Wx/Menubar.pm:119 lib/Padre/Wx/Menubar.pm:159
+msgid "&Perl"
+msgstr ""
+
+#: lib/Padre/Wx/Notebook.pm:31
+msgid "Files"
+msgstr "ファイル"
+
+#: lib/Padre/Wx/ErrorList.pm:91
+msgid "Error List"
+msgstr "エラー一覧"
+
+#: lib/Padre/Wx/ErrorList.pm:126
+msgid "No diagnostics available for this error!"
+msgstr "このエラーには診断メッセージがありません!"
+
+#: lib/Padre/Wx/ErrorList.pm:135
+msgid "Diagnostics"
+msgstr "診断メッセージ"
+
+#: lib/Padre/Wx/Main.pm:391
+#, perl-format
+msgid "No such session %s"
+msgstr "セッション「%s」が見つかりません"
+
+#: lib/Padre/Wx/Main.pm:569
+msgid "Failed to create server"
+msgstr "サーバを作成できません"
+
+#: lib/Padre/Wx/Main.pm:1369
+msgid "Command line"
+msgstr "コマンドライン"
+
+#: lib/Padre/Wx/Main.pm:1370
+msgid "Run setup"
+msgstr "セットアップを実行する"
+
+#: lib/Padre/Wx/Main.pm:1400
+msgid "Current document has no filename"
+msgstr "現在のドキュメントにはファイル名がありません"
+
+#: lib/Padre/Wx/Main.pm:1403
+msgid "Could not find project root"
+msgstr "プロジェクトルートが見つかりません"
+
+#: lib/Padre/Wx/Main.pm:1480
+#, perl-format
+msgid "Failed to start '%s' command"
+msgstr "「%s」コマンドを起動できません"
+
+#: lib/Padre/Wx/Main.pm:1505
+msgid "No open document"
+msgstr "開いているドキュメントはありません"
+
+#: lib/Padre/Wx/Main.pm:1522
+msgid "No execution mode was defined for this document"
+msgstr "このドキュメントは実行可能になっていません"
+
+#: lib/Padre/Wx/Main.pm:1553
+msgid "Not a Perl document"
+msgstr "Perlのドキュメントではありません"
+
+#: lib/Padre/Wx/Main.pm:1719
+msgid "Message"
+msgstr "メッセージ"
+
+#: lib/Padre/Wx/Main.pm:1915
+msgid "Autocompletions error"
+msgstr "オートコンプリートエラー"
+
+#: lib/Padre/Wx/Main.pm:1934
+msgid "Line number:"
+msgstr "行番号:"
+
+#: lib/Padre/Wx/Main.pm:2166
+#, perl-format
+msgid ""
+"Cannot open %s as it is over the arbitrary file size limit of Padre which is "
+"currently %s"
+msgstr ""
+"「%s」を開けません。Padreのファイルサイズの上限を越えています(現在の上限%s)"
+
+#: lib/Padre/Wx/Main.pm:2264
+msgid "Nothing selected. Enter what should be opened:"
+msgstr "選択されているものがありません。開くファイル名を入力してください:"
+
+#: lib/Padre/Wx/Main.pm:2265
+msgid "Open selection"
+msgstr "選択範囲を開く"
+
+#: lib/Padre/Wx/Main.pm:2329
+#, perl-format
+msgid "Could not find file '%s'"
+msgstr "ファイル「%s」が見つかりません"
+
+#: lib/Padre/Wx/Main.pm:2330
+msgid "Open Selection"
+msgstr "選択範囲を開く"
+
+#: lib/Padre/Wx/Main.pm:2414 lib/Padre/Wx/Main.pm:3618
+#, perl-format
+msgid "Could not reload file: %s"
+msgstr "ファイル「%s」をリロードできません"
+
+#: lib/Padre/Wx/Main.pm:2440
+msgid "Save file as..."
+msgstr "名前をつけて保存する..."
+
+#: lib/Padre/Wx/Main.pm:2454
+msgid "File already exists. Overwrite it?"
+msgstr "ファイルはすでに存在します。上書きしますか?"
+
+#: lib/Padre/Wx/Main.pm:2455
+msgid "Exist"
+msgstr "存在"
+
+#: lib/Padre/Wx/Main.pm:2555
+msgid "File changed on disk since last saved. Do you want to overwrite it?"
+msgstr "最後に保存してからファイルが変更されています。上書きしますか?"
+
+#: lib/Padre/Wx/Main.pm:2556 lib/Padre/Wx/Main.pm:3611
+msgid "File not in sync"
+msgstr "ファイルの同期がとれていません"
+
+#: lib/Padre/Wx/Main.pm:2565
+msgid "Could not save file: "
+msgstr "ファイルを保存できません: "
+
+#: lib/Padre/Wx/Main.pm:2627
+msgid "File changed. Do you want to save it?"
+msgstr "ファイルが変更されています。保存しますか?"
+
+#: lib/Padre/Wx/Main.pm:2628
+msgid "Unsaved File"
+msgstr "保存されていないファイル"
+
+#: lib/Padre/Wx/Main.pm:2790
+msgid "Cannot diff if file was never saved"
+msgstr "保存されていないファイルの差分はとれません"
+
+#: lib/Padre/Wx/Main.pm:2796
+msgid "There are no differences\n"
+msgstr "差はありません\n"
+
+#: lib/Padre/Wx/Main.pm:3263 lib/Padre/Plugin/Devel.pm:162
+#, perl-format
+msgid "Error: %s"
+msgstr "エラー: %s"
+
+#: lib/Padre/Wx/Main.pm:3264
+msgid "Internal error"
+msgstr "内部エラー"
+
+#: lib/Padre/Wx/Main.pm:3452
+#, perl-format
+msgid "Words: %s"
+msgstr "単語数: %s"
+
+#: lib/Padre/Wx/Main.pm:3453
+#, perl-format
+msgid "Lines: %d"
+msgstr "行数: %d"
+
+#: lib/Padre/Wx/Main.pm:3454
+#, perl-format
+msgid "Chars without spaces: %s"
+msgstr "空白以外の文字数: %s"
+
+#: lib/Padre/Wx/Main.pm:3455
+#, perl-format
+msgid "Chars with spaces: %d"
+msgstr "空白込みの文字数: %d"
+
+#: lib/Padre/Wx/Main.pm:3456
+#, perl-format
+msgid "Newline type: %s"
+msgstr "改行種別: %s"
+
+#: lib/Padre/Wx/Main.pm:3457
+#, perl-format
+msgid "Encoding: %s"
+msgstr "エンコーディング: %s"
+
+#: lib/Padre/Wx/Main.pm:3458
+#, perl-format
+msgid "Document type: %s"
+msgstr "ドキュメントタイプ: %s"
+
+#: lib/Padre/Wx/Main.pm:3458
+msgid "none"
+msgstr "なし"
+
+#: lib/Padre/Wx/Main.pm:3460
+#, perl-format
+msgid "Filename: %s"
+msgstr "ファイル名: %s"
+
+#: lib/Padre/Wx/Main.pm:3490
+msgid "Space to Tab"
+msgstr "スペースからタブ"
+
+#: lib/Padre/Wx/Main.pm:3491
+msgid "Tab to Space"
+msgstr "タブからスペース"
+
+#: lib/Padre/Wx/Main.pm:3494
+msgid "How many spaces for each tab:"
+msgstr "タブ幅:"
+
+#: lib/Padre/Wx/Main.pm:3610
+msgid "File changed on disk since last saved. Do you want to reload it?"
+msgstr "最後に保存してからファイルが変更されています。リロードしますか?"
+
+#: lib/Padre/Wx/Bottom.pm:42
+msgid "Output View"
+msgstr "出力ビュー"
+
+#: lib/Padre/Wx/FunctionList.pm:71
+msgid "Sub List"
+msgstr "サブルーチン一覧"
+
+#: lib/Padre/Wx/Dialog/Find.pm:58
+msgid "Find"
+msgstr "検索する"
+
+#: lib/Padre/Wx/Dialog/Find.pm:76 lib/Padre/Wx/Dialog/Search.pm:132
+msgid "Find:"
+msgstr "検索:"
+
+#: lib/Padre/Wx/Dialog/Find.pm:91
+msgid "Replace with:"
+msgstr "置換:"
+
+#: lib/Padre/Wx/Dialog/Find.pm:113
+msgid "&Find"
+msgstr "検索(&F)"
+
+#: lib/Padre/Wx/Dialog/Find.pm:121
+msgid "&Replace"
+msgstr "置換(&R)"
+
+#: lib/Padre/Wx/Dialog/Find.pm:146
+msgid "&Use Regex"
+msgstr "正規表現(&U)"
+
+#: lib/Padre/Wx/Dialog/Find.pm:155
+msgid "Search &Backwards"
+msgstr "後方検索(&B)"
+
+#: lib/Padre/Wx/Dialog/Find.pm:164
+msgid "Close Window on &hit"
+msgstr "見つかったらウィンドウを閉じる(&h)"
+
+#: lib/Padre/Wx/Dialog/Find.pm:178
+msgid "Replace &all"
+msgstr "全置換(&a)"
+
+#: lib/Padre/Wx/Dialog/Find.pm:189 lib/Padre/Wx/Dialog/Preferences.pm:500
+msgid "&Cancel"
+msgstr "キャンセル(&C)"
+
+#: lib/Padre/Wx/Dialog/Find.pm:347
+#, perl-format
+msgid "%s occurences were replaced"
+msgstr "%s件置換しました"
+
+#: lib/Padre/Wx/Dialog/Snippets.pm:18
+msgid "All"
+msgstr "すべて"
+
+#: lib/Padre/Wx/Dialog/Snippets.pm:22
+msgid "Class:"
+msgstr "クラス:"
+
+#: lib/Padre/Wx/Dialog/Snippets.pm:23 lib/Padre/Wx/Dialog/Snippets.pm:113
+msgid "Snippet:"
+msgstr "スニペット:"
+
+#: lib/Padre/Wx/Dialog/Snippets.pm:24
+msgid "&Insert"
+msgstr "挿入(&I)"
+
+#: lib/Padre/Wx/Dialog/Snippets.pm:26
+msgid "&Add"
+msgstr "追加(&A)"
+
+#: lib/Padre/Wx/Dialog/Snippets.pm:39
+msgid "Snippets"
+msgstr "スニペット"
+
+#: lib/Padre/Wx/Dialog/Snippets.pm:111
+msgid "Category:"
+msgstr "カテゴリー:"
+
+#: lib/Padre/Wx/Dialog/Snippets.pm:112
+msgid "Name:"
+msgstr "名前:"
+
+#: lib/Padre/Wx/Dialog/Snippets.pm:114 lib/Padre/Wx/Dialog/Preferences.pm:489
+msgid "&Save"
+msgstr "保存する(&S)"
+
+#: lib/Padre/Wx/Dialog/Snippets.pm:125
+msgid "Edit/Add Snippets"
+msgstr "スニペットを編集/追加する"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:37
+msgid "Automatic indentation style detection"
+msgstr "インデントスタイルの自動検出"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:41
+msgid "Use Tabs"
+msgstr "タブを使う"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:44
+msgid "TAB display size (in spaces):"
+msgstr "タブ表示幅(空白の数):"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:47
+msgid "Indentation width (in columns):"
+msgstr "インデント幅(カラム数):"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:50
+msgid "Guess from current document:"
+msgstr "現在のドキュメントから推測:"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:51
+msgid "Guess"
+msgstr "推測"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:53
+msgid "Autoindent:"
+msgstr "自動インデント:"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:77
+msgid "Default word wrap on for each file"
+msgstr "デフォルトでワードラップ"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:82
+msgid "Auto-fold POD markup when code folding enabled"
+msgstr "コードを折りたたむときはPODも自動的に折りたたむ"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:87
+msgid "Perl beginner mode"
+msgstr "Perl初心者モード"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:91
+msgid "Open files:"
+msgstr "ファイルの並び順:"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:95
+msgid "Open files in existing Padre"
+msgstr "既存のPadreでファイルを開く(MDIモード)"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:99
+msgid "Methods order:"
+msgstr "メソッドの並び順:"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:102
+msgid "Preferred language for error diagnostics:"
+msgstr "エラーメッセージの言語:"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:139
+msgid "Colored text in output window (ANSI)"
+msgstr "出力ウィンドウのテキストに色をつける(ANSI)"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:143
+msgid "Editor Font:"
+msgstr "エディタのフォント:"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:146
+msgid "Editor Current Line Background Colour:"
+msgstr "エディタの現在の行の背景色:"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:196
+msgid "Settings Demo"
+msgstr "設定デモ"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:280
+msgid "Enable?"
+msgstr "有効にする?"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:295
+msgid "Crashed"
+msgstr "クラッシュ"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:328
+msgid ""
+"i.e.\n"
+"\tinclude directory:  -I<dir>\n"
+"\tenable tainting checks:  -T\n"
+"\tenable many useful warnings:  -w\n"
+"\tenable all warnings:  -W\n"
+"\tdisable all warnings:  -X\n"
+msgstr ""
+"例\n"
+"\tインクルードディレクトリ: -I<dir>\n"
+"\t汚染チェックを有効にする: -T\n"
+"\t便利な警告を有効にする: -w\n"
+"\tすべての警告を有効にする: -W\n"
+"\tすべての警告を無効にする: -X\n"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:338
+#: lib/Padre/Wx/Dialog/Preferences.pm:382
+msgid "Interpreter arguments:"
+msgstr "インタプリタの引数:"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:344
+#: lib/Padre/Wx/Dialog/Preferences.pm:388
+msgid "Script arguments:"
+msgstr "スクリプトの引数:"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:351
+msgid "Unsaved"
+msgstr "未保存"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:352
+msgid "N/A"
+msgstr "なし"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:371
+msgid "No Document"
+msgstr "ドキュメントがありません"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:376
+msgid "Document name:"
+msgstr "ドキュメント名:"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:379
+msgid "Document location:"
+msgstr "ドキュメントの位置:"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:406
+msgid "Default"
+msgstr "デフォルト"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:412
+#, perl-format
+msgid "Current Document: %s"
+msgstr "現在のドキュメント: %s"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:427
+#: lib/Padre/Wx/Dialog/PluginManager.pm:290 lib/Padre/Wx/Menu/Edit.pm:355
+msgid "Preferences"
+msgstr "設定"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:452
+msgid "Behaviour"
+msgstr "動作"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:455
+msgid "Appearance"
+msgstr "表示"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:458
+msgid "Run Parameters"
+msgstr "実行パラメータ"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:462
+msgid "Indentation"
+msgstr "インデントガイドを表示する"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:535
+msgid "new"
+msgstr "新しい順"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:536
+msgid "nothing"
+msgstr "なし"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:537
+msgid "last"
+msgstr "古い順"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:538
+msgid "no"
+msgstr "なし"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:539
+msgid "same_level"
+msgstr "同じ深さ"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:540
+msgid "deep"
+msgstr "深くする"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:541
+msgid "alphabetical"
+msgstr "アルファベット順"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:542
+msgid "original"
+msgstr "出現順"
+
+#: lib/Padre/Wx/Dialog/Preferences.pm:543
+msgid "alphabetical_private_last"
+msgstr "プライベート変数は最後"
+
+#: lib/Padre/Wx/Dialog/Bookmarks.pm:30
+msgid "Existing bookmarks:"
+msgstr "既存のしおり:"
+
+#: lib/Padre/Wx/Dialog/Bookmarks.pm:42
+msgid "Delete &All"
+msgstr "全削除(&A)"
+
+#: lib/Padre/Wx/Dialog/Bookmarks.pm:55
+msgid "Set Bookmark"
+msgstr "しおりをはさむ"
+
+#: lib/Padre/Wx/Dialog/Bookmarks.pm:56
+msgid "GoTo Bookmark"
+msgstr "しおりに移動する"
+
+#: lib/Padre/Wx/Dialog/Bookmarks.pm:122
+msgid "Cannot set bookmark in unsaved document"
+msgstr "保存されていないドキュメントにはしおりをはさめません"
+
+#: lib/Padre/Wx/Dialog/Bookmarks.pm:133
+#, perl-format
+msgid "%s line %s: %s"
+msgstr "%s 行 %s: %s"
+
+#: lib/Padre/Wx/Dialog/Bookmarks.pm:171
+#, perl-format
+msgid "The bookmark '%s' no longer exists"
+msgstr "しおり「%s」はすでに存在しません"
+
+#: lib/Padre/Wx/Dialog/PluginManager.pm:43 lib/Padre/Wx/Menu/Plugins.pm:34
+msgid "Plugin Manager"
+msgstr "プラグインマネージャー"
+
+#: lib/Padre/Wx/Dialog/PluginManager.pm:174
+#, perl-format
+msgid "Error loading pod for class '%s': %s"
+msgstr "クラス「%s」のpodをロードできません: %s"
+
+#: lib/Padre/Wx/Dialog/PluginManager.pm:229
+#: lib/Padre/Wx/Dialog/SessionManager.pm:210
+msgid "Name"
+msgstr "名前"
+
+#: lib/Padre/Wx/Dialog/PluginManager.pm:230
+msgid "Version"
+msgstr "バージョン"
+
+#: lib/Padre/Wx/Dialog/PluginManager.pm:231 lib/Padre/Wx/CPAN/Listview.pm:43
+#: lib/Padre/Wx/CPAN/Listview.pm:78
+msgid "Status"
+msgstr "ステータス"
+
+#: lib/Padre/Wx/Dialog/PluginManager.pm:291
+#: lib/Padre/Wx/Dialog/SessionSave.pm:209
+#: lib/Padre/Wx/Dialog/SessionManager.pm:241
+msgid "Close"
+msgstr "閉じる"
+
+#: lib/Padre/Wx/Dialog/PluginManager.pm:465
+#: lib/Padre/Wx/Dialog/PluginManager.pm:475
+msgid "Show error message"
+msgstr "エラーメッセージを表示する"
+
+#: lib/Padre/Wx/Dialog/PluginManager.pm:489
+msgid "Disable"
+msgstr "無効"
+
+#: lib/Padre/Wx/Dialog/PluginManager.pm:499
+msgid "Enable"
+msgstr "有効"
+
+#: lib/Padre/Wx/Dialog/ModuleStart.pm:26
+msgid "Module Name:"
+msgstr "モジュール名:"
+
+#: lib/Padre/Wx/Dialog/ModuleStart.pm:29
+msgid "Author:"
+msgstr "作者名:"
+
+#: lib/Padre/Wx/Dialog/ModuleStart.pm:32
+msgid "Email:"
+msgstr "メールアドレス:"
+
+#: lib/Padre/Wx/Dialog/ModuleStart.pm:35
+msgid "Builder:"
+msgstr "ビルダー:"
+
+#: lib/Padre/Wx/Dialog/ModuleStart.pm:38
+msgid "License:"
+msgstr "ライセンス:"
+
+#: lib/Padre/Wx/Dialog/ModuleStart.pm:41
+msgid "Parent Directory:"
+msgstr "親ディレクトリ:"
+
+#: lib/Padre/Wx/Dialog/ModuleStart.pm:42
+msgid "Pick parent directory"
+msgstr "親ディレクトリを選択してください"
+
+#: lib/Padre/Wx/Dialog/ModuleStart.pm:68
+msgid "Module Start"
+msgstr ""
+
+#: lib/Padre/Wx/Dialog/ModuleStart.pm:110
+#, perl-format
+msgid "Field %s was missing. Module not created."
+msgstr "%sフィールドが入力されていません。モジュールを作成できません"
+
+#: lib/Padre/Wx/Dialog/ModuleStart.pm:111
+msgid "missing field"
+msgstr "入力されていないフィールドがあります"
+
+#: lib/Padre/Wx/Dialog/ModuleStart.pm:139
+#, perl-format
+msgid "%s apparantly created. Do you want to open it now?"
+msgstr "%sは作成済みのようです。開きますか?"
+
+#: lib/Padre/Wx/Dialog/ModuleStart.pm:140
+msgid "Done"
+msgstr "完了"
+
+#: lib/Padre/Wx/Dialog/SessionSave.pm:32
+msgid "Save session as..."
+msgstr "名前をつけてセッションを保存する..."
+
+#: lib/Padre/Wx/Dialog/SessionSave.pm:179
+msgid "Session name:"
+msgstr "セッション名:"
+
+#: lib/Padre/Wx/Dialog/SessionSave.pm:188
+msgid "Description:"
+msgstr "説明:"
+
+#: lib/Padre/Wx/Dialog/SessionSave.pm:208
+msgid "Save"
+msgstr "保存"
+
+#: lib/Padre/Wx/Dialog/Search.pm:151
+msgid "Previ&ous"
+msgstr "前(&o)"
+
+#: lib/Padre/Wx/Dialog/Search.pm:169
+msgid "&Next"
+msgstr "次(&N)"
+
+#: lib/Padre/Wx/Dialog/Search.pm:177
+msgid "Case &insensitive"
+msgstr "大文字と小文字を区別しない(&i)"
+
+#: lib/Padre/Wx/Dialog/Search.pm:181
+msgid "Use rege&x"
+msgstr "正規表現(&x)"
+
+#: lib/Padre/Wx/Dialog/SessionManager.pm:36
+msgid "Session Manager"
+msgstr "セッションマネージャー"
+
+#: lib/Padre/Wx/Dialog/SessionManager.pm:198
+msgid "List of sessions"
+msgstr "セッション一覧"
+
+#: lib/Padre/Wx/Dialog/SessionManager.pm:212
+msgid "Last update"
+msgstr "最終更新"
+
+#: lib/Padre/Wx/Dialog/SessionManager.pm:239
+msgid "Open"
+msgstr "開く"
+
+#: lib/Padre/Wx/Dialog/SessionManager.pm:240
+msgid "Delete"
+msgstr "削除"
+
+#: lib/Padre/Wx/Menu/Edit.pm:31
+msgid "&Undo"
+msgstr "元に戻す(&U)"
+
+#: lib/Padre/Wx/Menu/Edit.pm:43
+msgid "&Redo"
+msgstr "やり直す(&R)"
+
+#: lib/Padre/Wx/Menu/Edit.pm:59
+msgid "Select"
+msgstr "選択する"
+
+#: lib/Padre/Wx/Menu/Edit.pm:78
+msgid "Mark selection start\tCtrl-["
+msgstr "選択範囲の始点をマークする\tCtrl-["
+
+#: lib/Padre/Wx/Menu/Edit.pm:90
+msgid "Mark selection end\tCtrl-]"
+msgstr "選択範囲の終点をマークする\tCtrl-]"
+
+#: lib/Padre/Wx/Menu/Edit.pm:102
+msgid "Clear selection marks"
+msgstr "選択範囲のマークをクリアする"
+
+#: lib/Padre/Wx/Menu/Edit.pm:150
+msgid "&Goto\tCtrl-G"
+msgstr "移動する(&G)\tCtrl-G"
+
+#: lib/Padre/Wx/Menu/Edit.pm:160
+msgid "&AutoComp\tCtrl-P"
+msgstr "オートコンプリート(&A)\tCtrl-P"
+
+#: lib/Padre/Wx/Menu/Edit.pm:170
+msgid "&Brace matching\tCtrl-1"
+msgstr "対応するかっこに移動する(&B)\tCtrl-1"
+
+#: lib/Padre/Wx/Menu/Edit.pm:180
+msgid "&Join lines\tCtrl-J"
+msgstr "行を結合する(&J)\tCtrl-J"
+
+#: lib/Padre/Wx/Menu/Edit.pm:190
+msgid "Snippets\tCtrl-Shift-A"
+msgstr "スニペット\tCtrl-Shift-A"
+
+#: lib/Padre/Wx/Menu/Edit.pm:238
+msgid "Tabs and Spaces"
+msgstr "タブとスペース"
+
+#: lib/Padre/Wx/Menu/Edit.pm:244
+msgid "Tabs to Spaces..."
+msgstr "タブからスペース..."
+
+#: lib/Padre/Wx/Menu/Edit.pm:256
+msgid "Spaces to Tabs..."
+msgstr "スペースからタブ..."
+
+#: lib/Padre/Wx/Menu/Edit.pm:270
+msgid "Delete Trailing Spaces"
+msgstr "行末のスペースを削除する"
+
+#: lib/Padre/Wx/Menu/Edit.pm:283
+msgid "Delete Leading Spaces"
+msgstr "行頭のスペースを削除する"
+
+#: lib/Padre/Wx/Menu/Edit.pm:297
+msgid "Upper/Lower Case"
+msgstr "大文字/小文字"
+
+#: lib/Padre/Wx/Menu/Edit.pm:303
+msgid "Upper All\tCtrl-Shift-U"
+msgstr "すべて大文字\tCtrl-Shift-U"
+
+#: lib/Padre/Wx/Menu/Edit.pm:315
+msgid "Lower All\tCtrl-U"
+msgstr "すべて小文字\tCtrl-U"
+
+#: lib/Padre/Wx/Menu/Edit.pm:330
+msgid "Diff"
+msgstr "差分をとる"
+
+#: lib/Padre/Wx/Menu/Edit.pm:340
+msgid "Insert From File..."
+msgstr "ファイルから挿入する..."
+
+#: lib/Padre/Wx/Menu/View.pm:37
+msgid "Lock User Interface"
+msgstr "ユーザインタフェースをロックする"
+
+#: lib/Padre/Wx/Menu/View.pm:52
+msgid "Show Output"
+msgstr "出力を表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:64
+msgid "Show Functions"
+msgstr "関数を表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:82
+msgid "Show Outline"
+msgstr "アウトラインを表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:94
+msgid "Show Directory Tree"
+msgstr "ディレクトリツリーを表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:106
+msgid "Show Syntax Check"
+msgstr "構文チェックを表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:118
+msgid "Show Error List"
+msgstr "エラー一覧を表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:132
+msgid "Show StatusBar"
+msgstr "ステータスバーを表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:149
+msgid "View Document As..."
+msgstr "ドキュメントの表示を変える..."
+
+#: lib/Padre/Wx/Menu/View.pm:183
+msgid "Show Line Numbers"
+msgstr "行番号を表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:195
+msgid "Show Code Folding"
+msgstr "コードの折りたたみを表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:207
+msgid "Show Call Tips"
+msgstr "コールチップを表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:222
+msgid "Show Current Line"
+msgstr "現在の行を表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:237
+msgid "Show Newlines"
+msgstr "改行を表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:249
+msgid "Show Whitespaces"
+msgstr "空白を表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:261
+msgid "Show Indentation Guide"
+msgstr "インデントガイドを表示する"
+
+#: lib/Padre/Wx/Menu/View.pm:273
+msgid "Word-Wrap"
+msgstr "ワードラップ"
+
+#: lib/Padre/Wx/Menu/View.pm:288
+msgid "Increase Font Size\tCtrl-+"
+msgstr "フォントを大きくする\tCtrl-+"
+
+#: lib/Padre/Wx/Menu/View.pm:300
+msgid "Decrease Font Size\tCtrl--"
+msgstr "フォントを小さくする\tCtrl--"
+
+#: lib/Padre/Wx/Menu/View.pm:312
+msgid "Reset Font Size\tCtrl-/"
+msgstr "フォントの大きさをリセットする\tCtrl-/"
+
+#: lib/Padre/Wx/Menu/View.pm:327
+msgid "Set Bookmark\tCtrl-B"
+msgstr "しおりをはさむ\tCtrl-B"
+
+#: lib/Padre/Wx/Menu/View.pm:339
+msgid "Goto Bookmark\tCtrl-Shift-B"
+msgstr "しおりに移動する\tCtrl-Shift-B"
+
+#: lib/Padre/Wx/Menu/View.pm:355
+msgid "Style"
+msgstr "スタイル"
+
+#: lib/Padre/Wx/Menu/View.pm:359
+msgid "Padre"
+msgstr ""
+
+#: lib/Padre/Wx/Menu/View.pm:360
+msgid "Night"
+msgstr ""
+
+#: lib/Padre/Wx/Menu/View.pm:361
+msgid "Ultraedit"
+msgstr ""
+
+#: lib/Padre/Wx/Menu/View.pm:362
+msgid "Notepad++"
+msgstr ""
+
+#: lib/Padre/Wx/Menu/View.pm:410
+msgid "Language"
+msgstr "言語"
+
+#: lib/Padre/Wx/Menu/View.pm:417
+msgid "System Default"
+msgstr "システムデフォルト"
+
+#: lib/Padre/Wx/Menu/View.pm:464
+msgid "&Full Screen\tF11"
+msgstr "フルスクリーン表示\tF11"
+
+#: lib/Padre/Wx/Menu/Plugins.pm:49
+msgid "All available plugins on CPAN"
+msgstr "CPANから入手できるプラグイン一覧"
+
+#: lib/Padre/Wx/Menu/Plugins.pm:60
+msgid "Edit My Plugin"
+msgstr "Myプラグインを編集"
+
+#: lib/Padre/Wx/Menu/Plugins.pm:66
+msgid "Could not find the Padre::Plugin::My plugin"
+msgstr "Padre::Plugin::Myプラグインが見つかりません"
+
+#: lib/Padre/Wx/Menu/Plugins.pm:75
+msgid "Reload My Plugin"
+msgstr "Myプラグインをリロードする"
+
+#: lib/Padre/Wx/Menu/Plugins.pm:82 lib/Padre/Wx/Menu/Plugins.pm:85
+#: lib/Padre/Wx/Menu/Plugins.pm:86
+msgid "Reset My Plugin"
+msgstr "Myプラグインをリセットする"
+
+#: lib/Padre/Wx/Menu/Plugins.pm:101
+msgid "Reload All Plugins"
+msgstr "すべてのプラグインをリロードする"
+
+#: lib/Padre/Wx/Menu/Plugins.pm:108
+msgid "(Re)load Current Plugin"
+msgstr "現在のプラグインを(リ)ロードする"
+
+#: lib/Padre/Wx/Menu/Plugins.pm:115
+msgid "Test A Plugin From Local Dir"
+msgstr "ローカルディレクトリのプラグインをテストする"
+
+#: lib/Padre/Wx/Menu/Plugins.pm:122
+msgid "Plugin Tools"
+msgstr "プラグインツール"
+
+#: lib/Padre/Wx/Menu/Search.pm:31
+msgid "&Find\tCtrl-F"
+msgstr "検索する(&F)\tCtrl-F"
+
+#: lib/Padre/Wx/Menu/Search.pm:43
+msgid "Find Next\tF3"
+msgstr "次を検索する\tF3"
+
+#: lib/Padre/Wx/Menu/Search.pm:55
+msgid "Find Previous\tShift-F3"
+msgstr "前を検索する\tShift-F3"
+
+#: lib/Padre/Wx/Menu/Search.pm:68
+msgid "Replace\tCtrl-R"
+msgstr "置換する\tCtrl-R"
+
+#: lib/Padre/Wx/Menu/Search.pm:81
+msgid "Quick Find"
+msgstr "クイック検索"
+
+#: lib/Padre/Wx/Menu/Search.pm:102
+msgid "Find Next\tF4"
+msgstr "次を検索する\tF4"
+
+#: lib/Padre/Wx/Menu/Search.pm:114
+msgid "Find Previous\tShift-F4"
+msgstr "前を検索する\tShift-F4"
+
+#: lib/Padre/Wx/Menu/Search.pm:131
+msgid "Find in fi&les..."
+msgstr "ファイル内を検索(&l)"
+
+#: lib/Padre/Wx/Menu/Help.pm:38
+msgid "Context Help\tF1"
+msgstr "コンテキストヘルプ\tF1"
+
+#: lib/Padre/Wx/Menu/Help.pm:58
+msgid "Current Document"
+msgstr "現在のドキュメント"
+
+#: lib/Padre/Wx/Menu/Help.pm:70
+msgid "Visit the PerlMonks"
+msgstr "PerlMonksを訪問する"
+
+#: lib/Padre/Wx/Menu/Help.pm:80
+msgid "Report a New &Bug"
+msgstr "新しいバグを報告する(&B)"
+
+#: lib/Padre/Wx/Menu/Help.pm:87
+msgid "View All &Open Bugs"
+msgstr "未解決のバグを全表示する(&O)"
+
+#: lib/Padre/Wx/Menu/Help.pm:97
+msgid "&About"
+msgstr "Padreについて(&A)"
+
+#: lib/Padre/Wx/Menu/Help.pm:151
+msgid "Copyright 2008-2009 The Padre development team as listed in Padre.pm"
+msgstr ""
+
+#: lib/Padre/Wx/Menu/Run.pm:31
+msgid "Run Script\tF5"
+msgstr "スクリプトを実行する\tF5"
+
+#: lib/Padre/Wx/Menu/Run.pm:43
+msgid "Run Script (debug info)\tShift-F5"
+msgstr "スクリプトを実行する (デバッグ情報)\tShift-F5"
+
+#: lib/Padre/Wx/Menu/Run.pm:55
+msgid "Run Command\tCtrl-F5"
+msgstr "コマンドを実行する\tCtrl-F5"
+
+#: lib/Padre/Wx/Menu/Run.pm:67
+msgid "Run Tests"
+msgstr "テストを実行する"
+
+#: lib/Padre/Wx/Menu/Run.pm:80
+msgid "Stop\tF6"
+msgstr "停止する\tF6"
+
+#: lib/Padre/Wx/Menu/File.pm:31
+msgid "&New\tCtrl-N"
+msgstr "新しいファイルを開く(&N)\tCtrl-N"
+
+#: lib/Padre/Wx/Menu/File.pm:48
+msgid "New..."
+msgstr "新しい..."
+
+#: lib/Padre/Wx/Menu/File.pm:55
+msgid "Perl 5 Script"
+msgstr "Perl 5スクリプト"
+
+#: lib/Padre/Wx/Menu/File.pm:65
+msgid "Perl 5 Module"
+msgstr "Perl 5モジュール"
+
+#: lib/Padre/Wx/Menu/File.pm:75
+msgid "Perl 5 Test"
+msgstr "Perl 5テスト"
+
+#: lib/Padre/Wx/Menu/File.pm:85
+msgid "Perl 6 Script"
+msgstr "Perl 6スクリプト"
+
+#: lib/Padre/Wx/Menu/File.pm:95
+msgid "Perl Distribution (Module::Starter)"
+msgstr "Perlディストリビューション (Module::Starter)"
+
+#: lib/Padre/Wx/Menu/File.pm:108
+msgid "&Open...\tCtrl-O"
+msgstr "ファイルを開く(&O)...\tCtrl-O"
+
+#: lib/Padre/Wx/Menu/File.pm:117
+msgid "Open Selection\tCtrl-Shift-O"
+msgstr "選択範囲を開く\tCtrl-Shift-O"
+
+#: lib/Padre/Wx/Menu/File.pm:121
+msgid "Open Session...\tCtrl-Alt-O"
+msgstr "セッションを開く...\tCtrl-Alt-O"
+
+#: lib/Padre/Wx/Menu/File.pm:138
+msgid "&Close\tCtrl-W"
+msgstr "閉じる(&C)\tCtrl-W"
+
+#: lib/Padre/Wx/Menu/File.pm:150
+msgid "Close All"
+msgstr "すべて閉じる"
+
+#: lib/Padre/Wx/Menu/File.pm:161
+msgid "Close All but Current"
+msgstr "現在のファイル以外すべて閉じる"
+
+#: lib/Padre/Wx/Menu/File.pm:172
+msgid "Reload File"
+msgstr "ファイルをリロードする"
+
+#: lib/Padre/Wx/Menu/File.pm:187
+msgid "&Save\tCtrl-S"
+msgstr "保存する(&S)\tCtrl-S"
+
+#: lib/Padre/Wx/Menu/File.pm:198
+msgid "Save &As...\tF12"
+msgstr "名前をつけて保存する(&A)...\tF12"
+
+#: lib/Padre/Wx/Menu/File.pm:209
+msgid "Save All"
+msgstr "すべて保存する"
+
+#: lib/Padre/Wx/Menu/File.pm:220
+msgid "Save Session...\tCtrl-Alt-S"
+msgstr "現在のセッションを保存する...\tCtrl-Alt-S"
+
+#: lib/Padre/Wx/Menu/File.pm:232
+msgid "&Print..."
+msgstr "印刷する(&P)..."
+
+#: lib/Padre/Wx/Menu/File.pm:256
+msgid "Convert..."
+msgstr "変換する..."
+
+#: lib/Padre/Wx/Menu/File.pm:262
+msgid "EOL to Windows"
+msgstr "改行をWindows風に"
+
+#: lib/Padre/Wx/Menu/File.pm:274
+msgid "EOL to Unix"
+msgstr "改行をUnix風に"
+
+#: lib/Padre/Wx/Menu/File.pm:286
+msgid "EOL to Mac Classic"
+msgstr "改行をMac Classic風に"
+
+#: lib/Padre/Wx/Menu/File.pm:302
+msgid "&Recent Files"
+msgstr "最近使ったファイル(&R)"
+
+#: lib/Padre/Wx/Menu/File.pm:309
+msgid "Open All Recent Files"
+msgstr "最近使ったすべてのファイルを開く"
+
+#: lib/Padre/Wx/Menu/File.pm:319
+msgid "Clean Recent Files List"
+msgstr "最近使ったファイルの一覧を消去する"
+
+#: lib/Padre/Wx/Menu/File.pm:336
+msgid "Document Statistics"
+msgstr "ドキュメントの統計情報"
+
+#: lib/Padre/Wx/Menu/File.pm:353
+msgid "&Quit\tCtrl-Q"
+msgstr "終了する(&Q)\tCtrl-Q"
+
+#: lib/Padre/Wx/Menu/Perl.pm:40
+msgid "Find Unmatched Brace"
+msgstr "対応していないかっこを検索する"
+
+#: lib/Padre/Wx/Menu/Perl.pm:51 lib/Padre/Document/Perl.pm:666
+msgid "Find Variable Declaration"
+msgstr "変数宣言を検索する"
+
+#: lib/Padre/Wx/Menu/Perl.pm:66 lib/Padre/Document/Perl.pm:678
+msgid "Lexically Rename Variable"
+msgstr "変数をレキシカルにリネームする"
+
+#: lib/Padre/Wx/Menu/Perl.pm:73 lib/Padre/Wx/Menu/Perl.pm:74
+#: lib/Padre/Document/Perl.pm:689 lib/Padre/Document/Perl.pm:690
+msgid "Replacement"
+msgstr "置換する"
+
+#: lib/Padre/Wx/Menu/Perl.pm:89
+msgid "Vertically Align Selected"
+msgstr "選択範囲を桁揃えする"
+
+#: lib/Padre/Wx/Menu/Perl.pm:102
+msgid "Use PPI Syntax Highlighting"
+msgstr "PPIによる構文ハイライト表示"
+
+#: lib/Padre/Wx/Menu/Perl.pm:128
+msgid "Automatic bracket completion"
+msgstr "かっこを自動的に補完する"
+
+#: lib/Padre/Wx/Menu/Window.pm:46
+msgid "Next File\tCtrl-TAB"
+msgstr "次のファイル\tCtrl-TAB"
+
+#: lib/Padre/Wx/Menu/Window.pm:55
+msgid "Previous File\tCtrl-Shift-TAB"
+msgstr "前のファイル\tCtrl-Shift-TAB"
+
+#: lib/Padre/Wx/Menu/Window.pm:64
+msgid "Last Visited File\tCtrl-6"
+msgstr "最後に訪れたファイル\tCtrl-6"
+
+#: lib/Padre/Wx/Menu/Window.pm:73
+msgid "Right Click\tAlt-/"
+msgstr "右クリック\tAlt-/"
+
+#: lib/Padre/Wx/Menu/Window.pm:90
+msgid "GoTo Subs Window"
+msgstr "サブルーチンウィンドウに移動する"
+
+#: lib/Padre/Wx/Menu/Window.pm:103
+msgid "GoTo Outline Window\tAlt-L"
+msgstr "アウトラインウィンドウに移動する\tAlt-L"
+
+#: lib/Padre/Wx/Menu/Window.pm:115
+msgid "GoTo Output Window\tAlt-O"
+msgstr "出力ウィンドウに移動する\tAlt-O"
+
+#: lib/Padre/Wx/Menu/Window.pm:125
+msgid "GoTo Syntax Check Window\tAlt-C"
+msgstr "構文チェックウィンドウに移動する\tAlt-C"
+
+#: lib/Padre/Wx/Menu/Window.pm:140
+msgid "GoTo Main Window\tAlt-M"
+msgstr "メインウィンドウに移動する\tAlt-M"
+
+#: lib/Padre/Wx/Menu/Experimental.pm:30
+msgid "Disable Experimental Mode"
+msgstr "実験モードを無効にする"
+
+#: lib/Padre/Wx/Menu/Experimental.pm:44
+msgid "Refresh Menu"
+msgstr "メニューをリフレッシュする"
+
+#: lib/Padre/Wx/Menu/Experimental.pm:55 lib/Padre/Wx/Menu/Experimental.pm:76
+msgid "Refresh Counter: "
+msgstr "リフレッシュカウンタ: "
+
+#: lib/Padre/Plugin/Perl5.pm:39
+msgid "Install Module..."
+msgstr "モジュールのインストール..."
+
+#: lib/Padre/Plugin/Perl5.pm:40
+msgid "Install CPAN Module"
+msgstr "CPANモジュールのインストール"
+
+#: lib/Padre/Plugin/Perl5.pm:42
+msgid "Install Local Distribution"
+msgstr "ローカルディストリビューションのインストール"
+
+#: lib/Padre/Plugin/Perl5.pm:43
+msgid "Install Remote Distribution"
+msgstr "リモートディストリビューションのインストール"
+
+#: lib/Padre/Plugin/Perl5.pm:45
+msgid "Open CPAN Config File"
+msgstr "CPANコンフィグファイルを開く"
+
+#: lib/Padre/Plugin/Perl5.pm:96
+msgid "Failed to find your CPAN configuration"
+msgstr "CPANの設定が見つかりません"
+
+#: lib/Padre/Plugin/Perl5.pm:106
+msgid "Select distribution to install"
+msgstr "インストールするディストリビューションを選択してください"
+
+#: lib/Padre/Plugin/Perl5.pm:119 lib/Padre/Plugin/Perl5.pm:144
+msgid "Did not provide a distribution"
+msgstr "ディストリビューションが指定されていません"
+
+#: lib/Padre/Plugin/Perl5.pm:134
+msgid ""
+"Enter URL to install\n"
+"e.g. http://svn.ali.as/cpan/releases/Config-Tiny-2.00.tar.gz"
+msgstr ""
+"インストールするURLを入力してください\n"
+"例: http://svn.ali.as/cpan/releases/Config-Tiny-2.00.tar.gz"
+
+#: lib/Padre/Plugin/Perl5.pm:164
+msgid "pip is unexpectedly not installed"
+msgstr "pipがインストールされていません"
+
+#: lib/Padre/Plugin/Devel.pm:21
+msgid "Padre Developer Tools"
+msgstr "Padre開発者用ツール"
+
+#: lib/Padre/Plugin/Devel.pm:55
+msgid "Run Document inside Padre"
+msgstr "Padre内部でドキュメントを実行する"
+
+#: lib/Padre/Plugin/Devel.pm:57
+msgid "Dump Current Document"
+msgstr "現在のドキュメントをダンプする"
+
+#: lib/Padre/Plugin/Devel.pm:58
+msgid "Dump Top IDE Object"
+msgstr "最前列にあるIDEオブジェクトをダンプする"
+
+#: lib/Padre/Plugin/Devel.pm:59
+msgid "Dump %INC and @INC"
+msgstr "%INCと@INCをダンプする"
+
+#: lib/Padre/Plugin/Devel.pm:65
+msgid "Enable logging"
+msgstr "ログを有効にする"
+
+#: lib/Padre/Plugin/Devel.pm:66
+msgid "Disable logging"
+msgstr "ログを無効にする"
+
+#: lib/Padre/Plugin/Devel.pm:67
+msgid "Enable trace when logging"
+msgstr "ログ時にトレースを有効にする"
+
+#: lib/Padre/Plugin/Devel.pm:68
+msgid "Disable trace"
+msgstr "トレースを無効にする"
+
+#: lib/Padre/Plugin/Devel.pm:70
+msgid "Simulate Crash"
+msgstr "クラッシュをシミュレートする"
+
+#: lib/Padre/Plugin/Devel.pm:71
+msgid "Simulate Crashing Bg Task"
+msgstr "バックグラウンドタスクのクラッシュをシミュレートする"
+
+#: lib/Padre/Plugin/Devel.pm:73
+msgid "wxWidgets 2.8.8 Reference"
+msgstr "wxWidgets 2.8.8リファレンス"
+
+#: lib/Padre/Plugin/Devel.pm:76
+msgid "STC Reference"
+msgstr "STCリファレンス"
+
+#: lib/Padre/Plugin/Devel.pm:80 lib/Padre/Plugin/PopularityContest.pm:118
+msgid "About"
+msgstr "Padreについて"
+
+#: lib/Padre/Plugin/Devel.pm:119
+msgid "No file is open"
+msgstr "開いているファイルはありません"
+
+#: lib/Padre/Plugin/Devel.pm:149
+msgid "A set of unrelated tools used by the Padre developers\n"
+msgstr "Padre開発者が利用している外部ツール群\n"
+
+#: lib/Padre/Plugin/PopularityContest.pm:119
+msgid "Ping"
+msgstr ""
+
+#: lib/Padre/Document/Perl.pm:512 lib/Padre/Document/Perl.pm:538
+msgid "Check cancelled"
+msgstr "チェックはキャンセルされました"
+
+#~ msgid ""
+#~ "Plugin:%s - Not compatible with Padre::Plugin API. Plugin cannot be "
+#~ "instantiated"
+#~ msgstr ""
+#~ "プラグイン「%s」 - Padre::PluginのAPIと互換性がありません。プラグインをイ"
+#~ "ンスタンス化できません"
+
+#~ msgid ""
+#~ "Plugin:%s - Not compatible with Padre::Plugin API. Need to have sub "
+#~ "padre_interfaces"
+#~ msgstr ""
+#~ "プラグイン「%s」 - Padre::PluginのAPIと互換性がありません。"
+#~ "padre_interfacesサブルーチンがありません"
+
+#~ msgid "No output"
+#~ msgstr "出力がありません"
+
+#~ msgid "Ac&k Search"
+#~ msgstr "Ack検索(&k)"

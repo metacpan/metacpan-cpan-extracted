@@ -1,0 +1,26 @@
+# -*- cperl -*-
+
+=head1 NAME
+
+nat-sentalign - C sentence aligner.
+
+=head1 SYNOPSIS
+
+ nat-sentalign...
+
+=head1 DESCRIPTION
+
+You should use nat-sentence-align
+
+=head1 SEE ALSO
+
+nat-sentence-align and NATools documentation
+
+=head1 COPYRIGHT
+
+ Copyright (C)2002-2009 Alberto Simoes and Jose Joao Almeida
+
+ GNU GENERAL PUBLIC LICENSE (LGPL) Version 2 (June 1991)
+
+=cut
+

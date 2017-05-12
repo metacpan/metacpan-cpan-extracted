@@ -1,0 +1,48 @@
+Revision history for Lingua-TH-Numbers.
+
+v1.1.0  2017-03-22
+        - Relicensed under Perl 5 terms.
+
+v1.0.9  2015-03-05
+        - Fixed documentation (GH-1). Thanks @trizen!
+        - Cleaned up prereqs (GH-1).
+
+v1.0.8  2014-04-20
+        - Fixed "package version matches dist version" for CPANTS.
+        - Fixed license declared in meta files.
+        - General cleanup.
+
+v1.0.7  2013-05-08
+        - Moved release tests to xt/.
+        - Updated Build.PL to handle release tests as part of disttest.
+        - Added new release tests.
+        - Formatted readme with markdown.
+        - Added Test::FailWarnings to all tests.
+        - Added info on how to contribute examples.
+        - Updated links to point to MetaCPAN.
+        - Updated links to point to GitHub's issue tracker.
+
+v1.0.6  2012-10-03
+        - Relicensed as GPLv3.
+
+v1.0.5  2012-09-23
+        - Added PerlCritic tests for core policies.
+        - Added various meta information.
+        - Cleaned up requires and build_requires.
+        - Refactored tests to use Test::Exception instead of eval{}.
+        - Updated bugtracker URL.
+
+v1.0.4  2012-01-18
+        - Cleanup to pass PerlCritic 'harsh'.
+
+v1.0.3  2011-12-30
+        - Upgraded minimum requirement to Perl 5.8.
+
+v1.0.2  2011-12-28
+        - Fixed tests for Perl 5.6, now uses PerlIO only with 5.8+.
+
+v1.0.1  2011-12-26
+        - Added POD encoding information. Added documentation.
+
+v1.0.0  2011-12-26
+        - CPAN release.

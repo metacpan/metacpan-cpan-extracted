@@ -1,0 +1,31 @@
+Revision history for perl module Lingua::JA::Gairaigo::Fuzzy
+
+0.07 2017-01-10
+
+* Documentation
+
+0.06 2014-02-05
+
+* Add README, MIN_PERL_VERSION in Makefile.PL.
+
+0.05 2013-10-20
+
+* Bug fixes
+
+0.04 2013-10-20
+
+* ou and o- now the same.
+* ii and i- now the same.
+
+0.03 2013-10-20
+
+* Add 'eq' to "same_gairaigo", return 1 if true.
+
+0.02 2013-05-04
+
+* This release tidies up some loose ends (bad dependencies, no author
+  information in pod, etc.) The important code is the same as 0.01.
+
+0.01 2013-03-25
+
+

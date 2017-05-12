@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.21.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 08407f658e977f18c128595b627d08efbe195bf5 Calendar.pm
+SHA1 c7c46cb02483e0350948c057d091a5c2f6c746d9 Calendar.xs
+SHA1 cc0ffb8e3ba29e6f54ac1a22d690277e954d94ff Changes
+SHA1 93ac802f53054780ebcdb9a0e6a8860e11e96716 MANIFEST
+SHA1 a6543a0f058a72685022bc2ca2252ce0c28a38e5 MANIFEST.SKIP
+SHA1 196d505e101af54c9e0eb4b9c7611c6cedcaaefe Makefile.PL
+SHA1 b38552ca9eacd6162426073f687a8e4ae6f7b726 README
+SHA1 71cd4fda8aac0b858bddf16f0ce0074d25e23bc3 hcom.c
+SHA1 066992e0d3729ce9184ef528abaca6221e483852 hdate.c
+SHA1 73bf045d7056b437aaf00d3e5de30d5ec7dbe95d hdate.h
+SHA1 a46a0b15aa815840808d3d3ba19b30e0753130d7 t/0-signature.t
+SHA1 b7e2d2162a432f76bb1385e81fb51473e26a16b2 t/1-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (FreeBSD)
+
+iD8DBQE+J50UtLPdNzw1AaARAnJ4AJ9JVRnn0v3dG7qHtJI5JQE9tWHFYwCeMCFT
+/v0KZW7NR1w2smVALSPvBkU=
+=6ZSO
+-----END PGP SIGNATURE-----

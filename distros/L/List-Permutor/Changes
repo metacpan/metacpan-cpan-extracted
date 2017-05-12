@@ -1,0 +1,13 @@
+Revision history for Perl extension List::Permutor
+
+0.01  Wed Jun  2 22:28:31 1999
+	- original version; created by h2xs 1.18
+	- Permutation function works great
+0.02  Sun Jun  6 10:40 1999
+	- Changed name to List::Permutor
+	- Pass array as list, rather than ref
+	- Added README file
+0.021
+	- Fixed documentation error
+0.022
+	- Fixed documentation error

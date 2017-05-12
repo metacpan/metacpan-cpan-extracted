@@ -1,0 +1,9 @@
+Revision history for Perl extension Log::AndError.
+
+1.00  Thursday January 23, 2014
+	- Added the examples I was meaning to do.
+	- Fixed an undef error where perl no longer treats -1 as undef.
+
+0.99  Fri Mar 15 2002
+	- Born On Date;
+

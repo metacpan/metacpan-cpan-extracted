@@ -1,0 +1,88 @@
+#!/bin/sh
+
+# Test the status within Hugs of each module in the hierarchical libraries.
+
+packages='haskell98 base haskell-src network parsec QuickCheck unix OpenGL GLUT'
+
+this_dir="`dirname $0`"
+: ${this_dir:-.}
+hugs_src_dir="$this_dir/.."
+
+hugs=$hugs_src_dir/hugs
+
+HUGSDIR=$hugs_src_dir/../hugsdir
+export HUGSDIR
+
+case $# in
+1)	;;
+*)	echo "usage: $0 <directory where libraries lives>"
+	exit 1 ;;
+esac
+
+srcdir=$1/libraries
+if [ ! -d $srcdir ]; then
+	echo "Can't find libraries in directory '$1'"
+	exit 1
+fi
+
+tmpfile=/tmp/libs.$$
+trap 'rm -f $tmpfile+ $tmpfile-; exit 0' 0 1 2 3 15
+
+HUGSFLAGS=
+export HUGSFLAGS
+
+test_module() {
+	module=$1
+	# The +. flag ensures that ERRORs will be at the start of a line
+	$hugs +98 +. $module </dev/null >$tmpfile+
+	$hugs -98 +. $module </dev/null >$tmpfile-
+	if grep "^ERROR - Can't find module \"$module\"" $tmpfile- >/dev/null
+	then	echo "missing  $module"
+	elif grep ' ERROR: ' $tmpfile- >/dev/null
+	then	sed -n 's/\(.* ERROR\): \(.*\)/*\1*	'"$module"' (\2)/p' $tmpfile-
+	elif grep '^ERROR' $tmpfile- >/dev/null
+	then
+		module2=`grep '^ERROR ' $tmpfile- | sed -e 's:.*"[^"]*/[a-z][^"/]*/\([^".]*\)\.[a-z]*".*:\1:' -e 's:/:.:g'`
+		if [ "$module" != "$module2" ]
+		then	reason="imports $module2"
+		else	reason="`sed -n '/^ERROR / s/.* - //p' $tmpfile-`"
+		fi
+		echo "*ERROR*  $module ($reason)"
+	elif grep '^ERROR' $tmpfile+ >/dev/null
+	then
+		module2=`grep '^ERROR ' $tmpfile+ | sed -e 's:.*"[^"]*/[a-z][^"/]*/\([^".]*\)\.[a-z]*".*:\1:' -e 's:/:.:g'`
+		if [ "$module" != "$module2" ]
+		then	reason="imports $module2"
+		else
+			reason="`sed -n '/^ERROR / s/.* - //p' $tmpfile+`"
+			case "$reason" in
+			"Syntax error in data type definition (unexpected \`.')")
+				reason='rank-2 datatypes' ;;
+			"Syntax error in type expression (unexpected \`.')")
+				reason='rank-2 types' ;;
+			"Haskell 98 does not support dependent parameters")
+				reason='functional dependencies' ;;
+			"Haskell 98 does not support multiple parameter classes")
+				reason='multi-parameter type classes' ;;
+			esac
+		fi
+		echo "hugs -98 $module ($reason)"
+	else	echo "hugs +98 $module"
+	fi
+}
+
+(
+	cd $srcdir
+	for package in $packages
+	do	find $package -type f \( -name \*.hs  -o -name \*.lhs -o -name \*.y -o -name \*.ly -o -name \*.hsc -o -name \*.gc \) -print |
+			sed 's:^[^/]*/::
+				s/\..*//
+				s:/:.:g' |
+			sort
+	done
+) | grep -v '^Prelude$' | grep -v '^[GN]HC' |
+	grep -v '\.[a-z]' | grep -v '^[a-z]' |
+	while read module
+	do
+		test_module $module
+	done

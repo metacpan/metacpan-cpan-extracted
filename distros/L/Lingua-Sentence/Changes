@@ -1,0 +1,36 @@
+Revision history for Lingua-Sentence
+
+1.100     2017-02-26
+    - Moved to Dist::Zilla
+    - Moved to ExtUtils::MakeMaker
+    - Tidied the code to get rid of the tabs and spaces problem
+    - Removed use of non-ASCII characters in the regular expressions.
+      Use the \x{} syntax instead.
+    - Un-escaped several regular expressions non-metacharacters
+    - Removed usage of two-arg open
+    - Removed bareword file handles
+    - Use File::Spec and Path::Tiny to slurp files
+
+1.05     2013-12-19
+    - added language support for Danish, Finnish, Lithuanian and updated
+      language support for Greek
+
+1.04     2013-02-01
+    - added language support for Czech, Hungarian, Icelandic, Latvian,
+      Polish, Romanian, Russian, Slovak, Slovenian and Swedish
+    - changed license to LGPLv3 because language support files come under
+      this license
+    - fixed RT issue #82069: Sentences with more than one trailing
+      whitespace not split
+    - removed use of Exporter as this is object-oriented module
+
+1.03     2010-12-04
+    - added language support for Catalan and Dutch
+    - update language support for Spanish
+
+1.02     2010-07-07
+    - added language support for French, Italian, Spanish
+    - switched to File::ShareDir to access nonbreaking prefix files
+
+1.00     2010-02-18
+    - original version

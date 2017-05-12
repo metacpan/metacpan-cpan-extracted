@@ -1,0 +1,43 @@
+{
+   "abstract" : "a logging interface",
+   "author" : [
+      "Mark Rogaski <mrogaski@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4212",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Agent-Logger",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getargs::Long" : "0.103",
+            "Log::Agent" : "0.208"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Agent::Logger" : {
+         "file" : "lib/Log/Agent/Logger.pm",
+         "version" : "0.200"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "0.200",
+   "x_serialization_backend" : "JSON version 2.90"
+}

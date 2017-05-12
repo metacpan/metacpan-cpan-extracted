@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Lingua/JA/Onbiki.pm
+minil.toml
+t/00_compile.t
+t/01_base.t
+META.yml
+MANIFEST

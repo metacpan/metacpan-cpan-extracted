@@ -1,0 +1,88 @@
+Revision history for Perl module Lingua::EN::Numbers
+
+2.03 2015-11-07 NEILB
+    - Changed \d to [0-9] for all relevant regexps. Thanks to Ben Bullock
+      for the PR which did this.
+    - Dropped use of "use vars", switching to "our $VERSION" etc.
+    - Changed github repo URL after changing my github username
+
+2.02 2015-03-11 NEILB
+    - Added Perl 5.20 to Travis config. SREZIC++
+    - Support for explicit plus in mantissa. SREZIC++
+
+2.01 2015-02-21 NEILB
+    - If the English words version of a number already finish in "th"
+      (eg "one times ten to the thirty-sixth") then don't append another "th"
+      to the ordinal. RT#102177 from DRL++
+
+2.00 2014-08-16 NEILB
+    - Finally dropped the legacy OO interface (which was only the main
+      public interface for one release in 1999. So bumped major version.
+    - Expanded SEE ALSO to give a small description of each module, and
+      added Lingua::EN::Fractions at the same time.
+    - Module had "require 5.004", but the code now requires 5.006.
+    - Improvements to wording of DESCRIPTION.
+
+1.07 2014-05-27
+    - Added github repo to pod
+    - Clarified authorship history
+    - Improved the DESCRIPTION wording.
+
+1.06 2014-01-12
+
+    - Added "use warnings"
+    - Added Lingua::EN::Inflect to SEE ALSO in doc
+    - Added MIN_PERL_VERSION => 5.006 to Makefile.PL
+    - Added PREREQ_PM to Makefile.PL
+    - Added ExtUtils::MakeMaker to CONFIGURE_REQUIRES in Makefile.PL
+    - Added Test, Test::More and bigint to TEST_REQUIRES in Makefile.PL
+
+1.05 2013-11-24
+
+    - Added github repo to metadata in Makefile.PL
+    - Specified license type as GPL in Makefile.PL
+      (to match what the documentation already says)
+
+1.04 2012-06-21
+
+    - Added links in SEE ALSO to all similar modules, and to the review
+      I did of all such modules for English.
+    - Corrected SEE ALSO reference to a non-existent module
+      (reported by Karen Etheridge)
+
+1.03 2011-11-20
+
+    - Fixed bug in handling of very large numbers (when using bigint).
+      Reported by Steve Flitman, fix from Ben Bullock
+
+1.02 2011-11-20
+
+    - Neil Bowers <neilb@cpan.org> has taken over maintenance
+    - fixed a bug affecting numbers over 1 million, where the right-hand
+      three digits are 0\d\d (i.e. 99 or less), you'd get a rogue comma.
+      e.g. 1001001 became "one million, one thousand and, one"
+    - renamed ChangeLog to Changes, and reformatted to CPAN::Changes::Spec
+
+
+1.01 2005-01-05
+
+    - total rewrite
+    - It's more gooder now, in interface, internals, and accuracy.
+    - More tests.
+    - Mostly backwards compatable.  (But if you relied on the olde
+      stylee "British" mode, with "billiards" et al, you're out of
+      luck.)
+
+	
+0.02 2005-01-01  Sean M. Burke  sburke@cpan.org
+
+    - Sean M. Burke <sburke@cpan.org> took over maintenance
+    - Fixed various bugs to do with 0.
+    - Corrected "Fourty" to "Forty"
+    - Added some tests, generally rearraged the dist.
+
+
+0.01 1999-05-16 - Stephen Pandich  steve@pandich.com
+
+    - original version by Stephen Pandich <steve@pandich.com>
+

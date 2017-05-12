@@ -1,0 +1,8 @@
+Revision history for Perl extension Log::Pony
+
+1.0.1 2013-02-07T10:55:31
+
+    - win32 test fix
+
+1.0.0    Sun Feb  3 11:21:28 2013
+    - original version

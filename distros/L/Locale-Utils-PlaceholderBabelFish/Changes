@@ -1,0 +1,15 @@
+Revision history for Perl extension Locale::Utils::PlaceholderBabelFish.
+
+0.004  Fri Feb 24 07:08:02 2017
+- fixed pod, documentet method new
+
+0.003  Mon Nov  2 09:05:26 2015
+- some small fixes
+- default modifier html also for perl code
+
+0.002  Sat Oct 31 18:31:15 2015
+- https://rt.cpan.org/Ticket/Display.html?id=107912
+- implemented JavaScript part
+
+0.001  Fri Oct  2 08:57:18 2015
+- first version

@@ -1,0 +1,469 @@
+#################################################
+# CHUNKING FRONTIERS (type information, valeur) #
+#################################################
+#
+#
+####################################
+# PONCTUATION et DEBUT/FIN de PHRASE
+#
+POS	SEN
+POS	PUN
+#
+########
+# VERBES
+#
+#__________
+# INFINITIF
+POS	Vmn------
+#
+#_____________
+# CONDITIONNEL
+# pour le moment pas rencontre
+#
+#________________
+# INDICATIF FUTUR
+POS	Vmif-----
+# groupe
+POS	Vmif----1
+POS	Vmif----2
+POS	Vmif----3
+# personne groupe
+POS	Vmif1---1
+POS	Vmif2---1
+POS	Vmif3---1
+POS	Vmif1---2
+POS	Vmif2---2
+POS	Vmif3---2
+POS	Vmif1---3
+POS	Vmif2---3
+POS	Vmif3---3
+# personne nombre
+POS	Vmif1s---
+POS	Vmif2s---
+POS	Vmif3s---
+POS	Vmif1p---
+POS	Vmif2p---
+POS	Vmif3p---
+# personne nombre groupe
+POS	Vmif1s--1
+POS	Vmif2s--1
+POS	Vmif3s--1
+POS	Vmif1p--1
+POS	Vmif2p--1
+POS	Vmif3p--1
+POS	Vmif1s--2
+POS	Vmif2s--2
+POS	Vmif3s--2
+POS	Vmif1p--2
+POS	Vmif2p--2
+POS	Vmif3p--2
+POS	Vmif1s--3
+POS	Vmif2s--3
+POS	Vmif3s--3
+POS	Vmif1p--3
+POS	Vmif2p--3
+POS	Vmif3p--3
+#
+#____________________
+# INDICATIF IMPARFAIT
+POS	Vmii-----
+# groupe
+POS	Vmii----1
+POS	Vmii----2
+POS	Vmii----3
+# personne groupe
+POS	Vmii1---1
+POS	Vmii2---1
+POS	Vmii3---1
+POS	Vmii1---2
+POS	Vmii2---2
+POS	Vmii3---2
+POS	Vmii1---3
+POS	Vmii2---3
+POS	Vmii3---3
+# personne nombre
+POS	Vmii1s---
+POS	Vmii2s---
+POS	Vmii3s---
+POS	Vmii1p---
+POS	Vmii2p---
+POS	Vmii3p---
+# personne nombre groupe
+POS	Vmii1s--1
+POS	Vmii2s--1
+POS	Vmii3s--1
+POS	Vmii1p--1
+POS	Vmii2p--1
+POS	Vmii3p--1
+POS	Vmii1s--2
+POS	Vmii2s--2
+POS	Vmii3s--2
+POS	Vmii1p--2
+POS	Vmii2p--2
+POS	Vmii3p--2
+POS	Vmii1s--3
+POS	Vmii2s--3
+POS	Vmii3s--3
+POS	Vmii1p--3
+POS	Vmii2p--3
+POS	Vmii3p--3
+#
+#__________________
+# INDICATIF PRESENT
+POS	Vmip-----
+# groupe
+POS	Vmip----1
+POS	Vmip----2
+POS	Vmip----3
+# personne groupe
+POS	Vmip1---1
+POS	Vmip2---1
+POS	Vmip3---1
+POS	Vmip1---2
+POS	Vmip2---2
+POS	Vmip3---2
+POS	Vmip1---3
+POS	Vmip2---3
+POS	Vmip3---3
+# personne nombre
+POS	Vmip1s---
+POS	Vmip2s---
+POS	Vmip3s---
+POS	Vmip1p---
+POS	Vmip2p---
+POS	Vmip3p---
+# personne nombre groupe
+POS	Vmip1s--1
+POS	Vmip2s--1
+POS	Vmip3s--1
+POS	Vmip1p--1
+POS	Vmip2p--1
+POS	Vmip3p--1
+POS	Vmip1s--2
+POS	Vmip2s--2
+POS	Vmip3s--2
+POS	Vmip1p--2
+POS	Vmip2p--2
+POS	Vmip3p--2
+POS	Vmip1s--3
+POS	Vmip2s--3
+POS	Vmip3s--3
+POS	Vmip1p--3
+POS	Vmip2p--3
+POS	Vmip3p--3
+#
+#___________________
+# SUBJONCTIF PRESENT
+POS	Vmsp-----
+# groupe
+POS	Vmsp----1
+POS	Vmsp----2
+POS	Vmsp----3
+# personne groupe
+POS	Vmsp1---1
+POS	Vmsp2---1
+POS	Vmsp3---1
+POS	Vmsp1---2
+POS	Vmsp2---2
+POS	Vmsp3---2
+POS	Vmsp1---3
+POS	Vmsp2---3
+POS	Vmsp3---3
+# personne nombre
+POS	Vmsp1s---
+POS	Vmsp2s---
+POS	Vmsp3s---
+POS	Vmsp1p---
+POS	Vmsp2p---
+POS	Vmsp3p---
+# personne nombre groupe
+POS	Vmsp1s--1
+POS	Vmsp2s--1
+POS	Vmsp3s--1
+POS	Vmsp1p--1
+POS	Vmsp2p--1
+POS	Vmsp3p--1
+POS	Vmsp1s--2
+POS	Vmsp2s--2
+POS	Vmsp3s--2
+POS	Vmsp1p--2
+POS	Vmsp2p--2
+POS	Vmsp3p--2
+POS	Vmsp1s--3
+POS	Vmsp2s--3
+POS	Vmsp3s--3
+POS	Vmsp1p--3
+POS	Vmsp2p--3
+POS	Vmsp3p--3
+#
+#_____________________
+# SUBJONCTIF IMPARFAIT
+POS	Vmsi-----
+# groupe
+POS	Vmsi----1
+POS	Vmsi----2
+POS	Vmsi----3
+# personne groupe
+POS	Vmsi1---1
+POS	Vmsi2---1
+POS	Vmsi3---1
+POS	Vmsi1---2
+POS	Vmsi2---2
+POS	Vmsi3---2
+POS	Vmsi1---3
+POS	Vmsi2---3
+POS	Vmsi3---3
+# personne nombre
+POS	Vmsi1s---
+POS	Vmsi2s---
+POS	Vmsi3s---
+POS	Vmsi1p---
+POS	Vmsi2p---
+POS	Vmsi3p---
+# personne nombre groupe
+POS	Vmsi1s--1
+POS	Vmsi2s--1
+POS	Vmsi3s--1
+POS	Vmsi1p--1
+POS	Vmsi2p--1
+POS	Vmsi3p--1
+POS	Vmsi1s--2
+POS	Vmsi2s--2
+POS	Vmsi3s--2
+POS	Vmsi1p--2
+POS	Vmsi2p--2
+POS	Vmsi3p--2
+POS	Vmsi1s--3
+POS	Vmsi2s--3
+POS	Vmsi3s--3
+POS	Vmsi1p--3
+POS	Vmsi2p--3
+POS	Vmsi3p--3
+#
+#______________________________
+# AUXILIAIRES INDICATIF PRESENT
+POS	Vaip-----
+# groupe
+POS	Vaip----1
+POS	Vaip----2
+POS	Vaip----3
+# personne groupe
+POS	Vaip1---1
+POS	Vaip2---1
+POS	Vaip3---1
+POS	Vaip1---2
+POS	Vaip2---2
+POS	Vaip3---2
+POS	Vaip1---3
+POS	Vaip2---3
+POS	Vaip3---3
+# personne nombre
+POS	Vaip1s---
+POS	Vaip2s---
+POS	Vaip3s---
+POS	Vaip1p---
+POS	Vaip2p---
+POS	Vaip3p---
+# personne nombre groupe
+POS	Vaip1s--1
+POS	Vaip2s--1
+POS	Vaip3s--1
+POS	Vaip1p--1
+POS	Vaip2p--1
+POS	Vaip3p--1
+POS	Vaip1s--2
+POS	Vaip2s--2
+POS	Vaip3s--2
+POS	Vaip1p--2
+POS	Vaip2p--2
+POS	Vaip3p--2
+POS	Vaip1s--3
+POS	Vaip2s--3
+POS	Vaip3s--3
+POS	Vaip1p--3
+POS	Vaip2p--3
+POS	Vaip3p--3
+#
+#____________________________
+# AUXILIAIRES INDICATIF FUTUR
+POS	Vaif-----
+# groupe
+POS	Vaif----1
+POS	Vaif----2
+POS	Vaif----3
+# personne groupe
+POS	Vaif1---1
+POS	Vaif2---1
+POS	Vaif3---1
+POS	Vaif1---2
+POS	Vaif2---2
+POS	Vaif3---2
+POS	Vaif1---3
+POS	Vaif2---3
+POS	Vaif3---3
+# personne nombre
+POS	Vaif1s---
+POS	Vaif2s---
+POS	Vaif3s---
+POS	Vaif1p---
+POS	Vaif2p---
+POS	Vaif3p---
+# personne nombre groupe
+POS	Vaif1s--1
+POS	Vaif2s--1
+POS	Vaif3s--1
+POS	Vaif1p--1
+POS	Vaif2p--1
+POS	Vaif3p--1
+POS	Vaif1s--2
+POS	Vaif2s--2
+POS	Vaif3s--2
+POS	Vaif1p--2
+POS	Vaif2p--2
+POS	Vaif3p--2
+POS	Vaif1s--3
+POS	Vaif2s--3
+POS	Vaif3s--3
+POS	Vaif1p--3
+POS	Vaif2p--3
+POS	Vaif3p--3
+#
+#________________________________
+# AUXILIAIRES INDICATIF IMPARFAIT
+POS	Vaii-----
+# groupe
+POS	Vaii----1
+POS	Vaii----2
+POS	Vaii----3
+# personne groupe
+POS	Vaii1---1
+POS	Vaii2---1
+POS	Vaii3---1
+POS	Vaii1---2
+POS	Vaii2---2
+POS	Vaii3---2
+POS	Vaii1---3
+POS	Vaii2---3
+POS	Vaii3---3
+# personne nombre
+POS	Vaii1s---
+POS	Vaii2s---
+POS	Vaii3s---
+POS	Vaii1p---
+POS	Vaii2p---
+POS	Vaii3p---
+# personne nombre groupe
+POS	Vaii1s--1
+POS	Vaii2s--1
+POS	Vaii3s--1
+POS	Vaii1p--1
+POS	Vaii2p--1
+POS	Vaii3p--1
+POS	Vaii1s--2
+POS	Vaii2s--2
+POS	Vaii3s--2
+POS	Vaii1p--2
+POS	Vaii2p--2
+POS	Vaii3p--2
+POS	Vaii1s--3
+POS	Vaii2s--3
+POS	Vaii3s--3
+POS	Vaii1p--3
+POS	Vaii2p--3
+POS	Vaii3p--3
+#
+#_____________
+# CONDITIONNEL
+#
+POS	Vmcp3s--1
+POS	Vmcp3s--2
+POS	Vmcp3s--3
+POS	Vmcp3p--1
+POS	Vmcp3p--2
+POS	Vmcp3p--3
+#
+##############
+# PREPOSITIONS
+#
+POS	PRP
+#
+##########
+# ADVERBES
+#
+POS	ADV
+#
+#########
+# PRONOMS
+#
+#___________
+# PERSONNELS
+POS	Pp3fsj-
+POS	Pp3fsn-
+POS	Pp3fpj-
+POS	Pp3fpn-
+POS	Pp---j-
+POS	Pp3msn-
+POS	Pp3mpn-
+POS	Pp3msj-
+POS	Pp3-pj-
+POS	Pp3-sj-
+POS	Pp3ms--
+POS	Pp3--j-
+POS	Pp---j-
+LF	il
+#
+#__________
+# INDEFINIS
+LF	aucun
+LF	certain
+LF	certains
+LF	plusieurs
+POS	Pi3ms--
+POS	Pi3fs--
+POS	Pi3mp--
+POS	Pi3fp--
+POS	Pi3-p--
+#
+#______________
+# DEMONSTRATIFS
+LF	ce
+LF	cela
+LF	celui
+LF	tel
+POS	Pd3ms--
+POS	Pd3fs--
+POS	Pd3mp--
+POS	Pd3fp--
+POS	Pd3msn-
+POS	Pd3fsn-
+POS	Pd3-pn-
+#
+##############
+# DETERMINANTS
+#
+#___________
+# POSSESSIFS
+LF	mon
+LF	ton
+LF	son
+LF	leur
+POS	Ds3-s--d
+POS	Ds3-p--d
+POS	Ds3ms--d
+POS	Ds3fs--d
+POS	Ds3mp--d
+POS	Ds3fp--d
+#
+#####################
+#
+# PONCTUATION DIVERSE
+#
+#####################
+POS	(
+POS	)
+POS	,
+POS	{
+POS	}
+POS	"
+POS	/
+POS	+

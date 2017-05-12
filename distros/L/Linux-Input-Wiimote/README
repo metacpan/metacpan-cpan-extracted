@@ -1,0 +1,100 @@
+NAME
+    Linux::Input::Wiimote - Perl interface to the libcwiimote library
+
+SYNOPSIS
+        This is a perl interface to the C library libcwiimote ( http://sourceforge.net/projects/libwiimote/ ).
+        It implements most of that API and provides access to most functions of the wiimote.
+
+        libcwiimote version 0.04 must be installed and the bluetooth dameon must be running
+
+        Auto discovery is not yet built in.  You must know the id of your wiimote.  You can use hcitool scan
+        to find the id.
+
+METHODS
+        wiimote_connect( ID OF YOUR WIIMOTE ): pass in the id of your wiimote such as '00:19:1D:75:CC:30'.  Returns 0 on success
+        wiimote_update : updates the wiimote.  Should be called often
+
+        wiimote_discover: discovers and returns the id of the last wiimote it sees.  WARNING, this method has bugs and will segfault if it doesn't find a wii quickly
+        set_wiimote_rumble:  starts/stops rumble.  Pass in 1 to start, 0 to stop
+        set_wiimote_ir:  starts/stops ir sensor.  Pass in 1 to start, 0 to stop
+
+        get_wiimote_tilt_x
+        get_wiimote_tilt_y
+        get_wiimote_tilt_z
+
+        get_wiimote_axis_x
+        get_wiimote_axis_y
+        get_wiimote_axis_z
+
+        get_wiimote_ext_nunchuk_axis_x
+        get_wiimote_ext_nunchuk_axis_y
+        get_wiimote_ext_nunchuk_axis_z
+
+        get_wiimote_ext_nunchuk_joyx
+        get_wiimote_ext_nunchuk_joyy
+
+        IR sensor position (must first set_wiimote_ir(1) to start ir sensor) NOT YET FINISHED:
+        get_wiimote_ir1_y
+        get_wiimote_ir1_x
+        get_wiimote_ir1_size
+
+        get_wiimote_ir2_y
+        get_wiimote_ir2_x
+        get_wiimote_ir2_size
+
+        get_wiimote_ir3_y
+        get_wiimote_ir3_x
+        get_wiimote_ir3_size
+
+        get_wiimote_ir4_y
+        get_wiimote_ir4_x
+        get_wiimote_ir4_size
+
+        Methods below return 0 or 1 depending on if key is pressed:
+
+        get_wiimote_keys_home
+        get_wiimote_keys_minus
+        get_wiimote_keys_a
+        get_wiimote_keys_b
+        get_wiimote_keys_1
+        get_wiimote_keys_2
+        get_wiimote_keys_plus
+        get_wiimote_keys_up
+        get_wiimote_keys_down
+        get_wiimote_keys_right
+        get_wiimote_keys_left
+        get_wiimote_keys_bits
+
+EXAMPLE
+        use Linux::Input::Wiimote;
+
+        my $wii = new Linux::Input::Wiimote;
+
+        $wii->wiimote_connect('00:19:1D:75:CC:30');
+
+        while ( $wii->is_open() ) {
+            $wii->wiimote_update();
+            print "Wiimote Key bits: " . $wii->get_wiimote_keys_bits() . "\n";
+        }
+
+TODO
+    * Add support for multiple remotes (it is already in libcmote)
+    * Add auto descovery of wiimote
+
+KNOWN BUGS
+    * wiimote_discover can cause a segfault
+
+AUTHOR
+    Chad Phillips <chad@chadphillips.org>
+
+MAINTAINER
+    Brian Cassidy <bricas@cpan.org<gt>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007 by Chad Phillips
+
+    Copyright 2007 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

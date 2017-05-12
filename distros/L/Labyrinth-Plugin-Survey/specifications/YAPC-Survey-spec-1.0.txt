@@ -1,0 +1,320 @@
+Documentation for YAPC Survey YAML file
+
+NAME
+
+YAPC-Survey-spec - Specification for YAML documents containing questions for a conference survey.
+
+SYNOPSIS
+
+ --- #YAML:1.0
+ name:       YAPC::Europe 2008 Survey
+ version:    0.01
+ abstract:   Survey for YAPC::Europe 2008 Perl Conference.
+ license:    Public Domain
+ 
+ sections:
+   - label: Demographics (required)
+     preamble: These questions will help us understand who our attendees are.
+     questions:
+       - label: "Age Band:"
+         mandatory: yes
+         type: select
+         options:
+           - key:    under 20
+             value:  1
+           - key:    20 - 39
+             value:  2
+           - key:    40 - 59
+             value:  3
+           - key:    60 and over
+             value:  4
+       - label: "Sex:"
+         status: hidden
+         mandatory: yes
+         type: select
+         options:
+           - key:    Male
+             value:  M
+           - key:    Female
+             value:  F
+           - key:    Decline to state
+             value:  D
+       - label: "Job Type:"
+         mandatory: yes
+         multipart:
+           - type: select
+             options:
+               - key:    The Boss
+                 value:  1
+               - key:    Underling
+                 value:  2
+               - key:    Newbie
+                 value:  3
+               - key:    Other
+                 value:  3
+           - type: text
+             preamble: "If 'Other' please enter your professional job title:"
+ meta-spec:
+   version: 1.0
+   url: http://www.missbarbell.co.uk/labyrinth/YAPC-Survey-spec-v1.0.txt
+
+DESCRIPTION
+
+This document describes version 1.0 of the YAPC Survey YAML file specification.
+
+The SURVEY.yml file describes the content for a survey, consisting of sections, questions and options. This file is intended to be used to plug into the Labyrinth website framework, which provides a parser to convert the YAML into a data structure. The internal data structure can then be used to display the survey to a respondant, or to reference the recorded results submitted by the respondant.
+
+Note: The latest stable version of this specification can always be found at http://www.missbarbell.co.uk/labyrinth/YAPC-Survey-current.txt, with the latest development version available at http://www.missbarbell.co.uk/labyrinth/YAPC-Survey-blead.txt. Note that the development version may include entries that are only under discussion, which may not feature in a final release.
+
+FORMAT
+
+Each SURVEY.yml file is written in the YAML format (see http://www.yaml.org/).
+
+TERMINOLOGY
+
+respondant
+    The person expected to take part in the survey.
+
+survey
+    A collection of sections, questions and options.
+
+section
+    One or more sections, which split the survey into manageable chunks for a respondant to read.
+
+HEADER
+
+The first line of a SURVEY.yml file should be a valid YAML document header like "--- #YAML:1.0".
+
+FIELDS
+
+The remainder of the SURVEY.yml file is a single YAML mapping whose keys are described here. However, the fields are split into two groups. The Informational Fields provide information regarding the survey or the SURVEY.yml file. The Content Fields are those that contain the sections and questions relating to the survey itself.
+
+Informational Fields
+
+meta-spec
+
+Example:
+
+ meta-spec:
+   version: 1.0
+   url: http://www.missbarbell.co.uk/labyrinth/YAPC-Survey-spec-v1.0.txt
+
+(Spec 1.0) [required] {URL} This field indicates the location of the version of the SURVEY.yml specification used.
+
+name
+
+Example:
+
+  name: YAPC::Europe 2008 Survey
+
+(Spec 1.0) [required] {string} The name of the survey.
+
+version
+
+Example:
+
+  version: 0.01
+
+(Spec 1.0) [required] {version} The version of the survey to which the SURVEY.yml file refers.
+
+abstract
+
+Example:
+
+  abstract: Survey for YAPC::Europe 2008 Perl Conference.
+
+(Spec 1.0) [required] {string} A short description of the purpose of the survey.
+
+author
+
+Example:
+
+  author:
+    - Barbie <barbie@cpan.org>
+
+(Spec 1.0) [optional] {list of strings} A YAML sequence indicating the author(s) of the survey. The prefered form is author-name <email-address>.
+
+license
+
+Example:
+
+  license: Public Domain
+
+(Spec 1.0) [required] {string} The license under which this distribution may be used and redistributed.
+
+
+Section Fields
+
+The main field here is sections, which is the container for all survey content. Within this, there are section fields, question fields and the question type fields, which are described within each sub heading.
+
+sections
+
+Example:
+
+  sections:
+    - label: Section 1
+    - label: Section 2
+
+(Spec 1.0) [required] {list} This field defines the sections that make up the survey. There must be at least one.
+
+Sections
+
+label
+
+Example:
+
+  label: Section 1
+
+(Spec 1.0) [optional] {string} The section heading that will be displayed prior to the section content.
+
+preamble
+
+Example:
+
+  preamble: blah blah blah
+
+(Spec 1.0) [optional] {string} Text that will appear before the section.
+
+footnote
+
+Example:
+
+  footnote: blah blah blah
+
+(Spec 1.0) [optional] {string} Text that will appear after the section
+
+questions
+
+Example:
+
+  questions: 
+    - label: Question 1
+    - label: Question 2
+
+(Spec 1.0) [required] {list} A set of questions within the current section.
+
+Question Fields
+
+The main field here is 'questions', which is the container for all question content. Within this, there are question fields and the question type fields, which are described within each sub heading.
+
+label
+
+Example:
+
+  label: "Age Band:"
+
+(Spec 1.0) [optional] {string} The question text. This can be optional, if the previous question is a continuation. Note that it is advisable to include in quotes if special characters (e.g. ':') are to be included in the question text.
+
+hidden
+
+Example:
+
+  hidden: yes
+
+(Spec 1.0) [optional] {string} If used, should only be set to yes to indicate the question is to be ignored. 
+
+mandatory
+
+Example:
+
+  mandatory: yes
+
+(Spec 1.0) [optional] {string} If used, should only be set to yes to indicate the question is required. 
+
+type
+
+Example:
+
+  type: select
+
+(Spec 1.0) [optional] {string} Determines the type of form input to be used. Values can be select, radio, checkbox, text, textarea, matrix, count and currency.
+
+preamble
+
+Example:
+
+  preamble: blah blah blah
+
+(Spec 1.0) [optional] {string} Text that will appear after the question lable, but before the question options/input.
+
+footnote
+
+Example:
+
+  footnote: blah blah blah
+
+(Spec 1.0) [optional] {string} Text that will appear after the question.
+
+collate
+
+Example:
+
+  collate: yes
+
+(Spec 1.0) [optional] {string} If used, should only be set to yes to indicate the question is to be tied to other collated questions. Future revisions will allow gouping.
+
+multipart
+
+Example:
+
+  multipart:
+    - type: checkbox
+      options:
+        - key:    This was my first YAPC
+          value:  1
+
+(Spec 1.0) [optional] {list} Used when multiple questions are to be tied together as one related question. The contents of a multipart set are the same question fields available to normal questions, except the 'multipart' field.
+
+group
+
+Example:
+
+  group: YAPCs
+
+(Spec 1.0) [optional] {string} Used with multipart questions to tie the related questions together.
+
+options
+
+Example:
+
+  options:
+    - key:    under 20
+      value:  1
+    - key:    20 - 39
+      value:  2
+    - key:    40 - 59
+      value:  3
+    - key:    60 and over
+      value:  4
+
+(Spec 1.0) [optional] {list} Used when 'type' is set to select, radio or checkbox, to list the options to be displayed for that question.
+
+Options Fields
+
+key
+
+Example:
+
+  key: under 20
+
+(Spec 1.0) [required] {string} If options have been specified, at least one key/value pair is required. Value is the text that will be displayed.
+
+value
+
+Example:
+
+  value: 1
+
+(Spec 1.0) [required] {string} If options have been specified, at least one key/value pair is required. Value is the value that should be return for the form field.
+
+SEE ALSO
+
+Labyrinth, http://labyrinth.missbarbell.co.uk
+
+YAML, http://www.yaml.org/
+
+HISTORY
+
+October 10, 2010
+
+  *  Created version 1.0 of this document.

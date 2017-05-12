@@ -1,0 +1,22 @@
+Logger::Syslog  -- A simple wrapper over Sys::Syslog
+
+FEATURES
+
+Povides one function per syslog message level for sending message to syslog.
+
+REQUIREMENTS
+
+This module requires you to have installed the following other perl modules:
+  - Sys::Syslog
+
+NOTES
+
+Compliant with mod_perl.
+
+INSTALL
+
+Use the classic mantra:
+
+    $ perl Makefile.PL
+    $ make
+    # make install

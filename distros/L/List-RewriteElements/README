@@ -1,0 +1,35 @@
+#$Id: README 1124 2007-01-23 03:40:10Z jimk $
+List::RewriteElements - Create a new list by rewriting elements of a first list
+
+This document refers to version 0.09 of List::RewriteElements.  
+This version was released January 22, 2007.
+
+To install this module on your system, place the tarball archive file in a 
+temporary directory and call the following:
+
+% gunzip List-RewriteElements-0.09.tar.gz
+% tar xf List-RewriteElements-0.09.tar
+% cd List-RewriteElements-0.09
+% perl Makefile.PL
+% make
+% make test
+% make install
+
+If during installation you wish to view more information on test results, 
+substitute the following for the sixth line in the sequence of commands
+above:
+
+% make test TEST=VERBOSE
+
+If you are installing this module over any earlier version, you may 
+substitute the following for the last line in the sequence of commands 
+above:
+
+% make install UNINST=1
+
+If you are installing this module on a Win32 system with 'nmake', 
+substitute 'nmake' for 'make' in the sequence of commands above.
+
+In sending e-mail to the maintainer, please put "List::RewriteElements" or 
+"List-RewriteElements" in the subject line.
+

@@ -1,0 +1,36 @@
+Revision history for Loompa
+
+0.51    April 6, 2009
+        - taken over by hdp
+
+0.50    December 17, 2007
+        - should now correctly be creating class methods
+
+0.42    November 28, 2007
+        - constructor now passes its arguments to init()
+
+0.41    November 28, 2007
+        - Better error message for 'make_methods()' being passed incorrect data
+          structure.
+
+0.4     November 16, 2007
+        - Dramatically better method name checking and error messages 
+
+0.3     November 4, 2007
+        - Can now pass scalar values in `methods` hashref to set default
+          property values.
+
+0.2     November 3, 2007
+        - Can now pass hashref to `make_methods` to specify custom subroutines
+          for each generated method.
+        - make_methods() now requires a reference rather than a list.
+
+0.1     October 29, 2007
+        - Custom subroutines work.
+
+0.02    October 20, 2007
+        - Changing 'die' to 'croak'
+
+0.01    October 20, 2007
+        - First version, based on Oompa.
+

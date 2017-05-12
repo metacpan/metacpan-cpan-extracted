@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+if ($ARGV[0]=~/\-h/){
+   print STDERR qq{$0 - print MANIFEST.SKIP to stdout\n};
+   exit;
+}
+print q{
+# Version control files and dirs.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+
+# Makemaker generated files and dirs.
+^MANIFEST\.
+^Makefile$
+^blib/
+^MakeMaker-\d
+
+# Temp, old and emacs backup files.
+~$
+\.old$
+^#.*#$
+^\.#
+\.bak$
+
+# Leo dev and temp
+\b\.tmp$
+\bdev\b
+tar.gz$
+};

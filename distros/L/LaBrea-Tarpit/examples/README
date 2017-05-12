@@ -1,0 +1,16 @@
+To use this 'daemon.pl', compile and install
+
+LaBrea version 2.4b3 or higher from www.hackbusters.net
+
+Install LaBrea::Tarpit
+
+Edit the 'config' settings in 'daemon.pl' to conform
+to you system then make an entry in your startup
+files to run 'daemon.pl' at boot time.
+
+Make sure that you use 
+
+kill -15 (SIG_TERM)
+
+to shut down the daemon so it perserves it's cache 
+information for reboot.

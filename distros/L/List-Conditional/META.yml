@@ -1,0 +1,22 @@
+---
+abstract: 'Create lists based on a condition for each element'
+author:
+  - 'Darko Obradovic <dobradovic@gmx.de>'
+build_requires:
+  List::MoreUtils: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: List-Conditional
+provides:
+  List::Conditional:
+    file: lib/List/Conditional.pm
+    version: 0.02
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

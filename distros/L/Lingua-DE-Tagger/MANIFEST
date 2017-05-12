@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Lingua/DE/Tagger.pm
+Tagger/tags.yml
+Tagger/unknown.yml
+Tagger/words.yml
+
+META.yml                                 Module meta-data (added by MakeMaker)

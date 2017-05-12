@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+	<title lang="en">ERROR 404 - PAGE NOT FOUND</title>
+	<meta name="Generator" content="Labyrinth" />
+	<meta name="Author" content="Birmingham Perl Mongers" />
+	<meta name="description" content="This site is a bid by Birmingham.pm to host the annual YAPC::Europe Perl conference in 2006, in Birmingham, UK" />
+	<meta name="keywords" content="Perl Perl_conference Birmingham UK YAPC Larry_Wall language computer convention Perl_mongers computer_science YAPC::Europe" />
+	<meta name="copyright" content="Copyright (C) 2003-2006 Birmingham Perl Mongers" />
+
+	<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
+	<meta http-equiv="Content-Language" content="en-gb" />
+
+	<link rel="stylesheet" type="text/css" media="screen" href="[% webpath %]/css/master.css" />
+
+	<script type="text/javascript" src="[% webpath %]/js/x.js"></script>
+	<script type="text/javascript" src="[% webpath %]/js/global.js"></script>
+</head>
+<body>
+
+	<!-- Begin: Page Container -->
+	<div id="pagecontainer">
+
+		<!-- Begin: Page Header -->
+		<div id="pageheader">
+
+
+	<!-- Begin: Page Container -->
+	<div id="pagecontainer">
+
+		<!-- Begin: Page Header -->
+		<div id="pageheader">
+
+	<table width="98%" summary="top line menu">
+	<tr><td class="tagline" width="35%" align="left"><b>"The Accessibility Of Perl"</b><a tabindex="1" href="#Content" title="Jump to Content: Alt + C" class="HideSkips" accesskey="C"><span id="HideSkips">Jump to Content (Alt + C)</span></a></td>
+		<td class="tagline" width="30%" align="center"><b>30th August - 1st September 2006</b></td>
+		<td class="tagline" width="35%" align="right">[% INCLUDE public/navigation_top.html %]</td></tr>
+	<tr><td colspan="3" valign="middle"><img src="[% webpath %]/images/yapc-banner.jpg" width="765" alt="YAPC::Europe::2006" /></td></tr>
+	</table>
+
+		</div>
+		<!-- End: Page Header -->
+
+		<!-- Begin: Page Body -->
+		<div id="pagebody">
+
+			<!-- Begin: Left Column -->
+			<div id="left">
+
+			[% INCLUDE public/navigation.html %]
+
+			[% IF irand1 %][% block = irand1 %][% INCLUDE images/imagesblock.html %][% END %]
+			[% IF arand2 %][% block = arand2 %][% INCLUDE adverts/advertblock.html %][% END %]
+			[% IF irand3 %][% block = irand3 %][% INCLUDE images/imagesblock.html %][% END %]
+			[% IF arand4 %][% block = arand4 %][% INCLUDE adverts/advertblock.html %][% END %]
+			[% IF irand5 %][% block = irand5 %][% INCLUDE images/imagesblock.html %][% END %]
+			[% IF arand6 %][% block = arand6 %][% INCLUDE adverts/advertblock.html %][% END %]
+
+			</div>
+			<!-- End: Left Column -->
+
+			<!-- Begin: Centre Column -->
+			<div id="centre">
+
+				<a name="Content"></a>[% INCLUDE public/badpage.html %]
+
+			</div>
+			<!-- End: Centre Column -->
+
+			<!-- Begin: Right Column -->
+			<div id="right">
+
+			[% IF loggedin %]
+				[% INCLUDE admin/logout.html %]
+				[% INCLUDE admin/navigation.html %]
+			[% ELSE %]
+				[% INCLUDE admin/login.html %]
+			[% END %]
+
+			[% IF arand1 %][% block = arand1 %][% INCLUDE adverts/advertblock.html %][% END %]
+			[% IF irand2 %][% block = irand2 %][% INCLUDE images/imagesblock.html %][% END %]
+
+			[% INCLUDE news/latest.html %]
+
+			[% IF arand3 %][% block = arand3 %][% INCLUDE adverts/advertblock.html %][% END %]
+			[% IF irand4 %][% block = irand4 %][% INCLUDE images/imagesblock.html %][% END %]
+
+			[% INCLUDE public/offsite.html %]
+
+			[% IF arand5 %][% block = arand5 %][% INCLUDE adverts/advertblock.html %][% END %]
+			[% IF irand6 %][% block = irand6 %][% INCLUDE images/imagesblock.html %][% END %]
+
+			</div>
+			<!-- End: Centre Column -->
+
+		</div>
+		<!-- End: Page Body -->
+
+		<!-- Begin: Page Footer -->
+		<div id="pagefooter">
+
+<div class="box">
+<h4 align="center">Birmingham Fun Fact #[% fact0.factid %]</h4>
+<p align="center">[% fact0.fact %]
+</div>
+
+<p align="center" class="copyright">Copyright &copy; 2003-2006 Birmingham Perl Mongers.<br />
+All trademarks and copyrights on this page are owned by their respective owners.<br />
+Site hosting provided and supported by <a class="more" href="http://www.positive-internet.com">The Positive Internet Company Ltd</a>.
+
+		</div>
+		<!-- End: Page Footer -->
+
+	</div>
+	<!-- End: Page Container -->
+
+</body>
+</html>

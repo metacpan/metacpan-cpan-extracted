@@ -1,0 +1,39 @@
+Revision history for LaTeX-TikZ
+
+0.03    2015-04-23 02:00 UTC
+        + Chg : The module now depends directly on Mouse instead of Any::Moose.
+        + Chg : Scope::Guard is no longer a dependency.
+        + Chg : INCOMPATIBLE CHANGE : The LT::Set::Op role has been removed.
+                The old LT::Set::Path class has been renamed LT::Set::Union.
+                The new LT::Set::Path role plays a role similar to the old
+                LT::Set::Op.
+        + Chg : INCOMPATIBLE CHANGE : The LT::Set::Mutable role has been
+                renamed LT::Set::Container.
+        + Doc : POD headings have been made linkable.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+        + Upd : BUILD_REQUIRES are now set for ExtUtils::MakeMaker.
+        + Upd : Metadata overhaul.
+
+0.02    2010-08-02 13:00 UTC
+        + Add : The functor rules now default to be appended to the list of
+                existent rules ; except if there's already a rule of the same
+                name, in which case it is always replaced.
+                If you want to replace all the subclass/subroles, prepend the
+                target name by '+'.
+        + Chg : INCOMPATIBLE CHANGE : LT::Mod->cover was renamed to
+                LT::Mod->covers.
+        + Chg : The default space width for Dots and Lines patterns has been
+                bumped to 10.
+        + Chg : perl 5.8 is required.
+        + Doc : Completed documentation of LT::Formatter, LT::Functor and
+                LT::Meta::TC::Autocoerce.
+        + Doc : Many typos were fixed.
+        + Fix : Some raw and pattern mods could be wrongly optimized away.
+        + Fix : Warnings with Moose 1.09.
+        + Tst : Test autocoercion in t/02-autocoerce.t.
+        + Tst : More user tests.
+
+0.01    2010-07-03 11:40 UTC
+        First version, released on an unsuspecting world.
+

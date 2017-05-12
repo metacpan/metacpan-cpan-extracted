@@ -1,0 +1,239 @@
+NAME
+    Log::Fine - Yet another logging framework
+
+SYNOPSIS
+    Provides fine-grained logging and tracing.
+
+        use Log::Fine;
+        use Log::Fine::Levels::Syslog;                # exports log levels
+        use Log::Fine::Levels::Syslog qw( :masks );   # exports masks and levels
+
+        # Build a Log::Fine object
+        my $fine = Log::Fine->new();
+
+        # Specify a custom map
+        my $fine = Log::Fine->new(levelmap => "Syslog");
+
+        # Get the name of the log object
+        my $name = $fine->name();
+
+        # Use logger() to get a new logger object.  If "foo" is not
+        # defined then a new logger with the name "foo" will be created.
+        my $log = Log::Fine->logger("foo");
+
+        # Get list of names of defined logger objects
+        my @loggers = $log->listLoggers();
+
+        # Register a handle, in this case a handle that logs to console.
+        my $handle = Log::Fine::Handle::Console->new();
+        $log->registerHandle( $handle );
+
+        # Log a message
+        $log->log(INFO, "Log object successfully initialized");
+
+DESCRIPTION
+    Log::Fine provides a logging framework for application developers who
+    need a fine-grained logging mechanism in their program(s). By itself,
+    Log::Fine provides a mechanism to get one or more logging objects
+    (called *loggers*) from its stored namespace. Most logging is then done
+    through a logger object that is specific to the application.
+
+    For a simple functional interface to the logging sub-system, see
+    Log::Fine::Utils.
+
+  Handles
+    Handlers provides a means to output log messages in one or more ways.
+    Currently, the following handles are provided:
+
+    * Log::Fine::Handle::Console
+        Provides logging to `STDERR' or `STDOUT'
+
+    * Log::Fine::Handle::Email
+        Provides logging via email. Useful for delivery to one or more pager
+        addresses.
+
+    * Log::Fine::Handle::File
+        Provides logging to a file
+
+    * Log::Fine::Handle::File::Timestamp
+        Same thing with support for time-stamped files
+
+    * Log::Fine::Handle::Syslog
+        Provides logging to syslog
+
+    See the relevant perldoc information for more information. Additional
+    handlers can be defined to user taste.
+
+  Formatters
+    A formatter specifies how Log::Fine displays messages. When a message is
+    logged, it gets passed through a formatter object, which adds any
+    additional information such as a time-stamp or caller information.
+
+    By default, log messages are formatted as follows using the Basic
+    formatter object.
+
+         [<time>] <LEVEL> <MESSAGE>
+
+    For more information on the customization of log messages, see
+    Log::Fine::Formatter.
+
+INSTALLATION
+    To install Log::Fine:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+METHODS
+    The Log::Fine module, by itself, provides getters & setter methods for
+    loggers and level classes. After a logger is created, further actions
+    are done through the logger object. The following two constructors are
+    defined:
+
+  new
+    Creates a new Log::Fine object.
+
+    Parameters
+    A hash with the following keys
+
+    * levelmap
+        [default: Syslog] Name of level map to use. See Log::Fine::Levels
+        for further details
+
+    * no_croak
+        [optional] If set to true, then do not croak when _error is called.
+
+    * err_callback
+        [optional] If defined to a valid CODE ref, then this subroutine will
+        be called instead of _fatal when _error is called.
+
+    Returns
+    The newly blessed object
+
+  listLoggers
+    Provides list of currently defined loggers
+
+    Parameters
+    None
+
+    Returns
+    Array containing list of currently defined loggers
+
+  levelMap
+    Getter for the global level map.
+
+    Returns
+    A Log::Fine::Levels subclass
+
+  logger
+    Getter/Constructor for a logger object.
+
+    Parameters
+    * logger name
+        The name of the logger object. If the specified logger object does
+        not exist, then a new one will be created.
+
+    Returns
+    an Log::Fine::Logger object
+
+  name
+    Getter for name of object
+
+    Parameters
+    None
+
+    Returns
+    String containing name of object, otherwise undef
+
+  _error
+    Private internal method that is called when an error condition is
+    encountered. Will call _fatal unless `{no_croak}' is defined.
+
+    This method can be overridden per taste.
+
+    Parameters
+    message
+        Message passed to confess.
+
+  _fatal
+    Private internal method that is called when a fatal (non-recoverable)
+    condition is encountered. Calls confess with given error message.
+
+    While this method can be overridden, this is generally not advised.
+
+    Parameters
+    message
+        Message passed to confess.
+
+ACKNOWLEDGMENTS
+    I'd like the thank the following people for either inspiration or past
+    work on logging: Josh Glover for his work as well as teaching me all I
+    know about object-oriented programming in perl. Dan Boger for taking the
+    time and patience to review this code and offer his own suggestions.
+    Additional thanks to Tom Maher and Chris Josephs for encouragement.
+
+  Related Modules/Frameworks
+    The following logging frameworks provided inspiration for parts of
+    Log::Fine.
+
+        Dave Rolsky's Log::Dispatch module
+
+        Sun Microsystem's `java.utils.logging' framework
+
+        The Python logging package
+
+BUGS
+    Please report any bugs or feature requests to `bug-log-fine at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Log-Fine. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Log::Fine
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Log-Fine
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Log-Fine
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Fine
+
+    * Search CPAN
+        http://search.cpan.org/dist/Log-Fine
+
+CONTRIBUTING
+    Want to contribute? The source code repository for Log::Fine is now
+    available at http://github.com/cfuhrman/log-fine. To clone your own
+    copy:
+
+      $ git clone git://github.com/cfuhrman/log-fine.git
+
+    Signed patches generated by git-format-patch(1) may be submitted via
+    email.
+
+AUTHOR
+    Christopher M. Fuhrman, `<cfuhrman at pobox.com>'
+
+SEE ALSO
+    perl, syslog, Log::Fine::Handle, Log::Fine::Formatter,
+    Log::Fine::Logger, Log::Fine::Utils, Sys::Syslog
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2008-2011, 2013 Christopher M. Fuhrman, All rights
+    reserved.
+
+    This program is free software licensed under the...
+
+            The BSD License
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

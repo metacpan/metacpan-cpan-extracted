@@ -1,0 +1,6 @@
+Fri Oct 15 20:48:55 2004--> No expected value specified for field 'sdate' in a row with a key value '11' from collection 'sales'. Using default value : 'DFLTVW'
+Fri Oct 15 20:48:55 2004--> No expected value specified for field 'stor_id' in a row with a key value '11' from collection 'sales'
+Fri Oct 15 20:48:55 2004--> No expected value specified for field 'stor_id' in a row with a key value '10' from collection 'sales'
+Fri Oct 15 20:48:55 2004--> No expected value specified for field 'stor_id' in a row with a key value '19' from collection 'sales'
+Fri Oct 15 20:48:55 2004--> No expected value specified for field 'royaltyshare' in a row with a key value '409-56-7008#AA9008' from collection 'titleauthors'. Using default value : 'TDFLT'
+Fri Oct 15 20:48:55 2004--> No expected value specified for field 'royaltyshare' in a row with a key value '409-56-7008#DF9008' from collection 'titleauthors'. Using default value : 'TDFLT'

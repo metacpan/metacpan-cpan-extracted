@@ -1,0 +1,33 @@
+
+LEGO::RCX is a module to communicate with you LEGO(tm) Mindstorms(tm)
+RCX computer through the IR dongle.  It is an OO module with methods
+for everything from controlling the motors, reading sensors, modifying
+program variables, and getting data form the DataLog.
+
+The DOCS file contains the documentation for this package.  It 
+however is generated from the pod in the perl source so any
+modifications should be made there.
+
+More information can be found at 
+
+  http://members.cox.net/quillan/lego/rcx.pm.html
+
+Install:
+
+Option 1:
+  perl Makefile.PL
+
+  make install
+
+Option 2:
+  Copy this to any location, make sure your perl can find it and
+  follow the documentation.
+
+Bugs:
+
+Any bug reports please email quillan@cox.net.  If you have any
+feature suggestions or other ideas please let me know as well.
+
+
+
+

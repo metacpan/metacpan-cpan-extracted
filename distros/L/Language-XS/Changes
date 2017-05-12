@@ -1,0 +1,8 @@
+Revision history for Perl extension Language::XS
+
+0.02  Fri Jun 30 03:05:28 CEST 2006
+	- fix stray "-" not being quoted as required by newer perls.
+
+0.01  Thu Jan 13 06:02:04 CET 2000
+	- original version; created by cp -rp
+

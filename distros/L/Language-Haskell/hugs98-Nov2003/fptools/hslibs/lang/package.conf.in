@@ -1,0 +1,30 @@
+#include "config.h"
+
+Package {
+        name           = "lang",
+#ifdef INSTALLING
+	import_dirs    = [ "$libdir/hslibs-imports/lang" ],
+#else
+	import_dirs    = [ "$libdir/hslibs/lang",
+			   "$libdir/hslibs/lang/monads" ],
+#endif
+        source_dirs    = [],
+#ifdef INSTALLING
+        library_dirs   = [ "$libdir" ],
+#else
+        library_dirs   = [ "$libdir/hslibs/lang",
+			   "$libdir/hslibs/lang/cbits" ],
+#endif
+        hs_libraries    = [ "HSlang" ],
+	extra_libraries = [ "HSlang_cbits" ],
+#ifdef INSTALLING
+        include_dirs   = [],
+#else
+        include_dirs   = [ "$libdir/hslibs/lang/cbits" ],
+#endif
+        c_includes     = [ "HsLang.h" ],
+        package_deps   = [ "base" ],
+        extra_ghc_opts = [],
+        extra_cc_opts  = [],
+        extra_ld_opts  = []
+}

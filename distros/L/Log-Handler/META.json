@@ -1,0 +1,115 @@
+{
+   "abstract" : "Log messages to several outputs.",
+   "author" : [
+      "Jonny Schulz"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Handler",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::General" : "0",
+            "Config::Properties" : "0",
+            "DBI" : "0",
+            "Email::Date" : "0",
+            "IO::Socket" : "0",
+            "Net::SMTP" : "0",
+            "YAML" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Fcntl" : "0",
+            "File::Spec" : "0",
+            "POSIX" : "0",
+            "Params::Validate" : "0",
+            "Sys::Hostname" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "UNIVERSAL" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Handler" : {
+         "file" : "lib/Log/Handler.pm",
+         "version" : "0.88"
+      },
+      "Log::Handler::Config" : {
+         "file" : "lib/Log/Handler/Config.pm",
+         "version" : "0.09"
+      },
+      "Log::Handler::Levels" : {
+         "file" : "lib/Log/Handler/Levels.pm",
+         "version" : "0.07"
+      },
+      "Log::Handler::Output" : {
+         "file" : "lib/Log/Handler/Output.pm",
+         "version" : "0.10"
+      },
+      "Log::Handler::Output::DBI" : {
+         "file" : "lib/Log/Handler/Output/DBI.pm",
+         "version" : "0.12"
+      },
+      "Log::Handler::Output::Email" : {
+         "file" : "lib/Log/Handler/Output/Email.pm",
+         "version" : "0.08"
+      },
+      "Log::Handler::Output::File" : {
+         "file" : "lib/Log/Handler/Output/File.pm",
+         "version" : "0.08"
+      },
+      "Log::Handler::Output::Forward" : {
+         "file" : "lib/Log/Handler/Output/Forward.pm",
+         "version" : "0.03"
+      },
+      "Log::Handler::Output::Screen" : {
+         "file" : "lib/Log/Handler/Output/Screen.pm",
+         "version" : "0.07"
+      },
+      "Log::Handler::Output::Sendmail" : {
+         "file" : "lib/Log/Handler/Output/Sendmail.pm",
+         "version" : "0.07"
+      },
+      "Log::Handler::Output::Socket" : {
+         "file" : "lib/Log/Handler/Output/Socket.pm",
+         "version" : "0.08"
+      },
+      "Log::Handler::Pattern" : {
+         "file" : "lib/Log/Handler/Pattern.pm",
+         "version" : "0.07"
+      },
+      "Log::Handler::Plugin::Config::General" : {
+         "file" : "lib/Log/Handler/Plugin/Config/General.pm",
+         "version" : "0.02"
+      },
+      "Log::Handler::Plugin::Config::Properties" : {
+         "file" : "lib/Log/Handler/Plugin/Config/Properties.pm",
+         "version" : "0.03"
+      },
+      "Log::Handler::Plugin::YAML" : {
+         "file" : "lib/Log/Handler/Plugin/YAML.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.88"
+}

@@ -1,0 +1,68 @@
+#!/usr/bin/perl -w
+
+use strict;
+use utf8;
+use Getopt::Long;
+
+(our $Name = $0) =~ s!.*/!!;
+
+my ($open_bracket, $close_bracket, $help);
+
+GetOptions(
+    'open=s' => \$open_bracket,
+    'close=s' => \$close_bracket,
+    'help|?|h' => \$help,
+);
+
+$open_bracket = "[" unless defined $open_bracket;
+$close_bracket = "]" unless defined $close_bracket;
+
+if (defined $help || not @ARGV) { # help
+    print_usage();
+    exit 0;
+}
+
+while(<>) {
+    require Lingua::ZH::HanConvert;
+    if ($Name =~ /trad2simp/i) {
+	$_ = Lingua::ZH::HanConvert::simple($_, $open_bracket, $close_bracket);
+    } else { # simple -> traditional
+	$_ = Lingua::ZH::HanConvert::trad($_, $open_bracket, $close_bracket);
+    }
+    print;
+}
+
+
+sub print_usage {
+print <<'EOF';
+USAGE: trad2simp [OPTIONS] [FILES] [-]
+
+  Reads Simplified Chinese text from FILES, and outputs Traditional Chinese.
+
+USAGE: simp2trad [OPTIONS] [FILES] [-]
+
+  Reads Traditional Chinese text from FILES, and outputs Simplified Chinese.
+
+ALL TEXT IS HANDLED IN THE UTF-8 CHARACTER SET.  See below for how to handle
+GB2312 or Big5 encoded files.  Use "-" as a filename to read from STDIN.  If
+there are source characters which have more than one possible corresponding
+target character, then all the possible target characters will be listed in
+the output, enclosed by square brackets.
+
+OPTIONS:
+ --open=string		} Specify the strings to use to surround a list of
+ --close=string		} possible output characters.  Defaults are [ and ].
+ --help, -h, -?		Display this help.
+
+EXAMPLES:
+Convert UTF-8 Simplified Chinese to UTF-8 Traditional Chinese:
+$ simp2trad file.txt
+
+Convert Big5 Traditional Chinese to GB2312 Simplified Chinese:
+$ iconv -c -f Big5 -t UTF-8 file.txt |trad2simp - |iconv -c -f UTF-8 -t GB2312
+
+Convert GB2312 Simplified Chinese to Big5 Traditional Chinese:
+$ iconv -c -f GB2312 -t UTF-8 file.txt |simp2trad - |iconv -c -f UTF-8 -t Big5
+
+EOF
+}

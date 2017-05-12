@@ -1,0 +1,360 @@
+#!/usr/bin/env perl
+
+use common::sense;
+use Getopt::Long ();
+use Pod::Usage ();
+use Log::Log4perl ();
+$Log::Log4perl::JOIN_MSG_ARRAY_CHAR = '';
+use POSIX;
+
+use AnyEvent ();
+if (AnyEvent->VERSION < 6.01) {
+    # Try and force detection of modules for old AnyEvents
+    foreach (qw(EV Event Glib EventLib POE)) {
+        eval "use $_ ();";
+        unless ($@) {
+            last;
+        }
+    }
+    AnyEvent::detect;
+}
+
+use Lim ();
+use Lim::RPC::Server ();
+use Lim::RPC::TLS ();
+use Lim::Agent ();
+use Lim::Plugins ();
+
+my $help = 0;
+my $conf;
+my $log4perl;
+my $foreground = 0;
+my $pidfile = '/var/run/lim-agentd.pid';
+my @options;
+my @uris;
+my $uid;
+my $gid;
+my $user;
+my $group;
+
+sub _set_user_group {
+    if (defined $group and !defined $gid) {
+        unless (defined ($gid = getgrnam($group))) {
+            print STDERR 'Unable to get group id for ', $group, ': ', $!;
+            exit(3);
+        }
+    }
+    my @gids;
+    if (defined $user or defined $uid) {
+        my $user = $user;
+        my $gid = $gid;
+        my $putback;
+
+        unless (defined $user) {
+            unless (defined ($user = getpwuid($uid))) {
+                print STDERR 'Unable to get user name for id ', $uid, ': ', $!;
+                exit(3);
+            }
+        }
+
+        unless (defined $gid) {
+            (undef, undef, undef, $gid) = getpwnam($user);
+            unless (defined $gid) {
+                print STDERR 'Unable to get group id for user ', $user, ': ', $!;
+                exit(3);
+            }
+            $putback=1;
+        }
+
+        setgrent;
+        while (my ($gname,undef,$_gid,$members) = getgrent) {
+            foreach (split(/\s+/o, $members)) {
+                if (defined $gid and $_gid == $gid) {
+                    next;
+                }
+                if ($_ eq $user) {
+                    push(@gids, $_gid);
+                    last;
+                }
+            }
+        }
+        endgrent;
+
+        if (defined $putback) {
+            unshift(@gids, $gid);
+        }
+    }
+    if (defined $gid) {
+        $) = join(' ', $gid, @gids);
+        if ($!) {
+            print STDERR 'Unable to set groups to ', join(' ', $gid, @gids), ': ', $!;
+            exit(3);
+        }
+        unless (POSIX::setgid($gid)) {
+            print STDERR 'Unable to set group id to ', $gid, ': ', $!;
+            exit(3);
+        }
+    }
+    elsif (scalar @gids > 0) {
+        $) = join(' ', $gid, @gids);
+        if ($!) {
+            print STDERR 'Unable to set groups to ', join(' ', $gid, @gids), ': ', $!;
+            exit(3);
+        }
+    }
+
+    if (defined $user and !defined $uid) {
+        unless (defined ($uid = getpwnam($user))) {
+            print STDERR 'Unable to get user id for ', $user, ': ', $!;
+            exit(3);
+        }
+    }
+    if (defined $uid) {
+        unless (POSIX::setuid($uid)) {
+            print STDERR 'Unable to set user id to ', $uid, ': ', $!;
+            exit(3);
+        }
+    }
+}
+
+Getopt::Long::GetOptions(
+    'help|?' => \$help,
+    'conf:s' => \$conf,
+    'log4perl:s' => \$log4perl,
+    'foreground' => \$foreground,
+    'pidfile:s' => \$pidfile,
+    'option:s' => \@options,
+    'uri:s' => \@uris,
+    'uid:i' => \$uid,
+    'gid:i' => \$gid,
+    'user:s' => \$user,
+    'group:s' => \$group
+) or Pod::Usage::pod2usage(2);
+Pod::Usage::pod2usage(1) if $help;
+
+if (defined $log4perl and -f $log4perl) {
+    Log::Log4perl->init($log4perl);
+}
+elsif ($foreground) {
+    STDOUT->autoflush(1);
+    Log::Log4perl->init( \q(
+    log4perl.logger                   = DEBUG, Screen
+    log4perl.appender.Screen          = Log::Log4perl::Appender::Screen
+    log4perl.appender.Screen.stderr   = 0
+    log4perl.appender.Screen.layout   = Log::Log4perl::Layout::PatternLayout
+    log4perl.appender.Screen.layout.ConversionPattern = %d %F [%L] %p: %m%n
+    ) );
+}
+else {
+    Log::Log4perl->init( \q(
+    log4perl.logger                    = DEBUG, SYSLOG
+    log4perl.appender.SYSLOG           = Log::Dispatch::Syslog
+    log4perl.appender.SYSLOG.min_level = debug
+    log4perl.appender.SYSLOG.ident     = lim-agentd
+    log4perl.appender.SYSLOG.facility  = daemon
+    log4perl.appender.SYSLOG.layout    = Log::Log4perl::Layout::SimpleLayout
+    ) );
+}
+
+if (defined $conf) {
+    unless (-r $conf and Lim::LoadConfig($conf)) {
+        print STDERR 'Unable to read configuration file: ', $conf, "\n";
+        exit(1);
+    }
+    Lim::Config->{agent}->{config_file} = $conf;
+}
+else {
+    Lim::LoadConfig('/etc/lim/agent.yaml');
+}
+
+Lim::LoadConfigDirectory('/etc/lim/agent.d');
+Lim::ParseOptions(@options);
+Lim::UpdateConfig;
+
+unless ($foreground) {
+    unless (POSIX::setsid) {
+        print STDERR 'Unable to create a new process session (setsid): ', $!, "\n";
+        exit(2);
+    }
+
+    my $pid = fork();
+    if ($pid < 0) {
+        print STDERR 'Unable to fork a new process: ', $!, "\n";
+        exit(2);
+    }
+    elsif ($pid) {
+        exit 0;
+    }
+
+    if ($pidfile) {
+        unless(open(PIDFILE, '>', $pidfile,)) {
+            print STDERR 'Unable to open pidfile "', $pidfile, '" for writing: ', $!, "\n";
+            exit(2);
+        }
+        print PIDFILE POSIX::getpid, "\n";
+        close(PIDFILE);
+
+        unless(open(PIDFILE, $pidfile)) {
+            print STDERR 'Unable to open pidfile "', $pidfile, '" for verifying pid: ', $!, "\n";
+            exit(2);
+        }
+        my $pidinfile = <PIDFILE>;
+        chomp($pidinfile);
+        close(PIDFILE);
+
+        unless (POSIX::getpid == $pidinfile) {
+            print STDERR 'Unable to correctly write my pid to pidfile "', $pidfile, "\"\n";
+            exit(2);
+        }
+    }
+
+    # Initiate TLS/SSL context if configured
+    Lim::RPC::TLS->instance;
+
+    # Change the gid and/or uid if set
+    _set_user_group;
+
+    # Daemonize the process
+    unless (chdir('/')) {
+        print STDERR 'Unable to chdir to / : ', $!;
+        exit(2);
+    }
+    POSIX::setsid();
+    umask(0);
+    foreach (0 .. (POSIX::sysconf (&POSIX::_SC_OPEN_MAX) || 1024)) {
+        POSIX::close($_);
+    }
+
+    open(STDIN, '<', '/dev/null');
+    open(STDOUT, '>', '/dev/null');
+    open(STDERR, '>', '/dev/null');
+}
+else {
+    # Initiate TLS/SSL context if configured
+    Lim::RPC::TLS->instance;
+
+    # Change the gid and/or uid if set
+    _set_user_group;
+}
+
+# Initiate the signals
+my $cv = AnyEvent->condvar;
+my @watchers;
+
+push(@watchers,
+    AnyEvent->signal(signal => "HUP", cb => sub {
+    }),
+    AnyEvent->signal(signal => "PIPE", cb => sub {
+    }),
+    AnyEvent->signal(signal => "INT", cb => sub {
+        if ($foreground) {
+            $cv->send;
+        }
+    }),
+    AnyEvent->signal(signal => "QUIT", cb => sub {
+        $cv->send;
+    }),
+    AnyEvent->signal(signal => "TERM", cb => sub {
+        $cv->send;
+    }),
+);
+
+# Initiate the server and serve
+unless (scalar @uris) {
+    @uris = @{Lim::Config->{agent}->{uri}};
+}
+
+my $server;
+if (scalar @uris) {
+    $server = Lim::RPC::Server->new(
+        uri => (@uris == 1 ? $uris[0] : \@uris)
+    );
+    $server->serve(qw(Lim::Agent));
+    $server->serve(Lim::Plugins->instance->LoadedModules);
+}
+
+if (defined $server) {
+    push(@watchers, $server);
+    $cv->recv;
+    $cv = AnyEvent->condvar;
+    $server->close(sub {
+        $cv->send;
+    });
+    $cv->recv;
+}
+
+@watchers = ();
+
+unless ($foreground) {
+    if ($pidfile) {
+        unlink($pidfile);
+    }
+}
+
+__END__
+
+=head1 NAME
+
+lim-agentd - Lim Agent Daemon
+
+=head1 SYNOPSIS
+
+lim-agentd [options] --uri <uri>
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--uri <uri>>
+
+Specify the URI of the service to provide, this option can be given more then
+once.
+
+=item B<--conf <file>>
+
+Specify the configuration file to use (default /etc/lim/agent.yaml).
+
+=item B<--option <name>>=<value>
+
+Specify configuration on the command line, these settings overrides settings in
+configuration files. Syntax <name>=<value> will set <name> to <value> and
+<name>[]=<value> will treat <name> as an multi option array and append <value>.
+Option subgroups are seperated by . (for example log.obj_debug=0).
+
+=item B<--log4perl <file>>
+
+Specify a Log::Log4perl configure file (default output to stdout).
+
+=item B<--foreground>
+
+Do not fork into background, output logs to STDOUT if no Log::Log4perl
+configuration file is used.
+
+=item B<--pidfile <file>>
+
+Use the given file as pidfile (default /var/run/lim-agentd.pid).
+
+=item B<--group <group>> | --gid <gid>
+
+Specify a group to change to upon start.
+
+If used with --user, this will also specify the primary/effective group.
+
+=item B<--user <user>> | --uid <id>
+
+Specify a user to change to upon start.
+
+This will also add access to all the groups the user is a member for so it is
+unnessisary to specify the group with --group if the user is already a member.
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+...
+
+=cut

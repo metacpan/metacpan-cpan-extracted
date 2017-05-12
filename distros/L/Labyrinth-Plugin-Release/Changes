@@ -1,0 +1,13 @@
+Changes for Labyrinth-Plugin-Release
+====================================
+
+0.03    2014-12-26
+        - fixed license fields in META.json to be lists.
+        - extended META test suite.
+        - documentation updates.
+
+0.02    2014-05-25
+        - missed Clone from pre-requisites.
+
+0.01    2014-05-08
+        - first official release

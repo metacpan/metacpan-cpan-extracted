@@ -1,0 +1,6 @@
+Revision history for Perl extension Loop.
+
+1.00  Wed Mar 12 19:43:00 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Loop
+

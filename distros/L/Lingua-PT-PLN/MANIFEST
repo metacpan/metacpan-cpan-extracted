@@ -1,0 +1,29 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Lingua/PT/PLN.pm
+lib/Lingua/PT/PLN/nao_acentuadas
+lib/Lingua/PT/PLN/ptpho
+lib/Lingua/PT/PLN/Words2Sampa.pm
+README
+examples/README
+examples/divideFrases
+examples/divideFrases2
+examples/divideSilabas
+examples/divsent
+examples/exemplo
+examples/exemplo.Schuster
+examples/html2nontext
+examples/html2p
+examples/oco
+t/00_oco.ex
+t/00_oco.t
+t/05_tokenizer.t
+t/tokenizer
+bin/pt-tokenizer
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+bin/occurrences
+t/01_wordaccent.t
+META.json                                Module JSON meta-data (added by MakeMaker)

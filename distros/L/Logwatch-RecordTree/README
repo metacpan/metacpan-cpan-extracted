@@ -1,0 +1,37 @@
+
+Logwatch::RecordTree
+--------------------
+
+This module provides support for generating logwatch reports.  A
+Logwatch::RecordTree object provides a 'log' method for recording
+individual events garnered from lines of a log file.  Logged events are
+collected and counted.  When logging is complete, printing the tree object
+produces a neatly sorted and indented report with multiple levels of
+detail.  Various methods and hooks are provided for sorting and massaging
+the report.  There is also a subclass (Logwatch::RecordTree::IPv4)
+specifically for sorting, identifying, and condensing events keyed to IPv4
+addresses.
+
+Example service scripts for dovecot, exim, and http-error (Apache's
+error_log) are provided in the extra/ subdirectory.  These scripts would be
+placed in the /etc/logwatch/services/scripts directory according to the
+normal Logwatch configuration instructions.
+
+
+INSTALL:
+--------
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT:
+---------
+
+This software is copyright (c) 2015 by Reid Augustin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

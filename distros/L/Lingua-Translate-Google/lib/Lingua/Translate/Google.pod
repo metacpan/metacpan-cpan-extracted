@@ -1,0 +1,179 @@
+=head1 NAME
+
+Lingua::Translate::Google - Translation back-end for Google's translation service.
+
+=head1 SYNOPSIS
+
+  use Lingua::Translate;
+
+  Lingua::Translate::config(
+      back_end => 'Google',
+      api_key  => '<your API key>',
+      agent    => '<optional custom useragent string>',
+  );
+
+  my $xl8r = Lingua::Translate->new( src => 'de', dest => 'en' );
+
+  # prints 'My hovercraft is full of eels'
+  print $xl8r->translate('Mein Luftkissenfahrzeug ist voller Aale'), "\n";
+
+  # switch to auto detect for source language
+  $xl8r->config( src => 'auto' );
+
+  # prints 'My hovercraft is full of eels'
+  print $xl8r->translate('Mi aerodeslizador está lleno de anguilas'), "\n";
+
+=head1 DESCRIPTION
+
+Lingua::Translate::Google is a translation back-end for Lingua::Translate
+that contacts Google translation service to do the real work.
+
+Lingua::Translate::Google is normally invoked by Lingua::Translate; there
+should be no need to call it directly.  If you do call it directly, you will
+lose the ability to easily switch your programs over to alternate back-ends
+that are later produced.
+
+This module is mostly a wrapper for the L<WWW::Google::Translate> module.
+
+=over
+
+=item Please Read
+
+By using Google services (either directly or via this module) you are
+agreeing to the Google terms of service.
+
+L<http://code.google.com/apis/language/translate/v2/terms.html>
+
+The Google Translate API v2 is a paid service. You will need to obtain an
+API key and establish a Google Wallet account.
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new( key => $api_key, src => $lang, dest => $lang, agent => $agent )
+
+Creates a new translation handle. Subsequent calls to the translate method
+will use the src and dest values you provide here.
+
+=head1 METHODS
+
+The following methods may be called on Lingua::Translate::Google objects.
+
+=head2 available( [ $lang ] [, $dest_lang ] )
+ 
+Use this method to check about supported languages relative to the current
+destination language.
+
+  $xl8r->config( src => $src, dest => $dest );
+
+  die "can't translate from 'he' to $dest"
+      if !$xl8tr->available('he');
+
+  my @translatable_from_langs = $xl8r->available(); # to $dest
+
+NOTE: The behavior of this method has changed since version 0.15.
+
+=head2 translate( $text )
+
+Translates the given text.
+
+  my $result = $xl8r->translate( $text );
+
+If you may also call translate in list context to get a hash of information
+about the translation query. In order for this to work you must bypass
+the Lingua::Translate interface and create an instance of 
+Lingua::Translate::Google directly.
+
+  my $xl8r = Lingua::Translate::Google->new( src => 'auto', dest => 'en' );
+
+  my %xl8td = $xl8r->translate('Mein Luftkissenfahrzeug ist voller Aale');
+
+  print 'xl8td: ', Data::Dumper::Dumper( \%xl8td );
+
+      xl8td: $VAR1 = {
+          dest   => 'en',
+          q      => 'Mein Luftkissenfahrzeug ist voller Aale',
+          src    => 'de',
+          result => 'My hovercraft is full of eels'
+      };
+
+This feature is useful if you're specifying 'auto' and you want to see 
+what Google identifies as the source language.
+
+=head2 config( option => $value )
+
+Use this to set any of these options:
+
+=over
+
+=item src
+
+The source language. Same as constructor src option.
+
+=item dest
+
+The destination language. Same as constructor dest option.
+
+=item agent
+
+User agent string used by the HTTP client which makes the API requests.
+
+=back
+
+=head1 LIMITATIONS
+
+This module supports 'auto' src tag for auto detecting the source language. However,
+the calling module Lingua::Translate enforces that language tags are valid according to
+I18N::LangTags::is_language_tag. To prevent this from being a problem, you need to allow 
+Lingua::Translate::Google to be evaluated before the constructor call.
+
+For example:
+
+ use Lingua::Translate;
+
+ Lingua::Translate::config(
+     back_end => 'Google',
+ );
+
+ my $xl8r = Lingua::Translate->new(
+     src      => 'auto',
+     dest     => 'de',
+ );
+
+Or:
+
+ use Lingua::Translate::Google;
+
+ my $xl8r = Lingua::Translate->new(
+     back_end => 'Google',
+     src      => 'auto',
+     dest     => 'de',
+ );
+
+This will fail:
+
+ use Lingua::Translate;
+
+ my $dies = Lingua::Translate->new(
+     back_end => 'Google',
+     src      => 'auto',
+     dest     => 'de',
+ );
+
+=head1 SEE ALSO
+
+L<Lingua::Translate>
+L<Lingua::Translate::Babelfish>
+L<WWW::Google::Translate>
+
+=head1 LICENSE
+
+This is free software, and can be used/modified under the same terms as
+Perl itself.
+
+=head1 AUTHOR
+
+Dylan Doxey, <dylan.doxey@gmail.com>
+
+=cut

@@ -1,0 +1,39 @@
+---
+vendor: Intel
+model: "Core i3 2330M"
+cores: 2
+threads: 4
+TDP: 35
+score_3dmark06: 2629.9
+score_superpi_32m: 934.3
+---
+vendor: Intel
+model: "Core i3 2350M"
+cores: 2
+threads: 4
+TDP: 35
+score_3dmark06: 2640
+score_superpi_32m: 912
+---
+vendor: Intel
+model: "Core i5 480M"
+cores: 2
+threads: 4
+TDP: 35
+score_3dmark06: 2879.9
+score_superpi_32m: 852.3
+---
+vendor: Intel
+model: Core i5 2430M
+cores: 2
+threads: 4
+TDP: 35
+score_3dmark06: 3154
+score_superpi_32m: 725.5
+---
+vendor: Intel
+model: Core i5 2450M
+cores: 2
+threads: 4
+TDP: 35
+score_3dmark06: 3454

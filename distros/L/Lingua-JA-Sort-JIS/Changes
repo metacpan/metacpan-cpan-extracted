@@ -1,0 +1,24 @@
+Revision history for Perl extension Lingua::JA::Sort::JIS.
+
+0.10  Sun Jul 31 22:03:39 2011
+    - fix the tarball with world writable files.
+
+0.05  Sun Jan 14 16:53:39 2007
+    - Bug fix: the order between U+4EDD and U+3005 was reverse.
+      Correctly U+4EDD < U+3005 (same as that in the JIS kuten order).
+    - added nonkanji.t.
+    - added META.yml.
+    - POD has been separated into JIS.pod
+
+0.04  Sat Jun 09 08:26:47 2001
+    - now works on perl 5.003.
+    - malformed UTF-8 character is now carped (previously croaked).
+
+0.03  Mon Jun 04 20:52:01 2001
+    - fixed bug in t/test.t (Thank you, Andreas Marcel Riechert).
+
+0.02  Sat Jun 02 21:00:15 2001
+    - add OOP interface.
+
+0.01  Mon May 28 20:45:36 2001
+    - original version; created by h2xs 1.19

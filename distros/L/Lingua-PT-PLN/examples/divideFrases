@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+use Lingua::PT::PLN;
+
+$/='';
+
+while(<>){
+  print Lingua::PT::PLN::xmlsentences($_);
+}

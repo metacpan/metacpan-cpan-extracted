@@ -1,0 +1,42 @@
+0.015 2014-05-04
+ - Generated model file is now more deterministic.
+
+0.012 2012-09-20
+ - Option --each was added.
+
+0.010 2012-06-29
+ - Documentation was extended.
+ 
+0.009 2012-06-28
+ - Tests for scripts were added.
+ 
+0.009 2012-06-28
+ - Tests were extended.
+ - Examples were extended.
+ - Option --filelist was added to the yali-builder.
+ 
+0.008 2012-06-27
+ - Added script yali-builder for building custom language models.
+ - Changelog was renamed to Changes
+ 
+0.007 2012-06-27
+ - Added script yali-identifier for language identification with custom models.
+ 
+0.006 2012-06-27
+ - Added script yali-language-identifier for language identification with pretrained models.
+
+0.005 2012-06-26
+ - Comparison with other tools for language identification was added.
+
+0.004 2012-06-26
+ - Documentation was extended.
+ - Examples were added.
+
+0.003 2012-06-25
+ - Builder was implemented.
+
+0.002 2012-06-25
+ - Identifier was implemented.
+
+0.001 2012-06-25
+ - LanguageIdentifier was implemented.

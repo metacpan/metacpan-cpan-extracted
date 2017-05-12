@@ -1,0 +1,6 @@
+Changes
+lib/Log/Dispatch/Jabber.pm
+Makefile.PL
+MANIFEST
+t/1.t
+CPAN/MakeMaker.pm

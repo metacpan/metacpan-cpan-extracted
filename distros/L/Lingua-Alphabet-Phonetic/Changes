@@ -1,0 +1,49 @@
+2017-04-01  Kingpin  <martin@martin-M17x>
+
+	* MANIFEST: removed "MYMETA" files
+
+2016-11-28  Kingpin  <martin@martin-M17x>
+
+	* lib/Lingua/Alphabet/Phonetic.pm: version up
+
+	* Makefile.PL: fixed to work with Perls that do not have "." in their @INC
+
+2008-03-05    <Daddy@C-3PO>
+
+	* Kwalitee upgrades
+
+2007-04-21    <Daddy@C-3PO>
+
+	* lib/Lingua/Alphabet/Phonetic.pm: add pod for new()
+
+2006-10-07    <Daddy@C-3PO>
+
+	* lib/Lingua/Alphabet/Phonetic/NATO.pm: updated the "See Also" section
+
+	* lib/Lingua/Alphabet/Phonetic.pm: updated the "See Also" section
+
+2006-10-06    <Daddy@C-3PO>
+
+	* Makefile.PL: typo
+
+2006-10-01    <Daddy@C-3PO>
+
+	* Code/phonetize-code.PL: FIX spacing between words in certain cases
+
+2004-02-10  Kingpin  <mthurn@verizon.net>
+
+	* t/pod.t: new file
+
+2004-02-06  Kingpin  <mthurn@verizon.net>
+
+	* Code/phonetize-code.PL: check for undef arg
+	* lib/Lingua/Alphabet/Phonetic.pm (enunciate): check for undef arg on enunciate()
+
+2004-01-26  Kingpin  <mthurn@verizon.net>
+
+	* Code/phonetize-code.PL: new file
+
+2004-01-10  Kingpin  <mthurn@verizon.net>
+
+	* lib/Lingua/Alphabet/Phonetic.pm: FIRST RELEASE
+

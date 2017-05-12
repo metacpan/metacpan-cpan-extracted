@@ -1,0 +1,340 @@
+Revision history for Perl CPAN module Locale::SubCountry
+
+2.02 7 Mar 2017
+    Fixed RT bug #120002, name space pollution
+    Updated to alioth.debian.org codes 3.74 (Jan 2017)
+    
+2.01 15 Aug 2016
+
+    Added country's numeric code, accessed from the country_number method
+    Added 'levels' method, return all level types and their totals in a sub country
+    Added JSON to dependency, fix for RT bug #116926, 
+    
+2.00 11 Aug 2016
+    Sourced ISO codes from alioth.debian.org in JSON format,
+    Many French Metropolitan departments and Italian provinces added
+    Renamed SubCountry/Data.pm to Codes.pm
+    'category' method renamed to 'level', as it reflects a sub country's size
+    removed  FIPS10_4_code and ISO3166_2_code methods as FIPS is deprecated
+    removed regional_division method, info no longer available from new source data
+    Improved documentation
+
+1.66 23 Jul 2016
+    Github integration
+    Improved documentation
+    Updated France, all regions reorganised in January 2016
+    Updated Italy, all regions reorganised in January 2015
+    Distrito Federal renamed to Ciudad de México, in Mexico
+
+1.65 25 Apr 2016
+    Fixed #110905, wrong code for Sulawesi Barat
+
+1.64 7 Apr 2015
+    Suppressed warnings on printing wide characters in demo.pl
+    removed indirect object notation for 'new' method
+    Fixed #100617, several typos
+
+1.63 9 Apr 2014
+    Check that a country has sub countries before searching for code and full name, fix for RT bug 89706
+    Remove minuimum versions for utf8 and strict modules, fix for RT bug 92587
+
+1.62 23 Jul 2013
+    Removed POD utf encoding directive from SubCountry.pm again and removed utf8
+    characters from the POD section. They are still causing errors on selected
+    platforms and versions of Perl. Replaced with ASCII text. Fix for RT bug 71228
+
+1.61 15 Feb 2013
+    Small correction for German data
+    Replaced POD utf encoding directive in SubCountry.pm as some accented characters occur in the POD
+
+1.60 13 Feb 2013
+
+    NOTE: On September 2, 2008, FIPS 10-4 was one of ten standards withdrawn by NIST as a
+    Federal Information Processing Standard. FIPS data will remain in this module for now.
+    I may need to withdraw it if it becomes too difficult to align FIPS data with updates to ISO data
+
+    Added FIPS data to several countries
+    Added Communities to Spain
+    Added Italian regions
+    Allowed for blank lines within subcountry XML data
+    Added FIPS codes to many countries
+    Removed POD utf encoding directive from SubCountry.pm (only needed in Data.pm), fix for RT bug 82933
+
+1.59 22 Jan 2013
+    Added $VERSION variable into the Locale::SubCountry::World package
+
+1.58 22 Jan 2013
+    Added '=encoding utf8' to Data.pm to allow POD formatters to work
+    Changed minimimum required version of Test::Pod and Test::Pod::Coverage to 1.04, fix for RT bug 82717
+
+1.57 14 Jan 2013
+    Moved declaration of $VERSION into the Locale::SubCountry package, fix for RT bug 79734
+
+
+1.56 7 July 2012
+    Removed use of $ENV{AUTHOR_TESTING} for running POD tests, caused problems for CPAN testers
+
+1.55 5 July 2012
+    Fixed xml tagging in Macedonian data,  fix for RT bug 78157
+    Minor updates to data
+    Use $ENV{AUTHOR_TESTING} for running POD tests, fix for RT bug 78123
+    Print message to STDERR (via call to die) on badly formed country and sub country data
+
+    Thanks to Ron Savage for the following:
+    Use Test::More everywhere rather than Test::Simple sometimes.
+    Add t/test.t.
+    Clean up pre-reqs in Makefile.PL
+    Add Build.PL.
+    Add encoding to POD in Locale::SubCountry
+
+1.51 2 July 2012
+    Many new countries added, thanks to Ron Savage
+    Sub countries added to existing countries
+    Many corrections to sub country data
+    Changed to all lower case for the spelling of 'and', 'of' 'the' etc that may occur in names
+    Added 'use utf8' to main.t
+
+
+1.50 18 Apr 2012
+    Added Makefile.PL  back to the distribution set
+
+1.49 18 Apr 2012
+    Fixed errors in XML coding
+    Fixed the Brazilian state Rondônia, fix for RT bug 73830
+    Added 3 new Indonesian provinces, fix for RT bug 74763
+    Added 'use utf8' to Data.pm, fix for RT bug 73829
+    Added Metro Manila in Philippines, fixed some other provinces, fix for RT bug 69678
+
+1.48 17 Apr 2012
+    Added South Sudan as a new country
+    Removed states from Sudan
+    Added New Caledonia, Palau, San Marino, Guernsey, Jersey, Saint Martin,
+      Saint Barthélemy, Sint Maarten, Isle Of Man
+
+1.47 29 Apr 2011
+    Converted tests to use Test::Simple in main.t
+    Added test for regional_division
+    Added test for initialising with 2 letter country code
+    Improved synopsis
+
+    Fixed typo in 'new' method that was stopping the use of 2 letter country codes
+    being used as a parameter. Note, this also caused a faliure in the tests for
+    the dependant module, Lingua::EN::AddressParse
+
+
+1.46 6 Apr 2011
+    Fixed main.t so tests now use title cased country names.
+    Corrected typos in Changes, README, SubCountry.pm demo.pl, thanks to Glenn Fowler
+
+1.45 5 Apr 2011
+    Corrected FIPS codes for Repbulic or Ireland and other countries, thanks to Michele Ongaro
+    Added data for Montenegro as a separate country
+    Added data for Serbia as a separate country
+    Added Hong Kong and it's districts (it also appears as a region of China)
+    Corrections to documentation
+
+    Country names are now stored in title case, not all capitals, as in Fiji and not FIJI.
+    This was done to improve readability (original ISO date used upper case)
+    NOTE, this means that when calling the new method with a country name, you need
+    to specify the name in title case. It will not work if you use upper case. This
+    could cause some backward compatibility issues from your calling code.
+
+1.44 20 Jan 2011
+    Moved Locale::SubCountryData to Locale::SubCountry::Data name space
+    Added use struct and use warnings
+    Moved all global variables to the Locale::SubCountry name space
+
+1.43 14 Jan 2011
+    Fixed the number of tests in main.t, should be 17, not 15
+
+1.42 13 Jan 2011
+    Changed name of UK region St. Helens to Saint Helens, fix for RT bug 38599
+    Fixed FIPS codes for UK regions Stafforshire and Saint Helens
+    Removed trailing blanks, fix for RT bug 38597
+    Changed encoding of XML data to UTF-8,  thanks to Benjamin Erhart. Fix for RT bug 38559
+    Moved XML data to separate package, Locale::SubCountry::Data and encoded this file as UTF-8
+    Added additional tests for unknown sub country codes and names
+
+1.41 20 Apr 2008
+    Added FIPS codes for UK, thanks to TJMATHER for patch, RT bug #32899
+
+1.40 12 Jan 2008
+    Changed  regexp match on XML country field to account for both Unix and MSDOS line endings
+    Converted files to Unix line endings
+
+1.39 6 Jan 2008
+    Allowed for sub countries with no ISO code, such as Shariff Kabunsuan in the Phillipines
+    Thanks to Matt Loschert for pointing this out.
+
+
+1.38 26 Nov 2006
+    Changed sub country names in Sudan and Phillipines
+    Added examples/demo.pl
+
+1.37 02 Apr 2006
+    Removed invalid characters in data for Iran, United Arab Emirates and Oman
+    Removed alternate names (appended to end of main names in brackets) from many sub countries
+
+    NOTE: new method now issues warning and returns undef if invalid country code or
+    name parameter is passed. Previous versions died inside the new method.
+
+1.36 11 Jul 2005
+    Added regions for Andorra
+    Added regions for Grenada
+    Updated distribution to current CPAN requirements
+
+
+1.35 04 Jul 2005
+    Fixed problem with name space pollution for $VERSION variable
+
+    Added data for the following countries
+        Antigua and Barbuda
+        Andorra
+        Aruba
+        Bhutan
+        Nauru
+        Seychelles
+
+    For Cape Verde, changed Calheta de São Miguel to São Miguel
+    For Venezuela, changed Distrito Federal to Distrito Capital
+    Added districts for Honduras
+
+1.34 17 Apr 2004
+    Fixed typo in XML data for American Samoa
+
+    Added 'has_sub_countries' method to determine if a country has any sub countries
+    (some such a Singapore do not). Updated synopsis to show it's use.
+
+1.33 13 Feb 2004
+    Fixed pattern matching in data loader to allow for accented characters
+
+1.32 13 Feb 2004
+    Added 'use locale' to main.t to stop 'make test' errors
+
+1.31 12 Feb 2004
+    Moved XML data back into main module.
+    Corrected documentation
+
+1.30 8 Feb 2004
+
+    Completely updated data, many new countries and sub countries added
+    Added countries without sub countries, such as Singapore
+    Stored data in separate file in XML format
+
+    Added method 'category' to return the type of subcountry such as state, city etc
+    NOTE: this replaces the 'sub_country_type' method
+
+    Added method 'regional_division' to return the regional_division of subcountry
+    such as SCT (Scotland) for Edinburgh
+
+1.23 16 Jul 2003
+
+    Added data for Finland and Singapore, thanks to Chris McKay
+
+1.22 18 Jan 2003
+    Removed use of $_ in initialization code, as suggested by Ilya Martynov
+    Corrected country code for Iran, thanks to Todd A. Green
+    Removed Exporter references, as suggested by TJ Mather
+    Added Timor-Leste as a new country (East Timor)
+    Changed Canadian province of Newfoundland to Newfoundland and Labrador
+
+
+1.21 9 Sep 2002
+    Fixed bug in test script main.t
+
+1.20 7 Sep 2002
+
+    Added methods to new Locale::SubCountry::World package
+    - new
+    - all_full_names
+    - all_codes
+    - full_name_code_hash
+    - code_full_name_hash
+
+    NOTE!
+    all_full_names method replaces the stand alone all_country_names function
+    all_codes method replaces the stand alone all_country_codes function
+    The above method names duplicate existing method names (polymorphism),
+        so make sure you are working with the right type of object first.
+
+    These changes were necessary because of user requests for country name
+    and code look ups prior to sub-country lookups. Previous versions would not
+    work with Locale::Country because of a clash in exported names. Thanks to
+    Todd Green for this suggestion.
+
+    Added the FIPS 10-4 (US standard) for many sub countries
+    Added FIPS10_4_code method
+    Added ISO3166_2_code method
+    Added many corrections to sub country names
+    Thanks to TJ Mather for adding FIPS codes and fixing other data errors
+
+    Added extra tests to main.t
+    Prefixed internal data structure elements with a dash, to follow OO convention
+
+1.11 23 Mar 2002
+    Corrected codes for Corsica, France, thanks to Mathias Herberts
+
+1.10 04 Jan 2002
+    Replaced INIT block with anonymous subroutine. This removed problems
+    that occurred when mod_perl or eval statements were used.
+
+1.09 25 Jul 2001
+    Added code for US, West Virginia (WV), thanks to Michelle Agnew
+
+1.08 16 Mar 2001
+    Made many corrections to country data to align it with ISO:3166-2 standard
+    Defined sub country types for all countries
+    Added information for Israel and Albania
+    Removed some MS-DOS line terminators that were generating warnings
+    Added two more tests to main.t
+
+
+1.07 12 Mar 2001
+    Corrected errors in German sub countries thanks to Lars Steubesand
+
+    Corrected errors in data for Austria, Poland, Romania, Turkey, Germany and
+    Columbia. Thanks to Philip Newton.
+
+1.06 20 Feb 2001
+    Allowed countries to be specified by either full name or two letter code
+    Made country names compatible with ISO 3166-1 standard
+    Added country_code method to retrieve ISO code for current object
+    Added all_country_codes method to retrieve ISO codes for all countries
+    Corrected abbreviation for Canadian province of Nunavut
+    Thanks to Trevor Schellhorn for these suggestions
+
+    Corrected two Belgium sub countries. Thanks to Wim Verhaegen
+
+
+1.05 15 Oct 2000
+    sub_country_type method returns 'unknown' when no data defined
+    Fixed bug in mismatch count in main.t test module
+
+1.04 04 Oct 2000
+    Added all remaining countries, thanks to Alastair McKinstry
+    Included sub country type (state, county etc) in lookup data
+    Added country and sub_country_type methods
+    Accounted for sub country codes of 0
+
+1.03 20 Aug 2000
+    Added many more countries, thanks to Alastair McKinstry
+    Now account for any incorrect capitalization of sub country names
+    _clean subroutine only removes dots and spaces, dashes are now allowed
+    Added subroutine to return array of countries that have lookup data
+    Added test in main.t to convert all codes to names and back again
+    Allowed for leading or trailing white space in __DATA__ entries
+
+1.02 14 May 2000
+    Added Canadian province of Nunavut, thanks to Steve Taylor
+
+1.01 25 Apr 2000
+    To follow the approach of ISO 3166-2
+    - renamed module from RegionAbbrev to SubCountry
+    - replaced all references to 'abbreviation' with 'code'
+
+    Improved regexes in _clean, thanks to Mark Summerfield
+    Replaced regexp with hash lookup for valid countries
+    Accepted all forms of upper/lower case in country name
+
+1.00  8 Apr 2000
+     First Release

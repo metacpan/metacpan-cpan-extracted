@@ -1,0 +1,582 @@
+--- #YAML:1.0
+  L3Logo: |-
+    #declare L3Logo = union {
+    	sphere {<-59,0,-96>,6}
+    	cylinder {<-59,0,-96>,<59,0,-122>,6 open}
+    	sphere {<59,0,-122>,6}
+    	cylinder {<59,0,-122>,<59,0,-84>,6 open}
+    	sphere {<59,0,-84>,6}
+    	//
+    	sphere {<-59,0,-36>,6}
+    	cylinder {<-59,0,-36>,<-59,0,1>,6 open}
+    	sphere {<-59,0,1>,6}
+    	cylinder {<0,0,-49>,<0,0,-25>,6 open}
+    	sphere {<0,0,-25>,6}
+    	sphere {<59,0,-62>,6}
+    	cylinder {<59,0,-62>,<59,0,-24>,6 open}
+    	sphere {<59,0,-24>,6}
+    	cylinder {<-59,0,-36>,<59,0,-62>,6 open}
+
+    	sphere {<-35.95,0,57>,6}
+    	torus {18.45,6 clipped_by{plane{<40,0,-9>,0}} translate<-40,0,39>}
+    	cylinder {<-44.05,0,21>,<35.95,0,3>,6 open}
+    	torus {18.45,6 clipped_by{plane{<-40,0,9>,0}} translate<40,0,21>}
+    	cylinder {<44.05,0,39>,<0,0,49>,6 open}
+    	sphere {<0,0,49>,6}
+    	cylinder {<0,0,49>,<0,0,34>,6 open}
+    	sphere {<0,0,34>,6}
+
+    	torus {18.45,6 clipped_by{plane{<40,0,-9>,0}} translate<-40,0,99>}
+    	cylinder {<-44.05,0,81>,<35.95,0,63>,6 open}
+    	torus {18.45,6 clipped_by{plane{<-40,0,9>,0}} translate<40,0,81>}
+    	cylinder {<44.05,0,99>,<-35.95,0,117>,6 open}
+
+    	scale 4.5/128
+    }
+  _1_dash_4con0_dot_dat: >-
+    #declare _1_dash_4con0_dot_dat = cone { <0,0,0>, 1, <0,1,0>, 0 open
+    clipped_by { box { <0,-1,0>,<2,2,2> } } }
+  _1_dash_4con10_dot_dat: >-
+    #declare _1_dash_4con10_dot_dat = cone { <0,0,0>, 11, <0,1,0>, 10 open
+    clipped_by { box { <0,-1,0>,<12,2,12> } } }
+  _1_dash_4con1_dot_dat: >-
+    #declare _1_dash_4con1_dot_dat = cone { <0,0,0>, 2, <0,1,0>, 1 open
+    clipped_by { box { <0,-1,0>,<3,2,3> } } }
+  _1_dash_4con2_dot_dat: >-
+    #declare _1_dash_4con2_dot_dat = cone { <0,0,0>, 3, <0,1,0>, 2 open
+    clipped_by { box { <0,-1,0>,<4,2,4> } } }
+  _1_dash_4con3_dot_dat: >-
+    #declare _1_dash_4con3_dot_dat = cone { <0,0,0>, 4, <0,1,0>, 3 open
+    clipped_by { box { <0,-1,0>,<5,2,5> } } }
+  _1_dash_4con4_dot_dat: >-
+    #declare _1_dash_4con4_dot_dat = cone { <0,0,0>, 5, <0,1,0>, 4 open
+    clipped_by { box { <0,-1,0>,<6,2,6> } } }
+  _1_dash_4cyli_dot_dat: >-
+    #declare _1_dash_4cyli_dot_dat = cylinder { <0,0,0>, <0,1,0>, 1 open
+    clipped_by { box { <0,-1,0>,<2,2,2> } } }
+  _1_dash_4cyls2_dot_dat: |-
+    #declare _1_dash_4cyls2_dot_dat = cylinder { <0,0,0>, <0,1,0>, 1 open
+    	clipped_by { plane { <1,0,-1>,-O7071 } plane { <1,1,0>,0 } } }
+  _1_dash_4cyls_dot_dat: |-
+    #declare _1_dash_4cyls_dot_dat = cylinder { <0,0,0>, <0,1,0>, 1 open
+    	clipped_by { plane { <-1,0,-1>,-O7071 } plane { <1,1,0>,O7071 } } }
+  _1_dash_4disc_dot_dat: |-
+    #declare _1_dash_4disc_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 1
+    		clipped_by { box { <0,-1,0>, <2,1,2> } }
+    	}
+    #else
+    	cylinder {
+    		<0,-0.001,0>, <0,0.001,0>, 1
+    		clipped_by { box { <0,-1,0>, <2,1,2> } }
+    	}
+    #end
+  _1_dash_4ndis_dot_dat: |-
+    #declare _1_dash_4ndis_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 2, 1
+    		clipped_by { box { <0,-1,0>, <1,1,1> } }
+    	}
+    #else
+    	difference {
+    		box { <0,-0.001,0>, <1,0.001,1> }
+    		cylinder { <0,-1,0>, <0,1,0>, 1 }
+    	}
+    #end
+  _1_dash_4rin10_dot_dat: |-
+    #declare _1_dash_4rin10_dot_dat = disc {
+    		<0,0,0>, <0,1,0>, 11, 10
+    		clipped_by { box { <0,-1,0>, <12,1,12> } }
+    	}
+  _1_dash_4rin12_dot_dat: |-
+    #declare _1_dash_4rin12_dot_dat = disc {
+    		<0,0,0>, <0,1,0>, 13, 12
+    		clipped_by { box { <0,-1,0>, <14,1,14> } }
+    	}
+  _1_dash_4rin15_dot_dat: |-
+    #declare _1_dash_4rin15_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 16, 15
+    		clipped_by { box { <0,-1,0>, <17,1,17> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 16 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 15 }
+    		clipped_by { box { <0,-0.01,0>, <17,0.01,17> } }
+    	}
+    #end
+  _1_dash_4rin16_dot_dat: |-
+    #declare _1_dash_4rin16_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 17, 16
+    		clipped_by { box { <0,-1,0>, <18,1,18> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 17 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 16 }
+    		clipped_by { box { <0,-0.01,0>, <18,0.01,18> } }
+    	}
+    #end
+  _1_dash_4rin18_dot_dat: |-
+    #declare _1_dash_4rin18_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 19, 18
+    		clipped_by { box { <0,-1,0>, <20,1,20> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 19 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 18 }
+    		clipped_by { box { <0,-0.01,0>, <20,0.01,20> } }
+    	}
+    #end
+  _1_dash_4rin19_dot_dat: |-
+    #declare _1_dash_4rin19_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 20, 19
+    		clipped_by { box { <0,-1,0>, <21,1,21> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 20 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 19 }
+    		clipped_by { box { <0,-0.01,0>, <21,0.01,21> } }
+    	}
+    #end
+  _1_dash_4rin38_dot_dat: |-
+    #declare _1_dash_4rin38_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 39, 38
+    		clipped_by { box { <0,-1,0>, <40,1,40> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 39 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 38 }
+    		clipped_by { box { <0,-0.01,0>, <40,0.01,40> } }
+    	}
+    #end
+  _1_dash_4rin39_dot_dat: |-
+    #declare _1_dash_4rin39_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 40, 39
+    		clipped_by { box { <0,-1,0>, <41,1,41> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 40 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 39 }
+    		clipped_by { box { <0,-0.01,0>, <41,0.01,41> } }
+    	}
+    #end
+  _1_dash_4ring1_dot_dat: |-
+    #declare _1_dash_4ring1_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 2, 1
+    		clipped_by { box { <0,-1,0>, <3,1,3> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 2 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 1 }
+    		clipped_by { box { <0,-0.01,0>, <3,0.01,3> } }
+    	}
+    #end
+  _1_dash_4ring2_dot_dat: |-
+    #declare _1_dash_4ring2_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 3, 2
+    		clipped_by { box { <0,-1,0>, <4,1,4> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 3 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 2 }
+    		clipped_by { box { <0,-0.01,0>, <4,0.01,4> } }
+    	}
+    #end
+  _1_dash_4ring3_dot_dat: |-
+    #declare _1_dash_4ring3_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 4, 3
+    		clipped_by { box { <0,-1,0>, <5,1,5> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 4 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 3 }
+    		clipped_by { box { <0,-0.01,0>, <5,0.01,5> } }
+    	}
+    #end
+  _1_dash_4ring4_dot_dat: |-
+    #declare _1_dash_4ring4_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 5, 4
+    		clipped_by { box { <0,-1,0>, <6,1,6> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 5 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 4 }
+    		clipped_by { box { <0,-0.01,0>, <6,0.01,6> } }
+    	}
+    #end
+  _1_dash_4ring5_dot_dat: |-
+    #declare _1_dash_4ring5_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 6, 5
+    		clipped_by { box { <0,-1,0>, <7,1,7> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 6 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 5 }
+    		clipped_by { box { <0,-0.01,0>, <7,0.01,7> } }
+    	}
+    #end
+  _1_dash_4ring6_dot_dat: |-
+    #declare _1_dash_4ring6_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 7, 6
+    		clipped_by { box { <0,-1,0>, <8,1,8> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 7 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 6 }
+    		clipped_by { box { <0,-0.01,0>, <8,0.01,8> } }
+    	}
+    #end
+  _1_dash_4ring7_dot_dat: |-
+    #declare _1_dash_4ring7_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 8, 7
+    		clipped_by { box { <0,-1,0>, <9,1,9> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 8 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 7 }
+    		clipped_by { box { <0,-0.01,0>, <9,0.01,9> } }
+    	}
+    #end
+  _1_dash_4ring8_dot_dat: |-
+    #declare _1_dash_4ring8_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 9, 8
+    		clipped_by { box { <0,-1,0>, <10,1,10> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 9 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 8 }
+    		clipped_by { box { <0,-0.01,0>, <10,0.01,10> } }
+    	}
+    #end
+  _1_dash_4ring9_dot_dat: |-
+    #declare _1_dash_4ring9_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 10, 9
+    		clipped_by { box { <0,-1,0>, <11,1,11> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 10 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 9 }
+    		clipped_by { box { <0,-0.01,0>, <11,0.01,11> } }
+    	}
+    #end
+  _1_dash_8cyli_dot_dat: |-
+    #declare _1_dash_8cyli_dot_dat = cylinder {
+    	<0,0,0>, <0,1,0>, 1 open
+    	clipped_by { box { <O7071,0,0>, <1,1,O7071> } }
+    }
+  _1_dash_8disc_dot_dat: |-
+    #declare _1_dash_8disc_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 1
+    		clipped_by { plane { <0,0,-1>,0 } plane { <-1,0,1>,0 } }
+    	}
+    #else
+    	cylinder {
+    		<0,-0.001,0>, <0,0.001,0>, 1
+    		clipped_by { plane { <0,0,-1>,0 } plane { <-1,0,1>,0 } }
+    	}
+    #end
+  _1_dash_8ring3_dot_dat: |-
+    #declare _1_dash_8ring3_dot_dat = object {
+    // Ring  3 x 0.125
+    // Name: 1-8ring3.dat
+    // Author: Paul Easter
+    // LDRAW_ORG Primitive UPDATE 2002-02
+    // BFC CERTIFY CW
+    	mesh {
+    		triangle { <3,0,0>, <2.7716,0,1.1481>, <3.6955,0,1.5307> }
+    		triangle { <3.6955,0,1.5307>, <4,0,0>, <3,0,0> }
+    		triangle { <2.7716,0,1.1481>, <2.1213,0,2.1213>, <2.8284,0,2.8284> }
+    		triangle { <2.8284,0,2.8284>, <3.6955,0,1.5307>, <2.7716,0,1.1481> }
+    // 
+    	}
+    }
+  _1_dash_8sphe_dot_dat: >-
+    #declare _1_dash_8sphe_dot_dat = sphere { <0,0,0>, 1 clipped_by { box {
+    <0,0,0>, <2,2,2> } } }
+  _2_dash_4cyli_dot_dat: >-
+    #declare _2_dash_4cyli_dot_dat = cylinder { <0,0,0>, <0,1,0>, 1 open
+    clipped_by { box { <-2,-1,0>,<2,2,2> } } }
+  _2_dash_4cyls_dot_dat: |-
+    #declare _2_dash_4cyls_dot_dat = cylinder { <0,0,0>, <0,2,0>, 1 open
+    	clipped_by { plane { <0,0,-1>,0 } plane { <1,1,0>,O7071 } } }
+  _2_dash_4disc_dot_dat: |-
+    #declare _2_dash_4disc_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 1
+    		clipped_by { box { <-2,-1,0>, <2,1,2> } }
+    	}
+    #else
+    	cylinder {
+    		<0,-0.001,0>, <0,0.001,0>, 1
+    		clipped_by { box { <-2,-1,0>, <2,1,2> } }
+    	}
+    #end
+  _2_dash_4ndis_dot_dat: |-
+    #declare _2_dash_4ndis_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 2, 1
+    		clipped_by { box { <-1,-1,0>, <1,1,1> } }
+    	}
+    #else
+    	difference {
+    		box { <-1,-0.001,0>, <1,0.001,1> }
+    		cylinder { <0,-1,0>, <0,1,0>, 1 }
+    	}
+    #end
+  _2_dash_4ring1_dot_dat: |-
+    #declare _2_dash_4ring1_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 2, 1
+    		clipped_by { box { <-3,-1,0>, <3,1,3> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 2 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 1 }
+    		clipped_by { box { <-3,-0.01,0>, <3,0.01,3> } }
+    	}
+    #end
+  _2_dash_4ring2_dot_dat: |-
+    #declare _2_dash_4ring2_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 3, 2
+    		clipped_by { box { <-4,-1,0>, <4,1,4> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 3 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 2 }
+    		clipped_by { box { <-4,-0.01,0>, <4,0.01,4> } }
+    	}
+    #end
+  _2_dash_4ring3_dot_dat: |-
+    #declare _2_dash_4ring3_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 4, 3
+    		clipped_by { box { <-5,-1,0>, <5,1,5> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 4 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 3 }
+    		clipped_by { box { <-5,-0.01,0>, <5,0.01,5> } }
+    	}
+    #end
+  _2_dash_4ring4_dot_dat: |-
+    #declare _2_dash_4ring4_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 5, 4
+    		clipped_by { box { <-6,-1,0>, <6,1,6> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 5 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 4 }
+    		clipped_by { box { <-6,-0.01,0>, <6,0.01,6> } }
+    	}
+    #end
+  _2_dash_4ring7_dot_dat: |-
+    #declare _2_dash_4ring7_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 8, 7
+    		clipped_by { box { <-9,-1,0>, <9,1,9> } }
+    	}
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 8 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 7 }
+    		clipped_by { box { <-9,-0.01,0>, <9,0.01,9> } }
+    	}
+    #end
+  _2_dash_8sphe_dot_dat: >-
+    #declare _2_dash_8sphe_dot_dat = sphere { <0,0,0>, 1 clipped_by { box {
+    <-1,0,0>, <2,2,2> } } }
+  _3_dash_4cyli_dot_dat: |-
+    #declare _3_dash_4cyli_dot_dat = cylinder {
+    	<0,0,0>, <0,1,0>, 1 open
+    	clipped_by { plane { <1,0,-1>, O7071 } }
+    }
+  _3_dash_8cyls_dot_dat: >-
+    #declare _3_dash_8cyls_dot_dat = cylinder { <0,0,0>, <0,2,0>, 1 open
+    clipped_by {
+    	plane { <-O7071,0,-1-O7071>,-1/sqrt(4+sqrt(8)) }
+    	plane { <1,1,0>,O7071 }
+    } }
+  _4_dash_4con12_dot_dat: |-
+    #declare _4_dash_4con12_dot_dat = cone { <0,0,0>, 2, <0,1,0>, 1 open }
+  _4_dash_4con1_dot_dat: |-
+    #declare _4_dash_4con1_dot_dat = cone { <0,0,0>, 2, <0,1,0>, 1 open }
+  _4_dash_4cyli_dot_dat: |-
+    #declare _4_dash_4cyli_dot_dat = cylinder { <0,0,0>, <0,1,0>, 1 open }
+  _4_dash_4disc_dot_dat: |-
+    #declare _4_dash_4disc_dot_dat = #if (version >= 3.1)
+    	disc { <0,0,0>, <0,1,0>, 1 }
+    #else
+    	cylinder { <0,-0.001,0>, <0,0.001,0>, 1 }
+    #end
+  _4_dash_4ndis_dot_dat: |-
+    #declare _4_dash_4ndis_dot_dat = #if (version >= 3.1)
+    	disc {
+    		<0,0,0>, <0,1,0>, 2, 1
+    		clipped_by { box { <-1,-1,-1>, <1,1,1> } }
+    	}
+    #else
+    	difference {
+    		box { <-1,-0.001,-1>, <1,0.001,1> }
+    		cylinder { <0,-1,0>, <0,1,0>, 1 }
+    	}
+    #end
+  _4_dash_8sphe_dot_dat: >-
+    #declare _4_dash_8sphe_dot_dat = sphere { <0,0,0>, 1 clipped_by { box {
+    <-1,0,-1>, <2,2,2> } } }
+  _8_dash_8sphe_dot_dat: |-
+    #declare _8_dash_8sphe_dot_dat = sphere { <0,0,0>, 1 }
+  axle_dot_dat: |-
+    #declare axle_dot_dat = intersection {
+    	cylinder { <0,0,0>, <0,1,0>, 6 }
+    	union {
+    		box { <-7,-1,-2>, <7,2,2> }
+    		box { <-2,-1,-7>, <2,2,7> }
+    	}
+    }
+  box_dot_dat: '#declare box_dot_dat = box { <-1,-1,-1>, <1,1,1> }'
+  peghole_dot_dat: |-
+    #declare peghole_dot_dat = union {
+    	cylinder { <0,0,0>, <0,2,0>, 8 open }
+    	#if (version >= 3.1)
+    		disc { <0,2,0>, <0,1,0>, 8, 6 }
+    	#else
+    		difference {
+    			cylinder { <0,1.999,0>, <0,2.001,0>, 8 }
+    			cylinder { <0,1,0>, <0,3,0>, 6 }
+    		}
+    	#end
+    }
+  ring10_dot_dat: |-
+    #declare ring10_dot_dat = #if (version >= 3.1)
+    	disc { <0,0,0>, <0,1,0>, 11, 10 }
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 11 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 10 }
+    	}
+    #end
+  ring1_dot_dat: |-
+    #declare ring1_dot_dat = #if (version >= 3.1)
+    	disc { <0,0,0>, <0,1,0>, 2, 1 }
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 2 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 1 }
+    	}
+    #end
+  ring2_dot_dat: |-
+    #declare ring2_dot_dat = #if (version >= 3.1)
+    	disc { <0,0,0>, <0,1,0>, 3, 2 }
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 3 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 2 }
+    	}
+    #end
+  ring3_dot_dat: |-
+    #declare ring3_dot_dat = #if (version >= 3.1)
+    	disc { <0,0,0>, <0,1,0>, 4, 3 }
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 4 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 3 }
+    	}
+    #end
+  ring4_dot_dat: |-
+    #declare ring4_dot_dat = #if (version >= 3.1)
+    	disc { <0,0,0>, <0,1,0>, 5, 4 }
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 5 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 4 }
+    	}
+    #end
+  ring7_dot_dat: |-
+    #declare ring7_dot_dat = #if (version >= 3.1)
+    	disc { <0,0,0>, <0,1,0>, 8, 7 }
+    #else
+    	difference {
+    		cylinder { <0,-0.001,0>, <0,0.001,0>, 8 }
+    		cylinder { <0,-0.002,0>, <0,0.002,0>, 7 }
+    	}
+    #end
+  stud2_dot_dat: |-
+    #declare stud2_dot_dat = difference {
+    	cylinder { <0,0,0>, <0,-4,0>, 6 }
+    	cylinder { <0,0.01,0>, <0,-4.01,0>, 4 }
+    }
+  stud2a_dot_dat: |-
+    #declare stud2a_dot_dat = difference {
+    	cylinder { <0,0,0>, <0,-4,0>, 6 }
+    	cylinder { <0,0.01,0>, <0,-4.01,0>, 4 }
+    }
+  stud3_dot_dat: |-
+    #declare stud3_dot_dat = cylinder { <0,0,0>, <0,-4,0>, 4 }
+  stud3a_dot_dat: |-
+    #declare stud3a_dot_dat = cylinder { <0,0,0>, <0,-4,0>, 4 }
+  stud4_dot_dat: |-
+    #declare stud4_dot_dat = difference {
+    	cylinder { <0,0,0>, <0,-4,0>, 8 }
+    	cylinder { <0,0.01,0>, <0,-4.01,0>, 6 }
+    }
+  stud4a_dot_dat: |-
+    #declare stud4a_dot_dat = difference {
+    	cylinder { <0,0,0>, <0,-4,0>, 8 }
+    	cylinder { <0,0.01,0>, <0,-4.01,0>, 6 }
+    }
+  stud6_dot_dat: |-
+    #declare stud6_dot_dat = intersection {
+    	difference {
+    		cylinder { <0,0,0>, <0,-4,0>, 6 }
+    		cylinder { <0,0.01,0>, <0,-4.01,0>, 4 }
+    	}
+    	cylinder { <-10,0.01,-10>, <-10,-4.01,-10>, 20 open}
+    }
+  stud_dot_dat: |-
+    #declare stud_dot_dat = 
+    #if (QUAL <= 2)
+    cylinder { <0,0,0>, <0,-4,0>, 6 }
+    #else
+    union {
+    	cylinder { <0,0,0>, <0,-4,0>, 6 }
+    	object { L3Logo translate <0,-4,0> }
+    }
+    #end
+

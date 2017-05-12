@@ -1,0 +1,5 @@
+# Tags and words allowed in the parsing of the phrases
+!!CANDIDATES = ((JJS)|(JJR)|(JJ)|(NNS)|(NN)|(NP)|(CD)|(VBG)|(FW)|(NPS))!!
+!!DETERMINERS = ((DT))!!
+!!PREPOSITIONS = ((of)|(to))!!
+!!COORDINATIONS = ((CC))!!

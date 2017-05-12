@@ -1,0 +1,47 @@
+{
+   "abstract" : "A Log4perl layout that spits out LTSV",
+   "author" : [
+      "Frank Denis <jedi @ cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Log4perl-Layout-LTSV",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Log4perl" : "1.20",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Log4perl::Layout::LTSV" : {
+         "file" : "lib/Log/Log4perl/Layout/LTSV.pm",
+         "version" : "1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "1.004"
+}

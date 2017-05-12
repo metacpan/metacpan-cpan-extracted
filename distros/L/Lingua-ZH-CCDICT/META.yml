@@ -1,0 +1,45 @@
+---
+name: Lingua-ZH-CCDICT
+version: 0.05
+author:
+  - 'David Rolsky <autarch@urth.org>'
+abstract: An interface to the CCDICT Chinese dictionary
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  File::Temp: 0
+  Test::More: 0.46
+requires:
+  File::Spec: 0
+  Params::Validate: 0.24
+  Sub::Name: 0
+recommends:
+  BerkeleyDB: 0.19
+  Storable: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Lingua::ZH::CCDICT:
+    file: lib/Lingua/ZH/CCDICT.pm
+    version: 0.05
+  Lingua::ZH::CCDICT::ResultItem:
+    file: lib/Lingua/ZH/CCDICT/ResultItem.pm
+  Lingua::ZH::CCDICT::ResultSet:
+    file: lib/Lingua/ZH/CCDICT/ResultSet.pm
+  Lingua::ZH::CCDICT::ResultSet::Array:
+    file: lib/Lingua/ZH/CCDICT/ResultSet/Array.pm
+  Lingua::ZH::CCDICT::ResultSet::BerkeleyDB:
+    file: lib/Lingua/ZH/CCDICT/ResultSet/BerkeleyDB.pm
+  Lingua::ZH::CCDICT::Romanization:
+    file: lib/Lingua/ZH/CCDICT/Romanization.pm
+  Lingua::ZH::CCDICT::Romanization::Pinyin:
+    file: lib/Lingua/ZH/CCDICT/Romanization/Pinyin.pm
+  Lingua::ZH::CCDICT::Storage::BerkeleyDB:
+    file: lib/Lingua/ZH/CCDICT/Storage/BerkeleyDB.pm
+  Lingua::ZH::CCDICT::Storage::InMemory:
+    file: lib/Lingua/ZH/CCDICT/Storage/InMemory.pm
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

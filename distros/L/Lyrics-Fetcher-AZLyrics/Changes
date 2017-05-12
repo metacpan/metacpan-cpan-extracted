@@ -1,0 +1,24 @@
+Revision history for Perl extension Lyrics::Fetcher::AZLyrics.
+
+0.05 - 2010-04-15
+    Handle changes to AZLyrics site
+    Improve test script.
+    This gets things working again at least, although this module could use
+    some TLC.
+
+0.04  (2008/09/11)
+    AZLyrics.com changed their HTML slightly, adding ringtones adverts.
+
+0.03
+    fix comments in test scripts (thanks to James Ronan)
+
+0.02 - 2007-02-05 
+    Er... the test script tested calling this module via
+    Lyrics::Fetcher->fetch(), which isn't a good idea since we don't
+    have a dependency on Lyrics::Fetcher.
+    Changed to call L:F:A->fetch() directly to avoid test failures.
+    
+0.01 - 2007-02-03
+    original version; created by h2xs 1.23 with options
+    -AXc -n Lyrics::Fetcher::AZLyrics
+

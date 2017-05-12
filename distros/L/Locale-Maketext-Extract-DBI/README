@@ -1,0 +1,35 @@
+NAME
+    Locale::Maketext::Extract::DBI - Extract translation keys from a
+    database
+
+SYNOPSIS
+        my $extractor = Locale::Maketext::Extract::DBI->new;
+        $extract->extract( %options );
+
+DESCRIPTION
+    This module extracts translation keys from a database table.
+
+METHODS
+  new( )
+    Creates a new "Locale::Maketext::Extract::DBI" instance.
+
+  extract( %options )
+    The main method for extraction. Take a list of options to pass to
+    "Locale::Maketext::Extract" and "extract_dbi".
+
+  extract_dbi( $extractor, %options )
+    Connects to the database, runs the query and stuffs the results in to
+    the $extractor.
+
+AUTHOR
+    * Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    * Locale::Maketext::Extract
+

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+example.pl
+alpino.xml
+t/Lingua-NL-FactoidExtractor.t
+lib/Lingua/NL/FactoidExtractor.pm
+

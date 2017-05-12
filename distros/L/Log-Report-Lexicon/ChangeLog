@@ -1,0 +1,87 @@
+
+==== version history of Log::Report::Lexicon
+
+Unless noted otherwise, these changes where initiated and applied by
+Mark Overmeer.
+
+bugs:
+	- with multiple domains extracted at once, remove references which
+	  appear in one PO but the file moved to other domain, not scanned
+	  in the same xgettext-perl run.
+	- manual-page for xgettext-perl is missing
+
+wishlist:
+	- let xgettext-perl produce mo files as well.
+	- convert TT usage example into a real TT plugin.
+
+version 1.06: Wed 21 Sep 17:10:58 CEST 2016
+
+	Fixes:
+	- extract __nx as well.
+
+	Improvements:
+	- take domain from Dancer2::Plugin::LogReport as well [Andy Beverley]
+
+version 1.05: Tue 12 Apr 15:09:32 CEST 2016
+
+	Fixes:
+	- charset in MO files. [Paulo A Ferreira]
+
+	Improvements:
+	- explain context settings for interpolation (new in Log::Report 1.10)
+	- explain relation to gettext's pgettext() command.
+	- added --no-cleanup to bin/xgettext-perl
+	- some documentation for bin/xgettext-perl
+
+version 1.04: Mon Jun 15 17:34:38 CEST 2015
+
+	Improvements:
+	- spell-fix rt.cpan.org#96465 [Gregor Herrmann, Debian]
+	- add Log::Report::Extract::addPot()
+
+version 1.03: Wed Jun  4 17:22:19 CEST 2014
+
+	Fixes:
+	- more than one po-file with contexts.
+	  Reported by [Richard Still]
+
+	Improvements:
+	- accept PO-files which have CRLF endings, while running on LF
+	  platform (UNIX/Linux)
+
+version 1.02: Mon Mar 10 16:08:59 CET 2014
+
+	Changes:
+	- ::PO::unused() -> ::PO::useless()
+
+	Fixes:
+	- do not run t/12ctxt.t on openbsd: that platform does not support
+	  LC_ALL [cpantesters]
+	- ::POT::write(only_active) was not documented and only partially
+	  implemented [Patrick Goldmann]
+	- ::POT::write() did not check the number of plural forms.
+	  [Patrick Goldmann]
+
+	Improvements:
+	- changed documentation style
+	- explain how to use templates in combination with translation
+	  contexts
+
+version 1.01: Mon Jan  6 22:42:22 CET 2014
+	Fixes:
+	- t/12ctxt.t failed when 'en' locale was not installed.  Patched
+	  by [Slaven Rezic]
+
+version 1.00: Sun Jan  5 17:30:43 CET 2014
+	Split-off from Log::Report
+
+	Fixes:
+	- remove references to files which have disappeared from the set.
+
+	Improvements:
+	- add ::Lexicon as main extry point
+	- add ::Translator::Context and smart support for msgctxt
+	- command-line parameter option in xgettext-perl
+	- add msgctxt support to tables maintained in POT, POTcompact,
+	  and MOcompact format.
+	- more documentation

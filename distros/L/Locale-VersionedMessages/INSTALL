@@ -1,0 +1,16 @@
+For instructions on installing this, or any other perl module in
+a UNIX environment, please refer to:
+
+   http://www.cpan.org/modules/INSTALL.html
+   http://learn.perl.org/faq/perlfaq8.html#How-do-I-install-a-module-from-CPAN-
+
+For instructions in a Windows environment running ActivePerl,
+refer to one of the following (depending on your version of perl):
+
+   http://docs.activestate.com/activeperl/5.6/faq/ActivePerl-faq2.html
+   http://docs.activestate.com/activeperl/5.8/faq/ActivePerl-faq2.html
+   http://docs.activestate.com/activeperl/5.10/faq/ActivePerl-faq2.html
+   http://docs.activestate.com/activeperl/5.12/faq/ActivePerl-faq2.html
+   http://docs.activestate.com/activeperl/5.14/faq/ActivePerl-faq2.html
+   http://docs.activestate.com/activeperl/5.16/faq/ActivePerl-faq2.html
+

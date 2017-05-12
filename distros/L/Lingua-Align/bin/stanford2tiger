@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# USAGE: stanford2tiger
+#
+#
+
+use strict;
+use FindBin;
+use lib $FindBin::Bin.'/../lib';
+use Lingua::Align::Corpus;
+
+
+my $infile = $ARGV[0];
+my $outfile = $ARGV[1];
+
+# use Lingua::Align::Corpus::Treebank::Stanford;
+# my $corpus = new Lingua::Align::Corpus::Treebank::Stanford(-file => $infile);
+
+my $corpus = new Lingua::Align::Corpus(-file => $infile,-type => 'stanford');
+my $output = new Lingua::Align::Corpus(-type => 'TigerXML');
+
+
+open F,">$outfile.tmp" || die "cannot open $outfile.tmp\n";
+
+my %sent=();
+while ($corpus->next_sentence(\%sent)){
+#    print $output->print_tree(\%sent);
+    print F $output->print_tree(\%sent);
+#    print $sent{ID},"\n";
+}
+
+close F;
+
+open F,">$outfile" || die "cannot open $outfile\n";
+print F $output->print_header();
+close F;
+
+system "cat $outfile.tmp >> $outfile";
+system "rm -f $outfile.tmp";
+
+open F,">>$outfile" || die "cannot open $outfile\n";
+print F $output->print_tail();
+close F;
+

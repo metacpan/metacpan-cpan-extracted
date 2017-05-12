@@ -1,0 +1,10 @@
+Revision history for Perl extension List-Range
+
+0.02 2016-04-15T08:42:02Z
+
+    - break the bsearch loop if the ranges are empty
+
+0.01 2016-04-15T07:27:49Z
+
+    - original version
+

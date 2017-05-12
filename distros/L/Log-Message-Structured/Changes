@@ -1,0 +1,51 @@
+0.012
+  - fix tests
+
+0.011
+  - fix prereqs
+
+0.010
+  - YAML stringifier
+  - Documentation fixes
+  - class name attribute added
+
+0.009
+  - added missing requirement
+
+0.008
+  - new component to filter in / out attributes
+  - bugfixes
+
+0.007
+  - stringify is not required anymore, the class can compose zero or more stringifiers now.
+
+0.006
+  - Pull date and hostname attributes out into their own components,
+    making them optional (dams).
+  - Additional documentation.
+  - Drop unused dependency on JSON::Any
+
+0.005
+  - Require new version of Moose, which fixes the issues with
+    Log::Message::Structured::Stringify::Sprintf.
+    Clean these issues up and fix the documentation to compose
+    roles together, not seperately.
+  - Document issues with namespace::autoclean
+
+0.004
+  - Fix when MooseX::Getopt is not present.
+
+0.003
+  - Add an epochtime field with the simple time in epocseconds for easy
+    and cheap comparison without having to parse the 8601 time.
+
+  - Fix Log::Message::Structured::Stringify::Sprintf warnings when values
+    in the sprintf string are undef. They are now literally printed as
+    'undef'
+
+0.002
+  - Fix docs for Stringify::Sprintf
+
+0.001
+  - Initial version with the very basic roles extracted (and abstracted) from
+    state51 code (with permission).

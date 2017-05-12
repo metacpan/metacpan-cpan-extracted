@@ -1,0 +1,16 @@
+
+printPN < sample.txt  -- imprime os nomes próprios e sua contagem
+
+refPN         -- Exemplo de uso da função forPN para colocar uma etiqueta
+  "ref" com um tipo seleccionável via menu e que no final cria também uma
+  tabela NP -> tipo chamada "ref_dict"
+
+  Exemplo de uso:
+    head -20 sample.txt | refPN    # vai criando/completando uma ref_dict
+    head -20 sample.txt | refPN    # usa o ref_dict criado anteriormente
+
+ucPN          -- transforma cada NP em tudo maiúsculas
+
+tagPnWithJspell -- mini marcador de entidades mencionadas com base tagPnTable
+    Este exemplo precisa da instalação do Jspell e dos seus dicionários
+    Português e Inglês

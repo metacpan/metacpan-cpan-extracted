@@ -1,0 +1,37 @@
+---
+abstract: 'TF/IDF calculator based on MeCab.'
+author:
+  - 'Takeshi Miki <miki@cpan.org>'
+build_requires:
+  HTTP::Server::Simple::CGI: 0
+  Test::HTTP::Server::Simple: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-JA-TFIDF
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Getopt::Long: 0
+  HTML::Feature: 0
+  Term::ReadLine: 0
+  YAML::Sync: 0
+requires:
+  Carp: 0
+  Class::Accessor::Fast: 0
+  Class::Data::Inheritable: 0
+  HTML::Feature: 0
+  LWP::UserAgent: 0
+  List::MoreUtils: 0
+  Storable: 0
+  Text::MeCab: 0
+  XML::TreePP: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.00004

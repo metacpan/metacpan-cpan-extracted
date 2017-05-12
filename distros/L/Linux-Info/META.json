@@ -1,0 +1,131 @@
+{
+   "abstract" : "API in Perl to recover information about the running Linux OS",
+   "author" : [
+      "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Linux-Info",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008009"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "English" : "0",
+            "File::Spec" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::Perl::Critic" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor" : "0.34",
+            "Filesys::Df" : "0.92",
+            "Hash::Util" : "0.16",
+            "POSIX" : "1.32",
+            "Set::Tiny" : "0.01",
+            "Time::HiRes" : "1.9725",
+            "YAML::XS" : "0.41",
+            "perl" : "5.008009"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008009"
+         }
+      }
+   },
+   "provides" : {
+      "Linux::Info" : {
+         "file" : "lib/Linux/Info.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::Compilation" : {
+         "file" : "lib/Linux/Info/Compilation.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::CpuStats" : {
+         "file" : "lib/Linux/Info/CpuStats.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::DiskStats" : {
+         "file" : "lib/Linux/Info/DiskStats.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::DiskUsage" : {
+         "file" : "lib/Linux/Info/DiskUsage.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::FileStats" : {
+         "file" : "lib/Linux/Info/FileStats.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::LoadAVG" : {
+         "file" : "lib/Linux/Info/LoadAVG.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::MemStats" : {
+         "file" : "lib/Linux/Info/MemStats.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::NetStats" : {
+         "file" : "lib/Linux/Info/NetStats.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::PgSwStats" : {
+         "file" : "lib/Linux/Info/PgSwStats.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::ProcStats" : {
+         "file" : "lib/Linux/Info/ProcStats.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::Processes" : {
+         "file" : "lib/Linux/Info/Processes.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::SockStats" : {
+         "file" : "lib/Linux/Info/SockStats.pm",
+         "version" : "1.1"
+      },
+      "Linux::Info::SysInfo" : {
+         "file" : "lib/Linux/Info/SysInfo.pm",
+         "version" : "1.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/glasswalk3r/Linux-Info/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/glasswalk3r/Linux-Info.git",
+         "web" : "https://github.com/glasswalk3r/Linux-Info"
+      }
+   },
+   "version" : "1.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

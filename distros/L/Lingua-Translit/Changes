@@ -1,0 +1,203 @@
+0.27  -- 2017-04-26
+
+    * Added "BGN/PCGN RUS Standard" and "BGN/PCGN RUS Strict"
+      transliterations. Thanks to Nikola Lečić for contributing these tables!
+
+0.26  -- 2016-05-23
+
+    * Spelling corrections in man page - thanks to Lucas Kanashiro for
+      providing a patch!
+    * Maintainership passed from Lingua-Systems to Netzum Sorglos.
+    * developer-manual__eng.pdf: removed - the documentation is now available
+      online (see link in Lingua::Translit's man page).
+
+0.25  -- 2016-04-05
+
+    * Changed license terms from GPL v2/Artistic to Perl's license terms.
+    * Added "IAST Devanagari" and "Devanagari IAST" transliterations. Thanks
+      to Philip Kime for contributing these tables!
+
+0.24  -- 2015-11-25
+
+    * Define POD encoding (UTF-8) - thanks to Lucas Kanashiro and
+      Mohammad Sajid Anwar for reporting this issue!
+
+0.23  -- 2015-11-23
+
+    * Added "ISO 8859-16 RON" transliteration. Thanks to Ștefan Suciu for
+      contributing this table!
+
+0.22  -- 2015-07-07
+
+    * Added "ISO/R 9" transliteration (ISO/R 9:1954). Thanks to Dusan Vuckovic
+      for contributing this table!
+
+0.21  -- 2014-10-24
+
+    * Added "Common ARA" Arabic transliteration. Thanks to Ahmed Elsheshtawy
+      for suggesting this transliteration and his help implementing it!
+
+0.20  -- 2014-05-22
+
+    * lib/Lingua/Translit/Tables.pm: Added sub to handle Perl's
+      "Unicode Bug", see perlunicode for details (v0.10). This fixes the
+      errors reported by Perl v5.18.0.
+    * MANIFEST: Added missing "ALA-LC RUS" files to distribution.
+    * xml/: Removed "Common Classical MON" transliteration due to errors
+      and contributors lack of time to fix these.
+    * Code cleanups
+
+0.19  -- 2011-04-15
+
+    * Added "ALA-LC RUS" transliteration (ALA-LC:1997). Thanks to Dmitry Smal
+      and Rusar Publishing for contributing this table!
+
+0.18  -- 2010-07-29
+
+    * Added transliterations:
+        * "GOST 7.79 RUS OLD" (GOST 7.79:2000 B, support for Old Russian)
+        * "GOST 7.79 RUS"     (GOST 7.79:2000 B, reversible)
+        * "GOST 7.79 UKR"     (GOST 7.79:2000 B, reversible)
+    * lib/Lingua/Translit/Tables.pm: Improved translit_list_supported()
+      output (v0.9)
+    * translit: Minor improvements (v0.4)
+    * tools/substitute_tables.pl: Typo fixed
+
+0.17  -- 2010-01-20
+
+    * Added "DIN 1460 UKR" transliteration
+    * xml/din_1460_rus.xml: Hard and soft sign improvements
+    * t/23_tr_DIN_1460_RUS.t: Added all caps hard sign test
+
+0.16  -- 2010-01-04
+
+    * Added "DIN 1460 RUS" transliteration
+    * MANIFEST.SKIP: Added to ignore .git
+    * t/01_Lingua-Translit-Tables.t: Added various tests to verify any
+      supported transliteration can be referenced by a couple of variants
+      of their names, i.e. "Common DEU", "common_deu", "COMMON DEU" or
+      "common deu".
+    * t/11_tr_Common_DEU.t: Added decoded UTF-8 input tests
+    * Replaced HTML developer manual with a PDF version
+
+0.15  -- 2009-10-19
+
+    * Added support for the current development version of Perl (5.11) by
+      using named Unicode properties instead of POSIX character classes
+      within any context dependent transliteration rule.
+      The following transliteration tables are affected:
+        * xml/din_1460_bul.xml
+        * xml/iso_9.xml
+        * xml/streamlined_system_bul.xml
+      Closes #50613. Thanks to Andreas Koenig for reporting this issue.
+    * xml/template.xml: Added some more examples, added missing closing tag.
+    * lib/Lingua/Translit/Tables.pm, xml/xml2dump.pl: To increase robustness
+      and ease of use, tables are now associated with an identifier instead
+      of their names.
+    * Removed "utf8" and "bytes" pragmas.
+    * Updated indent of all transliteration tables.
+
+0.14  -- 2009-10-16
+
+    * Added Win32 support. (Closes #49544)
+      Please note that a Unix-like environment is still required to develop
+      transliteration tables using the provided set of tools.
+    * t/03_translit.t: Use $^X rather than relying on the shebang
+    * Various trivial fixes, code cleanups and hyperlink updates
+    * xml/manual/manual.pod: Added missing markup
+
+0.13  -- 2008-04-29
+
+    * Added developer manual covering the addition of own transliteration
+      tables (xml/manual/).
+    * Added test template (t/xx_tr_template.t.pl)
+    * Makefile.PL:
+        * Added "manual" target
+        * Suited MSWin32 check for CPAN Testers tools
+
+0.12 -- 2008-04-23
+
+    * Added common Polish transliteration ("Common POL")
+
+0.11 -- 2008-04-21
+
+    * xml/din_1460_bul.xml: changed transliteration of SOFT SIGN to plain
+      ASCII apostrophe.
+    * New transliterations:
+        * Common SLK (Slovak)
+        * Common SLV (Slovenian)
+
+0.10 -- 2008-04-17
+
+    * lib/Lingua/Translit.pm, xml/translit.dtd: Contexts can now contain two
+      patterns at a time (before and after). These are combined using AND
+      logics and therefore act as a logical "inbetween".
+    * xml/xml2dump.pl: Switched from XML::Simple to XML::LibXML in order to
+      prevent loss of whitespace charactes like U+180E.
+    * xml/greeklish.xml: GREEK CAPITAL LETTER UPSILON WITH DIALYTIKA (U+03AB)
+      bug fixed.
+    * t/13_tr_Greeklish.t: Added test for upsilon bugfix.
+    * Added two transliterations for Bulgarian:
+        * DIN 1460
+        * Streamlined System
+
+0.09 -- 2008-04-09
+
+    * Added Mongolian transliteration "Common Classical MON". Thanks to
+      Bayanzul Lodoysamba (baynaa@users.sourceforge.net) for contributing
+      this table!
+    * lib/Lingua/Translit.pm: "from" and "to" transliteration patterns are
+      now evaluated literally only (within \Q and \E).
+    * lib/Lingua/Translit/Tables.pm: Removed verbose package information from
+      translit_list_supported()
+    * translit: Display Lingua::Translit's version if show_list() is called
+    * translit: For convenience, every underscore in a transliteration's name
+      is substituted by a blank.
+    * Makefile.PL: Exit with a hint on MSWin32 rather than dying in
+      t/03_translit.t
+    * xml/xml2dump.pl: workaround for discarded U+180E character (see l.85)
+    * Added a transliteration table template (xml/template.xml)
+
+0.08 -- 2008-03-31
+
+    * Added common Czech transliteration "Common CES"
+
+0.07 -- 2008-03-21
+
+    * Fixed a wrong codepoint in an ISO 843 rule.
+
+0.06 -- 2008-03-21
+
+    * Fixed a wrong codepoint in a DIN 31634 rule.
+
+0.05 -- 2008-03-10
+
+    * Renamed "DIN 5008" to "Common DEU" as the DIN norm doesn't cover the
+      transliteration explicitly.
+
+0.04 -- 2008-02-28
+
+    * Added common Romanian transliteration ("Common RON")
+    * Updated Makefile.PL to use tools/substitute_tables.pl to read a
+      transliteration table dump and substitute a placeholder line in
+      lib/Lingua/Translit/Tables.pm with it.
+
+0.03 -- 2008-02-25
+
+    * Added DIN 31634 (1982)
+    * Test fixes (require Perl 5.8 if the "utf8" pragma is used)
+
+0.02 -- 2008-02-18
+
+    * Added Greeklish
+    * Code cleanup
+
+0.01 -- 2008-02-13
+
+    * Initial release
+    * Set of supported transliterations:
+        * ISO 9
+        * ISO 843
+        * DIN 5008
+
+# vim: set ft=changelog sw=4 sts=4 ts=4 ai et:

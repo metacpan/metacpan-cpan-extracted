@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alpino_ds version="1.3">
+  <node begin="0" cat="top" end="33" id="0" rel="top">
+    <node begin="8" end="9" frame="punct(punt_komma)" id="1" lcat="punct" pos="punct" rel="--" root=";" sense=";" special="punt_komma" word=";"/>
+    <node begin="0" cat="du" end="32" id="2" rel="--">
+      <node begin="0" cat="smain" end="8" id="3" rel="dp">
+        <node begin="0" cat="pp" end="3" id="4" rel="mod">
+          <node begin="0" end="1" frame="preposition(voor,[aan,door,uit,[in,de,plaats]])" id="5" lcat="pp" pos="prep" rel="hd" root="voor" sense="voor" word="Voor"/>
+          <node begin="1" cat="np" end="3" id="6" rel="obj1">
+            <node begin="1" end="2" frame="determiner(de)" id="7" infl="de" lcat="detp" pos="det" rel="det" root="de" sense="de" word="de"/>
+            <node begin="2" end="3" frame="noun(de,mass,sg)" gen="de" id="8" lcat="np" num="sg" pos="noun" rel="hd" root="onafhankelijkheid" sense="onafhankelijkheid" word="onafhankelijkheid"/>
+          </node>
+        </node>
+        <node begin="3" end="4" frame="verb(unacc,past(sg),copula)" id="9" infl="sg" lcat="smain" pos="verb" rel="hd" root="ben" sc="copula" sense="ben" tense="past" word="was"/>
+        <node begin="4" end="5" frame="proper_name(both,'LOC')" id="10" lcat="np" neclass="LOC" num="both" pos="name" rel="su" root="Bangalore" sense="Bangalore" word="Bangalore"/>
+        <node begin="5" cat="np" end="8" id="11" rel="predc">
+          <node begin="5" end="6" frame="determiner(een)" id="12" infl="een" lcat="detp" pos="det" rel="det" root="een" sense="een" word="een"/>
+          <node aform="base" begin="6" end="7" frame="adjective(e)" id="13" infl="e" lcat="ap" pos="adj" rel="mod" root="belangrijk" sense="belangrijk" vform="adj" word="belangrijke"/>
+          <node begin="7" end="8" frame="noun(de,count,sg)" gen="de" id="14" lcat="np" num="sg" pos="noun" rel="hd" root="industriestad" sense="industriestad" word="industriestad"/>
+        </node>
+      </node>
+      <node begin="9" cat="conj" end="32" id="15" rel="dp">
+        <node begin="9" cat="smain" end="22" id="16" rel="cnj">
+          <node begin="11" end="12" frame="verb(unacc,sg_heeft,aux_psp_zijn)" id="17" infl="sg_heeft" lcat="smain" pos="verb" rel="hd" root="ben" sc="aux_psp_zijn" sense="ben" tense="present" word="is"/>
+          <node begin="12" end="13" frame="determiner(het,nwh,nmod,pro,nparg,wkpro)" id="18" index="1" infl="het" lcat="np" pos="det" rel="su" root="het" sense="het" wh="nwh" word="het"/>
+          <node begin="9" cat="ppart" end="22" id="19" rel="vc">
+            <node begin="9" cat="ap" end="11" id="20" index="2" rel="mod">
+              <node aform="compar" begin="9" end="10" frame="adjective(meer)" id="21" infl="meer" lcat="ap" pos="adj" rel="mod" root="meer" sense="meer" vform="adj" word="meer"/>
+              <node aform="base" begin="10" end="11" frame="adjective(no_e(tmpadv))" id="22" infl="no_e" lcat="ap" pos="adj" rel="hd" root="recent" sense="recent" vform="adj" word="recent"/>
+            </node>
+            <node begin="12" end="13" id="23" index="1" rel="su"/>
+            <node begin="13" cat="np" end="21" id="24" rel="predc">
+              <node begin="13" end="14" frame="determiner(een)" id="25" infl="een" lcat="detp" pos="det" rel="det" root="een" sense="een" word="een"/>
+              <node aform="base" begin="14" end="15" frame="adjective(no_e(adv))" id="26" infl="no_e" lcat="ap" pos="adj" rel="mod" root="belangrijk" sense="belangrijk" vform="adj" word="belangrijk"/>
+              <node begin="15" end="16" frame="noun(het,count,sg)" gen="het" id="27" lcat="np" num="sg" pos="noun" rel="hd" root="centrum" sense="centrum" word="centrum"/>
+              <node begin="16" cat="pp" end="21" id="28" rel="mod">
+                <node begin="16" end="17" frame="preposition(van,[af,uit,vandaan,[af,aan]])" id="29" lcat="pp" pos="prep" rel="hd" root="van" sense="van" word="van"/>
+                <node begin="17" cat="np" end="21" id="30" rel="obj1">
+                  <node begin="17" end="18" frame="determiner(de)" id="31" infl="de" lcat="detp" pos="det" rel="det" root="de" sense="de" word="de"/>
+                  <node begin="18" end="19" frame="noun(de,count,sg)" gen="de" id="32" lcat="np" num="sg" pos="noun" rel="hd" root="informatie_technologie" sense="informatie_technologie" word="informatietechnologie"/>
+                  <node begin="19" cat="pp" end="21" id="33" rel="mod">
+                    <node begin="19" end="20" frame="preposition(in,[])" id="34" lcat="pp" pos="prep" rel="hd" root="in" sense="in" word="in"/>
+                    <node begin="20" end="21" frame="proper_name(both,'LOC')" id="35" lcat="np" neclass="LOC" num="both" pos="name" rel="obj1" root="India" sense="India" word="India"/>
+                  </node>
+                </node>
+              </node>
+            </node>
+            <node begin="21" end="22" frame="verb(unacc,psp,copula)" id="36" infl="psp" lcat="ppart" pos="verb" rel="hd" root="word" sc="copula" sense="word" word="geworden"/>
+          </node>
+        </node>
+        <node begin="22" end="23" frame="conj(en)" id="37" lcat="vg" pos="vg" rel="crd" root="en" sense="en" word="en"/>
+        <node begin="9" cat="smain" end="32" id="38" rel="cnj">
+          <node begin="23" end="24" frame="verb(unacc,sg3,passive)" id="39" infl="sg3" lcat="smain" pos="verb" rel="hd" root="word" sc="passive" sense="word" tense="present" word="wordt"/>
+          <node begin="24" end="25" frame="determiner(het,nwh,nmod,pro,nparg,wkpro)" id="40" index="3" infl="het" lcat="np" pos="det" rel="su" root="het" sense="het" wh="nwh" word="het"/>
+          <node begin="9" cat="ppart" end="32" id="41" rel="vc">
+            <node begin="9" end="11" id="42" index="2" rel="mod"/>
+            <node begin="24" end="25" id="43" index="3" rel="obj1"/>
+            <node aform="base" begin="25" end="26" frame="adjective(pred(adv))" id="44" infl="pred" lcat="ap" pos="adj" rel="mod" root="wel" sense="wel" vform="adj" word="wel"/>
+            <node begin="26" cat="np" end="31" id="45" rel="predc">
+              <node begin="26" end="27" frame="determiner(de)" id="46" infl="de" lcat="detp" pos="det" rel="det" root="de" sense="de" word="de"/>
+              <node begin="27" cat="mwu" end="29" id="47" mwu_root="Silicon_Valley" mwu_sense="Silicon_Valley" rel="hd">
+                <node begin="27" end="28" frame="proper_name(both,'LOC')" id="48" lcat="np" neclass="LOC" num="both" pos="name" rel="mwp" root="Silicon" sense="Silicon" word="Silicon"/>
+                <node begin="28" end="29" frame="proper_name(both,'LOC')" id="49" lcat="np" neclass="LOC" num="both" pos="name" rel="mwp" root="Valley" sense="Valley" word="Valley"/>
+              </node>
+              <node begin="29" cat="pp" end="31" id="50" rel="mod">
+                <node begin="29" end="30" frame="preposition(van,[af,uit,vandaan,[af,aan]])" id="51" lcat="pp" pos="prep" rel="hd" root="van" sense="van" word="van"/>
+                <node begin="30" end="31" frame="proper_name(both,'LOC')" id="52" lcat="np" neclass="LOC" num="both" pos="name" rel="obj1" root="India" sense="India" word="India"/>
+              </node>
+            </node>
+            <node begin="31" end="32" frame="verb(hebben,psp,pred_np)" id="53" infl="psp" lcat="ppart" pos="verb" rel="hd" root="noem" sc="pred_np" sense="noem" word="genoemd"/>
+          </node>
+        </node>
+      </node>
+    </node>
+    <node begin="32" end="33" frame="punct(punt)" id="54" lcat="punct" pos="punct" rel="--" root="." sense="." special="punt" word="."/>
+  </node>
+  <sentence>Voor de onafhankelijkheid was Bangalore een belangrijke industriestad ; meer recent is het een belangrijk centrum van de informatietechnologie in India geworden en wordt het wel de Silicon Valley van India genoemd .</sentence>
+  <comments>
+    <comment>Q#97339-4-1|Voor de onafhankelijkheid was Bangalore een belangrijke industriestad ; meer recent is het een belangrijk centrum van de informatietechnologie in India geworden en wordt het wel de Silicon Valley van India genoemd .|1|1|4.7309263761966465</comment>
+  </comments>
+</alpino_ds>

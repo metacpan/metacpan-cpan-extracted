@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+
+<!--
+
+  Transliteration definitions for Slovenian diacritics
+
+  Copyright (C) 2008 Rona Linke <rlinke@lingua-systems.com>
+  Copyright (C) 2009 Lingua-Systems Software GmbH
+
+-->
+
+
+<translit>
+
+    <name>Common SLV</name>
+    <desc>Slovenian without diacritics</desc>
+    <reverse>false</reverse>
+
+    <!-- set of transliteration rules -->
+    <!--
+    This transliteration is a simple mapping of characters with
+    diacritics to the same character without a diacritic in
+    hex notation of Unicode codepoints. (Letter names according
+    to Unicode Standard 5.0)
+    Abbreviations:
+    LCL = LATIN CAPITAL LETTER
+    LSL = LATIN SMALL LETTER
+ -->
+
+    <rules>
+
+        <rule>
+            <from>&#x010C;</from>	    <!-- LCL C WITH CARON  -->
+            <to>C</to>
+        </rule>
+
+        <rule>
+            <from>&#x010D;</from>	    <!-- LSL C WITH CARON  -->
+            <to>c</to>
+        </rule>
+
+        <rule>
+            <from>&#x0160;</from>	    <!-- LCL S WITH CARON  -->
+            <to>S</to>
+        </rule>
+
+        <rule>
+            <from>&#x0161;</from>	    <!-- LSL S WITH CARON  -->
+            <to>s</to>
+        </rule>
+
+        <rule>
+            <from>&#x017D;</from>	    <!-- LCL Z WITH CARON -->
+            <to>Z</to>
+        </rule>
+
+        <rule>
+            <from>&#x017E;</from>	    <!-- LSL Z WITH CARON -->
+            <to>z</to>
+        </rule>
+
+    </rules>
+
+</translit>
+
+<!--
+  vim: sts=4 sw=4 ai et
+-->

@@ -1,0 +1,25 @@
+Changes
+Ident.pm
+MANIFEST
+Makefile.PL
+README
+data/sample.de
+data/sample.de.utf-8
+data/sample.en
+data/sample.fr
+data/sample.it
+data/sample.ko
+data/sample.ko.utf-8
+data/sample.zh
+samples/sample.de
+samples/sample.en
+samples/sample.fr
+samples/sample.it
+samples/sample.ko
+samples/sample.zh
+liddemo
+t/00_load.t
+t/01_basic.t
+t/02_bench.t
+trainlid
+META.yml                                 Module meta-data (added by MakeMaker)

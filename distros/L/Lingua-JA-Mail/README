@@ -1,0 +1,29 @@
+Lingua/JA/Mail version 0.03
+===========================
+
+ This module is used to compose mail with Japanese charset.
+
+INSTALLATION
+
+ To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ This module requires perl5.8 or later.
+ And,
+ this module requires these other modules and libraries:
+
+   Encode
+   MIME::Base64
+
+COPYRIGHT AND LICENCE
+
+ Copyright (c) 2003-2005 Masanori HATA. All rights reserved.
+
+ This library is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

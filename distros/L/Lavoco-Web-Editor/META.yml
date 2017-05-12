@@ -1,0 +1,38 @@
+---
+abstract: 'FastCGI app to edit flat-files.'
+author:
+  - 'Rob Brown <rob@intelcompute.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lavoco-Web-Editor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper: '0'
+  DateTime: '0'
+  Digest::SHA1: '0'
+  Encode: '0'
+  FCGI: '0'
+  File::Slurp: '0'
+  FindBin: '0'
+  JSON: '0'
+  Log::AutoDump: '0'
+  Moose: '0'
+  Plack::Handler::FCGI: '0'
+  Plack::Request: '0'
+  Template: '0'
+  Term::ANSIColor: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+version: '0.07'

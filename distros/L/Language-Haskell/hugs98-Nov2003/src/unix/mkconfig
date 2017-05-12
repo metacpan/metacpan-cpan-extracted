@@ -1,0 +1,29 @@
+#!/bin/sh
+
+cat <<EOF 
+Running autoconf to generate ./configure script
+
+EOF
+
+
+echo "<<<<"
+autoconf
+echo ">>>>"
+
+cat <<EOF
+
+Running autoheader to generate ../config.h.in
+
+EOF
+
+
+echo "<<<<"
+autoheader
+echo ">>>>"
+
+cat <<EOF
+
+You can now run ./configure to configure hugs for Un*x machines
+EOF
+
+

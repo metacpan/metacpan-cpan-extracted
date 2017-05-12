@@ -1,0 +1,39 @@
+--- #YAML:1.0
+name:               Linux-DVB-DVBT-Apps-QuartzPVR
+version:            0.07
+abstract:           PVR Application 
+author:
+    - Steve Price <cpan@quartz-net.co.uk>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    App::Framework:       0
+    Config::Crontab:      0
+    Data::Dumper:         0
+    Date::Manip:          0
+    DBD::mysql:           0
+    DBI:                  0
+    File::Basename:       0
+    File::Path:           0
+    File::Spec:           0
+    Linux::DVB::DVBT:     2.11
+    Linux::DVB::DVBT::Advert:  0
+    Linux::DVB::DVBT::TS:  0
+    MP3::Tag:             0
+    Net::Server::Fork:    0
+    Pod::Coverage:        0.18
+    POSIX:                0
+    Test::Pod:            1.22
+    Test::Pod::Coverage:  1.08
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

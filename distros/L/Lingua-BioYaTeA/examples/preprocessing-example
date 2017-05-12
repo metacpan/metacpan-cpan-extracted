@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use File::Basename;
+use Lingua::BioYaTeA::PreProcessing;
+
+my $fh;
+
+my $in_file = "sampleBio1.ttg";
+my $out_file = "sampleBio1-prepro.ttg";
+
+warn "Creating Pre-processor\n";
+my $preProc = Lingua::BioYaTeA::PreProcessing->new();
+
+warn "\n";
+open($fh, ">$out_file") or die "can not open file $out_file to record corrected file";
+warn "Correcting input data from $in_file\n";
+warn "and recording correctied output data into $out_file...\n";
+$preProc->process_file($in_file, $fh);
+close($fh);
+warn "\n...done\n";
+

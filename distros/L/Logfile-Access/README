@@ -1,0 +1,128 @@
+Access(3)             User Contributed Perl Documentation            Access(3)
+
+
+
+NNAAMMEE
+       Logfile::Access - Perl extension for common log format web server logs
+
+SSYYNNOOPPSSIISS
+         use Logfile::Access;
+
+               my $log = new Logfile::Access;
+
+               open (IN, $filename);
+               while (<IN>)
+               {
+                 $log->parse($_);
+                 warn $log->remote_host;
+                 }
+               close IN;
+
+AABBSSTTRRAACCTT
+               A module for parsing common log format web server access log files.
+
+DDEESSCCRRIIPPTTIIOONN
+               new() - defines new logfile row object
+
+               load_mime_types() - loads mime types for filename extensions
+
+               parse() - parses a common log format row
+
+               print() - outputs the data to a common log format row
+
+       rreemmoottee__hhoosstt rreellaatteedd ffuunnccttiioonnss
+
+               class_a() - returns the Class A of the remote_host
+
+               class_b() - returns the Class B of the remote_host
+
+               class_c() - returns the Class C of the remote_host
+
+               tld() - returns the top level domain of the remote_host
+
+               country_name() - returns the country name
+
+               domain() - return the domain of the remote_host
+
+               remote_host() - returns / sets the remote host
+
+       aauutthheennttiiccaattiioonn rreellaatteedd ffuunnccttiioonnss
+
+               logname() - returns / sets the logname
+
+               user() - returns / sets the user name
+
+       ddaattee aanndd ttiimmee rreellaatteedd ffuunnccttiioonnss
+
+               date() - returns / sets the CLF date
+
+               mday() - returns / sets the day of the month
+
+               month() - returns / sets the abbreviated name of the month
+
+               year() - returns / sets the year
+
+               time() - returns / sets the time
+
+               hour() - returns / sets the hour
+
+               minute() - returns / sets the minute
+
+               second() - returns / sets the seconds
+
+               offset() - returns / sets the GMT offset
+
+       rreeqquueesstt oobbjjeecctt rreellaatteedd ffuunnccttiioonnss
+
+               method() - returns / sets the request method
+
+               scheme() - returns the request object scheme
+
+               query_string() - returns the query string from the requets object
+
+               path() - returns the object path
+
+               mime_type() - returns the object mime type
+
+               unescape_object() - returns the unescaped object string
+
+               escape_object() - returns the escaped object string
+
+               object() - returns / sets the requets object
+
+               protocol() - returns / sets the request protocol
+
+       rreessppoonnssee ccooddee rreellaatteedd ffuunnccttiioonnss
+
+               response_code() - returns / sets the numeric response code
+
+               content_length() - returns / sets the content length in bytes
+
+               http_referer() - returns / sets the http referer
+
+               http_user_agent() - returns / sets the http user agent string
+
+       EEXXPPOORRTT
+
+       None by default.
+
+PPRREERREEQQUUIISSIITTEESS
+               use Locale::Country;
+               use URI;
+               use URI::Escape;
+
+SSEEEE AALLSSOO
+       http://www.apache.org/
+
+AAUUTTHHOORR
+       David Tiberio, <dtiberio5@hotmail.com>
+
+CCOOPPYYRRIIGGHHTT AANNDD LLIICCEENNSSEE
+       Copyright 2004 David Tiberio, dtiberio5@hotmail.com
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+
+
+perl v5.8.0                       2004-10-24                         Access(3)

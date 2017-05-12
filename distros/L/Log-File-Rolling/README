@@ -1,0 +1,83 @@
+NAME
+    Log::File::Rolling - Log to date/time-stamped files
+
+SYNOPSIS
+      use Log::File::Rolling;
+
+      my $logger = Log::File::Rolling->new(
+                       filename => 'myapp.%Y-%m-%d.log',
+                       current_symlink => 'myapp.log.current',
+                       timezone => 'localtime',
+                   );
+
+      $logger->log("My log message\n");
+
+ABSTRACT
+    This module provides an object for logging to files. The log file will
+    be "rolled" over to the next file whenever the filename changes
+    according to the "filename" format parameter. When this occurs, an
+    optional "current_symlink" file will be pointed to the current file.
+
+DESCRIPTION
+    This module was forked from the Log::Dispatch::File::Rolling to add the
+    symlink feature and fix a few other minor issues (see the "Changes" file
+    for details).
+
+    Similar to the original, this module should also have these properties:
+
+    fork()-safe
+        This module will close and re-open the logfile after a fork.
+
+    multitasking-safe
+        This module uses flock() to lock the file while writing to it.
+
+    stamped filenames
+        This module's "stamped" filenames are rendered with Time::Piece's
+        "strftime" function. By default it uses "gmtime" for UTC timestamps,
+        but this can be changed by passing "localtime" into the
+        constructor's "timezone" parameter (see the synopsis).
+
+        NOTE: Because of a caching optimisation, files should not be rotated
+        more often than once per second.
+
+    current symlinks
+        If you pass in "current_symlink" to the constructor, it will create
+        a symlink at your provided filename. This symlink will always link
+        to the most recent log file. You can then use "tail -F" to monitor
+        an application's logs with no interruptions even when the filename
+        rolls over.
+
+METHODS
+    new()
+        Constructs an object. An empty file will be created at this point.
+
+    log()
+        Takes a message as an argument which will be stringified and
+        appended to the current file.
+
+SEE ALSO
+    The Log-File-Rolling github repo
+    <https://github.com/hoytech/Log-File-Rolling>
+
+    Log::Dispatch::File::Rolling
+
+    Looking for functionality like log-levels and message time-stamping?
+    Check out Log::Defer.
+
+AUTHOR
+    M. Jacob, <jacob@j-e-b.net>
+
+    This module was forked from Log::Dispatch::File::Rolling by Doug Hoyte.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2003, 2004, 2007, 2010, 2013 M. Jacob <jacob@j-e-b.net>,
+    2016 Doug Hoyte
+
+    Based on:
+
+      Log::Dispatch::File::Stamped by Eric Cholet <cholet@logilune.com>
+      Log::Dispatch::FileRotate by Mark Pfeiffer, <markpf@mlp-consulting.com.au>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

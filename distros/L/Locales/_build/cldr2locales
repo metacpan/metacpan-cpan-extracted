@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+
+use lib '_build';
+use _locales_build_utils;
+
+my ( $cldr_db_path, $locales_db ) = _locales_build_utils::init_paths_from_argv();
+
+print "Starting 'en' ...\n";
+system( './_build/cldr2en', $cldr_db_path, $locales_db ) == 0 || die "Could not build 'en'";
+
+require Locales::DB::Language::en;
+
+my $text_direction_map = {
+    'en' => $Locales::DB::Language::en::misc_info{'orientation'}{'characters'},
+};
+my $native_map = {
+    'en' => $Locales::DB::Language::en::code_to_name{'en'},
+};
+my $name_pattern = {
+    'en' => $Locales::DB::Language::en::misc_info{'cldr_formats'}{'locale'},
+};
+
+my %isfallback;
+my @plural_forms;
+for my $tag ( sort keys %Locales::DB::Language::en::code_to_name ) {
+    if ( $tag eq 'en' ) {
+        my $en = Locales->new('en');
+        push @plural_forms, { 'tag' => $tag, 'csv' => join( ', ', $en->get_plural_form_categories() ), 'zero_is_not_other' => ( $en->get_plural_form(0) ne 'other' ? 1 : 0 ) };
+        next;
+    }
+
+    print "Starting '$tag' ...\n";
+    if ( _locales_build_utils::get_xml_file_for( $tag, 1 ) ) {
+        system( './_build/en2mod', $cldr_db_path, $locales_db, $tag ) == 0 || die "Could not build '$tag'";
+    }
+    else {
+        print "No XML file for $tag\n";
+    }
+
+    if ( my $loc = Locales->new($tag) ) {
+        no strict 'refs';
+        $text_direction_map->{$tag} = ${"Locales::DB::Language::$tag\::misc_info"}{'orientation'}{'characters'};
+        $native_map->{$tag}         = $loc->get_language_from_code($tag);
+        $name_pattern->{$tag}       = ${"Locales::DB::Language::$tag\::misc_info"}{'cldr_formats'}{'locale'};
+        push @plural_forms, { 'tag' => $tag, 'csv' => join( ', ', $loc->get_plural_form_categories() ), 'zero_is_not_other' => ( $loc->get_plural_form(0) ne 'other' ? 1 : 0 ) };
+    }
+    else {
+        $text_direction_map->{$tag} = $text_direction_map->{'en'};                                        # default to 'en' since $tag has no data in CLDR
+        $native_map->{$tag}         = $Locales::DB::Language::en::code_to_name{$tag};                     # default to 'en' since $tag has no data in CLDR
+        $name_pattern->{$tag}       = $Locales::DB::Language::en::misc_info{'cldr_formats'}{'locale'};    # default to 'en' since $tag has no data in CLDR
+        push @plural_forms, { 'tag' => $tag };
+        $isfallback->{$tag} = 1;
+    }
+}
+
+_locales_build_utils::write_native_module( $native_map, $isfallback );
+
+_locales_build_utils::write_character_orientation_module( $text_direction_map, $isfallback );
+
+_locales_build_utils::write_name_pattern_module( $name_pattern, $isfallback );
+
+_locales_build_utils::write_plural_forms_argument_pod( \@plural_forms, $isfallback );
+
+_locales_build_utils::write_db_loadable_module();
+
+_locales_build_utils::build_javascript_share();
+
+_locales_build_utils::build_manifest();
+
+_locales_build_utils::do_changelog();

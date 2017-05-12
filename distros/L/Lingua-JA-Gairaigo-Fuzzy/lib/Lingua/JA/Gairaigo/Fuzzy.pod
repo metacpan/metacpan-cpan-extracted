@@ -1,0 +1,99 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lingua::JA::Gairaigo::Fuzzy - variant spellings of foreign words in Japanese
+
+=head1 SYNOPSIS
+
+    
+    use utf8;
+    use Lingua::JA::Gairaigo::Fuzzy 'same_gairaigo';
+    my $x = 'メインフレーム';
+    my $y = 'メーンフレーム';
+    if (same_gairaigo ($x, $y)) {
+        print "$x and $y may be the same word.\n";
+    }
+    
+    
+
+
+produces output
+
+    メインフレーム and メーンフレーム may be the same word.
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Lingua-JA-Gairaigo-Fuzzy-0.07/examples/synopsis.pl> in the distribution.)
+
+
+=head1 DESCRIPTION
+
+Given two Japanese gairaigo words (katakana words), guess whether they
+are the same word. Japanese language is somewhat inconsistent in how
+it writes foreign loan words. For example "motor" can be モーター or
+モータ from the English "motor", or モートル from Dutch "motor". This
+module attempts to guess whether two loanwords refer to the same
+thing.
+
+=head1 FUNCTIONS
+
+=head2 same_gairaigo
+
+    my $same = same_gairaigo ('メイン', 'メーン');
+
+This guesses whether the two words are the same. It catches things
+like addition and removal of "ー", "・", "ッ", mixing of elements such
+as "ティ", "テー", "テイ", and "テ", or combinations like "コウ" and 
+"コー".  If the two words appear to be the same, it returns a true
+value. If the two words appear not to be the same, it returns a false
+value.
+
+As of 0.07, the exact checks this makes are not
+documented, so please view the source code to find out the details.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item Lingua::JA::Moji
+
+L<Lingua::JA::Moji/kana2romaji> is used to compute whether a
+particular word ends in one vowel or another.
+
+=item Text::Fuzzy
+
+L<Text::Fuzzy> is used to compare the two katakana words to see what
+similarities there may be between them.
+
+=back
+
+=head1 HISTORY
+
+This module started as a script to help with the checking of duplicate
+entries for the online Japanese dictionaries by Jim Breen, see
+L<http://www.edrdg.org>.
+
+Because this module is intended to deal with natural language, it does
+not guarantee to find a correct answer. Bug reports containing test
+cases are very much appreciated.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2013-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

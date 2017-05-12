@@ -1,0 +1,18 @@
+divideFrases   -- bom para parágrafos separados por linhas em branco
+
+divideFrases2  -- usa como separador <p>
+
+divsent        -- junta os dois anteriores e tem vários opções extra...
+   divsent -stag=frase -ptag=par -ftag=file ... file file...
+
+divideSilabas  --
+
+exemplo        -- texto comprido usado para testes
+
+html2p         -- faz um html segmentado em frases (marcadas com p)
+
+oco            -- exemplos de uso da função oco para calcular o número
+                  de ocorrências. Por exemplo,
+                   ./oco exemplo
+                  que criará
+                   exemplo.out1 e exemplo.out2

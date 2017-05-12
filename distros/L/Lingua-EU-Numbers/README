@@ -1,0 +1,92 @@
+NAME
+    Lingua::EU::Numbers - Converts numbers into Bask (Euskara).
+
+SYNOPSIS
+      # Functional interface 
+      use Lingua::EU::Numbers;
+      my $number = shift;
+      print "The cardinal value of $number is " . cardinal2alpha($number) . " in Euskara.\n";
+      print "The ordinal value of $number is " . ordinal2alpha($number) . " in Euskara.\n";
+
+DESCRIPTION
+    This module converts numbers (cardinals and ordinals) into their
+    Bask (Euskara) equivalents. It accepts positive integers up to, but
+    not including, 1 trillion. Incidentally, the Bask counting system is
+    vigesimal, i.e. base 20.
+
+    The module uses unified Bask (Euskara Batua), which sometimes varies
+    from the Bask spoken in the seven Bask provinces, especially from
+    Labourd (Lapurdi) in the Northen Bask Country (Ipar Euskal Herria).
+    However, Euskara Batua is the official Bask taught in Bask schools
+    (Ikastolak) throughout the seven provinces.
+
+    For example, the cardinal '18' is 'hemezortzi' in Euskara Batua,
+    while it is 'hamazortzi' in Lapurdi. Those who wish to use their own
+    version of Euskara can export %num2alpha and modify it at their own
+    discretion.
+
+    A Bask legend says that even the Devil did not succeed in learning
+    this truly unique language, but that should not deter you from doing
+    so. Euskara is an orphan language of mysterious origins, apparently
+    unrelated to any language anywhere else in the world. It is believed
+    to predate the Indo-European invasion and if so, this is one of the
+    world's most ancient languages.
+
+    Bask people refer to themselves as Euskaldunak, or 'speakers of the
+    Euskara'. Being part of the Bask Nation is a question of language,
+    not ethnicity or place of birth. There is not even a word for 'being
+    a Bask' in Euskara. So if you learn this fascinating language, you
+    too can become Euskaldun.
+
+FUNCTIONS
+    cardinal2alpha($number)
+        This function accepts an integer (scalar) as a parameter and
+        returns a string (array), which is its Bask cardinal equivalent.
+
+        It returns `undef' if a)the argument passed is not defined, or
+        b)the argument is not an integer, or c)the integer passed does
+        not fall between zero and 999,999,999,999.
+
+    ordinal2alpha($number)
+        This function accepts an integer (scalar) as a parameter and
+        returns a string (array), which is its Bask ordinal equivalent.
+
+        It returns `undef' if a)the argument passed is not defined, or
+        b)the argument is not an integer, or c)the integer passed does
+        not fall between zero and 999,999,999,999.
+
+EXPORT
+    This module exports by default the functions cardinal2alpha() and
+    ordinal2alpha(). It can also export the hash %num2alpha.
+
+SOURCE
+    The Bask encyclopedia "Administrazio-hizkeraren entziklopedia" and
+    its web pages referring to Bask numbers (cardinals and ordinals) at:
+    http://www.ivap.com/eusk/entziklo/kardinal.htm and
+    http://www.ivap.com/eusk/entziklo/ordinal.htm.
+
+BUGS AND COMMENTS
+    If you find one, please use the Request Tracker Interface -
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-EU-Numbers to
+    report it.
+
+SEE ALSO
+    Lingua::FR::Numbers, Lingua::Num2Word
+
+THANKS
+    Milesker to Briac Pilpré who gave me the idea for this module, and
+    who also thought about exporting the hash %num2alpha for people
+    wanting to use their own version of Euskara.
+
+    Esker asko to Deric Gerlach who reviewed my English and my overall
+    pod documentation.
+
+AUTHOR
+    Isabelle Hernandez, <isabelle@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2002 by Isabelle Hernandez
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+

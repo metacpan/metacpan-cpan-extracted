@@ -1,0 +1,25 @@
+Changes
+lib/List/BinarySearch.pm
+lib/List/BinarySearch/PP.pm
+Makefile.PL
+MANIFEST            This list of files
+MANIFEST.SKIP
+README
+META.json
+META.yml
+t/00-boilerplate.t
+t/01-manifest.t
+t/02-pod.t
+t/03-pod-coverage.t
+t/04-perlcritic.t
+t/06-changes.t
+t/07-kwalitee.t
+t/09-load-prereqs.t
+t/10-load-can.t
+t/11-search.t
+t/12-positional_searches.t
+t/13-pp.t
+t/14-pp-isa.t
+t/15-xs-isa.t
+t/16-coverage.t
+examples/bsearch.pl

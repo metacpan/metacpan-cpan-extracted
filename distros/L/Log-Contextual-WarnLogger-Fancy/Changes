@@ -1,0 +1,20 @@
+0.002000 2016-06-19
+ - Add support for ordered lists of group prefixes.
+
+0.001003 2016-05-19
+ - Update test logic to employ Test::Needs
+
+0.001002 2016-05-19
+ - Update Git and Bug metadata
+
+0.001001 2016-05-17
+ - Increase runtime dependency on Term::ANSIColor for older cpan
+   clients who get test+runtime missmatch cases wrong.
+
+0.001000 2016-05-15
+ - Initial Release.
+ - QA Tests and travis integration still missing, mostly
+   because I can't be bothered dealing with the complexity mountain
+   that is DZil anymore, and I need to re-engineer all my travis
+   stuff to deal with DZil changes and it all has to stop.
+ - So just report bugs when you find them, thanks.

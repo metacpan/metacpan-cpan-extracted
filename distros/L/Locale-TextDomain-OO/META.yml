@@ -1,0 +1,138 @@
+---
+abstract: 'Locale::TextDomain::OO - Perl OO Interface to Uniforum Message Translation'
+author:
+  - 'Steffen Winkler <steffenw at cpan.org>'
+build_requires:
+  Cwd: '0'
+  Test::Differences: '0.60'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-TextDomain-OO
+provides:
+  Locale::TextDomain::OO:
+    file: lib/Locale/TextDomain/OO.pm
+    version: '1.026'
+  Locale::TextDomain::OO::FunctionalInterface:
+    file: lib/Locale/TextDomain/OO/FunctionalInterface.pm
+    version: '1.000'
+  Locale::TextDomain::OO::JavaScript:
+    file: lib/Locale/TextDomain/OO/JavaScript.pm
+    version: '1.017'
+  Locale::TextDomain::OO::Lexicon::File::MO:
+    file: lib/Locale/TextDomain/OO/Lexicon/File/MO.pm
+    version: '1.026'
+  Locale::TextDomain::OO::Lexicon::File::PO:
+    file: lib/Locale/TextDomain/OO/Lexicon/File/PO.pm
+    version: '1.026'
+  Locale::TextDomain::OO::Lexicon::Hash:
+    file: lib/Locale/TextDomain/OO/Lexicon/Hash.pm
+    version: '1.026'
+  Locale::TextDomain::OO::Lexicon::Role::File:
+    file: lib/Locale/TextDomain/OO/Lexicon/Role/File.pm
+    version: '1.023'
+  Locale::TextDomain::OO::Lexicon::Role::GettextToMaketext:
+    file: lib/Locale/TextDomain/OO/Lexicon/Role/GettextToMaketext.pm
+    version: '1.000'
+  Locale::TextDomain::OO::Lexicon::Role::StoreFile:
+    file: lib/Locale/TextDomain/OO/Lexicon/Role/StoreFile.pm
+    version: '1.017'
+  Locale::TextDomain::OO::Lexicon::Role::StoreFilter:
+    file: lib/Locale/TextDomain/OO/Lexicon/Role/StoreFilter.pm
+    version: '1.017'
+  Locale::TextDomain::OO::Lexicon::StoreJSON:
+    file: lib/Locale/TextDomain/OO/Lexicon/StoreJSON.pm
+    version: '1.026'
+  Locale::TextDomain::OO::Plugin::Expand::BabelFish::Loc:
+    file: lib/Locale/TextDomain/OO/Plugin/Expand/BabelFish/Loc.pm
+    version: '1.025'
+  Locale::TextDomain::OO::Plugin::Expand::Gettext:
+    file: lib/Locale/TextDomain/OO/Plugin/Expand/Gettext.pm
+    version: '1.014'
+  Locale::TextDomain::OO::Plugin::Expand::Gettext::DomainAndCategory:
+    file: lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/DomainAndCategory.pm
+    version: '1.014'
+  Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc:
+    file: lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/Loc.pm
+    version: '1.014'
+  Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc::DomainAndCategory:
+    file: lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/Loc/DomainAndCategory.pm
+    version: '1.014'
+  Locale::TextDomain::OO::Plugin::Expand::Gettext::Named:
+    file: lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/Named.pm
+    version: '1.016'
+  Locale::TextDomain::OO::Plugin::Expand::Maketext:
+    file: lib/Locale/TextDomain/OO/Plugin/Expand/Maketext.pm
+    version: '1.009'
+  Locale::TextDomain::OO::Plugin::Expand::Maketext::Loc:
+    file: lib/Locale/TextDomain/OO/Plugin/Expand/Maketext/Loc.pm
+    version: '1.014'
+  Locale::TextDomain::OO::Plugin::Expand::Maketext::Localise:
+    file: lib/Locale/TextDomain/OO/Plugin/Expand/Maketext/Localise.pm
+    version: '1.014'
+  Locale::TextDomain::OO::Plugin::Expand::Maketext::Localize:
+    file: lib/Locale/TextDomain/OO/Plugin/Expand/Maketext/Localize.pm
+    version: '1.014'
+  Locale::TextDomain::OO::Plugin::Language::LanguageOfLanguages:
+    file: lib/Locale/TextDomain/OO/Plugin/Language/LanguageOfLanguages.pm
+    version: '1.014'
+  Locale::TextDomain::OO::Role::Logger:
+    file: lib/Locale/TextDomain/OO/Role/Logger.pm
+    version: '1.006'
+  Locale::TextDomain::OO::Singleton::Lexicon:
+    file: lib/Locale/TextDomain/OO/Singleton/Lexicon.pm
+    version: '1.026'
+  Locale::TextDomain::OO::Singleton::Translator:
+    file: lib/Locale/TextDomain/OO/Singleton/Translator.pm
+    version: '1.010'
+  Locale::TextDomain::OO::TiedInterface:
+    file: lib/Locale/TextDomain/OO/TiedInterface.pm
+    version: '1.014'
+  Locale::TextDomain::OO::Translator:
+    file: lib/Locale/TextDomain/OO/Translator.pm
+    version: '1.026'
+recommends:
+  Test::Pod: '1.14'
+  Test::Pod::Coverage: '1.04'
+requires:
+  Carp: '0'
+  Class::Load: '0.19'
+  Clone: '0'
+  Encode: '0'
+  English: '0'
+  Hash::Util: '0'
+  JSON: '2.50'
+  JSON::PP: '0'
+  Locale::MO::File: '0.06'
+  Locale::PO: '0.24'
+  Locale::TextDomain::OO::Util: '2.002'
+  Locale::TextDomain::OO::Util::ExtractHeader: '3.006'
+  Locale::TextDomain::OO::Util::JoinSplitLexiconKeys: '0'
+  Locale::Utils::PlaceholderBabelFish: '0.001'
+  Locale::Utils::PlaceholderMaketext: '1.000'
+  Locale::Utils::PlaceholderNamed: '1.000'
+  Moo: '1.003001'
+  Moo::Role: '0'
+  MooX::Singleton: '0'
+  MooX::StrictConstructor: '0'
+  MooX::Types::MooseLike: '0'
+  MooX::Types::MooseLike::Base: '0'
+  Path::Tiny: '0.052'
+  Safe: '0'
+  Tie::Sub: '0.09'
+  Try::Tiny: '0'
+  charnames: '0'
+  namespace::autoclean: '0'
+  perl: '5.008'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.026'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

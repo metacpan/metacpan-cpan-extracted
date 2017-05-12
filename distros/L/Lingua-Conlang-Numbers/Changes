@@ -1,0 +1,23 @@
+Revision history for Perl extension Lingua::Conlang::Numbers
+
+0.04  Sun Mar 14 12:23:25 EDT 2010
+    - added Klingon (tlh) language
+
+0.03  Mon Mar  8 20:47:35 EST 2010
+    - added Esperanto POD translation -- forgot in 0.02
+
+0.02  Sun Mar  7 18:45:23 EST 2010
+    - added example.pl
+    - replaced Module::Install with Module::Build
+    - changed perl required from 5.10 to 5.8.1 (moriya/gardejo)
+    - Esperanto
+      + added support for a million through 999,999 vigintillion, long scale
+      + added POD translation in Esperanto (moriya/gardejo)
+    - Lojban
+      + changed word separator from space to nothing
+    - Toki Pona
+      + changed mute/ale cutoff from 100 to inf (Matthew Martin)
+
+0.01  Mon Mar  1 08:04:37 EST 2010
+    - initial public release
+    - includes Esperanto, Lojban, and Toki Pona

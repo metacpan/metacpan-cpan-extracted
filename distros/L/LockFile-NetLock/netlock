@@ -1,0 +1,164 @@
+#!/usr/bin/perl -w
+
+######################################################################
+#
+# netlock
+#
+# Network lock acquisition utility.  Uses FTP and mutually exclusive
+# directory creation under FTP to provide advisory locking.
+#
+# For program options type program name on a line by itself.
+#
+######################################################################
+
+use strict;
+use warnings;
+use Net::FTP;
+use Getopt::Std;
+
+use vars qw($opt_d $opt_f $opt_h $opt_i $opt_m 
+        $opt_p $opt_s $opt_t $opt_u);
+
+my $mutex_wait_rc;
+
+getopts('df:h:i:m:p:s:t:u:');
+
+unless (scalar(@ARGV) == 2) {
+print <<EOT;
+usage: netlock ftp_host lock_dir
+        options:
+                -d disconnect from FTP after creating lock_dir
+                        (for long held locks)
+                -f FTP heartbeat (should rarely need adjustment).
+                -h frequency in seconds of checking for live parent process
+                        (mnemonic heartbeat)
+                -i set ftp server idle (on systems supporting this feature)
+                -m mutex name on win32 systems
+                -p FTP password
+                -s sleep time between retries of creating lock_dir
+                -t Timeout interval before giving up on creating lock_dir
+                -u FTP user name
+        -f, -h, -s and -t time intervals are in seconds
+        with defaults of 15, 2, 4 and 40 respectively
+EOT
+exit;
+}
+
+$opt_f ||= 15;  # FTP heartbeat does pwd ever $opt_f seconds to prevent timeout
+$opt_h ||= 2;   # heartbeat check of parent default 2 seconds
+$opt_s ||= 4;   # sleep between attempts to create lock default 4 seconds
+$opt_t ||= 40;  # total time to wait to get lock default 40 seconds
+
+my ($host, $dir) = @ARGV;
+
+my $wait_time = $opt_t;
+my $is_infinite = scalar($wait_time =~ /infinite|forever/i);    
+my $is_killed;
+
+$| = 1;  # Don't buffer my STDOUT!
+  
+# Routine to complain that we couldn't get a lock
+sub bye { print @_, "\n"; exit }
+$SIG{'PIPE'} = sub {}; # don't let signal crash program
+$SIG{'INT'} = $SIG{'TERM'} = sub { 
+        print "killed - cleaning up\n";
+        $is_killed = 1;
+};
+
+my $mutex;
+if ($opt_m) {
+        require Win32::Mutex;
+        $mutex = Win32::Mutex->open($opt_m) or
+                bye "Could not open win32 mutex $opt_m: $^E";
+}
+
+# Connect to ftp host and login  
+my $ftp = Net::FTP->new($host)
+        or bye "Can't connect to $host: $@";
+
+$ftp->login( grep(defined $_, ($opt_u, $opt_p)) )
+        or bye "Can't log into account $opt_u\@$host: " . $ftp->message();
+
+if ($opt_i) {
+        ($ftp->site("idle $opt_i") == 2) 
+                or bye "Requested idle setting could not be honored";
+}
+my $locked;
+my $print_rc = 1;
+
+# probably overkill to test for this
+eval{select(undef, undef, undef, 0);};
+my $select_ok = (! $@);
+
+# try to create directory (and thus get lock)
+while ($print_rc && ($wait_time >= 0) && (! $is_killed)) {
+        if( $ftp->mkdir($dir) ) { $locked = 1; last; }
+
+        my $sleep_time = ($wait_time > $opt_s) ? $opt_s : $wait_time;
+        if ($select_ok) {
+                select (undef, undef, undef, $sleep_time);
+        }
+        else {
+                sleep $sleep_time;
+        }
+        $wait_time -= $opt_s unless ($is_infinite);
+        $print_rc = print STDOUT '.';
+}
+
+# $locked not set - we timed out
+unless ($locked) {
+        my $sv_err = $ftp->message();
+        $ftp->quit;
+        exit if ($is_killed);
+        bye "timed out error: $sv_err";
+} 
+
+$ftp->quit if ($opt_d);
+
+print "OK\n"; # tell the parent that we got the lock!
+  
+my $ftp_delay = 0;
+while ($print_rc && (! $is_killed)) {
+        # Don't let the connection time out (unless we disconnected).
+        if (($ftp_delay >= $opt_f) && (! $opt_d)) {
+                $ftp->pwd();
+                $ftp_delay -= $opt_f;
+        }
+
+        if ($opt_m) { # using win32 mutex
+                $mutex_wait_rc = $mutex->wait(1000 * $opt_h);
+                # last unless rc explicitely says time out
+                last unless (defined($mutex_wait_rc) && ($mutex_wait_rc == 0));
+        }
+        else {
+                if ($select_ok) {
+                        select (undef, undef, undef, $opt_h);
+                }
+                else {
+                        sleep $opt_h;
+                }
+                $print_rc = print STDOUT '.';
+                $ftp_delay += $opt_h;
+        }
+}
+
+if ($opt_d) {
+        unless( ($ftp = Net::FTP->new($host))                           &&
+                $ftp->login( grep(defined $_, ($opt_u, $opt_p)) )       ){
+                exit -1;
+        }
+}
+
+# remove the directory and release the lock
+my $rm_rc = $ftp->rmdir($dir);
+# Can only check for return code on recent versions of Net::FTP
+unless($rm_rc || ($Net::FTP::VERSION < 2.64)) {
+        # try one more time
+        unless($ftp->rmdir($dir)) {
+                $ftp->quit;
+                exit -1; #important information - try not to lose it
+        }
+}
+$ftp->quit();
+exit -2 if ($opt_m && !(defined($mutex_wait_rc) && ($mutex_wait_rc == 1)));
+exit;

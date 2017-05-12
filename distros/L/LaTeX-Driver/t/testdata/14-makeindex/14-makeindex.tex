@@ -1,0 +1,21 @@
+% $Id: 14-makeindex.tex 22 2007-09-23 20:35:35Z andrew $
+% Test input file for checking index generation.
+% Do not make gratuitous changes here as the text is checked by the
+% test script 14-makeindex.t.
+
+\documentclass{article}
+\usepackage{makeidx}
+\makeindex
+\date{20 September 2007}
+\author{A.N. Other}
+\title{Simple Test Document 14}
+\begin{document}
+\maketitle
+
+This is a test document that def{}ines the index terms `seal' and `sea
+lion'.  These are the example terms used in the makeindex man page.
+\index{seal}
+\index{sea lion}
+
+\printindex
+\end{document}

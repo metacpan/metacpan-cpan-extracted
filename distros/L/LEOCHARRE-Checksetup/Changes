@@ -1,0 +1,10 @@
+2008-10-30 11:32  cvs
+
+	* t/: 00.t, 01_mysqletc.t: made it so if not root, root tests are
+	  skipped
+
+2008-10-27 14:51  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/Checksetup.pm, t/00.t,
+	  t/01_mysqletc.t, t/99_cleanup.sh: Initial revision
+

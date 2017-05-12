@@ -1,0 +1,292 @@
+# --------------------------------------------------------------------------
+# Makefile for Hugs
+#
+# The Hugs 98 system is Copyright (c) Mark P Jones, Alastair Reid, the
+# Yale Haskell Group, and the OGI School of Science & Engineering at OHSU,
+# 1994-2003, All rights reserved.  It is distributed as
+# free software under the license in the file "License", which is
+# included in the distribution.
+# --------------------------------------------------------------------------
+
+# Targets:
+#
+# <default>:   	  make hugs@EXE@ and runhugs@EXE@
+# libraries:	  generate libraries from fptools raw sources
+#		  (located in $(FPTOOLS))
+# install:	  make and install programs/libraries
+# hugs@EXE@:	  make minimal working system
+# runhugs@EXE@:	  make batch-mode version of Hugs
+# clean:       	  delete files not required in running system
+# distclean:      delete files that can be regenerated using C compiler
+# veryclean:      delete all machine generated files 
+#                   (you need perl, bison/yacc, etc to rebuild these files)
+# check:	  run regression tests
+# TAGS:           build emacs TAGS table
+
+# This rule goes first to make it the default choice
+default		:: hugs@EXE@ runhugs@EXE@ libraries
+
+CC		= @CC@
+CFLAGS		= @CFLAGS@ @DEBUGFLAGS@
+OPTFLAGS	= @OPTFLAGS@
+
+LD		= @LD@
+LDFLAGS    	= @LDFLAGS@  @LDDEBUGFLAGS@
+LIBS		= @LIBS@
+
+YACC		= @YACC@
+RM		= @RM@
+CP		= @CP@
+EXE		= @EXE@
+OBJ		= @OBJ@
+
+FPTOOLS		= @FPTOOLS@
+
+BUILD_DIR	= ../hugsdir
+
+# a file created by make libraries
+LIBRARIES	= $(BUILD_DIR)/libraries/Prelude.hs
+
+# a file created by make include
+INCLUDES	= $(BUILD_DIR)/include/HsFFI.h
+
+# These variables determine where various parts of the Hugs system are
+# installed.  (They are ignored in Windows or DOS.)
+# Binaries are installed in $(bindir); libraries go in $(hugsdir)/libraries
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+bindir		= @bindir@
+libdir		= @libdir@
+datadir		= @datadir@
+mandir          = @mandir@
+hugsdir		= @hugsdir@
+
+.SUFFIXES	:
+.SUFFIXES	: .c .h @OBJ@
+HFILES		= HsFFI.h builtin.h command.h config.h connect.h errors.h \
+		  evaluator.h goal.h machdep.h module.h observe.h options.h \
+		  opts.h output.h prelude.h script.h server.h storage.h \
+		  strutil.h subst.h
+CFILES		= hugs.c runhugs.c server.c edit.c observe.c \
+		  builtin.c compiler.c errors.c evaluator.c \
+		  ffi.c goal.c input.c machdep.c machine.c \
+		  module.c opts.c output.c plugin.c script.c \
+		  static.c storage.c strutil.c subst.c \
+		  type.c version.c
+INCFILES	= array.c bignums.c dirprim.c interns.c iomonad.c \
+		  preds.c printer.c scc.c timeprim.c timer.c
+YFILES		= parser.y
+SOURCES		= $(HFILES) $(CFILES) $(INCFILES) $(YFILES) 
+OBJECTS		= builtin@OBJ@ compiler@OBJ@ errors@OBJ@ evaluator@OBJ@ \
+		  ffi@OBJ@ goal@OBJ@ input@OBJ@ machdep@OBJ@ machine@OBJ@ \
+		  module@OBJ@ opts@OBJ@ output@OBJ@ plugin@OBJ@ script@OBJ@ \
+		  static@OBJ@ storage@OBJ@ strutil@OBJ@ subst@OBJ@ \
+		  type@OBJ@ version@OBJ@
+IOBJECTS	= hugs@OBJ@ edit@OBJ@ observe@OBJ@ $(OBJECTS)
+PRELUDE		= config.h options.h prelude.h script.h
+
+HEADERS		= HsFFI.h config.h platform.h unix/MachDeps.h unix/template-hsc.h
+
+TOOLSDIR	= ../tools
+TOOLS		= $(TOOLSDIR)/Package.hs $(TOOLSDIR)/ParsePkgConf.hs \
+		  $(TOOLSDIR)/get_pkg_field
+
+################################################################
+# Hugs interpreter and standalone evaluator
+################################################################
+
+hugs@EXE@	: $(IOBJECTS) @WOBJECTS@ @RC_FILES@
+		  $(CC) $(LDFLAGS) $(IOBJECTS) @WOBJECTS@ $(LIBS) -o hugs@EXE@ 
+		  @STRIP@
+
+version@OBJ@	: version.c $(SOURCES)
+		  @$(CC) \
+		      -DMONTH_YEAR='"'"`date +'%B %Y' 2> /dev/null`"'"' \
+		      -DYYYYMMDD='"'"`date +'%Y%m%d' 2> /dev/null`"'"' \
+		      -c $(CFLAGS) $(OPTFLAGS) $<
+
+SERVER_OBJECTS	= server@OBJ@ $(OBJECTS) 
+runhugs@EXE@	: runhugs@OBJ@ $(SERVER_OBJECTS)
+		  $(CC) $(LDFLAGS) runhugs@OBJ@ $(SERVER_OBJECTS) $(LIBS) -o runhugs@EXE@
+
+ffihugs@EXE@	: ffihugs@OBJ@ $(SERVER_OBJECTS)
+		  $(CC) $(LDFLAGS) ffihugs@OBJ@ $(SERVER_OBJECTS) $(LIBS) -o ffihugs@EXE@
+
+ffihugs@OBJ@	: runhugs@OBJ@
+		  $(CC) -c $(CFLAGS) $(OPTFLAGS) -DFFI_COMPILER runhugs.c -o ffihugs@OBJ@
+
+################################################################
+# Libraries, converted from raw sources out of the fptools tree
+################################################################
+
+CONVERTERS	= unix/convert_libraries unix/hugs-package
+
+libraries	:: $(LIBRARIES) @FFI_LIBRARIES@
+
+$(LIBRARIES)	: runhugs@EXE@ ffihugs@EXE@ ../libraries/Hugs/*.* $(CONVERTERS) $(TOOLS) $(INCLUDES)
+		  mkdir -p $(BUILD_DIR)/tools
+		  $(CP) $(TOOLS) $(BUILD_DIR)/tools
+		  mkdir -p $(BUILD_DIR)/libraries/Hugs
+		  $(CP) ../libraries/Hugs/*.* $(BUILD_DIR)/libraries/Hugs
+		  cd unix; ./convert_libraries $(FPTOOLS) ../../hugsdir
+
+$(INCLUDES)	: $(HEADERS)
+		  mkdir -p $(BUILD_DIR)/include
+		  $(CP) $(HEADERS) $(BUILD_DIR)/include
+
+################################################################
+# Library modules that use the Foreign Function Interface
+################################################################
+
+FFI_LIBRARIES	= $(BUILD_DIR)/libraries/Hugs/Storable@DLL@
+
+ffi_libraries	: $(FFI_LIBRARIES)
+
+BUILD_FFI = env HUGSDIR='$(BUILD_DIR)' HUGSFLAGS='' ./ffihugs +G
+
+# The script unix/BuildFFI is created by unix/convert_libraries,
+# and runs ffihugs on library modules that need it.
+
+$(FFI_LIBRARIES) : $(LIBRARIES) ffihugs$(EXE) $(INCLUDES)
+		  $(BUILD_FFI) +L'$(BUILD_DIR)/libraries/Hugs/Storable_aux.c' Hugs.Storable
+		  env HUGSDIR='$(BUILD_DIR)' HUGSFLAGS='' unix/BuildFFI
+
+################################################################
+# Clean, distclean, veryclean, TAGS
+################################################################
+
+clean		::
+		  $(RM) hugs@EXE@
+		  $(RM) runhugs@EXE@
+		  $(RM) ffihugs@EXE@
+		  $(RM) *.o
+		  $(RM) *.O
+		  $(RM) *.obj
+		  $(RM) *.OBJ
+		  $(RM) *.LIB
+		  $(RM) *.DEF
+		  $(RM) *.RES
+		  $(RM) *.EXP
+		  $(RM) *.ILK
+		  $(RM) *.PDB
+		  $(RM) *.TD2
+		  $(RM) *.MAP
+		  $(RM) *.CSM
+		  $(RM) *.TR2
+		  $(RM) *.DSW
+		  $(RM) *.aux
+		  $(RM) *.hp
+		  $(RM) -r $(BUILD_DIR)
+		  $(RM) LibStatus
+distclean	:: clean
+distclean	::
+		  $(RM) hugs@EXE@
+		  $(RM) runhugs@EXE@
+		  $(RM) ffihugs@EXE@
+		  $(RM) *.pdf
+		  $(RM) TAGS
+		  $(RM) *~
+veryclean	:: distclean
+veryclean	::
+		  $(RM) Makefile
+		  $(RM) config.h
+		  $(RM) options.h
+		  $(RM) unix/config.cache
+		  $(RM) unix/config.log
+		  $(RM) unix/config.status
+		  $(RM) unix/configure
+TAGS		::
+		  etags *.[ych]
+
+################################################################
+# C and Yacc rules
+################################################################
+
+.c@OBJ@	:
+		  $(CC) -c $(CFLAGS) $(OPTFLAGS) $<
+
+# Modules to be compiled without optimization.
+# (old comment: to avoid optimisation bugs in certain compilers.
+#               This may be overly conservative on some compilers.)
+# (The following explanation is based on a posting by Alastair Reid.)
+# These modules allocate cells on the Hugs heap and assume a conservative
+# garbage collector.  On some (especially RISC) architectures, the
+# optimizer may identify a pointer to a Cell as a common subexpression,
+# and hold that instead of the Cell.  This would then be missed by the
+# conservative garbage collector's simplistic scan of the C stack.
+# Modules associated with evaluation are safe because they don't assume
+# conservative GC (see IMPORTANT NOTICE in builtin.c).
+compiler@OBJ@	: compiler.c
+		  $(CC) -c $(CFLAGS) compiler.c
+module@OBJ@	: module.c
+		  $(CC) -c $(CFLAGS) module.c
+subst@OBJ@	: subst.c
+		  $(CC) -c $(CFLAGS) subst.c
+static@OBJ@	: static.c
+		  $(CC) -c $(CFLAGS) static.c
+type@OBJ@	: type.c
+		  $(CC) -c $(CFLAGS) type.c
+
+parser.c	: parser.y
+		  -$(YACC) parser.y
+		  mv y.tab.c parser.c
+# veryclean	::
+# 		  $(RM) parser.c
+
+################################################################
+# Generating object dependencies (requires gcc)
+################################################################
+
+HUGS_MAKEFILES = Makefile dotnet/Makefile msc/Makefile winhugs/Makefile
+
+depend: $(SOURCES)
+	gcc -MM $(CFILES) | sed 's/\.o:/$$(OBJ):/' >TMP
+	if cmp -s TMP MkDepend.in; then : ; else \
+		$(CP) TMP MkDepend.in; \
+		for mfile in $(HUGS_MAKEFILES);\
+		do	(echo '/^# Object dependencies/+++,/^# End of object dependencies/---d';\
+			 echo '-r MkDepend.in';\
+			 echo w) | ed - $$mfile; \
+		done;\
+	fi
+	rm TMP
+
+################################################################
+# Object dependencies (Don't change or delete this line)
+################################################################
+
+@MkDepend@
+
+################################################################
+# End of object dependencies (Don't change or delete this line)
+################################################################
+
+################################################################
+# Regression tests (Unix only)
+#
+# Uses runstdtest (from ghc-0.26/ghc/glafp-utils/scripts), perl 5
+# and /bin/sh (Bourne shell).
+#
+# "make verbosecheck" generates a lot of output to explain what is going on
+# and reassure you that progress is being made.  This is great if you've
+# never run these tests before - but if you just want to reassure yourself
+# that nothing has broken since the last release, you might prefer to
+# run "make check" which removes all the explanations and success
+# stories - leaving just the errors (if any).
+#
+################################################################
+
+check		: hugs@EXE@ libraries
+		  cd ../tests; sh testScript | egrep -v '^--( |-----)'
+
+verbosecheck	: hugs@EXE@ libraries
+		  cd ../tests; sh testScript
+
+LibStatus	: hugs@EXE@ libraries
+		  (cd unix; ./test_libraries $(FPTOOLS)) >$@
+
+@MkInstall@
+
+################################################################
+# End of Makefile
+################################################################

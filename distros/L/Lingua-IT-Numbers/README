@@ -1,0 +1,35 @@
+Lingua-IT-Numbers version 0.06
+==============================
+
+Lingua::IT::Numbers converts arbitrary numbers into human-oriented
+Italian text. It is then the Italian version of the Lingua::*::Numbers modules
+that can be found on cpan.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Regexp::Common::numbers
+  
+   is needed to parse number strings.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Leo "TheHobbit" Cacciari
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

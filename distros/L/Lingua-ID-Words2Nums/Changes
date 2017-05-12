@@ -1,0 +1,82 @@
+Revision history for Lingua-ID-Words2Nums
+
+0.17    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.16     2014-09-28 (PERLANCAR)
+
+         - Fix big multiplier values.
+
+         - Fix/tweak $Pat so it's more discriminating.
+
+
+0.15     2012-06-26 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add Rinci metadata
+
+         [BUG FIXES]
+
+         - "positif dua" was not parsed.
+
+
+0.14     2011-09-23 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Support abbreviations ('tjh plh jt' => 'tujuh puluh juta')
+
+         - Support very large numbers (until sentiliun and gugol)
+
+         - Provide $Pat
+
+
+0.13     2011-09-15 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Handle number in exponent form. Use updated (fixed)
+           Parse::Number::ID.
+
+
+0.12     2011-09-15 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Handle mixture of numbers and words (e.g. '1,5 juta 13 ribu' ->
+           1513000).
+
+
+0.11     2011-04-01 (SHARYANTO)
+
+         [ETC]
+
+         - bump version to 0.11, because old 0.01 version turned out set
+           $VERSION to 0.1, so PAUSE requires new version to be larger than
+           that.
+
+
+0.02     2011-04-01 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - no longer exports by default.
+
+         - sprinkled 5.010 requirements. :p
+
+         [ETC]
+
+         - modernize stuffs (code formatting, add tests, variable names,
+           comments, etc).
+
+
+0.01     1999-06-01 (SHARYANTO)
+
+         - original version; created by h2xs 1.19

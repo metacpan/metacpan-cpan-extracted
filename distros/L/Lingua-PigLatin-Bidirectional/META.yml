@@ -1,0 +1,38 @@
+---
+abstract: 'Translates English sentences to Pig Latin, and vice versa.'
+author:
+  - 'Oklahomer <hagiwara.go@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-PigLatin-Bidirectional
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Lingua::PigLatin::Bidirectional:
+    file: lib/Lingua/PigLatin/Bidirectional.pm
+    version: 0.01
+requires:
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/oklahomer/p5-Lingua-PigLatin-Bidirectional/issues
+  homepage: https://github.com/oklahomer/p5-Lingua-PigLatin-Bidirectional
+  repository: git://github.com/oklahomer/p5-Lingua-PigLatin-Bidirectional.git
+version: 0.01

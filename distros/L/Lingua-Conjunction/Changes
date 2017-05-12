@@ -1,0 +1,23 @@
+Revision history for Perl extension Lingua::Conjunction.
+
+2.00 16 Nov 2003
+	- maintenance release; changed version to 2.00 after 4+ year
+	- elaborated on more features in POD and added note about
+	  Perl Cookbook; fixed some typos
+	- minor code neating-up
+	- fixed penultimate rule in French (fr)
+	- added words for Afrikaans, Swahili, and Latin
+	- added rudimentary test script
+
+1.99  9 Oct 1999
+	- renamed module to Lingua::Conjunction
+	- incorporated much code and suggestions from Damian Conway
+	- blank items in the list are now ignored
+	- added hooks to configure a language other than English
+	- added French, German, Italian, Portugese and Spanish
+
+1.0   5 Oct 1999
+	- original version (released as Text::List and
+          mislabelled as 0.01 in the Changes file)
+
+

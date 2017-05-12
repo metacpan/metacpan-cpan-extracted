@@ -1,0 +1,12 @@
+Revision history for Perl module Lingua::PT::Stemmer
+
+0.02 2016-02-07 NEILB
+    - Switched to Dist::Zilla, fixing RT#107484 in the process, so the release
+      will have META.{json,yml} files.
+    - Moved test from test.pl in top directory to t/basic.t
+    - Updated format of this file to follow CPAN::Changes::Spec
+
+0.01 2003-01-28 XERN
+    - original version; created by h2xs 1.21
+      with options -XA Lingua::PT::Stemmer
+

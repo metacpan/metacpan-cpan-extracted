@@ -1,0 +1,59 @@
+[% 
+    title = 'Gallery Admin' ;
+
+    crumb1_name = 'Gallery' ;
+%]
+
+<div class="boxer">
+<h2>Gallery Admin</h2>
+
+[% IF thanks_message %]<p>[% thanks_message %]</p>[% END %]
+<p>Click on a page title to edit the contents, upload new photos or amend 
+existing photos. Note that moving gallery pages up or down, will only move 
+them in relation to others within the same month and year. Pages should be 
+edited if you wish to change either month or year.</p>
+<p><a href="[% cgipath %]/pages.cgi?act=album-pageadd">add a gallery page</a></p>
+
+<form method="post" action="[% cgipath %]/pages.cgi" name="EDIT" id="EDIT">
+<input type="hidden" name="act" value="album-pages" />
+<input type="hidden" name="latest" value="0" />
+<input type="hidden" name="was" value="[% month %]/[% year %]" />
+<p>[% ddmonths %][% ddyears %] <input type="submit" class="gobutton" value="GO" /></p>
+</div>
+
+<div class="boxer">
+<table class="blocker">
+<tr>
+    <th>Year/Month</th>
+    <th>Title</th>
+    <th>Photos</th>
+    <th>Hide</th>
+    <th>Action</th>
+</tr>
+[% IF records %]
+[% FOREACH record = records %]
+<tr>
+    <td>[% record.year %]/[% record.month %]</td>
+    <td><a href="[% cgipath %]/pages.cgi?act=album-pageedit&amp;pageid=[% record.pageid %]">[% record.title %]</a></td>
+    <td>[% record.count %]</td>
+    <td><input type="checkbox" name="HIDE" value="[% record.pageid %]" [% IF record.hide %]checked="checked"[% END %] /></td>
+    <td nowrap>
+        <a href="[% cgipath %]/pages.cgi?act=album-pagedelete&amp;pageid=[% record.pageid %]"><img         src="[% webpath %]/images/icons/icon_delete.gif" alt="delete" height="15" /></a>
+        <a href="[% cgipath %]/pages.cgi?act=album-pages&amp;pageid=[% record.pageid %]&amp;order=up"><img src="[% webpath %]/images/icons/icon_up.gif"     alt="up"     height="15" /></a>
+        <a href="[% cgipath %]/pages.cgi?act=album-pages&amp;pageid=[% record.pageid %]&amp;order=dn"><img src="[% webpath %]/images/icons/icon_down.gif"   alt="down"   height="15" /></a>
+    </td>
+</tr>
+[% END %]
+[% ELSE %]
+<tr><td colspan="7">No pages found.</td></tr>
+[% END %]
+</table>
+
+<p class="smalltext">
+<input type="hidden" name="recordid" value='' />
+<input type="hidden" name='doaction' value='' />
+<input type="button" value='Update' onClick="doSubmit('Update',0)" />
+</p>
+
+</div>
+</form>

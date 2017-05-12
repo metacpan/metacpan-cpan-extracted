@@ -1,0 +1,29 @@
+Revision history for Perl extension List::Member.
+
+0.01 2001-05-24T17:40:41
+	- original version; created by h2xs 1.20 with options
+		-Xcfn List::Member
+
+0.02  2001-08-14
+	- POD updated
+
+0.03  2007-02-15
+	- Default not-a-member indicator ($NEG) set to -1, as POD describes
+	- Added nota_member(), isa_member, both exported.
+	- Updated test and POD
+
+0.04  2007-03-22
+	- Updated test and POD, again.
+	  Excuse: five family illness in one month. Phew.
+
+0.041  2007-04-26
+	- Version number was wrong. Bah.
+
+0.042 2007-08-04T18:33:59
+	- Repacked.
+
+0.043 2008-04-23T20:30
+	- Accept 0 arg. Amazed it didn't.
+
+0.044 2008-11-15T20:22
+	- Accept a regex as argument.

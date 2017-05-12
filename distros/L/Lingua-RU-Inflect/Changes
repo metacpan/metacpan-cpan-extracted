@@ -1,0 +1,22 @@
+Revision history for Lingua-RU-Inflect
+
+0.01    24 Feb 2010
+        First version, which inflect russian given names and detect gender by name.
+        Complex names are ignored.
+
+0.02    04 Mar 2010
+        Included documentation in Russian.
+        Sub choose_preposition_by_next_word and its aliases was added.
+        More tests was added.
+        Some bugs was fixed.
+
+0.03    18 Feb 2011
+        Arguments can be transmitted to functions as list or hashes.
+        Prepositional subs and aliases now DEPRECATED, they moved
+        to Lingua::RU::Preposition
+
+0.04    16 Aug 2012
+        Warning was fixed (perl 5.14 and newer, thank to vividshow@github for patch)
+
+0.05    16 Sep 2014
+        Prepositional function was removed.

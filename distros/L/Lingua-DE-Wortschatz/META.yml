@@ -1,0 +1,26 @@
+---
+name: Lingua-DE-Wortschatz
+version: 1.27
+author:
+  - 'Daniel Schroeer <schroeer@cpan.org>'
+abstract: wortschatz.uni-leipzig.de webservice client
+license: perl
+requires:
+  Encode: 0
+  Exporter: 0
+  HTML::Entities: 0
+  SOAP::Lite: 0
+  Text::Autoformat: 0
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Lingua::DE::Wortschatz:
+    file: lib/Lingua/DE/Wortschatz.pm
+    version: 1.27
+  Lingua::DE::Wortschatz::Result:
+    file: lib/Lingua/DE/Wortschatz.pm
+    version: 0
+resources:
+  license: http://dev.perl.org/licenses/

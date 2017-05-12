@@ -1,0 +1,51 @@
+NAME
+    Linux::Pidfile - Pidfile handling to help control processes.
+
+SYNOPSIS
+        use Linux::Pidfile;
+        my $Pid = Linux::Pidfile::->new();
+        $Pid->create() or die('Already running!');
+        # ...
+        $Pid->remove();
+
+DESCRIPTION
+    Pidfile handling to help processes avoid running multiple times.
+
+METHODS
+  BUILD
+    Initialize the pidfile location.
+
+  DEMOLISH
+    Placeholder.
+
+  create
+    Try to create a new pidfile, if the proc is already running exit with
+    false.
+
+  pid_is_running
+    Return true if a process with the given pid is already running.
+
+  pidfile_is_running
+    Return true if the pidfile is configured, exists and a process with this
+    pid is running.
+
+  this_script_is_running
+    Return true if this script is running.
+
+  remove
+    Remove the pidfile. Should be called when the invoking process is about
+    to exit.
+
+NAME
+    Linux::Pidfile - Pidfile handling to help processes avoid running
+    multiple times.
+
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,39 @@
+Revision history for List::Cycle
+
+1.02    Sun Dec 23 22:01:38 CST 2012
+------------------------------------
+No new features.
+
+[FIXES]
+No longer fails under hash randomization under Perl 5.17+.  Thanks,
+Ron Savage.
+
+
+1.00    Fri Apr 16 21:53:11 CDT 2010
+------------------------------------
+[ENHANCEMENTS]
+No longer loads UNIVERSAL.  Loading UNIVERSAL has been deprecated,
+and isn't useful anyway.  This thread explains why it was done.
+http://www.nntp.perl.org/group/perl.perl5.porters/2009/01/msg143770.html
+Thanks to Todd Rinaldo for the fix.
+
+[DOCUMENTATION]
+Update copyright information.
+
+
+0.04    Thu Nov 10 09:54:30 CST 2005
+------------------------------------
+[ENHANCEMENTS]
+*   Added set_values() setter.  Thanks RJBS.
+*   Constructor now takes vals=>[list] or values=>[list].
+    I don't like unnecessary abbreviations, but I don't want to
+    break backward compatibility.
+
+[INTERNALS]
+*   Test suite now has full test coverage.  Thanks RJBS.
+
+
+0.02    Thu Mar 31 09:35:11 CST 2005
+------------------------------------
+First real version.  If you were using 0.01, I'm sorry.
+Change your constructor calls.

@@ -1,0 +1,20 @@
+Revision history for Perl module Lingua::JA::MacJapanese.
+
+0.20  Sun Jul 31 20:20:24 2011
+    - fix the tarball with world writable files.
+
+0.04  Tue Jun  5 21:57:24 2007
+    - mkheader, split_into_char() - avoid unpack('C*') on unicode.
+
+0.03  Sat Apr 16 20:00:23 2005
+    - upgraded according to updated JAPANESE.TXT in www.unicode.org
+      (though no character mapping is changed).
+    - added META.yml.
+    - added t/argu.t.
+
+0.02  Sat Oct 25 16:57:15 2003
+    - added deprecated 54 mappings [0xF8A1 to 0xF8D6 in Unicode]
+      according to CORPCHAR.TXT
+
+0.01  Sun Sep 28 10:09:32 2003
+    - original version;

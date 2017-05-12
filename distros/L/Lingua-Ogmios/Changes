@@ -1,0 +1,9 @@
+Revision history for Perl extension Lingua::Ogmios.
+
+0.011   - Correction in the Manifest
+        - Add of missing modules
+        - Add of documentation
+        - Add an output for printing terms and components recursively
+
+0.01  
+	- Version of the module with a CPAN configuration

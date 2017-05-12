@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+#no warnings 'utf8';
+use Carp;
+use LaTeX::Decode;
+use Encode;
+binmode(STDOUT, ':utf8');
+use Getopt::Long qw/:config no_ignore_case/;
+
+my $opts = {};
+GetOptions(
+  $opts,
+  'help|h|?',
+  'version|v',
+  'inputencoding|i=s',
+  'filter|f!',
+  'scheme|s=s',
+  'normalize|n!',
+  'normalization|N=s',
+  'strip_outer_braces|b!'
+);
+
+our $VERSION = '0.04';
+
+die usage() if exists $opts->{'help'};
+
+die version() if exists $opts->{'version'};
+
+my $text;
+
+if ($opts->{filter}) {
+    while (<STDIN>) {
+        $text .= $_
+    }
+    croak "Huh? There is nothing to convert!\n" if (!$text or $text =~ /^\s*$/)
+}
+else {
+    my $infile = $ARGV[0] or die usage();
+    require File::Slurp;
+
+    $text = read_file($infile) or croak "Cannot read input file '$infile'";
+}
+
+#Options to pass to latex_decode()
+my %ld_opts = ();
+
+if (exists $opts->{inputencoding}) {
+    my $encoding = $opts->{inputencoding};
+    $text = decode($encoding, $text);
+}
+
+if (exists $opts->{scheme} ) {
+    $ld_opts{scheme} = $opts->{scheme}
+}
+
+if (exists $opts->{normalize} ) {
+    die "The option 'normalize' has been removed:\n\t use '--normalization 0' to suppress normalization\n"
+}
+
+if (exists $opts->{normalization} ) {
+    if (!$opts->{normalization} or $opts->{normalization} eq 'undef') {
+        $ld_opts{normalize} = 0
+    } else {
+        $ld_opts{normalization} = $opts->{normalization}
+    }
+}
+
+if (exists $opts->{strip_outer_braces} ) {
+    $ld_opts{strip_outer_braces} = $opts->{strip_outer_braces}
+}
+
+$text = decode_utf8($text);
+
+print latex_decode($text, %ld_opts);
+
+sub version {
+    my $me = "latex2utf8";
+
+    qq[
+$me Version: $VERSION
+\n]
+}
+
+sub usage {
+    qq/
+Usage: latex2utf8 infile > outfile
+
+Options:
+  --help|-h             Show this help message.
+  --version|-v          Display version number.
+  --filter|-f           Use script as a filter, using standard input instead of
+                          an input file
+  --inputencoding|-i [encoding]
+                        Encoding used in the input file (or STDIN if using
+                          the option --filter)
+  --scheme|-s           Decoding scheme to use (possible values are 'base',
+                          'extra', 'full'; default = 'extra')
+  --normalization|-N [form]
+                        The normalization form to use (default = 'NFC')
+                          (with a value of 0 or undef the output will not be
+                          normalized with Unicode::Normalize)
+  --strip_outer_braces|-b
+                        Remove curly braces around characters (boolean)
+                          (e.g. "saut{\\\'e}" => "sauté")
+
+(See "perldoc LaTeX::Decode" for more information on the last three options.)
+
+Example: latex2utf8 -i latin1 -s base -N NFD infile.tex > outfile.tex
+\n/
+}
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+C<latex2utf8> - converts LaTeX encoding to UTF-8
+
+=head1 VERSION
+
+Version 0.04
+
+=head1 SYNOPSIS
+
+latex2utf8 file.tex > utf8file.tex
+
+echo '\textexclamdown\textctj\alpha\textphook\texthvlig!' | latex2utf8 --scheme full --filter
+
+=head1 DESCRIPTION
+
+Command-line utility to convert a LaTeX-encoded file to UTF-8.
+See the output of C<latex2utf8 --help> for usage and options.
+
+=head1 AUTHOR
+
+François Charette, C<< <firmicus@cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-latex-decode at
+rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=LaTeX-Decode>.  I will be
+notified, and then you'll automatically be notified of progress on your bug as
+I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009-2015 François Charette, all rights reserved.
+
+This module is free software.  You can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# vim: set tabstop=4 shiftwidth=4 expandtab:
+

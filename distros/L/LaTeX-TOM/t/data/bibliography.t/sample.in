@@ -1,0 +1,6 @@
+\documentclass[10pt]{article}
+\begin{document}
+\begin{thebibliography}{99}
+\bibitem{reference} text
+\end{thebibliography}
+\end{document}

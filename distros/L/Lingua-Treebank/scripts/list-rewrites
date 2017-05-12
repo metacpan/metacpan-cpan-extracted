@@ -1,0 +1,160 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my ( $help, $man );
+my $directinput = 0;
+my $verbose = 0;
+
+my $format = "%s => %s\n";
+my $terminal = 1;
+
+GetOptions(
+	   'help|?' => \$help,
+	   man      => \$man,
+	   directinput => \$directinput,
+	   'verbose+' => \$verbose,
+	   'format=s' => \$format,
+	   'terminal!' => \$terminal,
+  ) or pod2usage(2);
+pod2usage(1) if ($help);
+pod2usage( -exitstatus => 0, -verbose => 2 ) if ($man);
+
+# we wouldn't need the elaborate codeblock below if passing \*ARGV as
+# a filehandle worked properly outside of while (<>). (but see perldoc
+# perltodo). But code that operates on a filehandle (e.g.
+# Lingua::Treebank) needs this block.
+
+{
+    if (@ARGV == 0) {
+	push @ARGV, '-';
+    }
+    for (@ARGV) {
+	if ($_ eq '-' and -t STDIN and not $directinput) {
+	    pod2usage "STDIN requested, but hooked to a live TTY;" .
+	      " perhaps you want the --directinput option?"
+	  }
+
+	open my $fh, $_
+	  or die "Couldn't open '$_': $!\n";
+
+	use Lingua::Treebank;
+
+	my @utterances = Lingua::Treebank->from_penn_fh($fh);
+
+	foreach (@utterances) {
+	    # $_ is a Lingua::Treebank::Const now
+	    $_->walk (\&print_rewrites );
+
+	}
+
+	close $fh or die "Couldn't close '$_': $!\n";
+	warn "done reading from $_\n" if $verbose;
+    }
+}
+
+sub print_rewrites {
+    my $self = shift;
+
+    my $left = $self->tag();
+
+    my $right;
+    if ($self->is_terminal()) {
+	return if not $terminal;
+	$right = $self->word();
+    }
+    else {
+	$right = join " ", map { $_->tag() } @{$self->children()};
+    }
+
+    printf $format, $left, $right;
+}
+__END__
+
+=head1 NAME
+
+  list-rewrites - reads penn treebanks, prints out all rewrites found
+
+=head1 SYNOPSIS
+
+  list-rewrites [options] [file ...]
+
+  Options:
+     -help        brief help message
+     -man         full documentation
+    --verbose     more verbose to STDERR
+    --directinput allow TTY to STDIN
+
+    --format FORMAT provide a different output format
+
+    --terminal    include (exclude) terminal expansions
+    --noterminal  default is --terminal
+
+=head2 Sample output
+
+  $ echo "(S (NP (DET the) (NN dog)) (VP ran))" | ./list-rewrites
+  S => NP VP
+  NP => DET NN
+  DET => the
+  NN => dog
+  VP => ran
+
+=head1 OPTIONS
+
+=over
+
+=item B<--help>
+
+=item B<-?>
+
+Show this help message.
+
+=item B<--man>
+
+Show the manual page for this script.
+
+=item B<--directinput>
+
+By default, if there is a human-operated TTY on STDIN, this script
+issues a usage message and exits (this is so users can run
+C<list-rewrites> and get the usage message).  If you really want to type
+trees by hand on STDIN, add the B<--directinput> flag.
+
+=item B<--verbose>
+
+Repeatable option. Report more of what we're doing.
+
+=item B<--format> FORMAT
+
+provide an alternative output format. The default is C<%s => %s\n>,
+which creates output like the example in L</Sample output>.
+
+=back
+
+=head1 DESCRIPTION
+
+This program lists all rewrites in all trees presented by file or on
+STDIN to this script.
+
+=head2 CAVEATS
+
+The trees must be in Penn treebank format.
+
+The rewrites will not necessarily be unique; if you want them to be
+unique, you will have to pipe the output of this program into (e.g.)
+C<sort | uniq>.  This is deliberate, so that you can get counts from
+the output of this program as well as a survey of the rewrites in a corpus.
+
+=head2 TO DO
+
+None that I know of.
+
+=head1 AUTHOR
+
+Jeremy G. Kahn E<lt>jgk@ssli.ee.washington.eduE<gt>
+
+=cut

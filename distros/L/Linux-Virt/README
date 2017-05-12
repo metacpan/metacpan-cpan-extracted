@@ -1,0 +1,19 @@
+NAME
+    Linux::Virt - unified Linux virtualization wrapper
+
+METHODS
+  vms
+    Report all (supported) VMs found on the local host.
+
+NAME
+    Linux::Virt - Linux virtualization manager
+
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

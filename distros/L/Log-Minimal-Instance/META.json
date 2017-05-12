@@ -1,0 +1,84 @@
+{
+   "abstract" : "Instance based on Log::Minimal",
+   "author" : [
+      "Kosuke Arisawa <arisawa {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Minimal-Instance",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Stamped" : "0.03",
+            "Log::Minimal" : "0.14",
+            "parent" : "0.223"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.31",
+            "Test::More" : "0.98",
+            "Test::Output" : "0.16"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Minimal::Instance" : {
+         "file" : "lib/Log/Minimal/Instance.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/arisawa/p5-Log-Minimal-Instance/issues"
+      },
+      "homepage" : "https://github.com/arisawa/p5-Log-Minimal-Instance",
+      "repository" : {
+         "url" : "git://github.com/arisawa/p5-Log-Minimal-Instance.git",
+         "web" : "https://github.com/arisawa/p5-Log-Minimal-Instance"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "Kosuke Arisawa <arisawa@dena.jp>",
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Tomohiro Mitsumune <tomohiro.mitsumune@dena.com>",
+      "Kosuke Arisawa <kosuke.arisawa@dena.com>",
+      "xaicron <xaicron@gmail.com>",
+      "Kosuke Arisawa <arisawa@gmail.com>"
+   ]
+}

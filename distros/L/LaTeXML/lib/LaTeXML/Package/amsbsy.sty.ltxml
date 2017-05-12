@@ -1,0 +1,30 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  amsbsy                                                             | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+#**********************************************************************
+# See amsldoc
+#**********************************************************************
+
+DefConstructor('\boldsymbol{}', '#1', bounded => 1, requireMath => 1, font => { forcebold => 1 });
+
+# I think the intent is that you use \pmb to get bold, but your current font doesn't supply
+# a bold for those glyphs.  Since we're just forcing the glyph to be bold,
+# \pmb is probably \boldsymbol. or... ??
+Let('\pmb', '\boldsymbol');
+
+#**********************************************************************
+1;

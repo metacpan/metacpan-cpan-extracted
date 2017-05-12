@@ -1,0 +1,56 @@
+README for LEGO::Colors
+
+			    LEGO::Colors
+
+LEGO::Colors is a data module giving access to the RGB values of the various
+available colors of LEGO pieces.
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.8.0, so for
+anything lower, you're on your own.
+
+LEGO::Colors doesn't use any nonstandard modules.  In fact, it doesn't use
+any other modules at all.
+
+INSTALLATION
+
+You install LEGO::Colors, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of LEGO::Colors in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL PREFIX=~/perl
+
+DOCUMENTATION
+
+POD-format documentation is included in Colors.pm and Color.pm.  POD is
+readable with the 'perldoc' utility.
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+LEGO::Colors should just be sent to me at avi@finkel.org
+
+AVAILABILITY
+
+The latest version of LEGO::Colors is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+COPYRIGHT
+
+Copyright 2006, Avi Finkel <avi@finkel.org>, all rights
+reserved.  This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+LEGO® is a trademark of the LEGO Group of companies which does
+not sponsor, authorize or endorse this software.
+The official LEGO website is at L<http://www.lego.com/>

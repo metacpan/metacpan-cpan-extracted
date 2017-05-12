@@ -1,0 +1,15 @@
+Revision history for Perl module List::Zip
+
+0.04 2014-06-23
+    - Remove unnecessary code
+
+0.03 2014-05-26
+    - Removed unzip functionality
+
+0.02 2014-05-26
+    - Optimizations relating to cutoff point computation and
+      list pruning
+
+0.01 2014-05-20
+    - first release
+    - original version; created by ExtUtils::ModuleMaker 0.51

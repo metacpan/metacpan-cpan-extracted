@@ -1,0 +1,3 @@
+au_id	title_id	au_ord	royaltyshare
+998-72-3567	PS2091	1	0.50
+899-46-2035	PS2091	2	0.50

@@ -1,0 +1,63 @@
+Lingua-Translator-Microsoft
+
+This is a client library for the Microsoft Translator API
+
+SYNOPSIS
+
+    my $api_key = read_file('/home/myapp/priv/bing.priv');
+    my $translator = Lingua::Translator::Microsoft->new(
+        api_key  => $api_key,
+        app_id   => $app_id,
+    );
+
+    say $translator->translate('nl', 'en', 'voorbeeld'); # outputs 'example'
+
+    my $wav = $translator->speak('de', 'Worüber man nicht sprechen kann, darüber muss man schweigen');
+    open(my $fh, ">", "tractatus.wav");
+    print $fh $wav;
+    system("mplayer tractatus.wav");
+
+    say $translator->detect("Ci vuole un fiore."); # outputs 'it'
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Lingua::Translator::Microsoft
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Translator-Microsoft
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Lingua-Translator-Microsoft
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Lingua-Translator-Microsoft
+
+    Search CPAN
+        http://search.cpan.org/dist/Lingua-Translator-Microsoft/
+
+Github
+
+The source code for this module is hosted on Github:
+
+https://github.com/larion/lingua-translator-microsoft
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 Larion Garaczi <larion@cpan.org>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

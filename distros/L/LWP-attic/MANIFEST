@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+README
+lib/LWP/Socket.pm
+lib/LWP/SecureSocket.pm
+lib/LWP/IO.pm
+lib/LWP/TkIO.pm

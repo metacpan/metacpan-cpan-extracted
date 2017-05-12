@@ -1,0 +1,59 @@
+{
+   "abstract" : "Testing framework for command line applications inspired by Cram",
+   "author" : [
+      "Fabrice Gabolde <fabrice.gabolde@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lembas",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Scalar" : "0",
+            "Test::Builder::Tester" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36_14"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IPC::Run" : "0",
+            "List::Util" : "0",
+            "Moo::Lax" : "0",
+            "Params::Validate" : "0",
+            "Test::Builder::Module" : "0",
+            "Text::ParseWords" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "Lembas" : {
+         "file" : "lib/Lembas.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/fgabolde/Lembas"
+      }
+   },
+   "version" : "0.004"
+}

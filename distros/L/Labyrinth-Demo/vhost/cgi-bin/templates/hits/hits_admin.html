@@ -1,0 +1,40 @@
+[% 
+    title = "Hit Counters" ;
+%]
+
+<h3>Last Month Main Site Pages</h3>
+<div class="boxer">
+<table class="blocker">
+<tr>
+    <th width="30">Count</th>
+    <th>Area</th>
+    <th>Query</th>
+</tr>
+[% FOREACH record = pagesmon %]
+<tr>
+    <td>[% record.counter %]</td>
+    <td>[% record.area %]</td>
+    <td>[% record.query %]</td>
+</tr>
+[% END %]
+</table>
+</div>
+
+<h3>All Time Main Site Pages</h3>
+<div class="boxer">
+<table class="blocker">
+<tr>
+    <th width="30">Count</th>
+    <th>Area</th>
+    <th>Query</th>
+</tr>
+[% FOREACH record = pagesall %]
+<tr>
+    <td>[% record.counter %]</td>
+    <td>[% record.area %]</td>
+    <td>[% record.query %]</td>
+</tr>
+[% END %]
+</table>
+</div>
+

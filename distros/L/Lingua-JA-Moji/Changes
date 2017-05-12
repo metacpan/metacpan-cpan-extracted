@@ -1,0 +1,152 @@
+Revision history for perl module Lingua::JA::Moji
+
+0.44 2017-03-11
+
+* Change hentaigana functions to be many-to-many
+* Add kanji2hentai, kana2hentai
+
+0.43 2017-03-11
+
+* Small improvements in kana to hangul converter
+* Added hentaigana from Unicode 10.0
+* Dependence on JSON::Parse added
+
+0.42 2016-11-05
+
+* Work around for a bug in Perl 22 and later
+
+0.41 2016-02-11
+
+* Japanese-language documentation overhauled.
+* Added VERSION section to documentation.
+
+0.40 2015-10-27
+* Documentation cleaned up and clarified
+* Added HISTORY section to pod describing why I made this.
+
+0.39 2015-10-16
+
+* Deals with unhandled ヮ in kana2romaji
+* Documents undocumented return value of "is_romaji" and makes return
+  value of "is_romaji_strict" the same format
+
+0.38 2015-09-23
+
+* Remove unused file and unimplemented function
+
+0.37 2015-09-21
+
+* 'n' by itself is not a syllable any more in katakana2syllable.
+* Undocumented function is_romaji_semistrict
+* Removed faulty "binmode" statements.
+
+0.36 2015-02-12
+
+* Add "nigori_first" function.
+
+0.34 2014-08-16
+
+* Updated Japanese documentation
+
+0.33 2014-06-03
+
+* "romaji2hiragana" now works as it was documented to do (o-macron
+  becomes "ou" in kana)
+
+0.32 2014-02-17
+
+* InKana does not match KATAKANA MIDDLE DOT any more.
+* Add more circled kanji forms
+
+0.31 2013-11-26
+
+* Fix bug with uxi -> wi.
+* Clearer documentation of "kana2romaji" "style" option in English manual.
+
+0.30 2013-11-25
+
+* Add squared katakana / katakana conversion
+* Add new style for kana2romaji "common".
+
+0.29 2013-11-03
+
+* Don't allow 'je', 'che', 'rr', 'yy', 'thya', 'thi', 'yi' in
+  'is_romaji_strict'.
+* Fix bug 'WHO' allowed in 'is_romaji_strict'.
+* Remove 'thy' from possible romaji inputs.
+* Add 'wo' option for "kana2romaji".
+* Add 'ime' option for "romaji2kana" and "romaji2hiragana".
+
+0.28 2013-10-23
+
+* Fix bug "ttsu" not converted to "ッツ" in "romaji2kana".
+* More romaji constructions like nyi, nye, etc. in "romaji2kana".
+* Disallow "wi" in "is_romaji_strict".
+
+0.27 2013-10-14
+
+* Romaji to kana for hyi, hye, fya, fye, fyi, fyo, fyu, dyi, dye.
+* New function "is_romaji_strict", detects Japanese romanized words.
+
+0.26 2013-09-20
+
+0.25 2013-08-17
+
+* Documentation rewrites
+* Correct name in Makefile.PL
+
+0.24 2013-03-06
+
+* New function "katakana2syllable", breaks Japanese into syllables.
+
+0.23 2012-09-16
+
+* Bug fixes
+
+0.22 2012-07-21
+
+* Cleanup of distribution (remove unneeded files).
+
+0.21 2012-07-18
+
+* Bug fixes
+* Improved tests
+
+0.20 2012-05-29
+
+0.19 2012-05-23
+
+0.18 2012-05-23
+
+0.17 2012-05-15
+
+0.16 2012-05-15
+
+0.15 2012-05-10
+
+0.14 2012-04-16
+
+0.13 2012-04-16
+
+0.12 2012-04-16
+
+0.11 2012-04-13
+
+0.10 2011-11-06
+
+0.09 2011-11-04
+
+0.08 2011-06-12
+
+0.07 2011-06-08
+
+0.06 2011-06-08
+
+0.05 2011-02-05
+
+0.04 2010-12-16
+
+0.03 2010-10-26
+
+0.02 2010-10-15
+

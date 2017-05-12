@@ -1,0 +1,48 @@
+{
+   "abstract" : "encode characters for LaTeX formatting",
+   "author" : [
+      "Chris Travers <chris@efficito.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "LaTeX-Encode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp::Always" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "0",
+            "HTML::Entities" : "0",
+            "Pod::LaTeX" : "0",
+            "Pod::Usage" : "0",
+            "Readonly" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/einhverfr/LaTeX-Encode.git",
+         "web" : "https://github.com/einhverfr/LaTeX-Encode"
+      }
+   },
+   "version" : "v0.091.6"
+}

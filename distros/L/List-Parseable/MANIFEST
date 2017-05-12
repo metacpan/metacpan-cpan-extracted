@@ -1,0 +1,19 @@
+Build.PL
+examples/complex.pl
+examples/missing.pl
+HISTORY
+INSTALL
+lib/List/Parseable.pm
+lib/List/Parseable.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/parse_list.t
+t/parse_string.t
+t/pod.t
+t/pod_coverage.t
+t/runtests
+t/runtests.bat
+t/vars.t
+META.yml

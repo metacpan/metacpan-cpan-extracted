@@ -1,0 +1,61 @@
+==================================================
+Changes from 2015-10-02 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2016-10-01 23:44:19 +0000
+------------------------------------------
+
+  Change: 6d8fd7902f65a88e51adee7450f251391c675651
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-10-02 01:41:58 +0000
+
+    Changed methods to subroutines 
+
+------------------------------------------
+version 0.003 at 2016-10-01 03:06:13 +0000
+------------------------------------------
+
+  Change: 17084a69fa09f9bb90821fca1c4e5a92faddf6a3
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-10-01 05:06:13 +0000
+
+    Added AutoPrereqs 
+
+------------------------------------------
+version 0.002 at 2016-09-29 22:29:50 +0000
+------------------------------------------
+
+  Change: 4c00b5f9e6c1112b9b45e358f0a2d89cd558fb8e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-30 00:29:50 +0000
+
+    Module now uses Lingua::AR::Regexp patterns 
+
+  Change: 75c622452e08d78c4dad0365b69fb95083435059
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-28 17:27:10 +0000
+
+    Fixed documentation formatting
+
+    Some &lrms and removed not up to date parts 
+
+------------------------------------------
+version 0.001 at 2016-09-28 14:47:07 +0000
+------------------------------------------
+
+  Change: 455c3141e86b629b8646156904ed87248a4c0329
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-28 16:47:07 +0000
+
+    Added tests and renamed modules 
+
+  Change: a6221d06b88eaa4ce0d66da0239a5817692d2e86
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-27 05:00:28 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

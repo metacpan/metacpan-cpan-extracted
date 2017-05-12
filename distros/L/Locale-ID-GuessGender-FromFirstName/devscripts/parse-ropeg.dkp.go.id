@@ -1,0 +1,33 @@
+#!/usr/bin/perl -0777 -n
+
+# 2009-11-04
+
+# gelar ditaruh di depan, agak menyulitkan
+
+@rows = m!<tr\b(.+?)</tr>!sgi;
+for (@rows) {
+    if (m!<td align=LEFT valign=top>([^<]+).+?<td align=center valign=top>(LAKI-LAKI|PEREMPUAN)!s) {
+        $fullname = remove_title($1);
+        $firstname = get_first_name($fullname);
+        print "$fullname|$firstname|$2\n";
+    }
+}
+
+sub remove_title {
+    local $_ = shift;
+    s/^((Prof|Dr|Ir|Drs|Dra|drg|Ny)\.\s*)+//isg;
+    # gak semua, gak terlalu penting?
+    s/\b((,\s*)?\.?(S\.?P|M\.Si|S\.St\.Pi|A\.Md\.Pi|S\.ST|M\.?A|M\.H|S\.?Pi|AK\.S|S\.?E|S\.?H|S\.Pd|S\.?Ip|M\.?P|SST\.Pa|S\.Sos|S\.Kom|S\.T|B\.Sc|M\.?M|B\.Ac|A\.Md)\.?)+(,\s*)?$//ig;
+    $_;
+}
+
+sub get_first_name {
+    local $_ = shift;
+    my $orig = $_;
+    # balinese child name prefix
+    s/^(?:(i|ni|ida bagus|ida ayu|cokorda|anak agung|sagung|desak|gusti)\s*)?(putu|wayan|made|kadek|nyoman|komang|ketut)\s*//i;
+    # i=co, ni=ce, ida bagus=co, ida ayu=ce
+    s/^(.+?)\..*/$1/;
+    s/^(.+?)\s.*/$1/;
+    length($_) ? $_ : $orig;
+}

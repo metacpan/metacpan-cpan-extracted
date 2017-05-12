@@ -1,0 +1,27 @@
+---
+abstract: 'A basic Log::Any::Adapter to forward messages to a filehandle'
+author:
+  - 'Jason Rodrigues <jasonjayr+oss@gmail.com>'
+build_requires:
+  IO::String: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Any-Adapter-FileHandle
+no_index:
+  directory:
+    - author.t
+    - eg
+requires:
+  IO::Handle: '1.22'
+  Log::Any: '0.11'
+  Log::Any::Adapter: '0.02'
+resources:
+  bugtracker: http://github.com/jasonjayr/Log-Any-Adapter-FileHandle/issues
+  repository: git://github.com/jasonjayr/Log-Any-Adapter-FileHandle.git
+version: '0.010'

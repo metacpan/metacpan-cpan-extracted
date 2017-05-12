@@ -1,0 +1,500 @@
+# -*- perl -*-
+
+=head1 TITLE
+
+Using optimizer to do Method Munging.  (as done in
+Log::Log4perl::AutoCategorize)
+
+=head1 Munging
+
+Munging is a term borrowed from C++, where the technique was used to
+disambiguate same-named functions in different classes, or with
+different argument or return types.  Munging allowed a C++ front-end
+to use a C compiler back-end.
+
+ Example:
+
+ public class A {
+	int foo();
+	int foo(int);
+ }
+ public class B : public A {
+	String foo();
+	String foo(String);
+ }
+
+The reasons we do it are different, but the operation is the same; it
+'alters' the symbol table, in a way thats 'invisible'
+
+=head1 OK, but why bother
+
+The normal way of getting a method to behave differently for each
+caller/client is to parameterize the call, or the object its acting
+upon; each client tells the method or object what it wants to do.
+
+  # parameterize the ctor -> resulting object
+  $sock = IO::Socket::INET->new
+    ( PeerPort  => 9999,
+      PeerAddr  => inet_ntoa(INADDR_BROADCAST),
+      Proto     => udp,
+      LocalAddr => 'localhost',
+      Broadcast => 1 );
+
+  # alter some socket properties via method
+  print $sock->sockopt($opt, $val);
+    
+But this requires participation of the client, which isnt always
+convenient.  Consider a customer-service case;
+
+  cust> hello, the book I ordered hasnt arrived !
+  serv> whats your order number ?
+  cust> I dunno
+  serv> whats your name ?
+  cust> Cant u just look it up ?
+  serv> whats your credit-card number ?
+  cust> Aww Cripes, wheres my wallet ! 
+
+In this case, what you (the server) want is Caller-ID, feeding an
+automatic service-order retrieval, which pushes the complete customer
+bio to the service agent.  This way, you can magically do everything
+the customer wants.
+
+=head1 Motivating Application: Logging
+
+I used this technique for Log::Log4perl::AutoCategorize, which is a
+convenience wrapper around Log::Log4perl.  Log::Log4perl provides a
+powerful, flexible way to redirect and filter logging via config-file.
+
+=head2 Log::Log4perl example
+
+    # in your code, load a config-string or file
+    Log::Log4perl->init(\ qq{
+           log4perl.category.Candy.Twix = DEBUG, Screen
+           log4perl.appender.Screen = Log::Dispatch::Screen
+           log4perl.appender.Screen.layout = SimpleLayout
+           });
+
+    # now use that logger
+    package Candy::Twix;
+
+    sub new {
+	my $logger = Log::Log4perl->new("Candy::Twix::new");
+	$logger->debug("Creating a new Twix bar");
+	bless {}, shift;
+    }
+
+=head2 Notes about above example
+
+new() has its own category, implying that each method would also have
+its own.  This represents a coding burden on the client.
+
+The category must be manually added, even though its known to perl.
+
+Youre wise to keep category consistent with (ie the same as) the
+package and method.
+
+The config-string has a logging category for Bar.Twix only, not for
+each of its methods; detailed control of logging is not used here, but
+is possible later because methods use distinct categories.
+
+=head2 Doing things the ':easy' way
+
+    package main;
+    use Log::Log4perl qw(:easy);
+    Log::Log4perl->easy_init($ERROR);  # Set priority of root logger to ERROR
+
+    package Candy::Snickers;
+    use Log::Log4perl qw(:easy);
+    my $logger = get_logger(); # package wide category obtained transparently
+
+    sub foo {
+        $logger->fatal("This will get logged.");
+        $logger->debug("This won't.");
+    }
+
+The easy way automatically determines the category from your
+__PACKAGE__, but it precludes the detailed control that would be
+possible if __SUBROUTINE__ existed.
+
+=head1 OK, so how do we get the control and the ease ?
+
+caller() will give you the all that detail; package, subroutine,
+logging-level, even line number, yielding a category like
+B<Bar.Twix.new.debug.14>.  Just call it for every logging invocation.
+
+Note: To save typing, I do this in AUTOLOAD, which handles all logging
+calls: fatal, error, warning, info, debug.
+
+=head1 Damn, thats a lot of overhead
+
+Indeed.  For a application-wide logger, its unacceptable. And thats where
+optimizer comes in.
+
+By munging the methods at compile time, we provide a unique method
+which may be called later (if the code is reached).
+
+AUTOLOAD can now do the time-consuming (and detailed) category
+resolution once, then 'remember' it in a code block thats immediately
+added to the Symbol Table.
+
+Thereafter, the methods are dispatched directly; AUTOLOAD will not be
+called any more for them.
+
+=head1 Ahh.  So how do you do it ?
+
+First, a caveat.  
+
+Because munging is done at compile-time, blessed logger objects are
+not available to help recognize a method which should be munged.
+
+I define this as a non-problem by insisting that clients invoke all
+logging by using Class->method style.  This makes it simple and
+reliable to check for the right Class before munging the method.
+
+=head2 But this means changing my existing code-base.
+
+Hey, nothings perfect. 
+
+Besides, its easy enough to get 90% switched over, the rest you can
+shake out with a couple of test-runs.
+
+    perl -pi.bak \
+    -e s/(my $logger = (Log::Log4perl::)?get_logger)/#$1/ \
+    -e s/$logger->(debug|info|warn|error|fatal)/Logger->$1/ \
+    *.pm
+
+=head1 OK. So how do you use optimizer
+
+Well, Arthur Bergman is here to tell us all the finer points tomorrow,
+but heres the quick-and-dirty.
+
+    use optimizer 'extend-c' => sub { opchain-recognizer-code }
+
+The sub is called for every $op, and can march through the chain of
+linked opcodes, by calling $op->next() successively.  It must find
+the chains of interest, by examining each in turn.
+
+=head1 What we look for in the optimizer routine
+
+Here are a few variations of B<Logger->debug(@args)>, the source-code
+that we need to recognize and munge in the optimizer routine.  Note
+that there are invariant parts; these are what we need to focus upon.
+
+=head2 simplest invocation (no args)
+
+  $> perl -MO=Concise,-exec -e 'Logger->debug()'
+  1  <0> enter 
+  2  <;> nextstate(main 1 -e:1) v
+  3  <0> pushmark s
+  4  <$> const(PV "Logger") sM/BARE
+  5  <$> method_named(PVIV "debug") 
+  6  <1> entersub[t1] vKS/TARG
+  7  <@> leave[t1] vKP/REFC
+  -e syntax OK
+
+=head2 scalar arg
+
+  $> perl -MO=Concise,-exec -e 'Logger->debug(1)'
+  1  <0> enter 
+  2  <;> nextstate(main 1 -e:1) v
+  3  <0> pushmark s
+  4  <$> const(PV "Logger") sM/BARE
+  5  <$> const(IV 1) sM
+  6  <$> method_named(PVIV "debug") 
+  7  <1> entersub[t1] vKS/TARG
+  8  <@> leave[t1] vKP/REFC
+  -e syntax OK
+
+=head2 list arg
+
+  $> perl -MO=Concise,-exec -e 'Logger->debug(1,2)'
+  1  <0> enter 
+  2  <;> nextstate(main 1 -e:1) v
+  3  <0> pushmark s
+  4  <$> const(PV "Logger") sM/BARE
+  5  <$> const(IV 1) sM
+  6  <$> const(IV 2) sM
+  7  <$> method_named(PVIV "debug") 
+  8  <1> entersub[t1] vKS/TARG
+  9  <@> leave[t1] vKP/REFC
+  -e syntax OK
+
+=head2 arrayref arg
+  
+  $> perl -MO=Concise,-exec -e 'Logger->debug([1,"a"])'
+  1  <0> enter 
+  2  <;> nextstate(main 1 -e:1) v
+  3  <0> pushmark s
+  4  <$> const(PV "Logger") sM/BARE
+  5  <0> pushmark s
+  6  <$> const(IV 1) s
+  7  <$> const(PV "a") s
+  8  <@> anonlist sKRM/1
+  9  <1> srefgen sKM/1
+  a  <$> method_named(PVIV "debug") 
+  b  <1> entersub[t1] vKS/TARG
+  c  <@> leave[t1] vKP/REFC
+  -e syntax OK
+
+=head2 hashref arg
+
+  $> perl -MO=Concise,-exec -e 'Logger->debug({1,2})'
+  1  <0> enter 
+  2  <;> nextstate(main 1 -e:1) v
+  3  <0> pushmark s
+  4  <$> const(PV "Logger") sM/BARE
+  5  <0> pushmark s
+  6  <$> const(IV 1) s
+  7  <$> const(IV 2) s
+  8  <@> anonhash sKRM/1
+  9  <1> srefgen sKM/1
+  a  <$> method_named(PVIV "debug") 
+  b  <1> entersub[t1] vKS/TARG
+  c  <@> leave[t1] vKP/REFC
+  -e syntax OK
+
+=head2 nested call, to builtin
+
+  $> perl -MO=Concise,-exec -e 'Logger->debug(localtime)'
+  1  <0> enter 
+  2  <;> nextstate(main 1 -e:1) v
+  3  <0> pushmark s
+  4  <$> const(PV "Logger") sM/BARE
+  5  <0> localtime[t1] lM
+  6  <$> method_named(PVIV "debug") 
+  7  <1> entersub[t2] vKS/TARG
+  8  <@> leave[t1] vKP/REFC
+  -e syntax OK
+
+=head2 nested call, to builtin, (version 2)
+
+  $> perl -MO=Concise,-exec -e 'Logger->debug(localtime())'
+  1  <0> enter 
+  2  <;> nextstate(main 1 -e:1) v
+  3  <0> pushmark s
+  4  <$> const(PV "Logger") sM/BARE
+  5  <0> localtime[t1] lM*
+  6  <$> method_named(PVIV "debug") 
+  7  <1> entersub[t2] vKS/TARG
+  8  <@> leave[t1] vKP/REFC
+  -e syntax OK
+
+=head2 nested call, to your routine
+
+  $> perl -MO=Concise,-exec -e 'Logger->debug(foo())'
+  1  <0> enter 
+  2  <;> nextstate(main 1 -e:1) v
+  3  <0> pushmark s
+  4  <$> const(PV "Logger") sM/BARE
+  5  <0> pushmark s
+  6  <$> gv(*foo) s/EARLYCV
+  7  <1> entersub[t1] lKMS/NO(),TARG,INARGS,1
+  8  <$> method_named(PVIV "debug") 
+  9  <1> entersub[t2] vKS/TARG
+  a  <@> leave[t1] vKP/REFC
+  -e syntax OK
+
+=head2 nested call, to your (predefined) routine
+
+  $ perl -MO=Concise,-exec -e 'sub foo{2,3}; Logger->debug(foo())'
+  7  <0> enter 
+  8  <;> nextstate(main 2 -e:1) v
+  9  <0> pushmark s
+  a  <$> const(PV "Logger") sM/BARE
+  b  <0> pushmark s
+  c  <$> gv(*foo) s
+  d  <1> entersub[t1] lKMS/NO(),TARG,INARGS,1
+  e  <$> method_named(PVIV "debug") 
+  f  <1> entersub[t2] vKS/TARG
+  g  <@> leave[t1] vKP/REFC
+  -e syntax OK
+
+
+
+=head1 Munging results in Log::Log4perl::AutoCategorize
+
+This example illustrates some of the debug flags which print various
+details of the munging and subroutine creation process.
+
+perftests/tdebug.pl -d <flags> passes <flags> thru to the module; the
+full set of which are eminently understandable (by reading the code
+;-)
+
+Lots of B<Subroutine B::PADOP::padix redefined> warnings are elided
+here, I welcome help on suppressing them :-)
+
+=head2 $> perl perftests/tdebug.pl -db
+
+This enumerates the subroutines that are vivified by AUTOLOAD.  Method
+munging has already occurred (as you can see).
+
+ building enabled sub: Logger.warn_00004
+ building enabled sub: Logger.info_00005
+ building enabled sub: Logger.warn_00001
+ building enabled sub: Logger.warn_00002
+ building disabled sub: Logger.debug_00003
+ building enabled sub: Logger.info
+
+Subroutines are built enabled & disabled according to how theyre
+specified in the log-config; this determination is incorporated into
+the vivified routines.
+
+=head2 $> perl perftests/tdebug.pl -dc
+
+The 'c' flag displays the category determined by AUTOLOAD in the 1st
+invocation.
+
+ cat: main.main.warn.32
+ cat: main.main.info.33
+ cat: main.foo.warn.41
+ cat: A.bar.warn.51
+ cat: A.bar.debug.52
+ cat: Log.Log4perl.AutoCategorize.END.info.308
+
+=head2 $> perl perftests/tdebug.pl -dca
+
+Here, the 'a' prints the results of AUTOLOAD caller(0), caller(1), the
+0: 1: lines are those respective lines, which are combined into the
+category, which is reprised here.
+
+ 0: main,perftests/tdebug.pl,32,Log::Log4perl::AutoCategorize::AUTOLOAD
+ cat: main.main.warn.32
+ 0: main,perftests/tdebug.pl,33,Log::Log4perl::AutoCategorize::AUTOLOAD
+ cat: main.main.info.33
+ 1: main,perftests/tdebug.pl,34,main::foo
+ 0: main,perftests/tdebug.pl,41,Log::Log4perl::AutoCategorize::AUTOLOAD
+ cat: main.foo.warn.41
+ 1: main,perftests/tdebug.pl,35,A::bar
+ 0: A,perftests/tdebug.pl,51,Log::Log4perl::AutoCategorize::AUTOLOAD
+ cat: A.bar.warn.51
+ 1: main,perftests/tdebug.pl,35,A::bar
+ 0: A,perftests/tdebug.pl,52,Log::Log4perl::AutoCategorize::AUTOLOAD
+ cat: A.bar.debug.52
+ 1: main,perftests/tdebug.pl,0,Log::Log4perl::AutoCategorize::END
+ 0: Log::Log4perl::AutoCategorize,/usr/local/lib/perl5/site_perl/5.8.0/Log/Log4perl/AutoCategorize.pm,308,Log::Log4perl::AutoCategorize::AUTOLOAD
+ cat: Log.Log4perl.AutoCategorize.END.info.308
+
+=head1 Munging sub in Log::Log4perl::AutoCategorize
+
+  my $munged = '00000'; # preincremented for each munge
+
+  # sub method_munger
+  use optimizer 'extend-c' => sub {
+    my $opp = shift;
+
+    # look for op-chains which start with pushmark & const == __PACKAGE__
+    # Scan until method_named is reached, while keeping track of inner
+    # stack manipulations (iow monitor balance of push, pop on @opstack)
+    
+    my $n1 = $opp->name();
+    $opp = $opp->next();
+    return if ref $opp eq 'B::NULL';
+
+    my $n2 = $opp->name();
+    # by Policy, use Class method invocation only, hence const
+    return unless $n1 eq "pushmark" and $n2 eq "const";
+
+    # the Class->method requirement allows code to demand a const
+    # opcode, with value == __PACKAGE.
+
+    my $class = '';
+    eval { $class = $opp->sv->PV };
+    return unless $class eq $Alias or $class =~/^$MyPkg/;
+
+    $DB::single = 1 if $opt->{D};
+    $opp->dump if $opt->{d};
+
+    # OK: weve seen 2 required ops; pushmark, const='Logger'.  Now we
+    # track stack activity, so that nested meth_named ops dont
+    # prematurely end the scan which guards the munge.
+
+    my (@opchain, @opstack, $name);
+
+    while (@opstack or $opp->name ne 'method_named') {
+
+	return if ref $opp eq 'B::NULL';
+	$opp = $opp->next();
+	return if ref $opp eq 'B::NULL';
+	
+	push @opchain, $opp;
+	$name = $opp->name;
+	
+	if ($name eq 'pushmark') {
+	    push @opstack, $opp;
+	    printf "pushed: %s\n", opNames(\@opchain) if $opt->{s};
+	}
+	if ($name =~ /refgen|entersub/) {
+	    printf "popping: %s\n", opNames(\@opchain) if $opt->{s};
+	    pop @opstack;
+	}
+    }
+   printf "found op-chain: $class => %s\n", opNames(\@opchain) if $opt->{f};
+
+    # this should be proper end of chain
+    my ($meth) = $opchain[-1];
+
+    unless ($meth->name eq 'method_named') {
+	# this is a sign of problems.
+	printf "junk op-chain: $class => %s\n", opNames(\@opchain) if $opt->{j};
+	dumpchain(\@opchain) if $opt->{J};
+	return;
+    }
+
+    printf "matched op-chain: $class => %s\n", opNames(\@opchain) if $opt->{m};
+    dumpchain(\@opchain) if $opt->{M};
+
+    my $fnname = $meth->sv->PV;
+    unless (get_loglevel($fnname)) {
+	print "$fnname is ineligible for munging\n" if $opt->{v};
+	return;
+    }
+    # now do the munge
+    print "func: $fnname\n" if $opt->{r};
+    $munged++;
+    $meth->sv->PV("${fnname}_$munged");
+    print "munged func name: ${fnname}_$munged\n" if $opt->{r};
+
+    {
+	# record munged fnname, and where its called (to aid test-coverage review)
+	no warnings 'uninitialized';
+	$unseenCat{"${fnname}_$munged"} = join(',', (caller(0))[0..2]);
+    }
+    $meth->dump if $opt->{z};
+  };
+
+=head1 Conclusion: Other uses, Limitations
+
+Munging by itself is not useful; it needs AUTOLOAD to handle the calls
+to munged (and non-existent) subroutines.  AUTOLOAD must also eval the
+subroutines into existence, and put them in the symbol table,
+otherwise theres no point to doing the method munging in the 1st
+place.
+
+The Munge then AUTOLOAD paradigm (there, I snuck it in ;-), is only
+valuable if you have something clever to do with the detailed lexical
+knowledge that it makes efficiently available.
+
+AUTOLOAD could do lots of things;
+
+It could build sub warn_00003() to delegate back to warn(@customArgs)
+instead of creating an entirely new function.  In fact, this is
+approximately what it should do, because creating a lot of large,
+unique subroutines would greatly enlarge the executable size of your
+program.
+
+It could query a database to determine what each custom routine should
+do.  This is essentially what Log::Log4perls config file is doing for
+AutoCategorize.
+
+It could parse the method-name to extract additional information.
+Some possible, but unimplemented (and probably unwise), examples are;
+
+  debug_dump_20 ("reason: $reson", $data)	# to limit dump depth
+  debug_if1 ($if, "heres data", $data)		# if youre exceptionally lazy
+  debug_yaml ($data)				# 
+  
+
+But.. theres a limit to what the category can tell you, 
+
+    caller (and therefore category) only gives lexical information
+    you must add the contextual knowledge of whats important.

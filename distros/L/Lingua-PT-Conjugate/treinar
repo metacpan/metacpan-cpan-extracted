@@ -1,0 +1,393 @@
+#!/usr/bin/perl -w
+
+# 
+# treinar
+# Author          : Etienne  Grossmann
+# Created On      : May      1997
+# Last Modified On: November 1998
+# Language        : Perl
+# Status          : Use with caution!
+# 
+# (C) Copyright 1998 Etienne Grossmann
+# 
+
+use Term::ReadLine;
+$term = new Term::ReadLine 'Treinar', \*STDIN, \*STDOUT ;
+
+use Lingua::PT::Conjugate qw(list_verbs conjug @regverb $vlist
+                             %verb @tense %tense %long_tense 
+                             %alt_tense $letter );   
+import Lingua::PT::Accent_iso_8859_1 qw(iso2asc asc2iso un_accent);
+
+BEGIN{
+    $help_string= q{
+---------------------------------------------------------------------
+           A DRILLING PROGRAM FOR PORTUGUESE VERBS                   
+---------------------------------------------------------------------
+ INPUT:                       COMMANDS:                              
+ q                            Quit                                   
+ h                            Print help                             
+ <verb>                       Enter the requested verb               
+ c [eu|tu...|1..6] <verb>     Correct a previous entry               
+ f [tense]                    Fix drilled tense (default : current)  
+ i                            Toggle iso 8859-1 accentuation         
+ t [verb] [tense]             Will drill next  on "verb" at "tense"  
+                              (default : same)                       
+                                                                     
+           A ACENTUA\C~AO E A CEDILHA FAZEM-SE ASSIM.                
+---------------------------------------------------------------------
+};
+
+    $hslines = $help_string =~ tr/\n/\n/  ;
+    
+    print $help_string;
+}
+
+                                # Get a  list of all verbs
+# &Portuguese::Conjugate::codify($Portuguese::Conjugate::vl);
+# @all_verbs = (keys(Portuguese::Conjugate::verb), @Portuguese::Conjugate::regverbs );
+@all_verbs = grep(!/defectivos[123]?/ && /\S/,
+                  &list_verbs(), @regverb ); 
+# print "ARGH!\n" if( grep(/defectivos/ , @all_verbs ));
+# print "ARGH2\n" if( grep(/^\s*$/ , @all_verbs ));
+
+srand(time());
+
+%ltense= ("pres" =>"Presente", 
+          "perf" =>"Perfeito", 
+          "imp"  =>"Imperfeito",
+          "fut"  =>"Futuro",   
+          "mdp"  =>"Mais-que-Perfeito",  
+          "cpres"=>"Conjuntivo Presente",
+          "cimp" =>"Conjuntivo  Imperfeito",
+          "cfut" =>"Conjuntivo  Futuro", 
+          "cond" =>"Condicional",
+          "ivo"  =>"Imperativo",
+          "pp"   =>"Particípio Passado", #'
+          "grd"  =>"Gerundivo" );
+
+@subs = qw{ eu tu ele/ela nós vós eles/elas }; #'
+%subs = ('eu', 1, 'tu', 2, 'ele', 3, 'ela', 3, 'nos', 4, "n'os", 4 ,
+         'nós', 4, 'vós', 5, 'elas', 6, 'eles', 6 ); #'
+
+
+$flunked_name = '.flunked_verbs' ;
+$flunked = "$ENV{HOME}/$flunked_name";
+if( -e "$flunked" ){
+   open AA,"<$flunked";
+   @fv = <AA>;
+   close(AA);
+   chomp @fv;
+   @fv = grep /[a-z].+\d/,@fv;
+   %fv = map {$_,1} @fv;
+   @fv = keys(%fv);
+}
+
+# ###### Initialize a few variable, should quiet warnings ########
+$from_flunk = 0;                # Use a previously flunked verb?
+
+$fixed_tense = "";              # tense number or empty string
+$tc = 0;                        # tense number
+
+@delay = ();                    # Put flunked verbs on a waiting FIFO
+$wait  = 0;
+
+$isoacc = "i";
+if(($#ARGV >=0) && $ARGV[0]=~/^\-?i$/){
+
+    shift  @ARGV;
+    $isoacc="";
+
+    @ltense{keys(%ltense)} = asc2iso(values(%ltense));
+    @subs = asc2iso(@subs);
+    @ltense{keys(%subs)} = asc2iso(values(%subs));
+
+}
+
+while(1) {
+    print "ARGH3\n" if( grep(/^\s*$/ , @all_verbs ));
+    if( ($v= shift @ARGV) && $v =~ /[oaei]r$/ ){
+#        print "V=$v, @ARGV[0], $tense{$ARGV[0]}\n";
+        if( ($#ARGV>=0) && defined($tense{"$ARGV[0]"}) ){
+            $t  = shift @ARGV;
+            $tc = $tense{$t}-1;
+            #  print " Tense $t, $c \n";
+        } else {
+            $tc = int  rand($#tense+1) ;
+        }
+    } elsif(  @fv && rand()<0.5 ){
+
+        $v = splice(@fv , ($n=int rand($#fv+1)), 1);
+        ($v,$tc) = ($v =~ /^(\S+)\s+(\d+)/g) ; 
+        $from_flunk = 1;
+
+        if($v=~/^\s*$/){
+            print "BUG 1 : $v, $#fv, $n\n";
+        }
+        
+    } else {
+        
+        $from_flunk = 0;
+        $n = int rand($#all_verbs+1) ;
+        $v = $all_verbs[$n];
+
+        if($v=~/^\s*$/){
+            print "BUG 2 : $v, $#all_verbs, $n\n";
+        }
+        
+        $tc = int  rand($#tense+1) ;
+    }
+    if( $fixed_tense &&  ($tc != $fixed_tense) ){
+            $from_flunk = 0 ; 
+            $tc = $fixed_tense ;
+    }
+
+    if($v=~/^\s*$/){
+        print "BUG 3 : $v, $#fv, $#all_verbs, $n, $from_flunk \n";
+    }
+
+    $t = $tense[ $tc ]; 
+    # exit;
+    
+    $|=1;
+#    print "\nVerbo --- $v -----    ,  Tempo --- $ltense{$t} ----- \n";
+    $v1 =  $isoacc ? asc2iso($v) : $v;
+    printf("\n   VERBO : %-17s   TEMPO : %-22s \n\n",$v1,$ltense{$t}) ;
+
+    @pers = @ans = @ref = ();
+    $errors = 0;
+    foreach $p (0..$#subs){
+
+        # next if( $p == 4 || $t eq "ivo" && $p==0);
+	next if( $t eq "ivo" && $p==0);
+        # $a is the prompt string
+        if ($t ne "pp" && $t ne "grd" ){
+            
+            $a = sprintf("%+10s ",$subs[$p]) ;
+     
+        } else {
+     
+            $a = " " x 11 ;
+        }
+        
+        # $w0 is the input;
+        # $w  is the input, a little cleaner.
+        $w = $term->readline($a)  ;
+        unless(defined($w)){$w="";print"\n";}
+        chomp( $w0  = $w );
+        if($w){
+            $w =~ s/^\s+//; 
+            $w =~ s/\s+$//; 
+            $w =~ s/\\([\'\"\^])/$1/; #'"
+            $w = lc $w ;
+            $w = asc2iso($w);
+        }
+                                ################## Quit
+        if( $w =~ /^ q $/x ){    print "\n"," "x11,"Adeusinho \n\n"; exit 0 }
+
+                                ################## Do a correction
+        elsif( $w =~ /^ c \s* ([$letter\d]+) \s+ ([$letter]+) /ox ) {
+            
+            my $q = exists($subs{$1}) ? $subs{$1} : $1 ;
+            my $x = $2 ;
+            if($isoacc){ $x = asc2iso($x)}
+                                # Erase last entry
+            print "\33\133A", "\33\133C"x length($a),
+            " " x length($w0) , "\33\133D" x length($w0);
+
+            if( grep /$q/,@pers ){
+
+                                # Correction on terminal
+                my $d = $p-$q+(($p==5)?0:1) ;
+                print "\33\133A" x $d , " " x length($ans[$q]) ,
+                "\33\133D" x length($ans[$q]) , $x ,
+                "\33\133D" x length($x) , "\33\133B" x $d;
+
+                $ans[$q] = $x ;
+                if( $isoacc )          { $ref[$q] = asc2iso($ref[$q]) }
+                elsif(defined &iso2asc){ $ref[$q] = iso2asc($ref[$q]) }
+            }
+            redo ;
+                                            ################## Help
+        } elsif( $w =~ /^ h $/x ) {
+
+            print "\33\133A", "\33\133C"x length($a),
+            " " x length($w0) , "\33\133D" x length($w0),
+            "\33\133B", "\33\133D"x length($a) ;
+            # "\33\133D"x length($a) ;
+
+            print "\33\133A"x($hslines-1+@pers+4), $help_string,
+            "\33\133B"x(@pers+2),"\33\133C"x length($a);
+            redo; 
+
+                                ################## Try verb,tense
+        } elsif( $w =~ /^ t (?: \s+ (\S+))? (?: \s+ (\S.+))? $/x ) {
+
+            # Erase last entry
+            print "\33\133A", "\33\133C"x length($a),
+            " " x length($w0) , "\33\133D" x length($w0);
+            
+            
+            push @ARGV, $1 if $1;
+            if($2){
+                my $tmp = $2 ;
+                $tmp =~ s/  / /g;
+                $tmp = lc(un_accent($tmp));
+                $tmp = $alt_tense{$tmp} if 
+                    defined($alt_tense{$tmp}) && !ref($alt_tense{$tmp});
+                push @ARGV, $tmp;
+#               print "pushed >$tmp< >$alt_tense{$tmp}<\n";
+#               push @ARGV, $2 if $2;
+            }
+            redo;
+
+                                ################## Toggle ISO-8859-1
+        } elsif( $w =~ /^ i $/x) {
+
+            # Erase last entry
+            print "\33\133A", "\33\133C"x length($a),
+            " " x length($w0) , "\33\133D" x length($w0);
+
+            if($isoacc){
+                $isoacc="";
+
+                @ltense{keys(%ltense)} = iso2asc(values(%ltense));
+                @subs = iso2asc(@subs);
+                @ltense{keys(%subs)} = iso2asc(values(%subs));  
+
+            } else {
+#                do 'Accent_iso_8859_1.pm' unless $isoacc; 
+                $isoacc="i";
+  
+                @ltense{keys(%ltense)} = asc2iso(values(%ltense));
+                @subs = asc2iso(@subs);
+                @ltense{keys(%subs)} = asc2iso(values(%subs));  
+            }
+            redo;
+            
+                                ################## Fix tense
+        } elsif( $w =~ /^ f (?: \s+ (\S.+))? $/x){
+            
+            # Erase last entry
+            print "\33\133A", "\33\133C"x length($a),
+            " " x length($w0) , "\33\133D" x length($w0);
+
+            if( $1 ){
+                # Sorry no check; plain behaviour is fine.
+                # if( defined($tense{$1})){
+                my ($tmp,$tmp2) = ($1,$1) ;
+                $tmp =~ s/  / /g;
+                $tmp = lc(un_accent($tmp));
+
+                unless($alt_tense{$tmp}){
+                  # Print out known verbs
+                  my $message = 
+           "                                                            \n".
+"-----------------------------------------------------------------------\n".
+"                  Sorry, I know no tense called >$tmp2<                \n".
+"                  Try one of :                                         \n".
+"-----------------------------------------------------------------------\n".
+"                  ".
+                    join(",".(" "x45). "\n".(" "x18),
+                         values(%long_tense)) 
+                      . (" "x45)."\n" .
+"-----------------------------------------------------------------------\n".
+   sprintf("   VERBO : %-17s   TEMPO : %-22s \n",$v1,$ltense{$t}) .
+"                                                                       \n";
+
+                  my $mlines =  ($message =~ tr [\n] [\n])-4;
+
+                  print "\33\133A", "\33\133C"x length($a),
+                  " " x length($w0) , "\33\133D" x length($w0),
+                  "\33\133B", "\33\133D"x length($a) ;
+                  # "\33\133D"x length($a) ;
+                  
+                  print "\33\133A"x($mlines-1+@pers+4), $message,
+                  "\33\133B"x(@pers+2),"\33\133C"x length($a);
+
+                  redo ;
+                }
+
+                $fixed_tense =  $tense{$alt_tense{$tmp}}-1 
+				  unless( ref($alt_tense{$tmp}) );
+                             
+            } else {
+                $fixed_tense = $fixed_tense ? "" : $tc ;
+            }
+            redo;
+        }
+
+                                ########## Else, it's an entry
+        $w =~ s/^\s*(\S.+)\s*$/$1/;
+        if($isoacc){ 
+            $w = asc2iso($w);
+            
+            # Re-write last entry
+            print "\33\133A", "\33\133C"x length($a),
+            " " x length($w0) , "\33\133D" x length($w0), "$w\n" ;
+            
+        }
+
+        push @pers,$p+1;
+
+        $ans[$p+1] = $w;
+        chomp( $ref[$p+1] = conjug($isoacc?"sqx":"sqxi",$v,$t,$p+1) );
+
+        
+        last unless ($t ne "pp" && $t ne "grd" );
+        
+    }
+    
+    print "\33\133A" x @pers . "\33\133C" x 30 ;
+    
+    foreach (@pers){
+
+        my $d2 = $ref[$_];
+        $d2 =~ s/\\/\\\\/g;
+        $d2 =~ s/([^\\])([\'\"\^\~])/$1\\$2/g;#'"
+
+#        if( $ans[$_] eq $ref[$_] ){ 
+        if( $ans[$_] =~ /^$d2$/ || $ans[$_]=~/^\s*$/ && $d2=~/^\s*$/){ 
+            print " OK " . "\33\133B" . ("\33\133D" x 4)  ;
+        } else {
+            $errors = 1;
+#            print +($a=" Nope : $_ $ref[$_]  $ans[$_]") , "\33\133B" , 
+#            "\33\133D" x length($a) ;
+            print +($a=" Nope : $ref[$_]"), "\33\133B" , 
+            "\33\133D" x length($a) ;
+        }
+    }
+    
+    
+    print "\33\133D" x 30;
+
+    if($errors && ! $from_flunk && ! defined($fv{$v})){
+        print "\n :-( Booh! <Appending '$v' to $flunked_name\n";
+        if( ! -e $flunked){
+            print "Creating file : $flunked \n";
+        }
+        open AA,">>$flunked";
+        print AA "$v $tc\n";
+        close(AA); 
+        
+    } elsif(!$errors && $from_flunk ){
+        print "\n :-) <Congratulations!!!! Removing '$v' from $flunked_name\n";
+        open AA,">$flunked";
+        print AA join("\n",@fv),"\n";
+        close(AA); 
+    }
+    
+    if($errors){
+        push @delay,"$v $tc";
+    }
+    if(($#delay>=0) && ($#delay+$wait>=6)) {
+        push @fv,shift @delay ;
+        $wait=0;
+    } else {
+        $wait = ($#delay>=0) ? $wait+1 : 0; 
+    }
+    
+#    print " $#delay, $#fv \n";
+}
+
+

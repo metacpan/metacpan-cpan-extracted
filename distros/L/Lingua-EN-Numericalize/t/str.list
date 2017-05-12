@@ -1,0 +1,7 @@
+#   This file is used for regression testing.  Each line below contains
+#   an input and a result, separated by an equals sign with the result
+#   first.  Empty lines are allowed and comments are ignored.
+
+a 1000 = a thousand
+gazillion = gazillion
+no number here = no numbers here

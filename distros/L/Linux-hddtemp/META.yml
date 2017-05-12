@@ -1,0 +1,14 @@
+---
+name: Linux-hddtemp
+version: 0.01
+author:
+  - 'Y. Heling, E<lt>yorhel@cpan.orgE<gt>'
+abstract: monitors hard drive temperatures using the linux hddtemp utility
+license: perl
+requires:
+  IO::Socket: 1.00
+provides:
+  Linux::hddtemp:
+    file: lib/Linux/hddtemp.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

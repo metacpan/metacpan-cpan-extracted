@@ -1,0 +1,4082 @@
+-0.854290007159691	mečeve	1	13
+1	španjolsku	28	
+1	ulagačko	12	
+1	prosinac	106	
+-0.838978150409425	formalni	3	35
+1	prometni	12	
+0.954446734268499	načelima	84	2
+-0.805819439701568	dostavu	2	19
+1	pripala	15	
+1	crpki	28	
+1	boravilo	12	
+1	registarske	10	
+-0.854290007159691	otkupi	1	13
+-0.952875461146407	usuglasili	3	127
+-0.892591322159906	eventualnu	1	18
+1	proračune	16	
+0.849153034802772	promijenjen	12	1
+1	županiji	10	
+1	kazališnih	35	
+1	sučele	11	
+1	iskazivanje	15	
+-0.98801864923148	učešće	2	339
+1	manjkavosti	58	
+1	redoviti	15	
+-0.950794734140875	porekao	2	81
+1	zemljopisno	12	
+1	ocjenjivački	27	
+0.96593829345127	diplomat	113	2
+-0.991039976390508	evropa	1	227
+0.836560327899804	nasljeđem	11	1
+1	razvidan	13	
+1	stječe	47	
+1	izvanredni	53	
+-0.997635384904278	nivou	1	863
+0.869294275410358	nezabilježen	14	1
+-0.936196746738472	obimu	1	31
+0.854748699051882	neslužbenog	25	2
+-0.863990077906338	rodbini	1	14
+1	lipanj	158	
+0.896841840656464	obiteljskog	18	1
+1	priključili	20	
+0.948449555864262	središnji	37	1
+1	zahtijevat	18	
+1	nazočiti	78	
+1	izniman	27	
+-0.975969873115444	centralnom	1	84
+0.836560327899804	slamanju	11	1
+1	uzvikivali	14	
+0.849153034802772	iskaznicu	12	1
+0.803803325232117	prekomjernog	18	2
+0.821673640773722	stanjima	10	1
+0.996168472167825	dužnosnika	510	1
+1	prvotna	11	
+-0.854290007159691	istupi	1	13
+-0.973473934744114	prevazići	1	76
+0.977228952760118	inozemne	85	1
+1	znanstvenicima	20	
+1	kavu	19	
+1	čimbenika	108	
+1	umirovljenih	21	
+-0.814628579559378	razmiricama	1	10
+-0.907223634224005	mis	1	21
+0.930024808444208	utaje	27	1
+0.810145190719012	učinku	28	3
+1	ravnateljem	26	
+0.955482532122209	zanima	43	1
+1	računalni	22	
+1	proračunskim	26	
+1	baštine	53	
+1	izgredima	13	
+0.90667630154302	popravak	20	1
+0.92162069741924	opskrbljivača	24	1
+1	goleme	10	
+-0.868371406344596	formalne	2	29
+0.983544731981364	njezini	118	1
+-0.91314010710258	desetina	2	45
+1	tisuća	222	
+0.955482532122209	izišlo	43	1
+-0.897955978534989	zamisli	1	19
+-0.830048520180336	gajiti	1	11
+-0.956550159567236	zavisnosti	1	46
+0.891104110680441	izbornika	17	1
+1	priopćenju	612	
+1	nabavu	30	
+1	gospodarsku	237	
+-0.843100086310512	narastao	1	12
+1	konca	544	
+0.849153034802772	stanke	24	2
+0.940633888764989	citira	32	1
+1	priopćena	17	
+1	ubojica	13	
+1	rujnu	206	
+0.90667630154302	pojedinosti	20	1
+1	znanstveno	17	
+0.836560327899804	iziđe	11	1
+1	crpke	10	
+1	europsku	287	
+1	uporabi	44	
+1	popise	15	
+1	poduprli	56	
+1	povijesnom	47	
+1	poduprijet	13	
+0.821673640773722	aktualni	10	1
+1	tečaja	31	
+1	talijanskim	28	
+-0.972398866640406	meču	1	73
+0.873516332475301	kolosijeka	29	2
+1	naprosto	18	
+1	svibnju	271	
+1	židovi	11	
+-0.969054366200173	učešća	2	130
+0.970326430264497	demokraciji	65	1
+1	podupirala	14	
+-0.897955978534989	omladinske	1	19
+-0.836834885549543	rampama	2	23
+0.849153034802772	biračko	12	1
+0.910922357301293	djelovao	21	1
+-0.91834721440205	zadnjoj	1	24
+-0.938128917522506	demonstranti	3	96
+1	msp-om	11	
+1	sustave	47	
+0.877474162771805	školstvu	30	2
+0.940633888764989	ahtisaaria	32	1
+1	proračunom	40	
+-0.843100086310512	minhenu	1	12
+0.983405255634907	kojemu	117	1
+-0.942483393981935	rangu	2	69
+0.959614815313483	pristaše	95	2
+1	predsjedanje	54	
+0.949772077134522	kazalištu	38	1
+-0.82267313929342	shodno	2	21
+0.930024808444208	znatna	27	1
+1	siječanj	145	
+1	al-qaeda	31	
+0.877474162771805	usporediti	15	1
+1	obiteljskih	16	
+1	proračunske	32	
+1	razina	158	
+1	idućim	20	
+0.924637732683407	brojke	75	3
+1	zemljopisni	11	
+1	schengenskoj	34	
+1	tiskani	11	
+0.829441202417667	dosegnuvši	21	2
+1	ocjenjivačkog	38	
+0.884690515375318	podignuo	32	2
+1	veleposlanik	363	
+0.90667630154302	dovršiti	40	2
+0.859944070126432	vancouveru	13	1
+1	utvrda	19	
+-0.989836520092071	narednog	1	200
+0.854748699051882	prognozirao	25	2
+-0.988053678008631	kog	1	170
+1	dužnosnica	26	
+1	nazočnošću	11	
+-0.897955978534989	drevna	1	19
+0.948449555864262	uvjetom	37	1
+1	pomirbe	10	
+-0.814628579559378	materijalnih	1	10
+-0.830048520180336	stremiti	1	11
+1	elektroničke	15	
+1	dopušta	10	
+-0.97509095300046	liderom	1	81
+1	konzultacija	40	
+0.866319414052682	kaznene	41	3
+1	forenzični	10	
+1	nazočila	24	
+1	spilje	14	
+1	zajma	22	
+-0.947642291484593	tračnicama	1	38
+1	konzultacije	47	
+-0.96182698768357	prosto	2	105
+1	priključile	33	
+1	pričekati	28	
+1	nogometu	31	
+-0.902810238756176	privrednih	3	60
+1	redatelj	95	
+1	jednotjedni	12	
+1	oporbeni	85	
+0.985165585466146	zapreke	131	1
+1	snošljivost	16	
+-0.956550159567236	generalnog	3	138
+1	izvješćuju	42	
+1	priopćili	147	
+1	nazočit	10	
+1	predsjedao	23	
+-0.91494806562306	kartama	1	23
+1	obvezujuća	13	
+1	obvezujući	30	
+1	priljev	57	
+0.955482532122209	suradnjom	43	1
+1	tvrtka	715	
+1	nazočnosti	82	
+1	opozicijska	21	
+0.877474162771805	odgodom	15	1
+-0.843100086310512	pusti	1	12
+1	temeljenog	30	
+-0.854290007159691	daljeg	1	13
+-0.970399408667968	zavisno	1	68
+-0.902810238756176	pravičnih	1	20
+1	razvitku	183	
+0.836560327899804	fenomena	11	1
+0.965639395985705	neovisnog	56	1
+1	prevoditelj	10	
+-0.814628579559378	pravcem	1	10
+1	dakako	17	
+1	tisuću	20	
+1	nizozemski	59	
+-0.88449487803008	korumpiranosti	3	50
+1	tvrtku	113	
+1	zajamčiti	17	
+1	odljeva	16	
+1	utemeljenje	25	
+1	prvotnu	11	
+-0.982237427971955	protesti	1	114
+1	točka	91	
+0.836560327899804	nestrpljenjem	11	1
+1	mimohodu	18	
+-0.978942012343807	liderima	2	192
+1	ustrojila	20	
+0.896841840656464	ubojice	18	1
+1	pridonositi	10	
+-0.863990077906338	reorganizaciji	1	14
+-0.834633795599296	drevne	3	34
+1	promatra	40	
+1	uporabu	82	
+1	tijek	10	
+0.821673640773722	povjeren	10	1
+-0.879970997210649	prosta	1	16
+1	zanijekao	42	
+1	glasovao	35	
+-0.908607021905152	novostima	3	64
+1	tužiteljstava	12	
+0.930024808444208	odsutnosti	27	1
+-0.814628579559378	zasnivanje	1	10
+0.991875513529397	njezine	240	1
+1	veleposlanici	52	
+-0.91494806562306	redovne	2	46
+1	naputke	12	
+1	obrambenu	16	
+1	bruxellesu	137	
+0.821673640773722	težnju	10	1
+1	izvorno	12	
+0.891104110680441	odredaba	17	1
+-0.974145297654245	prvobitno	2	156
+1	sudionice	16	
+1	razvidno	25	
+1	antalyi	10	
+1	iskaznica	37	
+0.877474162771805	preokrenuti	15	1
+1	ustrajavati	36	
+-0.91724476105407	demonstranata	3	71
+1	težeći	12	
+0.926060794531108	natječaja	51	2
+-0.886631305275454	trustu	1	17
+1	iznimna	21	
+1	oporbena	139	
+-0.848901937398475	neformalnom	2	25
+-0.879970997210649	svuda	1	16
+1	iznimnom	12	
+0.836560327899804	specijalistica	11	1
+0.859944070126432	djelatnicima	13	1
+1	ozračjem	10	
+0.948449555864262	uzajamne	37	1
+-0.830048520180336	ispitom	1	11
+0.816089904554639	samostana	29	3
+1	desetljeće	49	
+-0.802694009943555	redovni	3	28
+1	zbilo	10	
+1	srednjovjekovnog	11	
+1	rumunje	31	
+-0.830048520180336	dubinske	1	11
+1	financirat	13	
+1	rumunja	77	
+1	ustrajavali	18	
+1	mksj-om	15	
+1	prodano	15	
+0.995600173697004	sveučilišta	444	1
+-0.934140006327356	naznačili	1	30
+0.930024808444208	najvjerojatnije	27	1
+-0.998324001415141	evropske	1	1218
+-0.883396181536817	pravične	2	33
+1	liberalno	47	
+0.884690515375318	nogometna	32	2
+1	predano	16	
+1	potičući	15	
+1	zemljoradnici	10	
+1	uhićenih	38	
+1	eliminiranje	15	
+0.96196831390872	skupinama	101	2
+1	stožer	41	
+0.902005192095369	sabora	57	3
+0.849153034802772	zakladu	12	1
+0.989712538463316	rumunjski	568	3
+0.877474162771805	dužničkih	15	1
+0.973654007527344	svezi	220	3
+-0.96679084428673	tačaka	2	121
+-0.892591322159906	ujedinjavanje	1	18
+0.902005192095369	proturaketne	19	1
+0.821673640773722	izvanrednom	10	1
+1	etape	14	
+1	uhićenjima	22	
+-0.843100086310512	teritorijama	1	12
+0.992801537815578	odličje	271	1
+-0.814628579559378	antalija	1	10
+0.914798852028131	složene	22	1
+0.92743110919274	sastat	52	2
+0.821673640773722	zadovoljava	20	2
+-0.968578437235916	narednim	2	128
+-0.919946898202442	pravca	2	49
+-0.997081406413633	odbrane	1	699
+0.959193951432817	predsjedatelja	47	1
+1	učinkovitiji	14	
+-0.843100086310512	izuzetak	2	24
+1	temeljeno	45	
+-0.968578437235916	upotreba	1	64
+1	istodobno	327	
+1	zločinačkih	10	
+-0.91834721440205	ispravnom	1	24
+1	sydneyu	10	
+1	atenskog	19	
+0.849153034802772	neovisan	12	1
+0.869294275410358	antičkoj	14	1
+0.877474162771805	teritorijem	15	1
+1	nazoči	35	
+0.896841840656464	alevi	18	1
+1	bitci	11	
+1	bruxellesom	11	
+1	znanost	279	
+1	sustavi	19	
+1	navješćuje	46	
+0.93243950173535	proračunu	84	3
+0.803803325232117	sastavila	18	2
+-0.980264219498374	direktno	2	205
+1	bruxellessa	10	
+0.821673640773722	prinuđena	10	1
+0.973535298061346	bodova	146	2
+1	znanstvene	52	
+0.90667630154302	protukandidata	20	1
+0.836560327899804	povjerenstava	11	1
+0.836560327899804	poštenih	11	1
+0.821673640773722	prekomjerno	10	1
+1	ciparskog	61	
+0.821673640773722	sjajno	10	1
+1	kostur	23	
+1	obrani	48	
+1	oess/odihr	10	
+0.859944070126432	informatičku	13	1
+-0.854290007159691	nezavisnim	1	13
+1	prosvjedu	33	
+1	tajnice	28	
+-0.959156027427684	protestiraju	1	49
+1	kave	10	
+-0.814628579559378	povike	1	10
+0.930024808444208	useljenika	54	2
+0.938777474584084	izravni	31	1
+0.995816414219242	tajnik	467	1
+-0.886631305275454	stanovišta	2	34
+-0.854290007159691	trojci	1	13
+0.942381034349018	unapređenja	33	1
+0.849153034802772	poduzimajući	12	1
+1	ustrajavajući	51	
+-0.805819439701568	usijane	2	19
+0.884690515375318	investicijskog	16	1
+1	povijesna	40	
+-0.952510337538219	prisustvuje	1	42
+1	sučelio	22	
+0.877474162771805	internetskim	30	2
+0.980988050466686	neovisnih	102	1
+-0.948950529737759	pristalica	2	78
+1	pothvata	24	
+-0.976522153093688	pristalice	1	86
+-0.911253615235317	parlamentarac	2	44
+1	facto	31	
+1	sveučilištima	62	
+1	gospodarstvu	154	
+-0.830048520180336	obavještavati	1	11
+0.920560611494642	potaknuo	71	3
+-0.995017143785567	januar	1	409
+0.869294275410358	presađivanje	14	1
+1	ec-a	63	
+-0.991988604644526	izvještavaju	1	254
+1	teorijski	10	
+0.881191817649941	agency	31	2
+1	schengenskog	20	
+1	postrojba	74	
+1	svatko	63	
+0.95409067342166	svakako	125	3
+1	martya	26	
+0.90667630154302	izišao	20	1
+-0.91834721440205	dužine	1	24
+-0.907223634224005	šou	1	21
+1	financirala	24	
+0.849153034802772	upoznavanje	12	1
+0.891104110680441	internetski	34	2
+1	prijepore	19	
+1	prosvjed	133	
+-0.886631305275454	dekret	1	17
+0.996394279998019	znanosti	542	1
+-0.98845858880241	otpočeo	1	176
+0.924637732683407	atenske	25	1
+0.877474162771805	opservatorij	15	1
+-0.946265237592653	djelotvorno	1	37
+0.869294275410358	internationala	28	2
+1	složeno	14	
+-0.814628579559378	ostvarenih	1	10
+1	sučeljavati	15	
+1	navijestili	31	
+0.991297718123332	povjerenstva	224	1
+0.957418961805666	jamstvo	45	1
+0.896841840656464	surađujemo	18	1
+-0.897955978534989	neformalne	1	19
+1	umirovljenici	34	
+-0.921485106630878	ceku	1	25
+0.986079691152699	stajalište	419	3
+1	promidžbe	40	
+-0.863990077906338	povrijeđena	1	14
+1	dojam	100	
+-0.944813791661799	princip	2	72
+1	litri	12	
+0.92743110919274	upućivanju	26	1
+-0.939947503158414	centralni	1	33
+1	uhićena	32	
+1	haaškom	26	
+0.864780617968279	znatnu	27	2
+0.836560327899804	pozajmljivanja	11	1
+0.887989046343665	podignuli	33	2
+0.93243950173535	icty-em	28	1
+1	ustrojili	16	
+-0.998647882692864	regionu	1	1510
+1	snimkama	11	
+1	obiteljima	85	
+0.829441202417667	obrazloženje	21	2
+-0.848901937398475	naznačila	2	25
+-0.863990077906338	zaposlenja	2	28
+1	kani	103	
+1	summita	86	
+1	citirali	15	
+1	nabavama	11	
+-0.886631305275454	rival	1	17
+-0.984524658724873	lidere	1	131
+-0.989985967252627	stejt	1	203
+1	mirovinama	17	
+0.877474162771805	motrenje	15	1
+1	koalicijski	43	
+1	atena	179	
+0.931653336302367	otok	83	3
+0.877474162771805	suzdržana	15	1
+1	veleposlanikom	27	
+0.944028282861588	zapovjedništvom	34	1
+1	bey	10	
+0.849153034802772	bizantske	12	1
+0.803803325232117	saznaje	18	2
+1	tajništva	14	
+1	točan	28	
+1	predprijamnog	10	
+-0.863990077906338	primorava	1	14
+-0.830048520180336	kursu	1	11
+1	računalu	10	
+1	znanstvenika	88	
+0.869294275410358	dui-a	28	2
+1	četvrtima	12	
+1	internetskog	21	
+0.877474162771805	krajeva	15	1
+1	temeljena	67	
+1	zemnog	105	
+1	složenija	10	
+-0.921485106630878	zadnjim	2	50
+0.922652863107701	polovica	73	3
+1	postrojbe	204	
+1	znanstvenici	134	
+1	izvješću	1206	
+-0.92836717677912	neophodna	2	55
+1	oess-a	185	
+1	priopćenje	189	
+1	značajke	13	
+1	ubojstva	259	
+1	njezinim	115	
+1	glazbe	105	
+0.891104110680441	sljedećem	51	3
+1	veleposlanstvu	21	
+1	ožujak	131	
+1	pljenidbu	10	
+-0.830048520180336	assadovog	1	11
+1	podrijetlo	23	
+0.894050601032093	poticaja	35	2
+1	južnoafričke	12	
+1	utemeljiti	17	
+1	ozljedama	11	
+-0.843100086310512	djelotvornosti	1	12
+1	gospodarska	244	
+-0.91494806562306	strahote	1	23
+-0.900442244807067	generalnom	2	39
+-0.958322843214184	nabavku	1	48
+1	izvješćima	249	
+1	veljače	1102	
+1	dužnosniku	14	
+0.821673640773722	golem	10	1
+-0.863990077906338	glasačka	2	28
+-0.91494806562306	pravični	1	23
+1	proeuropska	13	
+1	financijskih	191	
+0.990448627681219	izravno	204	1
+-0.854290007159691	karakteriziraju	1	13
+1	kreti	16	
+1	priopćen	12	
+-0.954619979426037	podrže	1	44
+1	akcesiji	31	
+0.854748699051882	dvorac	25	2
+0.826928309709818	izvanredno	31	3
+1	liječnicima	18	
+0.954446734268499	obnaša	42	1
+-0.843100086310512	sahranjen	1	12
+0.9346931022522	učinke	29	1
+1	navijestio	71	
+0.936801210228771	dvojbe	30	1
+1	navješćuju	23	
+0.891104110680441	sprovodu	17	1
+0.869294275410358	kontaktne	14	1
+-0.975390984139889	uhapšeno	1	82
+0.810145190719012	nadmeću	28	3
+0.869294275410358	okrivljava	14	1
+1	nakane	29	
+1	priključenja	117	
+0.896841840656464	pothvatu	18	1
+-0.80884739660646	gubici	3	29
+-0.948950529737759	reorganizaciju	1	39
+1	sportašima	11	
+0.813164822838618	zakladi	19	2
+1	prometnih	22	
+1	prosvjeda	348	
+1	temeljeni	21	
+0.873516332475301	položaje	29	2
+0.930024808444208	utemeljenja	27	1
+1	vjerovnicima	11	
+1	prijamu	129	
+0.803803325232117	ugljen	18	2
+1	dovršetka	12	
+1	europskom	302	
+0.836560327899804	oznakama	11	1
+1	imf-a	16	
+0.821673640773722	umirovljene	10	1
+-0.830048520180336	omladinska	1	11
+0.969398825607534	suradnik	63	1
+0.869294275410358	prisilili	14	1
+1	uzajamnom	15	
+1	hendikepirane	13	
+-0.848901937398475	rekonstrukciju	2	25
+1	gospodarstvima	50	
+0.884690515375318	koštuničina	16	1
+0.994613635471735	suradnje	725	2
+-0.91494806562306	izvještavanja	1	23
+-0.843100086310512	odsluženju	1	12
+0.99382346950568	gospodarske	632	2
+-0.863990077906338	podvukavši	1	14
+0.952799393718455	skopja	81	2
+1	dvojaka	14	
+0.940633888764989	udruzi	32	1
+1	podtajnik	28	
+-0.830048520180336	pogledima	1	11
+1	blagdanske	13	
+1	akcesija	13	
+1	glazbeni	49	
+1	preustrojiti	10	
+1	iznimnu	16	
+0.920019742011579	školstvo	47	2
+-0.886631305275454	napravile	1	17
+0.973535298061346	uvjetima	219	3
+0.849153034802772	strojevi	12	1
+1	pridonose	41	
+-0.854290007159691	pravičnu	1	13
+1	sučeljava	287	
+1	promatrača	80	
+1	oporbenim	16	
+0.896841840656464	složenim	18	1
+-0.87247926989368	gradić	1	15
+1	oporbenog	27	
+-0.91494806562306	zapazivši	1	23
+1	nogometa	40	
+-0.901244294018872	novinsku	3	59
+0.836560327899804	utaja	11	1
+0.859944070126432	interventne	13	1
+0.993032110845114	demokracije	280	1
+1	čimbenici	58	
+-0.814628579559378	povjerilaca	1	10
+1	nadvladavanje	58	
+-0.814628579559378	prisjetiti	1	10
+1	poštene	13	
+-0.879970997210649	stavke	1	16
+1	nazočnih	13	
+0.891104110680441	zrakoplovstvo	17	1
+-0.993901650683275	period	1	334
+1	ahtisaariev	21	
+0.949772077134522	utemeljio	38	1
+1	odvjetnik	121	
+1	sučeljavamo	15	
+1	olakšanju	11	
+0.877474162771805	učinkovitih	15	1
+1	časnika	80	
+1	izravnog	16	
+1	izvješće	636	
+1	ozlijeđen	29	
+-0.876338496587412	date	2	31
+-0.843100086310512	shvaćamo	1	12
+1	španjolskom	11	
+0.831882168198295	informatičke	32	3
+1	haaški	25	
+-0.902810238756176	potpiruje	1	20
+-0.984524658724873	kvalitet	1	131
+-0.830048520180336	pribavljanja	1	11
+1	boksač	13	
+-0.863990077906338	dileme	1	14
+1	školstva	56	
+1	prouzročila	13	
+1	prosvjednike	28	
+1	glasovanje	249	
+1	iskaznicama	10	
+1	umirovljenik	30	
+1	dvojake	31	
+0.896841840656464	odgođen	18	1
+1	utemeljila	12	
+0.866319414052682	pojedine	41	3
+1	zapovjednik	228	
+0.986112604606106	ustroj	140	1
+0.849153034802772	suspendirati	12	1
+1	ožujku	284	
+1	sportaše	14	
+-0.843100086310512	nikoziju	1	12
+1	nastojeći	13	
+1	koalicijskog	17	
+1	dragovoljno	26	
+1	europom	26	
+1	potresima	11	
+0.849153034802772	zlostavljani	12	1
+1	škriljevca	40	
+0.945583963937281	ozlijeđeno	70	2
+1	stožeru	12	
+-0.886631305275454	ličnostima	1	17
+1	podrijetlom	31	
+1	oporbi	45	
+0.997037984283586	sustav	660	1
+-0.857673527113883	kursa	3	40
+1	razvitka	376	
+1	prijepori	12	
+1	prvotnim	12	
+1	europljani	24	
+1	ciparska	52	
+1	zrakoplove	34	
+0.884690515375318	securitatee	16	1
+-0.957157575169685	teritoriji	3	140
+1	tvrtci	38	
+1	stupnja	31	
+0.821673640773722	suprotstavljenim	10	1
+1	financijama	17	
+1	kemijskog	11	
+1	glasovanjem	25	
+1	glazbenu	10	
+1	promatračima	18	
+-0.843100086310512	parlamentarce	1	12
+1	obvezao	18	
+0.877474162771805	neminovno	15	1
+0.836560327899804	trenutačnim	11	1
+1	odličja	188	
+1	događalo	21	
+0.803803325232117	ulagačke	18	2
+1	prometovati	12	
+1	suzdržani	25	
+-0.854290007159691	izučavanje	1	13
+0.902005192095369	priključe	19	1
+1	schengenski	11	
+1	konzultantske	13	
+1	umjetno	16	
+1	trgovinama	13	
+1	veleposlanica	44	
+-0.935184688715506	ustanoviti	2	61
+1	podupro	50	
+1	dosegnule	13	
+0.896841840656464	nadvladati	54	3
+-0.996822690609753	evropska	1	642
+-0.974468394443039	otpočeli	1	79
+1	prigodom	114	
+1	oporbom	26	
+1	pozornosti	120	
+1	dovršen	32	
+1	prijama	91	
+1	izgreda	118	
+1	prigodu	263	
+1	kaos	41	
+1	brusselsa	46	
+1	sustava	564	
+0.92162069741924	image	24	1
+0.821673640773722	polog	10	1
+1	mirovina	104	
+1	priopćavajući	20	
+-0.892591322159906	ustanovljene	1	18
+0.877474162771805	idućem	15	1
+1	dovršio	12	
+0.976117884273837	rumunji	81	1
+1	lipnja	1023	
+1	obrambenih	16	
+0.914798852028131	obožavatelji	22	1
+1	nicosije	11	
+0.983749605191209	desetljeća	239	2
+1	siječnja	1091	
+0.991258864993438	haagu	223	1
+1	nogometnim	13	
+1	priopćile	59	
+1	znanstvenim	26	
+1	prisege	13	
+-0.87247926989368	primorali	1	15
+1	neznatan	12	
+0.849153034802772	uzajamnim	12	1
+-0.854290007159691	podržavanje	1	13
+0.938777474584084	tečaj	31	1
+1	nogometnom	14	
+1	čimbenik	146	
+-0.929601308827709	nalaz	1	28
+1	uhite	10	
+0.902005192095369	iskazala	19	1
+0.914798852028131	davatelja	22	1
+1	točaka	118	
+1	prvotno	105	
+0.849153034802772	poreznim	12	1
+-0.973473934744114	garancije	1	76
+1	primjereno	16	
+1	koalicijskoj	22	
+-0.931946248263795	sačinjavaju	1	29
+1	nadići	10	
+0.803803325232117	vitalnog	18	2
+1	kipa	10	
+1	zapovjedništvo	26	
+1	preduvjete	15	
+-0.886631305275454	ofanzivu	1	17
+1	obrambena	11	
+1	djelomice	67	
+1	opsežnom	14	
+0.949772077134522	sastalo	38	1
+-0.863990077906338	akter	1	14
+1	ubojstava	51	
+0.877474162771805	ozljede	45	3
+0.971199453017209	promet	134	2
+1	cjepiva	32	
+1	organiziranju	14	
+0.869294275410358	postajama	14	1
+1	redovite	39	
+1	odvjetnica	10	
+0.884690515375318	plinskog	16	1
+1	osvojit	11	
+1	schengen	32	
+-0.825201711869374	miloševićevog	3	32
+1	podupirem	11	
+1	schengenskom	13	
+-0.82267313929342	akte	2	21
+1	akcijskog	37	
+1	obvezu	65	
+1	promičući	10	
+1	ravnateljstvo	24	
+1	nastojimo	12	
+1	kuran	11	
+-0.843100086310512	ugovorno	1	12
+0.872139616865653	izdvojila	43	3
+1	internetskoj	68	
+-0.876338496587412	lepezu	2	31
+-0.863990077906338	dostavi	2	28
+1	integriranom	14	
+1	predsjeda	10	
+-0.892591322159906	bugarkinja	1	18
+1	razinom	28	
+0.918352021472558	stjepanom	23	1
+1	gaddafia	38	
+1	tužiteljstvu	37	
+1	tjednik	21	
+-0.895342352107124	rivala	2	37
+0.821673640773722	pozivnicu	10	1
+1	biometričkih	13	
+1	neovisnoj	20	
+-0.830048520180336	obavljenom	1	11
+0.859944070126432	pozivnice	13	1
+1	regijom	27	
+-0.946265237592653	ustanovljena	1	37
+0.896841840656464	glazbenom	18	1
+1	cjelinu	17	
+0.938777474584084	zbivanja	31	1
+0.935411259668309	sastala	88	3
+0.96891293005966	nogomet	62	1
+-0.902810238756176	zapazila	1	20
+1	čitatelja	15	
+1	travanj	107	
+0.96891293005966	načelo	62	1
+0.854748699051882	ombudsman	25	2
+-0.982390525165394	tužilaca	1	115
+1	benghaziu	21	
+0.95102843746613	sudjelovala	39	1
+0.989694488282083	skupinu	189	1
+1	sustavima	28	
+-0.943281758062367	otkupila	1	35
+1	đorđem	11	
+-0.941662233528214	uradi	1	34
+-0.91834721440205	posvećenost	1	24
+-0.843100086310512	budžete	1	12
+1	zatočenika	34	
+1	cipru	273	
+0.849153034802772	priključuje	12	1
+-0.985614306208183	centralnoj	1	141
+1	jamstva	74	
+-0.879970997210649	istupio	1	16
+-0.830048520180336	odložili	1	11
+0.836560327899804	protuustavan	11	1
+1	poduprle	24	
+0.936801210228771	quo	60	2
+-0.964378294558041	grupu	3	169
+1	pomiču	10	
+-0.993257646370385	nauke	1	302
+1	bruxelless	12	
+1	ugleda	16	
+-0.814628579559378	heroinom	1	10
+1	vjerovnici	13	
+1	kipara	12	
+-0.944813791661799	pribojava	1	36
+1	krumpir	12	
+1	zrakoplovna	31	
+1	kemijske	11	
+1	produljiti	26	
+1	vjerovnika	14	
+1	dulje	59	
+0.939719971054145	skupinom	63	2
+1	posjetitelje	48	
+0.869294275410358	dogodili	14	1
+1	postrojbu	13	
+-0.936196746738472	postepeno	2	62
+-0.892591322159906	fokusom	1	18
+-0.850741697167013	principe	3	38
+1	točne	13	
+1	veleposlanicima	13	
+1	pijanist	14	
+1	obrana	28	
+0.836560327899804	birokracija	11	1
+1	glede	1425	
+1	schengena	23	
+0.836560327899804	prijepora	11	1
+-0.946265237592653	doprinio	1	37
+-0.87247926989368	proboj	1	15
+0.902005192095369	čelništva	19	1
+0.944028282861588	njezinom	34	1
+-0.941662233528214	kvadratnom	1	34
+1	plinovodom	13	
+-0.921485106630878	kćerka	1	25
+0.836560327899804	zarazu	22	2
+1	optimist	36	
+0.910922357301293	zastupničkih	21	1
+-0.879970997210649	formalnih	1	16
+1	priopćenja	43	
+0.843108961035381	kazano	23	2
+1	razdobljem	51	
+-0.965960913327871	promoviranju	1	59
+0.90667630154302	doputovali	20	1
+0.93243950173535	nogometne	56	2
+1	sveučilišne	25	
+-0.985089363419001	posjetilaca	1	136
+0.849153034802772	tvrdokorni	12	1
+1	uplitati	11	
+0.821673640773722	kćer	10	1
+0.984701933636072	odaziv	127	1
+1	proeuropski	15	
+0.849153034802772	čvršće	24	2
+1	sustavu	226	
+1	sveučilišni	32	
+1	iskapanje	27	
+-0.968578437235916	polovina	1	64
+0.836560327899804	bodove	11	1
+0.9346931022522	promiču	29	1
+0.937805037549965	organiziranje	61	2
+0.877474162771805	investicijski	45	3
+-0.9773045607414	investitori	1	89
+1	doputovat	13	
+1	ciparski	268	
+-0.814628579559378	proširivati	1	10
+-0.91494806562306	maltretiranje	1	23
+-0.863990077906338	učlanjenju	1	14
+1	nadvladavanju	36	
+0.973771656788006	inozemnih	221	3
+-0.814628579559378	sergeyom	1	10
+0.953361587933318	razinama	82	2
+1	thacia	35	
+1	opsežnog	11	
+1	njeguju	10	
+0.893086315660273	pojedini	52	3
+1	ustrajavao	59	
+0.99016061609003	zapreka	198	1
+-0.814628579559378	akterima	2	20
+1	izvjestiteljima	24	
+1	sudionicima	91	
+0.884690515375318	stjecanju	16	1
+0.994927624648829	priključenju	385	1
+0.852930182028195	težiti	37	3
+0.877474162771805	biračima	45	3
+1	doimao	20	
+1	ravnatelja	160	
+0.877474162771805	afp-u	15	1
+-0.924390747676153	presudnu	1	26
+-0.863990077906338	nepovratna	2	28
+-0.859307037068193	destinaciju	2	27
+-0.843100086310512	protivljenjima	1	12
+1	biometričke	17	
+0.990354515715744	financiranje	202	1
+-0.814628579559378	odbacivši	1	10
+-0.876338496587412	rumunskoj	2	31
+1	integriranje	10	
+1	ozračja	108	
+1	sveučilištu	286	
+0.849153034802772	održavajući	12	1
+0.884690515375318	bod	16	1
+1	povijesnih	48	
+1	nizozemci	10	
+1	priopćivši	10	
+1	izvješćivali	11	
+1	oporbu	37	
+1	židova	28	
+1	ustrojena	45	
+0.821673640773722	prodana	20	2
+1	priopćiti	21	
+1	tijeku	244	
+1	glazbenike	13	
+0.91661327037095	izvanrednim	45	2
+1	listopadu	296	
+-0.974307861801079	proteste	2	157
+0.92162069741924	miroljubive	24	1
+1	stajalištem	19	
+1	navijestila	32	
+0.93243950173535	pravilno	28	1
+1	ozlijeđenih	23	
+1	doista	237	
+1	jamčila	17	
+1	utemeljitelja	38	
+1	uporabom	16	
+1	povjerenstvu	35	
+1	natječaje	13	
+1	internetska	66	
+-0.921485106630878	špekulacija	1	25
+1	pomiče	20	
+0.896841840656464	pozabaviti	36	2
+0.821673640773722	obrazloženja	30	3
+1	priopćeno	41	
+1	nadmetati	18	
+1	preslike	14	
+1	postupno	85	
+1	obvezatni	13	
+-0.814628579559378	ijedna	1	10
+1	broadband	13	
+1	oporbene	254	
+1	inozemni	83	
+-0.814628579559378	gjorga	1	10
+0.940633888764989	surađivali	32	1
+1	uzajamna	12	
+1	mirovinskog	31	
+1	miroljubiva	15	
+1	tjednima	30	
+1	podjednako	18	
+1	tjedniku	15	
+0.938132597561184	internetske	92	3
+1	nazočili	214	
+1	protukandidat	20	
+0.877474162771805	načelu	30	2
+1	znanstvenog	30	
+0.891104110680441	učinkovitije	34	2
+1	sudionica	26	
+1	priopćila	581	
+1	promidžbene	11	
+1	gospodarskim	146	
+1	unutarnja	24	
+0.943489765735701	uzajamno	101	3
+-0.924390747676153	sekerinska	1	26
+-0.814628579559378	pređu	1	10
+0.821673640773722	smanjivanjem	10	1
+1	hedge	14	
+0.973535298061346	tromjesečju	73	1
+1	prisegu	43	
+1	uhićenja	295	
+0.912253130747623	citirao	64	3
+0.869294275410358	prodan	14	1
+1	promiče	64	
+0.990631447509148	svojem	624	3
+0.987448111594036	sučeljavaju	155	1
+1	zemni	63	
+1	autoplin	11	
+1	propisano	17	
+1	uvjet	155	
+-0.939947503158414	br	3	99
+0.96891293005966	djelomično	62	1
+1	nagnati	13	
+0.881191817649941	oprost	31	2
+-0.892591322159906	beneficije	1	18
+0.821673640773722	showa	10	1
+1	tisak	23	
+1	tužitelju	19	
+0.994613635471735	rumunjske	725	2
+1	nakladnika	16	
+1	financijski	165	
+1	proračunskog	61	
+1	sarkozya	20	
+0.902005192095369	nadvladavanja	19	1
+1	poviješću	11	
+1	poglavito	16	
+1	sudjelovanjem	28	
+0.991258864993438	prijam	446	2
+1	financira	70	
+-0.843100086310512	dopis	2	24
+1	teritorijima	11	
+-0.921485106630878	jugoslovenske	1	25
+1	pričuva	29	
+1	ispravama	11	
+-0.892591322159906	efekte	2	36
+1	južnoafričkoj	21	
+-0.814628579559378	benedikta	1	10
+1	promatrati	47	
+0.826928309709818	odgađanja	31	3
+0.957418961805666	izvedivosti	45	1
+1	usd	21	
+1	glazbenog	23	
+0.829441202417667	kvaliteti	21	2
+0.964389440287786	polovicu	54	1
+1	glazba	35	
+1	pozorno	108	
+1	transportira	11	
+1	srpnju	279	
+-0.970822144181577	promoviranja	1	69
+0.836560327899804	stječu	11	1
+-0.830048520180336	gaddafiju	1	11
+1	uhićenje	242	
+1	izaslanstvom	26	
+1	izvješćivanje	19	
+-0.976919985877469	atina	2	175
+1	ustrajavala	29	
+1	ustrajavaju	61	
+0.836560327899804	kruha	22	2
+1	socijaldemokrat	12	
+1	priključio	45	
+0.959193951432817	suzdržanost	47	1
+0.894050601032093	osobnu	35	2
+0.859944070126432	strahujući	26	2
+0.869294275410358	kazale	14	1
+1	ap-u	18	
+1	redatelja	157	
+-0.854290007159691	demarkacije	1	13
+0.9844590665441	nizozemska	125	1
+1	gospodarskom	226	
+-0.879970997210649	primorana	1	16
+0.859944070126432	ponovljeni	13	1
+1	uhiti	18	
+-0.907223634224005	otada	1	21
+1	tiskovnu	43	
+1	čimbenike	16	
+1	kućanstava	47	
+1	crti	23	
+0.869294275410358	poboljšat	14	1
+0.910922357301293	samostanu	21	1
+0.9755206739782	kazališta	79	1
+1	mladež	55	
+1	predsjedanja	39	
+0.874863716787849	zastupnica	44	3
+1	povijesne	62	
+0.836560327899804	odjeveni	11	1
+1	europskim	274	
+1	tiska	27	
+1	gospodarskih	264	
+-0.892591322159906	ubrzaju	1	18
+1	duljina	12	
+1	izbornik	31	
+0.988413761949344	demokraciju	168	1
+0.869294275410358	antička	14	1
+-0.91834721440205	projektila	1	24
+0.947055506196188	daytonskim	36	1
+-0.901244294018872	krivičnom	3	59
+0.922652863107701	liječnik	73	3
+-0.843100086310512	saučešće	2	24
+0.954446734268499	priključiti	126	3
+-0.879970997210649	ubrzavanja	1	16
+0.845176758883771	ahtisaarijevu	35	3
+-0.965384190200334	neophodnih	1	58
+1	nazočnost	155	
+1	rujan	98	
+1	otočju	10	
+0.938777474584084	dosegnuti	93	3
+-0.830048520180336	spiskova	1	11
+0.998151209710902	europske	1058	1
+-0.814628579559378	obavezno	3	30
+1	utrt	12	
+1	suradnike	10	
+-0.830048520180336	liči	1	11
+1	ozlijeđeni	18	
+1	razdoblje	289	
+1	ciparske	50	
+1	obvezatno	15	
+1	pričuve	41	
+0.992801537815578	stajališta	271	1
+1	unutarnjeg	19	
+1	sportaš	12	
+-0.91494806562306	djelotvorna	1	23
+1	veleposlanike	22	
+-0.902810238756176	upotrijebila	1	20
+-0.854290007159691	dostavljanje	1	13
+1	uvrjeda	11	
+1	umirovljenicima	16	
+1	europskoj	210	
+-0.989936642275645	alijanse	1	202
+0.916017112158651	izvanredne	67	3
+-0.986648426192536	desilo	1	152
+1	povjesničar	26	
+1	gospodarstva	765	
+-0.843100086310512	investicijama	2	24
+1	uzlet	12	
+0.98235854139563	nasljeđa	110	1
+-0.854290007159691	vezuju	1	13
+1	memorijalno	11	
+0.821673640773722	pošiljke	10	1
+0.973888259983378	predanosti	74	1
+-0.886631305275454	jednodnevne	1	17
+1	izvješćivanja	13	
+1	obnašao	32	
+1	useljenici	19	
+-0.91494806562306	neformalni	1	23
+1	prijamom	10	
+0.849153034802772	promjera	12	1
+1	zaklada	105	
+0.859944070126432	procijenjeno	26	2
+0.902005192095369	brojku	19	1
+-0.830048520180336	doprinositi	1	11
+1	ustrojeno	14	
+0.997033496237605	unutarnjih	659	1
+1	kolovoza	756	
+1	iskaznice	59	
+0.989906996156347	milijun	193	1
+-0.883396181536817	vanrednim	2	33
+0.891104110680441	utrti	17	1
+1	zadaća	97	
+1	gubitci	21	
+-0.814628579559378	beriša	1	10
+1	stabiliziranje	10	
+1	useljenike	18	
+1	prigode	31	
+1	potaknuli	23	
+1	talijanske	39	
+1	haaškim	71	
+1	sučeljena	10	
+1	burza	14	
+0.970326430264497	težnjama	65	1
+-0.830048520180336	sačinili	1	11
+1	glasovala	31	
+0.884690515375318	badnju	16	1
+1	dostupno	15	
+0.997850063763733	milijuna	2729	3
+1	internetskom	13	
+1	svagdje	21	
+-0.848901937398475	sačiniti	2	25
+1	mladeži	96	
+1	savjetodavnoj	10	
+-0.911253615235317	uzdržanost	1	22
+1	natpolovičnu	10	
+0.972022573724247	teritorij	69	1
+1	financirali	12	
+1	nicosii	17	
+0.992555182857167	koncu	262	1
+-0.996628703366994	izvještaj	1	605
+1	postrojbi	76	
+1	pravobranitelj	10	
+1	tjednu	19	
+1	dražbi	13	
+1	znanstvenoj	20	
+0.983681883313523	eu-a	119	1
+1	glasovanja	220	
+1	računalnih	22	
+1	donoseći	11	
+1	žitelji	22	
+1	prilagodbu	18	
+1	isprava	52	
+-0.82267313929342	uveliko	2	21
+0.961342532335672	prosvjednici	149	3
+1	nogometno	25	
+0.986401967713136	njezino	143	1
+1	preustroj	93	
+0.965025582659126	sudjelovali	165	3
+1	četirima	14	
+-0.863990077906338	antikorupcijskog	1	14
+1	počinitelje	14	
+0.914798852028131	nadmetanje	22	1
+-0.814628579559378	spolno	1	10
+1	nicosiji	64	
+1	podignula	21	
+-0.929601308827709	prisustvuju	1	28
+1	liječnica	13	
+0.966232035638133	financiranja	114	2
+0.969869765671829	podrijetla	64	1
+1	zrakoplovom	17	
+1	milijune	33	
+-0.863990077906338	motom	1	14
+-0.902810238756176	odlaganje	3	60
+1	održanju	22	
+-0.997452589145347	projekat	1	801
+1	utega	49	
+0.836560327899804	zakladama	11	1
+1	čitatelji	19	
+1	proračunski	112	
+-0.805819439701568	trodnevnoj	2	19
+-0.805819439701568	primoran	2	19
+-0.802694009943555	ovlast	3	28
+0.957418961805666	tužiteljstva	90	2
+-0.82267313929342	formalnu	2	21
+1	nazočnima	13	
+-0.814628579559378	usku	1	10
+1	uporaba	41	
+1	tajniku	27	
+1	središtima	27	
+1	elektroničkih	14	
+1	pretežito	11	
+1	razvitkom	20	
+0.955482532122209	reutersu	43	1
+-0.854290007159691	prikladno	1	13
+1	zajamčila	16	
+1	sučelit	26	
+0.914798852028131	sportaša	66	3
+1	mirovinski	16	
+-0.854290007159691	zakletve	1	13
+1	dužnosnicima	332	
+1	tjedan	196	
+1	izgred	78	
+1	motrišta	11	
+1	posjetiteljima	33	
+1	neovisnim	15	
+-0.863990077906338	kontinuiranih	1	14
+1	pokal	18	
+0.813164822838618	nužan	19	2
+1	izaslanstvu	17	
+1	nizozemskom	22	
+-0.830048520180336	obaveznu	1	11
+0.836560327899804	vođi	11	1
+1	internetskih	74	
+1	katu	10	
+0.803803325232117	krijumčarenju	18	2
+1	umjetne	17	
+-0.977797824372046	tenderu	1	91
+1	mimohoda	11	
+1	raspisani	14	
+-0.854290007159691	barrosoa	1	13
+1	tisuće	200	
+0.869294275410358	najvišoj	42	3
+0.9758229665692	rumunjskim	80	1
+0.988811052264677	suradnja	348	2
+-0.9513802108608	krivice	1	41
+1	redovitih	13	
+-0.892591322159906	preći	1	18
+0.980895290167949	priključenje	203	2
+1	produljenja	13	
+1	prosvjedi	131	
+1	pristašama	34	
+1	glazbenih	32	
+-0.995509930412877	evropskog	1	454
+1	oess	84	
+1	dosegnut	10	
+0.96372972788464	pojedinim	53	1
+0.849153034802772	razmotreni	12	1
+0.977228952760118	predana	85	1
+-0.992433646661151	izvještava	2	538
+0.859944070126432	pogrešku	13	1
+0.849153034802772	uvjerljivom	12	1
+0.859944070126432	odnosilo	13	1
+1	vladanja	11	
+1	proračunskom	13	
+1	kemikalija	10	
+-0.830048520180336	džeza	2	22
+1	tjedno	50	
+1	europu	329	
+1	sveučilišnih	19	
+1	aktualna	12	
+-0.838978150409425	njegu	3	35
+1	danim	10	
+0.859944070126432	narodnost	13	1
+1	domeni	12	
+-0.805819439701568	življenja	2	19
+1	konzultacijama	12	
+0.869294275410358	usporedbe	14	1
+1	glazbi	19	
+-0.87247926989368	odigra	1	15
+1	zrakoplovi	23	
+1	priopćio	530	
+1	financiranju	54	
+1	djelatnici	90	
+-0.992781191210896	briselu	2	564
+-0.854290007159691	sišao	1	13
+1	ležišta	16	
+0.993754508386772	udruge	625	2
+1	kolovoz	92	
+1	pn-a	10	
+1	gitarist	11	
+0.803803325232117	prometne	27	3
+1	sučeliti	174	
+0.896841840656464	odaziva	18	1
+1	atenska	17	
+-0.805819439701568	učlanjenje	2	19
+-0.854290007159691	akreditive	1	13
+1	znatnog	20	
+1	akropole	15	
+0.836560327899804	centimetara	11	1
+-0.91834721440205	krivično	3	72
+1	obvezama	27	
+1	stajat	11	
+1	glasuju	39	
+-0.950194984998913	ekonomijama	1	40
+1	tužiteljstvo	114	
+-0.897955978534989	akti	1	19
+1	msp-u	12	
+0.928751555995205	upućivanje	53	2
+1	prostornih	18	
+1	ustrojene	11	
+0.987987219483295	stožera	162	1
+1	posebice	1074	
+1	postrojbama	31	
+0.983816767286411	obranu	120	1
+0.821673640773722	nisi	10	1
+1	zadaćom	11	
+0.90667630154302	diplomaciji	20	1
+-0.886631305275454	primorala	1	17
+-0.80884739660646	ponovivši	3	29
+-0.966518734174829	investitorima	1	60
+-0.814628579559378	kresanje	2	20
+1	unutarnju	41	
+-0.814628579559378	djelotvornije	1	10
+-0.947642291484593	cik	1	38
+1	španjolskoj	64	
+1	prosincu	325	
+1	summitu	54	
+-0.961467011220216	džez	1	52
+-0.993420493857083	vjerovatno	2	619
+1	nagađati	17	
+1	točku	52	
+1	pridonio	52	
+1	izvješćem	45	
+1	paneuropskog	12	
+1	izravnu	35	
+0.899489784844253	smjera	37	2
+1	nazoče	42	
+1	duljine	94	
+1	dovršila	18	
+-0.933061096229335	upotrebi	2	59
+1	zlorabe	10	
+1	broncu	12	
+1	ciparskih	481	
+-0.950991453512103	neophodno	3	122
+1	mks	16	
+1	tenisača	11	
+1	prosvjeduje	11	
+0.977490752384182	objekt	86	1
+-0.859307037068193	nijednog	2	27
+1	rumunjskog	156	
+0.926060794531108	sudjelovat	51	2
+-0.995905831283519	gasa	1	498
+0.821673640773722	antički	20	2
+-0.946265237592653	specijalnih	1	37
+1	podupirući	16	
+0.924637732683407	manjkom	25	1
+0.821673640773722	eid	10	1
+-0.854290007159691	eventualnim	1	13
+1	računalnog	11	
+0.836560327899804	zapisa	11	1
+-0.854290007159691	uticaj	1	13
+0.884690515375318	izravnom	16	1
+-0.854290007159691	debi	1	13
+-0.863990077906338	nabavci	1	14
+0.974231930856118	pristaša	75	1
+1	čimbenicima	31	
+-0.843100086310512	sveukupna	2	24
+1	izvanrednog	14	
+1	imageu	10	
+1	financijsko	30	
+1	sveučilišnog	19	
+1	uhićenika	10	
+1	stajalištu	56	
+0.896841840656464	nepravedno	36	2
+-0.962412231326353	faktor	3	160
+0.944028282861588	strukturnih	34	1
+1	akcijski	67	
+1	demokracija	141	
+0.9346931022522	srebrno	58	2
+-0.854290007159691	privrednik	1	13
+-0.879970997210649	prijavljivanja	1	16
+-0.944813791661799	zemalja-članica	1	36
+1	desetcima	10	
+1	demokracijom	16	
+0.877474162771805	nasljeđu	15	1
+1	uhićenima	11	
+0.836560327899804	primjerena	11	1
+0.869294275410358	priključilo	14	1
+0.836560327899804	hendikepiranih	11	1
+1	obnašaju	14	
+1	iznimne	18	
+0.908848750630872	desetke	41	2
+1	vršitelj	34	
+1	rumunj	20	
+1	točnije	24	
+1	tripoliu	13	
+1	ustroji	17	
+0.98591275565208	posjetitelja	138	1
+-0.990333421935226	sistem	3	631
+1	liječniku	11	
+-0.994309315315132	ko	1	358
+0.982516084077746	tajnica	111	1
+-0.892591322159906	mečevima	1	18
+-0.843100086310512	kontinuirana	1	12
+0.869294275410358	gubitcima	14	1
+1	nakladnik	12	
+1	prošlotjedni	10	
+-0.982688936369923	naporu	1	117
+0.910922357301293	istaknulo	21	1
+-0.854290007159691	sačinjava	1	13
+1	sveučilišna	10	
+1	razmotreno	10	
+-0.953589119955611	nagovijestio	1	43
+-0.87247926989368	sume	1	15
+1	prigodama	10	
+0.889047016132559	regijama	50	3
+1	dovršeni	16	
+0.843108961035381	izostanak	23	2
+0.960826881983389	desetljećima	49	1
+1	lisnice	18	
+0.997958422334637	studenog	958	1
+1	prigodi	12	
+-0.886631305275454	prisutnima	1	17
+0.879977922216263	sadašnju	46	3
+1	kurana	11	
+-0.927089002465745	rundu	1	27
+1	točno	65	
+1	informativno	52	
+1	ravnatelju	14	
+1	ugljena	25	
+1	središnjeg	60	
+-0.876338496587412	stanici	2	31
+1	zaprimila	10	
+0.97960145793458	glasovali	95	1
+-0.963959374903234	naslijeđa	3	167
+-0.941662233528214	diskusija	1	34
+-0.805819439701568	maltretiranja	2	19
+1	schengenu	30	
+1	financijskom	77	
+0.836560327899804	kćeri	33	3
+0.821673640773722	prinuđeni	10	1
+1	prosvjedovati	26	
+-0.814628579559378	protokom	1	10
+0.884690515375318	sunarodnjaka	16	1
+-0.946732233994727	investitora	3	112
+1	prošlotjednog	18	
+0.942381034349018	podatcima	99	3
+1	promatranje	10	
+1	brončanog	20	
+1	pokrovitelji	13	
+1	promatračka	15	
+1	miroljubivu	11	
+1	topiem	13	
+1	stupnjeva	54	
+1	kompetentnost	12	
+-0.863990077906338	primorati	2	28
+0.991560310838473	idućih	231	1
+1	višedesetljetnog	11	
+0.985165585466146	podatci	131	1
+1	uhićene	26	
+1	inzistira	11	
+1	knjižnica	34	
+0.873516332475301	antičke	29	2
+0.836560327899804	učinaka	11	1
+-0.952510337538219	kvadratnih	2	84
+0.836560327899804	narušen	22	2
+1	potkopavanja	11	
+1	temeljenu	23	
+-0.895342352107124	nadležni	2	37
+-0.886631305275454	korumpiranost	1	17
+1	zapovijedio	12	
+1	iskapanja	43	
+1	židovske	15	
+1	podnositelji	16	
+-0.902810238756176	trust	1	20
+0.891104110680441	srednjovjekovne	17	1
+1	jamčenje	26	
+-0.99706463340635	miliona	2	1390
+1	ozračje	185	
+-0.843100086310512	evidenciji	1	12
+-0.830048520180336	napravljena	1	11
+1	nazočio	173	
+1	podudara	12	
+0.881191817649941	zajamčena	31	2
+1	uhititi	33	
+1	pogreška	32	
+-0.857673527113883	predsjedavajuće	3	40
+1	glazbenika	32	
+-0.997430159720352	rumunija	1	794
+1	spilja	26	
+1	vlaka	10	
+1	financijskim	117	
+-0.897955978534989	nikozija	2	38
+1	naporan	11	
+1	ophodnju	18	
+-0.995942421097043	evropi	2	1005
+-0.968578437235916	direkcije	1	64
+1	brusselsom	39	
+1	eu-om	19	
+1	veleposlanika	126	
+1	obnašati	46	
+1	streljiva	89	
+1	redovita	13	
+0.803803325232117	ostvarenju	27	3
+-0.87247926989368	pribavljanje	1	15
+1	nevjerojatan	14	
+1	financijska	175	
+1	sudjelovale	47	
+1	potaknulo	51	
+0.983070430303596	financijske	344	3
+1	kemijski	10	
+0.877474162771805	pravednu	15	1
+1	povlastica	47	
+0.938777474584084	nogometni	62	2
+0.859944070126432	složena	26	2
+0.973535298061346	al-qaede	73	1
+1	posve	16	
+-0.843100086310512	praznične	1	12
+0.836560327899804	građena	11	1
+1	litva	16	
+0.910922357301293	vitalna	21	1
+1	haag	69	
+1	opetujući	16	
+-0.843100086310512	topijem	1	12
+-0.938128917522506	pres	1	32
+1	veleposlanstava	23	
+0.963390619732038	potpori	105	2
+1	promatrač	10	
+0.974566672767651	strasbourgu	76	1
+1	jedanput	10	
+0.914798852028131	osobna	22	1
+1	lipnju	268	
+0.959193951432817	dovršetak	47	1
+-0.941662233528214	prijema	1	34
+1	prodavaonice	45	
+0.902005192095369	citirajući	57	3
+0.999382967871259	tijekom	3172	1
+-0.87247926989368	nadležnog	1	15
+-0.814628579559378	gaddafijevog	1	10
+1	protukorupcijski	16	
+1	kriminalističkih	16	
+1	diplomacija	35	
+1	znanstvenica	11	
+1	točna	14	
+1	zloporabama	10	
+1	prometu	20	
+1	sveučilišnom	11	
+0.910922357301293	uvrjedu	21	1
+0.877474162771805	popraćen	15	1
+1	pravednih	10	
+-0.830048520180336	donirao	1	11
+1	krajni	15	
+1	pridonijela	49	
+0.859944070126432	učinkovitijim	13	1
+1	beogradsko	10	
+1	usporedbu	14	
+0.914798852028131	posljednjeg	66	3
+1	sedamdesetih	13	
+1	gledatelja	34	
+1	zloporabu	69	
+-0.886631305275454	sarkozyjem	1	17
+1	rumunjskoj	741	
+0.940633888764989	dosegnula	64	2
+0.976405693722004	stupanj	82	1
+0.925592449873869	znatan	76	3
+-0.843100086310512	prostorno	1	12
+-0.974468394443039	povrijeđeno	1	79
+1	oformiti	16	
+-0.934140006327356	stanicu	1	30
+1	tužiteljem	14	
+1	promidžba	25	
+-0.843100086310512	plavšićeva	1	12
+0.803803325232117	učvršćivanje	18	2
+-0.900442244807067	insistiraju	2	39
+1	znanstvenike	19	
+-0.897955978534989	tužilaštvu	2	38
+-0.960726299019428	kurs	1	51
+1	znanstvenu	13	
+1	nesnošljivosti	10	
+1	thaciem	45	
+-0.929601308827709	principi	1	28
+0.821673640773722	paše	10	1
+1	tjeralice	13	
+1	atene	377	
+1	suglasnost	26	
+1	ustrojen	19	
+-0.991416413902847	specijalni	1	237
+-0.892591322159906	obavezne	1	18
+-0.988775623018501	obim	1	181
+1	udrugu	26	
+1	brussels	195	
+0.803803325232117	kruh	27	3
+1	suutemeljitelj	12	
+0.877474162771805	napornog	15	1
+0.945583963937281	omogućavajući	35	1
+0.965025582659126	washingtonu	165	3
+0.92162069741924	izdvojeno	24	1
+0.93358541396346	ovisno	57	2
+0.849153034802772	yugo	12	1
+-0.87247926989368	izgledali	1	15
+1	tražitelje	10	
+-0.883396181536817	parlamentarcima	2	33
+1	zamijetio	13	
+0.877474162771805	položajima	30	2
+1	časnici	13	
+0.99541469176645	europski	426	1
+-0.934140006327356	objelodanila	1	30
+1	povjesničari	23	
+-0.967581268230865	zapaža	2	124
+1	promicanje	91	
+1	odcjepljenju	16	
+1	ciparskom	17	
+-0.911253615235317	krivični	3	66
+0.836560327899804	dovršena	22	2
+1	opetovao	26	
+1	njezinoj	105	
+1	utemeljili	22	
+-0.814628579559378	rampi	1	10
+1	prosvjete	159	
+1	redovitoj	10	
+0.836560327899804	osiguravajući	11	1
+1	studenoga	12	
+1	benedict	23	
+-0.830048520180336	plata	1	11
+1	saboru	56	
+1	proračunskih	34	
+0.913544727355314	učinkovito	65	3
+-0.886631305275454	redovnim	1	17
+1	stege	10	
+0.869294275410358	učinkovite	28	2
+-0.848901937398475	licence	2	25
+1	španjolske	94	
+0.877474162771805	složen	30	2
+-0.843100086310512	istupiti	1	12
+0.956472272935439	kazališne	44	1
+1	brončana	27	
+1	mksj-a	42	
+1	bruxellessu	29	
+1	uputile	10	
+1	prepada	16	
+1	malen	20	
+0.849153034802772	diva	24	2
+1	njezinih	148	
+0.918352021472558	kip	23	1
+0.949772077134522	nogometnih	38	1
+1	euroazijska	26	
+-0.947642291484593	antikorupcijske	1	38
+1	cross-country	11	
+0.877474162771805	utire	30	2
+-0.981259864887057	direktnih	1	108
+1	neovisnu	40	
+1	sučeljavanje	68	
+0.894050601032093	suradnika	35	2
+0.978714361491979	četvornih	91	1
+0.884690515375318	računalima	16	1
+0.836560327899804	ostatci	33	3
+1	dosegnulo	13	
+-0.892591322159906	formiran	1	18
+-0.948950529737759	obavezu	2	78
+-0.814628579559378	krasniqijem	1	10
+1	oporbenu	11	
+1	znanstveni	31	
+1	pomaknula	18	
+-0.927089002465745	opredjeljenje	3	81
+1	dogodila	39	
+1	ustrajavanje	29	
+1	prigoda	125	
+1	povjesničara	12	
+0.859944070126432	zaposlenima	13	1
+-0.91494806562306	dažbina	1	23
+1	nizozemskoj	29	
+-0.854290007159691	demonstrant	1	13
+1	temeljen	80	
+0.965639395985705	kazalište	56	1
+0.9346931022522	pothvat	29	1
+1	djelatnika	170	
+1	salia	10	
+-0.991380199531248	rumuniju	1	236
+-0.863990077906338	eventualna	1	14
+1	doseže	21	
+-0.814628579559378	zbogar	1	10
+0.914798852028131	učinci	22	1
+1	redatelju	12	
+-0.892591322159906	otcjepljenje	2	36
+0.869294275410358	deseci	14	1
+1	odljev	16	
+0.849153034802772	dosegao	24	2
+1	uhitila	146	
+1	tko	377	
+0.908135926968129	potaknula	61	3
+1	danoj	15	
+1	ožujka	1084	
+1	samoubojstvo	22	
+-0.995100784533642	novembar	1	416
+1	točkama	27	
+-0.843100086310512	rodbina	3	36
+1	utemeljen	30	
+-0.868371406344596	prevare	2	29
+-0.996040711056735	rumunski	1	515
+1	računala	141	
+1	kazališna	10	
+0.914798852028131	središtem	22	1
+1	snošljivosti	25	
+-0.879970997210649	primorani	2	32
+1	stockholmu	20	
+0.803803325232117	prisiliti	27	3
+1	glasovati	175	
+1	zapovijedanja	10	
+-0.87247926989368	podiglo	1	15
+1	uhićeno	92	
+1	ravnatelji	27	
+1	pridodati	10	
+-0.911253615235317	proističu	1	22
+-0.868371406344596	podrškom	2	29
+1	јe	95	
+0.869294275410358	održanja	14	1
+0.869294275410358	miroljubiv	14	1
+1	helsinkiu	10	
+1	dulji	17	
+0.896841840656464	zrakoplovima	18	1
+-0.9513802108608	privredni	1	41
+1	ubojstvom	33	
+-0.820070338008709	lak	3	31
+0.981526231562592	posjetitelji	105	1
+1	maramu	15	
+0.965025582659126	središnju	55	1
+1	promicala	15	
+-0.994471016820604	saradnje	2	737
+0.994341187136976	povijesti	345	1
+1	koalicijskim	18	
+1	umirovljeni	41	
+1	potresi	14	
+1	unutarnjoj	15	
+0.936801210228771	nužne	30	1
+-0.961467011220216	kolumnista	1	52
+1	uhitili	20	
+1	zapovjedništva	21	
+1	prosvjedima	66	
+1	domjenku	11	
+1	tajništvo	20	
+-0.863990077906338	unutrašnju	2	28
+0.938777474584084	ahtisaarijeva	31	1
+1	potporom	57	
+0.821673640773722	ocijenivši	10	1
+1	inozemstvom	15	
+-0.843100086310512	miješane	1	12
+0.981698917632956	gospodarskoj	106	1
+-0.814628579559378	iznađe	1	10
+1	promidžbeni	10	
+0.960431025303401	liječnika	97	2
+-0.820070338008709	euroazijske	3	31
+1	mimohod	21	
+0.849153034802772	kroma	12	1
+1	travnju	243	
+1	nazočne	10	
+1	judo	10	
+1	izgledno	10	
+-0.967058567050051	otpočelo	1	61
+0.821673640773722	protuvladinih	10	1
+1	španjolskog	12	
+1	haaškog	50	
+-0.863990077906338	dvaput	2	28
+1	skladatelja	23	
+1	dosegne	15	
+1	iziđu	10	
+1	povijesno	40	
+1	streljivo	30	
+1	oporba	208	
+-0.991143550806909	šta	3	689
+1	financiranjem	14	
+1	setimes-u	55	
+1	elektroničkim	11	
+0.836560327899804	povlasticama	11	1
+1	tajnikom	63	
+1	mirovinske	16	
+1	rating	18	
+-0.939947503158414	žiri	1	33
+1	koalicijsku	19	
+-0.854290007159691	propisno	3	39
+0.90667630154302	zanimanja	60	3
+0.951633339580892	neovisni	79	2
+1	rajčica	11	
+1	pridonosi	59	
+1	mojeg	27	
+1	prvotne	10	
+1	rujna	920	
+0.821673640773722	poluotok	10	1
+1	gospodarski	520	
+0.821673640773722	očuvao	10	1
+0.997368433573903	europska	743	1
+0.849153034802772	onemogućuje	12	1
+-0.805819439701568	otpočnu	2	19
+0.902005192095369	yorka	19	1
+0.924637732683407	burzi	25	1
+1	točke	115	
+1	španjolska	117	
+1	burzu	10	
+-0.814628579559378	predsjedavajućom	1	10
+0.979167349026799	sudionici	186	2
+-0.814628579559378	učlanjivanja	1	10
+0.954446734268499	laboratorij	42	1
+1	trgovačkom	12	
+1	ustrajava	162	
+1	krasniqiem	10	
+-0.989191293313052	atine	2	376
+1	pomicanje	22	
+-0.924390747676153	delegacijom	1	26
+-0.886631305275454	privrednu	1	17
+1	brončano	59	
+-0.843100086310512	dubaiju	1	12
+0.994500151969585	diljem	710	2
+-0.805819439701568	obavile	2	19
+-0.843100086310512	insistirao	2	24
+-0.924390747676153	nalaza	1	26
+1	obiteljski	20	
+0.978714361491979	sudjelovao	91	1
+0.992956912093198	razdoblja	277	1
+0.975210726367094	priključila	78	1
+-0.814628579559378	motivacije	2	20
+0.877474162771805	raskrižju	15	1
+1	putovnice	94	
+0.982516084077746	pridonijeti	111	1
+1	cjepivo	14	
+1	listopad	116	
+0.884690515375318	identificiranju	16	1
+0.965639395985705	surađuje	56	1
+1	promatraju	23	
+-0.892591322159906	naspram	2	36
+0.99570631476569	unatoč	910	2
+0.821673640773722	ruralna	10	1
+-0.98391549663417	aerodrom	1	126
+1	obvezatan	12	
+-0.814628579559378	saznao	1	10
+1	financije	41	
+0.864780617968279	učinkovitu	27	2
+0.954446734268499	uplitanja	42	1
+0.955982965506327	brojka	87	2
+-0.886631305275454	zloupotrebljavaju	1	17
+0.958325347962607	zapreku	92	2
+-0.843100086310512	poene	1	12
+1	težimo	11	
+-0.892591322159906	polovinu	3	54
+1	produljenje	49	
+-0.980909652485792	vanredne	1	106
+0.991909088712887	obveze	241	1
+1	inozemstvo	66	
+-0.814628579559378	zadacima	1	10
+-0.892591322159906	zasnovanu	1	18
+1	intelektualno	12	
+0.947055506196188	unutarnjim	36	1
+-0.905068203681407	podržavamo	2	41
+1	sučelili	32	
+-0.959956551544026	specijalna	1	50
+1	genevi	42	
+1	zloporabe	81	
+1	ubojstvu	17	
+-0.99499271930923	izvještaju	3	1221
+-0.994797199548818	oblasti	3	1175
+0.884690515375318	sprečavanje	16	1
+0.849153034802772	čitateljima	12	1
+0.859944070126432	boravit	13	1
+1	cei-a	11	
+1	protukorupcijskog	11	
+1	kupnju	48	
+1	predane	17	
+1	plinovodu	33	
+-0.854290007159691	insistirali	1	13
+0.891104110680441	sudionik	17	1
+0.991126811061187	suradnji	659	3
+1	akcijskom	22	
+0.856522793466295	zajam	38	3
+1	suradnica	14	
+1	veleposlanstva	132	
+1	uhićenju	58	
+-0.952510337538219	dužini	1	42
+0.995946344915524	tiskovnoj	482	1
+1	nazočan	19	
+1	nitko	310	
+0.938777474584084	nakana	31	1
+0.963390619732038	zaklade	105	2
+1	pkk-om	11	
+1	nakanama	10	
+1	ravnateljstva	50	
+0.840985181051751	voditelj	34	3
+0.996763804678288	tvrtki	604	1
+1	uhićeni	108	
+-0.814628579559378	mirnoj	1	10
+0.854748699051882	posljednju	25	2
+-0.838978150409425	podržalo	3	35
+0.980801620266488	polovice	101	1
+1	glazbu	52	
+0.869294275410358	osporiti	14	1
+1	sustavom	54	
+-0.830048520180336	tanke	1	11
+1	obvezali	12	
+1	utemeljeno	13	
+1	darovala	13	
+1	dubaiu	11	
+1	obrambene	33	
+0.937473990511263	kaznenim	91	3
+-0.854290007159691	rasporedi	1	13
+0.938777474584084	blagdana	31	1
+1	polovici	101	
+1	promicao	13	
+1	ravnatelj	602	
+1	pobačaj	11	
+-0.834633795599296	uradili	3	34
+-0.993809257481732	finansijske	1	329
+1	bilance	10	
+0.884690515375318	zamijetili	16	1
+-0.814628579559378	prazničnu	1	10
+1	jazza	23	
+0.821673640773722	prisiljene	10	1
+1	podnositelja	15	
+0.924637732683407	diplomaciju	25	1
+1	prouzročiti	16	
+1	baštinu	16	
+1	tiskovne	74	
+0.877474162771805	obzoru	15	1
+0.963390619732038	izravnih	105	2
+1	pomaknuti	34	
+1	akcesiju	18	
+1	travanjskom	13	
+1	zatopljenja	13	
+0.960826881983389	nekoć	49	1
+0.949772077134522	kazalo	76	2
+1	povlaštenog	11	
+-0.988650922640622	saopćenje	1	179
+1	koalicijska	23	
+1	knjižnici	17	
+1	potaknule	23	
+-0.95874364149176	tužilaštva	2	97
+-0.965384190200334	penzionera	1	58
+0.953361587933318	sudionika	123	3
+1	prosvjednik	14	
+1	obveza	215	
+-0.886631305275454	zasniva	1	17
+1	kućanstvima	13	
+1	melbourneu	10	
+-0.963202058075176	promoviranje	2	109
+1	neučinkovita	12	
+-0.938128917522506	gonjenja	1	32
+-0.879970997210649	kompleksan	1	16
+1	podupru	13	
+1	surađivao	15	
+-0.814628579559378	žurnal	1	10
+0.968664149571421	mirovine	123	2
+1	zurichu	13	
+1	središnjom	18	
+1	ahtisaarievu	11	
+1	ciparskim	67	
+0.852930182028195	pravedno	37	3
+0.95102843746613	osamdesetih	39	1
+1	talijanskih	14	
+1	veljači	212	
+0.836560327899804	utemeljena	33	3
+1	srpanj	113	
+1	primjeren	13	
+1	zaprekom	11	
+1	ustroju	84	
+-0.886631305275454	protestu	1	17
+0.836560327899804	temeljiti	11	1
+1	listopada	1131	
+-0.984041135674819	rumunskog	1	127
+1	crpkama	10	
+0.859944070126432	zalagao	13	1
+-0.962180300574045	mečeva	1	53
+0.891104110680441	eliminiranju	17	1
+1	znanstvenih	38	
+1	schengenske	28	
+0.910922357301293	jamče	21	1
+1	sarkozyem	16	
+1	izvješća	450	
+1	stajalištima	51	
+0.90667630154302	tužitelje	20	1
+0.967893329433539	izvanrednih	60	1
+0.966804578628804	težnje	58	1
+-0.843100086310512	srebrne	2	24
+0.849153034802772	natjecateljskom	12	1
+1	štoviše	10	
+1	ciprom	23	
+-0.879970997210649	opservatorije	1	16
+0.810145190719012	konačan	28	3
+-0.805819439701568	dažbine	2	19
+-0.909949760340607	meča	3	65
+0.829441202417667	nastupili	21	2
+1	liječnici	86	
+-0.87247926989368	prevaru	1	15
+-0.91494806562306	glasao	1	23
+0.940633888764989	tenisačica	32	1
+1	brusselsu	418	
+-0.950194984998913	sred	1	40
+-0.87247926989368	rivali	1	15
+1	proračunska	27	
+-0.843100086310512	otpočinjanju	1	12
+0.918352021472558	suradnici	23	1
+1	sudionike	35	
+-0.863990077906338	aukciji	1	14
+-0.834633795599296	investiranje	3	34
+1	libanonu	30	
+0.854748699051882	marame	25	2
+1	internetsku	59	
+1	razmotrena	26	
+0.821673640773722	podatak	10	1
+-0.886631305275454	jankovićeva	1	17
+-0.843100086310512	građanstva	2	24
+0.836560327899804	snježnih	11	1
+-0.991762496187688	budžet	1	247
+1	elektronički	12	
+-0.879970997210649	prisustvu	1	16
+0.859944070126432	viđenja	13	1
+1	plinu	47	
+1	podupiremo	23	
+0.98820434550534	razine	165	1
+0.859944070126432	autocestu	13	1
+-0.994212595698001	august	1	352
+1	promatračke	12	
+1	opozicijske	41	
+1	ozljeda	25	
+1	prosvjede	155	
+1	povijesnu	15	
+1	umirovljenog	12	
+0.968411355129592	postaji	61	1
+-0.924390747676153	duži	1	26
+1	računalnim	13	
+-0.843100086310512	formiranjem	1	12
+-0.879970997210649	pat-pozicija	1	16
+1	znatnim	11	
+1	knjižnice	28	
+1	koncem	403	
+1	gospodarstvo	591	
+0.902005192095369	krivnja	19	1
+-0.836834885549543	objelodanio	2	23
+1	pozornost	190	
+1	odvjetnika	61	
+1	studenom	243	
+-0.814628579559378	omladinskog	1	10
+0.887989046343665	unapređenju	33	2
+1	prometom	10	
+1	primjerice	259	
+0.972416739037829	središnjoj	140	2
+0.902005192095369	prisilila	19	1
+0.970986048970946	zapovjednika	133	2
+-0.936196746738472	streme	1	31
+1	marama	49	
+1	pučki	10	
+1	produljen	15	
+-0.964170059179214	vanredni	1	56
+-0.87247926989368	kanu	2	30
+-0.97276677609226	merkelova	1	74
+1	ciprana	24	
+1	schengensku	35	
+0.982034782279297	povijesni	108	1
+1	bruxelles	49	
+0.938132597561184	diplomacije	92	3
+-0.847016257816383	odlučivanje	3	37
+0.982034782279297	dužnosnike	108	1
+1	glasovat	13	
+0.884690515375318	kuta	16	1
+1	izravan	44	
+1	dodanu	17	
+0.952223480394257	poduprla	80	2
+1	registriranje	17	
+0.987367120651438	središnje	308	2
+1	njezinog	12	
+-0.902810238756176	avijaciju	1	20
+-0.87247926989368	dokumentaraca	1	15
+0.864780617968279	krivnje	27	2
+1	nacionalist	13	
+0.90667630154302	prosvjednicima	40	2
+1	dvorca	12	
+-0.943281758062367	promoviraju	1	35
+0.896841840656464	pokolju	18	1
+1	konzultant	10	
+-0.814628579559378	restituciji	1	10
+1	dano	29	
+-0.948521775408324	kubnih	3	116
+-0.907223634224005	produženje	2	42
+-0.814628579559378	postupila	1	10
+1	desetljeću	42	
+1	libanon	12	
+1	cyber	46	
+1	judou	17	
+1	sučeli	13	
+-0.843100086310512	kontrolne	1	12
+-0.927089002465745	glasalo	2	54
+0.836560327899804	najučinkovitiji	11	1
+1	nužnih	21	
+-0.993615809798992	evropskom	1	319
+0.948449555864262	times-u	37	1
+1	rumunjsko	81	
+0.96372972788464	promatrači	159	3
+1	računalne	25	
+1	božićnjak	10	
+0.951633339580892	skopju	79	2
+-0.836834885549543	nezavisnom	2	23
+1	jamčiti	44	
+1	kamo	13	
+-0.854290007159691	antikorupcijsku	1	13
+1	inozemna	83	
+0.988023960553296	središta	325	2
+0.849153034802772	težnji	24	2
+1	pridonijet	11	
+1	prosvjedovalo	18	
+1	priljevom	13	
+0.99786491281054	europi	916	1
+1	investicijskih	21	
+1	njezina	404	
+-0.848901937398475	koledža	2	25
+0.877474162771805	otocima	15	1
+-0.97221115883624	upotrebu	2	145
+0.918352021472558	oscara	23	1
+0.813164822838618	euroatlantska	19	2
+1	tjedana	188	
+1	al-qaedom	25	
+1	nakladničkih	10	
+1	zapovjednikom	27	
+1	investicijskoj	10	
+1	oess-u	13	
+0.945583963937281	coe	35	1
+1	travnja	890	
+1	rumunjsku	262	
+-0.830048520180336	obavit	1	11
+1	glazbenici	27	
+0.92162069741924	unutarnjem	24	1
+0.9346931022522	daytonski	58	2
+1	inozemnog	15	
+1	gledatelji	17	
+1	nogometnoj	16	
+1	počinitelja	27	
+1	prouzročio	10	
+1	tajnicom	36	
+0.836560327899804	srednjovjekovnih	11	1
+-0.997017497614725	evropski	1	684
+1	redovito	107	
+-0.863990077906338	obavezujući	1	14
+1	netko	156	
+1	europsko	83	
+1	prosinca	1038	
+1	vjerodajnice	11	
+1	momčadi	65	
+-0.854290007159691	redovnom	1	13
+-0.830048520180336	goniti	1	11
+1	opozicijski	21	
+0.992880072515433	gospodarskog	274	1
+0.964062611461132	rumunjskih	107	2
+1	putova	20	
+-0.894441135046827	trodnevnu	3	55
+1	pričuvnog	10	
+0.996997096241295	obitelji	651	1
+0.942381034349018	nakanu	33	1
+-0.879970997210649	upotrijebi	1	16
+1	donora	14	
+0.894997647550034	umirovljenika	53	3
+1	biračke	12	
+-0.980168434768999	grupama	1	102
+-0.96374619827517	otpočela	3	166
+-0.941662233528214	budžetom	1	34
+1	glasovalo	57	
+1	promidžbu	81	
+1	zemljopisnog	11	
+1	unutarnji	26	
+1	zemnim	19	
+-0.883396181536817	obavezna	2	33
+1	trgovačko	17	
+1	izgredu	25	
+1	prodavaonica	49	
+0.922652863107701	kaznena	73	3
+1	znanstvena	55	
+1	inozemstva	69	
+1	financiraju	24	
+1	obrambenoj	10	
+1	nizozemskog	16	
+1	obvezatne	16	
+1	bruxellesa	33	
+1	tvrtke	1047	
+1	časnik	36	
+0.852930182028195	setimes-a	37	3
+0.933207786919664	učinkovitost	85	3
+0.884690515375318	potaknut	32	2
+-0.857673527113883	otkopali	3	40
+0.836560327899804	bulgaria	11	1
+1	osobnog	27	
+1	sustavno	22	
+0.976960991616478	prometa	168	2
+0.829441202417667	poticaje	21	2
+1	središnjih	17	
+1	putovnicu	23	
+-0.814628579559378	sveg	1	10
+1	anatoliji	11	
+1	akcesije	36	
+0.821673640773722	talent	10	1
+-0.843100086310512	doktore	1	12
+0.821673640773722	razmotrilo	10	1
+1	pogrešaka	15	
+0.93243950173535	strukturne	28	1
+-0.979775814236971	principa	1	100
+1	gospodarstava	83	
+1	udrugama	62	
+1	kazališni	29	
+1	proeuropsku	10	
+0.869294275410358	promicanja	28	2
+0.836560327899804	play	11	1
+1	studeni	126	
+0.966804578628804	zaprekama	58	1
+-0.905068203681407	benda	2	41
+1	organiziranja	17	
+0.840985181051751	investicijske	34	3
+0.952223480394257	načelno	40	1
+1	nizozemske	87	
+1	računalna	11	
+0.937805037549965	mirovinu	61	2
+0.919471456931841	pol	70	3
+0.962334151538414	pogreške	51	1
+1	udrugom	16	
+-0.886631305275454	stremi	3	51
+1	zrakoplov	43	
+0.949772077134522	zastupnike	38	1
+0.936801210228771	predan	30	1
+0.891104110680441	rasprostranjena	17	1
+0.995687398974261	ateni	453	1
+1	ahtisaarieva	11	
+0.914798852028131	kolosijeku	22	1
+1	jamstava	18	
+0.849153034802772	građen	12	1
+-0.959156027427684	zakletvu	1	49
+1	zapovijedi	27	
+1	zrakoplovu	10	
+1	glazbene	27	
+0.836560327899804	napetostima	11	1
+1	gospodarstvom	24	
+1	tsunami	12	
+1	ophodnje	29	
+0.968411355129592	tenisač	61	1
+-0.87247926989368	reorganizacije	1	15
+1	sip	11	
+1	otoke	10	
+0.893086315660273	provinciji	52	3
+1	bojnik	10	
+0.962334151538414	španjolski	51	1
+1	promicati	44	
+-0.876338496587412	podvlači	2	31
+-0.854290007159691	pretjeranu	1	13
+1	kazneno	98	
+1	strože	15	
+1	litve	20	
+0.836560327899804	izdvojena	11	1
+-0.854290007159691	okršajima	1	13
+0.944817085410795	okolici	69	2
+1	djelatnik	24	
+-0.848901937398475	elektroprivredna	2	25
+1	djelatnike	47	
+1	njezinu	231	
+1	računalo	32	
+-0.854290007159691	dominacijom	2	26
+-0.87247926989368	čas	1	15
+1	proeuropske	23	
+-0.87247926989368	sprovesti	2	30
+1	pravedan	16	
+0.821673640773722	belenama	10	1
+1	dužnosnik	281	
+1	promicanju	45	
+0.869294275410358	izdane	14	1
+-0.919946898202442	generalna	2	49
+1	natpolovična	10	
+1	doima	32	
+1	financijskoj	32	
+1	milijunima	11	
+1	unutarnje	111	
+1	opena	20	
+0.953361587933318	talijanskog	41	1
+0.896841840656464	uzajamnog	18	1
+0.869294275410358	dogodile	14	1
+1	prosvjedovali	63	
+0.993601422063473	inozemstvu	305	1
+-0.892591322159906	biometrijski	1	18
+0.869294275410358	namjernu	14	1
+1	preustroja	30	
+1	inozemnim	94	
+1	miroljubivo	34	
+0.92315881830629	izravne	49	2
+-0.961467011220216	promovirati	1	52
+0.965639395985705	mil	168	3
+-0.936196746738472	burgas-aleksandropolis	1	31
+-0.886631305275454	otcjepljenju	1	17
+1	nakanom	15	
+1	obvezuju	15	
+1	plinova	29	
+1	priopćilo	205	
+1	obrambenog	15	
+-0.848901937398475	grešaka	2	25
+1	nagađaju	25	
+-0.814628579559378	nagovještavaju	1	10
+1	umirovljenike	15	
+1	tjednika	39	
+-0.848901937398475	mirovnjaci	2	25
+0.970769458786981	sudjelovanju	66	1
+0.948449555864262	čelništvo	37	1
+1	dosegnuo	47	
+0.99353806539784	svojeg	906	3
+1	nositelj	13	
+1	obnašanje	19	
+1	zbližavanje	14	
+1	strojeva	18	
+0.976686648843742	predsjedatelj	83	1
+-0.900442244807067	glasanjem	2	39
+1	prosvjeduju	82	
+1	nagaznih	17	
+1	dovršetku	11	
+0.986542173930888	izvješćuje	289	2
+-0.934140006327356	poraditi	1	30
+1	nabava	16	
+1	nazočna	19	
+-0.859307037068193	demonstrantima	2	27
+1	definirano	12	
+1	liječnike	16	
+0.90667630154302	neovisnošću	20	1
+0.924637732683407	desetaka	50	2
+1	glasovanju	19	
+0.985495290617594	povjerenstvo	268	2
+-0.814628579559378	skale	1	10
+0.995771233049587	cipar	462	1
+0.942381034349018	tužiteljima	33	1
+1	inozemnoj	21	
+1	nicosia	34	
+1	motrenja	15	
+0.958325347962607	investicijska	46	1
+1	rumunjskom	115	
+0.836560327899804	šokove	11	1
+1	oformljena	14	
+0.902005192095369	zapovjedniku	19	1
+1	tegoba	12	
+-0.805819439701568	vršenju	2	19
+1	glazbena	10	
+1	svibanj	133	
+1	kubičnih	100	
+-0.87247926989368	sačinila	1	15
+1	divovski	18	
+1	znanstvenik	28	
+1	opsežan	17	
+-0.87247926989368	szo	1	15
+0.896841840656464	nabave	36	2
+1	tražitelja	29	
+0.904397770219301	podupirati	39	2
+-0.955606039896316	gonjenje	1	45
+-0.98108637971684	eksperata	1	107
+1	koalicijskih	13	
+0.869294275410358	tečajeve	14	1
+0.884690515375318	skorijoj	16	1
+1	milijuni	20	
+0.92162069741924	momčad	72	3
+0.836560327899804	kriminalističke	11	1
+0.995519623791234	europskog	436	1
+1	manjkavostima	12	
+0.821673640773722	razriješen	10	1
+1	složenije	12	
+1	oporbe	155	
+1	ubojstvo	189	
+0.869294275410358	vlakova	14	1
+-0.805819439701568	organ	2	19
+1	sportaši	46	
+0.91290371722967	obilaska	43	2
+1	pridonijelo	15	
+1	gospodarsko	63	
+1	iduća	24	
+0.962334151538414	kolumnist	51	1
+1	zrakoplova	81	
+1	sučelila	29	
+1	poduprlo	32	
+-0.980909652485792	faktora	1	106
+1	ubojstvima	22	
+-0.936196746738472	pasoš	1	31
+-0.857673527113883	pažnja	3	40
+-0.98845858880241	aktuelni	1	176
+1	povijesnim	50	
+-0.830048520180336	ožalošćeni	1	11
+0.971199453017209	surađuju	67	1
+1	odredištima	12	
+0.836560327899804	zaprimio	11	1
+1	atenskoj	12	
+0.821673640773722	prilagodbi	10	1
+1	umjetnu	11	
+-0.902810238756176	titula	1	20
+1	tisućama	22	
+0.877474162771805	integriranog	15	1
+1	uhićen	188	
+0.957877030138634	učinkovitosti	91	2
+1	svibnja	1028	
+-0.91834721440205	avione	1	24
+1	točki	33	
+1	sjedinjenje	11	
+-0.929601308827709	finansijsko	1	28
+0.92162069741924	opovrgnuo	24	1
+1	učinkovitog	17	
+1	siječnju	218	
+-0.921485106630878	privilegije	1	25
+1	sučeljavanja	12	
+0.845176758883771	ombudsmana	35	3
+-0.969286964800401	ostrvu	2	131
+1	vlak	43	
+1	kći	35	
+-0.843100086310512	tendera	3	36
+1	financijskog	70	
+1	ek-a	11	
+1	uhitio	10	
+1	jamaca	12	
+1	samoubojstva	10	
+0.910922357301293	davatelj	21	1
+1	elektroničku	15	
+1	računalnu	10	
+1	izdvojit	10	
+0.904397770219301	elektroenergetska	39	2
+0.967893329433539	temeljene	60	1
+1	povijesnog	47	
+1	europljana	12	
+1	pridonijeli	58	
+1	koјi	14	
+1	surađivala	14	
+0.891104110680441	osobnim	34	2
+1	litvi	18	
+0.821673640773722	projekcijom	10	1
+-0.863990077906338	uzdržana	1	14
+1	atenskom	20	
+1	opovrgava	33	
+1	obvezatna	12	
+1	suvremenih	13	
+0.813164822838618	informatičkih	19	2
+1	tajnika	211	
+0.843108961035381	procijenjen	23	2
+1	suprotstavila	15	
+1	uhitile	38	
+0.982972269873044	talijanski	114	1
+-0.87247926989368	kompleksne	1	15
+0.988549290216708	razvitak	510	3
+1	kućanstva	31	
+0.869294275410358	provincija	14	1
+1	organizacijskog	10	
+1	šekerinska	27	
+0.949119409005648	washingtona	75	2
+0.859944070126432	obranio	13	1
+1	učincima	12	
+-0.897955978534989	otcjepljenja	1	19
+-0.850741697167013	pribaviti	3	38
+0.958325347962607	msp-a	46	1
+0.98235854139563	regiju	220	2
+-0.981430196398971	tužilaštvo	1	109
+0.9346931022522	atenski	29	1
+0.954446734268499	koalicijske	42	1
+-0.843100086310512	doktoru	1	12
+1	sučeljavanju	48	
+1	obnašanja	11	
+0.938777474584084	nužna	31	1
+1	kućanstvo	13	
+1	cipra	394	
+0.884690515375318	kane	16	1
+1	priljeva	36	
+1	učinkovita	31	
+1	izravna	72	
+1	promidžbi	25	
+1	tiskovna	419	
+1	srpnja	966	
+-0.974145297654245	utisak	1	78
+1	ravnateljica	109	
+1	desetci	38	
+0.859944070126432	pomicanju	13	1
+1	talijanskom	22	
+0.938777474584084	glasuje	31	1
+0.902005192095369	opskrbljivač	19	1
+1	rumunjima	16	
+0.918352021472558	predani	46	2
+1	protukorupcijske	30	
+0.969869765671829	nogometnog	64	1
+-0.830048520180336	okončavanja	1	11
+-0.854290007159691	obavezama	2	26
+1	izgredi	39	
+1	izišli	34	
+0.877474162771805	opsežnu	15	1
+0.902005192095369	pravedne	19	1
+1	financijsku	188	
+1	kirurzi	11	
+1	priključivanje	23	
+0.95102843746613	neznatno	39	1
+1	obitelj	247	
+0.891104110680441	manager	17	1
+1	rumunjka	11	
+0.996658873068051	dužnosnici	1170	2
+-0.863990077906338	prisustvom	1	14
+0.99417275951813	rumunjska	1005	3
+0.821673640773722	nastupilo	10	1
+-0.99257120594762	maju	1	274
+1	kolovozu	129	
+1	obrambeni	21	
+0.951633339580892	preduvjet	79	2
+0.836560327899804	openu	11	1
+0.982972269873044	sudjelovanje	342	3
+1	tjedna	1740	
+1	vjerojatnost	24	
+1	poslovodstvo	14	
+1	europskih	370	
+1	odcjepljenje	26	
+1	započinju	22	
+0.866319414052682	dakle	41	3
+-0.962867662287014	tender	2	108
+1	strojnice	10	
+1	izaslanstvo	205	
+-0.994986575731272	lideri	2	813
+1	atenu	51	
+-0.87247926989368	nepropisno	1	15
+1	sveučilište	108	
+-0.879970997210649	zadatkom	1	16
+0.965025582659126	boda	55	1
+1	preduvjeta	29	
+1	prosvjedujući	56	
+-0.854290007159691	aspiracija	1	13
+1	promatrali	10	
+0.803803325232117	počinitelji	27	3
+0.884690515375318	neslužbenom	16	1
+1	izravnim	34	
+1	ozračju	62	
+0.914798852028131	neovisnom	22	1
+0.974231930856118	odgode	75	1
+1	redatelji	11	
+1	pridonijele	12	
+1	iznimkom	21	
+1	nizozemsku	23	
+1	prvotni	23	
+0.902005192095369	nevjerojatno	19	1
+1	navješćujući	13	
+0.972673403024946	uvjeti	212	3
+-0.843100086310512	neophodan	3	36
+-0.997339816306776	saradnju	1	767
+-0.907223634224005	oskara	1	21
+0.98219813375195	natječaju	109	1
+1	veleposlanstvo	138	
+0.821673640773722	vrijednosnica	10	1
+0.810145190719012	krivnju	28	3
+1	tvrtkom	60	
+1	ustrojiti	70	
+1	odvjetnici	41	
+-0.925764385462348	gigant	2	53
+-0.830048520180336	strahota	1	11
+1	ciprani	14	
+1	oporbenih	59	
+1	priopćenjem	14	
+0.877474162771805	reduciranje	15	1
+1	burze	35	
+-0.814628579559378	srednjevjekovnom	1	10
+1	putovnica	71	
+-0.814628579559378	opslužuje	1	10
+-0.97509095300046	dostigla	1	81
+-0.907223634224005	poen	1	21
+1	ciparsko	19	
+0.849153034802772	povećalom	12	1
+1	redateljica	12	
+1	bonitetna	11	
+1	mojem	46	
+-0.997529594723012	juna	1	826
+1	kaosa	21	
+-0.802694009943555	nalazima	3	28
+1	preustroju	20	
+1	obvezala	27	
+1	obiteljske	15	
+1	talijanska	37	
+0.821673640773722	pomažući	20	2
+1	preispitivanje	39	
+0.986242716577584	razdoblju	424	3
+-0.854290007159691	produženja	1	13
+-0.87247926989368	doprinijelo	2	30
+-0.814628579559378	unutrašnjoj	1	10
+1	obvezuje	22	
+1	neizravno	32	
+1	izaslanstva	166	
+1	zrakoplovnu	13	
+1	miroljubivog	10	
+1	tvrtkama	160	
+1	nazočni	31	
+0.836560327899804	zajmu	11	1
+1	ustroja	66	
+1	financija	487	
+1	duljini	13	
+-0.996446953313299	sistema	1	574
+1	usporednih	10	
+-0.843100086310512	kompleksna	1	12
+1	prepustiti	12	
+0.894050601032093	prijeko	35	2
+1	odcjepljenja	15	
+0.954797314589455	yorku	127	3
+0.90667630154302	nedaće	20	1
+1	utemeljitelj	56	
+0.843108961035381	poreznu	23	2
+1	znanstvenom	12	
+1	zapovjednici	13	
+1	četvornom	30	
+1	zloporaba	49	
+-0.964787587451001	generalnim	1	57
+1	zastupničke	14	
+1	činom	13	
+-0.843100086310512	bune	1	12
+1	surađivat	12	
+1	nazočilo	62	
+1	izgrede	25	
+-0.99169553047534	budžeta	1	245
+1	višedesetljetne	12	
+1	citirala	24	
+1	skladatelj	21	
+0.9346931022522	nogometaš	29	1
+-0.830048520180336	sastojao	1	11
+1	financirati	72	
+1	uhićenjem	39	
+1	povijest	173	
+0.821673640773722	strojeve	20	2
+0.941520508168473	osobno	65	2
+1	uporabe	70	
+0.958325347962607	snimka	138	3
+-0.944813791661799	delegaciju	1	36
+-1	vjerovatan		11
+-1	fudbal		63
+-1	trupama		34
+-1	saradnji		666
+-1	delegati		11
+-1	sedmičnjak		20
+-1	koalicionoj		20
+-1	ekspertima		22
+-1	prvobitna		12
+-1	obavezujuća		15
+-1	posjetioci		109
+-1	prodavnice		51
+-1	nabavki		26
+-1	koalicionim		16
+-1	bataljona		14
+-1	finansijskom		64
+-1	štabu		16
+-1	fudbaler		21
+-1	sistemi		23
+-1	hidžaba		36
+-1	zvanično		55
+-1	prekršioci		11
+-1	fudbalsku		10
+-1	sekretarom		74
+-1	tačna		10
+-1	popločati		17
+-1	urade		15
+-1	odložiti		43
+-1	opoziciona		156
+-1	višedecenijskog		14
+-1	evropljana		16
+-1	preduzela		12
+-1	aerodromu		77
+-1	ubice		15
+-1	zvaničnih		10
+-1	milion		160
+-1	škriljaca		10
+-1	kibernetski		13
+-1	uhapsile		32
+-1	saopćio		445
+-1	otuda		31
+-1	šverca		85
+-1	obezbijedio		15
+-1	milione		30
+-1	nađeno		17
+-1	italijanskog		30
+-1	operiraju		25
+-1	ljekara		23
+-1	koalicionog		20
+-1	šengena		21
+-1	budžeti		10
+-1	merkelove		21
+-1	zasnovano		26
+-1	firmama		42
+-1	regionom		23
+-1	otpočele		35
+-1	upotrebom		19
+-1	trivanova		11
+-1	muzikom		11
+-1	briselom		53
+-1	kur'ana		11
+-1	svakodnevicu		10
+-1	šampionatu		60
+-1	naslijeđem		14
+-1	ličnu		39
+-1	porodicama		80
+-1	rumunskom		57
+-1	finansijski		192
+-1	diskusiju		26
+-1	okarakterizirala		17
+-1	muziku		47
+-1	skorašnje		13
+-1	anadolije		15
+-1	španske		12
+-1	apelacioni		23
+-1	juni		23
+-1	univerzitetskom		14
+-1	penzionirani		11
+-1	tražilaca		10
+-1	ombudsmen		33
+-1	ustanovljenje		14
+-1	štampa		27
+-1	spisku		17
+-1	prošlosedmičnom		27
+-1	anonimusi		10
+-1	savremene		40
+-1	eksperti		363
+-1	reafirmirao		15
+-1	inostranstva		68
+-1	iskopavanja		62
+-1	iko		21
+-1	zasnovanim		12
+-1	zasnovani		22
+-1	bici		13
+-1	preduzme		10
+-1	italijanskom		20
+-1	dužim		10
+-1	ćorsokak		67
+-1	sarađujemo		18
+-1	prekršioce		10
+-1	jugoslovenska		14
+-1	ubistvima		22
+-1	drevnoj		17
+-1	zemlje-članice		23
+-1	priliva		38
+-1	odbrambenu		13
+-1	prevazišla		19
+-1	prodavaca		10
+-1	sarađuje		72
+-1	potjernice		17
+-1	hapšenjem		46
+-1	sačini		11
+-1	unaprjeđivanja		92
+-1	zamajcu		12
+-1	finansirala		18
+-1	čitalaca		14
+-1	tačno		77
+-1	komandanta		103
+-1	municija		11
+-1	zasnovane		59
+-1	biznismeni		12
+-1	zvaničnu		16
+-1	šverceri		10
+-1	faktorima		19
+-1	muzičkom		19
+-1	sportisti		51
+-1	saobraćajnoj		15
+-1	cifra		106
+-1	šupljine		11
+-1	kominikeu		12
+-1	saopćava		19
+-1	delegaciji		18
+-1	grupacijama		14
+-1	alijansom		14
+-1	muzičku		11
+-1	mijatovićeva		10
+-1	učešćem		34
+-1	aerodromom		13
+-1	vanrednog		17
+-1	holandija		108
+-1	akropolju		23
+-1	časova		10
+-1	specijalnom		28
+-1	djelotvornu		19
+-1	sarađivao		11
+-1	vanrednu		21
+-1	okolišnih		15
+-1	učestvuje		112
+-1	zvaničnim		18
+-1	dejtonskom		15
+-1	municijom		12
+-1	demokratijom		16
+-1	istambulske		10
+-1	holandski		51
+-1	rumunima		20
+-1	ekspert		123
+-1	haosa		20
+-1	gasova		21
+-1	štaviše		39
+-1	odata		10
+-1	šampion		36
+-1	proevropske		22
+-1	porodice		343
+-1	naučnim		23
+-1	prevarama		11
+-1	opozicionih		62
+-1	sistemom		59
+-1	nvo		75
+-1	libanu		29
+-1	decembru		323
+-1	privrednika		58
+-1	fokusirali		12
+-1	hemijskog		13
+-1	ambasadorima		11
+-1	izlaznosti		29
+-1	ćorsokaku		23
+-1	dostigao		81
+-1	mašine		31
+-1	kiprom		20
+-1	pribježište		14
+-1	vjerovatnije		14
+-1	zasnovanom		11
+-1	nevjerovatno		12
+-1	historijske		78
+-1	sedmično		49
+-1	kiparski		280
+-1	obavezuje		20
+-1	historiju		111
+-1	direktne		67
+-1	bezbjedno		31
+-1	italijanskih		12
+-1	uslovi		213
+-1	kompjuterskim		11
+-1	obezbijedilo		18
+-1	počinilaca		16
+-1	blagovremeno		14
+-1	oblast		169
+-1	finansiraju		30
+-1	pres-konferencije		37
+-1	generalne		56
+-1	fondaciji		16
+-1	advokatima		10
+-1	gasovod		109
+-1	povrijeđenih		35
+-1	omladina		25
+-1	vjerovatnoću		11
+-1	izvještajem		29
+-1	oktobar		473
+-1	historijskog		43
+-1	zaozbiljno		11
+-1	stepeni		45
+-1	vakcina		16
+-1	hagom		14
+-1	investirati		71
+-1	grani		13
+-1	žiži		222
+-1	omladinom		10
+-1	rumunska		195
+-1	penzionerima		13
+-1	ubistvom		28
+-1	sarađivala		11
+-1	litvanija		18
+-1	centralnih		21
+-1	čez		11
+-1	krivicu		21
+-1	univerziteta		344
+-1	fudbalskom		23
+-1	sajtu		10
+-1	ličnog		14
+-1	banjoj		93
+-1	štampi		33
+-1	region		347
+-1	povreda		23
+-1	sportistima		12
+-1	zemljotres		27
+-1	izvjestilac		14
+-1	aerodroma		89
+-1	pozorištu		24
+-1	panevropskog		13
+-1	šengenu		37
+-1	sedmicu		101
+-1	švercu		16
+-1	koalicionih		20
+-1	zaražavanje		10
+-1	apeluje		12
+-1	investiraju		12
+-1	avionima		19
+-1	advokatica		11
+-1	naučnici		128
+-1	prošlosedmičnog		26
+-1	prevazilaženja		21
+-1	direktna		59
+-1	holandiji		31
+-1	bronzanu		33
+-1	fakto		32
+-1	univerzitetskih		26
+-1	investicione		35
+-1	okarakteriziravši		19
+-1	krivična		56
+-1	rumune		29
+-1	kompjuterske		25
+-1	banjaluci		31
+-1	atinskog		19
+-1	učesnici		167
+-1	milioni		16
+-1	nivoima		56
+-1	periodu		628
+-1	dostigne		12
+-1	njujork		31
+-1	tendere		18
+-1	julu		268
+-1	pozorište		45
+-1	fabriku		41
+-1	el-kaide		35
+-1	dejtonski		56
+-1	historijata		10
+-1	kompjuterima		16
+-1	takmičenje		33
+-1	ambasadorica		38
+-1	fudbalu		32
+-1	paradajza		13
+-1	kosorova		46
+-1	kafu		16
+-1	zatopljavanja		12
+-1	univerzitetskog		20
+-1	specijalnim		32
+-1	bezbjednosti		91
+-1	džudu		11
+-1	hiljade		213
+-1	vanrednom		10
+-1	podsticanja		22
+-1	pozorišnih		22
+-1	historijsko		22
+-1	posmatrača		73
+-1	clintonova		57
+-1	poluostrvu		12
+-1	ekstradiciju		14
+-1	opozicionog		36
+-1	kvoa		12
+-1	naučni		34
+-1	šengenska		11
+-1	oktobru		281
+-1	zvaničnik		258
+-1	faktore		25
+-1	kese		11
+-1	strazburu		68
+-1	medijatora		12
+-1	nauka		443
+-1	desila		31
+-1	belenu		37
+-1	konsekvenci		10
+-1	haga		15
+-1	uradio		23
+-1	opredijeljen		22
+-1	direkcija		22
+-1	prvobitne		10
+-1	decembar		331
+-1	ambasadama		10
+-1	privrednim		21
+-1	pauzu		13
+-1	onlajn		31
+-1	uticaja		11
+-1	učestvovati		207
+-1	obavezala		35
+-1	odbrani		46
+-1	bakoyannisova		36
+-1	uzdrži		15
+-1	potjernicu		16
+-1	ofanzive		16
+-1	pribojavaju		67
+-1	evrovizije		21
+-1	pribojavajući		11
+-1	berze		30
+-1	saopćila		307
+-1	pješke		13
+-1	nepristrasan		11
+-1	svojine		13
+-1	april		343
+-1	naznačava		15
+-1	propraćen		10
+-1	ashtonova		29
+-1	naučne		43
+-1	šoping		14
+-1	obuhvata		94
+-1	skulptor		10
+-1	otpočinje		15
+-1	najvjerovatnije		37
+-1	haosu		10
+-1	osmanskog		17
+-1	namjesto		23
+-1	lepeza		11
+-1	tužiocima		28
+-1	protestima		82
+-1	pravce		10
+-1	kompjuter		20
+-1	konsultacija		43
+-1	holandiju		15
+-1	obavezali		43
+-1	kiparskim		81
+-1	izlaznost		116
+-1	posmatrači		158
+-1	ususret		26
+-1	faktori		51
+-1	spratu		10
+-1	delegata		19
+-1	rumunskim		61
+-1	prvobitni		16
+-1	historijat		21
+-1	doktori		70
+-1	ekonomijom		17
+-1	muzičari		22
+-1	tošeta		31
+-1	avio-kompanije		19
+-1	preduzeće		33
+-1	litar		12
+-1	saopštio		12
+-1	kibernetskog		10
+-1	izvještaji		66
+-1	saradnika		36
+-1	obezbjeđivati		29
+-1	pravično		49
+-1	obavezao		26
+-1	konfrontacije		16
+-1	direktnoj		11
+-1	pehar		10
+-1	elektroprivredne		31
+-1	španiji		49
+-1	kompjutersku		13
+-1	apelovala		20
+-1	obezbijedit		24
+-1	inostranstvu		279
+-1	penzioner		29
+-1	posmatrati		13
+-1	njujorka		12
+-1	interesira		11
+-1	specijalnog		139
+-1	martu		254
+-1	predviđalo		10
+-1	ubistvo		127
+-1	saobraćaju		32
+-1	dalji		23
+-1	alijansa		79
+-1	komitetom		28
+-1	augustu		115
+-1	obavezati		10
+-1	kontakt-grupa		18
+-1	diplomatiju		23
+-1	tužiteljka		11
+-1	berza		19
+-1	porodica		244
+-1	historijsku		28
+-1	historijskih		40
+-1	garantiraju		16
+-1	prilivom		11
+-1	historije		116
+-1	hiljadama		21
+-1	italijanskim		27
+-1	fudbalskih		36
+-1	prilivu		13
+-1	vanredno		42
+-1	evropsko		62
+-1	muzičkim		14
+-1	prevaziđu		19
+-1	oficir		36
+-1	pozorišni		24
+-1	podstičemo		16
+-1	informacionih		35
+-1	ambasada		107
+-1	usuglasile		55
+-1	biroa		38
+-1	ljekar		12
+-1	pumpi		12
+-1	prodavnica		46
+-1	antivladinih		11
+-1	komandu		14
+-1	apelirali		10
+-1	rumunije		666
+-1	direktnog		33
+-1	budžetu		118
+-1	piraterije		41
+-1	ustanovljavanje		19
+-1	poreski		32
+-1	bezbjednost		105
+-1	obezbjeđenje		30
+-1	dešavanja		148
+-1	tačne		10
+-1	dato		35
+-1	nijedne		15
+-1	sistemu		229
+-1	dejtonskog		80
+-1	djelimičnu		10
+-1	generalno		180
+-1	uhapsila		127
+-1	finansirati		79
+-1	aktuelne		79
+-1	centralna		134
+-1	samoubistvo		23
+-1	el-kaida		11
+-1	dešavanjima		31
+-1	šengenskog		13
+-1	generalnoj		39
+-1	optimista		54
+-1	naškodio		10
+-1	penzionisanih		12
+-1	demokratiji		60
+-1	garantirana		13
+-1	nauku		57
+-1	otpočet		15
+-1	izvinjenje		14
+-1	prevodilac		13
+-1	džez-festivala		14
+-1	nagovještava		18
+-1	bezbjedne		24
+-1	obavezale		14
+-1	kibernetske		14
+-1	istambula		107
+-1	uvis		30
+-1	jevrejske		14
+-1	naučnike		15
+-1	osce/odihr-a		16
+-1	cirihu		13
+-1	uhapsili		10
+-1	naučnoj		16
+-1	holandskog		20
+-1	haos		38
+-1	žiža		12
+-1	runde		40
+-1	diskutirali		10
+-1	sprovedbu		34
+-1	cifru		39
+-1	kurseve		16
+-1	krivičnu		17
+-1	odatle		12
+-1	zvaničnica		19
+-1	podobnih		11
+-1	finansijama		20
+-1	apelujući		10
+-1	otkupio		37
+-1	konsultacije		53
+-1	autogas		10
+-1	saopćenju		576
+-1	bokser		12
+-1	odbrambenog		10
+-1	alijansi		104
+-1	geografski		15
+-1	nabavke		33
+-1	učlaniti		20
+-1	posjetioce		44
+-1	pirata		10
+-1	učesnica		19
+-1	septembra		619
+-1	maršalovog		15
+-1	prijestonice		11
+-1	poreskog		10
+-1	hapšenja		274
+-1	zemljotresima		11
+-1	odložena		10
+-1	kompozitora		26
+-1	zloupotrebu		61
+-1	diskusijama		19
+-1	naučnu		12
+-1	firmi		207
+-1	fokusirati		33
+-1	unaprjeđivanju		135
+-1	kompozitor		18
+-1	sedmičnjaka		26
+-1	komandom		29
+-1	renoviranja		12
+-1	opredijeljenosti		32
+-1	uhapsio		10
+-1	prevara		22
+-1	sekretar		466
+-1	teniser		46
+-1	susrevši		10
+-1	avgusta		42
+-1	nabavkama		16
+-1	naglasile		10
+-1	omladinskih		17
+-1	svojinu		10
+-1	avioni		17
+-1	opozicione		286
+-1	podsticati		17
+-1	odbranio		10
+-1	geografske		11
+-1	hljeba		24
+-1	reputaciji		12
+-1	učestvovao		87
+-1	aktuelnih		44
+-1	mogne		20
+-1	neophodnu		23
+-1	zvan		15
+-1	personal		41
+-1	zvaničnike		97
+-1	upotrebe		85
+-1	nivoom		50
+-1	aprilu		245
+-1	budžetskim		23
+-1	učestvovalo		134
+-1	saradnja		416
+-1	kipra		328
+-1	uslov		130
+-1	vanrednih		28
+-1	muzičkog		22
+-1	porodičnu		16
+-1	učesnike		34
+-1	vjerovatnoća		10
+-1	prijemu		25
+-1	nauci		22
+-1	bronzu		40
+-1	aerodrome		53
+-1	fudbalskog		54
+-1	ustanovila		21
+-1	litvanije		17
+-1	diplomatija		26
+-1	hirurzi		12
+-1	euro-obveznice		15
+-1	narednu		69
+-1	takmičenjima		11
+-1	oblastima		394
+-1	lično		83
+-1	eksperte		31
+-1	insistirati		34
+-1	saopćili		145
+-1	prevazilaženje		29
+-1	dešavanje		26
+-1	odlaganjem		15
+-1	jie		163
+-1	konsultirati		11
+-1	odlaganju		13
+-1	uhapšen		158
+-1	dešavaju		41
+-1	takmičenja		42
+-1	doktorima		13
+-1	novembru		212
+-1	poluostrvo		10
+-1	efekat		44
+-1	sportiste		19
+-1	provajder		17
+-1	fokusirani		10
+-1	brisela		88
+-1	kompjutera		58
+-1	aerodromima		11
+-1	sprovedbi		32
+-1	hrom		11
+-1	naučnih		43
+-1	investicionih		24
+-1	patroliraju		13
+-1	januaru		218
+-1	zasnovanog		25
+-1	htjelo		10
+-1	mašina		22
+-1	italijanske		33
+-1	vašingtona		67
+-1	komandantom		22
+-1	holanđani		11
+-1	saradnik		61
+-1	porodičnog		17
+-1	susjedama		32
+-1	uslovom		85
+-1	propisne		11
+-1	nivoi		12
+-1	kompjutere		41
+-1	neophodni		29
+-1	inostranstvo		75
+-1	akropolja		11
+-1	indirektno		33
+-1	investira		13
+-1	centralne		283
+-1	firmom		48
+-1	djelimično		99
+-1	regiona		615
+-1	kiparskom		35
+-1	posmatračima		10
+-1	finansijska		179
+-1	milionima		10
+-1	municiju		16
+-1	univerzitete		23
+-1	komitet		105
+-1	šampiona		39
+-1	rang-listi		56
+-1	demokratija		135
+-1	garancija		38
+-1	briselskog		15
+-1	dejtonskim		28
+-1	vebsajtu		20
+-1	naslijeđu		15
+-1	uhapšena		41
+-1	banjaluke		13
+-1	zvana		17
+-1	fudbalski		64
+-1	aktuelnu		30
+-1	budžetskog		57
+-1	muzici		16
+-1	liban		14
+-1	podstaći		37
+-1	posmatrače		15
+-1	tuče		17
+-1	počinioci		21
+-1	naredno		14
+-1	generalštaba		99
+-1	saobraćaja		80
+-1	poluostrva		11
+-1	debati		14
+-1	srbijanci		18
+-1	investitor		36
+-1	otpočne		29
+-1	prevaziđe		27
+-1	atinski		29
+-1	investicioni		38
+-1	tužiocu		18
+-1	glasala		28
+-1	grupi		248
+-1	skopljanac		15
+-1	putarina		13
+-1	direktni		41
+-1	izvještaja		274
+-1	apelovao		50
+-1	juli		23
+-1	privrednike		14
+-1	uslova		330
+-1	hemije		12
+-1	nivoe		19
+-1	podsticanje		42
+-1	septembru		204
+-1	zavise		33
+-1	priliv		81
+-1	cunamija		10
+-1	gasu		13
+-1	zvaničniku		12
+-1	saobraćajnih		10
+-1	sistemima		24
+-1	protivna		10
+-1	zvanična		10
+-1	zasnovana		78
+-1	gledalaca		34
+-1	šengensku		41
+-1	narednom		172
+-1	dejtonu		10
+-1	saradnici		18
+-1	kresanja		28
+-1	septembar		393
+-1	kapiten		12
+-1	auto-puta		12
+-1	fondacije		91
+-1	neefikasnost		10
+-1	provajdera		18
+-1	direktnu		54
+-1	komandnu		11
+-1	odista		113
+-1	opredijeljeni		24
+-1	ubica		17
+-1	flotilu		26
+-1	neefikasna		10
+-1	zasnovanih		10
+-1	odložen		14
+-1	desetinama		23
+-1	nivo		546
+-1	građanstvo		51
+-1	historijskom		31
+-1	protestanata		28
+-1	faktički		12
+-1	holandskom		11
+-1	patrole		19
+-1	preduzeti		31
+-1	porodicom		35
+-1	ubistva		152
+-1	pejzaž		17
+-1	tursko-jermenskog		10
+-1	poresku		10
+-1	aktuelnim		43
+-1	sprovoditi		11
+-1	uticati		17
+-1	avionu		12
+-1	gasnog		23
+-1	aktuelno		11
+-1	četverodnevnu		13
+-1	šampioni		12
+-1	biznis		21
+-1	zloupotreba		29
+-1	biznismena		43
+-1	unazad		66
+-1	apelirala		13
+-1	obezbjeđenja		20
+-1	posjetiocima		33
+-1	evropskim		411
+-1	prodavnicama		15
+-1	unešto		21
+-1	saučesništvo		11
+-1	nastavničkih		10
+-1	holandije		68
+-1	tački		34
+-1	aprilskom		12
+-1	podstiču		28
+-1	odliva		18
+-1	efekata		40
+-1	uhapšenih		44
+-1	nultih		14
+-1	prevazilaženju		29
+-1	decenije		222
+-1	obavezuju		21
+-1	zamajca		25
+-1	brisel		251
+-1	tačkama		22
+-1	muzika		32
+-1	ničim		10
+-1	sarađuju		76
+-1	februaru		204
+-1	sekretara		232
+-1	vanredna		16
+-1	španski		44
+-1	privrednicima		14
+-1	alijansu		29
+-1	koštunicina		11
+-1	koaliciona		20
+-1	ombudsmena		32
+-1	ličnim		35
+-1	interenet		20
+-1	gasnih		19
+-1	državama-članicama		44
+-1	akcioni		65
+-1	scenario		40
+-1	penzionisanje		23
+-1	informacione		16
+-1	formirao		23
+-1	kontakt-grupe		28
+-1	šverc		101
+-1	intelektualnu		12
+-1	napolju		12
+-1	akcionom		19
+-1	bilansa		10
+-1	presudnim		20
+-1	strožije		19
+-1	biro		20
+-1	jun		338
+-1	potjernica		14
+-1	škode		12
+-1	zavisnost		56
+-1	penzioneri		30
+-1	hiljada		213
+-1	vozova		19
+-1	tužioci		264
+-1	poslaničkog		11
+-1	odloži		20
+-1	januara		817
+-1	koalicionu		17
+-1	sportistkinja		14
+-1	izglasao		12
+-1	pokrivanja		10
+-1	komandantu		13
+-1	oficiri		22
+-1	apelovali		15
+-1	lične		118
+-1	potpao		12
+-1	al-kaidom		18
+-1	usuglasila		10
+-1	sekretarijata		10
+-1	firme		365
+-1	posmatrač		12
+-1	finansiranju		55
+-1	periodom		23
+-1	počev		77
+-1	odlože		10
+-1	odbranu		153
+-1	povrijeđen		19
+-1	takmičenju		91
+-1	ambasade		124
+-1	pozorišta		45
+-1	libana		11
+-1	berzi		28
+-1	stimulaciju		12
+-1	efikasnije		26
+-1	diplomatije		50
+-1	tačan		29
+-1	sarađivati		138
+-1	italijanski		117
+-1	aktuelna		75
+-1	riceova		28
+-1	odslikava		11
+-1	penzioni		18
+-1	muzičara		31
+-1	poslanik		83
+-1	historičari		25
+-1	stepena		28
+-1	saopćeno		203
+-1	učestvovala		45
+-1	zavještanje		19
+-1	odložio		10
+-1	komunikacionih		12
+-1	regionima		32
+-1	lični		47
+-1	investicionim		10
+-1	proevropska		13
+-1	džudou		10
+-1	atinu		46
+-1	abortusa		10
+-1	izvještavalo		10
+-1	srednjevjekovni		15
+-1	demokratije		275
+-1	muzičare		11
+-1	finansiranjem		15
+-1	ciframa		35
+-1	gasom		68
+-1	upotrebljavati		17
+-1	kompjuterski		19
+-1	elektronsko		11
+-1	eventualnog		12
+-1	rumunsku		32
+-1	komitetu		26
+-1	aktuelnog		92
+-1	filijalu		10
+-1	desile		16
+-1	izvještaje		84
+-1	biblioteci		14
+-1	obezbijede		21
+-1	omladinu		27
+-1	obožavaoci		12
+-1	konsalting		19
+-1	adekvatna		12
+-1	pasoša		74
+-1	odbrana		28
+-1	vođstvom		11
+-1	ukop		11
+-1	historijskim		42
+-1	bezbjedan		17
+-1	odlaganjima		11
+-1	skali		35
+-1	srbijanaca		10
+-1	zvaničnici		1158
+-1	augusta		451
+-1	vagi		12
+-1	prodavci		10
+-1	vašington		123
+-1	sprovela		11
+-1	štab		21
+-1	kompleksnosti		12
+-1	penziju		29
+-1	investiranju		13
+-1	sticanja		13
+-1	talasa		13
+-1	užih		12
+-1	avio-prijevoznika		20
+-1	opozicionu		17
+-1	države-članice		56
+-1	dešava		101
+-1	personala		49
+-1	šoping-centar		10
+-1	zamajac		95
+-1	porodicu		97
+-1	apelacionog		16
+-1	akcionog		41
+-1	fudbalera		12
+-1	obezbjeđuje		87
+-1	uslovima		191
+-1	hronične		10
+-1	španije		94
+-1	finansije		45
+-1	obezbjeđivanje		28
+-1	junu		254
+-1	preduslove		11
+-1	dobrovoljnoj		10
+-1	budžetska		18
+-1	investicionom		10
+-1	sekretarka		100
+-1	urađeno		29
+-1	antikorupcijskih		13
+-1	finansijskih		159
+-1	avionom		15
+-1	desili		15
+-1	naučnicima		15
+-1	preduslova		22
+-1	ambasadi		23
+-1	budžetskih		35
+-1	kritu		16
+-1	obezbjeđivanja		15
+-1	stipom		22
+-1	garanciju		26
+-1	strahovanje		10
+-1	ugalj		14
+-1	šengenski		10
+-1	gasne		24
+-1	ankarskom		15
+-1	budžetskom		13
+-1	štaba		44
+-1	garantirati		33
+-1	ekstradiciji		20
+-1	režiseru		16
+-1	rumunijom		43
+-1	naučna		48
+-1	diskutirati		13
+-1	firmu		65
+-1	atini		466
+-1	anadoliji		14
+-1	deceniju		40
+-1	generalštab		16
+-1	izvodljivosti		49
+-1	prilagođavanja		12
+-1	postera		14
+-1	organizacionog		11
+-1	direktnim		36
+-1	zvaničnika		473
+-1	ostrvo		88
+-1	kandidatski		56
+-1	zvanični		18
+-1	šangaju		10
+-1	opredijeljenost		79
+-1	datih		10
+-1	grupom		49
+-1	kauciju		18
+-1	tužiocem		14
+-1	saobraćaj		99
+-1	univerziteti		21
+-1	srednjevjekovnih		10
+-1	direktnom		11
+-1	sekretarkom		34
+-1	evropsku		213
+-1	runda		43
+-1	ličnih		74
+-1	carevine		33
+-1	privrednici		44
+-1	efekti		33
+-1	tračnice		20
+-1	audio-priča		18
+-1	zavisit		16
+-1	sajt		15
+-1	kompjuterskih		31
+-1	penzionisani		36
+-1	opredijeljena		56
+-1	zemljotresu		10
+-1	eksperta		18
+-1	obezbijedili		23
+-1	demonstracijama		32
+-1	hroma		11
+-1	pozorišne		29
+-1	fabrici		35
+-1	penzionisanog		13
+-1	penzija		101
+-1	usaglasili		10
+-1	lideru		41
+-1	finansira		85
+-1	režisera		125
+-1	kiparska		42
+-1	doprinijet		15
+-1	usuglase		15
+-1	al-kaide		47
+-1	topićeva		18
+-1	dostigle		14
+-1	evropskoj		174
+-1	sprovedbe		18
+-1	advokata		48
+-1	macoveijeva		11
+-1	sisteme		46
+-1	pristalicama		41
+-1	registracijama		12
+-1	krivica		13
+-1	prihvata		14
+-1	ustanovljavanja		14
+-1	provoz		12
+-1	pres-konferenciji		238
+-1	objekat		146
+-1	polovini		88
+-1	raketnu		11
+-1	tahirijeva		14
+-1	uglja		29
+-1	uhapsiti		24
+-1	tužilaštava		11
+-1	penzijama		14
+-1	sedmici		24
+-1	španija		99
+-1	domen		13
+-1	metodima		15
+-1	odbrambene		32
+-1	demokratiju		166
+-1	efikasne		15
+-1	rampe		14
+-1	muzičke		32
+-1	saopćivši		27
+-1	ambasadori		45
+-1	sprovedba		15
+-1	grejs		13
+-1	podstakao		21
+-1	formirali		25
+-1	fudbalske		49
+-1	historičar		28
+-1	poslanika		165
+-1	naučnik		17
+-1	desi		55
+-1	učesnika		109
+-1	vebsajt		28
+-1	neophodnim		28
+-1	saradnjom		50
+-1	zemljama-članicama		20
+-1	hemijske		10
+-1	sarađivali		31
+-1	referent		10
+-1	sportista		75
+-1	krompir		10
+-1	regione		11
+-1	hali		13
+-1	zloupotrebi		10
+-1	rumun		26
+-1	oficira		71
+-1	prošlosedmični		11
+-1	raskrsnici		13
+-1	univerzitet		116
+-1	ostrvima		22
+-1	historiji		197
+-1	saopćenja		36
+-1	investiciona		51
+-1	štokholmu		23
+-1	pomjeranja		13
+-1	poreska		23
+-1	finansiranje		177
+-1	cifre		134
+-1	uprkos		803
+-1	zloupotrebe		63
+-1	odliv		19
+-1	vršilac		31
+-1	advokati		42
+-1	izvodljivost		12
+-1	učešću		61
+-1	grešku		20
+-1	redovno		107
+-1	rumunske		146
+-1	februar		365
+-1	specijalnoj		17
+-1	protestira		13
+-1	efikasno		24
+-1	osce-u		14
+-1	komandanata		13
+-1	vašingtonu		159
+-1	počinioce		14
+-1	saopštila		11
+-1	voz		40
+-1	gest		16
+-1	preduzećima		48
+-1	tužioce		24
+-1	džez-festival		20
+-1	špekulirati		14
+-1	birokratije		25
+-1	mirovnjaka		20
+-1	obezbjeđuju		48
+-1	nosilac		14
+-1	garantiranja		12
+-1	februara		747
+-1	istambul		53
+-1	fabrika		89
+-1	kiparskog		68
+-1	višedecenijske		12
+-1	atinska		16
+-1	njujorku		116
+-1	bengaziju		34
+-1	osnov		12
+-1	celzijusa		18
+-1	penzionere		13
+-1	učestvovat		44
+-1	pridruživati		16
+-1	pretjeranog		13
+-1	finansijsku		192
+-1	decenija		57
+-1	hapšenju		45
+-1	hapšenje		201
+-1	numera		10
+-1	bezbjednosne		12
+-1	zasnivati		14
+-1	liderka		19
+-1	dešavalo		15
+-1	litvaniji		19
+-1	italijanska		43
+-1	pasoše		48
+-1	hapšenjima		14
+-1	kvo		44
+-1	uradila		23
+-1	ambasadora		131
+-1	firma		202
+-1	ubistvu		17
+-1	budžetske		29
+-1	perioda		370
+-1	efikasan		12
+-1	finansijskim		102
+-1	komesar		14
+-1	aktuelnoj		28
+-1	izvještavali		14
+-1	interesovanja		14
+-1	biznismen		26
+-1	atinske		23
+-1	protivraketne		10
+-1	historijom		14
+-1	komande		35
+-1	poslanicima		34
+-1	zarekao		14
+-1	trusta		35
+-1	akciza		11
+-1	poslanica		18
+-1	avio		18
+-1	učesnicima		68
+-1	inostranih		15
+-1	historija		59
+-1	pređe		13
+-1	šampionata		19
+-1	sedmica		216
+-1	desiti		137
+-1	protestiralo		21
+-1	jugo		10
+-1	direktan		30
+-1	narednoj		30
+-1	fabrike		72
+-1	komandant		219
+-1	poređenju		130
+-1	naučnom		17
+-1	preduzeća		240
+-1	propisnog		11
+-1	sedmice		1685
+-1	odbrambenih		15
+-1	ćorsokaka		33
+-1	zvaničnicima		308
+-1	prošlosedmična		11
+-1	učestvuju		156
+-1	dobnoj		11
+-1	insistiranje		22
+-1	španiju		21
+-1	zvaničnog		15
+-1	ubijanju		13
+-1	obezbjeđivanju		25
+-1	hljeb		16
+-1	specijalno		34
+-1	porodični		17
+-1	fudbala		31
+-1	učesnice		18
+-1	pres-konferenciju		29
+-1	advokat		119
+-1	bezbjednu		23
+-1	osmanske		31
+-1	poslanici		109
+-1	kratkoročnoj		10
+-1	upravnika		12
+-1	bilans		13
+-1	oktobra		774
+-1	prihvataju		11
+-1	naučnika		87
+-1	štampu		143
+-1	prošlosedmične		34
+-1	španskog		14
+-1	dejtona		19
+-1	žiranata		11
+-1	integralno		11
+-1	zemljotrese		16
+-1	srednjevjekovne		20
+-1	krivici		34
+-1	kompjuterska		10
+-1	nezavisnoj		10
+-1	škodi		16
+-1	decenijama		46
+-1	nagovijestila		12
+-1	učestvovali		139
+-1	podsekretar		29
+-1	desio		35
+-1	historijski		116
+-1	septembr		17
+-1	kiparsko		37
+-1	porodičnih		11
+-1	posmatra		13
+-1	podsekretara		11
+-1	opozicioni		108
+-1	sticanje		10
+-1	fondacija		92
+-1	hiljadu		15
+-1	istambulski		16
+-1	opozicionim		27
+-1	ponteova		25
+-1	podsticaj		19
+-1	aprila		661
+-1	holandska		22
+-1	okolišne		17
+-1	jul		319
+-1	porodici		150
+-1	avio-kompanija		14
+-1	poreskih		52
+-1	antikorupcijski		13
+-1	rotaciono		14
+-1	porediti		16
+-1	šengenskoj		49
+-1	gledaoci		20
+-1	prodata		13
+-1	dopisu		21
+-1	skulptora		10
+-1	gasni		16
+-1	zemlje-kandidatkinje		11
+-1	prodavnici		11
+-1	konsultant		14
+-1	novembra		688
+-1	investitore		85
+-1	stepen		79
+-1	ankarskog		12
+-1	saopštenju		18
+-1	zapažaju		23
+-1	rumuni		79
+-1	učesnik		15
+-1	snabdijevanje		12
+-1	izdatom		14
+-1	briselski		20
+-1	gasovoda		166
+-1	autoputeva		20
+-1	univerzitetu		324
+-1	prodavac		21
+-1	tačku		38
+-1	garantira		41
+-1	municije		75
+-1	sergejem		14
+-1	učestvovale		33
+-1	prošlosedmičnoj		12
+-1	univerzitetska		12
+-1	hidžab		21
+-1	vršioca		10
+-1	podsticanju		15
+-1	milošoskim		27
+-1	državljanina		18
+-1	naučnog		22
+-1	fudbalska		28
+-1	podstiče		33
+-1	špekuliraju		25
+-1	mullerova		13
+-1	specijalnu		43
+-1	ambasadorom		23
+-1	štampe		132
+-1	piraterija		10
+-1	univerzitetski		45
+-1	efikasnosti		87
+-1	invalidnih		27
+-1	šengenskih		12
+-1	preduslov		79
+-1	saobraćajem		12
+-1	uhapšeni		79
+-1	konsultacijama		13
+-1	uhapsi		26
+-1	poslanike		18
+-1	zemljotresa		70
+-1	gasovodu		30
+-1	bezbjedna		16
+-1	jevreji		11
+-1	saopćile		29
+-1	zvani		11
+-1	propraćena		12
+-1	rumunskih		75
+-1	obezbijedi		40
+-1	atinskom		18
+-1	koalicione		37
+-1	procenat		26
+-1	univerzitetske		18
+-1	finansiranja		144
+-1	vještačke		13
+-1	rumuna		80
+-1	hag		59
+-1	ambasador		383
+-1	privrednog		16
+-1	investicionog		11
+-1	gasna		24
+-1	vještački		11
+-1	transdnjestru		10
+-1	kibernetskih		13
+-1	bronzane		26
+-1	otkupu		17
+-1	prethodnoj		13
+-1	zapažajući		27
+-1	holandske		25
+-1	zavisiti		40
+-1	efikasnost		72
+-1	uhapse		16
+-1	poreske		51
+-1	prodavnicu		11
+-1	jula		746
+-1	nadgledane		16
+-1	istambulskom		11
+-1	evropom		26
+-1	škriljčanog		21
+-1	sekretarijat		18
+-1	ustanovljavanju		17
+-1	bend		68
+-1	fondaciju		14
+-1	vakum		10
+-1	pasoši		26
+-1	cifara		22
+-1	prevazilazi		15
+-1	sedmicama		45
+-1	nađeni		15
+-1	naredni		117
+-1	istambulu		146
+-1	zdesna		10
+-1	historijska		31
+-1	skresati		10
+-1	rumuniji		781
+-1	baziran		11
+-1	povrijeđeni		10
+-1	utvrđivati		14
+-1	trajkovićeva		12
+-1	univerzitetima		58
+-1	fudbalskim		10
+-1	cik-a		21
+-1	muzike		84
+-1	najnovijom		11
+-1	vankuveru		11
+-1	kesa		13
+-1	vakcine		18
+-1	obezbijediti		221
+-1	skelet		22
+-1	posmatračke		14
+-1	ostrva		224
+-1	ekstradicije		16
+-1	prodato		14
+-1	čitaoci		19
+-1	sastojala		15
+-1	finansija		475
+-1	naređenja		12
+-1	saopćilo		36
+-1	bronzanog		13
+-1	muzičkih		26
+-1	jevreja		32
+-1	obimne		11
+-1	jermena		11
+-1	zapazio		97
+-1	deceniji		24
+-1	budžetski		98
+-1	zvanične		14
+-1	finansijskog		110
+-1	benedikt		24
+-1	porodične		25
+-1	kipru		297
+-1	fondacijama		11
+-1	ubistava		54
+-1	tačka		81
+-1	finansijskoj		28
+-1	teniserka		19
+-1	izvještajima		469
+-1	zavisi		162
+-1	penzionog		29
+-1	država-članica		113
+-1	aktuelnom		33
+-1	švercere		10
+-1	demonstrante		22
+-1	ambasadu		56
+-1	sprovođenje		17
+-1	zasnovan		86
+-1	šengen		19
+-1	rumunsko		47
+-1	evropljani		28
+-1	finansirat		11
+-1	evropu		385
+-1	zvanog		16
+-1	teritorijom		13
+-1	proevropski		16
+-1	zapazili		13
+-1	decembra		806
+-1	kiparske		38
+-1	operira		12
+-1	maternjem		10
+-1	šampionat		18
+-1	kćerku		20
+-1	pravičnost		11
+-1	tačke		133
+-1	penzije		132
+-1	kandidatskog		28
+-1	pres-ureda		11
+-1	eventualnih		15
+-1	tegova		45
+-1	režiser		86
+-1	koalicioni		47
+-1	pasošima		10
+-1	švercom		13
+-1	talas		14
+-1	tuča		12
+-1	centralnu		80
+-1	siđe		19
+-1	odbrambeni		14
+-1	španska		24
+-1	sekretaru		28
+-1	odloženo		12
+-1	kiparskih		482
+-1	obezbijedila		59
+-1	holivudska		10
+-1	uslove		346
+-1	konekcije		10
+-1	omladine		71
+-1	šengenske		28
+-1	nepravično		23
+-1	bendova		10
+-1	tužilac		225
+-1	okončavanju		13
+-1	izdato		10
+-1	birokratiju		10
+-1	evropskih		511
+-1	obuhvataju		19
+-1	principima		73
+-1	ambasadore		18
+-1	muzički		43
+-1	bogosluženje		12
+-1	dostiglo		10
+-1	uporedbi		13
+-1	nivoa		226
+-1	efikasna		11
+-1	tužioca		122
+-1	konsekvence		39
+-1	gran-pri		11
+-1	unaprjeđivanjem		21
+-1	avio-prijevoznik		36
+-1	pretpristupnog		15

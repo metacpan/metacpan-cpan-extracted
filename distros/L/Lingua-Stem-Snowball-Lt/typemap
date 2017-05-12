@@ -1,0 +1,23 @@
+AV *            T_AVREF 
+HV *			T_HVREF
+
+#############################################################################
+INPUT
+T_AVREF
+    if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV)
+        $var = (AV*)SvRV($arg);
+    else
+        Perl_croak(aTHX_ \"$var is not an array reference\")
+T_HVREF
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVHV)
+	    $var = (HV*)SvRV($arg);
+	else
+	    Perl_croak(aTHX_ \"$var is not a hash reference\")
+
+#############################################################################
+OUTPUT
+T_AVREF
+    $arg = newRV((SV*)$var);
+T_HVREF
+	$arg = newRV((SV*)$var);
+

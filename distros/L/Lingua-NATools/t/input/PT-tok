@@ -1,0 +1,828 @@
+O SPP2 ( Servidor de Processamento Paralelo ), desenvolvido no Laboratório de Computação de Alto Desempenho ( LCAD-ICMC-USP ), utiliza computadores convencionais conectados em uma rede de comunicação de alta velocidade . 
+$
+Pesquisadores da Universidade de Illinois desenvolveram uma camada de software de alto desempenho para a troca de mensagens entre máquinas conectadas por redes de alta velocidade Myrinet denominada Fast Messages , que apresenta baixa latência na transmissão de mensagens e alta taxa de transferência . 
+$
+Uma biblioteca de alto nível muito utilizada para a programação paralela é o PVM ( Parallel Virtual Machine ). 
+$
+Para que o PVM possa tirar proveito do desempenho de comunicação do sistema Fast Messages sobre Myrinet foi desenvolvida no LCAD-USP uma biblioteca que possui a semântica de comunicação de sockets , mas utiliza Fast Messages para atingir maior desempenho . 
+$
+Essa biblioteca também pode ser utilizada diretamente para troca de mensagens na rede , sendo mais adequada para o programador acostumado com sockets do que o uso das primitivas de Fast Messages . 
+$
+Testes preliminares mostram que sock2fm apresenta um desempenho melhor que TCP / IP para mensagens com mais de 250 bytes ( 79 % melhor para alguns tamanhos ). 
+$
+Diante das inúmeras opções de pacotes de software que existem atualmente para as aplicações de Sistemas de Informação e da dificuldade que um cliente tem para escolher aquele pacote que atenda melhor a suas necessidades , neste trabalho , é apresentado um procedimento para escolha de pacotes de software na área de Sistemas de Informação . 
+$
+Nesse procedimento , são utilizadas a norma NBR 12119 da Associação Brasileira de Normas Técnicas ( ABNT ) e o Quality Function Deployment ( QFD ) do American Supplier Institute ( ASI ). 
+$
+O planejamento de projeto de software é uma prática administrativa vital para o sucesso da gestão de um projeto . 
+$
+A ausência de práticas administrativas no desenvolvimento de software é a principal causa de sérios problemas enfrentados pelas organizações : atraso em cronogramas , custo maior do que o esperado e presença de defeitos . 
+$
+Tais problemas ocasionam inconveniências aos usuários e perda de tempo e de recursos para os desenvolvedores . 
+$
+Segundo os modelos e padrões de qualidade ISO , SPICE e CMM , o planejamento de projeto é um dos itens básicos para que uma empresa inicie a melhoria de processo de desenvolvimento de software . 
+$
+Este trabalho apresenta um modelo de processo de planejamento que define , relaciona e organiza as principais atividades que devem ser realizadas para planejar um projeto de software . 
+$
+O trabalho também apresenta um estudo de caso que mostra a aplicação do modelo de processo em um centro de desenvolvimento de sistemas de uma empresa privada . 
+$
+Neste artigo , é apresentada uma ferramenta para validação e verificação de requisitos . 
+$
+Essa ferramenta suporta a abordagem ERACE . 
+$
+Tal abordagem baseia-se no documento de requisitos do sistema e propõe a especificação das interações entre o sistema e seus agentes ( cenários ). 
+$
+Em seguida , os cenários são especificados detalhadamente . 
+$
+Também são apresentadas as heurísticas de evolução do modelo de requisitos para os modelos de análise , exemplificadas pelo estudo de caso apresentado . 
+$
+O crescimento do mercado de software acarreta o aumento do uso de técnicas de desenvolvimento , muitas vezes informais . 
+$
+A manutenção de softwares torna-se problemática , uma vez que sua documentação raramente reflete o código implementado . 
+$
+Nesse contexto , atua a Engenharia Reversa de Software , com o propósito de recuperar as informações de projeto perdidas durante a fase de desenvolvimento e documentar o real estado do software . 
+$
+Este artigo relata as questões levantadas durante a aplicação do método de engenharia reversa Fusion-RE / I. 
+$
+O experimento descrito é parte da re-engenharia de um sistema protótipo de hipermídia , cujo objetivo é adaptá-lo ao domínio de Engenharia de Software . 
+$
+Em virtude de o sistema alvo ser hipermídia , os resultados obtidos durante a aplicação do método Fusion-RE / I puderam ser registrados como um hiperdocumento no próprio sistema submetido à engenharia reversa . 
+$
+Foi , então , possível observar aspectos relevantes sobre a validação das etapas propostas no método Fusion-RE / I. 
+$
+Este trabalho apresenta requisitos funcionais identificados no processo de Engenharia Reversa de Software que possam ser suportados por um Sistema Hipertexto . 
+$
+Por meio da modelagem conceitual e navegacional do domínio de informações relativas ao método de engenharia reversa Fusion-RE / I , foram estabelecidos os requisitos funcionais de um aplicativo hipermídia de suporte ao método , de forma a nortear o engenheiro de software responsável pelo processo de engenharia reversa e possibilitar o acompanhamento da evolução desse processo . 
+$
+Este artigo discute questões sobre a autoria de aplicações hipermídia para ensino , com o objetivo de identificar requisitos para um ambiente de desenvolvimento de aplicações hipermídia . 
+$
+A autoria de hiperdocumentos para ensino é uma tarefa complexa e sistemas de autoria hipermídia tradicionalmente utilizados , como HyperCard , ToolBook e mesmo a linguagem HTML , no caso de autoria para a WWW , são mais direcionados à criação de hiperdocumentos para apresentação e recuperação de informação . 
+$
+Este artigo apresenta algumas ferramentas para autoria de hiperdocumentos para ensino e defende a necessidade de uma modelagem prévia do domínio de conhecimento . 
+$
+Um método para o projeto de aplicações hipermídia para o ensino , o EHDM , é proposto como base para o desenvolvimento de ferramentas de autoria que incorporem a modelagem do domínio do conhecimento como parte do seu processo de autoria . 
+$
+Uma ferramenta desenvolvida utilizando o EHDM como base metodológica é também apresentada como forma de validação do EHDM num contexto real . 
+$
+O aprimoramento das técnicas e métodos sistemáticos elaborados para apoiar o desenvolvimento de aplicações trouxe como principal vantagem a produção de softwares de alta qualidade e custo mais baixo . 
+$
+De forma similar ao desenvolvimento de softwares comerciais , o desenvolvimento de aplicações hipermídia tem passado por significativas mudanças e por constantes evoluções . 
+$
+Atualmente , os sistemas de autoria hipermídia oferecem , por exemplo , condições para que uma aplicação seja previamente especificada para , em seguida , ser efetivamente implementada . 
+$
+No entanto , é necessário que possuam algumas características que proporcionem facilidades em sua utilização , de forma a motivar os usuários . 
+$
+De forma geral , este trabalho se concentra na avaliação da implementação de um conjunto de requisitos desejável em um ambiente de autoria de aplicações hipermídia para ensino denominado SASHE ( Sistema de Autoria e Suporte Hipermídia para Ensino ). 
+$
+Os requisitos propostos nas fases iniciais do desenvolvimento desse sistema também serão considerados na avaliação , que será realizada de forma experimental e resultará na obtenção de dados concretos com relação às condições atuais da implementação do módulo de autoria do sistema mencionado . 
+$
+Este artigo apresenta o Método para Projeto de Hiperdocumentos para Ensino , ou EHDM ( Educational Hyperdocuments Design Method ), uma abordagem sistemática para apoiar o projeto e o desenvolvimento de aplicações hipermídia para ensino . 
+$
+O método utiliza o modelo proposto por Michener e a técnica de mapeamento conceitual para modelar o domínio de conhecimento do hiperdocumento . 
+$
+São apresentadas as três fases que compõem o método - modelagem conceitual hierárquica , projeto navegacional de contextos e construção e teste . 
+$
+Sistemas Reativos caracterizam ­ se por reagir continuamente a estímulos externos e internos e por ter no aspecto comportamental seu principal enfoque . 
+$
+Dentre as técnicas utilizadas para especificar o comportamento desse tipo de sistema estão as Redes de Petri . 
+$
+Em virtude do caráter crítico geralmente envolvido nesses sistemas , sua especificação deve ser validada de forma criteriosa . 
+$
+Por isso , a Análise de Mutantes , um critério de teste baseado em erros , normalmente aplicado ao teste de programas , tem sido explorada no contexto de teste de Redes de Petri . 
+$
+O objetivo deste trabalho é a implementação da ferramenta Proteum ­ RS / PN , para automatizar o processo de teste e validar as Redes de Petri com base no critério Análise de Mutantes , visto que a aplicação manual desse critério é impraticável . 
+$
+O problema da Mochila Compartimentada pode ser enunciado considerando-se a seguinte situação hipotética : um alpinista deve carregar sua mochila de capacidade limitada com possíveis itens úteis . 
+$
+A cada item atribui-se seu peso e um valor de utilidade ( até aqui , o problema coincide com o clássico Problema da Mochila ). 
+$
+Entretanto , os itens são de classes distintas ( alimentos , medicamentos , utensílios , etc .) e devem estar em compartimentos separados na mochila . 
+$
+Os compartimentos da mochila são flexíveis e têm capacidade limitada . 
+$
+Cada compartimento tem um custo que depende da classe com que foi preenchido . 
+$
+O problema consiste em determinar a capacidade adequada de cada compartimento e como esses compartimentos devem ser carregados , elevando ao máximo o valor de utilidade total . 
+$
+Neste trabalho , propomos uma modelagem matemática não linear inteira para o problema e verificamos algumas heurísticas para sua resolução . 
+$
+Tal problema estende os Problemas da Mochila encontrados na literatura , o que pode ser confirmado pela ausência em trabalhos recentes de revisão de Problemas da Mochila não-padronizados . 
+$
+Uma aplicação prática relevante desse problema aparece no corte de bobinas de aço sujeitas à laminação . 
+$
+Este trabalho apresenta o STT ( Sistema de Telemetria e Telecomando ), parte do Projeto ARARA-Aeronaves de Reconhecimento Assistidas por Rádio e Autônomas ( Autonomous and Radio-Assisted Reconnaissance Aircraft ). 
+$
+O STT permite operar a aeronave do ARARA além do alcance visual do piloto . 
+$
+As imagens de vídeo e os dados dos instrumentos são transmitidos da aeronave para a estação de base em tempo real . 
+$
+A interface gráfica do STT apresenta o vídeo sobreposto por um painel de instrumentos , similar aos simuladores de vôo , o que torna a sua operação muito intuitiva . 
+$
+Atualmente as organizações devem trocar dados entre si , e a tendência é que essas trocas sejam efetuadas cada vez mais por meios digitais . 
+$
+Os dados são consultados ( alimentados ) livremente nas bases de dados de organizações independentes entre si , porém , quando é necessária a troca de dados , como não existe uma previsão de integração , os dados somente podem ser trocados após uma preparação que impõe alguma forma de intervenção manual , construção de filtros especiais , etc ., uma vez que a não existência de um esquema comum impede que os dados de uma base possam ser intercambiados com os de outra base . 
+$
+No entanto , embora as bases de dados de diferentes organizações possam ser construídas de maneira totalmente independente , a necessidade de uma troca significa que a semântica dos elementos manipulados , em particular daqueles que devem ser compartilhados é , no mínimo , semelhante . 
+$
+Por exemplo , se duas organizações devem trocar dados sobre pessoas , não importa se para as diferentes organizações as pessoas são clientes , empregados , alunos ou pacientes , o significado de & quot ; pessoa & quot ; é sempre entendido pelos membros das organizações . O mesmo ocorre com qualquer entidade sobre a qual se deseje trocar informações . 
+$
+Este trabalho parte da suposição de que possa existir alguma forma de definição primitiva para os diversos elementos de dados que devem ser compartilhados , com base na qual sua instanciação em elementos de um esquema de dados em particular possa ser reconhecido . 
+$
+Assim , busca-se identificar estruturas primitivas , com a finalidade de integrar os sistemas . 
+$
+Contudo , para chegar a tal estrutura , é preciso definir regras que garantam a preservação de suas propriedades com a finalidade de permitir que , sempre que o esquema de uma organização A seja construído a partir de uma mesma estrutura primitiva que foi utilizada por outra organização B , a integração entre ambas possa ser feita de forma automática , e que isso não provoque inconsistência nas bases de dados que estarão recebendo as informações . 
+$
+Para atingir esses objetivos , este trabalho propõe que tais estruturas de esquemas primitivos sejam parte das Bibliotecas de Componentes Reutilizáveis ( BTO ) que são distribuídas como parte das Ferramentas de Desenvolvimento Rápido de Aplicativos ( RAD ) comerciais . 
+$
+Como um exemplo de como isso poderia ser feito , apresenta-se um componente que define genericamente um objeto pessoa , desenvolvido a partir de como & quot ; pessoas & quot ; são tratadas em dois sistemas reais , centrando essa estrutura em uma única Abstração : a Abstração de Generalização . 
+$
+Apresenta também o conjunto de regras que deve ser utilizado para a integração de componentes centrados nessa abstração , que é a mais universalmente compatível entre os diversos modelos de dados orientados a objetos disponíveis atualmente . 
+$
+Este trabalho apresenta meios alternativos para a obtenção de imagens aéreas e sua utilização na agricultura . 
+$
+Imagens aéreas representam uma ferramenta importante na avaliação de diversos aspectos da atividade agrícola moderna , principalmente daqueles que não podem ser avaliados no nível do solo . 
+$
+Três tipos de sistemas são definidos com níveis crescentes de complexidade e funcionalidade . 
+$
+Diversos critérios são propostos para a avaliação do sistema e para a determinação da sua adequação às principais aplicações na agricultura . 
+$
+Foi construído um protótipo de sistema do Tipo I baseado em aeromodelos , utilizado na avaliação da tecnologia e na validação do projeto . 
+$
+Foram utilizados componentes facilmente encontrados no mercado , existindo potencial para a evolução técnica do sistema construído em cada um dos seus componentes básicos : a aeronave , o método de controle e o meio de captação das imagens . 
+$
+Os resultados obtidos mostram que o sistema pode substituir , a baixo custo , os meios convencionais utilizados até então para a obtenção dessas imagens . 
+$
+Este trabalho apresenta o Animbs ( Animation for MBS ), um sistema capaz de visualizar dados gerados por um sistema de simulação de engenharia ( SD / FAST ) na forma de animações por computador . 
+$
+SD / FAST é um sistema utilizado para o modelamento e a simulação de sistemas mecânicos multicorpos ( MBS ). 
+$
+O sistema Animbs permite a associação de uma geometria ao MBS sendo simulado e utiliza os dados produzidos pela simulação do SD / FAST para criar uma animação do comportamento do sistema mecânico e , dessa forma , melhorar a análise de dados feita pelos usuários do SD / FAST . 
+$
+Este trabalho apresenta algumas técnicas e métodos que apóiam a fase de engenharia de requisitos , bem como uma comparação entre as abordagens revisadas . 
+$
+É apresentada uma proposta de processo para a engenharia de requisitos baseada na construção de cenários compatível com a UML . 
+$
+São apresentados a notação introduzida , o processo de construção dos modelos de requisitos e um conjunto de heurísticas para a construção de um modelo de análise . 
+$
+Um estudo de caso referente a um sistema de apoio à escrita de documentos técnicos ilustra a construção dos modelos propostos pelo processo . 
+$
+Finalmente , é apresentada uma ferramenta que apóia a construção dos modelos introduzidos pelo processo . 
+$
+A partir dos anos 90 , a qualidade tornou-se uma necessidade básica na competição por mercado e acabou afetando a indústria de software . 
+$
+Os desenvolvedores de software são obrigados a aperfeiçoar o produto final para continuar competindo no mercado . 
+$
+Após alguns anos de experiência no desenvolvimento de software , percebeu-se que alguns fatores de qualidade considerados pelos clientes estão mais relacionados ao processo de software do que ao produto final . 
+$
+A melhoria do processo de software aumenta as chances de obter um produto que atenda às expectativas dos clientes . 
+$
+No entanto , a realização de uma melhoria de processo de software não é uma tarefa simples e envolve vários fatores . 
+$
+Para auxiliar a tarefa de melhorar o processo de software , existem hoje na literatura vários modelos de melhoria como , por exemplo , o SW-CMM ( Software-Capability Maturity Model ). 
+$
+Porém , a maioria dos modelos de melhoria existentes são voltados para as empresas de grande porte , com uma estrutura complexa e & quot ; fechada & quot ; que dificilmente se ajusta às necessidades das empresas desenvolvedoras de software brasileiras , que são , na sua maioria , empresas de pequeno porte . 
+$
+Nesse contexto , este trabalho apresenta diretrizes para orientar clara e objetivamente a melhoria de processo de software . 
+$
+As diretrizes seguem os passos da fase de estabelecimento da Abordagem IDEAL - Estabelecimento de Prioridades , Desenvolvimento da Abordagem e Planejamento de Ações - e consideram algumas idéias obtidas no estudo das abordagens S : PLAN , Bootstrap e da parte 7 do Modelo SPICE . 
+$
+A Injeção de Defeitos é uma técnica que tem sido amplamente empregada na construção de sistemas que precisam ser altamente confiáveis . 
+$
+Dentre as atividades de Injeção de Defeitos , existem estudos que englobam a injeção de defeitos de hardware e de software . 
+$
+Observa-se que existem poucos trabalhos relacionados à injeção de defeitos de software na literatura , assim como poucos modelos de defeitos e métodos de injeção relacionados . 
+$
+Desse modo , o objetivo deste trabalho é estudar modelos de defeitos de software e investigar métodos de injeção com base nos conceitos e princípios oriundos do critério Análise de Mutantes . 
+$
+Dada a crescente complexidade dos sistemas computacionais , o projeto e a implementação de uma ferramenta de suporte à atividade de injeção tornam-se necessários . 
+$
+Dessa forma , neste trabalho é apresentada uma ferramenta de injeção de defeitos de software denominada ITool , baseada em um esquema de injeção de defeitos . 
+$
+Esse esquema caracteriza o mapeamento de uma taxonomia de defeitos de software ( Taxonomia de DeMillo ) para os operadores de mutação do critério de teste Análise de Mutantes para a linguagem C. 
+$
+Para ilustrar a relevância e a exeqüibilidade das idéias exploradas neste trabalho , conduziu-se um experimento piloto utilizando-se o programa Space , um sistema real desenvolvido pela ESA ( European Space Agency ). 
+$
+Um estudo empírico para avaliar a eficácia em revelar erros , a dificuldade de satisfação e o custo de aplicação do critério Análise de Mutantes é apresentado neste trabalho . 
+$
+Eficácia e custo também foram avaliados para os critérios Potenciais-Usos , comparando-se assim os resultados obtidos para esses critérios . 
+$
+A especificação e implementação de uma estratégia de minimização de conjuntos de casos de teste adequados ao critério Análise de Mutantes também é apresentada . 
+$
+Com base nos resultados obtidos , observou-se que os critérios Potenciais-Usos ( baseados em fluxo dados ) e o critério Análise de Mutantes ( baseado em erros ) são promissores e apresentam características complementares que merecem ser investigadas em um experimento de maior porte . 
+$
+A utilização de mutação restrita e de minimização de conjunto de casos de teste constituem mecanismos que viabilizam a aplicação desses critérios em ambientes de produção de software . 
+$
+A execução da engenharia reversa orientada a objetos de um sistema legado desenvolvido com orientação procedimental é usada como base para sua reengenharia , seguindo duas abordagens diferentes . 
+$
+Na primeira , o sistema passa por reengenharia com mudança de orientação , por meio de segmentação e , posteriormente , transformação para uma linguagem orientada a objetos de forma semi ­ automática . 
+$
+Na segunda , é feito o reconhecimento de padrões recorrentes de software no modelo de objetos produzido pela engenharia reversa para , depois , ser efetuada a reengenharia utilizando esses padrões . 
+$
+Os resultados obtidos por essas duas abordagens podem ser comparados quanto a manutenibilidade , legibilidade e reuso . 
+$
+A versão original do sistema legado escolhido para a realização da experiência está implementada na linguagem Clipper e tem cerca de vinte mil linhas de código . Trata ­ se de uma oficina auto ­ elétrica e mecânica de veículos . 
+$
+Para a engenharia reversa foi escolhido o método Fusion / RE , sendo feita uma proposta para sua evolução , que adiciona um maior detalhamento da etapa de abstração do modelo de análise do sistema . 
+$
+Para mudança de orientação do paradigma de desenvolvimento , de procedimental para orientado a objetos , são propostas duas etapas adicionais , a serem executadas após a aplicação do Fusion / RE : o projeto avante do sistema e a segmentação do programa legado . 
+$
+São fornecidas indicações sobre como fazer a segmentação . 
+$
+A transformação do código segmentado em Clipper para Java é feita com auxílio da máquina Draco ­ Puc . 
+$
+Uma estratégia é proposta para o reconhecimento de padrões com base no modelo de objetos do sistema obtido pela engenharia reversa . 
+$
+Por meio dela , podem ser reconhecidas instâncias dos padrões Type ­ Object , Association ­ Object , State Across a Collection e Behaviour Across a Collection . 
+$
+São feitas experiências de implementação de alguns desses padrões em Delphi . 
+$
+Independentemente do tipo de manutenção conduzida - corretiva , preventiva , adaptativa ou evolutiva -, as atividades de teste de regressão são necessárias para testar as modificações realizadas e as eventuais novas funcionalidades de um programa , e , principalmente , para testar se as funcionalidades já existentes não foram afetadas adversamente pelas modificações . 
+$
+Para aplicar o teste de regressão de uma maneira sistemática a um baixo custo e com eficácia , muitas técnicas têm sido propostas na literatura . 
+$
+Essas diversas técnicas são divididas em duas abordagens : retest-all e seletiva . 
+$
+A abordagem retest-all utiliza todo o conjunto de casos de teste disponível para testar as modificações , ao passo que a abordagem seletiva utiliza um subconjunto dos casos de teste disponíveis para testar as modificações . 
+$
+As técnicas baseadas na abordagem seletiva têm sido muito estudadas , pois visam diminuir os esforços despendidos no teste de regressão , reduzindo o número de casos de teste a serem reexecutados . 
+$
+Diante da diversidade das técnicas seletivas , fazem-se necessários estudos empíricos para avaliar e comparar a aplicação dessas técnicas . 
+$
+Assim , este trabalho visa aplicar e avaliar empiricamente duas técnicas de teste de regressão que têm se mostrado promissoras : a Técnica baseada em Modificação ( Wong et al ., 1997a ) e a Técnica baseada em Mutação Seletiva ( Wong et al ., 1997b ). 
+$
+Para auxiliar nessa avaliação , é utilizado um framework proposto por Rothermel e Harrold ( 1996 ). 
+$
+Com a realização desses experimentos , espera-se contribuir para o estabelecimento de estratégias de teste de regressão efetivas e de baixo custo . 
+$
+Atividades de teste no desenvolvimento de Sistemas Reativos são de grande relevância , bem como a disponibilidade de ferramentas que apóiem essas atividades , uma vez que a ocorrência de falhas nesses sistemas pode causar graves conseqüências econômicas e / ou sociais . 
+$
+O critério Análise de Mutantes , um dos critérios da técnica de teste baseada em erros , normalmente aplicado em testes de unidades , tem sido explorado no teste de especificações do aspecto comportamental de Sistemas Reativos baseadas em Máquinas de Estados Finitos , Statecharts e Redes de Petri . 
+$
+A especificação da ferramenta Proteum ­ RS constitui uma iniciativa para apoiar a aplicação do critério Análise de Mutantes no contexto de Sistemas Reativos . 
+$
+Este trabalho tem como objetivo a implementação da instanciação da Proteum ­ RS para o teste de especificações baseadas em Statecharts , a Proteum ­ RS / ST . 
+$
+Dessa forma , pretende ­ se fornecer subsídios para investigar a adequação de critérios de teste tradicionalmente usados no teste de programas , como é o caso da Análise de Mutantes , ao teste de especificações de Sistemas Reativos , em particular no contexto de especificações baseadas em Statecharts . 
+$
+Sistemas Reativos caracterizam ­ se por reagir continuamente a estímulos externos e internos e por controlar atividades humanas . 
+$
+A ocorrência de falhas nesses sistemas pode resultar em grandes prejuízos . 
+$
+Dessa forma , o uso de métodos e técnicas rigorosas para a especificação do comportamento desse tipo de sistema é essencial para evitar inconsistências e ambigüidades no modelo . 
+$
+As Redes de Petri são uma das técnicas que têm sido usadas para a especificação de sistemas reativos . 
+$
+Teste e validação são atividades essenciais na produção dessa classe de sistemas . 
+$
+Por isso , o critério Análise de Mutantes , um critério de teste baseado em erros normalmente aplicado ao teste de programas , tem sido explorado no contexto de teste de especificações de sistemas reativos . 
+$
+É necessário o desenvolvimento de ferramentas que apóiem sua utilização , visto que a aplicação manual do critério é impraticável . 
+$
+O objetivo deste trabalho é a implementação da ferramenta Proteum ­ RS / PN , que apóia a aplicação do critério Análise de Mutantes para validar especificações baseadas em Redes de Petri . 
+$
+Para sistematizar os testes e contornar as restrições de tempo e custo associadas à atividade de teste , diversas técnicas , critérios e ferramentas têm sido desenvolvidos . 
+$
+Além disso , para estabelecer uma estratégia de teste incremental , que apresente baixo custo de aplicação e alta eficácia em revelar a presença de erros , a comunidade de teste vem conduzindo estudos teóricos e empíricos . 
+$
+O presente trabalho está inserido nesse contexto e tem como objetivo a realização de estudos empíricos para comparar a adequação entre os critérios baseados em erros - Análise de Mutantes ( teste de unidade ) e Mutação de Interface ( teste de integração ) -, com o objetivo de estabelecer estratégias de teste eficazes e de baixo custo , que englobem todo o ciclo de desenvolvimento de software . 
+$
+Dessa perspectiva , são definidas algumas estratégias incrementais de aplicação dos operadores de mutação de unidade e de integração , explorando o aspecto complementar dos critérios baseados em mutação , reduzindo com isso os custos da atividade de teste durante as fases do teste de unidade e de integração , sem comprometer sua qualidade . 
+$
+É apresentado ainda um conjunto essencial de operadores de mutação para o critério Mutação de Interface . 
+$
+Estudos empíricos têm mostrado que a Análise de Mutantes - um dos critérios de teste baseado em erros - é bastante eficaz para revelar a presença de erros . 
+$
+Entretanto , seu alto custo , decorrente principalmente do grande número de mutantes gerados , tem motivado a proposição de diversas abordagens alternativas para sua aplicação . 
+$
+Um estudo relevante nesse sentido resultou na determinação de um conjunto essencial de operadores de mutação para a linguagem Fortran , mostrando que é possível reduzir o custo de aplicação do critério preservando um alto grau de adequação em relação à Análise de Mutantes . 
+$
+Alguns estudos também têm demonstrado que a redução da eficácia não é significativa . 
+$
+Este trabalho tem como objetivo investigar alternativas pragmáticas para a aplicação do critério Análise de Mutantes e , nesse contexto , propor um procedimento para a determinação de um conjunto essencial de operadores de mutação para a linguagem C , com base nos operadores implementados na ferramenta Proteum . 
+$
+Procurando aplicar e validar o procedimento proposto , dois grupos distintos de programas são utilizados . 
+$
+Para ambos os grupos , o conjunto essencial obtido apresenta resultados bastante significativos quanto à redução de custo , com um decréscimo muito pequeno no grau de adequação em relação à Análise de Mutantes . 
+$
+Também são investigadas estratégias para fazer evoluir e refinar um conjunto essencial para diferentes domínios de aplicação . 
+$
+O crescimento do mercado de software a cada dia acarreta um aumento do uso de técnicas de desenvolvimento muitas vezes informais . 
+$
+A manutenção de tais softwares torna-se problemática , uma vez que a documentação associada ao software , na maioria das vezes , não está de acordo com o código implementado . 
+$
+Dessa forma , quando diante da necessidade de fazer a manutenção do produto , o engenheiro de software encontra uma documentação informal e incompleta , que não reflete o software existente . 
+$
+Nesse contexto é que se encontra a Engenharia Reversa de Software , com o propósito de recuperar as informações de projeto perdidas durante a fase de desenvolvimento e de documentar o real estado do software . 
+$
+O principal objetivo deste trabalho de mestrado foi a investigação de uma estrutura adequada de hiperdocumento para apoiar a documentação requerida durante o processo de engenharia reversa de software . 
+$
+Com base em um levantamento dos requisitos desejáveis em um hiperdocumento , para que possua as habilidades de suporte à documentação de engenharia reversa de software , foi definido um conjunto de links e estruturas de nós . 
+$
+Os requisitos para a composição de tal hiperdocumento foram investigados por meio de uma experiência : a autodocumentação do sistema hipermídia denominado SASHE ( Sistema de Autoria e Suporte Hipermídia para Ensino ), que já possui suporte para o tratamento de nós aninhados e outras características de aplicativo para ensino . 
+$
+A engenharia reversa foi desenvolvida baseando-se no método de engenharia reversa Fusion-RE / I e os produtos obtidos foram inseridos em uma hiperbase no SASHE . 
+$
+Este trabalho apresenta um procedimento de auxílio ao primeiro passo do método de engenharia reversa FUSION-RE / I - obtenção de informações sobre o sistema . 
+$
+Esse procedimento compreende um processo para a criação de uma base de conhecimento ( Processo de Aquisição de Conhecimento IPAIA , instanciado para o domínio de engenharia reversa ) e diretrizes para a utilização dessa base de conhecimento na construção de visões funcionais do sistema . 
+$
+Sistemas orientados a objetos confiáveis devem incorporar atividades de tratamento de exceções de forma a comportarem ­ se adequadamente em uma grande variedade de situações , mesmo na presença de erros . 
+$
+Nesse contexto , um mecanismo de tratamento de exceções é fundamental para detecção e recuperação de erros bem como para ativação das medidas necessárias para restaurar a atividade normal do sistema . 
+$
+O desenvolvimento de um mecanismo de tratamento de exceções é uma tarefa difícil , especialmente quando a concorrência é uma das características dos sistemas de software . 
+$
+Os principais objetivos desta dissertação são o projeto e a implementação de um mecanismo de tratamento de exceções para a construção de sistemas orientados a objetos confiáveis . 
+$
+Na construção do mecanismo proposto , utilizamos técnicas de estruturação de software tais como reflexão computacional e padrões de projeto . 
+$
+Duas contribuições são consideradas principais . 
+$
+A primeira delas , caracterizada por aspectos técnicos e usos práticos , é o projeto e a implementação de um mecanismo de exceções utilizando a linguagem de programação Java e uma arquitetura de software reflexiva chamada Guaraná . 
+$
+O mecanismo proposto oferece suporte especialmente ao tratamento de exceções concorrentes . 
+$
+A outra contribuição , caracterizada por aspectos abstratos e abordagem inovadora , é a definição de uma arquitetura de software reflexiva e de um conjunto de padrões de projeto relacionados para a implementação de mecanismos de tratamento de exceções . 
+$
+Esta dissertação propõe um novo método orientado a objetos para apoiar o projeto e o desenvolvimento estruturado de aplicações hipermídia denominado HMBS / M. 
+$
+O HMBS / M tem como principal característica o uso do HMBS ( Hypertext Model Based on Statecharts ) que utiliza como modelo formal subjacente a técnica de Statecharts para especificar a estrutura organizacional e a semântica de navegação de uma aplicação hipermídia . 
+$
+São apresentadas as quatro etapas que compõem o método - modelagem conceitual , modelagem navegacional , modelagem da interface e implementação . 
+$
+Em cada fase do método são construídos modelos que podem ser melhorados ou incrementados na fase posterior , permitindo assim um desenvolvimento interativo . 
+$
+São discutidas três formas de implementação para uma aplicação hipermídia especificada pelo HMBS / M ( interpretada , traduzida e de tradução livre ) com ênfase nas duas primeiras , que são implementadas usando uma ferramenta que suporta o HMBS , o sistema HyScharts , e usando o ambiente WWW ( padrão HMTL ). 
+$
+Para ilustrar e validar o HMBS / M apresenta-se a especificação de uma aplicação hipermídia baseada nos catálogos de Graduação e Pós-graduação do Instituto de Ciências Matemáticas e de Computação da USP . 
+$
+A dinâmica e a flexibilidade da autoria de hiperdocumentos na Web , por um lado , popularizam a cada dia o uso da Internet , mas , por outro , propiciam facilmente a inconsistência de muitas informações . 
+$
+Basta uma definição errônea de um hiperlink para que o usuário se depare com uma inconsistência e se sinta & quot ; perdido & quot ;. 
+$
+Um procedimento comum durante o desenvolvimento de um site é a reutilização dos componentes de link , seja por haver na mesma página origem mais de um link , ou o mesmo rótulo de link em diversas páginas , ou ainda vários links para uma mesma página destino . 
+$
+Como um site , geralmente , contém uma grande quantidade de links , torna-se inviável a verificação manual da reusabilidade de seus links . 
+$
+A ferramenta DB-LiOS foi desenvolvida com o objetivo de automatizar a verificação da reusabilidade de links de um site da Web , por meio de processos de extração e classificação de links . 
+$
+Com a utilização de DB-LiOS , os autores de um site podem obter um auxílio efetivo para avaliação da consistência de seus links . 
+$
+Este trabalho apresenta o Método para Projeto de Hiperdocumentos para Ensino , ou EHDM ( Educational Hyperdocuments Design Method ), que proporciona uma abordagem sistemática para apoiar o projeto e o desenvolvimento de aplicações hipermídia para ensino . 
+$
+O método utiliza o modelo proposto por Michener e a técnica de mapeamento conceitual para modelar o domínio de conhecimento do hiperdocumento . 
+$
+São apresentadas as três fases que compõem o método - modelagem conceitual hierárquica , projeto navegacional de contextos e construção e teste . 
+$
+Uma ferramenta denominada Educational Hyperdocuments Development Tool ( EHDT ) foi desenvolvida para auxiliar o desenvolvimento de hiperdocumentos para ensino destinados ao sistema SASHE . 
+$
+Essa ferramenta utiliza o EHDM como base metodológica . 
+$
+A EHDT fornece mecanismos para facilitar laços de realimentação rápidos entre as fases do método e para apoiar abordagens de projeto bottom-up e top-down . 
+$
+Este trabalho propõe um ambiente denominado SIATE ( Sistema Inteligente de Apoio ao Treinamento e Ensino ), que integra características de ambientes de Prática / Treinamento , Hipermídia , Sistemas Tutores e Sistemas Híbridos de Conhecimento . 
+$
+É voltado para o ensino e tem como característica marcante a liberdade , por parte do estudante , de explorar um domínio qualquer , podendo recorrer , quando necessário , ao auxílio de um Sistema Tutor e de um Sistema Híbrido de Conhecimento com conhecimento especialista nesse domínio . 
+$
+São enfatizados aqui o projeto e o desenvolvimento de um Sistema Tutor que oferece apoio pedagógico ao ambiente , bem como o desenvolvimento dos recursos hipermídia desse ambiente . 
+$
+Este trabalho apresenta um protótipo de ferramenta , a Html2Hip , que proporciona um ambiente de importação e adaptação de documentos descritos segundo o padrão HTML ( HyperText Markup Language ) para a representação interna do SASHE ( Sistema de Autoria e Suporte Hipermídia para Ensino ), que se baseia na estruturação de objetos multimídia segundo a hierarquia de classes proposta pelo MCA ( Modelo de Contextos Aninhados ). 
+$
+Além disso , este trabalho estendeu a capacidade do editor de nós de informação do tipo texto do protótipo anterior no que concerne ao processamento de arquivos-texto descritos pelo padrão RTF ( Rich Text Format ). 
+$
+Dessa forma , o SASHE tornou-se capaz de processar e organizar materiais instrucionais preparados em seu próprio ambiente , no ambiente WWW ( World-Wide Web ), bem como em processadores de texto comuns . 
+$
+A experiência com autoria de material didático multimídia para propósitos educacionais mostra um grande problema : como prover uma maneira de tratar objetos multimídia de modo que usuários inexperientes ( como professores ) possam estar aptos a projetar e construir suas próprias apresentações ? 
+$
+Uma infra ­ estrutura básica que armazene e entregue eficientemente os dados de vídeo é necessária , porém , outro ponto importante é organizar esses dados armazenados no servidor , de forma a facilitar seu acesso por parte dos usuários . 
+$
+Neste trabalho , isso é alcançado pelo uso de um sistema interativo de recuperação e gerenciamento de informações projetado para facilitar o acesso a itens ( ou parte deles ) armazenados no servidor . 
+$
+A principal característica de tal sistema é o uso de uma base de metadados que contém os atributos dos vídeos armazenados no servidor . 
+$
+Buscas podem ser feitas por título , assunto , tamanho , autor , conteúdo ou , mais importante no caso de material didático , por cenas ou frames específicos . 
+$
+O sistema foi implementado segundo uma abordagem cliente / servidor utilizando a linguagem de programação JAVA . 
+$
+A comunicação entre clientes e servidores é realizada através do Visibroker 3.0 , que é uma ferramenta de programação para Objetos Distribuídos segundo o padrão CORBA . 
+$
+O acesso aos dados a partir da base de metadados é realizado por um driver PostgreSQL que segue a API JDBC . 
+$
+Para propósitos de avaliação do sistema , um player foi construído utilizando a ferramenta Java Media Framework ( JMF ). 
+$
+Foi realizada uma análise para a verificação do impacto da utilização das tecnologias CORBA e JDBC no sistema . 
+$
+Detectou-se que a utilização da tecnologia JDBC impõe um atraso muito mais significativo que a utilização da tecnologia CORBA . 
+$
+Outra conclusão é que a utilização de metadados provê uma melhor interatividade em buscas , permite economia de tempo durante o processo de edição e provê economia de espaço de armazenamento pelo compartilhamento de objetos como vídeos , cenas e frames . 
+$
+Com base na análise de diversos trabalhos publicados sobre requisitos para sistemas de autoria hipermídia educacional , foi proposto um novo conjunto de requisitos que tem por objetivo auxiliar as etapas de engenharia de requisitos e de avaliação no processo de desenvolvimento de um sistema pertencente a esse domínio . 
+$
+De forma geral , foi proposto um conjunto de requisitos que privilegia tanto as necessidades do contexto educacional quanto as necessidades relacionadas aos ambientes de autoria hipermídia . 
+$
+Esses requisitos foram utilizados na avaliação do sistema SASHE , tendo sido obtidos resultados que indicaram a eficácia dessa proposta e , simultaneamente , a qualidade da implementação do sistema . 
+$
+Em um mundo computacional em constante evolução , a Web se apresenta como um ambiente caracterizado por um desenvolvimento acelerado de informações . 
+$
+Além de as informações na Web sofrerem muitas mudanças com extrema freqüência , os autores ( ou desenvolvedores ) das páginas enfrentam dificuldades nas suas atividades quando estas envolvem muitas pessoas trabalhando em paralelo no desenvolvimento de uma página ou de um conjunto de páginas . 
+$
+Diante desses problemas , este trabalho apresenta a ferramenta VersionWeb . 
+$
+Os objetivos principais foram proporcionar aos internautas a obtenção das versões das páginas durante a navegação e fornecer um modo fácil de controle de versões de páginas da Web aos autores através da própria Web . 
+$
+Muitos dos sistemas computacionais atuais de apoio ao ensino podem ser considerados parte de uma evolução que tem enfatizado a exploração de sistemas hipermídia em geral e da Web em particular . 
+$
+A pesquisa associada ao trabalho aqui reportado tem como objetivo explorar as tecnologias de Hipermídia e Computer Supported Cooperative Work ( CSCW ) para viabilizá-las em um ambiente que suporte o acesso de alunos a hiperdocumentos de conteúdo didático de forma cooperativa - o ambiente StudyConf . 
+$
+Para promover a interação entre os alunos que navegam pelos hiperdocumentos , o StudyConf controla a navegação deles e gera , dinamicamente , sessões de discussão com outros alunos que visitam o mesmo material . 
+$
+O StudConf mantém o registro das discussões realizadas na forma de hiperdocumentos estruturados , que podem ser utilizados , por exemplo , para a geração cooperativa de documentos , conforme proposto em várias ferramentas Computer Supported Cooperative Learning ( CSCL ). 
+$
+O trabalho aqui reportado colaborou , ainda , para o desenvolvimento de uma técnica que tem como objetivo orientar o projeto de aplicações hipermídia que manipulem informações na Web . 
+$
+O projeto SMmD - Sistemas Multimídia Distribuídos - investiga a construção de uma estrutura de middleware para dar suporte à implementação de aplicações multimídia interativas em ambientes distribuídos e heterogêneos . 
+$
+Para tanto , devenvolveu-se o Ambiente SMmD , o qual inclui módulos para armazenamento e recuperação de objetos de mídia tais como áudio e vídeo , e também módulos para autoria e intercâmbio de objetos multimídia em conformidade com o padrão ISO MHEG-5 . 
+$
+Esta dissertação descreve o trabalho de implementação de um dos módulos do Projeto SMmD , chamado Módulo de Apresentação e Sincronização ( MAS ). 
+$
+Esse módulo foi implementado com base em outro , chamado Java MHEG-5 Engine ( JHEG ), cuja função é interpretar e manipular objetos multimídia em conformidade com aquele padrão . 
+$
+Inicialmente são apresentados o contexto , a motivação e os objetivos que levaram à execução deste trabalho . 
+$
+A seguir , é feita uma revisão dos conceitos relacionados à apresentação multimídia , enfatizando os aspectos relacionados à sincronização de seus componentes . 
+$
+Em seguida , apresenta-se o padrão MHEG-5 juntamente com outros padrões e recomendações relevantes no contexto deste trabalho . 
+$
+Com o objetivo de contextualizar o trabalho , é apresentada , então , uma visão geral dos módulos que compõem o Ambiente SMmD , seguida de uma descrição do trabalho de pesquisa que resultou na implementação do applet SyncEvent , embrião do Módulo de Apresentação e Sincronização . 
+$
+O Módulo de Apresentação e Sincronização , resultado principal deste trabalho , é então descrito , detalhando-se aspectos de sua arquitetura e de sua implementação . 
+$
+Finalmente , na conclusão , as contribuições são discutidas juntamente com suas limitações e possíveis trabalhos futuros , dentre os quais está a integração do MAS com os outros módulos do Projeto SMmD . 
+$
+Orientar o desenvolvimento de aplicações para a Web é um desafio para pesquisadores da área de Hipermídia . 
+$
+O trabalho apresentado nesta dissertação tem como objetivo apoiar a construção de aplicações que se preocupam com o intercâmbio de informações por meio da utilização da especificação XML ( Extensible MarkUp Language ). 
+$
+Apresenta-se xRot , um roteiro para apoiar as etapas de definição , geração e apresentação de documentos estruturados manipulados por aplicações para a Internet . 
+$
+O roteiro inclui um algoritmo para geração de documentos XML em um ambiente apoiado por servidores de banco de dados e World Wide Web . 
+$
+Também é apresentada a ArqGDE , uma arquitetura que suporta as aplicações desenvolvidas com o xRot . 
+$
+Como estudos de caso da utilização do roteiro , foram desenvolvidas duas aplicações : AulaML e C2000ML . 
+$
+Aplicações de Processamento de Língua Natural ( PLN ), como revisores ortográficos , gramaticais e tradutores , geralmente precisam consultar extensos dicionários contendo , por exemplo , informações morfossintáticas de várias centenas de milhares de palavras de uma língua . 
+$
+Autômatos finitos , largamente utilizados na construção de eficientes analisadores léxicos para compiladores , apresentam-se como ótimos candidatos para o problema de representação desse tipo de léxico de língua natural . 
+$
+Este trabalho investigou os métodos de codificação de léxicos utilizando autômatos finitos , as técnicas de minimização de autômatos determinísticos acíclicos e as estruturas de dados necessárias para uma representação compacta , resultando em um sistema computacional eficiente e versátil de representação de grandes léxicos de língua natural . 
+$
+Um léxico de mais de 430.000 palavras da língua portuguesa pode ser convertido em um autômato de menos de 220Kb , em menos de 5 minutos , usando um computador doméstico . 
+$
+A etiquetagem morfossintática é uma tarefa básica , bem conhecida e bastante explorada em diversas aplicações de Processamento de Línguas Naturais ( PLN ) como análise sintática e extração e recuperação de informações . 
+$
+Os etiquetadores para a língua inglesa atingiram um estado da arte entre 96-99 % de precisão geral . 
+$
+Diferentemente do inglês , para o português do Brasil não foram ainda exploradas todas as técnicas para a etiquetagem , nem se atingiu a precisão dos melhores etiquetadores para a língua inglesa . 
+$
+Com essas motivações , quatro etiquetadores disponíveis na WWW foram treinados - Unigrama ( TreeTagger ), Trigrama ( TreeTagger ), baseado em transformações ( TBL ) e baseado em máxima entropia ( MXPOST ) -, e um etiquetador simbólico foi desenvolvido ( PoSiTagger ). 
+$
+Todos os etiquetadores adaptados foram treinados com um corpus com cerca de 100.000 palavras formado por textos didáticos , jornalísticos e literários , e etiquetado com o Nilc tagset . 
+$
+A maior precisão geral obtida foi a do MXPOST - 89,66 %. 
+$
+Foram também implementados quatorze métodos para a combinação dos etiquetadores , dos quais sete superaram a precisão do MXPOST . 
+$
+A maior precisão obtida com os métodos de combinação foi 90,91 %. 
+$
+A precisão geral sofreu a influência do tamanho do corpus manualmente etiquetado disponível para treinamento , do conjunto de etiquetas e dos tipos de texto utilizados . 
+$
+A construção de ferramentas para a correção automática de textos tem ganhado destaque , seguindo a evolução e eficiência dos processadores de textos aos quais são incorporadas . 
+$
+E , além das técnicas simbolistas tradicionais de implementação de tais ferramentas , através do uso de regras de produção , surgem aplicações com técnicas até então não usuais na área de lingüística computacional , como o uso de Redes Neurais Artificiais . 
+$
+O trabalho proposto tem por objetivo fazer um estudo comparativo do uso das técnicas conexionista e simbolista na revisão automática de erros gramaticais da língua portuguesa . 
+$
+Usando como estudo de caso as regras gramaticais da crase , tomamos como exemplo de modelo tradicional de implementação o revisor gramatical ReGra , e , de outro lado , implementamos dois modelos de redes neurais ( um modelo backpropagation e um modelo Elman ), para detectar erros de uso da crase , tanto em casos de presença incorreta quanto de ausência . 
+$
+A meta deste estudo não é apontar qual método é o mais eficiente em termos gerais , mesmo porque acreditamos que isso não seja possível . 
+$
+Queremos , sim , observar o desempenho de ambos os métodos quanto ao problema determinado , visando assim a uma maior integração entre eles , aproveitando suas melhores potencialidades . 
+$
+Atualmente , o inglês é a língua dominante para a escrita e divulgação de pesquisas científicas na forma de artigos científicos . 
+$
+Porém , existem muitos usuários da língua inglesa que sofrem interferência da língua materna quando escrevem esse gênero de texto em inglês . 
+$
+Esses usuários se defrontam com problemas nas regras de gramática e estilo e / ou se sentem incapazes de gerar expressões e orações padronizadas e composições lingüísticas maiores , que são convencionais nesse gênero . 
+$
+Para amenizar os problemas desses usuários foi desenvolvido um ambiente modular de auxílio e ensino de escrita técnica chamado AMADEUS ( Amiable Article Development for User Support ). 
+$
+AMADEUS consiste de várias ferramentas inter-relacionadas - ferramenta de referência , ferramenta de suporte , ferramenta de crítica e ferramenta tutorial - e fornece o contexto em que está inserido este trabalho de mestrado . 
+$
+O objetivo principal deste mestrado é implementar AMADEUS como uma arquitetura de agentes que se comunicam através da troca de mensagem com um agente especial que contém um modelo dinâmico do usuário interagindo com o ambiente . 
+$
+Para tanto , introduzimos o conceito de adaptatividade em sistemas computacionais e descrevemos vários shells para modelar o usuário . 
+$
+Também fornecemos detalhes sobre agentes inteligentes que foram usados para implementar o modelo de usuário para o ambiente AMADEUS . 
+$
+Este trabalho apresenta uma ferramenta de auxílio à geração de textos por escritores que usam sistemas de computação . 
+$
+Trata ­ se do Verifica , um sistema para verificação e aconselhamento ortográfico de palavras da língua portuguesa . 
+$
+O sistema de verificação ortográfica encontra ­ se disponível para utilização através de uma interface texto e através de uma interface gráfica . 
+$
+A interface gráfica foi implementada com a utilização das ferramentas Tcl / Tk , um sistema de programação para desenvolver e utilizar aplicações com interface gráfica . 
+$
+O sistema Verifica também permite correção on line pela web em http://www.dcc.ufmg/verifica. 
+$
+O sistema testa a ocorrência das palavras da entrada em um vocabulário da língua portuguesa armazenado em um autômato finito determinístico acíclico . 
+$
+Um autômato é uma estrutura de dados eficiente para o armazenamento de léxicos por prover uma maneira compacta de armazenamento de vocabulário e garantir eficiência de acesso a esse mesmo vocabulário . 
+$
+Visto que um verificador ortográfico tradicional apresenta deficiências , foi estudada uma forma de refinar a análise ortográfica com base na análise da estrutura da frase . 
+$
+Foi implementado , então , um algoritmo que atribui classe sintática às palavras da língua . 
+$
+Esse é o primeiro componente de um analisador sintático para o português segundo uma nova abordagem , a abordagem funcional , que é independente de um léxico . 
+$
+Como resultado pôde ­ se concluir que a nova abordagem é viável e pode ­ se partir para a análise da frase em um contexto mais amplo . 
+$
+Além disso , o componente desenvolvido pode ser utilizado para implementação de um analisador sintático para a língua portuguesa , que posteriormente poderá fazer parte do sistema Verifica . 
+$
+A utilização de recursos Hipermídia e técnicas de Inteligência Artificial em ambientes de ensino e aprendizado oferece uma melhor apresentação das informações aos usuários e proporciona melhores resultados , por habilitar o sistema a & quot ; raciocinar & quot ; sobre que ensinamentos apresentar e como apresentar ensinamentos efetivos , estimulando o estudante a aprender . 
+$
+Assim sendo , propõe-se , em um projeto de maior abrangência , a arquitetura de um ambiente denominado SIATE - Sistema Inteligente de Apoio a Treinamento e Ensino - que integra características de Sistemas Baseados em Conhecimento , Sistemas Tutores , Raciocínio Baseado em Casos , Hipermídia e Simulação , com o objetivo de enriquecer um ambiente exploratório de ensino com conhecimento especialista do domínio e de melhorar o aprendizado do estudante . 
+$
+O presente trabalho , parte integrante do SIATE no domínio de Aquisição de Conhecimento , corresponde ao projeto e desenvolvimento de um sistema Híbrido de Conhecimento , o qual contém o conhecimento especializado do domínio de aplicação e fornece apoio à geração de roteiros de páginas de um hiperdocumento e à ferramenta de treinamento do SIATE . 
+$
+Tarefas que envolvem Reconhecimento de Padrões vêm se tornando mais freqüentes em diferentes domínios de aplicação . 
+$
+A maioria dessas tarefas tem sido eficientemente tratada pela utilização de Redes Neurais Artificiais . 
+$
+Entre os modelos de Redes Neurais mais difundidos , destaca-se o modelo Perceptron Multi-Camadas ( Multi-Layer Perceptron ou MLP ). 
+$
+Entretanto , o desempenho de uma Rede Neural MLP em um determinado problema depende diretamente da topologia adotada , que deve ser determinada no início do processo de treinamento . 
+$
+A escolha da topologia de uma Rede Neural não é trivial , normalmente resultando em uma busca exaustiva pela configuração mais apropriada . 
+$
+Com o objetivo de auxiliar a determinação da topologia de uma Rede Neural , vários métodos foram desenvolvidos para a automação desse processo , entre os quais se encontram as Redes Neurais Construtivas . 
+$
+Essas redes utilizam Algoritmos Construtivos que , a partir de uma rede mínima , inserem gradualmente novos neurônios e conexões durante o treinamento , procurando melhorar o desempenho dessa mesma rede mínima . 
+$
+Contudo , a avaliação da melhor aplicação de diferentes Algoritmos Construtivos em um mesmo problema depende da homogeneidade do seu ambiente de treinamento . 
+$
+Este trabalho fornece a definição de um conjunto de classes abstratas para permitir que diferentes algoritmos de treinamento , incluindo Algoritmos Construtivos , sejam criados como componentes com acesso estritamente definido para futura utilização em diferentes aplicações . 
+$
+Com o uso desses componentes em uma nova versão do Simulador para Redes Neurais Artificiais Kipu , teve início a análise da eficiência de Redes Neurais Construtivas em tarefas reais de Reconhecimento de Padrões . 
+$
+Esta tese trata do problema da escrita de artigos científicos em inglês como língua estrangeira . 
+$
+Do ponto de vista teórico , foram investigados métodos e técnicas de duas áreas da Inteligência Artificial - Lingüística Computacional e Raciocínio Baseado em Casos -, em busca de soluções para a construção de ferramentas de software que diminuíssem os problemas de interferência da língua materna e de falta de coesão e coerência nos textos escritos por estudantes da área de física experimental , principalmente . 
+$
+Do ponto de vista prático , foram desenvolvidas duas ferramentas de auxílio à escrita . Uma primeira , chamada Ferramenta de Referência , foi implementada utilizando-se o método de análise de corpus para a geração de uma Base de Expressões que contém as colocações do tipo expressões-padrão , comumente encontradas em textos científicos de artigos e livros de subáreas de física e informática . 
+$
+O acesso às colocações pode ser feito de três maneiras : através de componentes e subcomponentes da estrutura esquemática de artigos da área de pesquisa experimental , através de palavras-chave pertencentes a esse gênero , e pelos padrões retóricos mais comuns que esse gênero utiliza . 
+$
+Uma ferramenta de aquisição de conhecimento está acoplada à Ferramenta de Referência , permitindo extensibilidade , fácil personalização e transporte ( portability ) para novos domínios . 
+$
+Testes com alunos de pós-graduação em um curso de Escrita Científica no IFQSC-USP comprovaram a eficácia da ferramenta , uma vez que seu uso auxiliou na superação do bloqueio inicial em produzir um primeiro rascunho de texto , e forneceu input adequado para a escrita de textos coesos . 
+$
+Como se observou , também , que essa ferramenta só é adequada para usuários com boa recepção da língua inglesa e alguma experiência em escrita científica , uma nova ferramenta foi implementada para uma classe de usuários que têm problemas mais severos quanto à coesão e interferência da língua materna . 
+$
+Ela foi denominada Ferramenta de Suporte , e para sua implementação utilizou-se , além do método de análise de corpus , a abordagem baseada em casos para modelar as fases da escrita . 
+$
+A análise de corpus nessa segunda ferramenta foi mais detalhada , ficando assim restrita à Seção Introdutória de Artigos Experimentais . 
+$
+Essa análise identificou trinta estratégias retóricas encontradas em artigos científicos , geralmente realizadas por três ou quatro mensagens ( denominação para os tipos diferentes de informações ) tomadas de um conjunto de quarenta e cinco tipos . 
+$
+A base de casos da implementação atual da ferramenta conta com cinqüenta e quatro instâncias de introduções autênticas das revistas Physical Review Letters e Thin Solid Films , um número ainda pequeno que deve ser aumentado para que uma avaliação quantitativa do método de busca seja realizada . 
+$
+Uma ferramenta para auxiliar o engenheiro de conhecimento na aquisição de novos casos e vários filtros para automatizar o processo de edição dos casos foram implementados , tornando o processo de geração de novos casos semi-automático . 
+$
+Os trabalhos futuros com relação a essa segunda ferramenta devem tratar principalmente do acréscimo de casos na base , da avaliação da precisão e revocação da busca , e de testes com usuários , que , com certeza , contribuirão para o aperfeiçoamento de ferramentas construídas nessas bases . 
+$
+Neste trabalho , estudamos um problema de otimização combinatorial conhecido como Problema da Mochila Compartimentada , que é uma extensão do clássico Problema da Mochila . 
+$
+O problema consiste em determinar as capacidades adequadas de vários compartimentos que podem vir a ser alocados em uma mochila e como esses compartimentos devem ser carregados , respeitando as restrições de capacidade dos compartimentos e da mochila . 
+$
+Busca-se maximizar o valor de utilidade total . 
+$
+O problema é muito pouco estudado na literatura , apesar de surgir naturalmente em aplicações práticas . 
+$
+Neste estudo , propomos uma modelagem matemática não linear para o problema e verificamos algumas heurísticas para sua resolução . 
+$
+A tendência atual no projeto de sistemas hipermídia é o desenvolvimento de sistemas que sejam abertos , extensíveis e distribuídos entre diferentes usuários . 
+$
+Nos últimos anos , vários sistemas hipermídia abertos foram apresentados na literatura . 
+$
+As técnicas formais vêm se tornando uma ferramenta útil para especificação de aplicações hipermídia ( e conseqüentemente de aplicações em sistemas hipermídia abertos ). 
+$
+Modelos formais adequados podem oferecer abordagens sistemáticas e confiáveis para analisar e verificar as propriedades estruturais e dinâmicas dessas aplicações . 
+$
+Este projeto de mestrado tem como objetivo principal desenvolver um modelo formal para hiperdocumentos ( aplicações hipermídia ) que sejam apoiados por sistemas hipermídia abertos . 
+$
+Tal modelo deve satisfazer as características relacionadas com a & quot ; abertura & quot ; de uma aplicação hipermídia . Características tais como a distinção , em um documento hipermídia , dos aspectos de conteúdo e estrutura , por um lado , e dos aspectos de armazenamento e tempo de execução por outro . 
+$
+Para a construção do modelo , deverá ser utilizada uma técnica formal que atenda aos requisitos necessários para a modelagem das características impostas por aplicações hipermídia abertas . 
+$
+O aprimoramento de técnicas e métodos sistemáticos elaborados para apoiar o desenvolvimento de aplicações trouxe como principal vantagem a produção de softwares com alta qualidade e a custos mais baixos . 
+$
+De forma similar ao desenvolvimento de softwares comerciais , o desenvolvimento de aplicações hipermídia tem passado por significativas mudanças e por constantes evoluções . 
+$
+Atualmente , os sistemas de autoria hipermídia oferecem , por exemplo , condições para que uma aplicação seja previamente especificada para , em seguida , ser efetivamente implementada . 
+$
+No entanto , é necessário que eles tenham alguns atributos que proporcionem facilidades em sua utilização , de forma a motivar seus usuários . 
+$
+De forma geral , este trabalho se concentra na avaliação da implementação de um conjunto de requisitos desejável em um ambiente de autoria de aplicações hipermídia para ensino denominado SASHE ( Sistema de Autoria e Suporte Hipermídia para Ensino ). 
+$
+Os requisitos dos usuários específicos desse sistema também serão considerados na avaliação , que será realizada de forma experimental e resultará na obtenção de dados concretos sobre as condições atuais da implementação do módulo de autoria do sistema mencionado . 
+$
+Este trabalho propõe uma modelagem lingüística dos itens lexicais do português do Brasil , uma modelagem relacional e sua implementação na forma de uma Base de Dados Lexicais . 
+$
+O recurso de PLN resultante favorece padronização , centralização e reutilização dos dados , facilitando o que é considerado uma das etapas mais difíceis no processo de desenvolvimento : a aquisição de conhecimento lingüístico necessário . 
+$
+Este projeto visa à construção de um protótipo de sumarizador automático para investigar o planejamento textual conforme a abordagem proposta por Rino ( 1996 ). 
+$
+A parte principal do trabalho consiste no estudo do modelo de discurso fundamental para a sumarização automática e na implementação de estratégias de planejamento , expressas por operadores de plano cuja seleção é dirigida por objetivos comunicativos . 
+$
+Para complementar o protótipo , será associado ao planejador textual um realizador lingüístico para produzir o texto com base em seu plano estrutural . 
+$
+O estudo fundamental também abrange a averiguação de técnicas de sumarização , investigações na área de geração automática de textos e levantamento de critérios que possam avaliar os resultados obtidos . 
+$
+Neste trabalho de mestrado foi desenvolvido o projeto de uma máquina paralela dedicada à solução de sistemas de equações lineares . 
+$
+Esse é um problema presente em uma grande variedade de aplicações científicas e de engenharia e cuja solução torna ­ se uma tarefa computacionalmente intensiva , à medida que o número de incógnitas aumenta . 
+$
+Implementou ­ se uma Arquitetura Sistólica , conectada numa topologia em anel , que mapeia métodos de solução iterativos . 
+$
+Essa classe de arquiteturas paralelas apresenta características de simplicidade , regularidade e modularidade que facilitam implementações em hardware , sendo muito utilizada em sistemas de computação dedicados à solução de problemas específicos , os quais possuem como requisitos a grande demanda computacional e a necessidade de respostas em tempo real . 
+$
+Foram adotadas metodologias e ferramentas avançadas para projeto de hardware que aceleram o ciclo de desenvolvimento e , para a implementação , foram utilizados circuitos reconfiguráveis FPGAs ( Field Programmable Gate Arrays ). 
+$
+Os resultados de desempenho são apresentados e discutidos , indicando que a abordagem e a metodologia adotadas são viáveis e eficientes para a solução desse tipo de problema . 
+$
+Esta dissertação de mestrado apresenta uma extensão do ASiA ( Ambiente de Simulação Automático ) para simulação de arquiteturas de computadores denominada Módulo Arquitetura . 
+$
+Esse módulo possibilita que o usuário utilize arquiteturas já definidas ( alterando ou não os seus parâmetros ) ou desenvolva o modelo de uma nova arquitetura utilizando ferramentas específicas para simulação de arquitetura de computadores . 
+$
+Dois exemplos ilustram a utilização do Módulo Arquitetura , destacando as vantagens de sua aplicação tanto em ensino como em pesquisa . 
+$
+Este trabalho apresenta ainda algumas alterações efetuadas no ASiA para torná-lo mais amigável e flexível . 
+$
+Uma revisão bibliográfica dos assuntos relacionados ao tema é também apresentada . 
+$
+Os sistemas computacionais distribuídos aplicados à computação paralela permitem uma melhor relação custo / benefício para a computação paralela . 
+$
+Esses sistemas oferecem a potência computacional adequada às aplicações que não necessitam de uma máquina maciçamente paralela , porém necessitam de uma potência computacional maior do que aquela que uma máquina seqüencial pode oferecer . 
+$
+PVM ( Parallel Virtual Machine ) e MPI ( Message Passage Interface ) são exemplos de ambiente de paralelos virtuais amplamente discutidos na literatura . 
+$
+Tendo em vista a grande utilização desses ambientes tanto acadêmica quanto comercial e industrialmente , torna ­ se interessante a criação de uma ferramenta que apóie o desenvolvimento de programas para esses ambientes . 
+$
+Poucas são as ferramentas desse tipo que aparecem na literatura ; uma delas , que permite ser estendida para dar suporte a tais ambientes , é a FAPP ( Ferramenta de Apoio à Programação Paralela ). 
+$
+Nesse contexto , este trabalho apresenta a modelagem dos ambientes paralelos virtuais segundo a abordagem proposta na definição da FAPP , para que arcabouços de programas PVM e MPI possam ser gerados . 
+$
+Essa ferramenta permite a utilização da computação paralela por um maior número de usuários , ou seja , auxilia os iniciantes na confecção dos programas e os experientes na manutenção , além de permitir maior produtividade . 
+$
+Foram realizados estudos visando à validação e à avaliação da ferramenta . 
+$
+Os resultados obtidos demonstram que a ferramenta tem comportamento estável e potencial para ser utilizada livremente em ambientes PVM e MPI . 
+$
+O MPI é uma tentativa de padronização para ambientes de programação via troca de mensagens , tendo como objetivo portabilidade e eficiência em qualquer plataforma . 
+$
+O requisito de alta portabilidade sem perda de eficiência torna o MPI um padrão extenso . 
+$
+Rotinas de comunicação ponto ­ a ­ ponto , por exemplo , são estruturadas de várias maneiras , apresentando diferentes desempenhos . 
+$
+O objetivo deste trabalho é estudar o desempenho das rotinas de comunicação ponto ­ a ­ ponto do MPI em uma rede de computadores pessoais que executa o sistema operacional LINUX , a fim de avaliar objetivamente a relação custo / benefício de cada uma . 
+$
+A avaliação é feita pela execução de benchmarks e de um exemplo de aplicação , executados em três implementações de domínio público do MPI ( MPICH , LAM e UNIFY ), permitindo a comparação dessas implementações . 
+$
+Resultados obtidos com a utilização do PVM também são incluídos e comparados aos do MPI , visto que o PVM é uma plataforma de programação via troca de mensagens muito difundida na comunidade computacional . 
+$
+A apresentação clara e concisa dos aspectos fundamentais das diferentes formas de comunicação disponíveis em diferentes implementações do MPI e a avaliação de desempenho efetuada , que é capaz de orientar o usuário final na escolha de uma implementação do MPI , bem como da forma de comunicação mais adequada à sua aplicação , são contribuições importantes desta dissertação . 
+$
+Esta dissertação de mestrado descreve a implementação de um módulo de simulação de redes de computadores para o ASiA ( Ambiente de Simulação Automático ). 
+$
+Esse módulo permite ao usuário a simulação de redes já definidas ( com a possibilidade de alteração dos parâmetros de entrada ) ou a definição de novas redes pela utilização dos recursos da barra de ferramentas . 
+$
+Para aumentar a gama de sistemas que o usuário pode modelar , foram implementadas e incluídas na barra de ferramentas novas funcionalidades que permitem a modelagem de sistemas mais complexos . 
+$
+Este trabalho apresenta também uma revisão bibliográfica sobre simulação , redes de computadores e ambientes de simulação . 
+$
+O desempenho global dos sistemas computacionais é limitado , geralmente , pelo componente de menor desempenho . 
+$
+Os processadores e a memória principal têm experimentado um aumento de desempenho bem maior que o da memória secundária , como os discos magnéticos . 
+$
+Em 1984 , Johnson introduziu o conceito de fragmentação , em que um dado é gravado em uma matriz de discos , de forma que os seus fragmentos podem ser recuperados em paralelo e , por conseqüência , de forma mais rápida . 
+$
+O principal problema da fragmentação é a redução da confiabilidade da matriz , pois a falha de um dos discos torna o dado inacessível . 
+$
+Patterson , Gibson e Katz propuseram , em 1988 , cinco formas de armazenar informação redundante na matriz de discos e , dessa forma , aumentar sua confiabilidade . 
+$
+A essas formas foi dado o nome de RAID - Redundant Arrays of Independent Disks . 
+$
+Com o passar do tempo , outras formas de armazenamento de redundância foram criadas , tornando complexa a taxonomia da área . 
+$
+Além disso , alterações de parâmetros na matriz implicam em variações de desempenho nem sempre fáceis de perceber em um primeiro momento . 
+$
+Com o objetivo de facilitar a compreensão da taxonomia e permitir que sejam feitos experimentos na matriz buscando um melhor desempenho , esta dissertação propõe um ambiente de simulação e aprendizado para RAID onde o usuário pode interagir com diversos modelos de RAID ou até criar o seu próprio , para avaliar seu desempenho em várias situações , além de oferecer ao usuário acesso ao conhecimento da área , agindo como um tutor . 
+$
+Esta dissertação apresenta , ainda , um protótipo de um simulador de discos magnéticos que pode ser utilizado como base para o desenvolvimento de um simulador de RAID para ser utilizado pelo ambiente . 
+$
+Este trabalho apresenta uma ferramenta de apoio ao desenvolvimento de aplicações distribuídas , baseadas em RPCs , para o ambiente Windows 95 . 
+$
+Discute , ainda , algumas aplicações construídas para validar o sistema , as quais seguem o paradigma cliente ­ servidor . 
+$
+É feita uma revisão bibliográfica dos assuntos mais relevantes relacionados ao tema e são apresentados os detalhes de implementação da ferramenta . 
+$
+Esta foi implementada com técnicas de orientação a objetos , sendo composta por um Gerador Automático de Stubs e uma Biblioteca RPC , possibilita também a utilização de um Serviço de Binding . 
+$
+As aplicações construídas procuram explorar as potencialidades da ferramenta , e são fornecidas também orientações gerais para o desenvolvimento de aplicações distribuídas no ambiente Windows 95 . 
+$
+Neste trabalho é apresentada uma avaliação de desempenho das plataformas de portabilidade PVM e MPI quando executadas em um sistema distribuído e em uma máquina paralela SP2 . 
+$
+Essa análise é feita através do desenvolvimento de vários algoritmos paralelos de ordenação , utilizando ­ se quatro implementações : IBM MPI , IBM PVMe ( executadas no SP2 ), MPICH e PVM ( executadas no sistema distribuído ). 
+$
+Com base na execução de algoritmos paralelos , apresenta ­ se uma comparação entre o comportamento dessas plataformas em cada tipo de arquitetura e em cada algoritmo implementado e uma comparação entre os diversos algoritmos de ordenação considerados . 
+$
+Os resultados obtidos com os algoritmos seqüenciais também são incluídos nessa avaliação , permitindo analisar o speedup alcançado com a execução das aplicações paralelas implementadas em cada plataforma . 
+$
+Com os resultados obtidos , foi possível constatar que realmente , conforme alguns autores citam mas não demonstram , o PVM apresenta melhor desempenho quando executado em sistemas distribuídos ( visto que foi projetado especialmente para atuar sobre grupos de computadores autônomos interligados ) e o MPI é mais adequado se implementado em arquiteturas paralelas . 
+$
+Os sistemas computacionais distribuídos aplicados à computação paralela permitem uma melhor relação custo / benefício para a computação paralela . 
+$
+Esses sistemas oferecem a potência computacional adequada às aplicações que não necessitem de uma máquina maciçamente paralela , porém necessitem de uma potência computacional maior do que a que uma máquina seqüencial pode oferecer . 
+$
+O PVM ( Parallel Virtual Machine ) é um exemplo de ambiente de passagem de mensagens , amplamente discutido na literatura , que permite a criação de máquinas paralelas virtuais em estações de trabalho , normalmente máquinas RISC , com o sistema operacional UNIX . 
+$
+Nesse contexto , este trabalho descreve detalhadamente a implementação do PVM ­ W95 ( PVM para Windows95 ), um ambiente de passagem de mensagens que permite a criação de uma máquina paralela virtual , utilizando computadores pessoais conectados por uma rede de comunicação e com o sistema operacional Windows95 , de modo análogo ao PVM . 
+$
+Foram realizados estudos preliminares visando à validação e à avaliação do desempenho do PVM ­ W95 . 
+$
+Os resultados obtidos demonstram que o ambiente tem comportamento estável e que as aplicações paralelas desenvolvidas apresentam um excelente speedup , considerando ­ se o hardware disponível . 
+$
+Os objetivos principais deste trabalho são o desenvolvimento e a avaliação de algoritmos numéricos paralelos e sua execução em máquinas paralelas ( máquinas multiprocessadas , máquinas vetoriais e máquinas paralelas virtuais ). 
+$
+Os algoritmos desenvolvidos foram executados em diferentes condições tanto em termos de plataformas utilizadas como em termos de tamanho da aplicação considerada . 
+$
+Os resultados obtidos na implementação dos algoritmos numéricos são analisados com base em algumas métricas ( tempo de execução e operações em ponto flutuante ) comuns aos resultados apresentados nos principais benchmarks estudados . 
+$
+Com os resultados obtidos , são analisados o desempenho das bibliotecas de passagem de mensagem MPI e PVM e o desempenho das arquiteturas consideradas e da implementação dos algoritmos numéricos . 
+$
+Este trabalho investiga a aplicação de critérios de teste para o teste de especificações do aspecto comportamental de Sistemas Reativos , descritos em Estelle e em Statecharts . 
+$
+A utilização de Sistemas Reativos em várias atividades humanas requer uma maior qualidade tanto do produto como do processo de desenvolvimento , pois falhas nesses sistemas podem ocasionar riscos para vidas humanas e perdas econômicas . 
+$
+Os critérios de teste propostos nesta tese visam fornecer uma medida de cobertura dos testes , permitindo que a qualidade da atividade de teste possa ser mensurada e avaliada . 
+$
+Esta tese apresenta contribuições para as três atividades fundamentais no contexto de teste de software , que são : definição de critérios de teste , desenvolvimento de estudos teóricos / empíricos e desenvolvimento de ferramentas . 
+$
+Com relação à definição de critérios de teste , é proposta a aplicação do Teste de Mutação para Estelle e a aplicação de critérios de Fluxo de Controle para Estelle e Statecharts . 
+$
+Para o Teste de Mutação , são identificados os tipos de erros em especificações Estelle , definindo-se os operadores de mutação , as estratégias de teste incrementais e os critérios de mutação alternativa que visam diminuir o custo de aplicação desse critério . 
+$
+Para os critérios de Fluxo de Controle , foram definidas duas famílias de critérios : FCCS - Família de Critérios de Cobertura para Statecharts e FCCE - Família de Critérios de Cobertura para Estelle . 
+$
+Estudos teóricos são realizados visando analisar a complexidade do Teste de Mutação para Estelle e a relação de inclusão dos critérios FCCS e FCCE . 
+$
+Estudos empíricos são realizados visando comparar os critérios de teste definidos e analisar a sua aplicação durante a simulação de especificações Estelle e Statecharts . 
+$
+Com relação ao desenvolvimento de ferramentas , a família de ferramentas Proteum , que apóia a aplicação do teste de Mutação , e os ambientes para simulação de especificações Estelle ( EDT ) e Statecharts ( StatSim ) fornecem uma base essencial para o desenvolvimento das ferramentas . 
+$
+São apresentadas algumas ponderações que devem ser consideradas para a definição de ferramentas de apoio à aplicação dos critérios propostos . 
+$
+Este trabalho apresenta um estudo sobre a viabilidade de utilização do protocolo conservativo CMB para sincronização de simulações distribuídas em diferentes plataformas MIMD com memória distribuída , utilizando granulosidade grossa com poucos processos paralelos . 
+$
+A técnica utilizada para a realização das análises consiste em efetuar coleta de dados na execução da simulação de um grande número de modelos . 
+$
+Para a simulação desses modelos foi desenvolvida , e é apresentada neste trabalho , a extensão funcional ParSMPL , que implementa o protocolo de sincronização CMB . 
+$
+Pode ­ se subdividir os resultados obtidos com a análise dos dados das simulações em enfoques que apresentam contribuições distintas . 
+$
+O primeiro enfoque avalia como a plataforma adotada e o modelo a ser simulado influenciam no speedup alcançado . 
+$
+Nesse caso , define ­ se quando uma aplicação tem tendência a ser eficiente com o paradigma da simulação distribuída utilizando o protocolo CMB . 
+$
+O segundo enfoque refere ­ se à necessidade de o usuário conhecer a melhor forma de utilizar a simulação distribuída . 
+$
+Com base nas análises realizadas foi estabelecido um conjunto de diretrizes que visam auxiliar o processo de desenvolvimento de uma simulação distribuída conservativa . 
+$
+Com a ajuda dessas diretrizes e a disponibilidade da extensão ParSMPL espera ­ se auxiliar o usuário a desenvolver aplicações eficientes utilizando o paradigma da simulação distribuída conservativa , sem exigir desse usuário o conhecimento das características e particularidades do protocolo de sincronização utilizado . 
+$
+Este trabalho propõe e descreve em detalhes o projeto do AMIGO ( DynAMical FlexIble SchedulinG EnvirOnment ), uma nova ferramenta de software capaz de viabilizar a união de diferentes algoritmos de escalonamento de uma maneira completamente transparente ao usuário . 
+$
+O AMIGO é capaz de flexibilizar o escalonamento ( em tempo de execução da aplicação ) desde a sua configuração até a sua efetiva aplicação . 
+$
+Além da flexibilidade dinâmica e da transparência , o AMIGO também é modular : o seu projeto está dividido em módulos que , entre outras vantagens , facilitam sua execução em diferentes plataformas . 
+$
+Este trabalho também contribui apresentando uma análise crítica da literatura da área , apontando divergências e propondo pontos de convergência importantes . 
+$
+Assim , o levantamento bibliográfico apresentado atua como um material introdutório precioso para que os pesquisadores iniciantes formem um contexto geral sobre a área e , desse modo , aprofundem mais rapidamente seus estudos em outros trabalhos mais específicos . 
+$
+A avaliação de desempenho feita com o AMIGO demonstra que é possível a obtenção de ganhos de desempenho expressivos , com total transparência para o usuário final . 
+$
+Unindo ­ se desempenho , flexibilidade e transparência , espera ­ se contribuir para a redução da lacuna existente entre teoria e prática na área de escalonamento de processos . 
+$

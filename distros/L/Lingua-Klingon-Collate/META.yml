@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Lingua-Klingon-Collate
+version: 1.03
+license: bsd
+distribution_type: module
+requires:
+  perl: 5.005_03
+recommends: {}
+build_requires:
+  Module::Build: 0
+  Test::Differences: 0
+  Test::More: 0.19
+conflicts: {}
+provides:
+  Lingua::Klingon::Collate:
+    file: lib/Lingua/Klingon/Collate.pm
+    version: 1.03
+generated_by: Module::Build version 0.20

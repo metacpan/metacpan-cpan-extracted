@@ -1,0 +1,56 @@
+Revision history for Lingua-EN-Conjugate
+
+
+0.1
+
+Original version -- no guarantees.
+
+0.2
+	
+Added a stop-list for words that shouldn't have the final consonant doubled when adding
+-ed or -ing.
+
+0.21
+
+nothin much, just fixing the documentation...
+
+0.24
+
+lots of changes under the hood.  Added the ability to form questions and negations, since 
+these are harder to do with conjugated verbs; you've got to switch the word order around 
+and so forth.  Also added some new "tenses" ... present_do, past_do, and used_to... I don't 
+know whether these are technically "tenses" or not, I'm an engineer, not a linguist!!
+
+0.26
+
+added the "allow_contractions" option
+
+0.27
+
+The passive tense was added.
+
+0.29
+
+"contraction" subroutine is exported
+
+0.3
+
+Contraction subroutine is put in a different module, Lingua::EN::Contraction
+
+0.3xx
+
+Various bug fixes, listing the prerequisites in Meta.yml, spelling changes in the docs... 
+
+
+0.308
+
+Removed "use diagnostics"
+
+0.310
+
+changed the __DATA__ section to subroutines; exported s_form()
+
+0.311
+
+fixed past tense of 'dye' to 'dyed'
+

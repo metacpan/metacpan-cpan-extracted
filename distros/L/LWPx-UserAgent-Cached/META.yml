@@ -1,0 +1,54 @@
+---
+abstract: 'Subclass of LWP::UserAgent that caches HTTP GET requests'
+author:
+  - 'Mark Gardner <mjgardner@cpan.org>'
+build_requires:
+  Cache::FileCache: '0'
+  Carp: '0'
+  Digest::SHA: '0'
+  English: '0'
+  File::Spec: '0'
+  Find::Lib: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Scalar::Util: '0'
+  Test::Fake::HTTPD: '0'
+  Test::More: '0.94'
+  Test::Requires: '0'
+  blib: '1.01'
+  constant: '0'
+  lib: '0'
+  perl: '5.012'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWPx-UserAgent-Cached
+provides:
+  LWPx::UserAgent::Cached:
+    file: lib/LWPx/UserAgent/Cached.pm
+    version: '0.008'
+requires:
+  CHI: '0'
+  Data::Serializer::Sereal: '0'
+  HTTP::Status: '0'
+  LWP::UserAgent: '0'
+  List::Util: '1.33'
+  Moo: '1.004005'
+  MooX::Types::MooseLike::Numeric: '0'
+  Types::Standard: '0'
+  namespace::clean: '0'
+  perl: '5.012'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mjgardner/LWPx-UserAgent-Cached/issues
+  homepage: http://metacpan.org/release/LWPx-UserAgent-Cached/
+  repository: git://github.com/mjgardner/LWPx-UserAgent-Cached.git
+version: '0.008'
+x_serialization_backend: 'YAML::Tiny version 1.69'

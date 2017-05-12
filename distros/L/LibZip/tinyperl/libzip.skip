@@ -1,0 +1,8 @@
+Safe::World
+Safe::Hole
+qr/(?:^|\/)Safe\/World\.pm/
+qr/(?:^|\/)Safe\/World\//
+qr/(?:^|\/)Safe\/Hole\.pm/
+qr/(?:^|\/)Safe\/Hole\//
+
+qr/\.pl$/

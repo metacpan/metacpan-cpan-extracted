@@ -1,0 +1,24 @@
+SYNOPSIS
+
+     use LWP::UserAgent::Patch::HTTPSHardTimeout -timeout => 300;
+
+DESCRIPTION
+
+    This module contains a simple workaround for hanging issue with HTTPS
+    requests. It wraps send_request() with an alarm() timeout.
+
+    Can be used with WWW::Mechanize because it uses LWP::UserAgent.
+
+FAQ
+
+ Why not subclass?
+
+    By patching, you do not need to replace all the client code which uses
+    LWP::UserAgent (or WWW::Mechanize, and so on).
+
+SEE ALSO
+
+    http://stackoverflow.com/questions/9400068/make-timeout-work-for-lwpuseragent-https
+
+    LWPx::ParanoidAgent
+

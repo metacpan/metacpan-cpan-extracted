@@ -1,0 +1,32 @@
+Revision history for Perl extension Lingua::ES::Numeros.
+
+0.09  dom jul 10 13:25:46 VET 2011
+    - Fix HTML entities names when MAYUSCULAS=>1 as reported via RT #69323
+      by Eduardo Tubert <eatubert@insoft.com.mx>
+    - New test cases for HTML entity names
+    - Split cardinal method to use cardinal_str. Fixes a bug found after 
+      fixing entity names.
+
+0.08  Wed Mar  3 11:43:08 VET 2010
+    - Create tag :constants to import genre constants
+    - Documentation and examples fixes
+
+0.07  Wed Jan  6 00:14:36 VET 2010
+    - Corrected fractional formating bug in real() thanks to Joaquin Ferrero
+    - Corrected female hundreths under one million
+
+0.06  Sun Sep  6 18:58:32 VET 2009
+    - Correct spelling for 2 from dós to dos
+    - Reformat source code: perltidy -pbp -l=99
+
+0.05  Tue Oct 23 19:32:11 VET 2007
+    - small bug fixes
+
+0.04  Tue Oct 23 15:49:18 VET 2007
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Lingua::ES::Numeros
+    - New API
+    - Docs in english
+
+0.01  Sun Sep 16 19:18:07 VET 2001
+    - alpha version

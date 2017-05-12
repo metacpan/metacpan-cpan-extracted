@@ -1,0 +1,74 @@
+NAME
+
+Locale::SubCountry - Convert state, province, county etc. names to/from ISO 3166-2 codes, get all states in a country
+    
+SYNOPSIS
+
+    use Locale::SubCountry;
+    
+    my $fr = Locale::SubCountry->new('France');
+    if ( not $fr )
+    {
+        die "Invalid country or code: France\n";
+    }
+    else
+    {
+        print($fr->country,"\n");        # France
+        print($fr->country_code,"\n");   # FR
+
+        if (  $fr->has_sub_countries )
+        {
+            print($fr->code('Hautes-Alpes '),"\n");       # 05
+            print($fr->full_name('03'),"\n");             # Allier
+            my $upper_case = 1;
+            print($fr->full_name('02',$upper_case),"\n"); # AINSE
+            print($fr->level('02'),"\n");                 # Metropolitan department
+            print($fr->level('A'),"\n");                  # Metropolitan region
+            print($fr->level('BL'),"\n");                 # Overseas territorial collectivity
+            print($fr->levels,"\n");                      # Metropolitan region => 22, Metropolitan department => 96 ... 
+ 
+            my @fr_names  = $fr->all_full_names;    # Ain, Ainse, Allier...
+            my @fr_codes   = $fr->all_codes;        # 01, 02, 03 ...
+            my %fr_names_keyed_by_code  = $fr->code_full_name_hash;  # 01 => Ain...
+            my %fr_codes_keyed_by_name  = $fr->full_name_code_hash;  # Ain => 01 ...
+
+            foreach my $code ( sort keys %fr_names_keyed_by_code )
+            {
+               printf("%-3s : %s\n",$code,$fr_names_keyed_by_code{$code});            
+            }
+        }
+    }
+
+    # Methods for fetching all country codes and names in the world
+
+    my $world = Locale::SubCountry::World->new();
+    my @all_countries     = $world->all_full_names;
+    my @all_country_codes = $world->all_codes;
+
+    my %all_countries_keyed_by_name = $world->full_name_code_hash;
+    my %all_country_keyed_by_code   = $world->code_full_name_hash;
+
+
+DESCRIPTION
+
+This module allows you to convert the full name for a country's administrative
+region to the code commonly used for postal addressing. The reverse look up
+can also be done.
+
+Lists of sub country codes are useful for web applications that require a valid
+state, county etc to be entered as part of a users location.
+
+Sub countries are termed as states in the US and Australia, provinces
+in Canada and counties in the UK and Ireland. Other terms include region,
+department, city and territory. Countries such as France have several
+levels of sub countries, such as Metropolitan department, Metropolitan region etc.
+
+Names and ISO 3166-2 codes for all sub countries in a country can be
+returned as either a hash or an array.
+
+Names and ISO 3166-1 codes for all countries in the world can be
+returned as either a hash or an array. This in turn can be used to
+fetch every sub country from every country (see examples/demo.pl).
+
+Sub country codes are defined in "ISO 3166-2,
+Codes for the representation of names of countries and their subdivisions".

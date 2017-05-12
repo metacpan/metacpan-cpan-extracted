@@ -1,0 +1,35 @@
+LSF-Hosts version 0.01
+======================
+
+DESCRIPTION
+
+LSF::Hosts is a module which interfaces arround the 'bhosts' lsf command. This is an addition to the LSF modules written by Mark Southern.
+
+INSTALLATION
+
+To install this module do the following:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+You could also use the Makefile.PL, which will install 
+Module::Build for you, and then use it to install the 
+LSF::Hosts module.
+
+  perl Makefile.PL
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LSF
+  lsf binaries in your $PATH
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2005, Aukjan van Belkum. All Rights Reserved.
+This module is free software. It may be used, redistributed
+and/or modified under the terms of the Perl Artistic License
+(see http://www.perl.com/perl/misc/Artistic.html)

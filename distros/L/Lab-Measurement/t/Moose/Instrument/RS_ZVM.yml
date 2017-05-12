@@ -1,0 +1,123 @@
+---
+command: '*RST'
+id: 0
+method: Write
+retval: 1
+timeout: 10
+---
+command: INST:NSEL?
+id: 1
+method: Query
+retval: '1'
+---
+command: SENS:FUNC?
+id: 2
+method: Query
+retval: '''XFR:POW:S11'''
+---
+command: SENS:SWE:POIN 3
+id: 3
+method: Write
+retval: 1
+---
+command: SENS:FREQ:STAR?
+id: 4
+method: Query
+retval: '10000000'
+---
+command: SENS:FREQ:STOP?
+id: 5
+method: Query
+retval: '2E+010'
+---
+command: INIT:CONT?
+id: 6
+method: Query
+retval: '1'
+---
+command: INIT:CONT 0
+id: 7
+method: Write
+retval: 1
+---
+command: SENS:AVER:COUN?
+id: 8
+method: Query
+retval: '10'
+---
+command: SENS:AVER:COUN 1
+id: 9
+method: Write
+retval: 1
+---
+command: SENS:SWE:COUN?
+id: 10
+method: Query
+retval: '10'
+---
+command: SENS:SWE:COUN 1
+id: 11
+method: Write
+retval: 1
+---
+command: FORM?
+id: 12
+method: Query
+retval: ASC,0
+timeout: 3
+---
+command: FORM REAL, 32
+id: 13
+method: Write
+retval: 1
+---
+command: INIT
+id: 14
+method: Write
+retval: 1
+---
+command: '*WAI'
+id: 15
+method: Write
+retval: 1
+---
+command: TRAC:DATA:RESP:ALL? CH1DATA
+id: 16
+method: Query
+retval: 23323234aefcc53ead1075bfe15f96be66d1f43ec7ed5ebe82f48e3d
+retval_enc: hex
+timeout: 10
+---
+command: INIT
+id: 17
+method: Write
+retval: 1
+---
+command: '*WAI'
+id: 18
+method: Write
+retval: 1
+---
+command: TRAC:DATA:RESP:ALL? CH1DATA
+id: 19
+method: Query
+retval: 233232340575c23ec31d75bf640496bef2b9f43eee735ebe1b998d3d
+retval_enc: hex
+timeout: 10
+---
+command: INIT
+id: 20
+method: Write
+retval: 1
+---
+command: '*WAI'
+id: 21
+method: Write
+retval: 1
+---
+command: TRAC:DATA:RESP:ALL? CH1DATA
+id: 22
+method: Query
+retval: 23323234cc56a43e66b577bfe55d96bec45af43e6edf5fbe06968e3d
+retval_enc: hex
+timeout: 10

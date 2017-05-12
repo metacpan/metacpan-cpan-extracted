@@ -1,0 +1,10 @@
+msgid ""
+msgstr ""
+"Last-Translator: Audrey Tang <cpan@audreyt.org>\n"
+"Language-Team: Chinese <contact@ourinet.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "This is a test"
+msgstr "這是測試"

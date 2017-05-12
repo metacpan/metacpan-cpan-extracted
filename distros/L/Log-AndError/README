@@ -1,0 +1,44 @@
+Log::AndError - Logging module for ISA inclusion in other modules or as a standalone module.
+
+=head1 SYNOPSIS
+
+	use Log::AndError;
+        @ISA = qw(Log::AndError);
+		Remember to set values with the provided methods
+	or
+	use Log::AndError;
+	use Log::AndError::Constants qw(:all);
+	my $ref_logger = Log::AndError->new(
+		'LOG_LOGGER' => \&log_sub,
+		'LOG_SERVICE_NAME' => 'GENERIC', # Use this to seperate log entries from different modules in your app.
+		'LOG_DEBUG_LEVEL'  =>  DEBUG1, # See Log::AndError::Constants for example
+		'LOG_INFO_LEVEL' => INFO, # See Log::AndError::Constants for example
+		'LOG_ALWAYSLOG_LEVEL' => ALWAYSLOG, # See Log::AndError::Constants for example
+	);
+
+	$self->logger(DEBUG3, 'my_sub('.join(',',@_).')'); 
+		# for instance logs the entry into a subroutine.
+	$self->logger(ALWAYSLOG, 'Something is wrong'); 
+		# logs an error when it is always wanted
+
+	After you do this:
+		$self->error($error_code, $error_msg);
+	Your Caller does this:
+		my($err,$msg) = $obj_ref->error();
+	to retrieve the errors.
+
+=head1 DESCRIPTION
+
+This is a generic log and error class for Perl modules. There are two distinct pieces here. The error functions and the logging. The error functions are most convenient when inherited by your package although this is not needed. They are mostly here for convenience and to promote "good" behavior. The logging functions are the more complex piece and is the bulk of the code.  
+
+To use the logging function pass in a reference to an anonymous sub routine that directs the error output to where you want it to go. There are a few sample subs located under this class. The default outputs to STDERR via C<warn()>.
+
+The DEBUG constants are always >=0 and the ALWAYSLOG and INFO type constants always need to be <= -2 (-1 == undef on most systems). See Log::AndError::Constants for an example. 
+
+Examples forthcoming at some point. 
+
+Hey, it beats overwriting %SIG{__WARN__} with an anonymous sub for error string grabbing. 
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001 Thomas Bolioli. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. 

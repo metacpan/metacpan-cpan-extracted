@@ -1,0 +1,9 @@
+Revision history for Perl extension Lemonldap::Cluster::Status.
+
+0.01  Fri Sep 16 14:22:18 2005
+	- original version; created by h2xs 1.23 with options
+		-XAn Lemonldap::Cluster::Status
+0.02 Fri Jan 20 
+        - minor correction
+        - add cacti script monitoring
+ 

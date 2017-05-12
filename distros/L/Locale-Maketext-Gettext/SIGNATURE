@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 be0627fff2e8aef3d2a14d5d7486babc8a4873ba Artistic
+SHA1 f044bfe71c57b6f25c659bc0a6067aa854bc8343 BUGS
+SHA1 7d6278e57e33472b167335a5435081f307f0dc70 Build.PL
+SHA1 8624bcdae55baeef00cd11d5dfcfa60f68710a02 COPYING
+SHA1 5863e86e8a20bbb63b3fd295520b861fa87db0c7 Changes
+SHA1 e9345adfeb32db567cd1be52f3f27307943a36bc INSTALL
+SHA1 c7d9c9b334b816e6f06473647cd9a054152a44c9 MANIFEST
+SHA1 39589ded15e1d09a79c41391392d249de3708f4a META.yml
+SHA1 ec92e11b76afaa05f67d83a6e32056505a45c99e Makefile.PL
+SHA1 b699f73f5fa33123b2f4f1b210665e295900c74d README
+SHA1 3db402b52e04cf5a6e60291c23aac8c16f2db810 THANKS
+SHA1 85dd5ac895cc0a5b95827060999578d8ce8d41dd TODO
+SHA1 f9deac7b12cc6a3cb18b7f5282f9e6a1e1a624b9 lib/Locale/Maketext/Gettext.pm
+SHA1 b88b6bad1e8cb0ba825594c233c006c1b297646f lib/Locale/Maketext/Gettext/Functions.pm
+SHA1 f89afd70fdcbaeeab44fada7ed3087d5c7f6f018 script/maketext
+SHA1 525f414c7a0aadc61240a4b0959ca2cda7514c75 t/00-signature.t
+SHA1 7bc2bf2d3ef2befd48a457fb3d90c7c7bdcc4854 t/01-basic.t
+SHA1 73ce1e3ba168373318655b3f4fbca1847e49fd75 t/02-big-endian.t
+SHA1 4b07656e4c35bfce793c96b59bb9ae2917be335e t/03-errors.t
+SHA1 8a28c721b5eefe607c300192c8cb8e8107f419be t/04-encodings.t
+SHA1 c16af7bbe1d9bd7ce8644c19f968231b94156c12 t/05-switching.t
+SHA1 0212e5b50d6886601b0a4ad82d3c656975009a73 t/06-racing.t
+SHA1 2ddb628b67ae35033fad4331c5323928d7dd7395 t/07-f-basic.t
+SHA1 a4491ef77b899c4988b8ab34fb8f945a8d06c285 t/08-f-errors.t
+SHA1 8fb7ecbce36daaf81ac9c197dab6834b25233cc5 t/09-f-encodings.t
+SHA1 2c1641cc6fff792fb83826486050acab23a1db51 t/10-f-switching.t
+SHA1 4afe4980e7ed4d326009b8257e01320abfb33d14 t/11-command-line.t
+SHA1 b85626024d610808bd0909989dcfb9fb20a40485 t/99-pod.t
+SHA1 97dad77dee7f751d09efdb6900b077d68c853d46 t/T_L10N.pm
+SHA1 676b87d7a8edc735ba676d2901827eb52532b418 t/locale/C/LC_MESSAGES/test.mo
+SHA1 80ca74a96bd6f83bd903ebfd021b87c9184582eb t/locale/en/LC_MESSAGES/bad.mo
+SHA1 676b87d7a8edc735ba676d2901827eb52532b418 t/locale/en/LC_MESSAGES/test.mo
+SHA1 fbd67646ebb39a99c1ab5aa985addd7f7ab27561 t/locale/en/LC_MESSAGES/test2.mo
+SHA1 99b05048a1243bb75622a3c6e8a7c8e9f59a9151 t/locale/en/LC_MESSAGES/test_be.mo
+SHA1 5d3e312b86526ebe164589b1f7fbf96f01823b0c t/locale/en/LC_MESSAGES/test_utf8.mo
+SHA1 42eece65e0ceae8267000b42692212c260a49b36 t/locale/zh_CN/LC_MESSAGES/test.mo
+SHA1 746c06a73e4eb641eb006c90ed938c4b98cfc2ec t/locale/zh_CN/LC_MESSAGES/test_be.mo
+SHA1 8db66e4035d1f55cd27186e02c0386709c2fc3d0 t/locale/zh_CN/LC_MESSAGES/test_utf8.mo
+SHA1 6aa98d6675c91555309d58a93ff59cb205cbdd7b t/locale/zh_TW/LC_MESSAGES/test.mo
+SHA1 bcc89cdc393507d51b5a76e40954db72914b60d8 t/locale/zh_TW/LC_MESSAGES/test2.mo
+SHA1 20f810c6229d0bd4064b27f9b3d86b61a20f0821 t/locale/zh_TW/LC_MESSAGES/test_be.mo
+SHA1 eb13887b005e3c3e9fab774dfea22de5c01ad1ef t/locale/zh_TW/LC_MESSAGES/test_utf8.mo
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkpFc8MACgkQi9gubzC5S1w3kQCfY4bdMI9M6+sTT+y//sHibPDP
+LUUAnRvtrXrg1Tov/anLHx0Xur3TmAQQ
+=Au1F
+-----END PGP SIGNATURE-----

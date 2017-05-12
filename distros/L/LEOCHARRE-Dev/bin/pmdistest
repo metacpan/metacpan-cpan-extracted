@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+use base 'LEOCHARRE::CLI';
+use strict;
+use Cwd;
+
+my $o = gopts();
+
+my @dists;
+for my  $dist (@ARGV){
+   my $abs = Cwd::abs_path($dist) or die("can resolve cwd abs path '$dist'");
+   -f $abs or die("not on disk $abs");
+   $abs=~/tar.gz/ or die("$abs not tar.gz");
+   push @dists, $abs;
+}
+
+my $total = scalar @dists;
+my $ok    = 0;
+
+$total or die("missing dist arguments");
+
+debug("@dists");
+for my $dist (@dists){
+   print STDERR "Testing $dist.. " ;
+   if ( distest($dist) ){
+      print STDERR "Ok.\n";
+      $ok++;
+   }
+   else {
+      print STDERR "FAIL.\n";
+      
+   }
+  
+
+}
+
+if ( $ok == $total ){
+   print STDERR "Ok.\n";
+   exit;
+}
+
+print STDERR "Ok: $ok of $total.\n";
+exit 1;
+
+
+
+
+sub distest {
+   my $dist = shift;
+   -f $dist or die;
+
+   my $filename = $dist;
+   $filename =~s/^.+\/+//;
+   
+   my $to = "/tmp/$filename";
+
+   system( 'cp', $dist, $to) ==0 or die;
+
+
+   my $loc = $to;
+   $loc=~s/\.tar\.gz$// or die;
+   debug("loc '$loc', to $to");
+
+   chdir('/tmp') or die;
+
+   system( 'tar', '-xvf', $to ) ==0 or die;
+
+   chdir($loc) or die;
+
+   system('perl Makefile.PL;') ==0 or return 0;
+   
+   system('make test') ==0 or return 0;
+   
+   return 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+sub usage {
+   return qq{
+$0 - test a distro 
+
+DESCRIPTION
+
+After you run 'make dist', you can test the archive with this utility.
+
+USAGE EXAMPLE
+
+   $0 ./File-PathInfo-Ext-1.20.tar.gz
+
+
+   };
+   }

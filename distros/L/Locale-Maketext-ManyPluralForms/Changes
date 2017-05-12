@@ -1,0 +1,13 @@
+Revision history for Perl module Locale::Maketext::ManyPluralForms
+
+0.03      2017-02-27 08:04:15+00:00 UTC
+   Switch to dzil
+
+0.03 Mon Sep  12 2016
+    - Added debug.
+
+0.02 Thu Jul  14 16:00:00 2016
+    - Travis.yml chnges.
+
+0.01 Thu Jul  14 10:00:00 2016
+    - First version, released on an unsuspecting world.

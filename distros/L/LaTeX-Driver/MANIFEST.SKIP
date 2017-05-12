@@ -1,0 +1,16 @@
+~$
+#defaults
+^Makefile$
+^blib/
+.hg/
+^pm_to_blib
+^blibdirs
+.git/
+.gitignore
+LaTeX-Driver-[0-9]+\.[0-9]+\.tar.*
+MYMETA.yml
+MYMETA.json
+MANIFEST.bak
+Makefile.old
+AssertOS
+CheckOS

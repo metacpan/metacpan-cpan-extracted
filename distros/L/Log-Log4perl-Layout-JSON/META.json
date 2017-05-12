@@ -1,0 +1,71 @@
+{
+   "abstract" : "Layout a log message as a JSON hash, including MDC data",
+   "author" : [
+      "Michael Schout <mschout@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Log-Log4perl-Layout-JSON",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Tiny" : "0",
+            "JSON::MaybeXS" : "0",
+            "Log::Log4perl" : "0",
+            "Log::Log4perl::Layout" : "0",
+            "Log::Log4perl::Layout::PatternLayout" : "0",
+            "Log::Log4perl::Level" : "0",
+            "parent" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : "0",
+            "Log::Log4perl::MDC" : "0",
+            "Test::Compile" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Test::Signature" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-log-log4perl-layout-json at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Log-Log4perl-Layout-JSON"
+      },
+      "homepage" : "http://search.cpan.org/dist/Log-Log4perl-Layout-JSON/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mschout/Log-Log4perl-Layout-JSON"
+      }
+   },
+   "version" : "0.50",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

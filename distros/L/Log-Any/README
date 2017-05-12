@@ -1,0 +1,64 @@
+Log::Any
+
+"Log::Any" provides a standard log production API for modules.
+Log::Any::Adapter allows applications to choose the mechanism for log
+consumption, whether screen, file or another logging mechanism like
+Log::Dispatch or Log::Log4perl.
+
+Many modules have something interesting to say. Unfortunately there is
+no standard way for them to say it - some output to STDERR, others to
+"warn", others to custom file logs. And there is no standard way to get
+a module to start talking - sometimes you must call a uniquely named
+method, other times set a package variable.
+
+This being Perl, there are many logging mechanisms available on CPAN.
+Each has their pros and cons. Unfortunately, the existence of so many
+mechanisms makes it difficult for a CPAN author to commit his/her users
+to one of them. This may be why many CPAN modules invent their own
+logging or choose not to log at all.
+
+To untangle this situation, we must separate the two parts of a logging
+API. The first, *log production*, includes methods to output logs (like
+"$log->debug") and methods to inspect whether a log level is activated
+(like "$log->is_debug"). This is generally all that CPAN modules care
+about. The second, *log consumption*, includes a way to configure where
+logging goes (a file, the screen, etc.) and the code to send it there.
+This choice generally belongs to the application.
+
+A CPAN module uses "Log::Any" to get a log producer object. An
+application, in turn, may choose one or more logging mechanisms via
+Log::Any::Adapter, or none at all.
+
+"Log::Any" has a very tiny footprint and no dependencies beyond Perl
+5.8.1, which makes it appropriate for even small CPAN modules to use. It
+defaults to 'null' logging activity, so a module can safely log without
+worrying about whether the application has chosen (or will ever choose)
+a logging mechanism.
+
+See <http://www.openswartz.com/2007/09/06/standard-logging-api/> for the
+original post proposing this module.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jonathan Swartz, David Golden,
+and Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

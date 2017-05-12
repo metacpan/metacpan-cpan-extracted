@@ -1,0 +1,52 @@
+HISTORY
+    0.99    Original version; created by h2xs 1.22 with options
+
+                    -A
+                    -C
+                    -X
+                    -b5.6.1
+                    -nLog::Dispatch::File::Rolling
+                    --skip-exporter
+                    -v0.99
+
+    1.00    Initial coding
+
+    1.01    Someone once said "Never feed them after midnight!"---Ok, let's
+            append: "Never submit any code after midnight..."
+
+            Now it is working, I also included 4 tests.
+
+    1.02    No code change, just updated Makefile.PL to include correct
+            author information and prerequisites.
+
+    1.03    Changed the syntax of the '$' format character because I noticed
+            some problems while making Log::Dispatch::File::Alerts. You need
+            to change your configuration!
+
+    1.04    Got a bug report where the file handle got closed in
+            mid-execution somehow. Added a additional check to re-open it
+            instead of writing to a closed handle.
+
+    1.05    Updated packaging for newer standards. No changes to the coding.
+
+    1.06    Fixed a subtle bug that prevented us from locking the logfile
+            after a fork if no PID was used in the filename.
+
+            Also disabled forced double opening of the logfile at startup.
+            It was in place because I didn't trust Log::Dispatch::File to
+            really open the file at the right moment.
+
+            Thanks to Peter Lobsinger for the patch. Please always wrap
+            non-standard Test::* modules in eval and make your testfile
+            clean up after itself... ;)
+
+    1.07    Fixed rt.cpan.org bug #89001. Seems Log::Dispatch::File changed
+            its initialization procedure---and we are inheriting from it.
+
+    1.08    Fixed dependency on Log::Dispatch::File. The change in 1.07 only
+            works with 2.37 or later. For older versions of
+            Log::Dispatch::File use 1.06.
+
+    1.09    Dependency change of 1.08 was missing from the Makefile.PL.
+            Oops.
+

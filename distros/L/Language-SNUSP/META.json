@@ -1,0 +1,56 @@
+{
+   "abstract" : "A SNUSP Interpreter and Visual Debugger",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Language-SNUSP",
+   "no_index" : {
+      "directory" : [
+         "example",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Curses" : "0",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/language-snusp-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/language-snusp-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/language-snusp-pm.git",
+         "web" : "https://github.com/ingydotnet/language-snusp-pm"
+      }
+   },
+   "version" : "0.0.15"
+}
+

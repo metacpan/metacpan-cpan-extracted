@@ -1,0 +1,25 @@
+---
+name: Log-Dispatch-Email-EmailSend
+version: 0.03
+author:
+  - 'Dave Rolsky, <autarch@urth.org>'
+abstract: Subclass of Log::Dispatch::Email that uses Email::Send
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Email::Send: 2
+  Email::Simple::Creator: 0
+  Log::Dispatch: 2
+  Params::Validate: 0
+build_requires:
+  Email::Send::Test: 0
+  Module::Build: 0
+provides:
+  Log::Dispatch::Email::EmailSend:
+    file: lib/Log/Dispatch/Email/EmailSend.pm
+    version: 0.03
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

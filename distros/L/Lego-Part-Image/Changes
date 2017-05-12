@@ -1,0 +1,20 @@
+0.05 2015-09-24T00:21:23+02:00
+ - Add tests for image_url() methods.
+ - Move author tests to xt/ directory.
+
+0.04 2015-08-25T23:05:17+02:00
+ - Fix Makefile.PL and META.yml files.
+ - Update examples/ directory.
+
+0.03 2015-08-24T11:28:31+02:00
+ - Add Task::Lego to SEE ALSO section in doc.
+ - Add minimal version of Perl.
+ - Improve SEE ALSO sections in doc.
+ - Update Module::Install to 1.16 version.
+
+0.02 2015-03-09T06:18:53+01:00
+ - Add tests for constructors.
+ - Fix test dependencies.
+
+0.01 2015-03-08T18:53:37+01:00
+ - First version.

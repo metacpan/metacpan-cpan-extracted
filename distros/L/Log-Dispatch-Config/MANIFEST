@@ -1,0 +1,32 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Log/Dispatch/Config.pm
+lib/Log/Dispatch/Configurator.pm
+lib/Log/Dispatch/Configurator/AppConfig.pm
+t/00_compile.t
+t/01_configure.t
+t/02_log.t
+t/03_reload.t
+t/04_nolog.t
+t/05_compat.t
+t/06_configurator.t
+t/07_hardwired.t
+t/08_datetime.t
+t/09_ini.t
+t/10_caller.t
+t/11_no_watch.t
+t/12_inherit.t
+t/13_do_reload.t
+t/14_destroy.t
+t/15_appconfig.t
+t/another.cfg
+t/bar.cfg
+t/date.cfg
+t/foo.cfg
+t/log.cfg
+t/log.ini
+t/section.ini
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

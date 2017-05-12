@@ -1,0 +1,48 @@
+LaTeX-PGF-Diagram2D version 1.00
+================================
+
+PURPOSE
+
+The module creates PGF files containing 2D diagrams following the
+DIN461 standard for diagrams.
+The diagrams can be used with LaTeX, PGF files can be used in both
+sources for latex/dvips and pdflatex.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DOCUMENTATION
+
+After installing the module you can run
+
+  ./build-docu.sh
+
+or
+
+  build-docu.bat
+
+to build the documentation.
+This generates the files diagram-en.pdf and diagram-de.pdf
+containing a tutorial in English and German language.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  PDL
+  Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Dirk Krause
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,492 @@
+NAME
+      LaBrea::Tarpit - Utilities and web displays for 
+      Tom Liston's LaBrea scanner/worm disruptor
+
+      See: http://www.hackbusters.net
+
+SYNOPSIS
+      use LaBrea::Tarpit qw( [exportable functions] );
+      or
+      require LaBrea::Tarpit;
+
+      daemon(%hash or \%hash);
+
+      $bandwidth = bandwidth(\%tarpit);
+
+      $midnight = midnight($epoch_time,$tz);
+
+      $timezone = timezone($now);
+
+      $sec = $tz2_sec($tz);
+
+      $time_string = their_date($gmtime,$tz);
+
+      $rv = restore_tarpit(\%tarpit,path2cache_file);
+
+      $rv = log2_mem(\%tarpit,log_line,is_daemon,port_intvls,DShield);
+
+      $rv = process_log(\%tarpit,path2log_file,is_daemon,port_intvls);
+
+      $rv = cull_threads(\%tarpit,timeout,scanners,port_intvls,DShield);
+
+      $rv = write_cache_file(\%tarpit,path2cache_file,umask,flag);
+
+            prep_report(\%tarpit,\%hash);
+
+      $rv = find_old_threads(\%tarpit,\%report,$age);
+
+INSTALL
+    * Package
+                Untar the package
+
+                perl Makefile.PL
+                make
+                make test
+                make install
+
+                To use examples/daemon.pl, configure
+                the array at the beginning of the script
+                and set the locations for the cache files.
+                ...typically /var/tmp/labrea.cache
+                and /var/tmp/DShield.cache
+
+    * Report/examples/html_report.plx
+    * Report/examples/paged_report.plx
+        html_report and paged_report will run as a cgi scripts by simply
+        renaming them xxx_report.cgi. It is highly recommend that you enable
+        the file caching to minimize load on your system.
+
+        Read the comments in the file itself for configuration. The defaults
+        should work fine, but you must create the temporary directory used
+        for file caching AND it must be writable by the web server.
+
+        html_report and paged_report are configured to provide other_site
+        reporting. You must set up the cron job maintain the site_stats file
+        for reporting. See webscan.pl below:
+
+    * Get/examples/web_scan.pl
+        Run web_scan.pl from a cron job hourly or daily to update the
+        statistics from all know sites running LaBrea::Tarpit. A report can
+        then be generated showing the activity worldwide.
+
+          # MIN HOUR DAY MONTH DAYOFWEEK   COMMAND
+          30 * * * * ./web_scan.pl ./other_sites.txt ./tmp/site_stats
+
+          Also see: LaBrea::Tarpit::Report::other_sites
+
+    * examples/tell_me.pl AGE
+        Run tell_me.pl from a cron job daily to send yourself an email
+        detailing teergrubed hosts that have been held longer than AGE days.
+        You might actually want to tell the bad guys that they have a rogue
+        machine.
+
+          # MIN HOUR DAY MONTH DAYOFWEEK   COMMAND
+          30 * * * * ./tell_me.pl 60  # default
+
+    * DShield/examples/mail_dshield.pm
+        Configure with your DShield UserID, email address, mail agent and
+        the location of the daemon - DShield cache file, then run
+        periodically from cron to send reports to DShield.
+
+DESCRIPTION - LaBrea::Tarpit
+    A comprehensive Hack Attack reporting module when used in conjunction
+    with Tom Liston's LaBrea scanner/worm disruptor. When configured with
+    reporting and stat collection it provides a detailed HTML page
+    containing:
+
+    * Bandwidth consumed by attack/disruption daemon
+    * Summary of previous 5 days of attack/disruption
+    * All IP addresses currently attacking
+    * IP address, port attacked/held, attack start time
+    * As above, but history of terminated attacks
+    * By day detail graphs on port attack intensity
+    * Active summary of known LaBrea::Tarpit sites
+    For more information on LaBrea see: http://www.hackbusters.net/ or
+    contact the author of LaBrea, Tom Liston the tliston@hackbusters.net
+    entry elsewhere in this document.
+
+    The parsed output of either syslog data or STDOUT from LaBrea using -o
+    or -O options is readily turned into text reports or an html output
+    page.
+
+    Basically there are two methods of operation. You can use the daemon
+    mode to create an almost realtime cache that may be parsed using the
+    report routines, or you can use the update and report routines to parse
+    the syslog files on an as needed basis. If you plan to create web page
+    reports, the daemon model will use less system resources in the long run
+    and avoids running syslog with the high volume output of LaBrea.
+
+    Improvements VERSION 1.00
+
+    As of version 1.00, daemon.pl uses network sockets to provide data for
+    the report modules. This means that the daemon can run on a remote
+    machine and the report scripts and web server can be somewhere else.
+
+    For those of you upgrading from older versions, you MUST upgrade all of
+    your report scripts as well. Older versions use a pipe or FIFO and this
+    is no longer supported as there were problems maintaining separate
+    sessions.
+
+    * recurse_hash2txt(\$txt_buffer,\%hash,$keys_so_far,flag)
+       Appends to txt_buffer.
+
+       Generates a text tree of a hash.
+       %hash{lvl1}->{lvl2}->{lvl3} = 5;       this real hash
+       flag = 0, ksf = ''                     with this input
+       lvl1:lvl2:lvl3:5               produces this text
+       flag = 1, ksf = ptr                    this input
+       ptr->{lvl1}->{lvl2}->{lvl3} = 5;       this txt
+
+    * ($LBfh,$version,$kid) = lbd_open($LaBrea,$DEBUG);
+      Core daemon start routine. Not exported, but can be replaced
+      externally with:
+
+        *LaBrea::Tarpit::lbd_open = sub { stuff };
+
+      Returns the pid of the underlying process (if any) and the version
+      number of that process. It also sets the command line shown by 'ps'
+      like this:
+
+        $0 = 'stuff';
+
+        input:        path to daemon,
+                      STDERR switch
+        returns:      LaBrea file handle,
+                      version,
+                      pid of kid
+
+    * lbd_close($LBfh,$kid);
+      Core daemon close routine, not exported but can be replaced externally
+      with:
+
+        *LaBrea::Tarpit::lbd_close = sub { sutff };
+
+      Close the daemon and kill off $kid with sig 15
+
+        input:        filehandle,
+                      pid of kid
+        returns:      nothing
+
+    * daemon(&hash | \%hash)
+       input parameters: from hash or pointer to hash
+       {
+        'LaBrea'      => '/usr/local/bin/LaBrea -z -v -p 1000 -h -i eth0 -b -O 2>&1',
+       # 'd_port'     => '8686',              # default local comm port
+        'd_host'      => 'localhost',         # defaults to ALL interfaces 
+                                              # NOT recommended
+        'allowed'     => 'localhost,remote.com',      # default is ALL
+                                              # recommend only 'localhost'
+        'pid'         => '/path/to/pid/file_name',
+        'cache'       => '/path/to/cache/file',
+        'DShield'     => '/path/to/DShield/out_file',
+       # 'kids'       => default 5            # kids to deliver net msgs
+                                              # why would you need more??
+       # 'umask'      => default 033,         # cache_file umask
+       # 'cull'       => default 600,         # seconds to keep old threads
+        'scanners'    => 100,                 # keep this many dead threads
+       # 'port_timer' => default 86400,       # seconds per collection period
+        'port_intvls' => 30,                  # keep #nintvls of port stats
+                                              # 0 or missing disables
+                                              # this can take lots of memory
+        # optional exclusion information (required if files exist)
+          'config'    => '/etc/LaBreaConfig',
+        # or
+       #   'config'   => 'LaBrea.cfg',        # windoze (untested)
+        # or
+       #   'config'   => ['/etc/LaBreaExclude','/etc/LaBreaHardExclude'],
+       };
+
+      The daemon can be run on a remote host with restricted client access
+      and the data retrieved by another host that has web server
+      capabilities
+
+        scanners is enabled by setting to a positive number. Since all IP's
+        that are seen but not captured can potentially be saved, this list
+        could grow very large. You can limit the amount of memory used by
+        setting the number of items that can be saved. There is no default,
+        a value <= 0 turns of this feature. Scanners are saved on a fifo
+        basis, when full, the oldest will be deleted first.
+
+       Signals:
+
+        HUP           cull then write new cache file
+        TERM          cull, write cache, exit
+
+        Killing the daemon with SIG_KILL (-9) will NOT write
+        a new cache file and will leave LaBrea running.
+        YOU SHOULD NOT DO THIS
+
+      daemon operation: The daemon parses the output of LaBrea in real time
+      and collects the information in its memory cache, periodically pruning
+      away threads that are no longer active to minimize the memory
+      footprint. Upon receiving a HUP, it immediately prunes memory of old
+      threads and writes its cache to file.
+
+      data retrieval
+
+        Usage:
+              connect to TCP port 8686
+              send "standard" (endline)
+                or
+              send "active" (endline)
+                or
+              send "short" (endline)
+                or
+              send "config" (endline)
+
+      to receive the complete memory cache described above or only active
+      threads or a truncated version suitable for making a short report.
+      config sends the daemon configuration file information to the client.
+
+    * $bandwidth = bandwidth(\%tarpit);
+      Returns bandwidth reported by LaBrea or zero if the -b option is not
+      used or bw is unknown.
+
+    * $time = midnight($epoch_time,$tz);
+       Returns epoch time at 00:00:00 of current day
+       from any epoch time submitted. Time zone is
+       calculated (inefficently) each time if omitted.  
+
+    * $seconds = $tz2_sec($tz);
+        Convert time zone into seconds
+
+        input:        timezone i.e. -0800
+        returns:      seconds i.e. -28800
+
+    * $time_string = their_date($gmtime,$tz);
+        Returns date string like perl's 
+        localtime(time)
+        for the specified time zone
+
+    * $timezone = timezone($now);
+       Returns the local timezone as a text string
+              i.e. -0800
+       uses current time if $now is omitted, 
+       this is the normal method of usage.
+
+    * $rv = restore_tarpit(\%tarpit,path2cache_file);
+       Restore the memory cache from the file cache.
+
+       returns        true if successful
+                      false if cache_file won't open
+
+       File Cache is of the form:
+         _VERSION:Package::Name version daemon | static
+         _CACHEDUMP:date of last cache dump
+              # for each src host
+         at:ip_addr:sport:dest
+         at:ip_addr:sport:dport
+         at:ip_addr:sport:ct
+         at:ip_addr:sport:last
+         at:ip_addr:sport:persist
+         at:ip_addr:sport:DShield:dest:dp:time
+
+         bw:number
+              # for each scanning (gone) host
+         dt:ip_addr:sport:dport
+         dt:ip_addr:sport:last
+         dt:ip_addr:persist
+
+         ph:time:dport:count
+
+         now:1234567890
+
+         tz:-0800
+
+    * array2_tarpit(\%tarpit,\@array);
+      Restore the memory cache from an array of lines as described for
+      restore_tarpit. The lines must already be stripped of return
+      characters
+
+      Always returns true;
+
+    * $rv = log2_mem(\%tarpit,log_line,is_daemon,port_intvls,DShield);
+      Update memory cache from log output line. Set is_daemon if the log
+      output is from daemon STDOUT
+
+      In order of minimum CPU overhead: Daemon mode or logs created from
+      STDOUT require the least cpu overhead. LaBrea -O is more efficient
+      than Labrea -o. Logs from STDOUT are more efficient than syslogs.
+      Standalone syslogs are more efficient than mixed.
+
+       All log lines used are of the form:
+
+       epoch time (seconds)
+              or
+       date text      
+              followed by
+       [...LaBrea:]           # syslog only
+              one of these
+       info text bw:  bandwidth (bytes/sec)
+              or
+       info text:  src_ip src_port txt dest_ip dest_port
+
+       Or more succinctly:
+       time text: bandwidth
+              or
+       time text: src_ip src_port txt dest_ip dest_port
+
+       Returns:       true / false on success / fail
+
+    * $rv = process_log(\%tarpit,path2log_file,is_daemon,port_intvls);
+      Update the memory cache from a file with lines of the form described
+      for log2_mem
+
+      Set is_daemon if the output log was created from STDOUT of LaBrea or
+      if you can guarantee that there is nothing in the file except LaBrea
+      lines.
+
+      Returns true on success, false if file fails to open
+
+    * $rv=cull_threads(\%tarpit,timeout,scanners,port_intvls,DShield);
+      Cull aged threads from memory cache. Default time is 600 seconds (10
+      min). On startup, no culls are done for the cull time interval to
+      retain old capture time information for any lingering black hats that
+      may fall back into the tarpit.
+
+      See daemon description for scanners, port_intvls
+
+      cull_threads updates the time zone of the tarpit cache
+
+      appends DShield info to file specified in DShield if present
+
+        returns:      true if threads removed, else false
+
+    * $rv = write_cache_file(\%tarpit,path2cache_file,umask,flag);
+       Write memory cache to file.
+       returns cache text on success, false if file fails to open.
+
+              umask defaults to 033 if not supplied
+
+       File Cache is of the form:
+         _VERSION:Package::Name version daemon | static
+         _CACHEDUMP:date of last cache dump
+
+      see description above in restore_tarpit
+
+       flag   = true,  append 'daemon' to version
+       flag   = false, append 'static' to version
+
+    * prep_report(\%tarpit,\%hash);
+       Prepare arrays of report values from the tarpit memory cache.
+       Only the values requested will be filled.
+
+       %hash values:          times in seconds since epoch
+       {
+       #      teergrubed hosts
+              'tg_srcIP'  => \@tgsip, # B<REQUIRED>
+              'tg_sPORT'  => \@tgsp,  # B<REQUIRED>
+              'tg_dstIP'  => \@tgdip,
+              'tg_dPORT'  => \@tgdp,
+              'tg_captr'  => \@tgcap, # capture epoch time
+              'tg_last'   => \@tglst, # last contact
+              'tg_prst'   => \@tgpst, # type / persistent [true|false]
+       #
+       #      threads per teergrubed host
+              'th_srcIP'  => \@thsip, # B<REQUIRED>
+              'th_numTH'  => \@thnum, # number threads this IP
+       #
+       #      capture statistics      # all fields B<REQUIRED>
+              'cs_days'  => number of days to show,
+              'cs_date'  => \@csdate, # epoch midnight of capt date
+              'cs_ctd'   => \@csctd,  # captured this date
+       #
+       #      phantom IP's used (from our IP block)
+              'ph_dstIP' => \@phdip,  # B<REQUIRED>
+              'ph_prst'  => \@phpst,  # type / persistent [true|false]
+       #
+       #      scanning hosts lost
+              'sc_srcIP' => \@scsip,  # B<REQUIRED>
+              'sc_dPORT' => \@scdp,   # attacked port
+              'sc_prst'  => \@scpst,  # type / persistent [true|false]
+              'sc_last'  => \@sclst,  # last contact
+       #
+       #      port statistics         # all fields B<REQUIRED>
+              'port_intvls'  => number of periods to show,
+              'ports'     => \@ports, # scanned port list
+              'portstats' => \@portstats,
+       # where @portstats = @stats_port1, @stats_port2, etc...
+
+       # always returned
+              $hash{tz}         = timezone, always filled if not present
+              $hash{now}        = epoch time of last load from cache
+              $hash{bw}         = bandwidth always filled
+              $hash{total_IPs}  = total teergrubed hosts
+              $hash{threads}    = total # of threads
+       # conditionally returned
+              $hash{LaBrea}     = version if known
+              $hash{pt}         = port activity collection interval
+              $hash{tg_capt}    = active hard captured (need tg_prst)
+              $hash{phantoms}   = total phantoms
+              $hash{ph_capt}    = phantoms that were hard captures
+              $hash{sc_total}   = total dropped scans
+              $hash{sc_capt}    = dropped hard capture (need sc_prst)
+      }
+
+      NOTE: prep_report will fill any subset of the specified or all if they
+      are all specified
+
+    * $rv = find_old_threads(\%tarpit,\%report,$age);
+        Report only aged threads
+
+        input:        \%tarpit, \%report, age_in_days 
+        returns:      false = fail, or nothing to report
+                      true  = number of items
+                      and fills \%report
+
+              %report = (
+                  [text string]        [time since epoch]
+                ip.addr:sp -> dp      => time captured,
+                      ....
+
+DEPENDENCIES
+            Net::Whois::IP version 0.35     
+            Net::Netmask version 1.8 or higher
+            LaBrea version 2.4b3 or higher
+
+    See the INSTALL document for complete information
+
+EXPORT
+      None by default.
+
+EXPORT_OK
+            recurse_hash2txt
+            daemon
+            bandwidth
+            midnight
+            timezone
+            tz2_sec
+            their_date
+            restore_tarpit
+            log2_mem
+            process_log
+            cull_threads
+            write_cache_file
+            prep_report
+            find_old_threads
+            array2_tarpit
+
+COPYRIGHT
+    Copyright 2002, 2003, 2004, Michael Robinton & BizSystems This program
+    is free software; you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free
+    Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+AUTHOR
+    Michael Robinton, michael@bizsystems.com
+
+SEE ALSO
+    perl(1), LaBrea::Codes(3), LaBrea::Tarpit::Get(3),
+    LaBrea::Tarpit::Report(3), LaBrea::Tarpit::Util(3),
+    LaBrea::Tarpit::DShield(3)
+

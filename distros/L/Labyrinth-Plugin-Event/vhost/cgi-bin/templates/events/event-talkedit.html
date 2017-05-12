@@ -1,0 +1,90 @@
+[% 
+    IF data.venueid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Talk' ;
+
+    crumb3_name = 'Event' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=event-admin' ;
+    crumb2_name = 'Talks' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=venue-admin' ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name='act' value='event-savetalk' />
+<input type="hidden" name='talkid' value='[% data.talkid %]' />
+
+[% IF thanks %]<p>Talk saved successfully.</p>[% END %]
+<p>Fields marked * are mandatory fields and must be completed.</p>
+
+[% IF errmess %]
+<div class="box">
+    [% IF errmess == 1 %]
+    <p class="alert">There are invalid or missing fields, as noted by the <span class="alert">&empty;</span> symbol.</p>
+    [% ELSE %]
+    <p class="alert">[% errmess %]</p>
+    [% END %]
+</div>
+[% END %]
+
+<div class="boxer">
+<table class="blocker">
+  <tr><td width="80">Event</td>
+      <td width="10"></td>
+      <td><a href="[% cgipath %]/pages.cgi?act=event-edit&amp;eventid=[% data.eventid %]" title="edit event">[% data.eventdate %] - [% data.title %]</a><br />
+                Move talk to another event:<br />
+                [% data.ddevents %]
+      </td></tr>
+  <tr><td>Speaker *</td>
+       <td>[% data.userid_err %]</td>
+       <td>[% data.ddusers %]</td></tr>
+  <tr><td>Guest</td>
+      <td>[% data.guest_err %]</td>
+      <td><input type="checkbox" name=guest [% IF data.guest %]CHECKED[% END %] /></td></tr>
+  <tr><td>Title *</td>
+      <td>[% data.talktitle_err %]</td>
+      <td><input type="text" name="talktitle" value="[% data.talktitle %]" size="50" /></td></tr>
+  <tr><td>Abstract *</td>
+      <td>[% data.abstract_err %]</td>
+      <td><textarea name="abstract" rows="8" cols="45">[% data.abstract %]</textarea></td></tr>
+  <tr><td>Resources</td>
+      <td>[% data.resource_err %]</td>
+      <td><textarea name="resource" rows="8" cols="45">[% data.resource %]</textarea></td></tr>
+</table>
+</div>
+
+<p align="center">
+<input type="submit" value='Submit' /></p>
+</form>
+
+<h2>Preview</h2>
+
+<div class="boxer">
+<table class="blocker">
+<tr><th>
+        [% IF data.guest %][% data.realname %] <span class="alert">*</span>
+        [% ELSE %]<a href='[% cgipath %]/pages.cgi?act=user-item&amp;userid=[% data.userid %]' title="about [% data.realname %]">[% data.realname %]</a>
+        [% END %]
+    </th>
+    <th>[% data.talktitle %]</th></tr>
+[% IF data.abstracted %]
+<tr>
+    <td colspan="2">
+    <p>Abstract:
+    <ul title="abstract bullet points">
+    [% data.abstracted %]
+    </ul>
+    </td></tr>
+[% END %]
+[% IF data.resourced %]
+<tr>
+    <td colspan="2">
+    <p>Resources:
+    <ul title="resource bullet points">
+    [% data.resourced %]
+    </ul>
+    </td></tr>
+</table>
+[% END %]
+</div>

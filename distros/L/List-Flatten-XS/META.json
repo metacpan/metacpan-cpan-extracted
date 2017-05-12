@@ -1,0 +1,77 @@
+{
+   "abstract" : "L<List::Flatten> with XS",
+   "author" : [
+      "K <x00.x7f@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.9",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "List-Flatten-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4005",
+            "Module::Build::XSUtil" : "0.03"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::LeakTrace" : "0",
+            "Test::More" : "0.98",
+            "Test::Valgrind" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "List::Flatten::XS" : {
+         "file" : "lib/List/Flatten/XS.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Code-Hex/List-Flatten-XS/issues"
+      },
+      "homepage" : "https://github.com/Code-Hex/List-Flatten-XS",
+      "repository" : {
+         "url" : "git://github.com/Code-Hex/List-Flatten-XS.git",
+         "web" : "https://github.com/Code-Hex/List-Flatten-XS"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:CODEHEX",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

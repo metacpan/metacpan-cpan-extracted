@@ -1,0 +1,38 @@
+Revision history for Perl extension Lingua::JA::Summarize.
+
+0.08  Tue Aug 12 19:03:00 2008
+	- move mecab handler to separate class
+	- more stopwords
+	- add concat_noun flag to control word concatenation behaviour
+	- [bugfix] do not block words starting with patterns that exist in ng_words
+	- [bugfix] use utf8::decode for counting characters
+
+0.06  Tue May 23 11:25:01 2006
+	- [bugfix] when jaascii_as_word set to false, words like 'lamdba関数' were treated as single words
+
+0.05  Thr May 04 14:10:01 2006
+	- %LJS_Defaults and %LJS_Defaults_keywords available for modifying default preferences
+	- preferences can be set through environment variables
+	- remove tests thought to be dependent to mecab version (or to the dictionary used)
+	- [win32] test suite now defaults to shift_jis and expects mecab in C:/Program Files/MeCab
+
+0.04  Tue May 02 04:45:01 2006
+	- default preferences now set by %Defaults
+	- support for non-EUC charsets
+	- introduced new property `minwords' for `keywords' function
+	- follow PBP coding rules
+
+0.03  Mon May 01 10:31:01 2006
+	- fix tf/idf calculation bug, re-adjust parameters
+	- add accessors stats, wordcount
+	- API change - default value of default_cost is now 1.0
+	- add t/00_util.t to dist
+	
+0.02  Thr Apr 27 14:48:01 2006
+	- better handling of English words, like o'reilly or 30boxes
+	- fix regex bug on handling periods (thanks to tatsuwo-san)
+	- more documentation
+	- fix bug in example/keyword.cgi
+
+0.01  Wed Apr 26 14:03:44 2006
+	- initial release

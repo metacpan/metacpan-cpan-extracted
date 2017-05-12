@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use File::Slurp;
+
+use lib ( 'lib', '../lib' );
+use Language::Tea;
+
+my $package = 'pt.v1.tea.testapp';
+my $filename = shift;  #'myfile.tea';
+my $printToFile = shift;
+
+my @source_lines = File::Slurp::read_file( $filename );
+my $source_code = join('', @source_lines);
+
+Language::Tea::translate($source_code, $filename, @source_lines);
+
+if ($printToFile) {
+    mkdir("Project", 0777) || print "Directory already exists!!";
+    chdir ("Project/") || die "Cannot access Project directory!!";
+    open(FILE, ">MainProgram.java");
+    print FILE Language::Tea::printMainProg($package);
+    close FILE;
+
+    for my $class ( keys %Language::Tea::Classes ) {
+        #print Dumper( $Classes{$class} );
+        open(FILE, ">>MainProgram.java");
+        open(FILE, ">$class.java");
+	print FILE Language::Tea::printClass($class);
+        close FILE;
+    }
+}else{
+    print Language::Tea::printMainProg($package);
+    for my $class ( keys %Language::Tea::Classes ) {
+        print Language::Tea::printClass($class);
+    } 
+}

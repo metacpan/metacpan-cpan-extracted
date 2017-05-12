@@ -1,0 +1,5 @@
+liblwp-protocol-rsync-perl (1-0.1) unstable; urgency=low
+
+  * Packaged version.
+
+ -- Kevin Ryde <user42@zip.com.au>  Wed, 26 Mar 2014 16:49:26 +1100

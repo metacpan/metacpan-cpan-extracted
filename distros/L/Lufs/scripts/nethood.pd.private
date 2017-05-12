@@ -1,0 +1,11 @@
+$VAR1 = {
+	BONHAM => {
+		ip => '192.168.7.40',
+		shares => ['data'],
+	},
+	PLANT => {
+		ip => '192.168.7.1',
+		shares => ['data'],
+	}
+};
+

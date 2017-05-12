@@ -1,0 +1,26 @@
+---
+abstract: 'PSGI engine for Limper'
+author:
+  - 'Ashley Willis <ashley+perl@gitable.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Limper-Engine-PSGI
+provides:
+  Limper::Engine::PSGI:
+    file: lib/Limper/Engine/PSGI.pm
+    version: '0.003'
+requires:
+  Limper: '0.013'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: ssh://git@gitable.org/ashley/limper-engine-psgi.git
+version: '0.003'

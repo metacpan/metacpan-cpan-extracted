@@ -1,0 +1,55 @@
+Phonology version 0.3
+======================
+
+This module allows for the creation and manipulation of language
+phonologies computationally. It consists of a top-level module,
+Lingua::Phonology, and several sub-modules.
+
+Documentation for all of these modules can be found on CPAN, or in the
+manual pages.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+This is assuming that you're on an operating system that supports make. If
+you're not (as with Windows), you'll be on your own for unzipping the files and
+putting them in the correct places. There may be scripts or other utilities for
+assisting you with this process.
+
+Regardless of your operating system, you can use the CPAN module to automate
+most of these steps.
+
+DEPENDENCIES
+
+XML::Simple v2.08
+
+Parse::RecDescent v1.9
+
+B::Deparse v0.63
+
+Recommended:
+
+Whatif v1.0
+
+Graph v0.2
+
+If the recommended  modules are available, then you will get a few unexpected
+success messages when running make test, as if a TODO test had succeeded. These
+tests aren't actually TODO, though--they're only marked as such to indicate
+their optional nature. 
+
+If these modules aren't available, you don't lose much--just one method from
+Lingua::Phonology::Features, and one parameter in Lingua::Phonology::Rules.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003-2004 Jesse Bangs
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

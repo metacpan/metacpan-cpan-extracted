@@ -1,0 +1,74 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  theorem                                                            | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+#**********************************************************************
+# \newtheorem in LaTeX.pool
+# This is close enough to amsthm to just use it.
+RequirePackage('amsthm');
+# However, theorem.sty's styles do NOT record the headfont!
+AssignValue(THEOREM_PARAMETERS => ['\thm@bodyfont', '\thm@headpunct',
+    '\thm@styling', '\thm@headstyling',
+    'thm@swap']);
+# And headpunct defaults to none.
+DefRegister('\thm@headpunct' => Tokens());
+
+DefMacro('\FMithmInfo', '');
+
+#AssignValue('\thm@headfont' => T_CS('\bfseries'));
+#AssignValue('\thm@bodyfont' => T_CS('\slshape'));
+DefMacro('\theoremheaderfont{}', sub {
+    AssignValue('\thm@headfont' => $_[1]); });
+
+# \th@plain defined in LaTeX.pool, but amsthm redefines to add .
+
+DefPrimitive('\th@plain', sub {
+    AssignValue('\thm@bodyfont'    => T_CS('\itshape'));
+    AssignValue('\thm@headstyling' => T_CS('\lx@makerunin'));
+    return; });
+
+DefPrimitive('\th@break', sub {
+    AssignValue('\thm@bodyfont'    => T_CS('\slshape'));
+    AssignValue('\thm@headstyling' => Tokens());           # NOT runin!
+    return; });
+
+DefPrimitive('\th@change', sub {
+    AssignValue('thm@swap'         => 'S');
+    AssignValue('\thm@bodyfont'    => T_CS('\slshape'));
+    AssignValue('\thm@headstyling' => T_CS('\lx@makerunin'));
+    return; });
+
+DefPrimitive('\th@margin', sub {
+    AssignValue('thm@swap'      => 'S');                # The number is in margin, so we must also swap
+    AssignValue('\thm@bodyfont' => T_CS('\slshape'));
+    AssignValue('\thm@headstyling' => Tokens(T_CS('\lx@makerunin'), T_CS('\lx@makeoutdent')));
+    return; });
+
+DefPrimitive('\th@marginbreak', sub {
+    AssignValue('thm@swap'      => 'S');                # The number is in margin, so we must also swap
+    AssignValue('\thm@bodyfont' => T_CS('\slshape'));
+    AssignValue('\thm@headstyling' => T_CS('\lx@makeoutdent'));    # NOT runin!
+    return; });
+
+DefPrimitive('\th@changebreak', sub {
+    AssignValue('thm@swap'         => 'S');
+    AssignValue('\thm@bodyfont'    => T_CS('\slshape'));
+    AssignValue('\thm@headstyling' => Tokens());                   # NOT runin!
+    return; });
+
+RawTeX('\th@plain');
+#**********************************************************************
+1;

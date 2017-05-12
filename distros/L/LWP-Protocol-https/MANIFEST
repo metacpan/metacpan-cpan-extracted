@@ -1,0 +1,9 @@
+Changes				History of this package
+MANIFEST			This file
+Makefile.PL			Makefile generator
+README
+lib/LWP/Protocol/https.pm	Access with HTTP/1.1 protocol over SSL
+t/apache.t
+t/https_proxy.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

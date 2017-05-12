@@ -1,0 +1,107 @@
+.____    .__                             .___                      __
+|    |   |__| ____  __ _____  ___ /\  /\ |   | ____ ______  __ ___/  |_
+|    |   |  |/    \|  |  \  \/  / \/  \/ |   |/    \\____ \|  |  \   __\
+|    |___|  |   |  \  |  />    <  /\  /\ |   |   |  \  |_> >  |  /|  |
+|_______ \__|___|  /____//__/\_ \ \/  \/ |___|___|  /   __/|____/ |__|
+        \/       \/            \/                 \/|__|
+
+		 a pure-perl interface to Linux's input system
+
+
+
+.oO( A Brief Introduction to Linux's Input Event System )
+
+
+  If your Linux kernel is version 2.6.0 or higher,
+  go look in /dev/input.  You might see something like this:
+
+    total 0
+    crw-r--r--    1 root     root      13,  64 Dec 31  1969 event0
+    crw-r--r--    1 root     root      13,  65 Dec 31  1969 event1
+    crw-r--r--    1 root     root      13,  66 Dec 31  1969 event2
+    crw-r--r--    1 root     root      13,  67 Dec 31  1969 event3
+    crw-------    1 beppu    root      13,   0 Dec 31  1969 js0
+    crw-r--r--    1 root     root      13,  63 Dec 31  1969 mice
+    crw-r--r--    1 root     root      13,  32 Dec 31  1969 mouse0
+
+  The Linux kernel has implemented a nice system whereby
+  you can open any of these files and wait for events to happen.
+  When an event happens, the kernel will write a predictably
+  sized data structure to these virtual files.
+
+  This works for practically every input device that Linux
+  supports, whether it be a keyboard, a mouse, a joystick
+  or something more exotic.  Just `cat /proc/bus/inputs/devices` 
+  to see what you have at your disposal.
+
+  Furthermore, this system lets you receive makes and
+  breaks which are really useful for anyone trying to write
+  an application that needs to handle complex input sequences
+  (like a game).
+
+
+.oO( Why do I like it so much? )
+
+
+  It's like a Grand Unified Input System that fits perfectly
+  into the everything-is-a-file model that Unix users have
+  come to know and love.  It'll take any input device,
+  regardless of what bus it's connected to and make it so
+  that you, the programmer, can treat them equally in
+  your code.  It's also super simple to program for.
+
+  And now, with this Perl module, it's become even easier.
+
+
+.oO( What does this perl module distribution provide? )
+
+
+  Linux::Input
+
+    This is the main class that lets you access the
+    input system.
+
+    `perldoc Linux::Input` for the details.
+
+  Linux::Input::Joystick
+
+    This is a subclass of Linux::Input that reads
+    joystick events.  They are very similar to the
+    universal catch-all events, but not quite the same.
+    This particular interface existed from around the
+    2.2 series, and the new input system is a direct
+    descendant of this work.
+
+    When you use this module, you'll want to read
+    from joystick device files.  They're typically
+    named like:
+
+      /dev/input/js0
+      /dev/input/js9
+      /dev/js0
+      /dev/js1
+
+    NOTE: You don't have to use Linux::Input::Joystick
+    to access joysticks.  You can use Linux::Input for
+    joysticks, too.  However, you will not be reading
+    from joystick device files.  Instead, you will read
+    from one of the event device files.
+
+  evtest.pl
+
+    After you install this distribution, try typing:
+
+      sudo evtest.pl /dev/input/event*
+
+    Then, move you mouse, push some keys, move
+    your gamepad around, etc....  This will help
+    figure out if this distribution works on your
+    system.
+
+
+
+
+Special thanks to Vojtech for creating this system in the first place.
+I hope other Unixes implement it, too.
+
+

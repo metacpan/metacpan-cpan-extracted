@@ -1,0 +1,135 @@
+
+.Terms {
+    color: FFCBDB;
+    font-weight: bold;
+}
+
+.abnormality {
+    color: yellow;
+    font-weight: bold;
+}
+
+.limitation {
+    color: red;
+    font-weight: bold;
+}
+
+.discovery {
+    color: purple;
+    font-weight: bold;
+}
+
+.experience {
+    color: orange;
+    font-weight: bold;
+}
+
+.uncertainty {
+    color: green;
+    font-weight: bold;
+}
+
+.negation {
+    color: darkblue;
+    font-weight: bold;
+}
+
+.approximation {
+    color: blue;
+    font-weight: bold;
+}
+
+.frequency {
+    color: FF0000;
+    font-weight: bold;
+}
+
+.problem {
+    color: FF0000;
+    font-weight: bold;
+}
+
+.dosage {
+    color: DD0000;
+    font-weight: bold;
+}
+
+.DOSE {
+    color: 990000;
+    font-weight: bold;
+}
+
+.pre-possible {
+    color: 00FF00;
+    font-weight: bold;
+}
+
+.treatment {
+    color: 00FF00;
+    font-weight: bold;
+}
+
+.pre-absent {
+    color: 00DD00;
+    font-weight: bold;
+}
+
+.pre-hypothetical {
+    color: 00BB00;
+    font-weight: bold;
+}
+
+.test {
+    color: 0000FF;
+    font-weight: bold;
+}
+
+.evidential {
+    color: 009900;
+    font-weight: bold;
+}
+
+.occurrence {
+    color: FFFF00;
+    font-weight: bold;
+}
+
+.post-problem {
+    color: AA0000;
+    font-weight: bold;
+}
+
+.pre-treatment {
+    color: 00AA00;
+    font-weight: bold;
+}
+
+.pre-noi2b2concept {
+    color: AAAA00;
+    font-weight: bold;
+}
+
+.pre-neg {
+    color: EE0000;
+    font-weight: bold;
+}
+
+.post-problem {
+    color: AAFF00;
+    font-weight: bold;
+}
+
+.post-neg {
+    color: EEFF00;
+    font-weight: bold;
+}
+
+.duration {
+    color: 00BBBB;
+    font-weight: bold;
+}
+
+.clinical_dept {
+    color: 00DD00;
+    font-weight: bold;
+}

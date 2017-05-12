@@ -1,0 +1,23 @@
+Lingua/SV/Num2Word version 0.05
+===============================
+
+Lingua::SV::Num2Word is number to text convertor for svedish. Output
+text is in iso-8859-1 encoding.
+
+Converts whole numbers from 0 up to 999 999 999.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004 PetaMem s.r.o.
+
+This package is free software. Tou can redistribute and/or modify it under
+the same terms as Perl itself.

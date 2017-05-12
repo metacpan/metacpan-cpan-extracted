@@ -1,0 +1,13 @@
+Revision history for LinuxMint-Releases
+
+0.02    2016-02-24 (PERLANCAR)
+
+	- Update data (new release: 17.3/rosa).
+
+        - Update prereq minimum version Perinci::Sub::Gen::AccessTable to
+	  0.55 (incompatible with previous version).
+
+
+0.01    2015-10-06 (PERLANCAR)
+
+        - First version.

@@ -1,0 +1,85 @@
+{
+   "abstract" : "Thesaurus management",
+   "author" : [
+      "Laurent Dami <dami@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-Thesaurus",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBD::SQLite" : "1.54",
+            "DBI" : "0",
+            "Module::Load" : "0",
+            "Moose" : "0",
+            "Search::Tokenizer" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.01"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "POSIX" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::Thesaurus" : {
+         "file" : "lib/Lingua/Thesaurus.pm",
+         "version" : "0.13"
+      },
+      "Lingua::Thesaurus::IO" : {
+         "file" : "lib/Lingua/Thesaurus/IO.pm"
+      },
+      "Lingua::Thesaurus::IO::ISO2788" : {
+         "file" : "lib/Lingua/Thesaurus/IO/ISO2788.pm"
+      },
+      "Lingua::Thesaurus::IO::Jurivoc" : {
+         "file" : "lib/Lingua/Thesaurus/IO/Jurivoc.pm"
+      },
+      "Lingua::Thesaurus::IO::LivelinkCollectionServer" : {
+         "file" : "lib/Lingua/Thesaurus/IO/LivelinkCollectionServer.pm"
+      },
+      "Lingua::Thesaurus::RelType" : {
+         "file" : "lib/Lingua/Thesaurus/RelType.pm"
+      },
+      "Lingua::Thesaurus::Storage" : {
+         "file" : "lib/Lingua/Thesaurus/Storage.pm"
+      },
+      "Lingua::Thesaurus::Storage::SQLite" : {
+         "file" : "lib/Lingua/Thesaurus/Storage/SQLite.pm"
+      },
+      "Lingua::Thesaurus::Term" : {
+         "file" : "lib/Lingua/Thesaurus/Term.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/Lingua-Thesaurus"
+      }
+   },
+   "version" : "0.13"
+}

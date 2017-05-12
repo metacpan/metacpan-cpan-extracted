@@ -1,0 +1,95 @@
+Revision history for Lingua-Diversity
+
+0.07    Mon Nov 3 12:15:00 2014
+        * In L::D::Internals, removed acute accent in comments about Renyi's
+          entropy.
+        * In t/03-Lingua-Diversity-Internals, fixed an error in the function
+          for comparing hashes, which led to spurious failure in Strawberry
+          Perl.
+
+
+0.06    Wed Dec 7 22:00:00 2011
+        * Added Test::Pod::Coverage to build_requires in Build.pl.
+        * L::D::Utils:
+        - Fixed version number.
+        - Fixed bug in _split_tagged_text() (case where none of 'original',
+          'lemma', and 'tag' was defined in condition).
+        * L::D::VOCD:
+        - Set default value of 'min_value' to 0.01 (to work 'per category').
+        * L::D::Variety:
+        - Removed the sampling_order attribute, which did not appear to be as
+          useful as it was confusing. Things now follow the logical
+          'transform_then_average' pattern. Doc and tests changed accordingly.
+        * L::D::Subtype:
+        - Removed the SamplingOrder subtype (no longer used by L::D::Variety).
+
+
+0.05    Fri Dec 2 11:30:00 2011
+        * Fixed error in test plan of t/04-Lingua-Diversity-Utils.
+        * L::D::Subtype:
+        - Created this module.
+        - Moved all Moose subtype definitions there.
+        - Qualified subtypes with L::D namespace (this seems to have been
+        a problem in v0.04.
+        - Modified accordingly all modules that used to contain their
+        own subtype definitions.
+        - Made a silent prayer for this version to finally pass the tests on
+        CPAN just like it does on the author's machine.
+
+0.04    Mon Nov 28 23:05:00 2011
+        * Modified extensive parts of the embedded documentation.
+        * Added classes L::D::Variety, L::D::SamplingScheme, and L::D::VOCD,
+        along with corresponding test files.
+        * Lingua::Diversity (major refactoring):
+        - Methods measure() and measure_per_category() are not abstract
+        anymore: they perform the array validation and unit recoding
+        stuff, and pass the results on to new abstract private method
+        _measure(). This private method is required to return a
+        L::D::Result object, which is directly forwarded as the return
+        value of public method measure() and measure_per_category(). Note
+        that _measure() has the responsability of handling both the case
+        where it is passed a single array by measure() and the case where
+        it is passed two arrays by measure_per_category().
+        - Subroutines _validate_size() and _prepend_unit_with_category()
+        have been removed from L::D::Internals and added to this package
+        (L::D). Tests and exception classes have been removed, moved, or
+        renamed accordingly.
+        - Attributes min_num_items and max_num_items (with private getters
+        and setters) have been added and can be set from within derived
+        classes if necessary.
+        - This module now uses L::D::Variety, L::D::MTLD, and L::D::VOCD.
+        * L::D::MTLD:
+        - Refactored the code to match the modifications of L::D.
+        - Fixed bug in _measure(), namely the case of a single partial
+        factor with a TTR of 1. Now it counts as 1 factor of length 0
+        (which is not very satisfying but it is hard to come up with a
+        better alternative).
+        * L::D::Utils:
+        - Fixed bug in split_tagged_text() which caused tags to be used in
+        place of lemmas.
+        * L::D::Internals:
+        - Added export tag 'all'.
+        - Added subroutines _sample_indices(), _count_types(),
+        _count_frequency(), _shannon_entropy(), _perplexity(),
+        _renyi_entropy(), and _get_units_per_category() (along with
+        documentation and tests).
+        - Moved subroutines _validate_size() and
+        _prepend_unit_with_category() to the L::D module (along with
+        documentation and tests).
+        - Fixed variance precision problem in _get_average().
+        - Added shortcut in _get_average() for the case where there's only
+        1 value.
+
+0.03    Sun Nov 13 23:00:00 2011
+        Fixed a few more errors in the embedded documentation.
+        Added the possibility to selectively in-/exclude tokens in subroutine
+        Lingua::Diversity::Utils::split_tagged_text().
+        Relaxed constraints on attributes 'diversity', 'variance', and 'count'
+        of Lingua::Diversity::Result objects; they're just plain Nums now.
+
+0.02    Sat Nov 12 21:30:00 2011
+        Fixed a few typos, errors and glitches in the embedded documentation.
+
+0.01    Sat Nov 12 12:00:00 2011
+        First version, released on an unsuspecting world.
+        

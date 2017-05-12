@@ -1,0 +1,17 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/List/NSect.pm
+t/001_wantarray_nsect.t
+t/002_wantscalar_nsect.t
+t/003_wantarray_spart.t
+t/004_wantscalar_spart.t
+t/005_wantarray_deal.t
+t/006_wantscalar_deal.t
+perl-List-NSect.spec
+scripts/List-NSect-Parallel-ForkManager-example.pl
+scripts/List-NSect-card-dealer.pl
+META.yml                                 Module meta-data (added by MakeMaker)

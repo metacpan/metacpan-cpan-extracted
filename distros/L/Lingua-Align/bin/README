@@ -1,0 +1,29 @@
+
+jorg.tiedemann@lingfil.uu.se	2009-11-03
+
+
+Here are some example scripts showing how to use Lingua::Align
+Some are ready to use as front-ends for tree alignment and alignment
+evaluation. Look especially at
+
+treealign (there is POD information included)
+treealigneval (for evaluation)
+
+Example alignments can be run with 
+Smultron data (see ../examples/smultron/)
+Europarl data (see ../examples/europarl) and
+WPT 2003 data (see ../examples/wpt03)
+
+
+
+megam
+
+Lingua::Align uses external tools for training the local
+classifiers. Currently it uses megam, a state-of-the-art
+implementation of a maximum-entropy based classifier. We include the
+binary version of megam (compiled on a standard i688 Linux
+architecture) in this package which can be downloaded from
+http://www.cs.utah.edu/~hal/megam/ We are not aware of any copyright
+restrictions. Please contact the author in any cases of doubt about
+licenses etc. For further details look at http://www.cs.utah.edu/~hal/
+

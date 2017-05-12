@@ -1,0 +1,8 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Lingua/JPN/Number.pm
+t/01_ini.t
+t/02_samples.t

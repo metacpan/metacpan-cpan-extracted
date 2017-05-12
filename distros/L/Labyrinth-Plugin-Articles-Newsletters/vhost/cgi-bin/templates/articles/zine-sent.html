@@ -1,0 +1,13 @@
+<h2>Newsletter</h2>
+
+<p>Mail sent: [% mailsent %]</p>
+
+[% IF thanks %]
+[% IF thanks == 2 %]
+<p>Mails sent successfully.</p>
+[% ELSIF thanks == 3 %]
+<p>Failed to send mails.</p>
+[% ELSE %]
+<p>Sorry there was a problem.</p>
+[% END %]
+[% END %]

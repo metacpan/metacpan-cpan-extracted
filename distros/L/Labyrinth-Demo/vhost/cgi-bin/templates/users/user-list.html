@@ -1,0 +1,76 @@
+<!-- Begin: Centre Column -->
+<div id="centre"><div id="centrecol">
+
+<h2>Users</h2>
+
+<div class="box">
+    <form method="post" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name="act" value="user-list" />
+    <input type="hidden" name="searched" value="[% searched %]" />
+
+    <table width="100%">
+    <tr><td>
+            Search Users: <input type="text" name="searchname" size="10"/> <input type="submit" value="GO" />
+        </td></tr>
+    <tr><td>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=A'>A</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=B'>B</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=C'>C</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=D'>D</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=E'>E</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=F'>F</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=G'>G</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=H'>H</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=I'>I</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=J'>J</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=K'>K</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=L'>L</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=M'>M</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=N'>N</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=O'>O</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=P'>P</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=Q'>Q</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=R'>R</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=S'>S</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=T'>T</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=U'>U</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=V'>V</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=W'>W</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=X'>X</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=Y'>Y</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=Z'>Z</a>
+        </td></tr>
+    </table>
+    </form>
+</div>
+
+<div class="box">
+    <table width="100%">
+
+[% FOREACH item = data %]
+
+[% IF item.password != '-banned-' %]
+    <tr><td><b>[% item.realname %]</b>
+            [% IF item.link %]<br /><img src='[% webpath %]/[% item.link %]' alt='[% item.tag %]'/>[% END %]
+            [% IF item.nickname %]<br />[% item.nickname %][% END %]
+            <br />Posted: [% item.posts %] times
+        </td>
+        <td>[% IF item.aboutme %]<p>[% item.aboutme %][% END %]
+            [% IF item.url %]<p>My Web Page: <a href="[% item.url %]">[% item.url %]</a>[% END %]
+        </td>
+    </tr>
+[% END %]
+
+[% END %]
+
+    </table>
+
+[% IF searched %]
+[% IF norecs %]<p align="center">No users listed for search.[% END %]
+[% ELSE %]
+<p align="center">Please select a search criteria from the options above.
+[% END %]
+</div>
+
+</div></div>
+<!-- End: Centre Column -->

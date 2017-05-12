@@ -1,0 +1,77 @@
+=pod
+
+=head1 NAME
+
+Lingua::Names - test a string to see if it is a first name
+
+=head1 SYNOPSIS
+
+   use Lingua::Names 'is_name';
+
+   for my $string (qw/leo james jawf 44 lUCy/){
+
+      printf "is name '$string'? %s\n",
+         ( 
+            is_name($string) 
+               ? 'yes' 
+               : 'no' 
+         );
+   }
+
+=head1 DESCRIPTION
+
+I wanted to test strings to see if the looked like names, first names. 
+There seemed not to be anything out there. After discussion on perlmonks.. Here it is.
+
+This module is very basic. It only tests against a selection of names from a United States census. 
+As of this version:
+   Total female names: 3944
+   Male names: 1219
+   Total: 5163
+
+=head1 SUBS
+
+None are exported by default.
+
+=head2 is_name()
+
+Argument is string. 
+Returns true or false.
+Truth is returned as the value passed.
+
+Useful for something like :
+
+   my $name = is_name($arg)
+      or warn("Not name.")
+      and next;
+
+
+=head1 CAVEATS
+
+In development, alpha. 
+Please contact AUTHOR with any suggestions, crit, complaints, etc.. AUTHOR is very open to peer review.
+
+=head1 SEE ALSO
+
+Peter Hickman's L<Data::RandomPerson>, most of the names are taken from here. Sadly, you can't ask those modules for a list.
+
+=head1 THANKS
+
+"skim" - helped with documentation.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+

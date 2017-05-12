@@ -1,0 +1,100 @@
+---
+vendor: Intel
+model: "HD Graphics 4000"
+score_3dmark06: 6841
+---
+vendor: Intel
+model: "HD Graphics 3000"
+score_3dmark05: 6396.2
+score_3dmark06: 3563.3
+---
+vendor: Intel
+model: "HD Graphics 2000"
+score_3dmark05: 5802
+score_3dmark06: 3162
+---
+vendor: NVIDIA
+model: GeForce 310M
+score_3dmark05: 6661.7
+score_3dmark06: 3346.2
+---
+vendor: NVIDIA
+model: GeForce GT 520M
+score_3dmark05: 9069.7
+score_3dmark06: 4957.2
+---
+vendor: NVIDIA
+model: "GeForce GT 520MX"
+score_3dmark06: 5899.5
+---
+vendor: NVIDIA
+model: "GeForce GT 525M"
+score_3dmark05: 13307
+score_3dmark06: 7056.7
+---
+vendor: NVIDIA
+model: "GeForce GT 540M"
+score_3dmark05: 14821.6
+score_3dmark06: 8141
+---
+vendor: NVIDIA
+model: "GeForce GT 550M"
+score_3dmark05: 16509.5
+score_3dmark06: 8904.7
+---
+vendor: NVIDIA
+model: "GeForce GT 555M"
+score_3dmark05: 18199.3
+score_3dmark06: 10585.1
+---
+vendor: "Radeon"
+model: "HD 6450M"
+score_3dmark05: 7235.5
+score_3dmark06: 4267
+---
+vendor: "Radeon"
+model: "HD 6470M"
+score_3dmark05: 8031.3
+score_3dmark06: 4488.2
+---
+vendor: "Radeon"
+model: "HD 7450M"
+score_3dmark05: 8358
+score_3dmark06: 4807
+---
+vendor: "Radeon"
+model: "HD 6490M"
+score_3dmark05: 9512.3
+score_3dmark06: 5310.5
+---
+vendor: "Radeon"
+model: "HD 6630M"
+score_3dmark05: 12511.2
+score_3dmark06: 6900.1
+---
+vendor: "Radeon"
+model: "HD 6650M"
+score_3dmark05: 14501.5
+score_3dmark06: 7483.1
+---
+vendor: "Radeon"
+model: "HD 6730M"
+score_3dmark05: 15492
+score_3dmark06: 7918
+---
+vendor: "Radeon"
+model: "HD 6750M"
+score_3dmark05: 15010.5
+score_3dmark06: 8843.4
+---
+vendor: "Radeon"
+model: "HD 6770M"
+score_3dmark05: 15484.3
+score_3dmark06: 10234.9
+---
+vendor: "Radeon"
+model: "HD 6830M"
+---
+vendor: "Radeon"
+model: "HD 6870M"
+score_3dmark06: 14396

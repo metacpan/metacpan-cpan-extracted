@@ -1,0 +1,56 @@
+List::Maker version 0.005
+
+    The List::Maker module hijacks Perl's built-in file globbing syntax
+    ("< *.pl >" and "glob '*.pl'") and retargets it at list creation.
+
+    The rationale is simple: most people rarely if ever glob a set of
+    files, but they have to create lists in almost every program they
+    write. So the list construction syntax should be easier than the
+    file-name expansion syntax.
+
+        use List::Maker;
+
+        @list = <1..10>;                      # (1,2,3,4,5,6,7,8,9,10)
+        @list = <10..1>;                      # (10,9,8,7,6,5,4,3,2,1)
+
+        @list = <1,3,..10>                    # (1,3,5,7,9)
+        @list = <1..10 x 2>                   # (1,3,5,7,9)
+
+        @list = <0..10 : prime N>;            # (2,3,5,7)
+        @list = <1,3,..30  : /7/>             # (7,17,27)
+
+        @words = < a list of words >;         # ('a', 'list', 'of', 'words')
+        @words = < 'a list' "of words" >;     # ('a list', 'of words')
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the
+following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

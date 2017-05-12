@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+use strict;
+use vars qw($VERSION);
+use Getopt::Std::Strict 'dhvp:a:';
+use LEOCHARRE::Dir ':all';
+use LEOCHARRE::DEBUG;
+use Cwd;
+use Carp;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.1 $ =~ /(\d+)/g;
+
+init();
+
+$opt_a ||= cwd();
+
+$opt_p ||= "@ARGV";
+
+
+
+my $args = "find '$opt_a' -type f | xargs grep -sl '$opt_p'";
+
+print STDERR " = $args\n" if $opt_d;
+
+system( $args );
+
+
+
+exit;
+
+
+
+sub usage {
+   qq{$0
+
+OPTIONS
+
+   -d          debug on
+   -h          help
+   -v          version and exit
+   -a path     base path to search
+   -p string   pattern
+
+EXAMPLES
+
+   $0 'sub user'
+
+AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+SEE ALSO
+
+}}
+
+sub init {
+   $opt_h and print usage() and exit;
+   $opt_v and print $VERSION and exit;
+
+}
+
+

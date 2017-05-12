@@ -1,0 +1,4 @@
+lib/Lingua/FI/Hyphenate.pm
+Makefile.PL
+MANIFEST
+t/tavuta.t

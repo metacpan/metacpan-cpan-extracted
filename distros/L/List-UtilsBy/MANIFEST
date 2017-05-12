@@ -1,0 +1,24 @@
+Build.PL
+Changes
+lib/List/UtilsBy.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01sort_by.t
+t/02nsort_by.t
+t/03max_by.t
+t/04min_by.t
+t/05uniq_by.t
+t/06partition_by.t
+t/07count_by.t
+t/08zip_by.t
+t/09unzip_by.t
+t/10extract_by.t
+t/11weighted_shuffle_by.t
+t/12bundle_by.t
+t/99pod.t
+t/Unrandom.pm

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/LWP-UserAgent-Cache-Memcached.t
+lib/LWP/UserAgent/Cache/Memcached.pm
+META.yml                                 Module meta-data (added by MakeMaker)

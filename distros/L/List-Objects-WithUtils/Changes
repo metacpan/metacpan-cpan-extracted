@@ -1,0 +1,538 @@
+Revision history for Perl module List::Objects::WithUtils
+
+2.028003 2016-04-07
+
+  - Minor hash->get optimization
+
+2.028002 2016-04-04
+
+  - Fix hash->random_kv & hash->random_key to return explicit undef when
+    called on empty lists
+
+  - array->tuples with a type specified will no longer fail type
+    checks/coercions on incomplete tuples
+
+  - Various optimizations wrt array->tuples, hash->set
+
+2.028001 2016-01-25
+
+  - Add hash->random_kv / random_key / random_value
+
+2.027002 2016-01-12
+
+  - Use perl-5.20+ hash slice syntax for hash->sliced if available
+
+  - Add documentation regarding installing '$a'/'$b' from custom types
+
+  - Expand test coverage
+
+2.027001 2016-01-08
+
+  - Add array->squished
+
+2.026001 2016-01-07
+
+  - Add array->pick
+
+  - Add array->repeated
+
+  - Add array->roll
+
+2.025001 2015-11-26
+
+  - Allow use of any Type::API-conforming object with array_of/hash_of
+
+2.024001 2015-11-23
+
+  - Add support for returning blessed array-type objects from array->tuples
+
+  - Minor array->rotate optimization
+
+  - Minor constructor optimizations
+
+2.023002 2015-11-17
+
+  - Fix array->nsect without arguments
+
+2.023001 2015-11-13
+
+  - Add array->part_to_hash
+    (Inspired by YANICK in List::MoreUtils PR#15)
+
+  - Documentation fixes; explicitly document array->zip alias for array->mesh
+
+2.022001 2015-07-16
+
+  - array->indexes without arguments returns the complete list of available
+    indexes
+
+  - Drop List::MoreUtils support
+
+2.021003 2015-02-27
+
+  - 'use strictures 2;' for saner fatal warning behavior
+
+2.021002 2015-01-25
+
+  - Fix autoboxed []->rotate_in_place
+
+  - Minor array->natatime optimizations
+
+2.021001 2014-12-05
+
+  - Add hash->kv_grep
+
+2.020001 2014-12-01
+
+  - Support $a/$b variables for use with hash->kv_map
+
+  - Add simple Moo attribute example to examples/
+
+2.019001 2014-11-30
+
+  - Support $a/$b variables for use with hash->kv_sort
+
+  - Kill 'used only once' warnings for $a/$b for all array and hash types
+
+2.018001 2014-11-30
+
+  - Support $a/$b variables for use with array->sort/reduce/foldr
+
+2.017002 2014-11-06
+
+  - cpanfile fixes; explicitly require autobox
+
+2.017001 2014-11-06
+
+  - Add array->foldr($sub), alias array->foldl to array->reduce
+
+  - Switch to 'cpanfile' dependency management
+
+2.016001 2014-10-13
+
+  - Add TO_ZPL for Text::ZPL compatibility
+
+2.015001 2014-09-08
+
+  - Add hash->get_path
+
+  - Reorganize Role::Hash POD
+
+2.014002 2014-07-23
+
+  - Fix hash->inverted test
+
+2.014001 2014-07-22
+
+  - Add hash->inverted
+
+  - Alias array->size -> array->count
+
+2.013001 2014-07-01
+
+  - Add array->exists($idx) (requested by TOBYINK)
+  
+  - Add array->defined($idx)
+
+  - Pass requested index/key to ->get_or_else() builder subs
+
+2.012001 2014-06-26
+
+  - Add array->get_or_else / hash->get_or_else
+
+  - Fix array->insert($pos => @vals)
+
+  - Add ->untyped method for use in method chains involving typed objects
+
+2.011002 2014-06-24
+
+  - Fix array->has_any(sub { !defined })
+
+2.011001 2014-06-22
+
+  - Add array->nsect, array->ssect
+
+  - Optimize hash->set
+
+2.010002 2014-04-16
+
+  - Fix array->sliced to avoid backfilling undefs if requesting position(s)
+    past the end of the array
+
+  - Fix array->insert to backfill undefs if inserting to a position past the
+    end of the array
+
+  - Fix array->rotate on an empty array
+
+  - Fix array->delete_when to localize *_ (not $_) for consistency
+
+  - Expand regression tests for empty array behavior
+
+2.010001 2014-03-19
+
+  - Drop List::MoreUtils from required dependencies.
+    
+    List::MoreUtils is used almost everywhere, but is not in core
+    and was a bit abandoned the last few years.
+    
+    It has been adopted upstream, which is wonderful, but the development
+    versions are taking List::MoreUtils in directions I don't understand;
+    rather than the small module providing fast XS implementations of simple
+    and common list operations that I'm used to, this is turning into some
+    sort of behemoth containing confusing "implementation sets" and depending
+    upon half of CPAN.
+
+    Not good, do not want.
+
+    Users with 0.3x versions of List::MoreUtils will still get faster
+    implementations of the following array operations:
+
+      indexes uniq
+      first_index last_index last_where
+      items_after items_after_incl items_before items_before_incl
+
+    Users with 0.4 development versions of List::MoreUtils will fall back to
+    pure-Perl implementations for now.
+
+2.009001 2014-03-05
+
+  - Add hash->iter
+
+  - POD fixes
+
+2.008002 2014-01-12
+
+  - Fix hash->kv_map on 5.8.x/5.10.0
+
+2.008001 2014-01-11
+
+  - Add hash->kv_map
+
+  - Fix autoboxed []->tuples(), []->validated()
+
+2.007001 2013-12-28
+
+  - Add array->rotator(), array->visit()
+
+  - Add hash->maybe_set()
+
+2.006001 2013-12-26
+
+  - Add array->intersection(), array->diff(), hash->diff()
+
+2.005001 2013-12-22
+
+  - Add array->indexes() (from List::MoreUtils)
+
+  - Add array->last_index, array->last_where
+
+  - array->first moved to array->first_where;
+    backwards compatible ->first remains for now, but may be
+    eventually placed in a warn-then-remove deprecation cycle.
+
+  - Add array->first_index (same as ->firstidx);
+    these changes should add some sanity to first/last method naming
+    (first_where, first_index, last_where, last_index)
+
+2.004003 2013-12-19
+
+  - Run non-XS List::UtilsBy tests if Test::Without::Module is available
+
+2.004002 2013-12-17
+
+  - Use List::UtilsBy::XS if available (TOBYINK rt#91461)
+
+2.004001 2013-12-15
+
+  - Add array->rotate(), array->rotate_in_place()
+
+  - Optimize hash->new()
+
+2.003001 2013-12-14
+
+  - Add hash->intersection()
+
+  - Minor optimizations
+
+  - Fix unnecessary List::Objects::Types dep in some tests
+
+2.002005 2013-12-13
+
+  - Fix single-arg array->splice()
+
+2.002004 2013-12-06
+
+  - Minor low-level behavior changes;
+    bring Role::Hash in line with Role::Array blessed_or_pkg & ->copy
+
+  - Test coverage improvements
+
+2.002003 2013-12-06
+
+  - Bad import args now die rather than warn
+
+  - Optimize methods returning arrays
+
+  - hash->new() matches array->new() behavior
+
+  - Test coverage improvements
+
+2.002002 2013-11-22
+
+  - Drop Hash::Util in favor of tied immutable hashes;
+    these now work just like immutable array types
+    (and no longer throw an exception on unknown key fetches)
+
+2.002001 2013-10-27
+
+  - Add ->is_mutable / ->is_immutable methods
+
+  - Add array->kv()
+
+  - Add array->elements()
+    (This is the same as '->all', but it's natural for people coming from
+    Moose and similar to the perl6 'elems' method.)
+
+2.001001 2013-10-03
+
+  - Import all constructor functions by default
+    (via 'use List::Objects::WithUtils')
+
+  - Add 'immhash' immutable hashes
+
+  - Add 'immarray_of' and 'immhash_of' immutable type-checking lists
+
+  - New array methods: delete_when(), end(), inflate()
+
+  - hash()->clear returns the hash object
+
+  - Immutable array behavior should now work consistently across any
+    perl version; no longer mucking about with Internals::SvREADONLY
+
+  - Immutable & type-checking behavior moved to roles
+
+  - Role::WithJunctions moved to Role::Array::WithJunctions
+
+  - t/ reorganized to be slightly more managable
+
+1.012001 2013-09-16
+
+  - Add hash->kv_sort()
+
+1.011001 2013-09-08
+
+  - Depend on newer Type::Tie (we need SPLICE)
+
+1.011000 2013-09-05
+
+  - Add 'hash_of' (List::Objects::WithUtils::Hash::Typed)
+     (Toby Inkster - github PR #3)
+    These hashes perform type-checking on their values via Type::Tie.
+
+  - List::Objects::WithUtils/Lowu now accept ':functions' import tag
+    (':all' without autobox)
+
+  - Array::Type now uses a Type::Tie tied array
+     (Toby Inkster - github PR #2)
+    This is faster (no more overload or method overrides), and allows for
+    'push @$typedarr, $foo' with type coercion/checking.
+
+1.010002 2013-09-04
+
+  - Fix array->tuples() to skip adding unnecessary undefs
+
+  - Fix immarray->tuples()
+
+1.010001 2013-09-01
+
+  - Fix array_of() assertions on non-coercible types
+
+1.010000 2013-09-01
+
+  - Add 'array_of' (List::Objects::WithUtils::Array::Typed)
+    These array-type objects perform Type::Tiny-compatible type-checking
+    against their elements (when constructed and when elements are added).
+
+  - Add array()->tuples (with Type::Tiny support)
+
+  - Add array()->validated($type)
+
+1.009005 2013-09-01
+
+  - Add array()->mapval (borrowed from Data::Munge)
+
+  - Drop minimum Perl prereq to perl-5.6
+
+1.009004 2013-08-23
+
+  - Pass tests on 5.19.3
+
+  - carp() on unknown import tags
+
+1.009003 2013-08-10
+
+  - Fix ->flatten(_all) on 5.8
+
+1.009002 2013-08-09
+
+  - No code changes.
+    Fix 'Changes' to match CPAN::Changes::Spec,
+    courtesy of Sergey Romanov ->
+    https://github.com/avenj/list-objects-withutils/pull/1
+
+1.009001 2013-08-09
+
+  - Fix ->flatten(_all) behavior regarding ARRAY-type objects;
+    consumers of List::Objects::WithUtils::Role::Array are flattened,
+    other ARRAY-type objects should be left alone.`
+
+1.009000 2013-08-02
+
+  - Add array()->random
+
+  - POD fixes
+
+1.008000 2013-07-06
+
+  - Add array()->flatten($depth)
+
+1.007000 2013-06-30
+
+  - Backwards incompatible change; the return value of hash->set() is now the
+    object, in order to be consistent with array->set()
+
+  - Fix hash->get(@keys) return value
+
+  - Add array()->flatten_all
+
+  - Reorganize Role::Array POD
+
+1.006001 2013-06-22
+
+  - Fix ->inflate() on autoboxed hashes; add test for same.
+
+1.006000 2013-06-22
+
+  - Add hash->inflate() to simplify creating little struct-like objects out of
+    hashes.
+
+  - Add a ->TO_JSON method to array and hash objects.  (Serializing these
+    objects to JSON is a pretty common use case for me.)
+
+1.005000 2013-06-21
+
+  - Turn junctions into List::Objects::WithUtils::Array subclasses,
+    allowing easier junction manipulation.
+
+  - Minor ->sort() optimization.
+
+1.004000 2013-06-19
+
+  - Implement streamlined junctions.
+    This removes Sub::Exporter from the dependency chain;
+    additionally, we do not need the extra methods - and probably do not
+    want the smart-match support - provided by Perl6::Junction and
+    Syntax::Keyword::Junction.
+
+1.003001 2013-06-16
+
+  - Missing dep on 'parent'
+
+1.003000 2013-06-16
+
+  - Add 'use Lowu;' shortcut to import all available functionality.
+
+  - Add autoboxing support via List::Objects::WithUtils::Autobox and
+    make autoboxing available via "use List::Objects::WithUtils 'autobox'"
+    (as well as the 'use Lowu;' shortcut)
+
+  - More flexible import() in List::Objects::WithUtils; allows for exporting
+    selected functionality to designated target packages.
+
+  - Added 'all'/':all' import tags to List::Objects::WithUtils;
+    bare import list still just enables array/immarray/hash,
+    'all' adds autoboxing.
+
+  - Add array()->export to line up with hash()->export.
+
+  - POD improvements.
+
+1.002002 2013-06-15
+
+  - Fix CarpLevel for unimplemented immutable array object methods
+
+1.002001 2013-06-03
+
+  - Simplify read-only array constructor
+
+  - Cleanups / test tweaks
+
+1.002000 2013-06-03
+
+  - Add immarray() immutable array objects
+
+  - Add hash->copy() to match array->copy()
+
+  - Add array->head(), array->tail() methods
+
+  - POD, test fixups
+
+1.001001 2013-06-02
+
+  - Sanity check ->mesh() arguments.
+
+  - Other minor cleanups.
+
+1.001000 2013-06-02
+
+  - Add array->part()
+
+1.000003 2013-06-02
+
+  - Add array->mesh()
+
+1.000002 2013-05-19
+
+  - Documentation tweaks.
+
+1.000001 2013-05-10
+
+  - Minor documentation fix
+    (->natatime's iterator returns a list, not an ARRAY)
+
+1.000000 2013-05-05
+
+  - Documentation shuffle.
+
+  - No functional changes.
+
+0.003000 2013-03-16
+
+  - Add hash->sliced()
+
+0.002004 2013-03-14
+
+  - Documentation fixes.
+
+0.002003 2013-03-10
+
+  - Fix missing POD for array->natatime with coderef callback.
+
+0.002002 2013-03-10
+
+  - POD cleanups, some small fixes.
+
+  - New release tests and rectify missing test for array->join
+
+0.002001 2013-03-10
+
+  - Missing dependency in dist.ini
+
+0.002000 2013-03-10
+
+  - Add Junctions via Role::WithJunctions
+    ( array->any_items / array->all_items )
+
+0.001001 2013-03-10
+
+  - Initial release

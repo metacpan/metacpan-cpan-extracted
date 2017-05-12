@@ -1,0 +1,158 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Create and highlight excerpts.
+ *
+ * The Highlighter can be used to select relevant snippets from a document,
+ * and to surround search terms with highlighting tags.  It handles both stems
+ * and phrases correctly and efficiently, using special-purpose data generated
+ * at index-time.
+*/
+public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
+
+    Searcher   *searcher;
+    Query      *query;
+    String     *field;
+    uint32_t    excerpt_length;
+    uint32_t    slop;
+    String     *pre_tag;
+    String     *post_tag;
+    Compiler   *compiler;
+
+    /** Create a new Highlighter.
+     *
+     * @param searcher An object which inherits from
+     * [](cfish:Searcher), such as an
+     * [](cfish:IndexSearcher).
+     * @param query Query object or a query string.
+     * @param field The name of the field from which to draw the excerpt.  The
+     * field must marked as be `highlightable` (see
+     * [](cfish:FieldType)).
+     * @param excerpt_length Maximum length of the excerpt, in characters.
+     */
+    public inert incremented Highlighter*
+    new(Searcher *searcher, Obj *query, String *field,
+        uint32_t excerpt_length = 200);
+
+    /** Initialize a Highlighter.
+     *
+     * @param searcher An object which inherits from
+     * [](cfish:Searcher), such as an
+     * [](cfish:IndexSearcher).
+     * @param query Query object or a query string.
+     * @param field The name of the field from which to draw the excerpt.  The
+     * field must marked as be `highlightable` (see
+     * [](cfish:FieldType)).
+     * @param excerpt_length Maximum length of the excerpt, in characters.
+     */
+    public inert Highlighter*
+    init(Highlighter *self, Searcher *searcher, Obj *query,
+         String *field, uint32_t excerpt_length = 200);
+
+    /** Take a HitDoc object and return a highlighted excerpt as a string if
+     * the HitDoc has a value for the specified `field`.
+     */
+    public incremented String*
+    Create_Excerpt(Highlighter *self, HitDoc *hit_doc);
+
+    /** Encode text with HTML entities. This method is called internally by
+     * [](cfish:.Create_Excerpt) for each text fragment when assembling an excerpt.  A
+     * subclass can override this if the text should be encoded differently or
+     * not at all.
+     */
+    public incremented String*
+    Encode(Highlighter *self, String *text);
+
+    /** Highlight a small section of text.  By default, prepends pre-tag and
+     * appends post-tag.  This method is called internally by [](cfish:.Create_Excerpt)
+     * when assembling an excerpt.
+     */
+    public incremented String*
+    Highlight(Highlighter *self, String *text);
+
+    /** Setter.  The default value is "\<strong>".
+     */
+    public void
+    Set_Pre_Tag(Highlighter *self, String *pre_tag);
+
+    /** Setter.  The default value is "\</strong>".
+     */
+    public void
+    Set_Post_Tag(Highlighter *self, String *post_tag);
+
+    /** Accessor.
+     */
+    public String*
+    Get_Pre_Tag(Highlighter *self);
+
+    /** Accessor.
+     */
+    public String*
+    Get_Post_Tag(Highlighter *self);
+
+    /** Accessor.
+     */
+    public String*
+    Get_Field(Highlighter *self);
+
+    /** Accessor.
+     */
+    public uint32_t
+    Get_Excerpt_Length(Highlighter *self);
+
+    /** Accessor.
+     */
+    public Searcher*
+    Get_Searcher(Highlighter *self);
+
+    /** Accessor.
+     */
+    public Query*
+    Get_Query(Highlighter *self);
+
+    /** Accessor for the Lucy::Search::Compiler object derived from
+     * `query` and `searcher`.
+     */
+    public Compiler*
+    Get_Compiler(Highlighter *self);
+
+    /** Decide based on heat map the best fragment of field to concentrate on.
+     * Take the fragment and determine the best edges for it based on
+     * sentence boundaries when possible.  Add ellipses when boundaries cannot
+     * be found.
+     *
+     * (Helper function for Create_Excerpt only exposed for testing purposes.)
+     */
+    String*
+    Raw_Excerpt(Highlighter *self, String *field_value, int32_t *top,
+                HeatMap *heat_map);
+
+    /** Take the text in raw_excerpt, add highlight tags, encode, and place
+     * the result into `highlighted`.
+     *
+     * (Helper function for Create_Excerpt only exposed for testing purposes.)
+     */
+    String*
+    Highlight_Excerpt(Highlighter *self, Vector *spans, String *raw_excerpt,
+                      int32_t top);
+
+    public void
+    Destroy(Highlighter *self);
+}
+
+

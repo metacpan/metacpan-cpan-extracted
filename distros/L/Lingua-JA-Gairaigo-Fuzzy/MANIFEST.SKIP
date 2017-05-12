@@ -1,0 +1,14 @@
+build\.pl
+blib/.*
+.gitignore
+.git/.*
+Makefile$
+pm_to_blib
+MYMETA..*
+.*\.bak
+^Lingua-JA-Gairaigo-[0-9.]/$
+^Lingua-JA-Gairaigo-[0-9.]\.tar\.gz$
+^xt/.*\.t$
+^lib/Lingua/JA/Gairaigo/Fuzzy\.pod\.tmpl$
+^make-pod\.pl$
+^examples/.*-out\.txt$

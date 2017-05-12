@@ -1,0 +1,7 @@
+Changelog
+Makefile.PL
+MANIFEST
+README
+t/LWP-Protocol-http-SocksChain.t
+SocksChain.pm
+META.yml                                 Module meta-data (added by MakeMaker)

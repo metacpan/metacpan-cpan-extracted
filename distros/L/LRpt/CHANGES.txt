@@ -1,0 +1,144 @@
+****************************************************************
+The LReport module is Copyright (c) 2004-2006 Piotr Kaluski. Poland. 
+All rights reserved.
+You may distribute under the terms of either the GNU General Public License 
+or the Artistic License, as specified in the Perl README file.
+****************************************************************
+
+Stable_0.0.1
+
+This is the very first release of LReport library.
+
+It is marked stable since it passes my unit tests. However, there are many,
+many things to be done to make the software usable for people not familiar
+with the code (i.e. everyone except me).
+To mention the most important todos (as of 03.09.2004):
+* No CPAN, no PPM package
+* No end user documentation
+* No use in production environment.
+* Probably works only on Windows
+
+But I am working on it. Please check lreport.sourceforge.net or 
+www.piotrkaluski.com web sites from time to time to check what's going on.
+
+If despite this obstacles, you really want to try this software here are
+some hints:
+* After ungziping and untaring you can go to lib subdirectory and run test.pl.
+  All tests (3) should pass
+* It does use some perl modules, which are not a part of standard perl 
+  installation. But all of them are available in ppm format. One warning,
+  based on my personal experience: Active State's repository not always
+  contains the most up to date modules. XML::Simple provided with perl 5.6.0
+  does not work for well with Test::Harness which is used by test suite. Take
+  the most recent one from CPAN.
+  As for other packages - just run the test and see what does perl complain
+  about. Then download the missing modules.
+* It is not installing itself in standard place for perl packages. Therefore,
+  in order to use LReport's classes in you scripts, you have to use "use lib"
+  pragma to specify the location of LReport code. 
+
+
+Stable_0.2
+
+* Some cleanup
+* Moved packages names to LRpt namespace so they do not polute the main 
+  namespace.
+
+Stable_0.3
+
+* Added test case for logging during comparing with expectations.
+* Fixed bugs related to comparing expected with actual output files
+
+
+Stable_0.4
+
+* The core functionality is finaly implemented. It is tested (although not 
+too thoroughly). I believe it has everything to handle most of real life 
+cases.
+
+Stable_0.5
+
+* DiffRpt operates on 2 Report objects instead of on one Report object
+  and a bunch of selects.
+
+Stable_0.6
+
+* Fixed some moderate problems:
+    * Tables with not equal expected rows do not have right border.
+    * Report object can't be created using report definition file and a 
+key structure (not file)
+
+Stable_0.7
+
+* Using RTF::Writer for creation of RTF documents
+* Made the module CPAN and ppm compatible.
+
+Stable_0.8
+
+* Not using xml files for defining "where" keys.
+
+
+Stable_0.9
+
+* Columns in reported unmatched rows are listed in the order of columns in the
+  database.
+
+Stable_0.11
+
+* Fixed bug "[1105088] Columns sorting does not work for unkeyed rows".
+* Improved columns coloring and underlining in reporting differences
+  between actual data and expectations:
+   * When reporting "not equal" rows, whenever possible, column coloring
+     is retained.
+   * When reporting unmatched rows columns are printed in the order
+     in which they are in the database. Secondly columns coloring is retained
+     (taken from the report layout definition file). Thirdly, when reporting
+     unmatched rows, LReport is looking for the closest match. Fields, which 
+     make expectations not match to the closest match, are bolded, italics
+     and doubly underlined.
+
+
+Stable_0.12
+
+* Got rid of Config and DBSource modules. They are almost not used. 
+  Secondly, they are better respective modules available, which do the same.
+* Started working on POD documentation of pm files.
+
+Stable_0.13
+
+* All modules have PODs so the ppm package contains documentation. It
+  is far from being clear, though :-(
+
+
+Stable_0.14
+
+* MAJOR MODULE's REDESIGN:
+   * LReport operates mainly on csv files
+   * Fine print reporting removed from perl code and moved to xslt scripts
+* Better documentation is in place. 
+
+Stable_0.15
+
+* MAJOR MODULE's REDESIGN continued:
+   * LReport operates only on csv files
+   * Chunking implemented
+   * lcsvdump.pl and lks.pl are now good citizens and they input from
+     standard input or from files given in command line (like diamond
+     operator)
+
+Stable_0.16
+
+* TUNNING:
+   * Done some refactoring in order to improve performance. There is still some
+     space for improvement. Collection::build_one_key should be better
+     tuned, rows should be stored in lists rather then in hashes
+* Command line switches and environment variables
+   * Handling of the most important command line switches and environment
+     variables is implemented.
+   * Still some minor configurability to be done
+* BUG fixes
+   * 1544069 - Change sign make diff output look cluttered - --#> used now.   
+* Features
+   * 1544070 - Diff should not pick unecessary files - only files with
+               proper extension are used
+* Note: Documentation needs some refinements to reflect changes

@@ -1,0 +1,68 @@
+Revision history for Perl extension Lingua::PT::PLN.
+
+0.22  Thu Feb 11, 2016
+	    - Skip failing tests
+
+0.21  Wed Jun 27, 2012
+        - Properly encode POD;
+
+0.20  Tue Aug 23, 2011
+        - Skip some tests if locale doesn't know about accented chars
+
+0.19  Sat Aug 20, 2011
+        - Require Text::RewriteRules
+
+0.18  Fri Aug 19, 2011
+        - add Abstract to META
+        - occurrences script now handles utf8 encoding.
+        - fixed occurrences script POD.
+
+0.17  Mon Nov 10, 2008
+        - occurrences now can read from stdin.
+        - Added basic POD for occurrences.
+
+0.16  Mon Jul 3, 2008
+	- module tokeniser removed; 
+        - small improvement in Syllable
+	- Improvements in function Wordaccent
+
+0.15  Mon Jul 1, 2008
+        - Some more minor bugs fixed in function Syllable
+
+0.14  Mon Jul 1, 2008
+	- Minor bugs fixed in function Syllable
+
+0.13  Mon Jun 30, 2008
+	- Bug fixed in function Syllable and accent
+
+0.12  Tue Nov 21, 2006
+	- removed sentences and tokenization functions to Lingua::PT::PLNbase
+	- Added Lingua::PT::PLNbase functions as export functions (yuck)
+
+0.11  Wed Jun 22, 2005
+	- Added a quick script to cound occurrences. Need more work
+	- Added 'ignorexml' to ocurrence counter;
+
+0.10  Mon Oct 4, 2004
+	- Export a missing function
+
+0.09  Mon Oct 4, 2004
+	- Skip tests using locale. Corrected test file.
+
+0.08  Fri Oct 1, 2004
+	- Skip tests using locale if there is not defined a good one.
+
+0.07  Thu Sep 30, 2004
+	- Added tests for the tokenizer function
+
+0.06  Wed Aug 6, 2003
+	- skip tests if not in a good locale;
+
+0.05.1 Wed Jul 30, 2003
+	- use strict;
+	- better documentation (but still incomplete)
+
+0.01  Fri Mar 30, 2001
+	- original version; created by h2xs 1.20 with options
+		-AXcn Lingua::PT::PLN
+

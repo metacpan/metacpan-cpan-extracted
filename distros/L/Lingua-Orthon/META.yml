@@ -1,0 +1,28 @@
+---
+abstract: 'Various measures of orthographic relatedness between two letter strings'
+author:
+  - 'Roderick Garton <rgarton@cpan.org>'
+build_requires:
+  List::AllUtils: 0.03
+  Math::MatrixReal: 2.09
+  String::LCSS_XS: 1.2
+  String::Similarity: 1.04
+  Test::More: 0.98
+  Text::Abbrev: 1.01
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3624'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-Orthon
+provides:
+  Lingua::Orthon:
+    file: lib/Lingua/Orthon.pm
+    version: 0.02
+requires:
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

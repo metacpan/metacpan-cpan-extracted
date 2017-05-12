@@ -1,0 +1,30 @@
+---
+abstract: 'Object for logging to screen.'
+author:
+  - 'Daisuke Komatsu <vkg.taro@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  IO::Scalar: 0
+  Log::Dispatch: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.87'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Dispatch-Colorful
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Filter::Util::Call: 0
+  Log::Dispatch::Output: 0
+  Params::Validate: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

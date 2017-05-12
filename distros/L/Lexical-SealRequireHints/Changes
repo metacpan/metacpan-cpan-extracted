@@ -1,0 +1,188 @@
+version 0.010; 2016-03-18
+
+  * skip test with lexical $_ on Perl 5.23.4+ where that feature has
+    been removed
+
+version 0.009; 2015-03-20
+
+  * in test of require for version checking, work around [perl #124135]
+    which was introduced in Perl 5.21.4
+
+version 0.008; 2015-03-20
+
+  * bugfix: don't localise hints around a version-number require, so that
+    "use v5.10.0" can have its intentional effect of setting feature flags
+
+  * bugfix: in pure Perl implementation, use a ($) prototype on
+    CORE::GLOBAL::require, so that the argument expression will be in
+    the correct context
+
+  * better error message for refusing to use pure Perl implementation
+    on Perl 5.9.4 to 5.10.0
+
+  * document that the pure Perl implementation breaks the use of the
+    implicit $_ parameter with require
+
+  * in swash test, don't fail if utf8.pm was loaded unexpectedly early,
+    as has been seen to happen on some systems
+
+  * test idempotence
+
+  * fix test for thread safety, which risked false negatives
+
+  * when preemptively loading Carp and Carp::Heavy, avoid the Perl core
+    bug regarding the context applied to file scope of required modules,
+    in case of future versions of those modules becoming vulnerable and
+    running on an old Perl
+
+  * declare correct version for Test::More dependency
+
+  * typo fix in documentation
+
+  * typo fix in a comment
+
+version 0.007; 2012-02-11
+
+  * be thread-safe, by mutex control on op check hooking
+
+  * in pure Perl implementation, avoid putting extra eval stack frames
+    around the require, to avoid unnecessary complication of exception
+    handling; this can't be done on Perls 5.9.4 to 5.10.0, so don't
+    allow use of the pure Perl implementation on those Perls
+
+  * revise documentation to suggest loading this module earlier
+
+  * document the relevant changes to the Perl core in more detail
+
+  * on Perl versions where the pure Perl implementation can't work,
+    dynamically declare requirement for XS infrastructure in Build.PL
+
+  * refine threshold for ability to correctly override require from
+    5.8.0 to 5.7.2
+
+  * revise minimum required Perl version down from 5.6.1 to 5.6.0
+
+  * test that modules see the correct context at file scope
+
+  * test that module return values are handled correctly
+
+  * test that the module doesn't generate warnings
+
+  * in pure Perl implementation, fix handling of the variable that
+    previously needed to be "our"
+
+  * rearrange and better comment the treatment of lexical warnings in
+    the Perl code
+
+version 0.006; 2011-11-20
+
+  * bugfix: avoid loading warnings.pm and leaving its delayed requires
+    of Carp.pm susceptible to hint leakage, which was causing trouble
+    on some Perls
+
+  * skip swash test on Perl 5.6, where swash loading appears to be broken
+    by loading Test::More or anything else useful
+
+  * remove bogus tests that cause false failures on Perl 5.15.5
+
+  * in Build.PL, declare incompatibility with pre-0.19
+    B::Hooks::OP::Check, which doesn't play nicely around op check hooking
+
+  * comment why a variable surprisingly needs to be "our"
+
+  * convert .cvsignore to .gitignore
+
+version 0.005; 2011-07-25
+
+  * bugfix: work around core bug [perl #73174] affecting Unicode swash
+    loading, and apply entire workaround arrangement to 5.11.{0..5}
+    where [perl #73174] exists but [perl #68590] does not
+
+  * correct dynamic_config setting to 0
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.004; 2010-11-21
+
+  * bugfix: don't attempt to use XS version of the workaround on Win32,
+    where it can't work properly due to linker restriction on access to
+    core symbols
+
+  * only define PERL_CORE for compilation on Perl versions where the
+    bug workaround (and thus interference with core-private stuff)
+    is actually necessary
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * in XS, provide a reserve definition of croak, so that the Perl_croak
+    circumlocution is avoided even with PERL_CORE defined
+
+  * in XS, give symbolic names to the Perl version thresholds
+
+  * jump through hoops to avoid compiler warnings
+
+  * use full stricture in test suite
+
+  * also test POD coverage of pure Perl implementation
+
+  * in t/setup_pp.pl, avoid a warning that occurs if XSLoader::load()
+    is given no arguments, which is now a valid usage
+
+  * in Build.PL, explicitly set needs_compiler to avoid bogus
+    auto-dependency on ExtUtils::CBuilder
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+version 0.003; 2010-04-10
+
+  * bugfix: in pure-Perl implementation, make sure ambient package (from
+    which require is invoked) is passed on correctly to the code in the
+    required file, on those Perls where it is so inherited
+
+  * in XS, use macros to avoid explicit passing of aTHX, in the manner
+    of the core
+
+  * in XS, avoid using "class" as a variable name, for compatibility
+    with C++ compilers
+
+  * make all numeric comparisons against $] stringify it first, to avoid
+    architecture-dependent problems with floating point rounding giving
+    it an unexpected numeric value
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.002; 2009-10-21
+
+  * generate a more normal-looking op tree, that doesn't crash B::Deparse
+
+  * don't apply the workaround on Perl 5.11.0 or later, where the bug
+    has been fixed
+
+  * in t/seal.t, test that cop_hints_hash is properly handled
+
+  * check for required Perl version at runtime
+
+version 0.001; 2009-09-26
+
+  * bugfix: die cleanly if the pure-Perl implementation is needed but
+    won't work (which occurs on pre-5.8 perls)
+
+  * bugfix: avoid undesired warning from pure-Perl implementation if
+    require has already been overridden via CORE::GLOBAL::require
+
+  * in tests, set HINT_LOCALIZE_HH where appropriate, to avoid false
+    test failures on pre-5.10 perls
+
+  * test that the module plays nicely with code that overrides require
+    via CORE::GLOBAL::require
+
+version 0.000; 2009-09-22
+
+  * initial released version

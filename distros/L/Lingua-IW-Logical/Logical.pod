@@ -1,0 +1,63 @@
+=head1 NAME
+
+Lingua::IW::Logical - module for working with logical and visual hebrew
+
+=head1 SYNOPSIS
+
+use Lingua::IW::Logical;
+
+$visual = log2vis_string($logical)
+
+$vistext = log2vis_text($logtext)
+
+$vistext = log2vis_text($logtext,$linelength)
+
+$vistext = log2vis_text($logtext,$linelength,$start)
+
+$vistext = log2vis_text($logtext,$linelength,$start,$end)
+
+=head1 DESCRIPTION
+
+This module is intended to automate task of converting logical Hebrew to visual Hebrew.
+
+=head2 log2vis_string STRING
+
+This function converts it's argument from logical representaion to visual (renders it like it should be printed).
+
+=head2 log2vis_text STRING,LENGTH,START,END
+
+This function allows to convert blocks of text, using C<log2vis_string>. All arguments except the first are optional. LENGTH defines the maximal length of the resulting line, with default of 80. START defines the text added before each line of the resulting text. If START is undefined, the line is padded so that the text is right-aligned. END defines what is added after each line of 
+text. Default is newline.
+
+Example 1:
+
+	#!/usr/bin/perl
+	use Lingua::IW::Logical;
+
+	while(<>)
+	{
+	  print log2vis_text($_);
+	}
+
+This short program will convert any text in logical Hebrew to readable visual Hebrew.
+
+Example 2:
+
+	#!/usr/bin/perl
+	use Lingua::IW::Logical;
+
+	while(<>)
+	{
+	  print log2vis_text($_,80,"<nobr>","</nobr><br>\n");
+	}
+
+This example show how you can HTML-ize file in logical hebrew, so that you can put it on the web page.
+
+=head1 KNOWN BUGS
+
+Bug reports are welcome.
+There are some unresolved things with constructions like "H-1", where H is hebrew letter. The parser now thinks it's number "-1", while in this context it might as well be dash. Also, it seems that Word likes to write percents as "%12.5". This is also not rendered well. I'm thinking how to resolve these issues. 
+
+=head1 AUTHOR
+
+Stanislav Malyshev (frodo@sharat.co.il)

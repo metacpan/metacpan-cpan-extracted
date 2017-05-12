@@ -1,0 +1,43 @@
+--- #YAML:1.0
+name:               Lexical-Attributes
+version:            2009121601
+abstract:           Proper encapsulation
+author:
+    - Abigail <lexical-attributes@abigail.be>
+license:            mit
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+    strict:               0
+    Test::More:           0.88
+    warnings:             0
+build_requires:
+    ExtUtils::MakeMaker:  0
+    strict:               0
+    Test::More:           0.88
+    warnings:             0
+requires:
+    Filter::Simple:  0.78
+    perl:            5.008001
+    Scalar::Util:    0
+    strict:          0
+    warnings:        0
+resources:
+    repository:  git://github.com/Abigail/lexical--attributes.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+keywords:
+    - Objects
+    - Encapsulation
+    - Attributes
+    - Strict
+test_requires:
+    strict:      0
+    Test::More:  0.88
+    warnings:    0

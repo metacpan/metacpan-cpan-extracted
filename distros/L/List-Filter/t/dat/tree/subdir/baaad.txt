@@ -1,0 +1,5 @@
+Wednesday February 28, 2007  11:36 PM
+This is a test file. 
+The goal is to make sure there's 
+some emacs backup files around and 
+so on.

@@ -1,0 +1,47 @@
+Revision history for Perl extension Lingua::PT::Speaker.
+
+0.12  Wed Jul 11 14:16:17 WEST 2012
+        - require Text::RewriteRules version 0.25
+
+0.11  Wed Jun 27 17:13:13 WEST 2012
+        - support alsa aplay
+
+0.10  Fri Mar 28 20:53:60 2008
+	- fixed some sounds like 'ontem'
+
+0.09  Sat Oct 18 17:11:00 2005
+	- use strict;
+
+0.08  Sat Sep  3 14:50:00 2005
+        - Pos-YAPC::EU::2005 release.
+        - Corrected pt-speak to look to the '-t' option.
+	- Moved from Module::Install to MakeMaker again, as I can't
+          make Module::Install work correctly on my MacOS X.
+	- Detect mbrola executable and, if not found, ask for one.
+
+0.07  Tue Aug 17 15:00:00 2005
+	- Changed to Module::Install instead of MakeMaker, so I can
+	  autobundle Config::AutoConf, needed during configuration.
+
+0.06  Sat Aug 13 13:40:00 2005
+	- Trying to fix CPAN indexation, and add a description to the
+          module.
+
+0.05  Fri Aug 12 19:30:00 2005
+	- Dependency on Config::AutoConf. Now we check automatically
+          for a number of different places where the phonemes library
+          could be, as well for a different number of possible wav
+          players.
+	- Hopefully this module starts to be prepared for CPAN;
+	- Added dependency on Text::RewriteRules instead of using mktextrr
+	- Rearranged directory structure.
+
+0.04  ...
+	- added mktextrr to the distribution as it is required.
+
+ ...
+
+0.01  Wed Apr 18 10:49:36 2001
+	- original version; created by h2xs 1.20 with options
+		-A -X -n pt::speaker
+

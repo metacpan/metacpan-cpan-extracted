@@ -1,0 +1,69 @@
+<Sect1 id="Readline">
+<Title><Literal>Readline</Literal>: Command line editing
+</Title>
+
+<Para>
+<IndexTerm><Primary>Readline library (misc syslib)</Primary></IndexTerm>
+<IndexTerm><Primary>command-line editing library</Primary></IndexTerm>
+</Para>
+
+<Para>
+(Darren Moffat supplied the initial version of the <Literal>Readline</Literal> module.)
+</Para>
+
+<Para>
+The <Literal>Readline</Literal> module is a straightforward interface to the GNU
+Readline library.  As such, you will need to look at the GNU
+documentation (and have a <Filename>libreadline.a</Filename> file around somewhere&hellip;)
+</Para>
+
+<Para>
+The main function you'll use is:
+
+<ProgramListing>
+readline :: String{-the prompt-} -&#62; IO (Maybe String)
+</ProgramListing>
+
+</Para>
+
+<Para>
+If you want to mess around with Full Readline G(l)ory, we also
+provide:
+
+<ProgramListing>
+type KeyCode = Char
+
+type CallbackFunction = 
+    (Int -&#62;     -- Numeric Argument
+     KeyCode -&#62; -- KeyCode of pressed Key
+     IO Int)    -- What's this?
+
+initialize      :: IO ()
+addHistory      :: String -&#62; IO ()
+bindKey         :: KeyCode -&#62; CallbackFunction -&#62; IO ()
+addDefun        :: String  -&#62; CallbackFunction -&#62; Maybe KeyCode -&#62; IO ()
+	       
+getReadlineName :: IO String
+setReadlineName :: String -&#62; IO ()
+getLineBuffer   :: IO String
+setLineBuffer   :: String -&#62; IO ()
+getPoint        :: IO Int
+setPoint        :: Int -&#62; IO ()
+getEnd          :: IO Int
+setEnd          :: Int -&#62; IO ()
+getMark         :: IO Int
+setMark         :: Int -&#62; IO ()
+setDone         :: Bool -&#62; IO ()
+setPendingInput :: KeyCode -&#62; IO ()
+getPrompt       :: IO String
+getTerminalName :: IO String
+	       
+inStream        :: Handle
+outStream       :: Handle
+</ProgramListing>
+
+(All those names are just Haskellised versions of what you
+will see in the GNU readline documentation.)
+</Para>
+
+</Sect1>

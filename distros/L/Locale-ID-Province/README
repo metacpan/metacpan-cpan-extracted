@@ -1,0 +1,22 @@
+SYNOPSIS
+
+     use Locale::ID::Province qw(list_id_provinces);
+     my $res = list_id_provinces();
+
+DESCRIPTION
+
+    This module provides API access for list of provinces in Indonesia.
+    Data is currently retrieved from the gudang-data-interim repository at
+    https://github.com/sharyanto/gudang-data-interim/tree/master/data/ind_province/
+
+    This module's functions has Rinci specs.
+
+SEE ALSO
+
+    list-id-provinces
+
+    Gudang Data Interim project,
+    https://github.com/sharyanto/gudang-data-interim/
+
+    This API will also be available on GudangAPI, http://gudangapi.com/
+

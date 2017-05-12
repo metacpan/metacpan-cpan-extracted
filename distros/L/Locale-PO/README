@@ -1,0 +1,18 @@
+Locale::PO - Object-oriented interface to gettext po-file entries
+
+    All rights reserved.  This program is free software; you can
+    redistribute it and/or modify it under the same terms as Perl itself.
+
+DESCRIPTION
+    This module provides methods for manipulating objects that represent
+    entries in a gettext po-file (untranslated and translated strings,
+    with associated comments). It can load and save complete po-files.
+
+PREREQUISITES
+    Test::More, File::Slurp
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make test
+    make install

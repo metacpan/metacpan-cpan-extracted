@@ -1,0 +1,174 @@
+\documentclass[10pt]{report}
+
+ % this is a report
+
+\pagestyle{headings}
+\begin{document}
+
+\title{title}
+\author{author}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\flushleft
+
+\begin{abstract}
+
+Fusce lobortis luctus risus, in consequat arcu porttitor quis.
+Curabitur interdum ligula et dolor commodo pulvinar.
+
+\end{abstract}
+
+Etiam vitae dolor augue
+
+\chapter{chapter1 \"a \"A \"u \"U \"o \"O}
+
+\section{section1 \"a \"A \"u \"U \"o \"O}
+
+Lorem ipsum dolor sit amet, \ldots
+
+\begin{enumerate}
+
+\item consectetur adipiscing elit.
+
+\item Morbi lobortis purus non enim
+
+\begin{enumerate}
+
+\item Aliquam
+
+\begin{enumerate}
+
+\item turpis
+
+\end{enumerate}
+
+\end{enumerate}
+
+\item leo
+
+\item[5.] Quisque lobortis
+
+\item [6.] Duis sed lacus lectus,
+
+\end{enumerate}
+
+Cras pharetra dui quis
+
+% this is the end of an enumerated list
+
+fringilla auctor interdum tortor aliquet.
+
+\subsection{subsection1 \"a \"A \"u \"U \"o \"O}
+
+Nunc \textbf{feugiat} condimentum\\
+
+\subsection{subsection2}
+
+% this is a subsection
+
+\begin{itemize}
+
+\item \textsf{urna} nec consectetur.	
+
+\begin{description}
+\end{description}
+
+\end{itemize}
+
+Aliquam arcu augue,\newline
+Aliquam arcu augue,\newline
+
+\subsubsection{subsubsection1}
+
+\begin{description}
+
+\item[dapibus] \# \$ \% \& \_ \{ \} sed
+
+\end{description}
+
+\subsubsection{subsubsection2}
+
+\begin{itemize}
+
+\item vestibulum sed, \"a \"A \"u \"U \"o \"O
+
+\end{itemize}
+
+\begin{itemize}
+
+\item[-] item 1
+
+\end{itemize}
+
+Nam id
+
+\chapter{chapter2}
+
+\section{section2}
+
+sodales  
+sodales  
+
+\begin{verbatim}
+
+ eget   
+  enim. 
+\end{verbatim}
+
+Duis arcu sapien
+
+\subsection{subsection1}
+
+\verb+Proin+
+\verb*+Proin+
+
+\section{section3}
+
+quis \emph{elit}
+
+\begin{itemize}
+
+\item Quisque vulputate
+
+Curabitur in neque
+Donec molestie
+\# \$ \% \& \_ \{ \}
+
+\item Etiam ac mauris
+
+\begin{itemize}
+
+\item sem sit amet
+
+\item ligula rutrum vel
+
+\end{itemize}
+
+\item eu bibendum leo
+
+\end{itemize}
+
+\begin{verbatim}
+               .'.        
+ '..cll.    .lxxdxl'      
+ ',:clkx. .;OK0ko;ll;     
+  okoddc.oOo,;l::'.;c;    
+  xoldo'dkl'..':;;:,:;:   
+  lKo,c'lkO,.,,:;,. ;;lo. 
+   :xl,;dxKlc;'odddxKd:;c 
+     .,.kKOoxoc;x0d.xx,;: 
+        d0o 00d l0. ,O;.  
+        ox ;lc. ;c   o:   
+        :: .,' ..    c'   
+        ;    .c,.    ,    
+       ..   .'.',   .l.   
+      ;'.           .,    
+\end{verbatim}
+
+\begin{description}
+\end{description}
+
+\end{document}

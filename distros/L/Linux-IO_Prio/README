@@ -1,0 +1,36 @@
+Linux-IO_Prio version 0.01
+========================
+
+Linux-IO_Prio is a perl module which provides access to the Linux functions
+ioprio_get(2) and ioprio_set(2). There are also ionice functions and which
+provide slightly more convenient perlish interface than the C API.
+
+Currently there is Linux support. Other operating systems are not supported due
+to kernel limitations. However support will be added as the kernel capability
+becomes available.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires only core modules. However it does require a valid
+syscall.ph file which is more dependent on the vendor distribution.
+
+COPYRIGHT AND LICENCE
+
+All rights reserved.
+
+Copyright (C) 2011 by Mark Hindley
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

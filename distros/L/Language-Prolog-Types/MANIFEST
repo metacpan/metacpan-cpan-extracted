@@ -1,0 +1,13 @@
+Changes
+lib/Language/Prolog/Types/Abstract.pm
+lib/Language/Prolog/Types/Converter.pm
+lib/Language/Prolog/Types/Factory.pm
+lib/Language/Prolog/Types/Internal.pm
+lib/Language/Prolog/Types/overload.pm
+lib/Language/Prolog/Types.pm
+Makefile.PL
+MANIFEST
+README
+t/1_run.t
+t/2_pods.t
+META.yml                                 Module meta-data (added by MakeMaker)

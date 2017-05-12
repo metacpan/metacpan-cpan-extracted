@@ -1,0 +1,38 @@
+Linux-Taskstats-Read version 6.01
+=================================
+
+This module reads a taskstats struct and puts it into a lovely hashref
+for you to do whatever you want with it.
+
+  my $ts = new Linux::Taskstats::Read( -file => '/some/taskstats.log', -ver => 4 );
+  my $rec = $ts->read;
+  $ts->close;
+  print "Process name: " . $rec->{ac_comm} . "\n";
+
+For more information about taskstats, see the 'SEE ALSO' section of
+this module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Requires a 64-bit machine architecture for quad ('Q') template support
+in unpack(). You should probably also make sure the 'reader' machine
+has the same endian-ness as the machine producing the dump files.
+
+COPYRIGHT AND LICENCE
+
+Software written by Scott Wiersdorf
+
+Copyright (C) 2007 by Bluehost, Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

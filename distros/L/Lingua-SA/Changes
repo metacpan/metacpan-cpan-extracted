@@ -1,0 +1,29 @@
+Revision history for Perl extension Lingua::SA.
+
+0.01  Fri May 23 22:03:22 2008
+	- original version; created by h2xs 1.22 with options
+		-A -X -n Lingua::SA
+
+0.02  Fri May 23 22:10:22 2008
+	- the start version was 0.02
+
+0.03  Mon May 26 2008
+    - added CB as a consonant for Chandra-Bindu (&#2305;)
+
+0.04  Mon Jun  2 2008
+	- introduced catching of some argument errors in vibhakti
+
+0.06  Tue Jun  3 2008
+	- Adeed a few tests and documentation
+
+0.07  Thu Jun  5 2008
+	- Changed 3351 and 3361 from inaaH to inaH
+	- Added 2355 for L (L as in Marathi)
+
+0.08  Tue Jun 10 2008
+	- fixed 6273 bug u->U (saptamI strI U-kaaraant bahuvachana)
+	- Nouns ending in aa now properly treated as A endings
+	- numeric aliases for vibhakti (1-8), vachana (1-3), linga (1-3) available
+	- prathamaa == prathamA etc. synonyms now available for vibhakti and linga
+	- sambodhan exceptions for ambA, akkA, allA added as special case
+	- when a linga, ending combination not supported, an exception is thrown

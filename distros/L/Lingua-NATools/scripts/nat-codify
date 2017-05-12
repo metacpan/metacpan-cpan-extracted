@@ -1,0 +1,138 @@
+#!/usr/bin/perl -s
+
+# NATools - Package with parallel corpora tools
+# Copyright (C) 2002-2012  Alberto Simões
+#
+# This package is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+
+
+use strict;
+use warnings;
+
+use POSIX qw(locale_h);
+setlocale(LC_CTYPE, "pt_PT");
+use locale;
+
+
+use Lingua::NATools;
+use Lingua::NATools::Lexicon;
+use Lingua::NATools::Config;
+use Cwd;
+
+our ($tmx, $langs, $tokenize, $utf8, $id, $h, $i, $v, $csize);
+
+sub usage {
+  print "nat-codify: codifies a corpus. Normally not used manually.\n\n";
+  print "\tnat-codify [-v] [-utf8] [-id=ID] [-csize=70000] [-tokenize] [-i] [-langs=L1..L2]\n\t\t <sourceCrp> <targetCrp>\n\n";
+  print "\tnat-codify [-v] [-utf8] [-id=ID] [-csize=70000] [-tokenize] [-i] [-langs=L1..L2]\n\t\t -tmx <tmxfile>\n\n";
+  print "For more help, please run 'perldoc nat-codify'\n";
+  exit;
+}
+
+$v||=0;
+
+usage () if ($h);
+
+my @files = @ARGV;
+usage() unless @files;
+
+my @langs = ();
+
+if ($tmx) {
+    $tmx = $files[0];
+    print STDERR "Loading TMX file.\n";
+    @files = Lingua::NATools::tmx2files({utf8 => $utf8, verbose=>$v},$tmx);
+    die "Error loading TMX file\n" unless @files;
+
+    for (@files) {
+        m!\Q$tmx\E-(.+)!;
+        push @langs, $1;
+    }
+    if ($langs && $langs =~ m!([a-z-]+)\.\.([a-z-]+)!i){
+        @langs = ($1,$2) ;
+        @files = ("$tmx-".lc($1),"$tmx-".lc($2));
+    }
+}
+
+### Define file names
+my ($crp1,$crp2) = @files[0..1];
+my $defaultname  = $id || "$crp1-$crp2";
+my $currentdir   = getcwd;
+
+### Check if we have specific languages defined.
+@langs = ($1,$2) if ($langs && $langs =~ m!([a-z-]+)\.\.([a-z-]+)!i);
+
+my $self = Lingua::NATools->init({csize => $csize || undef},
+                                 $currentdir, $defaultname, @langs);
+
+$i = 0 if $utf8;
+$self->{tokenize} = 1 if $tokenize;
+$self->codify({
+               ignore_case => $i,
+               utf8        => $utf8,
+               verbose     => $v
+              },
+              $crp1, $crp2);
+$self->index_invindexes(1);
+
+if ($tmx) {
+    unlink for @files
+}
+
+
+
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-codify - Command line tool to codify corpora
+
+=head1 SYNOPSIS
+
+   nat-codify <file1.nat> <file2.nat>
+
+   nat-codify -tmx <file.tmx>
+
+=head1 DESCRIPTION
+
+The C<-tokenize> flag can be used to force NATools to tokenize the
+texts. Note that at the moment a Portuguese tokenizer is used for all
+languages. This might change in the future.
+
+The C<-id=name> flag can be used to force NATools Corpora name. By default
+the name is read interactively.
+
+The C<-q> flag can be used to force quite mode.
+In thic case, the name is extracted from the file-names.
+
+The C<-lang=PT..EN> flag can be used to force languages.
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1), nat-create
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2002-2012 by Alberto Manuel Brandão Simões
+
+=cut

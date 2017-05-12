@@ -1,0 +1,19 @@
+#########################################################################
+#
+# $Id: selects.txt,v 1.1 2006/01/14 20:01:28 pkaluski Exp $
+# $Name: Stable_0_16 $
+#
+# $Log: selects.txt,v $
+# Revision 1.1  2006/01/14 20:01:28  pkaluski
+# Adjusted test to new design.
+#
+#
+#
+#########################################################################
+
+name: titleauthors
+select: select * from titleauthors where --au_id-- 
+%%
+name: sales
+select: select * from sales where --stor_id--
+%%

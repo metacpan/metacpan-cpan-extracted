@@ -1,0 +1,22 @@
+Revision history for Perl extension Lingua::Bork.
+
+0.03  Wed Feb 19
+        - made 'i' substitution follow first-in-word rule
+        - took out title-case code, letters now match the case they
+          were originally in
+        - leading 'ee' will not be processed, following that in most
+          cases a leading 'ee' had been tranformed from an 'i'
+          online enchefinator follows the same rule
+        - oo style calls now work
+          Bork Bork Bork!
+
+0.02  Tue Feb 18
+        - forgot a semicolon and was testing off wrong version.
+          Bork Bork Bork!
+        - Fixed tarball internal directory to reflect full package.
+          Bork Bork Bork!
+
+0.01  Tue Feb 18 21:19:29 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n Lingua::Bork
+

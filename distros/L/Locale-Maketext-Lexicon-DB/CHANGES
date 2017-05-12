@@ -1,0 +1,56 @@
+==================================================
+Changes from 2013-07-02 00:00:00 +0000 to present.
+==================================================
+
+---------------------------------------------
+version 1.141830 at 2014-07-02 09:28:48 +0000
+---------------------------------------------
+
+  Change: 18ca79b3017caf377fb055f05eeac48cdf7fcec7
+  Author: Pete Smith <pete.smith@net-a-porter.com>
+  Date : 2014-06-30 18:28:16 +0000
+
+    Remove escaping of newlines 
+
+  Change: 485e56d9b6fb8f1378b86a357abe499b5bf08a33
+  Author: Pete Smith <pete.smith@net-a-porter.com>
+  Date : 2014-04-29 19:55:39 +0000
+
+    Fix tests, cache key and change level of logging
+
+    - Skip memached tests if cannot connect - Fix the format of the cache
+    key - Changed logging level to trace across the board 
+
+  Change: 92982ab5195f339a430e18949f68694507ccfa11
+  Author: Pete Smith <pete.smith@net-a-porter.com>
+  Date : 2014-01-20 13:17:33 +0000
+
+    Fix test to not fail if memcached not installed 
+
+  Change: a992581811c72bfe3f682f67974b820bd11be28f
+  Author: Pete Smith <pete.smith@net-a-porter.com>
+  Date : 2014-01-10 17:41:50 +0000
+
+    Fix tests and pod 
+
+  Change: 1744f76db4c91ec82617b75c3c906043096f1174
+  Author: Pete Smith <pete.smith@net-a-porter.com>
+  Date : 2014-01-09 16:29:05 +0000
+
+    Update pod 
+
+  Change: 24c62cda125fb4b47ed37f21ee9080f4d59aae5a
+  Author: Pete Smith <pete.smith@net-a-porter.com>
+  Date : 2014-01-09 11:20:38 +0000
+
+    Update test and pod 
+
+  Change: 93648e74dbf53ae9df1520018d4d5865f4df4383
+  Author: Pete Smith <pete.smith@net-a-porter.com>
+  Date : 2014-01-08 16:08:07 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,522 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on February, 3  2002 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Using LinkController: Invoking the Programs</TITLE>
+
+<META NAME="description" CONTENT="Using LinkController: Invoking the Programs">
+<META NAME="keywords" CONTENT="Using LinkController: Invoking the Programs">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC42"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_13.html#SEC41"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC43"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_13.html#SEC36"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_15.html#SEC49"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1> F. Invoking the LinkController Programs </H1>
+<!--docid::SEC42::-->
+<P>
+
+Because they use the Perl <CODE>Getopt::Mixed</CODE> module, all of the
+LinkController command line programs respond to the standard POSIX style
+command line options.  At least the following two options will be implemented. 
+</P><P>
+
+<DL COMPACT>
+<DT><SAMP>`--help'</SAMP>
+<DD>This option will give a list of all of the options understood by the
+program along with brief explanations of what they do.  
+<DT><SAMP>`--version'</SAMP>
+<DD>This option will give some version information for the program.
+</DL>
+<P>
+
+You can use the <SAMP>`--help'</SAMP> option to get help on each program, for
+example:
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>extract-links --help
+</pre></td></tr></table></P><P>
+
+You can then use that information to get the program to do what you
+want.
+</P><P>
+
+<BLOCKQUOTE><TABLE BORDER=0 CELLSPACING=0> 
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC43">F.1 Invoking link-report</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">link-report usage summary</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC44">F.2 Invoking test-link</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">test-link usage summary</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC45">F.3 Invoking extract-links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">extract-links usage summary</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC46">F.4 Invoking fix-link</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">fix-link usage summary</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC47">F.5 Invoking check-page</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">check-page usage summary</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC48">F.6 Invoking build-schedule</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">build-schedule usage summary</TD></TR>
+</TABLE></BLOCKQUOTE>
+<P>
+
+<A NAME="Invoking link-report"></A>
+<HR SIZE="6">
+<A NAME="SEC43"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC44"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_15.html#SEC49"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> F.1 Invoking link-report </H2>
+<!--docid::SEC43::-->
+<P>
+
+The <SAMP>`link-report'</SAMP> program prints out status information about links
+allowing the user to see what needs to be fixed.  The default is to
+print out all of the broken and redirected links that currently occur on
+the users web pages and which are either redirected or broken.  
+</P><P>
+
+Before running <SAMP>`link-report'</SAMP> you should probably use
+<CODE>test-link</CODE> (see section <A HREF="link-controller_14.html#SEC44">F.2 Invoking test-link</A>) to check which links
+are broken.  That may not be needed if your system administrator does it
+for you.  After you have identified broken links you may want to use
+<CODE>fix-link</CODE> (see section <A HREF="link-controller_14.html#SEC46">F.4 Invoking fix-link</A>) to repair the broken
+links.
+</P><P>
+
+The primary configuration file used by <CODE>link-report</CODE> is the
+<SAMP>`.link-control.pl'</SAMP> file.  This tells it where the schedule file and
+LinkController database are. See section <A HREF="link-controller_3.html#SEC5">2.2 Setting Configuration Variables</A>, for
+how to control the contents of this file.
+</P><P>
+
+In the case of the <SAMP>`--long-list'</SAMP> report, a second configuration
+file, the <SAMP>`infostrucs'</SAMP> file, is used.  This contains the
+information needed to know where to extract links from by default.
+See section <A HREF="link-controller_3.html#SEC7">2.4 Configuring Infostructures</A>, for more details on configuring
+this.
+</P><P>
+
+<STRONG>FIXME</STRONG> this section should give a better description of each option.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>link-report [options]
+
+ -V --version            Give version information for this program
+ -h --help --usage       Describe usage of this program.
+    --help-opt=OPTION    Give help information for a given option
+ -v --verbose[=VERBOSITY] Give information about what the program is 
+                         doing.  Set value to control what information
+                         is given.
+
+ -U --uri=URIs           Give URIs which are to be reported on.
+ -f --uri-file=FILENAME  Read all URIs in a file (one URI per line).
+ -E --uri-exclude=EXCLUDE RE Add a regular expressions for URIs to 
+                         ignore.
+ -I --uri-include=INCLUDE RE Give regular expression for URIs to check
+                         (if this option is given others aren't 
+                         checked).
+ -e --page-exclude=EXCLUDE RE Add a regular expressions for pages to 
+                         ignore.
+ -i --page-include=INCLUDE RE Give regular expression for URIs to check
+                         (if this option is given others aren't 
+                         checked).
+
+ -a --all-links          Report information about every URI.
+ -b --broken             Report links which are considered broken.
+ -n --not-perfect        Report any URI which wasn't okay at last test.
+ -r --redirected         Report links which are redirected.
+ -o --okay               Report links which have been tested okay.
+ -d --disallowed         Report links for which testing isn't allowed.
+ -u --unsupported        Report links which we don't know how to test.
+ -m --ignore-missing     Don't complain about links which aren't in the
+                         database.
+ -g --good               Report links which are probably worth listing.
+
+ -N --no-pages           Report without page list.
+    --config-file=FILENAME Load in an additional configuration file
+    --link-index=FILENAME Use the given file as the index of which file
+                         has what link.
+    --link-database=FILENAME Use the given file as the dbm containing 
+                         links.
+
+ -l --long-list          Where possible, identify the file and long 
+                         list it (implies infostructure).  This is used
+                         for emacs link-report-dired.
+ -R --uri-report         Print URIs on separate lines for each link.
+ -H --html               Report status of links in html format.
+</pre></td></tr></table></P><P>
+
+<A NAME="Invoking test-link"></A>
+<HR SIZE="6">
+<A NAME="SEC44"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC43"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC45"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_15.html#SEC49"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> F.2 Invoking test-link </H2>
+<!--docid::SEC44::-->
+<P>
+
+The <CODE>test-link</CODE> program tests all of the links in the
+LinkController database storing information about any problems found.
+It works as a robot contacting the servers where the target of each link
+is stored and verifying that the resource the link points to is really there.
+</P><P>
+
+Before running <CODE>test-link</CODE> you should probably use
+<CODE>extract-links</CODE> (see section <A HREF="link-controller_14.html#SEC45">F.3 Invoking extract-links</A>) to collect all of
+the links you want to test and then <CODE>build-schedule</CODE>
+(see section <A HREF="link-controller_14.html#SEC48">F.6 Invoking build-schedule</A>).
+</P><P>
+
+The configuration file used by <CODE>test-link</CODE> is the
+<SAMP>`.link-control.pl'</SAMP> file.  This tells it where the schedule file and
+LinkController database are. See section <A HREF="link-controller_3.html#SEC5">2.2 Setting Configuration Variables</A>, for
+how to control the contents of this file.
+</P><P>
+
+<STRONG>FIXME</STRONG> this section should give a better description of each option.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>test-link [arguments]
+
+ -V --version            Give version information for this program
+ -h --help --usage       Describe usage of this program.
+    --help-opt=OPTION    Give help information for a given option
+ -v --verbose[=VERBOSITY] Give information about what the program is
+                         doing.  Set value to control what information
+                         is given.
+ --quite -q --silent     Program should generate no output except in
+                         case of error.
+    --no-warn            Avoid issuing warnings about non-fatal 
+                         problems.
+
+ -c --config-file=FILENAME Load in an additional configuration file
+ -u --user-address=STRING Email address for user running link testing.
+ -H --halt-time=MINUTES  stop after given number of minutes
+
+    --never-stop         keep running without stopping
+    --no-robot           Don't follow robot rules.  Dangerous!!!
+ -w --no-waitre=NETLOC-REGEX Home HOST regex: no robot rules.. 
+                         (danger?)!!!
+    --test-now           Test links now not when scheduled (testing 
+                         only)
+    --untested           Test all links which have not been tested.
+    --sequential         Put links into schedule in order tested (for 
+                         testing)
+ -H --halt-time=MINUTES  stop after given number of minutes
+ -m --max-links=INTEGER  Maximum number of links to test (-1=no limit)
+</pre></td></tr></table></P><P>
+
+Several of the options could potentially lead to overloading networks
+and even other people's computer systems:
+</P><P>
+
+Don't use --no-robot, except for when you are doing local
+testing (that is, you aren't connected to the internet proper).
+</P><P>
+
+Don't use --never-stop or --test-now except when you are watching what
+is happening.
+</P><P>
+
+Generally you should be somewhat careful about running this program
+since it does automatically connect to other servers on the internet.
+Reasonable care has been taken to ensure it does this in a responsible
+way, but you must make sure that anybody who is inconvenienced has a
+good route for communicating this problem back to you.
+</P><P>
+
+<A NAME="Invoking extract-links"></A>
+<HR SIZE="6">
+<A NAME="SEC45"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC44"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC46"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_15.html#SEC49"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> F.3 Invoking extract-links </H2>
+<!--docid::SEC45::-->
+<P>
+
+The <CODE>extract-links</CODE> program walks through the users web pages
+collecting all of the links from those pages and storing them into a
+database for later checking by the <CODE>test-link</CODE> program
+(see section <A HREF="link-controller_14.html#SEC44">F.2 Invoking test-link</A>).  It can also list the links found into a
+given file.
+</P><P>
+
+After running <CODE>extract-links</CODE> you should use <CODE>build-schedule</CODE>
+(see section <A HREF="link-controller_14.html#SEC48">F.6 Invoking build-schedule</A>) which will make sure that any new
+links discovered are scheduled for checking..
+</P><P>
+
+There are two configuration files used by <CODE>extract-links</CODE>.  The
+<SAMP>`.link-control.pl'</SAMP> file is the first.  This tells it where the
+various files it uses are.  See section <A HREF="link-controller_3.html#SEC5">2.2 Setting Configuration Variables</A>, for
+how to control the contents of this file.  The second file is the
+<SAMP>`infostrucs'</SAMP> file.  This contains the information needed to know
+where to extract links from by default.  
+See section <A HREF="link-controller_3.html#SEC7">2.4 Configuring Infostructures</A>, for more details on configuring this.
+</P><P>
+
+<STRONG>FIXME</STRONG> this section should give a better description of each option.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>extract-links [arguments] [url-base [file-base]]
+
+ -V --version            Give version information for this program
+ -h --help --usage       Describe usage of this program.
+    --help-opt=OPTION    Give help information for a given option
+ -v --verbose[=VERBOSITY] Give information about what the program is
+                         doing.  Set value to control what information
+                         is given.
+ --quiet -q --silent     Program should generate no output except in
+                         case of error.
+
+ -e --exclude-regex=REGEX Exclude expression for excluding files.
+ -p --prune-regex=REGEX  Regular expression for excluding entire 
+                         directories.
+ -d --default-infostrucs handle all default infostrucs (as well as ones 
+                         listed on command line)
+
+ -l --link-database=FILENAME Database to create link records into.
+ -c --config-file=FILENAME Load in an additional configuration file
+
+ -o --out-url-list=FILENAME File to output the URL of each link found to
+ -i --in-url-list=FILENAME File to input URLs from to create links
+</pre></td></tr></table></P><P>
+
+<A NAME="Invoking fix-link"></A>
+<HR SIZE="6">
+<A NAME="SEC46"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC45"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC47"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_15.html#SEC49"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> F.4 Invoking fix-link </H2>
+<!--docid::SEC46::-->
+<P>
+
+The <CODE>fix-link</CODE> program is designed to repair a broken links across
+all of the files which LinkController is managing.  It does this by
+looking up index files and seeing files contain the broken link then
+doing a textual substitution in each of these files.  This makes it much
+faster than searching through all of the files in a set of web pages to
+see which pages have the broken link.
+</P><P>
+
+In order to work properly, <CODE>extract-links</CODE> 
+(see section <A HREF="link-controller_14.html#SEC45">F.3 Invoking extract-links</A>) must have been run first to build up
+the index databases used by <CODE>fix-link</CODE>.
+</P><P>
+
+There are two configuration files used by <CODE>fix-link</CODE>.  The
+file <SAMP>`.link-control.pl'</SAMP> is the first.  This tells it where the
+other configuration file and index files are.  See section <A HREF="link-controller_3.html#SEC5">2.2 Setting Configuration Variables</A>, for how to control the contents of this file.  The second
+file is the <SAMP>`infostrucs'</SAMP> file.  This contains the information
+needed to relate broken links to the files which need to be repaired.
+See section <A HREF="link-controller_3.html#SEC7">2.4 Configuring Infostructures</A>, for more details on confiuguring
+this.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>fix-link [options] old-link new-link
+
+ -V --version            Give version information for this program
+ -h --help --usage       Describe usage of this program.
+    --help-opt=OPTION    Give help information for a given option
+ -v --verbose[=VERBOSITY] Give information about what the program is 
+                         doing. Set value to control what information is 
+                         given.
+ -q --quiet --silent     Program should generate no output except in
+                         case of error.
+    --no-warn            Avoid issuing warnings about non-fatal 
+                         problems.
+
+    --directory=DIRNAME  correct all files in the given directory.
+
+ -r --relative           Fix relative links (expensive??).
+ -t --tree               Fix the link and any others based on it.
+ -b --base=FILENAME      Base URI of the document or directory to be 
+                         fixed.
+
+    --config-file=FILENAME Load in an additional configuration file
+</pre></td></tr></table></P><P>
+
+<A NAME="Invoking check-page"></A>
+<HR SIZE="6">
+<A NAME="SEC47"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC46"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC48"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_15.html#SEC49"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> F.5 Invoking check-page </H2>
+<!--docid::SEC47::-->
+<P>
+
+Check page is useful where broken links in files need to be manually
+corrected.  It outputs a list of line numbers where interesting links
+occur allowing the user to find those lines and correct the mistakes.
+The output format is compatible with the <CODE>emacs</CODE> <CODE>compile</CODE>
+mode which allows fast access to the problem locations.
+</P><P>
+
+There are two configuration files used by <CODE>extract-links</CODE>.  The
+file <SAMP>`.link-control.pl'</SAMP> is the first.  This tells it where the link
+database is.  See section <A HREF="link-controller_3.html#SEC5">2.2 Setting Configuration Variables</A>, for how to control
+the contents of this file.  The second file is the <SAMP>`infostrucs'</SAMP>
+file.  This allows <CODE>check-page</CODE> to know what the base URI of
+the file being checked is and so check relative links within the page
+corectly.  See section <A HREF="link-controller_3.html#SEC7">2.4 Configuring Infostructures</A>, for more details on
+configuring this.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>check-page [options] filename...
+
+ -V --version            Give version information for this program
+ -h --help --usage       Describe usage of this program.
+    --help-opt=OPTION    Give help information for a given option
+ -v --verbose[=VERBOSITY] Give information about what the program is 
+                         doing.  Set value to control what information 
+                         is given.
+
+ -r --redirect           Report links which are redirected.
+ -m --ignore-missing     Don't complain about links which aren't in 
+                         database.
+
+    --link-index=FILENAME Use the given file as the index of which 
+                         file has what link.
+    --link-database=FILENAME Use the given file as the dbm containing
+                         links.
+</pre></td></tr></table></P><P>
+
+<A NAME="Invoking build-schedule"></A>
+<HR SIZE="6">
+<A NAME="SEC48"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC47"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_15.html#SEC49"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_15.html#SEC49"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> F.6 Invoking build-schedule </H2>
+<!--docid::SEC48::-->
+<P>
+
+The <CODE>build-schedule</CODE> program makes a schedule for testing links.
+If run with no options it will make sure that all the links in the
+LinkController database will be checked at some point in the future.
+</P><P>
+
+Before running <CODE>build-schedule</CODE> you should probably use
+<CODE>extract-links</CODE> (see section <A HREF="link-controller_14.html#SEC45">F.3 Invoking extract-links</A>) to collect all of
+the links you want to test.  Afterwards you should use <CODE>test-link</CODE>
+to check which ones are broken (see section <A HREF="link-controller_14.html#SEC44">F.2 Invoking test-link</A>).
+</P><P>
+
+The configuration file used by <CODE>build-schedule</CODE> is the
+<SAMP>`.link-control.pl'</SAMP> file.  This tells it where the schedule file and
+LinkController database are. See section <A HREF="link-controller_3.html#SEC5">2.2 Setting Configuration Variables</A>, for
+how to control the contents of this file.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>build-schedule [options]
+
+ -V --version            Give version information for this program
+ -h --help --usage       Describe usage of this program.
+    --help-opt=OPTION    Give help information for a given option
+ -v --verbose[=VERBOSITY] Give information about what the program is
+                         doing.  Set value to control what information 
+                         is given.
+ --quite -q --silent     Program should generate no output except in
+                         case of error.
+    --no-warn            Avoid issuing warnings about non-fatal 
+                         problems.
+
+ -l --url-list=FILENAME  File with complete list of URLs to schedule
+ -s --schedule=FILENAME  Override location of the schedule
+ -t --spread-time=SECONDS Time over which to spread checking; default 10 
+                        days
+ -S --start-offset=SECONDS Time offset from now for starting work (can
+                         be negative)
+ -d --ignore-db          Set the time with no regard to curent setting
+ -i --ignore-link        Set the time with no regard to link status
+    --no-warn            Avoid issuing warnings about non-fatal 
+                         problems.
+    --config-file=FILENAME Load in an additional configuration file
+</pre></td></tr></table></P><P>
+
+<A NAME="Related Packages"></A>
+<HR SIZE="6">
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_14.html#SEC42"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_15.html#SEC49"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Michael De La Rue</I> on <I>February, 3  2002</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

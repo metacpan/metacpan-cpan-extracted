@@ -1,0 +1,331 @@
+=pod
+
+=head1 NAME
+
+LEOCHARRE::Class2
+
+=head1 DESCRIPTION
+
+My own OO class maker.
+Meant to create methods etc.
+
+=head1 REGULAR METHODS
+
+=head2 make_constructor()
+
+   __PACKAGE__->make_constructor();
+
+creates normal blessed object from optional hashref
+
+=head2 make_constructor_init()
+
+Like make_constructor(), but an instance checks if $class->init exists and calls.
+
+=head2 make_accessor_setget()
+
+argument is name of accessor to create in class.
+can provide a list of names.
+
+optionally, if the argument is an array ref, the second element should be the default value to set.
+
+This example creates 'model', 'year' and 'make' setget methods in the current class:
+
+   __PACKAGE__->make_accessor_setget(
+      'model', 
+      'make', 
+      'year',
+   );
+
+This is example is the same but sets defaults for make and year
+
+   __PACKAGE__->make_accessor_setget(
+      'model', 
+      [ 'make' => 'toyota' ], 
+      [ 'year' => '1999'   ],
+   );
+
+If those values are passed to the constructor or via method, they change..
+
+
+   my $o = Thing->new({ make => 'ford' });
+   $o->year(2001);   # changes to 2001
+   $o->year;         # returns 2001
+   $o->model;        # returns undef
+   $o->make;         # returns ford
+   
+
+You can also pass a hashref as argument to make setget methods, keys are names, vals are 
+the default values..
+
+   __PACKAGE__->make_accessor_setget({
+      model => undef,
+      make  => 'toyota',
+      year  => '1999',
+   });
+
+=head2 make_accessor_get()
+
+Same as make_accessor_setget(), but only returns.
+To set a value, must be set in constructor, or in class default.
+
+   package X;
+   use LEOCHARRE::Class2;
+   __PACKAGE__->make_accessor_get( 'name' );
+
+   package main;
+   use X;
+   my $x = X->new({ name => 'joe' });
+   $x->name; # returns joe
+   $x->name('jane'); # throws exception
+
+=head2 make_conf()
+
+Optional argument is abs path to conf file, this is a yaml file.
+Adds the methods
+   
+   abs_conf()
+   conf()
+   conf_load()
+   conf_keys()
+   conf_save()
+
+conf_load() is called automatically.
+
+
+
+=head1 FILE RESOURCE METHODS
+
+This is often useful if you are using conf files, etc.
+
+=head2 make_accessor_setget_ondisk_file()
+
+Will check that the path is on disk. 
+Will return undef and warn if not.
+If defined, must be on disk or an exception is thrown.
+Defining this for the instance, it must be there or returns undef and warns.
+
+The following would croak unless it exists on disk
+
+   use LEOCHARRE::Class2;
+   __PACKAGE__->make_accessor_setget_ondisk_file({
+      abs_conf => './t/my.conf',
+   });
+
+The following would throw an exception if not on disk but after instancing or
+passing bad argument..
+
+   package This;
+   use LEOCHARRE::Class2;
+   __PACKAGE__->make_accessor_setget_ondisk_file({
+      abs_conf => undef,
+   });
+
+   1;
+
+   package main;
+   use This;
+
+   my $this = new This({ abs_conf => './my.conf' });
+   
+   # or
+
+   my $this = new This;
+
+   $this->abs_conf('./my.conf');
+
+
+
+=head2 make_accessor_setget_ondisk_dir()
+
+Like make_accessor_setget_ondisk_file(), but must be a dir.
+
+=head1 ARRAY METHODS
+
+=head2 make_method_counter()
+
+   __PACKAGE__->make_method_counter('houses_sold');
+
+   $self->houses_sold;    # returns 0
+   $self->houses_sold(1); # returns 1
+   $self->houses_sold(9); # returns 10
+   $self->houses_sold;    # returns 10
+   $self->houses_sold(0); # returns 0
+
+=head2 make_accessor_setget_aref()
+
+Adds two methods, one to set and get an array ref, and one to count the items
+
+   __PACKAGE__->make_accesor_setget_aref('houses');
+
+   $self->houses;    # returns []
+   $self->houses_count; # returns 0
+   $self->houses([qw(one two three)]); # sets 
+   $self->houses_count; # returns 3
+   $self->houses; # returns [one two three]
+
+You can also instanciate with a default, like the other makers..
+
+   __PACKAGE__->make_accessor_setget_aref({
+      houses => [qw(one two three)],
+   });
+
+The method created can return an array or an array ref, on context.
+
+   __PACKGE__->make_method_setget_aref('houses');
+   my $aref = $self->houses;
+   my @array= $self->houses;
+
+   my $element_0 = $self->houses->[0];
+
+
+=head2 make_count_for()
+
+Called when you use make_setget_aref()
+Will return count of method's value , checks object key if no method of said name
+
+   __PACKAGE__->make_method_setget([ houses => [qw(one two three)]);
+   __PACKAGE__->make_count_for('houses');
+
+   $self->houses_count; # returns 3
+
+If class cannot method, then it seeks in object.
+
+
+
+
+=head2 make_accessor_setget_unique_array()
+
+
+   __PACKAGE__->make_method_setget_unique_array({ houses => [qw(one two three)] });
+
+   $self->houses_count; # returns 3
+   
+   $self->houses_add('lovely');
+   $self->houses_count; # now 4
+   
+   $self->houses_add('lovely');
+   $self->houses_count; # still 4!
+
+   
+   $self->houses_delete('lovely');
+   $self->houses_count; # 3
+
+   $self->houses_clear;
+   $self->houses_count; # 0
+
+   $self->houses_href;
+   $self->houses_aref;
+   
+
+Adds following methods
+
+=head3 $name()
+
+If you provide argument, behaves as $name_add().
+
+Returns array or array ref depending on context.
+
+=head3 $name_add()
+
+Argument is element.
+Returns true.
+Remember this is a unique array, if you add same thing, you are really replacing.
+
+=head3 $name_delete()
+
+Argument is element.
+
+=head3 $name_exists()
+
+Argument is element, returns bool if there.
+
+=head3 $name_clear()
+
+Takes no argument.
+Clears all contents.
+
+=head3 $name_count()
+
+Takes no argument.
+Returns count of elements. Returns 0 if none.
+
+=head3 $name_href()
+
+Takes no argument.
+Returns hashref to actual data.
+Always returns a hash ref, even if {}.
+
+=head3 $name_aref()
+
+Takes no argument.
+
+
+
+
+
+=head1 How the method created works
+
+This checks for a value in order of 
+1) in (a)rgument to method
+1) in (o)bject instance data (self)
+2) in (c)lass package
+
+If a value is provided, the object's data is changed, not the class.
+If no value is provided, we return the object's data, if none, the class, if none, undef.
+
+This example creates an object setget accessor that defaults to the name jimmy, stored in the class.
+
+   __PACKAGE__->make_accessor_setget(['name' => 'jimmy']);
+
+Our class being named 'My::House', we now have
+
+   &My::House::name
+   $My::House::name
+
+Value in object instance is stored in self
+Thus, if you provide to the constructor a 'self' hashref that specifies a 'name', the method name 
+would return that value.
+
+
+=head1 CAVEATS
+
+=item class wide defaults
+
+Please note, if you set a default value to be an anon ref, this is indeed set for the whole class.
+BUT, when an object is intanced, the instance data will actually hold a COPY of the value.
+
+For example:
+
+   Neighborhood->make_accessor_setget([ houses => ['green','red'] ]);
+
+Would normally cause all object instances of Neighborhood to refer to the same houses anon array ref.
+We don't want that, we just want to use that as a default.
+So the above will actually result in
+
+$Neighborhood::houses = $your_ref
+
+Don't think too hard about it.
+
+=item resetting methods that had defaults
+
+If you provide a default and then you set it to undef, we do not load the defaults again..
+
+   __PACKAGE__->make_accessor_setget([ name => 'leo' ]);
+
+   $self->{name} = undef;
+
+   $self->name; # returns undef
+   
+Basically it means that if the blessed hashref does not have the method data key, THEN we do
+attempt to load a default.
+This is so you don't get unexpected results.
+
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=cut
+
+
+

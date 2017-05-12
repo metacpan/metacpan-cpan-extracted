@@ -1,0 +1,47 @@
+<p> 
+    <input type="button" onclick="parent.location='/'" value="back to surveys" />
+    <input type="button" onclick="parent.location='/anno/admin'" value="back to announcement admin" />
+    <input type="button" onclick="parent.location='[% cgipath %]/pages.cgi?act=anno-edit&amp;announceid=[% data.announceid %]'" value="back to this announcement" />
+</p>
+
+<h2>Announcement Admin</h2>
+
+<h3>Send Selected Announcement</h3>
+
+<div class="boxer">
+[% IF thanks %]<p>Announcement saved successfully.[% END %]
+[% IF errmess %]
+[% IF errmess == 1 %]
+<p class="alert">There are invalid or missing fields, as noted by the <span class="red">&empty;</span> symbol.
+[% ELSE %]
+<p class="alert">[% errmess %]
+[% END %]
+[% END %]
+</div>
+
+<form method="post" action="/anno/sendone">
+<input type="hidden" name="act" value="anno-sendone" />
+<input type="hidden" name="announceid" value="[% data.announceid %]" />
+
+<div class="boxer">
+[% IF users %]
+<p><b>From: [% data.hFrom %]<br />Subject: [% data.hSubject %]</b></p>
+
+<table class="blocker" width="100%">
+<tr><th>#</th>
+    <th><a href="[% cgipath %]/pages.cgi?act=[% request %]&amp;announceid=[% data.announceid %]&amp;sortname=realname&amp;sorttype=[% sorttype %]">User</a></th>
+    <th><a href="[% cgipath %]/pages.cgi?act=[% request %]&amp;announceid=[% data.announceid %]&amp;sortname=email&amp;sorttype=[% sorttype %]">Email</a></th>
+    <th>Select</th>
+</tr>
+[% count = 1 %]
+[% FOREACH user = users %]
+<tr><td>[% count ; count = count + 1 %]</td><td>[% user.realname %]</td><td>[% user.email %]</td><td><input type="checkbox" name="LISTED" value="[% user.userid %]"></td>
+[% END %]
+</table>
+[% END %]
+</div>
+
+<p align="center"><input type="submit" value="Send Selected Announcements" />
+
+</form>
+

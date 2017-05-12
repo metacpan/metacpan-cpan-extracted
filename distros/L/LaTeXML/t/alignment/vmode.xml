@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml package="graphics"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <section refnum="1" xml:id="S1">
+    <title><tag close=" ">1</tag>Nesting hbox &amp; vbox</title>
+    <para xml:id="S1.p1">
+      <p>a b c d</p>
+    </para>
+    <para xml:id="S1.p2">
+      <p>abcd</p>
+    </para>
+    <para xml:id="S1.p3">
+      <p><inline-block vattach="bottom">
+          <p>a</p>
+        </inline-block><inline-block vattach="bottom">
+          <p>b</p>
+        </inline-block><inline-block vattach="bottom">
+          <p>c</p>
+        </inline-block><inline-block vattach="bottom">
+          <p>d</p>
+        </inline-block></p>
+    </para>
+    <para xml:id="S1.p4">
+      <p vattach="bottom">a b c d</p>
+    </para>
+    <para xml:id="S1.p5">
+      <inline-block vattach="bottom">
+        <p>a</p>
+        <p>b</p>
+        <p>c</p>
+        <p>d</p>
+      </inline-block>
+    </para>
+    <para xml:id="S1.p6">
+      <inline-block vattach="bottom">
+        <p vattach="bottom">a</p>
+        <p vattach="bottom">b</p>
+        <p vattach="bottom">c</p>
+        <p vattach="bottom">d</p>
+      </inline-block>
+    </para>
+    <para xml:id="S1.p7">
+      <p>ab<inline-block vattach="bottom">
+          <p>a</p>
+          <p>b</p>
+          <p>c</p>
+          <p>d</p>
+        </inline-block>cd</p>
+    </para>
+  </section>
+  <section refnum="2" xml:id="S2">
+    <title><tag close=" ">2</tag>parbox and minipage</title>
+    <para xml:id="S2.p1">
+      <inline-block class="ltx_parbox" vattach="middle" width="144.5pt">
+        <p>hbox1</p>
+        <p vattach="bottom">vbox1</p>
+        <p>hbox2</p>
+        <p>hbox3</p>
+        <p vattach="bottom">vbox2</p>
+      </inline-block>
+    </para>
+    <para xml:id="S2.p2">
+      <inline-block class="ltx_minipage" vattach="middle" width="144.5pt">
+        <p>This is random text. This is random text.
+This is random text. This is random text. This is random text.</p>
+        <itemize xml:id="I1">
+          <item xml:id="I1.i1">
+            <tag>•</tag>
+            <para xml:id="I1.i1.p1">
+              <p>One</p>
+            </para>
+          </item>
+          <item xml:id="I1.i2">
+            <tag>•</tag>
+            <para xml:id="I1.i2.p1">
+              <p>Two</p>
+            </para>
+          </item>
+          <item xml:id="I1.i3">
+            <tag>•</tag>
+            <para xml:id="I1.i3.p1">
+              <p>Three</p>
+            </para>
+          </item>
+        </itemize>
+        <p>This is random text. This is random text.
+This is random text. This is random text. This is random text.</p>
+      </inline-block>
+    </para>
+  </section>
+  <section refnum="3" xml:id="S3">
+    <title><tag close=" ">3</tag>Centering</title>
+    <para xml:id="S3.p1">
+      <p align="center">This is random text. This is random text. This is random text.
+This is random text. This is random text. This is random text.
+This is random text. This is random text. This is random text.
+This is random text. This is random text. This is random text.</p>
+    </para>
+    <para xml:id="S3.p2">
+      <p align="center">This is random text. This is random text. This is random text.</p>
+      <p align="center">This is random text. This is random text. This is random text.</p>
+      <p align="center">This is random text. This is random text. This is random text.</p>
+    </para>
+    <para xml:id="S3.p3">
+      <graphics candidates="foo.png" class="ltx_centering" graphic="foo.png" xml:id="S3.p3.g1"/>
+    </para>
+    <para class="ltx_centering" xml:id="S3.p4">
+      <p>c) Parabolic cylinder,  <Math mode="inline" tex="x^{2}=2pz" text="x ^ 2 = 2 * p * z" xml:id="S3.p4.m1">
+          <XMath>
+            <XMApp>
+              <XMTok meaning="equals" role="RELOP">=</XMTok>
+              <XMApp>
+                <XMTok role="SUPERSCRIPTOP" scriptpos="post3"/>
+                <XMTok font="italic" role="UNKNOWN">x</XMTok>
+                <XMTok fontsize="70%" meaning="2" role="NUMBER">2</XMTok>
+              </XMApp>
+              <XMApp>
+                <XMTok meaning="times" role="MULOP">⁢</XMTok>
+                <XMTok meaning="2" role="NUMBER">2</XMTok>
+                <XMTok font="italic" role="UNKNOWN">p</XMTok>
+                <XMTok font="italic" role="UNKNOWN">z</XMTok>
+              </XMApp>
+            </XMApp>
+          </XMath>
+        </Math>;  it is a developable surface.</p>
+      <p>Signatures: blah <Math mode="inline" tex="x" text="x" xml:id="S3.p4.m2">
+          <XMath>
+            <XMTok font="italic" role="UNKNOWN">x</XMTok>
+          </XMath>
+        </Math>, <Math mode="inline" tex="y" text="y" xml:id="S3.p4.m3">
+          <XMath>
+            <XMTok font="italic" role="UNKNOWN">y</XMTok>
+          </XMath>
+        </Math>)</p>
+    </para>
+    <figure frefnum="Figure 1" refnum="1" xml:id="S3.F1">
+      <graphics candidates="foo.png" class="ltx_centering" graphic="foo" xml:id="S3.F1.g1"/>
+      <toccaption class="ltx_centering"><tag close=" ">1</tag>This is random text. This is random text. This is random text.</toccaption>
+      <caption class="ltx_centering"><tag close=": ">Figure 1</tag>This is random text. This is random text. This is random text.</caption>
+    </figure>
+    <figure frefnum="Figure 2" refnum="2" xml:id="S3.F2">
+      <p align="center">A Figure line</p>
+      <p align="center">Another Figure line</p>
+      <p align="center">Yet another Figure line</p>
+      <toccaption class="ltx_centering"><tag close=" ">2</tag>Figure: This is a figure.</toccaption>
+      <caption class="ltx_centering"><tag close=": ">Figure 2</tag>Figure: This is a figure.</caption>
+    </figure>
+  </section>
+  <section refnum="4" xml:id="S4">
+    <title><tag close=" ">4</tag>Graphics rescaling</title>
+    <para xml:id="S4.p1">
+      <graphics candidates="foo.png" graphic="foo" xml:id="S4.p1.g1"/>
+    </para>
+    <para xml:id="S4.p2">
+      <inline-block depth="0.0pt" height="32.0pt" width="93.6pt" xscale="3" xtranslate="31.2pt" yscale="2" ytranslate="8.0pt">
+        <graphics candidates="foo.png" graphic="foo" xml:id="S4.p2.g1"/>
+      </inline-block>
+    </para>
+  </section>
+</document>

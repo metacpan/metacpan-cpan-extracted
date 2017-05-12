@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/Log/Dispatch/Email/EmailSend.pm
+MANIFEST			This list of files
+t/01-basic.t
+Makefile.PL
+META.yml
+SIGNATURE    Added here by Module::Build

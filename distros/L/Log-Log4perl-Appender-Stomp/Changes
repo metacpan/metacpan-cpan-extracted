@@ -1,0 +1,9 @@
+Revision history for Log-Log4perl-Appender-Stomp
+
+1.000  Thu Jan 28 22:44:00 2010
+
+       Use Dist::Zilla for building and releasing.
+
+0.0.1  Fri Aug 15 17:29:23 2008
+       Initial release.
+

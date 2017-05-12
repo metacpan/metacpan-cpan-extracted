@@ -1,0 +1,25 @@
+Build.PL
+CCDICT-README
+Changes
+examples/make-bdb-files
+lib/Lingua/ZH/CCDICT.pm
+lib/Lingua/ZH/CCDICT/Data.pm
+lib/Lingua/ZH/CCDICT/ResultItem.pm
+lib/Lingua/ZH/CCDICT/ResultSet.pm
+lib/Lingua/ZH/CCDICT/ResultSet/Array.pm
+lib/Lingua/ZH/CCDICT/ResultSet/BerkeleyDB.pm
+lib/Lingua/ZH/CCDICT/Romanization.pm
+lib/Lingua/ZH/CCDICT/Romanization/Pinyin.pm
+lib/Lingua/ZH/CCDICT/Storage/BerkeleyDB.pm
+lib/Lingua/ZH/CCDICT/Storage/InMemory.pm
+LICENSE
+MANIFEST			This list of files
+README
+t/01-memory.t
+t/02-bdb.t
+t/lib/SharedTests.pm
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+SIGNATURE    Added here by Module::Build

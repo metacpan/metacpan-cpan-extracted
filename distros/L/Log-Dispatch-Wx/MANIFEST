@@ -1,0 +1,9 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+lib/Log/Dispatch/Wx.pm
+t/001_load.t
+t/zzz_pod.t

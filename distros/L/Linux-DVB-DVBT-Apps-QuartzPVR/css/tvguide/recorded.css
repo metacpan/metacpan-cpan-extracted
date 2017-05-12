@@ -1,0 +1,67 @@
+#recordedContents {
+
+}
+
+#quartz-content #list-body #recordedContents ol {
+	clear: both ;
+}
+
+#quartz-content #list-body #recordedContents .recProgs {
+	clear: both ;
+	/*
+	margin-top: 10px ;
+	margin-bottom: 10px ;
+	*/
+}
+
+#quartz-content #list-body #recordedContents .recProgs li {
+	display: inline ;
+	float: left ;
+	position: relative ;
+	text-align: center ;
+	width: 128px ;
+	background: none ;
+	height: auto ;
+}
+
+
+#quartz-content #list-body #recordedContents .recProg {
+	margin: 10px auto ;
+	padding: 5px ;
+	height: 80px ;
+	width: 80px ;
+	
+	border-radius: 10px ;
+-moz-border-radius: 10px;
+-webkit-border-radius: 10px;
+-o-border-radius: 10px;
+border-top-right-radius: 10px;
+border-top-left-radius: 10px;
+border-bottom-right-radius: 10px;
+border-bottom-left-radius: 10px;
+
+	background-position: center ;
+}
+
+#quartz-content #list-body #recordedContents .recProg a {
+	border: none ;
+}
+
+#quartz-content #list-body #recordedContents .recHead {
+
+	padding-top: 20px ;
+	padding-bottom: 5px ;
+	margin-bottom: 10px ;
+	background-position: left bottom ;
+	background-repeat: no-repeat ;
+}
+
+
+#quartz-content #list-body #recordedContents .recCaption {
+	color: white ;
+	font-size: 12px ;
+	margin: 0px 10px 0 10px ;
+	text-align: center ;
+	height: 2.5em ;
+	overflow: hidden ;
+}

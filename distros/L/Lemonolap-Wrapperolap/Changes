@@ -1,0 +1,6 @@
+Revision history for Perl extension Lemonolap::Wrapperolap
+
+0.01  Tue Nov 29 11:06:25 2005
+	- original version; created by h2xs 1.23 with options
+		-XAn Lemonolap::Wrapperolap
+

@@ -1,0 +1,187 @@
+=encoding utf8
+
+=head1 ИМЯ
+
+Lingua::RU::Preposition - подбор русских предлогов
+
+=head1 ВЕРСИЯ
+
+Версия 0.02
+
+=head1 ОПИСАНИЕ
+
+L<Lingua::RU::Preposition> — модуль perl, предоставляющий
+процедуру для русского языка: выбор правильной формы предлога
+с беглой конечной гласной в зависимости от следующего за ним слова.
+
+=head1 ПРИМЕР ИСПОЛЬЗОВАНИЯ
+
+    use Lingua::RU::Preposition qw/:all/;
+
+    # Following string contains cyrillic letters
+    print ob, 'мне'; # prints 'обо' (obo)
+    print choose_preposition_by_next_word 'из', 'огня'; # prints 'из' (iz)
+
+=head1 ПЛАНЫ
+
+Проверить корректность подбора по словарям и правилам
+и, если понадобится, исправить.
+
+=head1 ЭКСПОРТ
+
+Функция C<choose_preposition_by_next_word> экспортируeтся по умолчанию.
+
+Кроме того, можно экспортировать короткие псевдонимы этой функции
+
+    use Lingua::RU::Preposition qw/:short/;
+
+Или всё имеющееся: функции и псевдонимы:
+
+    use Lingua::RU::Preposition qw/:all/; # или
+    use Lingua::RU::Preposition qw/:subs :short/;
+
+=head1 ФУНКЦИЯ
+
+=head2 choose_preposition_by_next_word
+
+Выбирает предлог с беглой гласной (например, о/об/обо) по следующему за
+ним слову.
+
+Принимает 2 аргумента: I<предлог> и I<следующее_слово>.
+В качестве I<предлога> выступает строка с наиболее коротким из возможных значений.
+Допустимые I<предлоги>: C<'в'>, C<'из'>, C<'из-под'>, C<'к'>, C<'над'>, C<'о'>, C<'от'>,
+C<'пред'>, C<'перед'>, C<'под'> и C<'с'>.
+
+Для вызова функции с допустимыми предлогами задан ряд псевдонимов.
+Имена псевдонимов образованы от полных вариантов предлогов путём их
+транслитерации (чтобы избежать использования однобуквенных идентификаторов)
+за исключением функции с предлогом 'о/об/обо' —
+для него доступны два псевдонима: C<ob> и C<obo>.
+
+=head3 bezo
+
+C<bezo> — псевдоним для C<choose_preposition_by_next_word 'без',>
+
+Необходимость использования этого псевдонима неясна, так как с некоторыми
+словами употребляются обе формы предлога («без всего» и «безо всего»).
+Функция возвращает более длинный вариант.
+
+=head3 izo
+
+C<izo> — псевдоним для C<choose_preposition_by_next_word 'из',>
+
+=head3 izpodo
+
+C<izpodo> — псевдоним для C<choose_preposition_by_next_word 'из-под',>
+
+=head3 ko
+
+C<ko> — псевдоним для C<choose_preposition_by_next_word 'к',>
+
+=head3 nado
+
+C<nado> — псевдоним для C<choose_preposition_by_next_word 'над',>
+
+=head3 ob
+
+C<ob> — псевдоним для C<choose_preposition_by_next_word 'о',>
+
+=head3 oto
+
+C<oto> — псевдоним для C<choose_preposition_by_next_word 'от',>
+
+=head3 podo
+
+C<podo> — псевдоним для C<choose_preposition_by_next_word 'под',>
+
+=head3 predo
+
+C<predo> — псевдоним для C<choose_preposition_by_next_word 'пред',>
+
+=head3 peredo
+
+C<peredo> — псевдоним для C<choose_preposition_by_next_word 'перед',>
+
+=head3 so
+
+C<so> — псевдоним для C<choose_preposition_by_next_word 'с',>
+
+=head3 vo
+
+C<vo> — псевдоним для C<choose_preposition_by_next_word 'в',>
+
+По умолчанию эти псевдонимы не экспортируются.
+Можно указать экспортирование явно, указав имена нужных функций либо
+тэги C<:short> и C<:all>.
+
+Пример использования псевдонимов:
+
+    use Lingua::RU::Preposition qw/:short/;
+
+    map {
+        print ob, $_;
+    } qw(
+        арбузе баране всём Елене ёлке игле йоде
+        мне многом огне паре ухе юге яблоке
+    );
+
+    map {
+        print so, $_;
+    } qw(
+        огнём водой
+        зарёй зноем зрением зябликом
+        садом светом слоном спичками ссылкой
+        Стёпой стаканом сухарём сэром топором
+        жарой жбаном жратвой жуком
+        шаром шкафом шлангом шубой
+    );
+
+=head1 НЕПОЛАДКИ
+
+Пожалуйста, присылайте сообщения о найденных неполадках и желаемых
+возможностях на C<bug-lingua-ru-preposition at rt.cpan.org>, или через
+веб-интерфейс на
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Lingua-RU-Preposition>.
+Меня известят, и вы будете автоматически оповещены при устранении
+найденных вами неполадок.
+
+=head1 ПОДДЕРЖКА
+
+Вы можете найти документацию к этому модулю с помошью команды  perldoc.
+
+    perldoc Lingua::RU::Preposition
+
+Кроме того, вы можете найти информацию в других местах:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-RU-Preposition>
+
+=item * AnnoCPAN: Аннотированная документация CPAN
+
+L<http://annocpan.org/dist/Lingua-RU-Preposition>
+
+=item * Рейтинги CPAN
+
+L<http://cpanratings.perl.org/d/Lingua-RU-Preposition>
+
+=item * Поиск по CPAN
+
+L<http://search.cpan.org/dist/Lingua-RU-Preposition/>
+
+=back
+
+=head1 АВТОР
+
+Александр Сапожников L<http://shoorick.ru/>
+
+=head1 ЛИЦЕНЗИЯ
+
+Эта библиотека является свободным программным обеспечением, вы можете
+распространять и модифицировать её на тех же условиях, что и Perl.
+
+=cut
+
+1;

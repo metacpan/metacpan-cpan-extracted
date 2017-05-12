@@ -1,0 +1,127 @@
+=head1 NAME
+
+Leyland::Manual::Logging - How to use a log in Leyland applications
+
+=head1 LOGGING
+
+Logging is an important aspect of any web application, at least in my
+opinion. There are quite a lot of options on CPAN for logging, such as
+L<Log::Dispatch>, L<Log::Handler>, L<Log::Log4perl> and many
+others (not to mention plain old C<print STDOUT/STDERR $log_msg>).
+
+Before v1.0.0, Leyland had its own logging mechanism. Since v1.0.0, however,
+Leyland refers to Plack middlewares for the purpose of logging, but still
+provides a default logger that simply prints to standard output.
+
+=head1 SELECTING A LOGGING MIDDLEWARE
+
+Selecting a logging middleware is done as you would in any Plack application.
+For example, to use L<Plack::Middleware::LogDispatch>, do this in your app's
+PSGI file:
+
+	# in app.psgi
+	use MyLeylandApp;
+	use Log::Dispath;
+
+	builder {
+		enable "LogDispatch", logger => Log::Dispatch->new(...);
+		MyLeylandApp->new->to_app;
+	};
+
+Refer to the documentation of your preferred logging middleware for complete
+instructions.
+
+=head1 PRINTING LOG MESSAGES
+
+As you may already know, when using logging platforms, every log message
+you print is assigned a log level, which denotes the severity of the message.
+Common levels are "info", "warn" and "error". Unfortunately, different
+log classes have different log levels. Leyland supports the following log
+levels:
+
+=over
+
+=item * B<trace>
+
+=item * B<debug>
+
+=item * B<info> (with an B<inform> alias)
+
+=item * B<notice>
+
+=item * B<warning> (with a B<warn> alias)
+
+=item * B<error> (with an B<err> alias)
+
+=item * B<critical> (with a B<crit> and C<fatal> aliases)
+
+=item * B<alert>
+
+=item * B<emergency>
+
+=back
+
+Printing to the log is done from the context object using its C<log> attribute.
+For example:
+
+	get '^/$' {
+		$c->log->info("Got a request to display the index page");
+		$c->template('index.html');
+	}
+
+And that's pretty much it.
+
+=head1 WHAT'S NEXT?
+
+Read L<Leyland::Manual::Exceptions> to learn how to return proper HTTP
+exceptions or L<return to the table of contents|Leyland::Manual/"TABLE OF CONTENTS">.
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Leyland at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Leyland::Manual::Views
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Leyland>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Leyland>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Leyland/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

@@ -1,0 +1,129 @@
+2003-12-05 22:37  ed
+
+	* README, TraceMessages.pm, test.pl: Version 1.4.
+
+2003-12-05 22:35  ed
+
+	* test.pl: After setting $Logfile to undef, an extra call to t() is
+	  needed to close the file before it can be unlinked on Windows.
+
+2003-06-21 14:29  ed
+
+	* TraceMessages.pm: Uncuddled else as recommended by perlstyle.
+
+2003-06-21 14:28  ed
+
+	* TraceMessages.pm: Quoted ' in pod documentation so Emacs
+	  font-lock works.
+
+2003-01-26 17:58  ed
+
+	* TraceMessages.pm, test.pl: Version 1.3.  test.pl now has its
+	  version number in a variable $VERSION where it can be easily
+	  checked to see it matches that in TraceMessages.pm.  The only
+	  reason for this release is that the last one had the numbers
+	  mismatched!
+
+2003-01-26 17:55  ed
+
+	* mkdist: Use set -e to exit when any command fails (we don't want
+	  to start rming things when cd has failed, for example).
+
+	  Changed to use CVS and cvs2cl rather than RCS.
+
+	  Check that the versions in test.pl and TraceMessages.pm match.
+
+2002-10-25 16:05  ed
+
+	* README: Updated for version 1.2.
+
+2002-09-26 21:49  ed
+
+	* TraceMessages.pm: Bumped version to 1.2, and moved the assignment
+	  onto its own line so CPAN can parse it (hopefully).
+
+2002-09-01 14:57  ed
+
+	* README, TraceMessages.pm: Updated my email address.
+
+2001-11-28 13:21  ed
+
+	* README: Updated for version 1.1.
+
+2001-11-28 13:16  ed
+
+	* Makefile.PL: Added HTML::FromText as a dependency (thanks to
+	  cpan-testers for spotting this).
+
+2001-02-12 17:45  ed
+
+	* TraceMessages.pm: Reinstated isa(AutoLoader) - otherwise the
+	  Makefile goes wrong
+
+2001-02-08 18:30  ed
+
+	* test.pl: Lots of fiddling around trying to make it work after RCS
+	  corrupted it; changing variable names to stop that happening
+	  again.
+
+2000-11-24 17:50  ed
+
+	* test.pl: Added tests for $Logfile
+
+2000-11-24 17:50  ed
+
+	* TraceMessages.pm: Added $Logfile letting you change where
+	  messages are printed
+
+2000-10-16 18:36  ed
+
+	* mkdist: Load TraceMessages.pm from current directory to get
+	  version (not random one lying around in PERL5LIB)
+
+2000-10-15 18:48  ed
+
+	* mkdist: Works
+
+2000-10-15 18:47  ed
+
+	* MANIFEST: Sort properly - working around locale bug in GNU sort
+
+2000-10-15 18:23  ed
+
+	* MANIFEST: sorted
+
+2000-10-15 18:21  ed
+
+	* mkdist: Initial revision
+
+2000-10-15 18:18  ed
+
+	* MANIFEST: Added README
+
+2000-10-15 18:17  ed
+
+	* README: Initial revision
+
+2000-10-15 18:06  ed
+
+	* TraceMessages.pm: d() returns empty string (instead of undef) if
+	  trace is off - stops warnings
+
+2000-10-15 17:57  ed
+
+	* test.pl: Test code for t(), d(), check_argv() and $On, $CGI flags
+
+2000-10-15 17:48  ed
+
+	* TraceMessages.pm: Remember to require HTML::FromText before
+	  trying to use it
+
+2000-10-15 17:08  ed
+
+	* TraceMessages.pm: First working version - based on Dbg.pm
+
+2000-10-15 16:54  ed
+
+	* MANIFEST, Makefile.PL, TraceMessages.pm, test.pl: Initial
+	  revision
+

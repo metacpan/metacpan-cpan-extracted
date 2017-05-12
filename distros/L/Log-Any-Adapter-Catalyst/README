@@ -1,0 +1,50 @@
+NAME
+    Log::Any::Adapter::Catalyst - Enable error and status logging in
+    Catalyst Models via Log::Any
+
+VERSION
+    version 1.00
+
+SYNOPSIS
+    In a Catalyst Model, View, etc (anywhere you don't have $c):
+
+        use Log::Any qw($log);
+
+        $log->debug( "Sent to $c->log() if called from a Catalyst model" );
+
+    In a your main Catalyst module (MyApp.pm):
+
+        use Log::Any::Adapter;
+
+        Log::Any::Adapter->set('Catalyst', logger => __PACKAGE__->log);
+
+DESCRIPTION
+    This Log::Any adapter uses Catalyst::Log for logging. Catalyst::Log must
+    be initialized before calling *set*, but Catalyst takes care of that for
+    you. There are no parameters.
+
+LOG LEVEL TRANSLATION
+    Log levels are translated from Log::Any to Catalyst::Log as follows:
+
+        trace -> debug
+        debug -> debug
+        info (inform) -> info
+        notice -> info
+        warning (warn) -> warn
+        error (err) -> error
+        critical (crit, fatal) -> fatal
+        alert -> fatal
+        emergency -> fatal
+
+SEE ALSO
+    Log::Any, Log::Any::Adapter, Catalyst, Catalyst::Log
+
+AUTHOR
+    Mark Grimes, <mgrimes@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Mark Grimes, <mgrimes@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

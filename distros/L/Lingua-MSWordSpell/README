@@ -1,0 +1,26 @@
+Lingua::MSWordSpell v1.011
+
+(c) BBC 2005. This program is free software; you can redistribute it 
+and/or modify it under the GNU GPL.
+
+See the file COPYING in this distribution, or 
+http://www.gnu.org/licenses/gpl.txt
+
+QUICK START:
+
+Install Lingua::MSWordSpell by unpacking the tarball 
+and running the following commands in the source directory:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    Then delete the source directory tree since it's no longer needed.
+
+    run 'perldoc Lingua::MSWordSpell' to read the full documentation.
+
+To contact the authors, send an email to:
+
+	cpan _at_ bbc.co.uk
+	
+Our CPAN page is http://search.cpan.org/~bbc

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml package="fontenc" options="T1"?>
+<?latexml package="textcomp"?>
+<?latexml package="inputenc" options="applemac"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <section refnum="1" xml:id="S1">
+    <title><tag close=" ">1</tag>Input encoding applemac</title>
+    <para xml:id="S1.p1">
+      <tabular class="ltx_guessed_headers" vattach="middle">
+        <tbody>
+          <tr>
+            <td border="r" thead="row"/>
+            <td align="center">0</td>
+            <td align="center">1</td>
+            <td align="center">2</td>
+            <td align="center">3</td>
+            <td align="center">4</td>
+            <td align="center">5</td>
+            <td align="center">6</td>
+            <td align="center">7</td>
+            <td align="center">8</td>
+            <td align="center">9</td>
+            <td align="center">A</td>
+            <td align="center">B</td>
+            <td align="center">C</td>
+            <td align="center">D</td>
+            <td align="center">E</td>
+            <td align="center">F</td>
+          </tr>
+          <tr>
+            <td align="left" border="r t" thead="row">8x</td>
+            <td align="center" border="t">Ä</td>
+            <td align="center" border="t">Å</td>
+            <td align="center" border="t">Ç</td>
+            <td align="center" border="t">É</td>
+            <td align="center" border="t">Ñ</td>
+            <td align="center" border="t">Ö</td>
+            <td align="center" border="t">Ü</td>
+            <td align="center" border="t">á</td>
+            <td align="center" border="t">à</td>
+            <td align="center" border="t">â</td>
+            <td align="center" border="t">ä</td>
+            <td align="center" border="t">ã</td>
+            <td align="center" border="t">å</td>
+            <td align="center" border="t">ç</td>
+            <td align="center" border="t">é</td>
+            <td align="center" border="t">è</td>
+          </tr>
+          <tr>
+            <td align="left" border="r" thead="row">9x</td>
+            <td align="center">ê</td>
+            <td align="center">ë</td>
+            <td align="center">í</td>
+            <td align="center">ì</td>
+            <td align="center">î</td>
+            <td align="center">ï</td>
+            <td align="center">ñ</td>
+            <td align="center">ó</td>
+            <td align="center">ò</td>
+            <td align="center">ô</td>
+            <td align="center">ö</td>
+            <td align="center">õ</td>
+            <td align="center">ú</td>
+            <td align="center">ù</td>
+            <td align="center">û</td>
+            <td align="center">ü</td>
+          </tr>
+          <tr>
+            <td align="left" border="r" thead="row">Ax</td>
+            <td align="center">†</td>
+            <td align="center">°</td>
+            <td align="center">¢</td>
+            <td align="center">£</td>
+            <td align="center">§</td>
+            <td align="center">•</td>
+            <td align="center">¶</td>
+            <td align="center">ß</td>
+            <td align="center">®</td>
+            <td align="center">©</td>
+            <td align="center">™</td>
+            <td align="center">´</td>
+            <td align="center">¨</td>
+            <td align="center"><Math mode="inline" tex="\neq" text="not-equals" xml:id="S1.p1.m1">
+                <XMath>
+                  <XMTok meaning="not-equals" name="neq" role="RELOP">≠</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center">Æ</td>
+            <td align="center">Ø</td>
+          </tr>
+          <tr>
+            <td align="left" border="r" thead="row">Bx</td>
+            <td align="center"><Math mode="inline" tex="\infty" text="infinity" xml:id="S1.p1.m2">
+                <XMath>
+                  <XMTok meaning="infinity" name="infty" role="ID">∞</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\pm" text="plus-or-minus" xml:id="S1.p1.m3">
+                <XMath>
+                  <XMTok meaning="plus-or-minus" name="pm" role="ADDOP">±</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\leq" text="less=" xml:id="S1.p1.m4">
+                <XMath>
+                  <XMTok meaning="less-than-or-equals" name="leq" role="RELOP">≤</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\geq" text="&gt;=" xml:id="S1.p1.m5">
+                <XMath>
+                  <XMTok meaning="greater-than-or-equals" name="geq" role="RELOP">≥</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center">¥</td>
+            <td align="center"><Math mode="inline" tex="\mu" text="mu" xml:id="S1.p1.m6">
+                <XMath>
+                  <XMTok font="italic" name="mu" role="UNKNOWN">μ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\partial" text="partial-differential" xml:id="S1.p1.m7">
+                <XMath>
+                  <XMTok meaning="partial-differential" name="partial" role="OPERATOR">∂</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\Sigma" text="Sigma" xml:id="S1.p1.m8">
+                <XMath>
+                  <XMTok name="Sigma" role="UNKNOWN">Σ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\Pi" text="Pi" xml:id="S1.p1.m9">
+                <XMath>
+                  <XMTok name="Pi" role="UNKNOWN">Π</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\pi" text="pi" xml:id="S1.p1.m10">
+                <XMath>
+                  <XMTok font="italic" name="pi" role="UNKNOWN">π</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\int" text="integral" xml:id="S1.p1.m11">
+                <XMath>
+                  <XMTok mathstyle="text" meaning="integral" name="int" role="INTOP">∫</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center">ª</td>
+            <td align="center">º</td>
+            <td align="center"><Math mode="inline" tex="\Omega" text="Omega" xml:id="S1.p1.m12">
+                <XMath>
+                  <XMTok name="Omega" role="UNKNOWN">Ω</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center">æ</td>
+            <td align="center">ø</td>
+          </tr>
+          <tr>
+            <td align="left" border="r" thead="row">Cx</td>
+            <td align="center">¿</td>
+            <td align="center">¡</td>
+            <td align="center"><Math mode="inline" tex="\lnot" text="not" xml:id="S1.p1.m13">
+                <XMath>
+                  <XMTok meaning="not" name="lnot" role="FUNCTION">¬</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\surd" text="square-root" xml:id="S1.p1.m14">
+                <XMath>
+                  <XMTok meaning="square-root" name="surd" role="OPERATOR">√</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center">f</td>
+            <td align="center"><Math mode="inline" tex="\approx" text="approximately-equals" xml:id="S1.p1.m15">
+                <XMath>
+                  <XMTok meaning="approximately-equals" name="approx" role="RELOP">≈</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\Delta" text="Delta" xml:id="S1.p1.m16">
+                <XMath>
+                  <XMTok name="Delta" role="UNKNOWN">Δ</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center">«</td>
+            <td align="center">»</td>
+            <td align="center">…</td>
+            <td/>
+            <td align="center">À</td>
+            <td align="center">Ã</td>
+            <td align="center">Õ</td>
+            <td align="center">Œ</td>
+            <td align="center">œ</td>
+          </tr>
+          <tr>
+            <td align="left" border="r" thead="row">Dx</td>
+            <td align="center">–</td>
+            <td align="center">—</td>
+            <td align="center">“</td>
+            <td align="center">”</td>
+            <td align="center">‘</td>
+            <td align="center">’</td>
+            <td align="center"><Math mode="inline" tex="\div" text="/" xml:id="S1.p1.m17">
+                <XMath>
+                  <XMTok meaning="divide" name="div" role="MULOP">÷</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center"><Math mode="inline" tex="\diamond" text="diamond" xml:id="S1.p1.m18">
+                <XMath>
+                  <XMTok name="diamond" role="ADDOP">⋄</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center">ÿ</td>
+            <td align="center">Ÿ</td>
+            <td align="center"><Math mode="inline" tex="/" text="/" xml:id="S1.p1.m19">
+                <XMath>
+                  <XMTok meaning="divide" role="MULOP">/</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center">¤</td>
+            <td align="center">‹</td>
+            <td align="center">›</td>
+            <td align="center">fi</td>
+            <td align="center">fl</td>
+          </tr>
+          <tr>
+            <td align="left" border="r" thead="row">Ex</td>
+            <td align="center">‡</td>
+            <td align="center">·</td>
+            <td align="center">‚</td>
+            <td align="center">„</td>
+            <td align="center">‰</td>
+            <td align="center">Â</td>
+            <td align="center">Ê</td>
+            <td align="center">Á</td>
+            <td align="center">Ë</td>
+            <td align="center">È</td>
+            <td align="center">Í</td>
+            <td align="center">Î</td>
+            <td align="center">Ï</td>
+            <td align="center">Ì</td>
+            <td align="center">Ó</td>
+            <td align="center">Ô</td>
+          </tr>
+          <tr>
+            <td align="left" border="r" thead="row">Fx</td>
+            <td/>
+            <td align="center">Ò</td>
+            <td align="center">Ú</td>
+            <td align="center">Û</td>
+            <td align="center">Ù</td>
+            <td align="center">ı</td>
+            <td align="center">^</td>
+            <td align="center">~</td>
+            <td align="center">¯</td>
+            <td align="center">˘</td>
+            <td align="center">˙</td>
+            <td align="center">o</td>
+            <td align="center">¸</td>
+            <td align="center">˝</td>
+            <td align="center">˛</td>
+            <td align="center">ˇ</td>
+          </tr>
+        </tbody>
+      </tabular>
+    </para>
+  </section>
+</document>

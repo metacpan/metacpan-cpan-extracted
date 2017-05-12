@@ -1,0 +1,29 @@
+get an uninitialised value from robot rules on news urls.. why
+
+The ftp HEAD method appears to be dangerous.  What it seems to do is
+start the connection then abort it.  This could possibly have a bad
+effect on servers which can't cope with this.. 
+
+We should more carefully set things up for tests, by de-embedding the
+timescales from the WWW::Link module.
+
+the MAILTO should have a head method which validates addresses at the
+site where possible
+
+The system is totally careless with URLS
+
+	we should check we are following case sensitivity rules
+	properly, in particular, the scheme should be case insensitive
+	all of the time
+
+we should not substitute partial hosts 
+	or should we?? what about renamed domains.
+
+We should handle signals correctly
+
+	all of the database reading and writing programs should ``do the
+	right thing''...
+
+We should check which links are still valid
+
+first(index)

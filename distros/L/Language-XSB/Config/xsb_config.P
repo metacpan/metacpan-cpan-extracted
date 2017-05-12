@@ -1,0 +1,15 @@
+
+xsb_config :-
+	 xsb_configuration(install_dir,HOME),
+	 xsb_configuration(config_dir,CONFDIR),
+	 xsb_configuration(emudir,EMUDIR),
+	 str_cat(CONFDIR,  '/saved.o/xsb.o' , XSB_O),
+	 writeln('HOME' = HOME),
+	 writeln('XSB_O' = XSB_O),
+	 writeln('CONFDIR' = CONFDIR),
+	 writeln('EMUDIR' = EMUDIR).
+
+:-
+	writeln('__XSB_CONFIG_BEGIN__'),
+	xsb_config,
+	writeln('__XSB_CONFIG_END__').

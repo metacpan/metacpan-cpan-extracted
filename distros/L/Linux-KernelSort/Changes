@@ -1,0 +1,6 @@
+Revision history for Perl extension Linux::KernelSort.
+
+0.01  Fri Nov  3 10:04:40 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Linux::KernelSort
+

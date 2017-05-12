@@ -1,0 +1,81 @@
+NAME
+
+    LaTeX::Recode - Encode/Decode chars to/from UTF-8/macros in LaTeX
+
+SYNOPSIS
+
+        use LaTeX::Recode;
+    
+        my $string       = 'Muḥammad ibn Mūsā al-Khwārizmī';
+        my $latex_string = latex_encode($string);
+            # => 'Mu\d{h}ammad ibn M\=us\=a al-Khw\=arizm\={\i}'
+    
+        my $string = 'Mu\d{h}ammad ibn M\=us\=a al-Khw\=arizm\={\i}';
+        my $utf8_string   = latex_decode($string);
+            # => 'Muḥammad ibn Mūsā al-Khwārizmī'
+    
+    
+        # if you want to define a different conversion set (either
+        # for encoding or decoding):
+        use LaTeX::Recode encode_set => 'full', decode_set => 'base';
+
+DESCRIPTION
+
+    Allows conversion between Unicode chars and LaTeX macros.
+
+GLOBAL OPTIONS
+
+    Possible values for the encoding/decoding set to use are 'null', 'base'
+    and 'full'; default value is 'base'.
+
+    null => No conversion
+
+    base => Most common macros and diacritics (sufficient for Western
+    languages and common symbols)
+
+    full => Also converts punctuation, larger range of diacritics and
+    macros (e.g. for IPA, Latin Extended Additional, etc.), symbols, Greek
+    letters, dingbats, negated symbols, and superscript characters and
+    symbols ...
+
+ latex_decode($text, @options)
+
+    Converts LaTeX macros in the $text to Unicode characters.
+
+    The function accepts a number of options:
+
+        * normalize => $bool (default 1)
+            whether the output string should be normalized with Unicode::Normalize
+    
+        * normalization => <normalization form> (default 'NFD')
+            and if yes, the normalization form to use (see the Unicode::Normalize documentation)
+
+ latex_encode($text, @options)
+
+    Converts UTF-8 to LaTeX
+
+ _init_sets(<decode set>, <encode_set>)
+
+    Initialise recoding sets. This is a private method, and its direct
+    usage should not be needed in normal circunstances.
+
+SEE ALSO
+
+    biber
+
+AUTHOR
+
+    François Charette, Philip Kime and Alberto Simões ambs@cpan.org
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2016, François Charette, Philip Kime and Alberto Simões, all
+    rights reserved.
+
+    This code is free software. You can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0.
+
+    This program is distributed in the hope that it will be useful, but
+    without any warranty; without even the implied warranty of
+    merchantability or fitness for a particular purpose.
+

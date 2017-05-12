@@ -1,0 +1,128 @@
+% layout 'default';
+% title 'About';
+%= javascript begin
+var hasError = /error/;
+$(document).ready(function() {
+	$('div.latex-fragment, span.latex-fragment').each(function(index) {
+                $("body").css("cursor","progress");
+                $('#message').text('Converting...');
+		var tex = $(this).text();
+		var mythis = $(this);
+		//$.post("/convert", { "profile":"fragment","tex": "literal:"+tex },
+      $.post("/convert", { "profile":"fragment","tex": tex },
+			function(data){
+				if (!hasError.test(data.status)) { 
+					mythis.html(data.result);
+          $("body").css("cursor", "auto");
+          $("#message").text("Converted from TeX On-the-Fly!");
+          if (!canMathML) { MathJax.Hub.Typeset(); }
+				}
+   			}, "json");
+	});
+   });
+% end
+<div style="margin:10px;"><div class="latex-fragment">
+\title{The LaTeXML Daemon: Editable Math for
+the Collaborative Web}
+\maketitle
+\section*{Editable Math on the Web}
+Read the \href{https://svn.kwarc.info/repos/arXMLiv/doc/cicm-systems11/paper.pdf}{paper} or see the \href{/demo}{demo}.
+
+\section*{LaTeXML}
+\begin{itemize}
+\item Converts {\TeX/\LaTeX} to \textbf{XML}
+\item Embraces Open Standards \\
+
+
+\hspace{2cm}{\color{blue}\it XHTML, MathML, OpenMath, SVG}
+\item Large coverage ({\color{red}{\it$>2,000,000$ documents}})\\
+
+
+\hspace{2cm}{\color{blue}$\approx70\%$ arXiv, $\approx95\%$ZBLMath}\\
+\item Semantics-friendly
+  \begin{itemize}
+   \item Preserves source semantics
+   \item Content Mathematics
+   \item Semantic Web support\\
+
+
+   \hspace{2cm}{\color{blue}HTML5+RDFa}
+   \end{itemize}
+\item Extensible\\
+
+
+   \hspace{2cm}{\color{blue}sTeX, Daemon mode}
+\end{itemize}
+
+\section*{A Daemon for LaTeXML}
+\begin{itemize}
+\item Efficient\\
+
+
+   \hspace{2cm}{\color{blue}Load and init once}
+\vspace{1mm}
+\item Scalable\\
+
+
+   \hspace{2cm}{\color{blue}Enable multi-threaded,\\
+
+
+   \hspace{2cm}distributed workflows}
+\vspace{1mm}
+\item On-the-fly\\
+
+
+   \hspace{2cm}{\color{blue}Realtime conversion for web apps}
+\vspace{1mm}
+\item Flexible Conversion\\
+
+
+   \hspace{2cm}{\color{blue} Wikis, Forums, Journals \ldots}
+\vspace{1mm}
+\item Robust and Secure\\
+
+
+   \hspace{2cm}{\color{blue}Virtual Machine-like concerns}
+\vspace{1mm}
+\end{itemize}
+\begin{center}{\color{red}Public Domain} software\end{center}
+
+\section*{Details}
+\vspace{3mm}
+\begin{itemize}
+\item Socket Server,\\ Mojolicious web application\\
+\vspace{3mm}
+\item Perl multi-threading,\\ arXMLiv build system
+\vspace{3mm}
+\item RESTful API, Sessions,\\ Conversion Profiles
+\vspace{3mm}
+\item Perl's eval\{\} and LaTeXML::State,\\
+      Unix file system permissions
+\end{itemize}
+
+\section*{Future work}
+\begin{itemize}
+\item Enhance processing speed\\
+
+
+   \hspace{2cm}{\color{blue}Daemonize
+     post-processing,\\\hspace{2cm}Memoize math parsing}
+\vspace{2mm}
+\item Enable distributed corpora workflows\\
+
+
+   \hspace{2cm}{\color{blue}scaling on computational
+     clusters}
+\vspace{3mm}
+\item {\LaTeX} packages for web workflows\\
+
+
+   \hspace{2cm}{\color{blue}wiki.sty, Metadata support}
+\vspace{3mm}
+\item Enable incremental conversion jobs\\
+
+
+   \hspace{2cm}{\color{blue}co-editing a book on the web}
+
+\end{itemize}
+</div></div>

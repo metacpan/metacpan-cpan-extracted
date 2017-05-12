@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+use Language::l33t;
+
+my $l33t = Language::l33t->new;
+
+$l33t->load( join '', <STDIN> );
+
+$l33t->run;
+

@@ -1,0 +1,71 @@
+Nov 30 14:31:36 h174 /usr/local/bin/LaBrea: Persist Activity: 67.97.64.173 61623 -> 63.77.172.50 80
+Nov 30 14:31:39 h174 /usr/local/bin/LaBrea: Initial Connect (tarpitting): 63.204.44.126 2014 -> 63.77.172.39 80
+Nov 30 14:31:40 h174 /usr/local/bin/LaBrea: Additional Activity: 63.204.44.126 2014 -> 63.77.172.39 80
+Nov 30 14:31:50 h174 /usr/local/bin/LaBrea: Persist Trapping: 63.204.44.126 2014 -> 63.77.172.39 80 *
+Nov 30 14:31:59 h174 /usr/local/bin/LaBrea: Current average bw: 145 (bytes/sec)
+Nov 30 15:31:39 h174 /usr/local/bin/LaBrea: Initial Connect (tarpitting): 222.205.44.126 2014 -> 63.77.172.49 123
+LOTS of garbage follows
+Oct 27 18:33:10 h174 kernel: Symbol table has incorrect version number. 
+Oct 27 18:39:22 h174 modprobe: modprobe: Can't open dependencies file /lib/modules/2.4.12-ac3/modules.dep (No such file or directory)
+Oct 27 19:19:04 h174 login[2229]: ILLEGAL ROOT LOGIN on `pts/0' from `rambo.is.bizsystems.com' 
+Oct 29 07:27:04 h174 inetd[4917]: execv /usr/sbin/nmbd: No such file or directory
+Oct 29 08:03:46 h174 modprobe: modprobe: Can't locate module char-major-10-135
+Oct 29 08:03:47 h174 rpc.mountd: Caught signal 15, un-registering and exiting. 
+Oct 29 08:09:22 h174 modprobe: modprobe: Can't locate module char-major-10-135
+Oct 29 08:17:30 h174 kernel: md0: no spare disk to reconstruct array! -- continuing in degraded mode
+Oct 29 08:17:31 h174 kernel: raid1: md1, not all disks are operational -- trying to recover array
+Nov  1 08:54:11 h174 kernel: md: md0: raid array is not clean -- starting background reconstruction
+Nov 23 12:51:37 h174 modprobe: modprobe: Can't locate module ipt_MASQUERADE
+Nov 23 12:58:27 h174 last message repeated 2 times
+Nov 23 18:00:25 h174 kernel: nfsd: last server has exited
+Nov 23 18:00:25 h174 kernel: nfsd: unexporting all filesystems
+Nov 23 18:21:19 h174 kernel: Linux version 2.4.15-pre1.1 (root@h174) (gcc version 2.95.3 20010315 (release)) #1 Fri Nov 9 16:26:42 PST 2001
+Nov 23 18:21:19 h174 kernel:  BIOS-e820: 0000000000000000 - 00000000000a0000 (usable)
+Nov 23 18:21:19 h174 kernel:  BIOS-e820: 00000000000f0000 - 0000000000100000 (reserved)
+Nov 23 18:21:19 h174 kernel: On node 0 totalpages: 12032
+Nov 23 18:21:19 h174 kernel: zone(0): 4096 pages.
+Nov 23 18:21:19 h174 kernel: zone(1): 7936 pages.
+Nov 23 18:21:19 h174 kernel: zone(2): 0 pages.
+Nov 23 18:21:19 h174 kernel: Kernel command line: auto BOOT_IMAGE=LinuxRaid ro root=900 ether=10,0x300,eth0 ether=5,0x320,eth1
+Nov 23 18:21:19 h174 kernel: Detected 75.169 MHz processor.
+Nov 23 18:21:19 h174 kernel: Console: colour VGA+ 80x25
+Nov 23 18:21:19 h174 kernel: Calibrating delay loop... 149.91 BogoMIPS
+Nov 23 18:21:19 h174 kernel: Memory: 45520k/48128k available (822k kernel code, 2224k reserved, 214k data, 212k init, 0k highmem)
+Nov 23 18:21:19 h174 kernel: Dentry-cache hash table entries: 8192 (order: 4, 65536 bytes)
+Nov 23 18:21:19 h174 kernel: Inode-cache hash table entries: 4096 (order: 3, 32768 bytes)
+Nov 23 18:21:19 h174 kernel: Mount-cache hash table entries: 1024 (order: 1, 8192 bytes)
+Nov 23 18:21:19 h174 kernel: Buffer-cache hash table entries: 1024 (order: 0, 4096 bytes)
+Nov 23 18:21:19 h174 kernel: Page-cache hash table entries: 16384 (order: 4, 65536 bytes)
+Nov 23 18:21:20 h174 kernel: CPU: Intel Pentium 75 - 200 stepping 05
+Nov 23 18:21:20 h174 kernel: POSIX conformance testing by UNIFIX
+Nov 23 18:21:20 h174 kernel: PCI: PCI BIOS revision 2.10 entry at 0xfb240, last bus=0
+Nov 23 18:21:20 h174 kernel: PCI: Using configuration type 1
+Nov 23 18:21:20 h174 kernel: PCI: Probing PCI hardware
+Nov 23 18:21:20 h174 kernel: Starting kswapd
+Nov 23 18:21:20 h174 kernel: pty: 256 Unix98 ptys configured
+Nov 23 18:21:21 h174 kernel: block: 128 slots per queue, batch=32
+Nov 23 18:21:21 h174 kernel: ide: Assuming 33MHz system bus speed for PIO modes; override with idebus=xx
+Nov 23 18:21:21 h174 kernel: SIS5513: IDE controller on PCI bus 00 dev 09
+Nov 23 18:21:21 h174 kernel: SIS5513: chipset revision 208
+Nov 23 18:21:21 h174 kernel: SIS5513: not 100%% native mode: will probe irqs later
+Nov 23 18:21:21 h174 kernel:     ide0: BM-DMA at 0x4000-0x4007, BIOS settings: hda:pio, hdb:pio
+Nov 23 18:21:21 h174 kernel:     ide1: BM-DMA at 0x4008-0x400f, BIOS settings: hdc:pio, hdd:pio
+Nov 23 18:21:21 h174 kernel: hda: SAMSUNG WNR-32100A (2.1GB), ATA DISK drive
+Nov 23 18:21:21 h174 kernel: hdc: ST32122A, ATA DISK drive
+Nov 23 18:21:22 h174 kernel: ide0 at 0x1f0-0x1f7,0x3f6 on irq 14
+Nov 23 18:21:22 h174 kernel: ide1 at 0x170-0x177,0x376 on irq 15
+Nov 23 18:21:23 h174 kernel: eth0: NE2000 found at 0x300, using IRQ 10.
+Nov 23 18:21:23 h174 kernel: eth1: NE2000 found at 0x320, using IRQ 5.
+Nov 23 18:21:26 h174 kernel: IP: routing cache hash table of 512 buckets, 4Kbytes
+Nov 23 18:21:26 h174 kernel: TCP: Hash tables configured (established 4096 bind 4096)
+Nov 23 18:21:27 h174 kernel: VFS: Mounted root (ext2 filesystem) readonly.
+Nov 23 18:21:27 h174 kernel: Freeing unused kernel memory: 212k freed
+Nov 23 18:21:27 h174 kernel: ip_tables: (c)2000 Netfilter core team
+Nov 23 18:21:27 h174 kernel: ip_conntrack (376 buckets, 3008 max)
+Nov 23 18:21:27 h174 kernel: svc: unknown version (3)
+Nov 23 18:25:55 h174 LaBrea: /etc/LaBreaHardExclude not found - no hard exclusions
+Nov 23 18:25:55 h174 LaBrea: /etc/LaBreaExclude not found - no exclusions
+Nov 23 18:26:18 h174 kernel: New not syn:IN=eth0 OUT=eth1 SRC=192.168.1.167 DST=209.67.169.35 LEN=414 TOS=0x00 PREC=0x00 TTL=127 ID=9739 DF PROTO=TCP SPT=1114 DPT=80 WINDOW=8433 RES=0x00 ACK PSH URGP=0 
+Nov 23 18:26:48 h174 kernel: New not syn:IN=eth0 OUT=eth1 SRC=192.168.1.167 DST=63.77.172.29 LEN=413 TOS=0x00 PREC=0x00 TTL=127 ID=10763 DF PROTO=TCP SPT=1110 DPT=80 WINDOW=7702 RES=0x00 ACK PSH URGP=0 
+Nov 24 07:23:42 h174 kernel: New not syn:IN=eth1 OUT= MAC=00:40:05:6f:f1:14:00:20:6f:03:56:a8:08:00 SRC=63.168.243.102 DST=63.77.172.60 LEN=40 TOS=0x00 PREC=0x00 TTL=242 ID=7650 PROTO=TCP SPT=51441 DPT=4088 WINDOW=0 RES=0x00 ACK RST URGP=0 
+Nov 24 10:54:58 h174 kernel: spurious 8259A interrupt: IRQ7.

@@ -1,0 +1,37 @@
+Revision history for Perl module Lingua::EN::Fractions
+
+0.08 2015-10-27 NEILB
+    - Updated github repo URL after changing my github username
+    - Include a META.json in releases, and tag & push to github on release
+
+0.07 2014-08-16
+    - Added Travis config, and use CopyFilesFromBuild to copy Makefile.PL
+      to the top directory, so Travis can use it.
+
+0.06 2014-06-18
+    - Added support for Unicode MINUS SIGN. Thanks to Nick Patch
+      for the pull request that added this.
+
+0.05 2014-06-16
+    - Added support for Unicode fraction characters and the Unicode
+      FRACTION SLASH.
+    - Adding the Unicode support bumps min version to 5.8.0, for pragma utf8.
+
+0.04 2014-06-15
+    - Added support for a whole part ahead of the fraction.
+      eg "1 2/3" is converted as "one and two thirds".
+    - Added a testsuite for the :constants option to Number::Fraction
+
+0.03 2014-06-07
+    - Skip Number::Fraction as a prereq, since it's only explicitly
+      used in a testsuite, which is skipped if you don't have
+      Number::Fraction installed.
+
+0.02 2014-06-06
+    - Fix typo in example output in pod. Thanks to Nick Patch.
+    - Added a testsuite to confirm that fraction2words() works fine
+      with instances of Number::Fraction.
+
+0.01 2014-06-05
+    - First release to CPAN, inspired by email from Sean Burke
+

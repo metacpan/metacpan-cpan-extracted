@@ -1,0 +1,17 @@
+cpu		: MIPS
+cpu model	: VR41XX V5.2
+system type	: VR41XX Agenda VR3
+revision_id	: 0
+revision	: 0.2
+cpu_mhz		: 65.53600
+bus_mhz		: 65.53600
+BogoMIPS	: 42.80
+byteorder	: little endian
+unaligned accesses	: 2
+wait instruction	: no
+microsecond timers	: no
+extra interrupt vector	: no
+hardware watchpoint	: yes
+VCED exceptions		: not available
+VCEI exceptions		: not available
+spurious interrupts	: 0

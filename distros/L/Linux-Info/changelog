@@ -1,0 +1,60 @@
+liblinux-info-perl (1.1) trusty; urgency=low
+  * Test improvement due reported error
+  Due the following report at
+    http://www.cpantesters.org/cpan/report/9bf4f64a-e358-11e6-8701-efd0
+    9b0a6f8c, some modification were added in order to make the test
+    more robusts and recover more information about the system were it
+    failed. 
+  * Incremented version to a correct number (previous 0.9, 1.0 is the
+    next one expected by CPAN) 
+  * Improving Kwalitee 
+  * Added Perl::Critic validations Fixed some errors Replaced
+    Dist::Zilla::Plugin::PkgVersion by
+    Dist::Zilla::Plugin::OurPkgVersion 
+  * Improving Kwalitee by creating a list of provided modules defined
+    in META.yml. 
+  * Small fixes for Ubuntu DEB package 
+  * Big changes Replaced YAML::Syck with YAML::LibYAML since the former
+    is not being maintained anymore and it's not available on Ubuntu
+    LTS 14.04 Replaced usage of df program in Linux::Info::DiskUsage
+    with Filesys::Df Updated and added more tests to
+    Linux::Info::DiskUsage Linux::Info::DiskUsage now provides inode
+    information as well (optional) 
+  * Trying to fix issues with Debian package control files 
+  * Using automatic Changelog creation based on Debian standards 
+  * Added one more author dependency 
+  * manually added dependencies there is no examples in the t directory
+    (only sample data) 
+  * Renamed the examples subdirectory under t directory to avoid
+    warnings from debuild Updated the debian/changelog manually 
+  * Added necessary files to build DEB packages of distribution for
+    Ubuntu LTS Added MANIFEST.SKIP to not include those files in to the
+    CPAN tarball Upgrade de version for next release 
+  * Downgraded minimum version requires to match Ubuntu Trusty
+    available packages versions 
+  * Added more information to dist.ini 
+  * Added Dist::Zilla goodies 
+  * Merge pull request #1 from chorny/master
+  Display repository URL on MetaCPAN 
+  * repository for META.* 
+  * Moved to Dist::Zilla Updates to enable usage of Dist::Zilla for
+    automation Included control of minimum Perl version 
+  * Merge branch 'master' of github.com:glasswalk3r/Linux-Info 
+  * Changes due differences on /proc/cpuinfo for ARM processors Added a
+    new attribute called "model" and respective getter Modified the
+    tests for two attributes that were generating errors for ARM
+    processors. Now those two are conditionally tested. 
+  * Improving Kwalitee 
+  * Improvements for Sysinfo Added additional debugging for testing
+    regarding reading the flags field of /proc/cpuinfo Added the
+    attribute multithread to the SysInfo class Using Hash::Util to
+    control de attributes that are part of the class 
+  * Incremented version for new CPAN release 
+  * Improved style for GNU GPL 
+  * Improved style Include also some useful links 
+  * Initial README.md 
+  * Initial release 
+  * Initial commit 
+
+ -- Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>  Sun,  5 Feb 2017 13:47:34 +0000
+

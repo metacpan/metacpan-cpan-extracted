@@ -1,0 +1,7 @@
+Log::Dispatch::TestDiag
+
+This module provides logging output for Log::Dispatch to "diag()".  Useful when
+running tests, as you can see all of your logged output immediate as part of the
+test results.
+
+Copyright (C) 2011, Graham TerMarsch.  All Rights Reserved.

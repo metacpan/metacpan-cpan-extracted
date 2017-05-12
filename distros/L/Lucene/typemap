@@ -1,0 +1,146 @@
+TYPEMAP
+Document *                  T_CPP_CLASS
+Reader *                    T_CPP_CLASS
+IndexWriter *               T_CPP_CLASS
+IndexReader *               T_CPP_CLASS
+Term *                      T_CPP_CLASS
+IndexSearcher *             T_CPP_CLASS
+Query *                     T_CPP_CLASS
+Explanation *               T_CPP_CLASS
+HitCollector *              T_CPP_CLASS
+Hits *                      T_CPP_CLASS
+Sort *                      T_CPP_CLASS
+Filter *                    T_CPP_CLASS
+StandardFilter *            T_CPP_CLASS
+StopFilter *                T_CPP_CLASS
+LowerCaseFilter *           T_CPP_CLASS
+ISOLatin1AccentFilter *     T_CPP_CLASS
+Token *                     T_CPP_CLASS
+Tokenizer *                 T_CPP_CLASS
+TokenFilter *               T_CPP_CLASS
+TokenStream *               T_CPP_CLASS
+LowerCaseTokenizer *        T_CPP_CLASS
+WhitespaceTokenizer *       T_CPP_CLASS
+LetterTokenizer *           T_CPP_CLASS
+StandardTokenizer *         T_CPP_CLASS
+QueryFilter *               T_CPP_CLASS
+RangeFilter *               T_CPP_CLASS
+SortField *                 T_CPP_CLASS
+TermQuery *                 T_CPP_CLASS
+FuzzyQuery *                T_CPP_CLASS
+QueryParser *               T_CPP_CLASS
+MultiFieldQueryParser *     T_CPP_CLASS
+SimpleAnalyzer *            T_CPP_CLASS
+PerlAnalyzer *              T_CPP_CLASS
+PerlTokenizer *             T_CPP_CLASS
+PerlTokenFilter *           T_CPP_CLASS
+PerlCharTokenizer *         T_CPP_CLASS
+PerFieldAnalyzerWrapper *   T_CPP_CLASS
+StopAnalyzer *              T_CPP_CLASS
+WhitespaceAnalyzer *        T_CPP_CLASS
+KeywordAnalyzer *           T_CPP_CLASS
+StandardAnalyzer *          T_CPP_CLASS
+RAMDirectory *              T_CPP_CLASS
+FSDirectory *               T_CPP_CLASS
+Field *                     T_CPP_CLASS
+Analyzer *                  T_CPP_CLASS
+Directory *                 T_CPP_CLASS
+Similarity *                T_CPP_CLASS
+
+int32_t                     T_IV
+const int32_t               T_IV
+int64_t                     T_IV
+wchar_t **                  T_WCHAR_ARRAY
+const wchar_t **            T_WCHAR_ARRAY
+wchar_t_keepalive **        T_WCHAR_ARRAY_KEEPALIVE
+const wchar_t_keepalive **  T_WCHAR_ARRAY_KEEPALIVE
+wchar_t *                   T_WCHAR
+const wchar_t *             T_WCHAR
+wchar_t                     T_WCH
+const wchar_t               T_WCH
+
+
+
+INPUT
+T_IV
+    $var = ($type)SvIV($arg)
+
+T_CPP_CLASS
+    {
+        $var = SvToPtr<$type>($arg);
+        if (!$var)
+            XSRETURN_UNDEF;
+    }
+
+T_WCHAR
+    $var = SvToWChar($arg);
+    SAVEFREEPV($var);
+
+T_WCH
+    {
+        wchar_t *ch = SvToWChar($arg);
+        $var = ch[0];
+        Safefree(ch);
+    }
+
+T_WCHAR_ARRAY
+    {
+        int i = 0;
+        int inc = 1;
+        char **words = XS_unpack_charPtrPtr($arg);
+        Newz(0, $var, 100, wchar_t*);
+        while (words[i]) {
+            ${var}[i] = STRDUP_AtoW(words[i]);
+            ++i;
+            if (!(i % 100)) {
+                ++inc;
+                Renew($var, (100 * inc), wchar_t*);
+            }
+        }
+        ${var}[i] = NULL;
+        SAVEFREEPV($var);
+    }
+
+T_WCHAR_ARRAY_KEEPALIVE
+    {
+        int i = 0;
+        int inc = 1;
+        char **words = XS_unpack_charPtrPtr($arg);
+        Newz(0, $var, 100, wchar_t*);
+        while (words[i]) {
+            ${var}[i] = STRDUP_AtoW(words[i]);
+            ++i;
+            if (!(i % 100)) {
+                ++inc;
+                Renew($var, (100 * inc), wchar_t*);
+            }
+        }
+        ${var}[i] = NULL;
+    }
+
+OUTPUT
+T_IV
+    sv_setiv($arg, (IV)$var);
+T_CPP_CLASS
+        {
+          if (!$var)
+            XSRETURN_UNDEF;
+          PtrToSv(CLASS, (void*)$var, $arg);
+        }
+
+T_WCHAR
+        {
+          wchar_t* src;
+          if (!$var)
+            XSRETURN_UNDEF;
+          src = (wchar_t*) $var;
+          WCharToSv(src, (SV*)$arg);
+        }
+
+T_WCH
+        {
+          wchar_t src[2];
+          src[0] = (wchar_t)$var;
+          src[1] = 0;
+          WCharToSv(src, (SV*)$arg);
+        }

@@ -1,0 +1,190 @@
+NAME
+    Log::Structured - Log events in a structured manner
+
+VERSION
+    version 0.001003
+
+SYNOPSIS
+     use Log::Structured;
+
+     my $structured_log = Log::Structured->new({
+       category            => 'Web Server',
+       log_category        => 1,
+       priority            => 'trace',
+       log_priority        => 1,
+       log_file            => 1,
+       log_line            => 1,
+       log_date            => 1,
+       log_event_listeners => [sub {
+          my ($self, $e) = @_;
+          my @date = @{$e->{date}};
+
+          my $ymd_hms  = "$date[5]-$date[4]-$date[3] $date[2]:$date[1]:$date[0]";
+          my $location = "$e->{file}:$e->{line}";
+          warn "[$ymd_hms][$location][$e->{priority}][$e->{category}] $e->{message}"
+       }, sub {
+          open my $fh, '>>', 'log';
+          print {$fh} encode_json($_[1]) . "\n";
+       }],
+     });
+
+     $structured_log->log_event({ message => 'Starting web server' });
+
+     $structured_log->log_event({
+       message => 'Oh no!  The database melted!',
+       priority => 'fatal',
+       category => 'Core',
+     });
+
+DESCRIPTION
+    This module is meant to produce logging data flexibly and powerfully.
+    All of the data that it produces can easilly be serialized or put into a
+    database or printed on the top of a cake or whatever else you may want
+    to do with it.
+
+ATTRIBUTES
+  log_event_listeners
+    "ArrayRef[CodeRef]", coderefs get called in order, as methods, with log
+    events as an argument
+
+  caller_clan
+    A stringified regex matching packages to use when getting any caller
+    information (including stacktrace.) Typically this will be used to
+    exclude things from the caller information. So to exclue DBIx::Class and
+    SQL::Abstract from your caller information:
+
+     caller_clan => '^DBIx::Class|^SQL::Abstract',
+
+  category
+    String representing the category of the log event
+
+  priority
+    String representing the priority of the log event. Should be debug,
+    trace, info, warn, error, or fatal.
+
+  start_time
+    Returns an "ArrayRef" containing the time the object was instantiated
+
+  last_event
+    Returns an "ArrayRef"h containing the last time a log event occurred
+
+  caller_depth
+    An integer caller levels to skip when getting any caller information
+    (not including stacktrace.)
+
+ATTRIBUTES TO ENABLE LOG DATA
+    All of the following attributes will enable their respective data in the
+    log event:
+
+    *
+     log_milliseconds_since_start
+
+    *
+     log_milliseconds_since_last_log
+
+    *
+     log_line
+
+    *
+     log_file
+
+    *
+     log_package
+
+    *
+     log_subroutine
+
+    *
+     log_category
+
+    *
+     log_priority
+
+    *
+     log_date
+
+    *
+     log_host
+
+    *
+     log_pid
+
+    *
+     log_stacktrace
+
+METHODS
+  add_log_event_listener
+    Takes a coderef to be added to the "log_event_listeners"
+
+  log_event
+    Takes a hashref of the data to be passed to the event listeners. All of
+    the data except for "message", "category", and "priority" will be
+    automatically populated by the methods below, unless they are passed in.
+
+  milliseconds_since_start
+    Returns milliseconds since object has been instantiated
+
+  milliseconds_since_last_log
+    Returns milliseconds since previous log event
+
+  line
+    Returns the line at the correct depth
+
+  file
+    Returns the file at the correct depth
+
+  package
+    Returns the package at the correct depth
+
+  subroutine
+    Returns the subroutine at the correct depth
+
+  date
+    Returns an arrayref containing the results from "localtime"
+
+  host
+    Returns the host of the machine being logged on
+
+  pid
+    Returns the pid of the process being logged
+
+  stacktrace
+    Returns the a stacktrace ending at the correct depth. The stacktrace is
+    an arrayref of arrayrefs, where the inner arrayrefs match the return
+    values of caller in list context
+
+SEE ALSO
+    During initial development all the code from this module was part of
+    Log::Sprintf. This module continues to work with "Log::Sprintf". For
+    example the "SYNOPSIS"' example of instantiation could be rewritten as:
+
+     use Log::Structured;
+     use Log::Sprintf;
+
+     my $formatter = Log::Sprintf->new({ format => "[%d][%F:%L][%p][%c] %m" });
+
+     my $structured_log = Log::Structured->new({
+       category            => 'Web Server',
+       log_category        => 1,
+       priority            => 'trace',
+       log_priority        => 1,
+       log_file            => 1,
+       log_line            => 1,
+       log_date            => 1,
+       log_event_listeners => [sub {
+          warn $formatter->sprintf($_[1])
+       }, sub {
+          open my $fh, '>>', 'log';
+          print {$fh} encode_json($_[1]) . "\n";
+       }],
+     });
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

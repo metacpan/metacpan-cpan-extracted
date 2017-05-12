@@ -1,0 +1,34 @@
+Log::CSVLogger version 0.1
+=========================
+
+See Pod for documentation or 
+ perldoc Log::CSVLogger
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+or
+
+  perl -MCPAN -e 'install Log::CSVLogger;'
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+     Text::CSV_XS
+     POSIX
+     Path::Class
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Gaurav Khambhala
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,45 @@
+<h2>Newsletter Admin</h2>
+
+<form name="EDIT" id="EDIT" method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="zine-admin" />
+<input type="hidden" name="sectionid" value="[% sectionid %]" />
+
+    <p>Search by Name : <input type="text" name="searchname" /> [% ddpublish %] <input type="submit" value="GO" /></p>
+    <p><a href="pages.cgi?act=zine-admin&amp;sectionid=[% sectionid %]">view all</a>
+    | <a href="[% cgipath %]/pages.cgi?act=zine-add">add a newsletter</a>
+    | <a href="[% cgipath %]/pages.cgi?act=zine-subadmin">view subscriptions</a>
+    </p>
+
+<div class="admin">
+<table>
+<tr>
+    <th>Title</th>
+    <th width="100">Status</th>
+    <th width="50">Action</th>
+    <th width="50">Send Newsletter</th>
+</tr>
+
+[% IF data %]
+[% FOREACH item = data %]
+<tr>
+    <td><a href="/zine/edit?articleid=[% item.articleid %]">[% item.title %]</a></td>
+    <td>[% item.publishstate %]</td>
+    <td><input type="checkbox" name="LISTED" value="[% item.articleid %]" /></td>
+    <td>[% IF item.publishstate == 'Published' %]<a href="/zine/prep?articleid=[% item.articleid %]">Prepare</a>[% END %]</td>
+</tr>
+[% END %]
+[% ELSE %]
+<tr><td colspan="4" align="center">Sorry, no articles found</td></tr>
+[% END %]
+
+</table>
+
+<p>
+<input type="hidden" name="doaction" value="" />
+<input type="hidden" name="recordid" value="" />
+<input type="button" value="Promote" onClick="doSubmit('Promote',0)" />
+<input type="button" value="Delete"  onClick="doSubmit('Delete',0)" />
+</p>
+
+</div>
+</form>

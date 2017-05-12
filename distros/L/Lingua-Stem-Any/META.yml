@@ -1,0 +1,44 @@
+---
+abstract: 'Unified interface to any stemmer on CPAN'
+author:
+  - 'Nick Patch <patch@cpan.org>'
+build_requires:
+  English: '0'
+  Pod::Man: '2.04'
+  Test::More: '0.82'
+  open: '0'
+configure_requires:
+  Module::Build: '0.3622'
+  Software::License: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Stem-Any
+provides:
+  Lingua::Stem::Any:
+    file: lib/Lingua/Stem/Any.pm
+    version: '0.05'
+requires:
+  Carp: '0'
+  Lingua::Stem: '0.80'
+  Lingua::Stem::Patch: '0.04'
+  Lingua::Stem::Snowball: '0.95'
+  Lingua::Stem::UniNE: '0.08'
+  List::Util: '1.33'
+  Moo: '1.001000'
+  Unicode::CaseFold: '0'
+  Unicode::Normalize: '0'
+  namespace::clean: '0'
+  perl: v5.8.1
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/patch/lingua-stem-any-pm5/issues
+  homepage: https://github.com/patch/lingua-stem-any-pm5
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/patch/lingua-stem-any-pm5.git
+version: '0.05'

@@ -1,0 +1,13 @@
+lemonldap-ng-cli.PL
+lemonldap-ng-cli.in
+lib/Lemonldap/NG/Cli.pm
+t/Lemonldap-NG-Cli.t
+lemonldap-cli.ini
+Build.PL
+Changes
+LICENSE
+README.md
+TODO
+MANIFEST			This list of files
+META.yml
+META.json

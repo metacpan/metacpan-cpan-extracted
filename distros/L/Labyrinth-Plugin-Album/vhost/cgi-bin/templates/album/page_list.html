@@ -1,0 +1,54 @@
+[% 
+    htmltitle = 'Gallery' ;
+    title = 'Gallery' ;
+
+    crumb1_name = 'Gallery' ;
+%]
+
+<h2>Photos</h2>
+
+<div class="boxer">
+<p>These are various photos taken on numerous holidays, jaunts, nights out,
+gigs and stuff, with the occasional attempt at art. Well I try ;)</p>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name="act" value="album-main" />
+    <input type="hidden" name="latest" value="0" />
+
+    Search: <input type="text" name="metadata" value="" />
+    [% ddmonths %][% ddyears %] <input type="submit" class="gobutton" value="GO" />
+    <p>
+        <a href="[% cgipath %]/pages.cgi?act=album-main&amp;latest=1">Latest Updates</a>
+    |   <a href="[% cgipath %]/pages.cgi?act=hits-pages">Top Galleries</a>
+    |   <a href="[% cgipath %]/pages.cgi?act=hits-photos">Top Photos</a>
+</form>
+    <p>
+    Recently uploaded or updated galleries are marked with a <span class="alert">*</span>.
+    To help find a specific gallery select the month or year to better refine the list.
+    </p>
+</div>
+
+<div class="boxer">
+
+[% IF records %]
+<table class="blocker">
+[% FOREACH record = records %]
+<tr><td>[% record.year %]/[% record.month %]</td>
+    <td class="alert">[% IF record.new %]*[% END %]</td>
+    <td>
+        <a href="[% docroot %]/album/[% record.pageid %]">[% record.title %]</a></td>
+</tr>
+[% END %]
+</table>
+
+[% ELSE %]
+<p align="center">Sorry, no galleries found for those dates.</p>
+[% END %]
+
+</div>
+
+<p align="justify">All photos [% copyright %]
+<br />You are free to use these photos for all non-commercial purposes. If you
+wish to use any photo for any publicity or commercial reason, please ask before
+doing so. Permission is unlikely to be refused, but it is nice to be asked
+first ;)</p>

@@ -1,0 +1,176 @@
+=head1 NAME
+
+Leyland::Manual::Upgrading - Guide for upgrading Leyland for existing applications
+
+=head1 UPGRADING FROM VERSIONS 0.X.Y TO VERSIONS 1.X.Y
+
+Since version 1.0.0 (i.e. 1.000000), several changes have been made which are not
+backwords compatible, and thus require making certain changes for existing applications.
+
+The following is a list of changes that will require updating existing code, including
+the necessary code updates. Also included are several changes which you need to be aware
+of, even if they don't break backwords compatibility.
+
+=head2 BACKWORDS COMPATIBILITY BREAKING CHANGES
+
+=over
+
+=item * Leyland now properly inherits L<Plack::Component>, so it automatically gets the C<to_app()> method from it. You no longer need define an application subroutine that calls the C<handle()> method. On that note, the C<handle()> method is renamed to C<call()> in accordance with C<Plack::Component>. This should be a simple change in your PSGI files: either change C<handle> to C<call>, or just call the C<to_app()> method on the application object to create the application subroutine automatically.
+
+	# previous code in app.psgi
+	my $leyland_app = MyLeylandApp->new;
+	my $plack_app = sub { $leyland_app->handle(shift) };
+
+	# new code in app.psgi
+	my $plack_app = MyLeylandApp->new->to_app;
+
+	# or, if you don't want to call to_app()
+	my $leyland_app = MeyLalndApp->new;
+	my $plack_app = sub { $leyland_app->call(shift) };
+
+=item * Leyland no longer provides its own logging mechanism. The L<Plack> logger (C<psgix.logger>) is now used, so you can use your preferred logging middleware. This doesn't change the syntax for writing to the log, but changes the way it is configured.
+
+	# previous code in app.psgi
+	my $leyland_app = MyLeylandApp->new(config => {
+		logger => {
+			class => 'LogDispatch',
+			opts => \%opts
+		}
+	});
+
+	# new code in app.psgi
+	use Plack::Builder;
+	use Log::Dispatch;
+
+	my $app = MyLeylandApp->new->to_app;
+
+	builder {
+		enable 'LogDispatch', logger => Log::Dispatch->new(%opts);
+		$app;
+	};
+
+	# of course, you can use whichever logging middleware you want
+
+=item * Configuration of Leyland-specific options (such as C<views> and C<locales>) is now not done by using the C<config> hash-ref that the PSGI file provides to the application object. Instead, the options are taken from the C<setup()> method defined in the application class (if any). This method, which was previously used to make initializations upon creation of the application object, should now return a hash-ref of these configuration options. You should move your initialization work from the C<setup()> method into the Moo/Moose based C<BUILD> method (which should have been the right way to do it from the start anyway).
+
+	# previous code in app.psgi
+	my $leyland_app = MyLeylandApp->new(config => {
+		views => ['Tenjin'],
+		locales => './i18n',
+		something_app_specific => 'whatever'
+	});
+
+	# previous code in MyLeylandApp.pm
+	sub setup {
+		# initialization work
+	}
+
+	# new code in app.psgi
+	my $leyland_app = MyLeylandApp->new(config => {
+		something_app_specific => 'whatever'
+	})->to_app;
+
+	# new code in MyLeylandApp.pm
+	sub setup {
+		return {
+			views => ['Tenjin'],
+			locales => ['./i18n']
+		};
+	}
+
+	sub BUILD {
+		# initialization work
+	}
+
+=item * The C<leyland> command line utility for scaffolding a Leyland application is no longer available.
+
+=item * The C<forward()> method of L<Leyland::Context> will now only forward to a specific route method. If you don't tell it to which method to forward (e.g. C<forward('POST:/something')>), it will assume forwarding to a C<GET> method. This is a security measure so you don't accidentally forward to a "dangerous" route.
+
+	# previous code in a controller
+	$c->forward('/something'); # might forward to a GET, POST, PUT, DELETE route, whichever is the first matching
+
+	# new code in a controller
+	$c->forward('/something'); # only forwards to GET routes, same as writing $c->forward('GET:/something')
+
+=back
+
+=head2 POSSIBLY BACKWORDS COMPATIBILITY BREAKING CHANGES
+
+The following changes might require updates to existing code:
+
+=over
+
+=item * There is no longer any need to provide the application object with the name of the application (which is then available in the "name" attribute). The name is now automatically calculated - it is the package name of the application. If your app used and relied on this attribute in some way, you should take that into account.
+
+	# previous code in app.psgi
+	my $leyland_app = MyLeylandApp->new(config => { name => 'MyLeylandApp' });
+
+	# then somewhere else
+	my $name = $leyland_app->name; # = MyLeylandApp
+
+	# new code in app.psgi
+	my $leyland_app = MyLeylandApp->new->to_app;
+
+	# then somewhere else
+	my $name = $leyland_app->new; # = MyLeylandApp
+
+=item * Leyland no longer uses L<JSON::Any> as its JSON object. It now uses L<JSON> (which will automatically load L<JSON::XS> if available). The interface should be the same, but you probably should be aware of this change. Note, also, that C<convert_blessed> is now enabled on the JSON object.
+
+=item * Leyland is now L<Moo>-based instead of L<Moose>-based, so it is much lighter than previously. This change I<should not> mean anything to existing applications, except that you I<can> move them to Moo if you so wish. If your apps continue to use Moose, so will Leyland automatically.
+
+=back
+
+=head1 WHAT'S NEXT?
+
+This is the last stop of the Leyland manual. You can L<return to the table of contents|Leyland::Manual/"TABLE OF CONTENTS">
+if you wish or start writing your applications.
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Leyland at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Leyland::Manual::Upgrading
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Leyland>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Leyland>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Leyland/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

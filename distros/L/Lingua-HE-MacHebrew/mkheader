@@ -1,0 +1,207 @@
+#!perl
+#
+# This mkheader script makes two C header files,
+# $FmH_File and $ToH_File (see below their values).
+# These files are used to build Lingua::HE::MacHebrew.
+#
+use 5.006001;
+use strict;
+use warnings;
+
+my $MapFile = "hebrew.map";
+my $AddFile = "addition.map";
+my $EncName = "mache";
+
+###################
+
+my $TypeSC = 'struct macbidi_contra';
+my $TypeBC = 'STDCHAR'; # byte string
+my $TypeDC = 'STDCHAR'; # direction
+my $TypeSL = 'U8';      # length of Unicode sequence from a mac char
+
+my $FmH_File = "fm${EncName}.h";
+my $ToH_File = "to${EncName}.h";
+
+my $DirNt = 0;
+my $DirLR = 1;
+my $DirRL = 2;
+my $UvPDF = 0x202C;
+my $UvLRO = 0x202D;
+my $UvRLO = 0x202E;
+
+sub qstring {
+    return sprintf '"%s"', join '', map sprintf("\\x%02x", $_), @_;
+}
+
+sub split_into_char {
+    use bytes;
+    my $uni = pack('U*', @_);
+    my $len = length($uni);
+    my @ary;
+    for(my $i = 0; $i < $len; ++$i) {
+	push @ary, ord(substr($uni,$i,1));
+    }
+    return @ary;
+}
+
+my $StrPDF = qstring(split_into_char($UvPDF));
+my $StrLRO = qstring(split_into_char($UvLRO));
+my $StrRLO = qstring(split_into_char($UvRLO));
+
+###################
+
+my (%FmMac, %ToMacR, %ToMacL, %ToMacN, %ToMacC, %Contra, %Direct);
+
+for my $f ($AddFile, $MapFile) {
+    open IN, "<$f" or die "$f $!";
+    binmode IN;
+
+    while (<IN>) {
+	next if /^#/;
+	next if /^\s*$/;
+
+	my @t = split;
+	my $e = hex $t[0];
+	next if ! $t[1];
+
+	my @c = split /\+/, $t[1];
+	my $d = '';
+	if ($c[0] =~ /<(?:LR|RL)>/) {
+	    $d = shift @c;
+	    $d =~ tr/<>//d;
+	}
+	my @uv = map hex, @c;
+	die "no Unicode in $_" if @uv < 1;
+	die "$e > 255 in $_" if $e > 255;
+
+	for my $u (@uv) {
+	    $u > 0xffff and die "$u > 0xffff in $u";
+	}
+
+	$FmMac {$e} = [ @uv ];
+	$Direct{$e} = $d eq 'LR' ? $DirLR : $d eq 'RL' ? $DirRL : $DirNt;
+
+	if (@uv == 1) {
+	    my($row,$cel) = unpack('CC', pack 'n', $uv[0]);
+	    $ToMacL{$row}{$cel} = $e if $d ne 'RL'; # L or neutral
+	    $ToMacR{$row}{$cel} = $e if $d ne 'LR'; # R or neutral
+	    $ToMacN{$row}{$cel} = $e if $d eq '';   # neutral
+	}
+	else {
+	    my $base = shift @uv;
+	    my($row,$cel) = unpack('CC', pack 'n', $base);
+	    $ToMacC{$row}{$cel} ++;
+	    push @{ $Contra{$base} }, [ $e, split_into_char(@uv) ];
+	}
+    }
+    close IN or die "$f can't be closed.\n";
+}
+
+###################
+
+open FM, ">$FmH_File" or die "$FmH_File $!" or die;
+binmode FM;
+
+print FM <<"EOH";
+#define MACBIDI_DIR_NT	($DirNt)
+#define MACBIDI_DIR_LR	($DirLR)
+#define MACBIDI_DIR_RL	($DirRL)
+
+#define MACBIDI_UV_PDF	($UvPDF)
+#define MACBIDI_UV_LRO	($UvLRO)
+#define MACBIDI_UV_RLO	($UvRLO)
+
+#define MACBIDI_STR_PDF	($StrPDF)
+#define MACBIDI_STR_LRO	($StrLRO)
+#define MACBIDI_STR_RLO	($StrRLO)
+\n
+EOH
+
+print FM "$TypeBC* fm_${EncName}_tbl [256] = {\n";
+for (my $i = 0; $i < 256; $i++) {
+    my @u = defined $FmMac{$i} ? @{ $FmMac{$i} } : ();
+
+    my @c = split_into_char(@u);
+    my $str = qstring(@c);
+    print FM @c ? "\t($TypeBC*)$str" : "NULL";
+
+    print  FM ','  if $i != 255;
+    print  FM "\n" if $i % 2 == 1;
+}
+print FM "};\n\n";
+
+print FM "$TypeDC fm_${EncName}_dir [256] = {\n";
+for (my $i = 0; $i < 256; $i++) {
+    printf FM " %d", defined $Direct{$i} ? $Direct{$i} : $DirNt;
+    print  FM ','  if $i != 255;
+    print  FM "\n" if $i % 16 == 15;
+}
+print FM "};\n\n";
+
+close FM or die "$FmH_File can't be closed.\n";
+
+###################
+
+open TO, ">$ToH_File" or die "$ToH_File $!" or die;
+binmode TO;
+
+print TO "$TypeSC { $TypeSL len; $TypeBC* string; $TypeBC byte; };\n\n";
+
+foreach my $uv (sort { $a <=> $b } keys %Contra) {
+    my @list = sort { @$b <=> @$a } @{ $Contra{$uv} };
+			# ordered from longest
+
+    print TO "$TypeSC to_${EncName}_${uv}_contra [] = {\n";
+    foreach my $ele (@list) {
+	my ($by, @c) = @$ele;
+	my $str = qstring(@c);
+	my $len = @c;
+	print TO "\t{ ($TypeSL)$len, ($TypeBC*)$str, ($TypeBC)$by },\n";
+    }
+    print TO "{0,NULL,0}\n};\n\n";
+}
+
+my %ToMacHsh = (
+    L => \%ToMacL,
+    R => \%ToMacR,
+    N => \%ToMacN,
+    C => \%ToMacC,
+);
+
+foreach my $dir (qw( L R N C ) ) {
+    my $hsh = $ToMacHsh{$dir};
+    my $typ = $dir eq 'C' ? "$TypeSC*" : $TypeBC;
+
+    foreach my $le (sort { $a <=> $b } keys %$hsh) {
+	print TO "$typ to_${EncName}_${le}_${dir} [256] = {\n";
+	for (my $i = 0; $i < 256; $i++) {
+	    my $uv = $le * 256 + $i;
+	    if ($dir eq 'C') {
+		printf TO "\t%s",
+		    defined $hsh->{$le}{$i}
+			? "to_${EncName}_${uv}_contra"
+			: "NULL";
+	    } else {
+		printf TO "\t%s",
+		    defined $hsh->{$le}{$i} ? "($typ) $hsh->{$le}{$i}" : 0;
+	    }
+	    print  TO ','  if $i != 255;
+	    print  TO "\n" if $i % 8 == 7;
+	}
+	print TO "};\n\n";
+    }
+
+    print TO "$typ* to_${EncName}_${dir} [] = {\n";
+    for (my $i = 0; $i < 256; $i++) {
+	print TO "\t",
+	    defined $hsh->{$i} ? "to_${EncName}_${i}_${dir}" : "NULL";
+	print TO ','  if $i != 255;
+	print TO "\n" if $i % 8 == 7;
+    }
+    print TO "};\n\n\n";
+}
+
+close TO or die "$ToH_File can't be closed.\n";
+
+1;
+__END__

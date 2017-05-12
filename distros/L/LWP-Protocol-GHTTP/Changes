@@ -1,0 +1,15 @@
+Revision history for LWP-Protocol-GHTTP
+
+6.17      2017-01-04
+    - made to use DZilla
+    - Capitalized all references to the GNOME project
+    - perltidied things
+    - Marked as Deprecated
+
+6.16    2016-02-16
+    - Stripped from the main LWP distribution
+    - New tests added
+    - Bumped version ahead of LWP to make requirements easier
+    - Removed automated smoke testing
+    - Made documentation changes to make it clear this module should be avoided
+    - strict and warnings

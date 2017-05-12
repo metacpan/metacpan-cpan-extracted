@@ -1,0 +1,14 @@
+Revision history for Perl extension Ldraw.
+
+0.01  Tue Jan  4 22:17:06 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Ldraw
+
+0.5.1 First upload to CPAN
+
+0.5.2 Fri Sep 9 2005
+	- fixed file search mechanism in Lego::Ldraw::POV
+        - fixed circular reference in Lego::Ldraw::Line
+	- added option for idle callback to Lego::Ldraw::Display
+
+0.5.5 to 0.5.71 Minor documentation and distribution fixes

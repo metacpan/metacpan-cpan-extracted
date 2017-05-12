@@ -1,0 +1,30 @@
+Revision history for Perl extension Locale::Utils::PlaceholderMaketext.
+
+1.003  Fri Feb 24 17:12:16 2017
+- fixed pod
+
+1.002  Sun Apr 19 09:46:34 2015
+- fixed double new call in test
+
+1.001  Thu Apr 16 07:52:35 2015
+- fixed cpantesters seen things
+
+1.000  Mon Feb  2 08:29:12 2015
+- change boolean attribute name from strict to is_strict
+- boolean attribute is_escape_percent_sign
+  is false as default, before true
+
+0.004  Fri Jan 24 13:13:54 2014
+- fixed pod error
+- removed old Moose dependency
+
+0.003  Tue Oct 22 18:10:13 2013
+- use Moo
+- removed Build.PL from distribution
+
+0.002  Wed Apr 24 17:30:00 2012
+- handle escapes
+- repaired Build.PL
+
+0.001  Sat Nov 12 19:00:00 2011
+- first version

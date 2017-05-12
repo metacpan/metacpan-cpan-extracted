@@ -1,0 +1,12 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Log/Log4perl/ConfigByInifile.pm
+t/001_load.t
+t/002_new.t
+t/bad.ini
+t/good.ini
+META.yml                                 Module meta-data (added by MakeMaker)

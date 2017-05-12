@@ -1,0 +1,9 @@
+Revision history for Perl extension Linux::UserXAttr.
+
+0,02  Thu Mar 10 15:09:59 CET 2011
+      - more cpan tester compliance      
+
+0.01  Tue Mar  8 13:27:25 2011
+      - original version; created by h2xs 1.23 with options
+      		-A -b 5.8.8 -n Linux::UserXAttr
+

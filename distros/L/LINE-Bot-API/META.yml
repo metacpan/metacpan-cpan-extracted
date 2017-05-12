@@ -1,0 +1,46 @@
+---
+abstract: 'SDK of the LINE Messaging API for Perl'
+author:
+  - 'LINE Corporation'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LINE-Bot-API
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Digest::SHA: '0'
+  Furl: '0'
+  IO::Socket::SSL: '0'
+  JSON::XS: '0'
+  MIME::Base64: '0'
+  URI: '0'
+  parent: '0'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/line/line-bot-sdk-perl/issues
+  homepage: https://github.com/line/line-bot-sdk-perl
+  repository: https://github.com/line/line-bot-sdk-perl.git
+version: '1.03'
+x_contributors:
+  - 'Hiroyuki Akabane <hirobanex@gmail.com>'
+  - 'Jose Luis <GuitarSucks@users.noreply.github.com>'
+  - 'Kazuhiro Osawa <yappo@shibuya.pl>'
+  - 'LAU KENNETH <JP20405@w022341503a59m.local>'
+  - 'moznion <moznion@gmail.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Yuki Yoshida <worthmine@users.noreply.github.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

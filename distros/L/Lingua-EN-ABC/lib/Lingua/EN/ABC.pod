@@ -1,0 +1,213 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lingua::EN::ABC - American, British, and Canadian English
+
+=head1 SYNOPSIS
+
+    
+    use Lingua::EN::ABC ':all';
+    my $colour = a2b ('color');
+    print "$colour\n";
+    
+    
+
+
+produces output
+
+    colour
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Lingua-EN-ABC-0.06/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents version 0.06 of Lingua::EN::ABC corresponding to git
+commit 3a3f5f2f6acf9ba9ef39b6978e3dca08d9bb5f04 released on Wed Aug 31 13:24:28 2016 +0900.
+
+=head1 DESCRIPTION
+
+This module offers functions to convert between the spellings and
+vocabulary of American, British, and Canadian versions of English.
+
+=head1 FUNCTIONS
+
+The naming convention for the functions is "a" for American, "b" for
+British, "c" for Canadian, so "a2b" converts "American to British".
+
+=head2 a2b
+
+    my $british = a2b ('color');
+    # $british = 'colour'.
+
+Convert American into British spellings.  An option C<oxford> controls
+whether to use Oxford spelling (realize rather than realise):
+
+    my $oxford_british = a2b ('realize', oxford => 1);
+
+This cannot correctly convert ambiguous spellings like "program",
+which may be either "program" or "programme" in British English. See
+L</BUGS>. It tries to convert American formations like "gotten" into
+"got".
+
+=head2 b2a
+
+    my $american = b2a ('the colour of my pyjamas');
+    # $american = 'the color of my pajamas'
+
+Convert British spellings into American spellings. This cannot convert
+British formations like "got" into "gotten" due to the grammatical
+ambiguity ("I've got a car" versus "I've gotten into an accident", or
+"I got into an accident").
+
+=head2 a2c
+
+    my $canadian = a2c ('the color');
+    # $canadian = 'the colour'
+
+Convert American to Canadian spelling.
+
+=head2 c2a
+
+    my $american = c2a ('the color');
+    # $american = 'the colour'
+
+Convert Canadian to American spelling.
+
+=head2 b2c
+
+    my $canadian = b2c ('the programme');
+    # $canadian = 'the program'
+
+Convert British to Canadian spelling.
+
+=head2 c2b
+
+    my $british = c2b ($canadian);
+
+Convert Canadian to British spelling. An option C<oxford> controls
+whether to use Oxford spelling (realize rather than realise):
+
+    my $oxford_british = c2b ($canadian, oxford => 1);
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<boolean>
+
+boolean is used for making the JSON. It isn't required to use the
+module, only if you need to edit it. See also L</BUILD PROCESS>.
+
+=item L<Carp>
+
+Carp is used to print errors.
+
+=item L<JSON::Create>
+
+JSON::Create is used for making the JSON. It isn't required to use the
+module, only if you need to edit it. See also L</BUILD PROCESS>.
+
+=item L<JSON::Parse>
+
+JSON::Parse is used to read in the file of spelling data. This file
+isn't intended to be human-edited, please edit F<abc.txt> in the top
+directory of the distribution.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Lingua::EN::ABC::Data>
+
+This is the underlying data for this module, put into POD format so
+that it's easy to search and check.
+
+=item respell
+
+L<respell|http://membled.com/work/apps/respell/> is a tool to convert
+English text from one spelling system to another.
+
+=back
+
+=head1 STANDALONE SCRIPT
+
+There is a script called F<econv> in the distribution which runs these
+functions on its command line. Please use C<econv --help> for detailed
+usage instructions.
+
+=head1 BUILD PROCESS
+
+The file containing the spelling variations is F<abc.txt> in the top
+directory of the distribution. The comment at the top of the file
+contains information about the format. If you want to add to this
+module's list of words, please edit the file F<abc.txt> and send a
+pull request on github. Unfortunately the build process uses two
+private modules. One is called Table::Readable and the other one is
+called Perl::Build (this actually predates the module called
+Perl::Build on CPAN by TOKUHIROM), so it's hard to build. However, if
+you are interested in working on this module, but do not want to adopt
+it, please let me know, and I will remove the dependence on these two
+private modules. If you want to adopt the module then please contact
+me at bkb@cpan.org.
+
+=head1 BUGS
+
+=over
+
+=item No handling of ambiguous words like "program".
+
+=item Cannot convert case-insensitively.
+
+=item Word lists are not comprehensive
+
+=item The module's methodology is very far from efficient, so for very
+long texts this module may perform very badly.
+
+=item There are no tests involving the ambiguity data
+
+Up to version 0.05 of the module, the ambiguity data about which words
+are ambiguous (vice/vise etc.) was not being put into the JSON data
+file, and yet it was passing all its tests, so there cannot be any
+tests of this.
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+L<A list of words by Wikipedia user Ohconfucius|http://en.wikipedia.org/wiki/User:Ohconfucius/U.S._Spelling_versus_British_and_Canadian_Spellings>
+was used in the preparation of the data. Nigel Horne (NJH) and Ed Avis
+(EDAVIS) contributed some word additions and other suggestions.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head2 Request
+
+If you'd like to see this module continued, let me know that you're
+using it. For example, send an email, write a bug report, star the
+project's github repository, add a patch, add a C<++> on Metacpan.org,
+or write a rating at CPAN ratings. It really does make a
+difference. Thanks.
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2013-2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

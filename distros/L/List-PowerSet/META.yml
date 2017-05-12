@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: List-PowerSet
+version: 0.01
+license: perl
+distribution_type: module
+requires: {}
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  List::PowerSet:
+    file: lib/List/PowerSet.pm
+    version: 0.01
+generated_by: Module::Build version 0.21

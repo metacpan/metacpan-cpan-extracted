@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Log/Dispatch/DBI.pm
+t/00_compile.t
+t/01_csv.t
+t/02_dbh.t

@@ -1,0 +1,7 @@
+README
+Changes
+It.pm
+Makefile.PL
+META.yml
+MANIFEST
+t/00_all.t

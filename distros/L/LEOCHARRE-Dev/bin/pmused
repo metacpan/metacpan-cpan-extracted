@@ -1,0 +1,219 @@
+#!/usr/bin/perl
+use lib './lib';
+use strict;
+use base 'LEOCHARRE::CLI';
+use LEOCHARRE::PMUsed ':all';
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.13 $ =~ /(\d+)/g;
+my $o = gopts('xqlsMACr');
+
+if($o->{C}){
+   my $files = argv_aspaths();
+   
+   # use cpan for each missing module
+
+   my @all;
+
+   for my $path ( @$files ){
+      debug("path :: $path.. ");
+     my $m = _fileordir_modules($path); 
+     my @m = keys %$m;
+         
+     push @all, @m;
+   }
+   
+   ### @all
+   
+   MD: for my $module_name( @all){
+      if(  module_is_installed($module_name) ){
+         debug("$module_name already installed.\n");
+         next MD;
+      }
+
+      debug("$module_name missing.. calling cpan..\n");
+      system('cpan','-i', $module_name) ==0 or print STDERR"\n\n -- could not cpan $module_name ?\n\n";
+
+   
+   }
+
+   exit;
+
+}
+
+
+
+
+unless($o->{s}){ $o->{l} = 1; }
+
+my $code = $o->{M}; # as makefile code
+my $date = `date`;
+chomp $date;
+my $CODE = sprintf "   # gen %s by %s \n",$0,$date;
+
+my $files = argv_aspaths() or warn('missing argument list') and exit;
+
+
+if ($code){
+      $CODE.= "   PREREQ_PM => {\n";
+}
+
+for (@$files){
+   showone($_);
+}
+if ($code){
+      $CODE.= "   },\n";
+      print $CODE;
+}
+
+exit;
+
+
+
+sub _fileordir_modules {
+   my $abs = shift;
+
+   my $modules = {};
+
+   debug("$abs");
+
+   if (-d $abs){
+      debug("is dir\n");
+      $modules = modules_used_scan_tree($abs,1); # 1 is for skip ones in this package
+   }
+   else {
+      debug("is file\n");   
+      $modules = modules_used($abs);      
+   }
+
+
+   return $modules;
+}
+
+
+
+sub showone {
+   my ($abs,$modules) = (shift,{});
+   
+   debug( "$abs");
+
+   my $modules = _fileordir_modules($abs);
+   
+   showresults($modules);
+
+   return;
+   
+}
+
+
+
+
+sub showresults {
+   my $modulehash = shift;
+   
+
+    MODULE : for my $module_name (sort keys %$modulehash){      
+
+      if( !$o->{A} and _skip_module($module_name) ){ # leave out base, lib, etc
+         next MODULE;
+      }
+            
+      if ($o->{x} and module_is_installed($module_name)){
+         next MODULE;     
+      }
+      
+      if(!$code){
+         print "$module_name".( $o->{l} ? "\n" : ' ' );
+      }
+      else {
+         my $modules_simpler_version = {
+            CGI => 1,
+            Carp => 1,
+            Exporter => 1,
+            'Test::Simple' => 1,
+            'ExtUtils::MakeMaker' => 1,
+            'Smart::Comments' => 1,
+            Cwd => 1,
+
+         };
+
+         my $ropt = '';
+         if ( $o->{r} or $modules_simpler_version->{$module_name} ) { $ropt = '-r' ; } # to get numbers like 1 instead of 1.23
+         # also if a general module
+         
+
+      
+         my $version = `pmver $ropt $module_name 2>/dev/null`;
+         $version ||= 0;
+         $version < 100 or $version = 0;
+      
+         $CODE.= sprintf "      %-35s => %s,\n", "'$module_name'", "'$version'";
+
+      }
+      
+    }
+
+    print "\n" unless $o->{q};
+    
+    return;
+}
+
+sub _skip_module {
+   my $name = shift;
+   
+   return ( $name=~/^[A-Z]\w+/ ? 0 : 1 ); 
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pmused - ask questions about perl modules used in a code file or hierarchy
+
+=head1 DESCRIPTION
+
+With this you can quickly find out if a package or other mountain of perl code
+needs modules that are not installed in your system.
+Also you can have a pretty format for using with cpan install.
+
+=head1 OPTION FLAGS
+
+	-d debug on
+	-v print version and exit
+	-h help
+	-x only show modules not installed
+   -q quiet
+   
+   -l one per line, default
+   -s single line
+   
+   -M print as code for Makefile.PL
+   -r change versions like v1.0.0 to 1, 0.234 to 0
+   -A show *all* modules used, including strict, vars, etc.
+
+   -C run cpan for each missing module, does it once per module missing (-x)
+   
+=head1 USAGE
+
+To see what modules are used in a code file
+
+	pmused ./path/to/file.pl
+
+To see recursively for all perl files in a dir tree
+
+	pmused ./path/to/dev/dir
+
+To only print to screen any modules used but not installed
+
+	pmused -x ./path/to/dev/dir
+	pmused -x ./path/to/file.pl
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 SEE ALSO
+
+LEOCHARRE::Dev
+
+=cut

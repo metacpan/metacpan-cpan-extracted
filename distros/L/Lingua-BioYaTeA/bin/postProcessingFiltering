@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use File::Basename;
+use Lingua::BioYaTeA::PostProcessing;
+
+my $man = 0;
+my $help = 0;
+
+my %options;
+my $log;
+
+&GetOptions(\%options, 
+	    "help|?|h", 
+	    "man|m", 
+	    "configuration|c=s", 
+	    "input-file|i=s", 
+	    "output-file|o=s") 
+    or pod2usage(2);
+
+pod2usage(-exitstatus => 0, -verbose => 2) if $options{'man'};
+pod2usage(1) if ($options{'help'} or (!$options{'input-file'} or !$options{'output-file'} or (!$options{'configuration'})));
+
+my $in_list = $options{'input-file'};
+my $out_list = $options{'output-file'};
+
+my $postProc = Lingua::BioYaTeA::PostProcessing->new(\%options);
+
+my ($second,$minute,$hour,$day,$month,$year,$weekday,$yearday,$isdailysavingtime) = localtime(time);
+$year += 1900;
+
+$postProc->logfile(dirname($postProc->output_file) . '/term-filtering-tmp-' . "date-$year-$month-${day}_${hour}_$minute" . '.log');
+$postProc->_printOptions(\*stderr);
+$postProc->load_configuration;
+$postProc->defineTwigParser;
+$postProc->filtering;
+$postProc->printResume;
+# $postProc->rmlog;
+
+=encoding utf8
+
+=head1 NAME
+
+postProcessingFiltering - Perl script for carrying out a filtering of the extracted terms provided by BioYaTeA.
+
+=head1 SYNOPSIS
+
+postProcessingFiltering [-help] [-man] [--configuration file] input_file output_file
+
+=head1 OPTIONS
+
+=over 4
+
+=item    B<--help>, B<-h>, B<-?>              brief help message
+
+=item    B<--man>, B<-m>                   full documentation
+
+=item    B<--configuration file>, B<-c>    load the given configuration file
+
+=item    I<input_file>, I<-i>              BioYaTeA XML output file
+
+=item    I<output_file>, I<-o>             Filtered output file (BioYaTeA XML format)
+
+
+=back
+
+=head1 DESCRIPTION
+
+This script performs the post-processing of the BioYaTeA XML output in
+order to fit special requirement of the biomedical texts and to
+improve the result quality.
+
+=head1 INPUT/OUTPUT FILE FORMATS
+
+See Documentation in Lingua::YaTeA
+
+
+=head1 EXAMPLES
+
+postProcessingFiltering -i examples/sampleEN-output.xml -o examples/sampleEN-output-PP.xml --configuration examples/post-processing-filtering.conf 
+
+
+=head1 SEE ALSO
+
+Documentation of Lingua::BioYaTeA::PostProcessing, Lingua::BioYaTeA and Lingua::YaTeA 
+
+=head1 AUTHORS
+
+Wiktoria Golik <wiktoria.golik@jouy.inra.fr>, Zorana Ratkovic <Zorana.Ratkovic@jouy.inra.fr>, Robert Bossy <Robert.Bossy@jouy.inra.fr>, Claire Nédellec <claire.nedellec@jouy.inra.fr>, Thierry Hamon <thierry.hamon@univ-paris13.fr>
+
+=head1 LICENSE
+
+Copyright (C) 2012 Wiktoria Golik, Zorana Ratkovic, Robert Bossy, Claire Nédellec and Thierry Hamon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

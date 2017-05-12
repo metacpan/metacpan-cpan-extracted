@@ -1,0 +1,13 @@
+abstract: GENIA Tagger
+author: 'Yung-chung Lin <xern@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.54
+license: perl
+name: Lingua-EN-GeniaTagger
+no_index:
+  directory:
+    - inc
+    - t
+version: 0.01

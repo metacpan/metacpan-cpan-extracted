@@ -1,0 +1,19 @@
+0.05  Tue Aug 17 22:51:21 GMT 2010
+    - Use Dist::Zilla
+    - Make all warnings fatal
+
+0.04 Sun Feb 24 02:06:32 GMT 2008
+    - Doc fix
+    - Add Encode dependency
+    - Try to fix non-ascii stuff for real
+
+0.03 Sat Feb 23 19:08:53 GMT 2008
+    - Remove Makefile
+    - Escape non-ascii chars in pod
+
+0.02 Sat Feb 23 15:57:57 GMT 2008
+    - Doc fix
+
+0.01 Sat Feb 23 15:42:04 GMT 2008
+    - Initial release
+

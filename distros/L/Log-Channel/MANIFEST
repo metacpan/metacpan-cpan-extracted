@@ -1,0 +1,15 @@
+Makefile.PL
+Changes
+MANIFEST
+Channel.pm
+t/01_dispatch.t
+t/02_carp.t
+t/03_stderr.t
+t/04_packages.t
+t/05_topic.t
+t/06_decorator.t
+t/07_reuse.t
+t/08_commandeer.t
+t/09_subpkg.t
+t/10_decorate2.t
+t/11_dispatch2.t

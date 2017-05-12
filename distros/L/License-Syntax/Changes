@@ -1,0 +1,41 @@
+Revision history for License-Syntax
+
+0.13	2011-11-30, jw
+	fixed LGPL-2+
+
+0.12    2011-05-29, jw
+	Comma (',') no longer seperates licenses, it occurs within old pdb names.
+
+0.11    2011-04-28, jw
+	Implicit mapping from WWWWvD.0 to WWWW-D
+
+0.10    2011-04-20, jw
+	Enhanced add_alias(): normalizing whitespace & tracking tokenized versions of names.
+	Enhanced tokenize(): preserve names as one piece, even if they appear 
+	to contain tokens.
+	Support and prefer 'and' and 'or', instead of '&' and '|'.
+
+0.08    2011-04-19, jw
+	renamed to License::Syntax, it is not RPM specific at all.
+	added synopsis.csv from legal/trunk/rpm-license-string/
+	revamped loadmap_csv
+
+0.07    2009-09-18, jw
+	fixed test suite. again. grrr.
+
+0.05    2009-09-15, jw
+	right extend added to add_alias(); warnings for left extend attempts
+	or cyclic mapping attempts added. t/11-diag.t done. disambiguate TODO.
+        
+0.04    2009-09-15, jw
+	intial draft ready, extending test suite
+
+0.03    2009-09-14, jw
+	done load/save sqlite maps.
+	tokenize, format_tokens done.
+
+0.02	2009-09-13, jw
+	done load/save csv maps.
+
+0.01    2009-08-31, jw
+        Initial draft. Modelling misc/parse_license_string.pl as an OO perl module

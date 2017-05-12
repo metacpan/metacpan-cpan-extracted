@@ -1,0 +1,9 @@
+lib/LockFile/NetLock.pm
+Makefile.PL
+MANIFEST
+t/netlock.t
+netlock
+README
+META.yml
+Changes
+LICENSE

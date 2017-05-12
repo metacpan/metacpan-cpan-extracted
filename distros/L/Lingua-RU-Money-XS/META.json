@@ -1,0 +1,60 @@
+{
+   "abstract" : "Perl extension for digit conversion to corresponding money sum in Russian.",
+   "author" : [
+      "Igor Munkin <imun@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-RU-Money-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Encode" : "2",
+            "ExtUtils::MakeMaker" : "0",
+            "List::MoreUtils" : "0",
+            "Test::Exception" : "0",
+            "Test::Spec" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.016000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "imun@cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-RU-Money-XS"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/igormunkin/Lingua-RU-Money-XS.git",
+         "web" : "https://github.com/igormunkin/Lingua-RU-Money-XS"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

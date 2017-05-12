@@ -1,0 +1,22 @@
+######################################################################
+Revision history for Perl extension LWP::UserAgent::POE
+
+0.05  2014/05/26
+    (ms) Fixed prereq on LWP::UserAgent in Makefile.PL
+
+0.04  2014/05/23
+    (ms) Fixed test suite, added "use" before "use base" ([rt.cpan.org #95887])
+
+0.03  2010/10/19
+    (ms) Passing constructor arguments through to LWP::UserAgent to
+         allow 'agent' and other parameters to take effect.
+
+0.02  2008/12/13
+    (ms) Set LWP::UserAgent defaults (suggested by Marc Mims 
+         [rt.cpan.org #41164]).
+    (ms) Added prepare_request() call to simple_request(). Turned
+         out that LWP::UserAgent needs that in order for Basic Auth to
+         function properly (bug reported by Marc Mims [rt.cpan.org #41164].
+
+0.01  2008/07/29
+    (ms) Where it all began.

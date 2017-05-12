@@ -1,0 +1,14 @@
+Build.PL
+Changes
+examples/sample.pl
+lib/Log/Log4perl/Layout/PatternLayout/Elapsed.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/01-format-hires.t
+t/01-format-time.t
+xt/00-distribution.t
+xt/00-pod-coverage.t
+xt/00-signature.t

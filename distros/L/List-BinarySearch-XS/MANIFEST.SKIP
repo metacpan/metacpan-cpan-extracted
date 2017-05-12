@@ -1,0 +1,31 @@
+# Version control files and dirs.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+^\.git/\b
+^\.gitignore$
+
+# Makemaker generated files and dirs.
+^MANIFEST\.
+^Makefile$
+^blib/
+^MakeMaker-\d
+\.tar\.gz
+^List-BinarySearch-XS-[\d.]+/
+
+# Temp, old and emacs backup files.
+~$
+\.old$
+^#.*#$
+^\.#
+
+# Custom skips.
+\.gz$
+MYMETA\b
+pm_to_blib
+pod2htmd\.tmp
+pod2htmi\.tmp
+\.o$
+\.bs$
+\.c$

@@ -1,0 +1,1135 @@
+\documentclass[ngerman,origlongtable]{scrartcl}
+\input{packages2.tex}
+\input{dkimginc.tex}
+\input{dkhyphde.tex}
+\usepackage{fancybox}
+\usepackage{pgf}
+\usepackage{ngerman}
+\newcommand{\version}[0]{1.00}
+\author{Dipl.-Ing.~D.~Krause}
+\title{\resizebox{10cm}{!}{LaTeX::PGF::Diagram2D}}
+\ifpdf
+\hypersetup{
+  pdftitle={LaTeX::PGF::Diagram2D 1.00},
+  pdfsubject={LaTeX::PGF::Diagram2D},
+  pdfauthor={Dipl.-Ing.~D.~Krause}
+}
+\fi
+
+\newcommand{\includepgfimage}[2]{%
+\begin{figure}%
+{\centering%
+\input{#1.pgf}\caption{#2}\label{fig:#1}%
+}%
+\end{figure}%
+}
+\begin{document}
+\startofdocument
+\section{Einleitung}
+Das Perl-Modul LaTeX::PGF::Diagram2D zeichnet 2D-Diagramme entsprechend dem
+Standard \textsc{din}\,461 für die Verwendung mit \LaTeX{}.
+Unterstützt werden nur solche Diagramme, aus denen
+Werte ausgelesen werden können (in der \textsc{din} als Arbeitsdiagramme
+bezeichnet).
+
+Es können sowohl Funktionen als auch Messwerte geplottet werden
+sowie parametrische Plots.
+
+Das Modul erzeugt Diagramme als PGF-Dateien. Das \LaTeX{}-Paket
+"`pgf"' erlaubt es, Graphiken im \LaTeX-Quelltext zu beschreiben,
+diese Graphiken sind sowohl mit latex+dvips als auch mit pdflatex nutzbar.
+
+Mit Code wie
+\begin{lstlisting}
+\begin{figure}%
+{\centering%
+\input{xxx.pgf}\caption{Meine Bildunterschrift}\label{blabla}%
+}%
+\end{figure}%
+\end{lstlisting}
+kann eine PGF-Datei im \LaTeX-Quelltext eingebunden werden.
+
+Die Größe der Diagrammfläche (nicht wie bei anderen Plotprogrammen
+die Größe des sich ergebenden gesamten Bildes) wird in cm vorgegeben.
+Beim Plotten von Funktionen als Kurve werden standardmäßig
+Bezier-Spline-Segmente
+verwendet. Linienzüge (polylines) werden nur verwendet, wenn dies explizit
+angefordert wird.\\
+Das Ziel des Modules besteht nicht darin, andere Programme wie
+GnuPlot\ldots{} zu ersetzen, vielmehr erfordert ein sinnvoller Einsatz
+des Modules die Kombination mit anderer Mathematiksoftware (im Tutorial
+werden GnuPlot\footnote{\url{http://gnuplot.sourceforge.net}}
+und wxMaxima\footnote{\url{http://maxima.sourceforge.net}}
+benutzt).
+
+
+\clearpage
+\section{Tutorial}
+\subsection[Funktion]{Beispiel 1: Funktionsverlauf plotten}
+\figimage{diagf001}{Beispielschaltung}
+Es soll eine Schaltung entsprechend Abb.\vref{fig:diagf001} mit
+\begin{align*}U_{\text{q}}&=1\,\text{V}&R_{\text{i}}&=4\,\Omega\end{align*}
+untersucht werden. An eine Spannungsquelle mit der Quellspannung
+1\,V und einem Innenwiderstand von 4\,\(\Omega\) wird ein Lastwiderstand
+\(R_{\text{L}}\) angeschlossen.
+
+Gesucht wird der Strom \(I\) in Abhängigkeit von \(R_{\text{L}}\) für
+\(0\leq R_{\text{L}}\leq 10\,\Omega\).
+
+Wie man leicht sieht, gilt:
+\begin{align*}I&=\frac{U_{\text{q}}}{R_{\text{L}}+R_{\text{i}}}\end{align*}
+
+Mit GnuPlot verschaffen wir uns zunächst eine Übersicht über den Verlauf:
+\begin{lstlisting}[language=GnuPlot]
+Uq=1.0
+Ri=4.0
+set xrange [0:10.0]
+plot Uq/(Ri+x) title "Strom"
+\end{lstlisting}
+Wir sehen einen maximalen Kurzschlussstrom von 0,25\,A, die Kurve fällt
+asymptotisch ab. Für die Darstellung auf Papier entscheiden wir uns für
+eine Breite von 10\,cm und eine Höhe von 6\,cm, wir wählen den Wertebereich
+bis 0,3\,A.
+\clearpage
+\lstinputlisting[float,title={../examples/test001a.pl},language=Perl]{../examples/test001a.pl}
+Mit der Datei ../examples/test001a.pl fertigen wir den ersten Plot an.
+
+Das Modul LaTeX::PGF::Diagram2D wird mit einer "`use"'-Anweisung eingebunden
+(Zeile 3).
+
+Die Funktion \textit{I}, die als Argument den Lastwiderstands-Wert
+erwartet, wird in den Zeilen 8\ldots{}13 definiert.
+
+Mit "`LaTeX::PGF::Diagram2D->new"' wird ein neues Diagramm angelegt, hier mit
+einer Breite von 10\,cm und einer Höhe von 6\,cm (Zeile 16).
+
+Das Diagramm wird in ein \LaTeX{}-Dokument eingebunden, das mit einer
+Schriftgröße von 12\,pt erstellt wird. Dies wird in Zeile 18
+konfiguriert.
+
+Die untere \(x\)-Achse (b: bottom)
+soll einen Wertebereich von 0,0\ldots{}10,0 abdecken
+und linear geteilt sein. Gitternetzlinien für die \(x\)-Achse werden
+jeweils im Abstand von 1 gezeichnet. Skalenbeschriftungen werden jeweils
+im Abstand 1 angebracht (Zeilen 20 und 21).
+
+Die linke \(y\)-Achse (l: left)
+soll einen Wertebereich von 0,0\ldots{}0,3 abdecken.
+Gitternetzlinien sollen jeweils im Abstand 0,05 gezeichnet werden,
+Skalenbeschriftungen werden jeweils im Abstand 0,1 angebracht (also
+an jeder zweiten Gitternetzlinie) (Zeilen 22 und 23).
+
+Mit der Diagramm-Methode \textit{axis()\/} wird eine Referenz auf ein
+Achsen-Objekt geholt. Für das Objekt werden nacheinander verschiedene
+Methoden zum Setup aufgerufen. Bei jeder dieser Methoden ist der
+Rückgabewert wieder die originale Objekt-Referenz, damit sind die
+Methodenaufrufe kaskadierbar.
+
+Mit der Methode \textit{plot()\/} des Diagrammes erhalten wir ein
+Plot-Objekt (Zeile 23). Dieses Objekt wird so konfiguriert, dass es
+die Funktion \textit{I()\/} benutzt, um Werte zu ermitteln (Zeile 26).
+Hierzu wird die Funktion
+\textit{set\textunderscore{}xy\textunderscore{}fct()\/} aufgerufen,
+als Argument erhält sie eine Referenz auf die Funktion.
+
+Das Diagramm wird als Datei "`../examples/test001a.pgf"' gespeichert
+(Zeile 28).
+
+\includepgfimage{../examples/test001a}{Diagramm für den Stromverlauf}
+\clearpage
+\subsection[Beschriftung]{Beispiel 2: Achsenbeschriftung und Einheit}
+\lstinputlisting[float,language=Perl,title={../examples/test002a.pl}]{../examples/test002a.pl}
+\includepgfimage{../examples/test002a}{Diagramm mit Achsenbeschriftung und Einheiten}
+Mit der Methode \textit{set\textunderscore{}label()\/} wird die
+Achsenbeschriftung eingestellt. Mit
+\textit{set\textunderscore{}unit()\/} wird die Einheit angegeben.
+Die Angabe der Größe erfolgt im Mathematikmodus,
+die Einheiten hingegen werden aufrecht stehend gesetzt. Der verwendete
+Text wird an \LaTeX{} zur Verarbeitung übergeben, es kann also das gleiche
+Markup verwendet werden, wie im normalen \LaTeX{}-Quelltext.
+Da der Backslash auch in Perl eine Sonderbedeutung hat, müssen für jeden
+Backslash, den \LaTeX{} sehen soll zwei Backslashes im Perl-Quelltext
+stehen.
+
+Die Achsenbeschriftungen werden automatisch mit den Pfeilen in Richtung
+wachsender Werte versehen, die Einheit wird zwischen den vorletzten
+und den letzten Skalenwert geschrieben.
+\clearpage
+\subsection[Platz für Einheit]{Beispiel 3: Mehr Platz für die Einheit}
+\includepgfimage{../examples/test003a}{Mehr Platz um Einheit der \(x\)-Achse}
+Im vorangegangenen Beispiel stehen die Texte "`9"', "`\(\Omega\)"' und "`10"'
+sehr eng gedrängt. Es ist gestattet, eine oder mehrere Skalenwerte wegzulassen,
+um Platz für die Einheit zu schaffen. Dabei darf aber nicht die Beschriftung
+"`0"' weggelassen werden.
+
+Mit der Methode \textit{set\textunderscore{}omit()\/} wird festgelegt,
+wieviele Skalenwerte an der jeweiligen Achse weggelassen werden sollen.
+\lstinputlisting[float,language=Perl,title={../examples/test003a.pl}]{../examples/test003a.pl}
+\clearpage
+\subsection[Mehrere Kurven]{Beispiel 4: Mehrere Kurven}
+\includepgfimage{../examples/test004a}{Mehrere Kurven in einem Diagramm}
+Es können auch mehrere Funktionen in einem Diagramm geplottet werden,
+hierzu werden einfach mehrere Plot-Objekte angelegt und konfiguriert.
+
+Im Beispiel wird ein zweiter Plot vorgenommen, für den der Innenwiderstand
+der Spannungsquelle auf 6\,\(\Omega\) erhöht wird.
+
+Werden Variablen geändert, die als Parameter in die genutzten Funktionen
+eingehen, muss vorher die Methode \textit{finish()\/} für die bereits
+bestehenden Plot-Objekte aufgerufen werden. Diese Methode berechnet die
+für den Plot zu verwendenden Funktionswerte.
+Die Methode \textit{finish()\/} darf erst aufgerufen werden, wenn die
+Konfiguration des Plot-Objektes abgeschlossen ist.
+
+Im Beispiel wird in Zeile 28 die Berechnung der Funktionswerte für den
+ersten Plot mit \(R_{\text{i}}=4\,\Omega\) veranlasst.
+Anschließend wird die Variable "`\textdollar{}Ri"' auf 6.0 geändert.
+Danach wird ein zweites Plot-Objekt mit derselben Funktion angelegt.
+Hier kommt der geänderte \(R_{\text{i}}\)-Wert zum Tragen
+(der \textdollar{}Ri-Wert zu dem Zeitpunkt, an dem die Methode
+\textit{finish()\/} des Plot-Objektes aufgerufen wird).
+
+\lstinputlisting[float,language=Perl,title={../examples/test004a.pl}]{../examples/test004a.pl}
+\clearpage
+\subsection[Text-Labels]{Beispiel 5: Text-Labels}
+\includepgfimage{../examples/test005a}{Diagramm mit Text-Labeln}
+Mit Hilfe von Text-Labeln können verschiedene Kurven auseinandergehalten
+werden.
+Die Diagramm-Methode \textit{label()\/} legt ein Text-Label an.
+Als Argumente werden zunächst die Achsennamen angegeben, auf die sich
+die Koordinaten beziehen, dann die Koordinaten, dann der Labeltext.
+Optional können noch Angaben zum Text-Anker erfolgen.
+
+Im Beispiel werden die Kommandos
+"`\textbackslash{}colorbox"' und "`\textbackslash{}ovalbox"' aus dem
+"`fancybox"'-Paket benutzt, um optisch ansprechende Labels zu erzeugen
+(Zeilen 34 bis 39).
+\lstinputlisting[float,language=Perl,title={../examples/test005a.pl}]{../examples/test005a.pl}
+\clearpage
+\subsection[Zwei Skalen]{Beispiel 6: Mehrere Skalen}
+\includepgfimage{../examples/test006a}{Diagramm mit zwei Skalenteilungen}
+Als zweite Kurve soll jetzt die am Lastwiderstand umgesetzte Leistung
+in Abhängigkeit vom Lastwiderstand mit eingezeichnet werden.\\
+Diese ergibt sich als
+\begin{align*}P&=\frac{{U_{\text{q}}}^2R_{\text{L}}}{{(R_{\text{L}}+R_{\text{i}})}^2}\end{align*}
+Mit GnuPlot verschaffen wir uns zunächst einen Überblick:
+\begin{lstlisting}[language=GnuPlot]
+Uq=1.0
+Ri=4.0
+set xrange [0:10.0]
+plot Uq*Uq*x/((Ri+x)*(Ri+x)) title "Leistung"
+\end{lstlisting}
+Wir sehen, dass bei \(R_{\text{i}}=4\,\Omega\) ein Maximum
+\(P_{\text{max}}=0,0625\,\text{W}\) auftritt.
+Wir entscheiden uns dafür, die Diagramm-Höhe auf 8\,cm zu erhöhen. Die
+linke \(y\)-Achse deckt jetzt den Bereich bis 0,4\,A ab, die rechte
+\(y\)-Achse soll den Bereich bis 0,08\,W abdecken.
+
+Weiterhin müssen für die rechte Achse einige Abstände festgelegt werden:
+\begin{itemize}
+\item	\textit{set\textunderscore{}tic\textunderscore{}offset()\/}\\
+legt den Abstand zwischen dem Diagrammrand und der rechten Kante der
+Skalenbeschriftungen fest. Der Standardwert von 2\,mm ist für die linke
+Skale sinnvoll, für die rechte Skale muss die Einstellung an die jeweiligen
+Skalenwerte angepasst werden.
+\item	\textit{set\textunderscore{}label\textunderscore{}offset()\/}\\
+legt den Abstand zwischen Diagrammrand und der Mitte der Achsenbeschriftung
+fest.
+\item	\textit{set\textunderscore{}border()\/}\\
+legt den Abstand zwischen dem Diagrammrand und dem Bildrand fest.
+\end{itemize}
+\lstinputlisting[float,language=Perl,title={../examples/test006a.pl}]{../examples/test006a.pl}
+\clearpage
+\subsection[Einheiten]{Beispiel 7: Einheiten}
+\includepgfimage{../examples/test007a}{Geänderte Einheiten}
+Die Darstellung kann verbessert werden, indem als Einheiten mA bzw.
+mW gewählt werden.
+
+Hierzu müssen die Berechnungsfunktionen geändert werden (Ergebnis
+vor der Rückgabe mit Faktor 1000 multiplizieren) und die Achseneinstellungen
+angepasst werden.
+
+Auch die Koordinaten der Text-Labels müssen angepasst werden.
+\lstinputlisting[float,language=Perl,title={../examples/test007a.pl}]{../examples/test007a.pl}
+\clearpage
+\subsection[Ableitung angeben]{Beispiel 8: Angabe der ersten Ableitung}
+\includepgfimage{../examples/test008a}{Diagramm mit Angabe der ersten Ableitungen}
+Es ist günstig, beim Kurven-Plotten die erste Ableitung
+\begin{align*}\frac{\intd Y}{\intd X}\end{align*}
+der Funktion \(Y=f(X)\) mit anzugeben.
+
+Kurven werden mittels Bezier-Splines realisiert, für die Berechnung der
+Kontrollpunkte wird die erste Ableitung benötigt.
+Ist keine Funktion zur Berechnung der Ableitung angegeben, so wird beim
+Plot ein Natural Spline in die Funktionswerte gelegt und aus den Polynomen
+der Spline-Segmente die erste Ableitung berechnet.
+
+Für die Berechnung des Natural Splines muss ein lineares Gleichungssystem
+gelöst werden, die Anzahl der Gleichungen ist das Vierfache der Anzahl der
+Spline-Segmente. Das Lösen eines solchen Gleichungssystemes nimmt umso mehr
+Rechenzeit in Anspruch, umso größer die Anzahl der Spline-Segmente ist.
+
+Mit wxMaxima kann mit
+\begin{lstlisting}
+diff((1000*Uq/(Ri+RL)), RL);
+ratsimp(diff((1000*Uq*Uq*RL/((Ri+RL)*(Ri+RL))), RL));
+\end{lstlisting}
+die Ableitung der beiden Funktionen 
+\begin{align*}
+I(R_{\text{L}})&=\frac{1000\cdot{}U_{\text{q}}}{R_{\text{i}}+R_{\text{L}}}&P(R_{\text{L}})&=\frac{1000\cdot{}U_{\text{q}}R_{\text{L}}^2}{{(R_{\text{i}}+R_{\text{L}})}^2}\\
+\intertext{als}
+\frac{\intd I}{\intd R_{\text{L}}}&=-\frac{1000\cdot{}U_{\text{q}}}{{(R_{\text{i}}+R_{\text{L}})}^2}&\frac{\intd P}{\intd R_{\text{L}}}&=-\frac{1000\cdot{} U_{\text{q}}^2(R_{\text{L}}-R_{\text{i}})}{R_{\text{}L}^3+3R_{\text{i}}R_{\text{L}}^2+3R_{\text{i}}^2R_{\text{L}}+3R_{\text{i}}^3}\end{align*}
+einfach gefunden werden.
+
+Die Referenz auf die Funktion zur Berechnung der ersten Ableitung wird als
+optionales zweites Argument beim Aufruf von
+\textit{set\textunderscore{}xy\textunderscore{}fct()\/} angegeben
+(Zeilen 39 und 40).
+\lstinputlisting[float,language=Perl,title={../examples/test008a.pl}]{../examples/test008a.pl}
+\clearpage
+\subsection[Parametrischer Plot]{Beispiel 9: Parametrischer Plot}
+\includepgfimage{../examples/test009a}{Parametrischer Plot}
+Im Beispiel wird die spiralförmige Kurve
+\begin{align*}
+\tilde{k}:&&x&=5\expe^{-t/2\pi}\cos{t}&y&=5\expe^{-t/2\pi}\sin{t}&0&\leq{}t\leq{}6\pi
+\end{align*}
+geplottet.
+Es werden die Funktionen
+\begin{align*}
+x(t)&=5\cdot\expe^{-t/2\pi}\cos{t}&y(t)&=5\cdot\expe^{-t/2\pi}\sin{t}\\
+\intertext{und die Ableitungen}
+\frac{\intd x}{\intd t}&=-\frac{1}{2\pi}(10\pi\sin{t}+5\cos{t})\cdot\expe^{-t/2\pi}&\frac{\intd y}{\intd t}&=-\frac{1}{2\pi}(5\sin{t}-10\pi\cos{t})\expe^{-t/2\pi}\end{align*}
+benutzt. Für ein gegebenes \(t\) wird der \(x\)- bzw. \(y\)-Wert mit der
+Funktion \textit{xfct()\/} bzw. \textit{yfct()\/} berechnet.
+Die Ableitungen \(\tfrac{\intd x}{\intd t}\) bzw. \(\tfrac{\intd y}{\intd t}\)
+werden durch die Funktionen \textit{dxdt()\/} bzw. \textit{dydt()\/}
+berechnet.
+
+Die Funktion
+\textit{set\textunderscore{}parametric\textunderscore{}fct()\/}
+muss als Argumente den Startwert und den Endwert des laufenden Parameters
+\(t\) erhalten sowie die Referenzen auf die Funktionen
+\textit{xfct()\/} und \textit{yfct()\/}. Als optionale Argumente folgen
+die Referenzen auf die Funktionen
+\textit{dxdt()\/} und \textit{dydt()\/}. Auch bei parametrischen
+Kurvenplots wird die Angabe der ersten Ableitungen empfohlen.
+\lstinputlisting[float,language=Perl,title={../examples/test009a.pl}]{../examples/test009a.pl}
+\clearpage
+\subsection[Polylinie]{Beispiel 10: Kurve oder Polylinie}
+\includepgfimage{../examples/test011a}{Funktionsdarstellung als Polylinie}
+Funktionen mit steilen Anstiegen, Unstetigkeiten, Knicken und
+anderweitig unsanften
+Verläufen werden u.\,U. in Form einer Polylinie
+besser und schneller dargestellt als mittels einer Kurve (Natural Spline).
+
+Im Beispiel wird eine Rechteckspannung mit überlagerten Störungen
+dargestellt.
+
+Mit der Methode
+\textit{set\textunderscore{}lines()\/} des Plot-Objektes wird eine Darstellung
+als Polylinie veranlasst. Beim Zeichnen der Polylinie werden nur die
+Punkte benötigt, keine Anstiege. Damit entfällt das Lösen eines
+Gleichungssystemes, da kein Natural Spline benötigt wird. Im Gegenzug muss
+aber mit
+\textit{set\textunderscore{}intervals()\/} die Anzahl der Segmente erhöht und
+an die Funktion angepasst werden.
+\clearpage
+\lstinputlisting[float,language=Perl,title={../examples/test011a.pl}]{../examples/test011a.pl}
+\clearpage
+\subsection[Logarithmisch]{Beispiel 11: Logarithmische Skalenteilung}
+\includepgfimage{../examples/test012a}{Tiefpass-Übertragungsfunktion}
+Im Beispiel wird die Tiefpass-Übertragungsfunktion
+\begin{align*}
+\frac{v_U}{\text{dB}}&=20\cdot\lg{\left|\frac{1}{1+\coj\frac{f}{f_{\text{G}}}}\right|}\\[0.2em]
+&=-10\lg{\left({\left(\frac{f}{f_{\text{G}}}\right)}^2+1\right)}\end{align*}
+dargestellt. Für die \(x\)-Achse wird eine logarithmische Skalenteilung
+benutzt.
+Die Substitution
+\begin{align*}
+X&=\frac{f}{f_{\text{G}}}\\
+\intertext{ergibt}
+Y&=-10\lg{\left(X^2+1\right)}\\[0.2em]
+\frac{\intd Y}{\intd X}&=-\frac{20X}{\left(X^2+1\right)\ln{10}}
+\end{align*}
+Mit der Achsen-Methode
+\textit{set\textunderscore{}logarithmic()\/}
+wird eine logarithmische Skalenteilung für die Achse eingestellt, Anfangs-
+und Endwert müssen positiv sein.\\
+Der Wert für
+\textit{set\textunderscore{}tic\textunderscore{}step()\/} und
+\textit{set\textunderscore{}grid\textunderscore{}step()\/} gibt hier nicht
+einen Abstand sondern einen Faktor an.
+
+Im Beispiel werden Gitternetzlinien jeweils für die Verzehnfachung des
+\(x\)-Wertes gezogen.
+\clearpage
+\lstinputlisting[float,language=Perl,title={../examples/test012a.pl}]{../examples/test012a.pl}
+\clearpage
+\subsection[Daten]{Beispiel 12: Messwerte plotten}
+Im Beispiel wurde die Kennlinie \(U_{C2}=f(U{B1})\) eines zweistufigen
+Transistorverstärkers aufgenommen. Dabei wurden Messwerte entsprechend der
+Tabelle gewonnen.\\[1em]
+\begin{tabular}{ccc}
+\begin{minipage}[m]{0.45\linewidth}
+\begin{tabular}{|c|c|}
+\hline
+\(U_{B1}\) / V&\(U_{C2}\) / V\\
+\hline
+\hline
+&\\[-0.9em]0,350&~0,17\\
+\hline
+&\\[-0.9em]0,355&~0,21\\
+\hline
+&\\[-0.9em]0,360&~0,26\\
+\hline
+&\\[-0.9em]0,365&~0,31\\
+\hline
+&\\[-0.9em]0,370&~0,38\\
+\hline
+&\\[-0.9em]0,375&~0,45\\
+\hline
+&\\[-0.9em]0,380&~0,54\\
+\hline
+&\\[-0.9em]0,385&~0,65\\
+\hline
+&\\[-0.9em]0,390&~0,79\\
+\hline
+&\\[-0.9em]0,395&~0,93\\
+\hline
+&\\[-0.9em]0,400&~1,10\\
+\hline
+&\\[-0.9em]0,405&~1,33\\
+\hline
+&\\[-0.9em]0,410&~1,62\\
+\hline
+&\\[-0.9em]0,415&~1,90\\
+\hline
+&\\[-0.9em]0,420&~2,27\\
+\hline
+&\\[-0.9em]0,425&~2,66\\
+\hline
+\end{tabular}
+\end{minipage}&~\begin{minipage}[m]{0.45\linewidth}
+\begin{tabular}{|c|c|}
+\hline
+\(U_{B1}\) / V&\(U_{C2}\) / V\\
+\hline
+\hline
+&\\[-0.9em]0,430&~3,16\\
+\hline
+&\\[-0.9em]0,435&~3,65\\
+\hline
+&\\[-0.9em]0,440&~4,35\\
+\hline
+&\\[-0.9em]0,445&~5,04\\
+\hline
+&\\[-0.9em]0,450&~5,86\\
+\hline
+&\\[-0.9em]0,455&~6,64\\
+\hline
+&\\[-0.9em]0,460&~7,58\\
+\hline
+&\\[-0.9em]0,465&~8,69\\
+\hline
+&\\[-0.9em]0,470&~9,92\\
+\hline
+&\\[-0.9em]0,475&11,20\\
+\hline
+&\\[-0.9em]0,480&12,53\\
+\hline
+&\\[-0.9em]0,485&13,74\\
+\hline
+&\\[-0.9em]0,490&15,01\\
+\hline
+&\\[-0.9em]0,495&15,07\\
+\hline
+&\\[-0.9em]0,500&15,09\\
+\hline
+&\\[-0.9em]&\\
+\hline
+\end{tabular}
+\end{minipage}
+\end{tabular}\\[1em]
+Mit der Methode
+\textit{set\textunderscore{}xy\textunderscore{}points\textunderscore{}text()\/}
+des Plot-Objektes wird als Datenquelle eine Variable angegeben, die den
+Text mit den Messwerten enthält. Jeder Messpunkt steht für sich in einer
+Zeile. Optional kann -- wie für \(U_{B1}=0,49\,\text{V}\) zu sehen -- der
+Anstieg im Punkt als dritter Wert angegeben werden. Dieser wird nur
+berücksichtigt, wenn eine Kurve in die Werte hineininterpoliert wird.\\
+Mit
+\textit{set\textunderscore{}xy\textunderscore{}points\textunderscore{}file()\/}
+werden die Messwerte aus einer Datei gelesen.\\
+Mit
+\textit{set\textunderscore{}xy\textunderscore{}points()\/} wird eine Referenz
+auf ein Array angegeben, das wiederum Array-Referenzen für die Daten der
+jeweils einzelnen Punkte enthält.
+
+Mit
+\textit{set\textunderscore{}dots()\/} wird als Ausgabe eine Punktmenge
+anstelle einer Kurve erzeugt.\\
+Wird der Befehl
+\textit{set\textunderscore{}dots()\/} weggelassen, wird ein Natural Spline
+in die Messwerte hineininterpoliert und die sich daraus ergebende Kurve
+gezeichnet.
+\clearpage
+\includepgfimage{../examples/test013a}{Messwerte}
+\clearpage
+\lstinputlisting[float,language=Perl,title={../examples/test013a.pl}]{../examples/test013a.pl}
+\clearpage
+\includepgfimage{../examples/test014a}{Messkurve}
+\clearpage
+\lstinputlisting[float,language=Perl,title={../examples/test014a.pl}]{../examples/test014a.pl}
+\clearpage
+\subsection[X-Splines]{Beispiel 13: Messwerte plotten mit X-Splines}
+\includepgfimage{../examples/test015a}{Messwerte-Plot mit X-Spline}
+Da das Modul LaTeX::PGF::Diagram2D keine Glättung zur Verfügung stellt, wirkt
+der vorangegangene Plot etwas "`unruhig"'.
+Dies kann reduziert werden, indem ein X-Spline-Plot vorgenommen wird.
+Cross-Splines (X-Splines) wurden von Carole Blanc und Christophe Schlick
+auf der \textsc{siggraph}'95 vorgestellt, der Beitrag ist in den
+Proceedings abgedruckt und online als "`X-Splines: A Spline Model
+Designed for the End-User"' veröffentlicht.\\
+Ein X-Spline ist eine kontinuierliche Kurve, die durch einen Satz
+Kontrollpunkte bestimmt wird. Die Kontrollpunkte bestehen aus einem
+\(x\)-Wert, einem \(y\)-Wert und einem Wert \(s\).\\
+Für \(-1\leq{}s<0\) erfolgt eine Interpolation der Kurve durch den
+angegebenen Punkt, für \(0\leq{}s\leq{}1\) eine Approximation.
+Der Wert \(s=0\) erlaubt einen Knick der Kurve am angegebenem Punkt.
+Positive Werte \(0<s\leq{}1\) erlauben, dass sich die Kurve leicht vom
+angegebenem Punkt hinwegbewegt. Negative Werte veranlassen, dass die Kurve
+durch den Punkte gezeichnet wird, \(-1\) sorgt für die geringstmögliche
+Krümmung.
+
+Im Beispiel wird für \(U_{\text{B1}}=0,490\,\text{V}\) ein Passieren des
+Punktes mit notfalls kleinem Krümmungsradius gefordert, für alle anderen
+Messpunkte wird zugeslassen, dass die Kurve minimal versetzt wird.
+
+Zur Kontrolle werden die Messpunkte mit eingezeichnet.
+\clearpage
+\lstinputlisting[float,language=Perl,title={../examples/test015a.pl}]{../examples/test015a.pl}
+\clearpage
+\section{Referenz}
+\subsection[Diagram]{LaTeX::PGF::Diagram2D}
+\subsubsection{Übersicht}
+Jedes Objekt der Klasse LaTeX::PGF::Diagram2D repräsentiert ein Diagramm.
+\subsubsection{Konstruktor}
+\begin{itemize}
+\item	\textit{LaTeX::PGF::Diagram2D-\textgreater{}new(width, height)\/}\\
+erstellt ein neues Diagramm. Die Breite und Höhe der Zeichenfläche wird
+über die Parameter \textit{width\/} und \textit{height\/} vorgegeben,
+die Angaben erfolgen in cm.
+\end{itemize}
+\subsubsection{Setup}
+\begin{itemize}
+\item	\textit{set\textunderscore{}font\textunderscore{}size(size)\/}\\
+gibt die Schriftgröße in Point (pt) vor. Diese Angabe wird genutzt,
+um die \(y\)-Koordinate der Skalenteilung für die untere \(x\)-Achse
+zu berechnen.
+\item	\textit{axis(name)\/}\\
+gibt eine Referenz auf ein Objekt der Klasse
+"`LaTeX::PGF::Diagram2D::Axis"' zurück. Diese Objektreferenz kann genutzt
+werden, um die entsprechende Achse einzurichten.\\
+Als Namen sind "`b"', "`l"', "`r"' und "`t"' bzw. "`bottom"', "`left"',
+"`right"' und "`top"' erlaubt.
+\end{itemize}
+\subsubsection{Druckdaten}
+\begin{itemize}
+\item	\textit{plot(name,name)\/}\\
+legt ein neues Objekt der Klasse "`LaTeX::PGF::Diagram2D::Plot"' an und gibt eine
+Referenz auf das Objekt zurück. Diese Objektreferenz kann dann genutzt
+werden, um den Plot zu konfigurieren.\\
+Es sind die gleichen Achsennamen zulässig wie unter "`\textit{axis()}"'
+beschrieben.
+\item	\textit{copy\textunderscore{}plot(plot)\/}\\
+legt ein neues Objekt der Klasse "`LaTeX::PGF::Diagram2D::Plot"' als Kopie
+eines bereits vorhandenen an und gibt eine Referenz auf das Objekt zurück.\\
+\end{itemize}
+\subsubsection{Zusätzliche Graphikobjekte}
+\begin{itemize}
+\item	\textit{label(name, name, x, y, text [, position])\/}\\
+legt ein neues Textobjekt an. Als Argumente müssen die Namen der Achsen
+angegeben werden, auf die sich die Koordinaten des Textlabels beziehen,
+die Koordinaten des Textlabels und der Text selbst. Optional kann eine
+Verankerung (z.\,B. "`left"', "`right"', "`top"', "`bottom"' oder eine
+Kombination mittels Komma) angegeben werden.
+Standardmäßig wird ein Textlabel horizontal
+und vertikal zentriert an den vorgegebenen Koordinaten angebracht.
+\item	\textit{polyline(name, name, arrayreference)\/}\\
+legt ein Polyline-Objekt an.
+Als Argumente müssen die Namen der Achsen
+angegeben werden, auf die sich die Koordinaten beziehen.
+Das dritte Argument ist eine Referenz auf ein Array, in dem sich für jeden
+Punkt der \(x\)- und der \(y\)-Wert befinden.
+\end{itemize}
+\subsubsection{Ausgabe}
+\begin{itemize}
+\item	\textit{write(filename)\/}\\
+erstellt die Graphikdatei mit dem Diagramm. Hat der Dateiname die Endung
+"`.tex"', wird eine vollständige \LaTeX{}-Quelldatei erstellt,
+andernfalls eine PGF-Datei, die in eine \LaTeX{}-Quelle eingebunden werden
+kann.
+\end{itemize}
+\clearpage
+\subsection[Axis]{LaTeX::PGF::Diagram2D::Axis}
+\subsubsection{Übersicht}
+Jedes Objekt der Klasse LaTeX::PGF::Diagram2D::Axis repräsentiert eine der vier
+möglichen Achsen
+\begin{itemize}
+\item	b (bottom, untere \(x\)-Achse),
+\item	l (left, linke \(y\)-Achse),
+\item	r (right, rechte \(y\)-Achse) bzw.
+\item	t (top, obere \(x\)-Achse).
+\end{itemize}
+Die Objekte werden automatisch vom Konstruktor der Klasse
+LaTeX::PGF::Diagram2D mit angelegt.
+
+Mit der Diagramm-Methode
+\textit{get\textunderscore{}axis(name)\/} erhält man die Referenz auf das
+zur jeweiligen Achse gehörige Objekt. Als Namen sind "`b"',
+"`l"', "`r"' bzw. "`t"' zulässig, alternativ können
+"`bottom"', "`left"', "`right"' bzw. "`top"' genutzt werden.
+
+\subsubsection{Wertebereich}
+\begin{itemize}
+\item	\textit{set\textunderscore{}linear(min, max)\/}\\
+legt eine lineare Skalenteilung für die Achse mit dem angegebenen
+Wertebereich fest.
+\item	\textit{set\textunderscore{}logarithmic(min, max)}\\
+legt eine logarithmische Skalenteilung für die Achse fest und gibt den
+Wertebereich vor. Es sind nur positive Werte zulässig.
+\end{itemize}
+
+\subsubsection{Skalenteilung}
+\begin{itemize}
+\item	\textit{set\textunderscore{}grid\textunderscore{}step(step)\/}\\
+legt die Schrittweite für die Gitternetzlinien fest (nur bottom und left).
+Für logarithmisch geteilte Skalen wird der vorgegebene Wert zum Vervielfachen
+des Minimums bzw. des letzten Wertes verwendet.
+\item	\textit{set\textunderscore{}tic\textunderscore{}step(step)\/}\\
+legt die Schrittweite zum Schreiben der Skalenteilungs-Werte fest.
+\end{itemize}
+
+\subsubsection{Achsenbeschriftung, Einheiten}
+\begin{itemize}
+\item	\textit{set\textunderscore{}label(text)\/}\\
+legt den Text für die Achsenbeschriftung fest, diese wird normalerweise
+geneigt geschrieben, wenn es sich um ein Formelzeichen handelt.
+\item	\textit{set\textunderscore{}unit(text)\/}\\
+legt die Einheit fest, diese wird aufrecht geschrieben.
+\item	\textit{set\textunderscore{}omit(number)\/}\\
+legt fest, wieviele Werte der Skalenteilung weggelassen werden sollen, um
+Platz für die Einheit zu schaffen.\\
+\emph{Hinweis:} Der Wert "`0"' darf nicht weggelassen werden.
+\item	\textit{set\textunderscore{}color(color)\/}\\
+legt die Farbe für die Achsenbeschriftung und den Pfeil fest, es können
+\LaTeX{}-Farbangaben wie z.\,B. "`blue"' oder "`blue!50!black"'
+benutzt werden.\\
+Beeinflusst wird nur die Achsenbeschriftung und der Pfeil, die Skalenteilung
+bleibt schwarz.
+\end{itemize}
+\clearpage
+\subsubsection{Ränder und Entfernungen}
+\figimagelw{}{diagf002}{Abstände}
+Für jede Achse gibt die Größe "`to"' die Entfernung vom Diagrammrand
+zum rechten, oberen oder unteren Rand der Skalenteilung an.
+Die Größe "`lo"' (label offset) gibt die Entfernung vom Diagramm-Rand zum
+Mittelpunkt der Achsenbeschriftung an.\\
+Die Größe "`bo"' (border) gibt den Abstand zwischen Diagramm-Rand und
+dem Rand der Zeichnung an.
+\begin{itemize}
+\item	\textit{set\textunderscore{}tic\textunderscore{}offset(distance)\/}\hfill{}setzt to.
+\item	\textit{set\textunderscore{}label\textunderscore{}offset(distance)\/}\hfill{}setzt lo.
+\item	\textit{set\textunderscore{}border(distance)\/}\hfill{}setzt bo.
+\end{itemize}
+\clearpage
+\subsection[Plot]{LaTeX::PGF::Diagram2D::Plot}
+\subsubsection{Übersicht}
+Jedes Objekt der Klasse "`LaTeX::PGF::Diagram2D::Plot"' repräsentiert einen
+in das Diagramm zu druckenden Datensatz.
+\subsubsection{Konstruktor}
+Der Konstruktor wird automatisch durch die Methoden
+\textit{plot()\/} bzw.
+\textit{copy\textunderscore{}plot()\/} der Klasse
+"`LaTeX::PGF::Diagram2D"' aufgerufen.
+\subsubsection{Datenquelle}
+\begin{itemize}
+\item	\textit{set\textunderscore{}xy\textunderscore{}fct(fct [, derivative ])}\/\\
+legt fest, dass zur Gewinnung der Plot-Daten die angegebene Funktion
+\textit{fct()\/} aufgerufen wird.\\
+Optional kann eine zweite Funktion angegeben werden, die als Ergebnis die
+erste Ableitung liefert. Es wird empfohlen, diese Funktion mit anzugeben wenn
+möglich.
+\item	\textit{set\textunderscore{}parametric\textunderscore{}fct(min, max, xfct, yfct [, xderivative, yderivative ])\/}\\
+legt fest, dass parametrisch geplottet werden soll. Für den laufenden
+Parameter werden der Start- und der Endwert vorgegeben.
+Die weiteren Argumente sind Referenzen zu Funktionen zur Berechnung von
+\(x\)- und \(y\)-Wert in Abhängigkeit vom laufenden Parameter und
+Funktionen zur Berechnung der ersten Ableitungen.\\
+Obwohl die Funktionen zur Berechnung der ersten Ableitung optional sind,
+wird empfohlen, diese anzugeben wenn möglich.
+\item	\textit{set\textunderscore{}xy\textunderscore{}points(arrayref)\/}\\
+gibt ein Array an, das die Koordinaten der Punkte enthält.
+Das Array wird als Referenz angegeben, es enthält wiederum Referenzen
+zu Arrays mit je einem \(x\)- und einem \(y\)-Wert und optional dem
+Anstiegswert des Punktes.
+\item	\textit{set\textunderscore{}xy\textunderscore{}points\textunderscore{}text(text)\/}\\
+gibt vor, dass die \(x\)- und \(y\)-Werte (und optional der Anstieg) für
+die Punkte aus einer Textvariablen gelesen werden.
+Jede Textzeile enthält die Daten für einen Punkt.
+\item	\textit{set\textunderscore{}xy\textunderscore{}points\textunderscore{}file(filename)\/}\\
+gibt vor, dass die Punktkoordinaten aus einer Textdatei eingelesen werden.
+Jede Zeile enthält die Daten für einen Punkt, jeweils \(x\)- und
+\(y\)-Wert, optional auch den Anstieg der Kurve im Punkt.
+\item	\textit{set\textunderscore{}xsplines\textunderscore{}points(arrayref)}\\
+gibt ein Array an, dass die Koordinaten der Messpunkte enthält.
+Das Array wird als Referenz angegeben, es enthält wiederum Referenzen
+zu Arrays mit je einem \(x\)- und einem \(y\)-Wert und optional dem
+\(s\)-Parameter des Punktes. Ist \(s\) nicht vorgegeben, wird der Standardwert
+\(-1\) verwendet.
+\item	\textit{set\textunderscore{}xsplines\textunderscore{}points\textunderscore{}text(text)}\\
+gibt vor, dass die \(x\)- und \(y\)-Werte (und optional der \(s\)-Parameter)
+für die X-Spline-Punkte aus einer Textvariable gelesen werden.
+Jede Textzeile enthält die Daten für einen Punkt.
+\item	\textit{set\textunderscore{}xsplines\textunderscore{}points\textunderscore{}file(filename)\/}\\
+gibt vor, dass die Punktkoordinaten aus einer Textdatei eingelesen werden.
+Jede Zeile enthält die Daten für einen Punkt, jeweils \(x\)- und
+\(y\)-Wert, optional einen \(s\)-Wert.
+\item	\textit{set\textunderscore{}xsplines\textunderscore{}segments(number)}\\
+legt fest, wieviele Bezier-Spline-Segmente pro X-Spline-Segment gezeichnet
+werden. Der Standardwert 8 sollte ausreichend sein.
+\end{itemize}
+\subsubsection{Ausgabe festlegen}
+\begin{itemize}
+\item	\textit{set\textunderscore{}intervals( number )\/}\\
+legt fest, in wieviele Abschnitte der Druckbereich aufgeteilt wird.
+Dies wirkt sich nur beim Plotten von Funktionen aus.
+\item	\textit{set\textunderscore{}curve()\/}\\
+legt fest, dass ein Kurvenzug ausgegeben werden soll.
+\item	\textit{set\textunderscore{}lines()\/}\\
+legt fest, dass ein Linienzug (polyline) gezeichnet wird.
+\item	\textit{set\textunderscore{}dots([ style [, size ]  ])\/}\\
+legt fest, dass eine Punktwolke gezeichnet werden soll.
+Der optionale Parameter 
+\textit{style} gibt vor, wie jeder einzelne Punkt zu zeichnen
+ist. Mögliche Werte sind
+"`circle"', "`square"', "`diamond"', "`triangle"', "`crosshair"' und
+"`pentagon"'.\\
+Der optionale zweite Parameter legt das Größenverhältnis des Punktes
+im Vergleich zur Linienbreite fest.
+\item	\textit{set\textunderscore{}color(name)\/}\\
+legt die Farbe für den Plot fest, hier können \LaTeX{}-Farbnamen
+benutzt werden.
+\end{itemize}
+\subsubsection{Druckvorbereitung}
+\begin{itemize}
+\item	\textit{finish()\/}\\
+bereitet den Datensatz zum Drucken vor. Dabei werden die Funktions- und
+ggf. die Anstiegswerte berechnet. Die Funktion wird implizit durch die
+Funktion \textit{write()\/} des Diagrammes aufgerufen.\\
+Ein expliziter Aufruf ist nur erforderlich, wenn Variablen geändert werden
+sollen, die als Parameter in die Funktionen eingehen.
+\end{itemize}
+\clearpage
+\subsection{Label}
+Jedes Objekt der Klasse "`LaTeX::PGF::Diagram2D::Plot"' repräsentiert ein
+Text-Label. Die Methode \textit{label()\/} eines Diagramm-Objektes
+erzeugt ein Label-Objekt und gibt die Referenz auf das neue Objekt zurück.
+
+Mit der Methode \textit{set\_color()\/} kann die Farbe des Textlabels eingestellt
+werden, es muss eine \LaTeX{}-Farbangabe als Argument verwendet werden.
+\clearpage
+\subsection{Polyline}
+Jedes Object der Klasse "`LaTeX::PGF::Diagram2D::Polyline"' repräsentiert
+einen zusätzlichen Linienzug. Die Methode \textit{polyline()\/} eines
+Diagramm-Objektes erzeugt ein Polyline-Objekt und gibt die Referenz auf das
+neue Objekt zurück.
+
+Mit der Methode \textit{set\_color()\/} kann die Farbe des Textlabels eingestellt
+werden, es muss eine \LaTeX{}-Farbangabe als Argument verwendet werden.
+
+Mit der Methode \textit{set\_width()\/} kann die Linienbreite eingestellt
+werden, das Argument ist ein Faktor. Die Linienbreite ergibt sich durch
+Multiplikation des Faktors mit der Linienbreite von Kurven"=Plots.
+\clearpage
+\section{Tipps}
+\begin{itemize}
+\item	\textbf{Geben Sie die erste Ableitung mit an, falls bekannt.}\\
+Beim Plotten von Funktionen wird die erste Ableitung
+\begin{align*}\frac{\intd Y}{\intd X}&\end{align*}
+benötigt, bei parametrischen Plots
+\begin{align*}\frac{\intd X}{\intd T}&&\frac{\intd Y}{\intd T}\end{align*}
+um daraus die entsprechenden Ableitungen der Verläufe auf dem Papier
+\begin{align*}\frac{\intd y}{\intd x}&&\frac{\intd x}{\intd t}&&\frac{\intd y}{\intd t}\end{align*}
+zu bilden.\\
+Sind nicht alle benötigten Ableitungen gegeben sondern nur eine Funktion
+zur Berechnung der Werte bzw. die Werte ohne Ableitungen, versucht das Modul,
+ein Natural Spline mit vereinfachten Polynomen durch die Punkte zu legen.
+Ist dabei für einen Teil der Punkte ein Anstieg gegeben, wird dieser mit
+berücksichtigt.\\
+Für jedes Spline-Segment müssen 4 Koeffizienten berechnet werden. Für \(s\)
+Splines werden \(4\cdot{}s\) Werte benötigt, es muss also ein lineares
+Gleichungssystem mit \(4\cdot{}s\) Gleichungen gelöst werden. Bei einer hohen
+Anzahl Segmente kann dies zeitaufwendig werden.\\
+Wird jedes Bezier-Segment mit den richtigen Anstiegen berechnet, spiegelt es
+den Kurvenverlauf möglicherweise etwas besser wieder als ein Bezier-Segment,
+das mit "`geratenen"' Anstiegen produziert wurde.
+\item	\textbf{Plotten Sie schwarz/weiß.}\\
+In \textsc{din} 461 ist Farbe mit keinem Wort erwähnt.
+Technische Dokumente müssen gelegentlich auch unter ungünstigen Umständen
+reproduziert werden. Beim Außeneinsatz "`auf der Baustelle"' geht es 
+beispielsweise schneller, das nächstbeste Fax zum Kopieren zu verwenden,
+als extra wegen einer Farbkopie in das Büro zurückzukehren oder einen
+Copy-Shop zu suchen.\\
+Um sicherzugehen, dass s/w-Kopien bzw. Kopien auf Faxgeräten zumindest
+noch benutzbar sind, sollten Sie Ihre Plots nach Möglichkeit nur in
+s/w anfertigen oder zumindest nur dunkle Farben verwenden.\\
+Falls Sie mehrere Kurven in ein Diagramm plotten, sollten die Kurven
+nicht nur an der Farbe unterscheidbar sein. Verwenden Sie Text-Labels
+oder erzeugen Sie eine Legende, um die Unterscheidung
+zu gewährleisten.
+\end{itemize}
+\clearpage
+\section{Theorie}
+\subsection{Koordinaten}
+2D-Plots werden benutzt, um eine Größe \(Y\) in Abhängigkeit von einer
+Größe \(X\) darzustellen. Dazu werden auf dem Paper die Koordinaten
+\(y\) und \(x\) genutzt.\\
+Bei parametrischen Plots sind \(X\) und \(Y\) abhängig von einem Parameter
+\(T\), der ein gewisses Intervall durchläuft.
+
+Für die Diagrammachse wird vorgegeben, welcher Wertebereich
+\([X_{\text{min}};X_{\text{max}}]\) den Papierkoordinaten im Bereich
+\([x_{\text{min}};x_{\text{max}}]\) entsprechen soll.
+
+Die Zuordnung zwischen Größe und Koordinate kann dabei linear
+oder logarithmisch sein.
+
+Für lineare Skalenteilungen gilt:
+\begin{align*}
+x&=x_{\text{min}}+\frac{X-X_{\text{min}}}{X_{\text{max}}-X_{\text{min}}}\cdot{}(x_{\text{max}}-x_{\text{min}})\\
+\intertext{Für die erste Ableitung ergibt sich:}
+\frac{\intd x}{\intd X}&=\frac{x_{\text{max}}-x_{\text{min}}}{X_{\text{max}}-X_{\text{min}}}\end{align*}
+Für logarithmische Skalenteilungen gilt:
+\begin{align*}
+x&=x_{\text{min}}+(x_{\text{max}}-x_{\text{min}})\frac{\log{\left(\frac{X}{X_{\text{min}}}\right)}}{\log{\left(\frac{X_{\text{max}}}{X_{\text{min}}}\right)}}\\
+\intertext{Für die erste Ableitung ergibt sich:}
+\frac{\intd x}{\intd X}&=\frac{x_{\text{max}}-x_{\text{min}}}{X\log{\left(\frac{X_{\text{max}}}{X_{\text{min}}}\right)}}
+\end{align*}
+Wie man sieht, hängt bei logarithmisch geteilten Skalen die Ableitung
+vom jeweiligen Wert ab, bei linear geteilten Skalen nicht.
+
+Analoge Beziehungen gelten für die \(y\)-Achse.
+
+Zum Zeichnen von Punkten (Dots) und Linienzügen (Polylines) sind diese
+Beziehungen ausreichend.
+\clearpage
+\subsection{Kurven-Plot mit Bezier-Splines}
+\subsubsection{Bezier-Segmente}
+Das Plotten von Funktionen erfolgt, indem eine Reihe von Stützstellen
+generiert wird, anschließend wird eine Kurve in die Stützstellen hineingelegt.
+Die Stützstellen werden so gewählt, dass sie gleiche \(x\)-Abstände
+haben (für logarithmisch geteilte Achsen bedeutet dies von Stützstelle
+zu Stützstelle eine Vervielfachung des \(X\)-Wertes mit dem gleichen
+Faktor).
+
+Die gezeichnete Kurve besteht aus mehreren Segmenten. Modere Graphikformate
+(wie PostScript, PDF und das hier genutzte PGF) unterstützen
+Bezier-Segmente. Jedes Bezier-Segment wird durch 4 Punkte
+\(P_0(x_0;y_0)\) (Anfangspunkt), \(P_0^+(x_0^+;y_0^+)\) (linker Kontrollpunkt),
+\(P_1^-(x_1^-;y_1^-)\) (rechter Kontrollpunkt) und
+\(P_1(x_1;y_1)\) (Endpunkt) definiert.
+Der Kurvenverlauf ist dann eine parametrische
+Kurve
+\begin{align*}
+0&\leq{}t\leq 1\\[0.2em]
+x(t)&={(1-t)}^3x_0+3t{(1-t)}^2x_0^++3t^2(1-t)x_1^-+t^3x_1\\[0.2em]
+y(t)&={(1-t)}^3y_0+3t{(1-t)}^2y_0^++3t^2(1-t)y_1^-+t^3y_1
+\end{align*}
+Für die ersten Ableitungen an den Stellen \(t=0\) und \(t=1\) ergibt sich
+\begin{align*}
+\atpos{\frac{\intd x}{\intd t}}{t=0}&=3x_0^+-3x_0&\atpos{\frac{\intd x}{\intd t}}{t=1}&=3x_1-3x_1^-\\[0.2em]
+\atpos{\frac{\intd y}{\intd t}}{t=0}&=3y_0^+-3y_0&\atpos{\frac{\intd y}{\intd t}}{t=1}&=3y_1-3y_1^-\\
+\intertext{Sind Anfangspunkt \(P_0\) und Endpunkt \(P_1\) sowie die Anstiege \(\tfrac{\intd x}{\intd t}\) und \(\tfrac{\intd y}{\intd t}\) in beiden Punkten bekannt, können daraus die Kontrollpunkte berechnet werden:}
+x_0^+&=x_0+\frac{1}{3}\cdot\atpos{\frac{\intd x}{\intd t}}{t=0}&x_1^-&=x_1-\frac{1}{3}\cdot\atpos{\frac{\intd x}{\intd t}}{t=1}\\[0.2em]
+y_0^+&=y_0+\frac{1}{3}\cdot\atpos{\frac{\intd y}{\intd t}}{t=0}&y_1^-&=y_1-\frac{1}{3}\cdot\atpos{\frac{\intd y}{\intd t}}{t=1}
+\end{align*}
+\clearpage
+\subsubsection{Plots y=f(x)}
+Bei Plots mit Abhängigkeit \(y=f(x)\) wird für jedes Kurvensegment
+mit gegebenem
+\[
+x_0\qquad{}y_0\qquad\atpos{\frac{\intd y}{\intd x}}{x=x_0}\qquad{}x_1\qquad{}y_1\qquad\atpos{\frac{\intd y}{\intd x}}{x=x_1}
+\]
+eine Substitution vorgenommen:
+\begin{align*}
+x(t)&=x_0+(x_1-x_0)\cdot t&t\in[0;1]\\[0.2em]
+\frac{\intd x}{\intd t}&=x_1-x_0&\frac{\intd y}{\intd t}&=\frac{\intd y}{\intd x}\cdot\frac{\intd x}{\intd t}
+\end{align*}
+Ist die Ableitung der Größen \(\tfrac{\intd Y}{\intd X}\) bekannt, so kann
+daraus die Ableitung der Kurve auf dem Papier gewonnen werden:
+\begin{align*}
+\frac{\intd y}{\intd x}&=\frac{\frac{\intd y}{\intd Y}}{\frac{\intd x}{\intd X}}\cdot\frac{\intd Y}{\intd X}
+\end{align*}
+Ist \(\tfrac{\intd Y}{\intd X}\) nicht bekannt, muss eine Interpolation der
+Kurve erfolgen, um die Anstiegswerte zu ermitteln,
+siehe Abschnitt~\vref{sec:interpolation}.
+\clearpage
+\subsubsection{Parametrische Plots}
+Für einzelne Kurvensegmente im Bereich von \(T_0\) bis \(T_1\) wird
+substituiert:
+\begin{align*}
+T(t)&=T_0+(T_1-T_0)\cdot t&t&\in[0;1]\\[0.2em]
+\frac{\intd T}{\intd t}&=T_1-T_0\end{align*}
+Sind die Ableitungen \(\tfrac{\intd X}{\intd T}\) und
+\(\tfrac{\intd Y}{\intd T}\) gegeben, können daraus die für die Bezier-Segmente
+benötigten Ableitungen \(\tfrac{\intd x}{\intd t}\)
+und \(\tfrac{\intd y}{\intd t}\) ermittelt werden:
+\begin{align*}
+\frac{\intd x}{\intd t}&=\frac{\intd x}{\intd X}\cdot\frac{\intd X}{\intd T}\cdot\frac{\intd T}{\intd t}\\[0.2em]
+\frac{\intd y}{\intd t}&=\frac{\intd y}{\intd Y}\cdot\frac{\intd Y}{\intd T}\cdot\frac{\intd T}{\intd t}
+\end{align*}
+Sind die Ableitungen nicht gegeben, werden \(\tfrac{\intd x}{\intd t}\) und
+\(\tfrac{\intd y}{\intd t}\) durch Kurveninterpolation ermittelt,
+siehe Abschnitt~\vref{sec:interpolation}.
+\clearpage
+\subsection{Kurveninterpolation}\label{sec:interpolation}
+\subsubsection{Übersicht}
+Bei der Kurveninterpolation wird nach Funktionen gesucht, die durch
+bestimmte Punkte verlaufen. Durch Differentiation dieser Funktion(en)
+kann dann der Anstieg im jeweiligen Punkt ermittelt werden. Weiterhin
+können Funktionswerte und Ableitungen auch zwischen den gegebenen Punkten
+bestimmt werden.
+
+Dabei gibt es sowohl die Möglichkeit, eine durchgängige Funktion
+zu definieren, die alle Punkte trifft als auch die Möglichkeit, die
+Interpolationsfunktion stückweise aus verschiedenen Funktionen zusammenzusetzen.
+
+Ein Beispiel für eine durchgängige Kurve wäre ein Polynom höheren Grades.
+Sind \(N\) Punkte gegeben, kann daraus ein Gleichungssystem mit \(N\)
+Gleichungen erstellt und gelöst werden, um z.\,B. die \(N\) Koeffizienten
+eines Polynomes vom Grad \(N-1\) zu bestimmen.\\
+Dieses Verfahren wird aber praktisch nicht verwendet, bzw. so selten, dass
+mir nichts davon bekannt ist. Der Nachteil eines Polynomes vom Grad
+\(N-1\) ist, dass es bis zu \(N-2\) Extremstellen aufweist. Liegen einige
+davon zufälligerweise zwischen den gegeben Punkten, erhalten wir eine stark
+oszillierende Kurve.
+
+Daher verwendet man meist andere Verfahren, wie z.\,B. Natural Splines
+oder X-Splines, bei denen der Einfluss einzelner Punkte überwiegend lokal ist.
+\subsubsection{Natural Splines}
+Für \(N\) gegebene Punkte mit streng monoton steigenden \(x\)- bzw. \(t\)-Werten
+werden \(N-1\) Segmente gebildet. Jedes Segment \(i\) zwischen den
+\(x\)-Werten \(x_i\) und \(x_{i+1}\)
+wird durch ein kubisches
+Polynom
+\begin{align*}
+y&=m_i{(x-x_i)}^3+n{(x-x_i)}^2+p_i(x-x_i)+q_i\\
+\intertext{bzw.}
+y&=a_ix^3+b_ix^2+c_ix+d_i
+\end{align*}
+beschrieben. Beide Schreibweisen sind gleichwertig,
+(\(m_i\), \(n_i\), \(p_i\), \(q_i\)) und (\(a_i\), \(b_i\), \(c_i\), \(d_i\))
+können ineinander umgerechnet werden. Wir verwenden die zweite Schreibweise,
+da sie einige Berechnungen einfacher ermöglicht.
+\clearpage
+Für \(N-1\) Kurvensegmente haben wir \(4(N-1)\) Koeffizienten zu finden,
+somit müssen wir \(4(N-1)\) Gleichungen aufstellen:
+\begin{itemize}
+\item	N-1 Gleichungen (nummeriert mit 0\ldots{}N-2) für den Funktionswert
+am linken Rand eines jeden Segmentes (\(0\leq i\leq N-1\)):
+\begin{align*}y_i&=a_ix_i^3+b_ix_i^2+c_ix_i+d_i\end{align*}
+\item	N-1 Gleichungen (nummeriert mit N-1\ldots{}2N-3) für den Funktionswert
+am rechten Rand eines jeden Splines (\(0\leq i\leq N-1\)):
+\begin{align*}y_{i+1}&=a_ix_{i+1}^3+b_ix_{i+1}^2+c_ix_{i+1}+d_i\end{align*}
+\item	N-2 Gleichungen (nummeriert mit 2N-2\ldots{}3N-5), die dafür sorgen,
+dass an inneren Punkten die erste Ableitung des linken Segmentes gleich
+der ersten Ableitung des rechten Segmentes ist (\(0\leq i\leq N-2\)):
+\begin{align*}3a_ix_{i+1}^2+2b_ix_{i+1}+c_i&=3a_{i+1}x_{i+1}^2+2b_{i+1}x_{i+1}+c_{i+1}\end{align*}
+\item	N-2 Gleichungen (nummeriert mit 3N-4\ldots{}4N-7), die dafür sorgen,
+dass an den inneren Punkten die zweite Ableitung des linken Segmentes
+gleich der zweiten Ableitung des rechten Segmentes ist
+(\(0\leq i\leq N-2\)):
+\begin{align*}6a_ix_{i+1}+2b_i&=6a_{i+1}x_{i+1}+2b_{i+1}\end{align*}
+\item	2 Gleichungen (nummeriert mit 4N-6 und 4N-5), die festlegen,
+dass die zweite Ableitung an den äußeren Punkten 0 ist:
+\begin{align*}
+6a_0x_0+2b_0&=0\\[0.2em]
+6a_{N-2}x_{N-1}+2b_{N-2}&=0\end{align*}
+\end{itemize}
+Die gesuchten Variablen in diesem Gleichungssystem sind
+die (\(a_i\), \(b_i\), \(c_i\) und \(d_i\)).
+
+Sind für einzelne Punkte \(P_i\) die ersten Ableitungen gegeben,
+müssen einzelne Gleichungen ersetzt werden.
+Handelt es sich um einen inneren Punkt, wird die Gleichung
+\(3N-4+i-1\),
+die bisher die zweite Ableitung des linken und rechten Polynomes gleichsetzte,
+ersetzt durch die Gleichung
+\begin{align*}3a_ix_i^2+2b_ix_i+c_i&=y'(x_i)\end{align*}
+Handelt es sich um den Anfangspunkt, wird die Gleichung \(4N-6\), die
+bisher die zweite Ableitung am Anfangspunkt auf 0 setzte, ersetzt durch
+\begin{align*}3a_0x_0^2+2b_0x_0+c_0&=y'(x_0)\end{align*}
+Handelt es sich um den letzten Punkt, wird die Gleichung \(4N-5\), welche
+bisher die zweite Ableitung in diesem Punkt auf 0 setzte, ersetzt durch
+\begin{align*}3a_{N-2}x_{N-1}^2+2b_{N-2}x_{N-1}+c_{N-2}&=y'(x_{N-1})\end{align*}
+
+Das Modul "`LaTeX::PGF::Diagram2D"' verwendet das Modul "`PDL"', um eine numerische
+Lösung des Gleichungssystems zu finden.
+\clearpage
+\subsubsection{X-Splines}
+Cross-Splines (X-Splines) wurden von Carole Blanc und Christophe Schlick
+auf der \textsc{siggraph}'95 vorgestellt, der Beitrag ist in den
+Proceedings abgedruckt und online als "`X-Splines: A Spline Model
+Designed for the End-User"' veröffentlicht.\\
+Hier werden X-Splines stark vereinfacht beschrieben, soweit es für das
+Verständnis des Modules "`LaTeX::PGF::Diagram2D"' erforderlich ist. Für eine
+vollständige Beschreibung der X-Splines sei auf die Konferenz-Proceedings
+verwiesen.
+
+Ein X-Spline wird als ein Satz von Kontrollpunkten angegeben,
+die einem laufenden Parameter \(t\) an den diskreten Stellen
+\(t_0\), \(t_1\)\ldots{}\(t_{N-1}\) jeweils Werte \(x_i\), \(y_i\) und
+\(s_i\) zuweisen. Optional ist auch ein \(z_i\) möglich.
+Für das Diagramm-Modul wird davon ausgegangen, dass die Stützstellen
+äquidistant mit dem Abstand 1 sind, d.h.
+\begin{align*}\forall i(0\leq i<N-1):&&&t_{i+1}-t_{i}=1\end{align*}
+Jeder Punkt weist eine linksseitige und eine rechtsseitige Gewichtsfunktion
+auf, die sich maximal bis zum übernächsten Punkt erstrecken kann.
+
+In einem beliebigen Segment zwischen den Stützstellen \(t_i\) und \(t_{i+1}\)
+werden \(x\)-Werte mit der Formel
+\begin{align*}x(t)&=\frac{x_{i-1}F_{i-1}^+(t)+x_iF_i^+(t)+x_{i+1}F_{i+1}^-(t)+x_{i+2}F_{i+2}^-(t)}{ F_{i-1}^+(t)+F_i^+(t)+F_{i+1}^-(t)+F_{i+2}^-(t)}\end{align*}
+gebildet, dabei bezeichnet \(F_j^+(t)\) die rechtsseitige Gewichtsfunktion
+des Punktes \(P_j\) und \(F_k^-(t)\) die linksseitige Gewichtsfunktion
+des Punktes \(P_k\).
+
+Als Gewichtsfunktionen kommen folgende zwei Funktionen zum Einsatz:
+\begin{align*}
+\intertext{Für die Approximation:}
+f(u)&=\begin{cases}
+u^3\big(10-p+(2p-15)u+(6-p)u^2\big)&\text{für~}0\leq{}u\leq{}1\\
+0&\text{ansonsten}\\
+\end{cases}\\
+\intertext{Für die Interpolation:}
+e(u)&=\begin{cases}
+qu+2qu^2-2qu^4-qu^5&\text{für~}-1\leq{}u<0\\
+qu+2qu^2+(10-12q-p)u^3+(2p+14q-15)u^4+(6-5q-p)u^5&\text{für~}0\leq{}u\leq{}1\\
+0&\text{ansonsten}\\
+\end{cases}
+\end{align*}
+\clearpage
+Der Parameter \(s_i\) bestimmt Typ und Parameter der rechtsseitigen
+Gewichtsfunktion des linken Nacharn und der linksseitigen Kontrollfunktion
+des rechten Nachbarn.\\
+Für \(0\leq{}s_i\leq{}1\) gilt:
+\begin{align*}
+T_{i-1}^+&=t_i+s_i&p_{i-1}^+&=2{(T_{i-1}^+-t_{i-1})}^2\\[0.2em]
+F_{i-1}^+(t)&=f\left(\frac{T_{i-1}^+-t}{T_{i-1}^+-t_i}\right)\\[0.2em]
+T_{i+1}^-&=t_i-s_i&p_{i+1}^+&=2{(t_{i+1}-T_{i+1}^-)}^2\\[0.2em]
+F_{i+1}^-(t)&=f\left(\frac{t-T_{i+1}^-}{t_{i+1}-T_{i+1}^-}\right)
+\end{align*}
+Für \(-1\leq{}s_i<0\) gilt:
+\begin{align*}
+p_{i-1}^+&=2&q_{i-1}^+&=-\tfrac{1}{2}s_i\\[0.2em]
+F_{i-1}^+(t)&=e(t_i-t)\\[0.2em]
+p_{i+1}^-&=2&q_{i+1}^-&=-\tfrac{1}{2}s_i\\[0.2em]
+F_{i+1}^-(t)&=e(t-t_i)
+\end{align*}
+\clearpage
+\subsection{Beispiele}
+\subsubsection{Punktmenge}
+\includepgfimage{../examples/test016a}{Punktmenge}
+In diesem Abschnitt werden einige Beispiele für Kurveninterpolation
+und -approximation gezeigt. Dabei soll die angegebene Punktmenge verwendet
+werden.
+\clearpage
+\subsubsection{Polynom hoher Ordnung}
+Im ersten Versuch wollen wir ein Polynom 8. Ordnung durch die 9 Messpunkte
+interpolieren.
+\begin{align*}
+y&=ax^8+bx^7+cx^6+dx^5+ex^4+fx^3+gx^2+hx+i
+\end{align*}
+Das Gleichungssystem
+\begin{align*}
+\left(\begin{array}{ccccccccc}
+1^8&1^7&1^6&1^5&1^4&1^3&1^2&1&1\\
+2^8&2^7&2^6&2^5&2^4&2^3&2^2&2&1\\
+3^8&3^7&3^6&3^5&3^4&3^3&3^2&3&1\\
+4^8&4^7&4^6&4^5&4^4&4^3&4^2&4&1\\
+5^8&5^7&5^6&5^5&5^4&5^3&5^2&5&1\\
+6^8&6^7&6^6&6^5&6^4&6^3&6^2&6&1\\
+7^8&7^7&7^6&7^5&7^4&7^3&7^2&7&1\\
+8^8&8^7&8^6&8^5&8^4&8^3&8^2&8&1\\
+9^8&9^7&9^6&9^5&9^4&9^3&9^2&9&1\\
+\end{array}\right)\cdot\left(\begin{array}{c}a\\b\\c\\d\\e\\f\\g\\h\\i\end{array}\right)&=\left(\begin{array}{c}2\\2\\2\\2\\4\\6\\6\\6\\6\end{array}\right)
+\end{align*}
+wird numerisch gelöst, dies ergibt:
+\begin{align*}
+a&=1,7647\cdot{}{10}^{-16}&b&=-1,9841\cdot{}{10}^{-3}&c&=6,9444\cdot{}{10}^{-2}&d&=-9,8056\cdot{}{10}^{-1}\\[0.2em]
+e&=7,1528&f&=-28,722&g&=62,778&h&=-68,295\\[0.2em]
+i&=30
+\end{align*}
+Abb.~\vref{fig:../examples/test017a} zeigt das Polynom. Zu sehen sind starke Oszillationen
+und ein sehr starker Anstieg an den Enden der Punktmenge.
+\clearpage
+\includepgfimage{../examples/test017a}{Interpolation mit Polynom 8. Ordnung}
+\clearpage
+\subsubsection{Natural Spline}
+Im nächsten Beispiel legen wir einen Natural Spline durch die Punktmenge.
+\lstinputlisting[language=Perl,title={../examples/test018a.pl}]{../examples/test018a.pl}
+
+Im Ergebnis (Abb.~\vref{fig:../examples/test018a}) sind noch schwache Oszillationen
+zu sehen.
+\clearpage
+\includepgfimage{../examples/test018a}{Natural Spline}
+\clearpage
+Nun geben wir für die Punkte (4;2) und (6;6) vor, dass dort ein Anstieg
+0 eingestellt werden soll, da die Kurve ja dort "`von links kommt"' bzw.
+"`nach rechts läuft"'.
+\lstinputlisting[language=Perl,title={../examples/test019a.pl}]{../examples/test019a.pl}
+Im Ergebnis (Abb.~\vref{fig:../examples/test019a}) ist zu sehen, dass die Oszillationen
+beseitigt sind.
+\clearpage
+\includepgfimage{../examples/test019a}{Natural Spline mit Vorgaben für den Anstieg}
+\clearpage
+\subsubsection{X-Splines}
+Im nächsten Beispiel nehmen wir eine Kurveninterpolation mit X-Splines
+vor. Da wir keinen \(s\)-Parameter angegeben haben, wird der
+Standardwert -1 verwendet, der eine Interpolation bewirkt.
+\lstinputlisting[language=Perl,title={../examples/test020a.pl}]{../examples/test020a.pl}
+Das Ergebnis ist in Abb.~\vref{fig:../examples/test020a} zu sehen.
+\clearpage
+\includepgfimage{../examples/test020a}{X-Spline mit Interpolation}
+\clearpage
+Nun setzen wir manuell den \(s\)-Parameter für die Punkte (4;2) und (6;6)
+auf \(-\tfrac{1}{2}\). Dies bewirkt, dass an den Punkten eine stärkere
+Krümmung zugelassen wird. Damit werden die Oszillationen verringert.
+\lstinputlisting[language=Perl,title={../examples/test021a.pl}]{../examples/test021a.pl}
+\includepgfimage{../examples/test021a}{X-Spline, Interpolation mit starker Krümmung}
+\clearpage
+Um eine Approximation durchzuführen, verwenden wir als Standardwert
+für \(s\) 1,0, diesen Wert geben wir in der Funktion
+\textit{set\textunderscore{}xsplines\textunderscore{}points\textunderscore{}text()\/}
+als zweites Argument an. Der Standardwert wird für alle Zeilen verwendet,
+die nicht explizit einen \(s\)-Wert aufweisen.
+\lstinputlisting[language=Perl,title={../examples/test022a.pl}]{../examples/test022a.pl}
+Die Approximationskurve ist in Abb.~\vref{fig:../examples/test022a} zu sehen.
+\clearpage
+\includepgfimage{../examples/test022a}{X-Spline mit Approximation}
+\clearpage
+Wir ändern nun den \(s\)-Wert der Punkte (4;2) und (6;6) auf 0,5.
+Damit wird die Kurve näher zu diesen Punkten herangezogen.
+\lstinputlisting[language=Perl,title={../examples/test023a.pl}]{../examples/test023a.pl}
+\clearpage
+\includepgfimage{../examples/test023a}{X-Spline, Approxmiation mit Heranziehen der Kurve}
+\clearpage
+In der letzten Kurve nehmen wir zahlreiche Änderungen an den \(s\)-Werten
+vor, zum zu zeigen, dass sowohl Approximations- als auch Interpolationsbereiche
+gleichzeitig möglich sind.
+\lstinputlisting[language=Perl,title={../examples/test024a.pl}]{../examples/test024a.pl}
+\clearpage
+\includepgfimage{../examples/test024a}{X-Spline, Approximation und Interpolation}
+\clearpage
+\end{document}
+

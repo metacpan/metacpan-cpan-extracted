@@ -1,0 +1,487 @@
+package List::Objects::WithUtils;
+$List::Objects::WithUtils::VERSION = '2.028003';
+use Carp;
+use strictures 2;
+
+our %ImportMap = (
+  array       => 'Array',
+  immarray    => 'Array::Immutable',
+  array_of    => 'Array::Typed',
+  immarray_of => 'Array::Immutable::Typed',
+  hash        => 'Hash',
+  immhash     => 'Hash::Immutable',
+  hash_of     => 'Hash::Typed',
+  immhash_of  => 'Hash::Immutable::Typed',
+);
+
+our @DefaultImport = keys %ImportMap;
+
+sub import {
+  my ($class, @funcs) = @_;
+
+  my $pkg;
+  if (ref $funcs[0]) {
+    croak 'Expected a list of imports or a HASH but got '.$funcs[0]
+      unless ref $funcs[0] eq 'HASH';
+    my %opts = %{ $funcs[0] };
+    @funcs = @{ $opts{import} || [ 'all' ] };
+    $pkg   = $opts{to} || caller;
+  }
+
+  @funcs = @DefaultImport unless @funcs;
+  my %fmap = map {; 
+    lc( substr($_, 0, 1) eq ':' ? substr($_, 1) : $_ ) => 1
+  } @funcs;
+
+  if (defined $fmap{all} || defined $fmap{-all}) {
+    @funcs = ( 
+      @DefaultImport,
+      'autobox'
+    )
+  } elsif (defined $fmap{functions} || defined $fmap{funcs}) {
+    # Legacy import tag, tested but not documented
+    @funcs = @DefaultImport
+  }
+
+  my @mods;
+  for my $function (@funcs) {
+    if ($function eq 'autobox' || $function eq '-autobox') {
+      require List::Objects::WithUtils::Autobox;
+      List::Objects::WithUtils::Autobox::import($class);
+      next
+    }
+    if (my $thismod = $ImportMap{$function}) {
+      push @mods, 'List::Objects::WithUtils::'.$thismod;
+      next
+    }
+    croak "Unknown import parameter '$function'"
+  }
+
+  $pkg = caller unless defined $pkg;
+  my @failed;
+  for my $mod (@mods) {
+    my $c = "package $pkg; use $mod; 1;";
+    local $@;
+    eval $c and not $@ or carp $@ and push @failed, $mod;
+  }
+
+  if (@failed) {
+    croak 'Failed to import ' . join ', ', @failed
+  }
+
+  1
+}
+
+print <<'_EOB'
+  (CLASS)
+  + (ROLES)
+   -> (SUBCLASS)
+    + (ROLES)
+List::Objects::WithUtils::
+  Array                             (array)
+  + Role::Array
+  + Role::Array::WithJunctions
+   -> Array::Immutable              (immarray)
+      + Role::Array::Immutable
+    -> Array::Immutable::Typed      (immarray_of)
+       + Role::Array::Immutable
+       + Role::Array::Typed
+   -> Array::Junction               (array->{any,all}_items)
+   -> Array::Typed                  (array_of)
+      + Role::Array::Typed
+  Hash                              (hash)
+  + Role::Hash
+   -> Hash::Immutable               (immhash)
+      + Role::Hash::Immutable
+    -> Hash::Immutable::Typed       (immhash_of)
+      + Role::Hash::Immutable
+      + Role::Hash::Typed
+   -> Hash::Typed                   (hash_of)
+      + Role::Array::Typed
+  
+  Hash::Inflated                    (hash->inflate)
+   -> Hash::Inflated::RW            (hash->inflate(rw => 1))
+_EOB
+unless caller;
+
+1;
+
+=pod
+
+=for Pod::Coverage import
+
+=head1 NAME
+
+List::Objects::WithUtils - List objects, kitchen sink included
+
+=head1 SYNOPSIS
+
+  ## A small sample; consult the description, below, for links to
+  ## extended documentation
+
+  # Import all object constructor functions:
+  #   array immarray array_of immarray_of
+  #   hash immhash hash_of immhash_of
+  use List::Objects::WithUtils;
+
+  # Import all of the above plus autoboxing:
+  use List::Objects::WithUtils ':all';
+  # Same as above, but shorter:
+  use Lowu;
+
+  # Most methods returning lists return new objects; chaining is easy:
+  array(qw/ aa Ab bb Bc bc /)
+    ->grep(sub { /^b/i })
+    ->map(sub  { uc })
+    ->uniq
+    ->all;   # ( 'BB', 'BC' )
+
+  # Useful utilities from other list modules are available:
+  my $want_idx = array(
+    +{ id => '400', user => 'bob' },
+    +{ id => '600', user => 'suzy' },
+    +{ id => '700', user => 'fred' },
+  )->first_index(sub { $_->{id} > 500 });
+
+  my $itr = array( 1 .. 7 )->natatime(3);
+  while ( my @nextset = $itr->() ) {
+    ...
+  }
+
+  my $meshed = array(qw/ a b c d /)
+    ->mesh( array(1 .. 4) )
+    ->all;   # ( 'a', 1, 'b', 2, 'c', 3, 'd', 4 )
+  
+  my ($evens, $odds) = array( 1 .. 20 )
+    ->part(sub { $_[0] & 1 })
+    ->all;
+
+  my $sorted = array(
+    +{ name => 'bob',  acct => 1 },
+    +{ name => 'fred', acct => 2 },
+    +{ name => 'suzy', acct => 3 },
+  )->sort_by(sub { $_->{name} });
+
+  # array() objects are mutable:
+  my $mutable = array(qw/ foo bar baz /);
+  $mutable->insert(1, 'quux');
+  $mutable->delete(2);
+
+  # ... or use immarray() immutable arrays:
+  my $static = immarray( qw/ foo bar baz / );
+  $static->set(0, 'quux');  # dies
+  $static->[0] = 'quux';    # dies
+  push @$static, 'quux';    # dies
+
+  # Construct a hash:
+  my $hash  = hash( foo => 'bar', snacks => 'cake' );
+  
+  # You can set multiple keys in one call:
+  $hash->set( foobar => 'baz', pie => 'cherry' );
+
+  # ... which is useful for merging in another (plain) hash:
+  my %foo = ( pie => 'pumpkin', snacks => 'cheese' );
+  $hash->set( %foo );
+
+  # ... or another hash object:
+  my $second = hash( pie => 'key lime' );
+  $hash->set( $second->export );
+
+  # Retrieve one value as a simple scalar:
+  my $snacks = $hash->get('snacks');
+
+  # ... or retrieve multiple values as an array-type object:
+  my $vals = $hash->get('foo', 'foobar');
+
+  # Take a hash slice of keys, return a new hash object
+  # consisting of the retrieved key/value pairs:
+  my $slice = $hash->sliced('foo', 'pie');
+
+  # Arrays inflate to hash objects:
+  my $items = array( qw/ foo bar baz/ )->map(sub { $_ => 1 })->inflate;
+  if ($items->exists('foo')) {
+    # ...
+  }
+
+  # Hashes inflate to simple objects with accessors:
+  my $obj = $hash->inflate;
+  $snacks = $obj->snacks;
+
+  # Methods returning multiple values typically return new array-type objects:
+  my @match_keys = $hash->keys->grep(sub { m/foo/ })->all;
+  my @match_vals = $hash->values->grep(sub { m/bar/ })->all;
+  
+  my @sorted_pairs = hash( foo => 2, bar => 3, baz => 1)
+    ->kv
+    ->sort_by(sub { $_->[1] })
+    ->all;  # ( [ baz => 1 ], [ foo => 2 ], [ bar => 3 ] )
+
+  # Perl6-inspired Junctions:
+  if ( $hash->keys->any_items == qr/snacks/ ) {
+    # ... hash has key(s) matching /snacks/ ...
+  }
+  if ( $hash->values->all_items > 10 ) {
+    # ... all hash values greater than 10 ...
+  }
+
+  # Type-checking arrays via Type::Tiny:
+  use Types::Standard -all;
+  my $int_arr = array_of Int() => 1 .. 10;
+
+  # Type-checking hashes:
+  use Types::Standard -all;
+  my $int_hash = hash_of Int() => (foo => 1, bar => 2);
+
+  # Native list types can be autoboxed:
+  use List::Objects::WithUtils 'autobox';
+  my $foo = [ qw/foo baz bar foo quux/ ]->uniq->sort;
+  my $bar = +{ a => 1, b => 2, c => 3 }->values->sort;
+
+  # Autoboxing is lexically scoped like normal:
+  { no List::Objects::WithUtils::Autobox;
+    [ 1 .. 10 ]->shuffle;  # dies
+  }
+
+
+=head1 DESCRIPTION
+
+A set of roles and classes defining an object-oriented interface to Perl
+hashes and arrays with useful utility methods, junctions, type-checking
+ability, and optional autoboxing. Originally derived from L<Data::Perl>.
+
+=head2 Uses
+
+The included objects are useful as-is but are largely intended for use as data
+container types for attributes. This lends a more natural object-oriented
+syntax; these are particularly convenient in combination with delegated
+methods, as in this example:
+
+  package Some::Thing;
+  use List::Objects::WithUtils;
+  use Moo;
+
+  has items => (
+    is      => 'ro',
+    builder => sub { array },
+    handles => +{
+      add_items   => 'push',
+      get_items   => 'all',
+      items_where => 'grep',
+    },
+  );
+
+  # ... later ...
+  my $thing = Some::Thing->new;
+  $thing->add_items(@more_items);
+  # Operate on all positive items:
+  for my $item ($thing->items_where(sub { $_ > 0 })->all) {
+    ...
+  }
+
+L<List::Objects::Types> provides L<Type::Tiny>-based types & coercions
+matching the list objects provided by this distribution. These integrate
+nicely with typed or untyped list objects:
+
+  package Accounts;
+  use List::Objects::Types -types;
+  use Moo 2;
+
+  has usergroups => (
+    is        => 'ro',
+    # +{ $group => [ [ $usr => $id ], ... ] }
+    # Coerced to objects all the way down:
+    isa       => TypedHash[ TypedArray[ArrayObj] ],
+    coerce    => 1,
+    builder   => sub { +{} },
+  );
+
+  # ... later ...
+  my $users_in_grp = $accts->usergroups
+    ->get($some_group)
+    ->grep(sub { $_[0]->get(0) });
+    
+
+=head2 Objects
+
+=head3 Arrays
+
+B<array> (L<List::Objects::WithUtils::Array>) provides basic mutable
+ARRAY-type objects.  Behavior is defined by
+L<List::Objects::WithUtils::Role::Array>; look there for documentation on
+available methods.
+
+B<immarray> is imported from L<List::Objects::WithUtils::Array::Immutable> and
+operates much like an B<array>, except methods that mutate the list are not
+available; using immutable arrays promotes safer programming patterns.
+
+B<array_of> provides L<Type::Tiny>-compatible type-checking array objects
+that can coerce and check their values as they are added; see
+L<List::Objects::WithUtils::Array::Typed>.
+
+B<immarray_of> provides immutable type-checking arrays; see
+L<List::Objects::WithUtils::Array::Immutable::Typed>.
+
+=head3 Hashes
+
+B<hash> is the basic mutable HASH-type object imported from
+L<List::Objects::WithUtils::Hash>; see
+L<List::Objects::WithUtils::Role::Hash> for documentation.
+
+B<immhash> provides immutable (restricted) hashes; see
+L<List::Objects::WithUtils::Hash::Immutable>.
+
+B<hash_of> provides L<Type::Tiny>-compatible type-checking hash
+objects; see L<List::Objects::WithUtils::Hash::Typed>.
+
+B<immhash_of> provides immutable type-checking hashes; see
+L<List::Objects::WithUtils::Hash::Immutable::Typed>.
+
+=head2 Importing
+
+A bare import list (C<use List::Objects::WithUtils;>) will import all of the
+object constructor functions described above; they can also be selectively
+imported, e.g.:
+
+  use List::Objects::WithUtils 'array_of', 'hash_of';
+
+Importing B<autobox> lexically enables L<List::Objects::WithUtils::Autobox>,
+which provides L<List::Objects::WithUtils::Array> or
+L<List::Objects::WithUtils::Hash> methods for native ARRAY and HASH types.
+
+Importing B<all> or B<:all> will import all of the object constructors and
+additionally turn B<autobox> on; C<use Lowu;> is a shortcut for importing
+B<all>.
+
+=head2 Debugging
+
+Most methods belonging to these objects are heavily micro-optimized -- at the
+cost of useful error handling.
+
+Since there are few built-in argument checks, a mistake in your code can
+frequently lead to slightly cryptic errors from the perl side:
+
+  > my $pos;  # whoops, I'm still undefined later:
+  > if ($arr->exists($pos)) { ... }
+  Use of uninitialized value in numeric le (<=) at $useless_lib_lineno
+
+... in which case L<Devel::Confess> is likely to improve your quality of life
+by providing a real backtrace:
+
+  $ perl -d:Confess my_app.pl
+  Use of uninitialized value in numeric le (<=) at ...
+    [...]::Array::exists(ARRAY(0x8441068), undef) called at ...
+
+=head2 Subclassing
+
+The importer for this package is somewhat flexible; a subclass can override
+import to pass import tags and a target package by feeding this package's
+C<import()> a HASH:
+
+  # Subclass and import to target packages (see Lowu.pm f.ex):
+  package My::Defaults;
+  use parent 'List::Objects::WithUtils';
+  sub import {
+    my ($class, @params) = @_;
+    $class->SUPER::import(
+      +{
+        import => [ 'autobox', 'array', 'hash' ], 
+        to     => scalar(caller)
+      } 
+    )
+  }
+
+Functionality is mostly defined by Roles.
+For example, it's easy to create your own array class with new methods:
+
+  package My::Array::Object;
+  use Role::Tiny::With;
+  # Act like List::Objects::WithUtils::Array:
+  with 'List::Objects::WithUtils::Role::Array',
+       'List::Objects::WithUtils::Role::Array::WithJunctions';
+
+  # One way to add your own functional interface:
+  use Exporter 'import';  our @EXPORT = 'my_array';
+  sub my_array { __PACKAGE__->new(@_) }
+
+  # ... add/override methods ...
+
+... in which case you may want to also define your own hash subclass that
+overrides C<array_type> to produce your preferred arrays:
+
+  package My::Hash::Object;
+  use Role::Tiny::With;
+  with 'List::Objects::WithUtils::Role::Hash';
+
+  use Exporter 'import';  our @EXPORT = 'my_hash';
+  sub my_hash { __PACKAGE__->new(@_) }
+  
+  sub array_type { 'My::Array::Object' }
+
+  # ... add/override methods ...
+ 
+=head1 SEE ALSO
+
+L<List::Objects::WithUtils::Role::Array> for documentation on the basic set of
+C<array()> methods.
+
+L<List::Objects::WithUtils::Role::Array::WithJunctions> for documentation on C<array()>
+junction-returning methods.
+
+L<List::Objects::WithUtils::Array::Immutable> for more on C<immarray()>
+immutable arrays.
+
+L<List::Objects::WithUtils::Array::Typed> for more on C<array_of()>
+type-checking arrays.
+
+L<List::Objects::WithUtils::Array::Immutable::Typed> for more on
+C<immarray_of()> immutable type-checking arrays.
+
+L<List::Objects::WithUtils::Role::Hash> for documentation regarding C<hash()>
+methods.
+
+L<List::Objects::WithUtils::Hash::Immutable> for more on C<immhash()>
+immutable hashes.
+
+L<List::Objects::WithUtils::Hash::Typed> for more on C<hash_of()>
+type-checking hashes.
+
+L<List::Objects::WithUtils::Hash::Immutable::Typed> for more on
+C<immhash_of()> immutable type-checking hashes.
+
+L<List::Objects::WithUtils::Autobox> for details on autoboxing.
+
+The L<Lowu> module for a convenient importer shortcut.
+
+L<List::Objects::Types> for relevant L<Type::Tiny> types.
+
+L<MoopsX::ListObjects> for integration with L<Moops> class-building sugar.
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+Licensed under the same terms as Perl.
+
+The original Array and Hash roles were derived from L<Data::Perl> by Matthew
+Phillips (CPAN: MATTP), haarg, and others.
+
+Immutable array objects were originally inspired by L<Const::Fast> by Leon
+Timmermans (CPAN: LEONT), but now use C<tie>.
+
+Junctions are adapted from L<Perl6::Junction> by Carl Franks (CPAN: CFRANKS)
+
+Most of the type-checking code and other useful additions were contributed by
+Toby Inkster (CPAN: TOBYINK)
+
+A significant portion of this code simply wraps other widely-used modules, especially:
+
+L<List::Util>
+
+L<List::UtilsBy>
+
+L<Type::Tiny>
+
+Inspiration for a few pieces comes from the "classic" (version 0.33)
+L<List::MoreUtils>. 
+
+=cut

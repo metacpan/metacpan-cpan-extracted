@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Locale/BR.pm
+t/00-load.t
+t/manifest.t
+t/01-code.t
+t/02-name.t
+Makefile.PL
+META.yml
+META.json

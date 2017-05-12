@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Lingua-EN-BioLemmatizer
+version:            1.002
+abstract:           Perl interface to the University of Colorado's BioLemmatizer
+author:
+    - Tom Christiansen <tchrist@perl.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:             1.08
+    Devel::Peek:      1.03
+    Errno:            1.1
+    IO::Handle:       1.27
+    IPC::Open2:       1.02
+    Scalar::Util:     1.19
+    Test::Exception:  0.31
+    Test::More:       0.96
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

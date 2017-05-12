@@ -1,0 +1,210 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use LaTeX::Table;
+use Carp;
+
+use version; our $VERSION = qv('1.0.6');
+
+my $line_id = 0;
+my @input;
+my $paramline;
+
+while ( my $line = <> ) {
+    chomp $line;
+    $line =~ s{\s+}{ }xmsg;
+    $line =~ s{\A \s* | \s* \z}{}xmsg;
+
+    # remove trailing \\, we do that later
+    $line =~ s{\A \\\\ \z}{}xmsg;
+
+    if ( $line_id == 0 ) {    #first line contains the parameters
+        $paramline = $line;
+    }
+    else {
+        push @input, $line;
+    }
+    $line_id++;
+}
+
+# remove trailing empty lines
+while ( !length $input[-1] ) {
+    pop @input;
+}
+
+# uncomment original input
+_say( join q{}, map {"\n % $_"} ( $paramline, @input ) );
+
+# create rows/column array[array_ref], remove leading and trailing spaces
+@input = map {
+    [ map { m{\A \s* (.*) \s* \z}xms ? $1 : $_ } split m{ & }xms ]
+} @input;
+
+# store the paramline in a hash
+my %params = map { _parse_param($_) } split m{ ; }xms, $paramline;
+
+my $table = LaTeX::Table->new(
+    {   header => [ $input[0] ],
+        data   => [ @input[ 1 .. $#input ] ],
+        %params,
+    }
+);
+
+_say( "\n" . $table->generate_string() );
+
+sub _parse_param {
+    my ($s) = @_;
+    if ( $s =~ m{ \A (.*?) = (.*) \z}xms ) {
+        return $1 => $2;
+    }
+    else {
+        croak q{Invalid parameter line};
+    }
+    return;
+}
+
+sub _say {
+    my ($s) = @_;
+    print "$s\n" or croak q{Can't print to stdout.};
+    return;
+}
+
+__END__
+
+=head1 NAME
+
+ltpretty - Use LaTeX::Table from within your text editor.
+
+=head1 SYNOPSIS
+
+  ltpretty < lazytable
+
+=head1 DESCRIPTION
+
+This program takes a I<lazy formatted> LaTeX table from STDIN (typically piped
+from Vim or emacs) and outputs a completely formatted table.
+
+=head1 LAZY FORMAT
+
+The first line must contain the L<LaTeX::Table> options (separated by 
+semicolons C<;>) in the format C<optionname=value>. The
+second line must contain the header, the following lines the data. 
+Columns are separated by C<&>. Trailing empty lines are ignored, other 
+empty lines generate horizontal rules (as in L<LaTeX::Table>).
+
+=head1 EXAMPLE 
+
+   theme=Meyrin;label=test;position=htb
+   Item:2c & Price
+   Gnat& per gram& 13.65
+   & each& 0.01
+
+   Gnu& stuffed& 92.59
+   Emu& stuffed& 33.33
+   Armadillo& frozen& 8.99
+
+=head1 VIM
+
+=over 
+
+=item 1. Select the text in C<VISUAL LINE> mode (C<shift+v>). 
+
+=item 2. Type C<!ltpretty>
+
+=back
+
+=head1 EMACS
+
+=over 
+
+=item 1. Select the text
+
+=item 2. Press C<alt+|> 
+
+=item 3. Now "Shell command on region" should appear. Type C<ltpretty>
+
+=back
+
+=head1 OUTPUT
+
+   % theme=Meyrin;label=test;position=htb
+   % Item:2c & Price
+   % Gnat& per gram& 13.65
+   % & each& 0.01
+   % 
+   % Gnu& stuffed& 92.59
+   % Emu& stuffed& 33.33
+   % Armadillo& frozen& 8.99
+  
+  \begin{table}[htb]
+  \centering
+  \begin{tabular}{llr}
+  \toprule
+  \multicolumn{2}{c}{Item} & Price \\
+  \midrule
+  Gnat      & per gram & 13.65 \\
+            & each     & 0.01  \\
+  \midrule          
+  Gnu       & stuffed  & 92.59 \\
+  Emu       & stuffed  & 33.33 \\
+  Armadillo & frozen   & 8.99  \\
+  \bottomrule
+  \end{tabular}
+  \label{test}
+  \end{table}
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+C<ltpretty> does not support configuration files or environment variables.
+
+=head1 DEPENDENCIES
+
+L<LaTeX::Table> 
+
+=head1 BUGS AND LIMITATIONS
+
+Our I<lazy format> does not support multi-line headers. Just add the other
+header lines afterwards. More importantly, it currently does not support 
+non-scalar L<LaTeX::Table> options like for example C<columns_like_header>.
+A future version may add this functionality.
+
+Please report any bugs or feature requests to
+C<bug-latex-table@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>. 
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2006-2010, C<< <limaone@cpan.org> >>. 
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut
+
+# vim: ft=perl sw=4 ts=4 expandtab

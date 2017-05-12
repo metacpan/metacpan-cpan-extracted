@@ -1,0 +1,167 @@
+=head1 README for LinkController 0.033
+
+LinkController is a package which is designed to allow the checking
+of links in sophisticated ways.  If you have ever noticed that link
+checkers spend more time sending you to sites which just happen to be
+down for the day due to maintenance problems than to real broken
+links, this should be for you.  
+
+It was written for and helps in the maintenance of the Scottish
+Climbing Archive (L<http://scotclimb.org.uk> ) but has deliberately gone a
+bit beyond the needs of a normal web page maintenance script.
+
+=head1 WHERE TO START
+
+Get LinkController installed.  The file INSTALL should help.
+
+Read the reference manual (in the docs directory as link-controller.*
+or in docs/HTML in HTML format).
+
+Documentation is available online at 
+http://scotclimb.org.uk/software/linkcont/link-controller-homepage.html
+
+Try the configuration commands; default-install if you are a system
+administrator or configure-link-control if you are not.
+
+Try each of the commands (C<test-link> C<link-report> etc.).  Use the
+C<--help> option to the commands to find out how they work.  Use the
+C<--not-perfect> option to link-report to get early output.
+
+=head1 FEATURES
+
+=over 4
+
+=item * 
+
+Link checking
+
+Link controller includes tools for extracting links from web pages and
+then testing them.
+
+=item * 
+
+rapid link repair
+
+LinkController includes systems for repairing all files which need
+repaired based on databases it builds up which.
+
+=item * 
+
+network efficient
+
+LinkController does requests at a very slow (and configurable) rate
+over time and B<mostly> uses HEAD requests to verify documents exist.
+
+=item * 
+
+works in network low usage time
+
+under configuration from your own crontab.
+
+=item * 
+
+obeys robot exclusion rules
+
+in configurable ways.
+
+=item * 
+
+has features for intranet usage
+
+Use of authentication tokens.  Fast checking of particular domains.
+
+=item * 
+
+source code included and protected under the GPL
+
+Guaranteed possibility to maintain the software, even if I go bust.  
+
+=back
+
+=head1 HOW IT WORKS
+
+LinkController normally works by checking all of your links to a
+database at times triggered from cron (you should choose low usage
+times).  After a few days, it will have built up a list of those links
+which are really broken and you can then examine them and do what
+repairs and changes are needed.  The time delay saves work in
+examining links which aren't really broken.
+
+Once you have the database built, you can selectively report problems
+with your links across all of your pages and repair broken ones
+rapidly, either using LinkControllers direct substitution system, or
+by directly opening the page up in your favorite editor (direct Emacs
+support is provided).
+
+LinkController includes a system for rapidly changing links through
+your HTML pages.  To do this it uses the database that it has already
+built up and only edits those files which need to be edited.  This can
+save much time if you have many pages to look after.
+
+Link controller is based over the World Wide Web capabilities provided
+by LibWWW-Perl and as such should be easy to modify and extend.  It
+should also be reliable and safe to use.
+
+=head1 GPL Protection
+
+Link Controller is available under the GNU Public License to protect
+your rights as a user of the software.
+
+That the source code is under the GPL means that your right to modify
+it is protected and that you can be sure that if you come across a
+version of this software in use somewhere, and have to do maintenance
+on it, you will at least have access to the source code.  That means
+that even if you can't fix it yourself, you can hire someone who can.
+The Perl consultants list will be a good place to start (go to
+<http://www.perl.org/> ).
+
+Link controller is user supported software, and no warantee is
+provided, no support is guaranteed.  Bugs and patches are gratefully
+accepted (link-controller@scotclimb.org.uk) no response is guaranteed,
+but I'll do my best.
+
+See the file INSTALL included in the distribution for information on
+how to install it.
+
+You can download LinkController from 
+
+	http://scotclimb.org.uk/software/linkcont/
+
+in various formats or
+
+	http://www.cpan.org/
+
+via the Perl modules system
+
+=head1 Thanks
+
+Thanks must go to various people and institutions which provided
+access or help.
+
+=over 4 
+
+=item *
+
+Esoterica Internet Portugal
+
+=item *
+
+IPPT PAN Institute in Poland and in particular
+
+=item *
+
+Piotr Pogorzelszi there
+
+=item *
+
+The Tardis Project at the University of Edinburgh CS Department
+
+=back
+
+Please see the LinkController user guide included with the
+distribution.
+
+=cut
+
+
+

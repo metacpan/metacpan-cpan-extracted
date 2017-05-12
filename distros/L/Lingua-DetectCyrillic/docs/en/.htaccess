@@ -1,0 +1,2 @@
+DirectoryIndex index.htm
+AddHandler server-parsed .htm

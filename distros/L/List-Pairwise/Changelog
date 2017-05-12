@@ -1,0 +1,108 @@
+1.03  2014-07-07
+    - Do not use List::Util anymore, until a strange bug
+      get fixed (see t/listutil.t using pairmap instead
+      of mapp)
+    - fix a few POD errors
+    - updated to Module::Install 1.08
+
+1.02  2013-11-20
+    - handle $a and $b warnings exemption for perl 5.19.6
+      and beyond
+
+1.01  2013-08-21
+    - Internally use Lit::Util pair* XS functions when
+      available for a major speedup
+    - The last undefined element in an odd list is now
+      readonly to mimic List::Util behavior
+
+1.00  2012-03-22
+    - no functional change, no need to update
+    - bumping version number to 1.00
+    - updated to Module::Install 1.06
+
+0.30  2012-02-14
+    - no functional change, no need to update
+    - modified tests to pass under perl 5.15
+    - updated to Module::Install 1.04
+    - next version will probably be 1.00 as the module
+      is proven to be stable
+
+0.29  2008-08-12
+    - no functional change, no need to update
+    - updated to Module::Install 0.77 and remove
+      auto_install() call in Makefile.PL
+    - minor POD corrections
+
+0.28  2007-12-06
+    - Made sure mapp and grepp/firstp/lastp code blocks
+      are executed in the same context as with map and
+      grep (Johan Lodin)
+    - Added a new context.t test to test this behavior
+      (Johan Lodin)
+    - clarify this in POD
+    - added an example in POD on how firstp can be used
+      to iterate pairs and emulating a last statement
+
+0.27  2007-12-05
+    - Relaxed warnings detection in tests. Should now
+      pass again for perl 5.6.x
+    - ignore warnX.t tests in coverage.pl
+
+0.26  2007-12-04
+    - removed warnings for $a and $b when they where
+      not used in the module (Johan Lodin).
+      This warning was due to the use of the warnings
+      pragam in List::Pairwise 0.25
+    - added tests for these warnings
+    - warnings could be set FATAL in the last release
+      because that was carp that was used (Johan Lodin)
+    - some minor POD fixes
+
+0.25  2007-12-03
+    - removed croak when given a on odd list of
+      arguments, warn if warnings are enabled, as
+      suggested by Johan Lodin
+    - added tests and pod for this new behavior      
+    - added require for perl 5.006 in Makefile.PL:
+      inplace modification tests were failing on
+      perl 5.005 (Slaven Rezic)
+    - moved coverage.pl in the t/ directory, so that
+      it does not get install along Pairwise.pm
+    - removed warnings in tests for $::NO_PLAN
+
+0.24  2007-11-29
+    - added a pair() function, as per Johan Lodin's
+      suggestion, implementation and examples
+    - added tests and POD for pair()
+    - show sub name when croaking, making it easier
+      to debug multiple chained mapp/grepp, as per
+      Johan Lodin's request
+    - renamed load.t to 01load.t
+    - added tests description
+    - clarified synopsis (I hope)
+    - Updated to Module::Install 0.68
+
+0.23  2006-11-27
+    - In my hurry to remove uses of the 'warnings'
+      pragma I forgot to set $^W to 0 where it had
+      to. This is now fixed and it should work again
+      under perl -w without issuing warnings.
+
+0.22  2006-11-26
+    - Improved test coverage (now 100%)
+    - Added test coverage report to POD
+    - Added 'vars' and removed 'warnings' pragmas to
+      ensure compatibility with old perl versions
+
+0.21  2006-10-23
+    - Updated Module::Install (0.64)
+    - Corrected typo in POD
+
+0.20  2006-10-22
+    - Fixed Carp::croak calls to run on Perl 5.9.x
+    - Added clarifications in POD regarding in-place
+      operations, as suggested by Andreas J. Koenig
+    - Some other minor POD modifications
+
+0.19  2006-10-18
+    - First release on CPAN

@@ -1,0 +1,116 @@
+[%
+  IF section == 'course';
+    title = 'Course';
+  ELSE ;
+    title = 'Talk';
+  END
+%]
+
+
+<h2>The [% yapc_name %] Conference Surveys</h2>
+
+[% IF data.submitted %]
+
+<div class="newsbox intro">
+
+<p>You have already completed your assessment form for this [% section %]. As 
+the assessment results are recorded anonymously, we are unable to retrieve your
+original assessment, and thus are unable to enable you to amend your response. 
+Apologies for any inconvenience.</p>
+
+<p>Return to the <a href="/">survey index</a>.</p>
+
+<p>
+Best regards,<br />
+[% yapc_host %]<br />
+[% yapc_city %]</p>
+
+</div>
+
+[% ELSIF data.thanks == 1 %]
+
+<div class="newsbox intro">
+
+<p>Many thanks for completing your assessment form for this [% section %]. The 
+results will be provided to the [% section %] presenter, to enable them to 
+improve the presentation for future attendees.</p>
+
+<p>You will be redirected in a few seconds. If this does not happen, please <a href="/?thanks=1">click here</a> to return to the <a href="/">survey index</a>.</p>
+
+<p>
+Best regards,<br />
+[% yapc_host %]<br />
+[% yapc_city %]</p>
+
+</div>
+
+[% redirect = '/?thanks=1' %]
+
+[% ELSIF data.thanks == 2 %]
+
+<div class="newsbox intro">
+
+<p>It appears you submitted a blank assessment form. Please click back in your browser
+and enter a completed form, or <a href="/">return to the survey index</a> to 
+submit other surveys.</p>
+
+<p>
+Best regards,<br />
+[% yapc_host %]<br />
+[% yapc_city %]</p>
+
+</div>
+
+[% ELSE %]
+
+[% IF NOT errmess %]
+<div class="newsbox intro">
+<h3>Dear Attendee,</h3>
+<p>We would like to invite you to complete the following [% section %] assessment form
+as best you can. Our aim is to to help the [% section %] presenter to improve their 
+presentation for future attendees.</p>
+<p>Please note that your individual assessment response will be stored anonymously.
+[% IF section == 'course' %]
+Your conference survey code is only used to ensure multiple forms are not
+submitted, and is referenced independently of your submitted assessment response,
+so we cannot correlate the two.
+[% ELSE %]
+As we do not record what talks you attended, we are relying on your good nature to
+only respond to talks to which you did indeed attend :)
+[% END %]
+</p>
+<p>Please complete this assessment form as soon as possible, as the 
+submissions will close at <b>midnight on [% survey_close %]</b>.</p>
+<p>Many thanks for taking part.</p>
+</div>
+[% END %]
+
+<h2 class="intro">'[% course.title %]' by [% course.tutor %]</h2>
+<h3>[% title %] Assessment Form</h3>
+
+<div>
+<form id="SURVEY" name="SURVEY" method="post" action="/submit/[% section %]" enctype="multipart/form-data" onsubmit="return check_submission();">
+<input type="hidden" name="act" value="[% section %]-submit" />
+<input type="hidden" name="courseid" value="[% data.courseid %]" />
+<input type="hidden" name="confirmation" value="Are you sure you wish to submit your survey now?" />
+
+<div id="survey">
+[% IF errmess %]
+<div class="newsbox intro">
+<p class="alert">Thanks for submitting, but unfortunately there seems to be one
+or more invalid or missing fields, as noted below by the &empty; symbol. Please
+amend the appropriate entries and resubmit your form. Thanks.</p>
+</div>
+[% END %]
+
+[% INCLUDE "survey/questions.html" %]
+
+<div class="newsbox intro">
+<p align="center"><b>Please note that following submission of this survey, you will not be able to amend your answers or resubmit this form.</b>
+<p align="center"><input type="submit" name="submission" value="SUBMIT" />
+</div>
+</div>
+
+[% END %]
+
+</div>

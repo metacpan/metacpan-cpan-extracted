@@ -1,0 +1,23 @@
+Revision history for Perl module Lingua::EN::Numbers::Ordinate
+
+1.04 2015-07-04 NEILB
+    - Added [MetaJSON] to dist.ini, so release will include META.json.
+      RT#105628 from ETHER++
+
+1.03 2014-05-31 NEILB
+    - Switched to Dist::Zilla
+    - strict and warnings everywhere, perl min version 5.6.0
+    - Added a SEE ALSO section with a couple of modules
+    - Added github repo to pod
+    - Renamed this file from ChangeLog to Changes,
+      reformatted as per CPAN::Changes::Spec
+
+1.02_01 2014-05-17 NEILB
+    - Developer release, containing all entries in 1.03, above.
+
+1.02 2004-12-30 SBURKE
+    - No code changes, just rebundling
+	
+0.01 2000-08-25 SBURKE
+	- First release to CPAN
+

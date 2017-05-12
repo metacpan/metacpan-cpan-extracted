@@ -1,0 +1,25 @@
+Here's a brief summary of the documentation which comes with this
+module. See the module itself for further details.
+
+NAME
+       List::Permutor - Process all of the possible permutations
+       of a list of items.
+
+SYNOPSIS
+         use List::Permutor;
+         my $perm = new List::Permutor qw/ fred barney betty /;
+         while (my @set = $perm->next) {
+             print "One order is @set.\n";
+         }
+
+AUTHOR
+       Tom Phoenix <rootbeer@redcat.com>
+
+INSTALLATION
+       See the instructions which came with your Perl distribution.
+       The current implementation uses no XS code, so this release
+       should be compatible with all systems.
+
+VERSION
+       Currently version 0.022 or so, so some features (or even the
+       module's name!) may change in the future.

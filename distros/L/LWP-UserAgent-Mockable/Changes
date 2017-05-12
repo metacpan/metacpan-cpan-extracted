@@ -1,0 +1,59 @@
+Revision history for LWP-UserAgent-Mockable
+
+1.18  2017-01-20 11:08:46 GMT
+
+        [MAINTENANCE]
+        - Updated README file to match POD
+
+1.17  2016-11-16 08:49:48 GMT
+        [DOCUMENTATION]
+        - Added documentation on running tests
+
+1.16  2016-08-01 15:38:05 BST
+        [MAINTENANCE]
+        - Github #3 Cleared up dependencies on Test::Internet and Test::RequiresInternet
+
+1.15  2015-09-28 10:57:50 BST
+        [BUG FIXES]
+        - RT#107252 Test failures if example.com cannot be reached
+        - Test suite should now run in parallel without failures
+
+1.14  2015-09-23 09:34:27 BST
+        [BUG FIXES]
+        - RT#107252 Test failures if example.com cannot be reached
+
+1.13  2015-09-22 17:44:32 BST
+        [BUG FIXES]
+        - RT#101744 Tests hang without network connectivity (MANWAR)
+        [MAINTENANCE]
+        - POD tidy
+        - Switched to Github issues from RT bugtracker
+
+1.12  2015-09-22 10:18:36 BST
+        [ENHANCEMENTS]
+        - Use Safe::Isa instead of UNIVERSAL::isa (KPETERS)
+
+1.11  2015-09-10 10:22:09 BST
+        [BUG FIXES]
+        RT#100193 - Fails with perls > 5.21.3
+     
+        [MAINTENANCE]
+        - Created github repository
+        - Built via Dist::Zilla 
+
+1.10    2009-05-25
+        - Allowed resetting of the action within a session.  Some error
+        messages changed as a result, but no other API changes.
+        - Get around HTTP/1.0 only proxies failing unittests.
+
+1.01    2009-05-18
+        No functionality changes
+            - Added dependancy on URI to avoid spurious test failures
+
+1.00    2009-04-19
+        No functionality changes
+            - Added dependany on B::Deparse
+            - Update unittests to be quicker
+
+0.90    Date/time
+        First version, released on an unsuspecting world.

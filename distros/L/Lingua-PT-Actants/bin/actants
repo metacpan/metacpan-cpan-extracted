@@ -1,0 +1,84 @@
+#!/usr/bin/perl -s
+# PODNAME: actants
+# ABSTRACT: command line interface for Lingua::PT::Actants
+
+use lib 'lib';
+
+use warnings;
+use strict;
+binmode(STDIN, ":utf8");
+binmode(STDOUT, ":utf8");
+
+use Lingua::PT::Actants;
+use Path::Tiny;
+
+our $dot;  # print trees in dot format for debug
+
+my $input;
+my $file = shift;
+if ($file) {
+  $input = path($file)->slurp_utf8;
+}
+else {
+  $input = join('', <STDIN>);
+}
+
+unless ($input) {
+  print "Usage: actants [-dot=<tree>] <input>\n",
+          " -dot: is used to print a tree in dot format\n";
+  exit;
+}
+
+my $o = Lingua::PT::Actants->new( conll => $input );
+
+if ($dot) {
+  # output data trees in dot format
+  my $output;
+  if ($dot =~ m/^(simple|deps|tree)$/) {
+    $output = $o->tree2dot($dot);
+  }
+  elsif ($dot =~ m/^(cores)$/) {
+    my @cores = $o->acts_cores;
+    $output = $o->cores2dot(@cores);
+  }
+  else {
+    # FIXME invalid option
+  }
+  print $output;
+}
+else {
+  # compute actants
+  my @cores = $o->acts_cores;
+  my @syns = $o->acts_syns(@cores);
+
+  print $o->text, "\n\n",
+          $o->pp_acts_cores(@cores), "\n",
+            $o->pp_acts_syntagmas(@syns), "\n";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+actants - command line interface for Lingua::PT::Actants
+
+=head1 VERSION
+
+version 0.05
+
+=head1 AUTHOR
+
+Nuno Carvalho <smash@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016-2017 by Nuno Carvalho.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

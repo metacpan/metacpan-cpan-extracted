@@ -1,0 +1,27 @@
+To install LinkController on RedHat Linux, first install Perl from
+your distribution
+
+     perl
+
+Next install the cdb programs and libraries
+
+     cdb-lib
+     cdb-util
+
+Then the following RPMs which you can find on the Powertools CDs (
+ftp://ftp.redhat.com/pub/Powertools/)
+
+    perl-CGI-Response
+    perl-libwww-perl
+    perl-MLDBM
+    perl-CDB_BiIndex
+    perl-Schedule
+    perl-URI
+    perl-CGI-modules
+
+Then install the following modules which are specific for the distribution.
+
+    perl-Getopt-Function
+    perl-Link
+    perl-LinkController
+

@@ -1,0 +1,48 @@
+{
+   "abstract" : "Porter's stemming algorithm for Russian (KOI8-R only)",
+   "author" : [
+      "Aleksandr Guidrevitch <pillgrim@mail.ru>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lingua-Stem-Ru",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "5.57",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Lingua-Stem-Ru",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Lingua-Stem-Ru.git",
+         "web" : "https://github.com/neilb/Lingua-Stem-Ru"
+      }
+   },
+   "version" : "0.04"
+}
+

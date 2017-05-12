@@ -1,0 +1,48 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  aa                                                                 | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Thanks to the arXMLiv group for initial implementation              | #
+# |    http://arxmliv.kwarc.info/                                       | #
+# | Released to the Public Domain                                       | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+# aa.cls
+#  Astronomy & Astrophysics
+# See http://www.aanda.org/content/view/129/173/lang,en/
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Class Options
+# Ignorable options
+foreach my $option (qw(10pt 11pt 12pt twoside onecolumn twocolumn
+  draft final referee
+  longauth rnote
+  oldversion
+  runningheads
+  envcountreset envcountsect
+  structabstract traditabstract
+  letter)) {
+  DeclareOption($option, undef); }
+
+# Anything else gets passed to article.
+DeclareOption(undef, sub {
+    PassOptions('article', 'cls', ToString(Digest(T_CS('\CurrentOption')))); });
+
+ProcessOptions();
+
+LoadClass('article');
+RequirePackage('aa_support');
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1;

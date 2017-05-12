@@ -1,0 +1,33 @@
+Revision history for Perl extension Lighttpd-Control
+
+0.03 Friday, Nov. 27, 2009
+    - added the binary_path_prefixes_to_search attribute
+      to make it easier to tell this module where to find
+      your lighttpd install.
+    - added the NetBSD specific binary path prefix to our
+      list of defaults
+      (thanks to Ulrich Habel)
+
+0.02 Thursday, Nov. 6, 2008
+    - changing the config file now clears the
+      pid-file and server-pid slots
+    - changing the pid-file slot will clear the
+      server-pid slot
+    - added predicate methods to check if there is
+      a pid-file given and a server pid available
+      - added tests for this
+    - pre_startup and post_shutdown now clear the
+      server pid at the right times, so that
+      start/stop/start/stop will work correctly
+      (Thanks to FAYLAND - RT #39819)
+      - added test for this
+    - post_startup will be sure to initailize the
+      server pid, and blocks (printing a log-message)
+      until the server has started (this can be
+      overriden if needed).
+
+
+0.01 Friday, Sept. 26, 2008
+    - I am getting sick of copy/pasting this stuff
+      between all the projects at work, so I am packaging
+      it up for release.

@@ -1,0 +1,42 @@
+---
+abstract: 'use Linux getdents syscall to read large directories over NFS'
+author:
+  - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
+build_requires:
+  Capture::Tiny: '0.36'
+  Cwd: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  File::Which: '1.21'
+  Test::More: '0'
+  Test::TempDir::Tiny: '0.016'
+  perl: '5.014004'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.014004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-NFS-BigDir
+no_index:
+  directory:
+    - inc
+provides:
+  Linux::NFS::BigDir:
+    file: lib/Linux/NFS/BigDir.pm
+    version: '0.002'
+requires:
+  Exporter: '0'
+  Fcntl: '0'
+  Inline: '0.80'
+  constant: '0'
+  perl: '5.014004'
+resources:
+  bugtracker: https://github.com/glasswalk3r/Linux-NFS-BigDir/issues
+  homepage: https://github.com/glasswalk3r/Linux-NFS-BigDir
+  repository: https://github.com/glasswalk3r/Linux-NFS-BigDir.git
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

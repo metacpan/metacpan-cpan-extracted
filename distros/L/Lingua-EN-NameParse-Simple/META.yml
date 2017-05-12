@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Lingua-EN-NameParse-Simple
+version:            0.14
+abstract:           Parse an English name into component parts 
+author:
+    - Hugh Esco <hesco@campaignfoundations.com>
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DB_File:     0
+    DBI:         0
+    Fcntl:       0
+    locale:      0
+    Test::More:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

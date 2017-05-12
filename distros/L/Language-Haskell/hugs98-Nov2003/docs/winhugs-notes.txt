@@ -1,0 +1,24 @@
+Hugs 98 for Windows
+===================
+
+Winhugs saves its configuration in Windows registry under the key
+
+  HKEY_CURRENT_USER\Software\Haskell\Hugs\Winhugs <version>
+
+Most of the options can be configured through the options dialog. 
+
+Documentation for Haskell and hugs can be accessed from the Help menu. 
+The program expects the following entries inside the docs dir:
+
+* hugs.hlp	(hugs help)
+* hugsman	(a dir containg the html version of hugs documentation)
+* report	(a dir containg the html version of Haskell 98 report)
+* library	(a dir containg the html version of Haskell 98 libraries)
+* tutorial	(a dir containg the html version of the Gentle intro to Haskell 98)
+* libs	        (a dir containg the html version of hugs and ghc extensions libraries documentation)
+
+You can download the corresponding files from haskell.org and hugs page.
+
+Please report bugs to hugs-bugs@haskell.org.
+
+

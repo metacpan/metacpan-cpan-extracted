@@ -1,0 +1,15 @@
+Tasks remaining :
+
+  * Add the tracker_search_get_hit_count_all() method : I've never seen this
+    used. A websearch yields no results. A Google code search turns up only
+    the tracker header and sources.
+
+  * Add the tracker_search_text_detailed() method : A little bit later.
+
+  * Implement tests for untested stuff (text search).
+
+  * Implement tracker_search_query : for RDF queries. Not too high on my
+    priority list.
+
+  * Licensing : Tracker is LGPL. Perl is GPL/Artistic.
+

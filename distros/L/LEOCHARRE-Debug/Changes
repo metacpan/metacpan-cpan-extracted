@@ -1,0 +1,16 @@
+2009-11-09 12:08  cvs
+
+	* lib/LEOCHARRE/Debug.pm, t/01_warnf.t, t/03-scope.t: fixed scope.
+	  it was creating debug() to check *all* $DEBUG in all packages for
+	  flag = 1, so setting DEBUG in one pkg, would turn ALL debug on..
+	  big stupid error..  fixed
+
+2009-05-01 15:31  cvs
+
+	* lib/LEOCHARRE/Debug.pm, t/01_warnf.t: added warnf
+
+2009-04-06 10:14  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/.Debug.pm.swp,
+	  lib/LEOCHARRE/Debug.pm, t/00.t: Initial revision
+

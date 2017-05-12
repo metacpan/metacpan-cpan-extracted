@@ -1,0 +1,25 @@
+---
+name: LWP-UserAgent-Snapshot
+version: v0.2
+author:
+  - 'Nick Woolley <npw@cpan.org>'
+abstract: modifies the behaviour of LWP::UserAgent to record and playback data.
+license: artistic
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+requires:
+  Digest::MD5: 0
+  HTTP::Response: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+  version: 0
+build_requires:
+  Module::Build: 0.28
+provides:
+  LWP::UserAgent::Snapshot:
+    file: lib/LWP/UserAgent/Snapshot.pm
+    version: v0.2
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

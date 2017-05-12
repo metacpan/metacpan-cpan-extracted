@@ -1,0 +1,103 @@
+Revision history for Perl extension Lingua::EN::Sentence.
+
+0.01  Thu Feb 22 12:16:17 2001
+	- original version; 
+0.02  Fri Feb 23 14:25:01 2001
+	(Thanks to Itai Nahshon for his comments!!)
+	- Supporting 'no' abbreviation.
+	- Exporting OK set_acronyms(),get_acronyms().
+	- Don't break on "." and a-like...
+	- Fixed bug causing wrong breaking sentence if abbreviation is the first word.
+0.03  Sun Feb 25 18:00:01 2001
+	(Thanks to Offer Kaye for his comments about the documentation)
+	- Changes in the documentation.
+	- Build package looks different now to support CPAN installer.
+	- EOS changed to something which is \W.
+	- Added get_EOS() set_EOS() to get/set the end-of-sentence mark.
+	- Added a test for the installation.
+0.04  Mon Mar 12 15:15:51 2001
+	- Added word boundary  before correcting EOS with abbreviations. (bugfix)
+0.05  Mon Mar 26 12:35:31 2001
+	- fix: "bla bla... yada yada" from being broken to: "bla bla..." and "yada yada"
+0.06  Sun Apr 1 09:00:02 2001
+	- Added PLACES abbreviations
+	(Thanks to Kim Ryan: kimaryan@ozemail.com.au)
+0.07  Mon May 14 16:12:12 2001
+	- bug fix.
+0.08  Mon May 21 05:55:23 2001
+	- Added months abbreviations.
+0.09 Tue Aug 21 08:11:07 2001
+	- More abbreviations
+	- Fixed bug where single letter before '.'/'?'/'!' didn't cause insertion of $EOS
+0.10 Tue Aug 28 15:07:47 2001
+	- Fixed bug when processing stuff like "   U.S.  "
+0.11 Tue Sep 4 15:12:55 2001
+	- Don't split |John P. Stenbit| into |John P.| and |Stenbit|
+0.12 Thu Sep 20 11:28:45 2001
+	- Should be a final fix for same thing as reported in 0.11
+0.13 Thu Oct 4 10:08:12 2001
+	- Bugfix splitting (wrongly!) after i.e. and e.g. and such
+	- Previously, sentences like "They won the game 0-3. We lost" didn't get split.
+0.14 Wed Oct 28 11:19:59 2001
+	- Added some more abbreviations
+	- added symbol '»' as another possibility of end-quote.
+	- Abbreviations added from: http://englishplus.com/grammar/00000057.htm
+	- Abbreviations added from: http://www.nyu.edu/classes/copyXediting/STABBREV.html
+0.15 Sun Nov 18 13:12:07 2001
+	- French use M. for Mr.
+	- Don't split sentences starting with a quote after the quote if the following text is not a capital letter.
+0.16 Sun Nov 18 17:00:04 2001
+	- testbench reduced to "nothing" again...
+0.17 Sun Nov 18 18:01:14 2001
+	- Considering French as well - some french characters are considered as \W - I had to exclude them by literaly writing them.
+0.18 Wed Nov 21 19:36:17 2001
+	- Using locale for allowing usage of iso8859-1. I'm expecting to find English and French (like) text, so I want my \w and \W to match the right things.
+0.19 Sun Dec 23 09:26:39 2001
+	- Added some more abbreviations.
+	- Trying not to break: text . . some more text
+0.20 Wed Dec 26 09:43:09 2001
+	- Break at the dot: concretizar-se-á. Astiazaram
+	- Fixed bugs with abbreviation 'no.'.
+0.21 Sun Jan 13  08:22:13 2002
+	- break sentence when: <punctuation><end-quote><whitespaces><open bracket>...
+	- break on:  ... Bush's. Bla Bla
+	- Added abbreviation 'Capt.'
+0.22 Wed Jan 30  13:15:31 2002
+	- Added more acronyms.
+	- Hopefully not breaking anymore NY like street addresses.
+	- In general, don't break on single letter followed by a dot.
+	- Special attention to abbreviation 'no.'.
+	- bugfix conserning internal variable $PAP
+	- added set_locale()
+0.23 Sun Feb 17	09:00:00 2002
+	- Break sentence after seeing "a.m." or "p.m." followed by a capital letter.
+	- Added some abbreviations
+0.24 Mon Sep 23 12:30:02 2002
+	- Changing the "rights" notice.
+0.25 Tue Sep 24 13:28:33 IDT 2002
+	- changed the email address.
+	
+0.26 Mar 12 2015
+    - Fixed POD errors
+	- Fixed RT bug 97681, setlocale work around for Android systems
+	- Added Build.PL
+	- Added tests harness and more tests
+	- update to newer Perl idioms such as 'our' variables
+	
+0.27 Mar 12 2015
+    - added main.t to MANIFEST
+	- added more prefixes and suffixes for people's names, such as Mme. , Msgr.
+	
+0.28 May 22 2015
+    Fixed RT bug #104419: [PATCH] make abbreviation processing faster
+	
+0.29 May 25 2015
+    Fixed RT bug #104637 [PATCH]improve documentation on acronym input
+	Removed redundant call that remained after 104419 patch was applied
+	
+0.30 Aug 08 2016
+    used github as repository
+	added more abbreviations
+	set the default character set to en_US.UTF-8
+	added example/demo.pl script
+	

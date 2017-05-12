@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use File::Basename;
+use File::Spec;
+use lib File::Spec->rel2abs(dirname(__FILE__) . "/../lib");
+
+use CljPerl;
+
+my $cljp = CljPerl::Evaler->new();
+
+$cljp->load("core");
+if(scalar @ARGV == 0) {
+  print "user=> ";
+  while(<STDIN>) {
+    my $line = $_;
+    chomp $line;
+    if($line eq "'quit") {
+      exit 0;
+    } elsif($line eq "'help") {
+      print "'quit => exit REPL\n'help => print help info";
+    } else {
+      my $res = undef;
+      eval {
+        $res = $cljp->clj2perl($cljp->eval($line));
+      };
+      if($@) {
+        print "$@";
+      } else {
+        if(defined $res) {
+          print $res;
+        } else {
+          print "nil";
+        };
+      };
+    }
+    print "\nuser=> ";
+  }
+} else {
+  foreach my $f (@ARGV) {
+    $cljp->load($f);
+  }
+}

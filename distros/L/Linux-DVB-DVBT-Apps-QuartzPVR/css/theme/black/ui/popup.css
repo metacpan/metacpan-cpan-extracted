@@ -1,0 +1,43 @@
+/*------------------------------------------------------------------------------------*/
+/* Popup info */
+
+.popupContent {
+  background-color:#000000;
+  background:#000 url(../images/popup.png) repeat-x top left;
+  border: solid white 1px;
+}
+
+.popupContent .wrap {
+  /*background:#f2e4fa;*/
+  color : white ;
+}
+
+.popupContent .summary {
+  color: yellow ;
+}
+
+.popupContent .times {
+  color: yellow ;
+}
+
+
+.popupContent .description {
+  /*background:#f2e4fa;*/
+  color : white ;
+}
+
+/* each program entry in a multirec list */
+.popupContent .multi {
+  border-top: solid white 1px ;
+  /* background:#000 url(../images/popup.png) repeat top left; */
+  background: black ;
+}
+
+.popupContent .multi .wrap {
+  color: yellow ;
+}
+
+.popupContent .multi .summary {
+  color: yellow ;
+}
+

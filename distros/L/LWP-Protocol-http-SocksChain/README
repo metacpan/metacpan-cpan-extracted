@@ -1,0 +1,99 @@
+NAME
+    LWP::Protocol::http::SocksChain - Speak HTTP through Net::SC
+
+SYNOPSIS
+     use LWP::UserAgent;
+     use LWP::Protocol::http::SocksChain;
+     LWP::Protocol::implementor( http => 'LWP::Protocol::http::SocksChain' );
+
+     @LWP::Protocol::http::SocksChain::EXTRA_SOCK_OPTS = ( Chain_Len    => 1,
+                                                           Debug        => 0,
+                                                           Random_Chain => 1,
+                                                           Auto_Save    => 1,
+                                                           Restore_Type => 1 );
+
+     my $ua = LWP::UserAgent->new();
+
+     my $req = HTTP::Request->new(
+                  GET => 'http://home.sinn.ru/~gosha/perl-scripts/');
+
+     my $res = $ua->request($req) || die $!;
+
+     if ($res->is_success) {
+      ...
+     } else {
+      ...
+     }
+
+
+     or
+
+
+     use LWP::UserAgent;
+     use LWP::Protocol::http::SocksChain;
+     LWP::Protocol::implementor( http => 'LWP::Protocol::http::SocksChain' );
+
+     @LWP::Protocol::http::SocksChain::EXTRA_SOCK_OPTS = ( Chain_Len    => 1,
+                                                           Debug        => 0,
+                                                           Random_Chain => 1,
+                                                           Chain_File_Data => [
+                                                              '2x0.41.23.164:1080:::4:383 b/s Argentina',
+                                                              '24.2x2.88.160:1080:::4:1155 b/s Argentina',
+                                                           ],
+                                                           Auto_Save    => 0,
+                                                           Restore_Type => 0 );
+
+     my $ua = LWP::UserAgent->new();
+
+     my $req = HTTP::Request->new(
+                  GET => 'http://home.sinn.ru/~gosha/perl-scripts/');
+
+     my $res = $ua->request($req) || die $!;
+
+     if ($res->is_success) {
+      ...
+     } else {
+      ...
+     }
+
+DESCRIPTION
+    LWP::Protocol::http::SocksChain enables you to speak HTTP through
+    SocksChain ( Net::SC ). To use it you need to overwrite the implementor
+    class of the LWP 'http' scheme.
+
+    The interface of LWP::Protocol::http::SocksChain is similar to
+    LWP::Protocol::http. To enable the old HTTP/1.0 protocol driver instead
+    of the new HTTP/1.1 driver use LWP::Protocol::http::SocksChain10.
+
+SEE ALSO
+    LWP, LWP::Protocol, Net::SC
+
+AUTHOR
+     Igor V. Okunev  mailto:igor<at>prv.mts-nn.ru
+                     http://www.mts-nn.ru/~gosha
+                     icq:106183300
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 - 2006 by Igor V. Okunev
+
+    All rights reserved. This library is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+
+
+INSTALLATION
+
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+DEPENDENCIES
+
+    This module requires these other modules and libraries:
+
+       LWP
+
+       Net::SC
+

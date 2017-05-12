@@ -1,0 +1,47 @@
+[% 
+    title = 'Releases' ;
+    htmltitle = title ;
+
+    crumb2_name = 'Home' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Releases' ;
+%]
+
+<div class="blocker">
+<em>To download and listen to the MP3s, please click the title of the track, and save to you local computer.</em>
+</div>
+
+[% FOREACH type = types %]
+[% count = 1 %]
+[% FOREACH item = releases %]
+[% IF item.reltypeid == type.reltypeid %]
+[% IF item.publish == 3 %]
+
+<div class="blocker">
+<div class="release">
+	[% IF item.data.data.link %]
+  <div class="rightbox">
+      <img src="[% webpath %]/[% item.data.data.link %]" alt="[% item.data.data.tag %]" width="350" align="right" />
+  </div>
+  [% END %]
+
+<h3>[% item.title %] ([% item.postyear %])</h3>
+
+		[% block = article.body %]
+		[% INCLUDE "articles/arts-block.html" %]
+
+	[% IF item.lyrics %]
+	<ol>[% FOREACH lyric = item.lyrics %]<li><a href="[% webpath %]/mp3/[% lyric.quickname %]">[% lyric.title %]</a></li>[% END %]</ol>
+	[% ELSE %]
+	<p>No tracks listed for this release.</p>
+	[% END %]
+
+<div class="clearboth"></div>
+
+</div>
+</div>
+
+[% END %]
+[% END %]
+[% END %]
+[% END %]

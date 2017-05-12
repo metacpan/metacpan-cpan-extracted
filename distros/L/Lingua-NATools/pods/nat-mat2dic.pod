@@ -1,0 +1,35 @@
+# -*- cperl -*-
+
+=head1 NAME
+
+nat-mat2dic - A translator from co-occurrence matrices to a dictionary
+file.
+
+=head1 SYNOPSIS
+
+ nat-mat2dic <mat-in> <matdic-out>
+
+=head1 DESCRIPTION
+
+This command is not intended to be used independently. It is used in
+conjunction with C<nat-ipfp>, C<nat-samplea> or C<nat-sampleb> and
+C<nat-post>.
+
+Translates the co-occurrence matrix after the application of
+EM-Algorithm. The dictionary is an intermediary format used by
+C<nat-post> to write the dictionary on a readable format.
+
+=head1 SEE ALSO
+
+nat-initmat, nat-ipfp, nat-samplea, nat-sampleb and remaining NATools
+documentation.
+
+=head1 COPYRIGHT
+
+ Copyright (C)2002-2003 Alberto Simoes and Jose Joao Almeida
+ Copyright (C)1998 Djoerd Hiemstra
+
+ GNU GENERAL PUBLIC LICENSE (LGPL) Version 2 (June 1991)
+
+=cut
+

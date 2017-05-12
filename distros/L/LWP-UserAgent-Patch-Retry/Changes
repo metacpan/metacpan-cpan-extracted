@@ -1,0 +1,17 @@
+Revision history for LWP-UserAgent-Patch-Retry
+
+0.03    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.02    2013-11-02 (SHARYANTO)
+
+        - No functional changes. Fix example in Synopsis.
+
+
+0.01    2013-11-02 (SHARYANTO)
+
+        - First release.

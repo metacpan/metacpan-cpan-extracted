@@ -1,0 +1,134 @@
+#!/usr/bin/perl -w
+
+use lib "./lib";
+use IO::File;
+use YAML::Syck qw(LoadFile DumpFile);
+use Locale::Codes::Constants;
+use Locale::Codes::Country_Retired;
+use Locale::Codes::Language_Retired;
+use Locale::Codes::Currency_Retired;
+use Locale::Codes::Script_Retired;
+use Locale::Codes::LangExt_Retired;
+use Locale::Codes::LangVar_Retired;
+
+############################################################################
+
+our %mod_list = qw(country     Country
+                   currency    Currency
+                   langext     LangExt
+                   langvar     LangVar
+                   language    Language
+                   script      Script
+                 );
+
+our $curr    = "internal/curr.yaml";
+our $prev    = "internal/prev.yaml";
+
+our %curr    = %{ LoadFile($curr) };
+our %prev    = %{ LoadFile($prev) };
+
+our $mod_dir = "lib/Locale/Codes";
+
+############################################################################
+############################################################################
+
+foreach my $type (keys %mod_list) {
+   update_retired($type);
+   write_module($type);
+}
+
+############################################################################
+# UPDATE_MODULE
+############################################################################
+
+sub update_retired {
+   my($type)  = @_;
+   my $module = $mod_list{$type};
+
+   foreach my $codeset (keys %{ $ALL_CODESETS{$type}{'codesets'} }) {
+      foreach my $code (keys %{ $prev{$type}{$codeset}{'code'} }) {
+         next  if (exists $curr{$type}{$codeset}{'code'}{$code});
+         my $name = $prev{$type}{$codeset}{'code'}{$code};
+
+         $Locale::Codes::Retired{$type}{$codeset}{'code'}{$code} = $name;
+      }
+
+      foreach my $lc (keys %{ $prev{$type}{$codeset}{'name'} }) {
+         next  if (exists $curr{$type}{$codeset}{'name'}{$lc});
+         my($code,$name) = @{ $prev{$type}{$codeset}{'name'}{$lc} };
+
+         $Locale::Codes::Retired{$type}{$codeset}{'name'}{$lc} =
+           [$code,$name];
+      }
+   }
+}
+
+############################################################################
+# WRITE_MODULE
+############################################################################
+
+sub write_module {
+   my($type)  = @_;
+   my $module = $mod_list{$type};
+
+   my $file   = "$mod_dir/${module}_Retired.pm";
+
+   my $out    = new IO::File;
+   $out->open(">$file");
+   my $timestamp   = `date`;
+   chomp($timestamp);
+
+   print $out "package #
+Locale::Codes::${module}_Retired;
+
+# This file was automatically generated.  Any changes to this file will
+# be lost the next time 'deprecate_codes' is run.
+#    Generated on: $timestamp
+
+use strict;
+require 5.006;
+use warnings;
+use utf8;
+
+our(\$VERSION);
+\$VERSION='3.51';
+
+";
+
+   foreach my $codeset (sort keys %{ $ALL_CODESETS{$type}{'codesets'} }) {
+      print $out "\$Locale::Codes::Retired{'$type'}{'$codeset'}{'code'} = {\n";
+      foreach my $code (sort keys %{ $Locale::Codes::Retired{$type}{$codeset}{'code'} }) {
+         my $name = $Locale::Codes::Retired{$type}{$codeset}{'code'}{$code};
+         print $out "   q($code) => q($name),\n";
+      }
+      print $out "};\n\n";
+   }
+
+   foreach my $codeset (sort keys %{ $ALL_CODESETS{$type}{'codesets'} }) {
+      print $out "\$Locale::Codes::Retired{'$type'}{'$codeset'}{'name'} = {\n";
+      foreach my $lc (sort keys %{ $Locale::Codes::Retired{$type}{$codeset}{'name'} }) {
+         my ($code,$name) =
+           @{ $Locale::Codes::Retired{$type}{$codeset}{'name'}{$lc} };
+         print $out "   q($lc) => [ q($code), q($name) ],\n";
+      }
+      print $out "};\n\n";
+   }
+
+   print $out "
+1;
+";
+   $out->close();
+}
+
+1;
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

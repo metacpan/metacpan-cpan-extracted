@@ -1,0 +1,85 @@
+﻿<form name="f1" method="post">
+    <input type="hidden" name="i1" value="[% var.v1 %]" />
+    <table>
+        <colgroup>
+            <col width="70%" />
+            <col width="30%" />
+        </colgroup>
+        <tr>
+            <td colspan="2"><b>[% l('Text Ä') %]</b></td>
+        </tr>
+        <tr>
+            <td>
+                <input type="checkbox" name="c1" [% IF var.v2 %] checked="checked" [% END %] />[% l('Text Ö') %]
+            </td>
+            <td>
+                <input type="submit" class="button" value="[% loc_('Text Ü') %]" name="s1" />
+            </td>
+        </tr>
+    </table>
+    <pre>
+        [% loc_('This is a text.') %]
+        [% loc_x(
+            '{name} is programming {language}.',
+            name     => 'Steffen',
+            language => 'Perl',
+        ) %]
+        [% loc_n(
+            'Singular',
+            'Plural',
+            1,
+        ) %]
+        [% loc_n(
+            'Singular',
+            'Plural',
+            2,
+        ) %]
+        [% loc_nx(
+            '{num} date',
+            '{num} dates',
+            1,
+            num => 1,
+        ) %]
+        [% loc_nx(
+            '{num} date',
+            '{num} dates',
+            2,
+            num => 2,
+        ) %]
+        [% loc_p(
+            'appointment',
+            'date',
+        ) %]
+        [% loc_px(
+            'appointment',
+            '{num} date',
+            num => 1,
+        ) %]
+        [% loc_np(
+            'appointment',
+            'date',
+            'dates',
+            1,
+        ) %]
+        [% loc_np(
+            'appointment',
+            'date',
+            'dates',
+            2,
+        ) %]
+        [% loc_npx(
+            'appointment',
+            '{num} date',
+            '{num} dates',
+            1,
+            num => 1,
+        ) %]
+        [% loc_npx(
+            'appointment',
+            '{num} date',
+            '{num} dates',
+            2,
+            num => 2,
+        ) %]
+    </pre>
+</form>

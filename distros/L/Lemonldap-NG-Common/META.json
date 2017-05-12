@@ -1,0 +1,69 @@
+{
+   "abstract" : "Common files for Lemonldap::NG infrastructure",
+   "author" : [
+      "Xavier Guimard <x.guimard@free.fr>, ClÃ©ment Oudot <clement@oodo.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lemonldap-NG-Common",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::String" : "0",
+            "Net::LDAP" : "0",
+            "Test::Pod" : "1",
+            "XML::Simple" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Apache::Session::Browseable" : "0",
+            "HTML::Template" : "0",
+            "HTTP::Message" : "0",
+            "JSON" : "0",
+            "Net::LDAP" : "0",
+            "XML::LibXML" : "0",
+            "XML::Simple" : "0"
+         },
+         "requires" : {
+            "Apache::Session" : "0",
+            "CGI" : "3.08",
+            "Cache::Cache" : "0",
+            "Config::IniFiles" : "0",
+            "Crypt::OpenSSL::Bignum" : "0",
+            "Crypt::OpenSSL::RSA" : "0",
+            "Crypt::OpenSSL::X509" : "0",
+            "Crypt::Rijndael" : "0",
+            "DBI" : "0",
+            "Digest::SHA" : "0",
+            "File::Basename" : "0",
+            "JSON" : "0",
+            "Mouse" : "0",
+            "Net::CIDR::Lite" : "0",
+            "SOAP::Lite" : "0",
+            "Storable" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.9.9",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

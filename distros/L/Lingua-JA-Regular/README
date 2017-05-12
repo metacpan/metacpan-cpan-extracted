@@ -1,0 +1,122 @@
+NAME
+    Lingua::JA::Regular - Regularize of the Japanese character.
+
+SYNOPSIS
+      my $string = Lingua::JA::Regular->new($string)->regular;
+
+      my $regular = Lingua::JA::Regular->new($string);
+
+      $regular->strip->linefeed->h_ascii->z_kana;
+
+      if ($ENV{HTTP_USER_AGENT} =~ /Windows/) {
+          $regular->win;
+      }
+      elsif ($ENV{HTTP_USER_AGENT} =~ /Mac/) {
+          $regular->mac;
+      }
+
+      print $regular->geta->to_s;
+
+DESCRIPTION
+    Regularize of the Japanese character
+
+    Converts platform specific charactes to standard characters.
+
+    Converts multi byte(Japanese) alphanumeric and symbolcharacters to
+    single byte characters.
+
+METHODS
+    new
+          my $str = Convert::Character->new($str);
+
+        Create object.
+
+    to_s
+          $str->to_s;
+
+        It changes into a character sequence from an object.
+
+    linefeed
+          $str->linefeed;
+
+          $str->linefeed("\r");
+
+          $str->linefeed("\r\n");
+
+          $str->linefeed("<br>");
+
+        A new-line character(\r\n, \n, \r) is replaced by the argument. If
+        an argument becomes undef, it will replace by "\n".
+
+    strip
+          $str->strip;
+
+        The blank character of order is deleted.
+
+    uc
+          $str->uc;
+
+        uppercase.
+
+    lc
+          $str->lc;
+
+        lowercase.
+
+    z_ascii
+        alphabet, number, and sign are changed into ZENKAKU.
+
+    h_ascii
+        alphabet, number, and sign are changed into HANKAKU.
+
+    z_kana
+        h2z of Jcode is performed.
+
+    h_kana
+        z2h of Jcode is performed.
+
+    z_space
+        HANKAKU space is changed into a ZENKAKU space.
+
+    h_space
+        ZENKAKU space is changed into a HANKAKU space.
+
+    z_strip
+        The blank and ZENKAKU space character of order is deleted.
+
+    hiragana
+        It changes into a HIRAGANA.
+
+    katakana
+        It changes into a KATAKANA.
+
+    kanji
+        The model dependence character of KANJI is changed into an
+        alternative character.
+
+    win The model dependence character of Windows is changed into an
+        alternative character.
+
+    mac The model dependence character of Macintosh is changed into an
+        alternative character.
+
+    geta
+        The model dependence character is changed into an GETA.
+
+    regular
+        It is the same as the result which performed strip, (win|mac),
+        linefeed, z_kana, h_ascii, kanji, ,geta, and the to_s method.
+
+AUTHOR
+    KIMURA, takefumi <takefumi@takefumi.com>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Jcode, Lingua::JA::Regular::Table, Lingua::JA::Regular::Table::Kanji,
+    Lingua::JA::Regular::Table::Macintosh,
+    Lingua::JA::Regular::Table::Windows
+
+    <http://code.mfac.jp/trac/browser/CPAN/takefumi/Lingua-JA-Regular/>
+

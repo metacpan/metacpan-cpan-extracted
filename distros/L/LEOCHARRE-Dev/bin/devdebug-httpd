@@ -1,0 +1,4 @@
+#!/bin/sh
+#tail -f /var/log/httpd/error_log
+tail -f /var/log/httpd/error_log | sed 's/^.\+0.41\]\|\, referer.\+.cgi//g'
+

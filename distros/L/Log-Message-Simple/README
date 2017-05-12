@@ -1,0 +1,41 @@
+This is the README file for Log::Message::Simple, a simplified frontend
+to Log::Message (a small and powerful generic message logging module)
+
+Please type "perldoc Log::Message::Simple" after installation to see
+the module usage information.
+
+#####################################################################
+
+* Description
+
+Log::Message::Simple
+    This module is a simplified frontend to Log::Message, offering
+    most common use for logging, and easy access to the stack (in
+    both raw and pretty-printable form).
+
+    See the Log::Message::Simple manpage, and the Log::Message
+    module for details.
+
+
+#####################################################################
+
+* Installation
+
+Log::Message uses the standard perl module install process:
+
+perl Makefile.PL
+make
+make test
+make install
+
+######################################################################
+
+AUTHOR
+    This module by Jos Boumans <kane@cpan.org>.
+
+COPYRIGHT
+    This module is copyright (c) 2002 Jos Boumans <kane@cpan.org>. All
+    rights reserved.
+
+    This library is free software; you may redistribute and/or modify it
+    under the same terms as Perl itself.

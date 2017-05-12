@@ -1,0 +1,50 @@
+---
+abstract: 'Log dispatcher for logging to time-based directories'
+author:
+  - 'yowcow <yowcow@cpan.org>'
+build_requires:
+  Scope::Guard: '0'
+  Test::Exception: '0'
+  Test::Mock::Guard: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Dispatch-CronoDir
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Log::Dispatch::CronoDir:
+    file: lib/Log/Dispatch/CronoDir.pm
+    version: '0.06'
+requires:
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Log::Dispatch: '0'
+  Params::Validate: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/yowcow/p5-Log-Dispatch-CronoDir/issues
+  homepage: https://github.com/yowcow/p5-Log-Dispatch-CronoDir
+  repository: git://github.com/yowcow/p5-Log-Dispatch-CronoDir.git
+version: '0.06'
+x_authority: cpan:YOWCOW
+x_contributors:
+  - 'Yoko OYAMA <yowcow@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

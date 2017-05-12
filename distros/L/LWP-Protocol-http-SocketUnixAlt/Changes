@@ -1,0 +1,23 @@
+Revision history for LWP-Protocol-http-SocketUnixAlt
+
+0.0204   2014-04-21 (SHARYANTO)
+
+         - No functional changes.
+
+         - Tweak path parsing so it works.
+
+
+0.0203   2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core in 5.19.
+
+
+0.0202  2011-08-09 (SHARYANTO)
+
+        - No functional changes. Add missing dep to LWP.
+
+
+0.0201  2011-08-04 (SHARYANTO)
+
+        - First release, forked from LWP-Protocol-http-SocketUnix-0.02.

@@ -1,0 +1,28 @@
+---
+abstract: 'Design by Contract in Perl with Language Independent Validation Rules (LIVR).'
+author:
+  - 'Viktor Turskyi <koorchik@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: LIVR-Contract
+provides:
+  LIVR::Contract:
+    file: lib/LIVR/Contract.pm
+    version: 0.04
+  LIVR::Contract::Exception:
+    file: lib/LIVR/Contract/Exception.pm
+requires:
+  Class::Method::Modifiers: 2.04
+  Validator::LIVR: 0.01
+  perl: 5.010
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

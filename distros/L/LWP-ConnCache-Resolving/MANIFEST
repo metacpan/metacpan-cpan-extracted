@@ -1,0 +1,7 @@
+Changes
+lib/LWP/ConnCache/Resolving.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/LWP-ConnCache-Resolving.t

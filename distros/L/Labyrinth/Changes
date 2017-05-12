@@ -1,0 +1,490 @@
+Changes for the Labyrinth Core
+==============================
+
+5.32    2015-03-19
+        - completed code changes for ParamCheck (Support).
+
+5.31    2015-02-27
+        - added Labyrinth::Paths parsing, if available.
+
+5.30    2015-01-07
+        - fixed and extended date test script.
+        - switched to using DateTime (DTUtils).
+        - removed OptSelect as no longer used (DTUtils).
+        - documentation updates.
+
+5.29    2014-12-05
+        - now using Session::Token to create session ids, due to md5 clashes.
+        - enable Export of float methods for use in rules (Filters).
+
+5.28    2014-11-21
+        - protocol regex now a setting variable (Variables).
+        - multipart mails now include text and html parts, as well as 
+          attachments (Mailer).
+        - updated prerequisites.
+
+5.27    2014-10-26
+        - disabled SQLite tests for users.
+        - fixed SQL syntax for SQLite.
+        - disabled SQLite tests due issues with Test-Database/YAML-Tiny.
+
+5.26    2014-10-26
+        - prevent strings being used as numeric options (MLUtils).
+        - fixed MetaData sort order in search tests (Metadata).
+        - fixed protocol match to exclude non-alphabetics (Globals).
+
+5.25    2014-10-17
+        - fixed license fields in META.json to be lists.
+        - escape characters before sending URL request (IPAddr).
+        - enable both types of filters to be called via AUTOLOAD (Filters).
+        - added missing pre-requisite.
+        - moved UserGroups from Plugin::Groups to Core (Groups).
+        - provide consistent return values (Groups, IPAddr).
+        - reworked CSS creation to allow hashes and arrays of attributes. Now
+          use HTML::Entities to (un)escape characters (MLUtils).
+        - colours can be 3 characters as well as 6 (MLUtils).
+        - reworked url regex (Variables).
+        - more options for password validation (Users).
+        - added field name for user select (Users).
+        - extended functional test suite.
+
+5.24    2014-08-16
+        - added InternalLogin (Session) to enable authenticated logins.
+        - set error code to an empty value before each request (Labyrinth).
+        - add 1 to month when using time() (DTUtils).
+        - decode HTML entities before sending mails (Mailer).
+        - added missing use statement (Media).
+
+5.23    2014-06-09
+        - missed Exporter from prerequisites.
+
+5.22    2014-06-03
+        - Exporter tag ':default in Globals no longer used.
+        - added clean up of <script> tags in CleanLink (MLUtils).
+        - reworked FieldCheck (Support).
+        - added ParamCheck (Support). 
+        - added more scripts to test suite.
+        - fixed period drop down (DTUtils).
+        - added full version checks in META tests.
+
+5.21    2014-04-23
+        - CPAN Testers Reports from Chris Williams identified a very odd error
+          with the installed versions of File::Temp and File::Path. Specifying
+          versions of both in pre-requisites to ensure known working copies
+          are installed.
+        - if log file not writeable, ignore audit logging.
+        - extend unformat functionality (DTUtils).
+        - return (without BADACCESS) if no record found (Support).
+        - allow 'charset' to be set in return headers (Writer).
+        - catch phrasebook errors when creating the SQL (DBUtils).
+
+5.20    2014-02-02
+        - added error capture when reducing image (Media).
+        - added Config::IniFiles::errors on config file load errors (Request,
+          Globals, Variables).
+        - added GetUser to help reduce db calls (User).
+        - extend default tags list (MLUtils).
+        - allow evalperl to be set in config (Writer::Parser::TT).
+        - added Filters to meta files.
+
+5.19    2014-01-26
+        - set $past to current year if not set (DTUtils).
+        - SQL LIMIT doesn't use '=' (Metadata).
+        - load DB earlier to allow validation of parameters from DB tables
+          (Labyrinth).
+        - There is an issue with later versions of Data::FormValidator that
+          trashes some of the CGI instances of binary image files. I suspect 
+          this is something to do with the data format of the image files, but
+          to curtail further (already lengthy) investigations, I have written
+          an alternative method to uploading image files. (Media, Globals).
+        - new date format (DTUtils).
+        - completed Folder and Access permissions (Session, Support).
+        - preload profiles and access settings (Variables).
+        - fail gracefully ir settings or rules fail to load (Globals).
+        - prevent looping redirects (Writer).
+        - better file error handling, so browser can see a more descriptive
+          message (Labyrinth, Globals).
+
+5.18    2013-10-13
+        - removed Crypt::RandPasswd from prerequisites.
+        - added ResizeDimensions for displaying images (Media).
+
+5.17    2013-05-03
+        - fixed &#x000; style entities (MLUtils).
+        - added Filters.pm a DFV plugin for additional parameter validation.
+        - fixed missing pre-requisite, Session::Token.
+
+5.16    2013-04-28
+        - post-processing XHTML content before writing out is now optional, 
+          default is no post-processing. Use 'parsehtml' config setting 
+          (Writer).
+        - new 'parsetest' configuration setting to allow tests to determine
+          differences between original and post-processed content (Writer).
+        - added DumpToFile for parsetest functionality (Audit).
+        - fixed url validation (Variables).
+        - improvements to post-processing content (MLUtils).
+        - Enabled phrasebook caching to reduce disk I/O (Phrasebook).
+        - switched from Crypt::RandPasswd to Session::Token for password
+          generation for speed and efficiency (Users).
+
+5.15    2013-03-24
+        - added INSTALL file.
+        - rewrote README.
+        - added BlockURL functionality for remote service (IPAddr).
+        - allow logout redirect to be set by config variable (Session).
+        - clean up TinyMCE encodings (MLUtils).
+        - updated HTMLSend (Mailer).
+        - Transform can now save to file (Writer, Writer/TT).
+
+5.14    2013-02-10
+        - added DeleteFile (Media).
+        - updated default image and thmubnail upload sizes (Media).
+        - added config support for image and thmubnail upload sizes (Media).
+        - GetFolderIDs now uses a hash rather than a hashref (Session).
+        - added Javascript and JSON file types (Writer).
+        - catch parsing errors (Writer).
+        - capture initialisation issues uniformly.
+        - added LICENSE file.
+        - fixed constraints and url/email patterns.
+        - extended test suite.
+
+5.13    2012-09-02
+        - added crawler detection.
+        - change file dates changed to meet W3CDTF standards.
+        - implemented Perl::Critic suggestions.
+        - reworked Makefile.PL for clarity.
+        - added example pages.cgi script.
+
+5.12    2012-01-24
+        - extended CSS list of styles (MLUtils).
+        - length pattern now includes px and em (MLUtils).
+        - email changed to recipient_email to avoid clashes (Mailer).
+        - catch any template parsing errors (Mailer).
+        - made alignment lists more consistent (Support).
+        - Alignment split into AlignName and AlignClass (Support).
+
+5.11    2012-01-03
+        - Media now allows more control for resizing thumbnails.
+        - DTUtils give more scope for configuring YearSelect.
+
+5.10    2011-12-31
+        - fixed capturing require errors in DIUtils
+        - fixed passing args to D::FV::Constraints::Upload
+        - fixed file uploads in Media.
+        - fixed wrapper for Query::CGI.
+        - added File:Slurp as a prerequisite.
+
+5.09    2011-06-25 [unreleased]
+        - fix to Transform to correctly return content.
+        - fix to RSS.pm to use new Transform.
+        - fix to URL pattern match.
+        - added <label> as a valid tag to MLUtils.
+        - moved SetLogFile into Globals and allowed more settings.
+        - added titles to links, with the ability to provide user mappings.
+
+5.08    2011-06-19
+        - documentation updates.
+        - added url mapping for MetaCloud links.
+        - fixes for GetImageSize.
+
+5.07    2011-06-19
+        - added GetImageSize & GetGravatar to Media.pm.
+        - added a cleanup of erroneous XHTML patterns in MLUtils.pm.
+        - store error message if opening mail pipe fails in Mailer.pm.
+
+5.06    2011-05-19
+        - abstracted input CGI to Labyrinth::Query::CGI.
+        - abstracted output CGI to Labyrinth::Writer::Render::CGI.
+        - abstracted template parser to Labyrinth::Writer::Parser::TT.
+        - all above in order to allow PSGI packages and other template parsers
+          to be used.
+        - documentation updates.
+        - reworked CookieLib to use new Labyrinth::Query::CGI package.
+
+5.05    2011-04-11
+        - fixes and code cleaning from CPAN Testers Blog site.
+
+5.04    2011-03-13
+        - Abstracted GD and ImageMagick drivers into their own distributions.
+
+5.03    2011-01-05
+        - removed unused reference to Text::Format.
+
+5.02    2011-01-03
+        - added better handling of MIME Types from CPAN Testers sites.
+
+5.01    2011-01-01
+        - moved MasterCheck from plugins to core
+
+5.00    2011-01-01
+        - first official open source release.
+        - sessions can now be deleted by isolated script not part of logins.
+
+4.19    2010-09-13
+        - fixed RSS body content.
+        - update Phrasebook.pm to use Data::Phrasebook.
+
+4.18    2010-08-20
+        - merged Request.pm differences for DBI and .ini file configuration.
+        - plugins split away from core.
+        - documentation patches.
+
+4.17    2010-03-11
+        - rewrote requests to use database rather than ini files.
+        - rewrote plugin framework to load on demand.
+        - removed file lookups.
+        - added parameter validation to RSS feeds.
+        - alternate data sources for RSS body text .
+        - RSS permanent links split for articles and site links.
+        - auto commit now an option to DBUtils.
+        - comments can be ignored or removed in MLUtils.
+        - '#' is valid in a URL.
+        - 'noscript' added to the list of valid tags.
+        - defaults applied to 'who' when saving IPs.
+        - added UserID lookup in Users.
+
+4.16    2009-03-06
+        - fixed DTUtils.pm undefined error.
+        - simplified Metadata searches and combined photo/page searches into
+          a single table using nested selects
+        - updated MLUtils.pm with new XHTML compatibility fixes.
+        - removed unused Exporter references from several modules.
+        - removed excessive use of 'use vars' where it wasn't needed.
+        - reduced unncessary function calls
+        - reduced unncessary database calls
+        - added protection for bad image calls (IMDriver.pm/GDDriver.pm)
+        - moved Plugins management to Plugins.pm
+        - remove whitespace before </p> in MLUtils.pm
+        - added demoroniser code to MLUtils.pm
+
+4.15    2008-05-31
+        - upgraded to latest TinyMCE - v3.0.8
+        - fixed session update functionality
+        - fixed names of db access parameters
+
+4.14    2008-05-14
+        - aded further attribute (MLUtil.pm)
+        - MetaCloud now allows multiple lookups (Metadata.pm)
+        - added guest user lookup (Session.pm)
+        - added badcommand option (Writer.pm)
+        - constraints abstracted in CPAN module (Constraints.pm)
+        - new date format (DTUtils.pm)
+        - added links and perma fields (RSS.pm)
+        - remove any remaining actions on a reset request (Request.pm)
+        - added host settings (Globals.pm)
+        - added further log messages when mail not configured (Mailer.pm)
+        - added picture storing ability to Venues.pm
+        - added IPAddr.pm
+        - added GetUserGroup to Groups.pm
+        - added NAME to menu option fields to allow each option to have a 
+          unique identifier to be used within CSS (Menus.pm)
+        - rework of trail creation from menus (Menus.pm)
+        - rework of hits listings (Hits.pm)
+        - rework of guestbook, adding IPAddr functionality (Guestbook.pm)
+
+4.13    2007-12-13
+        - trim trailing whitespace from code
+        - incorporate session/menu changes from smart site
+        - map awkward quoting characters to sane ASCII versions
+        - include the ability to server binary (PDF) files (Writer.pm)
+        - include Order and Product plugin rewrites from smart site
+        - include Authenticated Downloads plugin
+        - fix Mailer hooks from Labyrinth.pm
+        - Allow for more caller information via Audit.pm
+        - bad login now throws BADUSER error (Session.pm)
+        - incorporate language code into session from OD360
+        - include RealmCheck and RealmID to realm support
+
+4.12    2007-12-03
+        - complete review of code to ensure that database result sets are
+          being returned and used correctly.
+        - removed further unnecessary template variables (eg 'norecs') when no
+          results sets. TT logic can figure it out!
+        - changed RSS to use name/email from settings
+        - fixed BookReviews to use PUBLISHER for admin access
+        - fixed image processing for BookReviews.pm
+        - added ISBN drivers to prerequisites (also added Amazon back in)
+        - fixed additional links to be saved and update for O'Reilly
+          (BookReviews.pm)
+
+4.11    2007-09-26
+        - added TagCloud support to Metadata.pm, Articles.pm and Diary.pm
+        - fix to MLUtils.pm to add further legal tags
+        - Change Labyrinth::Images to Labyrinth::Media
+        - add several media file support functionality, including archive
+          extraction
+        - removed all references to 'norecs', TT logic can figure it out!
+
+4.10    2007-08-09
+        - performance improvements within Globals and Variables
+        - name change: Specific.pm => Support.pm
+        - added extra debug info for DBUtils.pm
+        - added more default legal HTML tags in MLUtils.pm
+        - fixed session management with guest user
+        - fixed articles listings
+        - major rework of News.pm (removal of snippet, added better support
+          for front page and archived news).
+        - added more functionality to Hits.pm, changing the way hits are
+          recorded and presented
+
+4.09    2007-06-07
+        - added categories to links (Links.pm)
+        - 'users' template container used for data from Users.pm
+        - show/hide/ban/delete users functionality improved
+        - fixed closed_tag_dependent bug (MLUtils.pm)
+        - moves TechTalk.pm to Events/TechTalk.pm
+        - abstracted out social/technical specific code to Events/Meetings.pm
+        - changed the LoadSettings to use Config::IniFiles to read the settings
+          config file. This means that lists can now be used for settings.
+        - fixed new abbreviations - no longer supports regexs
+        - fixed VenueSelect blank reference
+        - fixed $where in Album::Page::Admin when undef
+
+4.08    2007-05-30
+        - when logging in the next command sets 'home-'+realm as the next
+          command. The default assumes a normal 'public' user. (Session.pm)
+        - added Survey plugins
+        - added server date/time template variables (Content.pm)
+
+4.07    2007-05-28
+        - more date/time formats (DTUtils.pm)
+        - more POD in core Images.pm
+        - urlregex moved to Variables.pm and stored in $settings{urlregex}
+        - emailregex added to Variables.pm and stored in $settings{emairegex}
+        - RSS.pm added to core
+        - Wiki.pm and WikiText.pm added to plugins
+        - better HTTP handling in Writer.pm, including returning 404 status
+        - fixed page/photo id checks in Hits.pm
+        - added <pre> as another tage where <p> doesn't to preceed it
+        - fixed bad URL capture
+        - fixed several areas when saving user data, no existing checks for a
+          new user and absolute default realm is 'public'
+        - added ipaddr to tvars
+        - added %closetag_is_dependent to allow for <a name="a" />
+        - improvement to menu option deleting
+        - added more entries to %safe_tags (MLUtils.pm)
+
+4.06    2007-05-10
+        - better handling of plugins by abstracting out into Plugin.pm
+        - added url regex to Constraints.pm
+        - added ipaddr code
+        - added Media functionality to core Images.pm (name may change)
+        - added more entries to %safe_tags (MLUtils.pm)
+        - improved Metadata.pm interfaces
+        - removed last remaining forum references
+
+4.05    2007-03-08
+        - lots of fixes!
+
+4.04    2007-02-21
+        - created Variables.pm to stop cyclic dependency, simplifying Globals.pm
+          in the process.
+        - improved Writer.pm so valid XHTML is correctly parsed out.
+        - as a result of the above extended MLUtils.pm and fixed several
+          hidden content bugs in the templates.
+        - Croak moved to Writer.pm as it's a better fit in the chain.
+        - removed unnecessary references to Globals.pm, Session.pm & Specific.pm
+          from plugins that don't use them.
+        - SafeHTML => CleanTags in several plugins.
+        - undef body bugfix to images in paragraphs (Articles.pm)
+        - initialise event types (Events.pm)
+
+4.03    2007-02-04
+        - Testing with Selenium has highlighted some areas of the core code
+          that needs a little more tightening, together with various areas of
+          plugin code.
+        - a fix to prevent anyone trying to access realm code directly
+          (Labyrinth.pm)
+        - removal of Carp dependancy and general code clean up (Audit.pm,
+          DBUtils.pm, DIUtils, Phrasebook.pm, Request.pm, GDDriver.pm,
+          IMDriver.pm, Specific.pm)
+        - Carp::croak replaced with Croak, which provides better error
+          messaging both to logs and to the user.
+        - PathMove and Croak added to Globals.pm
+        - GroupSelect updated and GroupSelectMulti added (Groups.pm)
+        - update of copyright/author/name documentation
+        - ddmmyy/printsafe/url/realname match functions updated with better
+          regexes and returns undef if no match (Constraints.pm)
+        - removed \n in select/option HTML strings (DTUtils.pm, Globals.pm,
+          Groups.pm, MLUtils.pm)
+        - better session logging (Session.pm)
+        - Mailer.pm improved to avoid cyclic dependancy
+        - added AccessLevel checks for admin functions (Plugin::Base.pm)
+        - added UserSelect (Users.pm)
+        - made UserName cache names correctly (User.pm)
+        - better error checking in public facing method, to prevent anyone
+          trying to access anything they shouldn't do. (various plugins)
+        - improved dropdown calls and deletion (Plugin::Groups.pm)
+        - RSS code made to reflect the configuration file (Plugin::News.pm)
+
+4.02    2007-01-26
+        - dates => ddmmyy, email => emails (Constraints.pm)
+        - DB connection error fix - now displays a nice message to the user and
+          doesn't reveal any sensitive info (DBUtils.pm)
+        - StockType added to gather data from DB (Globals.pm)
+        - major rework around stock types, such that the default (DRAFT) is
+          always id=1
+        - in CGIFile force lower case extension for uploaded file (Globals.pm)
+        - try and keep dimensions up to date (Images.pm)
+        - tidy up of code (Phrasebook.pm, Request.pm, Session.pm)
+        - scalars are not references! (Base.pm)
+        - default alignment = none (Specific.pm)
+        - added redirection code (Writer.pm)
+        - added new date format string (DTUtils.pm)
+        - added Standard plugin set to the manifest
+
+4.01    2007-01-12
+        - additional documentation
+        - better handling when a plugin fails (Labyrinth.pm)
+        - added ? to list of acceptable characters for simplewords
+          (Constraints.pm)
+        - settings now automatically passed to tvars for PROJECT, HTTP & CMS
+          sections (Globals.pm)
+        - fixed bugs in CleanTags (MLUtils.pm)
+
+4.00    2007-01-10
+        - implemented proper plugin functionality for Scooter Do & Style Stop
+          websites
+        - general code cleaning and additional documentation
+        - added more date formats (DTUtils.pm)
+        - fixed undef range bug in YearSelect (DTUtils.pm)
+        - ported core functionality out of plugins (Images.pm, Metadata.pm,
+          Users.pm)
+        - fixed undef issues with protocol and cgiroot values (Globals.pm)
+        - DB errors now trip MESSAGE rather than ERROR (Globals.pm)
+        - new functions CleanLink & CleanWords to fight spam (MLUtils.pm)
+        - fixed an undef error case (Phrasebook.pm)
+        - Login/Logout require direct reference (Session.pm)
+        - FreshPassword moved to new Users.pm
+        - improved session handling, now even guests have a key (Session.pm)
+        - fixed undef key for session key bug (Session.pm)
+        - removal of specific realm changing code (Specific.pm)
+        - addition of FolderSelect to prepare for full website management
+          (Specific.pm)
+        - fixed AuthorCheck/AccessUser bug where permission is 0 (PUBLIC)
+          (Specific.pm)
+        - removed unused error codes (Writer.pm)
+        - Evaluates Perl for BADPAGE (Writer.pm)
+
+3.00    2006-11-03
+        - More general improvements to the system from writing DanDan's website
+        - Added more caller info (Audit.pm)
+        - fixed AUTOLOAD bug (DBUtils.pm)
+        - simplified regex for script extraction from ENV variable (Globals.pm)
+        - removed strip from automatic CGI parameters parsing (Globals.pm)
+        - filters added to parserules file (Globals.pm)
+        - script & randpicwidth added to automatic tvars list (Globals.pm)
+        - formatted all HTML code to meet standards
+        - LinkSpam added to protect spam attacks (MLUtils.pm)
+        - broken url regex down to more understandable components (MLUtils.pm)
+        - added more realm handling code (Specific.pm)
+        - fixed AuthorCheck to cope with records without a userid field
+          (Specific.pm)
+        - fixed FieldCheck to cope with added items (zero or blank id fields)
+          (Specific.pm)
+
+2.00    2006-10-10
+        - complete overhaul of code from implementing the Slim Pickins site
+
+1.00    0000-00-00
+        - first version of Labyrinth, rebuilt basic core elements

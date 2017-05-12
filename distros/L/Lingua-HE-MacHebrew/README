@@ -1,0 +1,43 @@
+Lingua::HE::MacHebrew version 0.20
+================
+
+NAME
+
+Lingua::HE::MacHebrew - transcoding between Mac OS Hebrew encoding and Unicode
+
+SYNOPSIS
+
+    use Lingua::HE::MacHebrew;
+
+    $wchar = decodeMacHebrew($octet);
+    $octet = encodeMacHebrew($wchar);
+
+   # $wchar : a string in Perl's Unicode format
+   # $octet : a string in MacOS Hebrew encoding
+
+DEPENDENCIES
+
+* This module requires Perl 5.6.1 or later.
+  (sorry, cannot be built with Perl 5.6.0!)
+
+* You need a C compiler to build this module.
+
+INSTALLATION
+
+* At first, extract the tarball.
+
+* Then, type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENSE
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+
+Copyright(C) 2003-2011, SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

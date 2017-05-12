@@ -1,0 +1,7 @@
+Revision history for Perl extension LiquidWeb::Storm::CLI.
+
+1.01  Fri Mar 20 10:56:18 2015
+	- original version; created by h2xs 1.23 with options
+		-AX LiquidWeb::Storm::CLI
+1.03 Wed April 1 09:50:23 2015
+	- Updated tests. 

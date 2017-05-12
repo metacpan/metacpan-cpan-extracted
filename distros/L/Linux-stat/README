@@ -1,0 +1,101 @@
+NAME
+    Linux::stat - parse /proc/stat
+
+SYNOPSIS
+      use Linux::stat;
+
+      my $stat = Linux::stat->new( [ stat => "path to /proc/stat" ] );
+      my $hashref = $stat->stat();
+
+    or
+
+      my $hashref = Linux::stat::stat( [ "path to /proc/stat" ] );
+
+DESCRIPTION
+    Linux::stat is a simple Perl module which parses /proc/stat
+    file. Info is arranged in hash reference with descriptive keys.
+
+    Linux::stat was written on RedHat Linux 7.2, kernel 2.4.7 and
+    tested on RedHat 6.2, kernel 2.2.14. It is expected to work with
+    other versions as well, but this depends on Linux configuration
+    and kernel version.
+
+    Output data can be easily previewed with Data::VarPrint package,
+    available at CPAN.
+
+    Output fields (some of these are unavailable on kernels older
+    than 2.4):
+
+    boot_timestamp
+        Timestamp (number of seconds since epoch) when the system
+        was booted
+
+    context_switch
+        Context switch, used by Linux job scheduler; for more info
+        check Linux kernel sources: kernel/sched.c (look for
+        kstat.context_swtch)
+
+    cpu, cpu0, cpu1,...
+        Overall and per-CPU time: user, nice, system, idle
+
+    disks
+        Disks I/O (for each partition):
+
+    disk - disk number (0 for /dev/hda, 1 for /dev/hdb,...)
+    io - total number of I/O requests
+    major - major disk number (partition number on the disk)
+    read_count - number of reads from disk
+    read_sectors - number of sectors read from disk
+    write_count - number of writes to disk
+    write_sectors - number of sectors written to disk
+    disks_io
+        Overall disk I/O info; same fields as in disks (of course,
+        except for disk and major)
+
+    interrupts
+        Number for interrupts for each IRQ
+
+    interrupts_total
+        Total number of interrupts (same as sum of all numbers in
+        interrupts)
+
+    kstat.*
+        Not parsed, just added to hash
+
+    pages_in
+        Number of pages read
+
+    pages_out
+        Number of pages written
+
+    swap_pages_in
+        Number of pages read from swap
+
+    swap_pages_out
+        Number of pages written to swap
+
+    total_forks
+        Number of processes run since boot
+
+    uptime
+        System uptime in seconds (same as sum of all four times for
+        cpu)
+
+    All not-recognized fields are just passed on without parsing.
+
+OPTIONS
+    Currently, the only option available is stat which is path to
+    /proc/stat in case this changes for some reason.
+
+FILES
+    /proc/stat CPU, disk and some other information
+
+REQUIRES
+    Perl 5.000
+
+SEE ALSO
+    perl(1)
+
+AUTHOR
+    Vedran Sego, vsego@math.hr
+

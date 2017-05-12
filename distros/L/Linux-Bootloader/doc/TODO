@@ -1,0 +1,13 @@
+
+* (DONE) Create basic Linux::Bootloader
+* (DONE) Create Linux::Bootloader::Grub
+* (DONE) Create Linux::Bootloader::Detect
+* (DONE) Create Linux::Bootloader::Lilo
+* (DONE) Create Linux::Bootloader::Elilo
+* (DONE) Create Linux::Bootloader::Yaboot
+* (DONE) Test thoroughly on grub, including boot-once capability
+* Test thoroughly on lilo, including boot-once capability
+* Test thoroughly on elilo, except for boot-once capability
+* Test thoroughly on yaboot, except for boot-once capability
+* Research/develop boot-once capability for elilo
+* Research/develop boot-once capability for yaboot

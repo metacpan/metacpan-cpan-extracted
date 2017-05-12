@@ -1,0 +1,28 @@
+Language::FP version 0.03
+=========================
+
+Language::FP is an implementation of John Backus' FP language, a
+purely functional language remarkable for its lack of named variables.
+Using it is guaranteed to be a mind-warping experience.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Parse::RecDescent;
+  Regexp::Common;
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2002 Sean O'Rourke.  All rights reserved, some wrongs
+reversed.  This module is distributed under the same terms as Perl
+itself.  Let me know if you actually find it useful.

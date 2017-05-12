@@ -1,0 +1,40 @@
+Revision history for Perl extension LWP::Authen::Negotiate.
+
+0.08    Do 29. Okt 22:09:12 CET 2009
+        - added LWP::Debug to dependencies...
+
+0.07    Di 27. Okt 20:51:50 CET 2009
+
+        - fixed <https://rt.cpan.org/Public/Bug/Display.html?id=50881>
+          Thanks to Adam Sjøgren.
+
+0.06    Di Mar  7 21:10:12 CET 2006
+
+        - fixed bug to use undef in case of
+          ignored parameters in call to
+          gss_init_security context.
+          Thanks to Christopher Odenbach and Simon
+          Wilkinson
+
+0.05	Fr Feb 17 15:58:25 CET 2006
+
+	- added the LWP_AUTHEN_NEGOTIATE_DELEGATE
+	  Environment configuration (Thanks Leif)
+	- added checking to all $status return values
+
+0.03	Do Feb 16 22:51:06 CET 2006
+
+	- made the module use of CPAN GSSAPI 0.18 adapter
+	  to become ready for CPAN
+	- first time in CPAN...
+
+0.02  2005-12-02
+
+	Better errorhandling, not simple dieing...
+	Added useful hints do documentation
+	USes GSS_C_NT_HOSTBASED_SERVICE now
+
+0.01  Wed Nov 30 02:01:29 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n LWP::Authen::Negotiate
+

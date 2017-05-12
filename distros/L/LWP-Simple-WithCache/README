@@ -1,0 +1,38 @@
+LWP-Simple-WithCache
+
+This module is for the lazy developers like me.
+
+   use LWP::Simple;
+   use LWP::Simple::WithCache;
+
+   # default expiration is 600 seconds, we can change it if needed
+   $LWP::Simple::ua->{cache}->_set_default_expires_in(86400);
+
+   print get('http://www.google.com/'); # cache miss
+   print get('http://www.google.com/'); # cache hit
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   LWP::Simple;
+   LWP::UserAgent::WithCache;
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008 by Yen-Ming Lee
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

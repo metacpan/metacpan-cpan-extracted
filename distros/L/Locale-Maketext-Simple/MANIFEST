@@ -1,0 +1,17 @@
+Changes
+lib/Locale/Maketext/Simple.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+SIGNATURE			Public-key signature (added by MakeMaker)
+t/0-signature.t
+t/1-basic.t
+t/2-load_po_without_i_default.t
+t/3-load_po_with_i_default.t
+t/po_with_i_default/en.po
+t/po_with_i_default/fr.po
+t/po_with_i_default/i_default.po
+t/po_without_i_default/en.po
+t/po_without_i_default/fr.po

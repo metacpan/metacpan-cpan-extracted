@@ -1,0 +1,14 @@
+bin/logfile-tail
+lib/Logfile/Tail.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+perl-Logfile-Tail.spec
+t/1-use.t
+t/2-read.t
+t/3-rotate.t
+t/4-script.t
+t/5-error.t
+t/6-sanity.t
+t/lib.pl
+META.yml                                 Module meta-data (added by MakeMaker)

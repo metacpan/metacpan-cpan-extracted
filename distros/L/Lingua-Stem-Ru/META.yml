@@ -1,0 +1,25 @@
+---
+abstract: "Porter's stemming algorithm for Russian (KOI8-R only)"
+author:
+  - 'Aleksandr Guidrevitch <pillgrim@mail.ru>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Stem-Ru
+requires:
+  Carp: '0'
+  Exporter: '5.57'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/Lingua-Stem-Ru
+  repository: https://github.com/neilb/Lingua-Stem-Ru.git
+version: '0.04'

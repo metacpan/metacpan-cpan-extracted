@@ -1,0 +1,26 @@
+Untar the package
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+save the old files for their config data where ever you 
+have put them in your directory tree and replace with 
+these files if the version number has changed and edit 
+them to add any needed configuration parameters that 
+appear in the old files.
+
+  examples/daemon.pl			labrea data collection
+  Report/examples/page_report.plx	web data reports
+  Get/examples/web_scan.pl		other sites
+  examples/tell_me.pl			old rogue email notices
+  DShield/examples/mail_dshield.pl	DShield reporting
+
+check for a more recent version of:
+
+	Report/examples/localTrojans.pl
+	Get/examples/other_sites.txt
+
+done!

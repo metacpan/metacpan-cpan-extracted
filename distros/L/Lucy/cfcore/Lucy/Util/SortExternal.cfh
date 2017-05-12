@@ -1,0 +1,138 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Abstract external sorter.
+ *
+ * SortExternal objects are sort pools which allow you to sort huge
+ * collections of elements.  To achieve this, you [](cfish:.Feed) all items into the
+ * SortExternal object, [](cfish:.Flip) it from write mode to read mode, then [](cfish:.Fetch)
+ * the elements one at a time in sorted order.
+ *
+ * It's expected that the total memory footprint of the buffered sortable
+ * items will eventually exceed a specified threshold; at that point, the
+ * SortExternal object will call the abstract method [](cfish:.Flush).  It's expected
+ * that [](cfish:.Flush) implementations will empty out the current buffer, write a
+ * sorted "run" to external storage, and add a new child SortExternal object
+ * to the top level object's "runs" array to represent the flushed content.
+ *
+ * During the read phase, the child sortex objects retrieve elements from
+ * external storage by calling the abstract method [](cfish:.Refill).  The top-level
+ * SortExternal object then interleaves multiple sorted streams to produce a
+ * single unified stream of sorted items.
+ */
+abstract class Lucy::Util::SortExternal nickname SortEx
+    inherits Clownfish::Obj {
+
+    Obj          **buffer;
+    uint32_t       buf_cap;
+    uint32_t       buf_max;
+    uint32_t       buf_tick;
+    Obj          **scratch;
+    uint32_t       scratch_cap;
+    Vector        *runs;
+    Obj         ***slice_starts;
+    uint32_t      *slice_sizes;
+    uint32_t       mem_thresh;
+    bool           flipped;
+
+    inert SortExternal*
+    init(SortExternal *self);
+
+    /** Compare two sortable elements.
+     */
+    abstract int
+    Compare(SortExternal *self, Obj **ptr_a, Obj **ptr_b);
+
+    /** Flush all elements currently in the buffer.
+     *
+     * Presumably this entails sorting everything, writing the sorted elements
+     * to disk, spawning a child object to represent those elements, and
+     * adding that child to the top-level object via [](cfish:.Add_Run).
+     */
+    abstract void
+    Flush(SortExternal *self);
+
+    /** Add an item to the sort pool.
+     */
+    void
+    Feed(SortExternal *self, decremented Obj *item);
+
+    /** Flip the sortex from write mode to read mode.
+     */
+    void
+    Flip(SortExternal *self);
+
+    /** Fetch the next sorted item from the sort pool.  Invalid prior to
+     * calling [](cfish:.Flip). Returns NULL when all elements have been exhausted.
+     */
+    incremented nullable Obj*
+    Fetch(SortExternal *self);
+
+    /** Preview the next item that Fetch will return, but don't pop it.
+     * Invalid prior to calling [](cfish:.Flip).
+     */
+    nullable Obj*
+    Peek(SortExternal *self);
+
+    /** Add a run to the sortex's collection.
+     */
+    void
+    Add_Run(SortExternal *self, decremented SortExternal *run);
+
+    /** Compact buffer sizes and minimize memory consumption.
+     */
+    void
+    Shrink(SortExternal *self);
+
+    /** Refill the buffer of a run.  Will only be called on child sortex
+     * objects, not the main object.
+     */
+    abstract uint32_t
+    Refill(SortExternal *self);
+
+    /** Sort all items currently in the main buffer.
+     */
+    void
+    Sort_Buffer(SortExternal *self);
+
+    /** Reset buffer variables so that buffer gives the appearance of having
+     * been initialized.
+     *
+     * Subclasses may take steps to release items held in buffer, if any.
+     */
+    void
+    Clear_Buffer(SortExternal *self);
+
+    /** Return the number of items presently in the buffer.
+     */
+    uint32_t
+    Buffer_Count(SortExternal *self);
+
+    /** Allocate more memory to the buffer.
+     */
+    void
+    Grow_Buffer(SortExternal *self, uint32_t cap);
+
+    void
+    Set_Mem_Thresh(SortExternal *self, uint32_t mem_thresh);
+
+    public void
+    Destroy(SortExternal *self);
+}
+
+

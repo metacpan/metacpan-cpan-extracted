@@ -1,0 +1,163 @@
+#!/usr/bin/perl -w
+
+use Lemonldap::NG::Cli;
+use Config::IniFiles;
+use POSIX;
+use strict;
+
+sub giveUpPrivileges
+{
+     my ($user, $group) = @_;
+
+     if (not defined ($user))
+     {
+          $user = "nobody";
+     }
+
+     if (not defined ($group))
+     {
+          $group = "nobody";
+     }
+
+     # become $user:$group and give up root privileges
+     POSIX::setgid ((getgrnam ($group))[2]);
+     POSIX::setuid ((getpwnam ($user))[2]);
+
+     # if we are still root
+     if ($> == 0)
+     {
+          # ask the user to continue or abort
+          print STDERR "$0 must not be launchezd as root since local cache can be corrupted.\n";
+          print STDERR "Continue (y/N)? ";
+          my $res = <STDIN>;
+          exit 1 unless ($res =~ /^y/i);
+     }
+}
+
+sub loadConfig
+{
+     my ($conffile) = @_;
+
+     my $cfg = Config::IniFiles->new ( -file => $conffile );
+
+     if (defined ($cfg))
+     {
+          my $apacheuser  = $cfg->val ("apache", "user")  if $cfg->exists ("apache", "user")  or "nobody";
+          my $apachegroup = $cfg->val ("apache", "group") if $cfg->exists ("apache", "group") or "nobody";
+
+          &giveUpPrivileges ($apacheuser, $apachegroup);
+     }
+     else
+     {
+          &giveUpPrivileges ();
+     }
+}
+
+&loadConfig ("__CONFPATH__/lemonldap-cli.ini");
+
+exit (0);
+
+my $app = Lemonldap::NG::Cli->new ();
+
+my $ret = $app->run (@ARGV);
+
+exit ($ret);
+
+__END__
+
+=head1 NAME
+
+=encoding utf8
+
+lemonldap-ng-cli - Command Line Interface to edit LemonLDAP::NG configuration.
+
+=head1 SYNOPSIS
+
+Set/get variables in the configuration:
+
+  lemonldap-ng-cli set <variable> <value>
+  lemonldap-ng-cli unset <variable>
+  lemonldap-ng-cli get <variable>
+
+Define macros:
+
+  lemonldap-ng-cli set-macro <macro name> <perl expression>
+  lemonldap-ng-cli unset-macro <macro name>
+  lemonldap-ng-cli get-macro <macro name>
+
+Modify application list:
+
+  lemonldap-ng-cli apps-set-cat <cat id> <cat name>
+  lemonldap-ng-cli apps-get-cat <cat id>
+  
+  lemonldap-ng-cli apps-add <app id> <cat id>
+  lemonldap-ng-cli apps-set-uri <app id> <app uri>
+  lemonldap-ng-cli apps-set-name <app id> <app name>
+  lemonldap-ng-cli apps-set-desc <app id> <app description>
+  lemonldap-ng-cli apps-set-logo <app id> <logo>
+  lemonldap-ng-cli apps-set-display <app id> <app display>
+  
+  lemonldap-ng-cli apps-get <app id>
+  lemonldap-ng-cli apps-rm <app id>
+
+Manage rules:
+
+  lemonldap-ng-cli rules-set <virtual host> <expr> <rule>
+  lemonldap-ng-cli rules-unset <virtual host> <expr>
+  lemonldap-ng-cli rules-get <virtual host>
+
+Manage exported variables:
+
+  lemonldap-ng-cli export-var <key> <value>
+  lemonldap-ng-cli unexport-var <key>
+  lemonldap-ng-cli get-exported-vars
+
+Manage exported headers:
+
+  lemonldap-ng-cli export-header <virtual host> <HTTP header> <perl expression>
+  lemonldap-ng-cli unexport-header <virtual host> <HTTP header>
+  lemonldap-ng-cli get-exported-headers <virtual host>
+
+Manage virtual hosts:
+
+  lemonldap-ng-cli vhost-add <virtual host uri>
+  lemonldap-ng-cli vhost-del <virtual host>
+  lemonldap-ng-cli vhost-set-port <virtual host> <port>
+  lemonldap-ng-cli vhost-set-https <virtual host> <value>
+  lemonldap-ng-cli vhost-set-maintenance  <virtual host> <value>
+  lemonldap-ng-cli vhost-list
+
+Global Storage:
+
+  lemonldap-ng-cli global-storage
+  lemonldap-ng-cli global-storage-set-dir <path>
+  lemonldap-ng-cli global-storage-set-lockdir <path>
+
+Reload URLs:
+
+  lemonldap-ng-cli reload-urls
+  lemonldap-ng-cli reload-url-add <vhost> <url>
+  lemonldap-ng-cli reload-url-del <vhost>
+
+=head1 DESCRIPTION
+
+lemonldap-ng-cli allow user to edit the configuration of Lemonldap::NG via the
+command line.
+
+=head1 SEE ALSO
+
+L<Lemonldap::NG::Cli>, L<http://lemonldap-ng.org/>
+
+=head1 AUTHOR
+
+David Delassus E<lt>david.jose.delassus@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012, by David Delassus
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -1,0 +1,132 @@
+=encoding utf8
+
+=head1 NAME
+
+Log::Report::Lexicon::Table - generic interface to translation tables
+
+=head1 INHERITANCE
+
+ Log::Report::Lexicon::Table is extended by
+   Log::Report::Lexicon::MOTcompact
+   Log::Report::Lexicon::POT
+   Log::Report::Lexicon::POTcompact
+
+=head1 SYNOPSIS
+
+  # use one of the extensions, for instance:
+  my $pot = Log::Report::Lexicon::POT
+     ->read('po/nl.po', charset => 'utf-8')
+         or panic;
+
+=head1 DESCRIPTION
+
+This base class defines the generic interface for translation tables.
+
+Currently, there are three extensions:
+
+=over 4
+
+=item * L<Log::Report::Lexicon::POT|Log::Report::Lexicon::POT>
+
+This is a relatively heavy implementation, used to read but also to
+write PO files.  It is used by F<xgettext-perl>, for instance, to
+administer the collection of discovered msgid's.
+
+=item * L<Log::Report::Lexicon::POTcompact|Log::Report::Lexicon::POTcompact>
+
+Light-weighted read-only access to PO-file information.
+
+=item * L<Log::Report::Lexicon::MOTcompact|Log::Report::Lexicon::MOTcompact>
+
+Read-only access to MO-file information.  These binary MO-files are
+super efficient.
+
+=back
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Log::Report::Lexicon::Table-E<gt>B<new>(%options)
+
+=back
+
+=head2 Attributes
+
+=head2 Managing PO's
+
+=head3 Translation
+
+=over 4
+
+=item $obj-E<gt>B<msgid>( STRING, [$msgctxt] )
+
+Lookup the L<Log::Report::Lexicon::PO|Log::Report::Lexicon::PO> with the STRING.
+Returns C<undef> when not defined.
+
+=item $obj-E<gt>B<msgstr>( $msgid, [$count, $msgctxt] )
+
+Returns the translated string for $msgid.  When not specified, $count is 1.
+
+=back
+
+=head3 Administration
+
+=over 4
+
+=item $obj-E<gt>B<add>($po)
+
+Add the information from a $po into this POT.  If the msgid of the $po
+is already known, that is an error.
+
+=item $obj-E<gt>B<header>($field)
+
+The translation of a blank MSGID is used to store a MIME header, which
+contains some meta-data.  The $field value is looked-up (case-insensitive)
+and returned.
+
+=item $obj-E<gt>B<nrPlurals>()
+
+Returns the number of plurals, when not known then '2'.
+
+=item $obj-E<gt>B<pluralIndex>($count)
+
+Returns the msgstr index used to translate a value of $count.
+
+=item $obj-E<gt>B<setupPluralAlgorithm>()
+
+This method needs to be called after setting (reading or creating) a new
+table header, to interpret the plural algorithm as specified in the
+C<Plural-Forms> header field.
+
+=item $obj-E<gt>B<translations>( [$active] )
+
+Returns a list with all defined L<Log::Report::Lexicon::PO|Log::Report::Lexicon::PO> objects. When
+the string C<$active> is given as parameter, only objects which have
+references are returned.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: only acceptable parameter is 'ACTIVE'
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Log-Report-Lexicon distribution version 1.06,
+built on September 21, 2016. Website: F<http://perl.overmeer.net/log-report/>
+
+=head1 LICENSE
+
+Copyrights 2007-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,47 @@
+---
+abstract: 'LTSV logger'
+author:
+  - 'Hiroyoshi Houchi <git@hixi-hyi.com>'
+build_requires:
+  File::Temp: '0'
+  Test::Deep: '0'
+  Test::Deep::Matcher: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-LTSV-Instance
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Log::LTSV::Instance:
+    file: lib/Log/LTSV/Instance.pm
+    version: '0.06'
+  Log::LTSV::Instance::Flatten:
+    file: lib/Log/LTSV/Instance/Flatten.pm
+requires:
+  Carp: '0'
+  File::RotateLogs: '0'
+  Hash::Flatten: '0'
+  Time::Piece: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/hixi-hyi/p5-Log-LTSV-Instance/issues
+  homepage: https://github.com/hixi-hyi/p5-Log-LTSV-Instance
+  repository: git://github.com/hixi-hyi/p5-Log-LTSV-Instance.git
+version: '0.06'
+x_contributors:
+  - 'Naoki Yaguchi <murooka.1129.x50@gmail.com>'

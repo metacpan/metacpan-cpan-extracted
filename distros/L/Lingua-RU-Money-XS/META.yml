@@ -1,0 +1,31 @@
+---
+abstract: 'Perl extension for digit conversion to corresponding money sum in Russian.'
+author:
+  - 'Igor Munkin <imun@cpan.org>'
+build_requires:
+  Encode: '2'
+  ExtUtils::MakeMaker: '0'
+  List::MoreUtils: '0'
+  Test::Exception: '0'
+  Test::Spec: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-RU-Money-XS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.016000'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-RU-Money-XS
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/igormunkin/Lingua-RU-Money-XS.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

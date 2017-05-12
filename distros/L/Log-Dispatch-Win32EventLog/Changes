@@ -1,0 +1,69 @@
+Revision history for Perl extension Log::Dispatch::Win32EventLog.
+
+0.14 2007-10-21
+    - improved the test diagnostics (e.g. cmp_ok() instead of ok())
+    - Switched from Module::Build to EU::MM, since MB is not
+      bundled by default with Activestate Perl.
+    - maintainance handed over to David Landgren
+    - no code changes, this is simply to get support calls
+      directed to the current maintainer.
+    - detabbed source files
+    - removed SIGNATURE
+
+0.13 Mon Apr  4 2005
+    - commented-out unnecessary eval
+    - added Pod::Coverage and Test::Pod tests
+    - added stub Test::Prereq (disabled due to bugs)
+    - minor updates to documentation
+    - 02-register.t test disabled due to bugs in register
+    - added SIGNATURE to distribution
+
+0.12 Fri Sep  3 2004 (includes 0.11_xx releases)
+    - test for register set as TODO since it seems to fail on some
+      systems when run for the first few times, then suddenly works
+    - test for register skipped if not an administrator
+    - added test for log4j.NTEventLogAppender interface
+    - if backslashes are in the source, it changes them to spaces and
+      issues a warning rather than dying; message changed to
+      'Backslashes in source removed'
+    - tweaked tests with respect to opening event log to verify events
+    - removed use of Win32::IsAdminUser function, since it does
+      not seem to be universally available
+    - added warning in README about WinZip
+    - event source will only be registered if one is an admin user
+    - removed unnecessary tests
+    - updated POD and added Known Issues section
+    - corrected tests for registered sources (thanks to
+      <fpchan at aol.com> for feedback on this)
+
+0.11 Fri Aug  6 2004
+    - corrected handling of unregistered sources
+
+0.10 Wed Aug  4 2004
+    - build uses Test::Warn
+    - added test for invalid log registration
+    - renamed test files
+
+0.03_02 Mon Jul 26 2004
+    - added tests for registration and Log4perl (if present)
+    - allows registration of the source to a specific log
+    - tests verify that events were written to logs
+    - tests use Test::More
+    - event log is opened to $Source rather than "Application"
+    - checks for proper perl version
+    - handle is now closed when class is destroyed
+
+0.03_01 Mon Jul 26 2004
+    - fixed warnings related to Perl 5.8.x [cpan #7020]
+    - check for invalid characters in source
+    - reorganized and updated POD
+    - added Build.PL and META.yml to distribution
+    - corrected prereqs in Build.PL/Makefile.PL
+
+0.02  Thu Aug 22 09:29:46 CEST 2002
+    - Renamed to Win32EventLog from Win32Event
+    - Fixed typos in documentation
+
+0.01  Wed Aug 21 14:18:40 CEST 2002
+    - First version
+

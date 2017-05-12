@@ -1,0 +1,953 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+
+<!--
+
+  Transliteration definitions for ISO 9.
+
+  Copyright (C) 2007-2008 Rona Linke <rlinke@lingua-systems.com>
+  Copyright (C) 2009 Lingua-Systems Software GmbH
+
+  See http://en.wikipedia.org/wiki/ISO_9 for an introduction.
+
+-->
+
+
+<translit>
+
+    <!-- meta information -->
+
+    <name>ISO 9</name>
+    <desc>ISO 9:1995, Cyrillic to Latin</desc>
+    <reverse>true</reverse>
+
+
+    <!-- set of transliteration rules -->
+    <!-- Hexnotation of Unicode codepoints, letter names according
+    to Unicode Standard 5.0
+    Abbreviations:
+    CCL = CYRILLIC CAPITAL LETTER
+    CSL = CYRILLIC SMALL LETTER
+    LCL = LATIN CAPITAL LETTER
+    LSL = LATIN SMALL LETTER
+    -->
+
+    <rules>
+
+        <rule>
+            <from>&#x0410;</from>   <!-- CCL A -->
+            <to>&#x0041;</to>	    <!-- LCL A -->
+        </rule>
+
+        <rule>
+            <from>&#x0430;</from>   <!-- CSL A  -->
+            <to>&#x0061;</to>	    <!-- LSL A  -->
+        </rule>
+
+        <rule>
+            <from>&#x04D0;</from>   <!-- CCL A with BREVE  -->
+            <to>&#x0102;</to>	    <!-- LCL A with BREVE -->
+        </rule>
+
+        <rule>
+            <from>&#x04D1;</from>   <!-- CSL A WITH BREVE  -->
+            <to>&#x0103;</to>	    <!-- LSL A WITH BREVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04D2;</from>   <!-- CCL A WITH DIAERESIS  -->
+            <to>&#x00C4;</to>	    <!-- LCL A WITH DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x04D3;</from>   <!-- CSL A WITH DIAERESIS  -->
+            <to>&#x00E4;</to>	    <!-- LSL A WITH DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x04D8;</from>   <!-- CCL SCHWA  -->
+            <to>&#x0041;&#x030B;</to>
+            <!--LCL A WITH COMBINING DOUBLE ACUTE-->
+        </rule>
+
+        <rule>
+            <from>&#x04D9;</from>   <!-- CSL SCHWA  -->
+            <to>&#x0061;&#x030B;</to>
+            <!--LSL A WITH COMBINING DOUBLE ACUTE-->
+        </rule>
+
+        <rule>
+            <from>&#x0411;</from>   <!-- CCL BE  -->
+            <to>&#x0042;</to>	    <!-- LCL B  -->
+        </rule>
+
+        <rule>
+            <from>&#x0431;</from>   <!--CSL BE  -->
+            <to>&#x0062;</to>	    <!--LSL B  -->
+        </rule>
+
+        <rule>
+            <from>&#x0412;</from>   <!--CCL VE  -->
+            <to>&#x0056;</to>	    <!--LCL V  -->
+        </rule>
+
+        <rule>
+            <from>&#x0432;</from>   <!--CSL VE  -->
+            <to>&#x0076;</to>	    <!--LSL V  -->
+        </rule>
+
+        <rule>
+            <from>&#x0413;</from>   <!--CCL GHE  -->
+            <to>&#x0047;</to>	    <!--LCL G  -->
+        </rule>
+
+        <rule>
+            <from>&#x0433;</from>   <!--CSL GHE  -->
+            <to>&#x0067;</to>	    <!--LSL G  -->
+        </rule>
+
+        <rule>
+            <from>&#x0490;</from>   <!--CCL GHE WITH UPTURN  -->
+            <to>&#x0047;&#x0300;</to>
+            <!--LCL G WITH COMBINING GRAVE ACCENT-->
+        </rule>
+
+        <rule>
+            <from>&#x0491;</from>   <!--CSL GHE WITH UPTURN  -->
+            <to>&#x0067;&#x0300;</to>
+            <!--LCL G WITH COMBINING GRAVE ACCENT-->
+        </rule>
+
+        <rule>
+            <from>&#x0494;</from>   <!--CCL GHE WITH MIDDLE HOOK  -->
+            <to>&#x011E;</to>	    <!--LCL G WITH BREVE  -->
+        </rule>
+
+
+        <rule>
+            <from>&#x0495;</from>   <!--CSL GHE WITH MIDDLE HOOK  -->
+            <to>&#x011F;</to>	    <!--LSL G WITH BREVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0492;</from>   <!-- CCL GHE WITH STROKE  -->
+            <to>&#x0120;</to>	    <!-- LCL G WITH DOT ABOVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0493;</from>   <!-- CSL GHE WITH STROKE  -->
+            <to>&#x0121;</to>	    <!-- LSL G WITHDOT ABOVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0414;</from>   <!-- CCL DE  -->
+            <to>&#x0044;</to>	    <!-- LCL D  -->
+        </rule>
+
+        <rule>
+            <from>&#x0434;</from>   <!-- CSL DE  -->
+            <to>&#x0064;</to>	    <!-- LSL D  -->
+        </rule>
+
+        <rule>
+            <from>&#x0402;</from>   <!-- CCL DJE  -->
+            <to>&#x0110;</to>	    <!-- LCL D WITH STROKE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0452;</from>   <!-- CSL DJE  -->
+            <to>&#x0111;</to>	    <!-- LSL D WITH STROKE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0403;</from>   <!-- CCL GJE  -->
+            <to>&#x01F4;</to>	    <!-- LCL G WITH ACUTE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0453;</from>   <!-- CSL GJE  -->
+            <to>&#x01F5;</to>	    <!-- LSL G WITH ACUTE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0415;</from>   <!-- CCL IE  -->
+            <to>&#x0045;</to>	    <!-- LCL E  -->
+        </rule>
+
+        <rule>
+            <from>&#x0435;</from>   <!-- CSL IE -->
+            <to>&#x0065;</to>	    <!-- LSL E  -->
+        </rule>
+
+        <rule>
+            <from>&#x0401;</from>   <!-- CCL IO  -->
+            <to>&#x00CB;</to>	    <!-- LCL E WITH DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x0451;</from>   <!-- CSL IO  -->
+            <to>&#x00EB;</to>	    <!-- LSL E WITH DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x04D6;</from>   <!-- CCL IE WITH BREVE  -->
+            <to>&#x0114;</to>	    <!-- LCL E WITH BREVE -->
+        </rule>
+
+        <rule>
+            <from>&#x04D7;</from>   <!-- CSL IE WITH BREVE  -->
+            <to>&#x0115;</to>	    <!-- LSL E WITH BREVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0404;</from>   <!-- CCL UKRAINIAN IE  -->
+            <to>&#x00CA;</to>	    <!-- LCL E WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x0454;</from>   <!-- CSL UKRAINIAN IE  -->
+            <to>&#x00EA;</to>	    <!-- LSL E WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x04BC;</from>   <!-- CCL ABKHASIAN CHE  -->
+            <to>&#x0043;&#x0306;</to>
+            <!-- LCL C WITH COMBINING BREVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04BD;</from>   <!-- CSL ABKHASIAN CHE -->
+            <to>&#x0063;&#x0306;</to>
+            <!-- LSL C WITH COMBINING BREVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04BE;</from>   <!-- CCL ABKHASIAN CHE WITH DESCENDER-->
+            <to>&#x00C7;&#x0306;</to>
+            <!--LCL C WITH CEDILLA & COMBINING BREVE-->
+        </rule>
+
+        <rule>
+            <from>&#x04BF;</from>   <!-- CSL ABKHASIAN CHE WITH DESCENDER-->
+            <to>&#x00E7;&#x0306;</to>
+            <!--LSL C WITH CEDILLA & COMBINING BREVE-->
+        </rule>
+
+        <rule>
+            <from>&#x0416;</from>   <!-- CCL ZHE  -->
+            <to>&#x017D;</to>	    <!-- LCL Z WITH CARON  -->
+        </rule>
+
+        <rule>
+            <from>&#x0436;</from>   <!-- CSL ZHE  -->
+            <to>&#x017E;</to>	    <!-- LSL Z WITH CARON  -->
+        </rule>
+
+        <rule>
+            <from>&#x04C1;</from>   <!-- CCL ZHE WITH BREVE  -->
+            <to>&#x005A;&#x0306;</to>
+            <!-- LCL Z WITH COMBINING BREVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04C2;</from>   <!-- CSL ZHE WITH BREVE -->
+            <to>&#x007A;&#x0306;</to>
+            <!-- LSL Z WITH COMBINING BREVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04DC;</from>   <!-- CCL ZHE WITH DIAERESIS  -->
+            <to>&#x005A;&#x0304;</to>
+            <!-- LCL Z WITH COMBINING MACRON  -->
+        </rule>
+
+        <rule>
+            <from>&#x04DD;</from>   <!-- CSL ZHE WITH DIAERESIS  -->
+            <to>&#x007A;&#x0304;</to>
+            <!-- LSL Z WITH COMBINING MACRON  -->
+        </rule>
+
+        <rule>
+            <from>&#x0496;</from>   <!--CCL ZHE WITH DESCENDER  -->
+            <to>&#x017D;&#x0326;</to>
+            <!--LCL Z WITH CARON &
+				    COMBINDING COMMA BELOW-->
+        </rule>
+
+        <rule>
+            <from>&#x0497;</from>   <!--CSL ZHE WITH DESCENDER  -->
+            <to>&#x017E;&#x0327;</to>
+            <!--LSL Z WITH CARON &
+				    COMBINDING CEDILLA-->
+        </rule>
+
+        <rule>
+            <from>&#x0417;</from>   <!-- CCL ZE -->
+            <to>&#x005A;</to>	    <!-- LCL Z  -->
+        </rule>
+
+        <rule>
+            <from>&#x0437;</from>   <!-- CSL ZE  -->
+            <to>&#x007A;</to>	    <!-- LSL Z  -->
+        </rule>
+
+        <rule>
+            <from>&#x04DE;</from>   <!-- CCL ZE WITH DIAERESIS  -->
+            <to>&#x005A;&#x0308;</to>
+            <!-- LCL Z WITH COMBINING DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x04DF;</from>   <!-- CSL ZE WITH DIAERESIS  -->
+            <to>&#x007A;&#x0308;</to>
+            <!-- LSL Z WITH COMBINING DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x0405;</from>   <!-- CCL DZE  -->
+            <to>&#x1E90;</to>	    <!-- LCL Z WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x0455;</from>   <!-- CSL DZE  -->
+            <to>&#x1E91;</to>	    <!-- LSL WITH CIRCUMFLEX  -->
+        </rule>
+
+
+        <rule>
+            <from>&#x04E0;</from>   <!-- CCL ABKHASIAN DZE  -->
+            <to>&#x0179;</to>	    <!-- LCL Z WITH ACUTE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04E1;</from>   <!-- CSL ABKHASIAN DZE  -->
+            <to>&#x017A;</to>	    <!-- LSL Z WITH ACUTE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0418;</from>   <!-- CCL I  -->
+            <to>&#x0049;</to>	    <!-- LCL I  -->
+        </rule>
+
+        <rule>
+            <from>&#x0438;</from>   <!-- CSL I -->
+            <to>&#x0069;</to>	    <!-- LSL I  -->
+        </rule>
+
+        <rule>
+            <from>&#x04E4;</from>   <!-- CCL I WITH DIAERESIS  -->
+            <to>&#x00CE;</to>	    <!-- LCL I WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x04E5;</from>   <!-- CSL I WITH DIAERESIS  -->
+            <to>&#x00EE;</to>	    <!-- LSL I WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x0406;</from>   <!-- CCL BYELORUSSIAN-UKRAINIAN I  -->
+            <to>&#x00CC;</to>	    <!-- LCL I WITH GRAVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0456;</from>   <!-- CSL BYELORUSSIAN-UKRAINIAN I  -->
+            <to>&#x00EC;</to>	    <!-- LSL WITH GRAVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0407;</from>   <!-- CCL YI  -->
+            <to>&#x00CF;</to>	    <!-- LCL I WITH DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x0457;</from>   <!-- CSL YI  -->
+            <to>&#x00EF;</to>	    <!-- LSL I WITH DIAERESIS -->
+        </rule>
+
+        <rule>
+            <from>&#x0419;</from>   <!-- CCL SHORT I  -->
+            <to>&#x004A;</to>	    <!-- LCL J  -->
+        </rule>
+
+        <rule>
+            <from>&#x0439;</from>   <!-- CSL SHORT I -->
+            <to>&#x006A;</to>	    <!-- LSL J -->
+        </rule>
+
+        <rule>
+            <from>&#x0408;</from>   <!-- CCL JE  -->
+            <to>&#x004A;&#x030C;</to>
+            <!-- LCL J WITH COMBINING CARON  -->
+        </rule>
+
+        <rule>
+            <from>&#x0458;</from>   <!-- CSL JE  -->
+            <to>&#x01F0;</to>	    <!-- LSL J WITH CARON  -->
+        </rule>
+
+        <rule>
+            <from>&#x041A;</from>   <!-- CCL KA  -->
+            <to>&#x004B;</to>	    <!-- LCL K  -->
+        </rule>
+
+        <rule>
+            <from>&#x043A;</from>   <!-- CSL KA  -->
+            <to>&#x006B;</to>	    <!-- LSL K  -->
+        </rule>
+
+        <rule>
+            <from>&#x049A;</from>   <!-- CCL KA WITH DESCENDER  -->
+            <to>&#x0136;</to>	    <!-- LCL K WITH CEDILLA -->
+        </rule>
+
+        <rule>
+            <from>&#x049B;</from>   <!-- CSL KA WITH DESCENDER  -->
+            <to>&#x0137;</to>	    <!-- LSL K WITH CEDILLA  -->
+        </rule>
+
+        <rule>
+            <from>&#x049E;</from>   <!-- CCL KA WITH STROKE  -->
+            <to>&#x004B;&#x0304;</to>
+            <!-- LCL K WITH COMBINING MACRON  -->
+        </rule>
+
+        <rule>
+            <from>&#x049F;</from>   <!-- CSL KA WITH STROKE  -->
+            <to>&#x006B;&#x0304;</to>
+            <!-- LSL K WITH COMBINING MACRON  -->
+        </rule>
+        <rule>
+            <from>&#x041B;</from>   <!-- CCL EL -->
+            <to>&#x004C;</to>	    <!-- LCL L  -->
+        </rule>
+
+        <rule>
+            <from>&#x043B;</from>   <!-- CSL EL -->
+            <to>&#x006C;</to>	    <!-- LSL L  -->
+        </rule>
+
+        <rule>
+            <from>&#x0409;</from>   <!-- CCL LJE  -->
+            <to>&#x004C;&#x0302;</to>
+            <!-- LCL L WITH COMBINING CIRCUMFLEX -->
+        </rule>
+
+        <rule>
+            <from>&#x0459;</from>   <!-- CSL LJE  -->
+            <to>&#x006C;&#x0302;</to>
+            <!-- LSL L WITH COMBINING CIRCUMFLEX -->
+        </rule>
+
+        <rule>
+            <from>&#x041C;</from>   <!-- CCL EM  -->
+            <to>&#x004D;</to>	    <!-- LCL M  -->
+        </rule>
+
+        <rule>
+            <from>&#x043C;</from>   <!-- CSL EM  -->
+            <to>&#x006D;</to>	    <!-- LSL M  -->
+        </rule>
+
+        <rule>
+            <from>&#x041D;</from>   <!-- CCL EN  -->
+            <to>&#x004E;</to>	    <!-- LCL N  -->
+        </rule>
+
+        <rule>
+            <from>&#x043D;</from>   <!-- CSL EN  -->
+            <to>&#x006E;</to>	    <!-- LSL N  -->
+        </rule>
+
+        <rule>
+            <from>&#x040A;</from>   <!-- CCL NJE  -->
+            <to>&#x004E;&#x0302;</to>
+            <!-- LCL N WITH COMBINING CIRCUMFLEX -->
+        </rule>
+
+        <rule>
+            <from>&#x045A;</from>   <!-- CSL NJE  -->
+            <to>&#x006E;&#x0302;</to>
+            <!-- LSL N WITH COMBINING CIRCUMFLEX -->
+        </rule>
+
+        <rule>
+            <from>&#x04A4;</from>   <!-- CC LIGATURE EN GHE -->
+            <to>&#x1E44;</to>	    <!-- LCL N WITH DOT ABOVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04A5;</from>   <!-- CS LIGATURE EN GHE  -->
+            <to>&#x1E45;</to>	    <!-- LSL N WITH DOT ABOVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04A2;</from>   <!-- CCL EN WITH DESCENDER  -->
+            <to>&#x1E46;</to>	    <!-- LCL N WITH DOT BELOW  -->
+        </rule>
+
+        <rule>
+            <from>&#x04A3;</from>   <!-- CSL EN WITH DESCENDER  -->
+            <to>&#x1E47;</to>	    <!-- LSL N WITH DOT BELOW  -->
+        </rule>
+
+        <rule>
+            <from>&#x041E;</from>   <!-- CCL O  -->
+            <to>&#x004F;</to>	    <!-- LCL O -->
+        </rule>
+
+        <rule>
+            <from>&#x043E;</from>   <!-- CSL O  -->
+            <to>&#x006F;</to>	    <!-- LSL O  -->
+        </rule>
+
+        <rule>
+            <from>&#x04E6;</from>   <!-- CCL O WITH DIAERESIS -->
+            <to>&#x00D6;</to>	    <!-- LCL O WITH DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x04E7;</from>   <!-- CSL O WITH DIAERESIS -->
+            <to>&#x00F6;</to>	    <!-- LSL O WITH DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x04E8;</from>   <!-- CCL BARRED O  -->
+            <to>&#x00D4;</to>	    <!-- LCL WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x04E9;</from>   <!-- CSL BARRED O  -->
+            <to>&#x00F4;</to>	    <!-- LSL WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x041F;</from>   <!-- CCL PE  -->
+            <to>&#x0050;</to>	    <!-- LCL P  -->
+        </rule>
+
+        <rule>
+            <from>&#x043F;</from>   <!-- CSL PE  -->
+            <to>&#x0070;</to>	    <!-- LSL P  -->
+        </rule>
+
+        <rule>
+            <from>&#x04A6;</from>   <!-- CCL PE WITH MIDDLE HOOK  -->
+            <to>&#x1E54;</to>	    <!-- LCL P WITH ACUTE -->
+        </rule>
+
+        <rule>
+            <from>&#x04A7;</from>   <!-- CSL PE WITH MIDDLE HOOK  -->
+            <to>&#x1E55;</to>	    <!-- LSL P WITH ACUTE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0420;</from>   <!-- CCL ER  -->
+            <to>&#x0052;</to>	    <!-- LCL R  -->
+        </rule>
+
+        <rule>
+            <from>&#x0440;</from>   <!-- CSL ER  -->
+            <to>&#x0072;</to>	    <!-- LCL R  -->
+        </rule>
+
+        <rule>
+            <from>&#x0421;</from>   <!-- CCL ES  -->
+            <to>&#x0053;</to>	    <!-- LCL S  -->
+        </rule>
+
+        <rule>
+            <from>&#x0441;</from>   <!-- CSL ES  -->
+            <to>&#x0073;</to>	    <!-- LSL S  -->
+        </rule>
+
+        <rule>
+            <from>&#x04AA;</from>   <!-- CCL ES WITH DESCENDER  -->
+            <to>&#x00C7;</to>	    <!-- LCL C WITH CEDILLA  -->
+        </rule>
+
+        <rule>
+            <from>&#x04AB;</from>   <!-- CSL ES WITH DESCENDER  -->
+            <to>&#x00E7;</to>	    <!-- LSL C WITH CEDILLA  -->
+        </rule>
+
+        <rule>
+            <from>&#x0422;</from>   <!-- CCL TE  -->
+            <to>&#x0054;</to>	    <!-- LCL T  -->
+        </rule>
+
+        <rule>
+            <from>&#x0442;</from>   <!-- CSL TE  -->
+            <to>&#x0074;</to>	    <!-- LSL T  -->
+        </rule>
+
+        <rule>
+            <from>&#x04AC;</from>   <!-- CCL TE WITH DESCENDER  -->
+            <to>&#x0162;</to>	    <!-- LCL T WITH CEDILLA  -->
+        </rule>
+
+        <rule>
+            <from>&#x04AD;</from>   <!-- CSL TE WITH DESCENDER  -->
+            <to>&#x0163;</to>	    <!-- LSL T WITH CEDILLA  -->
+        </rule>
+
+
+        <rule>
+            <from>&#x040B;</from>   <!-- CCL TSHE  -->
+            <to>&#x0106;</to>	    <!-- LCL C WITH ACUTE  -->
+        </rule>
+
+        <rule>
+            <from>&#x045B;</from>   <!-- CSL TSHE  -->
+            <to>&#x0170;</to>	    <!-- LSL C WITH ACUTE -->
+        </rule>
+
+        <rule>
+            <from>&#x040C;</from>   <!-- CCL KJE  -->
+            <to>&#x1E30;</to>	    <!-- LCL K WITH ACUTE  -->
+        </rule>
+
+        <rule>
+            <from>&#x045C;</from>   <!-- CSL KJE  -->
+            <to>&#x1E31;</to>	    <!-- LSL K WITH ACUTE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0423;</from>   <!-- CCL U  -->
+            <to>&#x0055;</to>	    <!-- LCL U  -->
+        </rule>
+
+        <rule>
+            <from>&#x0443;</from>   <!-- CSL U  -->
+            <to>&#x0075;</to>	    <!-- LSL U  -->
+        </rule>
+
+        <rule>
+            <from>&#x0423;&#x0301;</from>  <!--CCL U WITH COMBINING ACUTE-->
+            <to>&#x00DA;</to>		   <!-- LCL U WITH ACUTE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0443;&#x0301;</from>  <!--CSL U WITH COMBINING ACUTE-->
+            <to>&#x00FA;</to>		   <!-- LSL U WITH ACUTE  -->
+        </rule>
+
+        <rule>
+            <from>&#x040E;</from>   <!-- CCL SHORT U  -->
+            <to>&#x016C;</to>	    <!-- LCL U WITH BREVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x045E;</from>   <!-- CSL SHORT U -->
+            <to>&#x016D;</to>	    <!-- LCL U WITH BREVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04F0;</from>   <!-- CCL U WITH DIAERESIS  -->
+            <to>&#x00DC;</to>	    <!-- LCL U WITH DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x04F1;</from>   <!-- CSL U WITH DIAERESIS  -->
+            <to>&#x00FC;</to>	    <!-- LSL U WITH DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x04F2;</from>   <!-- CCL U WITH DOUBLE ACUTE  -->
+            <to>&#x0170;</to>	    <!-- LCL U WITH DOUBLE ACUTE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04F3;</from>   <!-- CSL U WITH DOUBLE ACUTE  -->
+            <to>&#x0171;</to>	    <!-- LSL U WITH DOUBLE ACUTE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04AE;</from>   <!-- CCL STRAIGHT U  -->
+            <to>&#x00D9;</to>	    <!-- LCL U WITH GRAVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04AF;</from>   <!-- CSL STRAIGHT U -->
+            <to>&#x00F9;</to>	    <!-- LSL U WITH GRAVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0424;</from>   <!-- CCL EF  -->
+            <to>&#x0046;</to>	    <!-- LCL F  -->
+        </rule>
+
+        <rule>
+            <from>&#x0444;</from>   <!-- CSL EF  -->
+            <to>&#x0066;</to>	    <!-- LSL F  -->
+        </rule>
+
+        <rule>
+            <from>&#x0425;</from>   <!-- CCL HA  -->
+            <to>&#x0048;</to>	    <!-- LCL H  -->
+        </rule>
+
+        <rule>
+            <from>&#x0445;</from>   <!-- CSL HA  -->
+            <to>&#x0068;</to>	    <!-- LSL H  -->
+        </rule>
+
+        <rule>
+            <from>&#x04B2;</from>   <!-- CCL HA WITH DESCENDER  -->
+            <to>&#x1E28;</to>	    <!-- LCL H WITH CEDILLA  -->
+        </rule>
+
+        <rule>
+            <from>&#x04B3;</from>   <!-- CSL HA WITH DESCENDER  -->
+            <to>&#x1E29;</to>	    <!-- LSL H WITH CEDILLA  -->
+        </rule>
+
+        <rule>
+            <from>&#x04BA;</from>   <!-- CCL SHHA  -->
+            <to>&#x1E24;</to>	    <!-- LCL H WITH DOT BELOW  -->
+        </rule>
+
+        <rule>
+            <from>&#x04BB;</from>   <!-- CSL SHHA -->
+            <to>&#x1E25;</to>	    <!-- LSL H WITH DOT BELOW  -->
+        </rule>
+
+        <rule>
+            <from>&#x0426;</from>   <!-- CCL TSE  -->
+            <to>&#x0043;</to>	    <!-- LCL C  -->
+        </rule>
+
+        <rule>
+            <from>&#x0446;</from>   <!-- CSL TSE  -->
+            <to>&#x0063;</to>	    <!-- LSL C  -->
+        </rule>
+
+        <rule>
+            <from>&#x04B4;</from>   <!-- CC LIGATURE TE TSE   -->
+            <to>&#x0043;&#x0304;</to>
+            <!-- LCL C WITH COMBINING MACRON  -->
+        </rule>
+
+        <rule>
+            <from>&#x04B5;</from>   <!-- CS LIGATURE TE TSE  -->
+            <to>&#x0063;&#x0304;</to>
+            <!-- LSL C WITH COMBINING MACRON  -->
+        </rule>
+
+        <rule>
+            <from>&#x0427;</from>   <!-- CCL CHE  -->
+            <to>&#x010C;</to>	    <!-- LCL C WITH CARON -->
+        </rule>
+
+        <rule>
+            <from>&#x0447;</from>   <!-- CSL CHE -->
+            <to>&#x010D;</to>	    <!-- LSL C WITH CARON  -->
+        </rule>
+
+        <rule>
+            <from>&#x04F4;</from>   <!-- CCL CHE WITH DIAERESIS  -->
+            <to>&#x0043;&#x0308;</to>
+            <!-- LCL C WITH COMBINING DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x04F5;</from>   <!-- CSL CHE WITH DIAERESIS  -->
+            <to>&#x0063;&#x0308;</to>
+            <!-- LSL C WITH COMBINING DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x04CB;</from>   <!-- CCL KHAKASSIAN CHE  -->
+            <to>&#x00C7;</to>	    <!-- LCL C WITH CEDILLA  -->
+        </rule>
+
+        <rule>
+            <from>&#x04CC;</from>   <!-- CSL KHAKASSIAN CHE -->
+            <to>&#x00E7;</to>	    <!-- LSL C WITH CEDILLA  -->
+        </rule>
+
+        <rule>
+            <from>&#x040F;</from>   <!-- CCL DZHE  -->
+            <to>&#x0044;&#x0302;</to>
+            <!-- LCL D WITH COMBINING CIRCUMFLEX -->
+        </rule>
+
+        <rule>
+            <from>&#x045F;</from>   <!-- CSL DZHE  -->
+            <to>&#x0064;&#x0302;</to>
+            <!-- LSL D WITH COMBINING CIRCUMFLEX -->
+        </rule>
+
+        <rule>
+            <from>&#x0428;</from>   <!-- CCL SHA  -->
+            <to>&#x0160;</to>	    <!-- LCL S WITH CARON  -->
+        </rule>
+
+        <rule>
+            <from>&#x0448;</from>   <!-- CSL SHA  -->
+            <to>&#x0161;</to>	    <!-- LSL S WITH CARON  -->
+        </rule>
+
+        <rule>
+            <from>&#x0429;</from>   <!-- CCL SHCHA  -->
+            <to>&#x015C;</to>	    <!-- LCL S WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x0449;</from>   <!-- CSL SHCHA  -->
+            <to>&#x015D;</to>	    <!-- LSL S WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x042A;</from>   <!-- CCL HARD SIGN  -->
+            <to>&#x02BA;</to>	    <!-- MODIFIER LETTER DOUBLE PRIME -->
+            <!--
+		The capital hard sign is very seldom in use.
+		It may be capital, if everything is written in upper
+		case - therefore this context may help to identify the
+		upper case when transliteration is used reverse.
+	    -->
+            <context>
+                <after>\p{IsUpper}</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>&#x044A;</from>   <!-- CSL HARD SIGN  -->
+            <to>&#x02BA;</to>	    <!-- MODIFIER LETTER DOUBLE PRIME  -->
+        </rule>
+
+        <rule>
+            <from>&#x02BC;</from>   <!-- MODIFIER LETTER APOSTROPHE  -->
+            <to>&#x2019;</to>	    <!-- RIGHT SINGLE QUOTATION MARK  -->
+        </rule>
+
+        <rule>
+            <from>&#x042B;</from>   <!-- CCL YERU  -->
+            <to>&#x0059;</to>	    <!-- LCL Y -->
+        </rule>
+
+        <rule>
+            <from>&#x044B;</from>   <!-- CSL YERU  -->
+            <to>&#x0079;</to>	    <!-- LSL Y  -->
+        </rule>
+
+        <rule>
+            <from>&#x04F8;</from>   <!-- CCL YERU WITH DIAERESIS  -->
+            <to>&#x0178;</to>	    <!-- LCL Y WITH DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x04F9;</from>   <!-- CSL YERU WITH DIAERESIS  -->
+            <to>&#x00FF;</to>	    <!-- LSL Y WITH DIAERESIS  -->
+        </rule>
+
+        <rule>
+            <from>&#x042C;</from>   <!-- CCL SOFT SIGN  -->
+            <to>&#x02B9;</to>	    <!-- MODIFIER LETTER PRIME  -->
+            <context> <!-- see "hard sign" above -->
+                <after>\p{IsUpper}</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>&#x044C;</from>   <!-- CSL SOFT SIGN -->
+            <to>&#x02B9;</to>	    <!-- MODIFIER LETTER PRIME  -->
+        </rule>
+
+        <rule>
+            <from>&#x042D;</from>   <!-- CCL E  -->
+            <to>&#x00C8;</to>	    <!-- LCL E WITH GRAVE -->
+        </rule>
+
+        <rule>
+            <from>&#x044D;</from>   <!-- CSL E  -->
+            <to>&#x00E8;</to>	    <!-- LSL E WITH GRAVE -->
+        </rule>
+
+        <rule>
+            <from>&#x042E;</from>   <!-- CCL YU  -->
+            <to>&#x00DB;</to>	    <!-- LCL U WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x044E;</from>   <!-- CSL YU  -->
+            <to>&#x00FB;</to>	    <!-- LSL U WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x042F;</from>   <!-- CCL YA  -->
+            <to>&#x00C2;</to>	    <!-- LCL A WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x044F;</from>   <!-- CSL YA  -->
+            <to>&#x00E2;</to>	    <!-- LSL A WITH CIRCUMFLEX  -->
+        </rule>
+
+        <rule>
+            <from>&#x048C;</from>   <!-- CCL SEMISOFT SIGN  -->
+            <to>&#x011A;</to>	    <!-- LCL E WITH CARON  -->
+        </rule>
+
+        <rule>
+            <from>&#x048D;</from>   <!-- CSL SEMISOFT SIGN  -->
+            <to>&#x011B;</to>	    <!-- LSL E WITH CARON  -->
+        </rule>
+
+        <rule>
+            <from>&#x046A;</from>   <!-- CCL BIG YUS (HISTORICAL)  -->
+            <to>&#x01CD;</to>	    <!-- LCL A  WITH CARON  -->
+        </rule>
+
+        <rule>
+            <from>&#x046B;</from>   <!-- CSL BID YUS (HISTORICAL)  -->
+            <to>&#x01CE;</to>	    <!-- LSL A WITH CARON  -->
+        </rule>
+
+        <rule>
+            <from>&#x0472;</from>   <!-- CCL FITA (HISTORICAL)  -->
+            <to>&#x0046;&#x0300;</to>
+            <!-- LCL F WITH COMBINING GRAVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0473;</from>   <!-- CSL FITA (HISTORICAL)  -->
+            <to>&#x0066;&#x0300;</to>
+            <!-- LSL F WITH COMBINING GRAVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x0474;</from>   <!-- CCL IZHITSA (HISTORICAL)  -->
+            <to>&#x1EF2;</to>	    <!-- LCL Y WITH GRAVE -->
+        </rule>
+
+        <rule>
+            <from>&#x0475;</from>   <!-- CSL IZHITSA (HISTORICAL)  -->
+            <to>&#x1EF3;</to>	    <!-- LSL Y WITH GRAVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04A8;</from>   <!-- CCL ABKHASIAN HA  -->
+            <to>&#x00D2;</to>	    <!-- LCL  O WITH GRAVE -->
+        </rule>
+
+        <rule>
+            <from>&#x04A9;</from>   <!-- CSL ABKHASIAN HA  -->
+            <to>&#x00F2;</to>	    <!-- LSL O WITH GRAVE  -->
+        </rule>
+
+        <rule>
+            <from>&#x04C0;</from>   <!-- CCL PALOCHKA  -->
+            <to>&#x2021;</to>	    <!-- DOUBLE DAGGER  -->
+        </rule>
+
+    </rules>
+
+</translit>
+
+
+<!--
+  vim: sts=4 sw=4 ai et
+-->

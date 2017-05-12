@@ -1,0 +1,35 @@
+#!/usr/bin/perl -w
+use Test::More qw( no_plan );
+use Numbers;
+use vars qw(@numbers);
+
+for (qw( numbers decimals ) ){
+	print "-"x72 . "\n$_\n", "-" x 72 . "\n";
+	do($_);
+	while (@numbers) {
+	    my ( $number, $text ) = splice( @numbers, 0, 2 );
+	    is( number_to_fr($number), $text, "'$number'" );
+	}
+}
+
+print "-"x72 . "\nordinates\n", "-" x 72 . "\n";
+do('ordinates');
+while (@numbers) {
+    my ( $number, $text ) = splice( @numbers, 0, 2 );
+    is( ordinate_fr($number), $text, "'$number'" );
+}
+
+$SIG{__WARN__} = sub {};
+print "-"x72 . "\nerrors\n", "-" x 72 . "\n";
+@numbers = (
+	undef   => undef,
+	'foo'   => undef,
+	'12bar' => undef,
+	'12e2'  => 'mille deux cents',
+	1234567890123456 => undef,
+);
+
+while (@numbers){
+	my ($number, $test_string) = splice(@numbers, 0, 2);
+	ok( number_to_fr( $number ), $test_string );
+}

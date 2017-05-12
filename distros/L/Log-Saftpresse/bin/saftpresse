@@ -1,0 +1,195 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+# PODNAME: saftpresse
+# ABSTRACT: a modular and configurable logfile analyzer
+our $VERSION = '1.6'; # VERSION
+
+
+use Log::Saftpresse::App;
+
+my $app = Log::Saftpresse::App->new;
+$app->init_with_options;
+$app->run;
+
+exit(0);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+saftpresse - a modular and configurable logfile analyzer
+
+=head1 VERSION
+
+version 1.6
+
+=head1 Synopsis
+
+  usage: bin/saftpresse
+        [--config|-c <file>]
+        [--log-level|-l <level>]
+        [--help|-h]
+
+=head1 Description
+
+Saftpresse is a modular log file analyzer written perl.
+
+It features plugin architecture for
+
+=head2 Inputs
+
+For reading events from multiple sources.
+
+=over
+
+=item L<Log::Saftpresse::Input::Stdin>
+
+Reads log lines from STDIN.
+
+=item L<Log::Saftpresse::Input::FileTail>
+
+Will read all new lines from a file like tail(1) does.
+
+=item L<Log::Saftpresse::Input::Server>
+
+Line based TCP server. (eg. for syslog)
+
+=item L<Log::Saftpresse::Input::RELP>
+
+A TCP server implmenting the RELP protocol.
+
+=item L<Log::Saftpresse::Input::Redis>
+
+Will read events from a redis queue.
+
+=item L<Log::Saftpresse::Input::Lumberjack>
+
+A server implementing the lumberjack protocol v1/v2
+used by logstash and beats.
+
+=item L<Log::Saftpresse::Input::Command>
+
+A input reading output of a command.
+
+=item L<Log::Saftpresse::Input::Journald>
+
+Read events from systemd journal.
+
+=back
+
+=head2 Plugins
+
+For processing of events.
+
+Plugins are able to convert or alter events.
+They can add additional information like dns lookup or geo-locations.
+They can also create relationships between events.
+For example measure the time between the connect and disconnect of a client.
+
+A counter api could be used to meter events and their content.
+
+=over
+
+=item L<Log::Saftpresse::Plugin::Amavis>
+
+Plugin for amavisd-new log output.
+
+=item L<Log::Saftpresse::Plugin::Apache>
+
+Plugin for apache httpd log output.
+
+=item L<Log::Saftpresse::Plugin::GeoIP>
+
+Plugin for looking up ip in GeoIP database.
+
+=item L<Log::Saftpresse::Plugin::GraphitLineFormat>
+
+Plugin for parsing graphit line format messages.
+
+=item L<Log::Saftpresse::Plugin::LinuxNetfilter>
+
+Plugin for parsing output of linux netfilters LOG target.
+
+=item L<Log::Saftpresse::Plugin::Postfix>
+
+Plugin for parsing postfix mail logs based on pflogsumm.
+
+=item L<Log::Saftpresse::Plugin::PostfixGeoStats>
+
+Plugin to add geoip information to postfix events.
+
+=item L<Log::Saftpresse::Plugin::Syslog>
+
+Plugin to parse syslog network line format.
+
+=item L<Log::Saftpresse::Plugin::SyslogFile>
+
+Plugin to parse syslog file format. (/var/log/...)
+
+=back
+
+=head2 Outputs
+
+Multiple outputs can be defined for storing of events.
+
+=over
+
+=item L<Log::Saftpresse::Output::Elasticsearch>
+
+Write events to an elasticsearch server.
+
+=item L<Log::Saftpresse::Output::Graphite>
+
+Write graphit events to an carbon line reciever.
+
+=item L<Log::Saftpresse::Output::JSON>
+
+Dump events in JSON format.
+
+=item L<Log::Saftpresse::Output::Redis>
+
+Write events to a redis queue.
+
+=back
+
+=head2 Counter Outputs
+
+Multiple outputs can be defined for storing of counter data.
+
+=over
+
+=item L<Log::Saftpresse::CountersOutput::Dump>
+
+Dumper metric data.
+
+=item L<Log::Saftpresse::CountersOutput::Graphite>
+
+Write metrics to a carbon line reciever.
+
+=back
+
+=head1 Architecture
+
+The saftpresse engine is currently designed as a single process
+using non-blocking IO.
+
+=head1 AUTHOR
+
+Markus Benning <ich@markusbenning.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 1998 by James S. Seymour, 2015 by Markus Benning.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut

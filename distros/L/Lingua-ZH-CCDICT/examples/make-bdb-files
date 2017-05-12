@@ -1,0 +1,72 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Cwd;
+use File::Path;
+use Getopt::Long;
+
+use Lingua::ZH::CCDICT;
+
+my %opts;
+GetOptions( 'target:s' => \$opts{target},
+            'ccdict:s' => \$opts{ccdict},
+            'help'     => \$opts{help},
+          );
+
+if ( $opts{help} ||
+     ! ( defined $opts{target} && defined $opts{ccdict} )
+   )
+{
+    help();
+    exit;
+}
+
+unless ( -f $opts{ccdict} )
+{
+    die "\n  No file at $opts{ccdict}\n\n";
+    exit;
+}
+
+if ( -e $opts{target} && ! -d _ )
+{
+    die "\n  $opts{target} exists but is not a directory\n\n";
+    exit;
+}
+
+if ( ! -d _ )
+{
+    mkpath( $opts{target}, 1, 0755 );
+}
+
+my $dict = Lingua::ZH::CCDICT->new( storage  => 'BerkeleyDB',
+                                    work_dir => $opts{target},
+                                  );
+
+$| = 1;
+
+print "Creating dictionary ...\n";
+
+$dict->parse_source_file( $opts{ccdict}, \*STDOUT );
+
+print "Finished\n";
+
+
+sub help
+{
+    print <<'EOF';
+
+  make-bdb-files  --target=/path/to/dir  --cdict=/path/to/ccdict.txt
+
+This script will create a set of CCDICT BerkeleyDB files in the
+target directory.
+
+It takes these arguments:
+
+  --target     The directory in which to create the files.  Mandatory.
+
+  --ccdict     The CCDICT source file to use.  Mandatory.
+
+EOF
+
+}

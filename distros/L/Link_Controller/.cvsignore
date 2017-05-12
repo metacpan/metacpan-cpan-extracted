@@ -1,0 +1,15 @@
+Makefile
+check-req.out
+.cgi-infostruc.pl
+*.bdbm
+*.cdb
+*.db
+.working-config-file.pl
+urllist
+.fixlink-infostruc-defs
+*test-tmp*
+*.tar
+*.tar.gz
+blib
+pm_to_blib
+

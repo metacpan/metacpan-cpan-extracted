@@ -1,0 +1,7 @@
+This file documents the revision history for Perl extension Log::Any::Adapter::MojoLog.
+
+0.02 2016-04-12
+  - Fix license in META files, it should only be Artistic v2
+
+0.01 2016-04-12
+  - Initial release.

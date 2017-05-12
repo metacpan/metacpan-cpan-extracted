@@ -1,0 +1,42 @@
+--- #YAML:1.0
+name:                     Lingua-EN-NameCase
+version:                  1.19
+abstract:                 Correctly case a person's name from UPERCASE or lowcase
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                  artistic_2
+distribution_type:        module
+installdirs:              site
+
+requires:
+  perl:                   5.006
+  Carp:                   0
+  Exporter:               0
+recommends:
+  Test::CPAN::Meta:       0
+  Test::CPAN::Meta::JSON: 0
+  Test::Pod:              1.00
+  Test::Pod::Coverage:    0.08
+build_requires:
+  IO::File:               0
+  Test::More:             0.70
+
+provides:
+  Lingua::EN::NameCase:
+    file:     lib/Lingua/EN/NameCase.pm
+    version:  1.19
+no_index:
+  directory:
+    - t
+    - examples
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-EN-NameCase
+  repository: http://github.com/barbie/lingua-en-namecase
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

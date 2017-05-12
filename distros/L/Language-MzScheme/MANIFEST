@@ -1,0 +1,33 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Scripts.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Language/MzScheme.pm
+lib/Language/MzScheme/Env.pm
+lib/Language/MzScheme/Object.pm
+lib/Language/MzScheme_in.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+mzscheme.c
+mzscheme.h
+mzscheme.i
+mzscheme_wrap.c
+mzscheme_wrap.h
+README
+script/mzperl
+t/0-signature.t
+t/1-basic.t
+t/2-context.t
+t/3-object.t
+t/4-data.t
+t/5-perl.t
+t/6-error.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

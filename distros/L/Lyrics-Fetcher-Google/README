@@ -1,0 +1,34 @@
+NAME
+    Lyrics::Fetcher::Google - Get some lyrics. Maybe.
+
+SYNOPSIS
+      use Lyrics::Fetcher;
+
+      $Lyrics::Fetcher::gid = '<your google API id>';
+
+      print Lyrics::Fetcher->fetch("<artist>","<song>","Google");
+
+DESCRIPTION
+    This module tries to find lyrics on the web. Sometimes it works. But it
+    probably won't.
+
+    It searches google for an initial set. It then finds the largest block
+    of plain text in the top 5 results. Those results are then compared to
+    one another and weighted. The idea being that a large block of text on
+    one site may be a bunch of poo, but a large area of similar text on
+    multiple sites most likely is the lyrics for which you are looking.
+
+BUGS
+    Yes. I would be happy to hear that this worked for someone. Let me know
+    if it does. I may even respond if you let me know that it doesn't.
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+AUTHOR
+    John Lifsey <nebulous@crashed.net>
+

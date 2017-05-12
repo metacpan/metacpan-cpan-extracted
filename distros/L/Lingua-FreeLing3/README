@@ -1,0 +1,41 @@
+
+ Lingua-FreeLing3
+------------------
+
+This module is a wrapper around FreeLing 3.x C++ library. You can find
+details on this library visiting their webpage:
+http://nlp.lsi.upc.edu/freeling/
+
+
+INSTALLATION
+
+The Build script tries to guess where your freeling 3 installation resides.
+It tries the usual places for linux and Mac OS X operating systems.
+If it desn't detect, export the FL_PREFIX environment variable with the prefix
+used for your installation.
+
+So, on most situations, you can:
+
+   perl Build.PL
+
+and if you need to specify the prefix, use
+
+   FL_PREFIX=/path/to/freeling perl Build.PL
+
+Then, run
+
+   ./Build
+   ./Build test
+   ./Build install    # (as superuser)
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011, Projecto Natura
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+The FreeLing part used in this library has its own copyright and license.
+

@@ -1,0 +1,36 @@
+[% 
+    title = article.data.title ;
+%]
+
+<div class="box">
+[% FOREACH item = article.body %]
+[% IF item %]
+    [% IF item.type == 1 %]
+        [% IF item.link %]
+        [% IF item.align  %][% class  = item.align  %][% ELSE %][% class  = "inline" %][% END %]
+        [% IF item.href %]
+            <a href='[% item.href %]'><img class="[% class %]" src="[% webpath %]/[% item.link %]" alt="[% item.tag %]"
+            [% IF item.align  %]align="[% item.align %]"[% END %]
+            [% IF item.width  %]width="[% item.width %]"[% END %]
+            [% IF item.height %]height="[% item.height %]"[% END %]
+            /></a>
+        [% ELSE %]
+            <img class="[% class %]" src="[% webpath %]/[% item.link %]" align="[% item.align %]" alt="[% item.tag %]"
+            [% IF item.align  %]align="[% item.align %]"[% END %]
+            [% IF item.width  %]width="[% item.width %]"[% END %]
+            [% IF item.height %]height="[% item.height %]"[% END %]
+            />
+        [% END %]
+        [% END %]
+    [% END %]
+
+    [% IF item.type == 2 %]
+            [% item.body %]
+    [% END %]
+
+    [% IF item.type == 3 %]
+            <a href='[% item.href %]'>[% item.href %]</a>
+    [% END %]
+[% END %]
+[% END %]
+</div>

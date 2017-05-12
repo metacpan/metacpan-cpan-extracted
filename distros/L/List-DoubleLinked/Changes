@@ -1,0 +1,19 @@
+0.005     2016-08-15 20:20:51+02:00 Europe/Amsterdam
+          - Fix "Not a SCALAR reference at" error in shift method
+
+0.004     2016-07-10 14:15:35+02:00 Europe/Amsterdam
+          - Made a much better split between list and iterator capabilities
+          - Add compare overload
+          - Fix end method to return a valid value
+          - Fix erase to actually be usable
+          - Make pop/shift throw an exception on failure
+          - Revert "Made size() O(1) instead of O(N)"
+
+0.003     2011-01-25 15:38:59 Europe/Amsterdam
+          Made size() O(1) instead of O(N)
+
+0.002     2011-01-17 02:49:24 Europe/Amsterdam
+          Depend on namespace::clean 0.20 to avoid bugs.
+
+0.001     2011-01-15 01:56:26 Europe/Amsterdam
+          Initial release

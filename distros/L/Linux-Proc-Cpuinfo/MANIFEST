@@ -1,0 +1,10 @@
+Cpuinfo.xs
+lib/Linux/Proc/Cpuinfo.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/cpuinfo
+t/Linux-Proc-Cpuinfo.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

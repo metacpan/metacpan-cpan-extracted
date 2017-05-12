@@ -1,0 +1,23 @@
+---
+abstract: ~
+author: ~
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Language-Farnsworth-Functions-GoogleTranslate
+no_index:
+  directory:
+    - inc
+requires:
+  Language::Farnsworth: 0
+  REST::Google::Translate: 0
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: 0.9.1

@@ -1,0 +1,56 @@
+Revision history for Locale::Wolowitz
+
+1.004001  2017-02-06 22:40:56+02:00 Asia/Jerusalem
+    - Re-release under the terms of the Apache License 2.0
+
+1.004000  2017-02-01 23:51:13+02:00 Asia/Jerusalem
+    Thanks to Yanick Champoux for the following changes:
+    - Added the loc_for() currying method to generate a localization function that
+      translates to a specific language without having to specify it on every call.
+    - Added the ability to translate arguments to placeholders without having to
+      call loc() on the arguments as well. For example, instead of having to write
+      $w->loc("I'm using %1", 'he', $w->loc('Linux', 'he')), you can now simply
+      write $w->loc("I'm using %1", 'he', ['Linux']), and "Linux" will be translated
+      to Hebrew as well before replacing the %1 placeholder.
+    - Fixed a bug with definitions including 10 or more placeholders not being
+      correctly filled out.
+
+1.003000  2015-11-28 17:47:11+02:00 Asia/Jerusalem
+	- Added an options argument to the constructor with the ability to turn off
+	  automatic UTF-8 decoding of JSON localization files.
+
+1.002000  2015-03-30 19:18:26+03:00 Asia/Jerusalem
+	- Locale::Wolowitz will not load dotfiles in the localization directory (thanks Bas Bloemsaat)
+
+1.001000  2015-03-03 19:28:33+02:00 Asia/Jerusalem
+	- now using JSON::MaybeXS instead of JSON
+	- relaxed mode is now enabled on the JSON object, for more information read the docs
+	  for Cpanel::JSON::XS, JSON::XS or JSON::PP.
+
+1.000001  2014-04-27 21:28:13+03:00 Asia/Jerusalem
+	- $/ was undefined globally when reading JSON files, potentially modifying behavior
+	  of other code in an application. Modification now localized.
+
+1.000000  2014-04-08 19:08:18+03:00 Asia/Jerusalem
+	- Added the ability to load localization data directly from a hash-ref, so data can
+	  come from other sources except files (think databases).
+	- The path paremeter to the new() constructor is now optional, as you can call the
+	  (new) methods load_path() and load_structure() manually and as much as you want,
+	  merging data from call to call. Backwards compatibility is kept.
+	- Now using JSON instead of JSON::Any.
+
+0.4       2013-11-08 16:14:24 Asia/Jerusalem
+	- undef strings are returned as is from loc() (thanks isync)
+
+0.3       2012-11-22 21:08:09 Asia/Jerusalem
+	- Added the ability to load just on localization file
+	- Added versions to prereqs
+	- Added JSON recommendations to prereqs as JSON::Any doesn't require any JSON module
+	- Improved documentation
+
+0.2       2010-12-26 16:03:29 Asia/Jerusalem
+	- Changed distribution name to Locale::Wolowitz
+	- Fixed some documentation errors
+
+0.1       2010-12-25 22:28:01 Asia/Jerusalem
+	- Initial release

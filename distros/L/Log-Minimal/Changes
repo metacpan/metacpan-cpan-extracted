@@ -1,0 +1,71 @@
+Revision history for Perl extension Log::Minimal
+
+0.19 2014-05-20T01:07:04Z
+
+        - Fix comma position of stack trace
+        - Fix documentation for autodump option
+          (Thank you moznion)
+
+0.18 2014-03-12T07:51:14Z
+
+        - bug fix. croakf and croakff did not die on log level = NONE
+
+0.17 2013-12-20T07:48:02Z
+
+        - fix $Data::Dumper::{SortKeys => Sortkeys}
+
+0.16 2013-08-05T02:36:22Z
+
+        - add $ESCAPE_WHITESPACE variable (Thank you xaicron)
+        - minil migrate
+
+0.15    Mon Apr 8 11:55:33 2013
+        - enable Data::Dumper::SortKeys for fixing hash order
+
+0.14    Wed Jan 30 15:06:31 2013
+        - Enable to specify own ENV_DEBUG
+          (Thank you hirose31)
+
+0.13    Wed Nov 28 23:21:55 2012
+        - Enable to override $Log::Minimal::DEFAULT_COLOR by $ENV{LM_DEFAULT_COLOR}
+          (Thank you hirose31)
+
+0.12    Tue Nov 20 12:29:44 2012
+        - fixed test.
+          00_compile.t was failed if LM_DEBUG=1
+
+0.11    Mon Sep 10 10:27:19 2012
+        - requires Test::More > 0.94
+          t/03_color_by_env.t does not works with Test::More 0.94 (Thank you tokuhirom)
+
+0.10    Wed Apr 18 11:28:19 2012
+        - added $ENV{LM_COLOR} for a default value of $Log::Minimal::COLOR
+
+0.09    Tue Jul 26 13:29:49 2011
+        - added $raw_message for message text without color sequences
+
+0.08    Fri Jun 10 17:23:07 2011
+        - no code changes
+        - requires Term::ANSIColor
+
+0.07    Fri Jun 10 17:10:03 2011
+        - colorful log
+	- added croakf and croakff
+
+0.06    Mon May 9 16:55:15 2011
+        - force stringify message
+
+0.05    Wed 27 16:52:17 2011
+        - added $Log::Minimal::TRACE_LEVEL like a $Carp::CarpLevel
+
+0.04    Tue Dec 28 18:59:00 2010
+        - serialize messages automatically 
+
+0.03    Mon Nov 15 12:29:24 2010
+        - added "ddf" that serializes objects and references
+
+0.02    Fri Nov 05 23:28:55 2010
+        - supported log_level (xaicron)
+
+0.01    Tue Oct 19 23:30:11 2010
+        - original version

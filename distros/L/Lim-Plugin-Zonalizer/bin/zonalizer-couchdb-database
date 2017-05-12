@@ -1,0 +1,406 @@
+#!/usr/bin/env perl
+
+=encoding utf8
+
+=cut
+
+use common::sense;
+
+use AnyEvent;
+use AnyEvent::CouchDB;
+use AnyEvent::HTTP;
+use JSON;
+use OSSP::uuid;
+use Getopt::Long;
+
+STDOUT->autoflush( 1 );
+
+my $drop    = 0;
+my $create  = 0;
+my $upgrade = 0;
+my $debug   = 0;
+my $read    = 50;
+my $update  = 25;
+my $load;
+my $soft;
+
+GetOptions(
+    'drop'     => \$drop,
+    'create'   => \$create,
+    'upgrade'  => \$upgrade,
+    'debug'    => \$debug,
+    'read:i'   => \$read,
+    'update:i' => \$update,
+    'load:s'   => \$load,
+    'soft'     => \$soft,
+);
+
+$read   += 0;
+$update += 0;
+
+unless ( $ARGV[0] and $read > 0 and $update > 0 ) {
+    die 'usage: zonalizer-couchdb-database [--drop|--create|--upgrade|--soft|--debug|--read <num>|--update <num>] <uri>';
+}
+
+my $JSON = JSON->new->utf8;
+my $db   = couchdb( $ARGV[0] );
+
+if ( $drop ) {
+    eval { $db->drop->recv; };
+    if ( $@ and !$soft ) {
+        die $@;
+    }
+    undef $@;
+
+    unless ( $create ) {
+        say 'Dropped database';
+        exit;
+    }
+}
+if ( $create ) {
+    eval { $db->create->recv; };
+    if ( $@ and !$soft ) {
+        die $@;
+    }
+    undef $@;
+}
+
+foreach ( keys %{ schema() } ) {
+    my $doc;
+
+    if ( !$create or $soft ) {
+        eval { $doc = req( GET => $_ )->recv; };
+
+        unless ( $@ ) {
+            say 'Recreating ', $_;
+
+            $doc = $JSON->decode( $doc );
+            unless ( ref( $doc ) eq 'HASH' and $doc->{_rev} ) {
+                die 'Unexpected return or missing data from CouchDB when reading design for ' . $_;
+            }
+            req( DELETE => $_ . '?rev=' . $doc->{_rev} )->recv;
+        }
+        undef $@;
+    }
+
+    unless ( $doc ) {
+        say 'Creating ', $_;
+    }
+
+    req(
+        PUT => $_,
+        $JSON->encode(
+            {
+                %{ schema()->{$_} },
+                _id => $_
+            }
+        )
+    )->recv;
+}
+
+if ( $load ) {
+    open( LOAD, $load ) or die 'load failed for ' . $load . ': ' . $!;
+
+    while ( <LOAD> ) {
+        foreach ( $JSON->incr_parse( $_ ) ) {
+            $db->save_doc( $_ )->recv;
+        }
+    }
+
+    close( LOAD );
+}
+
+unless ( $upgrade ) {
+    exit;
+}
+
+!$debug and print 'Checking objects ...';
+my $skip       = 0;
+my $total_rows = 0;
+my $changed    = 0;
+my @update;
+
+while ( 1 ) {
+    $debug and say '_design/analysis/_view/id?include_docs=true&limit=' . $read . '&skip=' . $skip;
+    my $list = req( GET => '_design/analysis/_view/id?include_docs=true&limit=' . $read . '&skip=' . $skip )->recv;
+    $list = $JSON->decode( $list );
+    unless (ref( $list ) eq 'HASH'
+        and defined $list->{total_rows}
+        and defined $list->{offset}
+        and ref( $list->{rows} ) eq 'ARRAY' )
+    {
+        die 'Unexpected return or missing data from CouchDB when listing analysis';
+    }
+
+    if ( $list->{total_rows} > $total_rows ) {
+        $total_rows = $list->{total_rows};
+    }
+
+    my @docs;
+    foreach ( @{ $list->{rows} } ) {
+        unless (ref( $_ ) eq 'HASH'
+            and defined $_->{id}
+            and ref( $_->{doc} ) eq 'HASH' )
+        {
+            die 'Unexpected return or missing data from CouchDB when reading list of analysis';
+        }
+
+        $debug and say 'fetched ', $_->{id};
+        push( @docs, $_->{doc} );
+    }
+
+    foreach ( @docs ) {
+        if ( check( $_ ) ) {
+            $debug and say 'saving changes on ', $_->{_id};
+            push( @update, $_ );
+            $changed++;
+
+            if ( scalar @update == $update ) {
+                $db->bulk_docs( \@update )->recv;
+                @update = ();
+            }
+        }
+
+        $skip++;
+        !$debug and print "\r", 'Checking objects ... ', $skip, ' / ', $total_rows, ' (changed: ', $changed, ')';
+    }
+    $debug and say 'Checking objects ... ', $skip, ' / ', $total_rows, ' (changed: ', $changed, ')';
+
+    unless ( $skip < $total_rows ) {
+        last;
+    }
+}
+
+if ( scalar @update ) {
+    $db->bulk_docs( \@update )->recv;
+}
+
+!$debug and print "\r";
+say 'Checking objects ... ', $skip, ' / ', $total_rows, ' (changed: ', $changed, ') done';
+
+exit;
+
+sub check {
+    my ( $doc ) = @_;
+    my $changed = 0;
+
+    if ( ref( $doc->{results} ) eq 'ARRAY' ) {
+        foreach ( @{ $doc->{results} } ) {
+            if ( exists $_->{message} ) {
+                delete $_->{message};
+                $changed = 1;
+            }
+        }
+    }
+
+    unless ( exists $doc->{ipv4} ) {
+        $doc->{ipv4} = 1;
+        $changed = 1;
+    }
+    unless ( exists $doc->{ipv6} ) {
+        $doc->{ipv6} = 1;
+        $changed = 1;
+    }
+
+    unless ( $doc->{fqdn} =~ /\.$/o ) {
+        $doc->{fqdn} .= '.';
+        $changed = 1;
+    }
+
+    unless ( defined $doc->{space} ) {
+        $doc->{space} = '';
+        $changed = 1;
+    }
+
+    return $changed;
+}
+
+sub schema {
+    return {
+        '_design/new_analysis' => {
+            views => {
+                id => {
+                    map => '
+function (doc) {
+    if (doc.type == "new_analyze") {
+        emit(null);
+    }
+}
+'
+                },
+                all => {
+                    map => '
+function (doc) {
+    if (doc.type == "new_analyze" || doc.type == "analyze") {
+        emit([doc.space, doc.id]);
+    }
+}
+'
+                },
+            }
+        },
+        '_design/analysis' => {
+            views => {
+                id => {
+                    map => '
+function (doc) {
+    if (doc.type == "analyze") {
+        emit(null);
+    }
+}
+'
+                },
+                all => {
+                    map => '
+function (doc) {
+    if (doc.type == "analyze") {
+        emit([doc.space, doc.id, null]);
+    }
+}
+'
+                },
+                map( {
+                        'by_' . $_ => {
+                            map => '
+function (doc) {
+    if (doc.type == "analyze") {
+        emit([doc.space, doc.' . $_ . ', doc.id, null]);
+    }
+}
+'
+                        }
+                    } ( qw(fqdn created updated) ) ),
+                fqdn => {
+                    map => '
+function (doc) {
+    if (doc.type == "analyze") {
+        emit([doc.space, [doc.fqdn, null], doc.id, null]);
+    }
+}
+'
+                },
+                map( {
+                        'fqdn_by_' . $_ => {
+                            map => '
+function (doc) {
+    if (doc.type == "analyze") {
+        emit([doc.space, [doc.fqdn, null], doc.' . $_ . ', doc.id, null]);
+    }
+}
+'
+                        }
+                    } ( qw(created updated) ) ),
+                rfqdn => {
+                    map => '
+function (doc) {
+    if (doc.type == "analyze") {
+        var key = doc.fqdn.split(/\./).reverse(), i, s = "";
+        for (i=0; i<key.length; i++) {
+            if ( s ) {
+                s = s + ".";
+            }
+            s = s + key[i];
+            emit([doc.space, [s, null], doc.id, null]);
+        }
+    }
+}
+'
+                },
+                map( {
+                        'rfqdn_by_' . $_ => {
+                            map => '
+function (doc) {
+    if (doc.type == "analyze") {
+        var key = doc.fqdn.split(/\./).reverse(), i, s = "";
+        key.shift();
+        for (i=0; i<key.length; i++) {
+            if ( s ) {
+                s = s + ".";
+            }
+            s = s + key[i];
+            emit([doc.space, [s, null], doc.' . $_ . ', doc.id, null]);
+        }
+    }
+}
+'
+                        }
+                } ( qw(fqdn created updated) ) )
+            }
+        }
+    };
+}
+
+sub req {
+    my ( $method, $path, $body ) = @_;
+    my $cv = AnyEvent->condvar;
+
+    http_request(
+        $method => $db->uri . $path,
+        headers => $db->_build_headers(
+            {
+                $method eq 'POST' || $method eq 'PUT'
+                ? ( 'Content-Type' => 'application/json' )
+                : (),
+            }
+        ),
+        body => $body,
+        sub {
+            my ( $body, $headers ) = @_;
+            if ( $headers->{Status} >= 200 and $headers->{Status} < 400 ) {
+                $cv->send( $body );
+            }
+            else {
+                $cv->croak( $db->uri . $path . ': ' . $headers->{Status} . ' - ' . $headers->{Reason} . ' - ' . $headers->{URL} );
+            }
+        }
+    );
+
+    return $cv;
+}
+
+=head1 NAME
+
+zonalizer-couchdb-database - Create the CouchDB database for Zonalizer
+
+=head1 SYNOPSIS
+
+zonalizer-couchdb-database <uri>
+
+=head1 AUTHOR
+
+Jerry Lundström, C<< <lundstrom.jerry@gmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to L<https://github.com/jelu/lim-plugin-zonalizer/issues>.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Lim::Plugin::Zonalizer
+
+You can also look for information at:
+
+=over 4
+
+=item * Lim issue tracker (report bugs here)
+
+L<https://github.com/jelu/lim-plugin-zonalizer/issues>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2015-2016 Jerry Lundström
+Copyright 2015-2016 IIS (The Internet Foundation in Sweden)
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

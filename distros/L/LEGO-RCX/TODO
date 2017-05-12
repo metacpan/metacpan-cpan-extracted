@@ -1,0 +1,37 @@
+
+These are thing I would like to have done with RCX.pm in the
+future
+
+
+Short term
+===========
+
+Make uploadDatalog handle multi-byte gets.
+
+Check for errors in the responses.  This would include making
+sure the opcode is ok and the complement bytes match.
+
+Add a test.pl
+
+Medium term
+============
+
+Add support for Win32 Comm.
+
+Abstract out the communications layer so I can affectively add support
+for other communications mechanisms.  Possibly even a networked RCX.
+( a RCX connected to some other computer on the network ).
+
+Add support for loading in NQC output files (not the list files) to
+determine variable names.
+
+Long term
+==========
+
+Implement the file loading (sub, task) and flash loading.
+
+Make a PerlTk interface to control your RCX (I have already
+started this project but it is far from releasable.)
+
+
+

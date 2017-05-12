@@ -1,0 +1,101 @@
+THISPKG	= base
+SEARCH	= -I$(TOPDIR)/targets/$(MACHINE)
+EXTRA_H_FLAGS = +RTS -K4M -RTS
+
+SRCS	= \
+	Data/Bits.hs Data/Bool.hs Data/Char.hs Data/Complex.hs \
+	Data/Either.hs Data/FiniteMap.hs Data/IORef.hs Data/Int.hs \
+	Data/Ix.hs Data/List.hs Data/Maybe.hs Data/PackedString.hs \
+	Data/Ratio.hs Data/Set.hs Data/Tuple.hs Data/Word.hs Data/Array.hs \
+	Data/HashTable.hs Data/Typeable.hs Data/Dynamic.hs \
+	Data/Monoid.hs Data/Tree.hs \
+	Control/Monad.hs Control/Monad/Fix.hs Control/Monad/Trans.hs \
+	Control/Arrow.hs Debug/Trace.hs \
+	NHC/SizedTypes.hs \
+	System/IO.hs System/IO/Error.hs System/IO/Unsafe.hs \
+	System/Environment.hs System/Exit.hs System/Locale.hs \
+	System/Directory.hs System/Mem.hs System/Cmd.hs System/Info.hs \
+	System/Console/GetOpt.hs System/Random.hs \
+	Foreign/Ptr.hs Foreign/StablePtr.hs Foreign/Storable.hs \
+	Foreign/ForeignPtr.hs Foreign/C/Types.hs \
+	Foreign/Marshal/Alloc.hs Foreign/Marshal/Array.hs \
+	Foreign/Marshal/Utils.hs Foreign/Marshal/Error.hs \
+	Foreign/Marshal/Pool.hs Foreign/Marshal.hs \
+	Foreign/C/String.hs Foreign/C/Error.hs Foreign/C.hs Foreign.hs \
+	Text/PrettyPrint/HughesPJ.hs Text/PrettyPrint.hs \
+	Text/Html/BlockTable.hs Text/Html.hs \
+	Text/Read.hs Text/Show.hs Text/Show/Functions.hs
+
+#	[Data/Dynamic.hs] Data/Generics.hs Data/STRef.hs Data/Unique.hs
+#	Control/Monad/Identity.hs
+#	Debug/QuickCheck.hs
+#	System/CPUTime.hsc System/Time.hsc
+#	System/Mem.hs System/Mem/StableName.hs System/Mem/Weak.hs
+#	System/Posix/Types.hs System/Posix/Signals.hsc
+#	Text/ParserCombinators/ReadP.hs Text/ParserCombinators/ReadPrec.hs
+#	Text/Read/Lex.hs
+#	Text/Regex/* Text/Regex.hs
+
+
+# Here are the main rules.
+include ../Makefile.common
+
+# some extra rules
+NHC/SizedTypes.hs: NHC/SizedTypes.hs.cpp
+	$(CC) -E $< >$@
+
+# Here are the dependencies.
+$(OBJDIR)/Data/FiniteMap.$O: $(OBJDIR)/Data/Maybe.$O
+$(OBJDIR)/Data/Set.$O: $(OBJDIR)/Data/Maybe.$O $(OBJDIR)/Data/FiniteMap.$O
+$(OBJDIR)/Data/Array.$O: $(OBJDIR)/Data/Ix.$O
+$(OBJDIR)/Data/Dynamic.$O: $(OBJDIR)/Data/HashTable.$O \
+	$(OBJDIR)/Data/Typeable.$O
+$(OBJDIR)/Data/HashTable.$O: $(OBJDIR)/Control/Monad.$O
+$(OBJDIR)/Data/Int.$O: $(OBJDIR)/NHC/SizedTypes.$O
+$(OBJDIR)/Data/Word.$O: $(OBJDIR)/NHC/SizedTypes.$O
+$(OBJDIR)/NHC/SizedTypes.$O: $(OBJDIR)/Data/Bits.$O
+$(OBJDIR)/System/IO.$O: $(OBJDIR)/System/IO/Error.$O
+$(OBJDIR)/System/Random.$O: $(OBJDIR)/Data/Char.$O $(OBJDIR)/Data/IORef.$O \
+	$(OBJDIR)/System/IO/Unsafe.$O $(OBJDIR)/Foreign/Ptr.$O
+$(OBJDIR)/Debug/Trace.$O: $(OBJDIR)/System/IO.$O $(OBJDIR)/System/IO/Unsafe.$O
+$(OBJDIR)/Control/Monad/Fix.$O: $(OBJDIR)/System/IO.$O
+$(OBJDIR)/Control/Monad/Identity.$O: $(OBJDIR)/Control/Monad.$O \
+	$(OBJDIR)/Control/Monad/Fix.$O
+$(OBJDIR)/Foreign/Marshal/Alloc.$O:  $(OBJDIR)/Data/Maybe.$O \
+	$(OBJDIR)/Foreign/Ptr.$O $(OBJDIR)/Foreign/Storable.$O \
+	$(OBJDIR)/Foreign/C/Types.$O
+$(OBJDIR)/Foreign/Marshal/Array.$O:  $(OBJDIR)/Control/Monad.$O \
+	$(OBJDIR)/Foreign/Ptr.$O $(OBJDIR)/Foreign/Storable.$O \
+	$(OBJDIR)/Foreign/Marshal/Alloc.$O $(OBJDIR)/Foreign/Marshal/Utils.$O
+$(OBJDIR)/Foreign/Marshal/Utils.$O:  $(OBJDIR)/Data/Maybe.$O \
+	$(OBJDIR)/Foreign/Ptr.$O $(OBJDIR)/Foreign/Storable.$O \
+	$(OBJDIR)/Foreign/Marshal/Alloc.$O $(OBJDIR)/Foreign/C/Types.$O
+$(OBJDIR)/Foreign/Marshal/Error.$O: $(OBJDIR)/Foreign/Ptr.$O
+$(OBJDIR)/Foreign/C/String.$O: $(OBJDIR)/Data/Word.$O $(OBJDIR)/Foreign/Ptr.$O \
+	$(OBJDIR)/Foreign/Marshal/Array.$O $(OBJDIR)/Foreign/C/Types.$O 
+
+# C-files dependencies.
+Data/FiniteMap.$C: Data/Maybe.$C
+Data/Set.$C:       Data/Maybe.$C Data/FiniteMap.$C
+Data/Array.$C:     Data/Ix.$C
+Data/Dynamic.$C:   Data/HashTable.$C Data/Typeable.$C
+Data/HashTable.$C: Control/Monad.$C
+Data/Int.$C:       NHC/SizedTypes.$C
+Data/Word.$C:      NHC/SizedTypes.$C
+NHC/SizedTypes.$C: Data/Bits.$C
+System/IO.$C:      System/IO/Error.$C
+System/Random.$C:  Data/Char.$C Data/IORef.$C System/IO/Unsafe.$C
+Debug/Trace.$C:    System/IO.$C System/IO/Unsafe.$C
+Control/Monad/Fix.$C:      System/IO.$C
+Control/Monad/Identity.$C: Control/Monad.$C Control/Monad/Fix.$C
+Control/Monad/Trans.$C:    System/IO.$C
+Foreign/Marshal/Alloc.$C:  Data/Maybe.$C Foreign/Ptr.$C Foreign/Storable.$C \
+	Foreign/C/Types.$C
+Foreign/Marshal/Array.$C:  Control/Monad.$C Foreign/Ptr.$C Foreign/Storable.$C \
+	Foreign/Marshal/Alloc.$C Foreign/Marshal/Utils.$C
+Foreign/Marshal/Utils.$C:  Data/Maybe.$C Foreign/Ptr.$C Foreign/Storable.$C \
+	Foreign/C/Types.$C Foreign/Marshal/Alloc.$C
+Foreign/Marshal/Error.$C:  Foreign/Ptr.$C
+Foreign/C/String.$C:       Data/Word.$C Foreign/Ptr.$C Foreign/C/Types.$C \
+	Foreign/Marshal/Array.$C
+

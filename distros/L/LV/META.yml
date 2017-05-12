@@ -1,0 +1,52 @@
+---
+abstract: 'LV ♥ lvalue'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.013, CPAN::Meta::Converter version 2.120921'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: LV
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  LV:
+    file: lib/LV.pm
+    version: 0.006
+  LV::Backend::Magic:
+    file: lib/LV/Backend/Magic.pm
+    version: 0.006
+  LV::Backend::Sentinel:
+    file: lib/LV/Backend/Sentinel.pm
+    version: 0.006
+  LV::Backend::Tie:
+    file: lib/LV/Backend/Tie.pm
+    version: 0.006
+  LV::Backend::Tie::TiedScalar:
+    file: lib/LV/Backend/Tie.pm
+    version: 0.006
+recommends:
+  Sentinel: 0
+  Sub::Name: 0
+requires:
+  perl: 5.006000
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/LV/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=LV
+  homepage: https://metacpan.org/release/LV
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/tobyink/p5-lv
+version: 0.006

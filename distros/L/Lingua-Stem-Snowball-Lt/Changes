@@ -1,0 +1,8 @@
+v0.03   2013-11-27
+    * Removed non-ASCII characters from READMEs / POD to get the tests passing.
+
+v0.02   2013-06-06
+    * Bumped version number to release an improved TGZ archive.
+
+v0.01   2013-06-05
+    * Initial release

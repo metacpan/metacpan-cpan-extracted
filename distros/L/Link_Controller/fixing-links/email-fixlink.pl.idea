@@ -1,0 +1,14 @@
+=head1 NAME
+
+email-fixlink - repair links on a remote infostructure by remote control
+
+=head1 DESCRIPTION
+
+The aim of this program is to build up a list of changes that should
+be made to an infostructure and then send them out in an email message
+which will be processed automatically at the other end and cause
+changes to happen to the infostructure.  
+
+=cut
+
+die "not implemented yet";

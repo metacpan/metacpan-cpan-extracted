@@ -1,0 +1,33 @@
+Revision history for Perl extension Log::Dispatch::Jabber.
+
+0.3	- Mon Nov 25 2002
+
+	- Fixed (in a two-steps forward, one-step back kind of way)
+          the '_send' method such that messages can be sent to
+          multiple recipients. See POD for details.
+	  
+	- Added hooks to optionally check for recipient's presence
+
+	- Updated to use CPAN::MakeMaker
+
+0.22	- Wed Oct 02 2002
+
+	- Fixed a bug that could cause package to fail in DESTROY when 
+	  there was no buffer. Gah!
+ 
+0.21	- Tue Oct 01 2002
+
+	- Added option to pass "to" recipient as a string so that the
+	  package will play nicely with Log::Log4perl
+
+	- Updated POD
+
+0.2	- Tue Oct 01 2002
+
+	- Added option for buffering messages before sending
+
+	- Updated POD
+
+0.1	- Fri Sep 27 2002
+
+	- Initial release

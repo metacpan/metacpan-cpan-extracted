@@ -1,0 +1,78 @@
+{
+   "abstract" : "Log::Any::Adapter for Log::Handler",
+   "author" : [
+      "Gelu Lupaş <gvl@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Any-Adapter-Handler",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Any" : "1.03",
+            "Log::Handler" : "0",
+            "parent" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Any::Adapter::Handler" : {
+         "file" : "lib/Log/Any/Adapter/Handler.pm",
+         "version" : "0.009"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ggl/Log-Any-Adapter-Handler/issues"
+      },
+      "homepage" : "https://github.com/ggl/Log-Any-Adapter-Handler",
+      "repository" : {
+         "url" : "git://github.com/ggl/Log-Any-Adapter-Handler.git",
+         "web" : "https://github.com/ggl/Log-Any-Adapter-Handler"
+      }
+   },
+   "version" : "0.009",
+   "x_authority" : "cpan:GVL"
+}

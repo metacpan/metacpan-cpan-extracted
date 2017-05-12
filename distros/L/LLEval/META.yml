@@ -1,0 +1,35 @@
+---
+abstract: "Perl interface to dankogai's LLEval service"
+author:
+  - 'gfx <gfuji@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: LLEval
+name: LLEval
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  Furl: 0.07
+  JSON: 0
+  Mouse: 0.7
+  MouseX::Getopt: 0
+  MouseX::StrictConstructor: 0.02
+  URI::Escape: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/gfx/LLEval-Client.git
+version: 0.01

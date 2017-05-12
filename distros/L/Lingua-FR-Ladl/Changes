@@ -1,0 +1,9 @@
+Revision history for Lingua-FR-Ladl
+
+0.0.4  Thu Apr 19 14:23:42 CEST 2007
+       Makefile.PL: added prerequisite modules
+0.0.3  Wed Apr 18 10:45:54 CEST 2007
+       Improved tests
+0.0.1  Thu Mar 29 13:56:52 2007
+       Initial release.
+

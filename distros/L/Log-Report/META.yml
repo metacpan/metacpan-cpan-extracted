@@ -1,0 +1,28 @@
+---
+abstract: 'report a problem, pluggable handlers and language support'
+author:
+  - 'Mark Overmeer'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Report
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Devel::GlobalDestruction: 0.09
+  Encode: 2.00
+  Log::Report::Optional: 1.02
+  Scalar::Util: 0
+  String::Print: 0.13
+  Sys::Syslog: 0.27
+  Test::More: 0.86
+version: 1.19

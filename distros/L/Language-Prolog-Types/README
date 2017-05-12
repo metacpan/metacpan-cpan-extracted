@@ -1,0 +1,29 @@
+Language/Prolog/Types version 0.08
+==================================
+
+The packages in this module allow for the creation of Perl objects
+representing Prolog terms (atoms, functors, lists, nil, etc.).
+
+It has been succesfully used to interface Perl with the XSB
+(<http://xsb.sourceforge.net/>) system in the Language::XSB module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Salvador Fandiño <sfandino@yahoo.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,20 @@
+Revision history for Perl extension Lingua::ZH::CEDICT.
+
+0.04  Sat May 07 03:00:00 2005
+    - Updated CEDICT data
+    - Updated parsing in Textfile.pm to understand new CEDICT format
+    - Added Test::Pod and Test::Pod::Coverage tests
+    - Fixed Pod errors
+
+0.03  Sun Oct 05 23:30:00 2003
+    - added startFind() and Find()
+    - included CEDICT license
+
+0.02  Tue Aug 13 20:30:00 2002
+    - added own HanConvert module
+    - fixed a number of bugs (especially utf8Pinyin() and POD)
+    - tests now skip rather than fail (hopefully)
+    - not distributing Storable file anymore due to portability problems
+
+0.01  Thu Jul 18 12:34:23 2002
+    - original version

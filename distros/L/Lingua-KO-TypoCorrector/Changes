@@ -1,0 +1,22 @@
+Revision history for Perl extension Lingua-KO-TypoCorrector
+
+0.06 2013-07-24T05:46:42Z
+    - Change `toKorean` method to `to_hangul`
+    - Use Minilla
+
+0.05  Mon May  6 11:00:00 2013 KST
+    - Add Test::Base on PREREQ_PM
+
+0.04  Sat May  4 16:00:00 2013 KST
+    - Fix RT #84259: Packaging bug: inc directory missing
+
+0.03  Wed Feb  8 23:00:00 2012 KST
+    - Add a repository on resources
+
+0.02  Fri Jul 16 20:00:00 2010 KST
+    - Fix test fails on some os
+    - Set encoding utf8 on POD
+
+0.01  Wed Jun 25 12:41:07 2008
+	- original version; created by h2xs 1.23 with options
+		-AX -n Lingua::KO::TypoCorrector

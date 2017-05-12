@@ -1,0 +1,134 @@
+Livelink-DAV version 0.0013
+=========================
+
+Livelink::DAV - Perl extension for providing a Opentext Livelink EWS WebDAV connecter instance for CopyTree::VendorProof.
+
+This module provides a new [sic.] contructor and necessary subclass methods for CopyTree::VendorProof in order to deal with remote Livelink EWS WebDAV file operations.
+
+What?
+
+Oh, yes.  You've probabaly stumbled across this module because you wanted to copy something recursively.  Did you want to move some files into or off your SharePoint file server?  Did you buy Opentext's Livelink EWS and wish to automate some file transfers?  Well, this is kinda the right place, but it gets righter. Check out the documentation on my CopyTree::VendorProof module, where I have a priceless drill and screw analogy for how these modules all work together.  The information on this page is a tad too technical if all you're trying to decide is whether this is the module you need.
+
+The subclass methods provided in this connector objects include:
+   new
+   fdls
+   is_fd
+   read_info_memory
+   write_from_memory
+   copy_local_files
+   cust_mkdir
+   cust_rmdir
+   cust_rmfile
+
+The functionality of these methods are described in
+perldoc CopyTree::VendorProof
+
+Under the section "Object specific instance methods for the base class CopyTree::VendorProof"
+
+To create a Livelink::DAV connector instance:
+
+   my $llobj = Livelink::DAV->new;
+   
+
+To set up connection parameters:
+
+first, define the livelink server location:
+
+   $llobj->lldsite('http://www.livelink.server.org/');
+
+second, find out the root directory of your webdav resource, for example, if it's at 
+http://www.livelink.server.org/somedir/webdav_dir/
+
+then for llddav use:
+
+   'somedir/webdav_dir'
+
+   $llobj->llddav('somedir/webdav_dir');
+
+   #then enter your user account name:
+
+   $llobj->lldusern('username');
+
+   #then, enter your password:
+
+   $llobj->llduserp('password');
+As of this writing, only simple authentication has been tested, though with a lot of imagination, simple authentication over ssl (https) should work too.
+
+To add a source or destination item to a CopyTree::VendorProof instance:
+   my $ctvp_inst = CopyTree::VendorProof ->new;
+
+Add a Livelink::DAV source, which always starts with the dir / file right underneath the webdav_dir.  Do not include the webdav_dir itself, or any leading slashes.
+
+   $ctvp_inst ->src ('~username/path to your source', $llobj);
+
+   #create a new directory in Livelink:
+
+   $llobj->cust_mkdir('~username/newdir');
+
+   #set the destination to be in the new directory:
+
+   $ctvp_inst -> dst ('~username/newdir',$llobj);
+
+   #copies the file / dir
+
+   $ctvp_inst->cp;
+   
+Livelink::DAV provides different types of methods.  
+
+First, it provides connection methods to allow us to connect to Livelink EWS's WebDAV.  These connection methods that you see in the SYNOPSIS are pretty self explanatory. 
+
+Second, Livelink::DAV provides methods for its parent class (CopyTree::VendorProof), which includes
+
+   new
+   fdls           
+   is_fd
+   read_info_memory
+   write_from_memory
+   copy_local_files
+   cust_mkdir
+   cust_rmdir
+   cust_rmfile
+
+The functionality of these methods are described in 
+
+perldoc CopyTree::VendorProof 
+
+It is worth nothing that fdls comes in quite handy for testing whether you can actually connect to your livelink resource using this module.  Simply open up your web browser and go to your livelink site, and fdls any resource that has a webdav property.  If you do a Dumper print, you should get something back.
+
+   use Data::Dumper;
+   print Dumper $llobj -> fdls('', '~username/');
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+'CopyTree::VendorProof'=>0.0011,
+'namespace::autoclean' => 0.13,
+'HTTP::DAV' =>0.47,
+'Moose' =>2.0602,
+'MooseX::NonMoose' =>0.22 ,
+'Data::Dumper' =>2.121,
+'Carp' =>1.02,
+'File::Basename'=>2.82,
+'Term::ReadKey' =>2.30,#only needed for test suite
+'MIME::Base64=>3.01' #only needed for test suite
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by dbmolester
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

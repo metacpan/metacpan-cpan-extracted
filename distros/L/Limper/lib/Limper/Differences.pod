@@ -1,0 +1,201 @@
+=pod
+
+=head1 NAME
+
+Limper::Differences - differences between Limper and Dancer
+
+=head1 VERSION
+
+version 0.013
+
+=head1 DESCRIPTION
+
+This document describes the differences between L<Limper> and L<Dancer>, as
+well as planned features, what will never happen, etc.
+
+This just covers the basic differences of what is described on the main
+documentation page for L<Dancer>, and not deeper differences.  More about
+use, less about design.
+
+
+
+=head1 Differences
+
+=head2 Routes
+
+Limper also has B<trace>.
+
+Limper's B<any> really matches any. The following syntax is not supported:
+
+  any ['get', 'post'] => '/myaction' => sub { ... };
+
+Instead, you can chain routes together:
+
+  get post => '/myaction' => sub { ... };
+
+This is both cleaner code and cleaner syntax.
+
+Limper does not support B<prefix>, and likely never will.
+
+=head2 Hooks
+
+Limper has three hooks: B<after>, B<request_handler>, and B<response_handler>.
+
+Limper's B<after> is similar to Dancer's B<after>.
+
+Other hooks may be added as needed.
+
+=head2 Logging
+
+Limper has B<info> and B<warning>. They send to B<STDOUT> and B<STDERR>,
+respectively.
+
+Dancer also has B<debug> and B<error>, which Limper might get.
+
+There is currently no way to configure these.
+
+=head2 Config
+
+Limper does not currently use a config file.
+
+Dancer's B<setting> (and it's alias B<set>) allow you to get/set config
+setting, though it also accesses some sort of current settings under some
+condition.
+
+=head2 Response Headers
+
+Limper and Dancer both have B<headers>. Limper's will also return the
+current headers as a list or arrayref.
+
+However, Limper will currently replace B<all> headers with whatever is
+passed to it.
+
+Dancer's B<header> is just an alias for B<headers>.
+
+Something like B<push_header> is currently not supported, but could be
+supported by a plugin.
+
+=head2 Status
+
+Limper's B<status> can also set a custom phrase to return with the code
+(will likely only work with the built-in server).
+
+Dancer's B<status> can take a code's standard name in lower case instead of
+the code.
+
+=head2 Request
+
+Limper's B<request> is just a simple hashref.
+
+
+
+=head1 Differences that are outside the scope of Limper proper
+
+=head2 Data Structure Conversion
+
+Limper will never have any of these, but plugins can easily be created for
+them:
+
+  from_dumper to_dumper
+  from_json to_json
+  from_yaml to_yaml
+  from_xml to_xml
+
+=head2 Boolean
+
+Limper does not define B<true> or B<false>. Dancer's B<true> and B<false> is just B<1> and B<0>,
+which is annoying because then you can't C<use boolean;>.
+
+=head2 Sending Files and MIME Types
+
+See L<Limper::SendFile/send_file> and L<Limper::SendFile/mime_types>.
+
+=head2 Sugary Things
+
+These are all implemented in L<Limper::Sugar>:
+
+  limper_version load captures dirname halt send_error uri_for redirect content_type path
+
+
+
+=head1 Currently Unsupported
+
+The following are currently unsupported, and may or may not be supported later, either in Limper itself or via a plugin.
+
+=head2 var, vars
+
+This should be trivial enough to implement in Limper.
+
+=head2 params, param, param_array
+
+There should be a plugin for this.
+
+=head2 splat
+
+Something like this would be nice. Currently the following will work, though:
+
+  get qr{^/file/([^/]+)\.([^/]+)$} => sub {
+    my ($file, $extension) = ($1, $2);
+    ...
+  };
+
+Yes, it's hideous. "megasplat" is much more complex.
+
+=head2 forward
+
+Unknown complexity.
+
+=head2 pass
+
+Unknown complexity.
+
+=head2 cookie, cookies
+
+Unknown complexity.
+
+=head2 session
+
+Unknown complexity.
+
+=head2 upload
+
+Unknown complexity. Perhaps a plugin.
+
+=head2 template
+
+Unknown complexity. Will be a plugin.
+
+=head2 engine
+
+Unknown complexity. Perhaps a plugin. Related to B<template>.
+
+=head2 load_app
+
+Unknown complexity. Without B<prefix>, I'm not sure how useful this really is.
+Limper does not have the degree of containment that Dancer has.
+
+
+
+=head1 Features Limper has that Dancer does not
+
+=head2 response
+
+This returns a hashref of what the current response will be when the route
+ends.  It can be inspected and modified as needed.  I don't know how to get
+at any of these values easily under Dancer, outside of a hook.
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Ashley Willis E<lt>ashley+perl@gitable.orgE<gt>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 SEE ALSO
+
+L<Limper::Extending>
+
+=cut

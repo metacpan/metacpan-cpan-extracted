@@ -1,0 +1,261 @@
+# Value\Type	Position	Action	Split after
+NN\POS DT\POS	ANY	split	1
+NNS\POS DT\POS	ANY	split	1
+NP\POS DT\POS	ANY	split	1
+JJ\POS DT\POS	ANY	split	1
+VBG\POS DT\POS	ANY	split	1
+VVG\POS DT\POS	ANY	delete
+VVG\POS CD\POS	ANY	delete
+VVG\POS JJR\POS	ANY	split	1
+VVG\POS to\LF	ANY	split	1
+JJ\POS to\LF	ANY	split	1
+CD\POS of\LF DT\POS	ANY	split	1	CD of DT
+CD\POS DT\POS	ANY	delete
+of\LF DT\POS of\LF	ANY	split	1
+DT\POS CD\POS	ANY	split	1
+VBG\POS to\LF	ANY	split	1
+much\LF datum\LF	ANY	delete
+same\LF	ANY	delete
+such\LF	ANY	delete
+least\LF	ANY	delete
+means\IF of\LF	ANY	delete
+of\IF course\IF	ANY	delete
+or\IF more\IF	ANY	delete
+other\LF	ANY	delete
+versus\LF	ANY	delete
+in\LF common\LF	ANY	delete
+vs\LF	ANY	delete
+#in\IF addition\IF to\IF	ANY	delete
+# first words of sentences are lemmatized with capital letter by GeniaTagger
+#In\IF addition\IF	ANY	delete
+#in\LF contrast\IF	ANY	delete
+#In\LF contrast\IF	ANY	delete
+#in\LF respect\IF	ANY	delete
+#In\LF respect\IF	ANY	delete
+#more general rule
+in\IF NN\POS to\LF	ANY	delete
+In\IF NN\POS to\LF	ANY	delete
+many\IF	ANY	delete
+another\IF	ANY	delete
+both\IF	ANY	delete
+#several\IF	ANY	delete
+
+CD\POS	START	delete
+JJ\POS of\LF	START	split	1
+JJ\POS to\LF	START	split	1
+
+JJ\POS	END	delete
+JJR\POS	END	delete
+JJS\POS	END	delete
+of\LF CD\POS	END	delete
+
+
+#epipagri: Sandra Makuntima (2008)
+
+that\LF	ANY	delete
+the\LF	ANY	delete
+THE\LF	ANY	delete
+The\LF	ANY	delete
+THAT\LF	ANY	delete
+WHICH\LF	ANY	delete
+new\LF	ANY	delete
+NEW\LF	ANY	delete
+&lt;RTI\LF	ANY	delete
+RTI&gt;\LF	ANY	delete
+RTI>\LF	ANY	delete
+SEQ\LF	ANY	delete
+ID\LF	ANY	delete
+id\LF	ANY	delete
+early\LF	ANY	delete
+N[deg.]\LF	ANY	delete
+claim\LF	ANY	delete
+Claims\LF	ANY	delete
+table\LF	ANY	delete
+Table\IF	ANY	delete
+TABLE\IF	ANY	delete
+#position\LF	ANY	delete
+#present\LF	ANY	delete
+invention\LF	ANY	delete
+#number\LF	ANY	delete
+#level\LF	ANY	delete
+#amount\LF	ANY	delete
+figure\LF	ANY	delete
+various\LF	ANY	delete
+and\LF	END	delete	
+AND\LF	END	delete	
+CD\POS	END	delete
+
+RTI&gt;\LF NP\POS	START	delete
+#size\LF of\LF	START	delete
+one\LF of\LF	ANY	delete
+#use\LF of\LF	ANY	delete
+#method\LF of\LF	ANY	delete
+anyone\LF of\LF	ANY	delete
+variety\LF of\LF	ANY	delete
+respect\LF to\LF	ANY	delete
+ORF\LF CD\POS	ANY	delete
+ORF\LF NN\POS	ANY	delete
+ORF\LF NP\POS	ANY	delete
+figure\LF CD\POS	ANY	delete
+figure\LF NP\POS	ANY	delete
+fig\LF	ANY	delete
+Fig\IF	ANY	delete
+FIG\IF	ANY	delete
+
+
+e.g.\IF	ANY	delete
+etc.\IF	ANY	delete
+etc\IF	ANY	delete
+per\IF se\IF	ANY	delete
+i.e.\IF	ANY	delete
+
+#Quaero (Wiktoria 05/2010) Attention : certaines d'entre elles ne sont utiles que pour cette application (cad pour la comparaison avec un thesaurus, ex: terme "patent" peut etre interessant a garder pour une autre application)
+
+#first\LF	ANY	delete
+#second\LF	ANY	delete
+#third\LF	ANY	delete
+#above\LF	ANY	delete
+above-mentioned\LF	ANY	delete
+above-defined\LF	ANY	delete
+above-referenced\LF	ANY	delete
+abovementioned\LF	ANY	delete
+above-described\LF	ANY	delete
+preferred\LF	ANY	delete
+Preferred\IF	ANY	delete
+further\LF	ANY	delete
+#different\LF	ANY	delete
+next\LF	ANY	delete
+#selectively\LF	ANY	delete
+SELECTIVELY\IF	ANY	delete
+more\LF	ANY	delete
+much\LF	ANY	delete
+preceding\LF	ANY	delete
+of\LF interest\LF	ANY	delete
+seq\IF	ANY	delete
+#accession\LF	ANY	delete
+#appreciable\LF	ANY	delete
+#suitable\LF	ANY	delete
+#Suitable\LF	ANY	delete
+#appropriate\LF	ANY	delete
+certain\LF	ANY	delete
+#additional\LF	ANY	delete
+patent\LF	ANY	delete
+claims\LF	ANY	delete
+#benefit\LF	ANY	delete
+clause\LF	ANY	delete
+abstract\LF	ANY	delete
+Abstract\IF	ANY	delete
+abstr\LF	ANY	delete
+Abst\LF	ANY	delete
+discussion\LF	ANY	delete
+embodiment\LF	ANY	delete
+embodiments\LF	ANY	delete
+proceeding\LF	ANY	delete
+proceedings\LF	ANY	delete
+EMBODIMENT\IF	ANY	delete
+Embodiment\LF	ANY	delete
+#column\LF	ANY	delete
+Image\IF	ANY	delete
+image\LF	ANY	delete
+date\LF	ANY	delete
+Date\LF	ANY	delete
+#day\LF	ANY	delete
+Document\LF	ANY	delete
+Date\LF Jan.\LF	ANY	delete
+Date\LF Feb.\LF	ANY	delete
+Date\LF Mar.\LF	ANY	delete
+Date\LF Apr.\LF	ANY	delete
+Date\LF May\LF	ANY	delete
+Date\LF Jun.\LF	ANY	delete
+Date\LF Jul.\LF	ANY	delete
+Date\LF Aug.\LF	ANY	delete
+Date\LF Sep.\LF	ANY	delete
+Date\LF Oct.\LF	ANY	delete
+Date\LF Nov.\LF	ANY	delete
+Date\LF Dec.\LF	ANY	delete
+january\LF	ANY	delete
+february\LF	ANY	delete
+march\LF	ANY	delete
+april\LF	ANY	delete
+may\LF	ANY	delete
+june\LF	ANY	delete
+july\LF	ANY	delete
+august\LF	ANY	delete
+septembre\LF	ANY	delete
+octobre\LF	ANY	delete
+novembre\LF	ANY	delete
+decembre\LF	ANY	delete
+#time\LF	ANY	delete
+example\LF	ANY	delete
+examples\LF	ANY	delete
+Example\LF	ANY	delete
+EXAMPLE\IF	ANY	delete
+Examples\IF	ANY	delete
+principle\LF of\LF	ANY	delete
+principles\LF of\LF	ANY	delete
+purpose\LF of\LF	ANY	delete
+purposes\LF of\LF	ANY	delete
+#objective\LF	ANY	delete
+no.\IF	ANY	delete
+No.\IF	ANY	delete
+NO.\IF	ANY	delete
+No:\IF	ANY	delete
+NO:\IF	ANY	delete
+no:\IF	ANY	delete
+nos.\IF	ANY	delete
+Nos.\IF	ANY	delete
+e.\IF g.\IF	ANY	delete
+
+#W.G. (2010)
+
+#particular\LF	ANY	delete
+#precise\LF	ANY	delete
+prior\IF	ANY	delete
+#practical\LF	ANY	delete
+#specific\LF	ANY	delete
+#scientific\LF	ANY	delete
+#related\IF	ANY	delete
+#relative\LF	ANY	delete
+regard\LF	ANY	delete
+#relevant\LF	ANY	delete
+#repeated\IF	ANY	delete
+#respective\LF	ANY	delete
+#suplementary\LF	ANY	delete
+#significant\IF	ANY	delete
+#repetitive\LF	ANY	delete
+well-known\IF	ANY	delete
+#useful\LF	ANY	delete
+#undesirable\LF	ANY	delete
+#successful\LF	ANY	delete
+#sufficient\LF	ANY	delete
+#part\LF of\LF	ANY	delete
+#in\LF order\LF to\IF	ANY	delete
+#IN\LF order\LF to\IF	ANY	delete
+
+#FS pour empêcher l'extraction de certaines constructions qui matchent avec le patron NN to NN (remplacé par NN XXX NN lors d'un pre-processing)
+
+NN\POS XXX\POS	ANY	delete
+
+#FS pour empêcher l'extraction de certaines constructions qui matchent avec le patron NN(S) at NN (remplacé par NN AT NN lors d'un pre-processing)
+
+NN\POS AT\POS	ANY	delete
+NNS\POS AT\POS	ANY	delete
+
+#FS pour les adverbes
+
+also\LF	ANY	delete
+only\LF	ANY	delete
+against\LF	START	delete
+even\LF	ANY	delete
+together\LF	ANY	delete
+hereafter\IF	ANY	delete
+about\LF	START	delete
+finally\LF	ANY	delete
+generally\LF	ANY	delete
+therefore\LF	ANY	delete
+probably\LF	ANY	delete
+enterally\LF	ANY	delete
+NN\POS significantly\LF	ANY	delete
+NNS\POS significantly\LF	ANY	delete
+NN\POS marginally\LF	ANY	delete
+NNS\POS marginally\LF	ANY	delete

@@ -1,0 +1,140 @@
+Revision history for Perl extension Lingua::LinkParser.
+
+0.01  Thu Jan 13 09:54:28 2000
+    - original version.
+
+0.05  Tue Feb 8 13:00:13 2000
+    - public beta
+
+1.0   Wed Aug 16 14:35:44 2000
+    - Rewritten for the new Link Grammar 4.0 API
+    - Got LinkParser.xs to work with the char** functions, so 
+      linkage_get_words and get_domain_names now work.
+    - Makefile.PL changes LinkParser.pm to find data directory
+    - new() expects a hash defined the the pod documentation, and uses the 
+      the global $DATA_DIR to as a default path
+    - Added Lingua::LinkParser::Definitions to enable easy retrieval of 
+      link summaries and definitions from within the program. This is a 
+      totally non-orthoganal method of distributing this info, but I find 
+      it handy.
+    - Added linkage_get_word to ::Linkage, thanks Richard A. Wells.
+    - Added linkage_get_words, also thanks to Richard.
+    - Added access to the domain functions with num_domains and domain_names 
+      to the Lingua::LinkParser::Sublinkage class.
+    - Added function 'violation_name' to Lingua::LinkParser::Linkage class to 
+      return the label for a post-processing linkage violation.
+    - Added the new 'print_constituent_tree()' from the 4.0 API to display 
+      constituent tree structures.
+    - Added tests to 'test.pl' for 'get_words()', 'num_domains()', and 
+      'domain_names()'
+    - Added scripts to demonstrate use of 'bigstruct()' and 'define()'
+    - Added script to demonstrate 'print_constituent_tree()'
+    - Included the link guide in directory 'guide', since it's not in the 
+      distribution.
+    - Overloaded the stringify operators ("") for classes ::Sentence,
+      ::Linkage, and ::Sublinkage to display a diagram for each.
+    - Changed 'get_postscript' to use new 'mode' parameter
+    - Added the link functions that had previously only been available to 
+      sublinkage objects to linkage objects.
+
+1.01  Wed Sep 2 12:35:01 2000
+
+    - Built and tested using Link Grammar 4.1
+    - Fixed bug that redefined 'get_word' and 'num_word' functions in
+      Linkage.pm.
+    - Moved Dictionary 'type' to its own namespace, 
+      Lingua::LinkParser::Dictionary.
+    - Removed DESTROY methods from ::Sublinkage and ::Linkage; the API
+      4.0 was crapping a log when invoked.
+    - Added a class 'Lingua::LinkParser::Linkage::Word' to allow word 
+      object creation and quick access to information for that word.
+    - Lots to fixes to ::Sublinkage to get index numbers right
+    - Lots of examples added to 'scripts/', including a grammar regex
+    - Added alternate methods for overloading ::Linkage and
+      ::Sublinkage, "new_as_string()", to experiment with grammar regex
+    - Changed overloaded behaviour for ("") constants for ::Sentence to 
+      print out the original sentence text.
+
+1.02  Tue Sep 5 23:42:58 2000
+
+    - Added XSUBs for 'max_sentence_length' opts.
+    - Fixed Makefile.PL to find data file paths (link parser 4.1 still has 
+      dictionary files named "4.0")
+    - Changed '::Linkage::opts()' to take a hash of keys/values, or returns 
+      a value of only one argument is passed.
+    - Modified the script 'scripts/parse.pl' to parse null linkages 
+      automatically, and demonstrate more elements of the parser options.
+    - Changed the default behaviour of the overloaded ("") for ::Linkage and 
+      ::Sublinkage to use 'new_as_string'.
+
+1.03  Mon Nov 6 11:46:28 2000
+
+    Thanks to Ronald J Kimball for recommending the following changes:
+
+    - Made changes to Linkage.pm and Sublinkage.pm to avoid uninitialized 
+      value warnings.
+    - Fixed grammarregex.pl to use a negated look-ahead assertion.
+    
+1.04  Mon Nov 27 16:23:11 2000
+
+    - Fixed some perldoc documentation errors.
+    - Removed 'our' statements for compatability with versions < 5.6.
+
+1.05  Thu Feb 7 12:02:44 2001
+
+    - Fixed the hardcoded path entries in LinkParser.pm .. sorry folks.
+    - Started varifying arguments for constructurs in Lingua::LinkParser,
+      Lingua::LinkParser::Sentence and  and Lingua::LinkParser::Linkage.
+
+1.06
+    - Added Lingua::LinkParser::Simple to facilitate very easy processing; this
+      will collect methods like 'extract_subject' that require no link knowledge
+    - Fixed several POD bugs related to $sentence->linkages.
+
+1.07
+    - Added documentation to make num_linkages() more clear.
+    - Fixed OS X Jaguar build problems
+
+1.08 (pending 1.1)
+    - Fixed memory leaks with rewritten calls to all _delete functions
+
+1.09  Aug 11 2004
+    - Fixed misc. bugs
+    - Applied patches by Benji Adams to:
+      * fix indexes for words occuring more than once (Word.pm)
+      * fix uninitialized errors for indexes (Link.pm)
+
+1.10  Feb 28 2009
+    - Fixed build to work with 4.2.2 (AbiSource), not compatible with previous versions
+    - Build no longer extracts object files or prompts for package directory (see README)
+    - Constructor only takes a lang arg (optional), no dictionary paths anymore
+    - Reorganized module directory structure.
+
+1.11  Mar 3 2009
+    - Doc fixes
+
+1.12  Mar 10 2009
+    - strict-ified scripts/
+    - Removed link definitions from Lingua::LinkParser::Definitions
+
+1.13  Mar 20 2009
+    - changed XS return type for sentence_get_word
+    - added $linkage->constituent_tree() to get a constituent tree in a Perl data structure
+    - added scripts/constituent-tree.pl to demonstrate how to process constituent trees
+    - added some comments to the scripts/*
+
+1.14  April 15 2009
+    - fixed tests to be compatible with link parser 4.5.3.
+
+1.15  April 16 2010
+    - minor test fixes for link parser 4.6.x.
+
+1.16  May 17 2011
+    - minor docs updates, tested with the link parser through 4.7.x.
+
+1.17  March 22 2014
+    - fixed build
+    - fixed dependency on dictionary_create
+    - fixed a broken test
+    - still need to remove dependencies on deprecated functions
+

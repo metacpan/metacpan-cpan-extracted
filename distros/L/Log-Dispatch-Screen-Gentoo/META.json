@@ -1,0 +1,77 @@
+{
+   "abstract" : "Gentoo-colored screen logging output",
+   "author" : [
+      "Sawyer X <xsawyerx@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Dispatch-Screen-Gentoo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Unicode::UTF8" : "0"
+         },
+         "requires" : {
+            "Encode" : "0",
+            "Log::Dispatch" : "0",
+            "Module::Runtime" : "0",
+            "Term::GentooFunctions" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Term::ANSIColor" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Dispatch::Screen::Gentoo" : {
+         "file" : "lib/Log/Dispatch/Screen/Gentoo.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xsawyerx/log-dispatch-screen-gentoo/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/xsawyerx/log-dispatch-screen-gentoo.git",
+         "web" : "https://github.com/xsawyerx/log-dispatch-screen-gentoo"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

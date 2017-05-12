@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <style type="text/css"></style>
+        <!-- depends on -->
+        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script type="text/javascript" src="./Locale/Utils/PlaceholderBabelFish.js"></script>
+    </head>
+    <body>
+        <h1>Version: 0.002</h1>
+        <script type="text/javascript">
+            localeUtilsPlaceholderBabelFish.prototype.pluralCode = function(count) {
+                return count == 1 ? 0 : 1;
+            };
+            var babelFish = new localeUtilsPlaceholderBabelFish();
+
+            var c = function(comment) {
+                document.writeln('<h1>' + comment + '</h1>');
+            };
+            var b = function (text, expected) {
+                document.writeln(
+                    '<pre>'
+                    + 'got:      ' + babelFish.expandBabelFish(text) + '\n'
+                    + 'expected: ' + expected
+                    + '</pre>'
+                );
+            };
+            var bx = function (text, argMap, expected) {
+                document.writeln(
+                    '<pre>'
+                    + 'got:      ' + babelFish.expandBabelFish(text, argMap) + '\n'
+                    + 'expected: ' + expected
+                    + '</pre>'
+                );
+            };
+
+            c('text');
+            b('simple string', 'simple string');
+            b(
+                'no placeholder \#{placeholder}', 
+                'no placeholder #{placeholder}'
+            );
+            bx(
+                'no plural \\((singular|plural))', 
+                1,
+                'no plural ((singular|plural))'
+            );
+
+            c('simple replace');
+            bx(
+                'single number argument #{count}', 
+                1,
+                'single number argument 1'
+            );
+            bx(
+                'attribute num #{count :num}', 
+                {'count' : 2},
+                'attribute num 2'
+            );
+            bx(
+                'html placeholder <strong>#{text :html}</strong>', 
+                {'text' : '<foo>'},
+                'html placeholder <strong>&lt;foo&gt;</strong>'
+            );
+
+            c('plural');
+            bx(
+                'singular (single number argument) ((test|tests))',
+                1,
+                'singular (single number argument) test'
+            );
+            bx(
+                'singular ((#{count :num} \\|test|#{count :num} \\|tests))',
+                1,
+                'singular 1 |test'
+            );
+            bx(
+                'multi plural ((#{count :num} test|#{count :num} tests)) and ((#{num :num} test|#{num :num} tests)):num',
+                {'count' : 1, 'num' : 2},
+                'multi plural 1 test and 2 tests'
+            );
+            bx(
+                'special number 0: ((#{count} test|=0 no tests|#{count} tests))',
+                0,
+                'special number 0: no tests'
+            );
+            bx(
+                'special number 100: ((=100 lots of tests|#{count} test|#{count} tests))',
+                100,
+                'special number 100: lots of tests'
+            );
+        </script>
+    </body>
+</html>

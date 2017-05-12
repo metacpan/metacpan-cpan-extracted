@@ -1,0 +1,20 @@
+Revision history for LWP-UserAgent-Snapshot
+0.0.1  2009-10-12       Initial release.
+
+0.02 - Fri Nov  6 00:01:44 2009
+	Removed an inadvertant Perl 5.9 regex feature "(*FAIL)"
+	in Build.PL, which stopped installation on pre-5.9 Perls.
+
+0.02 - Fri Nov  6 00:01:05 2009
+	Removed an inadvertant Perl 5.9 regex feature "(*FAIL)"
+	in Build.PL, which stopped installation on pre-5.9 Perls.
+
+0.02 - Tue Nov  3 00:07:10 2009
+	Removed an inadvertant Perl 5.9 regex feature "(*FAIL)"
+	in Build.PL, which stopped installation on pre-5.9 Perls.
+
+0.01 - Fri Oct 16 12:43:54 2009
+	Initial release. No real unit tests yet.  
+	However, is reasonably tested by use from various scripts using HTTP::Encapsulate.
+
+

@@ -1,0 +1,8 @@
+CHANGES
+Functional.pm
+MANIFEST
+Makefile.PL
+README
+t/pod.t
+t/simple.t
+META.yml                                 Module meta-data (added by MakeMaker)

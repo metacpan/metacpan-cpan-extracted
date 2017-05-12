@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+use strict;
+use List::Vectorize;
+
+my $sets = [];
+for (@ARGV) {
+	open F, $_ or die "cannot open $_";
+	push(@$sets, [ <F> ]);
+	close F;
+}
+print join "", @{union(@$sets)};

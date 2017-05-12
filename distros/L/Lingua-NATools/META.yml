@@ -1,0 +1,98 @@
+---
+abstract: 'A framework for Parallel Corpora processing'
+author:
+  - 'Alberto SimÃµes <ambs@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Config::AutoConf: '0.311'
+  ExtUtils::CBuilder: '0.27'
+  ExtUtils::LibBuilder: '0.01'
+  Module::Build: '0.3603'
+  Parse::Yapp::Driver: '1.05'
+  Pod::Man: '0'
+  Test::More: '0'
+configure_requires:
+  Capture::Tiny: '0.15'
+  Config::AutoConf: '0.311'
+  ExtUtils::CBuilder: '0.27'
+  ExtUtils::LibBuilder: '0.01'
+  ExtUtils::PkgConfig: '1.12'
+  Module::Build: '0.3603'
+  Parse::Yapp::Driver: '1.05'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-NATools
+provides:
+  Lingua::NATools:
+    file: lib/Lingua/NATools.pm
+    version: v0.7.10
+  Lingua::NATools::CGI:
+    file: lib/Lingua/NATools/CGI.pm
+    version: v0.7.10
+  Lingua::NATools::Client:
+    file: lib/Lingua/NATools/Client.pm
+    version: v0.7.10
+  Lingua::NATools::Config:
+    file: lib/Lingua/NATools/Config.pm
+    version: v0.7.10
+  Lingua::NATools::Corpus:
+    file: lib/Lingua/NATools/Corpus.pm
+    version: v0.7.10
+  Lingua::NATools::Corpus::Iterator:
+    file: lib/Lingua/NATools/Corpus.pm
+    version: v0.7.10
+  Lingua::NATools::Dict:
+    file: lib/Lingua/NATools/Dict.pm
+    version: v0.7.10
+  Lingua::NATools::Lexicon:
+    file: lib/Lingua/NATools/Lexicon.pm
+    version: v0.7.10
+  Lingua::NATools::Matrix:
+    file: lib/Lingua/NATools/Matrix.pm
+    version: v0.7.10
+  Lingua::NATools::NATDict:
+    file: lib/Lingua/NATools/NATDict.pm
+    version: v0.7.10
+  Lingua::NATools::PCorpus:
+    file: lib/Lingua/NATools/PCorpus.pm
+    version: v0.7.10
+requires:
+  CGI: '0'
+  Compress::Zlib: '1.16'
+  DBD::SQLite: '1.30'
+  DBI: '0'
+  DB_File: '1.804'
+  ExtUtils::MakeMaker: '6.31'
+  ExtUtils::Manifest: '0'
+  Fcntl: '1.03'
+  File::Copy: '2.06'
+  File::Path: '1.06'
+  File::Spec: '0.86'
+  IO::Socket: '1.28'
+  IPC::Open2: '1.01'
+  Lingua::Identify: '0.17'
+  Lingua::PT::PLNbase: '0.17'
+  Lingua::PTD: '1.00'
+  List::MoreUtils: '0'
+  MLDBM: '2.00'
+  Memoize: '0'
+  POSIX: '0'
+  Parse::Yapp::Driver: '1.05'
+  Storable: '2.04'
+  Term::ReadLine: '1.01'
+  Test::Harness: '2.26'
+  Test::Pod: '1.20'
+  Test::Pod::Coverage: '1.06'
+  Text::NSP: '1.09'
+  Time::HiRes: '1.2'
+  URI::Escape: '3.26'
+  XML::DT: '0.44'
+  XML::TMX: '0.21'
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.7.10
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -1,0 +1,31 @@
+---
+abstract: 'Perl extension for providing a Opentext Livelink EWS WebDAV connecter instance for CopyTree::VendorProof.'
+author:
+  - 'dbmolester de gmail'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Livelink-DAV
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 1.02
+  CopyTree::VendorProof: 0.0011
+  Data::Dumper: 2.121
+  File::Basename: 2.82
+  HTTP::DAV: 0.47
+  MIME::Base64: 3.13
+  Moose: 2.0602
+  MooseX::NonMoose: 0.22
+  Term::ReadKey: 2.3
+  namespace::autoclean: 0.13
+version: 0.0013

@@ -1,0 +1,47 @@
+[% 
+    title = 'MP3 Admin' ;
+    htmltitle = title ;
+
+    crumb2_name = 'Admin' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=home-admin' ;
+    crumb1_name = 'MP3s' ;
+%]
+
+<div class="boxer">
+  <p><a href="/mp3s/add">create a new MP3</a></p>
+  [% IF thanks %]<p>[% thanks %]</p>[% END %]
+  <p>Click on an source title to edit its content.</p>
+</div>
+
+<div class="boxer">
+<form id="EDIT" name="EDIT" method="POST" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="mp3s-admin" />
+
+<table class="blocker">
+<tr>
+	<th>Order</th>
+	<th>Category</th>
+	<th>Source</th>
+	<th>Publish</th>
+	<th>Action</th>
+</tr>
+[% FOREACH record = data %]
+<tr>
+	<td><input type="text" name="ORDER[% record.mp3id %]" value="[% record.orderno %]" size="2" /></td>
+	<td>[% record.category %]</td>
+	<td nowrap><a href="/mp3s-edit?mp3id=[% record.mp3id %]">[% record.source %]</a></td>
+	<td>[% record.publish %]</td>
+	<td><input type="checkbox" name="LISTED" value="[% record.mp3id %]" /></td>
+</tr>
+[% END %]
+</table>
+
+<p>
+<input type="hidden" name='doaction' value='' />
+<input type="button" value='ReOrder' onClick="doSubmit('ReOrder')" />
+<input type="button" value='Promote' onClick="doSubmit('Promote')" />
+<input type="button" value='Copy'    onClick="doOnlyOne('Copy')" />
+<input type="button" value='Delete'  onClick="doSubmit('Delete')" />
+</p>
+</form>
+</div>

@@ -1,0 +1,61 @@
+{
+   "abstract" : "Returns the names of postcodes/zipcodes",
+   "author" : [
+      "Lance Wicks <lancew@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lingua-Postcodes",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::Postcodes" : {
+         "file" : "lib/Lingua/Postcodes.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lancew/Ligua-Postcodes/issues"
+      },
+      "homepage" : "https://github.com/lancew/Ligua-Postcodes",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/lancew/Ligua-Postcodes.git",
+         "web" : "https://github.com/lancew/Ligua-Postcodes"
+      }
+   },
+   "version" : "0.002",
+   "x_contributors" : [
+      "Lance Wicks <lw@judocoach.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ]
+}
+

@@ -1,0 +1,86 @@
+
+================================================================================
+
+LEOCHARRE::Strings - Combines string procedures I frequently use
+
+SYNOPSIS
+       use LEOCHARRE:Strings ':all';
+   
+       my $var = ' /path/to/file ';
+   
+       shomp $var; # remove whitespace leading and trailing
+   
+       my $shell_safe = sq($var); # escapes chars for shell
+       pretty($var); # make pretty
+
+SUBS
+    Not imported by default.
+
+  sq()
+    String::ShellQuote::shell_quote. Arg is string, makes safe for shell
+    use.
+
+  pretty()
+    String::Prettify::prettify()
+
+  shomp()
+    Arg is string variable. Takes out all leading and ending whitespace from
+    string.
+
+       my $var= ' this is ';
+
+       shomp $var;
+
+       # now $var is 'this is'
+
+    Returns true if it found something, false if not. This alters your
+    original variable, as chomp would. cannot take lists as args.
+
+  is_blank()
+    Arg is string. Returns true if it's defined, and has a non space char.
+    Returns false if undefined or ony contains whitespace.
+
+  is_comment()
+    Arg is string. Returns true if it's # comment line only, false
+    otherwise.
+
+  boc() is_blank_or_comment()
+    Arg is string. Returns true if it's a blank like or comment line.
+
+AUTHOR
+    Leo Charre leocharre at cpan dot org
+
+LICENSE
+    This package is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, i.e., under the terms of the
+    'Artistic License' or the 'GNU General Public License'.
+
+DISCLAIMER
+    This package is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    See the 'GNU General Public License' for more details.
+
+
+--------------------------------------------------------------------------------
+
+
+
+REQUIRES
+
+Carp: 1
+Exporter: 5
+Smart::Comments: 1
+String::Prettify: 1.03
+String::ShellQuote: 1.03
+Test::Simple: 0
+
+
+INSTALL
+
+   perl Makefile.PL
+   make install
+
+
+

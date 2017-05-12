@@ -1,0 +1,53 @@
+AlignmentSet version 1.1
+========================
+
+    This module is a Tools Library to manage an Alignment Set, i.e. a set of sentences aligned at the word (or phrase) level. It provides methods to display the links, to apply a function to each alignment of the set, to evaluate the alignments against a reference, and more. One of the objectives of the module is to allow the user to perform all these operations without bothering with the particular physical format of the Alignment Set. Anyway it also provides format conversion methods.
+
+PREREQUISITES
+
+- Perl 5.005 (or a more recent version)
+- The following CPAN modules and libraries (available from www.cpan.org):
+   * Pod::Usage (included in the Perl library, in the recent Perl versions) 
+
+INSTALLATION
+
+Extract the tar ball (or copy the extracted Lingua-AlignmentSet-xx directory) where you want to keep the reference pdf file, the sample code file and the command-line tools.
+
+Then to install the library modules go into the Lingua-AlignmentSet-xx directory and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install the modules in a custom directory add the PREFIX and/or LIB tags. For example:
+
+   perl Makefile.PL LIB=/your/lib/path 
+
+will specify '/your/lib/path' as the installation directory for the modules
+(to use the modules, make sure you have this path in your PERL5LIB environment variable).
+
+INSTRUCTIONS FOR USE
+
+See the detailed documentation in docs/reference.pdf (out of date:  Read the ./bin/*.pl manuals instead, with -man option).
+
+You may use the command-line utilities in the bin/ directory or include directly the library calls in a perl script. Look at code examples in the bin/sampleCode.pl program (out of date: instead, look at the examples in the ./bin/*.pl manuals with -man option).
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005 Patrik Lambert
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+

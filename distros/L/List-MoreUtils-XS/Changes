@@ -1,0 +1,9 @@
+Revision history for Perl extension List-MoreUtils-XS
+
+0.418 2017-03-29
+    - clarify license conditions
+
+0.417_001 2017-03-22
+    - Divorce List::MoreUtils and List::MoreUtils::XS
+    - Change license to Apache 2.0 to avoid code stealing without credits
+    - Don't support Perl 5.6 out of the box anymore

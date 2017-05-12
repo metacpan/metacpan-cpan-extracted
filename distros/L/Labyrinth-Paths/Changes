@@ -1,0 +1,13 @@
+Changes for Labyrinth-Paths
+===========================
+
+0.03    2015-01-01
+        - updated Abstract.
+        - updated documentation.
+
+0.02    2015-02-23
+        - fixed parser.
+        - extended funcional test suite.
+
+0.01    2015-02-22
+        - first version.

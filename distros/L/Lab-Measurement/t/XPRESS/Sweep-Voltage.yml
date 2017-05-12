@@ -1,0 +1,452 @@
+---
+id: 0
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 1
+method: Query
+retval: '+0.00000E+0'
+---
+id: 2
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 3
+method: Query
+retval: '+0.00000E+0'
+---
+id: 4
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 5
+method: Query
+retval: '+0.00000E+0'
+---
+id: 6
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion?
+id: 7
+method: Query
+retval: VOLT
+---
+id: 8
+method: is_blocked
+retval: 0
+---
+id: 9
+method: is_blocked
+retval: 0
+---
+id: 10
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 11
+method: Query
+retval: '+0.00000E+0'
+---
+id: 12
+method: is_blocked
+retval: 0
+---
+id: 13
+method: is_blocked
+retval: 0
+---
+id: 14
+method: is_blocked
+retval: 0
+---
+id: 15
+method: is_blocked
+retval: 0
+---
+id: 16
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 17
+method: Query
+retval: '1E+0'
+---
+command: :SOURce:LEVel 0.100000
+id: 18
+method: Write
+retval: 1
+---
+id: 19
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 20
+method: Query
+retval: '+0.10000E+0'
+---
+id: 21
+method: is_blocked
+retval: 0
+---
+id: 22
+method: is_blocked
+retval: 0
+---
+id: 23
+method: is_blocked
+retval: 0
+---
+id: 24
+method: is_blocked
+retval: 0
+---
+id: 25
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 26
+method: Query
+retval: '1E+0'
+---
+command: :SOURce:LEVel 0.200000
+id: 27
+method: Write
+retval: 1
+---
+id: 28
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 29
+method: Query
+retval: '+0.20000E+0'
+---
+id: 30
+method: is_blocked
+retval: 0
+---
+id: 31
+method: is_blocked
+retval: 0
+---
+id: 32
+method: is_blocked
+retval: 0
+---
+id: 33
+method: is_blocked
+retval: 0
+---
+id: 34
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 35
+method: Query
+retval: '1E+0'
+---
+command: :SOURce:LEVel 0.300000
+id: 36
+method: Write
+retval: 1
+---
+id: 37
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 38
+method: Query
+retval: '+0.30000E+0'
+---
+id: 39
+method: is_blocked
+retval: 0
+---
+id: 40
+method: is_blocked
+retval: 0
+---
+id: 41
+method: is_blocked
+retval: 0
+---
+id: 42
+method: is_blocked
+retval: 0
+---
+id: 43
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 44
+method: Query
+retval: '1E+0'
+---
+command: :SOURce:LEVel 0.400000
+id: 45
+method: Write
+retval: 1
+---
+id: 46
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 47
+method: Query
+retval: '+0.40000E+0'
+---
+id: 48
+method: is_blocked
+retval: 0
+---
+id: 49
+method: is_blocked
+retval: 0
+---
+id: 50
+method: is_blocked
+retval: 0
+---
+id: 51
+method: is_blocked
+retval: 0
+---
+id: 52
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 53
+method: Query
+retval: '1E+0'
+---
+command: :SOURce:LEVel 0.500000
+id: 54
+method: Write
+retval: 1
+---
+id: 55
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 56
+method: Query
+retval: '+0.50000E+0'
+---
+id: 57
+method: is_blocked
+retval: 0
+---
+id: 58
+method: is_blocked
+retval: 0
+---
+id: 59
+method: is_blocked
+retval: 0
+---
+id: 60
+method: is_blocked
+retval: 0
+---
+id: 61
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 62
+method: Query
+retval: '1E+0'
+---
+command: :SOURce:LEVel 0.600000
+id: 63
+method: Write
+retval: 1
+---
+id: 64
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 65
+method: Query
+retval: '+0.60000E+0'
+---
+id: 66
+method: is_blocked
+retval: 0
+---
+id: 67
+method: is_blocked
+retval: 0
+---
+id: 68
+method: is_blocked
+retval: 0
+---
+id: 69
+method: is_blocked
+retval: 0
+---
+id: 70
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 71
+method: Query
+retval: '1E+0'
+---
+command: :SOURce:LEVel 0.700000
+id: 72
+method: Write
+retval: 1
+---
+id: 73
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 74
+method: Query
+retval: '+0.70000E+0'
+---
+id: 75
+method: is_blocked
+retval: 0
+---
+id: 76
+method: is_blocked
+retval: 0
+---
+id: 77
+method: is_blocked
+retval: 0
+---
+id: 78
+method: is_blocked
+retval: 0
+---
+id: 79
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 80
+method: Query
+retval: '1E+0'
+---
+command: :SOURce:LEVel 0.800000
+id: 81
+method: Write
+retval: 1
+---
+id: 82
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 83
+method: Query
+retval: '+0.80000E+0'
+---
+id: 84
+method: is_blocked
+retval: 0
+---
+id: 85
+method: is_blocked
+retval: 0
+---
+id: 86
+method: is_blocked
+retval: 0
+---
+id: 87
+method: is_blocked
+retval: 0
+---
+id: 88
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 89
+method: Query
+retval: '1E+0'
+---
+command: :SOURce:LEVel 0.900000
+id: 90
+method: Write
+retval: 1
+---
+id: 91
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 92
+method: Query
+retval: '+0.90000E+0'
+---
+id: 93
+method: is_blocked
+retval: 0
+---
+id: 94
+method: is_blocked
+retval: 0
+---
+id: 95
+method: is_blocked
+retval: 0
+---
+id: 96
+method: is_blocked
+retval: 0
+---
+id: 97
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 98
+method: Query
+retval: '1E+0'
+---
+command: :SOURce:LEVel 1.000000
+id: 99
+method: Write
+retval: 1
+---
+id: 100
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 101
+method: Query
+retval: '+1.00000E+0'
+---
+id: 102
+method: is_blocked
+retval: 0
+---
+command: :PROG:HALT
+id: 103
+method: Write
+retval: 1

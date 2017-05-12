@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+Da.pm
+README
+stemmer.pl
+test.pl
+diffs.txt
+stop.txt

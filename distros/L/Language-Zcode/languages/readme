@@ -1,0 +1,9 @@
+Support & library files for translating into different languages
+-----------------------------------------------------------------
+
+hello.inf		Inform Hello, world program (42 bytes)
+hello.z5		Compiled hello.inf (1,536 bytes!)
+
+Various dirs will have hello_expected.*, which is what you should expect
+to get when translating hello.z5 to that language. Look at these as a
+simple(st) example of how translations work.

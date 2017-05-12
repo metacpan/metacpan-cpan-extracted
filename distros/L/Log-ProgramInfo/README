@@ -1,0 +1,27 @@
+This module, Log::ProgramInfo writes a log at the end of execution of a program,
+containing the global characteristics of the job.  These are generally the
+value that each had at the end of execution.
+
+This includes:
+
+    - Modules loaded
+      - Name
+      - Version
+      - Pathname loaded from
+      - checksum
+    - Include path for module search
+    - System Info
+      - various uname values
+      - Perl interpretor version and pathname/checksum of binary
+      - location and checksum of libc used by Perl
+      - per-processor info
+    - Program Invocation
+      - Program name, pathname, version, and checksum
+      - Command line arguments provided (copied when Log::ProgramInfo is loaded)
+    - Program characteristics
+      - Time: start, end, duration (in milliseconds)
+      - exit status
+
+Bug reports, enhancement requests are welcome (especially with patches).
+
+Please send any requests to B<mailto:BoutrosLabSoftware@oicr.on.ca>.

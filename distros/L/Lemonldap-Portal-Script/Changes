@@ -1,0 +1,6 @@
+Revision history for Perl extension Lemonldap::Portal::Script.
+
+0.01  Mon Aug 11 14:50:38 2008
+	- original version; created by h2xs 1.23 with options
+		-XAn Lemonldap::Portal::Script
+

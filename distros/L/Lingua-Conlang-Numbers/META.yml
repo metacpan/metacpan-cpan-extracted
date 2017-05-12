@@ -1,0 +1,41 @@
+---
+name: Lingua-Conlang-Numbers
+version: 0.04
+author:
+  - 'Nick Patch <patch@cpan.org>'
+abstract: Convert numbers into words in various constructed languages
+license: perl
+resources:
+  homepage: http://github.com/patch/lingua-conlang-numbers
+  repository: git://github.com/patch/lingua-conlang-numbers.git
+build_requires:
+  Test::More: 0.40
+  ok: 0.01
+requires:
+  Readonly: 1.03
+  Regexp::Common: 0.03
+  perl: v5.8.1
+recommends:
+  Readonly::XS: 1.02
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Lingua::Conlang::Numbers:
+    file: lib/Lingua/Conlang/Numbers.pm
+    version: 0.04
+  Lingua::EO::Numbers:
+    file: lib/Lingua/EO/Numbers.pm
+    version: 0.03
+  Lingua::JBO::Numbers:
+    file: lib/Lingua/JBO/Numbers.pm
+    version: 0.03
+  Lingua::TLH::Numbers:
+    file: lib/Lingua/TLH/Numbers.pm
+    version: 0.01
+  Lingua::TokiPona::Numbers:
+    file: lib/Lingua/TokiPona/Numbers.pm
+    version: 0.03
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

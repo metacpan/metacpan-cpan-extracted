@@ -1,0 +1,71 @@
+{
+   "abstract" : "extremely lightweight but not very powerful web application framework",
+   "author" : [
+      "Ashley Willis <ashley+perl@gitable.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Limper",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "IO::Socket" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Net::HTTP::Client" : "0.011",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Limper" : {
+         "file" : "lib/Limper.pm",
+         "version" : "0.013"
+      },
+      "Limper::Engine" : {
+         "file" : "lib/Limper/Engine.pm",
+         "version" : "0.013"
+      },
+      "Limper::Passphrase" : {
+         "file" : "lib/Limper/Passphrase.pm",
+         "version" : "0.013"
+      },
+      "Limper::Plugin" : {
+         "file" : "lib/Limper/Plugin.pm",
+         "version" : "0.013"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "ssh://git@gitable.org/ashley/limper.git"
+      }
+   },
+   "version" : "0.013"
+}
+

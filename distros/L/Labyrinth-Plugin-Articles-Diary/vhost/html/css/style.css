@@ -1,0 +1,70 @@
+/**************** thumbnail styles ****************/		
+.thumbnail {
+  display: block;
+  padding-bottom: 10px;
+  /*border-bottom: 1px solid #DDDDDD;*/
+  margin-top: 0px;
+  padding-top: 5px;
+}
+
+.thumb1,
+.thumbleft {
+  float: left;
+  margin: 0 5px 4px 0;
+  padding: 4px;
+  border: 1px solid #a0a0a0;
+  text-align: center;
+}
+
+.thumb2,
+.thumbcenter {
+  display: block;
+  margin: 0 auto 4px auto;
+  padding: 4px;
+  border: 1px solid #a0a0a0;
+  text-align: center;
+}
+
+.thumb3,
+.thumbright {
+  float: right;
+  margin: 0 0 4px 5px;
+  padding: 4px;
+  border: 1px solid #a0a0a0;
+  text-align: center;
+}
+
+.thumb1 p,
+.thumb2 p,
+.thumb3 p,
+.thumbleft   p,
+.thumbcenter p,
+.thumbright  p {
+  margin: 0;
+  padding: 0 0 -15px 0;
+}
+
+.thumb1 img,
+.thumb2 img,
+.thumb3 img,
+.thumbleft   img,
+.thumbcenter img,
+.thumbright  img {
+  margin: 0px;
+  padding: 0px;
+}
+
+.thumb1 a img,
+.thumb2 a img,
+.thumb3 a img,
+.thumbleft   a img,
+.thumbcenter a img,
+.thumbright  a img {
+  border: none;
+}
+
+.clear { float: none; }
+
+table.prevnext          { background-color: #fff; border: 0px #000 solid; width: 100% }
+table.prevnext td.left  { background-color: #fff; text-align: left; }
+table.prevnext td.right { background-color: #fff; text-align: right; }

@@ -1,0 +1,24 @@
+Revision history for Perl module Lingua::EN::FindNumber
+
+1.32 2015-10-25 NEILB
+    - Minor documentation improvements.
+    - Changed github repo URL after changing my github username.
+
+1.31 2015-07-04 NEILB
+    - Added [MetaJSON] to dist.ini, so release will include META.json.
+      RT#105631 from ETHER++
+
+1.30 2014-06-22 NEILB
+    - Switched to Dist::Zilla
+    - Added github repo to pod
+    - Reformatted this file as per CPAN::Changes::Spec
+
+1.2 2005-09-20 TMTM
+    - Add link to Advanced Perl Programming now that it's published
+
+1.1 2004-10-24 TMTM
+    - Tony Bowden is now maintainer
+
+1.0 2003-12-07 SIMON
+    - First release to CPAN
+

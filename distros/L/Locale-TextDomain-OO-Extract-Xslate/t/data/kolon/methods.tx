@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+: $c.__("Just some text")
+<html>
+  <head>
+    <title><: $c.__("Page title") :></title>
+  </head>
+  <body>
+    <p>
+: for $c.books -> $book {
+      <em><: $c.__x("Book named '{title}'.", title => $book.title) :></em>
+      <br/>
+: }
+      <: $c.__("Text with umlauts: äöüß.") :>
+      <br/>
+      <: $c.__px("some context", "Text with {variable}.", variable => $c.req.param('variable')) :>
+      <br/>
+      <: $c.__nx("Singular form with {variable1} and {variable2}.", "Plural form with {variable1} and {variable2}!", $c.req.param('plural'), variable1 => "one", variable2 => "two" ) :>
+      <br/>
+      <: $c.__npx("Whole other context", "Singular form with {variable}.", "Plural form with {variable}!", 2, variable => $c.req.param('variable')) :>
+    </p>
+  </body>
+</html>

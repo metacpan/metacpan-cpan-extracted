@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/List-Object.t
+lib/List/Object.pm
+t/data/Person.pm
+t/data/BadPerson.pm
+META.yml                                 Module meta-data (added by MakeMaker)

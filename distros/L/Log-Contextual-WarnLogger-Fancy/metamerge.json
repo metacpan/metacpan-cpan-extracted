@@ -1,0 +1,12 @@
+{
+  "resources":{
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/kentnl/Log-Contextual-WarnLogger-Fancy",
+      "web": "https://github.com/kentnl/Log-Contextual-WarnLogger-Fancy"
+    },
+    "bugtracker": {
+      "web": "https://github.com/kentnl/Log-Contextual-WarnLogger-Fancy/issues"
+    }
+  }
+}

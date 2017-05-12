@@ -1,0 +1,68 @@
+{
+   "abstract" : "Log to Files that Archive/Rotate Themselves",
+   "author" : [
+      "Michael Schout <mschout@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Log-Dispatch-FileRotate",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Manip" : "0",
+            "Fcntl" : "0",
+            "File::Spec" : "0",
+            "Log::Dispatch::File" : "0",
+            "Log::Dispatch::Output" : "0",
+            "Params::Validate" : "0",
+            "base" : "0",
+            "perl" : "5.005",
+            "strict" : "0",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "POSIX" : "0",
+            "Path::Tiny" : "0.018",
+            "Socket" : "0",
+            "Test::More" : "0.88",
+            "Test::Warn" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-log-dispatch-filerotate at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Log-Dispatch-FileRotate"
+      },
+      "homepage" : "http://search.cpan.org/dist/Log-Dispatch-FileRotate/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mschout/perl-log-dispatch-filerotate.git",
+         "web" : "https://github.com/mschout/perl-log-dispatch-filerotate"
+      }
+   },
+   "version" : "1.25",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

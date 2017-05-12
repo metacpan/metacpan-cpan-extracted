@@ -1,0 +1,6 @@
+Revision history for Perl extension PerlIO::via::PinyinConvert.
+
+0.01  Sun Feb  9 02:19:54 2003
+	- original version; created by h2xs 1.21 with options
+		-XA PerlIO::via::PinyinConvert
+

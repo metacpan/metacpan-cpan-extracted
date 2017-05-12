@@ -1,0 +1,18 @@
+
+Not much to do to get this to work. 
+
+Copy one of the "mail_dshield.pl" scripts
+into a suitable directory.
+
+Configure EITHER smtp or a sendmail equivalent.
+
+Set your DShield UserID, and mail address
+
+Adjust the PATH to the dshield cache directory, it
+should be the same as what you've configured for the
+LaBrea::Tarpit::daemon. 
+
+Run periodically from cron, it's smart enough to delete
+its old files and hang on to the ones that don't get
+sent for a retry.
+

@@ -1,0 +1,310 @@
+NAME
+    Log::Agent - logging agent
+
+SYNOPSIS
+     use Log::Agent;            # in all reusable components
+     logerr "error";
+     logtrc "notice:12", "notice that" if ...;
+     logdie "log and die";
+
+     use Log::Agent;            # in application's main
+     logconfig(-prefix => $0);  # simplest, uses default driver
+
+     use Log::Agent;                    # another more complex example
+     require Log::Agent::Driver::File;  # logging made to file
+     logconfig(-driver =>
+         Log::Agent::Driver::File->make(
+             -prefix      => $0,
+             -showpid     => 1,
+             -channels    => {
+                 'error'  => "$0.err",
+                 'output' => "$0.out",
+                 'debug'  => "$0.dbg",
+             },
+         )
+     );
+
+DESCRIPTION
+    The `Log::Agent' module provides an abstract layer for logging and
+    tracing, which is independant from the actual method used to physically
+    perform those activities. It acts as an agent (hence the name) that
+    collects the requests and delegates processing to a sublayer: the
+    logging driver.
+
+    The `Log::Agent' module is meant to be used in all reusable components,
+    since they cannot know in advance how the application which ends up
+    using them will perform its logging activities: either by emitting
+    messages on stdout and errors on stderr, or by directing messages to
+    logfiles, or by using syslog(3).
+
+    The logging interface is common for all the logging drivers, and is
+    therefore the result of a compromise between many logging schemes: any
+    information given at this level must be either handled by all drivers,
+    or may be ignored depending on the application's final choice.
+
+PRIORITIES AND LEVEL
+    The `Log::Agent' module can use both priorities (as defined by
+    syslog(3)) or logging levels, or either, in which case there is an
+    implicit computation of the missing item (i.e. the level 4, for
+    instance, corresponds to the "warning" priority, and vice-versa). See
+    Log::Agent::Priorities for more details.
+
+    A logging level is defined as being a threshold: any level lesser than
+    or equal to that threshold will be logged.
+
+    At the `Log::Agent' level, it is possible to define a trace level and a
+    debug level. Only the messages below those levels (inclusive) will be
+    handed out to the underlying driver for logging. They are used by the
+    logtrc() and logdbg() routines, respectively.
+
+CHANNELS
+    The `Log::Agent' class defines three logging channels, which are
+    `error', `output' and `debug'. Depending on the driver used for logging,
+    those channels are ignored (typically with syslog()) or may be
+    implicitely defined (default logging, i.e. the one achieved by the
+    `Log::Agent::Driver::Default' driver, remaps `error' and `debug' to
+    stderr, `output' to stdout).
+
+INTERFACE
+    Anywhere a *message* is expected, it can be a single string, or a
+    printf()-like format string followed by the required arguments. The
+    special macro `%m' is handled directly by `Log::Agent' and is replaced
+    by the string version of $!, which is the last error message returned by
+    the last failing system call.
+
+    NOTE: There should not be any trailing "\n" in the *message* strings,
+    nor any embededed one, although this is not enforced. Remember that the
+    main purpose of `Log::Agent' is to specify logging messages in a
+    standard way! Therefore, most of the time, a "should" should be read as
+    "must" and "should not" as "must not", which is the strongest
+    interdiction form available in English, as far as I know.
+
+    Here are valid *message* examples:
+
+        "started since $time"
+        "started since %s", $time
+        "fork: %m"
+
+    The follwing logging interface is made available to modules:
+
+    logdbg *priority*, *message*
+        Debug logging of *message* to the `debug' channel.
+
+        You may specify any priority you want, i.e. a `debug' priority is
+        not enforced here. You may even specify `"notice:4"' if you wish, to
+        have the message logged if the debug level is set to 4 or less. If
+        handed over to syslog(3), the message will nonetheless be logged at
+        the `notice' priority.
+
+    logtrc *priority*, *message*
+        Trace logging of *message* to the `output' channel.
+
+        Like logdbg() above, you are not restricted to the `info' priority.
+        This routine checks the logging level (either explicit as in
+        `"info:14"' or implicit as in `"notice"') against the trace level.
+
+    logsay *message*
+        Log the message at the `notice' priority to the `output' channel.
+        The logging always takes place under the default `-trace' settings,
+        but only if the routine is called, naturally. This means you can
+        still say:
+
+            logsay "some trace message" if $verbose;
+
+        and control whether the message is emitted by using some external
+        configuration for your module (e.g. by adding a -verbose flag to the
+        creation routine of your class).
+
+    logwarn *message*
+        Log a warning message at the `warning' priority to the `error'
+        channel.
+
+    logcarp *message*
+        Same as logwarn(), but issues a Carp::carp(3) call instead, which
+        will warn from the perspective of the routine's caller.
+
+    logerr *message*
+        Log an error message at the `error' priority to the `error' channel.
+
+    logdie *message*
+        Log a fatal message at the `critical' priority to the `error'
+        channel, and then dies.
+
+    logconfess *message*
+        Same as logdie(), but issues a Carp::confess(3) call instead. It is
+        possible to configure the `Log::Agent' module via the `-confess'
+        switch to automatically redirect a logdie() to logconfess(), which
+        is invaluable during unit testing.
+
+    logcroak *message*
+        Same as logdie(), but issues a Carp::croak(3) call instead. It is
+        possible to configure the `Log::Agent' module via the `-confess'
+        switch to automatically redirect a logcroak() to logconfess(), which
+        is invaluable during unit testing.
+
+    Log::Agent::inited
+        Returns true when `Log::Agent' was initialized, either explicitely
+        via a logconfig() or implicitely via any logxxx() call.
+
+    Modules sometimes wish to report errors from the perspective of their
+    caller's caller, not really their caller. The following interface is
+    therefore provided:
+
+    logxcarp *offset*, *message*
+        Same a logcarp(), but with an additional offset to be applied on the
+        stack. To warn one level above your caller, set it to 1.
+
+    logxcroak *offset*, *message*
+        Same a logcroak(), but with an additional offset to be applied on
+        the stack. To report an error one level above your caller, set it to
+        1.
+
+    For applications that wish to implement a debug layer on top of
+    `Log::Agent', the following routine is provided. Note that it is not
+    imported by default, i.e. it needs to be explicitely mentionned at `use'
+    time, since it is not meant to be used directly under regular usage.
+
+    logwrite *channel*, *priority*, *message*
+        Unconditionally write the *message* at the given *priority* on
+        *channel*. The channel can be one of `debug', `error' or `output'.
+
+    At the application level, one needs to commit once and for all about the
+    logging scheme to be used. This is done thanks to the logconfig()
+    routine which takes the following switches, in alphabetical order:
+
+    `-caller' => [ *parameters* ]
+        Request that caller information (relative to the logxxx() call) be
+        part of the log message. The given *parameters* are handed off to
+        the creation routine of `Log::Agent::Tag::Caller' and are documented
+        there.
+
+        I usually say something like:
+
+         -caller => [ -display => '($sub/$line)', -postfix => 1 ]
+
+        which I find informative enough. On occasion, I found myself using
+        more complex sequences. See Log::Agent::Tag::Caller.
+
+    `-confess' => *flag*
+        When true, all logdie() calls will be automatically masqueraded as
+        logconfess().
+
+    `-debug' => *priority or level*
+        Sets the priority threshold (can be expressed as a string or a
+        number, the string being mapped to a logging level as described
+        above in PRIORITIES AND LEVEL) for logdbg() calls.
+
+        Calls tagged with a level less than or equal to the given threshold
+        will pass through, others will return prematurely without logging
+        anything.
+
+    `-driver' => *driver_object*
+        This switch defines the driver object to be used, which must be an
+        heir of the `Log::Agent::Driver' class. See Log::Agent::Driver(3)
+        for a list of the available drivers.
+
+    `-level' => *priority or level*
+        Specifies both `-debug' and `-trace' levels at the same time, to a
+        common value.
+
+    `-prefix' => *name*
+        Defines the application name which will be pre-pended to all
+        messages, followed by `": "' (a colon and a space). Using this
+        switch alone will configure the default driver to use that prefix
+        (stripped down to its basename component).
+
+        When a driver object is used, the `-prefix' switch is kept at the
+        `Log::Agent' level only and is not passed to the driver: it is up to
+        the driver's creation routine to request the `-prefix'. Having this
+        information in Log::Agent enables the module to die on critical
+        errors with that error prefix, since it cannot rely on the logging
+        driver for that, obviously.
+
+    `-priority' => [ *parameters* ]
+        Request that message priority information be part of the log
+        message. The given *parameters* are handed off to the creation
+        routine of `Log::Agent::Tag::Priority' and are documented there.
+
+        I usually say something like:
+
+                -priority => [ -display => '[$priority]' ]
+
+        which will display the whole priority name at the beginning of the
+        messages, e.g. "[warning]" for a logwarn() or "[error]" for
+        logerr(). See Log::Agent::Tag::Priority and Log::Agent::Priorities.
+
+        NOTE: Using `-priority' does not prevent the `-duperr' flag of the
+        file driver to also add its own hardwired prefixing in front of
+        duplicated error messages. The two options act at a different level.
+
+    `-tags' => [ *list of `Log::Agent::Tag' objects* ]
+        Specifies user-defined tags to be added to each message. The objects
+        given here must inherit from `Log::Agent::Tag' and conform to its
+        interface. See Log::Agent::Tag for details.
+
+        At runtime, well after logconfig() was issued, it may be desirable
+        to add (or remove) a user tag. Use the `logtags()' routine for this
+        purpose, and iteract directly with the tag list object.
+
+        For instance, a web module might wish to tag all the messages with a
+        session ID, information that might not have been available by the
+        time logconfig() was issued.
+
+    `-trace' => *priority or level*
+        Same a `-debug' but applies to logsay(), logwarn(), logerr() and
+        logtrc().
+
+        When unspecified, `Log::Agent' runs at the "notice" level.
+
+    Additional routines, not exported by default, are:
+
+    logtags
+        Returns a `Log::Agent::Tag_List' object, which holds all
+        user-defined tags that are to be added to each log message.
+
+        The initial list of tags is normally supplied by the application at
+        logconfig() time, via the `-tags' argument. To add or remove tags
+        after configuration time, one needs direct access to the tag list,
+        obtained via this routine. See Log::Agent::Tag_List for the
+        operations that can be performed.
+
+KNOWN LIMITATIONS
+    The following limitations exist in this early version. They might be
+    addressed in future versions if they are perceived as annoying
+    limitatons instead of being just documented ones. :-)
+
+    *   A module which calls logdie() may have its die trapped if called
+        from within an eval(), but unfortunately, the value of $@ is
+        unpredictable: it may be prefixed or not depending on the driver
+        used. This is harder to fix as one might think of at first glance.
+
+    *   Some drivers lack customization and hardwire a few things that come
+        from my personal taste, like the prefixing done when *duperr* is set
+        in Log::Agent::Driver::File, or the fact that the `debug' and
+        `stderr' channels are merged as one in the
+        Log::Agent::Driver::Default driver.
+
+    *   When using logcroak() or logconfess(), the place where the call was
+        made can still be visible when -caller is used, since the addition
+        of the caller information to the message is done before calling the
+        logging driver. Is this a problem?
+
+AUTHOR
+    Log::Agent was originally authored by Raphael Manfredi
+    <Raphael_Manfredi@pobox.com> and is currently maintained by Mark Rogaski
+    <mrogaski@cpan.org>.
+
+LICENSE
+    Copyright (c) 1999-2000 Raphael Manfredi.
+
+    Copyright (c) 2002-2015 Mark Rogaski; all rights reserved.
+
+    This module is free software. You can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0.
+
+    This program is distributed in the hope that it will be useful, but
+    without any warranty; without even the implied warranty of
+    merchantability or fitness for a particular purpose.
+
+SEE ALSO
+    Log::Agent::Driver(3), Carp(3).

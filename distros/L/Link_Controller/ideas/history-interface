@@ -1,0 +1,161 @@
+Objects
+
+The history keeps three kinds of data, which should really be treated
+somewhat separately.  
+
+	1 information about our present run and what it has done..
+	  Generally, for each document we should check (not leaf),
+	  whether it has been checked yet, also for each failed link,
+	  which documents it was referenced from.
+
+	2 information about the world and it's status (mime headers
+	  etc for each URL).  This is effectively a cache of
+	  information we treat as statically determinable through the
+	  run.  This is split into:-
+
+		- information we have determined ourself this run in a
+		  personal database we have write access to
+
+		- information from outside sources which we simply
+		  read as we go along
+
+	3 meta-information about the last kind of information.  For
+	  example, who last checked it and when.  
+
+Type 1 information is personal to the present run of momspider, or
+possibly any runs that are happening in parallel with it.  Generally,
+it's just going to cover the pages of the infostructure that momspider
+is checking
+
+Type 2 information is, in principle, always derivable from the real
+world (go fetch the meta info :-)
+
+Type 3 information is used mainly by maintainance processes.  But also
+to allow momspider to be more selective about what data it uses, where
+a user dosen't trust the database, or dosen't think it is sufficiently
+up to date.
+
+History
+
+create history..
+
+hist_stat History ( filename [, filename [..]] )	files are databases
+	returns success status
+Hist_entry History::info ( 'url' )
+	returns the corresponding entry or success
+hist_stat History::
+
+
+History Entry
+
+	parts for normal running..
+
+Hist_Entry::meta_info_record ( RFC-header )  returns (just) the value
+						of that rfc header
+						stored.
+Hist_Entry::all_meta_info ()
+
+Hist_Entry::who_checked () the id of the person who ran the check recorded
+Hist_Entry::when_checked () the timestamp given (as GNU format time..)
+Hist_Entry::status () the status of the given history entry
+
+
+	for maintainance
+
+History_Entry::delete () get rid of that entry from the database ???
+
+
+
+
+How to write the program?   It should be written as an attempt to fill
+a complete history entry.  
+
+
+Ideas:- 
+
+	o prioritisation of jobs according to how easy they are to complete.
+
+	o efficient parallelisation of the process.. multiple machines
+	  WIDELY distributed, communicate minimal progress info from
+	  shared data and MD5 digests
+
+Implementation
+
+The history will be implemented as an xdbm file.  It will be keyed on
+the url of the data (as converted to the best possible format, by
+deletion of dir/.. and ./ within it. also possibly hostname converted
+to cannonical form.. (more suggestions for fixes in output file?) )
+
+Each entry will be 
+
+     Entry Meta Data
+	   (date-checked, timeout-count, owner_end_ptr, owner)
+
+     URL meta data
+	   standard newline separated RFC headers.. ordered
+	   alphabetically?
+
+The followint entries are reserved (the history cache will accept
+them, but will never cache any info on them, so if you manage to use
+one of them as a legal URL, you should hopefully waste alot of your
+machines resources and get kicked off by your sysadmin...)
+
+	 momspider-info:data-format
+
+		[size-of-pointer]\n[size-of-date]\n[date-format-type]\n
+		
+	 momspider-info:derived-from
+
+		list of newline separated owner, expiry date of
+		longest existing entry.
+		name of next part of list in database
+
+
+
+	momspider-info:[anything-else]
+
+		reserved for internal use
+
+	momspider-user-info:[anything]
+
+		reserved for use by packages.  The history mechanism
+		won't look after this stuff at all.  All it guarantees
+		is that this will not be checked as a url.  The merge
+		package will ignore this for the system database
+		unless told to copy it explicitly by the config file.
+		It will copy it by default for users to their own
+		databases, but with a warning unless flagged
+		otherwise.
+
+
+
+Security Considerations.  The main security consideration is that a
+database containing bad information could be merged into a database
+containing good information.  This can cause several things.
+
+	   o make someone change a link which shouldn't be changed
+
+	     o always check links before changing them (changelink
+	     script?) 
+
+	   o make momspider do extra work when the link is correct
+
+	     o merge process should back out if too many bad links are
+	     signaled 
+
+	   o make momspider believe broken links are correct
+
+	     o some randomly chosen links should be checked at merge
+	     time 
+
+	     o possibly some links should be checked redundantly
+
+	     o if a link was believed BROKEN not MISLAYED, then it
+	     should not just be accepted as okay automatically ???
+
+
+
+Extra meta information
+
+PGP public key (record this) href??
+Replaces   URL (for easy update checks) +signature

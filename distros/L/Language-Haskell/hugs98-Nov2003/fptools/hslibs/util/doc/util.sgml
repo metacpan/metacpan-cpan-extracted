@@ -1,0 +1,9 @@
+<Chapter id="sec-util"><Title>The <literal>util</literal> package: miscellaneous utilities</Title>
+
+&getopt
+&memo
+&quickcheck
+&readline
+&select
+
+</Chapter>

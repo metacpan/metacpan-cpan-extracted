@@ -1,0 +1,11 @@
+Revision history for Linux::ACL
+
+0.05    15.03.2017/01:30 UTC+3
+        Fixed rt.cpan.org #121126 (setfacl returns true even if an error occurs)
+
+0.03    28.08.2014/23:53 UTC+3
+        Fixed rt.cpan.org #98392 (Spurious output from Linux::ACL)
+
+0.02    21.05.2013/19:40 UTC+3
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,7 @@
+Revision history for LWPx-Profile
+
+0.2 Thu Feb 19 2015
+	Fix tests to actually use the recorded HTTP interactions.
+	
+0.1 Tue Feb 17 2015
+	Intial release.

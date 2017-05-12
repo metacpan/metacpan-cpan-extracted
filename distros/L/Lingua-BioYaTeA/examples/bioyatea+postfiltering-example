@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Basename;
+
+# use Data::Dumper;
+use Lingua::BioYaTeA;
+use Lingua::BioYaTeA::Corpus;
+use Lingua::BioYaTeA::PostProcessing;
+
+# use Lingua::YaTeA::Corpus;
+# use Lingua::YaTeA::Config;
+# use Config::General;
+
+
+# my $verbose;
+my $man = 0;
+my $help = 0;
+my $rcfile = "bioyatea.rc";
+my $postProcessingFile = "sampleBio1-bioyatea-out-pp.xml";
+my $ppConfigFile = "post-processing-filtering.conf";
+
+# GetOptions('help|?|h' => \$help, 
+# 	   'man|m' => \$man, 
+# 	   "rcfile=s" => \$rcfile,
+# 	   'post-processing|p=s' => \$postProcessingFile,
+# 	   'post-processing-config|C=s' => \$ppConfigFile,
+#     ) or pod2usage(2);
+# pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+# pod2usage(1) if $help or (scalar(@ARGV) == 0);
+
+my $current_dir = `pwd`;
+my $corpus_path = "sampleBio1.ttg";
+
+if (defined $rcfile) {
+    my %config = Lingua::BioYaTeA->load_config($rcfile);
+    
+    
+    my $sys_config ;
+    my $bioyatea;
+    my $corpus;
+    
+    $bioyatea = Lingua::BioYaTeA->new($config{"OPTIONS"}, \%config);
+    
+    if (defined $corpus_path) {
+	if (-f $corpus_path) {
+	    $corpus = Lingua::BioYaTeA::Corpus->new($corpus_path,$bioyatea->getOptionSet,$bioyatea->getMessageSet);
+	} else {
+	    die("\"".$corpus_path . "\"". $bioyatea->getMessageSet->getMessage("NO_FILE")->getContent($bioyatea->getOptionSet->getDisplayLanguage) . "\n");
+	}
+	$bioyatea->termExtraction($corpus);
+
+	if ((defined $postProcessingFile) && (defined $ppConfigFile)) {
+	    my %options;
+	    $options{'input-file'} = $corpus->getOutputFileSet->getFile("candidates")->getPath;
+	    warn "Loading YaTeA output file " . $options{'input-file'} . "\n";
+	    $options{'output-file'} = $postProcessingFile;
+	    $options{'configuration'} = $ppConfigFile;
+	    my $postProc = Lingua::BioYaTeA::PostProcessing->new(\%options);
+
+	    my ($second,$minute,$hour,$day,$month,$year,$weekday,$yearday,$isdailysavingtime) = localtime(time);
+	    $year += 1900;
+
+	    $postProc->logfile(dirname($postProc->output_file) . '/term-filtering-tmp-' . "date-$year-$month-${day}_${hour}_$minute" . '.log');
+	    $postProc->_printOptions(\*stderr);
+	    $postProc->load_configuration;
+	    $postProc->defineTwigParser;
+	    $postProc->filtering;
+	    $postProc->printResume;
+	    $postProc->rmlog;
+	}
+
+    } else {
+	die( $bioyatea->getMessageSet->getMessage("NO_FILE_ARG")->getContent($bioyatea->getOptionSet->getDisplayLanguage) . "\n");
+    }
+}
+

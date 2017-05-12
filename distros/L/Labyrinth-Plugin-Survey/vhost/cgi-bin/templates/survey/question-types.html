@@ -1,0 +1,76 @@
+<div class="question2">
+  [% IF q.preamble %]<p>[% q.preamble %]</p>[% END %]
+  [% err = q.name _ '_err' ; IF data.$err ; THEN ; error = '<span class="alert">&#8709;</span>' ; ELSE ; error = '' ; END %]
+
+	[% IF q.type == 'select' %]
+		<select name="[% q.name %]">
+	    <option value="0" [% IF NOT q.data %]selected="selected"[% END %] >Select</option>
+		[% FOREACH option = q.options %]
+	    <option value="[% option.value %]" [% IF q.data == option.value %]selected="selected"[% END %]>[% option.key %]</option>
+	    [% END %]
+	    </select> [% error %]
+		<br />
+	[% END %]
+
+	[% IF q.type == 'radio' %]
+		[% FOREACH option = q.options %]
+		<input type="radio" name="[% q.name %]" value="[% option.value %]" [% IF q.data == option.value %]checked="checked"[% END %] /> [% option.key %] [% error %]
+		[% IF option.default %]
+      <input type="text" name="[% q.name %]X" value="[% option.extra %]" /> [% error %]
+	  [% END %]
+		<br />
+	  [% END %]
+	[% END %]
+
+	[% IF q.type == 'checkbox' %]
+		<input type="checkbox" name="[% q.name %]" value="[% q.options.0.value %]" [% IF q.data == q.options.0.value %]checked="checked"[% END %] /> [% q.options.0.key %] [% error %]
+		[% IF q.default %]
+      <input type="text" name="[% q.name %]X" value="[% option.extra %]" /> [% error %]
+	  [% END %]
+		<br />
+	[% END %]
+
+	[% IF q.type == 'count' %]
+		[% FOREACH option = q.options %]
+	    <input type="text" name="[% q.name %]" value="[% IF q.data; q.data; ELSE; option.value; END %]" size="2" maxlength="2" /> [% option.key %][% IF q.max %] (max = [% q.max %] or 'ALL')[% END %] [% error %]<br />
+	    [% END %]
+	[% END %]
+
+	[% IF q.type == 'text' %]
+      <input type="text" name="[% q.name %]" value="[% IF q.data; q.data; ELSE; q.value; END %]" /> [% error %]
+	[% END %]
+
+	[% IF q.type == 'currency' %]
+	[% q.pre %] <input type="text" name="[% q.name %]" value="[% q.data %]" size="10" maxlength="10" /> [% q.post %] [% error %]
+	[% END %]
+
+	[% IF q.type == 'textarea' %]
+  [% error %]
+	<textarea name="[% q.name %]" rows="7" cols="120">[% IF q.data; q.data; ELSE; q.value; END %]</textarea>
+	[% END %]
+
+	[% IF q.type == 'matrix' %]
+  [% error %]
+	<table cellspacing="0" cellpadding="2" border="0">
+		<tr ><th>&nbsp;</th>
+			[% FOREACH option = q.options %]
+			<th>[% option %]</th>
+			[% END %]
+		</tr>
+		[% inx = 1 %]
+		[% FOREACH choice = q.choices %]
+		<tr[% IF inx % 2 == 1 %] class="greyrow"[% END %]><th>[% choice %]</th>
+			[% opt = 1 %]
+			[% FOREACH option = q.options %]
+      [% qname = q.name _ '_' _ inx %]
+			<td class="survey-choice"><input type="radio" name="[% q.name %]_[% inx %]" value="[% opt %]" [% IF data.$qname == opt %]checked="checked"[% END %] /></td>
+			[% opt = opt + 1 %]
+			[% END %]
+		</tr>
+		[% inx = inx + 1 %]
+		[% END %]
+	</table>
+	[% END %]
+
+  [% IF q.footnote %]<p>[% q.footnote %]</p>[% END %]
+</div>

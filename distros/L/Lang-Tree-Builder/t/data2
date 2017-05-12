@@ -1,0 +1,8 @@
+abstract Expr()
+Expr Plus(Expr left, Expr right)
+Expr Minus(Expr left, Expr right)
+Expr Times(Expr left, Expr right)
+Expr Divide(Expr left, Expr right)
+Expr Number(scalar value)
+Expr ExprList(Expr, ExprList)
+ExprList EmptyExprList()

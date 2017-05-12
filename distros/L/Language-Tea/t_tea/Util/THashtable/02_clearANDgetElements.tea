@@ -1,0 +1,16 @@
+
+define a [new THashtable]
+define b "oii"
+$a addElements ((1 2) ("a" 3) (1 44) (b 11))
+echo [$a get "a"]
+
+$a clear
+
+define len [length [$a getElements]]
+echo $len
+
+$a addElements ((1 2) ("a" 3) (1 44) (b 11))
+
+set! len [length [$a getElements]]
+
+echo $len

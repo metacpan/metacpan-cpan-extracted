@@ -1,0 +1,42 @@
+NAME
+    Lingua::Translate::InterTran - A Lingua::Translate backend for
+    InterTran.
+
+SYNOPSIS
+     use Lingua::Translate;
+
+     my $en2is = Lingua::Translate->new(
+         back_end => 'InterTran',
+         src      => 'en',
+         dest     => 'is',
+     );
+
+     my $is2en = Lingua::Translate->new(
+         back_end => 'InterTran',
+         src      => 'is',
+         dest     => 'en',
+     );
+
+     # prints 'ÉG vilja til hafa kynlíf í kvöld'
+     print $en2is->translate('I want to have sex tonight') . "\n";
+
+     # prints 'Myself yearn snuggle up to pursue sex this evening'
+     print $is2en->translate('Mig langar að stunda kynlíf i kvöld') . "\n";
+
+DESCRIPTION
+    Lingua::Translate::InterTran is a translation back-end for
+    Lingua::Translate that uses the online translator available at
+    <http://www.tranexp.com:2000/Translate/result.shtml>. The author felt
+    compelled to write a CPAN module for it since it is the only online
+    translator that can handle his native language, Icelandic (albeit
+    amusingly poorly).
+
+AUTHOR
+    Hinrik Örn Sigurðsson, hinrik.sig@gmail.com
+
+LICENSE AND COPYRIGHT
+    Copyright 2008 Hinrik Örn Sigurðsson
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

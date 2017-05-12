@@ -1,0 +1,105 @@
+[% 
+    IF data.eventid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Event' ;
+
+    crumb2_name = 'Event' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=event-admin' ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+[% IF thanks %]<p>Article saved successfully.</p>[% END %]
+<p>Fields marked * are mandatory fields and must be completed.</p>
+
+[% IF errmess %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name='act'      value='event-save' />
+<input type="hidden" name='eventid'  value='[% data.eventid %]' />
+<input type="hidden" name='folderid' value='[% data.folderid %]' />
+<input type="hidden" name='userid'   value='[% data.userid %]' />
+<input type="hidden" name='imageid'  value='[% data.imageid %]' />
+<input type="hidden" name='ALIGN0'   value='0' />
+
+<h2>Event Details</h3>
+<table class="blocker">
+<tr><th class="named">Title *</th>
+    <th width="10">[% data.title_err %]</th>
+    <td><input type="text" name="title" value="[% data.title %]" size="55" /></td></tr>
+[% IF editmode == 'Edit' %]
+<tr><th>Posted</th>
+    <th></th>
+    <td>by [% data.name %] on [% data.createdate %]</td></tr>
+[% END %]
+<tr><th>List Date *</th>
+    <th>[% data.listeddate_err %]</th>
+    <td><input type="text" name="listeddate" value="[% data.listeddate %]" size="20" /> DD/MM/YYYY</td></tr>
+<tr><th>Event Date *</th>
+    <th>[% data.eventdate_err %]</th>
+    <td><input type="text" name="eventdate" value="[% data.eventdate %]" size="40" /></td></tr>
+<tr><th>Event Time *</th>
+    <th>[% data.eventtime_err %]</th>
+    <td><input type="text" name="eventtime" value="[% data.eventtime %]" size="40" /></td></tr>
+<tr><th>Event Type *</th>
+    <th>[% data.eventtypeid_err %]</th>
+    <td>[% data.ddtype %]</td></tr>
+
+<tr><th>Status *</th>
+    <th>[% publish_err %]</th>
+    <td>[% data.ddpublish %]</td></tr>
+</table>
+
+<p align="right"><input type="submit" value='Submit' /></p>
+
+<h2>Associated Details</h3>
+<table class="blocker">
+<tr><th class="named">Venue</th>
+    <th width="10">[% data.venueid_err %]</th>
+    <td>[% IF data.venue %][% data.venue %], [% data.address %][% ELSE %]No venue selected[% END %]<br />
+        <a href="[% cgipath %]/pages.cgi?act=venue-edit&amp;eventid=[% data.eventid %]" title="Add A Venue">Add A Venue</a> |
+        <a href="[% cgipath %]/pages.cgi?act=venue-admin" title="Venue Admin">Venue Admin</a><br />
+        [% data.ddvenue %]</td></tr>
+<tr><th>Sponsor</th>
+    <th>[% data.sponsorid_err %]</th>
+    <td>[% IF data.sponsor %][% IF data.sponsorlink %]<a href="[% data.sponsorlink %]" title="link to [% data.sponsor %]">[% data.sponsor %]</a>[% ELSE ; data.sponsor ; END ; ELSE %]No sponsor selected[% END %]<br />
+        <a href="[% cgipath %]/pages.cgi?act=spon-edit&amp;eventid=[% data.eventid %]" title="Add A Sponsor">Add A Sponsor</a> |
+        <a href="[% cgipath %]/pages.cgi?act=spon-admin" title="Sponsor Admin">Sponsor Admin</a><br />
+        [% data.ddsponsor %]</td></tr>
+</table>
+
+<p align="right"><input type="submit" value='Submit' /></p>
+
+<h2>Description</h3>
+<table class="blocker">
+<tr><th class="named">Body *</th>
+    <th width="10">[% data.body_err %]</th>
+    <td><textarea name="body" rows="15" cols="40">[% data.body %]</textarea></td></tr>
+<tr><th>Links</th>
+    <th>[% data.links_err %]</th>
+    <td><textarea name="links" rows="10" cols="40">[% data.links %]</textarea></td></tr>
+</table>
+
+<h2>Talks</h3>
+<table class="blocker">
+<tr><th class="named">Talks</th>
+    <th width="10"></th>
+    <td><a href="[% cgipath %]/pages.cgi?act=event-addtalk&amp;eventid=[% data.eventid %]" title="Add A Talk">Add A Talk</a> |
+        <a href="[% cgipath %]/pages.cgi?act=event-listtalk" title="Talk Admin">Talk Admin</a>
+[% IF data.talks %]
+        <ul>
+[% FOREACH talk = data.talks %]
+        <li><a href="[% cgipath %]/pages.cgi?act=event-edittalk&amp;talkid=[% talk.talkid %]" title="edit [% talk.talktitle %]">[% talk.talktitle %]</a> [[% talk.realname || 'no name' %]]</li>
+[% END %]
+        </ul>
+[% END %]
+    </td></tr>
+</table>
+
+<p align="right"><input type="submit" value='Submit' /></p>
+
+</form>
+
+[% IF editmode == 'Edit' ; THEN ; INCLUDE "events/event-adminview.html" ; END %]

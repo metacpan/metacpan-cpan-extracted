@@ -1,0 +1,106 @@
+{
+   "abstract" : "Locale::TextDomain::OO::Extract - Extracts internationalization data as gettext pot file",
+   "author" : [
+      "Steffen Winkler <steffenw at cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Locale-TextDomain-OO-Extract",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Test::Differences" : "0.60",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Path::Iterator::Rule" : "0",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Clone" : "0",
+            "Data::Dumper" : "0",
+            "Encode" : "0",
+            "Locale::MO::File" : "0.05",
+            "Locale::PO" : "0.25",
+            "Locale::TextDomain::OO::Util" : "3.001",
+            "Locale::Utils::PlaceholderMaketext" : "0",
+            "Moo" : "1.003001",
+            "MooX::StrictConstructor" : "0",
+            "MooX::Types::MooseLike" : "0",
+            "Path::Tiny" : "0",
+            "Set::Scalar" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.009005"
+         }
+      }
+   },
+   "provides" : {
+      "Locale::TextDomain::OO::Extract" : {
+         "file" : "lib/Locale/TextDomain/OO/Extract.pm",
+         "version" : "2.006"
+      },
+      "Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor" : {
+         "file" : "lib/Locale/TextDomain/OO/Extract/Base/RegexBasedExtractor.pm",
+         "version" : "2.004"
+      },
+      "Locale::TextDomain::OO::Extract::HTML" : {
+         "file" : "lib/Locale/TextDomain/OO/Extract/HTML.pm",
+         "version" : "2.004"
+      },
+      "Locale::TextDomain::OO::Extract::JavaScript" : {
+         "file" : "lib/Locale/TextDomain/OO/Extract/JavaScript.pm",
+         "version" : "2.004"
+      },
+      "Locale::TextDomain::OO::Extract::Perl" : {
+         "file" : "lib/Locale/TextDomain/OO/Extract/Perl.pm",
+         "version" : "2.004"
+      },
+      "Locale::TextDomain::OO::Extract::Process" : {
+         "file" : "lib/Locale/TextDomain/OO/Extract/Process.pm",
+         "version" : "2.004"
+      },
+      "Locale::TextDomain::OO::Extract::Process::Plugin::MO" : {
+         "file" : "lib/Locale/TextDomain/OO/Extract/Process/Plugin/MO.pm",
+         "version" : "2.004"
+      },
+      "Locale::TextDomain::OO::Extract::Process::Plugin::PO" : {
+         "file" : "lib/Locale/TextDomain/OO/Extract/Process/Plugin/PO.pm",
+         "version" : "2.004"
+      },
+      "Locale::TextDomain::OO::Extract::Role::File" : {
+         "file" : "lib/Locale/TextDomain/OO/Extract/Role/File.pm",
+         "version" : "2.004"
+      },
+      "Locale::TextDomain::OO::Extract::TT" : {
+         "file" : "lib/Locale/TextDomain/OO/Extract/TT.pm",
+         "version" : "2.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2.006"
+}

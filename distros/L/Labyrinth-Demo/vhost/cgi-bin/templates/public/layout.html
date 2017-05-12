@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+
+[% body = PROCESS $content %]
+  
+  <title>[% iname %]</title>
+
+    <meta http-equiv="Content-Type"     content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Language" content="en-gb" />
+    <meta name="Generator"              content="Labyrinth" />
+    <meta name="keywords"               content="labyrinth,web,framework,templates" />
+    <meta name="description"            content="Labyrinth Demo - an example website for the Labyrinth Web Framework" />
+    <meta name="copyright"              content="Copyright (C) 2011 Miss Barbell Productions" />
+	  <meta name="Robots"				          content="index,follow" />
+
+    <link rel="icon"          href="/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+
+    <link rel="stylesheet" type="text/css" href="[% webpath %]/css/PixelGreen.css" />
+
+    <link rel="alternate"  type="application/atom+xml" title="Atom"    href="[% webpath %]/rss/atom-1.0.xml" />
+    <link rel="alternate"  type="application/rss+xml"  title="RSS 2.0" href="[% webpath %]/rss/rss-2.0.xml" />
+
+<!--
+
+    Site Layout, Design &amp; Development by Miss Barbell Productions
+    Original CSS/XHTML Layout Design by Erwin Aligam - ealigam@gmail.com (http://www.styleshout.com/) Copyright (c) 2006
+
+    Valid XHTML 1.0 - http://validator.w3.org/check?uri=referer
+    Powered by LAMP (Linux, Apache, MySQL &amp; Perl) technologies.
+    Produced by Labyrinth, a state of the art Website Management System available from Miss Barbell Productions
+    For more information contact Barbie <barbie@missbarbell.co.uk>
+
+-->
+
+[% INCLUDE "public/analytics.html" %]
+
+</head>
+
+<body>
+<!-- wrap starts here -->
+<div id="wrap">
+
+	<div id="header"><div id="header-content">	
+		
+		<h1 id="logo"><a href="/index.html" title="Labyrinth Demo website">Labyrinth<span class="gray">Demo</span></a></h1>	
+		<h2 id="slogan">Your imagination is your only limit</h2>		
+		
+		<!-- Menu Tabs -->
+    [% menu = menus.1 %]
+    [% INCLUDE "public/navigation.html" %]
+
+	</div></div>
+
+	<!-- content-wrap starts here -->
+	<div id="content-wrap"><div id="content">	
+  
+    [% INCLUDE "public/sidebar.html" %]		
+	
+		<div id="main">		
+
+      [% IF title %]<h1>[% title %]</h1>[% END %]
+      [% body %]
+    				
+			<br />				
+										
+		</div>					
+		
+	<!-- content-wrap ends here -->		
+	</div></div>
+
+[% INCLUDE "public/footer.html" %]
+	
+<!-- wrap ends here -->
+</div>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+=encoding UTF-8
+
+=head1 NAME
+
+jspell-dist - RFC for jspell dictionary packages
+
+=head1 RATIONALE
+
+The Lingua::Jspell binary format (also known as hash file) is
+architecture dependent (32 vs 64 bit architectures, little-endian vs
+big-endian architectures). This makes the release of binary formats
+for each dictionary unmanageable.
+
+Also, given that some language dictionaries (namely, the Portuguese
+dictionary) require some developing tools (bison, flex and gcc),
+distributing the bootstrap files would be also very complicated.
+
+Therefore, this RFC defines a middle-term structure, where just a full
+Lingua::Jspell installation is needed (together with Perl and some
+default Lingua::Jspell dependencies).
+
+=head1 DESCRIPTION
+
+The files that are usually installed for each dictionary are: affix
+file, hash file, irregular file (if exists) and meta (yaml) file. All
+these files are text documents, meaning they are architecture
+independent.
+
+Regarding the hash file, it is language dependent but can be built
+with C<jbuild>, that is delivered with Lingua::Jspell. C<jbuild>
+requires the affix file (already mentioned above) and the dictionary
+file.
+
+The dictionary file is, also, a textual document, and therefore,
+architecture independent. While C<jbuild> works with just one
+dictionary file, some dictionaries are split in different, smaller,
+files, making the management of the dictionary easier. Instead of
+requiring a single dictionary file, jspell dictionary packages can
+handle more than one dictionary file that are concatenated together
+during the build phase.
+
+=head2 PACKAGE CONTENTS
+
+The suggested structure for a jspell dictionary package is:
+
+=over 4
+
+=item C<MANIFEST>
+
+A C<MANIFEST> file, just like Perl modules manifest files. It will be
+used to check for package completeness.
+
+=item C<META-DATA FILE>
+
+The meta-data file is an yaml file. The name can be anything, given
+that the file extension is C<.yml> or C<.yaml>. Note that there should
+be B<only one> yaml file in the distribution package.
+
+This file should include the C<META> section, with the C<IDS>
+list. The first element of the list will be the official dictionary
+name, used when renaming the package files. Nevertheless, the system
+will try to link the other language names during installation.
+
+=item C<AFFIX FILE>
+
+The affix file should have the C<.aff> extension. Also, there should
+be B<only one> affix file in the distribution package.
+
+=item C<IRREGULARS FILES>
+
+Some languages might include irregular verbs (or other). They normally
+result in one or more files with the C<.irr> extension. They will be
+concatenated together in a single C<.irr> file, sorting filenames
+alphabetically.
+
+=item C<DICTIONARY FILES>
+
+All the files with C<.dic> extension are supposed to be dictionary
+files. They will be concatenated together, using filenames
+alphabetical order. This means that if there are any kind of macros
+that should be declared earlier, be sure to include them before any
+other file.
+
+=back
+
+=head2 INSTALLATION PROCESS
+
+The package installation process will follow the subsequent steps:
+
+=over 4
+
+=item 1.
+
+The C<MANIFEST> file is read and the package content files are
+tested. If any file is missing the installation process will fail.
+
+=item 2.
+
+The meta-data file (yaml file) is searched. If there is more than one,
+the system will issue an warning, but follow the process with one of
+them (the first one on the file glob). That file is read, and the
+names of the language extracted. Also, the yaml file is renamed to
+match the first language name with the C<.yaml> extension.
+
+If no yaml file is present, the system will issue an warning, but will
+continue trying to use as language the name of the affix file.
+
+=item 3.
+
+The affix file is searched, and the name used if no yaml file is
+present.  If the yaml file is present, the affix file will be renamed
+to the first language name (followed by the C<.aff> extension).
+
+=item 4.
+
+All the dictionary files (with extension C<.dic>) are sorted, and the
+files concatenated together. The result will be placed on a file with
+the language name, followed by the C<.dic> extension.
+
+=item 5.
+
+The same process will be performed for all C<.irr> file, sorting the
+files, concatenating them, and putting the result in a file with the
+language name and the C<.irr> extension.
+
+=item 6.
+
+The hash file will be created using the C<.aff> file and the C<.dic>
+file created on step 4.
+
+=item 7.
+
+The dictionary, irregular, hash, affixes and yaml files are copied to
+the Lingua::Jspell library directory (usually, ${prefix}/lib/jspell).
+
+=item 8.
+
+The optional language names will be used to create symlinks for all
+the files.
+
+=back
+
+
+=head1 SEE ALSO
+
+Lingua::Jpell(3)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Alberto Manuel Brandão Simões
+
+=cut

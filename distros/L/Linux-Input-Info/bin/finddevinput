@@ -1,0 +1,65 @@
+#!perl -w
+
+use strict;
+use Linux::Input::Info;
+
+=head1 NAME
+
+finddevinput - find /dev/input/event* that have a certain property
+
+=head1 USAGE
+
+	% finddevinput [-e] <key> <val>
+
+=head1 OPTIONS
+
+=head2 --event (-e)
+
+Exact match rather than a regex
+
+=head1 KEYS
+
+Any of the methods of B<Linux::Input::Info> (except C<new> and C<ev_name> of course).
+
+Bits will automatically be converted to their event name.
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Copyright 2005, Simon Wistow
+
+=head1 SEE ALSO
+
+Gerd Knorr's input utils from http://dl.bytesex.org/cvs-snapshots/
+
+=cut 
+
+my $exact = 0;
+
+if (@ARGV && ($ARGV[0] eq '-e' || $ARGV[0] eq '--exact')) {
+	shift @ARGV;
+	$exact = 1;
+}
+
+my $key = shift @ARGV;
+my $val = join " ", @ARGV;
+
+for my $event (0..32) {
+
+	my $i = Linux::Input::Info->new($event);
+	last unless $i;
+	my $match;
+	if ($key eq 'bits') {
+		$match = join " ", map { $i->ev_name($_) } $i->bits;
+	} else {
+		$match = $i->{$key};
+	}
+	next if not defined $match;
+	next if ($exact && $match ne $val);
+	next if ($match !~ /$val/);
+	print "$event\n";
+}
+

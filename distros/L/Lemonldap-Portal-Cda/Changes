@@ -1,0 +1,7 @@
+Revision history for Perl extension Lemonldap::Portal::Cda.
+
+0.01  Wed Dec 22 13:50:06 2004
+	- original version; created by h2xs 1.22 with options
+		-X -n Lemonldap::Portal::Cda
+0.02  Wed Feb 23 
+        - Correction of the test op = c or t for the cdamaster

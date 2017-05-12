@@ -1,0 +1,76 @@
+NAME
+       Labyrinth::Plugin::Event - Events handler for the Labyrinth framework.
+
+DESCRIPTION
+       Contains all the event functionality for Labyrinth.
+
+PUBLIC INTERFACE METHODS
+   Full Event Details
+       NextEvent()
+           Retrieves the next event for event type.
+
+       NextEvents()
+           Retrieves all the future events for event type.
+
+       PrevEvents()
+           Retrieves all the future events for event type.
+
+   Event Lists
+       ShortList()
+           Proives a list of forthcoming events, with abbreviations as
+           appropriate.  Defaults to 365 days or 20 events, but these limits
+           can be set in the configuration as 'eventsshortlistdays' and
+           'eventsshortlistcount' respectively.
+
+       LongList()
+           Provides a list of forthcoming events. No defaults, will return the
+           list based on the configured limits or all future events if no
+           configuration. Values can be set for 'eventslonglistdays' and
+           'eventslonglistcount'.
+
+       Item()
+           Provides the specified event.
+
+ADMIN INTERFACE METHODS
+   Events
+       ImageCheck
+           Provides a true or false value as to whether images have been used
+           within any event descriptions.
+
+       Admin
+           Provides list of the events currently available.
+
+       Add Add a new event.
+
+       Edit
+           Edit an existing event.
+
+       Copy
+           Copy an existing event, creating a new event.
+
+       Save
+           Save the current event.
+
+       Promote
+           Promote the published status of the specified event by one level.
+
+       Delete
+           Delete the specified events.
+
+   Event Attributes
+       VenueSelect
+           Provides a dropdown list of venues available.
+
+SEE ALSO
+       Labyrinth
+
+AUTHOR
+       Barbie, <barbie@missbarbell.co.uk> for Miss Barbell Productions,
+       <http://www.missbarbell.co.uk/>
+
+COPYRIGHT & LICENSE
+         Copyright (C) 2002-2015 Barbie for Miss Barbell Productions
+         All Rights Reserved.
+
+         This module is free software; you can redistribute it and/or
+         modify it under the Artistic License 2.0.

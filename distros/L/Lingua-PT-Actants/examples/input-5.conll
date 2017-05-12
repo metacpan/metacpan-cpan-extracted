@@ -1,0 +1,7 @@
+1	Nenhum	_	DET	pron-det||M|S	Gender=Masc|Number=Sing|NumType=Card|PronType=Ind,Neg,Tot|fPOS=DET++pron-det||M|S	2	det	_ _
+2	cidadão	_	NOUN	n|M|S	Gender=Masc|Number=Sing|fPOS=NOUN++n|M|S	3	nsubj	_	_
+3	apresenta	_	VERB	v-fin|PR|3S|IND	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|fPOS=VERB++v-fin|PR|3S|IND	0 ROOT	_	_
+4	duas	_	NUM	num||F|P	Gender=Fem|Number=Plur|NumType=Card|fPOS=NUM++num||F|P	5	nummod	_	_
+5	propostas	_	NOUN	n|F|P	Gender=Fem|Number=Plur|fPOS=NOUN++n|F|P	3	dobj	_	_
+6	diferentes	_	ADJ	adj|F|P	Gender=Fem|Number=Plur|fPOS=ADJ++adj|F|P	5	amod	_	_
+7	.	_	PUNCT	punc	fPOS=PUNCT++punc	3	punct	_	_

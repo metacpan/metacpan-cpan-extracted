@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use strict;
+use List::Vectorize;
+
+open F, $ARGV[0] or die "cannot open $ARGV[0]";
+my $fun = $ARGV[1] ? $ARGV[1] : 'sub {$_}';
+if($fun !~/^\s*sub\s*\{/) {
+	$fun = "sub $fun";
+}
+$fun =~s/\$_(?!\[)/\$_\[0\]/g;
+$fun = eval($fun);
+if ($@) {
+	print "applying function format is wrong.\n";
+	exit;
+}
+my $a = [ <F> ];
+$a = sapply($a, sub {chomp $_[0]; $_[0]});
+print join "\n", @{subset($a, $fun)};
+print "\n";

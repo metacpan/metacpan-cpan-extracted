@@ -1,0 +1,92 @@
+Revision history for Perl module List-Objects-Types
+
+2.001001 2016-07-22
+
+  - Parameterized TypedArray/TypedHash constraint generators now check
+    $type->equals and disallow subtypes (without coercion)
+  
+    Lyle Kopnicky observed that the behavior of parameterized
+    TypedArray/TypedHash could have unexpected results. Accepting
+    TypedArray[SubType] for an attribute that isa => TypedArray[Type] adds
+    unexpected constraints; subtypes are now disallowed for mutable types.
+
+    This implies coercion now works as-expected; for example, a Moo(se)
+    attribute declared as 'isa => TypedArray[Num], coerce => 1' will coerce an
+    array_of(Int) to Num, rather than the broken 1.x behavior of accepting the
+    subtype as-is.
+
+1.003002 2016-01-08
+
+  - Recommend (and test with, if available) Moo-2+
+
+  - Parameterized InflatedHash optimizations
+
+  - Switch to 'cpanfile' packaging
+
+1.003001 2014-11-23
+
+  - Add parameterized InflatedHash; InflatedHash[@methods] verifies that
+    @methods are available on the InflatedHash.
+
+1.002003 2014-07-20
+
+  - Type-Tiny-0.46 sanity checks exposed that I'm an idiot; a comma that
+    should've been a semicolon caused a bad value to be passed to 'coerce'.
+    Found by TOBYINK.
+    
+1.002002 2014-01-12
+
+  - Skip a failing test on <5.16, for now
+
+  - POD fixes
+
+1.002001 2014-01-12
+
+  - Add InflatedHash type & coercion
+
+1.001001 2013-12-19
+
+  - Bump to 1.x, interface should be fairly static
+
+0.006001 2013-10-03
+
+  - Updated for List::Objects::WithUtils 2.0;
+    adds ImmutableTypedArray / ImmutableTypedHash
+
+0.005001 2013-09-05
+
+  - Add TypedHash
+
+0.004004 2013-09-05
+
+  - Explicitly depend on List::Objects::WithUtils-1.011
+    (fixes TypedArrays)
+
+0.004003 2013-09-05
+
+  - Fix TypedArray to work with latest List::Objects::WithUtils
+
+0.004002 2013-09-04
+
+  - Add TOBYINK's TypedArray examples to examples/
+    Borrowed from:
+      http://www.perlmonks.org/?node_id=1052124
+      https://github.com/avenj/list-objects-types/pull/1
+
+0.004001 2013-09-03
+
+  - Add parameterized TypedArray support, courtesy of Toby Inkster:
+    -> https://github.com/avenj/list-objects-types/pull/1
+    (Also adds inlinable type constraints.)
+
+0.003001 2013-09-01
+
+  - Add type: TypedArray
+
+0.002001 2013-08-30
+
+  - Add coercion: ImmutableArray from ArrayObj
+
+0.001001 2013-08-23
+
+  - Initial release

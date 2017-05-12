@@ -1,0 +1,38 @@
+Changes for the Labyrinth-Plugin-Articles-Diary
+===============================================
+
+1.06    2014-10-29
+        - fixed license fields in META.json to be lists.
+        - extended META and functional test suite.
+        - added permission check to Comment methods.
+        - added worst offenders listings.
+        - upgraded prequisites.
+
+1.05    2014-04-17
+        - fixed distribution name in META.
+        - added LICENSE file.
+
+1.04    2013-10-31
+        - documentation updates.
+        - fixes to comment methods.
+        - added paging functionality via Article in core plugins.
+        - added missing CSS and Javascript files.
+        - updated templates.
+
+1.03    2013-01-06
+        - added indexes to SQL.
+        - change file dates changed to meet W3CDTF standards.
+        - fixed searches.
+        - updated test suite.
+
+1.02    2012-06-10
+        - module name fixes in request file.
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+1.01    2011-01-19
+        - path fixes in vhost.
+
+1.00    2011-01-19
+        - first official release

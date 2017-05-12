@@ -1,0 +1,20 @@
+Revision history for Perl module Lingua::KO::MacKorean.
+
+0.20  Sun Jul 31 20:20:48 2011
+    - fix the tarball with world writable files.
+
+0.04  Tue Jun  5 21:57:57 2007
+    - mkheader, split_into_char() - avoid unpack('C*') on unicode.
+
+0.03  Sat Apr 16 19:56:51 2005
+    - added mappings for 0x85-0x9F to C1 controls according to updated
+      KOREAN.TXT in www.unicode.org.
+    - added META.yml.
+    - added t/argu.t.
+
+0.02  Sat Oct 25 17:43:34 2003
+    - added old mappings in changes from version b02 to version b03/c01
+      according to KOREAN.TXT.
+
+0.01  Sun Sep 28 10:10:19 2003
+    - original version;

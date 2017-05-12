@@ -1,0 +1,85 @@
+/*** Appearance ***/
+#scanContents {
+
+	color: cyan ;
+}
+
+#quartz-content #list-body #scanContents .scanButton {
+	background: url("../images/lsgrd.png") repeat-x scroll center top ;
+}
+#quartz-content #list-body #scanContents .scanButton a {
+	color: white ;
+	cursor: pointer ;
+}
+
+
+#quartz-content #list-body #scanContents .scanHead {
+
+	color: white ;
+	background-image: url("../images/headline.png") ;
+}
+
+#quartz-content #list-body #scanContents .scanFreq {
+	background-color: #333 ;
+	border: 2px solid black ;
+}
+
+#quartz-content #list-body #scanContents #freqs .scanFreqCurr {
+	background-color: #009 ;
+	border: 2px solid yellow ;
+}
+
+#quartz-content #list-body #scanContents #freqs .scanFreqFail {
+	background-color: #900 ;
+}
+
+#quartz-content #list-body #scanContents #freqs .scanFreqDone {
+	background-color: #090 ;
+}
+
+
+/* Channels section */
+#quartz-content #list-body #scanContents #chans ol li {
+	color: yellow ;
+}
+#quartz-content #list-body #scanContents #chans ol li .scanLCN {
+	background-color: #333 ;
+}
+#quartz-content #list-body #scanContents #chans ol li .scanType {
+	background-color: #333 ;
+}
+#quartz-content #list-body #scanContents #chans ol li .scanChan {
+	background-color: #333 ;
+}
+#quartz-content #list-body #scanContents #chans ol li .scanNet {
+	background-color: #333 ;
+	font-style: italic ;
+}
+
+#quartz-content #list-body #scanContents #chans  #scanChanHead ol li {
+	color: white ;
+	background: none ;
+}
+
+
+/* Section headings */
+#quartz-content #list-body #scanContents .scanHead {
+}
+
+
+/* Progress bar */
+#quartz-content #list-body #scanContents #progress {
+}
+
+#quartz-content #list-body #scanContents #progress ol li {
+}
+
+#quartz-content #list-body #scanContents #progress .progressWrap {
+	background-color: #333 ;
+}
+
+#quartz-content #list-body #scanContents #progress .progressInner {
+
+	background-color: #a00 ;
+}
+

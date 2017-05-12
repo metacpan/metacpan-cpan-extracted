@@ -1,0 +1,125 @@
+Language-RAM
+
+This package provides a library (Language::RAM) and an interpreter (ram.pl) to emulate a basic
+"Random Access Machine". This computer model uses an assembler-like syntax
+and can be used to test simple algorithms for their complexity.
+
+SYNTAX
+
+There are four data registers (a, i1, i2 and i3), 1 instruction pointer (ip) and
+an unlimited (limited to your computer's capabilities, of course) data block s.
+
+imm: Number = \d+(\.\d+)?
+reg: Register = a|i1|i2|i3
+mem: Value in s from fixed index = s[imm]
+mmem: Value in s from calculated index = s[i1|i2|i3 ((+|-) imm)?]
+
+INPUT/OUTPUT/HALT
+
+INPUT (imm|imm..imm): Store arguments in the following memory blocks
+OUTPUT (imm|imm..imm): Print values of following indices(after HALT)
+HALT: Stop program and print results
+
+ASSIGNMENTS
+
+reg <-- imm
+reg <-- mem
+a <-- mmem
+mem <-- reg
+mmem <-- a
+reg <-- reg
+
+CONDITIONALS
+
+jump imm: Jump to line imm
+if reg (<|<=|=|!=|=>|>) 0 then jump imm: Jump to line imm if condition is true
+
+ARITHMETIC
+
+a <-- a (+|-|*|div|mod) (imm|mem|mmem)
+
+INDEX-OPERATIONS
+
+i1 <-- i1 (+|-) imm
+i2 <-- i2 (+|-) imm
+i3 <-- i3 (+|-) imm
+
+COMMENTS
+
+Everything after "//" is a comment.
+
+COMMAND ADDRESS
+
+By default, a line's address is the line number. Prepend "imm> " to set the
+address of a line manually (e.g. "2> a <-- s[0] // Command Address: 2").
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Language::RAM
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Language-RAM
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Language-RAM
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Language-RAM
+
+    Search CPAN
+        http://search.cpan.org/dist/Language-RAM/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2015 Fabian Stiewitz
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

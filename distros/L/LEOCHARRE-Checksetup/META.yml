@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         LEOCHARRE-Checksetup
+version:      1.03
+version_from: lib/LEOCHARRE/Checksetup.pm
+installdirs:  site
+requires:
+    Carp:                          1
+    Exporter:                      5
+    File::Which:                   0.05
+    Smart::Comments:               1
+    Test::Simple:                  0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

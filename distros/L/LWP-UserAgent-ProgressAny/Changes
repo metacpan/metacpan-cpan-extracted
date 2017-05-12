@@ -1,0 +1,44 @@
+Revision history for LWP-UserAgent-ProgressAny
+
+0.06    2015-01-23 (PERLANCAR)
+
+	- [ux] Markup message so it can be elided more nicely using
+	  String::Elide::Parts.
+
+
+0.05    2015-01-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Refactor] combine response_done & response_data handlers so less
+	  code is duplicated.
+
+	- [doc] Update/fix comparison with LWP::UserAgent::ProgressBar.
+
+	- [doc] Mention HTTP::Tiny::ProgressAny.
+
+
+0.04    2015-01-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add screenshot.
+
+
+0.03    2015-01-22 (PERLANCAR)
+
+	- Show download size in message.
+
+
+0.02    2015-01-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Set memory variable per-request object (previously the
+	  second and subsequent LWP requests do not get updated because the
+	  memory variable was globally-scoped).
+
+
+0.01     2015-01-20 (PERLANCAR)
+
+         - First release.

@@ -1,0 +1,31 @@
+Lingua::Spelling::Alternative
+=============================
+
+This module is designed to return all forms of a given word (for example
+when you want to see all possible forms of some word entered in search
+engine) which can be generated using affix file (from ispell) or using
+findaffix output file (also part of ispell package)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires affix files for used language or output of findaffix
+program to produce alternatives
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002-2003 by Dobrica Pavlinusic
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

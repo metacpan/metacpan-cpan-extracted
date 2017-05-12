@@ -1,0 +1,218 @@
+Revision history for Perl distribution Locales
+
+0.34  2016-01-15 16:07:01
+    - Add v0.33 tests to the .in file
+    - simplified Makefile prereqs
+    - rt 105521: Fix regular expression deprecation warning
+    - Change rt to github
+
+0.33  2015-01-24 14:55:28
+    - Add missing native tlh name for fun and profit
+    - Support character string environments
+        (i.e. give back Unicode strings instead of utf8 strings)
+
+0.32  2013-12-28 14:51:42
+    - update BUILD_REQUIRES to match PREREQ_PM
+    - bump README version
+    - re-add missing Changes data
+
+0.31  2013-12-26 17:46:36
+    - prevent benign eval from tripping potentially fatal sig handler
+    - simplify lazy loading *a lot* via have_mod()
+    - rt 91549 - chicken and egg swap bug in get_formatted_decimal()
+    - default list_quote_mode back to mode 'none'
+
+0.30  2013-10-21 11:08:58
+    - add new add RELEASE_TESTING tests added in v0.29 to MANIFEST.in
+    - include ISO 3166-1-numeric territories in the CLDR data building
+        - this will result in hard locales being built (e.g. es_419)
+        - this will include all the data for soft locale support (e.g. es_053)
+    - rebuild CLDR (auto generated) to include the ISO 3166-1-numeric data
+
+0.29 2013-09-22 11:55:58
+    - more rt 80546: hide package line to fix rt 76129
+    - rt 88846, update Changes format (thanks NEILB!)
+        - add t/pkg-changes.t
+    - update README version
+        - add t/pkg-readme.t
+
+0.28 2013-09-21 20:16:42
+    - re-Tidy
+    - add critic, tidy, and spelling tests
+    - rt 84952: POD typo
+    - rt 80546: hide package line to fix rt 76129
+    - Add get_formatted_ellipsis_[initial,medial,final]()
+    - improve temporary get_list_or()
+    - add quote() and quote_alt()
+    - Add {'misc'}{'list_quote_mode'} all/some/none (defaulting to all for now at least)
+    - rt 81223: probably a local issue (out of disk space so a module missing, etc)
+        - prove -w t/05.plural_rules_behavior.t == All tests successful. (40k+ tests)
+
+0.27 2012-10-29 23:00:14
+    - rt 80247: make new() work properly when used as object method
+    - rt 76129: move __END__ from the string into variable (in plural rules .pm builder function) 
+                so that CPAN parser doesn't mistake it for the actual one
+    - move POD tests under RELEASE_TESTING
+    - enable strict/warnings
+    - fix more_information harvesting to handle the es_es-type-structures
+    - rt 80132: add get_language_lookup() and get_territory_lookup()
+    - rt 77404: a few object features:
+        + soft locale support (get_soft_locale_fallback() method) 
+            + tag_is_soft_locale(L_T) 
+                + tag_is_loadable(L[_T])
+                + territory_code_is_known(T)
+        + get_loadable_language_codes()
+            + Locale::DB::Loadable (for this function and the soft locale related functions)
+        + supports_special_zeroth(), plural_category_count()
+        + 'Supported Locale Criteria' to POD, 
+        + non_locale_list(), is_non_locale(), 
+        + typical_en_alias_list(), is_typical_en_alias()
+
+0.26 2012-02-27 12:18:39
+    - rt 75166: POD: change DataTime::Locale to DateTime::Locale
+    - rt 73892: Undeclared dependency on File::Slurp – add most of the proposed patch Makefile.PL part
+    - rt 75167: add normalize_tag_for_ietf()
+
+0.25 2012-01-03 23:38:40
+    - rt 73571 (copy/paste leftover)
+    - rt 73572 (comment typo)
+    - Added 90 more plural rule tests (i.e. @plural_tests in t/04.…, only 2 of which failed in 0.24 due to rt 73678)
+    - rt 73678 (do Java style modulus in plural rules per CLDR)
+    - javascript functions (initial get_plural_form() w/ perl/js tests in t/06.…)
+
+0.24 2011-12-28 22:34:09
+    - rt 73238 added get_fallback_list()
+    - rt 73268 added datetime JSON file to share/
+    - change naming in share/ to be more inline w/ JSON/JS naming conventions
+    - get_cldr_number_symbol_decimal() and get_cldr_number_symbol_group() accessors
+    - Add tests that the javascript plural functions behave the same as the perl plural functions
+
+0.23 2011-12-09 12:54:20
+    - update share/ to not include unloadable locales, whups!
+
+0.22 2011-12-08 22:27:13
+    - rt 71251: fallback needs normalized and split
+    - build 'category_rules_function' in module building process
+    - added plural_rule_string_to_javascript_code()
+    - used plural_rule_string_to_javascript_code() in building the file in share/javascript
+    - added TODO item regarding installing share/
+
+0.21 2011-11-29 09:34:07
+    - rt 72788: fix tests that fail when nvsize > 8, no code changes except version bump
+
+0.20 2011-09-26 09:30:32
+    - improve plural form fallback during CLDR build
+    - rt 70503 - fix NAME section in generated plural form POD
+    - rt 70610 - do native names in their display format if possible
+    - rt 70620 - *_fast() should fall back to parent tag if no explicit entry
+    - default to quiet for the FYI: The number of given values (%d) does not match the number of categories (%d).
+    - Do not interpolate {0} and {1} when passed in as arguments that are being used in pattern building
+
+0.19 2011-08-03 16:36:51
+    - rt 69987: added strict/warnings comment in Locales.pm (also updated 0.18 changelog entry)
+    - rt 70000: added reminder to comment
+    - change stub get_list_or() to be get_list_and() and update POD and tests accordingly
+
+0.18 2011-08-03 09:51:12
+    - Added get_cldr_version()
+    - Fixed a variable name. 
+    - made aliases via coderef instead of glob
+    - added note to get_plural_form() regarding negative value behavior
+    - removed commented out development code 
+    - use simple regex instead of comprehensive parsing if the pattern is the default one
+    - ensure 'en' is included in plural form documentation (rt 69972)
+    - manually tidy due to rt 69971
+    - added comment about category_rules_function key todo
+    - added strict/warnings step in build dir's README
+
+0.17 2011-07-06 10:10:07
+    - Updated data to CLDR 2.0 (rt 65164)
+    - wrapped new()'s eval-require() in %INC existence check (per requested optimization)
+    - added ellipses (rt 65166), "more info" character, and quotation characters to misc_info
+    - added list formats to misc_info
+    - added plural form to misc_info
+    - added t/01.cldr_parse_inherit_sanity.t
+    - added plural_rule_hashref_to_code() &&  plural_rule_string_to_code() && get_cldr_plural_category_list() functions
+    - added get_plural_form() && get_plural_form_categories() methods
+    - added get_list_and()
+    - added stub get_list_or() pending http://unicode.org/cldr/trac/ticket/4051
+    - added get_formatted_decimal()
+    - added get_character_orientation_from_code_fast() && Tiny.pm for its use (per requested optimization)
+    - added get_locale_display_pattern_from_code_fast() && && Tiny.pm for its use (per requested optimization)
+    - added get_locale_display_pattern_from_code()
+
+0.16 2011-02-23 16:12:36
+    - added normalize_tag_for_datetime_locale()
+    - rt52972 POD consistency: s/Return 2/Returns 2/
+    - rt52971 POD: update CLDR version to 1.7.2 (i.e. Based on CLDR 1.7.1)
+    - rt52900 POD clarification: s/returns a 3 element array/returns a reference to a 3 element array/
+    - rt53663 I18N::LangTags::locale2language_tag() does not allow trailing '_'
+
+0.15 2009-12-17 16:48:35
+    - Updated data to CLDR 1.7.2
+    - Added misc_info for decimal and percent format identifiers
+    - removed deprecated non CLDR based,  '::Base' based modules/interface
+    - Added numf() method
+
+0.14 2009-12-14 22:39:27
+    - get_i_tag_for_string() do not prepend 'i_' if we have it already (w/ tests)
+    - comment typo
+
+0.13 2009-11-19 21:33:45
+    -  I18N::LangTags::locale2language_tag() only allows parts between 1 and 8 characters, adjust normalize_tag() accordingly
+
+0.12 2009-11-16 22:39:08
+    - rt 51583 :: change eval/require to core-perl in t/03.cldr_db.t so tests won;t have to be skipped on some systems
+
+0.11 2009-11-11 08:51:07
+    - POD notice of deprecated modules being removed.
+    - Don't test deprecated module POD to avoid erroneous test failures
+
+0.10 2009-11-09 18:56:59
+    - rt 51134 : POD fixups
+    - rt 51137 : parent language fallback
+    - fix version issue w/ Territory mods
+
+0.09 2009-11-05 10:23:16
+    - add Locales::DB::CharacterOrientation
+    - add CLDR report URL to POD
+    - Clarified POD verbiage in 'BEFORE YOU SUBMIT A BUG REPORT' section
+    - Added CLDR version/URL info to POD 
+
+0.08 2009-11-02 09:54:03
+    - skipped tests for deprecated system since they were broken on some systems and are not longer needed
+
+0.07 2009-10-29 09:40:21
+    - add get_native_language_from_code() method
+    - POD tweaks
+    - fix up t/pod-coverage.t to avoid checking aods w/ out POD (i.e. the DB modules)
+    - Added deprecation message to NAME part of all Locales::Base based modules's POD
+    - add digits to normalization functions
+    - improved key normalization
+
+0.06 2009-10-28 14:37:54
+    - Added a new, more efficient, and standard CLDR based Locales.pm object system 
+      (does not use any of the original Locales::Base based modules && doesn't die())
+    - Added deprecated notice to all Locales::Base based modules' POD
+
+0.05 2009-05-19 23:01:55
+    - Added DESTROY stub to silence warnings during make test
+    - fixed rt 40244
+    - fixed rt 34439 
+    - bumped main version to 0.05 and Locales::Base to 0.03
+    - will address other rt's ASAP
+
+0.04 2003-05-29 01:49:16 EDT
+    - examples/lang[1-7].pl changed to language[1-7].pl
+    - documentation for examples/ scripts.
+    - documentation for Locales::Language and Locales::Country.
+
+0.03 2003-05-26 08:46:26 EDT
+    - documentation started for Locales::Language:: modules.
+
+0.02 2003-05-24 10:03:20 EDT
+    - added examples/country7.pl and examples/lang7.pl.
+    - start of documentation.
+
+0.01 2003-05-16 02:33:11 EDT
+    - initial release.

@@ -1,0 +1,42 @@
+NAME
+    LCS::BV - Bit Vector (BV) implementation of the Longest Common
+    Subsequence (LCS) Algorithm
+
+SYNOPSIS
+      use LCS::BV;
+
+      $alg = LCS::BV->new;
+      @lcs = $alg->LCS(\@a,\@b);
+
+ABSTRACT
+    LCS::BV implements Algorithm::Diff using bit vectors and is faster in
+    most cases, especially on strings with a length shorter than the used
+    wordsize of the hardware (32 or 64 bits).
+
+DESCRIPTION
+  CONSTRUCTOR
+    new()
+        Creates a new object which maintains internal storage areas for the
+        LCS computation. Use one of these per concurrent LCS() call.
+
+  METHODS
+    LCS(\@a,\@b)
+        Finds a Longest Common Subsequence, taking two arrayrefs as method
+        arguments. It returns an array reference of corresponding indices,
+        which are represented by 2-element array refs.
+
+  EXPORT
+    None by design.
+
+SEE ALSO
+    Algorithm::Diff
+
+AUTHOR
+    Helmut Wollmersdorfer <helmut.wollmersdorfer@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2014-2015 by Helmut Wollmersdorfer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

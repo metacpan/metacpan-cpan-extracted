@@ -1,0 +1,16 @@
+Revision history for Perl extension List::UtilsBy::XS
+
+0.05 2017-02-22T06:57:22Z
+        - Fix build issue on newer Perl(5.25.9 or higher versions)
+
+0.04 2014-04-17T15:29:06Z
+        - Fix floating numbers sort issue(#2)
+
+0.03 2013-06-25T02:27:07Z
+        - Add CFLAGS(-DPERL_EXT) for older Perl
+
+0.02 2013-06-24T05:35:29Z
+        - Convert to Minilla
+
+0.01  2011-09-26
+        - original version

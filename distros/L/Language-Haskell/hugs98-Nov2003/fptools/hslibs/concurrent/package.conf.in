@@ -1,0 +1,24 @@
+#include "config.h"
+
+Package {
+        name		= "concurrent",
+#ifdef INSTALLING
+	import_dirs	= [ "$libdir/hslibs-imports/concurrent" ],
+#else
+	import_dirs	= [ "$libdir/hslibs/concurrent" ],
+#endif
+        source_dirs	= [],
+#ifdef INSTALLING
+        library_dirs	= [ "$libdir" ],
+#else
+        library_dirs	= [ "$libdir/hslibs/concurrent" ],
+#endif
+        hs_libraries    = [ "HSconcurrent" ],
+	extra_libraries = [],
+        include_dirs    = [],
+        c_includes      = [],
+        package_deps    = [ "base" ],
+        extra_ghc_opts  = [],
+        extra_cc_opts   = [],
+        extra_ld_opts   = []
+}

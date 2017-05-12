@@ -1,0 +1,153 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: Script for language identification
+# PODNAME: yali-language-identifier
+
+use strict;
+use warnings;
+
+use Lingua::YALI::LanguageIdentifier;
+use Lingua::YALI;
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Basename;
+
+our $VERSION = '0.015'; # VERSION
+
+my $file_list = undef;
+my $input_file = undef;
+my $format = "single";
+my $languages = undef;
+my $help = 0;
+my $supported = 0;
+my $each_line = undef;
+
+my $result = GetOptions("filelist=s" => \$file_list,
+                     "input|i=s"   => \$input_file,      # string
+                     "languages|l=s" => \$languages,
+                     "format|f=s"  => \$format,
+                     "supported|s"  => \$supported,,
+                     "each|e"  => \$each_line,
+                     "help|h"  => \$help
+) || pod2usage(-exitval => 105);
+
+if ($help) {
+    pod2usage(-exitval => 0);
+}
+
+my $identifier = Lingua::YALI::LanguageIdentifier->new();
+
+# print out supported files and terminate
+if ( $supported ) {
+    print join("\n", @{$identifier->get_available_languages()}), "\n";
+    exit;
+}
+
+# check output format
+if ( $format ne "single" && $format ne "all" && $format ne "all_p" && $format ne "tabbed" ) {
+    pod2usage(-exitval => 101, -msg => "Unsupported format $format.");
+}
+
+# reading input from STDIN is default
+if ( ! defined($input_file) && ! defined($file_list) ) {
+    $input_file = "-";
+}
+
+# it is incorrect when parameter filelist and input are both specified
+if ( defined($input_file) && defined($file_list) ) {
+    pod2usage(-exitval => 101, -msg => "Options --filelist and --input can not be specified in the same time.");
+}
+
+if ( ! defined($languages) ) {
+    pod2usage(-exitval => 101, -msg => "Options --languages has to be specified.");
+}
+
+# register required languages
+my @languages = split(/ /, $languages);
+$identifier->add_language(@languages);
+
+# identify languages
+if ( defined($input_file) ) {
+    if ( $input_file eq "-" ) {
+        Lingua::YALI::_identify_handle($identifier, \*STDIN, $format, \@languages, $each_line);
+    } else {
+        Lingua::YALI::_identify($identifier, $input_file, $format, \@languages, $each_line);
+    }
+} elsif ( defined($file_list) ) {
+    my $fh_list = undef;
+    my $list_dir = "";
+
+    if ( $file_list eq "-" ) {
+        $fh_list = \*STDIN;
+    } else {
+        open($fh_list, "<", $file_list) or croak("Not found: $file_list\n" . $!);
+        $list_dir = dirname($file_list) . "/";
+    }
+    while ( my $file = <$fh_list> ) {
+        chomp $file;
+        if ( ! -f $file ) {
+            $file = $list_dir . $file;
+        }
+        Lingua::YALI::_identify($identifier, $file, $format, \@languages, $each_line);
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yali-language-identifier - Script for language identification
+
+=head1 VERSION
+
+version 0.015
+
+=head1 SYNOPSIS
+
+yali-language-identifier [options]
+
+Identify languages with pretrained models.
+
+Options:
+
+ -i, --input=F         input file. When F is -, read standard input.
+     --filelist=F      input files are read from F. When F is -, read them from standard input.
+ -f, --format=FORMAT   output FORMAT
+ -l, --languages=L     ISO 639-3 codes of languages seperated by space
+ -s, --supported       prints list of supported languages
+ -h, --help            prints documentation
+
+FORMAT:
+
+ single   - prints out only the most probable language
+ all      - prints out all languages sorted according to their probability descendetly
+ all_p    - prints out all languages with probability sorted according to their probability descendetly
+ tabbed   - prints out probabilities of languages separated by tab in order used for --languages
+
+EXAMPLES:
+
+ Is file /etc/passwd written in english or czech?
+ cat /etc/passwd | yali-language-identifier -i=- -l="eng ces"
+
+More examples are available at L<http://search.cpan.org/perldoc?Lingua%3A%3AYALI%3A%3AExamples>
+
+Version: 0.015 (2014-05-04)
+
+=head1 AUTHOR
+
+Martin Majlis <martin@majlis.cz>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Martin Majlis.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

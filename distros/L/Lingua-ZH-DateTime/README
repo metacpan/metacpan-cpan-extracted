@@ -1,0 +1,28 @@
+This is the README file for Lingua::ZH::DateTime, a module to
+Convert time to chinese format.
+
+* Installation
+
+Lingua::ZH::DateTime uses the standard perl module install process:
+
+perl Makefile.PL
+make
+make test(will be come soon)
+make install
+
+* Copyright
+
+The Lingua::ZH::DateTime module is Copyright (c) 2005-2006 hoowa sun & Meng.H
+P.R.China. All rights reserved.
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+
+* Introduction
+
+This module can convert asctime to chinese format in your locale.
+you can select china singapore hongkong taiwan locale and gb2312/big5 charset.
+asctime is ASC C standard format will from C<localtime> like this:
+
+	$asctime = localtime();
+

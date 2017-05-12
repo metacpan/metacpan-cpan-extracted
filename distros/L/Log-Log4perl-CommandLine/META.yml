@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Log-Log4perl-CommandLine
+version:            0.07
+abstract:           Simple Command Line Interface for Log4perl
+author:
+    - Curt Tilmes <ctilmes@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Getopt::Long:   0
+    Log::Log4perl:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

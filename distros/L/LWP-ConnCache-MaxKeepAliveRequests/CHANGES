@@ -1,0 +1,7 @@
+Revision history for Perl module LWP::ConnCache::MaxKeepAliveRequests:
+
+0.33 Sat Jul 23 15:31:06 BST 2011
+     - fix Content-Type tests (patch by David Storrs)
+
+0.32 Sun Feb  1 15:21:28 GMT 2009
+     - initial release

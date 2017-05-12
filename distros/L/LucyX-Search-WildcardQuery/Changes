@@ -1,0 +1,23 @@
+Revision history for LucyX-Search-WildcardQuery
+
+0.06 01 Sept 2014
+ - pod fix(es)
+ - pass boost through to child ORCompiler (required for Lucy 0.4.0)
+
+0.05 4 Oct 2013
+ - fix highlight_spans() to actually work
+
+0.04 10 July 2013
+ - turn off Stemming analyzer in tests, to clarify how wildcards work.
+ - refactor internals to use delegate pattern with ORQuery and get rid of
+   the WildcardScorer class
+
+0.03 21 Oct 2011
+ - fix to support 'subordinate' change in Lucy 0.2.2
+
+0.02 23 Sept 2011
+ - add highlighting spans support 
+
+0.01 21 June 2011
+ - Initial release. Forked from Search::Query::Dialect::Lucy.
+

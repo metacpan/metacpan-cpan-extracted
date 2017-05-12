@@ -1,0 +1,102 @@
+NAME
+    Lingua::RU::OpenCorpora::Tokenizer - tokenizer for OpenCorpora project
+
+SYNOPSIS
+        my $tokens = $tokenizer->tokens($text);
+
+        my $bounds = $tokenizer->tokens_bounds($text);
+
+DESCRIPTION
+    This module tokenizes input texts in Russian language.
+
+    Note that it uses probabilistic algorithm rather than trying to parse
+    the language. It also uses some pre-calculated data freely provided by
+    OpenCorpora project.
+
+    NOTE: OpenCorpora periodically provides updates for this data. Checkout
+    "opencorpora-update-tokenizer" script that comes with this distribution.
+
+    The algorithm is this:
+
+    1. Split text into chars.
+    2. Iterate over the chars from left to right.
+    3. For every char get its context (see CONTEXT).
+    4. Find probability for the context in vectors file (see "VECTORS FILE")
+    or use the default value - 0.5.
+
+  CONTEXT
+    In terms of this module context is just a binary vector, currently
+    consisting of 17 elements. It's calculated for every character of the
+    text, then it gets converted to decimal representation and then it's
+    checked against "VECTORS FILE". Every element is a result of a simple
+    function like "_is_latin", "_is_digit", "_is_bracket" and etc. applied
+    to the input character and few characters around it.
+
+  VECTORS FILE
+    Contains a list of vectors with probability values showing the chance
+    that given vector is a token boundary.
+
+    Built by OpenCorpora project from semi-automatically annotated corpus.
+
+  HYPHENS FILE
+    Contains a list of hyphenated Russian words. Used in vectors
+    calculations.
+
+    Built by OpenCorpora project from semi-automatically annotated corpus.
+
+  EXCEPTIONS FILE
+    Contains a list of char sequences that are not subjects to tokenizing.
+
+    Built by OpenCorpora project from semi-automatically annotated corpus.
+
+  PREFIXES FILE
+    Contains a list of common prefixes for decompound words.
+
+    Built by OpenCorpora project from semi-automatically annotated corpus.
+
+    NOTE: all files are stored as GZip archives and are not supposed to be
+    edited manually.
+
+METHODS
+  new(%args)
+    Constructs and initializes new tokenizer object.
+
+    Arguments are:
+
+    data_dir
+        Path to a directory with OpenCorpora data. Optional. Defaults to
+        distribution directory (see File::ShareDir).
+
+  tokens($text [, $options])
+    Takes text as input and splits it into tokens. Returns a reference to an
+    array of tokens.
+
+    You can also pass a hashref with options as a second argument. Current
+    options:
+
+    threshold
+        Minimal probability value for tokens boundary. Boundaries with lower
+        probability are excluded from consideration.
+
+        Default value is 1, which makes tokenizer do splitting only when
+        it's confident.
+
+  tokens_bounds($text)
+    Takes text as input and finds bounds of tokens in the text. It doesn't
+    split the text into tokens, it just marks where tokens could be.
+
+    Returns an arrayref of arrayrefs. Inner arrayref consists of two
+    elements: boundary position in text and probability.
+
+SEE ALSO
+    Lingua::RU::OpenCorpora::Tokenizer::Updater
+
+    <http://mathlingvo.ru/nlpseminar/archive/s_49>
+
+AUTHOR
+    OpenCorpora.org team <http://opencorpora.org>
+
+LICENSE
+    This program is free software, you can redistribute it under the same
+    terms as Perl itself.
+

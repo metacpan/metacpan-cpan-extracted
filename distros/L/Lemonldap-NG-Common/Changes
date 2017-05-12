@@ -1,0 +1,25 @@
+Revision history for Perl extension Lemonldap::NG::Common.
+
+See http://jira.ow2.org/browse/LEMONLDAP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel&allVersions=true
+for newer revisions
+
+0.94 Mon Jun 29 11:44:47 2009
+	- New SOAP wrapper
+	- WSDL builder
+	- New Apache2::Log wrapper
+	- Syslog wrapper
+	- setApacheUser() sub
+	- LDAP storage backend for sessions and configuration
+	- Crypt object in configuration
+	- Safelib.pm : common subs useable in Lemonldap::NG rules
+
+0.92 Sun Feb 8 08:04:25 2009
+	- Change CGI SOAP system
+
+0.91 Sun Dec 26 10:06:42 2008
+	- Add SOAP::Lite dependency
+
+0.9  Mon Nov 17 16:34:56 2008
+	- New package including the old Lemonldap::NG::manager::Conf and CGI
+	  common functions
+

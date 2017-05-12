@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentCollection xmlns="http://alvis.info/enriched/" version="1.1">
+<documentRecord xmlns="http://alvis.info/enriched/" id="EE84646F3CDF765B8EE759DC235DF475">
+  <acquisition>
+      <acquisitionData>
+        <modifiedDate>2007-12-13 22:03:06</modifiedDate>
+        <urls>
+          <url>file://Fichiers-Test/NLPPlatform.html</url>
+        </urls>
+      </acquisitionData>
+      <canonicalDocument>        
+        <section>
+	<section>
+            <section>Alvis::NLPPlatform - Perl extension for linguistically annotating XML documents in Alvis</section>
+              <section># =item * Licence:</section> 
+              <section># Compatible with GPL</section> 
+	      </section>
+<section>
+              <section># =item * Version number required:</section> 
+              <section># 0.4</section> 
+          <list>
+            <item>NAME</item> 
+            <item>SYNOPSIS</item> 
+            <item>DESCRIPTION</item> 
+            <item>Linguistic annotation: requirements</item> 
+            <item>METHODS</item> 
+            <item>compute_dependencies()</item> 
+            <item>unparseable_id()</item></list> PLATFORM CONFIGURATION DEFAULT INTEGRATED/WRAPPED NLP TOOLS 
+          <list>
+            <item>Named Entity Tagger</item> 
+            <item>Word and sentence segmenter</item> 
+            <item>Part-of-Speech Tagger</item> 
+          </list>
+</section>
+</section>      </canonicalDocument>
+      <metaData>
+        <meta name="title">title</meta>
+      </metaData>
+      <links>
+        <outlinks>
+          <link type="a">
+            <anchorText>http://www.link.cs.cmu.edu/link/ftp-site/link-grammar/link-4.1b/unix/link-4.1b.tar.gz</anchorText>
+            <location>http://www.link.cs.cmu.edu/link/ftp-site/link-grammar/link-4.1b/unix/link-4.1b.tar.gz</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www-tsujii.is.s.u-tokyo.ac.jp/~genia/postagger/geniatagger-2.0.1.tar.gz</anchorText>
+            <location>http://www-tsujii.is.s.u-tokyo.ac.jp/~genia/postagger/geniatagger-2.0.1.tar.gz</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www.alvis.info</anchorText>
+            <location>http://www.alvis.info</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www.it.utu.fi/biolg/</anchorText>
+            <location>http://www.it.utu.fi/biolg/</location>
+          </link>
+          <link type="a">
+            <anchorText>thierry.hamon@lipn.univ-paris13.fr</anchorText>
+            <location>mailto:thierry.hamon@lipn.univ-paris13.fr</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www.alvis.info/alvis/Architecture_2fFormats?action=show&amp;amp;redirect=architecture%2Fformats#documents</anchorText>
+            <location>http://www.alvis.info/alvis/Architecture_2fFormats?action=show&amp;amp;redirect=architecture%2Fformats#documents</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger/DecisionTreeTagger.html</anchorText>
+            <location>http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger/DecisionTreeTagger.html</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www-lipn.univ-paris13.fr/~hamon/ALVIS/Tools/TagEN.tar.gz</anchorText>
+            <location>http://www-lipn.univ-paris13.fr/~hamon/ALVIS/Tools/TagEN.tar.gz</location>
+          </link>
+          <link type="a">
+            <anchorText>http://search.cpan.org/~thhamon/Alvis-TermTagger-0.3/</anchorText>
+            <location>http://search.cpan.org/~thhamon/Alvis-TermTagger-0.3/</location>
+          </link>
+          <link type="a">
+            <anchorText>julien.deriviere@lipn.univ-paris13.fr</anchorText>
+            <location>mailto:julien.deriviere@lipn.univ-paris13.fr</location>
+          </link>
+          <link type="a">
+            <anchorText>http://www-lipn.univ-paris13.fr/~hamon/ALVIS/Tools/WordSeg.tar.gz</anchorText>
+            <location>http://www-lipn.univ-paris13.fr/~hamon/ALVIS/Tools/WordSeg.tar.gz</location>
+          </link>
+        </outlinks>
+      </links>
+    		<analysis>
+			<property name="language">en</property>
+		</analysis>
+  </acquisition>
+</documentRecord>
+</documentCollection>

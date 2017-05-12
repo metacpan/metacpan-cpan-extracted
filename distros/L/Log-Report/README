@@ -1,0 +1,14 @@
+==== README for Log::Report
+=    Last update: 25 May 2007, Mark Overmeer
+
+The Log::Report module is entangled with various other modules, which
+may each take a long time to install but then are never used.  Therefore,
+these modules will produce compile-time errors.
+
+Optional modules:      Needed for:
+  Log::Dispatch and ::*  Log::Report::Dispatcher::LogDispatch
+  Log::Log4perl          Log::Report::Dispatcher::Log4perl
+  Sys::Syslog            Log::Report::Dispatcher::Syslog
+  PPI                    Log::Report::Extract::PerlPPI
+  Locale::gettext        Log::Report::Translator::Gettext
+

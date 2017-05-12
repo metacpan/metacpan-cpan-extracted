@@ -1,0 +1,7 @@
+exists:
+CloudLinux-release
+redhat-release
+
+do not:
+redhat_version
+lsb-release

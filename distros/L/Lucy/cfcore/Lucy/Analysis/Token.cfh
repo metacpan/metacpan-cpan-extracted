@@ -1,0 +1,128 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Unit of text.
+ *
+ * Token is the fundamental unit used by Apache Lucy's Analyzer subclasses.
+ * Each Token has 5 attributes: `text`, `start_offset`,
+ * `end_offset`, `boost`, and `pos_inc`.
+ *
+ * The `text` attribute is a Unicode string encoded as UTF-8.
+ *
+ * `start_offset` is the start point of the token text, measured in
+ * Unicode code points from the top of the stored field;
+ * `end_offset` delimits the corresponding closing boundary.
+ * `start_offset` and `end_offset` locate the Token
+ * within a larger context, even if the Token's text attribute gets modified
+ * -- by stemming, for instance.  The Token for "beating" in the text "beating
+ * a dead horse" begins life with a start_offset of 0 and an end_offset of 7;
+ * after stemming, the text is "beat", but the start_offset is still 0 and the
+ * end_offset is still 7.  This allows "beating" to be highlighted correctly
+ * after a search matches "beat".
+ *
+ * `boost` is a per-token weight.  Use this when you want to assign
+ * more or less importance to a particular token, as you might for emboldened
+ * text within an HTML document, for example.  (Note: The field this token
+ * belongs to must be spec'd to use a posting of type RichPosting.)
+ *
+ * `pos_inc` is the POSition INCrement, measured in Tokens.  This
+ * attribute, which defaults to 1, is a an advanced tool for manipulating
+ * phrase matching.  Ordinarily, Tokens are assigned consecutive position
+ * numbers: 0, 1, and 2 for `"three blind mice"`.  However, if you
+ * set the position increment for "blind" to, say, 1000, then the three tokens
+ * will end up assigned to positions 0, 1, and 1001 -- and will no longer
+ * produce a phrase match for the query `"three blind mice"`.
+ */
+public class Lucy::Analysis::Token inherits Clownfish::Obj {
+
+    char     *text;
+    size_t    len;
+    uint32_t  start_offset;
+    uint32_t  end_offset;
+    float     boost;
+    int32_t   pos_inc;
+    int32_t   pos;
+
+    /** Create a new Token.
+     *
+     * @param text A UTF-8 string.
+     * @param len Size of the string in bytes.
+     * @param start_offset Start offset into the original document in Unicode
+     * code points.
+     * @param start_offset End offset into the original document in Unicode
+     * code points.
+     * @param boost Per-token weight.
+     * @param pos_inc Position increment for phrase matching.
+     */
+    public inert incremented Token*
+    new(const char *text, size_t len, uint32_t start_offset,
+        uint32_t end_offset, float boost = 1.0, int32_t pos_inc = 1);
+
+    /** Initialize a Token.
+     *
+     * @param text A UTF-8 string.
+     * @param len Size of the string in bytes.
+     * @param start_offset Start offset into the original document in Unicode
+     * code points.
+     * @param start_offset End offset into the original document in Unicode
+     * code points.
+     * @param boost Per-token weight.
+     * @param pos_inc Position increment for phrase matching.
+     */
+    public inert Token*
+    init(Token *self, const char *text, size_t len,
+         uint32_t start_offset, uint32_t end_offset,
+         float boost = 1.0, int32_t pos_inc = 1);
+
+    /** qsort-compatible comparison routine.
+     */
+    inert int
+    compare(const void *va, const void *vb);
+
+    public uint32_t
+    Get_Start_Offset(Token *self);
+
+    public uint32_t
+    Get_End_Offset(Token *self);
+
+    public float
+    Get_Boost(Token *self);
+
+    public int32_t
+    Get_Pos_Inc(Token *self);
+
+    /** Accessor for pos.  Only valid after position increments for an array
+     * of tokens have been resolved.
+     */
+    int32_t
+    Get_Pos(Token *self);
+
+    public char*
+    Get_Text(Token *self);
+
+    public size_t
+    Get_Len(Token *self);
+
+    public void
+    Set_Text(Token *self, char *text, size_t len);
+
+    public void
+    Destroy(Token *self);
+}
+
+

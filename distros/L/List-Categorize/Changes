@@ -1,0 +1,12 @@
+Revision history for List-Categorize
+
+0.01    Wed Sep  9 16:16:26 2009
+        Initial version.
+
+0.02    Tue Sep 22 19:14:53 2009
+        Fixed a bug reported by Johan Lodin. Thanks, Johan!
+        http://rt.cpan.org/Public/Bug/Display.html?id=49910
+
+0.03    Tue Sep 22 19:21:32 2009
+        Updated Changes file and corrected RT URLs.
+

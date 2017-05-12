@@ -1,0 +1,28 @@
+---
+abstract: 'appender for DBIx::Class'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Text::xSV: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Log4perl-Appender-DBIx-Class
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBIx::Class: 0
+  Log::Log4perl: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

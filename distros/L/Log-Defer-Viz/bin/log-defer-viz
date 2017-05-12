@@ -1,0 +1,760 @@
+#!/usr/bin/env perl
+use common::sense;
+
+use JSON::XS;
+use Getopt::Long;
+use Term::ANSIColor;
+use Term::Size;
+use Try::Tiny;
+use IPC::Open2;
+
+use Log::Defer::Viz;
+
+
+## List of terminal colours in order of preference (not all terminals support bright_*)
+
+my $colour_spec = {
+    error => [qw/ bright_red red /],
+    warn => [qw/ bright_yellow yellow /],
+    info => [qw/ green /],
+    debug => [qw/ bright_blue blue /],
+};
+
+my @opt_spec = (
+  ## INPUT FORMAT
+
+  'input-format=s',
+
+  ## DATE
+
+  'date!',
+  'since-now',
+  'tz=s',
+
+  ## FILTERING
+
+  'logs!',
+
+  'verbosity=i',
+  'error!',
+  'warn!',
+  'info!',
+  'debug!',
+
+  'quiet|q',
+  'verbose|v',
+
+  'colour!', 'color!',
+
+  ## TIMERS
+
+  'timers!',
+  'timer-columns=i',
+
+  ## DATA SECTION
+
+  'data!',
+  'data-format=s',
+  'data-only',
+  'count=s@',
+
+  ## MISC
+
+  'help|h|?',
+  'grep|filter|g=s',
+  'map|m=s',
+  'pass-through|pt',
+  'reduce|r=s',
+  'follow|f',
+  'follow-reopen|F',
+  'preserve-newlines|pn',
+  'sort-time',
+);
+
+my $opt = {
+    'input-format' => 'json',
+
+    'date' => 1,
+    'since-now' => 0,
+
+    'logs' => 1,
+    'verbosity' => 30,
+    'quiet' => 0,
+    'verbose' => 0,
+
+    'timers' => 1,
+    'timer-columns' => 100,
+
+    'data-format' => 'json-pretty',
+    'data-only' => 0,
+
+    'follow' => 0,
+    'follow-reopen' => 0,
+    'preserve-newlines' => 0,
+    'sort-time' => 0,
+};
+
+GetOptions($opt, @opt_spec) || die "GetOptions failed";
+
+
+
+if ($opt->{help}) {
+  require Pod::Perldoc;
+  @ARGV = ('-F', $0);
+  Pod::Perldoc->run();
+  exit;
+}
+
+
+die "Only json input-format is currently supported" unless $opt->{'input-format'} eq 'json';
+
+$opt->{colour} = $opt->{color} if exists $opt->{color};
+if (!exists $opt->{colour}) {
+  $opt->{colour} = 1 if -t STDOUT;
+}
+
+if ($opt->{verbose} && $opt->{quiet}) {
+  die "--verbose and --quiet are incompatible";
+} elsif ($opt->{verbose}) {
+  $opt->{verbosity} = 40;
+  $opt->{data} = 1 unless (defined $opt->{data} && !$opt->{data});
+} elsif ($opt->{quiet}) {
+  $opt->{verbosity} = 20;
+  $opt->{timers} = 0 unless !$opt->{timers};
+}
+
+
+if ($opt->{'data-only'}) {
+  $opt->{date} = $opt->{timers} = $opt->{logs} = 0;
+  $opt->{data} = 1;
+}
+
+
+
+my $columns = $opt->{'timer-columns'};
+
+my ($term_cols, $term_rows) = Term::Size::chars(*STDOUT{IO});
+$columns = $term_cols if $term_cols;
+
+
+
+## The _ sub is a shortcut for use in --grep, --map, and --count expressions, ie --grep "_->{data}"
+sub _ () { $_ }
+
+if ($opt->{grep}) {
+  my $expr = $opt->{grep};
+  $opt->{grep} = eval('sub { local $_ = $_[0]; ' . "$expr\n" . '}');
+  die "Error compiling --grep expression '$expr' ($@)" if $@;
+}
+
+if ($opt->{map}) {
+  my $expr = $opt->{map};
+  $opt->{map} = eval('sub { local $_ = $_[0]; ' . "$expr\n" . '}');
+  die "Error compiling --map expression '$expr' ($@)" if $@;
+}
+
+$Log::Defer::Viz::Reduce::o = {};
+
+if ($opt->{reduce}) {
+  my $expr = $opt->{reduce};
+  $opt->{reduce} = eval('package Log::Defer::Viz::Reduce; our $o; sub { local $_ = $_[0]; ' . "$expr\n" . '}');
+  die "Error compiling --reduce expression '$expr' ($@)" if $@;
+}
+
+die "--pass-through and --map are incompatible" if $opt->{'pass-through'} && $opt->{map};
+die "--pass-through and --reduce are incompatible" if $opt->{'pass-through'} && $opt->{reduce};
+
+
+my $count = {};
+my $count_subs = {};
+
+foreach my $key (@{ $opt->{count} }) {
+  if ($key =~ /^\w+$/) {
+    ## The original format for count arguments were keys to the data hash
+    $count_subs->{$key} = sub { $_[0]->{data}->{$key} };
+  } else {
+    ## But the more general way is with an accessor
+    $count_subs->{$key} = eval('sub { local $_ = $_[0]; ' . "$key\n" . '}');
+    die "Error compiling --count expression '$key' ($@)" if $@;
+  }
+
+  $count->{$key} = {};
+}
+
+
+
+
+
+unshift(@ARGV, '-') unless @ARGV;
+if (@ARGV > 1 && ($opt->{follow} || $opt->{'follow-reopen'})) {
+  die "You've specified --follow or --follow-reopen but have also provided multiple files, which doesn't make sense. Did you mean to do this?";
+}
+
+if ($opt->{follow} && $opt->{'follow-reopen'}) {
+  die "-f and -F are mutually exclusive";
+}
+
+
+my ($sort_out_fh, $sort_in_fh);
+
+if ($opt->{'sort-time'}) {
+  open2($sort_out_fh, $sort_in_fh, 'sort', '-n');
+}
+
+
+while (my $file = shift) {
+  my $fh;
+
+  if ($file =~ /[.]gz$/) {
+    open($fh, '-|', qw/zcat/, $file) || die "couldn't open $file with zcat: $!";
+  } elsif ($file =~ /[.]bz2$/) {
+    open($fh, '-|', qw/bzcat/, $file) || die "couldn't open $file with bzcat: $!";
+  } elsif ($file eq '-') {
+    $fh = \*STDIN;
+  } else {
+    if ($opt->{follow}) {
+      open($fh, '-|', qw/tail -f -n 0/, $file) || die "couldn't open $file with tail -f: $!";
+    } elsif ($opt->{'follow-reopen'}) {
+      ## May not be fully portable
+      open($fh, '-|', qw/tail -F -n 0/, $file) || die "couldn't open $file with tail -F: $!";
+    } else {
+      open($fh, '<', $file) || die "couldn't open $file: $!";
+    }
+  }
+
+  if ($opt->{'sort-time'}) {
+    while (<$fh>) {
+      if (/"start":\s*([\d.]+)/) {
+        print $sort_in_fh "$1$_";
+      }
+    }
+    next;
+  }
+
+  handle_all_entries_from_fh($fh);
+
+  close($fh);
+}
+
+if ($opt->{'sort-time'}) {
+  undef $sort_in_fh;
+  handle_all_entries_from_fh($sort_out_fh);
+}
+
+
+if (scalar @{$opt->{count}}) {
+  print output_data($count);
+}
+
+if ($opt->{reduce}) {
+  print output_data($Log::Defer::Viz::Reduce::o);
+}
+
+
+
+sub handle_all_entries_from_fh {
+  my $fh = shift;
+
+  while(<$fh>) {
+    my $entry;
+
+    try {
+      $_ =~ s/^[^{]+//; ## } grep -r prepends filename, this regexp is so you don't have to remember the -h flag to grep.
+      $entry = decode_json($_);
+    } catch {
+      if ($opt->{verbose}) {
+        print STDERR "Error parsing log line: $_";
+      }
+    };
+
+    handle_entry($entry, \$_) if defined $entry;
+  }
+}
+
+sub handle_entry {
+  my ($entry, $line_ref) = @_;
+
+  if ($opt->{grep}) {
+    my $result;
+
+    eval {
+      $result = $opt->{grep}->($entry);
+    };
+
+    if ($@) {
+      print STDERR "Run-time error in --grep expression, skipping record: $@";
+      return;
+    }
+
+    return unless $result;
+  }
+
+  if ($opt->{'pass-through'}) {
+    print $$line_ref;
+
+    return;
+  }
+
+  if ($opt->{map}) {
+    my $output;
+
+    eval {
+      $output = $opt->{map}->($entry);
+    };
+
+    if ($@) {
+      print STDERR "Run-time error in --map expression, skipping record: $@";
+      return;
+    }
+
+    $output = "$output\n" unless $output =~ /\n$/;;
+    print $output;
+
+    return;
+  }
+
+  if ($opt->{reduce}) {
+    eval {
+      $opt->{reduce}->($entry);
+    };
+
+    if ($@) {
+      print STDERR "Run-time error in --reduce expression, skipping record: $@";
+      return;
+    }
+
+    return;
+  }
+
+  if (@{ $opt->{count} }) {
+    foreach my $key (@{ $opt->{count} }) {
+      my $val;
+
+      eval {
+        $val = $count_subs->{$key}->($entry);
+      };
+
+      if ($@) {
+        print STDERR "Run-time error in --count expression, skipping record: $@";
+        return;
+      }
+
+      if (defined $val) {
+        $count->{$key}->{$val} += 1;
+      }
+    }
+
+    return;
+  }
+
+  my $millis = '';
+
+  if ($entry->{start} =~ /[.](\d+)$/) {
+    $millis = ".$1";
+  }
+
+  if ($opt->{date}) {
+    my $formatted = '';
+
+    if ($opt->{'since-now'}) {
+      require Date::Calc;
+
+      my $elapsed = int(time - $entry->{start});
+
+      if ($elapsed <= 0) {
+        $formatted = abs($elapsed) . " seconds in the future.. clock is wrong?";
+      } else {
+        my ($Dd,$Dh,$Dm,$Ds) = Date::Calc::Normalize_DHMS(0, 0, 0, int(time - $entry->{start}));
+        $formatted .= "$Dd days " if $Dd;
+        $formatted .= "$Dh hours " if $Dh;
+        $formatted .= "$Dm minutes " if $Dm;
+        $formatted .= "$Ds seconds " if $Ds;
+
+        $formatted .= "ago";
+      }
+    } else {
+      require Date::Format;
+
+      $formatted = Date::Format::time2str("%Y-%m-%d %a %H:%M:%S$millis %Z", $entry->{start}, $opt->{tz});
+    }
+
+    my $date_header = "------ $formatted ($entry->{start}) ------";
+
+    $date_header = colored($date_header, 'black on_white') if $opt->{colour};
+
+    print "$date_header\n";
+  }
+
+  if ($opt->{logs}) {
+    foreach my $log (@{ $entry->{logs} }) {
+      next unless should_show_message($log->[1]);
+
+      my @log_message = @$log[2..(@$log-1)];
+
+      my $log_string = ' [' . sprintf("%5s", num_to_level($log->[1])) . ']';
+
+      if (@log_message > 1 && !ref $log_message[0] && $log_message[0] !~ /\n/) {
+          $log_string .= " $log_message[0]";
+          shift @log_message;
+      }
+
+      if (@log_message == 1 && !ref $log_message[0] && !$opt->{'preserve-newlines'}) {
+        $log_string .= ' ' . $log_message[0];
+      }
+      else {
+        $log_string .= ' ' . encode_json(\@log_message) if @log_message;
+      }
+
+      if ($opt->{colour}) {
+          my $colour = num_to_colour($log->[1]);
+          unless ($opt->{'preserve-newlines'}) {
+            my $white_bar = colored('|', 'white').color($colour);
+            $log_string =~ s/\n(?=.)/\n  $white_bar                  /gs;
+            chomp $log_string;
+          }
+          $log_string = colored($log_string, $colour) if defined $colour;
+      }
+      else {
+          # whitespace insertion to indent&align with '   | 0.003226 [ WARN] '
+          unless ($opt->{'preserve-newlines'}) {
+            $log_string =~ s/\n(?=.)/\n  |                  /g;
+            chomp $log_string;
+          }
+      }
+
+      print '  | ' . format_time_offset($log->[0]) . $log_string . "\n";
+    }
+
+    print "  |_" . format_time_offset($entry->{end}) . " [END]\n\n";
+  }
+
+  if ($opt->{timers}) {
+    print Log::Defer::Viz::render_timers(width => $columns-10, timers => $entry->{timers})
+      if (ref $entry->{timers} eq 'ARRAY' && @{ $entry->{timers} }) ||
+         (ref $entry->{timers} eq 'HASH' && %{ $entry->{timers} });
+  }
+
+  if ($entry->{data}) {
+    if ($opt->{data}) {
+      print "  Data:\n" unless $opt->{'data-only'};
+      print output_data($entry->{data});
+    } else {
+      print "  ** This log has associated data. See it with --data\n"
+        unless $opt->{quiet} || (defined $opt->{data} && !$opt->{data});
+    }
+  }
+
+  print "\n";
+}
+
+
+
+sub num_to_level {
+  my $level = shift;
+
+  return "ERROR" if $level == 10;
+  return "WARN" if $level == 20;
+  return "INFO" if $level == 30;
+  return "DEBUG" if $level == 40;
+
+  return $level;
+}
+
+my $terminal_colour_name_cache = {};
+
+sub get_colour_name {
+  my $name = shift;
+
+  return $terminal_colour_name_cache->{$name} if exists $terminal_colour_name_cache->{$name};
+
+  foreach my $colour_under_test (@{ $colour_spec->{$name} }) {
+    eval {
+      colored('junk', $colour_under_test);
+    };
+
+    return ($terminal_colour_name_cache->{$name} = $colour_under_test)
+      if !$@;
+  }
+
+  return ($terminal_colour_name_cache->{$name} = undef);
+}
+
+sub num_to_colour {
+  my $level = shift;
+
+  return get_colour_name("error") if $level <= 10;
+  return get_colour_name("warn") if $level <= 20;
+  return get_colour_name("info") if $level <= 30;
+  return get_colour_name("debug") if $level <= 40;
+
+  return;
+}
+
+sub format_time_offset {
+  my $offset = shift;
+
+  return sprintf("%.6f", $offset);
+}
+
+sub should_show_message {
+  my $level = shift;
+
+  return $opt->{error} if $level == 10 && defined $opt->{error};
+  return $opt->{warn} if $level == 20 && defined $opt->{warn};
+  return $opt->{info} if $level == 30 && defined $opt->{info};
+  return $opt->{debug} if $level == 40 && defined $opt->{debug};
+
+  return 1 if $level <= $opt->{verbosity};
+
+  return 0;
+}
+
+
+my $pretty_json_context;
+
+sub output_data {
+  my $data = shift;
+
+  if ($opt->{'data-format'} eq 'json-pretty') {
+    $pretty_json_context ||= JSON::XS->new->ascii->pretty->canonical->allow_nonref;
+    return $pretty_json_context->encode($data);
+  } elsif ($opt->{'data-format'} eq 'json') {
+    return encode_json($data);
+  } elsif ($opt->{'data-format'} eq 'yaml') {
+    require YAML;
+    return YAML::Dump($data);
+  } elsif ($opt->{'data-format'} eq 'dumper') {
+    require Data::Dumper;
+    local $Data::Dumper::Terse = 1;
+    local $Data::Dumper::Indent = 1;
+    local $Data::Dumper::Useqq = 1;
+    local $Data::Dumper::Deparse = 1;
+    local $Data::Dumper::Quotekeys = 0;
+    local $Data::Dumper::Sortkeys = 1;
+
+    return Data::Dumper::Dumper($data);
+  }
+
+  die "Unknown data format: $opt->{'data-format'}";
+}
+
+
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+log-defer-viz - command-line utility for rendering log messages created by L<Log::Defer>
+
+=head1 DESCRIPTION
+
+L<Log::Defer> is a module that creates structured logs. The L<Log::Defer> documentation explains structured logging and its benefits over ad-hoc logging.
+
+This module installs a command-line script that parses structured logs created by L<Log::Defer> and displays them in a readable manner.
+
+=head1 INSTALLATION
+
+The fastest way to install C<log-defer-viz> is with cpanminus:
+
+    curl -sL https://raw.github.com/miyagawa/cpanminus/master/cpanm | sudo perl - Log::Defer::Viz
+
+=head1 SWITCHES
+
+=head2 INPUT METHODS
+
+    $ cat file.log | log-defer-viz
+    $ log-defer-viz < file.log
+    $ log-defer-viz file.log
+    $ log-defer-viz -F file.log # continuously tail file
+    $ log-defer-viz file.log file2.log
+    $ log-defer-viz archived.log.gz more_logs.bz2
+
+=head2 INPUT FORMAT
+
+    $ log-defer-viz --input-format=json  ## default is newline separated JSON
+    $ log-defer-viz --input-format=sereal  ## Sereal::Decoder (not impl)
+    $ log-defer-viz --input-format=messagepack  ## Data::MessagePack (not impl)
+    $ log-defer-viz --input-format=storable  ## Storable (not impl)
+
+Note: The only input format currently implemented is newline-separated JSON.
+
+=head2 LOG MESSAGES
+
+    $ log-defer-viz  ## by default shows error, warn, and info logs
+    $ log-defer-viz -v  ## verbose mode (adds debug logs and more)
+    $ log-defer-viz --debug  ## show debug logs
+    $ log-defer-viz --quiet  ## only errors and warnings
+    $ log-defer-viz --verbosity 25  ## numeric verbosity threshold
+    $ log-defer-viz --nowarn  ## muffle warn logs (so show error and info)
+    $ log-defer-viz --nologs  ## don't show log section
+    $ log-defer-viz --nocolour  ## turn off terminal colours
+    $ log-defer-viz --preserve-newlines # don't indent multi-line log messages
+
+=head2 TIMERS
+
+    $ log-defer-viz --timer-columns 80  ## width of timer chart
+    $ log-defer-viz --since-now  ## show relative to now times
+                                 ##   like "34 minutes ago"
+    $ log-defer-viz --notimers  ## don't show timer chart
+    $ log-defer-viz --tz UTC  ## show times in UTC, not local
+
+=head2 DATA SECTION
+
+Applications can optionally log information in a "data" hash. This information is mostly designed to be extracted by programs so C<log-defer-viz> doesn't display it by default. Use the C<--data> option to display it anyway, and the C<--data-format> option to choose the format to display it in. The available formats are C<pretty-json>, C<json>, C<yaml>, and C<dumper>.
+
+    $ log-defer-viz --data  ## show data section. default is pretty-json
+    $ log-defer-viz --data-format=json  ## compact, not pretty
+    $ log-defer-viz --data-format=dumper  ## Data::Dumper
+    $ log-defer-viz --data-only  ## only show data
+
+=head2 FILTERS, TRANSFORMS, AGGREGATES
+
+As described in detail in their respective sections below, C<--grep>, C<--map>, and C<--reduce> allow flexible selection and manipulation of your log data using arbitrary perl code. In the provided perl code, C<$_> refers to the log entry as a hash-reference. In C<--reduce> there is also a special C<$o> output variable.
+
+    $ log-defer-viz --grep '$_->{data}'  ## grep for records that have a data section.
+                                         ## $_ is the entire Log::Defer entry.
+    $ log-defer-viz --map '$_->{data}->{username}'  ## Extract username from data
+    $ log-defer-viz --reduce '$o->{ $_->{data}->{ip_addr} }++'  ## Count IP addresses
+    $ log-defer-viz --pass-through  ## After grepping, print a valid log-defer stream
+
+=head2 COUNT
+
+The count parameter tallies values found in log file. The arguments can be keys in the data section or arbitrary perl code. Multiple values are accepted. Note: This feature is mostly obsoleted by the C<--reduce> feature but is kept for backwards compatibility and because it can be quite convenient.
+
+    $ log-defer-viz --data --count ip_address ## display how many log lines for each ip address
+    $ log-defer-viz --data --count ip_address --count '$_->{data}->{login_info}->{username}'
+
+=head2 MISCELLANEOUS
+
+    $ log-defer-viz --help  ## the text you are reading now
+    $ log-defer-viz --sort-time  ## sort by start time
+
+
+=head1 GREPING
+
+As shown above, there is a C<--grep> command-line option. This lets you filter log messages using arbitrary perl code. If the expression returns true, the log message is processed and displayed as usual.
+
+Being able to do this easily is an important advantage of structured logs. With unstructured logs it is often difficult to extract all of the information related to a request and nothing else.
+
+For example, here is how to grep for all requests that took longer than 500 milliseconds:
+
+    $ log-defer-viz --grep '$_->{end} > .5' server.log
+
+Depending on your underlying storage format, it may be meaningful to grep B<before> passing to C<log-defer-viz> (usually for performance reasons). Currently the only supported storage format is newline-separated JSON which I<is> designed to be pre-grepable. If your search string appears anywhere in the object, the entire log message will be displayed:
+
+    $ grep 10.9.1.2 app.log | log-defer-viz
+
+The final and most error-prone way to grep Log::Defer logs is to grep the unstructured output of C<log-defer-viz> (not recommended):
+
+    $ log-defer-viz app.log | grep 10.9.1.2
+
+In general, C<--grep> can be combined with other switches that take expressions such as C<--map> and C<--reduce>. In these cases, the greping will occur first.
+
+
+=head1 MAPPING
+
+Similar to C<--grep>, there is also a C<--map> command-line option. If this option is passed in, the only output is whatever your C<--map> expression returns.
+
+For example, if you are putting the PID into the data section with C<< $log->data->{pid} = $$ >>, then you can extract the PID like so:
+
+    $ log-defer-viz --map '$_->{data}->{pid}' < app.log
+    9765
+    9768
+    9771
+
+Join together fields with a pipe:
+
+    $ log-defer-viz --map 'join "|", $_->{data}{pid}, $_->{start}' < app.log
+    9765|1362166673.95104
+    9768|1362168038.85611
+    9771|1362169482.39561
+
+Make dates readable (C<localtime> in scalar context makes a timestamp readable):
+
+    $ log-defer-viz --map 'join "|", $_->{data}{pid}, "".localtime($_->{start})' < app.log
+    9765|Fri Mar  1 14:37:53 2013
+    9768|Fri Mar  1 15:00:38 2013
+    9771|Fri Mar  1 15:24:42 2013
+
+As with C<--grep>, you have access to any perl functions you might need. Also, you can combine C<--map> and C<--grep>. The grep filtering will be applied before the mapping.
+
+For example, here is how to do a "pass-through grep" where the output is another valid JSON-encoded L<Log::Defer> file:
+
+    $ export USER=jimmy
+    $ log-defer-viz -g "_->{data}{username} eq '$USER'" \
+                    -m "encode_json _"                  \
+                    < requests.log                      \
+                    > jimmys-requests.log
+
+Note that the above also demonstrates two shortcut features: First, the C<-g> and C<-m> switches are abbreviations for C<--grep> and C<--map> respectively. Second, in grep and map expressions the C<_> function is an abbreviation for C<$_>. Although this is one character shorter, the main reason this exists is so that you can use double-quoted strings without having to worry about escaping C<$> characters from your shell.
+
+Instead of using C<-m "encode_json $_">, there is a C<--pass-through> option that is more efficient since it doesn't pointlessly re-encode the log message.
+
+
+
+=head1 REDUCING
+
+Unlike C<--map> which outputs the same number of values that were input, and C<--grep> that can return any number up to that amount, C<--reduce> returns exactly one value.
+
+While the expression passed in as an argument to C<--reduce> is being evaluated, there is a special variable called C<$o> available. The initial value of this variable is an empty hash (C<{}>) and the value stored there is preserved across all invocations of your reduce expression. This means it can be used for counters and accumulators and such.
+
+The most straightforward use-case is the simple tally or count. For example, here is how you could mimic the (somewhat deprecated) C<--count> feature and get the sum totals of the different HTTP status codes present in the log file:
+
+    $ log-defer-viz --reduce '$o->{ $_->{data}->{status_code} }++' \
+                    service.log
+    {
+        "200": 10293,
+        "404": 392,
+        "304": 3012,
+        "500": 2
+    }
+
+Here is how to count how many log entries contain at least one error message (log level 10 or lower, see L<Log::Defer>):
+
+    --reduce '$o->{errors}++ if grep { $_->[1] <= 10 } @{ $_->{logs} }'
+
+As with C<--data> and C<--count>, the default output format is prettified JSON but you can change that with the C<--data-format> option.
+
+
+
+=head1 SEE ALSO
+
+L<Log::Defer>
+
+L<Log::Defer::Viz github repo|https://github.com/hoytech/Log-Defer-Viz>
+
+The C<log-defer-viz> is also useful for visualising logs created by Michael Pucyk's L<LogDefer Python module|https://github.com/mikep/LogDefer> (since it outputs the same format)
+
+=head1 AUTHOR
+
+Doug Hoyte, C<< <doug@hcsw.org> >>
+
+=head1 CONTRIBUTORS
+
+Matt Phillips, C<< <mattp@cpan.org> >>
+
+Mike P
+
+Mike R
+
+Avianna
+
+Thanks to the above and also to everyone else who has given feedback or suggestions.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2013-2016 Doug Hoyte and contributors.
+
+This module is licensed under the same terms as perl itself.
+
+=cut
+
+
+
+TODO:
+
+* detect duplicate arguments to --grep and --map and --reduce.. must be some Getopt::Long flag to force an exception?
+
+* option --interleaved that shows events at absolute times

@@ -1,0 +1,36 @@
+Lingua-Conlang-Numbers version 0.04
+===================================
+
+Convert numbers into words in various constructed languages
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Readonly
+    Regexp::Common
+
+DESCRIPTION
+
+The "Lingua-Conlang-Numbers" distrobution includes modules for converting
+numbers into words in various constructed languages, also known as planned
+languages or artificial languages.
+
+The "Lingua::Conlang::Numbers" module provides a common interface to all of
+the included modules without the need to "use" each one.
+
+COPYRIGHT AND LICENSE
+
+Copyright 2009, 2010 Nick Patch
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

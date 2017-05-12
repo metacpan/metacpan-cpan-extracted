@@ -1,0 +1,8 @@
+Revision history for Perl extension Lingua::ZH::ChineseNaming.
+
+0.01  Wed Nov 27 13:33:05 2002
+	- original version; created by h2xs 1.21 with options
+		-nLingua::ZH::ChineseNaming -XA
+
+0.02  Mon, 14 Apr 2003 19:27:35 +0800
+	- Nothing changed. Just to make up for the disappearance on CPAN :-/

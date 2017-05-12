@@ -1,0 +1,32 @@
+Language/Prolog/Sugar
+=====================
+
+This module allows for the easily creation of subs to construct
+Prolog terms as implemented in the Language::Prolog::Types package.
+
+It's just some syntactic sugar to make your Perl programs emulating or
+calling a real Prolog system to look more like Prolog.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Language::Prolog::Types
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002-2006 Salvador Fandiño
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

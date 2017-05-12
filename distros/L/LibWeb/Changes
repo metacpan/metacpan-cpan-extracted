@@ -1,0 +1,94 @@
+$Id: Changes,v 1.6 2000/07/13 04:45:03 ckyc Exp $
+
+Revision history for Perl extension LibWeb
+------------------------------------------
+Unless otherwise specified, all changes do not adversely affect
+LibWeb's API and client codes written for previous versions of LibWeb.
+
+
+0.02
+----
+Fixed:
+- Logo display in LibWeb::HTML::Default::header(),
+
+- bug in LibWeb::File::read_lines_from_file(),
+
+- links to LibWeb's ftp in all pods.
+
+- various HTML syntax errors in LibWeb::Themes::Default.
+
+- LibWeb::Admin::add_new_user() now checks if user name contains
+  spaces.
+
+- LibWeb::HTML::Default now ISAs LibWeb::Themes::Default.
+
+- LibWeb::CGI now supports CGI.pm without cgi_error() (i.e. pre CGI.pm
+  2.47).
+
+- LibWeb::Database_init()'s fatal when there is no database (added rc:
+  IS_DB_ENABLED).
+
+- the ``require LibWeb::Crypt'' bug in LibWeb::Core::alert_admin().
+
+Changed:
+- LibWeb::HTML::Default's header(), sheader(), lpanel(), content(),
+  rpanel() and footer() now return an ARRAY reference instead of SCALAR
+  reference.  Sample class MyHTML changed accordingly.
+
+- sample script lm.cgi: $p_is_just_login changed from '.a' to '.b' and
+  $p_is_first_time changed from '.b' tp '.c'.
+
+- `use DBI;' into `require DBI;' at line 29 of LibWeb::Database.
+
+- deprecated rc:Lib_ROOT and rc:COPYRIGHT.  LibWeb::HTML::Default and
+  MyHTML changed accordingly.
+
+- Separated Crypt into Crypt and Digest.
+
+- LibWeb::Session::is_login() and LibWeb::Admin::is_login() are now
+  deprecated (actually, they refer to the same method).  They are
+  replaced by LibWeb::Session::get_user() and LibWeb::Admin::get_user()
+  respectively.
+
+- Changed the name for LibWeb::HTML::Site to LibWeb::HTML::Standard.
+
+Added:
+
+- `croak' in various places of LibWeb::HTML::Default,
+  LibWeb::HTML::Error and LibWeb::Themes::Default, this makes
+  debugging applications easier.
+
+- `_parse_construct()' and `_parse_content()' in LibWeb::HTML::Default
+  and LibWeb::Themes::Default respectively.  Updated the sample class
+  `MyHTML' accordingly.
+
+- fatal call in LibWeb::Session::is_browser_cookie_enabled().
+
+- `IS_DB_ENABLED' option in dot_lwrc file.
+
+- bodered_titled_table() and enlighted_titled_table() in
+  LibWeb::Themes::Default.  Set the standard in how methods should be
+  named in a theme class; they should be named in alphabetical order
+  for easy API.
+
+- $core->{OS} so that LEAPs can perform some portabililty tweaking
+  according to this variable
+
+- LibWeb::Themes::tabber(); allows you to add a tabbing navigation bar
+  to your HTML pages.
+
+- In READEME, added download locations for LibWeb's dependencies.
+
+- Fatal errors logging ability; added rc: FATAL_LOG.
+
+- Documentation for is_logout() in LibWeb::Admin.
+
+- `SMTP' option in dot_lwrc and LibWeb now uses Mail::Sendmail and
+  hence LibWeb now supporting NT platform with respect to mailing.
+
+
+0.01
+----
+Sat May 13 01:42:11 2000
+- original version; created by h2xs 1.18
+

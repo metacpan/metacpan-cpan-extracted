@@ -1,0 +1,44 @@
+Log-Agent-Driver-Apache
+=============================
+
+This is a driver for Log::Agent for use in mod_perl environments.
+
+Log::Agent is the standard logging module for perl. (Well, thats
+what I've been told anyhow)
+
+This driver, combined with Log::Agent, allow you to use the Log::Agent
+functions and have the results go to the apache server log.
+
+A neat side effect of this is that if you have modules that aren't 
+tied to mod_perl, you can use Log::Agent with an alternate driver
+for testing and development. Also, if your project grows or in some
+other way requires other forms of logging, (say, syslog for example)
+making the change is simple.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Log::Agent
+mod_perl version 2. (It uses Apache2::*) 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Jamie Hoglund
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+Note: This module may work with earlier versions of perl and/or the 
+modules, but, I can't guarantee it.

@@ -1,0 +1,30 @@
+---
+abstract: 'Convert and spell Thai numbers.'
+author:
+  - 'Guillaume Aubert <aubertg@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::FailWarnings: '0'
+  Test::More: '0.94'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-TH-Numbers
+provides:
+  Lingua::TH::Numbers:
+    file: lib/Lingua/TH/Numbers.pm
+    version: v1.1.0
+requires:
+  Carp: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/guillaumeaubert/Lingua-TH-Numbers/issues
+  homepage: https://metacpan.org/release/Lingua-TH-Numbers
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/guillaumeaubert/Lingua-TH-Numbers
+version: v1.1.0

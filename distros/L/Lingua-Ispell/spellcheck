@@ -1,0 +1,76 @@
+#!/usr/local/bin/perl -w
+
+$| = 1;
+
+use lib qw( lib );
+use Lingua::Ispell qw( :all );
+use strict;
+
+while ( <> ) {
+  chomp;
+  my $line = $_;
+
+  if ( s/^-C\s*// ) { allow_compounds(1); next; }
+  if ( s/^-m\s*// ) { infer_root_affix_combos(1); next; }
+  if ( s/^-d\s*// ) { use_dictionary(split); next; }
+  if ( s/^-p\s*// ) { use_personal_dictionary(split); next; }
+
+
+  for my $r ( spellcheck( $line ) ) {
+
+    {
+      'ok' =>
+        sub { print "ok: $r->{'term'}\n"; },
+
+      'compound' =>
+        sub { print "ok: $r->{'term'}\n"; },
+
+      'root' =>
+        sub { print "ok: '$r->{'term'}' can be formed from root '$r->{'root'}'\n"; },
+
+      'none' =>
+        sub {
+          my $indent = ' ' x $r->{'offset'};
+          print <<EOF;
+No match found for term "$r->{'term'}" in:
+"$line"
+$indent^
+
+EOF
+        },
+
+      'miss' =>
+        sub {
+          my $indent = ' ' x $r->{'offset'};
+	  local $" = "\n\t";
+          print <<EOF;
+Near miss on term "$r->{'term'}" in:
+"$line"
+$indent^
+missed terms:
+	@{$r->{'misses'}}
+
+EOF
+        },
+
+      'guess' =>
+        sub {
+          my $indent = ' ' x $r->{'offset'};
+	  local $" = "\n\t";
+          print <<EOF;
+Guess on term "$r->{'term'}" in:
+"$line"
+$indent^
+missed terms:
+	@{$r->{'misses'}}
+guesses:
+	@{$r->{'guesses'}}
+
+EOF
+        },
+
+    }->{ $r->{'type'} }->();
+  }
+}
+
+

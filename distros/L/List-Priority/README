@@ -1,0 +1,55 @@
+List/Priority version 0.04
+==========================
+
+NAME
+    List::Priority - Perl extension for a list that manipulates objects by
+    their priority
+
+SYNOPSIS
+      use List::Priority;
+
+      # Create an instance
+      my $list = List::Priority->new();
+
+      # Insert some elements, each woth a unique priority
+      $list->insert(2,'World!');
+      $list->insert(5,'Hello');
+      $list->insert(3,' ');
+
+      # Print
+      print $list->size()                   # prints 3
+      while (my $element = $list->pop()) {
+              print $element;
+      }
+
+DESCRIPTION
+    If you want to handle multiple data items by their order of importance,
+    this one's for you.
+
+    You may retrieve the highest-priority item from the list using "pop()",
+    or the lowest-priority item from the list using "shift()". If two items
+    have the same priority, they are returned in first-in, first-out order.
+    New items are inserted using "insert()".
+
+    You can constrain the capacity of the list using the "capacity"
+    parameter. Low-priority items are automatically evicted once the specified
+    capacity is exceeded. By default the list's capacity is unlimited.
+
+    I'd like to thank Joseph N. Hall and Randal L. Schwartz for their
+    excellent book "Effective Perl Programming" for one of the code hacks.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Copyright (C) 2002 Eyal Udassin
+Current maintainer Miles Gould, <miles@assyrian.org.uk>
+Hosted at GitHub: see <http://github.com/pozorvlak/List-Priority>
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

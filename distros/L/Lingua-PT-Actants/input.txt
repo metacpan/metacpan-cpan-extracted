@@ -1,0 +1,5 @@
+1   A       _   DET     DET     _   2   det     _   _
+2   Maria   _   PROPN   PROPN   _   3   nsubj   _   _
+3   tem     _   VERB    VERB    _   0   ROOT    _   _
+4   razão   _   NOUN    NOUN    _   3   dobj    _   _
+5   .       _   PUNCT   PUNCT   _   3   punct   _   _

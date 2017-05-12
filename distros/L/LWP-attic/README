@@ -1,0 +1,17 @@
+The LWP-attic distribution contains old and depreciated modules from
+the libwww-perl distribution.  These modules are provided for old code
+that happens to depend on them somehow.
+
+
+LWP::Socket
+LWP::SecureSocket
+
+  The LWP protocol modules have been rewritten and is now based on the
+  IO::Socket::INET modules in the standard perl distribution.
+
+
+-----------------------------------------------------------------------
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+© 1997 Gisle Aas

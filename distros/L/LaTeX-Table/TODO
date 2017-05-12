@@ -1,0 +1,11 @@
+- The OO design is a real MESS. Most of it is easy to fix without breaking the
+  API (started)
+- coldef_strategy is an ugly hack. This API should be redone for a 2.0 release.  
+- nicer examples.pdf (started)
+- maybe move csv2pdf and ltpretty in an extra package, because they introduce
+  dependencies. But hey, we use Moose which requires half of CPAN anyway...
+- fine tune default parameters
+- shortcut for multirows
+- csvpdf should support all LT options 
+- csv2pdf should maybe use my Text::CSV::R module
+- ltpretty and csv2pdf should support a config file

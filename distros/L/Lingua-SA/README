@@ -1,0 +1,30 @@
+Lingua/SA version 0.08
+======================
+
+Lingua::SA - Perl extension for the language Sanskrit
+use Lingua::SA qw(transliterate vibhakti sandhi);
+
+The module exports functions to 
+       (1) Obtain declinations of Sanskrit nouns
+       (2) Convert Roman into Unicode Sanskrit
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Ashish Mahabal
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

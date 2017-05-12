@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/html2txt
+lib/LEOCHARRE/HTML/Rip.pm
+lib/LEOCHARRE/HTML/Text.pm
+t/03_rip.t
+t/04_html2txt.t
+t/05-wget-w32safe-slurpmod.t
+t/99_cleanup.sh
+t/bbc.html
+META.yml                                 Module meta-data (added by MakeMaker)

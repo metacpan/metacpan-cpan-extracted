@@ -1,0 +1,235 @@
+Revision history for Perl extension List::Compare.
+
+0.04  Sat Jun  8 2002
+	- last draft version before using h2xs
+
+0.05  Sun Jun  9 2002
+	- original version; created by h2xs 1.20 with options
+		-XA -n List::Compare
+
+0.06  Wed Jun 12 2002
+	- documentation changes; POD broke
+
+0.07  Thu Jun 13 2002
+	- documentation changes
+
+0.08  Sat Jun 15 2002
+	- added method get_version()
+	- used non-idiomatic syntax for 'foreach' in hope of making module more backwardly compatible
+	- to free up memory, zeroed out %seenA and %seenB when no longer needed
+	- added method get_bag()
+	- inspired by Set::Scalar, used typeglob syntax to implement aliases for methods
+	- revised POD extensively
+
+0.09  Sun Jun 16 2002
+	- added tests to test get_bag()
+	- implemented Carp module for warnings
+
+0.10  Wed Jun 19 2002
+	- corrected one typo in documentation
+	- commented out # require 5.00562 and use warnings
+	- first version uploaded to CPAN
+
+0.11  Thu Jun 20 2002
+	- corrected errors in POD that caused HTML to display incorrectly
+
+0.12  Sat Jul 13 2002
+	- major expansion
+	- capability to accelerate processing of comparisons of 2 lists
+	  when only 1 comparison method is expected to be called
+	- capability to compare more than 2 lists at a time
+	- introduction of methods including:
+		get_shared()
+		get_nonintersection()
+		print_subset_map()
+		print_equivalence_map()
+	- not released to CPAN due to errors in README and Changes
+
+0.13  Sat Aug 03 2002
+	- corrected documentation errors found in v0.12
+	- released to CPAN
+
+0.14  Sun Aug 18 2002
+	- commented out 'use warnings;' to permit module to run on pre-5.6 versions
+	- corrected one error in POD
+	- removed e-mail addresses of authors of other modules from POD
+
+0.15  Sat Sep 07 2002
+	- conformed CPAN addresses of other modules to new structure of search.cpan.org
+
+0.16  Sat Mar 08 2003
+	- for each method which returned an array, added an analogous method which
+	  returns a reference to that array
+
+0.17  Thu May 22 2003
+	- eliminated certain synthetic variables
+	- created List::Compare::SeenHash
+
+0.18  Sun Jun 1 2003
+	- added methods member_which(), single_member_which()
+
+0.19  Sun Jun 1 2003
+	- added methods member_any(), single_member_any()
+	- fixed annoying carping messages when running 'make test'
+
+0.20 Fri Jun 6 2003
+	- updated documentation discussing changes since v0.17
+	- changed names of recently added methods to is_member_which(), is_member_which_ref(),
+	  are_members(), is_member_any(), are_members_any()
+
+0.21 Sun Oct 26 2003
+	- added functional interface to list comparison functions:  List::Compare::Functional; this required changes in List::Compare::Base::Accelerated and the creation of List::Compare::Base::_Engine
+
+0.22 Sun Nov 23 2003
+	- corrected conceptual flaw in List::Compare::SeenHash so as to exclude values in a seen-hash mathematically equal to zero
+	- implemented 'unsorted' option for list comparisons
+
+0.23 [Accidentally skipped.]
+
+0.24 Sun Mar 28 2004
+	- first implementation of 'multiple accelerated' mode wherein user can request speedier processing of more than two lists when only one comparison among the lists is sought
+	- converted test suite to use Test::Simple
+
+0.25 Sun Apr 4 2004
+	- continued implementation of 'multiple accelerated' mode; applied to List::Compare::SeenHash and List::Compare::Functional
+	- modification of interfaces to methods/functions are_members_which() and are_members_any throughout; items to be tested must be passed (by reference) as an anonymous array rather than as a flat list
+
+0.26  Sun Apr 11 2004
+        - List::Compare::SeenHash and associated tests deprecated
+        - capacity to pass references to seen-hashes to constructor now
+transferred directly into List::Compare
+	- corrections to POD
+
+0.27  Sun Apr 18 2004
+	- corrections to POD
+
+0.28  Sun Apr 25 2004
+	- implementation of is_LdisjointR
+	- correction of error in tests of multiple-accelerated mode
+	- correction of error in internal subroutine _argument_checker_0
+	- further implication of deprecation of List::Compare::SeenHash is that all the code in List::Compare::Base::Regular, L:C:B:Accelerated, L:C:B:Multiple and L:C:B:Multiple::Accelerated is no longer shared between List::Compare and List::Compare::SeenHash and hence can be taken back into List::Compare; thereby eliminating the 'use base' calls from List::Compare.
+
+0.29  Sun May 16 2004
+	- implementation of alternative ('Adlerian') interface wherein a single hash reference is passed to constructor or function
+
+0.30  Fri May 21 2004
+	- documentation corrections only
+
+0.31  Sun Aug 15 2004
+	- added methods get_unique_all() and get_complement_all(); added 3335
+tests; repositioned most methods in List::Compare::Base::_Engine to
+List::Compare::Accelerated as they were no longer also being used in
+List::Compare::Functional; other internal code clean-up
+
+0.32  Sun Sep 18 2005
+    - No changes in functionality.  Distribution restructured so that modules
+      are now underneath the 'lib/' directory.
+
+0.33  Sun Feb 19 2006
+    - Documentation changes only.  Support for List-Compare is now offered via
+      dedicated mailing list.
+
+0.34 Mon Nov  5 18:35:15 EST 2007
+    - Add require 5.6 to Makefile.PL.
+
+0.35 Sun May 18 19:54:32 EDT 2008
+    - Fix bug reported by Charles Bailey.  In object-oriented interface, two
+      lists case, get_shared and get_shared_ref should default to
+      get_intersection and get_intersection_ref.
+    - Complete overhaul of test suite.  Tests are now grouped by interface in
+      a more logical order.
+
+0.36 Fri May 23 21:41:55 EDT 2008
+    - IO::CaptureOutput was mispositioned:  should have been directly under t/
+      rather than under t/Test/.
+
+0.37 Sat Jun  7 19:46:52 EDT 2008
+    - Tests refined and code refactored so as to achieve 100% subroutine,
+      statement, branch and condition coverage by test suite as measured by
+      Devel::Cover.  Some cleanup of POD.
+
+0.38 Thu Sep  5 21:09:10 EDT 2013
+    - Update support information; no longer using dedicated mailing list.
+
+0.39 Fri Jul  4 15:38:24 EDT 2014
+    - Repository migrated from Subversion to git.  Development repository
+      initiated at https://github.com/jkeenan/list-compare.
+
+0.40 Sat Feb  7 08:39:06 EST 2015
+    - Eliminated three unnecessary hash assignments.
+
+0.41 Sun Feb  8 20:38:46 EST 2015
+    - Revised List::Compare::Functional::_intersection_engine() to eliminate
+      need to call _calculate_xintersection_only() and
+      _calculate_hash_intersection();
+
+0.42 Wed Feb 11 20:57:43 EST 2015
+    - Improve performance of four List::Compare::Functional functions.
+
+      get_nonintersection
+      get_nonintersection_ref
+      get_symmetric_difference
+      get_symmetric_difference_ref
+
+0.43 Thu Feb 12 19:14:35 EST 2015
+    - Improve performance of two List::Compare::Functional functions.
+
+      get_shared
+      get_shared_ref
+
+0.44 Sun Feb 15 14:40:06 EST 2015
+    - Improve performance of complement-related functions in both functional
+      and object-oriented interfaces:
+
+      get_complement
+      get_complement_ref
+      get_complement_all
+
+0.45 Mon Feb 16 16:59:03 EST 2015
+    - Improve performance of unique-related functions in both functional and
+      object-oriented interfaces:
+
+      get_unique
+      get_unique_ref
+      get_unique_all
+
+0.46 Wed Feb 18 19:30:30 EST 2015
+    - Improve performance of List::Compare::Multiple::Accelerated methods:
+
+      get_intersection
+      get_intersection_ref
+      get_shared
+      get_shared_ref
+
+0.47 Sun Feb 22 08:17:54 EST 2015
+    - Improve performance of List::Compare::Multiple::Accelerated methods:
+
+      get_nonintersection
+      get_nonintersection_ref
+      get_symmetric_difference
+      get_symmetric_difference_ref
+
+0.48 Wed Feb 25 17:59:30 EST 2015
+    - Improve performance of is_LdisjointR in List::Compare::Functional and in
+      multiple accelerated mode of List::Compare.
+
+0.49 Sun Mar  8 20:06:20 EDT 2015
+    - Add metadata to Makefile.PL.
+
+0.50 Sat May  9 09:06:41 EDT 2015
+    - Improve performance of is_LsubsetR via patches submitted by Mich Rawson
+      at New York Perl Hackathon (May 2 2015).
+
+0.51 Thu May 14 21:49:00 EDT 2015
+    - Changes to List::Compare::Functional::is_LsubsetR introduced in v0.50
+      found to be buggy.  See: https://rt.cpan.org/Ticket/Display.html?id=104452.
+      Pending further investigation, reverted to v0.49 of
+      List::Compare::Base::_Auxiliary; added two test files.
+
+0.52 Thu May 21 21:57:18 EDT 2015
+    - v0.51 changes were not applied to master branch; apply them.
+      Remove two hash-to-hash assignments in List::Compare::Base::_Auxiliary::_subset_subengine.
+
+0.53 Sun Jun  7 10:49:24 MDT 2015
+    - Accept patch submitted by Paulo Custodio reworking, and correcting,
+      changes originally published in 0.50.

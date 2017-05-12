@@ -1,0 +1,74 @@
+Revision history for Lucene
+
+0.01    2006-04-25
+        First version
+
+0.02    2006-09-30
+        Added sort.
+        Exception handling.
+        Added close() method for FSDirectory.
+        Close FSDirectory and RAMDirectory at destruction.
+
+0.03    2006-11-14
+        Added MultiFieldQueryParser.
+        Exception handling for IndexReader.
+        Added ability to set Similarity.
+
+0.04    2006-12-08
+        Added UTF-8 support.
+        Added QueryFilter.
+        Exception handling for IndexWriter and QueryParser.
+        Enabled global loading of Lucene shared object.
+
+0.05    2006-12-18
+        Resolved bug when indexing float or integer numbers in field values.
+
+0.06    2006-12-21
+        Exception handling for MultiFieldQueryParser.
+
+0.07    2007-02-03
+        Package now requires clucene-core-0.9.17.
+
+0.08    2007-02-09
+        Made sure package compiles both with clucene-core-0.9.16a and clucene-core-0.9.17.
+        Added huge patch from Scott Beck containing the following:
+           - Analysis subclassing
+           - common Tokenizer classes
+           - Tokenizer subclassing
+           - common TokenFilter classes
+           - TokenFilter subclassing
+           - access to Lucene constants 
+
+0.09    2007-02-16
+        Avoid segfault by returning undef when returned string is NULL.
+
+0.10    2007-03-01
+        Added possibility to specify boosts in MultiFieldQueryParser.
+        Added KeywordAnalyzer.
+
+0.11    2007-03-19
+        T_CPP_CLASS OUTPUT typemap returns undef if C++ object is NULL.
+
+0.12    2007-03-23
+        Added possiblity to specify stop words in StandardAnalyzer.
+        Added toString method to Document class.
+        Exception handling for deleteDocuments in IndexReader.
+
+0.13    2007-03-26
+        Added deleteDocument, hasDeletions and undeleteAll methods to IndexReader class.
+
+0.14    2007-04-04
+        Added RangeFiler.
+        Package now required clucene-core-0.9.17 or above.
+
+0.15    2007-04-12
+        Added _search method in IndexSearcher for HitCollectors.
+
+0.16    2007-04-18
+        Added Explanation.
+
+0.17    2007-08-13
+        Solved bug when sorting on two sortfields.
+
+0.18    2007-09-26
+        Make sure addIndexes can take more than one Directory

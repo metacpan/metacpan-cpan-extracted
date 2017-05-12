@@ -1,0 +1,9 @@
+# vim:set noet ts=8 ai nosta:
+
+Revision history for Perl extension Lingua::Zompist::Barakhinei.
+
+0.02  Wed 2002-05-29
+	- Added pluggable grammatical features
+
+0.01  Fri 2002-05-24
+	- First version; copied from Lingua::Zompist::Verdurian v0.91

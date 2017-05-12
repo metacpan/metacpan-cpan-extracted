@@ -1,0 +1,19 @@
+language: perl
+perl:
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+  - "5.10"
+  - "5.8"
+before_install:
+  - cpanm -n Devel::Cover::Report::Coveralls CPAN::Meta
+before_script:
+  - perl Makefile.PL
+  - cpanm -n --installdeps .
+  - make manifest
+  - make distdir
+  - cd $(perl -MCPAN::Meta -e '$m = CPAN::Meta->load_file("MYMETA.yml"); print $m->name . "-" . $m->version')
+  - perl Makefile.PL
+script:
+  - cover -test -report coveralls

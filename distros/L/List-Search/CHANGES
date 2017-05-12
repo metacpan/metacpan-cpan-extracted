@@ -1,0 +1,14 @@
+CHANGES
+
+0.3 - Mon Jan 22 2007 - evdb
+
+  * bug fixes from Sean Woolcock (empty arrary, first index and faster
+    comparisons).
+
+0.2 - Thu Jan 4 2007 - evdb
+
+  * Added Makefile.PL
+
+  * Fixed typos in docs
+
+  * Added list_contains functions for conveniance

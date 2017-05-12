@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN" "http://www.w3.org/TR/MathML2/dtd/xhtml-math11-f.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:svg="http://www.w3.org/2000/svg">
+<head>
+  <title><%= title %></title>
+  <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+  <link rel="stylesheet" type="text/css" href="css/external/LaTeXML.css" />
+  <link rel="stylesheet" type="text/css" href="css/external/jquery-ui.css" />
+  <link rel="stylesheet" type="text/css" href="css/external/trac.css" />
+  <link rel="stylesheet" type="text/css" href="css/external/trac-sanity.css" />
+  <link rel="shortcut icon"  type="image/x-icon" href="css/external/favicon.ico" />
+  <link rel="icon"  type="image/x-icon" href="css/external/favicon.ico" />
+<style type="text/css">
+    body { margin:0; background:#cfd2e6; color:#000000; }
+    table.summary { border: 1px solid; border-collapse: collapse; }
+    table.summary td, th { border: 1px solid; } 
+    table.nb {
+     border: none;
+     border-collapse: separate;
+    }
+    td.nb, th.nb {
+     border: none;
+    }
+    table.form-table {
+      border: none;
+      border-collapse: collapse;
+    }
+    table.form-table td,th {
+      border: none;
+      text-align:right;
+    }
+    table.form-table td.input {
+      border: none;
+      text-align:left;
+    }
+    #slogan {
+     font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
+     font-weight:bold;
+     font-style:normal;
+     font-size:20px;
+    }
+    div.left-div { float:left; width: 40%;}
+    div.right-div { margin-left: 40%; width:auto;}
+select {
+    -moz-border-radius: 4px;
+    -moz-box-shadow: 1px 1px 5px #cfcfcf inset;
+    border: 1px solid #cfcfcf;
+    vertical-align: middle;
+    background-color: transparent;
+}
+option {
+    background-color: #fef5e6;
+    border-bottom: 1px solid #ebdac0;
+    border-right: 1px solid #d6bb86;
+    border-left: 1px solid #d6bb86;
+}
+option:hover {
+    cursor: pointer;
+}
+</style>
+<%= javascript 'js/external/jquery.min.js' %>
+<%= javascript 'js/external/jquery-ui.min.js' %>
+<%= javascript begin %>
+//======================================================================
+// Load MathJax, IFF the current browser can't handle MathML natively.
+
+var agent = navigator.userAgent;
+var canMathML = ((agent.indexOf('Gecko') > -1) && (agent.indexOf('KHTML') === -1)
+ || agent.match(/MathPlayer/) );
+
+// Add script element loading MathJax unless we can handle MathML
+if (!canMathML) {
+  var el = document.createElement('script');
+  el.type = "text/javascript";
+  el.src = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML";
+  var head = document.getElementsByTagName("head")[0], script;
+  head.appendChild(el);
+};
+<% end %>
+</head>
+<body style="font-size:72.5%;">
+    <div id="siteheader">
+    </div>
+    <div id="banner">
+      <div id="header">
+        <p><a id="logo" href="http://dlmf.nist.gov/LaTeXML/"><img src="img/external/latexml-logo.png" alt="LaTeXML" width="70" /></a>
+        <span id="slogan">ltxMojo: LaTeXML's Web Server</span></p>
+      </div>
+<div id="messagediv" style="margin=1px; width:20%;">
+<p style="margin-bottom:0;"><br /><b id='message'>
+<% if (my $message = flash 'message' ) { %>
+<%= $message %>
+<% } %>
+</b><br /></p>
+</div>
+    <div id="metanav" class="nav">
+      <ul>
+      <% if (my $name = session 'name' ) { %>
+      <li class="first">logged in as <%= $name %></li><li><a href="/logout">Logout</a></li><li class="last"><a href="/prefs">Preferences</a></li>
+      <% } else { %>
+      <li class="first"><a href="/login">Login</a></li>
+      <% } %>
+    </ul>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li><a href="/about">About</a></li><li><a href="/upload">Upload &amp; Convert</a></li><li><a href="/editor">Web Editor</a></li><li><a href="/demo">Demo</a></li><li class="last"><a href="/admin" title="Administration">Admin</a><a href="/help">Help</a></li>
+    </ul>
+  </div>
+</div>
+<%= content %>
+<div id="footer" lang="en" xml:lang="en"><hr />
+  <p class="left">
+    <a alt="LaTeXML" href="http://dlmf.nist.gov/LaTeXML/"><strong>LaTeXML <%= $LaTeXML::VERSION %> </strong></a>
+  </p>
+<p class="right">
+  <a href="http://jquery.com"><img alt="jQuery Logo" width="100" src="img/external/JQuery_logo.svg" /></a>
+  <a href="http://mojolicio.us">
+    <img alt="Mojolicious logo" width="100" src="img/external/mojolicious-white.png" />
+  </a>
+  <a href="http://www.perl.org/">
+    <img alt="Perl 5" width="100" src="img/external/raptor-black.png" />
+  </a></p>
+  <p class="right">
+    <a href="http://kwarc.info"><img alt="KWARC Research Group" width="60" src="img/external/kwarc-logo-transparent.png"/></a>
+  </p>
+</div>
+    <div align="center">
+    <div id="sitefooter">
+        <font size="-2">
+          <div style="line-height:10px;color:#C0C0C0" align="center">
+	    <a href="https://svn.mathweb.org/repos/LaTeXML/branches/arXMLiv/">Public
+	    Domain Software</a>, created in
+	    the <a href="http://trac.kwarc.info/arXMLiv/">arXMLiv</a> Project.
+	  </div>
+	</font>
+    </div>
+    </div>
+</body>
+</html>
+

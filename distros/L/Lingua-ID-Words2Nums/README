@@ -1,0 +1,36 @@
+SYNOPSIS
+
+     use Lingua::ID::Words2Nums qw(words2nums words2nums_simple);
+    
+     print words2nums("seratus tiga koma dua");  # 103.2
+     print words2nums("minus 3 juta 100 ribu");  # 3100000
+     print words2nums("1,605 jt");               # 1605000 (abbreviations accepted)
+     print words2nums("-1.3e4");                 # 13000
+    
+     print words2nums_simple("satu dua tiga");   # 123
+
+DESCRIPTION
+
+    This module provides two functions, words2nums and words2nums_simple.
+    They are the counterpart of Lingua::ID::Nums2Words's nums2words and
+    nums2words_simple.
+
+EXPORTS
+
+    None are exported by default, but they are exportable.
+
+ $Pat (regex)
+
+    A regex for quickly matching/extracting number verbage from text; it
+    looks for a string of words. It's not perfect (improper verbage might
+    be allowed, e.g. "dua ribu tiga juta"), but it's convenient.
+
+    Currently only multipliers up to trillions ("triliun") are recognized.
+    Bigger multipliers are usually only found in scientific text.
+
+SEE ALSO
+
+    Lingua::ID::Nums2Words
+
+    Parse::Number::ID is used to parse numbers in the verbage.
+

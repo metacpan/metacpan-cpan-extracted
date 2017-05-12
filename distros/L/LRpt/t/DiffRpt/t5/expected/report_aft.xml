@@ -1,0 +1,161 @@
+<report>
+    <authors>
+        <statement><![CDATA[select * from authors]]></statement>
+        <header>
+            <au_id/>
+            <au_lname/>
+            <au_fname/>
+            <phone/>
+            <address/>
+            <city/>
+            <state/>
+            <zip/>
+        </header>
+        <data>
+            <equal>
+                <au_id>213-46-8915</au_id>
+                <au_lname>Green</au_lname>
+                <au_fname>Marjorie</au_fname>
+                <phone>415 986-7020</phone>
+                <address>309 63rd St. #411</address>
+                <city>Oakland</city>
+                <state>CA</state>
+                <zip>94618</zip>
+            </equal>
+            <equal>
+                <au_id>238-95-7766</au_id>
+                <au_lname>Carson</au_lname>
+                <au_fname>Cheryl</au_fname>
+                <phone>415 548-7723</phone>
+                <address>589 Darwin Ln.</address>
+                <city>Berkeley</city>
+                <state>CA</state>
+                <zip>94705</zip>
+            </equal>
+            <additional>
+                <au_id>409-56-7008</au_id>
+                <au_lname>Bennet</au_lname>
+                <au_fname>Abraham</au_fname>
+                <phone>415 658-9932</phone>
+                <address>6223 Bateman St.</address>
+                <city>Berkeley</city>
+                <state>CA</state>
+                <zip>94705</zip>
+            </additional>
+            <additional>
+                <au_id>722-51-5454</au_id>
+                <au_lname>DeFrance</au_lname>
+                <au_fname>Michel</au_fname>
+                <phone>219 547-9982</phone>
+                <address>3 Balding Pl.</address>
+                <city>Gary</city>
+                <state>IN</state>
+                <zip>46403</zip>
+            </additional>
+            <additional>
+                <au_id>998-72-3567</au_id>
+                <au_lname>Ringer</au_lname>
+                <au_fname>Albert</au_fname>
+                <phone>801 826-0752</phone>
+                <address>67 Seventh Av.</address>
+                <city>Salt Lake City</city>
+                <state>UT</state>
+                <zip>84152</zip>
+            </additional>
+        </data>
+    </authors>
+    <editors>
+        <statement><![CDATA[select * from editors where ed_fname = 'Martinella']]></statement>
+        <header>
+            <ed_id/>
+            <ed_lname/>
+            <ed_fname/>
+            <ed_pos/>
+            <phone/>
+            <address/>
+            <city/>
+            <state/>
+            <zip/>
+            <ed_boss/>
+        </header>
+        <data>
+            <equal>
+                <ed_id>321-55-8906</ed_id>
+                <ed_lname>DeLongue</ed_lname>
+                <ed_fname>Martinella</ed_fname>
+                <ed_pos>project</ed_pos>
+                <phone>415 843-2222</phone>
+                <address>3000 6th St.</address>
+                <city>Berkeley</city>
+                <state>CA</state>
+                <zip>94710</zip>
+                <ed_boss>993-86-0420</ed_boss>
+            </equal>
+        </data>
+    </editors>
+    <roysched>
+        <statement><![CDATA[select * from roysched where title_id = 'PS2091']]></statement>
+        <header>
+            <title_id/>
+            <lorange/>
+            <hirange/>
+            <royalty/>
+        </header>
+        <data>
+            <equal>
+                <title_id>PS2091</title_id>
+                <lorange>0</lorange>
+                <hirange>1000</hirange>
+                <royalty>0.10</royalty>
+            </equal>
+            <missing>
+                <title_id>PS2091</title_id>
+                <lorange>1001</lorange>
+                <hirange>5000</hirange>
+                <royalty>0.12</royalty>
+            </missing>
+            <equal>
+                <title_id>PS2091</title_id>
+                <lorange>5001</lorange>
+                <hirange>50000</hirange>
+                <royalty>0.14</royalty>
+            </equal>
+        </data>
+    </roysched>
+    <titleauthors>
+        <statement><![CDATA[select * from titleauthors where title_id = 'PS2091']]></statement>
+        <header>
+            <au_id/>
+            <title_id/>
+            <au_ord/>
+            <royaltyshare/>
+        </header>
+        <data>
+            <additional>
+                <au_id>486-29-1786</au_id>
+                <title_id>PS2091</title_id>
+                <au_ord>4</au_ord>
+                <royaltyshare>5.50</royaltyshare>
+            </additional>
+            <different>
+                <au_id>899-46-2035</au_id>
+                <title_id>PS2091</title_id>
+                <au_ord>
+                    <old_value>2</old_value>
+                    <new_value>5</new_value>
+                </au_ord>
+                <royaltyshare>
+                    <old_value>0.50</old_value>
+                    <new_value>0.60</new_value>
+                </royaltyshare>
+            </different>
+            <equal>
+                <au_id>998-72-3567</au_id>
+                <title_id>PS2091</title_id>
+                <au_ord>1</au_ord>
+                <royaltyshare>0.50</royaltyshare>
+            </equal>
+        </data>
+    </titleauthors>
+</report>
+

@@ -1,0 +1,306 @@
+NAME
+    Log::Dispatch::Config - Log4j for Perl
+
+SYNOPSIS
+      use Log::Dispatch::Config;
+      Log::Dispatch::Config->configure('/path/to/log.conf');
+
+      my $dispatcher = Log::Dispatch::Config->instance;
+      $dispatcher->debug('this is debug message');
+      $dispatcher->emergency('something *bad* happened!');
+
+      # or if you write your own config parser:
+      use Log::Dispatch::Configurator::XMLSimple;
+
+      my $config = Log::Dispatch::Configurator::XMLSimple->new('log.xml');
+      Log::Dispatch::Config->configure($config);
+
+      # automatic reloading conf file, when modified
+      Log::Dispatch::Config->configure_and_watch('/path/to/log.conf');
+
+DESCRIPTION
+    Log::Dispatch::Config is a subclass of Log::Dispatch and provides a way
+    to configure Log::Dispatch object with configulation file (default, in
+    AppConfig format). I mean, this is log4j for Perl, not with all API
+    compatibility though.
+
+METHOD
+    This module has a class method "configure" which parses config file for
+    later creation of the Log::Dispatch::Config singleton instance. (Actual
+    construction of the object is done in the first "instance" call).
+
+    So, what you should do is call "configure" method once in somewhere
+    (like "startup.pl" in mod_perl), then you can get configured dispatcher
+    instance via "Log::Dispatch::Config->instance".
+
+    Formerly, "configure" method declares "instance" method in Log::Dispatch
+    namespace. Now it inherits from Log::Dispatch, so the namespace
+    pollution is not necessary. Currrent version still defines one-liner
+    shortcut:
+
+      sub Log::Dispatch::instance { Log::Dispatch::Config->instance }
+
+    so still you can call "Log::Dispatch->instance", if you prefer, or for
+    backward compatibility.
+
+CONFIGURATION
+    Here is an example of the config file:
+
+      dispatchers = file screen
+
+      file.class = Log::Dispatch::File
+      file.min_level = debug
+      file.filename = /path/to/log
+      file.mode = append
+      file.format = [%d] [%p] %m at %F line %L%n
+
+      screen.class = Log::Dispatch::Screen
+      screen.min_level = info
+      screen.stderr = 1
+      screen.format = %m
+
+    In this example, config file is written in AppConfig format. See the
+    Log::Dispatch::Configurator::AppConfig manpage for details.
+
+    See the section on "PLUGGABLE CONFIGURATOR" for other config parsing
+    scheme.
+
+  GLOBAL PARAMETERS
+
+    dispatchers
+          dispatchers = file screen
+
+        "dispatchers" defines logger names, which will be splitted by
+        spaces. If this parameter is unset, no logging is done.
+
+    format
+          format = [%d] [%p] %m at %F line %L%n
+
+        "format" defines log format. Possible conversions format are
+
+          %d    datetime string (ctime(3))
+          %p    priority (debug, info, warning ...)
+          %m    message string
+          %F    filename
+          %L    line number
+          %P    package
+          %n    newline (\n)
+          %%    % itself
+
+        Note that datetime (%d) format is configurable by passing "strftime"
+        fmt in braket after %d. (I know it looks quite messy, but its
+        compatible with Java Log4j ;)
+
+          format = [%d{%Y%m%d}] %m  # datetime is now strftime "%Y%m%d"
+
+        If you have Time::Piece, this module uses its "strftime"
+        implementation, otherwise POSIX.
+
+        "format" defined here would apply to all the log messages to
+        dispatchers. This parameter is optional.
+
+        See the section on "CALLER STACK" for details about package, line
+        number and filename.
+
+  PARAMETERS FOR EACH DISPATCHER
+
+    Parameters for each dispatcher should be prefixed with "name.", where
+    "name" is the name of each one, defined in global "dispatchers"
+    parameter.
+
+    You can also use ".ini" style grouping like:
+
+      [foo]
+      class = Log::Dispatch::File
+      min_level = debug
+
+    See the Log::Dispatch::Configurator::AppConfig manpage for details.
+
+    class
+          screen.class = Log::Dispatch::Screen
+
+        "class" defines class name of Log::Dispatch subclasses. This
+        parameter is essential.
+
+    format
+          screen.format = -- %m --
+
+        "format" defines log format which would be applied only to the
+        dispatcher. Note that if you define global "format" also, %m is
+        double formated (first global one, next each dispatcher one). This
+        parameter is optional.
+
+    (others)
+          screen.min_level = info
+          screen.stderr = 1
+
+        Other parameters would be passed to the each dispatcher
+        construction. See Log::Dispatch::* manpage for the details.
+
+SINGLETON
+    Declared "instance" method would make "Log::Dispatch::Config" class
+    singleton, so multiple calls of "instance" will all result in returning
+    same object.
+
+      my $one = Log::Dispatch::Config->instance;
+      my $two = Log::Dispatch::Config->instance; # same as $one
+
+    See GoF Design Pattern book for Singleton Pattern.
+
+    But in practice, in persistent environment like mod_perl, lifetime of
+    Singleton instance becomes sometimes messy. If you want to reload
+    singleton object manually, call "reload" method.
+
+      Log::Dispatch::Config->reload;
+
+    And, if you want to reload object on the fly, as you edit "log.conf" or
+    something like that, what you should do is to call "configure_and_watch"
+    method on Log::Dispatch::Config instead of "configure". Then "instance"
+    call will check mtime of configuration file, and compares it with last
+    configuration time. If config file is newer than last configuration, it
+    will automatically reload object.
+
+NAMESPACE COLLISION
+    If you use Log::Dispatch::Config in multiple projects on the same perl
+    interpreter (like mod_perl), namespace collision would be a problem.
+    Bizzare thing will happen when you call
+    "Log::Dispatch::Config->configure" multiple times with differenct
+    argument.
+
+    In such cases, what you should do is to define your own logger class.
+
+      package My::Logger;
+      use Log::Dispatch::Config;
+      use base qw(Log::Dispatch::Config);
+
+    Or make wrapper for it. See the POE::Component::Logger manpage
+    implementation by Matt.
+
+PLUGGABLE CONFIGURATOR
+    If you pass filename to "configure" method call, this module handles the
+    config file with AppConfig. You can change config parsing scheme by
+    passing another pluggable configurator object.
+
+    Here is a way to declare new configurator class. The example below is
+    hardwired version equivalent to the one above in the section on
+    "CONFIGURATION".
+
+    *   Inherit from Log::Dispatch::Configurator.
+
+          package Log::Dispatch::Configurator::Hardwired;
+          use base qw(Log::Dispatch::Configurator);
+
+    *   Implement two required object methods "get_attrs_global" and
+        "get_attrs".
+
+        "get_attrs_global" should return hash reference of global
+        parameters. "dispatchers" should be an array reference of names of
+        dispatchers.
+
+          sub get_attrs_global {
+              my $self = shift;
+              return {
+                  format => undef,
+                  dispatchers => [ qw(file screen) ],
+              };
+          }
+
+        "get_attrs" accepts name of a dispatcher and should return hash
+        reference of parameters associated with the dispatcher.
+
+          sub get_attrs {
+              my($self, $name) = @_;
+              if ($name eq 'file') {
+                  return {
+                      class     => 'Log::Dispatch::File',
+                      min_level => 'debug',
+                      filename  => '/path/to/log',
+                      mode      => 'append',
+                      format  => '[%d] [%p] %m at %F line %L%n',
+                  };
+              }
+              elsif ($name eq 'screen') {
+                  return {
+                      class     => 'Log::Dispatch::Screen',
+                      min_level => 'info',
+                      stderr    => 1,
+                      format  => '%m',
+                  };
+              }
+              else {
+                  die "invalid dispatcher name: $name";
+              }
+          }
+
+    *   Implement optional "needs_reload" and "parse" methods.
+        "needs_reload" should return boolean value if the object is stale
+        and needs reloading itself. This method will be triggered when you
+        configure logging object with "configure_and_watch" method.
+
+        Stub config file mtime based "needs_reload" method is declared in
+        Log::Dispatch::Configurator as below, so if your config class is
+        based on filesystem files, you do not need to reimplement this.
+
+          sub needs_reload {
+              my($self, $obj) = @_;
+              return $obj->{ctime} < (stat($self->{file}))[9];
+          }
+
+        If you do not need *singleton-ness at all*, always return true.
+
+          sub needs_reload { 1 }
+
+        "parse" method should do parsing of the config file. This method is
+        called in the first parsing of the config file, and again when
+        "needs_reload" returns true. Log::Dispatch::Configurator base class
+        has a null "parse" method.
+
+    *   That's all. Now you can plug your own configurator (Hardwired) into
+        Log::Dispatch::Config. What you should do is to pass configurator
+        object to "configure" method call instead of config file name.
+
+          use Log::Dispatch;
+          use Log::Dispatch::Configurator::Hardwired;
+
+          my $config = Log::Dispatch::Configurator::Hardwired->new;
+          Log::Dispatch::Config->configure($config);
+
+CALLER STACK
+    When you call logging method from your subroutines / methods, caller
+    stack would increase and thus you can't see where the log really comes
+    from.
+
+      package Logger;
+      my $Logger = Log::Dispatch::Config->instance;
+
+      sub logit {
+          my($class, $level, $msg) = @_;
+          $Logger->$level($msg);
+      }
+
+      package main;
+      Logger->logit('debug', 'foobar');
+
+    You can adjust package variable $Log::Dispatch::Config::CallerDepth to
+    increase the caller stack depth. The default value is 0.
+
+      sub logit {
+          my($class, $level, $msg) = @_;
+          local $Log::Dispatch::Config::CallerDepth = 1;
+          $Logger->$level($msg);
+      }
+
+    Note that your log caller's namespace should not match against
+    "/^Log::Dispatch/", which makes this module confusing.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net> with much help from Matt
+    Sergeant <matt@sergeant.org>.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Log::Dispatch::Configurator::AppConfig manpage, the Log::Dispatch
+    manpage, the AppConfig manpage, the POE::Component::Logger manpage
+

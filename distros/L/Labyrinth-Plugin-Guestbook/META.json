@@ -1,0 +1,67 @@
+{
+    "name": "Labyrinth-Plugin-Guestbook",
+    "version": "1.06",
+    "abstract": "Guestbook plugin for the Labyrinth framework",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "web",
+        "cgi",
+        "framework"
+    ],
+
+    "prereqs" : {
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Labyrinth::Test::Harness": "1.08",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+              "perl": "5.006",
+              "Data::Pageset": "0",
+              "Labyrinth": "5.20",
+              "Labyrinth::Plugin::Core": "5.15"
+            }
+        }
+    },
+
+    "provides": {
+        "Labyrinth::Plugin::Guestbook": {
+            "file": "lib/Labyrinth/Plugin/Guestbook.pm",
+            "version": "1.06"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples","vhost"]
+    },
+
+    "resources": {
+        "homepage": "http://labyrinth.missbarbell.co.uk",
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Labyrinth-Plugin-Guestbook" },
+        "repository": {
+            "url": "git://github.com/barbie/labyrinth-plugin-guestbook.git",
+            "web": "http://github.com/barbie/labyrinth-plugin-guestbook",
+            "type": "git"
+        }
+    }
+}

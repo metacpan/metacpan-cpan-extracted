@@ -1,0 +1,38 @@
+Lingua-Stem-Es version 0.01
+===========================
+
+BRIEF EXPLANATION
+
+This module implements Porter's and returns an array reference of stemmed words.
+You can define a hash reference keyed by exeption words and whose values will
+be returned in the stemmed array reference.
+
+Visit http://snowball.tartarus.org/algorithms/spanish/stemmer.html for the
+actual algorithm. That is Mr. Porter's official site. From his site I have 
+included the files voc.txt and output.txt, which contain a sample vocabulary 
+and the result of applying the stemming algorithm.
+These two files are thus used as tests for this implementation.
+
+This module follows the same interface as the Lingua::Stem set of modules
+and is heavily based on the work of Sébastien Darribere-Playt, author of
+the French implementation.
+
+For more information on the use of the module, see perldoc Lingua::Stem::Es
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Julio Fraire
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

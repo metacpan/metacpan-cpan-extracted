@@ -1,0 +1,46 @@
+Revision history for Perl extension LaBrea::Tarpit::DShield
+
+0.09  Tue Jul  6 16:47:36 PDT 2004
+	Add patch to not send empty DShield messages that might get
+	created when sending to multiple destinations. 
+	Petter Reinholdtsen <pere@hungry.com>
+
+0.08  Tue Jul  6 09:57:45 PDT 2004
+	Add patch courtesy of Petter Reinholdtsen <pere@hungry.com>
+	to allow delivery of DShield reports to multiple destinations
+
+0.07  Thu Sep 19 08:09:51 PDT 2002
+	No module code changes.
+	Changed test in move2_Q.t to accomodate 'flock' 
+	implementations of perl that use 'fcntl'
+
+0.06  Fri Aug 16 15:36:12 PDT 2002
+	changed match string in 'move2_Q' to
+	recognize single digit destination ports
+
+0.05  Fri May 10 12:35:47 PDT 2002
+	add 'mail2_Q'
+	rename deliver2_DShield -> 'process_Q'
+	and alias deliver2_DShield -> 'process_Q'
+	rearrange some things to improve code usage
+
+0.04  Mon May  6 12:54:45 PDT 2002
+	add error message to DShield.cache "unlink" 
+	to report failure to delete cache file.
+
+	Add comments about existing debug options 
+	to help users set up DShield reporting
+
+0.03  Tue Apr 30 13:00:31 PDT 2002
+	fix illegal reference to *glob in deliver2_DShield
+
+	left USERID out of the Subject: field
+
+	TZ format should be -XX:XX, not -XXXX
+
+0.02  Mon Apr 29 18:30:06 PDT 2002
+	error in handling TZ's starting with +
+	fixed in 'move2_Q'
+
+0.01  Sat Apr 27 10:33:54 PDT 2002
+	initial release

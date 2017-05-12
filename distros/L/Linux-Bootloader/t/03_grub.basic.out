@@ -1,0 +1,15 @@
+timeout 10
+default 0	# set by t/03_grub.basic.t
+fallback 1
+
+serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1
+terminal --timeout=5 serial console
+
+title  Gentoo - old
+root (hd0,0)
+kernel /vmlinuz root=/dev/sda3
+
+title Gentoo 2.6.15
+root (hd0,0)
+kernel /vmlinuz-2.6.15 root=/dev/sda3 console=tty0 console=ttyS0,115200
+

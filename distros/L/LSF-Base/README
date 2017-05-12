@@ -1,0 +1,55 @@
+LSF::Base - Access Platform Computing's LSF (Load Sharing Facility) Base API
+from Perl
+----------------------------------------------------------------------------
+Copyright (c) 2001 Paul Franceus. All rights reserved.  This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+-----------------------------------------------------------------------------
+
+Most of the functions in the API have been implemented and tested, but
+the formal test.pl is still rather skimpy, as you can see from the
+test.pl. The Testlist file shows which calls have been tested as of
+today.
+
+If you are interested in contributing at this point, you can:
+
+1: Write some more tests so I can get this whole thing tested.
+2: Flesh out the interfaces to a few calls that I haven't implemented
+   yet, ls_loadinfo() being the most notable.
+3: If you have ideas for improving the "perlishness" of the interface
+   chime right in.
+
+Notes:
+
+This has now been tested on both AIX and Solaris. It is currently in
+production use at my site, without too many problems, so far.
+
+Thanks to Jim Meyer of Platform Computing for his Makefile.PL.
+
+History:
+
+Version 0.01 12/21/1999:
+
+First public release. Some functions not totally debugged and not
+completely tested.
+
+Version 0.03 6/01/2000
+
+Synced version with LSF::Batch. Added new Makefile.PL. Fixed a bug or two.
+
+Version 0.04 3/28/2001
+
+Updated for LSF 4.0/4.1.
+
+Added support for other operating systems. Now works with Compaq Alpha,
+Linux, AIX and Solaris. Thanks to Ray Hookway at Compaq for Alpha changes.
+
+Version 0.05 3/29/2001
+
+Fixed a boneheaded mistake with 0.04...
+
+Any suggestions, comments, questions please send to me:
+
+Paul Franceus
+Capita Technologies, Inc.
+paul@capita.com

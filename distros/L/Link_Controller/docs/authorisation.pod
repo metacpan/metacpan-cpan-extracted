@@ -1,0 +1,87 @@
+=head1 NAME
+
+link-authorisation - how to handle authorisation in LinkController
+
+=head1 DESCRIPTION
+
+Using link-controller in an environment with high controlled
+authentication is inherently a security issue.  This risk may,
+however, not be much higher than the one that you are currently
+carrying, so this can be useful  
+
+This page describes how this works.
+
+=head1 SECURITY PROBLEMS
+
+The fundamental security problem with this system is that the
+authentication token must be stored somewhere where the program can
+access it.  This is because link-controller has to send the actual
+authentication token over the link to authenticate.  Since it's very
+easy to monitor the inputs and outputs of a program, it's very easy to
+monitor this password.
+
+This applies even if we keep the password in some encrypted form,
+since we then have to store the decryption key in the program which
+can then be found and used to decrypt the key.  
+
+So there are only two possible defenses:
+
+=over 4
+
+=item *
+
+make sure that the program data remains secret
+
+=item *
+
+make sure that the passwords the program has can't do any real damage
+
+=back
+
+We demand permissions on our files which protect against accidental
+disclosure by encouraging the user to be more secure.  
+
+Making sure that the program can't do any damage is normally achieved
+by giving it a dedicated account which has only read only privilages
+and, preferably, can only use it's privilages from a specified IP
+address which will be the host on which the link checking is run.
+
+=head2 Accidental Sending of Tokens
+
+Another authentication risk is that the system will send it to a
+server which is trying to trick it.  This is again difficult to
+protect against.  The only solution in this case is to ensure that the
+regular expression used for limiting the URI matches only host names
+which are under the control of the body responsible for handing out
+the authentication token.
+
+=head2 Sending of Tokens over Insecure protocols
+
+If an insecure protocol like HTTP is used for sending an
+authentication token, then it is possible for someone to listen to the
+transaction and record the token for later use.
+
+The protection against this is to switch over to only using secure
+tokens and hard wire the protocol name into the URI regular expression.
+
+=head1 "ENCRYPTED" TOKEN STORAGE
+
+
+Regexp and a Relm token, separated by whitespace.
+
+  # comment
+  <uri-regexp> <authentication-token> <realm-regexp>
+
+The location of this file is determined by the C<$::authfile>
+configuration variable.
+
+The authentication token is `encrypted' with the rot13 (Caesar)
+scheme.  This is not a security measure as such.  Rather it allows
+those who don't want to know the password to read the file but not
+directly see the passwords.
+
+At startup, test-link reads in the file.  Whenever a document needing
+authentication is
+
+=cut
+

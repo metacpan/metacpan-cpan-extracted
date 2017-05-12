@@ -1,0 +1,35 @@
+Revision history for Perl extension List::Enumerator
+
+0.09 Thu Oct 21 09:35:00 2010
+	* Fix dependency.
+
+0.08 Tue Oct 19 04:35:00 2010
+	* Fix dependency.
+
+0.07 Mon May 18 04:35:00 2008
+	* `first` and `last` method can take number of items.
+
+0.06 Wed Aug 20 09:06:00 2008
+	* Just add Class::Accessor::Fast dependency.
+
+0.05 Sat Aug 16 00:06:00 2008
+	* New method: choice, sample, shuffle, transpose
+
+0.04 Sun Aug 10 16:40:00 2008
+	* Use Class::Accessor::Fast instead of Moose.
+	* List::Enumerator::Role is just a class now.
+	* E is exported by default.
+
+0.03 Sat Jun 14 04:05:55 2008
+	* more faster each method.
+	* changed interface of each.
+	  now each method always returns self.
+
+0.02 Thu May 22 22:56:06 2008
+	* append some methods.
+	* fixed silly 'select' bug.
+	* fixed bug around rewind.
+
+0.01 Sat May 17 01:06:38 2008
+	* original version
+

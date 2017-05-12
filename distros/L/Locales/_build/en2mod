@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+use lib '_build';
+use _locales_build_utils;
+
+my ( $cldr_db_path, $locales_db, $manifest ) = _locales_build_utils::init_paths_from_argv();
+
+# use Data::Dumper;print Dumper($_locales_build_utils::plural_forms);
+
+chdir $locales_db || die "Could not change into '$locales_db': $!";
+
+my $tag = Locales::normalize_tag( $ARGV[2] );
+my ( $l, $t ) = Locales::split_tag($tag);
+
+my @root;
+if ( $l ne $tag ) {
+    print "Fetching root for $tag ($l)\n";
+    @root = ( _locales_build_utils::get_target_structs_from_cldr_for_tag( $l, {}, {}, {} ) )[ 0, 3, 2 ];
+
+    #  use Data::Dumper;print Dumper($root[2]);
+}
+
+require Locales::DB::Language::en;
+require Locales::DB::Territory::en;
+
+if (@root) {
+
+    # merge \%Locales::DB::Language::en::code_to_name into $root[0]
+    for my $k ( keys %Locales::DB::Language::en::code_to_name ) {
+        if ( !exists $root[0]->{$k} ) {
+            $root[0]->{$k} = $Locales::DB::Language::en::code_to_name{$k};
+        }
+    }
+
+    # merge \%Locales::DB::Territory::en::code_to_name into $root[1]
+    for my $k ( keys %Locales::DB::Territory::en::code_to_name ) {
+        if ( !exists $root[1]->{$k} ) {
+            $root[1]->{$k} = $Locales::DB::Territory::en::code_to_name{$k};
+        }
+    }
+
+    # merge \%Locales::DB::Language::en::misc_info into $root[2]
+
+    # use Data::Dumper;
+    # print Dumper( [ 'pre-merge', $root[2] ] );
+    $root[2] = _locales_build_utils::merge_hash( $root[2], \%Locales::DB::Language::en::misc_info );
+
+    # use Data::Dumper;
+    # print Dumper( [ 'pst-merge', $root[2] ] );
+
+    # $root[2] = {
+    #     # 'fallback' => $fallback,
+    #     # 'cldr_formats' => {
+    #     #     'decimal' => $root[2]->{'numbers'}{'decimalFormats'}{'decimalFormatLength'}{'decimalFormat'}{'pattern'} || $Locales::DB::Language::en::misc_info{'cldr_formats'}{'decimal'},
+    #     #     'percent' => $root[2]->{'numbers'}{'percentFormats'}{'percentFormatLength'}{'percentFormat'}{'pattern'} || $Locales::DB::Language::en::misc_info{'cldr_formats'}{'percent'},
+    #     #     'territory' => $root[2]->{'localeDisplayNames'}{'codePatterns'}{'codePattern'}{'territory'}{'content'} || $Locales::DB::Language::en::misc_info{'cldr_formats'}{'territory'},
+    #     #     'language' => $root[2]->{'localeDisplayNames'}{'codePatterns'}{'codePattern'}{'language'}{'content'} || $Locales::DB::Language::en::misc_info{'cldr_formats'}{'language'},
+    #     #     'locale' => $root[2]->{'localeDisplayNames'}{'localeDisplayPattern'}{'localePattern'} || $Locales::DB::Language::en::misc_info{'cldr_formats'}{'locale'}, # wx_yz has no name but wx does and xy may
+    #     #     # {'localeDisplayNames'}{'localeDisplayPattern'}{'localePattern'}{'localeSeparator'} => ', ' (not needed since we only use territory subtag)
+    #     # },
+    #     # 'orientation' => {
+    #     #     'characters' => $root[2]->{'layout'}{'orientation'}{'characters'} || $Locales::DB::Language::en::misc_info{'orientation'}{'characters'} || 'left-to-right',
+    #     #     'lines' => $root[2]->{'layout'}{'orientation'}{'lines'} || $Locales::DB::Language::en::misc_info{'orientation'}{'lines'}  || 'top-to-bottom',
+    #     # },
+    #     # 'posix' => {
+    #     #     'yesstr' => $root[2]->{'posix'}{'messages'}{'yesstr'} || $Locales::DB::Language::en::misc_info{'posix'}{'yesstr'},
+    #     #     'nostr' => $root[2]->{'posix'}{'messages'}{'nostr'} || $Locales::DB::Language::en::misc_info{'posix'}{'nostr'},
+    #     #     # TODO: yesexp/noexp
+    #     # },
+    # };
+}
+else {
+    @root = ( \%Locales::DB::Language::en::code_to_name, \%Locales::DB::Territory::en::code_to_name, \%Locales::DB::Language::en::misc_info );
+}
+
+print "Fetching tag $tag\n";
+my ( $lang_code_to_name, $lang_name_to_code, $lang_misc_info, $terr_code_to_name, $terr_name_to_code ) = _locales_build_utils::get_target_structs_from_cldr_for_tag( $tag, @root ) or die "Could not get data for '$tag'";
+
+_locales_build_utils::write_language_module( $tag, $lang_code_to_name, $lang_name_to_code, $lang_misc_info );
+
+_locales_build_utils::write_territory_module( $tag, $terr_code_to_name, $terr_name_to_code );
+
+_locales_build_utils::write_locale_test($tag);
+
+_locales_build_utils::write_get_plural_form_test($tag);

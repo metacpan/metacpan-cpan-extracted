@@ -1,0 +1,40 @@
+---
+abstract: "Override LWP's HTTP/HTTPS backend with your own PSGI application"
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: '0.88'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-Protocol-PSGI
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  HTTP::Message::PSGI: '0'
+  LWP: '5'
+  LWP::Protocol: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/miyagawa/LWP-Protocol-PSGI/issues
+  homepage: https://github.com/miyagawa/LWP-Protocol-PSGI
+  repository: https://github.com/miyagawa/LWP-Protocol-PSGI.git
+version: '0.09'
+x_contributors:
+  - 'Daisuke Maki <lestrrat+github@gmail.com>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Sawyer X <xsawyerx@cpan.org>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'

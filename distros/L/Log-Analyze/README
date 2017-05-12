@@ -1,0 +1,27 @@
+This is Perl module Log::Analyze.
+
+INSTALLATION
+
+Log::Analyze installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Log::Analyze
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Log::Analyze documentation is available as in POD. So you can do:
+
+    % perldoc Log::Analyze
+
+to read the documentation online with your favorite pager.
+
+takeshi miki

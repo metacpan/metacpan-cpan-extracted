@@ -1,0 +1,28 @@
+% perl sample11.pl
+2008/08/13 22:33:50 fatal message
+main warn  message 2
+main error message 2
+main fatal message 2
+
+% perl sample11.pl -v
+2008/08/13 22:33:52 info  message
+2008/08/13 22:33:52 warn  message
+2008/08/13 22:33:52 error message
+2008/08/13 22:33:52 fatal message
+main info  message 2
+main warn  message 2
+main error message 2
+main fatal message 2
+
+% perl sample11.pl -d
+2008/08/13 22:33:55 debug message
+2008/08/13 22:33:55 info  message
+2008/08/13 22:33:55 warn  message
+2008/08/13 22:33:55 error message
+2008/08/13 22:33:55 fatal message
+main debug message 2
+main info  message 2
+main warn  message 2
+main error message 2
+main fatal message 2
+

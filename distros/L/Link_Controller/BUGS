@@ -1,0 +1,69 @@
+	WIERD URLS
+
+I've tried to get rid of the URI::URL class in LinkController and the
+classes it uses and use URI only instead.  I am not sure if this will
+cause problems with some old data.  It shouldn't though since we store
+URIs in text strings and so should access them fine and other places
+should be insulated by subclasses?  
+
+	TIME TRANSPORTED OBJECTS
+
+I'm not sure what happens in general if I take a frozen object
+belonging to someone else's class and then transport it in time.  Do I
+have to provide it with the same version of the library to interpret
+it?  Can I do that if perl doesn't support library versioning?
+Probably we should discuss with the other developers how to get a
+forward compatible version format + backwards protecting version
+labelling?
+
+	UNTESTED OPTIONS
+
+Many different options have not yet been tested.  Certainly there is
+no way that every combination of options have been tested.
+Contributions to the test suite are very much appreciated.  
+
+	FRAGMENTS
+
+It seems that fragments often contain spaces.  In this case they are
+left out of the database.  Actually, the fragment should be recorded
+separately within the link and then it should be part of resource
+_content_ verification.  For properly defined URL schemes, the
+resource its self will always be retrieved / activated in one go..
+
+	LOSSES FROM DATABASE
+
+There were some losses from the database.  These should now be fixed.
+Of course it's still possible to lose information if a crash occurs
+during a database write.  Keep backups as usual.  We make no attempt
+to protect the Link data which isn't considered that valuable since
+it's "easy" to regenerate with in a few days.
+
+	LOCATION OF PERL
+
+I make the assumption that the perl that is first in your path is the
+one you want to use.  The choice of perl should be propagated through to
+the Progcopy.PL script and tests from the Makefile.PL.
+
+	SUNOS COMMAND START UP
+
+On SunOS 4, the -w flags in the first line of all the programs end up
+split across the maximum length of a command for me.  This leads to
+the error
+
+  Unrecognized switch: - .
+
+Strangely this only happens with some of the programs. The only
+solution is to fix the programs by hand.  Just add ten or so spaces
+after between perl and the option.  Or better yet upgrade to a more
+modern operating system.
+
+If anyone knows the general rule about which bit of the first line is
+used on what operating system, I can try to ensure that this doesn't
+get installed broken.
+
+	BASE URLS
+
+lack of clarity about when we should end an infostructure base with a
+slash ( `/' ).  I don't think there are any bad cases, but if you find
+one, please tell me.
+

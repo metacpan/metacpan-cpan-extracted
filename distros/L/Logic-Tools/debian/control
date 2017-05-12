@@ -1,0 +1,16 @@
+Source: liblogic-tools-perl
+Section: perl
+Priority: optional
+Maintainer: root <root@lagutas.itlogic.pro>
+Build-Depends: debhelper (>= 9)
+Build-Depends-Indep: perl
+Standards-Version: 3.9.5
+Homepage: https://metacpan.org/release/Logic-Tools
+
+Package: liblogic-tools-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}
+Description: The great new Logic::Tools!
+ (no description was found)
+ .
+ This description was automagically extracted from the module by dh-make-perl.

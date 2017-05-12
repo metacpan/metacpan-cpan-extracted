@@ -1,0 +1,136 @@
+[% 
+    IF data.articleid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Profile' ;
+    htmltitle = title ;
+
+    crumb3_name = 'Admin' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=home-admin' ;
+    crumb2_name = 'Profiles' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=who-admin' ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+<div class="boxer">
+  <p>   <a href="[% cgipath %]/pages.cgi?act=who-admin">profile admin</a>
+      | <a href="[% cgipath %]/pages.cgi?act=who-add">create a new profile</a></p>
+
+  [% IF thanks %]<p>Profile saved successfully.</p>[% END %]
+  <p>Fields marked * are mandatory fields and must be completed.</p>
+
+[% IF errmess %]
+  <p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+[% END %]
+</div>
+
+<form method="post" action="[% cgipath %]/pages.cgi" id="EDIT" name="EDIT" enctype="multipart/form-data">
+<input type="hidden" name="act"       value="who-save" />
+<input type="hidden" name="sectionid" value="[% article.data.sectionid %]" />
+<input type="hidden" name="articleid" value="[% article.data.articleid %]" />
+<input type="hidden" name="folderid"  value="[% article.data.folderid %]" />
+<input type="hidden" name="userid"    value="[% article.data.userid %]" />
+<input type="hidden" name="imageid"   value="[% article.data.imageid %]" />
+<input type="hidden" name="doaction"  value="" />
+<input type="hidden" name="recordid"  value="" />
+<input type="hidden" name="postdate"  value="[% article.data.postdate %]" />
+
+<div class="boxer">
+  <table class="blocker">
+  <tr><th>Quickname *</th>
+      <th class="alert">[% article.data.quickname_err %]</th>
+      <td><input type="text" name="quickname" value="[% article.data.quickname %]" size="20" /></td>
+  </tr>
+  <tr><th width="120">Name *</th>
+      <th width="10" class="alert">[% article.data.title_err %]</th>
+      <td><input type="text" name="title" value="[% article.data.title %]" size="50" /></td>
+  </tr>
+  <tr>
+      <th>Instruments</th>
+      <th class="alert">[% article.data.snippet_err %]</th>
+      <td><input type="text" name="snippet" value="[% article.data.snippet %]" /></td>
+  </tr>
+  <tr><th>Status *</th>
+      <th class="alert">[% article.data.publish_err %]</th>
+      <td>[% article.data.ddpublish %]</td>
+  </tr>
+  </table>
+</div>
+
+<input type="hidden" name="display" value="display0" />
+<input type="hidden" name="list" value="[% article.blocks %]" />
+
+[% FOREACH item = article.body %]
+[% IF item %]
+<input type="hidden" name="BLOCK[% item.orderno %]" value="[% item.type %],[% item.paraid %]" />
+[% END %]
+[% END %]
+
+<div class="boxer">
+  <table class="blocker">
+
+[% IF article.blocks %]
+
+[% FOREACH item = article.body %]
+[% IF item %]
+[% IF item.type == 1 %]
+  <tr><th width="80">[% item.orderno %] : Image</th>
+      <th width="10" class="red">[% item.error %]</th>
+      <td><input type="hidden" name="display[% item.orderno %]" value="" />
+          <input type="hidden" name="gallery[% item.orderno %]" value="[% item.imageid %]" />
+          <input type="file" name="IMAGEUPLOAD[% item.orderno %]" />
+      [% IF item.link %]
+          <img id="display[% item.orderno %]" src="[% webpath %]/[% item.link %]" alt="[% item.tag %]" />
+      [% ELSE %]
+          <img id="display[% item.orderno %]" src="[% webpath %]/images/blank.png" alt="" />
+      [% END %]
+          <br />[ <a href="javascript:DoPopup('display[% item.orderno %]')">Select from Gallery</A> ]
+          <table>
+          <tr><td>Align:</td><td colspan="3">[% item.ddalign %]</td></tr>
+          <tr><td>HyperLink:</td><td><input type="text" name="IMAGELINK[% item.orderno %]" value="[% item.tag %]" /></td>
+              <td>Tag:</td><td><input       type="text" name="IMAGETAG[% item.orderno %]"  value="[% item.tag %]" /></td></tr>
+          <tr><td>Width:</td><td><input     type="text" name="width[% item.orderno %]"     value="[% item.width %]" /></td>
+              <td>Height:</td><td><input    type="text" name="height[% item.orderno %]"    value="[% item.height %]" /></td></tr>
+          </table>
+          <p>Please note that when initially selecting images from the Photo Gallery, the loaded image wlll be the
+          current raw size. Once the page is saved the image will be resized to the appropriate dimensions. In the
+          width and height boxes, you may leave these blank or set to 0 to use the default settings (max 400x400 pixels).
+      </td>
+  </tr>
+[% END %]
+[% IF item.type == 2 %]
+  <tr><th width="80">[% item.orderno %] : Text</th>
+      <th width="10" class="red">[% item.error %]</th>
+      <td><textarea name="TEXT[% item.orderno %]" rows="20" cols="50">[% item.body %]</textarea></td>
+  </tr>
+[% END %]
+[% IF item.type == 3 %]
+  <tr><th width="80">[% item.orderno %] : Link</th>
+      <th width="10" class="red">[% item.error %]</th>
+      <td><input type="text" name="LINK[% item.orderno %]" value="[% item.link %]" /></td>
+  </tr>
+[% END %]
+  <tr><th></th>
+      <th></th>
+      <td>
+      [ <a href="javascript:doSubmit('MoveUp',[% item.paraid %])">Move block up</a>
+      | <a href="javascript:doSubmit('MoveDn',[% item.paraid %])">Move block down</a>
+      | <a href="javascript:doSubmit('Delete',[% item.paraid %])">Delete block</a> ]</td>
+  </tr>
+[% END %]
+[% END %]
+
+[% ELSE %]
+  <tr><td align="center">No content yet!</td></tr>
+[% END %]
+
+</table>
+
+<p align="center">[ <a href="javascript:doSubmit('AddImage',0)">Add an image</a> | <a href="javascript:doSubmit('AddPara',0)">Add a text block</a> ]</p>
+<p align="center"><input type="submit" value="Submit" /></p>
+</div>
+
+
+</form>
+
+[% INCLUDE "profiles/who-preview.html" %]

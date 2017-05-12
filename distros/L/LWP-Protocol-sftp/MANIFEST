@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/LWP-Protocol-sftp.t
+lib/LWP/Protocol/sftp.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,125 @@
+
+
+% Image base file name
+% Caption
+\newcommand{\figimage}[2]{%
+\begin{figure}%
+{\centering%
+\input{#1.tex}%
+\caption{#2}%
+\label{fig:#1}%
+}%
+\end{figure}%
+}
+
+% Linewidth factor
+% Image base file name
+% Caption
+\newcommand{\figimagelw}[3]{%
+\begin{figure}%
+{\centering%
+\resizebox{#1\linewidth}{!}{\input{#2.tex}}%
+\caption{#3}%
+\label{fig:#1}%
+}%
+\end{figure}%
+}
+
+% Width in cm
+% Image base file name
+% Caption
+\newcommand{\figimagecm}[3]{}
+
+% Image base file name
+% Caption
+\newcommand{\pngimage}[2]{%
+\begin{figure}%
+{\centering%
+\ifpdf%
+\input{#1.pdf}%
+\else%
+\input{#1}%
+\fi%
+\caption{#2}%
+\label{fig:#1}%
+}%
+\end{figure}%
+}
+
+% Linewidth factor
+% Image base file name
+% Caption
+\newcommand{\pngimagelw}[3]{%
+\begin{figure}%
+{\centering%
+\ifpdf%
+\includegraphics[width=#1\linewidth]{#2.pdf}%
+\else%
+\includegraphics[width=#1\linewidth]{#2}%
+\fi%
+\caption{#3}%
+\label{fig:#1}%
+}%
+\end{figure}%
+}
+
+% Width in cm
+% Image base file name
+% Caption
+\newcommand{\pngimagecm}[3]{%
+\begin{figure}%
+{\centering%
+\ifpdf%
+\includegraphics[width=#1cm]{#2.pdf}%
+\else%
+\includegraphics[width=#1cm]{#2}%
+\fi%
+\caption{#3}%
+\label{fig:#1}%
+}%
+\end{figure}%
+}
+
+% Image base file name
+% Caption
+\newcommand{\mpimage}[2]{%
+\begin{figure}%
+{\centering%
+\includegraphics{#1.mps}%
+\caption{#2}%
+\label{fig:#1}%
+}%
+\end{figure}%
+}
+
+% Linewidth factor
+% Image base file name
+% Caption
+\newcommand{\mpimagelw}[3]{%
+\begin{figure}%
+{\centering%
+\includegraphics[width=#1\linewidth]{#2.mps}%
+\caption{#3}%
+\label{fig:#1}%
+}%
+\end{figure}%
+}
+
+% Width in cm
+% Image base file name
+% Caption
+\newcommand{\mpimagecm}[3]{%
+\begin{figure}%
+{\centering%
+\includegraphics[width=#1cm]{#2.mps}%
+\caption{#3}%
+\label{fig:#1}%
+}%
+\end{figure}%
+}
+
+
+\newcommand{\gpimage}[2]{\mpimage{#1}{#2}}
+\newcommand{\gpimagelw}[3]{\mpimagelw{#1}{#2}{#3}}
+\newcommand{\gpimagecm}[3]{\mpimagecm{#1}{#2}{#3}}
+

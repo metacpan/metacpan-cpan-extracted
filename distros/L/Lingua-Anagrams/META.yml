@@ -1,0 +1,30 @@
+---
+abstract: 'pure Perl anagram finder'
+author:
+  - 'David F. Houghton <dfhoughton@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0.88'
+  blib: '1.01'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Anagrams
+no_index: {}
+requires:
+  List::MoreUtils: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+version: '0.019'

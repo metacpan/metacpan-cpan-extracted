@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+use strict;
+use Getopt::Std::Strict 'h';
+use Cwd;
+
+print STDERR usage() and exit if $opt_h;
+
+print find_project_name();
+
+
+sub usage {
+   qq{$0 - get name of project
+   };
+}
+
+
+
+sub find_project_name {
+   
+   my $abs = $ARGV[0] || cwd();
+   $abs = Cwd::abs_path($abs) or die;
+
+   -f "$abs/Makefile.PL" or die("no Makefile.PL in $abs");
+
+   $abs=~/([^\/]+)$/;
+   my $pname = $1;
+   $pname=~s/\-/::/g;
+
+   return $pname;
+} 

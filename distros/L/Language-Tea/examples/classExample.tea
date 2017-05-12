@@ -1,0 +1,24 @@
+class classExample (
+        a
+        v
+        
+)
+method classExample showArray (in) {
+    
+    define _inArray $in
+    define tmpCount_1 0
+    define tmpCount_2 0
+      
+    foreach var_1 $_inArray {
+        if {pair? $var_1}{
+            set! tmpCount_2 0 
+            foreach var_2 [nth $_inArray $tmpCount_1] {
+                echo "     [" $tmpCount_2 "] => " $var_2
+                set! tmpCount_2 [+ $tmpCount_2 1]
+            }
+        }{
+            echo "[" $tmpCount_1 "] => " $var_1
+        }
+        set! tmpCount_1 [+ $tmpCount_1 1]
+    }
+}

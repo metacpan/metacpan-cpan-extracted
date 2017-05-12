@@ -1,0 +1,12 @@
+Revision history for Lingua-HPSG
+
+0.01    2009-10-03/17:27
+        created package
+0.02	2009-10-09/15:56
+	added classes representing the feature-structure tree on p61
+0.03	2009-10-11/15:41
+	* removed the Agreement namespace (we'll note agreement with roles)
+	* added Lingua::HPSG::Feature namespace for feature definitions
+	* added some classes to
+          Lingua::HPSG::FeatureStructure::Expression which were new on
+          p84

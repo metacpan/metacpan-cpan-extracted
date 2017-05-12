@@ -1,0 +1,27 @@
+package Logfile::EPrints::Parser::Foo;
+
+use strict;
+use warnings;
+
+use Carp;
+use Logfile::EPrints::Hit::Foo;
+
+sub new
+{
+	my( $class, %args ) = @_;
+	Carp::croak("Requires handler argument") unless $args{ handler };
+	bless \%args, ref($class) || $class;
+}
+
+sub parse
+{
+	my( $self, $target ) = @_;
+
+	while(my $rec = $target->next)
+	{
+		my $hit = Logfile::EPrints::Hit::Foo->new( $rec );
+		$self->{ handler }->hit( $hit );
+	}
+}
+
+1;

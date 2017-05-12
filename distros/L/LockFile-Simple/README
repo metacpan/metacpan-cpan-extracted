@@ -1,0 +1,86 @@
+                        LockFile::Simple 0.206
+              Copyright (c) 2000,2007, Johan Vromans
+
+                        LockFile::Simple 0.2
+              Copyright (c) 1998-1999, Raphael Manfredi
+
+
+------------------------------------------------------------------------
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the Perl Artistic License or the GNU
+    General Public License as published by the Free Software
+    Foundation; either version 2 of the License, or (at your option)
+    any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    Artistic License for more details.
+------------------------------------------------------------------------
+
+       *** This is alpha software -- use at your own risks ***
+
+Name           DSLI  Description                                  Info
+-----------    ----  -------------------------------------------- -----
+LockFile::           Application-level locking facilities
+::Simple       adpr  Simple file locking mechanism                RAM
+::Lock::       ----  Lock handles created by LockFile::* schemes  RAM
+::Manager      ----  Records locks created by LockFile::*         RAM
+
+SYNOPSIS
+
+	#
+	# The simple way
+	#
+
+	use LockFile::Simple qw(lock unlock);
+
+	lock("file") || die "Can't lock file\n";
+	open(FILE, ">>file") || die "Can't append to file: $!\n";
+	....
+	close FILE;
+	unlock("file");
+
+	#
+	# The more elaborated way
+	#
+
+	use LockFile::Simple;
+
+	my $scheme = LockFile::Simple->make(
+		-autoclean => 1,
+		-format => "%f.lck");
+
+	$scheme->lock($0, "/var/run/%F.%p") || die "already running";
+
+	my $lock = $sheme->lock("file");
+	open(FILE, ">>file") || die "Can't append to file: $!\n";
+	....
+	close FILE;
+	$lock->release;
+
+DESCRIPTION
+
+The LockFile::Simple extension provides simple file locking, of
+the advisory kind, i.e. it requires cooperation between applications
+wishing to lock the same files.
+
+It is meant to be used in quick-and-dirty scripts or more elaborated
+programs that want a simple locking scheme, yet with a reasonable
+level of configuration.
+
+This code comes from the mailagent-3.0 package and retains most
+of its configuration abilities.
+
+I do not intend to leave this simple scheme as-is forever. The code is
+designed to be extended to offer other locking schemes, such as
+MTA locking--usually a combination of this simple scheme and flock().
+
+Despite being flagged as simple and not bullet proof all over the
+place, locking is good enough in practice for simple applications
+wishing to protect against concurrent actions.
+
+There is an embeded POD manual page in Simple.pm.
+
+-- Raphael Manfredi <Raphael_Manfredi@pobox.com>
+

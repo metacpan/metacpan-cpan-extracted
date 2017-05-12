@@ -1,0 +1,35 @@
+#!/bin/bash
+
+if [ ! -z $1 ]; then
+    MAKEFILE=$1
+fi
+makefile=${MAKEFILE:-"/usr/src/linux/Makefile"}
+
+if [ ! -z $2 ]; then
+    FORMAT=$2
+fi
+format=${FORMAT:-"%v.%p.%s%e"}
+
+if [ ! -f $makefile ]; then
+    if [ -f "$makefile/Makefile" ]; then
+        makefile="$makefile/Makefile"
+    else
+        echo "ERROR:  Could not find makefile '$makefile'" 2>&1 
+        exit -1
+    fi
+fi
+
+export `egrep "^ *VERSION *=" $makefile | sed "s/ *//g;"`
+export `egrep "^ *PATCHLEVEL *=" $makefile | sed "s/ *//g;"`
+export `egrep "^ *SUBLEVEL *=" $makefile | sed "s/ *//g;"`
+export `egrep "^ *EXTRAVERSION *=" $makefile | sed "s/ *//g;"`
+export `egrep "^ *NAME *=" $makefile | sed "s/ *//g;"`
+
+echo $format \
+    | sed "s/%v/$VERSION/g" \
+    | sed "s/%p/$PATCHLEVEL/g" \
+    | sed "s/%s/$SUBLEVEL/g" \
+    | sed "s/%e/$EXTRAVERSION/g" \
+    | sed "s/%n/$NAME/g" 
+    
+exit 0

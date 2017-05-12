@@ -1,0 +1,157 @@
+==================================================
+Changes from 2015-11-27 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 1.6 at 2016-11-26 08:52:31 +0000
+----------------------------------------
+
+  Change: 781b3b79f17c36d2ee33dadfc44d0eaf56210a34
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-26 09:51:51 +0000
+
+    Add test dependecy on Test::Pod 
+
+  Change: 71dd68a9dbbfc32fc2f215ee35743d699e8b04de
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-26 09:47:30 +0000
+
+    Add dependecy on Net::Lumberjack 
+
+  Change: b228f096ac74e2f6675a9b70e17a129865e0b9bd
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-26 09:43:44 +0000
+
+    Add Command and Journald inputs 
+
+  Change: 54a58e33a03ab41e2701bc35a2dfaeefdb6d1b55
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-25 09:54:41 +0000
+
+    Updated input/output docs in saftpresse man page 
+
+  Change: b3eb3603a760887a486efb1ca947f4140bb218b3
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-08 07:07:03 +0000
+
+    Add support for a lumberjack server 
+
+  Change: 9b2f7132723a786ffd1742540bf5609e8bf39a8b
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-06 17:38:49 +0000
+
+    Add support for docker image 
+
+  Change: a765606ac517297bb73d6474ab2b6fa6bcf19df5
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-23 21:37:54 +0000
+
+    Added support for Redis input/output 
+
+  Change: 57d10769ea81560caedd672b4d5ce95fd2f205a5
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-23 21:37:33 +0000
+
+    Convert build system to cpanfile 
+
+----------------------------------------
+version 1.5 at 2016-05-16 09:51:37 +0000
+----------------------------------------
+
+  Change: 188775211729c7e2ebd90c2591ee3627f99cedc0
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-05-16 11:51:37 +0000
+
+    be compatible with UUID < 0.06
+
+    As reported in rt.cpan.org #114390 by henrik@hswn.dk the uuid()
+    function is only available in UUID module version >=0.06. Instead of
+    uuid() this calls generate() and unparse() and should work with older
+    versions.
+
+    closes rt.cpan.org #114390 
+
+----------------------------------------
+version 1.4 at 2016-05-15 08:58:34 +0000
+----------------------------------------
+
+  Change: 3aecf8d00c81413a0ae91baa715f41f6efafdfae
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-05-15 10:58:34 +0000
+
+    fixed uninitialized loggin in saftsumm
+
+    This fixes a bug when logging is not initialized in saftsumm:
+
+    Can't call method "info" on an undefined value at
+    /usr/local/share/perl/5.20.2/Log/Saftpresse/PluginContainer.pm line
+    32. 
+
+  Change: 8c7c960d72b0d31ef9dc0bd767fb77c50271cdbd
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-01-12 09:04:08 +0000
+
+    remove debian packaging from upstream
+
+    Debian packaging will be moved to a seperate git repository managed
+    with git-buildpackage.
+
+    fixes rt.cpan.org #110957 
+
+  Change: 2a8dfa5bc899d083923f8c1de8af59db445bace5
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-01-12 09:01:11 +0000
+
+    add VERSION and ABSTRACT to Tracking.pm 
+
+  Change: d26707b5ba967a2aea05d314635f2ae3e55ef9fb
+  Author: Markus Benning <werewolf@dampfhammer.bofh-noc.de>
+  Date : 2016-01-10 15:48:45 +0000
+
+    Add new Tracking feature
+
+    The new Plugin::Role::Tracking adds functions to add tracking to
+    plugins. This also implements a basic tracking of message
+    transactions of postfix/amavis by pid/queue_id. 
+
+----------------------------------------
+version 1.3 at 2016-01-06 11:24:51 +0000
+----------------------------------------
+
+  Change: 6fff32c97c77244669ab3c2ec27f26784f2d9bb1
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-01-06 12:24:51 +0000
+
+    complete initial version of debian package 
+
+  Change: ecbe58c3bcce3066a171d50cb70ed37831faf3e6
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-01-05 10:55:39 +0000
+
+    fix regex for postfix short queueids
+
+    Matthias Schneider pointed out that a postfix short queuedid (without
+    enable_long_queue_ids) could be 8,9,10 or 12 chars depending on
+    queues filesystem inode. 
+
+  Change: e994f286003b8671484b6bdf49e077f9d25fcc11
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-01-04 22:29:44 +0000
+
+    add basic packaging work 
+
+  Change: dd34115fed49c52e8260ff369c941916d4513a04
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-01-04 20:43:36 +0000
+
+    Merge branch 'master' of github.com:benningm/saftpresse 
+
+  Change: d666b909bda9adbfba8436f8a13bd0c4efab0832
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 09:00:42 +0000
+
+    add minimum perl version 
+
+================================================
+Plus 3 releases after 2015-11-27 00:00:00 +0000.
+================================================

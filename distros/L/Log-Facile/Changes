@@ -1,0 +1,43 @@
+Revision history for Perl extension Log::Facile.
+
+0.01  Fri Aug 22 01:35:40 2008
+	- original version; created by h2xs 1.23 with options
+		-X -A Log::Facile
+
+0.02  Fri Aug 24 01:01:40 2008
+	- add debug_flag
+
+0.03  Sat Nov 29 19:01:34 2008
+	- remove dependency Class::Accessor::Fast
+        - add log swapping implementation
+
+0.04  Sat Nov 29 22:33:57 2008
+	- accessors field define checker implementation
+	- add date format configure implementation
+	- add log level string configure implementation
+	- add methods $l->fatal(), $l->warn()
+
+0.05  Mon Dec 2 01:19:23 2008
+	- bug fix in $self->swap($swap_dir);
+
+0.06  Wed Dec  3 03:00:37 JST 2008
+	- add more tests
+
+1.00  Thu Dec  4 04:13:19 JST 2008
+	- add customize log format implementation
+	- add more tests
+
+1.01  Sun Dec  7 09:35:51 JST 2008
+	- edit pod
+	- add comments
+
+1.02  Wed Apr  8 01:13:53 JST 2009
+	- getter bug fix (delete no need pattern)
+	- gnu coding style with 'perltidy -gnu'
+	- pod edit (Methods)
+	- test module bug fix (Log-Facile-swap-fail-001.t)
+
+1.03  Wed Apr  8 02:43:41 JST 2009
+	- make 'template item accessor arg 0' constant
+	- edit test modules
+

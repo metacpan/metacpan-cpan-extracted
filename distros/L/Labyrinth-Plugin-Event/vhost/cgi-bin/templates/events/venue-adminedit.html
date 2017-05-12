@@ -1,0 +1,68 @@
+[% 
+    IF data.venueid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Venue' ;
+
+    crumb3_name = 'Event' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=event-admin' ;
+    crumb2_name = 'Venue' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=venue-admin' ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+<form action="[% cgipath %]/pages.cgi" method="post">
+<input type="hidden" name='act' value='venue-save' />
+<input type="hidden" name="venueid" value="[% data.venueid %]" />
+<input type="hidden" name="eventid" value="[% data.eventid %]" />
+
+[% IF thanks %]<p>Venue saved successfully.</p>[% END %]
+<p>Fields marked * are mandatory fields and must be completed.</p>
+
+[% IF errmess %]
+<div class="box">
+    [% IF errmess == 1 %]
+    <p class="alert">There are invalid or missing fields, as noted by the <span class="alert">&empty;</span> symbol.</p>
+    [% ELSE %]
+    <p class="alert">[% errmess %]</p>
+    [% END %]
+</div>
+[% END %]
+
+<div class="boxer">
+<table class="blocker">
+<tr><th>Name *</th>
+    <td class="alert">[% data.venue_err %]</td>
+    <td><input type="text" name="venue" size="50" value="[% data.venue %]" /></td></tr>
+<tr><th>Link</th>
+    <td class="alert">[% data.venuelink_err %]</td>
+    <td><input type="text" name="venuelink" size="50" value="[% data.venuelink %]" /></td></tr>
+<tr><th>Address *</th>
+    <td class="alert">[% data.address_err %]</td>
+    <td><input type="text" name="address" size="50" value="[% data.address %]" /></td></tr>
+<tr><th>Map Link</th>
+    <td class="alert">[% data.addresslink_err %]</td>
+    <td><input type="text" name="addresslink" size="50" value="[% data.addresslink %]" /></td></tr>
+<tr><th>Info</th>
+    <td class="alert">[% data.info_err %]</td>
+    <td><textarea name="info" rows="10" cols="[% cols %]">[% data.info %]</textarea></td>
+</tr>
+<tr><th></th>
+    <td></td>
+    <td><input type="submit" value='Save Venue' /></td>
+</tr>
+</table>
+</div>
+
+</form>
+
+<h2>Preview</h2>
+
+<div class="boxer">
+<table class="blocker">
+<tr><td>Venue:</td><td>[% IF preview.venuelink %]<a href="[% preview.venuelink %]" title="link to venue">[% preview.venue %]</a>[% ELSE %][% preview.venue %][% END %]</td></tr>
+<tr><td>Address:</td><td>[% IF preview.addresslink %]<a href="[% preview.addresslink %]" title="map for venue address">[% preview.address %]</a>[% ELSE %][% preview.address %][% END %]</td></tr>
+</table>
+</div>
+
+[% IF preview.info %][% preview.info %][% END %]

@@ -1,0 +1,141 @@
+
+#: /t/data/dummy.pl:9
+#, locale-simple-format dummy
+msgid "mo'ooooo"
+msgstr ""
+
+#: /t/20-locale-simple.t:71 /t/data/test.py:83
+#, locale-simple-format
+msgctxt "alien"
+msgid "Hello"
+msgstr ""
+
+#: /t/data/dummy.pl:10
+#, locale-simple-format
+msgid " Sie müssen eine eigene Domain eingeben. \"%s\" ist nicht zulässig. "
+msgstr ""
+
+#: /t/20-locale-simple.t:47 /t/data/test.py:63
+#, locale-simple-format
+msgid "%2$s brought %1$d message"
+msgid_plural "%2$s brought %1$d messages"
+msgstr[0] ""
+
+#: /t/20-locale-simple.t:53 /t/data/test.py:68
+#, locale-simple-format
+msgid "%2$s has %1$d message"
+msgid_plural "%2$s has %1$d messages"
+msgstr[0] ""
+
+#: /t/data/dummy.tx:4
+#, locale-simple-format
+msgid "/unternehmen/kundeninformationen/agb-verbraucher/#widerrufsrecht"
+msgstr ""
+
+#: /t/20-locale-simple.t:59 /t/data/test.py:73
+#, locale-simple-format
+msgid "Change order test %s %s"
+msgstr ""
+
+#: /lib/Locale/Simple.pm:LINE /lib/Locale/Simple.pm:LINE /t/20-locale-simple.t:17 /t/21-dryrun.t:20 /t/30-locale-simple-other.t:18 /t/30-locale-simple-other.t:26 /t/data/test.py:38
+#, locale-simple-format
+msgid "Hello"
+msgstr ""
+
+#: /t/20-locale-simple.t:65 /t/data/test.py:78
+#, locale-simple-format
+msgid "Other change order test %s %s %s"
+msgstr ""
+
+#: /t/data/dummy.pl:11
+#, locale-simple-format
+msgid "Sie müssen eine eigene Domain eingeben. \"%s\" ist nicht zulässig!"
+msgstr ""
+
+#: /t/data/dummy.tx:2 /t/data/dummy.tx:3
+#, locale-simple-format
+msgid "Soll der Tarif %s?"
+msgstr ""
+
+#: /t/30-locale-simple-other.t:31
+#, locale-simple-format
+msgid "Umlaut-Test"
+msgstr ""
+
+#: /t/data/dummy.tx:4
+#, locale-simple-format
+msgid "Verbraucher können ihre Vertragserklärung innerhalb von zwei Wochen ohne Angabe von Gründen in Textform (z. B. Brief, Fax, E-Mail) widerrufen. Hier finden Sie die %s Einzelheiten zu Ihrem Widerrufsrecht %s."
+msgstr ""
+
+#: /t/data/dummy.tx:1
+#, locale-simple-format
+msgid "Vertrag gekündigt zum %s"
+msgstr ""
+
+#: /t/20-locale-simple.t:35 /t/20-locale-simple.t:41 /t/21-dryrun.t:38 /t/21-dryrun.t:44 /t/data/test.py:53 /t/data/test.py:58
+#, locale-simple-format
+msgid "You have %d message of %s"
+msgid_plural "You have %d messages of %s"
+msgstr[0] ""
+
+#: /lib/Locale/Simple.pm:LINE /lib/Locale/Simple.pm:LINE /t/20-locale-simple.t:23 /t/20-locale-simple.t:29 /t/21-dryrun.t:26 /t/21-dryrun.t:32 /t/data/test.py:43 /t/data/test.py:48
+#, locale-simple-format
+msgid "You have %d message"
+msgid_plural "You have %d messages"
+msgstr[0] ""
+
+#: /t/22-locale-simple-simplenumber.t:16 /t/22-locale-simple-simplenumber.t:22
+#, locale-simple-format
+msgid "You have a message"
+msgid_plural "You have some messages"
+msgstr[0] ""
+
+#: /t/data/dummy.pl:10
+#, locale-simple-format
+msgid "ihr-name"
+msgstr ""
+
+#: /t/data/dummy.pl:2
+#, locale-simple-format
+msgid "mo\"o"
+msgstr ""
+
+#: /t/data/dummy.pl:7
+#, locale-simple-format
+msgid "mo\"ooooo"
+msgstr ""
+
+#: /t/data/dummy.pl:12 /t/data/dummy.pl:14
+#, locale-simple-format
+msgid "mo'o\n   oooo"
+msgstr ""
+
+#: /t/data/dummy.pl:4
+#, locale-simple-format
+msgid "mo'ooo"
+msgstr ""
+
+#: /t/data/dummy.pl:8 /t/data/dummy.pl:18
+#, locale-simple-format
+msgid "mo'ooooo"
+msgstr ""
+
+#: /t/data/dummy.pl:3
+#, locale-simple-format
+msgid "mo\\\"oo"
+msgstr ""
+
+#: /t/data/dummy.pl:5 /t/data/dummy.pl:6
+#, locale-simple-format
+msgid "mo\\oooo"
+msgstr ""
+
+#: /t/data/dummy.pl:1
+#, locale-simple-format
+msgid "moo"
+msgstr ""
+
+#: /t/40-error.t:19 /t/40-error.t:27
+#, locale-simple-format
+msgid "test"
+msgstr ""

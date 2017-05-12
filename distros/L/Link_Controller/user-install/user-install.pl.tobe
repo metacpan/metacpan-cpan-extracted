@@ -1,0 +1,7 @@
+$runlink
+
+$croncommands <<EOF
+5 1 * * *       $progbindir/runlink
+EOF
+
+$oldcron = `crontab -l`

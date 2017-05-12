@@ -1,0 +1,23 @@
+---
+abstract: 'Alphabet Katakana pronunciations'
+author:
+  - 'Naoki Tomita <tomita@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-JA-Alphabet-Yomi
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Unicode::Japanese: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

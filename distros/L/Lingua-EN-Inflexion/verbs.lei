@@ -1,0 +1,360 @@
+#_____/ "Is" is special \____________________________________________________________________
+#
+#   Singular           Plural            Preterite         Pres particple    Past participle
+#   ____________       _____________     _______           _____________     __________
+
+    is                 are               was|were          being             been
+    are                are                   were          being             been
+    am                 are               was|were          being             been
+    was                were              was|were          being             been
+
+
+#_____/ Modal verbs \________________________________________________________________________
+
+    can                can               could             _                 _
+    could              could             _                 _                 _
+    may                may               _                 _                 _
+    might              might             _                 _                 _
+    must               must              _                 _                 _
+    ought              ought             _                 _                 _
+    shall              shall             _                 _                 _
+    should             should            _                 _                 _
+    would              would             _                 _                 _
+
+
+#_____/ Common irregular verbs \____________________________________________________________
+#
+#   Singular           Plural            Preterite         Pres particple    Past participle
+#   ____________       _____________     _______           _____________     __________
+
+    aches              ache              ached             aching            ached
+    arises             arise             arose             arising           arisen
+    asks               ask               asked             asking            asked
+    avalanches         avalanche         avalanched        avalanching       avalanched
+    awakes             awake             awoke             awakening         awoken
+   *bears             *bear             *bore             *bearing          *borne
+    beats              beat              beat              beating           beaten
+    becomes            become            became            becoming          become
+    begets             beget             begot             begetting         begotten
+    begins             begin             began             beginning         begun
+    beholds            behold            beheld            beholding         beheld
+    bellyaches         bellyache         bellyached        bellyaching       bellyached
+    bends              bend              bent              bending           bent
+    bets               bet               bet               betting           bet
+   *bids              *bid              *bade             *bidding          *bidden
+    binds              bind              bound             binding           bound
+    bites              bite              bit               biting            bitten
+    blitzes            blitz             blitzed           blitzing          blitzed
+    bleeds             bleed             bled              bleeding          bled
+    blows              blow              blew              blowing           blown
+    breaks             break             broke             breaking          broken
+    breeds             breed             bred              breeding          bred
+    brings             bring             brought           bringing          brought
+    broadcasts         broadcast         broadcast         broadcasting      broadcast
+    builds             build             built             building          built
+    burns              burn              burnt             burning           burnt
+    bursts             burst             burst             bursting          burst
+    busts              bust              bust              busting           bust
+   *buys              *buy              *bought           *buying           *bought
+    caches             cache             cached            caching           cached
+    casts              cast              cast              casting           cast
+    catches            catch             caught            catching          caught
+    chooses            choose            chose             choosing          chosen
+   *clads             *clad             *clad             *cladding         *clad
+    clings             cling             clung             clinging          clung
+    comes              come              came              coming            come
+    costs              cost              cost              costing           cost
+    creches            creche            creched           creching          creched
+    creeps             creep             crept             creeping          crept
+   *cuts              *cut              *cut              *cutting          *cut
+    deals              deal              dealt             dealing           dealt
+    digs               dig               dug               digging           dug
+    dives              dive              dived             diving            dived
+   *does              *do               *did              *doing            *done
+    douches            douche            douched           douching          douched
+    drags              drag              dragged           dragging          dragged
+   *draws             *draw             *drew             *drawing          *drawn
+    drinks             drink             drank             drinking          drunk
+    drives             drive             drove             driving           driven
+    dwells             dwell             dwelt             dwelling          dwelt
+    eats               eat               ate               eating            eaten
+    falls              fall              fell              falling           fallen
+   *feeds             *feed             *fed              *feeding          *fed
+    feels              feel              felt              feeling           felt
+    fights             fight             fought            fighting          fought
+    finds              find              found             finding           found
+    flees              flee              fled              fleeing           fled
+    flies              fly               flew              flying            flown
+    flings             fling             flung             flinging          flung
+    forbids            forbid            forbade           forbidding        forbidden
+    forecasts          forecast          forecast          forecasting       forecast
+    foresees           foresee           foresaw           foreseeing        foreseen
+    foretells          foretell          foretold          foretelling       foretold
+    forgets            forget            forgot            forgetting        forgotten
+    forgives           forgive           forgave           forgiving         forgiven
+    forsakes           forsake           forsook           forsaking         forsaken
+   *freezes           *freeze           *froze            *freezing         *frozen
+    gets               get               got               getting           gotten
+    gilds              gild              gilded            gilding           gilded
+    gives              give              gave              giving            given
+    goes               go                went              going             gone
+    grinds             grind             ground            grinding          ground
+   *grows             *grow             *grew             *growing          *grown
+   *hangs             *hang             *hung             *hanging          *hung
+    has                have              had               having            had
+   *hears             *hear             *heard            *hearing          *heard
+    hews               hew               hewed             hewing            hewn
+   *hides             *hide             *hid              *hiding           *hidden
+    hits               hit               hit               hitting           hit
+    holds              hold              held              holding           held
+    hurts              hurt              hurt              hurting           hurt
+    inlays             inlay             inlaid            inlaying          inlaid
+   *inputs            *input            *input            *inputting        *input
+    insists            insist            insisted          insisting         insisted
+    interlays          interlay          interlaid         interlaying       interlaid
+    irises             iris              irised            irising           irised
+    keeps              keep              kept              keeping           kept
+    kneels             kneel             knelt             kneeling          knelt
+   *knits             *knit             *knitted          *knitting         *knitted
+    knows              know              knew              knowing           known
+    lays               lay               laid              laying            laid
+    leads              lead              led               leading           led
+    leans              lean              leaned            leaning           leaned
+    leaps              leap              leapt             leaping           leapt
+    leaves             leave             left              leaving           left
+   *lends             *lend             *lent             *lending          *lent
+   *lets              *let              *let              *letting          *let
+    lies               lie               lay               lying             lain
+   *lights            *light            *lit              *lighting         *lit
+    loses              lose              lost              losing            lost
+   *makes             *make             *made             *making           *made
+    means              mean              meant             meaning           meant
+    meets              meet              met               meeting           met
+    menus              menu              menued            menuing           menued
+    misleads           mislead           misled            misleading        misled
+    mistakes           mistake           mistook           mistaking         mistaken
+    moves              move              moved             moving            moved
+   *mows              *mow              *mowed            *mowing           *mown
+    niches             niche             niched            nicheing          niched
+    overdraws          overdraw          overdrew          overdrawing       overdrawn
+    overhears          overhear          overheard         overhearing       overheard
+    overtakes          overtake          overtook          overtaking        overtaken
+   *pays              *pay              *paid             *paying           *paid
+    presets            preset            preset            presetting        preset
+    proves             prove             proved            proving           proven
+    psyches            psyche            psyched           psyching          psyched
+    puts               put               put               putting           put
+    quits              quit              quit              quitting          quit
+    quizzes            quiz              quizzed           quizzing          quizzed
+   *reads             *read             *read             *reading          *read
+    rends              rend              rent              rending           rent
+    rides              ride              rode              riding            ridden
+    rids               rid               rid               ridding           rid
+    rings              ring              rang              ringing           rung
+    rises              rise              rose              rising            risen
+    rives              rive              rived             riving            riven
+    runs               run               ran               running           run
+    saws               saw               sawed             sawing            sawn
+   *says              *say              *said             *saying           *said
+    seeks              seek              sought            seeking           sought
+   *sees              *see              *saw              *seeing           *seen
+   *sells             *sell             *sold             *selling          *sold
+   *sends             *send             *sent             *sending          *sent
+   *sets              *set              *set              *setting          *set
+   *sews              *sew              *sewed            *sewing           *sewn
+    shakes             shake             shook             shaking           shaken
+    shaves             shave             shaved            shaving           shaved
+   *shears            *shear            *sheared          *shearing         *shorn
+    sheds              shed              shed              shedding          shed
+   *shines            *shine            *shone            *shining          *shone
+    shits              shit              shat              shitting          shitted
+    shoes              shoe              shod              shoeing           shod
+   *shoots            *shoot            *shot             *shooting         *shot
+    shows              show              showed            showing           shown
+    shrinks            shrink            shrank            shrinking         shrunk
+   *shuts             *shut             *shut             *shutting         *shut
+    sings              sing              sang              singing           sung
+    sinks              sink              sank              sinking           sunk
+    sits               sit               sat               sitting           sat
+    slays              slay              slew              slaying           slain
+   *sleeps            *sleep            *slept            *sleeping         *slept
+    slides             slide             slid              sliding           slid
+   *slings            *sling            *slung            *slinging         *slung
+    slinks             slink             slunk             slinking          slunk
+    slits              slit              slit              slitting          slit
+    smells             smell             smelled           smelling          smelled
+    smites             smite             smote             smiting           smitten
+    sows               sow               sowed             sowing            sown
+    speaks             speak             spoke             speaking          spoken
+    speeds             speed             sped              speeding          sped
+    spends             spend             spent             spending          spent
+   *spins             *spin             *spun             *spinning         *spun
+    spits              spit              spat              spitting          spat
+   *splits            *split            *split            *splitting        *split
+    spoils             spoil             spoilt            spoiling          spoiled
+   *spreads           *spread           *spread           *spreading        *spread
+    springs            spring            sprang            springing         sprung
+    stands             stand             stood             standing          stood
+    staves             stave             staved            staving           staved
+    steals             steal             stole             stealing          stolen
+   *sticks            *stick            *stuck            *sticking         *stuck
+    stings             sting             stung             stinging          stung
+    stinks             stink             stank             stinking          stunk
+    strews             strew             strewed           strewing          strewn
+    strides            stride            strode            striding          strode
+   *strikes           *strike           *struck           *striking         *struck
+   *strings           *string           *strung           *stringing        *strung
+    strives            strive            strove            striving          strived
+    sublets            sublet            sublet            subletting        sublet
+    swears             swear             swore             swearing          sworn
+    sweats             sweat             sweat             sweating          sweated
+    sweeps             sweep             swept             sweeping          swept
+    swells             swell             swelled           swelling          swollen
+    swims              swim              swam              swimming          swum
+    swings             swing             swung             swinging          swung
+   *takes             *take             *took             *taking           *taken
+   *teaches           *teach            *taught           *teaching         *taught
+    tears              tear              tore              tearing           torn
+   *tells             *tell             *told             *telling          *told
+   *thinks            *think            *thought          *thinking         *thought
+   *throws            *throw            *threw            *throwing         *thrown
+    thrusts            thrust            thrust            thrusting         thrust
+    treads             tread             trod              treading          trodden
+   *tries             *try              *tried            *trying           *tried
+    undergoes          undergo           underwent         undergoing        undergone
+    understands        understand        understood        understanding     understood
+    undertakes         undertake         undertook         undertaking       undertaken
+    upsets             upset             upset             upsetting         upset
+    wakes              wake              woke              waking            woken
+    wears              wear              wore              wearing           worn
+   *weaves            *weave            *wove             *weaving          *woven
+   *weds              *wed              *wed              *wedding          *wed
+    weeps              weep              wept              weeping           wept
+    wends              wend              wended            wending           wended
+   *wets              *wet              *wet              *wetting          *wetted
+    will               will              willed            willing           willed
+   *winds             *wind             *wound            *winding          *wound
+    wins               win               won               winning           won
+    withdraws          withdraw          withdrew          withdrawing       withdrawn
+    withholds          withhold          withheld          withholding       withheld
+    withstands         withstand         withstood         withstanding      withstood
+    wrings             wring             wrung             wringing          wrung
+   *writes            *write            *wrote            *writing          *written
+
+
+#_____/ Other common (but regular) verbs \____________________________________
+#
+#   Singular           Plural            Preterite         Pres particple    Past participle
+#   ____________       _____________     _______           _____________     __________
+
+    abides             abide             abided            abiding           abided
+   *adds              *add              *added            *adding           *added
+   *alights           *alight           *alighted         *alighting        *alighted
+   *allows            *allow            *allowed          *allowing         *allowed
+   *appears           *appear           *appeared         *appearing        *appeared
+   *believes          *believe          *believed         *believing        *believed
+   *calls             *call             *called           *calling          *called
+    changes            change            changed           changing          changed
+    claps              clap              clapped           clapping          clapped
+   *clothes           *clothe           *clothed          *clothing         *clothed
+   *considers         *consider         *considered       *considering      *considered
+    continues          continue          continued         continuing        continued
+   *creates           *create           *created          *creating         *created
+    dares              dare              dared             daring            dared
+    dies               die               died              dying             died
+    dives              dive              dived             diving            dived
+    dreams             dream             dreamed           dreaming          dreamed
+    expects            expect            expected          expecting         expected
+   *fits              *fit              *fitted           *fitting          *fitted
+    follows            follow            followed          following         followed
+    happens            happen            happened          happening         happened
+    helps              help              helped            helping           helped
+   *includes          *include          *included         *including        *included
+    kills              kill              killed            killing           killed
+    knits              knit              knitted           knitting          knitted
+    leans              lean              leaned            leaning           leaned
+    learns             learn             learned           learning          learned
+    likes              like              liked             liking            liked
+    lives              live              lived             living            lived
+    looks              look              looked            looking           looked
+    loves              love              loved             loving            loved
+   *melts             *melt             *melted           *melting          *melted
+    misunderstands     misunderstand     misunderstood     misunderstanding  misunderstood
+    needs              need              needed            needing           needed
+   *offers            *offer            *offered          *offering         *offered
+   *opens             *open             *opened           *opening          *opened
+   *plays             *play             *played           *playing          *played
+    proves             prove             proved            proving           proved
+    provides           provide           provided          providing         provided
+    reaches            reach             reached           reaching          reached
+    remains            remain            remained          remaining         remained
+    remembers          remember          remembered        remembering       remembered
+    seems              seem              seemed            seeming           seemed
+   *serves            *serve            *served           *serving          *served
+    skis               ski               skied             skiing            skied
+   *smells            *smell            *smelled          *smelling         *smelled
+    sneaks             sneak             sneaked           sneaking          sneaked
+   *spells            *spell            *spelled          *spelling         *spelled
+   *spills            *spill            *spilled          *spilling         *spilled
+   *starts            *start            *started          *starting         *started
+    stays              stay              stayed            staying           stayed
+    stops              stop              stopped           stopping          stopped
+    strips             strip             stripped          stripping         stripped
+    sunburns           sunburn           sunburned         sunburning        sunburned
+    talks              talk              talked            talking           talked
+    thrives            thrive            thrived           thriving          thrived
+   *turns             *turn             *turned           *turning          *turned
+   *uses              *use              *used             *using            *used
+    vexes              vex               vexed             vexing            vexed
+    waits              wait              waited            waiting           waited
+    walks              walk              walked            walking           walked
+    wants              want              wanted            wanting           wanted
+    watches            watch             watched           watching          watched
+   *works             *work             *worked           *working          *worked
+
+
+#_____/ Regular patterns of verb inflection \_________________________________________________
+#
+#   Singular           Plural            Preterite         Pres particple    Past participle
+#   ____________       _____________     _______           _____________     __________
+
+# Negations...
+
+    -n't               -n't              -n't              _                 _
+
+# Common patterns of verb inflexion...
+#
+
+    -[aeiou]ys         -[aeiou]y         -[aeiou]yed       -[aeiou]ying      -[aeiou]yed
+    -[aiy]nxes         -[aiy]nx          -[aiy]nxed        -[aiy]nxing       -[aiy]nxed
+    -ceps              -ceps             -cepsed           -cepsing          -cepsed
+    -[cs]hes           -[cs]h            -[cs]hed          -[cs]hing         -[cs]hed
+    -oes               -oe               -oed              -oeing            -oed
+    -ieus              -ieu              -ieued            -ieuing           -ieued
+    -eaus              -eau              -eaued            -eauing           -eaued
+    -sses              -ss               -ssed             -ssing            -ssed
+    -trixes            -trix             -trixed           -trixing          -trixed
+    -xes               -x                -xed              -xing             -xed
+    -zzes              -zz               -zzed             -zzing            -zzed
+    -zes               -ze               -zed              -zing             -zed
+    -ues               -ue               -ued              -ueing            -ued
+    -is                -i                -ied              -iing             -ied
+    -ees               -ee               -eed              -eeing            -eed
+    -yes               -ye               -yed              -yeing            -yed
+    -[au]es            -[au]e            -[au]ed           -[au]ing          -[au]ed
+    -[^b]is            -[^b]i            -[^b]ied          -[^b]ing          -[^b]ied
+    -sses              -ss               -ssed             -ssing            -ssed
+    -ies               -y                -ied              -ying             -ied
+    -ys                -y                -yed              -ying             -yed
+    -[^e]es            -[^e]e            -[^e]ed           -[^e]ing          -[^e]ed
+    -ers               -er               -ered             -ering            -ered
+
+
+# The most general verb inflexion...
+# (Note that the non-present forms are omitted because of final constant doubling issues)
+#
+#
+#   Singular           Plural            Preterite         Pres particple    Past participle
+#   ____________       _____________     _______           _____________     __________
+
+    -[^s]s             -[^s]             _                 _                 _

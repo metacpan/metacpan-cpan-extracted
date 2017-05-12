@@ -1,0 +1,9 @@
+
+<Sect1 id="sec-LazyST">
+<Title><literal>LazyST</literal><IndexTerm><Primary>LazyST</Primary></IndexTerm></Title>
+
+  <para>The contents of this module can now be found in
+  <ulink url="../base/Control.Monad.ST.Lazy.html"><literal>Control.Monad.ST.Lazy</literal></ulink>, and
+  <ulink url="../base/Data.STRef.Lazy.html"><literal>Data.STRef.Lazy</literal></ulink>.</para>
+
+</Sect1>

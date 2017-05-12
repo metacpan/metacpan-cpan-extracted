@@ -1,0 +1,25 @@
+SYNOPSIS
+
+     use Lingua::SU::Nums2Words qw(nums2words nums2words_simple);
+     binmode(STDOUT, ":utf8");
+    
+     print nums2words(1023);       # sa-rébu dua puluh tilu
+     print nums2words_simple(109); # hiji kosong salapan
+
+DESCRIPTION
+
+    This module provides two functions, nums2words and nums2words_simple,
+    to convert number to Sundanese verbage.
+
+SEE ALSO
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 6:
+
+      Non-ASCII character seen before =encoding in 'sa-rébu'. Assuming
+      UTF-8
+

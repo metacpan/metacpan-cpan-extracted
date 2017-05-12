@@ -1,0 +1,39 @@
+---
+abstract: '"ギャル文字" converter'
+author:
+  - 'Naoki Tomita <tomita@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-JA-Gal
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Lingua::JA::Gal:
+    file: lib/Lingua/JA/Gal.pm
+    version: '0.03'
+requires:
+  File::ShareDir: '1.00'
+  Unicode::Japanese: '0'
+resources:
+  bugtracker: https://github.com/tomill/Lingua-JA-Gal/issues
+  homepage: https://github.com/tomill/Lingua-JA-Gal
+  repository: git://github.com/tomill/Lingua-JA-Gal.git
+version: '0.03'
+x_contributors:
+  - 'tomi-ru <tomi-ru@d0d07461-0603-4401-acd4-de1884942a52>'

@@ -1,0 +1,30 @@
+Revision history for Perl module Lingua::EN::Syllable
+
+0.30 2016-02-14 NEILB
+    - Merged PR from MANWAR, which added MetaProvides::Package to dist.ini
+
+0.29 2015-11-28 NEILB
+    - Added SEE ALSO section, with links to Lingua::Phonology and Text::Info
+    - Updated github repo URL after changing my github username
+    - Added [MetaJSON] to dist.ini so META.json is included in releases
+
+0.28 2015-02-26 NEILB
+    - Made change suggested in RT#101178, thanks to jgstratt.
+      Words ending in -sed like "accused" generally have one fewer syllable
+      than the algorithm reports. I think this needs refinement, but it
+      seems like it's a general improvement.
+
+0.27 2015-02-24 NEILB
+    - Refactored test to be data-driven using Test::More
+    - Apart from 'w', single-letter words now return a syllable count of 1.
+      RT#101177, thanks to jgstratt.
+    - Improved handling of words ending with -ism and -isms. RT#60988
+
+0.26 2014-06-10 NEILB
+    - Switched to Dist::Zilla
+    - Added github repo to pod, and added std text for LICENSE AND COPYRIGHT
+    - Added Changes file
+
+0.251 1999-02-04 GREGFAST
+    - First version released to CPAN
+

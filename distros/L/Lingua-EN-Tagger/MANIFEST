@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Tagger.pm
+t/clean.t
+t/load.t
+t/nouns.t
+t/parser.t
+t/parser_latin1.t
+t/parser_utf8.t
+t/relax.t
+t/sentence.t
+t/threads.t
+t/weighted.t
+Tagger/tags.yml
+Tagger/unknown.yml
+Tagger/words.yml
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

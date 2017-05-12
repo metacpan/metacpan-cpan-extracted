@@ -1,0 +1,163 @@
+=head1 NAME
+
+Leyland::Manual - Manual for the Leyland web application framework
+
+=head1 WHAT IS LEYLAND
+
+	This section is just a copy of L<Leyland/"DESCRIPTION">.
+
+Leyland is a L<Plack>-based application framework for building truely
+RESTful, MVC-style web applications. It is feature rich and highly
+extensible.
+
+=head2 FEATURES
+
+=over
+
+=item * B<Build truely RESTful web applications:> Leyland was designed from
+the ground up according to the Representational State Transfer style of
+software architecture. Leyland applications perform real HTTP negotiations,
+(can) provide different representations of the same resource easily, respond
+with proper HTTP status codes, throw real HTTP exceptions, etc.
+
+=item * B<Automatic data (de)serialization> - Leyland automatically
+serializes resources to representations in the format your client
+wants to receive, like JSON and XML. It will also automatically deserialize
+JSON/XML requests coming from the client to Perl data-structures.
+
+=item * B<Pure UTF-8> - Leyland applications are pure UTF-8. Anything your
+application receives is automatically UTF-8 decoded, and anything your
+application sends is automatically UTF-8 encoded. Leyland apps will not
+accept, nor provide, content in a different character set. If you want to
+use different/multiple encodings, then Leyland is not for you.
+
+=item * B<Localize for the client, not the server> - Pretty much every other
+application framework only concerns itself with localizing the application
+to the locale of the machine on which it is running. I find that this is
+rarely useful nor interesting to the application developer. Leyland localizes for
+the client, not the server. If the client wants to view your application
+(which may be a simple website) in Hebrew, and your application supports
+Hebrew, then you can easily provide him with Hebrew representations.
+Leyland uses L<Locale::Wolowitz> for this purpose.
+
+=item * B<< Easy deployment and middleware support via L<Plack> >> - Leyland doesn't
+support Plack, it is dependant on it. Leyland's entire session support,
+for example, depends on Plack's L<Session|Plack::Middleware::Session>
+middleware. Use the full power of Plack in your Leyland application.
+
+=item * B<Lightweight> - Leyland is much smaller than L<Catalyst> or other
+major frameworks, while still providing lots of features. While it is not
+a "micro-framework", it is pretty small. If you're looking for an extremely
+lightweight solution, my other framework - L<McBain> - might fit your need.
+
+=item * B<Flexible, extensible> - Leyland was designed to be as flexible and
+as extensible as possible - where flexibility matters, and strict - where
+constistency and convention are appropriate. Leyland goes to great lengths
+to give you the ability to do things the way you want to, and more
+importantly - the way your end-users want to. Your applications listen to
+your users' preferences and automatically decide on a suitable course of action.
+Leyland is also L<Moo> based, making it easy to extend and tweak its behavior
+(and making it L<Moose> compatible).
+
+=item * B<Doesn't have a pony> - You don't really need a pony, do you?
+
+=back
+
+=head1 WHAT IS THIS MANUAL
+
+This manual is your guide to creating Leyland-based web applications.
+Hopefully, it will provide you with all the knowledge you need to create
+Leyland applications and utilize its full potential.
+
+=head1 TABLE OF CONTENTS
+
+The guide is divided into the following sections (order purely a suggestion,
+but you probably should read L<Leyland::Manual::Applications> first):
+
+=over
+
+=item 1. L<Leyland::Manual::Applications> - Describes Leyland application
+structure and how to create (more correctly initialize) and configure
+Leyland applications.
+
+=item 2. L<Leyland::Manual::Controllers> - Describes controllers, routes,
+resources, representations, etc.
+
+=item 3. L<Leyland::Manual::Views> - Describes view classes and their usage.
+
+=item 4. L<Leyland::Manual::Models> - Describes models and their usage.
+
+=item 5. L<Leyland::Manual::StaticFiles> - Describes how to serve static
+files from your application.
+
+=item 6. L<Leyland::Manual::Localization> - Describes how application
+localization is performed.
+
+=item 7. L<Leyland::Manual::Logging> - Describes how to use Leyland's
+logging facilities.
+
+=item 8. L<Leyland::Manual::Exceptions> - To err is human, to throw proper
+HTTP exceptions divine.
+
+=item 9. L<Leyland::Manual::Deployment> - Describes how to run/deploy/test
+Leyland applications.
+
+=item 10. L<Leyland::Manual::Extending> - Describes how to extend Leyland.
+
+=item 11. L<Leyland::Manual::FAQ> - Contains frequently asked questions
+and their answers.
+
+=item 12. L<Leyland::Manual::Upgrading> - Contains information about upgrading
+Leyland for existing applications.
+
+=back
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Leyland at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Leyland::Manual
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Leyland>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Leyland>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Leyland/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

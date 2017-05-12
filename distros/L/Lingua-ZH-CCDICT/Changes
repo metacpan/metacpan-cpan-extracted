@@ -1,0 +1,42 @@
+0.05  2009-09-12
+
+- Fix the all_characters method for the InMemory storage class. RT #44071.
+
+
+0.04  2007-11-26
+
+- The 0.03 release did not declare Sub::Name as a prereq.
+
+
+0.03  2007-11-25
+
+* Updated to CCDICT 5.1.1. The data has changed a fair amount, and
+  this means a number of API changes. Notably, most of the different
+  romanizations are gone, and there is only each for (Hanyu) Pinyin,
+  Hakka Pinjim, and Cantonese Jyutping.
+
+- Unicode representations for pinyin with one vowel at the beginning
+  of the syllable were not being created at all.
+
+- Fixed an off-by-one error which caused this module to skip the last
+  item in the dictionary. Reported by Scott Lanning. RT #27717.
+
+- Changed obsolete() to is_obsolete(). The old version is still
+  available, but deprecated.
+
+
+0.02  2003-02-26
+
+- Fixed a bug in turning fifth tone (no tone) pinyin syllables into
+  Unicode.  The syllable was being turned into '', which is definitely
+  not right ;)
+
+- Fixed COPYRIGHT sections of docs to specify that the module is
+  licensed under the same terms as Perl itself, not just the Artistic
+  License.
+
+
+0.01  2002-08-23 (from Taiwan)
+
+- First release.  It seems to work but no doubt has bugs.
+

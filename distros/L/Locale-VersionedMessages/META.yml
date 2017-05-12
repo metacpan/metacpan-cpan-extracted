@@ -1,0 +1,32 @@
+---
+abstract: 'handle all aspects of the localization process'
+author:
+  - 'Sullivan Beck <sbeck@cpan.org>'
+build_requires:
+  Module::Build: '0.21'
+  Test::Inter: '1.04'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.21'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-VersionedMessages
+provides:
+  Locale::VersionedMessages:
+    file: lib/Locale/VersionedMessages.pm
+    version: '0.95'
+  Locale::VersionedMessages::Sets::lm_gui:
+    file: lib/Locale/VersionedMessages/Sets/lm_gui.pm
+requires:
+  File::Path: '0'
+  IO::File: '0'
+  perl: '5.008'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/SBECK-github/Locale-VersionedMessages
+version: '0.95'

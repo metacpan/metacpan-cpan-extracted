@@ -1,0 +1,13 @@
+
+0.01	Fri Oct 12 15:42:53 CEST 2012
+	- first version of the blacklist classifier as a perl module
+
+0.02	Sat Oct 13 09:57:20 CEST 2012
+	- now with documentation
+
+0.03	Sun Oct 14 18:50:20 CEST 2012
+	- read from files with line-length-limit
+	- integrated general-purpose language identifier (Lingua::Identify::CLD)
+
+0.04
+	- fixed a bug in identify file (classification was based on 64k only)

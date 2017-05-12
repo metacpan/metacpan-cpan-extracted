@@ -1,0 +1,530 @@
+#!/usr/bin/perl
+
+use strict ;
+use Pod::Usage ;
+use Getopt::Long qw/:config no_ignore_case/ ;
+
+++$! ;
+
+use Linux::DVB::DVBT ;
+
+our $VERSION = "1.01" ;
+our $RECORD_SECS = 4 ;
+
+	my ($help, $man, $DEBUG, $DEBUG_SCRIPT, $VERBOSE, $config, $tsid_only, $adap) ;
+	GetOptions('v|verbose=i' => \$VERBOSE,
+			   'dbg-script=i' => \$DEBUG_SCRIPT,
+			   'debug=i' => \$DEBUG,
+			   'h|help' => \$help,
+			   'man' => \$man,
+			   'cfg=s' => \$config,
+			   'tsid=s' => \$tsid_only,
+			   'a|adap|dvb=i' => \$adap,
+			   'len=i' => \$RECORD_SECS,
+			   ) or pod2usage(2) ;
+
+
+    pod2usage(1) if $help;
+    pod2usage(-verbose => 2) if $man;
+
+	Linux::DVB::DVBT->debug($DEBUG) ;
+	Linux::DVB::DVBT->dvb_debug($DEBUG) ;
+	Linux::DVB::DVBT->verbose($VERBOSE) ;
+
+	## Create dvb 
+	## NOTE: With default object settings, the application will
+	## die on *any* error, so there is no error checking in this script
+	##
+	my $dvb = Linux::DVB::DVBT->new(
+		'adapter_num' 	=> $adap,
+		'add_si'		=> 0,				# Do NOT add SI tables
+		'errmode'		=> 'message',
+	) ;
+	
+	$dvb->config_path($config) if $config ;
+	
+	# read config
+	my $tuning_href = $dvb->get_tuning_info() ;
+	my $channels_aref = $dvb->get_channel_list() ;
+Linux::DVB::DVBT::prt_data("Current tuning info=", $tuning_href) if $DEBUG>=5 ;
+	
+	my $ok = 1 ;
+	
+	# Set displayed widths
+	my %widths = (
+		'check'		=> 1,
+		'lcn'		=> 3,
+		'chan'		=> 30,
+		'tsid'		=> 6,
+		'pnr'		=> 5,
+		'type'		=> 7,
+		'pids'		=> 56,
+	) ;
+	
+	# calc seperators
+	my $horiz_bar = "" ;
+	$horiz_bar .= "-"x$widths{'check'} ;
+	$widths{'total'} = $widths{'check'} ;
+	$horiz_bar .= "-"x$widths{'lcn'} ;
+	$widths{'total'} = $widths{'lcn'} ;
+#	foreach (qw/chan tsid pnr type pids/)
+	foreach (qw/chan type pids/)
+	{
+		# vert sep
+		if ($_ eq 'pnr')
+		{
+			$horiz_bar .= "-" ;
+			$widths{'total'}++ ;
+		}
+		else
+		{
+			$horiz_bar  .= "-+-" ;
+			$widths{'total'} += 3 ;
+		}
+		
+		# column
+		$horiz_bar .= "-"x$widths{$_} ;
+		$widths{'total'} += $widths{$_} ;
+	}
+	my $tsid_bar = "."x$widths{'total'} ;
+
+	print <<HEAD ;
+$horiz_bar
+ LCN | Channel Name                   | Type    | Channel Quality                                                 
+$horiz_bar
+HEAD
+	
+	my %summary ;
+
+	## print channels grouped into multiplexes
+	my %multi ;
+	foreach my $ch_href (@$channels_aref)
+	{
+		my $chan = $ch_href->{'channel'} ;
+		my $tsid = $tuning_href->{'pr'}{$chan}{'tsid'} ;
+		$multi{$tsid} ||= [] ;
+		push @{$multi{$tsid}}, $ch_href ;
+	}
+	
+	my $tsids=0;
+	my @tsid_list = sort {$a <=> $b} keys %multi ;
+	if ($tsid_only)
+	{
+		if (exists($multi{$tsid_only}))
+		{
+			@tsid_list = ($tsid_only) ;
+		}
+		else
+		{
+			print "Error : Requested TSID $tsid_only is not a valid value for this tuner\n" ;
+			exit 1 ; 
+		}
+	}
+	foreach my $tsid (@tsid_list)
+	{
+		if ($tsids)
+		{
+			print <<SEP ;
+$tsid_bar
+SEP
+		}
+		
+		my $tsid_info = "" ;
+			$tsid_info .= "Freq: $tuning_href->{'ts'}{$tsid}{'frequency'} Hz" ;
+			$tsid_info .= " $tuning_href->{'ts'}{$tsid}{'modulation'}QAM" ;
+			$tsid_info = "[$tsid_info]" ;
+		print <<TSID ;
+TSID $tsid   $tsid_info
+$tsid_bar
+TSID
+		++$tsids ;
+		my %totals = (
+			'chans'			=> 0,
+			'pkts'			=> 0.0,
+			'unrecorded'	=> 0,
+			'errors'		=> 0,
+			'overflows'		=> 0,
+		) ;
+		foreach my $ch_href (@{$multi{$tsid}})
+		{
+			my ($tv, $radio) = (0, 0) ;
+			my %info = print_chan($tuning_href, $ch_href, \$tv, \$radio) ;
+			$totals{'chans'} += ($tv || $radio ? 1 : 0) ;
+			foreach my $type (qw/video audio/)
+			{
+				if ($info{$type}{'recorded'})
+				{
+					foreach my $field (qw/errors overflows/)
+					{
+						$totals{$field} += $info{$type}{$field} ;
+					}
+					$totals{'pkts'} += 1.0*$info{$type}{'pkts'} ;
+				}
+				else
+				{
+					++$totals{'unrecorded'} ;
+				}
+			}
+		}	
+
+		my $summary = sprintf "%3d chans %5.0f pkts %3d unrecorded %4d errors %4d overflows",
+			$totals{'chans'},
+			$totals{'pkts'} / $totals{'chans'},
+			$totals{'unrecorded'},
+			$totals{'errors'},
+			$totals{'overflows'};
+			
+		$summary{$tsid} = $summary ;
+		
+		print <<TSID ;
+$tsid_bar
+TSID $tsid Summary: $summary
+$tsid_bar
+
+TSID
+
+	}
+
+	print <<TAIL ;
+$horiz_bar
+
+TAIL
+
+
+	## Show summary table
+	print <<TSID_SUMMARY ;
+-------------------------------------------------------------------------------
+SUMMARY	
+-------------------------------------------------------------------------------
+TSID_SUMMARY
+	foreach my $tsid (sort {Linux::DVB::DVBT::Config::tsid_sort($a,$b)} keys %summary)
+	{
+		my $tsid_str = Linux::DVB::DVBT::Config::tsid_str($tsid);
+		print "TSID $tsid_str : $summary{$tsid}\n" ;
+	}
+	print <<TSID_SUMMARY ;
+-------------------------------------------------------------------------------
+TSID_SUMMARY
+
+
+
+#-------------------------------------------------------------------------------------------------------
+sub print_chan
+{
+	my ($tuning_href, $ch_href, $tv_ref, $radio_ref) = @_ ;
+
+
+	my $error = 0 ;
+	my %info = (
+		'audio'		=> {
+			'recorded'		=> 0,
+			'errors'		=> 0,
+			'overflows'		=> 0,
+			'pkts'			=> 0,
+		},
+		'video'		=> {
+			# don't mess up the stats!
+			'recorded'		=> 1,
+			'errors'		=> 0,
+			'overflows'		=> 0,
+			'pkts'			=> 0,
+		},
+	) ;	
+	my $chan = $ch_href->{'channel'} ;
+
+	print STDERR "print_chan($chan) - $ch_href->{type}\n" if $DEBUG_SCRIPT ;
+
+	if ($ch_href->{type} eq 'radio')
+	{
+		$$radio_ref = 1 ;
+	}
+	elsif ($ch_href->{type} =~ /tv/)
+	{
+		$$tv_ref = 1 ;
+	}
+	
+
+	my $qualstr = "**Unable to record**" ;
+	if ($$tv_ref || $$radio_ref)
+	{
+		my %multiplex_info ;
+		
+		## Check we can record
+		my $file = "/tmp/test.ts" ;
+		my $duration_secs = $RECORD_SECS ;
+		my $duration = "0:0:$duration_secs" ;
+		unlink $file ;
+	
+		## Parse command line
+		print STDERR " + multiplex_parse\n" if $DEBUG_SCRIPT ;
+		my @chan_spec ;
+		$error = $dvb->multiplex_parse(\@chan_spec, "f=$file", "ch='$chan'", "len=$duration");
+		print STDERR "ERROR: $error\n" if $error && $DEBUG_SCRIPT ;
+		
+		if (!$error)
+		{
+			print STDERR " + multiplex_select\n" if $DEBUG_SCRIPT ;
+
+			## Select the channel(s)
+			my %options = (
+				'out'			=> "av",
+			) ;
+			$error ||= $dvb->multiplex_select(\@chan_spec, %options) ;
+			print STDERR "ERROR: $error\n" if $error && $DEBUG_SCRIPT ;
+		}
+		
+		if (!$error)
+		{
+			print STDERR " + multiplex_info\n" if $DEBUG_SCRIPT ;
+		
+			## Get multiplex info
+			%multiplex_info = $dvb->multiplex_info() ;
+			if ($DEBUG_SCRIPT >= 2)
+			{ 
+				Linux::DVB::DVBT::prt_data("info", \%multiplex_info) ;
+			}
+			
+			if ($ch_href->{type} eq 'tv')
+			{
+				$info{'video'}{'recorded'}=0 ;
+			}
+	
+			
+			## Record
+			print STDERR " + multiplex_record\n" if $DEBUG_SCRIPT ;
+			eval {
+				my $stderr ;
+				local *STDERR ;
+				open(STDERR, '>', \$stderr) or die "Can't open STDERR: $!";
+	
+				## Record
+				$error ||= $dvb->multiplex_record(%multiplex_info) ;
+			} ;
+			if ($@)
+			{
+				print STDERR "ERROR: $@\n" if $DEBUG_SCRIPT ;
+			}
+			
+			if ($DEBUG_SCRIPT >= 2)
+			{ 
+				Linux::DVB::DVBT::prt_data("info", \%multiplex_info) ;
+			}
+		}
+		
+		if (!$error)
+		{
+			my $pids = 0 ;
+			print STDERR " + process results...\n" if $DEBUG_SCRIPT ;
+			foreach my $file (sort keys %{$multiplex_info{'files'}})
+			{
+				my $href = $multiplex_info{'files'}{$file} ;
+				print STDERR "  $file\n" if $DEBUG_SCRIPT ;
+				foreach my $pid_href (@{$multiplex_info{'files'}{$file}{'pids'}})
+				{
+					++$pids ;
+					if ($DEBUG_SCRIPT)
+					{				
+						printf STDERR "    PID %5d [$pid_href->{'pidtype'}] : %s errors / %s overflows / %s packets\n", 
+							$pid_href->{'pid'},
+							$pid_href->{'errors'},
+							$pid_href->{'overflows'},
+							$pid_href->{'pkts'},
+							 ;
+					}
+					
+					if ($pid_href->{'pidtype'} =~ /video|audio/)
+					{
+						$info{$pid_href->{'pidtype'}}{'recorded'} = 1 ;
+						foreach (qw/errors overflows pkts/)
+						{
+							$info{$pid_href->{'pidtype'}}{$_} = $pid_href->{$_} ;
+						}
+					}
+					
+				}
+				print STDERR "\n" if $DEBUG_SCRIPT ;
+			}
+			
+			if (!$pids)
+			{
+				$error = "No pids recorded\n" ;
+				print STDERR "No pids recorded\n" if $DEBUG_SCRIPT ;
+			}
+		}
+		unlink $file ;
+	
+		if (!$error)
+		{
+			print STDERR " + create string...\n" if $DEBUG_SCRIPT ;
+			my $vstr = "" ;
+			if ($info{'video'}{'recorded'})
+			{
+				$vstr = sprintf "video: %5d (%3d e %3d o) ", 
+					$info{'video'}{'pkts'},
+					$info{'video'}{'errors'},
+					$info{'video'}{'overflows'} ;
+			}
+			
+			my $astr = "" ;
+			if ($info{'audio'}{'recorded'})
+			{
+				$astr = sprintf "audio: %5d (%3d e %3d o) ", 
+					$info{'audio'}{'pkts'},
+					$info{'audio'}{'errors'},
+					$info{'audio'}{'overflows'} ;
+			}
+	
+			$qualstr = "$vstr$astr" ;
+			
+			
+		}
+	}
+	else
+	{
+		print STDERR " + skipped special\n" if $DEBUG_SCRIPT ;
+		$qualstr = "**Special channel skipped**" ;
+	}	
+	
+	printf "%-$widths{check}s%$widths{lcn}d | %-$widths{chan}s | %-$widths{type}s | $qualstr \n", 
+		$error ? "*" : " ",
+		$ch_href->{'channel_num'},
+		$chan,
+		$ch_href->{type} ;
+
+	return %info ;
+	
+}
+
+	
+
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+=head1 NAME
+
+dvbt-tsid-qual - Show signal quality of DVBT channels
+
+=head1 SYNOPSIS
+
+dvbt-tsid-qual [options]
+
+Options:
+
+       -debug level         set debug level
+       -verbose level       set verbosity level
+       -help                brief help message
+       -man                 full documentation
+       -cfg <config>        use specified configuration directory
+       -tsid <tsid>         show only the specified multiplex
+       
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Set verbosity level. Higher values show more information.
+
+=item B<-debug>
+
+Set debug level. Higher levels show more debugging information (only really of any interest to developers!)
+
+=item B<-cfg>
+
+Specify an alternate configuration directory (containing the dvb-ts, dvb-pr files) to use, rather than using the default.
+
+=item B<-tsid>
+
+Specify the TSID and only the results for that multiplex will be shown
+
+
+
+=back
+
+=head1 DESCRIPTION
+
+Script that uses the perl Linux::DVB::DVBT package to provide DVB-T adapter functions.
+ 
+Reads the config files (either default set or specified using the -cfg option) and then records a few seconds for each
+channel, displaying the results showing any errors.
+
+The displayed channel information contains:
+
+=over 4
+
+=item B<LCN>
+
+The logical channel number (where supported) or just an incrementing index.
+
+=item B<Channel Name>
+
+The channel name as broadcast
+
+=item B<Type>
+
+Whether this is a TV channel (i.e. contains video), or a radio station (audio only)
+
+=item B<Statistics>
+
+The statistics column shows the results of recording this channel. It is in two parts: video and audio. Each part contains 
+the number of recorded packets, the number of errors (shown as B<I<number> e>) and the number of buffer overflows  
+(shown as B<I<number> o>)
+
+=back
+
+For example:
+
+   2 | Yesterday | tv | video: 5252 ( 0 e 0 o) audio: 436 ( 0 e 0 o)
+
+Once the full set has completed, a summary table showing statistics for each multiplex is shown.
+
+=head2 Example output 
+
+	-----+--------------------------------+--------+---------------------------------------------------------
+	 LCN | Channel Name                   | Type   | Channel Quality                                                 
+	-----+--------------------------------+--------+---------------------------------------------------------
+	TSID 4107   [Freq: 578000000 Hz 16QAM]
+	........................................................................................................
+	   1 | BBC ONE                        | tv     | video: 10367 (  0 e   0 o) audio:   763 (  0 e   0 o)  
+	   2 | BBC TWO                        | tv     | video:  6190 (  0 e   0 o) audio:   870 (  0 e   0 o)  
+	  70 | CBBC Channel                   | tv     | video: 21687 (  0 e   0 o) audio:   872 (  0 e   0 o)  
+	  80 | BBC NEWS                       | tv     | video:  6470 (  0 e   0 o) audio:   656 (  0 e   0 o)  
+	........................................................................................................
+	TSID 4107 Summary:   4 chans 11969 pkts   0 unrecorded    0 errors    0 overflows
+	........................................................................................................
+	
+	...
+	
+	
+	-----+--------------------------------+--------+---------------------------------------------------------
+	
+	-------------------------------------------------------------------------------
+	SUMMARY
+	-------------------------------------------------------------------------------
+	TSID  12290 : 12 chans 4992 pkts 0 unrecorded 0 errors 0 overflows
+	TSID  16384 : 16 chans 3344 pkts 0 unrecorded 0 errors 0 overflows
+	TSID  20480 : 9 chans 6422 pkts 0 unrecorded 0 errors 0 overflows
+	TSID  24576 : 17 chans 3050 pkts 0 unrecorded 0 errors 0 overflows
+	TSID   4107 : 4 chans 11750 pkts 0 unrecorded 0 errors 0 overflows
+	TSID   8199 : 8 chans 7476 pkts 0 unrecorded 0 errors 0 overflows
+	-------------------------------------------------------------------------------
+
+=head1 FURTHER DETAILS
+
+For full details of the DVBT functions, please see L<Linux::DVB::DVBT>:
+
+   perldoc Linux::DVB::DVBT
+ 
+=cut
+
+	

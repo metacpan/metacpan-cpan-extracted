@@ -1,0 +1,6 @@
+Revision history for Perl extension LWP::Simple::Cookies.
+
+0.01  Sun Oct 19 23:19:31 2003
+	- original version; created by h2xs 1.6 with options
+		-X -P -n LWP::Simple::Cookies
+

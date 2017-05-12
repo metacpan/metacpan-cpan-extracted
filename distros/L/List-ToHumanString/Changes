@@ -1,0 +1,31 @@
+Revision history for List-ToHumanString
+
+1.003001   2015-03-24
+        - Converted packaging to Dist::Zilla
+        - Added git repo
+
+1.002   2013-12-05
+        - Added a reference to Lingua::Conjunction, after its author
+          pointed out to me that such a thing exists.
+
+1.001   2013-12-04
+        - COMPLETELY CHANGED FUNCTIONALITY FROM PREVIOUS RELEASE!!
+          Removed h() nad humanize(). Changed what to_human_string() does.
+        - Upped the version way higher, based on feedback and because
+          the interface is now solidified
+        - Added examples/humanize.pl
+        - Fixed POD typos
+
+0.004   2013-12-01
+        - Fixed a typo
+
+0.003   2013-12-01
+        - Removed the broken GIT link from the POD
+
+0.002   2013-12-01
+        - Made the module remove empty and blank string along with
+          undefs, since there's no need for those either.
+
+0.001   2013-11-27
+        - First version, released on an unsuspecting world.
+

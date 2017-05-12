@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+DShield.pm
+dshield.cache
+dshield.result1
+dshield.result2
+dshield.result3
+dshield.sendmail.response
+dshield.smtp.response
+examples/README
+examples/mail_dshield.pl
+examples/mail_2me_dshield.pl
+t/chk_config.t
+t/move2_Q.t
+t/deliver.t

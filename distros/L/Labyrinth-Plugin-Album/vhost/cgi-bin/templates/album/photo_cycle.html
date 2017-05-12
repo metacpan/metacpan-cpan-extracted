@@ -1,0 +1,73 @@
+[%
+
+  htmltitle = album.page.title || 'Welcome' ;
+  title = htmltitle ;
+
+  url = 'http://demo.missbarbell.co.uk' ;
+
+%]
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="/js/fadeslideshow.js"></script>
+
+<script type="text/javascript">
+
+/*
+
+The original script listed above can be obtained by visiting the Dynamic Drive site:
+
+http://www.dynamicdrive.com/dynamicindex14/fadeinslideshow.htm
+
+However, the script is also included with this distribution, as it also features a slight modification to allow an
+initial delay to the fading slideshow. This is useful if you have several slideshows on a page, and want to stagger
+the changes between the slideshows, rather than have them all change at the same time.
+
+*/
+
+var mygallery1 = new fadeSlideShow({
+	wrapperid: "fadeshow1", //ID of blank DIV on page to house Slideshow
+	dimensions: [300, 200], //width/height of gallery in pixels. Should reflect dimensions of largest image
+	imagearray: [
+
+[% concat = '' ; FOREACH item = albums.1.records %]
+    [% concat %]
+    ["[% picpath %]/photos/[% item.image %]", "", "", "[% item.tagline %]"]
+    [% concat = ',' %]
+[% END %]
+
+  ],
+	displaymode: {type:'auto', pause:2500, cycles:0, wraparound:false; delay: 1000;},
+	persist: false,         //remember last viewed slide and recall within same session?
+	fadeduration: 500,      //transition duration (milliseconds)
+	descreveal: "ondemand",
+	togglerid: ""
+})
+
+var mygallery2 = new fadeSlideShow({
+	wrapperid: "fadeshow2", //ID of blank DIV on page to house Slideshow
+	dimensions: [300, 200], //width/height of gallery in pixels. Should reflect dimensions of largest image
+	imagearray: [
+
+[% concat = '' ; FOREACH item = albums.2.records %]
+    [% concat %]
+    ["[% picpath %]/photos/[% item.image %]", "", "", "[% item.tagline %]"]
+    [% concat = ',' %]
+[% END %]
+
+  ],
+	displaymode: {type:'auto', pause:2500, cycles:0, wraparound:false; delay: 2000;},
+	persist: false,         //remember last viewed slide and recall within same session?
+	fadeduration: 500,      //transition duration (milliseconds)
+	descreveal: "ondemand",
+	togglerid: ""
+})
+</script>
+
+<div class="post">
+  <div id="cycle-para">
+      Some Text
+  </div>
+  <div id="cycle-pic"><div id="fadeshow1"></div></div>
+  <div id="cycle-pic"><div id="fadeshow2"></div></div>
+  <div class="clear"></div>
+</div>

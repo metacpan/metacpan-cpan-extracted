@@ -1,0 +1,14 @@
+Revision history for Lavoco-Web-App
+
+0.06    14 Jan 2015 - Only reload config if file changed.
+
+0.05    13 Jan 2015 - Relax JSON config loading.
+
+0.04    12 Jan 2015 - Docs, removed app name attribute.
+
+0.03    08 Jan 2015 - Docs.
+
+0.02    08 Jan 2015 - Docs and less verbose logging.
+
+0.01    07 Jan 2014 - First version.
+

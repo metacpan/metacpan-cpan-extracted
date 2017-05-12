@@ -1,0 +1,30 @@
+---
+abstract: 'map ASCII characters to names of Star Wars characters'
+author:
+  - "Martin 'Kingpin' Thurn, C<mthurn at cpan.org>, L<http://tinyurl.com/nn67z>."
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.18'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Lingua::Alphabet::Phonetic::StarWars
+name: Lingua-Alphabet-Phonetic-StarWars
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Lingua::Alphabet::Phonetic: 0
+  perl: '5.004'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.02'

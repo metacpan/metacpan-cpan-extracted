@@ -1,0 +1,19 @@
+#!/usr/bin/perl -s
+
+use POSIX qw(locale_h);
+setlocale(&POSIX::LC_ALL, "pt_PT");
+use locale;
+
+
+our ($rs,$latin1);
+
+if(not $latin1){
+  binmode(STDOUT,":utf8") ;
+  binmode(STDIN,":utf8") ;
+}
+
+$/ = $rs ||  "";
+
+use Lingua::PT::ProperNames;
+
+printPN(oco=>1);

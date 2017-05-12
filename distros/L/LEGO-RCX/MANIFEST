@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+RCX.pm
+README
+ARTISTIC
+COPYING
+DOCS
+TODO
+samples/beep.PL
+samples/motor.PL

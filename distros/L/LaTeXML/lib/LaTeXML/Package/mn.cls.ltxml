@@ -1,0 +1,46 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  mn.cls                                                             | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+# Generally ignorable options
+foreach my $option (qw(letters landscape galley referee)) {
+  DeclareOption($option, undef); }
+
+DeclareOption("usenatbib",   sub { AssignValue('@usenatbib'   => 1); });
+DeclareOption("usedcolum",   sub { AssignValue('@usedcolum'   => 1); });
+DeclareOption("usegraphicx", sub { AssignValue('@usegraphicx' => 1); });
+
+# Anything else is for article.
+DeclareOption(undef, sub {
+    PassOptions('article', 'cls', ToString(Digest(T_CS('\CurrentOption')))); });
+
+ProcessOptions();
+LoadClass('article');
+RequirePackage('mn2e_support');
+
+# And some stuff not in the later version...
+
+DefMacro('\NewSymbolFont{}{}',            '');
+DefMacro('\NewMathSymbol{}{}{}{}',        '');
+DefMacro('\NewMathDelimiter{}{}{}{}{}{}', '');
+DefMacro('\NewMathAlphabet{}{}{}',        '');
+DefMacro('\NewTextAlphabet{}{}{}',        '');
+DefMacro('\UseAMStwoboldmath',            '');
+RawTeX('\newif\ifnfssone\newif\ifnfsstwo\newif\ifoldfss');
+DefRegister('\realparindent' => Dimension('18pt'));
+DefMacro('\resetsizehook{}{}{}{}', '');
+
+1;

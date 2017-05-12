@@ -1,0 +1,50 @@
+[% 
+    IF data.linkid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Link' ;
+
+    crumb2_name = 'Link' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=link-admin' ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+<h2>[% title %]</h2>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="link-save" />
+<input type="hidden" name="linkid" value="[% data.linkid %]" />
+
+<div class="boxer">
+<div class="blocker">
+[% IF thanks %]<p>Link saved successfully.</p>[% END %]
+[% IF errmess %]
+[% IF errmess == 1 %]
+<p class="alert">There are invalid or missing fields, as noted by the <span  class="alert">&empty;</span> symbol.</p>
+[% ELSE %]
+<p class="alert">[% errmess %]</p>
+[% END %]
+[% END %]
+</div>
+</div>
+
+<div class="boxer">
+<table class="blocker">
+<tr><th>Category *</th>
+    <td class="alert">[% data.catid_err %]</td>
+    <td>[% data.ddcats %]</td></tr>
+<tr><th>Link *</th>
+    <td class="alert">[% data.href_err %]</td>
+    <td><input type="text" name="href" size="55" value="[% data.href %]" /></td></tr>
+<tr><th>Title</th>
+    <td class="alert">[% date.title_err %]</td>
+    <td><input type="text" name="title" size="55" value="[% data.title %]" /></td></tr>
+<tr><th>Info</th>
+    <td class="alert">[% data.body_err %]</td>
+    <td><textarea name="body" rows="10" cols="45">[% data.body %]</textarea></td></tr>
+</table>
+</div>
+
+<p class="aligncentre"><input type="submit" value="Save Link" /></p>
+
+</form>

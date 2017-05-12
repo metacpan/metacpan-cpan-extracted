@@ -1,0 +1,316 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use 5.006;
+
+use Getopt::Std qw(getopts);
+use Lingua::Identify qw(:all);
+
+# get the user options
+our %opts    = get_options();
+
+# special requests
+show_help()             if $opts{h};
+show_version()          if $opts{v};
+show_languages()        if $opts{l};
+choose_languages()      if $opts{o};
+
+# check options for sanity
+if ($opts{m}) {
+    $opts{m} > 0 || die "langident: please provide a positive value for -m\n";
+    $opts{a} = $opts{m};
+}
+
+$opts{s} ||= "\n";
+
+# identify the language...
+
+if (@ARGV) { # ...of files
+    my @files = @ARGV;
+    for (sort @files) {
+        -f && -r && -s || next;
+        if ($opts{E}) {
+            open (FILE,"<:encoding($opts{E})" ,$_) || 
+              do {print STDERR "Could not open $_ ($!)\n" ; next};
+        } else {
+            open (FILE,"<:utf8" ,$_) || do {print STDERR "Could not open $_ ($!)\n" ; next};
+        }
+        local $/ = $opts{s};
+        print $_, ":", (join $", ident(<FILE>)), "\n";
+        close (FILE);
+    }
+}
+else {       # ...of STDIN
+    binmode(STDIN, ":utf8");
+    print ((join $", ident(<>)), "\n");
+}
+
+#
+# subroutines
+#
+
+###
+
+sub get_options {
+    my %opts;
+    getopts('acde:hlo:ps:vm:E:', \%opts );
+
+    foreach my $key ( keys %opts )
+      {
+          $opts{$key} = 1 unless defined $opts{$key}
+      }
+
+    debug_options( %opts ) if $opts{d};
+
+    return %opts;
+}
+
+###
+
+sub debug_options {
+        my %opts = @_;
+
+        #local $^W = 0;
+        no warnings;
+                {
+                print STDERR <<"HERE";
+-------------------------------------------------------------------------
+Command line options
+-------------------------------------------------------------------------
+a   $opts{a}
+c   $opts{c}
+d   $opts{d}
+e   $opts{e}
+h   $opts{h}
+l   $opts{l}
+m   $opts{m}
+o   $opts{o}
+p   $opts{p}
+s   $opts{s}
+v   $opts{v}
+-------------------------------------------------------------------------
+HERE
+                }
+        }
+
+###
+
+sub show_help {
+  die "Usage: langident file1 file2
+ or:   langident -a -p file
+ or:   cat file | langident
+langident: identifies the languages files are written in
+
+Options:
+  -a         show all results
+  -c         show confidence level
+  -d         debug
+  -e METHODS select the method(s) to use
+  -h         displays this messages and exit
+  -l         list available languages and exit
+  -m NUMBER  sets maximum number of results (languages) to display
+  -o LANGS   work only with specified languages
+  -p         also show percentages
+  -s SIZE    maximum size to examine
+  -v         show version and exit
+"
+}
+
+###
+
+sub show_version {
+  die "langident version 0.08 (Lingua::Identify ", Lingua::Identify->VERSION, ")\n";
+}
+
+###
+
+# identify the language
+sub ident {
+  if ($opts{a} || $opts{p} || $opts{c}) {
+    my @results = langof(get_config(),@_);
+    @results || return ();
+    if ($opts{m}) {
+      my $m = $opts{m} > @results / 2 ? @results - 1 : (($opts{m} * 2) - 1);
+      @results = @results[0 .. $m];
+    }
+    my @confidence = $opts{c} ? scalar confidence(@results) * 100 : ();
+    @results = @results[0,1] unless $opts{a};
+    @results = grep /[a-z]{2}/, @results unless $opts{p};
+    for (@results) {$_*=100 if /\d/}
+    return (shift @results, @confidence, @results);
+  }
+  else {
+    return (langof(get_config(),@_))[0];
+  }
+}
+
+###
+
+# HELP!!! I'm an innocent comment trapped in here by an evil programmer :-(
+# Please get me out of here :-( My family is probably looking for me :-(
+
+###
+
+sub get_config {
+  my %config;
+
+  # get the methods to use
+  if (defined $opts{e}) {
+    my %methods;
+    for (get_all_methods()) { $methods{$_} = 0 }
+    for (split /,/, $opts{e}) {
+      my ($m, $v) = split /=/;
+      defined $methods{$_} || next;
+      $methods{$_} = $v || 1;
+    }
+    $config{'method'} = \%methods;
+  }
+
+  return \%config;
+}
+
+###
+
+sub choose_languages {
+  my $t = set_active_languages(split /,/, $opts{o});
+  $opts{m} = $t if $opts{m} > $t;
+}
+
+# show all available languages
+sub show_languages {
+  for (sort (get_all_languages())) {
+    print uc $_, " - ", ucfirst name_of($_) ,"\n";
+  }
+  exit;
+}
+
+__END__
+
+=head1 NAME
+
+langident - identifies the language files are written in
+
+=head1 SYNOPSIS
+
+  langident [OPTIONS] file1 [file2 ...]
+
+=head1 DESCRIPTION
+
+Identifies the language files are written in using Perl module
+Lingua::Identify.
+
+=head2 OPTIONS
+
+=head2 -a
+
+Show all results (not just the most probable language).
+
+=head2 -c
+
+Show confidence level for most probable language (it will be the first value
+right after the most probable language).
+
+=head2 -d
+
+Debug (development only).
+
+=head2 -E ENCODING
+
+Select an input encoding. Defaults to UTF-8.
+
+  # use ISO-8859-1 (latin1)
+  langident -E ISO-8859-1 file
+
+=head2 -e METHODS
+
+Select the method(s) to use. There are three ways of doing this:
+
+  # simply using a method
+  langident -e ngrams3 file
+
+  # using several methods (separate them with a comma)
+  langident -e prefixes3,suffixes3
+
+  # using several methods and assign different weights to each of them
+  langident -e smallwords=2,prefixes=1,ngrams3=1.3
+
+The available methods are the following: B<smallwords>, B<prefixes1>,
+B<prefixes2>, B<prefixes3>, B<prefixes4>, B<suffixes1>, B<suffixes2>,
+B<suffixes3>, B<suffixes4>, B<ngrams1>, B<ngrams2>, B<ngrams3> and B<ngrams4>.
+
+=head2 -h
+
+Display help message and exit.
+
+=head2 -l
+
+List all available languages and exit.
+
+=head2 -m NUMBER
+
+Set maximum number of results (languages) to display (shows the N most probable
+languages, by descending order of probability).
+
+Overrides the -a switch.
+
+=head2 -o LANGUAGES
+
+Only work with specified languages.
+
+  # identify between Portuguese and English only
+  langident -o pt,en *
+
+=head2 -p
+
+Also show percentages.
+
+=head2 -s SIZE
+
+Maximum size to examine.
+
+=head2 -v
+
+Show version and exit.
+
+=head1 EXAMPLES
+
+Use methods ngrams2 and ngrams1, assigning the double of importance to ngrams2
+(-e switch); output will include the three most probable languages (-m switch)
+with its percentages (-p switch) and also the confidence level (-c switch) of
+the first result.
+
+  $ langident -e ngrams2=2,ngrams1 -c -p -m 3 README 
+  README:en 65.7209505939491 7.8971987481393 ga 4.11905889385895 tr 4.08487011400505
+  $ 
+
+=head1 TO DO
+
+=over 6
+
+=item * Add a switch to ignore HTML tags (and maybe other formats too)
+
+=back
+
+=head1 SEE ALSO
+
+Lingua::Identify(3), Text::ExtractWords(3), Text::Ngram(3), Text::Affixes(3).
+
+A linguist and/or a shrink.
+
+The latest CVS version of C<Lingua::Identify> (which includes I<langident>) can
+be attained at http://natura.di.uminho.pt/natura/viewcvs.cgi/Lingua/Identify/
+
+ISO 639 Language Codes, at http://www.w3.org/WAI/ER/IG/ert/iso639.htm
+
+=head1 AUTHOR
+
+Jose Alves de Castro, E<lt>cog@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2004 by Jose Alves de Castro
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

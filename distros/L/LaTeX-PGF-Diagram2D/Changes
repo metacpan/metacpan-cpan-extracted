@@ -1,0 +1,15 @@
+Revision history for Perl extension LaTeX::PGF::Diagram2D.
+
+1.01  Sat Jun 18 20:54:00 2011
+	- Documentation source files added.
+	- Makefile.PL changed, so the docu is build on "make".
+
+1.00  Wed Jun  8 19:17:00 2011
+	- Import of the sources from the previously named DKrause::Diagram
+	  package.
+	- First version published on CPAN.
+
+0.01  Wed Jun  8 18:55:24 2011
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n LaTeX::PGF::Diagram2D
+

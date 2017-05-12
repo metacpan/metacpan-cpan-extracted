@@ -1,0 +1,11 @@
+#!/usr/bin/perl -s
+use Lingua::PT::PLN;
+
+$/='</p>';
+
+while(<>){
+  chomp;
+  s{.*<p\b.*?>}{}s;
+  s/\s*\n\s*/ /g;
+  print Lingua::PT::PLN::xmlsentences($_),"\n";
+}

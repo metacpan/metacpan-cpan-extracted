@@ -1,0 +1,25 @@
+--- !!perl/hash:LCFG::Build::PkgSpec 
+abstract: LCFG version control infrastructure
+author: 
+  - Stephen Quinney <squinney@inf.ed.ac.uk>
+base: ''
+build: 
+  gencmake: 0
+  remove_input_after_translate: 1
+  translate_before_pack: 1
+date: 19/01/17 13:33:37
+license: GPLv2
+name: LCFG-Build-VCS
+orgident: org.lcfg
+platforms: 
+  - FedoraCore5
+  - FedoraCore6
+  - ScientificLinux5
+release: 1
+schema: 1
+translate: 
+  - "*.in"
+vcs: 
+  genchangelog: 1
+  logname: Changes
+version: 0.2.3

@@ -1,0 +1,18 @@
+Revision history for List-oo
+
+v0.2.1 2008-06-07
+
+  * fix declaration of first() method (was a segfault)
+
+v0.1.1 2007-10-22
+
+  * fix undeclared test prereq
+
+v0.1.0 2007-10-21
+
+  * first public release
+
+See the source code repository for more detail.
+  http://scratchcomputing.com/svn/List-oo/trunk
+
+vim:ts=2:sw=2:et:sta

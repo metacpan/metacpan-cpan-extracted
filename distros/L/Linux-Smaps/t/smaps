@@ -1,0 +1,1750 @@
+08048000-080aa000 r-xp 00000000 03:05 1142298    /opt/apache22-worker/sbin/httpd
+Size:               392 kB
+Rss:                 20 kB
+Shared_Clean:        12 kB
+Shared_Dirty:         0 kB
+Private_Clean:        8 kB
+Private_Dirty:        0 kB
+080aa000-080ab000 r--p 00062000 03:05 1142298    /opt/apache22-worker/sbin/httpd
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+080ab000-080ae000 rw-p 00063000 03:05 1142298    /opt/apache22-worker/sbin/httpd
+Size:                12 kB
+Rss:                 12 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        4 kB
+Private_Dirty:        8 kB
+080ae000-08776000 rw-p 080ae000 00:00 0          [heap]
+Size:              6944 kB
+Rss:                  8 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        8 kB
+Private_Dirty:        0 kB
+b755f000-b7563000 r-xp 00000000 03:05 32475      /lib/libnss_dns-2.5.so
+Size:                16 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7563000-b7565000 rw-p 00003000 03:05 32475      /lib/libnss_dns-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75ad000-b75b4000 rw-s 00000000 00:08 8191250    /dev/zero (deleted)
+Size:                28 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        4 kB
+Private_Dirty:        0 kB
+b75b4000-b75cd000 rw-s 00000000 00:08 8191247    /dev/zero (deleted)
+Size:               100 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75cd000-b75d1000 r-xp 00000000 03:09 4441717    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/APR/Pool/Pool.so (deleted)
+Size:                16 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75d1000-b75d2000 r--p 00003000 03:09 4441717    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/APR/Pool/Pool.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75d2000-b75d3000 rw-p 00004000 03:09 4441717    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/APR/Pool/Pool.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75d3000-b75d8000 r-xp 00000000 03:09 4442001    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/Connection/Connection.so (deleted)
+Size:                20 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75d8000-b75d9000 r--p 00004000 03:09 4442001    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/Connection/Connection.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75d9000-b75da000 rw-p 00005000 03:09 4442001    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/Connection/Connection.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75da000-b75e0000 r-xp 00000000 03:09 4442021    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/RequestUtil/RequestUtil.so (deleted)
+Size:                24 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75e0000-b75e1000 r--p 00006000 03:09 4442021    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/RequestUtil/RequestUtil.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75e1000-b75e2000 rw-p 00007000 03:09 4442021    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/RequestUtil/RequestUtil.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75e2000-b75e7000 r-xp 00000000 03:09 4442028    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/ServerUtil/ServerUtil.so (deleted)
+Size:                20 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75e7000-b75e8000 r--p 00004000 03:09 4442028    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/ServerUtil/ServerUtil.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75e8000-b75e9000 rw-p 00005000 03:09 4442028    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/ServerUtil/ServerUtil.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75e9000-b75ef000 r-xp 00000000 03:09 4442027    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/ServerRec/ServerRec.so (deleted)
+Size:                24 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75ef000-b75f0000 r--p 00005000 03:09 4442027    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/ServerRec/ServerRec.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75f0000-b75f1000 rw-p 00006000 03:09 4442027    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/ServerRec/ServerRec.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75f1000-b75f5000 r-xp 00000000 03:09 4442004    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/Log/Log.so (deleted)
+Size:                16 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75f5000-b75f6000 r--p 00003000 03:09 4442004    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/Log/Log.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75f6000-b75f7000 rw-p 00004000 03:09 4442004    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/Log/Log.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75f7000-b75fc000 r-xp 00000000 03:09 4441998    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/APR/Table/Table.so (deleted)
+Size:                20 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75fc000-b75fd000 r--p 00004000 03:09 4441998    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/APR/Table/Table.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75fd000-b75fe000 rw-p 00005000 03:09 4441998    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/APR/Table/Table.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b75fe000-b7602000 r-xp 00000000 03:09 4442003    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/Directive/Directive.so (deleted)
+Size:                16 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7602000-b7603000 r--p 00003000 03:09 4442003    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/Directive/Directive.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7603000-b7604000 rw-p 00004000 03:09 4442003    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/Directive/Directive.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7604000-b7608000 r-xp 00000000 03:09 4442000    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/CmdParms/CmdParms.so (deleted)
+Size:                16 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7608000-b7609000 r--p 00003000 03:09 4442000    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/CmdParms/CmdParms.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7609000-b760a000 rw-p 00004000 03:09 4442000    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/CmdParms/CmdParms.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b760a000-b7645000 r--p 00000000 03:05 617761     /usr/lib/locale/en_US.utf8/LC_CTYPE
+Size:               236 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7645000-b771c000 r--p 00000000 03:05 617762     /usr/lib/locale/en_US.utf8/LC_COLLATE
+Size:               860 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b771c000-b7724000 r-xp 00000000 03:05 32481      /lib/libnss_nis-2.5.so
+Size:                32 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7724000-b7726000 rw-p 00007000 03:05 32481      /lib/libnss_nis-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7726000-b772c000 r-xp 00000000 03:05 32473      /lib/libnss_compat-2.5.so
+Size:                24 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b772c000-b772e000 rw-p 00005000 03:05 32473      /lib/libnss_compat-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b772e000-b7736000 r-xp 00000000 03:05 32477      /lib/libnss_files-2.5.so
+Size:                32 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7736000-b7738000 rw-p 00007000 03:05 32477      /lib/libnss_files-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7739000-b773f000 r-xp 00000000 03:09 4442012    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/RequestIO/RequestIO.so (deleted)
+Size:                24 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b773f000-b7740000 r--p 00005000 03:09 4442012    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/RequestIO/RequestIO.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7740000-b7741000 rw-p 00006000 03:09 4442012    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/RequestIO/RequestIO.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7741000-b7742000 r-xp 00000000 03:09 4442037    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/Const/Const.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7742000-b7743000 r--p 00000000 03:09 4442037    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/Const/Const.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7743000-b7744000 rw-p 00001000 03:09 4442037    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/Const/Const.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7744000-b774e000 r-xp 00000000 03:09 4442019    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/RequestRec/RequestRec.so (deleted)
+Size:                40 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b774e000-b774f000 r--p 00009000 03:09 4442019    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/RequestRec/RequestRec.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b774f000-b7750000 rw-p 0000a000 03:09 4442019    /home/r2/work/mp2/trunk/trunk/blib/arch/auto/Apache2/RequestRec/RequestRec.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7750000-b7751000 r--p 00000000 03:05 601629     /usr/lib/locale/en_US.utf8/LC_MONETARY
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7751000-b7752000 r--p 00000000 03:05 617736     /usr/lib/locale/en_US.utf8/LC_MESSAGES/SYS_LC_MESSAGES
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7752000-b7753000 r--p 00000000 03:05 617668     /usr/lib/locale/en_US.utf8/LC_PAPER
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7753000-b7754000 r--p 00000000 03:05 617691     /usr/lib/locale/en_US.utf8/LC_NAME
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7754000-b7755000 r--p 00000000 03:05 601626     /usr/lib/locale/en_US.utf8/LC_ADDRESS
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7755000-b7756000 r--p 00000000 03:05 617653     /usr/lib/locale/en_US.utf8/LC_TELEPHONE
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7756000-b7757000 r--p 00000000 03:05 617654     /usr/lib/locale/en_US.utf8/LC_MEASUREMENT
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7757000-b775e000 r--s 00000000 03:05 600904     /usr/lib/gconv/gconv-modules.cache
+Size:                28 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b775e000-b7760000 r-xp 00000000 03:05 1142266    /opt/apache22-worker/libexec/mod_unique_id.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7760000-b7761000 r--p 00001000 03:05 1142266    /opt/apache22-worker/libexec/mod_unique_id.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7761000-b7762000 rw-p 00002000 03:05 1142266    /opt/apache22-worker/libexec/mod_unique_id.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7762000-b7767000 r-xp 00000000 03:05 1142264    /opt/apache22-worker/libexec/mod_status.so
+Size:                20 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7767000-b7768000 r--p 00004000 03:05 1142264    /opt/apache22-worker/libexec/mod_status.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7768000-b7769000 rw-p 00005000 03:05 1142264    /opt/apache22-worker/libexec/mod_status.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7769000-b7791000 r-xp 00000000 03:05 1142263    /opt/apache22-worker/libexec/mod_ssl.so
+Size:               160 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7791000-b7792000 r--p 00028000 03:05 1142263    /opt/apache22-worker/libexec/mod_ssl.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7792000-b7793000 rw-p 00029000 03:05 1142263    /opt/apache22-worker/libexec/mod_ssl.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7793000-b7795000 rw-p b7793000 00:00 0 
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7795000-b77a4000 r-xp 00000000 03:05 1142260    /opt/apache22-worker/libexec/mod_rewrite.so
+Size:                60 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77a4000-b77a5000 r--p 0000e000 03:05 1142260    /opt/apache22-worker/libexec/mod_rewrite.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77a5000-b77a6000 rw-p 0000f000 03:05 1142260    /opt/apache22-worker/libexec/mod_rewrite.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77a6000-b77b8000 r-xp 00000000 03:05 32471      /lib/libnsl-2.5.so
+Size:                72 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77b8000-b77ba000 rw-p 00011000 03:05 32471      /lib/libnsl-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77ba000-b77bc000 rw-p b77ba000 00:00 0 
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77bc000-b77bd000 r--p 00000000 03:05 617743     /usr/lib/locale/en_US.utf8/LC_NUMERIC
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77bd000-b77be000 r--p 00000000 03:05 601630     /usr/lib/locale/en_US.utf8/LC_TIME
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77be000-b77c0000 r-xp 00000000 03:05 1142261    /opt/apache22-worker/libexec/mod_setenvif.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77c0000-b77c1000 r--p 00001000 03:05 1142261    /opt/apache22-worker/libexec/mod_setenvif.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77c1000-b77c2000 rw-p 00002000 03:05 1142261    /opt/apache22-worker/libexec/mod_setenvif.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77c2000-b77c9000 r-xp 00000000 03:05 1142259    /opt/apache22-worker/libexec/mod_proxy_http.so
+Size:                28 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77c9000-b77ca000 r--p 00006000 03:05 1142259    /opt/apache22-worker/libexec/mod_proxy_http.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77ca000-b77cb000 rw-p 00007000 03:05 1142259    /opt/apache22-worker/libexec/mod_proxy_http.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77cb000-b77dc000 r-xp 00000000 03:05 1142254    /opt/apache22-worker/libexec/mod_proxy.so
+Size:                68 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77dc000-b77dd000 r--p 00010000 03:05 1142254    /opt/apache22-worker/libexec/mod_proxy.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77dd000-b77de000 rw-p 00011000 03:05 1142254    /opt/apache22-worker/libexec/mod_proxy.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77de000-b77e0000 r-xp 00000000 03:05 32494      /lib/libutil-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77e0000-b77e2000 rw-p 00001000 03:05 32494      /lib/libutil-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b77e2000-b7911000 r-xp 00000000 03:05 667022     /usr/lib/perl5/5.8.8/i586-linux-thread-multi/CORE/libperl.so
+Size:              1212 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7911000-b7912000 r--p 0012e000 03:05 667022     /usr/lib/perl5/5.8.8/i586-linux-thread-multi/CORE/libperl.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7912000-b7917000 rw-p 0012f000 03:05 667022     /usr/lib/perl5/5.8.8/i586-linux-thread-multi/CORE/libperl.so
+Size:                20 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7917000-b791a000 rw-p b7917000 00:00 0 
+Size:                12 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b791a000-b7953000 r-xp 00000000 03:09 4423681    /home/r2/work/mp2/trunk/trunk/src/modules/perl/mod_perl.so (deleted)
+Size:               228 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7953000-b7954000 r--p 00038000 03:09 4423681    /home/r2/work/mp2/trunk/trunk/src/modules/perl/mod_perl.so (deleted)
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7954000-b7956000 rw-p 00039000 03:09 4423681    /home/r2/work/mp2/trunk/trunk/src/modules/perl/mod_perl.so (deleted)
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7956000-b795e000 r-xp 00000000 03:05 1142253    /opt/apache22-worker/libexec/mod_negotiation.so
+Size:                32 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b795e000-b795f000 r--p 00007000 03:05 1142253    /opt/apache22-worker/libexec/mod_negotiation.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b795f000-b7960000 rw-p 00008000 03:05 1142253    /opt/apache22-worker/libexec/mod_negotiation.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7960000-b7964000 r-xp 00000000 03:05 1142251    /opt/apache22-worker/libexec/mod_mime.so
+Size:                16 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7964000-b7965000 r--p 00003000 03:05 1142251    /opt/apache22-worker/libexec/mod_mime.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7965000-b7966000 rw-p 00004000 03:05 1142251    /opt/apache22-worker/libexec/mod_mime.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7966000-b796b000 r-xp 00000000 03:05 1142250    /opt/apache22-worker/libexec/mod_mem_cache.so
+Size:                20 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b796b000-b796c000 r--p 00004000 03:05 1142250    /opt/apache22-worker/libexec/mod_mem_cache.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b796c000-b796d000 rw-p 00005000 03:05 1142250    /opt/apache22-worker/libexec/mod_mem_cache.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b796d000-b7972000 r-xp 00000000 03:05 1142247    /opt/apache22-worker/libexec/mod_log_config.so
+Size:                20 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7972000-b7973000 r--p 00004000 03:05 1142247    /opt/apache22-worker/libexec/mod_log_config.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7973000-b7974000 rw-p 00005000 03:05 1142247    /opt/apache22-worker/libexec/mod_log_config.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7974000-b797f000 r-xp 00000000 03:05 1142246    /opt/apache22-worker/libexec/mod_ldap.so
+Size:                44 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b797f000-b7980000 r--p 0000a000 03:05 1142246    /opt/apache22-worker/libexec/mod_ldap.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7980000-b7981000 rw-p 0000b000 03:05 1142246    /opt/apache22-worker/libexec/mod_ldap.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7981000-b7985000 r-xp 00000000 03:05 1142245    /opt/apache22-worker/libexec/mod_info.so
+Size:                16 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7985000-b7986000 r--p 00003000 03:05 1142245    /opt/apache22-worker/libexec/mod_info.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7986000-b7987000 rw-p 00004000 03:05 1142245    /opt/apache22-worker/libexec/mod_info.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7987000-b7992000 r-xp 00000000 03:05 1142244    /opt/apache22-worker/libexec/mod_include.so
+Size:                44 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7992000-b7993000 r--p 0000a000 03:05 1142244    /opt/apache22-worker/libexec/mod_include.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7993000-b7994000 rw-p 0000b000 03:05 1142244    /opt/apache22-worker/libexec/mod_include.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7994000-b7997000 r-xp 00000000 03:05 1142243    /opt/apache22-worker/libexec/mod_imagemap.so
+Size:                12 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7997000-b7998000 r--p 00003000 03:05 1142243    /opt/apache22-worker/libexec/mod_imagemap.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7998000-b7999000 rw-p 00004000 03:05 1142243    /opt/apache22-worker/libexec/mod_imagemap.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7999000-b799c000 r-xp 00000000 03:05 1142241    /opt/apache22-worker/libexec/mod_headers.so
+Size:                12 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b799c000-b799d000 r--p 00002000 03:05 1142241    /opt/apache22-worker/libexec/mod_headers.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b799d000-b799e000 rw-p 00003000 03:05 1142241    /opt/apache22-worker/libexec/mod_headers.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b799e000-b79a1000 r-xp 00000000 03:05 1142240    /opt/apache22-worker/libexec/mod_filter.so
+Size:                12 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79a1000-b79a2000 r--p 00002000 03:05 1142240    /opt/apache22-worker/libexec/mod_filter.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79a2000-b79a3000 rw-p 00003000 03:05 1142240    /opt/apache22-worker/libexec/mod_filter.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79a3000-b79a4000 r-xp 00000000 03:05 1142236    /opt/apache22-worker/libexec/mod_env.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79a4000-b79a5000 r--p 00000000 03:05 1142236    /opt/apache22-worker/libexec/mod_env.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79a5000-b79a6000 rw-p 00001000 03:05 1142236    /opt/apache22-worker/libexec/mod_env.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79a6000-b79ab000 r-xp 00000000 03:05 1142234    /opt/apache22-worker/libexec/mod_disk_cache.so
+Size:                20 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79ab000-b79ac000 r--p 00004000 03:05 1142234    /opt/apache22-worker/libexec/mod_disk_cache.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79ac000-b79ad000 rw-p 00005000 03:05 1142234    /opt/apache22-worker/libexec/mod_disk_cache.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79ad000-b79af000 r-xp 00000000 03:05 1142233    /opt/apache22-worker/libexec/mod_dir.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79af000-b79b0000 r--p 00001000 03:05 1142233    /opt/apache22-worker/libexec/mod_dir.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79b0000-b79b1000 rw-p 00002000 03:05 1142233    /opt/apache22-worker/libexec/mod_dir.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79b1000-b79b6000 r-xp 00000000 03:05 1142232    /opt/apache22-worker/libexec/mod_deflate.so
+Size:                20 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79b6000-b79b7000 r--p 00004000 03:05 1142232    /opt/apache22-worker/libexec/mod_deflate.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79b7000-b79b8000 rw-p 00005000 03:05 1142232    /opt/apache22-worker/libexec/mod_deflate.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79b8000-b79bc000 r-xp 00000000 03:05 1142230    /opt/apache22-worker/libexec/mod_dav_lock.so
+Size:                16 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79bc000-b79bd000 r--p 00003000 03:05 1142230    /opt/apache22-worker/libexec/mod_dav_lock.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79bd000-b79be000 rw-p 00004000 03:05 1142230    /opt/apache22-worker/libexec/mod_dav_lock.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79be000-b79c9000 r-xp 00000000 03:05 1142229    /opt/apache22-worker/libexec/mod_dav_fs.so
+Size:                44 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79c9000-b79ca000 r--p 0000a000 03:05 1142229    /opt/apache22-worker/libexec/mod_dav_fs.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79ca000-b79cb000 rw-p 0000b000 03:05 1142229    /opt/apache22-worker/libexec/mod_dav_fs.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79cb000-b79e2000 r-xp 00000000 03:05 1142228    /opt/apache22-worker/libexec/mod_dav.so
+Size:                92 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79e2000-b79e3000 r--p 00016000 03:05 1142228    /opt/apache22-worker/libexec/mod_dav.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79e3000-b79e4000 rw-p 00017000 03:05 1142228    /opt/apache22-worker/libexec/mod_dav.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79e4000-b79eb000 r-xp 00000000 03:05 1142227    /opt/apache22-worker/libexec/mod_cgid.so
+Size:                28 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79eb000-b79ec000 r--p 00007000 03:05 1142227    /opt/apache22-worker/libexec/mod_cgid.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79ec000-b79ed000 rw-p 00008000 03:05 1142227    /opt/apache22-worker/libexec/mod_cgid.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79ed000-b79f5000 r-xp 00000000 03:05 1142225    /opt/apache22-worker/libexec/mod_cache.so
+Size:                32 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79f5000-b79f6000 r--p 00007000 03:05 1142225    /opt/apache22-worker/libexec/mod_cache.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79f6000-b79f7000 rw-p 00008000 03:05 1142225    /opt/apache22-worker/libexec/mod_cache.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79f7000-b79ff000 r-xp 00000000 03:05 1142224    /opt/apache22-worker/libexec/mod_autoindex.so
+Size:                32 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b79ff000-b7a00000 r--p 00007000 03:05 1142224    /opt/apache22-worker/libexec/mod_autoindex.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a00000-b7a01000 rw-p 00008000 03:05 1142224    /opt/apache22-worker/libexec/mod_autoindex.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a01000-b7a02000 r-xp 00000000 03:05 1142223    /opt/apache22-worker/libexec/mod_authz_user.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a02000-b7a03000 r--p 00000000 03:05 1142223    /opt/apache22-worker/libexec/mod_authz_user.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a03000-b7a04000 rw-p 00001000 03:05 1142223    /opt/apache22-worker/libexec/mod_authz_user.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a04000-b7a06000 r-xp 00000000 03:05 1142221    /opt/apache22-worker/libexec/mod_authz_host.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a06000-b7a07000 r--p 00001000 03:05 1142221    /opt/apache22-worker/libexec/mod_authz_host.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a07000-b7a08000 rw-p 00002000 03:05 1142221    /opt/apache22-worker/libexec/mod_authz_host.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a08000-b7a0a000 r-xp 00000000 03:05 1142220    /opt/apache22-worker/libexec/mod_authz_groupfile.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a0a000-b7a0b000 r--p 00001000 03:05 1142220    /opt/apache22-worker/libexec/mod_authz_groupfile.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a0b000-b7a0c000 rw-p 00002000 03:05 1142220    /opt/apache22-worker/libexec/mod_authz_groupfile.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a0c000-b7a0d000 r-xp 00000000 03:05 1142219    /opt/apache22-worker/libexec/mod_authz_default.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a0d000-b7a0e000 r--p 00000000 03:05 1142219    /opt/apache22-worker/libexec/mod_authz_default.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a0e000-b7a0f000 rw-p 00001000 03:05 1142219    /opt/apache22-worker/libexec/mod_authz_default.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a0f000-b7a11000 r-xp 00000000 03:05 1142218    /opt/apache22-worker/libexec/mod_authz_dbm.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a11000-b7a12000 r--p 00001000 03:05 1142218    /opt/apache22-worker/libexec/mod_authz_dbm.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a12000-b7a13000 rw-p 00002000 03:05 1142218    /opt/apache22-worker/libexec/mod_authz_dbm.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a13000-b7a15000 rw-p b7a13000 00:00 0 
+Size:                 8 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        4 kB
+Private_Dirty:        0 kB
+b7a15000-b7a26000 r-xp 00000000 03:05 32517      /lib/libz.so.1.2.3
+Size:                68 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a26000-b7a28000 rw-p 00010000 03:05 32517      /lib/libz.so.1.2.3
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7a28000-b7b43000 r-xp 00000000 03:05 260697     /usr/lib/libcrypto.so.0.9.8
+Size:              1132 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7b43000-b7b49000 r--p 0011b000 03:05 260697     /usr/lib/libcrypto.so.0.9.8
+Size:                24 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7b49000-b7b58000 rw-p 00121000 03:05 260697     /usr/lib/libcrypto.so.0.9.8
+Size:                60 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7b58000-b7b5b000 rw-p b7b58000 00:00 0 
+Size:                12 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7b5b000-b7b94000 r-xp 00000000 03:05 260698     /usr/lib/libssl.so.0.9.8
+Size:               228 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7b94000-b7b98000 rw-p 00039000 03:05 260698     /usr/lib/libssl.so.0.9.8
+Size:                16 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7b98000-b7b99000 rw-p b7b98000 00:00 0 
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7b99000-b7baf000 r-xp 00000000 03:05 259608     /usr/lib/libsasl2.so.2.0.22
+Size:                88 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7baf000-b7bb1000 rw-p 00015000 03:05 259608     /usr/lib/libsasl2.so.2.0.22
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7bb1000-b7bc0000 r-xp 00000000 03:05 32488      /lib/libresolv-2.5.so
+Size:                60 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7bc0000-b7bc2000 rw-p 0000e000 03:05 32488      /lib/libresolv-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7bc2000-b7bc4000 rw-p b7bc2000 00:00 0 
+Size:                 8 kB
+Rss:                  4 kB
+Shared_Clean:         4 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7bc4000-b7cec000 r-xp 00000000 03:05 32460      /lib/libc-2.5.so
+Size:              1184 kB
+Rss:                  8 kB
+Shared_Clean:         8 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7cec000-b7ced000 r--p 00128000 03:05 32460      /lib/libc-2.5.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ced000-b7cef000 rw-p 00129000 03:05 32460      /lib/libc-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7cef000-b7cf2000 rw-p b7cef000 00:00 0 
+Size:                12 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7cf2000-b7cf4000 r-xp 00000000 03:05 32466      /lib/libdl-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7cf4000-b7cf6000 rw-p 00001000 03:05 32466      /lib/libdl-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7cf6000-b7d0a000 r-xp 00000000 03:05 32486      /lib/libpthread-2.5.so
+Size:                80 kB
+Rss:                  4 kB
+Shared_Clean:         4 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7d0a000-b7d0c000 rw-p 00013000 03:05 32486      /lib/libpthread-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7d0c000-b7d0f000 rw-p b7d0c000 00:00 0 
+Size:                12 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7d0f000-b7d18000 r-xp 00000000 03:05 32464      /lib/libcrypt-2.5.so
+Size:                36 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7d18000-b7d1b000 rw-p 00008000 03:05 32464      /lib/libcrypt-2.5.so
+Size:                12 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7d1b000-b7d42000 rw-p b7d1b000 00:00 0 
+Size:               156 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7d42000-b7d49000 r-xp 00000000 03:05 32490      /lib/librt-2.5.so
+Size:                28 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7d49000-b7d4b000 rw-p 00006000 03:05 32490      /lib/librt-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7d4b000-b7d72000 r-xp 00000000 03:05 1142196    /opt/apache22-worker/lib/libapr-1.so.0.2.11
+Size:               156 kB
+Rss:                 20 kB
+Shared_Clean:        16 kB
+Shared_Dirty:         0 kB
+Private_Clean:        4 kB
+Private_Dirty:        0 kB
+b7d72000-b7d73000 r--p 00026000 03:05 1142196    /opt/apache22-worker/lib/libapr-1.so.0.2.11
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7d73000-b7d74000 rw-p 00027000 03:05 1142196    /opt/apache22-worker/lib/libapr-1.so.0.2.11
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        4 kB
+Private_Dirty:        0 kB
+b7d74000-b7d92000 r-xp 00000000 03:05 571254     /usr/lib/libexpat.so.1.5.0
+Size:               120 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7d92000-b7d93000 r--p 0001d000 03:05 571254     /usr/lib/libexpat.so.1.5.0
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7d93000-b7d95000 rw-p 0001e000 03:05 571254     /usr/lib/libexpat.so.1.5.0
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7d95000-b7dd9000 r-xp 00000000 03:05 571803     /usr/lib/libsqlite.so.0.8.6
+Size:               272 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7dd9000-b7ddc000 rw-p 00043000 03:05 571803     /usr/lib/libsqlite.so.0.8.6
+Size:                12 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ddc000-b7e35000 r-xp 00000000 03:05 571799     /usr/lib/libsqlite3.so.0.8.6
+Size:               356 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7e35000-b7e37000 rw-p 00059000 03:05 571799     /usr/lib/libsqlite3.so.0.8.6
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7e37000-b7e38000 rw-p b7e37000 00:00 0 
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7e38000-b7e44000 r-xp 00000000 03:05 259923     /usr/lib/liblber-2.3.so.0.2.15
+Size:                48 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7e44000-b7e46000 rw-p 0000b000 03:05 259923     /usr/lib/liblber-2.3.so.0.2.15
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7e46000-b7e7c000 r-xp 00000000 03:05 259925     /usr/lib/libldap-2.3.so.0.2.15
+Size:               216 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7e7c000-b7e7e000 rw-p 00035000 03:05 259925     /usr/lib/libldap-2.3.so.0.2.15
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7e7e000-b7e9a000 r-xp 00000000 03:05 1142201    /opt/apache22-worker/lib/libaprutil-1.so.0.2.11
+Size:               112 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7e9a000-b7e9b000 r--p 0001c000 03:05 1142201    /opt/apache22-worker/lib/libaprutil-1.so.0.2.11
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7e9b000-b7e9c000 rw-p 0001d000 03:05 1142201    /opt/apache22-worker/lib/libaprutil-1.so.0.2.11
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7e9c000-b7ec0000 r-xp 00000000 03:05 32468      /lib/libm-2.5.so
+Size:               144 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ec0000-b7ec2000 rw-p 00023000 03:05 32468      /lib/libm-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ec2000-b7ec3000 r--p 00000000 03:05 601627     /usr/lib/locale/en_US.utf8/LC_IDENTIFICATION
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ec3000-b7ec9000 r-xp 00000000 03:05 1142217    /opt/apache22-worker/libexec/mod_authnz_ldap.so
+Size:                24 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ec9000-b7eca000 r--p 00005000 03:05 1142217    /opt/apache22-worker/libexec/mod_authnz_ldap.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7eca000-b7ecb000 rw-p 00006000 03:05 1142217    /opt/apache22-worker/libexec/mod_authnz_ldap.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ecb000-b7ecc000 r-xp 00000000 03:05 1142216    /opt/apache22-worker/libexec/mod_authn_file.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ecc000-b7ecd000 r--p 00000000 03:05 1142216    /opt/apache22-worker/libexec/mod_authn_file.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ecd000-b7ece000 rw-p 00001000 03:05 1142216    /opt/apache22-worker/libexec/mod_authn_file.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ece000-b7ecf000 r-xp 00000000 03:05 1142215    /opt/apache22-worker/libexec/mod_authn_default.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ecf000-b7ed0000 r--p 00000000 03:05 1142215    /opt/apache22-worker/libexec/mod_authn_default.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ed0000-b7ed1000 rw-p 00001000 03:05 1142215    /opt/apache22-worker/libexec/mod_authn_default.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ed1000-b7ed2000 r-xp 00000000 03:05 1142214    /opt/apache22-worker/libexec/mod_authn_dbm.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ed2000-b7ed3000 r--p 00000000 03:05 1142214    /opt/apache22-worker/libexec/mod_authn_dbm.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ed3000-b7ed4000 rw-p 00001000 03:05 1142214    /opt/apache22-worker/libexec/mod_authn_dbm.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ed4000-b7ed5000 r-xp 00000000 03:05 1142212    /opt/apache22-worker/libexec/mod_authn_anon.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ed5000-b7ed6000 r--p 00000000 03:05 1142212    /opt/apache22-worker/libexec/mod_authn_anon.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ed6000-b7ed7000 rw-p 00001000 03:05 1142212    /opt/apache22-worker/libexec/mod_authn_anon.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ed7000-b7ede000 r-xp 00000000 03:05 1142211    /opt/apache22-worker/libexec/mod_auth_digest.so
+Size:                28 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ede000-b7edf000 r--p 00006000 03:05 1142211    /opt/apache22-worker/libexec/mod_auth_digest.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7edf000-b7ee0000 rw-p 00007000 03:05 1142211    /opt/apache22-worker/libexec/mod_auth_digest.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ee0000-b7ee2000 r-xp 00000000 03:05 1142210    /opt/apache22-worker/libexec/mod_auth_basic.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ee2000-b7ee3000 r--p 00001000 03:05 1142210    /opt/apache22-worker/libexec/mod_auth_basic.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ee3000-b7ee4000 rw-p 00002000 03:05 1142210    /opt/apache22-worker/libexec/mod_auth_basic.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ee4000-b7ee6000 r-xp 00000000 03:05 1142208    /opt/apache22-worker/libexec/mod_alias.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ee6000-b7ee7000 r--p 00002000 03:05 1142208    /opt/apache22-worker/libexec/mod_alias.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ee7000-b7ee8000 rw-p 00003000 03:05 1142208    /opt/apache22-worker/libexec/mod_alias.so
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ee8000-b7ee9000 rw-p b7ee8000 00:00 0 
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7ee9000-b7eea000 r-xp b7ee9000 00:00 0          [vdso]
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         4 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7eea000-b7f05000 r-xp 00000000 03:05 32453      /lib/ld-2.5.so
+Size:               108 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7f05000-b7f07000 rw-p 0001a000 03:05 32453      /lib/ld-2.5.so
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+bf921000-bf938000 rw-p bf921000 00:00 0          [stack]
+Size:                92 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB

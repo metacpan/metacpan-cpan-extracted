@@ -1,0 +1,25 @@
+eg/Segment/S01
+eg/Segment/S02
+eg/Segment/S03
+eg/Segment/S04
+eg/Segment/S05
+eg/Segment/S06
+eg/Segment/S07
+eg/Segment/S08
+eg/Segment/S09
+eg/Segment/S10
+eg/segmenter.pl
+eg/example2.pl
+lib/Lingua/EN/Segmenter/Baseline.pm
+lib/Lingua/EN/Segmenter/Evaluator.pm
+lib/Lingua/EN/Segmenter/TextTiling.pm
+lib/Lingua/EN/Segmenter.pm
+lib/Lingua/EN/Splitter.pm
+lib/Lingua/EN/StopWords.pm
+Makefile.PL
+CHANGES
+MANIFEST
+README
+t/Lingua-EN-Segmenter-TextTiling.t
+t/lib/ExtUtils/AutoInstall.pm
+META.yml                                 Module meta-data (added by MakeMaker)

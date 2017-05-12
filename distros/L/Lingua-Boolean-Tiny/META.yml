@@ -1,0 +1,49 @@
+---
+abstract: 'a smaller Lingua::Boolean, with support for more languages'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+  - unknown
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Boolean-Tiny
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Lingua::Boolean::Tiny:
+    file: lib/Lingua/Boolean/Tiny.pm
+    version: '0.007'
+  Lingua::Boolean::Tiny::BASE:
+    file: lib/Lingua/Boolean/Tiny.pm
+    version: '0.007'
+  Lingua::Boolean::Tiny::More:
+    file: lib/Lingua/Boolean/Tiny/More.pm
+    version: '0.007'
+  Lingua::Boolean::Tiny::Union:
+    file: lib/Lingua/Boolean/Tiny.pm
+    version: '0.007'
+requires:
+  perl: '5.006002'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Lingua-Boolean-Tiny
+  homepage: https://metacpan.org/release/Lingua-Boolean-Tiny
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-lingua-boolean-tiny.git
+version: '0.007'
+x_contributors:
+  - 'Diab Jerius (DJERIUS) <djerius@cpan.org>'

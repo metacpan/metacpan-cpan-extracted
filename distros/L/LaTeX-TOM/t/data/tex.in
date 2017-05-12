@@ -1,0 +1,9 @@
+\NeedsTeXFormat{LaTeX2e}
+\documentclass[11pt]{book}
+\title{Some Test Doc}
+\begin{document}
+    \maketitle
+    \mainmatter
+    \chapter*{Preface}
+    \input{t/data/input.tex}
+\end{document}

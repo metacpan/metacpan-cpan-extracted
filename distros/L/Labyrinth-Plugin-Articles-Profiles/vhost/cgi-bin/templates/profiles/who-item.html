@@ -1,0 +1,17 @@
+[% 
+    htmltitle = 'Band Profiles: ' _ article.data.title ;
+    title = htmltitle ;
+
+    crumb2_name = 'Profiles' ;
+    crumb2_href = '/who/list' ;
+    crumb1_name = article.data.title ;
+%]
+
+[% subtitle = 'Profiles - ' _ article.data.title _ ' - ' %]
+
+<p>Plays: [% article.data.snippet %]</p>
+
+<div id="content">
+[% block = article.body %]
+[% INCLUDE "articles/arts-block.html" %]
+</div>

@@ -1,0 +1,5 @@
+[Wed Aug 12 02:08:23 1998]  17120 04log.t LOG: Some LOG schtuff 1 - LOGLEVEL=1 at t/04log.t line 47.
+[Wed Aug 12 02:08:23 1998]  17120 04log.t LOG: Some LOG schtuff 1 - LOGLEVEL=2 at t/04log.t line 49.
+[Wed Aug 12 02:08:23 1998]  17120 04log.t ERR: WARNING: This goes to LOG too - LOGLEVEL=2 at t/04log.t line 50.
+[Wed Aug 12 02:08:23 1998]  17120 04log.t LOG: Some LOG schtuff 2 - LOGLEVEL=1 at t/04log.t line 55.
+[Wed Aug 12 02:08:23 1998]  17120 04log.t ERR: WARNING: This goes to LOG too - LOGLEVEL=1 at t/04log.t line 56.

@@ -1,0 +1,64 @@
+Log::Message::JSON
+
+Structured messages that stringify to JSON.
+
+Good logging requires today a lot more than in Good Ol' Times[tm]. Each log
+entry should have a structure and be machine-parseable. On the other hand,
+there are lot of logging libraries that don't quite support structured logs
+and only process flat strings.
+
+Log::Log4perl architecture allows both, flat strings and structured entries.
+It's up to appender module whether it accepts one or another form.
+Unfortunately, this makes application developer to decide in advance, which
+appenders could be in use and defeats much of Log::Log4perl's flexibility.
+
+Log::Message::JSON is an attempt to solve this problem. Developer can create
+a message that has an internal structure (i.e. is a hash(ref)), and at the
+same time it can be used as a simple string, instantly serializing to
+single-line JSON. This way the developer don't need to decide on appenders in
+advance. Moreover, flat string logfiles are easier to parse, especially if
+entries have this form.
+
+Of course, you don't need Log::Log4perl to use this module. It could be used
+wherever a hashref needs to be sensibly stringified while preserving its all
+hash-like features.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Log::Message::JSON
+
+You can also look for information at:
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Log-Message-JSON
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Log-Message-JSON
+
+    Search CPAN
+        http://search.cpan.org/dist/Log-Message-JSON/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Stanislaw Klekot
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+
+
+use strict;
+use FindBin;
+use lib $FindBin::Bin.'/../lib';
+use Lingua::Align::Corpus::Parallel;
+use Lingua::Align::Corpus::Parallel;
+
+my $infile = shift(@ARGV);
+my $informat = shift(@ARGV);
+my $outformat = shift(@ARGV);
+
+my $corpus = new Lingua::Align::Corpus::Parallel(-file => $infile,
+					       -type => $informat);
+my $output = new Lingua::Align::Corpus::Parallel(-type => $outformat,
+						 -skip_node_ids => 1);
+
+my %src=();
+my %trg=();
+my $links={};
+
+my %sent=();
+print $output->print_header();
+while ($corpus->next_alignment(\%src,\%trg,\$links)){
+    print $output->print_alignments(\%src,\%trg,$links);
+#    print "\n";
+}
+print $output->print_tail();
+
+__END__
+
+=head1 NAME
+
+convert_bitext - a script for converting bitexts
+
+=head1 SYNOPSIS
+
+  convert_bitext input-file input-format output-format
+
+=head1 DESCRIPTION
+
+Convert bitexts from one format to another. There are several formats supported by Lingua::Align. Check L<Lingua::Align::Corpus>, L<Lingua::Align::Corpus::Treebank> for more information.
+
+=head1 AUTHOR
+
+Joerg Tiedemann
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Joerg Tiedemann
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

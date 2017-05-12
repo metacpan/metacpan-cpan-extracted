@@ -1,0 +1,77 @@
+Revision history for Locale-Msgfmt
+
+0.15    Nov 07, 2010
+        - General code cleaning (ADAMK)
+        - Changes to Module::Install::Msgfmt to make it compatible with
+          Module::Install::Share. (ADAMK)
+        - Moved script from bin/ to script/ (ADAMK)
+        - Moved private tools from dev to private (ADAMK)
+        - Picking 5.008005 as our minimum Perl to ensure solid Unicode support (ADAMK)
+        - Converted the Build.PL to a Module::Install Makefile.PL (ADAMK)
+        - Fixed it so that it actually works (AZAWAWI)
+
+0.14    Jul 09, 2009
+        - fix a mess with Module::Install::Msgfmt :P
+
+0.13    Jul 08, 2009
+        - act like make when rebuilding, only rebuild things that need to be rebuilt.
+        - add a --force option to force the old behavior of always rebuilding
+        - make the "use" in msgfmt.pl versioned to make sure that the correct version
+          of Locale::Msgfmt is being used, and add a test to keep this up to date
+
+0.12    Jul 06, 2009
+        - unlink the output file before writing to it if it already exists
+        - default to verbose (pass -q to msgfmt.pl or verbose => 0 to msgfmt)
+        - die when an unknown line is found in a .po file
+
+0.11    Jul 06, 2009
+        - some code improvement in open() and opendir() and error handling (SZABGAB)
+
+0.10    Jul 5, 2009
+        - actually upload with Module::Install::Msgfmt this time.
+
+0.09    Jul 5, 2009
+        - still require the newer version of Locale::Maketext::Gettext
+          when running under CPAN Testers
+        - use is_deeply instead of making a string out of the hash and
+          then using is
+        - add Module::Install::Msgfmt. just replace install_share with
+          install_share_with_mofiles in your Makefile.PL.
+        - add remove option to remove the source file(s) and all .pot
+          files if a directory is being processed
+        - add verbose option to print the files that were converted
+
+0.08    Jun 27, 2009
+        - again remove the dependency on Locale::Maketext::Gettext,
+          there is another problem with its installation
+
+0.07    Jun 26, 2009
+        - make the interface a bit nicer
+        - remove the msgfmt_dir function (msgfmt now handles this if
+          the input file is a directory)
+        - more tests
+        - always build_require Locale::Maketext::Gettext, now it will
+          install correctly
+        - improved POD
+        - switch the "sample" translation used for the tests to
+          japanese instead of french, since the japanese includes
+          copyright and license information
+
+0.06    Jun 26, 2009
+        - add support for contexts
+        - add support for ngettext
+
+0.05    Jun 25, 2009
+        - don't run the external script from the tests
+
+0.04    Jun 25, 2009
+        - if running from CPAN testers, require Locale::Maketext::Gettext too
+
+0.03    Jun 24, 2009
+        - fix on perl 5.8
+
+0.02    Jun 24, 2009
+        - add a msgfmt_dir function to convert all of the .po files in a directory
+
+0.01    Jun 24, 2009
+        - First version, released on an unsuspecting world.

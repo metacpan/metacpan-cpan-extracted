@@ -1,0 +1,17 @@
+Changes
+lib/Lingua/PT/Speaker.pm
+lib/Lingua/PT/Speaker/AdjWords.pm
+lib/Lingua/PT/Speaker/nao_acentuadas
+lib/Lingua/PT/Speaker/Numbers.pm
+lib/Lingua/PT/Speaker/Prosody.pm
+lib/Lingua/PT/Speaker/ptpho
+lib/Lingua/PT/Speaker/Specials.pm
+lib/Lingua/PT/Speaker/Words2Sampa.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+pt-speak.in
+README
+t/01_load.t
+inc/AutoConf.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

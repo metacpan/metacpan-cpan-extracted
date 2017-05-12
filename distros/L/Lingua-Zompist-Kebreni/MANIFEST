@@ -1,0 +1,9 @@
+Changes
+Kebreni.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/1_base.t
+t/2_pattern.t
+t/kebtest.dat

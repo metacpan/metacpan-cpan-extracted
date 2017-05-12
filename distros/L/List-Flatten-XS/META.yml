@@ -1,0 +1,41 @@
+---
+abstract: 'L<List::Flatten> with XS'
+author:
+  - 'K <x00.x7f@gmail.com>'
+build_requires:
+  Test::LeakTrace: '0'
+  Test::More: '0.98'
+  Test::Valgrind: '0'
+configure_requires:
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.03'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: List-Flatten-XS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  List::Flatten::XS:
+    file: lib/List/Flatten/XS.pm
+    version: '0.02'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Code-Hex/List-Flatten-XS/issues
+  homepage: https://github.com/Code-Hex/List-Flatten-XS
+  repository: git://github.com/Code-Hex/List-Flatten-XS.git
+version: '0.02'
+x_authority: cpan:CODEHEX
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,81 @@
+Linux-DVB-DVBT-TS
+=================
+
+Linux::DVB::DVBT::TS is a package that provides a framework for parsing transport stream files.
+
+Example scripts have been provided in the package which illustrate the expected use of the package (and
+are useable programs in themeselves). For futher details please see 'perldoc Linux::DVB::DVBT::TS'.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+use File::Basename ;
+use File::Path ;
+use File::Spec ;
+
+
+DEBUG
+
+If you have any problems, particularly with scanning, please re-run with debug set to 15 and send me the
+log file (see my CPAN email). I'll try to fix the problem as soon as possible.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Steve Price
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+This module uses libmpeg2 for MPEG2 video decoding:
+
+ * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
+ * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
+ *
+ * See http://libmpeg2.sourceforge.net/ for updates.
+ *
+ * libmpeg2 is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * libmpeg2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+This module uses mpegaudiodec for AAC audio decoding:
+
+ * MPEG Audio decoder
+ * Copyright (c) 2001, 2002 Fabrice Bellard.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+

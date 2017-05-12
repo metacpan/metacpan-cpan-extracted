@@ -1,0 +1,16 @@
+Build.PL
+Changes
+ignore.txt
+lib/Lingua/RO/Numbers.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/00-load.t
+t/01-num_to_ro.t
+t/02-ro_to_num.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+%% __("Just some text")
+<html>
+  <head>
+    <title>[% __("Page title") %]</title>
+  </head>
+  <body>
+    <p>
+%% for $books -> $book {
+      <em>[% __x("Book named '{title}'.", title => $book.title) %]</em>
+      <br/>
+%% }
+      [% __("Text with umlauts: äöüß.") %]
+      <br/>
+      [% __px("some context", "Text with {variable}.", variable => $param.variable) %]
+      <br/>
+      [% __nx("Singular form with {variable1} and {variable2}.", "Plural form with {variable1} and {variable2}!", $plural, variable1 => "one", variable2 => "two") %]
+      <br/>
+      [% __npx("Whole other context", "Singular form with {variable}.", "Plural form with {variable}!", 2, variable => $param.variable) %]
+    </p>
+  </body>
+</html>

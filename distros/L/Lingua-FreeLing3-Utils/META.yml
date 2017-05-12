@@ -1,0 +1,26 @@
+---
+abstract: 'text processing utilities using FreeLing3 Perl inferface'
+author:
+  - 'Nuno Carvalho <smash@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-FreeLing3-Utils
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Slurp: 0
+  Getopt::Std: 0
+  Lingua::FreeLing3: 0.06
+  Scalar::Util: 0
+  Test::More: 0
+version: 0.09

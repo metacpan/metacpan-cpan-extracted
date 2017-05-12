@@ -1,0 +1,56 @@
+{
+   "abstract" : "Adapter for Log::Any that outputs with a priority prefix that systemd's journal can parse",
+   "author" : [
+      "Mark Grimes E<lt>mgrimes@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.011",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Any-Adapter-Journal",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.011"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "2.00",
+            "Log::Any" : "1.00",
+            "Log::Any::Adapter::Screen" : "0.12",
+            "Module::Build::Tiny" : "0.030"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Any::Adapter::Journal" : {
+         "file" : "lib/Log/Any/Adapter/Journal.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/mvgrimes/Log-Any-Adapter-Journal/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/mvgrimes/Log-Any-Adapter-Journal.git",
+         "web" : "http://github.com/mvgrimes/Log-Any-Adapter-Journal"
+      }
+   },
+   "version" : "0.13",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

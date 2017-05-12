@@ -1,0 +1,84 @@
+
+The files in this directory provide tools for conjugating Portuguese
+verbs and recognizing conjugated forms of these verbs.
+
+- Conjugate.pm   is a perl module with low-level tools (see manpage)
+- conjug         is a perl program that conjugates verbs (see manpage) 
+- treinar        is a perl program that drills the user on conjugation. 
+- UnConjugate.pm is a perl module with low-level tools.
+- unconj         is a perl program that regcognizes conjugated verbs.
+
+
+Quick demo :
+
+perl -e 'use Lingua::PT::Conjugate; print conjug("programar","perfeito")'
+
+programar :                                                          
+perf         programei programaste programou programamos programaram
+
+ See also : http://www.isr.ist.utl.pt/~etienne 
+
+Requisites : 
+    
+    Perl 5.004 or greater. Maybe less will do.
+
+    Perl Module : "treinar" require the Term::ReadLine and
+                   Term::ReadKey modules. Term::ReadLine::Perl or
+                   Term::ReadLine::Gnu are more friendly.
+
+INSTALLATION : 
+
+gunzip  Lingua-PT-Conjugate-V.MM.tar.gz
+tar xvf Lingua-PT-Conjugate-V.MM.tar
+cd      Lingua-PT-Conjugate-V.MM
+perl Makefile.PL
+make
+make test 
+make install
+
+
+MAN PAGES :
+
+  conjug                  : Progam conjugating Portuguese verbs.
+
+  treinar                 : Training at conjugation.
+
+  unconj                  : Recognizes conjugated portuguese verbs.
+
+  Lingua::PT::UnConjugate : Description of module functions.
+
+  Lingua::PT::Conjugate   : Description of the conjugation algorithm.
+
+
+BUG REPORTS:
+
+
+Mail me at etienne@isr.ist.utl.pt about bug, patches and suggestions. 
+
+
+Copyright (c) 1997,1999 Etienne Grossmann All rights reserved. This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+CREDITS:
+
+  Thanks to all people on usenet and at ISR (http://ww.isr.ist.utl.pt)
+with whom I have discussed about this module, who have provided advice
+on conjugation, programming, on naming and on all relevant points.
+
+  Thanks to Lupe Christoph <lupe@lupe-christoph.de> from
+cpan-testers@perl.org and to Miguel Marques
+<marques@physik.uni-wuerzburg.de> for finding and fixing some bugs.
+
+  Thanks to Soraia Almeida (salmeida@logos.it) from the Logos project
+(http://www.logos.it) and Ulisses Pinto and José João Almeida from
+Projecto Natura (shiva.di.uminho.pt/~jj/pln) who made Ispell
+available.
+
+  A big part of the list of verb infinitives comes from files used in
+Ispell (shiva.di.uminho.pt/~jj/pln) and in Logos (www.verba.org,
+www.logos.it).  these projects. Some verbs were removed and others
+added by hand.
+
+  A fix for the verb "pedir" was sent by Itai Nahshon <itai@siftology.com>

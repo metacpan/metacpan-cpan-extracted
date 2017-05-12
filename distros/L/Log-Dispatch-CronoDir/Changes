@@ -1,0 +1,27 @@
+Revision history for Perl extension Log-Dispatch-CronoDir
+
+0.06 2016-09-13T05:03:26Z
+
+    - Make "permission" optional.
+      When not specified, creating directory's permissions are based on current umask.
+
+0.05 2016-06-16T12:20:21Z
+
+    - Skip directory permissions test on Windows OS
+
+0.04 2016-06-13T05:55:14Z
+
+    - Remove Test::Pretty from dependencies
+
+0.03 2016-06-13T05:26:11Z
+
+    - Add an option for directory permissions
+
+0.02 2016-06-12T04:18:34Z
+
+    - Remove named capture in regex to keep compatibility with Perl 5.8
+
+0.01 2016-06-11T13:11:56Z
+
+    - original version
+

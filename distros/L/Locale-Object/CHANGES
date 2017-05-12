@@ -1,0 +1,167 @@
+2012-11-22: 0.79
+  - POD updates (COPYRIGHT AND LICENSE)
+
+2007-10-22: 0.78
+  - Added "Republic of Serbia" and "Republic of Montenegro", new countries since
+    last year.
+
+2007-09-04: 0.77
+  - The Unicode edition. Added currency symbols for numerous currencies
+    that had previously been spelt out, like "slashed C" for the Costa Rican
+    colón, and "Tug" instead of the the Mongolian tögrög symbol. Improved
+    spelling/accentage of some currency names but most likely some more
+    work is needed. As usual, please let me know of ommissions/inaccuracies.
+    I did not include several symbols that do not currently seem to be
+    well supported, such as "U+20B2: GUARANI SIGN" and "U+17DB: KHMER
+    CURRENCY SYMBOL RIEL".
+	
+2007-08-11: 0.76
+  - Jess Robinson and Matt S. Trout reported that using Getopt::Long in
+    Build.PL for the verbose option was eating up options meant to go to
+    Module::Build - fixed with a suggestion from Jos Boumans. Also renamed
+    the --verbose option to --showsql.
+  - DBD::SQLite wasn't in build_requires (Matt again).
+  - Pound symbol (£) was missing from the SQL (Jess again).
+  - Removed unnecessary use of warnings::register in most modules.
+  - Version number for Locale::Object::Country was incorrect.
+
+2007-01-06: 0.75
+  - More helpful Build.PL output. Will display the SQL being run if you use
+    the flag --verbose.
+  - Some minor updates to documentation and pruning of unneeded files.
+
+2006-06-28: 0.74
+  - Tom Insam at Fotango kindly patched Locale::Object to create the database
+    at build time from an SQL dump, instead of relying on a binary file 
+    distributed with the modules which could go painfully out of date (see 
+    note below). This smartly circumvents the issue I'd been having and means 
+    we can to back to using DBD::SQLite. Thanks Tom.
+  - Dependencies updated to accomodate changes in DateTime.
+
+2006-06-26: 0.73X, the evil bearded release from the mirror universe
+
+  - PAUSE-- # Allows co-maintainer to upload a version that already exists!
+
+2005-08-12: 0.73
+  - Switched to using DBD::SQLite2 to access the database, on a tip from
+    Nathan McFarland. This is a workaround for the fact that SQLite's
+    internal format has changed. I've received several requests to release a
+    new version using the SQLite 3 format for the DB, and despite a 
+    protracted period of trying very hard to convert it (see 
+    http://use.perl.org/~hex/journal/24191 for the gory details) I still 
+    haven't managed to get it working yet - hence this workaround.
+
+2004-04-24: 0.72
+  - Added a note to Language.pm about obsolete ISO 639 codes on a tip from 
+    Robin Szemeti.
+  - Got rid of a warning the appearing when Object.pm tests were run.
+    
+2004-03-31: 0.71
+  - Ask Bjoern Hansen provided a patch for a bug in using Antarctica as a
+    country and spotted that Congo was missing a continent listing in the
+    database. Thanks!
+  
+2004-01-15: 0.7
+  - New sane() and make_sane() methods for Object.pm.
+  - New languages_official() method for Country.pm.
+  - Fixed a broken error message in Language.pm.
+  - Fixed list markup in database.pod.
+
+2004-01-06: 0.6
+  - New timezone() and all_timezones() methods for Country.pm that
+    interface with DateTime::TimeZone.
+  - Added new timezone table to db; removed old UTC offset stuff,
+    because DT::TZ deals with that.
+  - Moved Locale::Object::DB::Schemata to docs/database.pod as that
+    makes more sense.
+  - Added documentation to Object.pm.
+  - Added missing "Congo, the Democratic Republic of the" to db.
+  - Renumbered 00pod.t to 99pod.t.
+  
+2003-12-30: 0.54_02
+  - Converter.pm only "carp"s now, not "croak"s, when required modules 
+    are missing.
+  - Fixed broken version number for Scalar::Util in Build.PL.
+  
+2003-12-29: 0.54_01
+  - Locale::Object itself now has functionality: creating compound
+    objects that can contain country, currency and language objects.
+    This is still incomplete, and the API is almost certainly going
+    to change.
+  - Altered tests and Converter.pm further after 0.53 test results
+    for more robustness. No longer has Finance::Currency::Convert::XE
+    and Finance::Currency::Convert::Yahoo as requirements.
+  - Language.pm's countries() will now return an array in array 
+    context. Added missing documentation for method.
+  - Changed tests to use isa_ok().
+  - Removed an incorrect line of documentation from Language.pm.
+
+2003-12-22: 0.53
+  - Removed a chunk of old code that had got back into DB.pm 
+    somehow and was causing warnings.
+  - Modified Converter.pm to try and deal with errors a little 
+    better.
+  - Changed tests in 06converter.t to only indicate if conversions 
+    don't succeed, rather than fail and break installation - if 
+    they don't succeed, it may be a network problem rather than one
+    with the module. (Thanks to Jost Krieger and Barbie for test 
+    results prompting this change.)
+
+2003-12-18: 0.52
+  - Made Continent.pm, Country.pm, Currency.pm and Language.pm 
+    subclasses of Object.pm so they could share one new() method for
+    code efficiency. Also fixed them to have get/set methods for
+    internal attributes to improve robustness. Thanks to James Duncan
+    for both these suggestions.
+    
+2003-12-18: 0.51
+  - Slight documentation patch.
+
+2003-12-17: 0.5
+  - Added new module: Locale::Object::Currency::Converter.
+
+2003-12-16: 0.41
+  - Added UTC offset data to the db.
+  - Added utc_offset_main() and utc_offsets_all() to Country.pm.
+  - Added a few more tests to bring subroutine coverage to 100%.
+  
+2003-12-09: 0.4
+  - Added dialing_codes column to the the country table in the db
+    and populated it with international dialing codes. 
+  - Added dialing_code method to Country.pm.
+  - Removed unused name_native, main_timezone and 
+    uses_daylight_savings columns from the db, their 
+    associated methods in Country.pm and listings in Schemata.pm.
+  - Added a couple of spots of missing POD markup to Schemata.pm.
+  - Updated two slightly out-of-date error messages in DB.pm.
+  
+2003-12-01: 0.31
+  - Added Language.pm to MANIFEST where it should have been.
+  
+2003-11-28: 0.3
+  - Added a new module: Language.pm.
+  - The database now contains a table of language-country mappings.
+  - New languages() method for Country.pm.
+  - New lookup_dual() method for DB.pm.
+  - Altered DB.pm's lookup() method - now returns a reference to an 
+    array of hashes rather than an array. This should not change 
+    again. Removed redundant lookup_all() method as a result.
+  - Continent.pm does now really actually give back an array.
+  - Added continent names to the database for some Pacific islands 
+    that should have been listed as Oceania but weren't.
+  - Added currencies to the db that were missing for those same 
+    islands.
+
+2003-11-25: 0.2
+  - Cleaned up the API a little - the countries() method in 
+    Continent.pm and Currency.pm now gives an array back, instead 
+    of a hash.
+
+2003-11-25: 0.11
+  - Fixed a bit of semi-finished and outdated documentation in DB.pm 
+    that had crept past me.
+  - Added a little bit more documentation to copy-for-test.PL for
+    clarity.
+
+2003-11-24: 0.1
+  - Initial release.

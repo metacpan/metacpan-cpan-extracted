@@ -1,0 +1,72 @@
+
+=pod
+
+=head1 NAME
+
+Log::Any::Adapter::Mojo
+
+=head1 SYNOPSIS
+
+    use Mojo::Log;
+    use Log::Any::Adapter;
+
+    Log::Any::Adapter->set('Mojo', logger => Mojo::Log->new);
+
+Mojolicious app:
+
+    use Mojo::Base 'Mojolicious';
+
+    use Log::Any::Adapter;
+
+    sub startup {
+        my $self = shift;
+
+        Log::Any::Adapter->set('Mojo', logger => $self->app->log);
+    }
+
+Mojolicious::Lite app:
+
+    use Mojolicious::Lite;
+
+    use Log::Any::Adapter;
+
+    Log::Any::Adapter->set('Mojo', logger => app->log);
+
+=head1 DESCRIPTION
+
+This Log::Any adapter uses L<Mojo::Log|Mojo::Log> for logging. Mojo::Log must
+be initialized before calling I<set>. The parameter logger must
+be used to pass in the logging object.
+
+=head1 LOG LEVEL TRANSLATION
+
+Log levels are translated from Log::Any to Mojo::Log as follows:
+
+    trace -> debug
+    notice -> info
+    warning -> warn
+    critical -> fatal
+    alert -> fatal
+    emergency -> fatal
+
+=head1 SEE ALSO
+
+L<Log::Any|Log::Any>, L<Log::Any::Adapter|Log::Any::Adapter>,
+L<Mojo::Log|Mojo::Log>
+
+=head1 AUTHOR
+
+Henry Tang
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (C) 2011 Henry Tang, all rights reserved.
+
+Log::Any::Adapter::Mojo is provided "as is" and without any express or
+implied warranties, including, without limitation, the implied warranties
+of merchantibility and fitness for a particular purpose.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,54 @@
+Locale::Maketext::Gettext - Joins the gettext and Maketext frameworks
+
+Locale::Maketext::Gettext joins the GNU gettext and Maketext
+frameworks.  It is a subclass of Locale::Maketext that follows the
+way GNU gettext works.  It works seamlessly, both in the sense of
+GNU gettext and Maketext.  As a result, you enjoy both their
+advantages, and get rid of both their problems, too.
+
+You start as an usual GNU gettext localization project:  Work on
+PO files with the help of translators, reviewers and Emacs.  Turn
+them into MO files with msgfmt.  Copy them into the appropriate
+locale directory, such as
+/usr/share/locale/de/LC_MESSAGES/myapp.mo.
+
+Then, build your Maketext localization class, with your base class
+changed from Locale::Maketext to Locale::Maketext::Gettext.  That's
+all. ^_*'
+
+
+* Locale::Maketext::Gettext::Functions
+
+Locale::Maketext::Gettext::Functions is a functional
+interface to Locale::Maketext::Gettext (and Locale::Maketext).
+It works completely the GNU gettext way.  It plays magic to
+Locale::Maketext.  No more localization class/subclasses and language
+handles are required.
+
+
+* The maketext script
+
+The maketext script is a command-line interface to
+Locale::Maketext::Gettext (and Locale::Maketext).  It can be used in
+shell scripts, etc, to translate, maketext and return the
+result.  It enables Maketext to be integrated into other programming
+languages/systems, like bash/csh, python, PHP, C, etc.  It works
+like the command-line program gettext.
+
+
+* Installation
+
+    Read INSTALL for instructions on how to install
+Locale::Maketext::Gettext.
+
+
+* News, Changes and Updates
+
+    Refer to the Changes for changes, bug fixes, updates, new functions, etc.
+
+
+* Copyright
+
+Copyright (c) 2003-2007 imacat. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms
+as Perl itself.

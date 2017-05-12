@@ -1,0 +1,925 @@
+0.8.2 2016-07-10
+     - Numerous bug, robustness, fidelity fixes;
+     - fixes to amsmath, amsthm, keyvals, listings, tikz/pgf, color, xcolor, supertabular packages;
+     - fixes to bibliography, OpenMath, MathML, svg generation;
+     - accomodate sizing of math, better position adjustments;
+     - JATS/NLM format;
+     - Colorized error logging;
+     - New bindings: aas_macros.sty, algc.sty, algcompatible.sty, algmatlab.sty, algorithm.sty,
+       algorithmic.sty, algorithmicx.sty, algpascal.sty, algpseudocode.sty, amsgen.sty,
+       apjfonts.sty, attachfile.sty, authblk.sty, balance.sty, braket.sty, breakurl.sty,
+       colordvi.sty, deluxtable.sty, emulateapj5.sty, esint.sty, fix-cm.sty, flafter.sty,
+       grffile.sty, ifluatex.sty, import.sty, lmodern.sty, marvosym.sty, mathbbol.sty,
+       mathtools.sty, nameref.sty, newlfont.sty, parskip.sty, pdfsync.sty, psfig.tex,
+       pslatex.sty, rotate.sty, srcltx.sty, showkeys.sty, slashed.sty, soul.sty, subfig.sty,
+       subfloat.sty, stmaryrd.sty, svg.sty, t1enc.sty, tabulary.sty, threeparttable.sty,
+       transparent.sty, wasysym.sty.
+
+    Thanks: Deyan Ginev, Kim Philipp Jablonski, Lukas Kohlhase, Michael Kohlhase,
+       Viacheslav Zholudev;
+       And angerhang, Stefan Becuwe, Stephane Binarez, casio7131, Howard Cohl, Joe Cornelli,
+       Boyd Duffee, Giovanni, goska, Bernhard Kleine, neos21, Grant Petty, Bob Plantz,
+       Paolo Prandoni, Tim Prescott, Matteo Seclì, M. Senthilkumar, Moritz Schubotz, Raniere Silva,
+       Cooper Stevenson, Tom Tczyczko, Scott Walter, Frederic Wang, Simon Winter, Tom Wiesing,
+
+0.8.1 2015-02-17
+     - Generate "span soup" for inline blocks, when otherwise would produce invalid HTML5.
+     - Can use svg as math ouput format.
+     - listings from the listings package provides link to downloadable raw data 
+     - implemented low-level TeX input/ouptut primitives
+     - more consistent handling of math spacing, delimiter sizes,
+       equation positioning and alignment; improved linebreaking layout
+     - parallel math markup w/cross-referencing
+     - math grammar enhancements
+     - language support (xml:lang & (slightly) internationalized number recognition)
+     - font size handling more consistent with CSS
+     - New fallback for unknown classes "OmniBus.cls" mimics common frontmatter markup.
+     - improved package option handling
+     - improved documentation
+     - improved portability (Windows, Perl versions)
+     - various other bugs & fidelity improvements
+     - New bindings:
+       a0poster.cls, a0size.sty, braket.sty, crop.sty, epsf.tex, ellipsis.sty,
+       fancyhdr.sty, floatpag.sty, ifthen.sty, lineno.sty, listingsutf8.sty,
+       pgfplots.sty, relsize.sty, type1cm.sty, xargs.sty
+
+    Thanks: Deyan Ginev, Michael Brade, Joe Cornelli, dpantele, Giovanni,
+       Kim Phillip Jablonski, Bernhard Kleine, Lukas Kohlhase, Michael Kohlhase,
+       Silviu Opreah, Antonio Sanchez, Moritz Schubotz, Rainere Silva, Frederic Wang & Others.
+
+0.8.0 2014-05-05
+     - Too many changes to enumerate...
+     - Generates HTML5, ePub
+     - new Color objects allowing better & more accurate, and extensible
+       color models; binding for the xcolor package.
+     - RDFa support; Thanks Christoph Lange
+     - consistent error reporting, in both conversion & post-processing
+       that supports automated build systems; Thanks Deyan Ginev, Heinrich Stammerjohanns
+     - uses dvipng (IF available) for converting tex code to images;
+       MUCH faster than going via eps.
+       HOWEVER, it wont handle embedded postscript,
+       so we only use it for converting math to images.
+     - Reorganize various non-perl data files into a (hopefully) more manageable arrangement,
+       and with more consistent naming:
+       lib/LaTeXML/resources contains various resources for running the program
+       including
+       * DTD, RelaxNG for holding various schema
+       * XSLT, CSS, javascript for holding various styling & script resources
+     - Mechanism for bindings to request resources (css, javascript) that will
+       be included in generated output if appropriate (eg. if html)
+     - more consistent naming schemes
+       * for classes typically start ltx_<element>, ltx_font_<font>, ltx_role_<role> etc
+       * LaTeXML.css for core.css
+       * package specific css files: ltx-<package>.css
+       * special purpose css files: LaTeXML-<feature>.css
+     - XSLT uses <xsl:element> exclusively so same modules cope with both xhtml & html5;
+       More easily extended and overridden by author customizations.
+
+0.7.9xx 2012-08-01
+     - some slight efficiency improvements
+       (reports Deyan Ginev, Joe Corneli)
+     - fixed bug in Post reading from STDIN (thanks Josh Bialkowski)
+     - various robustness
+     - I/O reorganization, which includes
+       * an extensible pseudo-protocol for sources of TeX and data,
+       	 including file:<filename>, string:<explicit-string-data>
+       * Migration of control of I/O to functions defined in Package.pm
+       	 InputFile, InputDefinitions, etc
+       * Obsolete $GULLET->input, $GULLET->expandTokens
+       * Tokens lists are now immutable (do NOT implement Mouth API)
+
+0.7.9xx 2012-07-01
+     - more consistent handling of math spacing;
+       treat \quad and wider as punctuation
+     - better support for adding ID to all elements
+     - parallel math markup will establish node-to-node cross-referencing
+       Particularly pmml+cmml uses id & xref to connect related pmml & cmml nodes.
+     - generate MathML mrow instead of mfenced.
+     - experimentally, do NOT define non-control sequences as mathactive
+       (in order to assign XMTok attributes), but store such properties separately.
+     - Have MathBox store the XMTok properties of simple symbols;
+       create Primitives for simple symbols, rather than Constructors.
+     - switched comparison files from dvi to pdf; more portable
+
+0.7.9xx 2012-06-02
+     - MathFork updates
+     - use LaTeXML.catalog more consistently;
+       define URN's for RelaxNG modules and XSLT modules
+     -
+
+0.7.9xx 2011-06-01
+     - various changes and small completions to LaTeX that help to
+       process raw TeX style & definition files from the LaTeX distribution.
+     - Support LaTeX's input encoding mechanism by finding, reading and 
+       implementing the encoding definitions
+     - Support LaTeX's fontencoding mechanism and TeX's \char, etal,
+       by implementing FontMap's that map input codepoints to unicode.
+       Also read in font encoding definitions from the LaTeX distribution
+     - Support babel by implementing core support and reading individual
+       language definitions from the LaTeX distribution.
+
+0.7.x 2011-03-16
+     - Bindings for floatfig, floatflt, JHEP,JHEP2,JHEP3
+     - improved model, attributes and conversion for floating objects
+     - Have \caption increment the appropriate counter, rather than figure, table, etc
+       This avoids many problems with subfigures, and so forth.
+
+0.7.x 2011-02-28
+     - Bindings for llncs.cls, rsfs.sty, multicol.sty, enumerate.sty, xspace.sty,
+       caption.sty, subfigure.sty, upgreek.sty
+     - Initial support for AmSTeX (AmSTeX.pool)
+     - Schema changes: new ltx:inline-para, fixed ltx:classification, positionable ltx:p,
+       ltx:bib-data holds original bibentry
+     - improved parallel markup
+     - support for Unicode Plane 1 as alternative to mathvariant
+     - various improved code, implenting \fracwithdelims, \DeclareMathAlphabet,
+       \obeylines, \hypersetup, \centering, \raggedright, \raggedleft, \let,
+       \rotatebox, \reflectbox, \scalebox, \qopname, \Sb, \Sp, \afterassignment,
+       \sidecaption, \@vec, \minCDarrowwidth, \beginsection, \proclaim,
+       \AtBeginDocument, \AtEndDocument,
+       numbering, 
+       rules within tables
+     - new Box() function
+     - \iflatexml in latexml.sty
+       namespaced attributes
+     - improved table header heuristics
+     - better handling, and distinguishing broup, begingroup
+     - better ID handling; many elements get ID's, equations always do.
+     - better MathML conversion, even when parsing fails.
+     - support for --icon provides a favicon
+     - more test cases (but not enough)
+     - More careful distinction between ToString vs Stringify vs UnTeX
+       Stringify is for debugging, ToString should return string form, NOT neccesarily for getting TeX
+       many changes to definitions and usage of these.
+     - Many constructors converted to Primitives to support turning accents or Unicode conversions
+       directly to boxes, not requiring constructors; this allows them to be unambiguosly converted
+       to Strings (using ToString) and thus can be put in attributes.
+     - avoid introducing doubled slashes in pathnames, so that (eventually) might
+       use the TeX standard interpretation that treats them as recursive wildcard.
+       (that is, expandable directories)
+     - INCOMPATIBLE: Localization; remove assumed names & symbols from formatting titles, sections, etc.
+       Let style files determine prefixes or formatting of reference numbers.
+       Put these within the ltx:title (eg.) and wrapped in ltx:tag.
+       This is incompatible as different attributes are used, and ltx:tag is used to contain the reference number.
+     - more flexible TOC creation, support for list-of-figures and similar.
+     - Fuller support for seealso, heuristics to try to connect the terms to actual entries.
+     - Safer encode/decode of objects being stored in the ObjectDB.
+
+0.7.x 2009-06-19 (ref 983)
+     - fixed typos in aa_support & sv
+     - added wrapfig.sty, llncs.cls, rsfs.sty, multicol.sty, enumerate.sty,
+       xspace.sty, caption.sty, subfigure.sty
+     - initial implementation of AMSTeX (amstex.tex & amsppt.sty)
+     - enabled better CSS styling via XSLT.
+      Thanks Lee Worden
+
+0.7.0  2009-06-16 (rev 964)
+     - Release 0.7.0
+
+0.6.x  2009-06-15 (rev 959)
+     - mostly complete listings.sty
+     - new classes sv, svmult
+     - better compatibility-mode support
+     - made indices case sensitive and fixed sorting order correspondingly
+     - many small fixes throughout
+     - improved manual
+     - Thanks to Deyan Ginev, Michael Kohlhase, Lee Worden for reports/patches.
+
+0.6.x  2009-05-07 (rev 899)
+     - added various macros to existing packages.
+     - new packages/classes: elsart, iopart, iopams, mn, mn2e
+     - added less obnoxious Info message for things not as severe as Warning.
+     - changes to centering, flush commands; get rid of centering element,
+       try to use class and css for same effect.
+     - fix typos in latexmlpost (Thanks Jason Blevins)
+     - reduced load time, primarily for latexmlmath
+   
+0.6.x  2009-03-15 (rev. 824)
+     - efficiency improvements
+     - documentation and error message improvements
+     - various minor fixes, extra macros, 
+     - heuristics to handle misused environments
+     - support to "lock" macros from being inappropriately
+       redefined within TeX documents
+     - new packages: paralist, eurosym
+
+0.6.x  2009-01-14 (rev. 740)
+       Preparation for release 0.7.0
+     - New packages:
+       revtex and revtex4 classes and styles
+       (Thanks Deyan Ginev <d.ginev@jacobs-university.de>
+       and Catalin David <c.david@jacobs-university.de>)
+       aas styles, amscd, lscape
+     - latexml now processes BibTeX files
+     - latexmlmath; new command for creating images or MathML
+       for individual math expressions.
+     - Improvements to MathGrammar for bra-ket notations,
+       assignment, and other presentation markup like odd sub/superscripts
+     - Improved option handling
+     - More consistent math meaning "ontology"
+     - Some documentation improvements
+     - Rearranged Makefile & dependencies to port to Centos, MacOS
+     - Many additional macros, robustness fixes
+     - Clarified progress and error messages.
+
+0.6.0  2008-04-09 (rev 485)
+       Released.
+     - Reorganized site and manual building.
+       Unfortunately, the manual isn't as extensively rewritten
+       as I'd like.
+     - reorganized build & installation.
+       Should be able to generate rpm's now.
+
+0.5.x  2008-03-18
+     - Added implementation for supertabular and longtable
+       (the latter isn't perfect; it produces empty rows after
+       header/footers)
+     - random minor fixes
+0.5.x  2008-03-03
+     - Added support for class & package options
+       with new exported functions in LaTeXML::Package
+       (DeclareOption, PassOptions, ProcessOptions, ExecuteOptions).
+     - Modular XSLT: individual XSLT files correspond
+       to the Schema modules and are assembled into
+       composite html and xhtml versions.
+     - Option to latexmlpost to suppress section numbering.
+     - new package ifpdf
+     - more consistent date formatting
+     - switch to using id in html instead of <a name=...
+     - make "\ " generate no-break-space (more portable)
+     - random other minor fixes.
+     - documentation improvement
+
+0.5.x  2008-01-16
+     - Major check-in of accumulated changes
+     - Added a MathFork/MathBranch construct to represent
+       math with alternative structures, especially alignment.
+       This allows representing eg. eqnarray as a group
+       of equations. Each equation has a MathFork where
+       the main branch is the complete equation (hopefully semantic),
+       and the branch contains 1 or more tr each containing 3 td.
+       Thus both the meaning and the structured alignment can
+       be preserved.
+     - Change to use xml:id instead of id.
+     - Changed common attribute label to labels (plural)
+       along with support in postprocessing, etc.
+       This is since LaTeX in principle allows multiple labels
+       to attach to the same place.
+       The labels are also stored as "LABEL:text" instead of just "text",
+       so that the same mechanism can be leveraged for other
+       crossreferencing later (eg. acronyms,etc).
+     - Some generic exported support functions to ease the above
+       CleanLabel, CleanIndexKey, CleanBibKey, CleanURL, GenerateID
+
+0.5.x  2007-12-01
+     - Conversion to RelaxNG Schema.
+       (currently only recognizes XML format)
+       Use RelaxNGSchema($schema) to declare the schema to use.
+     - Continued refinement and simplification of model.
+     - Use xml:id instead of id.
+
+0.5.x  2007-10-10
+     - Began revising documentation.
+       Added documentation of DTD; this led to refining
+       and making the model and attributes more consistent.
+     - Yet another alignment/math fix.
+     - more complete hyperref.
+     
+0.5.99  2007-09-26
+	Released.
+
+0.5.x  2007-09-20
+     - Added Conditionals to deal with encoding changes in
+       XML::LibXML; LaTeXML should work with 1.61 or newer.
+     - Better detection of latex (vs. plain tex)
+     - Modularized CSS; allows multiple css stylesheets,
+       separated supplied stylesheet into several options
+       core, navbar-left, navbar-right, theme-blue, amsart
+     - Lots of more fixes due to arXMLiv project testing.
+     - Initial implementation of ams classes
+       (amsart,amsproc,amsbook, gen-j-l,gen-m-l,gen-p-l),
+       and upref.
+     - Improved interaction between alignments, text and math modes.
+     - improved manual.
+
+0.5.x  2007-09-05
+     - registered missing handlers in Post::Scan (thanks Harald Soleng)
+
+0.5.9  2007-06-20
+     - Hmmm, I haven't been keeping the changelog uptodate.
+       Things _have_ been happening...
+     - Lots of changes, including:
+     - Improvements to handling of various kinds of Alignments,
+       including multrow, rowspan, tabularx packages
+     - enhancements to postprocessing to support splitting single
+       documents into multiple output pages, as well as crossreferencing
+       between multiple source documents.
+     - Improvements to manual.
+     - Updated for XML::LibXML version 1.62
+       No longer explicitly requires XPathContext.
+     - Experimental math linebreaker 
+       (see --linelength option to latexmlpost)
+     - Various minor correctness & robustness patches.
+       [Thanks to the DLMF and ArXMLiv projects for testing and patches]
+
+0.5.1  2006-04-27
+       Released.
+
+0.5.0  2006-03-22
+       Released.
+
+0.5.x  2006-08-03
+     - Changes to how frontmatter is handled, and represented.
+       Frontmatter gets accumulated and added to <document>
+       when it is absorbed, whether or not there's a \maketitle.
+       <author> => <creator role='author'><personname>...
+       <affliation> => <contact role='affiliation'>... inside of <creator>
+       Similarly for <email>
+       This construct gives more flexibility for representing
+       editors, translators, reviewers, etc,
+       And also for various kinds of info about them (address, etc).
+
+0.5.x  2006-07-24
+     - Fixed a sneaky bug in \def parameters, and gullet->readMatch
+       where TeX collapses multiple spaces! Thanks Ioan!
+
+0.5.x  2006-07-23
+     - Fixed the TeX font command to recognize more fonts.
+     - Redefined sectioning commands to go via \@startsection,
+       so more author customizations will still work.
+     - added report & book classes. 
+     - Other random (minimal) packages: eulervm, yfonts, a4wide
+
+0.5.x  2006-07-22
+     - Dealing with some font issues, and adding minimal
+       implementations: fixltx2e, textcomp, exscale
+       mathptmx, mathpazo, charter, utopia, chancery, helvet, avant,
+       courier, bookman, newcent, times, palatino, mathptm, mathpple,
+       latexsym, beton, euler, ccfonts, concmath, cmbright,
+       luximono, txfonts, pxfonts, fourier,
+
+       And a start at pifont...
+
+
+0.5.x  2006-07-22
+     - Went through the TeX book and implemented bunches of
+       Appendix B (plain) --- still not complete, but better.
+       
+0.5.x  2006-07-21
+     - Added implementation of amsthm; thanks Ioan Sucan.
+       along with tests, implementation of LaTeX's newtheorem,
+       and a few other tweaks to make it cleaner.
+
+0.5.x  2006-07-17
+     - Revised handling of sub/superscripts:
+       Abandoned the SUBSUPERSCRIPT combinination of sub+super
+       generated by the parser; now sub and superscripts
+       (including prescripts) are nested in the (seemingly)
+       given order; ams's sideset is done similarly.
+       This imho gives a more sensible semantic structure.
+
+       The stackscripts attribute was renamed to scriptpos
+       and generalized to track the position (pre, mid, post)
+       and the bracket nesting level where the script was created.
+       This allows the presentation mathml module to determine
+       sensible nesting and positioning so that it can
+       determine under/over vs sub/sup as well as subsuper combinations,
+       and mprescripts according to the given tree.
+
+       A few other enhancements were made to mathml generation, as well.
+
+     - Added class attribute to <text> and defined new (generic)
+       block element with class attribute.  These can serve
+       as fallback elements for testing purposes.
+
+0.5.x  2006-06-24
+     - With some trepidations...
+       Converted math arrays to use XMArray/XMRow/XMCell
+       so there's more sharing with tabular, and it can
+       handle the lines, headings, etc.
+       Instead of the more abstract XMApp/[role=ARRAY], etc.
+
+     - Added a meaning attribute to math.
+       The idea is:
+         role : grammar or presentation info.
+	 name : a name for the token, probably from the cs,
+	        but not necessarily completely semantic.
+	 meaning: a hopefully semantic enough name for the token.	
+	 	This would be used for content conversions.
+
+     - Recent runs show the Perl function bound as an XPath
+       extension are very costly.  Recoded the font match
+       handling to avoid the perl function, using a set of
+       contains calls.  Vastly faster!
+
+0.5.x  2006-06-16
+     - Fixed typos in DTD parsing
+       Thanks Ioan Sucan <i.sucan@iu-bremen.de>
+     - Reworked pathname_find to be a little clearer about
+       seaching for files that come with the installation
+       (but can be overridden by SEARCHPATHS).
+       Added pathname_findall which finds all matching files,
+       and used it so that all available catalogs are loaded,
+       in particular any in the SEARCHPATHS.
+
+       In the process noted a bug that if the environment variable
+       XML_DEBUG_CATALOG is set, XML::LibXML bombs
+       (seeking advice from mailing list).
+     - Fix to \varintjlim (Ioan Sucan)_
+
+0.5.x  2006-06-01
+     - Simplifications to PMML; use roles more consistently
+       (which means there are some roles that never appear in Grammar,
+       but which represent presentational structure).
+
+0.5.x  2006-05-20
+     - Sorted out (hopefully finally) the Unicode nonsense
+       w/chars in 80--FF; Perl is dumm; you really need to use pack;
+       exported handy UTF(hex) from LaTeXML::Package to help.
+       I had been (over)using Unicode::Normalize::NFC to patchup
+       after the fact, but this has screwy effects
+       (translates \langle to something in chinese block !?!)
+
+0.5.x  2006-04-28
+     - A number of initializations, typos, missing \and fixed.
+       Thanks Christopher B. Hamlin <chamlin@aip.org>
+     - Fix to eqnarray numbering bug.
+       Thanks Eduardo Tabacman <eduardot@dessci.com>
+
+0.5.1  2006-04-27
+     - Release 0.5.1
+
+0.5.x  2006-04-24
+     - Refined the math grammar, added some test cases.
+
+0.5.x  2006-04-09
+     - Fixed up some math grammatical quirks, 
+       redefined default role for :, \mid
+
+     - Corrected handling of \left.,\right.
+
+     - Fixed up Presentation MathML handling of unsuccessfully
+       parsed math.
+
+0.5.x  2006-03-28
+     - straightened out some namespace mismatches in DTD's
+
+     - Updated documentation to reflect current commands & API's
+
+
+0.5.0  2006-03-22
+     - Release 0.4.0
+
+0.4.x  2006-03-18
+     - Defined \LXDeclMath for "Math Declarations" in latexml package.
+       These declarations can be embedded in the TeX Source.
+       Basically these define patterns to match to scoped portions
+       of the generated document tree (using Rewrite rules),
+       and add declarative attributes to support the math parsing.
+
+0.4.x  2006-03-01
+     - Modularized the DTD, along with lots of cleanup.
+
+0.4.x  2006-02-09
+     - Cleaned up Makefile.pm: made ImageMagick optional
+       (tho' without any clear failure mode when used, yet);
+       Safer XSL style file generation.
+       Should be close to able to install on windows.
+     - Wrote some Test::Builder support code, reorganized
+       the test suite, and started adding new tests.
+
+0.4.x  2006-01-27
+     - Essentially backtracking on changes for 0.2.0,
+       I'm concerned about the number of globals and exports,
+       and formalizing extensible readers for control sequences.
+       Thus, yet another incompatible change in the parameters
+       to code blocks defining macros, primitives and constructors.
+       
+       macro($gullet,@args)
+       primitive($stomach,@args)
+         beforeDigest($stomach)
+         afterDigest($stomach)
+       constructor($document,@args, %properties)
+         beforeDigest($stomach)
+	 properties($stomach,@args)
+         afterDigest($stomach,$whatsit)
+	 beforeConstruct($document,$whatsit)
+	 afterConstruct($document,$whatsit,$node)
+       For Tag code blocks:
+         afterOpen($document,$node,$box);
+         afterClose($document,$node,$box);
+         
+0.4.x  2006-01-22
+     - Yet another rewrite of tabular processing.
+       Now allows @-expressions.
+
+     - New Tag option: whitspaceTrim; this trims
+       leading & trailing whitespace from the direct
+       text content of these tags.
+
+     - Significant namespace cleanup. 
+       There are 2 prefix/namespace mappings.
+       (1) the one used in code (eg.ltxml) for constructors,etc.
+       (2) the one used to interpret the DocType (dtd).
+       Constructors should always specify a namespace prefix for names,
+       unless they are in the null namespace (NOT default namespace).
+       In fact, there is no longer a notion of default namespace, as such,
+       and RegisterNamespace no longer takes that 3rd argument.
+       DocType takes as extra args prefix=>namespaceURI mappings
+       to be used in interpretting the DTD, and the resulting document
+       will be constructed using those same prefixes.
+
+0.4.1  2006-01-09
+     - Relase 0.4.1
+
+0.4.x  2006-01-09
+     - Experimental tabular transformation.
+       More faithful reproduction of latex tabular in html,
+       via CSS.  Heuristics for table headers.
+
+0.4.x  2005-12-15
+     - Fixed some namespace usages, so that
+       constructors containing "<foo:bar>..." will
+       work, provided foo was registered (RegisterNamespace)
+       Added a too-simple testcase.
+
+     - If "-" is used on latexml|latexmlpost command line,
+       they reads the TeX|XML, respectively, from STDIN.
+
+  
+0.4.x  2005-09-27
+      - Added missing test result file keyval.xml
+      - Patch to postprocessor: only mung LaTeXML's DTDs.
+
+0.4.0  2005-09-26
+      - Release 0.4.0
+
+0.3.x  2005-09-xx
+      - Hopefully harmless simplifications in DTD regarding text.
+        Combined the <textstyle> and <hbox> with the <text> element.
+	Changed model for XMath to only allow <text> rather
+  	than %Simple.class; and made <text> auto-open so that
+	all non-obviously math things will be wrapped in <text>.
+      - More DTD (and generation) modification to better support
+        a logical versus physical paragraph  structure.
+	  <paragraph> is a possibly numbered & labeled element
+	     generated by the \paragraph command.
+	  <para> represents a logical paragraph; It contains block
+	     elements, in particular it can contain sequences of
+	     <p> and <equation> that represent a logical paragraph.
+	     It can have a refnum and label, although it does
+	     NOT get the label assigned by \label.
+	  <p> represents a physical paragraph --- a block of text.
+      - implemented various missing plain macros.
+
+0.3.x  2005-08-xx
+      - Added support for LaTeX's picture environment and
+        pstricks (along with pst-node).
+	A Postprocessing module converts the resulting XML into SVG!
+	Thanks very much to Ioan Sucan!!
+
+      - Reverted the attribute xml:id to id on math nodes (XM*),
+        since XMRef's idref attribute should only refer to XMath nodes.
+	This also avoids conflict with other uses of xml:id that
+ 	a developer might need to make.
+
+0.3.x  2005-07-xx
+       - INCOMPATIBLE changes.
+         In order to make constructors more flexible, I'm incorporating
+	 the possibility to invoke arbitrary functions within constructors.
+	 So, something like:
+	 <foo bar='&Func(#1,'a')'/>
+	 would set the attribute bar on the element foo to
+	 be the result of applying the function Func to the first argument,
+	 and the string 'a'.
+	 Note that even w/o args,parens are required (so maybe entities still work).
+
+	 The Incompatibility is due to absorbing previous ad-hoc functionality:
+	   ?IfMath is now ?#isMath
+	   (since isMath is an internal property of all Whatsits)
+           Accessing bound values is
+                   VALUE('name') => &LookupValue('name')
+
+         A new constructor pattern triggered by '%' is defined
+	 such that %value adds a _set_ of attributes to an element,
+         where value would be something like #1, #foo, &KeyVals(#1)
+ 	 such that the value returns a hash reference.
+	 
+       - The above also allows KeyVals to be better encapsulated
+         and pulled out from the core of LaTeXML.
+	 The functionality of keyvals will now only be available if
+	 you \usepackage{keyvals} or RequirePackage('keyval')
+	
+	 The Parameter specification for KeyVals is now of the form;
+	    RequiredKeyVals:name
+	 or OptionalKeyVals:name
+	 where name is the name of the keyval set.  The first expects
+	 keyvals wrapped in the usual {} pair, whereas the second
+	 expects optional args wrapped in [], if present.
+
+	 Furthermore, the constructor patterns have been redefined in a more
+	 general framework:
+	 Accessing KeyVal data:
+   	    #1{key} is now &KeyVal(#1,'key')
+	 Accessing all keys would now be
+	    <foo %&KeyVals(#1)/>
+	 instead of simply <foo #1/>
+	
+      -  Similar change to argument type semiverb.  Instead of 
+          {semiverb}
+         you should now write
+	   Semiverbatim
+         this reads an {} delimited argument, but with most catcodes turned off.
+
+      - Conditional patterns in constructors now properly balance the delimiting
+        parentheses.  Thus conditionals can now be nested, and function calls
+	used within the patterns should work.
+
+      - Revamped and regularized Parameter specs, making them more extensible.
+        {KeyVals:foo} => RequiredKeyVals:foo
+        [KeyVals:foo] => OptionalKeyVals:foo
+        Flag:*       => OptionalKeyword:*
+
+0.3.x  2005-06-xx
+      - Fixed Subtle bug with conditionals and \else; 
+         Special case: \else doesn't get expanded while
+ 	 the conditional test is being expanded! (See TeX: The Program)
+        (Thanks Kohlhase for pointing it out)
+      - Fixed \underline, \overrightarrow, \overleftarrow to work in textmode.
+
+0.3.2  2005-05-16
+      - Cleanup of LaTeXML.dtd; to be make sure all elements get
+        appropriate attributes defined (should validate mostly).
+      - More tweaks & tuning for more understandable error messages.
+      - implemented \raggedright, \raisebox,\buildrel,\stackrel
+      - New functionality in Constructor patterns:
+        VALUE('keyword') can be used where a value is expected
+        to lookup a value in the state. Also allows args & such,
+        So \ref ends up defined as <ref labelref='#1'>VALUE('LABEL@#1')</ref>
+        This also means that the constructors \@VALUE and \REF are no longer
+        needed, so they're removed.
+
+0.3.1  2005-05-10
+      - Improved mismatched environment reporting.
+      - More faithful implementation of verbatim & comment environments
+      	with fixes to mouth's readRawLines.
+      - Fix in Stringify for XML nodes; apparently a documentation bug
+        in XML::LibXML::Namespace ? (it doesn't implement getValue)
+      - imcremental improvements in latexmlfind
+
+0.3.0  2005-05-06
+      - Release 0.3.0
+      - Some speculative code on handling the picture environment,
+        along with pstricks, but not yet settled.
+      - More exports from Package for common operations there,
+        and hopefully reduce the usage of global $STOMACH, etc.
+      - Improved and updated documentation.
+      	Still need to document the new Rewrite facilities
+	(but would like to make API more concise)
+
+0.2.99x 2005-04-13
+      - Allow * flag (ignored) on \newcommand, et.al.
+      - Fixed some problems with fake environments
+        (ie. \begin{small}...\end{small})
+
+0.2.99 2005-04-07
+      - Released as 0.2.99 so the Bremen folks can get
+        some work done.  Documentation update is needed
+	for 0.3.0 release.
+
+0.2.xx 2005-03-17
+      - Bigger changes, increment version.
+      - Modified DocType; don't add namespace, use RegisterNamespace
+      	instead.
+      - Intestine now creates XML::LibXML structures directly.
+        Module LaTeXML::Node is removed.
+	In fact, Intestine essentially represents the Document itself
+	and thus is now renamed LaTeXML::Document.
+      - Removed global exported Font() and MathFont()
+      - Made more definitions scopable, cleaned up stash & scope
+        implementation.  Renamed: methods {de}activateStash
+      - Implemented Rewrite rules that act on the constructed document.
+        They also allow rules defined in terms of TeX strings
+	(tokenized, digested, converted	to document fragments
+	and then XPath statements, as needed).
+	These rules can be used to effectively declare variable
+	or symbol's Grammatical roles.
+	Math Parsing is now part of the latexml script
+	and removed from latexmlpost.
+
+0.2.3 2005-01-xx
+      - Fixed a problem where misplaced egroups could
+        inadvertently change the mode. Mode is no longer
+	affected by the TeX stack; they must be explicitly
+	start/finished (even though they also introduce grouping).
+
+      - Fixed counting of `raw' lines read for
+      	"comment"ed environments.  Line numbers for
+	errors were getting skewed.
+
+      - Moved sectional attribute declarations inside the
+      	%define.structure; block to ease defining extension DTD's
+
+0.2.2 2005-01-11
+      - Random minor bug fixes and improvements to error
+        reporting.
+ 
+0.2.1 2005-01-10
+      - Bug fixes to stylesheet LaTeXML-xhtml,
+      	Thanks Yann Golanski
+      - A few rearrangements and renamings to make a simple
+        top-level 'digest from string' alternative.
+ 	[  $latexml->readAndDigestString($string) ]
+	Also, renamed the slightly misnamed Stomach methods:
+          readAndDigestChunk => digestNextChunk
+          readAndDigestBody => digestNextBody
+      - A few typos in Stomach fixed
+      - Almost complete implementation of the various AMS
+        packages:amsbsy,amsfonts,amsmath,amsopn,amssymb,amstext,amsxtra
+        Still need to complete and test the various alignment environments
+
+0.2.0 2004-12-25
+      Extensive changes, so incrementing minor version, but
+      not robust enough for major version!
+
+      - Added version info to latexml, latexmlpost help output.
+        separated --debug and --trace options.
+      - Removed mathConstructor option to various DefXXs
+      	Use new constructor conditional "?IfMath(..)(...)"
+
+      - POS is an annoying acronym. Role is better and
+        upon reflection, doesn't conflict with OpenMath's ussge.
+	Hence, partOfSpeech and POS have been replaced by role
+	to describe the grammatical role (or `part of speech')
+	of tokens to be interpreted during a math parse.
+
+      - Reduced introduction of new `name' attributes for
+      	math tokens, especially when they add little value.
+	Most greek & math characters are just replaced
+	by thier unicode equivalent; In most cases, a name
+        is synthesized from the control sequence when needed.
+        The intestines will now create an XMTok, if required.
+	Also, it will automatically manage the font
+	and assign a `cs' attribute to record the macro
+	used to create the token.
+
+      - DefSymbol is deprecated (removed in fact)
+      - DefMath (new) covers what DefSymbol did,
+      	and more: handles the common form for functions
+	taking arguments. When the macro takes args and
+	the replacement presentation text involves #1,
+	it generates an XMDual using the replacement as
+	an expansion, but also creates the content form.
+        To avoid duplicating the arguments, the XMArg's
+        containing the arguments in the content branch
+        are marked with an id; in the presentation branch
+	<XMRef idref='id..'/> is used.  Corresponding
+	code in postprocessor looks up the referred node
+	when needed.  XMRef can also be used on it's own:
+	see the macros \@XMArg and \@XMRef in TeX.ltxml.
+
+      - Constructors take property arguments which supply
+      	properties to the whatsit (which can be CODE evaluated
+	at digestion time).  These properties can be used
+	in the constructor pattern.
+
+      - Refactoring of Intestine & DOM; most interaction
+        with Model is done in Intestine.  Renamed
+        DOM to Node and renamed it's subclasses.
+
+      - "In for a dime, in for a dollar":
+        Since I'd found it necessary to use global variables
+	to access the stomach and intestine from strange places, 
+	then I might just USE the darn'ed things!
+	Consequently, most places were a $stomach, $intestine
+	(or $gullet and $model) were passed around as arguments, 
+        no longer do. Now, just use the globals, which the inlines
+	STOMACH, INTESTINE and GULLET and MODEL return.
+	As a side effect, the `0-th' argument to CODE implementing
+	control sequences is generally the definition (for whatever
+	use that might be), or the Whatsit for constructors.
+
+      - Made DOM construction more forgiving by using SalvageError
+        when constructing a tree that doesn't conform to DTD.
+	The result may not be valid, but continues processing.
+	This led to major rewriting & cleanup of error reporting,
+	and storing a `locator' on all data objects that record
+	where in the source file they were created.
+	[Thanks to suggestions from Kevin Smith]
+      - Cleanup of math parsing, presentation mathml generation.
+      - Added postprocessing module for generating OpenMath.
+        It is insufficient, but a starting point.
+      - latexml.sty & latexml.ltxml
+        A start at providing special purpose macros that make sense
+	in LaTeX, and do even more interesting things in LaTeXML.
+	Currently, define some silly macros like \XML, \LaTeXML, etc,
+	and provide LaTeX bindings for things like DefMath!
+
+      - Sadly, I gave up on "overload".  Nice idea, but 
+        for a big package, it's tricky to get right.
+	The magic creation of methods can lead to hard-to-find
+	performance issues, if you try to do to much with Stringify.
+	So, Object doesn't use overload.  To stringify or compare,
+	consider the (newly exported functions in Global):
+	Stringify($ob), ToString($ob) and Equals($a,$b).
+
+      - added latexml.sty which should get installed in the local branch
+        of the standard texmf directories.  Not yet documented, but
+	it provides (or will) LaTeX bindings to interesting LaTeXML
+	declarations, eg. defining math commands.
+
+0.1.2 2004-09-02
+      - Some experiments to reduce namespace redundancy.
+      	C14N is too severe, use of $node->addNewChild
+  	is non-portable and awkward.
+	Kludge: leverage the namespace cleanup on _parsing_ !!
+	(which means, write to string & reparse!!!)
+	(acknowledged need on libxml2 end, but not done)
+
+      - Portability fixes to LaTeXML::Util::Pathname
+        Should work in Windows, thanks Ioan Sucan.
+
+      - Modifications to Constructor patterns
+	* Changed the `property' value pattern to '#name'
+	  (eg. #body instead of %body).        
+	  (Gratuitous, but simplifies the grammar)
+        * Values in patterns, #1 and #name can now
+	  be followed by {key}, for KeyVal arguments,
+	  to access the value associated with a given key.
+	* Conditional expressions now recognize general values:
+	  ?<value>(...) and also accept an else clause
+ 	  ?<value>(...)(...).  
+	* The NOT conditional, !<value>(...), is removed;
+	  Use ?<value>()(...) instead.
+	* Prefixing the constructor pattern with '^'
+	  allows the generated XML to `float up' to a parent
+	  node that is allowed to contain it, according to
+	  the document type.  The floats keyword for definitions
+	  is also removed.
+	* The untex strings for constructors that shouldn't appear
+	  in the math TeX string (used for image generation)
+	  should now be empty, '', instead of using the floats keyword.
+
+0.1.1 2004-06-15
+      - Packages:
+        * Made package loading more robust; doesn't re-load;
+	* Crude access to options
+	* Added several missing definitions to TeX & LaTeX
+	* Implemented comment, acronym packages;
+	  initial (mostly empty) amssymb
+
+      - General:
+        * Catch filters that don't actually change the input.
+	* Refactoring: New module Global.pm carries all exported
+	  constants and constructors to simplify coding.
+	* Refactoring: name changes & code movement of methods
+	  confusingly called `digestFoo' and similar.
+	* Refactoring: Moved macro parameter handling to new
+	  module Parameters.pm (and as side-effect had to
+	  rename parameters to Register (DefRegister, etc))
+	* More careful Token equals method, so newline can convert to
+	  a T_SPACE w/ newline inside; this means the output nominally
+	  preserves lines! (but STOMACH->setValue('preserveNewLines',0);
+	  disables it).
+	* New constructor \@VALUE fetches values from stomach during
+	  absorbtion in intestines. This (or similar) used to put
+	  reference numbers in \ref, like 2nd LaTeX pass.
+
+      - Math:
+        * Introduced new element <Math> which can contain the various
+	  alternative representations of math, such as XMath, m:math, ...
+	  Moved most of XMath's attributes to Math.
+
+      - Error/Warning Messages
+        * Added messages to show progress during processing (unless -quiet)
+	* New SalvageError message for things that in principle are errors,
+	  but we're going to try to proceed; added some things to this category,
+	  like unknown macros, and such.
+	* Added source locator to Whatsit to improve error messages.
+
+      - PostProcessing:
+        * Fixed xml catalog so it finds mathml dtd and entity files
+	* Fixed latexmlpost and LaTeXML::Post to recognize html and xhtml
+	  output formats; refined the stylesheets (LaTeXML-html.xsl and
+	  LaTeXML-xhtml.xsl (both of which include LaTeXML-base.xsl))
+
+      - Put LaTeXML tags in thier own namespace:
+            http://dlmf.nist.gov/LaTeXML
+	And first pass at fixing postprocessors to recognize this
+	[probably introduced bugs, and in any case, namespace normalization
+	 is pretty crummy]
+
+      - NEED TO DO:
+      	* Implement alltt package
+	* Question: Should XMath be duplicated before parsing?
+	  (ie w/different status=tokenized|parsed|partially-parsed|....)
+	  This would allow more inference and then re-run the parser.
+	* Extend constructor syntax to work with KeyVals, apply random functions?
+	* Refactor DOM? eg. use XML::LibXML, move more analysis to Intestine
+	  this needs (at least) resorting Font reduction.
+
+      Thanks to Michael Kohlhase <m.kohlhase@iu-bremen.de> for comments & examples
+      leading to many of these patches.
+
+0.1.0 2004-05-10
+      Initial (pre)release

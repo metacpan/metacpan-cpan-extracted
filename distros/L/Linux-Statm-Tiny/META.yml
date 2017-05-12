@@ -1,0 +1,22 @@
+---
+abstract: 'simple access to Linux /proc/../statm'
+author:
+  - 'Robert Rothenberg <rrwo@thermeon.com>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-Statm-Tiny
+requires:
+  Moo: '0'
+  MooX::Aliases: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0.16'
+  perl: v5.8.8
+resources:
+  bugtracker: https://github.com/robrwo/Linux-Statm-Tiny/issues
+  repository: git://github.com/robrwo/Linux-Statm-Tiny.git
+version: '0.0505'

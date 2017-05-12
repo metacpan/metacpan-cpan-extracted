@@ -1,0 +1,40 @@
+
+ Almost complete modules:
+  - Word::Analysis                             (missing sense support)
+  - Word                          (missing a lot of setters/selectors)
+  - Sentence    (missing some selectors, and vector inherited methods)
+  - Paragraph                                        (mostly complete)
+  - MorphAnalyzer                                 (needs more testing)
+  - RelaxTagger                                   (needs more testing)
+
+ Incomplete modules:
+  - Document
+  - ParseTree (node)
+  - ChartParser    
+  - dep_txala
+  - dep_tree (needs more test)
+
+ Module exists, does nothing yet
+  - nec
+
+ Missing modules:
+  - fex
+  - traces
+  - senses
+  - disambiguator
+  - sense_info
+  - semanticDB
+
+ Probably not needed:
+  - VectorWord
+  - ListWord
+  - ListAnalysis
+  - ListSentence
+  - ListParagraph
+  - ListString
+  - ListInt
+  - VectorListInt
+  - VectorListString
+  - TreeNode
+  - TreeDepnode
+  - dependency_parser

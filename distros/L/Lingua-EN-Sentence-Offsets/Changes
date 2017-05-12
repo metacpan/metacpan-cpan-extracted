@@ -1,0 +1,11 @@
+Changelog for Lingua-EN-Sentence-Offsets
+
+0.03 2014-03-03T11:39:31
+ - Minor publishing pipeline tweaks (AndrÃ© Santos)
+
+.02 2014-02-24T15:43:34
+ - Fixes bug which splitted sentences after abbreviations (AndrÃ© Santos)
+
+.01 2012-10-29T00:31:06
+ - fixed name in dist.ini (AndrÃ© Santos)
+

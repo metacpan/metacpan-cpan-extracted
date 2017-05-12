@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <para xml:id="p1">
+    <tabular vattach="middle">
+      <tbody>
+        <tr>
+          <td align="left">aa</td>
+          <td align="left">bb</td>
+          <td align="left"><tabular vattach="middle">
+              <tr>
+                <td align="right">c</td>
+                <td align="right">d</td>
+              </tr>
+              <tr>
+                <td align="right">e</td>
+                <td align="right">f</td>
+              </tr>
+            </tabular></td>
+        </tr>
+        <tr>
+          <td align="left">aa</td>
+          <td align="left">bb</td>
+          <td align="left"><tabular vattach="middle">
+              <tr>
+                <td align="right">c</td>
+                <td align="right">d</td>
+              </tr>
+              <tr>
+                <td align="right">e</td>
+                <td align="right">f</td>
+              </tr>
+            </tabular></td>
+        </tr>
+      </tbody>
+    </tabular>
+  </para>
+</document>

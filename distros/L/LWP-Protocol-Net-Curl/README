@@ -1,0 +1,151 @@
+NAME
+
+    LWP::Protocol::Net::Curl - the power of libcurl in the palm of your
+    hands!
+
+VERSION
+
+    version 0.023
+
+SYNOPSIS
+
+        #!/usr/bin/env perl;
+        use common::sense;
+    
+        use LWP::Protocol::Net::Curl;
+        use WWW::Mechanize;
+    
+        ...
+
+DESCRIPTION
+
+    Drop-in replacement for LWP, WWW::Mechanize and their derivatives to
+    use Net::Curl as a backend.
+
+    Advantages:
+
+      * support ftp/ftps/http/https/sftp/scp protocols out-of-box (secure
+      layer require libcurl <http://curl.haxx.se/> to be compiled with
+      TLS/SSL/libssh2 support)
+
+      * support SOCKS4/5 proxy out-of-box
+
+      * connection persistence and DNS cache (independent from
+      LWP::ConnCache)
+
+      * lightning-fast HTTP compression
+      <https://en.wikipedia.org/wiki/Http_compression> and redirection
+
+      * lower CPU usage: this matters if you fork() multiple downloader
+      instances
+
+      * asynchronous threading via Coro::Select (see eg/async.pl)
+
+      * at last but not least: 100% compatible with both LWP and
+      WWW::Mechanize test suites!
+
+LIBCURL INTERFACE
+
+    You may query which LWP protocols are implemented through Net::Curl by
+    accessing @LWP::Protocol::Net::Curl::implements or
+    %LWP::Protocol::Net::Curl::implements.
+
+    By default, every protocol listed in that array will be implemented via
+    LWP::Protocol::Net::Curl. It is possible to import only specific
+    protocols:
+
+        use LWP::Protocol::Net::Curl takeover => 0;
+        LWP::Protocol::implementor(https => 'LWP::Protocol::Net::Curl');
+
+    The default value of takeover option is true, resulting in exactly the
+    same behavior as in:
+
+        use LWP::Protocol::Net::Curl takeover => 0;
+        LWP::Protocol::implementor($_ => 'LWP::Protocol::Net::Curl')
+            for @LWP::Protocol::Net::Curl::implements;
+
+    Default curl_easy_setopt() options
+    <http://curl.haxx.se/libcurl/c/curl_easy_setopt.html> can be set during
+    initialization:
+
+        use LWP::Protocol::Net::Curl
+            encoding    => '',  # use HTTP compression by default
+            referer     => 'http://google.com/',
+            verbose     => 1;   # make libcurl print lots of stuff to STDERR
+
+    Or during runtime, using special HTTP headers (prefixed by X-CurlOpt-):
+
+        use LWP::Protocol::Net::Curl;
+        use LWP::UserAgent;
+    
+        my $ua = LWP::UserAgent->new;
+        my $res = $ua->get(
+            'https://metacpan.org/',
+            X_CurlOpt_Verbose => 1,
+        );
+
+    Options set this way have the lowest precedence. For instance, if
+    WWW::Mechanize sets the Referer: by it's own, the value you defined
+    above won't be used.
+
+DEBUGGING
+
+    Quickly enable libcurl verbose mode via PERL5OPT environment variable:
+
+        PERL5OPT=-MLWP::Protocol::Net::Curl=verbose,1 perl your-script.pl
+
+    Bonus: it works even if you don't include the use
+    LWP::Protocol::Net::Curl line!
+
+TODO
+
+      * better implementation for non-HTTP protocols
+
+      * more tests
+
+      * expose the inner guts of libcurl while handling encoding/redirects
+      internally
+
+      * revise Net::Curl::Multi "event loop" code
+
+BUGS
+
+      * sometimes still complains about Attempt to free unreferenced
+      scalar: SV 0xdeadbeef during global destruction.
+
+      * in "async mode", each LWP::UserAgent instance "blocks" until all
+      requests finish
+
+      * parallel requests via Coro::Select are very inefficient; consider
+      using YADA if you're into event-driven parallel user agents
+
+      * Net::Curl::Share support is disabled on threaded Perl builds
+
+SEE ALSO
+
+      * LWP::Protocol::GHTTP - used as a reference for LWP::Protocol
+      implementation
+
+      * LWP::Protocol::AnyEvent::http - another LWP::Protocol reference
+
+      * YADA - Net::Curl usage reference
+
+      * Net::Curl - backend for this module
+
+      * LWP::Curl - provides LWP::UserAgent-compatible API via WWW::Curl
+
+AUTHOR
+
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Stanislaw Pusep.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+CONTRIBUTOR
+
+    Peter Williams <pjwilliams@gmail.com>
+

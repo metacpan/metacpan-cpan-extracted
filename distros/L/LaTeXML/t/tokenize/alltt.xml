@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml package="alltt"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <para xml:id="p1">
+    <p>Spacing
+<verbatim font="typewriter">
+Word
+  Word
+    Word
+  Word
+Word
+</verbatim>
+OK</p>
+  </para>
+  <para xml:id="p2">
+    <p>Funny Characters
+<verbatim font="typewriter">
+a  b $ c &amp; d # e ^ f _ g % h ~ i
+</verbatim></p>
+  </para>
+  <para xml:id="p3">
+    <p>With math?
+<verbatim font="typewriter">
+a+b <Math mode="inline" tex="a+b" text="a + b" xml:id="p3.m1">
+          <XMath>
+            <XMApp>
+              <XMTok font="serif" meaning="plus" role="ADDOP">+</XMTok>
+              <XMTok font="serif italic" role="UNKNOWN">a</XMTok>
+              <XMTok font="serif italic" role="UNKNOWN">b</XMTok>
+            </XMApp>
+          </XMath>
+        </Math> a+b
+</verbatim></p>
+  </para>
+</document>

@@ -1,0 +1,23 @@
+SYNOPSIS
+
+     use Log::Any::Adapter;
+     Log::Any::Adapter->set('FileWriteRotate',
+         dir          => '/var/log',    # required
+         prefix       => 'myapp',       # required
+         #suffix      => '.log',        # default is ''
+         size         => 25*1024*1024,  # default is 10MB, unless period is set
+         histories    => 12,            # default is 10
+         #buffer_size => 100,           # default is none
+     );
+
+DESCRIPTION
+
+    This Log::Any adapter prints log messages to file through
+    File::Write::Rotate.
+
+SEE ALSO
+
+    Log::Any
+
+    File::Write::Rotate
+

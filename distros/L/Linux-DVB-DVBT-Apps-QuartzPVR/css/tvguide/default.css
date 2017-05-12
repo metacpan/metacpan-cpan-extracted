@@ -1,0 +1,110 @@
+/**********************************************************/
+/* Set to defaults */
+
+blockquote,
+body,
+dd,
+div,
+dl,
+dt,
+fieldset,
+form,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+li,
+ol,
+p,
+pre,
+td,
+textarea,
+th,
+ul {
+  margin:0;
+  padding:0;
+}
+
+fieldset,
+img {
+  border:0;
+}
+
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+strong,
+th,
+var {
+  font-style:normal;
+  font-weight:normal;
+}
+
+ol,
+ul {
+  list-style:none;
+}
+
+caption,
+th {
+  text-align:left;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size:100%;
+  font-weight:normal;
+}
+
+q:after,
+q:before {
+  content:'';
+}
+
+abbr,
+acronym {
+  border:0;
+}
+
+table {
+  border-collapse:collapse;
+  border-spacing:0;
+  font-size:inherit;
+  font-size:100%;
+}
+
+input,
+select,
+textarea {
+  font:99% arial,
+  helvetica,
+  clean,
+  sans-serif;
+}
+
+code,
+pre {
+  font:115% monospace;
+}
+
+body * {
+  line-height:1.22em;
+}
+
+
+
+/*********************************************************************/
+/* START WITH A BLACK BACKGROUND */
+body {
+  background-color: black ; 
+}

@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 0b10aa3264468f06378fa350b4c55f990154d084 Changes
+SHA1 786c1a0ae0ddf11766b712ec671448f778ce7c8d INSTALL
+SHA1 8582065cd14fffaec80bf3b157124ec6fbaef873 LICENSE
+SHA1 053858d33d49e24a221cb85b3d3fce229d4e7963 MANIFEST
+SHA1 e240b65984a07a06f9b3252fe7964f12c6065eac MANIFEST.SKIP
+SHA1 9e4785c2eedb8a53af3f6831e9c16d31d2a15d89 META.json
+SHA1 38f2402ad023356351bc2f396b63ed3c1fd69f74 Makefile.PL
+SHA1 9023eb35df8beedd8aa596dba7abce3e2fb7e227 README
+SHA1 1cb1099177cf1eb7da9c8b1e72ae1e38318f3c73 dist.ini
+SHA1 fa4138a0d8c2ebb52fbcab693ea26fc5b9190f67 lib/Leyland.pm
+SHA1 241bbdeaa47e822e8bcfbb1047ec83b9d5a4ed62 lib/Leyland/Context.pm
+SHA1 ebbd860cab3ced8ed9d88a878f00b7cada3c00db lib/Leyland/Controller.pm
+SHA1 5a8e54600ea6369089a0a99a418b48fd97aa3fec lib/Leyland/Exception.pm
+SHA1 6102b4c080ba87b365075a61f3b1bfe64ce9b344 lib/Leyland/Localizer.pm
+SHA1 979aac369b11256c34fae94a0a59f0c76cef9dab lib/Leyland/Logger.pm
+SHA1 1a459e2b948a6d923adacd1ac5b5ca5632d14e82 lib/Leyland/Manual.pod
+SHA1 44e010bb48eb47391232ca5f2338e685892a2272 lib/Leyland/Manual/Applications.pod
+SHA1 bb4b2f10208bea7a434e428352b2cda99a740131 lib/Leyland/Manual/Controllers.pod
+SHA1 e577f6c25676c600d3e4649fd72fe58c3e84f45c lib/Leyland/Manual/Deployment.pod
+SHA1 bf8d95a99b655814c816d08e15b6ff5dba55e9f0 lib/Leyland/Manual/Exceptions.pod
+SHA1 9e36eaeddd0bb6bf9e2e978a2306d6a0d94b032e lib/Leyland/Manual/Extending.pod
+SHA1 140dcea9c660b90bf47dd03d56522de397be9c82 lib/Leyland/Manual/FAQ.pod
+SHA1 fa7bf934fc492a45a5ad2b7ef009c32906b2cd41 lib/Leyland/Manual/Localization.pod
+SHA1 c4b2d3494957a0f8c614b6c9ef67eb991801e179 lib/Leyland/Manual/Logging.pod
+SHA1 0d6b058ba28d79872793521980ed701aa59c201f lib/Leyland/Manual/Models.pod
+SHA1 4e2b68dfc07243b31b5141911402290286381596 lib/Leyland/Manual/StaticFiles.pod
+SHA1 fc9b2141f7ddd6f492a53ddb961a5befff51b960 lib/Leyland/Manual/Upgrading.pod
+SHA1 58c0861f361804bcf381b45094896c952a1e39e9 lib/Leyland/Manual/Views.pod
+SHA1 8e367400861f106ab70e270af671a8feeef4d221 lib/Leyland/Negotiator.pm
+SHA1 d089bcca396ff0bd23f97b05f4b8527b9d774d26 lib/Leyland/Parser.pm
+SHA1 b35c773a2b4ca0b3b88f6e231d08171c54f361bb lib/Leyland/Parser/Route.pm
+SHA1 c44b82efbecc4322e7a2c1d5fbf89dc9922caa11 lib/Leyland/View.pm
+SHA1 1e08ff8d5b00392a1b7bfdc564d71a8e65c5d0ea lib/Leyland/View/Tenjin.pm
+SHA1 cc2d3687b7a7333938be172022fc4c85da66afb5 t/00-load.t
+SHA1 c2cfe1ed2cc90df302653c977eb32852311cb8dd t/01-simple.t
+SHA1 6b819867984cc623121263bfe38296d17223d5fb t/lib/LeylandTestApp.pm
+SHA1 f16f03126f26da955737f9555af156cfd1c8cbc5 t/lib/LeylandTestApp/Controller/Articles.pm
+SHA1 12166bfd84a1e37c307752aee9ebcb1e9c10fd49 t/lib/LeylandTestApp/Controller/Forwards.pm
+SHA1 b46ba45d442c74978e506304a9e94fb4a39cb193 t/lib/LeylandTestApp/Controller/Passes.pm
+SHA1 b24bd119c60d9f15259ce14f8907ae1056e6def9 t/lib/LeylandTestApp/Controller/Root.pm
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 e1c3a10da9c8b96c9782874613a055c39b3e0243 t/views/layouts/different.html
+SHA1 61a1d7e9abc7546b5cc238ab53aa5c98df9888ef t/views/layouts/main.html
+SHA1 a13fd8b8c25a616ee64d4b9d4ec83877f426e69c t/views/template.html
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iF4EAREIAAYFAlNKhdMACgkQa4OHQAFM10eicgEAgVrNSDMc+KUE8Pd4rjPQL3Ya
+rLhpPW4y/704Jksh7KIA/15LjDngMG/4+61R/zeYaN0ueitfHc4oUESFVGnLtBKM
+=TnHy
+-----END PGP SIGNATURE-----

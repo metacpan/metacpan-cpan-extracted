@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/List-Util-WeightedChoice.t
+lib/List/Util/WeightedChoice.pm
+META.yml                                 Module meta-data (added by MakeMaker)

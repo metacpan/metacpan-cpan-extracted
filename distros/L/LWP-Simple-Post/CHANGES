@@ -1,0 +1,18 @@
+Revision history for Perl extension LWP::Simple::Post.
+
+0.05  Wed Mar 30 06:35:00 2010
+	- Tidied everything up considerably
+
+0.04  Fri Dec 30 15:20:00 2005
+	- Removed a global $ua which was causing problems
+
+0.03  Tue Oct 18 01:52:00 2005
+	- Fixed minor POD error
+
+0.02  Sat Aug 20 10:40:00 2005
+  + Added a post_xml() method
+
+0.01  Tue Aug  9 10:47:10 2005
+	- original version; created by h2xs 1.9 with options
+		-AXc -n LWP::Simple::Post
+

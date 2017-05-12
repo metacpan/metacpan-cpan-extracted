@@ -1,0 +1,261 @@
+# PODNAME: Log::Any::Adapter::Development
+# ABSTRACT: Manual for developing new Log::Any adapters
+
+
+# vim: ts=4 sts=4 sw=4 et tw=75:
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Log::Any::Adapter::Development - Manual for developing new Log::Any adapters
+
+=head1 VERSION
+
+version 1.049
+
+=head1 SYNOPSIS
+
+The adapter module:
+
+   package Log::Any::Adapter::YAL;
+   use strict;
+   use warnings;
+   use Log::Any::Adapter::Util ();
+   use base qw(Log::Any::Adapter::Base);
+
+   # Optionally initialize object, e.g. for delegation
+   #
+   sub init {
+       my ($self) = @_;
+
+       $self->{attr} = ...;
+   }
+
+   # Create logging methods: debug, info, etc.
+   #
+   foreach my $method ( Log::Any::Adapter::Util::logging_methods() ) {
+       no strict 'refs';
+       *$method = sub { ... };
+   }
+
+   # Create detection methods: is_debug, is_info, etc.
+   #
+   foreach my $method ( Log::Any::Adapter::Util::detection_methods() ) {
+       no strict 'refs';
+       *$method = sub { ... };
+   }
+
+and the application:
+
+   Log::Any->set_adapter('YAL');
+
+=head1 DESCRIPTION
+
+This document describes how to implement a new Log::Any adapter.
+
+The easiest way to start is to look at the source of existing adapters, such as
+L<Log::Any::Adapter::Log4perl|Log::Any::Adapter::Log4perl> and
+L<Log::Any::Adapter::Dispatch|Log::Any::Adapter::Dispatch>.
+
+=head1 NAMING
+
+If you are going to publicly release your adapter, call it
+'Log::Any::Adapter::I<something>' so that users can use it with
+
+    Log::Any->set_adapter(I<something>);
+
+If it's an internal driver, you can call it whatever you like and use it like
+
+    Log::Any->set_adapter('+My::Log::Adapter');
+
+=head1 BASE CLASS
+
+All adapters must directly or indirectly inherit from
+L<Log::Any::Adapter::Base>.
+
+=head1 LOG LEVELS
+
+Log::Any supports the following log levels:
+
+=for :list * trace
+* debug
+* info
+* notice
+* warning
+* error
+* critical
+* alert
+* emergency
+
+If the logging mechanism used by your adapter supports different levels,
+it's your responsibility to map them appropriately when you implement the
+logging and detection methods described below.  For example, if your
+mechanism only supports "debug", "normal" and "fatal" levels, you might map
+the levels like this:
+
+=for :list * debug: trace, debug
+* normal: info, notice, warning
+* fatal: error, critical, alert, emergency
+
+=head1 METHODS
+
+=head2 Constructor
+
+The constructor (C<new>) is provided by
+L<Log::Any::Adapter::Base|Log::Any::Adapter::Base>. It will:
+
+=for :list * place any adapter arguments into a hash, along with the category
+* bless the hash into your subclass
+* call L</init> which may be optionally provided by your subclass
+
+At this point, overriding the default constructor is not supported. Hopefully
+it will not be needed.
+
+The constructor is called whenever a log object is requested. e.g. If the
+application initializes Log::Any like so:
+
+    Log::Any->set_adapter('Log::YAL', yal_object => $yal, depth => 3);
+
+and then a class requests a logger like so:
+
+    package Foo;
+    use Log::Any qw($log);
+
+Then C<$log> will be populated with the return value of:
+
+    Log::Any::Adapter::Yal->new(yal_object => $yal, depth => 3, category => 'Foo');
+
+This is memoized, so if the same category should be requested again (e.g.
+through a separate C<get_logger> call, the same object will be returned.
+Therefore, you should try to avoid anything non-deterministic in your L</init>
+function.
+
+=head2 Logging methods (required)
+
+The following methods have no default implementation, and MUST be defined by
+your subclass:
+
+=for :list * debug ($msg)
+* info ($msg)
+* notice ($msg)
+* warning ($msg)
+* error ($msg)
+* critical ($msg)
+* alert ($msg)
+* emergency ($msg)
+
+These methods must log a message at the specified level.
+
+To help generate these methods programmatically, you can get a list of the
+sub names with the
+L<Log::Any::Adapter::Util::logging_methods|Log::Any::Adapter::Util/logging_methods>
+function.
+
+=head2 Log-level detection methods (required)
+
+The following methods have no default implementation, and MUST be defined by
+your subclass:
+
+=for :list * is_debug ()
+* is_info ()
+* is_notice ()
+* is_warning ()
+* is_error ()
+* is_critical ()
+* is_alert ()
+* is_emergency ()
+
+These methods must return a boolean indicating whether the specified level is
+active, i.e. whether the adapter is listening for messages of that level.
+
+To help generate these methods programmatically, you can get a list of the
+sub names with the
+L<Log::Any::Adapter::Util::detection_methods|Log::Any::Adapter::Util/detection_methods>
+function.
+
+=head2 Aliases
+
+Aliases (e.g. "err" for "error") are handled by L<Log::Any::Proxy> and will
+call the corresponding real name in your adapter class.  You do not need to
+implement them in your adapter.
+
+=head2 Optional methods
+
+The following methods have no default implementation but MAY be provided by
+your subclass:
+
+=over
+
+=item init
+
+This is called after the adapter object is created and blessed into your class.
+Perform any necessary validation or initialization here.  For example, you
+would use C<init> to create a logging object for delegation, or open a file
+or socket, etc.
+
+=back
+
+=head2 Support methods
+
+The following L<Log::Any::Adapter::Base> method may be useful for defining
+adapters via delegation:
+
+=over
+
+=item delegate_method_to_slot ($slot, $method, $adapter_method)
+
+Handle the specified C<$method> by calling C<$adapter_method> on the object
+contained in C<< $self->{$slot} >>.
+
+See L<Log::Any::Adapter::Dispatch> and L<Log::Any::Adapter::Log4perl> for
+examples of usage.
+
+=back
+
+The following L<Log::Any::Adapter::Util> functions give you a list of
+methods that you need to implement.  You can get logging methods, detection
+methods or both:
+
+=for :list * L<Log::Any::Adapter::Util::logging_methods|Log::Any::Adapter::Util/logging_methods>
+* L<Log::Any::Adapter::Util::detection_methods|Log::Any::Adapter::Util/detection_methods>
+* L<Log::Any::Adapter::Util::logging_and_detection_methods|Log::Any::Adapter::Util/logging_and_detection_methods>
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Jonathan Swartz <swartz@pobox.com>
+
+=item *
+
+David Golden <dagolden@cpan.org>
+
+=item *
+
+Doug Bell <preaction@cpan.org>
+
+=item *
+
+Daniel Pittman <daniel@rimspace.net>
+
+=item *
+
+Stephen Thirlwall <sdt@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jonathan Swartz, David Golden, and Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

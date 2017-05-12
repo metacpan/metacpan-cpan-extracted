@@ -1,0 +1,6 @@
+#!/bin/sh
+message-pass --input ZeroMQ \
+ --input_options \
+ '{"socket_bind":"tcp://*:5558"}' \
+ --output STDOUT
+

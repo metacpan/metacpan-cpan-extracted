@@ -1,0 +1,21 @@
+dial25.avalon.net - - [02/Jun/1996:16:23:58 -0400] "GET /mall/os/ HTTP/1.0" 200 1470
+dial25.avalon.net - - [02/Jun/1996:16:24:09 -0400] "GET /mall/os/os_ri.htm HTTP/1.0" 200 1432
+dial25.avalon.net - - [02/Jun/1996:16:24:23 -0400] "GET /mall/os/unrestri.htm HTTP/1.0" 200 1745
+dial25.avalon.net - - [02/Jun/1996:16:24:33 -0400] "GET /mall/os/SW/ HTTP/1.0" 401 -
+minbar.cs.washington.edu - - [02/Jun/1996:16:24:40 -0400] "GET /~watkins/jeff/d0001/g0000056.htm HTTP/1.0" 200 47458
+minbar.cs.washington.edu - - [02/Jun/1996:16:24:42 -0400] "GET /~watkins/jeff/d0001/g0000055.htm HTTP/1.0" 200 46496
+ip245.phx.primenet.com - - [02/Jun/1996:16:24:47 -0400] "GET /~rsalz/xxx.html HTTP/1.0" 404 -
+dial25.avalon.net - - [02/Jun/1996:16:25:09 -0400] "GET /mall/os/mklinux.html HTTP/1.0" 200 1551
+143.132.46.11 - - [02/Jun/1996:16:25:30 -0400] "GET /graphics/bos-area-map.gif HTTP/1.0" 200 523913
+dial25.avalon.net - - [02/Jun/1996:16:25:40 -0400] "GET /cgi-bin/mall/register HTTP/1.0" 200 848
+www.arizona.edu - - [02/Jun/1996:16:24:42 -0400] "GET /~watkins/jeff/d0001/g0000055.htm HTTP/1.0" 200 46496
+ingate.tdev.to.djttd.com - name@host.uwaterloo.ca [03/Jun/1996:10:31:26 -0400] "GET /mall/web/SW-java/java_rpt.ps.tar.gz HTTP/1.0" 200 231660
+hbjin.keri.re.kr - another@host.keri.re.kr [03/Jun/1996:10:32:29 -0400] "GET /mall/web/SW-java/osfjdk1.0.1-decunix32.tar.gz HTTP/1.0" 200 4196971
+ingate.tdev.to.djttd.com - name@host.uwaterloo.ca [03/Jun/1996:10:33:23 -0400] "GET /mall/web/SW-java/java_rpt.ps.tar.gz HTTP/1.0" 200 40960
+
+
+
+
+
+
+

@@ -1,0 +1,53 @@
+==================================================
+Changes from 2012-08-15 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.023 at 2013-08-15 17:08:41 +0000
+------------------------------------------
+
+  Change: a1eed1260e5bea0eaf68f3b73a139909963672d5
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-15 13:01:43 +0000
+
+    Add MANIFEST.SKIP. 
+
+------------------------------------------
+version 1.022 at 2013-08-11 20:02:26 +0000
+------------------------------------------
+
+  Change: 930f3b70a5ff468ed48ae218638fcfd5d6e34838
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-11 16:02:26 +0000
+
+    Update copyright date. 
+
+  Change: 42a9e410cedd1a656fc88f5d2db4fee9706c1ec6
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-11 15:57:08 +0000
+
+    Merge branch 'master' of github.com:rcaputo/lexical-persistence 
+
+  Change: 5288e78f14d4459af3e1e48556909aa6c01e3ef1
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-11 15:54:44 +0000
+
+    Switch to Dist::Zilla. 
+
+  Change: e59502b75249ab6f0c902f876003cb3119e3612c
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-03 20:16:42 +0000
+
+    Merge pull request #2 from dsteinbrunner/patch-1
+
+    Documentation typo fix. 
+
+  Change: 804c7f59f50be69d7ae6091b02f1c5a93dafcf18
+  Author: David Steinbrunner <dsteinbrunner@pobox.com>
+  Date : 2013-07-21 20:21:49 +0000
+
+    typo fix 
+
+================================================
+Plus 6 releases after 2012-08-15 00:00:00 +0000.
+================================================

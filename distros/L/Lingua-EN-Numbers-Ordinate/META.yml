@@ -1,0 +1,24 @@
+---
+abstract: 'go from cardinal number (3) to ordinal ("3rd")'
+author:
+  - 'Sean Burke <sburke@bowers.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-EN-Numbers-Ordinate
+requires:
+  Exporter: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilbowers/Lingua-EN-Numbers-Ordinate
+  repository: https://github.com/neilbowers/Lingua-EN-Numbers-Ordinate.git
+version: '1.04'

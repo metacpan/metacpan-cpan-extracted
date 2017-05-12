@@ -1,0 +1,35 @@
+#!perl
+
+use strict;
+use warnings;
+use 5.010;
+use Carp;
+
+use IO::File;
+
+use Test::More;
+use Lembas;
+
+{
+    package LembasWrap;
+    our $hg_changeset_re = qr/[a-f0-9]{12}/;
+}
+
+my $filename = shift
+    or croak "USAGE: lembas FILE";
+
+my $specs = IO::File->new($filename, 'r')
+    or BAIL_OUT("Can't open test file at '$filename': $!");
+
+my $retval;
+
+eval {
+    my $lembas = Lembas->new_from_test_spec(handle => $specs);
+    $lembas->run;
+};
+
+if (my $error = $@) {
+    BAIL_OUT($error);
+}
+
+done_testing;

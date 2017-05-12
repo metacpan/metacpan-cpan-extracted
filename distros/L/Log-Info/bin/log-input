@@ -1,0 +1,753 @@
+#!/usr/bin/perl -w
+
+# (X)Emacs mode: -*- cperl-mode -*-
+
+=head1 NAME
+
+log_input - run a command, collecting all stdout & stderr to file
+
+=head1 DESCRIPTION
+
+Take a command line, run this command as a child process, collection all
+output into a specified logfile, with timestamps.
+
+When a signal is received, it will be logged.  If the signal is a SIGCONT, the
+logger will check to see how many children are still alive, and log that
+count.  If the signal is a SIGHUP or SIGTERM, the child process will be
+killed, before log_input itself exits (with whatever exit code the child
+exited with).
+
+For each line of output received from the child, the log file is checked to
+see if it would exceed 1Gb.  If it would, then the log file is closed, renamed
+to include a timestamp (of the time of closure), and a new log file with the
+original name is opened.
+
+=cut
+
+# Pragmas --------------------------------------------------------------------
+
+use strict;
+use sigtrap
+  handler => \&handle_signal, qw( error-signals normal-signals
+					    QUIT CONT );
+
+# Utility --------------------------------------------------------------------
+
+use Carp;
+use Config;
+use Fcntl qw( SEEK_END );
+use FileHandle;
+use Getopt::Long qw( GetOptions );
+use IO::Pipe;
+use IO::Select;
+BEGIN {
+  eval { require Pod::Usage; Pod::Usage->import (qw( pod2usage )); 1 }
+    or *{pod2usage} = sub { die "Pod::Usage not found :-(\n" };
+}
+use POSIX        qw( :sys_wait_h );
+
+# Constants ---------------------------
+
+use constant FILE_RESTART_SAVE_LINES  => 128;
+
+# Globals --------------------------------------------------------------------
+
+my $NoArchive = 0;
+my $PreserveLines = FILE_RESTART_SAVE_LINES;
+
+my $logger;
+my $nohup = 0;
+
+my $stdin_fp;
+my $stder_fp;
+my $init_ok;
+my $command;
+my $pid;
+
+my %sig_num;
+my @sig_name;
+unless ($Config{sig_name} && $Config{sig_num}) {
+  die "No sigs?\n";
+} else {
+  my @names = split ' ', $Config{sig_name};
+  @sig_num{@names} = split ' ', $Config{sig_num};
+  foreach (@names) {
+    $sig_name[$sig_num{$_}] ||= $_;
+  }
+}
+
+# Classes --------------------------------------------------------------------
+
+# log_input ------------------------------------------------------------------
+
+package log_input;
+
+use Fcntl        qw( :flock );
+
+# Constants ------------------------------------------------------------
+
+use constant DEFAULT_FILE_MAX         => 1 * 1024 ** 3; # 1Gb
+# The number of log lines of the file to save when restarting a log file
+# without archiving
+use constant BUFFER_SIZE              => 8192;
+
+# Exception types:
+
+use constant EX_LOG_CLOSE	=> 'log close';
+use constant EX_LOG_OPEN	=> 'log open';
+use constant EX_LOG_WRITE	=> 'log write';
+use constant EX_LOG_LOCK 	=> 'log lock';
+use constant EX_STDIN_CLOSE	=> 'stdin close';
+
+# Exception error messages:
+
+use constant EXCEPTION_MESSAGES	=>
+  (
+   EX_LOG_CLOSE()	=> 'Failed to close log file: __LOG_FILE__',
+   EX_LOG_OPEN()	=> 'Failed to open log file: __LOG_FILE__',
+   EX_LOG_WRITE()	=> 'Failed to write to log file: __LOG_FILE__',
+   EX_STDIN_CLOSE()	=> 'Failed to close standard input.',
+   EX_LOG_LOCK()        => 'Failed to attain file lock on log file: __LOG_FILE__',
+   _DEFAULT		=>
+     'Unknown fatal exception occured. Log file: __LOG_FILE__',
+  );
+
+# Fixed line formats:
+
+use constant LINE_BREAK		=> '=' x 54;
+# A leader string for log-generated lines.
+use constant LEADER		=> '++';
+
+# Subrs ----------------------------------------------------------------
+
+sub date_stamp {
+  my $self = shift;
+
+  return scalar (localtime);
+}
+
+# ----------------------------------
+
+=head2	exit_status
+
+=over 4
+
+=item	ARGUMENTS
+
+=item	*
+
+If provided, set the exit status to this.
+
+=item	RETURNS
+
+=over 4
+
+=item	*
+
+The exit status of the logged process, or undef if it has not yet
+finished.
+
+=back
+
+=back
+
+=cut
+
+sub exit_status {
+  my $self = shift;
+  $self->{exit_status} = $_[0]
+    if @_;
+  return ( exists $self->{exit_status} ) ? $self->{exit_status} : undef;
+}
+
+# ----------------------------------
+
+=head2	log_file
+
+=over 4
+
+=item	ARGUMENTS
+
+=item	*
+
+If provided, set the log file (handle) to this.
+
+=item	RETURNS
+
+=over 4
+
+=item	*
+
+The file handle of the log file.
+
+=back
+
+=back
+
+=cut
+
+sub log_file {
+  my $self = shift;
+  if ( @_ ) {
+    $_[0]->autoflush;
+    flock $_[0], LOCK_EX | LOCK_NB
+      or $self->raise_io_exception (EX_LOG_LOCK);
+    $self->{log_file} = $_[0];
+  }
+  return $self->{log_file};
+}
+
+# ----------------------------------
+
+=head2	log_file_name
+
+=over 4
+
+=item	ARGUMENTS
+
+=item	*
+
+If provided, set the log file (name) to this.
+
+=item	RETURNS
+
+=over 4
+
+=item	*
+
+The file name of the log file.
+
+=back
+
+=back
+
+=cut
+
+sub log_file_name {
+  my $self = shift;
+  $self->{log_file_name} = $_[0]
+    if @_;
+  return $self->{log_file_name};
+}
+
+# ----------------------------------
+
+sub raise_io_exception {
+  my $self = shift;
+  my ($excptn_type) = @_;
+
+  my %messages = (EXCEPTION_MESSAGES());
+  my $message = $messages{$excptn_type} || $messages{_DEFAULT};
+  $message =~ s/__LOG_FILE__/$self->log_file_name/eg;
+
+  Carp::confess $message;
+}
+
+# ----------------------------------
+
+sub read_args {
+  my $self = shift;
+  my ($log_file_name, @command) = @_;
+
+  $self->log_file_name ($log_file_name);
+  $command = join (' ', @command);
+}
+
+# ----------------------------------
+
+my (@SAVE1, @SAVE2);
+
+sub write_to_log {
+  my $self = shift;
+  my ($typ, @msg) = @_;
+
+return if $self->finalized;
+
+  for (@msg) {
+#    die "tell doesn't work with >> files in perl 5.8.0+\n"
+#      if $] >= 5.008;
+    my $new_size = $self->log_file->tell + length;
+    if ( $new_size > $self->{file_max} ) {
+      $self->log_file->close
+        or $self->raise_io_exception ("close");
+      if ( $NoArchive ) {
+        unlink $self->log_file_name;
+      } else {
+        my ($dd, $mm, $yy) = (gmtime)[3..5];
+        my $tname = sprintf ("%s-%d-%02d-%02d", $self->log_file_name,
+                             $yy+1900, $mm+1, $dd);
+        my $tail = '00';
+        $tail++
+          while -e join '-', $tname, $tail;
+        rename $self->log_file_name, join '-', $tname, $tail
+          or $self->raise_io_exception ("rename");
+      }
+      $self->open_log;
+      if ( $NoArchive ) {
+        my ($new_save, $old_save) =
+          ( @SAVE1 == $PreserveLines ) ?
+          ( \@SAVE2, \@SAVE1 ) : ( \@SAVE1, \@SAVE2 );
+        for ( @$old_save[@$new_save..$PreserveLines-1], @$new_save ) {
+          $self->log_file->print("$_\n")
+            or $self->raise_io_exception ("write");
+        }
+      }
+    }
+
+    my $line = join('',
+                    '[', join (' ', time, $self->date_stamp, $typ), ']', ' ',
+                    $_);
+
+    if ( @SAVE1 == $PreserveLines ) {
+      push @SAVE2, $line;
+      @SAVE1 = ()
+        if @SAVE2 == $PreserveLines;
+    } else {
+      push @SAVE1, $line;
+      @SAVE2 = ()
+        if @SAVE1 == $PreserveLines;
+    }
+
+    unless ( $self->log_file->print("$line\n") ) {
+      $self->raise_io_exception ("write");
+    }
+  }
+}
+
+# ----------------------------------
+
+sub write_init_string {
+  my $self = shift;
+
+  my $init_str =
+    join ("\n",
+	  LINE_BREAK,
+	  join (" ", "@{[LEADER()]}Command: ", $command),
+	  join (" ", "@{[LEADER()]}Process started at ",  $self->date_stamp),
+	  "\n");
+
+  $self->log_file->print ($init_str)
+    or $self->raise_io_exception (EX_LOG_WRITE);
+}
+
+# ----------------------------------
+
+sub init {
+  my $self = shift;
+
+  $self->open_log;
+
+  if ( $self->log_file_open ) {
+    $self->write_init_string;
+    $init_ok = 1;
+
+    my $outpipe = IO::Pipe->new;
+    my $errpipe = IO::Pipe->new;
+
+    $pid = fork;
+    die "Couldn't fork: $!\n"
+      unless defined $pid;
+
+    unless ( $pid ) {
+      # Child
+      $outpipe->writer;
+      $errpipe->writer;
+
+      $SIG{HUP} = 'IGNORE'
+	if $self->{nohup};
+      # Set process group for potential infanticide
+      setpgrp;
+
+      if ( $] >= 5.008 ) {
+        close STDOUT;
+        close STDERR;
+        open STDOUT, '>&', $outpipe->fileno;
+        open STDERR, '>&',  $errpipe->fileno;
+      } else {
+        open STDOUT, '>& ' . $outpipe->fileno;
+        open STDERR, '>& ' . $errpipe->fileno;
+      }
+
+      exec $command;
+    }
+
+    # Parent
+    $outpipe->reader;
+    $errpipe->reader;
+
+    # Stick red-hot poker up buffers
+    { my $old = select STDERR; $| = 1; select $old }
+    { my $old = select STDOUT; $| = 1; select $old }
+
+    $stdin_fp = $outpipe;
+    $stder_fp = $errpipe;
+  } else {
+    $self->raise_io_exception (EX_LOG_OPEN);
+  }
+}
+
+# ----------------------------------
+
+sub open_log {
+  my $self = shift;
+
+  $self->log_file (new FileHandle ">> " . $self->log_file_name)
+}
+
+# ----------------------------------
+
+sub log_file_open {
+  my $self = shift;
+  return defined $self->log_file;
+}
+
+# ----------------------------------
+
+sub write_final_string {
+  my $self = shift;
+
+  my $final_str = join ('',
+			"\n@{[LEADER()]}Process finished at ",
+			$self->date_stamp,
+			"\n", LINE_BREAK, "\n");
+  if ( not defined ($self->log_file->print ($final_str)) ) {
+    $self->raise_io_exception ("write");
+  }
+}
+
+# ----------------------------------
+
+sub finalize_log {
+  my $self = shift;
+  my ($status) = @_;
+
+  return if $self->finalized;
+  return unless defined $self->log_file;
+
+  if ( ! defined $status ) {
+    my $err = waitpid $pid, 0;
+    $status = $?;
+
+    if ( $err = $pid ) {
+      $self->exit_status ($status);
+    } else {
+      $self->write_to_log
+	('XXX',
+	 "Waitpid couldn't reap child: $pid (?status $status)", $command)
+	  unless $err == $pid;
+    }
+  }
+
+  my $exit_value  = $status >> 8;
+  my $exit_signal = $status & 127;
+  my $exit_core   = $status & 128;
+
+  $self->write_to_log
+    ('---',
+     "Command $command failed:",
+     "Exit Value: $exit_value; " .
+     "Signal: $exit_signal; " .
+     "Core: $exit_core\n")
+      if $status;
+
+  $self->write_final_string;
+  if ( ! defined $self->log_file->close ) {
+    $self->raise_io_exception (EX_LOG_CLOSE);
+  }
+
+  if ( $exit_value ) {
+    $self->exit_status ($exit_value);
+  } elsif ( $status ) {
+    # Signal rec'd
+    $self->exit_status (255);
+  }
+
+  $self->{finalized} = 1;
+}
+
+# -------------------------------------
+
+sub finalized {
+  my $self = shift;
+  return exists $self->{finalized} and $self->{finalized} == 1;
+}
+
+# ----------------------------------
+
+sub read_input {
+  my $self = shift;
+
+  my $selector = IO::Select->new;
+  $selector->add ($stdin_fp);
+  $selector->add ($stder_fp);
+
+  my ($outbuf, $errbuf, $dufbuf) = ('') x 3;
+  my ($readcount, @lines);
+  my ($outname, $bufr);
+
+  while ( $selector->count ) {
+    # Block waiting for read.
+    my @can_read = $selector->can_read;
+
+    foreach my $fh (@can_read) {
+      if ( $fh eq $stdin_fp ) {
+	$outname = 'out';
+	$bufr = \$outbuf;
+      } elsif ($fh eq $stder_fp) {
+	$outname = 'err';
+	$bufr = \$errbuf
+      } else {
+	$outname = '???';
+	$bufr = \$dufbuf;
+      }
+
+      $readcount = $fh->sysread ($$bufr, BUFFER_SIZE, length $$bufr);
+      if ( $readcount ) {
+	@lines = grep $_ ne '', split /(.*\n)/, $$bufr;
+	if ( substr ($lines[-1], -1) ne "\n" ) {
+	  $$bufr = splice @lines, -1;
+	} else {
+	  $$bufr = '';
+	}
+
+	$self->write_to_log ($outname, $_)
+	  for map { chomp; $_ } @lines;
+      } else {
+        $selector->remove ($fh);
+      }
+    }
+  }
+}
+
+# ----------------------------------
+
+sub make {
+  my $class = shift;
+  my ($nohup, $file_max) = @_;
+
+  $file_max ||= DEFAULT_FILE_MAX;
+
+  bless { nohup => $nohup,
+	  file_max => $file_max, }, $class;
+}
+
+# Subrs ----------------------------------------------------------------------
+
+package main;
+
+sub handle_signal {
+  my ($sig) = @_;
+  if ( defined $logger ) {
+    $logger->write_to_log ('sig', "Caught a SIG$sig");
+    if ( $sig eq 'CONT' ) {
+      my $children = kill 0, -$pid;
+      $logger->write_to_log ('sig', "$children children still around");
+    }
+
+    elsif ( $sig =~ /^(?:TERM|QUIT|INT)$/
+	    or
+	    $sig eq 'HUP' and ! $nohup ) {
+      $logger->write_to_log ('sig', "Passing $sig onto children");
+      kill $sig_num{$sig} => -$pid;
+      eval {
+	local $SIG{ALRM} = sub { die "alarm\n" };
+	alarm 1;
+	my $reaped = waitpid $pid, 0;
+	alarm 0;
+	$logger->finalize_log ($?);
+      }; if ($@) { die unless $@ eq "alarm\n" }
+
+      # Increasing brutality
+
+      for (grep $_ ne $sig, qw( INT QUIT TERM )) {
+	last unless kill 0, -$pid;
+	$logger->write_to_log ('sig', "Trying to kill children with $_");
+	kill $sig_num{$_} => -$pid;
+	eval {
+	  local $SIG{ALRM} = sub { die "alarm\n" };
+	  alarm 1;
+	  my $reaped = waitpid $pid, 0;
+	  alarm 0;
+	  $logger->finalize_log ($?);
+	}; if ($@) { die unless $@ eq "alarm\n" }
+
+	my $left = kill (0, -$pid);
+	if ( $left ) {
+	  $logger->write_to_log ('sig', "$left children left");
+	} else {
+	  last;
+	}
+      }
+
+      if ( kill 0, -$pid ) {
+	$logger->write_to_log ('sig', "Trying hardest to kill children");
+	kill $sig_num{KILL} => -$pid;
+	eval {
+	  local $SIG{ALRM} = sub { die "alarm\n" };
+	  alarm 1;
+	  my $reaped = waitpid $pid, 0;
+	  alarm 0;
+	  $logger->finalize_log ($?);
+	}; if ($@) { die unless $@ eq "alarm\n" }
+
+	$logger->write_to_log ('sig', join (' ', kill (0, -$pid),
+					    " children left"));
+      }
+
+      $logger->write_to_log ('sig', "Exiting now.  Bye.");
+
+      $logger->finalize_log
+	unless $logger->finalized;
+      exit $logger->exit_status;
+    }
+  } else {
+    print STDERR "Caught a SIG$sig\n";
+  }
+
+  return 1;
+}
+
+# Main -----------------------------------------------------------------
+
+package main;
+
+=head1 SYNOPSIS
+
+log_input [options] <logfile> <command>
+
+  option:          Value     Default   Unit   Meaning
+  -h|--nohup       boolean   false            Ignore SIGHUP in child
+  -m|--maxsize     int       1Gb              Maximum log size in bytes
+  -A|--noarchive   boolean   false            Don't archive old logs
+  --preserve-lines int       128              Keep n lines if not archiving(-A)
+  --help                                      Produce summary help on stdout
+  --longhelp                                  Produce long help on stdout
+  --man                                       Produce full man page on stdout
+
+C<logfile> is a single shell word.  C<command> may be multiple shell words.
+
+=head1 OPTIONS
+
+Options come in short (single-character) and/or long forms.  Short options are
+preceded by a single dash (-x), whilst long options are preceded by a
+double-dash (--option).  Long options may be abbreviated to the minimal
+distinct prefix.  Single char options may be bundled (-v -a -x == -vax),
+values may be interspersed (-v 1 -a 2 -x 3 == -v1a2x3).  Options taking string
+values will assume that anything immediately following is a string value, even
+if the string is optional and/or the "value" could be interpreted as another
+option (if -v takes a string, -vax will give the value "ax" to the option -v).
+Options which are boolean must use the long form to negate, prefixed by
+"no_" (--foo may be negated by --no_foo).
+
+log_input will only see options presented prior to the specification of the
+logfile.  Logfiles with names beginning with '-' are not usable.  Any options
+presented after the logfile will be considered as part of the command to run.
+
+=over 4
+
+=item nohup|h
+
+Attempt to ignore the NOHUP signal in the logger and child; this is useful if
+you may want to detach the controlling terminal, for example.  See L<nohup>.
+
+Note that we cannot promise that the child will ignore it, unfortunately.  If
+the child installs its own HUP handler, we can not affect it.
+
+=item maxsize|m
+
+The maximum permissable size for a log file.  Once this size is reached, the
+logfile will be moved to a timestamped name, and a new one opened.  The size
+is given in bytes.
+
+=item noarchive|A
+
+Don't create archive files when the log gets cleaned (due to exceeding the
+maximum size).  Instead, just restart the log file (preserving the last n
+lines, where n is preserve-lines)
+
+=item preserve-lines
+
+The number of log lines to preserve when rotating but not archiving logs.
+Note that up to twice this number of lines are kept in memory whilst running,
+so a larger number increases the memory footprint.  Also be careful that the
+total size of the lines does not itself exceed the maxsize, to avoid
+unpredictable behaviour.  Defaults to 128.
+
+=item help
+
+Print a brief help message and exits.
+
+=item longhelp
+
+Print a longer help message and exits.
+
+=item man
+
+Prints the manual page and exits.
+
+=back
+
+=cut
+
+my $maxsize;
+
+Getopt::Long::Configure (qw[ auto_abbrev no_getopt_compat
+                             bundling ignore_case require_order ]);
+GetOptions ('h|nohup'          => \$nohup,
+	    'm|maxsize=i'      => \$maxsize,
+            'A|noarchive'      => \$NoArchive,
+            'preserve-lines=i' => \$PreserveLines,
+
+	    'help'           => sub { pod2usage ( -exitval => 1,
+                                                  -verbose => 0,
+                                                  -output  => \*STDOUT, ) },
+            'longhelp'       => sub { pod2usage ( -exitval => 1,
+                                                  -verbose => 1,
+                                                  -output  => \*STDOUT, ) },
+            'man'            => sub { pod2usage ( -exitval => 1,
+                                                  -verbose => 2,
+                                                  -output  => \*STDOUT, ) },
+           )
+  or exit 2;
+
+pod2usage ( -message => 'No command was provided!',
+            -exitval => 2,
+            -verbose => 0,
+            -output  => \*STDERR, )
+  unless @ARGV > 1;
+
+my $exit_status = 1;
+
+$logger = log_input->make ($nohup, $maxsize);
+
+$logger->read_args (@ARGV);
+$logger->init;
+if ( $init_ok ) {
+  $logger->read_input;
+  $logger->finalize_log;
+}
+
+exit ($logger->exit_status);
+
+END {
+  if ( defined $logger ) {
+    $logger->finalize_log
+      unless $logger->finalized;
+  }
+}
+
+
+=head1	AUTHOR
+
+Martyn J. Pearce fluffy@cpan.org
+
+ Copyright (c) 2001 Martyn J. Pearce.  This program is free software; you can
+ redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1	SEE ALSO
+
+Z<>
+
+=cut
+
+__END__

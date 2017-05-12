@@ -1,0 +1,22 @@
+@numbers = (
+   -2 => undef,
+   -1 => undef,
+	0 => undef,			# 'zéroième' ???
+	1 => 'premier',
+	2 => 'deuxième',
+	5 => 'cinquième',
+	9 => 'neuvième',
+	20 => 'vingtième',
+	21 => 'vingt et unième',
+	25 => 'vingt-cinquième',
+	29 => 'vingt-neuvième',
+	80 => 'quatre-vingtième',	    # https://rt.cpan.org/Ticket/Display.html?id=1772
+	83 => 'quatre-vingt-troisième',	# ...
+	100 => 'centième',
+	101 => 'cent unième',
+	326 => 'trois cent vingt-sixième',
+	1000 => 'millième',
+	1001 => 'mille unième',	# should be 'mille et unième' ?
+	2439 => 'deux mille quatre cent trente-neuvième',
+	5_000_323 => 'cinq millions trois cent vingt-troisième',
+);

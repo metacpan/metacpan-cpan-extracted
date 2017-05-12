@@ -1,0 +1,26 @@
+---
+abstract: 'Logging to Growl'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Dispatch-Growl
+requires:
+  File::Basename: 0
+  Growl::Any: 0
+  Log::Dispatch::Output: 0
+  Params::Validate: 0
+resources:
+  bugtracker: https://github.com/gugod/Log-Dispatch-Growl/issues
+  repository: git://github.com/gugod/Log-Dispatch-Growl.git
+version: 1.0.0

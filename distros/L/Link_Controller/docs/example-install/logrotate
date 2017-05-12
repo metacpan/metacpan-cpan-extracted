@@ -1,0 +1,13 @@
+/home/sca/link-data/link-test.log {
+	compress
+	daily
+	delaycompress
+	rotate 10
+}
+
+/home/sca/link-data/link-extract.log {
+	compress
+	daily
+	delaycompress
+	rotate 10
+}

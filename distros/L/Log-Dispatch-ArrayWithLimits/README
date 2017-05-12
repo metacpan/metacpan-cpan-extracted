@@ -1,0 +1,57 @@
+SYNOPSIS
+
+     use Log::Dispatch::ArrayWithLimits;
+    
+     my $file = Log::Dispatch::ArrayWithLimits(
+         min_level     => 'info',
+         array         => $ary,    # default: [], you can always refer by name e.g. 'My::array' to refer to @My::array
+         max_elems     => 100,     # defaults unlimited
+     );
+    
+     $file->log(level => 'info', message => "Your comment\n");
+
+DESCRIPTION
+
+    This module functions similarly to Log::Dispatch::Array, with a few
+    differences:
+
+      * only the messages (strings) are stored
+
+      * allow specifying array variable name (e.g. "My::array" instead of
+      \@My:array)
+
+      This makes it possible to use in Log::Log4perl configuration, which
+      is a text file.
+
+      * can apply some limits
+
+      Currently only max_elems (the maximum number of elements in the
+      array) is available. Future limits will be added.
+
+    Logging to an in-process array can be useful when debugging/testing, or
+    when you want to let users of your program connect to your program to
+    request viewing the ogs being produced.
+
+METHODS
+
+ new(%args)
+
+    Constructor. This method takes a hash of parameters. The following
+    options are valid: min_level and max_level (see Log::Dispatch
+    documentation); array (a reference to an array, or if value is string,
+    will be taken as name of array variable; this is so this module can be
+    used/configured e.g. by Log::Log4perl because configuration is
+    specified via a text file), max_elems.
+
+ log_message(message => STR)
+
+    Send a message to the appropriate output. Generally this shouldn't be
+    called directly but should be called through the log() method (in
+    LLog::Dispatch::Output>).
+
+SEE ALSO
+
+    Log::Dispatch
+
+    Log::Dispatch::Array
+

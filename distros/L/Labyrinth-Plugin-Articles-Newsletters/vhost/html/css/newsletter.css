@@ -1,0 +1,27 @@
+body {
+    background-color: #000;
+    font-family : FreeSans, Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", Sans-serif;
+    font-size: 10pt;
+}
+
+#centre {
+	margin: 0 150px 0 0;
+	padding: 10px;
+	color: #FFE4C4;
+	text-align: center;
+}
+
+#centre a:link,
+#centre a:active,
+#centre a:visited {
+	color: yellow;
+}
+
+.blocker        { background-color: #333333; margin-bottom: 5px; border-collapse: collapse; padding: 5px; }
+.blocker th     { background-color: #666666; padding: 5px; }
+.blocker td     { padding: 5px; }
+.blocker ul     { padding-top: 5px; padding-bottom: 5px; }
+
+#subscriptions  { width: 400px; height: 200px; }
+#prepare        { width: 600px; margin: 10px auto; }
+#newsletter     { border: 1px solid black; padding: 2px; margin: 10px 0; display: none }

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+Tagger.patch
+lib/Lingua/BrillTagger.pm
+lib/Lingua/BrillTagger.xs
+t/01-tokenize.t
+t/02-tag.t
+t/examples.txt

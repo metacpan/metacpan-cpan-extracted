@@ -1,0 +1,63 @@
+Lingua/DE/ASCII version 0.11
+============================
+
+NAME
+
+Lingua::DE::ASCII - Perl extension to convert german umlauts to and from ascii
+
+SYNOPSIS
+
+  use Lingua::DE::ASCII;
+  print to_ascii("Umlaute wie ä,ö,ü,ß oder auch é usw. " .
+                 "sind nicht im ASCII Format " .
+                 "und werden deshalb umgeschrieben);
+  print to_latin1("Dies muesste auch rueckwaerts funktionieren ma cherie");
+                 
+
+DESCRIPTION
+
+This module enables conversion from and to the ASCII format of german texts.
+
+It has two methods: C<to_ascii> and C<to_latin1> which one do exactly what they say.
+
+EXPORT
+
+to_ascii($string)
+to_latin1($string)
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+The self test is very intensive,
+it may need 10 minutes as it tests with a huge german word list.
+If it is to long for, just look for the first few seconds, 
+if no error occurs up till then, it shouldn't happen in the remaining minutes and
+it should be O.K. to skip the remaining test.
+(And to give you a feeling, a progress bar is shown)
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Test::More (only for testing)
+
+If you want a nicer feeling when testing and waiting,
+you should also install
+Term::ProgressBar
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003 Janek Schleicher
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

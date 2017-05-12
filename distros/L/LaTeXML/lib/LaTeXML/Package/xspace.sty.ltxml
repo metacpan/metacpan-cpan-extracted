@@ -1,0 +1,37 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  xspace                                                             | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+#**********************************************************************
+# Actually, the source TeX works, too, but ...
+
+our @XSPACES = (
+  T_BEGIN, T_END, T_CS('\/'), T_CS('\ '), T_CS('~'),
+  (map { T_OTHER($_) } '.', '!', ',', ':', ';', '?', '/', "'", ")", '-'),
+  T_CS('\@xobeysp'), T_CS('\xspace'), T_CS('\space'), T_CS('\@sptoken'));
+
+# Signature is actually \xpace Token
+# but be more defensive if we're in an argument {...\xspace}
+# ie. LaTeXML's structured arguments are processed differently than in TeX!
+DefMacro('\xspace', sub {
+    my ($gullet) = @_;
+    if (my $token = $gullet->readToken) {
+      ((grep { Equals($token, $_) } @XSPACES) ? ($token) : (T_SPACE, $token)); }
+    else {
+      (); } });
+
+#======================================================================
+1;

@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 579ccb49e2964dc987bed621a43bd4e35557abde Changes
+SHA1 538423015aaec0a95230f0684fe6f643929eaf41 MANIFEST
+SHA1 ce7f0fbbd97c08fe069e7cbbf1f5a01215eb277e META.yml
+SHA1 9e01754121ecd53c68cb1f5b0c02ebb7b4fce959 Makefile.PL
+SHA1 ba427236a1c626d098fe0a99abb0b66a5e64acc5 README
+SHA1 7607f8dd40c93d4f0b9580fa59a2561589084ee4 README.mkdn
+SHA1 7b4ae50ebac72d20761171c4c2b50c206344ea40 inc/Module/Install.pm
+SHA1 d9fe55a427fe2fd75b5029afeeaa61b592e07f79 inc/Module/Install/Base.pm
+SHA1 62d3922826d9f89f20c185e7031ac8f028504745 inc/Module/Install/Can.pm
+SHA1 dc809f64fb70a26b069a36f8d3d353d520dbb7e1 inc/Module/Install/Fetch.pm
+SHA1 82e6709c1cdb488770cb21f6149a7f22913cd8c1 inc/Module/Install/GithubMeta.pm
+SHA1 73ab91490a628452cc140db72ef9d13a1326d211 inc/Module/Install/Makefile.pm
+SHA1 8ce3f2b414e4617e6233dd4ba10830f8c5d672ec inc/Module/Install/Metadata.pm
+SHA1 a815f14e3aeaa8c6f5f318cda7a2fb431b462780 inc/Module/Install/Package.pm
+SHA1 3b0acd2eeac93a0afe48120f5648f0db362e5bbf inc/Module/Install/Win32.pm
+SHA1 f08924f051e623f8e09fa6a121993c4a9cf7d9eb inc/Module/Install/WriteAll.pm
+SHA1 5011127553463730d768e68ac9765d28d21490b1 inc/Module/Package.pm
+SHA1 ccb48d3fec5ef96403f50b13eec529ce10961c02 inc/Pod/Markdown.pm
+SHA1 4673f68c8a614668d68488ca173af3bfa6948d9e lib/Locale/Maketext/Fuzzy.pm
+SHA1 41afe2c04bb573b40e283e2b210ed70a47a3f8ba t/0-signature.t
+SHA1 ccd6690df0db3383aeb608c753c91736ab301cff t/1-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (Darwin)
+
+iEYEARECAAYFAk7kEqoACgkQtLPdNzw1AaDWKACfToL4CJ/cu1Cckt1lHbE8CaWg
+WDcAoISo8RbTssmcyFaPmuaDoFGtQufe
+=z8R5
+-----END PGP SIGNATURE-----

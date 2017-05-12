@@ -1,0 +1,9 @@
+lector
+doctor
+focus
+jocus
+districtus
+civitatem
+adoptare
+opera
+secundus

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Lingua-JP-Kanjidic.t
+t/minidic
+lib/Lingua/JP/Kanjidic.pm
+META.yml                                 Module meta-data (added by MakeMaker)

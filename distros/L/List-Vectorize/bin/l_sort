@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+use strict;
+use List::Vectorize;
+
+open F, $ARGV[0] or die "cannot open $ARGV[0]";
+my $sort_fun = $ARGV[1] ? $ARGV[1] : 'sub {$a <=> $b}';
+if($sort_fun !~/^\s*sub\s*\{/) {
+	$sort_fun = "sub $sort_fun";
+}
+$sort_fun =~s/\$a/\$_\[0\]/g;
+$sort_fun =~s/\$b/\$_\[1\]/g;
+$sort_fun = eval($sort_fun);
+if ($@) {
+	print "sorting function format is wrong.\n";
+	exit;
+}
+print join "", @{sort_array([ <F> ], $sort_fun)};

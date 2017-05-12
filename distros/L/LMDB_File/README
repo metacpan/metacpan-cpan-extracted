@@ -1,0 +1,75 @@
+LMDB_File version 0.12
+======================
+
+LMDB_File is a Perl wrapper around the OpenLDAP's LMDB (Lightning
+Memory-Mapped Database) C library.
+
+LMDB is an ultra-fast, ultra-compact key-value data store developed
+by Symas for the OpenLDAP Project. See http://symas.com/mdb/ for details.
+
+LMDB_File provides full access to the complete C API, a thin Perl wrapper
+with an Object-Oriented interface and a simple Perl's tie interface
+compatible with others DBMs.
+
+PREREQUISITES
+
+Right now LMDB needs a 64bits platform.
+
+ Before you can build LMDB_File you need to have the following installed
+on your system:
+
+    * Perl 5.10.0 or greater linked with pthreads.
+      See https://rt.perl.org/Public/Bug/Display.html?id=122906
+
+    * A working C compiler.
+
+    * LMDB Version 0.9.17 or greater
+      (previous versions may work but will miss some features)
+
+      Some Linux distributions are now including it:
+
+        * Fedora 20+
+
+            `yum install lmdb-devel`
+
+        * Ubuntu
+
+            `apt-get install liblmdb-dev`
+
+      If the library and its header file isn't found installed in
+      your system, Makefile.PL will try to use Doug Hoyte's Alien::LMDB module
+      if available.
+
+      Otherwise, if you getting this from GitHub, a submodule is included
+      in 'liblmdb' that you can use, please check git documentation to
+      populate the directory.
+
+    * To run the test harness for this module:
+      - You must make sure that the directory where you have untarred this
+      module is NOT a network drive, e.g. NFS or AFS.
+      - You need the Test::Exception module installed.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+*** WARNING ***
+This is an early release to allow the interested people the testing and
+discussion of the module: there is some missing features and you should
+be aware that the API isn't in stone yet. See TODO
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013-2017 by Salvador Ortiz Garcia
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

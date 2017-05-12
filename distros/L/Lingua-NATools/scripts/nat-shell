@@ -1,0 +1,204 @@
+#!/usr/bin/perl -s
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+
+use Term::ReadLine;
+use File::Spec;
+use File::Path;
+use File::Copy;
+use Lingua::NATools;
+
+our ($h);
+
+if ($h) {
+  print "nat-shell: A shell interface to NATools corpora alignment\n\n";
+  print "\tnat-shell\n\n";
+  print "For more help, please run 'perldoc nat-shell'\n";
+  exit;
+}
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-shell - A shell interface to NATools corpora alignment
+
+=head1 SYNOPSIS
+
+  nat-shell
+
+=head1 DESCRIPTION
+
+This is intended to be a shell for NATools main command. At the moment
+is just supports the creation of parallel corpora. Details on the
+shell commands usage are available inside the shell. Just issue a
+C<usage> command at the prompt.
+
+=cut
+
+print "Welcome to NATools shell tool\n";
+
+our $SELF = {};
+our %usage =
+  (
+   init     => "Initializes a directory for a NATools corpus. Use:\n\tinit <dir> <name>\n",
+   usage    => "Gets help for a command. Use:\n\tusage <command>\nYou can get a list of available commands using\n\tcommands\n",
+   commands => "Prints the list of available commands.\n",
+   codify   => "Codifies a parallel corpus. Use:\n\tcodify <corpus-1> <corpus-2>\n",
+   align    => "Aligns all chunks or a specific one. Use:\n\talign [<chunk_nr>|all]\n",
+   index    => "Join all invertion indexes",
+   open     => "Open a NATools corpus. Use:\n\topen <dir>\n",
+   grep     => "",
+   mkdict   => "",
+  );
+$usage{help}   = $usage{usage};
+$usage{encode} = $usage{codify};
+
+my $cmds = init_commands();
+our $term = new Term::ReadLine 'nat-shell';
+our $prompt = "(nat)";
+my $line;
+while ( defined ($line = $term->readline($prompt)) ) {
+  next if $line =~ m!^\s*$!;
+  $line =~ m!^\s*(\S+)(?:\s+(.*))?!;
+  my ($command,$data) = ($1,$2);
+  if (exists($cmds->{$command})) {
+    if ($data) {
+      $cmds->{$command}(split/\s+/,$data)
+    } else {
+      $cmds->{$command}()
+    }
+  } else {
+    print "Command '$command' unknown\n";
+  }
+
+  print "\n"; # clear line before exit
+}
+print "\n"; # clear line before exit
+
+
+
+
+
+sub init_commands {
+  +{
+    init     => \&init,
+    open     => \&openit,
+    usage    => \&usage,
+    help     => \&usage,
+    commands => \&list_commands,
+    codify   => \&codify,
+    encode   => \&codify,
+    align    => \&align,
+    index    => \&invindex,
+    grep     => \&grp,
+    mkdict   => \&mkdict,
+   }
+}
+
+sub mkdict {
+  $SELF->make_dict
+}
+
+sub invindex {
+  $SELF->index_invindexes(1);
+}
+
+
+sub codify {
+  my ($txt1, $txt2) = @_;
+
+  eval {
+    $SELF->codify({verbose => 1}, $txt1,$txt2);
+  };
+  print $@ if ($@);
+}
+
+
+sub list_commands {
+  print " Commands available:\n";
+  print "   $_\n" for sort keys %$cmds;
+}
+
+
+sub align {
+  my ($chunk) = @_;
+  $chunk ||= "all";
+
+  if ($chunk eq "all") {
+    $SELF->align_all;
+  } else {
+    eval {
+      $SELF->align_chunk($chunk)
+    };
+    print $@ if $@;
+  }
+}
+
+sub openit {
+  my ($dir) = @_;
+  if ($dir) {
+      $SELF = Lingua::NATools->load($dir);
+      if ($SELF) {
+	  $prompt = "(".$SELF->{conf}->param("nat.name").")";
+      } else {
+	  print "Error loading '$dir'";
+      }
+  } else {
+    usage("open");
+  }
+}
+
+sub init {
+  my ($dir,$name) = @_;
+  if ($dir && $name) {
+    if (-d $dir) {
+      my $homedir = File::Spec->catfile($dir,$name);
+      if (-d $homedir) {
+	my $ans = $term->readline("Directory already exists. Overwrite? [no]");
+	return unless $ans =~ m!^y(es)?$!;
+      }
+
+      eval { $SELF = Lingua::NATools->init($dir,$name) };
+
+      if ($@) {
+	print $@;
+	return
+      }
+
+      $prompt = "($name)";
+
+    } else {
+      print "Directory '$dir' does not exist\n";
+    }
+  } else {
+    usage("init");
+  }
+}
+
+sub usage {
+  my $arg = shift || "help";
+
+  if (exists($usage{$arg})) {
+    print $usage{$arg}
+  } else {
+    print "Command '$arg' is unknown\n";
+  }
+}
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2012 by Alberto Manuel Brandão Simões
+
+=cut

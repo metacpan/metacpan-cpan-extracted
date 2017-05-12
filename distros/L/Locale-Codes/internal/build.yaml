@@ -1,0 +1,6 @@
+---
+core: 5.007003
+script:
+  examples/code2country: 0
+  examples/country2code: 0
+git: 1

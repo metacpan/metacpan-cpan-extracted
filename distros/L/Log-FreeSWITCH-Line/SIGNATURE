@@ -1,0 +1,68 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 aa5114436bd893a8e2b604bf14aad9cb59e92766 Changes
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
+SHA1 ecc13b648ad48d02fe7175acd4c36facdef9849b Line.pm
+SHA1 e5156392fab944afdbe8d42ccc6ad4e9be2039d3 Line/Data.pm
+SHA1 701efb3f16e9da8a9f7a827cd1d7010b1969af57 MANIFEST
+SHA1 4af218674a631456afc917a104df661d7728ee67 META.yml
+SHA1 b7ea608ba1ed6028c1e3f6a0c15ade365597e1aa Makefile.PL
+SHA1 04ef962a07bb9836fd177cc6df7eb32311b3da14 README
+SHA1 0f12aede8b6d2497b311721685744d0f958f9a36 examples/ex1.pl
+SHA1 c9569897dd97cc38174354be514ecaf9cb48ab1c examples/ex2.pl
+SHA1 a8c48b46e4c94a150b07154a015691cad7d22629 examples/ex3.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 85d7f392970ea438981f4e41d410447e553ac4fe t/Log-FreeSWITCH-Line-Data/01-use.t
+SHA1 4968087a4b9937398b3f95a9ebd1afe43cde21ff t/Log-FreeSWITCH-Line-Data/02-version.t
+SHA1 278aa208bfe0512186c927a0b761f2ab58b197cb t/Log-FreeSWITCH-Line-Data/03-new.t
+SHA1 b10b7928d891ed48f6eaad100d13f2f2f7107442 t/Log-FreeSWITCH-Line-Data/04-date.t
+SHA1 9679dc3a71bd3e387d7791e3c6cc51aeeb2d722c t/Log-FreeSWITCH-Line-Data/05-datetime_obj.t
+SHA1 9d8cafe13dd1f74fbbdb0fa2356c140ed5479d8d t/Log-FreeSWITCH-Line-Data/06-file.t
+SHA1 226fa3b9a6c0bf072462c13330863a59d199edd4 t/Log-FreeSWITCH-Line-Data/07-file_line.t
+SHA1 cf16b56c6f737be8dd85a660d1f9823bfb12d0f7 t/Log-FreeSWITCH-Line-Data/08-message.t
+SHA1 5f14bc18cb03d7221cb4d539325dfa8254278286 t/Log-FreeSWITCH-Line-Data/09-raw.t
+SHA1 c2e02cd6aa43bd559e0bad7711559cdcc033ed6d t/Log-FreeSWITCH-Line-Data/10-time.t
+SHA1 e1ecd122ed33fefda6eceab3ce064b30b25fb324 t/Log-FreeSWITCH-Line-Data/11-type.t
+SHA1 438f318512ea90a65de4345245427b76cc50271f t/Log-FreeSWITCH-Line/01-use.t
+SHA1 7fdd1a81e0073e91080960dba54ee5a3adc63e23 t/Log-FreeSWITCH-Line/02-version.t
+SHA1 f1445bf372958f13e8c014b38ec82ecf6c74cce2 t/Log-FreeSWITCH-Line/03-parse.t
+SHA1 77f96c3a92f2129661dee195fe98715836e98305 t/Log-FreeSWITCH-Line/04-serialize.t
+SHA1 82b2688a7c014743251aaa54cee73d45fc931a31 xt/Log-FreeSWITCH-Line-Data/01-pod_coverage.t
+SHA1 f38e5ef00c5e6ce2f605fe195a4d72a4ab61802c xt/Log-FreeSWITCH-Line-Data/02-pod.t
+SHA1 d0dcff47918c9475b4cd92082c6d8483dbac0137 xt/Log-FreeSWITCH-Line/01-pod_coverage.t
+SHA1 dc28e3c936a6274c2debfb1d2fcbca5addcf2221 xt/Log-FreeSWITCH-Line/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWKKwPAAoJEJe+XXKaIuTl+SgIALvbbofRFjnzYMBOuNbVE97W
+pbsbs7M+7xOsHW+zOzfL+QNzedE8SNVEbLOTxQ+AciIJAk6h2jMOvm8IPzB8+b+N
+EpxYrKQOikr9gIMPoMrOtJ1lsO/3NqT+fHcrxoBttty8K4hWHJ8zwu7i8i+EiIw2
+rPa2bk8swgxQRUK+Q13Gm/9P+qWU+hoxn13B0bHKodXvvNuX7rjBxpQ15mOL+3eo
+xr1e2kW8jty560I7SQVqYKoyrTvTkx8YX6CLRAgcGZJM3nmul6yk31EqRidh7KDA
+kZNhjzISDQiY424t6HylaBjMMfc7bB36YuvNjkTc7L377mInUmcMRSrqpIJckIg=
+=1TBE
+-----END PGP SIGNATURE-----

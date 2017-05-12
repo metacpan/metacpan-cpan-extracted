@@ -1,0 +1,14 @@
+Revision history for Log-Simple-Color
+
+0.0.3
+    Wed Mar 10 13:06:54 KST 2010
+    Fix invalid test code (Thanks to Duane <d.m.berry@verizon.net>)
+
+0.0.2
+    Wed Mar  4 19:36:19 KST 2009
+    Remove dependency with Perl6::Say
+
+0.0.1
+    Wed Dec 31 10:48:10 KST 2008
+    Initial release.
+

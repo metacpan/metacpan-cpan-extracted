@@ -1,0 +1,164 @@
+% layout 'html5';
+% title 'Upload Interface';
+<link rel="stylesheet" type="text/css" href="css/upload/fileAPI.css" />
+
+<div style="margin:10px;">
+
+<h2>Upload Interface</h2>
+<p>This service converts TeX/LaTeX documents into HTML5.</p>
+<p>Currently, please send a single self-sufficient ZIP archive (up to 40 MB),
+  containing all relevant sources.</p>
+
+<h3>Choose ZIP file:</h3>
+<p></option>
+    <label for="files-encoding">Encoding</label></option>
+    <select id="files-encoding" name="encoding" style="background-color:white;"></option>
+      <option value="utf8" selected>UTF8</option></option>
+      <option value="AdobeStandardEncoding">AdobeStandardEncoding</option>
+      <option value="AdobeSymbol">AdobeSymbol</option>
+      <option value="AdobeZdingbat">AdobeZdingbat</option>
+      <option value="ascii">ascii</option>
+      <option value="ascii-ctrl">ascii-ctrl</option>
+      <option value="big5-eten">big5-eten</option>
+      <option value="big5-hkscs">big5-hkscs</option>
+      <option value="cp1006">cp1006</option>
+      <option value="cp1026">cp1026</option>
+      <option value="cp1047">cp1047</option>
+      <option value="cp1250">cp1250</option>
+      <option value="cp1251">cp1251</option>
+      <option value="cp1252">cp1252</option>
+      <option value="cp1253">cp1253</option>
+      <option value="cp1254">cp1254</option>
+      <option value="cp1255">cp1255</option>
+      <option value="cp1256">cp1256</option>
+      <option value="cp1257">cp1257</option>
+      <option value="cp1258">cp1258</option>
+      <option value="cp37">cp37</option>
+      <option value="cp424">cp424</option>
+      <option value="cp437">cp437</option>
+      <option value="cp500">cp500</option>
+      <option value="cp737">cp737</option>
+      <option value="cp775">cp775</option>
+      <option value="cp850">cp850</option>
+      <option value="cp852">cp852</option>
+      <option value="cp855">cp855</option>
+      <option value="cp856">cp856</option>
+      <option value="cp857">cp857</option>
+      <option value="cp858">cp858</option>
+      <option value="cp860">cp860</option>
+      <option value="cp861">cp861</option>
+      <option value="cp862">cp862</option>
+      <option value="cp863">cp863</option>
+      <option value="cp864">cp864</option>
+      <option value="cp865">cp865</option>
+      <option value="cp866">cp866</option>
+      <option value="cp869">cp869</option>
+      <option value="cp874">cp874</option>
+      <option value="cp875">cp875</option>
+      <option value="cp932">cp932</option>
+      <option value="cp936">cp936</option>
+      <option value="cp949">cp949</option>
+      <option value="cp950">cp950</option>
+      <option value="dingbats">dingbats</option>
+      <option value="euc-cn">euc-cn</option>
+      <option value="euc-jp">euc-jp</option>
+      <option value="euc-kr">euc-kr</option>
+      <option value="gb12345-raw">gb12345-raw</option>
+      <option value="gb2312-raw">gb2312-raw</option>
+      <option value="gsm0338">gsm0338</option>
+      <option value="hp-roman8">hp-roman8</option>
+      <option value="hz">hz</option>
+      <option value="iso-2022-jp">iso-2022-jp</option>
+      <option value="iso-2022-jp-1">iso-2022-jp-1</option>
+      <option value="iso-2022-kr">iso-2022-kr</option>
+      <option value="iso-8859-1">iso-8859-1</option>
+      <option value="iso-8859-10">iso-8859-10</option>
+      <option value="iso-8859-11">iso-8859-11</option>
+      <option value="iso-8859-13">iso-8859-13</option>
+      <option value="iso-8859-14">iso-8859-14</option>
+      <option value="iso-8859-15">iso-8859-15</option>
+      <option value="iso-8859-16">iso-8859-16</option>
+      <option value="iso-8859-2">iso-8859-2</option>
+      <option value="iso-8859-3">iso-8859-3</option>
+      <option value="iso-8859-4">iso-8859-4</option>
+      <option value="iso-8859-5">iso-8859-5</option>
+      <option value="iso-8859-6">iso-8859-6</option>
+      <option value="iso-8859-7">iso-8859-7</option>
+      <option value="iso-8859-8">iso-8859-8</option>
+      <option value="iso-8859-9">iso-8859-9</option>
+      <option value="iso-ir-165">iso-ir-165</option>
+      <option value="jis0201-raw">jis0201-raw</option>
+      <option value="jis0208-raw">jis0208-raw</option>
+      <option value="jis0212-raw">jis0212-raw</option>
+      <option value="johab">johab</option>
+      <option value="koi8-f">koi8-f</option>
+      <option value="koi8-r">koi8-r</option>
+      <option value="koi8-u">koi8-u</option>
+      <option value="ksc5601-raw">ksc5601-raw</option>
+      <option value="MacArabic">MacArabic</option>
+      <option value="MacCentralEurRoman">MacCentralEurRoman</option>
+      <option value="MacChineseSimp">MacChineseSimp</option>
+      <option value="MacChineseTrad">MacChineseTrad</option>
+      <option value="MacCroatian">MacCroatian</option>
+      <option value="MacCyrillic">MacCyrillic</option>
+      <option value="MacDingbats">MacDingbats</option>
+      <option value="MacFarsi">MacFarsi</option>
+      <option value="MacGreek">MacGreek</option>
+      <option value="MacHebrew">MacHebrew</option>
+      <option value="MacIcelandic">MacIcelandic</option>
+      <option value="MacJapanese">MacJapanese</option>
+      <option value="MacKorean">MacKorean</option>
+      <option value="MacRoman">MacRoman</option>
+      <option value="MacRomanian">MacRomanian</option>
+      <option value="MacRumanian">MacRumanian</option>
+      <option value="MacSami">MacSami</option>
+      <option value="MacSymbol">MacSymbol</option>
+      <option value="MacThai">MacThai</option>
+      <option value="MacTurkish">MacTurkish</option>
+      <option value="MacUkrainian">MacUkrainian</option>
+<!--       <option value="MIME-B">MIME-B</option>
+      <option value="MIME-Header">MIME-Header</option>
+      <option value="MIME-Header-ISO_2022_JP">MIME-Header-ISO_2022_JP</option>
+      <option value="MIME-Q">MIME-Q</option> -->
+      <option value="nextstep">nextstep</option>
+      <option value="null">null</option>
+      <option value="posix-bc">posix-bc</option>
+      <option value="shiftjis">shiftjis</option>
+      <option value="symbol">symbol</option>
+      <option value="UCS-2BE">UCS-2BE</option>
+      <option value="UCS-2LE">UCS-2LE</option>
+      <option value="UTF-16">UTF-16</option>
+      <option value="UTF-16BE">UTF-16BE</option>
+      <option value="UTF-16LE">UTF-16LE</option>
+      <option value="UTF-32">UTF-32</option>
+      <option value="UTF-32BE">UTF-32BE</option>
+      <option value="UTF-32LE">UTF-32LE</option>
+      <option value="UTF-7">UTF-7</option>
+      <!-- <option value="utf-8-strict">utf-8-strict</option> -->
+    </select>
+    <br></br>
+    <input id="files-upload" type="file" multiple>
+<!--    <input id="convert-button" type="submit" value="Convert" />-->
+</p>
+<div style="display:inline; width: 40%;
+     word-wrap:break-word; float:left; margin: 15px;">
+<p id="drop-area">
+    <span class="drop-instructions">or drag and drop ZIP files here</span>
+    <span class="drop-over">Drop files here!</span>
+</p>
+
+<ul id="file-list">
+    <li class="no-items">(no files uploaded yet)</li>
+</ul>
+<%= javascript 'js/upload/fileAPI.js' %>
+</div>
+<div style="display:inline; width: 40%;
+     word-wrap:break-word; float:left; margin: 15px;"><b>
+</b></div>
+
+<div style="clear:both; font-size:0px;">&nbsp;</div>
+
+<!-- <p><strong>Note:</strong> For uploads of several files the service -->
+<!--   needs to maintain a session, via a session cookie, for which you -->
+<!--   need cookies enabled. -->
+</div>

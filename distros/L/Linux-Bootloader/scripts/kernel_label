@@ -1,0 +1,58 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Long;
+
+# This script uses heuristics to convert a patch name into 
+# something more appropriate to a kernel name.
+
+sub usage {
+    print "
+Usage:  $0 <kernel-patch-name> [-blt]
+
+Options:
+  -b	Print the kernel release only.
+  -l	Print a label.
+  -t	Print a tag (eg. Lilo label).
+
+Example:
+  kernel_label patch-2.6.17-rc4-git9.bz2 -t
+  Outputs: 2.6.17r4g9 
+\n";
+    exit 1;
+}
+
+my %params;
+
+GetOptions(
+           \%params,
+           "base",
+           "label",
+           "tag",
+           "version|V",
+           );
+
+if ($params{version}) {
+    print "$0 version 1.1\n";
+}
+
+my $kernel = shift @ARGV || usage();
+
+# Strip off any patch extensions
+$kernel =~ s/^linux-|^patch-//;
+$kernel =~ s/\.gz$|\.bz2$|\.patch$|\.diff$|\.dif|\.tar//g;
+
+if (defined $params{base}) {
+  $kernel =~ m/(\d+\.[\d\.]+)/;
+  $kernel = $1;
+  print "$kernel\n" if defined $kernel;
+} elsif (defined $params{label}) {
+  $kernel =~ s/([-_][a-zA-Z]{3})[a-zA-Z]*/$1/g;
+  print "$kernel\n";
+} else {
+  $kernel =~ s/[-_]([a-zA-Z])[a-zA-Z]*/$1/g;
+  $kernel = substr($kernel, 0, 15) if length($kernel) > 15;
+  print "$kernel\n";
+}
+
+

@@ -1,0 +1,277 @@
+
+MACRO(lcfg_translate)
+
+[%+ FOREACH file IN trans.keys.sort %]
+CONFIGURE_FILE("[% file %]" "[% trans.item(file) %]" @ONLY)
+[%+ END +%]
+
+ENDMACRO(lcfg_translate)
+
+MACRO(lcfg_add_comp_script compname)
+
+  UNSET( comppath CACHE )
+  FIND_FILE( comppath ${compname}
+             ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}
+             NO_DEFAULT_PATH )
+
+  IF(comppath)
+    INSTALL(PROGRAMS ${comppath} DESTINATION ${LCFGCOMP})
+  ENDIF(comppath)
+
+ENDMACRO(lcfg_add_comp_script)
+
+MACRO(lcfg_add_schema schema_name schema_ver)
+
+  SET(schemafile ${schema_name}.def)
+
+  UNSET( schemapath CACHE )
+  FIND_FILE( schemapath ${schemafile}
+             ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}
+             NO_DEFAULT_PATH )
+
+  IF(schemapath)
+    STRING(LENGTH ${schema_ver} schema_length)
+    IF(${schema_length} GREATER 0)
+      SET(deffile ${schema_name}-${schema_ver}.def)
+    ELSE(${schema_length} GREATER 0)
+      SET(deffile ${schema_name}.def)
+    ENDIF(${schema_length} GREATER 0)
+
+    INSTALL(FILES ${schemapath}
+            DESTINATION ${LCFGCLIENTDEF}
+            RENAME ${deffile})
+
+    INSTALL(FILES ${schemapath}
+            DESTINATION ${LCFGSERVERDEF}
+            RENAME ${deffile}
+            COMPONENT defaults)
+
+  ENDIF(schemapath)
+
+ENDMACRO(lcfg_add_schema)
+
+FIND_PROGRAM(PODSTRIP podselect)
+
+MACRO(pod_strip in out)
+
+  IF(PODSTRIP)
+    EXECUTE_PROCESS(COMMAND ${PODSTRIP} ${in} OUTPUT_FILE ${out})
+  ENDIF(PODSTRIP)
+
+ENDMACRO(pod_strip)
+
+MACRO(lcfg_add_man manfile section)
+ 
+  INSTALL(FILES ${manfile} DESTINATION ${LCFGMAN}/man${section})
+
+ENDMACRO(lcfg_add_man)
+
+FIND_PROGRAM(POD2MAN pod2man)
+
+MACRO(lcfg_pod2man podfile manfile section)
+  IF(NOT POD2MAN)
+    message(FATAL ERROR "Need pod2man installed to generate manual files")
+  ENDIF(NOT POD2MAN)
+
+  IF(NOT EXISTS ${podfile})
+    MESSAGE(FATAL ERROR "Could not find pod file ${podfile} to generate manual file")
+  ENDIF(NOT EXISTS ${podfile})
+
+  SET(outfile "${manfile}.${section}")
+
+  IF(LCFG_GROUP)
+    EXECUTE_PROCESS(COMMAND ${POD2MAN} --section="${section}" --release="Release: ${LCFG_VERSION}" --center="${LCFG_GROUP}" --date="${LCFG_DATE}" ${podfile} ${outfile})
+  ELSE(LCFG_GROUP)
+    EXECUTE_PROCESS(COMMAND ${POD2MAN} --section="${section}" --release="Release: ${LCFG_VERSION}" --date="${LCFG_DATE}" ${podfile} ${outfile})
+  ENDIF(LCFG_GROUP)
+
+  IF(EXISTS ${outfile})
+    lcfg_add_man("${CMAKE_BINARY_DIR}/${outfile}" ${section})
+  ENDIF(EXISTS ${outfile})
+
+ENDMACRO(lcfg_pod2man)
+
+MACRO(lcfg_add_pod podfile manfile section)
+
+  IF(EXISTS ${podfile})
+    INSTALL(FILES ${podfile} DESTINATION ${LCFGPOD})
+
+    lcfg_pod2man(${podfile} ${manfile} ${section})
+  ENDIF(EXISTS ${podfile})
+
+ENDMACRO(lcfg_add_pod)
+
+MACRO(lcfg_add_comp_pod compname)
+
+  SET(podfile "${compname}.pod")
+  SET(manfile "lcfg-${compname}")
+
+  lcfg_add_pod(${podfile} ${manfile} ${MANSECT})
+
+ENDMACRO(lcfg_add_comp_pod)
+
+SET(PERL_LIBSECT 3 CACHE STRING "Manual section for Perl libraries")
+
+MACRO(lcfg_add_perl_module file modpath)
+
+  STRING( REGEX REPLACE "\\.pm" "" modname ${modpath})
+  STRING( REGEX REPLACE "/" "::" modname ${modname} )
+
+  SET(podfile "${modname}.pod")
+
+  pod_strip(${file} ${podfile})
+  lcfg_add_pod("${CMAKE_BINARY_DIR}/${podfile}" ${modname} ${PERL_LIBSECT})
+
+  GET_FILENAME_COMPONENT(dirname ${modpath} PATH)
+
+  INSTALL(FILES ${file}
+          DESTINATION "${PERL_LIBDIR}/${dirname}")
+
+ENDMACRO(lcfg_add_perl_module)
+
+MACRO(lcfg_add_perl_tree dir)
+
+  # Need to search both the binary and source directories
+
+  FILE( GLOB_RECURSE perlmods
+        RELATIVE "${CMAKE_BINARY_DIR}/${dir}"
+        "${CMAKE_BINARY_DIR}/${dir}/*.pm")
+  FOREACH(perlmod ${perlmods})
+    lcfg_add_perl_module("${CMAKE_BINARY_DIR}/${dir}/${perlmod}" ${perlmod})
+  ENDFOREACH(perlmod)
+
+  IF( NOT ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR} )
+    FILE( GLOB_RECURSE perlmods
+          RELATIVE "${CMAKE_SOURCE_DIR}/${dir}"
+          "${CMAKE_SOURCE_DIR}/${dir}/*.pm")
+    FOREACH(perlmod ${perlmods})
+      lcfg_add_perl_module("${CMAKE_SOURCE_DIR}/${dir}/${perlmod}" ${perlmod})
+    ENDFOREACH(perlmod)
+  ENDIF( NOT ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR} )
+
+ENDMACRO(lcfg_add_perl_tree)
+
+MACRO(lcfg_add_program location binfile mansect)
+
+  IF(${ARGC} GREATER 3)
+    IF (${ARGV3} STREQUAL "podstrip")
+      pod_strip(${binfile} "${binfile}.pod")
+      lcfg_add_pod("${binfile}.pod" ${binfile} ${mansect})
+    ENDIF (${ARGV3} STREQUAL "podstrip")
+  ENDIF(${ARGC} GREATER 3)
+
+  IF(EXISTS ${binfile})
+    INSTALL(PROGRAMS ${binfile} DESTINATION ${location})
+  ENDIF(EXISTS ${binfile})
+
+ENDMACRO(lcfg_add_program)
+
+MACRO(lcfg_add_bin binfile)
+  lcfg_add_program(${LCFGBIN} ${binfile} 1 ${ARGV1})
+ENDMACRO(lcfg_add_bin)
+
+MACRO(lcfg_add_sbin binfile)
+  lcfg_add_program(${LCFGSBIN} ${binfile} 8 ${ARGV1})
+ENDMACRO(lcfg_add_sbin)
+
+MACRO(lcfg_add_logrotate)
+
+  IF(EXISTS "logrotate")
+    INSTALL(FILES "logrotate" DESTINATION "${LCFGDATA}/${LCFG_NAME}")
+  ENDIF(EXISTS "logrotate")
+
+ENDMACRO(lcfg_add_logrotate)
+
+MACRO(lcfg_add_template)
+  INSTALL(FILES ${ARGV} DESTINATION ${LCFG_TMPLDIR})
+ENDMACRO(lcfg_add_template)
+
+MACRO(lcfg_add_templates)
+
+  # Allow non-standard templates directory
+
+  IF(${ARGC} GREATER 0)
+    SET(dir "${CMAKE_CURRENT_SOURCE_DIR}/${ARGV0}")
+  ELSE(${ARGC} GREATER 0)
+    SET(dir "${CMAKE_CURRENT_SOURCE_DIR}/templates")
+  ENDIF(${ARGC} GREATER 0)
+
+  # Allow non-standard destination directory
+
+  IF(${ARGC} GREATER 1)
+    SET(destination "${ARGV1}")
+  ELSE(${ARGC} GREATER 1)
+    SET(destination "${LCFG_TMPLDIR}")
+  ENDIF(${ARGC} GREATER 1)
+
+  # New-style templates directory, can contain sub-directories
+
+  FILE(GLOB_RECURSE templates RELATIVE ${dir} "${dir}/*")
+
+  FOREACH(template ${templates})
+    IF(${template} MATCHES "\\.cin$")
+      # nothing here...
+    ELSE(${template} MATCHES "\\.cin$")
+      GET_FILENAME_COMPONENT(dirname ${template} PATH)
+      INSTALL(FILES "${dir}/${template}"
+              DESTINATION "${destination}/${dirname}")
+    ENDIF(${template} MATCHES "\\.cin$")
+  ENDFOREACH(template)
+
+  # Old-style single template file named 'template' in the top-level
+  #  of the project directory.
+
+  install(FILES "template" DESTINATION ${destination} OPTIONAL)
+
+ENDMACRO(lcfg_add_templates)
+
+MACRO(lcfg_add_nagios_module modpath)
+
+  get_filename_component(modname ${modpath} NAME)
+  lcfg_add_perl_module(${modpath} "LCFG/Monitoring/Nagios/Translators/${modname}")
+
+ENDMACRO(lcfg_add_nagios_module)
+
+MACRO(lcfg_add_nagios_support)
+
+  file(GLOB nagios_mods "nagios/*.pm")
+
+  foreach(nagios_mod ${nagios_mods})
+    lcfg_add_nagios_module(${nagios_mod})
+  endforeach(nagios_mod ${nagios_mods})
+
+ENDMACRO(lcfg_add_nagios_support)
+
+MACRO(lcfg_add_meta)
+
+  install(FILES README ChangeLog
+          DESTINATION share/doc/${LCFG_FULLNAME}-${LCFG_VERSION}
+          OPTIONAL)
+
+ENDMACRO(lcfg_add_meta)
+
+MACRO(lcfg_add_component compname)
+
+  lcfg_translate()
+  lcfg_add_comp_script(${compname})
+  lcfg_add_comp_pod(${compname})
+  lcfg_add_schema(${compname} ${LCFG_SCHEMA})
+  lcfg_add_logrotate()
+  lcfg_add_templates()
+  lcfg_add_nagios_support()
+
+  # This is a directory used by components to store generated files
+  # Lots of components need it and it is harmless to create it for
+  # those which do not.
+
+  install(DIRECTORY DESTINATION ${CONFIGDIR})
+
+  # This is done here only for MacOSX as fedora/redhat do this in the
+  # specfile.
+
+  IF(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+     lcfg_add_meta()
+  ENDIF(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+
+ENDMACRO(lcfg_add_component)
+

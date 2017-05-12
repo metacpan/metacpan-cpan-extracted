@@ -1,0 +1,3 @@
+{ "paths": [
+    { "path": "/page/(\\w+).html", "variables": [ "pagename" ], "cgiparams": { "act": "home-page" }, "settings": { "test": 1 } }
+] }

@@ -1,0 +1,5 @@
+name   = "Locale-Scope"
+badges = ["travis"]
+
+# Module::Build::Tiny
+module_maker = "ModuleBuildTiny"

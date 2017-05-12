@@ -1,0 +1,777 @@
+<html><head><title>Web Localization in Perl</title>
+<style><!--
+P {text-align: justify}
+P.right {text-align: right}
+--></style></head><body>
+
+<h1>Web Localization in Perl</h1>
+<p class="right" align="right">
+Audrey Tang<br>
+OurInternet, Inc.<br>
+July 2002
+
+<p>
+<h2>Abstract</h2>
+
+<p>
+The practice of internationalization (i18n) enables applications to support multiple languages, date/currency formats and local customs (collectively known as <em>locales</em>); localization (L10n) then deals with the actual implementation of fitting the software into the needs of users in a certain locale.  Today, <em>Web applications</em> are one of the key areas that's being massively localized, due to its nature of text-based interface representation formats.
+<p>
+In the Free Software world, many of the most flexible and widely-used technologies are built upon the <em>Perl</em> language, which has long been the language of choice for web application developers.  This article presents the author's hands-on experience on localizing several Perl-based applications into Chinese, the detailed usage and pitfalls of common frameworks, as well as <em>best practice</em> tips for managing a localization project.
+
+<h2>Introduction</h2>
+
+<p class="right" align="right">
+<i>``There are a number of languages spoken by human beings in this world.''<br>-- Harald Tveit Alvestrand, in RFC 1766, ``Tags for the Identification of Languages''</i>
+<p>
+Why should someone localize their websites or web applications?
+<p>
+Let us imagine this very question being debated on the Web, with convincing arguments and explanations raised by various parties, in different languages.  As a participant in this discussion, you may hear following points being made:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Figure 1: Reasons for Localization (<em>before</em> localization)</font></caption>
+<tr><td><ul>
+<li>Иностранная валюта, формат даты, язык и обычаи могут казаться нам пугающими
+<li>Menschen sind produktiver wenn sie in ihrer gewohnten Umgebung arbeiten
+<li>Tas veicina daudz labâku sapraðanu un mijiedarbîbu starp daâdâm kultrâm
+<li>Un progretto con molti collaboratori internazionali si evolverá piú in fretta e meglio
+<li>地区化的过程, 有助於软件的模块化与可移植性
+</ul></td></tr></table>
+
+<p>
+But, alas, it is not likely that all parties could understand all these points.  This fact had naturally lead to the effect of <em>language barrier</em> -- our field of meaningful discussion are often restricted to a few <em>locale groups</em>: people who speak the same language and share the same culture with us.
+<p>
+However, that is truly sad since the arguments we missed are often valid ones, and usually offer new insights into our present condition.  Therefore, it will be truly beneficial if the arguments, interfaces and other texts are translated for us:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Figure 2: Reasons for Localization (<em>localized</em> to English)</font></caption>
+<tr><td><ul>
+<li>It is a distraction to have to deal with interfaces that use foreign languages, date formats, currencies and customs
+<li>People are more productive when they operate in their native environments
+<li>It fosters understanding and communication between cultures
+<li>Projects with more international contributors will evolve faster and better
+<li>Localization tends to improve the software's modularity and portability
+</ul></td></tr></table>
+
+<p>
+As these arguments have pointed out, it is often not possible nor desirable to <em>just speak X</em>, be it Latin, Interlingua, Esperanto, Lojban or, well, English.  At such times, localization (L10n) is needed.
+
+<p>
+For proprietary applications, L10n was typically done as a prerequisite of competing in a foreign market.  That implies if the localization cost exceeds estimated profit in a given locale, the company would not localize its application at all, and it would be difficult (and maybe illegal) for users to do it themselves without the source code.  If the vendor did not design its software with good i18n framework in mind -- well, then we're just out of luck.
+
+<p>
+Fortunately, the case is much simpler and rewarding with open-source applications.  As with proprietary ones, the first few versions are often designed with only one locale in mind; but the difference is <em>anybody</em> is allowed to internationalize it <em>at any time</em>.  As Sean M. Burke put it:
+
+<p>
+<blockquote>
+    The way that we can do better in open source is by writing our software
+    with the goal that localization should be easy both for the programmers
+    and maybe even for eager users. (After all, practically the definition
+    of "open source" is that it lets anyone be a programmer, if they are
+    interested enough and skilled enough.)
+</blockquote>
+
+<p>
+This article describes detailed techniques to make L10n easy for all parties involved.  I will focus on <em>web-based</em> applications written in the <em>Perl</em> language, but the principle should also apply elsewhere.
+
+<h2>Localizing Static Websites</h2>
+<p class="right" align="right">
+<i>``It Has To Work.''<br>
+-- First Networking Truth, RFC 1925</i>
+
+<p>
+Web pages come in two different flavors: <em>static</em> ones provides the same content during many visits, until it is updated; <em>dynamic</em> pages may offer different information depends on various factors.  They are commonly referred as <em>web documents</em> and <em>web applications</em>.
+<p>
+However, being static does not mean that all visitors must see the same <em>representation</em> -- different people may prefer different languages, styles or medium (e.g. via auditory outputs instead of visual ones).  Part of the Web's strength is its ability to let the client <em>negotiate</em> with the server, and determine the most preferred representation.
+<p>
+For a concrete example, let us consider the author's hypothetical homepage <tt>http://www.autrijus.org/index.html</tt>, written in Chinese:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 1. A simple Chinese page</font></caption>
+<tr><td><PRE>
+&lt;html&gt;&lt;head&gt;&lt;title&gt;<B>唐宗漢 - 家</B>&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;<B>施工中, 請見諒</B>&lt;/body&gt;&lt;/html&gt;
+</PRE></td></tr></table>
+<p>
+One day, I decided to translate it for my English-speaking friends:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 2. Translated page in English</font></caption>
+<tr><td><PRE>
+&lt;html&gt;&lt;head&gt;&lt;title&gt;<B>Audrey.Home</B>&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;<B>Sorry, this page is under construction.</B>&lt;/body&gt;&lt;/html&gt;
+</PRE></td></tr></table>
+
+<P>
+At this point, many websites would decide to offer a <em>language selection page</em> to let the visitor to pick their favorite language.  An example is shown in Figure 3:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Figure 3: A typical language selection page</font></caption>
+<tr><td align="center" colspan=4 bgcolor=black>
+<font color="white">Please choose your language:</font>
+</td></tr><tr><td align="center">
+<font size=-1><u>Čeština</u></font>
+</td><td align="center">
+<font size=-1><u>Deutsch</u></font>
+</td><td align="center">
+<font size=-1><u>English</u></font>
+</td><td align="center">
+<font size=-1><u>Español</u></font>
+</td></tr><tr><td align="center">
+<font size=-1><u>Français</u></font>
+</td><td align="center">
+<font size=-1><u>Hrvatski</u></font>
+</td><td align="center">
+<font size=-1><u>Italiano</u></font>
+</td><td align="center">
+<font size=-1><u>日本語</u></font>
+</td></tr><tr><td align="center">
+<font size=-1><u>한국어</u></font>
+</td><td align="center">
+<font size=-1><u>Nederlands</u></font>
+</td><td align="center">
+<font size=-1><u>Polski</u></font>
+</td><td align="center">
+<font size=-1><u>Русский язык</u></font>
+</td></tr><tr><td align="center">
+<font size=-1><u>Slovensky</u></font>
+</td><td align="center">
+<font size=-1><u>Slovensci</u></font>
+</td><td align="center">
+<font size=-1><u>Svenska</u></font>
+</td><td align="center">
+<font size=-1><u>中文 (GB)</u></font><br>
+<font size=-1><u>中文 (Big5)</u></font>
+</td></tr></table>
+
+<p>
+For both non-technical users and automated programs, that page is confusing, redundant, and highly irritating.  Besides demanding an extra search-and-click for each visits, it poses considerable amount of difficulty on <em>web agent</em> programmers, as they now have to parse the page and follow the correct link, which is a highly error-prone thing to do.
+
+<h3>MultiViews: The Easiest L10n Framework</h3>
+<p>
+Of course, it is much better if everybody could see their preferred language automatically.  Thankfully, the <em>Content Negotiation</em> feature in HTTP 1.1 addressed this problem quite neatly.
+<p>
+Under this scheme, browsers will always send an <b><tt>Accept-Language</tt></b> header, which specifies one or more preferred language codes; for example, <tt>zh-tw, en-us, en</tt> would mean "Traditional Chinese, American English or English, in this order".
+<p>
+The web server, upon receiving this information, is responsible to present the request content in the most preferred language.  Different web servers may implement this process differently; under Apache (the most popular web server), a technique called <b><tt>MultiViews</tt></b> is widely used.
+<p>
+Using <tt>MultiViews</tt>, I will save the English version as <tt>index.html.en</tt> (note the extra file extension), then put this line into Apache's configuration file <tt>httpd.conf</tt> or <tt>.htaccess</tt>:
+<p>
+<PRE>
+	Options <b>+MultiViews</b>
+</PRE>
+<p>
+After that, Apache will examine all requests to <tt>http://www.autrijus.org/index.html</tt>, and see if the client prefers <tt>'en'</tt> in its <tt>Accept-Language</tt> header.  Hence, people who prefer English would see the English page; otherwise, the original <tt>index.html</tt> is displayed.
+<p>
+This technique allows gradual introduction of new localized versions of the same documents, so my international friends can contribute more languages over time -- <tt>index.html.fr</tt> for French, <tt>index.html.he</tt> for Hebrew, and so on.
+<p>
+Since a large share of online populace speak only their native language and English, most of the contributed versions would be translated from English, <em>not</em> Chinese.  But because both versions represent the same contents, that is not a problem.
+<p>
+... or is it? What if I go back to update the original, <em>Chinese</em> page?
+
+<h3>The Difficulty on Keeping up Translations</h3>
+
+<p>
+As I modify the original page, the first thing I'd notice is that it's impossible to get my French and Hebrew friends to translate <em>from Chinese</em> -- clearly, using English as the <em>base version</em> would be necessary.  The same reasoning also applies to most Free Software projects, even if the principal developers do not speak English natively.
+
+<p>
+Moreover, even if it is merely a change to the background color (e.g. <tt>&lt;body bgcolor=gold&gt;</tt>), I still need to modify all translated pages, in order to keep the layout consistent.
+
+<p>
+Now, if both the layout <em>and</em> contents are changed, things quickly become very complicated.  Since the old HTML tags are gone, my translator friends must work from scratch every time!  Unless all of them are HTML wizards, errors and conflicts will surely arise.  If there are 20 regularly updated pages in my personal site, then pretty soon I will run out of translators -- or even out of friends.
+
+<p>
+As you can see, we need a way to <em>separate data and code</em> (i.e. text and tags), and <em>automate</em> the process of generating localized pages.
+
+<h3>Separate Data and Code with CGI.pm</h3>
+
+<p>
+Actually, the previous sentence pretty much summarized up the modern internationalization(i18n) process: To prepare a web application for localization, one must find a way to separate as much data from code as possible.
+
+<p>
+As the long-established Web development language of choice, Perl offers a bewildering array of modules and toolkits for website construction.  The most popular one is probably <tt>CGI.pm</tt>, which has been merged into core perl release since 1997.  Let us see a code snippet that uses it to automatically generate translated pages:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 3. Localization with MultiViews and CGI.pm</font></caption>
+<tr><td><PRE>
+use CGI ':standard'; <i># our templating system</i>
+foreach my $language (qw(zh_tw en de fr)) {
+    open OUT, "&gt;index.html.$language" or die $!;
+    print OUT start_html({ title =&gt; _(<b>"Audrey.Home"</b>) }),
+	      _(<b>"Sorry, this page is under construction."</b>),
+	      end_html;        
+    sub _ { some_function($language, @_) } <i># XXX: put L10n framework here</i>
+}
+</PRE></td></tr></table>
+
+<p>
+Unlike the HTML pages, this program enforces data/code separation via <tt>CGI.pm</tt>'s HTML-related routines.  Tags (e.g. &lt;html&gt;) now become functions calls (<tt>start_html()</tt>), and texts are turned into Perl strings.  Therefore, when the localized version is written out to the corresponding static page (<tt>index.html.zh_tw</tt>, <tt>index.html.en</tt>, etc.), the HTML layout will always be identical for each of the four languages listed.
+
+<p>
+<a title="">The <tt>sub _</tt> function is responsible for localizing any text into the current <tt>$language</tt>, by passing the language and text strings to a hypothetical <tt>some_function()</tt>; the latter is known as our <em>localization framework</em>, and we will see three such frameworks in the following section.</a>
+
+<p>
+After writing the snippet, it is a simple matter to <tt>grep</tt> for all strings inside <tt>_(...)</tt>, <em>extract</em> them into a <em>lexicon</em>, and ask translators to fill it out.  Note that here <em>lexicon</em> means a set of things that we know how to say in another language -- sometimes single words like (<tt>"Cancel"</tt>), but usually whole phrases (<tt>"Do you want to overwrite?"</tt> or <tt>"5 files found."</tt>).  Strings in a lexicon are like entries in travelers' pocket phrasebooks, sometimes with blanks to fill in, as demonstrated in Figure 4:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Figure 4: An English =&gt; Haitian lexicon</font></caption>
+<tr>
+<td align="center" bgcolor=black><font color="white">English</font></td>
+<td align="center" bgcolor=black><font color="white">Haitian</font></td>
+</tr><tr><td align="center">
+This costs ___ dollars.
+</td><td>
+Bagay la kute ___ dola yo.
+</td></tr></table>
+
+<p>
+Ideally, the translator should focus solely on this lexicon, instead of peeking at HTML files or the source code.  But there is the rub: different localization frameworks use different lexicon formats, so one has to choose the framework that suits the project best.
+
+<h2>Localization Frameworks</h2>
+
+<p align="right" class=right>
+<i>``It is more complicated than you think.''<br>
+-- Eighth Networking Truth, RFC 1925</i>
+
+<p>
+To implement the <tt>some_function()</tt> in figure 4, one needs a library to manipulate lexicon files, look up the corresponding strings in it, and maybe incrementally extract new strings to the lexicon.  These are collectively known as a <em>localization framework</em>.
+
+<p>
+From my observation, frameworks mostly differ in their idea about how lexicons should be structured.  Here, I will discuss the Perl interface for three such frameworks, starting from the venerable <tt>Msgcat</tt>.
+
+<h3>Msgcat -- Lexicons are Arrays</h3>
+
+<p>
+As one of the earliest L10n frameworks and part of XPG3/XPG4 standards, <tt>Msgcat</tt> enjoys ubiquity in all Un*x platforms.  It represents the first-generation paradigm of lexicons: treat entries as numbered strings in an array (a.k.a. <em>message catalog</em>).  This approach is straightforward to implement, needs little memory, and is very fast to look up.  The <em>resource files</em> used in Windows programming and other platforms uses basically the same idea.
+
+<p>
+For each page or source file, <tt>Msgcat</tt> requires us to make a lexicon file for each language, as shown below:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 4. A <tt>Msgcat</tt> lexicon</font></caption>
+<tr><td><PRE>
+$set <b>7</b> <i># $Id: nls/de/index.pl.m</i>
+<b>1</b> Audrey'.Haus
+<b>2</b> Wir bitten um Entschudigung. Diese Seite ist im Aufbau.
+</PRE></td></tr></table>
+
+<p>
+The above file contains the German translation for each text strings within <tt>index.html</tt>, which is represented by an unique <em>set number</em>, <b>7</b>.  Once we finished building the lexicons for all pages, the <tt>gencat</tt> utility is then used to generate the binary lexicon:
+<p>
+<pre>
+	% gencat nls/de.cat nls/de/*.m 
+</pre>
+
+<p>
+It is best to imagine the internals of the binary lexicon as a two-dimensional array, as shown in figure 5:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Figure 5: The content of <tt>nls/de.cat</tt></font></caption>
+<tr>
+<td align="right" bgcolor=black><font color="white">set_id<br>msg_id</font></td>
+<td align="center" bgcolor=black><font color="white">1</font></td>
+<td align="center" bgcolor=black><font color="white">2</font></td>
+<td align="center" bgcolor=black><font color="white">3</font></td>
+<td align="center" bgcolor=black><font color="white">4</font></td>
+<td align="center" bgcolor=black><font color="white">5</font></td>
+<td align="center" bgcolor=black><font color="white">6</font></td>
+<td align="center" bgcolor=black><font color="white">7</font></td>
+<td align="center" bgcolor=black><font color="white">8</font></td>
+<td align="center" bgcolor=black><font color="white">9</font></td>
+</tr><tr>
+<td align="center" bgcolor=black><font color="white">1</font></td>
+<td><i>...</i></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td>
+<td><tt>Audrey'.Haus</tt></td>
+<td><i>...</i></td><td><i>...</i></td>
+</tr><tr>
+<td align="center" bgcolor=black><font color="white">2</font></td>
+<td><i>...</i></td><td></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td>
+<td><tt>Wir bitten um Entschudigung...</tt></td>
+<td><i>...</i></td><td><i>...</i></td>
+</tr><tr>
+<td align="center" bgcolor=black><font color="white">3</font></td>
+<td><i>...</i></td><td></td><td><i>...</i></td><td><i>...</i></td><td></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td>
+</tr></table>
+
+<p>
+To read from the lexicon file, we use the Perl module <tt>Locale::Msgcat</tt>, available from CPAN (the Comprehensive Perl Archive Network), and implement the earlier <tt>sub _()</tt> function like this:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 5. Sample usage of <tt>Locale::Msgcat</tt></font></caption>
+<tr><td><PRE>
+use Locale::Msgcat;
+my $cat = Locale::Msgcat-&gt;new;
+$cat-&gt;catopen("nls/$language.cat", 1); <i># it's like a 2D array</i>
+sub _ { $cat-&gt;catgets(<b>7</b>, @_) } <i># <b>7</b> is the set_id for index.html</i>
+print _(<b>1</b>, "Audrey.House");  <i># <b>1</b> is the msg_id for this text</i>
+</PRE></td></tr></table>
+
+<p>
+Note that only the <tt>msg_id</tt> matters here; the string <tt>"Audrey.House"</tt> is only used as an optional fall-back when the lookup failed, as well as to improve the program's readability.
+
+<p>
+Because <tt>set_id</tt> and <tt>msg_id</tt> must both be <em>unique</em> and <em>immutable</em>, future revision may only delete entries, and never reassign the number to represent other strings.  This characteristic makes revisions very costly, as observed by Drepper et al in the GNU gettext manuals:
+
+<p>
+<blockquote>
+Every time he comes to a translatable string he has to define a number
+(or a symbolic constant) which has also be defined in the message
+catalog file.  He also has to take care for duplicate entries,
+duplicate message IDs etc.  If he wants to have the same quality in the
+message catalog as the GNU <tt>gettext</tt> program provides he also has to
+put the descriptive comments for the strings and the location in all
+source code files in the message catalog.  This is nearly a Mission:
+Impossible.
+</blockquote>
+
+<p>
+Therefore, one should consider using <tt>Msgcat</tt> only if the lexicon is very stable.
+<p>
+Another shortcoming that had plagued <tt>Msgcat</tt>-using programs is the <em>plurality</em> problem.  Consider this code snippet:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 6. Incorrect plural form handling</font></caption>
+<tr><td><PRE>
+printf(_(8, "<b>%d</b> files were deleted."), $files);
+</PRE></td></tr></table>
+
+<p>
+This is obviously incorrect when <tt>$files == 1</tt>, and <tt>"<b>%d</b> file(s) were deleted"</tt> is grammatically invalid as well.  Hence, programmers are often forced to use two entries:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 7. English-specific plural form handling</font></caption>
+<tr><td><PRE>
+printf(($files == 1) ? _(8, "<b>%d</b> file was deleted.")
+		     : _(9, "<b>%d</b> files were deleted."), $files);
+</PRE></td></tr></table>
+
+<p>
+But even that is still bogus, because it is English-specific -- French uses singular with <tt>($files == 0)</tt>, and Slavic languages has three or four plural forms!  Trying to retrofit those languages to the <tt>Msgcat</tt> infrastructure is often a futile exercise.
+
+<h3>Gettext -- Lexicons are Hashes</h3>
+
+Due to the various problems of <tt>Msgcat</tt>, the GNU Project has developed its own implementation of the Uniforum <tt>Gettext</tt> interface in 1995, written by Ulrich Drepper.  It had since become the <em>de facto</em> L10n framework for C-based free software projects, and has been widely adopted by C++, Tcl and Python programmers.
+
+<p>
+Instead of requiring one lexicon for each source file, <tt>Gettext</tt> maintains a single lexicon (called a <em>PO file</em>) for each language of the entire project.  For example, the German lexicon <tt>de.po</tt> for the homepage above would look like this:
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 8. A <tt>Gettext</tt> lexicon</font></caption>
+<tr><td><PRE>
+#: index.pl:4
+msgid "Audrey.Home"
+msgstr "Audrey'.Haus"
+
+#: index.pl:5
+msgid "Sorry, this site is under construction."
+msgstr "Wir bitten um Entschudigung. Diese Seite ist im Aufbau."
+</PRE></td></tr></table>
+
+<p>
+
+The <tt>#:</tt> lines are automatically generated from the source file by the program <tt>xgettext</tt>, which can extract strings inside invocations to <tt>gettext()</tt>, and sort them out into a lexicon.
+
+<p>
+Now, we may run <tt>msgfmt</tt> to compile the binary lexicon <tt>locale/de/LC_MESSAGES/web.mo</tt> from <tt>po/de.po</tt>:
+
+<pre>
+	% msgfmt locale/de/LC_MESSAGES/web.mo po/de.po
+</pre>
+
+<p>
+We can then access the binary lexicon using <tt>Locale::gettext</tt> from CPAN, as shown below:
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 9. Sample usage of <tt>Locale::gettext</tt></font></caption>
+<tr><td><PRE>
+use POSIX;
+use Locale::gettext;
+POSIX::setlocale(LC_MESSAGES, $language); <i># Set target language</i>
+textdomain("web"); <i># Usually the same as the application's name</i>
+sub _ { gettext(@_) } <i># it's just a shorthand for gettext()</i>
+print _("Sorry, this site is under construction.");
+</PRE></td></tr></table>
+
+<p>
+Recent versions (glibc 2.2+) of <tt>gettext</tt> had also introduced the <tt>ngettext("%d file", "%d files", $files)</tt> syntax.  Unfortunately, <tt>Locale::gettext</tt> does not support that interface yet.
+
+<p>
+Also, <tt>gettext</tt> lexicons support multi-line strings, as well as reordering via <tt>printf</tt> and <tt>sprintf</tt>:
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 10. A multi-line entry with numbered arguments</font></caption>
+<tr><td><PRE>
+msgid ""
+"This is a multiline string"
+"with <b>%1$s</b> and <b>%2$s</b> as arguments"
+msgstr ""
+"これは多線ひも変数として"
+"<b>%2$s</b> と <b>%1$s</b> のである"
+</PRE></td></tr></table>
+
+<p>
+Finally, GNU <tt>gettext</tt> comes with a very complete tool chain (msgattrib, msgcmp, msgconv, msgexec, msgfmt, msgcat, msgcomm...), which greatly simplified the process of merging, updating and managing lexicon files.
+
+<h3>Locale::Maketext -- Lexicons are Dispatch Tables!</h3>
+
+<p>
+First written in 1998 by Sean M. Burke, the <tt>Locale::Maketext</tt> module was revamped in May 2001 and included in Perl 5.8 core.
+
+<p>
+Unlike the function-based interface of <tt>Msgcat</tt> and <tt>Gettext</tt>, its basic design is object-oriented, with <tt>Locale::Maketext</tt> as an abstract base class, from which a <em>project class</em> is derived.  The project class (with a name like <tt>MyApp::L10N</tt>) is in turn the base class for all the <em>language classes</em> in the project (with names like <tt>MyApp::L10N::it</tt>, <tt>MyApp::L10N::fr</tt>, etc.).
+
+<p>
+A language class is really a perl module containing a <tt>%Lexicon</tt> hash as class data, which contains strings in the native language (usually English) as keys, and localized strings as values.  The language class may also contain some methods that are of use in interpreting phrases in the lexicon, or otherwise dealing with text in that language.
+
+<p>
+Here is an example:
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 11. A <tt>Locale::Maketext</tt> lexicon and its usage</font></caption>
+<tr><td><PRE>
+package MyApp::L10N;
+use base 'Locale::Maketext';
+
+package MyApp::L10N::de;
+use base 'MyApp::L10N';
+our %Lexicon = (
+    "[<b>quant</b>,_1,camel was,camels were] released." =>
+    "[<b>quant</b>,_1,Kamel wurde,Kamele wurden] freigegeben.",
+);
+
+package main;
+my $lh = MyApp::L10N-&gt;get_handle('de');
+print $lh-&gt;maketext("[<b>quant</b>,_1,camel was,camels were] released.", 5);
+</PRE></td></tr></table>
+
+<p>
+Under its <em>square bracket notation</em>, translators can make use of various linguistic-related functions inside their translated strings.  The example above highlights includes built-in plurals and quantifiers support; for languages with other kinds of plural-form characteristics, it is a simple matter of implementing a corresponding <tt>quant()</tt> function.  Ordinates and time formats are easy to add, too.
+
+<p>
+Each language class may also implement an <tt>-&gt;encoding</tt> method to describe the encoding of its lexicons, which may be linked with <tt>Encode</tt> for transcoding purposes.  Language families are also inheritable and subclassable: missing entries in <tt>fr_ca.pm</tt> (Canadian French) would fallbacks to <tt>fr.pm</tt> (Generic French).
+
+<p>
+The handy built-in method <tt>-&gt;get_handle()</tt> with no arguments magically detects HTTP, POSIX and Win32 locale settings in CGI, mod_perl or command line; it spares the programmer to parse those settings manually.
+
+<p>
+However, <tt>Locale::Maketext</tt> is not without problems.  The most serious issue is its lacking of a <em>toolchain</em> like GNU <tt>Gettext</tt>'s, due to the extreme flexibility of lexicon classes.  For the same reason, there are also fewer support in text editors (e.g. the <em>PO Mode</em> in Emacs).
+
+<p>
+Finally, since different projects may use different styles to write the language class, the translator must know some basic Perl syntax -- or somebody has to type in for them.
+
+<h3>Locale::Maketext::Lexicon -- The Best of Both Worlds</h3>
+
+<p>
+Irritated by the irregularity of <tt>Locale::Maketext</tt> lexicons, I implemented a home-brew lexicon format for my company's internal use in May 2002, and asked the <em>perl-i18n</em> mailing list for ideas and feedbacks.  Jesse Vincent suggested: "Why not simply standardize on <tt>Gettext</tt>'s PO File format?", so I implemented it to accept lexicons in various formats, handled by different <em>lexicon backend</em> modules.  Thus, <tt>Locale::Maketext::Lexicon</tt> was born.
+
+<p>
+The design goal was to combine the flexibility of <tt>Locale::Maketext</tt> lexicon's expression with standard formats supported by utilities designed for <tt>Gettext</tt> and <tt>Msgcat</tt>.  It also supports the <tt>Tie</tt> interface, which comes in handy for accessing lexicons stored in relational databases or DBM files.
+
+<p>
+The following program demonstrates a typical application using <tt>Locale::Maketext::Lexicon</tt> and the extended PO File syntax supported by the <tt>Gettext</tt> backend:
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 12. A sample application using <tt>Locale::Maketext::Lexicon</tt></font></caption>
+<tr><td bgcolor=black align=right><PRE><font color=white>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</font></PRE></td><td><PRE>
+use CGI ':standard';
+use base 'Locale::Maketext';      <i># inherits get_handle()</i>
+
+<i># Various lexicon formats and sources</i>
+use Locale::Maketext::Lexicon {
+    en =&gt; ['Auto'],              fr    =&gt; ['Tie' =&gt; 'DB_File', 'fr.db'],
+    de =&gt; ['Gettext' =&gt; \*DATA], zh_tw =&gt; ['Gettext' =&gt; 'zh_tw.mo'],
+};
+
+<i># Ordinate functions for each subclasses of 'main'</i>
+use Lingua::EN::Numbers::Ordinate; use Lingua::FR::Numbers::Ordinate;
+sub en::ord { ordinate($_[1]) } sub fr::ord { ordinate_fr($_[1]) }
+sub de::ord { "$_[1]." }        sub zh_tw::ord { "第 $_[1] 個" }
+
+my $lh = __PACKAGE__-&gt;get_handle; <i># magically gets the current locale</i>
+sub _ { $lh-&gt;maketext(@_) }       <i># may also convert encodings if needed</i>
+
+print header, start_html,         <i># [<b>*</b>,...] is a shorthand for [<b>quant</b>,...]</i>
+	_("You are my [<b>ord</b>,_1] guest in [<b>*</b>,_2,day].", $hits, $days), end_html;
+
+__DATA__
+# <i>The German lexicon, in extended PO File format</i>
+msgid "You are my <b>%ord(%1)</b> guest in <b>%*(%2,day)</b>."
+msgstr "Innerhalb <b>%*(%2,Tages,Tagen)</b>, sie sind mein <b>%ord(%1)</b> Gast."
+</PRE></td></tr></table>
+
+<p>
+Line 2 tells the current package <tt>main</tt> to inherit from <tt>Locale::Maketext</tt>, so it could acquire the <tt>get_handle</tt> method.  Line 5-8 builds four <em>language classes</em> using a variety of lexicon formats and sources:
+
+<ul>
+<li>The <em>Auto</em> backend tells <tt>Locale::Maketext</tt> that no localizing is needed for the English language -- just use the lookup key as the returned string.  It is especially useful if you are just starting to prototype a program, and does not want deal with the localization files yet.  
+<li>The <em>Tie</em> backend links the French <tt>%Lexicon</tt> hash to a Berkeley DB file; entries will then be fetched whenever it is used, so it will not waste any memory on unused lexicon entries.
+<li>The <em>Gettext</em> backend reads a compiled MO file from disk for Chinese, and reads the German lexicon from the DATA filehandle in PO file format.
+</ul>
+
+<p>
+Line 11-13 implements the <tt>ord</tt> method for each language subclasses of the package <tt>main</tt>, which converts its argument to ordinate numbers (1th, 2nd, 3rd...) in that language.  Two CPAN modules are used to handle English and French, while German and Chinese only needs straightforward string interpolation.
+
+<p>
+Line 15 gets a <em>language handle</em> object for the current package.  Because we did not specify the language argument, it automatically guesses the current locale by probing the <tt>HTTP_ACCEPT_LANGUAGE</tt> environment variable, POSIX <tt>setlocale()</tt> settings, or via <tt>Win32::Locale</tt> on Windows.  Line 16 sets up a simple wrapper funciton that passes all arguments to the handle's <tt>maketext</tt> method.
+
+<p>
+Finally, line 18-19 prints a message containing one string to be localized.  The first argument <tt>$hits</tt> will be passed to the <tt>ord</tt> method, and the second argument <tt>$days</tt> will call the built-in <tt>quant</tt> method -- the <tt>[*...]</tt> notation is a shorthand for the previously discussed <tt>[quant,...]</tt>.
+
+<p>
+Line 22-24 is a sample lexicon, in extended PO file format.  In addition to ordered arguments via <tt>%1</tt> and <tt>%2</tt>, it also supports <tt>%function(args...)</tt> in entries, which will be transformed to <tt>[function,args...]</tt>.  Any <tt>%1</tt>, <tt>%2</tt>... sequences inside the <em>args</em> will have their percent signs (<tt>%</tt>) replaced by underscores (<tt>_</tt>).
+
+<h2>Case Studies</h2>
+
+<p class="right" align="right">
+<i>``One size never fits all.''<br>
+-- Tenth Networking Truth, RFC 1925</i>
+
+<p>
+Armed with the understanding of localization frameworks, let us see how it fits into real-world applications and technologies.
+
+<p>
+For web applications, the place to implement a L10n framework is almost inevitably its <em>representation system</em>, also known as <em>templating system</em>, because that layer determines the extent of an application's data/code separation.  For example, the <em>Template Toolkit</em> encourages a clean 3-tier data/code/template model, while the equally popular <em>Mason</em> framework lets you easily mix perl code in a template.  In this section, we will survey L10n strategies for those two different frameworks, and the general principle should also apply to <em>AxKit</em>, <em>HTML::Embperl</em>, and other templating systems.
+
+<h3>Request Tracker (Mason)</h3>
+
+<p>
+The <em>Request Tracker</em> is the first application that uses <tt>Locale::Maketext::Lexicon</tt> as its L10n framework.  The <em>base language class</em> is <tt>RT::I18N</tt>, with subclasses reading <tt>*.po</tt> files stored in the same directory.
+
+<p>
+Additionally, its <tt>-&gt;maketext</tt> method was overridden to uses <tt>Encode</tt> (or in pre-5.8 versions of perl, my <tt>Encode::compat</tt>) to return UTF-8 data on-the-fly.  For example, Chinese translator may submit lexicons encoded in <tt>Big5</tt>, but the system will always handle them natively as Unicode strings.
+
+<p>
+In the application's Perl code, all objects use the <Tt>$self-&gt;loc</tt> method, inherited from <tt>RT::Base</tt>:
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 13. RT's L10n implementation</font></caption>
+<tr><td><PRE>
+sub RT::Base::loc
+    { $self-&gt;CurrentUser-&gt;loc(@_) }
+sub RT::CurrentUser::loc
+    { $self-&gt;LanguageHandle-&gt;maketext(@_) }
+sub RT::CurrentUser::LanguageHandle
+    { $self-&gt;{'LangHandle'} ||= RT::I18N-&gt;get_handle(@_) }
+</PRE></td></tr></table>
+
+<p>
+As you can see, the current user's language settings is used, so different users can use the application in different languages simultaneously.  For Mason templates, two styles were devised:
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 14. Two ways to mark strings in Mason templates</font></caption>
+<tr><td><PRE>
+% $m-&gt;print(<b>loc(</b>"<b>Another line of text</b>", $args...<b>)</b>);
+&lt;&amp;<b>|/l</b>, $args...&amp;&gt;<b>Single line of text</b>&lt;/&amp;&gt;
+</PRE></td></tr></table>
+<p>
+The first style, used in embedded perl chunks and <tt>&lt;%PERL&gt;</tt> sections, is made possible by exporting a global <tt>loc()</tt> function to the Mason interpreter; it automatically calls the current user's <tt>-&gt;loc</tt> method described above.
+
+<p>
+The second style uses the <em>filter component</em> feature in <tt>HTML::Mason</tt>, which takes the enclosed <tt>Single line of text</tt>, passes it to the <tt>/l</tt> component (possibly with arguments), and displays the returned string.  Here is the implementation of that component:
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 15. Implementation of the <tt>html/l</tt> filter component</font></caption>
+<tr><td><PRE>
+% my $hand = $session{'CurrentUser'}-&gt;LanguageHandle;
+% $m-&gt;print($hand-&gt;maketext($m-&gt;content, @_));
+</PRE></td></tr></table>
+
+<p>
+With these constructs, it is a simple matter of extracting messages out of existing templates, comment them, and send to the translators.  The initial extraction for 700+ entries took one week; the whole i18n/L10n process took less than two months.
+
+<h3>Slash (Template Toolkit)</h3>
+
+<p>
+Slash -- Slashdot Like Automated Storytelling Homepage -- is the code that runs Slashdot. More than that, however, Slash is an architecture for putting together web sites, built upon Andy Wardley's <em>Template Toolkit</em> module.
+
+<p>
+Due to the clean design of TT2, Slash features a careful separation of code and text, unlike RT/Mason. This largely eliminated the need to localize inside Perl source code.
+
+<p>
+Previous to this article's writing, various whole-template localizations based on the theme system had been attempted, including Chinese, Japanese, and Hebrew versions.  However, merging with a new version was very difficult (not to mention plugins), and translations tend to lag behind a lot.
+
+<p>
+Now, let us consider a better approach: An <em>auto-extraction</em> layer above the template provider, based on <tt>HTML::Parser</tt> and <tt>Template::Parser</tt>.  Its function would be like this:
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 16. Input and output of the TT2 extraction layer</font></caption>
+<tr><td bgcolor=black><font color=white>Input</font></td><td><PRE>
+&lt;B&gt;from the [% story.dept %] dept.&lt;/B&gt;
+</PRE></td></tr>
+<tr><td bgcolor=black><font color=white>Output</font></td><td><PRE>
+&lt;B&gt;[%<b>|loc(</b> story.dept <b>)</b>%]from the [<b>_1</b>] dept.[%END%]&lt;/B&gt;
+</PRE></td></tr></table>
+
+<p>
+The acute reader will point out that this layer suffer from the same linguistic problems as <tt>Msgcat</tt> does -- what if we want to make ordinates from <tt>[% story.dept %]</tt>, or expand the <tt>dept.</tt> to <tt>department</tt> / <tt>departments</tt>?  The same problem has occurred in RT's web interface, where it had to localize messages returned by external modules, which may already contain interpolated variables, e.g. <tt>"Successfully deleted 7 ticket(s) in 'c:\temp'."</tt>.
+
+<p>
+My solution to this problem is to introduce a <em>fuzzy match</em> layer with the module <tt>Locale::Maketext::Fuzzy</tt>, which matches the interpolated string against the list of <em>candidate entries</em> in the current lexicon, to find one that can possibly yield the string (e.g. <tt>"Successfully deleted [*,_1,ticket] in '[_2]'."</tt>).  If two or more candidates are found, -- after all, <tt>"Successfully [_1]."</tt> also matches the same string -- tie-breaking heuristics are used to determine the most likely candidate.
+
+<p>
+Combined with <tt>xgettext.pl</tt>, developers can supply compendium lexicons along with each plugin/theme, and the Slash system would employ a multi-layer lookup mechanism: Try plugin-specific entries first; then the theme's; then fallback to the global lexicon.
+
+<h2>Summary</h2>
+
+<p class="right" align="right">
+<i>``...perfection has been reached not when there is nothing left to add, but when there is nothing left to take away.''<br>
+-- Twelfth Networking Truth, RFC 1925</i>
+
+<p>
+From the two case studies above, it is quite easy to see an emergent pattern of how such efforts are carried.  This section presents a 9-step guide in localizing <em>existing</em> web applications, as well as tips of how to implement them with minimal hassles.
+
+<h3>The Localization Process</h3>
+
+We can summarize the localization process as several steps, each depending on previous ones:
+
+<ol>
+<li>Assess the website's templating system
+<li>Choose a localization framework and hook it up
+<li>Write a program to locate text strings in templates, and put filters around them
+<li>Extract a test lexicon; fix obvious problems manually
+<li>Locate text strings in the source code by hand; replace them with <tt><b>_(</b>...<b>)</b></tt> calls
+<li>Extract another test lexicon and machine-translate it
+<li>Try the localized version out; fix any remaining problems
+<li>Extract the beta lexicon; mail it to your translator teams for review
+Fix problems reported by translators; extract the official lexicon and mail it out!
+<li>Periodically notify translators of new lexicon entries before each release
+</ol>
+
+Following these steps, one could manage a L10n project fairly easily, and keep the translations up-to-date and minimize errors.
+
+<h3>Localization Tips</H3>
+
+Finally, here are some tips for localizing Web applications, and other softwares in general:
+
+<ul>
+<li><em>Separate data and code</em>, both in design and in practice
+<li>Don't work on i18n/L10n before the website or application takes shape
+<li>Avoid graphic files with text in them
+<li>Leave enough spaces around labels and buttons -- do not overcrowd the UI
+<li>Use complete sentences, instead of concatenated fragments (see listing 17):
+</ul>
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 17. Fragmented vs. complete sentences</font></caption>
+<tr><td><PRE>
+_("Found ") . $files . _(" file(s).");   <i># Fragmented sentence - wrong!</i>
+sprintf(_("Found %s file(s)."), $files); <i># Complete (with sprintf)</i>
+_("Found [*,_1,file].", $files);         <i># Complete (Locale::Maketext)</i>
+</PRE></td></tr></table>
+
+<ul>
+<li>Distinguish the same string in different contexts<br>
+e.g. "Home" in RT used to mean both "Homepage" and "Home Phone No."
+<li>Work with your translators as equals; do not apply lexicon patches by yourself
+<li>One person doing draft translations works best
+<li>In lexicons, provide as much comments and metadata as possible:
+</ul>
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>Listing 18. Comments in lexicons</font></caption>
+<tr><td><PRE>
+#: lib/RT/Transaction_Overlay.pm:579
+#. ($field, $self->OldValue, $self->NewValue)
+# <i>Note that 'changed to' here means 'has been modified to...'.</i>
+msgid "<b>%1 %2</b> changed to <b>%3</b>"
+msgstr "<b>%1 %2</b> cambiado a <b>%3</b>"
+</PRE></td></tr></table>
+
+<p>
+Using the <tt>xgettext.pl</tt> utility provided in the <tt>Locale::Maketext::Lexicon</tt> package, the source file, line number (marked by <tt>#:</tt>) and variables (marked by <tt>#.</tt>) can be deduced automatically and incrementally.  It would also be very helpful to clarify the meaning of short or ambiguous with normal comments (marked by <tt>#</tt>), as shown in listing 18 above.
+
+<h2>Conclusion</h2>
+
+<p>
+For countries with language dissimilar to English, localization efforts is often the prerequisite for people to participate in other Free Software projects.  In Taiwan, L10n projects like the CLE (Chinese Linux Environment), Debian-Chinese and FreeBSD-Chinese were (and still are) the principal place where community contributions are made.  However, such efforts are also historically time-consuming, error-prone jobs, partly because of English-specific frameworks and rigid coding practices used by existing applications.  The <em>entry barrier</em> for translators was unnecessarily high.
+
+<p>
+On the other hand, ever-increasing internationalization of the Web makes it increasingly likely that the interface to Web-based dynamic content service will be localized to two or more languages.  For example, Sean M. Burke led enthusiastic users to localize the popular <em>Apache::MP3</em> module, which powers home-grown Internet jukeboxes everywhere, to dozens of languages in 2002.  The module's author, Lincoln D. Stein, did not involve with the project at all -- all he needed to do was integrating the i18n patches and lexicons into the next release.
+
+<p>
+The Free Software projects are not abstractions filled with code, but rather depends on people caring enough to share code, as well as sharing useful feedback in order to improve each other's code.  Hence, it is my sincere hope that techniques presented in this article will encourage programmers and eager users to actively internationalize existing applications, instead of passively translating for the relatively few applications with established i18n frameworks.
+
+<h2>Acknowledgments</h2>
+
+<p>
+Thanks to Jesse Vincent for suggesting <tt>Locale::Maketext::Lexicon</tt> to be written, and for allowing me to work with him on RT's L10n model.  Thanks also to Sean M. Burke for coming up with <tt>Locale::Maketext</tt>, and encouraging me to experiment with alternative Lexicon syntaxes.
+
+<p>
+Thanks also go to my brilliant colleagues in OurInternet, Inc. for the hard work they did on localizing web applications: Hsin-Chan Chien, Chia-Liang Kao, Whiteg Weng and Jedi Lin.  Also thanks to my fellow translators of the Llama book (<em>Learning Perl</em>), who showed me the power of distributed translation teamworks.
+
+<p>
+I would also like to thank to Nick Ing-Simmons, Dan Kogai and Jarkko Hietaniemi for teaching me how to use the <tt>Encode</tt> module, Bruno Haible for his kind permission for me to use his excellent work on GNU libiconv, and Tatsuhiko Miyagawa for proofreading early versions of my <tt>Locale::Maketext::Lexicon</tt> module.  Thanks!
+
+<p>
+Finally, if you decide to follow the steps in this article and participate in software internationalization and localization, then you have my utmost gratitude; let's make the Web a truly <em>World Wide</em> place.
+
+<h2>Bibliography</h2>
+
+<p>
+Alvestrand, Harald Tveit.  1995.  <em>RFC 1766: Tags for the Identification of Languages.</em>, <tt>ftp://ftp.isi.edu/in-notes/rfc1766.txt</tt>
+
+<p>
+Callon, Ross, editor.  1996.  <em>RFC 1925: The Twelve Networking Truths.</em>, <tt>ftp://ftp.isi.edu/in-notes/rfc1925.txt</tt>
+
+<p>
+Drepper, Ulrich, Peter Miller, and Fran&ccedil;ois Pinard.  1995-2001.  GNU <tt>gettext</tt>.  Available in <tt>ftp://prep.ai.mit.edu/pub/gnu/</tt>, with extensive documents in the distribution package.
+
+<p>
+Burke and Lachler.  1999. <em>Localization and Perl: gettext breaks, Maketext fixes</em>, first published in The Perl Journal, issue 13.
+
+<p>
+Burke, Sean M.  2002. <em>Localizing Open-Source Software</em>, first published in the The Perl Journal, Fall 2002 edition.
+
+<p>
+W3C internationalization activity statement, 2001, <tt>http://www.w3.org/International/Activity.html</tt>
+
+<p>
+Mozilla i18n & L10n guidelines, 1999, <tt>http://www.mozilla.org/docs/refList/i18n/</tt>
+
+</body></html>

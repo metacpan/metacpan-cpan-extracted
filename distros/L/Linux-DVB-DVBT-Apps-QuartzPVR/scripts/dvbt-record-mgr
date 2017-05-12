@@ -1,0 +1,278 @@
+#!/usr/bin/perl
+#
+use strict ;
+
+# Local
+use App::Framework '+Sql +Config' ;
+
+use Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants ;
+
+use Linux::DVB::DVBT::Apps::QuartzPVR ;
+use Linux::DVB::DVBT::Apps::QuartzPVR::Base::DbgProf ;
+
+# VERSION
+our $VERSION = '6.02' ;
+
+
+	# Create application and run it
+	App::Framework->new() ;
+	go() ;
+
+
+#=================================================================================
+# SUBROUTINES EXECUTED BY APP
+#=================================================================================
+
+#----------------------------------------------------------------------
+# Main execution
+#
+sub app
+{
+	my ($app, $opts_href, $args_href) = @_ ;
+
+	$opts_href->{'user'}	||= Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants::SQL_USER ;
+	$opts_href->{'password'}||= Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants::SQL_PASSWORD ;
+	
+	if (!$opts_href->{'user'} || !$opts_href->{'password'})
+	{
+		print "Error: You must specify the MySQL username AND password when using this script outside the PVR suite\n" ;
+		exit 1 ;
+	}
+	
+	## Map special cases
+	my %tvguide_opts = (
+		'app'			=> $app,
+		'sql'			=> $app->sql,						# set to Database handler object
+
+		'tbl_recording'	=> $opts_href->{'tbl-record'},			# database table for recordings requests
+		'tbl_listings'	=> $opts_href->{'tbl-listings'},		# database table for tvguide listings
+		'tbl_schedule'	=> $opts_href->{'tbl-schedule'},		# database table for resulting scheduled recordings
+		'tbl_multirec'	=> $opts_href->{'tbl-multirec'},		# database table for multiplex recordings
+		'tbl_iplay'		=> $opts_href->{'tbl-iplay'},			# database table for get_iplayer scheduled recordings
+		'tbl_chans'		=> $opts_href->{'tbl-chans'},			# database table for list of channels
+		'tbl_recorded'	=> $opts_href->{'tbl-recorded'},		# database table for recorded programs
+
+		'trace_flag'	=> $opts_href->{'dbg-trace'},
+		'profile_flag'	=> $opts_href->{'dbg-prof'},
+	) ;
+	
+	## copy rest
+	foreach my $opt (keys %$opts_href)
+	{
+		# change '-' to '_'
+		my $new_opt = $opt ;
+		$new_opt =~ s/\-/_/g ;
+		
+		$tvguide_opts{$new_opt} = $opts_href->{$opt} ;	
+	}
+	
+	## new object
+	my $tvguide = Linux::DVB::DVBT::Apps::QuartzPVR->new( %tvguide_opts ) ;
+
+	Linux::DVB::DVBT::Apps::QuartzPVR::Base::DbgProf::startfn() ;
+	
+	## Run
+	$tvguide->process($opts_href) ;
+	
+	Linux::DVB::DVBT::Apps::QuartzPVR::Base::DbgProf::endfn() ;
+	Linux::DVB::DVBT::Apps::QuartzPVR::Base::DbgProf::display() ;
+}
+
+
+
+
+#=================================================================================
+# FUNCTIONS
+#=================================================================================
+
+
+#=================================================================================
+# SETUP
+#=================================================================================
+__DATA__
+
+[SUMMARY]
+
+Manages DVB recordings using crontab 
+
+[OPTIONS]
+
+-info					Display info
+
+Do not run scheduling, just display current settings
+
+-date=s					Set date
+
+Specify the baseline date (any recordings etc will be ignored if they are before this date). Default
+is to use today's date.
+
+-db|'database'=s		Database [default=$DEF_DATABASE]
+
+Specify database name
+
+-tbl-record=s		Table [default=$DEF_TBL_RECORDING]
+
+Specify database table name
+
+-tbl-listings=s		Table [default=$DEF_TBL_LISTINGS]
+
+EPG table
+
+-tbl-schedule=s		Table [default=$DEF_TBL_SCHEDULE]
+
+Specify database table name for scheduled recordings
+
+-tbl-multirec=s		Table [default=$DEF_TBL_MULTIREC]
+
+Specify database table name for multiplex recordings
+
+-tbl-iplay=s		Table [default=$DEF_TBL_IPLAY]
+
+Specify database table name for get_iplayer scheduled recordings
+
+-tbl-chans=s		Table [default=$DEF_TBL_CHANNELS]
+
+Specify database table name for list of channels
+
+-tbl-recorded=s		Table [default=$DEF_TBL_RECORDED]
+
+Specify database table name for tracking recorded programs
+
+-log_dir=s		Log directory [default=$DEF_PVR_LOGDIR]
+
+Log files location
+
+-dev:php 		PHP interface mode
+
+When set, returns messages/errors in a PHP-friendly manner
+
+
+-dev:rec=s 	Add/Change/Delete recording
+
+Expect a record specification of one of the following two forms. First form creates a new recording:
+
+  'rec:<level>:pid:<program id>:'
+
+Second form modifies (or deletes if level=0) an existing recording:
+
+  'rec:<level>:rid:<record id>:'
+
+-dev:test=i		Test mode [default=0]
+
+Do NOT commit changes. Test mode = 0 : commit all ; Test mode = 1 : commit sql NOT cron ; Test mode = 2 : commit neither sql NOR cron.
+
+
+-video_dir=s 	Video Directory [default=$DEF_VIDEO_DIR]
+
+Video record directory
+
+-audio_dir=s 	Audio Directory [default=$DEF_AUDIO_DIR]
+
+Audio record directory
+
+-video_path=s 	Video path spec [default=$DEF_VIDEO_PATH]
+
+Video record path specification. The variables are expanded for each file.
+
+-audio_path=s 	Audio path spec [default=$DEF_AUDIO_PATH]
+
+Audio record path specification. The variables are expanded for each file.
+
+-variables=s%		Variables
+
+Define your own variables to be used with the "path specs" (-video_path and -audio_path). Alternatively, use
+the environment variables.
+
+-pad|'padding'=s 	Start/end pad minutes [default=2]
+
+Amount of padding to add to start & end of recording
+
+-margin=s 	Program search margin hours [default=4]
+
+When a program is moved in the listings compared with the scheduled recording, this parameter sets the number of hours
+to search before and after the actual recording time (i.e. a search window)
+
+-early=s 	Early time (seconds) [default=45]
+
+When two programs are adjacent on the same adapter, finish the first program this number of seconds early. This allows the
+DVB tuner time to be retuned ready for the next program.
+
+-recprog=s 		Recording program [default=$DEF_PERL_SCRIPTS/$DEF_RECPROG]
+
+Specify the name of the program to be used to record. Default is to use the installed program provided with Linux::DVB::DVBT.
+
+-iplayprog=s 		Recording program [default=$DEF_PERL_SCRIPTS/$DEF_IPLAYPROG]
+
+Specify the name of the program to be used to download IPLAYER source.
+
+-iplay-time=s		IPLAY record time [default="01:00"]
+
+Time of day to schedule all IPLAY downloads
+
+
+-dev:dbg-sql=i	Debug sql module
+
+-dev:date=s		Set start date [default=today]
+
+Set date for debug purposes
+
+-dev:dbg-trace=s  Trace recording
+
+Display a trace for specified recording ID (rid). Special case 'all' shows all traces.
+
+-dev:dbg-prof=i		Profile script [default=0]
+
+-dev:dbg-schedule=i			Debug scheduling
+-dev:dbg-report=i			Debug reporting
+-dev:dbg-recording=i		Debug recording
+-dev:dbg-cron=i				Debug cron
+-dev:dbg-prog=i				Debug program
+-dev:dbg-series=i			Debug series
+-dev:dbg-iplay=i			Debug iplayer
+-dev:dbg-dbg-trace=i		Debug the trace module
+
+-enable-multirec=i		[default=1]
+
+Allow the use of multiple recording scheduled on the same multiplex
+
+-max-timeslip=i			[default=60]
+
+Maximum time allowed for start og program to slip (in minutes)
+
+-run-dir=s				[default=$DEF_PVR_HOME/.dvb_record_mgr]
+
+Directory in which to store all of the multiplex & iplayer recording specification files. Each file
+contains the list of programs to be recorded for that multiplex/iplay file.
+
+-run-ext=s				[default=.lst]
+
+Filenames extension for file containing multiplex recording list of programs
+
+
+
+-report=i             Print report [default=0]
+
+Print out full report
+
+-adapters=s				DVB tuners [default=$DEF_ADAPTERS]
+
+Specify the list of adapters to be used as comma and/or space separated string. Each adapter may be specified
+either as an adapter number or in {adapter}:{frontend} format
+
+-u|'user'=s		User
+
+Specify Mysql user name
+
+-p|'password'=s		Password
+
+Specify Mysql user password
+
+
+[DESCRIPTION]
+
+Reads the DVB recording database and sets up the user crontab to record the appropriate programs.
+
+Crontab entries for DVB recording are marked with a comment of the form:
+
+ #@ [dvb-record]
+

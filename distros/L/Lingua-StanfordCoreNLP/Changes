@@ -1,0 +1,50 @@
+Revision history for Perl module Lingua::StanfordCoreNLP
+
+0.10	2013-02-19
+	- The big update is moving most of the Java code
+	  into a separate Java library, making development
+	  and maintenance much easier.
+	- Updated to latest Stanford CoreNLP version.
+	- Added the environmental variables
+	  LINGUA_CORENLP_JAR_PATH --- to let you override
+	  where Lingua::StanfordCoreNLP looks for the
+	  CoreNLP jar-files --- and LINGUA_CORENLP_VERSION
+	  --- which tells us which version it is.
+	  Thanks to Bahareh Sarrafzadeh for pointing out the
+	  need for this (and, indirectly, getProperties and
+	  setProperties).
+	- General cleanup around class-paths.
+	- Added getProperties and setProperties, which let
+	  you change annotator options. See man-page for more
+	  info.
+	- s/getCorefMentions/getMentionsInTextualOrder/, as
+	  the CorefChain API has apparently changed.
+	- Changed tests to use Test::More rather than
+	  Test::Simple. Added more tests.
+	- Removed silencing of output, which seems to
+	  hang the new CoreNLP. Will look into it for future
+	  versions if someone asks me to.
+	- Sources are now available on GitHub:
+	  https://github.com/raisanen/lingua-stanfordcorenlp
+
+0.04  2012-05-29
+	- Updated to latest StanfordCoreNLP version.
+
+0.03  2011-09-05
+	- IDs are now sequential, rather than random.
+	  (Non-deterministic IDs are no fun after a
+	  a failure in the middle of processing
+	  11,000 files (and God knows how many sentences).)
+	- Smarter getting of index for governor/dependent
+	  in dependencies. (IndexedWord has an, wait for it,
+	  index method. I should read javadocs more closely)
+	- Dependencies now have full names (e.g. 'prep_of'
+	  rather than 'prep').
+	  Thanks to Eneko Agirre for the fix.
+
+0.02  2011-07-01
+	- Many sanity checks on indexes.
+	- Added this file.
+
+0.01  2011-06-30
+	- Initial release.

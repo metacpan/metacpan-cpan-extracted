@@ -1,0 +1,172 @@
+package LCFG::Component::[% pkgspec.name | ucfirst %]; # -*- perl -*-
+use strict;
+use warnings;
+
+use v5.10;
+
+our $VERSION = '@LCFG_VERSION@';
+
+use parent qw(LCFG::Component);
+
+use LCFG::Template qw($PERLTMPL $MODIFIED);
+
+##########################################################################
+# Resource variables
+##########################################################################
+
+my $server;
+
+##########################################################################
+sub Configure {
+##########################################################################
+
+    my ( $self, $res, @args ) = @_;
+
+########################################################################
+# We illustrate two different cases here. Normally, you wouldn't
+# use both together:
+########################################################################
+
+    $server = $res->{server}{VALUE};
+
+########################################################################
+# (1) Firstly, we recreate a configuration file when we get a reconfigure
+# call. Normally, this would be used if you have no daemon, or if
+# your daemon is a separate program.
+########################################################################
+
+    my $template = $res->{template}{VALUE};
+    my $configfile = $res->{configfile}{VALUE};
+
+    my $status = LCFG::Template::Substitute
+        ( $template, $configfile, $PERLTMPL, $res );
+
+    if ( ! defined $status ) {
+        $self->LogMessage($@);
+        $self->Fail( "failed to create config file (see logfile)");
+    }
+
+    if ( $status == $MODIFIED ) {
+        $self->LogMessage("configuration changed");
+    }
+
+    # At this point, we should check if the daemon is running, and
+    # if so notify it of any changes (if necessary)
+
+########################################################################
+# (2) Secondly, if we are writing our own daemon which runs as
+# a fork of this component code, then we use this routine to signal
+# the daemon to reload its resources
+########################################################################
+
+    $self->ConfigureDaemon( $res, @args );
+
+    return;
+}
+
+##########################################################################
+sub Start {
+##########################################################################
+
+    my ( $self, $res, @args ) = @_;
+
+########################################################################
+# Use this routine to start a daemon running as a fork of the
+# current code. This invokes the DaemonStart() routine.
+########################################################################
+
+    $self->StartDaemon( $res, @args );
+
+########################################################################
+# If you want to run an external daemon program, you should start
+# it here and record the PID somewhere so you can stop it later
+########################################################################
+
+########################################################################
+# If you don't have a daemon, you don't need a Start() routine
+# at all.
+########################################################################
+
+    return;
+}
+
+##########################################################################
+sub Stop {
+##########################################################################
+
+    my ( $self, $res, @args ) = @_;
+
+########################################################################
+# Use this routine to signal a daemon running as a fork of the
+# current code. This invokes the DaemonStop() routine.
+########################################################################
+
+    $self->StopDaemon( $res, @args );
+
+########################################################################
+# If you want to run an external daemon program, you should have
+# saved the PID in the Start() routine, so you can kill it here.
+# You probably want to wait here until you are satisfied that the
+# daemon really has stopped.
+########################################################################
+
+########################################################################
+# If you don't have a daemon, you don't need a Stop() routine
+# at all.
+########################################################################
+
+    return;
+}
+
+#######################################################################
+sub DaemonConfigure {
+#######################################################################
+
+    my ( $self, $res, @args ) = @_;
+
+    # This gets called * AT INTERRUPT TIME * in the daemon process
+    # when any resources have changed. Only use this if you are
+    # writing your daemon code as a fork of this component code.
+
+    $self->LogMessage("daemon reconfigured: @args");
+
+    $server = $res->{server}{VALUE};
+
+    return;
+}
+
+#######################################################################
+sub DaemonStop($$@) {
+#######################################################################
+
+    my ( $self, $res, @args ) = @_;
+
+    # This gets called * AT INTERRUPT TIME * in the daemon process
+    # when the component is stopped. Only use this if you are
+    # writing your daemon code as a fork of this component code.
+
+    $self->LogMessage("daemon stopped: @args");
+    exit(0);
+}
+
+#######################################################################
+sub DaemonStart($$@) {
+#######################################################################
+
+    my ( $self, $res, @args ) = @_;
+
+    # This is the main daemon loop.
+    # Normally, this will not exit. It will be terminated by
+    # an INT signal which invokes a call to DaemonStop().
+
+    $self->LogMessage("daemon started: version @LCFG_VERSION@ - @args");
+
+    while (1) {
+        $self->LogMessage("Hello World: server=$server");
+        sleep(10);
+    }
+
+    return;
+}
+
+1;

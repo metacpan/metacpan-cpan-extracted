@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                Lingua-FR-Ladl
+version:             v0.0.4
+abstract:            represent, query and investigate the Ladl tables, a french linguistic resource
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Class::Std:                    0
+    Contextual::Return:            0
+    Exception::Class:              0
+    Graph:                         0
+    Graph::Reader::Dot:            0
+    List::MoreUtils:               0
+    List::Util:                    0
+    Readonly:                      0
+    Test::More:                    0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Ingrid Falk <ingrid dot falk at loria dot fr>

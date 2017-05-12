@@ -1,0 +1,8 @@
+ChangeLog
+HanConvert.pm
+MANIFEST
+Makefile.PL
+README
+test.pl
+trad2simp
+simp2trad

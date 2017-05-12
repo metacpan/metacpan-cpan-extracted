@@ -1,0 +1,56 @@
+=head1 NAME
+
+jbuild - Builds Jspell dictionaries
+
+=head1 SYNOPSIS
+
+jbuild [-s] dict-file aff-file hash-file
+
+jbuild -c count aff-file
+
+=head1 DESCRIPTION
+
+This program makes a file containing information of the specified
+dictionary words organized in a hash table and containing the affix
+file information as well.
+
+=over 4
+
+=item dict-file
+
+file containing the list of words
+
+=item aff-file
+
+affix file containing rules associated with the flags
+
+=item hash-file
+
+where output will be saved to be used, latter, with B<jspell>.
+
+=item -s
+
+supress mesages from standard error;
+
+=back
+
+=head1 THANKS
+
+We should thanks ... for putting C<ispell> as a open source
+application, from where much of this application code was
+borrowed.
+
+=head1 AUTHOR
+
+ Ulisses Pinto
+ J.Joao Almeida  <jj@di.uminho.pt>
+
+=head1 SEE ALSO
+
+ See the following man pages: perl(1), agrep(1) and jspell(1)
+
+=head1 BUGS
+
+ We wait for them at any of the author e-mails!
+
+=cut

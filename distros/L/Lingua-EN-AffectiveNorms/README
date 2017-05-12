@@ -1,0 +1,148 @@
+NAME
+    Lingua::EN::AffectiveNorms - Perl based data store for the ANEW -
+    standardised list of Affective Norms for English Words.
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+    This module provides data store and retrieval to assess the emotional
+    content of text based on a standardised list of english words. It has
+    use in some text mining procedures (e.g. see ACKNOWLEDGEMENTS section).
+
+    DBIx::Class schema (dynamic) to load list of english affective words
+    from http://csea.phhp.ufl.edu/media/anewmessage.html
+
+     my $schema    = Lingua::EN::AffectiveWords->connect; # db lives in same dir as package by default
+     my $all_rs    = $schema->resultset(AllSubjects);
+     my $male_rs   = $schema->resultset(Male);
+     my $female_rs = $schema->resultset(Female);
+
+    The list of words is a bit tricky to obtain (see link above), but once
+    you do, you should enter the list into a sqlite schema given below, and
+    put it in the same directory as this .pm file (perldoc -M
+    Lingua::EN::AffectiveNorms to work out where that is).
+
+    The schema is as follows:
+
+     create table all_subjects (
+     word varchar(32),
+     word_stem varchar(32),
+     word_no integer,
+     valence_mean float,
+     valence_sd float,
+     arousal_mean float,
+     arousal_sd float,
+     dominance_mean float,
+     dominance_sd float,
+     word_freq float,
+     primary key(word)
+     );
+
+     create table male (
+     word varchar(32),
+     word_stem varchar(32),
+     word_no integer,
+     valence_mean float,
+     valence_sd float,
+     arousal_mean float,
+     arousal_sd float,
+     dominance_mean float,
+     dominance_sd float,
+     word_freq float,
+     primary key(word)
+     );
+
+     create table female (
+     word varchar(32),
+     word_stem varchar(32),
+     word_no integer,
+     valence_mean float,
+     valence_sd float,
+     arousal_mean float,
+     arousal_sd float,
+     dominance_mean float,
+     dominance_sd float,
+     word_freq float,
+     primary key(word)
+     );
+
+    The next thing is to put the male, female and all_subjects lists into
+    separate csv files, with the headibngs as for the column names in the
+    database, then run the following perl script on it:
+
+     use Text::CSV_XS;
+     my $csv = Text::CSV_XS->new;
+
+     use Lingua::Stem qw/stem/;
+
+     my ($infile, $table) = @ARGV or die "infile and table name required";
+     my $schema = Lingua::EN::AffectiveNorms::Schema->connect;
+     my $rs = $schema->resultset($table);
+
+     open my $IN, "<", $infile;
+     my @header;
+     while (<$IN>) {
+         $csv->parse($_);
+         my @row = $csv->fields;
+         if ($. == 1) {
+             @header = @row;
+         }
+         else {
+             my %data;
+             @data{@header} = @row;
+             $data{word_stem} = stem($data{word})->[0];
+             $rs->create(\%data);
+         }
+     }
+
+    I'd distribute the databse with this module, except that the
+    distribution conditions of the word list preclude this.
+
+AUTHOR
+    Kieren Diment, "<zarquon at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-lingua-en-affectivenorms at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Lingua-EN-AffectiveNorms
+    >. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Lingua::EN::AffectiveNorms
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-EN-AffectiveNorms>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Lingua-EN-AffectiveNorms>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Lingua-EN-AffectiveNorms>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Lingua-EN-AffectiveNorms/>
+
+ACKNOWLEDGEMENTS
+    Inspired by the paper Dodds, P., & Danforth, C. (2009). Measuring the
+    Happiness of Large-Scale Written Expression: Songs, Blogs, and
+    Presidents. Journal of Happiness Studies. doi:
+    10.1007/s10902-009-9150-9. avialable (open access) from:
+    <http://www.springerlink.com/content/757723154j4w726k>
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Kieren Diment, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,39 @@
+<!--
+Special container to show hash in hash
+-->
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <div class="panel-body" ng-repeat="n in currentNode.data">
+    <div class="input-group">
+      <span class="input-group-addon" trspan="hostname"></span>
+      <input type="text" class="form-control" ng-model="n.k"/>
+    </div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th width="40%" trspan="keys"></th>
+          <th width="40%" trspan="values"></th>
+          <th><span class="link text-success glyphicon glyphicon-plus-sign" ng-click="n.h.push({'k':'key','v':'uid'})"/></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="get in n.h">
+          <td><input class="form-control" ng-model="get.k"/></td>
+          <td><input class="form-control" ng-model="get.v"/></td>
+          <td>
+            <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="n.h.splice($index,1)"/>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script type="text/menu">
+[{
+  "title": "newHost",
+  "action": "addHost",
+  "icon": "plus-sign"
+}]
+</script>

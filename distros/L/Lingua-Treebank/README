@@ -1,0 +1,30 @@
+Lingua/Treebank version 0.16
+============================
+
+System for object-based management of Penn Treebank-style data.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ none.
+
+If the Devel::Cycle module is installed, it will be used in one of the
+distribution tests.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2008 Jeremy Gillmor Kahn
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,15 @@
+Lingua::Verbnet -- extract stats from verbnet xml files
+Lingua::Verbnet::Ambiguity -- query ambiguity stats as collected by Lingua::Verbnet
+verbstat -- extract ambiguity stats from verbnet XML files as a text dump of a Perl hash
+	(a wrapper script for the above modules)
+
+Read the POD docs for further information on how to use them,
+VerbNet web interface (to browse VerbNet online), overall project info,
+and download links (you need to download the XML files locally to use the modules)
+at http://verbs.colorado.edu/verb-index/index.php ,
+and also http://www.cs.bgu.ac.il/~nlpproj/parse-eval/ if you're interested in a
+comparison of 2 probabilistic parsers, dbparser and minipar, in the scope of which
+the code bundled here was born.
+
+Lingua::Verbnet POD docs "THANKS" section contains acknowledgements and
+explains the motivation behind publishing this on CPAN.

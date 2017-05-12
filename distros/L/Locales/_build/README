@@ -1,0 +1,27 @@
+How to update:
+
+0) get latest CLDR from http://cldr.unicode.org/index/downloads
+
+1) update $Locales::CLDR_VERSION && $Locales::VERSION
+
+2) build modules out of CLDR, something like this:
+
+   Note: If the DB mods are NOT changing you'll have to update "my $v_offset" in _locales_build_utils.pm && perl -pi -e 's{0\.25}{0.26}g;' t/042.*
+   
+   ./_build/cldr2locales ../Downloads/
+   
+../Downloads/ == path to downloaded and extracted CLDR core (should contain 'common/main' dir)
+
+3) do any other changes
+
+4) tidy it all (rt 69971)
+
+  perltidy -b `find lib/Locales/DB -name '*.pm'`
+  perltidy -b lib/Locales.pm
+  rm `find . -name '*.bak'`
+
+5) perl Makefile.PL && make && make test 
+
+6) RELEASE_TESTING=1 make test 
+
+7) ... make dist && sudo make install

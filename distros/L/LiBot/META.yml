@@ -1,0 +1,76 @@
+---
+abstract: 'The bot framework'
+author:
+  - 'Tokuhiro Matsuno < tokuhirom @ gmail.com >'
+build_requires:
+  Test::AllModules: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.5, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: LiBot
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  LiBot:
+    file: lib/LiBot.pm
+    version: v0.0.3
+  LiBot::Handler::CoreList:
+    file: lib/LiBot/Handler/CoreList.pm
+  LiBot::Handler::IkachanForwarder:
+    file: lib/LiBot/Handler/IkachanForwarder.pm
+  LiBot::Handler::Karma:
+    file: lib/LiBot/Handler/Karma.pm
+  LiBot::Handler::LLEval:
+    file: lib/LiBot/Handler/LLEval.pm
+  LiBot::Handler::PerldocJP:
+    file: lib/LiBot/Handler/PerldocJP.pm
+  LiBot::Handler::URLFetcher:
+    file: lib/LiBot/Handler/URLFetcher.pm
+  LiBot::Message:
+    file: lib/LiBot/Message.pm
+  LiBot::Provider::IRC:
+    file: lib/LiBot/Provider/IRC.pm
+  LiBot::Provider::Lingr:
+    file: lib/LiBot/Provider/Lingr.pm
+  LiBot::Test::Handler:
+    file: lib/LiBot/Test/Handler.pm
+requires:
+  AnyEvent::IRC::Client: 0
+  DB_File: 0
+  Data::OptList: 0
+  Furl: 0
+  HTML::Entities: 0
+  HTTP::Response::Encoding: 0
+  JSON: 0
+  Log::Pony: 0
+  Module::Runtime: 0
+  Mouse: 0
+  Plack: 0
+  Pod::PerldocJp: 0
+  Text::Shorten: 0
+  Twiggy: 0
+  URI::Escape: 0
+  perl: 5.010000
+resources:
+  bugtracker: https://github.com/tokuhirom/LiBot/issues
+  homepage: https://github.com/tokuhirom/LiBot
+  repository: git://github.com/tokuhirom/LiBot.git
+version: v0.0.3
+x_contributors:
+  - 'mattn <mattn.jp@gmail.com>'
+  - 'tokuhirom <tokuhirom@gmail.com>'

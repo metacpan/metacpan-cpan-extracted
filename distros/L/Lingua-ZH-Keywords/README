@@ -1,0 +1,29 @@
+# $File: //member/autrijus/Lingua-ZH-Keywords/README $ $Author: autrijus $
+# $Revision: #1 $ $Change: 3690 $ $DateTime: 2003/01/20 11:08:53 $
+
+This is the README file for Lingua::ZH::Keywords, a module to
+extracts keywords from Chinese text.
+
+* Installation
+
+This modules requires Lingua::ZH::TaBE, which in turn needs libtabe
+version 0.2.5 or above installed; please install the former from CPAN,
+and the latter from ftp://xcin.linux.org.tw/pub/xcin/libtabe/devel/
+before running Makefile.PL.
+
+Lingua::ZH::Keywords uses the standard perl module install process:
+
+cpansign -v		# see SIGNATURE for details
+perl Makefile.PL
+make
+make test
+make install
+
+* Copyright
+
+Copyright 2003 by Autrijus Tang <autrijus@autrijus.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.

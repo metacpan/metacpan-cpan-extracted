@@ -1,0 +1,18 @@
+Revision history for Perl extension Lingua::EN::WSD::CorpusBased.
+
+0.11
+	- Lingua::EN::WSD::CorpusBased::Corpus now has a method to 
+	  get a list of sentences in which given words occurr. See
+	  documentation of the class.
+	- More debug messages in Lingua::EN::WSD::CorpusBased::Corpus.
+	- Documentation of the demo and test corpus.
+	- Added method line() to the corpus class. Method returns a
+	  specific line of the corpus.
+	- Methods of CorpusBased now return error values instead of
+	  behaving undefined.
+	- Preparations for different debug levels (with 0 meaning no
+	  debug output, 1 meaning some debug output etc.).
+
+0.10
+	- Initial version.
+

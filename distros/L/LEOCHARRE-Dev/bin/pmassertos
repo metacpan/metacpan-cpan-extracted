@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+use strict;
+use Cwd;
+use base 'LEOCHARRE::CLI';
+
+my $o = gopts('a:');
+
+sub abs_distro {
+
+   $o->{a} ||= './';
+   my $distdir= Cwd::abs_path( $o->{a}) or die;
+   -d $distdir or die("$distdir is not even a directory");
+   -f "$distdir/Makefile.PL" or die("there is no Makefile.PL at '$distdir'");
+   return $distdir;
+}
+
+
+my $abs_loc = abs_distro();
+
+debug("DEBUG ON, distro is $abs_loc");
+
+my $abs_makefile = "$abs_loc/Makefile.PL";
+
+
+_file_prepend( $abs_makefile,
+   q|if ( $^O=~/mswin/i ){ print "OS Unsupported." and exit; } |);
+
+exit;
+
+sub _file_prepend {
+   my $abs = shift;
+   my $lineid = " #__nomswin__#\n";
+   my @lines;
+   for my $arg (@_){
+      for( split( /\n/, $arg) ){         
+         push @lines, "$_$lineid";
+      }
+   }
+   defined @lines or die;
+
+   if( open(ORI, '<',$abs)){
+      
+      debug("$abs was there, will read.. ");
+      push @lines, ( grep { !/$lineid/ } <ORI> );
+      close ORI;
+   }
+   open( NEW,'>',$abs) or die($!);
+   print NEW @lines;
+   close NEW;
+   debug("$abs prepended");
+   return $abs;
+}
+
+
+
+sub usage {
+   return qq{
+$0
+
+DECRIPTION
+
+Makes sure distro will not be run on mswin platform.
+
+OPTION FLAGS
+
+   -a abs path to target dist dir, default is cwd
+   -d debug
+
+
+USAGE EXAMPLES
+
+   $0 -a ./My-Distro
+
+SEE ALSO
+
+LEOCHARRE::Dev
+LEOCHARRE::CLI
+Devel::AssertOS
+use-devel-assertos
+
+   };
+}
+
+
+
+
+
+
+

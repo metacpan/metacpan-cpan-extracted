@@ -1,0 +1,54 @@
+LotusNotes-LoadExport
+
+This module is designed to read text files generated from a LotusNotes 'Structured Text' export.
+Normally the 'Word wrap within documents' entry (as part of the export) is set to 999
+characters (as many 9's as you can enter in the field).  The 'Separator between documents' is
+assumed to be linefeed (the export default).
+
+Load records from a Lotus Notes database export.
+
+Expects an array reference of fields to extract.
+
+Returns an array reference of hashes where each hash represents a record
+
+Two methods are provided load() which loads all the records or next() which is an iterator
+returning one record at a time
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc LotusNotes::LoadExport
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=LotusNotes-LoadExport
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/LotusNotes-LoadExport
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/LotusNotes-LoadExport
+
+    Search CPAN
+        http://search.cpan.org/dist/LotusNotes-LoadExport/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Greg George
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

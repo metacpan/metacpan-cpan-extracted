@@ -1,0 +1,128 @@
+=pod
+
+=head1 NAME
+
+Linux::Sysfs::Module - sysfs modules
+
+=head1 SYNOPSIS
+
+	my $module = Linux::Sysfs::Module->open('tg3');
+
+	my @attrs = $Module->get_attrs;
+	my @parms = $module->get_parms;
+	my @sects = $module->get_sections;
+
+	$module->close;
+
+=head1 DESCRIPTION
+
+Modules are represented in sysfs under the /sys/module.
+
+=head1 METHODS
+
+=over
+
+=item B<open>
+
+    my $module = Linux::Sysfs::Module->open($name);
+
+Opens a specific module with a given C<$name> and returns an according
+Linux::Sysfs::Module instance on success or undef on failure.
+
+=item B<open_path>
+
+    my $module = Linux::Sysfs::Module->open_path($path);
+
+Opens module at specific C<$path>. Returns a Linux::Sysfs::Module instance on
+success or undef on failure.
+
+=item B<close>
+
+    $module->close;
+
+Closes and cleans up the C<$module>.
+
+=item B<get_parm>
+
+    my $parm = $module->get_parm($name);
+
+Searches C<$module>'s parameters by C<$name> and returns the corresponding
+Linux::Sysfs::Attribute instance on success or undef on failure.
+
+=item B<get_parms>
+
+    my @parms = $module->get_parms;
+
+Get the C<$module>'s list of parameters. Returns a list of
+Linux::Sysfs::Attribute instances.
+
+=item B<get_section>
+
+    my $sect = $module->get_section($name);
+
+Searches C<$module>'s sections by C<$name> and returns the corresponding
+Linux::Sysfs::Attribute instance on success or undef on failure.
+
+=item B<get_sections>
+
+    my @sects = $module->get_sections;
+
+Get the C<$module>'s list of sections. Returns a list of
+Linux::Sysfs::Attribute instances.
+
+=item B<get_attr>
+
+=item B<get_attribute>
+
+    my $attr = $module->get_attr($name);
+
+Searches C<$module>'s attributes by C<$name> and returns the corresponding
+Linux::Sysfs::Attribute instance on success or undef on failure.
+
+=item B<get_attrs>
+
+=item B<get_attributes>
+
+    my @attrs = $module->get_attrs;
+
+Get the C<$module>'s list of attributes. Returns a list of
+Linux::Sysfs::Attribute instances.
+
+=item B<name>
+
+    my $name = $module->name;
+
+Returns the C<$module>'s name.
+
+=item B<path>
+
+    my $path = $module->path;
+
+Returns the full path of C<$module> in sysfs.
+
+=back
+
+=head1 AUTHOR
+
+Florian Ragwitz E<lt>rafl@debian.orgE<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Florian Ragwitz, all rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Library General Public License as published
+by the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307
+USA.
+
+=cut

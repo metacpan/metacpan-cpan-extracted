@@ -1,0 +1,50 @@
+Linux::Fuser README
+========================
+
+This module attempts to provide some of the functionality of the Unix
+command 'fuser' for use in Perl programs that might need to know whether
+a file is opened by another process.
+
+The way that it does this is highly OS dependent and I would be surprised
+( but happily surprised ) if it proves to work on any other OS than Linux
+from 2.2 onward -  If it is found to work on other platforms please do
+contact the author and we will look at changing the name :) I would also
+be grateful of any patches that might cause it to work on other OS.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module has no dependencies other than it will almost certainly only
+work on a Linux system with a /proc filesystem compatible with the one
+found with the 2.2.* kernel, there are some features that may become available
+to new kernel versions.
+
+SOURCE CODE
+
+The source code for this module is hosted on Github.  You can obtain
+the latest version via git from:
+
+  https://github.com/jonathanstowe/Linux-Fuser
+
+EXAMPLES
+
+Then supplied 'pfuser' program shows the basic usage of this module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C)2001 - 2013 Jonathan Stowe <jns@gellyfish.co.uk>
+
+This software carries no warranty either express of implied.
+
+This is free software, it can be distributed and/or modified under the
+same terms as Perl itself.  The Perl license can be found in the file
+README in the Perl source distribution.
+

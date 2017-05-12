@@ -1,0 +1,10 @@
+Revision history for Perl extension Locale::Maketext::Extract::Plugin::Xslate
+
+0.0.3 2013-05-23T17:02:44+09:00
+    - show line number in .po file
+
+0.0.2 2013-05-01T20:03:50+09:00
+    - add document VALID FORMATS and KNOWN FILE types
+
+0.0.1 2013-03-06T19:52:18+09:00
+    - original version

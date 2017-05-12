@@ -1,0 +1,369 @@
+#!/bin/sh
+
+# Convert a Haskell package for use by Hugs
+
+usage="$0 [-o script] source-dir [target-dir]"
+
+# The source directory is assumed to be the root of a package hierarchy,
+# i.e. A/B/C.hs contains the module A.B.C
+#
+# The file hugs/exclude (if present in the source directory) contains
+# a list of modules that aren't to be used with Hugs, one per line,
+# possibly with commentary on the rest of the line.
+#
+# Several packages may be put into the same target directory, as long as
+# they don't overlap (which they aren't supposed to).
+
+cpp_flags='-D__HUGS__'
+
+cc=${CC-@CC@}
+: ${cpp='gcc -P -E -traditional -xc'}
+: ${hsc2hs=hsc2hs}
+: ${greencard=greencard}
+: ${ffihugs=@BINDIR@/ffihugs}
+: ${runhugs=@BINDIR@/runhugs}
+: ${HUGSDIR=@HUGSDIR@}
+: ${SORT=@SortCmd@}
+: ${FIND=@FindCmd@}
+HUGSFLAGS=
+
+export HUGSDIR HUGSFLAGS
+
+X_CFLAGS='@X_CFLAGS@'
+X_PRE_LIBS='@X_PRE_LIBS@'
+X_LIBS='@X_LIBS@'
+X_EXTRA_LIBS='@X_EXTRA_LIBS@'
+
+GL_CFLAGS='@GL_CFLAGS@'
+GL_LIBS='@GL_LIBS@'
+GLUT_LIBS='@GLUT_LIBS@'
+
+EXE=@EXE@
+
+case `uname -a` in
+*CYGWIN*) platform=Win32 ;;
+*)	platform=Unix ;;
+esac
+
+# platform sensitive settings
+case $platform in
+Win32)	CALLCONV=stdcall
+	cpp_flags="$cpp_flags -DPLATFORM=Win32"  	# hack for HGL
+	tmpdir_root=`cygpath -w /tmp | sed -e 's%\\\\%/%g' `;;
+*)	CALLCONV=ccall
+	cpp_flags="$cpp_flags -DPLATFORM=X11"   	# hack for HGL
+	tmpdir_root="/tmp" ;;
+esac
+
+script=
+while [ $# -gt 0 ]
+do	case $1 in
+	-o)	shift		# don't execute FFI commands:
+		script="$1"	# append them to the named script
+		shift
+		;;
+	-*)	echo "$0: unrecognized option '$1'" >&2
+		echo "usage: $usage" >&2
+		exit 1 ;;
+	*)	break ;;
+	esac
+done
+
+case $# in
+1)	target_dir=$HUGSDIR/libraries ;;
+2)	target_dir=$2 ;;
+*)	echo "usage: $usage" >&2
+	exit 1 ;;
+esac
+
+source_dir=$1
+
+if [ ! -d $source_dir ]; then
+	echo "Can't find directory '$1'" >&2
+	exit 1
+fi
+
+# Canonicalize win32 paths 
+# (i.e., stay far away from unportable /cygdrive-paths)
+case $platform in
+Win32)	# stay away from -m (older versions of 'cygpath' doesn't support it.)
+	[ -n "${source_dir}" ] &&
+		source_dir=`cygpath -w $source_dir | sed -e 's@\\\\@/@g'`
+	[ -n "${HUGSDIR}" ] &&
+		HUGSDIR=`cygpath -w $HUGSDIR | sed -e 's@\\\\@/@g'`
+	[ -n "${target}" ] &&
+		target=`cygpath -w $target | sed -e 's@\\\\@/@g'`
+esac
+
+includes="-I$HUGSDIR/include -I$source_dir/include"
+tmpdir=$tmpdir_root/cvt.$$
+
+[ -d $tmpdir ] && rm -r $tmpdir
+
+# Convert a module using the FFI from conventional to standard form:
+# - change the calling convention CALLCONV to ccall on Unix, stdcall on Win32
+# - collect all the header files included by the module, if necessary
+#   produce a new header that includes them, and ensure all the foreign
+#   import declarations in the file refer to a header.
+
+hack_foreign() {
+	file=$1
+
+	# Determine the list of headers used by the file
+	# bug: <foo.h> and "foo.h" will not be unified
+	header_list=$file.hdrs
+	(
+		for h in $c_includes
+		do	echo "\"$h\""
+		done
+
+		sed -n 's/[ 	][ 	]*/ /g
+			s/^>* *{-# OPTIONS -#include \(.*\) #-}/\1/p
+			/^>* *foreign import / {
+				s/[^"]*"\([a-zA-Z0-9_][a-zA-Z0-9_]*\.h\).*/"\1"/p
+				s/[^"]*"[^"]* \([a-zA-Z0-9_][a-zA-Z0-9_]*\.h\).*/"\1"/p
+			}' $file
+	) | $SORT -u >$header_list
+
+	# If necessary, generate our own header file
+	case `wc -l <$header_list | sed 's/ *//'` in
+	0)	header= ;;
+	1)	header=`sed 's/["<>]//g' $header_list` ;;
+	*)
+		if grep '^>*[ 	]*foreign' $file | egrep -v 'export|"(dynamic|wrapper)|\.h' | grep . >/dev/null
+		then
+			full_header=`echo $file | sed 's/\.[^.]*$/_inc.h/'`
+			header=`basename $full_header`
+			HEADER=`echo $header | tr a-z. A-Z_`
+			(
+				echo "#ifndef $HEADER"
+				echo "#define $HEADER"
+				sed 's/^/#include /' $header_list
+				echo "#endif"
+			) >$full_header
+		else
+			header=
+		fi ;;
+	esac
+
+	# Hack the original module
+	# (but leave explicitly specified headers alone)
+	tmpfile=$file.new
+	sed '	/^>* *{-# OPTIONS /d
+		/^>*[ 	]*foreign[	 ]/ {
+			s/CALLCONV/'"$CALLCONV"'/
+			/export/ b end
+			/"dynamic[ "]/ b end
+			/"wrapper[ "]/ b end
+			/"[^"]*\.h[^"]*"/ b end
+			/"static[ "]/ {
+				s:"static:"static '"$header"':
+				b end
+			}
+			s:":"'"$header"' :
+			/"/ !s/[a-z][a-zA-Z0-9_]*[ 	]*::/"'"$header"'" &/
+			: end
+		}' $file >$tmpfile
+	cp $tmpfile $file
+
+	rm -r $tmpfile $header_list
+}
+
+# Get the value of a variable from the package Makefile
+# usage: extract_make_variable varname
+
+extract_make_variable() {
+	if [ -f $source_dir/Makefile ]
+	then	sed -n 's/[ 	]*#.*//
+			/^'"$1"'[ 	]*=/ {
+				s/.*=[ 	]*//
+				s/[ 	][ 	]*/", "/g
+				s/..*/"&"/
+				p
+			}' $source_dir/Makefile
+	else	echo '""'
+	fi
+}
+
+# Determine the list of modules to be converted
+
+module_list=$tmpdir_root/cvs.$$.1
+tmp=$tmpdir_root/cvs.$$.2
+
+trap "rm -f $module_list $tmp; exit 0" 0 1 2 3 15
+
+(
+	cd $source_dir
+	$FIND . \( -name '[a-z]*' -o -name GHC -o -name NHC \) -prune -o \
+		\( -name \*.hs -o -name \*.lhs -o -name \*.hsc \
+			-o -name \*.y -o -name \*.ly -o -name \*.gc \) -print |
+		sed '	s:^\./::
+			s/\..*//' |
+		$SORT -u >$tmp
+
+	if [ -f hugs/exclude ]; then
+		sed '	/^[	]*#/ d
+			/^[ 	]*$/ d
+			s/[ 	].*//
+			s:\.:/:g' hugs/exclude |
+		$SORT -u | comm -13 - $tmp >$module_list
+	else
+		mv $tmp $module_list
+	fi
+)
+
+# Pass 1: preprocess modules
+
+while read modname
+do	echo "Converting $modname"
+
+	stem=$source_dir/$modname
+	target_stem=$target_dir/$modname
+	dstdir=`dirname $target_stem`
+	basename=`basename $stem`
+
+	mkdir -p $dstdir
+
+	# Prefer *_hsc_make.c to *.hsc, and *.hs to *.[l]y,
+	# so that if these are present we don't need hsc2hs and happy.
+	# (But don't take .hs if .hsc is present.)
+
+	if [ -f ${stem}_hsc_make.c ]; then
+		# don't run hsc2hs if its output is already present
+		hsc_make="${target_stem}_hsc_make"
+		$cc $cpp_flags $includes -o "$hsc_make" "${stem}_hsc_make.c"
+		$hsc_make >$target_stem.hs
+		rm "$hsc_make${EXE}"
+	elif [ -f $stem.hsc ]; then
+		cp "$stem.hsc" "$target_stem.hsc"
+		$hsc2hs --cc="$cc" $cpp_flags $includes "$target_stem.hsc"
+		rm "$target_stem.hsc"
+	elif [ -f $stem.gc ]; then
+		abs_src_dir=`cd $source_dir; pwd`
+		(
+			cd $target_dir
+			$greencard -t ffi -i $abs_src_dir $modname.gc
+		)
+	elif [ -f $stem.hs ]; then
+		# gcc-3.3 on MacOS X 10.3 is reported to add #pragma
+		$cpp $cpp_flags $includes $stem.hs | grep -v '^#' |
+			cat -s >$target_stem.hs
+	elif [ -f $stem.lhs ]; then
+		$cpp $cpp_flags $includes $stem.lhs | grep -v '^#' |
+			cat -s >$target_stem.lhs
+	elif [ -f $stem.y ]; then
+		mkdir $tmpdir
+		cp $stem.y $tmpdir
+		(
+			cd $tmpdir
+			happy $basename.y
+		)
+		$cpp $cpp_flags $tmpdir/$basename.hs | grep -v '^#' |
+			cat -s >$target_stem.hs
+		rm -r $tmpdir
+	elif [ -f $stem.ly ]; then
+		mkdir $tmpdir
+		cp $stem.ly $tmpdir
+		(
+			cd $tmpdir
+			happy $basename.ly
+		)
+		$cpp $cpp_flags $tmpdir/$basename.hs | grep -v '^#' |
+			cat -s >$target_stem.hs
+		rm -r $tmpdir
+	else
+		echo "$0: don't know how to handle $stem" >&2
+	fi
+done <$module_list
+
+# Pass 2: compile FFI modules (or save commands in a script)
+
+# for X11, HGL and similar packages
+PACKAGE=`extract_make_variable PACKAGE`
+PACKAGE_DEPS=`extract_make_variable PACKAGE_DEPS`
+
+conf_in=$source_dir/package.conf.in
+conf=`echo $source_dir/*.conf`
+
+if [ -f "$conf_in" ]
+then	$cpp $cpp_flags $includes \
+		-DPACKAGE="$PACKAGE" -DPACKAGE_DEPS="$PACKAGE_DEPS" \
+		-DLIBDIR= -DLIBRARY= \
+		-DX_CFLAGS="\"$X_CFLAGS\"" -DX_PRE_LIBS="\"$X_PRE_LIBS\"" \
+		-DX_LIBS="\"$X_LIBS\"" -DX_EXTRA_LIBS="\"$X_EXTRA_LIBS\"" \
+		-DGL_CFLAGS=",\"$GL_CFLAGS\"" -DGL_LIBS=",\"$GL_LIBS\"" \
+		-DGLUT_LIBS=",\"$GLUT_LIBS\"" \
+		$conf_in | grep -v '^#' >$tmp
+	conf=$tmp
+fi
+
+# Get values from the package description file
+
+get_pkg_field="$runhugs -98 $HUGSDIR/tools/get_pkg_field"
+
+extra_libraries=
+extra_ld_opts=
+extra_cc_opts=
+c_includes=
+if [ -f "$conf" ]
+then	extra_libraries=`$get_pkg_field extra_libraries $conf | sed 's/HS[^ ]*_cbits *//'`
+	extra_ld_opts=`$get_pkg_field extra_ld_opts $conf`
+	extra_cc_opts=`$get_pkg_field extra_cc_opts $conf`
+	c_includes=`$get_pkg_field c_includes $conf`
+fi
+
+while read modname
+do
+	stem=$target_dir/$modname
+	dstdir=`dirname $stem`
+	basename=`basename $stem`
+	if [ -f $stem.lhs ]
+	then	filename=$stem.lhs
+	else	filename=$stem.hs
+	fi
+
+	# Crude test for foreign declarations.
+	# Running ffihugs on a few extras does no harm.
+
+	if grep '^>*[ 	]*foreign[ 	][ 	]*[ei][mx]port' $filename >/dev/null
+	then
+		hack_foreign $filename
+
+		cmd="$ffihugs +G -98 -P$target_dir:"
+		for flag in -I$dstdir -I$target_dir $includes
+		do	cmd="$cmd +L$flag"
+		done
+		for file in ${stem}_stub_ffi.c ${stem}_hsc.c
+		do	if [ -f $file ]
+			then	cmd="$cmd +L$file"
+			fi
+		done
+		for file in `sed -n 's/{-# CBITS \(.*\) #-}/\1/p' $filename`
+		do	cmd="$cmd +L$source_dir/cbits/$file"
+		done
+		for flag in $extra_ld_opts $extra_cc_opts
+		do	cmd="$cmd +L$flag"
+		done
+		for lib in $extra_libraries
+		do	case $platform in
+			Win32)	
+			        if test "x$cc" = xgcc; then
+			           cmd="$cmd +L-l$lib"
+				else
+				   cmd="$cmd +L$lib.lib"
+				fi ;;
+			*)	cmd="$cmd +L-l$lib" ;;
+			esac
+		done
+		cmd="$cmd `echo $modname | tr / .`"
+
+		case "$script" in
+		'')
+			echo "Compiling $filename"
+			$cmd ;;
+		*)
+			echo "echo 'Compiling $filename'" >>$script
+			echo $cmd >>$script ;;
+		esac
+	fi
+done <$module_list

@@ -1,0 +1,17 @@
+name:                Log-Log4perl-Appender-Fluent
+version:             0.04
+abstract:            Log::Log4perl appender writing to Fluentd
+license:             perl
+distribution_type:   module
+prereqs:
+  runtime:
+    requires:
+      base: 0
+      Sys::Hostname:  0
+      Fluent::Logger: 0
+      Log::Log4perl::Appender: 0
+  test:
+    requires:
+      YAML: 0
+author:
+  - Stanislaw Klekot <cpan@jarowit.net>

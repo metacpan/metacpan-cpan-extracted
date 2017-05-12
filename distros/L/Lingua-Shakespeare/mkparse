@@ -1,0 +1,535 @@
+#!/usr/bin/perl
+
+# $Id: mkparse,v 1.2 2002/03/25 07:39:46 gbarr Exp $
+
+my($source,$dest) = @ARGV;
+
+system qw(byacc -P),$source;
+
+open(OUT, ">$dest") or die "Cannot open $dest: $!\n";
+
+open(IN, "gcc -E -C -DYYDEBUG=1  -x c y.tab.pl|");
+
+%var = ();
+%seen = ();
+%state = ();
+
+while(<IN>) {
+  if (/__YYSTATES__/) {
+    my $states = join(" ", keys %state);
+    $states =~ s/(.{60,75} )/$1\n/g;
+    print OUT '@yystate{qw(',"\n$states\n)} = ();\n";
+    next;
+  }
+
+  # In perl the stack size is not a problem
+  next if /YYSTACKSIZE/;
+
+  # Replace variables with constant subs
+  if(s/^\$([A-Z][A-Z_0-9]*)\s*=\s*(\d+)\s*;/sub const$1 () { $2 }/) {
+    $var{$1} = "const" . $1 . "()";
+  }
+  s/
+    (\$([A-Z][A-Z_0-9]*))
+   /
+    exists $var{$2} ? $var{$2} : $1
+  /xeg;
+
+  # Comment out the id line
+  s/^(?=\$yysccsid)/#/;
+
+  # Use my variables
+  s/^(\@yy\w+\s+=)/my $1/;
+
+  # Make yyparse return $$ for the top terminal
+  if (/^sub yyparse/ .. /^\}\s*#\s*yyparse/) {
+    s/\breturn\(1\)/return undef/;
+    s/\breturn\(0\)/return \$yyvs[\$yyvsp]/;
+  }
+
+  # Are we inside the switch statement ?
+  my $ln = /^\s+switch:/ .. /^\s+\$yyssp -= \$yym;/;
+
+  # Change all the if statements in the switch to labels
+  if ( $ln ) {
+    s/^if \(\$yyn == (\d+)\s*\)/State$1:/ and $state{"State$1"} = '';
+  }
+
+  # fix an uninit bug
+  s/^(\s*)(?=\$yycheck\[\$yyn\]\s+==)/$1\$yyn <= \$#yycheck && /;
+
+  print OUT;
+
+  # Print the goto for the switch
+  print OUT <<'ESQ' if $ln == 2;
+my $label = "State$yyn";
+goto $label if exists $yystate{$label};
+last switch;
+ESQ
+}
+
+# output table with names of labels that exist
+#my $states = '%yystate = (\'' . join("','",%state) . "');\n"; 
+#$states =~ s/(.{60,75},)/$1\n/g;
+#print OUT $states,"\n1;\n";
+print OUT "__DATA__\n",<DATA>;
+
+close OUT;
+close IN;
+
+__DATA__
+$ARTICLE
+a
+an
+the
+$BE
+am
+are
+art
+be
+is
+$CHARACTER
+Achilles
+Adonis
+Adriana
+Aegeon
+Aemilia
+Agamemnon
+Agrippa
+Ajax
+Alonso
+Andromache
+Angelo
+Antiochus
+Antonio
+Arthur
+Autolycus
+Balthazar
+Banquo
+Beatrice
+Benedick
+Benvolio
+Bianca
+Brabantio
+Brutus
+Capulet
+Cassandra
+Cassius
+Christopher Sly
+Cicero
+Claudio
+Claudius
+Cleopatra
+Cordelia
+Cornelius
+Cressida
+Cymberline
+Demetrius
+Desdemona
+Dionyza
+Doctor Caius
+Dogberry
+Don John
+Don Pedro
+Donalbain
+Dorcas
+Duncan
+Egeus
+Emilia
+Escalus
+Falstaff
+Fenton
+Ferdinand
+Ford
+Fortinbras
+Francisca
+Friar John
+Friar Laurence
+Gertrude
+Goneril
+Hamlet
+Hecate
+Hector
+Helen
+Helena
+Hermia
+Hermonie
+Hippolyta
+Horatio
+Imogen
+Isabella
+John of Gaunt
+John of Lancaster
+Julia
+Juliet
+Julius Caesar
+King Henry
+King John
+King Lear
+King Richard
+Lady Capulet
+Lady Macbeth
+Lady Macduff
+Lady Montague
+Lennox
+Leonato
+Luciana
+Lucio
+Lychorida
+Lysander
+Macbeth
+Macduff
+Malcolm
+Mariana
+Mark Antony
+Mercutio
+Miranda
+Mistress Ford
+Mistress Overdone
+Mistress Page
+Montague
+Mopsa
+Oberon
+Octavia
+Octavius Caesar
+Olivia
+Ophelia
+Orlando
+Orsino
+Othello
+Page
+Pantino
+Paris
+Pericles
+Pinch
+Polonius
+Pompeius
+Portia
+Priam
+Prince Henry
+Prospero
+Proteus
+Publius
+Puck
+Queen Elinor
+Regan
+Robin
+Romeo
+Rosalind
+Sebastian
+Shallow
+Shylock
+Slender
+Solinus
+Stephano
+Thaisa
+The Abbot of Westminster
+The Apothecary
+The Archbishop of Canterbury
+The Duke of Milan
+The Duke of Venice
+The Ghost
+Theseus
+Thurio
+Timon
+Titania
+Titus
+Troilus
+Tybalt
+Ulysses
+Valentine
+Venus
+Vincentio
+Viola
+$FIRST_PERSON
+I
+me
+$FIRST_PERSON_POSSESSIVE
+mine
+my
+$FIRST_PERSON_REFLEXIVE
+myself
+$NEGATIVE_ADJECTIVE
+bad
+cowardly
+cursed
+damned
+dirty
+disgusting
+distasteful
+dusty
+evil
+fat
+fat-kidneyed
+fatherless
+foul
+hairy
+half-witted
+horrible
+horrid
+infected
+lying
+miserable
+misused
+oozing
+rotten
+rotten
+smelly
+snotty
+sorry
+stinking
+stuffed
+stupid
+vile
+villainous
+worried
+$NEGATIVE_COMPARATIVE
+punier
+smaller
+worse
+$NEGATIVE_NOUN
+Hell
+Microsoft
+bastard
+beggar
+blister
+codpiece
+coward
+curse
+death
+devil
+draught
+famine
+flirt-gill
+goat
+hate
+hog
+hound
+leech
+lie
+pig
+plague
+starvation
+toad
+war
+wolf
+$NEUTRAL_ADJECTIVE
+big
+black
+blue
+bluest
+bottomless
+furry
+green
+hard
+huge
+large
+little
+normal
+old
+purple
+red
+rural
+small
+tiny
+white
+yellow
+$NEUTRAL_NOUN
+animal
+aunt
+brother
+cat
+chihuahua
+cousin
+cow
+daughter
+door
+face
+father
+fellow
+granddaughter
+grandfather
+grandmother
+grandson
+hair
+hamster
+horse
+lamp
+lantern
+mistletoe
+moon
+morning
+mother
+nephew
+niece
+nose
+purse
+road
+roman
+sister
+sky
+son
+squirrel
+stone wall
+thing
+town
+tree
+uncle
+wind
+$NOTHING
+nothing
+zero
+$POSITIVE_ADJECTIVE
+amazing
+beautiful
+blossoming
+bold
+brave
+charming
+clearest
+cunning
+cute
+delicious
+embroidered
+fair
+fine
+gentle
+golden
+good
+handsome
+happy
+healthy
+honest
+lovely
+loving
+mighty
+noble
+peaceful
+pretty
+prompt
+proud
+reddest
+rich
+smooth
+sunny
+sweet
+sweetest
+trustworthy
+warm
+$POSITIVE_COMPARATIVE
+better
+bigger
+fresher
+friendlier
+nicer
+jollier
+$POSITIVE_NOUN
+Heaven
+King
+Lord
+angel
+flower
+happiness
+joy
+plum
+summer's day
+hero
+rose
+kingdom
+pony
+$SECOND_PERSON
+thee
+thou
+you
+$SECOND_PERSON_POSSESSIVE
+thine
+thy
+your
+$SECOND_PERSON_REFLEXIVE
+thyself
+yourself
+$THIRD_PERSON_POSSESSIVE
+his
+her
+its
+their
+$AND
+and                                    
+$AS
+as                                    
+$ENTER
+enter                                    
+$EXEUNT
+exeunt                                    
+$EXIT
+exit                                    
+$HEART
+heart                                    
+$IF_NOT
+if not                                    
+$IF_SO
+if so                                    
+$LESS
+less                                    
+$LET_US
+let us                                    
+$LISTEN_TO
+listen to                                    
+$MIND
+mind                                    
+$MORE
+more                                    
+$NOT
+not                                    
+$OPEN
+open                                    
+$PROCEED_TO
+proceed to                                    
+$RECALL
+recall                                    
+$REMEMBER
+remember                                    
+$RETURN_TO
+return to                                    
+$SPEAK
+speak                                    
+$THAN
+than                                    
+$THE_CUBE_OF
+the cube of                                    
+$THE_DIFFERENCE_BETWEEN
+the difference between                                    
+$THE_FACTORIAL_OF
+the factorial of                                    
+$THE_PRODUCT_OF
+the product of                                    
+$THE_QUOTIENT_BETWEEN
+the quotient between                                    
+$THE_REMAINDER_OF_THE_QUOTIENT_BETWEEN
+the remainder of the quotient between                                    
+$THE_SQUARE_OF
+the square of                                    
+$THE_SQUARE_ROOT_OF
+the square root of                                    
+$THE_SUM_OF
+the sum of                                    
+$TWICE
+twice                                    
+$WE_MUST
+we must                                    
+$WE_SHALL
+we shall                                    
+$COLON
+:
+$COMMA
+,
+$EXCLAMATION_MARK
+!
+$LEFT_BRACKET
+[
+$PERIOD
+.
+$QUESTION_MARK
+?
+$RIGHT_BRACKET
+]

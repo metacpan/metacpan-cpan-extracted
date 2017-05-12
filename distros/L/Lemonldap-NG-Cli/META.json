@@ -1,0 +1,43 @@
+{
+   "abstract" : "Command Line Interface to edit LemonLDAP::NG configuration.",
+   "author" : [
+      "David Delassus <david.jose.delassus@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lemonldap-NG-Cli",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Config::IniFiles" : 0,
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::IniFiles" : 0,
+            "Lemonldap::NG::Common::Conf" : "1.0"
+         }
+      }
+   },
+   "provides" : {
+      "Lemonldap::NG::Cli" : {
+         "file" : "lib/Lemonldap/NG/Cli.pm",
+         "version" : "0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.2"
+}

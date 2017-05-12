@@ -1,0 +1,19 @@
+# vim:set noet ts=8 ai list lcs=tab\:^» tw=72:
+
+Revision history for Perl extension Lingua::Klingon::Segment.
+
+1.03	Mon 2004-05-17
+	- Forgot to update Changes completely before committing
+
+1.02	Mon 2004-05-17
+	- a couple of new tests
+	- removed \G and /c from the regex in 'sub spell'
+	- updated POD documentation (e.g. document the return value of
+	  'spell' and 'syllabify' in scalar context)
+
+1.01	Sun 2004-05-09
+	- Handle segmenting of "ngh" better; add multi-word capability
+
+1.0	Sat 2003-09-20
+	- original version
+

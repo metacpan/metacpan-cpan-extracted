@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 29f543ac8d8857f3b382b10c9b03aecd3020e033 Changes
+SHA1 3b10b88adfb275defab278496c5da79564943268 Hebrew.pm
+SHA1 870900166e2f7b9f56019acdbbc56b24467fc823 Hebrew.xs
+SHA1 3b7ddd9f4e749b68570039df9b6c61f59d96a1d9 MANIFEST
+SHA1 f54b318e644c2f3432fa464a872e1593fd9b0511 MANIFEST.SKIP
+SHA1 3fc70b336ea2c42e624bd94848c8c6060449e4a0 META.yml
+SHA1 33870470e55bc9761557a0e9da76957ea2be741b Makefile.PL
+SHA1 4b86614dd4eac92ff2f259c9c32badd9645e44fe README
+SHA1 cc6ded44327f42601c2616e418a6037a35c877ce bidi.c
+SHA1 1ebec4119486a032a5612a403e8d7b7be973e938 inc/Module/Install.pm
+SHA1 24038af925a69df41972971356ccce885b0fe2ad inc/Module/Install/Base.pm
+SHA1 8f96eddfef548c9328457fbb17a121631cda356b inc/Module/Install/Can.pm
+SHA1 ec29048e48edd9c9c55f9de7b773bd7c904335ad inc/Module/Install/Fetch.pm
+SHA1 0384525d85d51e99532e3ad8729d870113646d14 inc/Module/Install/Makefile.pm
+SHA1 38c657de4d91f5a60ff8e6c6f6a5547daf7c4ab2 inc/Module/Install/Metadata.pm
+SHA1 5c25f1104c0038041e3b93e0660c39171e4caf2b inc/Module/Install/Win32.pm
+SHA1 94d47349c803c4bd2a9230d25e4db0b6aaf1acd8 inc/Module/Install/WriteAll.pm
+SHA1 4aeb184c9bed26ab6c3be1ebdb8470c0cb353b1f t/0-signature.t
+SHA1 58f1588eba68af8d1fe37623808615c79efe1b04 t/1-basic.t
+SHA1 cad4e3de1e561a681ab7cb7a7f7145fad22f50d6 t/2-utf8.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (Darwin)
+
+iEYEARECAAYFAkv91UoACgkQtLPdNzw1AaCs7gCgg8tqDfnFsIM2Hvllxu6aIK6e
+jC8AoJnw6Tinxh4qTGHmxlLbqcWmld8n
+=lhmq
+-----END PGP SIGNATURE-----

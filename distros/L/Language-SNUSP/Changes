@@ -1,0 +1,48 @@
+0.0.15 Sun Feb 12 13:57:28 PST 2017
+ - Release after pause-cleanup removed wrong dists
+
+0.0.14 Mon Oct  6 21:26:59 CEST 2014
+ - Fix debugger warning
+ - Debugging begins in a 'stopped' state.
+
+0.0.13 Thu Sep  4 19:54:12 MDT 2014
+ - Added the long missing hyphen from 'well-known'!!!
+
+0.0.12 Sat Aug 16 16:07:44 PDT 2014
+ - Fix strict/warnings
+
+0.0.11 Sat Aug 16 15:03:19 PDT 2014
+ - Remove .gitignore
+
+0.0.10 Sat Aug 16 11:30:03 PDT 2014
+ - Meta 0.0.2
+
+0.0.9 Fri Aug 15 16:00:52 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.0.8 Fri Aug  8 19:21:04 PDT 2014
+ - Fix swim errors
+
+0.0.7 Fri Aug  8 12:40:58 PDT 2014
+ - Switch hashbang to '#!/usr/bin/env perl'
+
+0.0.6 Sat Aug  2 12:00:54 PDT 2014
+ - Fix Copyright years.
+
+0.0.5 Wed Jul 16 23:23:22 PDT 2014
+ - Move doc to Swim
+ - Fix Meta and add Contributing file
+
+0.0.4 Sat Jun 14 13:36:04 PDT 2014
+ - Switch to Zilla::Dist
+
+0.0.3 Wed Apr 10 13:55:10 PDT 2013
+ - Support input to programs
+ - Add all the runnable c2 code snippets to the examples directory.
+
+0.0.2 Mon Apr  8 00:39:26 PDT 2013
+ - Heavy refactoring to DRY out the code.
+
+0.0.1 Sun Apr  7 10:25:23 PDT 2013
+ - Initial version.

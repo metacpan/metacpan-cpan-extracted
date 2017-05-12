@@ -1,0 +1,42 @@
+{
+   "abstract" : "Perl bindings to the LabOne API of Zurich Instruments ",
+   "author" : [
+      "Simon Reinhardt <simon.reinhardt@stud.uni-regensburg.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lab-Zhinst",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.labmeasurement.de",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/lab-measurement/Lab-Zhinst.git",
+         "web" : "https://github.com/lab-measurement/Lab-Zhinst"
+      },
+      "x_IRC" : "irc://chat.freenode.net/#labmeasurement",
+      "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

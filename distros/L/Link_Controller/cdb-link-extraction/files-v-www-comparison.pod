@@ -1,0 +1,32 @@
+=head1 COMPARISON
+
+This method of getting links has its advantages and disadvantages
+compared to getting them from files.  The points of comparison are
+given below.
+
+=head2 indeterminate
+
+We can never be sure whether we have really finished.  With files, we
+just follow the directory structure.  With WWW pages, the index of a
+directory may not match its contents.  There may be hidden resources,
+that are never referenced from inside.  Even so, outside can know
+about them so we may need to maintain them.
+
+=head2 inefficient
+
+Apart from the fact that this goes through the WWW server to find it's
+files, and probably does this in a very random order, there is also a
+need to use, within the program, an index of all of the links examined
+so far.  This can use alot of disk-space.
+
+=head2 follows real server space
+
+The files seen from the outside are really in the locations that they
+are seen from the outside in.. Looking at files can be deceptive
+because the WWW server can be configured in almost anyway, and even
+two files in a particular directory don't have to occur in anything
+like the same location from outside.  In fact they could even be
+served by different servers from different IP addresses.
+
+=cut
+

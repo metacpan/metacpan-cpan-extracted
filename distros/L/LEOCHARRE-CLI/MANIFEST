@@ -1,0 +1,12 @@
+MANIFEST
+META.yml
+Makefile.PL
+lib/LEOCHARRE/CLI.pm
+#lib/LEOCHARRE/CLI/Base/Users.pm
+t/0.t
+t/5_whoami.t
+t/7_tmpdir.t
+t/80_usermodetc.t
+t/example_scripts/renamerfpi
+t/example_scripts/mkperlbin
+t/test.conf

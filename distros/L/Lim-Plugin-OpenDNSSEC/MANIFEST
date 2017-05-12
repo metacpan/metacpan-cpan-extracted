@@ -1,0 +1,15 @@
+Changes
+
+lib/Lim/Plugin/OpenDNSSEC.pm
+lib/Lim/Plugin/OpenDNSSEC/CLI.pm
+lib/Lim/Plugin/OpenDNSSEC/Client.pm
+lib/Lim/Plugin/OpenDNSSEC/Server.pm
+
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

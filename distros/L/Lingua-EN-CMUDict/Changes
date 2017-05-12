@@ -1,0 +1,13 @@
+Revision history for Perl extension Lingua::EN::CMUDict.
+
+0.01  Tue Sep 27 20:07:30 2011
+	- original version; created by h2xs 1.23 with options
+		-A -X Lingua::EN::CMUDict
+0.2   Thu Nov 3  20:06:00 2011
+	- removed extraneous file
+0.3   Sun Nov 6  09:20:00 2011
+	- fixed tests to work for CPAN
+0.4   Mon Nov 7  09:00:00 2011
+	- fixed tests to work for CPAN
+0.5   Tue Nov 8  21:00:00 2011
+	- once again fixed those tests.

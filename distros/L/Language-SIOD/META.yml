@@ -1,0 +1,10 @@
+name: Language-SIOD
+version: 0.01
+abstract: Perl bindings to SIOD
+author: Autrijus Tang <autrijus@autrijus.org>
+license: perl
+distribution_type: module
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

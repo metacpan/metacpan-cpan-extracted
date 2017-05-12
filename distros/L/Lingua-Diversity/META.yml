@@ -1,0 +1,53 @@
+---
+abstract: 'measuring the diversity of text units'
+author:
+  - 'Aris Xanthos <aris.xanthos@unil.ch>'
+build_requires:
+  Test::More: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-Diversity
+provides:
+  Lingua::Diversity:
+    file: lib/Lingua/Diversity.pm
+    version: 0.07
+  Lingua::Diversity::Internals:
+    file: lib/Lingua/Diversity/Internals.pm
+    version: 0.04
+  Lingua::Diversity::MTLD:
+    file: lib/Lingua/Diversity/MTLD.pm
+    version: 0.04
+  Lingua::Diversity::Result:
+    file: lib/Lingua/Diversity/Result.pm
+    version: 0.04
+  Lingua::Diversity::SamplingScheme:
+    file: lib/Lingua/Diversity/SamplingScheme.pm
+    version: 0.02
+  Lingua::Diversity::Subtype:
+    file: lib/Lingua/Diversity/Subtype.pm
+    version: 0.02
+  Lingua::Diversity::Utils:
+    file: lib/Lingua/Diversity/Utils.pm
+    version: 0.05
+  Lingua::Diversity::VOCD:
+    file: lib/Lingua/Diversity/VOCD.pm
+    version: 0.03
+  Lingua::Diversity::Variety:
+    file: lib/Lingua/Diversity/Variety.pm
+    version: 0.03
+  Lingua::Diversity::X:
+    file: lib/Lingua/Diversity/X.pm
+    version: 0.03
+requires:
+  Exception::Class: 0
+  Moose: 0
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07

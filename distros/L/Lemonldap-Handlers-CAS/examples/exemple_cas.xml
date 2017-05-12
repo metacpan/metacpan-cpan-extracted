@@ -1,0 +1,73 @@
+<lemonconfig>
+<domain    id="demo.net"
+           Cookie="lemondemo"
+	   Sessionstore="memcached"
+	   portal= "http://authen.demo.net/portail/accueil.pl"
+	   LoginCASPage="/tmp/login.htmlcas"
+	   LogoutCASPage="/tmp/logout.htmlcas"
+	   LoginPage="/tmp/login.html"
+	   ldap_server="192.168.247.30"
+           ldap_branch_people="ou=personnes,dc=demo,dc=net"    
+         >
+	 <handler 
+		id="validate"
+                MultiHoming="pied,tete" 
+              />
+        <handler id="pied"
+         MotifIn="/192.168.204.108\/caspied"
+         applcode= "mail"
+         pluginpolicy="Lemonldap::Handlers::RowPolicy"
+          />
+         <handler id="tete"
+         MotifIn="/192.168.204.108\/castete"
+         disableaccessControl="1"
+         />
+	 
+
+          <handler 
+        	id="appli1" 
+                applcode= "APT"
+                pluginpolicy="Lemonldap::Handlers::RowPolicy"
+                enableLWP="1"
+                basepub="http://myappli.demo.net"
+                basepriv="http://www.eyrolles.com"
+		>  
+	</handler>      
+<DefinitionSession>
+               <ligne  id = "mail"
+                       type = "single"
+                       cle ="mail"
+                       valeur= "%mail%" >
+               </ligne>
+               <ligne  id = "roleprofil"
+                       type = "multi"
+		       cle ="%roleprofil;0%"
+                       valeur= "%roleprofil;1%" >
+               </ligne>
+               <ligne  id = "dn"
+                       type = "single"
+                       cle ="dn"
+                       valeur= "%dn%" >
+               </ligne>
+               <exp    id ="dn"
+                       type= "dnentry"
+                     />
+               <exp    id ="mail"
+                       type= "attrldap"
+                       attribut= "mail"
+                     />
+
+               <exp    id ="roleprofil"
+                       type= "attrldap"
+                       attribut= "mefiapplidgcp"
+                     />
+
+</DefinitionSession>
+
+
+</domain>
+<session    id="memcached" 
+	SessionParams="( servers => ['localhost:11211']   )" 
+        >
+</session>
+</lemonconfig>

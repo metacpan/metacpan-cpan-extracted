@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/xml.t
+t/pod.t
+t/pod-coverage.t
+lib/Log/Log4perl/Layout/XMLLayout.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+1.8 2011-11-01 Fix bug with DNS timings
+I had misnamed it and then written the test wrong. Which is just plain embarassing.
+
+1.7 2011-10-31 Force version of LWP
+There's a prototype mismatch with old versions of HTTP::Message->push_header (thanks Garth Webb)
+
+1.6 2011-10-27 Finally! An update!
+Upgrade to the latest version LWP::Protocol::http and add a new Client-Request-Dns-Time timing
+
+1.5 2007-02-01 Fix buglet
+Patch from Ton Voon to fix an occasion when you get a 0 Client Response Server Time (like on localhost)
+
+1.4 2005-02-21 Docs update
+Apparently Time::HiRes returns seconds not microseconds. Not sure how I missed this.
+
+1.3 2004-04-4  Added https support
+Patch from Richard Clamp
+
+1.2 2003-10-02 Client-Request-Connect-TIme
+Doh! Mislabelled in the docs
+
+1.1 2003-09-29 Build.PL
+Should really include this
+
+1.0 2003-09-27 Initial release 
+Based on conversations on the libwww mailing list and code by David Carter

@@ -1,0 +1,184 @@
+=head1 NAME
+
+Leyland::Manual::Models - How to use models in Leyland applications
+
+=head1 LEYLAND AND MODELS
+
+As mentioned in L<Leyland::Manual::Applications>, L<Leyland> does not
+concern itself with the models of your app. Why would it really? Your
+models can be anything, and it's your decision how to use them. If you're
+familiar with L<Catalyst>, you'd know that in Catalyst, you create model
+classes under the "Model" namespace of your application. These model
+classes almost always are just wrappers to Catalyst base classes that in
+themselves wrap classes like L<DBIx::Class>. Leyland, on the other hand,
+does not provide such base classes for you, nor would it care about anything
+you put under the "Model" namespace of your app (if any). Basically, you
+can disregard the rest of the article completely and just do what you like.
+However, you can read on for some examples and suggestions.
+
+With Leyland, you will mostly find yourself initializing models by hand
+in the main C<MyApp.pm> file. If your models are class based, it will make
+sense (I guess) to locate them under the "Model" namespace. Let's look
+at some examples:
+
+=head2 DBIx::Class
+
+if you're using L<DBIx::Class>, you can create your schema under the
+"Model" namespace like so:
+
+	# lib/MyApp/Model/DB.pm
+	package MyApp::Model::DB;
+	use base qw/DBIx::Class::Schema/;
+
+	__PACKAGE__->load_namespaces();
+
+	1;
+
+	# lib/MyApp/Model/DB/Result/Artist.pm
+	package MyApp::Model::DB::Result::Artist;
+	use base qw/DBIx::Class::Core/;
+
+	__PACKAGE__->table('artist');
+	__PACKAGE__->add_columns(qw/ artistid name /);
+	__PACKAGE__->set_primary_key('artistid');
+
+	1;
+
+And then initialize the model in C<MyApp.pm>:
+
+	package MyApp;
+
+	use Moo;
+	use MyApp::Model::DB;
+	use namespace::clean;
+
+	has 'db' => (is => 'ro', writer => '_set_db');
+
+	extends 'Leyland';
+
+	sub BUILD {
+		my $self = shift;
+
+		# initialize the database
+		$self->_set_db(MyApp::Model::DB->connect($dbi_dsn, $user, $pass, \%dbi_params));
+	}
+
+	1;
+
+As you can see, you will need to manually C<use> the model class. We've
+added a "db" attribute to our application, in which we will store our
+database object, after initializing it in the C<setup()> method, which is
+provided by Leyland exactly for this kind of initializations. In your app,
+the database object will be available to you from the context object by
+calling C<< $c->app->db >>.
+
+=head2 MongoDBx::Class
+
+If you have a L<MongoDB> database and use the L<MongoDBx::Class> ORM, then
+you can do pretty much the same thing as for DBIx::Class, only you don't
+need a base class for your model, just the document classes. For example:
+
+	# MyApp/Model/DB/Artist.pm
+	package MyApp::Model::DB::Artist;
+
+	use MongoDBx::Class::Moose;
+	use namespace::autoclean;
+
+	with 'MongoDBx::Class::Document';
+
+	has 'artistid' => (is => 'ro', isa => 'Int', required => 1);
+
+	has 'name' => (is => 'ro', isa => 'Str', required => 1);
+
+	__PACKAGE__->meta->make_immutable;
+
+Then, we can initialize the model in C<MyApp.pm>:
+
+	package MyApp;
+
+	use Moose;
+	use namespace::autoclean;
+	use MongoDBx::Class;
+
+	has 'db' => (is => 'ro', isa => 'MongoDBx::Class::Database', writer => '_set_db');
+
+	extends 'Leyland';
+
+	sub BUILD {
+		my $self = shift;
+
+		# initialize the database
+		my $m = MongoDBx::Class->new(namespace => 'MyApp::Model::DB');
+		my $conn = $m->connect(host => $self->config->{database_host}, db_name => 'myapp', safe => 1);
+		$self->_set_db($conn->get_database('myapp'));
+		$self->ensure_indexes;
+	}
+
+	sub ensure_indexes {
+		my $self = shift;
+
+		$self->db->get_collection('artist')->ensure_index([ artistid => 1 ], { unique => 1 });
+	}
+
+	__PACKAGE__->meta->make_immutable;
+
+The C<ensure_indexes()> method is just an example. I find it good practice to
+make sure all indexes exist when my applications initialize.
+
+As with DBIx::Class, the database object is now available for the application
+under C<< $c->app->db >>.
+
+=head2 WHAT'S NEXT?
+
+Read L<Leyland::Manual::StaticFiles> to learn how to serve static files
+from your applications, or L<return to the table of contents|Leyland::Manual/"TABLE OF CONTENTS">.
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Leyland at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Leyland::Manual::Models
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Leyland>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Leyland>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Leyland/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

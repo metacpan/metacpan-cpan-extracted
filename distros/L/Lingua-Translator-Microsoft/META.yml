@@ -1,0 +1,35 @@
+---
+abstract: 'A client library for the Microsoft Translator API'
+author:
+  - 'Larion Garaczi <larion@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Translator-Microsoft
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  MooseX::HasDefaults::RO: '0'
+  MooseX::StrictConstructor: '0'
+  Params::Validate: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  URI: '0'
+  XML::Simple: '0'
+  namespace::autoclean: '0'
+  perl: '5.010000'
+version: v1.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

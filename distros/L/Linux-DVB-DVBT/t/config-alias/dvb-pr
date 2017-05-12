@@ -1,0 +1,66 @@
+[4107-4415]
+video = 640
+audio = 641
+audio_details = eng:641
+type = 1
+net = BBC
+name = BBC NEWS
+
+[4107-4671]
+video = 620
+audio = 621
+audio_details = eng:621 eng:622
+type = 1
+net = BBC
+name = CBBC Channel
+
+[4107-4235]
+video = 610
+audio = 611
+audio_details = eng:611 eng:612
+type = 1
+net = BBC
+name = BBC TWO
+
+
+[8199-8263]
+type = 1
+net = ITV
+name = ITV1
+video = 520
+audio = 521
+audio_details = eng:521 eng:522
+
+[8199-8384]
+type = 1
+net = Channel 4 TV
+name = Channel 4
+video = 560
+audio = 561
+audio_details = eng:561 eng:562
+
+[8199-8448]
+type = 1
+net = Channel 4 TV
+name = E4
+video = 570
+audio = 571
+audio_details = eng:571 eng:572
+
+
+[8199-8353]
+type = 1
+net = ITV
+name = ITV4
+video = 600
+audio = 601
+audio_details = eng:601 eng:602
+
+[8199-8442]
+type = 1
+net = Channel 4 TV
+name = More 4
+video = 590
+audio = 591
+audio_details = eng:591 eng:592
+

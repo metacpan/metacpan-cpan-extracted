@@ -1,0 +1,529 @@
+0.88    Released at 2016-08-08.
+        - Just fixed meta data.
+
+0.87    Released at 2015-06-16.
+        - Implemented new option skip_message.
+
+0.86    Released at 2015-06-12.
+        - Quick fix for dateext and fileopen.
+
+0.85    Released at 2015-06-12.
+        - Added parameter dateext to Output::File.
+
+0.84    Released at 2014-10-24.
+        - Fixed some version conflicts.
+
+0.83    Released at 2014-10-23.
+        - Added method set_default_param.
+
+0.82    Released at 2013-11-03.
+        - Fixed the calls of _raise_error (RT #89989).
+
+0.81    Released at 2013-11-01.
+        - Added param utf-8 to Screen.pm and File.pm.
+
+0.80    Released at 2013-10-04.
+        - Fixed RT #89250 - dump() calls Dumper() now only if the log
+          level is active.
+
+0.79    Released at 2013-09-06.
+        - Added option "category".
+
+0.78    Released at 2013-05-16.
+        - Fixed bug in validate->reload for default configs (RT #85346).
+
+0.77    Released at 2013-05-15.
+        - Just fixed Pod::Coverage testing in 002-pod-coverage.t.
+
+0.76    Released at 2012-11-19.
+        - Fixed dbi_handle in DBI.pm (RT #81155).
+
+0.75    Released at 2012-03-09.
+        - Quick fix and replaced the "defined or" operator // with || in
+          Pattern.pm, line 101 for backward compability with Perl < 5.10.
+          Thanks to all CPAN smoker for the fix test reports!
+
+0.74    Released at 2012-03-07.
+        - Removed "main" from _get_c_sub if caller returns undef.
+          Sorry, that was just for debugging :/
+        - 3 releases at one day... GRML
+
+0.73    Released at 2012-03-07.
+        - Improved _get_c_sub in Pattern.pm (RT #75596).
+
+0.72    Released at 2012-03-07.
+        - Some code improvements to tune Log::Handler.
+          Each value that is passed to set_pattern and is not code
+          will be embedded into sub{}.
+        - Add option utf8 to Screen.pm (RT #75593).
+
+0.71    Released at 2011-02-10.
+        - Fixed RT#65515 and added dateformat to _split_options().
+
+0.70    Released at 2011-01-07.
+        - Added exists_logger().
+        - get_logger() doesn't croak any more if a logger
+          doesn't exists.
+
+0.69    Released at 2010-12-11.
+        - Just a full release.
+
+0.68_01 Released at 2010-12-07.
+        - Added option dbi_handle to DBI.pm.
+        - Bug fix RT #63687.
+
+0.68    Released at 2010-11-24.
+        - Fixed a bug in add(). It wasn't possible to pass more
+          than one output configuration to add().
+
+0.67    Released at 2010-10-10.
+        - Fixed a bug in set_level. The new level was set correctly
+          but no message was logged because the output wasn't added
+          to the $self->{levels} array.
+
+0.66    Released at 2010-09-27.
+        - Roled back again to 0.65 for different reasons.
+        - Fixed some spelling error in POD (RT #60005).
+        - It's not possible any more to create or get
+          more than one logger with get_logger() and
+          create_logger().
+
+0.65_04 Released at 2010-09-07.
+        - Fixed a bug with filter_output in Log::Handler
+          and Log::Handler::Output.
+
+0.65_03 Released at 2010-08-27.
+        - Added option filter (unused since 2008-07-25).
+        - Added method filter().
+
+0.65_02 Released at 2010-08-16.
+        - Rollbacked to 0.65 :-)
+        - Fixed some spelling error in POD (RT #60005).
+        - Added option category that works like filter_caller
+          but it's nicer to configure.
+
+0.65_01 Released at 2010-08-03.
+        - Modified create_logger and get_logger and added
+          the functionalety to create and fetch category loggers.
+        - Fixed some spelling error in POD (RT #60005).
+
+0.65    Released at 2010-08-02.
+        - Modified Log::Handler::Output::DBI. Oracle is unable
+          to handle "select 1". The statement is changed to
+          "select 1 from dual".
+
+0.64    Released at 2010-01-29.
+        - Fixed a bug in Email.pm on line 256 - $string can be
+          uninitialized.
+
+0.63    Released at 2009-11-24.
+        - Fixed a typo in Email.pm (RT #51745).
+        - Added options cc and bcc to Email.pm - this was a
+          feature request.
+        - It's now possible to pass the log level to log()
+          of Sendmail.pm.
+
+0.62    Released at 2009-11-06.
+        - Some bug fixes for reload() but it should run now :-)
+
+0.61_04 Released at 2009-11-04.
+        - Fixed a little bug in Sendmail.pm - the tests returns
+          an error if no /usr/sbin/sendmail is found.
+        - Some code improvements in Handler.pm.
+
+0.61_03 Released at 2009-11-01.
+        - Added a validate() functionality. It's really
+          useable to validate() before reload().
+
+0.61_02 Released at 2009-11-01.
+        - Fixed a bug in Email.pm - $options -> $opts.
+        - Made some code improvements in Log::Handler.
+        - Added reload() to the test suite.
+        - Added UNIVERSAL to the dependencies.
+
+0.61_01 Released at 2009-10-31.
+        - Added a reload functionality to Log::Handler and
+          all output-modules.
+
+0.60    Released at 2009-10-23.
+        - File.pm: "append" is now the default for option
+          "mode"
+        - Full release.
+
+0.59_02 Released at 2009-10-17.
+        - Default for option newline is now 1.
+
+0.59_01 Released at 2009-10-11.
+        - Kicked deprecated module Log::Handler::Simple.
+        - Kicked _close, _lock, _unlock in File.pm and moved the
+          functionalety into log() and close().
+        - Kicked deprecated option "reconnect" from DBI.pm.
+        - Added Log::Handler::Output::Sendmail.
+
+0.58    Released at 2009-10-07.
+        - Forget to kick Devel::Backtrace from Log::Handler::Simple.
+        - Log::Handler::Simple will be kicked in the next release.
+
+0.57    Released at 2009-10-06.
+        - Kicked UNIVERSAL::require.
+        - Kicked Devel::Backtrace.
+
+0.56    Released at 2009-06-06.
+        - Just a full version.
+
+0.55_01 Released at 2009-06-05.
+        - Oops... there was no _raise_error routine in
+          Log::Handler::Output::Screen.
+        - Fixed a bug in Handler.pm - the hash reference that were
+          passed to add() were changed (RT #46631).
+
+0.54    Released at 2009-05-27.
+        - Just a full version.
+
+0.53_01 Released at 2009-05-27.
+        - Fixed a bug in Log::Handler::Output::DBI - it was unable
+          to create a valid dsn for sqlite (RT #46407).
+          - Added option dbname
+          - Added option data_source
+
+0.52    Released at 2009-05-24.
+        - No changes, just a full version.
+
+0.51_01 Released at 2009-05-22.
+        - Added method set_level() to Handler.pm to change the log
+          level at runtime.
+
+0.51    Released at 2009-03-07.
+        - Just a full release.
+
+0.50_01 Released at 2009-03-07.
+        - Fixed a bug in the output DBI.pm - if the connection to
+          the database was lost then the message lost as well even
+          if a reconnect was successful.
+        - Added option prepare_message.
+        - Fixed message_pattern - the formatted messages was
+          overwritten if message_pattern was set.
+        - Option reconnect from Log::Handler::Output::DBI is
+          deprecated.
+
+0.50    Released at 2008-11-27.
+        - Added the functionality to create a application logger.
+          New functions are create_logger and get_logger.
+        - Added option expect_caller, what is the opposite of
+          option filter_caller.
+
+0.49    Released at 2008-11-16.
+        - Added patterns %U and %G (user, group).
+        - Fixed a bug in Socket.pm. If the server gone then
+           Log::Handler croaks even if die_on_errors is disabled.
+        - Fixed a bug in Output.pm. $log->error(0) logs nothing.
+          $log->error('foo', undef, 'bar') caused a warning.
+
+0.48    Released at 2008-10-28.
+        - Fixed a bug in Email.pm - no error message if a email
+          couldn't be send.
+        - Added Email::Date to send the date with a email.
+        - EMAIL: if the key $message->{level} exists then the level is
+          used in the subject: "$level: $subject". The level can
+          passed with the option message_pattern.
+
+0.47    Released at 2008-09-04.
+        - Add new config features. Now it's possilbe to add the
+          configuration for the outputs as a array reference.
+        - Add method log() to log with the level as first argument:
+          log($level=>$msg).
+        - Kicked Changes.pm. Not needed any more.
+
+0.46    Released at 2008-07-28.
+        - Fixed Plugin::YAML. It was created as Plugin::Config::YAML.
+        - Did some code/example improvements.
+
+0.45    Released at 2008-07-25.
+        - Kicked $self->{caller_level} and replaced it with
+          Log::Handler::CALLER_LEVEL. The reason is that if dump(),
+          die() or warn() was called then the patterns %p, %f, %c or
+          %s was wrong.
+        - Changed option filter to filter_message and added a new
+          option called filter_caller.
+
+0.44    Released at 2008-06-04.
+        - Fixed set_pattern(). It dies if the key name is something like
+          'x-name' because $m->{x-name} is not valid.
+        - Changed pattern %R to %r.
+
+0.43    Released at 2008-05-21.
+        - Fixed log() in DBI.pm and Socket.pm - only try to reconnect
+          if persistent + reconnect is set to true. Sorry :(
+
+0.42    Released at 2008-05-21.
+        - Added $|=1 to Screen.pm.
+        - warn() is now a shortcut for warning().
+        - Add flush() to Handler.pm, Output.pm and File.pm.
+        - Added Perl version 5.6.1 to Build.PL (use warnings & utf8).
+        - Added a licence file.
+        - Fixed reconnect in DBI.pm.
+        - Fixed a lot of POD typos.
+
+0.41    Released at 2008-05-09.
+        - Messages will be send to all outputs, even if a output is
+          not able to log a message. In version 0.40 the handler
+          stopped if a message couldn't be logged. That was bad.
+        - Did a lot code, POD and internal doc improvements.
+
+0.40    Released at 2008-05-04.
+        - A full release - finally :-)
+        - Kicked all <level>_and_trace and <level>_and_die methods.
+          Replaced them with $log->die and $log->trace.
+        - Did some code and POD improvements.
+
+0.39_17 Released at 2008-04-29.
+        - Kicked all <level>_and_croak methods and carp() - to bloated.
+        - message_pattern and message_layout is now builded with eval.
+        - The patterns are not static any more. Changes at runtime are
+          possible with set_pattern().
+        - Fixed Log::Handler::Output::Email - forget to call sendmail()
+          if buffer is set to 0.
+        - Kicked option interval from Log::Handler::Output::Email.
+        - All log() methods of each output expects now a hash or a
+          hash reference with the message (message => $message).
+          Before this change it was possible to pass a hash reference
+          or a simple string: { message => $message } or just $message.
+        - Some other little improvements: POD, Code, Examples
+
+0.39_16 Released at 2008-04-17.
+        - Kicked all <level>_and_exit() methods - to bloated.
+        - Added Log::Handler::Pattern.
+        - Added Log::Handler::Output::Socket.
+        - Added option filter and alias to the handler.
+        - Added close() to Log::Handler::Output::File.
+        - Added connect() and disconnect() to Log::Handler::Output::DBI.
+        - Added connect() and disconnect() to Log::Handler::Output::Socket.
+
+0.38_15 Released at 2008-03-06.
+        - The old style of Log::Handler version 0.38 is now implemented as
+          Log::Handler::Simple.
+        - POD improved; added Changes.pod, Examples.pod.
+
+0.38_14 Released at 2008-02-17.
+        - Forget to delete some POD parts - sorry :/
+
+0.38_13 Released at 2008-02-17.
+        - Kicked trace() and option "trace".
+        - Added trace methods for each level.
+        - Added croak, carp, die and warn methods for different levels.
+        - Log::Handler::Levels is now the base class for all level methods.
+
+0.38_12 Released at 2008-02-16.
+        - Released with a lot of POD, code and example improvements.
+
+0.38_11 Released at 2008-02-15.
+        - Changed option message_keys to message_pattern.
+          I hope that was the last change of this name :/
+        - Fixed POD typos and improved the documentation.
+
+0.38_10 Released at 2008-02-13.
+        - Added Log::Handler::Output::Screen.
+        - Added option "priority" to the handler.
+
+0.38_09 Released at 2008-02-09.
+        - Fixed t/100-config.t. Config::General was loaded, but it's not
+          in the prereq list. Kicked GLOBREF from the validate list for
+          config filename in Log::Handler::Config.
+
+0.38_08 Released at 2008-02-08.
+        - Kicked eval { } from Log::Handler::Output::DBI.
+        - Missed documentation for dbi_params in Log::Handler::Output::DBI.
+
+0.38_07 Released at 2008-02-08.
+        - Replaced options prefix and postfix with message_layout.
+        - Added %m as message to placeholders.
+        - Renamed option setinfo to message_keys.
+        - Added Log::Handler::Output::DBI.
+        - A lot of other code improvements.
+        - Moved the main logic from Log::Handler::Logger back to
+          Log::Handler.
+        - Renamed Log::Handler::Logger to Log::Handler::Output. This module
+          builds the output message and is just for internal usage.
+        - Renamed all output modules from Logger to Output.
+        - Patterns are not global any more. Now the patterns are stored
+          into the Log::Handler object.
+        - Changed option debug to debug_trace. The reason is that the
+          option debug can be used for output objects.
+
+0.38_06 Released at 2008-01-20.
+        - POD improved and a lot of POD typos fixed.
+        - Fixed splitToTree argument for plugin Config::Properties.
+        - Different code improvements.
+        - Add option setinfo to Log::Handler::Logger.
+        - The message is now handled with a hash ref intern.
+
+0.38_05 Released at 2008-01-19.
+        - Very annoyingly... wrong description for Log::Handler::Logger::Forward.
+
+0.38_04 Released at 2008-01-19.
+        - Fixed test for parameter 'filename' in t/03handler.t.
+        - Fixed a lot of typos and improved the code.
+        - Added Log::Handler::Logger::Forward.
+        - Added Log::Handler::Logger::Email with Net::SMTP.
+        - Added fatal() to Log::Handler.
+
+0.38_03 Released at 2008-01-14.
+        - Added Log::Handler::Config.pm.
+        - Added plugins for Config::General, Config::Properties and YAML.
+        - Fixed some POD typos.
+
+0.38_02 Released at 2008-01-13.
+        - Fixed test for 'mode' in t/03handler.t.
+        - POD and intern documentation improved.
+        - Fixed example examples/trace.pl.
+        - Kicked method levels() from Log::Handler::Logger.
+        - Added the option trace. With this option it's possible
+          to deactivate the logging of trace messages to a logfile.
+
+0.38_01 Released at 2008-01-13.
+        - Added Log::Handler::Logger and moved the main logger logic to it.
+        - Now it's possible to define more than one log file. Each log file
+          got it's own Log::Handler::Logger object.
+        - The simple call of "Log::Handler->new()" will not create a default
+          output object for *STDOUT any more, it just creates an empty Log::Handler object.
+        - To add log file the method add() should be used. The first log file can be
+          defined by new().
+        - The methods close(), set_prefix(), get_prefix are not available any more.
+        - The placeholder <--LEVEL--> for the prefix is changed to %L. In addition there
+          are different other placeholders available and it's possible to define a postfix.
+        - trace() will trace caller informations to all log files that are defined.
+        - Did a lot of other code changes.
+
+0.38    Released at 2007-09-29.
+        - Kicked set_log_buffer() and get_buffer_log().
+        - Did some code improvements and split _print() into different routines.
+        - The option filename isn't mandatory any more. The default is *STDOUT.
+
+0.37_01 Released at 2007-07-20.
+        - Added set_buffer_log() and get_buffer_log() to Log::Handler.
+        - Kicked now the would_log_* methods. Since 0.33 the is_* methods exists
+          as replacement.
+
+0.37    Released at 2007-07-04.
+        - Added option rewrite_to_stderr.
+        - Replaced syswrite to print in _print().
+
+0.36    Released at 2007-06-15.
+        - Now it's possible to set utf8 on the filehandle.
+        - Kicked CLOSE().
+        - Kicked File::Stat because CORE::stat() is much faster and I did some
+          other improvements. Now _print() is ~50% faster if reopen is used.
+
+0.35    Released at 2007-06-05.
+        - Added method trace() to prints caller() to the log file.
+        - Did some code improvements and fixed POD typos.
+
+0.34    Released at 2007-05-22.
+        - Changed the regex /.*\z/ to /.\z|^\z/ to append a newline if not
+          exists because /.*\z/ seems to be a regex bug.
+
+0.33	Released at 2007-05-09.
+        - Added 13 is_* methods. They do the same as the would_log_* methods.
+        - Added close() as replacement for CLOSE(). CLOSE() exists in further
+          releases but is deprecated.
+        - Did some code improvements and fix some POD typos.
+        - Kicked IO::Handle from PREREQS and autoflush myself on the file handle.
+
+0.32	Released at 2007-04-26.
+	    I jumped from 0.15 to 0.32 because there exists brownfields on backpan.
+	    Replaced my own routine to get caller() informations with Devel::Backtrace.
+	    Added the option debugger_skip.
+
+0.15	Released at 2007-04-25.
+        - Fixed typos in POD.
+        - Changed the way to activate the debugger. Now the debugger is activated
+          over the call of new().
+
+0.14	Released at 2007-04-24.
+        - Fixed "use Log::Handler debug => ...".
+
+0.13    Released at 2007-04-20.
+        - Added the availability to activate debugging with "Log::Handler debug => 1".
+
+0.12    Released at 2007-04-15.
+        - Fixed DESTROY(). DESTROY() tries to unlock $self->{fh} in any case.
+        - Autoflush wasn't set if the option "filename" was set to STDOUT or
+           STDERR or a GLOBREF.
+
+0.11    Released at 2007-04-10
+        - Add the methods set_prefix() and get_prefix(). Did some POD changes.
+
+0.11_02 Released at 2007-04-04
+        - Add the alternative to set "nothing" as option for minlevel and
+          maxlevel.
+
+0.11_01 Released at 2007-04-04
+        - I changed the log levels because they wasn't in the right order.
+          0 debug     is now 7
+          1 info      is now 6
+          2 notice    is now 5
+          3 warning   is now 4
+          4 error     is now 3
+          5 crit      is now 2
+          6 alert     is now 1
+          7 emergency is now 0
+          8 nothing is still the same
+          If you set maxlevel and minlevel as strings in your code than
+          you don't need to change your code, but if you used numbers
+          than you must change it! BIG sorry to all users that have to
+          re-write code in this case.
+        - Thanks to betterworld for his tipps about the log levels! (thx pepe ;-))
+
+0.10    Released at 2007-04-04
+        - Add the alternative to set STDOUT and STDERR as a string
+          with the option "filename".
+
+0.09    Released at 2007-03-01.
+        - Fixed t/03handler.t. The test log file was in unix format
+          t/Log-Handler-Test-File.log, now it use File::Spec catfile().
+        - Forget to CLOSE() the log file in t/03handler.t and test fails
+          on Windows.
+
+0.08    Released at 2007-02-25.
+        - Now it's possible to hand off GLOBREF to option filename.
+          There are some options that will be forced automatical:
+          - fileopen => 1
+          - filelock => 0
+          - reopen   => 0
+
+0.07    Released at 2007-03-13.
+        - Fixed t/03handler.t.
+
+0.06    Released at 2007-03-11.
+        - Fixed a bad typo in SYNOPSIS of POD.
+        - Changed the description in NAME of POD.
+
+0.05    Released at 2007-03-11.
+        - Fixed some typos in the documentation.
+
+0.04    Released at 2007-03-09.
+        - Fixed code in new(). There was three typos.
+
+0.03    Released at 2007-03-09.
+        - Fixed t/03handler.t.
+        - Added some points to the documentation.
+        - Add an example for die_on_errors.
+        - Add an example to call syslog methods.
+        - Different code changes.
+        - Fixed new(). Now it returns undef if open()
+          fails.
+
+0.02    Released at 2007-02-05.
+        - Added eight new methods:
+          would_log_debug()
+          would_log_info()
+          would_log_notice(), would_log_note()
+          would_log_warning()
+          would_log_error(), would_log_err()
+          would_log_critical(), would_log_crit()
+          would_log_alert()
+          would_log_emergency(), would_log_emerg()
+        - Changed the POD.
+
+0.01	Released at 2007-02-04.
+x.xx	Thanks to Larry Wall and all other Perl developers for Perl :-)

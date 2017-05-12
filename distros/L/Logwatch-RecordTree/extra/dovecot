@@ -1,0 +1,391 @@
+#!/usr/bin/perl -w
+########################################################
+# $Id: dovecot,v 1.18 2010/09/18 17:41:00 stefan Exp $
+########################################################
+# $Log: dovecot,v $
+# Revision 2.035 Sat Mar 28 16:17:29 PDT 2015 reid
+# Major rewrite to use Logwatch::RecordTree
+#
+# Revision 1.18  2010/09/18 17:41:00  stefan
+# ignore: ssl-build-param
+#
+# Revision 1.17  2009/06/02 14:48:06  mike
+# Removed some periods that were in the Fedora patch and broke the file -mgt
+#
+# Revision 1.16  2009/06/02 14:45:48  mike
+# Patch from Fedora (Ivana Hutarova Varekova) -mgt
+#
+# Revision 1.15  2008/11/18 06:02:49  mike
+# Rolled back..that was wrong. -mgt
+#
+# Revision 1.14  2008/11/18 06:00:34  mike
+# Removed a space should be better -mgt
+#
+# Revision 1.13  2008/11/18 04:32:49  mike
+# Added bytes detected to IMAP disconnect match expect more issues -mgt
+#
+# Revision 1.12  2008/08/11 15:38:02  mike
+# Connection closed patch from Niels Baggesen -mgt
+#
+# Revision 1.11  2008/06/30 23:07:51  kirk
+# fixed copyright holders for files where I know who they should be
+#
+# Revision 1.10  2008/03/24 23:31:26  kirk
+# added copyright/license notice to each script
+#
+# Revision 1.9  2008/02/14 18:19:51  mike
+# Patch from Gilles Detillieux summarize pop3/imap -mgt
+#
+# Revision 1.8  2008/01/16 20:11:04  bjorn
+# Filtering dovecot start-up message, by Gilles Detillieux.
+#
+# Revision 1.7  2007/06/18 03:54:45  bjorn
+# Better printing of IPv6 addresses, by Patrick Vande Walle.
+#
+# Revision 1.6  2007/03/17 19:13:13  bjorn
+# Now handling dovecot starts/kills.
+#
+# Revision 1.5  2006/12/20 15:25:09  bjorn
+# Additional filtering, by Ivana Varekova.
+#
+# Revision 1.4  2006/08/13 22:02:31  bjorn
+# IPv4 addresses displayed in native format, and don't display user totals
+# if user connects from only one IP address; changes by Patrick Vande Walle.
+#
+# Revision 1.3  2006/08/13 21:06:33  bjorn
+# Added support for Dovecot 1.0 based on patches from Mark Nienberg, and
+# IP addresses displayed without brackets for consistency across versions;
+# modifications by Patrick Vande Walle.
+#
+# Revision 1.2  2005/12/07 04:31:44  bjorn
+# Added $dovecot_ignore_host.
+#
+# Revision 1.1  2005/09/18 17:01:05  bjorn
+# Dovecot filters written by Patrick Vande Walle.
+#
+########################################################
+# Please send all comments, suggestions, bug reports,
+#    etc, to logwatch-devel@lists.sourceforge.net
+########################################################
+# The Dovecot script was written by:
+#   Patrick Vande Walle <patrick@isoc.lu>
+# Based on previous work by
+#    Pawel Golaszewski <blues@gda.pl>
+#
+# TODO:
+# - use printf features to align text in table
+#
+########################################################
+
+########################################################
+## Copyright (c) 2008 Patrick Vande Walle
+## Covered under the included MIT/X-Consortium License:
+##    http://www.opensource.org/licenses/mit-license.php
+## All modifications and contributions by other persons to
+## this script are assumed to have been donated to the
+## Logwatch project and thus assume the above copyright
+## and licensing terms.  If you want to make contributions
+## under your own copyright or a different license this
+## must be explicitly stated in the contribution an the
+## Logwatch project reserves the right to not accept such
+## contributions.  If you have made significant
+## contributions to this script and want to claim
+## copyright please contact logwatch-devel@lists.sourceforge.net.
+#########################################################
+
+use Sort::Key::IPv4 ( 'ipv4sort' );
+use Net::IP::Identifier;
+use Logwatch::RecordTree;
+use aliased 'Logwatch::RecordTree::IPv4' => 'IPv4', (
+    neat_names => -1,   # left-justified neat names
+    columnize  => 1,    # put into columns, if it fits
+    identify   => 1,    # try to identify each IP's owner
+    snowshoe   => 1,    # condense nets within /24 netblocks to CIDRs
+);
+
+my $fd = \*STDIN;   # default to reading STDIN
+my $filename = $ARGV[0];
+if ($filename and -f $filename) {
+    open $fd, '<', $filename
+        or croak("Error opening $filename for reading: $!\n");
+    print "file opened, clearing date filter...\n";
+    $filter = '.*';
+}
+elsif (defined &DB::DB) {
+    print "DeBug detected, clearing date filter...\n";
+    $filter = '.*';
+}
+
+my $tree = Logwatch::RecordTree->new(
+    name      => 'Dovecot events:',
+    no_indent => 1,
+);
+
+my $identifier = Net::IP::Identifier->new;
+
+my $Debug = $ENV{'LOGWATCH_DEBUG'} || 0;
+my $Detail = $ENV{'dovecot_detail'} || $ENV{'LOGWATCH_DETAIL_LEVEL'} || 0;
+my $IgnoreHost = $ENV{'dovecot_ignore_host'} || "";
+
+if ( $Debug >= 5 ) {
+    print STDERR "\n\nDEBUG \n\n";
+}
+
+# Handle "dovecot: <svc>" and "dovecot: [ID yyyyy mail.info] <svc"
+my $dovecottag = qr/dovecot:(?:\s*\[[^]]+\])?/;
+
+while (defined($ThisLine = <$fd>)) {
+    chomp $ThisLine;
+    # remove timestamp.  We can't use *RemoveHeaders because we need the
+    # service name
+    $ThisLine =~ s/^\w{3} .\d \d\d:\d\d:\d\d [^ ]* //;
+    if ( $ThisLine =~ /(?:ssl-build-param|ssl-params): SSL parameters regeneration completed/ or
+         $ThisLine =~ /ssl-params: Generating SSL parameters/ or
+         $ThisLine =~ /auth-worker/ or
+         $ThisLine =~ /auth:.*: Connected to/ or
+         $ThisLine =~ /Connection closed/ or
+         $ThisLine =~ /IMAP.*: Connection closed bytes/ or
+         $ThisLine =~ /IMAP.* failed with mbox file/ or
+         $ThisLine =~ /discarded duplicate forward to/ or
+         $ThisLine =~ /discarding vacation response/ or
+         $ThisLine =~ /spamd: server successfully spawned child process/ or
+         $ThisLine =~ /spamd: handled cleanup of child pid/ or
+         $ThisLine =~ /spamd(\S*): prefork: child states/ or
+         $ThisLine =~ /spamd(\S*): logger: removing stderr method/ or
+         $ThisLine =~ /Login not permitted to account with a uid lower/
+       )
+        {
+        # We don't care about these - ignore
+    }
+    elsif ( ($user) = $ThisLine =~ m/dovecot: auth: Error: Cpanel::MailAuth: Failed to getpwnam for user (\S+)/) {
+       # These are better reported by exim (the host IP is included in the
+       # error log)
+    }
+    # dovecot: pop3-login: Disconnected (auth failed, 1 attempts in 2 secs): user=<info@duelist101.com>, method=PLAIN, rip=92.45.203.64, lip=198.20.250.121, session=<uu3g+6f+AgBcLctA>: 1 Time(s)
+    # dovecot: pop3-login: Aborted login (auth failed, 1 attempts in 10 secs): user=<mail>, method=PLAIN, rip=177.103.223.239, lip=198.20.250.122, session=<rseM9sj+MQCxZ9/v>: 1 Time(s)
+    elsif (($proto, $attempts, $user, $ip) = $ThisLine =~ /dovecot: (pop3|imap)-login: (?:Aborted login|Disconnected) \(auth failed, (\d+) attempts in .*: user=<?(\S+?)>?, .*, rip=([\d\.]+),/) {
+        for (1 .. $attempts) {
+            $tree->log(['Auth Failed:', IPv4], $ip, [$proto, undef, {columnize=>1}], $user);
+        }
+    }
+    # dovecot: pop3-login: Disconnected (no auth attempts in 0 secs): user=<>, rip=66.240.236.119, lip=198.20.250.122, TLS: Disconnected, session=<YB1gGsz+1wBC8Ox3>: 1 Time(s)
+    elsif (($proto, $ip) = $ThisLine =~ /dovecot: (pop3|imap)-login: (?:Aborted login|Disconnected) \(no auth attempts in .*, rip=([\d\.]+),/) {
+        $tree->log(['Auth Failed:', IPv4], $ip, [$proto, undef, {columnize=>1}], 'no auth attempts');
+    }
+    # dovecot: auth: Error: Cpanel::MailAuth: cphulk blocked login for user 'info@earthenjewels.com' to access service 'mail' from IP '151.250.30.164': 1 Time(s)
+    elsif (($user, $ip) = $ThisLine =~ m/dovecot: auth: Error: Cpanel::MailAuth: cphulk blocked login for user '([^']+)' to access service '\w+' from IP '([\d\.]+)'/) {
+        $tree->log(['Auth Failed:', IPv4], $ip, ['Cpanel', undef, {columnize=>1}], $user);
+    }
+    elsif (($user, $ip) = $ThisLine =~ /Cpanel::MailAuth: Internal Error: cphulkd request failed to process (\S*) from IP '([\d.]+)'/) {
+    # dovecot: auth: Error: Cpanel::MailAuth: Internal Error: cphulkd request failed to process msmith@duelist101.com from IP '31.184.194.114' for service smtp.
+        $tree->log(['Auth Failed:', IPv4], $ip, ['Cpanel', undef, {columnize=>1}], $user);
+    }
+    elsif (($signal) = $ThisLine =~ /Killed with signal (\S+) /) {
+        $End++;
+        $tree->log('Killed with signal', $signal);
+    }
+    elsif (($ver, $with) = $ThisLine =~ /Dovecot v(\S+)\s*starting up for (.*)/) {
+        # Mar 23 21:51:03 web dovecot: master: Dovecot v2.2.16 starting up for imap, pop3 (core dumps disabled)
+        $End = 0;
+        $tree->log(['Restart: ver', undef, {sort_key=>'Killx'}], $ver, "with $with");
+    }
+    elsif ( ($User, $Host) = ( $ThisLine =~ /^pop3-login: Login: (.*?) \[(.*)\]/ ) ) {
+        if ($Host !~ /$IgnoreHost/) {
+            $Host = identify($Host);
+            $Host_Login{pop3}{$Host}++;
+            $Connections{$Host}++;
+            $tree->log('Login/logout:', 'pop3', $User);
+        }
+    }
+    elsif ( ($User, $Host) = ( $ThisLine =~ /^imap-login: Login: (.*?) \[(.*)\]/ ) ) {
+        if ($Host !~ /$IgnoreHost/) {
+            $User = '__cpanel__service__' if ($User =~ m/^__cpanel__service__auth__imap__/);
+            $Host = identify($Host);
+            $Host_Login{imap}{$Host}++;
+            $Connections{$Host}++; 
+            $tree->log('Login/logout:', 'imap', $User);
+        }
+    }
+    # This is for Dovecot 1.0 series
+    elsif ( ($User, $Host) = ( $ThisLine =~ /managesieve-login: Login: user=\<(.*?)\>.*rip=(.*)\, lip=/ ) ) {
+        if ($Host !~ /$IgnoreHost/) {
+            $Host = identify($Host);
+            $Connections{$Host}++;
+            $Host_Login{pop3}{$Host}++;
+            $tree->log('Login/logout:', 'pop3', $User);
+            $tree->log('ManageSieve Logins:', $User, $Host);
+        }
+    }
+    # 'lda' for dovecot 2.0, 'deliver' for earlier versions
+    elsif ( ($User, $Mailbox) = ( $ThisLine =~ /^$dovecottag (?:lda|deliver)\((.*)\): msgid=.*: saved mail to (.*)/ ) ) {
+        $tree->log('Delivered to:', $User, $Mailbox);
+    }
+    # For Sieve-based delivery
+    elsif ( ($User, $Mailbox) = ( $ThisLine =~ /^$dovecottag (?:lda\(|deliver\(|lmtp\(\d+, )(.*)\): (?:[^:]+: )?sieve: msgid=.*: stored mail into mailbox '(\S+)'/ ) ) {
+    }
+    elsif ( ($User, $Mailbox) = ( $ThisLine =~ /^$dovecottag (?:lda|deliver)\((.*)\): sieve: msgid=.*: stored mail into mailbox '(.*)'/ ) ) {
+        $tree->log('Delivered to:', $User, $Mailbox);
+    }
+    # LMTP-based delivery
+    elsif ( ($User, $Mailbox) = ( $ThisLine =~ /^$dovecottag lmtp\(\d+, (.*)\): [^:]+: msgid=.*: saved mail to (.*)/ ) ) {
+    # dovecot: [ID 583609 mail.info] lmtp(12782, cloyce@headgear.org): jBt1EfjCMk3uMQAAm9eMBA: msgid=<4D32DB1F.3080707@c-dot.co.uk>: saved mail to INBOX
+        $tree->log('Delivered to:', $User, $Mailbox);
+    }
+    # sieve forward
+    elsif (($User, $Recip) = ($ThisLine =~ /^$dovecottag (?:lda|deliver)\((.*)\): sieve: msgid=.* forwarded to \<(.*)\>/)) {
+        $tree->log('Forwarded via', "$User to", $Recip);
+    }
+    # sieve vacation
+    elsif (($User, $Recip) = ($ThisLine =~ /^$dovecottag (?:lda|deliver)\((.*)\): sieve: msgid=.* sent vacation response to \<(.*)\>/)) {
+        $tree->log('LDA sieve vacation responses from', "$User to", $Recip);
+    }
+    elsif (($User, $Recip) = ($ThisLine =~ /^$dovecottag (?:lda|deliver)\((.*)\): sieve: msgid=.* discarded duplicate vacation response to \<(.*)\>/ )) {
+        $tree->log('LDA sieve duplicate vacation responses discarded from', "$User to", $Recip);
+    }
+    elsif ( $ThisLine =~ /^$dovecottag lmtp\(.*\): Connect from/ ) {
+        # dovecot: [ID 583609 mail.info] lmtp(12782): Connect from local: 1 Time(s)
+        # IGNORE
+    }
+    elsif ( $ThisLine =~ /^$dovecottag lmtp\(.*\): Disconnect from/ ) {
+        # dovecot: [ID 583609 mail.info] lmtp(12782): Disconnect from local: Client quit: 1 Time(s)
+        # IGNORE
+    }
+    # This is for Dovecot 1.0 series
+    elsif ( ($User, $Host) = ( $ThisLine =~ /^$dovecottag pop3-login: Login: user=\<(.*?)\>.*rip=(.*)\, lip=/ ) ) {
+        if ($Host !~ /$IgnoreHost/) {
+            $Host = identify($Host);
+            $Host_Login{pop3}{$Host}++;
+            $Connections{$Host}++;
+            $tree->log('Login/logout:', 'pop3', $User);
+        }
+    }
+    elsif ( ($User, $Host) = ( $ThisLine =~ /^$dovecottag imap-login: Login: user=\<(.*?)\>.*rip=(.*)\, lip=/) ) {
+        if ($Host !~ /$IgnoreHost/) {
+            $User = '__cpanel__service__' if ($User =~ m/^__cpanel__service__auth__imap__/);
+            $Host = identify($Host);
+            $Host_Login{imap}{$Host}++;
+            $Connections{$Host}++;
+            $tree->log('Login/logout:', 'imap', $User);
+        }
+    }
+    elsif ( my ($proto, $User) = $ThisLine =~ /dovecot: (pop3|imap)\(([^)]+)\): Disconnected: Logged out /) {
+        $User = '__cpanel__service__' if ($User =~ m/^__cpanel__service__auth__imap__/);
+        my $item = $tree->child_by_name('Login/logout:', $proto, $User);
+        if ($item) {
+            $item->count_fields->[0] = '/';
+            $item->count_fields->[1] = ($item->count_fields->[1] || 0) + 1;
+        }
+    }
+    elsif ($ThisLine =~ /Disconnected (\[|top)/) {
+        $tree->log('Disconnected:', 'no reason');
+    }
+    elsif (($Reason) = ($ThisLine =~ /Disconnected: (.*) \[/) ) {
+        $tree->log('Disconnected:', $Reason);
+    }
+    elsif (($Reason) = ($ThisLine =~ /Disconnected: (.*) (bytes|top)=.*/) ) {
+        $tree->log('Disconnected:', $Reason);
+    }
+    elsif (($Reason) = ($ThisLine =~ /Disconnected \((.*)\):/) ) {
+        $tree->log('Disconnected:', $Reason);
+    }
+    elsif (($user, $rip) = ($ThisLine =~ /Maximum number of connections.* exceeded.* user=<([^>]+)>.*rip=([^,]+), lip=(?:[^,]+)/)) {
+        # dovecot: [ID 583609 mail.info] imap-login: Maximum number of connections from user+IP exceeded (mail_max_userip_connections=10): user=<cloyce@headgear.org>, method=CRAM-MD5, rip=102.225.17.52, lip=14.105.322.67, TLS
+        $tree->log('User/IP connection limit exceeded', $user, $rip);
+    }
+    # This is for Dovecot 1.0 series
+    # Overly general matches in this section -mgt
+    elsif ($ThisLine =~ /Disconnected for inactivity/) {
+        $tree->log('Disconnected:', 'inactivity');
+    }
+    elsif ($ThisLine =~ /Disconnected in IDLE/) {
+        $tree->log('Disconnected:', 'in IDLE');
+    }
+    elsif ($ThisLine =~ /Disconnected in APPEND/) {
+        $tree->log('Disconnected:', 'in APPEND');
+    }
+    elsif ($ThisLine =~ /Disconnected$/ or
+           ($Reason) = ($ThisLine =~ /pop3-login: Disconnected: (.+)/) or
+           ($Reason) = ($ThisLine =~ /imap-login: Disconnected: (.+)/) ) {
+        $tree->log('Disconnected:', 'no reason');
+    }
+    elsif (($Reason) = ($ThisLine =~ /POP3.+: Disconnected: (.+) top/) or
+           ($Reason) = ($ThisLine =~ /pop3-login: Disconnected \((.+)\): /) or
+           ($Reason) = ($ThisLine =~ /IMAP.+: Disconnected: (.+) bytes=/i) or
+           ($Reason) = ($ThisLine =~ /IMAP.+: Disconnected: (.+)/i)) {
+        $tree->log('Disconnected:', $Reason);
+    }
+    elsif (($proto) = ($ThisLine =~ /(IMAP|POP3).+: Connection closed (top|bytes)=/i))  {
+        $tree->log('Connection closed:', $proto, 'no reason');
+    }
+    elsif ( ($proto, $Reason) = $ThisLine =~ /(IMAP|POP3).*?: Connection closed: (.*) (top|bytes)=/i) {
+        $tree->log('Connection closed:', $proto, $Reason);
+    }
+    elsif (($Reason) = $ThisLine =~ /(IMAP|POP3).+: (Connection closed.*)/) {
+        $tree->log('Disconnected:', $Reason);
+    }
+    elsif ($ThisLine =~ /POP3.+: Connection closed top=.* retr=.* del=.* size=.*/i) {
+        $tree->log('Connection closed:', 'POP3', 'no reason');
+    }
+    else {
+      # Report any unmatched entries...
+        $tree->log('Others:', $ThisLine);
+    }
+}
+
+################################################
+
+if ( $End ) {
+    $tree->log(['Dovecot was killed, and not restarted afterwards.', undef, {sort_key=>'Killz'}]);
+}
+
+printf "Detail $Detail, connected from %s hosts\n", scalar keys %Connections;
+
+if (my $item = $tree->child_by_name('Login/logout:')) {
+    $item->sort_key(-999);    # first
+}
+
+my @con_map;
+if ( ( $Detail >= 0 ) and (keys %Connections)) {
+    push @con_map,
+        '',
+        '  ==========================',
+        '      Host            |     POP3 |     IMAP |     Total',
+        '  ------------------- | -------- | -------- | ---------';
+
+    foreach $Host (Logwatch::RecordTree::IPv4->ipv4sort(keys %Connections)) {
+        $Total = $Connections{$Host};
+        $POP3_Login  = $Host_Login{pop3}{$Host} || 0;
+        $IMAP_Login  = $Host_Login{imap}{$Host} || 0;
+        $Host=~ s/::ffff://;
+        push @con_map, sprintf '      %-15s | %8s | %8s | %9s', $Host, $POP3_Login, $IMAP_Login, $Total;
+        $POP3Count += $POP3_Login;
+        $IMAPCount += $IMAP_Login;
+        $TotalCount += $Total;
+    }
+    push @con_map,
+        '  ------------------- | -------- | -------- | ---------',
+        sprintf '      %-15s | %8s | %8s | %9s', '', $POP3Count, $IMAPCount, $TotalCount,
+        '',
+        '';
+}
+$tree->log(["\nPOP3 and IMAP Connections:", undef, {sort_key=>-998, no_count=>1}], join("\n", @con_map));    # second
+
+print $tree->sprint(sub { push @{$_[0]->lines}, '' if (@{$_[1]} == 1); });
+
+exit(0);
+
+sub identify {
+    my ($host) = @_;
+
+    my $id = $identifier->identify($host);
+    return $host if not $id;
+    $id = 'GMail' if ($id eq 'Google');
+    return $id;
+}
+
+# vi: shiftwidth=3 tabstop=3 syntax=perl et
+# Local Variables:
+# mode: perl
+# perl-indent-level: 3
+# indent-tabs-mode: nil
+# End:

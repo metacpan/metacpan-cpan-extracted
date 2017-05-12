@@ -1,0 +1,29 @@
+---
+abstract: 'A simple way to send structured log messages via UDP'
+author:
+  - 'Robin Smidsrød <robin@smidsrod.no>'
+build_requires:
+  Data::Serializer::JSON: 0
+  JSON: 0
+  Test::More: 0
+  Time::HiRes: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-UDP-Client
+requires:
+  Carp: 0
+  Data::Serializable: v0.40.0
+  IO::Socket::INET: 0
+  Moose: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/robinsmidsrod/Log-UDP-Client.git
+version: 0.20.2

@@ -1,0 +1,12 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/jargon_file.pl
+lib/LWP/Simple/Post.pm
+t/01_sani.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

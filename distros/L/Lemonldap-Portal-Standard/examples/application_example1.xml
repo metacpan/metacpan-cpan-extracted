@@ -1,0 +1,49 @@
+<lemonconfig>
+<domain    id="demo.net"
+           Cookie="lemondemo"
+	   Sessionstore="memcached"
+	   portal= "http://authen.demo.net/portail/accueil.pl"
+	   LoginPage="/tmp/login.html"
+	   >
+	<handler 
+        	id="appli1" 
+		>  
+	</handler>      
+<DefinitionSession>
+               <ligne  id = "mail"
+                       type = "single"
+                       cle ="mail"
+                       valeur= "%mail%" >
+               </ligne>
+               <ligne  id = "roleprofil"
+                       type = "single"
+                       cle ="%roleprofil;0%"
+                       valeur= "%roleprofil;1%" >
+               </ligne>
+               <ligne  id = "dn"
+                       type = "single"
+                       cle ="dn"
+                       valeur= "%dn%" >
+               </ligne>
+               <exp    id ="dn"
+                       type= "dnentry"
+                     />
+               <exp    id ="mail"
+                       type= "attrldap"
+                       attribut= "mail"
+                     />
+
+               <exp    id ="roleprofil"
+                       type= "attrldap"
+                       attribut= "roleprofil"
+                     />
+
+</DefinitionSession>
+
+
+</domain>
+<session    id="memcached" 
+            SessionParams="( servers => ['localhost:11211'] )" 
+        >
+</session>
+</lemonconfig>

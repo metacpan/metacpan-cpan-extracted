@@ -1,0 +1,31 @@
+---
+abstract: 'Provides HTTP/CONNECT proxy support for LWP::UserAgent'
+author:
+  - 'Markus Benning <me@w3r3wolf.de>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: LWP-Protocol-connect
+requires:
+  HTTP::Request: 0
+  IO::Socket::SSL: 0
+  LWP::Protocol: 0
+  LWP::Protocol::http: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  URI::http: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=LWP-Protocol-connect
+  repository: https://github.com/benningm/LWP-Protocol-connect
+version: 6.09

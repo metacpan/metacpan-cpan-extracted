@@ -1,0 +1,3 @@
+TYPEMAP
+sd_journal * T_PTR
+uint64_t    T_IV

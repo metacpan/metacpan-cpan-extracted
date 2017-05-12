@@ -1,0 +1,27 @@
+Revision history for Language-Kemuri
+
+0.07
+
+    - modernize package
+
+0.06
+
+    - some tests moved to xt/
+
+0.05
+
+    fixed test code bug.
+
+0.04
+    no changes
+
+0.03
+    fixed build bug.
+
+0.0.2  Sat Mar 17 17:23:14 JST 2007
+       use unpack.
+       thanks to hio_d.
+
+0.0.1  Fri Mar 16 22:47:16 2007
+       Initial release.
+

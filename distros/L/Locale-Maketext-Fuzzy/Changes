@@ -1,0 +1,25 @@
+[Changes for 0.11 - 2011-12-11]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under public domain with the "CC0 Universal" declaration.
+
+* Skip fuzzy matches which are only placeholders and whitespace.
+  (Alex Vandiver)
+
+[Changes for 0.10 - 2007-10-14]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the permissive "MIT" license.
+
+* Modernized the build infrastructure with Module::Install.
+
+* Tidied up source code, test files, and this changelog.
+
+[Changes for 0.02 - 2002-10-01]
+
+* Failed matches no longer interpolates.
+  (This makes normal strings with brackets possible.)
+
+[Changes for 0.01 - 2002-08-02]
+
+* Initial CPAN release.

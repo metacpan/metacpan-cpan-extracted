@@ -1,0 +1,12 @@
+Revision history for Perl extension LWP::ConnCache::Resolving.
+
+0.02  Tue May 15 12:33:19 EDT 2007
+	- fixed module documentation so MakeMaker can extract ABSTRACT properly.
+
+0.01  Tue May 15 11:53:19 EDT 2007
+        - original version; created by h2xs 1.23 with options
+	                -AX -n LWP::ConnCache::Resolving
+
+	It subclasses LWP::ConnCache and accepts resolver subroutine as constructor parameter.
+	It also provides cacheing of resolution results (can be turned off).
+

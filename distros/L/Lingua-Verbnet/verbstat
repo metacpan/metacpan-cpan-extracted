@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+=head1 NAME
+
+verbstat -- extract ambiguity stats from verbnet XML files as a text dump of a Perl hash
+
+=head1 SYNOPSIS
+
+verbstat [file1 ...]
+
+=cut
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long;
+
+use Lingua::Verbnet;
+
+=head1 DESCRIPTION
+
+Given a list of Verbnet files, collect crude ambiguity stats,
+by counting how many frames are associated with a given verb
+across the various verbnet classes.
+
+The output is in the form of a Perl hash.
+
+Written as a tool to extract test corpus for cross-evaluation
+of parsers at L<http://www.cs.bgu.ac.il/~nlpproj/parse-eval/>.
+
+=cut
+
+{
+	GetOptions(
+		'help|h|?' => sub { pod2usage(1) },
+		'man' => sub { pod2usage(-exitstatus => 0, -verbose => 2); },
+		)
+		or pod2usage();
+}
+
+@ARGV = ('-') unless @ARGV;
+my %stats = Lingua::Verbnet->new(@ARGV)->ambiguity->hash;
+
+print "(\n";
+{
+	foreach (sort keys %stats) {
+		print "\t'$_' => $stats{$_},\n";
+	}
+}
+print ");\n";
+
+=head1 SEE ALSO
+
+L<Lingua::Verbnet::Ambiguity>, L<Lingua::Verbnet>, L<difficult(1)>
+
+=head1 AUTHOR
+
+Vassilii Khachaturov <F<vassilii@tarunz.org>>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See F<http://www.perl.com/perl/misc/Artistic.html>

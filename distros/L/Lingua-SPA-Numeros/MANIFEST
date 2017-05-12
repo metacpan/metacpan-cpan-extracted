@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Lingua/SPA/Numeros.pm
+t/CardinalsTest.pm
+t/OrdinalsTest.pm
+t/t01_init.t
+t/t02_cardinals.t
+t/t03_fractions.t
+t/t04_ordinals.t

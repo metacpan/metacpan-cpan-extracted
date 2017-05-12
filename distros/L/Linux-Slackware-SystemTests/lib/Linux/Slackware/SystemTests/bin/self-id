@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+# Copyright (C) 2007-2016 TTK Ciar
+# Available for unlimited distribution and use.
+# The copyright is just so someone else cannot claim ownership and sue me for use of my own code.
+
+# DESCRIPTION:  Slightly lobotomized version of self-id, used to report various things about the local host.
+# The full version is available at http://ciar.org/ttk/codecloset/self-id
+
+use strict;
+use warnings;
+use Data::Dumper;
+
+usage() if (defined($ARGV[0]) && $ARGV[0] =~ /^\-+h/);
+my $FORMAT = $ARGV[0] || 'perl';
+
+my $tm = time();
+my $lt = localtime($tm);
+my %h = (tm => $tm, lt => $lt);
+
+detect_uname(\%h);
+detect_version(\%h);
+
+print(to_format(\%h, $FORMAT)."\n");
+exit(0);
+
+sub detect_version {
+  my ($hr) = @_;
+  $hr->{'release'} = 'unknown';
+  $hr->{'distro'} = 'unknown';
+  $hr->{'version'} = '0';
+  if (-e '/usr/bin/lsb_release') {
+    foreach my $x (`/usr/bin/lsb_release -a 2>&1`) {
+      chomp ($x);
+      $hr->{'lsb'}     = lc($1) if ($x =~ /^LSB Version:\s+(.+)/);
+      $hr->{'release'} = lc($1) if ($x =~ /^Description:\s+(.+)/);
+      $hr->{'version'} = lc($1) if ($x =~ /^Release:\s+(.+)/);
+      $hr->{'distro'}  = lc($1) if ($x =~ /^Distributor ID:\s+(.+)/);
+    }
+  }
+  if ($hr->{'release'} eq 'unknown') {
+    my $fh = undef;
+    my $id_file = first_file("/etc/os-release", glob("/etc/*{-release,-version,_version}"), '/etc/lsb-release', '/etc/release'); # the ordering of these are important.
+    if (defined($id_file) && open ($fh, "<", $id_file)) {
+      if ($id_file eq "/etc/os-release") { # http://0pointer.de/blog/projects/os-release
+        while (defined(my $buf = <$fh>)) {
+          chomp($buf);
+          $hr->{'release'} = lc($1) if ($buf =~ /^\s*pretty_name\s*=\s*"?(.*?)\"?\s*$/i );
+          $hr->{'version'} = lc($1) if ($buf =~ /^\s*version_id\s*=\s*"?(.*)"?\s*$/i );
+          $hr->{'distro'}  = lc($1) if ($buf =~ /^\s*name\s*=\s*"?(.*)"?\s*$/i );
+          $hr->{'distro'}  = lc($1) if ($buf =~ /^\s*id\s*=\s*"?(.*)"?\s*$/i );
+        }
+      }
+      elsif ($id_file eq '/etc/lsb-release') { # Ubuntu and Debian, though those likely have lsb_release installed.
+        while (defined(my $buf = <$fh>)) {
+          chomp($buf);
+          $hr->{'release'} = lc($1) if ($buf =~ /^\s*Description\s*:\s*"?(.*?)\"?\s*$/i );
+          $hr->{'version'} = lc($1) if ($buf =~ /^\s*Release\s*:\s*"?(.*?)\"?\s*$/i );
+          $hr->{'distro'}  = lc($1) if ($buf =~ /^\s*Distributor[^\w]*ID\s*:\s*"?(.*?)\"?\s*$/i );
+        }
+      }
+      elsif ($id_file eq '/etc/release') { # NetBSD, and maybe others?
+        while (defined(my $buf = <$fh>)) {
+          next unless ($buf =~ /^\s*([A-Z][^\s]+)\s+(\d[\w\.]+)/);
+          $hr->{'release'} = lc("$1 $2");
+          ($hr->{'os'}, $hr->{'version'}) = (lc($1), lc($2));
+          $hr->{'distro'} = '';
+          last;
+        }
+      }
+      else {
+        $hr->{'release'} = lc(<$fh>);
+        chomp ($hr->{'release'});
+        ($hr->{'distro'}, $hr->{'version'}) = ($1, $2) if ($hr->{'release'} =~ /(.+?)\s+release\s+([\d\.]+)/);
+        ($hr->{'distro'}, $hr->{'version'}) = ($1, $2) if ($hr->{'distro'} eq 'unknown' && $hr->{'release'} =~ /^([\w]+)\s+([\d\.]+)/);
+      }
+      close ($fh);
+    }
+  }
+  return;
+}
+
+sub detect_uname {
+  my ($hr) = @_;
+  my $fh;
+  $hr->{'name'} = 'unknown';
+  $hr->{'kernel'} = 'unknown';
+  $hr->{'arch'} = 'unknown';
+  $hr->{'bits'} = 'unknown';
+  my $uname = '/bin/uname';
+     $uname = '/sbin/uname' unless (-x $uname);
+     $uname = '/usr/bin/uname' unless (-x $uname);
+     $uname = '/usr/sbin/uname' unless (-x $uname);
+  if (-x $uname) {
+    my $x = `$uname -snrm`;
+    chomp($x);
+    ($hr->{'os'}, $hr->{'name'}, $hr->{'kernel'}, $hr->{'arch'}) = split (/\s+/, $x);
+    if ($hr->{'arch'} =~ /(_64|ultra|alpha|rs[14-9])/i) {
+      $hr->{'bits'} = 64;
+    } else {
+      $hr->{'bits'} = 32;
+    }
+  }
+  return;
+}
+
+sub first_file {
+  foreach my $f (@_) { return $f if (-e $f); }
+  return undef;
+}
+
+sub to_format {
+  my ($hr, $fmt) = @_;
+  $fmt = lc($fmt);
+
+  if ($fmt eq 'json') {
+    my $success = 0;
+    die ("JSON not supported") unless (eval('use JSON; $success = 1;') || $success);
+    return JSON::to_json($hr);
+  }
+
+  elsif ($fmt eq 'csv') {
+    my @keys = sort keys %{$hr};
+    my $ret  = "";
+    foreach my $k (@keys) { $ret .= "\"$k\","; }
+    chop($ret); # lose trailing comma
+    $ret .= "\n";
+    foreach my $k (@keys) { $ret .= "\"$hr->{$k}\","; }
+    chop($ret); # lose trailing comma
+    return $ret;
+  }
+
+  elsif ($fmt eq 'ini') {
+    my @keys = sort keys %{$hr};
+    my $ret  = "";
+    foreach my $k (@keys) { $ret .= "$k=$hr->{$k}\n"; }
+    chomp($ret);
+    return $ret;
+  }
+
+  elsif ($fmt eq 'perl') {
+    my $old_indent = $Data::Dumper::Indent;
+    my $old_terse  = $Data::Dumper::Terse;
+    $Data::Dumper::Indent = 0;
+    $Data::Dumper::Terse  = 1;
+    my $ret = Dumper($hr);
+    $Data::Dumper::Indent = $old_indent;
+    $Data::Dumper::Terse  = $old_terse;
+    return $ret;
+  }
+
+  # default to hash format
+  my $ret = "";
+  foreach my $k (sort keys %h) { $ret .= "$k=$hr->{$k}\t"; }
+  chop($ret);
+  return $ret;
+}
+
+sub usage {
+  print "Usage: $0 <format>\n";
+  print "Output format may be one of: 'json', 'perl', 'hash', 'ini', or 'csv'.\n";
+  print "default is 'perl'.\n";
+  exit(1);
+}

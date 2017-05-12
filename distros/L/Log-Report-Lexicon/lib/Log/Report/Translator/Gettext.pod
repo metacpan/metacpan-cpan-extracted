@@ -1,0 +1,63 @@
+=encoding utf8
+
+=head1 NAME
+
+Log::Report::Translator::Gettext - the GNU gettext infrastructure
+
+=head1 INHERITANCE
+
+ Log::Report::Translator::Gettext
+   is a Log::Report::Translator
+
+=head1 SYNOPSIS
+
+ # normal use (end-users view)
+
+ textdomain 'my-domain'
+   , translator => Log::Report::Translator::Gettext->new;
+
+ print __"Hello World\n";  # language determined by environment
+
+ # internal use
+
+ my $msg = Log::Report::Message->new
+   ( _msgid      => "Hello World\n"
+   , _textdomain => 'my-domain'
+   );
+
+ print Log::Report::Translator::Gettext->new
+     ->translate($msg, 'nl-BE');
+
+=head1 DESCRIPTION
+
+UNTESTED!!!  PLEASE CONTRIBUTE!!!
+Translate a message using the GNU gettext infrastructure.
+
+Guido Flohr reports:
+be aware that Locale::gettext is only a binding for the C library
+libintl and depends on its features.  That means that your module will
+effectively only run on GNU systems and maybe on Solaris (depending
+on the exact version), because only these systems provide the plural
+handling functions ngettext(), dngettext() and dcngettext().  Sooner or
+later you will probably also need bind_textdomain_codeset() which is
+also only available on certain systems.
+
+Extends L<"DESCRIPTION" in Log::Report::Translator|Log::Report::Translator/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Log::Report::Translator|Log::Report::Translator/"METHODS">.
+ 
+=head1 SEE ALSO
+
+This module is part of Log-Report-Lexicon distribution version 1.06,
+built on September 21, 2016. Website: F<http://perl.overmeer.net/log-report/>
+
+=head1 LICENSE
+
+Copyrights 2007-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

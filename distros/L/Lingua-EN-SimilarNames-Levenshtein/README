@@ -1,0 +1,3 @@
+Find pairs of names that are similar in spelling.
+
+See the test, t/basic.t for a usage example.

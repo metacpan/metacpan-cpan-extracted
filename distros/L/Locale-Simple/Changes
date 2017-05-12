@@ -1,0 +1,597 @@
+==================================================
+Changes from 1740-11-26 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.019 at 2014-09-10 21:30:34 +0000
+------------------------------------------
+
+  Change: 5a9acb386fc24d74abc82def3ec7a9c8d1e66e87
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-09-10 23:30:28 +0000
+
+    Hups, fixed rights 
+
+  Change: f3cf138c99b0c2a59c5fa3e7a2bcb8b84702ecd0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-09-10 23:29:53 +0000
+
+    Bugfix in old scraper 
+
+  Change: 88e9c5a2aa5f7897ecc98950484859c2e8a69c89
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-09-07 19:22:18 +0000
+
+    Added old (different working) scraper version 
+
+  Change: 51c0f2442f2d22b7190fa9e735854abd7a33f8f1
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-09-06 23:18:40 +0000
+
+    allow for multiple concat ops and add xslate concat op ~ 
+
+  Change: fac3922df2f924741b97730489cf02f1d4e4b694
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-21 01:33:34 +0000
+
+    new travis settings 
+
+  Change: 3a2e6bd93acabf9a841812d49441e27485fb1920
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-21 02:01:22 +0000
+
+    all the test data needs to be treated by dzil as binary files 
+
+  Change: d354738a61681b1adaa228c9b99105c1be77eb35
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:59:07 +0000
+
+    empty merge commit to aid history spelunking 
+
+  Change: 5bbbce110bfdc22487f8a277cce7691f37c0a3d0
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:51 +0000
+
+    add option to suppress line number output 
+
+  Change: c77da4bcc2ee7444d27b08ec2785d5b117670575
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:51 +0000
+
+    ignore dzil build artefacts 
+
+  Change: 54abf6cc9ea0b2a890246c4b5ff4d3552f657dc0
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:51 +0000
+
+    concatenated dynamic strings can contain function calls 
+
+  Change: fda3c3e96796b464298f65be13483383aac0bdab
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:51 +0000
+
+    perl 5.10 needs parens on that shift 
+
+  Change: d2b351477b816a68daf6d4533c749acadc873e0a
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:51 +0000
+
+    force the scraper to always process files in the same order 
+
+  Change: ad424870b8e55259f9ef620151171d7bcfabe7c5
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:51 +0000
+
+    ensure tests work in release configuration and after dzil munging 
+
+  Change: ab274636dff23eefc2f3812141b94a4622e0cb6e
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:50 +0000
+
+    move expect_op to Parser.pm, as it is specific to LSSP 
+
+  Change: 2f4fc01d9ce9f1fef077a115ec6565b1faac21dd
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:50 +0000
+
+    add abstracts for the newly added modules 
+
+  Change: 73679cc14493df6827650d389879d45285ddb8e9
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:50 +0000
+
+    dzil config now uses AutoPrereqs 
+
+  Change: c88f9150a8ac04b54d732e7d84a65bc3eb05402b
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:50 +0000
+
+    expect_op now handles preceding whitespace transparently 
+
+  Change: 1cc552da4524ab6fba73509c8631ee003524382b
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:50 +0000
+
+    reports for where tokens are found now use the line number of the l*
+    call 
+
+  Change: 106f4c0a6d0ee116077227f2f73d9fba813171a5
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:50 +0000
+
+    make arguments() semantically more clean by moving result saving to
+    call() 
+
+  Change: 38e62bea8996620911ccf101f4fdc1a15b193550
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:50 +0000
+
+    don't strip error line numbers in tests, report doesn't print them
+    anymore 
+
+  Change: 241d96d976237742def3511af29d8e57aa897027
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:50 +0000
+
+    improve readability of arguments sub 
+
+  Change: e9c05a529f0f86eb368aa36e3da8d4b788f2d2b7
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:49 +0000
+
+    converted required_args methods into one method 
+
+  Change: aae77a545878f8e2e0f6c6d5fcb6213abdfad55a
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:49 +0000
+
+    expect_string is now expect_op, which never returns the op 
+
+  Change: 04161839133a2f1c26d999727907a71c8a054e11
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:49 +0000
+
+    introduce with_ws to execute a parse while keeping whitespace 
+
+  Change: 0743bd2c0bfc5e0cceb3abd2d0d7e3f47b238373
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:49 +0000
+
+    introduce shortcuts for some curries, fixes list_of curry
+    incompatibility 
+
+  Change: 198fa19ac24ff9b27b5e54b704348e07fe947768
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:49 +0000
+
+    improve readability by liberal application of curry 
+
+  Change: ede065b3109d7903f6ef76584909ce2aacb7abed
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:49 +0000
+
+    improve readability of parser code by factoring out generic shortcuts 
+
+  Change: 9f46c2be62b444c7ccc9a1f871a5e5958ed47180
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:49 +0000
+
+    improve readability of parser code by renaming and refactoring 
+
+  Change: cc052d2d718cd54e5e3d1ae16952d2257678f542
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:49 +0000
+
+    converted extra-arg parsing from maybe to list, fixing extra arg
+    counts 
+
+  Change: ba349b9ffd92664044f1736d9c7485b4666d1505
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:49 +0000
+
+    the noise character count does not really matter and is too volatile 
+
+  Change: dd3bd125198e73a68ba43cc1a9d95bfc18917175
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:49 +0000
+
+    test for multiline calls of various kinds 
+
+  Change: 2c596d2773feb1df9661d41598bfc944aa410691
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:48 +0000
+
+    parse extra arguments with variables and variables in concatenated
+    strings 
+
+  Change: bafc84f5907e98a99b933bf7a1aee83a678fb8ae
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:48 +0000
+
+    parse concatenated strings 
+
+  Change: f2c3fa0d66eb03ff1d9720fb766b0c9c991b8ec6
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:48 +0000
+
+    retain spaces in strings 
+
+  Change: 56afbff9798d52063d7396129ef66f61be73b8eb
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:48 +0000
+
+    parse required arguments per function 
+
+  Change: 95713c6ba85ef412f6a63af08fda86fc14148872
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:48 +0000
+
+    only debug MGC fails 
+
+  Change: 8aa65721d0bd4dd8e7e23eff2e55e2df90f5ea41
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:48 +0000
+
+    support for nested localization calls 
+
+  Change: f54aa0dcd19f1cd2bb7410885882ad7d729124b5
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:48 +0000
+
+    extended definition of what a non-escaped character in a complex
+    string is 
+
+  Change: 3562a372c734766b52bcdbace8e251e077aab3e3
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:48 +0000
+
+    the commit is unnecessary since we fail() manually 
+
+  Change: 3c0eda8181de7d4aabbf01efd129257099fd3531
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:48 +0000
+
+    implemented MGC parser for scraper 
+
+  Change: 81a03c17314b4ab4a98556927c6464062a5356b3
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:48 +0000
+
+    ensure backslashes in output are properly escaped 
+
+  Change: f1d1fcbb633772232ce367fada205f50079fb0f9
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:47 +0000
+
+    factored out result_from_params function in scraper 
+
+  Change: ba1f1fa83bc38c8ea2e1105a8fe19e615ffc7bfe
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 18:57:37 +0000
+
+    tests 
+
+  Change: d9c59161296ff01618469295b3283df40bb0fe40
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 16:19:56 +0000
+
+    properly mark translation strings in plural strings 
+
+  Change: 2edbd09bf905aef864bb09c4295ddb047d11f141
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 16:19:56 +0000
+
+    ensure escaped characters are output correctly 
+
+  Change: 800966d46e06aebfe41a9126cf45e87ac3b2ab1a
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 16:19:56 +0000
+
+    find tokens at the start of a line 
+
+  Change: 00f27cc819035ce7c6e684c5ecba5db495fbd27e
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2014-02-20 16:19:56 +0000
+
+    move scraper code into a module 
+
+  Change: 6eaef83f4785e27eea6b673b8f90ed7e306b52f5
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2013-08-15 15:58:02 +0000
+
+    Fix empty-string issue for python 
+
+  Change: 0a7638e02856d46277f270136007e1114fa93897
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-06-11 05:41:16 +0000
+
+    Added test that should fail... but hm they dont... ok but i made them 
+
+  Change: 3f85969c5ff7de8c44db0228c5b44f426e79244c
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2013-05-13 11:31:19 +0000
+
+    make sure the first test uses _dumb instead of _pp 
+
+  Change: 49919fca65b967ba299a46b18b37dde977dbe80b
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2013-05-13 11:30:22 +0000
+
+    require TextDomain version that'll give us _dumb 
+
+  Change: cd0a22b47da7053e70b2926d2688d7003cfeaaaa
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-05-11 23:42:24 +0000
+
+    Lets see if this works for travis now... 
+
+  Change: 3326ac645caf753b4ae02f177a744bfd95275f92
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-05-11 23:34:34 +0000
+
+    Switched to TravisCI module, added new .travis.yml 
+
+  Change: af380d7e80aa7867390049820e724baa448b6f5c
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2013-05-11 23:28:10 +0000
+
+    make Locale::Simple independent of OS locale mechanics 
+
+  Change: 5e367e77dc7537f432ec149e5b19aa3c322924a9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-04-21 01:26:16 +0000
+
+    Added .travis.yml 
+
+  Change: 501b627fcf9658f98f3b7246979268caf5fd0dcf
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-04-09 10:39:43 +0000
+
+    Fixed locale_simple_scraper... Removed very.... wrong code ;) 
+
+  Change: 593b3cfcbae98e7e73289e2a51c683a86c721d37
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-22 18:40:50 +0000
+
+    Added only option to locale_simple_scraper 
+
+  Change: cac1427566a47f8fbf296219b431371705feea43
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2013-02-22 18:33:26 +0000
+
+    extractor dies on incomplete tokens 
+
+  Change: 3be0a635a606b5c9c6907ce4582f1ab4087ce043
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2013-02-22 18:33:25 +0000
+
+    typo 
+
+  Change: cd899f38557b743e1352f5e113940913ee434e21
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2013-02-22 18:33:08 +0000
+
+    set locale for messages if the system supports it 
+
+  Change: 9bfc923a80b4c60decadc8ce2d313a2ef7f34c3b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-01 22:52:57 +0000
+
+    Added sprintf_compare function for comparing placeholders 
+
+  Change: 08d6e3ff613d6e57184eb221edd44e7dfc5943d8
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2013-01-30 13:10:37 +0000
+
+    make sure the scraper actually prints newlines as proper chars 
+
+  Change: 2ba70dc80208a393e1bf7f1e56c106491dbb1bbb
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-01-28 14:36:28 +0000
+
+    Merge pull request #2 from wchristian/patch-2
+
+    allow output of scraper to be recognized by poedit 
+
+  Change: ef4523a42ecd13775f7f17832f5e29119f60372a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-01-28 14:34:56 +0000
+
+    Merge pull request #1 from wchristian/patch-1
+
+    allow use of msg ids with utf8 chars 
+
+  Change: e9fb07d24fca0bbe0c1c683b517dc2573533d45d
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2013-01-23 19:05:33 +0000
+
+    allow output of scraper to be recognized by poedit
+
+    Without an empty msgstr line, poedit will not recognize msgid lines
+    as items to be translated, so adding it results in useful .po files. 
+
+  Change: 0fff6638016621512caf177cf27bd378b4b909bd
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2013-01-23 19:02:41 +0000
+
+    allow use of msg ids with utf8 chars
+
+    The msgids from the mo file are read in as bytes in L::TD, as such
+    they need to be encoded before being sent to it, otherwise they
+    wouldn't match any keys and translations would not be found for them. 
+
+  Change: b4a28393576cc066823cec2ccf6b3f7386972fc5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-01-22 22:20:13 +0000
+
+    Moved the bad utf8 handling of gettext_pp before sprintf (Mithaldu++) 
+
+  Change: 298430517fd0bbdd07895646929c7452dc1373d5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-01-22 22:17:53 +0000
+
+    Scramble filenames with md5 for positioning informations 
+
+  Change: 9ed9047cb2d38bae72b850ba1c26a2ac6dedb23d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-01-10 10:42:47 +0000
+
+    Added token scraper, first version, but works so far good! 
+
+  Change: c93d75bd0188a0a7c2ded5a3af200d37ca204700
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2013-01-06 11:11:35 +0000
+
+    fix readme importer 
+
+  Change: df5f8de3a1c268ff5e9c40f22d3ba49d5fb5eb29
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-01-06 09:52:33 +0000
+
+    Refactored the Javascript testing to automatic testing, added new
+    tests for changed order with plural and placeholder 
+
+  Change: 7e1b10c60b87e0edc01e5a3ad0e12f04e9f69061
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2013-01-05 17:08:31 +0000
+
+    fix setup.py ... again 
+
+  Change: b07b1ee5a9a4ac8795f3bd62438c982a9535b5bb
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-01-06 01:03:40 +0000
+
+    Ok so we finally know how to make a python package, eh? ;) 
+
+  Change: 565ae413f915f61e664e9cf39dbe546ac6581839
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-01-06 00:15:55 +0000
+
+    Made it a platform independent egg for python 
+
+  Change: 7fef458515c360a532925f4135f5b1b6f3b713a0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-01-06 00:11:49 +0000
+
+    Fixed dist.ini, removed NextRelease usage 
+
+  Change: b0ca475467152ece63fdcec4d44f80a733c7d933
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2013-01-05 16:08:26 +0000
+
+    make tests exit with $?=1 if they fail 
+
+  Change: 8364d6c99a1e7be04639b4a20dee7f3d388d16f2
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2013-01-05 15:56:37 +0000
+
+    fix data finder 
+
+  Change: 9ee178482942cdbf755a7527bc248bec5eae7470
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2013-01-05 15:47:07 +0000
+
+    die if there is no V 
+
+  Change: 337a8b47719d63dc8a77eaec138b6c4ea3f1f067
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-01-05 23:43:41 +0000
+
+    Adapted dist.ini for python parts, changed description, added python
+    build files to .gitignore 
+
+  Change: 17279d34e5fdf3241afda36ca44982d1887f8e79
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2013-01-05 15:39:24 +0000
+
+    oops, fix version 
+
+  Change: b7368cddac6176d79f7cb6bc54b590826d529fb8
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2013-01-05 15:37:30 +0000
+
+    grab version from ENV 
+
+  Change: 43c014ef7ce15425773291546bc547c302d4df6e
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2013-01-05 13:51:51 +0000
+
+    documentation for python 
+
+  Change: 4200e2d52dfd3c6bebae8d2a5c0d80e4d1b1b410
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2013-01-05 13:08:05 +0000
+
+    add python version 
+
+  Change: a784a3ab528edd115e7bf82528bd3134d7d912ab
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-01-05 19:46:06 +0000
+
+    Added simple context test 
+
+  Change: 95efe61a1d1e323a093a527dbcbf8cc64b07134c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-01-05 19:41:09 +0000
+
+    Added complex ordering case from sprintf documentation of Perl,
+    output validation information added (should be some JS with green/red
+    flag probably?), fixed update_locale.sh 
+
+  Change: eb1e1639eb5e2e2266e53ceb1d464a84f233f030
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-10 18:33:23 +0000
+
+    Removed changes for new pluginbundle 
+
+  Change: 3cdb241227348d9ad15d18699f98e0a6c907aa5a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-10 18:32:46 +0000
+
+    Switched to Author::GETTY dzil plugin bundle 
+
+  Change: 41c5535c2949c7501457b4a82d0a4b5186177cbe
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-10 18:32:35 +0000
+
+    Added l_nolocales 
+
+  Change: c7c70389922fb36312bc4bf479f1585ee34ba83c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-05-27 11:38:23 +0000
+
+    v0.001 
+
+  Change: 00e61f87b1528161e525e41b722a9df6cff2012c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-05-27 11:38:10 +0000
+
+    Fixed rights 
+
+  Change: 99cb2730a6e880f3f643c5051649644455360abb
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-05-27 11:37:56 +0000
+
+    Added PODNAME and ABSTRACT to po2json 
+
+  Change: 55fbd2695f9805c99f3964be307932cd246a07c9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-05-27 11:31:05 +0000
+
+    Added base documentation, still requires gettext knowledge 
+
+  Change: f42488cfb112b9112e0ff5c3f3d339e3bcb81ca7
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-05-27 11:08:30 +0000
+
+    Copy over from DDG::Translate 
+
+  Change: 606285cd3894c311225f359957ce4b62f05a2d7a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-05-27 10:55:37 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

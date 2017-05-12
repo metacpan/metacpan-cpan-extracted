@@ -1,0 +1,328 @@
+Revision history for Log-Any
+
+** denotes an incompatible change
+
+1.049     2017-03-28 16:02:10-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed failing tests on Windows because of path separator
+      interpolation. Thanks @nanis [Github #56]
+
+    - Added explicit core dependency on Sys::Syslog in case of Perls
+      with non-standard core libraries. Thanks @nanis [Github #57]
+
+1.048     2017-03-27 15:16:12-05:00 America/Chicago
+
+    - No changes since 1.047 trial release
+
+1.047     2017-03-22 20:22:47-05:00 America/Chicago (TRIAL RELEASE)
+
+    [Fixed]
+
+    - Fixed backwards-compatibility with users using the Unix::Syslog
+      macros in Log::Any::Adapter::Syslog. This requires that the user
+      have Unix::Syslog installed (which Log::Any does not explicitly
+      depend on).
+
+    - Log level aliases are now case-insensitive to match the regular
+      log levels. Prior to this, "WARNING", "Warning", and "warning"
+      would all work, but "WARN", and "Warn" would not, only "warn".
+      Thanks to @0x62ash for reporting this issue. [Github #55]
+
+    - Invalid log levels for the File, Stderr, and Stdout adapters now
+      result in a warning, and the default level of "trace" is used.
+      Previously, no warning would be issued and no logs would be
+      generated. Thanks to @0x62ash for reporting this issue. [Github
+      #55]
+
+1.046     2017-01-11 21:22:57-06:00 America/Chicago (TRIAL RELEASE)
+
+    [Added]
+
+    - The Syslog adapter is now part of the core distribution, since it
+      relies only on core Perl modules.
+
+1.045     2016-11-11 21:52:46-06:00 America/Chicago
+
+    - No changes from previous (trial) release 1.044
+
+1.044     2016-11-06 15:30:35-06:00 America/Chicago (TRIAL RELEASE)
+
+    [Fixed]
+
+    - Imported log object can now be called anything instead of just
+      `$log`. This means `use Log::Any '$LOG'` or `use Log::Any '$foo'`
+      now work.
+
+1.043     2016-11-03 21:31:18-05:00 America/Chicago (TRIAL RELEASE)
+
+    [Fixed]
+
+    - Objects that overload stringification are now stringified
+      correctly (instead of run through Data::Dumper). Thanks @mephinet!
+
+1.042     2016-08-26 23:37:33-05:00 America/Chicago
+
+    [Added]
+
+    - Default adapters can now be configured with arguments (thanks
+      @bjakubski!)
+
+1.041     2016-08-18 00:00:10-05:00 America/Chicago (TRIAL RELEASE)
+
+    [Added]
+
+    - Logging methods now return the formatted log string so that it can
+      be used in a `die` or `warn` call.
+
+    [Changed]
+
+    - A new default log proxy (Log::Any::Proxy::Null) is used when there
+      are no adapters configured (and so no place for logs to go). This
+      proxy does no processing and is about 1000% percent faster on my
+      laptop.
+
+    [Fixed]
+
+    - Suppress 'redundant argument' warnings if too many arguments are
+      given to a log formatting string.
+
+1.040     2016-02-24 17:47:00-05:00 America/New_York
+
+    [Fixed]
+
+    - Fixed duplicated documentation sections.
+
+1.038     2016-02-10 14:15:31-07:00 America/Mazatlan
+
+    - No changes from 1.037
+
+1.037     2016-02-05 20:22:34-05:00 America/New_York (TRIAL RELEASE)
+
+    [Fixed]
+
+    - Fixed t/filescreen.t Unicode string tests to use a backwards
+      compatible form.  Should fix tests before 5.16.
+
+1.035     2016-02-04 14:47:20-05:00 America/New_York (TRIAL RELEASE)
+
+    [Changed]
+
+    - The default formatter now replaces a code reference argument with
+      the results of calling the code reference ONLY when it is the first
+      argument (in place of a format string).  Code references in
+      subsequent arguments (to sprintf) are not executed, as this would
+      break backwards compatibility.
+
+    [Documented]
+
+    - Noted that repeatedly calling 'set' to set an adapter without calling
+      'remove' or using the 'lexically' feature will leak memory.
+
+1.033     2016-02-03 10:32:57-05:00 America/New_York (TRIAL RELEASE)
+
+    [Added]
+
+    - The default formatter now expands code references.  If the first
+      argument is a code reference, it is expanded and returned.  If an
+      argument to "sprintf" style formatting is a code reference, it is
+      expanded.
+
+    [Changed]
+
+    - The File adapter now opens files with the ":utf8" layer.  It also
+      takes a 'binmode' attribute to change the default.
+
+    [Fixed]
+
+    - does_not_contain_ok test adapter function now gives proper
+      diagnostic message
+
+    - all diagnostic messages that output the captured log now
+      correctly dump the log with pretty formatting
+
+    [Documented]
+
+    - documented the 'proxy_class' argument to `get_logger`
+
+    [~Internal~]
+
+    - Data::Dumper is loaded lazily, to reduce module load times
+      for programs that don't need it.
+
+1.032     2015-03-26 17:23:37-04:00 America/New_York
+
+    - no changes from 1.031
+
+1.031     2015-03-26 06:08:17-04:00 America/New_York (TRIAL RELEASE)
+
+    [Fixed]
+
+    - Log::Any::Adapter::Test passed through all constructor arguments,
+      which could be fatal when mocking adapters without all key-value
+      pairs (like Log::Any::Adapter::File); now this only passes through
+      the category and ignores other parameters when used as an
+      adapter class override.
+
+1.03      2015-01-01 22:39:41-05:00 America/New_York
+
+    [Changed]
+
+    - Log::Any::Proxy concatenates arguments to basic logging functions
+      with a space character before passing them to adapters as a single
+      string.  This ensures consistency across adapters that handle
+      multiple arguments differently.
+
+1.02      2014-12-28 07:06:49-05:00 America/New_York
+
+    [Fixed]
+
+    - Some adapters relied on Log::Any::Adapter::Util also loading
+      Log::Any so this behavior has been restored.
+
+1.01      2014-12-26 22:25:13-05:00 America/New_York
+
+    [Fixed]
+
+    - 'numeric_level' was not exported properly from
+      Log::Any::Adapter::Util
+
+1.00      2014-12-25 22:04:13-05:00 America/New_York
+
+    [Added]
+
+    - Logging now goes via a Log::Any::Proxy object instead of directly to
+      an adapter. This allows easy customization of the message production.
+
+    - File, Stdout, and Stderr adapters now support a minimum
+      log level parameter.
+
+    [Changed]
+
+    - Removed dead code from Log::Any::Adapter::Base; particularly this
+      was the formatting code, since this is now handled by
+      Log::Any::Proxy.
+
+    [Fixed]
+
+    - File will flock the handle when writing (if flock is avaiable).
+
+    - Won't die if adapters aren't loadable modules as long as they
+      provide a constructor.  This allows using private adapters
+      defined in another file.
+
+    [Documented]
+
+    - Revised docs for creating adapters
+
+    - Fixed typos and improved docs for Log::Any::Adapter::Util; removed
+      stub docs for modules that didn't need it.
+
+    [Deprecated]
+
+    - Deprecated some methods in Log::Any::Adapter::Util
+
+    [Internal]
+
+    - Merged Log-Any and Log-Any-Adapter distributions; reduces code
+      duplication and ensures Log::Any and adapter framework stay in sync
+
+    - Eliminates all non-core dependencies (as of Perl 5.8.1), including
+      Capture::Tiny, Devel::GlobalDestruction and Guard
+
+0.92      2014-12-15 07:12:38-05:00 America/New_York (TRIAL RELEASE)
+
+0.91      2014-12-14 22:13:09-05:00 America/New_York (TRIAL RELEASE)
+
+0.90      2014-12-12 17:08:22-05:00 America/New_York (TRIAL RELEASE)
+
+0.15  Apr 10, 2013
+
+* Fixes
+  - Hide 'package Log::Any::Adapter' from PAUSE/Module::Metadata - miyagawa
+
+0.14  Aug 31, 2011
+
+* Fixes
+  - Fix version number in Log/Any.pm - Stephen Thirlwall
+
+0.13  Aug 2, 2011
+
+* Fixes
+  - Fix typo in lib/Log/Any/Adapter/Test.pm - RT #69850 - Stephen Thirlwall
+
+0.12  Mar 23, 2011
+
+* Fixes
+  - Return false from null adapter is_xxx methods - RT #64164 - Chip Salzenberg
+  - Eliminate 'subroutine redefined' warning in case Log::Any::Adapter loaded before
+    Log::Any::Test
+
+* Implementation
+  - Migrate to Dist::Zilla
+
+0.11  Feb 12, 2010
+
+* Improvements
+  - Add trace level - suggested by Szymon Swierkosz
+
+0.10  Jan 5, 2010
+
+* Fixes
+  - Fix Log::Any::Core to support references in printf-style methods
+
+0.09  Jan 5, 2010
+
+* Improvements
+  - Convert undef to string "<undef>" in printf-style methods - RT #53398, suggested by Steven Haryanto
+
+0.08  Dec 15, 2009
+
+* Fixes
+  - Fix Log::Any::Test to support full logging API (aliases and printf methods)
+
+0.07  Dec 7, 2009
+
+* Implementation
+  - Depend on Test::Simple rather than Test::More
+
+* Improvements
+  - Add Log::Any::Test, to aid in testing code that uses Log::Any
+
+0.06  Oct 31, 2009
+
+* Fixes
+  - Implement Log::Any->set_adapter again for backward compatibility with 0.04 and earlier
+
+0.05  Oct 27, 2009
+
+* Implementation
+  - ** Strip Log::Any down to a relative minimum, so as to keep it stable and
+    unchanging. Move everything else to Log::Any::Adapter.
+
+0.04  Sep 3, 2009
+
+* Fixes
+  - Replace Test::Deep::cmp_deeply with an internal version to avoid Test::Deep dependency
+
+0.03  Jul 17, 2009
+
+* Improvements
+  - Eliminated extra '::Log' from adapter names, e.g. Log::Any::Adapter::Log::Dispatch is
+    now Log::Any::Adapter::Dispatch. The long name was properly descriptive but was making
+    me wince every time.
+
+0.02  Jul 14, 2009
+
+* Fixes
+  - Fix logging aliases like warn => warning
+
+* Implementation
+  - Eliminate unnecessary Test/InternalOnly.pm class
+  - Precompute alias and method lists like Log::Any->logging_methods
+
+0.01  Jul 11, 2009
+
+- Initial version
+

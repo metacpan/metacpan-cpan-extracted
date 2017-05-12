@@ -1,0 +1,54 @@
+{
+   "abstract" : "Perl extension for managing Lemonldap::NG Web-SSO system.",
+   "author" : [
+      "Xavier Guimard <x.guimard@free.fr>, ClÃ©ment Oudot <clement@oodo.net>, Thomas Chemineau <thomas.chemineau@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lemonldap-NG-Manager",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::String" : "0",
+            "Regexp::Common" : "0",
+            "Test::Pod" : "1"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Convert::PEM" : "0",
+            "Crypt::OpenSSL::RSA" : "0",
+            "HTML::Template" : "0",
+            "JSON" : "0",
+            "LWP" : "0",
+            "Lemonldap::NG::Common" : "v1.9.9",
+            "Lemonldap::NG::Handler" : "v1.9.9",
+            "URI" : "0",
+            "XML::LibXML" : "0",
+            "XML::LibXSLT" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.9.9",
+   "x_LWP::Protocol::https" : 0,
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

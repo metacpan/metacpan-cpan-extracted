@@ -1,0 +1,337 @@
+<HTML>
+<HEAD>
+<TITLE>ExtUtils::TBone - a "skeleton" for writing "t/*.t" test files.</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#output">OUTPUT</A></LI>
+	<UL>
+
+		<LI><A HREF="#standard output">Standard output</A></LI>
+	</UL>
+
+	<LI><A HREF="#log file">Log file</A></LI>
+	<LI><A HREF="#public interface">PUBLIC INTERFACE</A></LI>
+	<UL>
+
+		<LI><A HREF="#construction">Construction</A></LI>
+		<LI><A HREF="#doing tests">Doing tests</A></LI>
+		<LI><A HREF="#logging messages">Logging messages</A></LI>
+		<LI><A HREF="#utilities">Utilities</A></LI>
+	</UL>
+
+	<LI><A HREF="#version">VERSION</A></LI>
+	<LI><A HREF="#change log">CHANGE LOG</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>ExtUtils::TBone - a ``skeleton'' for writing ``t/*.t'' test files.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>Include a copy of this module in your t directory (as t/ExtUtils/TBone.pm),
+and then write your t/*.t files like this:</P>
+<PRE>
+    use lib &quot;./t&quot;;             # to pick up a ExtUtils::TBone
+    use ExtUtils::TBone;</PRE>
+<PRE>
+    # Make a tester... here are 3 different alternatives:
+    my $T = typical ExtUtils::TBone;                 # standard log
+    my $T = new ExtUtils::TBone;                     # no log 
+    my $T = new ExtUtils::TBone &quot;testout/Foo.tlog&quot;;  # explicit log
+</PRE>
+<PRE>
+
+    # Begin testing, and expect 3 tests in all:
+    $T-&gt;begin(3);                           # expect 3 tests
+    $T-&gt;msg(&quot;Something for the log file&quot;);  # message for the log</PRE>
+<PRE>
+
+    # Run some tests:    
+    $T-&gt;ok($this);                  # test 1: no real info logged
+    $T-&gt;ok($that,                   # test 2: logs a comment
+           &quot;Is that ok, or isn't it?&quot;); 
+    $T-&gt;ok(($this eq $that),        # test 3: logs comment + vars 
+           &quot;Do they match?&quot;,
+           This =&gt; $this,
+           That =&gt; $that);</PRE>
+<PRE>
+
+    # That last one could have also been written... 
+    $T-&gt;ok_eq($this, $that);            # does 'eq' and logs operands
+    $T-&gt;ok_eqnum($this, $that);         # does '==' and logs operands</PRE>
+<PRE>
+
+    # End testing:
+    $T-&gt;end;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module is intended for folks who release CPAN modules with 
+``t/*.t'' tests.  It makes it easy for you to output syntactically
+correct test-output while at the same time logging all test
+activity to a log file.  Hopefully, bug reports which include
+the contents of this file will be easier for you to investigate.</P>
+<P>
+<HR>
+<H1><A NAME="output">OUTPUT</A></H1>
+<P>
+<H2><A NAME="standard output">Standard output</A></H2>
+<P>Pretty much as described by <CODE>Test::Harness</CODE>, with a special
+``# END'' comment placed at the very end:</P>
+<PRE>
+    1..3
+    ok 1
+    not ok 2
+    ok 3
+    # END</PRE>
+<P>
+<HR>
+<H1><A NAME="log file">Log file</A></H1>
+<P>A typical log file output by this module looks like this:</P>
+<PRE>
+    1..3
+</PRE>
+<PRE>
+
+    ** A message logged with msg().
+    ** Another one.
+    1: My first test, using test(): how'd I do?
+    1: ok 1</PRE>
+<PRE>
+
+    ** Yet another message.
+    2: My second test, using test_eq()...
+    2: A: The first string
+    2: B: The second string
+    2: not ok 2</PRE>
+<PRE>
+
+    3: My third test.
+    3: ok 3</PRE>
+<PRE>
+
+    # END</PRE>
+<P>Each <CODE>test()</CODE> is logged with the test name and results, and
+the test-number prefixes each line.
+This allows you to scan a large file easily with ``grep'' (or, ahem, ``perl'').
+A blank line follows each test's record, for clarity.</P>
+<P>
+<HR>
+<H1><A NAME="public interface">PUBLIC INTERFACE</A></H1>
+<P>
+<H2><A NAME="construction">Construction</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_new_%5BARGS%2E%2E%2E%5D">new [ARGS...]</A></STRONG><BR>
+<DD>
+<EM>Class method, constructor.</EM>
+Create a new tester.  Any arguments are sent to log_open().
+<P></P>
+<DT><STRONG><A NAME="item_typical">typical</A></STRONG><BR>
+<DD>
+<EM>Class method, constructor.</EM>
+Create a typical tester.  
+Use this instead of <CODE>new()</CODE> for most applicaitons.
+The directory ``testout'' is created for you automatically, to hold
+the output log file, and <A HREF="#item_log_warnings"><CODE>log_warnings()</CODE></A> is invoked.
+<P></P></DL>
+<P>
+<H2><A NAME="doing tests">Doing tests</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_begin">begin NUMTESTS</A></STRONG><BR>
+<DD>
+<EM>Instance method.</EM>
+Start testing.  
+This outputs the 1..NUMTESTS line to the standard output.
+<P></P>
+<DT><STRONG><A NAME="item_end">end</A></STRONG><BR>
+<DD>
+<EM>Instance method.</EM>
+Indicate the end of testing.
+This outputs a ``# END'' line to the standard output.
+<P></P>
+<DT><STRONG><A NAME="item_ok_BOOL%2C_%5BTESTNAME%5D%2C_%5BPARAMHASH%2E%2E%2E">ok BOOL, [TESTNAME], [PARAMHASH...]</A></STRONG><BR>
+<DD>
+<EM>Instance method.</EM>
+Do a test, and log some information connected with it.
+This outputs the test result lines to the standard output:
+<PRE>
+    ok 12
+    not ok 13</PRE>
+<P>Use it like this:</P>
+<PRE>
+    $T-&gt;ok(-e $dotforward);</PRE>
+<P>Or better yet, like this:</P>
+<PRE>
+    $T-&gt;ok((-e $dotforward), 
+           &quot;Does the user have a .forward file?&quot;);</PRE>
+<P>Or even better, like this:</P>
+<PRE>
+    $T-&gt;ok((-e $dotforward), 
+           &quot;Does the user have a .forward file?&quot;,
+           User =&gt; $ENV{USER},
+           Path =&gt; $dotforward,
+           Fwd  =&gt; $ENV{FWD});</PRE>
+<P>That last one, if it were test #3, would be logged as:</P>
+<PRE>
+    3: Does the user have a .forward file?
+    3:   User: &quot;alice&quot;
+    3:   Path: &quot;/home/alice/.forward&quot;
+    3:   Fwd: undef
+    3: ok</PRE>
+<P>You get the idea.  Note that defined quantities are logged with delimiters 
+and with all nongraphical characters suitably escaped, so you can see 
+evidence of unexpected whitespace and other badnasties.  
+Had ``Fwd'' been the string ``this\nand\nthat'', you'd have seen:</P>
+<PRE>
+    3:   Fwd: &quot;this\nand\nthat&quot;</PRE>
+<P>And unblessed array refs like [``this'', ``and'', ``that''] are 
+treated as multiple values:</P>
+<PRE>
+    3:   Fwd: &quot;this&quot;
+    3:   Fwd: &quot;and&quot;
+    3:   Fwd: &quot;that&quot;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ok_eq_ASTRING%2C_BSTRING%2C_%5BTESTNAME%5D%2C_%5BP">ok_eq ASTRING, BSTRING, [TESTNAME], [PARAMHASH...]</A></STRONG><BR>
+<DD>
+<EM>Instance method.</EM>  
+Convenience front end to ok(): test whether <CODE>ASTRING eq BSTRING</CODE>, and
+logs the operands as 'A' and 'B'.
+<P></P>
+<DT><STRONG><A NAME="item_ok_eqnum_ANUM%2C_BNUM%2C_%5BTESTNAME%5D%2C_%5BPARA">ok_eqnum ANUM, BNUM, [TESTNAME], [PARAMHASH...]</A></STRONG><BR>
+<DD>
+<EM>Instance method.</EM>  
+Convenience front end to ok(): test whether <CODE>ANUM == BNUM</CODE>, and
+logs the operands as 'A' and 'B'.
+<P></P></DL>
+<P>
+<H2><A NAME="logging messages">Logging messages</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_log_open_PATH">log_open PATH</A></STRONG><BR>
+<DD>
+<EM>Instance method.</EM>
+Open a log file for messages to be output to.  This is invoked
+for you automatically by <CODE>new(PATH)</CODE> and <A HREF="#item_typical"><CODE>typical()</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_log_close">log_close</A></STRONG><BR>
+<DD>
+<EM>Instance method.</EM>
+Close the log file and stop logging.  
+You shouldn't need to invoke this directly; the destructor does it.
+<P></P>
+<DT><STRONG><A NAME="item_log_warnings">log_warnings</A></STRONG><BR>
+<DD>
+<EM>Instance method.</EM>
+Invoking this redefines $SIG{__WARN__} to log to STDERR and 
+to the tester's log.  This is automatically invoked when
+using the <A HREF="#item_typical"><CODE>typical</CODE></A> constructor.
+<P></P>
+<DT><STRONG><A NAME="item_log_MESSAGE%2E%2E%2E">log MESSAGE...</A></STRONG><BR>
+<DD>
+<EM>Instance method.</EM>
+Log a message to the log file.  No alterations are made on the
+text of the message.  See <CODE>msg()</CODE> for an alternative.
+<P></P>
+<DT><STRONG><A NAME="item_msg_MESSAGE%2E%2E%2E">msg MESSAGE...</A></STRONG><BR>
+<DD>
+<EM>Instance method.</EM>
+Log a message to the log file.  Lines are prefixed with ``** '' for clarity,
+and a terminating newline is forced.
+<P></P></DL>
+<P>
+<H2><A NAME="utilities">Utilities</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_catdir_DIR%2C_%2E%2E%2E%2C_DIR">catdir DIR, ..., DIR</A></STRONG><BR>
+<DD>
+<EM>Class/instance method.</EM>
+Concatenate several directories into a path ending in a directory.
+Lightweight version of the one in <CODE>File::Spec</CODE>; this method
+dates back to a more-innocent time when File::Spec was younger
+and less ubiquitous.
+<P>Paths are assumed to be absolute.
+To signify a relative path, the first DIR must be ``.'',
+which is processed specially.</P>
+<P>On Mac, the path <EM>does</EM> end in a ':'.
+On Unix, the path <EM>does not</EM> end in a '/'.</P>
+<P></P>
+<DT><STRONG><A NAME="item_catfile_DIR%2C_%2E%2E%2E%2C_DIR%2C_FILE">catfile DIR, ..., DIR, FILE</A></STRONG><BR>
+<DD>
+<EM>Class/instance method.</EM>
+Like catdir(), but last element is assumed to be a file.
+Note that, at a minimum, you must supply at least a single DIR.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<P>$Id: TBone.pm,v 1.124 2001/08/20 20:30:07 eryq Exp $</P>
+<P>
+<HR>
+<H1><A NAME="change log">CHANGE LOG</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_124">Version 1.124   (2001/08/20)</A></STRONG><BR>
+<DD>
+The terms-of-use have been placed in the distribution file ``COPYING''.  
+Also, small documentation tweaks were made.
+<P></P>
+<DT><STRONG><A NAME="item_122">Version 1.122   (2001/08/20)</A></STRONG><BR>
+<DD>
+Changed output of <CODE>&quot;END&quot;</CODE> to <CODE>&quot;# END&quot;</CODE>; apparently, ``END'' is
+not a directive.  Maybe it never was.
+<EM>Thanks to Michael G. Schwern for the bug report.</EM>
+<PRE>
+    The storyteller
+       need not say &quot;the end&quot; aloud;
+    Silence is enough.</PRE>
+<P>Automatically invoke <A HREF="#item_log_warnings"><CODE>log_warnings()</CODE></A> when constructing
+via <A HREF="#item_typical"><CODE>typical()</CODE></A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_120">Version 1.120   (2001/08/17)</A></STRONG><BR>
+<DD>
+Added <A HREF="#item_log_warnings"><CODE>log_warnings()</CODE></A> to support the logging of SIG{__WARN__}
+messages to the log file (if any).
+<P></P>
+<DT><STRONG><A NAME="item_116">Version 1.116   (2000/03/23)</A></STRONG><BR>
+<DD>
+Cosmetic improvements only.
+<P></P>
+<DT><STRONG><A NAME="item_112">Version 1.112   (1999/05/12)</A></STRONG><BR>
+<DD>
+Added lightweight <CODE>catdir()</CODE> and <CODE>catfile()</CODE> (a la File::Spec)
+to enhance portability to Mac environment.
+<P></P>
+<DT><STRONG><A NAME="item_111">Version 1.111   (1999/04/18)</A></STRONG><BR>
+<DD>
+Now uses File::Basename to create ``typical'' logfile name,
+for portability.
+<P></P>
+<DT><STRONG><A NAME="item_110">Version 1.110   (1999/04/17)</A></STRONG><BR>
+<DD>
+Fixed bug in constructor that surfaced if no log was being used.
+<P></P></DL>
+<P>Created: Friday-the-13th of February, 1998.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Eryq (<EM><A HREF="mailto:eryq@zeegee.com">eryq@zeegee.com</A></EM>).
+President, ZeeGee Software Inc. (<EM><A HREF="http://www.zeegee.com">http://www.zeegee.com</A></EM>).</P>
+<P>Go to <EM><A HREF="http://www.zeegee.com">http://www.zeegee.com</A></EM> for the latest downloads
+and on-line documentation for this module.</P>
+<P>Enjoy.  Yell if it breaks.</P>
+
+</BODY>
+
+</HTML>

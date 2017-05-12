@@ -1,0 +1,758 @@
+<html><head><title>用 Perl 進行網站本土化</title>
+<style><!--
+P {text-align: justify}
+P.right {text-align: right}
+--></style></head><body>
+
+<h1>用 Perl 進行網站本土化</h1>
+<p class="right" align="right">
+唐宗漢<br>
+傲爾網<br>
+2002年12月
+
+<p>
+<h2>摘要</h2>
+
+<p>
+對應用程式進行國際化（Internationalization，i18n）的目的，是在使它支援多種語言、日期、貨幣格式，以及各地的習俗等「地區設定（locale）」。接下來，本土化（Localization，l10n）則負責實際將軟體轉譯，以切合特定地區的使用者需求。當前，網頁應用程式（Web Application）由於以文字作為界面描述的格式，已成為最熱門的本土化對象之一。
+<p>
+在自由軟體的世界裡，許多最具彈性、最受歡迎的技術，是用Perl語言開發的。對網站應用程式的開發者來說，Perl也是長期以來的不二選擇。本篇文章是筆者對Perl應用程式進行中譯的經驗談，包含實作方式、常用工具的優劣之處，以及管理本土化專案時需注意的事項。
+
+<h2>簡介</h2>
+
+<p class="right" align="right">
+「在這個世界上，人類的語言為數不少。」<br>
+　　－－Harald Tveit Alvestrand，RFC 1766，『語言識別標記』
+<p>
+網站及網頁應用程式，為什麼要作本土化呢？
+<p>
+請讀者想像一下：假設有人在全球資訊網上提出這個問題，許多人用不同的語言提出意見、彼此討論。身為其中的一份子，你可能會聽到這些論點：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1><b>圖1: 本土化的理由(中文化之前)</b></font></caption>
+<tr><td><ul>
+<li>Иностранная валюта, формат даты, язык и обычаи могут казаться нам пугающими
+<li>Menschen sind produktiver wenn sie in ihrer gewohnten Umgebung arbeiten
+<li>Tas veicina daudz labâku sapraðanu un mijiedarbîbu starp daâdâm kultrâm
+<li>Un progretto con molti collaboratori internazionali si evolverá piú in fretta e meglio
+<li>地区化的过程, 有助於软件的模块化与可移植性
+</ul></td></tr></table>
+
+<p>
+不幸的是，這些論點並非每個人都看得懂。這就造成了「語言障礙」－－能共同討論的對象，往往侷限在少數語言相同、文化相近的「地區社群」中。
+<p>
+然而，我們看不懂的論點往往很有道理，並且能帶來新的省思。所以，最好能有人將這些意見、操作界面及其他資料翻譯成我們看得懂的文字：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>圖2: 本土化的理由(中文化之後)</font></caption>
+<tr><td><ul>
+<li>要遷就外地的語言、日期、貨幣及習俗，是件煩人的事。
+<li>人在熟悉的操作環境下，會比較有生產力。
+<li>它能促進文化間的瞭解與交流。
+<li>擁有許多國際同好的專案，進步的速度更快，品質也更好。
+<li>本土化的過程，有助於軟體的模組化與可移植性。
+</ul></td></tr></table>
+
+<p>
+正如同上列論點所述，通常無法要求所有人「書同文」，一律採用拉丁語、通用語、世界語、邏輯語或是英文。這時，就需要本土化了。
+
+<p>
+對專屬軟體而言，本土化通常是打入國外市場的先決條件。若是某地的預期利潤低於本土化的成本，廠商便不會進行翻譯；在沒有源碼的情況下，當地的使用者要自己進行翻譯，便是件困難（也可能違法）的任務。如果廠商設計軟體時，完全沒有考慮到國際化的架構，那更是回天乏術。
+
+<p>
+相較之下，對開放源碼的應用程式進行本土化，則要簡單多了。和專屬軟體一樣，早期的版本通常祗為單一語言而設計；不同的是，任何人都可以隨時加上國際化的架構。誠如Sean M. Burke所述：
+
+<p>
+<blockquote>
+「要讓開放源碼做得更好，我們可以在寫程式時多加留意，讓程式員和熱心的使用者，都能輕易進行本土化。（話說回來，「開放源碼」的本意，就是讓任何有意願、有技術的人，都能成為程式員。）」
+</blockquote>
+
+<p>
+本文敘述的技巧，能有效降低本土化的難度。雖然重點放在Perl寫的網站應用程式上，但是其中的原則應該也適用於其他地方。
+
+<h2>對靜態網站進行本土化</h2>
+<p class="right" align="right">
+「它一定得動起來。」<br>
+　　－－網絡第一真理，RFC 1925
+
+<p>
+網頁可以粗分為兩種：「靜態」網頁直到下一次更新為止，隨時都提供相同的內容；「動態」網頁則依據各種因素，提供相應的資訊。通常我們稱前者為「網頁文件」，稱後者為「網頁應用程式」。
+<p>
+不過，對不同的使用者來說，靜態網頁並不一定得保持相同的「呈現方式」－－它的語言、樣式或媒介可以因人而異。（例如，視障人士可能會偏好用語音，來代替影像輸出。）全球資訊網的長處之一，就在它能讓客戶端與伺服器進行交涉，決定最合適的呈現方式。
+<p>
+舉個實例來說，假設筆者有個中文網頁，放在<tt>http://www.autrijus.org/index.html</tt>：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表1. 基本的中文網頁</font></caption>
+<tr><td><PRE>
+&lt;html&gt;&lt;head&gt;&lt;title&gt;<B>唐宗漢 - 家</B>&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;<B>施工中, 請見諒</B>&lt;/body&gt;&lt;/html&gt;
+</PRE></td></tr></table>
+<p>
+有天我心血來潮，想要將它譯成英文版給外地的朋友看：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表2. 翻譯英文的網頁</font></caption>
+<tr><td><PRE>
+&lt;html&gt;&lt;head&gt;&lt;title&gt;<B>Audrey.Home</B>&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;<B>Sorry, this page is under construction.</B>&lt;/body&gt;&lt;/html&gt;
+</PRE></td></tr></table>
+
+<P>
+這時，許多網站會提供一個「語言選擇頁面」，讓訪客挑選適合的語言，如下所示：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>圖3: 典型的語言選擇頁面</font></caption>
+<tr><td align="center" colspan=4 bgcolor=black>
+<font color="white">Please choose your language:</font>
+</td></tr><tr><td align="center">
+<font size=-1><u>Čeština</u></font>
+</td><td align="center">
+<font size=-1><u>Deutsch</u></font>
+</td><td align="center">
+<font size=-1><u>English</u></font>
+</td><td align="center">
+<font size=-1><u>Español</u></font>
+</td></tr><tr><td align="center">
+<font size=-1><u>Français</u></font>
+</td><td align="center">
+<font size=-1><u>Hrvatski</u></font>
+</td><td align="center">
+<font size=-1><u>Italiano</u></font>
+</td><td align="center">
+<font size=-1><u>日本語</u></font>
+</td></tr><tr><td align="center">
+<font size=-1><u>한국어</u></font>
+</td><td align="center">
+<font size=-1><u>Nederlands</u></font>
+</td><td align="center">
+<font size=-1><u>Polski</u></font>
+</td><td align="center">
+<font size=-1><u>Русский язык</u></font>
+</td></tr><tr><td align="center">
+<font size=-1><u>Slovensky</u></font>
+</td><td align="center">
+<font size=-1><u>Slovensci</u></font>
+</td><td align="center">
+<font size=-1><u>Svenska</u></font>
+</td><td align="center">
+<font size=-1><u>中文 (GB)</u></font><br>
+<font size=-1><u>中文 (Big5)</u></font>
+</td></tr></table>
+
+<p>
+對一般的使用者和程式來說，這樣的頁面都模糊不清、多餘而麻煩。它不但迫使每位訪客多按一個鍵，也對網頁代理程式的作者造成障礙：剖析這一頁的結構、選擇正確的鏈結，是件很容易出錯的事。
+
+<h3>MultiViews：最簡單的本土化架構</h3>
+<p>
+當然，要是能讓每個人自動取得適合的語言，那是最好了。HTTP 1.1版提供的「內容交涉（Content Negotiation）」功能，就是達成這個目標的好辦法。
+<p>
+在內容交涉的架構下，瀏覽器會傳送「<tt>Accept-Language</tt>」標頭，代表使用者偏好的語言。舉例來說，「<tt>zh-tw, en-us, en</tt>」的意思就是「正體中文、美式英文，不然就是英文」。
+<p>
+網站伺服器接到這項資訊之後，便負責挑選最合適的語言版本，傳回給使用者。實作此項流程的方式，各種伺服器可能有所不同；在最受歡迎的Apache下，可以利用「<tt>MultiViews</tt>」技術來達成。
+<p>
+要使用<tt>MultiViews</tt>時，我們將英文版存成<tt>index.html.en</tt>（注意後面的<tt>.en</tt>），再到<tt>httpd.conf</tt>或<tt>.htaccess</tt>設定檔裡，加上這一列：
+<p>
+<PRE>
+	Options <b>+MultiViews</b>
+</PRE>
+<p>
+在此之後，Apache就會在接到<tt>http://www.autrijus.org/index.html</tt>的要求時，檢查客戶端是否於<tt>Accept-Language</tt>裡偏好英文（<tt>en</tt>）。這樣一來，英語系的讀者就會看到英文頁面，其他人則看到原本的<tt>index.html</tt>。
+<p>
+利用這個技術，我可以請國際友人幫忙，逐漸加上新的翻譯版本－－法文版是<tt>index.html.fr</tt>，<tt>index.html.he</tt>代表希伯來文等等。
+<p>
+由於網路上的許多人，都祗會自己的母語和英文，因此新的版本通常都不是從中文，而是由英文翻譯過去的。不過，既然中英文的內容相同，這也不成問題。
+<p>
+...真的沒問題了嗎？要是我哪天更新了中文版呢？
+
+<h3>保持翻譯時效並不容易</h3>
+
+<p>
+在我改完原本的網頁之後，就會馬上發現，負責法文和希伯來文的朋友沒辦法看懂中文－－顯然，我有必要準備一份英文的「標準版本」。許多自由軟體專案正是因為這樣，就算核心團隊的母語不是英文，仍然採用英文作為程式的預設語系。
+
+<p>
+此外，就算祗是改了背景顏色（像是<tt>&lt;body bgcolor="gold"&gt;</tt>），我還是得更新所有的譯本，好讓格式保持一致。
+
+<p>
+若是我同時更新格式和內容，事情就麻煩了。一旦失去了原先的HTML標籤，幫忙翻譯的朋友就必需從頭來過！除非他們都是HTML大師，不然馬上就會出錯。要是網站上有20個經常更新的頁面，那很快就沒人肯做翻譯－－至連朋友也當不成了。
+
+<p>
+從上面的例子看來，顯然有必要將資料與源碼（也就是文字和標籤）分開，並且自動化翻譯版本的生產流程。
+
+<h3>利用CGI.pm將資料與源碼分開</h3>
+
+<p>
+事實上，上一段已經一語道盡了現代的國際化（i18n）流程：在進行網站應用程式本土化之前，必須先找出區分資料與源碼的方法。
+
+<p>
+多年以來，Perl就是網頁開發的首選語言，也提供了多不勝數的的模組與網站建製工具。其中最普遍的，要算是自1997年以來就併入標準程式庫的<tt>CGI.pm</tt>。底下的範例程式，就是利用<tt>CGI.pm</tt>來自動產生翻譯版本：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表3. 利用MultiViews及CGI.pm進行本土化</font></caption>
+<tr><td><PRE>
+use CGI ':standard'; <i># 此程式的模版系統（Templating System）</i>
+foreach my $language (qw(zh_tw en de fr)) {
+    open OUT, "&gt;index.html.$language" or die $!;
+    print OUT start_html({ title =&gt; _(<b>"Audrey.Home"</b>) }),
+	      _(<b>"Sorry, this page is under construction."</b>),
+	      end_html;        
+    sub _ { some_function($language, @_) } <i># XXX: 需補上本土化架構</i>
+}
+</PRE></td></tr></table>
+
+<p>
+此程式利用<tt>CGI.pm</tt>的HTML</tt>相關函式，達成資料與源碼的分隔，這點與單純的HTML頁面不同。標籤（如<tt>&lt;html&gt;</tt>）變成了函式呼叫（<tt>start_html()</tt>），文字則以字串表示。因此，在產生每份本地化的頁面時（<tt>index.html.zh_tw</tt>、<tt>index.html.en</tt>等等），就能保持相同的HTML格式。
+
+<p>
+「<tt>sub _</tt>」這個函式負責叫用<tt>some_function()</tt>，將輸入的英文字句翻譯成<tt>$language</tt>變數所代表的語言。<tt>some_function()</tt>就是此程式的「本土化架構（localization framework）」；在下一節裡，我們會介紹三種不同的架構。
+
+<p>
+寫完上面這段小程式後，我們祗需用<tt>grep</tt>找出所有「<tt>_(...)</tt>」裡的字串，將它們解到一份詞典（lexicon）檔裡，再請譯者填入所需的翻譯即可。在此，「詞典」的定義是兩種語言之間的對照表：其中有些項目祗有一個單字（如「<tt>Cancel</tt>」），但通常則包含整個句子（如「<tt>Do you want to overwrite?</tt>」或「<tt>5 files found.</tt>」）。和觀光手冊上的「外語速成」一樣，詞典裡的字串也許還有待填的空白，如同下列的中文╱海地語詞典所示：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>圖4: 中文 =&gt; 海地語詞典</font></caption>
+<tr>
+<td align="center" bgcolor=black><font color="white">中文</font></td>
+<td align="center" bgcolor=black><font color="white">Haitian</font></td>
+</tr><tr><td align="center">
+這個東西要 ___ 塊錢。
+</td><td>
+Bagay la kute ___ dola yo.
+</td></tr></table>
+
+<p>
+在理想情況下，譯者祗需要翻譯詞典的內容，不用管HTML或程式碼裡寫些什麼。可是，由於各種本土化架構的詞典格式彼此不同，我們得先選出最適合這項專案的架構。
+
+<h2>本土化架構一覽</h2>
+
+<p align="right" class=right>
+「它比你想像中還複雜。」<br>
+　　－－網絡第八真理，RFC 1925
+
+<p>
+要實作上一段裡的<tt>some_function()</tt>函式，需要能讀取詞典檔、查出相符的字串、甚至將新的項目解到詞典裡的程式庫。這樣的程式庫，就稱為「本土化架構」。
+
+<p>
+依筆者的經驗，本土化架構之間的不同，通常表現在詞典檔結構的差異上。接下來，讓我們看看Perl如何使用其中的三種架構，從最簡單的<tt>Msgcat</tt>開始。
+
+<h3>Msgcat：用陣列當詞典</h3>
+
+<p>
+Msgcat是最早的本土化架構，也是XPG3╱XPG4標準的一部份，因此在Unix平台上隨處可得。它是第一代的詞典檔架構：將各個字串以編號表示，循序存放在名為「訊息清單（message catalog）」的陣列裡。這種架構容易實作、節省記憶體，並且查詢速度很快。在Windows等平台上的「資源檔（resource file）」也是基於相同的概念。
+
+<p>
+對於每個網頁及程式檔，Msgcat都需要一份相應的詞典檔，格式如下：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表4. <tt>Msgcat</tt> 詞典檔</font></caption>
+<tr><td><PRE>
+$set <b>7</b> <i># $Id: nls/de/index.pl.m</i>
+<b>1</b> Audrey'.Haus
+<b>2</b> Wir bitten um Entschudigung. Diese Seite ist im Aufbau.
+</PRE></td></tr></table>
+
+<p>
+這份檔案包含index.html裡所有字串的德文翻譯；它的「集合編號（set id）」是7。在做完所有頁面的翻譯之後，我們利用gencat這支程式來產生二進制的詞典檔：
+<p>
+<pre>
+	% gencat nls/de.cat nls/de/*.m 
+</pre>
+
+<p>
+二進制詞典檔的內容，可以想成是如下所示的二維陣列：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>圖5: <tt>nls/de.cat</tt> 的內容</font></caption>
+<tr>
+<td align="right" bgcolor=black><font color="white">set_id<br>msg_id</font></td>
+<td align="center" bgcolor=black><font color="white">1</font></td>
+<td align="center" bgcolor=black><font color="white">2</font></td>
+<td align="center" bgcolor=black><font color="white">3</font></td>
+<td align="center" bgcolor=black><font color="white">4</font></td>
+<td align="center" bgcolor=black><font color="white">5</font></td>
+<td align="center" bgcolor=black><font color="white">6</font></td>
+<td align="center" bgcolor=black><font color="white">7</font></td>
+<td align="center" bgcolor=black><font color="white">8</font></td>
+<td align="center" bgcolor=black><font color="white">9</font></td>
+</tr><tr>
+<td align="center" bgcolor=black><font color="white">1</font></td>
+<td><i>...</i></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td>
+<td><tt>Audrey'.Haus</tt></td>
+<td><i>...</i></td><td><i>...</i></td>
+</tr><tr>
+<td align="center" bgcolor=black><font color="white">2</font></td>
+<td><i>...</i></td><td></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td>
+<td><tt>Wir bitten um Entschudigung...</tt></td>
+<td><i>...</i></td><td><i>...</i></td>
+</tr><tr>
+<td align="center" bgcolor=black><font color="white">3</font></td>
+<td><i>...</i></td><td></td><td><i>...</i></td><td><i>...</i></td><td></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td><td><i>...</i></td>
+</tr></table>
+
+<p>
+要從詞典檔中讀取字串，就得利用CPAN（Perl 綜合典藏網）上的<tt>Locale::Msgcat</tt>模組，來實作前面提到的「<tt>sub _</tt>」：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表5. 示範 <tt>Locale::Msgcat</tt> 的用法</font></caption>
+<tr><td><PRE>
+use Locale::Msgcat;
+my $cat = Locale::Msgcat-&gt;new;
+$cat-&gt;catopen("nls/$language.cat", 1); <i># 想成是二維陣列</i>
+sub _ { $cat-&gt;catgets(<b>7</b>, @_) } <i># <b>7</b> 是 index.html 的集合編號（set_id）</i>
+print _(<b>1</b>, "Audrey.House");  <i># <b>1</b> 是這串文字的詢息編號（msg_id）</i>
+</PRE></td></tr></table>
+
+<p>
+要注意的是，祗有第一個參數（<tt>msg_id</tt>）有作用；接在後面的<tt>"Audrey.House"</tt>祗是作為查詢失敗時的預設傳回值，以及讓人比較容易看懂而已。
+
+<p>
+因為<tt>set_id</tt>及<tt>msg_id</tt>的組合必須獨一無二、不能更改，因此更新時祗能刪除某個編號，而無法重複利用。這項特性往往造成更新困難，正如Drepper等人在GNU <tt>gettext</tt>說明文件裡指出的：
+
+<p>
+<blockquote>
+「程式員每次遇到要翻譯的字串時，都得先定義一個數值（或常數符號），再將它加進訊息清單裡。他還得費心避免重複的字串、重複的訊息編號等等。如果想具有與GNU <tt>gettext</tt>一樣的訊息清單品質，還得在裡面加上說明，並註明程式裡各個字串的位置。這簡直是『不可能的任務』。」
+</blockquote>
+
+<p>
+因此，祗有在詞典十分穩定的情況下，纔可以考慮使用<tt>Msgcat</tt>作為本地化架構。
+
+<p>
+採用<tt>Msgcat</tt>的程式，還經常遇到「複數形式」的問題。請看下列程式：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表6. 錯誤的複數形式處理</font></caption>
+<tr><td><PRE>
+printf(_(8, "<b>%d</b> files were deleted."), $files);
+</PRE></td></tr></table>
+
+<p>
+當<tt>$files</tt>的值為<tt>1</tt>時，輸出的訊息顯然是錯誤的，而<tt>"%d file(s) were deleted"</tt>也不合英文文法。因此，我們非得分成兩個字串表示不可：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表7. 祗考慮英文的複數形式處理</font></caption>
+<tr><td><PRE>
+printf(($files == 1) ? _(8, "<b>%d</b> file was deleted.")
+		     : _(9, "<b>%d</b> files were deleted."), $files);
+</PRE></td></tr></table>
+
+<p>
+但就算這樣寫，在英文以外的語言仍然行不通－－法文的單數形式在<tt>$files</tt>為<tt>0</tt>時也適用，而斯拉夫語系的複數形式更多達三到四種！想在<tt>Msgcat</tt>的架構下照顧到這些狀況，必然是徒勞無功。
+
+<h3>Gettext：用雜湊當詞典</h3>
+
+<p>
+為了解決<tt>Msgcat</tt>的諸多問題，Ulrich Drepper在1995年參考Uniforum的<tt>Gettext</tt>界面，為GNU計劃開發了一套本土化系統。時到如今，在以C語言開發的自由軟體當中，GNU <tt>gettext</tt>已儼然成為本土化的標準架構，也廣受C++、Tcl及Python程式員的歡迎。
+
+<p>
+Gettext不需要為每份源碼檔案準備各自的詞典，而是為整個專案，針對每種語言各製作一份詞典（又稱作「PO檔」）。舉例來說，上述網頁的德文詞典檔「<tt>de.po</tt>」可能內容如下：
+
+<p align="center">
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表8. <tt>Gettext</tt> 詞典檔</font></caption>
+<tr><td><PRE>
+#: index.pl:4
+msgid "Audrey.Home"
+msgstr "Audrey'.Haus"
+
+#: index.pl:5
+msgid "Sorry, this site is under construction."
+msgstr "Wir bitten um Entschudigung. Diese Seite ist im Aufbau."
+</PRE></td></tr></table>
+
+<p>
+
+以「<tt>#:</tt>」開頭的兩列是由xgettext這支程式自動產生的。該程式會找出源碼裡呼叫<tt>gettext()</tt>的地方，將它們依序解到詞典檔裡。
+
+<p>
+接下來，我們執行<tt>msgfmt</tt>，從<tt>po/de.po</tt>產生二進制的詞典檔<tt>locale/de/LC_MESSAGES/web.mo</tt>：
+
+<pre>
+	% msgfmt locale/de/LC_MESSAGES/web.mo po/de.po
+</pre>
+
+<p>
+這樣一來，程式就可以用CPAN上的<tt>Locale::gettext</tt>模組來存取二進制執行檔，如下所示：
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表9. 示範 <tt>Locale::gettext 的用法</tt></font></caption>
+<tr><td><PRE>
+use POSIX;
+use Locale::gettext;
+POSIX::setlocale(LC_MESSAGES, $language); <i># 設定目的語言</i>
+textdomain("web"); <i># 通常和程式名稱相同</i>
+sub _ { gettext(@_) } <i># 祗是 gettext() 的簡寫</i>
+print _("Sorry, this site is under construction.");
+</PRE></td></tr></table>
+
+<p>
+新版的<tt>gettext</tt>（glibc 2.2版以上）更提供了<tt>ngettext("%d file", "%d files", $files)</tt>的複數形式處理；不過，<tt>Locale::gettext</tt>模組目前還未支援此項界面。筆者已將修正檔送出，希望該模組的作者會盡快處理。
+
+<p>
+Also, <tt>gettext</tt> lexicons support multi-line strings, as well as reordering via <tt>printf</tt> and <tt>sprintf</tt>:
+此外，<tt>gettext</tt>的詞典檔也支援多列字串，以及利用<tt>printf</tt>與<tt>sprintf</tt>函式達成的更換變數順序功能：
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表10. 使用編號參數的多列字串</font></caption>
+<tr><td><PRE>
+msgid ""
+"This is a multiline string"
+"with <b>%1$s</b> and <b>%2$s</b> as arguments"
+msgstr ""
+"これは多線ひも変数として"
+"<b>%2$s</b> と <b>%1$s</b> のである"
+</PRE></td></tr></table>
+
+<p>
+最後，GNU <tt>gettext</tt>套件附有相當完整的工具集（<tt>msgattrib</tt>、<tt>msgcmp</tt>、<tt>msgconv</tt>、<tt>msgexec</tt>、<tt>msgfmt</tt>、<tt>msgcat</tt>、<tt>msgcomm</tt>...），大幅簡化了合併、更新、管理詞典檔的流程。
+
+<h3>Locale::Maketext：用物件當詞典！</h3>
+
+<p>
+<tt>Locale::Maketext</tt>於1998年由Sean M. Burke所開發，並於2001年5月修訂後，併入Perl 5.8版的核心程式庫。
+
+<p>
+此模組與<tt>Msgcat</tt>及<tt>Gettext</tt>等函式導向的架構不同，是以物件導向的設計，讓「<tt>Locale::Maketext</tt>」作為抽象的基底類別，衍生出用於特定專案的「專案類別」。專案類別（名稱如「<tt>MyApp::L10N</tt>」）進一步衍生出數個「語言類別」，如「<tt>MyApp::L10N::it</tt>」、「<tt>MyApp::L10N::fr</tt>」等等。
+>
+<p>
+所謂的語言類別，就是具有全域<tt>%Lexicon</tt>雜湊的Perl模組。<tt>%Lexicon</tt>裡的鍵是原文（通常是英文）的字串，雜湊值則是翻譯過的字串。語言類別還可以定義某些方法，來處理詞典中的文法變換等事項。
+
+<p>
+請見底下範例：
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表11. <tt>Locale::Maketext</tt> 詞典檔及使用範例</font></caption>
+<tr><td><PRE>
+package MyApp::L10N;
+use base 'Locale::Maketext';
+
+package MyApp::L10N::de;
+use base 'MyApp::L10N';
+our %Lexicon = (
+    "[<b>quant</b>,_1,camel was,camels were] released." =>
+    "[<b>quant</b>,_1,Kamel wurde,Kamele wurden] freigegeben.",
+);
+
+package main;
+my $lh = MyApp::L10N-&gt;get_handle('de');
+print $lh-&gt;maketext("[<b>quant</b>,_1,camel was,camels were] released.", 5);
+</PRE></td></tr></table>
+
+<p>
+利用Maketext的「方括號語法」，譯者可以在字串中取用各種文法函式。上面的例子示範了內建的複數形式與量詞支援；對於需要特別處理複數形式的語言，祗需實作相應的<tt>quant()</tt>函式即可。同樣的，也很容易加入轉換序數與時間格式的功能。
+
+<p>
+每個語言類別，還可以定義自己的<tt>-&gt;encoding</tt>方法，描述其中的詞典編碼；這可以用來傳給「<tt>Encode</tt>」模組，進行即時轉碼。語言類別間也可以相互繼承：<tt>fr_ca.pm</tt>（加拿大法語）裡缺少的字串，預設會由<tt>fr.pm</tt>（一般法語）補上。
+
+<p>
+內建的<tt>-&gt;get_handle()</tt>方法，在沒有參數時，會自動在CGI、mod_perl與命令列下，偵測HTTP、POSIX及Win32的地區設定；程式員毋須再做偵測，就可以立刻呈現適合的語系給使用者。
+
+<p>
+不過，「<tt>Locale::Maketext</tt>」並非完美無缺。它最大的問題，就是缺乏如GNU <tt>gettext</tt>的工具集；也因為詞典檔的語法太有彈性，使得編輯器難有像Emacs的「<tt>PO Mode</tt>」這樣的支援模式。
+
+<p>
+最後，因為採用Perl模組作為詞典檔，導致譯者必須熟悉基本的Perl語法－－不然的話，就得有人幫忙做格式轉換了。
+
+<h3>Locale::Maketext::Lexicon：兩全其美</h3>
+
+<p>
+2002年5月，有感於<tt>Locale::Maketext</tt>詞典太過鬆散的格式，我著手實作公司內部使用的詞典格式，並在perl-i18n郵遞論壇上徵詢大家的意見。Jesse Vincent問道：「為什麼不直接使用<tt>gettext</tt>的PO檔格式呢？」於是我就設計了抽換式的後端系統，能接受各種不同格式的詞典。這樣一來，「<tt>Locale::Maketext::Lexicon</tt>」就誕生了。
+
+<p>
+此模組設計時的初衷，在結合<tt>Locale::Maketext</tt>彈性的表達式，與廣泛支援的<tt>gettext</tt>或<tt>Msgcat</tt>檔案格式。它也支援繫結（Tie）界面，讓詞典也能存放在關聯式資料庫，或DBM檔中。
+
+<p>
+底下的應用程式，示範了<tt>Locale::Maketext::Lexicon</tt>的數種用法，以及「Gettext」後端所支援的延伸PO格式：
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表12. <tt>Locale::Maketext::Lexicon</tt> 的範例程式</font></caption>
+<tr><td bgcolor=black align=right><PRE><font color=white>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</font></PRE></td><td><PRE>
+use CGI ':standard';
+use base 'Locale::Maketext';      <i># 繼承 get_handle()</i>
+
+<i># 各種詞典格式及來源</i>
+use Locale::Maketext::Lexicon {
+    en =&gt; ['Auto'],              fr    =&gt; ['Tie' =&gt; 'DB_File', 'fr.db'],
+    de =&gt; ['Gettext' =&gt; \*DATA], zh_tw =&gt; ['Gettext' =&gt; 'zh_tw.mo'],
+};
+
+<i># 對 main 的各個子類別，定義該語言裡的序數函式</i>
+use Lingua::EN::Numbers::Ordinate; use Lingua::FR::Numbers::Ordinate;
+sub en::ord { ordinate($_[1]) } sub fr::ord { ordinate_fr($_[1]) }
+sub de::ord { "$_[1]." }        sub zh_tw::ord { "第 $_[1] 個" }
+
+my $lh = __PACKAGE__-&gt;get_handle; <i># 自動取得目前的地區設定</i>
+sub _ { $lh-&gt;maketext(@_) }       <i># 如有需要，也可以自動進行轉碼</i>
+
+print header, start_html,         <i># [<b>*</b>,...] 是 [<b>quant</b>,...] 的簡寫</i>
+	_("You are my [<b>ord</b>,_1] guest in [<b>*</b>,_2,day].", $hits, $days), end_html;
+
+__DATA__
+# <i>以延伸 PO 格式寫成的德文詞典</i>
+msgid "You are my <b>%ord(%1)</b> guest in <b>%*(%2,day)</b>."
+msgstr "Innerhalb <b>%*(%2,Tages,Tagen)</b>, sie sind mein <b>%ord(%1)</b> Gast."
+</PRE></td></tr></table>
+
+<p>
+程式的第2列讓<tt>main</tt>套件繼承<tt>Locale::Maketext</tt>，以取得<tt>get_handle</tt>方法。第5∼8列定義了四個語言類別，各自採用不同的詞典格式及來源：
+
+<ul>
+<li>「Auto」後端告訴<tt>Locale::Maketext</tt>無須特別處理英文－－直接將接到的雜湊鍵傳回即可。此後端特別適合剛開始撰寫程式、還不想處理本地化的狀況。
+<li>「Tie」後端將法文的<tt>%Lexicon</tt>雜湊繫結到一個Berkeley DB檔；其中的字串在需要時纔會取用，因此不會浪費額外的記憶體。
+<li>「Gettext」後端從磁碟上讀取編譯過的二進制MO檔，作為中文的詞典；此外，它也從<tt>DATA</tt>檔案代號取得PO檔格式的德文詞典。
+</ul>
+
+<p>
+第11∼13列實作各個語言類別的<tt>ord</tt>方法，負責將參數轉換為該語言的序數（如1st、2nd、3rd...）。英文與法文採用了兩個CPAN模組達成，而德文及中文則祗需要字串安插即可。
+
+<p>
+第15列取得目前套件的「語言代號（language handle）」物件。因為沒有給定參數，它會自動偵測HTTP_ACCEPT_LANGUAGE環境變數、POSIX的<tt>setlocale()</tt>設定，以及Windows環境下的<tt>Win32::Locale</tt>。第16列實作了簡單的本地化函式，將參數直接交給該物件的<tt>maketext</tt>方法處理。
+
+<p>
+最後，第18∼19列會印出一則經由本地化處理的訊息。第一個參數<tt>$hits</tt>會交給<tt>ord</tt>方法，而<tt>$days</tt>則交給內建的<tt>quant</tt>方法處理－－「<tt>[*...]</tt>」是前面提過的「<tt>[quant,...]</tt>」的簡寫。
+
+<p>
+第22∼24列是以延伸PO格式寫成的範例詞典。除了藉由<tt>%1</tt>及<tt>%2</tt>調動參數順序之後，它也支援「<tt>%function(args...)</tt>」語法，代表<tt>Locale::Maketext</tt>語法中的「<tt>[function,args...]</tt>」；args裡出現的<tt>%1</tt>、<tt>%2</tt>等變數，都會自動替換成<tt>_1</tt>、<tt>_2</tt>等等。
+
+<h2>實例討論</h2>
+
+<p class="right" align="right">
+「沒有大小通喫這回事。」<br>
+　　－－網絡第十真理，RFC 1925
+
+<p>
+瞭解了本土化架構的原理後，讓我們來看看它們如何應用到實際的應用程式上。
+
+<p>
+對網站應用程式來說，本土化架構幾乎都在「呈現系統」（或稱「模版系統」）上實作，因為它決定了應用程式如何分隔資料與源碼。舉例來說，「Template Toolkit」鼓勵乾淨的三層式資料/源碼/模版架構；同樣受歡迎的「Mason」系統則傾向將Perl程式碼內嵌在模版裡。這一節裡，我們會看到適用於這兩種架構的本土化方式；其中的原則，也同樣適用於「AxKit」、「HTML::Embperl」等模版系統上。
+
+<h3>Request Tracker（Mason）</h3>
+
+<p>
+「Request Tracker」是第一個以<tt>Locale::Maketext::Lexicon</tt>作為本土化架構的應用程式。它的「基底語言類別」是「<tt>RT::I18N</tt>」，子類別則由同一個目錄下的<tt>*.po</tt>檔案產生。
+
+<p>
+除此之外，它的<tt>-&gt;maketext</tt>方法也利用「<tt>Encode</tt>」模組（在5.8版以前的Perl，則是利用我的「<tt>Encode::compat</tt>」模組）直接傳回UTF-8編碼的資料。這樣一來，負責中文的譯者就可以用Big5碼編輯詞典檔，系統卻可以將它視為萬國碼（Unicode）處理。
+
+<p>
+在RT的Perl源碼裡，所有物件都利用從<tt>RT::Base</tt>繼承的<tt>$self-&gt;loc</tt>方法來翻譯訊息：
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表13. RT 的本土化架構</font></caption>
+<tr><td><PRE>
+sub RT::Base::loc
+    { $self-&gt;CurrentUser-&gt;loc(@_) }
+sub RT::CurrentUser::loc
+    { $self-&gt;LanguageHandle-&gt;maketext(@_) }
+sub RT::CurrentUser::LanguageHandle
+    { $self-&gt;{'LangHandle'} ||= RT::I18N-&gt;get_handle(@_) }
+</PRE></td></tr></table>
+
+<p>
+如上所示，翻譯時採用的是現行使用者的語系，因此多個使用者可以藉由不同語言，同時執行這個程式。對Mason模版來說，則採用了兩種方式：
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表14. 兩種標示 Mason 模版中字串的方式</font></caption>
+<tr><td><PRE>
+% $m-&gt;print(<b>loc(</b>"<b>Another line of text</b>", $args...<b>)</b>);
+&lt;&amp;<b>|/l</b>, $args...&amp;&gt;<b>Single line of text</b>&lt;/&amp;&gt;
+</PRE></td></tr></table>
+<p>
+第一列的方式，用在內嵌的Perl源碼與<tt>&lt;%PERL&gt;</tt>段落之中；它會自動叫用現行使用者的<tt>-&gt;loc</tt>方法，交由上述的函式處理。
+
+<p>
+第二列則利用<tt>HTML::Mason</tt>模組所提供的「過濾元件（filter component）」功能，將中間的"Single line of text"傳給「<tt>/l</tt>」元件（也許還附加參數），最後再顯示該元件傳回的字串。底下是此元件的實作方式：
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表15. <tt>html/l</tt> 過濾元件的實作方式</font></caption>
+<tr><td><PRE>
+% my $hand = $session{'CurrentUser'}-&gt;LanguageHandle;
+% $m-&gt;print($hand-&gt;maketext($m-&gt;content, @_));
+</PRE></td></tr></table>
+
+<p>
+有了這些方式，祗要將既有模版裡的訊息解成詞典檔，再寄給譯者就行了。找出700多則訊息的工作約費時一個星期；整個國際化╱本土化的流程則花了不到兩個月的時間。
+
+<h3>Slash（Template Toolkit）</h3>
+
+<p>
+Slash（類似於Slashdot的自動說書首頁，Slashdot Like Automated Storytelling Homepage）是Slashdot背後的程式。不過，Slash更是完整的網站的建置環境，建立在Andy Wardley的「Template Toolkit」模組上。
+
+<p>
+基於TT2乾淨的設計，Slash將源碼與資料徹底分開，這點與RT╱Mason不同。因此，幾乎沒有必要在Perl程式檔裡進行本土化的工作。
+
+<p>
+在本文撰寫之前，有許多直接將模版翻譯而成的「本土化」版本，包括中文、日文、希伯來文等。然而，在新版釋出時需要做的合併（merge）動作非常困難（外掛程式就更別提了），因此翻譯版本往往延遲許久纔釋出。
+
+<p>
+這裡，我們提出一個較好的解決方式：在模版提供函式上架設「自動解譯層」，利用<tt>HTML::Parser</tt>及<tt>Template::Parser</tt>實作。它的功能如下所示：
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表16. TT2 解譯層的輸入與輸出</font></caption>
+<tr><td bgcolor=black><font color=white>輸入</font></td><td><PRE>
+&lt;B&gt;from the [% story.dept %] dept.&lt;/B&gt;
+</PRE></td></tr>
+<tr><td bgcolor=black><font color=white>輸出</font></td><td><PRE>
+&lt;B&gt;[%<b>|loc(</b> story.dept <b>)</b>%]from the [<b>_1</b>] dept.[%END%]&lt;/B&gt;
+</PRE></td></tr></table>
+
+<p>
+眼尖的讀者會發現，這樣的轉譯層會碰到跟<tt>Msgcat</tt>相同的同題－－要是我們想將<tt>[% story.dept %]</tt>轉成序數，或是把<tt>dept.</tt>依複數形式展開成<tt>department</tt>╱<tt>departments</tt>的話，該怎麼辦呢？同樣的問題，也出現在RT的網頁界面裡，需要翻譯從外部模組傳回的訊息時；舉例來說，<tt>"Successfully deleted 7 ticket(s) in 'c:\temp'."</tt>這樣的字串要怎麼翻呢？
+
+<p>
+筆者的解決方法，是開發<tt>Locale::Maketext::Fuzzy</tt>模組，用來將已經安插變數的字串，與詞典檔進行比對－－例如前述的字串，就可能符合<tt>"Successfully deleted [*,_1,ticket] in '[_2]'."</tt>這則訊息。要是符合的字串不止一個（畢竟，<tt>"Successfully [_1]."</tt>也算符合），該模組會依循經驗法則，找出最適合的答案。
+
+<p>
+搭配<tt>xgettext.pl</tt>這支程式，開發者可以為每套外掛程式及佈景主題附上各自的詞典檔，供Slash系統進行多層次的處理：先嘗試所屬外掛程式的詞典；接著再試佈景主題；最後纔以全域的詞典檔作為預設。
+
+<h2>總結</h2>
+
+<p class="right" align="right">
+「所謂盡善盡美，並非不能再加，而是不能再減。」<br>
+　　－－網絡第十二真理，RFC 1925
+
+<p>
+從以上的兩個例子裡，可以約略看出本土化的共通流程。這一節會介紹如何經由十個階段，來本土化既有的網站應用程式，以及一些相關的小祕訣。
+
+<h3>本土化的流程</h3>
+
+本土化的流程，可以依序總結成下列幾項步驟：
+
+<ol>
+<li>評估網頁的模版系統。
+<li>選擇一項本土化架構，將它與模版系統銜接上。
+<li>用程式找出模版裡的文字字串，用過濾函式進行代換。
+<li>解出測試用的詞典；手動修掉明顯的問題。
+<li>手動找出源碼裡的文字字串，將它們代換成「<tt><b>_(</b>...<b>)</b></tT>」函式呼叫。
+<li>再解出一份測試詞典，交由機器翻譯。
+<li>實地測試本土化版本；修掉餘下的問題。
+<li>解出試用版的詞典，寄給翻譯團隊校訂。
+<li>修掉譯者回報的問題，寄出正式版的詞典！
+<li>在每個新版釋出前，定期整理詞典裡新的項目，通知譯者進行翻譯。
+</ol>
+
+照著以上的步驟，你就可以輕鬆地管理本土化的專案，並且保持翻譯時效、減少錯誤。
+
+<h3>一些小祕訣</H3>
+
+最後，這裡是對網頁與其他應用程式進行本土化時，幾點需要注意的事項：
+
+<ul>
+<li>在設計及實作階段，都應將資料與源碼分開。
+<li>不要在網站或程式成形前，就先設計國際化/本土化的架構。
+<li>避免內含文字的圖檔。
+<li>預留標籤和按鈕旁邊的空白－－避免讓操作介面過度擁擠。
+<li>使用完整的句子，而非片段：
+</ul>
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表17. 片段與完整句</font></caption>
+<tr><td><PRE>
+_("Found ") . $files . _(" file(s).");   <i># 不完整的句子－－錯了！</i>
+sprintf(_("Found %s file(s)."), $files); <i># 完整句（利用sprintf）</i>
+_("Found [*,_1,file].", $files);         <i># 完整句（用Locale::Maketext）</i>
+</PRE></td></tr></table>
+
+<ul>
+<li>不同語境下的同樣字串，應該作出區分。舉例來說，RT裡的<tt>"Home"</tt>原本具有<tt>"Homepage"</tt>及<tt>"Home Phone No."</tt>等兩種用法。
+<li>平等對待譯者，別將他們視為下屬；避免擅自修改詞典檔。
+<li>先讓一個人譯出草稿，再請其他人修改。
+<li>盡量在詞典檔裡提供註解及描述資訊：
+</ul>
+
+<p align=center>
+<table border=2 align=center>
+<caption align=bottom><font size=-1>列表18. 詞典檔裡的註解</font></caption>
+<tr><td><PRE>
+#: lib/RT/Transaction_Overlay.pm:579
+#. ($field, $self->OldValue, $self->NewValue)
+# <i>請注意：底下的「changed to」意思是「已改為...」。</i>
+msgid "<b>%1 %2</b> changed to <b>%3</b>"
+msgstr "<b>%1 %2</b> cambiado a <b>%3</b>"
+</PRE></td></tr></table>
+
+<p>
+利用<tt>Locale::Maketext::Lexicon</tt>套件中附的「<tt>xgettext.pl</tt>」這支程式，可以自動產生詞典檔中的源碼檔名、列號（以<tt>#:</tt>表示）、變數（以<tt>#.</tt>表示），並隨時更新。如上所示，對太短或意義不明的句子加上註解（以<tt>#</tt>表示），對翻譯也會有很大的幫助。
+
+<h2>結論</h2>
+
+<p>
+對非英語系國家的人民來說，本土化往往是參與自由軟體專案的前提。以臺灣而言，CLE（中文Linux環境）、Debian-Chinese及FreeBSD-Chinese等本土化專案，都是社群貢獻的聚集焦點。然而，拜以英文為主的僵化軟體架構所賜，這往往也是耗時費力、容易出錯的工作。對譯者來說，「進入障礙」還是太高了些。
+
+<p>
+話說回來，在日漸昇高的網頁國際化趨勢下，網站應用程式經常有翻譯成多國語言的機會。舉例來說，Sean M.Burke在2002年領導熱心的使用者，將廣受歡迎的「Apache::MP3」線上點播模組譯成數十種語言的版本。模組的原作者Lincoln D. Stein完全未參與翻譯－－他祗要將修正檔和詞典併入下個釋出版本就行了。
+
+<p>
+自由軟體並非一堆抽象的程式，而是靠人們共享源碼、彼此提供建議的熱情而存在的。因此，我誠摰地希望本文介紹的技巧，能鼓勵程式員及使用者在被動翻譯之外，也能主動國際化既有的應用程式。
+
+<h2>致謝</h2>
+
+<p>
+感謝Jesse Vincent建議我開發<tt>Locale::Maketext::Lexicon</tt>，以及讓我協助他設計RT的本土化架構。我也要感謝Sean M. Burke創造了<tt>Locale::Maketext</tt>，並鼓勵我實驗各種不同的詞典格式。
+
+<p>
+感謝我在傲爾網的同事們（簡信昌、高嘉良、翁千婷、林克寰）為本土化網頁應用程式付出的努力。也謝謝駱馬書（Perl學習手冊）的譯者群，讓我學到了分散式翻譯團隊的力量。
+
+<p>
+感謝Nick Ing-Simmons、小飼弾及Jarkko Hietaniemi教我如何利用<tt>Encode</tt>模組；Bruno Haible允許我借用他強大的GNU libiconv；以及宮川達彥對<tt>Locale::Maketext::Lexicon</tt>早期版本的校訂協助。
+
+<p>
+最後，如果你願意依照本文裡的步驟，參與軟體的國際化與本地化，請容我向你致上最高的謝忱；讓我們一起打造「全球」的資訊網吧！
+
+<h2>參考資料</h2>
+
+<ul>
+<li>Harald Tveit Alvestrand，「RFC 1766: Tags for the Identification of Languages」，1995年，<a href="ftp://ftp.isi.edu/in-notes/rfc1766.txt"><tt>ftp://ftp.isi.edu/in-notes/rfc1766.txt</tt></a>。
+<li>Ross Callon編，「RFC 1925: The Twelve Networking Truths」，1996年，<a href="ftp://ftp.isi.edu/in-notes/rfc1925.txt"><tt>ftp://ftp.isi.edu/in-notes/rfc1925.txt</tt></a>
+<li>Ulrich Drepper、Peter Miller、Francois Pinard，GNU "gettext"，1995-2001年。附在<a href="ftp://prep.ai.mit.edu/pub/gnu/"><tt>ftp://prep.ai.mit.edu/pub/gnu/</tt></a>套件的說明文件中。
+<li>Burke、Lachler，「Localization and Perl: gettext breaks, Maketext fixes」，1999年，出版於Perl Journal，第13期。
+<li>Sean M. Burke，「Localizing Open-Source Software」，2002年，出版於Perl Journal，2002年秋季號。
+<li>W3C 國際化行動宣言，2001年，<a href="http://www.w3.org/International/Activity.html"><tt>http://www.w3.org/International/Activity.html</tt></a>
+<li>Mozilla 國際化及本土化指引，1999年，<a href="http://www.mozilla.org/docs/refList/i18n/"><tt>http://www.mozilla.org/docs/refList/i18n/</tt></a>
+</ul>
+
+</body></html>

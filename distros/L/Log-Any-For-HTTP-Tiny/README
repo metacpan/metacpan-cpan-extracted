@@ -1,0 +1,18 @@
+SYNOPSIS
+
+     use Log::Any::For::LWP
+         -log_request          => 1, # optional, default 1 (from HTTP::Tiny::Patch::LogAny)
+         -log_response         => 1, # optional, default 1 (from HTTP::Tiny::Patch::LogAny)
+         -log_response_content => 1, # optional, default 0 (from HTTP::Tiny::Patch::LogAny)
+     ;
+
+DESCRIPTION
+
+    An alias for HTTP::Tiny::Patch::LogAny.
+
+SEE ALSO
+
+    HTTP::Tiny::Patch::LogAny
+
+    Log::Any
+

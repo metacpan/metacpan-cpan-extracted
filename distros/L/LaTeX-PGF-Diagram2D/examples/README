@@ -1,0 +1,25 @@
+This directory contains the examples used in the documentation.
+
+test001a.pl   First example, draw a function.
+test002a.pl   Axis label and units added.
+test003a.pl   One axis value omitted to obtain more space for the unit.
+test004a.pl   Multiple curves in one diagram.
+test005a.pl   Text labels.
+test006a.pl   Two scales.
+test007a.pl   Units changed to mA and mW.
+test008a.pl   First derivative specified to avoid equation system solving.
+test009a.pl   Parametric plot.
+test011a.pl   Polyline instead of curve.
+test012a.pl   Logarithmic scale for low-pass function.
+test013a.pl   Measurement results.
+test014a.pl   Curve through measurement results.
+test015a.pl   Measurement results with X-spline.
+test016a.pl   Point set for X-spline examples.
+test017a.pl   Polynomial through point set.
+test018a.pl   Natural spline through point set.
+test019a.pl   Natural spline with specified derivative in some points.
+test020a.pl   X-spline interpolation.
+test021a.pl   X-spline interpolation, s parameter changed.
+test022a.pl   X-spline approximation.
+test023a.pl   X-spline approximation, s parameter changed.
+test024a.pl   X-spline, approximation and interpolation mixed.

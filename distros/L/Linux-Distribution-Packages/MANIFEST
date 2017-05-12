@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Linux-Distribution-Packages.t
+lib/Linux/Distribution/Packages.pm

@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 b816a921c9d9ae9109678bac160e22ffeb9dd9dc COPYRIGHT
+SHA1 fcc0855cf164ac1fe3b59e6c6aee83afc2624e37 CREDITS
+SHA1 e963890f299e006582aa99d1a5ee9dad59d93736 Changes
+SHA1 667be14a2789da8ba8c1f66902768617fb43088d INSTALL
+SHA1 ec5a7b4f3023f03ebf821b57690758f7e6f3ae2a LICENSE
+SHA1 f8a06366d0c8b34944b740b28441c3f9a147c4f1 MANIFEST
+SHA1 14d0c511e0970023ee01456249e448f7f1fb45ac META.json
+SHA1 174adae89a9b1933821d7115057086e089ee6a35 META.yml
+SHA1 c95af58957b4679f0a431f37bd91f776d399bc4d Makefile.PL
+SHA1 d711af1e4b6b675b791e388712d6e2f3d6ae20b3 README
+SHA1 fda0b1106798ec463688189b390940a13d782a53 dist.ini
+SHA1 576c07b93ff50e749e15a3c24a2544a7289a9d40 doap.ttl
+SHA1 3533847233634c96e371f396f3b51c3d532d8719 examples/benchmarking.pl
+SHA1 ccc8e642230584f988e1a9297f20679fb6d7b632 lib/LV.pm
+SHA1 a7b071ed5bdb65b00b36656f0f090ae2dea31157 lib/LV/Backend/Magic.pm
+SHA1 8782837a326619031a4fdc78a551ee567136726a lib/LV/Backend/Sentinel.pm
+SHA1 9022794f42c01ae35e1d032936eac49799358595 lib/LV/Backend/Tie.pm
+SHA1 1bdcf3fe8c966b6044aeaf0ea2fbc9973d2ac8ce t/01basic.t
+SHA1 0e7c8252de03949131a5dd4aa217ff77a1d91200 t/02tie.t
+SHA1 b2588afd44c6b6d05cf7632036cf2f253113d37d t/03sentinel.t
+SHA1 f9b0718b8cc17e677f036f89f56f5b223c912d8f t/04magic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlJ1/ksACgkQzr+BKGoqfTnZmwCgtsphPotq3aqL+76AUBpE+pSb
+v9IAoJoMXe7E8b+9fVeUyC+h8J8VTBtf
+=5mjr
+-----END PGP SIGNATURE-----

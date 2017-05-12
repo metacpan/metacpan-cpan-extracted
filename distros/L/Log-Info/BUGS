@@ -1,0 +1,35 @@
+001	1.00	use Log::Info dies with :stderr not exported
+	1.01	Fixed
+
+002	1.00	syslog.t test fails on single-digit month days due to
+		bad RE.
+	1.01	Fixed
+
+003	1.00	Makefile.PL fails:
+		[riechert@tairou Log-Info-1.00]$ perl Makefile.PL 
+		Internal Check (8) failed
+		[riechert@tairou Log-Info-1.00]$ 
+
+		Where:
+		[riechert@tairou cpan]$ cat --version
+		cat (GNU textutils) 2.0a
+		Written by Torbjorn Granlund and Richard M. Stallman.
+
+	1.02	Fixed (hopefully; untested)
+
+004	1.02	Default channels created with LOG_INFO as channel level, in
+		contradiction to documentation
+	1.03	Fixed (in BEGIN block in Info.pm), test added to defaults.t
+
+005	1.02	syswrite fails:
+		Log::Info::Log : Print to filehandle :stderr on channel :info failed:
+		  Can't locate object method "syswrite" via package "IO::Handle" at /usr/local/share/perl/5.6.0/Log/Info.pm line 803.
+
+	1.03	Fixed (in import of IO in Info.pm)
+
+006	1.04	Bug with Scalar-List-Utils' List::Util::first (1.06)
+		on Debian Potato boxes trips up Log::Info::Fork.
+	1.05	first() replaced with builtin.
+
+007	1.04	Test leaves dirs lying around when not in TEST_DEBUG mode
+	1.05	Sense of test inverted to correct!

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Log-Dispatch-FogBugz
+version:      0.1
+version_from: lib/Log/Dispatch/FogBugz.pm
+installdirs:  site
+requires:
+    Log::Dispatch::Output:         0
+    LWP::UserAgent:                0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

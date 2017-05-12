@@ -1,0 +1,21 @@
+Changes
+example/01_expand_babel_fish.pl
+javascript/Example.html
+javascript/Locale/Utils/PlaceholderBabelFish.js
+lib/Locale/Utils/PlaceholderBabelFish.pm
+MANIFEST			This list of files
+README
+t/01_use.t
+t/02_exceptions.t
+t/03_expand_named.t
+t/04_modifier_code.t
+t/05_expand_plural.t
+t/11_test_examples.t
+t/chars.t
+t/perl_critic.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_build.t
+Makefile.PL
+META.yml
+META.json

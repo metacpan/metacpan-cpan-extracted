@@ -1,0 +1,27 @@
+Revision history for Perl module Lingua::Stem::Patch
+
+0.06 2015-02-13
+ - Added stemming rule to unabbreviate Esperanto ’st- and 'st- to est- #eo
+
+0.05 2014-09-30
+ - Remove 1-letter suffixes from 4-letter Polish words instead of just 5-letter
+   words and greater, for example `kota` and `koty` are now both stemmed to `kot`
+   #pl [issue #1]
+
+0.04 2014-08-29
+ - Added new Polish language stemmer (first on CPAN) #pl
+
+0.03 2014-07-16
+ - Added participle stemming exceptions for words in the Fundamento #eo
+ - Added participle suffix removal instead of normalization when aggressive #eo
+ - Added stemming exceptions for article and pronouns #io
+ - Added stemming rules for pronouns, participle adjectives, -ab- verbs #io
+
+0.02 2014-07-13
+ - Added aggressive stemmers which remove the entire suffix #eo #io
+ - Added stemming exceptions for all standalone root words #eo
+ - Added stemming rules for correlatives, -en adverbs, unuj, l’ #eo
+
+0.01 2014-06-05
+ - First release
+ - Languages supported: Esperanto (eo), Ido (io)

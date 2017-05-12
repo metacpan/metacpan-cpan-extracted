@@ -1,0 +1,19 @@
+/*
+ * LCFG @LCFG_NAME@ component : default resources
+ *
+ * @LCFG_AUTHOR@
+ * Version: @LCFG_VERSION@ @LCFG_DATE@ (Schema @LCFG_SCHEMA@)
+ *
+ * @MSG@
+ *
+ */
+
+#include "ngeneric-1.def"
+#include "om-1.def"
+
+schema @LCFG_SCHEMA@
+
+/* %%% TBD %%% */
+
+
+/* eof */

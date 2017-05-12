@@ -1,0 +1,40 @@
+NAME 
+
+Locale::Object - OO locale information
+
+DESCRIPTION
+
+The Locale::Object group of modules attempts to provide locale-related 
+information in an object-oriented fashion. The information is collated 
+from several sources and provided in an accompanying DBD::SQLite database.
+
+At present, the modules are:
+
+* Locale::Object                      - make compound objects containing 
+                                        country, currency & language objects
+* Locale::Object::Country             - objects representing countries
+* Locale::Object::Continent           - objects representing continents
+* Locale::Object::Currency            - objects representing currencies
+* Locale::Object::Currency::Converter - convert between currencies
+* Locale::Object::DB                  - does db lookups for the modules
+* Locale::Object::Language            - objects representing languages
+
+For more information, see the documentation for those modules. The database
+is documented in docs/database.pod.
+
+AUTHOR
+
+Originally by Earle Martin.
+
+COPYRIGHT AND LICENSE
+
+Originally by Earle Martin. To the extent possible under law, the
+author has dedicated all copyright and related and neighboring rights
+to this software to the public domain worldwide. This software is
+distributed without any warranty. You should have received a copy of
+the CC0 Public Domain Dedication along with this software. If not, see
+<http://creativecommons.org/publicdomain/zero/1.0/>.
+
+SEE ALSO
+
+Locale::Codes, for simple conversions between names and ISO codes.

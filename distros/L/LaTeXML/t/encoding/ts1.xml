@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml package="textcomp"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <section refnum="1" xml:id="S1">
+    <title><tag close=" ">1</tag>Font Encoding TS1</title>
+    <para xml:id="S1.p1">
+      <tabular vattach="middle">
+        <tbody>
+          <tr>
+            <td border="r"/>
+            <td align="center">´0</td>
+            <td align="center">´1</td>
+            <td align="center">´2</td>
+            <td align="center">´3</td>
+            <td align="center">´4</td>
+            <td align="center">´5</td>
+            <td align="center">´6</td>
+            <td align="center">´7</td>
+          </tr>
+          <tr>
+            <td align="right" border="r t">´0x</td>
+            <td align="center" border="t">`</td>
+            <td align="center" border="t">´</td>
+            <td align="center" border="t">^</td>
+            <td align="center" border="t">~</td>
+            <td align="center" border="t">¨</td>
+            <td align="center" border="t">˝</td>
+            <td align="center" border="t">˚</td>
+            <td align="center" border="t">ˇ</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´1x</td>
+            <td align="center">˘</td>
+            <td align="center">¯</td>
+            <td align="center">˙</td>
+            <td align="center">¸</td>
+            <td align="center">˛</td>
+            <td align="center">‚</td>
+            <td align="center"/>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´2x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">"</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">–</td>
+            <td align="center">—</td>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´3x</td>
+            <td align="center">←</td>
+            <td align="center">→</td>
+            <td align="center"> ̑</td>
+            <td align="center"> ̑</td>
+            <td align="center"> ̑</td>
+            <td align="center"> ̑</td>
+            <td align="center"/>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´4x</td>
+            <td align="center">␢</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">$</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">'</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´5x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">⁎</td>
+            <td align="center"/>
+            <td align="center">,</td>
+            <td align="center">=</td>
+            <td align="center">.</td>
+            <td align="center">⁄</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´6x</td>
+            <td align="center">0</td>
+            <td align="center">1</td>
+            <td align="center">2</td>
+            <td align="center">3</td>
+            <td align="center">4</td>
+            <td align="center">5</td>
+            <td align="center">6</td>
+            <td align="center">7</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´7x</td>
+            <td align="center">8</td>
+            <td align="center">9</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">〈</td>
+            <td align="center">-</td>
+            <td align="center">〉</td>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´10x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´11x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">℧</td>
+            <td align="center"/>
+            <td align="center">◯</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´12x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">Ω</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´13x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">⟦</td>
+            <td align="center"/>
+            <td align="center">⟧</td>
+            <td align="center">↑</td>
+            <td align="center">↓</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´14x</td>
+            <td align="center">`</td>
+            <td align="center"/>
+            <td align="center">⋆</td>
+            <td align="center">⚮</td>
+            <td align="center">✝</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´15x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">⚭</td>
+            <td align="center">♪</td>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´16x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´17x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">~</td>
+            <td align="center">=</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´20x</td>
+            <td align="center">˘</td>
+            <td align="center">ˇ</td>
+            <td align="center">˝</td>
+            <td align="center"> ̏</td>
+            <td align="center">†</td>
+            <td align="center">‡</td>
+            <td align="center">‖</td>
+            <td align="center">‰</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´21x</td>
+            <td align="center">•</td>
+            <td align="center">℃</td>
+            <td align="center">$</td>
+            <td align="center">¢</td>
+            <td align="center">ƒ</td>
+            <td align="center">₡</td>
+            <td align="center">₩</td>
+            <td align="center">₦</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´22x</td>
+            <td align="center">G⃒</td>
+            <td align="center">₱</td>
+            <td align="center">₤</td>
+            <td align="center">℞</td>
+            <td align="center">‽</td>
+            <td align="center">⸘</td>
+            <td align="center">₫</td>
+            <td align="center">™</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´23x</td>
+            <td align="center">‱</td>
+            <td align="center">¶</td>
+            <td align="center">฿</td>
+            <td align="center">№</td>
+            <td align="center">⁒</td>
+            <td align="center">℮</td>
+            <td align="center">◦</td>
+            <td align="center">℠</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´24x</td>
+            <td align="center">⁅</td>
+            <td align="center">⁆</td>
+            <td align="center">¢</td>
+            <td align="center">£</td>
+            <td align="center">¤</td>
+            <td align="center">¥</td>
+            <td align="center">¦</td>
+            <td align="center">§</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´25x</td>
+            <td align="center">¨</td>
+            <td align="center">©</td>
+            <td align="center">ª</td>
+            <td align="center"/>
+            <td align="center">¬</td>
+            <td align="center">℗</td>
+            <td align="center">®</td>
+            <td align="center">¯</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´26x</td>
+            <td align="center">°</td>
+            <td align="center">±</td>
+            <td align="center">²</td>
+            <td align="center">³</td>
+            <td align="center">´</td>
+            <td align="center">µ</td>
+            <td align="center">¶</td>
+            <td align="center">·</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´27x</td>
+            <td align="center">※</td>
+            <td align="center">¹</td>
+            <td align="center">º</td>
+            <td align="center">√</td>
+            <td align="center">¼</td>
+            <td align="center">½</td>
+            <td align="center">¾</td>
+            <td align="center">€</td>
+          </tr>
+          <tr>
+            <td align="right" border="r">´30x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´31x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´32x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">×</td>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´33x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´34x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´35x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´36x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center">÷</td>
+            <td align="center"/>
+          </tr>
+          <tr>
+            <td align="right" border="r">´37x</td>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+            <td align="center"/>
+          </tr>
+        </tbody>
+      </tabular>
+    </para>
+  </section>
+</document>

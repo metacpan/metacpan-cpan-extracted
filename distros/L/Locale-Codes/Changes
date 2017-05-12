@@ -1,0 +1,8 @@
+Currently maintained by:
+   Sullivan Beck (sbeck@cpan.org)
+Any suggestions, bug reports, or donations :-) should be sent to me.
+
+3.00  2010-02-10
+  - The ChangeLog has been moved to the Locale::Codes::Changes manual.
+    Please refer to it.
+

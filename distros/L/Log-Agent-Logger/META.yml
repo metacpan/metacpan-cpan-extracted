@@ -1,0 +1,25 @@
+---
+abstract: a logging interface
+author:
+  - 'Mark Rogaski <mrogaski@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Agent-Logger
+provides:
+  Log::Agent::Logger:
+    file: lib/Log/Agent/Logger.pm
+    version: 0.200
+requires:
+  Getargs::Long: 0.103
+  Log::Agent: 0.208
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: 0.200
+x_serialization_backend: YAML version 1.15

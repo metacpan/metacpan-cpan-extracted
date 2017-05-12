@@ -1,0 +1,199 @@
+=encoding utf8
+
+=head1 NAME
+
+List::Prefixed - Prefixed String List
+
+=head1 SYNOPSIS
+
+  use List::Prefixed;
+
+  # construct a new prefixed tree
+  $folded = List::Prefixed->fold(qw( Fu Foo For Form Foot Food Ba Bar Baz ));
+
+  # get all items sharing a common prefix
+  @list = $folded->list('Fo'); # Foo, Food, Foot, For, Form
+
+  # serialize as regular expression
+  $regex = $folded->regex; # '(?:Ba(?:r|z)?|F(?:o(?:o(?:d|t)?|r(?:m)?)|u))'
+
+  # de-serialize from regular expression
+  $unfolded = List::Prefixed->unfold($regex);
+
+=head1 DESCRIPTION
+
+The idea of a I<Prefixed List> comes from regular expressions determining a finite
+list of words, like this:
+
+  /(?:Ba(?:r|z)?|F(?:o(?:o(?:d|t)?|r(?:m)?)|u))/
+  
+The expression above matches exactly these strings:
+
+  "Ba", "Bar", "Baz", "Foo", "Food", "Foot", "For", "Form", "Fu".
+
+Representing a string list that way can have some advantages in certain situations:
+
+=over 4
+
+=item *
+
+The regular expression provides efficient test methods on arbitrary strings
+(e.g. whether or not a string is contained in the list or starts or ends with an element
+from the list).
+
+=item *
+
+The representaion is compressing, depending on how many shared prefixes appear in a list.
+
+=item *
+
+Conversely, a prefixed list can be efficiently set up from such a regular expression.
+Thus, the prefixed list leads to a natural way of serialization and de-serialization.
+
+=item *
+
+Sub lists sharing a common prefix can be extracted efficently from a prefixed list. 
+This leads to an efficient implementation of auto-completion.
+
+=back
+
+For example, from Perl L<package names|https://cpan.metacpan.org/modules/02packages.details.txt>
+indexed on CPAN, one can get a list of about 82K module names that takes more than 2M data.
+We can compress the list to a regular expression of about 900K that matches exactly all these names.
+
+A I<Prefixed List> is a tree consisting of node triples, formally defined as follows:
+
+  node: ( prefix [node-list] opt )
+    where:
+      prefix: String
+      node-list: List of node
+      opt: Boolean
+
+The list elements are the prefix strings, each of them appended to the prefix of the parent node. 
+The C<opt> flag is true if the list of sub nodes is optional, i.e., if the node prefix appended 
+together with the parent prefixes is also contained in the list itself.
+      
+Any string list has a trivial representation that way, if one takes each string as the prefix
+of a node with empty node-list and collects all these nodes into a parent node with empty prefix.
+
+A prefixed tree is called I<folded>, if it's in minimal form, i.e. if there are no two
+child nodes in a parent node sharing a common left part in their prefixes. Obviously, for 
+each string list, there exists a unique folded I<Prefixed Tree> representation.
+      
+=head1 METHODS
+
+=head2 new
+
+  $prefixed = List::Prefixed->new( @list );
+
+This is an alias of the L<fold|/fold> method.
+
+=head2 fold
+
+  $prefixed = List::Prefixed->fold( @list );
+
+Constructs a new folded C<List::Prefixed> tree from the given string list.
+
+=head2 unfold
+
+  $prefixed = List::Prefixed->unfold( $regex );
+
+Constructs a new C<List::Prefixed> tree from a regular expression string.
+The string argument shuld be obtained from the L<regex|/regex> method.
+
+=head2 list
+
+  @list = $prefixed->list;
+  @list = $prefixed->list( $string );
+
+Returns the list of list elements starting with the given string if a string argument
+is present or the whole list otherwise. In scalar context an ARRAY reference is
+returned.
+
+=head2 regex
+
+  $regex = $prefixed->regex;
+
+Returns a minimized regular expression (as string) matching exactly the strings
+the object has been constructed with.
+
+You can control the escaping style of the expression. The default behavior is
+to apply Perl's L<quotemeta|http://perldoc.perl.org/functions/quotemeta.html> function
+and replace any non-ASCII character with C<\x{FFFF}>, where C<FFFF> is the hexadecimal
+character code. This is the Perl-compatible or PCRE style. To obtain an expression
+compatible with Java and the like, use
+
+  use List::Prefixed uc_escape_style => 'Java'; # \uFFFF style
+
+To skip Unicode escaping completely, use
+
+  use List::Prefixed uc_escape_style => undef;  # do not escape
+
+Alternatively, you can control the style at runtime by way of
+L<configuration variables|/"CONFIGURATION VARIABLES">.
+
+=head1 CONFIGURATION VARIABLES
+
+=over 4
+
+=item I<$UC_ESCAPE_STYLE>
+
+Controls the escaping style for Unicode (non-ASCII) characters.
+The value can be one of the following:
+
+=over 4
+
+=item C<'PCRE'>
+
+Default style C<\x{FFFF}>
+
+=item C<'Java'>
+
+Java etc. style C<\uFFFF>
+
+=item C<undef>
+
+Do not escape Unicode characters at all. This may result in shorter expressions
+but may cause encoding issues under some circumstances.
+
+=back
+
+=item I<$REGEX_ESCAPE>, I<$REGEX_UNESCAPE>
+
+By providing string functions one can customize the escaping behavior arbitrarily.
+In this case, C<$UC_ESCAPE_STYLE> has no effect.
+
+=back
+
+=head1 KNOWN BUGS
+
+The term I<prefix> refers to the storage order of characters. That is, prefix
+filtering with right-to-left written Unicode strings (such as Arabic or Hebrew)
+goes to the wrong direction from the user's point of view.
+
+Large lists may cause deep recursion within the L<fold|/fold> method. To avoid a lot of L<Deep recursion on anonymous subroutine|http://perldoc.perl.org/perldiag.html> warnings, there is a
+
+  no warnings 'recursion'
+
+directive in place. This is worth mentioning, though it's not actually a bug.
+
+=head1 EXPORT
+
+Strictly OO, exports nothing.
+
+=head1 REPOSITORY
+
+L<https://github.com/boethin/List-Prefixed>
+
+=head1 AUTHOR
+
+Sebastian Böthin, E<lt>boethin@xn--domain.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Sebastian Böthin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+

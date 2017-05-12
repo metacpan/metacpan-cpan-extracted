@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Dumper::Concise;
+use Lingua::Word::Parser;
+
+my $p = Lingua::Word::Parser->new(
+  word   => shift || 'abioticaly',
+  dbname => shift || 'word_part',
+  dbuser => shift || die(usage()),
+  dbpass => shift || die(usage()),
+#  dbtype => 'mysql', # <- Default
+);
+#warn Dumper $p->{lex};
+
+# Find the known word-part positions.
+my ($known) = $p->knowns;
+#warn Dumper $known;
+my $combos = $p->power;
+#warn Dumper $combos;
+my $score = $p->score;
+#warn Dumper $score;
+warn Dumper $score->{ [ sort keys %$score ]->[-1] };
+
+sub usage {
+    return "perl $0 word dbname dbuser dbpass\n";
+}

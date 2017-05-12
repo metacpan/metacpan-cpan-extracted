@@ -1,0 +1,31 @@
+Lingua::RU::Detect - Heuristics for guessing encoding sequence
+
+/*
+	Description
+*/
+
+Lingua::RU::Detect makes a guess of how the original text was reconverted with a sequence of different encodings.
+
+/*
+	Installation
+*/
+
+perl Makefile.PL
+make
+make test
+make install
+
+/*
+	Author
+*/
+
+Andrew Shitov <andy@shitov.ru>
+
+Please feel free to contact me via e-mail.
+
+/*
+	Copyright
+*/
+
+Lingua::RU::Detect module is a free software. 
+You may redistribute and (or) modify it under the same terms as Perl 5.10.

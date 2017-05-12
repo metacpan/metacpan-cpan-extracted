@@ -1,0 +1,91 @@
+=encoding utf8
+
+=head1 NAME
+
+Log::Report::Win32Locale - unix/windows locales
+
+=head1 INHERITANCE
+
+ Log::Report::Win32Locale
+   is a Exporter
+
+=head1 SYNOPSIS
+
+  # Only usable on Windows
+  print codepage_to_iso(0x0413);   # nl-NL
+  print iso_to_codepage('nl_NL');  # 1043
+  printf "%x", iso_to_codepage('nl_NL');  # 413
+
+  my $iso = iso_locale(ms_codepage_id());
+  my $iso = iso_locale;  # same
+
+  print charset_encoding;          # cp1252
+  print ms_codepage_id;            # 1043
+  print ms_install_codepage_id;    # 1043
+  print ms_locale;                 # Dutch (Netherlands)
+
+=head1 DESCRIPTION
+
+Windows uses different locales to represent languages: codepages. Programs
+which are written with Log::Report however, will contain ISO encoded
+language names; this module translates between them.
+
+The algorithms in this module are based on Win32::Locale and Win32::Codepage.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<charset_encoding>()
+
+Returns the encoding name (usable with module Encode) based on the current
+codepage.  For example, C<cp1252> for iso-8859-1 (latin-1) or C<cp932> for
+Shift-JIS Japanese.  Returns undef if the encoding cannot be identified.
+
+=item B<codepage_to_iso>($codepage)
+
+Translate windows $codepage into ISO code.  The $codepage is numeric
+or a hex string like '0x0304'.
+
+=item B<iso_locale>( [$codepage] )
+
+Returns the ISO string for the Microsoft codepage locale.  Might return
+C<undef>/false.  By default, the actual codepage is used.
+
+=item B<iso_to_codepage>($iso)
+
+Returns the numeric value of the codepage.  The $iso may look like
+this: C<xx_YY>.  Then, first the C<xx_YY> is looked-up.  If that does
+not exist, C<xx> is tried.
+
+=item B<ms_codepage_id>()
+
+Returns the numeric language ID for the current codepage language.
+For example, the numeric value for C<0x0409> for C<en-US>, and C<0x0411>
+for C<ja>.  Returns false if the codepage cannot be identified.
+
+=item B<ms_install_codepage_id>()
+
+Returns the numeric language ID for the installed codepage language.
+This is like L<ms_codepage_id()|Log::Report::Win32Locale/"FUNCTIONS">, but refers to the codepage that was
+the default when Windows was first installed.
+
+=item B<ms_locale>()
+
+Returns the locale setting from the control panel.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Log-Report-Lexicon distribution version 1.06,
+built on September 21, 2016. Website: F<http://perl.overmeer.net/log-report/>
+
+=head1 LICENSE
+
+Copyrights 2007-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

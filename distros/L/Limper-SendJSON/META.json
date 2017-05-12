@@ -1,0 +1,61 @@
+{
+   "abstract" : "adds a send_json function to Limper",
+   "author" : [
+      "Ashley Willis <ashley+perl@gitable.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Limper-SendJSON",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::MaybeXS" : "0",
+            "Limper" : "0.012",
+            "Try::Tiny" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Net::HTTP::Client" : "0.011",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Limper::SendJSON" : {
+         "file" : "lib/Limper/SendJSON.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitable.org/ashley/limper-sendjson.git",
+         "web" : "https://gitable.org/ashley/limper-sendjson.git"
+      }
+   },
+   "version" : "0.003"
+}
+

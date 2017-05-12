@@ -1,0 +1,94 @@
+NAME
+    Lego::Part - Lego part object.
+
+SYNOPSIS
+     use Lego::Part;
+     my $obj = Lego::Part->new;
+     my $color = $obj->color($color);
+     my $design_id = $obj->design_id($design_id);
+     my $element_id = $obj->element_id($element_id);
+
+METHODS
+    *       "new()"
+
+             Constructor.
+             Returns object.
+
+    *       "color([$color])"
+
+             Get or set color.
+             Returns string with color.
+
+    *       "design_id([$design_id])"
+
+             Get or set lego design id.
+             Returns string with design ID.
+
+    *       "element_id([$element_id])"
+
+             Get or set lego element id.
+             Returns string with element ID.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Lego::Part;
+
+     # Object.
+     my $part = Lego::Part->new(
+             'color' => 'red',
+             'design_id' => '3002',
+     );
+
+     # Print color and design ID.
+     print 'Color: '.$part->color."\n";
+     print 'Design ID: '.$part->design_id."\n";
+
+     # Output:
+     # Color: red
+     # Design ID: 3002
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Lego::Part;
+
+     # Object.
+     my $part = Lego::Part->new(
+             'element_id' => '300221',
+     );
+
+     # Print color and design ID.
+     print 'Element ID: '.$part->element_id."\n";
+
+     # Output:
+     # Element ID: 300221
+
+DEPENDENCIES
+    Class::Utils, Error::Pure.
+
+SEE ALSO
+    Task::Lego
+        Install the Lego modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Lego-Part>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2013-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.03
+

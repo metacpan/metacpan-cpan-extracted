@@ -1,0 +1,25 @@
+test = "0000FF"
+problem = "FF0000"
+treatment = "00FF00"
+frequency = "FF0000"
+dosage = "DD0000"
+Terms = "BB0000"
+pre-possible = "00FF00"
+pre-absent = "00DD00"
+DOSE = "990000"
+pre-hypothetical = "00BB00"
+# frequency = FFCBDB
+# dosage = FFCBDB
+# Terms: FFCBDB
+# DOSE = FFCBDB
+# pre-hypothetical = FFCBDB
+# pre-possible = FFCBDB
+# pre-absent = FFCBDB
+
+limitation = red
+uncertainty = green
+approximation = blue
+negation = darkblue
+experience = orange
+discovery = purple
+abnormality = yellow

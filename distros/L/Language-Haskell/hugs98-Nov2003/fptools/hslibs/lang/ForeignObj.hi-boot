@@ -1,0 +1,7 @@
+module ForeignObj where
+
+data ForeignObj
+
+writeForeignObjOffAddr :: Addr.Addr -> GHC.Base.Int -> ForeignObj
+	-> GHC.IOBase.IO ()
+

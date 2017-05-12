@@ -1,0 +1,13 @@
+Changes
+lib/Lingua/EN/Numbers.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/01_about_verbose.t
+t/02_about_env.t
+t/20_main_integers.t
+t/30_v1_tests.t
+t/31_rogue_comma.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

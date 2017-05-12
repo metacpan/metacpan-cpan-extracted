@@ -1,0 +1,12 @@
+Revision history for Linux-Proc-Maps.
+
+0.002     2016-11-27 22:03:31-07:00 MST7MDT
+
+  * Require at least perl 5.8.0; it may work on earlier perls, but I don't
+    want to support it.
+  * Document the possibility of integer overloading
+
+0.001     2016-11-25 22:53:07-07:00 MST7MDT
+
+  * Initial release
+

@@ -1,0 +1,79 @@
+Revision history for Log-Unrotate
+
+1.32    Wed Jul 17, 2013
+        * do not write same position to pos history
+
+1.31    Thu Jun 06, 2013
+        * fix perldoc syntax (fix tests)
+
+1.30    Wed Jun 05, 2013
+        * improve perldocs
+
+1.29    Tue May 07, 2013
+        * speed up read() by 30% by inlining the $getline->() call
+
+1.28    Tue May 15, 2012
+        * autofix pos-files using rollback
+        * fix problem with pos-file parsing regexps
+        * cursor tests
+
+1.27    Mon Apr 09, 2012
+        * don't fail when log is empty and start => 'end'
+        * read returns undef in the list context
+
+1.26    Wed Feb 29, 2012
+        * ignore all incomplete lines in rotated logs
+        * fix missing logs handling
+
+1.25    Thu Jun 03, 2010
+        * log_number() and log_name() methods
+        * -i mode in unrotate script
+
+1.24    Fri May 21, 2010
+        * using Dist::Zilla
+
+1.23    Wed Apr 28, 2010
+        * Test::NoWarnings in build_requires
+
+1.22    Tue Apr 27, 2010
+        * one more bugfix, lag() could hang too
+
+1.21    Tue Apr 27, 2010
+        * bugfix: _find_log could hang forever because of negative
+          LogNumber values
+        * MANIFEST updated
+
+1.20    Mon Apr 26, 2010
+        * position persistence logic moved to separate Cursor::* classes
+        * 'autofix_cursor' option implemented
+        * support for 'filter' option removed
+
+1.10    Fri Apr 23, 2010
+        * end => 'future' moves to subsequent logs.
+        * In some cases, reading old logs when logrotate happened, could
+        result in skipping logfile
+
+1.06    Thu Apr 22, 2010
+        Build using Module::Build
+
+1.05    Tue Nov 3, 2009
+        Throw exception and don't break pos file when trying to commit with
+        full disk.
+
+1.04    Tue Nov 3, 2009
+        Set 644 permissions on pos file.
+
+1.03    Thu Oct 1, 2009
+        Old tests removed, new tests fixed
+
+1.02    Tue Sep 15, 2009
+        * Skipping correct test on Solaris
+        * Require at least 5.8 perl to run
+
+1.01    Mon Sep 14, 2009
+        * Fixing (skipping, mostly) tests on solaris and windows
+        * Testing coverage increased to 93.6 percents
+
+1.00    Wed Sep 9, 2009
+        First opensource release.
+

@@ -1,0 +1,47 @@
+{
+   "abstract" : "Titlecase English words by traditional editorial rules.",
+   "author" : [
+      "Ashley Pond V  C<< <ashley@cpan.org> >>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-EN-Titlecase",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Fast" : "0",
+            "ExtUtils::MakeMaker" : "6.62",
+            "HTML::TokeParser" : "2",
+            "List::Util" : "0",
+            "Test::More" : "0",
+            "parent" : "0.2"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.15"
+}

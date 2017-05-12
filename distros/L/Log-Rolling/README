@@ -1,0 +1,60 @@
+Log-Rolling
+
+Log::Rolling is a module designed to give programs lightweight, yet
+powerful logging facilities.  One of the primary benefits is that, while the
+logs I<can> be infinitely long and handled by something like C<logrotate>,
+the module is capable of limiting the number of lines in the log in a fashion
+where by the oldest lines roll off to keep the size constant at the maximum
+allowed size, if so tuned.
+
+This module is particularly useful when you need to keep logs around for a 
+certain amount of available data, but do not need to incur the complexity
+and overhead of using something as heavy as C<logrotate> or other methods
+of archiving.  Since the rolling is built into the logging facility, no
+extra cron jobs or the like are necessary.
+
+Data is buffered throughout the run of a program with each call to C<entry()>.
+Once C<commit()> is called, that buffer is written to the log file, and the
+log buffer is cleared.  The C<commit()> method may be called as many times as
+necessary; however, it is best to do so as few times as required due to the
+overhead of file operations involved in rolling the log--hence the reason the
+entries are stored in memory until manually committed in the first place.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Log::Rolling
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Rolling
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Log-Rolling
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Log-Rolling
+
+    Search CPAN
+        http://search.cpan.org/dist/Log-Rolling/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2009 Mark Luljak
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

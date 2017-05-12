@@ -1,0 +1,19 @@
+PerlIO/via/PinyinConvert version 0.01
+=====================================
+
+PerlIO layer for Lingua::ZH::PinyinConvert
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 xern <xern@cpan.org>
+
+This module is free software; you can redistribute it or modify it under the same terms as Perl itself.

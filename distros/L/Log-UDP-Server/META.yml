@@ -1,0 +1,27 @@
+---
+abstract: 'A simple way to receive and handle structured messages via UDP'
+author:
+  - 'Robin Smidsrød <robin@smidsrod.no>'
+build_requires:
+  English: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-UDP-Server
+recommends:
+  Readonly::XS: 0
+requires:
+  Data::Serializable: 0.40.0
+  IO::Socket::INET: 0
+  MooseX::POE: 0
+  Readonly: 0
+  perl: 5.006
+resources:
+  repository: git://github.com/robinsmidsrod/Log-UDP-Server.git
+version: 0.40.0

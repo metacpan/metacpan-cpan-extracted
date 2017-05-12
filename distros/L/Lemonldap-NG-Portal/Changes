@@ -1,0 +1,150 @@
+Revision history for Perl extension Lemonldap::NG::Portal.
+
+See http://jira.ow2.org/browse/LEMONLDAP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel&allVersions=true
+for newer revisions
+
+0.88  Mon jun 29 12:00:15 2009
+	- New auth and userDB modules : Multi, Remote, Null (userDB only)
+	- New module system for passwords
+	- Notification system
+	- Pre-compilation in Apache's configuration files
+	- Double session mechanism (1 secured and the other not)
+
+0.87  Sun feb 8 8:05:02 2009
+	- ldap+tls was broken
+	- fix security problem when running on Apache with thread support:
+	  setMacros and setGroups were not launched with the good datas
+	- fix XSS filter that rejected URL with a port
+
+0.86  Thu dec 25 8:55:41 2008
+	- New Menu module
+	  * Password management
+	  * Dynamic links
+	- New pastel skin
+	- Configuration managed by Lemonldap::NG::Common::Conf
+	- UserDB system : LDAP is not needed now
+	- Custom functions
+	- SOAP functions
+
+0.85  Mon aug 25 22:07:54 2008
+	- CSS for the portal
+	- Little bug in CDA
+
+0.83  Sat May 24 17:24:23 2008
+	- Integration in Handler status system
+	- Romanian translation
+	- New auth architecture
+	- ENV variables are now available using exportedValue (can be used to
+	  send SSL variables to the remote application)
+
+0.82  Mon Apr 7 15:01:02 2008
+	- 2 Net::LDAP password policy controls in the portal:
+	  * account locked
+	  * password expired
+
+0.81  Wed Feb 8 17:44:46 2008
+	- Ldap groups can now be available in $groups
+	- Bug in AuthSSL
+
+0.8   Mon Oct 15 7:58:25 2007
+	- Integration of the Liberty Alliance module issued from FederID project
+
+0.77  Mon Jul 30 21:27:08 2007
+	- Little bug fix in javascript
+	- DBI::ping is now called each time to avoid timeout
+
+0.76  Sat Jul 21 15:21:57 2007
+	- LDAP+TLS support (thanks to Baptiste Grenier)
+	- New logout system: URL can now be declared in Manager interface
+
+0.75  Tue Jul 3 20:42:09 2007
+	- Security fix: authentication could be replayed with another uid
+
+0.741 Tue Jul 3 7:21:16 2007
+	- Little bug in redirect sub
+
+0.74  Mon May 14 7:04:48 2007
+	- Multiple ldap servers can be used
+	- CDA optimization
+
+0.73  Fri Apr 20 8:48:06 2007
+	- Bug fix in test (AuthCAS failed)
+
+0.72  Sat Apr 14 22:35:45 2007
+	- Bug fix in authentication other than 'ldap'
+	- More tests
+
+0.71  Sun Apr 1 22:20:41 2007
+	- New authentication scheme: AuthApache.pm
+
+0.7   Thu Mar 22 23:00:34 2007
+	- $startTime variable
+	- Liberty Alliance service provider Skeleton
+
+0.65  Wed Mar 15 7:38:40 2007
+	- New feature: single logout
+	- bug corrections:
+	  * existingSessions was never called
+	  * Typo in Portal/CDA.pm
+	  * Multi-valued attributes in HTTP headers (Closes: #306792 /
+	    forge.objectweb.org)
+
+0.64  Fri Mar 9 17:49:44 2007
+	- Delete of DBI.pm which is no more in use
+
+0.63  Thu Feb 2 20:44:43 2007
+	- Adding CAS authentication compatibility system
+	- New i18n system for errors
+
+0.62  Wed Feb 28 23:22:14 2007
+	- Adding cross-domain-authentication mechanism
+	- local configuration overrides global configuration
+
+0.61  Sun Feb 11 9:10:12 2007
+	- Existing sessions are now checked
+
+0.6   Sat Jan 6 20:17:15 2007
+	- Use Safe->reval instead of eval
+	- Perl expressions in 'groups' has not to be enclosed in {} if no LDAP
+	  filter is used
+	- Corrections in documentation
+
+0.5   Tue Dec 19 19:11:15 2006
+	- config is now shared with Lemonldap::NG::Manager::Conf
+	
+0.42  Thu Dec 7 12:23:52 2006
+	- remove html code written after redirection because of a Firefox-2 bug
+	- move Portal.pod to Portal.pm because CPAN does not index correctly
+	  pod documents
+
+0.41  Fri Nov 3 8:19:36 2006
+	- Correction in documentation
+	- rename AuthSsl.pm to AuthSSL.pm
+
+0.4   Thu Nov 2 16:00:25 2006
+	- New documentation
+	- Portal.pm becomes Portal/Simple.pm
+
+0.3   Mon Oct 30 22:45:15 2006
+	- SharedConf.pm : all parameters are stored in the database
+
+0.2   Tue Oct 17 15:55:32 2006
+	- Little correction since CGI.pm has change
+	- First release running with Apache2
+
+0.111 Sat Oct 14 16:09:25 2006
+	- error in pod
+
+0.11  Sat Oct 14 15:20:45 2006
+	- (little) bug corrections
+
+0.1   Sat Oct 7 22:21:56 2006
+	- bug corrections
+
+0.02  Fri Jul 1 21.45.00 2005
+	- bug corrections
+
+0.01  Tue Jun 21 11:14:00 2005
+	- original version; created by h2xs 1.23 with options
+		-AXn Lemonldap::NG::Portal
+

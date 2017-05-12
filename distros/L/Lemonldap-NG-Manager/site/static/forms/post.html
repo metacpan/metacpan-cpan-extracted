@@ -1,0 +1,53 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title" trspan="formReplay"></h3>
+  </div>
+  <table class="table">
+    <tr>
+      <th><span trspan="postUrl"></span></th>
+      <td colspan="2"><input id="pi1" class="form-control" ng-model="currentNode.title"/></td>
+    </tr>
+    <tr>
+      <th><span trspan="postTargetUrl"></span></th>
+      <td colspan="2"><input id="pi2" class="form-control" ng-model="currentNode.data.target"/></td>
+    </tr>
+    <tr>
+      <th><span trspan="jqueryUrl"></span></th>
+      <td colspan="2"><input id="pi3" class="form-control" ng-model="currentNode.data.jqueryUrl"/></td>
+    </tr>
+    <tr>
+      <th><span trspan="jqueryFormSelector"></span></th>
+      <td colspan="2"><input id="pi4" class="form-control" ng-model="currentNode.data.formSelector"/></td>
+    </tr>
+    <tr>
+      <th><span trspan="jqueryButtonSelector"></span></th>
+      <td colspan="2"><input id="pi5" class="form-control" ng-model="currentNode.data.buttonSelector"/></td>
+    </tr>
+    <tr>
+      <th colspan="3">
+        <span trspan="postedVars"></span>
+        <span ng-if="!currentNode.data.vars.length" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newPostVar'})"/>
+      </th>
+    </tr>
+    <tr ng-repeat="v in currentNode.data.vars">
+      <td><input class="form-control" ng-model="v[0]"/></td>
+      <td><input class="form-control" ng-model="v[1]"/></td>
+      <td>
+        <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.data.vars,$index)"/>
+        <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newPostVar'})"/>
+      </td>
+    </tr>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "title": "newPost",
+  "icon": "plus-sign"
+},{
+  "title": "newPostVar",
+  "icon": "plus-sign"
+},{
+  "title": "deleteEntry",
+  "icon": "minus-sign"
+}]
+</script>

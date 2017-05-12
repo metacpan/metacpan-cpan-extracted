@@ -1,0 +1,9 @@
+ChangeLog
+lib/LWP/UserAgent/ExponentialBackoff.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00_compile.t
+t/10_exponentialbackoff_test.t
+META.yml                                 Module meta-data (added by MakeMaker)

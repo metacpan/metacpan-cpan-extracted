@@ -1,0 +1,43 @@
+#include "config.h"
+
+Package {
+        name           = "base",
+	auto	       = True,
+#ifdef INSTALLING
+	import_dirs    = [ "$libdir/imports" ],
+#else
+	import_dirs    = [ "$libdir/libraries/base" ],
+#endif
+        source_dirs    = [],
+#ifdef INSTALLING
+        library_dirs   = [ "$libdir" ],
+#else
+        library_dirs   = [ "$libdir/libraries/base"
+                         , "$libdir/libraries/base/cbits" ],
+#endif
+        hs_libraries      =
+#                           if !defined(mingw32_TARGET_OS) && !defined(cygwin32_TARGET_OS)
+                            [ "HSbase" ],
+#                           else
+                            /* This splitting is the subject of a totally 
+                               horrible hack, which glues HSbase{1,2,3}
+                               back into HSbaase for the purposes of static linking.
+                               See DriverState.getPackageLibraries for details. */
+                            [ "HSbase1", "HSbase2", "HSbase3" ],
+#                           endif
+	extra_libraries   = [ "HSbase_cbits"
+#if defined(mingw32_TARGET_OS) || defined(__MINGW32__) || defined(_MSC_VER)
+                            , "wsock32", "msvcrt", "kernel32", "user32"
+#endif
+			    ],
+#ifdef INSTALLING
+        include_dirs   = [],
+#else
+        include_dirs   = [ "$libdir/libraries/base/include" ],
+#endif
+        c_includes     = [ "HsBase.h" ],
+        package_deps   = [ "rts" ],
+        extra_ghc_opts = [],
+        extra_cc_opts  = [],
+        extra_ld_opts  = []
+}

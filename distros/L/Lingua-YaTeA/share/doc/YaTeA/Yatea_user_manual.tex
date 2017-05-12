@@ -1,0 +1,682 @@
+% Author:  Jaakko Löfström 10/1/2005
+% mods by Wray
+
+% note we have pretty much forced document style "article" and pagination details
+% on you, add your EPSF support here or whatever
+
+% note we have no place for confidentiality considerations, so please
+% place this in bold in your abstract too
+\documentclass[a4paper]{article}
+%\usepackage{alvis}
+\usepackage{listings}
+\usepackage{moreverb}
+\usepackage{listings}
+\usepackage{graphicx}
+
+\title{\YaTeA\\User manual}
+\author{Sophie Aubin, Thierry Hamon}
+\lstset{language=XML}
+\lstset{basicstyle=\footnotesize, }
+
+   \def\YaTeA{{\rmfamily Y\kern-.36em%
+    \lower.7ex\hbox{A}\kern-.25em%
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.08emA}~}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+\label{Introduction}
+
+
+\YaTeA  aims at identifying and extracting phrases
+which are potential terms ({\em i.e. } term candidates). Moreover each
+term candidate is syntactically analysed in order to identify head and
+modifier components. 
+
+Data used for the identification and syntactic analysis of the term
+candidates are provided. They can be modified by
+the user. New data can also be defined by the user. 
+
+Different kinds of outputs are offered, among which, 
+\begin{itemize}
+\item a list of term candidates in a XML format,
+\item an XML annotation of the corpus with either testified terms or
+  term candidates in a format compatible with the biolg version of
+  the Link Grammar Parser,
+\item a list of term candidates in text format
+\item the HTML visualisation of term candidates and non extracted phrases
+  marked in the corpus 
+\end{itemize}
+
+
+\YaTeA takes a corpus in the TreeTagger format as an input.
+
+
+
+\section{Running \YaTeA}
+\label{RunningYatea}
+
+
+The term extractor can be run according to a command line:
+
+\sloppy
+\texttt{perl yatea.pl file\_in.ttg -language \textit{language-code} [-rcfile
+  \textit{configuration-file}] [-termino  \textit{file}] [-match-type \textit{loose} or \textit{strict}]
+  [output-style-options]
+  % [-MNPhtml] [-printChunking] %[-compareChunking
+                                %\textit{file}] 
+  %[-xmlout] [-suffix] %[-correction] [-annotate] 
+  %[-TTforLGP] [-TCforLGP] [termList] %[basicTerms]
+  }
+
+
+\texttt{file\_in.ttg} is the input corpus in the TreeTagger format.
+\texttt{[output-style-options]} can be chosen among the options
+described below. Several can be specified. 
+
+\textbf{Options} : 
+\begin{itemize}
+\item \texttt{-help} : displays the message about command line and
+  options
+
+\item \texttt{-language} \textit{langue-code} : (mandatory) definition of the
+  corpus language (\texttt{EN} for English, \texttt{FR} for
+  French). This information allows the selection of the right configuration files.
+
+\item \texttt{-rcfile} : (optional) specification of a particular
+  configuration file containing pathes to repositories containing
+  linguistic data files. 
+
+\item \texttt{-suffix} : (optional) specification of a name for the current version of the analysis. results are gathered in a specific directory of this name and result files also carry this suffix. 
+
+\item \texttt{-monolexical-all} : all the occurrences of monolexical
+  phrases are considered as term candidate occurrences
+
+\item \texttt{-monolexical-included} : occurrences of monolexical term
+  candidates that appear in complex term candidates are also
+  considered as term candidate occurrences
+
+\item \texttt{-termino} \textit{filename}: (optional) name of a file
+  containing testified terms (in the TreeTagger format)
+
+\item \texttt{-match-type} \textit{loose} or \textit{strict} : affects
+  the matching of testified terms in the corpus; with \textit{loose},
+  testified terms match either inflected or lemmatized forms of each
+  word; with \textit{strict}, testified terms match the combination of
+  inflected form and PoS tag of each word; by default, testified terms match match inflected forms of words
+
+% \item \texttt{-correction}: (optional) allows the correction of PoS or
+%   lemma information of the MNPs according to the testified terms provided.
+\end{itemize}
+
+
+\textbf{Options for result display} : 
+\begin{itemize}
+
+\item \texttt{-termList}: (optional) displays a list of terms and
+  sub-terms along with their frequency in a text file. To extract only term candidates containing more than one word (multi-word term candidates), specify the option \"multi\". By default, all term candidates will be extracted, monolexical and multi-word term candidates
+
+% \item \texttt{-basicTerms}: (optional) displays the list of basic term candidates (every pairs of words in a Head-Modifier relationship)
+
+
+% \item \texttt{-MNPhtml}: (optional) displays \index{display} of the
+%   corpus marked with MNPs in a HTML file. Information on
+%   \begin{itemize}
+%   \item the lexical form of each MNP;
+%   \item the potential islands of reliability (exogenous and
+%   indogenous) identified in the MNP;
+% \item its parsing status (parsed or
+%   not, parsing method applied)
+% \item the potential corrections made
+%   on the lexical information using the testified terms
+%   \end{itemize}
+%   can be seen by clicking on each occurrence of an MNP marked in the corpus. 
+
+
+\item \texttt{-xmlout}: (optional) displays the term 
+  candidates in XML formatµ. Term candidates are linked to each others
+  in a syntactic network.
+
+\item \texttt{-printChunking}: (optional) displays \index{display} of the
+  corpus marked with extracted (\textit{i.e.} term candidates) and rejected phrases in a HTML file
+
+% \item \texttt{-compareChunking} \textit{filename}: comparison of the chunking (MNP
+%   identification) of a first version of the current analysed corpus (the option
+%   -printChunking was specified when analysing the first corpus, here
+%   specified as \textit{filename}: CORPUS\_Chunking\_corpus.html)
+
+% \item \texttt{-heads}: (optional) selects the display of the terms where the 
+%   syntactic head is marked
+%   (see section \ref{sec:term-head-format}) \index{tete syntaxique\@tête syntaxique}.
+
+\item \texttt{-TT-for-BioLG} : annotation of the corpus with testified
+  terms in a XML format compatible with the "biolg" version of the
+  Link Grammar Parser
+\item \texttt{-XML-corpus-for-BioLG} : creation of a BioLG compatible
+  XML version of the corpus with PoS tags marked form each word
+\item \texttt{-annotate-only} : only annotate testified terms (no acquisition)
+
+\item \texttt{-TC-for-BioLG} : annotation of the corpus with term candidates in a XML format compatible with the "BioLG" version of the Link Grammar Parser
+
+\item  \texttt{-TTG-style-term-candidates} : term candidates are displayed in TreeTagger output format. Term separator is the sentence boundary tag \"SENT\". To extract only term candidates containing more than one word (multi-word term candidates), specify the option \"multi\". By default, all term candidates will be extracted, monolexical and multi-word term candidates
+
+\end{itemize}  
+
+
+\subsection{File Hierarchy}
+
+The package provides several directories and files. Configuration
+files are use to define specific features for each language. 
+
+\begin{itemize}
+\item \verb+yatea+: main program
+  % \item \verb+CORPUS+: répertoire de corpora (fichiers entrée) 
+  %   \begin{itemize}
+  %   \item \verb+LANG+: directory containing the répertoire contenant les corpora pour une langue donnée
+  %   \end{itemize}
+\item \verb+/share/YaTeA/config/+: directory containing the linguistic resources
+  required for the term extraction and analysis. The resources are
+  distributed according to the language (LANG).
+  \begin{itemize}
+  \item \verb+LANG+: directory including the resources for a given
+    language (for instance : EN for English) . % We propose to use
+    % the acronym defined in the norm ISO 3166 (related to the country code).
+    \begin{itemize}
+    \item \verb+TagSet+: the file contains the definition of the
+      different classes of tags or inflected forms: \texttt{CANDIDATES},
+      \texttt{DETERMINERS}, \texttt{PREPOSITIONS} and \texttt{COORDINATIONS}, used in the Parsing Patterns
+    \item \verb+ChunkingExceptions+: the file provides the set
+      of exceptions items regarding the chunking of the corpus into maximal
+      noun phrases. Items can be PoS tags or words in their inflected
+      or lemmatized form. 
+    \item \verb+ChunkingFrontiers+: the file provides the set
+      of items used as frontiers to the chunking of the corpus into maximal
+      noun phrases. Items can be PoS tags or words in their inflected
+      or lemmatized form. 
+    \item \verb+CleaningFrontiers+: the file provides the
+      set of items which cannot be used as frontiers of the maximal noun
+      phrases. Items can be PoS tags or words in their inflected
+      or lemmatized form.
+    \item \verb+CleaningExceptions+: the file provides the set
+      of exceptions items regarding the pruning of phrases.
+    \item \verb+ForbiddenStructures+: the file contains
+      structures that cannot appear in the noun phrases. Structures
+      can mix PoS tags or words in their inflected or lemmatized form.
+    \item \verb+Options+: options relating to linguistic processing
+   % \item \verb+MiscellanousOptions+: other options
+    \item \verb+ParsingPatterns+: the file contains the
+      patterns defined to analyse the noun phrases.
+    \end{itemize}
+  \end{itemize}
+  % \item \verb+TOOLS+ : répertoire d'outils de segmentation et de nettoyage des textes
+% \item \verb+RESULTS+ : this directory contains the results of the term
+%   extraction and analysis.
+%   \begin{itemize}
+%   \item \verb+LANG+: this directory is named according to the working
+%     corpus language provided in command line (\textit{e.g.} \verb+EN+).
+%     \begin{itemize}
+%     \item \verb+CORPUS+ or \verb+CORPUS/SUFFIX+: a directory is
+%       created for each analysed corpus. The directory name is the name
+%       of the corpus minus its path and extension. If a suffix is
+%       provided in command line, a sub-directory is created to store the
+%       results of the current version of the corpus analysis. Results
+%       are further organized according to the format (\textit{i.e.} extension) of the files:
+%         \begin{itemize}
+%         \item \verb+raw+: contains files in text format (or any other)
+%         \item \verb+html+: contains files in HTML format
+%         \item \verb+xml+: contains files in XML format
+%         \end{itemize}
+%       \end{itemize}
+%     % Currently, this directory contains the following files (where
+% %     \verb+<CORPUS>+ is the basename of the corpus without the final
+% %     extension):
+% %     \begin{itemize}
+% %     \item \verb+<CORPUS>_MaximalNounPhrases_TYPE.txt+: list of the maximal
+% %       noun phrases. TYPE is the type of information requested by the
+% %       user in the command line option \texttt{-mnp}.
+
+% %     \item \verb+<CORPUS>_UnparsedMNP.txt+: list of the noun phrases
+% %       that could not be parsed.
+
+% %     \item \verb+<CORPUS>_ParsedTerms.txt+: list of the parsed
+% %       noun phrases.
+
+% %     \end{itemize}
+
+%   \end{itemize}
+\item \verb+????+ : this directory contains the documentation for the
+  term extractor \YaTeA. 
+   \begin{itemize}
+  %  \item \verb+DeliverableD6.3.pdf+: Description of the architecture
+%      and implementation of \YaTeA. 
+   \item \verb+Yatea_user_manual.pdf+: this document
+     \item \verb+Penn-Treebank-English-Tagset.ps+: description of the
+       tagset for English data 
+     \item \verb+french-TreeTagger-tagset.html+: description of the
+       tagset for French data 
+   \end{itemize}
+\end{itemize}
+
+
+\section{Input formats}
+\label{sec:input-format}
+
+\subsection{Corpus}
+
+As an input, the term extractor requires a corpus which has been
+segmented in words and sentences, lemmatized and tagged with
+part-of-speech (PoS)
+information. Currently, the prototype takes as input the TreeTagger
+ouput format. Information relating to a word is recorded in a
+line. Each line contains three fields separated by a tabulation:
+the inflected form, the PoS tag, and the lemma (see sample in 
+Figure \ref{corpus}). If the lemma of the word appears as
+$<$unknown$>$, its inflected form is used as a lemma.
+
+
+\begin{figure}
+\begin{verbatim}
+However         RB      however
+,               ,       ,
+the             DT      the
+concentration   NN      concentration
+of              IN      of
+protein         NN      protein
+p6              NN      <unknown>
+appeared        VVD     appear
+to              TO      to
+be              VB      be
+important       JJ      important
+for             IN      for
+repression      NN      repression
+of              IN      of
+the             DT      the
+early           JJ      early
+promoter        NN      promoter
+C2              NN      <unknown>
+.               SENT    .
+\end{verbatim}
+  \caption{Sample of the input format}\label{corpus}
+\end{figure}
+
+\subsection{Resources}\label{ress}
+
+The term extractor requires additional resources (chunking frontiers,
+extraction patterns, \emph{etc}.) to process the input corpus. The directory
+\texttt{/share/YaTeA/config/}\textit{LANG} contains the resources for a given
+language, where \textit{LANG} is declared as an option in the
+command line. % Each file
+% related to a resource has the suffix \texttt{\_}\textit{LANG}. For
+% instance, to process an English corpus, the language option is
+% \texttt{-lang EN}. In that respect, the term extractor uses the resources
+% in the directory \texttt{DATA/EN}, where each file ends with
+% \texttt{\_EN} (\texttt{ParsingPatterns\_EN}).
+
+The resources are provided as described below.
+
+\subsubsection{TagSet}
+\label{sec:tagset}
+\texttt{TagSet} contains the definition for the tags allowing the
+phrases to be parsed. It must conform to the following format (see
+sample in Figure \ref{fig:tagset}):
+ \begin{itemize}
+  \item the comments start with the character \verb+#+.
+  \item four kinds of tags are declared: ``CANDIDATES'',
+    ``DETERMINERS'', ``PREPOSITIONS'' and  ``COORDINATIONS'' which
+    list the tags (or inflected forms for prepositions) for
+    respectively content  words, determiners, prepositions and coordination words. The line starts and ends with the characters
+    \texttt{!!}. The tags are defined as regular expressions. Note
+    that the ``coordination'' tags are not used in the current version
+    of the package.
+ \end{itemize}
+\begin{figure}[!ht]
+\begin{verbatim}
+# Tags and words allowed in the parsing of the phrases
+!!CANDIDATES = ((JJS)|(JJR)|(JJ)|(NNS)|(NN)|(NP)|(CD)|(VBG)|(FW)|(NPS))!!
+!!DETERMINERS = ((DT))!!
+!!PREPOSITIONS = ((of)|(to))!!
+!!COORDINATIONS = ((CC))!!
+\end{verbatim}
+  
+  \caption{Sample of the tagset definition file}\label{fig:tagset}
+\end{figure}
+  
+
+\subsubsection{ParsingPatterns}
+\label{sec:parsingpatterns}
+\texttt{ParsingPatterns} contains the definition for the parsing
+patterns used to parse phrases identified during the chunking step. It must conform to the following
+  format (see sample in Figure \ref{fig:patterns}):
+  
+
+  \begin{itemize}
+  \item the comments start with the character \verb+#+.
+    
+  
+  \item the syntactic patterns are defined in a line with 3 fields
+    separated by a tabulation. The first field describes the syntactic
+    analysis of the matching term (\texttt{H} a head component of the
+    term, and \texttt{M} for a modifier component). The two remaining fields
+    give the priority of the pattern (integer) and the analysis
+    direction (LEFT or RIGHT).
+    The position of the most global head in the pattern determines the direction. 
+    
+  \end{itemize}
+  \begin{figure}[!ht]
+\begin{verbatim}
+#Pattern                            Priority   Direction
+( JJR<=M> NNS<=H> )                     1       RIGHT
+( JJ<=M> ( JJ<=M> NNS<=H> )<=H> )       1       RIGHT
+( NN<=H> of NNS<=M> )                   1       LEFT
+( NN<=H> to DT NN<=M> )                 1       LEFT
+\end{verbatim}
+
+    \caption{Sample of the parsing pattern definition file}\label{fig:patterns}
+  \end{figure}
+  
+
+  \subsubsection{ChunkingFrontiers}
+  \label{sec:chunkingfrontiers}
+
+  
+ \texttt{ChunkingFrontiers} contains the declaration of the
+ external frontiers of the chunk, \textit{i.e.} tags or words that
+ cannot appear in a term (\textit{e.g.} verbs). They are used to chunk the corpus and identify the
+  maximal phrases. The required format is given below:
+
+  \begin{itemize}
+  \item the comments start with the character \verb+#+.
+
+  \item each line describes a chunking frontier according to two fields:
+    the information which will be used as a frontier (inflected form --
+    \texttt{IF}, part-of-speech tag -- \texttt{POS}, or lemma --
+    \texttt{LF}), and the value of the frontier (see the example in 
+    Figure \ref{fig:chunkingfrontiers}).
+    \begin{figure}[!ht]
+\begin{verbatim}
+# Type  Value
+POS     VB
+POS     VV
+POS     VBD
+POS     IN
+\end{verbatim}
+      \caption{Sample of the chunking frontier file.}\label{fig:chunkingfrontiers}
+    \end{figure}
+
+  \end{itemize}
+
+
+  \subsubsection{ChunkingExceptions}
+  \label{sec:chunkingexceptions}
+
+  
+ \texttt{ChunkingExceptions} contains the declaration of the frontier exceptions.  They are used to prevent the corpus from being 
+  chunked in some specific cases. The format is given below:
+
+  \begin{itemize}
+  \item the comments start with the character \verb+#+.
+
+  \item each line describes a frontier exception according to two fields:
+    the information which will be used as an exception (inflected form --
+    \texttt{IF}, part-of-speech tag -- \texttt{POS}, or lemma --
+    \texttt{LF}), and the value of the exception (see the example in
+    figure \ref{fig:chunkingexceptions} where the inflected form ``of'' is an
+    exception of the frontier tag ``IN'' declared in the file of chunking
+    frontiers).
+    \begin{figure}[!ht]
+\begin{verbatim}
+# Type of the element   Value of the element
+IF     of
+\end{verbatim}
+      \caption{Sample of the exception frontier file}\label{fig:chunkingexceptions}
+    \end{figure}
+
+  \end{itemize}
+
+
+  \subsubsection{CleaningFrontiers}
+  \label{sec:cleaningfrontiers}
+
+  
+ \texttt{CleaningFrontiers} contains the declaration of the cleaning
+  frontiers. They are used to improve the chunking
+  by removing words (like determiners) that cannot appear in a start
+  or final position of a term. 
+  % 
+  The file contains the list of the elements (words, tags, or lemma) that
+  are allowed to start or end a maximal noun phrase. 
+
+The format is given below:
+
+  \begin{itemize}
+  \item the comments start with the character \verb+#+.
+
+  \item each line describes a cleaning frontier according to two fields:
+    the information which will be used as a frontier (inflected form --
+    \texttt{IF}, part-of-speech tag -- \texttt{POS}, or lemma --
+    \texttt{LF}), and the value of the frontier (see the example in
+    Figure \ref{fig:cleaningFrontiers}).
+    \begin{figure}[!ht]
+\begin{verbatim}
+# Type  Value
+POS     NN
+POS     NNS
+POS     NP
+\end{verbatim}
+      \caption{Sample of the cleaning frontier file}\label{fig:cleaningFrontiers}
+    \end{figure}
+
+  \end{itemize}
+
+ \texttt{CleaningExceptions} contains the declaration of the cleaning
+ exceptions.  They are used to prevent from the presence of specific
+ words for which the PoS tag would be allowed on the borders of a phrase. The format is given below:
+
+  \begin{itemize}
+  \item the comments start with the character \verb+#+.
+
+  \item each line describes a frontier exception according to two fields:
+    the information which will be used as an exception (inflected form --
+    \texttt{IF}, part-of-speech tag -- \texttt{POS}, or lemma --
+    \texttt{LF}), and the value of the exception (see the example in
+    figure \ref{fig:cleaningexceptions} where the inflected form ``of'' is an
+    exception of the frontier tag ``IN'' declared in the file of chunking
+    frontiers).
+    \begin{figure}[!ht]
+\begin{verbatim}
+# Type   Value
+IF     several
+\end{verbatim}
+      \caption{Sample of the cleaning exception file}\label{fig:cleaningexceptions}
+    \end{figure}
+
+  \end{itemize}
+
+  \subsubsection{ForbiddenStructures}
+  \label{sec:forbiddenstructures}
+
+   \texttt{ForbiddenStructures} contains the declaration of the forbidden structures. They describe the word/tag sequences that cannot appear in a term. For instance, in ``\textit{in
+    which \textbf{case the timers}}'', the noun phrase ``\textit{case the timers}'' has the
+  PoS form \texttt{NN DT NNS}. To avoid such improper constructions,
+  we do not allow the sequence \texttt{NN DT}. 
+  Forbidden structures can contain a mix of inflected, lemmatized
+  forms and tags.
+  There are two possible operations when a forbidden structure is
+  found: splitting or deletion, according to what is declared in the file.
+
+The format is given below:
+
+  \begin{itemize}
+  \item the comments start with the character \verb+#+.
+
+  \item each line describes a forbidden structure according to five
+    fields (the last one is defined only for the splitting action):
+     the value of the pattern with the type of
+    information (inflected form --
+    \texttt{IF}, part-of-speech tag -- \texttt{POS}, or lemma --
+    \texttt{LF}), the position in the phrase where the sequences is expected to be
+    found (START, END or ANY), the action
+    (\texttt{split} or
+    \texttt{delete}) for the structures in ANY position, and the
+    position of the word, lemma or tag that will be used to perform
+    the splitting (\textit{i.e.} pivot). Figure \ref{fig:forbiddenstructures} shows an example of a forbidden structure file.
+    \begin{figure}[!ht]
+\begin{verbatim}
+# Value\Type    	Position	Action	Split after
+JJ\POS of\LF     	START
+JJR\POS	                END
+such\LF	                ANY     	delete
+of\LF DT\POS of\LF	ANY     	split	1
+\end{verbatim}
+      \caption{Sample of the forbidden structure file}\label{fig:forbiddenstructures}
+    \end{figure}
+
+  \end{itemize}
+
+
+
+  \subsubsection{Options}
+  \label{sec:options}
+
+ \texttt{Options} contains additional configuration information. The file defines the options for
+  the parsing of the terms for a given language. Each option is
+  defined on a line as follows:
+  \texttt{OPTION\_NAME = value}.
+
+The mandatory options are the following:
+
+\begin{itemize}
+\item \texttt{DOCUMENT\_BOUNDARY}: a (PoS) tag in the corpus that indicates
+  the limit between 2 documents
+\item \texttt{SENTENCE\_BOUNDARY}: a (PoS) tag in the corpus that indicates
+  the limit between 2 sentences
+\item \texttt{PARSING\_DIRECTION}: the possible values of this option are 
+  ``LEFT'' or ``RIGHT''. It defines the tendancy of the given language to
+  have the head of a noun phrase on its left or right edge. For
+  instance, the preferential direction of the analysis in English is
+  ``RIGHT'', while for French it is ``LEFT''. This information is used
+  to perform a priority sorting of the parsing patterns when several
+  are possible in the prograssive parsing. This information
+  refers to the information \textit{Direction} (second field) defined for
+  each syntactic pattern in the file \texttt{ParsingPatterns}.
+
+
+\item \texttt{COMPULSORY\_ITEM}: this option is declared
+  as a regular expression, using disjonction (OR) and quantifiers
+  (\texttt{+}, \texttt{?}, \texttt{*}). It is used during the chunking of
+  the phrases to check that at least one compulsory tag appears
+  in each extracted term candidate. For instance, in English, as we use the PennTree Bank tagset with the
+  TreeTagger, the default option is the following: \texttt{COMPULSORY\_ITEM = (N.*)}. In that respect, we check that there is
+  at least one common or proper noun in each identified phrase.
+\item \texttt{PHRASE\_MAXIMUM\_LENGTH} defines the maximal number
+  of tokens allowed in a
+  maximal phrase. The default value is 12.
+
+\item \texttt{COLOR\_BLIND} offers brighter colors in the HTML output files 
+\end{itemize} 
+
+
+% \subsubsection{MiscellaneousOptions}
+% \label{sec:miscoptions}
+
+%  \texttt{MiscellaneousOptions} contains the declaration of  miscellaneous options. It defines the processing
+%   options according to the format \texttt{OptionName = value}:, 
+
+% \begin{itemize}
+% \item \texttt{COLOR\_BLIND} offers brighter colors in the HTML output files 
+% \item \texttt{TAGGER} defines the path to the tagger used to tag plain
+%   lists of testified terms
+% \end{itemize} 
+
+\subsubsection{Testified terms}
+Lists of testified terms can be provided in % different formats:
+a \textsc{tagged} % or \textsc{bracketed}.
+format.
+
+
+\begin{itemize}
+\item 
+A \textsc{tagged} format terminology is a file containing terms in the TreeTagger
+format as shown in
+Figure  \ref{TTtagged}. Terms are separated by the SENTENCE\_BOUNDARY
+tag as defined in
+the 
+Options file.
+\begin{figure}[!ht]
+\begin{verbatim}
+catabolite      NN      catabolite
+repression      NN      repression
+.               SENT    .
+core            NN      core
+RNA             NN      RNA
+polymerase      NN      polymerase
+.
+\end{verbatim}
+      \caption{Sample of a testified term file in \textsc{tagged} format}\label{TTtagged}
+    \end{figure}
+
+%   \item  
+% A \textsc{bracketed} format terminology  is a file containing terms along with their
+% syntactic analysis as shown in
+% Figure  \ref{TTbracketed}. One term per line is allowed. 6 fields
+% provide information on each testified: the bracketed parse, the
+% inflected form, PoS sequence and lemmatized form of the term, its
+% global syntactic head PoS tag, and the name of the resource it comes from
+% \begin{figure}[!ht]
+% \begin{small}
+% \begin{verbatim}
+% ( heat<=M=NN> shock<=H=NN> )  heat shock  NN NN  heat shock  NN  PhB
+% ( spore<=M=JJ> coat<=H=NN> )  spore coat  JJ NN  spore coat  NN  PhB
+% ( protein<=H=NN> of ( Bacillus<=H=NN> subtilis<=M=NN> )<=M=NN> )  
+%   protein of Bacillus subtilis  NN of NN NN  protein of Bacillus 
+%   subtilis  NN  PhB
+% \end{verbatim}
+% \end{small}
+%       \caption{Sample of a testified term file in \textsc{bracketed} format}\label{TTbracketed}
+%     \end{figure}
+
+\end{itemize}
+
+
+\section{Output formats}
+\label{sec:output-format}
+
+We describe the XML format only in this section. For information on
+the other output formats, please see the option description in Section
+\ref{RunningYatea}.
+
+\subsubsection{xmlout option format}
+\label{sec:xmloutformat}
+The result of the extraction and analysis of term candidates is
+displayed in XML format. % The XLM format output allows the display of
+% non ambiguous term candidates only, \textit{i.e.} term candidates for which
+% only one syntactic tree was found.
+It contains all the extracted term candidates either corresponding to
+complete phrases identified during the chunking step or to their
+sub-parts processed during the parsing step. 
+\begin{figure}
+  \includegraphics[scale=1]{TC_tree}
+  \caption{Example of term candidates processed from a phrase}
+  \label{fig:TCtree}
+\end{figure}
+
+
+The DTD (Document Type Definition) that was defined for the XML
+display appears in Appendix \ref{sec:dtd-xml-display}. Figure \ref{fig:exampleXML} shows an example of the XML output for a
+term candidate.
+
+
+\begin{figure}[!htbp]
+  \centering
+  {\lstinputlisting[firstline=267,lastline=301]{samples/pmid10788508-v2.genia2.xml}}
+  \caption{Example of the XML display for a term candidate}
+  \label{fig:exampleXML}
+\end{figure}
+
+\appendix
+\section{DTD for the XML display}\label{sec:dtd-xml-display}
+
+\lstinputlisting{DTD/yatea.dtd}
+
+\end{document}

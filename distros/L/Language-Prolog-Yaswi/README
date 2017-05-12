@@ -1,0 +1,77 @@
+Language::Prolog::Yaswi
+=======================
+
+Language::Prolog::Yaswi provides a bidirectional interface between
+Perl and SWI-Prolog (http://www.swi-prolog.org/)
+
+
+INSTALLATION
+
+To install this module the SWI-Prolog executable "pl" has to be in the
+PATH or alternatively the PL environment variable can be used to
+select another executable name and location.
+
+Type the following:
+
+   perl Makefile.PL
+   # or 'PL=/path/to/my/swi-prolog/executable perl Makefile.PL'
+   make
+   make test
+   make install
+
+pl.pl script should be copied to a place in the PATH (pl.pl is a
+wrapper to run Prolog with support for calling Perl).
+
+Both or none Perl and SWI-Prolog have to be compiled with thread
+support. Other configurations are not supported and the build
+process will refuse to make the module with them.
+
+Under Perl only the ithread model is supported.
+
+If you get SEGV errors when using the module try compiling the
+prolog library with --disable-segv-handling (and send me also a
+bug report!).
+
+
+BUGS
+
+Requires SWI-Prolog 5.6.x or newer
+
+Loading of prolog shared libraries doesn't work, this is due to a
+limitation on SWI-Prolog itself.
+
+The programing interface should not be considered stable,
+incompatibilities could be introduced in future releases.
+
+
+MS WINDOWS SUPPORT
+
+This module has been minimal tested under windows, it seems to work,
+and I plan to support it, but the primary development platform
+continues to be Linux/Unix.
+
+To make it work, the "bin" directory for your SWI-Prolog installation
+will have to be included in your PATH also at runtime (If you get an
+error telling about the lippl.dll being missing, try using 8 chars
+names in the PATH, i.e. C:\PROGRA~1\SWI-PR~1\BIN).
+
+
+DEPENDENCIES
+
+This module requires SWI-Prolog already installed in your system and
+these other modules and libraries:
+
+	Language::Prolog::Types
+	Language::Prolog::Sugar (recommended)
+	Test::More (only for testing)
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2006, 2008, 2011, 2012 Salvador Fandiño
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+SWI-Prolog is distributed under the LGPL/GPL licenses, consult the
+documentation bundled with your copy for details.

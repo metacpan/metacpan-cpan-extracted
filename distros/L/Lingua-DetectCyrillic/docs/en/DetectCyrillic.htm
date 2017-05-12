@@ -1,0 +1,364 @@
+<HTML>
+<HEAD>
+<TITLE>Lingua::DetectCyrillic. Detection of 7 Cyrillic codings and 2 languages</TITLE>
+<LINK REL="stylesheet" HREF="../pod.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<script language=javascript1.2>var MenuBuiltOnServer=0;</script>
+<!--#include virtual="../menu.pl" -->
+<script language=javascript1.2 src="../Languages.inc"></script>
+<script language=javascript1.2 src="./Menu.inc"></script>
+<script language=javascript1.2 src="../MakeMenu.js"></script>
+
+<hr>
+
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Lingua::DetectCyrillic. Detection of 7 Cyrillic codings and 2 languages</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<UL>
+
+		<LI><A HREF="#annotation">ANNOTATION</A></LI>
+		<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+		<LI><A HREF="#description">DESCRIPTION</A></LI>
+		<LI><A HREF="#dependencies">DEPENDENCIES</A></LI>
+		<LI><A HREF="#usage details">USAGE DETAILS</A></LI>
+		<LI><A HREF="#how it works">HOW IT WORKS</A></LI>
+		<UL>
+
+			<LI><A HREF="#stage 1. formal analysis of alphabet hits and capitalization">Stage 1. Formal analysis of alphabet hits and capitalization</A></LI>
+			<LI><A HREF="#stage 2. frequency analysis of words and 2letter combinations.">Stage 2. Frequency analysis of words and 2-letter combinations.</A></LI>
+		</UL>
+
+		<LI><A HREF="#reference information">REFERENCE INFORMATION</A></LI>
+		<UL>
+
+			<LI><A HREF="#modern cyrillic codings and where are they used">Modern Cyrillic codings and where are they used</A></LI>
+			<LI><A HREF="#algorithm codes explanation">Algorithm codes explanation</A></LI>
+		</UL>
+
+		<LI><A HREF="#history">HISTORY</A></LI>
+		<LI><A HREF="#todo">TODO</A></LI>
+		<LI><A HREF="#contacts and copyright">CONTACTS AND COPYRIGHT</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H2><A NAME="annotation">ANNOTATION</A></H2>
+<P><STRONG>Lingua::DetectCyrillic</STRONG>. The package detects 7 Cyrillic codings as
+well as the language - Russian or Ukrainian. Uses embedded frequency dictionaries;
+usually one word is enough for correct detection.</P>
+<P>
+<H2><A NAME="synopsis">SYNOPSIS</A></H2>
+<PRE>
+  use Lingua::DetectCyrillic;
+   -or (if you need translation functions) -
+  use Lingua::DetectCyrillic qw ( &amp;TranslateCyr &amp;toLowerCyr &amp;toUpperCyr );</PRE>
+<PRE>
+  # New class Lingua::DetectCyrillic. By default, not more than 100 Cyrillic
+  # tokens (words) will be analyzed; Ukrainian is not detected.
+  $CyrDetector = Lingua::DetectCyrillic -&gt;new();</PRE>
+<PRE>
+  # The same but: analyze at least 200 tokens, detect both Russian and
+  # Ukrainian.
+  $CyrDetector = Lingua::DetectCyrillic -&gt;new( MaxTokens =&gt; 200, DetectAllLang =&gt; 1 );</PRE>
+<PRE>
+  # Detect coding and language
+  my ($Coding,$Language,$CharsProcessed,$Algorithm)= $CyrDetector -&gt; Detect( @Data );</PRE>
+<PRE>
+  # Write report
+  $CyrDetector -&gt; LogWrite(); #write to STDOUT
+  $CyrDetector -&gt; LogWrite('report.log'); #write to file</PRE>
+<PRE>
+  # Translating to Lower case assuming the source coding is windows-1251
+  $s=toLowerCyr($String, 'win');
+  # Translating to Upper case assuming the source coding is windows-1251
+  $s=toUpperCyr($String, 'win');
+  # Converting from one coding to another
+  # Acceptable coding definitions are win, koi, koi8u, mac, iso, dos, utf
+  $s=TranslateCyr('win', 'koi',$String);</PRE>
+<P>See <A HREF="#usage details">Additional information on usage of this package </A>.</P>
+<P>
+<H2><A NAME="description">DESCRIPTION</A></H2>
+<P>This package permits to detect automatically all live Cyrillic codings -
+<A HREF="#item_windows%2d1251">windows-1251</A>, <A HREF="#item_koi8%2dr">koi8-r</A>,
+<A HREF="#item_koi8%2du">koi8-u</A>, <A HREF="#item_iso%2d8859%2d5">iso-8859-5</A>,
+<A HREF="#item_utf%2d8">utf-8</A>, <A HREF="#item_cp866">cp866</A>,
+<A HREF="#item_x%2dmac%2dcyrillic">x-mac-cyrillic</A>, as well
+as the language - <STRONG>Russian</STRONG> or <STRONG>Ukrainian</STRONG>. It applies 3 algorithms for
+detection:
+<A HREF="#stage 1. formal analysis of alphabet hits and capitalization">formal analysis of alphabet hits</A>,
+<A HREF="#stage 2. frequency analysis of words and 2letter combinations.">frequency analysis of words and frequency analysis of 2-letter combinations</A>.</P>
+<P>It also provides routines for conversion between different codings of Cyrillic
+texts which can be imported if necessary.</P>
+<P>The package permits to detect coding with one or two words only. Certainly,
+in case of one word reliability will be low, especially if you wrote the words
+for testing completely in lower or uppercase, as capitalization is a very
+important attribute for coding detection. Nethertheless the package correctly
+recognizes coding in a message containing one single word, even all lowercase -
+'privet' ('hello' in Russian), 'ivan', 'vodka', 'sputnik'. ;-)))</P>
+<P>Ukrainian language will be specified only if the text contains specific
+Ukrainian letters.</P>
+<P>Performance is good as the analysis passes two stages: on the first
+only formal and fast analysis of proper capitalization and alphabet hit
+is carried out and only if these data are not enough, the input is analyzed
+second time - on frequency dictionaries.</P>
+<P>
+<H2><A NAME="dependencies">DEPENDENCIES</A></H2>
+<P>The package requires so far <STRONG><A HREF="#item_unicode%3a%3astring">Unicode::String</A></STRONG> and
+<STRONG><A HREF="#item_unicode%3a%3amap8">Unicode::Map8</A></STRONG>
+which can be downloaded from <A HREF="http://www.cpan.org.">http://www.cpan.org.</A>
+See <A HREF="#which additional packages are required">Additional information on packages to be installed </A>.</P>
+<P>I plan to implement my own support of character decoding so these
+packages will be not required in future releases.</P>
+<OL>
+<LI><STRONG><A NAME="item_Unicode%3A%3AMap8"><STRONG>Unicode::Map8</STRONG></A></STRONG><BR>
+
+Basic package for conversion between different one-byte codings. Available
+at <A HREF="http://www.cpan.org">http://www.cpan.org</A> .
+<P><STRONG>Warning!</STRONG> This module requires preleminary compilation with a C++ compiler;
+under Unix this procedure goes smoothly and doesn't need commenting;
+but under Win32 with ActiveState Perl you must</P>
+<OL>
+<LI><STRONG><A NAME="item_use_MS_Visual_C%2B%2B_and">use MS Visual C++ and</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_make_some_manual_changes_to_the_listing_after_havi">make some manual changes to the listing after having run Makefile.PL</A></STRONG><BR>
+
+Open <STRONG>map8x.c</STRONG> and change the line 97 from
+<PRE>
+    ch = PerlIO_getc(f);</PRE>
+<P>to</P>
+<PRE>
+    ch = getc(f);</PRE>
+<P>In one word, you need to replace Perl wrapper for C function <EM>getc</EM> to the
+function itself. The compiler produces warnings, but as a result you'll get
+a 100% working DLL.</P>
+<P></P></OL>
+<LI><STRONG><A NAME="item_Unicode%3A%3AString"><STRONG>Unicode::String</STRONG></A></STRONG><BR>
+
+Provides support for <STRONG>Unicode::Map8</STRONG>. Available at <A HREF="http://www.cpan.org">http://www.cpan.org</A> .
+<P></P></OL>
+<P>
+<H2><A NAME="usage details">USAGE DETAILS</A></H2>
+<UL>
+<LI><STRONG><A NAME="item_Create_a_class_Lingua%3A%3ADetectCyrillic">Create a class <STRONG>Lingua::DetectCyrillic</STRONG></A></STRONG><BR>
+
+<PRE>
+  $CyrDetector = Lingua::DetectCyrillic -&gt;new();
+  $CyrDetector = Lingua::DetectCyrillic -&gt;new( MaxTokens =&gt; 100, DetectAllLang =&gt; 1 );</PRE>
+<P><EM>MaxTokens</EM> - the package <EM>stops analyzing</EM> the input, if the given number
+of Cyrillic tokens is reached. You have not to analyze all 100 or 200 thousand
+bytes from the input if after first 100 tokens the coding and the language can
+be easily determined. If not specified, this argument defaults to 100.</P>
+<P><EM>DetectAllLang</EM> - by default the package assumes Russian language only. Setting
+this parameter to any non-zero value will involve analysis on two languages -
+Russian and Ukrainian. This slows down perfomance by nearly 10% and can in rare
+cases may result in a worse coding detection.</P>
+<LI><STRONG><A NAME="item_Pass_an_array_of_strings_to_the_class_method_Detec">Pass an array of strings to the class method <EM>Detect</EM>:</A></STRONG><BR>
+
+<PRE>
+ my ($Coding,$Language,$CharsProcessed,$Algorithm)= $CyrDetector -&gt; Detect( @Data );</PRE>
+<DL>
+<DT><STRONG><A NAME="item_%24Coding">$Coding</A></STRONG><BR>
+<DD>
+- <A HREF="#item_windows%2d1251">windows-1251</A>, <A HREF="#item_koi8%2dr">koi8-r</A>,
+<A HREF="#item_iso%2d8859%2d5">iso-8859-5</A>, <A HREF="#item_utf%2d8">utf-8</A>, <A HREF="#item_cp866">cp866</A>,
+<A HREF="#item_x%2dmac%2dcyrillic">x-mac-cyrillic</A>. If the
+input doesn't have a single Cyrillic character, returns <STRONG>iso-8859-1</STRONG>. If
+<EM>DetectAllLang &gt; 0</EM>, may return <A HREF="#item_koi8%2du">koi8-u</A> as well.
+<P></P>
+<DT><STRONG><A NAME="item_%24Language">$Language</A></STRONG><BR>
+<DD>
+- <STRONG>Rus</STRONG> or (if <EM>DetectAllLang &gt; 0</EM>) <STRONG>Ukr</STRONG> as well. If the
+input doesn't have a single Cyrillic character, returns <STRONG>NoLang</STRONG> (I can't state
+for sure this language to be <EM>English</EM>, <EM>German</EM>, <EM>French</EM> or any other ;-).
+<P></P>
+<DT><STRONG><A NAME="item_%24CharsProcessed">$CharsProcessed</A></STRONG><BR>
+<DD>
+- number of characters processed in the most possible coding.
+Useful to estimate the level of reliability. If the program found 3-4 poor Cyrillic
+characters in input no need to say how correct the results are...
+<P></P>
+<DT><STRONG><A NAME="item_%24Algorithm">$Algorithm</A></STRONG><BR>
+<DD>
+- numeric code showing on which stage the program decided to
+stop further analysis (satisfied with the results). Useful for debugging. If
+you will report me errors, please refer to this code. For more detailed
+explanation see the table
+<A HREF="#algorithm codes explanation">Algorithm codes explanation</A>.
+<P></P></DL>
+<LI><STRONG><A NAME="item_Write_a_report%2C_if_you_want">Write a report, if you want</A></STRONG><BR>
+
+<PRE>
+  $CyrDetector -&gt; LogWrite(); #write to STDOUT
+  $CyrDetector -&gt; LogWrite('report.log'); #write to file</PRE>
+<P>If the only argument is not specified or equal to <EM>stdout</EM> (in upper- or
+lowercase), the program writes the report to the <STRONG>STDOUT</STRONG>, otherwise to
+the file.</P>
+</UL>
+<P>
+<H2><A NAME="how it works">HOW IT WORKS</A></H2>
+<P>
+<H3><A NAME="stage 1. formal analysis of alphabet hits and capitalization">Stage 1. Formal analysis of alphabet hits and capitalization</A></H3>
+<P>Started programming, I came from an obvious fact: a 'human' reader can
+easily determine the coding and language from one sight, or at least to say
+<EM>the text to be displayed in a wrong coding</EM>. The thing is that the <EM>alphabets</EM>,
+i.e. <EM>letters</EM> of most Cyrillic codings do <EM>not</EM> coincide so if we try to
+display text in a bad coding we will <EM>inevitably</EM> see on screen messy characters
+inside words which can not be typed with Russian or Ukrainian keyboard layout
+in a standard way - valuta signs, punctuation marks, Serbian letters, sometimes
+binary characters etc etc.</P>
+<P>Indeed we have only one hard case: the two most popular Cyrillic codings -
+windows-1251 and koi8-r - have their alphabets in the same range from 192 to 255,
+but <EM>uppercase</EM> letters of windows-1251 are placed on the codes of <EM>lowercase</EM>
+letters of koi8-r and vice versa, so 'Ivan Petrov' in one of these codings
+will look like 'iVAN pETROV' in another, i.e. have absolutely <EM>wrong
+capitalization</EM> which can be also easily determined by formal analysis of
+characters. And as you may guess any more or less consistent Cyrillic text
+must have at least one word starting with a capital letter (I don't take in
+consideration some weird Internet inhabitants WRITING ALL WITH CAPITAL LETTERS ;-).</P>
+Also on the first stage of analysis the program consequently assumes the given
+text has been written in one of 6 or 7 Cyrillic codings and calculates:
+<div style='position:relative;left:30'>
+1. how many tokens have inside 'bad' characters which are not
+part of the Russian or Ukrainian alphabet and cannot be typed with standard
+keyboard layout; <br>
+2. how many tokens have improper capitalization which differs
+from normal <i>UPPERCASE</i>, <i>lowercase,</i> and <i>Proper</i> words capitalization.
+</div><P>This formal analysis is very <EM>fast</EM> and suits for 99.9% of <EM>real</EM> texts.
+Wrong codings are easily filtered out and we get only one 'absolute winner'.
+This method is also reliable: I can hardly imagine a normal person writing in
+reverse capitalization. But what if we have only a few words and all them are
+in upper- or lowerscase?</P>
+<P>
+<H3><A NAME="stage 2. frequency analysis of words and 2letter combinations.">Stage 2. Frequency analysis of words and 2-letter combinations.</A></H3>
+<P>In this case we apply frequency analysis of words and 2-letter combinations,
+called also <EM>hashes</EM> (not in <EM>Perl</EM> sense, certainly ;-).</P>
+<P>The package has dictionaries for 300 most frequent Russian and Ukrainian words
+and for nearly 600 most frequent Russian and Ukrainian 2-letter combinations,
+built by myown (the input texts were maybe not be very typical for Internet
+authors but any linguist can assure you this is not very principal:
+first hundreds of the most popular words in any language are very stable,
+nothing to say about letter combinations).</P>
+<P>Also the text is analyzed second time (this shouldn't take too much time as we may
+get into situation like this only in case of a very short text); all the Cyrillic
+letters analized, no matter in which capitalization they are. If we found at least
+one word - the coding is determined on it, otherwise - on comparison of letter
+hashes.</P>
+<P>In some very rare cases (usually in a very artificial situation when we have
+only one short word written all in lower- or uppercase) the statistics on several
+codings are equal. In this case we prefer windows-1251 to mac, koi8-r to koi8-u
+and - if nothing helps  - windows-1251 to koi8-r.</P>
+<P>To judge about which algorithm was applied you may wish to analyze the 4th
+variable, returned by the function <EM>Detect</EM> - <A HREF="#item_%24algorithm">$Algorithm</A>.
+More detailed explanation of it is in the table
+<A HREF="#algorithm codes explanation">Algorithm codes explanation</A>.</P>
+<P>
+<H2><A NAME="reference information">REFERENCE INFORMATION</A></H2>
+<P>
+<H3><A NAME="modern cyrillic codings and where are they used">Modern Cyrillic codings and where are they used</A></H3>
+<P>The supported codings are:</P>
+<UL>
+<LI><STRONG><A NAME="item_windows%2D1251">windows-1251</A></STRONG><BR>
+
+This is the most popular Cyrillic coding nowadays, used on nearly 99% PC's.
+Full alphabet starts with code 192 (uppercase A), like most Microsoft character
+sets for national languages, and ends with code 255 (lowercase ya). Contains
+also characters for Ukrainian, Byelorussian and other languages based on
+Cyrillic alphabet. Can be easily sorted etc.
+<P></P>
+<LI><STRONG><A NAME="item_koi8%2Dr">koi8-r</A></STRONG><BR>
+
+Transliterated coding; terrible remnant of the old 7-bit world.
+First another coding - koi7-r was designed, where Russian characters were on
+places of <STRONG>similar</STRONG> English ones, for example Russian A on place of English A,
+Russian R (er) on place of English R etc. Even if there were no Cyrillic
+fonts at all the text still stayed readable. <EM>Koi8-r</EM> is in essence the same
+archeologic <EM>Koi7-r</EM> with characters shifted to the extended part of ASCII
+table. <EM>Koi8-r</EM> is still used on Unix-based computers, therefore it is the
+second popular Russian coding on the Net.
+<P></P>
+<LI><STRONG><A NAME="item_koi8%2Du">koi8-u</A></STRONG><BR>
+
+The same as koi8-r, but with Ukrainian characters added.
+<P></P>
+<LI><STRONG><A NAME="item_utf%2D8">utf-8</A></STRONG><BR>
+
+A good textual representation of Unicode text. Basic characters (codes &lt; 128)
+are represented with one-byte codes, while all other languages except
+Oriental ones - with two-byte sequences. See RFC 2279 'UTF-8, a transformation
+format of ISO 10646' for detailed information.
+<P></P>
+<LI><STRONG><A NAME="item_iso%2D8859%2D5">iso-8859-5</A></STRONG><BR>
+
+Though this coding is approved by ISO, it is used only on some rare Unix systems,
+for example on Russian Solaris. For my whole life on the Net I have met only one
+or two guys working on computers like these.
+<P></P>
+<LI><STRONG><A NAME="item_cp866">cp866</A></STRONG><BR>
+
+Also called 'alternative' coding. Used under DOS and Russian OS/2.
+<P></P>
+<LI><STRONG><A NAME="item_x%2Dmac%2Dcyrillic">x-mac-cyrillic</A></STRONG><BR>
+
+Macintosh coding. Lowercase letters almost completely coincide with Windows-1251
+(except 2 characters) so in some rare cases <EM>x-mac-cyrillic</EM> can be confused with
+<EM>windows-1251</EM>. On the Internet this coding has almost died out; its share
+is absolutely insignificant. On PC platform it is supported by default only
+under Windows NT+.
+<P></P></UL>
+<P>
+<H3><A NAME="algorithm codes explanation">Algorithm codes explanation</A></H3>
+<table width="80%">
+     <th colspan=2> Algorithm codes explanation </th>
+     <tr class=tr1><td width=5%>11</td><td width=40%>Formal analysis of quantity/capitalization of Cyrillic characters;
+      only one alternative found</td></tr>
+     <tr><td>21</td><td>Formal analysis of quantity/capitalization of Cyrillic characters;
+      two alternatives found (koi8-r and koi8-u); koi8-r chosen</td></tr>
+     <tr class=tr1><td>22</td><td>Formal analysis of quantity/capitalization of Cyrillic characters;
+      two alternatives found (win1251 and mac); win1251 chosen</td></tr>
+     <tr><td>31</td><td>At least one word from the dictionary found and there is only one
+      alternative</td></tr>
+     <tr class=tr1><td>32</td><td>At least one hash from the hash dictionary found and there is only one
+      alternative</td></tr>
+     <tr><td>33</td><td>Formally win1251 defined (most probably on analysis of hash)</td></tr>
+     <tr class=tr1><td>34</td><td>Formally koi8-r defined (most probably on analysis of hash)</td></tr>
+     <tr><td>40</td><td>Most probable results were chosen, but reliability is very low</td></tr>
+     <tr class=tr1><td>100</td><td>No single Cyrillic character detected</td></tr>
+</table><P>
+<H2><A NAME="history">HISTORY</A></H2>
+<P>December 01, 2002 - Extensive Russian documentation added. Version changed to 0.02.</P>
+<P>November 19, 2002 - version 0.01 released.</P>
+<P>
+<H2><A NAME="todo">TODO</A></H2>
+<P>1. Own Unicode support.</P>
+<P>2. Option to detect only necessary codings from a list.</P>
+<P>What else? Need your feedback!!</P>
+<P>
+<H2><A NAME="contacts and copyright">CONTACTS AND COPYRIGHT</A></H2>
+<P>The author: <STRONG>Alexei Rudenko</STRONG>, Russia, Moscow. My home phone is <EM>(095) 468-95-63</EM></P>
+<P>Web-site: <A HREF="http://www.bible.ru/DetectCyrillic/">http://www.bible.ru/DetectCyrillic/</A></P>
+<P>CPAN address: <A HREF="http://search.cpan.org/author/RUDENKO/">http://search.cpan.org/author/RUDENKO/</A></P>
+<P>Email: <A HREF="mailto:rudenko@bible.ru">rudenko@bible.ru</A></P>
+<P>Copyright (c) 2002 Alexei Rudenko. All rights reserved.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Lingua::DetectCyrillic. Detection of 7 Cyrillic codings and 2 languages</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,76 @@
+#!/usr/bin/perl -s
+
+use strict;
+use warnings;
+use Lingua::NATools;
+our ($h);
+
+usage() if ($h);
+my $corpus = shift || usage();
+
+my $obj = Lingua::NATools->load($corpus);
+
+my $PATH = $obj->{conf}->param("nat.homedir");
+my $nr = $obj->{conf}->param("nat.nr-chunks");
+
+print STDERR "nr of chunks is: $nr\n";
+
+for my $i (1..$nr) {
+  my $filename = sprintf("rank.%03d.rnk", $i);
+  print STDERR "$filename...\n";
+  open OUT, ">$PATH/$filename" or die "Cannot open rank file\n";
+  Lingua::NATools::rank(\*OUT,
+                        "$PATH/source.lex",
+                        "$PATH/target.lex",
+                        "$PATH/source-target.bin",
+                        "$PATH/target-source.bin",
+                        sprintf("$PATH/source.%03d.crp", $i),
+                        sprintf("$PATH/target.%03d.crp", $i)
+                       );
+  close OUT;
+}
+
+$obj->set_rank_cfg;
+
+sub usage {
+  print "nat-rank: classifies each sentence from a NATools corpus.\n\n";
+  print "\tnat-rank <nat-dir>\n\n";
+  print "For more help, please run 'perldoc nat-rank'\n";
+  exit;
+}
+
+1;
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-rank - classifies each parallel corpus aligned sentence
+
+=head1 SYNOPSIS
+
+  nat-rank <ParallelCorpus>
+
+=head1 DESCRIPTION
+
+This tool reads the C<ParallelCorpus> configuration file and computes
+a translation quality value for each aligned sentence. This quality
+value is computed using the terminology dictionary obtained by the
+word alignment process.
+
+=head1 SEE ALSO
+
+NATools documentation;
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2009 by Alberto Manuel Brandão Simões
+
+=cut
+
+

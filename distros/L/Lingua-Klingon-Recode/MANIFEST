@@ -1,0 +1,10 @@
+Build.PL			build script
+Changes				Changes to this module
+MANIFEST			This list of files
+META.yml			Metadata file
+Makefile.PL			Old-style makefile
+README				REDME file
+lib/Lingua/Klingon/Recode.pm	The module itself
+t/01_base.t			Tests loading the module
+t/02_scalar.t			Tests scalar context of recode()
+t/03_list.t			Tests list context of recode()

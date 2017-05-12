@@ -1,0 +1,8 @@
+MAILTO=mikedlr
+#34 22-11 * * * /home/sca/bin/run-test-link --verbose >> /home/sca/link-data/link-test.log 2>&1
+34 * * * * /home/sca/bin/run-test-link --verbose >> /home/sca/link-data/link-test.log 2>&1
+11 00 * * * /usr/sbin/logrotate -f /home/sca/link-data/logrotate
+22 01 * * * /home/sca/bin/run-extract-links >> /home/sca/link-data/link-extract.log 2>&1
+17 02 * * * /home/sca/bin/build-schedule --verbose >> /home/sca/link-data/link-extract.log 2>&1
+00 23 * * * /home/sca/bin/conditions-mailreports.pl >> /home/sca/tmp/cond-error 2>&1
+15 02 * * * /home/sca/bin/mail-link-report  >> /home/sca/link-data/link-email.log 2>&1

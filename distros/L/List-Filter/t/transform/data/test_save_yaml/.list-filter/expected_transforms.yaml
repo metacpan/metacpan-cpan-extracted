@@ -1,0 +1,26 @@
+---
+sanitize_email:
+  description: remove dangerous phrases
+  method: sequential
+  modifiers: x
+  terms:
+    -
+      - !perl/regexp:
+        REGEXP: pointy-haired \s+ boss
+      - i
+      - esteemed leader
+    -
+      - !perl/regexp:
+        REGEXP: kill
+      - ''
+      - reward
+    -
+      - !perl/regexp:
+        REGEXP: Kill
+      - ''
+      - Reward
+    -
+      - !perl/regexp:
+        REGEXP: attack at midnight
+      - ''
+      - go out for donuts

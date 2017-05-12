@@ -1,0 +1,109 @@
+NAME
+    Linux::UserXAttr - Support for extended file attributes on Linux
+
+SYNOPSIS
+     use Linux::UserXAttr qw/:all/;
+
+     $success=setxattr $filename_or_handle, $name, $value, $flags;
+     $success=lsetxattr $filename, $name, $value, $flags;
+     $value=getxattr $filename_or_handle, $name;
+     $value=lgetxattr $filename, $name;
+     @names=listxattr $filename_or_handle;
+     @names=llistxattr $filename;
+     $success=removexattr $filename_or_handle, $name;
+     $success=lremovexattr $filename, $name;
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DESCRIPTION
+    This module implements a very thin layer around the extended attributes
+    syscalls on Linux. See setxattr(2), getxattr(2), listxattr(2) and
+    removexattr(2) for more information.
+
+    Due to varying support in different kernels the test suite of this
+    module is really simple. It verfies that the functions and constants are
+    exported but does not call the actual syscalls. If you smell a wumpus
+    try "strace", e.g.:
+
+     strace perl -MLinux::UserXAttr=:all -le 'setxattr qw/. user.name value/'
+
+    and look up the syscall like:
+
+     setxattr(".", "user.name", "value", 5, 0) = 0
+
+  Functions
+   $success=setxattr $filename_or_handle, $name, $value, $flags
+    creates or modifies the extended attribute $name and sets its value to
+    $value. $flags can be used to refine the semantics of the operation. The
+    2 constants are allowed "XATTR_CREATE" and "XATTR_REPLACE".
+
+    For more information see the setxattr(2) manpage.
+
+    $filename_or_handle may be a file or directory name or an open file or
+    directory handle.
+
+    On success true is returned. On failure the empty list is returned and
+    $! set accordingly.
+
+    Note, support for extended attributes and particularly for $flags may
+    vary for different kernels.
+
+   $success=lsetxattr $filename, $name, $value, $flags
+    same as "setxattr" but fails if $filename is a symlink.
+
+   $value=getxattr $filename_or_handle, $name
+    reads an extended attribute.
+
+    On failure the empty list is returned and $! set accordingly.
+
+   $value=lgetxattr $filename, $name
+    same as "getxattr" but fails if $filename is a symlink.
+
+   @names=listxattr $filename_or_handle
+    returns a list of names of extended attributes.
+
+   @names=llistxattr $filename
+    same as "listxattr" but fails if $filename is a symlink.
+
+   $success=removexattr $filename_or_handle, $name
+    removes the extended attribute $name.
+
+    On success true is returned. On failure the empty list is returned and
+    $! set accordingly.
+
+   $success=lremovexattr $filename, $name
+    same as "removexattr" but fails if $filename is a symlink.
+
+EXPORT
+    None by default.
+
+    On demand all functions and constants are exported.
+
+   Export tags
+    :flags
+        exports "XATTR_CREATE" and "XATTR_REPLACE"
+
+    :functions
+        exports "setxattr", "lsetxattr", "getxattr", " lgetxattr",
+        "listxattr", "llistxattr", "removexattr" and "lremovexattr".
+
+    :all
+        all of the above
+
+SEE ALSO
+    Linux manual.
+
+AUTHOR
+    Torsten Förtsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 by Torsten Förtsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

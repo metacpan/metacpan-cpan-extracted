@@ -1,0 +1,133 @@
+Revision history for Perl extension Log::Syslog::Fast.
+0.65   Thu May  7 13:41:10 PDT 2015
+        - Fix ipv6 test helper. Thanks to srezic@ for reporting #103433 and
+          sjohnston@github for the patch.
+0.64   Thu Apr  9 13:41:16 PDT 2015
+        - Fix PP constructor modifying @_ in place:
+          https://github.com/athomason/Log-Syslog-Fast/pull/7
+        - Add link to github repo. Both thanks to dolmen@.
+0.63   Thu Feb 12 13:50:33 PST 2015
+        - Fix missing MANIFEST entries
+0.62   Tue Feb 10 17:53:36 PST 2015
+        - Emit strict RFC3339 timestamp in RFC5424 mode.
+          See https://github.com/athomason/Log-Syslog-Fast/pull/6
+          Thanks to Oleg Komarov, komarov@.
+0.61   Wed Oct 31 16:41:12 PDT 2012
+        - Return a descriptive error on getaddrinfo failure.
+0.60   Tue Mar  6 18:00:32 PST 2012
+        - Clean up after failed AF_UNIX+SOCK_STREAM socket creation.
+          Thanks Pawl Pabian.
+0.59   Fri Mar  2 14:11:49 PST 2012
+        - Complain instead of crash when string parameters are undefined.
+          Thanks Pawl Pabian.
+        - Clarify documentation of how $port is used for LOG_UNIX. Also Thanks
+          Pawl Pabian.
+0.58   Wed Jan  4 11:58:35 PST 2012
+        - Add support for messages formatted according to RFC5424. Thanks Ryan
+          P. Kelly.
+0.57   Thu Dec 29 11:49:30 PST 2011
+        - Fix fd leak when reconnecting. Thanks maxs@.
+0.56   Sat Nov  5 19:44:36 PDT 2011
+        - Fix documentation for set_receiver. Thanks maxs@.
+0.55   Mon Apr 11 16:41:43 PDT 2011
+        - Recover some speed lost in 0.54 by replacing strcpy with strncpy
+        - Add tools for benchmarking different things
+        - Replace redundant POD in PP.pm with a pointer to Fast.pm
+        - Remove overflow tests which make NetBSD unhappy
+0.54   Wed Apr  6 18:20:45 PDT 2011
+        - Avoid recomputing length of message string
+        - Add ::PP pure-perl version for comparison
+        - Make string storage dynamic and growable to limits of memory
+0.53   Sat Apr  2 00:47:33 PDT 2011
+        - Fix off-by-one buffer overflow (thanks jrockway)
+        - Document message length limitation
+0.52   Thu Feb 24 18:10:55 PST 2011
+        - Move use_ok to separate compilation test
+0.51   Wed Feb 23 13:47:02 PST 2011
+        - Fix for older NetBSD and OpenBSD which don't define AI_ADDRCONFIG
+0.50   Mon Feb 21 15:13:24 PST 2011
+        - Fix segfault in BSDs freeaddrinfo when parameter is null
+0.49   Fri Feb 18 14:46:07 PST 2011
+        - Support IPv6 (courtesy David Skoll)
+0.48   Thu Jan 27 17:15:44 PST 2011
+        - Croak instead of die when nonexistent methods are called
+0.47   Thu Jan 27 17:07:42 PST 2011
+        - Add individual setters for facility and severity
+        - Add getters for priority, facility, severity, sender, name, and pid
+0.46   Tue Nov 16 19:52:24 PST 2010
+        - Remove MSG_DONTWAIT from send parameters since appropriate sockets
+          (UDP) are already marked non-blocking (thanks POWERMAN@)
+        - Add note about thrown exceptions in send
+        - croak on close(2) failure
+0.45   Mon Sep  6 19:12:59 PDT 2010
+        - Report old IO::Socket::INET versions
+0.44   Tue Aug 31 04:16:34 PDT 2010
+        - Restore legacy aliases
+        - Guard against and test for obscure buffer overflows
+        - Prevent buffer overflow from big unix filename
+0.43   Sun Aug 29 16:42:02 PDT 2010
+        - Be more forgiving of time race conditions
+0.42   Fri Aug 27 17:44:04 PDT 2010
+        - Support perl 5.6.2
+0.41   Fri Aug 27 16:55:37 PDT 2010
+        - Make pedantic C compilers happier
+        - Fix timing race in test
+0.40   Thu Aug 26 17:31:13 PDT 2010
+        - Eliminate performance penalty of C version by removing perl shim
+          layer
+        - Rename some things in C space
+0.37_C Mon Aug 23 18:13:37 PDT 2010
+        - Convert C++ objects to pure C functions; additional perl function
+          wrappers cause ~15% performance decrease (this should help with all
+          the failures on BSD platforms)
+0.37  Sun Aug 22 18:21:11 PDT 2010
+        - BSDs appear to raise SIGPIPE on TCP close instead of failing sendto
+          syscall, so expect either failure in test
+0.36  Sat Aug 21 16:49:20 PDT 2010
+        - Don't test against OS- and locale-specific strerror(3) strings
+0.35  Fri Aug 20 17:40:31 PDT 2010
+        - Overhaul tests to be more readable and comprehensive
+        - Support fallback to SOCK_DGRAM with LOG_UNIX should SOCK_STREAM fail
+          (thanks to tim.esselens)
+        - Add additional tests and docs for LOG_UNIX
+0.34  Mon Aug 16 18:53:09 PDT 2010
+        - Test that unreachable server fails on connect for TCP/UNIX, or 2nd
+          connect for UDP
+        - Document that behavior (thanks to Adam Kennedy)
+0.33  Wed Jun  9 18:08:47 PDT 2010
+        - Bail early if g++ is missing
+0.32  Thu May 27 16:37:28 PDT 2010
+        - Extra error checking
+0.31_01 Mon May 24 14:38:33 PDT 2010
+        - Bump version to push test verbosity change to cpan
+0.31  Sun May 23 15:07:04 PDT 2010
+        - Compute socket(2) length parameter correctly for BSDs
+0.30  Sat May 22 17:57:39 PDT 2010
+        - s/AF_FILE/AF_UNIX/ to make FreeBSD happy
+0.29  Mon May 17 16:19:45 PDT 2010
+        - Additional testing of payload
+0.28  Mon Jan 11 13:15:10 PST 2010
+        - Move syslogconstants into Log::Syslog::Constants
+0.27  Fri Jan  8 18:03:41 PST 2010
+        - Support unix sockets (e.g. /dev/log)
+        - Throw, don't crash on failure in setReceiver
+        - Better error reporting
+0.26  Fri Jan  8 13:08:43 PST 2010
+        - Add get_facility/get_severity for getting constants by name
+        - Fix swapped :facilities/:severities
+0.25  Thu Nov 19 12:40:03 PST 2009
+        - Make log socket be close-on-exec
+0.24  Thu Oct 15 22:20:07 PDT 2009
+        - Fix porting bug in Log::Syslog::Fast::Simple;
+          https://rt.cpan.org/Ticket/Display.html?id=50548
+0.23  Thu Jul  2 16:23:09 PST 2009
+        - Add shipit config
+0.22  Thu Jul  2 16:03:33 PST 2009
+        - Clarify newline (non)-handling
+0.21  Thu Jul  2 12:00:35 PST 2009
+        - Document emit alias
+0.20  Tue Jun 30 19:26:33 PST 2009
+        - Fix tests to account for variable payload length
+0.15  Thu Jun 18 15:18:01 PST 2009
+        - Copied from Log::Syslog::UDP
+        - Add support for blocking TCP transport

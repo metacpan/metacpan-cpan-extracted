@@ -1,0 +1,102 @@
+Revision history for Perl extension Lingua::PT::PLNbase.
+
+0.27  Sat Oct  4 16:31:05 WEST 2014
+      - localize $_
+
+0.26  Sun Mar  9 21:38:49 WET 2014
+      - protection of bookcleaner markup "_sec:..._"
+      - PLNbase is now written in UTF-8
+      - try to choose setlocale(LC_CTYPE, "pt_PT|pt_BR|???") to be
+          less dependent of present LC_CTYPE.
+      - fix a bug related with xml tags tokenizing in "cqptokens"
+      - incorporated lots of new rules for syllable division
+        (thanks to João Machado, from P-Pal project)
+
+0.25  Mon Jun 25 10:58:35 WEST 2012
+      - Pod encoding fixes
+
+0.24  Fri Jan 21 17:52:32 WET 2011
+      - Added support to unicode on cqptokens function
+
+0.23  Tue Nov 23 12:32:16 WET 2010
+       - Added missing dependency.
+
+0.22  Sat Nov 20 13:44:00 2010
+       - Fixed tests not to use external diff command, and to create
+         temporary files.
+
+0.21  Sat Oct 24 21:58:00 2009
+       - Added 'atomos' function alias to 'atomiza'
+
+0.20  Sat Mar 15 14:50:00 2008
+	- Added documentation the 'sentences' command
+	- close output file on 'fsentences' function to flush filehandle
+
+0.19  Mon Feb 25 12:36:00 2008
+	- Bug fixes
+	- Test bug fix
+
+0.18  Sat Jun 30 11:58:00 2007
+	- Added tokenization support for most EN and FR texts
+	- Bug fixes
+
+0.17  Tue Nov 21 12:40:00 2006
+	- Added some functions like xmlsentences and cqptokens
+	- Added some regular expressions on tokenizer
+
+0.16  Mon Nov 20  8:20:01 2006
+	- Upload of 0.15 failed
+
+0.15  Mon Nov 20  8:20:00 2006
+	- Change behaviour on tokenizing quotes by configuration
+
+0.14  Sat Jun  4 19:57:00 2005
+	- Force PT encoding for tests (natural for Lingua::PT modules)
+
+0.13  Thu May 20  9:00:00 2005
+	- Corrected a bunch of bugs
+
+0.12  Thu Mar 31 15:24:00 2005
+	- Added pod coverage tests missing
+
+0.11  Wed Mar 16 21:52:00 2005
+	- Added a script to simplify fsentence usage
+
+0.10  Wed Mar 16 16:00:00 2005
+	- fsentence supports tokenization and NATools output format;
+
+0.09  Thu Nov 11  9:21:00 2004
+	- Added some features to segmenter;
+
+0.08  Wed Nov 10  9:05:00 2004
+	- Corrected some more tests for bad locale systems;
+
+0.07  Tue Nov  9 19:38:00 2004
+	- Rely on Lingua::PT::Abbrev for abbreviations;
+	- Added some heuristics for tokenization;
+	- Added some tests;
+
+0.06  Tue Oct  5 12:00:00 2004
+	- finally, corrected the tests. Sorry for the inconvenience.
+
+0.05  Mon Oct  4 09:33:33 2004
+	- corrected tests skip in case of weird locale.
+
+0.04  Fri Oct  1 16:00:00 2004
+	- added has_accents and remove_accents functions
+	- added tests for POD correctness and POD coverage
+
+0.03  Thu Sep  2 10:46:10 2004
+	- added some more tests
+	- added other version of the tokenizer to the documentation
+        - removed failing tests to one of the tokenizers (bad practice)
+	- added documentation for fsentences
+	- corrected bug with wrong substitution
+
+0.02  Tue May 18 21:32:33 2004
+	- changed module description for CPAN
+
+0.01  Mon Mar 29 14:11:52 2004
+	- original version; created by h2xs 1.23 with options
+		-X -O -b5.6.0 -n Lingua::PT::PLNbase
+

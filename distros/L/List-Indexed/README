@@ -1,0 +1,15 @@
+
+NAME
+	List::Indexed - A sequence of elements with random access.
+
+DESCRIPTION
+	The List::Indexed combines the functionality of hashes with those of lists,
+	meaning it is possible to access the elements of the list using their keys, 
+	but the order of the insertion in the list is preserved.
+
+COPYRIGHT
+	Copyright (c) 2003 Farkas Arpad. <arpadf@spidernet.co.ro>
+	
+	All rights reserved.
+	This program is free software; you can redistribute it and/or modify it
+	under the same terms as Perl itself.

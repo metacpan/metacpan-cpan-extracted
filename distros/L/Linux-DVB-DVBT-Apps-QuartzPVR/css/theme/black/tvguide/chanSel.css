@@ -1,0 +1,45 @@
+@CHARSET "ISO-8859-1";
+
+#chanContents {
+}
+
+#quartz-content #list-body #chanContents ol {
+}
+
+#quartz-content #list-body #chanContents .channels {
+}
+
+#quartz-content #list-body #chanContents ol li {
+}
+
+
+#quartz-content #list-body #chanContents .channel {
+	background-image: url("../images/black_gloss.png");
+	background-repeat: none ;
+	color: yellow ;
+	color: white ;
+}
+
+#quartz-content #list-body #chanContents .channel span {
+}
+
+#quartz-content #list-body #chanContents .channel span.chan {
+}
+
+#quartz-content #list-body #chanContents .channel span.lcn {
+}
+
+#quartz-content #list-body #chanContents .channel span.sel {
+}
+
+#quartz-content #list-body #chanContents .chanHead {
+	color: white ;
+	background-image: url("../images/headline.png") ;
+	background-repeat: no-repeat ;
+}
+
+
+#quartz-content #list-body #chanContents .chanCaption {
+	color: white ;
+}
+

@@ -1,0 +1,193 @@
+=pod
+
+=head1 NAME
+
+Lembas::Specification -- Technical specification for the Lembas syntax and commands
+
+=head1 DESCRIPTION
+
+This is the full specification for the current version of Lembas.  For
+usage documentation, see the main L<Lembas> manual page.
+
+=head1 SYNTAX
+
+Whitespace is important.
+
+=head2 LEMBAS COMMANDS
+
+Any line starting at column 0 is interpreted as an internal Lembas
+command, or a comment.  Note that output lines may also have non-space
+characters at column 0 if they are "tagged".
+
+=head3 COMMENTS
+
+Comments start with a "#" on the first column of any line.
+
+Lembas uses a shebang-like syntax to specify what program or
+interpreter ought to be started to run commands or generate output.
+For example:
+
+  #!/bin/bash -r
+
+starts a restricted shell interpreter.  Shebang lines must be the
+first line of the Lembas script file, or they will be treated as
+regular comments.  Shebangs are overridden by the L<Lembas>
+constructor's C<shell> argument, if present.
+
+=head3 COMMANDS
+
+All Lembas commands match C<qr/\w+/>, and may take any number of
+arguments depending on the command.  Lembas supports basic shell-like
+quoting and quote escaping, through L<Text::ParseWords>' C<quotewords>
+function.
+
+See also the C<COMMANDS> section of this document, for a list of
+currently supported commands and their parameters.
+
+=head2 INPUT AND OUTPUT
+
+Input and output lines start at column 4.
+
+=head3 INPUT
+
+Input lines start with a dollar sign and space.  They will be directly
+passed on to the current interpreter, with an appended newline (the
+current platform's "\n").
+
+      $ export FOOTMPDIR=$(mktemp -d)
+      $ cd $FOOTMPDIR
+
+=head3 OUTPUT: LITERAL MATCHING
+
+This is the default matching style.  Lines of text output by the
+interpreter will be matched with C<eq> to lines of literal matching
+output.  For example:
+
+  # note that `cd' has no output
+      $ cd /tmp
+      $ pwd
+      /tmp
+
+Lembas strips any output of its final C<CRLF> (or just C<LF>) and some
+other things, in order for test files to be reasonably easy to write:
+
+=over 4
+
+=item * carriage returns
+
+=item * ANSI escape sequences
+
+=item * non-backspace characters followed by a backspace character
+
+=back
+
+This means that you still have a chance of writing a working test file
+even if the interpreter prints "funny colored lines that don't move":
+
+  Starting foobar daemon...    [WAITING]
+  Starting foobar daemon...    [  OK   ]
+  foobar daemon started successfully!
+
+=head3 OUTPUT: REGEX MATCHING
+
+Regex matching output is differentiated from literal matching output
+by the presence of a "re: " tag at column 0.  In a regex matching
+output line, any Perl regex is allowed.  The matching test is done
+under the effects of C<use re 'eval'>, so you can do tricky things
+like
+
+  package LembasWrap {
+      # match hex changeset hashes
+      our $hg_changeset_re = qr/[a-f0-9]{12}/;
+  }
+  eval {
+      my $lembas = Lembas->new_from_test_spec(...);
+      $lembas->run;
+  }; ...
+
+and in your Lembas script file:
+
+  # Checking that everything looks good
+      $ hg log
+  re: changeset:   0:(??{${LembasWrap::hg_changeset_re}})
+      tag:         tip
+      user:        Fabrice Gabolde <fabrice.gabolde@gmail.com>
+  re: date:        .*
+      summary:     created repo and added a file
+      
+
+with delayed regex interpolation.
+
+Like in literal matching, output lines are sanitized by removing line
+endings and color.
+
+=head1 COMMANDS
+
+=head2 fastforward
+
+  fastforward QUANTIFIER
+
+Skip ahead until the next expected output matches.  Does not generate
+a test.
+
+This command works by trying output lines one by one against the next
+match (literal or regex).  When they fail, the failed match is put
+back into the command queue, and L<Test::Builder> history is rewritten
+to pretend everything went fine.  Any L<Test::Builder> output during
+this phase is suppressed.
+
+When an output line finally matches the next test, Lembas exits
+fastforwarding mode and outputs the results of the successful test as
+if nothing had happened.
+
+C<QUANTIFIER> has no use for the moment.
+
+=head2 preamble
+
+  preamble
+
+This special command can only be used as the very first command in a
+Lembas script.  It kickstarts Lembas into matching output (because
+Lembas expects a command to generate output, it gets confused when
+output is generated without a command).  You can use it to match
+e.g. license and copyright information.
+
+Because C<preamble> acts much like a regular input line, it generates
+a "no output left unmatched" test.
+
+=head2 wait_less_than
+
+  wait_less_than VALUE UNIT
+
+Start a timer; if some output does not arrive within a certain time,
+report a failure and bail out from the test script (it is unlikely the
+rest of the script is going to work anyway).  If some output does
+arrive, report a success and kill the timer.
+
+This uses C<alarm>, in case it is important for your test script to be
+able to C<sleep>.
+
+C<VALUE> may be any value.  C<UNIT> may be "second", "seconds",
+"minute" or "minutes".
+
+=head2 yield
+
+  yield
+
+The C<yield> command exits the Lembas loop mid-tests so that you can
+perform some other tasks.  You can resume the Lembas tests by calling
+the C<run> method again.
+
+=head1 AUTHOR
+
+Fabrice Gabolde <fabrice.gabolde@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by Fabrice Gabolde
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

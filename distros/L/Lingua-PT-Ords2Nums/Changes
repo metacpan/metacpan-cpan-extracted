@@ -1,0 +1,30 @@
+Revision history for Perl extension Lingua::PT::Ords2Nums.
+
+0.07  Tue Nov 09 20:14:00 2004
+	- fixed a bug that had to do with dependencies
+
+0.06  Mon Nov 08 19:55:00 2004
+	- moved a few things around
+        - changes in the documentation
+        - added pod.t and pod-coverage to the tests directory
+
+0.05  Thu Sep 30 23:17:00 2004
+        - Perl required version is now 5.006 (was 5.008)
+	- added META.yml
+
+0.04  Wed May 10 14:01:00 2004
+        - updated documentation
+
+0.03  Wed May 10 16:13:00 2004
+        - fixed Makefile.PL (PREREQ_PM now includes Lingua::PT::Words2Nums)
+
+0.02  Wed May 10 15:08:12 2004
+	- working up to 999.999.999.999
+
+0.01  Wed May  5 20:46:12 2004
+	- first release ready; works up to 199; needs more tests
+
+0.01  Wed May  5 20:32:12 2004
+	- original version; created by h2xs 1.22 with options
+		-XAn Lingua::PT::Ords2Nums
+

@@ -1,0 +1,24 @@
+# $File: //member/autrijus/Lingua-ZH-HanDetect/README $ $Author: autrijus $
+# $Revision: #1 $ $Change: 3923 $ $DateTime: 2003/01/27 20:55:42 $
+
+This is the README file for Lingua::ZH::HanDetect, a module for guessing
+Chinese text's variant and encoding.
+
+* Installation
+
+Lingua::ZH::HanDetect uses the standard perl module install process:
+
+cpansign -v		# see SIGNATURE for details
+perl Makefile.PL
+make
+make test
+make install
+
+* Copyright
+
+Copyright 2003 by Autrijus Tang <autrijus@autrijus.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.

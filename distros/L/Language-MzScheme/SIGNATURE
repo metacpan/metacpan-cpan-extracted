@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 bd73ecb6403445c824e90c92502480df8abfe0b8 Changes
+SHA1 cc9a7dcadeb9df6ea41d0ee832d46989aa47b97f MANIFEST
+SHA1 0adae534d312009a2a51bc1d347bfa2e8ab42d86 MANIFEST.SKIP
+SHA1 7baacf804e3816e1b5d29e43f3e28d6afcf42a1e META.yml
+SHA1 4b7f09eb66ade5f196eeee66695e3e09405e85fe Makefile.PL
+SHA1 ac54a1b93788ef8b4f64788943b561b218ed5d43 README
+SHA1 06d883487127fa0026311904e7c4867e850c505c inc/Module/Install.pm
+SHA1 2771d5c5033e94c4789c66a0aad4e21c62985ce9 inc/Module/Install/Base.pm
+SHA1 b5e2d5fc07b92d042c97631d2b00f61f974fc164 inc/Module/Install/Can.pm
+SHA1 c3747aa4bd8faa530c974b78f729c67f15c6f928 inc/Module/Install/Fetch.pm
+SHA1 d8bc0d6e0a82d2b7533bdd3de467593094cc8b2c inc/Module/Install/Makefile.pm
+SHA1 6fca1d05c6b9a8f10865de5be4fefb9bfa7a52e9 inc/Module/Install/Metadata.pm
+SHA1 2e6f5004ac895a26c41f043bf8fa5efb4f5b21c4 inc/Module/Install/Scripts.pm
+SHA1 6b051a6d3ed824df40343a7ff09b66282e1783c3 inc/Module/Install/Win32.pm
+SHA1 77f82ce7c623e05304ac9aae05bcd1a5558fadbb inc/Module/Install/WriteAll.pm
+SHA1 fa68d930030026229031e57913b676d92fa4cdc3 lib/Language/MzScheme.pm
+SHA1 b307c6bc0a26ca701aa93a97a0c745521780e453 lib/Language/MzScheme/Env.pm
+SHA1 0cb638e0200c5180625073b8d4f389d493cff280 lib/Language/MzScheme/Object.pm
+SHA1 9cf6fce2ad625616ffd96d3ef8acce1267c92bb7 lib/Language/MzScheme_in.pm
+SHA1 7602d4a0c5f3c4eeefa676b6dcfb1b922f9a3751 mzscheme.c
+SHA1 17aa75bc0034488c686c3d370f9652b31925725b mzscheme.h
+SHA1 30bbb57c7092670e6ff2e607c4fef85ef32f0631 mzscheme.i
+SHA1 bada8bb97970a5e83feca7e0852e42c2264c4837 mzscheme_wrap.c
+SHA1 606d26ad36e54c5a6f9434d5aa46e6491d05ce42 mzscheme_wrap.h
+SHA1 2a3df8e0c60b920f985173ee62be3a0bc522a48a script/mzperl
+SHA1 d8b8b3acd9561d58ff7da04bb2a8e8244d09e6fc t/0-signature.t
+SHA1 67b7dbac95d29093ad4adc7f6c3ca2f8cb08ae8c t/1-basic.t
+SHA1 e44b34fb9594096289a38bae74d4ed6330546f6a t/2-context.t
+SHA1 86e4a8ba68f2b1ffc21a9f3a9a3f1f51beb69835 t/3-object.t
+SHA1 d5f24b9183df579f97f3a86d3a25bdcdad49180f t/4-data.t
+SHA1 42b23053d7905258079a5cbd43157de6c1dffb45 t/5-perl.t
+SHA1 d18267a6e23e81b724003850349c222e3b1ec729 t/6-error.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (FreeBSD)
+
+iD8DBQFByFddtLPdNzw1AaARAsOFAJ9ePe3A3y4UhO91hUUVfbAOD0EAogCcD+AN
+kg6V/+GZbjtzWgdNk4ZEmbY=
+=+2fi
+-----END PGP SIGNATURE-----

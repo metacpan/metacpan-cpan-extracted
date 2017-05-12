@@ -1,0 +1,323 @@
+
+=head1 NAME
+
+Locale::MakePhrase::OSDC2004
+
+=head1 SYNOPSIS
+
+This POD is a conference paper for the OpenSource Developers
+Conference 2004 (Melbourne, Australia).
+
+The information that follows is description of a technique which is in
+use within the L<Locale::MakePhrase> module.
+
+=head1 DESCRIPTION
+
+Language localisation of applications (ie internationalisation of text
+strings) can be a complicated problem.  Existing solutions
+are often based around enumerating or objectifying the message, thus
+allowing the output mechanism to display the appropriate string.
+Alternatively, we can use a text string as a B<key> to a mechanism
+which returns the language specific string.
+
+Most translation systems are loosely based around one of these concepts.
+For example, the B<C> library implements the C<catgets> function
+(among many locale-related functions), which takes a 'message number'
+and returns a string based on the language.  The C<gettext> function call
+implements a similar mechanism.
+
+The following information describes a Perl module which implements a
+(possibly new?) technique which I have termed B<linguistic rule evaluation>,
+ie language rules which can be evaluated at run-time.  Using this
+technique, it is possible to determine which language phrase to be
+output, given the current input phrase.
+
+Note that this module still requires a linguist to mark-up the application
+(in the appropriate language/dialect), except that it provides a more
+sophisticated set of tools (than say, gettext) so that when some
+text gets displayed, it will more accurately reflect the application
+context.
+
+For further information on the complexities of localising application
+strings, please read L<Locale::Maketext::TPJ13>.
+
+=head1 How would you or I speak a phrase in a second language?
+
+Many people speak more than one language.  When a person wants to
+translate a phrase from one language to another, they will usually do
+something like:
+
+=over 3
+
+=item 1.
+
+Think of the phrase that you want to say, usually in the language
+that they speak most often.
+
+=item 2.
+
+Try to understand what it is they are trying to say; that is, they
+determine the context/meaning of the phrase.
+
+=item 3.
+
+Speak that information in the second language.
+
+=back
+
+The important point is that the information conveyed by the phrase is what
+is being translated, and this is determined by all of the various
+pieces of information surrounding the phrase (such as, the geographical
+region).
+
+=head1 How hard is it really?
+
+Luckily for us, linguists already have a pretty good idea of how to
+translate any given phrase, into a second language.  Actually, so does
+anyone that can speak more than one language...
+
+The general philosophy is that for phrases that dont have any of the
+'fill in the blanks' (as in "Please choose some ___"), then it is a
+relatively simple problem to translate the phrase; its generally
+just a matter of knowing the language/region (as in en_au).
+
+However, for the 'fill in the blanks' phrases, then it is substantially
+more complicated, as we have to handle singular, plural, duality, zero,
+etc. on a per-language basis.
+
+But more importantly, each blank that needs to be filled, needs to
+be tested to understand what what information it is actually trying
+to convey.  For example:
+
+=over 2
+
+Lets say that the English phrase is "Please select ___ files", where
+the blank entry is a number.  And lets assume that we would like to
+display the correct output phrase which matches the 'meaning' of the
+phrase for all possible values of blank.
+
+Now, if the blank has a value of zero then ideally we would like
+to be able to display "Dont select any files".  To output this phrase
+we need to evaluate the value of the blank; if the value is non-zero,
+then we would want to display something else.
+
+=back
+
+This test/evaluation needs to happen at run-time, as the value of the
+blank is not known until just before we output the message; and this
+example is just for English - lets extrapolate this a little bit...
+
+=over 2
+
+What if the blank has a value of one?  Ideally we want to output the
+phrase "Only select a single file".
+
+What if the value is two?  Should we output "Please select 2 files"
+or should we output "Please select two files"?
+
+What happens if the value is really big?  What happens if it negative?
+
+=back
+
+This example is applicable for English.  What about the next language?
+Do any of these tests/evaluations apply?  If so, how many of these
+tests are common to all languages?
+
+=over 6
+
+=item Note:
+
+I have just said "the no-fill-in-the-blanks" is relatively simple, in the
+translation stages.  However, this ignores the fact that phrases in
+some languages also have gender, age, seniority and other properties
+that should be taken into account.  This is the subject of further
+study.
+
+=back
+
+=head1 Don't assume a property of one language, is applicable to others.
+
+The previous example highlighted the number of phrases that need
+evaluation for English.  It turns out that assuming other languages
+have similar properties, is simply a misnomer; there is no single
+person who would be capable of understanding the nuances of every language.
+Thus it is pointless to even try to make a property of one language,
+also apply to another.
+
+Lets look at an example - Chinese vs English. 
+
+=over 2
+
+When translating a phrase with numbers, in most cases the Chinese
+phrase wont change for the singular vs plural cases.
+
+Whereas Engligh requires two seperate phrases, one for singular
+and one for plural.
+
+=back
+
+=head1 What is a linguistic rule?
+
+Now that we have discussed how you or I would translate a phrase,
+lets explain the concept of a B<linguistic rule>.
+
+A linguistic rule contains the properties to encapsulate the technique
+of interpreting the meaning of a phrase.  When we want to translate
+a given phrase into another language, we select the most appropriate
+rule from many rules.  The choice of the most suitable rules, is part
+of the B<linuguistic rule evaluation> engine.
+
+A rule has the following properties:
+
+=over 2
+
+=item language
+
+This is an L<RFC3066|http:E<sol>E<sol>www.ietf.orgE<sol>rfcE<sol>rfc3066.txt> language tag (eg 'en' or 'en_au').
+
+=item key
+
+This is the phrase that is used as the base input phrase.  This will
+most likely be in the language of the programmer (eg English).
+
+=item translation
+
+The output phrase written in the appropriate language.
+
+=item expression
+
+If the phrase contains variables, this is the expression that is used
+to determine if this output phrase should be the phrase that is
+chosen.
+
+=item priority
+
+In some circumstances, there may be multiple expressions which
+evaluate to be true.  The priority is used to determine which expression
+to evaluate first.
+
+=back
+
+A linguistic rule, from programmers point of view, is a struct which
+contains enough information to enable us to implement an
+equivalent process as that of a linguist.
+
+=head1 Text syntax
+
+Before we describe some of the details, we should explain the syntax
+of the application text.
+
+Whenever we want an application value to take part in the phrase, we
+use the syntax:
+
+  "This is some phrase, with a [_1] value that is to be run-time evaluated"
+
+The square brackets indicate that a program value is going to be
+passed to the translation engine.  Some application strings dont have
+any program arguements, while others will have many.
+
+=head1 Expression syntax
+
+The sytax of an expression, is of the form:
+
+  _X op val
+
+where:
+
+  X   - numerical application argument; the underscore indicates
+        that the value is an argument, not a value
+  op  - evaluation operator
+  val - the value to tested against
+
+An example of an expression, for English:
+
+  _1 == 0
+  _2 > 1
+  left(_3,5) eq "house"
+
+=head1 Linguistic rule evaluation
+
+To summarise, the engine implements the following:
+
+=over 3
+
+=item 1.
+
+Find all language rules where the key matches the input phrase, for
+the corresponding language tag.  Note that the implementation supports
+the concept of fallback languages (eg: 'en_au' falls back to 'en').
+The linguistic rules for the fallback languages which match the key,
+are also retrieved.
+
+=item 2.
+
+Sort the rules based on a combination of the priority, the language
+tag (eg 'en_au' has higher precedence than 'en') and whether a non-null
+expression exists.  Rules with no expression have the lowest priority.
+
+=item 3.
+
+Evalute the expression from each rule, starting with the highest
+priority.  The first rule to evaluate to C<true>, is chosen.
+
+=item 4.
+
+Apply the arguments in-place, to the selected rule's translated value.
+
+=back
+
+=head1 Features
+
+=over 2
+
+=item *
+
+Support an arbitrary number of blanks to fill.
+
+=item * 
+
+Be able to swap the ordering of the blanks, ie positional argument 2
+needs to be able to be the first blank to fill.
+
+=item *
+
+Allow translations in dialects of a language to be output, in
+preference to the corresponding translation in the base language.
+
+=item *
+
+Support multiple types of backing stores, eg: single file for all 
+languages, a file per language or a database.
+
+=back
+
+=head1 Example
+
+The L<Locale::MakePhrase> tarball contains test cases.  These are
+used as working examples...
+
+=head1 Further development
+
+Gender... Age...
+
+=over 2
+
+As an examples, lets say that we were talking about a person,
+specifically a female child.  In Italian the term used would be
+'bambina'; for a male child it is 'bambino'.  Thus in this case,
+the context surrounding the phrase will include the age and gender
+of the child.
+
+=back
+
+How do we handle this?  Future development may revolve around the
+support of gender, age and seniority.
+
+Each of these three properties need to be considered from the point
+of view of the speaker as well as the receiver.  Since the speaker
+is simply a computer, one possible scenario is to pass the age and
+gender of the user, as arguments to the constructor of the translation
+instance.
+
+=cut
+

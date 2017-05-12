@@ -1,0 +1,139 @@
+NAME
+    Language::MPI - v0.9 Message Parsing Interpreter
+
+SYNOPSIS
+    Processor for the Message Parsing Interpreter text composition language,
+    based on the MPI found in MU* online environments, adapted for more
+    general semantics.
+
+    http://en.wikipedia.org/wiki/Message_Parsing_Interpreter
+
+USAGE
+            use Language::MPI;
+            $node = new Language::MPI($noderef);
+            $node->setvar("varname", "varval");
+            $results = $node->parse("tick {set:varname,{time:}} tock");
+            $val = $node->readvar("varname");
+
+    MPI assumes an operating environment consisting of a set of nodes each
+    of which has a set of named properties. How these nodes and properties
+    are stored and structured is up to the application except that:
+
+    * noderefs are perl scalars used by application supplied functions.
+    Something with a printable value is encouraged but not required.
+    * properties may be identified by and resolve to plain text strings.
+
+    MPI, in the interest of more general usage, expects some support
+    subroutines to be supplied by app to access nodes and properties. Should
+    any of these not be supplied, errors are trapped to prevent crashing.
+    Functions not needing these should still work properly. Should the
+    application designer wish, app data to be passed to these callbacks may
+    be set into and read from the object by the setvar() and readvar()
+    methods.
+
+    mpi_neighbors($thisnode, $pattern, $obj)
+        $thisnode is a noderef. $pattern is a string pattern used to specify
+        which nodes 'neighboring' the current node are of interest. returns
+        list of noderefs;
+
+    mpi_prop($thisnode, $propname, $obj)
+        $propname is the string name of a property. returns propval;
+
+    mpi_props($thisnode, $proppat, $obj)
+        $propat is a string specifier to a property directory or a subset of
+        properties. returns list of propnames;
+
+    mpi_propset($thisnode, $propname, $val, $obj)
+
+INSTALATION
+            perl Makefile.PL
+            make
+            make install
+
+    Or simply copy the MPI.pm file to Language/ under the perl modules
+    directory. README and the man file for this package exist as pod data in
+    MPI.pm.
+
+STATUS
+    Some MPI standard functions incomplete or unimplimented. Testing
+    incomplete.
+
+Etc
+    This code developed using perl 5.8.8. Might work with perl 5.6.0 or
+    older with proper libraries. Uses strict and warning.
+
+    Copyright (c)2007 Peter Hanely. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+MPI primitives
+  {abs:num}
+  {add:num1,num2...}
+  {and:num1,num2...}
+  {attr:attribute...,text}
+  {count:array}
+  {date:}
+  {dec:var,dec}
+  {default:var1,var2...}
+  {delprop:var[,obj]}
+  {dice:range[,count[,bonus]]}
+  {dist:x1,y2...}
+  {div:num,num1...}
+  {eq:var1,var2}
+  {eval:vars...}
+  {exec:prop[,node]}
+  {for:varname,start,end,increment,commands}
+  {foreach:varname,list,command[,list seperator]}
+  {ge:var1,var2}
+  {gt:var1,var2}
+  {if:condition,true[,false]}
+  {inc:var,inc}
+  {index:prop[,obj]}
+  {insrt:string1,string2}
+  {lcommon:list1,list2}
+  {le:var1,var2}
+  {list:props[,obj]}
+  {listprops:props[,obj]}
+  {lmember:list,item[,delimiter]}
+  {max:var1,var2...}
+  {min:var1,var2...}
+  {mklist:list items}
+  {mod:num1,num2}
+  {mult:num1,num2...}
+  {ne:var1,var2}
+  {neighbors:varname,pattern,code}
+  {nl:}
+  {not:var}
+  {null:...}
+  {or:var1,var2...}
+  {prop:property,node}
+  {secs:}
+  {set:var,val}
+  {sign:num}
+  {smatch:string,pattern}
+  {store:val,property[,node]}
+  {strip:string}
+  {strlen:string}
+  {subst:string,old,new}
+  {subt:num1,num2...}
+  {time:}
+  {tolower:string}
+  {toupper:string}
+  {v:varname}
+  {version:}
+  {while:condition,command}
+  {with:varname...}
+  {xor:num1,num2...}
+Public object methods
+  new(noderef);
+    Create new MPI object.
+
+  $mpi->setvar(var,val);
+    Sets a variable in the mpi object to a scalar value.
+
+  $mpi->readvar(var);
+    Reads a scalar value from the mpi object
+
+  $mpi->parse(string);
+    Processes a string for MPI codes
+

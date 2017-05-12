@@ -1,0 +1,75 @@
+{
+   "abstract" : "Perl extension of Lingua::YaTeA for extracting terms from a biomedical corpus.",
+   "author" : [
+      "Wiktoria Golik <wiktoria.golik@jouy.inra.fr>, Zorana Ratkovic <Zorana.Ratkovic@jouy.inra.fr>, Robert Bossy <Robert.Bossy@jouy.inra.fr>, Claire NÃ©dellec <claire.nedellec@jouy.inra.fr>, Thierry Hamon <thierry.hamon@univ-paris13.fr>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-BioYaTeA",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "Test::More" : "0.62"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::chmod" : 0,
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::General" : "2.3",
+            "Data::Dumper" : 0,
+            "File::Basename" : 0,
+            "Getopt::Long" : 0,
+            "Lingua::YaTeA" : "0.622",
+            "Module::Build::Compat" : 0,
+            "Pod::Usage" : 0,
+            "Test::More" : "0.62",
+            "Test::Pod" : 0,
+            "Test::Pod::Coverage" : 0,
+            "XML::Twig" : "3.3",
+            "perl" : "5.005"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::BioYaTeA" : {
+         "file" : "lib/Lingua/BioYaTeA.pm",
+         "version" : "0.11"
+      },
+      "Lingua::BioYaTeA::Corpus" : {
+         "file" : "lib/Lingua/BioYaTeA/Corpus.pm",
+         "version" : 0
+      },
+      "Lingua::BioYaTeA::PostProcessing" : {
+         "file" : "lib/Lingua/BioYaTeA/PostProcessing.pm",
+         "version" : "0.1"
+      },
+      "Lingua::BioYaTeA::PreProcessing" : {
+         "file" : "lib/Lingua/BioYaTeA/PreProcessing.pm",
+         "version" : "0.1"
+      },
+      "Lingua::BioYaTeA::TwigXML" : {
+         "file" : "lib/Lingua/BioYaTeA/TwigXML.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.11"
+}

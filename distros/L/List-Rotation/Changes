@@ -1,0 +1,24 @@
+Revision history for Perl extension List::Rotation
+
+0.005
+        initial published revision
+
+1.005
+        [INTERNALS]
+        * Changed VERSION to 1.005 to force CPAN indexing of List::Rotation::Cycle
+        * Added t/pod-coverage.t
+
+1.006
+        [INTERNALS]
+        * Added Memoize to prerequisits
+        * Changed all perl files to non-executable
+
+1.009
+        [INTERNALS]
+        * Added SIGNATURE file
+        * Upgraded META.yml to META-spec-v1.3
+        * Added a example file (without a real example)
+
+1.010
+        * Added methods 'prev' and 'curr'
+

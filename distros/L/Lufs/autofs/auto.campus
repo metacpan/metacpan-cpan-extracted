@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+# Autofs script for mounting a smb network
+# original idea and first version by denthijs
+# modified by pardus for more flexibility
+#
+# args: ipnum_share, hostname_share or hostname_ipnum_share
+@args = split(/_/,$ARGV[0]);
+if ( (scalar(@args) > 3) || (scalar(@args) < 2) ) {
+	die "Wrongly formatted drectory name.";
+}
+
+$share = pop @args;
+if (scalar(@args) > 1) { ($host, $ip) = @args }
+elsif ($args[0] =~ /^\d{1,3}(\.\d{1,3}){3}$/ ) { 
+	$ip = $args[0];
+	$host = 'only_ip_is_known';
+}
+else { 
+	$host = $args[0];
+	unless ($host =~ /\./) {
+		open NMB, '-|', 'nmblookup', $host;
+		my @lines = map {chomp; $_} (<NMB>);
+		close NMB;		
+		unless ($?) {
+			if ($lines[-1] =~ /failed/) { $host .= '.student.utwente.nl' }
+			elsif ($lines[-1] =~ /^(\d{1,3}(\.\d{1,3}){3})/) { $ip = $1 }
+		}
+	}
+}
+
+print "-fstype=smbfs,guest,username=GUEST".($ip ? ",ip=$ip" : '')." ://$host/$share\n";
+

@@ -1,0 +1,35 @@
+LWP-Protocol-virtual
+
+
+PURPOSE and POINT
+This URI schema and Protocol work together to allow virtualization of URL's.
+
+For example, consider the URL's you might use to access a file on CPAN:
+	ftp://ftp.perl.org/pub/CPAN/authors/id/S/SN/SNOWHARE/...
+		Lingua-Stem-0.81.tar.gz
+Well, you could just as easily use:
+	file://home/mine/cpan/mirror
+or
+	http://cpan.org/gotta/be/there/somewhere
+
+Well, with virtual:// URLs, you don't have to use any of them.  Or at least not
+directly.  You just take a group, and name it in ~/.lwp_virt, and then use
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+or, if you use GNU make, just
+	make
+	make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Rich Paul
+

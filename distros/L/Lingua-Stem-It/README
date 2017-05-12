@@ -1,0 +1,36 @@
+NAME
+    Lingua::Stem::It - Porter's stemming algorithm for Italian
+
+SYNOPSIS
+        use Lingua::Stem::It;
+        my $stems = Lingua::Stem::It::stem({ -words => $word_list_reference,
+                                             -locale => 'it',
+                                             -exceptions => $exceptions_hash,
+                                          });
+    
+        my $stem = Lingua::Stem::It::stem_word( $word );                                      
+
+DESCRIPTION
+    This module applies the Porter Stemming Algorithm to its parameters,
+    returning the stemmed words.
+
+    The algorithm is implemented exactly (I hope :-) as described in:
+
+        http://snowball.tartarus.org/algorithms/italian/stemmer.html
+
+    The code is carefully crafted to work in conjunction with the the
+    Lingua::Stem module by Benjamin Franz, from which I've also
+    borrowed some functionalities (caching and exception list).
+
+AUTHOR
+    Aldo Calpini, dada@perl.it
+
+SEE ALSO
+     Lingua::Stem
+
+COPYRIGHT
+    Copyright (c) Aldo Calpini, dada@perl.it. All rights reserved.
+
+    This library is free software; you can redistribute it and/or 
+    modify it under the same terms as Perl itself.
+

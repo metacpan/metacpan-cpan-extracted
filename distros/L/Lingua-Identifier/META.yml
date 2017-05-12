@@ -1,0 +1,28 @@
+---
+abstract: 'A NN based approach for language identification'
+author:
+  - 'Alberto Simoes <ambs@cpan.org>'
+build_requires:
+  Math::Matrix::MaybeGSL: '0.006'
+  Module::Build: '0.3601'
+  Test::More: '0'
+configure_requires:
+  Math::Matrix::MaybeGSL: '0.006'
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Identifier
+requires:
+  File::ShareDir: '0'
+  File::Spec::Functions: '0'
+  Math::Matrix::MaybeGSL: '0.006'
+  Text::Ngram: '0'
+  perl: '5.014004'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+version: '0.01'

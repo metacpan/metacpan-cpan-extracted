@@ -1,0 +1,85 @@
+=head2 robots
+
+In internet technology robots (sometimes misleadingly called agents,
+which could be confused with the suggestion of artificial
+intelligences, an entirely different and somewhat more Science Fiction
+kind of thing) are all programs which are designed to automatically,
+without human supervision make access to the World Wide Web.  
+
+When robots were originally proposed, there was a feeling that they
+could seriously endanger the internet its self by using so much
+network resource that they would make it impossible to use the
+internet for anything else.  For this reason clear rules were proposed
+to limit what the robots did and how the did it.  These original
+proposals can be summarised as.
+
+=over 4
+=item * robots shouldn't go anywhere where they aren't wanted
+=item * robots should do things slowly so that they don't overload
+	servers
+=item * robots should spread the work they are doing between as many
+	sites as possible at a time so as to minimise the load they
+	impose on any one site.
+=back
+
+To some extent, this prediction has been proved true.  The automatic
+downloading of files is generating a real over-use of the internet.
+However, almost all of this `automatic' usage is coming from people
+downloading WWW pages in Netscape which then downloads all of the
+image files and other junk attached to those files.
+
+=head3 So what's the solution?  
+
+Ban Netscape?  No.  The original design of the internet largely
+assumed that it's users were sociable friendly people who liked
+eachother.  Remember it wasn't even the academics, but the army.  If
+you were allowed to use the network (security could be built in for
+this, of course) then you were on our side.
+
+Nowadays, the internet is no longer used like this and ways have to be
+found to control network usage of even people who are deliberately
+trying to make life as difficult as possible.  Crackers, vandals and
+Netscape users (not that they're deliberate) alike.
+
+For these reasons, the calculation in favour of robots has become alot
+better.  They're already used in a large way by such people as
+Alta-Vista, Infoseek etc. for gathering their information, and even if
+you set up your robot to do the maximum damage, it wouldn't be likely
+to be much worse than some people doing random browsing across a site
+with multiple copies of netscape.
+
+The only way to stop people from downloading vast tracts of pages from
+your site automatically is to have some kind of defences which
+automatically stop connections from sites which aren't behaving as you
+would like them to.
+
+=head3 What limits do we now impose on our robot?
+
+We don't want people to have to stop our robot.  We want them to like
+us.. so I've been conservative.  I like to be careful, so I've stuck
+to the original rules.  In the case of this robot, they work very
+well.
+
+We use and follow the Robot Rules provided from /robots.txt on web
+sites.  We can't do the same on ftp sites because this isn't a
+standard and isn't written into libwww-perl.  It probably could and
+should be.
+
+By default we wait some time between each check and are careful about
+which sites we are checking.  You can turn this off and may find that
+you want to if you are checking your own local network.  You shouldn't
+turn this off unless you know that you have reasonable permission from
+every computer involved.  I don't know when that would be though.
+Possibly you are checking from a dialup connection and feel that you
+have paid for every byte that tranfers.  I use the Tardis Project's
+links which are paid for by the University of Edinburgh.  So I do all
+my checking at night when they don't need or use the bandwidth
+anyway.  Even then I do it slowly, just incase someone happens to be
+doing something at that time.
+
+For more information about robots and the related rules please see
+
+	http://info.webcrawler.com/mak/projects/robots/robots.html
+
+=cut
+

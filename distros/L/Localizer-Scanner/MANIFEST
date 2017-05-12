@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Localizer/Dictionary.pm
+lib/Localizer/Scanner.pm
+lib/Localizer/Scanner/Perl.pm
+minil.toml
+t/00_compile.t
+t/Dictionary.t
+t/Scanner/Perl.t
+t/dat/Scanner/perl.pl
+META.yml
+MANIFEST

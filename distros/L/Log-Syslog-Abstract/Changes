@@ -1,0 +1,26 @@
+Revision history for Log-Syslog-Abstract
+
+1.200	Wed, 05 Jan 2011 15:31:02 -0500
+	Revert to version that does not use Sub::Exporter, as there's really no
+	need.
+
+1.004	Thu, 09 Dec 2010 13:38:19 -0500 
+	(bugfix) Only detect and create subs on first import() call.
+
+1.003   Tue, 12 Oct 2010 15:23:06 -0400
+	(bugfix) Some Unix::Syslog constants may not exist on some platforms,
+	even if they claim to be exportable by Unix/Syslog.pm.  This caused
+	runtime crashes on Solaris -- but not during the tests, as we fake
+	everything there.
+
+1.002	Tue, 01 Apr 2008 10:38:24 -0400
+	(bugfix) RHEL5 still ships with ancient Sys::Syslog.  Call
+	setlogsock() to make it happy.
+
+1.001	Tue, 06 Nov 2007 12:17:47 -0500 dmo
+
+	(bugfix) Module would fail to load with older versions of Sys::Syslog
+	that didn't support :macros
+
+1.000	Fri, 13 Apr 2007 09:51:49 -0400 dmo
+	First public version released to CPAN

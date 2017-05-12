@@ -1,0 +1,825 @@
+# definition of the linguistic annotation steps
+
+OGMIOSTMP	= $HOME/tmp
+
+PLATFORM_ROOT	= $HOME/Platform
+
+AWK		= /usr/bin/awk
+PERL            = /usr/bin/perl
+
+DEBUG           = 0
+
+<NLP_connection>
+	SERVER			= localhost
+	PORT			= 1510
+	RETRY_CONNECTION	= 10
+</NLP_connection>
+
+<XML_INPUT>
+    PRESERVEWHITESPACE = 0
+    LINGUISTIC_ANNOTATION_LOADING = 1
+    FILEFORMAT = ALVIS
+</XML_INPUT>
+
+
+<XML_OUTPUT>
+    FORM = 1
+    ID = 1
+    TOKEN_LEVEL = 1
+    SEMANTIC_UNIT_NAMED_ENTITY_LEVEL	= 1
+    WORD_LEVEL	= 1
+    SENTENCE_LEVEL = 1
+    MORPHOSYNTACTIC_FEATURE_LEVEL	= 1
+    LEMMA_LEVEL	= 1
+    SEMANTIC_UNIT_TERM_LEVEL	= 1
+    SEMANTIC_UNIT_LEVEL	= 1
+    SYNTACTIC_RELATION_LEVEL	= 1
+
+    SECTION_LEVEL = 0
+
+#    NO_STD_XML_OUTPUT = 1 
+#     NO_STD_XML_OUTPUT = 2 # termlistoutput
+#      NO_STD_XML_OUTPUT = 3 # HTML output (corpus and tagged terms)
+#       NO_STD_XML_OUTPUT = 5 # Txt output
+#      NO_STD_XML_OUTPUT = 9
+#     YATEA = 1
+</XML_OUTPUT>
+
+<linguistic_annotation>
+	ENABLE_TOKEN	= 1
+	ENABLE_NER	= 1
+	ENABLE_WORD	= 1
+	ENABLE_SENTENCE = 1
+	ENABLE_POS	= 1
+	ENABLE_LEMMA	= 1
+	ENABLE_TERM_TAG	= 1
+	ENABLE_SYNTAX	= 0
+	ENABLE_SEMANTIC_TAG	= 0
+    <processing>
+      id       = 2
+      order    = 1
+      tool     = "I2B2 Named Entity Recognizer"
+      comments = "Named Entity Recognition"
+    </processing>
+# #     <processing>
+# #       id       = 3
+# #       order    = 1
+# #       tool     = TagEN
+# #       comments = "Named Entity Recognition"
+# #     </processing>
+# #     <processing>
+# #       id       = 30
+# #       order    = 2
+# #       tool     = "Ukrainian Word Segmentizer"
+# #       comments = "Word segmentation for Ukrainian"
+# #     </processing>
+    <processing>
+      id       = 4
+      order    = 2
+      tool     = "Awk Word Segmentizer"
+      comments = "Word segmentation"
+    </processing>
+    <processing>
+      id       = 5
+      order    = 3
+      tool     = "Basic internal Sentence Segmentizer"
+      comments = "Sentence segmentation"
+    </processing>
+#     <processing>
+#       id       = 6
+#       order    = 3
+#       tool     = "I2B2 Sentence Segmentizer"
+#       comments = "Sentence segmentation for I2B2"
+#     </processing>
+#      <processing>
+#        id       = 7
+#        order    = 4
+#        tool     = "GeniaTagger"
+#        comments = "Genia POS Tagger"
+#      </processing>
+#      <processing>
+#        id       = 8
+#        order    = 5
+#        tool     = "StanfordParser"
+#        comments = "Syntactic Parser"
+#      </processing>
+# #     <processing>
+# #       id       = 14
+# #       order    = 8
+# #       tool     = "I2B2 2010 Relation Acquisition"
+# #       comments = "I2B2 2010 Relation Acquisition"
+# #     </processing>
+    <processing>
+      id       = 15
+      order    = 4
+      tool     = "TreeTagger"
+      comments = "POS tagger"
+    </processing>
+#     <processing>
+#       id       = 18
+#       order    = 5
+#       tool     = "Flemm"
+#       comments = "POS tagger and morphological analyser"
+#     </processing>
+#     <processing>
+#       id       = 8
+#       order    = 6
+#       tool     = "PorterStemmer"
+#       comments = "Word Stemming"
+#     </processing>
+#      <processing>
+#        id       = 9
+#        order    = 7
+#        tool     = "TermTagger"
+#        comments = "Term Tagger"
+#      </processing>
+    <processing>
+      id       = 10
+      order    = 8
+      tool     = "YaTeA"
+      comments = "Term Extractor"
+    </processing>
+#      <processing>
+#        id       = 16
+#        order    = 6
+#        tool     = "I2B22010ConceptTagging"
+#        comments = "I2B2 2010 concept tagging based on results"
+#      </processing>
+#      <processing>
+#        id       = 17
+#        order    = 8
+#        tool     = "I2B2AssertionIdentification"
+#        comments = "I2B2 Assertion Identification"
+#      </processing>
+# #      <processing>
+# #        id       = 11
+# #        order    = 9
+# #        tool     = "MorphoSemanticTagging"
+# #        comments = "Semantic tagging based on morphological and lexical clues"
+# #      </processing>
+# # #     <processing>
+# # #       id       = 12
+# # #       order    = 8
+# # #       tool     = Faster
+# # #       comments = "Morphosyntactic variants acquisition"
+# # #     </processing>
+
+#     <processing>
+#       id       = 20
+#       order    = 100
+#       tool     = "I2B2 2010 Post Processing"
+#       comments = "Post Processing for the 2010 I2B2 Challenge"
+#     </processing>
+
+</linguistic_annotation>
+
+<NLP_misc>
+	NLP_resources	= $PLATFORM_ROOT/Resources
+	SAVE_IN_OUTDIR	= 1
+	TERM_LIST_EN	= $NLP_resources/terms.txt.sav
+	TERM_LIST_FR	= $NLP_resources/terms_FR.txt
+    # valid tags for each language
+    <POSTAG_LIST>
+        <EN>
+	    CC = 1
+	    CD = 1
+    	    DT = 1
+            EX = 1
+            FW = 1
+            IN = 1
+            JJ = 1
+            JJR = 1
+            JJS = 1
+            LS = 1
+            MD = 1
+            NN = 1
+            NNS = 1
+            NP = 1
+            NPS = 1
+            PDT = 1
+            POS = 1
+            PP = 1
+            PP$ = 1
+            RB = 1
+            RBR = 1
+            RBS = 1
+            RP = 1
+            SYM = 1
+            TO = 1
+            UH = 1
+            VB = 1
+            VBD = 1
+            VBG = 1
+            VBN = 1
+            VBP = 1
+            VBZ = 1
+            VV = 1
+            VVD = 1
+            VVG = 1
+            VVN = 1
+            VVP = 1
+            VVZ = 1
+            WDT = 1
+            WP = 1
+            WP$ = 1
+            WRB = 1
+        </EN>
+        
+        <FR>
+            ABR = 1
+            ADJ = 1
+            ADV = 1
+            DET:ART = 1
+            DET:POS = 1
+            INT = 1
+            KON = 1
+            NAM = 1
+            NOM = 1
+            NUM = 1
+            PRO = 1
+            PRO:DEM = 1
+            PRO:IND = 1
+            PRO:PER = 1
+            PRO:POS = 1
+            PRO:REL = 1
+            PRP = 1
+            PRP:det = 1
+            PUN = 2
+            PUN:cit = 2
+            SENT = 2
+            SYM = 1
+            VER:cond = 1
+            VER:futu = 1
+            VER:impe = 1
+            VER:impf = 1
+            VER:infi = 1
+            VER:pper = 1
+            VER:ppre = 1
+            VER:pres = 1
+            VER:simp = 1
+            VER:subi = 1
+            VER:subp = 1
+        </FR>
+        
+    </POSTAG_LIST>
+</NLP_misc>
+
+# TO KEEP
+NLP_tools_root = $PLATFORM_ROOT/NLPtools
+NLP_resources_root = $PLATFORM_ROOT/Resources
+#
+
+
+SEMTAG_EN_DIR = $NLP_tools_root/AlvisSemTag-0.4
+ONTOLOGY = $SEMTAG_EN_DIR/share/Subtilis_Molecular_Biology-v2.rdf
+CANONICAL_DICT = $SEMTAG_EN_DIR/share/canonical_head_variants.dict.trish2 # optional
+PARENT_DICT = $SEMTAG_EN_DIR/share/Subtilis_Molecular_Biology-v2.parent.trish2 # optional
+
+<NLP_tools>
+	NETAG_EN		= "$NLP_tools_root/TagEN/tagen -t -y :bio"
+	NETAG_FR		= "$NLP_tools_root/TagEN/tagen -t -y :equer"
+	WORDSEG_EN		= "$AWK -f $NLP_tools_root/WordSeg/words-en.awk"
+	# WORDSEG_EN		= "$NLP_tools_root/WordSeg/sentences.pl"
+	WORDSEG_FR		= "$AWK -f $NLP_tools_root/WordSeg/words-fr.awk"
+	#POSTAG_EN		= "$NLP_tools_root/TreeTagger/bin/tree-tagger $NLP_tools_root/TreeTagger/lib/english.par -token -lemma -sgml -no-unknown"
+	#POSTAG_EN		= "(cd $NLP_tools_root/geniatagger-2.0.1; sed 's/ /___/g' | tr '\n' ' '| ./geniatagger -nt | cut -f 1,2,3|sed 's/\([^\t]*\t\)\([^\t]*\)\t\([^\t]*\)/\1\3\t\2/g' | sed 's/___/ /g' | grep -v '^$')"
+	POSTAG_FR		= "$NLP_tools_root/TreeTagger/bin/tree-tagger $NLP_tools_root/TreeTagger/lib/french.par -token -lemma -sgml -no-unknown"
+	SYNTACTIC_PATH_EN	= "$NLP_tools_root/link-4.1b"
+	# SYNTACTIC_PATH_EN       = "$NLP_tools_root/biolgForAlvis/biolg-1.1.7b"
+	SYNTACTIC_PATH_FR	= ""
+	SYNTACTIC_ANALYSIS_EN	= "cd $SYNTACTIC_PATH_EN ; $SYNTACTIC_PATH_EN/parse"
+
+# 	SYNTACTIC_PATH_EN_SUPPL       = "$HOME/Research/Logiciels/LP2LP"
+#         SYNTACTIC_ANALYSIS_EN_LP2LP_CLEAN       = "cd $SYNTACTIC_PATH_EN_SUPPL ; $SYNTACTIC_PATH_EN_SUPPL/clean_BioLG_output_for_lp2lp.pl"
+#         SYNTACTIC_ANALYSIS_EN_LP2LP     = "cd $SYNTACTIC_PATH_EN_SUPPL ; $SYNTACTIC_PATH_EN_SUPPL/lp2lp/lp2lp -r $SYNTACTIC_PATH_EN_SUPPL/lp2lp/test/lp2lp.conf"
+
+	# SYNTACTIC_ANALYSIS_EN	= "cd $SYNTACTIC_PATH_EN ; $SYNTACTIC_PATH_EN/parse -xmlin"
+	SYNTACTIC_ANALYSIS_FR	= ""
+	TERM_TAG_FR		= ""
+	TERM_TAG_EN		= ""
+        SEMTAG_EN               = "$SEMTAG_EN_DIR/src/AlvisSemTag -c $CANONICAL_DICT -p $PARENT_DICT -o $ONTOLOGY"
+        SEMTAG_FR               = ""
+        YATEARC                 = "/etc/yatea/yatea.rc"
+        YATEAOUTPUT             = "$ALVISTMP"
+        <TOOL>
+            NAME                = "TagEN"
+            VERSION             = "1"
+            COMMENTS            = "Named Entity Recognizer"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::TagEN"
+            <CONFIGURATION>
+               <CONFIG language=EN>
+                   TAGENCONF = "$NLP_tools_root/TagEN/tagen.conf"
+               </CONFIG>
+               <CONFIG language=FR>
+                   TAGENCONF = "$NLP_tools_root/TagEN/tagen.conf"
+               </CONFIG>
+               <COMMANDS language=EN>
+                   TAGENMODE               = ":bio"
+                   TAGEN_CMD               = "$NLP_tools_root/TagEN/tagen -t -y $TAGENMODE"
+               </COMMANDS>
+               <COMMANDS language=FR>
+                   TAGENMODE               = ":equer"
+                   TAGEN_CMD               = "$NLP_tools_root/TagEN/tagen -t -y $TAGENMODE"
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "Awk Word Segmentizer"
+            VERSION             = "1"
+            COMMENTS            = "Word segmentizer"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::AwkWordSegmentizer"
+            <CONFIGURATION>
+               <COMMANDS language=SV>
+                   WordSegmentizer_CMD       = "$AWK -f $NLP_tools_root/WordSeg/words-en.awk"
+               </COMMANDS>
+               <COMMANDS language=EN>
+                   WordSegmentizer_CMD       = "$AWK -f $NLP_tools_root/WordSeg/words-en.awk"
+               </COMMANDS>
+               <COMMANDS language=FR>
+                   WordSegmentizer_CMD       = "$AWK -f $NLP_tools_root/WordSeg/words-fr.awk"
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "Ukrainian Word Segmentizer"
+            VERSION             = "1"
+            COMMENTS            = "Word segmentizer for ukrainian"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::UKWordSegmentizer"
+            <CONFIGURATION>
+               <COMMANDS language=UK>
+                   WordSegmentizer_CMD       = "/bin/false"
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "Basic internal Sentence Segmentizer"
+            VERSION             = "1"
+            COMMENTS            = "Very basic intenal segmentizer"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::BasicSentenceSegmentizer"
+            <CONFIGURATION>
+               <COMMANDS language=SV>
+                    WSSegmentizer_CMD       = ""
+               </COMMANDS>
+               <COMMANDS language=EN>
+                    WSSegmentizer_CMD       = ""
+               </COMMANDS>
+               <COMMANDS language=FR>
+                   WSSegmentizer_CMD       = ""
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "I2B2 Sentence Segmentizer"
+            VERSION             = "1"
+            COMMENTS            = "Specific sentencesegmentizer for I2B2"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::I2B2SentenceSegmentizer"
+            <CONFIGURATION>
+               <COMMANDS language=SV>
+                    WSSegmentizer_CMD       = ""
+               </COMMANDS>
+               <COMMANDS language=EN>
+                    WSSegmentizer_CMD       = ""
+               </COMMANDS>
+               <COMMANDS language=FR>
+                   WSSegmentizer_CMD       = ""
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "I2B2 Named Entity Recognizer"
+            VERSION             = "1"
+            COMMENTS            = "Named Entity Recognizer dedicated to the I2B2 challenge - medical textual data"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::I2B2NER"
+            <CONFIGURATION>
+               <COMMANDS language=SV>
+                    WSSegmentizer_CMD       = ""
+               </COMMANDS>
+               <COMMANDS language=EN>
+               </COMMANDS>
+               <RESOURCE language=EN>
+#                       MEDICATION = ""
+#                       REASON = ""
+                        MODEADM_LIST = "$HOME/Research/Resources/I2B2-2010/ModeAdm.txt"
+                        DOSAGE_LIST = "$HOME/Research/Resources/I2B2-2010/Dosage.txt"
+                        FREQUENCY_LIST = "$HOME/Research/Resources/I2B2-2010/Frequency.txt"
+                        DURATION_LIST = "$HOME/Research/Resources/I2B2-2010/Duration.txt"
+               </RESOURCE>
+               <COMMANDS language=FR>
+                   WSSegmentizer_CMD       = ""
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "I2B2 Post Processing"
+            VERSION             = "1"
+            COMMENTS            = "Post Processing for the I2B2 challenge - medical textual data"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::I2B2PostProcessing"
+            <CONFIGURATION>
+               <COMMANDS language=SV>
+                    WSSegmentizer_CMD       = ""
+               </COMMANDS>
+               <COMMANDS language=EN>
+               </COMMANDS>
+               <RESOURCE language=EN>
+                    CORRESP     = "$HOME/Research/Resources/I2B2-2010/Correspondances.rc"
+                    MEDSECTION  = "$HOME/Research/Resources/I2B2-2010/MedicationSections-v2.rc"
+                    INDEX       = "$HOME/Research/Challenges/I2B2-2010/Data/TrainingSets"
+               </RESOURCE>
+               <COMMANDS language=FR>
+                   WSSegmentizer_CMD       = ""
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "I2B2 Post Processing 2009"
+            VERSION             = "1"
+            COMMENTS            = "Post Processing for the 2009 I2B2 challenge - medical textual data"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::I2B2PostProcessing2009"
+            <CONFIGURATION>
+               <COMMANDS language=SV>
+                    WSSegmentizer_CMD       = ""
+               </COMMANDS>
+               <COMMANDS language=EN>
+               </COMMANDS>
+               <RESOURCE language=EN>
+                    CORRESP     = "$HOME/Research/Resources/I2B2-2010/Correspondances.rc"
+                    MEDSECTION  = "$HOME/Research/Resources/I2B2-2010/MedicationSections-v2.rc"
+                    INDEX       = "$HOME/Research/Challenges/I2B2-2010/Data/TrainingSets"
+               </RESOURCE>
+               <COMMANDS language=FR>
+                   WSSegmentizer_CMD       = ""
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+
+        <TOOL>
+            NAME                = "I2B2 2010 Post Processing"
+            VERSION             = "1"
+            COMMENTS            = "Post Processing for the 2010 I2B2 challenge - medical textual data"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::I2B2PostProcessing2010"
+            <CONFIGURATION>
+               <COMMANDS language=SV>
+                    WSSegmentizer_CMD       = ""
+               </COMMANDS>
+               <COMMANDS language=EN>
+               </COMMANDS>
+               <CONFIG language=EN>
+                     TERMFILTERING = "iTer"
+                     TERMFILTERING_VALUE = "0.5"
+               </CONFIG>
+               <CONFIG language=FR>
+               </CONFIG>
+               <RESOURCE language=EN>
+                      CORRESP_R     = "$HOME/Research/Resources/I2B2-2010/Correspondances-rel.rc"
+                      CORRESP_CA     = "$HOME/Research/Resources/I2B2-2010/Correspondances.rc"
+                      STOPWORDS     = "$HOME/Research/Resources/I2B2-2010/noterms.txt"
+                      NORMALITY     = "$HOME/Research/Resources/I2B2-2010/normality.txt"
+                     MEDSECTION  = "$HOME/Research/Resources/I2B2-2010/MedicationSections-v3.rc"
+                     INDEX       = "$HOME/Research/Challenges/I2B2-2010/Training/ProcessAnnot"
+                     DESTDIR     = "$HOME/Research/Challenges/I2B2-2010/Training/RESULTS/AST/RUNTEST"
+                     OUTPUTTYPE  = "A"
+                                  # C, A, R
+               </RESOURCE>
+               <COMMANDS language=FR>
+                   WSSegmentizer_CMD       = ""
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "TreeTagger"
+            VERSION             = "3.1"
+            COMMENTS            = "Decision TreeTagger POS tagger"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::TreeTagger"
+            <CONFIGURATION>
+               <COMMANDS language=EN>
+                    TreeTagger_PARAMETER_FILE   = "$NLP_tools_root/TreeTagger/lib/english.par"
+                    TreeTagger_PARAMETERS       = "-token -lemma -sgml -no-unknown"
+                    TreeTagger_BIN       = "$NLP_tools_root/TreeTagger/bin/tree-tagger"
+                    TreeTagger_CMD       = "$TreeTagger_BIN $TreeTagger_PARAMETER_FILE $TreeTagger_PARAMETERS"
+               </COMMANDS>
+               <COMMANDS language=FR>
+                    TreeTagger_PARAMETER_FILE   = "$NLP_tools_root/TreeTagger/lib/french.par"
+                    TreeTagger_PARAMETERS       = "-token -lemma -sgml -no-unknown"
+                    TreeTagger_BIN       = "$NLP_tools_root/TreeTagger/bin/tree-tagger"
+                    TreeTagger_CMD       = "$TreeTagger_BIN $TreeTagger_PARAMETER_FILE $TreeTagger_PARAMETERS"
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "GeniaTagger"
+            VERSION             = "2.0.1"
+            COMMENTS            = "Genia POS tagger"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::GeniaTagger"
+            <CONFIGURATION>
+               <COMMANDS language=EN>
+                    GeniaTagger_BIN       = "./geniatagger"
+                    GeniaTagger_DIR      = "$NLP_tools_root/geniatagger-2.0.1"
+                    GeniaTagger_CMD       = "(cd $GeniaTagger_DIR; $GeniaTagger_BIN -nt)"
+               </COMMANDS>
+               <COMMANDS language=FR>
+                    TreeTagger_PARAMETER_FILE   = "$NLP_tools_root/TreeTagger/lib/french.par"
+                    TreeTagger_PARAMETERS       = "-token -lemma -sgml -no-unknown"
+                    TreeTagger_BIN       = "$NLP_tools_root/TreeTagger/bin/tree-tagger"
+                    TreeTagger_CMD       = "$TreeTagger_BIN $TreeTagger_PARAMETER_FILE $TreeTagger_PARAMETERS"
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "PorterStemmer"
+            VERSION             = "1"
+            COMMENTS            = "Stemming with the Porter' algorithm"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::PorterStemmer"
+            <CONFIGURATION>
+               <COMMANDS language=EN>
+                    PerlModule  = "Lingua::Stem"
+               </COMMANDS>
+               <COMMANDS language=FR>
+                    PerlModule  = "Lingua::Stem"
+               </COMMANDS>
+               <COMMANDS language=SV>
+                    PerlModule  = "Lingua::Stem"
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "TermTagger"
+            VERSION             = "0.5"
+            COMMENTS            = "Simple Term Tagger"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::TermTagger"
+            <CONFIGURATION>
+               <COMMANDS language=EN>
+                    TERMLIST    = "$HOME/Research/Resources/I2B2-2010/VJul2010/marqueurs_assertions_tot"
+#                     TERMLIST    = "$HOME/Research/Resources/I2B2-2010/conceptI2B2-2010d"
+#                     TERMLIST    = "$HOME/Research/Resources/I2B2-2010/term-ctx.txt"
+#                     TERMLIST    = "$HOME/Research/Challenges/I2B2-2010/Data/Resources/Medication.txt"
+                    PerlModule  = "Alvis::TermTagger"
+               </COMMANDS>
+               <COMMANDS language=FR>
+                    TERMLIST    = "$NLP_resources_root/terms_FR.txt"
+                    PerlModule  = "Alvis::TermTagger"
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "I2B2AssertionIdentification"
+            VERSION             = "0.1"
+            COMMENTS            = "I2B2 Assertion Identification"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::I2B2AssertionIdentification"
+            <CONFIGURATION>
+               <CONFIG language=EN>
+                   CONFIGFILE  = "$HOME/Research/Resources/I2B2-2010/AssertionIdentification-RUN1.rc"
+                   SOMEBODYELSEFIRST = 1
+               </CONFIG>
+               <CONFIG language=FR>
+               </CONFIG>
+               <COMMANDS language=EN>
+               </COMMANDS>
+               <COMMANDS language=FR>
+               </COMMANDS>
+               <RESOURCE language=EN>
+#                    REXEXPMARKS = "$HOME/Recherche/Resources/I2B2-2010/regexp_marqueurs_assertion"
+#                    PATTERNS    = "$HOME/Research/Resources/I2B2-2010/VJul2010/patterns_marqueurs_assertion"
+#                     MEDSECTION  = "$HOME/Research/Resources/I2B2-2010/MedicationSections-v3.rc"
+#                     AFFIXLIST   = "$HOME/Research/Resources/I2B2-2010/VJul2010/assertionMorpho.txt"
+               </RESOURCE>
+               <RESOURCE language=FR>
+               </RESOURCE>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "I2B22010ConceptTagging"
+            VERSION             = "0.1"
+            COMMENTS            = "I2B2 2010 concept tagging based on results"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::I2B22010ConceptTagging"
+            <CONFIGURATION>
+               <CONFIG language=EN>
+               </CONFIG>
+               <CONFIG language=FR>
+               </CONFIG>
+               <COMMANDS language=EN>
+               </COMMANDS>
+               <COMMANDS language=FR>
+               </COMMANDS>
+               <RESOURCE language=EN>
+                     GTDIR       = "$HOME/Research/Challenges/I2B2-2010/Training/GT"
+                     I2B2MODULE  = "I2B2 2010 Post Processing"
+                     INDEX       = "$HOME/Research/Challenges/I2B2-2010/Training/ProcessAnnot"
+                     OUTPUTTYPE  = "C"
+                                  # C, A, R
+               </RESOURCE>
+               <RESOURCE language=FR>
+               </RESOURCE>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "StanfordParser"
+            VERSION             = "0.1"
+            COMMENTS            = "Stanford Parser"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::StanfordParser"
+            <CONFIGURATION>
+               <CONFIG language=EN>
+               </CONFIG>
+               <CONFIG language=FR>
+               </CONFIG>
+                  STANFORDPARSER_DIR  = "$NLP_tools_root/StanfordParser/stanford-parser-2010-07-01"
+               <COMMANDS language=EN>
+                 STANFORDPARSER_CMD   = "java -mx1500m -cp "$STANFORDPARSER_DIR/stanford-parser.jar:" edu.stanford.nlp.parser.lexparser.LexicalizedParser  -maxLength 200  -sentences newline -tokenized -tagSeparator /  -outputFormat "typedDependencies" $STANFORDPARSER_DIR/englishPCFG.ser.gz "
+               </COMMANDS>
+               <COMMANDS language=FR>
+               </COMMANDS>
+               <RESOURCE language=EN>
+               </RESOURCE>
+               <RESOURCE language=FR>
+               </RESOURCE>
+            </CONFIGURATION>
+        </TOOL>
+#         <TOOL>
+#             NAME                = ""
+#             VERSION             = "0.1"
+#             COMMENTS            = ""
+#             WRAPPER             = "Lingua::Ogmios::NLPWrappers::"
+#             <CONFIGURATION>
+#                <CONFIG language=EN>
+#                </CONFIG>
+#                <CONFIG language=FR>
+#                </CONFIG>
+#                <COMMANDS language=EN>
+#                </COMMANDS>
+#                <COMMANDS language=FR>
+#                </COMMANDS>
+#                <RESOURCE language=EN>
+#                    CONFIGFILE  = ""
+#                </RESOURCE>
+#                <RESOURCE language=FR>
+#                </RESOURCE>
+#             </CONFIGURATION>
+#         </TOOL>
+        <TOOL>
+            NAME                = "I2B2 2010 Relation Acquisition"
+            VERSION             = "0.1"
+            COMMENTS            = "Module for the acquisition of semantic relations -- I2B2 2010"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::I2B22010RelationAcquisition"
+            <CONFIGURATION>
+               <CONFIG language=EN>
+                   CONFIGFILE  = "$HOME/Research/Resources/I2B2-2010/RelationAcquisition.rc"
+               </CONFIG>
+               <CONFIG language=FR>
+               </CONFIG>
+               <COMMANDS language=EN>
+               </COMMANDS>
+               <COMMANDS language=FR>
+               </COMMANDS>
+               <RESOURCE language=EN>
+#                    CONFIGFILE  = ""
+                   RELATIONMARKS = "$HOME/Research/Resources/I2B2-2010/I2B22010Relations.txt"
+               </RESOURCE>
+               <RESOURCE language=FR>
+               </RESOURCE>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "MorphoSemanticTagging"
+            VERSION             = "0.1"
+            COMMENTS            = "Semantic tagging based on morphologic and lexical clues"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::MorphoSemanticTagging"
+            <CONFIGURATION>
+               <CONFIG language=EN>
+                   CONFIGFILE  = "$HOME/Research/Resources/I2B2-2010/MorphoSemanticTagging.rc"
+               </CONFIG>
+               <CONFIG language=FR>
+               </CONFIG>
+               <COMMANDS language=EN>
+               </COMMANDS>
+               <COMMANDS language=FR>
+               </COMMANDS>
+               <RESOURCE language=EN>
+                   AFFIXLIST   = "$HOME/Research/Resources/I2B2-2010/term-type.txt"
+               </RESOURCE>
+               <RESOURCE language=FR>
+               </RESOURCE>
+            </CONFIGURATION>
+        </TOOL>
+        <TOOL>
+            NAME                = "YaTeA"
+            VERSION             = "0.5"
+            COMMENTS            = "term extractor"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::YaTeA"
+            <CONFIGURATION>
+               <CONFIG language=EN>
+                   YATEACONF = "$PLATFORM_ROOT/Conf/yatea-i2b2.rc"
+               </CONFIG>
+               <CONFIG language=FR>
+#                    YATEACONF = "$PLATFORM_ROOT/Conf/yatea-dev-flemm2.rc"
+                   YATEACONF = "$PLATFORM_ROOT/Conf/yatea-dev-fr2.rc"
+               </CONFIG>
+               <COMMANDS language=EN>
+                   PerlModule  = "Lingua::YaTeA"
+               </COMMANDS>
+               <COMMANDS language=FR>
+                   PerlModule  = "Lingua::YaTeA"
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+
+        <TOOL>
+            NAME                = "Flemm"
+            VERSION             = "0.1"
+            COMMENTS            = "POS tagger and morphological analyser"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::Flemm"
+            <CONFIGURATION>
+               <CONFIG language=EN>
+               </CONFIG>
+               <CONFIG language=FR>
+               </CONFIG>
+               <COMMANDS language=EN>
+               </COMMANDS>
+               <COMMANDS language=FR>
+                   PerlModule  = "Flemm"
+                   FLEMM_BIN   = "export PERL5LIB=$NLP_tools_root/FLEMM:$PERL5LIB; $PERL $NLP_tools_root/FLEMM/flemm.pl"
+                   FLEMM_PARAMETERS = " --tagger treetagger"
+                   FLEMM_IN_PARAMETERS = "--entree"
+                   FLEMM_OUT_PARAMETERS = "--sortie"
+                   FLEMM_CMD   = "$FLEMM_BIN $FLEMM_PARAMETERS"
+#                   FLEMM_CMD   = "flemm.pl --entree CORPUS_TTG --sortie CORPUS_FLEMM --tagger treetagger"
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+
+
+        <TOOL>
+            NAME                = "Faster"
+            VERSION             = "2.03"
+            COMMENTS            = "Morphosyntactic term variant extractor"
+            WRAPPER             = "Lingua::Ogmios::NLPWrappers::Faster"
+            <CONFIGURATION>
+               <CONFIG language=EN>
+                   FASTRCONF = "$PLATFORM_ROOT/Conf/Fastr.conf-en"
+               </CONFIG>
+               <CONFIG language=FR>
+                   FASTRCONF = "$PLATFORM_ROOT/Conf/Fastr.conf-fr"
+               </CONFIG>
+               FASTRBIN                = "$NLP_tools_root/FASTER/bin"
+               FASTRCMD                = "$NLP_tools_root/FASTER/cmd"
+               FASTRLIB                = "$NLP_tools_root/FASTER/lib"
+               FASTREMPTYCONF          = "$FASTRLIB/Fastr.conf-empty"
+               <COMMANDS language=EN>
+                   FASTR                   = "$FASTRBIN/Fastr"
+                   CONVERTCORPUS_CMD       = "$FASTRCMD/TreeTaggertoFastr.prl $FASTRLIB/TAGS-TreeTagger-en"
+                   MAKEMETARULES_SW_CMD    = "$FASTRCMD/TermtoRules.prl $FASTRLIB/TAGS-TreeTagger-en | grep '^Word' | sort -u | $FASTRCMD/WordtoFamilies.prl $FASTRLIB/der-families-en -classes $FASTRLIB/sem-classes-en | sort -u"
+                   MAKEMETARULES_TRM_CMD   = "$FASTRCMD/TermtoRules.prl $FASTRLIB/TAGS-TreeTagger-en | grep -v '^Word'"
+               </COMMANDS>
+               <COMMANDS language=FR>
+                   FASTR                   = "$FASTRBIN/Fastr"
+                   CONVERTCORPUS_CMD       = "$FASTRCMD/TreeTaggertoFastr.prl $FASTRLIB/TAGS-TreeTagger-fr"
+                   MAKEMETARULES_SW_CMD    = "$FASTRCMD/TermtoRules.prl $FASTRLIB/TAGS-TreeTagger-fr | grep '^Word' | sort -u | $FASTRCMD/WordtoFamilies.prl $FASTRLIB/der-families-fr -classes $FASTRLIB/sem-links-fr | sort -u"
+                   MAKEMETARULES_TRM_CMD   = "$FASTRCMD/TermtoRules.prl $FASTRLIB/TAGS-TreeTagger-fr | grep -v '^Word'"
+               </COMMANDS>
+            </CONFIGURATION>
+        </TOOL>
+</NLP_tools>
+
+<CONVERTERS>
+text/plain = text2xhtml  <
+
+text/html = 
+
+www/unknown = 
+#text/plain ; ; GuessText
+
+text/x-tex = tth -g -w1 -r <  
+
+application/x-tex =  tth -g -w1 -r < 
+#text/x-tex ; untex -a -e -giso ; TeXText
+#application/x-tex ; untex -a -e -giso ; TeXText
+#text/x-tex ;  ; TeX
+#application/x-tex ; ; TeX
+
+application/pdf = pdftohtml -i -noframes -nomerge -stdout 
+#application/pdf ; pstotext ; Text
+application/postscript = pstotext 
+application/msword = antiword -t 
+
+application/vnd.ms-excel =  xlhtml -fw 
+
+application/vnd.ms-powerpoint = ppthtml 
+application/powerpoint = ppthtml 
+
+application/rtf = unrtf --nopict --html 
+# image/gif ; ; Image
+# image/jpeg ; ; Image
+# image/tiff ; ; Image
+application/xml = 
+
+<STYLESHEET>
+
+default = xsltproc /etc/ogmios/xsl/Default.xsl
+
+</STYLESHEET>
+
+SupplMagicFile = $HOME/Research/Programs/Ogmios2/Lingua-Ogmios/etc/ogmios/mime/magic.TeX
+# SupplMagicFile = /etc/ogmios/mime/magic.TeX
+
+StoreInputFiles = 0
+
+</CONVERTERS>
+

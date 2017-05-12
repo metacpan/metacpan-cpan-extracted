@@ -1,0 +1,54 @@
+<!-- Begin: Centre Column -->
+<div id="centre"><div id="centrecol">
+
+<h2>Change Password</h2>
+
+[% IF errmess %]<div class="box"><p style="alert">[% errmess %]</P></div>[% END %]
+<div class="box">
+    <p>Please use the following rules to create your new password:
+    <ul>
+    <li>Passwords should be [% minpasslen %] - [% maxpasslen %] characters in length.
+    <li>Use more than one type from the upper case, lower case, numeral and symbol character types, e.g. 'Myword', 'smallword2' and 'L!TTLE' would all be fine.
+    <li>Use at least 3 unique characters, i.e 'Eeeeee' is not allowed.
+    <li>No whitespace characters allowed.
+    </ul>
+</div>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="user-chng" />
+<input type="hidden" name="userid" value="[% user.userid %]" />
+
+<div class="box">
+        <table width="100%">
+        <tr><td>User</td>
+            <td></td>
+            <td><b>[% user.name %]</b></td>
+        </tr>
+        <tr><td width="150">Your Current Password</td>
+            <td width="10"></td>
+            <td><input type="password" name="effect1" size="20" /></td>
+        </tr>
+        <tr><td>New Password</td>
+            <td></td>
+            <td><input type="password" name="effect2" size="20" /></td>
+        </tr>
+        <tr><td>Retype New Password</td>
+            <td></td>
+            <td><input type="password" name="effect3" size="20" /></td>
+        </tr>
+<!--
+        [% IF data.admin %]
+        <tr><td>Mail User</td>
+            <td></td>
+            <td><input type="checkbox" name="mailuser" /></td>
+        </tr>
+        [% END %]
+-->
+        </table>
+</div>
+
+<p align="center"><input type="submit" name="submit" value="UPDATE" />
+</form>
+
+</div></div>
+<!-- End: Centre Column -->

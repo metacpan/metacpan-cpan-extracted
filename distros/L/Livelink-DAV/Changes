@@ -1,0 +1,18 @@
+Revision history for Perl extension Livelink::DAV.
+
+
+0.0013  Thr Jun  7 15:02:00 2012
+	- edit README and .pm version, POD 
+	- added test for version 0.0013 CopyTree::VendorProof definitions
+		- for write_from_memory and copy_local_files
+	- code change => 0.0012 version's copy_local_file method will not
+		- overwrite existing file. hopefully a no one went and used for
+		- production after 1 day of debut
+
+0.0012  Wed Jun  6 16:02:00 2012
+	-updated documentation and completed module
+
+0.0011  Fri Jun  1 11:14:29 2012
+	- original version; created by h2xs 1.23 with options
+		-aXn Livelink::DAV
+

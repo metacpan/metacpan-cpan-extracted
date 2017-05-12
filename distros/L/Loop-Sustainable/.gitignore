@@ -1,0 +1,12 @@
+cover_db
+META.yml
+Makefile
+blib
+inc
+pm_to_blib
+Makefile.old
+nytprof.out
+MANIFEST
+MANIFEST.bak
+MYMETA.*
+*.sw[po]

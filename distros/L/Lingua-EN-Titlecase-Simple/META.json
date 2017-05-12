@@ -1,0 +1,57 @@
+{
+   "abstract" : "John Gruber's headline capitalization script",
+   "author" : [
+      "John Gruber <http://daringfireball.net/2008/05/title_case>",
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-EN-Titlecase-Simple",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Tidy" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.88",
+            "constant" : "0",
+            "if" : "0",
+            "open" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ap/titlecase/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ap/titlecase.git",
+         "web" : "https://github.com/ap/titlecase"
+      }
+   },
+   "version" : "1.001"
+}
+

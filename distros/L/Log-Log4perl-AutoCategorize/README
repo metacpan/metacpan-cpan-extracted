@@ -1,0 +1,108 @@
+Log/Log4perl/AutoCategorize version 0.0081
+========================================
+
+
+Log::Log4perl::AutoCategorize is a wrapper module for Log::Log4perl,
+and adds 2 primary features;
+
+  1. extended, automatic, transparent categorization capabilities
+  2. catalogs all invocations of logger, by all users:
+     a. test-coverage assessment
+     b. supports you in managing your logging config.
+
+2ndary features are;
+
+  3. use-time configuration loading
+  4. Aliasing to a top-level class (ex: myLogger)
+  5. subclassable
+
+ 
+There are several more mature alternatives which you should check out
+for comparison;
+
+  # 1. search for Stealth Loggers in POD
+  use Log::Log4perl qw(:easy);
+  Log::Log4perl->easy_init($ERROR);
+
+  # 2.
+  use Log::Log4perl::Filter;
+
+
+INTERFACE AND FEATURES
+
+0. You should be familiar with Log::Log4perl
+
+1. Log::Log4perl::AutoCategorize automatically creates the logging
+categories based upon the client package name, subroutine name, and
+line number.  It does this by using caller().
+
+2. In order to support the optimization phase, AutoCategorize requires
+use of a specific coding style:
+
+ ie: Class->method();
+
+The optimization avoids the repeated cost of AUTOLOAD(), saving ~40%,
+and yielding performance comparable to unadorned Log::Log4perl.
+
+3. Because typing Log::Log4perl::AutoCategorize->debug() is so
+tedious, the package provides an alias facility, so that you can say:
+
+   use Log::Log4perl::AutoCategorize ( alias => 'myLogger');
+   myLogger->debug("foo", { a=>1, b=>2 });
+
+I tend to use 'Logger' as the official alias (and shorthand)
+throughout the doc.
+
+4. To support test-coverage analysis, this module catalogs every
+lexical usage of Logger methods, tracks their invocation (by their
+category, which is unique) during the program execution, and reports
+the info at the END.  Invocations which, based on the Log::Log4perl
+config, are active (ie producing log output) have their count
+incremented, disabled ones are decremented.  Calls that are never
+reached are also separately reported.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Log::Log4perl - my class is just a wrapper around this
+  optimizer - cuts runtime by ~ 40%
+  Data::Dumper - logs structured data with this
+  YAML (tbd) - optional replacment for Data::Dumper
+
+Since I developed this on 5.8, that is a requirement currently.  For
+5.8.1, I needed to patch both B::Generate and optimizer, please email
+me if you want to try those patches.
+
+I recently discovered 'use 5.5.62' in B::Generate, but it doesnt
+compile for me on 5.6.2-pre ( PL_custom_op_names is undefined there ).
+If you can successfully build B::Generate or optimizer on 5.6.x, or if
+you want to try to tweak my patches, *please* let me know.
+
+
+ACKNOWLEDGMENTS
+
+  (hey, this is my 1st soapbox, um, module ;-)
+
+  Mike Schilli, Kevin Goess for writing an efficient standards-based
+  logger thats better than what Java has.  Simon Cozens & Arthur
+  Bergman for optimizer.pm.  Larry Wall, pumpkings, p5p, CPAN authors
+  for building perl and the great resources and community around it.
+
+COPYRIGHT AND LICENCE
+
+  Copyright (C) 2003 Jim Cromie <jcromie@cpan.org>
+
+  This library is free software; you can redistribute it
+  and/or modify it under the same terms as Perl itself.
+

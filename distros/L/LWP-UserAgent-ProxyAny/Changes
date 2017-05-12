@@ -1,0 +1,8 @@
+Revision history for Perl extension LWP::UserAgent::ProxyAny.
+
+1.01    2004.03.12 00:33 Qing-Jie Zhou
+    * More general license description
+
+1.00    2004.03.11 23:55 Qing-Jie Zhou
+    - original version
+    - modifed from WWW::BookBot 0.13

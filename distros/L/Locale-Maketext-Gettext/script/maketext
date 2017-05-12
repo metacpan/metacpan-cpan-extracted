@@ -1,0 +1,215 @@
+#! /usr/bin/perl -w
+# Command-line interface to Locale::Maketext::Gettext (and Locale::Maketext)
+
+# Copyright (c) 2003-2007 imacat. All rights reserved. This program is free
+# software; you can redistribute it and/or modify it under the same terms
+# as Perl itself.
+# First written: 2003-05-03
+
+use 5.008;
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use Locale::Maketext::Gettext::Functions;
+use vars qw($VERSION);
+$VERSION = 0.05;
+# Prototype declaration
+sub main();
+sub parse_args();
+
+use vars qw($THIS_FILE $SHORTHELP $VERSTR $SEARCH $HELP);
+$THIS_FILE = $0;
+$THIS_FILE =~ s/^.*\///;
+$SHORTHELP = "Try `$THIS_FILE --help' for more information.";
+$VERSTR = "$THIS_FILE v$VERSION by imacat <imacat\@mail.imacat.idv.tw>";
+$SEARCH = join " ", @Locale::Maketext::Gettext::Functions::SYSTEM_LOCALEDIRS;
+$HELP = << "EOT";
+Usage: maketext [OPTION] [--domain=TEXTDOMAIN] MSGKEY [PARAM...]
+or:    maketext [OPTION] -s MSGID [PARAM...]
+
+Maketext and display native language translation of a textual message.
+
+  -d, --domain=TEXTDOMAIN   retrieve translated messages from TEXTDOMAIN
+  -h, --help                display this help and exit
+  -V, --version             display version information and exit
+  MSGKEY [PARAM...]         retrieve translated message corresponding
+                            to MSGKEY from TEXTDOMAIN
+
+If the TEXTDOMAIN parameter is not given, the domain is determined from the
+environment variable TEXTDOMAIN.  If the message catalog is not found in the
+regular directory, another location can be specified with the environment
+variable TEXTDOMAINDIR.
+When used with the -s option the program adds a new line to the end of the
+output so that it behaves like the `echo' or the `gettext' command.
+Standard search directories: $SEARCH
+
+Report bugs to <imacat\@mail.imacat.idv.tw>.
+EOT
+
+use vars qw($DOMAIN $LOCALEDIR $ECHO $KEY @PARAM);
+$ECHO = 0;
+
+# Main program
+main();
+exit 0;
+
+# main: Main program
+sub main() {
+    local ($_, %_);
+    
+    # Parse the arguments
+    parse_args();
+    
+    bindtextdomain($DOMAIN, $LOCALEDIR)
+        if defined $DOMAIN && defined $LOCALEDIR;
+    textdomain($DOMAIN) if defined $DOMAIN;
+    print maketext($KEY, @PARAM);
+    print "\n" if $ECHO;
+    
+    return;
+}
+
+# parse_args: Parse the arguments
+sub parse_args() {
+    local ($_, %_);
+    
+    # Get the arguments 取得參數
+    $_ = eval {
+        local $SIG{__WARN__} = sub { die $_[0]; };
+        Getopt::Long::Configure("no_auto_abbrev");
+        GetOptions( "domain|d=s"=>\$DOMAIN,
+                    "s"=>sub { $ECHO = 1; },
+                    "help|h"=>sub { print $HELP; exit 0; },
+                    "version|V"=>sub { print "$VERSTR\n"; exit 0; });
+        return 1;
+    };
+    die "$THIS_FILE: $@" if !defined $_;
+    
+    # The MSGKEY
+    die "$THIS_FILE: missing arguments\n" if @ARGV == 0;
+    $KEY = shift @ARGV;
+    @PARAM = @ARGV;
+    
+    # Set the locale directory
+    $LOCALEDIR = $ENV{"TEXTDOMAINDIR"} if exists $ENV{"TEXTDOMAINDIR"};
+    # Set the text domain
+    $DOMAIN = $ENV{"TEXTDOMAIN"}
+        if !defined $DOMAIN && exists $ENV{"TEXTDOMAIN"};
+    
+    return;
+}
+
+__END__
+
+=head1 NAME
+
+maketext - translate and make messages
+
+=head1 SYNOPSIS
+
+  maketext [OPTION] [--domain=TEXTDOMAIN] MSGKEY [PARAM...]
+  maketext [OPTION] -s MSGID [PARAM...]
+
+=head1 DESCRIPTION
+
+The C<maketext> script translates a natural language message into
+the user's language, by looking up the translation in a message MO
+file, and process the plural transformation with Maketext.
+
+The C<maketext> script is a command-line interface to
+L<Locale::Maketext::Gettext(3)|Locale::Maketext::Gettext/3> (and
+L<Locale::Maketext(3)|Locale::Maketext/3>).  It can be used in shell
+scripts, etc, to translate, maketext and return the result.  By this
+way, it enables Maketext to be integrated into other programming
+languages/systems, like bash/csh, python, PHP, C, etc.  It works
+like the command-line program gettext.
+
+For example:
+
+  % maketext -s "[*,_1,virus was,viruses were] found in [*,_2,file,files]." 0 1
+  0 viruses were found in 1 file.
+  % maketext -s "[*,_1,virus was,viruses were] found in [*,_2,file,files]." 1 3
+  1 virus was found in 3 files.
+  %
+
+=head1 OPTIONS
+
+=over
+
+=item -d,--domain=TEXTDOMAIN
+
+Retrieve translated messages from TEXTDOMAIN.
+
+=item -s
+
+Adds a new line to the end of the output so that it behaves like the
+`echo' or the `gettext' command.
+
+=item -h,--help
+
+Display the help messages.
+
+=item -V,--version
+
+Display version information and exit.
+
+=item MSGKEY
+
+The original text used to look up translated text.
+
+=item PARAM...
+
+Parameters to Maketext for the plural and other text functions.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item TEXTDOMAIN
+
+TEXTDOMAIN is used to determine the text domain when the -d
+parameter is not given.
+
+=item TEXTDOMAINDIR
+
+TEXTDOMAINDIR is used to search the message catelog/MO file if it
+does not reside in the system locale directories.
+
+=back
+
+=head1 NOTES
+
+Maketext language function override, like C<quant> or C<numerate>, is
+not available here.  Suggestions are welcome.
+
+The current system locale directory search order is:
+/usr/share/locale, /usr/lib/locale, /usr/local/share/locale,
+/usr/local/lib/locale.  Suggestions are welcome.
+
+=head1 BUGS
+
+Report bugs to imacat <imacat@mail.imacat.idv.tw>
+
+=head1 SEE ALSO
+
+L<Locale::Maketext(3)|Locale::Maketext/3>,
+L<Locale::Maketext::TPJ13(3)|Locale::Maketext::TPJ13/3>,
+L<Locale::Maketext::Gettext(3)|Locale::Maketext::Gettext/3>,
+L<Locale::Maketext::Gettext::Functions(3)|Locale::Maketext::Gettext::Functions/3>,
+L<bindtextdomain(3)|bindtextdomain/3>, L<textdomain(3)|textdomain/3>.
+Also, please refer to the official GNU gettext manual at
+L<http://www.gnu.org/software/gettext/manual/>.
+
+=head1 AUTHOR
+
+imacat <imacat@mail.imacat.idv.tw>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003-2007 imacat. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=cut

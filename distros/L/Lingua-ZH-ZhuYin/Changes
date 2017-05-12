@@ -1,0 +1,16 @@
+Revision history for Lingua-ZH-ZhuYin
+
+0.01    Feb 17 22:12:30 CST 2008
+        - First version, released on an unsuspecting world.
+
+0.02    Feb 27 22:11:13 CST 2008
+	- Update Makefile.PL
+
+0.03	Thu Feb 29 09:12:39 CST 2008
+	- add scripts/zhuyin-sqlite.pl
+	  - use this script to convert zhuyin from dictionary
+	- add examples/
+	- add t/01-basic.t for usage
+
+0.04	Sat Mar  1 15:06:25 CST 2008
+        - tiny code fixes

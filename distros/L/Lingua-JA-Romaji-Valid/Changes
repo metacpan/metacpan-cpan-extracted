@@ -1,0 +1,15 @@
+Revision history for Lingua-JA-Romaji-Valid
+
+0.03 2012-09-27
+  - quote meta characters
+  - fix a UUV warning
+
+0.02 2007-10-05
+  - fixed the example in the synopsis: I used a wrong option :/
+  - changed the way to split: I don't know why but m//gc (and
+    the following m/\G./) doesn't work well on perl 5.6.
+  - squashed a UUV warning
+
+0.01 2007-10-05
+  - initial release
+

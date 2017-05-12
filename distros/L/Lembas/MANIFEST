@@ -1,0 +1,19 @@
+bin/lembas
+Build.PL
+Changes
+examples/hg.lembas.t
+examples/lembas
+examples/repl.lembas.t
+examples/ush
+lib/Lembas.pm
+lib/Lembas/Specification.pod
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/00-construction.t
+t/01-spec-parsing.t
+t/commands/00-preamble.t
+t/commands/01-fastforward.t
+t/commands/02-yield.t

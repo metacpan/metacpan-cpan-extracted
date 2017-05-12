@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# $Id: lcfg-cfg2meta.in 3445 2009-03-11 13:25:36Z squinney@INF.ED.AC.UK $
+# $Source: /var/cvs/dice/LCFG-Build-PkgSpec/bin/lcfg-cfg2meta.in,v $
+# $Revision: 3445 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_1_0/bin/lcfg-cfg2meta.in $
+# $Date: 2009-03-11 13:25:36 +0000 (Wed, 11 Mar 2009) $
+
+our $VERSION = '0.1.0';
+
+use File::Basename       ();
+use File::Spec           ();
+use LCFG::Build::PkgSpec ();
+use Pod::Usage           ();
+use Getopt::Long         ();
+
+my $help;
+Getopt::Long::GetOptions( 'help|?' => \$help ) or Pod::Usage::pod2usage(2);
+if ($help) {
+    Pod::Usage::pod2usage(0);
+}
+
+my $cfg = shift @ARGV || q{.};
+if ( -d $cfg ) {
+    $cfg = File::Spec->catfile( $cfg, 'config.mk' );
+}
+
+if ( !-f $cfg ) {
+    die "You failed to specify the config.mk file or it does not exist\n";
+}
+
+my $directory = ( File::Basename::fileparse($cfg) )[1];
+my $metafile = File::Spec->catfile( $directory, 'lcfg.yml' );
+
+my $pkgspec;
+if ( -f $metafile ) {
+
+    # Done inside an eval, if it fails we don't care
+    eval { $pkgspec = LCFG::Build::PkgSpec->new_from_metafile($metafile); };
+}
+
+if ( ref $pkgspec ) {
+    $pkgspec->new_from_cfgmk($cfg);
+}
+else {
+    $pkgspec = LCFG::Build::PkgSpec->new_from_cfgmk($cfg);
+}
+
+$pkgspec->save_metafile($metafile);
+
+__END__
+
+=head1 NAME
+
+lcfg-cfg2meta - Tool to convert LCFG config.mk into new metadata file
+
+=head1 VERSION
+
+This documentation refers to lcfg-cfg2meta version 0.1.0
+
+=head1 SYNOPSIS
+
+   lcfg-cfg2meta ~/cvs/lcfg-foo/config.mk
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>
+
+Print a brief help message and exit.
+
+=back
+
+=head1 DESCRIPTION
+
+This tool reads in the old-style config.mk used by LCFG components and
+translates the information into the form used in the new YAML-based
+metadata file, named C<lcfg.yml>. In most cases this should be all
+that is necessary to then go on and use the various new release tools.
+
+=head1 DEPENDENCIES
+
+This application requires L<LCFG::Build::PkgSpec>.
+
+=head1 SEE ALSO
+
+lcfg-pkgcfg(1), L<LCFG::Build::PkgSpec>, L<LCFG::Build::Tools>
+
+=head1 PLATFORMS
+
+This is the list of platforms on which we have tested this
+software. We expect this software to work on any Unix-like platform
+which is supported by Perl.
+
+ScientificLinux5, ScientificLinux6
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this application. Please report any
+problems to bugs@lcfg.org, feedback and patches are also always very
+welcome.
+
+=head1 AUTHOR
+
+Stephen Quinney <squinney@inf.ed.ac.uk>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2008 University of Edinburgh. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GPL, version 2 or later.
+
+=cut

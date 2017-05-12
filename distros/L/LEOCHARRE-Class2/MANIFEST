@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/LEOCHARRE/Class2.pm
+lib/LEOCHARRE/Class2.pod
+t/11_Person.t
+t/12_other.t
+t/14_setgetondisk.t
+t/15_setgetaref.t
+t/16_init.t
+t/17_get_accessor.t
+t/18_setgetuniqarray.t
+t/19_setgetuniqarray.t
+t/20_setgetuniquearray.t
+t/21_conf.t
+t/Person.pm
+META.yml                                 Module meta-data (added by MakeMaker)

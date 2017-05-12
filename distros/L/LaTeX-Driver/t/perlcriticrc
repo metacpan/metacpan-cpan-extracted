@@ -1,0 +1,11 @@
+# perlcriticrc file for our Test::Perl::Critic tests
+
+severity  = 3
+only      = 1
+force     = 0
+verbose   = 4
+top       = 50
+theme     = (pbp || security) && bugs
+include   = NamingConventions ClassHierarchies
+exclude   = Variables  Modules::RequirePackage
+#color     = 0

@@ -1,0 +1,20 @@
+---
+abstract: 'Number 2 word conversion in JPN.'
+author:
+  - 'Mike Schilli <m@perlmeister.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-JPN-Number
+requires:
+  Perl6::Export::Attrs: 0
+  perl: v5.10.1
+  strict: 0
+  warnings: 0
+version: 0.0682

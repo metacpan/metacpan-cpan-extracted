@@ -1,0 +1,10 @@
+define in [new TUrlInput "http://www.google.com"]
+define s $null
+define i 1
+
+while {not-null? [set! s [$in readln]] } {
+    echo "Line " $i ": " $s
+    ++ i
+}
+
+$in close

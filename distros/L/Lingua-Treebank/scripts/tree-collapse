@@ -1,0 +1,95 @@
+#!/usr/nikola/bin/perl -w
+use Getopt::Long;
+use Pod::Usage;
+
+my $man = 0;
+my $help = 0;
+## Parse options and print usage if there is a syntax error,
+## or if usage was explicitly requested.
+GetOptions('help|?' => \$help, man => \$man) or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-verbose => 2) if $man;
+
+## If no arguments were given, then allow STDIN to be used only
+## if it's not connected to a terminal (otherwise print usage)
+pod2usage("$0: No files given on open terminal.")
+  if ((@ARGV == 0) and (-t STDIN));
+
+
+use Lingua::Treebank;
+
+if (@ARGV == 0) {
+    read_from_stdin();
+}
+elsif (@ARGV) {
+    while (@ARGV) {
+	my $file = shift @ARGV;
+	if ($file eq '-') {
+	    read_from_stdin();
+	}
+	else {
+	    my @utts = Lingua::Treebank->from_penn_file($file);
+	    emit_flat(\@utts);
+	}
+    }
+}
+sub read_from_stdin {
+    my @utts = Lingua::Treebank->from_penn_fh(*STDIN);
+    emit_flat(\@utts);
+}
+sub emit_flat {
+    $Lingua::Treebank::Const::INDENT_CHAR = '';
+    $Lingua::Treebank::Const::CHILD_PROLOG = " ";
+    $Lingua::Treebank::Const::CHILD_EPILOG = " ";
+    my $utts = shift;
+    for my $utt (@$utts) {
+    	my $string = $utt->as_penn_text();
+#  	$string =~ s/\)\)/) )/g;
+#  	$string =~ s/\)\)/) )/g;
+
+#  	$string =~ s/\)\(/) (/g;
+#  	$string =~ s/\)\(/) (/g;
+
+#  	$string =~ s/\(\(/( (/g;
+#  	$string =~ s/\(\(/( (/g;
+	print $string, "\n";
+    }
+}
+
+__END__
+
+=head1 NAME
+
+tree-collapse - reads multi-line Penn trees from files or STDIN and
+outputs trees one per line.
+
+=head1 SYNOPSIS
+
+tree-collapse [options] [file or STDIN]
+
+ Options:
+   -help            brief help message
+   -man             full documentation
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+Reads inflated Penn treebank-format trees, with children indented and
+possibly on different lines, and outputs intact trees, one tree per
+line with whitespace as input.
+
+=cut

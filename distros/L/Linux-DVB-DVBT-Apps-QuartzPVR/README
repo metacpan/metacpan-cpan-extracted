@@ -1,0 +1,277 @@
+Linux-DVB-DVBT-Apps-QuartzPVR
+=============================
+
+Linux::DVB::DVBT::Apps::QuartzPVR is a package that includes a web frontend EPG for scheduling DVB-T recordings.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+INSTALL QUESTIONS
+
+When you run 'perl Makefile.PL' a number of questions are asked to determine your setup. The answers are then 
+embedded into various config files in the installation.
+
+Questions asked are:
+
+* SQL_ROOT_PASSWORD - MySQL root user password so I can create the pvr database
+
+The root user password for your MySQL server. This allows the installation to create the new MySQL user
+and database used for the tv guide. 
+
+* DVBT_FREQFILE - full path to DVB-T tuning frequency file (usually under /usr/share/dvb/dvb-t)
+
+Give the path to the frequency file. This is used by dvbt-scan to initialise the tuner. Can alternatively supply
+a 2 letter country code (for example GB) to initiatate a (much longer) full frequency scan.
+
+* MAIL_TO - email account to mail PVR errors to
+
+Give a mail account (e.g. fred@bloggs) to which all script errors will be sent. This is useful for cases where a 
+program has failed to record. 
+
+* WEB_USER - user name of the web server
+
+User name that your web server uses (e.g. on Ubuntu this is www-data). Script should have worked out the correct
+setting, but change if it's not correct for your system.
+
+* WEB_GROUP - group name of the web server
+
+Group name that your web server uses (e.g. on Ubuntu this is www-data). Script should have worked out the correct
+setting, but change if it's not correct for your system.
+
+The script then asks if you want to use the default values for the "extra" options. These defaults will work on any 
+system, but you may answer 'no' to allow you chance to see and change all of the following settings:
+
+
+
+* SERVER_PORT - TCP port of the new PVR server that I will install
+
+Specify a different TCP port number for the PVR server to use. The server provides the interface between the scheduling
+Perl script and the web frontend 
+
+* SQL_USER - username of the MySQL pvr database owner
+
+Change the MySQL username that will be created for the tv guide database
+
+* SQL_PASSWORD - password of the MySQL pvr database owner
+
+Change the MySQL password that will be used for the tv guide database
+
+* PVR_USER - Linux user name created for recording
+
+Specify a username to use for running the recording scripts. By default a new system user will be created, but you can
+also specify an existing user. Note that recordings are added to that user's crontab
+
+* PVR_GROUP - Linux group name for PVR_USER
+
+Specify a group to use for running the recording scripts. By default uses 'video' to allow access to the DVB-T drivers.
+
+* PVR_LOGDIR - location of PVR logs
+
+A directory under which all PVR logs are stored
+
+* DATABASE - PVR database name
+
+The MySQL database name to use for the tv guide
+
+* VIDEO_DIR - Video recording top-level directory
+
+The directory under which all videos are recorded
+
+* AUDIO_DIR - Audio recording top-level directory
+
+The directory under which all audio files are recorded
+
+* VIDEO_TRASH - Video trashcan directory
+
+During recording, various temporary video files are created and then removed. By default the "deleted" files are moved
+to this trashcan location. A cron job is set up in the QUARTZPVR user's crontab which deletes trash files after a week.
+
+This is done to ensure you always have access to the raw recording just in case the file left in the video directory
+is not playable (allows for re-processing the original).
+
+* VIDEO_PATH - Video file full path
+
+Recorded video file will be stored with this full pathname. Obviously the filename must contain variables otherwise every
+recording will overwrite the previous recording.
+
+The default setting is: $video_dir/$title/$tva_series/$YmdHMS-$name.ts
+
+The full list of variable that can be used are:
+
+
+	$Y
+	Four digit year (e.g. 2011) of recording start date.
+	
+	$m
+	Two digit month with leading zero of recording start date.
+	
+	$d
+	Two digit day with leading zero of recording start date.
+	
+	$H
+	Two digit hour with leading zero of recording start time.
+	
+	$M
+	Two digit minute with leading zero of recording start time.
+	
+	$S
+	Two digit second with leading zero of recording start time.
+	
+	$Ymd
+	Shortcut to using Y, m, d variables individually (e.g. results in 20110901 for September 1st, 2011)
+	
+	$HMS
+	Shortcut to using H, M, S variables individually (e.g. results in 173500 for 17:35:00)
+	
+	$Ymd
+	Shortcut to using Y, m, d, H, M, S variables individually (e.g. results in 20110901173500 for September 1st, 2011 at 17:35:00)
+	
+	$genre
+	Broadcast genre string. This is usually not much use as it only conveys 'Film', 'Show', or 'News'.
+	
+	$series
+	If the program is part of a series, then this variable is set to 'Series X'.
+	
+	$series_num
+	If the program is part of a series, then this variable is set to the series number e.g. 'X'.
+	
+	$episode
+	If the program is part of a series, then this variable is set to 'Episode Y'.
+	
+	$episode_num
+	If the program is part of a series, then this variable is set to the episode number e.g. 'Y'.
+	
+	$tva_series
+	Set to the TVAnytime series string (f present).
+	
+	$tva_prog
+	Set to the TVAnytime program string (f present).
+	
+	$title
+	Set to the program title (e.g. 'The Big Bang Theory').
+	
+	$subtitle
+	This is the "minor title" or extra details string extracted from the program description.
+	
+	$name
+	Set to a meaningful name for the program. Default is to the use the title.
+	
+	$audio_dir
+	Set to the top-level path for recording all audio files. This is initialised when the application is installed.
+	
+	$video_dir
+	Set to the top-level path for recording all video files. This is initialised when the application is installed.
+	
+	$dir
+	Automatically set to video_dir or audio_dir depending on the file type.
+	
+
+* AUDIO_PATH - Audio file full path
+
+Recorded audio file will be stored with this full pathname. 
+
+The default setting is: $audio_dir/$title/$series/$YmdHMS-$name.mp3
+
+* PVR_ROOT - Installation directory. This is where all of the PVR software is installed.
+
+This is where the web frontend files (PHP, CSS, Javascript) are installed. You will need to add an entry to your 
+web server configuration to allow access to this directory (and it is up to you to protect site access).
+
+* ADAPTERS - DVB-T/T2 adapters to be used
+
+Space separated list of the adapter numbers to use (leave blank for default)
+
+* ADSKIP - Advert removal
+
+Advert removal (1=remove adverts, 0=do not remove adverts)
+
+* DATE_TZ - Timezone
+Your timezone (as defined for the PHP Date object)
+
+* PHP_SEARCH - Include all PHP libs
+
+Allow use of other installed PHP (may cause name clashes). 
+
+* PHP_LOG - PHP log file
+
+Debug: Log file to use for PHP application. Default is no log file specified so no logging is done. 
+
+Note: You are responsible for ensuring the directory is writable by the web server.
+
+* SERVER_DEBUG - QuartzPVR server debugging
+
+Debug: Level of server debug logging. Debug logs will be stored in /var/log/quartzpvr-server.log
+
+
+
+UBUNTU
+
+If you haven't already got DBD::mysql, then you may need to install libmysqlclient-dev package for the cpan install
+to work properly (it needs mysql_config). Run:
+
+	sudo apt-get install libmysqlclient-dev
+
+DEPENDENCIES
+
+To run the web frontend you need to have installed:
+
+	web server (preferably apache)
+	php
+	MySql
+	a dvb package (to provide the initial frequency file)
+
+This module requires these other modules and libraries:
+
+	use App::Framework ;
+	use Linux::DVB::DVBT ;
+	use Linux::DVB::DVBT::TS ;
+	use Linux::DVB::DVBT::Advert ;
+	use MP3::Tag ;
+	use DBI ;
+	use DBD::mysql ;
+	use Net::Server::Fork ;
+
+
+OPTIONAL
+
+If you have access to the BBC iplayer, you can schedule iplayer file downloads via the EPG. To do this you need
+to install get_iplayer from http://www.infradead.org/get_iplayer/html/get_iplayer.html
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Steve Price
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+The web interface uses jQuery:
+
+	Copyright (c) 2009 John Resig, http://jquery.com/
+	
+	Permission is hereby granted, free of charge, to any person obtaining
+	a copy of this software and associated documentation files (the
+	"Software"), to deal in the Software without restriction, including
+	without limitation the rights to use, copy, modify, merge, publish,
+	distribute, sublicense, and/or sell copies of the Software, and to
+	permit persons to whom the Software is furnished to do so, subject to
+	the following conditions:
+	
+	The above copyright notice and this permission notice shall be
+	included in all copies or substantial portions of the Software.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+	EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+	NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+	LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+	OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

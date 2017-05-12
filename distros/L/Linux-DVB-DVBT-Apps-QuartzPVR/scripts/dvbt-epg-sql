@@ -1,0 +1,585 @@
+#!/usr/bin/perl
+#
+use strict ;
+
+use Linux::DVB::DVBT ;
+use Date::Manip ;
+
+# Local
+use App::Framework '+Sql' ;
+
+use Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants ;
+
+# VERSION
+our $VERSION = '2.00' ;
+our $DEBUG=0;
+our $APP;
+
+our @info_lines ;
+our $progname ;
+our $dvb_name ;
+
+
+	# Create application and run it
+	$APP = App::Framework->new() ;
+	$APP->go() ;
+
+
+
+#=================================================================================
+# SUBROUTINES EXECUTED BY APP
+#=================================================================================
+
+#----------------------------------------------------------------------
+# Main execution
+#
+sub app
+{
+	my ($app, $opts_href) = @_ ;
+
+	# options
+#	my %opts = $app->options() ;
+	$DEBUG=$opts_href->{'debug'} ;
+
+	Linux::DVB::DVBT->debug($DEBUG) ;
+	Linux::DVB::DVBT->dvb_debug($opts_href->{'dvb-debug'}) ;
+	$Linux::DVB::DVBT::DEBUG = $DEBUG ;
+	Linux::DVB::DVBT->verbose($opts_href->{'verbose'} ? 2 : 0) ;
+	
+	# get sql
+	my $sql = $app->sql() ;
+
+	## Create dvb (use first found adapter). 
+	## NOTE: With default object settings, the application will
+	## die on *any* error, so there is no error checking in this script
+	##
+	my $dvb = Linux::DVB::DVBT->new(
+		'adapter'	=> $opts_href->{'adapter'},
+	) ;
+	
+	$progname = $app->progname ;
+	$dvb_name = sprintf "DVB%d", $opts_href->{'adapter'} ;
+
+	info("===============================================================") ;
+	info("$progname v$VERSION") ;
+	info("Linux::DVB::DVBT v$Linux::DVB::DVBT::VERSION") ;
+
+	## Get EPG info - automatically tunes the frontend
+	info("== Locked $dvb_name ==") ;
+	my ($epg_href, $dates_href) = $dvb->epg() ;
+
+	## Release DVB (for next recording)
+	info("== Released $dvb_name ==") ;
+	$dvb->dvb_close() ;
+	
+	$app->prt_data("==EPG==", $epg_href) if $DEBUG>=2 ;
+	$app->prt_data("==DATES==", $dates_href) if $DEBUG>=3 ;
+
+	my $user = $opts_href->{'user'}	|| Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants::SQL_USER ;
+	my $password = $opts_href->{'password'}	|| Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants::SQL_PASSWORD ;
+	
+	if (!$user || !$password)
+	{
+		print "Error: You must specify the MySQL username AND password when using this script outside the PVR suite\n" ;
+		exit 1 ;
+	}
+	
+	# Set up database
+	my %sql_vars ;
+	$app->sql->set(
+			'database'	=> $opts_href->{'database'},
+			'table'		=> $opts_href->{'table'},
+			'user'		=> $user,
+			'password'	=> $password,
+			
+			'trace'		=> $opts_href->{'debug'},
+			'trace'		=> $opts_href->{'dbg-sql'},
+			'trace_file'=> 'logsql.log',
+			'debug' 	=> $opts_href->{'dbg-sql'},
+			
+			'prepare'	=> {
+				'insert'	=> {
+					'vars'	=> [qw/pid event channel title date start duration episode num_episodes  text genre tva_prog tva_series audio video subtitles/],
+					'vals'	=> \%sql_vars,
+				}, 
+
+				# Update type, list a var names, where to get values (HASH ref or ARRAY ref), where clause, where names, where to get values, optional table name
+				'update'	=> {
+					'vars'	=> [qw/event title date start duration text episode num_episodes  text genre tva_prog tva_series audio video subtitles/],
+					'vals'	=> \%sql_vars,
+					'where'	=> {
+						'vars'	=> [qw/pid channel/],
+						'vals'	=> \%sql_vars
+					}, 
+					'limit'	=> 1,
+				}, 
+
+				# select type, 
+				'check'		=> {
+					'limit'	=> 1,
+					'where'	=> {
+						'vars'	=> [qw/pid channel/],
+						'vals'	=> \%sql_vars
+					}, 
+				}, # 'check'
+
+				# get channels 
+				'select_channels'		=> {
+					'table'	=> 'channels',
+				},
+			}, # 'prepare'
+	) ;
+
+	### Update database ###
+	info("Updating database:") ;
+
+	## first remove any old entries (> 1 month ago)
+	if ($opts_href->{'del-old'})
+	{
+		my $del_old_query = "DELETE FROM $opts_href->{table} WHERE ".
+			"`date` <= ( SELECT DATE_SUB(CURDATE(), INTERVAL 1 MONTH) )" ;
+		$app->sql->do($del_old_query) unless $opts_href->{'skip-sql'} ;
+	}
+	
+	## keep track of how many epg entries we've processed
+	my $new_eit = 0 ;
+	
+	# Add data to database	
+	foreach my $chan (sort keys %$epg_href)
+	{
+#TODO: Ensure channel list is up to date
+		info("  $chan...") ;
+		next unless $chan ;
+		
+		# Remove any information covered by the current epg data
+		my $del_query = "DELETE FROM $opts_href->{table} WHERE ".
+			"`channel`='$chan' AND (".
+			"(`date` = '$dates_href->{$chan}{start_date}' AND `start` >= '$dates_href->{$chan}{start}') ".
+			"OR (`date` > '$dates_href->{$chan}{start_date}' AND `date` <= '$dates_href->{$chan}{end_date}') ".
+			")" ;
+		
+		print "$chan : $del_query\n" if ($opts_href->{'debug'});
+
+		##SKIP###		
+		$app->sql->do($del_query) unless $opts_href->{'skip-sql'} ;
+
+		## skip "unknown" channels i.e. are of the format <tsid>-<pnr>
+		next if $chan =~ /^(\d+)\-(\d+)$/ ;
+
+		print "PROCESSING $chan : \n" if ($opts_href->{'debug'});
+
+		## update count
+		++$new_eit ;
+
+
+		my @sorted ;
+		foreach my $pid (keys %{$epg_href->{$chan}})
+		{
+			next unless $pid ;
+			
+			my $entry_href = $epg_href->{$chan}{$pid} ;
+			
+			# reformat date (make it parseable by Date::Manip)
+			my $date = reformat_date($entry_href->{'date'}) ; 
+			
+			# cache the start & end date/times
+			my $dt = parse_date($entry_href->{date}, $entry_href->{start}) ;
+
+			$entry_href->{'start_dt_mins'} = dt2mins($dt) ;
+			
+		}		
+		@sorted = sort {start_cmp($epg_href->{$chan}{$a}, $epg_href->{$chan}{$b} )} keys %{$epg_href->{$chan}} ;
+
+		# do each program
+		foreach my $pid (@sorted)
+		{
+			next unless $pid ;
+			
+			my $entry_href = $epg_href->{$chan}{$pid} ;
+			
+	
+			#              date => 18-09-2008,
+			#              start => 23:15,
+			#              end => 03:20,
+			#              duration => 04:05,
+			#
+			#              title => Personal Services,
+			#              synopsis => This is a gently witty, if curiously coy, attempt by director
+			#              genre => Film,
+
+			my $episode;
+			my $num_episodes ;
+			
+			if (exists($entry_href->{'episode'}))
+			{
+				$episode = int($entry_href->{'episode'}) ;
+				$num_episodes = int($entry_href->{'num_episodes'}) ;
+			}
+
+			my $episode_str = $episode ? "$episode / $num_episodes" : "" ;
+
+			# Copy variables ready for sql ops
+			sql_prepare_vals($entry_href, \%sql_vars) ;
+			
+#			## check for "dodgy" film genre
+#			if ($sql_vars{'genre'} =~ m/Film/i)
+#			{
+#				if (time2mins($sql_vars{'duration'}) <= 60)
+#				{
+#					$sql_vars{'genre'} = '' ;
+#				}
+#			}
+
+			# First check to see if we already have an entry
+			my @results ;
+			@results = $app->sql->sth_query_all('check') unless $opts_href->{'skip-sql'}  ;
+			if (@results)
+			{
+				# got it already - do update
+				info("    Update: $sql_vars{'channel'} [$pid] $entry_href->{'title'} @ $entry_href->{'start'} on $entry_href->{'date'}  $episode_str") ;
+				$app->sql->sth_query('update') unless $opts_href->{'skip-sql'} ;
+			}
+			else
+			{
+				# new
+				info("    New: $sql_vars{'channel'} [$pid] $entry_href->{'title'} @ $entry_href->{'start'} on $entry_href->{'date'}  $episode_str") ;
+				$app->sql->sth_query('insert') unless $opts_href->{'skip-sql'} ;
+			}
+			
+			set_times($entry_href) ;
+			info("#@# $pid | $sql_vars{'channel'} | $entry_href->{'date'} | $entry_href->{'start'} .. $entry_href->{'end'} | $entry_href->{'title'} | ") ;
+		}
+	}
+
+	## Report the total number of progs processed
+	info("Processed $new_eit programs") ;
+
+	## End
+	info("COMPLETE") ;
+}
+
+
+
+#=================================================================================
+# LOCAL SUBROUTINES
+#=================================================================================
+
+#-----------------------------------------------------------------------------
+# Format a timestamp for the reply
+sub timestamp
+{
+	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+	return sprintf "%02d:%02d:%02d %02d/%02d/%04d", $hour,$min,$sec, $mday,$mon+1,$year+1900;
+}
+
+
+#---------------------------------------------------------------------------------
+sub prompt
+{
+	my $timestamp = timestamp() ;
+	my $prompt = "[$progname ($$) $timestamp $dvb_name]" ;
+	
+	return $prompt ;
+}
+
+#---------------------------------------------------------------------------------
+sub info
+{
+	my ($msg) = @_ ;
+
+	my $prompt = prompt() ;
+	$msg =~ s/\n/\n$prompt /g ;
+	print STDERR "$prompt $msg\n" ;
+	
+	push @info_lines, $msg ;
+}
+
+
+#---------------------------------------------------------------------------------
+# send error email
+sub error_mail
+{
+	my ($to, $error, $channel, $file, $log) = @_ ;
+	
+	my $prompt = prompt() ;
+	
+	my $data = "echo '$error'" ;
+	
+	my $tmpfile = "/tmp/dvbt-ffrec.$$" ;
+	if (open my $fh, ">$tmpfile")
+	{
+		print $fh "$error\n\n" ;
+		foreach (@info_lines)
+		{
+			print $fh "$_\n" ;
+		}
+		close $fh ;
+		
+		$data = "cat $tmpfile" ;	
+	}
+	else
+	{
+		$tmpfile = undef ;
+	}
+	
+	`$data | mail -s '$prompt $channel $file Error' $to` ;
+	
+	# clean up
+	unlink $tmpfile if $tmpfile ;
+}
+
+#---------------------------------------------------------------------------------
+# send error email then exit
+sub die_error_mail
+{
+	my ($to, $error, $channel, $file, $log) = @_ ;
+	
+	error_mail($to, $error, $channel, $file, $log) ;
+
+	info("FATAL: $error") ;
+	exit 1 ;
+}
+
+#---------------------------------------------------------------------------------------------------
+# 
+sub time2mins
+{
+	my ($time) = @_ ;
+	my $mins = 0 ;
+	
+	if ($time =~ /^(\d+):(\d+):(\d+)/)
+	{
+		$mins = $1*60 + $2 ; 
+	}
+	elsif ($time =~ /^(\d+):(\d+)/)
+	{
+		$mins = $1*60 + $2 ; 
+	}
+	elsif ($time =~ /^(\d+)/)
+	{
+		$mins = $1 ; 
+	}
+	return $mins ;
+}
+
+#---------------------------------------------------------------------------------------------------
+# copy contents of hash into sql vars hash
+sub sql_prepare_vals
+{
+	my ($href, $sql_vars_href) = @_ ;
+
+	# blank out all keys	
+	foreach my $key (keys %$sql_vars_href)
+	{
+		$sql_vars_href->{$key} = '' ;
+	}
+
+	
+	# copy over what we've got
+	foreach my $key (keys %$href)
+	{
+		my $val = $href->{$key} ;
+
+		$sql_vars_href->{$key} = $val if defined($val) ;
+	}
+
+	$sql_vars_href->{'text'} .= $sql_vars_href->{'etext'} ;
+	$sql_vars_href->{'title'} ||= '(no program)' ;
+	$sql_vars_href->{'episode'} ||= 0 ;
+	$sql_vars_href->{'num_episodes'} ||= 0 ;
+	$sql_vars_href->{'tva_prog'} ||= '-' ;
+	$sql_vars_href->{'tva_series'} ||= '-' ;
+
+	## Add audio/video format
+	$sql_vars_href->{'subtitles'} = 0 ;
+	$sql_vars_href->{'audio'} = 'unknown' ;
+	$sql_vars_href->{'video'} = 'unknown' ;
+	if (exists($href->{'flags'}))
+	{
+		$sql_vars_href->{'subtitles'} = $href->{'flags'}{'subtitles'} || 0 ;
+		
+		#	'mono'			=> $epg_flags & $EPG_FLAGS{'AUDIO_MONO'} ? 1 : 0,
+		#	'stereo'		=> $epg_flags & $EPG_FLAGS{'AUDIO_STEREO'} ? 1 : 0,
+		#	'dual-mono'		=> $epg_flags & $EPG_FLAGS{'AUDIO_DUAL'} ? 1 : 0,
+		#	'multi'			=> $epg_flags & $EPG_FLAGS{'AUDIO_MULTI'} ? 1 : 0,
+		#	'surround'		=> $epg_flags & $EPG_FLAGS{'AUDIO_SURROUND'} ? 1 : 0,
+		#	
+		foreach my $audio (qw/surround multi dual-mono stereo mono/)
+		{
+			if ($href->{'flags'}{$audio})
+			{
+				$sql_vars_href->{'audio'} = $audio ;
+				last ;
+			}	
+		}
+		
+		#	'4:3'			=> $epg_flags & $EPG_FLAGS{'VIDEO_4_3'} ? 1 : 0,
+		#	'16:9'			=> $epg_flags & $EPG_FLAGS{'VIDEO_16_9'} ? 1 : 0,
+		#	'hdtv'			=> $epg_flags & $EPG_FLAGS{'VIDEO_HDTV'} ? 1 : 0,
+		foreach my $video (qw/hdtv 16:9 4:3/)
+		{
+			if ($href->{'flags'}{$video})
+			{
+				$sql_vars_href->{'video'} = uc $video ;
+				last ;
+			}	
+		}
+	}
+
+	# Extract event-id from id (event-channum-date)
+	if ($sql_vars_href->{'pid'} =~ /^([\d]+)\-/)
+	{
+		$sql_vars_href->{'event'} = $1 ;
+	}
+
+	# TODO: Get channel type
+	$sql_vars_href->{'chan_type'} = 'tv' ;
+
+
+$APP->prt_data("sql_prepare_vals() src=", $href, " dest=", $sql_vars_href, "\n") if $DEBUG ;
+}
+
+#---------------------------------------------------------------------------------------------------
+# reformat date (make it parseable by Date::Manip)
+sub reformat_date
+{
+	my ($date) = @_ ;
+
+	$date =~ s%-%/%g ;
+
+	return $date ;
+}
+
+
+#---------------------------------------------------------------------------------------------------
+# parse the date & time to return a Date::Manip
+sub parse_date
+{
+	my ($date, $time) = @_ ;
+
+	# allow $date to be set to date & time
+	$time ||= "" ;
+	my $dt = ParseDate("$date $time") ;
+
+	return $dt ;
+}
+
+#---------------------------------------------------------------------------------------------------
+# convert Date::Manip to string
+sub dt_format
+{
+	my ($dt, $fmt) = @_ ;
+
+	return UnixDate($dt, $fmt) ;
+}
+
+
+#---------------------------------------------------------------------------------------------------
+# convert Date::Manip to epoch mins
+sub dt2mins
+{
+	my ($dt) = @_ ;
+
+	my $secs = dt_format($dt, "%s") ;
+	my $mins = int ($secs / 60) ;
+
+	return $mins ;
+}
+
+#---------------------------------------------------------------------------------------------------
+# Just compare start time (using start_dt_mins field)
+sub start_cmp
+{
+	my ($a, $b) = @_ ;
+
+	return 
+		$a->{'start_dt_mins'} <=> $b->{'start_dt_mins'} ;
+}
+
+#---------------------------------------------------------------------------------------------------
+# add an offset to a Date::Manip
+sub dt_offset
+{
+	my ($dt, $offset) = @_ ;
+
+	my $err ;
+	$dt = DateCalc($dt, $offset, \$err) ;
+print "Date calc error ($offset): $err\n" if ($err) ;
+	return $dt ;
+}
+
+#---------------------------------------------------------------------------------------------------
+# convert Date::Manip to HH:MM string
+sub dt2hm
+{
+	my ($dt) = @_ ;
+
+	my $time = dt_format($dt, "%H:%M") ;
+
+	return $time ;
+}
+
+
+#---------------------------------------------------------------------------------------------------
+sub set_times
+{
+	my ($entry_href) = @_ ;
+	
+	# get duration
+	my $duration_mins = time2mins($entry_href->{'duration'}) ;
+	my $duration_add = sprintf "+ %dmin", $duration_mins ;
+	
+	# cache the start & end date/times
+	my $dt = parse_date($entry_href->{date}, $entry_href->{start}) ;
+
+	# add duration to start to get end
+	$dt = dt_offset($dt, $duration_add) ;
+	$entry_href->{'end'} = dt2hm($dt) ;
+	
+}
+
+
+#=================================================================================
+# SETUP
+#=================================================================================
+__DATA__
+
+[SUMMARY]
+
+Manages DVB epg 
+
+[OPTIONS]
+
+-a|dvb|'adapter'=s			Adapter [default=0]
+
+Set DVB adapter number
+
+-db|'database'=s		Database [default=$DEF_DATABASE]
+
+Specify database name
+
+-tbl|'table'=s			Table [default=$DEF_TBL_LISTINGS]
+
+Specify database table name
+
+-u|'user'=s		User
+
+Specify Mysql user name
+
+-p|'password'=s		Password
+
+Specify Mysql user password
+
+-skip-sql		Skip sql access
+
+-del-old=i		Delete old listings [default=0]
+
+Delete all listings older than 1 month. Disable this to keep a history.
+
+-dbg-sql=i	Debug sql module
+
+-dvb-debug=i	Debug DVB
+
+[DESCRIPTION]
+
+Grabs epg and inserts into Mysql database

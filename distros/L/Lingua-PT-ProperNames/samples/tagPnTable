@@ -1,0 +1,41 @@
+ my @pcolectiva =qw{ Direcção Administração  Comissão Conselho
+ };
+
+ my @metaInst = qw{ Instituto Fundação
+   Universidade Faculdade Escola Departamento Conservatório Academia
+   Sindicato Associação Federação
+   Teatro Grupo 
+   Ministério Conselho Câmara Fundo Secretaria Assembleia Centro Embaixada
+ };
+
+ my @pessoa = qw{ Engenheiro Doutor Presidente Professor Dr.
+   Embaixador Ministro
+   Director Secretário 
+   Padre Frei Papa Cónego Arcebispo Bispo Cardeal 
+   General Almirante Comandante Capitão Brigadeiro Tenente Alferes Inspector
+   Marquês Conde Dom D. Visconde Conselheiro Comendador Barão 
+   Senhor Senhora
+ };
+
+ my @metaLug = qw{ Lugar Largo Praça Praceta Bairro Rua R. Avenida Av. 
+   Travessa Beco Urbanização Quinta Viela Estrada Calçada Rotunda Jardim 
+ };
+
+ my @monumento = qw{Convento Mosteiro Igreja Palácio Torre Museu Sé Fonte
+   Solar Catedral Palacete Chafariz Aqueduto
+ };
+
+ my @santo = qw{São S. Santo Santa St.
+ };
+
+ my @tab=();
+
+ @tab{@metaInst}   = ("instituição") x @metaInst;
+## @tab{@metaOrg}   = ("organização") x @metaOrg;
+ @tab{@pcolectiva} = ("pessoa colectiva") x @pcolectiva;
+ @tab{@pessoa}     = ("pessoa") x @pessoa;
+ @tab{@santo}      = ("santo") x @santo;
+ @tab{@metaLug}    = ("lugar") x @metaLug;
+ @tab{@monumento}  = ("monumento") x @monumento;
+
+ \%tab;

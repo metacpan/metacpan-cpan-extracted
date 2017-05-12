@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               LibCAS
+version:            0.02a
+abstract:           A library for interacting with Jasig's CAS server
+author:
+    - "Michael Morris" <"michael.m.morris@gmail.com">
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Apache2::Const:       2
+    Apache2::Log:         2
+    Apache2::RequestRec:  2
+    Apache2::URI:         2
+    APR::Table:           0
+    Data::Dumper:         0
+    HTTP::Cookies:        1.39
+    LWP::UserAgent:       2
+    perl:                 
+    Test::More:           0.86
+    URI:                  1.35
+    XML::LibXML:          1.58
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

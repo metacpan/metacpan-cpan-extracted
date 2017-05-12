@@ -1,0 +1,33 @@
+define s (a1 b) {
+    if [> $a1 $b] {
+        return -1
+    }
+    if [< $a1 $b] {
+        return 1
+    }
+    return 0
+}
+ 
+define so (a c) {
+ echo experiencia
+}
+
+define a [new TVector]
+
+$a append 4 1 32 2
+
+echo [$a getAt 0]
+echo [$a getAt 1]
+echo [$a getAt 2]
+echo [$a getAt 3]
+
+echo 
+
+$a sort s
+
+echo [$a getAt 0]
+echo [$a getAt 1]
+echo [$a getAt 2]
+echo [$a getAt 3]
+
+

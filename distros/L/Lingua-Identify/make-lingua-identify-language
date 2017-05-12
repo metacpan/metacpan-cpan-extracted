@@ -1,0 +1,429 @@
+#!/usr/bin/perl -s
+use strict;
+use POSIX;
+
+use Text::Ngram qw(ngram_counts);
+use Text::ExtractWords qw(words_count words_list);
+use Text::Affixes;
+
+my $version = '0.02';
+
+our ($v,$h,$d,$u,$verbose,$locale);
+
+if ($locale) {
+    if ($u && $locale !~ /utf/i) {
+        verbose("setting locale: $locale.UTF-8");
+        POSIX::setlocale( &POSIX::LC_CTYPE, "$locale.UTF-8" );
+    } else {
+        verbose("setting locale: $locale");
+        POSIX::setlocale( &POSIX::LC_CTYPE, $locale );
+    }
+    use locale;
+}
+
+
+our $utf8 = undef;
+$utf8 = 1 if $u;
+
+show_help()        if $h;
+show_version()     if $v;
+
+unless (-d || @ARGV) {
+    $d = 1;
+}
+
+if ($d) {
+    my @languages = @ARGV || <*-*>;
+    for (@languages) {
+        /(.+)-(.+)/ ||
+          die "Can't figure out the language tag and name out of '$_'\n";
+        make_module($1, $2, <$_/*>);
+    }
+}
+else {
+    my $tag      = shift || die "You must provide a language tag.\n";
+    my $language = shift || die "You must provide a language name.\n";
+    @ARGV                || die "You must provide at least one file.\n";
+    verbose("Creating module for $tag for $language language");
+    make_module(lc($tag), lc($language), @ARGV);
+}
+
+###############
+# subroutines #
+###############
+
+sub verbose {
+    print STDERR $_[0], "\n" if $verbose;
+}
+
+###
+
+sub show_help {
+    die "Usage: make-lingua-identify-language tag language file1 file2
+ or:   make-lingua-identify-language -d directory1 directory2
+make-lingua-identify-language: creates Lingua::Identify language modules
+
+Examples:
+  make-lingua-identify-language en english file1
+  make-lingua-identify-language -d en-english/ pt-portuguese/
+  make-lingua-identify-language
+
+Options:
+  -d         directory mode
+  -h         displays this messages and exit
+  -v         show version and exit
+  -verbose   verbose mode
+  -u         unicode
+"
+}
+
+###
+
+sub show_version { 
+    die "make-lingua-identify-language version $version\n";
+}
+
+###
+
+sub make_module {
+    my ($tag, $name, @files) = @_;
+
+    verbose("Studying $name ($tag)");
+
+    # read all files in its directory
+    my $text;
+
+    my $meta = {
+                'language_name' => $name,
+                'sets'          => [],
+               };
+    $tag =~ /^..$/  and $meta->{'two_letter_code'}   = $tag;
+    $tag =~ /^...$/ and $meta->{'three_letter_code'} = $tag;
+
+    for (@files) {
+        if ($utf8) {
+            open( STDINO, '<:utf8', $_ ) || die $!;
+        } else {
+            open( STDINO, $_ ) || die $!;
+        }
+        if ($_ eq 'META.yml') {
+            verbose("\tfound META.yml");
+            while (<STDINO>) { # META.yml is processed here
+                if (/^(\w+):\s*(\w+)$/) {
+                    $meta->{$1} = $2;
+                    verbose("\tassigned $1 to $2");
+                }
+                elsif (/^(\w+):\s*$/) {
+                    my $id = $1;
+                    while (<STDINO>) {
+                        last if /^\s*$/;
+                        if (/^\s*(\w*)\s*$/) {
+                            push @{$meta->{$id}}, $1;
+                            verbose("\tpushed $1 into $id");
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            if ($locale) {
+                $text .= join "\n", map { lc } <STDINO>;
+            } else {
+                $text .= join "\n", <STDINO>;
+            }
+        }
+        close STDINO;
+    }
+
+    # write some headers
+    if ($utf8) {
+        open( STDOUTO, ">:utf8" , ( uc $tag ) . ".pm" ) || die;
+    } else {
+        open( STDOUTO, ">" . ( uc $tag ) . ".pm" ) || die;
+    }
+    my $sets = join ", ", map { "'$_'" } @{$meta->{'sets'}};
+    verbose("\t$sets");
+    print STDOUTO "use utf8;\n" if $utf8;
+    print STDOUTO "use strict;\n",
+      "\n\${Lingua::Identify::languages{'_versions'}{'$tag'}} = '$version';\n",
+      "\n\${Lingua::Identify::languages{'_names'}{'$tag'}} = '$name';\n",
+      "\n\${Lingua::Identify::languages{'_sets'}{'$tag'}} = '$sets';\n";
+
+    # write POD
+
+    my $module_name = uc $tag;
+    my $podname = ucfirst $name;
+
+    print STDOUTO pod_unindent("
+
+    =head1 NAME
+
+    Lingua::Identify::$module_name - Meta-information on $podname
+
+    =head1 SYNOPSIS
+
+    Nothing here is meant for public consumption. This module is to be
+    loaded by Lingua::Identify.
+
+    =head1 DESCRIPTION
+
+    Automatically generated. Do not change this module yourself unless
+    you know what you're doing.
+
+    =head1 SEE ALSO
+
+    Lingua::Identify(3).
+
+    =head1 AUTHOR
+
+    Jose Castro, C<< <cog\@cpan.org> >>
+
+    =head1 COPYRIGHT AND LICENSE
+
+    Copyright (C) 2010 by Alberto Simoes
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself, either Perl version 5.8.4 or,
+    at your option, any later version of Perl 5 you may have available.
+
+    =cut
+");
+
+    # write prefixes information
+    verbose("\tstudying prefixes");
+
+    my $prefixes = get_prefixes( { min => 1, max => 4 }, $text );
+
+    for my $i ( 1 .. 4 ) {
+        select STDOUTO;
+        print "\n\${Lingua::Identify::languages{'prefixes$i'}{'$tag'}} = {\n";
+        my $total;
+        for ( values %{ $$prefixes{$i} } ) { $total += $_; }
+        for (
+             (
+              sort { $$prefixes{$i}{$b} <=> $$prefixes{$i}{$a} }
+              keys %{ $$prefixes{$i} }
+             )[ 0 .. 19 ]
+            )
+          {
+              print "  '$_'\t=> ", $$prefixes{$i}{$_} / $total, ",\n";
+          }
+        print "};\n";
+    }
+
+    # write suffixes information
+    verbose("\tstudying suffixes");
+
+    my $suffixes = get_suffixes( { min => 1, max => 4 }, $text );
+    for my $i ( 1 .. 4 ) {
+        select STDOUTO;
+        print "\n\${Lingua::Identify::languages{'suffixes$i'}{'$tag'}} = {\n";
+        my $total;
+        for ( values %{ $$suffixes{$i} } ) { $total += $_; }
+        for (
+             (
+              sort { $$suffixes{$i}{$b} <=> $$suffixes{$i}{$a} }
+              keys %{ $$suffixes{$i} }
+             )[ 0 .. 19 ]
+            )
+          {
+              print "  '$_'\t=> ", $$suffixes{$i}{$_} / $total, ",\n";
+          }
+        print "};\n";
+    }
+
+    # write words information
+    verbose("\tstudying words");
+
+    my $hash_w;
+    if ($utf8) {
+        $hash_w = my_words_count($text);
+    } else {
+        my %hash;
+        words_count(\%hash, $text);
+        $hash_w = \%hash;
+    }
+    my $total;
+    for ( values %$hash_w ) { $total += $_; }
+    print "\n\${Lingua::Identify::languages{'smallwords'}{'$tag'}} = {\n";
+    for (( sort { $hash_w->{$b} <=> $hash_w->{$a} }
+           grep { !/(?:[_'",;:.«»0-9\(\)\[\]\{\}\/\\\!\?%]|^-|-$)/ } keys %$hash_w )
+         [ 0 .. 19 ] )
+      {
+          print "  '$_'\t=> ", $hash_w->{$_} / $total, ",\n";
+      }
+    print "};\n";
+
+    # write ngrams information
+    my $f = sub { ngram_counts( {spaces => 0}, $_[0], $_[1]) };
+    get_ngrams($tag, 'ngrams', 1, 4, $f, $text );
+
+    # close the file
+    close(STDOUT);
+
+}
+
+###############################
+
+sub get_ngrams {
+    my ($tag, $what, $min, $max, $function, $text) = @_;
+
+    for my $gram ( $min .. $max ) {
+
+        verbose("\tstudying $what $gram");
+
+        #my $hash_r = ngram_counts( $text, $gram );
+        my $hash = &{$function}($text, $gram);
+
+        my $total;
+        for ( values %$hash ) {
+            $total += $_;
+        }
+
+        print "\n\${Lingua::Identify::languages{'$what$gram'}{'$tag'}} = {\n";
+
+        for ((sort { $$hash{$b} <=> $$hash{$a} } keys %$hash )[ 0 .. 19 ]) {
+            print "  '$_' => ", $$hash{$_} / $total, ",\n";
+        }
+
+        print "};\n";
+
+    }
+
+}
+
+###
+
+sub pod_unindent { ( local $_ = shift ) =~ s/^ +//mg; $_ }
+
+sub my_words_count {
+    my $text = shift;
+    my $count;
+    for my $word (split /[\n\s]+/, $text) {
+        $count->{$word}++;
+    }
+    return $count;
+}
+
+__END__
+
+=head1 NAME
+
+make-lingua-identify-language - creates language modules for Lingua::Identify
+
+=head1 SYNOPSIS
+
+  make-lingua-identify-language Language-Tag Language-Name file1 [file2 ...]
+
+or
+
+  make-lingua-identify-language -d TAG1-LANGUAGE1/ [TAG2-LANGUAGE2/ ...]
+
+or
+
+  make-lingua-identify
+
+=head1 DESCRIPTION
+
+Creates language modules to be used by Lingua::Identify.
+
+After creating the modules, you still have to install them.
+
+Please note that this script is still at an early stage. Please do not even
+look at the code...
+
+Without parameters, make-lingua-identify-language assumes mode -d and goes
+through all the directories in the current one. This is useful to be used in a
+directory where you something like this:
+
+  .
+  |-- en-english
+  |   `-- english.txt
+  |-- fr-french
+  |   `-- french1.txt
+  |   `-- french2.txt
+  `-- pt-portuguese
+      `-- portuguese.txt
+
+=head2 OPTIONS
+
+=head2 -d
+
+Directory mode. Each parameter passed should be a directory whose name
+must be of the form tag-name (e.g., en-english/ ). Each of the
+directories passed should contain text files that can be used to train
+Lingua::Identify.
+
+=head2 -D
+
+Debug mode. Only for development.
+
+=head2 -h
+
+Display help and exit.
+
+=head2 -v
+
+Show version and exit.
+
+=head2 -verbose
+
+Verbose mode.
+
+=head2 -locale=C<< <locale> >>
+
+Set a specific locale. This way your text will be all lowercased before analysed.
+
+=head1 META.yml
+
+C<META.yml> files are not parsed as other files, they are ignored.
+
+In directory mode (C<-d> switch), C<META.yml> files are checked for
+info on languages codes and sets.
+
+Here's a simple C<META.yml> for you to put in your directories:
+
+  two_letter_code:   pt
+  three_letter_code: por
+  sets:
+    spoken_in_portugal
+
+With that, the language will be identified with the two letter code
+"pt" or the three letter code "por"; it will also be in the set
+":spoken_in_portugal".
+
+=head1 CONTRIBUTING WITH NEW LANGUAGES
+
+Please do not contribute with modules you made yourself. It's easier
+to contribute with unprocessed text, because that allows for new
+versions of Lingua::Identify not having to drop languages down in case
+I can't contact you by that time.
+
+Use I<make-lingua-identify-language> to create a new module for your
+own personal use, if you must, but try to contribute with unprocessed
+text rather than those modules.
+
+=head1 SEE ALSO
+
+Lingua::Identify(3), langident(1)
+
+A linguist and/or a shrink.
+
+The latest CVS version of C<Lingua::Identify> (which includes
+I<make-lingua-identify>) can be attained at
+http://natura.di.uminho.pt/natura/viewcvs.cgi/Lingua/Identify/
+
+ISO 639 Language Codes, at http://www.w3.org/WAI/ER/IG/ert/iso639.htm
+
+=head1 AUTHOR
+
+Jose Alves de Castro, E<lt>cog@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2004-2005 by Jose Alves de Castro
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

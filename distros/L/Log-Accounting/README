@@ -1,0 +1,32 @@
+Log::Accounting version 0.02
+============================
+
+NAME
+    Log::Accounting - Accounting of network services
+
+DESCRIPTION
+    Accounting of network services.
+
+SYNOPSIS
+    use Log::Accounting;
+
+    my $sm = Log::Accounting->new("Sendmail");
+    $sm->addfile($fh);
+    $sm->filter("oli@42.nu","oliver@42.nu"); # only this mails
+    $sm->map(oli=>["oli@42.nu","oliver@42.nu"]); # map to one "mail account"
+    $sm->group("oli"); # sum up mails
+    %result = $sm->calc();
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+   The author of this package disclaims all copyrights and releases it
+   into the public domain.

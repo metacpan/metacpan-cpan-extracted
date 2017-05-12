@@ -1,0 +1,42 @@
+[% 
+    IF users.data.userid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = data.realname _ ' (Change Password)' ;
+%]
+
+<br />
+
+<div class="post">
+    [% IF errmess %]<p style="alert">[% errmess %]</p>[% END %]
+
+    <p>Please use the following rules to create your new password:
+    <ul>
+    <li>Passwords should be [% minpasslen %] - [% maxpasslen %] characters in length.</li>
+    <li>Use more than one type from the upper case, lower case, numeral and symbol character types, e.g. 'Myword', 'smallword2' and 'L!TTLE' would all be fine.</li>
+    <li>Use at least 3 unique characters, i.e 'Eeeeee' is not allowed.</li>
+    <li>No whitespace characters allowed.</li>
+    </ul>
+</div>
+
+<br />
+
+  <form method="post" action="[% cgipath %]/pages.cgi">
+  <input type="hidden" name="act" value="user-adminchng" />
+  <input type="hidden" name="userid" value="[% data.userid %]" />
+
+    <table>
+    <tr><th width="160">User</th>
+        <th width="10"></th>
+        <td><b>[% data.name %]</b></td>
+    </tr>
+    <tr><th>New Password</th>
+        <th></th>
+        <td><input type="password" name="effect2" size="20" /></td>
+    </tr>
+    <tr><th>Retype New Password</th>
+        <th></th>
+        <td><input type="password" name="effect3" size="20" /></td>
+    </tr>
+	  <tr><td colspan="2"></td><td><input type="submit" name="submit" value="UPDATE" /></td></tr>
+    </table>
+  </form>
+

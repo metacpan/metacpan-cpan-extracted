@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+use strict;
+use lib './lib';
+use LEOCHARRE::HTML::Text 'html2txt';
+use base 'LEOCHARRE::CLI';
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /(\d+)/g;
+my $o = gopts();
+
+if ($o->{d}){ $LEOCHARRE::HTML::Text::DEBUG = 1 }
+
+
+for my $arg (@ARGV){
+   my $out = html2txt($arg)
+      or warn("Could not get output from argument '$arg'")
+      and next;
+   print "$out\n";
+}
+
+sub usage { q/html2text [OPTION].. [URL|PATH|HTML]..
+Convert html to text
+
+   -h       help
+   -d       debug
+   -v       version
+
+Try 'man html2text' for more info.
+/ }
+
+exit;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+html2txt - Convert html to text
+
+=head1 DESCRIPTION
+
+Argument is a url or html file, spits simple text to stdout.
+
+=head1 USAGE 
+
+html2text [OPTION].. [URL|PATH|HTML]..
+
+=head1 OPTIONS
+
+   -h       help
+   -d       debug
+   -v       version
+
+=head1 USAGE EXAMPLES
+
+   html2text http://news.bbc.co.uk
+   html2text ./file.html
+   html2text http://news.bbc.co.uk ./file.html
+
+Save to a file?
+
+   html2text ./filewithhtml.txt > out.txt
+
+=head1 SEE ALSO
+
+L<LEOCHARRE::HTML::Text> parent package, full API.
+
+=cut

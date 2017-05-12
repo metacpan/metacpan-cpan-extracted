@@ -1,0 +1,107 @@
+=head1 NAME
+
+jspell - jspell affix file format
+
+=head1 The Grammar
+
+  table := [headers] [prefixes] [sufixes]
+
+  headers := [options] char-sets
+
+  options := {fmtr-stmt|bool-stmt|flag-stmt|num-stmt}
+
+  fmtr-stmt := {nroff-stmt|tex-stmt}
+
+  nroff-stmt := {nroffchars|troffchars} string
+
+  tex-stmt := {TeXchars|texchars} string
+
+  bool-stmt := {cmpnd-stmt|aff-stmt}
+
+  cmpnd-stmt := compoundwords on-or-off
+
+  aff-stmt := allafixes on-or-off
+
+  on-or-off := {on|off}
+
+  flag-stmt := flagmarker character
+
+  num-stmt := compoundmin digit
+
+  char-sets := norm-sets [alt-sets]
+
+  norm-sets := [deftype] charset-group
+
+  deftype := defstringtype name deformatter suffix*
+
+  charset-group := {char-stmt|string-stmt|dup-stmt}*
+
+  char-stmt := wordchars character-range
+            |  wordchars lowercase-range uppercase-range
+            |  boudarychars character-range
+            |  boundarychars lowercase-range uppercase-range
+
+  string-stmt := stringchar string
+              |  stringchar lowercase-string uppercase-string
+
+  alt-sets := alttype [alt-stmt*]
+
+  alttype := altstringtype name suffix*
+
+  alt-stmt := altstringchar alt-string std-string
+
+  prefixes := prefixes flagdef*
+
+  suffixes := suffixes flagdef*
+
+  flagdef := flag [*|+] char : [; classification] repl*
+
+  repl := condition* > [- string-string,] append-string [; classification]
+
+This grammar is the I<jspell> portion that differs from the I<ispell>
+one that can be found, complete and commented on I<ispell> manual.
+
+=head2 Word Classification
+
+The power of affix files was augmented using a classification option
+field that is, not more than a string (between quotes) where we can
+write anything but, for usability, should contain the word classification.
+
+Example:
+
+  flag p: ; "CAT=adj_nc"
+
+  I L > -L, S ; "N=p"   # il->is (funil ---> funis)
+
+In this case, "N=p" means that the application of this rule, the word
+number (C<N>) will be plural (C<p>). The C<CAT=adj_nc> string is only
+usefull when using the C<-c> flag or when using the library
+C<get_roots(...)> function.
+
+=head2 Suffixes' suffixes
+
+Another change was adding the C<+> operator that provides a way that a
+flag can be used on a flagged word, or, in another words, mean it can
+be suffixed.
+
+
+=head1 THANKS
+
+We should thanks Pace Willisson and Geoff Kuenning for putting
+C<ispell> as a open source application, from where much of this
+application code was borrowed.
+
+=head1 AUTHOR
+
+ Ulisses Pinto
+ J.Joao Almeida  <jj@di.uminho.pt>
+
+=head1 SEE ALSO
+
+ See the following man pages: jspell(1), perl(1), agrep(1)
+
+=head1 BUGS
+
+ We wait for them at any of the author e-mails!
+
+=cut

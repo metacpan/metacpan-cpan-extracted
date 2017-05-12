@@ -1,0 +1,28 @@
+
+ Lingua::PT::Speaker  
+---------------------
+
+  Text-to-Speech module for the portuguese language.
+
+  To run it you need to fulfill the module dependencies (as expected)
+  but also:
+
+  - an mbrola player. You can find an executable for your operating
+    system in the mbrola webpage. At the moment we expect you to have
+    in the your system PATH, and called just 'mbrola'.
+
+  - the mbrola phonemes library for the Portuguese language. It can be
+    downloaded also from the mbrola website. Put it somewhere as
+    /usr/lib/mbrola/pt1. The module checks for some reasonable
+    locations, but not all possible.
+
+    http://tcts.fpms.ac.be/synthesis/mbrola/dba/pt1/pt1-000509.zip
+
+  - an .wav command line player. We check for 'play', 'sndplay',
+    'esdplay' and 'rawplay' in this order. Please check you have one
+    of those in your path.
+
+
+For Linux RPMs try:
+ http://http://natura.di.uminho.pt/~jj/RPMS/i586/mbrola-3.01g1-1.i386.rpm
+ http://http://natura.di.uminho.pt/~jj/RPMS/i586/mbrola-pt1-1.05-1.i386.rpm

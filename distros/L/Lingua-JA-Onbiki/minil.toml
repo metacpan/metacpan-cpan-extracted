@@ -1,0 +1,4 @@
+name = "Lingua-JA-Onbiki"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,8 @@
+<lido:lido
+ xmlns:lido="http://www.lido-schema.org"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:gml="http://www.opengis.net/gml"
+ xsi:schemaLocation="http://www.lido-schema.org http://www.lido-schema.org/schema/v1.0/lido-v1.0.xsd">
+
+<lido:lidoRecID lido:source="Yale Center for British Art" lido:type="local">YCBA/lido-TMS-499</lido:lidoRecID>
+</lido:lido>

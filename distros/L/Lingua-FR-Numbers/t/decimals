@@ -1,0 +1,11 @@
+@numbers = (
+    12.55     => 'douze virgule cinquante-cinq',
+    1_012.125 => 'mille douze virgule cent vingt-cinq',
+    55.5      => 'cinquante-cinq virgule cinq',
+    123.23    => 'cent vingt-trois virgule vingt-trois',
+    8.01      => 'huit virgule un centième',
+    8.001     => 'huit virgule un millième',
+    10.055    => 'dix virgule cinquante-cinq millièmes',
+    10.0055   => 'dix virgule cinquante-cinq dix millièmes',
+    10.00055  => 'dix virgule cinquante-cinq cent millièmes',
+);

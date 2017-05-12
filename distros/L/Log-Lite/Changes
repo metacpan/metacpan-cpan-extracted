@@ -1,0 +1,32 @@
+Revision history for Perl extension Log::Lite.
+
+0.01  Thu Aug 18 18:06:22 2011
+	- original version; created by h2xs 1.23 with options
+		-XA -n Log::Lite
+0.02  Thu Nov 17 12:00:18 2011
+	- add logpath() to defined logpath
+0.03  Fri Nov 18 11:37:38 2011
+	- fix document
+0.04  Tue Mar 13 15:23:41 2012
+    - fix warnings
+0.05  Tue May  7 22:04:53 2013
+    - report error when fail to create logpath
+0.06  Sat Sep  7 13:50:42 2013
+    - debug mode support
+0.07  Sun Sep  8 11:33:51 2013
+    - slient mode support
+0.08  Sun Sep  8 21:16:09 2013
+	- logrotate mode support
+0.09  Sun Sep  8 21:26:19 2013
+	- fix document (buggy version)
+0.10  Sun Sep  8 21:38:26 2013
+	- fix bug
+0.11  Wed Feb 12 15:51:25 2014
+    - change mkdir to File::Path
+0.12  Thu Apr 10 19:49:43 2014
+    - fix bug
+0.13  Sat May 31 23:06:31 2014
+    - add logsregex()
+0.14  Mon Dec  5 16:24:15 2016
+    - fix a bug on Strawberry Perl for windows in logpath()
+

@@ -1,0 +1,11 @@
+Revision history for Log-Dispatch-SNMP
+
+0.02    2010/06/10
+        Fixed parameter clashing bug (thanks Erez Zarum for reporting
+        and helping debug it)
+        Improved documentation
+        Added some more tests
+
+0.01    2009/03/04
+        First version, released on an unsuspecting world.
+

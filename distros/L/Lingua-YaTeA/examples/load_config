@@ -1,0 +1,47 @@
+#!/usr/bin/perl -w
+
+#######################################################################
+#
+# Last Update: 11/07/2006 (mm/dd/yyyy date format)
+# 
+# Copyright (C) 2004 Thierry Hamon, Sophie Aubin
+#
+# Written by thierry.hamon@univ-paris13.fr, sophie.aubin@lipn.univ-paris13.fr
+#
+# Author : Thierry Hamon - Sophie Aubin
+# Email : thierry.hamon@univ-paris13.fr - sophie.aubin@lipn.univ-paris13.fr
+# URL : http://www-limbio.smbh.univ-paris13.fr/membres/hamon/
+# Version : 1
+########################################################################
+
+
+use strict;
+use Getopt::Long;
+use Config::General;
+use Pod::Usage;
+use Data::Dumper;
+
+
+use Lingua::YaTeA::Corpus;
+# use Lingua::YaTeA::Config;
+use Lingua::YaTeA;
+
+
+# Process Option
+
+my $man = 0;
+my $help = 0;
+my $rcfile = "";
+
+# GetOptions('help|?' => \$help, man => \$man, "rcfile=s" => \$rcfile) or pod2usage(2);
+# pod2usage(1) if $help;
+# pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+
+my %config = Lingua::YaTeA::load_config("yatea-test.rc");
+
+my $yatea;
+
+$yatea = Lingua::YaTeA->new($config{"OPTIONS"}, \%config);
+
+$yatea->getParsingPatternSet->print;

@@ -1,0 +1,292 @@
+#
+# ParsingPatternParser.yp
+# 
+#  used to generate Lingua::YaTeA::ParsingPatternParser.pm
+#
+#  Use: yapp -m 'Lingua::YaTeA::ParsingPatternParser' -o lib/Lingua/YaTeA/ParsingPatternParser.pm lib/Lingua/YaTeA/ParsingPatternParser.yp
+#
+# Parse::Yapp input grammar for parsing the yatea PArsint patterns
+#
+#
+#
+%{
+    use Lingua::YaTeA;
+#     use Data::Dumper;
+    use warnings;
+
+    my $node_set;
+    my $level = 0;
+    my $node;
+    my @uncomplete;
+    my @parse;
+    my $edge;
+    my $num_content_words;
+    my @pos_sequence;
+    my $priority;
+    my $direction;
+    my $pos_sequence;
+    my $pattern;
+    my $parse;
+    my $num_line = 1;
+%}
+%%
+input:  #empty
+        |   input line  { # print STDERR "INPUT $_[1] \n";
+		      }
+;
+
+line:       '\n' { $_[1] }
+        |  parsingpattern '\n' { 
+# 	     print STDERR "=>$_[1]\n";
+
+	     $pos_sequence = join(" ",@pos_sequence);
+	     $parse = join(" ",@parse);
+# 	     print STDERR "parse = $parse\n";
+	     $node_set->setRoot; 
+	     $pattern = Lingua::YaTeA::ParsingPattern->new($parse,$pos_sequence,$node_set,$priority,$direction,$num_content_words,$num_line);
+	     
+  	     $_[0]->YYData->{PPRS}->addPattern($pattern);
+	     @pos_sequence = ();
+	     @uncomplete = ();
+	     @parse = ();
+	     $level = 0;
+  	     $_[0]->YYData->{PPRS}->checkContentWords($num_content_words,$num_line);
+
+	     if ($num_content_words > $Lingua::YaTeA::ParsingPatternRecordSet::max_content_words)
+	     {
+		 $Lingua::YaTeA::ParsingPatternRecordSet::max_content_words = $num_content_words;
+	     }
+	     $num_content_words = 0;
+	     $num_line++;
+	 }
+	|  error '\n' { $_[0]->YYErrok }
+;
+
+parsingpattern: { # print STDERR "START\n";
+
+		  $node_set = Lingua::YaTeA::NodeSet->new;
+
+                } OPEN pattern END priority direction 
+		|	error 'parsingpattern' { $_[0]->YYErrok }
+;
+
+
+pattern: CANDIDATE PREP DET CANDIDATE
+             | CANDIDATE PREP CANDIDATE
+             | CANDIDATE PREP PREP CANDIDATE
+             | CANDIDATE DET CANDIDATE
+             | CANDIDATE CANDIDATE
+	     |	error '\nnew_pattern: ' { $_[0]->YYErrok }
+;
+
+OPEN: OPEN_TAG {# print STDERR "OPEN $_[1]\n";
+
+		if ($level == 0)
+		{
+		    $node = Lingua::YaTeA::RootNode->new($level);
+		}
+		else
+		{
+		    $node = Lingua::YaTeA::InternalNode->new($level);
+		}
+		$node_set->addNode($node);
+		push @uncomplete, $node;
+		$level++;
+		push @parse, $_[1];
+}
+	     |	error '\nOPEN: ' { $_[0]->YYErrok }
+;
+
+CANDIDATE: CANDIDATE_TAG POSITION_TAG {
+#                print STDERR "CANDIDATE $_[1] $_[2]\n";
+
+	       $edge = Lingua::YaTeA::PatternLeaf->new($_[1],$node);
+	       $node->addEdge($edge,$_[2]);
+	       $num_content_words++;
+	       push @pos_sequence,$_[1];  
+	       push @parse, "$_[1]<=$_[2]>";
+
+	   }
+	     | OPEN pattern CLOSE
+	     |	error '\nCANDIDATE: ' { $_[0]->YYErrok }
+;
+
+PREP: PREP_TAG {# print STDERR "PREP $_[1]\n";
+		$node->{"PREP"} = $_[1]; 
+		push @pos_sequence, $_[1];
+		push @parse, $_[1];
+	    }
+	     |	error '\nPREP: ' { $_[0]->YYErrok }
+;
+
+
+DET: DET_TAG {# print STDERR "DET $_[1]\n";
+	      $node->{"DET"} = $_[1]; 
+	      push @pos_sequence, $_[1]; 
+	      push @parse, $_[1];
+	  }
+	     |	error '\nDET: ' { $_[0]->YYErrok }
+;
+
+CLOSE: CLOSE_TAG {# print STDERR "CLOSE_TAG $_[1]\n";
+		  pop @uncomplete;
+		  $node->linkToFather(\@uncomplete,$_[1]);
+		  $node = $uncomplete[$#uncomplete];
+		  $level--;
+		  push @parse, ')';
+	      }
+	     |	error '\nCLOSE: ' { $_[0]->YYErrok }
+;
+
+END: END_TAG {# print STDERR "END $_[1]\n"; 
+	      push @parse, $_[1];
+	      $_[1];
+	  }
+	     |	error '\nEND: ' { $_[0]->YYErrok };
+
+priority: PRIORITY_TAG {# print STDERR "PRIORITY\n";
+			$priority = $_[1];
+		    }
+	     |	error '\npriority: ' { $_[0]->YYErrok }
+;
+
+direction: DIRECTION_TAG {# print STDERR "DIRECTION $_[1]\n";
+			  $direction = $_[1];
+		      }
+	     |	error '\ndirection: ' { $_[0]->YYErrok }
+;
+
+%%
+
+
+
+sub _Error {
+        exists $_[0]->YYData->{ERRMSG}
+    and do {
+        print $_[0]->YYData->{ERRMSG};
+        delete $_[0]->YYData->{ERRMSG};
+        return;
+    };
+    print "Syntax error.\n";
+}
+
+sub _Lexer {
+    my($parser)=shift;
+
+     my $fh = $parser->YYData->{FH};
+
+    my $open = '(\()';
+    my $det = $parser->YYData->{DETERMINERS};
+    my $prep = $parser->YYData->{PREPOSITIONS};
+    my $candidates = $parser->YYData->{CANDIDATES};
+    my $positions = '<=(([MH])||(C[12]))>';
+    my $close = '\)<=(([MH])||(C[12]))>';
+    my $end = '(\))\t+';
+    my $priority = '([0-9]+)\t+';
+    my $direction = '((LEFT)|(RIGHT))';
+
+
+        $parser->YYData->{INPUT}
+     or  $parser->YYData->{INPUT} = <$fh>
+    or  return('',undef);
+
+    $parser->YYData->{INPUT}=~s/^[ \t]*#.*//;
+    $parser->YYData->{INPUT}=~s/^[ \t]*//;
+
+
+
+    for ($parser->YYData->{INPUT}) {
+        s/^$open\s*// and return ('OPEN_TAG', $1);
+	s/^$candidates\s*// and return('CANDIDATE_TAG', $1);
+	s/^$prep// and return('PREP_TAG', $1);
+	s/^$det// and return('DET_TAG', $1);
+	s/^$positions\s*// and return('POSITION_TAG', $1);
+	s/^$close// and return('CLOSE_TAG', $1);
+	s/^$end// and return('END_TAG', $1);
+	s/^$priority// and return('PRIORITY_TAG', $1);
+	s/^$direction// and return('DIRECTION_TAG', $1);
+        s/^(.)//s  and return($1,$1);
+	
+    }
+}
+
+# sub Run {
+#     my($self)=shift;
+#     $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error );
+# }
+
+# my($parsingpattern)=new ParsingPatternParser;
+# $parsingpattern->Run;
+
+
+__END__
+
+=head1 NAME
+
+Lingua::YaTeA::ParsingPatternParser - Perl extension for parsing the file containing the parsing patterns (based on Parse::Yapp)
+
+=head1 SYNOPSIS
+
+  use Lingua::YaTeA::ParsingPatternParser;
+
+  my $fh = FileHandle->new("<$file_path");
+
+  my $parser = Lingua::YaTeA::ParsingPatternParser->new();
+
+  $parser->YYData->{PPRS} = $this;
+  $parser->YYData->{FH} = $fh;
+  $parser->YYData->{CANDIDATES} = $tag_set->getTagList("CANDIDATES");
+  $parser->YYData->{PREPOSITIONS} = $tag_set->getTagList("PREPOSITIONS");
+  $parser->YYData->{DETERMINERS} = $tag_set->getTagList("DETERMINERS");
+
+  $parser->YYParse(yylex => \&Lingua::YaTeA::ParsingPatternParser::_Lexer, yyerror => \&Lingua::YaTeA::ParsingPatternParser::_Error);
+
+=head1 DESCRIPTION
+
+The module implements a parser for analysing parsing pattern file.  
+
+The parser takes into account several information: the file handler to
+read (field C<FH>), the list of the possible Part-of-Speech tags
+(field C<CANDIDATES>), the list of prepositions (field
+C<PREPOSITIONS>), and the list of determiners (field C<DETERMINERS>).
+
+=head1 METHODS
+
+=head2 _Error()
+
+    _Error($error_objet);
+
+The method is used to manage the parsing error and prints a message
+explaining the error.
+
+=head2 _Lexer()
+
+    _Lexer($parser_info);
+
+The method applies the parser on the data contains in the structure
+C<$parser_info> (field C<INPUT>).
+
+
+
+=head1 SEE ALSO
+
+Sophie Aubin and Thierry Hamon. Improving Term Extraction with
+Terminological Resources. In Advances in Natural Language Processing
+(5th International Conference on NLP, FinTAL 2006). pages
+380-387. Tapio Salakoski, Filip Ginter, Sampo Pyysalo, Tapio Pahikkala
+(Eds). August 2006. LNAI 4139.
+
+
+=head1 AUTHOR
+
+Thierry Hamon <thierry.hamon@univ-paris13.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 by Thierry Hamon and Sophie Aubin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

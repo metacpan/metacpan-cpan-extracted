@@ -1,0 +1,15 @@
+Changes
+ignore.txt
+lib/LWP/UserAgent/Tor.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-total.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/torrc
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

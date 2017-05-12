@@ -1,0 +1,19 @@
+---
+name: List-Uniq
+version: 0.20
+author:
+  - |-
+    James FitzGibbon
+    <james+perl@nadt.net>
+abstract: extract the unique elements of a list
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+provides:
+  List::Uniq:
+    file: lib/List/Uniq.pm
+    version: 0.20
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,40 @@
+Revision history for LWP-UserAgent-Anonymous
+
+0.09  Fri Oct 09 12:00:00 2015
+      - Added LICENSE file.
+
+0.08  Sat Jan 17 09:45:00 2015
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.07  Tue Sep 16 00:23:01 2014
+      - Added proxy checking.
+      - Added HTTP::Request as pre-requisite to Makefile.PL file.
+      - Minor cosmetic changes.
+
+0.06  Sun Sep 14 20:43:00 2014
+      - Updated invalid method call to _fetch_proxies().
+      - Added missing import of LWP::Simple package.
+      - Added LWP::Simple to Makefile.PL file.
+      - Updated method anon_request() to accept request object correctly.
+
+0.05  Sun Sep 14 12:23:09 2014
+      - Removed the dependency on the fixed list of proxies instead now fetch the proxy runtime.
+      - Deleted Build.PL file.
+      - Removed dependency on Carp.pm and Net::Telnet.
+      - Added section "REPOSITORY" to the pod
+      - Added key "META_MERGE" to Makefile.PL
+
+0.04  Tue Aug 09 12:57:11 2011
+      - Prepared the distribution using the Module::Signature v0.68.
+
+0.03  Tue Apr 19 13:29:13 2011
+      - Renamed title "SYNOPSIS" to "DESCRIPTION".
+      - Minor cosmetics changes.
+
+0.02  Wed Apr 13 16:37:20 2011
+      - Changed the URL in the unit test.
+
+0.01  Fri Mar 18 10:05:17 2011
+      - First version released.

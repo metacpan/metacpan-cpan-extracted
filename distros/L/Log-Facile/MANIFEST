@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Log-Facile-use-ok.t
+t/Log-Facile-write-pass-001.t
+t/Log-Facile-tmpl-config-pass-001.t  
+t/Log-Facile-accessor-pass-001.t  
+t/Log-Facile-accessor-fail-001.t 
+t/Log-Facile-swap-pass-001.t  
+t/Log-Facile-swap-fail-001.t 
+lib/Log/Facile.pm
+META.yml                                 Module meta-data (added by MakeMaker)

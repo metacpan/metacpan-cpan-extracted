@@ -1,0 +1,78 @@
+Revision history for Perl extension Lingua::KO::Hangul::Util.
+
+0.27  Sun Sep  1 13:11:14 2013
+    - mkheader: close FH.
+    - test.t: remove a test with charnames.
+    - pod: add CAVEAT about Unicode 5.2.0 this module does not support.
+
+0.26  Sat Mar 10 18:21:49 2012
+    - avoid "use Test".
+
+0.25  Sun Jul 31 21:10:28 2011
+    - fix the tarball with world writable files.
+
+0.24  Sun Feb  6 14:12:53 2011
+    - xsub: avoid pointer type mismatch.
+
+0.23  Tue Jun  5 21:55:36 2007
+    - mkheader, charlist() - avoid unpack('C*') on unicode.
+
+0.22  Sun May  8 20:48:43 2005
+    - added isStandardForm(), insertFiller() and getSyllableType().
+    - added t/filler.t, t/std.t and t/type.t.
+    - hangul.h (now removed) is integrated into Util.xs.
+    - (perl 5.8.1 or later) improved utf8 upgrade of non-POK (private POK)
+      values like tied scalars, overloaded objects, etc.
+    - added META.yml.
+
+0.21  Sun Oct 19 20:33:22 2003
+    - fix in composeJamo (XSUB): no longer relies on a string to be
+      terminated with '\0'.
+
+0.20  Mon Sep 08 21:38:02 2003
+    - added decomposeJamo(), composeJamo(), decomposeSyllable(),
+      composeSyllable(), and decomposeFull().
+    - changed INSTALLATION (cf. README).
+    - simplified Makefile.PL.
+    - modified how to build XSUB (sorry for inconvenience).
+      The purePerl-XSUB converter is now provided as two perl script files,
+      named "enableXS" and "disableXS".
+      (no longer <perl Makefile.PL xs> and <perl Makefile.PL noxs>.)
+    - added fulldec.t and unary.t.
+
+0.11  Sat May 11 11:59:36 2002
+    - modify a test for a custom translator on charnames.
+
+0.10  Sat Apr 27 10:47:21 2002
+    - removes unreferenced local variables and signed/unsigned mismatches.
+
+0.09  Sun Apr 14 10:48:12 2002
+    - The XS now uses utf8n_to_uvuni() instead of utf8n_to_uvchr().
+
+0.08  Tue Dec 11 22:53:07 2001
+    - add a test and modify Makefile.PL.
+
+0.07  Tue Nov 13 00:31:51 2001
+    - modify tests (thanks, Andreas Marcel Riechert)
+
+0.06  Thu Nov 01 22:22:42 2001
+    - add getHangulComposite()
+
+0.05  Wed Oct 31 21:48:06 2001
+    - modify hangul.h and Util.xs.
+
+0.04  Sun Oct 28 16:07:46 2001
+    - XSUB is now supported. (but pure Perl is also supported.)
+
+0.03  Wed Oct 10 00:50:20 2001 (not released)
+    - In list context, composeHangul('') should return
+      empty list, rather than empty string.
+
+0.02  Sat Aug 11 00:16:02 2001
+    - fix SEE ALSO (the Unicode Normalization Forms is UAX #15)
+    - getHangulName and parseHangulName return
+      a list (undef) of one element in list context.
+
+0.01  Fri Aug  3 21:25:11 2001
+    - original version; created by h2xs 1.21 with options
+          -A -X -n Lingua::KO::Hangul::Util

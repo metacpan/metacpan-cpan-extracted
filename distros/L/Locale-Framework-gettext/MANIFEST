@@ -1,0 +1,8 @@
+Changes
+lib/Locale/Framework/gettext.pm
+locale/nl_NL/LC_MESSAGES/default.po
+locale/nl_NL/LC_MESSAGES/default.mo
+Makefile.PL
+MANIFEST
+README
+t/2.t

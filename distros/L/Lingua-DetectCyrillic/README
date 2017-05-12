@@ -1,0 +1,53 @@
+ANNOTATION
+
+Lingua::DetectCyrillic. The package detects 7 Cyrillic codings as
+well as the language - Russian or Ukrainian. 
+Uses embedded frequency dictionaries;
+usually one word is enough for correct detection.
+
+INSTALLATION
+
+First, install packages Unicode::Map8 and Unicode::String required 
+by the package (available at www.cpan.org).
+
+Then install as usual:
+
+perl Makefile.PL
+	- or -
+perl Makefile.PL PREFIX=/home/mydirectory LIB=/home/mydirectory
+
+make 
+make test
+make install
+
+On win32 platform use Microsoft nmake.exe instead of make 
+(can be downloaded from Microsoft site).
+
+SYNOPSIS
+
+  use Lingua::DetectCyrillic;
+   -or (if you need translation functions) -
+  use Lingua::DetectCyrillic qw ( &TranslateCyr &toLowerCyr &toUpperCyr );
+
+  # New class Lingua::DetectCyrillic. By default, not more than 100 Cyrillic
+  # tokens (words) will be analyzed; Ukrainian is not detected.
+  $CyrDetector = Lingua::DetectCyrillic ->new();
+
+  # The same but: analyze at least 200 tokens, detect both Russian and
+  # Ukrainian.
+  $CyrDetector = Lingua::DetectCyrillic ->new( MaxTokens => 200, DetectAllLang => 1 );
+
+  # Detect coding and language
+  my ($Coding,$Language,$CharsProcessed,$Algorithm)= $CyrDetector -> Detect( @Data );
+
+  # Write report
+  $CyrDetector -> LogWrite(); #write to STDOUT
+  $CyrDetector -> LogWrite('report.log'); #write to file
+
+  # Translating to Lower case assuming the source coding is windows-1251
+  $s=toLowerCyr($String, 'win');
+  # Translating to Upper case assuming the source coding is windows-1251
+  $s=toUpperCyr($String, 'win');
+  # Converting from one coding to another
+  # Acceptable coding definitions are win, koi, koi8u, mac, iso, dos, utf
+  $s=TranslateCyr('win', 'koi',$String);

@@ -1,0 +1,301 @@
+
+=head1 NAME 
+
+Lingua::PT::Conjugate.pm - Module for Conjugating Portuguese verbs
+
+=head1 DESCRIPTION 
+
+This module contains various routines for  conjugating Portuguese verbs.
+
+=head1 USAGE
+
+  use Lingua::PT::Conjugate;
+
+This module pollutes your namespace with the function C<conjug>,
+that takes just the same arguments as the program C<conjug> (which is
+just a wrapper). 
+
+ perl -e 'use Lingua::PT::Conjugate; print conjug("programar","perfeito")'
+ programar :                                                          
+ perf         programei programaste programou programamos programaram
+
+
+See the C<conjug> manpage for more examples.
+
+=head1 SYNOPSIS 
+
+  $a = conjug( [$options,] $verb [,$tense ... ] [,$person ... ])
+
+=head2 Options define how the output will be formatted.
+
+=over 4
+
+=item 'q' : 'Quiet', only return the conjugated forms.
+
+=item 'v' : 'Verbose', return the infinitive, the tenses, the
+conjugated forms and say if the verb is irregular or follows a model
+(Default). 
+
+=item 's' : 'Single', returned string is a single line. 'quiet' option
+is forced, but can be toggled off by a subsequent 'v'  option.
+
+=item 'r' : 'Row', each row represents a person.
+
+=item 'c' : 'Column', each column represents a person (Default).
+
+=item 'o' : 'cOmma', output is comma-separated. Basically useless.
+
+=item 'l' : Long form of verb name is used.
+
+=item 'x' : 'regeXp', when multiple forms are available, returns a
+regexp that matches all correct form, and only these. This is mostly
+useful for past participle of abundant verbs. 
+
+=item 'i' : 'ascIi', use only ascii characters, no accents.
+
+=item 'h' : 'Hash', return a hash rather than a string. The keys are
+the tense names (both long and short). The values are refs to arrays
+whose i'th element is the i'th person, for i in 1-6. For example,
+C<$h->{pres}->[1]> is the first person singular. C<$h->{pres}->[0]> is
+not defined. For the particípio passado, only $h->{pp}->[1] is
+defined, and likewise for gerundivo.  This options renders ineffective
+all other options except 'i' and 'x'.
+
+=back
+
+=head2 VERB 
+
+The verb argument must end in 'ar', 'or' '\^or', 'er' or 'ir'
+(otherwise it cannot be a genuine portuguese verb). If a string with a
+valid ending is passed, that is not a true portuguese verb -say,
+'PerlProgrammer' - it will be conjugated as if it were a regular verb.
+
+=head2 TENSE
+
+The optional 'tense' arguments consist in a list of 
+
+   'pres' , 'Presente', 
+   'perf' , 'Perfeito', 
+   'imp'  , 'Imperfeito', 
+   'fut'  , 'Futuro',
+   'mdp'  , 'Mais Que Perfeito' or 'Mais-que-Perfeito', 
+   'cpres', 'Conjuntivo Presente', 
+   'cimp' , 'Conjuntivo Imperfeito', 
+   'cfut' , 'Conjuntivo Futuro', 
+   'ivo'  , 'Imperativo', 
+   'pp'   , 'Particípio Passado',
+   'grd'  , 'Gerundivo'. 
+
+  Caps don't matter. Default is all tenses in the first column.
+
+=head2 PERSON
+
+The optional 'person' arguments consist in a list of numbers
+representing the person at which the verb is conjugated : 'I'=1,
+'you'=2, 'she/he'=3, 'we'=4, 'you(plural)'=5 'they'=6. All numbers
+other that 1-6 are ignored. Default is 1-6.
+
+  Now, for the inner details :
+
+=head1 DATA STRUCTURES :
+
+=head2 Variable C<$Lingua::PT::Conjugate::vlist>
+
+The database is a single big string, defined at the end of
+Conjugate.pm (the comments and end-of-line's are taken out).
+
+It is in the variable C<$Lingua::PT::Conjugate::vlist>.
+
+To understand the format, have a look at the code, and read this
+informal description :
+
+I<Definition of the conjugation of a verb>
+
+<verb_name> ":" <tense>? <conjugated_form> <conjugated_form>...
+
+The <tense> is optional : By default, the "parser" expects to find
+them in the order pres (i.e. present), perf (perfeito), imp
+(imperfeito), fut (futuro), mdp (mais-que-perfeito), cpres (conjuntivo
+presente), cimp (conjuntivo imperfeito), cfut (conjuntivo futuro), cond
+(condicional), ivo (imperativo), pp (particípio passado) and grd
+(gerundivo).
+
+The conjugated forms must correspond to 1st person, second, third,
+first plural, second plural and third plural; except for
+the imperative tense (shortname : "ivo") which starts at 2nd; and past
+participle ("pp") and gerundivo ("grd") that have a single form
+only. The conjugated forms may be regexes that match a correct form
+(and only a correct form), when more than one form is ok (this is the
+case of the "verbos abundivos"). 
+
+The second person plural has been added in version 1.02, and is
+probably buggy.
+
+Shorthand notation may be used :
+
+ An "etc"  means that the rest of that tense is regular.
+ A   "."   means that the current person is regular.
+ A   "x"   means that this verb is defective, and that the current
+           person is missing.
+ A   "acc" means that circumflex and acute accents are toggled for the
+           current tense.
+
+I<Saying what verbs follows the model of a given verb>
+
+<model_name> = <verb_name> <verb_name> ...
+
+Mean that all the verbs after the "=" have the verb on the lhs as
+model. 
+
+I<Saying what verbs is defective>
+
+defectivos1= <verb_name> ...
+defectivos2= <verb_name> ...
+defectivos3= <verb_name> ...
+ 
+entries specifies defective verbs for which the function L<conjug>
+has a hard-wired behavior.
+
+
+=head2 C<%verb> is a hash in the format :
+
+  $verb->{$verb_name}->{$tense_name}->[$person] == "whole word".
+
+This is used for irregular verbs. All the
+$verb->{$verb_name}->{$tense_name}->[$person] and
+$verb->{$verb_name}->{$tense_name} need not be defined.
+
+  If a verb follows a model (i.e. is conjugated like a verb which is
+present in %verb's keys, and more completely defined), it has a
+"model" key :
+
+  $verb->{$verb_name}->{"model"} == "model name".
+
+  If a verb is "defectivo" (has missing forms), but otherwise regular,
+it will have an entry 
+
+  $verb->{"defectivo"}->{$verb_name} == number.
+
+  where the number (1,2, or 3) defines how it behaves.
+
+
+=head2 C<%reg> is a hash describing the ending of regular verbs :
+
+    $reg->{$verb_ending}->{$tense_name}->[$person] == "ending".
+
+The verb ending may be [aeio]r. 
+
+=head2 C<%endg> contains regexes that match
+verb endings, and is, right now, a little obsolete in the code.
+
+=head2 C<codify($string)> reads a string in the
+L<$vlist> format, and modifies the internal L<%verb> variable so that
+it reflect the information if C<$string>.
+
+=head2 C<&locate($verbname)> If $verbname is not a key of "%verb",
+finds the data relevant to that verb in the string L<$vlist> , and
+codes it so that L<%verb> reflects that data. 
+
+=head1 ALGORITHM of the C<conjug> sub :
+
+
+
+  Pick up options and arguments.
+
+
+  FOREACH verb $v,
+
+    Find the $root and ending ($edg).
+
+    Check if $v will require a special treatment, e.g. if it ends in
+      /g[ei]r$/, /c[ei]r$/, etc... and if it is the case, define a
+      "modifier" function (called &$modif), that will be called to
+      "final-polish" the output.
+
+    IF $v is IRREGULAR, e.g. if %verb{$v} is defined.
+  
+      IF $v follows a model, find that model, and "see what it looks
+        like" (e.g. does the model's root ($rm) end with consonnants,
+        etc). 
+      END
+
+
+      FOREACH tense $t and person $p ($b is in 1-4,6),
+      
+        IF this form (e.g. $verb->{$v}->{$t}->[$p-1]) is explicitely
+          defined,  
+
+          Great! That's it.
+
+        ELSE IF the model is explicitly defined, for this form,
+    
+          "See how the model relates to the form, and how the verb $v
+           relates to the model, and from that find what should be $v's
+           corresponding form" (quite heuristic).
+
+        ELSE 
+
+          Find the appropriate form for regular-irregular verbs (another
+          series of heuristics).
+
+        END
+      
+        Check for "defective" verbs.
+  
+      END
+
+    ELSE (verb is REGULAR)
+      
+        It's trivial. 
+
+    END
+  END  That's it!
+
+  The actual code is much, much hairier.
+
+
+
+=head2 WHAT MAKES ME BELIEVE IT WORKS?
+
+I checked in the book "Guia Prático dos Verbos Portugueses", by Deolinda
+Monteiro e Beatriz Pessoa. Well, to some extent ...
+
+The file C<reference> reference contains conjugation tables for
+plenty of verbs. Each time I modify C<Conjugate.pm>, I run the program
+C<ckconj> ("ckconj all") that checks that the output is still correct
+for all these verbs.
+
+This program outputs two lines, one starting with "OK", containing
+the verbs that checked ok, and a line "NOT IN REFERENCE FILE"
+containing the verbs that "Conjugate.pm" knows about, but that are not
+in the "reference" file.
+
+  Any other output reports found errors.
+
+
+Since C<reference> is produced by C<conjug>, it may be inadvertely
+contaminated. When I discover that, I hack C<Conjugate.pm> until it
+conjugates correctly the faulty verb (by checking myself), *and all
+the other ones too* (with "ckconj all")(like that, I check that my fix
+has not broken anything). And then I run the program F<assert> (syntax
+is "assert faulty_verb"), which modifies the reference table.
+
+=head1 SEE ALSO : treinar, conjug.
+
+=head1 VERSION 1.0
+
+=head1 AUTHOR Etienne Grossmann, 1998-2006 [etienne@isr.ist.utl.pt] 
+
+=head1 CREDITS
+
+Thanks to all people on usenet and here at ISR with whom I have
+discussed about this module, who have provided advice on conjugation,
+programming, on naming and on all relevant points.
+
+Thanks to Lupe Christoph <lupe@lupe-christoph.de> from
+cpan-testers@perl.org and to Miguel Marques
+<marques@physik.uni-wuerzburg.de> for finding and fixing some bugs.
+
+=cut
+
+

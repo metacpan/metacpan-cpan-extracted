@@ -1,0 +1,22 @@
+---
+abstract: 'Advanced adapter for logging to files'
+author:
+  - 'Mikhail Ivanov <m.ivanych@gmail.com>'
+  - 'Anastasia Zherebtsova <zherebtsova@gmail.com>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Any-Adapter-Fille
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  bugtracker: https://github.com/ivanych/Log-Any-Adapter-Fille/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ivanych/Log-Any-Adapter-Fille.git
+version: '0.05'

@@ -1,0 +1,28 @@
+Lingua-NO-Num2Word version 0.01
+===============================
+
+OO module for converting positiv whole numbers into its
+norwegian textual representation. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Under WIN32 
+
+   use nmake instead of make
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Kjetil Fikkan (kjetil@fikkan.org)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

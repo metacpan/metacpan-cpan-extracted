@@ -1,0 +1,24 @@
+---
+abstract: 'higher-order list utility functions'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: List-UtilsBy
+provides:
+  List::UtilsBy:
+    file: lib/List/UtilsBy.pm
+    version: '0.10'
+requires:
+  Exporter: '5.57'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.10'

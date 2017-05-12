@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+Reader.pm
+README
+t/01.t
+t/test.lw4
+examples/lw4ToODS
+META.yml                                 Module meta-data (added by MakeMaker)

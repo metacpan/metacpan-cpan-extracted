@@ -1,0 +1,155 @@
+#!/usr/local/bin/perl -w
+##
+## A command which will go through a journal and ensure that all entries
+## are at least made friends-only
+##
+##   $Id: friends-only,v 1.4 2005/09/19 16:33:39 simes Exp $
+##
+
+use strict;             # Silly not to be
+use POSIX;		# For strftime()
+use LJ::Simple;         # Kinda silly not to have this
+use Getopt::Std;	# Options parsing
+use Data::Dumper;	# For debugging
+
+## Command line options
+# User name [-u]
+my $user=undef;
+# Password [-p]
+my $pass=undef;
+# Dry run [-n] ?
+my $DryRun=0;
+
+
+sub usage() {
+  my $cmd=(split(/\//,$0))[$#_];
+  my $spc=" "x(length($cmd));
+  print STDERR <<EOF;
+$cmd [-hn] [-u user] [-p pass]
+  -h       This help
+  -n       Only show which entries would be changed
+  -u user  Specify the username
+  -p pass  Specify the password; if not given you will be
+           asked.
+
+Giving -u  will disable the use of the ~/.livejournal file
+
+EOF
+  exit 255;
+}
+
+
+# To keep -w happy
+$main::opt_h=undef;
+$main::opt_n=undef;
+$main::opt_u=undef;
+$main::opt_p=undef;
+
+getopts("hnu:p:") || usage();
+($main::opt_h) && usage();
+($main::opt_n) && ($DryRun = 1);
+(defined $main::opt_u) && ($user=$main::opt_u);
+(defined $main::opt_p) && ($pass=$main::opt_p);
+
+if (!$DryRun) {
+  $|=1;
+  print STDERR "\nAbout to change public posts to friends-only\n";
+  print STDERR "Are you sure you want to do this [y/n] ? ";
+  my $ans=<STDIN>;
+  chomp($ans);
+  $ans=lc($ans);
+  if ($ans!~/^y/) {
+    print STDERR "\nStopped at user request\n";
+    exit 255;
+  }
+  $|=0;
+}
+
+if (defined $user) {
+  print STDERR "LJ Username: $user\n";
+} else {
+  $|=1;
+  print STDERR "LJ Username: ";
+  $user=<STDIN>;
+  chomp($user);
+  $|=0;
+}
+if (defined $pass) {
+  print STDERR "LJ Password: <not displayed>\n";
+} else {
+  $|=1;
+  system("stty -echo");
+  ($?!=0) && die "$0: Non-zero exit code [$?] returned by stty -echo\n";
+  print STDERR "LJ Password: ";
+  $pass=<STDIN>;
+  system("stty echo");
+  print STDERR "\n";
+  ($?!=0) && die "$0: Non-zero exit code [$?] returned by stty echo\n";
+  chomp($pass);
+  $|=0;
+}
+
+print STDERR "Logging into LJ\n";
+my $lj = new LJ::Simple({ user=>$user,pass=>$pass });
+(defined $lj) ||
+  die "$0: Failed to log into LJ - $LJ::Simple::error\n";
+
+# Now we need to go through all journal entries - fun
+print STDERR "Getting list of journal entries\n";
+my ($num,@ItemId)=$lj->SyncItems(1);
+(defined $num) ||
+  die "$0: Failed to get item ids - $LJ::Simple::error\n";
+
+print STDERR "Starting to process list of entries\n";
+foreach (@ItemId) {
+  ($_->{type} eq "L") || next;
+  my %Entries=();
+  (defined $lj->GetEntries(\%Entries,undef,"one",$_->{item_id})) ||
+    die "$0: Failed to get entries - $LJ::Simple::error\n";
+  my $Entry;
+  foreach $Entry (values %Entries) {
+    my ($item_id,$anum,$html_id)=$lj->GetItemId($Entry);
+    (defined $item_id)
+      || die "$0: Failed to get item id - $LJ::Simple::error\n";
+    my ($protect,@prot_opt)=$lj->GetProtect($Entry);
+    (defined $protect)
+      || die "$0: Failed to get entry protection type - $LJ::Simple::error\n";
+    my $ToProt=0;
+    my $key="";
+    my $date=strftime("%Y-%m-%d %H:%M:%S",gmtime($lj->GetDate($Entry)));
+    if ($protect eq "public") {
+      $key="public";
+      $ToProt=1;
+    } elsif ($protect eq "friends") {
+      $key="friends only";
+    } elsif ($protect eq "groups") {
+      $key=join("",
+             "friends groups: ",
+             join(", ",@prot_opt),
+           );
+    } elsif ($protect eq "private") {
+      $key="private";
+    }
+    print "[$date] $item_id $anum = $key\n";
+    if ($ToProt) {
+      if (!$DryRun) {
+        my $ent=$lj->GetEntry($Entry);
+        if (!defined $ent) {
+          print "  FAILED: $LJ::Simple::error\n";
+          next;
+        }
+        if ($ent eq "") {
+          print "  FAILED: blank entry\n";
+          next;
+        }
+        print "  Making entry friends-only\n";
+        $lj->SetProtectFriends($Entry);
+        $lj->EditEntry($Entry)
+          || die "$0: Failed to edit entry - $LJ::Simple::error\n";
+      } else {
+        print "  Not making friends-only [dry run]\n";
+      }
+    }
+  }
+}
+

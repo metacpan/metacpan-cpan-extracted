@@ -1,0 +1,5 @@
+#!/bin/sh
+pmchanges > Changes
+pmmanifest > MANIFEST
+pmmakefile -r > Makefile.PL
+cvs commit -m ''

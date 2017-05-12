@@ -1,0 +1,31 @@
+---
+abstract: 'Utility functions'
+author:
+  - 'Orkun Karaduman <orkunkaraduman@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lazy-Utils
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON: '2.90'
+  Pod::Simple::Text: '3.26'
+  Term::ReadKey: '2.33'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/orkunkaraduman/Lazy-Utils/issues
+  homepage: https://metacpan.org/release/Lazy-Utils
+  license: https://www.gnu.org/licenses/gpl-3.0.html
+  repository: git://git@github.com:orkunkaraduman/Lazy-Utils.git
+version: '1.16'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

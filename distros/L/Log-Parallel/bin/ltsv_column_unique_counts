@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+
+
+use strict;
+use warnings;
+use Config::YAMLMacros::YAML;
+use File::Slurp::Remote::SmartOpen;
+
+my $metafile = shift;
+die unless -e $metafile;
+
+my $meta = LoadFile($metafile);
+
+my ($file) = sort { $b->{items} <=> $a->{items} } @{$meta->{FILES}};
+
+my @colnames;
+my @values;
+my $header;
+smartopen("$file->{host}:$file->{filename}.header", $header, "r");
+while (<$header>) {
+	chomp;
+	die unless /^(\d+)\t(\S+)$/;
+	$colnames[$1-1] = $2;
+	$values[$1-1] = {};
+}
+
+my %ncol;
+
+my $tsv;
+smartopen("$file->{host}:$file->{filename}", $tsv, "r");
+while (<$tsv>) {
+	chomp;
+	my (@data) = split(/\t/, $_, -1);
+	for my $i (0..$#data) {
+		$values[$i]{$data[$i]}++;
+	}
+	$ncol{scalar(@data)}++;
+}
+
+push(@colnames, 'number of columns');
+push(@values, \%ncol);
+
+for my $i (0..$#colnames) {
+	my $cn = $colnames[$i];
+	my $u = scalar(grep { $_ == 1 } values %{$values[$i]}),
+	my $r = scalar(grep { $_ > 1 } values %{$values[$i]});
+	printf "%50s %7d uniques, %7d repeaters %s\n", $cn, $u, $r, ($u == 0 && $r == 1 ? "***" : "");
+}
+
+__END__
+
+=head1 LICENSE
+
+This package may be used and redistributed under the terms of either
+the Artistic 2.0 or LGPL 2.1 license.
+

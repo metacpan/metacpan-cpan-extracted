@@ -1,0 +1,42 @@
+NAME
+    Lingua::Align::Corpus::Parallel - Class factory for reading parallel
+    corpora
+
+SYNOPSIS
+      use Lingua::Align::Corpus::Parallel;
+
+      my $corpus = new Lingua::Align::Corpus::Parallel(-srcfile => $srcfile,
+                                                       -trgfile => $trgfile);
+
+      my @src=();
+      my @trg=();
+      while ($corpus->next_alignment(\@src,\@trg)){
+         print "src> ";
+         print join(' ',@src);
+         print "\ntrg> ";
+         print join(' ',@trg);
+         print "============================\n";
+      }
+
+DESCRIPTION
+    A collection of modules for reading parallel sentence-aligned corpora.
+    Default format is plain text (see
+    Lingua::Align::Corpus::Parallel::Bitext)
+
+SEE ALSO
+    Lingua::Align::Corpus::Parallel::Bitext,
+    Lingua::Align::Corpus::Parallel::Giza,
+    Lingua::Align::Corpus::Parallel::Moses,
+    Lingua::Align::Corpus::Parallel::OPUS,
+    Lingua::Align::Corpus::Parallel::STA
+
+AUTHOR
+    Joerg Tiedemann, <jorg.tiedemann@lingfil.uu.se>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Joerg Tiedemann
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

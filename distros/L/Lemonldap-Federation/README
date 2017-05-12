@@ -1,0 +1,82 @@
+NAME
+    Lemonldap::Federation::Shibboleth - Perl extension for lemonldap websso
+    and Shibboleth IDP
+
+SYNOPSIS
+      use Lemonldap::Federation::ShibbolethRequestMap ;
+      my $requestmap = Lemonldap::Federation::ShibbolethRequestMap->new( xml_host => $extrait_de_xml ,
+                                      xml_application=> $extrait_de_xml2 ,
+                                      uri => $full_uri , ) ;
+      my $re= $requestmap->application_id;
+      my  $redirection = $requestmap->redirection ;
+
+DESCRIPTION
+    There are two pieces of code :
+
+    * Lemonldap::Federation::SplitURI
+    * Lemonldap::Federation::ShibbolethRequestMap
+
+    First (Lemonldap::Federation::SplitURI) is used in order to split uri in
+    scheme , host , port and path .
+
+     eg :   https://sp.example.org/secure/admin/index.html must be splited into 
+
+    * https
+    * 443
+    * sp.example.org
+    * secure
+    * admin
+    * index.html
+
+    The second compoment is the RequestMap . It job is to find and return
+    the applicationID for URI. For this it uses an XML configuration file
+    like this :
+
+       <Host  scheme="https" port="443"  name="sp.example.org" >
+                    <Path name="secure" 
+                          authType="shiboleth" 
+                          requireSession="true"
+                          exportAssertion="true">
+                     <Path name="admin" applicationId ="foo-admin" />
+                    </Path>
+
+      </Host>
+
+METHODS:
+  Constructor 
+  $requestmap = Lemonldap::Federation::ShibbolethRequestMap->new( xml_host => $extrait_de_xml ,
+                                  xml_application=> $extrait_de_xml2 ,
+                                  uri => $full_uri , ) ;
+      with:
+
+    * xml_host : XML piece of <RequestMapProvider>..</RequestMapProvider>
+    * xml_application : XML piece of <Applications> ..</Applications>
+
+  Application_id
+        return the application id for an URI .
+  
+  redirection
+        return entire line of redirection to IPD  :
+
+       eg :
+ 
+    https://idp.exemple.org/sso?target=http%3A%2F%2Fauthen.demo.net%2Fshibe&
+    shire=http%3A%2F%2Fsp.example.org%2Fshire&providerId=http%3A%2F%2Fsp.exa
+    mple.org
+
+       see GenericSHIB.pm in example directory
+
+SEE ALSO
+     https://spaces.internet2.edu/display/SHIB/WebHome
+     http://shibboleth.internet2.edu/
+  
+AUTHOR
+    eric German, <germanlinux@yahoo.fr>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by lemonasso
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+

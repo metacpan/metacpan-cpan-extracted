@@ -1,0 +1,510 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on February, 3  2002 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Using LinkController: Using LinkController</TITLE>
+
+<META NAME="description" CONTENT="Using LinkController: Using LinkController">
+<META NAME="keywords" CONTENT="Using LinkController: Using LinkController">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC12"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC11"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC13"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_4.html#SEC8"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_6.html#SEC21"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1> 4. Using LinkController to Check Links </H1>
+<!--docid::SEC12::-->
+<P>
+
+This chapter covers in reasonable detail how to use each of the programs
+in LinkController.  
+</P><P>
+
+<BLOCKQUOTE><TABLE BORDER=0 CELLSPACING=0> 
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC13">4.1 Extracting Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Getting link information from WWW pages.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC14">4.2 Testing Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">How to run the link testing program.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC15">4.3 Reporting Problems</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Getting information the state of your links.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC16">4.4 Email Reporting of Newly Broken Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Automatic reporting of newly broken links.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC17">4.5 Examining Individual Files</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Checking individual HTML files.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC18">4.6 Repairing Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Replacing old URLs with new ones.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC19">4.7 Making Suggestions</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Making suggestions for other users.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC20">4.8 CGI Interface</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">The LinkController web interface (primitive).</TD></TR>
+</TABLE></BLOCKQUOTE>
+<P>
+
+<A NAME="Extracting Links"></A>
+<HR SIZE="6">
+<A NAME="SEC13"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC14"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_6.html#SEC21"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 4.1 Extracting Links </H2>
+<!--docid::SEC13::-->
+<P>
+
+This section is written assuming that you are using a standard HTML
+infostructure in a directory or on the World Wide Web
+</P><P>
+
+The first part of using link controller is to extract the links.  When
+doing this, a pair of index files is built which list which URLs happen
+on which pages along with a file listing all of the URLs in the
+infostructure.  
+</P><P>
+
+<STRONG>FIXME:</STRONG> compare and contrast multi-user configuration with
+single user
+</P><P>
+
+<A NAME="IDX32"></A>
+The first stage of the process is done by <CODE>extract-links</CODE>
+<A NAME="DOCF2" HREF="link-controller_fot.html#FOOT2">(2)</A>.
+</P><P>
+
+There are two modes for extract links <CODE>directory</CODE> and <CODE>www</CODE>.
+The key difference between them is that the latter actually downloads
+from a server so it is less efficient but will work in more
+circumstances and is more likely to represent your site as seen by
+users.  This is assuming that all of your WWW pages are interconnected
+so it can find them.
+</P><P>
+
+<STRONG>FIXME</STRONG> : need to describe modes of operation of extract link
+</P><P>
+
+<A NAME="IDX33"></A>
+<A NAME="IDX34"></A>
+</P><P>
+
+<CODE>extract-links</CODE> creates three files.  The first two files
+(<TT>`*.cdb'</TT>) are the index files for your infostructure and are
+located wherever you have configured them to by default they are called
+<TT>`link_on_page.cdb'</TT>, <TT>`page_has_link.cdb'</TT>.  The third file is
+the database file <TT>`links.db'</TT>.  <CODE>extract-links</CODE> can also
+optionally create a text file which lists all of the URLs in the
+infostructure, one per line.
+</P><P>
+
+There are a number of other ways of using <CODE>extract-links</CODE> and
+it has many options. See section <A HREF="link-controller_14.html#SEC45">F.3 Invoking extract-links</A>, for more information
+about using extract links.
+</P><P>
+
+<A NAME="Testing"></A>
+<HR SIZE="6">
+<A NAME="SEC14"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC13"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC15"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_6.html#SEC21"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 4.2 Testing Links </H2>
+<!--docid::SEC14::-->
+<P>
+
+If you are using someone else's link information then you may be able to
+skip this part and go straight on to the next one on generating reports.
+If not then the next stage is to test your links using <CODE>test-link</CODE>.
+</P><P>
+
+Testing links takes a long time.  Reporting of broken links will not
+begin until after several days.  This is a deliberate feature of
+LinkController.  Most problems that will be found in a well maintained
+web page will be temporary configuration or system problems.  By
+wainting to report problems we give people responsible for the other end
+of the problem link a chance to repair their resources.  Once we have
+made this decision, we may as well check slowly and in a way which will
+reduce the amount of network bandwidth LinkController uses at a given
+time and so its impact on other people's Internet usage.
+</P><P>
+
+<A NAME="IDX35"></A>
+The key program which you want to use is <CODE>test-link</CODE>.  I run
+this from a shell script which directs its output to a log file
+</P><P>
+
+<STRONG>FIXME</STRONG> actually I now just use a cron job.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>#!/bin/sh
+#this is just a little sample script of how I run the program.
+
+LOGDIR=$HOME/log
+test-link &#62;&#62; \
+        $LOGDIR/runlog-`/bin/date +%Y-%m-%d`.log 2&#62;&#38;1 
+#assumes the use of a gnu style date command which can print 
+#out full dates.
+</pre></td></tr></table></P><P>
+
+And I run this shell script from my <TT>`crontab'</TT> with a command like
+this
+</P><P>
+
+<A NAME="IDX36"></A>
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>42 02 * * *     /..directories./run-daily-test.sh
+</pre></td></tr></table></P><P>
+
+The string <CODE>/..directories./</CODE> should be replaced with the directory
+where you have the script.  Remember to make the script executable.  
+</P><P>
+
+This will now run until completion each night.   However, you should
+make sure that it does actually finish.  If you have too many links to
+check in the given time, then you can end up with a backlog and the
+system will take a long time to stop.  To avoid this, either make
+testing less frequent or make checking run faster.  This will have to be
+done by editing the program itself at present.
+</P><P>
+
+The <CODE>test-link</CODE> program has a number of options.  These control
+the limits on checking and the speed of checking.  See section <A HREF="link-controller_14.html#SEC45">F.3 Invoking extract-links</A>, for more information on these.
+</P><P>
+
+<A NAME="Reporting"></A>
+<HR SIZE="6">
+<A NAME="SEC15"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC14"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC16"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_6.html#SEC21"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 4.3 Reporting Problems </H2>
+<!--docid::SEC15::-->
+<P>
+
+The easiest way to find out which links are broken is to use the command
+line interface.  The simplest report you can generate is just a list of
+all the known broken links.  Do this like so:
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>link-report
+</pre></td></tr></table></P><P>
+
+On the system I'm testing on right now, this gives:
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>broken:-       file://ftp.ncsa.uiuc.edu/Web/httpd/Unix/ncsa_httpd/cgi
+        http://www.ippt.gov.pl/docs-1.4/cgi/examples.html
+broken:-       file://ftp.ncsa.uiuc.edu/Web/httpd/Unix/ncsa_httpd/curr
+ent/httpd_1.4_irix5.2.Z
+        http://www.ippt.gov.pl/docs-1.4/setup/PreExec.html
+broken:-       file://ftp.ncsa.uiuc.edu/Web/httpd/Unix/ncsa_httpd/curr
+ent/httpd_1.4_linux.Z
+        http://www.ippt.gov.pl/docs-1.4/setup/PreExec.html
+broken:-       file://ftp.ncsa.uiuc.edu/Web/httpd/Unix/ncsa_httpd/curr
+ent/httpd_1.4_osf3.0.Z
+        http://www.ippt.gov.pl/docs-1.4/setup/PreExec.html
+broken:-       file://ftp.ncsa.uiuc.edu/Web/httpd/Unix/ncsa_httpd/curr
+ent/httpd_1.4_solaris2.4.Z
+        http://www.ippt.gov.pl/docs-1.4/setup/PreExec.html
+broken:-       file://ftp.ncsa.uiuc.edu/Web/httpd/Unix/ncsa_httpd/curr
+ent/httpd_1.4_solaris2.4.tar.Z
+        http://www.ippt.gov.pl/docs-1.4/setup/PreCompiled.html
+Sorry, couldn't find info for url file://ftp.ncsa.uiuc.edu/Web/httpd/U
+nix/ncsa_httpd/current/httpd_1.4_source.tar.Z
+please remember to check you have put it in full format
+broken:-       file://ftp.ncsa.uiuc.edu/Web/httpd/Unix/ncsa_httpd/docu
+ments/usage.ps
+        http://www.ippt.gov.pl/docs-1.4/postscript-docs/Overview.html
+..etc...
+</pre></td></tr></table></P><P>
+
+Which just tells you which links are broken.  We also know which page
+they are broken on and can go and look at that on the World Wide Web or
+directly as a file on the server.
+</P><P>
+
+There are many different options which control the output of
+<CODE>link-report</CODE>.  These include options which select which kinds
+of problems to report, options which select which pages to report from
+and options which allow other output formats such as HTML.
+See section <A HREF="link-controller_14.html#SEC43">F.1 Invoking link-report</A>, for more information about these.
+</P><P>
+
+For more advanced reporting and editing of documents with broken links
+you may want to use the Emacs interface (see section <A HREF="link-controller_7.html#SEC22">6. The Emacs Interface</A>).
+</P><P>
+
+<BLOCKQUOTE><TABLE BORDER=0 CELLSPACING=0> 
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC16">4.4 Email Reporting of Newly Broken Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Automatic notification of broken links.</TD></TR>
+</TABLE></BLOCKQUOTE>
+<P>
+
+<A NAME="Email Reporting"></A>
+<HR SIZE="6">
+<A NAME="SEC16"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC15"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC17"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_6.html#SEC21"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 4.4 Email Reporting of Newly Broken Links </H2>
+<!--docid::SEC16::-->
+<P>
+
+It's possible to arrange automatic reporting by email of links which
+have become newly broken.  This is done by getting <CODE>test-link</CODE>
+to make a list of links that become broken using the <SAMP>`$::link_stat_log'</SAMP>
+variable (see section <A HREF="link-controller_3.html#SEC6">2.3 LinkController Configuration Variables</A>) and calling <CODE>link-report</CODE> to
+report on those links.
+</P><P>
+
+Typically, you may don't want to have a report every time that
+<CODE>test-link</CODE> runs, but probably once a day instead.  In this
+case, run a script like the following from your crontab.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>#!/bin/sh
+STAT_LOG=$HOME/link-data/stat-log
+WORK=$STAT_LOG.work
+EMAIL=me@example.com
+mv $STAT_LOG  $WORK
+if [ -s $WORK ]
+then
+   link-report --broken --url-file=$STAT_LOG | 
+      mail -s "link-report for `date`" $EMAIL
+fi
+</pre></td></tr></table></P><P>
+
+Every time that this script is run, it will rename the status change
+log file and then mail a report with all of the new broken links
+to the specified email address.  
+</P><P>
+
+<A NAME="Checking Files"></A>
+<HR SIZE="6">
+<A NAME="SEC17"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC16"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC18"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_6.html#SEC21"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 4.5 Examining Individual Files </H2>
+<!--docid::SEC17::-->
+<P>
+
+When you have just written an HTML page, you often want to check it
+before you put it up for use.  You can do this immediately using the
+<CODE>check-page</CODE> program.  Simply run something like
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>check-page filename.html
+</pre></td></tr></table></P><P>
+
+And it will list all of the links that it is unsure about along with the
+line number the problem occurred on.  This program works particularly
+well when you editing with Emacs (see section <A HREF="link-controller_7.html#SEC24">The Emacs Interface</A>).
+</P><P>
+
+<A NAME="Repairing Links"></A>
+<HR SIZE="6">
+<A NAME="SEC18"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC17"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC19"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_6.html#SEC21"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 4.6 Repairing Links </H2>
+<!--docid::SEC18::-->
+<P>
+
+<A NAME="IDX37"></A>
+The program responsible for repairing links is <CODE>fix-link</CODE>.  It
+simply accepts two URLs and changes all of the occurrences of the first
+link in your documents into the second link.  It assumes that you have
+permission to edit all of the problem files and that there is a
+replacement link.  For example
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>fix-link http://www.ed.ac.uk/~mikedlr/climbing/ \
+        http://www.tardis.ed.ac.uk/~mikedlr/climbing/
+</pre></td></tr></table></P><P>
+
+Typed at the shell prompt would have updated the location of my Climbing
+pages when they moved some while ago and 
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>fix-link http://www.tardis.ed.ac.uk/~mikedlr/climbing/ \
+        http://scotclmb.org.uk/
+fix-link http://www.tardis.ed.ac.uk/climb/ \
+        http://scotclmb.org.uk/
+</pre></td></tr></table></P><P>
+
+Will change them to the very latest location.  More information about
+<CODE>fix-link</CODE> can be found in See section <A HREF="link-controller_14.html#SEC46">F.4 Invoking fix-link</A>.
+</P><P>
+
+At present, there's no facility for automatically updating the databases
+when you do this.  Instead, you have to run <CODE>extract-links</CODE>
+after some time so that new links are noticed.  In practice this doesn't
+matter because you shouldn't be creating new pages with broken links and
+can check that you don't with <CODE>check-page</CODE>.  A later version of
+LinkController will may change this.
+</P><P>
+
+The other way to fix links is to edit the files by hand.  This is the
+only solution where a link has disappeared forever and so text changes
+have to be made to the web site.  This can be made more convenient by
+using the <SAMP>`link-report-dired'</SAMP> emacs module included in the
+distribution.  This is covered elsewhere in this manual (see section <A HREF="link-controller_7.html#SEC22">6. The Emacs Interface</A>). 
+</P><P>
+
+<A NAME="Suggestions"></A>
+<HR SIZE="6">
+<A NAME="SEC19"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC18"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC20"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_6.html#SEC21"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 4.7 Making Suggestions </H2>
+<!--docid::SEC19::-->
+<P>
+
+A link in the database can have suggestions associated with it.  These
+are normally alternative URLs which somebody or something has decided
+would make a good replacement for the URL of the Link.  Humans can add
+to the database with the <CODE>suggest</CODE> program.  For example use:
+</P><P>
+
+<A NAME="IDX38"></A>
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>suggest file://ftp.ncsa.uiuc.edu/Web/httpd/Unix/ncsa_httpd/current/htt
+pd_1.4_linux.Z \
+        http://delete.me.org/
+Link suggestion accepted.  Thank you
+</pre></td></tr></table></P><P>
+
+If you try the same thing again you get
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>suggest file://ftp.ncsa.uiuc.edu/Web/httpd/Unix/ncsa_httpd/current/htt
+pd_1.4_linux.Z \
+        http://delete.me.org/ 
+Already knew about that suggestion.  Thanks though.
+</pre></td></tr></table></P><P>
+
+These suggestions will make it easier for others to repair links,
+especially if they are using the CGI interface.
+</P><P>
+
+<A NAME="CGI Interface"></A>
+<HR SIZE="6">
+<A NAME="SEC20"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC19"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_6.html#SEC21"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_6.html#SEC21"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 4.8 CGI Interface </H2>
+<!--docid::SEC20::-->
+<P>
+
+The CGI interface is not fully developed and has a number of issues
+related to security to be considered.  I have however used it and shown
+that it can work, so if you want to you could try the same.  The two
+programs <CODE>fix-link.cgi</CODE> and <CODE>link-report.cgi</CODE> replace the
+normal ones <CODE>fix-link</CODE> and <CODE>link-report</CODE>.  They should be
+interfaced through an HTML page which feeds the needed information to
+<CODE>link-report.cgi</CODE>.
+</P><P>
+
+<A NAME="IDX39"></A>
+The main security question is how to do authentication of the user.
+This will have to be set up using the features of the web server.   You
+should not leave these programs available for non-authenticated users
+since that would give them the ability to edit your web pages directly
+and probably do worse.  
+</P><P>
+
+<A NAME="Interfaces"></A>
+<HR SIZE="6">
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_6.html#SEC21"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Michael De La Rue</I> on <I>February, 3  2002</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

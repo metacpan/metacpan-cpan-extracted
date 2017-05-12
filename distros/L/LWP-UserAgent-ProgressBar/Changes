@@ -1,0 +1,27 @@
+Revision history for Perl extension LWP-UserAgent-ProgressBar
+
+1.100810  2010-03-22 22:40:40 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.05  Thu 2010.03.04 00:15:24 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - require Test::More 0.88 for done_testing() in t/00_versions.t
+    - refactor test code (thanks tokuhirom)
+
+0.04  Wed 2010.02.10 11:52:23 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - add post_with_progress method for POST request. (Ktat <ktat at cpan.org>)
+    - updated skeleton
+
+0.03  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.02  Thu, 29 May 2008 12:05:49 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.02
+    - fixed POD typo
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - .shipit: fixed svk.tagpattern
+
+0.01  Sat, 24 Nov 2007 20:53:01 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

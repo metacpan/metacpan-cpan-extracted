@@ -1,0 +1,7 @@
+Revision history for Perl extension Lyrics::Fetcher::LyricsTranslate.
+
+0.002 2016-10-15T18:11+01:00
+ - Allow searching for translations to languages other than English
+
+0.001 2016-09-01T00:35+01:00
+ - Initial release

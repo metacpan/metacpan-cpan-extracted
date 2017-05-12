@@ -1,0 +1,81 @@
+LIM - Gluing your DNS/DNSSEC stuff together since 2012
+
+ABOUT
+
+Lim is actually just a framework to generalize RPC calls from RESTful JSON/XML,
+XML-RPC, JSON-RPC and SOAP to plugins. It was developed for managing OpenDNSSEC
+and SoftHSM which is used for DNSSEC.
+
+For more information about OpenDNSSEC and the OpenDNSSEC Lim plugin please see:
+    OpenDNSSEC - https://www.opendnssec.org
+    Lim plugin - https://github.com/jelu/lim-plugin-opendnssec
+
+For more information about SoftHSM and the SoftHSM Lim plugin please see:
+    SoftHSM - https://www.opendnssec.org/softhsm
+    Lim plugin - https://github.com/jelu/lim-plugin-softhsm
+
+For more information about generic DNS Lim plugin please see:
+    https://github.com/jelu/lim-plugin-dns
+
+ARCHITECTURE
+
+    There are three parts (so far) in Lim; Server, Client and CLI. You can
+    install them separately to be able to manage software remotely by CLI or
+    by writing your own software with the Client libraries or calling the
+    different RPC protocols.
+    
+    The Server software that is run on the machines that you want to manage is
+    called an Agent daemon (lim-agentd). It will load all available plugins on
+    the system and serve them through the RPC protocols.
+    
+    +-------------------+                         +-------------------+
+    |                   |                         |                   |
+    |        CLI        |                         |      Client       |
+    |                   |                         |                   |
+    +---------+---------+                         +---------+---------+
+              |                                             |
+              |    +----------------------------------------+
+              |    |                     |                  |
+              +-------------------+--------------------+    |
+              |    |              |      |             |    |
+    +---------+----+----+  +------+------+-----+  +----+----+---------+
+    |                   |  |                   |  |                   |
+    |    lim-agentd     |  |    lim-agentd     |  |    lim-agentd     |
+    |                   |  |                   |  |                   |
+    +-------------------+  +-------------------+  +-------------------+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for the modules with the
+perldoc command.
+
+    perldoc Lim
+    perldoc Lim::*
+
+You can also look for information at:
+
+    Issue tracker (report bugs here)
+        https://github.com/jelu/lim/issues
+
+    GIT repository
+        https://github.com/jelu/lim
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012-2013 Jerry Lundström
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

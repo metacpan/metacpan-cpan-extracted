@@ -1,0 +1,9 @@
+Revision history for Perl extension Lingua::RU::Translit.
+
+0.02  Mon Oct 21 20:26:14 2002
+        - renamed tarball/subdirs to match CPAN conventions
+          (yes, I should've done it before uploading 0.01 :(( )
+
+0.01  Sun Oct 13 16:01:44 2002
+        - original version; created by h2xs 1.19
+

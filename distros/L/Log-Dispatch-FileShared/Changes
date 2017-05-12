@@ -1,0 +1,11 @@
+==============================================================
+Revision history for Perl extension Log::Dispatch::FileShared.
+==============================================================
+
+1.01
+Initial version
+
+1.02
+Bumped version up in order to repackage module with the version
+number as part of the directory name as required for creating a
+FreeBSD port.

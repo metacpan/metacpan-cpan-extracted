@@ -1,0 +1,11 @@
+Revision history for Log-Rolling
+
+1.00    Sun Jul 26 20:40:10 EDT 2009
+        First version.
+
+1.01    Sun Jul 26 23:12:12 EDT 2009
+        Fixed re-defaulting on some values if out of bounds.
+
+1.02    Mon Jul 27 05:06:46 EDT 2009
+        Added bounds checking for several hash values to new().
+        Added 'pid' to hash values for new() in documentation.

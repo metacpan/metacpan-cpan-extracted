@@ -1,0 +1,8 @@
+Revision history for Perl extension Log::Dispatch::DBI.
+
+0.02  Fri Apr 12 03:20:40 JST 2002
+	* remove pseudo-hash. Now it requires Log::Dispatch 2.0
+
+0.01  Wed Nov 28 06:49:14 2001
+	- original version; created by h2xs 1.19
+

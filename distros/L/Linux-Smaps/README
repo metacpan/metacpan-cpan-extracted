@@ -1,0 +1,358 @@
+NAME
+    Linux::Smaps - a Perl interface to /proc/PID/smaps
+
+SYNOPSIS
+      use Linux::Smaps;
+      my $map=Linux::Smaps->new($pid);
+      my @vmas=$map->vmas;
+      my $private_dirty=$map->private_dirty;
+      ...
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DESCRIPTION
+    The /proc/PID/smaps files in modern linuxes provides very detailed
+    information about a processes memory consumption. It particularly
+    includes a way to estimate the effect of copy-on-write. This module
+    implements a Perl interface.
+
+    The content of the smaps file is a set of blocks like this:
+
+     0060a000-0060b000 r--p 0000a000 fd:01 531212       /bin/cat
+     Size:                  4 kB
+     Rss:                   4 kB
+     Pss:                   4 kB
+     Shared_Clean:          0 kB
+     Shared_Dirty:          0 kB
+     Private_Clean:         0 kB
+     Private_Dirty:         4 kB
+     Referenced:            4 kB
+     Swap:                  0 kB
+     KernelPageSize:        4 kB
+     MMUPageSize:           4 kB
+
+    Each one describes a virtual memory area of a certain process. All those
+    areas together describe its complete address space. For the meaning of
+    the items refer to your Linux documentation.
+
+    The set of information announced by the kernel depends on its version.
+    Early versions (around Linux 2.6.14) lacked for example "Pss",
+    "Referenced", "Swap", "KernelPageSize" and "MMUPageSize". "Linux::Smaps"
+    provides an interface to all of the components. It creates accessor
+    methods dynamically depending on what the kernel reveals. The
+    "Shared_Clean" entry for example mutates to the
+    "Linux::Smaps::VMA->shared_clean" accessor. Method names are built by
+    simply lowercasing them. The actual set of methods is created when the
+    first smaps file is parsed. Subsequent "update" or "Linux::Smaps->new"
+    operations expect exactly the same file format. That means you cannot
+    parse smaps files from different kernel versions by the same perl
+    interpreter.
+
+  Constructor, Object Initialization, etc.
+   Linux::Smaps->new
+   Linux::Smaps->new($pid)
+   Linux::Smaps->new(pid=>$pid, procdir=>'/proc')
+   Linux::Smaps->new(filename=>'/proc/self/smaps')
+    creates and initializes a "Linux::Smaps" object. On error an exception
+    is thrown. "new()" may fail if the smaps file is not readable or if the
+    file format is wrong.
+
+    "new()" without parameter is equivalent to "new('self')" or
+    "new(pid=>'self')". With the "procdir" parameter the mount point of the
+    proc filesystem can be set if it differs from the standard "/proc".
+
+    The "filename" parameter sets the name of the smaps file directly. This
+    way also files outside the standard "/proc" tree can be analyzed.
+
+   Linux::Smaps->new(uninitialized=>1)
+    returns an uninitialized object. This makes "new()" simply skip the
+    "update()" call after setting all parameters. Additional parameters like
+    "pid", "procdir" or "filename" can be passed.
+
+   $self->pid($pid) or $self->pid=$pid
+   $self->procdir($dir) or $self->procdir=$dir
+   $self->filename($name) or $self->filename=$name
+    get/set parameters.
+
+    If a filename is set "update()" reads that file. Otherwize a file name
+    is constructed from "$self->procdir", "$self->pid" and the name "smaps".
+    The constructed file name is not saved in the "Linux::Smaps" object to
+    allow loops like this:
+
+     foreach (@pids) {
+         $smaps->pid=$_;
+         $smaps->update;
+         process $smaps;
+     }
+
+   $self->update
+    reinitializes the object; rereads the underlying file. Returns the
+    object or "undef" on error. The actual reason can be obtained via
+    "lasterror()".
+
+   $self->clear_refs
+    writes to the corresponding /proc/PID/clear_refs file. Thus, the amount
+    of memory reported as "Referenced" by the process is reset to 0 for all
+    VMAs.
+
+    Returns the object or "undef" on failure.
+
+    Example:
+
+     # how much memory is referenced while updating the Linux::Smaps object?
+     perl -MLinux::Smaps -le '
+       my $s=Linux::Smaps->new;
+       print $s->referenced;
+       print $s->clear_refs->update->referenced
+     '
+     2556
+     840
+
+     # how much memory is used while the shell is inactive?
+     perl -MLinux::Smaps -le '
+       my $s=Linux::Smaps->new(shift);
+       print $s->referenced;
+       print $s->clear_refs->update->referenced
+     ' $$
+     1468
+     0
+
+   $self->lasterror
+    "update()" and "new()" return "undef" on failure. "lasterror()" returns
+    a more verbose reason. Also $! can be checked.
+
+  Information Retrieval
+   $self->vmas
+    returns a list of "Linux::Smaps::VMA" objects each describing a vm area,
+    see below.
+
+   $self->size
+   $self->rss
+   $self->shared_clean
+   $self->shared_dirty
+   $self->private_clean
+   $self->private_dirty
+    these methods compute the sums of the corresponding values of all vmas.
+
+    "size", "rss", "shared_clean", "shared_dirty", "private_clean" and
+    "private_dirty" methods are unknown until the first call to
+    "Linux::Smaps::update()". They are created on the fly. This is to make
+    the module extendable as new features are added to the smaps file by the
+    kernel. As long as the corresponding smaps file lines match
+    "^(\w+):\s*(\d+) kB$" new accessor methods are created.
+
+    At the time of this writing at least one new field ("referenced") is on
+    the way but all my kernels still lack it.
+
+   $self->stack
+   $self->heap
+   $self->vdso
+   $self->vsyscall
+    these are shortcuts to the corresponding "Linux::Smaps::VMA" objects.
+
+   $self->all
+   $self->named
+   $self->unnamed
+    In array context these functions return a list of "Linux::Smaps::VMA"
+    objects representing named or unnamed VMAs or simply all VMAs. Thus, in
+    array context "all()" is equivalent to "vmas()".
+
+    In scalar context these functions create a fake "Linux::Smaps::VMA"
+    object containing the summaries of the "size", "rss", "shared_clean",
+    "shared_dirty", "private_clean" and "private_dirty" fields.
+
+   $self->names
+    returns a list of vma names, i.e. the files that are mapped.
+
+   ($new, $diff, $old)=$self->diff( $other )
+    $other is assumed to be also a "Linux::Smaps" instance. 3 arrays are
+    returned. The first one ($new) is a list of vmas that are contained in
+    $self but not in $other. The second one ($diff) contains a list of pairs
+    (2-element arrays) of vmas that differ between $self and $other. The 3rd
+    one ($old) is a list of vmas that are contained in $other but not in
+    $self.
+
+    Vmas are identified as corresponding if their "vma_start" fields match.
+    They are considered different if they differ in one of the following
+    fields: "vma_end", "r", "w", "x", "mayshare", "file_off", "dev_major",
+    "dev_minor", "inode", "file_name", "shared_clean", "shared_diry",
+    "private_clean" and "private_dirty".
+
+  "Linux::Smaps::VMA" objects
+    normally these objects represent a single vm area:
+
+   $self->vma_start
+   $self->vma_end
+    start and end address
+
+   $self->r
+   $self->w
+   $self->x
+   $self->mayshare
+    these correspond to the VM_READ, VM_WRITE, VM_EXEC and VM_MAYSHARE
+    flags. see Linux kernel for more information.
+
+   $self->file_off
+   $self->dev_major
+   $self->dev_minor
+   $self->inode
+   $self->file_name
+    describe the file area that is mapped.
+
+   $self->size
+    the same as vma_end - vma_start but in kB.
+
+   $self->rss
+    what part is resident.
+
+   $self->shared_clean
+   $self->shared_dirty
+   $self->private_clean
+   $self->private_dirty
+    "shared" means "page_count(page)>=2" (see Linux kernel), i.e. the page
+    is shared between several processes. "private" pages belong only to one
+    process.
+
+    "dirty" pages are written to in RAM but not to the corresponding file.
+
+  Notes
+    "size", "rss", "shared_clean", "shared_dirty", "private_clean" and
+    "private_dirty" methods are unknown until the first call to
+    "Linux::Smaps::update". They are created on the fly. This is to make the
+    module extendable as new features are added to the smaps file by the
+    kernel. As long as the corresponding smaps file lines match
+    "^(\w+):\s*(\d+) kB$" new accessor methods are created.
+
+    See also "EXPORT" below.
+
+Example: The copy-on-write effect
+     use strict;
+     use Linux::Smaps;
+
+     my $x="a"x(1024*1024);         # a long string of "a"
+     if( fork ) {
+       my $s=Linux::Smaps->new($$);
+       my $before=$s->all;
+       $x=~tr/a/b/;                 # change "a" to "b" in place
+       #$x="b"x(1024*1024);         # assignment
+       $s->update;
+       my $after=$s->all;
+       foreach my $n (qw{rss size shared_clean shared_dirty
+                         private_clean private_dirty}) {
+         print "$n: ",$before->$n," => ",$after->$n,": ",
+                $after->$n-$before->$n,"\n";
+       }
+       wait;
+     } else {
+       sleep 1;
+     }
+
+    This script may give the following output:
+
+     rss: 4160 => 4252: 92
+     size: 6916 => 7048: 132
+     shared_clean: 1580 => 1596: 16
+     shared_dirty: 2412 => 1312: -1100
+     private_clean: 0 => 0: 0
+     private_dirty: 168 => 1344: 1176
+
+    $x is changed in place. Hence, the overall process size (size and rss)
+    would not grow much. But before the "tr" operation $x was shared by
+    copy-on-write between the 2 processes. Hence, we see a loss of
+    "shared_dirty" (only a little more than our 1024 kB string) and almost
+    the same growth of "private_dirty".
+
+    Exchanging the "tr"-operation to an assingment of a MB of "b" yields the
+    following figures:
+
+     rss: 4160 => 5276: 1116
+     size: 6916 => 8076: 1160
+     shared_clean: 1580 => 1592: 12
+     shared_dirty: 2432 => 1304: -1128
+     private_clean: 0 => 0: 0
+     private_dirty: 148 => 2380: 2232
+
+    Now we see the overall process size grows a little more than a MB.
+    "shared_dirty" drops almost a MB and "private_dirty" adds almost 2 MB.
+    That means perl first constructs a 1 MB string of "b". This adds 1 MB to
+    "size", "rss" and "private_dirty" and then copies it to $x. This takes
+    another MB from "shared_dirty" and adds it to "private_dirty".
+
+A special note on copy on write measurements
+    The proc filesystem reports a page as shared if it belongs multiple
+    processes and as private if it belongs to only one process. But there is
+    an exception. If a page is currently paged out (that means it is not in
+    core) all its attributes including the reference count are paged out as
+    well. So the reference count cannot be read without paging in the page.
+    In this case a page is neither reported as private nor as shared. It is
+    only included in the process size.
+
+    Thus, to exaclty measure which pages are shared among N processes at
+    least one of them must be completely in core. This way all pages that
+    can possibly be shared are in core and their reference counts are
+    accessible.
+
+    The mlockall(2) syscall may help in this situation. It locks all pages
+    of a process to main memory:
+
+     require 'syscall.ph';
+     require 'sys/mmap.ph';
+
+     0==syscall &SYS_mlockall, &MCL_CURRENT | &MCL_FUTURE or
+         die "ERROR: mlockall failed: $!\n";
+
+    This snippet in one of the processes locks it to the main memory. If all
+    processes are created from the same parent it is executed best just
+    before the parent starts to fork off children. The memory lock is not
+    inherited by the children. So all private pages of the children are
+    swappable.
+
+EXPORT
+    The module's "import()" method is implemented as follows:
+
+     my $once;
+     sub import {
+       my $class=shift;
+       unless( $once ) {
+         $once=1;
+         eval {$class->new(@_)};
+       }
+     }
+
+    Thus, the first
+
+     use Linux::Smaps;
+
+    initializes all methods according to your current kernel.
+
+    To avoid that use
+
+     use Linux::Smaps ();
+
+    If your "proc" filesystem is mounted elsewhere or if you want to
+    initialize the methods according to a certain file you can achieve this
+    by
+
+     use Linux::Smaps (procdir=>'/procfs');
+
+    or
+
+     use Linux::Smaps (filename=>'/path');
+
+SEE ALSO
+    Linux Kernel.
+
+AUTHOR
+    Torsten Foertsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005-2011 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+

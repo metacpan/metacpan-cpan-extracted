@@ -1,0 +1,8 @@
+Locale::Geocode is an object-oriented interface to the complete ISO
+3166-1 specification (including alpha-2, alpha-3, and numeric sets)
+and selected elements of the 3166-2 specification.
+
+Locale::Geocode includes select extensions to the specification for
+postal conventions.  These extensions are not included by default,
+but can be enabled and disabled by the user during execution.
+

@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8259f011441a2cbc9d3a1302145f60fb06c07d79 ChangeLog
+SHA1 13fb33dd81f4a7ff05f8c14ce1db6f1e9dcd7b16 MANIFEST
+SHA1 5840419216b5855d0f8efcd99a248c33873dd91d META.yml
+SHA1 dd91c66e702af9843f27f1326253a0748cadc330 Makefile.PL
+SHA1 94f23e2a052f81dc296976349c319c09495d8d41 README
+SHA1 4d96d7db9438dfc0bd5c23ef28678af460b46d45 lib/Locale/Maketext/Lexicon/Slurp.pm
+SHA1 f30f2bef491cbb0769b3057a6a3e99fc8a1bb8c9 t/basic.t
+SHA1 c1f32a0edf42dc36a08bc8a16a222ce9d73a0524 t/files/de/cat
+SHA1 e924dff14203af7529212d0e632e7b8ee74da4fc t/files/de/dog
+SHA1 56ac1c08fa5479fd57c4a5c65861c4ed3ed93ff8 t/files/de/hello
+SHA1 8f6abfbac8c81b55f9005f7ec09e32d29e40eb40 t/files/en/cat
+SHA1 ee8ca7a80229e38588e5a1062a2320c6c372a097 t/files/en/dog
+SHA1 f572d396fae9206628714fb2ce00f72e94f2258f t/files/en/hello
+SHA1 a4441a2cf2a685dc71c22ddd109682a8bcdffcf2 t/files/others/fi/bar
+SHA1 51c0fe24d59fff5ad4f658b2ca065bea2a3f28cc t/files/others/fi/foo
+SHA1 9cde71f2ea0a05c65d47d228403b7ed93ed4d8f4 t/files/others/fr/bar
+SHA1 6185c3b0dba68dcbda0abb5064f7dfa210ca11fc t/files/others/fr/foo
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod_coverage.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFGcUaAVCwRwOvSdBgRAkNuAJ9qkOkj7Qyg+2t6Wmnqohbb5aHT1ACdG5/e
+hB2S0nGlYgZ5PPHFBEKpADg=
+=3bM2
+-----END PGP SIGNATURE-----

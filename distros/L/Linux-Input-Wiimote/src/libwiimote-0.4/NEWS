@@ -1,0 +1,57 @@
+NEWS
+====
+
+0.4
+
+  * Added support for the classic controller.
+
+0.3.1
+
+  * Switch to autoconf build (Noritada Kobayashi).
+
+  * Fixed byte alignment issues, so the library now works on ARM
+    systems (tested with GP2X and E680i).
+
+0.3
+
+  * Support for reading Mii data. See wiimote_mii.h for details (Chad 
+    Phillips).
+
+  * Support for multiple local devices. This feature automatically
+    binds a wiimote to the local device with the least number of
+    active connections (given priority to piconet masters when
+    there is a tie). In theory, up to 112 (7 * HCI_MAX_DEV) wiimotes
+    may be connected to a single host, but in practice the maximum
+    number of wiimotes will be a lot less.
+
+    By default wiimotes are automatically assigned to a device, but the
+    assignment may be overriden by setting the wiimote->link.device to
+    the desired device number (hci0 is device number 1).
+
+    This feature is enabled by default, but may be turned off by compiling
+    with _DISABLE_AUTO_SELECT_DEVICE which will enable the old behavior.
+
+  * The wiimote_update() method no longer blocks until an event has
+    been received from the wiimote. To enable the old behavior compile
+    with _ENABLE_BLOCKING_UPDATE,
+
+  * Added new method wiimote_pending() to check if there is any pending
+    data from the wiimote.
+
+0.2
+
+  * Support for automatic discovery of wiimotes (Krishna Gadepalli,
+    L. Donnie Smith).
+
+  * Renamed the library to libcwiimote because of name conflict with another
+    library (CWiid).
+
+  * Changed tilt entry in wiimote to use floats instead of unsigned shorts
+    (can be disabled by compiling without _ENABLE_TILT).
+
+  * Added a new entry, force, in wiimote which holds the force on each axis
+    in g (can be disabled by compiling without _ENABLE_FORCE). 
+
+0.1
+
+  * Initial release.

@@ -1,0 +1,29 @@
+---
+abstract: 'the power of libcurl in the palm of your hands!'
+author:
+  - 'Stanislaw Pusep <stas@sysd.org>'
+build_requires:
+  LWP::Simple: '0'
+  Test::HTTP::Server: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-Protocol-Net-Curl
+requires:
+  HTTP::Date: '0'
+  LWP::Protocol: '0'
+  LWP::UserAgent: '0'
+  Net::Curl: '0.25'
+  URI: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/creaktive/LWP-Protocol-Net-Curl/issues
+  homepage: https://github.com/creaktive/LWP-Protocol-Net-Curl
+  repository: git://github.com/creaktive/LWP-Protocol-Net-Curl.git
+version: '0.023'
+x_contributors:
+  - 'Peter Williams <pjwilliams@gmail.com>'

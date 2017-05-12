@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Stemmer.pm
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/MakeMaker.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+test.pl

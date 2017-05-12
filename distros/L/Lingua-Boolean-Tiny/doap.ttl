@@ -1,0 +1,164 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006002"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Lingua-Boolean-Tiny>;
+	doap:created         "2013-03-04"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Lingua-Boolean-Tiny>;
+	doap:homepage        <https://metacpan.org/release/Lingua-Boolean-Tiny>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Lingua-Boolean-Tiny";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-007>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-lingua-boolean-tiny>;
+	];
+	doap:shortdesc       "a smaller Lingua::Boolean, with support for more languages".
+
+<http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Lingua-Boolean-Tiny-0.001"^^xsd:string;
+	dc:issued            "2013-03-05"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lingua-Boolean-Tiny-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Lingua-Boolean-Tiny-0.002"^^xsd:string;
+	dc:issued            "2013-03-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Lingua::Boolean::Tiny::More adds support for 150 more languages.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/daxim>;
+		], [
+			rdfs:label "Improved translations.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/daxim>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lingua-Boolean-Tiny-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Lingua-Boolean-Tiny-0.003"^^xsd:string;
+	dc:issued            "2013-03-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Lingua::Boolean::Tiny::Union now autoloads More.pm if necessary.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lingua-Boolean-Tiny-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Lingua-Boolean-Tiny-0.004"^^xsd:string;
+	dc:issued            "2013-03-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Force Perl 5.10.0 down the legacy code path (manual 'smart match' implementation) as $scalar~~@array behaviour was changed in 5.10.1.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lingua-Boolean-Tiny-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Lingua-Boolean-Tiny-0.005"^^xsd:string;
+	dc:issued            "2013-05-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "yesno method";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/djerius>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lingua-Boolean-Tiny-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Lingua-Boolean-Tiny-0.006"^^xsd:string;
+	dc:issued            "2013-05-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Bikeshedding - isn't yesno a lovely colour now?";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lingua-Boolean-Tiny-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Lingua-Boolean-Tiny/v_0-007>
+	a                    doap:Version;
+	rdfs:label           "Bond... James Bond";
+	dc:identifier        "Lingua-Boolean-Tiny-0.007"^^xsd:string;
+	dc:issued            "2014-07-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Prefer match::simple (if available) over smartmatch.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix smartmatch-related warning on Perl >= 5.18.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/97328>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/djerius>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lingua-Boolean-Tiny-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/daxim>
+	a                    foaf:Person;
+	foaf:name            "Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯";
+	foaf:nick            "DAXIM";
+	foaf:page            <https://metacpan.org/author/DAXIM>.
+
+<http://purl.org/NET/cpan-uri/person/djerius>
+	a                    foaf:Person;
+	foaf:name            "Diab Jerius";
+	foaf:nick            "DJERIUS";
+	foaf:page            <https://metacpan.org/author/DJERIUS>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/97328>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "97328"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=97328>.
+

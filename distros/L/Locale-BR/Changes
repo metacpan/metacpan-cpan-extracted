@@ -1,0 +1,10 @@
+Revision history for Locale-BR
+
+0.02    2011-03-25
+        - Major bugfix regarding all_state_names() and all_state_codes().
+        - encoding pod as utf8
+        - More tests added.
+
+0.01    2009-12-29
+        First version, released on an unsuspecting world.
+

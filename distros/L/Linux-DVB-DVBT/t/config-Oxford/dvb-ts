@@ -1,0 +1,77 @@
+[12290]
+tsid = 12290
+code_rate_high = 23
+guard_interval = 32
+transmission = 2
+net = Oxon & Bucks.
+netid = 12296
+frequency = 713833000
+modulation = 64
+bandwidth = 8
+code_rate_low = 12
+hierarchy = 0
+
+[8199]
+tsid = 8199
+code_rate_high = 23
+guard_interval = 32
+transmission = 2
+net = Oxon & Bucks.
+netid = 12296
+frequency = 850000000
+modulation = 64
+bandwidth = 8
+code_rate_low = 12
+hierarchy = 0
+
+[20480]
+tsid = 20480
+code_rate_high = 34
+guard_interval = 32
+transmission = 2
+net = Oxon & Bucks.
+netid = 12296
+frequency = 690000000
+modulation = 16
+bandwidth = 8
+code_rate_low = 34
+hierarchy = 0
+
+[16384]
+tsid = 16384
+code_rate_high = 34
+guard_interval = 32
+transmission = 2
+net = Oxon & Bucks.
+netid = 12296
+frequency = 721833000
+modulation = 16
+bandwidth = 8
+code_rate_low = 34
+hierarchy = 0
+
+[4107]
+tsid = 4107
+transmission = 2
+guard_interval = 32
+code_rate_high = 34
+net = Oxon & Bucks.
+netid = 12296
+frequency = 578000000
+modulation = 16
+bandwidth = 8
+code_rate_low = 34
+hierarchy = 0
+
+[24576]
+tsid = 24576
+code_rate_high = 34
+guard_interval = 32
+transmission = 2
+netid = 12296
+frequency = 538000000
+modulation = 16
+bandwidth = 8
+code_rate_low = 34
+hierarchy = 0
+

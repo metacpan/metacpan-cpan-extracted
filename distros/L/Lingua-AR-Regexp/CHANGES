@@ -1,0 +1,39 @@
+==================================================
+Changes from 2015-10-02 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2016-10-01 03:07:22 +0000
+------------------------------------------
+
+  Change: 5d9228c2a5a3f4774160aa55e8e3472b0c0649fb
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-10-01 05:05:33 +0000
+
+    Added AutoPrereqs 
+
+------------------------------------------
+version 0.001 at 2016-09-29 22:22:10 +0000
+------------------------------------------
+
+  Change: 1f8ae86f65e9f6552a43b0fa9a8414dd7822ba5d
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-30 00:22:10 +0000
+
+    Added IsTashkeel and separate Hamza properties 
+
+  Change: 19fe31d5c5980936668b3670a54c89ed9df263ab
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-29 22:56:11 +0000
+
+    Added non-combining Hamza forms 
+
+  Change: f393c01bc06dab0c134979c2fcef168a7701061e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-09-29 22:24:19 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

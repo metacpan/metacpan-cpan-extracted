@@ -1,0 +1,37 @@
+#include "config.h"
+
+Package {
+	name		= "GLUT",
+	auto		= True,
+#ifdef INSTALLING
+	import_dirs	= [ "$libdir/imports" ],
+#else
+	import_dirs	= [ "$libdir/libraries/GLUT" ],
+#endif
+	source_dirs	= [],
+#ifdef INSTALLING
+	library_dirs	= [ "$libdir" ],
+#else
+	library_dirs	= [ "$libdir/libraries/GLUT"
+	                  , "$libdir/libraries/GLUT/cbits" ],
+#endif
+	hs_libraries	= [ "HSGLUT" ],
+#ifdef USE_QUARTZ_OPENGL
+	extra_libraries	= [ "HSGLUT_cbits", "objc" ],
+#else
+	extra_libraries	= [ "HSGLUT_cbits"],
+#endif
+#ifdef INSTALLING
+	include_dirs	= [],
+#else
+	include_dirs	= [ "$libdir/libraries/GLUT/include" ],
+#endif
+	c_includes	= [ "HsGLUT.h" ],
+	package_deps	= [ "base", "OpenGL" ],
+	extra_ghc_opts	= [],
+	extra_cc_opts	= [ "" GL_CFLAGS ],
+#ifdef USE_QUARTZ_OPENGL
+	extra_frameworks = [ "GLUT" ],
+#endif
+	extra_ld_opts	= [ "" GLUT_LIBS ]
+}

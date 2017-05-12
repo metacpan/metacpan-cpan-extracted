@@ -1,0 +1,32 @@
+Lingua-tlhInganHol-yIghun!
+
+    Allow Terran scum to program in the Warrior's Tongue!
+
+INSTALLATION
+
+To install this module, make sure you have Module::Build installed and
+then run the following commands:
+
+     perl Build.PL
+     ./Build
+     ./Build test
+     ./Build install
+
+
+DEPENDENCIES
+
+    Courage
+    Valour
+    Strength
+    Honour
+    Test::More
+    Test::Harness       3.00 or stronger
+    Filter::Simple
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001-2009, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

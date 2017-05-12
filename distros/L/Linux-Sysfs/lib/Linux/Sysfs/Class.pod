@@ -1,0 +1,85 @@
+=pod
+
+=head1 NAME
+
+Linux::Sysfs::Class - sysfs classes
+
+=head1 SYNOPSIS
+
+    my $class = Linux::Sysfs::Class->open('net');
+    my @devices = $class->get_devices;
+    $class->close;
+
+=head1 DESCRIPTION
+
+Libsysfs provides functions to open sysfs classes.
+
+=head1 METHODS
+
+=over
+
+=item B<open>
+
+    my $class = Linux::Sysfs::Class->open($name);
+
+Opens up one the class represented by C<$name> in sysfs in the /sys/class
+directory.  On success, it returns a Linux::Sysfs::Class instance, otherwise
+undef.
+
+=item B<close>
+
+    $class->close;
+
+Closes up the Linux::Sysfs::Class instance including its class devices.
+
+=item B<get_device>
+
+    my $classdev = $class->get_device($name);
+
+Looks for a device with C<$name> in this class. Returns a
+Linux::Sysfs::ClassDevice on success or undef on failure.
+
+=item B<get_devices>
+
+    my @classdevs = $class->get_devices;
+
+Returns a list of Linux::Sysfs::ClassDevice instances for the given class.
+
+=item B<name>
+
+    my $name = $class->name;
+
+Returns the class' name.
+
+=item B<path>
+
+    my $path = $class->path;
+
+Returns the full path to the class in sysfs.
+
+=back
+
+=head1 AUTHOR
+
+Florian Ragwitz E<lt>rafl@debian.orgE<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Florian Ragwitz, all rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Library General Public License as published
+by the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307
+USA.
+
+=cut

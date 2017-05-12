@@ -1,0 +1,320 @@
+# just to make PodWeaver happy at the moment
+package Language::Expr::Manual::Syntax;
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: Description of the Language::Expr language
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Language::Expr::Manual::Syntax - Description of the Language::Expr language
+
+=head1 VERSION
+
+This document describes version 0.29 of Language::Expr::Manual::Syntax (from Perl distribution Language-Expr), released on 2016-07-03.
+
+=head1 OVERVIEW
+
+Language::Expr language is very simple. It has just enough features to
+support mathematical/logical/string operations, arrays, hashes,
+variables, and function calls.
+
+Language::Expr is (intentionally) not Turing-complete (lacks
+assignment and loops).
+
+Language::Expr is a lot like Perl. Differences from Perl, if any, are given
+after each section.
+
+It should be trivial to implement an interpreter or code generator
+from the parser. In fact, Language::Expr is meant to be easily
+convertible to Perl, PHP, and Javascript (among others like Python and
+Ruby).
+
+=head1 LITERALS
+
+=head2 Undefined value
+
+ undef
+
+=head2 Boolean
+
+ true
+ false
+
+Differences from Perl: Perl doesn't support native booleans, but there are
+modules like L<boolean> which practically make Perl behaves like it does.
+
+=head2 Number
+
+ 1
+ -2.3
+ inf
+ nan
+ 0x1f    # hexadecimal, = 31 in decimal
+ 0o17    # octal, = 15 in decimal
+ 0b100   # binary, = 4 in decimal
+
+Differences from Perl: octal literals in Expr are written using the less
+error-prone 0o123 syntax, which is also adopted by Python.
+
+=head2 String
+
+Single-quoted strings, e.g. 'single quoted'. Supported escape
+sequences:
+
+ \'    literal single quote
+ \\    literal backslash
+
+Double-quoted strings, e.g. "double quoted". Supported escape
+sequences:
+
+ \'    literal single quote
+ \"    literal double quote
+ \\    literal backslash
+ \$    prevent variable interpolation
+ \t    tab
+ \n    newline
+ \r    linefeed
+ \f    formfeed
+ \b    backspace
+ \a    bell
+ \e    escape
+
+ \0 or \03 or \033    octal char
+ \x7 or \x7B          hex char
+ \x{263a}             wide hex char
+
+Double-quoted strings will also interpolate variables, e.g.:
+
+ "I have $num apples"
+ "This is Foo::Bar version ${perl:/Foo/Bar/VERSION}"
+
+Differences from Perl: Perl supports a few other escape sequences, but they are
+not commonly found in other scripting languages (e.g.: named Unicode character
+or the \l, \L, et al), so they are not included.
+
+=head2 Array
+
+ []
+ [1, 2, "str"]
+
+Differences from Perl: dangling comma at the end is not allowed in Expr.
+
+=head2 Hash
+
+ {}
+ {a => 1, "b c" => 2+3}
+
+Differences from Perl: in Expr you must always use "=>" to separate key and
+value, not comma. Dangling comma at the end is not allowed.
+
+=head1 OPERATORS
+
+Many operators are taken from Perl, along with their precedence levels
+and associativity, but here are the differences:
+
+=over 4
+
+=item * No assigment operators.
+
+Because assignment is deliberately not supported.
+
+=item * No smart-match "~~" operator or the other more esoteric or Perl-specific operators.
+
+These include Perl's "..", "...", "->", etc.
+
+=item * Currently no "and", "or", "not" operators.
+
+Use &&, ||, ! instead. Perl supports an extra, low-precedence set of logical
+operators mostly to separate statements, which we do not have anyway.
+
+=item * "xor" becomes "^^" (to be consistent with "^" as bitwise-xor).
+
+=item * Hash value is accessed using [] instead of {}, and barewords (e.g. $hash[key] instead of $hash["key"]) are not allowed.
+
+Which, BTW, is also the way it is done in Python, Ruby, and PHP.
+
+=item * Comparison operators can be chained (except <=> and cmp).
+
+Example:
+
+ 1 < 2 < 3       # true
+ 2 == (1+1) != 2 # false
+
+=back
+
+Below is list of supported operators, ordered from lowest precedence,
+along with their associativity.
+
+ left     =>
+ left     || // ^^
+ right    ?:
+ left     &&
+ left     | ^
+ left     &
+ left     == != <=> cmp eq ne < > <= >= ge gt le lt
+ nonassoc <=> cmp
+ left     << >>
+ left     + - .
+ left     * / % x
+ right    ! ~ unary+ unary-
+ right    **
+ left     subscript (hash[s], array[i])
+ left     term (variable, str/num literals, (paren), func())
+
+=head2 Pair
+
+ left     =>
+
+=head2 Logical or, defined-or, logical xor
+
+ left     || // ^^
+
+=head2 Ternary operator
+
+ right    ?:
+
+=head2 Logical and
+
+ left     &&
+
+=head2 Bitwise or, bitwise xor
+
+ left     | ^
+
+=head2 Bitwise and
+
+ left     &
+
+=head2 Comparison operators
+
+ left     == != <=> cmp eq ne < > <= >= ge gt le lt
+
+=head2 Tri-valued comparison
+
+ nonassoc <=> cmp
+
+=head2 Bitwise shift left & right
+
+ left     << >>
+
+=head2 Numeric addition, subtraction, string concatenation
+
+ left     + - .
+
+=head2 Numeric multiplication, division, modulus, string repetition
+
+ left     * / % x
+
+=head2 Logical not, bitwise not, unary plus, unary minus (numeric negation)
+
+ right    ! ~ unary+ unary-
+
+=head2 Numeric power
+
+ right    **
+
+=head2 Hash and array subscript
+
+ left     subscript (hash[s], array[i])
+
+=head2 Term
+
+ left     term (variable, str/num literals, (paren), func())
+
+=head1 VARIABLES
+
+There are two syntax for variables:
+
+ $alphanum123 (including $_)
+ $package::separated::var
+
+and:
+
+ ${anything goes except closing curly brace}
+
+Differences from Perl: In Expr there is just $scalar, no @array or %hash or
+others. There are no special variables with funny names ($., $$, etc), but if
+they are enclosed with curly braces they are allowed (e.g. ${.},
+${name/contains/slashes}). In fact, the curly braces syntax allows the
+compiler/interpreter a greater freedom of defining the namespace scheme aside
+from the Perl-like double-colon syntax, e.g.:
+
+ # Unix-path-like
+ ${../foo}
+ ${/foo/bar/baz}
+
+ # volume:path (or URL-like)
+ ${schema:/foo/bar/baz}
+ ${data:../../baz}
+
+=head1 FUNCTIONS
+
+Examples:
+
+ rand()
+ length("foo")
+
+Differences from Perl: parentheses are required in Expr.
+
+The language define just a few functions:
+
+=head2 map({ EXPR }, ARRAY) -> RESULT_ARRAY
+
+This is similar to Perl's map() (but notice the required parentheses), it will
+form a new array composed from the result of EXPR. EXPR will be evaluated for
+each element of ARRAY (stored in B<$_>). The original value of $_ will be
+restored after EXPR completes.
+
+=head2 grep({ EXPR }, ARRAY) -> RESULT_ARRAY
+
+This is similar to Perl's grep() (but notice the required parentheses), it will
+form a new array composed from the elements of ARRAY when EXPR evaluates to true
+(like in Perl, empty string '', the number 0, boolean C<false>, C<undef> are
+considered false). EXPR will be evaluated for each element of ARRAY (stored in
+B<$_>). The original value of $_ will be restored after EXPR completes.
+
+=head2 usort({ EXPR }, ARRAY) -> RESULT_ARRAY
+
+This is similar to Perl's sort() (but notice the required parentheses), it will
+return the ARRAY sorted using comparison in EXPR. EXPR will be evaluated for
+each element of ARRAY (B<$a> and B<$b> will be set with two values to be
+compared). The original value of B<$a> and B<$b> will be restored after EXPR
+completes.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Language-Expr>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-Language-Expr>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Language-Expr>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

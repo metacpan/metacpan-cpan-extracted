@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+README
+t/Lazy-Lockfile.t
+lib/Lazy/Lockfile.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

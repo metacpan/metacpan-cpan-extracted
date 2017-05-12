@@ -1,0 +1,13 @@
+--- 
+abstract: Adds separate logging channels to Log::Dispatch
+author: 
+  - Jesse Luehrs <doy at tozt dot net>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.003
+license: perl
+name: Log-Dispatch-Channels
+requires: 
+  Carp: 0
+  Log::Dispatch: 0
+  Test::Exception: 0
+  Test::More: 0
+version: 0.01

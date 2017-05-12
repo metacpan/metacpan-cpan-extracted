@@ -1,0 +1,31 @@
+---
+name: LWPx-TimedHTTP
+version: 1.8
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+abstract: time the different stages of an HTTP request
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  HTTP::Daemon: 0
+  Test::More: 0
+requires:
+  LWP::UserAgent: 6
+  Time::HiRes: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  LWPx::TimedHTTP:
+    file: lib/LWPx/TimedHTTP.pm
+    version: 1.8
+  LWPx::TimedHTTP::Socket:
+    file: lib/LWPx/TimedHTTP.pm
+  LWPx::TimedHTTP::https:
+    file: lib/LWPx/TimedHTTP.pm
+  LWPx::TimedHTTP::https::Socket:
+    file: lib/LWPx/TimedHTTP.pm
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

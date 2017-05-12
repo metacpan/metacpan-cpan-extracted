@@ -1,0 +1,52 @@
+---
+abstract: 'Yet another framework for localization'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Localizer
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Localizer:
+    file: lib/Localizer.pm
+    version: '0.05'
+  Localizer::BuiltinFunctions:
+    file: lib/Localizer/BuiltinFunctions.pm
+  Localizer::Resource:
+    file: lib/Localizer/Resource.pm
+  Localizer::Style::Gettext:
+    file: lib/Localizer/Style/Gettext.pm
+  Localizer::Style::Maketext:
+    file: lib/Localizer/Style/Maketext.pm
+requires:
+  Class::Accessor::Lite: '0.05'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Localizer/issues
+  homepage: https://github.com/tokuhirom/Localizer
+  repository: git://github.com/tokuhirom/Localizer.git
+version: '0.05'
+x_authority: CPAN:TOKUHIROM
+x_contributors:
+  - 'moznion <moznion@gmail.com>'

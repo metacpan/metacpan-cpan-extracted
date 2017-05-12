@@ -1,0 +1,39 @@
+Revision history for Perl extension Lutherie::FretCalc.
+
+0.01  Sun Mar 11 10:37:20 2001
+	- original version; created by h2xs 1.20 with options
+		-AXn Lutherie::FretCalc
+
+0.14  Sun March 11 2001
+        - Created example scripts, fretcalc.pl and fretcalc.cgi
+
+0.15  Tue March 13 2001
+        - Removed test line from fretcalc.cgi
+        - Fixed bug in fret()
+        - Fix typos in README
+        - Remove common code from while loop
+0.16  Fri June 29 2001
+        - Added additional calculation methods
+        - Added non 12-tone calculation
+        - Modified example scripts 
+
+0.20  Mon July 23 2001
+        - Module rewrite to OO style. Not backwards compatible.
+
+0.30  Wed Sept 05 2001
+        - Added dulc_calc() method 
+        - Added dulc_calc.pl and dulc_calc.cgi scripts
+        - Added calc_type to fretcalc.cgi and dulc_calc.cgi
+
+0.31  Sat June 15 2002
+        - Fixed error in Synopsis 
+        - Added a basic Tk script (fretcalctk.pl) in examples directory
+
+0.32  Sat June 16 2002
+        - Added num_frets to constructor
+        - Added precision() method
+        - Added dulcimer mode to fretcalctk.pl (v 0.02)
+
+0.33  Mon June 18 2002
+        - Added in units, out units, calc method and
+          settings dislay to fretcalctk.pl (v 0.03)

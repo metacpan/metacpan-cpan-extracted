@@ -1,0 +1,15 @@
+Revision history for Perl extension Linux-GetPidstat
+
+0.03 2016-07-14T03:08:05Z
+
+    - Changed flag options (https://github.com/yoheimuta/Linux-GetPidstat/pull/3)
+
+0.02 2016-06-16T13:57:00Z
+
+    - Excluded child threads (https://github.com/yoheimuta/Linux-GetPidstat/pull/1)
+    - Limited a number of pidstat processes (https://github.com/yoheimuta/Linux-GetPidstat/pull/2)
+
+0.01 2016-06-12T13:30:33Z
+
+    - original version
+

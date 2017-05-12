@@ -1,0 +1,206 @@
+Revision history for Perl extension LaBrea::Tarpit::Report
+
+1.16  Sat Nov  1 17:56:40 PST 2008
+	update prerequisites
+
+1.15  Sat Nov 13 16:31:56 PST 2004
+	update documentation
+
+1.14  Sun Nov  7 11:34:42 PST 2004
+	updated html list of trojans on paged_report.plx page
+
+1.13  Thu Sep  2 12:14:52 PDT 2004
+	update whois.plx to show PTR lookup for IP's
+
+1.12  Sat Mar 27 15:58:39 PST 2004
+	update paged_report.plx to clear tarpit hash so the garbage
+	collector can recover the memory. No changes to Report.pm
+
+1.11  Tue Oct 21 12:18:00 PDT 2003
+	aarrggggg....  typo in version 1.10 bug fix
+
+1.10  Tue Oct 21 11:56:25 PDT 2003
+	fixed bug in Report.pm that caused html_report.plx pop up whois to
+	fail. Reported by Mike Brown brownm1970@despammed.com
+
+1.09  Tue Sep 30 09:11:50 PDT 2003
+	added robots meta tag to paged_report
+	add javascript function to Report.pm to close popped window on page unload
+	to prevent multiple sites from trying to use the same named window
+
+1.08  Mon Sep 29 16:24:01 PDT 2003
+	workaround for MSIE windown pop-up problem
+	for compatitbility with SpamCannibal. There are just some 
+	things that MSIE doesnt' do very well. sigh...
+
+1.07  Tue Sep  9 13:51:56 PDT 2003
+	additional enhancements for SpamCannibal Support
+
+1.06  Tue Aug 12 10:23:24 PDT 2003
+	changes to get_versions to support alternate daemon names
+	cosmetic changes to Report::capture_summary
+	cosmetic changes to paged_report.plx
+
+1.05  Wed Aug  6 14:23:44 PDT 2003
+	Report.pm updated to eliminate use of Geek Tools
+	add page 'whois.plx'
+
+1.04 Tue Oct  8 08:21:21 PDT 2002
+	removed "image" checking from Report::port_stats.
+	this resolves a bug between file system paths
+	and web-server paths that is dependent on server configuration.
+	Thanks to Andrew Findlay <andrew.findlay@skills-1st.co.uk>
+	for spotting the problem.
+
+1.03 Fri Aug  2 14:56:20 PDT 2002
+	added "please wait" capability to "other sites"
+	in examples/paged_report.plx
+
+1.02  Wed Jul 31 17:07:11 PDT 2002
+	added "please wait" message to paged_report.plx
+	REMINDER, copy examples/pwait01.gif to your images directory
+
+1.01  Tue May 21 20:51:10 PDT 2002
+	update paged_report.plx and html_report.plx, removed some extra
+	stuff, the pervious version from 1.00 will work fine.
+
+	edit for move of 'their_date' from Util.pm to Tarpit.pm
+	add a color to 'Trends' report and extend range to > 100,000
+	move javascript precache standard list into Report.pm module
+	add bonehead checking for images and image directory
+
+1.00  Wed May 15 16:54:43 PDT 2002
+	add 'make_image_cache' to generate 
+	javascript to force browser to precache the
+	images for 'port_stats'
+
+	update paged_report.plx and html_report.plx to use image cache
+
+0.22  Mon May 15 17:46:11 PDT 2002
+	add 'make_buttons'
+	export 'time2local' 
+	export 'other_sites'
+	update ./examples/html_report.plx to use 'make_buttons'
+	increased FIFO timeout to 30 seconds
+
+0.21  Wed May  8 10:58:57 PDT 2002
+	Differentiate 'my_IPs' error colors into 'INDIGO' and 'VIOLET'
+	for type 5 and 6 ERRORS -- undocumented
+
+	move $time calculation in 'other_sites' into non error
+	'if' statement to avoid spurious calls to 'Util::their_time'
+	that complains in the http error log
+
+	preset %phantoms values to 1 or 0 when TCP/persistent in 
+	'my_IPs' to accommodate 'protocol' enhancements in Tarpit.pm
+
+0.20  Tue May  7 14:27:41 PDT 2002
+	initialize some un-inited variables that some 
+	platforms complain about.
+
+0.19  Wed May  1 12:07:42 PDT 2002
+	correct 'short_report' to recognize '+ timezones'
+
+0.18  Sun Apr 28 00:55:48 PDT 2002
+	correct Report::generate to add items for 
+	short report generation on a long report update
+
+0.17  Wed Apr 24 15:53:51 PDT 2002
+	added 'other_sites'
+
+	moved utility routines to LaBrea::Tarpit::Util
+
+		cache_is_valid
+		update_cache
+		share_open
+		ex_open
+		close_file
+		http_date
+		their_date
+
+0.16  Wed Apr 24 10:01:03 PDT 2002
+	refine 'die' messages in 'generate' and 'gen_short'
+	to return only exact text without debug info
+
+0.15  Tue Apr 23 18:04:05 PDT 2002
+	add short_file capability and caching to html_report.plx
+
+	modify 'update_cache' to conditionally update
+	either/or cache or short_cache
+
+	add 'short_report'
+	add 'gen_short'
+
+	add 'their_date', returns date string
+	of another time zone
+
+0.14  Fri Apr 12 16:21:13 PDT 2002
+	add 'http_date', returns date string per the
+	http 'DATE' spec. Nice for cgi when 
+	Apache::Utility is not available.
+
+	add 'shared_open', 'ex_open', 'close_file', 
+	'cache_is_valid, 'update_cache' locking file 
+	access utilities and their test routines
+
+	add html file caching to 'examples/html_report.plx'
+
+	correct font name VERANDA -> VERDANA
+	nice catch by Thomas Liston <tliston@premmag.com>
+
+0.13  Wed Apr 10 14:43:37 PDT 2002
+	add 'syslog2_txt' to Report.pm
+	add syslog analyze capability
+	to Report/examples/html_report.plx
+
+0.12  Tue Apr  9 12:16:12 PDT 2002
+	add 'get_versions' to Report.pm
+	add button bars and version reporting    
+	to LaBrea/Report/examples/html_report.plx
+
+0.11  Mon Apr  8 22:35:19 PDT 2002
+	add "threshold" to port activity comments
+
+0.10  Mon Apr  8 18:43:20 PDT 2002
+	fixed typo in substitution of magdot/cleardot
+	removed extraneous STDERR debugging statements
+
+0.09  Mon Apr  8 16:03:59 PDT 2002
+	fix sort by 'max' error in port activity reporting.
+	add 'threshold' parameter to %look_n_feel.
+	add version reporting to html_report.plx.
+
+0.08  Mon Apr  8 13:59:35 PDT 2002
+	correct type on $look_n_feel{images}
+	include missing 'cleardot.gif' in Manifest
+
+0.07  Sat Apr  6 11:34:48 PST 2002
+	add support for activity graphs
+	break out individual subroutines and document
+	their use to make Report.pm more generic
+
+	add localTrojans.pm and 1x1 color gifs
+	to examples directory, update html_report.plx
+
+0.06  Fri Mar  8 10:52:34 PST 2002
+	correct type on parsing of exclude lines of
+	the form 1.2.3.4 - 1.2.3.7 that failed
+	to produce the ip range requested
+
+0.05  Fri Mar  8 08:11:23 PST 2002
+	Documentation updates
+	"generate" returns $@ error contents
+	on timeout or failure to trap missing daemon
+	when attempting fifo read.
+
+0.04  Wed Mar  6 19:44:53 PST 2002
+	upgrade Report.pm to use both LaBreaConfig
+	and the OLDSTYLE configuration file pair
+
+0.03  Thu Dec 13 16:04:28 PST 2001
+	correct table format error in Report.pm
+
+0.02  Thu Dec 13 15:15:33 PST 2001
+	add 'require Apache::Util' in examples/html_report.plx
+
+0.01  Tue Nov 27 21:05:31 PST 2001

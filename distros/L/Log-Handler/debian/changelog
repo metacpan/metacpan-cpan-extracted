@@ -1,0 +1,18 @@
+liblog-handler-perl (0.84-1) unstable; urgency=low
+
+    * Fixed some version conflicts.
+
+ -- Jonny Schulz <js@bloonix.de>  Fri, 24 Oct 2014 07:00:00 +0200
+
+liblog-handler-perl (0.83-1) unstable; urgency=low
+
+    * Added method set_default_param.
+
+ -- Jonny Schulz <js@bloonix.de>  Thu, 23 Oct 2014 22:00:00 +0200
+
+liblog-handler-perl (0.82-1) unstable; urgency=low
+
+  * Initial self-created debian release.
+
+ -- Jonny Schulz <js@bloonix.de>  Mon, 25 Aug 2014 15:00:00 +0200
+

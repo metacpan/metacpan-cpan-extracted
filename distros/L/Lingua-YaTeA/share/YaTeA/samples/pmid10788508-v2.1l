@@ -1,0 +1,12 @@
+Combined action of two transcription factors regulates genes encoding spore coat proteins of Bacillus subtilis .
+During sporulation of Bacillus subtilis , spore coat proteins encoded by cot genes are expressed in the mother cell and deposited on the forespore .
+Transcription of the cotB , cotC , and cotX genes by final sigma ( K ) RNA polymerase is activated by a small , DNA-binding protein called GerE .
+The promoter region of each of these genes has two GerE binding sites .
+5' deletions that eliminated the more upstream GerE site decreased expression of lacZ fused to cotB and cotX by approximately 80 % and 60 % , respectively but had no effect on cotC-lacZ expression .
+The cotC-lacZ fusion was expressed later during sporulation than the other two fusions .
+Primer extension analysis confirmed that cotB mRNA increases first during sporulation , followed by cotX and cotC mRNAs over a 2-h period .
+In vitro transcription experiments suggest that the differential pattern of cot gene expression results from the combined action of GerE and another transcription factor , SpoIIID .
+A low concentration of GerE activated cotB transcription by final sigma ( K ) RNA polymerase , whereas a higher concentration was needed to activate transcription of cotX or cotC .
+SpoIIID at low concentration repressed cotC transcription , whereas a higher concentration only partially repressed cotX transcription and had little effect on cotB transcription .
+DNase I footprinting showed that SpoIIID binds strongly to two sites in the cotC promoter region , binds weakly to one site in the cotX promoter , and does not bind specifically to cotB .
+We propose that late in sporulation the rising level of GerE and the falling level of SpoIIID , together with the position and affinity of binding sites for these transcription factors in cot gene promoters , dictates the timing and level of spore coat protein synthesis , ensuring optimal assembly of the protein shell on the forespore surface .

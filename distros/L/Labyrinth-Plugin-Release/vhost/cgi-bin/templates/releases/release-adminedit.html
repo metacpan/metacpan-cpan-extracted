@@ -1,0 +1,365 @@
+[% 
+    IF release.articleid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Release' ;
+    htmltitle = title ;
+
+    crumb3_name = 'Admin' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=home-admin' ;
+    crumb2_name = 'Releases' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=release-admin' ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+<script type="text/javascript">
+
+var optf = [
+[% c = 0 ; FOREACH format = allformats %]
+  [% IF c == 1 %],[% END %]
+  {index: "[% format.relformid %]", value: "[% format.format %]" }
+[% c = 1 ; END %]
+];
+
+var optt = [
+[% c = 0 ; FOREACH track = alltracks %]
+  [% IF c == 1 %],[% END %]
+  {index: "[% track.articleid %]", value: "[% track.title %]" }
+[% c = 1 ; END %]
+];
+
+var optm = [
+[% c = 0 ; FOREACH track = allmp3s %]
+  [% IF c == 1 %],[% END %]
+  {index: "[% track.mp3id %]", value: "[% track.title %]" }
+[% c = 1 ; END %]
+];
+
+var optp = [
+[% c = 0 ; FOREACH item = allprofiles %]
+  [% IF c == 1 %],[% END %]
+  {index: "[% item.articleid %]", value: "[% item.title %]" }
+[% c = 1 ; END %]
+];
+
+</script>
+
+
+<div class="boxer">
+  <p><a href="[% cgipath %]/pages.cgi?act=release-admin">release admin</a></p>
+  [% IF thanks %]<p>Release saved successfully.</p>[% END %]
+  <p>Fields marked * are mandatory fields and must be completed.</p>
+
+  <p>Please note that when initially selecting images from the Photo Gallery, the loaded image wlll be the
+  current raw size. Once the page is saved the image will be resized to the appropriate dimensions. In the
+  width and height boxes, you may leave these blank or set to 0 to use the default settings; raw image size 
+  to a max of 400x400 pixels.</p>
+
+  [% IF errmess %]
+  <p class="alert">There are invalid or missing fields, as noted by the "&empty;" symbol.</p>
+  [% END %]
+</div>
+
+<form method="post" action="[% cgipath %]/pages.cgi" name="EDIT" enctype="multipart/form-data">
+<input type="hidden" name="act"       value="release-save" />
+<input type="hidden" name="recordid"  value='' />
+<input type="hidden" name="orderid"   value='' />
+<input type="hidden" name="upward"    value='' />
+<input type="hidden" name="item"      value='' />
+<input type="hidden" name="section"   value="[% section %]" />
+<input type="hidden" name="releaseid" value="[% release.releaseid %]" />
+<input type="hidden" name="articleid" value="[% article.data.articleid %]" />
+<input type="hidden" name="folderid"  value="[% article.data.folderid %]" />
+<input type="hidden" name="userid"    value="[% article.data.userid %]" />
+<input type="hidden" name="imageid"   value="[% article.data.imageid %]" />
+
+<div class="boxer">
+<h3>Release Data</h3>
+<table class="blocker">
+<tr><th width="100px">Title *</th>
+		<td width="10px" class="alert">[% release.title_err %]</td>
+		<td><input type="text" name="title" value="[% release.title %]" size="50" /></td>
+</tr>
+<tr><th>Quickname *</th>
+		<td class="alert">[% release.quickname_err %]</td>
+		<td><input type="text" name="quickname" value="[% release.quickname %]" size="20" /></td>
+</tr>
+<tr><th>Release Date</th>
+		<td class="alert">[% release.reldate_err %]</td>
+		<td><input type="text" name="reldate" value="[% release.reldate %]" size="20" /> DD/MM/YYYY</td>
+</tr>
+
+<tr><th>Cover</th>
+		<td class="alert">[% article.data.image_err %]</td>
+		<td>
+			<input type="hidden" name="display0" value="[% article.data.imageid %]" />
+		[% IF article.data.link %]
+			<img id="display0" src="[% webpath %]/[% article.data.link %]" alt="[% article.data.body %]" width="200" />
+		[% ELSE %]
+			<img id="display0" src="[% webpath %]/images/blank.png" alt="blank" />
+		[% END %]
+			<br /><input type="file" name="IMAGEUPLOAD0" />
+			<br />[ <a href="javascript:DoPopup('display0')">Select from Gallery</a> ]
+			<table>
+			<tr><td>Width:</td><td><input type="text" name="width0" value="[% item.width %]" /></td>
+				<td>Height:</td><td><input type="text" name="height0" value="[% item.height %]" /></td></tr>
+			</table>
+		</td>
+</tr>
+
+<tr><th>Type *</th>
+  	<td class="alert">[% release.type_err %]</td>
+		<td>[% release.ddtypes %]</td>
+</tr>
+<tr><th>Status *</th>
+    <td class="alert">[% article.data.publish_err %]</td>
+    <td>[% article.data.ddpublish %]</td>
+</tr>
+</table>
+</div>
+
+<p align="center"><input type="submit" value="Save" /></p>
+
+<h3>Release Formats</h3>
+
+<div class="boxer">
+	<table id="formats">
+	<tr>
+    <th>Format</th>
+		<th>Catalogue No.</th>
+		<th>Label</th>
+		<th>Select</th>
+	</tr>
+[% FOREACH format = formats %]
+	<tr>
+    <td><input type="hidden" name="frm_[% format.ixformatid %]" value="[% format.relformid %]" />[% format.format %]</td>
+		<td><input type="text" name="cat_[% format.ixformatid %]" value="[% format.catalogue %]" /></td>
+		<td><input type="text" name="lab_[% format.ixformatid %]" value="[% format.label %]" /></td>
+		<td><input type="checkbox" name="FORMATS" value="[% format.ixformatid %]" /></td>
+	</tr>
+[% END %]
+	</table>
+</div>
+
+<p align="center">[ <a href='javascript:addformat()'>Add a format</a> | <a href='javascript:delformat()'>Delete formats</a> ]</p>
+<p align="center"><input type="submit" value="Save" /></p>
+
+<h3>Track List</h3>
+
+<div class="boxer">
+	<table id="lyrics">
+	<tr>
+    <th>Order</th>
+		<th>Title</th>
+		<th>Link Name</th>
+		<th>MP3</th>
+		<th>Select</th>
+		<th>Action</th>
+	</tr>
+[% order = 1 %]
+[% FOREACH lyric = lyrics %]
+	<tr id="trow_x[% order %]">
+    <td width="100px"><input type="text" name="LORD[% lyric.articleid %]" value="[% order %]" size="2" /></td>
+		<td>[% lyric.title %]</td>
+		<td>[% lyric.quickname %]</td>
+		<td>[% IF lyric.mp3 %]Yes[% ELSE %]No[% END %]</td>
+		<td><input type="checkbox" name="LISTED" value="[% lyric.articleid %]" /></td>
+		<td><a href='javascript:edittrack([% release.articleid %],[% lyric.articleid %])'>Edit</a> | <a href='javascript:deltrk([% release.articleid %],[% lyric.articleid %])'>Delete</a></td>
+	</tr>
+[% order = order + 1 %]
+[% END %]
+	</table>
+</div>
+
+<div id="add-lyric">
+	<table>
+	<tr>
+    <th>Order</th>
+		<th>Title</th>
+		<th>Link Name</th>
+	</tr>
+	<tr>
+    <td width="100px"><input type="text" name="lyric_order" value="99" size="2" /></td>
+		<td><input type="input" name="lyric_title" value="" /></td>
+		<td><input type="input" name="lyric_name" value="" /></td>
+		<td>drop down list</td>
+	</tr>
+	<tr><td colspan="3"><input type="submit" value="Save" /></td></tr>
+	</table>
+</div>
+
+<p align="center">[ <a href='javascript:addtrack()'>Add a track</a> | <a href='javascript:deltrack()'>Delete tracks</a> ]</p>
+<p align="center"><input type="submit" value="Save" /></p>
+
+<h3>Without Whom</h3>
+
+<div class="boxer">
+	<table id="profiles">
+	<tr>
+    <th>Order</th>
+		<th>Name</th>
+		<th>Link Name</th>
+		<th>Type</th>
+		<th>Select</th>
+		<th>Action</th>
+	</tr>
+[% order = 1 %]
+[% FOREACH profile = profiles %]
+	<tr id="prow_x[% order %]">
+    <td width="100px"><input type="text" name="PORD[% profile.articleid %]" value="[% order %]" size="2" /></td>
+		<td>[% profile.title %]</td>
+		<td>[% profile.quickname %]</td>
+		<td>[% IF profile.type %][% profile.type %][% ELSE %]-[% END %]</td>
+		<td><input type="checkbox" name="LISTED" value="[% profile.articleid %]" /></td>
+		<td><a href='javascript:editprofile([% release.articleid %],[% profile.articleid %])'>Edit</a> | <a href='javascript:delprofile([% release.articleid %],[% profile.articleid %])'>Delete</a></td>
+	</tr>
+[% order = order + 1 %]
+[% END %]
+	</table>
+</div>
+
+<div id="add-profile">
+	<table>
+	<tr>
+    <th>Order</th>
+		<th>Name</th>
+		<th>Link Name</th>
+	</tr>
+	<tr>
+    <td width="100px"><input type="text" name="profile_order" value="99" size="2" /></td>
+		<td><input type="input" name="profile_title" value="" /></td>
+		<td><input type="input" name="profile_name" value="" /></td>
+		<td>drop down list</td>
+	</tr>
+	<tr><td colspan="3"><input type="submit" value="Save" /></td></tr>
+	</table>
+</div>
+
+<p align="center">[ <a href='javascript:addprofile()'>Add a profile</a> | <a href='javascript:delprofile()'>Delete profiles</a> ]</p>
+<p align="center"><input type="submit" value="Save" /></p>
+
+<h3>Liner Notes</h3>
+
+<input type="hidden" name="display" value="display0" />
+<input type="hidden" name="list" value="[% article.blocks %]" />
+
+<div class="boxer">
+
+[% IF article.body %]
+[% FOREACH item = article.body %]
+[% IF item %]
+<input type="hidden" name="BLOCK[% item.orderno %]" value="[% item.type %],[% item.paraid %]" />
+[% END %]
+[% END %]
+
+<table class="blocker">
+[% FOREACH item = article.body %]
+[% IF item %]
+[% IF item.type == 1 %]
+<tr><th width="100">[% item.orderno %] : Image</th>
+		<th width="10" class="alert">[% item.error %]</th>
+		<td><input type="hidden" name="display[% item.orderno %]" value="" />
+  			<input type="hidden" name="gallery[% item.orderno %]" value="[% item.imageid %]" />
+		[% IF item.link %]
+			[% IF item.width > 400; item.width = 400; END %]
+		  	<img id="display[% item.orderno %]" src="[% webpath %]/[% item.link %]" alt="[% item.tag %]" 
+	  			[% IF item.width %]width="[% item.width %]"[% END %]
+			  	[% IF item.height %]height="[% item.height %]"[% END %]
+				/>
+		[% ELSE %]
+  			<img id="display[% item.orderno %]" src="[% webpath %]/images/blank.png" alt="blank" width="100" />
+		[% END %]
+        <br /><input type="file" name="IMAGEUPLOAD[% item.orderno %]" />
+        <br />[ <a href="javascript:DoPopup('display[% item.orderno %]')">Select from Gallery</a> ]
+        <table>
+        <tr><td>Align:</td><td colspan="3">[% item.ddalign %]</td></tr>
+        <tr><td>HyperLink:</td><td><input type="text" name="IMAGEHREF[% item.orderno %]" /></td>
+            <td>Tag:</td><td><input type="text" name="IMAGETAG[% item.orderno %]" value="[% item.tag %]" /></td></tr>
+        <tr><td>Width:</td><td><input type="text" name="width[% item.orderno %]" value="[% item.width %]" /></td>
+            <td>Height:</td><td><input type="text" name="height[% item.orderno %]" value="[% item.height %]" /></td></tr>
+        </table>
+		</td>
+</tr>
+[% END %]
+[% IF item.type == 2 %]
+<tr><th width="100px">[% item.orderno %] : Text</th>
+		<th width="10px" class="alert">[% item.error %]</th>
+		<td><textarea name="TEXT[% item.orderno %]" rows="15" cols="70">[% item.body %]</textarea></td>
+</tr>
+[% END %]
+[% IF item.type == 3 %]
+<tr><th width="100px">[% item.orderno %] : Link</th>
+		<th width="10px" class="alert">[% item.error %]</th>
+		<td><input type="text" name="LINK[% item.orderno %]" value="[% item.link %]" /></td>
+</tr>
+[% END %]
+<tr><th></th>
+		<th></th>
+		<td>[ <a href='javascript:moveblockup([% item.paraid %])'>Move block up</a>
+			| <a href='javascript:moveblockdown([% item.paraid %])'>Move block down</a> 
+			| <a href='javascript:deleteblock([% item.paraid %])'>Delete block</a> ]</td>
+</tr>
+[% END %]
+[% END %]
+
+[% ELSE %]
+<tr><td align="center">No content yet!</td></tr>
+[% END %]
+
+</table>
+</div>
+<p align="center">[ <a href='javascript:addimage()'>Add an image</a> | <a href='javascript:addtext()'>Add a text block</a> ]</p>
+<p align="center"><input type="submit" value="Save" /></p>
+
+</form>
+
+<h2>Preview</h2>
+
+<div id="pagecontent">
+<div id="textcontent">
+
+	[% IF preview.data.link %]
+		[% IF preview.data.resize %]<a href="[% webpath %]/[% preview.data.link %]">[% END %]
+			<img class="inline rightbox" src="[% webpath %]/[% preview.data.link %]" alt="[% preview.data.tag %]"
+					[% IF preview.data.width %]width="[% preview.data.width %]"[% END %]
+					[% IF preview.data.height %]height="[% preview.data.height %]"[% END %]
+					[% IF preview.data.align %]align="[% preview.data.align %]"[% END %]
+					/>
+		[% IF preview.data.resize %]</a>[% END %]
+	[% END %]
+
+	<h4>[% preview.data.title %]</h4>
+
+<div class="rightbox boxer">
+	<ul>
+[% FOREACH format = formats %]
+	<li>[% format.format %]: "<b>[% format.catalogue %]</b>" ([% format.label %])</li>
+[% END %]
+	</ul>
+</div>
+
+<div class="boxer">
+	<ol>
+[% FOREACH lyric = lyrics %]
+    <li><a href="/article/[% lyric.quickname %]">[% lyric.title %]</a></li>
+[% END %]
+	</ol>
+</div>
+
+<div class="boxer">
+	<ol>
+[% FOREACH profile = profiles %]
+    <li><a href="/article/[% profile.quickname %]">[% profile.title %]</a> ([% profile.type %])</li>
+[% END %]
+	</ol>
+</div>
+
+<div class="clearboth"></div>
+<hr />
+
+<h4>[% preview.data.title %]</h4>
+
+[% block = preview.body %]
+[% INCLUDE "articles/arts-block.html" %]
+</div>
+</div>

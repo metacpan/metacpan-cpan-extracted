@@ -1,0 +1,112 @@
+{
+    "name": "Labyrinth-Plugin-Survey",
+    "version": "0.08",
+    "abstract": "YAPC Surveys plugin for the Labyrinth framework",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "cgi",
+        "framework",
+        "surveys",
+        "web",
+        "workshop",
+        "yapc"
+    ],
+
+    "prereqs" : {
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Class::Accessor::Fast": "0",
+                "Crypt::Lite": "0",
+                "Digest::SHA1": "0",
+                "Encode": "0",
+                "HTML::Entities": "0",
+                "JSON": "0",
+                "Labyrinth": "5.24",
+                "Labyrinth::Plugin::Core": "5.15",
+                "Session::Token": "0",
+                "Time::Local": "0",
+                "Time::Piece": "0",
+                "WWW::Mechanize": "0",
+                "YAML": "0",
+
+                "utf8": "0",
+                "Data::Dumper": "0",
+                "File::Basename": "0",
+                "File::Copy": "0",
+                "File::Path": "0",
+                "Getopt::Long": "0",
+                "Imager": "0",
+                "Imager::Graph::Pie": "0",
+                "IO::File": "0",
+                "Template": "0",
+                "Text::Wrap": "0"
+
+            }
+        }
+    },
+
+    "provides": {
+        "Labyrinth::Plugin::Survey": {
+            "file": "lib/Labyrinth/Plugin/Survey.pm",
+            "version": "0.08"
+        },
+        "Labyrinth::Plugin::Survey::Act::API": {
+            "file": "lib/Labyrinth/Plugin/Survey/Act/API.pm",
+            "version": "0.08"
+        },
+        "Labyrinth::Plugin::Survey::Announce": {
+            "file": "lib/Labyrinth/Plugin/Survey/Announce.pm",
+            "version": "0.08"
+        },
+        "Labyrinth::Plugin::Survey::Course": {
+            "file": "lib/Labyrinth/Plugin/Survey/Course.pm",
+            "version": "0.08"
+        },
+        "Labyrinth::Plugin::Survey::Talk": {
+            "file": "lib/Labyrinth/Plugin/Survey/Talk.pm",
+            "version": "0.08"
+        },
+        "Labyrinth::Plugin::Survey::YAPC": {
+            "file": "lib/Labyrinth/Plugin/Survey/YAPC.pm",
+            "version": "0.08"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples","specifications","vhost"]
+    },
+
+    "resources": {
+        "homepage": "http://yapc-surveys.org",
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Labyrinth-Plugin-Survey" },
+        "repository": {
+            "url": "git://github.com/barbie/labyrinth-plugin-survey.git",
+            "web": "http://github.com/barbie/labyrinth-plugin-survey",
+            "type": "git"
+        }
+    }
+}

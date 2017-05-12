@@ -1,0 +1,16 @@
+Lingua::IT::Hyphen - Italian word hyphenation
+
+The module exports one function, sillaba(), which gets one or
+more text strings and returns an array of syllabes.
+
+Example:
+
+    use Lingua::IT::Hyphen;
+    print join('-', sillaba "Salve, mondo!"));
+        
+    Sal-ve-mon-do
+    
+Aldo Calpini <dada@divinf.it>
+05 April 1999
+
+

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                LWP-Protocol-https-SocksChain10
+version:             1.7
+abstract:            ~
+license:             ~
+author:              
+    - Igor Okunev <igor@prv.mts-nn.ru>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    IO::Socket::SSL:               
+    LWP:                           
+    Net::SC:                       1.11
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

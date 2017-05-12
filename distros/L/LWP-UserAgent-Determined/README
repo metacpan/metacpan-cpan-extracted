@@ -1,0 +1,84 @@
+README for LWP::UserAgent::Determined
+                                        Time-stamp: "2004-04-08 22:37:47 ADT"
+
+NAME
+
+LWP::UserAgent::Determined - a virtual browser that retries errors
+
+SYNOPSIS
+
+  use strict;
+  use LWP::UserAgent::Determined;
+  my $browser = LWP::UserAgent::Determined->new;
+  my $response = $browser->get($url, headers... );
+
+DESCRIPTION
+
+This class works just like LWP::UserAgent (and is based on it, by
+being a subclass of it), except that when you use it to get a web page
+but run into a possibly-temporary error (like a DNS lookup timeout),
+it'll wait a few seconds and retry a few times.
+
+It also adds some methods for controlling exactly what errors are
+considered retry-worthy and how many times to wait and for how many
+seconds, but normally you needn't bother about these, as the default
+settings are relatively sane.
+
+
+
+
+INSTALLATION
+
+You install this module, as you would install any perl module library,
+by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of this module in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+Then you may need something like
+  setenv PERLLIB "$HOME/perl"
+in your shell initialization file (e.g., ~/.cshrc).
+
+For further information, see perldoc perlmodinstall
+
+
+DOCUMENTATION
+
+POD-format documentation is included in this module.  POD is readable
+with the 'perldoc' utility.  See ChangeLog for recent changes.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+this module should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of this modules is available from the Comprehensive
+Perl Archive Network (CPAN).  Visit <http://www.perl.com/CPAN/> to
+find a CPAN site near you.
+
+
+COPYRIGHT
+
+Copyright 2004, Sean M. Burke <sburke@cpan.org>, all rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+AUTHOR
+
+Sean M. Burke <sburke@cpan.org>

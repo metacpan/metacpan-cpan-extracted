@@ -1,0 +1,70 @@
+{
+    "name": "Labyrinth-Plugin-Release",
+    "version": "0.03",
+    "abstract": "Release plugin for the Labyrinth framework",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "music",
+        "web",
+        "cgi",
+        "framework"
+    ],
+
+    "prereqs" : {
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+              "perl": "5.006",
+              "Clone": "0",
+              "Labyrinth": "5.20",
+              "Labyrinth::Plugin::Core": "5.15",
+              "Labyrinth::Plugin::Articles::Lyrics": "1.00",
+              "Labyrinth::Plugin::Articles::Profiles": "1.00",
+              "Labyrinth::Plugin::MP3s": "1.00"
+            }
+        }
+    },
+
+    "provides": {
+        "Labyrinth::Plugin::Release": {
+            "file": "lib/Labyrinth/Plugin/Release.pm",
+            "version": "0.03"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples","vhost"]
+    },
+
+    "resources": {
+        "homepage": "http://labyrinth.missbarbell.co.uk",
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Labyrinth-Plugin-Release" },
+        "repository": {
+            "url": "git://github.com/barbie/labyrinth-plugin-release.git",
+            "web": "http://github.com/barbie/labyrinth-plugin-release",
+            "type": "git"
+        }
+    }
+}

@@ -1,0 +1,14 @@
+  <lemonolap>
+	<format id="format1"
+		file_in="extract.log"
+		handler="Lemonolap::Log4lemon"
+                file_out="phase1.log" 
+	        />
+	<filter id ="filter1" 
+		file_in="phase1.log"
+	        file_out="phase2.log" 
+	        handler="Lemonolap::Filter4lemon"
+	       />	
+        
+  </lemonldap>	
+

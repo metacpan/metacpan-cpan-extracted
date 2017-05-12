@@ -1,0 +1,128 @@
+NAME
+    Term::GetKey - A perl module for quick easy simple key control
+SYNOPSIS
+    use Term::GetKey;
+DESCRIPTION
+    This module changes the settings of Term::ReadKey using the `\' as a
+    toggle key. qtty() makes a single character request to Term::ReadKey
+    which is esential for the functionality of this module. `|' toggles the
+    case of the output character to UPPERCase lowercase or off. qtty() and
+    keypasswd() and query() use chomp on all input.
+    use Term::Getkey;
+    my $ch;#$ch can be any scalar variable
+    $ch=qtty();#single character good for menus
+    The methods in this module are dynamically loded so you do not need the
+    full prefix Term::GetKey-> prefix to call a method. The Term::ReadKey
+module is used to control the terminal.
+
+    reserve words:
+
+            ReadKey ReadMode ReadLine GetTerminalSize SetTerminalSize
+            GetSpeed GetControlChars SetControlChars
+    are still available and functional.
+
+    qtty() keypasswd() query() status() setkeymode()
+    keymode() setannounce() announcestatus() setcase() casestatus()
+    keymodestatus() is the list of methods that do not require the full
+    system path and module name before the method name.
+
+
+    When you press `|' or `\' and then a `\\n' depending on the settings you
+    cycle through the settings of Term::ReadKey. The keys effected by
+    Term::GetKey->qtty are disabled in noecho mode. When Term::GetKey is in
+    (cbreak, raw or ultra-raw) modes the `\n' or enter key is not required.
+
+The following methods are called by qtty()
+
+    setanounce() `~'
+
+    setcase() `|'
+
+    setkeymode() `\\' the backslash key
+
+    Terminat your program with '`' the grav accent key.
+
+    keypasswd() calls qtty to create a password. This saves a call to stty -
+    echo and stty echo.
+
+    my $opt_passwd;
+
+    $opt_passwd=keypasswd();
+
+    query() calls setcase() `|'
+
+    If you wish to have a `|' as the only character on the line: `\|' will
+    cause query() to remove the `\\' and `|' will be sent as the string.
+
+    The announcements are not disabled when you call qtty() or query() if
+    they are waiting for a request and you press '|' or '\\'. You can
+    disable the announcements with a call to set_announce(). The functions
+    setcase() setkeymode() casestatus() and keymodestatus return the current
+    value or the changed value of their called method.
+
+keymode Settings
+    0 Restore original settings. 1 Change to normal mode. 2 Change to cooked
+    mode with echo off. (Good for passwords) strings are uneffected 3 Change
+    to cbreak mode. 4 Change to raw mode. 5 Change to ultra-raw mode. (LF to
+    CR/LF translation turned off)
+
+GetKey announces the synonyms:
+    restore normal noecho cbreak raw ultra-raw
+
+    The Default is cbreak.
+
+    qtty() handles each key individually. It returns to the `normal' mode
+    after each key has been pressed so that you can continue with your
+    program allowing you flexability. When case conversion is activated with
+    the `|' or called via a program it takes priority over your current case
+    settings. It saves your current setting and sets itself so that other
+    programs run normally. The default setting for its case conversion is
+    off (no translation). You can toggle or query the settings with the
+    following calls:
+
+    status();
+
+    my $myval; $myval=casestatus();
+
+    $myval=keymodestatus();
+
+    #change the case of the key requested and announce the setting
+
+    my $keymodeval; setcase();
+
+    #or
+
+    $readval=setcase();
+
+    query();#handles lines of text.
+
+    my$opt_passwd=keypasswd();
+
+    my $textline=query();
+
+    The characters returned are set to the case setting that you set with
+    `|'.
+
+    announcestatus announces the status of the verbosity.
+
+    The status of Term::GetKey is available by pressing `=' the equals key.
+
+    setannounce toggles the setting verbosity. The calls to the keystrokes
+    mentioned above are only present with a call to qtty() All the
+    Term::GetKey commands except '\\' are disabled when Term::GetKey is in
+    noecho mode.
+
+    In noecaho mode, qtty() only has `\\' active. query() has case
+    conversion disabled.
+
+Case and announcement values:
+    setcase() casestatus() keymodestatus() setkeymode() return values only
+    when announce mode is disabled with the default.
+
+values:
+    Off 0 UPPERCASE and announcements active 1 lowercase 2
+
+Term::GetKey is written by:
+Barry Pollock
+<barryp@hurontel.on.ca>
+

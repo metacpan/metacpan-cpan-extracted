@@ -1,0 +1,67 @@
+Lingua::Romana::Perligata version 0.601
+
+NOMEN
+
+    Lingua::Romana::Perligata -- Perl in Latin
+
+DESCRIPTIO
+
+    The Lingua::Romana::Perligata makes it makes it possible to write Perl
+    programs in Latin. (If you have to ask "Why?", then the answer probably
+    won't make any sense to you either.)
+
+    The linguistic principles behind Perligata are described in:
+
+        http://www.csse.monash.edu.au/~damian/papers/HTML/Perligata.html
+
+    The module is 'use'd at the start of the program, and installs a filter
+    which allows the rest of the program to be written in (modified) Latin,
+    as described in the accompanying documentation.
+
+EXEMPLUM
+
+    use Lingua::Romana::Perligata;
+
+    adnota Illud Cribrum Eratothenis
+
+    maximum tum val inquementum tum biguttam tum stadium egresso scribe.
+    da meo maximo vestibulo perlegementum.
+
+    maximum comementum tum novumversum egresso scribe.
+    meis listis conscribementa II tum maximum da.
+    dum damentum nexto listis decapitamentum fac
+        sic
+            lista sic hoc tum nextum recidementum cis vannementa listis da.
+            dictum sic deinde cis tum biguttam tum stadium tum cum nextum
+            comementum tum novumversum scribe egresso.
+        cis
+
+
+SCRIPTOR
+
+    Damian Conway (damian@conway.org)
+
+
+STATUERE
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+
+DESIDERATAT
+
+    None.
+
+
+IUS TRANSCRIBENDI
+
+    Copyright (c) 2000-2016, Damian Conway. All Rights Reserved.
+
+    This module is free software. It may be used, redistributed and/or
+    modified under the terms as Perl itself.
+
+

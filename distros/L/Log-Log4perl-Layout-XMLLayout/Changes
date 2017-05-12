@@ -1,0 +1,11 @@
+Revision history for Perl extension XMLLayout.
+
+0.1  Thu Jul 24 20:26:40 2003
+     - initial Version based on Log::Log4perl::Layout::PatternLayout
+     
+0.2  Sun Mar 27 23:16:51 2005
+     - preceding '<?xml version = "1.0" encoding = "iso8859-1"?>' will be suppressed
+       if the Encoding attribute is not defined in the Layout configuration. 
+       (Newer chainsaw version do not like such a line)
+     - added an example for chainsaw usage to the XMLLayout POD
+     

@@ -1,0 +1,29 @@
+Revision history for Perl module Lingua::HE::MacHebrew
+
+0.20  Sun Jul 31 19:33:55 2011
+    - fix the tarball with world writable files.
+
+0.10  Sat Jan 22 20:41:16 2011
+    - xs: fix mixing STDCHAR and U8.
+
+0.05  Tue Jun  5 21:56:55 2007
+    - mkheader, split_into_char() - avoid unpack('C*') on unicode.
+
+0.04  Thu Apr 28 22:49:15 2005
+    - upgraded according to updated HEBREW.TXT in www.unicode.org
+      (though no character mapping is changed).
+    - added old mappings for 0xF89A and 0xF89F in Unicode PUA; they are
+      only used in the direction from Unicode to Mac OS Hebrew encoding.
+    - added META.yml.
+    - added t/argu.t.
+
+0.03  Sat Feb 01 20:15:25 2003
+    - document modification.
+
+0.02  Sat Feb 01 01:35:15 2003
+    - *.map files are integrated.
+    - document modification.
+    - contraction support is supported without hard-coding.
+
+0.01  Thu Jan 30 22:46:20 2003
+    - original version;

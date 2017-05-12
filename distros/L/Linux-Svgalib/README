@@ -1,0 +1,62 @@
+Linux::Svgalib
+==============
+
+This module provides a Perl interface to svgalib - a library of graphics
+routines that work in the Linux virtual console. 
+
+There is an existing module called 'vga' that provides similar facilities -
+the major difference being that this module provides a vaguely object
+oriented interface and attempts to make it easier to work with some
+of the svgalib functions that return or take as arguments C datatypes that
+are sometimes difficult to work with in Perl.
+
+## INSTALLATION
+
+** N.B.  The svgalib operates at a fairly low level and may not be
+compatible with certain hardware or other running software, do not
+install it on a system that you can't reboot without warning **
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Because of the way in which svgalib works you will almost certainly need to
+become the superuser before running 'make test' - infact on most systems
+you will either need to be the superuser or have created a setuid program
+to use this module properly at all, it is also unlikely to work at all
+from within an X terminal window of some sort.
+
+## DEPENDENCIES
+
+This module obviously requires svgalib in order to build, unless you
+have built the library from source then you may have to install the
+'devel' package as well in what ever way is provided on your system.
+It has been tested with version 1.4.2 of the library but it doesnt appear
+that the API has changed since about 1.2 so anything since then should
+work but I am not going to make any guarantees about that.
+
+As far as I know svgalib only works on x86 linux - but I dont have any
+alternative hardware on which to test this assertion.
+
+## SUPPORT
+
+As most PC hardware has moved beyond what is supported by this library
+it is difficult to know whether it works properly or at all, or even 
+how to test it. It compiles though.
+
+If you are lucky enough to have hardware that it supports and you find
+it has a problem, please send a patch or report via the github:
+
+https://github.com/jonathanstowe/Linux-Svgalib
+
+## COPYRIGHT AND LICENCE
+
+Copyright © 2001-2016 Jonathan Stowe <jns@gellyfish.co.uk> .
+
+This is free software - it can be modified and/or distributed under
+the same terms as Perl itself. The full text of the Perl licence can be
+found in the README file in the Perl distribution.
+

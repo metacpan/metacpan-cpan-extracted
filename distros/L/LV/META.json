@@ -1,0 +1,94 @@
+{
+   "abstract" : "LV ♥ lvalue",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.013, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "LV",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Sentinel" : "0",
+            "Sub::Name" : "0"
+         },
+         "requires" : {
+            "perl" : "5.006000"
+         },
+         "suggests" : {
+            "Variable::Magic" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "provides" : {
+      "LV" : {
+         "file" : "lib/LV.pm",
+         "version" : "0.006"
+      },
+      "LV::Backend::Magic" : {
+         "file" : "lib/LV/Backend/Magic.pm",
+         "version" : "0.006"
+      },
+      "LV::Backend::Sentinel" : {
+         "file" : "lib/LV/Backend/Sentinel.pm",
+         "version" : "0.006"
+      },
+      "LV::Backend::Tie" : {
+         "file" : "lib/LV/Backend/Tie.pm",
+         "version" : "0.006"
+      },
+      "LV::Backend::Tie::TiedScalar" : {
+         "file" : "lib/LV/Backend/Tie.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/LV/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=LV"
+      },
+      "homepage" : "https://metacpan.org/release/LV",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/tobyink/p5-lv"
+      }
+   },
+   "version" : "0.006"
+}

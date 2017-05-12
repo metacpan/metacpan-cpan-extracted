@@ -1,0 +1,23 @@
+Lingua/CS/Num2Word version 0.03
+===============================
+
+Lingua::CS::Num2Word is a number to text convertor for czech. Output
+text is in iso-8859-2 encoding.
+
+Converts whole numbers from 0 up to 999 999 999.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002-2004 PetaMem s.r.o. - http://www.petamem.com/
+
+This package is free software. You can redistribute and/or modify it under
+the same terms as Perl itself.

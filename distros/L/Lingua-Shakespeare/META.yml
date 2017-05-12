@@ -1,0 +1,12 @@
+name: Lingua-Shakespeare
+version: 1.00
+abstract: Write poetic perl scripts
+author: Graham Barr <gbarr@cpan.org>
+license: gpl
+distribution_type: module
+requires:
+  perl: 5.004
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.31

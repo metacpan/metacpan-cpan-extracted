@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Log/Minimal.pm
+t/00_compile.t
+t/01_croak.t
+t/02_color.t
+t/03_color_by_env.t
+t/04_env_debug.t
+t/LogTest.pm
+META.yml
+MANIFEST

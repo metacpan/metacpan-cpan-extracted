@@ -1,0 +1,10 @@
+debian/
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/liblinux-info-perl.docs
+debian/liblinux-info-perl.examples
+debian/rules
+debian/source
+debian/watch

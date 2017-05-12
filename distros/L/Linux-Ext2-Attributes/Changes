@@ -1,0 +1,18 @@
+0.20 Sun 06 Oct 2013
+
+ * Moved test for Linux into Build.PL and die with the correct error string so
+   automated things (e.g. CPAN Testers) give up on other platforms.
+ 
+ * Switched license from BSD to Perl.
+ 
+ * Use H2PM to find the correct ioctl numbers at compile time rather than
+   executing hardcoded ones and hoping for the best.
+ 
+ * Use H2PM to get the ext2 flag constants. The ext3/4 constants are still
+   included as the ext3/4 headers don't seem to be available in userland.
+ 
+ * Removed some unused and undocumented things.
+
+0.10 Sun 30 Sep 2012
+
+ * Initial release

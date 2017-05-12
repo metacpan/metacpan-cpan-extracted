@@ -1,0 +1,164 @@
+#!/usr/bin/perl
+use strict ;
+use Pod::Usage ;
+use Getopt::Long qw/:config no_ignore_case/ ;
+
+++$! ;
+
+# Script illustrating the use of the Linux::DVB::DVBT package for recording channels
+
+use Linux::DVB::DVBT ;
+
+our $VERSION = "1.000" ;
+
+
+	my ($help, $man, $DEBUG, $VERBOSE, $config, $info, $adap) ;
+	GetOptions('v|verbose=s' 	=> \$VERBOSE,
+			   'debug=s' 		=> \$DEBUG,
+			   'h|help' 		=> \$help,
+			   'man' 			=> \$man,
+			   'cfg=s' 			=> \$config,
+			   'info'			=> \$info,
+			   'a|adap|dvb=i' => \$adap,
+			   ) or pod2usage(2) ;
+
+
+    pod2usage(1) if $help;
+    pod2usage(-verbose => 2) if $man;
+    pod2usage("$0: No arguments given.")  if (@ARGV == 0) ;
+    pod2usage("$0: No filename given.")  if (@ARGV <= 1) ;
+    pod2usage("$0: No duration given.")  if (@ARGV <= 2) ;
+
+	Linux::DVB::DVBT->debug($DEBUG) ;
+	Linux::DVB::DVBT->dvb_debug($DEBUG) ;
+	Linux::DVB::DVBT->verbose($VERBOSE) ;
+
+	## Create dvb
+	## NOTE: With default object settings, the application will
+	## die on *any* error, so there is no error checking in this script
+	##
+	my $dvb = Linux::DVB::DVBT->new(
+		'adapter_num'	=> $adap,
+	) ;
+	
+	$dvb->config_path($config) if $config ;
+	
+	## Select the channel
+	$dvb->select_channel($ARGV[0]) ;
+	
+	## Record
+	$dvb->record($ARGV[1], $ARGV[2]) ;
+
+	if ($info)
+	{
+		## Get multiplex info
+		my %multiplex_info = $dvb->multiplex_info() ;
+	
+		#display summary of recording settings
+		print<<"HEAD";
+Recording Summary
+=================
+
+Total record duration: $multiplex_info{'duration'} seconds
+
+TSID: $multiplex_info{'tsid'}
+
+Files
+-----
+
+HEAD
+
+		foreach my $file (sort keys %{$multiplex_info{'files'}})
+		{
+			my $href = $multiplex_info{'files'}{$file} ;
+			print "  $file\n" ;
+			foreach my $pid_href (@{$href->{'demux'}})
+			{
+				printf "    PID %5d [$pid_href->{'pidtype'}]\n", $pid_href->{'pid'} ;
+			}
+			print "\n" ;
+		}
+
+	}	
+
+
+
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+=head1 NAME
+
+dvbt-record - Record a program to file
+
+=head1 SYNOPSIS
+
+dvbt-record [options] channel filename duration
+
+Options:
+
+       -debug level         set debug level
+       -verbose level       set verbosity level
+       -help                brief help message
+       -man                 full documentation
+       -a <num>             Use adapter <num>
+       
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Set verbosity level. Higher values show more information.
+
+=item B<-debug>
+
+Set debug level. Higher levels show more debugging information (only really of any interest to developers!)
+
+=item B<-a>
+
+Specify which adapter number to use
+
+
+=back
+
+=head1 DESCRIPTION
+
+Script that uses the perl Linux::DVB::DVBT package to provide DVB-T adapter functions.
+
+Specify the channel name to record, the filename of the recorded file (which may include a directory path
+and the directories will be created as needed), and the duration of the recording. Note that the filename should end
+with .ts file extension.
+
+The duration may be specified either as an integer number of minutes, or in HH:MM format (for hours & minutes), or in
+HH:MM:SS format (for hours, minutes, seconds).
+
+The program uses a "fuzzy" search to match the specified channel name with the name broadcast by the network.
+The case of the name is not important, and neither is whitespace. The search also checks for both numeric and
+name instances of a number (e.g. "1" and "one").
+
+For example, the following are all equivalent and match with the broadcast channel name "BBC ONE":
+
+    bbc1
+    BbC One
+    b b c    1  
+
+
+For full details of the DVBT functions, please see:
+
+   perldoc Linux::DVB::DVBT
+ 
+=cut
+
+	
+	
+	

@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# This is a wrapper script to interface to whatever initrd tool
+# the system is using.
+
+# variables
+PATH=$PATH:/testing/usr/bin:/sbin:/usr/sbin
+
+if [ ! -z $1 ]; then
+    RELEASE_TAG=$1
+fi
+release_tag=${RELEASE_TAG:-test}
+
+if [ ! -z $2 ]; then
+    TARGET_DIR=$2
+fi
+target_dir=${TARGET_DIR:-/boot}
+
+initrd_tools="mkinitrd mkinitrc mkinitramfs yaird"
+for tool in $initrd_tools; do
+    echo $tool
+    which $tool > /dev/null 2>&1
+    if [ $? == 0 ]; then
+        initrd_tool=$tool
+        break
+    fi
+done
+
+case $initrd_tool in
+    mkinitrd)
+       mkinitrd $target_dir/initrd.img-$release_tag $release_tag
+       ;;
+    mkinitrc)
+       mkinitrc -k $target_dir/linux-$release_tag -i $target_dir/initrd.img-$release_tag
+       ;;
+    mkinitramfs)
+       mkinitramfs kernel=$release_tag --output=$target_dir
+       ;;
+    yaird)
+       yaird -o $target_dir/initrd.img-$release_tag $release_tag
+       ;;
+    *) echo "Unknown initrd tool '$initrd_tool'"
+       exit
+       ;;
+esac
+

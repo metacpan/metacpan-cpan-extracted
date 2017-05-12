@@ -1,0 +1,15 @@
+Changes file for Linux::LXC
+
+1.0002    2017-04-02 11:30:20+02:00 Europe/Paris
+
+	* Fix ownership of folder created with the "put" subroutine.
+	* Add harness for running integration tests.
+
+1.0001    2017-03-06 22:05:08+01:00 Europe/Paris
+
+	* Add prereqs of the module.
+	* Add changelog.
+
+1.0000    2017-03-05 21:18:19+01:00 Europe/Paris
+
+	* Initial release.

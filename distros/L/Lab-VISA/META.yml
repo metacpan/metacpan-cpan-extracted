@@ -1,0 +1,30 @@
+---
+abstract: 'Perl interface to the National Instruments VISA library'
+author:
+  - 'Daniel Schroeer <schroeer@cpan.org>'
+  - 'Andreas K. Huettel <mail@akhuettel.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lab-VISA
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DynaLoader: '0'
+  Exporter: '0'
+resources:
+  MailingList: lab-measurement-users@mailman.uni-regensburg.de
+  bugtracker: https://github.com/lab-measurement/Lab-VISA/issues
+  homepage: https://github.com/lab-measurement/Lab-VISA
+  repository: https://github.com/lab-measurement/Lab-VISA.git
+version: '3.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

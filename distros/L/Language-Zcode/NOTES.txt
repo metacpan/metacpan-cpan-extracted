@@ -1,0 +1,380 @@
+Phase 1
+PLOTZ: Perpetrating Linguistics On The Z-machine. 
+(aka Poly-Lingual Opcode Translation for the Z-machine)
+
+Perl program that takes a Z story file and creates a Perl (or other language!)
+program that'll run the game.  
+
+Plotz is what your mother does when she finds out you're wasting your life
+playing computer games instead of becoming a doctor. And you couldn't call
+once in a while? 
+
+Btw, Plotz is also a machine company in Cleveland. And it was used on raif in
+1999 to describe that indescribable thing that IF games have that draws you in
+and keeps you playing even if there isn't an actual plot.
+
+Phase 2
+TOPAZ: Translating Opcodes for Parrot Assembly Z-machine
+Translate Z-code into Parrot Assembly instructions (using maybe a mix of Z
+opcodes and Parrot opcodes). Then run parrot on the PASM.
+(This should be done with Plotz::PIR.)
+
+Phase 3
+PIZMON: Parrot/Pizmon Is the Z-machine Operating Natively
+The point here is that Parrot itself will think it's the Z-machine, not that
+it's emulating the Z-machine.  It'll be reading opcodes, pushing stack frames,
+and calling subs just like the Z-machine. (Although there is that pesky
+problem of the missing stack.)
+
+######################################################################
+Questions for Z-machine list:
+
+- Confirm non-popping of stack in indirect vars.
+  What about *direct* reference of the stack?
+  load 0 -> i; ! does stack get decremented?
+  load [n] -> i; ! does stack get decremented if n == 0?
+  load [sp] -> i; ! does stack get decremented? What if sp = 0?
+- Is it true that vars (& stack) are *always* stored as unsigned?
+  I.e., signed only happens during computation (or inc_chk).
+  Then spec1.0's "dec 0 = -1" is wrong. It's 65535.
+
+######################################################################
+IO
+
+Eventually, I should have Input.pm, Output.pm (which stores all the
+outputstreams stuff, too), and ZIO.pm or a ZIO directory. (Call it UI?
+Screen?)
+
+(Don't want to separate $zio's input and output since that's heavily
+UI-dependent. But ZIO_Generic will turn into PlotzPerl::UI, with its
+subclasses.)
+
+If we do a read while stream 3 is selected, we still echo the input text to
+stream 1 (and possibly 2 and 4) and not 3. So "echoed input text" is a
+different beast than usual output text.
+read_char is NOT echoed to stream 1 (or 2 or 3), but IS echoed to stream 4.
+
+Note that Games::Rezrov doesn't read_char from input_stream 1 or dup
+read_char's inputs to output_stream 4 OR 2.
+
+I should probably use the format "[ZSCII VALUE]\n" mentioned in the spec's
+remarks.
+
+I need to move cursor stuff partly out of ZIO. After all, the game is supposed
+to know where it's currently sitting.
+
+@buffer_mode needs to flush the buffer if it gets turned off.
+
+###
+Win32 Console
+We get an @event array back when we do $in->Console
+(@event is empty if we do a mouse click & ENABLE_MOUSE_INPUT is off)
+	# Event type (1 keyboard, 2 mouse), key down or up (1,0)
+	# repeat count, virtual keycode, virtual scan code (?)
+	# char (if ASCII, otherwise 0), control key state
+	# num lock -> 1 1 1 144 69 0 256
+	# '0', num lock on -> 1 1 1 96 82 48 32
+	# '0', num lock off -> 1 1 1 38 72 0 288
+	# F1 -> 1 1 1 112 59 0 0
+	# Home -> 1 1 1 36 71 0 256
+	# End  -> 1 1 1 35 79 0 256
+	# Left -> 1 1 1 37 75 0 256
+	# Up   -> 1 1 1 38 72 0 256
+	# Right-> 1 1 1 39 77 0 256
+	# Down -> 1 1 1 40 80 0 256
+	# Alt  -> 1 1 1 18 56 0 2 [ignore these: Alt-Tab = next window, e.g.]
+	# Shift-> 1 1 1 16 42 0 16 [ignore these - get next char]
+	# Ctrl -> 1 1 1 17 29 0 8
+	# a    -> 1 1 1 65 30 97 0
+	# A    -> 1 1 1 65 30 65 16
+
+####
+WINDOWS
+The upper window doesn't get buffered, and doesn't get passed to stream 2.
+Upper window input DOES get passed to stream 3 or 4.
+That means that we need to know what window we're writing to when
+we decide whether to buffer or not.
+So it seems I need to make the current window an attribute of Output class.
+Can we get rid of the ZIO current_window attribute? A few things use it but
+maybe we can pass that in from Output. Or maybe not.
+Seems like we'll need rows/columns attributes for Output (or at least the
+Bufferable streams) as well as $zio. 
+Maybe we can make window be a parallel class to OutputStream,
+and they'll just call each other once in a while?
+A read CAN happen in the upper window. (read_char? I think so.)
+
+Version 6 allows each window to have a "echo to stream 2" attribute.
+I can do this even if I'm not supporting v6. I can either make Window the only
+class, and call new for Lower & Upper (and Status) windows with the particular
+attributes that fit for that window, OR I can make separate Lower/Upper/Status
+classes. Latter is slightly nicer for OO, but former makes more sense if we
+imagine that SOMEDAY someone might want to create v6 output. Well, I could
+have a separate Window::v6 class, since there will be other differences.
+
+
+ARGH! Problem: each (bufferable) window needs its own buffer!
+[maybe not: see below]
+Ignore the problem since we never buffer anything but lower window?
+IRL (v6), each buffer needs to store text separately for each window.
+Make buffer an object. For now, it can be blessed text, which
+dies if you try to call it with a window != LOWER. But eventually,
+should be buffering separately for each window. Note that even if we buffer
+into windows, when you flush the buffers, they still have to go into the
+streams! 
+Call $window->buffer($text) (which does $buffer.=$text) in stream_line()
+Call $self->write($window->get_buffer()) in stream_line().
+Call $window->flush_buffer() ($buffer = "") in newline().
+Actually, stream 2 should have only one buffer, while for stream 1 you would
+have a buffer in each window. That is, anything that will produce a separate
+output needs its own buffer.
+For now, we'll just give stream 1 and stream 2 their own buffers, rather
+than putting the buffer into the window.
+
+Each window also kinda needs to store its cursor position, or at least the
+stream 1 and 2 windows do.
+
+Should test in Frotz whether stream 3 really sucks up all text even as you
+switch windows. Also confirm all stream/window combos do what I think.
+
+One solution:
+Each stream has a set of windows.
+PP::Window::current_window returns integer current window.
+OS::output says
+$stream->get_window(PP::Window::current_window)->output($text);
+Stream 1: Window::Lower, Window::Upper (possibly Window::Status)
+Window::Lower ISA NewlineBuffered & Screen.
+Window::Upper ISA Screen.
+Stream 2: @Windows = (Window::Transcript->new, Window::DevNull->new);
+Stream 3: $Windows[1] = $Windows[0] = new Window::StackOfBuffered;
+(so writing to window 0 OR 1 writes to the same buffer in the stack)
+Stream 4: $Windows[1] = $Windows[0] = new Window::File
+[Or, streams 3-4 don't have 2 windows]
+
+Is ZIO pointed to by both Upper & Lower windows, or by the stream object that
+points to them. If the latter, might be tough to cross-communicate when
+printing text, newlines, etc.
+
+8.6.1.3 - version 3, "restore" sets upper window to size 0.
+8.7.3.3 - erase_window(-1) should happen at the beginning of every
+(v4+) game
+###############
+
+restart. Spec 6 remarks say: "Note that the "state of play" does not include
+numerous input/output settings (the current window, cursor position, splitness
+or otherwise, which streams are selected, etc.): neither does it include the
+state of the random-number generator. (Games with elaborate status lines must
+redraw them after a restore has taken place.)" That doesn't seem to match what
+Dzip and Rezrov do, though. I think they reset almost everything.
+(See notes on paper.)
+
+See Graham Nelson's email. DON'T restart streams. Should be fine to rewrite
+other things.
+
+###############
+SAVE
+
+Note that a given call stack frame in quetzal is sort of a mix of
+information from two different subs:
+
+- PC of first command AFTER the call opcode in caller() - in a Z-machine
+  sense, where PC should go when I hit a @ret opcode
+- Variable to store result of current sub (plus discard bit) in caller(). In
+  Z-speak, what local var to put result in, since once I return to caller(),
+  I can't back up the PC to the middle of the calling opcode to see where 
+  I was supposed to store the result from the current routine. 
+- Which args if any were supplied to this routine
+- Locals in this routine: 
+- Evaluation stack for this routine. 
+
+Btw, how do I figure out which address z_call should call? If I restore from a
+Frotz save file, I have no idea which subroutines make up the frames of the
+stack. All we have are the next_PC's. Which is fine when you're
+subroutine-less; you just restore by jumping to restore_PC, then each time you
+hit a return, you jump to next_PC. But how can we climb the stack?
+One way to do it is to grep the symbol table for routines like 'rtn\d+',
+sort those routines, and call the subroutine with the highest address less
+than the next_PC for the *next* frame of the call stack.
+Of course, if I'm getting so complicated that I'm reading the symbol table,
+perhaps I should rethink this whole "using subroutines" strategy...
+
+Make sure that restore test tests a call sp (and why not call locv while we're
+at it).
+
+NOTE Quetzal 3.5
+
+NOTE: Quetzal 6.2 defines some info about catch and throw
+
+NOTE: Quetzal 7 - store some extra stuff? Author can be $>. See 7.5
+Read them in and use them somehow? Store their score, time, and location, e.g.
+7.8 IntD interpreter dependent chunk: 
+
+######################################################################
+Glk?! For platform independence -- or will Parrot get me that anyway?
+We'll need to distribute Glk libraries, right?
+
+From the spec:
+Note that it is permissible for a routine to be in dynamic memory. Marnix
+Klooster suggests this might be used for compiling code at run time! 
+
+Try Zork special commands like $ve
+
+######################################################################
+To create an interpreter:
+- Runtime.pm and IO.pm stuff can be called directly.
+- Mostly copy %trans and eval the result!
+- Change call_* translations. Need to do a jump and create local
+  vars & stack.
+
+######################################################################
+We could make the translated Perl code more like Z-code with lots
+of additional overhead. (It would still be more like a running Z-machine
+than an interpreter - um, sort of.) Basically, make an array of global
+vars that ties to an object which uses set/get_global_var for FETCH/STORE.
+Same for $SP (watch out for indirect variables)! Lvalueness should be handled
+automatically.
+
+We could also make all arithmetic happen like Z-machine arithmetic if we made
+the locv's (and Global/SP) objects of a class that has arithmetic (except
+logical or/and/not etc.!) overloaded to do signed_word.
+Lots more overhead here, cuz every arithmetic op calls subs, which sort of
+loses the whole point of translation. But it's a little cooler - and maybe
+more like what PIZMON is supposed to do.
+We could use overload::constant(integer) to automatically make integers into
+objects whose arithmetic gets overloaded. Otherwise, "add 1 65532" won't work 
+correctly. But this might break any actual arithmetic we have w/in that class.
+Um, maybe. Also, the alternative is just to recognize while translating
+when we get a situation w/ 2 constants (could probably do that even with a
+simple regexp). When that happens, we could EITHER do the arithmetic at
+translation time, or if we want to be more authentic, convert the values to
+their signed-word equivalents: "add 1 -4". 
+Certainly could use ++/-- for inc/dec (which doesn't even have the integer
+constant problem - you wouldn't write 7++).
+
+We could even create an array whose index 0 is tied to a Stack object, 1-15
+tied to LocalVar objects, 16-255 tied to GlobalVar objects. Actually, tie the
+whole array to do the dispatch automatically? Oteherwise, $arr[100]=1
+will remove the tied GlobalVar from $arr[100].
+
+We could translate je to do $foo == [$bar, $blah] and overload == to
+do the grep if lhs is object and rhs has [].
+
+Make Perl objects that represent Z Objects. But note that behind the scenes,
+the objects don't store props, attributes, parents, etc. Things that seem like
+getter/setter methods are really just calling the same old code that
+manipulates PlotzMemory.
+
+######################################################################
+DEBUG/OPTIMIZE
+
+Optimize: translate each opcode to include "$count{$opcode}++" in outputted
+code.  Then running code will show what got called how many times so we can
+plan optimization.
+
+Or just use perl -d:DProf.
+Use perl -d:DProf on plotz, too.
+
+240 out of 1111 strings in Zork don't use abbrevs. Print those explicitly?
+Probably not worth it.
+
+Not worth optimizing print: it's only done a few times per turn! Worry about
+the other several hundred opcodes!
+Objects could be cached, but things will break if someone writes object stuff
+directly to memory using storeb/storew.
+
+set/get_global_var can be calls to mult_add_string. It'll be less readable
+(only do it with -O option?) but faster, and it happens a lot.
+
+######################################################################
+Spec version1.1:
+Opcode operands are always evaluated from first to last - this order is
+important when the stack pointer appears as an argument. Thus
+"@sub sp sp" subtracts the second-from-top stack item from the topmost
+stack item.
+
+In the seven opcodes that take indirect variable references (inc, dec,
+inc_chk, dec_chk, load, store, pull), an indirect reference to the stack
+pointer does not push or pull the top item of the stack - it is read
+or written in place. [Argh! -ADK]
+
+Read must return 13 when terminated by the user pressing "enter". See
+section 3.
+
+The dictionary and flag operands of tokenise are optional.
+
+Given the existence of Quetzal, a portable saved file format, it is quite
+possible that after loading, the game may be running on a different
+interpreter to that on which the game started. As a result, it is strongly
+advisable to recheck any interpreter capabilities (eg Standard version,
+unicode support, etc) after loading.
+extended save/restore have new optional prompt
+
+set_text_style, set_font, set_colour are changed. See spec.
+
+######################################################################
+PIR stuff
+
+Note that perfect sub arg passing isn't necessary to do a simple
+addition, for example.
+
+For local vars and/or temp vars, use $I0 etc. or .locals?
+I could even use explicitly I0-15 (we know there's max 15 local vars)
+and I16-31 for temp vars. Ask on list.
+Can .local be declared mid-sub? Otherwise I could declare a couple in every
+sub. Is it bad to mix true registers with $I registers and/or .locals?
+
+Save/Restore may be a major problem with doing PIZMON. Because we
+need to change the Parrot call stack. Asked about it on the mailing list &
+didn't get much of an answer.
+If we can't modify the Parrot call stack (by using an opcode in C) then maybe
+we can do a hybrid sub/manual call stack procedure. It would work like this:
+- Before every sub call
+--- push the current local variables onto a stack, 
+--- save the label of the line that calls the next sub in the stack.
+- If restoring, then go back to main. Foreach sub in the call stack,
+--- set the local variables in this frame from the saved stack, 
+--- goto the line that will call the next sub in the call stack.
+
+Note that this does result in a bit of buildup in the true Parrot call stack
+(because when you call "restore" you'll have some stuff in the call stack.
+Then you goto program start and start adding new things to the stack without
+removing teh old.) But I think it's just a few subs worth, and for most uses
+of the Z-machine, there shouldn't be TOO much danger of overloading the Parrot
+call stack.
+When the time comes to try this, offer it as an alternative to the "change the
+call stack" opcode.
+
+######################################################################
+PIZMON. Parrot IS the Z-Machine.
+Should load opcodes (for the correct version!).
+Then jump to first routine's address (which is in header).
+Then keep running as Parrot, only interpreting its opcodes as Z opcodes.
+
+Extended opcodes don't work? Maybe we could consider the second byte the first
+arg, and make the extended_opcode_handler sub just be basically a sub hash
+my $ext=shift; &{$subhash{$ext}}(@_);
+
+I think there could be major problems with sizes. Parrot expects
+everything to happen on 4-byte boundaries, which it doesn't. It expects
+opcodes to be four bytes, and for there to be N arguments of 4 bytes each.
+IRL, we're going to have:
+
+  Opcode               1 or 2 bytes
+  (Types of operands)  1 or 2 bytes: 4 or 8 2-bit fields
+  Operands             Between 0 and 8 of these: each 1 or 2 bytes
+  (Store variable)     1 byte
+  (Branch offset)      1 or 2 bytes
+  (Text to print)      An encoded string (of unlimited length)
+
+Plus don't forget the extra byte at the beginning of each routine saying how
+many local variables it has. (Course, we could ignore that and always allow
+15.)
+
+######################################################################
+
+"In Planetfall there is a blacked-out room you can't see anything in. There's a
+lamp in the game, but it's located in a lab full of deadly radiation. You can
+enter the lab and take the lamp, but will die of radiation poisoning before
+you can make it back to the darkened room." If we manually turn off the
+radiation, or "pilfer" the lamp, what will we find in that room?
+
+vim: tw=78

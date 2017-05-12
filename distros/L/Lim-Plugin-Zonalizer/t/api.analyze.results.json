@@ -1,0 +1,19 @@
+{
+    "ReadAnalyze2": {
+        "created" : 1,
+        "updated" : 2,
+        "summary" : {
+            "notice" : null,
+            "warning" : null,
+            "critical" : null,
+            "error" : null
+        },
+        "id" : "test-id-1",
+        "status" : "reserved",
+        "progress" : 0,
+        "url" : "/zonalizer/1/analysis/test-id-1",
+        "fqdn" : "test1.com.",
+        "ipv4" : 1,
+        "ipv6" : 1
+    }
+}

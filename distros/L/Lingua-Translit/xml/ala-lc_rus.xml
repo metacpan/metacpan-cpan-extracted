@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+
+<!--
+
+  Transliteration definitions for ALA-LC Romanization table for Russian.
+  This table used by the library of Congress and American Library
+  Assosiantion.
+
+  Reference table: http://www.loc.gov/catdir/cpso/roman.html
+
+  Dmitry Smal <mialinx@gmail.com>
+
+  Copyright 2010 (C) Rusar Publishing
+
+-->
+
+
+<translit>
+
+    <name>ALA-LC RUS</name>
+    <desc>ALA-LC:1997, Cyrillic to Latin, Russian</desc>
+    <reverse>false</reverse>
+
+    <rules>
+
+        <rule>
+            <from>А</from>
+            <to>A</to>
+        </rule>
+
+        <rule>
+            <from>Б</from>
+            <to>B</to>
+        </rule>
+
+        <rule>
+            <from>В</from>
+            <to>V</to>
+        </rule>
+
+        <rule>
+            <from>Г</from>
+            <to>G</to>
+        </rule>
+
+        <rule>
+            <from>Д</from>
+            <to>D</to>
+        </rule>
+
+        <rule>
+            <from>Е</from>
+            <to>E</to>
+        </rule>
+
+        <rule>
+            <from>Ё</from>
+            <to>&#x00CB;</to>       <!-- latin capital letter e with diaeresis -->
+        </rule>
+
+        <rule>
+            <from>Ж</from>
+            <to>Zh</to>
+        </rule>
+
+        <rule>
+            <from>З</from>
+            <to>Z</to>
+        </rule>
+
+        <rule>
+            <from>И</from>
+            <to>I</to>
+        </rule>
+
+        <rule>
+            <from>&#x0406;</from>   <!-- belorussian i -->
+            <to>&#x012A;</to>       <!-- latin capital letter i with macron -->
+        </rule>
+
+        <rule>
+            <from>Й</from>
+            <to>&#x012C;</to>       <!-- latin capital letter i with breve -->
+        </rule>
+
+        <rule>
+            <from>К</from>
+            <to>K</to>
+        </rule>
+
+        <rule>
+            <from>Л</from>
+            <to>L</to>
+        </rule>
+
+        <rule>
+            <from>М</from>
+            <to>M</to>
+        </rule>
+
+        <rule>
+            <from>Н</from>
+            <to>N</to>
+        </rule>
+
+        <rule>
+            <from>О</from>
+            <to>O</to>
+        </rule>
+
+        <rule>
+            <from>П</from>
+            <to>P</to>
+        </rule>
+
+        <rule>
+            <from>Р</from>
+            <to>R</to>
+        </rule>
+
+        <rule>
+            <from>С</from>
+            <to>S</to>
+        </rule>
+
+        <rule>
+            <from>Т</from>
+            <to>T</to>
+        </rule>
+
+        <rule>
+            <from>У</from>
+            <to>U</to>
+        </rule>
+
+        <rule>
+            <from>Ф</from>
+            <to>F</to>
+        </rule>
+
+        <rule>
+            <from>Х</from>
+            <to>Kh</to>
+        </rule>
+
+        <rule>
+            <from>Ц</from>
+            <to>TS</to>             <!-- need ligature -->
+        </rule>
+
+        <rule>
+            <from>Ч</from>
+            <to>Ch</to>
+        </rule>
+
+        <rule>
+            <from>Ч</from>
+            <to>Ch</to>
+        </rule>
+
+        <rule>
+            <from>Ш</from>
+            <to>Sh</to>
+        </rule>
+
+        <rule>
+            <from>Щ</from>
+            <to>Shch</to>
+        </rule>
+
+        <rule>
+            <from>Ъ</from>
+            <to></to>
+            <context>
+                <before>\b</before> <!-- letter is disregarded in romanization when found at the end of a word -->
+            </context>
+        </rule>
+
+        <rule>
+            <from>Ъ</from>
+            <to>&#x2033;</to>       <!-- double prime -->
+        </rule>
+
+        <rule>
+            <from>Ы</from>
+            <to>Y</to>
+        </rule>
+
+        <rule>
+            <from>Ь</from>
+            <to>&#x2032;</to>       <!-- prime -->
+        </rule>
+
+        <rule>
+            <from>&#x0462;</from>   <!-- cyrillic capital yat -->
+            <to>IE</to>             <!-- need ligature -->
+        </rule>
+
+        <rule>
+            <from>Э</from>
+            <to>&#x0116;</to>       <!-- latin capital letter e with dot above -->
+        </rule>
+
+        <rule>
+            <from>Ю</from>
+            <to>IU</to>             <!-- need ligature -->
+        </rule>
+
+        <rule>
+            <from>Я</from>
+            <to>IA</to>             <!-- need ligature -->
+        </rule>
+
+        <rule>
+            <from>&#x0466;</from>   <!-- cyrillic capital letter little yus -->
+            <to>&#x0118;</to>       <!-- latin capital letter e with ogonek -->
+        </rule>
+
+        <rule>
+            <from>&#x04E8;</from>   <!-- cyrillic capital letter barred o -->
+            <to>&#x1E1E;</to>       <!-- latin capital letter f with dot above -->
+        </rule>
+
+        <rule>
+            <from>&#x0474;</from>   <!-- cyrillic capital letter izhitsa -->
+            <to>&#x1E8E;</to>       <!-- latin capital letter y with dot above -->
+        </rule>
+
+        <rule>
+            <from>а</from>
+            <to>a</to>
+        </rule>
+
+        <rule>
+            <from>б</from>
+            <to>b</to>
+        </rule>
+
+        <rule>
+            <from>в</from>
+            <to>v</to>
+        </rule>
+
+        <rule>
+            <from>г</from>
+            <to>g</to>
+        </rule>
+
+        <rule>
+            <from>д</from>
+            <to>d</to>
+        </rule>
+
+        <rule>
+            <from>е</from>
+            <to>e</to>
+        </rule>
+
+        <rule>
+            <from>ё</from>
+            <to>&#x00EB;</to>       <!-- latin small letter e with diaeresis -->
+        </rule>
+
+        <rule>
+            <from>ж</from>
+            <to>zh</to>
+        </rule>
+
+        <rule>
+            <from>з</from>
+            <to>z</to>
+        </rule>
+
+        <rule>
+            <from>и</from>
+            <to>i</to>
+        </rule>
+
+        <rule>
+            <from>&#x0456;</from>   <!-- belorussian i -->
+            <to>&#x012B;</to>       <!-- latin small letter i with macron -->
+        </rule>
+
+        <rule>
+            <from>й</from>
+            <to>&#x012D;</to>       <!-- latin small letter i with breve -->
+        </rule>
+
+        <rule>
+            <from>к</from>
+            <to>k</to>
+        </rule>
+
+        <rule>
+            <from>л</from>
+            <to>l</to>
+        </rule>
+
+        <rule>
+            <from>м</from>
+            <to>m</to>
+        </rule>
+
+        <rule>
+            <from>н</from>
+            <to>n</to>
+        </rule>
+
+        <rule>
+            <from>о</from>
+            <to>o</to>
+        </rule>
+
+        <rule>
+            <from>п</from>
+            <to>p</to>
+        </rule>
+
+        <rule>
+            <from>р</from>
+            <to>r</to>
+        </rule>
+
+        <rule>
+            <from>с</from>
+            <to>s</to>
+        </rule>
+
+        <rule>
+            <from>т</from>
+            <to>t</to>
+        </rule>
+
+        <rule>
+            <from>у</from>
+            <to>u</to>
+        </rule>
+
+        <rule>
+            <from>ф</from>
+            <to>f</to>
+        </rule>
+
+        <rule>
+            <from>х</from>
+            <to>kh</to>
+        </rule>
+
+        <rule>
+            <from>ц</from>
+            <to>ts</to>             <!-- need ligature -->
+        </rule>
+
+        <rule>
+            <from>ч</from>
+            <to>ch</to>
+        </rule>
+
+        <rule>
+            <from>ш</from>
+            <to>sh</to>
+        </rule>
+
+        <rule>
+            <from>щ</from>
+            <to>shch</to>
+        </rule>
+
+        <rule>
+            <from>ъ</from>
+            <to></to>
+            <context>
+                <before>\b</before> <!-- letter is disregarded in romanization when found at the end of a word -->
+            </context>
+        </rule>
+
+        <rule>
+            <from>ъ</from>
+            <to>&#x2033;</to>       <!-- double prime -->
+        </rule>
+
+        <rule>
+            <from>ы</from>
+            <to>y</to>
+        </rule>
+
+        <rule>
+            <from>ь</from>
+            <to>&#x2032;</to>       <!-- prime -->
+        </rule>
+
+        <rule>
+            <from>&#x0463;</from>   <!-- cyrillic small yat -->
+            <to>ie</to>             <!-- need ligature -->
+        </rule>
+
+        <rule>
+            <from>э</from>
+            <to>&#x0117;</to>       <!-- latin smal letter e with dot above -->
+        </rule>
+
+        <rule>
+            <from>ю</from>
+            <to>iu</to>             <!-- need ligature -->
+        </rule>
+
+        <rule>
+            <from>я</from>
+            <to>ia</to>             <!-- need ligature -->
+        </rule>
+
+        <rule>
+            <from>&#x0467;</from>   <!-- cyrillic small letter little yus -->
+            <to>&#x0119;</to>       <!-- latin small letter e with ogonek -->
+        </rule>
+
+        <rule>
+            <from>&#x04E9;</from>   <!-- cyrillic small letter barred o -->
+            <to>&#x1E1F;</to>       <!-- latin small letter f with dot above -->
+        </rule>
+
+        <rule>
+            <from>&#x0475;</from>   <!-- cyrillic small letter izhitsa -->
+            <to>&#x1E8F;</to>       <!-- latin small letter y with dot above -->
+        </rule>
+
+    </rules>
+
+</translit>
+
+<!--
+  vim: sts=4 sw=4 ai et
+-->

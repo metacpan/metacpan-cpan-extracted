@@ -1,0 +1,170 @@
+Lemonldap/Portal/Authntsso version 0.05
+=======================================
+
+NAME
+
+Lemonldap::Portal::Authntsso - Perl extension for the Lemonldap SSO system
+
+SYNOPSIS
+
+  use Lemonldap::Portal::Authntsso;
+  sub my_method {
+     my $self = shift;
+     my $user = $self->{'user'};
+     $user.="-cp" if  $user !~ /-cp$/;
+     $self->{'user'} = $user;
+      return ;
+             }
+
+ my $message = '';
+ my %params =Vars;
+ my $stack_user=Lemonldap::Portal::Authntsso->new('formateUser' => \&my_method);
+ my $urlc;
+ my $urldc; 
+ $retour=$stack_user->process(param =>  \%params,           
+                server          => $ReverseProxyConfig::ldap_serveur,
+                port            => $ReverseProxyConfig::ldap_port,
+                DnManager       => $ReverseProxyConfig::ldap_admin_dn,
+                passwordManager => $ReverseProxyConfig::ldap_admin_pd,
+                branch => $ReverseProxyConfig::ldap_branch_people,
+		BDC     => $ReverseProxyConfig::BDC,
+		BDC_secours     => $ReverseProxyConfig::BDC_secours,
+	        ntdomain     => $ReverseProxyConfig::ntdomain,
+			  
+                             );
+    if ($retour)   { 
+      	$message=$retour->message;
+	$erreur=$retour->error;
+                         }
+
+
+DESCRIPTION
+
+Lemonldap is a SSO system under GPL. 
+The authentification phase need to display a form with user / password .
+Authntsso.pm  manage all the cycle of authentification against ntdomain :
+
+ step 0  : setting configuration
+ step 1  : manage the source of request
+ step 2  : manage timeout 
+ step 3  : control the input form of user and password
+ step 4  : formate the userid if needing
+ step 5  : build the filter for  the  search
+ step 6  : build subtree for the search ldap 
+ step 7  : make socket upon ldap server
+ step 8  : bind operation
+ step 9  : make search
+ step 10 : confection of %session from ldap infos   
+ step 11 : unbind 
+ step 12 : validing user's  credentials  against ntdomain 
+
+Any step can bee overload for include your custom method.
+
+ standards errors messages :
+
+ 1 => 'Your connection has expired; You must to be authentified once again',
+ 2 => 'User and password fields must be filled',
+ 3 => 'Wrong directory manager account or password' ,
+ 4  => 'not found in directory',
+ 5  => 'wrong credentials' ,
+	      
+ warning the value 9 for error message is returned then the form is empty is't not an real error , perhaps it's the initial request.
+
+METHODS
+ 
+ Standard->new();
+ 
+my $stack_user= Lemonldap::Portal::Authntsso->new('standard_method' => \&my_method);
+ 
+ process();
+
+ $retour=$stack_user->process(param =>  \%params,           
+                server          => 'ldap_serveur',
+                port            => 'ldap_port',
+                DnManager       => 'ldap_admin_dn',
+                passwordManager => 'ldap_admin_pd',
+                branch => 'ldap_branch_people'  
+		BDC     => $ReverseProxyConfig::BDC,
+		BDC_secours     => $ReverseProxyConfig::BDC_secours,
+	        ntdomain     => $ReverseProxyConfig::ntdomain,
+                             );
+  You can keep DnManager and passwordManager in undef state in order to  provide anonymous bind.
+   Don't pass them like parameter for this. 
+ %params is  the hash initialized whith  CGI params 
+  Lemonldap provide several  parameters like :
+  identifiant , secret  (user and password) 
+  urlc : url of  the original request .
+ 
+ message() ;
+ 
+  return the text of error 
+
+ error() ;
+ 
+  return the  number of error 
+
+ sub infoSession ()
+
+  return a reference of hash of session 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Authen::Smb
+ 
+SEE ALSO
+
+Lemonldap(3), Lemonldap::Handler::Intrusion(3), Lemonldap::Standard.
+
+http://lemonldap.sourceforge.net/
+
+"Writing Apache Modules with Perl and C" by Lincoln Stein E<amp> Doug
+MacEachern - O'REILLY
+
+ See the examples directory
+
+AUTHORS
+
+Eric German, E<lt>germanlinux@yahoo.frE<gt>
+
+Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 by Eric German E<amp> Xavier Guimard
+
+Lemonldap originaly written by Eric german who decided to publish him in 2003
+under the terms of the GNU General Public License version 2.
+
+
+This package is under the GNU General Public License, Version 2.
+
+The primary copyright holder is Eric German.
+
+Portions are copyrighted under the same license as Perl itself.
+
+Portions are copyrighted by Doug MacEachern and Lincoln Stein.
+This library is under the GNU General Public License, Version 2.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 dated June, 1991.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  A copy of the GNU General Public License is available in the source tree;
+  if not, write to the Free Software Foundation, Inc.,
+  59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+

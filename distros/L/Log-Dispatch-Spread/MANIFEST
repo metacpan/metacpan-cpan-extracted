@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Log-Dispatch-Spread.t
+lib/Log/Dispatch/Spread.pm

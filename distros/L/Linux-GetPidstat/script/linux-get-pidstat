@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long qw/:config posix_default no_ignore_case bundling auto_help/;
+use Pod::Usage;
+use Linux::GetPidstat;
+
+# check progs
+my @progs = qw(pidstat pstree);
+for my $prog (@progs) {
+    `which $prog 2> /dev/null` or pod2usage(2);
+}
+
+# get options
+my %opt = (
+    include_child   => 1,
+    max_child_limit => 30,
+    interval        => 1,
+    count           => 60,
+    dry_run         => 1,
+);
+GetOptions(
+    \%opt, qw/
+      pid_dir|p=s
+      res_file|r=s
+      interval|i=i
+      count|c=i
+      dry_run!
+      datetime|t=s
+      include_child!
+      max_child_limit|l=i
+      mackerel_api_key|m=s
+      mackerel_service_name|s=s
+      /
+) or pod2usage(2);
+
+my $stat = Linux::GetPidstat->new;
+$stat->run(%opt);
+
+__END__
+
+=head1 NAME
+
+linux-get-pidstat - cli tool for Linux::GetPidstat
+
+=head1 SYNOPSIS
+
+    linux-get-pidstat - command description
+      Usage: command [options]
+      Options:
+        --pid_dir               A directory path for pid files
+        --res_file              A file path to be stored results
+        --interval              Interval second to be given as a pidstat argument (default:1)
+        --count                 Count number to be given as a pidstat argument (default:60)
+        --dry_run               Dry run mode. not run the side-effects operation (default:1) (--no-dry_run is also supported)
+        --datetime              Datetime (ex. '2016-06-10 00:00:00') to be recorded
+        --include_child         Flag to be enabled to include child process metrics (default:1) (--no-include_child is also suppoted)
+        --max_child_limit       Number to be used for limiting pidstat multi processes (default:30) (skip this limit if 0 is specified)
+        --mackerel_api_key      An api key to be used for posting to mackerel
+        --mackerel_service_name An mackerel service name
+      Requirement Programs: pidstat and pstree commands

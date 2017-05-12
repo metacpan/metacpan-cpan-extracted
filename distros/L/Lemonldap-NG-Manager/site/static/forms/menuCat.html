@@ -1,0 +1,41 @@
+<script type="text/ng-template" id="cat_render.html">
+  <p ng-class="{'cat-tree-category':cat.type=='menuCat'}">{{cat.title}}</p>
+  <ul class="cat-tree"><li ng-repeat="cat in cat.nodes track by cat.id" ng-include="'cat_render.html'"></li></ul>
+</script>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title" trspan="menuCategory"></h3>
+  </div>
+  <table class="table table-striped">
+    <tr>
+      <th><span trspan="categoryName"></span></th>
+      <td><input id="catTitle" aria-describedby="catTitleL" class="form-control" ng-model="currentNode.title"/></td> 
+    </tr>
+  </table>
+  <div class="panel-body">
+    <h4 trspan="appsInThisCat"></h4>
+    <ul class="cat-tree">
+      <li ng-repeat="cat in currentNode.nodes track by cat.id" ng-include="'cat_render.html'"></li>
+    </ul>
+  </div>
+</div>
+
+<script type="text/menu">
+[{
+  "title": "up",
+  "icon": "arrow-up"
+},{
+  "title": "down",
+  "icon": "arrow-down"
+},{
+  "title": "deleteEntry",
+  "icon": "minus-sign"
+},{
+  "title": "newCat",
+  "icon": "plus-sign"
+},{
+  "title": "newApp",
+  "icon": "plus-sign"
+}]
+</script>

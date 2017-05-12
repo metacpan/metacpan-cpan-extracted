@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Lucene/Search/Highlight.pm
+LuceneSearchHighlight.xs
+xs/QueryScorer.xs
+xs/Highlighter.xs
+xs/SimpleHTMLFormatter.xs
+t/00-load.t
+typemap
+Av_CharPtrPtr.cpp
+Av_CharPtrPtr.h

@@ -1,0 +1,24 @@
+Revision history for Perl extension Lazy::Bool.
+
+0.01  Wed Jan 23 15:29:43 2013
+	- original version; created by h2xs 1.23 with options
+		-XAn Lazy::Bool
+
+0.02  Wed Jan 23 19:29:43 2013
+	- improve documentation and meta.yml
+
+0.03  Wed Jan 23 22:29:43 2013
+	- turn & I shortcut evaluated
+	- add Lazy::Bool::Cached
+	- move to Dist::Zilla
+	
+0.04   Wed Jan 23 23:29:43 2013 
+	- Improve documentation, readme, etc
+	
+0.05   Thu Jan 24 20:29:43 2013 
+	- add helper lzb and lzbc to create instances (exported)
+	- Improve documentation, readme, etc	
+	
+0.06   Sat Jan 26 20:29:43 2013 
+	- small change: use base instead use parent, to be compatible with perl 5.00405
+	

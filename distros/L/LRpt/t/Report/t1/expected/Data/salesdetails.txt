@@ -1,0 +1,2 @@
+sonum	qty_ordered	qty_shipped	title_id	date_shipped
+11	10	10	MC2222	2001-12-20

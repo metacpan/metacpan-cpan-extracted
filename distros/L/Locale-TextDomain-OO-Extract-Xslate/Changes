@@ -1,0 +1,7 @@
+
+0.02      2017-01-16 22:31:32+01:00 Europe/Berlin
+	- Allow registration of custom translation methods (kgoess)
+	- Allow extraction of texts to be translated via filters (kgoess)
+
+0.01      2015-11-08 20:35:03+01:00 Europe/Berlin
+	- Initial Release

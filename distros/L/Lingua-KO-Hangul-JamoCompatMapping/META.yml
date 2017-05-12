@@ -1,0 +1,22 @@
+---
+abstract: 'provide a function that maps Hangul Jamo into Hangul Compatibility code'
+author:
+  - 'Geunyoung Park <gypark@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-KO-Hangul-JamoCompatMapping
+requires:
+  Exporter: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/gypark/Lingua-KO-Hangul-JamoCompatMapping.git
+version: 0.004

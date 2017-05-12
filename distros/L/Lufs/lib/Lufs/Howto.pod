@@ -1,0 +1,160 @@
+=head1 NAME
+
+Lufs::Howto - howto write a module for perlfs
+
+=head1 DESCRIPTION
+
+This documentation contains some basic knowledge necessary for
+writing modules for B<perlfs>. B<perlfs> is a module for Lufs
+(Linux Userland FileSystem) L<http://lufs.sourceforge.net/> which in turn loads
+perl modules as Lufs modules. The B<perlfs> module and some example perl modules 
+that implement a filesystem can be found in the Lufs package on CPAN.
+
+The concept is very simple, you just write a module implementing some
+basic filesystem operations (see L</METHODS> below) and B<perlfs> takes care of the rest.
+
+=head2 Mounting
+
+Once you wrote a module implementing a filesystem, say Foo::Bar, you can mount it with a command like this:
+
+	lufsmount -c 1 perlfs://Foo.Bar /mnt/foobar
+
+Lufs normally uses an URL scheme to encode the filesystem that is to be mounted, but 
+B<perlfs> employs what normally would be the hostname to encode the module that is to be used. In this scheme the dot '.' is used as the namespace separator instead of '::'.
+
+The "port" and "root" parts of the URL can be used as configuration arguments.
+You can supply other arguments to your module in two ways, you can supply them as mount options on the commandline, or put them in F</etc/lufsd.conf>.
+The commandline mount options work like this:
+
+	lufsmount -c 1 -o arg1=value1,arg2=value2 perlfs://Foo.Bar /mnt/foobar
+
+To specify options in F<lufsd.conf> the names needs to start with C<PERLFS::>.
+Also it is good practice to prefix all names of options in F<lufsd.conf> with the name of your module to avoid conflicts with other perl modules.
+
+Both commandline options and options from F<lufsd.conf> are supplied to the C<init()> method.
+
+ TODO something bout automount stuff
+
+=head1 METHODS
+
+ FIXME which methods are mandatory ?
+
+All methods (except for C<init()>) return C<true> on success and C<false> on failure. Methods that should result in other data always get a reference to a data structure to store this data.
+
+When a method gets a file- or a directory-name these names are always relative to the mount point.
+
+=over 4
+
+=item C<init($self, \%options)>
+
+This method is used instead of a constructor, C<$self> is an empty hash blessed into your class.
+
+The hash C<%options> contains both mount options supplied on the command line and _all_ options from L</etc/lufsd.conf> that start with C<PERLFS::>. This hash contains a key C<host> with your module name. Also this hash can contain the keys C<port> and C<root> which are the remaining parts of the URL that was "mounted".
+
+=item C<mount($self)>
+
+Mount the "filesystem".
+
+=item C<umount($self)>
+
+Umount the "filesystem".
+
+=item C<stat($self, $node, \%attr)>
+
+This method should put information about a file or directory in the hash C<%attr>.
+C<perldoc -f stat> lists the keys with a nice verbose explanation.
+The keys should be prefixed with 'f_'.
+
+ FIXME a verbose explanation of the keys here
+
+ See also FIXME man page bout stat
+
+=item C<read($self, $file, $offset, $count, $buffer)>
+
+This method should put C<$count> number of bytes at offset C<$offset> from C<$file>
+into C<$buffer>.
+
+ FIXME is $buffer a scalar or a scalar ref ?
+
+=item C<write($self, $file, $offset, $count, $buffer)>
+
+Should write the C<$count> number of bytes form C<$buffer> to C<$file> at offset
+C<$offset>.
+
+=item C<mkdir($self, $dir, $mode)>
+
+Create a new dir.
+
+C<$mode> is the octal bitmask for the wanted permissions.
+
+=item C<readdir($self, $dir, \@list)>
+
+Should store a list of files in the array C<@list> which is
+referenced by the third argument.
+
+Make sure to remove C<.> and C<..> from the list when 
+using output from C<CORE::readdir>.
+
+=item C<rmdir($self, $dir)>
+
+Remove a dir.
+
+=item C<create($self, $file, $mode)>
+
+Create a new file.
+
+C<$mode> is the octal bitmask for the wanted permissions.
+
+=item C<unlink($self, $file)>
+
+Remove a file.
+
+=item C<rename($self, $node1, $node2)>
+
+ FIXME can this be done for both files and dirs ?
+
+=item C<open($self, $file, $mode)>
+
+This should just return true or false. All filehandle bookkeepping should be done internally.
+You can get the constants for working with C<$mode> with C<use Fcntl>.
+Example:
+
+   use Fcntl;
+   if (($mode & O_WRONLY) == O_WRONLY) { q{just for writing} }
+
+=item C<release($self, $file)>
+
+Close a file.
+
+=item C<readlink($self, $file, $buffer)>
+
+ FIXME is $buffer a scalar or a scalar ref ?
+
+=item C<link($self, $file1, $file2)>
+
+Hard links are not allowed to directories.
+
+=item C<symlink($self, $node1, $node2)>
+
+Symlinks can reference both files and directories.
+
+=item C<setattr($self, $node, \%attr)>
+
+This module is the opposite of C<stat()>, it should set the properties in C<%attr> for C<$node>.
+
+=item C<touch($self, $file)>
+
+ FIXME I suppose dirs can't be touched (?)
+
+=back
+
+=head1 AUTHOR
+
+This document was written by Jaap Karssenberg E<lt>pardus@cpan.orgE<gt>.
+You are free to copy and modify it as you see fit.
+
+The Lufs perl package is maintained by Raoul Zwart E<lt>rlzwart@cpan.orgE<gt>.
+
+=head1 SEE ALSO
+
+L<Lufs>, L<http://lufs.sourceforge.net/>

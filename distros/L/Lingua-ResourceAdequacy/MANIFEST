@@ -1,0 +1,17 @@
+AUTHOR
+Build.PL
+Changes
+examples/example-en.pl
+examples/example-fr.pl
+lib/Lingua/ResourceAdequacy.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/0-creation.t
+t/1-creation.t
+t/2-computestats.t
+t/3-computestats.t
+t/4-adequacymeasures.t
+t/pod-coverage.t
+t/pod.t

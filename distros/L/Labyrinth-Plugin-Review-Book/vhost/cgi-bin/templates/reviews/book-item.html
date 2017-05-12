@@ -1,0 +1,30 @@
+<h2>[% data.typename %]</h2>
+
+<p>Static Link: <a href="[% docroot %]/reviews/[% data.reviewid %]">[% docroot %]/reviews/[% data.reviewid %]</a></p>
+
+<div class="boxer">
+<div class="blocker">
+  <div class="spacer">&nbsp;</div>
+
+    [% IF data.image_link %]
+    <a href="[% data.itemlink %]" title="product page for [% data.title %]"><img src="[% webpath %]/[% data.image_link %]" alt="[% data.title %]" class="picture" align="right" /></a>
+    [% END %]
+
+    <table class="review">
+    <tr><th>Title:</th><td><a href="[% data.itemlink %]" title="retailers page for [% data.title %]">[% data.title %]</a></td></tr>
+    <tr><th>Brand:</th><td>[% data.brand %]</td></tr>
+    <tr><th>Product Code:</th><td>[% data.itemcode %]</td></tr>
+    <tr><th>Retailer:</th><td><a href='[% data.retailerlink %]' title="link to Publishers website">[% data.retailer %]</a></td></tr>
+    <tr><th>Reviewer:</th><td><a href="/user/[% data.userid %]" title="User Profile for [% data.realname %]">[% data.realname %]</a></td></tr>
+
+    [% IF data.additional %]
+    <tr><th>Additional:</th><td>[% data.additional %]</td></tr>
+    [% END %]
+
+    </table>
+
+    [% data.body %]
+
+  <div class="spacer">&nbsp;</div>
+</div>
+</div>

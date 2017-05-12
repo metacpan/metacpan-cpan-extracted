@@ -1,0 +1,35 @@
+Revision history for Perl extension Locale::Nationality::en.
+
+1.04  2016-08-14T11:33:00
+	- Stop using Test::Stream. Use Test::More shipped in the Test::Simple distro.
+		See RT#116937. Thanx to Chad Granum.
+	- Update version #s in pre-reqs.
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Update .gitignore and MANIFEST.SKIP.
+	- Change licence from Artistic to Perl.
+	- Move Test::Pod and Test::Simple to TEST_REQUIRES within Makefile.PL.
+
+1.03  2014-11-25T08:37:00
+	- Fix quoting of country names which split names with internal spaces.
+		See RT#109597. Many thanx to Nicolas Mendonza for the report.
+	- Add github repo https://github.com/ronsavage/Locale-Nationality-en.
+	- Remove Build.PL.
+	- Move t/pod.t to xt/author/.
+	- Switch from Test::More to Test::Stream.
+	- Add .gitignore to MANIFEST.SKIP.
+	- Update docs.
+
+1.02  2014-08-08T13:51:00
+	- Rename CHANGES to Changes, as per CPAN::Changes::Spec.
+	- Fix typo in t/test.t which produced test errors and hence fails.
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+
+1.01  2010-12-05T10:24:00
+	- Set required version of Test::Pod to 1.44 so L<text|url> is acceptable.
+		Thanx to CPAN testers.
+	- Set required version of Test::More to 0.96.
+
+1.00  2010-04-25T17:51:00
+	- Original version

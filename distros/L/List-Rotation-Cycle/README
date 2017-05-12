@@ -1,0 +1,47 @@
+$Id: README,v 1.4 2005/05/19 10:04:56 pelagic Exp pelagic $
+
+You can install this module in the usual Perl way:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	
+The documentation is in the module file.  Once you install
+the file, you can read it with perldoc:
+
+	perldoc List::Rotation::Cycle
+	
+If you want to read it before you install it, you can use
+perldoc directly on the module file:
+
+	perldoc Cycle.pm
+	
+You can unistall this module by using something like this:
+<code>
+#!/usr/local/bin/perl -w
+use strict;
+use ExtUtils::Packlist;
+use ExtUtils::Installed;
+
+$ARGV[0] or die "Usage: $0 Module::Name\n";
+
+my $mod = $ARGV[0]; 
+
+my $inst = ExtUtils::Installed->new();
+
+    foreach my $item (sort($inst->files($mod))) {
+             print "removing $item\n";
+             unlink $item;
+          }
+
+     my $packfile = $inst->packlist($mod)->packlist_file();
+          print "removing $packfile\n";
+          unlink $packfile;
+</code>
+
+
+Share and Enjoy, 
+
+Imre Saling, pelagic@cpan.org
+

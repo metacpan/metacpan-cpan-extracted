@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+MacJapanese.pm
+MacJapanese.xs
+addition.map
+japanese.map
+mkheader
+t/argu.t
+t/gaiji.t
+t/test.t

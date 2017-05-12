@@ -1,0 +1,18 @@
+2007-01-28	vassilii
+
+	* t/: bork.xml empty.xml test.t:
+
+	ship tests
+
+	* lib/Lingua/Verbnet.pm:
+
+	- in the modularized version making %stats package-global makes sense no more
+	- thus, shove VNCLASS handler as a closure into new as well
+	- for verbosity in package scoping of the handlers a comment suffices
+	- use Carp
+	- perlbot(1) autoloading example is obsolete, change style
+	  Updated verbnet WWW reference from a dead page to a live one.
+
+	* README:
+
+	Updated verbnet WWW reference from a dead page to a live one.

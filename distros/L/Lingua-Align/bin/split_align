@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# split_align .... split GIZA++/Moses word alignment into one file per document
+#
+# requires word alignment file (Giza.A3 file OR Moses word align file) and 
+#          aligned sentence ID file (like the ones created by opus2moses.pl)
+#
+#
+
+use File::Basename;
+
+my $idfile=shift(@ARGV);                    # sentence ID file
+my $filebase=shift(@ARGV) || 'wordalign';   # file base for all output files
+
+
+my $giza;
+
+
+open F,"<$idfile" || die "cannot open sentence ID file $idfile\n";
+
+
+my $srcfile;
+my $trgfile;
+my $base;
+
+while (<F>){
+#    chomp;
+    if (/^\#+\s+(.*)\t(.*)$/){
+	($srcfile,$trgfile)=($1,$2);
+	$base=basename($srcfile);      # use only source file name as base!
+	$base=~s/\.xml(\.gz)?$//;
+	# open new files (old ones close automatically)
+	print STDERR "save alignments for $srcfile <-> $trgfile\n";
+	open A,">$filebase.$base.alg" || 
+	    die "cannot open align file $filebase.$base.alg for writing!\n";
+	open I,">$filebase.$base.ids" || 
+	    die "cannot open id file $filebase.$base.ids for writing!\n";
+	next;
+    }
+#    my ($srcid,$trgid) = split(/\t/);
+    print I $_;
+
+    my $line = <>;
+    # first line decides if it is in giza format or moses format
+    if (not defined $giza){
+	if ($line=~/^\#\s+Sentence pair/){
+	    $giza=1;
+	}
+	else{$giza=0;}
+    }
+    print A $line;
+    if ($giza){
+	$line = <>;        # read 2 more lines that actually contain
+	print A $line;     # the alignment
+	$line = <>;
+	print A $line;
+    }
+}

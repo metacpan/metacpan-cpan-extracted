@@ -1,0 +1,129 @@
+#!/usr/bin/perl
+require Language::MzScheme;
+
+=head1 NAME
+
+mzperl - Embed Perl in MzScheme
+
+=head1 SYNOPSIS
+
+    #!/usr/local/bin/mzperl
+    (perl-use 'Config)
+    (printf "<MzScheme> I'm running under Perl, version ~A.\n"
+            (perl-eval "$Config{version}"))
+    ;__PERL__;
+    printf "<Perl> I'm running under MzScheme, version %s.\n",
+            mz_eval('(version)');
+
+=head1 DESCRIPTION
+
+Is it Scheme? Is it Perl?  It's neither, it's both.  It's MzPerl!
+
+MzPerl is a "new language" that looks like MzScheme.  As an added bonus,
+you'll get access to the full Perl runtime via the MzPerl API.
+
+The F<mzperl> script will normally be installed in the same directory as the
+C<perl> binary on your system, for example as F</usr/local/bin/mzperl>. 
+
+=cut
+
+Language::MzScheme->new->eval(do {
+    my $file = (@ARGV ? shift(@ARGV) : '-');
+
+    local *CODE;
+    open CODE, $file or die qq(Can't open mzperl script "$file": $!\n);
+    my $code = do { local $/; <CODE> };
+    close CODE;
+
+    my $escape = sub {
+        my $string = shift;
+        $string =~ s/(?=["\\])/\\/g;
+        return $string;
+    };
+
+    $code =~ s{^\s*#!.*}{};
+    $code =~ s{\;\s*__PERL__\s*;(.*?)(?:;\s*__END__\s*;|\z)}{
+        '(perl-eval "'.$escape->($1).'")'
+    }egs;
+    $code;
+});
+
+=head1 FUNCTIONS
+
+The MzPerl API is just a set of MzScheme primitives that you can use to
+access the Perl runtime.  They are the same set of primitives defined in
+all C<Language::MzScheme-E<gt>new> instances:
+
+=head2 perl-eval I<code>
+
+Eval a string or symbol in Perl and return the result.  There are 11
+variants of this call, just like any other functions exported from Perl:
+
+    ; list context calls
+    (perl-eval "string")    ; if there is one return value, return it
+                            ; as a scalar, otherwise returns a list
+    (perl-eval@ "string")   ; returns a list
+    (perl-eval^ "string")   ; returns a vector
+    (perl-eval% "string")   ; returns a hash-table
+    (perl-eval& "string")   ; returns an association-list
+
+    ; scalar context calls
+    (perl-eval$ "string")   ; returns a scalar of an appropriate type
+    (perl-eval~ "string")   ; returns a string
+    (perl-eval+ "string")   ; returns a number
+    (perl-eval. "string")   ; returns the first character
+    (perl-eval? "string")   ; returns a boolean (#t or #f)
+
+    ; void context calls
+    (perl-eval! "string")   ; always returns #<void>
+
+=head2 perl-use I<module> [ I<import-list> ]
+
+Loads a perl module, and optionally imports symbols from it, just
+like Perl's C<use> keyword.  Imported symbols are available in
+subsequent C<perl-eval> calls, as well as in scheme code as primitives.
+
+Fully-qualified names (C<Module::symbol>) are always available.
+
+=head2 perl-require I<module-or-filename>
+
+Loads a perl module or file, without importing any symbols.
+
+=head2 perl-do I<filename>
+
+Evaluates a perl file.  Also available in all 11 context forms like
+the C<perl-eval> above.
+
+=head2 ;__PERL__; ... ;__END__;
+
+The C<;__PERL__;> token begins a perl code region.  It ends on the next
+C<;__END__;> token, or until the end of file.
+
+=head1 WHY?
+
+Scheme has no CPAN.  Perl5 has no macros and no continuations.  So... :-)
+
+=head2 Continuations?  In Perl?
+
+Yes.  To wit:
+
+    #!/usr/local/bin/mzperl
+    (let* ((yin ((perl-eval "sub { print $/; @_ }")
+                 (call/cc (perl-eval "sub { @_ }"))))
+           (yang ((perl-eval "sub { print '*'; @_ }")
+                  (call/cc (perl-eval "sub { @_ }"))))) (yin yang))
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2004 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

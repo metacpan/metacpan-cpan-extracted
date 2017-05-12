@@ -1,0 +1,23 @@
+filetype plugin indent on
+
+0.06 2016-02-16T12:20:23Z
+    - enable to pass maxage=0 (murooka) https://github.com/hixi-hyi/p5-Log-LTSV-Instance/pull/6
+
+0.05 2015-12-03T03:25:46Z
+    - escape multiple (murooka) https://github.com/hixi-hyi/p5-Log-LTSV-Instance/pull/5
+
+0.04 2015-08-03T09:20:01Z
+    - fix default maxage (murooka) https://github.com/hixi-hyi/p5-Log-LTSV-Instance/pull/4
+
+0.03 2015-06-15T07:15:11Z
+    - escape tab and line feed (murooka) https://github.com/hixi-hyi/p5-Log-LTSV-Instance/pull/3
+
+0.02 2015-05-27T08:52:43Z
+
+    - support scalar value
+    - add link [ltsv.org] https://github.com/hixi-hyi/p5-Log-LTSV-Instance/issues/1
+
+0.01 2015-03-07T13:07:56Z
+
+    - original version
+

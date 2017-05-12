@@ -1,0 +1,36 @@
+---
+abstract: 'Log::Dispatch notification backend using Desktop::Notify'
+author:
+  - 'Christian Garbs <mitch@cgarbs.de>'
+build_requires:
+  Mock::Quick: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Dispatch-Desktop-Notify
+provides:
+  Log::Dispatch::Desktop::Notify:
+    file: lib/Log/Dispatch/Desktop/Notify.pm
+    version: v0.0.2
+requires:
+  Desktop::Notify: '0'
+  Log::Dispatch::Null: '0'
+  Log::Dispatch::Output: '0'
+  Try::Tiny: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mmitch/fritz/log-dispatch-desktop-notify
+  repository: git://github.com/mmitch/log-dispatch-desktop-notify.git
+version: v0.0.2
+x_serialization_backend: 'YAML::Tiny version 1.69'

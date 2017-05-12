@@ -1,0 +1,25 @@
+---
+abstract: 'generate the formatted stamp for logging'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Stamper
+provides:
+  Log::Stamper:
+    file: lib/Log/Stamper.pm
+    version: 0.031
+requires:
+  Carp: 0
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Log-Stamper
+version: 0.031

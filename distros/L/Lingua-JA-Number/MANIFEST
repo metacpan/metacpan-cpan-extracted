@@ -1,0 +1,9 @@
+LICENSE
+Changes
+Makefile.PL
+README
+lib/Lingua/JA/Number.pm
+t/01_ini.t
+t/02_samples.t
+eg/jptraining
+MANIFEST

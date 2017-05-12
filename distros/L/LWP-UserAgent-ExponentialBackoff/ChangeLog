@@ -1,0 +1,4 @@
+Revision history for Perl extension LWP::UserAgent::ExponentialBackoff
+
+2011-07-17  Michael Marrotte  marrotte@cpan.org
+	* Release 0.01 -- First public release.

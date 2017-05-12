@@ -1,0 +1,47 @@
+Revision history for Log-Any-DBI-Query
+
+0.07    2016-02-22 (PERLANCAR)
+
+	- Fix logging execute().
+
+
+0.06    2016-02-19 (PERLANCAR)
+
+	- Also log execute() in addition to prepare() because it contains
+	  the bind parameters.
+
+
+0.05    2016-02-11 (PERLANCAR)
+
+	- Remove development debugging log.
+
+
+0.04    2016-01-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add description of difference between this module and
+	  Log::Any::For::DBI.
+
+
+0.03    2016-01-23 (PERLANCAR)
+
+	- Also log queries from select*() methods.
+
+        - Add option to log result (via LOG_SQL_RESULT=1).
+
+        - Add option to turn off logging of queries (via LOG_SQL_QUERY=0).
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.02    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.01     2015-06-16 (PERLANCAR)
+
+         - First release.

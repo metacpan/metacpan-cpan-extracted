@@ -1,0 +1,113 @@
+/* Nifty Corners */
+
+.rtop,.rbottom{display:block}
+.rtop *,.rbottom *{display:block;height: 1px;overflow: hidden}
+.r1{margin: 0 5px}
+.r2{margin: 0 3px}
+.r3{margin: 0 2px}
+.r4{margin: 0 1px;height: 2px}
+
+.rs1{margin: 0 2px}
+.rs2{margin: 0 1px}
+
+
+/* From wiki.css */
+div.wiki-toc { 
+	#background-color: #cfd2e6; 
+	border: none; border-right:1pt solid #000000; border-bottom:1pt solid #000000; 
+	padding: 1pt;
+        margin: 4pt;
+}
+.wiki-toc ul { padding: 1em; } 
+.wiki-toc h4 { padding-left: 1em; padding-right: 1em; padding-top: 1em; }
+.wiki-toc .active { background: #c0cdf2; position: relative; }
+
+
+/* From trac.css */
+body { background: #eee; color: #000; margin: 10px; padding: 0; }
+body, th, td {
+ font: normal 13px Verdana,Arial,'Bitstream Vera Sans',Helvetica,sans-serif;
+}
+h1, h2, h3, h4 {
+ font-family: Arial,Verdana,'Bitstream Vera Sans',Helvetica,sans-serif;
+ font-weight: bold;
+ letter-spacing: -0.018em;
+ page-break-after: avoid;
+}
+h1 { font-size: 19px; margin: .15em 1em 0.5em 0 }
+h2 { font-size: 16px }
+
+
+
+
+
+
+
+
+
+h3 { font-size: 14px }
+hr { border: none;  border-top: 1px solid #ccb; margin: 2em 0 }
+address { font-style: normal }
+img { border: none }
+
+
+/* Link styles */
+:link, :visited {
+ color: #339;
+ border: none;
+}
+:link:hover, :visited:hover {
+ background-color: #fff;
+ text-decoration: underline;
+ color: #339;
+}
+
+#metanav :link, #metanav :visited, #metanav :link:hover, #metanav :visited:hover { background: #eee;  }
+
+
+/* Main navigation bar */
+#mainnav {
+ background: #339;
+ color: #fff;
+ margin: none;
+ border: none;
+}
+
+#mainnav :link, #mainnav :visited {
+ background: #339;
+ color: #fff;
+ border: none;
+ text-decoration: none;
+}
+
+#mainnav .active :link, #mainnav .active :visited {
+ background: #339;
+ color: #bbb;
+ border: none;
+ font-weight: normal;
+}
+
+#mainnav .active :link:hover, #mainnav .active :visited:hover {
+	border: none; }
+
+#mainnav :link:hover, #mainnav :visited:hover {
+ background: #339;
+ border: none;
+ text-decoration: underline;
+}
+
+#mainnav.nav ul { text-align: center; }
+.nav li.last { border: none; }
+.nav li { border-right: 1px solid #000; }
+
+#prefs { background: #c0cdf2; padding: 0; border: none; } 
+#prefs div, #prefs fieldset { padding: .8em; }
+
+
+/* For overriding roadmap.css */
+.milestone .info h2 em { color: #6698ff; }
+
+
+/* Overrides for browser.css */
+#dirlist td.change { color: #444; }
+

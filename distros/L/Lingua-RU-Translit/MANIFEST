@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Translit.pm
+Translit.xs
+mktables.c
+tables.h
+test.pl

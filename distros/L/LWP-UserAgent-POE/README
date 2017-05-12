@@ -1,0 +1,91 @@
+######################################################################
+    LWP::UserAgent::POE 0.05
+######################################################################
+
+NAME
+    LWP::UserAgent::POE - Drop-in LWP::UserAgent replacement in POE
+    environments
+
+SYNOPSIS
+        use LWP::UserAgent::POE;
+
+        my $ua = LWP::UserAgent::POE->new();
+
+          # The following command looks (and behaves) like it's blocking, 
+          # but it actually keeps the POE kernel ticking and processing 
+          # other tasks. post() and request() work as well.
+        my $resp = $ua->get( "http://www.yahoo.com" );
+
+        if($resp->is_success()) {
+            print $resp->content();
+        } else {
+            print "Error: ", $resp->message(), "\n";
+        }
+
+        POE::Kernel->run();
+
+DESCRIPTION
+    LWP::UserAgent::POE is a subclass of LWP::UserAgent and works well in a
+    POE environment. It is a drop-in replacement for LWP::UserAgent in
+    systems that are already using LWP::UserAgent synchronously and want to
+    play nicely with POE.
+
+    The problem: LWP::UserAgent by itself is synchronous and blocks on
+    requests until the response from the network trickles in. This is
+    unacceptable in POE, as the POE kernel needs to continue processing
+    other tasks until the HTTP response arrives.
+
+    LWP::UserAgent::POE to the rescue. Its request() method and all related
+    methods like get(), post() etc. work just like in the original. But if
+    you peek under the hood, they're sending a request to a running
+    POE::Component::Client::HTTP component and return a valid $response
+    object when a response from the network is available. Although the
+    program flow seems to be blocked, it's not. LWP::UserAgent::POE works
+    the magic behind the scenes to keep the POE kernel ticking and process
+    other tasks.
+
+    The net effect is that you can use LWP::UserAgent::POE just like
+    LWP::UserAgent in a seemingly synchronous way.
+
+    Note that this module is not a POE component. Instead, it is a subclass
+    of LWP::UserAgent. It is self-contained, it even spawns the
+    POE::Component::Client::HTTP component in its constructor unless there's
+    one already running that has been started by another instance.
+
+  Cookies and other features
+    Just like LWP::UserAgent, LWP::UserAgent::POE supports cookies if you
+    define a cookie jar:
+
+       my $ua = LWP::UserAgent::POE->new(
+           cookie_jar => HTTP::Cookies->new(),
+       );
+
+    Just make sure to pass these parameters to the constructor, see the
+    'Bugs' section below on what hasn't been implemented yet.
+
+  Bugs
+    Currently, you can't call LWP::UserAgent's parameter methods, like
+
+        $ua->timeout();
+
+    as this won't be propagated to the POE component running the HTTP
+    requests. It might be added later. Currently, you have to add it to the
+    constructor, like
+
+        my $ua = LWP::UserAgent->new( timeout => 10 );
+
+    to take effect. LWP::UserAgent::POE translates the LWP::UserAgent
+    parameter names to POE::Component::Client::HTTP's parameters, which are
+    slightly different.
+
+LEGALESE
+    Copyright 2008 by Mike Schilli and Rocco Caputo, all rights reserved.
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    The code of this module is based on Rocco Caputo's "pua-defer" code,
+    which has been included with his permission.
+
+    2008, Mike Schilli <cpan@perlmeister.com>
+

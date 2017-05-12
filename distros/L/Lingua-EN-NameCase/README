@@ -1,0 +1,153 @@
+=head1 NAME
+
+NameCase - Perl module to fix the case of people's names.
+
+=head1 SYNOPSIS
+
+    # Working with scalars; complementing lc and uc.
+
+    use Lingua::EN::NameCase qw( nc ) ;
+
+    $FixedCasedName  = nc( $OriginalName ) ;
+
+    $FixedCasedName  = nc( \$OriginalName ) ;
+
+    # Working with arrays or array references.
+
+    use Lingua::EN::NameCase 'NameCase' ;
+
+    $FixedCasedName  = NameCase( $OriginalName ) ;
+    @FixedCasedNames = NameCase( @OriginalNames ) ;
+
+    $FixedCasedName  = NameCase( \$OriginalName ) ;
+    @FixedCasedNames = NameCase( \@OriginalNames ) ;
+
+    NameCase( \@OriginalNames ) ; # In-place.
+
+    # NameCase will not change a scalar in-place, i.e.
+    NameCase( \$OriginalName ) ; # WRONG: null operation.
+
+    $Lingua::EN::NameCase::SPANISH = 1;
+    # Now 'El' => 'El' instead of (default) Greek 'El' => 'el'.
+    # Now 'La' => 'La' instead of (default) French 'La' => 'la'.
+
+=head1 DESCRIPTION
+
+Forenames and surnames are often stored either wholly in UPPERCASE
+or wholly in lowercase. This module allows you to convert names into
+the correct case where possible.
+
+Although forenames and surnames are normally stored separately if they
+do appear in a single string, whitespace separated, NameCase and nc deal
+correctly with them.
+
+NameCase currently correctly name cases names which include any of the
+following:
+    Mc, Mac, al, el, ap, da, de, delle, della, di, du, del, der, 
+    la, le, lo, van and von.
+
+It correctly deals with names which contain apostrophies and hyphens too.
+
+=head2 EXAMPLE FIXES
+
+    Original            Name Case
+    --------            ---------
+    KEITH               Keith
+    LEIGH-WILLIAMS      Leigh-Williams
+    MCCARTHY            McCarthy
+    O'CALLAGHAN         O'Callaghan
+    ST. JOHN            St. John
+
+plus "son (daughter) of" etc. in various languages, e.g.:
+
+    VON STREIT          von Streit
+    VAN DYKE            van Dyke
+    AP LLWYD DAFYDD     ap Llwyd Dafydd
+etc.
+
+plus names with roman numerals (up to 89, LXXXIX), e.g.:
+
+    henry viii          Henry VIII
+    louis xiv           Louis XIV
+
+=head1 BUGS
+
+The module covers the rules that I know of. There are probably a lot
+more rules, exceptions etc. for "Western"-style languages which could be
+incorporated.
+
+There are probably lots of exceptions and problems - but as a general
+data 'cleaner' it may be all you need.
+
+Use Kim Ryan's NameParse.pm for any really sophisticated name parsing.
+
+=head1 CHANGES
+
+These are the original change comments. These have now been moved to the new
+Changes file within the distribution.
+
+1998/04/20  First release.
+
+1998/06/25  First public release.
+
+1999/01/18  Second public release.
+
+1999/02/08  Added Mac with Mack as an exception, thanks to Kim Ryan for this.
+
+1999/05/05  Copied Kim Ryan's Mc/Mac solution from his NameParse.pm and 
+            replaced my Mc/Mac solution with his.
+
+1999/05/08  nc can now use $_ as its default argument 
+            e.g. "$ans = nc ;" and "nc ;", both of which set $_, with the
+            first one setting $ans also.
+
+1999/07/30  Modified for CPAN and automatic testing. Stopped using $_ as the
+            default argument.
+
+1999/08/08  Changed licence to LGPL.
+
+1999/09/07  Minor change to packaging for CPAN.
+
+1999/09/09  Renamed package Lingua::EN::NameCase.pm as per John Porter's
+            (CPAN) suggestion.
+
+1999/11/13  Added code for names with roman numerals, thanks to David Lynn
+            Rice for this suggestion. (If you need to go beyond LXXXIX let me
+            know.)
+
+2000/11/22  Added use locale at the suggestion of Eric Kolve. It should have
+    	    been there in the first place.
+
+2002/04/25  Al, Ben and Van are preserved if single names and namecased 
+	        otherwise, e.g. 'Al' => 'Al', 'Al Fahd' => 'al Fahd'. Added
+	        $SPANISH_EL variable. All thanks to a suggestion by Aaron
+    	    Patterson.
+
+2002/04/26  Changed $SPANISH_EL to $SPANISH and now 'La' => 'la' unless 
+	        $SPANISH is set in which case 'La' => 'La'. Again thanks to
+	        Aaron Patterson.
+
+2007/04/27  Added 16 "Mac" exceptions provided by Stuart McConnachie.
+    	    The license is now "the same terms as Perl itself".
+
+2008/02/07  Fixed the version number.
+
+=head1 AUTHOR
+
+  Mark Summerfield <summer@qtrac.eu> - 1998-2014
+  Barbie <barbie@cpan.org>  2014-present
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Kim Ryan <kimaryan@ozemail.com.au> for his Mc/Mac solution.
+
+=head1 COPYRIGHT
+
+Copyright (c) Mark Summerfield 1998-2014. All Rights Reserved.
+Copyright (c) Barbie 2014-2015. All Rights Reserved.
+
+This distribution is free software; you can redistribute it and/or
+modify it under the Artistic Licence v2.
+
+=cut
+

@@ -1,0 +1,11 @@
+Revision history for Perl extension Device::CDROM.
+
+0.02  Wed Nov 16 17:38:15 CET 2005
+    - fixes compilation on gcc4 (but a lot harmless warnings still there)
+      (spotted by H.Merijn Brand <h DOT m DOT brand AT xs4all DOT nl>)
+
+0.01  Mon Jan  5 09:18:31 2004
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.0 -n Device::CDROM /usr/include/linux/cdrom.h
+		(and then renamed)
+

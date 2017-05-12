@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 34dfc38df81353a12fc35bfa2b769a585e33c64d Changes
+SHA1 e430dd8b4a82be3895583a750b03ed1558a43d79 MANIFEST
+SHA1 d73f6910c2283dca6aa23a5d820950745dcb76f6 MANIFEST.SKIP
+SHA1 4fbcdc0b6db3d565372ed447f16f6c99d50042b3 META.json
+SHA1 7ed2f345305a43010b4ae195d322112d07b26f17 META.yml
+SHA1 9cb1ae5425867eb6791325cf5d6930d0264383b8 Makefile.PL
+SHA1 e9d6e234c33ea5b0f74181af628927e30b0db4b0 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 5e43fafa101c289655e292b058239f803c3e6a23 debian/control
+SHA1 83000e703d428a997479acc46b6d003ac31f7e95 debian/copyright
+SHA1 fb4b84af99dfca7bf5e1fd1cbcebba2f57fafacc debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 1a6875808e95b84f09c3be4256c7a88f08fca0ea debian/watch
+SHA1 916237e49814360211842e5a5905652183c96f2d devel/foo.html
+SHA1 3ca8963a6544761dbeca083fd366833065e1d49a devel/listing-html.pl
+SHA1 36aa4c0770930a53801097768e207ed88b007159 devel/rsync.pl
+SHA1 45a2226726699afb97fdc99ddc3ae6b901b1ea66 devel/rsyncd.conf
+SHA1 aaf43a4e3c7d7fd671cdc212f5f4b7455a5091aa devel/rsyncd.secrets
+SHA1 51a603a21032518be84262af1603c1222517a72a lib/LWP/Protocol/rsync.pm
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 b6ce3309549100bab966ec5ca4b14d3639853c29 t/lwp-nosuch.t
+SHA1 b717d9a532e992f5ab88dcd0621bd468cf376538 t/lwp.t
+SHA1 02afc4076ae8a4ce00c4b6b101eae5315893e73f t/rsync.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 1cafa4e23b7a691e09161c0927e6920dd663e2ce xt/0-examples-xrefs.t
+SHA1 7bc810750906ae91a13b16c7bd833dd6e1c9741b xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 ed5ac6dc4e11eb361c2fa5d0fcb404006e6eea44 xt/rsyncd-test.conf
+SHA1 aaf43a4e3c7d7fd671cdc212f5f4b7455a5091aa xt/rsyncd-test.secrets
+SHA1 7c6c63c5ce910e639910b490833d0b9e573cedf1 xt/rsyncd-test.t
+SHA1 7c5a6d62b02d3bc516a202810fc6b3365e126624 xt/wstat.t
+SHA1 f1c935ab99ee8cc82296292139a6e556c494826b xtools/my-check-copyright-years.sh
+SHA1 14c7c532c545a1914623532ac960f415b93c7d7a xtools/my-check-spelling.sh
+SHA1 f3e50b961e575e060e35ddc4d94c7b3e6101d660 xtools/my-deb.sh
+SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
+SHA1 830acfc76ae9239a2c36143c437a3ec7c6736a0a xtools/my-pc.sh
+SHA1 7b1e948c88915689b3782d872ef9b92a2912c593 xtools/my-tags.sh
+SHA1 f90084e1d6f95abb12eea896cd1cc850402d7726 xtools/my-wunused.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iD8DBQFTNgkQLFMCIV9q3ToRAlj7AKCP9tFuw/FEOoHzLzpJac0s7kYCwgCdEgp3
+uML2b/AGScxgG+miWbT3/P8=
+=2abb
+-----END PGP SIGNATURE-----

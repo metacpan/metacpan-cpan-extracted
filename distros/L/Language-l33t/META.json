@@ -1,0 +1,93 @@
+{
+   "abstract" : "a l33t interpreter",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Language-l33t",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Const::Fast" : "0",
+            "IO::Socket::INET" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "MooX::HandlesVia" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::MungeHas" : "0",
+            "Type::Tiny" : "0",
+            "Types::Standard" : "0",
+            "experimental" : "0",
+            "perl" : "v5.20.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Language::l33t" : {
+         "file" : "lib/Language/l33t.pm",
+         "version" : "v1.0.1"
+      },
+      "Language::l33t::Operators" : {
+         "file" : "lib/Language/l33t/Operators.pm",
+         "version" : "v1.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/language-l33t/issues"
+      },
+      "homepage" : "https://github.com/yanick/language-l33t",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/language-l33t.git",
+         "web" : "https://github.com/yanick/language-l33t"
+      }
+   },
+   "version" : "1.0.1",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ]
+}
+

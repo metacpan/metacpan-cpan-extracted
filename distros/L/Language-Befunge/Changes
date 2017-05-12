@@ -1,0 +1,355 @@
+Revision history for Language-Befunge
+
+5.000     2016-05-20 15:32:58+02:00 Europe/Paris
+ - migrated to dist::zilla
+ - fix rt#110870 - fix pod, mark pod tests as authoring
+ - fix rt#110877 - get rid of given/when
+ - fix rt#110878 - use $^X instead of system perl
+
+**
+
+4.13 Sat May 22 18:20:27 2010
+ - fix #57721: test suite fails with test::simple 0.95
+
+4.12 Tue Jul  7 16:41:51 2009
+ - fix #47642: missing prereqs
+
+4.11 Thu Jun  4 20:24:49 CEST 2009
+ - new fingerprint: CPLI - complex numbers extension
+ - new fingerprint: DIRF - directory operations
+ - new fingerprint: FILE - file i/o operations
+ - new fingerprint: FIXP - fixed point operations
+ - new fingerprint: STRN - string operations
+ - new fingerprint: SUBR - subroutines extension
+ - new fingerprint: TIME - date/time operations
+ - debug() now a plain sub in Language::Befunge::Debug, for a ~20% speedup
+ - tests sanitized (ported to test::more, test::output and test::exception)
+
+4.10 Sun Apr  5 15:44:57 CEST 2009
+ - new infinite loop detection (mark)
+
+4.09 Sat Jan 17 14:34:08 CET 2009
+ - using class::xsaccessor internally, for a 10% speedup
+
+4.08 Sun Nov 16 11:23:13 CET 2008
+ - change libs semantics when unloading under stack
+ - fix on some extensions
+
+4.07 Sat Nov 15 19:44:27 CET 2008
+ - fix month in y instruction
+ - new fingerprint: BASE - non-standard math bases extension
+ - new fingerprint: BOOL - boolean operations extension
+ - new fingerprint: EVAR - environment variables extention
+ - new fingerprint: HRTI - high-resolution timer extension
+ - new fingerprint: MODU - modulo arithmetic extension
+
+4.06 Tue Nov 11 17:50:47 CET 2008
+ - new fingerprint: NULL - extension to opacify loaded extensions
+ - new fingerprint: ORTH - orthogonal easement extension
+ - new fingerprint: PERL - extension to embed perl within bBefunge
+ - new fingerprint: REFC - referenced cells extension
+ - new fingerprint: ROMA - roman numerals extension
+
+4.05 Mon Nov 10 15:46:00 CET 2008
+ - handprint changed to JQBF
+ - mycology compliance. this comes with some changes in unclear semantics:
+	. spaces and comments are now slurped in 0 tick
+	. k interprets the instructions at its position
+
+4.04 Mon Jul 28 18:54:02 CEST 2008
+ - speeding LBS->store by 55+% (mark)
+ - input not cached per ip, but per interpreter (mark)
+ - bringing test coverage up to 100% (mark, jq)
+
+4.03 Fri Jul  4 12:14:45 CEST 2008
+ - adding 'm' opcode (z if) (mark)
+ - completing code coverage up to 97.5% (mark, jq)
+ - adding optional module for TEST lib (jq)
+
+4.02 Thu Jul  3 20:44:11 CEST 2008
+ - completing list of required modules, even if a corelist one
+ - providing empty base class LBW
+
+4.01 Mon Jun  9 17:33:48 CEST 2008
+ - Test::Exception now a hard prereq of the module
+
+4.00 Sun Jun  8 17:08:22 CEST 2008
+ - split LB::LaheySpace in LB::Storage and LB::Wrapping (jq, mark)
+ - first storage implementations:
+    . LBS:2D:Sparse      2-dims, sparse hash (jq)
+    . LBS:Generic:AoA    n-dims, array of arrays (jq, mark)
+    . LBS:Generic:Vec    n-dims, vec-based, supporting lbsgvxs (mark)
+    . LBS:Generic:Sparse n-dims, sparse hash (mark)
+ - first wrapping implementations:
+    . LBW:LaheySpace    funge98 wrapping (jq)
+ - LBI->new:
+    . stricter params checking (jq)
+    . easier to expand with syntaxes (jq)
+    . new alternative syntaxes (mark)
+ - requiring perl 5.10 (jq, mark)
+ - API changes:
+    . LBV has additional rasterize method (moved and expanded from LBGSGA) (mark)
+    . LBV supports accelerated rasterize method in LBVXS > 1.0.0 (mark)
+    . labels_lookup should return Vector objects (mark)
+    . expand() should exist for all Storage modules (mark)
+    . add get_dims() to the Storage API (mark)
+ - new befunge lib: TEST (book)
+
+**
+
+3.05 Tue Jan 22 17:52:27 CET 2008
+ - LBV now uses an array internally for more efficiency
+ - LBV tries to load transparently LBVXS for even more speed
+ - LB:LaheySpace.pm now also understand \r\n and \r terminated programs
+ - some tests cleaning
+
+3.04 Wed Jan  9 17:50:58 CET 2008
+ - more robust way of skipping tests when Test::Exception isn't present
+   . fix t/1-classes/vector.t and t/3-lahey/generic.t
+   . fix RT ticket #32164
+
+3.03 Sun Jan  6 19:05:09 CET 2008
+ - tests reorganized
+
+3.02 Mon Nov 26 13:02:20 CET 2007
+ - kwalitee/cpants release
+
+3.01 Wed Oct 24 14:22:24 CEST 2007
+ - fixing stricture
+
+3.00 Fri Sep 28 17:41:27 CEST 2007
+ - new LB::Vector class for abstracting dimension (mark)
+ - new LB::LaheySpace::Generic, a n-dims laheyspace (mark)
+ - support for n-dims
+ - ops now belong to their own modules, with one test per op
+ - new LB::Interpreter class to create the combination dims / ops
+ - possibility to choose the set of ops: unefunge, befunge, generic-funge
+ - move to lib/ layout
+
+**
+
+2.08 Mon May 28 19:36:11 CEST 2007
+ - skipping a failing exec test on windows
+
+2.07 Sat May 26 15:05:46 CEST 2007
+ - kwalitee release: LICENSE, pod tests, etc.
+
+2.06 Tue May  2 18:02:12 CEST 2006
+ - corrected input error introduced during accessor split
+ - migrated 02befunge.t, 10stdio.t and 22lib.t to Test::More
+ - added tests for generic Befunge.pm test
+ - added tests for output errors
+ - added tests for library semantics
+
+2.05 Mon May  1 18:34:18 CEST 2006
+ - migrated 03ip.t to Test::More
+ - updated 03ip.t to 100% cover L::B::IP
+ - updated 04lahey.t to 100% cover L::B::LaheySpace
+ - test-suite coverage is now 95.7%
+
+2.04 Sun Apr 30 15:47:16 CEST 2006
+ - removed cargo-cult proto in constructors
+ - removed OO indirect notations
+ - renamed private methods to begin with _
+ - migrated 04lahey.t to Test::More
+ - ran coverage on the test-suite: 93.6%
+
+2.03 Fri Feb 17 17:04:49 CET 2006
+ - use-ing integer for faster computations
+
+2.02 Fri Feb 17 15:36:08 CET 2006
+ - rewritten accessors for L::B::IP, using same technik as L::B
+ - doc updated
+
+2.01 Fri Feb 17 15:15:43 CET 2006
+ - rewritten accessors generation, for another speedup
+ - adapted the documentation
+
+2.00 Fri Feb 17 14:48:54 CET 2006
+ - splitted accessors for L::B in get_* and set_*, for a small speedup. note:
+   this will break your code if you're running your own inner-loop!
+ - beginning of L::B 2.x, an optimization serie
+
+**
+
+1.20 Mon Feb 13 18:08:28 CET 2006
+ - fixed wrapping in L::B::LaheySpace::move_ip_forward to comply with
+   LaheySpace specs (mark)
+
+1.11 Tue Feb  7 18:07:03 CET 2006
+ - fixed L::B::IP->svalue returning undef on non-existent stack depth (mark)
+
+1.10 Tue Feb  7 15:05:13 CET 2006
+ - included a Module::Builder mechanism (old scheme with Makefile.PL is preserved)
+
+**
+
+1.06 Mon Feb  6 21:04:04 CET 2006
+ - reworked Makefile.PL (now more light-weight)
+ - added a TODO file
+
+1.05 Mon Feb  6 19:01:37 CET 2006
+ - fixing wrapping when ip delta is greater than lahey space width or height (mark)
+
+1.04 Wed Feb  1 17:38:49 CET 2006
+ - detecting infinite loop on bogus funges in move_curip (mark)
+
+1.03 Mon Jan  2 21:20:07 CET 2006
+ - fixing failed test on 64bits platforms (mark)
+
+1.02 Fri Dec  2 21:44:48 CET 2005
+ - enhanced input checking, dealing correctly with non-ascii characters
+   (with the help of Mark Glines)
+
+1.01 Sat Nov 26 16:22:23 CET 2005
+ - unrolling k instruction to avoid deep recursion warning (mark)
+
+1.00 Thu Oct 28 19:13:59 CEST 2004
+ - official release
+ - i instruction support binary flag (book)
+ - mailing-list available: language-befunge@mongueurs.net
+ - stable for now 2 years, -98 fully implemented: sane basis for further work
+   on the module
+
+**
+
+0.38 Fri May  3 14:47:09 CEST 2002
+ - Removed a (silly) debug message.
+ - Fool-proof for ascii input.
+ - Numeric input works with LB::IP::input() (just as ascii input).
+ - Numeric input asks for input until it gets a valid input.
+
+0.37 Wed Apr 24 08:54:00 CEST 2002
+ - New mechanism of libraries loading: loading instances of extension instead
+   of a plain module.
+ - doc/library.pod modified to reflect this.
+
+0.36 Mon Apr 22 20:44:10 CEST 2002
+ - jqbf98 now understands the -v flag (verbose)
+ - New examples tpr00.bf, palin.bf
+ - IP.pm now has two methods spush_vec and spop_vec. Befunge.pm modified to
+   take advantage of those methods.
+ - IP.pm now has a method spush_args to push (and convert) arguments on the stack.
+ - IP.pm comes with a storage facility to allow library to fetch and store
+   whatever data they want. This is highly experimental and the interface may
+   change in future releases.
+
+0.35 Tue Apr 16 17:20:29 CEST 2002
+ - LaheySpace::labels_lookup() now also returns the velocity that found the label.
+ - Minor pod update.
+
+0.34 Tue Apr 16 15:00:27 CEST 2002
+ - Minor bug fix in LaheySpace.pm. I discovered it by chance, since it's
+   a tiny little bug that did not seem to break anything.
+ - LaheySpace now has a labels_lookup() method, that allow to search for
+   labels inside comments. This will be used in Inline::Befunge and maybe
+   some extensions will use this non-standard mechanism.
+ - Minor update to doc/library.pod
+
+0.33 Mon Apr 15 17:21:23 CEST 2002
+ - Fancy stuff added in order to support Inline::Befunge (does not change
+   the default behavior)
+ - One more debug message
+
+0.32 Mon Apr 15 12:01:53 CEST 2002
+ - POD fixing in doc/library.pod
+
+0.31 Mon Apr 15 09:41:21 CEST 2002
+ - Smarter way of handling parameters.
+ - jqbf98 interpreter now handles parameters.
+
+0.30 Sun Apr 14 15:53:19 CEST 2002
+ - Befunge.pm now has an Object Oriented interface.
+ - rewriting tests to take the new interface into account.
+
+**
+
+0.20 Sat Apr 13 13:08:17 CEST 2002
+ - Befunge.pm modified to understand libraries semantics:
+   parens (to load/unload) and capital letters.
+ - IP modified in order to accept the libraries semantics.
+ - New directory lib/ where to put libraries.
+ - New libraries FOO and HELO
+ - New test 22lib -> test libraries semantics.
+ - Pod completed in Befunge.pm
+ - Tutorial (doc/library.pod) on how to build new extensions.
+ - all instructions implemented in instr.txt
+
+**
+
+0.12 Fri Apr 12 18:51:04 CEST 2002
+ - Shipped with some examples.
+ - Shipped with the Funge-98 specs.
+
+0.11 Fri Apr 12 18:33:09 CEST 2002
+ - Bug fix in the way spaces are handled in strings.
+ - Bug fix in numeric input.
+ - Bug fix in ascii input.
+ - New script jqbf98, a standalone interpreter.
+ - Rewrite of Makefile.PL to install this file.
+
+0.10 Fri Apr 12 15:04:10 CEST 2002
+ - More POD documentation.
+ - Bug fix in instruction t.
+ - More debug messages.
+ - New test 21concur.t -> tests concurrent Funge.
+
+0.09 Fri Apr 12 12:05:03 CEST 2002
+ - Bug fix in y instruction (flags).
+ - Bug fix in y instruction (size of TOSS).
+ - 20th field of y instruction returns ENV sorted by keys.
+ - More debug messages in Befunge.pm
+ - New test 20system.t -> tests exec and info retrieval
+
+0.08 Thu Apr 11 19:34:38 CEST 2002
+ - Fixed some bad API calls in Befunge.pm
+ - Bug fix in LaheySpace.pm
+ - More debug messages in Befunge.pm
+ - Minor bug fix in output file for text flag.
+ - New test 19storg.t -> tests storage
+ - 10stdio.t extended to test input and output file.
+
+0.07 Thu Apr 11 17:49:03 CEST 2002
+ - Fixed a bug in IP.pm and 03ip.pm
+ - Fixed some bad API calls in Befunge.pm
+ - More debug messages.
+ - New test 18sos.t -> tests stack stack manipulation
+ - instr.txt rewritten.
+
+0.06 Thu Apr 11 15:06:50 CEST 2002
+ - Pod cleaning in LaheySpace.pm.
+ - Some bug fixes in Befunge.pm
+ - New test 16string.t -> tests string thingies
+ - New test 17stack.t  -> tests stack stuff
+
+0.05 Thu Apr 11 14:25:10 CEST 2002
+ - Completed 14flow.t
+ - New test 15decis.t -> tests decision making
+
+0.04 Thu Apr 11 12:04:30 CEST 2002
+ - store_code includes magic to display the correct filename in error msgs.
+ - instr.txt explained.
+ - Bug fixes for control flow instructions.
+ - New test 13dir.t  -> tests direction changing
+ - New test 14flow.t -> tests flow control
+
+0.03  Thu Apr 11 09:59:28 CEST 2002
+ - Bug fix with string-mode.
+ - Debug facilities.
+ - New test 02befunge.t -> tests the exported functions
+ - New test 10stdio.t   -> tests ,. and space
+ - New test 11nums.t    -> tests 0-9a-f
+ - New test 12maths.t   -> tests +-*/%
+ - New file inst.txt with the instruction and their current
+   status (tested with a X).
+
+0.02  Wed Apr 10 14:22:31 CEST 2002
+ - New function store_code.
+ - Language::Befunge synopsis extended.
+
+0.01  Wed Apr 10 14:01:20 CEST 2002
+ - Original version.
+ - Every instruction is implemented, but _not_ tested.
+ - Module LaheySpace written and tested.
+ - Module IP written and tested.
+

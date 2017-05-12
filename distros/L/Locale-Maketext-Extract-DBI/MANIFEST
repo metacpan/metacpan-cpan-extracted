@@ -1,0 +1,11 @@
+bin/xgettextdbi
+Build.PL
+Changes
+lib/Locale/Maketext/Extract/DBI.pm
+MANIFEST			This list of files
+META.yml
+t/01-use.t
+t/98-pod_coverage.t
+t/99-pod.t
+Makefile.PL
+README

@@ -1,0 +1,63 @@
+Revision history for Lingua-DE-Tagger
+
+0.14            Tobias Schulz            7/06/08
+
+        I used Lingua::EN::Tagger 0.13 as base for the first version
+        of Lingua::DE::Tagger. It uses an other (now german)
+        corpus and some minor bugs were changed.
+
+0.13            Aaron Coburn            6/29/05
+
+        Added 'get_sentences' method
+
+0.12            Aaron Coburn            3/39/05
+
+        Fixed a bug introduced in the parsing of utf8 text
+
+0.11            Aaron Coburn            11/15/04
+
+        Improved Unicode support thanks to the contributions from
+        Eric Nichols <eric-n@is.naist.jp>, Nara Institute of 
+        Science and Technology
+
+0.10            Aaron Coburn            4/27/04
+
+        Fixed some errors in the POD documentation
+
+0.09            Aaron Coburn            2/04/04
+
+        Improved the splitting on punctuation
+
+0.06            Aaron Coburn            12/18/03
+
+        Improved recognition of an end of sentence
+        
+
+0.05            Aaron Coburn            12/09/03
+        
+        Added method ``get_proper_nouns''
+        Eliminated use of Lingua::EN::Sentence
+        
+
+0.04            Aaron Coburn            12/08/03
+
+        Applied fixes to unknown word assignment
+
+
+0.03            Aaron Coburn            11/03
+
+        Fixed some errors in the text scrubbing methods
+        Shortened and moved lexicon, made things run faster
+        Added a testing suite
+
+
+0.02            Maciej Ceglowski        5/03
+
+        Applied fixes for module installer from Nathaniel Irons
+
+
+0.01            Maciej Ceglowski        2/03
+
+        Initial Release for CPAN
+        Re-written from Aaron Coburn's LSI::Parser::POS 
+

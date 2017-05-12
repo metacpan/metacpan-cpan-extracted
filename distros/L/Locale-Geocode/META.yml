@@ -1,0 +1,13 @@
+name:               Locale-Geocode
+version:            1.20
+abstract:           complete ISO 3166-1 and limited ISO 3166-2 implementation
+license:            perl
+version_from:       lib/Locale/Geocode.pm
+installdirs:        site
+distribution_type:  module
+generated_by:       Mike Eldridge <diz@cpan.org>
+requires:
+  XML::Simple: 2.16
+  XML::SAX::Expat: 0.39
+author:
+  - Mike Eldridge <diz@cpan.org>

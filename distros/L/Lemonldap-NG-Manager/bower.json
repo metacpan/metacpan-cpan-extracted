@@ -1,0 +1,19 @@
+{
+  "name": "angular-lemonldap-ng-manager",
+  "description": "Lemonldap::NG manager with AngularJS",
+  "version": "1.9.0",
+  "homepage": "https://lemonldap-ng.org",
+  "license": "GPL2",
+  "private": true,
+  "dependencies": {
+    "angular": "1.5.x",
+    "angular-animate": "1.5.x",
+    "angular-bootstrap": "x",
+    "angular-cookies": "1.5.x",
+    "angular-ui-tree": "x",
+    "bootstrap": "x",
+    "es5-shim": "x",
+    "file-saver.js": "x",
+    "jquery": "2.x"
+  }
+}

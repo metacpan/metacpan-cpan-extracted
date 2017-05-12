@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml package="textcomp"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <para xml:id="p1">
+    <tabular vattach="middle">
+      <tbody>
+        <tr>
+          <td align="left" border="t" colspan="10"><text font="bold">Accents</text></td>
+        </tr>
+        <tr>
+          <td align="center">Á</td>
+          <td align="center">Ă</td>
+          <td align="center">Ǎ</td>
+          <td align="center">A̧</td>
+          <td align="center">Â</td>
+          <td align="center">Ä</td>
+          <td align="center">Ȧ</td>
+          <td align="center">A̋</td>
+          <td align="center">Ā</td>
+          <td align="center">A͡</td>
+        </tr>
+        <tr>
+          <td align="center">Ą</td>
+          <td align="center">Å</td>
+          <td align="center">A͡</td>
+          <td align="center">Ã</td>
+          <td align="center">A͡</td>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+        </tr>
+        <tr>
+          <td align="left" border="t" colspan="10"><text font="bold">Numerals</text></td>
+        </tr>
+        <tr>
+          <td align="center">¹</td>
+          <td align="center">²</td>
+          <td align="center">³</td>
+          <td align="center">¼</td>
+          <td align="center">½</td>
+          <td align="center">¾</td>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+        </tr>
+        <tr>
+          <td align="left" border="t" colspan="10"><text font="bold">Old-style Numerals</text></td>
+        </tr>
+        <tr>
+          <td align="center"><text font="oldstyle">0</text></td>
+          <td align="center"><text font="oldstyle">1</text></td>
+          <td align="center"><text font="oldstyle">2</text></td>
+          <td align="center"><text font="oldstyle">3</text></td>
+          <td align="center"><text font="oldstyle">4</text></td>
+          <td align="center"><text font="oldstyle">5</text></td>
+          <td align="center"><text font="oldstyle">6</text></td>
+          <td align="center"><text font="oldstyle">7</text></td>
+          <td align="center"><text font="oldstyle">8</text></td>
+          <td align="center"><text font="oldstyle">9</text></td>
+        </tr>
+        <tr>
+          <td align="left" border="t" colspan="10"><text font="bold">Pair Symbols</text></td>
+        </tr>
+        <tr>
+          <td align="center">⟨</td>
+          <td align="center">⟩</td>
+          <td align="center">⟦</td>
+          <td align="center">⟧</td>
+          <td align="center">↑</td>
+          <td align="center">↓</td>
+          <td align="center">←</td>
+          <td align="center">→</td>
+          <td align="center">⁅</td>
+          <td align="center">⁆</td>
+        </tr>
+        <tr>
+          <td align="left" border="t" colspan="10"><text font="bold">Monetary/Commercial Symbols</text></td>
+        </tr>
+        <tr>
+          <td align="center">฿</td>
+          <td align="center">¢</td>
+          <td align="center">¢</td>
+          <td align="center">₡</td>
+          <td align="center">¤</td>
+          <td align="center">$</td>
+          <td align="center">$</td>
+          <td align="center">₫</td>
+          <td align="center">€</td>
+          <td align="center">f</td>
+        </tr>
+        <tr>
+          <td align="center">₲</td>
+          <td align="center">₤</td>
+          <td align="center">₦</td>
+          <td align="center">₱</td>
+          <td align="center">£</td>
+          <td align="center">₩</td>
+          <td align="center">¥</td>
+          <td align="center">℗</td>
+          <td align="center">ↄ⃝</td>
+          <td align="center">©</td>
+        </tr>
+        <tr>
+          <td align="center">⁒</td>
+          <td align="center">℮</td>
+          <td align="center">‱</td>
+          <td align="center">‰</td>
+          <td align="center">※</td>
+          <td align="center">®</td>
+          <td align="center">℠</td>
+          <td align="center">™</td>
+          <td/>
+          <td/>
+        </tr>
+        <tr>
+          <td align="left" border="t" colspan="10"><text font="bold">Footnote Symbols</text></td>
+        </tr>
+        <tr>
+          <td align="center">*</td>
+          <td align="center">‖</td>
+          <td align="center">¦</td>
+          <td align="center">•</td>
+          <td align="center">†</td>
+          <td align="center">‡</td>
+          <td align="center">◦</td>
+          <td align="center">¶</td>
+          <td align="center">·</td>
+          <td align="center">¶</td>
+        </tr>
+        <tr>
+          <td align="center">§</td>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+        </tr>
+        <tr>
+          <td align="left" border="t" colspan="10"><text font="bold">Scientific Symbols</text></td>
+        </tr>
+        <tr>
+          <td align="center">℃</td>
+          <td align="center">°</td>
+          <td align="center">÷</td>
+          <td align="center">¬</td>
+          <td align="center">℧</td>
+          <td align="center">−</td>
+          <td align="center">µ</td>
+          <td align="center">Ω</td>
+          <td align="center">ª</td>
+          <td align="center">º</td>
+        </tr>
+        <tr>
+          <td align="center">±</td>
+          <td align="center">√</td>
+          <td align="center">×</td>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+        </tr>
+        <tr>
+          <td align="left" border="t" colspan="10"><text font="bold">Various Symbols</text></td>
+        </tr>
+        <tr>
+          <td align="center">˝</td>
+          <td align="center">´</td>
+          <td align="center">˘</td>
+          <td align="center">ˇ</td>
+          <td align="center">¨</td>
+          <td align="center">`</td>
+          <td align="center">¯</td>
+          <td align="center">○</td>
+          <td align="center">␢</td>
+          <td align="center">★</td>
+        </tr>
+        <tr>
+          <td align="center">=</td>
+          <td align="center">=</td>
+          <td align="center">✝</td>
+          <td align="center">⚮</td>
+          <td align="center">/</td>
+          <td align="center">‟</td>
+          <td align="center">‽</td>
+          <td align="center">⸘</td>
+          <td align="center">🍂</td>
+          <td align="center">⚭</td>
+        </tr>
+        <tr>
+          <td align="center" border="b">♪</td>
+          <td align="center" border="b">№</td>
+          <td align="center" border="b">'</td>
+          <td align="center" border="b">‚</td>
+          <td align="center" border="b">„</td>
+          <td align="center" border="b">℞</td>
+          <td align="center" border="b">—</td>
+          <td align="center" border="b">~</td>
+          <td align="center" border="b">—</td>
+          <td border="b"/>
+        </tr>
+      </tbody>
+    </tabular>
+  </para>
+</document>

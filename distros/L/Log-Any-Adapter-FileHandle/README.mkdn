@@ -1,0 +1,65 @@
+# NAME
+
+Log::Any::Adapter::FileHandle - A basic Log::Any::Adapter to forward messages to a filehandle
+
+# VERSION
+
+version 0.010
+
+# SYNOPSIS
+
+     use Log::Any qw($log);
+     use Log::Any::Adapter;
+
+     # Send all logs to Log::Any::Adapter::FileHandle
+     Log::Any::Adapter->set('FileHandle');
+
+     $log->info("Hello world");
+    
+
+# DESCRIPTION
+
+This module is a basic adapter that will simply forward log messages to a filehandle, or any object that
+supports a 'print' method ([IO::String](https://metacpan.org/pod/IO::String), [IO::Socket::INET](https://metacpan.org/pod/IO::Socket::INET), Plack's $env->{psgi.errors} object, etc).
+
+I've created it so that my scripts running under damontools or runit can output
+messages to locally defined logs.  It does not timestamp messages, that responsbility  is
+delegated to the external log capture mechanism.
+
+You can override the default configuration by passing extra arguments to the
+`Log::Any` set\_adapter method:
+
+- fh
+
+    Pass in your IO::Handle-like object here.  If this isn't specified, it will
+    default to opening STDERR.  If the object supports an autoflush method,
+    autoflush will be enabled, unless no\_autoflush is set.
+
+- no\_autoflush
+
+    Disable automatically turning on autoflush on the fh object.
+
+- format
+
+    A sprintf string that controls the formatting of the message.  It is supplied 2
+    arguments: the log level as supplied by Log::Any (usually all-lowercase), and
+    the message to be logged.  The default is "\[%s\] %s\\n".  This value should
+    contain the log record terminator, such as a newline.
+
+- escape
+
+    one of 'none' (default), 'newline', or 'nonascii'.  Controls how messages are
+    pre-filtered before passing them to a filehandle. This is handy if you want do
+    smoosh messages into a single line (for easier filtering + processing), or if
+    you want to filter non ascii characters for safe terminal printing.
+
+# COPYRIGHT AND LICENSE
+
+Copyright 2014 by Jason Jay Rodrigues <jasonjayr+oss@gmail.com>
+
+Log::Any::Adapter::FileHandle is provided "as is" and without any express or
+implied warranties, including, without limitation, the implied warranties of
+merchantibility and fitness for a particular purpose.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

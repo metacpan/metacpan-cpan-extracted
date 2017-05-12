@@ -1,0 +1,58 @@
+Revision history for Log-Any-For-DBI
+
+0.10    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.09     2012-11-29 (SHARYANTO)
+
+         - Use Log::Any::For::Class 0.18 (which has caller_depth adjustment) to
+           correctly show caller location.
+
+
+0.08     2012-09-06 (SHARYANTO)
+
+         - Allow logging only certain methods by passing them as import
+           arguments.
+
+
+0.07     2012-08-16 (SHARYANTO)
+
+         - Log more methods (previously rollback(), commit() didn't get logged).
+
+
+0.06     2012-08-16 (SHARYANTO)
+
+         - Work better with newer Log::Any::For::Class (observe 'indent' and
+           'max_depth' logger args).
+
+
+0.05     2012-07-17 (SHARYANTO)
+
+         - Load DBI, for convenience.
+
+         - Minor tweaks.
+
+
+0.04     2012-07-10 (SHARYANTO)
+
+         - No functional changes. Rebuild (forgot to update requirement
+           version).
+
+
+0.03     2012-07-10 (SHARYANTO)
+
+         - No functional changes. Adjust for Log::Any::For::Class 0.05.
+
+
+0.02     2012-07-10 (SHARYANTO)
+
+         - No functional changes. Adjust for Log::Any::For::Class 0.04.
+
+
+0.01     2012-07-10 (SHARYANTO)
+
+         - First release.

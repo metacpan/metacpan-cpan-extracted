@@ -1,0 +1,183 @@
+//* General settings */
+
+@media print { #menuleft, #menu, #menuright, #sponsor { display: none; } }
+
+a img {
+	border: none;
+}
+
+/* Layout */
+
+.contentmain h2 {
+  margin: 5px 0;
+}
+
+/* Text formating */
+
+.important {
+	border: 1px dotted #535353;
+	background-color: #DFF2F8;
+	background-image: url(/images/important.gif);
+	background-repeat: no-repeat;
+	background-position: left top;
+	font-style: italic;
+	padding: 5px 5px 5px 40px;
+}
+
+.small {
+	color: #535353;
+	font-size: 0.8em;
+}
+
+.locationbox {
+	font-size: 0.9em;
+	margin: 5px 0px 0px 0px;
+	border-bottom: 1px dotted #535353;
+}
+
+.toplocation {
+	color: #22b5d7;
+	font-weight: 800;
+	font-style: italic;
+	margin-right: 5px;
+}
+
+.locationbox h3, .locationbox h4 {
+	margin: 0px 0px 0px 0px ;
+	color: black;
+}
+
+.locationbox img {
+	float: right;
+	position: relative;
+	margin-left: 5px;
+}
+
+.locationbox p {
+	padding-left: 15px;
+}
+
+.alert {
+	color: red;
+}
+
+/* Survey Div */
+
+#survey {
+	margin-top: 5px;
+}
+
+#survey hr {
+	height: 1px;
+	background-color: #000;
+	border: 0px;
+}
+
+/* Survey Tables */
+
+#survey table.usertable {
+}
+
+#survey table {
+	border: 1px solid #535353;
+	border-spacing: 2px;
+	border-collapse: collapse;
+	empty-cells:show;
+}
+
+#survey table.grid td {
+	border: 1px solid #747474;
+}
+
+#survey table td {
+	vertical-align: top;
+	text-align: left;
+	width: 100px;
+}
+
+#survey fieldset {
+	border: none;
+	border: 1px solid #535353;
+}
+
+
+#survey table table {
+	border: none;
+	border-collapse: separate;
+	border-spacing: 3px;
+}
+
+#survey table table td {
+	vertical-align: top;
+	width: 100px;
+}
+
+
+#survey fieldset table {
+	border: none;
+}
+
+#survey th {
+		background-color: #747474;
+		color: white;
+}
+
+#survey .highlight {
+		background-color: #DFF2F8;
+}
+
+#survey .section h2 {
+    margin-top: 10px;
+}
+
+.section {
+    font-size: 0.9em;
+    border-bottom: 0px solid #ddd;
+    margin-bottom: 0px;
+    padding: 7px 0px;
+}
+
+.question {
+	font-weight: 800;
+	font-style: italic;
+  padding-top: 20px;
+}
+
+.greyrow {
+	background-color: #BBBBBB;
+}
+
+
+// Amendments to work with the survey layout
+
+.strike {
+    text-decoration: line-through;
+}
+
+.post h3 {
+    background-color: #333;
+    padding: 5px 25px;
+    color: #fff;
+    margin-top: -5px;
+    margin-bottom: 2px;
+}
+
+.post .newsbox h4 {
+    margin-bottom: 10px;
+    padding: 7px 25px;
+    font-size: 1.4em;
+    color: #000;
+    border-bottom: 2px solid #ddd;
+}
+
+.clearbar {
+    clear:both; 
+}
+
+#footer   { margin-top: 10px; border-top: 1px solid #333; }
+
+#nav h1 { font-size: 150%; color: #fff; padding: 8px 0 0 40px; font-weight: bold; }
+
+.closed     { border: 1px solid #f00; margin: 5px 0; padding: 5px; color: #f00; text-align: center; font-size: 150%; font-weight: bold; }
+
+.boxer ul   { list-style: none inside none; padding: 0px; }

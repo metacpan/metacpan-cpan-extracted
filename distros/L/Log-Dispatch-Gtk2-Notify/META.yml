@@ -1,0 +1,23 @@
+---
+abstract: 'send log messages to a desktop notification daemon'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.11
+generated_by: 'Dist::Zilla version 1.100651'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Dispatch-Gtk2-Notify
+requires:
+  File::Basename: 0
+  Gtk2: 0
+  Gtk2::Notify: 0
+  Log::Dispatch: 0
+  Moose: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+  namespace::clean: 0
+version: 0.02

@@ -1,0 +1,12 @@
+Revision history for Perl extension Lingua::SV::Num2Word.
+
+0.01	- original version;
+        - number to text conversion for whole numbers from 0 up to 999 999 999
+
+0.02	- changes for coding guideline compliance
+
+0.03	- changed split to use negative param in split uses, makes code cleaner
+
+0.04    - bug solved with numbers ending with 00, 000, etc.
+
+0.05    - versio release just to publish in CPAN. No changes where made.

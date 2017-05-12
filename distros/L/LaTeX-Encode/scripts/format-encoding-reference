@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+# Script to generate and format a references document giving the
+# characters that are encoded.
+
+use strict;
+use warnings;
+
+use blib;
+use charnames qw();
+use LaTeX::Encode;
+use LaTeX::Encode::EncodingTable;
+use LaTeX::Table;
+use LaTeX::Driver;
+use File::Slurp;
+use HTML::Entities qw(%char2entity);
+
+my $basename = './character-encodings';
+
+
+# Create the table of encoded characters using LaTeX::Table
+
+my $header = [ [ 'Code', 'Char', 'Entity', 'Encoding', 'Name'  ] ];
+
+my $data = [];
+foreach my $char (sort keys %latex_encoding) {
+    my $charcode = ord $char;
+    my $entity   = $char2entity{$char};
+    my $charname = charnames::viacode($charcode);
+
+    push(@$data, [ sprintf("0x%x", $charcode),
+                   latex_encode($char),
+		   sprintf("\\texttt{%s}", latex_encode($entity)),
+                   sprintf("\\texttt{%s}", latex_encode(latex_encode($char))),
+                   "\\small $charname"
+		    ]);
+}
+
+my $table = LaTeX::Table->new( { caption => 'Characters',
+				 label   => 'table:charencodings',
+				 type    => 'xtab',
+				 header  => $header,
+				 data    => $data } );
+
+$table = $table->generate_string;
+
+
+# Read the template from the DATA section and create the source document
+
+my $doc = join("", (<DATA>));
+$doc =~ s/\[\* table \*\]/$table/;
+
+write_file("${basename}.tex", \$doc);
+
+
+# Format the document with LaTeX::Driver
+
+my $drv = LaTeX::Driver->new(source => $basename . ".tex",
+			     output => $basename . ".dvi",
+			     format => 'dvi',
+                             tmpdir => 1,
+                             DEBUG  => 1,
+                             DEBUGPREFIX => '#latex: ',
+);
+
+$drv->run;
+
+
+exit(0);
+
+__END__
+% [% TAGS star %]
+\documentclass[a4paper,10pt]{article}
+\usepackage[textwidth=180mm,textheight=250mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{booktabs}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{xtab}
+\title{Characters encoded by \texttt{LaTeX::Encode}}
+\author{automatically generated}
+\begin{document}
+\maketitle
+[* table *]
+\end{document}

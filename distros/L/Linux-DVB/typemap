@@ -1,0 +1,10 @@
+FE_fd		T_FE_FD
+
+INPUT
+
+T_FE_FD
+	if (sv_derived_from ($arg, \"Linux::DVB::Frontend\"))
+	  $var = ($type) SvIV (*hv_fetch ((HV*)SvRV ($arg), \"fd\", 2, 1));
+	else
+	  croak (\"$var is not of type Linux::DVB::Frontend\")
+

@@ -1,0 +1,23 @@
+Revision history for Perl module Lingua::AR::MacArabic.
+
+0.20  Sun Jul 31 19:33:07 2011
+    - fix the tarball with world writable files.
+
+0.10  Sat Jan 22 20:38:52 2011
+    - xs: fix mixing STDCHAR and U8.
+
+0.04  Thu Apr 28 22:51:26 2005
+    - upgraded according to updated ARABIC.TXT in www.unicode.org
+      (though no character mapping is changed).
+    - added META.yml.
+    - added t/argu.t.
+
+0.03  Sat Feb 01 12:09:14 2003
+    - document modification.
+
+0.02  Sat Feb 01 01:37:51 2003
+    - *.map files are integrated.
+    - document modification.
+
+0.01  Wed Jan 29 23:12:20 2003
+    - original version;

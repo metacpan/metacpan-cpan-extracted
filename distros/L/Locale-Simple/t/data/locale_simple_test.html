@@ -1,0 +1,68 @@
+<html>
+	<head>
+		<script language="javascript" src="../../share/js/sprintf.js"></script>
+		<script language="javascript" src="../../share/js/gettext/Gettext.js"></script>
+		<script language="javascript" src="../../share/js/locale_simple.js"></script>
+		<script language="javascript" src="locale/de_DE/LC_MESSAGES/test.json"></script>
+		<script language="javascript" src="locale/de_DE/LC_MESSAGES/othertest.json"></script>
+		<script language="javascript">
+
+			function tt(text,result) {
+				var newdiv = document.createElement('div');
+				var tn = document.createTextNode(text);
+				newdiv.appendChild(tn);
+				document.getElementById("t").appendChild(newdiv);
+				if (result == text) {
+					newdiv.style.color = 'green';
+				} else {
+					newdiv.style.color = 'red';
+					var failtext = document.createTextNode(
+						'Test failed! Correct would be: "' + result + '"'
+					);
+					var failtextdiv = document.createElement('div');
+					var failtext = document.createTextNode(
+						'Test failed! Correct would be: "' + result + '"'
+					);
+					failtextdiv.style.color = 'red';
+					failtextdiv.appendChild(failtext);
+					document.getElementById("t").appendChild(failtextdiv);
+					var faildiv = document.getElementById('fail');
+					faildiv.style.display = 'block';
+				}
+			}
+
+			window.onload = function() {
+
+				ltd('test');
+
+				tt(l("Hello"),'Hallo');
+				tt(ln("You have %d message","You have %d messages",4),'Du hast 4 Nachrichten');
+				tt(ln("You have %d message","You have %d messages",1),'Du hast 1 Nachricht');
+				tt(ln("You have %d message of %s","You have %d messages of %s",4,'harry'),
+					'Du hast 4 Nachrichten von harry');
+				tt(ln("You have %d message of %s","You have %d messages of %s",1,'harry'),
+					'Du hast 1 Nachricht von harry');
+				tt(ln('%2$s brought %1$d message','%2$s brought %1$d messages',1,'harry'),
+					'1 Nachricht gebracht von harry');
+				tt(ln('%2$s has %1$d message','%2$s has %1$d messages',4,'harry'),
+					'harry hat 4 Nachrichten');
+				tt(l("Change order test %s %s",1,2),'Andere Reihenfolge hier 2 1');
+				tt(l("Other change order test %s %s %s",1,2,3),
+					'Verhalten aus http://perldoc.perl.org/functions/sprintf.html 3 1 1');
+				tt(lp("alien","Hello"),'Hallo Ausserirdischer');
+
+			}
+
+		</script>
+	</head>
+	<body>
+		<h1>locale_simple.js Translation Test</h1>
+		<div id="t"></div>
+		<div id="fail" style="display:none">
+			<h4>
+				Please report these failing tests to <a href="mailto:torsten@raudss.us">torsten@raudss.us</a>
+			</h4>
+			Include this output and all informations of your browser you can give. If all tests are failing, then you might miss the part of the distribution which includes the LC_MESSAGES file for the translations.
+		</div>
+	</body>
+</html>

@@ -1,0 +1,7 @@
+
+<Sect1 id="sec-Dynamic">
+<Title><literal>Dynamic</literal><IndexTerm><Primary>Dynamic</Primary></IndexTerm> </Title>
+
+  <para>This module has moved to <ulink url="../base/Data.Dynamic.html"><literal>Data.Dynamic</literal></ulink> in the
+  hierarchical libraries.</para>
+</Sect1>

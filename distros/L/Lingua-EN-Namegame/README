@@ -1,0 +1,63 @@
+Lingua/EN/Namegame version 0.05
+===============================
+
+NAME
+
+    Lingua::EN::Namegame - Creates a "Name-Game" verse from a name (or
+    word)
+
+SYNOPSIS
+
+            use Lingua::EN::Namegame;
+
+            $verse = name2verse ('Marsha');
+
+            print $verse;
+
+    *Or, more simply, at your OS command prompt*:
+
+            name2verse  Marsha              # script provided with module
+
+  Output
+
+            Marsha Marsha 
+                bo Barsha, 
+                    Banana Fanna Fo Farsha, 
+                        Fee Fi Mo-arsha
+                            MARSHA!
+
+    *Or, for extra policital correctness*
+
+            name2verse_nonprofane  Chuck     # script provided with module
+
+  Output
+
+            Sorry, the verse for Chuck contains a profane word.
+
+DESCRIPTION
+
+    name2verse is a subroutine that generates a rhyming verse based on
+    a name (or word), in accordance with the "rhyming algorithm"
+    documented in the lyrics of the famous 1960's song The Name Game,
+    by *Shirley Ellis*.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  None for the module itself, but one sample script provided requires Regexp::Common
+
+COPYRIGHT AND LICENCE
+
+    Copyright (c) 2002-2003, Timothy F. Maher.  All rights reserved.
+
+    This module is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+

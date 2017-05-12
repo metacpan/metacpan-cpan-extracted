@@ -1,0 +1,18 @@
+--- 
+abstract: Perl interface to the libcwiimote library
+author: 
+  - Chad Phillips <chad@chadphillips.org>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Linux-Input-Wiimote
+no_index: 
+  directory: 
+    - inc
+    - t
+version: 0.04002

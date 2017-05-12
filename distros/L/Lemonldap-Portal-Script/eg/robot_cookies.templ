@@ -1,0 +1,57 @@
+[% PROCESS add_cookies %]
+
+
+
+[% BLOCK add_cookies %]
+###  echange numero [%numero%]            ###
+###  analyse de la reponse : les cookies  ###
+$temp_ligne='';
+$temp_cp=0;
+$line_cookie= $question->header('Set-Cookie');
+my @des_cookies;
+[% FOREACH item IN cookienames %]
+my $motif= '[%item%]';
+
+my $capture;
+($capture)= $line_cookie=~ /($motif=.+?);/;
+if (!$capture) {
+	( $capture)= $line_cookie=~ /($motif=.+)/ ;
+ }
+
+push @des_cookies,$capture if $capture ;
+[% END %]
+my $l_cookie= join (" ;",@des_cookies);
+$cp_l= 0;
+for (@des_h_questions) {
+	if ($_ !~ /cookie/i ){
+  	$cp_l ++;
+  	next;
+ 	  } 
+##### on isole la ligne en les supprimant 
+	$temp_cp =  $cp_l+1; 
+	#   $des_h_questions[$cp_l+1] .=" ;".$l_cookie ;
+	$des_h_questions[$cp_l+1] .=$l_cookie ; 
+	$l_cookie="";
+	$temp_ligne=  $des_h_questions[$cp_l+1];
+ }
+if ($temp_cp > 0) {
+	splice   (@des_h_questions,$temp_cp-1,2); 
+ }
+my %HASH_C; 
+my $line_c;
+$temp_ligne= $l_cookie if  (!$temp_ligne)  ; 
+######## creation ligne cookie verification des doublons #########
+my @tmp_c = split / ;/, $temp_ligne ;
+for (@tmp_c) {
+	(my $cle, my $valeur)= /(.+?)=(.+)/;  
+	$HASH_C{$cle}= $valeur;
+ }
+###  operation inverse 
+for (keys  %HASH_C ) {
+	$line_c.=$_."=".$HASH_C{$_}." ;";
+ }
+if ($line_c) {
+	push @des_h_questions,(Cookie,$line_c);
+ }
+
+[% END %]

@@ -1,0 +1,56 @@
+{
+   "abstract" : "Perl interface for Linux setns system call.",
+   "author" : [
+      "Marian Marinov <HackMan>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.55_02, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Linux-Setns",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Linux::Setns" : {
+         "file" : "lib/Linux/Setns.pm",
+         "version" : "2.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
+      ],
+      "repository" : {
+         "url" : "https://github.com/hackman/Linux-Setns"
+      }
+   },
+   "version" : "2.1",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

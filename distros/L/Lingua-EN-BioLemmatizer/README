@@ -1,0 +1,32 @@
+Lingua-EN-BioLemmatizer version 1.000
+=====================================
+
+Perl module to interface with the University of Colorado's BioLemmatizer
+code.  To use this module, you must first download the BioLemmatizer
+jarfile from <URL: http://biolemmatizer.sourceforge.net>, and then set
+the BIOLEMATIZER environment variable to the path of that jarfile. You
+also need a working Java installation. See the SourceForge documentation
+for any details about the BioLemmatizer itself.
+
+For documentation about the module itself, run this command
+
+    pod2text lib/Lingua/EN/BioLemmatizer.pm
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Tom Christiansen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 
+or, at your option, any later version of Perl 5 you may have available.

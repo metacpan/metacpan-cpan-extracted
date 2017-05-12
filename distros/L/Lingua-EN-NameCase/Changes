@@ -1,0 +1,99 @@
+Revision history for Lingua-EN-NameCase
+=======================================
+
+1.19    2015-01-29
+        - added use warnings for CPANTS completeness.
+
+1.18    2014-10-11
+        - fixed license fields in META.json to be lists.
+        - simplified parameter logic checks.
+        - added tests to check bad calls.
+        - Devel::Cover = 100%
+
+1.17    2014-08-02
+        - switch to Test::More in tests.
+        - RT#88359 - typo fix (thanks to dsteinbrunner).
+        - RT#50047 - roman numerals optional (thanks to degatcpan).
+        - added Post-Nominial Initials, based on RT#47708 (thanks to Dave Gray
+          and Mark Summerfield for the ideas). The current list isn't
+          exhaustive, but should suffice for now.
+        - RT#46669 - Ben first name (thanks to Dave Gray).
+        - added $HEBREW switch.
+        - added 'bat', daughter of, in HEBREW.
+
+1.16    2014-07-24
+        - new maintainer: Barbie.
+        - created Changes, taken from POD.
+        - moved module into lib directory path.
+        - updated copyright and license.
+        - added LICENSE file.
+        - reworked Makefile.PL for clarity.
+        - minimum perl version is now 5.006.
+        - added META.json and updated META.yml.
+        - extended test suite.
+
+1.15    2008-02-27
+        - Fixed the version number.
+
+1.14    2007-04-27
+        - Added 16 "Mac" exceptions provided by Stuart McConnachie.
+          The license is now "the same terms as Perl itself".
+
+1.13    2002-04-26
+        - Changed $SPANISH_EL to $SPANISH and now 'La' => 'la' unless 
+          $SPANISH is set in which case 'La' => 'La'. Again thanks to
+          Aaron Patterson.
+
+1.12    2002-04-25
+        - Al, Ben and Van are preserved if single names and namecased 
+          otherwise, e.g. 'Al' => 'Al', 'Al Fahd' => 'al Fahd'. Added
+          $SPANISH_EL variable. All thanks to a suggestion by Aaron
+          Patterson.
+
+1.11    2000-11-24
+        - Added use locale at the suggestion of Eric Kolve. It should have
+          been there in the first place.
+
+1.10    1999-11-15
+        - Added code for names with roman numerals, thanks to David Lynn
+          Rice for this suggestion. (If you need to go beyond LXXXIX let me
+          know.)
+
+1.08    1999-09-10
+        - Renamed Text-NameCase => Lingua-EN-NameCase
+        - Renamed package Lingua::EN::NameCase.pm as per John Porter's
+          (CPAN) suggestion.
+
+1.08    1999-09-10
+        - Minor change to packaging for CPAN.
+
+1.07    1999-08-11
+        - Changed licence to LGPL.
+
+1.06    1999-08-06
+        - Renamed NameCase => Text-NameCase
+
+1.06    1999-07-30
+        - Modified for CPAN and automatic testing. Stopped using $_ as the
+          default argument.
+
+1.04    1999-05-10
+        - nc can now use $_ as its default argument 
+          e.g. "$ans = nc ;" and "nc ;", both of which set $_, with the
+          first one setting $ans also.
+
+1,03    1999-05-05
+        - Copied Kim Ryan's Mc/Mac solution from his NameParse.pm and 
+          replaced my Mc/Mac solution with his.
+
+1.00    1999-03-01
+        - Added Mac with Mack as an exception, thanks to Kim Ryan for this.
+
+0.03    1999-01-18
+        - Second public release.
+
+0.02    1998-06-25
+        - First public release.
+
+0.01    1998-04-20
+        - First release.

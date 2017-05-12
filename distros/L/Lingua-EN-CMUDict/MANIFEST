@@ -1,0 +1,8 @@
+Changes
+lib/Lingua/EN/CMUDict.pm
+Makefile.PL
+MANIFEST
+README
+share/cmusyldict.db
+t/Lingua-EN-CMUDict.t
+tools/mkdbfile.pl

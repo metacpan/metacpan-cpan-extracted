@@ -1,0 +1,264 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# $Id: lcfg-pkgcfg.in 22420 2013-01-22 14:19:52Z squinney@INF.ED.AC.UK $
+# $Source: /var/cvs/dice/LCFG-Build-PkgSpec/bin/lcfg-pkgcfg.in,v $
+# $Revision: 22420 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-PkgSpec/LCFG_Build_PkgSpec_0_1_0/bin/lcfg-pkgcfg.in $
+# $Date: 2013-01-22 14:19:52 +0000 (Tue, 22 Jan 2013) $
+
+use LCFG::Build::PkgSpec;
+use File::Spec ();
+use Getopt::Long ();
+use Pod::Usage ();
+
+our $VERSION = '0.1.0';
+
+my ( $get, %set, $in, $out, $skeleton, $help );
+Getopt::Long::GetOptions('get=s'    => \$get,
+                         'set=s'    => \%set,
+                         'in=s'     => \$in,
+                         'out=s'    => \$out,
+                         'skeleton' => \$skeleton,
+                         'help'     => \$help)
+    or Pod::Usage::pod2usage( -verbose    => 1,
+                              -exitstatus => 2 );
+
+if ( $help ) {
+    Pod::Usage::pod2usage( -verbose   => 1,
+                           -existatus => 0 );
+}
+
+if ( !defined $in ) {
+    $in = q{.};
+}
+
+my $infile;
+if ( -d $in ) {
+    $infile = File::Spec->catfile( $in, 'lcfg.yml' );
+}
+else {
+    $infile = $in;
+}
+
+my $outfile;
+if ( defined $out ) {
+    if ( -d $out ) {
+        $outfile = File::Spec->catfile( $out, 'lcfg.yml' );
+    }
+    else {
+        $outfile = $out;
+    }
+}
+else {
+    $outfile = $infile;
+}
+
+my $updates;
+
+my $spec;
+if ( $skeleton ) {
+    $spec = LCFG::Build::PkgSpec->new( name => 'skeleton' );
+    $updates = 1;
+}
+else {
+    $spec = LCFG::Build::PkgSpec->new_from_metafile($infile);
+}
+
+if ( scalar keys %set > 0 ) {
+    for my $key ( keys %set ) {
+        $spec->$key($set{$key});
+    }
+    $updates = 1;
+}
+
+if ( $updates || $infile ne $outfile ) {
+    $spec->save_metafile($outfile);
+}
+
+if ( defined $get ) {
+    my ( $key, @subkeys ) = split /\./, $get;
+
+    my $value = eval { return $spec->$key };
+
+    if ( $@ ) {
+      warn "Failed to fetch value for '$get': Unsupported attribute\n";
+      exit 2;
+    }
+
+    my $val = eval {
+        if ( ref $value ) {
+            if ( ref $value eq 'HASH' ) {
+                for my $key (@subkeys) {
+                    $value = $value->{$key}
+                }
+            }
+
+            if ( ref $value eq 'ARRAY' ) {
+                $value = join ', ', @{$value};
+            }
+        }
+        return $value;
+    };
+
+    if ( !$@ && defined $val ) {
+        print $val . "\n";
+    } else {
+      warn "Failed to fetch value for '$get': $@\n";
+      exit 3;
+    }
+}
+
+__END__
+
+=head1 NAME
+
+lcfg-pkgcfg - A tool for querying LCFG build metadata files
+
+=head1 VERSION
+
+This documentation refers to lcfg-reltool version 0.1.0
+
+=head1 USAGE
+
+    lcfg-pkgcfg --get=name
+
+    lcfg-pkgcfg --get=name --in ~/cvs/lcfg-foo
+
+    lcfg-pkgcfg --get=name --in ~/cvs/lcfg-foo/lcfg.yml
+
+    lcfg-pkgcfg --get=vcs.genchangelog
+
+    lcfg-pkgcfg --set schema=2 --set license=gpl
+
+    lcfg-pkgcfg --skeleton
+
+    lcfg-pkgcfg --skeleton --set name=foo --set version=1.0.0
+
+    lcfg-pkgcfg --in META.yml --out lcfg.yml
+
+=head1 DESCRIPTION
+
+This tool allows the user to create LCFG build package specification
+files and also query and modify the data stored. The tool can display
+or modify any attributes stored in a scalar or list form. It is also
+possible to clone existing metadata files, including those used for
+Perl CPAN modules.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --in
+
+The input LCFG build package specification metadata file name. If no
+path is passed into the script then it uses the lcfg.yml file in the
+current-directory. Otherwise you can specify a particular metadata
+file (in which case any name is acceptable) or a particular directory,
+in which case lcfg.yml will be used automatically.
+
+=item --out
+
+The output LCFG build package specification metadata file name. If no
+path is passed into the script then it uses the input file
+name. Otherwise you can specify a particular metadata file (in which
+case any name is acceptable) or a particular directory, in which case
+lcfg.yml will be used automatically. This is only normally used when
+part of the specification is updated (I<--set> or
+I<--skeleton>).
+
+There is an interesting additional feature which makes it possible to
+clone metadata files. When the input and output filenames differ then
+the data from the input will be copied to the output, anything
+irrelevant will be ignored. It is thus possible to create an LCFG
+metadata file from a CPAN metadata file (META.yml).
+
+=item --get
+
+Specify the name of the attribute to query. See
+L<LCFG::Build::PkgSpec> for the full list of attributes. Attributes
+which are stored as arrays, such as the author and platforms lists,
+will be flattened to a string (e.g. "fedora5, fedora6,
+scientificlinux5"). It is possible to query the values stored in a
+hash by joining the key names with a period (C<.>). For example
+C<vcs.genchangelog> or C<build.gencmake>, you can access any hash
+element as deep as you like. If the value of an element is an array it
+will be stringified as described above.
+
+=item --set
+
+Set the value for a attribute in the LCFG build package specification,
+see L<LCFG::Build::PkgSpec> for the full list of attributes. It is
+possible to set any number of key-value pairs at the same time. Each
+pair should be separated by just an '=' sign and preceded by the
+I<--set> option.
+
+=item --skeleton
+
+Create a skeleton package specification. As a default it sets the
+package name to 'skeleton', which is not what you want, and leaves
+most stuff blank. You can combine this option with a list of I<--set>
+options to create the package specification you actually wanted. You
+should be aware that if you use this option with a project that
+already has a lcfg.yml specification that file will be overwritten
+with the new settings.
+
+=item --help
+
+Show the documentation.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+By default this script reads and writes to the C<lcfg.yml> file for a
+project.
+
+There are no other separate configuration files and no environment
+variables need to be altered.
+
+=head1 EXIT STATUS
+
+When attempting to fetch the value for an attribute, if it is not part
+of the L<LCFG::Build::PkgSpec> API the exit status will be 2. If the
+lookup fails for any other reason the script will exit with an error
+status of 3. Any other error will result in a non-zero exit status.
+
+=head1 DEPENDENCIES
+
+This application requires L<LCFG::Build::PkgSpec>
+
+=head1 SEE ALSO
+
+lcfg-cfg2meta(1), L<LCFG::Build::PkgSpec>, L<LCFG::Build::Tools>
+
+=head1 PLATFORMS
+
+This is the list of platforms on which we have tested this
+software. We expect this software to work on any Unix-like platform
+which is supported by Perl.
+
+ScientificLinux5, ScientificLinux6
+
+=head1 BUGS AND LIMITATIONS
+
+It is not currently possible to query or set metadata which is stored
+as part of a hash reference (e.g. the version-control
+information). Anyone with good ideas as to how this can be sensibly
+achieved please contact the author.
+
+There are no known bugs in this application. Please report any
+problems to bugs@lcfg.org, feedback and patches are also always very
+welcome.
+
+=head1 AUTHOR
+
+Stephen Quinney <squinney@inf.ed.ac.uk>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2008-2013 University of Edinburgh. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GPL, version 2 or later.
+
+=cut

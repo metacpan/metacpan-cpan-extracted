@@ -1,0 +1,10 @@
+Revision history for Perl extension LibTracker::Client.
+
+0.01  Sun Mar  9 11:58:31 2008
+	- original version; created by h2xs 1.23 with options
+		-n LibTracker::Client tracker
+
+0.02  Sat Jul 12 16:25:14 2008
+	- included Devel::CheckLib to bail out on unmet dependencies.
+
+

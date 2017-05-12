@@ -1,0 +1,108 @@
+
+<Sect1 id="sec-NumExts">
+<Title><literal>NumExts</literal><IndexTerm><Primary>NumExts</Primary></IndexTerm>
+</Title>
+
+<Para>
+The <Literal>NumExts</Literal> interface collect together various numeric
+operations that have proven to be commonly useful 
+</Para>
+
+<Para>
+
+<ProgramListing>
+ -- Going between Doubles and Floats:
+doubleToFloat :: Double -&#62; Float
+floatToDouble :: Float  -&#62; Double
+
+showHex       :: Integral a =&#62; a -&#62; ShowS
+showOct       :: Integral a =&#62; a -&#62; ShowS
+showBin       :: Integral a =&#62; a -&#62; ShowS
+
+showIntAtBase :: Integral a 
+	      =&#62; a            -- base
+	      -&#62; (a -&#62; Char)  -- digit to char
+	      -&#62; a            -- number to show.
+	      -&#62; ShowS
+
+showListWith  :: (a -&#62; ShowS) -&#62; [a] -&#62; ShowS 
+</ProgramListing>
+
+</Para>
+
+<Para>
+Notes: 
+
+<ItemizedList>
+<ListItem>
+
+<Para>
+If <Function>doubleToFloat</Function> is applied to a <Literal>Double</Literal> that is within
+the representable range for <Literal>Float</Literal>, the result may be the next
+higher or lower representable <Literal>Float</Literal> value. If the <Literal>Double</Literal>
+is out of range, the result is undefined.
+</Para>
+</ListItem>
+<ListItem>
+
+<Para>
+No loss of precision occurs in the other direction with
+<Function>floatToDouble</Function>, the floating value remains unchanged.
+</Para>
+</ListItem>
+<ListItem>
+
+<Para>
+<Function>showOct</Function>, <Function>showHex</Function> and <Function>showBin</Function> will prefix <Literal>0o</Literal>,
+<Literal>0x</Literal> and <Literal>0b</Literal>, respectively. Like <Function>Numeric.showInt</Function>,
+these show functions work on positive numbers only.
+</Para>
+</ListItem>
+<ListItem>
+
+<Para>
+<Function>showIntAtBase</Function> is the more general function for converting
+a number at some base into a series of characters. The above
+<Function>show*</Function> functions use it, for instance, here's how <Function>showHex</Function>
+could be defined
+
+
+<ProgramListing>
+showHex :: Integral a =&#62; a -&#62; ShowS
+showHex n r = 
+ showString "0x" $
+ showIntAtBase 16 (toChrHex) n r
+ where  
+  toChrHex d
+    | d &#60; 10    = chr (ord '0' + fromIntegral d)
+    | otherwise = chr (ord 'a' + fromIntegral (d - 10))
+</ProgramListing>
+
+
+</Para>
+</ListItem>
+<ListItem>
+
+<Para>
+<Function>showListWith</Function> is strictly speaking not a '<Literal>NumExts</Literal>' kind
+of function, but it's sometimes useful in conjunction with the
+other <Function>show*</Function> functions that <Literal>NumExts</Literal> exports. It is
+the non-overloaded version of <Function>showList</Function>, allowing you to 
+supply the <Function>shows</Function> function to use per list element. For
+instance, 
+ 
+<ProgramListing>
+putStrLn (NumExts.showListWith NumExts.showHex [0..16])
+</ProgramListing>
+
+will print out the elements of <Literal>[0..16]</Literal> in hexadecimal form.
+
+
+</Para>
+</ListItem>
+
+</ItemizedList>
+
+</Para>
+
+</Sect1>

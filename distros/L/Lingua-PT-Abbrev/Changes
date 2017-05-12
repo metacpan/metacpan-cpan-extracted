@@ -1,0 +1,37 @@
+Revision history for Lingua-PT-Abbrev
+
+0.10    Sat Oct  4 16:33:52 WEST 2014
+        - Localize $_
+
+0.09    Tue Jul 23 18:17:38 WEST 2013
+        - Fix low precedence or (thanks Reini Urban!)
+
+0.08    August 22, 2012
+        - Proper encoding in POD file.
+
+0.07    September 3, 2008
+        - Removed the tilde on my name, from Makefile.PL.
+          Was generating some weird results on VMS and Solaris.
+
+0.06	Mon Mar 24 22:13 2008
+	- Added a README File;
+	- Added abbreviations;
+
+0.05    Tue Nov 09 19:35 2004
+	- Added method to get regular expression of abbrevs;
+
+0.04    Mon Nov 08 19:45 2004
+	- Moved abbreviation database to separate file;
+	- Added instalation procedure to abbreviation database;
+
+0.03    Fri Oct 22 15:40 2004
+	- Moved from Module::Builder to ExtUtils::MakeMaker;
+
+0.02    Sat Oct  9 20:23 2004
+	- Basic code to handle a custom dictionary;
+	- Basic code to handle a session dictionary;
+
+0.01    Tue Oct  5 15:20 2004
+        - Basic code and documentation
+	- Very basic list of abbreviations
+

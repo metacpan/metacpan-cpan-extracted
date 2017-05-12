@@ -1,0 +1,26 @@
+##################################################
+# CHUNKING EXCEPTIONS (type information, valeur) #
+##################################################
+#
+########################
+# CERTAINES PREPOSITIONS
+#
+IF	de
+IF	du
+IF	d
+IF	au
+IF	aux
+IF	des
+IF	à
+IF	avant
+IF	par
+IF	le
+IF	la
+IF	les
+IF	l
+IF	en
+POS	Vmpp-----
+POS	Vmps-sm--
+POS	Vmps-sf--
+POS	Vmps-pm--
+POS	Vmps-pf--

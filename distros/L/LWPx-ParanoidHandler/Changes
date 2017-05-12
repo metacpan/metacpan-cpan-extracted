@@ -1,0 +1,30 @@
+Revision history for Perl extension LWPx::ParanoidHandler
+
+0.07 2014-06-04T03:39:17Z
+
+    - Fixed dependencies
+    - Fixed testing issue.
+
+0.06
+    
+    [NO FEATURE CHANGES]
+    - docs about timeout
+
+0.05
+
+    - fixed deps
+
+0.04
+
+    - split package with Net::DNS::Parnoid
+
+0.03
+
+    - more docs!
+
+0.02
+
+    - doc enhancements
+
+0.01    Fri Sep 14 12:25:05 2012
+    - original version

@@ -1,0 +1,236 @@
+# -*- perl -*-
+
+=head1 TITLE
+
+Using optimizer to do Method Munging.  (as done in
+Log::Log4perl::AutoCategorize)
+
+=head1 Munging (from C++)
+
+A Term borrowed from C++; it disambiguates same-named functions in
+different classes, or with different argument or return types.
+It allowed a C++ front-end to use a C compiler back-end.
+
+ Example:
+
+ public class A {
+	int foo();
+	int foo(int);
+ }
+ public class B : public A {
+	String foo();
+	String foo(String);
+ }
+
+yielding something like: (its internal to compile/link so doesnt matter)
+
+    foo_A_void;
+    foo_A_int;
+    foo_B_void;
+    foo_B_String;
+
+The reasons we do it are different, but the operation is similar; it
+'alters' the symbol table.
+
+=head1 Reason to Munge
+
+At compile time, we want to convert all instances of:
+
+    FROM: {
+	Logger->debug ("msg A");
+	Logger->debug ("msg B");
+    }
+    TO:	{
+	Logger->debug_001 ("msg A");
+	Logger->debug_002 ("msg B");
+    }
+
+Each invocation gets its own B<UNIQUE> function-name (an arbitrary one)
+
+=head2 Why?	
+
+So we can create custom handlers for each.. (hold this thought)
+
+=head1 Motivating Application: logging with Log::Log4perl
+
+Log::Log4perl provides a powerful, flexible way to redirect and filter
+logging via config-file, and the 'category' that the programmer writes
+into his classes.
+
+Its problem is that using the power requires that the programmer be
+careful and diligent with his categorization used in his logging.
+
+=head2 Log::Log4perl powerful example
+
+    # load a config-string (or file)
+    Log::Log4perl->init(\ qq{
+           log4perl.category.Candy.Twix = DEBUG, Screen
+           log4perl.category.Candy.Snickers = INFO, Screen
+           });
+
+    # now use that logger
+    package Candy::Twix;
+
+    sub new {
+	my $logger = Log::Log4perl->new("Candy::Twix::new");
+	$logger->debug("Creating a new Twix bar");
+	bless {}, shift;
+    }
+
+=head2 Notes about above example
+
+new() has its own category, implying that each method would also have
+its own.  This represents a coding burden on the client.  The category
+must be manually added to each method, even though its known to perl,
+via caller().
+
+You're wise to keep category consistent with (ie the same as) the
+package and method.
+
+The config-string has a logging category for Bar::Twix only, not for
+each of its methods.  This example doesnt do detailed control of
+logging, but its possible later (assuming a config-file) because
+methods use distinct categories.
+
+=head2 Log::Log4perl qw(:easy);
+
+In easy mode, Log4perl sets $category = __PACKAGE__
+
+No work for the programmer, but gives a lot less control over what
+gets logged.
+
+Sorry Virginia, there is no __SUBROUTINE__.
+
+=head1 You can have both ease and power, with Log::Log4perl::AutoCategorize
+
+AutoCategorize is a wrapper on Log::Log4perl, and uses its log-config
+and filtering mechanisms.  However, it extends the $category, giving
+the filters more detailed info to act upon..
+
+In Log4perl ':easy':
+
+    $category = "$package";
+
+In Log::Log4perl::AutoCategorize:
+
+    $category = "$package.$subroutine.$loggingLevel.$lineNumber";
+
+Now filtering, as specified in your log-config, can tease out every
+invocation individually.
+
+
+=head1 OK, wheres optimizer come into it ?
+
+In Log4perl, every time $logger->debug() is called, it must decide:
+I<what to do with the message?>
+
+I made it worse; now $category includes info that only caller() can
+provide.  This adds significant runtime cost (esp for an
+application-wide logger).
+
+I<However>.. by differentiating each caller B<with a unique method
+name>, the name can be associated with the log / dont-log choice, and
+'remembered' by a custom subroutine, which is added to the symbol
+table.
+
+The next time that munged method (ex: debug_00001) is called,
+AutoCategorize::AUTOLOAD is uninvolved; the recently vivified method
+is dispatched directly.
+
+This actually executes faster than Log4perl, and up-front munging cost
+is quickly amortized, though at cost of more memory for code.
+
+=head2 Youre still using caller() at runtime.  Why ?
+
+To compute the $category, caller() must be looking at the real
+call-stack.  At compile-time, the only thing on the stack (besides the
+optimizer callback) is an __ANON__ block.
+
+Since we cant determine a category at runtime, the munge is arbitrary,
+and _00001++ is as good as any.
+
+=head1 Shameless plug
+
+Since Log::Log4perl::AutoCategorize knows all logging calls, and knows
+which ones were actually invoked, it gives you a detailed coverage
+report for free.
+
+ [jimc@harpo t]$ mroe out.cover.tconf_file 
+ (19:44:06.204) Log.Log4perl.AutoCategorize.END.info.308: Seen Log Events:, {
+  'Log.Log4perl.AutoCategorize.END.info.308' => 1,
+  'log4perl.category.A.truck.debug.63' => 20,
+  'log4perl.category.A.truck.debug.65' => 20,
+  'log4perl.category.A.truck.debug.66' => 20,
+  'log4perl.category.A.truck.warn.62' => 20,
+  'log4perl.category.main.car.warn.46' => 10,
+  'log4perl.category.main.main.info.28' => 5,
+  'log4perl.category.main.main.warn.27' => 5,
+  'log4perl.category.main.suv.warn.51' => '-10',
+  'log4perl.category.main.suv.warn.52' => '-10'
+ }
+ (19:44:06.207) Log.Log4perl.AutoCategorize.END.info.308: un-Seen Log Events:, {
+  'info_00011' => 'main,tconf_file.pl,36',
+  'warn_00008' => 'B::C,tconf_file.pl,76'
+ }
+ (19:44:06.210) Log.Log4perl.AutoCategorize.END.info.308: cat2data:, {
+  'A.truck.debug.63' => 'debug_00005',
+  'A.truck.debug.65' => 'debug_00006',
+  'A.truck.debug.66' => 'debug_1_00007',
+  'A.truck.warn.62' => 'warn_00004',
+  'main.car.warn.46' => 'warn_00001',
+  'main.main.info.28' => 'info_00010',
+  'main.main.warn.27' => 'warn_00009',
+  'main.suv.warn.51' => 'warn_00002',
+  'main.suv.warn.52' => 'warn_00003'
+ }
+
+As a convenience, it also dumps ref-data args.
+
+
+=head2 Notes on Coverage Report
+
+%Seen counts number of times the call was made, positive numbers mean
+the logging was enabled, negative means suppressed.
+
+%UnSeen calls were never reached, and may represent testing
+inadequacies.
+
+I eat my own dog-food; the same logging mechanisms issue a report from
+an END block, and are re-directable using any Log4perl means.
+
+=head1 Conclusions
+
+optimizer is BADDASS, this is a fairly trivial usage.
+
+I had a couple surprises, particularly with B::NULL ops.  These are
+probably remnants of optimization done before I get called.
+
+My optimzer callback recognizes and alters this opcode chain:
+
+   perl -MO=Concise,-exec -e 'Logger->debug([{1=>"a"}])'
+
+Arthur Bergman is talking tomorrow on optimizer.pm
+
+
+All flavors of munging require AUTOLOAD to handle the munged
+functions.  Otherwize, you'd not bother munging, and just code it
+directly.
+
+This is only useful in a situation where you need info about your
+caller; ie where you have to make a decision that needs it as input.
+
+Munging worked here because: 
+
+=item
+
+we're too lazy to provide our own categories
+
+=item
+
+the caller-info was an acceptable approximation of what
+we would do if we werent so lazy
+
+=item
+
+laziness is a virtue :-)
+

@@ -1,0 +1,11 @@
+Revision history for LWP-UserAgent-ProxyHopper-Base
+
+0.003   August 6, 2012
+        Updated examples and docs to thank for the patch
+
+0.002   October 9, 2008
+        Fixed the bug that prevented reuse of "working" list.
+
+0.001   Mar 16, 2008
+        First version, released on an unsuspecting world.
+

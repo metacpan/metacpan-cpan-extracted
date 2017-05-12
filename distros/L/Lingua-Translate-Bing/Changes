@@ -1,0 +1,8 @@
+Revision history for Lingua-Translate-Bing
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    Fix bug with lack "tokens.xml".
+
+0.03    Fix documentation bugs. Added some tests.

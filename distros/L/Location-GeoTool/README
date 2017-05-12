@@ -1,0 +1,36 @@
+Location-GeoTool version 2.00
+=========================
+
+This module is for one who wants to calcurate Geometric
+Data.
+This contains these functions:
+  > Change the format of coordinates
+  > Calculate the point from direction and distance
+  > Calculate the direction and the distance of two points
+  > Change the datum of coordinates
+  > Get Direction name string from degree
+Sorry, in this version can handle only two datum : WGS84 and TOKYO.
+It is welcome if you extend this module to datum you want.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Math::Trig
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2007 by Kokogiko!,
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

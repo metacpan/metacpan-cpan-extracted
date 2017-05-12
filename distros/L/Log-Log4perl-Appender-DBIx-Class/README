@@ -1,0 +1,76 @@
+NAME
+    Log::Log4perl::Appender::DBIx::Class - appender for DBIx::Class
+
+SYNOPSIS
+      my $dbic_appender = Log::Log4perl::Appender->new(
+        'Log::Log4perl::Appender::DBIx::Class',
+        schema => $schema,
+        class => 'Message',
+      );
+
+      $log->add_appender($dbic_appender);
+
+      $log->error('Hello!');
+
+DESCRIPTION
+    This is a specialized Log4perl appender that allows you to log to with
+    DBIx::Class. Each appender can use a different (or the same) class and
+    each column is configurable.
+
+    Note: I wanted this module to operate on an already connected schema,
+    hence it's lack of a config file example. If you want to use it in such
+    a way, patches are welcome!
+
+PARAMETERS
+    These can be supplied to Appender's `new' method.
+
+    class
+        The resultset class to use for logging. Defaults to 'Log'.
+
+    category_column
+        The column in which to store the Log4perl category. Defaults to
+        'category'.
+
+    level_column
+        The column in which to store the Log4perl level. Defaults to
+        'level'.
+
+    message_column
+        The column in which to store the Log4perl message. Defaults to
+        'message'. In case you are wondering (I was), this column WILL
+        received the formatted message as defined by the appender's layout.
+
+    other_columns
+        This parameter allows you to pass in an arrayref of arbitrary column
+        names. At the time the row is created, this arrayref will be
+        iterated over and any column names will be set:
+
+          foreach my $col (@{ $self->{column_names}}) {
+              $row->$col($self->{$col});
+          }
+  
+        This allows you to specificy arbitrary options when you create the
+        appender and have the logged in any rows created. An example is in
+        order:
+
+          my $appender = Log::Log4perl::Appender->new(
+              'Log::Log4perl::Appender::DBIx::Class',
+              schema => $schema,
+              class => 'Message',
+              user => 'someuser',
+              other_columns => [qw(user)]
+          );
+  
+        This will cause any Message objects that are logged to have their
+        `user' column set to 'someuser'.
+
+AUTHOR
+    Cory G Watson <gphat@cpan.org>
+
+SEE ALSO
+    Log::Log4perl, DBIx::Class
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

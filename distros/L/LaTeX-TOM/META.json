@@ -1,0 +1,59 @@
+{
+   "abstract" : "A module for parsing, analyzing, and manipulating LaTeX documents.",
+   "author" : [
+      "Steven Schubiger <schubiger@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "LaTeX-TOM",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "File::Basename" : 0
+         }
+      }
+   },
+   "provides" : {
+      "LaTeX::TOM" : {
+         "file" : "lib/LaTeX/TOM.pm",
+         "version" : "1.03"
+      },
+      "LaTeX::TOM::Node" : {
+         "file" : "lib/LaTeX/TOM/Node.pm",
+         "version" : "0.03"
+      },
+      "LaTeX::TOM::Parser" : {
+         "file" : "lib/LaTeX/TOM/Parser.pm",
+         "version" : "0.07"
+      },
+      "LaTeX::TOM::Tree" : {
+         "file" : "lib/LaTeX/TOM/Tree.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.03"
+}

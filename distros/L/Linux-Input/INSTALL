@@ -1,0 +1,12 @@
+perl -MCPAN -e 'install Linux::Input';
+
+or
+
+# download the distribution
+# untar it
+./Build
+./Build test
+# become root
+./Build install
+
+

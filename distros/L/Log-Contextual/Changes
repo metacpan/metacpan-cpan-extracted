@@ -1,0 +1,121 @@
+Revision history for Log-Contextual
+
+0.007000  2016-04-11 21:35:41-07:00 America/Los_Angeles
+ - Add `has_logger` predicate to avoid setting logger twice
+   (Thanks Wes Malone!  Thwes!)
+
+0.006005  2015-03-14 12:54:46-05:00 America/Chicago
+ - Fix performance (and arguably duplicate side effects!) in multilogger setups
+   (Good catch and fix Christian Walde!)
+ - Fix warning introduced in 5.21.x
+
+0.006004  2014-07-15 21:50:41-05:00 America/Chicago
+ - Various POD fixes (Karent Etheridge, Florian Schlichting)
+
+0.006003  2014-02-22 09:41:29CST-0600 America/Chicago
+  - Stop depending on XS module Sub::Identify
+
+0.006002  2014-02-20 16:05:20CST-0600 America/Chicago
+  - Fix missing POD
+
+0.006001  2014-02-20 15:51:29CST-0600 America/Chicago
+  - Fix warnings caused by importing more than once
+
+0.006000 2013-09-05
+  - Add Log::Contextual::Easy::Default for simple LC usage (Jakob Voß)
+  - Add Log::Contextual::Easy::Package for more different simple LC usage
+
+0.005005 2013-08-08
+  - Fix minimum version of Exporter::Declare
+
+0.005004 2013-08-08
+  - Dep on a newer version of Moo for multiple role composition
+
+0.005003 2013-03-21
+  - Yell loudly if a user tries to use Log::Contextual::set_logger() or
+    Log::Contextual::with_logger() (aka internals that don't work anymore)
+    directly
+
+0.005002 2013-02-14 (♥)
+  - Fix RT#83267 (Tyler Riddle)
+
+0.005001 2013-02-07
+  - No changes from previous dev release
+
+0.005000_03 2013-01-16
+  - merge unpushed 0.004300 into master (frew--, Tyler Riddle++)
+
+0.005000_02 2013-01-15
+ - add missing changelog entry (derp)
+
+0.005000_01 2013-01-11
+  - significant changes in the way Log::Contexual works, but the upshot of it is
+    that Log::Contextual is now much less global than before, and applications
+    using Log::Contextual can guard against modules using set_logger (or
+    something like that) and changing their logger.  See the new
+    Log::Contextual::Role::Router for more information
+
+0.004300 2012-10-03
+  - add a way to set default import tags
+
+0.004202 2012-08-04
+  - correct the caller_level passed into coderef, and document "both" uses of
+    caller_level
+
+0.004201 2012-07-21
+  - The smallest pod fix ever
+
+0.004200 2012-07-20
+  - Improve information passed to logger coderef
+  - Significant doc improvements
+  - Fix warning in test suite in Perl 5.16
+
+0.004100 2012-03-29
+  - Log::Contextual::WarnLogger now supports customized log levels via the
+    'levels' constructor argument (Karen Etheridge)
+
+0.004001 2011-08-15
+  - Fix version of Exporter::Declare that we dep on
+
+0.004000 2011-08-06
+  - Support Log::Contextual subclasses for default import options
+  - Allow custom log levels
+
+0.00305 2011-07-27
+  - Fix regression that caused D* subs to dumper even if the log level was off
+
+0.00304 2010-07-31
+  - Add $package_UPTO environment variable for WarnLogger
+
+0.00303 2010-07-10
+  - Fix broken Log::Log4perl test
+
+0.00302 2010-07-08
+  - Add Log::Contextual::TeeLogger
+  - Add levels_upto (RT58558)
+  - Use Log::Log4perl 1.29 to clean up caller stuff
+
+0.00301 2010-07-08
+  [deleted due to missing the TeeLogger]
+
+0.00300 2010-06-03
+  - Add -package_logger import option
+
+0.00202 2010-05-23
+  - Fix a bug that caused Dlog and friends not to work with a default
+
+0.00201 2010-03-04
+  - I left a needed file for testing out of the MANIFEST; fixing :-/
+
+0.00200 2010-03-03
+  - add example for Log::Dispatchouli since it works nicely now
+  - make Log::Log4perl work out of the box
+  - Added WarnLogger for libraries
+  - Warn if set_logger is called more than once
+  - Fix tiny POD errors
+
+0.00101 2010-02-21
+  - Fix tests to not need use lib (incorrect test failures)
+
+0.00100 2010-02-20
+  - initial release

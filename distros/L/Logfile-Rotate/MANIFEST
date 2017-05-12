@@ -1,0 +1,17 @@
+Changes
+Logfile-Rotate.man.html
+MANIFEST
+Makefile.PL
+README
+Rotate.pm
+TODO
+t/01rotate.t
+t/02signal.t
+t/03compress.t
+t/04dir.t
+t/05flock.t
+t/06persist.t
+t/07pre.t
+t/08post.t
+t/09lib_compress.t
+t/rotate.log

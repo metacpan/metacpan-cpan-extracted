@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>
+Cyrillic detector test
+</title>
+<LINK REL="stylesheet" HREF="../pod.css" TYPE="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<style>
+BODY {font-family: Arial, Helvetica,sans-serif;font-size:10 pt}
+</style>
+</head>
+<body bgcolor="#E8E8E8">
+
+<script language=javascript1.2>var MenuBuiltOnServer=0;</script>
+<!--#include virtual="../menu.pl" -->
+<script language=javascript1.2 src="../Languages.inc"></script>
+<script language=javascript1.2 src="./Menu.inc"></script>
+<script language=javascript1.2 src="../MakeMenu.js"></script>
+
+<h4>Определяет кодировку и язык - русский или украинский</h4>
+Введите фрагмент текста на русском или украинском языке и нажмите на кнопку <i>Определить</i>.
+<br><b>Число токенов</b> - число токенов (слов), после которых программа останавливает анализ (удовлетворяется результатами).
+<br><b>Определять все языки</b> - если не помечено "галочкой", программа определяет только русский язык.  
+<p><i>Примечания.</i> Для проверки <i>не пользуйтесь</i> дополнительным скриптом перекодировки в правой части 
+меню, а меняйте кодировку только в Вашем браузере. Старые версии Netscape не позволяют динамически менять кодировку, 
+если в документе имеется тэг <i>meta</i> с явным указанием charset.
+
+<form method=get action="http://www.bible.ru/cgi-bin/DetectCyrillic_test.pl" >
+<textarea rows=6 cols=53 name="Text_area"></textarea><br>
+Маскимальное число токенов: <select size="1" name="MaxTokens">
+  <option>10</option>
+  <option>30</option>
+  <option>50</option>
+  <option selected>100</option>
+  <option>200</option>
+  <option>300</option>
+  <option>500</option>
+</select>&nbsp;&nbsp; Определять все языки: <input type="checkbox" name="DetectAllLang" value="ON" checked><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type=submit value="Определить!">
+</form>
+</body>
+</html>

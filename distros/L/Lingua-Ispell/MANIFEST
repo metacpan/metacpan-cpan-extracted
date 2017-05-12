@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+test.pl
+Changes
+README
+lib/Lingua/Ispell.pm
+spellcheck

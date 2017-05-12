@@ -1,0 +1,4 @@
+Options +Includes +ExecCGI 
+DirectoryIndex DetectLanguage.pl 
+AddHandler server-parsed .htm
+AddHandler cgi-script .pl

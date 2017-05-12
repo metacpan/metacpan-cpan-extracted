@@ -1,0 +1,88 @@
+[% 
+    htmltitle = 'Diary' ;
+    title = htmltitle ;
+
+    crumb1_name = 'Diary' ;
+%]
+
+[% IF mainarts %]
+[% FOREACH article = mainarts %]
+<div class="blocker">
+
+  <h2><a href="[% webpath %]/diary/[% article.data.articleid %]" rel="bookmark" title="Permanent Link to [% article.data.title | html %]">[% article.data.title | html %]</a></h2>
+  <p class="small">Posted by <a href="/user/[% article.data.userid %]">[% article.data.name %]</a> on [% article.data.postdate %]</p>
+
+    [% FOREACH item = article.body %]
+    [% IF item.type == 1 %]
+  [% IF item.align  %][% class = item.alignclass %][% ELSE %][% class = "inline" %][% END %]
+    [% IF item.href %]
+      <div class="thumb[% item.alignclass %]" >
+      <a href='[% item.href %]'><img src="[% webpath %]/[% item.link %]" alt="[% item.tag | html %]"
+        [% IF item.width  %]width="[% item.width %]"[% END %]
+        [% IF item.height %]height="[% item.height %]"[% END %]
+        /></a>
+      [% IF item.tag %]<p>[% item.tag | html %]</p>[% END -%]
+        </div>
+    [% ELSE %]
+        <div class="thumb[% item.align %]" >
+        <img src="[% webpath %]/[% item.link %]" alt="[% item.tag %]"
+        [% IF item.width  %]width="[% item.width %]"[% END %]
+        [% IF item.height %]height="[% item.height %]"[% END %]
+        />
+      [% IF item.tag %]<p>[% item.tag | html %]</p>[% END -%]
+        </div>
+    [% END %]
+    [% END %]
+    [% IF item.type == 2 %]
+            [% item.body %]
+    [% END %]
+    [% IF item.type == 3 %]
+            <a href='[% item.href %]'>[% item.body %]</a>
+    [% END %]
+    [% END %]
+
+    <table border="0" cellspacing="2" cellpadding="0" width="100%">
+    <tr><td valign="bottom">
+  <p class="small">
+    [% IF article.meta %]
+      File Under:
+      [% count = 0 %]
+      [% FOREACH meta = article.meta %]
+        [% IF count > 0 %]/[% END %]
+        <a href="[% cgipath %]/pages.cgi?act=diary-meta&amp;data=[% meta %]">[% meta %]</a>
+        [% count = count + 1 %]
+      [% END %]
+      <br />
+    [% END %]
+      <a href="[% cgipath %]/pages.cgi?act=diary-item&amp;articleid=[% article.data.articleid %]#comments">
+      [% IF article.comments == 0 %]NO COMMENTS[% END %]
+      [% IF article.comments == 1 %]1 COMMENT[% END %]
+      [% IF article.comments > 1 %][% article.comments %] COMMENTS[% END %]
+      </a>
+    [% IF user.admin %]
+    | Edit | Delete
+    [% END %]
+  </p>
+    <hr class="ruler" />
+    </td></tr>
+    </table>
+</div>
+[% END %]
+[% ELSE %]
+<p>Sorry, your search failed to find any blog entries :(</p>
+[% END %]
+
+[% IF archive.volumes %]
+<table class="prevnext">
+<tr><td class="left">[% IF archive.volumes.prev %]&lt;&lt; <a href="[% cgipath %]/pages.cgi?act=diary-list&amp;volume=[% archive.volumes.prev.volumeid %]">[% archive.volumes.prev.archdate %]</a> ([% archive.volumes.prev.counter %])[% END %]</td>
+    <td class="right">[% IF archive.volumes.next %]<a href="[% cgipath %]/pages.cgi?act=diary-list&amp;volume=[% archive.volumes.next.volumeid %]">[% archive.volumes.next.archdate %]</a> ([% archive.volumes.next.counter %]) >>[% END %]</td></tr>
+</table>
+[% END %]
+
+[% IF pages %]
+<table class="prevnext">
+<tr><td class="left">[% IF pages.previous %]&lt;&lt; <a href="[% cgipath %]/pages.cgi?act=diary-list&amp;page=[% pages.previous %]">Page [% pages.previous %]</a>[% END %]</td>
+    <td class="right">[% IF pages.next %]<a href="[% cgipath %]/pages.cgi?act=diary-list&amp;page=[% pages.next %]">Page [% pages.next %]</a> >>[% END %]</td></tr>
+</table>
+[% END %]
+

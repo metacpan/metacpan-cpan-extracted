@@ -1,0 +1,53 @@
+Changes for the Labyrinth-Plugin-Event
+======================================
+
+1.10    2015-03-09
+        - added missing GetEventType SQL phrase.
+        - added even more functional tests.
+
+1.09    2015-03-06
+        - added more functional tests.
+
+1.08    2015-02-18
+        - added missing test pre-requisite.
+
+1.07    2015-02-04
+        - fixed date calculations in tests.
+
+1.06    2014-12-22
+        - missing prerequisite.
+
+1.05    2014-12-08
+        - fixed license fields in META.json to be lists.
+        - extended META test suite.
+        - sponsorid is not mandatory for new sponsors.
+        - DeleteSponsors requires a list.
+        - added test data files.
+        - added event, sponsor, talks, types and venue tests.
+        - EventSelect is now an object method.
+        - added permissions checks to admin methods.
+        - fixed field order for Save and Copy event.
+
+1.04    2014-04-15
+        - fixed distribution name in META (thanks Neil).
+
+1.03    2013-05-05
+        - change file dates changed to meet W3CDTF standards.
+        - test suite update.
+        - added LICENSE file.
+        - template updates.
+        - upgrade to Labyrinth 5.17.
+
+1.02    2012-06-10
+        - fixed substitutions on undefined variables.
+        - listdate now an int to allow numeric sorting.
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+1.01    2011-04-10
+        - added missing abbreviations code.
+        - fixed templates and Event code from cpanblog integration.
+
+1.00    2011-04-09
+        - first official release

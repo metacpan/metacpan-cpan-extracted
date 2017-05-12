@@ -1,0 +1,21 @@
+README for Lab::Measurement
+-----------------------------------------------------------------------------------------
+
+Lab::Measurement allows to perform test and measurement tasks with Perl scripts. It
+provides an interface to several instrumentation control backends, as e.g. LinuxGPIB or
+National Instruments' NI-VISA library. Dedicated instrument driver classes relieve the
+user from taking care for internal details.
+
+See http://www.labmeasurement.de/ for further information, including
+installation instructions.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 
+  2004-2008 Daniel Schröer, 
+  2009-2010 Daniel Schröer, Andreas K. Hüttel, Daniela Taubert, David Kalok, and others,
+  2011-2012 Florian Olbrich, Andreas K. Hüttel, Alois Dirnaichner, Hermann Kraus, Stefan Geissler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.

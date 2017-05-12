@@ -1,0 +1,10 @@
+
+
+0.01 -> 0.02
+   - Moved around directories so 'make install' works properly
+     (oops!).
+   - Added further pod documentation.
+   - Added is_valid_gender() function.
+   - Added 'make test'.
+   - Fixed the gender() function.
+

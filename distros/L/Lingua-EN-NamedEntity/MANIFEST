@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+NamedEntity.pm
+README
+t/1.t
+t/kelly
+data/givennames-ol
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+data/mkdb.pl
+data/dictionary.gz
+data/dictionary-README
+META.json                                Module JSON meta-data (added by MakeMaker)

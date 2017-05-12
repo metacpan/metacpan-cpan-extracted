@@ -1,0 +1,40 @@
+
+This widget provide: 
+- Log::Dispatch::TkText: a read-only text widget (based on Tk::ROText)
+  for logging through the Log::Dispatch module.
+- Log::Dispatch::ToTk: an interface class to handle logs between
+  Log::Dispatch and the Tk widget. (Log::Dispatch::TkText in most
+  cases)
+
+Most users will only need to use a Log::Dispatch::TkText widget to
+have Log::Dispatch messages written on a text widget. For more fancy
+uses, the Log::Dispatch::ToTk class can be used by a dedicated
+composite widget.
+
+See the embedded documentation in the module for more details.
+
+Comments and suggestions are always welcome.
+
+Legal mumbo jumbo:
+
+ Copyright (c) 2000-2003,2017 Dominique Dumont
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.
+
+Author: Dominique Dumont (ddumont@cpan.org)
+
+---------------------------------------------------------------------
+INSTALLATION
+
+   	 gunzip -c <dist_file>.tar.gz | tar xvf -
+   	 cd <dist_directory>
+   	 perl Makefile.PL
+   	 make test          
+   	 make install
+
+
+
+
+
+
+

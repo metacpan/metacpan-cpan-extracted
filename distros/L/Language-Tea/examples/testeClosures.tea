@@ -1,0 +1,11 @@
+define areaRectangulo (comprimento) {
+    lambda (largura) { 
+        echo "o comprimento e " $comprimento " a largura e " $largura
+        * $comprimento $largura }
+}
+
+define a [areaRectangulo 4]
+define b [areaRectangulo 2]
+
+echo [$a 3]
+echo [$b 3]

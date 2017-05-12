@@ -1,0 +1,34 @@
+<lemonconfig>
+
+<domain
+	id="foo.com"
+	Cookie="Brownie"
+	Portal="https://www.foo.com/portail/accueil.pl"
+	Menu="https://www.foo.com/portail/menu.pl"
+	Session="memcached"
+	ldap_server="ldap.foo.com"
+	ldap_branch_people="ou=people,dc=foo,dc=com"
+	DnManager="uid=root,dc=foo,dc=com"
+	PasswordManager="secret"
+	>
+	<handler
+		id="LINAGORA"
+		AttrLdap="LINUX"
+		CodeAppli="TUX"
+		BasePub="http://public.foo.com"
+		BasePriv="http://private.foo.com"
+		IpcNb="5"
+		Enabledproxy="1"
+		ProxyExt="http://10.75.5.12:3132"
+		>
+	</handler>
+</domain>
+
+<cache id="/tmp/TEST">
+</cache>
+
+<session id="memcached" SessionParams="(servers => ['127.0.0.1:11211'])">
+</session>
+
+</lemonconfig>
+

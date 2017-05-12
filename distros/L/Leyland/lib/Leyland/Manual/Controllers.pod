@@ -1,0 +1,371 @@
+=head1 NAME
+
+Leyland::Manual::Controllers - Creating Leyland controllers
+
+=head1 CONTROLLERS
+
+Controllers are the main building blocks of your application. They define
+the resources (or routes) available to clients and perform whatever logic
+your application needs to perform.
+
+Every controller has one or more routes. A route is a path in your web
+application, like "/posts" or "/articles/139". Of course, it's much more
+than that, as explained by the L</"ROUTES"> section. Every controller
+also has a prefix. The prefix is prepended to the paths of all routes
+in the controller. So, if a controller has a prefix "/posts", and
+a route with the path "/comments", then the actual path of the route would
+be "/posts/comments".
+
+Every Leyland application has a root controller. This controller has an
+empty prefix, so all of its routes are top level. This controller will hold
+the root route, which has no path (or more correctly has the "/" path).
+If your application is located under C<http://example.com/>, then the
+root route handles requests directly to C<http://example.com/>.
+
+Different controllers can share the same prefix, which is useful if you
+want to categorize your routes according to some common properties. Note,
+however, that when having two or more routes with the exact same declaration in two
+or more controllers that share the same prefix, Leyland's behavior is
+undefined, so please avoid such situations.
+
+All controllers of your application should be located under the C<lib/MyApp/Controller/>
+directory of your application. Of course, you can nest controllers
+infinitely, Leyland won't care (but Perl mostly would).
+
+A controller class is a L<Moo>/L<Moose> class that consumes the L<Leyland::Controller> role.
+A minimal Leyland controller will look something like this:
+
+	package MyApp::Controller::Root;
+
+	use Moo;
+	use Leyland::Parser;
+	use namespace::clean;
+
+	with 'Leyland::Controller';
+
+	prefix { '' }
+
+	get '^/$' {
+		$c->template('index.html');
+	}
+	
+	1;
+
+This controller, which is an application's root controller, has an empty
+prefix (non-root controllers will have prefixes that start with a slash,
+like "/posts"), and one root route for GET requests. The next section
+describes routes.
+
+A controller class is also allowed to have any or all of the following
+methods:
+
+=head2 auto( $self, $c )
+
+This method is called at the beginning of every request, before it is
+handled by the proper route. The thing about the C<auto()> method is that
+every C<auto()> method in the chain starting from the root controller
+and leading up to the controller that actually handles the request will
+be called in order. So, say a request to your application is to be
+handled by your C<MyApp::Controller::Posts::Comments> controller.
+In this case, Leyland will attempt to invoke the C<auto()> method of
+C<MyApp::Controller::Root>, then C<MyApp::Controller::Posts> (if exists),
+and finally C<MyApp::Controller::Posts::Comments>. The chain won't "break"
+if any of the controllers doesn't have an C<auto()> method, since every
+Leyland controller has a default C<auto()> method that doesn't do anything.
+
+=head2 pre_route( $self, $c )
+
+This method is very similar to the C<auto()> method. It is also called
+before the request is handled by its proper route, but after the C<auto()>
+method, and only the C<pre_route()> method of the actuall controller is
+invoked.
+
+=head2 pre_template( $self, $c, $tmpl_name, [ \%context, $use_layout ] )
+
+This method is called right before a view/template is rendered (i.e. when
+you call C<< $c->template() >>. It receives the context object (C<$c>),
+and whatever arguments you've passed to C<< $c->template() >>. If you
+find it useful, knock yourself out, personally I do not use it.
+
+=head2 post_route( $self, $c, \$ret )
+
+This method is called after a response was generated, but before it is
+returned to the client. It receives the context object (C<$c>), and a reference
+to the returned output (which is a scalar). The reason a reference is provided
+is to allow you to modify it before sending. If you need to modify the
+response for every controller and not just on a per-controller basis,
+take a look at the C<finalize()> method of L<Leyland::Context> (read
+L<Leyland::Manual::Extending> to learn how to define this method), which
+is exactly the same, but called after C<post_route()> and for every
+request.
+
+=head1 ROUTES
+
+The route, as previousely mentioned, is what actually handles a request
+and generates a response. Every route is built of six parts:
+
+=over
+
+=item 1. The HTTP request method the route handles, like GET or POST.
+
+=item 2. A regular expression describing the URI paths the route matches
+(in string form).
+
+=item 3. A list of content types the route accepts from the client (a string
+separated by the '|' character).
+
+=item 4. A list of content types the route returns to clients (a string
+separated by the '|' character).
+
+=item 5. The route's type (external or internal, described later).
+
+=item 6. The route's logic (a plain Perl subroutine).
+
+=back
+
+Let's look at a pretty complete example:
+
+	get '^/posts$' accepts 'text/html|application/json' returns 'application/json' {
+		my @posts = MyDatabase->load_posts();
+		return { posts => \@posts };
+	}
+
+The above route will only match C<GET> requests whose path is exactly
+"/posts" (assuming we're on the root controller, or any controller that
+has an empty prefix). It will only accept C<text/html> or C<application/json>
+from the client, and will only return JSON. The following HTTP methods
+are available:
+
+=over
+
+=item * get: for C<GET> requests. If you want your app to really be RESTful,
+get routes should be "safe", in that they should not change the state of
+the application. C<GET> requests are as they're named: requests to I<get>
+data, not create/modify/delete data. Your clients need to rest assured
+application data will not be tampered as a result of C<GET> requests.
+
+=item * put: for C<PUT> requests.
+
+=item * post: for C<POST> requests.
+
+=item * del: for C<DELETE> requests.
+
+=item * any: will match any request method. Please don't use it. Really.
+But if you do, take into account that if a route that matches a certain
+path exists with the exact request method, and another route matches the
+same path but with the 'any' method, then the exact route will take
+precedence.
+
+=back
+
+Read L<Leyland::Manual::FAQ> if you want to know how to fulfil C<OPTIONS>
+and C<HEAD> HTTP request methods.
+
+If your route doesn't define the "accepts" option, it will accept any requests
+that do not have a content type (mostly GET routes). If your route doesn't
+define a "returns" option, a default of C<text/html> is used, unless a different
+default is defined in your application class (see L<Leyland::Manual::Applications/"CONFIGURING LEYLAND APPLICATIONS">
+to learn how). C<POST> and C<PUT> routes also automatically accept the
+C<application/x-www-form-urlencoded content> type.
+
+A route can also have the "is" option, which takes one of two values:
+"external", meaning clients can directly access this route (this is the
+default), or "internal", meaning clients cannot directly access this route,
+only other (possibly external) routes can forward to it.
+
+	post '^/posts$' returns 'application/json' {
+		my @posts = $c->forward('GET:/posts');
+		# do stuff with @posts
+	}
+
+	get '^/posts$' returns 'application/json' is 'internal' {
+		return MyDatabase->load_posts();
+	}
+
+More about forwarding later on.
+
+As you've probably already noticed, the context object is automatically
+available to the route's subroutine. This is not the only variable available
+to subroutines - the controller object is also available as C<$self>.
+
+The only thing that remains is actually writing your route logic. This is
+your field, but keep in mind you can use Leyland's logging facilities,
+exception facilities, etc., which are all described in other sections of
+this manual.
+
+=head1 HOW ARE PATHS MATCHED
+
+Route paths are regular expressions, which means a single route can match
+requests to different URI paths, like "/posts/159" and "/posts/160". Let's
+assume in this example we're talking about a route that loads an article
+that has a certain integer ID. Of course, if your route is going to load
+and return this article, it needs to know its integer ID. To do this, just
+use captures in the route's regex. Captures are provided to the route in
+the order they were defined. For example:
+
+	get '^/posts/(\d+)$' {
+		my $post_id = shift;
+		# now load post and return it
+	}
+
+	get '^/posts/(\d+)/comments/(\d+)$' {
+		my ($post_id, $comment_id) = @_;
+		...
+	}
+
+Be careful when defining route regexes that aren't strict (i.e. don't match
+from the beginning and/or to the end using the C<^> and C<$> metacharacters),
+like C<get 'posts'> for example, as you're likely to get the wrong results.
+
+=head1 RETURNING OUTPUT
+
+A route is supposed to generate the output that the client will receive.
+To learn about how to return output, read L<Leyland::Manual::Views> (which
+also describes Leyland's automatic data serialization).
+
+=head1 FORWARDING REQUESTS
+
+Often, you will find it useful to internally forward requests to other
+routes. These may be routes whose only purpose is to serve other routes.
+Forwarding is performed by the C<forward()> method of L<Leyland::Context>.
+It expects a path (prefixed by an HTTP method) to forward to, and possibly
+a list of arguments to pass to the route:
+
+	$c->forward('GET:/posts', $post->id);
+
+Some routes, as explained earlier, can only be forwarded to, and clients
+cannot directly access them. These are routes that are defined with the
+C<is 'internal'> rule in the route's declaration.
+
+When you forward a request to a different route, Leyland will not perform
+negotation with L<Leyland::Negotiator> like it does in the beginning of
+the request, but instead will only attempt to find the route and invoke it.
+If you are forwarding to a C<GET> route, you can change the above line to:
+
+	$c->forward('/posts', $post->id);
+
+But for any other HTTP method, you I<must> tell Leyland the method.
+
+When a request is forwarded to another route, it returns to the route that
+performed the forward (with the output it generated), so the route that
+performed the forward continues to operate. If you want to end processing
+immediately after the forward, C<return> it:
+
+	return $c->forward('GET:/posts', $post->id);
+
+When a forwarded route is matched, if its path regex had any captures in
+it, they will be provided as arguments to the route like any other route.
+If you've also provided other arguments via the C<forward()> method, they
+will also be available, but after the captures.
+
+An interesting thing about forwards, is that they return the output before
+serialization. So say you have an external route (i.e. not internal) that
+returns a Perl data structure. When directly matched, the data structure
+will be serialized and returned to the client (say to JSON). When internally
+forwarded to, however, the forwarding route will not get the serialized data, but
+the Perl data structure.
+
+Another thing to note about forwarding is that arguments you pass via the
+C<forward()> method are not considered part of the route's path. So, the
+following call:
+
+	$c->forward('/posts', $post_id);
+
+Will not match the C<^/posts/(\d+)$> route, but only the C<^/posts$> route.
+If you want to forward to the first one, you need to do this:
+
+	$c->forward('/posts/'.$post_id);
+
+=head1 PASSING REQUESTS
+
+When Leyland handles a request, it finds all the routes in the application
+that can satisfy it, and invokes the first one found. At times (rarely
+if at all), you might find that Leyland's decision isn't what you wanted.
+If that happens, you can use the C<pass()> method to pass the request to
+the next matching route:
+
+	if ($c->params->{something_that_tells_me_something})
+		$c->pass;
+	}
+
+Like C<forward()>, the passing route will not end processing, but will
+continue once the pass has been completed. To end processing immediately,
+use C<return>:
+
+	if ($c->params->{something_that_makes_sense_to_me})
+		return $c->pass;
+	}
+
+=head1 REDIRECTING REQUESTS
+
+HTTP redirects are frequent and common. I will not detail situations in
+which redirects are appropriate. Redirecting is easy - all you need to
+do is define a URI to redirect to in the response object (located under
+the C<res> attribute of the context object):
+
+	$c->res->redirect($c->uri_for('/posts'));
+
+Note that you have to provide the absolute URI to redirect to, not a relative
+path.
+
+Once again, redirection does not happen immediately. Sometimes it is useful
+to set a redirect, and still continue handling the request and/or perform
+some other operations. If, however, you want to redirect immediately,
+use C<return>:
+
+	return $c->res->redirect($c->uri_for('/posts'));
+
+=head1 WHAT'S NEXT?
+
+Read L<Leyland::Manual::Views> to learn how to create views and templates
+or L<return to the table of contents|Leyland::Manual/"TABLE OF CONTENTS">.
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Leyland at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Leyland::Manual::Controllers
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Leyland>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Leyland>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Leyland/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

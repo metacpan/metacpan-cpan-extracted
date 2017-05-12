@@ -1,0 +1,79 @@
+Revision history for LWP-Authen-OAuth2
+
+0.13    2016-11-21T15:08:43
+    - Add documentation for some new methods, and for Dwolla (Adi Fairbank)
+
+
+0.12    2016-07-13T12:44:47
+    - fix typos in documentation (Nick Morrott, RT115463, RT115464)
+
+
+0.11	2016-03-11T12:02:25
+    - Ensure lib loads and instantiates (Leon Wright)
+    - Catch feature changes that break instantiation (Leon Wright)
+    - Allow 'use_test_urls' to be optional (Leon Wright)
+
+
+0.10    2016-01-11T20:28:13
+    - new class ServiceProvider::Dwolla (Adi Fairbank)
+    - new method OAuth2->make_api_call (Adi Fairbank)
+    - add configuration param use_test_urls (Adi Fairbank)
+    - add expires_time() method (Adi Fairbank)
+    - link to GitHub from META files; fix the string in LICENSE (Gabor Szabo)
+
+
+0.09	2014-08-25T10:59:11+0200
+    - squashed some warnings (Leon Wright)
+    - Strava Service Provider (Leon Wright)
+
+
+0.08	2014-06-27T00:00:00
+    - NEW MAINTAINER: domm
+    - inverted Changelog (newest entry on top)
+    - Allow additional arguments to be passed to the save_tokens
+      callback (Chris)
+    - Fixed copying required/optional params in
+      collect_action_params (Alexander Dutton)
+    - Added overridable methods for returing authz and token endpoints
+      (Alexander Dutton)
+
+
+0.07    20131128 - 7:47 AM PST
+    - Property acknowledge domm
+
+
+0.06    20131128 - 7:47 AM PST
+    - Add Module::Load dependency
+    - Catch that the Google service provider was missing
+       s/flow/client_type/.
+    - Make syntax errors in a service provider less confusing to debug.
+
+
+0.05    20130720 - 12:38 PM PDT
+    - There was another (why don't I get to see these???)
+
+
+0.04    20130717 - 6:34 PM PDT
+    - Fix 2 minor POD formatting mistakes.
+
+
+0.03    20130715 - 7:26 PM PDT
+    - Find more dependencies.
+    - Rename flow to client_type in many places.
+    - Rename *_more_* to *_optional_* in ServiceProvider.
+    - Rename *_defaults to *_init to be more descriptive.
+    - Another documentation pass.
+
+
+0.02    20130712 - 2:54 PM PDT
+        *sigh*  My machine was not running all of the tests that module
+        starter installed.  Other environments did, and therefore failed.
+        Removed or fixed those.  (Really, I do not want to have end user
+        documentation in subclasses of parent methods that they were
+        supposed to override.)
+
+
+0.01    20130711 - 3:13 PM PDT
+        First version, released on an unsuspecting world with much
+        documentation and no useful tests.
+

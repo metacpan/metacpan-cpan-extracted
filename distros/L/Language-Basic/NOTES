@@ -1,0 +1,222 @@
+BUGS/do now:
+
+POD for LB::Common!
+
+REM without any text after it is a bug cuz it's looking for a \s char.
+Change regex to REM($|\s.*) or something similar.
+
+I currently reevaluate step & limit each time I get to a next! That's probably
+wrong. Instead, give For a separate limit_exp field, which stores the exp
+permanently, and a limit field which stores limit_exp->evaluate throughout
+the duration of the loop.
+
+Do soon:
+
+Change INPUT "Foo"; not to print the question mark? I think it may be
+more standard.
+Handle INPUT "Foo", bar. It's just as easy as ;, and means you don't have
+to print a question mark.
+
+Note that I'm currently allowing you to dim with Expressions!
+(This actually isn't so bad, as long as expressions use constants.
+Variables are all zero, though. But only way to test it is to hierarchically
+descend through the expression to the atoms & make sure they're all constants.
+Hm.)
+
+----------
+
+Expression TODO:
+- change new back to parse and make new just call parse? Then, we
+  can have a Expression::print called from new if debugging.
+
+Need to decide if Iwant these things to inherit from LBE or not. E.g. if
+you say "print 1" then the 'new LBE' will return just an LB Constant. If
+that's not considered an expression, that might be weird. Of course, we're
+already doing that with Functions. Why *shouldn't* they inherit from LBE?
+
+- LB::Constant::Boolean. Its parse or output_perl is an error, since it
+    should only be generated during implementation. 
+- LB::Constant::Boolean::True and ::False. and/or/not methods!
+    use overload?
+- Inherit from LB::Boolean
+- LB::Boolean subclasses are the only things that access these. For anything
+    else, it's an error. LBER::evaluate returns new Boolean::True or False.
+    LBE::And/Or only know how to deal w/ LBCB's, via anding and oring.
+- This makes it very easy to see if we're trying to access TRUE/FALSE like
+    regular values, to print them, etc.
+- new can take a Perl expression, which it evals! Or maybe it's better
+  just to take new of the eval'ed expression.
+
+In fact, why not make LB::Constant::String and LB::Constant::Numeric.
+Or actually, change the currently existing LBE::Constant::*
+Change every field that now holds a string or number to hold an object.
+This allows:
+- overall, gives us more control: we always know exactly what sort of
+  data we're working with.
+- errors when you try to set a Numeric to a String without STR$, e.g.
+  also errors when you try to subtract strings & things. 
+- Might make printing easier. We just tell it print the extra space if you're
+  printing a Numeric.
+- Might it make DATA statements w/ unquoted strings workable? Maybe not.
+- In fact, we could use overload for all these subclasses. If we do, then
+  we no longer need to use perl eval for string comparison in Rel. Exp.
+  (Note: mail cplm & ask if it's a good idea to use it.)
+- evaluate called on an LBC returns the object itself. (I.e. don't return its
+  value, because we want to call print with an LB::Constant, not with a Perl
+  string.) OTOH, I think output_perl needs to output the actual value.
+- We can actually make these objects just be blessed variables, rather than
+  hashes, because they only need to store the text that makes them. Then
+  e.g. &add is just return $$a + $$b
+
+(In theory, Arith/Mult shouldn't have to check for boolean, because Unary will
+exiterror if there is one. Similarly for And/Or. But leave them for
+extra safety?)
+
+----------
+I should really isolate all printing done by the program, to better control
+it (e.g. this will eventually allow printing to a filehandle or something else, 
+simpler testbasic.pl). Basically, we just need a Program::print. (If I ever
+make a print_basic, it would call that.)
+
+----------
+
+If statements also need to suck up stuff if they're multistatements.
+Different BASIC programs I've got seem to allow ELSE right after a
+colon OR right after the last THEN statement. Others allow IF/THEN within
+an ELSE. (It doesn't make sense in a THEN because the ELSE would slurp up the
+other else.) Do we allow that? (If not, make it an error to get a Statement::If
+when "parsing_if" is set!)
+
+    Note that we may want to parse Input/Data stuff intelligently, e.g. to
+have non-quoted strings. Could we use nexttok with that too?
+
+Case insensitivity in strings? 
+
+Test suite should also translate each to perl & run it & make sure we get the
+same output, in order to test output_perl functionality.
+
+Better errors. E.g., instead of using die, we should have a different kind
+of error function that says something like "Internal Error on line...". I.e.,
+it'll be useful for us to know what line we're on.
+
+----------
+
+LB::Debug? Or overkill.
+Separate into Parse_Debug and Other_Debug?
+Parse_Debug:
+- print line #
+- print line text
+- print current statement? (Not as easy unless we save statement text.
+     or just print statement type?)
+- print line tokens
+- print expression hierarchy (shorter print version that just prints the exp?)
+Other_Debug:
+- print line #
+- print line text
+- print current statement? (Not as easy unless we save statement text.)
+- print expression as it's being calculated?
+
+LBE::print {
+    print exps[0]
+    foreach (@operators) {print "Operator: $op\n"; print exps[$a++]}
+}
+Lvalue: print varname, args if any
+Unary - print parens if nested. Print expression
+Function
+Arglist
+
+Program should maybe have a "debug" pointer to an LB::Debug object.
+
+LB::Debug::indent/outdent change debugging indent for printing
+expression hierarchy.
+
+----------------------------------------------------------------------
+Enhancements to BASIC:
+
+If I want to parse unquoted strings, then I either need to call 
+new LBE::Constant directly, or call Unary with some flag set s.t. we're
+not allowed to interpret the string as a new variable.
+
+I should have an error if we try to assign a string expression to a numeric
+variable. 
+
+----------------------------------------------------------------------
+BASIC things to implement for The Secret Project:
+- LINE INPUT command
+- Make sure we can handle a string with value '"'. (Just take ASC(A$)=34?
+or do we need to use \" or something? But then we need to quote \ too!)
+- LOAD function of some sort? Not *really* needed
+
+----------------------------------------------------------------------
+BASIC things to implement for the betterment of mankind:
+More complicated conditional expressions
+Exponentiation
+More functions: ABS, SQR, string functions, etc.
+file read/write
+GET, GET$
+RESTORE
+NEXT I,J
+hex constants
+scientific notation, integer variables
+correct handling of RND.
+
+Note that CLEAR in some dialects means CLS, in others clear all variables!
+RETURN # means return from the gosub, but then immediately goto #
+
+Handle KEY, LOCATE, COLOR, etc. gracefully.
+
+----------------------------------------------------------------------
+Things we need like a hole in the head (but implemented anyway):
+
+- output PERL E.g.:
+From Tom Phoenix:
+    But if a line isn't recognized, you could just throw it in to the Perl
+    source, marked with a special comment like "#??" at the start of the line.
+
+Since every line in BASIC is just one line, we could even handle
+unsupported commands. In fact, we could overload Exit_Error to output
+"#??$Original_Line" instead of exiting. (Note that this does require
+storing the original line!)
+
+There should be subs that act exactly like basic PRINT & INPUT, since the
+behavior is kind of complicated. E.g. keeping track of print_column. Then just
+call those subs. (And write the subs into the program!) Except that that may be
+Hard. Can one write a sub that handles PRINT "3" differently from PRINT 3?
+Maybe. E.g., if you're printing a numeric variable or a number, then print a
+space. But the complicated part is expressions. How does this sub, which only
+gets the output of $foo->output_perl, know if the '3' that was returned is the
+string 3 or the number 3? I can't imagine how it does. Which means that numeric
+& string Constants can't be differentiated. But I could have
+    print_basic(["n", 3], ["s", "3"]);
+n or s tells it whether the overall expression should be printed w/ a number
+or not.
+
+Better AI to print nicer code.
+* Ugliest thing now may be do loops, which have convoluted code to allow for
+  upward or downward loops. Unfortunately, LBS::Next can't actually access the
+  information it needs in order to decide whether to test for > or <. I
+  *could* maybe change the way Next is stored. But it would be convoluted. We
+  could always use something like
+      $test_for = sub {$for_k < $limit_for_k}, 
+  and then at the end of the loop just test &$test_for. But it's arguable
+  whether that's less convoluted.
+* Any way to definitely know when to add \n's to separate blocks of code? 
+  Maybe I could only leave whitespace if we're not indented? Same with ifs? (In
+  that case, testing has to be done in LBP::output_perl, which may be a
+  dangerous (or impossible, if it's calling all the statemeout outputters)
+  place to do it.) Have a MAYBENEWLINE command to put space iff we're not
+  currently indenting?
+* Put ifs on one line if there's no else & it's short? Note that I can test
+  length of the string representing the "then" statement (and whether it has
+  \n's in it). Alternatively, put extra \n before else if it's more than one
+  line.
+* Remove all labels but those that are goto'ed to?  Note that (a) this doesn't
+  work if there are any computed gotos/gosubs (but who really uses those?) It
+  requires keeping a list of the lines that are goto'd to during parsing, so
+  that we know which line numbers we need to output before we actually output
+  any lines.
+* my() variables. Or at least setting some to "" or 0? Otherwise we get
+Uninitialized value errors from perl -w.
+
+- output BASIC? In theory, that could be useful for debugging. Right now,
+we can't print out lines after we've parsed them.

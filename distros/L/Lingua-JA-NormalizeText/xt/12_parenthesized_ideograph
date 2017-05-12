@@ -1,0 +1,29 @@
+use strict;
+use warnings;
+use utf8;
+use charnames ();
+use Test::More;
+
+binmode Test::More->builder->$_ => ':utf8'
+    for qw/output failure_output todo_output/;
+
+my @hex;
+
+for my $dec ( hex('0000') .. hex('10FFFF') )
+{
+    my $charname = charnames::viacode($dec) // '';
+    my $hex = sprintf("%04X", $dec);
+
+    if ($charname =~ /^PARENTHESIZED IDEOGRAPH/)
+    {
+        push(@hex, $hex);
+    }
+
+    note("U+$hex");
+}
+
+my @parenthesized_kanji = map { sprintf("%04X", $_); } ( hex('3220') .. hex('3243') );
+
+is_deeply(\@hex, \@parenthesized_kanji);
+
+done_testing;

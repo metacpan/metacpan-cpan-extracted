@@ -1,0 +1,24 @@
+# $File: //member/autrijus/Lingua-ZH-Summarize/README $ $Author: autrijus $
+# $Revision: #1 $ $Change: 3686 $ $DateTime: 2003/01/20 07:16:38 $
+
+This is the README file for Lingua::ZH::Summarize, a simple module
+providing summarization of Chinese texts.
+
+* Installation
+
+Lingua::ZH::Summarize uses the standard perl module install process:
+
+cpansign -v		# see SIGNATURE for details
+perl Makefile.PL
+make
+make test
+make install
+
+* Copyright
+
+Copyright 2003 by Autrijus Tang <autrijus@autrijus.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.

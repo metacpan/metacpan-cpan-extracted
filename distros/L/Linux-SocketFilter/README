@@ -1,0 +1,70 @@
+NAME
+    "Linux::SocketFilter" - interface to Linux's socket packet filtering
+
+SYNOPSIS
+     use Linux::SocketFilter qw( :bpf pack_sock_filter );
+     use IO::Socket::Packet;
+     use Socket qw( SOCK_DGRAM );
+
+     my $sock = IO::Socket::Packet->new(
+        IfIndex => 0,
+        Type    => SOCK_DGRAM,
+     ) or die "Cannot socket - $!";
+
+     $sock->attach_filter(
+        pack_sock_filter( BPF_RET|BPF_IMM, 0, 0, 20 )
+     );
+
+     while( my $addr = $sock->recv( my $buffer, 20 ) ) {
+        printf "Packet: %v02x\n", $buffer;
+     }
+
+DESCRIPTION
+    This module contains the constants and structure definitions to use
+    Linux's socket packet filtering mechanism.
+
+CONSTANTS
+    The following constants are exported:
+
+  Socket Options
+     SO_ATTACH_FILTER SO_DETACH_FILTER
+
+  BPF Instructions
+     BPF_LD BPF_LDX BPF_ST BPF_STX BPF_ALU BPF_JMP BPF_RET BPF_MISC
+     BPF_W BPF_H BPF_B BPF_IMM BPF_ABS BPF_IND BPF_MEM PBF_LEN BPF_MSH
+     BPF_ADD BPF_SUB BPF_MUL BPF_DIV BPF_OR BPF_AND BPF_LSH BPF_RSH BPF_NEG
+     BPF_JA BPF_JEQ BPF_JGT BPF_JGE BPF_JSET
+     BPF_K BPF_X BPF_A BPF_TAX BPF_TXA
+
+    This entire set of constants is also exported under the tag name ":bpf".
+
+  Linux BPF Extension Packet Addresses
+     SKF_AD_OFF SKF_AD_PROTOCOL SKF_AD_PKTTYPE SKF_AD_IFINDEX
+     SKF_NET_OFF SKF_LL_OFF
+
+    This entire set of constants is also exported under the tag name ":skf".
+
+STRUCTURE FUNCTIONS
+  $buffer = pack_sock_filter( $code, $jt, $jf, $k )
+  ( $code, $jt, $jf, $k ) = unpack_sock_filter( $buffer )
+    Pack or unpack a single BPF instruction.
+
+SOCKET FUNCTIONS
+    The following exported functions are also provided as methods on the
+    "IO::Socket" class.
+
+  attach_filter( $sock, $filter )
+  $sock->attach_filter( $filter )
+    Attaches the given filter program to the given socket. The program
+    should be a string formed by concatenating multiple calls to
+    "pack_sock_filter()" to build the filter program, or by using
+    Linux::SocketFilter::Assembler.
+
+  detach_filter( $sock )
+  $sock->detach_filter()
+    Detaches the current filter from the socket, returning it to accepting
+    all packets.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

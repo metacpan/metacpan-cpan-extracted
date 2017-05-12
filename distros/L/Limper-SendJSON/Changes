@@ -1,0 +1,11 @@
+Revision history for Limper-SendJSON
+
+0.003     2014-10-27 03:12:31+00:00 UTC
+- changes because Limper 0.012
+
+0.002     2014-10-24 02:29:12+00:00 UTC
+- fix test skipping
+- skip tests if MSWin32
+
+0.001     2014-10-19 06:52:49+00:00 UTC
+- initial basic release

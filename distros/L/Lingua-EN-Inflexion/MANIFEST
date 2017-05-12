@@ -1,0 +1,37 @@
+Changes
+lib/Lingua/EN/Inflexion.pm
+lib/Lingua/EN/Inflexion/Indefinite.pm
+lib/Lingua/EN/Inflexion/Term.pm
+lib/Lingua/EN/Inflexion/Nouns.pm
+lib/Lingua/EN/Inflexion/Verbs.pm
+adjectives.lei
+nouns.lei
+verbs.lei
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/adjectives.t
+t/case_sensitive.t
+t/indefinite.t
+t/inflect.t
+t/noun_classical_plural.t
+t/noun_general.t
+t/noun_is_plural.t
+t/noun_is_singular.t
+t/noun_plural.t
+t/noun_singular.t
+t/verb_general.t
+t/verb_is_plural.t
+t/verb_is_singular.t
+t/verb_past.t
+t/verb_past_part.t
+t/verb_plural.t
+t/verb_pres_part.t
+t/verb_singular.t
+bin/generate_nouns
+bin/generate_verbs
+t/export_names.t
+t/matching.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,43 @@
+Revision history for Ledger-Parser
+
+0.05    2016-01-12 (PERLANCAR)
+
+        [Bug fixes]
+
+        - Use Math::BigFloat for amount arithmetics to avoid floating point
+          round-off error.
+
+	- as_string() was not implemented, derp.
+
+	- Fix handling of file with no newline at EOF.
+
+
+0.04    2015-03-26 (PERLANCAR)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Rewrite implementation, interface is now different. Parsing is now
+          closer to the spec of Ledger 3, but still only a subset is supported.
+          The goal of this module is to be able to parse a Ledger journal, load
+          it as Perl object, modify the journal (e.g. add/modify/delete
+          transactions) and write it back to string/file (and be round-trip
+          about it, preserving whitespaces/comments). Currently the basic parser
+          is done, but no journal-modifying methods have been (re-)added. Stay
+          tuned.
+
+
+0.03    2011-11-01 (SHARYANTO)
+
+        - No functional changes. Add missing dep to DateTime [ct].
+
+
+0.02    2011-10-31 (SHARYANTO)
+
+        - Refactorings and fixes. Add is_balanced() to transaction. Add sample
+          file and tests, flesh out L::Pricing. Add missing dependency to Moo
+          [ct].
+
+
+0.01    2011-09-09 (SHARYANTO)
+
+        - First release.

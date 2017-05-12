@@ -1,0 +1,8 @@
+Changes
+etc/benchmark.pl
+lib/Log/Dispatch/FileShared.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/basic.t
+t/pod.t

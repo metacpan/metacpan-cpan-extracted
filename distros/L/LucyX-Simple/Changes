@@ -1,0 +1,34 @@
+Revision history for perl module LucyX::Simple
+
+0.008002 2014-02-22
+    - changed github repo url
+
+0.008001 2013-07-29
+    - Added Changes to MANIFEST
+
+0.008 2013-07-29
+    - Reformatted Changes file as per CPAN::Changes::Spec
+    - Changed issue tracker to github
+
+0.007 2013-07-29
+    - Fixed defaults
+
+0.006 2013-07-27
+    - Now uses Moo instead of Moose
+    - Added github repo info
+
+0.005 2013-04-14
+    - No changes, I accidently deleted the tar.gz from cpan, had to reupload, can't upload same version twice
+
+0.004 2012-10-19
+    - Version bump for inc::Module::Install upgrade (http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04)
+
+0.003 2012-01-18
+    - Removed errornous analazyer attribute from QueryParser, added more test cases
+
+0.002 2012-01-16
+    - Will now always try and create search index dir if doesn't exist
+
+0.001 2012-01-14
+    - First release
+

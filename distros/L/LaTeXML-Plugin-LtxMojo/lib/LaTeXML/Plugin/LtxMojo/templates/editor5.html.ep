@@ -1,0 +1,136 @@
+% layout 'html5';
+% title 'In-browser HTML5 Editor of LaTeX Fragments';
+<link rel="stylesheet" type="text/css" href="css/editor.css"></link>
+<%= javascript 'js/editor/examples.js' %>
+%= javascript begin
+function show_log() {
+    $('#onthefly').hide();
+    $('#log').show();
+}
+function show_result() {
+    $('#log').hide();
+    $('#onthefly').show();
+    if (!canMathML) { MathJax.Hub.Typeset(); }
+}
+function setup_message(data) {
+ $('#message').html($('#message').text(data.status).html().replace(/\n/g,"<br></br>")+"<a href='#'>(Details)</a>");
+ $('#message').hover( function () {show_log();}, function () {show_result();} );
+ $('#message').click(  function () {
+    $('#message').unbind('mouseenter').unbind('mouseleave');
+    show_log();
+  });
+ $('#log').hide();
+ $('#log').html($('#log').text(data.log).html().replace(/\n/g,"<br></br>"));
+}
+
+
+var ac_counter = 0;
+var send_called = 0;
+var mouse_pressed = 0;
+var timeout = null;
+var hasFatal = /fatal error/;
+var hasPreamble = /^([\s\S]*\\begin{document})([\s\S]*)\\end{document}([\s\S]*)$/;
+
+var sendRequest = function(tex, my_counter, onthefly){
+    if (my_counter == ac_counter) {
+	$('#log').html('');
+	$('#previewtext').html('Converting...');
+	$('#message').html('Converting...');
+        $("body").css("cursor","progress");
+	if (ac_counter == 1) send_called = 0;
+	send_called++;
+	$('#counter').html(send_called);
+        //Check if preamble exists:
+        var m = hasPreamble.exec(tex);
+        var preamble = null;
+        if (m != null) {
+            preamble = "literal:"+m[1];
+            //tex = "literal:"+m[2];
+            tex = m[2];
+        }
+	$.post("/convert", { "tex": tex, "preamble" :
+			     preamble, "profile":"fragment-html"},
+	       function(data) {
+                   setup_message(data);
+                   if (onthefly) {
+                       if (!hasFatal.test(data.status)) {
+                           if ((data.result != '') && (my_counter <= ac_counter)) { 
+                               $('#onthefly').html(data.result);
+                               show_result();
+                           }
+                       } else {show_log();}
+                   }
+		   $('#previewtext').text('On-the-Fly Preview');
+                   $("body").css("cursor", "auto");
+               },"json");
+    }
+}
+
+function do_convert_on_the_fly(e) {
+    if (e) { 
+	var key = e.keyCode;
+	if (!key) key = 0;
+    } else {
+	var key = 0;
+    }
+    
+    ac_counter++;
+    //console.log(key);
+    if (((key < 37 || key > 40) && key > 32 && key <= 250) || key == 8 || key == 0){
+	// immediately cancel outstanding requests
+	if (timeout) clearTimeout(timeout);
+        ac_counter--;
+   	var tex = $('textarea').val();
+	//alert(key);
+	if (!tex) {
+	    ac_counter = 0;
+	    $('#onthefly').html(' ');
+	    return;
+	}
+	
+	// call erst nach 300ms
+	timeout = setTimeout(function(){sendRequest(tex, ac_counter, true)}, 300);
+    }
+}	
+
+
+var examples = new Array();
+load_examples(examples);
+$(document).ready(function() {
+    $('#example_select').change(function () {
+	var str = "";
+	$('#example_select option:selected').each(function () {
+            str = $(this).attr("value");
+	});
+	if (str.length>0) {
+	    $('#onthefly').html('');
+	    $('#editarea').val(examples[str]).change();
+	}
+    });
+
+    $('#editarea').bind('keyup change', function() {
+	setTimeout(do_convert_on_the_fly, 100);
+	show_result();
+    });
+});
+% end
+
+
+<div style="display:inline; float:left; height: 95%; width: 45%; overflow-y:auto;">
+  <h2 class="bodyslogan"></h2>
+  <form><textarea class="editarea" id="editarea">Enter LaTeX here...</textarea></form>
+</div>
+<div style="display:inline; float:left; height: 500px; width: 45%; overflow-y:auto;"><h2 class="bodyslogan" id="previewtext">On-the-Fly Preview</h2><br></br>
+<div style="background-color: #FFFFFF; display: none;
+            word-wrap:break-word; margin: 5px;" id="onthefly"></div>
+<div style="background-color: #ffddbb; display: none;
+            word-wrap:break-word; margin: 5px;" id="log"></div>
+</div>
+<div style="clear:both; font-size:0px;">&nbsp;</div>
+<div id="counter" style="width: 45%; background-color: #cccccc; display: inline;">&nbsp;</div>
+<br></br><div style="float:left"><%= select_field example =>
+  [["Equations"=>"eqn"],["Tables"=>"tbl"],["Narrative"=>"nar"],["Babel"=>"bab"],["Unicode"=>"utf"],["Color"=>"clr"],["Web
+  Graphics"=>"wgr"],["PSTricks Graphics"=>"psp"],["Metadata"=>"met"],["Wiki Syntax"=>"wik"],["Obfuscated"=>"xii"],["Turing Machine"=>"tur"],
+  ['Tikz Basic' =>"tikz-basic"],['Tikz AC Voltage'=>'tikz-ac-drive-voltage'],['Tikz Rotated Triangle'=>'tikz-rotated-triangle'],
+  ["Select Example"=>"","selected"=>"selected"]],id => 'example_select' %></div>
+<div style="display:none"><div id="source"></div></div>

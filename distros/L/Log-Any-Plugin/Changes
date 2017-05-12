@@ -1,0 +1,33 @@
+Revision History for perl module Log::Any::Plugin
+
+0.007     2017-05-05T16:52:56AEST+1000
+
+    - Use Class::Load rather than stringy eval
+        - thanks José Joaquín Atria
+
+0.006     2016-08-28T09:55:48UTC+0000
+
+    - Escape curlies in test regexes
+
+0.005     2015-01-29T16:41:59AEDT+1100
+
+    - Restore level param check in Levels plugin
+
+0.004     2015-01-29T15:56:16AEDT+1100
+
+    - Updated to work correctly with Log::Any 1.x
+
+0.003     2014-10-09T10:31:03AEDT+1100
+
+    - Remove missing Log::Any::Adapter::Util dependency
+        - fixes RT:99373 - thanks Mark Lawrence
+
+0.002     2013-08-30T16:44:53EST+1000
+
+    - Performance improvements
+    - Remove before/after/around functions
+        - use Class::Method::Modifiers instead if you need these
+
+0.001     2011-09-06
+
+    - Initial release

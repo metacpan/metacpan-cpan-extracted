@@ -1,0 +1,189 @@
+NAME
+    Lingua::JA::Numbers - Converts numeric values into their Japanese string
+    equivalents and vice versa
+
+VERSION
+    $Revision: 0.3 $ $Date: 2005/08/18 07:16:13 $
+
+SYNOPSIS
+      use Lingua::JA::Numbers;
+
+      # OO Style
+      my $ja = Lingua::JA::Numbers->new(1234567890, {style=>'romaji'});
+      # JuuNiOkuSanzenYonHyakuGoJuuRokuManNanaSenHappyakuKyuuJuu
+      # $ja->get_string is implictly called
+      print "$ja\n"; 
+      print $ja+0, "\n";
+      # 1234567890
+      # $ja->number is implicitly called.
+      # 1234567890
+
+      # Functional Style
+      my $str = ja2num(1234567890, {style=>'romaji'});
+      print "$str\n";
+      # JuuNiOkuSanzenYonHyakuGoJuuRokuManNanaSenHappyakuKyuuJuu
+      print num2ja($str), "\n";
+      # 1234567890
+
+INSTALLATION
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+DEPENDENCIES
+    This module requires perl 5.8.1 or better. It also uses bignum
+    internally (that comes with perl core).
+
+DESCRIPTION
+    This module converts Japanese text in UTF-8 (or romaji in ascii) to
+    number, AND vice versa. Though this pod is in English and all examples
+    are in romaji to make <http://search.cpan.org/> happy, this module does
+    accept Japanese in UTF-8. Try the code below to see it.
+
+      perl -MLingua::JA::Numbers \
+        -e '$y="\x{4e8c}\x{5343}\x{4e94}"; printf "(C) %d Dan Kogai\n", ja2num($y)'
+
+  CAVEAT
+    DO NOT BE CONFUSED WITH Lingua::JA::Number by Mike Schilli. This module
+    is far more comprehensive. As of 0.03, it even does its to_string() upon
+    request.
+
+  METHODS
+    This module supports the following methods. They are compliant with
+    Lingua::En::Numbers and others.
+
+    ->new($str [, {key=>var ...} ])
+      Constructs an object via $str. String can either be number or a string
+      in Japanese that represents a number. Optionally take options. See
+      "Functions" for options.
+
+    ->parse($str, [, {key=>var ...} ])
+      Parses $str.
+
+    ->opt(key => var)
+      Changes internal options.
+
+    ->get_string =item ->stringify =item ->as_string
+      Stringifies the object accordingly to the options. The object
+      auto-stringifies via overload so you don't usally need this.
+
+    ->as_number =item ->numify
+      Numifies the object. The object auto-numifies via overload so you
+      don't usally need this.
+
+  Functions
+    This module supports the funcitons below;
+
+    num2ja($num, [{key => value ... }]); =item number_to_ja()
+      Converts the number to Japanese accordingly to the options.
+      "number_to_ja()" is just an alias to "num2ja()".
+
+        # \x{767e}\x{4e8c}\x{5341}\x{4e09}
+        num2ja(123)
+        # HyakuNijuuSan
+        num2ja(123, {style=>"romaji"})
+
+      This function supports the options as follows;
+
+      style => (kanji|romaji|hiragana|katakana)
+        Sets which style (well, script but the word "script" is confusing).
+        You can choose "kanji" (default), romaji, hiragana and katakana.
+
+      daiji => (0|1|2)
+        When 1, *daiji* is used. When 2 or larger, even those that are not
+        represented as daiji will be in daiji. See
+        <http://ja.wikipedia.org/wiki/%E5%A4%A7%E5%AD%97_%28%E6%95%B0%E5%AD%
+        97%29> for details.
+
+        When this option is set to non-zero, "style" is ignored (kanji).
+
+      p_one
+        Forciblly prefix one even when not needed.
+
+          print num2ja(1110, {style=>"romaji"}), "\n";
+          # SenHyakuJuu
+          print num2ja(1110, {style=>"romaji", p_one=>1}), "\n";
+          # IchiSenIchiHyakuIchiJuu
+
+      fixed4
+        Just stack numbers for thousands.
+
+          print num2ja(2005, {style=>"romaji"}), "\n";
+          NiSenGo
+          print num2ja(2005, {style=>"romaji", fixed4=>1}), "\n";
+          NiZeroZeroGo
+
+      with_arabic
+        Like "fixed4" but stack these numbers with arabic.
+
+          print num2ja(20050831, {style=>"romaji"}), "\n";
+          # NiSenGoManHappyakuSanJuuIchi
+          print num2ja(20050831, {style=>"romaji" with_arabic=>1}), "\n";
+          # 2005Man0831
+
+      manman
+        Depreciated. When set to non-zero, it 8-digit (4x2) denomination for
+        'Goku' (10**48) and above.
+
+          print num2ja(10**60, {style=>"romaji"}), "\n";
+          # IchiAsougi
+          print num2ja(10**60, {style=>"romaji" manman=>1}), "\n";
+          # IchiManKougasha
+
+    ja2num($str, [{key => value ... }]); =item ja_to_number()
+      Converts Japanese number to number. Unlike "num2ja()", its
+      counterpart, it supports only one option, "manman =" (0|1)> which
+      toggles 8-digit denomination.
+
+      It is pretty liberal on what it takes. For instance they all return
+      20050831.
+
+        ja2num("NisenGoManHappyakuSanjuIchi")
+        ja2num("NiZeroZeroGoZeroHachiSanIchi")
+        ja2num("2005Man0831")
+
+  ja2num() hacks
+    ja2num() acts like a calculator -- the easiest way to support scientific
+    notation was just that. Try
+
+      ja2num("6.0225Kakeru10No23Jou")
+
+  to_string() of Lingua::JA::Number
+    Though not exported by default, This module comes with to_string() that
+    is (upper-)compatibile with Lingua::JA::Number.
+
+     my @words = Lingua::JA::Numbers::to_string(1234);
+     print join('-', @words), "\n";   
+     # "sen-ni-hyaku-san-ju-yon"
+
+  EXPORT
+    ja2num(), num2ja(), num2ja_ordinal(), ja_to_number(), number_to_ja(),
+    number_to_ja_ordinal()
+
+BUGS
+    bignum vs. Lingua::JA::Numbers
+      Because of overload, The OO approach does not go well with bignum,
+      despite the fact this module uses it internally
+
+    Jo, or 10**24
+      The chacracter Jo (U+25771) which represents ten to twenty-four does
+      not have a code point in BMP so it is represented in two letters that
+      look like one (U+79be U+x4e88)
+
+SEE ALSO
+    Lingua::En::Numbers Lingua::En::Number
+    <http://ja.wikipedia.org/wiki/%E6%BC%A2%E6%95%B0%E5%AD%97>
+
+AUTHOR
+    Dan Kogai, <dankogai@dan.co.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 by Dan Kogai
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+

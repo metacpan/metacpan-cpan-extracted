@@ -1,0 +1,28 @@
+Revision history for perl module Lingua::EN::ABC
+
+0.06 2016-08-31
+
+* Documentation updates
+* More words added
+
+0.05 2015-11-07
+
+* More words added
+* POD table added to distribution
+* Bug fix where American and British ambiguous words not recorded fixed
+
+0.04 2015-11-07
+
+* Improve documentation, change build process slightly.
+* Simple script econv is now installed and documented.
+
+0.03 2014-01-25
+
+* Add "README", minimum Perl version.
+
+0.02 2013-11-28
+
+* Add "Changes"
+* Add "script/econv", a command-line program to convert Englishes.
+
+0.01 2013-03-16

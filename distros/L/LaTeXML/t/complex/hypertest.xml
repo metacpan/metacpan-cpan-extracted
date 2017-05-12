@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml package="hyperxmp"?>
+<?latexml package="hyperref" options="draft,pdftitle=TestHyperrefMetadata,backref"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML" class="ltx_authors_1line" prefix="cc: http://creativecommons.org/ns# dcterms: http://purl.org/dc/terms/">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <title>Test Hyperref Metadata</title>
+  <creator role="author">
+    <personname>A.. Author</personname>
+  </creator>
+  <section refnum="1" xml:id="S1">
+    <title><tag close=" ">1</tag>Intentionally Left Blank</title>
+    <para xml:id="S1.p1">
+      <p>Nothing left to say, really.</p>
+    </para>
+  </section>
+  <section refnum="2" xml:id="S2">
+    <title><tag close=" ">2</tag>URL’s</title>
+    <para xml:id="S2.p1">
+      <p>Hyperref loads url, but redefines it</p>
+    </para>
+    <para xml:id="S2.p2">
+      <p>Special characters still neutralized:
+<ref class="ltx_url" font="typewriter" href="http://example.com/foo_bar">http://example.com/foo_bar</ref>,
+<ref class="ltx_url" font="typewriter" href="http://example.com/foo#bar">http://example.com/foo#bar</ref>,
+<ref class="ltx_url" font="typewriter" href="http://example.com/foo&amp;bar">http://example.com/foo&amp;bar</ref>.</p>
+    </para>
+    <para xml:id="S2.p3">
+      <p>But macros expanded: <ref class="ltx_url" font="typewriter" href="http://localhost/dir/index.html">http://localhost/dir/index.html</ref>.</p>
+    </para>
+    <para xml:id="S2.p4">
+      <p>And, you get this: <ref class="ltx_url" font="typewriter" href="http://example.com/{̃}user">http://example.com/{̃}user</ref></p>
+    </para>
+  </section>
+  <rdf about="" content="An Author" property="dcterms:creator"/>
+  <rdf about="" content="Not subject to copyright" property="dcterms:rights"/>
+  <rdf about="" content="test,hyperref" property="dcterms:subject"/>
+  <rdf about="" property="cc:licence" resource="http://creativecommons.org/licenses/by/3.0/"/>
+  <rdf about="" content="Testing LaTeXML’s processing of hyperref metadata" property="dcterms:subject"/>
+  <rdf about="" content="TestHyperrefMetadata" property="dcterms:title"/>
+</document>

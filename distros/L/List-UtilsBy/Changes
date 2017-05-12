@@ -1,0 +1,43 @@
+Revision history for List-UtilsBy
+
+0.10    2015/07/16 19:22:00
+        [CHANGES]
+         * Added 'extract_first_by'
+         * Updated documentation:
+            + Added 'since' version to all functions
+            + Use =head2 barename for nicer indexing
+
+0.09    CHANGES:
+         * Added 'unzip_by'
+         * Added 'nmax_by' and 'nmin_by' name aliases for 'max_by'/'min_by'
+
+0.08    CHANGES:
+         * Ensure that 'bundle_by' passes a short list to the body function
+           rather than trailing undefs
+         * Better hopefully-more efficient implementation of *sort_by.
+         * Removed back-compat renames of sortby etc..
+
+0.07    CHANGES:
+         * Added 'count_by', 'weighted_shuffle_by', 'bundle_by'
+
+0.06    CHANGES:
+         * Added 'rev_sort_by' and 'rev_nsort_by'
+         * Allow 'max_by' and 'min_by' in list context to return all optimal
+         * Test and document that 'extract_by' does not break weak references
+
+0.05    CHANGES:
+         * Added 'extract_by'
+
+0.04    CHANGES:
+         * Renamed functions sortby => sort_by, etc... Including back-compat
+           aliases by the old names
+
+0.03    CHANGES:
+         * Added 'zipby'
+
+0.02    CHANGES:
+         * Added 'partitionby'
+         * import Exporter::import rather than use base'ing it
+
+0.01    First version, released on an unsuspecting world.
+

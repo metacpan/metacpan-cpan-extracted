@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+#=============================================================================
+# Cleaner for LemonLDAP::NG: purge local handler cache and session cache
+#
+# This module is written to be used by cron to clean cache objects used
+# by Handler.
+#
+# This is part of LemonLDAP::NG product, released under GPL
+#=============================================================================
+
+use Lemonldap::NG::Common::Conf;
+use Lemonldap::NG::Common::Conf::Constants;
+use strict;
+
+my $debug = 0;
+
+#=============================================================================
+# Load configuration
+#=============================================================================
+my $lmconf = Lemonldap::NG::Common::Conf->new()
+  or die $Lemonldap::NG::Common::Conf::msg;
+my $conf = $lmconf->getLocalConf(HANDLERSECTION)
+  or die "Unable to get local configuration ($!)";
+
+print "Configuration loaded\n" if $debug;
+
+# Handler cache
+if ( $conf->{localStorage} ) {
+    eval "require $conf->{localStorage}";
+    $conf->{localStorageOptions}->{default_expires_in} ||= 600;
+    my $c = $conf->{localStorage}->new( $conf->{localStorageOptions} );
+    $c->purge();
+}
+
+# Session cache
+if ( $conf->{localSessionStorage} ) {
+    eval "require $conf->{localSessionStorage}";
+    $conf->{localSessionStorageOptions}->{default_expires_in} ||= 600;
+    my $s =
+      $conf->{localSessionStorage}->new( $conf->{localSessionStorageOptions} );
+    $s->purge();
+}
+
+exit 0;

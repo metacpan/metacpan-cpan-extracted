@@ -1,0 +1,9 @@
+pl => /t/data/bad.1pl
+- found func l at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- Expected ",":
+ |;ln("You have %d message"","You have %d messages",4);
+ |-------------------------^
+- discarded COUNT characters of noise

@@ -1,0 +1,36 @@
+---
+abstract: 'file locker with an automatic out-of-scope unlocking mechanism'
+author:
+  - 'Vyacheslav Matyukhin <mmcleric@yandex-team.ru>'
+build_requires:
+  File::Path: 0
+  IPC::System::Simple: 0
+  Test::Class: 0
+  Test::Fatal: 0
+  Test::More: 0
+  Test::Warn: 0
+  Time::HiRes: 0
+  autodie: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lock-File
+requires:
+  Carp: 0
+  Exporter: 0
+  Fcntl: 0
+  Log::Any: 0
+  POSIX: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/berekuk/Lock-File/issues
+  homepage: http://github.com/berekuk/Lock-File/wiki
+  repository: git://github.com/berekuk/Lock-File.git
+version: 1.03

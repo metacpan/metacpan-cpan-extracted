@@ -1,0 +1,112 @@
+<h2>The Regulars</h2>
+<script type="text/javascript">
+<!--
+function suball() {
+    f = document.searchbox;
+    f.searchall.value = 1;
+    f.submit();
+}
+function subletter(let) {
+    f = document.searchbox;
+    f.letter.value = let;
+    f.submit();
+}
+//-->
+</script>
+
+[% IF user.access >= 4 %]
+<div class="boxer">
+    <div class="admin">
+          <a href="[% cgipath %]/pages.cgi?act=user-admin">admin users</a>
+        | <a href="[% cgipath %]/pages.cgi?act=user-add">add a new user</a>
+    </div>
+</div>
+[% END %]
+
+<div class="boxer">
+    <div class="boxbody">
+    <form action="[% cgipath %]/pages.cgi" name="searchbox">
+    <input type="hidden" name='act' value='user-main' />
+    <input type="hidden" name='searchall' value='' />
+    <input type="hidden" name='letter' value='' />
+
+    <p>Search by Name:  <input type="text" name="searchname" />
+                        <input type="submit" value='GO' /></p>
+    <p><a href="javascript:suball()">everyone</a> |
+    <a href='javascript:subletter("A")'>A</a>
+    <a href='javascript:subletter("B")'>B</a>
+    <a href='javascript:subletter("C")'>C</a>
+    <a href='javascript:subletter("D")'>D</a>
+    <a href='javascript:subletter("E")'>E</a>
+    <a href='javascript:subletter("F")'>F</a>
+    <a href='javascript:subletter("G")'>G</a>
+    <a href='javascript:subletter("H")'>H</a>
+    <a href='javascript:subletter("I")'>I</a>
+    <a href='javascript:subletter("J")'>J</a>
+    <a href='javascript:subletter("K")'>K</a>
+    <a href='javascript:subletter("L")'>L</a>
+    <a href='javascript:subletter("M")'>M</a>
+    <a href='javascript:subletter("N")'>N</a>
+    <a href='javascript:subletter("O")'>O</a>
+    <a href='javascript:subletter("P")'>P</a>
+    <a href='javascript:subletter("Q")'>Q</a>
+    <a href='javascript:subletter("R")'>R</a>
+    <a href='javascript:subletter("S")'>S</a>
+    <a href='javascript:subletter("T")'>T</a>
+    <a href='javascript:subletter("U")'>U</a>
+    <a href='javascript:subletter("V")'>V</a>
+    <a href='javascript:subletter("W")'>W</a>
+    <a href='javascript:subletter("X")'>X</a>
+    <a href='javascript:subletter("Y")'>Y</a>
+    <a href='javascript:subletter("Z")'>Z</a>
+</p></form>
+    </div>
+</div>
+
+[% IF data %]
+    [% FOREACH item = data %]
+    [% INCLUDE "users/user-item.html" %]
+    [% END %]
+[% ELSE %]
+    <p align="center">No users currently available.</p>
+[% END %]
+
+<h2>Levels</h2>
+<p>Now that Birmingham Perl Mongers have become a registered not-for-profit company, our membership
+policy has had to change. Prior to incorporation anyone joining the mailing list or coming along to
+a meeting could consider themselves a member of the group. However, due to our incorporated status,
+we need to recognise membership in a more official capacity. The key below indicates the meaning of
+each level listed in each person's biography above.</p>
+
+<div class="boxer">
+<table class="review">
+<tr><th>Board Member</th>
+    <td>An officer of the registered company.</td></tr>
+<tr><th>Member</th>
+    <td>An annually paid-up official member of the company.</td></tr>
+<tr><th>Administrator</th>
+    <td>Our non-member mascots.</td></tr>
+<tr><th>Contributor</th>
+    <td>A non-member of the company, but someone who has contributed to the
+        content of the website or presented technical talks to the group.</td></tr>
+<tr><th>Subscriber</th>
+    <td>A non-member of the company, but someone who is a regular attendee of
+        the social and/or technical meetings, or a frequent poster to the
+        mailing list.</td></tr>
+</table>
+</div>
+
+<p>If you wish to become a paid-up member of Birmingham Perl Mongers, an annual
+fee of &#163;25 (twenty-five pounds) for waged members and &#163;10 (ten pounds) for
+unwaged members is requested. See one of the board members at one of our
+meetings or readour <a href="[% cgipath %]/pages.cgi?act=home-terms">Terms and
+Conditions of Membership</a> for more details. The membership fee is used to
+help fund the group for technical meetings by helping to pay for expenses for
+guest speakers and paying for incidentals such as new bulbs or repairs to the
+projector.</p>
+
+<p>If you simply wish to be added to the website as a regular attendee of the
+group, please email <a href="mailto:barbie@missbarbell.co.uk">Barbie</a> with
+a picture of yourself (it'll be resized if necessary) together with some
+background info about yourself. Use the existing bios above as a guide as to
+what to include.</p>

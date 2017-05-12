@@ -1,0 +1,26 @@
+NAME
+    sta2moses - convert from Stockholm Tree Aligner format to Moses/GIZA++
+    (plain text)
+
+SYNOPSIS
+        sta2moses alignments.xml
+
+DESCRIPTION
+    This script reads through a parallel treebank using the tree alignment
+    file (alignments.xml) and produces sentence aligned plain text files (to
+    be used with Moses/Giza++). The corpus will be stored in alignments.src
+    and alignments.trg.
+
+SEE ALSO
+    Lingua::Align::Corpus
+
+AUTHOR
+    Joerg Tiedemann
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Joerg Tiedemann
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

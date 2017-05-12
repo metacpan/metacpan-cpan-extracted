@@ -1,0 +1,9 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+VERSION
+Makefile.PL
+lib/Log/Dispatch/XML.pm
+t/logxml01.t
+META.yml                                 Module meta-data (added by MakeMaker)

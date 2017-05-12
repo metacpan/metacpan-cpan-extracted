@@ -1,0 +1,13 @@
+Revision history for Perl extension Linux::Mounts.
+
+0.01  Wed Feb 4 16:15:00 2004
+	- Original version; created by snck <snck@free.fr>
+
+0.02  Mon Feb 9 22:39:00 2004
+	- Documented the program.
+
+0.04  Fri Feb 13 21:42:43 CET 2004
+	- Correcting installation error
+
+0.05  Tue Feb  7 09:29:29 GMT 2006
+	- Correcting installation error

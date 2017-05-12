@@ -1,0 +1,6 @@
+Revision history for Perl extension Lingua::ZH::ZhuYinWen.
+
+0.01  Fri Feb 28 17:15:34 2003
+	- original version; created by h2xs 1.21 with options
+		-XA Lingua::ZH::ZhuYinWen
+

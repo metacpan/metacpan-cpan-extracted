@@ -1,0 +1,28 @@
+Revision history for Perl extension Log-Dispatch-Pipe
+
+0.06 2016-06-03T03:14:03Z
+
+    - Remove dependency on File::Touch
+
+0.05 2015-11-13T04:53:20Z
+
+    - Skip testing on Windows OS
+
+0.04 2015-10-29T08:18:06Z
+
+    - Do autoflush on file handle
+
+0.03 2015-08-18T07:16:53Z
+
+    - Open pipe file handle safely by calling `open` with 3 arguments
+
+0.02 2015-08-17T13:04:07Z
+
+    - Reuse open file handle
+    - Improve pipe writing test
+    - Add author test to check parallel writing
+
+0.01 2015-08-12T10:35:12Z
+
+    - Original version
+

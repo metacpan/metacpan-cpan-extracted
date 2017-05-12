@@ -1,0 +1,154 @@
+% layout 'default';
+  <%= javascript begin %>
+  $(document).ready(function() {
+    $("#accordion").accordion();
+    $("#accordion2").accordion();
+    $("#tabs").tabs();
+    $("form").each(function(c, obj) {
+     $(obj).attr("action", '');
+     $(obj).submit(function(event) {
+      event.preventDefault;
+      $.ajax ({
+        url: "/ajax",
+        type: "POST",
+        dataType: "json",
+        data: $(this).serialize(),
+        success: function(response) {
+            $("#message").html("<p><br><b>"+response.message+"</b><br></p>");
+            startup_users("#modify_select");
+            startup_users("#delete_select");
+            if (response.form) {
+             $("#modify_details").html(response.form);
+             $("#startup_profiles").attr("style",response.style);
+             $("#modify_action").attr("value","modify");
+            }
+         }
+     });
+     return false;
+    });
+   });
+  });
+
+  var startup_users = function (id) {
+    $.post("/ajax", { "user_action": "startup_users" },
+    function(data) {
+     $(id).empty();
+     $.each(data.users, function(index,value) {
+       $(id).append("<option value=\""+value+"\">"+value+"</option>") });
+     }, "json");
+  }
+  startup_users("#modify_select");
+
+  var startup_profiles = function (id) {
+    reset_profiles();
+    $.post("/ajax", { "profile_action": "startup_profiles" },
+    function(data) {
+     $(id).empty();
+     $.each(data.profiles, function(index,value) {
+       $(id).append("<option value=\""+value+"\">"+value+"</option>") });
+     }, "json");
+  }
+
+  var reset_profiles = function () {
+    $("#modify_details").empty();
+    $("#modify_action").attr("value","select");
+  }
+
+
+  var user_overview = function(id) {
+    $.post("/ajax", { "user_action": "overview_users" },
+    function(data) {
+     $(id).empty();
+     var ovhtml = "<table cellspacing=\"25\" class=\"nb\"><tr>";
+     var ucount = 0;
+     $.each(data.users, function (index,name) {
+      var summary = data.summary[index];
+      ovhtml = ovhtml + "<td class=\"nb\"><p>User: <b>"+name+"</b><br>"+summary+"</p></td>";
+      ucount=ucount+1; if (!(ucount % 5)) {ovhtml = ovhtml + "</tr><tr>";}
+     });
+     ovhtml = ovhtml + "</tr></table>";
+     $(id).html(ovhtml);
+     }, "json");
+}
+
+  <% end %>
+% title 'Administrative Interface';
+<div id="tabs">
+    <ul>
+        <li><a href="#um-tab"><span>User Management</span></a></li>
+        <li><a href="#profiles-tab" onClick="startup_profiles('#modify_profile')"><span>Conversion Profiles</span></a></li>
+        <li><a href="#status-tab"><span>Service Status</span></a></li>
+        <li><a href="#maintenance-tab"><span>Server Maintenance</span></a></li>
+    </ul>
+
+	<div id="um-tab">
+          <div id="accordion">
+           <h3><a href="#" onClick="startup_users('#modify_select')">Modify User</a></h3>
+           <div><%= form_for ''  => begin %>
+           <table class="form-table"/>
+           <tr><td>Name</td><td class="input"><%= select_field name => [], id => 'modify_select' %></td></tr>
+           <tr><td>Password</td><td class="input"><%= password_field 'pass' %></td></tr>
+           <tr><td>Role</td><td class="input"><%= text_field 'role' %></td></tr>
+           <tr><td>Default Profile</td><td class="input"><%= text_field 'default_profile' %></td></tr>
+           <tr><td></td><td class="input"><%= submit_button 'Modify' %></td></tr></table>
+           <%= hidden_field user_action => 'modify' %>
+           <p><it>Note: Empty means 'unchanged'</it></p>
+          <% end %>
+          </div>
+           <h3><a href="#">Add User</a></h3>
+           <div><%= form_for ''  => begin %>
+           <table class="form-table"/>
+           <tr><td>Name</td><td class="input"><%= text_field 'name' %></td></tr>
+           <tr><td>Password</td><td class="input"><%= password_field 'pass' %></td></tr>
+           <tr><td>Role</td><td class="input"><%= text_field 'role' %></td></tr>
+           <tr><td>Default Profile</td><td class="input"><%= text_field 'default_profile' %></td></tr>
+           <tr><td></td><td class="input"><%= submit_button 'Add' %></td></tr></table>
+           <%= hidden_field user_action => 'add' %>
+          <% end %>
+          </div>
+           <h3><a href="#" onClick="startup_users('#delete_select')" >Delete User</a></h3>
+           <div><%= form_for '' => begin %>
+           <table class="form-table"/>
+           <tr><td>Name</td><td class="input"><%= select_field name => [],id =>'delete_select'%></td></tr>
+           <tr><td></td><td class="input"><%= submit_button 'Delete' %></td></tr></table>
+           <%= hidden_field user_action => 'delete' %>
+          <% end %>
+          </div>
+           <h3><a href="#" onClick="user_overview('#user_overview')">Overview</a></h3>
+           <div id="user_overview"></div>
+         </div>
+	</div>
+
+	<div id="profiles-tab">
+          <div id="accordion2">
+            <h3><a onClick="startup_profiles('#modify_profile');"
+            onBlur="reset_profiles()" href="#">Modify Profile</a></h3>
+            <div id="startup_profiles"><%= form_for ''  => begin %>
+               Profile: <%= select_field 'profile_name' => [], id =>  'modify_profile' %><br>
+               <%= submit_button 'Select' , id => '#selector', onClick=>'$("#modify_action").attr("value","select");' %><br>
+               <div id="modify_details"></div>
+               <%= hidden_field 'profile_action' => 'select', id=>'modify_action' %>
+               <% end %>
+            </div>
+            <h3><a href="#">Add Profile</a></h3>
+            <div><%= form_for ''  => begin %>
+               Profile Name: <%= text_field 'profile',class => 'text-input' %><br>
+               <%= submit_button 'Add' %><br>
+               <% end %>
+            </div>
+         </div>
+	</div>
+
+	<div id="status-tab">
+		<p><b>Statistics on current DB and Conversion status</b></p>
+                <p>ObjectDB: <%= $startup->{db}->status %></p>
+        </div>
+	<div id="maintenance-tab">
+		<p>Restart/reboot/top-level parameters like 'autoflush' etc.
+		</p>
+	</div>
+</div>
+</body>
+</html>
+
+

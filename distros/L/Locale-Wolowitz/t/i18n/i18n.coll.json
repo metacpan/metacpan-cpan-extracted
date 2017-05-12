@@ -1,0 +1,20 @@
+{
+	"hey man": {
+		"he": "היי בן-אדם",
+		"xo": "yo bro"
+	},
+	
+	"what's up %1?": {
+		"he": "מה נשמע %1?",
+		"xo": "how's it hangin' %1?"
+	},
+
+	"generic": {
+		"en": "bye bye",
+		"he": "ביי ביי",
+		"xo": "see ya"
+	},
+
+	"just english %1 and %2": {
+	}
+}

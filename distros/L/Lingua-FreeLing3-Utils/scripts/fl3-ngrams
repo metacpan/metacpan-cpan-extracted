@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Lingua::FreeLing3::Utils qw/ngrams ngrams_pp/;
+use File::Slurp qw/read_file/;
+use Getopt::Std;
+use Data::Dumper;
+
+my %opts;
+getopt('nlit', \%opts);
+
+my $filename = shift;
+exit unless ($filename);
+
+my $text = read_file($filename, binmode => ':utf8');
+my $ngrams = ngrams(\%opts, $text);
+ngrams_pp($ngrams);

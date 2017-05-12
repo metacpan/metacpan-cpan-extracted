@@ -1,0 +1,16 @@
+Revision history for Perl extension Locale-Maketext-Lexicon-Properties
+
+0.03 2014-02-05T11:29:19Z
+
+    - Fix the handling of '\\n' character in the value (@tokuhirom)
+
+0.02 2014-02-02T10:51:24Z
+
+    - Allow to use whitespace which are on the both sides of
+      the delimiter and beginning of line
+    - Improve documentations
+
+0.01 2014-02-01T11:41:28Z
+
+    - original version
+

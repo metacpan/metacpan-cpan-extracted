@@ -1,0 +1,20 @@
+TODO
+
+* Release format & type handling
+- needed to manage the various formats for the collection type
+- create Labyrinth::Plugin::Release::Formats
+- create admin templates
+
+* Lyric/MP3s indexing
+- needed to manage the mp3 to lyric indexes (and possibly others)
+- create Labyrinth::Plugin::Release::Indices
+- create admin templates
+
+* clean up templates
+- ensure templates correctly link to each other
+
+* clean up javascript
+- there are several javascript calls, using a variety of names. Consolidate
+  them all into a single file, and use consistent naming.
+
+* provide CSS files.

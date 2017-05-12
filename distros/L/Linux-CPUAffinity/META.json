@@ -1,0 +1,72 @@
+{
+   "abstract" : "set and get a process's CPU affinity mask",
+   "author" : [
+      "Jiro Nishiguchi <jiro@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Linux-CPUAffinity",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Linux::CPUAffinity" : {
+         "file" : "lib/Linux/CPUAffinity.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/spiritloose/Linux-CPUAffinity/issues"
+      },
+      "homepage" : "https://github.com/spiritloose/Linux-CPUAffinity",
+      "repository" : {
+         "url" : "git://github.com/spiritloose/Linux-CPUAffinity.git",
+         "web" : "https://github.com/spiritloose/Linux-CPUAffinity"
+      }
+   },
+   "version" : "0.01"
+}

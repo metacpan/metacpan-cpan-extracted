@@ -1,0 +1,11 @@
+#define a [tdbc-get-default]
+tdbc-set-default "XOTAs" "cromo" "abcs"
+define a [tdbc-get-default]
+
+echo [length $a]
+
+foreach b $a {
+ if [not-null? $b] {
+     echo $b
+ }
+}

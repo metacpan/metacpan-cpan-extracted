@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/Linux/Ext2/Attributes.pm
+lib/Linux/Ext2/Attributes/Constants.pm.PL
+MANIFEST			This list of files
+META.json
+META.yml
+t/11-attributes.t

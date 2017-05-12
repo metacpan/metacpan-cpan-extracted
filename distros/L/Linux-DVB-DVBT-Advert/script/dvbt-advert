@@ -1,0 +1,262 @@
+#!/usr/bin/perl
+
+use strict ;
+use Pod::Usage ;
+use Getopt::Long qw/:config no_ignore_case/ ;
+use File::Basename ;
+
+use Data::Dumper ;
+
+++$! ;
+
+use Linux::DVB::DVBT::Advert ;
+use Linux::DVB::DVBT::Advert::Mem ;
+
+our $VERSION = "1.01" ;
+
+	my $process_state = "" ;
+	
+	my $XS_MEM ;
+	my $MEMPROF ;
+	my $FRAME_BUFF ;
+	my ($help, $man, $DEBUG, $VERBOSE, $dbg_logo, $dbg_frame, $dbg_audio, $dbg_ts) ;
+	my ($cutfile, $det, $use_file, $adv, $mode, $expected, $config, $channel, $cutmode, $write_cfg) ;
+	GetOptions('v|verbose=s' => \$VERBOSE,
+			   'debug=i' => \$DEBUG,
+			   'MEM=i' => \$XS_MEM,
+			   'MEMPROF' => \$MEMPROF,
+			   'FRAME_BUFF=i' => \$FRAME_BUFF,
+			   'dbg-logo=i' => \$dbg_logo,
+			   'dbg-frame=i' => \$dbg_frame,
+			   'dbg-audio=i' => \$dbg_audio,
+			   'dbg-ts=i' => \$dbg_ts,
+			   'h|help' => \$help,
+			   'man' => \$man,
+			   'cfg=s' => \$config,
+			   'ch|chan|channel=s' => \$channel,
+			   'det=s' => \$det,
+			   'file=s' => \$use_file,
+			   'adv=s' => \$adv,
+			   'mode=i' => \$mode,
+			   'exp|expected=s' => \$expected,
+			   'cutfile=s' => \$cutfile,
+			   'cutmode=s' => \$cutmode,
+			   'wrcfg' => \$write_cfg,
+			   ) or pod2usage(2) ;
+
+print "Linux::DVB::DVBT::Advert version $Linux::DVB::DVBT::Advert::VERSION\n" ;
+
+	$Linux::DVB::DVBT::Advert::DEBUG = $DEBUG ;
+	$Linux::DVB::DVBT::Advert::USE_XS_MEM = $XS_MEM if defined($XS_MEM) ;
+	$Linux::DVB::DVBT::Advert::FRAME_BUFF = $FRAME_BUFF if defined($FRAME_BUFF) ;
+	$Linux::DVB::DVBT::Advert::Mem::MEM_PROFILE = $MEMPROF if defined($MEMPROF) ;
+	
+    pod2usage(1) if $help;
+    pod2usage(-verbose => 2) if $man;
+    
+    if ($write_cfg)
+    {
+    	## force re-write of default config file
+    	Linux::DVB::DVBT::Advert::write_default_config(1, $config) ;
+    	exit 0 ;
+    }
+    
+    
+    pod2usage("$0: No arguments given.")  if ((@ARGV == 0) && (!$use_file)) ;
+    pod2usage("$0: No filename given.")  if ((@ARGV < 1) && (!$use_file)) ;
+
+	my ($file) = join ' ', @ARGV ;
+	print "FILE: $file\n" ;
+	my ($name, $dir, $ext) = fileparse($file, '\..*') ;
+	
+	# Read advert config info
+	my $ad_config_href = Linux::DVB::DVBT::Advert::ad_config() ; 
+	
+	# Add debug
+	my $settings_href = {
+		'debug' => $DEBUG,
+		'dbg-logo' => $dbg_logo,
+		'dbg-frame' => $dbg_frame,
+		'dbg-audio' => $dbg_audio,
+		'dbg-ts' => $dbg_ts,
+		'progress_callback' => \&progress,
+	} ;
+	
+	# change mode
+	if ($mode)
+	{
+		$settings_href->{'detection_method'} = $mode ;
+		printf("Set mode to 0x%02x\n", $mode) ;
+	}
+	
+	## Detect
+	my $results_href ;
+	if ($use_file)
+	{
+		print "Detection (reading from file)...\n" ;
+		$results_href = Linux::DVB::DVBT::Advert::detect_from_file($use_file) ;
+	}
+	else
+	{
+		print "Detection...\n" ;
+		# detect($src, $settings_href, $channel, $ad_config_href, $detect)
+		$results_href = Linux::DVB::DVBT::Advert::detect($file, $settings_href, $channel, $ad_config_href, $det) ;
+		print "\n" ;
+	}
+	
+	my $results_settings_href = $results_href->{'settings'} || {} ;
+print Data::Dumper->Dump(["Results settings:", $results_settings_href]) if $DEBUG >= 10 ;
+	if (!Linux::DVB::DVBT::Advert::ok_to_detect($results_settings_href))
+	{
+		print "Skipping advert detection...\n" ;
+	}
+	
+	## Read in expected results
+	my $expected_aref ;
+	if ($expected && -f $expected)
+	{
+		my @expected = Linux::DVB::DVBT::Advert::read_expected($expected) ;
+		$expected_aref = \@expected ;
+	}
+	
+	## Analyse
+	print "Analyse...\n" ;
+	my @cut_list = Linux::DVB::DVBT::Advert::analyse($file, $results_href, $ad_config_href, $channel, $adv, $expected_aref, $settings_href) ;
+
+	# free up memory
+	$results_href = {} ;
+	$settings_href = {} ;
+	$ad_config_href = {} ;
+
+	## print results
+	if (!@cut_list)
+	{
+		print "No Adverts detected!\n" ;
+	}
+	else
+	{
+		print "Cut List:\n" ;
+		foreach (@cut_list)
+		{
+			print "  pkt=$_->{start_pkt}:$_->{end_pkt}\n" ;
+		}
+		print "\n" ;
+	}
+
+	## Cut
+	if ($cutfile && $file)
+	{
+		my $err ;
+		if ($cutmode eq "cut")
+		{
+			# cut
+			print "Cut \"$file\" to \"$cutfile\"...\n" ;
+			$err = Linux::DVB::DVBT::Advert::ad_cut($file, $cutfile, \@cut_list) ;
+		}
+		else
+		{
+			# split 
+			print "Split \"$file\" to \"$cutfile\"...\n" ;
+			$err = Linux::DVB::DVBT::Advert::ad_split($file, $cutfile, \@cut_list) ;
+		}
+		
+		print "Error: $err\n" if $err ;
+	}
+
+	
+	exit 0 ;
+	
+#---------------------------------------------------------------------------------
+sub progress
+{
+	my ($state_str, $progress, $total) = @_ ;
+
+#	printf STDERR "$state_str : $progress / $total (%d%%)\n", $progress*100/$total ;
+
+	if ($state_str =~ /PREPROCESS/i)
+	{
+		$state_str = "Pre-processing: " ;
+	}
+	else
+	{
+		$state_str = "Detecting:      " ;
+	}
+	
+	if ($process_state ne $state_str)
+	{
+		print STDERR "100%\n" if $process_state ;
+		print STDERR $state_str ;
+		$process_state = $state_str ;
+	}
+
+	
+	printf STDERR "%3d%%\b\b\b\b", $progress*100/$total ;
+}
+
+
+
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+=head1 NAME
+
+dvbt-advert - Advert detection
+
+=head1 SYNOPSIS
+
+dvbt-advert [options] filename
+
+Options:
+
+       -debug level         set debug level
+       -verbose level       set verbosity level
+       -help                brief help message
+       -man                 full documentation
+       -wrcfg               overwrite advert config file
+       -cfg <config>        use specified DVBT config file
+       -chan <chan>         specify channel (to determine settings)
+       -det <detfile>       save detection results to file (.det)
+       -file <detfile>      read detection results from file (.det)
+       -adv <advfile>       save analysis to file (.adv)
+       -mode <mode>         set detection mode 
+       -exp <expected>      read expected cut list
+       -cutfile <cutfile>   set filename for cut file
+       -cutmode <mode>      set cut mode to 'cut' or 'split'
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Set verbosity level. Higher values show more information.
+
+=item B<-debug>
+
+Set debug level. Higher levels show more debugging information (only really of any interest to developers!)
+
+=back
+
+=head1 DESCRIPTION
+
+TO BE COMPLETED.......
+
+=head1 FURTHER DETAILS
+
+For full details of the DVBT functions, please see L<Linux::DVB::DVBT>:
+
+   perldoc Linux::DVB::DVBT
+ 
+=cut
+
+	

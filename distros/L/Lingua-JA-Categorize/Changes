@@ -1,0 +1,28 @@
+Revision history for Perl extension Lingua::JA::Categorize
+
+0.02002  2011/07/07
+        - update sample.bin data
+
+0.02001  2009/10/19
+        - add user_extention() method on Lingua::JA::Categorize::Result
+
+0.01001  2009/10/06
+        - add confidence() method on Lingua::JA::Categorize::Result
+        - and some changes(slightly)
+
+0.00004  2009/08/11
+        - redefine Algorithm::NaiveBayes::Util::rescale
+
+0.00004  2009/08/11
+        - brush up the eg/server.pl
+        - add more_train script ( eg/more_train )
+
+0.00003  2009/03/29
+        - fix a bug
+
+0.00002  2009/03/29
+        - correct some mistake of POD
+        - use Class::Data::ConfigHash in base class
+
+0.00001  2008/11/24
+        - original version

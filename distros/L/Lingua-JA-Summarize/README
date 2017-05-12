@@ -1,0 +1,26 @@
+Lingua-JA-Summarize version 0.06
+================================
+
+Lingua::JA::Summarize is a keyword extractor / summary generator for
+Japanese texts.  The module uses MeCab as a tokenizer.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+MeCab is required to use this module.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2006  Cybozu Labs, Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

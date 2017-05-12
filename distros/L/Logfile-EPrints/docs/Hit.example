@@ -1,0 +1,30 @@
+package Logfile::EPrints::Hit::Foo;
+
+use strict;
+use warnings;
+
+use vars qw( $AUTOLOAD );
+
+sub new
+{
+	my( $class, $rec ) = @_;
+	bless {
+		datetime => $rec->{ datetime },
+	}, ref($class) || $class;
+}
+
+#
+# $hit->foo( $bar )
+# $hit->foo # equals $bar
+#
+sub AUTOLOAD
+{
+	my $self = shift;
+	$AUTOLOAD =~ s/^.*:://;
+	return if $AUTOLOAD =~ /^[A-Z]/;
+	return @_ ?
+		$self->{ $AUTOLOAD } = shift :
+		$self->{ $AUTOLOAD };
+}
+
+1;

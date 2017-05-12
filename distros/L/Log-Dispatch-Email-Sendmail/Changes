@@ -1,0 +1,8 @@
+Revision history for Log-Dispatch-Email-Sendmail
+
+0.02	Fri Apr 26 15:45:56 EDT 2013
+	Don't attempt to install on machines without sendmail
+	Error if to is not set
+
+0.01	Thu Feb 14 09:35:50 EST 2013
+        First draft

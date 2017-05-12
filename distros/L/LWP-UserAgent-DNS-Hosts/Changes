@@ -1,0 +1,39 @@
+Revision history for Perl extension LWP::UserAgent::DNS::Hosts
+
+0.12 2017-05-01T05:54:56Z
+        - set SSL_hostname for SNI (#4)
+
+0.11 2017-03-04T07:24:34Z
+        - fix t/11_https.t (#3)
+
+0.10 2017-02-28T17:42:34Z
+        - fix test dependencies (#2)
+
+0.09 2017-02-28T10:25:17Z
+        - repackage with Minilla (#1)
+
+0.08
+        - override SSL_verifycn_name
+
+0.07
+        - fix https test
+
+0.06
+        - update libraries
+
+0.05
+        - implements read_hosts(), register from "hosts" syntax
+
+0.04
+        - fixed compile test problems
+        - added register_hosts() and clear_hosts()
+        - cleanup all tests
+
+0.03
+        - added parent.pm to dependency
+
+0.02
+        - renamed from LWP::Protocol::Hosts
+
+0.01
+        - original version

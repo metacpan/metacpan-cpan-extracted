@@ -1,0 +1,179 @@
+#!/usr/bin/perl -w
+use base 'LEOCHARRE::CLI';
+use strict;
+use Carp;
+use File::Find::Rule;
+use Module::Info;
+
+#use Smart::Comments '###';
+
+my $o = gopts();
+
+my $projects = argv_aspaths() or die('missing directory argument');
+
+for (@$projects){
+   check($_);
+}
+
+exit;
+
+
+
+sub check {
+   my $abs_project = shift;
+
+   for ($abs_project, "$abs_project/t", "$abs_project/lib"){
+      -d $_ or die("[$_] is not a dir");
+   }
+
+   my @testfiles = File::Find::Rule->new()->file()->name( qr/\.t$/ )->in("$abs_project/t");   
+   scalar @testfiles or die("no test files found in [$abs_project/t'");
+
+   # get a list of all subs called
+
+   my $called = {};
+
+   for (@testfiles){
+      map { $called->{$_}++ } @{ subs_called($_) };  
+      print STDERR " test $_\n" if DEBUG;
+      
+   }
+   ### $called
+   
+
+
+
+   
+   
+   my $subs;
+
+   my @modules = File::Find::Rule->new()->file()->name( qr/\.pm$/ )->in("$abs_project/lib");
+   scalar @modules or die("no modules found in [$abs_project/lib]");
+ 
+   for (@modules){
+      map { $subs->{$_}++ } @{ subs($_) };  
+      print STDERR " module $_\n" if DEBUG;
+      
+   }
+
+   ### $subs
+   
+
+   my @uncalled; #subs in modules not being called by any tests
+   
+   for( keys %$subs){
+   
+      my $namespace = $_;
+      $namespace=~/([^\:]+)$/ or die();
+      my $name = $1;
+      print STDERR " $namespace - [$name]\n" if DEBUG;
+      next if exists $called->{$name};
+      push @uncalled, $namespace;    
+   
+   }
+
+
+   printf "%s modules defined but not called in tests:\n%s\n",scalar @uncalled ,   join("\n", sort @uncalled);
+   
+
+}
+
+
+
+sub subs {
+   my $modulename = $_;
+   my $m = Module::Info->new_from_file($modulename);
+
+      my %s = $m->subroutines; # no _internals()
+     # my @subs = map { /([^\:]+)$/ ; $1 } grep { !/^_/ } keys %s;
+      my @subs = grep { !/^_/ } keys %s;
+
+      return \@subs;
+}
+
+sub subs_called {
+   my $modulename = $_;
+   my $m = Module::Info->new_from_file($modulename);
+
+      my @sc = $m->subroutines_called; # no _internals()
+      my $subs;
+      for (@sc){
+         my $h = $_;
+         $h->{name} or next;
+         next if $h->{name}=~/^_/;
+
+         $subs->{$h->{name}}++;
+      }
+      
+     # my @subs = map { /([^\:]+)$/ ; $1 } grep { !/^_/ } keys %s;
+
+    my @s = keys %$subs;
+    return \@s;
+
+}
+
+
+# get a list of all subs being used in the test files - this is imperfect
+
+
+
+
+
+
+
+
+
+
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pmtestcheck
+
+=head1 DESCRIPTION
+
+When you write tests for a perl module, all the methods in your module should be at some point be called in your tests.
+This tells you what subroutines/methods that you have in your module, are not tested in the tests.
+
+This is beta, it is imperfect.
+If your test calls HI::dufus() and BYE::dufus(), we recognize as the same sub
+
+=head1 OPTIONS
+
+	-v version
+	-h help
+   
+=head1 OPTION FLAGS
+
+	-d debug on
+	-v print version and exit
+	-h help
+	
+=head1 PARAMETERS
+
+Argument should be the base directory where the module being developed resides.
+
+There should be a lib and a t directories in this directory.
+
+
+=head1 EXAMPLE USAGE
+
+If your module resides in /myself/dev/Awesome-Project
+
+   pmtestcheck /myself/dev/Awesome-Project
+
+=head1 SEE ALSO
+
+LEOCHARRE::Dev
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=cut
+

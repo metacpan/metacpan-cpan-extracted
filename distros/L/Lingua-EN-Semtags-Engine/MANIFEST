@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01.t
+lib/Lingua/EN/Semtags/Engine.pm
+lib/Lingua/EN/Semtags/Sentence.pm
+lib/Lingua/EN/Semtags/LangUnit.pm

@@ -1,0 +1,96 @@
+<lemonconfig>
+<menu>
+
+     <rubrique id="rb1"
+               name="Applications DGI/DGCP">
+          <appli id="OCT"
+                 name="Intranet commun DGI/DGCP"
+                 url="http:/icc.int.appli.cp/icc/index.php"
+                 >
+          </appli>
+          <appli id="cpc"
+                 name="CPC"
+                 url="http://lancelotcpc.appli.cp/cpc/init.php"
+                 >
+          </appli>
+     </rubrique>
+
+
+</menu>
+
+<domain    id="int.appli.impots"
+           Cookie="lemonintimpots"
+           templates_dir="/opt/apache/portail/templates"
+           templates_options =  "ABSOLUTE     => '1', INCLUDE_PATH => 'templates_dir'"
+           Portal ="http://authen.int.appli.impots/portail/accueil.pl"
+           Menu= "http://authen.int.appli.impots/portail/application_new.pl"
+           ldap_server ="10.ip.ip.ip"
+           ldap_branch_people="ou=mefi,o=gouv,c=fr"
+           Session="memcached"
+          >
+	<handler 
+        	id="edito-agent" 
+		>  
+	</handler>      
+</domain>
+<cache  id="config1"
+	ConfigIpcKey="CONF" 
+	ConfigTtl ="1000"
+	>
+</cache>
+<session    id="memcached" 
+            SessionParams="( servers => ['ip.ip.ip.ip:11211'] )" 
+        >
+</session>
+<DefinitionSession>
+	<ligne  id = "commentaire" 
+		type = "single"
+		cle ="commentaire"
+		valeur= "mon commentaire est %buffer% merci"> 
+	</ligne>
+	<ligne  id = "mail" 
+		type = "single"
+		cle ="mail"
+		valeur= "%mail%" >
+	</ligne>
+	<ligne  id = "roleprofil" 
+		type = "single"
+		cle ="%roleprofil;0%"
+		valeur= "%roleprofil;1%" >
+	</ligne>
+	<ligne  id = "mefiapplicp" 
+		type = "multi"
+		cle ="%mefiapplicp;0%"
+		primarykey="cp" 
+		valeur= "%mefiapplicp;1%" >
+	</ligne>
+	
+	<ligne  id = "dn" 
+		type = "single"
+		cle ="dn"
+		valeur= "%dn%" >
+	</ligne>
+
+	<exp    id ="dn" 
+	        type= "dnentry"
+	      />
+	<exp    id ="buffer" 
+	        type= "constant"
+		valeur=" ce  que je veux "
+		/>
+	
+	<exp    id ="mail" 
+	        type= "attrldap"
+	        attribut= "mail" />
+
+	<exp    id ="roleprofil" 
+	        type= "attrldap"
+	        attribut= "roleprofil" />
+	<exp    id ="mefiapplicp" 
+	        type= "attrldap"
+	        attribut= "mefiapplicp" />
+	
+	
+</DefinitionSession>
+	
+</lemonconfig>

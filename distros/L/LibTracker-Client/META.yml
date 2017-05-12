@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                LibTracker-Client
+version:             0.02
+abstract:            Perl interfce to libtrackerclient
+license:             ~
+author:              
+    - Devendra Gera <gera@theoldmonk.net>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

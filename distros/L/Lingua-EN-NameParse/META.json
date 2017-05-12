@@ -1,0 +1,60 @@
+{
+   "abstract" : "extract the components of a person or couples full name, presented as a text string",
+   "author" : [
+      "Kim Ryan <kimryan at cpan org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4208",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-EN-NameParse",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "Test::Pod" : "1.04"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Parse::RecDescent" : "1",
+            "Test::Pod::Coverage" : "1.04",
+            "locale" : "1",
+            "strict" : "1.04",
+            "utf8" : "1.09",
+            "warnings" : "1.12"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::EN::NameParse" : {
+         "file" : "lib/Lingua/EN/NameParse.pm",
+         "version" : "1.36"
+      },
+      "Lingua::EN::NameParse::Grammar" : {
+         "file" : "lib/Lingua/EN/NameParse/Grammar.pm",
+         "version" : "1.36"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/kimryan/Lingua-EN-NameParse"
+      }
+   },
+   "version" : "1.36",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

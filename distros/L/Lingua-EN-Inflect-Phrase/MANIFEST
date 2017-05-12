@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Lingua/EN/Inflect/Phrase.pm
+t/00-compile.t
+t/basic.t
+t/bugs.t
+t/lib/TestPhrase.pm
+t/numbers.t
+t/release-pod-syntax.t
+t/schema-loader.t

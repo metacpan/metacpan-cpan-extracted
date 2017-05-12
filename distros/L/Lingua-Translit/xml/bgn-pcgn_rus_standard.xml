@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+<!--
+
+  ===========================================================================
+    BGN/PCGN Romanization System for Russian (Standard Variant)
+    for Lingua::Translit Perl Module
+    https://github.com/ndlecic/bgn-pcgn_rus
+
+    Copyright 2017 Nikola D. Lečić <nikola.lecic@anthesphoria.net>
+  ===========================================================================
+
+  This implementation of BGN/PCGN romanization system comes in two
+  variants:
+    - strict
+    - standard
+  Please see respective XML files for explanations.
+
+  The BGN/PCGN system was approved by the U.S. Board on Geographic Names
+  (BGN) in 1944 and the Permanent Committee on Geographical Names for
+  British Official Use (PCGN) in 1947.
+
+  Source:
+    Romanization Systems and Roman-Script Spelling Conventions. Prep.
+    by the U.S. Board on Geographical Names, Foreign Names Committee Staff.
+    Pub. by the Defense Mapping Agency, 1994. Pp. 93-94.
+
+  Available at:
+    https://libraries.ucsd.edu/bib/fed/USBGN_romanization.pdf
+
+  Terminology:
+    character = a graphic symbol used only in a non-Roman script writing
+                system
+    letter    = a symbol used only in a Roman-script writing system
+                or in a set of romanization equivalents
+    (cf. p. iv).
+
+  ===========================================================================
+    About Standard Variant:
+      In this variant of BGN/PCGN transliteration we do not follow the
+      transliteration schemes for "unusual Russian character sequences"
+      as described on p. 94 (which are followed in the Strict variant).
+      Therefore, in the Standard variant there is no interpunct character.
+
+      Although some academic publications designate this variant of
+      BGN/PCGN system as 'simplified', (cf., e.g., Understanding
+      Russianness. Ed. by Alapuro R. et al. Routledge: London, 2012,
+      p. xiv), it is, in out opinion, more desirable to designate it as
+      'Standard', since it follows the original BGN/PCGN rules. The
+      designation 'simplified' should be reserved for numerous
+      modifications of BGN/PCGN system, which simplify it in one way or
+      another (e.g. Oxford Style Manual, Wikipedia, etc.).
+  ===========================================================================
+
+-->
+
+<translit>
+
+    <name>BGN/PCGN RUS Standard</name>
+    <desc>BGN/PCGN:1947 (Standard Variant), Cyrillic to Latin, Russian</desc>
+    <reverse>false</reverse>
+
+    <rules>
+
+        <!--
+             Abbreviations vs. All Caps
+
+             Abbreviations are widely used in the Russian language, so
+             it's important to have them transliterated properly (e.g.
+             ВЦИОМ -> VTsIOM, not VTSIOM).
+
+             On the other hand, it's impossible to determine if a
+             character sequence is an abbreviation or a word written in
+             all caps.
+
+             Besides that, it is impossible to determine whether a common
+             one-character word 'Я' appears in all caps environment (where
+             it should be transliterated as 'YA') or not (in which case it
+             should be transliterated as 'Ya').
+
+             Another important case where it's impossible to determine if
+             an uppercase character is in all caps environment are usual
+             abbreviations of given names and patronymics; we want to
+             transliterate Ю. Я. Щербаков as 'Ya. Yu. Shcherbakov', not as
+             'YA. YU. Shcherbakov'.
+
+             Therefore, we deliberately don't try to detect all caps
+             environment in the rules. There are a lot of ways for a user
+             to achieve a proper capitalization of transliterated output
+             if it is needed.
+        -->
+
+        <!--
+            BGN/PCGN doesn't mention accent sign, so we remove it in
+            transliteration.
+        -->
+        <rule>
+            <from>&#x0301;</from> <!-- COMBINING ACUTE ACCENT -->
+            <to></to>
+        </rule>
+
+        <!--
+             Firstly, we transliterate characters whose transliteration
+             context depends on other characters, in order to minimize
+             the occurrence of already transliterated material in the rules.
+        -->
+
+        <!--
+             E -> Ye
+               initially
+               after the vowel characters А, Е, Ё, И, О, У, Ы, Э, Ю, Я
+               after Й, Ь, Ъ
+             Е -> E
+               in all other instances
+        -->
+        <rule>
+            <from>Е</from>
+            <to>Ye</to>
+            <context>
+                <!-- Since camel case is common in Russian abbreviations,
+                     we always test context for both upper- and lowercase
+                     characters -->
+                <after>[АЕЁИОУЫЭЮЯЙЬЪАеёиоуыэюяйьъ]</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>Е</from>
+            <to>Ye</to>
+            <context>
+                <after>\b</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>Е</from>
+            <to>E</to>
+        </rule>
+
+        <!--
+             E -> YË
+               initially
+               after the vowel characters А, Е, Ё, И, О, У, Ы, Э, Ю, Я
+               after Й, Ь, Ъ
+             Е -> Ë
+               in all other instances
+        -->
+        <rule>
+            <from>Ё</from>
+            <to>Yë</to>
+            <context>
+                <!-- include 'e' from transliterated 'Ye' as well -->
+                <after>[АЕЁИОУЫЭЮЯЙЬЪАеёиоуыэюяйьъe]</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>Ё</from>
+            <to>Yë</to>
+            <context>
+                <after>\b</after>
+            </context>
+        </rule>
+
+        <!--
+            Then, we proceed to characters whose context doesn't depend
+            on other characters.
+        -->
+
+        <rule>
+            <from>Ё</from>
+            <to>Ë</to>
+        </rule>
+
+        <rule>
+            <from>Й</from>
+            <to>Y</to>
+        </rule>
+
+        <rule>
+            <from>Ы</from>
+            <to>Y</to>
+        </rule>
+
+        <rule>
+            <from>Э</from>
+            <to>E</to>
+        </rule>
+
+        <rule>
+            <from>А</from>
+            <to>A</to>
+        </rule>
+
+        <rule>
+            <from>Б</from>
+            <to>B</to>
+        </rule>
+
+        <rule>
+            <from>В</from>
+            <to>V</to>
+        </rule>
+
+        <rule>
+            <from>Г</from>
+            <to>G</to>
+        </rule>
+
+        <rule>
+            <from>Д</from>
+            <to>D</to>
+        </rule>
+
+        <rule>
+            <from>Ж</from>
+            <to>Zh</to>
+        </rule>
+
+        <rule>
+            <from>З</from>
+            <to>Z</to>
+        </rule>
+
+        <rule>
+            <from>И</from>
+            <to>I</to>
+        </rule>
+
+        <rule>
+            <from>К</from>
+            <to>K</to>
+        </rule>
+
+        <rule>
+            <from>Л</from>
+            <to>L</to>
+        </rule>
+
+        <rule>
+            <from>М</from>
+            <to>M</to>
+        </rule>
+
+        <rule>
+            <from>Н</from>
+            <to>N</to>
+        </rule>
+
+        <rule>
+            <from>О</from>
+            <to>O</to>
+        </rule>
+
+        <rule>
+            <from>П</from>
+            <to>P</to>
+        </rule>
+
+        <rule>
+            <from>Р</from>
+            <to>R</to>
+        </rule>
+
+        <rule>
+            <from>С</from>
+            <to>S</to>
+        </rule>
+
+        <rule>
+            <from>Т</from>
+            <to>T</to>
+        </rule>
+
+        <rule>
+            <from>У</from>
+            <to>U</to>
+        </rule>
+
+        <rule>
+            <from>Ф</from>
+            <to>F</to>
+        </rule>
+
+        <rule>
+            <from>Х</from>
+            <to>Kh</to>
+        </rule>
+
+        <rule>
+            <from>Ц</from>
+            <to>Ts</to>
+        </rule>
+
+        <rule>
+            <from>Ч</from>
+            <to>Ch</to>
+        </rule>
+
+        <rule>
+            <from>Ш</from>
+            <to>Sh</to>
+        </rule>
+
+        <rule>
+            <from>Щ</from>
+            <to>Shch</to>
+        </rule>
+
+        <!--
+            The source (p. 93) doesn't specify if the characters used to
+            represent hard and soft signs are primes, apostrophes or
+            quotation marks. However, this discussion
+            https://en.wikipedia.org/wiki/Talk:BGN/PCGN_romanization_of_Russian#Apostrophes_vs._primes
+            contains a convincing argument that in BGN/PCGN transliteration
+            we shouldn't use primes or quotation signs.
+
+            Therefore we use single and double apostrophe for Ь and Ъ.
+            Transliteration output can be formatted if needed.
+        -->
+        <rule>
+            <from>Ъ</from>
+            <to>''</to>
+        </rule>
+
+        <rule>
+            <from>Ь</from>
+            <to>'</to>
+        </rule>
+
+        <rule>
+            <from>Ю</from>
+            <to>Yu</to>
+        </rule>
+
+        <rule>
+            <from>Я</from>
+            <to>Ya</to>
+        </rule>
+
+        <!--
+            Now, we proceed to lowercase characters, in the same order.
+        -->
+
+        <!--
+             e -> ye
+               initially
+               after the vowels characters а, е, ё, и, о, у, ы, э, ю, я
+               after й, ь, ъ
+             е -> e
+               in all other instances
+        -->
+        <rule>
+            <from>е</from>
+            <to>ye</to>
+            <context>
+                <!-- capitals are already transliterated, so we can expect
+                     'Ya', 'Yu', 'Ye', 'Yë', apostrophes, and 'Y' -->
+                <after>[AEËIOUYeëau'аеёиоуыэюяйьъ]</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>е</from>
+            <to>ye</to>
+            <context>
+                <after>\b</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>е</from>
+            <to>e</to>
+        </rule>
+
+        <!--
+             e -> yë
+               initially
+               after the vowels characters а, е, ё, и, о, у, ы, э, ю, я
+               after й, ь, ъ
+             е -> ë
+               in all other instances
+        -->
+        <rule>
+            <from>ё</from>
+            <to>yë</to>
+            <context>
+                <!-- capitals and 'е' are already transliterated, so we can
+                     expect 'Ya', 'Yu', 'Ye', 'Yë', 'ye', apostrophes,
+                     and 'Y' -->
+                <after>[AEËIOUYeëau'аеёиоуыэюяйьъ]</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>ё</from>
+            <to>yë</to>
+            <context>
+                <after>\b</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>ё</from>
+            <to>ë</to>
+        </rule>
+
+        <!--
+            Then, we proceed to characters whose context doesn't depend
+            on other characters.
+        -->
+
+        <rule>
+            <from>й</from>
+            <to>y</to>
+        </rule>
+
+        <rule>
+            <from>ы</from>
+            <to>y</to>
+        </rule>
+
+        <rule>
+            <from>э</from>
+            <to>e</to>
+        </rule>
+
+        <rule>
+            <from>а</from>
+            <to>a</to>
+        </rule>
+
+        <rule>
+            <from>б</from>
+            <to>b</to>
+        </rule>
+
+        <rule>
+            <from>в</from>
+            <to>v</to>
+        </rule>
+
+        <rule>
+            <from>г</from>
+            <to>g</to>
+        </rule>
+
+        <rule>
+            <from>д</from>
+            <to>d</to>
+        </rule>
+
+        <rule>
+            <from>ж</from>
+            <to>zh</to>
+        </rule>
+
+        <rule>
+            <from>з</from>
+            <to>z</to>
+        </rule>
+
+        <rule>
+            <from>и</from>
+            <to>i</to>
+        </rule>
+
+        <rule>
+            <from>к</from>
+            <to>k</to>
+        </rule>
+
+        <rule>
+            <from>л</from>
+            <to>l</to>
+        </rule>
+
+        <rule>
+            <from>м</from>
+            <to>m</to>
+        </rule>
+
+        <rule>
+            <from>н</from>
+            <to>n</to>
+        </rule>
+
+        <rule>
+            <from>о</from>
+            <to>o</to>
+        </rule>
+
+        <rule>
+            <from>п</from>
+            <to>p</to>
+        </rule>
+
+        <rule>
+            <from>р</from>
+            <to>r</to>
+        </rule>
+
+        <rule>
+            <from>с</from>
+            <to>s</to>
+        </rule>
+
+        <rule>
+            <from>т</from>
+            <to>t</to>
+        </rule>
+
+        <rule>
+            <from>у</from>
+            <to>u</to>
+        </rule>
+
+        <rule>
+            <from>ф</from>
+            <to>f</to>
+        </rule>
+
+        <rule>
+            <from>х</from>
+            <to>kh</to>
+        </rule>
+
+        <rule>
+            <from>ц</from>
+            <to>ts</to>
+        </rule>
+
+        <rule>
+            <from>ч</from>
+            <to>ch</to>
+        </rule>
+
+        <rule>
+            <from>ш</from>
+            <to>sh</to>
+        </rule>
+
+        <rule>
+            <from>щ</from>
+            <to>shch</to>
+        </rule>
+
+        <!-- cf. the note for Ъ and Ь above -->
+        <rule>
+            <from>ъ</from>
+            <to>''</to>
+        </rule>
+
+        <rule>
+            <from>ь</from>
+            <to>'</to>
+        </rule>
+
+        <rule>
+            <from>ю</from>
+            <to>yu</to>
+        </rule>
+
+        <rule>
+            <from>я</from>
+            <to>ya</to>
+        </rule>
+
+    </rules>
+
+</translit>
+
+<!-- vim: set sts=4 sw=4 ts=4 ai et ft=xml: -->

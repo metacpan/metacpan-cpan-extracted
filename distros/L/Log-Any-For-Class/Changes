@@ -1,0 +1,216 @@
+Revision history for Log-Any-For-Class
+
+0.27    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.26    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.25    2015-04-25 (PERLANCAR)
+
+	- Avoid perl undef warning when Log::Log4perl is not used (one that
+	  works).
+
+
+0.24    2014-12-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use the new renamed module SHARYANTO::Package::Util ->
+	  Package::MoreUtil.
+
+
+0.23     2013-11-20 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Now never load/require modules for you, you need to require modules
+           yourself.
+
+         - Add option 'import_hook' (import option -hook) to install import
+           hook. Otherwise pattern in 'packages' (or 'classes') still will only
+           search in existing packages.
+
+
+0.22     2013-11-20 (SHARYANTO)
+
+         - Bugfix: typo in Log::Any::For::Class which prevented 'use
+           Log::Any::For::Class qw(Class1 ...)' to work.
+
+
+0.21     2013-11-20 (SHARYANTO)
+
+         - No functional changes. Add logging statement and FAQ item.
+
+
+0.20     2012-12-07 (SHARYANTO)
+
+         [NEW FEATURES]
+
+         - Option 'packages' can now contain regexes. This module will
+           automatically add logging if you load modules that match the regexes
+           (this is done via an @INC import hook).
+
+         - Add logger options: 'log_sub_args' and 'log_sub_result'.
+
+         [FIXES]
+
+         - Utilize SHARYANTO::Package::Util for more robust package-related
+         routines.
+
+
+0.19     2012-11-29 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Adjust caller_depth for nested call inside logged package.
+
+
+0.18     2012-11-29 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - caller_depth adjustment didn't work for Log::Any::For::Class.
+
+
+0.17     2012-11-29 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Adjust $Log::Log4perl::caller_depth to correctly show caller location
+           (inspired by DBIx::LogAny).
+
+         - Environment variables LOG_PACKAGE_INCLUDE_SUB_RE and
+           LOG_PACKAGE_EXCLUDE_SUB_RE are now observed.
+
+
+0.16     2012-08-16 (SHARYANTO)
+
+         No functional changes. Forgot import in Log/Any/For/Class.pm.
+
+
+0.15     2012-08-16 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Allow adding logging to packages during import (e.g. 'use
+           Log::Any::For::Package qw(Foo Bar)') for convenience.
+
+
+0.14     2012-08-16 (SHARYANTO)
+
+         - No functional changes. Fix Log::Any::For::Class's default logger
+           which didn't understand 'indent' and 'max_depth' logger args.
+
+
+0.13     2012-08-16 (SHARYANTO)
+
+         - No functional changes. Fix regression (we do need to copy @_, because
+           'args' might need to be changed, e.g. in Log::Any::For::DBI to mask
+           passwords).
+
+
+0.12     2012-08-16 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add logger argument: max_depth.
+
+
+0.11     2012-08-16 (SHARYANTO)
+
+         - No functional changes. Fix indenting.
+
+
+0.10     2012-08-16 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add 'logger_args' argument to allow passing arguments to logger
+           routines.
+
+         - Indent log message according to nest level (default indent=1).
+
+
+0.09     2012-08-16 (SHARYANTO)
+
+         [REMOVED FEATURES]
+
+         - Remove 'filter_args' argument. What I was needed was actually just
+           cleaning.
+
+         [ENHANCEMENTS]
+
+         - Use Data::Clean::JSON (and customize it a bit) to clean/filter args
+           and result when showing in log.
+
+
+0.08     2012-08-16 (SHARYANTO)
+
+         - Add 'filter_args' argument. By default, show objects as '(<Classname>
+           object)' instead of dumping them.
+
+         - Use Sub::Uplevel so not to mess with caller().
+
+
+0.07     2012-07-17 (SHARYANTO)
+
+         - Previous release doesn't work. Revert to 0.05.
+
+
+0.06     2012-07-17 (SHARYANTO)
+
+         - 'filter_subs' cannot be coderef anymore for now.
+
+         - Use Module::Patch 0.07
+
+
+0.05     2012-07-10 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - logger receives hashref arguments instead of hash, so it can modify
+           them.
+
+         [ENHANCEMENTS]
+
+         - Handle wantarray undef.
+
+
+0.04     2012-07-10 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add Log::Any::For::Package
+
+         - Add argument: 'filter_subs' ('filter_methods' for
+           Log::Any::For::Class).
+
+
+0.03     2012-07-10 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Don't try to load module if package already exists.
+
+         - Don't log $self in arguments.
+
+
+0.02     2012-07-10 (SHARYANTO)
+
+         - No functional changes. Add missing dep to Log::Any.
+
+
+0.01     2012-07-10 (SHARYANTO)
+
+         - First release.

@@ -1,0 +1,122 @@
+<p><input type="button" onclick="parent.location='/'" value="back to surveys" /></p>
+
+<a name="top"></a>
+<h2>Talks Admin</h2>
+
+<div class="newsbox">
+<ul>
+<li>[% count1 || 0 %] <a href="#lt">lightning talks</a></li>
+<li>[% count2 || 0 %] <a href="#rt">regular talks</a></li>
+<li>[% count3 || 0 %] <a href="#tc">tutorial classes</a></li>
+<li>[% count4 || 0 %] <a href="#ig">ignored talks</a></li>
+</ul>
+</div>
+
+<form name="talkform" method="post" action="/pages.cgi">
+<input type="hidden" name="act" value="talk-update" />
+
+<a name="lt"></a>
+<h3>Lightning Talks</h3>
+<div class="newsbox">
+[% IF talks_lt %]
+<table width="100%">
+<tr><th width="150">Tutor</th>
+    <th>Course</th>
+    <th width="150">Type</th>
+    <th width="20">Select</th>
+</tr>
+[% FOREACH talk = talks_lt %]
+<tr><td>[% talk.tutor %]</td>
+    <td><a href="[% cgipath %]/pages.cgi?act=talk-edit&amp;courseid=[% talk.courseid %]">[% talk.course %]</a></td>
+    <td>[% talk.ddtype %]</td>
+    <td><input type="checkbox" id="LIST[% talk.courseid %]" name="LIST[% talk.courseid %]" /></td>
+</tr>
+[% END %]
+</table>
+<p><input type="submit" value="Update" /></p>
+[% ELSE %]
+<p>No talks available yet</p>
+[% END %]
+</div>
+
+<p><a href="#top">top of page</a></p>
+
+<a name="rt"></a>
+<h3>Regular Talks</h3>
+<div class="newsbox">
+[% IF talks_rt %]
+<table width="100%">
+<tr><th width="150">Tutor</th>
+    <th>Course</th>
+    <th width="150">Type</th>
+    <th width="20">Select</th>
+</tr>
+[% FOREACH talk = talks_rt %]
+<tr><td>[% talk.tutor %]</td>
+    <td><a href="[% cgipath %]/pages.cgi?act=talk-edit&amp;courseid=[% talk.courseid %]">[% talk.course %]</a></td>
+    <td>[% talk.ddtype %]</td>
+    <td><input type="checkbox" id="LIST[% talk.courseid %]" name="LIST[% talk.courseid %]" /></td>
+</tr>
+[% END %]
+</table>
+<p><input type="submit" value="Update" /></p>
+[% ELSE %]
+<p>No talks available yet</p>
+[% END %]
+</div>
+
+<p><a href="#top">top of page</a></p>
+
+<a name="tc"></a>
+<h3>Other Courses</h3>
+<div class="newsbox">
+[% IF talks_mc %]
+<table width="100%">
+<tr><th width="150">Tutor</th>
+    <th>Course</th>
+    <th width="150">Type</th>
+    <th width="20">Select</th>
+</tr>
+[% FOREACH talk = talks_mc %]
+<tr><td>[% talk.tutor %]</td>
+    <td><a href="[% cgipath %]/pages.cgi?act=talk-edit&amp;courseid=[% talk.courseid %]">[% talk.course %]</a></td>
+    <td>[% talk.ddtype %]</td>
+    <td><input type="checkbox" id="LIST[% talk.courseid %]" name="LIST[% talk.courseid %]" /></td>
+</tr>
+[% END %]
+</table>
+<p><input type="submit" value="Update" /></p>
+[% ELSE %]
+<p>No talks available yet</p>
+[% END %]
+</div>
+
+<p><a href="#top">top of page</a></p>
+
+<a name="ig"></a>
+<h3>Ignored Talks</h3>
+<div class="newsbox">
+[% IF talks_ig %]
+<table width="100%">
+<tr><th width="150">Tutor</th>
+    <th>Course</th>
+    <th width="150">Type</th>
+    <th width="20">Select</th>
+</tr>
+[% FOREACH talk = talks_ig %]
+<tr><td>[% talk.tutor %]</td>
+    <td><a href="[% cgipath %]/pages.cgi?act=talk-edit&amp;courseid=[% talk.courseid %]">[% talk.course %]</a></td>
+    <td>[% talk.ddtype %]</td>
+    <td><input type="checkbox" id="LIST[% talk.courseid %]" name="LIST[% talk.courseid %]" /></td>
+</tr>
+[% END %]
+</table>
+<p><input type="submit" value="Update" /></p>
+[% ELSE %]
+<p>No talks available yet</p>
+[% END %]
+</div>
+
+<p><a href="#top">top of page</a></p>
+
+</form>

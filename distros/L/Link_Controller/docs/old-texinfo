@@ -1,0 +1,45 @@
+There's another way to do this.  We can relate our list of broken links
+to an infostructure.  In your case that's probably just your HTML
+pages.  And since the software can only handle one infostructure at
+present there's no complexity.
+
+@example
+link-report --infostructure
+@end example
+
+or even
+
+@example
+link-report -I
+@end example
+
+@example
+broken:-       http://www.ippt.gov.pl/smarr.hdf
+broken:-       http://www.ippt.gov.pl/~Perzyna
+broken:-       http://www.ippt.gov.pl/~bradzisz
+broken:-       http://www.ippt.gov.pl/~jszczepa
+broken:-       http://www.ncsa.uiuc.edu:8001/stis.nsf.g.....etc......
+broken:-       http://www.ippt.gov.pl/~mmarks
+broken:-       file://ftp.ncsa.uiuc.edu/Web/httpd/Unix/ncsa_httpd/docu
+ments/usage.ps
+broken:-       http://www.ippt.gov.pl/ippt/spokomm/spokomm.html
+...etc...
+@end example
+
+
+
+
+@cindex URLs, mailto
+@cindex mailto URLs
+@cindex URLs, news
+@cindex news URLs
+At the present time @samp{mailto:} and @samp{news:} links are always
+reported broken even when they aren't.  You might want to use something
+like.
+
+@example
+link-report -e'^mailto' -e'^news' ...normal arguments...
+@end example
+
+in order to avoid getting the spurious reports about them.
+

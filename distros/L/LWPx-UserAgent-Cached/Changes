@@ -1,0 +1,27 @@
+Revision history for perl distribution LWPx-UserAgent-Role-Cached
+
+0.008     2016-10-27 00:29:55-05:00 America/Chicago
+    - more correctly handle HTTP Client-Transfer-Encoding: chunked
+      headers
+    - remove Modern::Perl from prerequisites
+    - documentation tweaks (automatically generating list of
+      prerequisites, listing other Perl modules in monospace text)
+0.007     2015-03-04 17:06:36-05:00 America/New_York
+    - documentation and metadata fixes, no functional changes
+0.006     2015-03-03 13:34:06-05:00 America/New_York
+    - use CHI's built-in serializer support by default (with Sereal) instead
+      of serializing in the UserAgent
+    - fix and fully test ETag support
+    - add support for no-cache and no-store Cache-Control request and response
+      headers, and Pragma: no-cache request header
+0.005     2015-02-17 22:59:02-05:00 America/New_York (TRIAL RELEASE)
+    - add preliminary ETag cache control support
+0.004     2015-02-12 22:55:49-05:00 America/New_York
+    - require newer version of Moo's Sub::Quote to get the qsub function
+0.003     2015-02-11 22:15:47-05:00 America/New_York
+    - more micro-optimizations with Sereal replacing Storable
+0.002     2015-02-10 21:40:24-05:00 America/New_York (TRIAL RELEASE)
+    - require a version of Moo that allows undef defaults in attributes
+    - use faster Type::Tiny rather than MooX::Types::MooseLike
+0.001     2015-02-10 18:22:57-05:00 America/New_York (TRIAL RELEASE)
+    - Initial release

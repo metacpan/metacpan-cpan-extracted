@@ -1,0 +1,45 @@
+
+=head1 NAME
+
+linux_mkinitrd - script to interface to multiple initrd tool variants
+
+=head1 SYNOPSIS
+
+linux_mkinitrd [RELEASE_TAG] [TARGET_DIR]
+
+
+=head1 DESCRIPTION
+
+This script provides a handy wrapper around several different mkinitrd
+tools (e.g. mkinitrd, mkinitrc, mkinitramfs, yaird).  It scans the
+system for the tools and uses the first it finds, invoking it with the
+correct syntax to create an init file.
+
+Regardless of the initrd tool used, the initrd file will be named in 
+the same fashion:  $TARGET_DIR/initrd.img-$RELEASE_TAG.
+
+If not specified, $TARGET_DIR defaults to /boot.  $RELEASE_TAG defaults
+to "test".
+
+
+=head1 SEE ALSO
+
+L<crucible>, L<WWW::PkgFind>, L<Test::Parser>, L<Linux::Distribution>
+
+=head1 AUTHOR
+
+Bryce Harrington  [bryce at osdl dot org]
+
+=head1 COPYRIGHT
+
+Copyright (C) 2006 Bryce Harrington and Open Source Development Labs
+All Rights Reserved.
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.10 $
+
+=cut

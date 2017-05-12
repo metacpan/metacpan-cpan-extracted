@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+my $dir = shift;
+$dir =~ /^(.*\@)?(.*)$/;
+printf "-fstype=lufs,fs=perlfs,quiet,host=%s,username=%s none\n", $2, $1;

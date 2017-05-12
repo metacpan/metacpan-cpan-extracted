@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+
+  Basic document type definition for transliteration tables.
+
+  Copyright (C) 2007-2008 Alex Linke <alinke@lingua-systems.com>
+  Copyright (C) 2009-2016 Lingua-Systems Software GmbH
+  Copyright (C) 2016 Netzum Sorglos, Lingua-Systems Software GmbH
+
+-->
+
+
+<!ELEMENT translit  (name, desc, reverse, rules)>
+<!ELEMENT name      (#PCDATA)>
+<!ELEMENT desc      (#PCDATA)>
+<!ELEMENT reverse   (#PCDATA)>
+<!ELEMENT rules     (rule+)>
+<!ELEMENT rule      (from, to, context?)>
+<!ELEMENT from      (#PCDATA)>
+<!ELEMENT to        (#PCDATA)>
+<!ELEMENT context   ((before|after),(before|after)?)>
+<!ELEMENT before    (#PCDATA)>
+<!ELEMENT after     (#PCDATA)>
+
+
+<!-- vim: set ft=dtd sts=4 ts=4 sw=4 ai et: -->

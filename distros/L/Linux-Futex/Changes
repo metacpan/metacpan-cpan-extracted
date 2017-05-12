@@ -1,0 +1,10 @@
+Revision history for Perl extension Futex.
+
+0.6  Thu Jan 30 12:36:18 2014
+	- renamed to Linux::Futex
+        - Updated README
+
+0.5  Fri Jan 24 12:36:18 2014
+	- original version; created by h2xs
+        - Implements lock and unlock only
+

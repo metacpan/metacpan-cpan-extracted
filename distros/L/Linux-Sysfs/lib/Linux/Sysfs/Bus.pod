@@ -1,0 +1,104 @@
+=pod
+
+=head1 NAME
+
+Linux::Sysfs::Bus - sysfs buses
+
+=head1 SYNOPSIS
+
+	my $bus = Linux::Sysfs::Bus->open('pci');
+
+	my @devices = $bus->get_devices;
+	my @drivers = $bus->get_drivers;
+
+	$bus->close;
+
+=head1 DESCRIPTION
+
+The library provides functions for viewing buses represented in sysfs.
+
+=head1 METHODS
+
+=over
+
+=item B<open>
+
+	my $bus = Linux::Sysfs::Bus->open($name);
+
+Opens up one of the buses represented in sysfs in the /sys/bus directory.
+C<$name> is the name of the bus to open (e.g. "pci"). It returns a
+Linux::Sysfs::Bus instance on success or undef on failure.
+
+=item B<close>
+
+	$bus->close;
+
+Closes up the sysfs_bus structure including its devices, and drivers and the
+list of attributes.
+
+=item B<get_devices>
+
+	my @devices = $bus->get_devices;
+
+Returns a list of Linux::Sysfs::Device instances that are registered with this
+bus.
+
+=item B<get_drivers>
+
+	my @drivers = $bus->get_drivers;
+
+Returns a list of Linux::Sysfs::Driver instances that are registered with this
+bus.
+
+=item B<get_device>
+
+	my $device = $bus->get_device($id);
+
+Looks for a device with the given C<$id> on this bus. On success, it returns a
+Linux::Sysfs::Device instance, otherwise undef.
+
+=item B<get_driver>
+
+	my $driver = $bus->get_driver($name);
+
+Looks for a driver with the given C<$name> on this bus. On success, it returns
+a Linux::Sysfs::Driver instance, otherwise undef.
+
+=item B<name>
+
+	my $name = $bus->name;
+
+Returns the bus' name.
+
+=item B<path>
+
+	my $path = $attr->path;
+
+Returns the full path to the bus' file in sysfs.
+
+=back
+
+=head1 AUTHOR
+
+Florian Ragwitz E<lt>rafl@debian.orgE<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Florian Ragwitz, all rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Library General Public License as published
+by the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307
+USA.
+
+=cut

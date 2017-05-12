@@ -1,0 +1,20 @@
+0.03    2006-08-09
+
+- This module could overwrite if it was in buffered mode and it sent
+  mail as a script exited. Reported by Dean Kopesky.
+
+
+0.02    2006-07-12
+
+- Make all the tests skip if we don't have Email::Send::Test.
+
+- Add a build_requires prereq on Email::Send::Test.
+
+- Require Email::Send 2.0+ and use its new OO API.
+
+- The mailer_args parameter was being ignored entirely.
+
+
+0.01    2005-04-11
+
+- First release.

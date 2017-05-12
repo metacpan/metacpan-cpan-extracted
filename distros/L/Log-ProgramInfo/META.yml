@@ -1,0 +1,37 @@
+---
+abstract: 'Module to log program termination status info.'
+author:
+  - 'Boutros Lab Software Engineering  <BoutrosLabSoftware@oicr.on.ca>'
+  - 'John Macdonald  <jmacdonald@oicr.on.ca>'
+build_requires:
+  File::Path: '0'
+  Test::Exception: '0'
+  Test::More: '0.10'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-ProgramInfo
+provides:
+  Log::ProgramInfo:
+    file: lib/Log/ProgramInfo.pm
+    version: v0.1.13
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  DateTime::Duration: '0'
+  Fcntl: '0'
+  FindBin: '0'
+  Time::HiRes: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.1.13
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

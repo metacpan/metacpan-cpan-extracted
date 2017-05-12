@@ -1,0 +1,46 @@
+[% 
+    htmltitle = 'Guestbook' ;
+    title = htmltitle ;
+
+    crumb1_name = 'Guestbook' ;
+%]
+
+<div class="boxer">
+<p>To add your message to our guestbook, fill in the blanks below. Fields marked with * must be completed, while all others are optional. Thanks!</p>
+<p>Please note that your message may not appear straight away, due to moderation, as a result in the increasing amount of "comment spam" we are seeing. So please 
+be patient if you don't see your message at the top of the list. Also note that any inappropriate content (including links) will be removed.</p>
+[% IF errmess %]<p>Details were entered incorrectly. Please check the field marked <span class="alert">&empty;</span> and resubmit.</p>[% END %]
+</div>
+
+<div class="boxer">
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="guest-save" />
+<input type="hidden" name="loopback" value="[% ipaddr %]" />
+<table>
+<tr><td width="100">Your Name *</td>
+    <td width="10"><span class="alert">[% data.realname_err %]</span></td>
+    <td><input type="text" size="32" name="realname" value="[% data.realname %]" /></td></tr>
+<!--
+<tr><td>E-Mail</td>
+    <td><span class="alert">[% data.email_err %]</span></td>
+    <td><input type="text" size="32" name="email"    value="[% data.email %]"	/></td></tr>
+<tr><td>URL</td>
+    <td><span class="alert">[% data.url_err %]</span></td>
+    <td><input type="text" size="32" name="url"      value="[% data.url %]"		/></td></tr>
+-->
+<tr><td>City</td>
+    <td><span class="alert">[% data.city_err %]</span></td>
+    <td><input type="text" size="32" name="city"     value="[% data.city %]"	/></td></tr>
+<tr><td>Country</td>
+    <td><span class="alert">[% data.country_err %]</span></td>
+    <td><input type="text" size="32" name="country"  value="[% data.country %]"	/></td></tr>
+<tr><td>Comment *</td>
+    <td><span class="alert">[% data.comments_err %]</span></td>
+    <td>Please note all inappropriate urls will be removed from your message.<br />
+        <textarea name="comments" cols="60" rows="10">[% data.comments %]</textarea></td></tr>
+<tr><td></td>
+    <td></td>
+    <td><input type="submit" value="Submit Comment" />&nbsp;&nbsp;<input type="reset" /></td></tr>
+</table>
+</form>
+</div>

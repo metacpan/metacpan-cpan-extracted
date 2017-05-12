@@ -1,0 +1,44 @@
+/*--------------------------------------------------------------------*/
+/* Recording Listings */
+
+#qtv-listings .grid .lrow li {
+	color: #00D5FB;
+}
+
+#qtv-listings .grid .lrow ol li .edView {
+	/* In-place edit */
+    background: #ffc ;
+    color: black ;
+}
+
+
+#qtv-listings .grid .lrow li.lchan {
+	color: yellow ;
+}
+
+/* inactive */
+#qtv-listings .grid .linactive li {
+	color: #888;
+}
+#qtv-listings .grid .linactive li.lchan {
+	color: #888 ;
+}
+
+/* prog */
+#qtv-listings .grid .lprog li {
+    background: #000055 ;
+}
+
+
+
+.recListPop ul li.sel {
+    background: #000055 ;
+}
+
+.recListPop ul li.recradio:hover {
+    background: #009999 ;
+}
+
+
+
+

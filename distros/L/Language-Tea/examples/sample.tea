@@ -1,0 +1,19 @@
+    # To get a web page from a server, you can write this code which
+    # assumes that the output of the server is text.
+    define aSocket [new TSocket "www.yahoo.com" 80]
+    define aLine   $null
+    $aSocket writeln "GET / HTTP/1.0"
+    $aSocket writeln
+    while { not-null? [set! aLine [$aSocket readln]] } {
+        $stdout writeln $aLine
+    }
+    $aSocket close
+
+    # But if binary data is a possibility, then the following
+    # version is recommended instead
+    define aSocket [new TSocket "www.yahoo.com" 80]
+    $aSocket writeln "GET / HTTP/1.0"
+    $aSocket writeln
+    $aSocket copyTo $stdout
+    $aSocket close
+

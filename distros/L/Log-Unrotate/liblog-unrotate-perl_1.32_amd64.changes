@@ -1,0 +1,31 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Format: 1.7
+Date: Wed, 17 Jul 2013 15:40:12 +0400
+Source: liblog-unrotate-perl
+Binary: liblog-unrotate-perl
+Architecture: source all
+Version: 1.32
+Distribution: unstable
+Urgency: low
+Maintainer: Vyacheslav Matjukhin (No comments) <mmcleric@yandex-team.ru>
+Changed-By: Andrei Mishchenko <druxa@yandex-team.ru>
+Description: 
+ liblog-unrotate-perl - Rotating logs reader
+Changes: 
+ liblog-unrotate-perl (1.32) unstable; urgency=low
+ .
+   * do not write same position to pos history
+Files: 
+ 493be2e8ab48b22b800be9f94f91e403 635 perl optional liblog-unrotate-perl_1.32.dsc
+ 2eb293463981581a8d0a264a86e9d5b5 104977 perl optional liblog-unrotate-perl_1.32.tar.gz
+ bbe86e9345135b356e1a10b28207ba99 27508 perl optional liblog-unrotate-perl_1.32_all.deb
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFR5oK2734+XFWIp0gRAgDoAKC3h8B3ZqVUmtb8YhJv2razxK8EdACfZUTs
+De8QwjthRmjYhutsX3bVEXY=
+=kUX+
+-----END PGP SIGNATURE-----

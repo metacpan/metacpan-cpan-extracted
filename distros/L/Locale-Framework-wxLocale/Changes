@@ -1,0 +1,10 @@
+Revision history for Perl extension Lang.
+
+0.05 Changed name from 'Lang' to 'Locale::Framework'.
+     
+0.04 Added wxLocale backend.
+
+0.01  Wed Mar 24 21:27:14 2004
+	- original version; created by h2xs 1.22 with options
+		-X Lang -b 5.6.0
+

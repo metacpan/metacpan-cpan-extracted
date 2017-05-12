@@ -1,0 +1,12 @@
+Changes
+lib/Lemonldap/Config/Initparam.pm
+lib/Lemonldap/Config/Parameters.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+scripts/dump_cache.pl
+scripts/valid.pl
+t/1.t
+t/config-parameters.t
+t/test.xml

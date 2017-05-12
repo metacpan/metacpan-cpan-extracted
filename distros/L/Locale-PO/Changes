@@ -1,0 +1,85 @@
+Revision history for Perl extension Locale::PO.
+
+0.27  Dec 15 2014
+   -  Fix RT#94231 (previous — fuzzy — msgid, #|). Thanks to Raphael Hertzog
+      for reporting it. Added a test case now, but previous messages are
+      treated like fuzzy messages, so use fuzzy_msgid().
+
+0.26  Dec 14 2014
+   -  Fix RT#42811 (don't add a flag twice). Thanks to Jason Sill for his
+      bug report from 2009 (!). Jason, sorry and better late than never.
+
+0.25  Dec 14 2014
+   -  This release now should work reliably on Linux, MSWin32, msys and
+      I believe also MacOS, also when writing PO files from one platform
+      and reading them back on another. Hopefully :-)
+   -  Fix RT#99069 (\ not being escaped). Thanks to Jeff Fearn.
+   -  Fix RT#87374 (mixed \r\n handling problems). Thanks to Jason
+      Fesler for the bug report.
+
+0.24  May 29 2014
+   -  Fix inline "\n" not being escaped properly. RT #96016
+      Thanks to Jeff Fearn for bug report and patch.
+
+0.23  Feb 06 2013
+   -  Bugs RT#76366 and RT#54064 - Added encoding option. Now we can load & save
+      PO files in any encoding, For example in 'utf8'. Added test about this.
+      (patch by Perlover, based on patch from Zach)
+   -  Some code indenting inside.
+
+0.22  Sep 03 2012
+   -  New maintainer: Cosimo Streppone (COSIMO)
+   -  Bug RT#40009 Incorrect handling of multi-line obsolete entries
+      (patch by Joshua Miller, test case by Cosimo Streppone)
+   -  Bug RT#66264 Added support for fuzzy string prefix "#|" and "#~|".
+      (patch by Joshua Miller)
+
+0.21  May 19 2008
+   -  BUG #35939 - Locale::PO is now correctly subclassable
+      (patch provided by Cosimo Streppone)
+
+0.20  Mar 15 2008
+   -  BUG #34110 - fixed a rather serious problem with the dist not building on
+      anything but a Mac
+
+0.19  Mar 14 2008
+    - FEATURE: Added msgctxt support (thanks to Kevin Scannell for the patch)
+
+0.18  Mar 14 2008
+    - New maintainer: Ken Prows
+    - BUG #33969: Fixed a problem with multi-line msgid_plural entries
+    - BUG #18679: Obsolete entries (#~) are now preserved
+    - API: The following methods are now private:
+      load_file, save_file, normalize_str, dump_multi_comment
+      Apologies to anyone using these (undocumented) methods.
+    - FEATURE: Added "loaded_line_number" accessor which returns the line number
+      that an entry started at in the loaded po file
+    - FEATURE: Now preserves any flag encountered in a #~ comment
+    - Expanded POD
+    - Thanks to Kalle Olavi Niemitalo for help in making many of these changes
+
+0.17  Tue May 22 12:07:00 CDT 2007
+    - Improved regexes in load_file to handle whitespace better.
+      Suggested by Byron Hammond.
+
+0.16  Mon Oct 17 11:00:00 GMT 2005
+	- Added support for msgid_plural and msgstr_n. Also tidied up
+	  tests. evdb@ecclestoad.co.uk
+
+0.15  Sun Aug 13 15:34:00 CDT 2005
+	- Fix to output of flags by albert.fazli@gmail.com.
+
+0.14  Wed Dec 08 09:35:01 CDT 2004
+	- #. comments can be multiline. Fix by Kevin Patrick Scannell.
+
+0.13  Fri Nov 21 14:25:01 CDT 2004
+	- Fix to empty comment handling by Frank Ralf
+
+0.12  Fri Oct  1 13:00:01 CDT 2004
+	- Fixes to multiline string handling by Michael Soegtrop.
+
+0.11  Mon Jul 24 09:24:31 CDT 2000
+	- test.pl script no longer uses diff -B, which is nonportable.
+
+0.10  Sun Jul 16 14:24:39 2000
+	- original version; created by Alan Schwartz

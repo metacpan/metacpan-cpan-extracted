@@ -1,0 +1,41 @@
+Revision history for Perl extension Lingua::JA::WordNet
+
+0.21    Sun, 30 Dec 2012 03:16:18 +0900
+        - Added 'no_index directory' to Makefile.PL
+
+0.20    Sun, 30 Dec 2012 00:16:46 +0900
+        - Added 14,197 synonym pairs (Japanese Wordnet Synonyms Database)
+        to bundled Japanese Wordnet database file
+        - Added 'Synonym' method and 'WordID' method
+        - Added 'Out of memory!' section to documentation (RT#82276)
+
+0.12    Thu, 27 Dec 2012 09:40:31 +0900
+        - Updated bundled Japanese WordNet database file from Ver.1.0 to Ver.1.1
+        ( 'wnjpn-1.1.db' was actually Ver.1.0. (*_*) )
+
+0.11    Wed, 26 Dec 2012 19:54:26 +0900
+        - Changed the return value of Allsynsets() from array to arrayref
+        - Set 'jpn' to default value of $lang
+        - Improved performance slightly
+
+0.10    Tue, 25 Dec 2012 21:27:27 +0900
+        - Bundled Japanese WordNet database file
+        - Added dependency on File::ShareDir
+        - Improved tests
+
+0.05    Fri, 08 Jun 2012 15:21:01 +0900
+        - improved documentation
+
+0.04    Mon, 14 May 2012 13:50:03 +0900
+        - improved documentation
+        - improved namespace pollutions
+
+0.03    Mon, 07 Nov 2011 00:14:50 +0900
+        - added verbose option
+        - added Pos method
+
+0.02    Fri, 04 Nov 2011 18:21:46 +0900
+        - fixed typo in POD
+
+0.01    Fri, 04 Nov 2011 16:34:52 +0900
+        - original version

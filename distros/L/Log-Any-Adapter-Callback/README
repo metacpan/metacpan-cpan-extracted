@@ -1,0 +1,66 @@
+NAME
+    Log::Any::Adapter::Callback - Send Log::Any logs to a subroutine
+
+VERSION
+    version 0.09
+
+SYNOPSIS
+     # say, let's POST each log message to an HTTP API server
+     use LWP::UserAgent;
+     my $ua = LWP::UserAgent->new;
+
+     use Log::Any::Adapter;
+     Log::Any::Adapter->set('Callback',
+         min_level    => 'warn',
+         logging_cb   => sub {
+             my ($method, $self, $format, @params) = @_;
+             $ua->post("https://localdomain/log", level=>$method, Content=>$format);
+             sleep 1; # don't overload the server
+         },
+         detection_cb => sub { ... }, # optional, default is: sub { 1 }
+     );
+
+DESCRIPTION
+    This adapter lets you specify callback subroutine to be called by
+    Log::Any's logging methods (like $log->debug(), $log->error(), etc) and
+    detection methods (like $log->is_warning(), $log->is_fatal(), etc.).
+
+    This adapter is used for customized logging, and is mostly a convenient
+    construct to save a few lines of code. You could achieve the same effect
+    by creating a full Log::Any adapter class.
+
+    Your logging callback subroutine will be called with these arguments:
+
+     ($method, $self, $format, @params)
+
+    where $method is the name of method (like "debug") and ($self, $format,
+    @params) are given by Log::Any.
+
+SEE ALSO
+    Log::Any
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-Any-Adapter-Callback>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Log-Any-Adapter-Callback>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Any-Adapter-Callb
+    ack>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

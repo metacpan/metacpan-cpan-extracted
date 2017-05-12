@@ -1,0 +1,58 @@
+// [% warning %]
+
+[%- IF class.parent %]
+include "[% class.parent.name("/") %]";
+[%- END %]
+[%- UNLESS class.is_abstract %]
+include "[% visitor.name("/") %]";
+[%- END %]
+
+[% IF class.is_abstract %]abstract [% END -%]
+class [% class.name("::") -%]
+[% IF class.parent %] : public [% class.parent.name("::") %][% END %] {
+[% UNLESS class.is_abstract %]
+    private:
+    [%- FOREACH arg IN class.args %]
+        [% arg.name %]* [% arg.argname %];
+    [%- END %]
+
+    public:
+        /**
+    [%- FOREACH arg IN class.args %]
+         * @param [% arg.name("::") %]* [% arg.argname %] the [% arg.argname.camelcase %] component.
+    [%- END %]
+         */
+        [% class.lastpart %]([% FOREACH arg IN class.args -%]
+                             [%- arg.name("::") %]* [% arg.argname -%]
+                             [%- LAST IF loop.last %][% ", " %]
+                             [%- END %]) {
+            [%- FOREACH arg IN class.args %]
+            self.[% arg.argname %] = [% arg.argname %];
+            [%- END %]
+        }
+
+        ~[% class.lastpart %]() {
+            [%- FOREACH arg IN class.args %]
+            delete [% arg.argname %];
+            [%- END %]
+        }
+
+    [%- FOREACH arg IN class.args %]
+        /**
+         * @return [% arg.name("::") %] the [% arg.argname.camelcase %] component.
+         */
+        [% arg.name("::") %]* [% arg.argname.getMethod %]() {
+            return [% arg.argname %];
+        }
+    [% END -%]
+
+        /**
+         * @param [% visitor.interface("::") %] $visitor an object implementing the
+         *  [% visitor.interface("::") %] interface.
+         * @return [% visitor.resulttype %]
+         */
+        [% visitor.resulttype %] accept([% visitor.interface("::") %] &visitor) {
+            return visitor.visit(this);
+        }
+[% END %]
+};

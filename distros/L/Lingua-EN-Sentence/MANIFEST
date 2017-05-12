@@ -1,0 +1,10 @@
+Changes
+README
+MANIFEST
+LICENCE
+Makefile.PL
+lib/Lingua/EN/Sentence.pm
+t/main.t
+examples/demo.pl
+META.yml
+META.json

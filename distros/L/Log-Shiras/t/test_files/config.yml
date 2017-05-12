@@ -1,0 +1,29 @@
+---
+buffering:
+  log_file: 1
+name_space_bounds:
+  Activity:
+    call_someone:
+      UNBLOCK:
+        log_file: trace
+        phone_book: eleven
+  main:
+    UNBLOCK:
+      log_file: warn
+    test_sub:
+      UNBLOCK:
+        log_file: debug
+reports:
+  log_file:
+  - test_files/configII.yml
+  phone_book:
+  - filename: phone.csv
+    format_string: '%s,%s,%s'
+    header: Name,Area_Code,Number
+    package: Phone::Report
+    roles:
+    - Log::Shiras::Report::ShirasFormat
+    - Log::Shiras::Report::TieFile
+    superclasses:
+    - Log::Shiras::Report
+  

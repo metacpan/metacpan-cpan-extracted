@@ -1,0 +1,35 @@
+Lingua::Preferred
+
+Many web browsers let you specify which languages you understand.
+Then they negotiate with the web server to get documents in the best
+language possible.  This is something similar in Perl.
+
+which_lang() takes a list of languages the user understands, such as
+qw(en es) and a list of those available on the server, such as qw(en fr
+de), and it returns the language to use.  There is some fooling around
+with picking second-best 'dialects' of a language, for example if the
+user's language is en_IE and a page is available in en_US.
+
+acceptable_lang() takes a list of languages the user understands and a
+single language, and returns true iff that language is acceptable.
+Again it assumes that different dialects of a language are mutually
+comprehensible.
+
+Note: I created this module by packaging up some of my own code, but
+with hindsight I'm not sure it was a good idea.  The world does not
+need another NIH way of doing language selections.  It would be better
+to pick languages by adapting HTTP language negotiation or gettext.
+So I do not plan further development on this module except for
+bugfixes.
+
+Version 0.2.4: accept language choice 'C' (named after the Unix
+locale) to mean pick the first available language.
+
+* Copying
+
+Copyright 2001-2003 Ed Avis.  This is free software; you may
+distribute it under the same terms as perl itself (either under the
+GNU General Public License, version 2 or at your option any later
+version); or under the Artistic License.
+
+-- Ed Avis, <ed@membled.com>, 2003-12-14

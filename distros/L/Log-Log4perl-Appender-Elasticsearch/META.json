@@ -1,0 +1,50 @@
+{
+   "abstract" : "implements appending to Elasticsearch",
+   "author" : [
+      "Alexei Pastuchov<palik@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Log4perl-Appender-Elasticsearch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Headers" : "6.05",
+            "HTTP::Request" : "6",
+            "JSON" : "2.61",
+            "LWP::UserAgent" : "6.05",
+            "Log::Log4perl" : "1.41",
+            "MIME::Base64" : "3.13",
+            "URI" : "1.6",
+            "perl" : "5.006",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

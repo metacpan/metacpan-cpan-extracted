@@ -1,0 +1,10 @@
+Revision history for Perl extension Lemonolap::Log4lemon.
+
+0.01  Thu Nov 24 14:53:01 2005
+	- original version; created by h2xs 1.23 with options
+		-XAn Olap::Formate
+0.02  Tue Nov 29 14:53:01 2005
+        - Add Formatelog :wrapper of Log4lemon 
+        - Add eg directory
+0.03  Fri Dec 02 14:53:01 2005
+        - modify Log4lemon for works under wrapperolap 

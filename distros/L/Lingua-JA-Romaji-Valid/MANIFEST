@@ -1,0 +1,25 @@
+Changes
+lib/Lingua/JA/Romaji/Valid.pm
+lib/Lingua/JA/Romaji/Valid/Filter/Kana.pm
+lib/Lingua/JA/Romaji/Valid/Filter/Word.pm
+lib/Lingua/JA/Romaji/Valid/Rule.pm
+lib/Lingua/JA/Romaji/Valid/Rule/Hepburn.pm
+lib/Lingua/JA/Romaji/Valid/Rule/HepburnPassport.pm
+lib/Lingua/JA/Romaji/Valid/Rule/HepburnRailway.pm
+lib/Lingua/JA/Romaji/Valid/Rule/HepburnRevised.pm
+lib/Lingua/JA/Romaji/Valid/Rule/HepburnRevisedInternational.pm
+lib/Lingua/JA/Romaji/Valid/Rule/ISO3602.pm
+lib/Lingua/JA/Romaji/Valid/Rule/ISO3602Loose.pm
+lib/Lingua/JA/Romaji/Valid/Rule/ISO3602Strict.pm
+lib/Lingua/JA/Romaji/Valid/Rule/Liberal.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/01_basic.t
+t/02_name.t
+t/03_errors.t
+t/99_pod.t
+t/99_podcoverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

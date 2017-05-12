@@ -1,0 +1,83 @@
+{
+   "abstract" : "Object for logging to pipe output",
+   "author" : [
+      "yowcow <yowcow@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Dispatch-Pipe",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Log::Log4perl" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Time::Piece" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Dispatch" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Dispatch::Pipe" : {
+         "file" : "lib/Log/Dispatch/Pipe.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yowcow/p5-Log-Dispatch-Pipe/issues"
+      },
+      "homepage" : "https://github.com/yowcow/p5-Log-Dispatch-Pipe",
+      "repository" : {
+         "url" : "git://github.com/yowcow/p5-Log-Dispatch-Pipe.git",
+         "web" : "https://github.com/yowcow/p5-Log-Dispatch-Pipe"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "yowcow <yowcow@gmail.com>",
+      "Yoko OYAMA <yowcow@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

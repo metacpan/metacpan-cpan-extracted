@@ -1,0 +1,74 @@
+# Value\Type	Position	Action	Split after
+NN\POS DT\POS	ANY	split	1
+NNS\POS DT\POS	ANY	split	1
+NP\POS DT\POS	ANY	split	1
+JJ\POS DT\POS	ANY	split	1
+VBG\POS DT\POS	ANY	split	1
+VVG\POS DT\POS	ANY	split	1
+VVG\POS CD\POS	ANY	split	1
+VVG\POS JJR\POS	ANY	split	1
+VVG\POS to\LF	ANY	split	1
+JJ\POS to\LF	ANY	split	1
+CD\POS of\LF DT\POS	ANY	split	1	CD of DT
+of\LF DT\POS of\LF	ANY	split	1
+DT\POS CD\POS	ANY	split	1
+VBG\POS to\LF	ANY	split	1
+much\LF datum\LF	ANY	delete
+same\LF	ANY	delete
+such\LF	ANY	delete
+least\LF	ANY	delete
+means\IF of\LF	ANY	delete
+of\IF course\IF	ANY	delete
+or\IF more\IF	ANY	delete
+other\LF	ANY	delete
+versus\LF	ANY	delete
+in\LF common\LF	ANY	delete
+vs\LF	ANY	delete
+in\IF addition\IF to\IF	ANY	delete
+# first words of sentences are lemmatized with capital letter by GeniaTagger
+In\IF addition\IF	ANY	delete
+in\LF contrast\IF	ANY	delete
+In\LF contrast\IF	ANY	delete
+in\LF respect\IF	ANY	delete
+In\LF respect\IF	ANY	delete
+many\IF	ANY	delete
+another\IF	ANY	delete
+both\IF	ANY	delete
+several\IF	ANY	delete
+#
+following\IF	ANY	delete
+first\IF	ANY	delete
+previous\IF	ANY	delete
+good\IF	ANY	delete
+more\IF	ANY	delete
+only\IF	ANY	delete
+
+CD\POS	START
+JJ\POS of\LF	START
+JJ\POS to\LF	START
+
+JJ\POS	END
+JJR\POS	END
+JJS\POS	END
+of\LF CD\POS	END
+
+
+#
+#NN\POS PP$	split	2	PP$
+#NNS PP$	split	2	PP$
+#VBG\POS PP$	split	2	VBG PP$
+#CC TO	split	2	CC TO
+#and an	split	2	and an
+#and a	split	2	and a
+#CC DT\POS	split	2	CC DT
+#CC CD\POS	split	2	CC
+#PDT\POS	split	1	PDT
+# Action peut etre "split" ou "delete"
+# Type info peut etre CAT, LM ou FF - on ne peut pas faire de mix
+#NP\POS NP\POS CC NP\POS NP\POS	split	1	CC
+#NP\POS NP\POS CC NP\POS NPS\POS	split	1	CC
+#NNS CC NNS	split	1	CC
+#JJR\POS NN CC JJR\POS NNS	less bandwidth and fewer clients	Nb occ: 1
+#JJR\POS NN CC JJR\POS NNS	split	1	CC
+#JJ\POS NN NN CC NN	new user name and group	Nb occ: 1
+#NN NN CC NN	split	1	CC

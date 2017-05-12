@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+use strict;
+use base 'LEOCHARRE::CLI';
+
+my $o = gopts('r');
+
+scalar @ARGV or die('missing modules args');
+
+my $manymods = (scalar @ARGV > 1) ? 1 : 0;
+
+
+for ( @ARGV ){
+   havemod($_) 
+      or warn("# can't find: '$_'\n")
+      and next;
+   do_one($_);
+}
+
+
+
+sub usage {qq{$0 [OPTION].. MODULES
+What version of a perl module is installed
+
+   -h       help
+   -d       debug
+   -v       version
+   -r       round off things like 2.15, 0.345, and v5.4.4 to 2, 0, and 5
+
+
+If the moduoe version cannot be determined it returns 0,
+if the module is not present, warns.
+
+USAGE EXAMPLES
+
+   $0 CPAN
+   $0 Cwd
+   $0 ./lib/MOD.pm
+
+Try man 'LEOCHARRE::Dev' for more info.
+}}
+
+
+
+
+sub do_one {
+   my $arg = shift;
+
+
+   my $ver;
+   no strict 'refs';
+
+   
+   my $modname = $arg;
+
+   debug("modname $modname");
+
+   if ( $modname!~/\// and eval "require $modname" ){ # TODO this executes the code!! OH NO
+      
+      debug($modname);
+
+      #require $modname;
+
+      $ver = ${"$modname\:\:VERSION"};
+      defined $ver or debug("$modname is installed but can't set version via module.");
+
+   }
+   
+   
+
+   #`perl -M$mod -e "print \$$mod::VERSION"
+
+   else {
+      debug("$modname not installed on this system.");
+      $ver = '';
+   }
+
+   if ($o->{r} and $ver){
+      $ver=~s/^v//;
+      $ver=~s/\..+$//;
+   }
+
+
+   defined $ver or $ver =0;
+
+   if ( $manymods ){
+      print "$modname $ver\n";
+   }
+
+   else { print $ver }
+}
+
+
+sub havemod_ok { # nah, this tests if mod is ok..
+   my $name = shift;
+   $name or croak('missing modname');
+   eval "use $name";
+   $@ ? 0 : 1;
+}
+
+sub havemod {
+   my $name = shift;
+   $name or croak('missing name');
+
+   my $path = $name;
+   $path=~s/::/\//g;
+   $path.='.pm';
+
+      
+   for my $base (@INC){
+      -e "$base/$path" and return 1;
+   }
+   0;
+
+
+}

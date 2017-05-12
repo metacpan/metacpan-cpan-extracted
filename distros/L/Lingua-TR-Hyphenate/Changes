@@ -1,0 +1,6 @@
+Revision history for Perl extension Lingua::TR::Hyphenate.
+
+0.01  Mon Jul 22 20:34:50 2002
+	- original version; created by h2xs 1.21 with options
+		-X Lingua::TR::Hyphenate
+

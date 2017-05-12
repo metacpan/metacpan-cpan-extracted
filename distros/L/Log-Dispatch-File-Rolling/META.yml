@@ -1,0 +1,23 @@
+---
+abstract: 'Object for logging to date/time/pid stamped files'
+author:
+  - 'M. Jacob <jacob@j-e-b.net>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Dispatch-File-Rolling
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Log::Dispatch: 2.37
+  Log::Log4perl: 0.32
+version: 1.09

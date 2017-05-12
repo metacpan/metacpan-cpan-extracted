@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Lingua-PigLatin.t
+lib/Lingua/PigLatin.pm
+META.yml                                 Module meta-data (added by MakeMaker)

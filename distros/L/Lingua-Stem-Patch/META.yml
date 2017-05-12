@@ -1,0 +1,49 @@
+---
+abstract: 'Patch stemmers for Esperanto and Ido'
+author:
+  - 'Nick Patch <patch@cpan.org>'
+build_requires:
+  English: '0'
+  Pod::Man: '2.04'
+  String::Dump: '0.05'
+  Test::More: '0.82'
+  open: '0'
+configure_requires:
+  Module::Build: '0.4004'
+  Software::License: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Stem-Patch
+provides:
+  Lingua::Stem::Patch:
+    file: lib/Lingua/Stem/Patch.pm
+    version: '0.06'
+  Lingua::Stem::Patch::EO:
+    file: lib/Lingua/Stem/Patch/EO.pm
+    version: '0.06'
+  Lingua::Stem::Patch::IO:
+    file: lib/Lingua/Stem/Patch/IO.pm
+    version: '0.06'
+  Lingua::Stem::Patch::PL:
+    file: lib/Lingua/Stem/Patch/PL.pm
+    version: '0.06'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Moo: '1.001000'
+  namespace::clean: '0'
+  parent: '0'
+  perl: v5.8.1
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/patch/lingua-stem-patch-pm5/issues
+  homepage: https://github.com/patch/lingua-stem-patch-pm5
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/patch/lingua-stem-patch-pm5.git
+version: '0.06'

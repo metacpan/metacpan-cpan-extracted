@@ -1,0 +1,872 @@
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#include "lkhutmp.h"
+
+#define Hangul_SBase  0xAC00
+#define Hangul_SFinal 0xD7A3
+#define Hangul_SCount  11172
+#define Hangul_NCount    588
+#define Hangul_LBase  0x1100
+#define Hangul_LFinal 0x1112
+#define Hangul_LCount     19
+#define Hangul_VBase  0x1161
+#define Hangul_VFinal 0x1175
+#define Hangul_VCount     21
+#define Hangul_TBase  0x11A7
+#define Hangul_TFinal 0x11C2
+#define Hangul_TCount     28
+#define Hangul_JBase  0x1100
+#define Hangul_JFinal 0x11FF
+#define Hangul_JCount    256
+
+#define Hangul_IsS(u)  ((Hangul_SBase <= (u)) && ((u) <= Hangul_SFinal))
+#define Hangul_IsN(u)  (! (((u) - Hangul_SBase) % Hangul_TCount))
+#define Hangul_IsLV(u) (Hangul_IsS(u) && Hangul_IsN(u))
+#define Hangul_IsL(u)  ((Hangul_LBase <= (u)) && ((u) <= Hangul_LFinal))
+#define Hangul_IsV(u)  ((Hangul_VBase <= (u)) && ((u) <= Hangul_VFinal))
+#define Hangul_IsT(u)  ((Hangul_TBase  < (u)) && ((u) <= Hangul_TFinal))
+#define Hangul_IsJ(u)  ((Hangul_JBase <= (u)) && ((u) <= Hangul_JFinal))
+
+#define Hangul_BName "HANGUL SYLLABLE "
+#define Hangul_BNameLen 16
+#define Hangul_LLenMax   2
+#define Hangul_VLenMax   3
+#define Hangul_TLenMax   2
+#define Hangul_NameMax  23
+
+#define IsHangulNameV(c) ( \
+  (c) == 'A' || (c) == 'E' || (c) == 'I' || (c) == 'O' || \
+  (c) == 'U' || (c) == 'W' || (c) == 'Y' )
+
+#define IsHangulNameC(c) ( \
+  (c) == 'G' || (c) == 'N' || (c) == 'D' || (c) == 'R' || (c) == 'L' || \
+  (c) == 'M' || (c) == 'B' || (c) == 'S' || (c) == 'J' || (c) == 'C' || \
+  (c) == 'K' || (c) == 'T' || (c) == 'P' || (c) == 'H' )
+
+static char* hangul_JamoL[] = { /* Initial (HANGUL CHOSEONG) */
+    "G", "GG", "N", "D", "DD", "R", "M", "B", "BB",
+    "S", "SS", "", "J", "JJ", "C", "K", "T", "P", "H"
+  };
+
+static char* hangul_JamoV[] = { /* Medial (HANGUL JUNGSEONG) */
+    "A", "AE", "YA", "YAE", "EO", "E", "YEO", "YE", "O",
+    "WA", "WAE", "OE", "YO", "U", "WEO", "WE", "WI", "YU", "EU", "YI", "I"
+  };
+
+static char* hangul_JamoT[] = { /* Final (HANGUL JONGSEONG) */
+    "", "G", "GG", "GS", "N", "NJ", "NH", "D", "L", "LG", "LM",
+    "LB", "LS", "LT", "LP", "LH", "M", "B", "BS",
+    "S", "SS", "NG", "J", "C", "K", "T", "P", "H"
+  };
+
+/* Hangul Syllable Type */
+#define Jamo_LIni	(0x1100)
+#define Jamo_LFin	(0x1159)
+#define Jamo_LFill	(0x115F)
+#define Jamo_VIni	(0x1160)
+#define Jamo_VFin	(0x11A2)
+#define Jamo_TIni	(0x11A8)
+#define Jamo_TFin	(0x11F9)
+
+/* Perl 5.6.1 ? */
+#ifndef uvuni_to_utf8
+#define uvuni_to_utf8   uv_to_utf8
+#endif /* uvuni_to_utf8 */
+
+/* Perl 5.6.1 ? */
+#ifndef utf8n_to_uvuni
+#define utf8n_to_uvuni  utf8_to_uv
+#endif /* utf8n_to_uvuni */
+
+/* if utf8n_to_uvuni() sets retlen to 0 when flags = 0 */
+#define ErrRetlenIsZero "panic (Lingua::KO::Hangul::Util)" \
+	": zero-length character"
+
+static UV compositeHangul (UV uv, UV uv2)
+{
+    if (Hangul_IsL(uv) && Hangul_IsV(uv2)) {
+	uv  -= Hangul_LBase; /* lindex */
+	uv2 -= Hangul_VBase; /* vindex */
+	return(Hangul_SBase + (uv * Hangul_VCount + uv2) * Hangul_TCount);
+    }
+    if (Hangul_IsLV(uv) && Hangul_IsT(uv2)) {
+	uv2 -= Hangul_TBase; /* tindex */
+	return(uv + uv2);
+    }
+    return 0;
+}
+
+static void sv_cat_decompSyl (SV* sv, UV uv)
+{
+    UV sindex, lindex, vindex, tindex;
+    U8 *t, tmp[3 * UTF8_MAXLEN + 1];
+
+    if (! Hangul_IsS(uv))
+	return;
+
+    sindex =  uv - Hangul_SBase;
+    lindex =  sindex / Hangul_NCount;
+    vindex = (sindex % Hangul_NCount) / Hangul_TCount;
+    tindex =  sindex % Hangul_TCount;
+
+    t = tmp;
+    t = uvuni_to_utf8(t, (lindex + Hangul_LBase));
+    t = uvuni_to_utf8(t, (vindex + Hangul_VBase));
+    if (tindex)
+	t = uvuni_to_utf8(t, (tindex + Hangul_TBase));
+    *t = '\0';
+    sv_catpvn(sv, (char *)tmp, strlen((char *)tmp));
+}
+
+static void sv_cat_decompJamo (SV* sv, UV uv)
+{
+    U8 idx, *t, tmp[3 * UTF8_MAXLEN + 1];
+    STDCHAR *s, *p;
+
+    if (! Hangul_IsJ(uv))
+	return;
+
+    idx = (U8)(uv & 0xFF);
+    t = tmp;
+    for (p = s = LKHU_Decomp[idx];
+	 (p == s) || (p - s < LKHU_DecompCnt && *p != LKHU_DecompEnd);
+	 p++)
+    /* (p == s) for U+11FF (must output at least one char */
+    {
+	t = uvuni_to_utf8(t, 0x1100 + (UV)(*p & 0xFF));
+    }
+    *t = '\0';
+    sv_catpvn(sv, (char *)tmp, strlen((char *)tmp));
+}
+
+static char * sv_2pvunicode(SV *sv, STRLEN *lp)
+{
+    char *s;
+    STRLEN len;
+    s = (char*)SvPV(sv,len);
+    if (!SvUTF8(sv)) {
+	SV* tmpsv = sv_mortalcopy(sv);
+	if (!SvPOK(tmpsv))
+	    (void)sv_pvn_force(tmpsv,&len);
+	sv_utf8_upgrade(tmpsv);
+	s = (char*)SvPV(tmpsv,len);
+    }
+    *lp = len;
+    return s;
+}
+
+MODULE = Lingua::KO::Hangul::Util	PACKAGE = Lingua::KO::Hangul::Util
+
+
+void
+composeJamo(src)
+    SV * src
+  PROTOTYPE: $
+  PREINIT:
+    SV *dst;
+    U8 *s, *p, *e, *d;
+    UV uv;
+    STRLEN srclen, dstlen, retlen;
+    LKHU_CompStruct *i, *complist;
+    bool fcomposed;
+  PPCODE:
+    s = (U8*)sv_2pvunicode(src,&srclen);
+    e = s + srclen;
+
+    dstlen = srclen + 1; /* equal or shorter */
+    dst = newSV(dstlen);
+    SvPOK_only(dst);
+    SvUTF8_on(dst);
+    d = (U8*)SvPVX(dst);
+
+    for (p = s; p < e;) {
+	uv = utf8n_to_uvuni(p, e - p, &retlen, 0);
+	if (!retlen)
+	    croak(ErrRetlenIsZero);
+	p += retlen;
+
+	fcomposed = FALSE;
+	if (Hangul_IsJ(uv) && (complist = LKHU_Comp[uv & 0xFF])) {
+	    for (i = complist; i->len; i++) {
+		if (i->len <= (e - p) && memEQ(p, i->trail, i->len)) {
+		    d = uvuni_to_utf8(d, i->composite);
+		    p += i->len;
+		    fcomposed = TRUE;
+		    break;
+		}
+	    }
+	}
+	if (!fcomposed)
+	    d = uvuni_to_utf8(d, uv);
+    }
+    *d = '\0';
+    SvCUR_set(dst, d - (U8*)SvPVX(dst));
+    XPUSHs(dst);
+
+
+
+void
+composeSyllable(src)
+    SV * src
+  PROTOTYPE: $
+  PREINIT:
+    SV *dst;
+    U8 *s, *p, *e, *d;
+    UV lastuv, nextuv, lindex, vindex, tindex;
+    STRLEN srclen, dstlen, curlen, retlen;
+  PPCODE:
+    s = (U8*)sv_2pvunicode(src,&srclen);
+    e = s + srclen;
+
+    dstlen = srclen + 1; /* equal or shorter */
+    dst = newSV(dstlen);
+    SvPOK_only(dst);
+    SvUTF8_on(dst);
+    d = (U8*)SvPVX(dst);
+
+    for (p = s; p < e; ) {
+	lastuv = utf8n_to_uvuni(p, e - p, &retlen, 0);
+	if (!retlen)
+	    croak(ErrRetlenIsZero);
+
+	p += retlen;
+	curlen = e - p;
+	if (curlen) {
+	    nextuv = utf8n_to_uvuni(p, curlen, &retlen, 0);
+	    if (!retlen)
+		croak(ErrRetlenIsZero);
+	}
+
+     /* 1. composed if lastuv is L and nextuv is V. */
+	if (curlen && Hangul_IsL(lastuv) && Hangul_IsV(nextuv)) {
+	    lindex = lastuv - Hangul_LBase;
+	    vindex = nextuv - Hangul_VBase;
+	    lastuv = Hangul_SBase +
+		(lindex * Hangul_VCount + vindex) * Hangul_TCount;
+	    p += retlen;
+	    curlen = e - p;
+	    if (curlen) {
+		nextuv = utf8n_to_uvuni(p, curlen, &retlen, 0);
+		if (!retlen)
+		    croak(ErrRetlenIsZero);
+	    }
+	}
+
+     /* 2. composed if lastuv is LV and nextuv is T. */
+	if (curlen && Hangul_IsLV(lastuv) && Hangul_IsT(nextuv)) {
+	    tindex = nextuv - Hangul_TBase;
+	    lastuv += tindex;
+	    p += retlen;
+	}
+
+	d = uvuni_to_utf8(d, lastuv);
+    }
+    *d = '\0';
+    SvCUR_set(dst, d - (U8*)SvPVX(dst));
+    XPUSHs(dst);
+
+
+SV*
+decomposeSyllable(src)
+    SV * src
+  PROTOTYPE: $
+  ALIAS:
+    decomposeJamo = 1
+  PREINIT:
+    UV uv;
+    SV *dst;
+    STRLEN srclen, retlen;
+    U8 *s, *e, *p;
+  CODE:
+    s = (U8*)sv_2pvunicode(src,&srclen);
+    e = s + srclen;
+
+    dst = newSV(1);
+    SvPOK_only(dst);
+    SvUTF8_on(dst);
+
+    for (p = s; p < e; p += retlen) {
+	uv = utf8n_to_uvuni(p, e - p, &retlen, 0);
+	if (!retlen)
+	    croak(ErrRetlenIsZero);
+
+	if (ix == 0 && Hangul_IsS(uv))
+	    sv_cat_decompSyl(dst, uv);
+	else if (ix == 1 && Hangul_IsJ(uv))
+	    sv_cat_decompJamo(dst, uv);
+	else
+	    sv_catpvn(dst, (char *)p, retlen);
+    }
+    RETVAL = dst;
+  OUTPUT:
+    RETVAL
+
+
+void
+decomposeHangul(code)
+    UV code
+  PROTOTYPE: $
+  PREINIT:
+    UV sindex, lindex, vindex, tindex;
+    SV *decomp;
+    U8 *t, temp[3 * UTF8_MAXLEN + 1];
+    STRLEN tlen;
+    int notwantarray;
+  PPCODE:
+    notwantarray = (GIMME_V != G_ARRAY);
+    if (! Hangul_IsS(code)) {
+	if (notwantarray)
+	    XSRETURN_UNDEF;
+	else
+	    XSRETURN_EMPTY;
+    }
+
+    sindex = code - Hangul_SBase;
+    lindex =  sindex / Hangul_NCount;
+    vindex = (sindex % Hangul_NCount) / Hangul_TCount;
+    tindex =  sindex % Hangul_TCount;
+
+    if (notwantarray) {
+	t = temp;
+	t = uvuni_to_utf8(t, (lindex + Hangul_LBase));
+	t = uvuni_to_utf8(t, (vindex + Hangul_VBase));
+	if (tindex)
+	    t = uvuni_to_utf8(t, (tindex + Hangul_TBase));
+	*t = '\0';
+	tlen = strlen((char*)temp);
+	decomp = sv_2mortal(newSVpvn((char*)temp, tlen));
+	SvUTF8_on(decomp);
+	XPUSHs(decomp);
+    }
+    else {
+	XPUSHs(sv_2mortal(newSVuv(lindex + Hangul_LBase)));
+	XPUSHs(sv_2mortal(newSVuv(vindex + Hangul_VBase)));
+	if (tindex)
+	    XPUSHs(sv_2mortal(newSVuv(tindex + Hangul_TBase)));
+    } /* decomposeHangul */
+
+
+void
+getHangulComposite(uv,uv2)
+    UV uv
+    UV uv2
+  PROTOTYPE: $$
+  PREINIT:
+    UV ret_uv;
+  PPCODE:
+    ret_uv = compositeHangul(uv, uv2);
+    if (ret_uv)
+	XPUSHs(sv_2mortal(newSVuv(ret_uv)));
+    else
+	XSRETURN_UNDEF;
+
+
+SV*
+getHangulName(code)
+    UV code
+  PROTOTYPE: $
+  PREINIT:
+    UV sindex, lindex, vindex, tindex;
+    char name[Hangul_NameMax + 1];
+    STRLEN nlen;
+  CODE:
+    if (! Hangul_IsS(code))
+	XSRETURN_UNDEF;
+
+    sindex = code - Hangul_SBase;
+    lindex =  sindex / Hangul_NCount;
+    vindex = (sindex % Hangul_NCount) / Hangul_TCount;
+    tindex =  sindex % Hangul_TCount;
+    strcpy(name, Hangul_BName);
+    strcat(name, hangul_JamoL[lindex]);
+    strcat(name, hangul_JamoV[vindex]);
+    strcat(name, hangul_JamoT[tindex]);
+    nlen = strlen(name);
+    RETVAL = newSVpvn(name, nlen);
+  OUTPUT:
+    RETVAL
+
+
+SV*
+parseHangulName(sv)
+    SV* sv
+  PROTOTYPE: $
+  PREINIT:
+    UV uv;
+    char jamoL[Hangul_LLenMax];
+    char jamoV[Hangul_VLenMax];
+    char jamoT[Hangul_TLenMax];
+    char *s, *p, *e;
+    STRLEN slen, llen, vlen, tlen;
+  CODE:
+    s = SvPV(sv, slen);
+    e = s + slen;
+
+    if (slen <= Hangul_BNameLen ||
+	Hangul_NameMax < slen ||
+	strnNE(s, Hangul_BName, Hangul_BNameLen))
+	XSRETURN_UNDEF;
+
+    s += Hangul_BNameLen;
+    for (p = s; p < e && p < s + Hangul_LLenMax; p++) {
+	if (IsHangulNameC(*p))
+	    jamoL[p - s] = *p;
+	else if (IsHangulNameV(*p))
+	    break;
+	else
+	    XSRETURN_UNDEF;
+    }
+    llen = p - s;
+    s += llen;
+
+    for (p = s; p < e && p < s + Hangul_VLenMax; p++) {
+	if (IsHangulNameV(*p))
+	    jamoV[p - s] = *p;
+	else if (IsHangulNameC(*p))
+	    break;
+	else
+	    XSRETURN_UNDEF;
+    }
+    vlen = p - s;
+    if (! vlen) /* Vowel must have length */
+	XSRETURN_UNDEF;
+
+    s += vlen;
+    for (p = s; p < e && p < s + Hangul_TLenMax; p++) {
+	if (IsHangulNameC(*p))
+	    jamoT[p - s] = *p;
+	else
+	    XSRETURN_UNDEF;
+    }
+    tlen = p - s;
+    s += tlen;
+    if (s != e) /* has weird trailing char(s) */
+	XSRETURN_UNDEF;
+
+    uv = Hangul_SBase;
+
+    if (llen == 0) {
+	uv +=  11 * Hangul_NCount;
+    }
+    else if (llen == 1) {
+	switch (jamoL[0]) {
+	case 'G':
+	    uv +=  0 * Hangul_NCount;
+	    break;
+	case 'N':
+	    uv +=  2 * Hangul_NCount;
+	    break;
+	case 'D':
+	    uv +=  3 * Hangul_NCount;
+	    break;
+	case 'R':
+	    uv +=  5 * Hangul_NCount;
+	    break;
+	case 'M':
+	    uv +=  6 * Hangul_NCount;
+	    break;
+	case 'B':
+	    uv +=  7 * Hangul_NCount;
+	    break;
+	case 'S':
+	    uv +=  9 * Hangul_NCount;
+	    break;
+	case 'J':
+	    uv += 12 * Hangul_NCount;
+	    break;
+	case 'C':
+	    uv += 14 * Hangul_NCount;
+	    break;
+	case 'K':
+	    uv += 15 * Hangul_NCount;
+	    break;
+	case 'T':
+	    uv += 16 * Hangul_NCount;
+	    break;
+	case 'P':
+	    uv += 17 * Hangul_NCount;
+	    break;
+	case 'H':
+	    uv += 18 * Hangul_NCount;
+	    break;
+	default:
+	    XSRETURN_UNDEF;
+	}
+    }
+    else { /* llen == 2 */
+	if (jamoL[0] != jamoL[1])
+	    XSRETURN_UNDEF;
+	switch (jamoL[0]) {
+	case 'G':
+	    uv +=  1 * Hangul_NCount;
+	    break;
+	case 'D':
+	    uv +=  4 * Hangul_NCount;
+	    break;
+	case 'B':
+	    uv +=  8 * Hangul_NCount;
+	    break;
+	case 'S':
+	    uv += 10 * Hangul_NCount;
+	    break;
+	case 'J':
+	    uv += 13 * Hangul_NCount;
+	    break;
+	default:
+	    XSRETURN_UNDEF;
+	}
+    } /* jamoL */
+
+    if (vlen == 1) {
+	switch (jamoV[0]) {
+	case 'A':
+	    uv +=  0 * Hangul_TCount;
+	    break;
+	case 'E':
+	    uv +=  5 * Hangul_TCount;
+	    break;
+	case 'O':
+	    uv +=  8 * Hangul_TCount;
+	    break;
+	case 'U':
+	    uv += 13 * Hangul_TCount;
+	    break;
+	case 'I':
+	    uv += 20 * Hangul_TCount;
+	    break;
+	default:
+	    XSRETURN_UNDEF;
+	}
+    }
+    else if (vlen == 2) {
+	if (jamoV[0] == 'A') {
+	    if (jamoV[1] == 'E')
+		uv +=  1 * Hangul_TCount;
+	    else
+		XSRETURN_UNDEF;
+	}
+	else if (jamoV[0] == 'O') {
+	    if (jamoV[1] == 'E')
+		uv += 11 * Hangul_TCount;
+	    else
+		XSRETURN_UNDEF;
+	}
+	else if (jamoV[0] == 'E') {
+	    if (jamoV[1] == 'O')
+		uv +=  4 * Hangul_TCount;
+	    else if (jamoV[1] == 'U')
+		uv += 18 * Hangul_TCount;
+	    else
+		XSRETURN_UNDEF;
+	}
+	else if (jamoV[0] == 'Y') {
+	    switch (jamoV[1]) {
+	    case 'A':
+		uv +=  2 * Hangul_TCount;
+		break;
+	    case 'E':
+		uv +=  7 * Hangul_TCount;
+		break;
+	    case 'O':
+		uv += 12 * Hangul_TCount;
+		break;
+	    case 'U':
+		uv += 17 * Hangul_TCount;
+		break;
+	    case 'I':
+		uv += 19 * Hangul_TCount;
+		break;
+	    default :
+		XSRETURN_UNDEF;
+	    }
+	}
+	else if (jamoV[0] == 'W') {
+	    switch (jamoV[1]) {
+	    case 'A':
+		uv +=  9 * Hangul_TCount;
+		break;
+	    case 'E':
+		uv += 15 * Hangul_TCount;
+		break;
+	    case 'I':
+		uv += 16 * Hangul_TCount;
+		break;
+	    default :
+		XSRETURN_UNDEF;
+	    }
+	}
+	else
+	    XSRETURN_UNDEF;
+    }
+    else { /* vlen == 3 */
+	if (jamoV[0] == 'Y') {
+	    if (jamoV[1] == 'A' && jamoV[2] == 'E')
+		uv +=  3 * Hangul_TCount;
+	    else if (jamoV[1] == 'E' && jamoV[2] == 'O')
+		uv +=  6 * Hangul_TCount;
+	    else
+		XSRETURN_UNDEF;
+	}
+	else if (jamoV[0] == 'W') {
+	    if (jamoV[1] == 'A' && jamoV[2] == 'E')
+		uv +=  10 * Hangul_TCount;
+	    else if (jamoV[1] == 'E' && jamoV[2] == 'O')
+		uv +=  14 * Hangul_TCount;
+	    else
+		XSRETURN_UNDEF;
+	}
+	else
+	    XSRETURN_UNDEF;
+    } /* jamoV */
+
+    if (tlen == 0) {
+	uv +=  0;
+    }
+    else if (tlen == 1) {
+	switch (jamoT[0]) {
+	case 'G':
+	    uv +=  1;
+	    break;
+	case 'N':
+	    uv +=  4;
+	    break;
+	case 'D':
+	    uv +=  7;
+	    break;
+	case 'L':
+	    uv +=  8;
+	    break;
+	case 'M':
+	    uv += 16;
+	    break;
+	case 'B':
+	    uv += 17;
+	    break;
+	case 'S':
+	    uv += 19;
+	    break;
+	case 'J':
+	    uv += 22;
+	    break;
+	case 'C':
+	    uv += 23;
+	    break;
+	case 'K':
+	    uv += 24;
+	    break;
+	case 'T':
+	    uv += 25;
+	    break;
+	case 'P':
+	    uv += 26;
+	    break;
+	case 'H':
+	    uv += 27;
+	    break;
+	default:
+	    XSRETURN_UNDEF;
+	}
+    }
+    else { /* tlen == 2 */
+	if (jamoT[0] == 'G') {
+	    if (jamoT[1] == 'G')
+		uv +=  2;
+	    else if (jamoT[1] == 'S')
+		uv +=  3;
+	    else
+		XSRETURN_UNDEF;
+	}
+	else if (jamoT[0] == 'N') {
+	    switch (jamoT[1]) {
+	    case 'J':
+		uv +=  5;
+		break;
+	    case 'H':
+		uv +=  6;
+		break;
+	    case 'G':
+		uv += 21;
+		break;
+	    default :
+		XSRETURN_UNDEF;
+	    }
+	}
+	else if (jamoT[0] == 'L') {
+	    switch (jamoT[1]) {
+	    case 'G':
+		uv +=  9;
+		break;
+	    case 'M':
+		uv += 10;
+		break;
+	    case 'B':
+		uv += 11;
+		break;
+	    case 'S':
+		uv += 12;
+		break;
+	    case 'T':
+		uv += 13;
+		break;
+	    case 'P':
+		uv += 14;
+		break;
+	    case 'H':
+		uv += 15;
+		break;
+	    default:
+		XSRETURN_UNDEF;
+	    }
+	}
+	else if (jamoT[0] == 'B' && jamoT[1] == 'S')
+	    uv += 18;
+	else if (jamoT[0] == 'S' && jamoT[1] == 'S')
+	    uv += 20;
+	else
+	    XSRETURN_UNDEF;
+    } /* jamoT */
+
+    RETVAL = newSVuv(uv);
+  OUTPUT:
+    RETVAL
+
+
+SV*
+getSyllableType (code)
+    UV code
+  PROTOTYPE: $
+  PREINIT:
+    char * hangtype;
+    STRLEN typelen;
+  CODE:
+    if (Jamo_LIni <= code && code <= Jamo_LFin || code == Jamo_LFill) {
+	hangtype = "L"; typelen = 1;
+    }
+    else if (Jamo_VIni <= code && code <= Jamo_VFin) {
+	hangtype = "V"; typelen = 1;
+    }
+    else if (Jamo_TIni <= code && code <= Jamo_TFin) {
+	hangtype = "T"; typelen = 1;
+    }
+    else if (Hangul_SBase <= code && code <= Hangul_SFinal) {
+	if ((code - Hangul_SBase) % Hangul_TCount) {
+	    hangtype = "LVT"; typelen = 3;
+	}
+	else {
+	    hangtype = "LV"; typelen = 2;
+	}
+    }
+    else {
+	hangtype = "NA"; typelen = 2;
+    }
+    RETVAL = newSVpvn(hangtype, typelen);
+OUTPUT:
+    RETVAL
+
+
+
+SV*
+isStandardForm(src)
+    SV * src
+  PROTOTYPE: $
+  ALIAS:
+    insertFiller = 1
+  PREINIT:
+    UV uv;
+    SV *dst;
+    STRLEN srclen, retlen;
+    U8 *s, *e, *p;
+    char pretype, curtype, nexttype;
+  CODE:
+    s = (U8*)sv_2pvunicode(src,&srclen);
+    e = s + srclen;
+
+    if (ix) {
+	dst = newSV(1);
+	SvPOK_only(dst);
+	SvUTF8_on(dst);
+    }
+    else {
+	dst = &PL_sv_yes;
+    }
+    pretype = 'N';
+
+    for (p = s; p < e; p += retlen) {
+	uv = utf8n_to_uvuni(p, e - p, &retlen, 0);
+	if (!retlen)
+	    croak(ErrRetlenIsZero);
+
+	if (Jamo_LIni <= uv && uv <= Jamo_LFin || uv == Jamo_LFill) {
+	    curtype = nexttype = 'L';
+	}
+	else if (Jamo_VIni <= uv && uv <= Jamo_VFin) {
+	    curtype = nexttype = 'V';
+	}
+	else if (Jamo_TIni <= uv && uv <= Jamo_TFin) {
+	    curtype = nexttype = 'T';
+	}
+	else if (Hangul_SBase <= uv && uv <= Hangul_SFinal) {
+	    if ((uv - Hangul_SBase) % Hangul_TCount) {
+		curtype = 'L'; nexttype = 'T';
+	    }
+	    else {
+		curtype = 'L'; nexttype = 'V';
+	    }
+	}
+	else {
+	    curtype = nexttype = 'N';
+	}
+
+	if (pretype == curtype) {
+	    1;
+	}
+	else if (curtype == 'V') {
+	    if (pretype != 'L') {
+		if (ix)
+		    sv_catpvn(dst, LKHU_LF_STRING, LKHU_LF_LENGTH);
+		else {
+		    dst = &PL_sv_no;
+		    break;
+		}
+	    }
+	}
+	else {
+	    if (pretype == 'L') {
+		if (ix)
+		    sv_catpvn(dst, LKHU_VF_STRING, LKHU_VF_LENGTH);
+		else {
+		    dst = &PL_sv_no;
+		    break;
+		}
+	    }
+	    if (pretype != 'V' && curtype == 'T') {
+		if (ix) {
+		    sv_catpvn(dst, LKHU_LF_STRING, LKHU_LF_LENGTH);
+		    sv_catpvn(dst, LKHU_VF_STRING, LKHU_VF_LENGTH);
+		}
+		else {
+		    dst = &PL_sv_no;
+		    break;
+		}
+	    }
+	}
+
+	pretype = nexttype;
+	if (ix) {
+	    sv_catpvn(dst, (char *)p, retlen);
+	}
+    }
+    if (pretype == 'L') {
+	if (ix)
+	    sv_catpvn(dst, LKHU_VF_STRING, LKHU_VF_LENGTH);
+	else {
+	    dst = &PL_sv_no;
+	}
+    }
+    RETVAL = dst;
+  OUTPUT:
+    RETVAL
+

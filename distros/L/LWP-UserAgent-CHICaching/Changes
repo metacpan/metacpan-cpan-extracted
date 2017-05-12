@@ -1,0 +1,38 @@
+LWP-UserAgent-CHICaching
+========================
+
+Created:      2014-09-03
+Home page:    <https://metacpan.org/release/LWP-UserAgent-CHICaching>
+Bug tracker:  <https://github.com/kjetilk/p5-lwp-useragent-chicaching/issues>
+Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+
+0.04	2016-03-07	Support manipulated the cached response
+
+ - Added: Role to control cache insertion and retrieval
+ - Make the test test for 2 or 3 second age
+
+0.03	2015-06-29	Fix testing on old Perls
+
+ - Skip some tests on old Perl versions, that doesn't support test syntax.
+
+0.02	2015-06-29	Improve the support for Vary header
+
+ - Add Moo version dep for coerce to work.
+ - Added: Improve documentation.
+ - Added: More tests.
+ - Added: New role for simplest keys and Vary treatment.
+ - Added: New role for when Vary is *.
+ - Added: Refactor key and logic for Vary headers in roles on their own.
+
+0.01	2015-06-26	Improve support for RFC7234
+
+ - Added: Add Perl version dep for better kwalitee.
+ - Added: Improve distro metadata.
+ - Added: Support large parts of RFC7234.
+
+0.002	2015-02-17	Create a Role
+
+ - Refactor the code into a Role.
+   Matt S Trout++
+
+0.001	2015-02-17	Initial release

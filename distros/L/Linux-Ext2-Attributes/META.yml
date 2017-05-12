@@ -1,0 +1,23 @@
+---
+abstract: 'Linux ext2/3/4 filesystem attributes'
+author:
+  - 'Daniel Collins <solemnwarning@solemnwarning.net>'
+build_requires:
+  ExtUtils::H2PM: 0.03
+  Module::Build: 0.2806
+configure_requires:
+  Module::Build: 0.2806
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Linux-Ext2-Attributes
+provides:
+  Linux::Ext2::Attributes:
+    file: lib/Linux/Ext2/Attributes.pm
+    version: 0.20
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.20

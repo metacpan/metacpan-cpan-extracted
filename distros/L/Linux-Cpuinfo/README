@@ -1,0 +1,41 @@
+README FOR Linux::Cpuinfo
+==========================
+
+Linux::Cpuinfo is a module that provides an object oriented interface to
+the /proc/cpuinfo on Linux systems.  This file contains information about
+the CPU (or CPUs) in the computer which may be of use for diagnostic
+purposes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+There are no other modules needed.  The only absolute dependency is that
+there is a file that contains the same information as the /proc/cpuinfo
+found on Linux systems with the 2.2.16 kernel with the procfs configured.
+
+I would be delighted if this was found to work on other systems than Linux
+and indeed if other OS do have a similar interface then I might be 
+persuaded to include support for them in future releases.
+
+Since the original release of this module I have received copies of the
+/proc/cpuinfo from a variety of architectures from a number of people
+which has been very helpful in developing this module further.  
+Keep them coming - and if you understand what the information means a 
+little note explaining it for inclusion in the documentation would
+be very welcome.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001 - 2015 Jonathan Stowe All rights reserved.
+
+This library is free software: it can be distributed under the same terms
+as Perl itself.
+

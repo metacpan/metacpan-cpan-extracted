@@ -1,0 +1,59 @@
+        0.84 2010.04.29 - Documentation fixes to the En stemmer and removal
+                          of the accidentally included lib/Lingua/test.pl file
+                          Thanks goes to Aaron Naiman for bringing the
+                          documentation error to my attention and to
+                          Alexandr Ciornii and 'kmx' for the pointing out
+                          the problem with the test.pl file.
+
+        0.83 2007.06.23 - Disabled Italian locale tests due to changes
+                          in behavior of Lingua::Stem::It causing
+                          test breakage
+
+        0.82 2006.07.23 - Added 'stem_in_place' to base package.
+                          Tweaks to documentation and build tests.
+
+        0.81 2004.07.26 - Minor documentation tweak.
+
+        0.80 2004.07.25 - Added support for Linuga::Stem::Ru
+
+        0.70 2004.04.26 - Added support for Lingua::Stem::Fr and
+                          documentation fixes for Lingua::Stem::Gl
+
+        0.61 2003.09.28 - Documentation fixes. No functional changes.
+
+        0.60 2003.04.05 - Added more locales by wrappering various stemming
+                          implementations. Documented currently supported
+                          list of locales.
+
+        0.50 2000.09.14 - Fixed major implementation error. Starting with
+                          version 0.30 I forgot to include rulesets 2,3 and 4
+                          for Porter's algorithm. The resulting stemming results
+                          were very poor. Thanks go to <csyap@netfision.com>
+                          for bringing the problem to my attention. Unfortunately,
+                          the fix inherently generates *different*
+                          stemming results than 0.30 and 0.40 did. If you
+                          need identically broken output - use locale 'en-broken'.
+
+        0.40 2000.08.25 - Added stem caching support as an option. This
+                          can provide a large speedup to the operation
+                          of the stemmer. Caching is default turned off
+                          to maximize compatibility with previous versions.
+
+        0.30 1999.06.24 - Replaced core of 'En' stemmers with code from
+                          Jim Richardson <jimr@maths.usyd.edu.au>
+                          Aliased 'en-us' and 'en-uk' to 'en'
+                          Fixed 'SYNOPSIS' to correct return value
+                          type for stemmed words (SYNOPIS error spotted
+                          by <Arved_37@chebucto.ns.ca>)
+
+        0.20 1999.06.15 - Changed to '.pm' module, moved into Lingua:: namespace,
+                          added OO interface, optionalized the export of routines
+                          into the caller's namespace, added named parameter
+                          initialization, stemming exceptions, autoloaded
+                          locale support and isolated case flattening to
+                          localized stemmers prevent i18n problems later.
+
+                          Input and output text are assumed to be in UTF8
+                          encoding (no operational impact right now, but
+                          will be important when extending the module to
+                          non-English).

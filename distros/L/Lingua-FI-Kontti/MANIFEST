@@ -1,0 +1,6 @@
+ChangeLog
+lib/Lingua/FI/Kontti.pm
+Makefile.PL
+MANIFEST
+README
+t/kontti.t

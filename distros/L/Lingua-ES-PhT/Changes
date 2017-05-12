@@ -1,0 +1,9 @@
+Revision history for Perl extension Lingua::ES::PhT.
+
+0.01  Sat Oct  6 12:56:49 2007
+	- original version; created by h2xs 1.23 with options
+		-n Lingua::ES::PhT -XA
+
+0.9  Fri Sep  18 20:56:49 2009
+	- first public version
+

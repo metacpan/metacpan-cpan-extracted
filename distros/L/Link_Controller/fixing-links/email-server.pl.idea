@@ -1,0 +1,106 @@
+#!/usr/bin/perl -wT
+
+=head1 NAME
+
+email-server - make changes within an infostructure by remote control
+
+=head1 SYNOPSIS
+
+email-server < {email-message}
+
+=head1 DESCRIPTION
+
+This program is designed to make changes to an infostructure by remote
+control.  
+
+The program is absolutely security critical.  If someone else can get
+it to accept messages as if they are from you then they will be able
+to change your infostructure as much as they like.  You will at least
+get told that they are doing things so that you can stop them, unless
+they stop that somehow. 
+
+What security do we provide?  Well, the only safe security system to
+use is PGP.  Everybody should be using this anyway.  When you are
+setting the program up, just give it all of the public keys of all the
+people you want authorised.   
+
+The other security system provided is passwords.  A normal email will
+travel through as many as 20 or so different computers (even if it's
+sent directly over SMTP:- if mail servers and forwarding are involved,
+this can be much worse).  Provided that you can trust every single one
+of those people and provided that they are all so security expert that
+none of their machines can be broken into, you'll be fine.   Put
+another way, this is B<not> security.. but that might be okay by you.
+
+There are two final security controls.  Firstly we record all of the
+actions which are carried out on the system and send a log to the
+appropriate users, secondly we can keep backups of files which are
+changed which can then be reverted to if there is a problem.
+
+=cut
+
+die "not implemented yet";
+
+#open the log where we will send information
+
+#open LOG
+
+#read in the configurations
+
+#open CONFIG 
+
+#check the security on the mail
+
+=head1 MESSAGE FORMAT 
+
+Messages can be endcoded in various ways.  
+
+=over 4
+
+=item * 
+
+PGP encoding
+
+=item * 
+
+gzip compression
+
+=item * 
+
+uuencoding
+
+=item * 
+
+mime encoding
+
+=back
+
+First this is stripped away.  Next a security check is carried out.
+Either that the first non-blank line matches the users password or
+that the message matches a users PGP signature. 
+
+=head2 commands
+
+The possible commands are
+
+fixlink url new-url
+addfile filename length
+....new file....
+patchfile filename length
+....file patch....
+changefile filename length
+....substituted file....
+deletefile filename length
+....substituted file....
+addirectory filename 
+deletedirectory filename 
+
+All filenames must be specified relative to the infostructures base
+and there may be no use of the down directory string (/../).  If there
+is then the command will be rejected.
+
+=cut
+
+#3 now read the email.. 
+
+

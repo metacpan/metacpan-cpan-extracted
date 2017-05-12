@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Lingua-EN-WSD-CorpusBased.t
+lib/Lingua/EN/WSD/CorpusBased.pm
+lib/Lingua/EN/WSD/CorpusBased/Corpus.pm
+META.yml                                 Module meta-data (added by MakeMaker)

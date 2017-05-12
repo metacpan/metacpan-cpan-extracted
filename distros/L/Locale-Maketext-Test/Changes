@@ -1,0 +1,16 @@
+Revision history for Locale-Maketext-Test
+
+0.04      2017-02-27 08:15:07+00:00 UTC
+    Switch to dzil
+
+0.04    18 August 2016
+        minor enhancement as per review comments
+0.03    15 August 2016
+        Proper documentation
+
+0.02    15 August 2016
+        Fix failing test
+
+0.01    12 August 2016
+        First version, released on an unsuspecting world.
+

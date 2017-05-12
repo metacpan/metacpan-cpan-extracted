@@ -1,0 +1,10 @@
+Revision history for Perl extension Lustre::Info.
+
+0.02  Tue Jul 27 10:08:18
+	- Remove Time::HiRes depency (wansn't used anyway)
+	- Do not install an additional copy of lustre-info.pl into @INC (d'oh!)
+	- Fixup perldoc
+	- Various small cleanups
+
+0.01  Thu Jul 15 12:45:36 2010
+	- First release

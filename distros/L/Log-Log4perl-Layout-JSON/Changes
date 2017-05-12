@@ -1,0 +1,26 @@
+Changes file for Log::Log4perl::Layout::JSON
+
+0.50  2017-04-10
+
+  - new mainteiner: Michael Schout
+  - add "utf8" config switch which allows JSON content to be in utf8 encoding.
+  - fix "off by one" caller depth in PatternLayout
+
+0.002003  2014-11-20 16:27:06+00:00 Europe/Dublin
+
+  - Append a newline to the output, so it can be used with file appenders etc.
+
+0.002002  2014-11-07 13:14:49+00:00 Europe/Dublin
+
+  - Smarter pruning of messages larger than max_json_length_kb
+
+0.002001  2014-10-07 14:09:25+01:00 Europe/Dublin
+
+  - Much better docs.
+  - Subclassable (uses Class::Tiny).
+  - Fixed Changes file.
+  - Added max_json_length_kb config.
+
+0.001001  2014-10-02 14:17:43+01:00 Europe/Dublin
+
+  - the first release

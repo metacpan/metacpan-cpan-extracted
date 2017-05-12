@@ -1,0 +1,8 @@
+Revision history for Lingua-Postcodes
+v0.002  2016-12-30
+        - name() no longer exported by default
+        - Changed from base Exporter to use exporter 'import'
+        - Minimum perl version thanks to manwar
+        - Resolved issues #6 and #7 from Github
+v0.001  2016-12-29
+        - Initial Release

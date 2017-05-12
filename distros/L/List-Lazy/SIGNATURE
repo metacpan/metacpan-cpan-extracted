@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a8f4772893d531ec7c76ee96a1fb683da19dd838 AUTHOR_PLEDGE
+SHA1 a25383770bf8bdaa3652b314e1885893127f44c8 CONTRIBUTORS
+SHA1 6e68415238868f0dda970441bdfb22bd58206678 Changes
+SHA1 64c01b7c3b6630fe0e5fe3584d22a4baa97df88f INSTALL
+SHA1 16b1a3b5ba1139b3687701cf5b53ac6bbe73e005 LICENSE
+SHA1 e28f08277c27a71c4a93fd53e8e9ed8f14508aa9 MANIFEST
+SHA1 43abd0e30841c98b867f0207b0eb977b7230c46e META.json
+SHA1 d04823c8087c0a5357e0377195538108dc1f364e META.yml
+SHA1 2de61e8b8e81acc6342c85cc1f1d7c70ed84b632 Makefile.PL
+SHA1 1fdfeafb5b05cff0fe43ef2150a854db838eebb6 README.mkdn
+SHA1 904cc620154826efb544996a25f26b22d74aeb14 cpanfile
+SHA1 75e0229824e8223265c41dd0cf8846c1e59ac376 doap.xml
+SHA1 fb78d9e3c884460ce6ca02b9bac9b96f7288e959 lib/List/Lazy.pm
+SHA1 7dcea98540c2e120968b9da27efa22c484c18315 t/00-compile.t
+SHA1 214fdd2dbaeaed378c0c26abf1fc8377f1158ca9 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 87ff721284fd251dd304e7f952ec425decb9054c t/append.t
+SHA1 8ff7ff35a42efbd44371d4eb7f9db2cfd4e2af35 t/basic.t
+SHA1 feb1b652bb2d7bf87a6965d561b0f07f089b55a3 t/batch.t
+SHA1 88e731641e7dbe8d097d478240d4b426fdcecb84 t/lazy_fixed_list.t
+SHA1 0c76874e6fcdf15f4de7a3a2269f5eeb89048c53 t/list-of-lists.t
+SHA1 9379d0252b1bbf407fb719d70c3f711b679a50c4 t/reduce.t
+SHA1 5651703186f1496d284986cc1911e0b634fbddb6 t/spy.t
+SHA1 25e96d7909b62bade6d2bf2b170bfb6d31ef1acf t/until.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAliA8cEACgkQ34Hwf+GwC4zCgACg5zbCGSn6nyEdcFtv0X1BzZCm
+cnAAn1npjTaYGev0+sWeN2hRJLG6TxUh
+=9vZ6
+-----END PGP SIGNATURE-----

@@ -1,0 +1,21 @@
+---
+name: Lingua-AIN-Romanize
+version: 0.0.2
+author:
+  - 'OHTSUKA Ko-hei <nene@kokogiko.net>'
+abstract: アイヌ語のローマ字表記とカタカナ表記を相互変換するモジュール
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Lingua::JA::Kana: 0.04
+  Test::Base: 0
+  version: 0
+provides:
+  Lingua::AIN::Romanize:
+    file: lib/Lingua/AIN/Romanize.pm
+    version: 0.0.2
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

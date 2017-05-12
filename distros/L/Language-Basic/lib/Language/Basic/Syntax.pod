@@ -1,0 +1,254 @@
+=head1 NAME
+
+Syntax - Pod file describing syntax understood by Language::Basic module
+
+=head1 SYNOPSIS
+
+There is no Language::Basic::Syntax module. This is just a pod file
+describing the syntax that's supported by the Language::Basic module.
+
+=head1 DESCRIPTION
+
+Things in I<italics> are objects. Things in B<boldface> are actual strings
+(reserved words or punctuation).  "[]" means optional, "..." means 
+optionally more copies of the same thing, and things between slashes that
+look like Perl regexps are Perl regexps.
+
+This syntax description probably isn't exactly correct from a computer
+science standpoint, but the idea is just to show what LB supports.
+
+=head2 Line Syntax
+
+=over 4 
+
+=item Line:
+
+I<Line_Num> I<Statement> [B<:> I<Statement> ...]
+
+=head2 Statement Syntax
+
+=over 4
+
+=item *
+
+B<DATA> I<Constant> [ B<,> I<Constant> ...]
+
+=item *
+
+B<DIM> I<Var-Name> [ I<Arglist> ] [ B<,> I<Var-Name> [ I<Arglist> ] ...]
+
+I<Arglist> must be made up of constant arithmetic expressions.
+
+=item *
+
+B<DEF> I<Func-Name> B<(> I<Var-Name> [ B<,> I<Var-Name> ...] B<)>  B<=> I<Arith-Exp>
+
+I<Var-Name>s must be scalar variables.
+
+=item *
+
+B<END> 
+
+=item *
+
+B<FOR> I<Lvalue> B<=> I<Arith-Exp> B<TO> I<Arith-Exp> [ B<STEP> I<Arith-Exp>]
+
+=item *
+
+B<GOTO> I<Arith-Exp>
+
+=item *
+
+B<IF> I<Or-Exp> B<THEN> I<Statement> [ B<:> I<Statement> ...] [ B<ELSE>
+I<Statement> [ B<:> I<Statement> ...]]
+
+B<IF> I<Or-Exp> B<THEN> I<Line_Num> [ B<ELSE> I<Line_Num> ]
+
+=item *
+
+B<INPUT> [ I<Str-Const> B<;> ] I<Lvalue> [ B<,> I<Lvalue> ...]
+
+=item *
+
+[B<LET>] I<Lvalue> B<=> I<Arith-Exp>
+
+=item *
+
+B<NEXT> I<Lvalue>
+
+=item *
+
+B<ON> I<Arith-Exp> GOTO/GOSUB I<Arith-Exp> [ B<,> I<Arith-Exp> ...]
+
+=item *
+
+B<PRINT> [ I<Expression> [ I<Print_Sep> ] [  I<Expression> [ I<Print_Sep> ] ...] ]
+
+=item *
+
+B<READ> I<Lvalue> [ B<,> I<Lvalue> ...]
+
+=item *
+
+I<Comment>
+
+=back
+
+=head2 Expression Syntax
+
+Note that, unlike C or Perl, Boolean values cannot be "cast" to non-Boolean
+(string or numeric) values and vice versa.
+
+By the way, the classes in module Language::Basic::Expression rather
+closely mimic this syntax description.
+
+=over 4 
+
+=item I<Expression>:
+
+I<Arith-Exp>
+
+I<Or-Exp>
+
+=item I<Arithmetic Expression>:
+
+I<Mult-Exp> I<Arith-Op> I<Mult-Exp>
+
+I<String-Exp> B<+> I<String-Exp>
+
+=item I<Multiplicative Expression>:
+
+I<Unary-Exp> I<Mult-Op> I<Unary-Exp>
+
+=item I<Unary Expression>:
+
+B<-> I<Unary-Exp>
+
+(I<Arith-Exp>)
+
+I<Lvalue>
+
+I<Function>
+
+I<Constant>
+
+=item I<Lvalue>:
+
+I<Var-Name> [ I<Arglist> ]
+
+=item I<Arglist>: 
+
+B<(> I<Expression> [ B<,> I<Expression> ...] B<)>
+
+=item I<Function>: 
+
+I<Func-Name> I<Arglist>
+
+=item I<Constant>:
+
+I<Str-Const>
+
+I<Num-Const>
+
+=item I<String Expression>:
+
+I<Str-Const>
+
+I<Arith-Exp> 
+
+The I<Arith-Exp> must be made from I<Str-Exp>s.
+
+=item I<Logical Or Expression>:
+
+I<And-Exp> [ B<OR> I<Or-Exp> ]
+
+=item I<Logical And Expression>:
+
+I<Rel-Exp> [ B<AND> I<And-Exp> ]
+
+=item I<Relational Expression>:
+
+B<NOT> I<Rel-Exp>
+
+I<Arith-Exp>  I<Rel-Op>  I<Arith-Exp>
+
+I<String-Exp>  I<Rel-Op>  I<String-Exp>
+
+B<(> I<Or-Exp> B<)>
+
+=back
+
+=head2 Identifier Syntax
+
+=over 4 
+
+=item I<Variable Name>:
+
+I<Numeric Identifier>
+
+I<String Identifier>
+
+=item I<Function Name>:
+
+/FN[A-Z]\w+/
+
+=item I<Numeric Identifier>:
+
+/[A-Z]\w*/
+
+=item I<String Identifier>:
+
+/[A-Z]\w*\$/
+
+=back
+
+=head2 Token Syntax
+
+Tokens, or atoms, are indivisible pieces of text making up a BASIC program
+
+(Note: Language::Basic only pays attention to case in string constants.)
+
+=over 4 
+
+=item I<Line Number>: 
+
+/\d+/
+
+=item I<Comment>: 
+
+B<REM> /.*/
+
+Note that a comment goes all the way to the end of a line. Colons in a comment
+do not start a new statement.
+
+=item I<Keyword>:
+
+B<DATA> | B<DIM> | B<DEF> | B<END> | B<FOR> | B<GOSUB> | B<GOTO> | B<IF> |
+B<INPUT> | B<LET> | B<NEXT> | B<ON> | B<PRINT> | B<READ> | B<RETURN> | B<THEN>
+| B<ELSE> | B<TO> | B<STEP>
+
+=item I<Numeric Constant>:
+
+/(\d*)?\.?\d+/
+
+=item I<String Constant>:
+
+/".*?"/
+
+=item I<Relational Operator>:
+
+B<E<lt>> | B<E<lt>=> | B<E<gt>> | B<E<gt>=> | B<=> | B<E<lt>E<gt>>
+
+=item I<Arithmetic Operator>:
+
+B<+> | B<->
+
+=item I<Multiplicative Operator>:
+
+B<*> | B</>
+
+=item I<Print Separator>:
+
+B<,> | B<;>
+
+=back

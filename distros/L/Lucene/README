@@ -1,0 +1,30 @@
+Lucene
+
+INSTALLATION
+
+This module requires the clucene library compiled in ASCII mode to be
+present in your library path. In order to produce and install such a
+library run the following commands:
+
+    wget http://kent.dl.sourceforge.net/sourceforge/clucene/clucene-core-0.9.15.tar.gz
+    cd clucene-core-0.9.15
+    ./autogen.sh
+    ./configure --disable-debug --prefix=/usr --exec-prefix=/usr --enable-ascii
+    make
+    make check
+    sudo make install
+
+To install the perl module itself, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Thomas Busch
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

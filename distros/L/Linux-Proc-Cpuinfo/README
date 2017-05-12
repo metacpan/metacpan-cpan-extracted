@@ -1,0 +1,95 @@
+NAME
+    Linux::Proc::Cpuinfo - XS wrapper for libproccpuinfo - a generic parser
+    for /proc/cpuinfo
+
+SYNOPSIS
+        use Linux::Proc::Cpuinfo;
+
+        my $info = Linux::Proc::Cpuinfo->new;
+        if ( defined $info ) {
+            print "Architecture:\t\t",    $info->architecture,      "\n";
+            print "Hardware Platform:\t", $info->hardware_platform, "\n";
+            print "Frequency:\t\t",       $info->frequency,         "\n";
+            print "Bogomips:\t\t",        $info->bogomips,          "\n";
+            print "Cache:\t\t\t",         $info->cache,             "\n";
+            print "CPUs:\t\t\t",          $info->cpus,              "\n";
+        }
+
+DESCRIPTION
+    Linux::Proc::Cpuinfo is a XS wrapper for "libproccpuinfo"
+    (<https://savannah.nongnu.org/projects/proccpuinfo/>). It provides a
+    generic interface to access "/proc/cpuinfo".
+
+METHODS
+  "new" or "new('filename')"
+    Returns a new Linux::Proc::Cpuinfo object. Without any argument, parses
+    "/proc/cpuinfo". If "filename" is passed, then the file with that name
+    is parsed.
+
+    On error, returns "undef".
+
+  "architecture"
+    Returns CPU architecture. If "/proc/cpuinfo" file does not list these
+    values or if the library fails to recognise the architecture, then the
+    value will be set to "undef".
+
+  "hardware_platform"
+    Returns hardware platform. If "/proc/cpuinfo" file does not list these
+    values or if the library fails to recognise the hardware platform, then
+    the value will be set to "undef".
+
+  "frequency"
+    Returns the CPU clock speed in MHz. If the "/proc/cpuinfo" file does not
+    list the clock speed or if the library fails to recognise the clock
+    speed, then this value defaults to "undef".
+
+  "bogomips"
+    Returns the BogoMips as calculated by the kernel. BogoMips defaults to
+    "undef" if the "/proc/cpuinfo" file does not list the BogoMips or if the
+    library fails to recognise the BogoMips.
+
+  "cache"
+    Returns the amount of L2 cache in kilobytes. If the "/proc/cpuinfo" file
+    does not list the amount of L2 cache or if the library fails to
+    recognise the amount of L2 cache, then the value defaults to "undef".
+
+  "cpus"
+    Returns the total number of processors detected. On systems that list
+    the number of detected processors and the number of active/enabled
+    processors, the number of detected processors is used. If the
+    "/proc/cpuinfo" file does not list the number of processors or if the
+    library fails to determine the number of processors, then the value
+    defaults to 1 since all running computers have at least 1 processor.
+
+INSTALLING "libproccpuinfo"
+    *   Gentoo Linux
+
+            # emerge libproccpuinfo
+
+    *   Generic Linux
+
+        Download the latest archive (named similar to
+        "libproccpuinfo-x.x.x.tar.bz2") from
+        <http://download.savannah.gnu.org/releases/proccpuinfo/> and extract
+        it.
+
+            $ cmake -D CMAKE_INSTALL_PREFIX=/usr .
+            $ make
+            $ make test
+            # make install
+
+        Please send me information on how to install it on other systems and
+        I will update it here.
+
+ACKNOWLEDGEMENT
+    Tim Heaney - reported missing dependency "Devel::CheckLib"
+
+AUTHOR
+    Alan Haggai Alavi <alanhaggai@alanhaggai.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Alan Haggai Alavi.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,26 @@
+Revision history for Lingua-Flags
+
+0.07    2009, 15 December (21:21)
+        - Removed more than half flags, and checked existing ones. Had
+          problems with language vs country codes.
+        - Added a disclaimer about flags and languages dilemma.
+
+0.06    2009, 15 December (19:36)
+        - Corrected some language codes.
+
+0.05    2008,  4 August (21:58)
+        - Added a flag link for 'EN'.
+
+0.04    2007,  1 July (20:20)
+        - Corrected typo on Makefile.PL
+
+0.03    2007,  1 July (20:18)
+        - Added Esperanto Flag (thanks to Ricardo Signes)
+
+0.02    2007, 30 June (11:46)
+        - Upload failed for version 0.01
+
+0.01    2007, 30 June (11:45)
+        - First version with 'as_gif' and 'as_html_img'
+
+

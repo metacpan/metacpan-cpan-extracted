@@ -1,0 +1,19 @@
+lib/Lingua/ZH/CEDICT.pm
+lib/Lingua/ZH/CEDICT/Textfile.pm
+lib/Lingua/ZH/CEDICT/Storable.pm
+lib/Lingua/ZH/CEDICT/MySQL.pm
+lib/Lingua/ZH/CEDICT/HanConvert.pm
+data/cedict_ts.u8
+data/cedict_readme.txt
+bin/import_storable.pl
+t/0-load.t
+t/1-match.t
+t/2-find.t
+t/3-utf8.t
+t/pod.t
+t/pod-coverage.t
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml                                Module meta-data (added by MakeMaker)

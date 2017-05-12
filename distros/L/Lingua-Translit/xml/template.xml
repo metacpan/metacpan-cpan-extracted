@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+
+<!--
+
+  Transliteration definitions for XXX.
+
+  Copyright 200x ... <...>
+
+-->
+
+
+<translit>
+
+    <name></name>
+    <desc></desc>
+    <reverse></reverse>
+
+    <!-- set of transliteration rules -->
+
+    <rules>
+
+        <!-- Without context... -->
+
+        <!-- ...using ASCII characters -->
+        <rule>
+            <from>X</from>
+            <to>Y</to>
+        </rule>
+
+        <!-- ...using Unicode codepoints (hexadecimal) -->
+        <rule>
+            <from>&#x00E4;</from> <!-- LATIN SMALL LETTER A WITH DIAERESIS -->
+            <to>ae</to>
+        </rule>
+
+        <!-- ...using Unicode codepoints (decimal) -->
+        <rule>
+            <from>&#228;</from>   <!-- LATIN SMALL LETTER A WITH DIAERESIS -->
+            <to>ae</to>
+        </rule>
+
+
+        <!-- With context... -->
+
+        <!-- ...specified as 'after', 'before' or both (= between) -->
+        <rule>
+            <from>A</from>
+            <to>B</to>
+            <context>
+                <after>x</after>
+                <before>y</before>
+            </context>
+        </rule>
+
+    </rules>
+
+</translit>
+
+<!-- vim: set sts=4 sw=4 ts=4 ai et ft=xml: -->

@@ -1,0 +1,38 @@
+define a [new TDate 2008 11 3 12 43 55]
+define b [new TDate ]
+
+define m [$b after $a]
+echo "b e depois de a?? " $m 
+
+define n                [$b before $a]
+echo "ou sera antes? " $n
+define o           [$b compare $a]
+echo "comparacao"                $o
+
+define c [$b format "yyyy.MM.dd G 'at' HH:mm:ss z"]
+echo "b tem esta data " $c
+
+define d   [$b getDay]
+echo "dia " $d
+define e [$b getDayOfWeek]
+echo "dia da semana " $e
+define f     [$b getHour]
+echo "hora "            $f
+define g  [$b getMinute]
+echo "minuto " $g
+define h  [$b getSecond]
+echo "segundo " $h
+define i [$b getMonth]
+echo "mes "  $i
+define j  [$b getYear]
+echo "ano "          $j
+define k                      [$b notSame $a]
+echo "sera k b n e igual a a "              $k
+define l                  [$b same $b]
+echo "b sera igual a b "   $l
+$b setDate 2007 9 7 
+echo "b tem esta data " [$b format "yyyy.MM.dd G 'at' HH:mm:ss z"]
+
+$b setTime 11 0 0
+echo "b tem esta data " [$b format "yyyy.MM.dd G 'at' HH:mm:ss z"]
+

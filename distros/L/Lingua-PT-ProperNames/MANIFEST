@@ -1,0 +1,22 @@
+Changes
+lib/Lingua/PT/ProperNames.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+samples/printPN
+samples/README
+samples/refPN
+samples/sample.txt
+samples/tagPnTable
+samples/tagPnWithJspell
+samples/ucPN
+t/00.load.t
+t/01.forPN.input
+t/01.forPN.t
+t/02.dict.t
+t/pod-coverage.t
+t/pod.t
+data/cpdata.pl
+data/names.dat
+META.json                                Module JSON meta-data (added by MakeMaker)

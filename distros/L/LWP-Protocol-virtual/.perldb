@@ -1,0 +1,1 @@
+*DB::get_fork_TTY=*DB::xterm_get_fork_TTY;

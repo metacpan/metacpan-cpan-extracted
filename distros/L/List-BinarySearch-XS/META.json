@@ -1,0 +1,57 @@
+{
+   "abstract" : "Binary Search a sorted array with XS routines.",
+   "author" : [
+      "David Oswald <davido [@at] cpan [d.o.t.] org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "List-BinarySearch-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "provides" : {
+      "List::BinarySearch::XS" : {
+         "file" : "lib/List/BinarySearch/XS.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/daoswald/List-BinarySearch-XS/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/daoswald/List-BinarySearch-XS.git",
+         "web" : "https://github.com/daoswald/List-BinarySearch-XS"
+      }
+   },
+   "version" : "0.09"
+}

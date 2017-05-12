@@ -1,0 +1,197 @@
+NAME
+    LaBrea::Tarpit::Util
+
+SYNOPSIS
+      use LaBrea::Tarpit::Util qw( .... );
+
+      $rv = cache_is_valid(*HANDLE,\%look_n_feel,$short);
+      $rv = update_cache(\%look_n_feel,\$html,\$short);  
+      ($modtime,$update)=daemon2_cache($cache,$src,$age);
+      $modtime = page_is_current($cache_time,$page);
+      $rv = share_open(*LOCK,*FILE,$filename,$nblock,$umask);   
+      $rv = ex_open(*LOCK,*FILE,$filename,$func,$nblock,$umask);
+      $rv = close_file(*LOCK,*FILE)
+      $time_string = http_date(time);
+      $name = script_name($depth);
+      $alive = reap_kids(\%kids);  deprecated in this module
+
+DESCRIPTION - LaBrea::Tarpit::Util
+    A collection of utility programs used by other modules and applications
+    of LaBrea::Tarpit
+
+    $rv=cache_is_valid(*HANDLE,\%look_n_feel,$short);
+        input:        HANDLE
+                      \look_n_feel
+                      flag, true  = check short cache
+                            false = standard
+
+        returns:      size of file, HANDLE open
+                      if cache valid
+                      false, cache requires update
+
+        dispose:      close HANDLE;
+
+    $rv = update_cache(\%look_n_feel,\$html,\$short);
+        Write new cache file with contents of 
+        optional $html and/or $short
+
+        The filename for the short cache is taken from 
+        $look_n_feel{html_cache_file} . '.short'
+
+        returns:      true on success
+                      false if failed
+
+    $rv=upd_cache($filename,$pagename,$html,$short);
+      This is the way update_cache should have worked the first time,
+      sigh....
+
+      Update a cache for a page and short report.
+
+        Write new cache file with contents of 
+        optional $html and/or $short
+
+        The filename for the short cache is taken from 
+        $filename . '.short'
+
+        The page file name is taken from the $filename stub
+        $filename.$pagename
+
+        i.e.  $filename = mycache
+              $pagename = page2
+
+        eq => mycache.page2
+
+        returns:      true on success
+                      false if failed
+
+    ($modtime,$update)=daemon2_cache($cache,$src,$age);
+        Return the last modified time of the cache
+        file, update cache if older than $age seconds.
+        Set $@ on error;
+
+        input:        cache file,
+                      src file,
+                        or
+                      hash->{d_host}
+                          ->{d_port} 
+                          ->{d_timeout}
+                      age in seconds 
+                      timeout in seconds [default 60]
+        returns:      (mod time, 0), no update
+                      (mod time, 1), updated
+                      or () on failure
+
+    $modtime=page_is_current($cache_time,$page);
+        Check to see if page is current
+
+        input:        cache time, path to page file
+        returns:      mtime of file or false on failure
+
+    $rv=share_open(*LOCK,*FILE,$filename,$nblock,$umask);
+      Open a file for shared (read only) access.
+
+        input:        LOCK handle, 
+                      FILE handle, 
+                      filename, 
+                      non-blocking, 
+                      umask           (default 0117)
+
+        returns:      true on success
+
+        dispose by:
+        close FILE;
+        close LOCK;
+
+        This is a READ ONLY OPERATION
+
+    $rv=ex_open(*LOCK,*FILE,$filename,$func,$nblock,$umask);
+      Open a file for exclusive access.
+
+        input:    LOCK handle, 
+                  FILE handle, 
+                  filename, 
+                  function,
+                  non-blocking,
+                  umask               (default 0117)
+
+        returns:  true on success
+
+        function:  1                  append
+                   false or [^\d]     rw access
+                  -1                  new/truncate rw access
+
+        nblock:    false              blocking access
+                   true               non-blocking access
+
+        dispose by:
+              close FILE;
+              close LOCK;
+
+    $rv = close_file(*LOCK,*FILE);
+        close file and lock file
+
+    $time_string = http_date($time);
+        Returns time string in HTTP date format, same as...
+
+        Apache::Util::ht_time(time, "%a, %d %b %Y %T %Z",1));
+
+        i.e. Sat, 13 Apr 2002 17:36:42 GMT
+
+    $name = script_name($depth);
+        Returns the name of the calling script.
+            (no path, just the name)
+
+        input:        depth of call stack
+                        (default = 0)
+        returns:      name of calling script
+
+    $mod_ver = labrea_whoami;
+      Returns a string of the form:
+
+        $mod_ver = 'Tarpit 1.00 Util 0.04';
+
+      showing all the LaBrea modules loaded and their version numbers. The
+      version numbers follow their respective module name, space separated.
+
+    $alive = reap_kids(\%kids);
+      Deprecated in this module, available for backwards compatibility only.
+
+      See: LaBrea::NetIO::reap_kids
+
+EXPORT_OK
+            cache_is_valid 
+            daemon2_cache
+            close_file
+            ex_open
+            http_date
+            labrea_whoami
+            page_is_current
+            script_name
+            share_open
+            update_cache
+            upd_cache
+            reap_kids
+
+COPYRIGHT
+    Copyright 2002, Michael Robinton & BizSystems This program is free
+    software; you can redistribute it and/or modify it under the terms of
+    the GNU General Public License as published by the Free Software
+    Foundation; either version 2 of the License, or (at your option) any
+    later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+AUTHOR
+    Michael Robinton, michael@bizsystems.com
+
+SEE ALSO
+    perl(1), LaBrea::Tarpit(3), LaBrea::Codes(3), LaBrea::Tarpit::Report(3),
+    LaBrea::Tarpit::Get(3), LaBrea::Tarpit::Util(3)
+

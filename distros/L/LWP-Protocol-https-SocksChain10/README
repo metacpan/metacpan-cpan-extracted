@@ -1,0 +1,54 @@
+NAME
+    LWP::Protocol::https::SocksChain10 - Speak HTTPs through Net::SC
+
+SYNOPSIS
+     use LWP::Protocol::https::SocksChain10;
+     LWP::Protocol::implementor( https => 'LWP::Protocol::https::SocksChain10' );
+
+     @LWP::Protocol::https::SocksChain10::EXTRA_SOCK_OPTS = ( Chain_len    => 2,
+                                                             Random_Chain => 0,
+                                                             ... );
+     ....
+
+DESCRIPTION
+    LWP::Protocol::https::SocksChain10 enables you to speak HTTPs through
+    SocksChain ( Net::SC ). To use it you need to overwrite the implementor
+    class of the LWP 'https' scheme.
+
+    The interface of LWP::Protocol::https::SocksChain10 is similar to
+    LWP::Protocol::http10. To enable the new HTTP/1.1 protocol driver
+    instead of the old HTTP/1.0 driver use LWP::Protocol::https::SocksChain.
+
+SEE ALSO
+    LWP, LWP::Protocol, Net::SC
+
+AUTHOR
+     Igor V. Okunev  mailto:igor<at>prv.mts-nn.ru
+                     http://www.mts-nn.ru/~gosha
+                     icq:106183300
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 - 2008 by Igor V. Okunev
+
+    All rights reserved. This library is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+
+
+INSTALLATION
+
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+DEPENDENCIES
+
+    This module requires these other modules and libraries:
+
+       LWP
+
+       Net::SC
+
+       IO::Socket::SSL

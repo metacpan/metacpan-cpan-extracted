@@ -1,0 +1,35 @@
+Revision history for Lingua-FreeLing3-Utils
+
+0.09    Sat Jun 15 16:26:36 WEST 2013
+        - install fl3-ngrams, fl3-wordanalysis and fl3-nlgrep.
+
+0.08    Sun Jun  9 12:53:26 WEST 2013
+        - Require Lingua::FreeLing3 properly
+        - Minor bug fixes
+
+0.07    Fri Jun  7 19:13:51 WEST 2013
+        - Do not count sentence-end/sentence-begin as valid grams.
+
+0.06    Fri Jun  7 17:07:36 WEST 2013
+        - Fix issue with ngrams default options
+
+0.05    Fri Jun  7 11:53:51 WEST 2013
+        - Fix issue when computing probabilities for cumulative
+          ngrams;
+
+0.04    Thu Jun  6 22:16:59 WEST 2013
+        - Fix CPAN permissions
+
+0.03    Thu Jun  6 22:09:59 WEST 2013
+        - Support "cumulative" ngrams
+
+0.02    Tue Dec 18 11:23:26 WET 2012
+        - fix dependencies
+
+0.01    Fri Nov 16 19:07:47 WEST 2012
+        - First release
+
+0.01_01 Tue May  1 23:31:28 WEST 2012
+        - First version
+        - add ngrams function
+        - add ngrams_pp function

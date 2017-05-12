@@ -1,0 +1,75 @@
+#!/usr/bin/perl -w
+
+use Lingua::PT::UnConjugate qw( unconj string_entries ) ;
+				# \%hash -> @strings 
+
+=head1 NAME
+
+unconj - A program for recognizing conjugated forms of portuguese verbs. 
+
+=head1 SYNOPSIS
+
+ > unconj dormisse
+ dormisse : 
+   dormir, conjuntivo imperfeito, 1
+   dormir, conjuntivo imperfeito, 3
+
+ > unconj foi     
+ foi : 
+   ir, perfeito, 3
+   ser, perfeito, 3
+
+=head1 OPTIONS
+
+=over 4
+
+=item -a : Try to recognize when accents are wrong.
+
+=item -A : If no match is found, then try to recognize with option
+    -a. 
+
+=back
+
+=head1 BUGS
+
+Composed tenses are not recognized. The verb list contains many
+non-verbs that I have not removed yet. 
+
+=head1 AUTHOR Etienne Grossmann, 1999 [etienne@isr.ist.utl.pt] 
+
+=head1 CREDITS
+
+Thanks to Soraia Almeida (salmeida@logos.it) from the Logos project
+(http://www.logos.it) and Ulisses Pinto and José João Almeida from
+Projecto Natura (http://shiva.di.uminho.pt/~jj/pln) who made Ispell
+available.
+
+A big part of the list of verb infinitives comes from files used in
+Ispell (http://shiva.di.uminho.pt/~jj/pln) and in Logos
+(http://www.verba.org, http://www.logos.it).  these projects. Some
+verbs were removed and others added by hand.
+
+=cut
+
+
+# print substr($inf_str,0,50),"\n" ;
+
+@opt = () ;			# Options
+
+while (@ARGV){
+    $v = shift;
+    if( $v =~ /^-/ )
+    {
+	push @opt, $v ;
+	next ;
+    }
+    $a = unconj(@opt, $v) ;
+    print "$v : \n  ", join("\n  ",string_entries('l',$a)),"\n" ; 
+}
+
+
+=head1 SEE ALSO : unconj, conjug, treinar.
+
+=head1 VERSION 0.01
+
+=head1 AUTHOR Etienne Grossmann, 1999 [etienne@isr.ist.utl.pt] 

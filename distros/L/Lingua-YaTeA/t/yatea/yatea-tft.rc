@@ -1,0 +1,23 @@
+<OPTIONS>
+    TTG-style-term-candidates = multi
+    language = EN
+    termino = "t/testified_terms.txt"
+    match-type = "loose"
+    TC-for-BioLG = 0
+    monolexical-included = 0
+    monolexical-all = 0
+    xmlout = 1
+    printChunking = 0
+    MESSAGE_DISPLAY = EN
+    XML-corpus-for-BioLG = 0
+    termList = multi
+    suffix = default
+    TT-for-BioLG = 0
+    debug = 0
+    annotate-only = 0
+</OPTIONS>
+<DefaultConfig>
+    CONFIG_DIR = share/YaTeA/config
+    RESULT_DIR = \$PWD/RESULTS
+    LOCALE_DIR = share/YaTeA/locale
+</DefaultConfig>

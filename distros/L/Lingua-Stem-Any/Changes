@@ -1,0 +1,38 @@
+Revision history for Perl module Lingua::Stem::Any
+
+0.05 2014-08-29
+ - Added support for Polish `pl` stemmer (first on CPAN) from
+   Lingua::Stem::Patch
+
+0.04 2014-08-27
+ - Added `nb` (Norwegian Bokmål) and `nn` (Norwegian Nynorsk) as aliases for
+   `no` (Norwegian) [issue #3]
+ - Removed attribute chaining, which was accidentally released in v0.04 but was
+   previously decided against [issue #6]
+ - Required Lingua::Stem::UniNE v0.08, containing a workaround for
+   Perl v5.13.10–v5.16.0 bug RT#113750 which caused the `fa` (Persian) stemmer
+   to clobber `$_` due to its use of the `charnames` pragma which uses the
+   previously buggy `re` pragma [issue #7]
+
+0.03 2014-06-05
+ - Increased Perl version required from v5.6.0 to v5.8.1
+ - Set the `language` attribute default value to `en` (English), which was
+   previosly undefined by default yet required
+ - Added `cache` attribute (boolean) for enabling stem caching and `clear_cache`
+   method for clearing the stem cache
+ - Added `exceptions` attribute (hashref of hashrefs) for setting stemming
+   exceptions per language
+ - Added new source module Lingua::Stem::Patch with support for languages
+   `eo` (Esperanto) and `io` (Ido)
+ - Added support for additional Lingua::Stem::UniNE language `de` (German)
+   [issue #2]
+ - Integrated Travis CI, Devel::Cover, and Coveralls with GitHub repo [issue #4],
+   [issue #5]
+
+0.02 2013-04-28
+ - Required Moo v1.1.0 because it supports non-reference scalars as default
+   values
+
+0.01 2013-04-26
+ - First release
+ - Sources supported: Lingua::Stem::Snowball, Lingua::Stem::UniNE, Lingua::Stem

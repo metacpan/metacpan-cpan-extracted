@@ -1,0 +1,16 @@
+Lingua::Stem::UniNE Installation
+
+# install via cpanminus
+cpanm Lingua::Stem::UniNE
+
+# install via CPAN shell
+cpan Lingua::Stem::UniNE
+
+# install via ActivePerl
+ppm install Lingua::Stem::UniNE
+
+# install manually
+perl Build.PL
+./Build
+./Build test
+./Build install

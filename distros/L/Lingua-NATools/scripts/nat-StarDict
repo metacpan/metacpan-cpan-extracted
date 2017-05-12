@@ -1,0 +1,91 @@
+#!/usr/bin/perl -s
+
+
+use warnings;
+use strict;
+
+use Data::Dumper;
+use Lingua::NATools::Client;
+
+sub usage {
+  print "nat-StarDict: Creates a StarDict from a NATools corpus.\n\n";
+  print "\tnat-StarDict <NatCorpus>\n\n";
+  print "For more help, please run 'perldoc nat-StarDict'\n";
+  exit;
+}
+
+our ($h);
+usage() if $h;
+
+my $dir = shift;
+usage() unless $dir;
+
+my $dic = "$dir/source-target.dmp";
+
+die "Can't find dump." unless -f $dic;
+
+$dic = do $dic;
+
+my $client = Lingua::NATools::Client -> new ( local => $dir );
+
+print "{\n";
+for my $w1 (keys %$dic) {
+  next if not_interesting($w1);
+  for my $w2 (keys %{$dic->{$w1}{trans}}) {
+    if ($dic->{$w1}{trans}{$w2} > 0.1) {
+       my $concs = $client -> conc({direction=>'<->'},  $w1, $w2);
+       $dic->{$w1}{sample}{$w2} = $concs -> [0];
+    }
+  }
+  print "'$w1' => ",Dumper($dic->{$w1}),",\n";
+  delete $dic->{$w1};
+}
+print "}\n";
+
+
+
+sub not_interesting {
+  my $w = shift;
+
+  return 1 if $w =~ m!\d!;
+  return 1 if $w =~ m/[!?.;:,\(\)\{\}\[\]\/]/;
+  return 1 if $w =~ m!^-!;
+  return 0;
+}
+
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-StarDict - Creates a StarDict from a NATools corpus.
+
+=head1 SYNOPSIS
+
+  nat-StarDict <NatCorpus>
+
+=head1 DESCRIPTION
+
+This tool creates a StarDict (http://stardict.sourceforge.net)
+dictionary with the probabilistic translation dictionary
+(source-target) and translation examples for the translations with
+higher translation probabilities.
+
+Note that this script is *NOT* fully functional. It outputs a perl
+structure that needs to be converted to StarDict format.
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2009 by Alberto Manuel Brandão Simões
+
+=cut

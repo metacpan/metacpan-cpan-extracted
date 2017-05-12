@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Log-Dispatch-UDP,
+version 0.01:
+
+  Log messages to a remote UDP socket
+
+This software is copyright (c) 2012 by Rob Hoelz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

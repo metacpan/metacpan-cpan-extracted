@@ -1,0 +1,98 @@
+{
+   "abstract" : "Log::Any adapter for Log::Log4perl",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>",
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Log-Any-Adapter-Log4perl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Any::Adapter::Base" : "0",
+            "Log::Any::Adapter::Util" : "1.03",
+            "Log::Log4perl" : "1.32",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0.20",
+            "Log::Any::Adapter" : "1.03",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Any::Adapter::Log4perl" : {
+         "file" : "lib/Log/Any/Adapter/Log4perl.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/Log-Any-Adapter-Log4perl/issues"
+      },
+      "homepage" : "https://github.com/dagolden/Log-Any-Adapter-Log4perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/Log-Any-Adapter-Log4perl.git",
+         "web" : "https://github.com/dagolden/Log-Any-Adapter-Log4perl"
+      }
+   },
+   "version" : "0.08",
+   "x_authority" : "cpan:DAGOLDEN"
+}
+

@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1ad4d10bc254536f5ca0e6c64bbb9f3c9f0463c1 Build.PL
+SHA1 8dcc16aafde00641bcbd64d90090b95413a36685 Changes
+SHA1 f67ef1519e66aee9e106a77e385d5737954e3da0 MANIFEST
+SHA1 df020f6495775391a6519257435656fc9970ec8b MANIFEST.SKIP
+SHA1 7580709b24b7cf47710e37a7994ba6fef830a488 META.json
+SHA1 b17ad02bbc0421f8216c6e00b25a2a8cf7565ef9 META.yml
+SHA1 097475e60a13ae8651f9a0961b13c06c16f557ff Makefile.PL
+SHA1 bb9e72b8c37fc5eab7f94c2a0db66345e609c70d README
+SHA1 e86e5151181d6ade1f3f1c58560efc58d0f787fc lib/Lingua/EN/CommonMistakes.pm
+SHA1 f6cbf2dbf3f9cf0673fe8c7e3029ec4fd362340c t/00-load.t
+SHA1 306f269cc3691ca8c8616c8a782863304dbe0fcc t/10-mistakes.t
+SHA1 e66a8fae16a1ebf2a993af51a38312bb77d61da0 t/changes.t
+SHA1 3914b6ae52885aae445bd6a9f602434577c9042d t/manifest.t
+SHA1 e68774abed6a9090b1fd450402a93fb7066c20b9 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJReGzCAAoJEG3YuWOtEXouVFkIAKUl/ORqD7KGDdk71nGjPl5h
+Ip9BdxYZb14THTg/uIL1VnLU5JtFN7mKSFeTwoeOe0YtLH2dInHI4flzgVN6iLxa
+KwoxXEJAjcdBeJmZL83vQJJxFhGoKicI8iRmOvmmwk+vQLs/iun15LJjqH0CcbXa
+uWXg58shANg4fwDLPCwUmhybg5iP7sLeXHaPJvrkFe7+eVowLhYGQEk8dGDrzkh4
+aJEHKWQHH4qDDAX45Igg4QucjuH1Rwz6toh2f/zKurnyURkMspu+pgRa9tW/oDlA
+ge2+rMseoYi8X+3mR/iDW7vIiV2z2l3uqo7Qv+CBc/uOyJnHwEk0yJoldCvWoLs=
+=3vHE
+-----END PGP SIGNATURE-----

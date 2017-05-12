@@ -1,0 +1,8 @@
+#!perl
+# This file is managed by /Users/Songmu/perl5/perlbrew/perls/5.16.2/bin/dim.
+{
+  dist => 'L',
+  distdir => 'L',
+  module => 'L',
+  template => 'Songmu'
+}

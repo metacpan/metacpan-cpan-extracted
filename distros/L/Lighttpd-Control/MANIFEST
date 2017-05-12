@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Lighttpd/Control.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/000_load.t
+t/001_basic.t
+t/002_basic_w_pidfile_discovery.t
+t/003_basic_with_fcgi_engine.t
+t/010_start_stop_start_stop.t
+t/conf/fcgi.engine.yml
+t/conf/lighttpd.dev.conf
+t/conf/lighttpd.fcgi.conf
+t/pod.t
+t/scripts/counter.pl

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+perl -MLocale::Maketext::Extract -MData::Dumper -e '$Ext = Locale::Maketext::Extract->new; $Ext->read_po(shift); my $f = $Ext->lexicon; my %h = %{$f}; foreach(sort keys %h){print $_ . " " . $h{$_} . "\n";}' $1

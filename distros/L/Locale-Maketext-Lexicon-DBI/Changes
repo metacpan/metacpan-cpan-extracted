@@ -1,0 +1,14 @@
+Revision history for Locale-Maketext-Lexicon-DBI
+
+0.2.1   12-21-2009/12:20pm
+        Fixed: Prints a warning when the db structure is too old or erroneous.
+
+0.2.0   12-17-2009/12:20pm
+        Fixed: *INCOMPATIBILITY CHANGE* Issue when using RDBMS different than PostgreSQL
+
+0.1.1   01-22-2009/11:20pm
+        Fix: Added version.pm to required modules
+
+0.1.0   10-28-2008/10:53pm
+        First version, released on an unsuspecting world.
+

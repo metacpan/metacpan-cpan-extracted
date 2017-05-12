@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:               Log-Simplest
+version:            1.0
+abstract:           Simple log module. Writes log messages to file and/or STDERR. 
+author:
+    - Dmytro Koval'ov <dmytro.kolalov@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    FileHandle:  2.01
+    POSIX:       1.09
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

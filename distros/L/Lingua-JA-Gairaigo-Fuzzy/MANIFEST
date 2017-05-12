@@ -1,0 +1,11 @@
+Changes
+examples/synopsis.pl
+lib/Lingua/JA/Gairaigo/Fuzzy.pm
+lib/Lingua/JA/Gairaigo/Fuzzy.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/Lingua-JA-Gairaigo-Fuzzy.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

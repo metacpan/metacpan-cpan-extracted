@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+package Log::Parallel::bin::process_logs;
+
+use strict;
+use warnings;
+use Log::Parallel;
+
+NOWARN: {
+	no warnings;
+	unless ($::testing_now) {
+		use warnings;
+		Log::Parallel::options();
+	}
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+process_logs - read, manipulate and report on various log files
+
+=head1 USAGE
+
+ process_logs [options] -c configuration_file.yml
+
+=head1 OPTIONS
+
+ -c --config_file file          	Specifies the configuration file
+ -a --reprocess_all             	Reprocess all files
+ --reprocess_from date          	Reprocess everything after [date]
+ -v --verbose                   	Increase debugging output (can be repeated)
+ --min_start_date date			Force all start dates to be at least [date]
+ --max_end_date date			Force all end dates to be no more than [date]
+ --priority_bias METHOD			Choose priorty adjustment from: 'random',  'date', 'depth'
+ --target_date DATE			For priority bias date & depth, aim for [date]
+ --ignore_code_dependencies, --no_code	Ignore dependencies on code 
+
+=head1 DESCRIPTION
+
+Process logs using the L<Log::Parallel> framework.  This is the main command.
+
+=head1 LICENSE
+
+This package may be used and redistributed under the terms of either
+the Artistic 2.0 or LGPL 2.1 license.
+

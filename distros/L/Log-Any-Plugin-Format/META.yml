@@ -1,0 +1,37 @@
+---
+abstract: 'Add a formatting subroutine to your Log::Any adapter'
+author:
+  - 'José Joaquín Atria <jjatria@cpan.org>'
+build_requires:
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  Log::Any::Adapter::TAP: '0.003003'
+  Log::Any::Plugin: '0'
+  Test::More: '0'
+  Test::Pod: '1.51'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Any-Plugin-Format
+provides:
+  Log::Any::Plugin::Format:
+    file: lib/Log/Any/Plugin/Format.pm
+    version: '0.02'
+requires:
+  Class::Method::Modifiers: '0'
+  Log::Any::Adapter::Util: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/jjatria/Log-Any-Plugin-Format/issues
+  repository: git://gitlab.com/jjatria/Log-Any-Plugin-Format.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.70'

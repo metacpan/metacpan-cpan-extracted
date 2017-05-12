@@ -1,0 +1,26 @@
+Changes for Labyrinth-DIUtils-ImageMagick
+=========================================
+
+5.08    2015-01-08
+        - fixed orientation on rotate to avoid browsers being "helpful".
+
+5.07    2014-10-19
+        - fixed license fields in META.json to be lists.
+        - extended META & functional test suite.
+        - can now set the quality of an image.
+        - improved error checking.
+
+5.06    2014-05-05
+        - fixed distribution name in META.
+
+5.05    2013-02-24
+        - change file dates changed to meet W3CDTF standards.
+        - added INSTALL & LICENSE files.
+        - reworked Makefile.PL for clarity.
+        - various META file updates.
+        - updated README.
+        - removed Croak and simplified error handling.
+        - updated and extended test suite.
+
+5.04	2011-03-13
+	    - abstracted from Labyrinth, as stand alone plugin.

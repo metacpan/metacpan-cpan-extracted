@@ -1,0 +1,50 @@
+$Id: Changes 61 2014-05-23 11:04:17Z adam $
+
+Revision history for Perl extension Log::Trivial
+
+0.40    23 May 2014
+    -   Add option to supresss date in log is requested (thanks to Peter Vypov)
+    -   Fixed suppressed file open errors (RT Bug No. 55098)
+    -   Tested against later Perls, NOT tested againts older Perls
+    -   Using SVN not CVS
+    -   Added Lesser GPL3 LICENCE
+    -   New GPG Signature: 9CDA8911AF0DB
+
+0.31    01 September 2007
+    -   Bug fix to test 02-write.t only, no module changes made
+    -   RT Bug No. 29054
+    -   Thanks to CPAN Tester "tony" for reporting it
+
+0.30    20 August 2007
+    -   Added crypto signature
+    -   Tested with Perl 5.6.2 and 5.8.8
+    -   More tests - Thanks to Perl Testing: A Developer's Notebook
+    -   More PBP strictness code tweak
+    -   Documentation fix (thanks to romanzzz)
+    -   Now uses GNU GPL Version 3.0 and later
+    -   Example file
+
+0.20    27 April 2006
+    -   Fix to single threaded write mode (thanks to Heikki Pora)
+    -   Fix to Build process (thanks to Corion)
+    -   Add log_tag option
+    -   More tests
+
+0.10    27 February 2006
+    -   Washed code through perltidy using PBP settings
+    -   Now using PBP guidelines
+    -   Improved test coverage
+    -   May work on non POSIX platforms
+
+0.03    20 October 2005
+    -   Supports Module::Build as well as make
+    -   Extra tests
+
+0.02    17 October 2005
+    -   Added t/92-pod.t
+    -   Documentation fixes
+    -   Minor API additions
+    -   Extra tests
+
+0.01    14 October 2005
+    -    Very basic OO file logging tool

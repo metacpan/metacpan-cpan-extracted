@@ -1,0 +1,455 @@
+#! /usr/bin/perl -w
+use strict;
+use 5.010;
+use # Hide from release warnings
+Data::Dump 'dump';
+
+# Structure of the data we're decoding...
+
+open my $target_fh, '>', 'lib/Lingua/EN/Inflexion/Verbs.pm';
+select $target_fh;
+
+my $COMMENT_LINE_PAT = qr{ \A \s* \# }xms;
+my $COMMENT_PAT      = qr{ \# .* }xms;
+my $BLANK_LINE_PAT   = qr{ \A \s* $ }xms;
+my $WS               = qr{ [\s]* }xms;
+my $WORD_SEQ         = qr{ \S* (?: \s \S+)* }xms;
+my $DATA_PAT         = qr{
+    \A
+        $WS
+        ([*-])?+ ( $WORD_SEQ )      # 3rd person singular
+        $WS
+        ([*-])?+ ( $WORD_SEQ )      # 3rd person plural
+        $WS
+        ([*-])?+ ( $WORD_SEQ )      # Simple past (preterite)
+        $WS
+        ([*-])?+ ( $WORD_SEQ )      # Present continuous participle
+        $WS
+        ([*-])?+ ( $WORD_SEQ )      # Past participle
+        $WS
+        $COMMENT_PAT?               # Optional trailing comment
+    \Z
+}xms;
+
+# The data structures we're building...
+my %singular_of;
+my %plural_of;
+my %past_of;
+my %pres_part_of;
+my %past_part_of;
+
+my %singular_word;
+my %plural_word;
+my %past_word;
+my %pres_part_word;
+my %past_part_word;
+
+# Access verb data...
+open my $verb_data_fh, '<', 'verbs.lei';
+
+# Collect and categorize data...
+INFLECTION:
+while (my $line = readline $verb_data_fh) {
+
+    # Skip noise...
+    next if $line =~ $COMMENT_LINE_PAT
+         || $line =~ $BLANK_LINE_PAT;
+
+    # Extract data...
+    my ($sing_gen, $sing, $plur_gen, $plur, $pret_gen, $pret, $pres_gen, $pres, $past_gen, $past)
+        = $line =~ $DATA_PAT
+            or die "Unknown input: $line";
+
+    # Expand macros...
+    for my $term ($sing, $plur, $pret, $pres, $past) {
+        $term =~ s{\(CONS\)}{[^aeiou]}gxms;
+        $term =~ s{\(VOWEL\)}{[^aeiou]}gxms;
+        $term =~ s{\(VOWELY\)}{[^aeiouy]}gxms;
+    }
+    for my $gen ($sing_gen, $plur_gen, $pret_gen, $pres_gen, $past_gen) {
+        $gen //= '';
+        next if !$gen;
+        $gen =~ s{-}{.+};
+        $gen =~ s{\*}{.*};
+    }
+
+    # Build pattern tables...
+    if ($sing_gen || $plur_gen || $pret_gen || $pres_gen || $past_gen) {
+        # Remove generic markers and optional restriction...
+        my $sing_restriction = $sing =~ s{ ( \[.*?\] )+ }{}xms ? $1 : q{};
+        my $plur_restriction = $plur =~ s{ ( \[.*?\] )+ }{}xms ? $1 : q{};
+        my $pret_restriction = $pret =~ s{ ( \[.*?\] )+ }{}xms ? $1 : q{};
+        my $pres_restriction = $pres =~ s{ ( \[.*?\] )+ }{}xms ? $1 : q{};
+        my $past_restriction = $past =~ s{ ( \[.*?\] )+ }{}xms ? $1 : q{};
+
+        # Add the pattern data to the list of generics...
+        push @{$plural_of{pattern}},    { is   => "($plur_gen$plur_restriction)$plur",
+                                          from => "(.*$sing_restriction)$sing",
+                                          to   => '${1}'.$plur
+                                        };
+        push @{$singular_of{pattern}},  { is   => "($sing_gen$sing_restriction)$sing",
+                                          from => "(.*$plur_restriction)$plur",
+                                          to   => '${1}'.$sing
+                                        };
+        if ($pret ne '_') {
+            push @{$past_of{pattern}},  { is   => "($pret_gen$pret_restriction)$pret",
+                                          from => "(.*$sing_restriction)$sing",
+                                          to   => '${1}'.$pret
+                                        };
+            push @{$past_of{pattern}},  { from => "(.*$plur_restriction)$plur",
+                                          to   => '${1}'.$pret
+                                        };
+        }
+        if ($pres ne '_') {
+            push @{$pres_part_of{pattern}}, { is   => "($pres_gen$pres_restriction)$pres",
+                                              from => "(.*$sing_restriction)$sing",
+                                              to   => '${1}'.$pres
+                                            };
+            push @{$pres_part_of{pattern}}, { from => "(.*$plur_restriction)$plur",
+                                              to   => '${1}'.$pres
+                                            };
+        }
+        if ($past ne '_') {
+            push @{$past_part_of{pattern}}, { is   => "($past_gen$past_restriction)$past",
+                                              from => "(.*$sing_restriction)$sing",
+                                              to   => '${1}'.$past
+                                            };
+            push @{$past_part_of{pattern}}, { from => "(.*$plur_restriction)$plur",
+                                              to   => '${1}'.$past
+                                            };
+        }
+    }
+
+    # Build literal tables (unless purely a generic rule)...
+    if (!($sing_gen && $plur_gen && $pret_gen)) {
+        # Build literal tables...
+        $plural_of{literal}{$sing}   //= $plur;
+        $singular_of{literal}{$plur} //= $sing;
+
+        $singular_word{$sing} //= 1;
+        $plural_word{$plur}   //= 1;
+
+        my $pret_plur;
+        if ($pret =~ /(.*?) [|] (.*)/xms) {
+            ($pret, $pret_plur) = ($1, $2);
+        }
+
+        if ($pret ne '') {
+            $past_word{$pret} //= 1;
+
+            $past_of{literal}{$sing} //= $pret;
+            $past_of{literal}{$past} //= $pret;
+            $past_of{literal}{$pres} //= $pret;
+            $past_of{literal}{$past} //= $pret;
+
+            if (defined $pret_plur) {
+                $past_of{literal}{$plur} //= $pret_plur;
+                $past_word{$pret_plur}   //= 1;
+            }
+            else {
+                $past_of{literal}{$plur} //= $pret;
+
+            }
+        }
+
+        if ($pres ne '') {
+            $pres_part_word{$pres} //= 1;
+
+            $pres_part_of{literal}{$sing} //= $pres;
+            $pres_part_of{literal}{$plur} //= $pres;
+            $pres_part_of{literal}{$pret} //= $pres;
+            $pres_part_of{literal}{$pres} //= $pres;
+            $pres_part_of{literal}{$past} //= $pres;
+        }
+
+        if ($past ne '') {
+            $past_part_word{$past} //= 1;
+
+            $past_part_of{literal}{$sing} //= $past;
+            $past_part_of{literal}{$plur} //= $past;
+            $past_part_of{literal}{$pret} //= $past;
+            $past_part_of{literal}{$pres} //= $past;
+            $past_part_of{literal}{$past} //= $past;
+        }
+
+        # Allow hyphenated terms without the hyphens...
+        if ($sing =~ s{-}{ }gxms) {
+             $plur =~ s{-}{ }gxms;
+             $pret =~ s{-}{ }gxms;
+             $pres =~ s{-}{ }gxms;
+             $past =~ s{-}{ }gxms;
+             redo;
+        }
+    }
+}
+
+# Emit standard header...
+say '##########################################';
+say '## NOTE: This module was autogenerated. ##';
+say '## Contains no user-servicable parts!!! ##';
+say '##########################################';
+say '';
+say 'package Lingua::EN::Inflexion::Verbs;';
+say 'use 5.010; use strict; use warnings;';
+say 'no if $] >= 5.018, warnings => "experimental::smartmatch";';
+say '';
+
+my ($sec,$min,$hour,$day,$mon,$year) = localtime;
+say 'our $VERSION = ', sprintf("%04d%02d%02d.%02d%02d%02d", $year+1900, $mon+1, $day, $hour, $min, $sec), ';';
+say '';
+
+# Emit tables...
+say 'my $plural_of = ', dump($plural_of{literal}) . ';';
+say '';
+say 'my $singular_of = ', dump($singular_of{literal}) . ';';
+say '';
+say 'my $past_of = ', dump($past_of{literal}) . ';';
+say '';
+say 'my $pres_part_of = ', dump($pres_part_of{literal}) . ';';
+say '';
+say 'my $past_part_of = ', dump($past_part_of{literal}) . ';';
+say '';
+say 'my $is_plural = {}; @{$is_plural}{values %{$plural_of} } = ();';
+say '                    @{$is_plural}{keys %{$singular_of} } = ();';
+say '                    @{$is_plural}{values %{$past_of} } = ();';
+say '                    @{$is_plural}{values %{$pres_part_of} } = ();';
+say '                    @{$is_plural}{values %{$past_part_of} } = ();';
+say '';
+say 'my $is_singular = {}; @{$is_singular}{values %{$singular_of} } = ();';
+say '                      @{$is_singular}{keys %{$plural_of} } = ();';
+say '                      @{$is_singular}{values %{$past_of} } = ();';
+say '                      @{$is_singular}{values %{$pres_part_of} } = ();';
+say '                      @{$is_singular}{values %{$past_part_of} } = ();';
+say '';
+say 'my $is_past = {}; @{$is_past}{values %{$past_of} } = ();';
+say '';
+say 'my $is_past_part = {}; @{$is_past_part}{values %{$past_part_of} } = ();';
+say '';
+say 'my $is_pres_part = {}; @{$is_pres_part}{values %{$pres_part_of} } = ();';
+say '';
+
+
+# Emit pattern-based inflection subroutines...
+emit_converter( 'plural',    $plural_of{pattern}    );
+say '';
+emit_converter( 'singular',  $singular_of{pattern}  );
+say '';
+emit_converter( 'past',      $past_of{pattern} );
+say '';
+emit_converter( 'pres_part', $pres_part_of{pattern} );
+say '';
+emit_converter( 'past_part', $past_part_of{pattern} );
+say '';
+
+
+# Emit pattern-based recognition subroutines...
+emit_recognizer( 'plural',    'singular', @{$plural_of{pattern}} );
+say '';
+emit_recognizer( 'singular',  'plural',   @{$singular_of{pattern}}   );
+say '';
+emit_recognizer( 'past',       undef,     @{$past_of{pattern}}   );
+say '';
+emit_recognizer( 'pres_part',  undef,     @{$pres_part_of{pattern}}   );
+say '';
+emit_recognizer( 'past_part',  undef,     @{$past_part_of{pattern}}   );
+say '';
+
+# Emit stupid trailing package terminator...
+say '1;';
+
+
+# Generate test files...
+{
+    # 1. is_singular()
+
+    open my $test_file_fh, '>', 't/verb_is_singular.t';
+    select $test_file_fh;
+
+    say 'use Test::More;';
+    say 'use Lingua::EN::Inflexion;';
+    say '';
+
+    for my $singular (keys %singular_word) {
+        say "ok verb(q{$singular})->is_singular  => q{is_singular: '$singular'};";
+    }
+
+    say '';
+    say 'done_testing();';
+}
+{
+    # 2. is_plural()
+
+    open my $test_file_fh, '>', 't/verb_is_plural.t';
+    select $test_file_fh;
+
+    say 'use Test::More;';
+    say 'use Lingua::EN::Inflexion;';
+    say '';
+
+    for my $plural (keys %plural_word) {
+        say "ok verb(q{$plural})->is_plural  => q{is_plural: '$plural'};";
+    }
+
+    say '';
+    say 'done_testing();';
+}
+{
+    # 3. plural()
+
+    open my $test_file_fh, '>', 't/verb_plural.t';
+    select $test_file_fh;
+
+    say 'use Test::More;';
+    say 'use Lingua::EN::Inflexion;';
+    say '';
+
+    for my $sing (keys %{$plural_of{literal}}) {
+        my $plural = $plural_of{literal}{$sing};
+
+        say "is verb(q{$sing})->plural,   q{$plural}  => q{plural: '$sing' --> '$plural'};";
+        say "is verb(q{$plural})->plural, q{$plural}  => q{plural: '$plural' --> '$plural'};"
+            if !$singular_word{$plural};
+    }
+
+    say '';
+    say 'done_testing();';
+}
+{
+    # 4. singular()
+
+    open my $test_file_fh, '>', 't/verb_singular.t';
+    select $test_file_fh;
+
+    say 'use Test::More;';
+    say 'use Lingua::EN::Inflexion;';
+    say '';
+
+    for my $plural (keys %plural_word) {
+        my $sing = $singular_of{literal}{$plural} // next;
+
+        say "is verb(q{$plural})->singular, q{$sing}  => q{singular: '$plural' --> '$sing'};";
+        say "is verb(q{$sing})->singular,   q{$sing}  => q{singular: '$sing' --> '$sing'};"
+            if !$plural_word{$sing};
+    }
+
+    say '';
+    say 'done_testing();';
+}
+{
+    # 5. past()
+
+    open my $test_file_fh, '>', 't/verb_past.t';
+    select $test_file_fh;
+
+    say 'use Test::More;';
+    say 'use Lingua::EN::Inflexion;';
+    say '';
+
+    for my $verb (keys %{$past_of{literal}}) {
+        my $past = $past_of{literal}{$verb};
+        next if $verb eq q{} || $past eq '_';
+
+        say "is verb(q{$verb})->past, q{$past}  => q{past '$verb' --> '$past'};";
+    }
+
+    say '';
+    say 'done_testing();';
+}
+{
+    # 6. pres_part()
+
+    open my $test_file_fh, '>', 't/verb_pres_part.t';
+    select $test_file_fh;
+
+    say 'use Test::More;';
+    say 'use Lingua::EN::Inflexion;';
+    say '';
+
+    for my $verb (keys %{$pres_part_of{literal}}) {
+        my $pres_part = $pres_part_of{literal}{$verb};
+        next if $verb eq q{} || $pres_part eq '_';
+
+        say "is verb(q{$verb})->pres_part, q{$pres_part}  => q{pres_part '$verb' --> '$pres_part'};";
+    }
+
+    say '';
+    say 'done_testing();';
+}
+{
+    # 7. past_part()
+
+    open my $test_file_fh, '>', 't/verb_past_part.t';
+    select $test_file_fh;
+
+    say 'use Test::More;';
+    say 'use Lingua::EN::Inflexion;';
+    say '';
+
+    for my $verb (keys %{$past_part_of{literal}}) {
+        my $past_part = $past_part_of{literal}{$verb};
+        next if $verb eq q{} || $past_part eq '_';
+
+        say "is verb(q{$verb})->past_part, q{$past_part}  => q{past_part '$verb' --> '$past_part'};";
+    }
+
+    say '';
+    say 'done_testing();';
+}
+
+#====[ Utility subs ]=====================================
+
+sub emit_converter {
+    my ($name, $replacement_suffixes) = @_;
+
+    my $type = $name;
+
+    # Generate subroutine structure...
+    say "sub convert_to_${name} {";
+    say '    my ($word) = @_;';
+    say "    return \$${name}_of->{\$word}    if exists \$${name}_of->{\$word};";
+    say "    return \$${name}_of->{lc \$word} if exists \$${name}_of->{lc \$word};";
+    say "    return \$word                    if is_$type(\$word);";
+    say '    given ($word) {';
+
+    # Generate each alternative replacement pattern...
+    for my $replacement_ref ( @{$replacement_suffixes} ) {
+        say '        when (m{' . $replacement_ref->{from} . '$}i) { return "' . $replacement_ref->{to} .'"; }';
+    }
+
+    # Subroutine defaults to failure...
+    say '        default { return "_"; }';
+    say '    }';
+    say '}';
+}
+
+sub emit_recognizer {
+    my ($name, $compl_name, @replacement_suffixes) = @_;
+
+    # Generate subroutine structure...
+    say "sub is_${name} {";
+    say '    my ($word) = @_;';
+    say "    return 1 if exists \$is_${name}\->{\$word};";
+    say "    return 1 if exists \$is_${name}\->{lc \$word};";
+    if ($compl_name) {
+        say "    return 0 if exists \$is_${compl_name}\->{\$word};";
+        say "    return 0 if exists \$is_${compl_name}\->{lc \$word};";
+    }
+    say '    given ($word) {';
+
+    # Generate each alternative replacement pattern...
+    for my $replacement_ref ( @replacement_suffixes ) {
+        next if !$replacement_ref->{is};
+        say '        when (m{\A' . $replacement_ref->{is} . '$}i) { return 1 }';
+    }
+
+    # Subroutine defaults to failure...
+    if ($name eq 'singular') {
+        say '        default { return !is_plural($word); }';
+    }
+    else {
+        say '        default { return 0; }';
+    }
+    say '    }';
+    say '}';
+}
+

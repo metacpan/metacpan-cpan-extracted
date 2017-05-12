@@ -1,0 +1,28 @@
+---
+abstract: 'Basic Timing of HTTP Requests'
+author:
+  - 'Chris Reinhardt <crein@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::Spec: '0'
+  Test::VCR::LWP: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWPx-Profile
+requires:
+  LWP::UserAgent: '0'
+  Time::HiRes: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/ctriv/perl-LWPx-Profile
+  repository: https://github.com/ctriv/perl-LWPx-Profile.git
+version: '0.2'

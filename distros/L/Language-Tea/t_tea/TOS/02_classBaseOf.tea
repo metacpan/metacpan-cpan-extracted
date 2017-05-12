@@ -1,0 +1,34 @@
+
+class teste()
+
+method teste test() {
+ echo "tou dentro do metodo"
+}
+
+class Triangulo teste(
+    _altura
+    _base
+)
+
+method Triangulo getArea (  ) {
+    / [* $_altura $_base] 2
+}
+
+method Triangulo constructor ( a b ) {
+    set! _altura $a
+    set! _base $b
+}
+
+method Triangulo setDimensoes ( a b ) {
+    set! _altura $a
+    set! _base $b
+}
+
+
+define tri1 [new Triangulo 2 2]
+echo "\nTeste de uma classe:\nUm triangulo com 2 de base e 2 de altura tem " [$tri1 getArea] " de area"
+
+define e [class-base-of Triangulo]
+define obj [new e ]
+
+echo [$obj test]

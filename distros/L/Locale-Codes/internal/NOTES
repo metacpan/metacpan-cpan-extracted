@@ -1,0 +1,178 @@
+The files in this directory are for primary use by me, the maintainer
+of Locale::Codes to prepare a new release.
+
+There is no reason for an end user to need to do this. However, it
+is documented for the sake of completeness, and to remind me of the
+steps I need to do.
+
+It's also available in case someone ever chooses to fork the
+module (though I hope that won't be necessary).
+
+#########################################################################
+Get the newest codes. Be sure to read the entire diff to make sure that
+no HTML is getting added to a code.
+
+   ./internal/harvest_and_check country
+   ./internal/harvest_and_check language
+   ./internal/harvest_and_check currency
+   ./internal/harvest_and_check script
+   ./internal/harvest_and_check langext
+   ./internal/harvest_and_check langvar
+   ./internal/harvest_and_check langfam
+
+   rm -f _init*
+   rm lib/Locale/Codes/*.bak
+
+#########################################################################
+Update mods/documentation
+
+   ./internal/gen_mods
+
+#########################################################################
+Update the copyright
+
+   y=`date '+%Y'`
+   for i in `find . -type f | egrep -v '.git' | xargs egrep -l 'Copyright \(c\) ....\-.... Sullivan Beck'` ;do
+     sed -e "s,\(Copyright (c) ....\)\-.... \(Sullivan Beck\),\1-$y \2," $i > z
+     mv z $i
+   done
+   chmod +x internal/deprecate_codes \
+            internal/dump_curr \
+            internal/gen_mods \
+            internal/harvest_and_check \
+            internal/harvest_data \
+            internal/print_curr_data
+
+#########################################################################
+Before every release, spellcheck the documents:
+
+   for i in `find lib -type f -name \*.pod` ;do
+      pod2text $i > $i.txt
+      ispell -p internal/ispell.isp $i.txt
+      rm -f $i.txt $i.txt.bak
+   done
+
+#########################################################################
+*** MAKE SURE TESTS PASS BEFORE DOING THIS ***
+
+Update the deprecated codes modules.  Don't do this until certain that
+the changes are good.
+
+   ./internal/dump_curr
+   ./internal/deprecate_codes
+
+#########################################################################
+Update the Change file with the date
+
+#########################################################################
+Regenerate the MANIFEST, Build.PL, Makefile.PL
+Run the kwalitee tests
+
+find . -name \*.swp
+
+#########################################################################
+To create a patch for perl:
+
+   cd /tmp
+   git clone git://perl5.git.perl.org/perl.git perl-git
+   cd perl-git
+
+   git branch sbeck
+   git checkout sbeck
+
+Update Porting/Maintainers.pl
+
+Copy in the modified files.
+
+   # Watch for problem in lib/Local/Script.pod
+
+   cd cpan/Locale-Codes
+   lcdir=`find ~/perl-modules -type d -name Locale-Codes\*`
+
+   new=`echo $lcdir | sed -e 's,^.*-,,'`
+   old=`grep 'VERSION=' lib/Locale/Codes.pm | sed -e "s,';,," -e "s,^.*',,"`
+
+   for i in `find . -type f` ;do
+      if [ ! -e $lcdir/$i ]; then
+         echo "## Remove: $i"
+         git rm $i
+      else
+         cp -p $lcdir/$i $i
+      fi
+   done
+
+   for file in `cd $lcdir; find . -type f` ;do
+      tmp=`echo $file | sed -e 's,\(examples\|internal\|.git\)/,,'`
+      if [ "$tmp" != "$file" -o \
+           "$tmp"  = "./Build.PL" -o \
+           "$tmp"  = "./Changes" -o \
+           "$tmp"  = "./INSTALL" -o \
+           "$tmp"  = "./LICENSE" -o \
+           "$tmp"  = "./MANIFEST" -o \
+           "$tmp"  = "./META.json" -o \
+           "$tmp"  = "./META.yml" -o \
+           "$tmp"  = "./Makefile.PL" -o \
+           "$tmp"  = "./README" -o \
+           "$tmp"  = "./README.first" -o \
+           "$tmp"  = "./.travis.yml" -o \
+           "$tmp"  = "./t/runtests.bat" -o \
+           "$tmp"  = "./t/runtests" -o \
+           "$tmp"  = "./t/pod.t" -o \
+           "$tmp"  = "./t/pod_coverage.t" -o \
+           "$tmp"  = "./t/pod_coverage.ign" \
+         ]; then
+         continue
+      fi
+
+      if [ ! -e $file ]; then
+         echo "## Added: $file"
+         cp -p $lcdir/$file $file
+         git add $file
+      fi
+   done
+
+   chmod -x t/*
+   cd ../..
+
+Modify the MANIFEST file if any files are added/removed.
+
+Create the patch (NOTE: fix the version numbers):
+
+   git -c user.name="Sullivan Beck" -c user.email='sbeck@cpan.org' \
+       commit -a -m "Bump Locale-Codes from $old to $new"
+   git -c user.name="Sullivan Beck" -c user.email='sbeck@cpan.org' \
+       format-patch origin
+   gzip 0001*
+   mv 0001* /tmp
+
+Modify the patch to include the correct email address at the top
+(and make sure it didn't modify Porters/Maintainers.pl except
+for my change). Also, make sure there are no permission changes
+in the patch.
+
+   ./Configure -des -Dusedevel
+   make test
+
+and make sure that the tests all succeed. Then submit the patch.
+
+   cat <<EOF;
+====
+To: perl5-porters@perl.org
+Subject: PATCH: Bump Locale-Codes from $old to $new 
+
+I just released Locale-Codes-$new which contains the core modules Locale::Country, Locale::Language, and Locale::Currency.  Due to the size of the patch (due to changes in codes), I'm including a link here instead of sending it as an attachment:
+
+http://sullybeck.com/0001-Bump-Locale-Codes-from-$old-to-$new.patch
+
+OR
+
+I just released Locale-Codes-$new which contains the core modules Locale::Country, Locale::Language, and Locale::Currency.  The patch is attached here.
+
+====
+Background:
+
+The core modules Locale::Country, Locale::Language, and Locale::Currency (all part of the Locale-Codes distribution) should be updated on a regular basis. They contain "codes" from various internet standards which change over time.
+
+I plan on releasing new versions at 4 times a year to keep the codes up-to-date. At this point, I'm not planning on any significant code changes (other than bug fixes), so the only significant changes between releases should be to update the codes.
+EOF
+

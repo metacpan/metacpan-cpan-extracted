@@ -1,0 +1,24 @@
+---
+abstract: 'Simple debug logging by number, with customizable labels and formatting'
+author:
+  - 'Steve Bertrand <steveb@cpan.org>'
+build_requires: {}
+configure_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Logging-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/stevieb9/logging-simple/issues
+  repository: https://github.com/stevieb9/logging-simple.git
+version: '1.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

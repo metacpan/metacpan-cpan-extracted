@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/capture.pl
+lib/Linux/SocketFilter.pm
+lib/Linux/SocketFilter/Assembler.pm
+lib/Linux/SocketFilter_const.pm.PL
+MANIFEST			This list of files
+t/00use.t
+t/01constants.t
+t/02filter.t
+t/03attach.t
+t/10assembler.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml

@@ -1,0 +1,73 @@
+[% 
+    htmltitle = 'Gallery' ;
+    title = 'Gallery' ;
+
+    crumb1_name = 'Gallery' ;
+    lightbox = 1 ;
+%]
+
+<div class="boxer">
+    <h2>[% album.page.title %]</h2>
+    [% IF album.page.summary %]<p>[% album.page.summary %]</p>[% END %]
+
+    <p><a href="/album/[% album.page.pageid %]">Permanent link</a>. Click on an image to see the full size picture.</p>
+</div>
+
+[% IF album.children %]
+<div class="boxer">
+<ul>
+[% FOREACH child = album.children %]
+<li><a href="/album/[% child.pageid %]">[% child.title %]</a></li>
+[% END %]
+</ul>
+</div>
+[% END %]
+
+<div class="boxer">
+[% IF album.records %]
+    <table width="80%" cellpadding="2" cellspacing="0" border="0" align="center">
+[% orderno = 1 %]
+[% FOREACH record = album.records %]
+
+    [% IF orderno % 6 == 1 %]
+    <tr>
+    [% END %]
+
+	[% IF record.thumb == "/images/icons/format-video.jpg" %]
+    <td valign="top" align="center">
+		<a href="[% picpath %]/photos/[% record.image %]" title="[% record.tagline %]"><img src="[% record.thumb %]" border="0" height="50" alt="[% record.tagline %]" /></a>
+	</td>
+	[% ELSE %]
+    <td valign="top" align="center">
+        <a href="[% docroot %]/photo/[% record.photoid %]" title="[% record.tagline %]"><img src="[% picpath %]/photos/[% record.thumb %]" border="0" height="50" alt="[% record.tagline %]" /></a>
+    </td>
+    [% END %]
+
+    [% IF (orderno) % 6 == 0 %]
+    </tr>
+    [% END %]
+
+    [% orderno = orderno + 1 %]
+[% END %]
+
+    [% IF (orderno) % 6 != 0 %]
+    </tr>
+    [% END %]
+
+    </table>
+[% ELSE %]
+<!--
+<p>Unfortunately the images for this gallery have either been deleted or hidden. 
+If the latter then they may become viewable at some point in the future.</p>
+-->
+[% END %]
+</div>
+
+<div id="photocopy">
+<p align="justify">All photos [% copyright %]
+<br />You are free to use these photos for all non-commercial purposes, using a
+<a href="http://creativecommons.org/licenses/by-nc/3.0/">Creative Commons by
+Attribution Non-Commercial License</a>. If you wish to use any photo in
+commercial works, please <a href="mailto:barbie@missbarbell.co.uk">please contact
+me</a> to discuss commercial licensing.</p>
+</div>

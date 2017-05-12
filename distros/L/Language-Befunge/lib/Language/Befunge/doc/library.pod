@@ -1,0 +1,281 @@
+# PODNAME: library
+# ABSTRACT: How to write Befunge-98 libraries & extensions
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+library - How to write Befunge-98 libraries & extensions
+
+=head1 VERSION
+
+version 5.000
+
+=head1 Befunge-98 Libraries & Extensions
+
+So you want to write your own Befunge extension? 
+
+Help save the world (tm), and send them to me so I can collect them
+and redistribute them.
+
+As you'll see, it's not very difficult to write your own
+extensions. Currently, one can only write his Befunge libraries in
+perl, but maybe I'll provide a mechanism in order to write you
+extensions in Befunge. That would be terrific! ]:->
+
+=head1 The fingerprint semantics
+
+First, here's a recall on the fingerprint semantics.
+
+Extension and customization of Funge-98 are accomplished through the
+so-called "fingerprint mechanism". 
+
+To be more precise, a fingerprint is a unique ID code which indicates
+a library of routines (a fingerprinted extension) to be assigned
+temporarily to what the instructions A to Z do. Multiple loaded
+fingerprints can overlap and overload, so even object-oriented-like
+inheritance is possible.
+
+These new semantics and instructions are only available to and only
+apply to the IP which loaded them. The C<( Load Semantics> instruction
+loads the semantics for a given fingerprint onto any or all of the
+instructions A to Z.
+
+C<(> pops a count. It then pops count cells. For each cell that it
+pops, it multiplies a temporary value (which is initially zero) by
+256, and adds the cell value to it.
+
+In this way, C<(> builds a fingerprint. This mechanism makes it simple
+to express large fingerprints like 0x72697679 in printable ASCII such
+as "OLEH"4( ... ), while not requiring the use of ASCII as the medium
+for all fingerprints.
+
+=head1 Writing your extension in perl
+
+Okay, let's assume you want to write an extension that does two
+things:
+
+=over 4
+
+=item o
+
+overloads the C<P> instruction and binds it to output C<I can see a
+llama!\n>
+
+=item o
+
+overloads the C<S> instruction and binds it to store onto the TOSS the
+gnirts C<I can see a llama!\n">
+
+=back
+
+As you can see, this is a must-have extension! :o)
+
+=head2 Choose a fingerprint
+
+The first thing to do is to choose a unique id (aka fingerprint) for
+your cool extension.
+
+This fingerprint:
+
+=over 4
+
+=item o
+
+should be unique, and should not be already taken by another
+extension. If somebody took the name you planned to use for your cool
+extension, check if the stoler's extension doesn't overlap with yours,
+and check with its author to know if you can help him/her to develop
+his/her extension or if you can take his extension.
+
+B</!\> Remember that if you want your extension to be distributed, it
+I<should> have a unique fingerprint!
+
+=item o
+
+should be self-explanatory (well, you're not technically forced to,
+but it would be better) when transposed in ASCII.
+
+=item o
+
+must B<not> be too long. Remember the ASCII is just a turn-around, but
+the real fingerprint is an integer. As such, it is required that it
+fits in a cell of Befunge (and this is a 4 bytes Befunge): this means
+that the extension fingerprint should not (when transposed in ASCII)
+be longer than 4 characters. Well, in fact, you I<can> go with an
+extension name as long as 8 chars or even more (depending on your
+hardware), but I B<strongly> discourage such ideas.
+
+=back
+
+Okay, given these rules, we decide to take the name C<B<LAMA>> for our
+extension, and the fingerprint would be C<0x76657765>. This was the
+first step.
+
+=head2 Create a new module
+
+Now, the next thing to do is to create a module. The module must be in
+the C<Language::Befunge::lib> hierarchy, and be named as your extension
+name.
+
+So, we're creating the module C<Language::Befunge::lib::LAMA>.
+
+B</!\> Warning: in order for the perl interpreter to find your cool
+module, you are to put it somewhere in C<@INC>.
+
+The new module is quite easy to begin, since you just have to put the
+following in the newly-created file:
+
+    package Language::Befunge::lib::LAMA;
+    sub new { return bless {}, shift; }
+    1;
+
+Don't forget the final C<1;>! Since it's a Perl module, perl needs the
+module to return a true value...
+
+Your module is in fact a class, and it should work as a class. That's
+why you need a C<new> constructor, even if it's really a basic one, as
+shown before.    
+
+Once you've done that, your module can be loaded in your Befunge
+program! Let's try the exciting program:
+
+    <     v     "ok"0 ( v# 4 "LAMA"
+          v "not ok"0   <
+          > :#,  _ q
+
+And it should output C<ok>. If it outputs C<not ok>, then you made a
+mistake in your module and either it does not compile (does your
+module return a true value?) or perl couldn't find it (check C<@INC>).
+
+=head2 Just code your functions!
+
+All you have to do now is to code your functions. Define a new sub for
+each binded instruction, named after this instruction.
+
+Thus, in order to overload the C<P> instruction, we just need to add
+the following in our module:
+
+    sub P {
+        print "I can see a llama!\n";
+    }
+
+And that's all! Once your cool module has been loaded, the P
+instruction will output your cool sentence... That's definitely
+terrific!
+
+=head2 Accessing the IP
+
+Since you may want to interact with the I<Instruction Pointer> and/or
+the I<cartesian Lahey space topology>, or whatever, each method will
+be called with the current Befunge interpreter (a C<Language::Befunge>
+object).
+
+See L<Language::Befunge> for more documentation about the relevant
+methods.
+
+Hey, that's exactly what we needed in order to implement our C<S>
+instruction! Let's code it just now:
+
+    sub S {
+        my (undef, $interp) = @_; # Remember it's an OO method.
+        $ip->spush( reverse map { ord } split //, "I can see a llama!\n".chr(0) );
+    }
+
+This may be a little complex, but keep in mind that Befunge works with
+a stack. Thus, one should reverse the string in order for it to be
+stored the right way.
+
+Another thing that may surprise you, is that the stack (as well as the
+Lahey space) stores integers. You have to convert them to whatever you
+want if you want to interpret them. In this example, we're storing a
+serie of characters onto the stack, but in fact we're truly storing
+the B<ordinal> values of the chars. This way, they will be displayed
+the right way when used with C<,>.
+
+=head2 Be kind to your mates
+
+Nothing else is needed for your cool extension to work. But since you
+may want to provide your module to everyone, I recommend you to:
+
+=over 4
+
+=item o
+
+Produce a clean code. This means that C<use strict;> and C<use
+warnings;> are really welcome on top of your module.
+
+=item o
+
+Document your module. The minimum is to say which instructions are
+overloaded, and what is the new semantics of the binded
+instructions. You're welcome to take credits about your cool module!
+
+=item o
+
+Reuse code. Don't forget this is just a plain module, and you can do
+whatever you're doing when you're coding a regular module: lots of
+functions, module variables, etc.
+
+=back
+
+=head2 Test your extensions
+
+I would B<really> appreciate if you ship me your extensions with a
+test file that tests it. Check the C<t/> directory to fetch an example
+of a test file. In order to keep a clean distribution, name your test
+file after your extension name, such as C<t/lib_LAMA> for our example
+extension.
+
+=head1 Tips & Tricks
+
+=head2 No Exporter needed
+
+Your module does not need to export anything. You just need to provide
+a function for each instruction that you plan to overload.
+
+=head2 Library semantics just overload A-Z
+
+Remember that a library can just overload the instruction C<A> to
+C<Z>. You can define a sub named C<a> but it won't overload the C<a>
+instruction, while you still can call your C<a> function within your
+module.
+
+=head2 One instruction should occur in one tick
+
+Remember that what you're implementing should be processed in one
+tick. This may not be important if you're working with non-concurrent
+Funge, but may matter for people who use the Concurent semantics.
+
+=head2 Befunge uses a stack
+
+Remember that Befunge is stack-based, thus you may need to reverse
+what you plan to store onto the stack.
+
+=head2 Befunge is just aware about integers
+
+You can store only integers in the stack. The meaning of those
+integers depends on you however. This means for example that you
+should push B<ordinal> values of characters onto the stack, instead of
+strings or characters.
+
+=head1 Author
+
+Jerome Quelin, E<lt>jquelin@cpan.orgE<gt>
+
+=head1 AUTHOR
+
+Jerome Quelin
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2003 by Jerome Quelin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

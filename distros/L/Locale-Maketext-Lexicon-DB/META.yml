@@ -1,0 +1,32 @@
+---
+abstract: 'Dynamically load lexicon from a database table'
+author:
+  - 'Pete Smith <pete@cubabit.net>'
+build_requires:
+  Cache::Memcached::Fast: 0
+  DBD::SQLite: 0
+  DBI: 0
+  File::Temp: 0
+  Test::Memcached: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.009, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Locale-Maketext-Lexicon-DB
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Locale::Maketext: 1.22
+  Log::Log4perl: 0
+  Moose: 0
+  namespace::autoclean: 0
+resources:
+  repository: https://github.com/cubabit/Locale-Maketext-Lexicon-DB.git
+version: 1.141830

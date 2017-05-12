@@ -1,0 +1,38 @@
+# Before `make install' is performed this script should be runnable with
+# `make test'. After `make install' it should work as `perl 1-corpusLoading.t'
+
+#########################
+
+use strict;
+use warnings;
+
+# change 'tests => 1' to 'tests => last_test_to_print';
+use Test::More tests => 5;
+
+BEGIN {use_ok('Lingua::BioYaTeA::PreProcessing') ;}
+
+#########################
+
+# Insert your test code below, the Test::More module is use()ed here so read
+# its man page ( perldoc Test::More ) for help writing this test script.
+
+# Instantiation of abstract subclass
+
+my $preProc = Lingua::BioYaTeA::PreProcessing->new();
+ok( defined($preProc) && ref($preProc) eq 'Lingua::BioYaTeA::PreProcessing', 'new() and load* work');
+
+ok(defined($preProc->getStopVerbs) && (scalar($preProc->getStopVerbs) > 0), 'stop verbs loaded');
+ok(defined($preProc->getStopParticiples) && (scalar($preProc->getStopParticiples) > 0), 'stop participles loaded');
+ok(defined($preProc->getStopList) && (scalar($preProc->getStopList) > 0), 'stop list loaded');
+
+# $preProc->_printPatterns(*STDERR);
+
+# $postProc->_printOptions(\*stderr);
+# $postProc->load_configuration;
+# ok(scalar(keys %{$postProc->reg_exps}) > 0, 'configuration loading works');
+# $postProc->defineTwigParser;
+# ok(defined $postProc->twig_parser, 'definition of the twig parser works');
+# # $postProc->filtering;
+# ok($postProc->filtering == 1, 'Filtering works');
+# $postProc->rmlog;
+# unlink("t/sampleEN-bioyatea-out-pp.xml");

@@ -1,0 +1,111 @@
+This document contains some random thoughts about links.  More
+thoughts could always be nice.
+
+What is a link really?  It's a reference from any place to another.  A
+place, in this situation, means somewhere/somedata that a human could
+access and a connection from that data to some other piece of data.
+
+Not all targets of links can legitimately and fully be represented by
+URLs.  This is, in my opinion unfortunate.
+
+Normally, at least part of the link can be represented by a url.  
+
+There seem to be several cases
+
+* links which are illegal within their proper URL scheme
+
+* links which are an extension of normal protocol
+
+* links which require extra data to be activated
+
+* links which don't (yet) have a defined scheme
+
+Here are some examples.
+
+- a post request for a query of a database
+
+we can represent some protocol location like
+
+http://bigdb.example.com/cgi-bin/people-list
+
+and we may not be able to represent
+
+first-name=john
+
+because of the limits of the http URL format.
+
+- a reference to a specific fragment within the link
+
+we can represent the link
+
+http://www.example.com/mydoc
+
+but the fragment is not legitimately part of the URL since the #
+character is illegal in a URL...
+
+Each of these references a specific piece of data, which should have
+resonably static meaning and which it would be useful to do link
+checking on.
+
+Now sometimes there are things which we can't reasonably represent by
+a URL because they are not meaningful in the current situation.
+
+- a post request that should be sent to add an entry to the database.
+
+Although there may be data returned, the success or failure of a
+request doesn't directly tell us whether or not the link is working
+since.
+
+The most that we can do is that we can make a reference to something
+which will ask the database if it is still there and functioning.  
+
+
+Another aspect of the handling of links which do not correspond
+directly to a "resource" is that often, multiple links should be
+resolved in one resource access.  E.g. when accessing a HTML text, we
+should occasionally check all of the 
+
+
+Ways to deal with 
+
+
+current way - 
+
+	ignore the fragments etc.
+
+another way - 
+
+	separate link in database for every single variation
+	use link database as reference for link testing / status
+
+	Link object has to know how to reference other link objects
+
+
+	keep a list of fragments in the link - 
+		tester uses it to access the other fragments
+		tester updates
+
+as far as fragments in http urls go, I think that these are better to
+see as part of content verification.  
+
+
+
+Definition of a Fragment
+
+	   a fragment is a link which will ALWAYS be broken when the
+	   retrieval of another "simpler" link will be broken
+
+	   restated: a fragment is a link for which the process of
+	   retrieval automatically includes the successful retrieval
+	   of another "simpler" link
+
+	   a simpler link is a link which can be automatically
+	   calculated from the fragment link.  
+
+	   a simpler link is a link which is not automatically broken
+	   if the fragment is automatically broken
+
+	   normally a fragment cannot be automatically calculated from
+	   the full link.
+
+	   

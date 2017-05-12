@@ -1,0 +1,26 @@
+NAME
+
+    Locale::Maketext::Lexicon::Getcontext - PO file parser for Maketext
+
+
+DESCRIPTION
+
+    This module is a very experimental fork/variant of
+    Locale::Maketext::Lexicon::Gettext where messages are fetched by their
+    "msgctxt" instead of their "msgid". It is currently mostly developed to
+    help the I18N of OpenFoodFacts <http://openfoodfacts.org/> and
+    OpenBeautyFacts <http://openbeautyfacts.org/>. You probably don't
+    want to use this, unless you really now what your are doing.
+
+
+AUTHORS
+
+    Sébastien Aperghis-Tramoni <saper@cpan.org>
+    Clinton Gormley <drtech@cpan.org>
+    Audrey Tang <cpan@audreyt.org>
+
+
+LICENSE
+
+    This program is free software, license under the MIT (X11) license.
+

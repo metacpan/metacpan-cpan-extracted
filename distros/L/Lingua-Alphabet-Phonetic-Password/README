@@ -1,0 +1,99 @@
+NAME
+    Lingua::Alphabet::Phonetic::Password - enunciate a password as words
+
+SYNOPSIS
+    This is a specialization of Lingua::Alphabet::Phonetic. You should not
+    use this module; all interaction should be done with an object of type
+    Lingua::Alphabet::Phonetic.
+
+      use Lingua::Alphabet::Phonetic;
+      my $phonetic = new Lingua::Alphabet::Phonetic('Password');
+      my @phonetic_pw = $phonetic->enunciate('qOusiENi');
+
+DESCRIPTION
+    This module is a dictionary for Lingua::Alphabet::Phonetic. It allows
+    for enunciation of passwords, using the following rules:
+
+    * lowercase letters
+        enunciated using the NATO alphabet per
+        Lingua::Alphabet::Phonetic::NATO, but the word will be lowercased.
+
+    * uppercase letters
+        enunciated using the NATO alphabet per
+        Lingua::Alphabet::Phonetic::NATO, but the word will be uppercased.
+
+    * numbers
+        enunciated as an initialcaps word for the english pronuciation of
+        the number.
+
+    * special characters
+        enunciated as a mixedcaps word for the english punctuation of the
+        character:
+
+          @ At
+          ? Question
+          _ Underscore
+          # Hash
+          & Ampersand
+          ! Exclamation
+          - Dash
+          * Asterisk
+          + Plus
+          = Equals
+          " DoubleQuote
+          % Percent
+          ' SingleQuote
+          ( LeftParens
+          ) RightParens
+          , Comma
+          . Period
+          / ForeSlash
+          \ BackSlash
+          : Colon
+          ; SemiColon
+          < LessThan
+          > GreaterThan
+          [ LeftBracket
+          ] RightBracket
+          { LeftBrace
+          } RightBrace
+          ^ Caret
+          ` Backtick
+          | Pipe
+          ~ Tilde
+
+    A character which does not fall into any of these categories is
+    dispatched back to the base class for conversion. In the case of
+    Lingua::Alphabet::Phonetic, this returns the character unchanged.
+
+INSPIRATION
+    This module was inspired by the web-based password generator at
+    http://www.winguides.com/security/password.php. In particular, the words
+    used for special characters are the same as used by that application
+    whenever possible. Some translations, like the character "x" are
+    different because this module uses Lingua::Alphabet::Phonetic to do the
+    heavy lifting for alphabetic characters. In that module, "x" is rendered
+    as "xray", but winguides.com reders it as "x-ray". C'est la vie.
+
+    This module supports more special characters than the passwords which
+    that application generates, so any liberties taken with these characters
+    are my own.
+
+SEE ALSO
+    Lingua::Alphabet::Phonetic by Martin Thurn, the core for which this
+    module serves as a dictionary.
+
+AUTHOR
+    James FitzGibbon, <jfitz@CPAN.org>.
+
+CREDITS
+    Martin Thurn for writing Lingua::Alphabet::Phonetic. The interface was
+    pleasantly simple to extend.
+
+COPYRIGHT
+    Copyright (c) 2004 Primus Telecommunications Canada Inc. All Rights
+    Reserved.
+
+    This module is free software. You may use and/or modify it under the
+    same terms as perl itself.
+

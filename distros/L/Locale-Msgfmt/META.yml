@@ -1,0 +1,28 @@
+---
+abstract: 'Compile .po files to .mo files'
+author:
+  - 'Ryan Niebur, all rights reserved.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Locale::Msgfmt
+name: Locale-Msgfmt
+no_index:
+  directory:
+    - inc
+    - private
+    - t
+requires:
+  File::Spec: 0.80
+  perl: 5.8.5
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.15

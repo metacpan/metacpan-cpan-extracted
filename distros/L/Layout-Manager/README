@@ -1,0 +1,53 @@
+Layout::Manager - 2D Layout Management
+
+SYNOPSIS
+
+Layout::Manager provides a simple interface for creating layout managers, or
+classes that size and position components within a container.
+
+A few managers are provided for reference, but this module is primarily meant
+to serve as a base for outside implementations.
+
+    use Layout::Manager;
+
+    my $foo = Layout::Manager->new;
+    $foo->do_layout($component);
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Layout::Manager
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Layout-Manager
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Layout-Manager
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Layout-Manager
+
+    Search CPAN
+        http://search.cpan.org/dist/Layout-Manager
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 - 2010 Cory G Watson
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

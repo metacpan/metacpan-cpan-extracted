@@ -1,0 +1,37 @@
+Language-Tea
+
+This module has the objective of converting Tea code into Java code.
+There are some limitations. Tea is not a typed language like Java. We try to guess
+the variable types based on the kind of data the variable will have, but this is 
+100% bulletproof.
+There are other limitations, like closures, and variable reuse.
+In Tea, we can have closures, using function lambda. We can't yet make a plausible 
+translaction to java code. Plus, the variable reuse in Tea is literally translated into
+java code. 
+
+Example:
+    Tea code:
+        define a 44
+        (more tea code)
+        set! a "hello guys"
+    Tea code translated into Java
+        Integer a = new Integer(44);
+        (more tea code translated)
+        a = "hello guys" -----> COMPILE ERROR
+
+Anyway, we hope nobody tries to reuse variables like this :\
+
+AUTHORS
+
+    Mario Silva,  "<mario.silva@verticalone.pt>"
+
+    Daniel Ruoso, "<daniel.ruoso@verticalone.pt>"
+
+    Flavio Glock, "<flavio.glock@verticalone.pt>"
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Mario Silva, Flavio Glock, Daniel Ruoso
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

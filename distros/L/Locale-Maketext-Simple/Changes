@@ -1,0 +1,116 @@
+
+[Changes for 0.21 - 2009-08-17]
+
+* None
+
+[Changes for 0.20_02 - 2009-07-12]
+
+* How'd that MANIFEST vanish, anyway?
+
+[Changes for 0.20_01 - 2009-07-12]
+
+* MakeMaker Makefile.PL which takes into account the fact that
+  we're now dual-lifed contributed by Jerry D. Hedden
+
+* Fix the i-default tests to skip if Local::Maketext::Lexicon is not
+  installed as they fail - Tomas Doran
+
+[Changes for 0.20 - 2009-07-08]
+
+* MANIFEST fixes (no code changes) - Tomas Doran
+
+[Changes for 0.19 - 2009-07-07]
+
+* Bumped the version dependency to 5.005
+
+* Ton Voon, from Opsera Limited contributed the ability to have the IANA
+  defined i-default language, for use as a fallback when arbitrary message keys,
+  rather than English phrases are being used.
+
+[Changes for 0.18 - 2006-09-08]
+
+* At the request of Steve Hay, this module is now available under the
+  Perl license when distributed as part of Perl 5.
+
+[Changes for 0.17 - 2006-08-13]
+
+* Sebastien Aperghis-Tramoni noticed that the MIT license text was
+  mis-hyphenated, and the waranty clauses mentions "X Consortium"
+  where it should say "authors or copyright holders".
+
+[Changes for 0.16 - 2006-05-03]
+
+* Oops, the gettext_to_maketext function was missing an escape
+  sequence, rendering message strings with [ ~ ] characters invalid.
+  Reported By: Rong-En Fan
+
+[Changes for 0.15 - 2006-05-02]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the permissive "MIT" license.  See the COPYRIGHT
+  section in README for the new terms.
+
+[Changes for 0.14 - 2006-04-27]
+
+* Repair Perl 5.005 compatibility in the build system.
+  Reported By: Rong-En Fan
+
+[Changes for 0.13 - 2006-04-11]
+
+* The "_style => 'gettext'" option was broken for adjacent variables
+  such as "%1%2%3".
+
+* Also removed the sole occurrence of of $&. 
+
+[Changes for 0.12 - 2004-03-17]
+
+* Supports the "Encoding" directive, including the special "locale" value.
+
+* Fix test to not emit warnings.
+
+[Changes for 0.11 - 2004-02-06]
+
+* ->auto_path was broken and always checking L::M::S's auto/ path.
+  Reported By: Marcus Ramberg
+
+[Changes for 0.10 - 2003-11-13]
+
+* The "%tense()" form was not working.
+  Reported By: Jos Boumans
+
+* Add reload_loc to clear away all cached handles.
+
+[Changes for 0.09 - 2003-09-16]
+
+* Without an English .po, L::M::S would not pick up any other POs.
+  Reported By: Marcus Ramberg
+
+* The default "maketext" calling style was broken.
+
+[Changes for 0.08 - 2003-08-26]
+
+* Calling loc_lang() without arguments now switches to "autodetected"
+  language properly.
+
+[Changes for 0.07 - 2003-08-21]
+
+* The "%quant()" form was not working as advertised.
+  Reported By: Jos Boumans
+
+[Changes for 0.05 - 2003-08-17]
+
+* Fixed breakage on Win32 with \\ pathnames.
+
+[Changes for 0.03 - 2003-08-03]
+
+* Documentation cleanup.
+
+* Avoid warnings during testing.
+
+[Changes for 0.03 - 2003-05-20]
+
+* Add Path option and loc_lang function.
+
+[Changes for 0.01 - 2003-05-09]
+
+* Initial release.

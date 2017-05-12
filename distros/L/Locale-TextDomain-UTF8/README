@@ -1,0 +1,69 @@
+NAME
+    Locale::TextDomain::UTF8 - Shortcut to use Locale::TextDomain and
+    decoding to UTF8
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+    Instead of:
+
+     use Locale::TextDomain 'Some-TextDomain';
+
+    you now say:
+
+     use Locale::TextDomain::UTF8 'Some-TextDomain';
+
+DESCRIPTION
+     use Locale::TextDomain::UTF8 'Some-TextDomain'
+
+    is equivalent to:
+
+     use Locale::TextDomain 'Some-TextDomain';
+     use Locale::Messages qw(bind_textdomain_filter);
+     use Encode;
+     BEGIN {
+         $ENV{OUTPUT_CHARSET} = 'UTF-8';
+         bind_textdomain_filter 'Some-TextDomain' => \&Encode::decode_utf8;
+     }
+
+    it's just more convenient, especially if you have to do it for each
+    textdomain.
+
+    Why would you want this? To ensure that strings returned by the "__()",
+    et al functions are UTF8-encoded Perl strings. For example, if you want
+    to pass the strings to Unicode::GCString. For more details, see the Perl
+    Advent article mentioned in the SEE ALSO section.
+
+SEE ALSO
+    Locale::TextDomain
+
+    Locale::Messages
+
+    <http://www.perladvent.org/2013/2013-12-09.html>
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Locale-TextDomain-UTF8>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Locale-TextDomain-UTF8>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Locale-TextDomain-UTF
+    8>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

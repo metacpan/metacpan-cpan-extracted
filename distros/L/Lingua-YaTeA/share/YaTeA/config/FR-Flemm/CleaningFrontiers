@@ -1,0 +1,46 @@
+#################################################
+# CLEANING FRONTIERS (type information, valeur) #
+#################################################
+#
+#
+######
+# NOMS
+#
+#________
+# PROPRES
+POS	Np----
+#
+#________
+# COMMUNS
+POS	Nc----
+POS	Ncm---
+POS	Nc-s--
+POS	Nc-p--
+POS	Ncms--
+POS	Ncfs--
+POS	Ncmp--
+POS	Ncfp--
+#
+###########
+# ADJECTIFS
+#
+POS	A------
+POS	A--m---
+POS	A---s--
+POS	A---p--
+POS	A--ms--
+POS	A--mp--
+POS	A--fs--
+POS	A--fp--
+#
+#######
+# ESSAI
+#POS	Vmps-sm--
+#POS	Vmps-pm--
+#
+########
+# DIVERS
+#
+
+#POS	NUM
+#POS	ABR

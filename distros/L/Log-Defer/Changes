@@ -1,0 +1,56 @@
+0.312  2016-03-07
+  * Fix typo in docs
+  * Links to more implementations:
+    * C++
+    * D (Richard Farr)
+    * Javascript (Mark Jubenville)
+
+0.311  2014-03-31
+  * Doc updates
+  * Link to Michael Pucyk's Python implementation
+
+0.310  2013-10-12
+  * In synopsis docs, add error checking to message encoding.
+    If you forget to do this and any of your messages can't be
+    encoded you will have a very difficult bug to solve
+    (thanks Matt Phillips)
+  * Doc updates
+
+0.300  2013-04-08
+  * Backwards-incompatible change: In the log message,
+    timers are now stored in an array instead of a hash.
+    This is because sometimes it is convenient to not
+    have to worry about giving two different timers the
+    same name (usually when the names are auto-generated).
+
+0.201  2013-03-13
+  * Add new merge method
+  * Add license info and github repo to meta
+  * Doc updates
+
+0.200  2013-02-15
+  * Removed Log::Defer::Viz since it's getting its own
+    CPAN distribution so you don't need to install its
+    dependencies on your servers
+  * Added verbosity option
+  * Now you can pass a hashref into the constructor
+    in order to support extra args (like verbosity).
+    The old way is still supported too.
+  * Added no-overhead debug logging (see docs)
+  * Don't include MYMETA in CPAN dist
+  * Doc updates
+
+0.12   2012-07-05
+  * Log::Defer::Viz ASCII art drawing of timer data
+
+0.11   2012-06-28
+  * OK now I have CPAN versions figured out :)
+
+0.02   2012-06-28
+  * Version number fix
+
+0.1.1   2012-06-17
+  * Test accidentally depended on JSON::XS
+
+0.1   2012-06-17
+  * Initial release

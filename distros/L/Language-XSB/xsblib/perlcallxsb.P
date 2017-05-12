@@ -1,0 +1,171 @@
+/* File:      perlcallxsb.P
+** Author(s): Salvador Fandino
+** Contact:   sfandino@yahoo.com, xsb-contact@cs.sunysb.edu
+** 
+** Copyright (C) The Research Foundation of SUNY, 1997-1998
+** 
+** XSB is free software; you can redistribute it and/or modify it under the
+** terms of the GNU Library General Public License as published by the Free
+** Software Foundation; either version 2 of the License, or (at your option)
+** any later version.
+** 
+** XSB is distributed in the hope that it will be useful, but WITHOUT ANY
+** WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+** FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for
+** more details.
+** 
+** You should have received a copy of the GNU Library General Public License
+** along with XSB; if not, write to the Free Software Foundation,
+** Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+**
+** $Id: $
+** 
+*/
+
+
+:- compiler_options([sysmod,xpp_on]).
+#include "standard.h"
+#include "sig_xsb.h"
+#include "flag_defs_xsb.h"
+
+:- import conget/2, conset/2 from gensym.
+:- import excess_vars/4 from setof.
+:- import call_expose/1, goal_cut_trans/3 from standard.
+
+:- 	set_inthandler('_$attv_int'(_,_), MYSIG_ATTV),
+	perl_mainloop.
+
+
+set_inthandler(Handler, Number) :-
+	Flag is Number + INT_HANDLERS_FLAGS_START,
+	term_psc(Handler, PSC),
+	stat_set_flag(Flag, PSC).
+
+'_$attv_int'(Intlist, Call) :-
+% 	file_write(1, '.... in _$attv_int/2'), file_nl(1),
+% 	file_write(1, '.... interrupt chain is : '),
+% 	file_write(1, Intlist), file_nl(1),
+	handle_interrupts(Intlist),
+%	file_write(1, '.... leaving _$attv_int/2'), file_nl(1),
+	call_c(Call).
+
+handle_interrupts([]) :- !.
+handle_interrupts([[Var|Value]|Ints]) :-
+% 	file_write(1, '.... [Var|Value] = '),
+% 	file_write(1, [Var|Value]), file_nl(1),
+	verify_attributes(Var, Value),
+	handle_interrupts(Ints).
+
+
+perl(Sub, Args, Result, Exception) :-
+	perl_call(Sub, Args, R, E),
+	Result=R,
+	Exception=E.
+
+perl_interface(_,_,_,_,_,_,_) :-
+				% Cmd, Query, Vars,
+				% Sub, Args, Result, Exception
+	halt.
+
+perl_call(Sub, Args, Result, Exception) :-
+	perl_interface(4,_,_, Sub, Args,_,_), % we count on perl to
+                                             % delay cmd 5 until next
+                                             % halt
+	repeat,
+	perl_interface(Cmd, Par, VarTerm,_,_,_,_),
+	(\+integer(Cmd)
+	 ->	file_write(STDERR,'Perl command error; must be an integer; is '),
+		file_write(STDERR,Cmd),
+		file_nl(STDERR),
+		!,
+		fail
+	 ; Cmd =:= 1
+	 ->	excess_vars(Par, [], [], VarList),
+		VarTerm =.. [ret|VarList],
+		do_pcall(Par,VarTerm)
+	 ; Cmd =:= 2
+	 ->	fail		% clear query
+	 ; Cmd =:= 5
+	 ->	perl_interface(6,_,_,_,_,Result, Exception), !
+	 ;	(file_write(STDERR,
+			    'Perl command sequence error; must be 1, 2 or 5; is '),
+		 file_write(STDERR,Cmd),
+		 file_nl(STDERR),
+		 fail)
+	).
+
+perl_mainloop :-
+        set_inthandler('_$keyboard_int'(_), MYSIG_KEYB),
+	'_$savecp'(Cp),		% to set abort cut point
+	conset('_$abort_cutpoint', Cp),
+	(conget('_$perl_calls_xsb_first_time',0)
+	->  conset('_$perl_calls_xsb_first_time',1),
+	    eval_cmdline_goal
+	;   true
+	),
+	repeat,
+	'_$savecp'(Cp2),
+	conset('_$abort_cutpoint', Cp2),
+	repeat,
+	perl_interface(Cmd,Par,VarTerm,_,_,_,_),
+	(\+integer(Cmd)
+	 ->	file_write(STDERR,'Perl command error; must be an integer; is '),
+		file_write(STDERR,Cmd),
+		file_nl(STDERR),
+		fail
+	 ; Cmd =:= 1
+	 ->	excess_vars(Par, [], [], VarList),
+		VarTerm =.. [ret|VarList],
+		do_pcall(Par,VarTerm)
+	 ; Cmd =:= 2
+	 ->	fail		% clear query
+	 ; (file_write(STDERR,
+		       'Perl command sequence error; must be 1 or 2; is '),
+	    file_write(STDERR,Cmd),
+	    file_nl(STDERR),
+	    fail)
+	).
+
+do_pcall(Call,VarTerm) :-
+	'_$call'(Call),
+	perl_interface(Cmd, Call, VarTerm,_,_,_,_),
+	(\+integer(Cmd)
+	 ->	file_write(STDERR,'Perl command error; must be an integer; is '),
+		file_write(STDERR,Cmd),
+		file_nl(STDERR),
+		!,
+		fail
+	 ; Cmd =:= 1		% next
+	 ->	fail
+	 ; Cmd =:= 2		% close query
+	 ->	% close_open_tables,
+		!,fail
+	 ; (file_write(STDERR,
+		       'Perl command sequence error; must be 1 or 2; is '),
+	    file_write(STDERR,Cmd),
+	    file_nl(STDERR),
+	    fail)
+	).
+
+% hidden version of call
+'_$call'(Y) :- 
+	'_$savecp'(C), 
+	goal_cut_trans(Y,X,C),
+	call_expose(X).
+
+eval_cmdline_goal :-
+	xsb_flag(goal, CmdGoal),
+	  file_open(CmdGoal, sr, FileDes),
+	    eval_cmdline_goal(FileDes).
+
+eval_cmdline_goal(FileDes) :-
+	file_read(FileDes, Goal),
+	Goal \= end_of_file,
+	(call((Goal,!)) -> true ; true),
+	eval_cmdline_goal(FileDes).
+eval_cmdline_goal(FileDes) :- file_close(FileDes).
+
+'_$keyboard_int'(_Call) :- 
+        abort.
+
+

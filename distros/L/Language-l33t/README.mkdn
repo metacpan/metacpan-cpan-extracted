@@ -1,0 +1,133 @@
+# NAME
+
+Language::l33t - a l33t interpreter
+
+# VERSION
+
+version 1.0.1
+
+# SYNOPSIS
+
+    use Language::l33t;
+
+    my $interpreter = Language::l33t->new;
+    $interpreter->set_source( 'Ph34r my l33t sk1llz' );
+    $interpreter->run;
+
+# DESCRIPTION
+
+Language::l33t is a Perl interpreter of the l33t language created by
+Stephen McGreal and Alex Mole. For the specifications of l33t, refer
+to [Language::l33t::Specifications](https://metacpan.org/pod/Language::l33t::Specifications).
+
+# METHODS
+
+## new( %options )
+
+Creates a new interpreter. The options that can be passed to the function are:
+
+- debug => $flag
+
+    If $flag is set to true, the interpreter will print debugging information
+    as it does its thing.
+
+- stdin => $io
+
+    Ties the stdin of the interpreter to the given object.
+
+- stdout => $io
+
+    Ties the stdout of the interpreter to the given object. 
+
+    E.g.:
+
+        my $output;
+        open my $fh_output, '>', \$output;
+
+        my $l33t = Language::l33t->new( stdout => $fh_output );
+
+        $l33t->set_source( $code );
+        $l33t->run;
+
+        print "l33t output: $output";
+
+- memory\_max\_size => $bytes
+
+    The size of the block of memory available to interpreter. By default set to
+    64K (as the specs recomment).
+
+- byte\_size => $size
+
+    The size of a byte in the memory used by the interpreter. Defaults to
+    256 (so a memory byte can hold a value going from 0 to 255).
+
+## source( $l33tcode )
+
+Loads and "compiles" the string $l33tcode. If one program was already loaded,
+it is clobbered by the newcomer. 
+
+## run( \[ $nbr\_iterations \] )
+
+Runs the loaded program. If $nbr\_iterations is given, interupts the program
+after this number of iterations even if it hasn't terminated. Returns 0 in
+case the program terminated by evaluating an END, 1 if it finished by reaching
+$nbr\_iterations.
+
+## reset
+
+Reset the interpreter to its initial setting. Code is
+recompiled, and pointers reset to their initial values. 
+
+E.g.
+
+    my $l33t = Language::l33t->new();
+    $l33t->load( $code );
+    $l33t->run;
+
+    # to run the same code a second time
+    $l33t->reset;
+    $l33t->run;
+
+## memory
+
+Returns the memory of the interpreter in its current state as an array.
+
+# DIAGNOSTICS
+
+- F00l! teh c0d3 1s b1g3R th4n teh m3m0ry!!1!
+
+    You tried to load a program that is too big to fit in 
+    the memory. Note that at compile time, one byte is reserved
+    for the memory buffer, so the program's size must be less than
+    the memory size minus one byte.
+
+- Byt3 s1z3 must be at l34st 11, n00b!
+
+    The _byte\_size_ argument of _new()_ was less than 11. 
+    The byte size of an interpreter must be at least 11 (to
+    accomodate for the opcodes).
+
+- L0L!!1!1!! n0 l33t pr0gr4m l04d3d, sUxX0r!
+
+    run() called before any program was load()ed.
+
+# SEE ALSO
+
+[Language::l33t::Specifications](https://metacpan.org/pod/Language::l33t::Specifications)
+
+# THANKS 
+
+It goes without saying, special thanks go 
+to Stephen McGreal and Alex Mole for inventing l33t. 
+They are teh rOxX0rs.
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

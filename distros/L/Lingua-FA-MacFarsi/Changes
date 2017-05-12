@@ -1,0 +1,23 @@
+Revision history for Perl module Lingua::FA::MacFarsi.
+
+0.20  Sun Jul 31 19:33:39 2011
+    - fix the tarball with world writable files.
+
+0.10  Sat Jan 22 20:40:22 2011
+    - xs: fix mixing STDCHAR and U8.
+
+0.04  Thu Apr 28 22:50:40 2005
+    - upgraded according to updated FARSI.TXT in www.unicode.org
+      (though no character mapping is changed).
+    - added META.yml.
+    - added t/argu.t.
+
+0.03  Sat Feb 01 12:10:05 2003
+    - document modification.
+
+0.02  Sat Feb 01 01:38:10 2003
+    - *.map files are integrated.
+    - document modification.
+
+0.01  Thu Jan 29 23:19:43 2003
+    - original version;

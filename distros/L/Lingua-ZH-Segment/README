@@ -1,0 +1,24 @@
+This is the README file for Lingua::ZH::Segment, a simple segmenter
+for Chinese Words.
+
+* Installation
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+* Todo
+
+- segment in phrase, sentence level.
+
+* Copyright
+
+Copyright 2005 by Cheng-Lung Sung <clsung@tw.freebsd.org>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.

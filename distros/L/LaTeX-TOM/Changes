@@ -1,0 +1,267 @@
+Revision history for Perl extension LaTeX::TOM.
+
+1.03  2011-12-23  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.02_01  2011-11-24  <schubiger@cpan.org>
+
+ - Change commented debug statements in ::Parser to be invokable.
+
+ - Alter _debug() to print filename and line number.
+
+1.02  2011-11-13  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.01_01  2011-10-09  <schubiger@cpan.org>
+
+ - Refactor new(), copy() and split() Node methods.
+
+ - Adjust setNodeText().
+
+ - Replace Node's boolean values with true/false.
+
+ - Enable warnings for the Node class.
+
+ - Remove obsoleted LICENSE file.
+
+1.01  2011-08-19  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.00_08  2011-08-18  <schubiger@cpan.org>
+
+ - Test getCommandNodesByName(), getEnvironmentsByName() and
+   getNodesByCondition().
+
+1.00_07  2011-08-15  <schubiger@cpan.org>
+
+ - Fix parsing user-defined mappings and add a test.
+   [rt #48540 - Jesse S. Bangs]
+
+ - Don't pass the parser object to the Tree constructor.
+
+ - Adjust some code indentation.
+
+1.00_06  2011-08-03  <schubiger@cpan.org>
+
+ - Fix setting instance config data for the main constructor.
+
+ - Introduce error handlers to minimize code repetition.
+
+ - Change commented debug statements in parse() to be invokable.
+
+ - Rename print() to _debug_tree() and wrap it twice in order to
+   emit output to STDOUT/STDERR.
+
+ - Alter _debug_tree() further to use the output handler being
+   passed in and enhance the code layout.
+
+ - Be less verbose for variable names when assigning user options.
+
+1.00_05  2011-07-29  <schubiger@cpan.org>
+
+ - Refactor _getTextAndCommentNodes(), which includes:
+
+ - Move creating a comment or text node to a lexical subroutine.
+
+ - Store the type as string and adjust comments accordingly.
+
+ - Append line to string directly instead of pushing to an array.
+
+ - (Re)set initialization variables with short-circuit operators.
+
+ - Use underscores within variable names where appropriate.
+
+ - Reformat visually the regular expressions used.
+
+1.00_04  2011-07-27  <schubiger@cpan.org>
+
+ - Strengthen the check for a \input file filename extension.
+
+ - Add File::Basename as dependency.
+
+1.00_03  2011-07-26  <schubiger@cpan.org>
+
+ - Fix an error when dereferencing the nodes of a subtree.
+
+ - Improve the \bibliography handling code and add a test.
+
+ - Make reading a \input file more strict.
+
+ - Test that empty \input files are not skipped.
+
+ - Bless into current package for the Node/Tree constructors.
+
+ - Adjust some code indentation.
+
+1.00_02  2011-07-24  <schubiger@cpan.org>
+
+ - Improve the \input handling code and add tests.
+
+ - Raise error in _readFile() when a file cannot be opened.
+
+ - Use lexical filehandle and slurp file in _readFile().
+
+ - Substitute warn with carp in _addInputs().
+
+1.00_01  2011-07-20  <schubiger@cpan.org>
+
+ - Use true as boolean value when initializing config data.
+
+ - Change the mention of the primary contact.
+
+ - Reword the documentation a bit.
+
+ - Remove broken website link and according text.
+
+ - Update broken license link.
+
+ - Skip documentation tests for non-release testing.
+
+1.00 Wed Oct  7 10:56:12 CEST 2009
+
+ - Merged development version to stable.
+
+0.9_03 Sun Aug 23 16:59:26 CEST 2009
+
+ - Initialize user options by calling a lexical subroutine.
+
+ - Replace calls to not existant copyTree/splitTextNode subs
+   with calls to the copy/split methods.
+
+ - Populate the config data hashes with true values at runtime.
+
+ - Remove the superfluous use of 'defined' when checking booleans.
+
+ - Declare globals with 'our' instead of 'use vars'.
+
+ - Assign the config data at once within the parser object.
+
+ - Set initial version numbers for the Node, Parser and Tree class.
+
+0.9_02 Sun Aug 16 12:31:18 CEST 2009
+
+ - Fix \input lines parsing failure with "read inputs flag" set.
+   [rt #48538 - Jesse S. Bangs]
+
+0.9_01 Wed Aug 12 14:25:08 CEST 2009
+
+ - Use code reference instead of string eval in getNodesByCondition().
+   [rt #48551 - Jesse S. Bangs]
+
+ - Fix some warnings which were suppressed within the tests.
+
+0.9 Tue Apr 29 12:21:00 CEST 2008
+
+ - Added support for dealing with starred commands.
+   [James Bowlin <bowlin@mindspring.com>]
+
+ - Merged development version to stable.
+
+0.8_02 Thu Feb 21 21:08:50 CET 2008
+
+ - Added further test-files to suite (i.e., ones that test the
+   parser, tree and node functionality).
+
+ - Fixed a slight documentation error (the method getTopLevelNodes()
+   returns a list, and *not* an array reference).
+
+0.8_01 Tue Feb 19 15:29:40 CET 2008
+
+ - Added basic test-file basic.t.
+
+ - Added CREDITS and LICENSE sections to the documentation.
+
+0.8 Mon Oct  8 10:23:01 CEST 2007
+
+ - Fixed failing tests pod.t & pod-coverage.t (adjusted plans).
+
+0.7 Tue Aug 28 00:12:03 CEST 2007
+
+ - Added formatting tags to the documentation where appropriate
+   and enlisted all methods within the documentation index.
+
+0.6 Wed Mar 14 01:05:09 CET 2007
+
+ - Merged development version to stable.
+
+0.5_05 Sun Feb 18 11:30:51 CET 2007
+
+ - Fixing reference types in all ...->{children}->{nodes}->[...]
+   occurrences in the LaTeX::TOM::Parser::_applyMapping and
+   LaTeX::TOM::Node::getLastChild subroutines.
+   [Otakar Smrz, otakar.smrz@mff.cuni.cz]
+
+0.5_04 Fri Feb 16 10:41:21 CET 2007
+
+ - Fixed approximately half a dozen broken hash keys in references
+   with {node} instead of {nodes} as subkey.
+
+0.5_03 Fri Feb 16 02:00:52 CET 2007
+
+ - Fixed wrong spelling of $self->{node} to $self->{nodes} within
+   LaTeX::TOM::Parser.
+
+0.5_02 Mon Feb 12 03:37:11 CET 2007
+
+ - Added suitable (albeit slightly modified) pod.t & pod-coverage.t
+   to the test directory.
+
+ - Documented LaTeX::TOM's constructor new().
+
+0.5_01 Mon Feb  5 08:47:05 CET 2007
+
+ - Resolved accidentally swapped $prev/$next pointers in assignment
+   in LaTeX::TOM::Node's listify(), resulting in misbehaviour of
+   getNextGroupNode(), getPreviousSibling() and the like.
+
+ - Added fully qualified package declaration to LaTeX::TOM::Parser,
+   LaTeX::TOM::Node & LaTeX::TOM::Tree. Removed class specification
+   from sub declarations likewise.
+
+ - LaTeX::TOM's constructor, new() reblesses a LaTeX::TOM::Parser
+   object with the references to the global variables defined within
+   LaTeX::TOM. @_ is passed unaltered to LaTeX::TOM::Parser's new().
+
+ - LaTeX::TOM establishes an ISA relationship with LaTeX::TOM::Parser
+   and LaTeX::TOM::Parser with LaTeX::TOM::Node/LaTeX::TOM::Tree.
+
+ - LaTeX::TOM::Tree's constructor, new() now returns a blessed hash
+   reference instead of previously a blessed array reference, because
+   we're basically reblessing the $parser object.
+
+ - Extracted the TODO part from LaTeX::TOM and put it in a separate
+   file named TODO in the root of the distribution.
+
+0.5 Son Dec 31 01:47:36 CET 2006
+
+ - Percents (%) and braces ({}) within verbatim blocks
+   are now taken care of while parsing.
+
+ - Replaced all occurences of tabs within the code with
+   literal whitespace.
+
+0.3 Sun Dec 24 11:37:21 CET 2006 
+
+ - Initial CPAN version.
+
+02c ???
+
+ - Bug fixes: Handling of newlines and whitespace between commands 
+   and parameters and groups, handling of \w+\d+ commands (thanks 
+   Leo Tenenblat for both of these), documentation bugfix: "parseFile",
+   not "parsefile".
+
+02b ???
+
+ - License included (BSD), some minor code indenting cleanups.
+
+02 ???
+
+ - This is the first release version.
+
+01 ???
+
+ - Non-OOP version of the current functionality. Not released.

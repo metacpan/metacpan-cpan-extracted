@@ -1,0 +1,46 @@
+Revision history for Lingua::StarDict::Gen
+0.10   12 Nov 2010
+    - minor correction related with pod-encoding
+
+0.09    3 Nov 2010
+    - correction of a bug that caused term losts.
+      This bug was related to term order (sort alg) in the 
+      index file
+      Thanks to Nicolav Shaplov
+
+
+0.08    22 Dec 2009
+	- output directory no longer hardcoded
+
+0.07    1 Jul 2009
+	- Easyer dictionary instalation procedure
+    - Small corrections in doc.
+
+0.06    5 Sep 2008
+	- improved term2stardict
+	- improved thesaurus2stardict
+	- new English API
+
+
+0.05    25 Jun 2008
+	- .ido and .dict with correct linefeed (no carriage return);
+
+0.04    20 Jun 2008
+        - compatibility with 5.10 (I hope)
+	- IDX with correct encoding
+
+0.03    10 Jun 2008
+        - First CPAN version without "_"
+        - Added term2stardict
+
+0.02_3 ...
+        - renamed Lingua::Stardict to Lingua::StarDict to match older
+          Lingua::StarDict module already on CPAN;
+
+0.02_2  30 May 2008
+	- imports (carregaDic) dictionaries in "term" format;
+	- New term2stardict script to generate stardict form term files.
+
+0.02_1  28 May 2008
+	- First CPAN version;
+

@@ -1,0 +1,80 @@
+{
+   "abstract" : "Deep Logging of information about a script state",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Deep",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.88",
+            "Test::Warn" : "0",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Spelling" : "0"
+         },
+         "requires" : {
+            "Clone" : "0.29",
+            "Data::Dump::Streamer" : "2.08",
+            "List::MoreUtils" : "0",
+            "Path::Tiny" : "0",
+            "Readonly" : "1.03",
+            "Term::ANSIColor" : "0",
+            "Time::HiRes" : "1.9711",
+            "perl" : "5.008",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Deep" : {
+         "file" : "lib/Log/Deep.pm",
+         "version" : "v0.3.5"
+      },
+      "Log::Deep::File" : {
+         "file" : "lib/Log/Deep/File.pm",
+         "version" : "v0.3.5"
+      },
+      "Log::Deep::Line" : {
+         "file" : "lib/Log/Deep/Line.pm",
+         "version" : "v0.3.5"
+      },
+      "Log::Deep::Read" : {
+         "file" : "lib/Log/Deep/Read.pm",
+         "version" : "v0.3.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Deep"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ivanwills/Log-Deep"
+      }
+   },
+   "version" : "v0.3.5"
+}

@@ -1,0 +1,32 @@
+---
+abstract: 'Linux specific special filehandles'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  IO::Handle: 0
+  IO::Select: 0
+  IPC::Open3: 0
+  Module::Build: 0.3601
+  POSIX: 0
+  Test::Exception: 0
+  Test::More: 0.89
+  Time::HiRes: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Linux-FD
+requires:
+  Sub::Exporter: 0
+  XSLoader: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Linux-FD
+  repository: git://github.com/Leont/linux-fd.git
+version: 0.011

@@ -1,0 +1,336 @@
+#!/usr/local/bin/perl -w
+##
+## A simple script to post a journal entry from a file
+## It pulls details from the .livejournal file or ask the
+## user for the auth details if that is not present.
+##
+##  $Id: ljpost,v 1.6 2005/06/28 16:47:26 simes Exp $
+##
+
+use strict;				# Silly not to be
+use POSIX;				# For strftime()
+use LJ::Simple;				# Kinda silly not to have this
+use File::Temp qw/ tempfile tempdir /;	# For temporary file name
+
+##
+## Simple sub to set the picture keyword
+##
+sub SetPicture($$) {
+  my ($lj,$event)=@_;
+  my %pictures=();
+  print "Set picture keyword [y/n] ? ";
+  my $ans=<STDIN>;
+  ($ans!~/^\s*y/) && return;
+  if (!defined $lj->pictures(\%pictures)) {
+    print STDERR "Unable to set picture keyword: $LJ::Simple::error\n";
+    return;
+  }
+  my @PicList=sort {$a cmp $b} (keys %pictures);
+  if ($#PicList<0) {
+    print STDERR "Unable to set picture keyword\n";
+    return;
+  }
+  print "The following picture keywords are available:\n";
+  print " * ",join("\n * ",@PicList),"\n";
+  print "Which would you like to use ? Hit return for none.\n";
+  my $done=0;
+  while(!$done) {
+    print "Keyword: ";
+    my $pict=<STDIN>;
+    chomp($pict);
+    if ($pict eq "") {
+      $done=1;
+    } else {
+      if ($lj->Setprop_picture_keyword($event,$pict)) {
+        $done=1;
+      }
+    }
+  }
+}
+
+if ($#ARGV>0) {
+  print STDERR <<EOF;
+Usage:
+  $0 filename   - Read post from a file
+  $0            - Fire up an editor
+EOF
+  exit 255;
+}
+
+my $Post="";
+if ($#ARGV==0) {
+  my ($file)=@ARGV;
+  open(F,$file) || die "$0: Failed to open $file for reading - $!\n";
+  $Post=join("",(<F>));
+  close(F);
+} else {
+  my $editor="/bin/vi";
+  (exists $ENV{EDITOR}) && ($editor=$ENV{EDITOR});
+  (-x $editor) || die "$0: Editor \"$editor\" is not executable\n";
+  my ($fh,$filename)=tempfile("ljpost-XXXXXXXX",UNLINK=>1,DIR=>"/tmp");
+  my $cmd="$editor $filename";
+  system($cmd);
+  ($?!=0) && die "$0: Non-zero exit code [$?] from $cmd\n";
+  $Post=join("",(<$fh>));
+  close($fh);
+  ($Post eq "") && die "$0: Refusing to post null entry\n";
+}
+
+my $user=undef;
+my $pass=undef;
+if (open(LJ,"$ENV{HOME}/.livejournal")) {
+  while(<LJ>) {
+    (/^#/ || /^\s*$/) && next;
+    chomp;
+    my ($k,$v)=split(/\s*=\s*/,$_,2);
+    $k=uc($k);
+    if ($k eq "USER") {
+      $user=$v;
+    } elsif ($k eq "PASS") {
+      $pass=$v;
+    }
+  }
+  close(LJ);
+}
+$|=1;
+
+if (defined $user) {
+  print STDERR "LJ Username: $user\n";
+} else {
+  print STDERR "LJ Username: ";
+  $user=<STDIN>;
+  chomp($user);
+}
+if (defined $pass) {
+  print STDERR "LJ Password: <not displayed>\n";
+} else {
+  system("stty -echo");
+  ($?!=0) && die "$0: Non-zero exit code [$?] returned by stty -echo\n";
+  print STDERR "LJ Password: ";
+  $pass=<STDIN>;
+  system("stty echo");
+  print STDERR "\n";
+  ($?!=0) && die "$0: Non-zero exit code [$?] returned by stty echo\n";
+  chomp($pass);
+}
+
+print STDERR "Logging into LJ\n";
+# Ensure timeout is correct
+($LJ::Simple::VERSION<0.07) && ($LJ::Simple::timeout = 300);
+my $lj = new LJ::Simple({ user=>$user,pass=>$pass });
+(defined $lj) ||
+  die "$0: Failed to log into LJ - $LJ::Simple::error\n";
+
+my %Event=();
+$lj->NewEntry(\%Event) ||
+  die "$0: Failed to prepare event - $LJ::Simple::error\n";
+
+my $TxtTimeT=$^T;
+my @LocTime=localtime($TxtTimeT);
+my $TxtTime=strftime("%Y%m%d",@LocTime);
+my $done=0;
+my ($mins,$hrs,$dy,$mn,$yr);
+while (!$done) {
+  print STDERR "Date of entry [$TxtTime]: ";
+  my $new_date=<STDIN>;
+  chomp($new_date);
+  if ($new_date ne "") {
+    $TxtTime=$new_date;
+  }
+  if ($TxtTime!~/^([0-9]{4})([0-9]{2})([0-9]{2})$/) {
+    print STDERR "Failed to parse date given as \"$TxtTime\"\n";
+  } else {
+    ($yr,$mn,$dy)=($1-1900,$2-1,$3);
+    $done=1;
+  }
+}
+$TxtTime=strftime("%H:%M",@LocTime);
+$done=0;
+while (!$done) {
+  print STDERR "Time of entry [$TxtTime]: ";
+  my $new_time=<STDIN>;
+  chomp($new_time);
+  if ($new_time ne "") {
+    $TxtTime=$new_time;
+  }
+  if ($TxtTime!~/^([0-9]{2}):([0-9]{2})$/) {
+    print STDERR "Failed to parse time given as \"$TxtTime\"\n";
+  } else {
+    ($hrs,$mins)=($1,$2);
+    $done=1;
+  }
+}
+
+$TxtTimeT=mktime(0,$mins,$hrs,$dy,$mn,$yr,0,0,$LocTime[8]);
+
+$lj->SetDate(\%Event,$TxtTimeT);
+
+print STDERR "Optional stuff on the post - hit return to not use\n";
+
+print STDERR "Subject: ";
+my $subject=<STDIN>;
+chomp($subject);
+($subject ne "") && $lj->SetSubject(\%Event,$subject);
+
+print STDERR "Mood: ";
+my $mood=<STDIN>;
+chomp($mood);
+if ($mood ne "") {
+  $lj->SetMood(\%Event,$mood) ||
+    die "$0: Failed to set mood - $LJ::Simple::error\n";
+}
+
+print STDERR "Music: ";
+my $music=<STDIN>;
+chomp($music);
+if ($music ne "") {
+  $lj->Setprop_current_music(\%Event,$music) ||
+    die "$0: Failed to set music - $LJ::Simple::error\n";
+}
+
+SetPicture($lj,\%Event);
+print STDERR "Comma separated list of tags: ";
+my $tags=<STDIN>;
+chomp($tags);
+($tags ne "") && $lj->Setprop_taglist(\%Event,split(/,\s*/,$tags));
+
+
+print "Do not auto-format [y/n] ? ";
+my $ans=<STDIN>;
+if ($ans=~/^\s*y/) {
+  $lj->Setprop_preformatted(\%Event,1) ||
+    die "$0: Failed to set entry as preformatted - $LJ::Simple::error\n";
+}
+
+$lj->SetEntry(\%Event,$Post) ||
+  die "$0: Failed to set entry - $LJ::Simple::error\n";
+
+print "Security level of post: public/Friends/Groups/Private [pFGP] ? [p] ";
+$ans=<STDIN>;
+if ($ans=~/^\s*F/) {
+  $lj->SetProtectFriends(\%Event);
+} elsif ($ans=~/^\s*G/) {
+  print "Available groups:\n";
+  my %fg=();
+  (defined $lj->GetFriendGroups(\%fg)) ||
+    die "$0: Failed to get groups - $LJ::Simple::error\n";
+  my $format="  %-2s %-40s\n";
+  printf($format,"Id","Group");
+  foreach (sort {$fg{$a}->{id}<=>$fg{$b}->{id}} keys %fg) {
+    printf($format,$fg{$_}->{id},$fg{$_}->{name});
+  }
+  print "Enter below the list - space or comma separated - of group Ids\n";
+  print "Permit: ";
+  $ans=<STDIN>;
+  my @grps=();
+  foreach (split(/[\s,]+/,$ans)) {
+    ($_ eq "") && next;
+    (exists $fg{$_}) || die "$0: Unknown group id \"$_\" given\n";
+    push(@grps,$fg{$_}->{name});
+  }
+  ($#grps==-1) && die "$0: No groups given\n";
+  $lj->SetProtectGroups(\%Event,@grps);
+} elsif ($ans=~/^\s*P/) {
+  $lj->SetProtectPrivate(\%Event);
+}
+
+print STDERR "Posting item\n";
+
+my ($item_id,$anum,$html_id)=$lj->PostEntry(\%Event);
+(defined $item_id) ||
+  die "$0: Failed to post entry - $LJ::Simple::error\n";
+
+my $link=sprintf("http://%s/users/%s/%s.html",
+			$lj->{lj}->{host},
+			$lj->{auth}->{user},
+			$html_id,
+		);
+print STDERR "Item posted; available at:\n";
+print STDERR "  $link\n";
+
+exit 0;
+
+=pod
+
+=head1 NAME
+
+ljpost - command line interface to post messages to LiveJournal
+
+=head1 SYNOPSIS
+
+B<ljpost>
+[B<file>]
+
+=head1 OPTIONS
+
+C<ljpost> only takes an optional file which holds the contents of the post;
+if this is not given then the editor in C<$EDITOR> is invoked instead.
+
+=head1 DESCRIPTION
+
+C<ljpost> is a simple command line interface to posting entries to LiveJournal.
+Currently it supports the following features:
+
+ o Setting date of entry
+ o Setting subject of entry
+ o Setting mood of entry
+ o Setting music of entry
+ o The user icon associated with the entry
+ o If the entry is auto-formated or not
+ o Set security levels of the entry; can be public, private,
+   friends-only or limited by friends groups
+  
+
+When the post has been made the URL where the post can be found. C<ljpost>
+can pull the LiveJournal username and password from a file -
+C<$HOME/.livejournal> The format of this file is simple; based on key/value
+pairs. Blank lines and lines starting with a C<#> are ignored. Otherwise
+there are two available keys C<User> and C<Pass>. These are separated from
+their values by C<=> signs. For example:
+
+  ##
+  ## Test entry
+  ##
+  User = test
+  Pass = test
+
+It should be noted that if either of the username or password values are not
+present then the user will be prompted for the values to use.
+
+=head1 FILES
+
+$HOME/.livejournal - Holds LiveJournal authentication details
+
+=head1 SEE ALSO
+
+LJ::Simple,
+perl(1),
+LiveJournal - http://www.livejournal.com/
+
+=head1 AUTHOR
+
+Simon Burr E<lt>F<simes@bpfh.net>E<gt>
+
+=cut
+
+##
+## $Log: ljpost,v $
+## Revision 1.6  2005/06/28 16:47:26  simes
+## ljpost now supports tags
+##
+## Revision 1.5  2004/05/20 16:31:23  simes
+## Fixed timezone issue in ljpost
+##
+## Revision 1.4  2004/05/20 15:41:20  simes
+## Bump to 0.12, added ljpost docs and now ljpost gets installed in the Solaris package
+##
+## Revision 1.3  2004/03/20 22:11:55  simes
+## Added setting of security bits
+##
+## Revision 1.2  2003/06/17 00:46:46  simes
+## Corrected month
+##
+## Revision 1.1  2003/06/13 10:35:42  simes
+## Initial version
+##
+##

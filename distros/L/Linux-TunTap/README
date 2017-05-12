@@ -1,0 +1,43 @@
+Linux::TunTap
+
+$Id: README,v 1.2 2004/07/15 11:22:43 abuse Exp $
+
+ABSTRACT
+========
+
+This is a module that provides the ability for a Perl script to act as
+a network device to receive and transmit raw Ethernet and/or IP
+datagrams to the Linux kernel using the tuntap device. With this, you
+can build IP tunnels and packet inspecting systems.
+
+This module is almost certainly Linux-specific. (Although since I've
+already been asked for a Mac OS X version, this might not remain the
+case.)
+
+A pair of scripts to manage the two endpoints of a DNS tunnel are
+provided, but they are very, very dirty. This module is merely just
+quite dirty (hence the very low version number.)
+
+INSTALLATION
+============
+
+a) Untar the archive
+b) cd into the directory created
+c) Makefile.PL
+d) make
+e) make install
+
+USAGE
+=====
+
+See "perldoc Linux::TunTap".
+
+COPYRIGHT
+=========
+
+Copyright (C) 2000-2004 Peter Corlett <abuse@cabal.org.uk>. All
+rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,111 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on February, 3  2002 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Using LinkController: Interfaces</TITLE>
+
+<META NAME="description" CONTENT="Using LinkController: Interfaces">
+<META NAME="keywords" CONTENT="Using LinkController: Interfaces">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC21"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC20"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_7.html#SEC22"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_7.html#SEC22"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1> 5. Interfacing to other programs </H1>
+<!--docid::SEC21::-->
+<P>
+
+Probably not all of your links are directly in web pages.  If this is
+the case, it's still possible to use LinkController to check those
+links, but it won't be possible to use the repair facilities.
+</P><P>
+
+In this case, you have to generate the list of URIs you want checked
+yourself.  This should be a file with one URI per line.  Then
+<CODE>extract-links</CODE> can be used to import those links into
+LinkControllers database.  For example, if you had put those links into
+the file <SAMP>`links'</SAMP> the following command would import them.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>extract-links --in-url-list=links
+</pre></td></tr></table></P><P>
+
+Now, when you want to report on your links you can give the links file
+as an argument to link-report and it will only report those links which
+are in your file.  This can be done with the following command
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>link-report --url-file=links
+</pre></td></tr></table></P><P>
+
+The usual options can be given to control which links are reported
+for example <SAMP>`--all-links'</SAMP> to list all links 
+(see section <A HREF="link-controller_14.html#SEC43">F.1 Invoking link-report</A>).
+</P><P>
+
+Another possibility for interfacing to programs is to use output from
+LinkController to automatically remove links from your web pages.  That
+would be a very suitable solution, for example, if you keep a list of
+links to other related pages, but don't mind if some of them disappear
+temporarily.  
+</P><P>
+
+In this case, it's probably best to use the <CODE>link-report</CODE>
+option for machine oriented output <SAMP>`--uri-report'</SAMP> and to choose
+either the <SAMP>`--broken'</SAMP> report for deleting links or the
+<SAMP>`--good'</SAMP><A NAME="DOCF3" HREF="link-controller_fot.html#FOOT3">(3)</A> option to choose which links should be shown on your
+web pages.  For example, run something like the following each night
+from your <SAMP>`.crontab'</SAMP> file.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>link-report --url-file=links --uri-report --broken \
+   | automatic-link-deleter
+</pre></td></tr></table></P><P>
+
+You should probably mail someone with the information that the link has
+been deleted so that if there's an easy way to fix it they can do that.
+</P><P>
+
+<A NAME="Emacs"></A>
+<HR SIZE="6">
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_5.html#SEC12"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_7.html#SEC22"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Michael De La Rue</I> on <I>February, 3  2002</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

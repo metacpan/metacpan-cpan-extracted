@@ -1,0 +1,56 @@
+NAME
+    Linux::Futex - Perl extension for using Futexes
+
+SYNOPSIS
+        use Linux::Futex ();
+        my $mutex_buf = "    ";
+        my $mutex = Linux::Futex::addr($mutex_buf);
+        Linux::Futex::init($mutex); # Execute once to set to zero
+        Linux::Futex::lock($mutex);
+        # do something critical
+        Linux::Futex::unlock($mutex);
+
+    Note that this examples mutex is local so wouldn't be much use for
+    inter-process. Use shared memory (eg. IPC::SharedMem) to make this work.
+
+DESCRIPTION
+    This perl module implements the high performance lightweight process
+    synchronization method using 'futexes' implemented in recent Linux
+    Kernels.
+
+  EXPORT
+    None by default.
+
+    addr()
+        Return the address of a string for use in mutex calls. Uses the same
+        format as IPC::SharedMem. Requires a string of at least 4 bytes.
+
+    init()
+        Initialize the futex with 0
+
+    lock()
+        Lock the futex. If currently locked then block until released.
+
+    unlock()
+        Unlock the futex. If not currently locked then no-op.
+
+SEE ALSO
+    The original paper on which this code is based:
+
+    *   *Futexes Are Tricky* by Ulrich Drepper (<drepper@redhat.com>),
+        (Published on Nov 5, 2011)
+
+    Some further discussion and improvements in:
+
+    *   See <http://locklessinc.com/articles/mutex_cv_futex/>
+
+AUTHOR
+    Nick Townsend, <nick.townsend@mac.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014 by Nick Townsend
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.1 or, at
+    your option, any later version of Perl 5 you may have available.
+

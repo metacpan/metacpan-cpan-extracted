@@ -1,0 +1,31 @@
+---
+abstract: 'Provide https support for LWP::UserAgent'
+author:
+  - 'Gisle Aas <gisle@activestate.com>'
+build_requires:
+  Test::More: '0'
+  Test::RequiresInternet: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-Protocol-https
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Socket::SSL: '1.54'
+  LWP::UserAgent: '6.06'
+  Mozilla::CA: '20110101'
+  Net::HTTPS: '6'
+  perl: '5.008001'
+resources:
+  MailingList: mailto:libwww@perl.org
+  repository: http://github.com/libwww-perl/lwp-protocol-https
+version: '6.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

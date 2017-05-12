@@ -1,0 +1,48 @@
+---
+abstract: "Utility functions for Graylog's GELF format."
+author:
+  - 'Adam Clarke <adamc@strategicdata.com.au>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Test::Warnings: '0.005'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-GELF-Util
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Log::GELF::Util:
+    file: lib/Log/GELF/Util.pm
+    version: '0.96'
+requires:
+  JSON::MaybeXS: '0'
+  Math::Random::MT: '0'
+  Params::Validate: '0'
+  Readonly: '2.00'
+  Sys::Hostname: '0'
+  Time::HiRes: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/strategicdata/log-gelf-util/issues
+  homepage: https://github.com/strategicdata/log-gelf-util
+  repository: git://github.com/strategicdata/log-gelf-util.git
+version: '0.96'
+x_contributors:
+  - 'Adam Clarke <adam.clarke@strategicdata.com.au>'
+  - 'Adam Clarke <adam@clarke.id.au>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

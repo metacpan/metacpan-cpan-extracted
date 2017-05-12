@@ -1,0 +1,17 @@
+MANIFEST			This list of files
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+README
+Makefile.PL
+lib/Lingua/ZH/Segment.pm
+t/0-basic.t
+t/1-utf8words.t
+t/2-big5words.t 
+META.yml                                 Module meta-data (added by MakeMaker)

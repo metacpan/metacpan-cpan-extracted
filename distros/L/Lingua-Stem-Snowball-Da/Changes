@@ -1,0 +1,21 @@
+2003-03-05  Dennis Haney  <davh@kultunaut.dk>
+
+        * Revision 1.01
+	* MORESPEEEEEED! About 50% faster
+	
+2003-03-04  Dennis Haney  <davh@kultunaut.dk>
+
+	* Revision 1.00
+	* Change from Swedish stem to Danish.
+	* Rename to Lingua::Stem::Snowball::Da
+	
+Revision history for Perl extension Lingua::Stem::Snowball::Se
+
+1.00  Fri Nov 01 2002
+  Works correctly against all the words in the diffs.txt database.
+  Changed the norwegian stemmer to a swedish one.
+  Changed the URL to the Snowball homepage.
+
+0.05  Wed Nov 28 2001
+	Initial Release.	
+

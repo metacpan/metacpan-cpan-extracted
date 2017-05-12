@@ -1,0 +1,109 @@
+NAME
+    Lingua::TFIDF - Language-independent TF-IDF calculator.
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+      use Lingua::TFIDF;
+      use Lingua::TFIDF::WordSegmenter::SplitBySpace;
+  
+      my $tf_idf_calc = Lingua::TFIDF->new(
+        # Use a word segmenter for japanese text.
+        word_segmenter => Lingua::TFIDF::WordSegmenter::SplitBySpace->new,
+      );
+  
+      my $document1 = 'Humpty Dumpty sat on a wall...';
+      my $document2 = 'Remember, remember, the fifth of November...';
+  
+      my $tf = $tf_idf_calc->tf(document => $document1);
+      # TF of word "Dumpty" in $document1.
+      say $tf->{'Dumpty'};  # 2, if you are referring same text as mine.
+  
+      my $idf = $tf_idf_calc->idf(documents => [$document1, $document2]);
+      say $idf->{'Dumpty'};  # log(2/1) ≒ 0.693147
+  
+      my $tf_idfs = $tf_idf_calc->tf_idf(documents => [$document1, $document2]);
+      # TF-IDF of word "Dumpty" in $document1.
+      say $tf_idfs->[0]{'Dumpty'};  # 2 log(2/1) ≒ 1.386294
+      # Ditto. But in $document2.
+      say $tf_idfs->[1]{'Dumpty'};  # 0
+
+DESCRIPTION
+    Quoting Wikipedia <http://en.wikipedia.org/wiki/Tf%E2%80%93idf>:
+
+      tf–idf, short for term frequency–inverse document frequency, is a numerical statistic that is intended to reflect how important a word is to a document in a collection or corpus. It is often used as a weighting factor in information retrieval and text mining.
+
+    This module provides feature for calculating TF, IDF and TF-IDF.
+
+  MOTIVATION
+    There are several TF-IDF calculator modules in CPAN already, for example
+    Text::TFIDF and Lingua::JA::TFIDF. So why I reinvent the wheel? The
+    reason is language dependency: "Text::TFIDF" assumes that words in
+    sentence are separated by spaces. This assumption is not true in most
+    east asian languages. And "Lingua::JA::TFIDF" works only on japanese
+    text.
+
+    "Lingua::TFIDF" solves this problem by separating word segmentation
+    process from word frequency counting. You can process documents written
+    in any languages, by providing appropriate word segmenter (see "CUSTOM
+    WORD SEGMENTER" below.)
+
+METHODS
+  new(word_segmenter => $segmenter)
+    Constructor. Takes 1 mandatory parameter "word_segmenter".
+
+   CUSTOM WORD SEGMENTER
+    Although this distribution bundles some language-independent word
+    segmenter, like Lingua::TFIDF::WordSegmenter::SplitBySpace, sometimes
+    language-specifiec word segmenters are more appropriate. You can pass a
+    custom word segmenter object to the calculator.
+
+    The word segmenter is a plain Perl object that implements "segment"
+    method. The method takes 1 positional argument $document, which is a
+    string or a reference to string. It is expected to return an word
+    iterator as CodeRef.
+
+    Roughly speaking, given custom word segmenter will be used like:
+
+      my $document = 'foo bar baz';
+  
+      # Can be called with a reference, like |->segment(\$document)|.
+      # Detecting data type is callee's responsibility.
+      my $iter = $word_segmenter->segment($document);
+  
+      while (defined(my $word = $iter->())) {
+         ...
+      }
+
+  idf(documents => \@documents)
+    Calculates IDFs. Result is returned as HashRef, which the keys and
+    values are words and corresponding IDFs respectively.
+
+  tf(document => $document | \$document [, normalize => 0])
+    Calculates TFs. Result is returned as HashRef, which the keys and values
+    are words and corresponding TFs respectively.
+
+    If optional parameter <normalize> is set true, the TFs are devided by
+    the number of words in the $document. It is useful when comparing TFs
+    with other documents.
+
+  tf_idf(documents => \@documents [, normalize => 0])
+    Calculates TF-IDFs. Result is returned as ArrayRef of HashRef. Each
+    HashRef contains TF-IDF values for corresponding document.
+
+SEE ALSO
+    Lingua::TFIDF::WordSegmenter::LetterNgram
+    Lingua::TFIDF::WordSegmenter::SplitBySpace
+    Lingua::TFIDF::WordSegmenter::JA::MeCab
+
+AUTHOR
+    Koichi SATOH <sekia@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by Koichi SATOH.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

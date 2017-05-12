@@ -1,0 +1,220 @@
+Revision history for Lim
+
+0.20    2015-08-26
+        - Release 0.20
+
+        BIG CHANGES:
+        - Change REST HTTP method convention, a HTTP POST is now mapped to
+          Create and HTTP PUT is mapped to Update. This affects all non-Lim
+          clients API calls.
+        - Gone with the old Module, in with the 'new' Name... for
+          Lim::Component (affects all modules).
+        - Added transport for RabbitMQ.
+        - Added support for transports for clients.
+        - Add single option to RPC collection definition.
+        - Use UTF8 in JSON since we return the tag that its in UTF8.
+        - Merge arrays in configuration instead of overwriting allowing for
+          plugin/module specific URI configurations etc.
+        - No default URI configured in agent.yaml.
+        - Object debug, RPC debug and debug logging is now default off.
+
+        Other changes:
+        - Reworked handling groups for lim-agentd, trying to get all
+          secondary groups in also. Use setsid when daemonizing the process
+          and added user/group options to lim-agentd.
+        - Fixed plugins() call in Lim::Agent::CLI.
+        - Use hosts manually if AnyEvent < 6.01.
+        - Implement resolve helper functions that can be configured to skip
+          DNS. Use them in Lim::RPC::Transport::HTTP and Lim::RPC::Client.
+        - Try to force detection of event backend for old AnyEvents (< 6.01).
+        - Lim::RPC::V() now gives the key where data is missing.
+        - Dump data on validation error in Lim::RPC::Call.
+        - Bugfix URIMaps, was not including call in map key so that same map
+          could be used with different calls resulting in wrong call.
+        - Add more debug to Lim::Util::run_cmd.
+        - Only exit on INT in lim-agentd if we are foregrounded (not daemon).
+        - Allow alpha numeric in REST calls.
+        - Fix predata in URIMaps.
+        - Add config rpc.json.pretty to configure REST and JSONRPC transports
+          to print pretty JSON.
+        - Add HTTP::Request object to Lim::RPC::Callback that all calls get
+          and add X-Lim-Base-URL header to the request so it can be used in
+          REST HATEOAS.
+        - Autoflush if foreground.
+        - Added serve() in Lim::RPC::Transport and called when serving
+          a module.
+        - Handle Connection header and keep-alive more correct.
+        - Use correct Content-Type for REST requests
+        - Debug output for loaded modules
+        - Extract user/pass information from URI and give more information to
+          the Transport for calls.
+        - Use localhost 80/443 as default values in HTTP Client Transport.
+        - Do not croak if the configuration directory isnt readable by the
+          current user.
+        - New plugin.load_all setting to load all plugins, otherwise only load
+          plugins in plugin.load.
+        - Add configuration option to specify what plugin should be served on
+          which URI.
+        - Specify URI specific transport configuration.
+        - Server can now close Transports nicely.
+        - A bit better handling of Component calls CLI, Client and Server.
+        - Better error on RPC::Server->serve when a plugin only have client
+          part installed.
+        - If there is no def and no data it should be ok.
+        - Make sure HTTP::Status code is integer.
+        - Use URI::Escape::XS if exists.
+        - Fix maximum request length check for HTTP.
+        - Fix Lim::Error::toString() return and Lim::Error handling of message.
+        - Do not start unless we got URIs.
+        - RabbitMQ transport will now re-resolve/connect on failure.
+        - Correct URI::Escape::XS/URI::Escape use to prevent redefined
+          warnings.
+        - Use auto_delete for RabbitMQ exchanges and channels instead of
+          trying to cleanup that ourselves. This prevents one lim-agentd
+          to prematurely end exchanges and channels that others might use.
+        - Reopen RabbitMQ channels if they are cancels outside our control.
+        - Weaken logger object in all classes to hopefully prevent weird
+          situations where logger still exists in global destruction
+          (Log4perl: Seems like no initialization happened.).
+        - Use class as category for all logger to enable better filtering.
+
+0.20_07 2015-08-10
+        - Release 0.20 candidate 07
+
+        Changes:
+        - Weaken logger object in all classes to hopefully prevent weird
+          situations where logger still exists in global destruction
+          (Log4perl: Seems like no initialization happened.).
+        - Use class as category for all logger to enable better filtering.
+
+0.20_06 2015-08-07
+        - Release 0.20 candidate 06
+
+        Changes:
+        - Reopen RabbitMQ channels if they are cancels outside our control.
+
+0.20_05 2015-08-06
+        - Release 0.20 candidate 05
+
+        Changes:
+        - Use auto_delete for RabbitMQ exchanges and channels instead of
+          trying to cleanup that ourselves. This prevents one lim-agentd
+          to prematurely end exchanges and channels that others might use.
+
+0.20_04 2015-07-30
+        - Release 0.20 candidate 04
+
+        Changes:
+        - Correct URI::Escape::XS/URI::Escape use to prevent redefined
+          warnings.
+
+0.20_03 2015-07-30
+        - Release 0.20 candidate 03
+
+        Changes:
+        - Do not start unless we got URIs.
+        - RabbitMQ transport will now re-resolve/connect on failure.
+
+0.20_02 2015-07-30
+        - Release 0.20 candidate 02
+
+        BIG CHANGES:
+        - Merge arrays in configuration instead of overwriting allowing for
+          plugin/module specific URI configurations etc.
+        - No default URI configured in agent.yaml.
+        - Object debug, RPC debug and debug logging is now default off.
+
+0.20_01 2015-07-28
+        - Release 0.20 candidate 01
+
+        BIG CHANGES:
+        - Change REST HTTP method convention, a HTTP POST is now mapped to
+          Create and HTTP PUT is mapped to Update. This affects all non-Lim
+          clients API calls.
+        - Gone with the old Module, in with the 'new' Name... for
+          Lim::Component (affects all modules).
+        - Added transport for RabbitMQ.
+        - Added support for transports for clients.
+        - Add single option to RPC collection definition.
+        - Use UTF8 in JSON since we return the tag that its in UTF8.
+
+        Other changes:
+        - Reworked handling groups for lim-agentd, trying to get all
+          secondary groups in also. Use setsid when daemonizing the process
+          and added user/group options to lim-agentd.
+        - Fixed plugins() call in Lim::Agent::CLI.
+        - Use hosts manually if AnyEvent < 6.01.
+        - Implement resolve helper functions that can be configured to skip
+          DNS. Use them in Lim::RPC::Transport::HTTP and Lim::RPC::Client.
+        - Try to force detection of event backend for old AnyEvents (< 6.01).
+        - Lim::RPC::V() now gives the key where data is missing.
+        - Dump data on validation error in Lim::RPC::Call.
+        - Bugfix URIMaps, was not including call in map key so that same map
+          could be used with different calls resulting in wrong call.
+        - Add more debug to Lim::Util::run_cmd.
+        - Only exit on INT in lim-agentd if we are foregrounded (not daemon).
+        - Allow alpha numeric in REST calls.
+        - Fix predata in URIMaps.
+        - Add config rpc.json.pretty to configure REST and JSONRPC transports
+          to print pretty JSON.
+        - Add HTTP::Request object to Lim::RPC::Callback that all calls get
+          and add X-Lim-Base-URL header to the request so it can be used in
+          REST HATEOAS.
+        - Autoflush if foreground.
+        - Added serve() in Lim::RPC::Transport and called when serving
+          a module.
+        - Handle Connection header and keep-alive more correct.
+        - Use correct Content-Type for REST requests
+        - Debug output for loaded modules
+        - Extract user/pass information from URI and give more information to
+          the Transport for calls.
+        - Use localhost 80/443 as default values in HTTP Client Transport.
+        - Do not croak if the configuration directory isnt readable by the
+          current user.
+        - New plugin.load_all setting to load all plugins, otherwise only load
+          plugins in plugin.load.
+        - Add configuration option to specify what plugin should be served on
+          which URI.
+        - Specify URI specific transport configuration.
+        - Server can now close Transports nicely.
+        - A bit better handling of Component calls CLI, Client and Server.
+        - Better error on RPC::Server->serve when a plugin only have client
+          part installed.
+        - If there is no def and no data it should be ok.
+        - Make sure HTTP::Status code is integer.
+        - Use URI::Escape::XS if exists.
+        - Fix maximum request length check for HTTP.
+        - Fix Lim::Error::toString() return and Lim::Error handling of message.
+
+0.19    2013-09-02
+        - Release 0.19
+        - New module Lim::Util::DBI - Create a DBH that is executed in a forked
+          process.
+
+0.18    2013-08-23
+        - Release 0.18
+        - Make a bootstrap sub in the Client class of Lim::Component's to detect
+          if they are already bootstrapped so we don't do it for each new Client
+          object.
+        - Add runtime options to lim-agentd to start as another user/group
+        - Add API to Lim::RPC::Server so you can get the transports and to the
+          Lim::RPC::Transport so you can get the host/port listened to.
+        - Change test to use dynamic ports
+
+0.17    2013-08-12
+        - Release 0.17
+
+0.16    2013-08-07
+        - Release 0.16
+
+0.15    2013-08-04
+        - Release 0.15
+
+0.14    2013-08-02
+        - Release 0.14
+
+0.13    2013-04-15
+        - Release 0.13
+
+0.12    2012-08-03
+        - Release 0.12

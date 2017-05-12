@@ -1,0 +1,21 @@
+Log-Any-Adapter-Fille
+
+Adapter Log::Any::Adapter::Fille is intended for logging messages to the
+file. Behavior of this adapter resembles simple built-in adapter behavior
+Log::Any::Adapter::File, but differs from it in several details:
+
+- Adapter Fille registers logs in advanced format
+  <date> <time> <PID> <log_level> <message>
+
+- Adapter Fille correctly processes messages containing wide character
+
+- and other minor differences (see POD)
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2015 Mikhail Ivanov
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+See http://dev.perl.org/licenses for more information.

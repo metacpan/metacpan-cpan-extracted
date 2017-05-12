@@ -1,0 +1,66 @@
+NAME
+    Log::Log4perl::Warn::Multiple::EasyInit - trap multiple calls to
+    Log::Log4perl::easy_init
+
+VERSION
+    version 0.0.1
+
+SYNOPSIS
+      BEGIN {
+        use Log::Log4perl::Warn::Multiple::EasyInit;
+      }
+
+DESCRIPTION
+    Have you ever found yourself scratching your head wondering why your
+    Log::Log4perl output isn't going to the file(s) you expected?
+
+    Often the culprit is a call to "easy_init()" somewhere in the landscape
+    of modules being used.
+
+    You could grep-hunt for the causes, or you could get your scripts and
+    modules to keep an eye out for you.
+
+EXPERIMENTAL
+    This module is experimental, and possible jsut mental
+
+EXAMPLE
+  foo/multiple_init.pl
+    This script uses the test libraries for the module:
+
+        #!/usr/bin/env perl
+        use strict;
+        use warnings;
+        use FindBin::libs;
+        use lib "${FindBin::Bin}/../t/lib";
+    
+        BEGIN {
+            use Log::Log4perl::Warn::Multiple::EasyInit;
+        }
+    
+        use foo;
+        use bar;
+        use baz;
+        use quux;
+
+  Script Output
+    Slightly reformatted for readability:
+
+        Log::Log4perl already initialised with easy_init()
+          [at /tmp/example/script/../t/lib/foo.pm, line 6]
+            at /tmp/example/script/../t/lib/bar.pm line 6
+        Log::Log4perl already initialised with easy_init()
+          [at /tmp/example/script/../t/lib/foo.pm, line 6]
+            at /tmp/example/script/../t/lib/quux.pm line 6
+        Log::Log4perl already initialised with easy_init()
+          [at /tmp/example/script/../t/lib/foo.pm, line 6]
+            at /tmp/example/script/../t/lib/baz.pm line 8
+
+AUTHOR
+    Chisel Wright <chisel@chizography.net>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chisel Wright.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

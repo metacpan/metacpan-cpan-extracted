@@ -1,0 +1,15 @@
+blib*
+Makefile
+Makefile.old
+Build
+Build.bat
+_build*
+pm_to_blib*
+*.tar.gz
+.lwpcookies
+.appveyor.yml
+.travis.yml
+cover_db
+pod2htm*.tmp
+Log-WarnDie-*
+t/online.enabled

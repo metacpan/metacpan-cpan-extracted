@@ -1,0 +1,68 @@
+#!/usr/bin/perl -w
+use strict;
+use base 'LEOCHARRE::CLI';
+use Cwd;
+
+my $abs_t = Cwd::abs_path($ARGV[0]) or die('no arg or cant resolve, arg must be abs path to test file you want to create');
+
+$abs_t=~/(.+\/t)\/[^\/]+\.t$/ or die('arg must be test file destination ending in .t');
+
+my $abs_d = $1;
+
+die("test dir $abs_d does not exist") unless -d $abs_d;
+
+die("test file $abs_t already exists") if -f $abs_t;
+
+
+
+my $data = <<'___TDATA___';
+use Test::Simple 'no_plan';
+use strict;
+use lib './lib';
+use warnings;
+use constant DEBUG => 1;
+
+print STDERR " - $0 started\n" if DEBUG;
+
+ok(1);
+
+
+print STDERR " - $0 ended\n" if DEBUG;
+
+___TDATA___
+
+
+open(FILE,'>',$abs_t) or die($!);
+print FILE $data;
+close FILE;
+
+print STDERR "Test file $abs_t created.\n";
+
+
+
+=pod
+
+=head1 NAME
+
+pmtestmake - make blank perl test t file
+
+=head1 DESCRIPTION
+
+Will not overrite existing test.
+Test t dir must exist.
+
+=head1 USAGE EXAMPLES
+
+   pmtestmake ./t/14.t
+
+   pmtestmake /home/me/dev/mod/t/12.t
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 SEE ALSO
+
+LEOCHARRE::CLI
+LEOCHARRE::Dev
+

@@ -1,0 +1,106 @@
+Revision history for Perl extension Lingua::EN::Tagger
+
+0.28            Aaron Coburn            12/23/16
+        Changed the generation of the part-of-speech
+        lexicon to use nstore instead of store. Based on a
+        contribution from Chris Butler <chrisb@debian.org>
+        and Reiner Herrmann <reiner@reiner-h.de>.
+
+0.27            Aaron Coburn            12/20/16
+        Fixed unescaped left braces in Makefile.PL
+
+0.25            Aaron Coburn            4/3/15
+        Fixed floating point number regex.
+
+0.24            Aaron Coburn            7/22/13
+        Fixed a typo in the documentation.
+
+0.23            Aaron Coburn            10/1/12
+        Fixed errors in threads tests.
+
+0.21            Aaron Coburn            9/27/12
+        Escaped some more curly braces in regex
+        patterns (see below). Made memoize module
+        support threads.
+
+0.20            Aaron Coburn            7/6/12
+        Escaped curly braces in regex patterns.
+        In perl 5.17 this becomes necessary.
+
+0.19            Aaron Coburn            5/28/12
+        Added missing metadata fields to
+        Makefile.PL
+
+0.18            Aaron Coburn            5/11/12
+        Added requirement for 5.8 for proper
+        unicode support. Modified get_sentences
+        routine for $ chars as with preceeding
+        issue.
+
+0.17            Aaron Coburn            5/10/12
+        Added better error handling for loading
+        YAML files. Fixed error in get_sentences
+        routine related to (, [ and { characters
+        being fused to the preceding word.
+
+0.16            Aaron Coburn            5/11/10
+        Fixed POD errors
+
+0.14			Aaron Coburn			7/28/08
+		Upgraded license to GPL 3
+
+0.13            Aaron Coburn            6/29/05
+
+        Added 'get_sentences' method
+
+0.12            Aaron Coburn            3/39/05
+
+        Fixed a bug introduced in the parsing of utf8 text
+
+0.11            Aaron Coburn            11/15/04
+
+        Improved Unicode support thanks to the contributions from
+        Eric Nichols <eric-n@is.naist.jp>, Nara Institute of 
+        Science and Technology
+
+0.10            Aaron Coburn            4/27/04
+
+        Fixed some errors in the POD documentation
+
+0.09            Aaron Coburn            2/04/04
+
+        Improved the splitting on punctuation
+
+0.06            Aaron Coburn            12/18/03
+
+        Improved recognition of an end of sentence
+        
+
+0.05            Aaron Coburn            12/09/03
+        
+        Added method ``get_proper_nouns''
+        Eliminated use of Lingua::EN::Sentence
+        
+
+0.04            Aaron Coburn            12/08/03
+
+        Applied fixes to unknown word assignment
+
+
+0.03            Aaron Coburn            11/03
+
+        Fixed some errors in the text scrubbing methods
+        Shortened and moved lexicon, made things run faster
+        Added a testing suite
+
+
+0.02            Maciej Ceglowski        5/03
+
+        Applied fixes for module installer from Nathaniel Irons
+
+
+0.01            Maciej Ceglowski        2/03
+
+        Initial Release for CPAN
+        Re-written from Aaron Coburn's LSI::Parser::POS 
+

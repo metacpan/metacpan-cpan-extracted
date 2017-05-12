@@ -1,0 +1,38 @@
+---
+abstract: 'Creates a temporary file using O_TMPFILE'
+author:
+  - 'Jiro Nishiguchi <jiro@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-TempFile
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+    - vendor
+provides:
+  Linux::TempFile:
+    file: lib/Linux/TempFile.pm
+    version: '0.02'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/spiritloose/Linux-TempFile/issues
+  homepage: https://github.com/spiritloose/Linux-TempFile
+  repository: git://github.com/spiritloose/Linux-TempFile.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

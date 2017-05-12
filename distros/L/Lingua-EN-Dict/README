@@ -1,0 +1,98 @@
+Greets Perlfolk,
+
+This is:
+	
+Lingua::EN::Dict - BETA Version of XML english dictionary storage.	           
+
+**SYNOPSIS:
+
+	use Lingua::EN::Dict;
+	
+	my $dict = Lingua::EN::Dict->new('words.xml');
+	my $part_of_speech = $dict->type('abash');
+	my $verb_tense = $dict->tense('zoomed');
+	my $flag1 = $dict->is_verb('utilizes');
+	my $flag2 = $dict->is_verb('utilized');
+	my $flag3 = $dict->is_verb('utilizing');
+	my @synonyms = $dict->syns('dictate');
+	my @antonyms = $dict->opps('valid');
+	my $defenition = $dict->defn('vindicate');
+	
+	undef $dict;
+	$dict = Lingua::EN::Dict->new(
+		server		=>	e.tdcj.com
+		port		=>	7778,
+	}
+	# defaults to local file 'words.xml' if it 
+	# cannot reach server.
+	# everything in first paragraph works here too
+	
+	undef $dict;
+	$dict = Lingua::EN::Dict->new(
+		server		=>	localhost
+		port		=>	7778,
+	}
+	# everything in first paragraph works here too
+	
+	undef $dict;
+	$dict = Lingua::EN::Dict->new;
+    # same as above consructor, defaults to local file
+    # 'words.xml' if it cannot reach server.
+	# everything in first paragraph works here too
+	
+**DESCRIPTION
+
+Note: BETA VERSION.                 
+
+This is a small module I came up with to use as a storage format for
+my humble attempt at a natural language parser (or a subset of natural
+language - english that is). This is a seperate module that stores
+the words in an xml-format file. With the distribution file, you 
+should have received an XML file called 'words.xml' that contains almost
+3000 words consiting of several hundred verbs (not counting the seperate
+forms of each of the verbs), as well as several hundred nouns, and 
+adjectives, articles, and modals. This module was created for the 
+storage and retrieval of words from the XML file. 
+
+The main reason for the beta relerase of this module is this: I would 
+like any and all feedback on the TCP server setup that I have added 
+to this module.
+
+I often got fed-up with having to wait 20 - 40 seconds for the new() 
+constructor to load and parse the entire 590k of words just to run a 
+simple 2 line test script. And since I like to tweek and run, tweek 
+and run (the life of a Perl programmer, eh? :-), it was really annoying 
+to have to wait 30 seconds for each test to run, when the actual test 
+script took less than 50ms to run.  Sooooo... I added a simple TCP transfer
+setup for the dictionary.
+
+To invovke a server process for the dictionary, simply use this one-liner:
+
+% perl -MLingua::EN::Dict -e daemon
+
+daemon() is a function automatically exported by this module for just this 
+purpose. It binds a TCP server to port 7778, accepting input from any IP 
+address and loads the file 'words.xml' into a dictionary object for 
+serving. 
+
+To create a client for this server, simply use:
+
+	my $dict = new Lingua::EN::Dict;
+
+This automatically tries to connect to the server on port 7778 of '
+localhost'. If it cannot connect to the server, it emits a warning 
+and proceeds to try to load the default file 'words.xml'.
+
+The reason I released this beta version was to get input from those of 
+you who might have some idea of how to make sure I don't leave any 
+security holes in the TCP server portion. 
+
+**LATEST VERSION
+
+You can always download the latest copy of Lingua::EN::Dict
+from http://www.josiah.countystart.com/modules/get.pl?dict:README
+
+**AUTHOR
+
+Josiah Bryan, jdb@wcoil.com
+

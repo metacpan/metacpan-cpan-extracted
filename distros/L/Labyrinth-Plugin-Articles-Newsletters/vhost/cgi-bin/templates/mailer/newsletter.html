@@ -1,0 +1,19 @@
+<html>
+<head>
+<link rel="stylesheet" href="[% docroot _ '/' _ webpath %]/css/newsletter.css" type="text/css" />
+</head>
+<body>
+<div id="centre">
+<div class="blocker">
+<div id="prepare">
+<h2>[% article.data.title %]</h2>
+[% block = article.body %]
+[% INCLUDE "articles/arts-block.html" %]
+</div>
+</div>
+</div>
+
+<p>To see this newsletter within the [% iname %] website, please <a href="[% docroot _ '/' _ webpath %]/zine/item/[% artricle.data.articleid %]">click here</a>.</p>
+<p>To unsubscribe from this newsletter, please <a href="[% docroot _ '/' _ webpath %]/zine/unsubscribe?email=[% email %]">click here</a>.</p>
+</body>
+</html>

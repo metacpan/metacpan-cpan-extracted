@@ -1,0 +1,118 @@
+=pod
+
+=head1 NAME
+
+Linux::Sysfs::ClassDevice - sysfs class devices
+
+=head1 SYNOPSIS
+
+    my $classdev = Linux::Sysfs::ClassDevice->open($name);
+
+	my $parent = $classdev->get_parent;
+	my $device = $classdev->get_device;
+
+    $classdev->close;
+
+=head1 DESCRIPTION
+
+Libsysfs provides functions to open sysfs class devices.
+
+=head1 METHODS
+
+=over
+
+=item B<open>
+
+    my $classdev = Linux::Sysfs::ClassDevice->open($name);
+
+Given the C<$name> of the class on which to look for, this method locates a
+given class device and returns a Linux::Sysfs::ClassDevice instance
+corresponding to the requested class device.
+
+=item B<open_path>
+
+    my $classdev = Linux::Sysfs::ClassDevice->open_path($path);
+
+Given the C<$path> to the class device file, this method opens up one of the
+class devices represented in C</sys/class/$class>. It returns a
+Linux::Sysfs::ClassDevice instance on success or undef on failure.
+
+=item B<close>
+
+    $classdev->close;
+
+Closes up the class device.
+
+=item B<get_parent>
+
+    my $parent = $classdev->get_parent;
+
+Returns a Linux::Sysfs::ClassDevice instance for the parent of the given class device.
+
+=item B<get_attr>
+
+=item B<get_attribute>
+
+    my $attr = $classdev->get_attribute($name);
+
+Searches supplied class device's attributes by C<$name> and returns the
+Linux::Sysfs::Attribute instance for it.
+
+=item B<get_attrs>
+
+=item B<get_attributes>
+
+    my @attrs = $classdev->get_attributes;
+
+Returns a list of Linux::Sysfs::Attribute instances for the given class device.
+
+=item B<get_device>
+
+    my $device = $classdev->get_device;
+
+Returns the Linux::Sysfs::Device instance (if present) for the given class device.
+
+=item B<name>
+
+    my $name = $classdev->name;
+
+Returns the class device's name.
+
+=item B<path>
+
+    my $path = $classdev->path;
+
+Returns the full path to the class device in sysfs.
+
+=item B<classname>
+
+    my $path = $classdev->classname;
+
+Returns the name of the class C<$classdev> belongs to.
+
+=back
+
+=head1 AUTHOR
+
+Florian Ragwitz E<lt>rafl@debian.orgE<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Florian Ragwitz, all rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Library General Public License as published
+by the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307
+USA.
+
+=cut

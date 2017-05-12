@@ -1,0 +1,273 @@
+#!/usr/bin/perl -w -s
+use Data::Dumper;
+use analiza;
+use strict;
+use locale;
+use Lingua::PT::PLN;
+use Lingua::PT::PLN::tokenizer;
+my $tab = $Lingua::PT::PLN::tokenizer::tab;
+use jspell;
+
+our ($nopn);
+
+jspell_dict("port");
+
+my %savit_p;
+my $savit_n;
+my %reap = ();
+my %subs = ();
+my $i=0;
+my $r;
+my $wp='\w+(?:-\w+)*';  #pattern for word
+my %validas;
+
+if($nopn){open(F,">output1") or die;
+  while(<>){print F $_}
+  close F;
+}
+else {tagPN("output1"); }
+
+open( I, "output1") or die;
+open( X, "|jspell -d port -W 0 -J -g -a -w \"'\"> output2") or die;
+
+while(<I>) {
+  for my $rule (@$tab) {
+     s{(^|\s|\b|["'«»])($rule->[0])}{ $1 . sav("$2","lex($2,$rule->[1])") }ge
+  }
+
+  print X tokenize($_);
+}
+
+close I;
+close X;
+
+
+
+open(X,"output2") or die;
+while(<X>){
+  s{\&\s+(.*?) 0 :}{procDesc($1)}ge;
+  s{\*\s+(.*?) 0 :}{$1	}g;
+  s{#n(\d+)}{$subs{$1} || "???$1"}eg;
+  print;
+}
+close X;
+
+
+
+sub procDesc{
+  my $p = shift ;
+  my @as = feaWithNewFlags($p);
+  if(@as) {
+      "$p\t".join(",", map {any2lex($_,$_->{rad})} @as);
+  } else {
+    my @an = analiza::analiza($p);
+    if (@an) {
+      "$p\t".join(",", map {any2lex($_,$_->{rad})} @an);
+    } else {
+      "$p\tNOK";
+    }
+  }
+}
+
+sub tokenize{
+  my $abrev = join '|', qw( srt?a? dra? [A-Z] etc exa? jr profs? arq av estr?
+			  et al vol eng tv lgo pr Oliv ig mrs? min rep );
+  my $protect = '
+       \#n\d+
+    | \w+\'\w+
+    | \w+-\w+
+    |  [\w_.-]+ \@ [\w_.-]+                      # emails
+    |  \w+\.[ºª]                                 # ordinals
+    |  <[^>]*>                                   # marcup XML SGML
+    |  \d+(?:\.\d+)+                             # numbers
+    |  \d+\:\d+                                  # the time
+    |  ((https?|ftp|gopher)://|www)[\w_./~-]+    # urls
+';
+  my $conf = { rs => "\n" };
+  my $text = shift;
+  if (ref($text) eq "HASH") {
+    $conf = { %$conf, %$text};
+    $text = shift;
+  }
+  my $result = "";
+  local $/ = ">";
+  my %tag=();
+  my ($a,$b);
+  for ($text) {
+    if(/<(\w+)(.*?)>/)
+      { ($a, $b) = ($1,$2);
+	if ($b =~ /=/ )  { $tag{'v'}{$a}++ }
+	else             { $tag{'s'}{$a}++ }
+      }
+    s/<\?xml.*?\?>//s;
+    s/(.)\n-\n/$1-/g;
+    s/($protect)/savit($1)/xge;
+    s/([\»\]])/$1 /g;
+    s#([\«\[])# $1#g;
+    s#\"# \" #g;
+    s/(\s*\b\s*|\s+)/\n/g;
+    s/\n+/\n/g;
+    s/\n(\.?[ºª])\b/$1/g;
+    while ( s#\b([0-9]+)\n([\,.])\n([0-9]+\n)#$1$2$3#g ){};
+    s#\n($abrev)\n\.\n#\n$1\.\n#ig;
+    s/\n*</\n</;
+    $_ = loadit($_);
+    s/(\s*\n)+$/\n/;
+    s/^(\s*\n)+//;
+    $result.=$_;
+  }
+
+  $result =~ s/\n/$conf->{rs}/g;
+
+  $result;
+}
+
+sub savit{
+  my $a=shift;
+  $savit_p{++$savit_n}=$a ;
+  " __MARCA__$savit_n "
+}
+
+sub loadit{
+  my $a = shift;
+  $a =~ s/ ?__MARCA__(\d+) ?/$savit_p{$1}/g;
+  $savit_n = 0;
+  $a;
+}
+
+sub tagPN{
+ my $out = shift || "output1";
+ forPN( {t => "double", out => $out } ,
+   sub {my ($p, $contex)=@_;
+      if($p =~ m/($wp)\b(\s*)(.*)/) {
+        my ($a,$b,$c)=($1,$2,$3);
+        if (vazia($a)){ if($c) { "$a$b". savPN($c, "lex($c, [CAT=np, unknown=guessed])") }
+                        else   { $p } }
+        else { savPN($p,"lex($p, [CAT=np,unknown=guessed])") }
+      }
+      else { $p }
+   },
+   sub {my ($p, $contex)=@_;
+      if($p =~ m/($wp)\b(\s*)(.*)/) {
+        my ($a,$b,$c)=($1,$2,$3);
+        if (!possibleNP($a)){ 
+            if($c) { "$a$b".savPN( $c ,"lex($c, [CAT=np,unknown=guessed])") }
+            else   { $p } }
+        else { savPN($p,"lex($p, [CAT=np,unknown=guessed])") }
+      }
+      else { $p }
+   } 
+ );
+}
+
+sub savPN{
+ my ($k,$inf)=@_;
+ my $r = "UNDEF";
+ my @a ;
+ if($k =~ /^($wp)/) {
+     my $x = $1;
+     @a = fea($x);
+     my $fs = +{ onethat({CAT=>"np"},@a) };
+     if(defined $fs->{CAT}) { 
+        delete $fs->{rad};
+	$fs->{unknown}="guessed" if length($k) != length($x);
+        $r = any2lex( $fs, $k);  
+     }
+     else{
+        $fs = +{ onethat({CAT=>"nc"},@a) };
+        if(defined $fs->{CAT}) { 
+	    $fs->{unknown}="guessed";
+            delete $fs->{rad};
+            $fs = { CAT=> "np",
+                    (defined $fs->{G}) ? (G => $fs->{G}) : (),
+                    (defined $fs->{N}) ? (N => $fs->{N}) : ()};
+            $r=any2lex( $fs, $k) ;  }
+        else { $r = any2lex($inf,$k) }
+     } 
+ }
+ else {  $r=any2lex($inf,$k)}
+ sav( $k,$r) 
+}
+
+sub any2lex{
+  my $x = shift;
+  my $o = shift||" ";
+  my $aux= any2str($x,"compact");
+  $aux =~ s/\{(.*?)\}/lex($o,[$1])/g;
+  $aux
+}
+
+sub sav {
+    my ($k,$inf)=@_;
+    if (exists($reap{$k})) { "#n$reap{$k}" } 
+ else                   { $subs{$i}="$k\t$inf";
+                          $reap{$k}=$i;
+                          $r="#n$i";
+                          $i++;
+                          $r }
+}
+
+sub possibleNP{
+  my $w = shift; 
+  !(rad($w)) or (ok({CAT=>"np"},fea($w))) }
+
+sub vazia{
+ my $w = shift;
+ my $CATs= join(" ",map {$_->{CAT}||""} fea($w));
+ return ( $CATs =~ m!\b(adv|p|art|con|cp)!)?1:0
+}
+
+
+sub feaWithNewFlags{
+  my $w = shift;
+  setmode("+flags");
+  setmode("+af");
+  setmode("+nm");
+  my @fs=fea($w);
+  #  print Dumper(\@fs);
+  my @r =  map { validaCatFlag($_)? ($_): () } @fs;
+}
+
+sub validaCatFlag{
+  my $f=shift;
+  my $flag=$f->{flags};
+  my @fs=fea($f->{rad});
+  #  print Dumper(\@fs);
+  my @comp = map { (defined($_->{CAT}) && $validas{$flag}{$_->{CAT}})
+                   ? (1) : () } @fs ;
+  scalar(@comp)
+}
+
+BEGIN{
+%validas=( 
+            'A' => { adj => 1 , a_nc => 1,},
+            'd' => { adj => 1 , a_nc => 1,},
+            'f' => { adj => 1 , a_nc => 1,},
+            'j' => { adj => 1 , a_nc => 1,},
+            'm' => { adj => 1 , a_nc => 1,},
+            's' => { adj => 1 , a_nc => 1,},
+            'U' => { adj => 1 , a_nc => 1,},
+            'F' => { adj => 1 , a_nc => 1,},
+            'I' => { adj => 1 , a_nc => 1,},
+            'T' => { adj => 1 , a_nc => 1,},
+            'U' => { adj => 1 , a_nc => 1,},
+            'a' => { nc =>1, adj => 1 , a_nc => 1,},
+            'h' => { nc =>1, adj => 1 , a_nc => 1,},
+            'p' => { nc =>1, adj => 1 , a_nc => 1,},
+            'i' => { nc =>1, a_nc => 1,},
+            't' => { nc =>1, a_nc => 1,},
+            'u' => { nc =>1, a_nc => 1,},
+            'w' => { nc =>1, a_nc => 1,},
+            'y' => { nc =>1, a_nc => 1,},
+            'C' => { v => 1 },
+            'c' => { v => 1 },
+            'D' => { v => 1 },
+            'M' => { v => 1 },
+            'n' => { v => 1 },
+            'o' => { v => 1 },
+            'v' => { v => 1 },
+            'L' => { v => 1 },
+            'P' => { v => 1 },
+            'G' => { nc => 1, adj => 1 , a_nc => 1,},
+          );
+}

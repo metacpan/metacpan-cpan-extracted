@@ -1,0 +1,31 @@
+[% 
+    title = 'Releases: ' _ [% release.data.title %];
+    htmltitle = title ;
+
+    crumb4_name = 'Home' ;
+    crumb4_href = '/' ;
+    crumb3_name = 'Releases' ;
+    crumb3_href = '/release-list' ;
+    crumb2_name = [% release.data.title %] ;
+    crumb2_href = '/release-item/' _ [% release.data.articleid %];
+    crumb1_name = 'Profiles' ;
+%]
+
+<table class="profile">
+<tr>
+	<th><a href="/release/item?name=[% release.data.quickname %]">[% release.data.title %]</a></th>
+	<th align="right">[% release.data.snippet %]</th>
+</tr>
+<tr><td>
+	<p>Without Whom:</p>
+	<ul>[% FOREACH profile = release.profiles %]<li><a href="#[% profile.data.data.quickname %]">[% profile.title %]</a> ([% profile.type %])</li>[% END %]</ul>
+	</td>
+	<td><img src="[% webpath %]/[% release.data.link %]" alt="[% item.data.tag %]" width="200" align="right" /></td>
+</tr>
+</table>
+
+[% FOREACH person = profiles %]
+[% profile = person.data %]
+<a name="[% profile.data.quickname %]">&nbsp;</a>
+	[% INCLUDE "who/who-block.html" %]
+[% END %]

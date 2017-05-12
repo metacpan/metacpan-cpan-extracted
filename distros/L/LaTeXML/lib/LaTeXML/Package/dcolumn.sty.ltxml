@@ -1,0 +1,62 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  dcolumn                                                            | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+RequirePackage('array');
+
+sub absorbedString {
+  my ($tokens) = @_;
+  my $capdocument = LaTeXML::Core::Document->new($STATE->getModel);
+  my $capture = $capdocument->openElement('ltx:_Capture_', font => LaTeXML::Common::Font->new());
+  $capdocument->absorb(Digest($tokens));
+  if (my @nodes = $capdocument->findnodes("//ltx:XMath/*", $capture)) {
+    return $nodes[0]->textContent; }
+  else {
+    return $capture->textContent; } }    # ???
+
+DefMacro('\lx@unactivate DefToken', sub {
+    my ($gullet, $delim) = @_;
+    $STATE->assignMathcode(ToString($delim) => undef); });
+
+DefMacro('\DC@{}{}{}', sub {
+    my ($gullet, $delim, $todelim, $ndec) = @_;
+    $delim = ToString($delim);
+    if ($delim ne ToString($todelim)) {
+      $STATE->assignMathcode($delim => 0x8000);
+      DefMacroI(T_CS($delim), undef, '\@hidden@bgroup\lx@unactivate{' . $delim . '}\ROLE{PERIOD}{' . UnTeX($todelim) . '}\@hidden@egroup');
+    }
+    if (LookupValue('IN_MATH') || $gullet->ifNext(T_MATH)) {    # Not really good enough, but...
+      (); }
+    else {
+      Let('\DC@end', T_MATH);
+      (T_MATH); } });
+# NOTE: We should be making arrangements for this funny thing to still
+# be considered a number!
+
+DefMacro('\DC@end', '');
+
+DefColumnType('D{}{}{}', sub {
+    my ($gullet, $delim, $todelim, $ndec) = @_;
+    my $alignment = absorbedString(Tokens(T_CS('\ensuremath'), T_BEGIN, $todelim, T_END));
+    $LaTeXML::BUILD_TEMPLATE->addColumn(before => Tokens(T_CS('\DC@'),
+        T_BEGIN, $delim->unlist,   T_END,
+        T_BEGIN, $todelim->unlist, T_END,
+        T_BEGIN, $ndec->unlist,    T_END),
+      align => 'char:' . $alignment,
+      after => Tokens(T_CS('\DC@end')));
+    return; });
+
+1;

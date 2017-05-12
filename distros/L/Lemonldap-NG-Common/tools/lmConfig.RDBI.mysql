@@ -1,0 +1,6 @@
+CREATE TABLE lmConfig (
+	cfgNum int(11) NOT NULL,
+	field varchar(255) NOT NULL DEFAULT '',
+	value longblob,
+	PRIMARY KEY (cfgNum,field)
+	);

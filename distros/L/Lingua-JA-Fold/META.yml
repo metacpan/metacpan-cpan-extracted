@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Lingua-JA-Fold
+version:             0.08
+abstract:            To fold a Japanese text.
+license:             ~
+author:              
+    - Masanori HATA <http://www.mihr.net/>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          1.01
+    Encode:                        1.98
+    Exporter:                      5.567
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

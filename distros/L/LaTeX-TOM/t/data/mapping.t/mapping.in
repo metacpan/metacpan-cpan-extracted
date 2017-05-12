@@ -1,0 +1,6 @@
+\documentclass[10pt]{article}
+\begin{document}
+\begin{center}
+foo {\bf bar} baz
+\end{center}
+\end{document}

@@ -1,0 +1,8 @@
+Dear [% name %],
+
+This newseltter is in HTML format. If you are reading this, it is likely your mail client does not support HTML emails. If you wish to see the full newsletter in your browser, please go to [% docroot _ '/' _ webpath %]/zine/item/[% artricle.data.articleid %].
+
+To unsubscribe from this newsletter, please use the following link: [% docroot _ '/' _ webpath %]/zine/unsubscribe?email=[% email %].
+
+Thanks,
+[% iname %]

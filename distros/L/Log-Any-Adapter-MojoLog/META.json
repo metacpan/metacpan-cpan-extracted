@@ -1,0 +1,54 @@
+{
+   "abstract" : "Log::Any integration for Mojo::Log",
+   "author" : [
+      "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.009",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Any-Adapter-MojoLog",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.007"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.009"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Any" : "0.14",
+            "Log::Any::Adapter" : "0.07",
+            "Mojolicious" : "2.15"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Any::Adapter::MojoLog" : {
+         "file" : "lib/Log/Any/Adapter/MojoLog.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Log-Any-Adapter-MojoLog/issues"
+      },
+      "license" : [
+         "https://opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Log-Any-Adapter-MojoLog"
+      }
+   },
+   "version" : "0.02"
+}

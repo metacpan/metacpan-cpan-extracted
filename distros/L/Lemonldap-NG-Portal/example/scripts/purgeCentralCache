@@ -1,0 +1,234 @@
+#!/usr/bin/perl
+#=============================================================================
+# Cleaner for LemonLDAP::NG: removes old sessions from Apache::Session
+#
+# This module is written to be used by cron to clean old sessions from
+# Apache::Session. It does not works with Apache::Session::Memcached
+#
+# This is part of LemonLDAP::NG product, released under GPL
+#=============================================================================
+
+use Lemonldap::NG::Common::Conf;
+use Lemonldap::NG::Common::Conf::Constants;
+use Lemonldap::NG::Common::Apache::Session;
+use Lemonldap::NG::Common::Session;
+use strict;
+use Getopt::Std;
+
+# Options
+# -d: debug mode
+# -f: force delete of corrupted sessions
+our $opt_d;
+our $opt_f;
+getopts('df');
+
+my $debug     = $opt_d;
+my $force     = $opt_f;
+my $nb_purged = 0;
+my $nb_error  = 0;
+
+#=============================================================================
+# Load configuration
+#=============================================================================
+my $lmconf = Lemonldap::NG::Common::Conf->new()
+  or die $Lemonldap::NG::Common::Conf::msg;
+my $conf = $lmconf->getConf or die "Unable to get configuration ($!)";
+my $localconf = $lmconf->getLocalConf(PORTALSECTION)
+  or die "Unable to get local configuration ($!)";
+
+if ($localconf) {
+    $conf->{$_} = $localconf->{$_} foreach ( keys %$localconf );
+}
+
+print "Configuration loaded\n" if $debug;
+
+#=============================================================================
+# Timeout
+#=============================================================================
+print "Timeout value: " . $conf->{timeout} . "\n" if $debug;
+
+#=============================================================================
+# Apache::Session backends
+#=============================================================================
+my @backends;
+my $module;
+
+# Sessions
+if ( defined $conf->{globalStorage} ) {
+
+    # Load module
+    $module = $conf->{globalStorage};
+    eval "use $module";
+    die $@ if ($@);
+    $conf->{globalStorageOptions}->{backend} = $module;
+
+    # Add module in managed backends
+    push @backends, $conf->{globalStorageOptions};
+
+    print "Session backend $module will be used\n" if $debug;
+}
+
+# SAML
+if ( defined $conf->{samlStorage}
+    or keys %{ $conf->{samlStorageOptions} } )
+{
+
+    # Load module
+    $module = $conf->{samlStorage} || $conf->{globalStorage};
+    eval "use $module";
+    die $@ if ($@);
+    $conf->{samlStorageOptions}->{backend} = $module;
+
+    # Add module in managed backends
+    push @backends, $conf->{samlStorageOptions};
+
+    print "SAML backend $module will be used\n" if $debug;
+}
+
+# CAS
+if ( defined $conf->{casStorage}
+    or keys %{ $conf->{casStorageOptions} } )
+{
+
+    # Load module
+    $module = $conf->{casStorage} || $conf->{globalStorage};
+    eval "use $module";
+    die $@ if ($@);
+    $conf->{casStorageOptions}->{backend} = $module;
+
+    # Add module in managed backends
+    push @backends, $conf->{casStorageOptions};
+
+    print "CAS backend $module will be used\n" if $debug;
+}
+
+# Captcha
+if ( defined $conf->{captchaStorage}
+    or keys %{ $conf->{captchaStorageOptions} } )
+{
+
+    # Load module
+    $module = $conf->{captchaStorage} || $conf->{globalStorage};
+    eval "use $module";
+    die $@ if ($@);
+    $conf->{captchaStorageOptions}->{backend} = $module;
+
+    # Add module in managed backends
+    push @backends, $conf->{captchaStorageOptions};
+
+    print "Captcha backend $module will be used\n" if $debug;
+}
+
+#=============================================================================
+# Load and purge sessions
+#=============================================================================
+for my $options (@backends) {
+
+    next if ( $options->{backend} eq "Apache::Session::Memcached" );
+    my @t;
+
+    # Get all expired sessions
+    Lemonldap::NG::Common::Apache::Session->get_key_from_all_sessions(
+        $options,
+        sub {
+            my $entry = shift;
+            my $id    = shift;
+            my $time  = time;
+
+            print "Check session $id\n" if $debug;
+
+            # Empty session need to be removed
+            unless ($entry) {
+                push @t, $id;
+                print "Session $id is empty (corrupted?), delete forced\n"
+                  if $debug;
+            }
+
+            # Do net check sessions without _utime
+            return undef unless $entry->{_utime};
+
+            # Session expired
+            if ( $time - $entry->{_utime} > $conf->{timeout} ) {
+                push @t, $id;
+                print "Session $id expired\n" if $debug;
+            }
+
+            # User has no activity, so considere the session has expired
+            elsif ( $conf->{timeoutActivity}
+                and $entry->{_lastSeen}
+                and $time - $entry->{_lastSeen} > $conf->{timeoutActivity} )
+            {
+                push @t, $id;
+                print "Session $id inactive\n" if $debug;
+            }
+            undef;
+        }
+    );
+
+    # Delete sessions
+    my @errors;
+    for my $id (@t) {
+
+        my $session = Lemonldap::NG::Common::Session->new(
+            storageModule        => $options->{backend},
+            storageModuleOptions => $options,
+            cacheModule          => $conf->{localSessionStorage},
+            cacheModuleOptions   => $conf->{localSessionStorageOptions},
+            id                   => $id,
+        );
+
+        unless ( $session->data ) {
+            print "Error while opening session $id\n" if $debug;
+            print STDERR "Error on session $id\n";
+            $nb_error++;
+            push @errors, $id;
+            next;
+        }
+
+        unless ( $session->remove ) {
+            print "Error while deleting session $id\n" if $debug;
+            print STDERR "Error on session $id\n";
+            $nb_error++;
+            push @errors, $id;
+            next;
+        }
+        print "Session $id has been purged\n" if $debug;
+        $nb_purged++;
+    }
+
+    # Remove lock files for File backend
+    if ( $options->{backend} =~ /^Apache::Session::(?:Browseable::)?File$/i ) {
+        require Apache::Session::Lock::File;
+        my $l = new Apache::Session::Lock::File;
+        my $lock_directory = $options->{LockDirectory} || $options->{Directory};
+        $l->clean( $lock_directory, $conf->{timeout} );
+    }
+
+    # Force deletion of corrupted sessions for File backend
+    if (    $options->{backend} =~ /^Apache::Session::(?:Browseable::)?File$/i
+        and $force )
+    {
+        foreach (@errors) {
+            my $id = $_;
+            eval { unlink $options->{Directory} . "/$id"; };
+            if ($@) {
+                print STDERR "Unable to remove session $id\n";
+            }
+            else {
+                print STDERR "Session $id removed with force\n";
+                $nb_error--;
+            }
+        }
+    }
+}
+
+#=============================================================================
+# Exit
+#=============================================================================
+print "$nb_purged sessions have been purged\n" if $debug;
+print STDERR
+  "$nb_error sessions remaining, try to purge them with force (option -f)\n"
+  if $nb_error;
+
+my $exit = $nb_error ? 1 : 0;
+exit $exit;

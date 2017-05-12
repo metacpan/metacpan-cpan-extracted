@@ -1,0 +1,56 @@
+{
+   "abstract" : "Xslate format parser",
+   "author" : [
+      "Kazuhiro Osawa E<lt>yappo {@} shibuya {dot} plE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4004, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Locale-Maketext-Extract-Plugin-Xslate",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Locale::Maketext::Extract" : "0",
+            "Text::Xslate" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      }
+   },
+   "provides" : {
+      "Locale::Maketext::Extract::Plugin::Xslate" : {
+         "file" : "lib/Locale/Maketext/Extract/Plugin/Xslate.pm",
+         "version" : "v0.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.3"
+}

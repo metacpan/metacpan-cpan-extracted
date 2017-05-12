@@ -1,0 +1,46 @@
+LWP-Curl
+
+Hi,
+
+Perhaps you need to install the package libcurl-dev because, WWW::Curl::Easy need it.
+
+Enjoy.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc LWP::Curl
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=LWP-Curl
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/LWP-Curl
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/LWP-Curl
+
+    Search CPAN
+        http://search.cpan.org/dist/LWP-Curl
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Lindolfo Rodrigues de Oliveira Neto
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Log-Log4perl-DataDumper.t
+lib/Log/Log4perl/DataDumper.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+MacFarsi.pm
+MacFarsi.xs
+addition.map
+farsi.map
+mkheader
+t/argu.t
+t/test.t

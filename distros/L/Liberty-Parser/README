@@ -1,0 +1,56 @@
+Liberty-Parser version 0.04
+===========================
+
+Libery::Parser is indeed a Perl wrapper for Synopsys Liberty Parse Open Source project.
+
+
+INSTALLATION
+============
+
+1. Please download liberty_parse-2.5e.tar.gz and gen-liberty.so.tar.gz from
+http://code.google.com/p/liberty-parser/downloads/list
+
+2.  un-tar the tarball
+% tar zxvf liberty_parse-2.5e.tar.gz
+% tar zxvf gen-liberty.so.tar.gz
+
+3. Move directory gen-liberty.so to liberty_parse-2.5 directory.
+% mv gen-liberty.so liberty_parse-2.5
+
+4. Detect your system environment and compile the liberty_parse-2.5
+% cd liberty_parse-2.5
+% ./configure
+% make
+
+5. Compile and link the liberty.so
+% cd gen-liberty.so
+% make
+Then you should get file liberty.so.
+Put the liberty.so at the somewhere Perl can find it through LD_LIBRARY_PATH.
+
+6. Follow formal perl module installation steps to install Libery::Parser module
+   % perl Makefile.PL 
+   or if you want to install the module to personal directory:
+   % perl Makefile.PL  LIB=/path/to/what/you/like
+
+   % make
+   % make test
+   % make install
+
+You can test if it work by performing the supplied demo tools liberty-info.pl
+% liberty-info.pl slow.lib
+To install this module type the following:
+
+DEPENDENCIES
+============
+
+This module requires liberty_parse from below Synopsys Open Liberty Project page:
+http://www.opensourceliberty.org/resources_ccs.html
+The suggested version is liberty_parse-2.5e.tar.gz.
+
+
+COPYRIGHT AND LICENCE
+======================
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,84 @@
+Revision history for Linux-Statm-Tiny
+
+0.0505    2015-06-23 18:05:22+01:00 Europe/London
+  [Other Changes]
+  - Only run tests on Linux machines
+
+  - Added Travis-CI configuration to repo
+
+0.0504    2015-05-25 14:35:16+01:00 Europe/London
+  [Other Changes]
+  - Use namespace::autoclean, as namespace::sweep is deprecated (GitHub #8).
+
+  - Added namespace tests.
+
+  - Added POD tests.
+
+0.0503    2015-05-06 14:18:35+01:00 Europe/London
+  [Enhancements]
+  - Added error reason when getconf fails.
+
+0.0502    2015-05-05 17:20:25+01:00 Europe/London
+  [Enhancements]
+  - Page size is only read once when the class is loaded.
+
+0.0501    2015-05-05 16:58:38+01:00 Europe/London
+  [Bug Fixes]
+  - Die when getting the page size fails.
+
+0.0500    2015-04-09 08:57:25+01:00 Europe/London
+  [Enhancements]
+  - Added mb/kb/etc aliases to vsz and rss methods.
+
+0.0400    2015-03-27 13:53:03+00:00 Europe/London
+  [Documentation]
+  - Improved POD so that it's clear that vsz and rss are aliases.
+
+  [Enhancements]
+  - vsz and rss and *_pages attributes are explicitly defined as
+    aliases.
+
+  - dist.ini modified to use AutoPrereqs and add better
+    metadata to the distribution.
+
+  - Removed use of common::sense in the tests.
+
+  - Added mb aliases, e.g. "size_mb".
+
+  - The kb and mb aliases use the ceil function to round values up.
+
+  - Added refresh method to refresh values.
+
+  [Other Changes]
+  - Added tests for pages alias.
+
+0.0300    2015-01-12 11:26:08+00:00 Europe/London
+  [Documentation]
+  - Fixed typo in POD markup.
+
+  - Bumped copyright year.
+
+  [Enhancements]
+  - Added vsz as alias for size.
+
+  - Used proper aliases instead of wrapper methods.
+
+  - Added *_pages aliases.
+
+  - Aded page_size attribute.
+
+  - Added *_bytes and *_kb methods.
+
+  [Incompatabile Changes]
+  - Removed vss alias, which is a typo. Use vsz.
+
+0.0201    2015-01-05 18:19:39+00:00 Europe/London
+  [Other Changes]
+  - Test prerequisties are explicitly in the test phase.
+
+0.0200    2015-01-05 15:36:32+00:00 Europe/London
+  [Enhancements]
+  - Added vss and rss as aliases for size and resident.
+
+0.0100    2015-01-05 12:18:43+00:00 Europe/London
+  - Initial prototype.

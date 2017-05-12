@@ -1,0 +1,12 @@
+Revision history for List-Util-Superpositions
+
+1.2     November 26, 2008
+        Noted dependency on Exporter::Lite.
+        Irrelevant pod fix to documentation.
+
+1.1     July 5, 2004
+        Added dependencies.
+
+1.0     July 4, 2004
+        First version, released on an unsuspecting world.
+

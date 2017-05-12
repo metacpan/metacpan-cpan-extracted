@@ -1,0 +1,55 @@
+#! /usr/local/bin/perl
+#########################################################+
+#      From the CONSULTIX "Perl Programming" class      #+
+# POB 70563, Seattle WA 98107 USA tim@consultix-inc.com #+
+#  Copyright 1997-2001, Tim Maher. All Rights Reserved  #+
+#########################################################+
+# name2verse2: Uses Namegame.pm to make verse from name
+# BUT: censors ones with naughty words!
+
+use strict;
+use warnings;
+
+# $::DEBUG=1;
+
+# This module exports the "name2verse" subroutine
+use Lingua::EN::Namegame;	# must be locatable through PERL5LIB var
+		# e.g., at shell level: PERL5LIB=~fred/modules
+
+use Regexp::Common 'RE_profanity';
+
+# Default arguments simplify testing
+@ARGV  or  @ARGV=qw(krusty arsenio);
+
+foreach my $name (@ARGV) {
+	my $verse = name2verse($name);
+
+	if (profane($verse) == 1) {	# test for acceptability
+		$::DEBUG  and 
+			print "Squelching\n";
+
+		# If I use warn, its output disappears! ??
+		print "Sorry, the verse for $name contains a profane word.\n";
+	}
+	else {
+		$::DEBUG  and 
+			print "Permitting\n";
+		print "$verse\n\n";
+	}
+}
+
+sub profane {
+	my $verse=shift;
+
+	my $retval=0;
+	foreach my $word ( split /\W+/, $verse ) {
+		$::DEBUG  and  print "Checking $word\n";
+		if ( "\L$word\E" =~ RE_profanity() ) {
+			$::DEBUG  and 
+				print "Found a profane word: '$&'\n";
+			$retval=1;
+			last;
+		}
+	}
+	return $retval;
+}

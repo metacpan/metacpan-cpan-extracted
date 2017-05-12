@@ -1,0 +1,51 @@
+Lexical-Accessor
+================
+
+Created:      2013-10-21
+Home page:    <https://metacpan.org/release/Lexical-Accessor>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Lexical-Accessor>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.008	2014-03-29
+
+ [ Bug Fixes ]
+ - Fix attribute defaults.
+
+0.007	2014-03-29
+
+ - Much cleaned up Sub::Accessor::Small.
+
+0.006	2014-03-29
+
+ - Split out the most reusable parts of Lexical::Accessor into
+   Sub::Accessor::Small.
+
+0.005	2014-03-28
+
+ - Make Lexical::Accessor more even subclassable.
+
+0.004	2014-03-28
+
+ - Make Lexical::Accessor more subclassable.
+
+0.003	2013-12-15
+
+ - If Sub::Name is available, use it to name the exported `lexical_has`
+   keyword.
+
+0.002	2013-10-22
+
+ [ Bug Fixes ]
+ - Fix is=>'lazy'.
+
+ [ Documentation ]
+ - Bundle a benchmarking script as an example.
+ - Comparisons with MooseX::Privacy, MooX::PrivateAttributes, etc.
+ - Fix minor (yet confusing) typo.
+
+ [ Other ]
+ - Default to is=>'rw' instead of is=>'bare'.
+ - Use Hash::FieldHash (it's significantly faster) instead of
+   Hash::Util::FieldHash::Compat.
+
+0.001	2013-10-21	Initial release

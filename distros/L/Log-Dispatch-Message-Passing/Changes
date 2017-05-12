@@ -1,0 +1,30 @@
+0.009
+   - Revert change to work with upcoming versions of Log::Dispatch (perigrin)
+     - Upon conversation with Dave Rolskey they're not as upcoming
+
+0.008
+   - Work with upcoming versions of Log::Dispatch
+
+0.007
+   - Fix test - newer versions of Log::Dispatch
+     return 'warning' instead of 'warn'
+
+0.006
+   - Fix broken dep in Makefile.PL RT#78799
+
+0.005
+    - More doc and example fixes.
+
+0.004
+    - Doc and example fixes
+
+0.003
+    - Rename
+
+0.002
+    - Better docs
+    - Better testing
+
+0.001
+    - Initial version
+

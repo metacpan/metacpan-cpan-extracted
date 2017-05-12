@@ -1,0 +1,7 @@
+% layout 'default';
+% title 'Welcome';
+Welcome <%= session 'name' %>!<br>
+<%= link_to logout => begin %>
+  Logout
+<% end %>
+

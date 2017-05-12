@@ -1,0 +1,68 @@
+=head1 NAME 
+
+xgettextdbi - Fetch values for translation from a database
+
+=head1 SYNOPSIS
+
+    % xgettextdbi [OPTIONS]
+    
+    INPUT OPTIONS:
+    --dsn      the database DSN
+    --username your username
+    --password your password
+    --query    the SQL query to select the column you would like translated
+    
+    OUTPUT OPTIONS:
+    -d, --default-domain Use $NAME.po for output, instead of messages.po
+    -o, --output         PO file name to be written or incrementally
+                         updated (use "-" for STDOUT)
+    -p, --output-dir     Output files will be placed in this directory
+
+=head1 DESCRIPTION
+
+Grabs values from a database;
+
+=cut
+
+use strict;
+use warnings;
+
+use Locale::Maketext::Extract::DBI;
+use Getopt::Long;
+use Pod::Usage;
+
+our $VERSION = '0.01';
+
+my %options;
+
+GetOptions( \%options, qw( dsn=s username=s password=s query=s help=s p|output-dir=s o|output=s d|default-domain=s ) );
+
+pod2usage( 1 ) && exit if exists $options{ help } or !keys %options;
+
+my $extractor = Locale::Maketext::Extract::DBI->new;
+$extractor->extract( %options );
+
+=head1 AUTHOR
+
+=over 4 
+
+=item * Brian Cassidy E<lt>bricas@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2006 by Brian Cassidy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=head1 SEE ALSO
+
+=over 4 
+
+=item * L<xgettext>
+
+=back
+
+=cut

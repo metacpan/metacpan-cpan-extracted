@@ -1,0 +1,366 @@
+%left ';'
+%right '=' ':=' '=!=' '::-' ':-' '|||' '+=' '-=' '*=' '%=' '**=' '/=' '^='
+%left '->' ':->'
+%left ARRAYFETCH
+#//%left '|'
+%nonassoc ':'
+%left '?'
+%left '&&' '||' '!' '^^'
+%left 'conforms'
+%nonassoc '<' '>' '==' '!=' '>=' '<=' '<=>' 
+%left '+' '-'
+%left 'per'
+%left '*' '/' '%' ' '
+%right IMPLICIT
+%left UMINUS
+%left NAME
+%right '^' '**'
+%nonassoc '++' '--'
+
+%{
+use Data::Dumper; 
+my $s;		# warning - not re-entrant
+my $fullstring;
+my $charcount;
+use warnings;
+use Language::Farnsworth::Parser::Extra; #provides a really nasty regex for lots of fun unicode symbols
+my $uni = $Language::Farnsworth::Parser::Extra::regex; #get the really annoyingly named regex
+my $identifier = qr/(?:\w|$uni)(?:[\w\d]|$uni)*/;
+%}
+
+%%
+
+stma: {undef}
+	| stmt          { bless [ $_[1] ], 'Stmt' }
+	| stmt ';' stma { bless [ $_[1], ref($_[3]) eq "Stmt" ? @{$_[3]} : $_[3]], 'Stmt' }
+	;
+
+stmt: expr                                 { $_[1] }
+	| 'var' NAME          { bless [ $_[2] ], 'DeclareVar' }
+	| 'var' NAME '=' expr { bless [ $_[2], $_[4] ], 'DeclareVar' }
+	| 'defun' NAME '=' expr { bless [ @_[2,4] ], 'DeclareFunc' }
+	| NAME ':=' expr                       { bless [@_[1,3]], 'UnitDef' }
+	| expr ':->' expr                      { bless [ @_[1,3] ], 'SetDisplay' }
+	| NAME '=!=' NAME                      { bless [ @_[1,3] ], 'DefineDimen' }
+	| expr '|||' NAME                      { bless [ @_[1,3] ], 'DefineCombo' }
+	| if
+	| while
+	| NAME '{' arglist '}' ':=' expr { bless [@_[1,3], (bless [$_[6]], 'Stmt')], 'FuncDef' }
+	| NAME '{' arglist '}' ':=' '{' stma '}' { bless [@_[1,3,7]], 'FuncDef' }
+	;
+
+ifstartcond: 'if' '(' expr ')' {$_[3]}
+           ;
+
+ifstmts: '{' stma '}' {$_[2]}
+       ;
+
+if: ifstartcond ifstmts {bless [@_[1,2], undef], 'If'}
+  | ifstartcond ifstmts 'else' ifstmts {bless [@_[1,2,4]], 'If'}
+  ;
+
+#not put in simply because i haven't decided if i even want c style for loops
+#for :	'for' '(' expr ';' expr ';' expr ')' '{' stmt '}'
+#			{ bless [ @_[3,5,7,10] ], 'For' }
+#	;
+
+while: 'while' '(' expr ')' '{' stma '}'  { bless [ @_[3,6] ], 'While' }
+	 ;
+
+#// i hate bad syntax highlighting
+#// ( ref($_[1]) eq 'Array' ? ( bless [@$_[1]], 'SubArray' ) : $_[1] )
+#// this is a really messed up looking tree building, BUT it allows me to detect when someone does something like [ [ 1,2,3], 1,2,3] versus, a = [1,2,3]; [a,1,2,3]; and allows me to act appropriately
+
+array: expr ',' array  {bless [ ( ref($_[1]) eq 'Array' ? ( bless [@{$_[1]}], 'SubArray' ) : $_[1] ), ref($_[3]) eq 'Array' ? @{$_[3]} : $_[3] ], 'Array' }
+	 | expr {bless [ ( ref($_[1]) eq 'Array' ? ( bless [@{$_[1]}], 'SubArray' ) : $_[1] ) ], 'Array'}
+	 | {bless [], 'Array'} #//need to do this for empty arrays
+	 | ',' array  {bless [ undef, ref($_[2]) eq 'Array' ? @{$_[2]} : $_[2] ], 'Array' }
+	 ;
+
+constraint: expr #// this MIGHT have to change slightly, mostly to make it allow things like, flow, volume
+		  | '...' {bless [], 'VarArg'} #// for having variable arguments
+		  ;
+
+argelement: NAME '=' expr 'isa' constraint {bless [ $_[1], $_[3], $_[5], 0], 'Argele'} #default value AND constraint 
+		  | NAME 'isa' constraint          {bless [ $_[1], undef, $_[3], 0], 'Argele'} #constraint
+		  | NAME '=' expr                  {bless [ $_[1], $_[3], undef, 0], 'Argele'} #default value
+		  | NAME                           {bless [ $_[1], undef, undef, 0], 'Argele'}
+		  | NAME 'byref' 'isa' constraint  {bless [ $_[1], undef, $_[4], 1], 'Argele'} #constraint
+		  | NAME 'byref'                   {bless [ $_[1], undef, undef, 1], 'Argele'}
+		  ;
+
+arglistfilled: argelement ',' arglistfilled { bless [ $_[1], ref($_[3]) eq 'Arglist' ? @{$_[3]} : $_[3] ], 'Arglist' }
+		     | argelement {bless [ $_[1] ], 'Arglist'}
+		     ;
+
+arglist: arglistfilled
+       |
+       ;
+
+number: NUMBER    { bless [ $_[1] ], 'Num' }
+      | HEXNUMBER { bless [ $_[1] ], 'HexNum' }
+	  ;
+
+value:	number
+     |	DATE			{ bless [ $_[1] ], 'Date' }
+	 |	STRING			{ bless [ $_[1] ], 'String' } #this will have to be reparsed later, just before evaluating
+	 |	singleval '@' array '$' %prec ARRAYFETCH { bless [ @_[1,3] ], 'ArrayFetch' }
+	 |	NAME			%prec NAME { bless [ $_[1] ], 'Fetch' }
+	 |   '[' array ']'              { $_[2] } 
+	 |   lambda
+	 |  '&' NAME        { bless [ $_[2] ], 'GetFunc' }
+	 ;
+
+parens:	'(' expr ')'	{ bless [$_[2]], 'Paren' } #do this so i can tell where parens were later, so i can rebuild everything correctly
+	  ;
+
+singleval: value
+         | parens
+         ;
+
+assignexpr: 	expr '=' expr	{ bless [ @_[1,3] ], 'Store' }
+		  ;
+
+assignexpr2:	expr '+=' expr 	{ bless [ @_[1,3] ], 'StoreAdd' }
+		   |	expr '-=' expr 	{ bless [ @_[1,3] ], 'StoreSub' }
+		   |	expr '/=' expr 	{ bless [ @_[1,3] ], 'StoreDiv' }
+		   |	expr '*=' expr 	{ bless [ @_[1,3] ], 'StoreMul' }
+		   |	expr '%=' expr 	{ bless [ @_[1,3] ], 'StoreMod' }
+		   |	expr '**=' expr	{ bless [ @_[1,3] ], 'StorePow' }
+		   |	expr '^=' expr	{ bless [ @_[1,3] ], 'StorePow' }
+		   ;
+
+assigncomb: assignexpr
+		  |	assignexpr2
+		  ;
+
+lambda:	'{`' arglist '`' stma '}' {bless [ @_[2,4] ], 'Lambda'}
+      | '{|' arglist '|' stma '}' {bless [ @_[2,4] ], 'Lambda'}
+	  ;
+
+multexpr: expr '*' expr	{ bless [ @_[1,3], '*'], 'Mul' }
+	    | singleval singleval %prec IMPLICIT { bless [ @_[1,2], 'imp'], 'Mul' }
+	    | singleval singleval expr %prec IMPLICIT { bless [bless([ @_[1,2], 'imp'], 'Mul'), $_[3], 'imp'], 'Mul' }
+	    | expr ' ' expr { bless [ @_[1,3], ''], 'Mul' }
+	    ;
+
+logic: expr '&&' expr	{ bless [ @_[1,3] ], 'And' }
+	 | expr '||' expr	{ bless [ @_[1,3] ], 'Or' }
+	 | expr '^^' expr	{ bless [ @_[1,3] ], 'Xor' }
+	 | '!' singleval	{ bless [ $_[2] ], 'Not' }
+	 ;
+
+compare: expr '<' expr	{ bless [ @_[1,3] ], 'Lt' }
+	   | expr '>' expr	{ bless [ @_[1,3] ], 'Gt' }
+	   | expr '<=' expr	{ bless [ @_[1,3] ], 'Le' }
+	   | expr '>=' expr	{ bless [ @_[1,3] ], 'Ge' }
+	   | expr '==' expr	{ bless [ @_[1,3] ], 'Eq' }
+	   | expr '<=>' expr { bless [ @_[1,3] ], 'Compare' }
+	   | expr '!=' expr	{ bless [ @_[1,3] ], 'Ne' }
+	   ;
+
+crement: '++' singleval { bless [ $_[2] ], 'PreInc' }
+	   | '--' singleval { bless [ $_[2] ], 'PreDec' }
+	   | singleval '++' { bless [ $_[1] ], 'PostInc' }
+	   | singleval '--' { bless [ $_[1] ], 'PostDec' }
+	   ;
+	   
+powexp: expr '**' expr { bless [ @_[1,3] ], 'Pow' }
+      | expr '^' expr  { bless [ @_[1,3] ], 'Pow' }
+      ;
+
+standardmath: expr '+' expr	{ bless [ @_[1,3]], 'Add' }
+	        | expr '-' expr	{ bless [ @_[1,3]], 'Sub' }
+	        | expr '/' expr	{ bless [ @_[1,3], '/'], 'Div' }
+	        | expr 'per' expr	{ bless [ @_[1,3], 'per' ], 'Div' }
+            | expr '%' expr	{ bless [ @_[1,3] ], 'Mod' }
+            ;
+
+exprnouminus: singleval
+	        | multexpr
+            | powexp   
+	        | standardmath
+	        | expr 'conforms' expr	{ bless [ @_[1,3] ], 'Conforms' }
+	        | expr '?' expr ':' expr { bless [@_[1,3,5]], 'Ternary' }
+	        | logic
+	        | compare
+	        | crement
+	        | NAME '::-'  expr	{ bless [ @_[1,3] ], 'SetPrefix' }
+	        | NAME ':-' expr		{ bless [ @_[1,3] ], 'SetPrefixAbrv' }
+            | expr '->' expr  { bless [ @_[1,3]], 'Trans' }
+	        | assigncomb
+	        ;
+
+expr: exprnouminus
+	| '-' expr     %prec UMINUS { bless [ $_[2] , (bless ['-1'], 'Num'), '-name'], 'Mul' } #unary -
+	;
+%%
+
+#helpers!
+my $ws = qr/[^\S\n]/; #whitespace without the \n
+
+sub yylex
+	{
+	no warnings 'exiting'; #needed because perl doesn't seem to like me using redo there now;
+	my $line = $_[-2];
+	my $charline = $_[-1];
+	my $lastcharline = $_[-3];
+	my $gotsingleval = $_[-4];
+	
+	#remove \n or whatever from the string
+	if ($s =~ /\G$ws*\n$ws*/gc)
+	{
+		$$line++;
+		$$lastcharline = $$charline;
+		$$charline = pos $s;
+		#print "LEX: ${$line} ${$charline} || ".substr($s, $$charline, index($s, "\n", $$charline)-$$charline)."\n";
+		redo
+	}
+	
+	#this has got to be the most fucked up work around in the entire code base.
+	#i'm doing this to check if i've gotten something like; 2a so that i can insert a fictious space token. so that 2a**2 will properly parse as 2 * (a ** 2) 
+	if ($$gotsingleval) #we had a number
+	{
+	  #print "INGOTNUMBER\n";
+	  $$gotsingleval = 0; #unset it
+	  if ($s =~ /\G(?=$identifier|
+	  	      	0[xb]?[[:xdigit:]](?:[[:xdigit:].]+)| #hex octal or binary numbers
+    			(?:\d+(\.\d*)?|\.\d+)(?:[Ee][Ee]?[-+]?\d+)| #scientific notation
+    			(?:\d+(?:\.\d*)?|\.\d+)| #plain notation
+	    		(?:\($ws*) #paren value
+	  )/gcx) #match opening array brace
+	  {#<NUMBER><IDENTIFIER> needs a space (or a *, but we'll use \s for now)
+	    #print "OMG IDENTIFIER!\n";
+	    return ' '; 
+	  }
+	}
+	
+	$s =~ /\G\s*(?=\s)/gc; #skip whitespace up to a single space, makes \s+ always look like \s to the rest of the code, simplifies some regex below
+		
+	#1 while $s =~ /\G\s+/cg; #remove extra whitespace?
+
+	$s =~ m|\G\s*/\*.*?\*/\s*|gcs and redo; #skip C comments
+	$s =~ m|\G\s*//.*(?=\n)?|gc and redo;
+
+    if ($s=~ /\G(?=
+        0x[[:xdigit:].]+| #hex octal or binary numbers
+        0b[01.]+|
+        0[0-7][0-7.]*|
+    	(?:\d+(\.\d*)?|\.\d+)(?:[Ee][Ee]?[-+]?\d+)| #scientific notation
+    	(?:\d+(?:\.\d*)?|\.\d+)| #plain notation
+	    (?:$ws*\)) #paren value
+    )/cgx)
+    {
+       #print "GOT SINGLEVAL!";
+       $$gotsingleval = 1; #store the fact that the last token was a number of some kind, so that we can do funky stuff on the next token if its an identifier
+    }
+
+    #i want a complete number regex
+    #The 'HEXNUMBER' is really just for numbers of different bases, e.g. Hexidecimal, Binary, and Octal
+	$s =~ /\G(0x[[:xdigit:].]+)/igc and return 'HEXNUMBER', $1;
+	$s =~ /\G(0b[01.]+)/igc and return 'HEXNUMBER', $1;
+	$s =~ /\G(0[0-7][0-7.]*)/igc and return 'HEXNUMBER', $1;
+		
+	$s =~ /\G((\d+(\.\d*)?|\.\d+)([Ee][Ee]?[-+]?\d+))/gc 
+	      and return 'NUMBER', $1;
+	$s =~ /\G((\d+(\.\d*)?|\.\d+))/gc 
+	      and return 'NUMBER', $1;
+
+
+
+    #token out the date
+    $s =~ /\G\s*#([^#]*)#\s*/gc and return 'DATE', $1;
+
+    $s =~ /\G\s*"((\\.|[^"\\])*)"/gc #" bad syntax highlighters are annoying
+		and return "STRING", $1;
+
+    #i'll probably ressurect this later too
+	#$s =~ /\G(do|for|elsif|else|if|print|while)\b/cg and return $1;
+	
+	$s =~ /\G\s*(while|conforms|else|if)\b\s*/cg and return $1;
+
+	#seperated this to shorten the lines, and hopefully to make parts of it more readable
+	#$s =~ /\G$ws*()$ws*/icg and return lc $1;
+	
+	#comparators
+	$s =~ /\G$ws*(==|!=|<=>|>=|<=)$ws*/icg and return lc $1;
+	
+	#pre and post decrements, needs to be two statements for \s
+	$s =~ /\G$ws*(\+\+|--)$ws*/icg and return lc $1;
+	
+	#farnsworth specific operators
+	$s =~ /\G$ws*(:=|->|:->)$ws*/icg and return lc $1;
+	
+	$s =~ /\G$ws*(var\b|defun\b|per\b|isa\b|byref\b|\:?\:\-|\=\!\=|\|\|\|)$ws*/icg and return lc $1;
+	
+	#assignment operators
+	$s =~ /\G$ws*(\*\*=|\+=|-=|\*=|\/=|%=|\^=|=)$ws*/icg and return lc $1;
+    
+    #logical operators
+    $s =~ /\G$ws*(\^\^|\&\&|\|\||\!)$ws*/icg and return lc $1;
+	
+	#math operators
+	$s =~ /\G$ws*(\*\*|\+|\*|-|\/|\%|\^)$ws*/icg and return lc $1;
+	
+	$s =~ /\G$ws*(;|\{\s*\`|\{\s*\||\{|\}|\>|\<|\?|\:|\,|\.\.\.|\`)$ws*/cg and return $1;
+	$s =~ /\G$ws*(\)|\])/cg and return $1; #freaking quirky lexers!
+	$s =~ /\G(\(|\[)$ws*/cg and return $1;
+	
+	$s =~ /\G($identifier)/cg and return 'NAME', $1; #i need to handle -NAME later on when evaluating, or figure out a sane way to do it here
+	$s =~ /\G(.)/cgs and return $1;
+    return '';
+}
+
+
+sub yylexwatch
+{
+   #my $oldp = pos $s;
+   my @r = &yylex;
+
+   #my $charlines = $_[-1];
+   #my $line = $_[-2];
+   #my $pos = pos $s;
+
+   #print Dumper(\@_);
+   #my $nextn = index($s, "\n", $pos+1);
+   #print "LEX: ${$line} ${$charlines} $pos :: ".substr($s, $pos, $nextn).":: ".substr($s, $pos, $nextn-$pos+1)."\n";
+   #$charcount+=pos $s;
+   #$s = substr($s, pos $s);
+   return @r;
+}
+
+sub yyerror
+	{
+	my $pos = pos $s;
+	my $charlines = $_[-1];
+	my $lines = $_[-2];
+    my $lastcharline = $_[-3];
+    my $gotnumber = $_[-4];
+	my $char = $pos-$charlines;
+
+	substr($fullstring,$pos,0) = '<###YYLEX###>';
+	my $fewlines = substr($fullstring, $lastcharline, index($fullstring, "\n", index($fullstring, "\n", $pos)+1) - $lastcharline);
+	$fewlines =~ s/^/### /mg;
+	die "### Syntax Error \@ $lines : $char ($charlines $pos) of $fewlines\n";
+	}
+
+sub parse
+	{
+	$charcount=0;
+	my $line = 1;
+	my $charlines = 0;
+	my $lastcharlines = 0;
+	my $gotnumber = 0;
+	my $self = shift;
+	
+	$s = join ' ', @_;
+	$fullstring = $s; #preserve it for errors
+	my $code = eval
+		{ $self->new(yylex => sub {yylexwatch(@_, \$lastcharlines, \$line, \$charlines, \$gotnumber)}, yyerror => sub {yyerror(@_, $lastcharlines, $line, $charlines, $gotnumber)})->YYParse };
+	die $@ if $@;
+	$code
+	}
+
+1;
+
+# vim: filetype=yacc

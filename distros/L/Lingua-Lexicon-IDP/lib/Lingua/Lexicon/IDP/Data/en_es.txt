@@ -1,0 +1,7487 @@
+###########################################################################
+#Copyright 1999 The Internet Dictionary Project/Tyler Chambers
+#http://www.june29.com/IDP/
+#This file is free to use and modify.  Thank you for using the IDP.
+#
+#Approximately 5048 entries.  9/21/97
+#Approximately 5488 entries.  1/7/98
+#Approximately 5910 entries.  3/8/98
+#Approximately 7450 entries.  2/19/99
+###########################################################################
+a	un, uno, una[Article]
+aardvark	cerdo hormiguero
+aardvark	oso hormiguero[Noun]
+aardvarks	cerdos hormigueros
+aardvarks	osos hormigueros 
+ab	prefijo que indica separacio/n
+aback	hacia atras
+aback	hacia atrás,take aback, desconcertar. En facha.
+aback	por sopresa, desprevenidamente, de improviso
+aback	atra/s[Adverb]
+abacterial	abacteriano, sin bacterias
+abacus	a/baco
+abacuses	a/bacos
+abaft	A popa (towards stern)/En popa (in stern)
+abaft	detra/s de[Adverb]
+abalone	abulo/n
+abalone	oreja de mar (molusco)[Noun]
+abalone	oreja de mar[Noun]
+abalones	abulones
+abalones	orejas de mar (moluscos)[Noun]
+abalones	orejas de mar[Noun]
+abandon	abandonar
+abandon	darse por vencido[Verb]
+abandon	dejar
+abandon	desamparar, desertar, renunciar, evacuar, repudiar
+abandon	renunciar a[Verb]
+abandon	abandono[Noun]
+abandoned	abandonado
+abandoned	dejado
+abandoned	desamparado
+abandoned	olvidado
+abandoned	abandonada,abandonado, abandonados, abandonadas[Verb]
+abandonee	abandonado
+abandonee	aislado
+abandonee	dejado
+abandonee	desamparado
+abandonee	money
+abandoner	abandonador
+abandoning	abandonando
+abandoning	abandono
+abandonment	abandono
+abandonment	desamparo, deserción
+abandonments	abandonos
+abandons	abandona
+abandons	desampara
+abase	abatir
+abase	abatir, envilecer
+abase	denigrar[Verb]
+abase	rebajar, humillar, degradar
+abase	rebajar, degradar, humillar, abatir[Verb]
+abased	degradado
+abased	rebajado, humillado, degradado
+abased	rebajado, degradado, humillado, abatido[Adjective]
+abasement	envilecimiento
+abasement	humillacio/n, degradacio/n
+abasement	rebajacio/n, degradacio/n, humillacio/n, abatimiento[Noun]
+abasements	humillaciones, degradaciones
+abaser	humillador
+abases	degrada; humilla[Verb]
+abash	avergonzar
+abash	avergonzar, abochornar, confundir[Verb]
+abash	avergonzar, confundir, 
+abashed	avergonzado
+abashes	avergu.enza; pone en situacio/n embarazosa[Verb]
+abashing	vergonzante, vergonzoso
+abashing	vergonzoso
+abashment	Vergüenza.
+abashment	verguenza
+abasing	humillante
+abasing	humillante, degradante[Verb]
+abate	amainar[viento, tormenta], abolir, descontar, calmarse[dolor, tormenta]bajar[inundación][Verb]
+abate	disminuir, reducir, mitigar
+abate	mitigar
+abate	terminar, hacer cesar
+abated	amainado, amplacado, mitigado
+abated	aplacado, abolido, descontado, disminuido.NO AMPLACADO[Adjective]
+abatement	Abolición, supresión
+abatement	descuento, rebaja
+abatements	Rebajas, descuentos, decaimientos,aboliciones
+abatements	s. descuento, rebaja, decaimiento
+abater	rebajador, mitigador[Noun]
+abates	satélites
+abating	 superando una marca; disminuyendo; situacio/n depresiva[Verb]
+abating	deprimente, calmante, aboliendo, disminuyendo, amainando, rebajando. NO SUPERAR UNA MARCA, en castellano es batir una marca: break a record
+abatis	barricada con alambre de púas, parapeto de troncos caídos
+abatis	tala, abatida, barricada de alambre de púas
+abatises	Barricads, parapetos, obstáculos
+abatises	sesame[Adjective]
+abatises	Barricadas
+abattoir	degolladero, macelo, matadero.
+abattoir	matadero de reses
+abattoir	matadero (GB)[Noun]
+abaxial	abacial
+abaxial	extraaxial
+abaxial	No situado en el eje, lejos del eje, desalineado. NO ES CORRECTO ABACIAL=ABBATIAL
+abaxial	abaxial, (Anatomi/a) aquella regio/n de un o/rgano alejada del eje[Adjective]
+abbacy	Abadía, convento, monasterio.
+abbacy	abadi/a
+abbas	ABBA= Padre, Dios. ABBAS, tío de Mahoma.
+abbas	aint
+abbe	abate
+abbe	ABBÉ=Abate
+abberations	Aberración
+abberations	aberracion
+abberations	desvi/o
+abberations	UNKNOWN WORD IN ENGLISH
+abbey	abadi/a
+abbey	abadía[Noun]
+abbeys	Abadías, monasterios, conventos
+abbeys	abadi/as
+abbot	Abad
+abbot	abad
+abbots	abades
+abbots	Abates. NO ABADES.
+abbreviate	abreviar
+abbreviate	Abreviar, simplificar.
+abbreviate	acortar[Verb]
+abbreviate	abreviar
+abbreviated	abreviado
+abbreviated	Abreviado, simplificado, acortado, reducido.NO CORTADO.
+abbreviated	cortado
+abbreviates	abrevia
+abbreviates	Reducciones, resúmenes, abreviaciones, compendios.
+abbreviating	abreviando
+abbreviation	abreviacio/n
+abbreviation	abreviatura
+abbreviation	abreviatura[Noun]
+abbreviations	abreviaciones
+abbreviations	abreviaturas
+abbreviator	abreviador
+abc	abc
+abc	abecedario
+abdicable	abdicable, que puede abdicar
+abdicate	abdicar
+abdicate	renunciar a; abdicar[Verb]
+abdicated	abdicado (participio de abdicar)
+abdication	abdicacio/n
+abdication	renuncia; abdicación (de un monarca)[Noun]
+abdicator	abdicador
+abdomen	abdo/men
+abdomen	abdomen[Noun]
+abdomen	(inf.)barriga, vientre
+abdomens	abdomenes
+abdomens	abdo/menes[Noun]
+abdomens	abdómenes[Noun]
+abdominal	abdominal
+abdominally	abdominalmente
+abduce	abducir
+abduced	abducido
+abducens	músculo abductor
+abducens	separador
+abducent	Abductor
+abducent	separador
+abducentes	abducentes
+abducing	Abductor
+abducing	separación
+abduct	secuestrar, raptar
+abducted	secuestrado, raptado
+abducted	Separado de la línea media del cuerpo.
+abducting	secuestrando, raptando
+abducting	separando, alejando de la línea media.
+abduction	Abducción, secuestro, rapto
+abduction	secuestro, rapto
+abductions	secuestros, raptos
+abductor	Abductor
+abductor	secuestrador
+abductors	Abductores
+abductors	secuestradores
+abducts	secuestra, rapta
+abeam	al trav/es
+abeam	De través
+abecedarian	abecedario
+abed	en cama, acostado
+aberrance	equivocacio/n, extravi/o
+aberrancy	aberraci/on
+aberrancy	error
+aberrant	aberrante
+aberrant	ano/malo, irregular, errado
+aberrantly	aberrantemente
+aberrate	aberrar
+aberrate	desviar
+aberrated	aberrado
+aberrated	desviado
+aberration	aberracio/n
+aberration	desviacio/n
+aberrational	aberrante; desviado[Adjective]
+aberrations	aberraciones
+aberrations	desvi/os
+abet	animar, colaborar
+abet	ayudar
+abet	Incitar, inducir, To aid and abet, ser cómplice de.
+abet	instigar, incitar, inducir
+abetment	colaboracio/n
+abetment	Complicidad.
+abetment	instigaci/n, apoyo
+abetment	instigación, apoyo
+abets	apoya, colabora
+abets	ayuda
+abets	encubre
+abetted	Apoyado, instigado, incitado, colaborado
+abetted	apoyo/, colaboro/
+abetted	ayud/o
+abetter	instigador, co/mplice
+abetting	instigando, incitando
+abettor	instigador
+abeyance	in~ en desuso[Adverb]
+abeyant	en suspenso[Adjective]
+abhor	detestar
+abhor	odiar
+abhor	aborrecer, abominar (de)[Verb]
+abhorred	odiado
+abhorred	aborrecido[Adjective]
+abhorrence	odio
+abhorrent	odioso
+abhorrently	en forma aborreciente, odiante[Adverb]
+abhorrer	la persona que odia[Noun]
+abhorring	aborreciente[Adjective]
+abhors	odia
+abidance	tolerancia, conformismo[Noun]
+abide	respetar[Noun]
+abide	tolerar,aguantar
+abide	quedar(se)
+abided	moro/
+abider	morador
+abides	mora
+abiding	permanente, perdurable
+abidingly	permanentemente[Adverb]
+abilities	habilidades, capacidades
+abilities	talentos[Noun]
+ability	habilidad, capacidad
+ability	talento[Noun]
+abiogenesis	abioge/nesis
+abiogenetic	abiogenético[Adverb]
+abiogenetical	abiogenético[Adjective]
+abiogenetically	abiogenéticamente[Adverb]
+abiological	abiológico[Adjective]
+abiologically	abológicamente[Adverb]
+abiotic	abio/tico[Adjective]
+abiotically	abio/ticamente[Adverb]
+abject	abyecto
+abject	miserable (poverty); rastrero (apology)[Adjective]
+abjection	abyección
+abjections	abyecciones[Noun]
+abjectly	abyectamente
+abjectness	abyeccio/n[Noun]
+abjuration	abjuración
+abjure	renunciar
+abjured	abjurado
+abjurer	abjurar
+abjures	abjura[Adverb]
+abjuring	abjurando; abjuracio/n[Verb]
+ablate	extirpar
+ablated	extirpado
+ablating	extirpando
+ablation	extirpación
+ablation	ablacio/n
+ablative	ablativo
+ablaut	quesontes
+ablaze	ardiendo
+ablaze	en llamas
+ablaze	en llamas[Adjective]
+ablaze	ardiente[Adjective]
+able	capaz
+able	hábil (skilled)[Adjective]
+abler	mas capaz[Adjective]
+abler	(comparativo) más capaz/hábil
+ablest	más capaz[Adjective]
+ablest	(comparativo) el más capaz/hábil
+abloom	en flor
+ablution	ablución
+ablutionary	ablucionario[Adjective]
+ablutions	abluciones
+ably	ha/bilmente[Adverb]
+ably	hábilmente[Adverb]
+abnegate	abnegar?
+abnegate	(auto)sacrificarse[Verb]
+abnegates	abniega
+abnegation	abnegacio/n
+abnegation	abnegación (autosacrificio)[Noun]
+abnegator	abnegador
+abnormal	anormal
+abnormalities	anormalidades
+abnormality	anormalmente
+abnormality	anormalidad[Noun]
+abnormality	anormalidad[Noun]
+abnormalize	anormalizar
+abnormalizes	anormaliza[Verb]
+abnormally	anormalmente
+aboard	a bordo
+aboard	a bordo de[Preposition]
+abode	sin domicilio fijo
+abodes	domicilios[Noun]
+aboil	abolir
+abolish	abolir
+abolish	suprimir, abolir[Verb]
+abolishable	abolible
+abolishable	suprimible
+abolished	abolido
+abolisher	abolicionista
+abolishers	abolicionistas
+abolishes	abole
+abolishing	aboliendo
+abolishment	abolici/on
+abolition	abolicio/n
+abolition	supresión, abolición[Noun]
+abolitionary	abolicionista
+abolitionism	abolicionismo
+abolitionist	abolicionista
+abolitionists	abolicionistas
+abolitionize	abolicionar[Verb]
+abomasal	del cuarto estómago[Adjective]
+abominable	abominable
+abominably	abominablemente
+abominate	abominar
+abomination	abominacio/n
+abominations	abominaciones
+abominator	abominador
+abominators	abominadores
+aboral	aboral[Adjective]
+aborally	de manera aboral[Adverb]
+aboriginal	aborigen
+aboriginally	aboriginalmente[Noun]
+aborigine	aborigen,australino
+aborigines	aborigenes[Noun]
+aborning	naciente[Adjective]
+abort	abortar
+abort	aborto[Noun]
+aborted	abortado
+aborter	abortante
+abortifacient	abortivo, que provoca aborto[Adjective]
+aborting	abortando
+abortion	aborto
+abortion	aborto (acción)[Noun]
+abortionist	abortista
+abortionists	abortistas
+abortions	abortos
+abortive	abortivo
+abortive	malogrado[Adjective]
+abortively	abortivamente
+abortiveness	calidad de  abortivo, infructuoso
+aborts	abortos
+abound	abundar
+abounded	abundo/
+abounding	abundando
+abounds	abunda
+about	acerca, sobre, a punto de
+about	más o menos, aproximadamente[Adverb]
+about	por todas partes[Adverb]
+about	de, sobre, acerca de; por[Preposition]
+above	arriba
+above	sobre
+above	encima, por encima, arriba[Adverb]
+aboveboard	legi/timo;honesto
+aboveboard	legítimo[Adjective]
+aboveground	sobrenivel[Noun]
+abovementioned	arriba citado,-a;susodicho,-a
+abracadabra	abracadabra
+abradable	abrasible, que se desgasta con fricción[Adjective]
+abradant	abrasivo[Adjective]
+abrade	raer, raspar
+abraded	raído, raspado
+abrader	que raspa, desgasta o limpia por fricción[Adjective]
+abrades	raspar[Verb]
+abrading	raspando[Verb]
+abrasion	abrasi/on
+abrasion	raspo/n, raspadura
+abrasions	abrasiones
+abrasive	abrasivo
+abrasive	brusco (manner)[Adjective]
+abrasively	abrasivamente
+abrasively	bruscamente (manner)[Adverb]
+abrasiveness	abrasividad
+abrasives	abrasuvis
+abrasives	abrasivos; bruscos (manner)[Adjective]
+abreact	liberar emociones verbalmente[Verb]
+abreaction	abreaccio/n
+abreast	de frente: to walk four~, caminar cuatro de frente[Adverb]
+abreast	de frente: "to keep abreast of" (fig): mantenerse al corriente de[Adverb]
+abridge	abreviar
+abridged	abreviado,-a; resumido,-a
+abridgement	compendio
+abridger	compendiador
+abridges	compendia[Verb]
+abridging	abreviando
+abridgment	abreviación
+abroach	espitado[Adjective]
+abroad	en el or la extranjaro
+abroad	en el extranjero (to be); al extranjero (to go)[Adverb]
+abrogate	abrogar
+abrogated	abrrogado[Adjective]
+abrogates	abrroga[Verb]
+abrogating	abrrogante[Adjective]
+abrogation	abrogaci/on
+abrupt	brusco,-a;a/spero;repentino,-a;su/bito;
+abrupt	brusco (sudden); áspero (curt)[Adjective]
+abruption	ruptura, abrupcio/n[Noun]
+abruptly	bruscamente; con aspereza; repentinamente
+abruptly	repentinamente (leave); bruscamente (speak)[Adverb]
+abruptness	precipitación, brusquedad
+abscess	absceso
+abscessed	abscesado[Adjective]
+abscesses	abscesos[Noun]
+abscise	abscisa
+abscised	cortado por abscisio/n[Adverb]
+abscissa	abscisa
+abscissae	abcisa[Noun]
+abscissas	abcisas[Noun]
+abscission	abscisio/n[Noun]
+abscond	vi huir; fugarse
+abscond	escaparse[Verb]
+absconded	oculto[Adjective]
+absconder	fugitivo, prófugo, desertor
+absconding	fuga/ndose
+absconds	ocultarse, esconderse[Verb]
+absence	ausencia; falta;distraccio/n
+absence	ausencia[Noun]
+absences	ausencias
+absent	ausente
+absent	ausente; 
+absented	ausente
+absented	ausentado[Verb]
+absentee	ausente;absenista
+absentee	ausente[Noun]
+absenteeism	absentismo
+absentees	ausentes
+absentia	ausencia
+absenting	ausentando[Adverb]
+absently	en ausencia[Adverb]
+absentminded	distrai/do,-a; despistado,-a
+absentminded	distraído[Adjective]
+absentmindedly	distraido
+absentmindedly	distraidamente[Adverb]
+absentmindedness	olvidadizo
+absents	ausentes
+absinth	ajenjo[Noun]
+absinthe	absenta
+absolute	absoluto,-a; completo,-a; puro,-a; incontrovertible; 
+absolute	absoluto[Adjective]
+absolutely	absolutamente
+absolutely	totalmente (totally); ¡por supuesto (que sí)! (certainly!)[Adverb]
+absoluteness	absoluto
+absolutes	absolutos[Noun]
+absolution	absolución[Adverb]
+absolutism	absolutismo
+absolutist	absolutista[Adjective]
+absolutistic	absolutista[Noun]
+absolutization	absolutización[Noun]
+absolutize	absolutizar[Verb]
+absolutizes	absolutiza[Verb]
+absolve	absolver
+absolved	absuelto
+absolver	absolutor[Noun]
+absolves	absuelve[Verb]
+absolving	absolver[Verb]
+absorb	absorber[Verb]
+absorbability	capacidad de absorber
+absorbable	absorbible[Noun]
+absorbance	absorvencia
+absorbancy	absorbencia[Noun]
+absorbant	absorbente[Adjective]
+absorbed	absorbido[Adjective]
+absorbed	absorto[Adjective]
+absorbency	absorbencia[Noun]
+absorbent	absorbente[]
+absorber	absorber[Verb]
+absorbing	absorbente[Adjective]
+absorbingly	absorbentemente[Verb]
+absorbs	absorbe[Verb]
+absorbtions	absorciones[Noun]
+absorptance	absortencia
+absorption	absorcio/n
+absorption	absorción[Noun]
+absorptive	absorbente[Adjective]
+abstain	abstener[Verb]
+abstain	abstenerse de (from)[Verb]
+abstain	absternerse
+abstained	abstinente[Noun]
+abstainer	abstemio[Noun]
+abstaining	abstinente[Adjective]
+abstains	abstiene[Verb]
+abstemious	abstemio, -a[]
+abstemiously	de forma abstemia[Adverb]
+abstention	abstencio/n
+abstentions	abstenciones[Noun]
+abstentious	abstencionista[Adjective]
+abstinence	abstinencia
+abstinent	abstinente[Adjective]
+abstinently	abstinentamente[Adverb]
+abstract	abstracto
+abstract	resumen[Noun]
+abstractable	abstraíble[Adjective]
+abstracted	abstracto[Noun]
+abstractedly	abstrai/damente[Adverb]
+abstractedness	abstrasencia
+abstracter	abstractor[Noun]
+abstracting	abstrayendo
+abstraction	abstracción[Noun]
+abstractionism	abstraccionismo
+abstractionists	abstraccionistas
+abstractions	abstracciones[Noun]
+abstractly	abstractamente[Adverb]
+abstractness	abstracto[Adjective]
+abstractor	abstractor
+abstractors	abstractores
+abstracts	abstractos[Adjective]
+abstrict	cercenar[Verb]
+abstriction	abstriccio/n[Noun]
+abstruse	abstruso[Adjective]
+abstruseness	oscuridad
+absurd	absurdo
+absurdism	absurdismo
+absurdities	disparates (plural)[Noun]
+absurdity	absurdo[Noun]
+absurdly	absurdamente[Adverb]
+absurdness	absurdo[Noun]
+absurdum	absurdo[Noun]
+abundance	abundancia[Adjective]
+abundant	abundante[Adjective]
+abundantly	abundantemente[Adverb]
+abusable	abusable
+abuse	abuso
+abused	maltratado
+abuser	abusador
+abusers	abusadores
+abuses	abusa
+abusing	abusando
+abusive	abusivo
+abusively	abusivamente
+abusiveness	abusividad
+abut	terminar, confinar
+abutilon	abutilon, (Bota/nica) ge/enero de las Malva/aceas
+abutment	lindero[Noun]
+abutments	estribos[Noun]
+abuts	lindar[Verb]
+abysmal	abismal[Noun]
+abysmally	mali/simamente[Adverb]
+abyss	abismo
+abyssal	abisal
+abysses	abismos
+acacia	acacia
+academe	academia
+academia	academia
+academic	acade/mico
+academical	académico[Conjunction]
+academically	academicamente
+academician	académico
+academicianship	academicismo
+academicism	academicismo[Noun]
+academics	academicas
+academies	academias
+academism	academismo
+academy	academia
+acanthocephalan	acantocéfalo
+acanthopterygian	acantopterigio
+acanthus	acanto[Noun]
+acanthuses	acantos[Noun]
+acaulescent	acaule, sin tallo[Adjective]
+accede	aceder
+acceded	accedio/[Verb]
+accedes	consentir en[Verb]
+acceding	accediendo
+accelerando	accelerating[Verb]
+accelerate	acelerar
+accelerated	acelerado
+accelerates	acelera
+accelerating	acelerando
+acceleratingly	aceleradamente[Adverb]
+acceleration	aceleracio/n
+accelerations	aceleraciones
+accelerative	acelerativo
+accelerator	acelerador
+accelerators	aceleradores
+accelerometer	acelerímetro
+accelerometers	acelerímetros
+accent	accento
+accent	el acento
+accented	acentuado
+accenting	acentuando[Verb]
+accentless	sin acento[Adjective]
+accents	accentos
+accentuate	acentuar
+accentuated	acentuado
+accentuates	acentuar[Verb]
+accentuating	acentuando[Verb]
+accentuation	acentuacio/n[Noun]
+accept	aceptar
+acceptability	aceptacio/n
+acceptable	aceptable
+acceptableness	aceptabilidad
+acceptably	aceptable[Noun]
+acceptance	aceptación
+acceptances	aceptacio/nes[Noun]
+acceptation	aceptacio/n
+accepted	aceptado
+acceptedly	aceptadamente[Adverb]
+accepter	aceptor[Adjective]
+accepting	aceptando[Verb]
+acceptingly	con aceptación[Adverb]
+acceptor	aceptador[Noun]
+acceptors	aceptadores [Noun]
+accepts	aceptar[Verb]
+access	acceso
+accessary	accesorio[Noun]
+accessed	accedido[Verb]
+accesses	accesos[Noun]
+accessibility	accesibilidad[Noun]
+accessibility	acesible
+accessible	accesible[Noun]
+accessibleness	accesibilidad
+accessibly	accesiblemente
+accessing	accediendo[Verb]
+accession	acceso[Noun]
+accessions	accesos[Noun]
+accessorial	accesorio[Adjective]
+accessories	accesorios[Noun]
+accessors	accesores
+accessory	accesorio
+accidence	accidente[Noun]
+accident	el accidente
+accident	un acidente
+accident	(automobile) choque[Noun]
+accidental	accidental[Adjective]
+accidentalism	accidentalismo
+accidentalist	aacidentalista
+accidentally	accidentalmente[Adverb]
+accidentally	por accidente[Adverb]
+accidentalness	accidentalmente[Adverb]
+accidently	accidentalmente
+accidents	accidentes[Noun]
+acclaim	aclamar
+acclaim	aplaudir[Verb]
+acclaimed	aclamado
+acclaimed	aplaudido
+acclaims	aclamar[Verb]
+acclamation	aclamacio/n[Noun]
+acclimate	aclimar
+acclimated	aclimatado
+acclimates	aclimatar[Verb]
+acclimating	aclimatando[Verb]
+acclimation	aclimatacio/n
+acclimatizable	aclimatable[Adjective]
+acclimatization	aclimatacio/n[Noun]
+acclimatize	aclimatizado[Noun]
+acclimatize	climatizar[Verb]
+acclimatized	aclimatizado[Noun]
+acclimatized	climatizado[Adjective]
+acclimatizer	climatizador[Noun]
+acclimatizers	climatizadores[Noun]
+acclimatizes	aclimatiza[Verb]
+acclivity	cuesta, subida, pendiente[Noun]
+accolade	espaldarazo
+accolades	acoladas[Noun]
+accommodate	acomodar
+accommodated	acomodado
+accommodated	alojado
+accommodates	hospedar[Verb]
+accommodating	alojando[Verb]
+accommodatingly	acomodadamente[Adverb]
+accommodation	accomadacio/n
+accommodation	alojamiento[Noun]
+accommodations	alojamientos[Noun]
+accommodator	acomodador[Noun]
+accompanied	acompanado
+accompanies	acompaña
+accompaniment	acompan~amiento
+accompaniments	acompan~amientos
+accompanist	acompanista
+accompanists	acompanistas
+accompany	acompan~ar[Verb]
+accompanying	acompan~ando[Verb]
+accompanyist	acompan~ante[Noun]
+accompanyists	acompan~antes[Noun]
+accomplice	cómplice[Noun]
+accomplices	co/mplices[Noun]
+accomplish	cumplido
+accomplishable	terminable[Noun]
+accomplished	terminado
+accomplisher	terminador
+accomplishers	terminadores
+accomplishes	termina  termino/
+accomplishing	cumpliendo
+accomplishment	triunfo
+accomplishments	triunfos
+accord	acordar
+accord	acuerdo[Noun]
+accordance	conforme[Noun]
+accordances	concordancias
+accordant	concordante
+accorded	acordado
+according	de acuerdo con
+accordingly	por consiguiente; en consecuencia[Adverb]
+accordion	acordeo/n[Noun]
+accordionist	acordeonista[Noun]
+accordionists	acordeonistas[Noun]
+accordions	acordeones[Noun]
+accords	acuerdos[Noun]
+accost	abordar[Verb]
+accosted	acoso/[Verb]
+accosts	abordar[Verb]
+account	cuenta[Noun]
+accountability	responsabilidad[Noun]
+accountable	responsable[Adjective]
+accountancy	contabilidad[Noun]
+accountant	contable
+accountant	el contador
+accountants	contables
+accounted	contabilizo/, rindio/ cuentas[Verb]
+accounting	contabilidad[Noun]
+accountings	contabilidades[Noun]
+accounts	cuentas[Noun]
+accouter	equipar[Verb]
+accouterment	equipo[Noun]
+accouterments	equipo[Noun]
+accredit	acreditar
+accreditation	acreditacion
+accreditations	acreditaciones
+accredited	autorizado[Adjective]
+accretion	aumento[Noun]
+accretions	aumentos[Noun]
+accrue	aumentarse[Verb]
+acculturate	aculturar
+acculturated	aculturado
+accumulable	acumulable[Noun]
+accumulate	acumular
+accumulate	acumular(se)[Verb]
+accumulated	acumulado
+accumulates	acumulado/a[Adjective]
+accumulating	acumulando[Verb]
+accumulation	acumulación[Verb]
+accumulations	acumulaciones[Verb]
+accumulative	acumulativo
+accumulatively	acumulativamente[Adverb]
+accumulator	acumulador/ra
+accumulators	acumuladores[Noun]
+accuracies	precisio/nes[Noun]
+accuracy	acuracia
+accuracy	precisión[Noun]
+accurate	atinado, preciso[Noun]
+accurate	exacto, preciso[Adjective]
+accurately	precisión
+accursed	maldito[Adjective]
+accusation	acusacion
+accusations	acusaciones
+accusative	acusativo/va
+accusatory	acusatorio/a
+accuse	acusar
+accused	acusado/da
+accuser	acusador/ra
+accuses	acusas
+accusing	acusando
+accusor	acusador/ra
+accustom	acostumbrar
+accustomed	acostumbrado
+accustoming	acostumbrando
+ace	as
+acellular	acelular[Adjective]
+acephalous	acefalo
+acerbate	acerbar
+acerbity	acerbidad, acritud[Noun]
+acetaldehyde	acetaldehido[Noun]
+acetamide	acetamida[Noun]
+acetaminophen	acetaminofen[Noun]
+acetaminophen	acetaminofe/n[Noun]
+acetate	acetato
+acetic	acético
+acetify	acetificar[Verb]
+acetone	acetona
+acetyl	acetilo[Noun]
+acetylene	Acetileno[Noun]
+ache	doler
+ache	dolor[Noun]
+ached	dolido
+ached	dolió[Verb]
+aches	duele
+achievable	conseguible
+achievable	lograble
+achieve	conseguir[Verb]
+achieve	lograr[Verb]
+achieved	conseguido
+achieved	logró[Verb]
+achievement	logro
+achievements	logros
+achiever	persona que logra sus metas
+achievers	personas que logran sus metas
+achieves	logra[Verb]
+achieving	consiguiendo
+achieving	que logra
+aching	que duele
+achingly	dolorosamente
+achromatic	acromático[Adjective]
+achromatically	acroma/ticamente[Adverb]
+achromaticity	acromaticidad
+achromatism	acromatismo
+acid	a/cido
+acid	ácido
+acidic	a/cido[Adjective]
+acidification	acidificación
+acidifier	que vuelve acído
+acidify	volver acído
+acidimeter	Medidor de acidez[Noun]
+acidimeters	Medidores de acidez[Noun]
+acidity	acidez
+acidness	acidez[Noun]
+acids	acidos
+acidulant	acidulante
+acidulate	Acidular[Verb]
+acidulation	Acidulación[Noun]
+acinus	a/cino[Noun]
+acknowledge	reconocer
+acknowledgeable	reconocible
+acknowledged	reconocido
+acknowledgement	reconocimiento
+acknowledgements	reconocimientos
+acknowledger	persona que reconoce
+acknowledging	reconociendo
+acknowledgment	reconocimiento[Noun]
+acne	acné
+acolyte	aco/lito[Noun]
+acolytes	aco/litos[Noun]
+acorn	bellota[Noun]
+acorns	bellotas[Noun]
+acoustic	Acústica[Adjective]
+acoustic	acu/stico[Adjective]
+acoustically	Acústicamente[Adverb]
+acoustics	acústica[Noun]
+acquaint	conocido[Noun]
+acquaintance	conocido/da
+acquaintances	conocidos/das
+acquire	Adquirir[Verb]
+acquired	Adquirido[Verb]
+acquirement	Adquisición[Noun]
+acquires	vt   adquirir[Verb]
+acquisition	adquisición[Noun]
+acquisitions	Adquisiciones[Noun]
+acre	acre[Noun]
+acrobacy	Acrobacia[Noun]
+acrobat	acróbata[Noun]
+acrobatic	acrobático(a)[Adjective]
+acrobatically	acrobaticamente[Adverb]
+acrobatics	acrobacias[Noun]
+acrobats	acróbatas[Noun]
+acronym	Acrónimo[Noun]
+acronymically	acronímicamente[Adverb]
+acronyms	acrónimos[Noun]
+acropetal	acropeta/lico[Adjective]
+acropetally	acropeta/licamente[Adverb]
+acrophobic	Acrofobia[Noun]
+acropolis	Acrópolis[Noun]
+across	a través[Adverb]
+acrostic	Acróstico[Noun]
+acrylic	Acrílico.
+act	n- acto, vi (to behave) comportarse, to ___out (psych) expresar impulsos reprinudos en conducta sin inhibiciones
+action	accio/n[Noun]
+actions	acciones[Noun]
+activate	activar[Verb]
+activated	Activado[Verb]
+activates	Activa[Verb]
+activation	Activación[Noun]
+activations	Activaciones[Noun]
+activator	Activador[Noun]
+activators	Activadores[Noun]
+active	activo(a)[Adjective]
+actively	activamente[Adverb]
+activeness	Cualidad de ser activo.[Noun]
+activism	Activismo[Noun]
+activist	Activista[Adjective]
+activists	Activistas[Adjective]
+activities	las actividades
+activity	Actividad[Noun]
+actor	un actor
+actors	los actores
+actress	una actriz
+actresses	Actrices[Noun]
+actual	actual
+actualization	Actualización.[Noun]
+actualizations	Actualizaciones[Noun]
+actualize	Actualizar[Verb]
+actualized	Actualizado[Verb]
+actualizes	Actualiza[Verb]
+acuity	n agudeza; visual _____ agudeza visual[Noun]
+aculeate	aculeado[Adjective]
+acumen	acumen[Noun]
+acuminate	acuminado[Adjective]
+acumination	acuminacio/n
+acupuncture	Acupuntura.[Noun]
+acute	Aguda,agudo.[Adjective]
+acutely	Agudamente.[Adverb]
+acuteness	Agudeza[Noun]
+acyclic	Acíclico.[Adjective]
+acyclically	Acíclicamente[Adverb]
+adapt	adaptar[Verb]
+adapt	adaptar(se)
+adaptability	adaptabilidad[Noun]
+adaptable	adaptable[Adjective]
+adaptation	adaptacio/n[Noun]
+adaptational	adaptacional
+adaptations	adaptaciones[Noun]
+adapted	adaptado
+adaption	n - adaptacion (accent over  o)
+adaptive	adaptativo
+adaptively	adaptativamente[Adverb]
+adaptivity	adaptabilidad
+adaxial	adaxial[Adjective]
+add	ma/s
+add	agregar; (arith) sumar[Verb]
+addenda	adendas
+addendum	adenda
+addict	adicto
+addicted	(to become addicted) enviciarse volverse adicto
+addiction	Adicción.[Noun]
+addictions	Adicciones.[Noun]
+addictive	adictivo
+addictive	que crea ha/bito
+addicts	adictos
+addition	adicio/n
+additive	adictivo, que crea habito (accent over  a  in habito[Adjective]
+additive	aditivo )adj & noun)
+additives	aditivos
+address	Dirección[Noun]
+address	domicilio[Noun]
+addressed	Dirigido[Verb]
+addressee	Destinatario[Noun]
+addressees	Destinatarios[Noun]
+addresser	Remitente[Noun]
+addressers	Remitentes[Noun]
+addresses	Direcciones[Noun]
+adductor	Abductor[Noun]
+adenine	adenina
+adenoid	Adenoide
+adenoidal	Adenoidal
+adenoma	Adenoma
+adenomatous	Adenomatoso
+adenosine	adenosina
+adept	Adepto[Noun]
+adequate	adj - adecuado, suficiente
+adhesion	n - adherencia
+adhesions	n - adherencias
+adhesive	adj - adhesivo; ______ tape - tela or cinta adhesiva
+adiabatic	adiabatica (curva)
+adios	Adiós
+adipose	Adiposo
+adiposity	Adiposidad
+adjacent	Adyacente
+adjective	el adjetivo
+adjectives	Adjetivos.[Noun]
+adjust	vt - ajustar, modificar[Verb]
+adjustable	adj - ajustable
+adjustment	n -  ajuste -m; correccion -f  (accent over the  o); modificacion -f (accent over the o)
+adjuvant	adj - adyuvante; coadyuvante
+administration	n  -  administracion -f  (accent over  o)
+administrators	administradores
+admire	admirar
+admission	n - (to the hospital) adnision -f (accent over the   o); ingreso
+admit	vt - (to the hospital) internar, ingressar [Verb]
+admitted	vt (pret & pp) - (to be admitted) internarse, ingresarse; She was admitted yesterday - Fue internada ayar; You need to be admitted - ud. necesita ser internado.
+adobe	adobe
+adolescence	n  - adolescencia
+adolescent	adj & n  -  adolescente
+adopt	vt  - adoptar[Verb]
+adoption	adopcio/n[Noun]
+adoptions	n  - adopciones -f (accent over second  o)
+adoptive	adj  - adoptivo
+adrenalin	n  - adrenalina
+adsorbent	adj  - adsorbente
+adult	adj & n  - adulto -ta (mf)
+advance	avance[Noun]
+advantage	la ventaja
+adverb	el adverbio
+advertisement	el anuncio
+advice	el consejo
+aerobic	adj  - aerobico (accent over 1st  o)
+aerobics	n pl - aerobicos (accent over 1st  o)
+aerosol	aerosol  -m[Noun]
+aerosolized	adj  - en aerosol
+affair	asunto[Noun]
+affairs	asuntos[Noun]
+affect	n  - (psych) afecto; vt afectar
+affection	n afecto, carino (enya over the  n)
+affectionate	carinoso[Adjective]
+affinities	n pl  - affinidades  -f
+affinity	n  - affinidad  -f
+affliction	mal. achaque[Noun]
+aficionada	aficionada (fan) -f
+aficionado	aficionada (fan) -m
+afraid	to be afraid - tener miedo
+afterbirth	(fam) placenta; secundinas (Fam)[Noun]
+afternoon	la tarde
+aftertaste	sabor  -m[Noun]
+again	otra vez
+age	edad -f;   middle age - edad madura or mediana; old age - vejez -f[Noun]
+agencies	agencias[Noun]
+agency	agencia[Noun]
+agent	agente -m[Noun]
+aggravate	agravar[Verb]
+aggression	agresio/n[Noun]
+aggressions	agresio/nes[Noun]
+aggressive	agresivo[Adjective]
+agile	a/gil[Adjective]
+aging	envejecimiento[Noun]
+agitate	agitar; to become agitated agitarse
+agitated	agitado[Adjective]
+ago	hace; atra/s (2 wks ago) hace dos semanas or dos semanas atra/s[Adjective]
+agoraphobia	agorafobia[Noun]
+agree	acordar
+agreement	el acuerdo
+aid	la curita
+aid	n -ayuda; auxilio; vt ayudar asistir
+aide	asistente -mf; ayudante -mf; auxiliar -mf
+aids	la SIDA[Noun]
+ailment	mal -m; achaque -m; padecimiento[Noun]
+air	el aire
+aircraft	el avión[Noun]
+airplanes	los aviones
+airport	el aeropuerto
+airsickness	mareo 
+airway	(breathing) vi/a ae/rea[Noun]
+alarm	alarma[Noun]
+alarmed	alarmado[Adjective]
+alarming	alarmante[Adjective]
+alarmingly	alarmantemente[Adverb]
+alcohol	alcohol[Noun]
+alcoholic	alcoholico[Noun]
+alcoholism	alcoholismo[Noun]
+ale	cerveza
+algebra	algebra[Noun]
+algebraically	algebraicamente[Adverb]
+algorithm	algoritmo[Noun]
+alibi	coartada[Noun]
+alien	extranjero[Noun]
+all	todo
+allow	dejar
+allow	permitir
+alloy	aleación[Noun]
+alloys	aleaciónes[Noun]
+allspice	malagueta[Noun]
+almond	la almendra
+almost	casi
+alphabet	el alfabeto
+alphabetic	english
+already	ya
+also	Tambien[Conjunction]
+although	aunque
+altitude	la altitud
+alto	long
+aluminum	el aluminio
+always	siempre
+am	2486
+amalgamate	amalgamar[Verb]
+amalgamated	amalgamado[Adjective]
+amass	amontonar[Verb]
+amassed	amontado[Adjective]
+amateur	novicio[Noun]
+amaze	asombrar[Verb]
+amaze	maravillar[Verb]
+amaze	pasmar[Verb]
+amazed	asombrado[Adjective]
+amazement	asombro[Noun]
+amazement	pasmo[Noun]
+amazing	asombroso
+amazing	maravilloso[Adjective]
+amazing	pasmoso[Adjective]
+ambassador	embajador[Noun]
+amber	ambre[Noun]
+ambulance	la ambulancia
+amen	ame/n
+amenities	amenidades
+American	americano
+amiable	amistable
+amicably	amistablemente
+amid	entre
+amuse	divertir
+amusing	divertido
+ancient	antiguo
+and	y
+angry	enojado
+animal	el animal
+animalcule	anima/lculo[Noun]
+animate	animar, animarse[Verb]
+animated	animado[Adjective]
+animation	animacio/n[Noun]
+anion	anio/n[Noun]
+aniseed	an/is[Noun]
+anisotropic	anisotropous[Adjective]
+ankle	el tobillo
+ankles	los tobillos[Noun]
+annihilate	aniquilar, anonadar[Verb]
+anniversaries	aniversarios
+anniversary	aniversario
+annotate	notar
+annotated	notado
+annotation	anotación
+announce	anunciar[Verb]
+announced	anunciado
+announcement	anuncio, prospecto
+announcements	anuncios, prospectos
+announcer	anunciador
+announcer	el locutor
+announcers	anuciadors
+announcing	estar anunciando
+annoy	burlarse
+annoy	enojar
+annoys	se burla
+annual	anual
+answer	la respuesta
+ant	hormiga
+ant	la hormiga
+antacid	antiacido
+antagonism	antagonismo
+antagonist	antagonista
+antagonistic	antagonico
+antagonize	enemistarse con;
+antarctic	antartico
+ante	apuesta(poker); ante...
+anteater	oso hormiguero
+antecedent	antecedente
+antecedents	antecedentes
+antechamber	antecamara; antesala
+antedate	preceder; ser anterior a
+antediluvian	antediluviano
+antelope	antilope
+antenatal	prenatal; antenatal
+antenna	antena
+antennae	antena
+anterior	anterior a
+anteroom	antesala; antecamara
+anthem	motete(Eccl); himno nacional
+anther	antera
+anthill	hormiguero
+anthologies	antologias
+anthologist	antologista
+anthologize	hacer una antologia de
+anthology	antologia
+anthracite	antracita
+anthrop	antrop
+anthropocentric	antropocentrico
+anthropoid	antropoide
+anthropological	antropologico
+anthropologist	antropologo
+anthropology	antropologia
+anthropomorphic	antropomorfico
+anthropomorphism	antropomorfismo
+anthropophagous	antropofago
+anthropophagy	antropofagia
+apartment	apartamento[Noun]
+apologize	disculparse
+appetite	el apetito
+appetizer	el aperitivo
+applaud	aplaudir
+applause	el aplauso
+apple	apple
+apple	la manzana
+apple	manzana
+apples	las manzanas
+apples	manzanas
+applesauce	pure de manzana
+applicable	aplicable
+applicant	applicante
+applicant	solicitante
+applicants	applicante
+application	aplicacion
+appointment	la cita
+appointments	las citas
+appreciate	apreciar
+apricot	el chabacano
+April	abril
+apron	el delantal
+aquarium	el acuarium
+architect	el arquitecto
+arena	corrida[Noun]
+argue	arguir
+argument	el argumento
+arm	el brazo
+arms	los brazos
+around	alrededor
+arrange	arreglar
+arrive	llegar
+arrow	la flecha
+art	arte
+artefact	artefacto
+arterial	pertinente al transito[Adjective]
+arterialization	arterializacion[Noun]
+arterialize	arterializar[Verb]
+arteries	las arterias[Noun]
+arteriole	arteriola; pequena arteria[Noun]
+arterioles	las arteriolas; las pequen~a arterias[Noun]
+arteriosclerosis	arteriolosclerosis[Noun]
+artful	diestro; habilidos; astuto; artificioso[Adjective]
+artfully	astutamente; ladinamente; artificiosamente; con artificio; con arte; diestramente
+arthritic	artrítico
+arthropod	artropodo
+artichoke	la alcachofa
+article	artículo
+artificial	artificial
+ashtray	el cenicero
+ask	preguntar
+asleep	dormido
+aspirin	la aspirina
+asterisk	el asterisco
+at	a
+ate	comi[Verb]
+athlete	el atleta
+attainable	conseguilbe[Adjective]
+attainableness	asequibilidad
+attempt	intento
+attend	asistir[Verb]
+attendance	asistencia[Noun]
+attendant	asistente
+attendants	asistentes
+attentive	atento[Adjective]
+attentively	atentamente[Pronoun]
+attire	atraer[Verb]
+attired	atraido[Adjective]
+attiring	atractivo[Adjective]
+attitude	actitud[Noun]
+attitudes	actitudes
+August	agosto
+author	el autor
+auto	el auto[Noun]
+autumn	oton~o[Noun]
+avenue	la avenida
+avoid	eludir[Verb]
+avoid	evitar[Verb]
+axe	la hacha
+b	b
+babble	balbucear
+babble	balbucear[Verb]
+babbled	balbuceado
+babblement	balbuceo
+babbler	balbuceador
+babbles	balbucea
+babbling	balbuceando
+babe	bebe
+babe	chica bonita[Verb]
+babe	criatura, bebe
+babe	nena
+babes	bebés
+babes	criaturas, bebes
+babes	ninos[Noun]
+babes	niños[Noun]
+babied	mimado (a)[Adjective]
+babies	bebe/s
+babies	criaturas, bebes
+baboon	babui/no
+babushka	la babushka (sombrero ruso)[Noun]
+baby	bebe/
+baby	criatura
+babyhood	niñez[Noun]
+babyhood	ninez
+babyhood	nin~ez
+babying	ninando
+babyish	infantil[Adjective]
+babysit	cuidar
+babysit	cuidar el chico; cuidar los chicos
+babysit	hacer de canguro[Verb]
+babysits	cuida a un bebe[Verb]
+babysitter	canguro
+babysitter	nin~era
+babysitters	canguros
+babysitters	nin~eras
+babysitters	niñera
+babysitting	cuidar nin~os[Verb]
+baccalaureate	licenciatura
+baccalaureate	bachillerato[Noun]
+baccarat	bacarr/a
+bacchanal	bacanal
+bacchanal	jodienda
+bacchanalia	bacanal
+bacchanalian	bacanálico (a)[Adjective]
+bacchic	BA/QUICO[Adjective]
+bachelor	bachiller
+bachelor	soltero
+bachelorhood	solteria
+bachelors	bachilleres
+bachelors	solteros
+bacillar	bacilar
+bacillary	forma bacilar (de bacilo)
+bacilli	bacilos
+bacillus	bacilo
+back	espalda (noun)
+back	(hacia) atra/s
+back	la espalda
+back	lomo (noun)
+backache	dolor de espalda
+backaches	dolores de espalda
+backbite	difamar[Verb]
+backbiter	el difamador[Noun]
+backbone	espinazo
+backbone	lomo
+backbones	espinazo
+backbones	espinazos
+backdrop	telon
+backdrops	TELONES[Noun]
+backed	RESPALDADO[Adjective]
+backer	RESPALDADOR[Noun]
+backers	RESPALDADORES[Noun]
+backfire	petardeo
+backgammon	chaquete
+background	fondo
+background	de fondo[Adjective]
+backgrounds	antecedentes
+backhand	reves
+backhanded	ambiguo
+backhouse	letrina
+backing	APOYO[Noun]
+backlash	barra invertida (\)
+backlash	contragolpe
+backless	SIN ESPALDA
+backlog	lista de cosas pendientes
+backlogs	ATRASOS[Noun]
+backpack	bolso/n
+backpack	mochila
+backpacker	mochilero
+backpacks	mochila
+backrest	respaldo
+backs	ESPALDAS[Noun]
+backseat	asiento trasero
+backside	espalda, lomo[Noun]
+backslash	barra invertida (\)
+backslide	reincidir[Verb]
+backslider	reincidente[Noun]
+backspace	tecla de retroceso
+backspaced	retrocedido[Verb]
+backspaces	retrocesos[Noun]
+backspacing	retrocediendo[Verb]
+backstage	bastidores[Noun]
+backstairs	escalera de atras[Noun]
+backstitch	pespunte[Noun]
+backstitched	pespunteado[Adjective]
+backstitches	pespuntes[Noun]
+backstitching	pespuntear[Verb]
+backtrack	retrotraer
+backtracked	desandado[Verb]
+backtracker	desandador[Noun]
+backtracking	desandando[Verb]
+backup	copia de seguridad
+backup	respaldo
+backups	backups, copia de seguridad[Noun]
+backward	atrasado[Adjective]
+backwardly	retrospectivamente[Adverb]
+backwardness	atraso[Noun]
+backwards	hacia atra/s
+backwash	estela[Noun]
+backwater	remanso[Noun]
+backwaters	remansos[Noun]
+backwood	bosque[Noun]
+backwoods	bosque[Noun]
+backwoodsman	bosqui/mano[Noun]
+backyard	patio de atras[Noun]
+bacon	el tocino
+bacteria	bacteria[Noun]
+bacterial	bacteriano[Adjective]
+bacterially	bacterianamente[Adverb]
+bactericidal	bactericida[Adjective]
+bactericidally	bactericidamente[Adverb]
+bactericide	bactericida[Adjective]
+bacterium	bacteria[Noun]
+bad	malo
+badge	banda, cinta, emblema[Noun]
+badger	tejo/n[Noun]
+badgered	molestado[Verb]
+badgering	molestando[Verb]
+badgers	tejones[Noun]
+badges	condecoraciones[Noun]
+badly	malamente[Adverb]
+badminton	badminton[Noun]
+badness	maldad[Noun]
+baffle	confundir[Verb]
+baffled	confundido[Verb]
+bafflement	confusio/n[Noun]
+baffler	deflector[Noun]
+bafflers	deflectores[Noun]
+baffling	confundiendo[Verb]
+bag	bolso
+bagatelle	bagatela[Noun]
+baggage	el equipaje[Noun]
+baggily	holgadamente[Adverb]
+baggy	holgado[Adjective]
+bagpipe	la gaita[Noun]
+bagpiper	gaitero (a)[Noun]
+bagpipes	gaitas[Noun]
+bags	bolsas[Noun]
+bail	pelota, balo/n[Noun]
+bailable	achicable[Adjective]
+bailee	depositario[Noun]
+bailer	fiador[Noun]
+bait	cebo[Noun]
+bake	hornear
+baker	el panadero
+bakery	panaderia[Noun]
+balalaika	pues eso
+balalaika	balalaika[Noun]
+balance	balancear[Verb]
+balanced	equilibrado (a)[Adjective]
+balcony	balcon[Noun]
+bald	calvo
+bald	desgastado(a)[Adjective]
+baldness	calvicie[Noun]
+bale	el fardo[Noun]
+baleful	funesto[Adjective]
+ball	bola[Noun]
+ball	la pelota
+ballad	balada[Noun]
+ballade	balada[Noun]
+balladist	baladista[Adjective]
+ballads	baladas[Noun]
+ballast	lastre[Noun]
+ballerina	bailarina[Noun]
+ballerinas	bailarinas[Noun]
+ballet	ballet[Noun]
+ballista	ballesta[Noun]
+ballistic	bali/stico (a)[Adjective]
+ballistics	la bali/stica[Noun]
+balloon	globo[Noun]
+balloons	globos[Noun]
+ballot	encuesta[Noun]
+balls	bolas[Noun]
+balmy	suave[Adjective]
+balsam	balsamo[Noun]
+balsamic	balsa/mico (a)[Adjective]
+balustrade	barandilla[Noun]
+balustrades	barandillas
+bamboo	bambú
+ban	prohibicion[Noun]
+banal	banal[Adjective]
+banana	platano
+bananas	platano[Noun]
+band	banda
+bandage	la venda
+bandit	bandido[Noun]
+bandits	bandito
+bandoleer	bandolero[Noun]
+bank	banco
+bank	el banco
+banker	el banquero
+bankrupt	bancarrota, quiebra economica[Noun]
+banquet	banquete[Noun]
+bar	barra[Noun]
+barbarian	ba/rbaro[Adjective]
+barbarians	b/arbaros[Adjective]
+barbaric	barbario[Adjective]
+barbarism	barbarismo[Adjective]
+barbarities	barbaridades[Adjective]
+barbarization	barbarizacio/n[Adjective]
+barbarize	barbarizar[Verb]
+barbecue	barbacoa[Noun]
+barber	el barbero
+barn	el troje
+basket	la cesta
+basketball	baloncesto[Noun]
+baskets	las cestas
+bat	murci"e/"lago[Noun]
+bathroom	el bano[Noun]
+be	be
+be	ser[Verb]
+beach	la playa
+beachboy	chico de la playa[Noun]
+beacon	atalaya[Noun]
+bead	perla, cuenta[Noun]
+beaker	vaso de precipitados[Noun]
+beam	haz de luz[Noun]
+beaming	radiante, brillante[Adjective]
+beamy	radiante, brillante[Adjective]
+bean	haba, jud\ia
+beans	frijoles
+bear	el oso
+beard	la barba
+beautiful	hermoso
+beauty	la belleza
+because	porque
+bed	la cama
+bedroom	el dormitorio
+bedrooms	el dormitorios[Noun]
+beds	las camas
+bedspread	la colcha
+bee	la abeja
+beer	cerveza
+beer	la cerveza
+before	antes
+begin	empezar
+begin	empezar[Noun]
+beginning	el principio
+beige	beige
+believe	creer
+bell	la campana
+bells	las campanas
+below	bajo[Adjective]
+benchmark	evaluación comparativa[Noun]
+benchmarking	evaluación comparativa (hacer una)[Verb]
+benchmarks	evaluaciones comparativas
+best	el mejor
+better	mejor
+between	entre
+bicycle	la bicicleta
+bien	good[Adjective]
+biff	biffar[Verb]
+big	grande
+biochemical	bioquimico[Noun]
+bird	pa/jaro[Noun]
+birth	el nacimiento
+birthday	cumplean~os[Noun]
+bit	el bit (computadora)
+bitch	perra[Noun]
+bitches	putas, putos[Noun]
+bite	bocado, picada[Noun]
+bite	morder
+biting	mordaz, penetrante[Adjective]
+bits	los bits (computadora)
+bitter	amargo
+bitterness	amargura, rencor[Noun]
+black	negro
+blackboard	la pizarra
+bladder	vejiga[Noun]
+bladders	las vejigas[Noun]
+blanket	la manta
+bleed	sangrar
+blind	ciego
+blinds	persianas
+blizzard	la ventisca
+block	bloque
+blocked	bloqueado
+blond	rubio
+blonde	rubio
+blood	la sangre
+blouse	la blusa
+blue	azul
+blueprint	anteproyecto[Noun]
+boat	el barco
+body	el cuerpo
+boil	hervir
+bone	el hueso
+bones	los huesos
+book	el libro
+bookcase	el estante de libros[Noun]
+books	los libros
+bookstore	la tienda de libros[Noun]
+boot	bota[Noun]
+boots	botas[Noun]
+bored	aburrido
+boring	aborrido[Adjective]
+boss	el jefe
+both	ambos/as[Adjective]
+bother	molestar
+bottle	la botella
+bottles	las botellas
+bottom	el fondo
+box	la caja
+boxes	las cajas
+boy	chico, chamaco, nino
+boy	el muchacho
+boycott	boicoteo; boicotear(verb)
+boycotted	boicoteado
+boyfriend	amigo
+boyfriend	novio
+boyhood	muchachez,juventud
+boyish	muchachil, juvenil
+boys	los muchachos
+bra	sosten
+bra	sujetador[Noun]
+brace	abrazadera
+bracelet	el brazalete
+bracelet	pulsera
+bracken	helecho
+bracket	abrazadera; soporte
+brackish	salobre; semisalado
+brad	puntilla; clavito
+brae	ladera de monte; pendiente
+brag	bravata; jactarse & fanfarronear(v)
+braggart	fanfarron; jactancioso
+bragging	fanfarronadas
+brahma	brahaman; bracman
+braid	trenza; galon(mil)
+brain	cerebro
+brainchild	parto del ingenio; invento
+brainless	estupido; insensato
+brainpower	fuerza intelectual
+brains	inteligencia; cabeza
+brainstorm	idea genial
+brainteaser	rompecabezas
+brainwash	lavar el cerebro a; 
+brainwashing	lavado de cerebro
+brainy	muy inteligente; talentudo
+braise	brasear
+brake	freno
+brakeless	sin freno[Adjective]
+branch	la rama
+branches	ramas[Noun]
+branchia	branquia[Noun]
+branchial	branquial[Noun]
+branchiate	branquiado[Adjective]
+branchless	sin ramas
+brand	marca[Noun]
+brandy	brandy[Noun]
+brass	metal[Noun]
+brasserie	panaderia[Noun]
+bratwurst	salchicha[Noun]
+bravery	el valor
+bread	el pan
+break	romper
+breakfast	el desayuno
+breathe	respirar
+breeze	la brisa
+brick	el ladrillo
+bridge	el puente
+bring	traer
+broad	ancho[Adjective]
+broadband	ancho de banda
+broken	roto
+broom	la escoba
+brother	el hermano
+brown	pardo
+brunette	moreno
+brush	el cepillo
+bucket	el cubo
+bug	error[Adjective]
+building	el edificio
+bull	el toro
+burn	la quemadura
+burn	quemar
+bus	la guagua (Canary Islands)[Noun]
+bus	autobus
+bush	el arbusto
+business	el negocio
+busy	ocupado
+but	pero
+butter	la mantequilla
+butter	mantequilla
+butterfish	mariposa
+buy	comprar
+buyer	comprador
+byte	el byte[Noun]
+bytes	los bytes[Noun]
+c	c
+cab	POLICIA[Noun]
+cab	taxi
+cab	taxi, radiotaxi
+cabal	concilia/bulo[Noun]
+cabala	ca/bala
+cabalism	cabalismo[Noun]
+cabalist	cabalista[Noun]
+cabalistic	cbali/stico(a)
+caballero	gent;emen
+caballero	gentleman
+caballero	knight[Noun]
+cabana	cabanã
+cabanas	caban~as
+cabaret	cabaret
+cabbage	col
+cabbage	la col
+cabbaged	repollado[Adjective]
+cabbages	coles
+cabbaging	repollando[Verb]
+cabbala	ca/bala[Noun]
+cabbie	chofer[Noun]
+cabbie	el taxista
+cabbies	choferes[Noun]
+cabbies	los taxistas
+cabby	chofer[Noun]
+cabby	el taxista[Noun]
+cabdriver	conductor de taxi
+cabdriver	taxista
+cabin	cabina
+cabin	litera
+cabinet	armario
+cabinet	gabinete
+cabinetmaker	ebanista
+cabinetmakers	ebanistas
+cabinetmakers	ebanister/ia
+cabinetmaking	ebanister/ia
+cabinets	armarios
+cabinets	gabinetes
+cabinetwork	ebanisteri/a[Noun]
+cabins	cabinas
+cable	cable
+cabled	cableado, telegrafiado[Noun]
+cablegram	cablegrama[Noun]
+cablegrams	cablegramas[Noun]
+cables	cables
+cablet	estacha[Noun]
+cableway	cablecarril[Noun]
+cabling	cableado, cableando, telegrafiando
+cabman	taxista[Noun]
+caboodle	montón[Noun]
+caboose	fogón; cocina[Noun]
+cabotage	cabotaje[Noun]
+cabriole	cabriola[Noun]
+cabriolet	cabriolet[Noun]
+cabs	taxis
+cabstand	parada de taxis[Noun]
+cacao	cacao
+cacciatore	caciatore
+cacciatore	hunter
+cachalot	cachalote[Noun]
+cacophonous	cacofo/nico[Adjective]
+cacophonously	cacofo/nicamente[Adverb]
+cacophony	cacofoni/a[Noun]
+cacti	cactus
+cactus	el cacto
+cactuses	cactos[Noun]
+cacuminal	cacuminal[Adjective]
+cadastral	catastral[Noun]
+cadastre	catastro[Noun]
+cadaver	cada/ver
+cadaveric	cadavérico
+cadaverine	cadaverina[Noun]
+caddy	estuche[Noun]
+cadence	cadencia ( musical)
+cadences	cadencias[Noun]
+cadency	cadencia[Noun]
+cadenza	cadencia[Noun]
+cadet	cadete
+cadge	sablear, gorronear[Verb]
+cadmium	cadmio
+cadre	cuadro[Noun]
+caducean	caduco
+caduceus	caduceo[Noun]
+caducity	caducidad
+caducous	caduco[Adjective]
+cafe	cafe/
+cafes	cafe/s
+cafeteria	cafeteri/a
+cafeterias	cafeteri/as
+caffeine	cafei/na
+caftan	cafta/n[Noun]
+cage	jaula
+cage	la jaula
+caged	enjaulado
+cages	jaulas
+cahier	cuaderno[Noun]
+caiman	caima/n
+cake	el pastel
+cake	pastel
+cake	tarta
+cake	torta
+cakes	pasteles
+cakes	tarta
+cakes	tortas
+calabash	calabaza[Noun]
+calaboose	calabozo[Noun]
+calamine	calamina[Noun]
+calamint	ajedrea[Noun]
+calamite	Calamites[Noun]
+calamities	calamidades
+calamitous	calamitoso
+calamitously	calamitosamente[Adverb]
+calamity	calamidad
+calamus	acoro, pluma[Noun]
+calash	calesa[Noun]
+calcaneal	calcan~al
+calcaneum	calca/neo[Noun]
+calcaneus	calca/neo[Noun]
+calcareous	calca/reo
+calcic	ca/lcico
+calcific	calcificar
+calcification	calcificacio/n
+calcified	calcificado
+calcifuge	calci/fugo[Adjective]
+calcifugous	calci/fugo
+calcify	calcificar
+calcimine	encalar[Verb]
+calcination	calcinacio/n
+calcine	calcinar
+calcined	calcinado
+calcining	calcinando, calcinante[Verb]
+calcite	calcita[Noun]
+calcitic	calci/tico[Adjective]
+calcium	calcio
+calculability	calculabilidad[Noun]
+calculable	calculable[Adjective]
+calculably	calculablemente[Adverb]
+calculate	calcular
+calculated	calculado
+calculatedly	calculadamente[Adverb]
+calculates	calcula
+calculation	ca/lculo
+calculations	ca/lculos
+calculator	calculadora
+calculators	calculadoras
+calculi	ca/lculos[Noun]
+calculus	ca/lculo
+caldera	caldera[Noun]
+caldron	caldero/n
+caleche	calesa[Noun]
+calendar	calendario, almanaque
+calendar	el calendario
+calendars	calendarios, almanaques
+calends	calendas[Noun]
+calendula	caléndula, maravilla[Noun]
+calenture	calentura[Noun]
+calf	chivo
+calfs	pantorrillas[Noun]
+caliber	calibre
+calibers	calibre[Noun]
+calibrate	calibrar
+calibrated	calibrado
+calibrates	calibra[Verb]
+calibrating	calibrando, calibrante[Verb]
+calibration	calibracio/n[Noun]
+calibrations	calibraciones[Noun]
+calibrator	calibrador[Adjective]
+calibrators	calibradores[Adjective]
+calibre	calibre[Noun]
+californium	californio[Noun]
+caliginous	caliginoso[Adjective]
+caliper	calibre, pie de rey[Noun]
+calipers	calibres, pies de rey[Noun]
+caliph	califa[Noun]
+caliphal	califal[Adjective]
+caliphate	califato[Noun]
+caliphs	califas[Noun]
+calisthenic	calisténico[Adjective]
+calisthenics	calistenia[Noun]
+call	llamar
+calla	aro palustre
+called	llamo/
+calligrapher	cali/grafo[Noun]
+calligraphers	cali/grafos[Noun]
+calligraphic	caligra/fico[Noun]
+calligraphically	caligra/ficamente[Adverb]
+calligraphist	cali/grafo[Noun]
+calligraphy	caligrafi/a
+calling	llamado ( as in calling in life)
+calliper	calibre, pie de rey[Noun]
+callosity	callosidad[Noun]
+callous	calloso[Adjective]
+calls	llamadas
+callus	callo
+calluses	callos
+calm	calmar ( verb)
+calmative	calmante 
+calmed	calmado
+calming	calmante
+calmly	calmadamente
+calmness	tranquilidad
+calms	calma
+caloric	calori/fico
+calorie	calori/a
+calories	calori/as
+calumniate	calumniar
+calumniation	calumnia
+camaraderie	camaraderi/a
+came	vino
+camel	camello
+camelia	camelia
+camels	camellos
+camera	camara
+cameraman	camaro/grafo
+cameramen	camaro/grafos
+cameras	camaras
+camp	campo
+campaign	campan~a
+campaigns	campan~as
+campesinos	country folk
+campfire	fogata
+camphor	alca/nfor
+camps	campamentos
+campus	recinto
+campuses	recintos
+can	la lata
+can	lata
+can opener	el abrelatas
+canal	canal
+canals	canales
+canaries	canarios
+canary	canario
+canasta	canasta ( basket)
+cancan	cancan ( the dance)
+cancel	cancelar
+cancelation	cancelacio/n
+cancelations	cancelaciones
+canceled	cancelo/
+cancellation	cancelacio/n
+cancellations	cancelaciones
+cancelled	cancelo/
+cancelling	cancelando
+cancer	ca/ncer
+cancerous	canceroso
+candelabra	candelabro
+candid	ca/ndido
+candidate	candidato
+candidates	candidatos
+candied	acaramelado
+candies	caramelos
+candle	la vela
+candle	vela
+candleholder	candelabro
+candy	caramelo
+candy	el dulce
+can't	no puede
+cane	basto/n ( as in walking stick)
+canes	bastones
+canned	enlatado
+cannibal	cani/bal
+cannibalism	canibalismo
+cannibals	canibales
+cannon	can~on
+canoe	canoa
+canoes	canoas
+canon	canonizar ( to canonize )
+cans	las latas
+cantaloupe	melo/n
+cantata	cantata
+cantina	cantina
+cap	el gorro
+capabilities	capacidades
+capability	capacidad
+capable	capaz
+capacitate	capacitar
+capacities	capacidades
+capacity	capacidad
+cape	capa
+capella	a capella
+capital	Capitolio ( as in building) 
+capital	la capital
+capitalism	Capitalismo
+capitalist	capitalista 
+capitalists	capitalistas
+capitol	capitolio
+capitols	capitolios
+capriccio	capricho
+capricious	caprichoso
+capriciously	caprichosamente
+capsule	ca/psula
+capsules	ca/psulas
+captain	capita/n
+captivate	cautivar
+captive	cautivo
+captives	cautivos
+capuchin	cachupi/n
+car	automo/vil, carro
+car	el coche
+car window	la ventanilla
+caravan	caravana
+caravans	caravanas
+caravel	caravela
+carbohydrate	carbohi/drato
+carbohydrates	carbohi/dratos
+carbon	carbo/n
+carcinogen	carcino/geno
+carcinogenic	carcinoge/nico
+carcinoma	carcinoma
+card	tarjeta
+cardiac	cardi/aco
+cardiogram	cardiograma
+cardiograms	cardiogramas
+cardiovascular	cardiovascular
+care	cuidado
+career	profesio/n
+careers	profesiones
+carefree	sin cuidado
+careful	cuidadoso
+carefully	cuidadosamente
+carefulness	cuidado
+careless	sin cuidado
+carelessly	sin cuidado
+caress	acariciar
+caresses	caricias
+cargo	carga
+cargoes	cargas
+cargos	cargas
+caribe	cari/be
+caricature	caricatura
+caricaturist	caricurista
+carnival	carnaval
+carnivals	carnavales
+carnivore	carni/voro
+carol	cantata
+carousel	carusel
+carpenter	carpintero
+carpenter	el carpintero
+carpenters	carpinteros
+carpentry	carpinteri/a
+carpet	alfombra
+carpet	la alfombra
+carrot	la zanahoria
+carry	cargar
+carry	llevar
+carryall	cargatodo
+carrying	cargando
+cars	automo/viles, carros
+cars	los coches
+cart	carretilla
+carte	carta ( as in a la carte )
+cartel	cartel
+cartilage	carti/lago
+cartographer	carto/grafo
+cartographers	carto/grafos
+cartographic	cartogra/fico
+cartography	cartografi/a
+cartomancy	carto/mancia
+cartoon	mun~equitos
+carts	carretillas
+carve	tallar
+carved	tallado
+casa	casa (house)
+casa	house[Conjunction]
+casaba	casaba ( vegetable )
+cascade	cascada
+cascades	cascadas
+cash	efectivo
+cashier	cajero
+cashier	el cajero
+cashiers	cajeros
+casino	casino
+casinos	casinos
+cast	arrojar, lanzar, echar (dados), asignar (papeles en el teatro)fundir, colar
+castanet	castan~uela
+castanets	castan~uelas
+castigate	castigar
+castigated	castigado
+castigates	castiga
+castigation	castigo
+castigator	castigador
+castigators	castigadores
+castle	castillo
+castle	el castillo
+castles	castillos
+castrate	castrar
+castrated	castrado
+casual	informal
+cat	el gato
+cat	gato
+cataclysm	cataclismo
+catacomb	catacumba
+catalog	cata/logo
+cataloged	catalogado
+catalogs	cata/logos
+catalogue	cata/logo
+catalogues	cata/logos
+catastrophe	cata/strofe
+catastrophes	cata/strofes
+catastrophic	catastro/fico
+catatonic	catato/nico
+catch	coger
+catechism	catecismo
+categoric	catego/rico
+categorically	catego/ricamente
+categories	categori/as
+categorize	catalogar
+cats	los gatos
+caudal	caudal
+caudillo	caudillo
+cauliflower	coli/flor
+cauliflower	la coliflor
+cauliflowers	coliflores
+cause	causa
+caution	cautela
+cave	cueva
+cave	la cueva
+caves	cuevas
+caviar	cavia/r
+cavities	caries
+cavity	carie ( dentist)
+cay	cayo
+cease	cesar
+ceased	ceso/
+ceasefire	cese al fuego
+ceases	cesa
+cedar	cedro
+cedarwood	cedro
+cede	ceder
+cedilla	cedilla
+ceiling	el techo
+ceiling	techo
+celebrant	festejante, celebrador
+celebrants	festejantes,celebradores
+celebrate	celebrar
+celebrate	festejar,celebrar
+celebrated	festejo/, celebro/
+celebrates	festeja, celebra
+celebration	festividad
+celebrations	festividades
+celebrities	ce/lebres
+celebrity	ce/lebre
+celery	apio
+celery	el apio
+celestial	celestial
+celibacy	celibato
+cell	ce/dula
+cellar	bodega
+cellars	bodegas
+cells	ce/dulas
+cellular	celular ( anglicism)
+cement	cemento
+cemented	encementado
+cemeteries	cementerios
+cemetery	cementerio
+cemetery	el cementerio
+censor	censurador
+censored	censurado
+censors	censuradores
+censorship	censura
+census	apadronamiento, censo
+censuses	apadronamientos, censos
+cent	centavo
+cent	el centavo
+centavo	centavo
+centenarian	centenario
+center	centro
+center	el centro
+centerpiece	centro de mesa
+centerpieces	centros de mesa
+centers	centros
+centesimo	cente/simo
+centigrade	centi/grado
+centigram	centi/gramo
+centigrams	centi/gramos
+centime	centimo
+centimeter	centi/metro
+centimeters	centi/metros
+centimo	centimo
+centric	ce/ntrico
+cents	centavos
+centuries	siglos
+centurion	centurio/n
+century	el siglo
+century	siglo
+cephalic	cefa/lico
+ceramic	cera/mica
+ceramics	cera/micas
+ceramist	cera/mico
+cereal	cereal
+cereals	cereales
+cerebellum	cerebellum
+ceremonial	ceremonial
+certain	cierto
+certainly	ciertamente
+certainty	certidumbre[Noun]
+certifiable	certificable
+certificate	certificado (noun)
+certificated	certificado
+certificates	certificados
+certification	acreditadacio/n
+certified	acreditado
+certifies	acredita
+certify	acreditar
+cesarian	cesa/rea
+cessation	cese
+chain	cadena
+chain	encadener[Verb]
+chain	la cadena
+chained	encadenado
+chains	cadenas
+chair	la silla
+chair	silla
+chairman	presidente[Noun]
+chairmanship	presidencia[Noun]
+chairs	las sillas
+chalet	chale/t
+chalice	ca/liz[Noun]
+chalk	la tiza
+chalk	tiza
+chalk	yeso[Noun]
+chalkboard	pizarra
+chalks	tizas
+chalky	yesoso[Adjective]
+challenge	desafiar[Verb]
+challenge	desafi/o
+challenged	desafio/ ( action verb)
+challenges	desafi/os
+challenging	desafiando
+chameleon	camaleo/n
+chamomile	manzanilla
+champ	campe/on
+champagne	champan~a
+champion	campeo/n
+champions	campeones
+chance	azar
+chance	oportunidad[Noun]
+chancy	arriesgado[Adjective]
+chandelier	chandelie/r
+chandelier	candelabro[Noun]
+chandeliers	chandelie/res
+change	cambiar
+change	cambiar (v)
+change	cambio
+changed	cambio/
+changes	cambios
+changing	cambiando
+channel	canal
+chanson	canci/on ( song )
+chanteuse	cantante ( singer m or f )
+chanteuses	cantantes
+chaos	caos
+chaos	chaos
+chaotic	cao/tico
+chaotically	cao/ticamente
+chapeau	cabeza ( head )
+chapel	iglesia 
+chapelles	sombreros ( hats )
+chapels	iglesias
+chaperon	chapero/n
+chaperone	chapero/n
+chapter	capi/tulo
+chapters	capi/tulos
+character	cara/cter
+characteristic	caracteri/stica
+characteristics	caracteri/sticas
+characters	cara/cteres
+charade	charada
+charades	charadas
+charcoal	carbo/n
+charcuterie	cuchilleri/a ( knives )
+charge	cargar ( batteries)
+chargeable	cargable
+charged	cargado
+charisma	carisma
+charismatic	carisma/tico
+charitable	caritativo
+charity	caridad
+charlatan	charlata/n
+charlatans	charlatanes
+charm	encantar (verb) amuleto ( noun)
+charm	echizar
+charmed	encantado
+charming	encantador
+charms	amuletos ( noun)
+chase	cazar
+chase	perseguir
+chased	persiguio/ 
+chaser	perseguidor
+chaste	casto
+chastise	castigar
+chastised	castigo/
+chastisement	castigo
+chastisements	castigos
+chastity	castidad
+chat	charlar
+chats	charlas
+chatted	charlo/
+chauffeur	chofe/r
+chauvinism	machismo
+chauvinist	machista
+chauvinistic	machista
+chauvinists	machistas
+cheap	barato
+cheaper	ma/s barato
+cheapie	tacan~o
+cheapskate	tacan~o
+cheapskates	tacan~os
+check	cheque
+checkbook	chequera
+checkbooks	chequeras
+checkers	damas ( game)
+checkmate	jaquemate ( chess)
+cheek	la mejilla
+cheek	mejilla
+cheekbone	po/mulo
+cheekbones	po/mulos
+cheeks	mejillas
+cheerfully	alegremente
+cheerfulness	alegri/a
+cheerily	alegremente
+cheers	chi/n, chi/n,  ( in a brindis)
+cheese	el queso
+cheese	queso
+cheeseburger	hamburquesa de queso
+cheeseburgers	hamburguesas de queso
+chef	cocinero
+chefs	cocineros
+chemical	qui/mico
+chemicals	qui/micas
+chemise	camisa ( men's shirt)
+chemises	camisas
+chemist	qui/mico
+chemistry	qui/mica
+chemists	qui/micos
+cherish	querer
+cherished	querido
+cherries	cerezas
+cherry	cereza
+cherry	la cereza
+cherub	querubi/n
+cherubs	querubines
+chess	ajedrez
+chess	el ajedrez
+chessboard	tabla de ajedrez
+chessboards	tablas de ajedrez
+chessman	pieza de ajedrez
+chest	el pecho
+chest	pecho
+chestnut	castan~a
+chestnuts	castan~as
+chew	mascar
+chew	masticar
+chewable	masticable
+chewed	mastico/
+chewing	masticando
+chic	chic
+chick	pollito
+chickadee	bohi/o
+chickadees	bohi/os
+chicken	el pollo
+chicken	pollo
+chickenhearted	coba/rde
+chickens	pollos
+chickpea	garbanzo
+chickpeas	garbanzos
+chicle	chicle ( gum)
+chide	regan~ar
+chiefly	principalmente[Adverb]
+chieftain	je/fe
+chieftaincy	jefatu/ra
+child	nin~a (f)
+child	nin~o
+childhood	nin~ez
+childish	bo/bo (a)[Adjective]
+childless	sin descende/ncia
+children	nin~os
+chili	chili
+chill	escalofri/o (med.)
+chills	escalofri/os (ned)
+chimney	chimenea
+chimney	la chimenea
+chimneys	chimeneas
+chimp	chimpance/
+chimpanzee	chimpanc/e
+chimpanzees	chimpance/s
+chimps	chimpance/s
+chin	barba
+chin	la barbilla
+chinaware	vajilla
+chipmunk	top/o
+chiropractic	quiropra/ctica
+chiropractor	me/dico quiropra/ctico 
+chiropractors	me/dicos quiropra/cticos
+chloral	clora/l
+chlorate	clora/to
+chloride	cloru/ro
+chlorides	cloru/ros
+chlorine	clo/ro
+chloroform	clorofo/rmo
+chlorophyll	cloro/filo
+chloroplast	cloropla/sto
+chocolate	chocolate
+chocolate	el chocolate
+chocolates	chocolates
+chocolaty	achocolata/do (a)[Adjective]
+choice	escogi/do (a)[Adjective]
+choicest	mas escogi/do (a)
+choir	coro
+choirboy	corista
+choirs	coros
+choke	estrangular
+cholera	co/lera ( disease)
+choleric	cole/rico
+cholesterol	colestero/l
+choline	coli/na
+cholinergic	coline/rgico (a)[Adjective]
+cholinesterase	colinestera/sa
+choose	escoger
+choose	escojer ( to choose)
+chopstick	pali/llo chi/no
+chopsticks	pali/llos chi/nos
+chore	la tarea
+chorizo	chorizo ( spanish sausage )
+chortle	reir(se)[Verb]
+chose	escojer
+christened	bautiza/do (a)[Adjective]
+christening	bauti/zo
+Christmas	la Navidad
+chromate	crom/ado (a)
+chromatic	croma/tico (a)[Adjective]
+chromatography	cromatografi/a
+chrome	cro/mo
+chromium	cromo
+chromosomal	cromosoma/l[Adjective]
+chromosome	cromoso/ma
+chromosomes	cromoso/mas
+chromosomic	cromoso/mico (a)[Adjective]
+chronic	cro/nico (a)[Adjective]
+chronically	cronicame/nte[Adverb]
+chronicity	cronicida/d
+chronicle	cro/nica
+chronicles	cro/nicas
+chronologer	crono/logo
+chronologic	cronolo/gico (a)[Adjective]
+chronological	cronolo/gico (a)[Adjective]
+chronologically	cronologicame/nte[Adverb]
+chronologist	crono/logo
+chronologists	crono/logos
+chronologize	cronologiza/r[Verb]
+chronology	cronologi/a
+chronometer	crono/metro
+chronometric	cronome/trico (a)[Adjective]
+chrysanthemum	crisa/ntemo
+chrysanthemums	crisa/ntemos
+chuckhole	ba/che (mex.)
+chunk	el tro/zo
+chunks	troci/tos
+church	la iglesia
+churches	las igle/sias
+churchless	sin iglesia[Adjective]
+churn	revolver(se)[Verb]
+churned	revuelto (a)[Adjective]
+chutzpah	personalidad
+cicadas	la cigarra
+cider	la sidra
+cigar	el cigarro
+cigar	el puro (mex)
+cigarette	el cigarrillo
+cigarette	el cigarro (mex)
+cigarettes	los cigarros (mex)
+cigars	los puros
+cilia	la cilia
+ciliary	ciliario (a)[Adjective]
+cinder	ceniza (ash)
+cinders	cenizas
+cinematography	cinematografi/a
+cinnamon	la canela
+cipher	la cifra
+circle	el ci/rculo
+circuit	el circuito
+circuits	los circuitos
+circular	circular[Adjective]
+circulate	circular[Verb]
+circulated	circulado (a)[Adjective]
+circulates	circula[Verb]
+circulation	la circulacion
+circulatory	circulatorio (med)
+circumcision	la circuncision
+circumference	la circunferencia
+circus	el circo
+city	la ciudad
+clam	la almeja
+clamp	apretar, embridar, sujetar[Verb]
+class	la clase
+clean	limpiar
+clean	limpio
+clerk	el dependiente
+cliff	el acantilado
+climate	el clima
+climb	subir
+clock	  ceas
+clock	el reloj
+clockwise	q
+clockwise	en el sentido de las agujas del reloj[Adverb]
+clockwork	mecanico[Adjective]
+close	cerrar
+closed	cerrado
+closet	el armario
+closet	el closet[Noun]
+cloth	la tela
+clothes	la ropa[Noun]
+clothing	la ropa
+cloud	la nube
+clouds	las nubes
+cloudy	nublado
+clown	el payaso
+c'mon	vamos
+cock	gallo[Noun]
+cock	pija, pene[Noun]
+cockatoo	cacatua[Noun]
+cockpit	cabina [de un piloto][Noun]
+cockroach	la cucaracha
+cocktail	coctail[Noun]
+coconut	el coco
+coffeepot	la cafetera
+collar	el collar (for dog)[Noun]
+collar	el cuello
+college	el colegio
+color	el color
+colors	los colores
+comb	el peine
+combustibles	combustibles[Noun]
+combustion	combustio/n[Noun]
+come	venir
+comeback	regresar[Verb]
+comedian	co/mico[Noun]
+comedians	co/micos[Noun]
+comedienne	co/mica[Noun]
+comediennes	co/micas[Noun]
+comedy	la comedia
+comer	comest
+comer	to eat
+comer	t.v.
+comet	cometa[Noun]
+comets	cometas[Noun]
+comfort	comodidad[Noun]
+comfortable	co/modo[Adjective]
+comforter	confortador[Noun]
+comforting	confortante[Adjective]
+comic	comer
+comical	co/mico[Adjective]
+comma	la coma
+command	mando[Noun]
+commandant	comandante[Noun]
+commands	o/rdenes[Noun]
+commas	comas[Noun]
+commemorate	conmemorar[Verb]
+commence	comenzar[Verb]
+commendable	recomendable[Adjective]
+complain	quejarse
+computer	computadora
+computers	computadoras[Noun]
+comrade	amigo[Noun]
+concert	el concierto
+confused	confuso
+consumption	consumo
+consumptive	tísico[Noun]
+contact	contacto[Noun]
+contact	contactar [Verbo][Verb]
+contact	ponerse en contacto
+contemplate	contemplar[Verb]
+contemplate	meditar[Verb]
+contemplate	proyectar[Verb]
+contemplates	contempla[Verb]
+contemplates	medita[Verb]
+contemplates	proyecta[Verb]
+contemplating	contemplando[Verb]
+contemplating	meditando[Verb]
+contemplation	contemplacio/n[Noun]
+contemplation	intencio/n[Noun]
+contemplation	meditacio/n[Noun]
+contemplations	contemplaciones[Noun]
+contemplations	intenciones[Noun]
+contemplations	meditaciones[Noun]
+contemporary	coeta/neo[Adjective]
+contemporary	contempora/neo[Adjective]
+contempt	desde/n[Noun]
+contempt	desprecio[Noun]
+contempt	menosprecio[Noun]
+contemptible	despreciable[Adjective]
+contemptible	vil[Adjective]
+contemptuous	desden~oso[Adjective]
+contend	altercar[Verb]
+contend	competir[Verb]
+contend	contender[Verb]
+content	contenido[Noun]
+content	contento[Adjective]
+content	satisfecho[Adjective]
+contented	contento[Adjective]
+contented	satisfecho[Adjective]
+contentedness	contentamiento[Noun]
+contentedness	contento[Noun]
+contention	contencio/n[Noun]
+contention	contienda[Noun]
+contention	disputa[Noun]
+contentions	contenciones[Noun]
+contentions	contiendas[Noun]
+contentions	disputas[Noun]
+contentment	contentamiento[Noun]
+contentment	contento[Noun]
+contest	certamen[Noun]
+contest	debate[Noun]
+contest	el concurso
+continent	el continente
+continue	continuar
+cook	cocer
+cook	el cocinero
+cookie	la galleta
+cookies	las galletas
+cool	chido
+cool	fresco
+cool	chevere, chilero[Adjective]
+copper	el cobre
+copy	copiar
+copy	la copia
+corduroy	la pana
+cork	el corcho
+corn	mai/z
+corn	mai/z[Noun]
+correct	correcto
+cost	costar
+costume	disfra/s[Noun]
+cough	la tos
+cough	toser
+count	contar
+countable	contable
+countdown	cuenta regresiva
+countdowns	cuentas regresivas
+counted	contado
+counter	contador (de tiempo)
+counterattack	contraataque
+counterclockwise	contra las agujas del reloj[Adverb]
+counterespionage	contraespionaje[Noun]
+counterintelligence	contrainteligencia[Noun]
+countermeasure	contramedida[Noun]
+counteroffensive	contraofensiva[Noun]
+counteroffer	contraoferta[Noun]
+counterpart	contraparte[Noun]
+counterproposal	contrapropuesta[Noun]
+counterrevolutionaries	contrarrevolucionarios[Noun]
+cousin	el primo
+covenant	alianza[Noun]
+covenants	alianzas[Noun]
+cover	cubrir
+cover	la cubierta
+cow	la vaca
+coward	el cobarde
+cowboy	el vaquero
+crab	el cangrejo
+crankshaft	ciguenal
+crazy	loco
+cream	la crema
+cricket	grillo[Noun]
+crime	el crimen
+crow	el cuervo
+crowd	muchedumbre[Noun]
+crowded	atestado[Adjective]
+crown	corona[Noun]
+crude	basto[Adjective]
+cruel	cruel[Adjective]
+crumb	la miga
+crutch	muleta[Noun]
+crutches	muletas[Noun]
+cry	llorar
+crying	llorando[Adjective]
+cucumber	el pepino
+cup	la taza
+cupulate	copular
+curable	curable
+cureless	incurable
+curfew	no tengo ni puta idea
+curiosities	curiosidades
+curiosity	curiosidad
+curious	curioso
+curricular	circular
+cursive	cursiva
+curtain	la cortina
+cut	cortar
+d%27etre	de ser
+dab	lenguado[Noun]
+dab	palmada, toba[Noun]
+dab	palmada, toba[Noun]
+dab	untar, dar palmadas[Verb]
+dacha	dacha[Noun]
+dactyl	dáctilo[Noun]
+dactylic	dactílico[Adjective]
+dad	el papa
+dad	padre
+daddies	padres[Noun]
+daddy	padres
+daddy	papa/[Noun]
+daddy	papi, papito [Noun]
+daddy	papi, papito [Noun]
+dads	padres
+dads	papas[Noun]
+daedal	intrincado; completo[Adjective]
+daemon	demonio[Noun]
+daemon	duende[Noun]
+daemon	espiritu[Noun]
+daemons	demonios[Noun]
+daff	bromear[Verb]
+daffodil	narciso[Noun]
+daffodils	narcisos[Noun]
+daffy	chiflado; loco[Adjective]
+daft	bobo[Adjective]
+daft	zonzo[Adjective]
+dafter	mas tonto[Adjective]
+daftest	el mas tonto[Adjective]
+daftly	locamente[Adverb]
+dagger	daga[Noun]
+daggerman	dagador[Noun]
+daggers	dagas[Noun]
+daguerreotype	daguerrotipo[Noun]
+daguerreotypes	daguerrotipos[Noun]
+daguerreotypic	daguerrotípico[Adjective]
+daguerreotypy	daguerrotipia[Noun]
+dahlia	dalia
+dahlias	dalias
+dailies	diarios[Noun]
+daily	diariamente[Preposition]
+daily	todos los dias
+daintier	delicado[Adjective]
+dainty	poquita[Adjective]
+dairies	diarios[Noun]
+dairy	producto la/cteo[Noun]
+dale	valle[Noun]
+dales	valles[Noun]
+dally	tardar, perder el tiempo[Verb]
+dalmatian	dalmata[Noun]
+dalmatians	dalmatas[Noun]
+dam	represa[Noun]
+damage	daño[Noun]
+damaged	dañado[Adjective]
+damages	daños[Noun]
+damaging	dañando[Adverb]
+damask	damasco[Noun]
+dame	dama[Noun]
+dame	mujer[Noun]
+dammit	maldición[Adjective]
+damned	condenado[Verb]
+damp	humedo[Adjective]
+damped	mojado[Verb]
+damsel	doncella[Noun]
+dance	bailar
+dance	el baile
+danced	bailo/
+dancer	bailador[Noun]
+dancer	bailarin
+dancer	bailarín[Noun]
+dancers	bailadores
+dancers	bailarines
+dances	baila
+dancing	bailando[Adjective]
+dandelion	diente de leon[Noun]
+dandelions	dientes de leo/n[Noun]
+dandruff	la caspa
+danger	el peligro
+dangerous	peligroso
+dangerously	peligrosamente[Adverb]
+d'art	de arte, arti/stico
+dare	cariño, querido(a)[Adjective]
+dark	oscuro
+darkness	la oscuridad
+darkroom	cuarto oscuro[Noun]
+dash	corre[Verb]
+dashing	hermoso[Adjective]
+data	datos[Noun]
+databanks	banco de datos
+database	base de datos
+date	Fecha
+date	la fecha
+dated	fechado
+daughter	Hija
+daughter	la hija
+daughter	Nina
+daughters	Hijas
+day	Día
+daybed	cama dia
+daybook	libro dia
+days	dias
+deactivated	desactivado[Noun]
+dead	muerto
+deaf	sordo
+deal	trato[Noun]
+dean	decano[Noun]
+dear	querido
+death	la muerte
+debate	debate[Noun]
+debit	debit
+debt	deuda[Noun]
+December	diciembre
+decide	decidir
+defeat	english[Noun]
+defeat	spanish
+delicate	delicado
+delicious	delicioso
+deliver	entregar
+deluge	diluvio[Noun]
+democracy	la democracia
+dentist	el dentista
+deny	negar
+describe	describir
+desert	el desierto
+desire	desear
+desk	el escritorio
+desperado	desesperado[Noun]
+dessert	el postre
+desserts	postres[Noun]
+destination	destinacio/n[Noun]
+destine	destinar[Verb]
+destined	destinado[Adjective]
+destinies	destinos[Noun]
+destiny	destino[Noun]
+destroy	destruir
+destroyed	destruido[Adjective]
+destroyer	destruidor[Noun]
+destructible	destructible[Adjective]
+destruction	ruina[Noun]
+destructive	destructivo[Adjective]
+d'etat	de estado[Noun]
+detour	el rodeo
+d'etre	de ser
+devil	el diablo
+diamond	el diamante
+diaper	el panal
+dichotomy	dicotomía
+dichroic	dicroico
+dichroism	dicroismo
+dichromatic	dicromatico
+dichromatism	dicromatismo
+dick	verga,pene.[Noun]
+dick	 declaracion, polla (vulg)[Noun]
+dicker	vergante[Adjective]
+dicks	vergas
+dicks	pollas (vulg)
+dicotyledon	dicotiledon
+dictate	dictar, notar (verb), dictamen (Noun)
+dictated	dictado[Verb]
+dictator	dictador
+dictatorial	dictatorial
+dictatorially	dictatorialmente
+dictators	dictadores
+dictatorship	dictadura
+dictionary	el diccionario
+did	past of do.[Verb]
+didn't	pasado negativo de "do"
+die	morir
+died	muerto[Verb]
+diehard	duro de matar[Adjective]
+different	diferente
+difficulty	dificultad[Noun]
+dimple	el hoyuelo
+dining room	el comedor
+diocese	diócesis[Noun]
+dirty	ensuciar[Verb]
+dirty	sucio
+dirty	verde[Adjective]
+dirtying	ensuciando
+disabilities	incapacidades
+disability	inhabilidad
+disable	inutilizar[Verb]
+disadvantage	desventaja[Noun]
+disadvantageous	desventajado[Adjective]
+disaster	el desastre
+dish	el plato
+dishes	los platos
+disrupt	transtornar[Verb]
+disrupted	transtornado[Verb]
+disrupting	transtornando[Verb]
+do	hacer
+docile	do/cil[Adjective]
+dock	da/rsena[Noun]
+dock	reducir[Verb]
+dockage	muellaje (docking fee)[Noun]
+docket	orden del di/a[Noun]
+docket	sumario[Noun]
+dockyard	arsenal[Noun]
+doctor	doctor[Noun]
+doctorate	doctornado[Noun]
+doctrinaire	doctrinario[Noun]
+doctrinal	doctrinal[Adjective]
+doctrine	doctrina[Noun]
+document	documentar[Verb]
+document	documento[Noun]
+document	document
+documental	documental
+documentary	documental[Adjective]
+documentation	documentacio/n[Noun]
+dodder	temblar[Verb]
+d'oeuvre	obra maestra (chef d'oeuvre)
+dog	el perro
+dog	la perra
+dogs	las perras
+dogs	los perros
+doll	mun~eca[Noun]
+dolls	mun~ecas[Noun]
+donkey	el burro
+door	la puerta
+doors	las puertas[Noun]
+dope	la mota[Noun]
+dorm	la residencia universitaria[Noun]
+dormitory	la residencia universitaria[Noun]
+doubt	dudar
+dove	la palomita[Noun]
+doves	las palomitas[Noun]
+down	abajo[Adverb]
+download	bajar[Verb]
+dowry	dote[Noun]
+dozen	la docena
+drawer	la gaveta
+dream	sueño[Noun]
+dream	soñar[Verb]
+dreams	sueños[Noun]
+dress	el vestido
+dresses	los vestidos[Noun]
+drink	beber
+drink	tomar
+drink	el refresco[Noun]
+drinking glass	el vaso
+drip	gotear
+drive	manejar
+drug	la droga
+drugstore	la farmacia
+drum	el tambor
+drunk	borracho
+dry	secar
+dry	seco
+duck	el pato
+duende	duende
+during	durante
+e	e
+each	cada
+eager	ancioso
+eager	ansioso[Adjective]
+eagerly	anciosamente
+eagerness	ancia
+eagerness	ansia
+eagle	aguila
+eagles	aguilas
+eaglet	aguilucho/ L'Aiglon (el aguilucho), el hijo de Napoleon[Noun]
+eagre	creciente de la marea; ola que forma la subida de la marea[Noun]
+ear	la oreja
+ear	oreja
+earache	dolor de oreja
+eardrop	espiando
+eardrop	gota para oreja[Noun]
+eardrum	tambor auditivo
+eardrums	tímpano, membrana del oído[Noun]
+eared	en mazorca, en espiga/ long-eared: de orejas largas[Adjective]
+earflap	oreja
+earful	noticias, rumores/arenga, admonición[Noun]
+earl	conde[Noun]
+earldom	condado/ título, condición y propiedad de conde en G.B.[Noun]
+earlier	mas temprano
+earliest	el mas temprano
+earliness	precocidad, anticipación/presteza, prontitud/calidad de temprano[Noun]
+earlobe	lo/bulo[Noun]
+early	temprano
+earmuff	orejera (protección contra el frío)[Noun]
+earn	ganar
+earned	ganado
+earner	ganador
+earners	ganadores
+earnest	seriedad, ahínco, empeño, intensidad/in earnest: en serio, con seriedad, de veras/[Noun]
+earnestly	seriamente/intensamente/de veras[Adverb]
+earnestness	seriedad, formalidad (de una persona)/ seriedad, gravedad (de una situación o asunto)[Noun]
+earning	ganancia[Noun]
+earnings	ganancias[Noun]
+earns	gana
+earphone	audi/fono[Noun]
+earphones	audi/fonos[Noun]
+earplug	tapon de oi/do[Noun]
+earring	el arete
+earring	el aro[Noun]
+earrings	aretes[Noun]
+earrings	los aros[Noun]
+ears	las orejas
+ears	oidos[Noun]
+ears	orejas
+earth	la tierra
+earth	tierra
+earthquake	el terremoto
+earthquake	terramoto
+earthquake	el temblor[Noun]
+earthquakes	terramotos
+earthquakes	los terremotos[Noun]
+earths	las tierras
+earthworm	gusano
+earthworms	gusanos
+ease	facilidad
+easier	mas facil
+easiest	el mas facil
+easily	facilmente
+east	el este
+easter	la Pasqua[Noun]
+eastward	al este[Adverb]
+easy	facil
+easy	fa/cil[Adjective]
+eat	comer
+eaten	comido
+eatery	el comedor[Noun]
+eating	comiendo
+echo	el eco
+ecology	ecologia
+economics	Economica[Noun]
+economize	economisa/r
+economized	economisa/do
+economy	econom'ia
+edge	orilla
+educate	educa/r
+educated	educado
+educates	educa
+e'er	contracción de "ever": siempre, alguna vez/ jamás, nunca en la vida[Adverb]
+effectual	eficaz[Adjective]
+egg	el huevo
+eight	ocho
+eighty	ochenta
+elbow	el codo
+electricity	electricidad[Noun]
+elephant	el elefante
+elevator	el ascensor
+eleven	once
+embarrassment	desconcierto, azoramiento[Verb]
+emerald	la esmeralda
+employ	emplear
+employee	el empleado
+enchilada	enchilada
+encompass	englobara[Verb]
+end	el fin
+England	la Inglaterra
+enjoy	gozar
+enough	bastante
+enter	entrar
+envelope	el sobre
+environment	ambiente[Noun]
+envy	envidiar[Verb]
+enzymatic	enzimático[Adjective]
+enzymatically	enzimaticamente[Adverb]
+enzyme	enzima[Noun]
+enzymes	enzimas[Noun]
+enzymic	enzimático[Adjective]
+enzymically	enzimaticamente[Adverb]
+enzymologist	enzimólogo[Noun]
+enzymology	enzimología[Noun]
+erase	borrar
+eraser	el borrador
+ermine	armin~o
+escape	escaparse
+estimate	estimar
+Europe	la Europa
+everyone	todo el mundo[Noun]
+everything	todo
+exactly	en punto
+example	el ejemplo
+excellent	excelente
+excited	excitado
+exhausted	agotado[Adjective]
+exhibit	exhibir
+exhibited	exhibido
+exhibiting	exhibiendo; exhibir
+exhibition	exhibición; exposición
+exhibitioner	exhibicionista; expositor
+exhibitionism	exhibicionismo
+exhibitionist	exhibicionista
+exhibitions	exhibiciones; exposiciones
+exhibitor	expositor
+exhibitors	expositores
+exhort	exhortar
+exhortation	exhortación
+exhortations	exhortaciones
+exhortative	exhortativo
+exhortatory	exhortatorio
+exhorted	exhortado
+exhorting	exhortando; exhortar
+exhorts	exhortos
+exhume	exhumar
+exhumed	exhumado
+exhumer	exhumador
+exhuming	exhumado; exhumar
+exigence	exigencia
+exigencies	exigencias
+exigency	exigencia
+exigent	exigente
+exigently	exigentemente
+exiguity	exigüedad
+exiguous	exiguo
+exiguously	exiguamente
+exiguousness	exigüedad
+exile	exilio
+exit	la salida
+expensive	caro
+explain	explicar
+explode	estallar
+express	expresar[Verb]
+expressions	expresiones[Noun]
+expressive	expresivo[Adjective]
+extending	extendiendo
+eye	4280
+eye	el ojo
+eyebrow	la ceja
+eyeglasses	ojos
+eyeglasses	eyeglasses
+eyeglasses	antiojos
+eyeglasses	eyeglasses
+eyes	los ojos
+fable	fabula
+fabric	fabrica[Noun]
+fabricant	fabricante
+fabricate	elaborar[Verb]
+fabricate	fabricar[Verb]
+fabulist	fabulista[Noun]
+fabulous	fabuloso[Adjective]
+fabulously	fabulosamente[Adverb]
+fabulousness	fabulosidad[Verb]
+facade	fachada[Noun]
+face	cara
+face	la cara
+face	rostro[Noun]
+face	rostro[Noun]
+faced	enfrentado[Verb]
+facet	faceta[Noun]
+facetious	gracioso[Adjective]
+facial	facial
+facile	vivo[Adjective]
+facilitate	facilitar[Verb]
+facilitation	facilitacion[Noun]
+facility	facilidad[Noun]
+facing	paramento[Noun]
+facsimile	facsimile[Noun]
+fact	realidad[Noun]
+faction	faccion
+factional	faccioso[Adjective]
+factionalism	faccionalismo[Noun]
+factious	faccioso[Adjective]
+factitious	facticio[Adjective]
+fair	justo
+fairy	la hada
+faith	la fe
+faithful	fiel
+fall	caer
+fallen	caido
+false	falso
+falsified	falsificado
+fame	la fama
+family	familia, parientes
+family	la familia
+famous	famoso
+fan	el ventilador
+fanatic	el fanatico[Noun]
+fanatical	fanatico[Adjective]
+fanaticism	el fanatacismo[Noun]
+fanatics	los fanaticos[Noun]
+far	lejos
+farm	la granja[Noun]
+farm	la hacienda
+farmer	el campesino
+fast	(adj.) ra/pido[Adjective]
+fast	(adv.) de prosa ra/pidamente[Adverb]
+fat	gordo
+father	el padre
+faucet	el grifo
+favor	el favor
+favorite	favorito
+fear	temer
+fearless	arrojado[Adjective]
+fearless	arrojado[Adjective]
+feast	fiesta[Noun]
+feather	la pluma
+feature	faccion[Noun]
+feature	faccio/n[Noun]
+February	febrero
+feel	sensacio/n[Noun]
+feel	sentir[Verb]
+feel	palpar[Verb]
+feeling	sensacio/n[Noun]
+feeling	sentimiento[Noun]
+feet	los pies
+feign	aparentar[Verb]
+feint	finta[Noun]
+feldspar	feldespato[Noun]
+felicitate	felicitar[Verb]
+fell	tralar[Verb]
+fellow	socio (fellow of a society)[Noun]
+felon	delincuente[Noun]
+female	femenino[Adjective]
+female	hembra (animal, plant, thing)[Noun]
+feminine	femenino[Adjective]
+feminism	feminismo[Noun]
+fence	la cerca
+ferment	fermentar[Verb]
+ferment	fermento[Noun]
+ferocious	feroz[Adjective]
+ferocity	la ferocidad[Noun]
+fertile	fe/rtil[Adjective]
+fertilize	fertilizar[Verb]
+fertilized	fertilizado[Adjective]
+fervid	vehemente[Adjective]
+fervor	el fervor[Noun]
+festival	fiesta[Noun]
+fetch	traer[Verb]
+fetus	feto[Noun]
+fever	la fiebre
+fever	calentura[Adjective]
+feverish	afiebrado[Adjective]
+feverish	febri/l[Adjective]
+few	pocos
+fewer	menos
+fiance	prometido[Noun]
+fiancee	prometida[Noun]
+fiasco	fiasco[Noun]
+fib	mentirilla[Noun]
+fiber	fibra[Noun]
+fickle	inconstante[Adjective]
+fiction	ficcio/n[Noun]
+fictional	novelesco[Adjective]
+fictionalize	novelizar[Verb]
+fictitious	ficticio[Adjective]
+fidelity	la fidelidad[Noun]
+fidget	agitarse[Verb]
+fidgety	inquieto[Adjective]
+fiduciary	fiduciario[Noun]
+field	el campo
+fielder	jardinero[Noun]
+fierce	feroz[Adjective]
+fiery	ardiente
+fifteen	quince
+fifteenth	decimoquinto (in a series)[Adjective]
+fifteenth	quinzavo (part)[Adjective]
+fifth	quinto[Adjective]
+fiftieth	quincauge/simo (in a series)[Adjective]
+fiftieth	cincuentavo (part)[Adjective]
+fifty	cincuenta
+fig	el higo
+fight	lucha[Noun]
+fight	luchar[Verb]
+fight	pelear
+fighter	luchador[Noun]
+figs	higos[Noun]
+figure	figura[Noun]
+figure	figurar[Verb]
+figured	figurado[Adjective]
+filament	filamento[Noun]
+file	archivar[Verb]
+file	fichero[Noun]
+filed	archivado[Adjective]
+filial	filial[Adjective]
+fill	llenar
+filthy	cochino
+finally	al fin
+finch	pinzón, especie de gorrión, de orígen europeo[Noun]
+find	encontrar
+find	hallar
+finger	el dedo
+fingers	los dedos
+finish	acabar
+fire	el fuego
+fire	fuego
+fire	hacer fuego[Verb]
+fire	la lumbre [Noun]
+firearm	arma de fuego[Noun]
+fireman	el bombero
+fireplace	el hogar
+fireplace	la chiminea[Noun]
+first	primero
+fish	el pescado
+fish	pescado
+fisherman	el pescador
+fishing	pesquero(a)[Adjective]
+five	cinco
+flag	la bandera
+flagellant	flagelante[Noun]
+flagellantism	flagelantismo[Noun]
+flagellants	flagelantes[Noun]
+flagellar	flagelar[Adjective]
+flagellation	flagelacion[Noun]
+flagpole	asta[Noun]
+flagpoles	astas[Noun]
+flags	banderas[Noun]
+flake	copo[Noun]
+flakes	copos[Noun]
+flame	la flama
+flannel	la franela
+flat	llano
+flat	plano
+flavor	el sabor
+flea	la pulga
+flight	vuelo[Noun]
+flights	vuelos[Noun]
+float	flotar
+floor	el suelo
+flour	la harina
+flower	la flor
+flowerpot	el tiesto
+flowers	las flores
+flu	la influenza
+fly	la mosca
+fly	volar
+flying	volando[Verb]
+foam	la espuma
+fog	la neblina
+foggy	nublado
+fold	doblar
+food	comida[Noun]
+food	comida[Noun]
+foot	el pie
+footage	documental[Noun]
+football	futbol[Noun]
+footballer	futbolista[Noun]
+footing	andar ( como deporte )[Verb]
+footnote	nota a pie de página[Noun]
+footpath	sendero[Noun]
+for	para
+for	por
+forecast	pronosticar
+forehead	la frenta
+foreign	extranjero
+forest	el bosque
+forever	para siempre[Article]
+forget	olvidarse
+forgetful	olvidadizo[Adjective]
+forgetfulness	olvido[Noun]
+forgets	olvida[Verb]
+forgive	perdonar
+forgiveness	perdo/n[Noun]
+forgives	perdona[Verb]
+forgiving	perdonador[Adjective]
+forgo	abstenerse de[Verb]
+forgotten	olvidado[Adjective]
+fork	el tenedor
+forlorn	desamparado[Adjective]
+fortunately	afortunadamente
+forty	cuarenta
+fought	luchado[Verb]
+found	fundar (to found eg. Found a city)[Verb]
+found	fundir (to melt or cast eg. to found the steel bars together)[Verb]
+fountain	la fuente
+four	cuatro
+four	fourty[Adjective]
+fourteen	catorce
+fourth	el cuarto
+fox	el zorro
+France	la Francia
+free	gratis
+freeze	helar
+frequent	adj. frecuente
+frequent	va. frecuentar
+frequented	adj. asendereado
+frequently	a menudo
+fresh	adj. fresco
+freshen	va. refrescarse
+Friday	el viernes
+fried	frito
+friend	amigo (m), amiga (f)
+friend	el amigo
+friends	los amigos
+friendship	amistad[Noun]
+friendships	amistades[Noun]
+frighten	espantar
+frog	la rana
+from	de
+front	el frente
+frost	la escarcha
+frozen	congelado
+fruit	la fruta
+fuck	chingar
+fucked	chingado[Verb]
+fucker	chingador[Noun]
+fuckers	chingadores[Noun]
+fucking	chingando[Verb]
+fucus	enfocar[Verb]
+fudge	dulce de chocolate
+fuel	combustible
+fugitive	fugitivo
+fugue	fuga
+fulcrum	fulcro
+fulfill	completar, lograr
+fulfill	cumplir
+fulfilled	cumplió, completó[Verb]
+fulfiller	cumplidor[Adjective]
+fulfillment	obligacion, deber
+fulfillments	obligaciones, deberes
+full	completo[Adjective]
+full	lleno
+fulsome	de mal gusto[Adjective]
+fumble	balbucear[Verb]
+fumble	manosear[Verb]
+funny	chistoso
+future	el futuro
+gadgets	artilugio[Noun]
+gala	gala[Noun]
+galaxies	galaxias[Noun]
+galaxy	galaxia[Noun]
+gallantly	galantemente[Adjective]
+gallantry	galantería[Adjective]
+gallery	galería[Noun]
+gallop	galope[Noun]
+galloping	galopando[Verb]
+game	el juego
+games	juegos[Noun]
+gang	banda, pandilla[Noun]
+gangster	pandillero[Noun]
+gangsters	pandilleros[Noun]
+garage	el garaje
+garbage	la basura
+garden	el jardín[Noun]
+gardener	el jardinero
+gardens	jardines[Noun]
+garlic	el ajo
+garlics	ajos[Noun]
+gasoline	la gasolina
+gator	crocodilibus
+generous	generoso
+Germany	la Alemania
+get	obtener
+get up	levantarse
+getup	levantarse[Verb]
+ghost	el fantasma
+gift	el regalo
+gin	la ginebra
+giraffe	la jirafa
+girl	la muchacha
+girlfriend	novia; amiga
+girlfriends	amigas
+girls	las muchachas
+give	dar
+glass	el vidrio
+glove	el guante
+gloves	los guantes
+glue	la cola
+go	ir
+going	I am going: voy  You are going: va  We are going: vamos  They are going: van[Verb]
+gold	el oro
+good	bueno
+goodbye	adios
+goodnight	buenas noches
+gooseberry	grossella espinosa
+gossip	los chismes
+government	el gobierno
+grammar	gramatica
+granddad	abuelo[Noun]
+granddaughter	la nieta
+grandfather	abuelo
+grandfather	el abuelo
+grandfathers	abuelos[Noun]
+grandma	abuela
+grandmas	abuelas
+grandmother	abuela
+grandmother	la abuela
+grandmothers	abuelas
+grandparent	abuelo[Noun]
+grandson	el nieto
+grandsons	nietos[Noun]
+grape	la uva
+grapefruit	la toronja
+grass	la hierba
+gratitude	gratitud[Noun]
+gratuities	propinas[Noun]
+gratuitous	gratuito[Adverb]
+gratuity	propina[Noun]
+grave	grave[Noun]
+gravel	grava[Noun]
+gravestone	lapida sepulcral[Noun]
+graveyard	camposanto[Noun]
+graveyards	camposantos[Noun]
+gravitate	gravitar[Verb]
+gravitation	gravitacion[Noun]
+gray	gris
+grease	engrasar[Verb]
+grease	la grasa
+greasy	grasiento[Adjective]
+great	gran[Adjective]
+greaten	mejorar[Verb]
+greatly	grandemente[Adverb]
+greed	codicia[Noun]
+greedily	vorazmente[Adverb]
+greedy	codicioso[Adjective]
+greedy	goloso[Adjective]
+green	verde
+greenhouse	inverna/culo[Noun]
+greenish	verdoso[Adjective]
+greens	verdes[Noun]
+grenade	granada[Noun]
+grenades	granadas[Noun]
+grocery store	la bodega
+groovy	chido
+gross	asqueroso
+ground	el suelo
+group	el grupo
+group	grupo
+grow	crecer
+grownups	gente grande
+gruelling	penoso,duro[Adjective]
+guilty	culpable
+guitar	la guitarra
+gut	intestino[Noun]
+guts	intestinos[Noun]
+gutter	cuneta (en la calle); canalón (tejado); gotera; arroyo[Noun]
+guy	tío (inf: hombre), tipo[Noun]
+guzzle	tragar; engullir[Verb]
+guzzled	tragado; engullido[Adjective]
+gym	gimnasio; gimnasia[Noun]
+gymnasium	gimnasio[Noun]
+gymnasiums	gimnasios[Noun]
+gymnast	gimnasta[Noun]
+gymnastic	gimnasia[Noun]
+gymnastics	gimnasia[Noun]
+gymnasts	gimnastas[Noun]
+gyms	gimnasios; gimnasias[Noun]
+gynecological	ginecológico/a[Adjective]
+gynecologicals	ginecológicos/as[Adjective]
+gynecologist	ginecólogo/a[Noun]
+gynecologists	ginecólogos/as[Noun]
+gynecology	ginecología[Noun]
+gypsies	gitanos/as[Noun]
+gypsies	gitanos/as[Noun]
+gypsies	gitanos/as[Noun]
+gypsy	gitano/a[Noun]
+gypsy	gitano/a[Noun]
+gypsy	gitano/a[Noun]
+h	h
+ha	ja
+habeas	habeas
+haberdasher	camisero[Noun]
+haberdasheries	mercerías[Noun]
+haberdashery	mercería[Noun]
+habilitate	habilitar
+habilitated	habilitado
+habilitates	habilitar
+habilitating	habilitando[Verb]
+habilitation	habilitacio/n
+habilitations	habilitaciones
+habit	ha/bito
+habit	hábito, costumbre; adicción (drogas)[Noun]
+habitability	habitabilidad
+habitable	habitable
+habitably	habilidad
+habitant	habitante
+habitants	habitantes
+habitat	ha/bitat
+habitat	hábitat[Noun]
+habitation	habitacio/n
+habitations	habitaciones
+habitats	habitats
+habitats	hábitats[Noun]
+habits	ha/bitos
+habits	hábitos, costumbres; adicciónes (drogas)[Noun]
+habitual	habitual
+habitual	acostumbrado, habitual; empedernido (bebedor, mentiroso)[Adjective]
+habitualize	habituar
+habitualize	acostumbrar[Verb]
+habitually	habitualmente
+habituate	habituar
+habituate	habituar[Verb]
+habituated	habituado
+habituates	(se) habitua
+habituating	habituando[Verb]
+habituation	habituacio/n[Noun]
+habitus	habito
+hacienda	hacienda
+haciendas	haciendas
+hack	hackear
+hack	cortar; tajar, rebanar[Verb]
+hacked	hackeado
+hacked	pretérito/participio pasado de hack[Verb]
+hacker	n.-('haa-ker), one who hacks. Also one who is capable of accessing unauthorized info.    
+hacker	pirata informático[Noun]
+hackers	hackers
+hackers	piratas informáticos[Noun]
+hacking	hacking
+hackle	pelo erizado
+hackled	happy birthday
+hackler	happy birthday
+hackles	happy birthday
+hackling	happy birthday
+hackmatack	happy birthday
+hackney	trillar[Verb]
+hackneyed	trillado[Adjective]
+had	yo teni/a (I had)[Verb]
+had	yo tuve (I had)
+had	pretérito/participio pasado de have[Verb]
+haddock	merluza[Noun]
+haddock	eglefino (pescado)[Noun]
+haddocks	eglefinos (pescados)[Noun]
+hadn't	no ha
+hafnium	hafnio[Noun]
+haggard	ojeroso[Adjective]
+haggis	morcilla, embutido escoce/s[Noun]
+haggish	embutido escoce/s[Noun]
+haggle	regatear[Verb]
+haggled	pretérito/participio pasado de haggle[Verb]
+haggling	gerundio/inf de haggle[Verb]
+hagiographies	hagiografi/as[Noun]
+hagiography	hagiografi/a[Noun]
+hail	alabar[Noun]
+hailstone	granizo[Noun]
+hailstorm	tormenta de granizo[Noun]
+hair	el pelo
+hairbrush	cepillo de pelo
+haircut	corte de pelo
+hairdresser	peluquero[Noun]
+hairdressers	peluqueros[Noun]
+half	medio
+halfcircle	semicirculo
+hallway	el pasillo
+halyard	driza[Noun]
+ham	jamon[Noun]
+hamburger	hamburgesa
+hamburgers	hamburgesas
+hammer	el martillo
+hand	la mano
+handbag	la bolsa[Noun]
+handbags	las bolsas[Noun]
+hands	las manos
+handsome	guapo(a)[Adjective]
+hang	colgar
+happen	pasar
+happiest	happy
+happy	alegre
+happy	feliz
+harangue	arengar[Verb]
+harangued	arengado[Adjective]
+harass	acosar[Verb]
+harass	molestar[Verb]
+harassed	ACOSADA[Adjective]
+harbor	puerto[Noun]
+hard	difi/cil[Adjective]
+hard	duro
+hard	tieso[Adjective]
+hardness	dureza
+hardware	circuitos[Noun]
+hare	Liebre[Noun]
+harebrained	Tonto[Adjective]
+harelipped	Leporino (labio)[Adjective]
+harem	Harém[Noun]
+hares	Liebres[Noun]
+harlequin	Arlequín[Noun]
+harlequinade	Arlequinada[Noun]
+harm	Dañar[Verb]
+harmed	Dañado[Verb]
+harmful	Dañino[Adjective]
+harmless	Inofensivo[Noun]
+harmonic	Armónico[Adjective]
+harmonica	Armónica (Inst.Mús.)[Noun]
+harmonical	Armónica[Adjective]
+harmonium	Armonio (Inst.Musical)[Noun]
+harmonize	Armonizar[Verb]
+hat	el sombrero
+hate	odiar
+have	haber[Verb]
+have	tener
+haven't	no tener[Verb]
+hazardous	peligroso[Adjective]
+haze	la bruma[Noun]
+hazel	avellanado[Adjective]
+hazelnut	avellano[Noun]
+hazelnuts	avellanos[Noun]
+hazy	brumoso[Adjective]
+he	e/l[Pronoun]
+head	cabeza
+head	la cabeza
+head	doument
+headache	dolor de cabeza
+headaches	dolores de cabeza
+headdress	tocado[Noun]
+headlight	linterna delantera[Noun]
+headlights	linternas delanteras[Noun]
+headline	ti/tulo[Noun]
+health	health
+health	la salud
+health	salud
+healthy	sano
+heat	el calor
+heavy	pesado
+height	la altura
+heir	Heredero[Noun]
+heiress	Heredera[Noun]
+heiresses	herederas[Noun]
+heirloom	herencia (objeto valioso familiar)[Noun]
+held	Tuvo lugar, sostuvo[Verb]
+helices	Hélice[Noun]
+helicoidal	helicoidal[Adjective]
+helicopter	Helicóptero[Noun]
+helicopters	Helicópteros[Noun]
+heliocentric	Heliocéntrico[Adjective]
+heliogram	heliograma[Noun]
+heliograms	heliogramas[Noun]
+helium	Helio[Noun]
+hell	Infierno[Noun]
+hello	hola
+hello	que tal
+helm	Yelmo[Noun]
+helmet	casco
+helmet	Casco[Noun]
+help	Ayuda[Noun]
+help	ayudar
+helped	Ayudado[Adjective]
+helper	Ayudante[Noun]
+helper	ayudante[Noun]
+helpers	Ayudantes[Noun]
+helpful	u/til[Adjective]
+hen	la gallina
+high	alto
+hill	la colina
+hill	la loma[Noun]
+him	el[Pronoun]
+hip	la cadera
+history	la historia
+hit	pegar
+home	hogar, casa, vivienda
+homebuilder	constructor
+homeless	desposeido
+homeowners	dueños de casa[Adjective]
+homosexual	homosexual[Noun]
+honest	honrado
+honey	la miel
+horse	CABALLO
+horse	Cabio
+horse	cabio[Noun]
+horse	el caballo
+horses	los caballos
+hospital	el hospital
+hot	caliente
+hotdogs	el pancho[Noun]
+hotel	el hotel
+hotels	los hoteles[Noun]
+hour	la hora
+hours	las horas
+house	CASA
+house	CASITA
+house	la casa
+house	casa[Noun]
+houses	casas
+humanity	humanidad[Noun]
+humans	los humanos[Noun]
+humble	humilde[Adjective]
+humble	humillar[Verb]
+humdrum	aburrido[Adjective]
+humidity	la humedad
+humiliate	humillar[Verb]
+hummingbird	colibri/[Noun]
+hunger	la hambre
+husband	el esposo
+I	yo
+i	yo
+iambic	ia/mbico[Adjective]
+ibis	ibis[Noun]
+ice	el hielo
+ice cream	el helado
+iceberg	iceberg[Noun]
+icebergs	témpano[Noun]
+icebox	la refrigeradora[Noun]
+iced	escarchado (cake)[Adjective]
+icicle	el cara/mbano[Noun]
+icicles	los cara/mbanos
+icier	ma/s helado[Adjective]
+iciest	lo ma/s helado[Adjective]
+icily	iconógrafo
+icing	alcorza, escarchado[Noun]
+icon	el i/cono[Noun]
+iconoclast	iconoclasta
+iconoclastic	iconoclasta[Adjective]
+iconoclastic	iconoclástico
+iconoclastically	iconoclásticamente
+iconographer	iconógrafo[Noun]
+iconographic	rhtrhyhgf
+iconographical	eth
+icons	iconos[Noun]
+idea	la idea
+ideal	ideal[Adjective]
+idealism	idealismo[Noun]
+idealist	idealista[Adjective]
+idealization	idealización[Noun]
+idealizations	idealizaciones[Noun]
+idealize	idealizar[Verb]
+idealized	idealizado[Adjective]
+idealizes	idealiza[Verb]
+ideals	ideales[Noun]
+ideas	ideas[Noun]
+ideate	idear[Verb]
+ideates	idea[Verb]
+idem	ídem
+identic	idéntico[Adjective]
+identical	idéntico[Adjective]
+identically	idénticamente[Adverb]
+identifiable	identificable[Adjective]
+identification	identificación[Noun]
+identifications	identificaciones[Noun]
+idiom	el idioma[Noun]
+idiot	idiota
+if	si
+implement	implantar[Verb]
+implementation	implantación
+important	importante
+imported	importado
+impossible	imposible
+impressive	impresionante[Adjective]
+in agreement	de acuerdo
+inborn	innato(a)[Adjective]
+incalculable	incalculable
+incalculably	incalculable[Adjective]
+incant	Encantar[Verb]
+incantation	Encantación
+incantations	Encantaciones
+incanted	Encantado(a)
+incapable	incapaz
+incapacitate	Incapacitar[Verb]
+incapacitated	incapacitado[Adjective]
+incapacitates	Incapacíta
+incapacity	incapacidad[Adjective]
+incarcerate	encarcelar[Verb]
+incarcerated	encarcelado
+incarcerates	encarcéla
+incarcerating	encarcelando
+incarceration	encarcelación
+incarnate	encarnar[Verb]
+incarnation	renacer
+incarnations	renacimientos
+incaution	descuido[Verb]
+incautious	descuidado(a)
+incautiously	descuidadamente
+incautiousness	descuidado(a)[Adjective]
+incendiaries	incendiarios(as)[Adjective]
+incendiary	incendiario(a)[Adjective]
+incense	incienso[Noun]
+incensed	inciensado(a)
+incenses	inciensa[Verb]
+incensing	inciensando[Verb]
+incentive	incentivo[Noun]
+incentives	incentivos
+incertitude	incierto[Adjective]
+incessant	incesante[Adjective]
+incessantly	incesantemente[Adjective]
+incest	incesto[Noun]
+incestuous	incestuoso(a)[Adjective]
+incestuously	incestuosamente[Adjective]
+incestuousness	incestuosidad[Adjective]
+inch	pulgada[Noun]
+inches	pulgadas[Noun]
+inching	despacio[Adverb]
+inchworm	gusano medidor[Noun]
+inchworms	gusanos medidores[Noun]
+incidence	incidencia[Noun]
+incidences	incidencias[Noun]
+incident	incidente[Noun]
+incidental	incidental[Adjective]
+incidentally	incidentalmente[Adjective]
+incidentals	a music notacion symbol
+incidents	incidentes[Noun]
+incinerate	incinerar[Verb]
+incinerated	incinerado[Adjective]
+incinerates	incinera[Verb]
+incinerating	incinerando[Verb]
+incineration	incineración[Adverb]
+incinerations	incineraciones[Adverb]
+incinerator	incinerador[Noun]
+incinerators	incineradores[Noun]
+incise	inciso[Noun]
+incises	incisos[Noun]
+incision	incisión[Noun]
+incisions	incisiones[Noun]
+incisor	incisor[Noun]
+incitant	incitante[Adjective]
+incitants	incitantes[Adjective]
+incitation	incitación[Noun]
+incitations	incitaciones[Noun]
+incite	incitar[Verb]
+incited	incitdo(a)[Adjective]
+incitement	incitamiento[Noun]
+incitements	incitamientos[Noun]
+inciter	incitar[Verb]
+incites	incita[Verb]
+inciting	incitante[Adjective]
+inclemency	inclemencia[Noun]
+inclement	inclemente[Adjective]
+inclemently	inclementemente[Adjective]
+inclinable	inclinable[Adjective]
+inclination	inclinación[Noun]
+inclinations	inclinaciones[Noun]
+incline	inclinar[Verb]
+increase	aumentar
+informant	informante
+information	informacion
+ink	la tinta
+innocence	la inocencia[Noun]
+innocent	inocente[Adjective]
+innocent	el inocente[Noun]
+inoffensive	inofensivo, inofensiva[Adjective]
+insect	el insecto
+inside	dentro
+insult	el insulto
+insult	insultar
+intelligent	inteligente
+interesting	interesante
+intern	interno(a)[Adjective]
+internal	interno(a)[Noun]
+internality	internalidad[Adjective]
+internalization	internalización[Noun]
+internalize	internalizar[Verb]
+internalized	internalizado[Adjective]
+internalizes	internaliza[Verb]
+internalizing	internalizando[Verb]
+internally	internamente[Adjective]
+internals	internos(as)[Adjective]
+international	internacional[Adjective]
+internationalism	internacionalismo[Noun]
+internationalist	internacionalista[Adjective]
+internationalists	internacionalistas[Adjective]
+internationality	internacionalidad[Adjective]
+internationalization	internaciionalización[Noun]
+internationalize	internacionalizar[Verb]
+internationalized	internacionalizado(a)[Adjective]
+internationalizes	internacionaliza[Verb]
+internationally	internacionalmente[Adjective]
+internationals	internacionales[Adjective]
+internetwork	trabajo en la RIM (Red Mundial Interna)[Noun]
+internetwork	Internet=RedMundial
+internetwork	Connección interna de comunicación
+interneuron	neuron interno[Noun]
+interneuronal	interneuronal[Adjective]
+interning	internando[Verb]
+intervention	intervencio/n[Noun]
+interview	la entrevista
+interweave	entretejer[Verb]
+intimacy	intimidad[Noun]
+intimate	i/ntimo[Adjective]
+intimidate	intimidar[Verb]
+introduction	introducción[Noun]
+introductions	introducciones
+invite	invitar
+iron	el hierro
+iron	planchar
+island	la isla
+Italy	Italia
+j	j
+jab	pinchazo
+jabber	algarabía
+jack	gato, para sujetar el coche cuando se cambia una rueda[Noun]
+jack	jota
+jack	clavija, para conectar algun aparto elctrotecnico [Noun]
+jack	[off] masturbarse[Verb]
+jackal	chacal[Noun]
+jackals	chacales
+jackass	burro[Noun]
+jackboot	bota de montar, bota militar[Noun]
+jackdaw	grajilla, grajo
+jacket	la chaqueta
+jackhammer	taladradora, martillo picador
+jackknife	navaja
+jackpot	bote, premio máximo[Noun]
+jackpot	premio máximo
+jade	jade
+jag	punta, puá[Noun]
+jag	raja
+jagged	dentado, mellado, disigual[Adjective]
+jail	jaula[Noun]
+janitor	el conserje
+January	enero
+jar	la jarra
+jealous	celoso
+jeans	vaqueros[Noun]
+jewel	la joya
+jewels	las joyas
+job	trabajo[Noun]
+joke	la broma
+judge	el juez
+juice	el jugo
+juice	joco[Verb]
+July	julio
+jump	saltar
+June	junio
+jungle	la selva
+kaleidoscope	caleidoscopio
+kangaroo	canguro[Noun]
+kangaroos	canguros[Noun]
+karat	kilate
+karate	karate
+karateist	karateca
+karma	carma
+kayak	kayak[Noun]
+keel	quilla[Noun]
+keep	guardar
+keep	keep
+keep	manutención, subsistencia
+keeper	Guardián, custodio
+keeping	custodia, cuidado
+key	la llave
+key	llave
+keyboard	tecla[Noun]
+keys	llaves
+kick	cocear
+kidnap	seguestar
+kill	matar
+killed	matado[Adjective]
+killer	asasino[Noun]
+killers	asasinos
+kilo	kilo
+kilobit	kilobit
+kilometer	kilómetro[Noun]
+kilometers	kilómetros
+kindness	la bondad
+king	el rey
+kingdom	reino[Noun]
+kingdoms	reinos[Noun]
+kings	reyes
+kiosk	kiosko
+kiss	besar
+kisses	besos[Noun]
+kitchen	la cocina
+kitten	el gatito
+knee	la rodilla
+kneel	arrodillarse[Verb]
+knees	rodillas
+knew	sabia, supo[Verb]
+knife	el cuchillo
+knife	la navaja
+knight	caballero
+knights	caballeros[Noun]
+knock	tocar
+knockdown	tumbar
+know	saber[Verb]
+knowledge	conocimiento[Noun]
+known	conocido[Adjective]
+kooks	üppou
+label	el marbete
+label	etiqueta
+labeled	etiquetado
+labeling	marcando
+labelled	etiquetado
+labels	etiquetas
+labia	labia[Noun]
+labial	labial
+labial	labial[Adjective]
+labialization	labializacion[Noun]
+labile	la/bil
+labiodental	labiodental[Adjective]
+labium	labio[Noun]
+labor	trabajo
+labor	la obra[Noun]
+labor	el labor[Noun]
+labor	laborar[Verb]
+labor	Parto (childbirth)[Noun]
+laborable	laborable
+laboratories	laboratorios
+laboratory	laboratorio
+labored	trabajado
+laborer	obrero[Noun]
+laborer	el trabajador[Noun]
+laborer	jornalero[Noun]
+laborers	obreros[Noun]
+laborers	los trabajadores[Noun]
+laborers	jornaleros[Noun]
+laboring	trabajando[Verb]
+laboring	laborando[Verb]
+laborious	laborioso
+laborious	tabajoso[Adjective]
+laboriously	laboriosamente
+laborist	el laborista[Noun]
+laborists	los laboristas[Noun]
+laborite	laborista[Noun]
+laborites	laboristas[Noun]
+labors	las obras[Noun]
+laborsaving	Que ahorra trabajo[Adjective]
+labradorite	labradorita[Noun]
+labs	los laboratorios[Noun]
+labyrinth	laberinto
+labyrinths	laberintos
+lac	laca
+lace	el encaje
+lace	encaje, lazo
+lace	la cinta[Noun]
+lacerate	lacerar[Verb]
+lacerated	lacerado[Adjective]
+lacerates	lacera[Verb]
+lacerating	lacerando[Verb]
+laceration	laceracion[Noun]
+lacerations	laceraciones[Noun]
+laces	cintas[Noun]
+lacework	encajes[Noun]
+lachrymal	lagrimal
+lachrymal	lacrimal[Adjective]
+lachrymator	lacrimogeno[Noun]
+lachrymose	lloron, llorona[Adjective]
+lachrymose	lloroso[Adjective]
+lack	falta, carencia
+lack	escasez[Noun]
+lackadaisical	apatico[Adjective]
+lackadaisically	apaticamente[Adverb]
+lacked	faltaba[Verb]
+lackey	lacayo (sirviente)[Noun]
+lackeys	lacayos (sirvientes)[Noun]
+lacking	faltar (something is lacking/algo falta)[Verb]
+lackluster	sin brillo[Adjective]
+lacks	le falta[Verb]
+laconic	lacónico[Adjective]
+laconism	laconismo[Noun]
+laconisms	laconismos[Noun]
+laconize	lacónizar[Verb]
+laconized	laónizados[Adjective]
+lacquer	laca
+lacquer	pintar con laca[Verb]
+lactase	lactasa
+lactate	lactato
+lactate	lactar[Verb]
+lactic	láctico[Adjective]
+lacuna	laguna[Noun]
+lacunae	lagunas[Noun]
+lacunar	lagunar[Noun]
+lad	muchacho
+lad	chico[Noun]
+ladder	escalera
+ladder	escala[Noun]
+ladders	las escaleras[Noun]
+ladders	escalas[Noun]
+lade	cargar (to load in shipping)[Verb]
+laded	cargado
+laden	cargado[Adjective]
+ladies	damas
+ladle	cucharon[Noun]
+ladles	cuchorones[Noun]
+ladling	sirviendo con cucharones[Verb]
+lads	muchachos
+lads	chicos[Noun]
+lady	dama
+ladybird	mariquita[Noun]
+ladybirds	mariquitas[Noun]
+ladybug	catarina
+ladybug	mariquita[Noun]
+ladybugs	catarinas
+ladybugs	mariquitas[Noun]
+ladyfinger	lengua de gato (biscuit)
+ladylike	fina, distinguida[Adjective]
+ladylike	afeminado[Adjective]
+ladylove	amada[Noun]
+ladyship	se~noria[Noun]
+lag	atrasarse
+lager	cerveza dorada[Noun]
+lagers	cervezas doradas[Noun]
+laggard	rezagado[Adjective]
+laggardly	rezagadamente[Adverb]
+lagged	retrasado
+lagger	vago, vaga[Noun]
+lagomorph	lagomorfo
+lagoon	laguna
+lagoons	lagunas[Noun]
+laic	laico, laica[Adjective]
+laicism	laicismo[Noun]
+laicization	laicizacion[Noun]
+laicizations	laicizaciones[Noun]
+laicize	dar caracter laico
+laicized	dio caracter laico
+laicizes	da caracter laico
+laid	recostado
+laid	colocado[Adjective]
+laid	acostado[Adjective]
+lair	la guarida[Noun]
+laird	terrateniente[Noun]
+laity	seglares[Noun]
+lake	el lago
+lake	lago
+lakefront	en la orilla del lago[Adjective]
+lakes	lagos[Noun]
+lakeshore	la orilla del lago[Noun]
+lam	huida[Noun]
+lama	lama (monje)
+lamas	lamas 
+lamb	cordero, borrego, oveja
+lamb	el cordero
+lamp	la la/mpara[Noun]
+lance	lanza[Noun]
+lance	lanzar[Verb]
+lances	lanzas[Noun]
+land	la tierra[Noun]
+landlady	la duen~a[Noun]
+landlord	el duen~o[Noun]
+landlords	los duen~os[Noun]
+language	la lengua
+language	el idioma[Noun]
+language	el lenguaje[Noun]
+languages	las lenguas[Noun]
+lantern	la la/mpara[Noun]
+lanterns	las la/mparas[Noun]
+lapel	la solapa[Noun]
+lapels	las solapas[Noun]
+large	grande[Adjective]
+lass	la muchacha
+lasses	las muchachas
+last	ultimo
+last	u/ltimo[Adjective]
+last	durar[Verb]
+late	tarde
+laud	loor[Noun]
+laudable	digno de loor[Adjective]
+laugh	reir
+laugh	reirse[Verb]
+laughing	riendo
+laughter	la risa[Noun]
+launder	lavar (ropa)[Verb]
+laundress	la lavadera[Noun]
+laundry	(laundromat) la lavanderi/a[Noun]
+laundryman	el lavadero[Noun]
+laurel	el laurel[Noun]
+lavatory	el lavato/rio[Noun]
+lavatory	el ban~o[Noun]
+law	la ley
+law	la suegra
+lawless	sin ley[Adjective]
+lawn	el prado
+lawn	el cesped[Noun]
+laws	las leyes[Noun]
+lawyer	el abogado
+lawyers	los abogados[Noun]
+lazy	perezoso
+lazy	guapo[Adjective]
+lead	el plomo
+leader	el li/der[Noun]
+leaf	la hoja
+leaflet	el librito
+leaflets	los libritos
+leap	saltar[Verb]
+leap	el salto[Noun]
+learn	aprender
+leash	correa[Noun]
+leather	el cuero
+leathern	de cuero[Adjective]
+leave	salir
+leaves	las hojas[Verb]
+lecturer	conferensista[Noun]
+ledge	borde, anaquel[Noun]
+ledger	travesaño, andamio[Noun]
+lee	sotavento[Noun]
+leech	sanguijuela[Noun]
+left	izquierdo
+lefties	surdos, surdas[Noun]
+lefty	surdo, surda[Noun]
+leg	la pierna
+legal	legal[Adjective]
+legalist	el legalista[Noun]
+legalize	legalizar[Verb]
+legend	la leyenda[Noun]
+legends	las leyendas[Noun]
+legs	las piernas
+leisure	el ocio
+lemon	el limo/n[Noun]
+lemonade	limonada[Noun]
+lemons	limones[Noun]
+lend	prestar
+lenses	lentes[Noun]
+lesbianism	el lesbianismo
+lesbians	las lesbianas
+less	menos
+lesson	la leccio/n[Noun]
+letter	a
+letter	baum
+letter	borkenkäfer
+letter	hasan
+letter	hello
+letter	jerk
+letter	la carta
+letter	latin
+letter	lifeguard
+letter	malayalam
+letter	r
+letter	restoration
+letter	s
+letter	society[]
+letter	the
+letter	typewriter[]
+letter	(of the alphabet) la letra[Noun]
+lettuce	la lechuga
+level	el nivel[Noun]
+levels	los niveles[Noun]
+liable	responsable[Adjective]
+liar	el mentiroso
+liberalism	el liberalismo[Noun]
+liberate	liberar[Verb]
+liberation	la liberacio/n[Noun]
+liberator	el libertador[Noun]
+liberty	la libertad[Noun]
+libraries	las bibliotecas[Noun]
+library	la biblioteca
+lice	los piojos[Noun]
+license	la licencia[Noun]
+lick	lamer
+lid	la tapa
+lie	mentir
+lie	yacer[Verb]
+life	la vida
+lift	alzar
+ligament	el ligamento[Noun]
+light	la luz
+lightbulb	la bombilla
+lightening	la la/mpara[Noun]
+lightening	el rela/mpago[Noun]
+lightning	el rela/mpago[Noun]
+like	gustar
+like	como[Adverb]
+lime	la lima
+lime	uni
+limes	las limas[Noun]
+limit	limitar[Verb]
+limit	el li/mite[Noun]
+limitation	la limitacio/n[Noun]
+limitations	las limitaciones[Noun]
+limited	limitado, limitada[Adjective]
+limitless	sin li/mites[Adjective]
+linoleic	linoleico[Noun]
+linoleum	linóleo[Noun]
+lion	león[Verb]
+lip	el labio
+lipid	lípido[Noun]
+lipidic	lipídico[Adjective]
+lipids	lípidos[Noun]
+lips	los labios
+liquor	el licor
+list	la lista
+listen	escuchar
+literally	woertlich
+literature	la literatura
+little	chico[Adjective]
+little	pequen~o[Adjective]
+little	poco[Adjective]
+littler	menor
+littlest	menor
+live	directo[Adjective]
+live	vivir
+lived	vivido
+liver	hi/gado[Noun]
+liver	hi/gados[Noun]
+living room	la sala
+lizard	lagarto[Noun]
+load	la carga[Noun]
+loads	las cargas[Noun]
+loaf	holgazanear[Verb]
+loan	el pre/stamo[Noun]
+loathe	aborrecer[Noun]
+lobby	el vesti/bulo[Noun]
+lobe	el lo/bulo[Noun]
+lobster	la langosta
+lobsters	las langostas[Noun]
+local	local[Adjective]
+locals	los vecinos[Noun]
+locate	localizar[Verb]
+location	la situacio/n[Noun]
+loch	el lago[Noun]
+lock	la cerradura
+lock	la esclusa[Noun]
+locker	el casillero[Noun]
+lockers	los casilleros[Noun]
+locket	el medallo/n[Noun]
+lockout	el lockout[Noun]
+locksmith	el cerrajero[Noun]
+locomotive	la locomotora[Noun]
+locust	la langosta[Noun]
+locusts	las langostas[Noun]
+lodge	la casa del guarda[Noun]
+loft	el desva/n[Noun]
+lofty	alto[Adjective]
+log	el len~o
+logbook	el diario de a bordo[Noun]
+logic	la lo/gica[Noun]
+logical	lo/gico
+logo	el logotipo
+loin	el lomo[Noun]
+loins	los lomos[Noun]
+loiter	vagar[Verb]
+loll	rapantigarse[Verb]
+lollipop	el piruli/[Noun]
+lone	solitario[Adjective]
+loneliness	la soledad[Noun]
+lonely	solitario[Adjective]
+long	largo
+longitude	la longitud
+look	apariencia[Noun]
+look	mirar[Verb]
+look	ver[Verb]
+look at	mirar
+look for	buscar
+looking	mirando
+looking	viendo[Verb]
+loom	telar[Verb]
+loose	flojo[Adjective]
+loose	suelto
+looser	sueltos[Adjective]
+lose	perder
+lost	perdido
+loud	ruidoso
+love	amar
+love	amor[Noun]
+love	encantar[Verb]
+love	encanta[Verb]
+love	love
+lovely	adorable[Adjective]
+lover	amante[Noun]
+low	bajo[Adjective]
+lubric	lúbrico[Adjective]
+lubricant	lubricante[Adjective]
+lubricants	lubricantes[Adjective]
+lubricate	lubricar[Verb]
+lubricated	lubricado[Adjective]
+lubricates	lubrica[Verb]
+lubricous	lúbrico[Adjective]
+lucidity	lucidez[Noun]
+lucidly	lu/cidamente[Adverb]
+luck	la suerte
+luck	suerte
+luckily	afortunadamente[Adverb]
+luckiness	suerte[Noun]
+lucrative	lucrativo[Adjective]
+lucratively	lucrativamente[Adverb]
+lucre	lucro[Noun]
+lucubrate	lucubrar[Verb]
+lucubration	lucubracio/n[Noun]
+lukewarm	tibio
+lunch	almorzar (v)
+lunch	almuerzo (n)
+lunch	el almuerzo
+luxury	el lujo
+ma	mama/[Noun]
+ma'am	s.  Contradiccion de madam,senora.
+ma'am	sen~ora[Noun]
+macabre	a. Macabro[Adjective]
+macabre	macabro
+macabrely	de manera macabra
+macadam	s. Piedras trituradas para macadamisar; calzada empedrada con ellas.
+macadamize	macadamizar[Verb]
+macadamized	alquitranado[Adjective]
+macaque	macaco[Noun]
+macarize	macarron[Verb]
+macarized	macarronismo[Noun]
+macarizes	macarrona[Verb]
+macarizing	macarronico, ca[Adjective]
+macaroni	macarrones
+macaronic	macarronico
+macaronically	macarronicamente[Adverb]
+macaronies	macarrones[Noun]
+macaroon	macarrón
+macaw	lapa
+macaws	lapas
+mace	mazo[Noun]
+macerate	macerar
+macerated	macerado
+macerates	macera
+macerating	macerando
+maceration	maceracio/n
+macerations	maceraciones
+macerator	macerador
+macerators	maceradores
+maces	mazas[Noun]
+machete	machete
+machinability	maquinabilidad[]
+machinable	maquinable
+machinate	maquinar
+machinated	maquinado
+machinates	maquina
+machinating	maquinando
+machination	maquinación[]
+machination	maquinacio/n
+machinator	maquinador
+machine	m'aquina
+machine	ma/quina
+machine	máquina[]
+machineable	maquinable
+machined	maquinado
+machinelike	como maquina
+machinelike	parecido a una ma/quina
+machineries	maquinarias
+machinery	maquinaria
+machines	m'aquinas
+machines	ma/quinas
+machines	máquinas[]
+machining	maquinando[Verb]
+machinist	maquinista
+machinists	maquinistas
+machismo	machismo
+macho	macho
+macintosh	macintosh
+mackerel	caballa
+mackerels	caballas
+mackintosh	mackintosh[Noun]
+macro	macro
+macroaggregate	macroagregar[Verb]
+macroaggregated	macroagregado[Adjective]
+macrobiotic	macrobiotico
+macrocephalic	macroencefalico
+macrocephalous	macrocefalo[Adjective]
+macrocephaly	macrocefalia[Noun]
+macrocosm	macrocosmo
+macrocosmic	macrocosmico
+macrocosmically	macrocosmicamente
+macrodynamic	macrodinamica
+macroeconomic	macroeconomico
+macroeconomics	macroeconomia
+macroevolution	macroevolucion[Noun]
+macrofossil	macrofosil[Noun]
+macroinstruction	macroinstrucción[Noun]
+macromolecular	macromolecular[Adjective]
+macromolecule	macromolecula[Noun]
+macromolecules	macromoleculas[Noun]
+macronucleus	macronucleo[Noun]
+macronutrient	macronutriente[Noun]
+macropathological	macropatológico[Adjective]
+macropathology	macropatología[Noun]
+macrophage	macrófago[Adjective]
+macroprocessor	macroprocesador[Noun]
+macrosocioeconomic	macrosocioeconómico[Noun]
+macrostructural	macroestructural
+macrostructure	macroestructura
+maculate	manchar[Verb]
+maculated	manchado,sucio
+mad	loco,chiflado,majara,majareta[Adjective]
+mad	enojado
+madam	dama[Noun]
+madams	damas[Noun]
+madcap	calavera; botarate; temerario[Noun]
+madder	m/as enfadado[Adjective]
+maddest	lo m/as enfadado[Adjective]
+made	hecho[Adjective]
+mademoiselle	señorita[Noun]
+mademoiselles	señoritas[Noun]
+madhouse	manicomio[Noun]
+madly	locamente[Adjective]
+madman	loco[Noun]
+madmen	locos[Noun]
+madness	locura, chifladura[Adjective]
+madwoman	mujer loca[Noun]
+maestro	arista eminent en cualquiere de las bellas artes[Noun]
+mafioso	niembre de la mafia[Noun]
+magazine	la revista
+magazine	(military)cargador,peine.Almacén[Noun]
+magazine	(military)cargador,peine.[Noun]
+magazine	una revista
+magazine	What happened? I just wanted to erase "Almacén"![Conjunction]
+magazines	las revistas[Noun]
+magenta	rojo purpureo; solferino[Adjective]
+maggot	cresa; gusano; larva[Noun]
+maggoty	caprichoso; quimerico[Adverb]
+magi	los Reyes Magos; sacredotes de la relig. zoroastrica[Noun]
+magic	magia[Noun]
+magic	ma/gico
+magical	ma/gico
+magically	mágicamente[Adjective]
+magician	mago
+magicians	magos
+magisterial	authoritario; dominante; pomposo
+magisterially	magistralmente
+magisterium	magistreio o autoriad delo
+magistracy	jurisdiccion de magistrado
+magistral	magistral[Noun]
+magistrally	magistralmente[Adjective]
+magistrate	magistrado
+magistrates	magistrados[Noun]
+magistrature	magistratura[Noun]
+magma	magma
+magma	lava volcanica[Noun]
+magnanimity	magnanimosidad[Noun]
+magnanimous	magnánimo[Adjective]
+magnanimously	magnanimosamente[Adjective]
+magnate	potentado
+magnesia	magnesio(a)
+magnesium	magnesio[Noun]
+magnet	ima/n
+magnetic	magne/tico
+magnetically	magneticamente[Adjective]
+magnetism	magnetismo[Noun]
+magnetisms	magnetismo[Noun]
+magnific	magnífico[Adjective]
+magnifically	magníficamente[Adjective]
+magnificence	magnificencia[Noun]
+magniloquence	magnilocuencia[Noun]
+magniloquent	magnilocuente[Adjective]
+magniloquently	magnilocuentemente[Adjective]
+magnitude	magnitud[Noun]
+magnitudes	magnitudes[Noun]
+magnolia	magnolia[Noun]
+magnolias	magnolias[Noun]
+maid	la criada
+maiden	soltera[Noun]
+maidenhood	solteri/a[Noun]
+mail	el correo
+mailbox	apartado postal
+mailbox	buzo/n
+mailboxes	buzones
+mailman	el cartero
+mainly	principalmente
+make	hacer
+mal	bad[Adjective]
+malignant	maligno[Adjective]
+malleability	maleabilidad
+mallet	mazo[Noun]
+malnutrition	desnutricio/n[Noun]
+mammals	mami/feros[Noun]
+mammary	mamaria
+mammography	mamografi/a[Noun]
+man	el hombre
+man	hombre
+man	vero/n[Noun]
+management	gerencia[Noun]
+manager	el gerente
+managerially	gerencialmente[Adverb]
+managers	gerentes[Noun]
+mancipation	emancipacio/n[Noun]
+maneuverer	maniobrador
+maneuvers	maniobras
+many	muchos
+map	el mapa
+March	marzo
+market	el mercado
+married	casado
+marry	casarse
+mask	ma/scara[Noun]
+May	mayo
+mayonnaise	la mayonesa
+meal	la comida
+meals	las comidas
+measurement	medicion[Noun]
+meat	la carne
+meatball	alb"o/"ndigas[Noun]
+medal	la medalla
+medicine	la medicina
+medieval	medieval[Adjective]
+meditate	meditar[Verb]
+meditation	meditacio/n[Noun]
+meditations	meditaciones[Noun]
+medium	intermedio[Adjective]
+medium	mediano[Adjective]
+medium	medio[Noun]
+mediums	medios[Noun]
+medley	baturrillo[Noun]
+medley	mezcla[Noun]
+medley	mezcolanza[Noun]
+medleys	baturrillos[Noun]
+medleys	mezclas[Noun]
+medleys	mezcolanzas[Noun]
+meek	do/cil[Adjective]
+meek	manso[Adjective]
+meek	paciente[Adjective]
+meekness	docilidad[Noun]
+meekness	mansedumbre[Noun]
+meet	encontrar[Verb]
+meet	reunirse[Verb]
+meet	ser presentado a[Verb]
+meeting	encuentro[Noun]
+meeting	reunio/n[Noun]
+meetings	encuentros[Noun]
+meetings	reuniones[Noun]
+meets	encontra[Verb]
+megabyte	mega-byte[Noun]
+memory	la memoria
+men	los hombres
+message	el mensaje
+metalize	shgfhg
+mi	me
+midnight	la medianoche
+mile	la mila
+milk	la leche
+millennium	3012
+minute	el minuto
+mirror	el espejo
+mischievous	travieso[Adjective]
+miss	extran~ar[Verb]
+mistake	la falta
+mixture	la mezcla
+modern	moderno
+Monday	el lunes
+money	el dinero
+monkey	el mono
+month	el mes
+months	los meses[Noun]
+mood	el humor
+moon	la luna
+mop	gerga[Noun]
+mopper	trapeador[Noun]
+mopping	trapear[Verb]
+more	ma/s[Adjective]
+moribund	moribundo
+morning	man~ana[Noun]
+mornings	man~anas[Noun]
+morphologic	morfolo/gico[Adjective]
+mortality	mortalidad[Noun]
+mortally	mortalmente[Adverb]
+mortals	mortales
+mortgage	hipoteca[Noun]
+mortgaged	hipotecado[Adjective]
+mortgager	hipotecario
+mortgages	hipotecas[Noun]
+mother	la madre
+mother	MADRE[Noun]
+motion	MOVIMIENTO[Noun]
+motionless	ESTATICO[Adjective]
+motions	MOVIMIENTOS[Noun]
+motivated	MOTIVADO[Adjective]
+motivating	MOTIVANTE[Adjective]
+motivation	MOTIVACION[Noun]
+motor	MOTOR[Noun]
+motorcycle	la motocicleta
+mouse	laucha
+mouse	rato/n
+moustache	el bigote[Noun]
+moustaches	los bigotes[Noun]
+mouth	la boca
+mouthwash	el enjuague
+move	(household) mudarse[Verb]
+move	mover(se)[Verb]
+movement	el movimiento[Noun]
+movements	los movimientos[Noun]
+movie	la peli/cula[Noun]
+movie theater	el cine
+movies	el cine[Noun]
+much	mucho
+mud	el lodo
+mud	el barro[Noun]
+mulberry	la mora[Noun]
+mule	la mula[Noun]
+multiplication	la multiplicacio/n[Noun]
+multiply	multiplicar[Verb]
+multiplying	multiplicando[Verb]
+multitude	la multitud[Noun]
+multitudes	las multitudes[Noun]
+munch	masticar[Verb]
+municipal	municipal[Adjective]
+municipalities	las municipalidades[Noun]
+municipality	la municipalidad[Noun]
+murder	asesinar
+murder	el asesinato
+murmur	murmurar[Verb]
+muscle	el mu/sculo[Noun]
+muscles	los mu/sculos[Noun]
+muscular	muscular[Adjective]
+museum	el museo
+mushroom	el hongo[Noun]
+music	la mu/sica[Noun]
+musical	musical[Adjective]
+musician	el mu/sico[Noun]
+musicians	los mu/sicos[Noun]
+musicologist	el musico/logo[Noun]
+musicology	la musicologi/a[Noun]
+mustache	el bigote
+mustaches	los bigotes[Noun]
+mustard	la mostaza
+mutation	la mutacio/n[Noun]
+mute	mudo, muda[Adjective]
+mystery	el misterio
+nail	el clavo
+nail	un~a[Noun]
+nails	clavos[Noun]
+nails	un~as[Noun]
+naive	ingenuo[Adjective]
+naively	ingenuamente[Adverb]
+naiveness	ingenuidad[Noun]
+naked	desnudo[Adjective]
+nakedly	desnudamente[Adverb]
+nakedness	desnudez[Noun]
+name	el nombre
+names	michael
+namesake	tocayo[Noun]
+nanosecond	nanosegundo[Noun]
+nanoseconds	nanosegundos[Noun]
+nap	la siesta
+napalm	napalm[Noun]
+naphtha	nafta[Noun]
+napkin	la servilleta
+napkins	servilletas[Noun]
+narcissism	narcisismo[Noun]
+narcissist	narcisista[Adjective]
+narcissist	narcisista[Noun]
+narcissist	narcisista[Noun]
+narcissistic	narcisista[Adjective]
+narcissistic	narcisista[Adjective]
+narcissus	narciso[Noun]
+narcolepsy	narcolepsia[Noun]
+narcolepsy	narcolepsia[Noun]
+narcotic	narco/tico
+narcotics	narco/ticos
+narrate	narrar[Noun]
+narrate	narrar[Verb]
+narrated	narrado[Verb]
+narration	narracio/n[Noun]
+narrational	narrativo, narrativa[Adjective]
+narrator	narrador[Noun]
+narrow	estrecho
+narrowing	estrechando[Adverb]
+nasty	desagradable[Adjective]
+nation	nacio/n[Noun]
+national	nacional
+nationalities	nacionalidades
+nationality	nacionalidad
+nationalization	nacionalizacio/n
+nationalize	nacionalizar
+natural	naturalis
+naturalism	natu
+nature	naturaleza[Noun]
+near	cerca
+nearby	cerca[Adjective]
+nearby	cerca[Adverb]
+neat	pulcro
+necessary	necesario
+neck	el cuello
+necklace	el collar
+necklaces	gargantillas
+necktie	la corbata
+nectar	nectar
+need	necesitar
+needle	la aguja
+negation	negatio/n
+negative	negativo
+negotiable	negociable
+negotiant	negociante
+negotiate	negociar
+negotiated	negociado
+negotiates	negocia
+negotiating	negociando
+neighbor	el vecino
+neighbor	la vecina[Noun]
+neighborhood	el vecindario
+neighborhoods	vecindades
+nephew	el sobrino
+nervous	nervioso
+nest	el nido
+net	la red[Noun]
+never	nunca
+nevertheless	no obstante
+new	nuevo
+newer	mas nuevo
+newest	el mas nuevo
+news	las noticias[Noun]
+nice	amable
+niece	la sobrina
+night	la noche
+nightmare	la pesadilla
+nine	nueve
+ninety	noventa
+nipple	pezon
+nipples	pezones
+nobody	nadie
+noise	el ruido
+none	ninguno
+north	el norte
+nose	la nariz
+notebook	cuaderno
+notebook	el cuaderno
+notebooks	cuadernos
+nothing	nada
+notice	notar[Verb]
+notice	prestar atencio/n[Verb]
+noticeable	conspicuo[Adjective]
+noticeable	notable[Adjective]
+noticing	notando
+notification	notificacio/n
+notifications	notificaciones
+notified	notifico/
+notion	idea[Noun]
+notion	nocio/n[Noun]
+notorious	infamo
+notorious	notorio[Adjective]
+notwithstanding	sin embargo[Adverb]
+noun	el sustantivo
+noun	nombre[Noun]
+noun	substantivo
+nourish	alimentar[Verb]
+nourish	nutrir[Verb]
+nourishing	alimenticio[Adjective]
+nourishing	nutrivito[Adjective]
+nourishment	nutrimento
+nourishment	sustento[Noun]
+novel	la novela
+November	noviembre
+now	ahora
+nuance	matiz[Noun]
+nuances	matices[Noun]
+nurse	la enfermera
+nystagmus	nova
+o	or[Conjunction]
+oaf	palurdo, patan, zoquete[Noun]
+oak	roble
+oaken	de roble[Adjective]
+oaks	robles
+oaks	Robles
+oakwood	madera de roble
+oar	remo
+oars	remos
+oasis	oasis
+oat	avena
+oatcake	Pastel de avena
+oath	juramento
+oaths	juramentos
+oatmeal	avena
+oats	avena
+obbligato	obligado[Adjective]
+obduracy	terquedad[Noun]
+obdurate	terco[Adjective]
+obdurately	tercamente[Adverb]
+obedience	obediencia
+obediences	obediencias
+obedient	obediente
+obediently	obedientemente
+obelisk	obelisco
+obese	gordo/gorda[Adjective]
+obese	obeso/obesa
+obese	obeso
+obesity	obesidad
+obey	obedecer
+obeyed	obedecio[Verb]
+obeying	obedeciendo[Verb]
+obeys	obedece
+obfuscate	ofuscar
+obfuscated	ofuscado
+obfuscating	ofuscando
+obfuscation	ofuscacion
+object	el objeto
+objected	objetado[Adjective]
+objection	objecio/n[Noun]
+objectionable	objetable[Adjective]
+objections	objeciones[Noun]
+objective	objetivo[Adjective]
+objectively	objetivamente[Adverb]
+objectiveness	objetividad[Noun]
+objector	objetor[Noun]
+objectors	objetores[Noun]
+objects	objetos[Noun]
+objet	objeto[Noun]
+objurgate	reprender[Verb]
+objurgated	reprendido[Adjective]
+obligate	obligar[Verb]
+obligated	obligado[Adjective]
+obligately	obligatoriamente[Adverb]
+obligation	obligacio/n[Noun]
+obligational	obligatorio[Adjective]
+obligations	obligaciones[Noun]
+obligatory	obligatorio[Adjective]
+oblige	obligar[Verb]
+obliged	obligado[Adjective]
+oblique	english
+oblique	oblicuo
+obliquely	oblicuamente
+obliqueness	oblicuidad[Noun]
+obliquity	oblicuidad[Noun]
+obtain	obtener[Verb]
+occident	occidente, poniente, oeste[Noun]
+occidental	occidental
+occipital	occipital[Noun]
+occipitally	occipitalmente[Adverb]
+occiput	nuca[Noun]
+occlude	obstruir[Verb]
+occult	oculto
+occultism	ocultismo
+occultist	ocultista
+occupant	ocupante
+occupants	ocupantes
+occupation	ocupacio/n
+occupational	ocupacional
+occupationally	ocupacionalmente
+occupations	ocupaciones
+occupied	ocupado[Adjective]
+occupies	ocupa
+occupy	ocupar[Verb]
+occupying	ocupando[Verb]
+occur	ocurre
+occurred	ocurrio/,ocurrido[Verb]
+occurrence	ocurrencia
+occurrences	ocurrencias
+occurrent	ocurrente
+occurs	ocurre
+ocean	oceano
+oceanarium	aquario
+oceanfront	costa
+oceangoing	maritimo
+oceanic	oceanico
+oceanographer	oceanografo
+oceanographers	oceanografos
+oceanographic	oceanografico[Adjective]
+oceanographical	oceanografico[Adjective]
+oceanographically	oceanograficamente[Adverb]
+oceanography	oceanografia
+oceanologic	oceanologico
+oceanological	oceanologico
+oceanologically	oceanologicamente
+oceanologist	oceanografo
+oceanology	oceanologia
+oceans	oceanos
+o'clock	en punto
+o'clock	En punto
+octagon	octa/gono
+octagonal	octagonal
+octagonally	octagonalmente
+octagons	octagonos
+octahedra	octaedro
+October	octubre
+odometer	odometro
+odometers	odometros
+odontologst	odontologo
+odontology	odontologia
+odor	olor
+odorless	inoloro
+odorous	oloroso
+odors	olores
+oeuvre	obra
+oeuvres	obras
+of	de
+of course	claro
+off	apagado
+offer	ofrecer
+office	la oficina
+ohm	ohm
+ohms	ohms
+oil	el aceite
+oiled	aceitado
+oiler	aceitera
+old	viejo
+older	mayor
+oligarch	oligarca
+oligarchic	oligarquico
+oligarchical	oligarquico
+oligarchy	oligarquia
+olive	la aceituna
+olives	aceitunas
+omelette	la tortilla
+omen	agüero
+omens	agüeros
+omit	omitir
+omnipotence	omnipotencia
+omnipotent	omnipotente
+omnipresent	omnipresente
+omniscience	omnisciencia
+omnivorous	omnivoro
+one	uno
+onion	cebolla
+onion	la cebolla
+onions	cebollas
+only	solamente
+open	             
+open	abierto
+open	abrir
+open	open
+or	o
+orange	la naranja
+orchestra	la orquesta
+ordinary	ordinario
+other	otro
+outside	afuera
+oven	el horno
+oven	orno
+overcoat	el abrigo
+overload	sobrecargar[Verb]
+overloaded	sobrecargado[Adverb]
+overpopulated	superpoblado[Adjective]
+overprice	sobreprecio[Noun]
+overpriced	sobrevalorado[Adjective]
+overview	visio/n general[Noun]
+owe	deber
+pace	paso[Noun]
+pacemaker	marcapasos[Noun]
+pachyderm	paquidermo[Adjective]
+pachydermal	paquide/rmico[Noun]
+pacific	pacífico[Adjective]
+pacific	pacifico[Adjective]
+pacifically	pacíficamente[Adverb]
+pacification	pacificación
+pacifications	pacificaciones
+pacificator	pacificador[Noun]
+pacificators	pacificadores
+pacificist	pacifista[Adjective]
+pacifier	pacificador
+pacifies	pacifica
+pacifism	pacifismo[Noun]
+pacifist	pacifista[Noun]
+pacifistic	pacifista[Adjective]
+pacifistically	paci/ficamente[Adverb]
+pacify	apaciguar[Verb]
+pack	paquete[Noun]
+package	el paquete
+package	empaquetar[Verb]
+packaged	empaquetado[Adjective]
+packager	empaquetador[Noun]
+packagers	empaquetadores
+packages	empaques
+packaging	empaquetando
+packagings	empaquetados
+packed	guardado (that's just 1 meaning)
+packet	paquete
+paella	paella[Noun]
+pagan	pagano[Noun]
+paganism	paganismo[Noun]
+paganization	paganizacion[Noun]
+page	página[Noun]
+pager	mensa/fono, buscapersonas
+paid	pagado
+pain	el dolor
+painful	doloroso
+painfully	dolorosamente[Adverb]
+painless	indoloro/sin dolor
+paint	pintar
+painted	pintado[Verb]
+painter	el pintor
+painters	pintores[Adjective]
+painting	la pintura
+paints	pinturas[Noun]
+pair	par[Adjective]
+pajama	pijama[Noun]
+pajamas	piyamas[Noun]
+pal	amigo[Noun]
+palace	palacio[Noun]
+palaces	palacios[Noun]
+palaeontology	paleontología[Noun]
+palazzi	palacios[Noun]
+palazzo	palacio[Noun]
+palazzos	palacios[Noun]
+pale	pa/lido[Adjective]
+pamper	chinear[Verb]
+pamphlet	folleto[Noun]
+pan	sarte/n[Noun]
+pancake	panqueque[Noun]
+pancakes	panqueques[Noun]
+paper	el papel
+park	el parque
+parsley	el perejil
+part	parta[Noun]
+participate	participar
+party	la tertulia
+pass	pasar
+passenger	el pasajero
+passengers	pasajeros[Noun]
+passively	pasivamente[Adverb]
+passiveness	pasividad[Noun]
+passport	el pasaporte
+passports	pasaportes[Noun]
+past	pasado
+pasteurize	pasteurizar[Verb]
+path	la senda
+patient	paciente
+patiently	pacientemente
+pause	la pausa
+pause	pausar
+paw	la garra
+pay	pagar
+paying	pagando
+pea	el guisante
+peace	la paz
+peace	paz
+peach	durazno
+peaches	duraznos
+peanut	el cacahuate
+pear	la pera
+pearl	la perla
+pearl	perla
+pen	la pluma
+pen	un boligrafo[Noun]
+pencil	lapiz
+people	la gente
+pepper	la pimienta
+peppermint	la menta
+perfect	perfecto
+perfume	el perfume
+permission	el permiso
+person	la persona
+personality	personalidad
+personify	personificar[Verb]
+personnel	personal[Noun]
+perspire	sudar
+pet	el animal dome/stico[Noun]
+petal	el pe/talo
+photographer	photographer
+piano	el piano
+pickle	el encurtido
+picture	el cuadro
+pie	el pastel
+pig	el chancho[Noun]
+pig	el puerco
+pigeon	la paloma
+pillow	la almohada
+pilot	el piloto
+pin	el alfiler
+pineapple	la pin~a[Noun]
+pineapple	la anana/[Noun]
+pineapples	las pin~as[Noun]
+pineapples	las anana/s[Noun]
+pines	los pinos[Noun]
+pink	rosado
+pipe	la pipa
+piss	mear[Verb]
+pistol	pistola
+place	el lugar
+placebo	placebo
+placed	situado
+placenta	placenta, tejido vegetal sobre el que se situan los o/vulos o primordios seminales[Noun]
+placentation	placentacio/n[Noun]
+placentations	placentaciones
+plain	plano, llanura[Noun]
+plains	llanos[Noun]
+planet	el planeta[Noun]
+planetarium	planetario[Noun]
+planetary	planetario[Adjective]
+planets	planetas[Noun]
+planimeters	plani/metros[Noun]
+planimetric	planime/trico[Adjective]
+plantation	plantacio/n[Noun]
+plantations	plantaciones
+plants	plantas[Noun]
+plasm	plasma[Noun]
+plasma	plasma
+plasmagenic	plasmage/nico
+plasmalemma	plasmalema[Noun]
+plasmatic	plasma/tico
+plasmid	pla/smido
+plasmids	plasmidios
+plasmolysis	plasmo/lisis
+plasmolytic	plasmoli/tico
+plasmolytically	plasmoli/ticamente[Adverb]
+plasodesma	plasmodesmo[Noun]
+plastic	pla/tico
+plasticity	plasticidad
+plastid	plasto
+plastidial	plastidial, relativo a los plastos[Adjective]
+plate	el plato
+plateau	plataforma [Noun]
+plateaus	plataformas[Noun]
+plates	La/minas[Noun]
+platform	plataforma
+platforms	plataformas
+platina	platina[Noun]
+plausible	plausible
+play	jugar
+play	tocar
+playable	pagable
+please	por favor
+pleasure	el gusto
+plebiscitary	plebiscitario
+plebiscite	plebiscito
+plenary	plenaria
+plenipotent	plenipotente
+plenipotentiary	plenipotenciario
+plenty	lleno
+plethora	ple/tora
+plethoric	pleto/rico
+pleura	pleura[Noun]
+pleurae	pleuras[Noun]
+pleural	pleural[Adjective]
+plexus	plexo
+plug	clavija
+pluggable	enchufable
+plugged	enchufado
+plugs	clavijas
+plum	la ciruela
+plumb	plomo
+plumbaginous	plumbagi/neo[Adjective]
+plumbago	plbago, ge/nero de las Plumbagina/aceas[Noun]
+plumbeous	plu/mbeo[Adjective]
+plumber	el plomero
+plumbic	plu/mbico[Adjective]
+plumbiferous	plumbi/fero[Adjective]
+plumose	plumoso[Adjective]
+plumulate	plumulado[Adjective]
+plumule	plu/mula[Noun]
+plumulose	plumuloso[Adjective]
+plural	plural
+pluralism	pluralismo
+pluralist	pluralista
+pluralistic	plurali/stico
+pluralistically	plurali/sticamente
+plurality	pluralidad
+pluralization	pluralizacio/n
+pluralize	pluralizar
+pluralized	pluralizado
+pluralizer	pluralizador
+pluralizers	pluralizadores
+plurals	plurales
+pluriaxial	pluriaxial
+pluripotent	pluripotente
+plus	añadido
+pluses	añadidos
+plutocracy	plutocracia
+plutocrat	pluto/crata
+plutocratic	plutocra/tico
+plutocratically	plutocra/ticamente
+pluton	pluto/n
+plutonian	plutoniano
+plutonic	pluto/nico
+plutonium	plutonio
+pluvial	pluvial
+pneumatic	neuma/tico
+pneumatically	neuma/ticamente
+pneumaticity	neumaticidad
+pneumatics	neuma/tica
+pneumatology	neumatologi/a
+pneumatolysis	neumatolisis
+pneumonia	neumoni/a
+pneumonic	neumo/nico
+pocket	el bolsillo
+pocketbook	libro de bolsillo
+pocketbooks	libros de bolsillo
+pocketknife	navaja
+podium	posio
+poem	el poema[Noun]
+poems	poemas
+poesies	poesi/as
+poet	el poeta
+poetic	poe/tico
+poetical	poe/tica
+poetically	poe/ticamente
+poignancy	viveza
+poignant	punzante[Adjective]
+poinsettia	poinsetia, flor de navidad, ge/nero de las Euforbia/ceas
+point	punto
+pointed	puntiagudo[Adjective]
+pointer	puntero
+pointillism	puntillismo
+pointillist	puntillista
+pointillistic	puntillistico
+points	puntos
+poise	aplomo
+poison	veneno
+poisoned	envenenado
+poisoner	envenenador
+poisoning	envenenando
+poisonous	venenoso
+poisonously	envenenadamente
+poisons	venenos
+poker	hurgo/n
+polar	polar
+polarimeter	polari/metro
+polarimeters	polari/metros
+polarities	polaridades
+polarity	polaridad
+polarizable	polarizable
+polarizables	polarizables
+polarization	polarizacio/n
+polarize	polarizar
+polarized	polarizado
+polarizer	polarizador
+polarizers	polarizadores
+polarizes	polariza
+polarizing	polarizando
+pole	polo
+polemic	pole/mica
+polemical	pole/mico
+polemically	pole/micamente
+polemicist	polemicista
+polemics	pole/micas
+polemist	polemizador
+police	polici/a
+policeman	polici/a
+policemen	polici/a
+polices	poli/ticas
+policewoman	polici/a
+policewomen	polici/as
+policies	poli/ticas
+policy	poli/tica
+poliomyelitis	poliomelitis
+polis	polis
+pond	el estanque
+pool	la piscina[Noun]
+pools	las piscinas[Noun]
+poop	caca[Noun]
+poor	pobre
+popcorn	las palomitas[Noun]
+pope	El Papa[Noun]
+popular	popular
+porch	el porche
+possible	posible
+poster	el cartel[Noun]
+posters	carteles[Noun]
+postman	cartero(a)[Noun]
+potato	la papa
+potato	la patata
+pound	la libra
+powder	el polvo
+practice	practicar
+pray	orar
+pray	rezar[Verb]
+pray	rogar[Verb]
+prayer	oracio/n[Noun]
+prayer	rezo[Noun]
+prayer	ruego[Noun]
+prayers	oraciones[Noun]
+prayers	rezos[Noun]
+prayers	ruegos[Noun]
+preach	predicar[Verb]
+preach	sermonear[Verb]
+preacher	predicador[Noun]
+preachers	predicadores[Noun]
+preaches	predica[Verb]
+preaching	predicacio/n[Noun]
+preaching	sermoneo[Noun]
+preaching	sermo/n[Noun]
+preamble	prea/mbulo[Noun]
+preambles	prea/mbulos[Noun]
+prearranged	arreglado de antemano[Adjective]
+precious	preciosa[Adjective]
+precise	preciso
+predict	predecir
+prefer	preferir
+pregnant	embarasada (really)
+prepare	preparar
+president	el presidente
+pretty	bonito
+pretty	lindo
+prevent	prevenir
+price	el precio
+principal	spainsh
+private	privado/privada
+prize	el premio
+problem	el problema
+products	PRODUCTOS[Noun]
+program	el programa
+promise	prometer
+pronounce	pronunciar
+prostate	pro/stata[Noun]
+prostitute	lklklkj[Conjunction]
+prostitute	prostituta[Noun]
+protect	proteger
+proud	orgulloso
+prove	probar
+puddle	charco
+puddles	charcos
+pumpkin	la calabaza
+punish	castigar
+pupil	a alumno[Noun]
+purchase	la compra
+pure	puro
+purple	morado
+purse	la bolsa
+puss	cara
+pussy	micha
+pussycat	minino
+put	poner
+q	q
+qua	en funciones de, en su condición de[Preposition]
+quack	graznido
+quack	matasanos[Noun]
+quackery	charlataneri/a
+quadrangle	cuadrángulo [Noun]
+quadrangles	cuadrángulos[Noun]
+quadrangular	cuadrangular[Adjective]
+quadrant	cuadrante
+quadrants	cuadrantes[Noun]
+quadraphonic	cuadrafónico[Adjective]
+quadraphony	cuadrafonía[Noun]
+quadratic	cuadrático
+quadratically	cuadráticamente[Adjective]
+quadrature	cuadratura
+quadriceps	cuadriceps
+quadrillion	cuatrillón[Noun]
+quadripartite	cuatripartita[Adjective]
+quadripartitely	cuatripartitamente[Adjective]
+quadriplegic	cuadriple/gico
+quadriplegic	paralítico[Adjective]
+quadroon	cuartero/n[Noun]
+quadruped	cuadru/pedo[Noun]
+quadruple	cua/druple[Noun]
+quadruplet	cua/druplo[Noun]
+quaff	beber a grandes tragos[Verb]
+quagmire	pantano[Noun]
+quagmires	pantanos[Noun]
+quail	codorniz[Noun]
+quail	acobardarse[Verb]
+quaint	pintoresco[Adjective]
+quaintness	cara/cter pintoresco[Noun]
+quake	temblor[Noun]
+quake	temblar[Verb]
+qualified	condicional, limitado, con salvedades[Adjective]
+qualified	(competent) capacitado[Adjective]
+qualified	(certified) acreditado[Adjective]
+quality	la calidad
+quantity	la cantidad
+queen	la reina
+question	la pregunta
+quick	pronto
+quickly	rapidamente[Adverb]
+quiet	quieto
+r	net(la red)[Noun]
+rabbet	barbilla[Noun]
+rabbi	rabino[Noun]
+rabbit	el conejo
+rabbits	conejos[Noun]
+rabble	canalla[Noun]
+rabid	rabioso[Adjective]
+rabidly	rabiosamente[Adjective]
+rabies	rabia[Noun]
+raccoons	mapache[Noun]
+race	carrera[Noun]
+race	(ethnicity, etc.) la raza [Noun]
+racecourse	pista de carreras[Noun]
+raced	e/l competio/[Verb]
+racehorse	carrera de caballos[Noun]
+racehorse	 el caballo de carrera[Noun]
+racehorses	caballos de carreras[Noun]
+races	carreras[Noun]
+racetrack	hipo/dromo[Noun]
+racial	racial[Adjective]
+racing	carreras[Noun]
+racism	racismo[Noun]
+racist	racista[Adjective]
+racists	racista[Noun]
+rack	rejilla[Noun]
+racket	raqueta (for tennis)[Noun]
+racquet	raqueta[Noun]
+radar	radar[Noun]
+radars	radares[Noun]
+radiance	brillantez (f), resplandor (m)[Noun]
+radians	radianes[Noun]
+radiant	brillante, resplandeciente[Adjective]
+radiantly	brillantemente
+radiate	radiar, irradiar (heat) [Verb]
+radiation	radiacio/n (f)[Noun]
+radical	radical[Adjective]
+radically	radicalmente[Adverb]
+radii	radios (pl. of radius=radio)[Noun]
+radio	la radio
+radioactive	radioactivo[Adjective]
+radioactively	radioactivamente[Adverb]
+radioastronomy	radioastronómico[Noun]
+radioautograph	radioautografo[Noun]
+radioautographic	radioautográfico[Noun]
+radioautography	radioautografía[Noun]
+radiobiologic	radiobiologico[Noun]
+radiobiologically	radiobiologicamente[Adverb]
+radiobiology	radiobiologia[Noun]
+radiobroadcast	transmisión de radio[Noun]
+radiobroadcaster	transmitidor de radio[Noun]
+radiochemist	radioquímico[Noun]
+radiochemistry	radioquímica[Noun]
+radiochlorine	radioclorina[Noun]
+radiography	radiografi/a[Noun]
+radiology	radiologi/a[Noun]
+radiolysis	radiolosis[Noun]
+radiolytic	radiolítico[Adjective]
+radiometeorograph	radiometeografo[Noun]
+radiometer	radiometro[Noun]
+radiometers	radiometros[Noun]
+radiometric	radiométrico[Adjective]
+radiometrically	radimétricamente[Adverb]
+radiometry	radiometría[Noun]
+radios	radios[Noun]
+radioscopic	radioscópico[Adjective]
+radioscopy	radioscopía[Noun]
+radiosensitive	radiosensitivo[Adjective]
+radiosensitivity	radiosensitividad[Noun]
+radiotherapy	radioterapia[Noun]
+radish	rabano
+radishes	rabanos
+radius	radio[Noun]
+raffle	rifa, sorteo[Noun]
+raft	baba[Noun]
+rafter	viga[Noun]
+rafts	babas[Noun]
+rag	trapo (piece of cloth)[Noun]
+rage	rabia, furor[Noun]
+ragged	desigual, mellado[Adjective]
+ragman	trapero[Noun]
+rags	los trapos[Noun]
+raid	incursio/n[Noun]
+raids	incursiones[Noun]
+rail	barandilla, pasamanos[Noun]
+rail	(railroad) vi/a[Noun]
+railing	barandilla[Noun]
+railroad	el ferrocarril
+rails	las vi/as
+rails	las vi/as
+rain	la lluvia
+rain	llover
+rainbow	el arcoiris[Noun]
+rainbow	el arcoiris[Noun]
+rainbows	los arcoirises[Noun]
+rainbows	los arcoirises[Noun]
+raincoat	el impermeable
+raincoats	los impermeables[Noun]
+raincoats	los impermeables[Noun]
+raindrop	la gota de lluvia[Noun]
+raindrop	la gota de lluvia[Noun]
+raindrops	las gotas de lluvia[Noun]
+raindrops	las gotas de lluvia[Noun]
+rained	llovio/[Verb]
+rained	llovio/[Verb]
+rainfall	la lluvia[Noun]
+rainfall	la lluvia[Noun]
+raining	lloviendo[Verb]
+raining	lloviendo[Verb]
+rains	las lluvias[Noun]
+rains	las lluvias[Noun]
+rainsquall	chubascos[Noun]
+rainstorm	el tormento de lluvia[Noun]
+rainstorm	el tormento de lluvia[Noun]
+rainy	lluvioso[Adjective]
+rainy	lluvioso[Adjective]
+raise	subir[Verb]
+raise	(a child or animal) criar[Verb]
+raisin	la pasa
+raisin	la pasa de uva[Noun]
+raisin	la pasa de uva[Noun]
+raisins	las pasas, las pasas de uva[Noun]
+raisins	las pasas, las pasas de uva[Noun]
+ran	corrio/[Verb]
+ranch	la finca[Noun]
+rancor	el rancor[Noun]
+rang	sono/[Verb]
+rank	(level) nivel[Noun]
+rap	tocar, golpear[Noun]
+rape	violar[Verb]
+raped	violo/[Verb]
+rapid	ra/pido, ra/pida[Adjective]
+rapidly	rapidamente[Adjective]
+raptor	el raptor[Noun]
+rare	raro
+raspberry	la frambuesa
+rat	la rata[Noun]
+rather	(than) en vez de[Conjunction]
+rather	mejor que
+ration	racio/n
+rations	las raciones[Noun]
+raw	crudo
+ray	irradiar[Verb]
+rayon	rayón[Noun]
+razor	la navaja
+reabsorb	reabsorber[Verb]
+reabsorption	reabsorción[Noun]
+reach	alcanzar[Verb]
+read	estudiar[Verb]
+read	indicar[Verb]
+read	leer
+reader	lector[Noun]
+reader	libro de lectura[Noun]
+readers	lectores[Noun]
+reading	indicacio/n[Noun]
+reading	lectura[Noun]
+reading	leyendo
+readings	indicaciones[Noun]
+readings	lecturas[Noun]
+readjust	ajustar de nuevo[Verb]
+readjust	arreglar de nuevo[Verb]
+readjust	reajustar[Verb]
+readjustment	nuevo arreglo[Noun]
+readjustment	readaptacio/n[Noun]
+readjustment	reajuste[Noun]
+readjusts	ajusta de nuevo[Verb]
+readjusts	arregla de nuevo[Verb]
+readjusts	reajusta[Verb]
+readout	indicacio/n[Noun]
+readouts	indicaciones[Noun]
+reads	estudia[Verb]
+reads	indica[Verb]
+reads	lee[Verb]
+ready	listo
+ready	preparado[Adjective]
+ready	propenso[Adjective]
+real	real
+real	verdadero[Adjective]
+realism	realismo[Noun]
+realist	realista[Noun]
+realist	vivo[Adjective]
+realistic	realista[Adjective]
+realistic	vivo[Adjective]
+realize	darse cuenta de[Verb]
+receipt	el recibo
+receive	recibir
+recent	reciente
+recipe	la receta
+recognize	reconocer
+recognize	recognize[Noun]
+recommend	recomendar
+recommendation	recomendacio/n[Noun]
+recommendation	recomendado
+recommended	recomendado[Adjective]
+reconcile	reconciliar[Verb]
+reconciliation	reconciliacio/n
+recycle	reciclar[Verb]
+red	rojo
+refrigerator	la nevera
+refuse	rehusar
+regret	sentir
+regular	regular
+relax	relajar
+remember	recordar
+remove	remover
+rent	el alquiler
+repair	reparar
+repeat	repetir
+reply	contestar
+request	pedir
+resentment	resentimiento[Noun]
+respect	respetar
+rest	descansar
+restaurant	el restaurante
+result	la resulta
+return	regresar[Verb]
+return	volver
+review	el repaso
+rib	la costilla
+rice	arroz
+rice	el arroz
+rich	rico
+ride	montar[Verb]
+right	derecha
+right	verdad[Adjective]
+rim	llanta
+rime	rima
+riming	rimando
+ring	el anillo
+ringing	sonando
+ripe	maduro
+rise	subir
+risk	riesgo[Noun]
+road	el camino
+roller	rodillo
+rollers	rodillos
+romantic	romantico[Adjective]
+roof	el techo
+room	el cuarto
+room	sala
+rooms	salas
+rooster	el gallo
+rope	la cuerda
+rose	la rosa
+rotten	podrido
+round	redondo
+routing	enrutamiento
+rub	frotar
+rubber	la goma
+rude	rudo
+rug	tapete
+rugs	tapetes
+ruin	ruina; bancarrota
+ruinate	destruir; ruinar[Noun]
+ruination	ruinacion[Noun]
+ruinations	ruinaciones[Noun]
+ruined	ruinado; bancarrotado[Verb]
+ruins	ruinas[Noun]
+rule	la regla
+ruled	reglado[Verb]
+ruler	la regla
+rulers	gobernantes[Noun]
+rules	reglas[Noun]
+ruling	reglando[Verb]
+rulings	fallos; decisiones de...[Noun]
+rum	el ron
+rumba	rumba[Noun]
+rumble	retumbar;hacer estruendo; ruido sordo;asiento trasero de un cupe[Noun]
+rumbled	retumbado
+rumor	el rumor
+run	correr
+rust	el moho
+rut	rut
+sabbat	sa/bado[Noun]
+sabbath	sa/bado[Noun]
+sabbatic	saba/tico[Adjective]
+sabbatical	saba/tico[Adjective]
+sabotage	sabotaje[Noun]
+sabotaged	saboteado[Verb]
+sabotages	sabotajes[Noun]
+sabotaging	saboteando[Verb]
+saboteur	saboteador[Noun]
+saccharin	sacarina[Noun]
+saccharose	sacarosa[Noun]
+sacerdotal	sacerdotal[Adjective]
+sack	saco[Noun]
+sacraments	sacramentos
+sacred	sagrado[Noun]
+sacrifice	sacrificar
+sacrifice	sacrificio[Noun]
+sacrificed	sacrificado
+sacrificer	quien realiza sacrificios[Noun]
+sacrifices	dewayne
+sacrilege	sacrilegio[Noun]
+sacrilegious	sacrilego[Adjective]
+sacristan	sacristan[Noun]
+sad	triste
+sadden	entristecer[Verb]
+saddle	silla de montar [Noun]
+saddle	montura[Noun]
+sadism	sadismo[Noun]
+sadist	sa/dico[Adjective]
+sadist	sadista[Noun]
+sadly	tristemente[Adverb]
+sadness	tristeza[Noun]
+sadomasochism	sadomasoquismo[Noun]
+sadomasochist	sadomasoquista
+sadomasochist	sadomasoquista[Adjective]
+sadomasochistic	sadomasoquista[Noun]
+safari	safari
+safe	salvo
+safety	seguridad[Noun]
+saffron	azafran[Noun]
+saga	saga[Noun]
+sagacious	sagaz[Adjective]
+sagaciously	sagazmente[Adverb]
+sagacity	sagacidad[Noun]
+sail	vela[Noun]
+sailor	el marinero
+saint	santo[Noun]
+saint	san[Noun]
+saints	santos[Noun]
+salad	la ensalada
+salads	ensaladas[Noun]
+salary	el sueldo
+sale	venta[Noun]
+sale	la liquidacion[Noun]
+salesclerk	dependiente[Noun]
+saleslady	dependienta
+salesman	el vendedor
+salesmen	dependientes
+salespeople	dependientes
+salesperson	dependiente
+saleswoman	dependienta
+saleswomen	dependientas
+saliva	saliva
+salsa	salsa[Noun]
+salt	la sal
+salty	salado
+salutations	saludos[Noun]
+salute	saludar
+salvation	salvacio/n
+salve	ungu.ento[Noun]
+same	mismo
+sample	muestra[Noun]
+sand	la arena
+sandwich	el bocadillo
+sarcasm	sarcasmo[Noun]
+sarcastic	sarcastico[Adjective]
+satisfied	satisfecho
+sauce	la salsa
+saucer	el platillo
+sausage	chorizo[Noun]
+sausage	salchicha[Noun]
+save	ahorrar
+say	decir
+say	decir, digo
+saying	dicho
+sayings	dichos
+scale	escala
+scar	la cicatriz
+scarf	la bufanda
+scarlet	escarlata
+schedule	el horario
+school	la escuela
+science	la ciencia
+scrambled	revuelto
+scream	chillar
+screen	pantalla
+screw	tornillo[Noun]
+screwdriver	el destornillador
+screws	tornillos[Noun]
+scuba diving	buceo
+sculpture	la escultura
+sea	el mar
+seabed	lecho marino
+seabird	ave marina
+seacoast	costa del mar
+seacoasts	costas del mar
+seafloor	fondo del mar
+seafood	mariscos
+seagull	gaviota
+seagulls	gaviotas
+seahorse	hipocampo, caballo de mar
+seal	foca; sello
+sealant	sellador
+sealed	sellado
+seals	focas; sellos
+sealskin	piel de foca
+seam	costura
+seaman	marinero
+seamen	marineros
+seamstress	modista
+seaports	puerto de mar
+seaquake	maremoto
+search	busqueda (noun); buscar (verb)
+seas	mares
+seashell	concha marina
+seashells	conchas marinas
+seashore	costa del mar
+seashores	costas del mar
+seasick	mareado
+seaside	playa, costa
+season	estaci\'on del a\~no (noun); condimentar (verb)
+seasonal	estacional
+seasoned	sazonado
+seat	el asiento
+seated	sentado
+second	el segundo
+secret	el secreto
+secretary	la secretaria
+secure	seguro[Adjective]
+see	ver
+seed	la semilla
+seek	buscar
+seem	parecer
+seesaw	balanci/n
+seize	agarrar[Verb]
+seldom	raramente[Adverb]
+select	escoger[Verb]
+sell	vender
+send	mandar
+sensible	razonable
+sensibly	razonablemente
+sentence	la frase
+September	septiembre
+serious	serio
+serve	servir
+server	server
+seven	siete
+seventy	setenta
+several	varios
+sew	coser
+sex	el sexo[Noun]
+sex	tener sexo[Verb]
+sexless	sin sexo[Adjective]
+sexual	sexual
+shape	la forma
+sharp	agudo
+shave	afeitar
+she	ella
+sheep	la oveja
+shelf	el estante
+shine	brillar
+ship	el vapor
+ship	nave, barco(a)[Noun]
+shirt	la camisa
+shit	mierda, f. [Noun]
+shiver	tiritar
+shoe	el zapato
+shoe	zapato
+shoes	los zapatos
+shop	tienda[Noun]
+short	corto
+shoulder	el hombro
+shout	gritar
+shovel	pala[Noun]
+shovels	palas[Noun]
+show	mostrar
+shower	la ducha
+shrimp	camarone[Noun]
+shrink	encoger
+shut	cerrar[Verb]
+sick	enfermo
+side	el lado
+sidewalk	acera, banqueta
+sidewalk	la acera
+sign	el letrero
+sign	firmar
+silence	el silencio
+silk	la seda
+silly	tonto
+silver	la plata
+similar	semejante
+simple	sencillo
+since	despue/s de[Preposition]
+sincere	sincero[Adjective]
+sincerely	sinceramente
+sincerity	sinceridad[Noun]
+sinecure	sinecura[Noun]
+sinew	tendo/n[Noun]
+sinful	pecaminoso[Adjective]
+sing	cantar
+singe	chamuscar[Verb]
+singer	el cantor
+single	solo[Adjective]
+singlehanded	sin ayuda[Adjective]
+singsong	mono/tono
+sister	la hermana
+sister	cuñada
+sit	sentarse
+six	seis
+sixty	sesenta
+skate	patinar
+ski	esquiar
+skin	la piel
+skinny	flaco
+skirt	la falda
+sky	el cielo
+sled	el trineo
+sleep	dormir
+sleeping	durmiendo
+sleeve	la manga
+slice	rebanar
+slow	lento
+slower	mas despacio[Adverb]
+slowly	lentamente
+small	bajo[Adjective]
+small	chaparro[Adjective]
+small	chiquito[Adjective]
+small	pequen~o[Adjective]
+small	small
+smaller	menor[Adjective]
+smallest	menor[Adjective]
+smart	majo[Adjective]
+smash	golpear[Verb]
+smashed	golpeado
+smell	oler
+smile	la sonrisa
+smoke	el humo
+smoke	fumar
+smooth	liso
+snack	tomar un aperitivo, picar[Verb]
+snacks	aperitivos, tentempie´, refrigerio[Noun]
+snag	un problema, un inconveniente[Noun]
+sneeze	estornudar
+snore	roncar
+snorkelear	to snorkel
+snot	moco
+snow	la nieve
+snow	nevar
+snug	acogedor[Adjective]
+so	de modo que, asi´ que[Conjunction]
+soaked	empapado[Adjective]
+soccer	f&uacute;tbol
+society	sociedad[Noun]
+sofa	el sofa/[Noun]
+soft	blando
+software	programa
+softwares	programas
+soldier	el soldado
+somebody	alguien
+someone	alguien[Pronoun]
+something	algo
+sometimes	a veces
+son	el hijo
+soon	pronto[Adverb]
+sore	dolorido
+sorry	siento
+soul	alma[Noun]
+soulful	conmovedor[Adjective]
+soup	la sopa
+sour	agrio
+south	el sur
+spareribs	Costillas
+spark	Chisme
+speak	hablar
+speakeasy	un bar prohibido (se usaba en los EEUU cuando fue prohibido el vender o beber el alcohol)[Noun]
+special	especial
+specs	las gafas (de "spectacles")[Noun]
+spectacled	que lleva gafas[Adjective]
+spectacles	gafas[Noun]
+speech	discurso[Noun]
+speechless	sin habla[Adjective]
+speed	la velocidad
+spell	el hechizo, el encanto[Noun]
+spells	los hechizos
+spend	gastar
+sphere	esfero[Noun]
+spheres	esferos[Noun]
+spider	arana[Noun]
+spinach	la espinaca
+spoken	hablado
+sponge	la esponja
+spoon	la cuchara
+sport	deporte[Noun]
+sports	los deportes[Noun]
+spouse	esposo, esposa[Noun]
+spring	fuente[Noun]
+spring	la primavera
+spring	muelle[Noun]
+spring	saltar[Verb]
+sprinter	velocista[Noun]
+spud	patata (slang)
+spurious	espurio[Noun]
+spuriously	espuriamente[Adverb]
+spy	espiar[Verb]
+squander	malgastar, derrochar[Verb]
+squandered	malgastado, derrochado[Verb]
+squanderer	despilfarrador[Noun]
+squandering	despilfarrando[Verb]
+square	cuadrado[Noun]
+square	el cuadro
+square	plaza[Noun]
+squid	calamar[Noun]
+stain	la mancha
+staircase	la escalera[Noun]
+stairway	la escalera
+stamp	el sello[Noun]
+star	la estrella
+station	estacio/n
+stationery	papel
+statistics	estadi/stica
+statue	estatua
+statue	la estatua
+statues	estatuas
+stature	altura
+stay	quedar
+steak	beef
+steak	el biftec
+steak	meat
+steaks	items
+steaks	things
+steal	grab
+steal	robar
+steal	take
+stealer	grabber
+stealer	taker
+stealing	grabbing
+stealing	taking
+steals	grabs
+steals	takes
+stealth	don't know
+stealth	not sure
+steam	el vapor
+steel	acero
+steel	el acero
+steelmaker	acerero, fabricante de acero
+steels	aceros
+steelwork	aceri/a, fabricacio/n de acero
+steelworker	acerero, trabajador del acero
+stepwise	progresivo[Adjective]
+stereo	estereo[Adjective]
+stereochemical	estereoquimico[Adjective]
+stereochemist	estereoquimico[Adjective]
+stereochemistry	estereoquimica[Noun]
+stereochemists	estereoquimicos[Noun]
+stereoisomer	estereoisomero[Noun]
+stereoisomeric	estereoisomerico[Adjective]
+stereophonic	estereofonico[Adjective]
+stereophonically	estereofonicamente[Adverb]
+stereophony	estereofonia[Noun]
+stereophotographic	estereofotografico[Adjective]
+stereophotography	estereofotografia[Noun]
+stereotropism	estereotropismo[Adjective]
+stereotype	esterotipo[Noun]
+stock	acciones[Noun]
+stocking	la media
+stockings	las medias[Noun]
+stomach	el esto/mago[Noun]
+stone	la piedra
+stop	dejar de (to stop doing something)[Verb]
+stop	detenerse[Verb]
+stop	pararse
+stoplight	la sema/fora[Noun]
+store	almacenar[Verb]
+store	la tienda
+storm	la tormenta
+story	el cuento
+storybook	el libro de cuentos[Noun]
+stove	la estufa
+straight	derecho[Adjective]
+straighten	enderezarse [intransitive][Verb]
+stranded	desamparado[Adjective]
+strange	extraño[Adjective]
+strange	raro[Adjective]
+strangely	extrañamente
+stranger	extraño[Noun]
+stranger	forastero[Noun]
+strategic	estratégico[Adjective]
+strategically	estratégicamente[Adverb]
+strategy	estrategia[Noun]
+straw	la paja
+strawberry	la fresa
+street	la calle
+street corner	la esquina
+streets	las calles
+stress	el estrés, la presión[Noun]
+strike	golpear[Verb]
+strike	huelga[Noun]
+strikebreaker	rompahuelgas[Noun]
+stroll	andar[Verb]
+strong	fuerte
+strongly	fuertemente
+stub	trozo, fragmento[Noun]
+stubbed	desarraigar[Verb]
+stubbing	desarraigar[Verb]
+stubble	rastrojo[Noun]
+stubbly	lleno de rastrojo, erizado; cerdoso[Adjective]
+stubborn	terco
+stubbornness	obstinación[Noun]
+stubby	lleno de tocones[Adjective]
+stubs	trozos, fragmentos[Noun]
+stucco	estuco[Noun]
+stuccowork	estucado[Noun]
+stuck	picar, punzar
+stud	tachón
+student	alumno
+student	el estudiante
+student	estudiante
+students	alumnos
+students	estudiates
+study	estudiar
+studying	estudiando
+stupid	menso, bobo, estúpido, torpe, necio[Adjective]
+stupidly	estúpidez, torpeza, necedad[Adverb]
+subject	asignatura[Noun]
+suburbs	las afueras[Noun]
+success	desarrollo[Noun]
+success	exito[Noun]
+successes	desarrollos
+successes	exitos[Noun]
+suck	chupas
+suddenly	de repente
+suede	el ante
+suffer	sufrir
+suggest	sugerir
+suit	el traje
+suitcase	la maleta
+summer	el verano
+sun	el sol
+Sunday	el domingo
+supper	la cena
+sure	seguro
+surfboard	tabla de surf[Noun]
+surgeon	el cirujano
+surprise	la sorpresa
+surprised	sorprendido
+swamp	el pantano
+swan	cisne
+sweet	dulce
+swim	nadar
+symphonic	sinfo/nico[Adjective]
+symphonies	sinfoni/as[Noun]
+symphony	sinfoni/a[Noun]
+symphysis	sinfisi/s[Noun]
+symposia	simposio[Noun]
+symposiums	simposio[Noun]
+symptom	si/ntoma[Noun]
+symptomatic	sintoma/tico
+synagog	sinagoga[Noun]
+synagogue	sinagoga[Noun]
+synapse	sinapsis[Noun]
+synarthrosis	sinartrosis[Noun]
+system	sistema[Noun]
+tab	teddy
+tabac	tabaco[Noun]
+tabernacle	taberna/culo
+tabernacles	taberna/culos
+table	la mesa
+table	mesa
+table	mesa[Noun]
+tablecloth	la mantel
+tablecloth	mantel
+tablecloth	mantel[Noun]
+tablecloths	manteles
+tables	mesas
+tablespoon	cuchara 
+tablespoon	la cuchara grande
+tablespoonful	cucharada
+tablespoonfuls	cucharadas
+tablespoons	cucharas
+tablespoonsful	cucharada
+tablet	tabletilla
+tabletop	mesa
+tabletops	mesas
+tablets	tabletillas
+tableware	cubiertos, utensilios de mesa
+tabloid	escenario
+tabloids	escenarios[Noun]
+taboo	tabu/
+taboos	tabu/es
+tabs	orejas, lenguetas, etiquetas[Noun]
+tabular	tabular
+tabularization	tabularizacio/n
+tabulate	tabular
+tabulated	tabulado, tabulada
+tabulator	tabulador, tabuladora
+tabulators	tabuladores, tabuladoras
+tachometer	taco/metro
+tachometers	taco/metros
+tachycardia	taquicardia
+tachygraphic	taquigráfico[Adjective]
+tachygraphical	tquigráfica[Noun]
+tachygraphy	tquigrafia[Noun]
+tachyons	taquio/n
+tacit	ta/cito, ta/cita
+tacitly	ta/citamente
+taciturn	taciturno, taciturna
+tack	tachuela[Noun]
+tacked	sujeto con tachuelas[Noun]
+tackier	pegajoso[Adjective]
+tackily	abandonado[Adjective]
+tacking	clavar tachuelas
+tackle	equipo,parafernalia,provisiones[Noun]
+tackled	equipado,preparado,provisto[Adjective]
+tacks	tachuelas[Noun]
+tacky	pegajoso[Adjective]
+taco	mexican sandwich
+tacos	mexican sandwiches
+tact	diplomacia
+tact	tacto,tino[Noun]
+tactful	con diplomacia
+tactfully	discretamente, diplomáticamente 
+tactfulness	consideraci'on,discreci'on[Noun]
+tactic	ta/ctica
+tactical	táctico[Adjective]
+tactically	t'acticamente[Adverb]
+tactician	t'actico[Noun]
+tactics	ta/cticas
+tactile	tactil,tangible[Adjective]
+tactilely	tactilmente,sensiblemente[Adverb]
+tactless	torpe,descortez[Adjective]
+tactlessly	torpemente,descortezmente[Adverb]
+tactlessness	torpeza,descortec'ia[Noun]
+tad	ni~no,nene[Noun]
+tadpole	renacuajo[Noun]
+tadpoles	renacuajos[Noun]
+taeniasis	infecci'on con tenia (gusano plano)[Noun]
+taffeta	     n
+taffeta	tafeta[Noun]
+taffetized	entafetado[Adjective]
+taffies	caramelos (de az'ucar fundida)[Noun]
+taffy	caramelo (de az'ucar fundida)[Noun]
+tag	etiqueta,r'otulo[Noun]
+tagalong	sucesi'on,repetici'on[Noun]
+tagged	etiquetado[Adjective]
+tail	cola
+tail	el rabio
+tailor	sastre ( noun)
+tailors	sastres ( noun)
+tails	colas
+take	tomar
+take	tomar ( verb)
+taken	tomado
+takeoff	despegar ( aviation)
+takeout	para llevar ( as in Take out food )
+talc	talco
+talcum	talco
+talent	talento
+talented	talentoso
+talents	talentos
+tales	cuentos  ( stories)
+talisman	talisma/n
+talk	hablar
+talkative	hablador ( noun)
+talked	hablo/
+talker	hablador
+talkers	habladores
+talking	hablando
+talks	charlas ( speeches)
+tall	alto
+taller	ma/s alto
+talon	talo/n
+talons	talones
+tamale	tamal
+tamarind	tamarindo ( the fruit)
+tame	domar ( to tame as in animals)
+tame	manso
+tameable	domable
+tamed	domado
+tameless	indomable
+tan	bronceado ( as in suntan)
+tan	tostado
+tangerine	la mandarina
+tango	tango ( the dance)
+tangos	tangos ( the dance )
+tank	tanque
+tanned	bronceado ( as in suntanned )
+tape	grabar ( as in tape a show)
+tape	la cinta
+tapioca	tapioca
+tarantula	tarantula
+tarantulas	tarantulas
+tardily	tardemente
+tardiness	tardi/a
+target_language	Spanish
+target_language	Spanish[]
+tariff	tarifa
+tariffs	tarifas
+tarnish	manchar ( to stain)
+tarnished	manchado ( stained)
+tarot	tarot
+tarts	tartas ( as in little cakes)
+task	quehacer ( chore)
+tasks	querhaceres (chores)
+taskwork	quehaceres ( chores)
+taste	gusto
+tasted	gusto/
+tasteful	gustoso
+tastefully	gustosamente
+tastefulness	gusto
+tasteless	sin gusto, insi/pido
+taster	gustador
+tasters	gustadores
+tastes	gustos
+tastier	gustoso
+tastily	gustosamente
+tasting	gustando
+tasty	gustoso
+tasty	sabroso
+tattletale	chivato ( cuban slang)noun
+tattoo	tatua/je
+tattooed	tatuado
+tattoos	tatuajes
+taut	tenso
+tavern	taberna
+taverna	taberna
+taverns	tabernas
+tax	el impuesto
+tax	impuesto ( as in IRS)
+taxi	el taxi
+taxi	taxi
+taxicab	taxi
+taxicabs	taxis
+taxidermy	taqui/dermia
+taxis	taxis
+tea	te/
+teach	ensen~ar
+teacher	el maestro
+teacher	maestra,profesora
+teacher	maestro, profesor
+teachers	maestros, profesores
+teaches	ensen~a
+teaching	ensen~ando
+teachings	ensen~anzas
+team	el equipo
+team	equipo ( as in football)
+teammate	compan~ero de equipo
+teammates	compan~eros de equipo
+teams	equipos
+teapot	la tetera
+teapot	tetera
+tear	desgarrar[Verb]
+tear	la/grima[Noun]
+tear	rajar
+tear	rasgar[Verb]
+tear	romper
+teardrop	lagrima
+teardrop	la/grima[Noun]
+tearful	lloroso[Adjective]
+teargas	gas lacrimante[Noun]
+teargas	gas lacrimo/geno[Noun]
+tearjerker	arrancala/grimas
+tears	desgarra[Verb]
+tears	la/grimas[Noun]
+tears	rasga[Verb]
+teas	te/s
+tease	burlarse ( to tease ( someone )
+tease	embromar[Verb]
+tease	importunar[Verb]
+tease	molestar[Verb]
+teases	embroma[Verb]
+teases	importuna[Verb]
+teases	molesta[Verb]
+teasingly	burlonmente
+teaspoon	cucharilla[Noun]
+teaspoon	cucharita
+teaspoon	la cucharita
+teaspoonful	cucharadita
+teaspoonfuls	cucharaditas
+teaspoons	cucharaditas
+teaspoons	cucharillas[Noun]
+teaspoonsful	cucharaditas
+teat	teta[Noun]
+teatro	teatro ( theater )
+teats	tetas[Noun]
+technic	te/cnico 
+technical	te/cnico
+technicalities	tecnicalidades
+technicality	tecnicalidad
+technique	te/cnica
+techniques	te/cnicas
+technocracy	tecnocracia
+technocrat	tecno/crata
+technologic	tecnolo/gico
+technologically	tecnolo/gicamente
+technologies	tecnologi/as
+technology	tecnologi/a
+technostructure	tecnoe/structura
+tedious	tedioso
+tediously	tediosamente
+teem	pulular
+teen	adolescente
+teenager	adolescente
+teenagers	adolescentes
+teens	adolescentes
+teeter	tambalear 
+teeth	dientes
+telecommunicate	telecomunicar
+telecommunication	telecomunicacio/n 
+telecommunications	tele/comunicaciones
+teleconference	telecomferencia
+teleconferenced	teleconferencio/
+teleconferences	teleconferencias
+teleconferencing	teleconfiriendo
+telecourse	telecurso
+telefacsimile	telefacsi/mile
+telefilm	telefilm
+telegram	telegrama
+telegrams	telegramas
+telepathic	telepa/tico
+telepathy	telepati/a
+telephone	tele/fono
+telephoned	telefoneo/
+telephones	tele/fonos
+telephony	telefoni/a
+telephoto	telefoto
+telephotographic	telefotogra/ficamente
+telephotography	telefotografi/a
+teleprinter	teleimpresora
+teleprompter	telepro/mpter
+telescope	telescopio
+telescopes	telescopios
+telethon	teleto/n
+televiewer	televidente
+televise	televisar
+television	televisio/n
+televisions	tele/visiones
+televisor	televisor, televisio/n
+televisors	televisores, televisiones
+televisual	televisual
+tell	contar
+teller	cajero ( cashier)
+tellers	cajeros (cashiers)
+telly	televisio/n ( TV)
+temblor	temblor ( as in earthquake)
+temerarious	temerario
+temerity	temor
+temp	temporario
+temper	genio
+temperament	genio, temperamento
+temperamental	temperamental
+temperamentally	temperamentalmente
+temperaments	genios, temperamentos
+temperature	la temperatura
+temperature	temperatura
+temperatures	temperaturas
+tempered	templado
+tempest	tempestad
+tempestuous	tempestuosidad
+temple	el templo
+tempt	tentar ( to tempt)
+temptation	tentacio/n
+temptations	tentaciones
+tempted	tento/
+ten	diez
+tenacious	tenaz
+tenaciously	tenazmente
+tenaciousness	tenacidad
+tenacity	tenacidad
+tenant	inquilino
+tenants	inquilinos
+tend	cuidar
+tendencies	tendencias
+tendency	tendencia
+tender	tierno
+tender	tierno ( as in gentle)
+tenebrous	tenebroso
+tennis	el tenis
+tennis	te/nis
+tennist	tenista
+tens	de/cimos
+tense	tenso 
+tension	tensio/n
+tent	carpa
+tentacle	tenta/culo 
+tentacles	tenta/culos
+tenth	de/cimo
+tenths	decimos
+tequila	tequila
+tergiversate	tergiversar
+tergiversation	tergiversio/n
+tergiversator	tergiversador
+teriyaki	teriyaki
+term	te/rmino
+termite	comeje/n, termitas
+terms	te/rminos
+terrace	la terraza
+terrace	terraza
+terrain	terrun~o
+terrains	terrun~os
+terraqueous	terra/queo
+terrarium	terrario
+terrazzo	terraza (terrazzo,terrace )
+terreplein	terraple/n
+terrestrial	terre/stre
+terrible	terrible
+terribly	terriblemente
+terrific	magni/fico
+terrified	terrorizado
+terrifies	terroriza
+terrify	terroriza
+terrifying	aterrante
+terrifying	espeleznante
+territories	territorios
+territory	territorio
+terror	terror
+terrorism	terrorismo
+terrorist	terrorista
+terrorists	terroristas
+terrorize	aterrar
+terrorized	aterrado
+terrorizer	terrorista
+terrorizers	terroristas
+terrorizes	aterrar
+terrors	terrores
+test	el examen
+test	exa/men
+testa	cabeza ( head)
+testament	testamento  ( will, as in death)
+testaments	testamentos
+tested	examino/
+testicle	testi/culo
+testicles	companeros
+testicles	huevos (vulg.)
+testicles	testi/culos
+testicular	testicular
+testified	atestigua/do
+testified	testi/fico
+testify	atestiguar
+testify	testificar
+testimonial	testimonio
+testimonialize	dar testimonio
+testimonializer	uno que da testimo/nio
+testimonials	testimonios
+testimonies	testimonios
+testimony	testimonio
+testing	examinando
+testing	proba/ndo[Verb]
+testings	exa/menes
+testings	prue/bas
+testis	testi/culo
+testosterone	testo/sterona
+tests	exa/menes
+testudo	testudo(one with a  big head)
+testy	ho/sco[Adjective]
+tetanic	teta/nico(a)
+tetanically	teta/nicamente[Adverb]
+tetanization	tetanizacio/n
+tetanize	tetaniza/r[Verb]
+tetanized	tetaniza/do
+tetanizes	tetani/za[Verb]
+tetanizing	tetanizacio/n
+tetanus	te/tano
+tetracycline	tetraci/clina
+tetrafluoride	tetrafluo/ruro
+text	texto
+textbook	el texto
+textbook	libro de texto, manual
+textbooks	manuales
+thank	agradecer
+thank	dar gracias
+thanked	agradecio/
+thankful	agradecido
+thankfully	agradecidamente
+thankfulness	agradecimiento
+thankless	malagradecido
+thanklessly	malagradecidamnete
+thanklessness	malagradecimiento
+thanks	gracias
+thanksgiving	Accio/n de Gracias
+that	esa[Adjective]
+that	ese[Adjective]
+that	eso
+thaw	descongelar ( to thaw)
+thawed	descongelado 
+theater	el teatro
+theater	teatro
+theaters	teatros
+theft	el robo
+theft	hurto
+thefts	hurtos
+their	su 
+theirs	sus
+theism	tei/smo
+theist	tei/sta
+them	ellos
+thematic	tema/tica
+thematically	tema/ticamente
+theme	tema
+themes	temas
+themselves	ellos mismos
+then	entonces
+thence	de alli/[Adverb]
+thence	desde alli/[Adverb]
+thenceforth	de alli/ en adelante[Adverb]
+thenceforth	desde entonces[Adverb]
+theocracy	teocracia[Noun]
+theocratic	teocra/tico[Adjective]
+theologian	teo/logo
+theologians	teo/logos
+theologic	teolo/gico
+theological	teolo/gico[Adjective]
+theologically	teolo/gicamente
+theology	teologi/a
+theorem	teorema
+theorems	teoremas
+theoretical	teo/rico[Adjective]
+theories	teorias[Noun]
+theorist	teo/rico
+theorists	teo/ricos
+theorize	teorizar[Verb]
+theory	teori/a
+therapeutic	terapeu/tico
+therapeutist	terapeu/ta
+therapies	tera/pias
+therapist	terape/uta
+therapists	terapeutas
+therapy	tera/pia
+there	alli/
+thereabout	alrededor
+thereabouts	en los alrededores
+thereafter	despue/s
+thereat	alla/
+there'd	habri/a
+therefor	entonces
+therefore	por eso
+therein	Adjunto
+there'll	habra/
+thesaurus	tesauro
+these	e/stos
+thespian	artista 
+thespians	artistas
+they	ellos
+thick	espeso
+thick	grueso
+thief	ladro/n
+thieves	ladrones
+thigh	el muslo
+thigh	muslo
+thighs	muslos
+thimble	dedal ( sewing)
+thimbles	dedales (sewing)
+thin	delgado
+thin	delgado ( person)
+thing	la cosa
+thingamajig	cachivache
+thingamajigs	cachivaches
+things	cosas
+think	pensar
+think	pensar ( to think)
+thinker	pensador
+thinkers	pensadores
+thinking	pensando
+thinks	piensa
+third	tercero
+thirdhand	terceramano
+thirdly	tercera
+thirds	tercios
+thirst	la sed
+thirst	sed
+thirsty	sediento
+thirteen	trece
+thirties	los trenta
+thirtieth	trige/simo
+thirty	treinta
+thirty	trenta
+this	e/sto
+this	esta
+thorns	espinas
+thorny	espinoso
+those	aquellos
+though	aunque
+thought	pensamiento 
+thoughtful	atento
+thoughtfully	atentamente
+thoughts	pensamientos
+thousand	mil
+thousandfold	mil veces
+thousands	miles
+thread	el hilo
+thread	hilo
+threaded	hilvanar
+threads	hilos
+threat	amenaza 
+threaten	amenazar
+threatened	amenazo/
+threatener	amenazador
+threatening	amenazando
+threateningly	amenazadamente
+threatens	amenaza
+threats	amenazas
+three	tres
+threefold	tres veces
+threesome	tri/o
+threw	tiro/
+throat	garganta
+throat	la garganta
+throats	gargantas
+throw	tirar
+thru	atra/vez
+thugs	malandros
+thumb	el pulgar
+thumbtack	la chinche
+thunder	el trueno
+thunder	trueno
+thunderbolt	rel/ampago
+thunderbolts	rela/mpagos
+thunderstorm	la tronada
+Thursday	el jueves
+thyroid	tiroide
+thyroids	tiroides
+tiara	tiara
+tic	tic 
+ticket	el billete
+ticket	tique/ ( theater)
+tickets	tique/s ( theater)
+tickle	hacer cosquillas
+ticklish	cosquilloso
+tide	marea ( as in weather )
+tides	mareas ( as in weather)
+tie	atar
+ties	corbatas ( as in dress tie )
+tiger	el tigre
+tiger	tigre
+tigers	tigres
+tight	apretado
+tighten	apretar
+tightly	apretadamente
+tightwad	tacan~o
+tightwads	tacan~os
+tigress	tigresa
+tilde	tilde
+tile	loza
+tile	mosaico
+tiled	enlozado
+tiles	lozas
+time	el tiempo
+time	hora
+timid	ti/mido
+timidity	timidez
+timidly	ti/midamente
+timidness	timidez
+timothy	Timoteo
+timpani	ti/mpano
+tin	lata
+tingle	erizar (to tingle)
+tingles	erizos
+tinkle	orinar ( to urinate)
+tins	latas
+tint	ten~ir ( to tint)
+tinted	ten~ido
+tints	tintes
+tinware	lateri/a
+tiny	pequen~o
+tip	propina ( gratuity) consejo ( advice)
+tips	propinas ( gratuities ) consejos ( advice)
+tiptoe	de puntillas
+tire	la llanta
+tire	llanta(car tire)cansar(to tire)
+tired	cansado
+tiredly	cansadamente
+tiredness	cansancio
+tireless	sin cansancio
+tirelessly	descansadamente
+tirelessness	descansancio
+tires	llantas ( car tires)
+tiresome	canso/n
+tisane	tisana
+tissue	tejido
+tit	teta ( as in breast,slang)
+titans	titanes
+tithe	diezmar
+tithes	diezmos
+title	ti/tulo
+titles	ti/tulos
+tits	tetas ( as in breasts ,slang)
+tittie	tetica ( as in titties, slang)
+titular	titular
+to	my love
+to	para
+toad	batracio ( Animal)
+toads	batracios
+toast	bri/ndis ( wine) or tostar ( as bread)
+toast	la tostada
+toasted	brindo/ ( wine) or tosto/ ( bread)
+toasted	tostado
+toaster	el tostador
+toaster	tostadora ( toaster for bread)
+toasters	tostadoras
+toasts	brindi/s(wine) or tostadas(bread)
+tobacco	tabaco
+tobacconist	tabaconero
+today	hoy
+toe	dedo del pie
+together	juntos
+toil	laborar ( as in to work)
+toiled	laboro
+toilet	escusado
+toilet	inodoro
+toilet	retrate
+toilets	inodoros
+toilsomely	laboriosamente
+token	peaje
+tolerability	tolerancia
+tolerable	tolerable
+tolerably	tolerablemente
+tolerance	tolerancia
+tolerant	tolerante
+tolerantly	con tolerancia
+tolerate	tolerar
+tolerated	tolero/
+tolerates	tolera
+tolerating	tolerando
+tomato	tomate
+tomatoes	tomates
+tomb	tumba
+tomboy	marimacha
+tombs	tumbas
+tombstone	tumba
+tombstones	tumbas
+tome	libro ( book)
+tomes	libros
+tomorrow	man~ana
+tomorrows	man~anas
+ton	tonelada
+tonalities	tonalidades
+tonality	tonalidad
+tone	tono
+tones	tonos
+tongue	la lengua
+tongue	lengua
+tongueless	sin lengua
+tongues	lenguas
+tonight	e/sta noche
+tons	toneladas
+tonsil	ami/gdalas
+too	demasiado
+too	tambie/n
+took	tomo/
+tool	herramienta
+toolbox	caja de herramientas
+toolboxes	cajas de herramientas
+tools	herramientas
+toot	pitar
+tooted	pito/
+tooth	diente
+tooth	el diente
+toothache	dolor de muelas
+toothaches	dolores de muela
+toothbrush	cepillo de dientes
+toothbrushes	cepillos de diente
+toothless	sin dientes
+toothpaste	pasta de dientes
+toothpick	modadiente 
+toothpicks	modadientes
+toothsome	dentudo
+top	cima
+topaz	topacio
+topcoat	sobreabrigo
+topcoats	sobreabrigos
+topiary	topiario
+topic	tema
+topics	temas
+topographer	topo/grafo
+topographic	topogra/fico
+topographically	topogra/ficamente
+topography	topografi/a
+torch	antorcha
+torches	antorchas
+toreador	torero, toreador
+torero	torero, toreador
+torment	tormento
+tormented	atormentado
+tormenter	atormentador
+tormenters	atormentadores
+tormenting	atormentando
+tormentor	atormentador
+torments	tormentos
+torn	roto
+tornado	tornado
+tornadoes	tornados
+tornados	tornados
+torpedo	torpedo
+torpedoes	torpedos
+torpedos	torpedos
+torpid	torpe
+torpidity	torpidez
+torpidly	torpemente
+torrent	torrente
+torrential	torrencioso
+torrentially	torrencialmente
+torrents	torrentes
+torrid	to/rrido
+torsion	torsio/n
+torso	torso
+torsos	torsos
+torte	torta ( pie)
+torticollis	torti/culis
+tortilla	tortilla ( omelet )
+tortoise	jicotea
+tortoises	jicoteas
+torture	tortura
+tortured	torturado
+torturer	atormentador
+tortures	torturas
+torturing	torturando
+total	suma
+totalism	totalismo
+totalitarian	totalitario, absoluto
+totalitarianism	totalitarianismo
+totality	totalidad
+totalization	total
+totally	totalmente
+totals	sumas
+tote	portar 
+toted	porto/ ( carried )
+touch	tocar
+touchable	tocable
+toupee	peluca ( wig)
+tourism	turismo
+tourist	guiri[Noun]
+tourist	racist[Adjective]
+tourist	turista
+touristic	turi/tico
+tourists	guiri[Noun]
+tourists	turistas
+tournament	campeonato
+tournaments	campeonatos
+toward	hacia
+towed	remolcado 
+towel	la toalla
+towel	toalla
+towels	toallas
+tower	torre
+towers	torres
+towing	remolcando
+town	el pueblo
+town	pueblo
+townhouse	townhouse
+towns	pueblos
+toxic	to/xico
+toxin	toxina
+toy	el juguete
+toy	juguete
+toyed	jugueteo/
+toying	jugueteando
+toys	juguetes
+trade	comercio, intercambiar ( to trade )
+tradition	tradicio/n
+traditional	tradicional
+traditionalism	tradicionalismo
+traditionalistic	tradicionalista
+traditionalists	tradicionalistas
+traditionally	tradicionalmente
+traditions	tradiciones
+traffic	tra/nsito
+trafficker	traficante
+traffickers	traficantes
+trafficking	traficando
+tragedies	tragedias
+tragedy	tragedia
+tragic	tra/gico
+tragicomedy	tragicomedia
+tragicomic	tragico/mico
+tragicomical	tragico/mico
+train	el tren
+train	tren ( noun) adiestrar ( military)
+trained	adiestrado ( military)
+trainer	adiestrador ( military)
+trainers	adiestradores
+training	adiestramiento
+training	training center
+trains	tre/nes
+trait	caracteri/stica
+traitor	traidor
+traitoress	traidora
+traitorize	traicionar
+traitors	traidores
+traits	caracteri/sticas
+trajection	trayectoria
+trajectories	trayectorias
+trajectory	trayectoria
+tram	tram
+tramcar	tram
+tramp	puta ( whore )
+tranquil	tranquilo
+tranquility	tranquilidad
+tranquilize	tranquilizar
+tranquilized	tranquilo
+tranquilizer	tranquilizante
+tranquilizers	tranquilizantes
+tranquilizes	tranquiliza
+tranquillity	tranquilidad
+tranquilly	tranquilamente
+tranquilness	tranquilidad
+transaction	transaccio/n
+transactions	transaccio/nes
+transatlantic	transatla/ntico
+transcend	trascender
+transcended	trascendio/
+transcendence	trascendencia
+transcendent	trascendiente
+transcendental	trascendental
+transcendentalism	trascendentalismo
+transcendentalist	trascendentalista
+transcendentalists	trascendentalistas
+transcendentalize	trascender
+transcendentalizes	trasciende
+transcendentally	trascendentalmente
+transcending	trascendiente
+transcends	trasciende
+transcontinental	transcontinental
+transcribe	transcribir
+transcripts	transcripcio/n
+transfer	transferencia ( noun)
+transferable	transferible
+transfers	transferencias ( noun)
+transform	transformar
+transformation	transformacio/n
+transfusion	transfusio/n
+transfusions	transfusiones
+transgress	pecar ( to sin)
+transgressed	peco/ ( sinned)
+transgression	pecado (sin)transgresio/n
+transgressions	pecados ( sins )
+transients	transeu/ntes
+transit	tra/nsito
+transition	transicio/n
+transitions	transiciones
+translatable	traducible
+translate	traducir
+translated	traducido
+translates	traduce
+translating	traduciendo
+translation	traduccio/n
+translations	traducciones
+translator	traductor
+translators	traductores
+transliterate	transliterar
+transliteration	transliteracio/n
+translocate	translocar
+translucent	reluciente
+transmissibility	transmisibidad
+transmissible	transmisible
+transmission	transmisio/n
+transmissions	transmisiones
+transmit	transmitir
+transmits	transmite
+transmittable	transmisible
+transsexual	transexual
+transsexualism	transexualismo
+transvestite	transvesti 
+trapeze	trapecio
+trapezist	trapecista
+trapezoid	trapezoide
+trapezoids	trapezoides
+trapped	atrapado
+traps	trampas
+trash	basura
+trattoria	parrilla
+trauma	trauma
+traumas	traumas
+traumatic	traumatico
+traumatize	traumar
+traumatized	traumado
+travel	viajar
+travel	viajar ( to travel )
+traveled	viajo/
+traveler	viajante
+travelers	viajantes
+traveling	viajando
+travelings	viajes
+travels	viajes
+tray	bandeja
+trays	bandejas
+treason	traicio/n
+treasure	tesoro
+treasured	atesorado
+treasurer	tesorero
+treasurership	tesoreri/a
+treasures	tesoros
+treasury	tesoreri/a
+treat	golosina ( sweets)
+treaties	pacto ( pact )
+treatment	tratamiento
+treatments	tratamientos
+treats	golosinas ( sweets )
+tree	arbo/l
+trees	arboles
+tremble	temblar
+trembled	temblo/
+trembles	tiembla
+trembling	tempando
+trembly	tembloroso
+tremendous	tremendo
+tremendously	tremendamente
+trial	juicio
+trials	juicios
+triangle	tria/ngulo
+triangles	tria/ngulos
+triangular	triangular
+tribe	tribu/
+tribes	tribu/s
+tribulation	tribulacio/n ( woe )
+tribunal	tribunal
+tribunals	tribunales
+tributary	tributo
+tributes	tributos
+triceps	triceps
+trick	truco
+trip	el viaje
+truck	camion[Noun]
+truth	la verdad
+Tuesday	el martes
+turkey	el pavo
+turtle	tortuga
+twelve	doce
+twenty	veinte
+twin	gemelo[Noun]
+two	dos
+tycoon	Magnate[Noun]
+typewriter	la ma/quina de escribir[Noun]
+typewriter	la maquina de escribir[Noun]
+typhoon	el tifo/n[Noun]
+typhus	el tifus[Noun]
+typist	el (la) mecano/grafo(a)[Noun]
+tyrannize	tiranizar[Verb]
+ugly	feo
+ulcer	ulcera[Noun]
+ultimately	Ultimadamente[Adverb]
+ultimatum	ultimatum[Noun]
+umbrella	el paraguas
+umbrella	paraguas[Noun]
+uncle	tio
+uncover	descubrir
+under	bajo
+underline	subrayar
+undershirt	la camiseta
+understand	entender
+understandability	comprensibilidad[Adjective]
+understandable	comprensible[Adjective]
+understanding	comprensio/n[Noun]
+underused	infrautilizado[Adjective]
+underutilization	infrautilizacio/n[Noun]
+underutilize	infrautilizar[Verb]
+underwear	la ropa interior
+unemployed	desempleo[Adjective]
+unhappy	infeliz
+United States	Estados Unidos
+university	la universidad
+unmarried	soltero
+uno	one
+untie	desatar
+until	hasta
+untrans	n
+untrans	y[]
+up	arriba
+upgrade	 mejoramiento
+use	el uso
+use	usar
+vacancies	vacantes[Noun]
+vacancy	vacante[Noun]
+vaccination	vacuna
+vagina	vagina[Noun]
+vaginal	vaginal[Adjective]
+vaginas	vaginas[Noun]
+vain	vano[Adjective]
+vainglory	vanagloria[Noun]
+valuable	valioso
+vanilla	la vainilla
+vault	bóveda, sótano, caja fuerte[Noun]
+vaulted	saltado, brincado[Verb]
+veal	la ternera
+vegetable	la legumbre
+vegetarian	vegetariano[Noun]
+velvet	el terciopelo
+verb	el verbo
+verb	verbo
+verbal	verbal
+very	muy
+vest	el chaleco
+view	la vista
+village	el pueblo
+vinegar	el vinagre
+visit	visitar
+vitamin	la vitamina
+vocabulary	el vocabulario
+vodka	el vodka
+voice	la voz
+wack	dar un buen golpe a[Verb]
+wacke	roca basáltica[Noun]
+wad	la borra[Noun]
+wad	tapón o corcho[Noun]
+wadding	relleno[Noun]
+waddle	nalguear, caminar a pasos pequeños[Verb]
+wade	chapotear[Verb]
+wafer	el barquillo[Noun]
+wafer	galleta[Noun]
+wafers	galletas[Noun]
+wafers	los barquillos[Noun]
+waft	soplo de viento[Noun]
+wag	menear[Verb]
+wag	mover[Verb]
+wage	el salario[Noun]
+wage	sueldo, salario [Noun]
+wager	apuesta[Noun]
+wager	la apuesta[Noun]
+wages	pago/paga/sueldo[Noun]
+wail	lamentarse[Verb]
+wail	lamento[Verb]
+wails	lamento(a)[Verb]
+waist	la cintura[Noun]
+waist	cintura[Noun]
+waistband	cinturón 
+waistcoat	el chaleco
+waistcoat	el chaleco[Noun]
+wait	esperar
+wait for	esperar
+waited	perdado[Verb]
+waiter	el camarero
+waiter	el mozo
+wake up	despertarse
+walk	andar
+wall	la pared
+wall	muro (a fuera)
+wall	pared (a dentro)
+wallet	la cartera
+walnut	la nuez
+want	querir
+wanted	querido (m), querida (f)
+war	la guerra
+warm	caliente[Adjective]
+was	fue 
+wash	lavar
+washed	lavo[Verb]
+washing	lavando[Verb]
+wasp	avispa[Noun]
+wasps	avispas
+wastebasket	basurero
+wastebaskets	basureros
+watch	el reloj
+water	el agua
+water	el agua[noun]
+waterfall	la catarata
+wave	ola (de agua)[Noun]
+waves	OLAS[Noun]
+wax	cera
+wax	la cera
+way	camino[Noun]
+way	la via[Noun]
+we	nosotros
+weasel	comadreja
+weather	clima
+weather	el tiempo
+web	tejido tela telaraña enredo red trama
+wed	casar
+wed	casarse
+wedding	boda
+wedding	la boda
+wedge	cuña
+week	la semana
+week	semana
+weekday	día de la semana
+weekend	fin de semana
+weekends	fines de semana
+weekly	semanal
+weep	llorar
+weeper	llorona[Noun]
+weepers	lloronas[Noun]
+weeping	la/grimas[Noun]
+weeping	llanto[Noun]
+weeping	llorando[Verb]
+weeping	lloro/n[Adjective]
+weeping	lloroso[Adjective]
+weeps	llora[Verb]
+weevil	gorgojo[Noun]
+weigh	considerar[Verb]
+weigh	pesar
+weigh	ponderar[Verb]
+weighs	considera[Verb]
+weighs	pesa[Verb]
+weighs	pondera[Verb]
+weight	an~adir peso a[Verb]
+weight	asignar un peso a[Verb]
+weight	carga[Noun]
+weight	el peso
+weight	la pesa[Noun]
+weights	cargas[Noun]
+weights	pesas[Noun]
+weights	pesos[Noun]
+weighty	de mucho peso[Adverb]
+weighty	grave[Adjective]
+weighty	importante[Adjective]
+weighty	ponderoso[Adjective]
+weird	extran~o[Adjective]
+weird	fanta/stico[Adjective]
+weird	misterioso[Adjective]
+weird	raro[Adjective]
+welcome	agradable[Adjective]
+welcome	bienvenidos[Adjective]
+welcome	dar la bienvenida a [Verb]
+welcome	denatha
+welcome	grato[Adjective]
+weld	soldadura[Noun]
+weld	soldar[Verb]
+well	bien[Adverb]
+west	el oeste
+wet	mojado
+what	que[Preposition]
+whatever	lo que; que/[Pronoun]
+wheel	la rueda
+when	cuando[Adverb]
+whenever	cada vez que[Adverb]
+where	donde
+where're	Donde esta?
+while	mientras
+whiskey	el whiskey
+whistle	silbar
+white	blanco
+whiter	ma/s blanco
+whore	puta[Noun]
+why	por que/
+wide	ancho
+widow	viuda[Noun]
+widower	viudo[Noun]
+wife	la esposa
+wife	marida[Noun]
+win	ganar
+wind	el viento
+window	la ventana
+windscreen	el parabrisa (se usa en Australia)[Noun]
+windshield	el parabrisa
+windshield	el parabrisa (se usa en los EEUU)[Noun]
+wine	el vino
+wing	la ala
+winner	el ganador
+winners	los ganadores[Noun]
+winter	el invierno
+wintered	paso/ el invierno[Verb]
+wintering	pasando el invierno (en algun sitio)[Verb]
+wise	sabio
+witch	bruja[Noun]
+witch	la bruja[Noun]
+witchcraft	brujeria[Noun]
+witches	las brujas[Noun]
+with	con
+with me	conmigo
+without	sin
+wolf	el lobo
+woman	la mujer
+wood	la madera
+wool	la lana
+word	la palabra
+work	el trabajo
+work	trabajar
+work	trabajo
+workable	trabajable
+workbench	mesa de trabajo[Noun]
+workbenches	mesas de trabajo[Noun]
+worked	trabajo/
+worker	trabajador, laborante
+workers	trabajadores[Noun]
+working	trabajando
+workingman	trabajador
+workingmen	trabajadores
+workman	trabajador[Noun]
+world	el mundo
+worried	preocupado
+worry	preocuparse
+worse	peor
+wound	la herida
+wounded	herida
+wrap	envolver[Verb]
+wrestling	lucha libre[Noun]
+wrinkle	la arruga
+write	escribir
+writer	el escritor(a)[Noun]
+writes	escribe[Verb]
+writing	escritura[Verb]
+written	escrito
+www	RIM (Red Mundial Interna)
+xylophone	xilo/fono[Noun]
+xylophones	xilo/fonos[Noun]
+yacht	yate
+yachts	yates
+yard	corral[Noun]
+yard	yarda[Noun]
+yarn	hilo[Noun]
+yawl	yola[Noun]
+yawn	bostezar
+yawn	bostezo
+yawn	el bostezo
+yawning	bostezando
+yeah	si
+year	an~o
+yearbook	anuario[Noun]
+yearly	anualmente
+yearn	desear
+yearning	anhelo
+yeast	levadura
+yell	aullar[Verb]
+yell	grito
+yelled	grito/
+yellow	amarillo
+yellowed	amarillo/
+yellowing	amarillando
+yellowish	amarillento
+yellowish	amarilloso
+yellows	amarillos
+yells	grita
+yelp	gan~ir[Verb]
+yen	yen
+yeoman	hacendado[Noun]
+yeomanry	burguesi/a
+yes	si,afimacion
+yesterday	ayer
+yet	au/n
+yew	tejo
+yield	producir
+yoke	sojuzgar
+yolk	yema de huevo
+yon	ahi/ alli/
+yonder	ahi/ alla/
+yore	antan~o
+you	tu/
+you	usted
+you	vosotros(plural/informal)
+you	vosotros(plural/informal)[Pronoun]
+young	joven
+younger	menor
+youngster	jovencito
+your	tus
+yours	el tuyo
+yourself	tu/ mismo
+yourselves	ustedes mismos
+youth	juventud
+youthful	juvenil
+youthfulness	juventud
+yowl	aullar
+ytterbium	iterbio
+yttrium	itrio
+yucca	yuca
+yule	pascua de navidad
+yuppie	yuppie
+yuppies	yuppies
+zany	bufo/n[Noun]
+zapping	zapeo[Noun]
+zeal	celo
+zealot	defensor
+zealot	fana/tico[Noun]
+zealotry	fanatismo[Noun]
+zealous	celoso
+zebra	cebra[Noun]
+zebras	cebras[Noun]
+zenith	ce/nit
+zenith	cenit
+zenithal	cenital[Adjective]
+zephyr	ce/firo[Noun]
+zero	cero
+zeroes	los ceros[Noun]
+zeros	los ceros[Noun]
+zest	deleite[Noun]
+zest	la vivacidad[Noun]
+zigzag	zigzag
+zinc	cinc[Noun]
+zither	ci/tara[Noun]
+zodiac	zodiaco[Noun]
+zodiacal	zodiacal
+zone	faja[Noun]
+zone	zona[Noun]
+zoo	jardi/n zoolo/gico[Noun]
+zoologist	el zoo/logo[Noun]
+zoology	la zoologi/a[Noun]
+zoom	pasar zumbando[Verb]
+zounds	ca/spita
+zucchini	el calabaci/n[Noun]

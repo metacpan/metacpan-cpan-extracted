@@ -1,0 +1,78 @@
+2009-05-15 09:33  cvs
+
+	* lib/LEOCHARRE/: Class2.pm, Class2.pod: added conf methods
+
+2009-05-07 14:55  cvs
+
+	* lib/LEOCHARRE/Class2.pm, lib/LEOCHARRE/Class2.pod,
+	  t/18_setgetuniqarray.t: made so setget unique array name method
+	  is also add() method
+
+2009-03-31 11:39  cvs
+
+	* lib/LEOCHARRE/Class2.pm, lib/LEOCHARRE/Class2.pod,
+	  t/18_setgetuniqarray.t: added aref method for unique array
+	  accessor
+
+2009-02-06 09:10  cvs
+
+	* lib/LEOCHARRE/Class2.pm, t/18_setgetuniqarray.t,
+	  t/19_setgetuniqarray.t: made sure that _add _delete _clear return
+	  true
+
+2009-02-05 12:35  cvs
+
+	* lib/LEOCHARRE/: Class2.pm, Class2.pod: added
+	  make_accessor_setget_unique_array() , like the hash manipulator
+
+2008-10-27 15:37  cvs
+
+	* Makefile.PL, lib/LEOCHARRE/Class2.pm: made so calling constructor
+	  without arg is ok
+
+2008-10-24 13:47  cvs
+
+	* lib/LEOCHARRE/: Class2.pm, Class2.pod: added make_accessor_get()
+	  class method
+
+2008-09-12 12:05  cvs
+
+	* lib/LEOCHARRE/Class2.pm, t/15_setgetaref.t: moved documentation
+	  to separate file, added wantarray for setget aref
+
+2008-07-27 15:19  cvs
+
+	* lib/LEOCHARRE/Class2.pm, t/16_init.t: added a constructor that
+	  checks for an init() method and calls it
+
+2008-07-27 14:33  cvs
+
+	* lib/LEOCHARRE/Class2.pm: cleaned up documentation
+
+2008-04-30 10:42  cvs
+
+	* t/12_other.t: added tentative test
+
+2008-04-17 14:35  cvs
+
+	* lib/LEOCHARRE/Class2.pm, t/15_setgetaref.t: refined count_for
+
+2008-04-17 14:10  cvs
+
+	* lib/LEOCHARRE/Class2.pm: added make_accessor_setget_aref
+
+2008-04-09 04:37  cvs
+
+	* lib/LEOCHARRE/Class2.pm, t/14_setgetondisk.t: added
+	  make_method_counter()
+
+2008-03-18 10:50  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/Class2.pm, t/11_Person.t,
+	  t/Person.pm: Initial revision
+
+2008-03-18 10:50  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/Class2.pm, t/11_Person.t,
+	  t/Person.pm: init
+

@@ -1,0 +1,603 @@
+NAME
+    Functional - a module which makes Perl slightly more functional
+    (think Haskell)
+
+SYNOPSIS
+        use Functional;
+        print 'The first ten primes are: ', 
+          show(take(10, filter("prime", integers))), "\n";
+
+DESCRIPTION
+    Perl already contains some functional-like functions, such as
+    `map' and `grep'. The purpose of this module is to add other
+    functional-like functions to Perl, such as foldl and foldr, as
+    well as the use of infinite lists.
+
+    Think as to how you would express the first ten prime numbers in
+    a simple way in your favourite programming language? So the
+    example in the synopsis is a killer app, if you will (until I
+    think up a better one ;-).
+
+    The idea is mostly based on Haskell, from which most of the
+    functions are taken. There are a couple of major omissions:
+    currying and types. Lists (and tuples) are simply Perl list
+    references, none of this 'cons' business, and strings are simple
+    strings, not lists of characters.
+
+    The idea is to make Perl slightly more functional, rather than
+    completely replace it. Hence, this slots in very well with
+    whatever else your program may be doing, and is very Perl-ish.
+    Other modules are expected to try a much more functional
+    approach.
+
+FUNCTIONS
+    The following functions are available. (Note: these should not
+    be called as methods).
+
+    In each description, I shall give the Haskell definition (if I
+    think it would help) as well as a useful example.
+
+    show
+        Show returns a string representation of an object. It does
+        not like infinite lists.
+
+    inc k
+        Increases the value passed by 1. eg: inc(2) = 3. In Haskell:
+
+            inc          :: a -> a
+            inc k         = 1 + k
+
+    double k
+        Doubles the passed value. eg: double(3) = 6. In Haskell:
+
+            double         :: a -> a
+            double k        = k * 2
+
+    square k
+        Returns the square of the passed value. eg: square(3) = 9.
+        In Haskell:
+
+            square          :: a -> a
+            square k         = 1 + k
+
+    gcd x y
+        Returns the greatest common denominator of two numbers. eg:
+        gcd(144, 1024) = 16. In Haskell:
+
+            gcd :: Integral a => a -> a -> a
+            gcd 0 0 = error "gcd 0 0 is undefined"
+            gcd x y = gcd' (abs x) (abs y)
+                      where gcd' x 0 = x
+                      gcd' x y = gcd' y (x `rem` y)
+
+    lcm x y
+        Returns the lowest common multiple of two numbers. eg:
+        lcm(144, 1024) = 9216. In Haskell:
+
+            lcm            :: (Integral a) => a -> a -> a
+            lcm _ 0         = 0
+            lcm 0 _         = 0
+            lcm x y         = abs ((x `quot` gcd x y) * y)
+
+    id x
+        The identity function - simply returns the argument. eg:
+        id([1..6]) = [1, 2, 3, 4, 5, 6]. In Haskell:
+
+            id             :: a -> a
+            id x            = x
+
+    const k _
+        Returns the first argument of 2 arguments. eg: const(4, 5) =
+        4. In Haskell:
+
+            const          :: a -> b -> a
+            const k _       = k
+
+    flip f
+        Given a function, flips the two arguments it is passed. Note
+        that this returns a CODEREF, as currying does not yet
+        happen. eg: flip(sub { $_[0] ** $_[1] })->(2, 3) = 9. In
+        Haskell (ie this is what it should really do):
+
+            flip           :: (a -> b -> c) -> b -> a -> c
+            flip f x y      = f y x
+
+    Until p f x
+        Keep on applying f to x until p(x) is true, and then return
+        x at that point. eg: Until(sub { $_[0] % 10 == 0 }, "inc",
+        1) = 10. In Haskell:
+
+            until          :: (a -> Bool) -> (a -> a) -> a -> a
+            until p f x     = if p x then x else until p f (f x)
+
+    fst x:xs
+        Returns the first element in a tuple. eg: fst([1, 2]) = 1.
+        In Haskell:
+
+            fst            :: (a,b) -> a
+            fst (x,_)       = x
+
+    snd x:y:xs
+        Returns the second element in a tuple. eg: snd([1, 2]) = 2.
+        In Haskell:
+
+            snd            :: (a,b) -> a
+            snd (_,y)       = y
+
+    head xs
+        Returns the head (first element) of a list. eg: head([1..6])
+        = 1. In Haskell:
+
+            head             :: [a] -> a
+            head (x:_)        = x
+
+    Last xs
+        Returns the last element of a list. Note the capital L, to
+        make it distinct from the Perl 'last' command. eg:
+        Last([1..6]) = 6. In Haskell:
+
+            last             :: [a] -> a
+            last [x]          = x
+            last (_:xs)       = last xs
+
+    tail xs
+        Returns a list minus the first element (head). eg:
+        tail([1..6]) = [2, 3, 4, 5, 6]. In Haskell:
+
+            tail             :: [a] -> [a]
+            tail (_:xs)       = xs
+
+    init xs
+        Returns a list minus its last element. eg: init([1..6]) =
+        [1, 2, 3, 4, 5]. In Haskell:
+
+            init             :: [a] -> [a]
+            init [x]          = []
+            init (x:xs)       = x : init xs
+
+    null xs
+        Returns whether or not the list is empty. eg: null([1, 2]) =
+        False. In Haskell:
+
+            null             :: [a] -> Bool
+            null []           = True
+            null (_:_)        = False
+
+    Map f xs
+        Evaluates f for each element of the list xs and returns the
+        list composed of the results of each such evaluation. It is
+        very similar to the Perl command 'map', hence the capital M,
+        but also copes with infinite lists. eg: Map("double",
+        [1..6]) = [2, 4, 6, 8, 10, 12]. In Haskell:
+
+            map              :: (a -> b) -> [a] -> [b]
+            map f xs          = [ f x | x <- xs ]
+
+    filter p xs
+        Returns the list of the elements in xs for which p(xs)
+        returns true. It is similar to the Perl command 'grep', but
+        it also copes with infinite lists. eg: filter("even",
+        [1..6]) = [2, 4, 6]. In Haskell:
+
+            filter           :: (a -> Bool) -> [a] -> [a]
+            filter p xs       = [ x | x <- xs, p x ]
+
+    concat
+        Concatenates lists together into one list. eg:
+        concat([[1..3], [4..6]]) = [1, 2, 3, 4, 5, 6]. In Haskell:
+
+            concat           :: [[a]] -> [a]
+            concat            = foldr (++) []
+
+        TODO: Make sure this works with infinite lists!
+
+    Length
+        Returns the length of a list - only do this with finite
+        lists! eg: Length([1..6]) = 6. In Haskell:
+
+        length :: [a] -> Int length = foldl' (\n _ -> n + 1) 0
+
+        TODO Make sure this works!
+
+    foldl f z xs
+        Applies function f to the pairs (z, xs[0]), (f(z, xs[0],
+        xs[1]), (f(f(z, xs[0], xs[1])), xs[2]) and so on. ie it
+        folds from the left and returns the last value. Note that
+        foldl should not be done to infinite lists. eg: the
+        following returns the sum of 1..6: foldl(sub { $_[0] + $_[1]
+        }, 0, [1..6]) = 21. In Haskell:
+
+            foldl            :: (a -> b -> a) -> a -> [b] -> a
+            foldl f z []      = z
+            foldl f z (x:xs)  = foldl f (f z x) xs
+
+    foldl1 f xs
+        This is a variant of foldl where the first value of xs is
+        taken as z. Applies function f to the pairs (xs[0], xs[1]),
+        (f(xs[0], xs[1], xs[2]), (f(f(xs[0], xs[1], xs[2])), xs[3])
+        and so on. ie it folds from the left and returns the last
+        value. Note that foldl should not be done to infinite lists.
+        eg: the following returns the sum of 1..6: foldl1(sub {
+        $_[0] + $_[1] }, [1..6]) = 21. In Haskell:
+
+            foldl1           :: (a -> a -> a) -> [a] -> a
+            foldl1 f (x:xs)   = foldl f x xs
+
+    scanl f q xs
+        Returns a list of all the intermedia values that foldl would
+        compute. ie returns the list z, f(z, xs[0]), f(f(z, xs[0]),
+        xs[1]), f(f(f(z, xs[0]), xs[1]), xs[2]) and so on. eg:
+        scanl(sub { $_[0] + $_[1] }, 0, [1..6]) = [0, 1, 3, 6, 10,
+        15, 21]. In Haskell:
+
+            scanl        :: (a -> b -> a) -> a -> [b] -> [a]
+            scanl f q xs  = q : (case xs of
+                                 []   -> []
+                                 x:xs -> scanl f (f q x) xs)
+
+    scanl1 f xs
+        This is a variant of scanl where the first value of xs is
+        taken as q. Returns a list of all the intermedia values that
+        foldl would compute. ie returns the list f(xs[0], xs[1]),
+        f(f(xs[0], xs[1]), xs[2]), f(f(f(xs[0], xs[1]), xs[2]),
+        xs[3]) and so on. eg: scanl1(sub { $_[0] + $_[1] }, [1..6])
+        = [1, 3, 6, 10, 15, 21]. In Haskell:
+
+            scanl1           :: (a -> a -> a) -> [a] -> [a]
+            scanl1 f (x:xs)   = scanl f x xs
+
+    foldr f z xs
+        This is similar to foldl but is folding from the right
+        instead of the left. Note that foldr should not be done to
+        infinite lists. eg: the following returns the sum of 1..6:
+        foldl(sub { $_[0] + $_[1] }, 0, [1..6]) = 21. In Haskell:
+
+            foldr            :: (a -> b -> b) -> b -> [a] -> b
+            foldr f z []      = z
+            foldr f z (x:xs)  = f x (foldr f z xs)
+
+    foldr1 f xs
+        This is similar to foldr1 but is folding from the right
+        instead of the left. Note that foldr1 should not be done on
+        infinite lists. eg: foldr1(sub { $_[0] + $_[1] }, [1..6]) =
+        21. In Haskell:
+
+            foldr1           :: (a -> a -> a) -> [a] -> a
+            foldr1 f [x]      = x
+            foldr1 f (x:xs)   = f x (foldr1 f xs)
+
+    scanr f z xs
+        This is similar to scanl but is scanning and folding from
+        the right instead of the left. Note that scanr should not be
+        done on infinite lists. eg: scanr(sub { $_[0] + $_[1] }, 0,
+        [1..6]) = [0, 6, 11, 15, 18, 20, 21]. In Haskell:
+
+            scanr            :: (a -> b -> b) -> b -> [a] -> [b]
+            scanr f q0 []     = [q0]
+            scanr f q0 (x:xs) = f x q : qs
+                                where qs@(q:_) = scanr f q0 xs
+
+    scanr1 f xs
+        This is similar to scanl1 but is scanning and folding from
+        the right instead of the left. Note that scanr1 should not
+        be done on infinite lists. eg: scanr1(sub { $_[0] + $_[1] },
+        [1..6]) = [6, 11, 15, 18, 20, 21]. In Haskell:
+
+            scanr1           :: (a -> a -> a) -> [a] -> [a]
+            scanr1 f [x]      = [x]
+            scanr1 f (x:xs)   = f x q : qs
+                                where qs@(q:_) = scanr1 f xs
+
+    iterate f x
+        This returns the infinite list (x, f(x), f(f(x)),
+        f(f(f(x)))...) and so on. eg: take(8, iterate(sub { $_[0]*2
+        }, 1)) = [1, 2, 4, 8, 16, 32, 64, 128]. In Haskell:
+
+            iterate          :: (a -> a) -> a -> [a]
+            iterate f x       = x : iterate f (f x)
+
+    repeat x
+        This returns the infinite list where all elements are x. eg:
+        take(4, repeat(42)) = [42, 42, 42, 42]. In Haskell:
+
+            repeat           :: a -> [a]
+            repeat x          = xs where xs = x:xs
+
+    replicate n x
+        Returns a list containing n times the element x. eg:
+        replicate(5, 1) = [1, 1, 1, 1, 1]. In Haskell:
+
+            replicate        :: Int -> a -> [a]
+            replicate n x     = take n (repeat x)
+
+    take n xs
+        Returns a list containing the first n elements from the list
+        xs. eg: take(2, [1..6]) = [1, 2]. In Haskell:
+
+            take                :: Int -> [a] -> [a]
+            take 0 _             = []
+            take _ []            = []
+            take n (x:xs) | n>0  = x : take (n-1) xs
+            take _ _             = error "Prelude.take: negative argument"
+
+    drop n xs
+        Returns a list containing xs with the first n elements
+        missing. eg: drop(2, [1..6]) = [3, 4, 5, 6]. In Haskell:
+
+            drop                :: Int -> [a] -> [a]
+            drop 0 xs            = xs
+            drop _ []            = []
+            drop n (_:xs) | n>0  = drop (n-1) xs
+            drop _ _             = error "Prelude.drop: negative argument"
+
+    splitAt n xs
+        Splits the list xs into two lists at element n. eg:
+        splitAt(2, [1..6]) = [[1, 2], [3, 4, 5, 6]]. In Haskell:
+
+            splitAt               :: Int -> [a] -> ([a], [a])
+            splitAt 0 xs           = ([],xs)
+            splitAt _ []           = ([],[])
+            splitAt n (x:xs) | n>0 = (x:xs',xs'') where (xs',xs'') = splitAt (n-1) xs
+            splitAt _ _            = error "Prelude.splitAt: negative argument"
+
+    takeWhile p xs
+        Takes elements from xs while p(that element) is true.
+        Returns the list. eg: takeWhile(sub { $_[0] <= 4 }, [1..6])
+        = [1, 2, 3, 4]. In Haskell:
+
+            takeWhile           :: (a -> Bool) -> [a] -> [a]
+            takeWhile p []       = []
+            takeWhile p (x:xs)
+                     | p x       = x : takeWhile p xs
+                     | otherwise = []
+
+    dropWhile p xs
+        Drops elements from the head of xs while p(that element) is
+        true. Returns the list. eg: dropWhile(sub { $_[0] <= 4 },
+        [1..6]) = [5, 6]. In Haskell:
+
+            dropWhile           :: (a -> Bool) -> [a] -> [a]
+            dropWhile p []       = []
+            dropWhile p xs@(x:xs')
+                     | p x       = dropWhile p xs'
+                     | otherwise = xs
+
+    span p xs
+        Splits xs into two lists, the first containing the first few
+        elements for which p(that element) is true. eg: span(sub {
+        $_[0] <= 4 }, [1..6]) = [[1, 2, 3, 4], [5, 6]]. In Haskell:
+
+            span                :: (a -> Bool) -> [a] -> ([a],[a])
+            span p []            = ([],[])
+            span p xs@(x:xs')
+                     | p x       = (x:ys, zs)
+                     | otherwise = ([],xs)
+                                   where (ys,zs) = span p xs'
+
+    break p xs
+        Splits xs into two lists, the first containing the first few
+        elements for which p(that element) is false. eg: break(sub {
+        $_[0] >= 4 }, [1..6]) = [[1, 2, 3], [4, 5, 6]]. In Haskell:
+
+            break         :: (a -> Bool) -> [a] -> ([a],[a])
+            break p        = span (not . p)
+
+    lines s
+        Breaks the string s into multiple strings, split at line
+        boundaries. eg: lines("A\nB\nC") = ['A', 'B', 'C']. In
+        Haskell:
+
+            lines     :: String -> [String]
+            lines ""   = []
+            lines s    = let (l,s') = break ('\n'==) s
+                         in l : case s' of []      -> []
+                                           (_:s'') -> lines s''
+
+    words s
+        Breaks the string s into multiple strings, split at
+        whitespace boundaries. eg: words("hey how random") = ['hey',
+        'how', 'random']. In Haskell:
+
+            words     :: String -> [String]
+            words s    = case dropWhile isSpace s of
+                              "" -> []
+                              s' -> w : words s''
+                                    where (w,s'') = break isSpace s'
+
+    unlines xs
+        Does the opposite of unlines, that is: joins multiple
+        strings into one, joined by newlines. eg: unlines(['A', 'B',
+        'C']) = "A\nB\nC"; In Haskell:
+
+            unlines   :: [String] -> String
+            unlines    = concatMap (\l -> l ++ "\n")
+
+        (note that strings in Perl are not lists of characters, so
+        this approach will not actually work...)
+
+    unwords ws
+        Does the opposite of unwords, that is: joins multiple
+        strings into one, joined by a space. eg:
+        unwords(["hey","how","random"]) = 'hey how random'. In
+        Haskell:
+
+            unwords   :: [String] -> String
+            unwords [] = []
+            unwords ws = foldr1 (\w s -> w ++ ' ':s) ws
+
+    Reverse xs
+        Returns a list containing the elements of xs in reverse
+        order. Note the capital R, so as not to clash with the Perl
+        command 'reverse'. You should not try to Reverse an infinite
+        list. eg: Reverse([1..6]) = [6, 5, 4, 3, 2, 1]. In Haskell:
+
+            reverse   :: [a] -> [a]
+            reverse    = foldl (flip (:)) []
+
+    And xs
+        Returns true if all the elements in xs are true. Returns
+        false otherwise. Note the capital A, so as not to clash with
+        the Perl command 'and'. You should not try to And an
+        infinite list (unless you expect it to fail, as it will
+        short-circuit). eg: And([1, 1, 1]) = 1. In Haskell:
+
+            and       :: [Bool] -> Bool
+            and        = foldr (&&) True
+
+    Or xs
+        Returns true if one of the elements in xs is true. Returns
+        false otherwise. Note the capital O, so as not to clash with
+        the Perl command 'or'. You may try to Or an infinite list as
+        it will short-circuit (unless you expect it to fail, that
+        is). eg: Or([0, 0, 1]) = 1. In Haskell:
+
+            or        :: [Bool] -> Bool
+            or         = foldr (||) False
+
+    any p xs
+        Returns true if one of p(each element of xs) are true.
+        Returns false otherwise. You should not try to And an
+        infinite list (unless you expect it to fail, as it will
+        short-circuit). eg: any("even", [1, 2, 3]) = 1. In Haskell:
+
+            any       :: (a -> Bool) -> [a] -> Bool
+            any p      = or  . map p
+
+    all p xs
+        Returns true if all of the p(each element of xs) is true.
+        Returns false otherwise. You may try to Or an infinite list
+        as it will short-circuit (unless you expect it to fail, that
+        is). eg: all("odd", [1, 1, 3]) = 1. In Haskell:
+
+             all  :: (a -> Bool) -> [a] -> Bool
+             all p      = and . map p
+
+    elem x xs
+        Returns true is x is present in xs. You probably should not
+        do this with infinite lists. Note that this assumes x and xs
+        are numbers. eg: elem(2, [1, 2, 3]) = 1. In Haskell:
+
+            elem             :: Eq a => a -> [a] -> Bool
+            elem              = any . (==)
+
+    notElem x xs
+        Returns true if x is not present in x. You should not do
+        this with infinite lists. Note that this assumes that x and
+        xs are numbers.
+
+            notElem          :: Eq a => a -> [a] -> Bool
+            notElem           = all . (/=)
+
+    lookup key xys
+        This returns the value of the key in xys, where xys is a
+        list of key, value pairs. It returns undef if the key was
+        not found. You should not do this with infinite lists. Note
+        that this assumes that the keys are strings. eg: lookup(3,
+        [1..6]) = 4. In Haskell:
+
+            lookup           :: Eq a => a -> [(a,b)] -> Maybe b
+            lookup k []       = Nothing
+            lookup k ((x,y):xys)
+                  | k==x      = Just y
+                  | otherwise = lookup k xys
+
+    minimum xs
+        Returns the minimum value in xs. You should not do this with
+        a infinite list. eg: minimum([1..6]) = 1. In Haskell:
+
+            minimum          :: Ord a => [a] -> a
+            minimum           = foldl1 min
+
+    maximum xs
+        Returns the maximum value in xs. You should not do this with
+        an infinite list. eg: maximum([1..6]) = 6. In Haskell:
+
+            maximum          :: Ord a => [a] -> a
+            maximum           = foldl1 max
+
+    sum xs
+        Returns the sum of the elements of xs. You should not do
+        this with an infinite list. eg: sum([1..6]) = 21. In
+        Haskell:
+
+            sum          :: Num a => [a] -> a
+            sum           = foldl' (+) 0
+
+    product xs
+        Returns the products of the elements of xs. You should not
+        do this with an infinite list. eg: product([1..6]) = 720. In
+        Haskell:
+
+            product      :: Num a => [a] -> a
+            product       = foldl' (*) 1
+
+    zip as bs
+        Zips together two lists into one list. Should not be done
+        with infinite lists. eg: zip([1..6], [7..12]) = [1, 7, 2, 8,
+        3, 9, 4, 10, 5, 11, 6, 12]. In Haskell:
+
+            zip              :: [a] -> [b] -> [(a,b)]
+            zip               = zipWith  (\a b -> (a,b))
+
+            zipWith                  :: (a->b->c) -> [a]->[b]->[c]
+            zipWith z (a:as) (b:bs)   = z a b : zipWith z as bs
+            zipWith _ _      _        = []
+
+    zip3 as bs cs
+        Zips together three lists into one. Should not be done with
+        infinite lists. eg: zip3([1..2], [3..4], [5..6]) = [1, 3, 5,
+        2, 4, 6]. In Haskell:
+
+            zip3             :: [a] -> [b] -> [c] -> [(a,b,c)]
+            zip3              = zipWith3 (\a b c -> (a,b,c))
+
+            zipWith3                 :: (a->b->c->d) -> [a]->[b]->[c]->[d]
+            zipWith3 z (a:as) (b:bs) (c:cs)
+                                      = z a b c : zipWith3 z as bs cs
+            zipWith3 _ _ _ _          = []
+
+    unzip abs
+        Unzips one list into two. Should not be done with infinite
+        lists. eg: unzip([1,7,2,8,3,9,4,10,5,11,6,12]) = ([1, 2, 3,
+        4, 5, 6], [7, 8, 9, 10, 11, 12]).
+
+            unzip    :: [(a,b)] -> ([a],[b])
+            unzip     = foldr (\(a,b) ~(as,bs) -> (a:as, b:bs)) ([], [])
+
+    unzip abcs
+        Unzips one list into three. Should not be done with infinite
+        lists. eg: unzip3([1,3,5,2,4,6]) = ([1, 2], [3, 4], [5, 6]).
+        In Haskell:
+
+            unzip3   :: [(a,b,c)] -> ([a],[b],[c])
+            unzip3    = foldr (\(a,b,c) ~(as,bs,cs) -> (a:as,b:bs,c:cs))
+                              ([],[],[])
+
+    integers
+        A useful function that returns an infinite list containing
+        all the integers. eg: integers = (1, 2, 3, 4, 5, ...).
+
+    factors x
+        A useful function that returns the factors of x. eg:
+        factors(100) = [1, 2, 4, 5, 10, 20, 25, 50, 100]. In
+        Haskell:
+
+            factors x = [n | n <- [1..x], x `mod` n == 0]
+
+    prime x
+        A useful function that returns, rather unefficiently, if x
+        is a prime number or not. It is rather useful while used as
+        a filter, eg: take(10, filter("prime", integers)) = [2, 3,
+        5, 7, 11, 13, 17, 19, 23, 29]. In Haskell:
+
+            primes = [n | n <- [2..], length (factors n) == 2]
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 1999, Leon Brocard
+
+    This module is free software; you can redistribute it or modify
+    it under the same terms as Perl itself.
+

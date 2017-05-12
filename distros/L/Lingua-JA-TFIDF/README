@@ -1,0 +1,27 @@
+This is Perl module Lingua::JA::TFIDF.
+
+INSTALLATION
+
+Lingua::JA::TFIDF installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Lingua::JA::TFIDF
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Lingua::JA::TFIDF documentation is available as in POD. So you can do:
+
+    % perldoc Lingua::JA::TFIDF
+
+to read the documentation online with your favorite pager.
+
+Takeshi Miki

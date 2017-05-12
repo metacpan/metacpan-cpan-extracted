@@ -1,0 +1,85 @@
+Revision history for Log-Dispatch-Dir
+
+0.14    2015-12-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Untaint result from Media::Type::Simple [RT#108188].
+
+
+0.13    2015-10-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove use of Taint::Util to reduce deps.
+
+
+0.12    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.11     2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core in 5.19.
+
+
+0.10    2011-06-17 (SHARYANTO)
+
+        - No functional changes. Fix failing tests [CT].
+
+
+0.09    2011-06-15 (SHARYANTO)
+
+        - No functional changes. Fix a couple of stupid bugs.
+
+
+0.08    2011-06-15 (SHARYANTO)
+
+        - No functional changes. Tweak default filename_pattern to be:
+        '%Y-%m-%d-%H%M%S.pid-%{pid}.%{ext}'.
+
+
+0.07    2011-06-15 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - New pattern for filename_pattern: %{ext}.
+
+        [INCOMPATIBLE CHANGES]
+
+        - Default filename pattern now contains %{ext} pattern.
+
+
+0.06    2010-03-04 (SHARYANTO)
+
+        - test file still refers to File::Stat, doh
+
+
+0.05    2010-03-03 (SHARYANTO)
+
+        - use plain ol' stat() instead of File::Stat due to failure in one
+          platform (http://www.cpantesters.org/cpan/report/6877510)
+
+
+0.04    2010-02-27 (SHARYANTO)
+
+        - packaging fix: forgot to add dependency for Pod::Coverage &
+          Test::Pod::Coverage
+
+0.03    2010-02-26 (SHARYANTO)
+
+        - switch to Dist::Zilla (to generate META.yml and become installable by cpanm)
+
+
+0.02    2009-04-30 (SHARYANTO)
+
+        - add missing dependency: Log::Dispatch::Output (closes #45583)
+
+
+0.01    2009-04-28 (SHARYANTO)
+
+        - First version

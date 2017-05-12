@@ -1,0 +1,13 @@
+Revision history for Perl extension List::Rubyish
+
+0.03	2008-10-22T23:16:27+09:00
+	- add refect method secondlife++
+	- add sort_by method walf443++
+	- fixed delete_if method's bug naoya++ secondlife++
+
+0.02	2008-10-16T19:29:35+09:00
+	- arguments support for first and last method
+	- add select method (secondlife++)
+
+0.01    Tue Oct 14 19:59:10 2008
+        - original version

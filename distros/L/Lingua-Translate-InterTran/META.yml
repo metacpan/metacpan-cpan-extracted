@@ -1,0 +1,30 @@
+---
+abstract: 'A L<Lingua::Translate|Lingua::Translate> backend for InterTran.'
+author:
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+build_requires:
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-Translate-InterTran
+no_index:
+  directory:
+    - t
+    - utils
+requires:
+  LWP::UserAgent: 0
+  Lingua::Translate: 0
+  URI: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-Translate-InterTran
+  homepage: http://search.cpan.org/dist/Lingua-Translate-InterTran/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hinrik/lingua-translate-intertran.git
+version: 0.05
+x_authority: cpan:HINRIK

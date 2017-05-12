@@ -1,0 +1,20 @@
+.perlcriticrc
+Build.PL
+Changes
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+ignore.txt
+lib/Log/Log4perl/Layout/PatternLayout/Redact.pm
+t/00-load.t
+t/10-cspec_E.t
+t/20-cspec_e.t
+t/manifest.t
+t/module_versions.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t

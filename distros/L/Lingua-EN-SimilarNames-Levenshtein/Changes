@@ -1,0 +1,53 @@
+Compare people names looking for similarities in spelling.
+
+0.10    2011 August 24
+        Test Fix:
+        Fix sort in basic.t (VPIT)
+
+0.09    2011 July 29
+        Test Fix:
+        * Reverting to Test::More 
+          Having to pull a valid test because of cpantester false failure
+
+0.08    2011 July 26
+        Test Fix:
+        * Require Test::Leaner for testing.
+
+0.07    2011 July 25
+        Test Fix:
+        * The last test in basic.t is giving erroneous results at times
+          This happens with CPAN Testers (but I can't reproduce it).
+          I'm trying Test::Leaner to see if the issue remains or goes away.
+
+0.06    2010 April 2
+        Bug Fix:
+        * remove 'use Set::Scalar' from test basic.t 
+          since it was no longer used.
+          
+0.05    2010 April 2
+        Bug Fix:
+        * list_of_similar_name_pairs test now has a fixed order to the 
+          array reference of similar names.
+        
+0.04    2010 Mars 28
+        Bug Fix:
+        * Remove Data::Dumper::Concise from basic.t as
+        it's not considered a dependency.
+
+0.03    2010 Mars 28
+        Improvements:
+        * Refine Synopsis
+        * Add code repository location.
+
+0.02    2010 Mars 27
+		
+        Improvements:
+        * Added accessor to list of pairs of people with similar names.
+          list_of_people_with_similar_names()
+        * renamed list_of_similar_names method to list_of_similar_name_pairs
+        to better clarify that the listed returned is pairs of names.
+        * POD to describe the classes and new accessor.
+
+0.01    2010 Mars 4
+
+        Initial CPAN release

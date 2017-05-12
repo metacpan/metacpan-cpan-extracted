@@ -1,0 +1,36 @@
+---
+abstract: "set and get a process's CPU affinity mask"
+author:
+  - 'Jiro Nishiguchi <jiro@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-CPUAffinity
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Linux::CPUAffinity:
+    file: lib/Linux/CPUAffinity.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/spiritloose/Linux-CPUAffinity/issues
+  homepage: https://github.com/spiritloose/Linux-CPUAffinity
+  repository: git://github.com/spiritloose/Linux-CPUAffinity.git
+version: '0.01'

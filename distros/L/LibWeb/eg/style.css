@@ -1,0 +1,97 @@
+# $Id: style.css,v 1.4 2000/07/16 20:47:12 ckyc Exp $
+
+BODY {
+  font-size: 10pt;
+  font-family: Helvetica, Arial, Sans-Serif;
+  #background: white;
+}
+
+TD {
+  font-size: 10pt;
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+TH {
+  font-size: 10pt;
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+P {
+  font-size: 10pt;
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+UL {
+  font-size: 10pt;
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+LI {
+  font-size: 10pt;
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+SMALL {
+  font-size: 8pt;
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+BIG {
+  color: #000000;
+  font-size: 12pt;
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+H2 {
+  color: #000000;
+  font-weight: bold;
+  font-size: 16pt;
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+H3 {
+  color: #000000;
+  font-weight: bold;
+  font-size: 14pt;
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+H4 {
+  color: #000000;
+  font-weight: bold;
+  font-size: 12pt;
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+H5 {
+  color: #000000;
+  font-weight: bold;
+  font-size: 10pt;
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+PRE {
+  color: #008080;
+  font-size: 11pt;
+  font-family: Clean, Courier New;
+}
+
+A {
+  text-decoration: none
+}
+
+.fade {
+  color: #999999;
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+.NO-IN {
+  margin-left: -25
+  margin-right: 1;
+  font-size: 8pt;
+  font-family: Verdana, Helvetica;
+}
+
+.NO-UN {
+  text-decoration: none;
+}

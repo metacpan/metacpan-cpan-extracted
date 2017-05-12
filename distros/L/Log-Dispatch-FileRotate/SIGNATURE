@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 be8d142518223e42940bc02380f22b8ab2ac4f78 Changes
+SHA1 bab88f54ea8c7c2588e407bd69fad8bf7cb47c1b LICENSE
+SHA1 b1bbf5c3f1e341251f8010786533366afa32ea61 MANIFEST
+SHA1 eb174e472fc75cb6a5a5f04e1dc740d569ad310b MANIFEST.SKIP
+SHA1 1435a76b37f4a2144a96bfb462c163fdf940f42f META.json
+SHA1 79887d5de45d957bfbdece38c9f6ecbca3679141 META.yml
+SHA1 2bf9933fa09da8e42fd03ff8bd15cb2763d40c02 Makefile.PL
+SHA1 177aed5338d17358b1e02120f4db29de4ffc28e5 README
+SHA1 b42b5c6f2dadafd365f247018ea1e734dfe88b6a lib/Log/Dispatch/FileRotate.pm
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 1b0ff3264a10a8bbb678cc7cbec943d838fc7677 t/basic.t
+SHA1 15be71bdf578a8bfc9f43a23751320c1e196ea8b t/file-open-failure.t
+SHA1 7b7eeff7d92376f5a9ba9b4fe65869b3532c014e t/lockfile-open-failure.t
+SHA1 ebfd5c0be8646d1e8c43515c5b745a63d3815955 t/no-activity-bug.t
+SHA1 f0c37746e0277de1ddb62c9227628a5ebe5a777a t/signature.t
+SHA1 11e859568dfce86bbb2d75c0eb902199aa23fa7e t/size-with-underscore.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIVAwUBWOurh6Ql27WkM10aAQjcfhAAothhBDrRgTQpnxInrbI6Jxt8cUmtVpDT
+fq8eNc+WF1M7tnBNk29pEGMqtsJxr7w8Ax0amiqc+eXIYSZ7jwjyxatEVaqdcrzW
+kWr+DqiHC4uY31/xh/rvW0rZG8waHUB3TRpJwcwXTUm039BFUiZQdi5tAhfi+EeN
+99uuSxA7+/qERoKFra4x/OCBAMm/WSKo8Hspqoz58qqe0RS7TNUML9GDNMdRB26q
+x+Alged0XN4u3ykmXViZR9op/0Wss6ojkac1YyKZDp+Wy4w4VaNaI/oT6JzoqGsT
+Phz712wE9fMtjBfnPQVZpJvZJp7axPQ7g3EFUvV+cs+YYLdVoe/Okl89BGeutGKs
+2+Sz0p9DTt1gzW5GyN3MjDjwPZOl7kFQ8qWpKh/jSHMYkK3u22QhjzpHo7vBpBSw
+rCRC1l2SIifxCqYYGcRkR7E4sZEJEnx98z9/rKJaH+uoW8azOO+1qnSSoWVVkjkA
+uzZ0p9hiruOOLmXp6lv2T5XLsl/TWeET53n1hdpzTN94dW4dlL6B0284v6nbffRL
+kAgMbS0KJIiG40xgh0FbXuDfURPlgx8DRr+cYBOvNgMxuPEqbSKp4fbUe6uqB3fk
+gMgyjJS7/tSoyHM5iJ7uCW+po9UNWSQj8He5lxYQJvq5BFwRQJPvLzBs2/oLwzjf
+GvA9Ge2z7Zs=
+=ths8
+-----END PGP SIGNATURE-----

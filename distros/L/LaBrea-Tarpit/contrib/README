@@ -1,0 +1,22 @@
+This will be included in version 2.4 of LaBrea
+so it is not necessary to add this patch if you
+have a more up-to-date release.
+
+Apply the patch-2.3.diff
+to this version:
+ * $RCSfile: labrea.c $
+ * $Release: 1.0 $
+ * $Revision: 2.3 $
+ * $Date: 2001/11/20 17:10:19 $
+ * $Author: tliston $
+
+to enable the -O option. 
+This option provides STDOUT logging with time tags
+in seconds since the epoch rather the text. This 
+option greatly reduces the overhead for both 
+LaBrea and the perl Tarpit daemons because 
+dates don't have to be converted from text
+back to seconds repeatedly.
+
+Everything will work without this patch, but
+applying it will improve the machine utilization.

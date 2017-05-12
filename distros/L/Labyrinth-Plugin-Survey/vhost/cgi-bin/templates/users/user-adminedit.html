@@ -1,0 +1,48 @@
+<p> 
+    <input type="button" onclick="parent.location='/'" value="back to surveys" />
+    <input type="button" onclick="parent.location='/admin/users'" value="back to user admin" />
+</p>
+
+<h2>Users Admin</h2>
+
+[% IF newuser %]<h3>Add New User</h3>
+[% ELSE %]<h3>User Edit</h3>[% END %]
+
+[% data = users.data %]
+
+<div class="newsbox">
+<p>Fields marked '*' are mandatory fields and must be completed.</p>
+</div>
+
+<div class="newsbox">
+<form method="post" id="userdetails" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name='act' value='user-adminsave' />
+<input type="hidden" name='userid' value="[% IF newuser %]0[% ELSE %][% data.userid %][% END %]" />
+
+<table class="blocker" width="100%">
+        <tr><td width="150">Name *</td>
+            <td class="alert">[% data.realname_err %]</td>
+            <td><input type="text" name="realname" value="[% data.realname %]" size="45" /></td>
+        </tr>
+        <tr><td>Email *</td>
+            <td class="alert">[% data.email_err %]</td>
+            <td><input type="text" name="email" value="[% data.email %]" size="45" /></td>
+        </tr>
+        <tr><td>Access</td>
+            <td class="alert">[% data.accessid_err %]</td>
+            <td>[% data.ddaccess %]</td>
+        </tr>
+        <tr><td>Realm</td>
+            <td class="alert">[% data.realm_err %]</td>
+            <td>[% data.ddrealms %]</td>
+        </tr>
+        <tr><td>Confirmed</td>
+            <td class="alert">[% data.confirmed_err %]</td>
+            <td><input type="checkbox" name="confirmed" [% IF data.confirmed %]checked="checked"[% END %] value="1" /></td>
+        </tr>
+</table>
+
+<p align="center"><input type="submit" name="submit" value='UPDATE' /></p>
+</form>
+</div>
+

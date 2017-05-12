@@ -1,0 +1,85 @@
+NAME
+    Log::Dispatch::DBI - Class for logging to database via DBI interface
+
+SYNOPSIS
+      use Log::Dispatch::DBI;
+
+      my $log = Log::Dispatch::DBI->new(
+          name       => 'dbi',
+          min_level  => 'info',
+          datasource => 'dbi:mysql:log',
+          username   => 'user',
+          password   => 'password',
+          table      => 'logging',
+      );
+
+      # Or, if your handle is alreaady connected
+      $log = Log::Dispatch::DBI->new(
+          name => 'dbi',
+          min_level => 'info',
+          dbh  => $dbh,
+      );
+
+      $log->log(level => 'emergency', messsage => 'something BAD happened');
+
+DESCRIPTION
+    Log::Dispatch::DBI is a subclass of Log::Dispatch::Output, which inserts
+    logging output into relational database using DBI interface.
+
+METHODS
+    new $log = Log::Dispatch::DBI->new(%params);
+
+        This method takes a hash of parameters. The following options are
+        valid:
+
+    -- name, min_level, max_level, callbacks
+        Same as various Log::Dispatch::* classes.
+
+    -- dbh
+        Database handle where Log::Dispatch::DBI throws log message.
+
+    -- datasource, username, password
+        If database connection is not yet established, put the DSN, username
+        and password for DBI connect method. Destructor method of
+        Log::Dispatch::DBI disconnects database handle, if the handle is
+        made inside by these parameters. (The method does not disconnect the
+        handle if it's supplied with `dbh' parameter.)
+
+    -- table
+        Table name for logging. default is log.
+
+    log_message
+        inherited from Log::Dispatch::Output.
+
+TABLE SCHEMA
+    Maybe something like this for MySQL.
+
+      CREATE TABLE log (
+          id        int unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT,
+          level     varchar(9) NOT NULL,
+          message   text NOT NULL,
+          timestamp timestamp
+      );
+
+    For example,
+
+      $log->log(level => 'info', message => 'too bad');
+
+    will execute the following SQL:
+
+      INSERT INTO log (level, message) VALUES ('info', 'too bad');
+
+    If you change this behaviour, what you should do is to subclass
+    Log::Dispatch::DBI and override `create_statement' and `log_message'
+    method.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Log::Dispatch manpage, the DBI manpage, the Log::Dispatch::Config
+    manpage
+

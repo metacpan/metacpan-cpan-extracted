@@ -1,0 +1,30 @@
+---
+abstract: 'sugary things like Dancer does'
+author:
+  - 'Ashley Willis <ashley+perl@gitable.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Limper-Sugar
+provides:
+  Limper::Sugar:
+    file: lib/Limper/Sugar.pm
+    version: 0.002
+requires:
+  File::Basename: 0
+  File::Spec: 0
+  Limper: 0.012
+  base: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://gitable.org/ashley/limper-sugar.git
+version: 0.002

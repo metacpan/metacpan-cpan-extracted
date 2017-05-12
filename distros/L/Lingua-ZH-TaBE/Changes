@@ -1,0 +1,144 @@
+[Changes for 0.07 - 2005-12-31]
+
+* Build system cleanups using latest Module::Install.
+* Upgrade to latest ppport.h.
+* Corrected bogus SIGNATURE file.
+  Reported by: Andreas Koenig.
+
+____________________________________________________________________________
+[  9693] By: autrijus                              on 2004/01/12  19:11:18
+        Log: * This be 0.05.
+             * Fix regex leakage bug on Perl 5.8.2+.
+             * Upgrade ppport.h to Perl 5.8.2.
+	   ! TaBE.xs lib/Lingua/ZH/TaBE.pm ppport.h
+____________________________________________________________________________
+[  9666] By: autrijus                              on 2004/01/11  12:36:44
+        Log: * This be 0.04.
+             * Kuang-Che Wu (kcwu) reported that ->split()
+             did not take a $method as advertised.
+	   + lib/Lingua/ZH/TaBE.pm
+	   - TaBE.pm
+	   ! AUTHORS MANIFEST Makefile.PL README
+	   ! t/1-basic.t
+____________________________________________________________________________
+[  5843] By: autrijus                              on 2003/05/14  14:25:38
+        Log: * DB=db2 won't link against DB4, of course.
+             correct doc glitch.
+	   ! Makefile.PL
+____________________________________________________________________________
+[  3698] By: autrijus                              on 2003/01/20  14:34:22
+        Log: * no need to use h2ph, since it's silly; use constants.pm
+	       instead.
+             * defining TRUE and FALSE was doubly silly.
+	   ! TaBE.pm
+____________________________________________________________________________
+[  3650] By: autrijus                              on 2003/01/19  14:35:08
+        Log: * don't hardcode the db location in tests.
+	   ! t/1-basic.t
+____________________________________________________________________________
+[  3649] By: autrijus                              on 2003/01/19  14:34:56
+        Log: * check for libtabe and die if not found, to please
+	       testers.
+	   ! Makefile.PL
+____________________________________________________________________________
+[  3647] By: autrijus                              on 2003/01/19  14:24:23
+        Log: * This be 0.03.
+             * we support 5.005 now.
+	   ! Makefile.PL
+____________________________________________________________________________
+[  3646] By: autrijus                              on 2003/01/19  14:23:10
+        Log: * switch to ZiYin since PossibleTsiYin is broken.
+             * correct ppport line for uv.
+	   ! TaBE.pm ppport.h
+____________________________________________________________________________
+[  3645] By: autrijus                              on 2003/01/19  14:15:31
+        Log: * avoid warning 'once'.
+	   ! t/1-basic.t
+____________________________________________________________________________
+[  3644] By: autrijus                              on 2003/01/19  14:13:06
+        Log: * another try at pppport.
+	   ! ppport.h
+____________________________________________________________________________
+[  3642] By: autrijus                              on 2003/01/19  14:11:07
+        Log: * add ppport support code.
+	   + ppport.h
+	   ! MANIFEST TaBE.pm TaBE.xs
+____________________________________________________________________________
+[  3639] By: autrijus                              on 2003/01/19  13:41:30
+        Log: * doc cleanup.
+	   ! Makefile.PL TaBE.pm
+____________________________________________________________________________
+[  3638] By: autrijus                              on 2003/01/19  13:39:49
+        Log: * no _uv in 5.005...
+	   ! TaBE.xs
+____________________________________________________________________________
+[  3637] By: autrijus                              on 2003/01/19  12:52:25
+        Log: * workaround for -L in 5.005's MM
+	   ! Makefile.PL
+____________________________________________________________________________
+[  3636] By: autrijus                              on 2003/01/19  12:44:14
+        Log: * add common library path for 5.005 building.
+	   ! Makefile.PL
+____________________________________________________________________________
+[  3635] By: autrijus                              on 2003/01/19  12:30:26
+        Log: * try doing without Test::More.
+	   ! Makefile.PL t/0-signature.t t/1-basic.t
+____________________________________________________________________________
+[  3634] By: autrijus                              on 2003/01/19  12:27:05
+        Log: * statue reports that 5.00503 building is broken.
+             try fixing it by adding typemap and nix bytes.pm.
+	   + AUTHORS
+	   ! MANIFEST TaBE.pm t/1-basic.t typemap
+____________________________________________________________________________
+[  3614] By: autrijus                              on 2003/01/18  16:24:59
+        Log: * This be 0.02.
+             * pod tweaks.
+	   ! TaBE.pm
+____________________________________________________________________________
+[  3613] By: autrijus                              on 2003/01/18  16:03:19
+        Log: * require Test::More now.
+             * fix test numbers.
+	   ! Makefile.PL t/1-basic.t
+____________________________________________________________________________
+[  3612] By: autrijus                              on 2003/01/18  16:01:47
+        Log: * use Test::More for signature test.
+	   ! t/0-signature.t
+____________________________________________________________________________
+[  3611] By: autrijus                              on 2003/01/18  16:01:31
+        Log: * add default paths for linux and other posix platforms.
+	   ! Makefile.PL TaBE.xs
+____________________________________________________________________________
+[  3610] By: autrijus                              on 2003/01/18  16:01:03
+        Log: * fix tabe path lookups.
+	   ! TaBE.pm
+____________________________________________________________________________
+[  3609] By: autrijus                              on 2003/01/18  15:19:51
+        Log: * avoid warnings.
+	   ! TaBE.pm TaBE.xs t/1-basic.t
+____________________________________________________________________________
+[  3607] By: autrijus                              on 2003/01/18  14:59:26
+        Log: * 0.01, first CPAN release.
+	   + MANIFEST.SKIP README
+	   ! Makefile.PL TaBE.pm TaBE.xs t/1-basic.t
+	   ! typemap
+____________________________________________________________________________
+[  3606] By: autrijus                              on 2003/01/18  10:09:17
+        Log: * finished all object mapping. 
+	   ! TaBE.pm TaBE.xs t/1-basic.t typemap
+____________________________________________________________________________
+[  3604] By: autrijus                              on 2003/01/18  09:30:43
+        Log: * a start of the tests.
+	   ! t/1-basic.t
+____________________________________________________________________________
+[  3603] By: autrijus                              on 2003/01/18  09:30:33
+        Log: * preliminary working version of OO-based libtabe.
+	   ! TaBE.pm TaBE.xs typemap
+____________________________________________________________________________
+[  3573] By: autrijus                              on 2003/01/16  09:05:34
+        Log: * err, i really meant 2003.
+	   ! TaBE.pm
+____________________________________________________________________________
+[  3571] By: autrijus                              on 2003/01/16  08:59:47
+        Log: * libtabe initial import.
+	   + Changes MANIFEST Makefile.PL TaBE.pm TaBE.xs
+	   + t/0-signature.t t/1-basic.t typemap

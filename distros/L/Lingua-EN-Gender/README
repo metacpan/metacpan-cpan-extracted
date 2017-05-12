@@ -1,0 +1,45 @@
+
+
+Lingua::EN::Gender
+
+
+Small module for inflecting pronouns for a bunch of different
+genders.
+
+Genders currently supported are:
+   neuter
+   male
+   female
+   either
+   spivak
+   splat
+   plural
+   egotistical
+   royal
+   2nd
+   sie/hir
+   zie/zir
+
+
+INSTALLING
+==========
+
+After unzipping and untarring the distribution directory, you install
+the library by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+OTHER STUFF
+===========
+
+Contacting me:  bekj@netizen.com.au is best.
+
+ObLegalStuff:
+   Copyright (c) 1998 Bek Oberin. All rights reserved. This program is
+   free software; you can redistribute it and/or modify it under the
+   same terms as Perl itself.
+

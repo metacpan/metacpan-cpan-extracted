@@ -1,0 +1,83 @@
+#!/usr/bin/perl -s
+
+use strict;
+use warnings;
+
+use POSIX qw(locale_h);
+setlocale(&POSIX::LC_ALL, "pt_PT");
+use locale;
+
+
+use Lingua::PT::PLNbase;
+
+our ($h, $help, $nat, $tokenize, $o);
+
+if ($h || $help) {
+  print_usage();
+  exit;
+}
+
+my $opt = {};
+
+$opt->{o_format} = 'NATools' if $nat;
+if ($tokenize) {
+    if ($tokenize eq "cqp") {
+        $opt->{tokenize} = 'cqp';
+    } else {
+        $opt->{tokenize} = 1;
+    }
+}
+$opt->{output} = $o if $o;
+
+fsentences($opt,@ARGV);
+
+
+
+sub print_usage {
+  print "sentences -h/-help   -- This help screen\n";
+  print "sentences [-tokenize[=cqp]] [-nat] [-o=output] file...\n";
+  print "\t-tokenize: tokenize sentences\n";
+  print "\t-nat: output format suitable for NATools\n";
+  print "\t-o=<file>: output to a specific file\n";
+}
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+sentences - Command line tool for text segmentation, tokenization and annotation
+
+=head1 SYNOPSIS
+
+   sentences [-tokenize[=cqp]] [-nat] [-o=output] <file>
+  
+=head1 DESCRIPTION
+
+C<sentences> is a command line tool for text segmentation and annotation. It uses the
+C<fsentences> function from C<Lingua::PT::PLNbase>. Its main behaviour is the detection of
+sentences and paragraphs, and their annotation with XML-like tags: E<lt>sE<gt> for sentences, 
+E<lt>pE<gt> for paragraphs, and E<lt>textE<gt> for different files.
+
+If the flag C<-tokenize> is used, then words are detected and separated from each other by a
+space. If C<-tokenize=cqp> is used, then each token is placed in a line by itself.
+
+The C<-nat> flag can be used to force a non-XML output, used for NATools alignment tools.
+
+It is also possible to use the C<-o> flag to send the output to a specific file.
+
+=head1 SEE ALSO
+
+Lingua::PT::PLNbase (3)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+José João Almeida, E<lt>jj@di.uminho.ptE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007-2008 by Projecto Natura
+
+=cut

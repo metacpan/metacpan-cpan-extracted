@@ -1,0 +1,80 @@
+NAME
+
+    Lingua::PT::Capitalizer - Simple text capitalize.
+
+VERSION
+
+    version 0.001
+
+SYNOPSIS
+
+ Procedural Interface
+
+       use Lingua::PT::Capitalizer;
+       my $text = q(ESCRITOR, JORNALISTA, CONTISTA E POETA JOAQUIM MARIA MACHADO DE ASSIS);
+       say capitalize($text);
+       # Output:
+       # Escritor, Jornalista, Contista e Poeta Joaquim Maria Machado de Assis
+    
+       $text = q(comprehensive perl archive network (CPAN));
+       say capitalize($text, 1);
+       # Output:
+       # Comprehensive Perl Archive Network (CPAN)
+
+ OO Interface
+
+        use Lingua::PT::Capitalizer ();
+    
+        my $capitalizer = Lingua::PT::Capitalizer->new();
+        my $text = q(ESCRITOR, JORNALISTA, CONTISTA E POETA JOAQUIM MARIA MACHADO DE ASSIS);
+        say $capitalizer->capitalize($text);
+        # Output:
+        # Escritor, Jornalista, Contista e Poeta Joaquim Maria Machado de Assis
+    
+        $text = q(comprehensive perl archive network (CPAN));
+        say $capitalizer->capitalize($text, 1);
+        # Output:
+        # Comprehensive Perl Archive Network (CPAN)
+
+DESCRIPTION
+
+    This module format strings in title-case mode using common typographic
+    rules for proper names in Portuguese Language.
+
+SUBROUTINES/METHODS
+
+ capitalize
+
+    Receive one or two arguments and return a capitalized string. If the
+    second argument is 1, the upper case words won't be affected.
+
+ lc_always
+
+    A data structure with some articles and prepositions that normaly stay
+    in lower case.
+
+EXAMPLES
+
+ Using files as input
+
+    If text.txt is a file with names/titles to capitalize, the easiest way
+    to capitalize all is:
+
+        perl -MLingua::PT::Capitalizer -wpE'$_=capitalize' text.txt
+
+ Getting lc_always hash
+
+       # Procedural Interface
+       my %lc_always = %{Lingua::PT::Capitalizer::lc_always}
+    
+       # OO Interface
+       my %lc_always = $capitalizer->{lc_always}
+
+AUTHOR
+
+    Ronaldo Ferreira de Lima aka jimmy <jimmy at gmail>.
+
+SEE ALSO
+
+    Text::Capitalize.
+

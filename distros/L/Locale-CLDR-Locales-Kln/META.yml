@@ -1,0 +1,44 @@
+---
+abstract: 'Locale::CLDR - Data Package ( Perl localization data for Kalenjin )'
+author:
+  - 'John Imrie <john.imrie1@gmail.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+  ok: '0'
+configure_requires:
+  Module::Build: '0.40'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+keywords:
+  - locale
+  - CLDR
+  - locale-data-pack
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-CLDR-Locales-Kln
+provides:
+  Locale::CLDR::Locales::Kln:
+    file: lib/Locale/CLDR/Locales/Kln.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Kln::Any:
+    file: lib/Locale/CLDR/Locales/Kln/Any.pm
+    version: v0.29.0
+  Locale::CLDR::Locales::Kln::Any::Ke:
+    file: lib/Locale/CLDR/Locales/Kln/Any/Ke.pm
+    version: v0.29.0
+requires:
+  DateTime: '0.72'
+  Locale::CLDR: v0.29.0
+  Moo: '2'
+  MooX::ClassAttribute: '0.011'
+  Type::Tiny: '0'
+  perl: v5.10.1
+  version: '0.95'
+resources:
+  bugtracker: https://github.com/ThePilgrim/perlcldr/issues
+  homepage: https://github.com/ThePilgrim/perlcldr
+  repository: https://github.com/ThePilgrim/perlcldr.git
+version: v0.29.0

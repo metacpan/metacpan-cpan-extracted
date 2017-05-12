@@ -1,0 +1,106 @@
+/*--------------------------------------------------------------------*/
+/* Recording Listings */
+
+#qtv-listings .grid .lrow li {
+	line-height:2em ;
+	height:2em ;
+}
+
+#qtv-listings .grid .lrow li a {
+	text-align: center ;
+    border: 0 ;
+}
+
+#qtv-listings .grid .lrow ol li .edView {
+	/* In-place edit */
+    padding: 0 2px ;
+    line-height:1.2em ;
+	height:1.2em ;
+	margin-top: 0.4em ;
+}
+
+#qtv-listings .grid .lrow li img {
+    vertical-align: middle ;
+}
+
+
+.lrow ol {
+	clear: both ;
+}
+
+
+/*
+
+RECORD:
+
+<div class="popupContent" style="position: absolute; visibility: hidden; left: 49px; top: 37.25px; z-index: 100; width: 300px;">
+	<div class="recListPop">
+		<ul class="recprog">
+			<li class="sub">
+			
+				<ul class="rectype">
+					<li class="recopt sel">
+						<a>DVBT</a>
+					</li>
+					<li class="recopt">
+						<a>FUZZY</a>
+					</li>
+				</ul>
+				
+				<ul class="recsel tab1" style="display: block;">
+					<li class="recradio">
+						<a title="No recording">
+							<img src="https://quartz-net.co.uk/su/apps/mediacentre-jquery/css/theme/black/images/record-none.png">
+							No recording
+						</a>
+					</li>
+					<li class="recradio chan">
+					<li class="recradio sel chan">
+					<li class="recradio chan">
+					<li class="recradio chan">
+					<li class="recradio">
+					<li class="recradio chan">
+				</ul>
+
+				<ul class="recsel tab2" style="display: none;">
+					</li>
+					</ul>
+					</div>
+					</div>
+					...
+PRIORITY:
+
+<div class="popupContent" style="position: absolute; visibility: hidden; left: 1561px; top: 37.25px; z-index: 100; width: 300px;">
+	<div class="recListPop">
+		<ul>
+			<li class="recradio">
+				<a title="Only record if resources allow">
+					<img src="https://quartz-net.co.uk/su/apps/mediacentre-jquery/css/theme/black/images/priority-none.png">
+					Only record if resources allow
+				</a>
+			</li>
+			<li class="recradio chan">
+			<li class="recradio">
+			<li class="recradio sel">
+			<li class="recradio">
+			<li class="recradio chan">
+		</ul>
+		</div>
+		</div>
+
+*/
+
+/* Record: List of options */
+.recListPop ul li.recradio {
+    height: 2em ;
+    vertical-align: middle ;
+}
+
+.recListPop ul li img {
+    vertical-align: middle ;
+}
+
+.recListPop ul li.recradio a {
+    text-decoration: none ;
+}
+

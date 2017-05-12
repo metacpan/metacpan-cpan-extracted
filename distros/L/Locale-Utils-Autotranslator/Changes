@@ -1,0 +1,24 @@
+Revision history for Perl extension Locale::Utils::Autotranslator.
+
+1.002  Sun Feb 26 07:50:57 2017
+- better pod coverage
+
+1.001  Fri Feb 24 17:11:04 2017
+- removed unneeded dependency List::MoreUtils
+
+1.000  Mon Aug 17 11:37:53 2015
+- incompatible change
+  - removed attribute: automatic_comment, debug_code, limit, sleep_seconds
+  - added attribute: after_translation_code, before_translation_code,
+    comment, translation_count
+- lots of fixes, mostly error handling
+- better performance, do not write the file so often
+
+0.003  Tue Oct 28 06:49:37 2014
+- added Path::Tiny to test dependencies
+
+0.002  Mon Oct 27 07:42:50 2014
+- using the new  Locale::TextDomain::OO::Util module
+
+0.001  Thu Oct 16 06:52:46 2014
+- first version

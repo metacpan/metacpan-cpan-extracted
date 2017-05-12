@@ -1,0 +1,15 @@
+<sect1 id="sec-MarshalError">
+  <title><literal>MarshalError</literal></title>
+  <indexterm><primary><literal>MarshalError</literal></primary></indexterm>
+
+  <para>This module has moved to <ulink url="../base/Foreign.Marshal.Error.html"><literal>Foreign.Marshal.Error</literal></ulink> in the
+  hierarchical libraries.</para>
+
+</sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: sgml ***
+     ;;; sgml-parent-document: ("../../doc/hslibs.sgml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

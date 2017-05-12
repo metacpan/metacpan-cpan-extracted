@@ -1,0 +1,69 @@
+2012-06-01  Steffen Schwigon  <ss5@renormalist.net>
+
+	Fix deprecated defined(@array) for Perl 5.16
+
+Fri Sep 28 21:20:57 CEST 2007   Johan Vromans <jv@span.org>
+
+	Changed LICENSE to include GPL.
+
+Mon Sep 18 21:56:05 MEST 2000   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.com>
+
+. Description:
+
+	Fixed computation of %F and %D when no '/' in file name.
+	Thanks to Philip Coombes <philip.coombes@aethos.co.uk> for
+	reporting the bug.
+
+	Fixed OO example of lock to emphasize check on returned value.
+	Thanks to Rob McMillin <rlm@pricegrabber.com> for suggesting it.
+
+	Now warns when no lockfile is found during unlocking.
+
+Tue Aug 15 20:41:53 MEST 2000   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.com>
+
+. Description:
+
+	Updated version number, grrr...
+
+Tue Aug 15 20:40:49 MEST 2000   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.com>
+
+. Description:
+
+	Fixed non-working "-wfunc => undef" due to misuse of defined().
+	Many thanks to David Coppit <david@coppit.org> for spotting it
+	and providing the right fix.
+
+	Check for stale lock while we wait for it.
+
+	Untaint pid before running kill() for -T scripts.
+
+Thu Mar  2 23:35:15 MET 2000   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.com>
+
+. Description:
+
+	Allow "undef" in -efunc and -wfunc to suppress logging.
+
+	Documented how to force warn() despite Log::Agent being there.
+
+Tue Jan  4 22:18:52 MET 2000   Raphael Manfredi <Raphael_Manfredi@grenoble.hp.com>
+
+. Description:
+
+	track where lock was issued in the code
+
+	logerr and logwarn are autoloaded, need to check something real
+
+	forbid re-lock of a file we already locked
+
+	force $\ to be undef prior to writing the PID to lockfile
+
+	added simple.t and user.t to the MANIFEST
+
+Tue May 12 09:34:55 MET 1998  Raphael_Manfredi <Raphael_Manfredi@grenoble.hp.com>
+. Description:
+
+	Revision history for Perl extension LockFile::Simple
+
+	0.1  Fri May  8 16:36:11 1998
+		- original version; created by h2xs 1.18
+

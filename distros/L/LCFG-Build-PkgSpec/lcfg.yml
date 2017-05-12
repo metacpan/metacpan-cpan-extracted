@@ -1,0 +1,24 @@
+--- !!perl/hash:LCFG::Build::PkgSpec 
+abstract: Object-oriented interface to LCFG build metadata
+author: 
+  - Stephen Quinney <squinney@inf.ed.ac.uk>
+base: ''
+build: 
+  gencmake: 0
+  remove_input_after_translate: 1
+  translate_before_pack: 1
+date: 24/06/15 10:11:54
+license: GPLv2
+name: LCFG-Build-PkgSpec
+orgident: org.lcfg
+platforms: 
+  - ScientificLinux5
+  - ScientificLinux6
+release: 1
+schema: 1
+translate: 
+  - "*.in"
+vcs: 
+  genchangelog: 1
+  logname: Changes
+version: 0.1.0

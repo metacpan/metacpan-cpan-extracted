@@ -1,0 +1,107 @@
+#!/usr/bin/perl -w 
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+# 
+# conjug
+# Author          : Etienne   Grossmann
+# Created On      : May       1997
+# Last Modified On: Fegruary  2014
+# Language        : Perl
+# Status          : More or less stable
+# 
+# (C) Copyright 1998- Etienne Grossmann
+# 
+
+# $VERSION = 0.92 ;
+
+$help_string= q{
+ conjug  :  CONJUGATION OF PORTUGUESE VERBS
+
+SYNOPSIS :
+
+ conjug [option]* "verb"+, ["tense"]*, [1-6]*
+
+ -options : 
+
+     h : Print this Help, then exit.
+
+     q : Quiet : Print only conjugated forms, with no extra stuff (see
+         EXAMPLES). 
+
+     i : Don't use Iso-8859-1 character set, but two-character accents
+         like "^a","'a" etc, and "\c" cedilla.
+
+     r : Produce output as one person per Row, rather than the default
+         one tense per row.
+
+     x : Each verb entry is a regular eXpression that matches a
+         correct form.
+
+ - "tense" is one of 
+      "pres"   : Presente 
+      "perf"   : Perfeito
+      "imp"    : Imperfeito 
+      "fut"    : Futuro 
+      "mdp"    : Mais-que-Perfeito
+      "cpres"  : Conjuntivo Presente
+      "cimp"   : Conjuntivo Imperfeito
+      "cfut"   : Conjuntivo Futuro
+
+      default is all.  
+
+ - the numbers 1-6 correspond to
+    "eu","tu","ele"/"ela","nos","eles"/"elas". 
+    second person plural is usually discarded.
+    default is 1-4,6.
+
+  Returns the verb congugated at the requested tenses and persons as
+  list of strings (one combination of tense, person each).
+
+EXAMPLES :
+
+etienne@anonimo: conjug i ouvir pres
+ouvir :  irreg                          
+pres     oi\co ouves ouve ouvimos ouvem 
+
+etienne@anonimo: conjug i q ouvir pres
+oi\co ouves ouve ouvimos ouvem 
+
+etienne@anonimo: conjug i qx ouvir pres
+o[iu]\co ouves ouve ouvimos ouvem 
+
+BUGS : 
+
+- Cedillas must be protected from shell escape : you must write 
+  "conjug cal\\car"  or "conjug 'cal\car' if don't want your verb to
+  become 'calcar'.
+
+- Options "ir" are interpreted as the verb "ir".
+
+- Second person plural is not defined (little used).
+
+SEE ALSO : Lingua::PT::Conjugate treinar
+
+AUTHOR : Etienne Grossmann etienne@isr.ist.utl.pt, January 1998
+
+}; #'"
+
+
+
+if( !@ARGV || $ARGV[0]!~/[aeio]r$/ &&  $ARGV[0] =~ /\-?h/ )
+{
+    print $help_string;
+    exit 0;
+}
+
+use Lingua::PT::Conjugate ;
+
+if (env_is_utf8())
+{
+	binmode (STDOUT, ":utf8");
+}
+
+print conjug (@ARGV);
+
+print "";

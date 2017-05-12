@@ -1,0 +1,38 @@
+/*------------------------------------------------------------------------------------*/
+/* Popup info */
+
+.popupContent {
+  left: -4px; 
+  top: -4px;       
+  padding: 5px;                 
+  font: normal 10pt sans-serif;    
+  width: 300px; /* default */
+}
+
+.popupContent .wrap {
+  display:block;
+  height:100%;
+  margin:0 4px 4px;
+  margin:0;
+}
+
+.popupContent .description {
+	overflow: visible;
+	z-index: 999;
+}
+
+.popupContent .summary {
+  display:block;
+  font-weight: bold;
+
+}
+
+.popupContent .wrap .times {
+  font-style: italic;
+
+}
+
+.popupContent .multi {
+
+	clear: both ;
+}

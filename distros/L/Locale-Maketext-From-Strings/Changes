@@ -1,0 +1,15 @@
+Revision history for perl distribution Locale-Maketext-From-Strings
+
+0.03 2015-07-18T08:58:24+0200
+ - Require Perl 5.10
+
+0.02 2013-11-28T10:46:34Z
+ - I don't want to support '90-perl
+
+0.0101 2013-11-26T09:40:35Z
+ - Can't locate object method "syswrite" via package "IO::Handle"
+
+0.01 2013-11-24T15:51:35Z
+ - Can load() and generate() from .strings.
+ - Can execute one-liner commands.
+

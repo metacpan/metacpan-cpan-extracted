@@ -1,0 +1,72 @@
+Language/XSB
+============
+
+This package provides a bidirectional interface to XSB
+(L<http://xsb.sourceforge.net>).
+
+From the XSB manual:
+
+    XSB is a research-oriented Logic Programming and
+    Deductive Database System developed at SUNY Stony Brook.
+    In addition to providing all the functionality of
+    Prolog, it contains features not usually found in Logic
+    Programming Systems such as evaluation according to the
+    Well Founded Semantics through full SLG resolution,
+    constraint handling for tabled programs, a compiled
+    HiLog implementation, unification factoring and
+    interfaces to other systems such as ODBC, C, Java, Perl,
+    and Oracle
+
+
+CHANGES
+
+From version 0.10 the public interface is incompatible with previous
+versions, some function names have changed, others have changed their
+behavior, and new ones are available.
+
+
+INSTALLATION
+
+***IMPORTANT***
+
+For the installation to work 'xsb' command has to be in the
+command path. Maybe you will have to run some command like:
+
+  PATH=$PATH:/path/to/xsb/bin/
+  export PATH;
+
+
+After the package is installed this is not needed
+anymore. 'xsb' configuration is stored in the Perl module
+'Language::XSB::Config'.
+
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XSB 2.6 system
+  Inline::C
+  Language::Prolog::Types
+  Test::More
+
+and it is also recommended to have:
+
+  Language::Prolog::Sugar
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2002, 2003 by Salvador Fandiño <sfandino@yahoo.com>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+

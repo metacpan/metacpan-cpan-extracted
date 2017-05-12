@@ -1,0 +1,24 @@
+Logfile-EPrints version 1.00
+============================
+
+Parse Apache combinedLog format logs for GNU EPrints full-text
+downloads etc.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Timothy D Brody
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,7 @@
+To generate/regenerate the bindings:
+
+   swig -perl5 -c++ -o FreeLing_wrap.cxx freeling_perlAPI.i
+
+Then, take Bindings.pm and move it to the lib/Lingua/FreeLing directory
+
+IMPORTANT: THIS IS NO LONGER THE DEFAULT FREELING SWIG FILE!!!

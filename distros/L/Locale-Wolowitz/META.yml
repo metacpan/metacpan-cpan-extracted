@@ -1,0 +1,32 @@
+---
+abstract: 'Dead simple localization with JSON.'
+author:
+  - 'Ido Perlmuter <ido@ido50.net>'
+build_requires:
+  Test::More: '0'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-Wolowitz
+recommends:
+  Cpanel::JSON::XS: '3.0115'
+requires:
+  Carp: '0'
+  JSON::MaybeXS: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/ido50/Locale-Wolowitz/issues
+  homepage: http://search.cpan.org/dist/Locale-Wolowitz
+  repository: git://github.com/ido50/Locale-Wolowitz.git
+version: '1.004001'
+x_serialization_backend: 'YAML::Tiny version 1.62'

@@ -1,0 +1,146 @@
+NAME
+    Lingua::JA::WordNet - Perl OO interface to Japanese WordNet database
+
+SYNOPSIS
+      use Lingua::JA::WordNet;
+
+      my $wn = Lingua::JA::WordNet->new;
+      my @synsets = $wn->Synset('相撲');
+      my @hypes   = $wn->Rel($synsets[0], 'hype');
+      my @words   = $wn->Word($hypes[0]);
+
+      print "$words[0]\n";
+      # -> レスリング
+
+      # Synonym method can access to Japanese WordNet Synonyms Database.
+      my $wordID   = $wn->WordID('ねんねこ', 'n');
+      my @synonyms = $wn->Synonym($wordID);
+
+      print "@synonyms\n";
+      # -> お休み ねね スリープ 就眠 御休み 眠り 睡り 睡眠
+
+DESCRIPTION
+    Japanese WordNet is a semantic dictionary of Japanese.
+    Lingua::JA::WordNet is yet another Perl module to look up entries in
+    Japanese WordNet.
+
+    The original Perl module is WordNet::Multi. WordNet::Multi is awkward to
+    use and no longer maintained. Because of this, I uploaded this module.
+
+METHODS
+  $wn = new($db_path) or new(%config)
+    Creates a new Lingua::JA::WordNet instance.
+
+      my $wn = Lingua::JA::WordNet->new(
+          data        => $db_path, # default is File::ShareDir::dist_file('Lingua-JA-WordNet', 'wnjpn-1.1_and_synonyms-1.0.db')
+          enable_utf8 => 1,        # default is 0 (see sqlite_unicode attribute of DBD::SQLite)
+          verbose     => 0,        # default is 0 (all warnings are ignored)
+      );
+
+    The data must be Japanese WordNet and English WordNet in an SQLite3
+    database.
+
+  @words = $wn->Word( $synset [, $lang] )
+    Returns the words corresponding to $synset and $lang.
+
+  @synsets = $wn->Synset( $word [, $lang] )
+    Returns the synsets corresponding to $word and $lang.
+
+  @synsets = $wn->SynPos( $word, $pos [, $lang] )
+    Returns the synsets corresponding to $word, $pos and $lang.
+
+  $pos = $wn->Pos($synset)
+    Returns the part of speech of $synset.
+
+  @synsets = $wn->Rel($synset, $rel)
+    Returns the relational synsets corresponding to $synset and $rel.
+
+  @defs = $wn->Def( $synset [, $lang] )
+    Returns the definition sentences corresponding to $synset and $lang.
+
+  @exs = $wn->Ex( $synset [, $lang] )
+    Returns the example sentences corresponding to $synset and $lang,
+
+  $allsynsets_arrayref = $wn->AllSynsets()
+    Returns all synsets.
+
+  $wordID = $wn->WordID( $word, $pos [, $lang] )
+    Returns the word ID corresponding to $word, $pos and $lang.
+
+  @synonyms = $wn->Synonym($wordID)
+    Returns the synonyms of $wordID.
+
+    This method works only under the bundled Japanese WordNet database file.
+
+  LANGUAGES
+    $lang can take 'jpn' or 'eng'. The default value is 'jpn'.
+
+  PARTS OF SPEECH
+    $pos can take the left side values of the following table.
+
+      a|adjective
+      r|adverb
+      n|noun
+      v|verb
+      a|形容詞
+      r|副詞
+      n|名詞
+      v|動詞
+
+    This is the result of the SQL query 'SELECT pos, def FROM pos_def'.
+
+  RELATIONS
+    $rel can take the left side values of the following table.
+
+      also|See also
+      syns|Synonyms
+      hype|Hypernyms
+      inst|Instances
+      hypo|Hyponym
+      hasi|Has Instance
+      mero|Meronyms
+      mmem|Meronyms --- Member
+      msub|Meronyms --- Substance
+      mprt|Meronyms --- Part
+      holo|Holonyms
+      hmem|Holonyms --- Member
+      hsub|Holonyms --- Substance
+      hprt|Holonyms -- Part
+      attr|Attributes
+      sim|Similar to
+      enta|Entails
+      caus|Causes
+      dmnc|Domain --- Category
+      dmnu|Domain --- Usage
+      dmnr|Domain --- Region
+      dmtc|In Domain --- Category
+      dmtu|In Domain --- Usage
+      dmtr|In Domain --- Region
+      ants|Antonyms
+
+    This is the result of the SQL query 'SELECT link, def FROM link_def'.
+
+Out of memory!
+    In rare cases, this error message is displayed during the installation
+    of this library. If this is displayed, please install this library
+    manually. (RT#82276)
+
+AUTHOR
+    pawa <pawapawa@cpan.org>
+
+SEE ALSO
+    Japanese WordNet: <http://nlpwww.nict.go.jp/wn-ja/>
+
+    <http://twitter.com/LinguaJAWordNet>
+
+LICENSE
+    This library except the bundled WordNet database file is free software;
+    you can redistribute it and/or modify it under the same terms as Perl
+    itself.
+
+    The bundled WordNet database file complies with the following licenses:
+
+    *   For Japanese data: <http://nlpwww.nict.go.jp/wn-ja/license.txt>
+
+    *   For English data: <http://wordnet.princeton.edu/wordnet/license/>
+

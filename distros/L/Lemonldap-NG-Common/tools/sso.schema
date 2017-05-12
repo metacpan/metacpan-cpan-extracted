@@ -1,0 +1,84 @@
+#=======================================
+# Schema for advanced SSO access rules
+# 
+# Designed for OpenLDAP software
+#   http://www.openldap.org
+#
+# Part of LemonLDAP::NG project
+#   http://lemonldap.ow2.org
+#
+# Author: Clement OUDOT
+#=======================================
+
+#=======================================
+# OID Prefix
+#   Registered in IANA database
+#=======================================
+objectIdentifier SSOOID 1.3.6.1.4.1.10943.10.2
+
+#=======================================
+# Attributes
+#=======================================
+
+# Application Name
+attributetype ( SSOOID:1.1
+	NAME 'ssoName'
+	DESC 'Application names'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+ 
+# Roles
+attributetype ( SSOOID:1.2
+	NAME 'ssoRoles'
+	DESC 'Application roles'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+# Logon hours
+attributetype ( SSOOID:1.3
+	NAME 'ssoLogonHours'
+	DESC 'Day and hours of connection'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+# Start date
+attributetype ( SSOOID:1.4
+	NAME 'ssoStartDate'
+	DESC 'Start date'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+# End date
+attributetype ( SSOOID:1.5
+	NAME 'ssoEndDate'
+	DESC 'End date'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+# Keystore
+attributetype ( SSOOID:1.6
+	NAME 'ssoKeyStore'
+	DESC 'KeyStore for credentials'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+
+#=======================================
+# ObjectClasses
+#=======================================
+
+# SSO user
+objectClass ( SSOOID:2.1
+	NAME 'ssoUser'
+	DESC 'SSO extended informations for a user'
+	SUP top
+	AUXILIARY
+	MAY ( ssoName $ ssoRoles $ ssoLogonHours $ 
+	ssoStartDate $ ssoEndDate $ ssoKeyStore ) )
+ 

@@ -1,0 +1,89 @@
+Locale-TextDomain-OO folder example
+===================================
+
+This is the explanation which file shows what.
+
+------------------------------------------------------------------------------
+This examples shows you the flexibility how to use different lexicons and
+translation methods. So you can run maketext and/or gettext methods in a mix
+you want.
+
+The module itself is not touching your machine locale. It is not reading any
+locale information of a request or from the operating system. You decide what
+you really want.
+
+You are able to bind this module to a perl script and also to a web framework
+e.g. Catalyst. Both I do with that module in a productive system. Before
+Locale::Maketext was used there. After context problems and plural problems
+we changed the used module and step by step the methods we call.
+
+Context problems: This are something like the word "date". You have one word in
+the English language and 2 German translations for that. The first is "Datum"
+in the datetime context. The second is "Date" for the appointment context.
+
+Plural problems: The plural of the text "There is 1 attachment." is "There are
+2 attachments". The Locale::Maketext workaround was "There is/are 1
+attachment." and "There is/are 2 attachments.".
+------------------------------------------------------------------------------
+
+02_filter.pl
+    This example shows how to run code after each translation.
+    Maybe you want to run any formatter like markdown or and/or encode to UTF-8
+    or anything else.
+
+03_language_of_languages.pl
+    This example shows how to use the plugin "Language::LanguageOfLanguages".
+    This plugin implements the method languages. You can give a lot of
+    languages. The first match in lexicon will store that language as the used
+    language. If no of that languages is availabe in lexicon that will use
+    language "i-default". Maybe you have to blow up that with super and panic
+    languages but that depends on your project.
+
+04_lexicon_store_JSON_utf-8.pl
+    This example shows how to use the lexicon as JSON for JavaScript. Because
+    not the full lexicon is used in JavaScript, you can set the filter.
+
+05_expand_gettext_modifier.pl
+    This example shows how to format numbers.
+
+06_expand_maketext_formatter_code.pl
+   This example shows how to format numbers.
+
+11_gettext_hash.pl, 11_gettext_loc_hash.pl, 11_gettext_named_hash.pl
+    This example shows how to create a lexicon from hash.
+    And it shows how to run with the different gettext plugins.
+
+12_gettext_mo_utf-8.pl
+    This example shows how to create a lexicon from mo file.
+    Also that is using Russian language with 3 plural forms.
+    It also shows how to work with grammar attributes.
+
+13_gettext_mo_cp1252.pl
+    It is also possible to read the mo file with Windows charset cp1252.
+
+14_N__.pl, 14_Nloc_.t
+    This example shows how to use all the N__... or Nloc_... methods.
+    This methods are seen by extractor but doing no translation.
+    Maybe there is a mapping and only one translation is used at the end.
+    So translate only that one and not all.
+
+17_multiplural_mo_utf-8.pl
+    This shows how to use more than one plural form in one phrase. That is a
+    special thing but a possible way.
+
+21_maketext_mo_utf-8.pl
+    Also the maketext method is callable. Here you can see, what to do.
+
+22_loc_mo_style_gettext.pl
+    Sometime the maketext method is written as method loc.
+    That example also shows the getext writing %1 instead of _1.
+
+23_localize_mo_utf-8.pl
+    Sometime the maketext method is written as method localize.
+
+41_tied_interface.pl
+    To interpolate all methods inside of a string use the tied stuff.
+
+42_gettext_mo_functional_interface.pl
+    There is also a functional Interface.
+    Create the object and bind that to the interface.

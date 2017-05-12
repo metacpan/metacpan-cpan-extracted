@@ -1,0 +1,39 @@
+Revision history for Perl extension Lingua::DxExtractor.
+
+0.01  Sun Feb 24 21:38:41 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Lingua::DxExtractor
+0.02  Mon Feb 25 21:40 2013
+	- edited POD; added required modules to Makefile.PL; edited README
+0.03  Tue Feb 26 22:00 2013
+	- process_text now runs through the whole processs; edited Makefile.PL and POD
+1.00  Fri Mar 01 
+	- refactored to pure perl implementation without Lingua::StanfordCoreNLP; now using Lingua::NegEx for negations
+1.01  Fri Mar 01
+	- edited POD and cleaned up typos
+1.02  Sat Mar 02
+	- edited README and POD
+1.03  Sun Mar 03 2013
+	- fixed typo in POD
+1.04  Fri Mar 08 2013
+	- edited to use update Lingua::NegEx-0.05 output; also now doing s/\W//g; to words in sentences
+1.05  Sat Mar 09 2013
+	- edited POD; cleaned up debug(); examine_text now returns something; added link to www.iturrate.com/DxExtractor.html
+1.06  Sun Mar 10 2013
+	- got rid of unless, got rid of repetative logic;
+	- now using $n_scope = [ 0 , 3 ] 
+	- formatting in  pod
+1.07  Sun Mar 10 2013
+	- fixed mistake with negation_scope array; added return to fxns;
+	- Perl::Critic
+1.08  Mon Mar 11 2013	
+	- got rid of complicated map, decreased nested loops;
+	- changed width of sample text in pod.
+1.09  Mon Mar 11 2013
+	- added checking for impression and final/preliminary
+2.00  Fri Aug 26 2016
+	- added absolute phrases, start phrase, colon to period, improved POD
+2.20  Fri Aug 26 2016
+	- cleaned up POD
+2.30  Mon Sep 05 2016
+	- refactored debug and cleaned up POD

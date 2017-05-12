@@ -1,0 +1,20 @@
+---
+abstract: 'parse gettext source files'
+author:
+  - 'Thomas Thurman <thomas@thurman.org.uk>'
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Locale-PO-Callback
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  POSIX: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

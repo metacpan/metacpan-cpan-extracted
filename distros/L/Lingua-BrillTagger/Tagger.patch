@@ -1,0 +1,1443 @@
+--- ./Learner_Code/contextual-rule-learn.c	2004/07/22 15:47:44
++++ ./Learner_Code/contextual-rule-learn.c	2004/07/27 10:37:15
+@@ -11,6 +11,7 @@
+ #include "registry.h"
+ #include "memory.h"
+ #include "useful.h"
++#include "rules.h"
+ 
+ #define THRESHOLD 2  /* SPECIFY THE THRESHOLD FOR LEARNING.  WHEN NO RULES */
+ 		     /* CAN BE FOUND WHOSE IMPROVEMENT IS GREATER THAN THE */
+@@ -759,16 +760,6 @@
+ /*************  The code below is for updating the corpus by applying
+                 the learned rule ***************************************/
+ 
+-void change_the_tag(theentry,thetag,theposition)
+-  char **theentry, *thetag;
+-  int theposition;
+-
+-{
+-  free(theentry[theposition]);
+-  theentry[theposition] = mystrdup(thetag);
+-}
+-
+-
+ void implement_change(thearg,thetagcorpus,thewordcorpus,corpuslen,
+ 		 wordreg,seentaggingreg)
+ char *thearg;
+--- ./Makefile	2004/07/22 15:47:44
++++ ./Makefile	2004/07/27 14:13:03
+@@ -2,6 +2,7 @@
+ 
+ SHELL = /bin/csh
+ RM    = /bin/rm -f
++CC    = gcc
+ 
+ #HOMEDIR  = .
+ 
+@@ -11,63 +12,69 @@
+ BINDIR     = ./Bin_and_Data
+ T_DIR      = ./Tagger_Code
+ L_DIR      = ./Learner_Code
++RANLIB     = ranlib
+ 
+ 
+ SRC = $(SRCDIR)/lex.c \
+       $(SRCDIR)/useful.c \
+       $(SRCDIR)/darray.c \
+       $(SRCDIR)/registry.c \
++      $(SRCDIR)/rules.c \
+       $(SRCDIR)/memory.c
+ 
+ OBJ = $(LIBDIR)/lex.o \
+       $(LIBDIR)/useful.o \
+       $(LIBDIR)/darray.o \
+       $(LIBDIR)/registry.o \
++      $(LIBDIR)/rules.o \
+       $(LIBDIR)/memory.o
+ 
+ 
+-C_INCL    =  -I${INCLUDEDIR} 
++C_INCL    =  -I${INCLUDEDIR}
+ 
+ 
+-FINAL = my_tagger
++L_TARGETS = ${BINDIR}/contextual-rule-learn \
++	    $(BINDIR)/kbest-contextual-rule-learn \
++	    $(BINDIR)/fix-kbest-rule-learn
+ 
+-L_TARGETS = contextual-rule-learn \
+-	    kbest-contextual-rule-learn \
+-	    fix-kbest-rule-learn
+-
+-T_TARGETS = final-state-tagger \
+-	    start-state-tagger \
+-	    nbest-tagger \
+-            tagger
++T_TARGETS = $(BINDIR)/final-state-tagger \
++	    $(BINDIR)/start-state-tagger \
++	    $(BINDIR)/nbest-tagger \
++            $(BINDIR)/tagger
+ 
+ 
+ EXECS = ${L_TARGETS} ${T_TARGETS}
+ 
+ 
+-CFLAGS = -O -I. ${C_INCL}
++OPTIMIZE = -O
++CFLAGS = $(OPTIMIZE) -I. ${C_INCL}
+ 
+-${FINAL} : ${EXECS}
++all : $(EXECS) libbrill.a
+ 
+ $(LIBDIR)/lex.o : $(SRCDIR)/lex.c
+-	cc -c -o $@ $<
++	$(CC) $(CFLAGS) -c -o $@ $<
+ 
+ $(LIBDIR)/useful.o : $(SRCDIR)/useful.c
+-	cc -c -o $@ $<
++	$(CC) $(CFLAGS) -c -o $@ $<
+ 
+ $(LIBDIR)/darray.o : $(SRCDIR)/darray.c
+-	cc -c -o $@ $<
++	$(CC) $(CFLAGS) -c -o $@ $<
+ 
+ $(LIBDIR)/registry.o : $(SRCDIR)/registry.c
+-	cc -c -o $@ $<
++	$(CC) $(CFLAGS) -c -o $@ $<
+ 
+ $(LIBDIR)/memory.o : $(SRCDIR)/memory.c
+-	cc -c -o $@ $<
++	$(CC) $(CFLAGS) -c -o $@ $<
+ 
+ ${T_TARGETS} : ${OBJ} 
+-	cc $(CFLAGS) ${OBJ} -o $(BINDIR)/$@ $(T_DIR)/$@.c
++	$(CC) $(CFLAGS) ${OBJ} -o $@ $(T_DIR)/$(@F).c
+ 
+ ${L_TARGETS} : ${OBJ}
+-	cc $(CFLAGS) ${OBJ} -o $(BINDIR)/$@ $(L_DIR)/$@.c
++	$(CC) $(CFLAGS) ${OBJ} -o $@ $(L_DIR)/$(@F).c
+ 
++libbrill.a : ${OBJ}
++	$(AR) r $@ $(OBJ)
++	$(RANLIB) $@
+ 
+-
++clean :
++	$(RM) $(OBJ) $(EXECS) libbrill.a
+--- ./Tagger_Code/final-state-tagger.c	2004/07/22 15:47:44
++++ ./Tagger_Code/final-state-tagger.c	2004/07/29 16:29:23
+@@ -17,6 +17,8 @@
+ #include "registry.h"
+ #include "memory.h"
+ #include "useful.h"
++#include "rules.h"
++
+ #define MAXTAGLEN 256  /* max char length of pos tags */
+ #define MAXWORDLEN 256 /* max char length of words */
+ 
+@@ -33,17 +35,6 @@
+ char            staart[] = "STAART";
+ 
+ 
+-void change_the_tag(theentry,thetag,theposition)
+-  char **theentry, *thetag;
+-  int theposition;
+-
+-{
+-  free(theentry[theposition]);
+-  theentry[theposition] = mystrdup(thetag);
+-}
+-
+-
+-
+ main(argc, argv)
+ 	int             argc;
+ 	char           *argv[];
+@@ -148,327 +139,15 @@
+ 	corpus_size = tag_corpus_array_index - 1;
+ 	while (fgets(line, sizeof(line), changefile) != NULL) {
+ 	  if (not_just_blank(line)) {
++	    trans_rule *r;
+ 	    line[strlen(line) - 1] = '\0';
+-	    split_ptr = perl_split(line);
+-	    strcpy(old, split_ptr[0]);
+-	    strcpy(new, split_ptr[1]);
+-	    strcpy(when, split_ptr[2]);
+-/*	    fprintf(stderr,"OLD: %s NEW: %s WHEN: %s\n", old, new, when);*/
++	    r = parse_contextual_rule(line);
++
+ 	    fprintf(stderr,"f");
+-	    if (strcmp(when, "NEXTTAG") == 0 ||
+-		strcmp(when, "NEXT2TAG") == 0 ||
+-		strcmp(when, "NEXT1OR2TAG") == 0 ||
+-		strcmp(when, "NEXT1OR2OR3TAG") == 0 ||
+-		strcmp(when, "PREVTAG") == 0 ||
+-		strcmp(when, "PREV2TAG") == 0 ||
+-		strcmp(when, "PREV1OR2TAG") == 0 ||
+-		strcmp(when, "PREV1OR2OR3TAG") == 0) {
+-	      strcpy(tag, split_ptr[3]);
+-	    } 
+-	    else if (strcmp(when, "NEXTWD") == 0 ||
+-		strcmp(when,"CURWD") == 0 ||
+-		strcmp(when, "NEXT2WD") == 0 ||
+-		strcmp(when, "NEXT1OR2WD") == 0 ||
+-		strcmp(when, "NEXT1OR2OR3WD") == 0 ||
+-		strcmp(when, "PREVWD") == 0 ||
+-		strcmp(when, "PREV2WD") == 0 ||
+-		strcmp(when, "PREV1OR2WD") == 0 ||
+-		strcmp(when, "PREV1OR2OR3WD") == 0) {
+-	      strcpy(word, split_ptr[3]);
+-	    }
+-	    else if (strcmp(when, "SURROUNDTAG") == 0) {
+-	      strcpy(lft, split_ptr[3]);
+-	      strcpy(rght, split_ptr[4]);
+-	    } else if (strcmp(when, "PREVBIGRAM") == 0) {
+-	      strcpy(prev1, split_ptr[3]);
+-	      strcpy(prev2, split_ptr[4]);
+-	    } else if (strcmp(when, "NEXTBIGRAM") == 0) {
+-	      strcpy(next1, split_ptr[3]);
+-	      strcpy(next2, split_ptr[4]);
+-	    }else if (strcmp(when,"LBIGRAM") == 0||
+-		       strcmp(when,"WDPREVTAG") == 0) {
+-	      strcpy(prev1,split_ptr[3]);
+-	      strcpy(word,split_ptr[4]); 
+-	    } else if (strcmp(when,"RBIGRAM") == 0 ||
+-		       strcmp(when,"WDNEXTTAG") == 0) {
+-	      strcpy(word,split_ptr[3]);
+-	      strcpy(next1,split_ptr[4]); 
+-	    } else if (strcmp(when,"WDAND2BFR")== 0 ||
+-		       strcmp(when,"WDAND2TAGBFR")== 0) {
+-	      strcpy(prev2,split_ptr[3]);
+-	      strcpy(word,split_ptr[4]);}
+-	     else if (strcmp(when,"WDAND2AFT")== 0 ||
+-		       strcmp(when,"WDAND2TAGAFT")== 0) {
+-	      strcpy(next2,split_ptr[4]);
+-	      strcpy(word,split_ptr[3]);}
++	    apply_contextual_rule(r, word_corpus_array, tag_corpus_array, corpus_size + 1,
++				  RESTRICT_MOVE, WORDS, SEENTAGGING);
+ 	    
+-	    
+-	    for (count = 0; count <= corpus_size; ++count) {
+-	      strcpy(curtag, tag_corpus_array[count]);
+-	      if (strcmp(curtag, old) == 0) {
+-		strcpy(curwd,word_corpus_array[count]);
+-		sprintf(atempstr2,"%s %s",curwd,new);
+-
+-		if (! RESTRICT_MOVE || 
+-		    ! Registry_get(WORDS,curwd) ||
+-		    Registry_get(SEENTAGGING,atempstr2)) {
+-
+-		  if (strcmp(when, "SURROUNDTAG") == 0) {
+-		    if (count < corpus_size && count > 0) {
+-		      if (strcmp(lft, tag_corpus_array[count - 1]) == 0 &&
+-			  strcmp(rght, tag_corpus_array[count + 1]) == 0)
+-			change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  } else if (strcmp(when, "NEXTTAG") == 0) {
+-		    if (count < corpus_size) {
+-		      if (strcmp(tag,tag_corpus_array[count + 1]) == 0)
+-			change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  }  
+-		  else if (strcmp(when, "CURWD") == 0) {
+-		    if (strcmp(word, word_corpus_array[count]) == 0)
+-		      change_the_tag(tag_corpus_array, new, count);
+-		  } 
+-		  else if (strcmp(when, "NEXTWD") == 0) {
+-		    if (count < corpus_size) {
+-		      if (strcmp(word, word_corpus_array[count + 1]) == 0)
+-			change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  } 
+-		   else if (strcmp(when, "RBIGRAM") == 0) {
+-		  if (count < corpus_size) {
+-		    if (strcmp(word, word_corpus_array[count]) ==
+-			0 &&
+-			strcmp(next1, word_corpus_array[count+1]) ==
+-			0)
+-		      change_the_tag(tag_corpus_array, new, count);
+-		  }
+-		} 
+-		  else if (strcmp(when, "WDNEXTTAG") == 0) {
+-		  if (count < corpus_size) {
+-		    if (strcmp(word, word_corpus_array[count]) ==
+-			0 &&
+-			strcmp(next1, tag_corpus_array[count+1]) ==
+-			0)
+-		      change_the_tag(tag_corpus_array, new, count);
+-		  }
+-		}
+-
+-		  else if (strcmp(when, "WDAND2AFT") == 0) {
+-		  if (count < corpus_size-1) {
+-		    if (strcmp(word, word_corpus_array[count]) ==
+-			0 &&
+-			strcmp(next2, word_corpus_array[count+2]) ==
+-			0)
+-		      change_the_tag(tag_corpus_array, new, count);
+-		  }
+-		}
+-		  else if (strcmp(when, "WDAND2TAGAFT") == 0) {
+-		  if (count < corpus_size-1) {
+-		    if (strcmp(word, word_corpus_array[count]) ==
+-			0 &&
+-			strcmp(next2, tag_corpus_array[count+2]) ==
+-			0)
+-		      change_the_tag(tag_corpus_array, new, count);
+-		  }
+-		}
+-
+-		  else if (strcmp(when, "NEXT2TAG") == 0) {
+-		    if (count < corpus_size - 1) {
+-		      if (strcmp(tag, tag_corpus_array[count + 2]) == 0)
+-			change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  } else if (strcmp(when, "NEXT2WD") == 0) {
+-		    if (count < corpus_size - 1) {
+-		      if (strcmp(word, word_corpus_array[count + 2]) == 0)
+-			change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  } else if (strcmp(when, "NEXTBIGRAM") == 0) {
+-		    if (count < corpus_size - 1) {
+-		      if
+-			(strcmp(next1, tag_corpus_array[count + 1]) == 0 &&
+-			 strcmp(next2, tag_corpus_array[count + 2]) == 0)
+-			  change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  } else if (strcmp(when, "NEXT1OR2TAG") == 0) {
+-		    if (count < corpus_size) {
+-		      if (count < corpus_size-1) 
+-			tempcount1 = count+2;
+-		      else 
+-			tempcount1 = count+1;
+-		      if
+-			(strcmp(tag, tag_corpus_array[count + 1]) == 0 ||
+-			 strcmp(tag, tag_corpus_array[tempcount1]) == 0)
+-			  change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  }  else if (strcmp(when, "NEXT1OR2WD") == 0) {
+-		    if (count < corpus_size) {
+-		      if (count < corpus_size-1) 
+-			tempcount1 = count+2;
+-		      else 
+-			tempcount1 = count+1;
+-		      if
+-			(strcmp(word, word_corpus_array[count + 1]) == 0 ||
+-			 strcmp(word, word_corpus_array[tempcount1]) == 0)
+-			  change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  }   else if (strcmp(when, "NEXT1OR2OR3TAG") == 0) {
+-		    if (count < corpus_size) {
+-		      if (count < corpus_size -1)
+-			tempcount1 = count+2;
+-		      else 
+-			tempcount1 = count+1;
+-		      if (count < corpus_size-2)
+-			tempcount2 = count+3;
+-		      else 
+-			tempcount2 =count+1;
+-		      if
+-			(strcmp(tag, tag_corpus_array[count + 1]) == 0 ||
+-			 strcmp(tag, tag_corpus_array[tempcount1]) == 0 ||
+-			 strcmp(tag, tag_corpus_array[tempcount2]) == 0)
+-			  change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  } else if (strcmp(when, "NEXT1OR2OR3WD") == 0) {
+-		    if (count < corpus_size) {
+-		      if (count < corpus_size -1)
+-			tempcount1 = count+2;
+-		      else 
+-			tempcount1 = count+1;
+-		      if (count < corpus_size-2)
+-			tempcount2 = count+3;
+-		      else 
+-			tempcount2 =count+1;
+-		      if
+-			(strcmp(word, word_corpus_array[count + 1]) == 0 ||
+-			 strcmp(word, word_corpus_array[tempcount1]) == 0 ||
+-			 strcmp(word, word_corpus_array[tempcount2]) == 0)
+-			  change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  }  else if (strcmp(when, "PREVTAG") == 0) {
+-		    if (count > 0) {
+-		      if (strcmp(tag, tag_corpus_array[count - 1]) == 0) {
+-			change_the_tag(tag_corpus_array, new, count);
+-		      }
+-		    }
+-		  } else if (strcmp(when, "PREVWD") == 0) {
+-		    if (count > 0) {
+-		      if (strcmp(word, word_corpus_array[count - 1]) == 0) {
+-			change_the_tag(tag_corpus_array, new, count);
+-		      }
+-		    }
+-		  } 
+-		   else if (strcmp(when, "LBIGRAM") == 0) {
+-		  if (count > 0) {
+-		    if (strcmp(word, word_corpus_array[count]) ==
+-			0 &&
+-		      strcmp(prev1, word_corpus_array[count-1]) ==
+-			0)
+-		      change_the_tag(tag_corpus_array, new, count);
+-		  }
+-		}
+-		  else if (strcmp(when, "WDPREVTAG") == 0) {
+-		  if (count > 0) {
+-		    if (strcmp(word, word_corpus_array[count]) ==
+-			0 &&
+-			strcmp(prev1, tag_corpus_array[count-1]) ==
+-			0)
+-		      change_the_tag(tag_corpus_array, new, count);
+-		  }
+-		}
+-		  else if (strcmp(when, "WDAND2BFR") == 0) {
+-		  if (count > 1) {
+-		    if (strcmp(word, word_corpus_array[count]) ==
+-			0 &&
+-			strcmp(prev2, word_corpus_array[count-2]) ==
+-			0)
+-		      change_the_tag(tag_corpus_array, new, count);
+-		  }
+-		}
+-		  else if (strcmp(when, "WDAND2TAGBFR") == 0) {
+-		  if (count > 1) {
+-		    if (strcmp(word, word_corpus_array[count]) ==
+-			0 &&
+-			strcmp(prev2, tag_corpus_array[count-2]) ==
+-			0)
+-		      change_the_tag(tag_corpus_array, new, count);
+-		  }
+-		}
+-
+-		  else if (strcmp(when, "PREV2TAG") == 0) {
+-		    if (count > 1) {
+-		      if (strcmp(tag, tag_corpus_array[count - 2]) == 0)
+-			change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  } else if (strcmp(when, "PREV2WD") == 0) {
+-		    if (count > 1) {
+-		      if (strcmp(word, word_corpus_array[count - 2]) == 0)
+-			change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  } else if (strcmp(when, "PREV1OR2TAG") == 0) {
+-		    if (count > 0) {
+-		      if (count > 1) 
+-			tempcount1 = count-2;
+-		      else
+-			tempcount1 = count-1;
+-		      if (strcmp(tag, tag_corpus_array[count - 1]) == 0 ||
+-			  strcmp(tag, tag_corpus_array[tempcount1]) == 0)
+-			change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  } else if (strcmp(when, "PREV1OR2WD") == 0) {
+-		    if (count > 0) {
+-		      if (count > 1) 
+-			tempcount1 = count-2;
+-		      else
+-			tempcount1 = count-1;
+-		      if (strcmp(word, word_corpus_array[count - 1]) == 0 ||
+-			  strcmp(word, word_corpus_array[tempcount1]) == 0)
+-			change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  } else if (strcmp(when, "PREV1OR2OR3TAG") == 0) {
+-		    if (count > 0) {
+-		      if (count>1) 
+-			tempcount1 = count-2;
+-		      else 
+-			tempcount1 = count-1;
+-		      if (count >2) 
+-			tempcount2 = count-3;
+-		      else 
+-			tempcount2 = count-1;
+-		      if (strcmp(tag, tag_corpus_array[count - 1]) == 0 ||
+-			  strcmp(tag, tag_corpus_array[tempcount1]) == 0 ||
+-			  strcmp(tag, tag_corpus_array[tempcount2]) == 0)
+-			change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  } else if (strcmp(when, "PREV1OR2OR3WD") == 0) {
+-		    if (count > 0) {
+-		      if (count>1) 
+-			tempcount1 = count-2;
+-		      else 
+-			tempcount1 = count-1;
+-		      if (count >2) 
+-			tempcount2 = count-3;
+-		      else 
+-			tempcount2 = count-1;
+-		      if (strcmp(word, word_corpus_array[count - 1]) == 0 ||
+-			  strcmp(word, word_corpus_array[tempcount1]) == 0 ||
+-			  strcmp(word, word_corpus_array[tempcount2]) == 0)
+-			change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  } else if (strcmp(when, "PREVBIGRAM") == 0) {
+-		    if (count > 1) {
+-		      if (strcmp(prev2, tag_corpus_array[count - 1]) == 0 &&
+-			  strcmp(prev1, tag_corpus_array[count - 2]) == 0)
+-			change_the_tag(tag_corpus_array, new, count);
+-		    }
+-		  }
+-		  else 
+-		    fprintf(stderr,
+-			    "ERROR: %s is not an allowable transform type\n",
+-			    when);
+-		}
+-	      }
+-	    }
+-	    free(split_ptr);
++	    rule_destroy(r);
+ 	  }
+ 	}
+ fprintf(stderr,"\n");
+--- ./Tagger_Code/start-state-tagger.c	2004/07/22 15:47:44
++++ ./Tagger_Code/start-state-tagger.c	2004/08/03 14:02:34
+@@ -17,6 +17,7 @@
+ #include "registry.h"
+ #include "memory.h"
+ #include "useful.h"
++#include "rules.h"
+ #define MAXTAGLEN 256  /* max char length of pos tags */
+ #define MAXWORDLEN 256 /* max char length of words */
+ #define MAXAFFIXLEN 5  /* max length of affixes being considered */
+@@ -237,301 +238,14 @@
+ 
+ /******************* END START STATE ALGORITHM ****************/
+ 	for (count=0;count < Darray_len(rule_array);++count) {
+-	  tempstr = (char *)Darray_get(rule_array,count);
+-/*fprintf(stderr,"RULE IS: %s\n",tempstr);*/
+-fprintf(stderr,"s");
+-	  therule = perl_split_independent(tempstr);
+-/* we don't worry about freeing "rule" space, as this is a small fraction
+-   of total memory used */
+-	  therule2 = &therule[1];
+-	  rulesize=0;
+-	  perl_split_ptr = therule;
+-	  while(*(++perl_split_ptr) != NULL) {
+-	    ++rulesize;}
++	  trans_rule *r = parse_lexical_rule(Darray_get(rule_array,count));
+ 
+-	  if (strcmp(therule[1],"char") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[rulesize-1]) !=0) {
+-		if(strpbrk(Darray_get(tag_array_key,count2), therule[0]) !=
+-		   NULL) {
+-		  Darray_set(tag_array_val,count2,therule[rulesize-1]);
+-		}
+-	      }
+-	    }
+-	  }
+-	  else if (strcmp(therule2[1],"fchar") == 0) { 
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[0]) ==0) {
+-		if(strpbrk(Darray_get(tag_array_key,count2), therule2[0]) !=
+-		   NULL) {
+-		  Darray_set(tag_array_val,count2,therule[rulesize-1]);
+-		}
+-	      }
+-	    }
+-	  }
+-	  else if (strcmp(therule[1],"deletepref") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[rulesize-1])
+-		  !=0) {
+-		tempstr = Darray_get(tag_array_key,count2);
+-		for (count3=0;count3<atoi(therule[2]);++count3) {
+-		  if (tempstr[count3] != therule[0][count3])
+-		    break;}
+-		if (count3 == atoi(therule[2])) {
+-		  tempstr += atoi(therule[2]);
+-		  if (Registry_get(lexicon_hash,(char *)tempstr) != NULL ||
+-		      (EXTRAWDS &&
+-		       Registry_get(wordlist_hash,(char *)tempstr) != NULL)){
+-		    Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-		}
+-	      }
+-	    }
+-	  }
+-	  
+-	  else if (strcmp(therule2[1],"fdeletepref") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[0]) == 0){ 
+-		tempstr=Darray_get(tag_array_key,count2);
+-		for (count3=0;count3<atoi(therule2[2]);++count3) {
+-		  if (tempstr[count3] != therule2[0][count3])
+-		    break;}
+-		if (count3 == atoi(therule2[2])) {
+-		  tempstr += atoi(therule2[2]);
+-		  if (Registry_get(lexicon_hash,(char *)tempstr) != NULL ||
+-		      (EXTRAWDS &&
+-		       Registry_get(wordlist_hash,(char *)tempstr) != NULL)){
+-		    
+-		    Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-		}
+-	      }
+-	    }
+-	  }
+-	  
+-	 
+-	  else if (strcmp(therule[1],"haspref") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[rulesize-1])
+-		  !=0) {
+-		tempstr = Darray_get(tag_array_key,count2);
+-		for (count3=0;count3<atoi(therule[2]);++count3) {
+-		  if (tempstr[count3] != therule[0][count3])
+-		    break;}
+-		if (count3 == atoi(therule[2])) {
+-		    Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-	      }
+-	    }
+-	  }
+-	  
+-	  else if (strcmp(therule2[1],"fhaspref") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[0]) == 0){ 
+-		tempstr=Darray_get(tag_array_key,count2);
+-		for (count3=0;count3<atoi(therule2[2]);++count3) {
+-		  if (tempstr[count3] != therule2[0][count3])
+-		    break;}
+-		if (count3 == atoi(therule2[2])) {
+-		    Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-	      }
+-	    }
+-	  }
++	  fprintf(stderr,"s");
++	  apply_lexical_rule(r, tag_array_key, tag_array_val, 
++			     lexicon_hash, wordlist_hash, bigram_hash,
++			     EXTRAWDS);
+ 
+-	  
+-	  else if (strcmp(therule[1],"deletesuf") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[rulesize-1])
+-		  !=0) {
+-		tempstr = Darray_get(tag_array_key,count2);
+-		tempcount=strlen(tempstr)-atoi(therule[2]);
+-		for (count3=tempcount;
+-		     count3<strlen(tempstr); ++count3) {
+-		  if (tempstr[count3] != therule[0][count3-tempcount])
+-		    break;}
+-		if (count3 == strlen(tempstr)) {
+-		  tempstr2 = mystrdup(tempstr);
+-		  tempstr2[tempcount] = '\0';
+-		  if (Registry_get(lexicon_hash,(char *)tempstr2) != NULL ||
+-		      (EXTRAWDS &&
+-		       Registry_get(wordlist_hash,(char *)tempstr2) != NULL)) {
+-
+-		    Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-		  free(tempstr2);
+-		}
+-	      }
+-	    }
+-	  }
+-	  
+-	  else if (strcmp(therule2[1],"fdeletesuf") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[0]) == 0){ 
+-		tempstr=Darray_get(tag_array_key,count2);
+-		tempcount=strlen(tempstr)-atoi(therule2[2]);
+-		for (count3=tempcount;
+-		     count3<strlen(tempstr); ++count3) {
+-		  if (tempstr[count3] != therule2[0][count3-tempcount])
+-		    break;}
+-		if (count3 == strlen(tempstr)){
+-		  tempstr2 = mystrdup(tempstr);
+-		  tempstr2[tempcount] = '\0';
+-		  if (Registry_get(lexicon_hash,(char *)tempstr2) != NULL||
+-		      (EXTRAWDS &&
+-		       Registry_get(wordlist_hash,(char *)tempstr2) != NULL)) {
+-
+-		    Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-		}
+-	      }
+-	    }
+-	  }
+-	  else if (strcmp(therule[1],"hassuf") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[rulesize-1])
+-		  !=0) {
+-		tempstr = Darray_get(tag_array_key,count2);
+-		tempcount=strlen(tempstr)-atoi(therule[2]);
+-		for (count3=tempcount;
+-		     count3<strlen(tempstr); ++count3) {
+-		  if (tempstr[count3] != therule[0][count3-tempcount])
+-		    break;}
+-		if (count3 == strlen(tempstr)) {
+-
+-		    Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-	      }
+-	    }
+-	  }
+-	  
+-	  else if (strcmp(therule2[1],"fhassuf") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[0]) == 0){ 
+-		tempstr=Darray_get(tag_array_key,count2);
+-		tempcount = strlen(tempstr)-atoi(therule2[2]);
+-		for (count3=tempcount;
+-		     count3<strlen(tempstr); ++count3) {
+-		  if (tempstr[count3] != therule2[0][count3-tempcount])
+-		    break;}
+-		if (count3 == strlen(tempstr)){
+-
+-		    Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-	      }
+-	    }
+-	  }
+-	  
+-	  else if (strcmp(therule[1],"addpref") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[rulesize-1])
+-		  == 0){
+-		sprintf(tempstr_space,"%s%s",
+-			therule[0],Darray_get(tag_array_key,count2));
+-		if (Registry_get(lexicon_hash,(char *)tempstr_space) != NULL
+-		    ||
+-		    (EXTRAWDS &&
+-		       Registry_get(wordlist_hash,(char *)tempstr_space) != NULL)) {
+-
+-		  Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-	      }
+-	    }
+-	  }
+-
+-	   else if (strcmp(therule2[1],"faddpref") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[rulesize-1]) == 0){
+-		sprintf(tempstr_space,"%s%s",therule2[0],
+-			Darray_get(tag_array_key,count2));
+-		if (Registry_get(lexicon_hash,(char *)tempstr_space) != NULL
+-		    ||
+-		    (EXTRAWDS &&
+-		       Registry_get(wordlist_hash,(char *)tempstr_space) != NULL)) {
+-
+-		  Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-	      }
+-	    }
+-	  }
+-
+-
+-	   else if (strcmp(therule[1],"addsuf") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[rulesize-1])
+-		  !=0) {
+-		sprintf(tempstr_space,"%s%s",
+-		       Darray_get(tag_array_key,count2),
+-		       therule[0]);
+-		if (Registry_get(lexicon_hash,(char *)tempstr_space) != NULL
+-		    ||
+-		    (EXTRAWDS &&
+-		       Registry_get(wordlist_hash,(char *)tempstr_space) != NULL)){
+-
+-		    Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-	      }
+-	    }
+-	  }
+-	  
+-	  
+-	   else if (strcmp(therule2[1],"faddsuf") == 0) {
+-	    for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	      if (strcmp(Darray_get(tag_array_val,count2),therule[0])
+-		  ==0) {
+-		sprintf(tempstr_space,"%s%s",
+-			Darray_get(tag_array_key,count2),
+-			therule2[0]);
+-		if (Registry_get(lexicon_hash,(char *)tempstr_space) != NULL
+-		    ||
+-		   (EXTRAWDS &&
+-		       Registry_get(wordlist_hash,(char *)tempstr_space) != NULL)){
+-
+-		    Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-	      }
+-	    }
+-	  }
+-
+-	  
+-	   else if (strcmp(therule[1],"goodleft") == 0) {
+-	     for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	       if (strcmp(Darray_get(tag_array_val,count2),therule[rulesize-1])
+-		   !=0) {
+-		 sprintf(bigram_space,"%s %s",
+-			Darray_get(tag_array_key,count2),therule[0]);
+-		 if (Registry_get(bigram_hash,(char *)bigram_space) != NULL) {
+-
+-		   Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-	       }
+-	     }
+-	   }
+-
+-	   else if (strcmp(therule2[1],"fgoodleft") == 0) {
+-	     for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	       if (strcmp(Darray_get(tag_array_val,count2),therule[0])
+-		   ==0) {
+-		 sprintf(bigram_space,"%s %s",Darray_get(tag_array_key,count2),therule2[0]);
+-		 if (Registry_get(bigram_hash,(char *)bigram_space) != NULL) {
+-
+-		   Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-	       }
+-	     }
+-	   }
+-	  
+-	  else if (strcmp(therule[1],"goodright") == 0) {
+-	     for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	       if (strcmp(Darray_get(tag_array_val,count2),therule[rulesize-1])
+-		   !=0) {
+-		 sprintf(bigram_space,"%s %s",therule[0],Darray_get(tag_array_key,count2));
+-		 if (Registry_get(bigram_hash,(char *)bigram_space) != NULL) {
+-
+-		   Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-	       }
+-	     }
+-	   }
+-
+-	   else if (strcmp(therule2[1],"fgoodright") == 0) {
+-	     for (count2=0;count2<Darray_len(tag_array_key);++count2) {
+-	       if (strcmp(Darray_get(tag_array_val,count2),therule[0])
+-		   ==0) {
+-		 sprintf(bigram_space,"%s %s",therule2[0],Darray_get(tag_array_key,count2));
+-		 if (Registry_get(bigram_hash,(char *)bigram_space) != NULL) {
+-
+-		   Darray_set(tag_array_val,count2,therule[rulesize-1]);}
+-	       }
+-	     }
+-	   }
+-
+- 
++	  rule_destroy(r);
+ 	}
+ 	fprintf(stderr,"\n");
+ 	
+--- ./Utils/lex.c	2004/07/22 15:47:44
++++ ./Utils/lex.c	2004/07/28 09:30:25
+@@ -31,7 +31,7 @@
+ 
+ 
+ char **perl_split(buf)
+-     char *buf;
++     const char *buf;
+ {
+   char **return_buf;
+   int cntr = 0;
+@@ -51,12 +51,13 @@
+ 
+ 
+ 
+-char **perl_split_independent(buf)
+-     char *buf;
++char **perl_split_independent(buf_in)
++     const char *buf_in;
+ {
+   char **return_buf;
+   int cntr = 0;
+   char *temp;
++  char *buf = mystrdup(buf_in);
+ 
+   while(*buf == ' ' || *buf == '\t') ++buf;
+   return_buf = (char **) malloc(sizeof(char *) * (numspaces(buf)+3));
+--- ./Utils/lex.h	2004/07/22 15:47:44
++++ ./Utils/lex.h	2004/07/28 09:30:25
+@@ -10,7 +10,7 @@
+              /* takes 2 strings, and appends them with character w3 (the */
+ 	     /* third argument) btwn them */
+ 
+-extern char **perl_split(char *);
++extern char **perl_split(const char *);
+ 	      /* takes a string with spaces and does a split, returning */
+ 	      /* an array of ptrs to strings. */
+               /* like perl - @temp = split(/\s+/,$buf); 
+@@ -18,7 +18,7 @@
+      /* x = perl_split(buf);  then you are responsible for freeing
+ 	*x and x */
+ 
+-extern char **perl_split_independent(char *);
++extern char **perl_split_independent(const char *);
+          /* same as perl_split, but each element in the array is a separate */
+ 	 /* string of memory. */
+ 
+--- ./Utils/useful.c	2004/07/22 15:47:44
++++ ./Utils/useful.c	2004/07/26 17:43:34
+@@ -2,7 +2,7 @@
+ #include "useful.h"
+ 
+ char *mystrdup(thestr) 
+-  char *thestr;
++  const char *thestr;
+ {
+ 
+   return((char *)strcpy(malloc(strlen(thestr)+1),thestr));
+--- ./Utils/useful.h	2004/07/22 15:47:44
++++ ./Utils/useful.h	2004/07/26 17:43:34
+@@ -36,7 +36,7 @@
+ #endif
+ 
+ #ifdef __STDC__
+-extern char *mystrdup(char *);
++extern char *mystrdup(const char *);
+      /* Just a hack around the fact that strdup isn't standard */
+ extern int not_just_blank(char *);
+     /* make sure we aren't processing a blank line */
+--- /dev/null	2004-06-24 13:04:38.000000000 -0500
++++ ./Utils/rules.c	2004-12-31 15:43:06.000000000 -0600
+@@ -0,0 +1,518 @@
++#include <stdio.h>
++#include "useful.h"
++#include "rules.h"
++#include "lex.h"
++#include "darray.h"
++#include "registry.h"
++#include "memory.h"
++
++#define MAXTAGLEN 256  /* max char length of pos tags */
++#define MAXWORDLEN 256 /* max char length of words */
++#define MAXAFFIXLEN 5  /* max length of affixes being considered */
++
++void change_the_tag(theentry,thetag,theposition)
++  char **theentry, *thetag;
++  int theposition;
++{
++  free(theentry[theposition]);
++  theentry[theposition] = mystrdup(thetag);
++}
++
++void change_the_tag_darray(tag_array,theposition,thetag)
++  Darray tag_array;
++  int theposition;
++  char *thetag;
++{
++  free(Darray_get(tag_array, theposition));
++  Darray_set(tag_array, theposition, mystrdup(thetag));
++}
++
++void rule_destroy(trans_rule *r) {
++  free(r->old);
++  free(r->new);
++  free(r->when);
++  free(r->arg1);
++  free(r->arg2);
++  free(r);
++}
++
++trans_rule *parse_lexical_rule (const char *rule_text) {
++  trans_rule *rule = (trans_rule*) malloc(sizeof(trans_rule));
++  char **split_ptr = perl_split(rule_text);
++
++  /* The general rule-pattern is:
++   * [old] arg1 when [arg2] new
++   * 'old' is only present when 'when' starts with 'f'.
++   * 'arg2' is only present for a few 'when' types.
++   */
++
++
++  int offset = 0;
++
++  /* Rule types starting with 'f' have an extra 'old' arg at the beginning */
++  if (*split_ptr[2] == 'f') {
++    rule->old = mystrdup(split_ptr[0]);
++    offset = 1;
++  } else {
++    rule->old = NULL;
++  }
++
++  rule->arg1 = mystrdup(split_ptr[0 + offset]);
++  rule->when = mystrdup(split_ptr[1 + offset]);
++
++  /* A few rules have a string-length argument too */
++  if (strstr(rule->when, "hassuf")    ||
++      strstr(rule->when, "haspref")   ||
++      strstr(rule->when, "addpref")   ||
++      strstr(rule->when, "addsuf")    ||
++      strstr(rule->when, "deletesuf") ||
++      strstr(rule->when, "deletepref")  ) {
++    rule->arg2 = mystrdup(split_ptr[2 + offset]);
++    offset++;
++  } else {
++    rule->arg2 = NULL;
++  }
++
++  rule->new = mystrdup(split_ptr[2 + offset]);
++
++  return rule;
++}
++
++trans_rule *parse_contextual_rule (const char *rule_text) {
++  trans_rule *rule = (trans_rule*) malloc(sizeof(trans_rule));
++  char **split_ptr = perl_split(rule_text);
++  
++  rule->old  = mystrdup(split_ptr[0]);
++  rule->new  = mystrdup(split_ptr[1]);
++  rule->when = mystrdup(split_ptr[2]);
++  rule->arg1 = mystrdup(split_ptr[3]);
++
++  /* The following rule-types take an additional argument */
++  if (strcmp(rule->when, "SURROUNDTAG")  == 0 ||
++      strcmp(rule->when, "PREVBIGRAM")   == 0 ||
++      strcmp(rule->when, "NEXTBIGRAM")   == 0 ||
++      strcmp(rule->when, "LBIGRAM")      == 0 ||
++      strcmp(rule->when, "WDPREVTAG")    == 0 ||
++      strcmp(rule->when, "RBIGRAM")      == 0 ||
++      strcmp(rule->when, "WDNEXTTAG")    == 0 ||
++      strcmp(rule->when, "WDAND2BFR")    == 0 ||
++      strcmp(rule->when, "WDAND2TAGBFR") == 0 ||
++      strcmp(rule->when, "WDAND2AFT")    == 0 ||
++      strcmp(rule->when, "WDAND2TAGAFT") == 0 )
++
++    rule->arg2 = mystrdup(split_ptr[4]);
++  else
++    rule->arg2 = NULL;
++
++  return rule;
++}
++
++
++void apply_contextual_rule(const trans_rule *r,
++			   char **word_corpus_array,
++			   char **tag_corpus_array,
++			   int corpus_size,
++			   int RESTRICT_MOVE,
++			   Registry WORDS,
++			   Registry SEENTAGGING
++			  ) {
++
++  char            tempstr[MAXWORDLEN],atempstr2[256];
++
++  int count, tempcount1, tempcount2;
++  
++  corpus_size--; /* Is used below as the index of the last element (dunno why...) */
++
++  /* fprintf(stderr,"R: OLD: %s NEW: %s WHEN: %s (%s).\n", r->old, r->new, r->when, r->arg1); */
++  
++  for (count = 0; count <= corpus_size; ++count) {
++    if (strcmp(tag_corpus_array[count], r->old) == 0) {
++
++      sprintf(atempstr2,"%s %s", word_corpus_array[count], r->new);
++      
++      if (! RESTRICT_MOVE || 
++	  ! Registry_get(WORDS, word_corpus_array[count]) ||
++	  Registry_get(SEENTAGGING,atempstr2)) {
++	
++	if (strcmp(r->when, "SURROUNDTAG") == 0) {
++	  if (count < corpus_size && count > 0) {
++	    if (strcmp(r->arg1, tag_corpus_array[count - 1]) == 0 &&
++		strcmp(r->arg2, tag_corpus_array[count + 1]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} else if (strcmp(r->when, "NEXTTAG") == 0) {
++	  if (count < corpus_size) {
++	    if (strcmp(r->arg1,tag_corpus_array[count + 1]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	}  
++	else if (strcmp(r->when, "CURWD") == 0) {
++	  if (strcmp(r->arg1, word_corpus_array[count]) == 0)
++	    change_the_tag(tag_corpus_array, r->new, count);
++	} 
++	else if (strcmp(r->when, "NEXTWD") == 0) {
++	  if (count < corpus_size) {
++	    if (strcmp(r->arg1, word_corpus_array[count + 1]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} 
++	else if (strcmp(r->when, "RBIGRAM") == 0) {
++	  if (count < corpus_size) {
++	    if (strcmp(r->arg1, word_corpus_array[count]) ==
++		0 &&
++		strcmp(r->arg2, word_corpus_array[count+1]) ==
++		0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} 
++	else if (strcmp(r->when, "WDNEXTTAG") == 0) {
++	  if (count < corpus_size) {
++	    if (strcmp(r->arg1, word_corpus_array[count]) ==
++		0 &&
++		strcmp(r->arg2, tag_corpus_array[count+1]) ==
++		0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	}
++	
++	else if (strcmp(r->when, "WDAND2AFT") == 0) {
++	  if (count < corpus_size-1) {
++	    if (strcmp(r->arg1, word_corpus_array[count]) ==
++		0 &&
++		strcmp(r->arg2, word_corpus_array[count+2]) ==
++		0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	}
++	else if (strcmp(r->when, "WDAND2TAGAFT") == 0) {
++	  if (count < corpus_size-1) {
++	    if (strcmp(r->arg1, word_corpus_array[count]) ==
++		0 &&
++		strcmp(r->arg2, tag_corpus_array[count+2]) ==
++		0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	}
++	
++	else if (strcmp(r->when, "NEXT2TAG") == 0) {
++	  if (count < corpus_size - 1) {
++	    if (strcmp(r->arg1, tag_corpus_array[count + 2]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} else if (strcmp(r->when, "NEXT2WD") == 0) {
++	  if (count < corpus_size - 1) {
++	    if (strcmp(r->arg1, word_corpus_array[count + 2]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} else if (strcmp(r->when, "NEXTBIGRAM") == 0) {
++	  if (count < corpus_size - 1) {
++	    if
++	      (strcmp(r->arg1, tag_corpus_array[count + 1]) == 0 &&
++	       strcmp(r->arg2, tag_corpus_array[count + 2]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} else if (strcmp(r->when, "NEXT1OR2TAG") == 0) {
++	  if (count < corpus_size) {
++	    if (count < corpus_size-1) 
++	      tempcount1 = count+2;
++	    else 
++	      tempcount1 = count+1;
++	    if
++	      (strcmp(r->arg1, tag_corpus_array[count + 1]) == 0 ||
++	       strcmp(r->arg1, tag_corpus_array[tempcount1]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	}  else if (strcmp(r->when, "NEXT1OR2WD") == 0) {
++	  if (count < corpus_size) {
++	    if (count < corpus_size-1) 
++	      tempcount1 = count+2;
++	    else 
++	      tempcount1 = count+1;
++	    if
++	      (strcmp(r->arg1, word_corpus_array[count + 1]) == 0 ||
++	       strcmp(r->arg1, word_corpus_array[tempcount1]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	}   else if (strcmp(r->when, "NEXT1OR2OR3TAG") == 0) {
++	  if (count < corpus_size) {
++	    if (count < corpus_size -1)
++	      tempcount1 = count+2;
++	    else 
++	      tempcount1 = count+1;
++	    if (count < corpus_size-2)
++	      tempcount2 = count+3;
++	    else 
++	      tempcount2 =count+1;
++	    if
++	      (strcmp(r->arg1, tag_corpus_array[count + 1]) == 0 ||
++	       strcmp(r->arg1, tag_corpus_array[tempcount1]) == 0 ||
++	       strcmp(r->arg1, tag_corpus_array[tempcount2]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} else if (strcmp(r->when, "NEXT1OR2OR3WD") == 0) {
++	  if (count < corpus_size) {
++	    if (count < corpus_size -1)
++	      tempcount1 = count+2;
++	    else 
++	      tempcount1 = count+1;
++	    if (count < corpus_size-2)
++	      tempcount2 = count+3;
++	    else 
++	      tempcount2 =count+1;
++	    if
++	      (strcmp(r->arg1, word_corpus_array[count + 1]) == 0 ||
++	       strcmp(r->arg1, word_corpus_array[tempcount1]) == 0 ||
++	       strcmp(r->arg1, word_corpus_array[tempcount2]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	}  else if (strcmp(r->when, "PREVTAG") == 0) {
++	  if (count > 0) {
++	    if (strcmp(r->arg1, tag_corpus_array[count - 1]) == 0) {
++	      change_the_tag(tag_corpus_array, r->new, count);
++	    }
++	  }
++	} else if (strcmp(r->when, "PREVWD") == 0) {
++	  if (count > 0) {
++	    if (strcmp(r->arg1, word_corpus_array[count - 1]) == 0) {
++	      change_the_tag(tag_corpus_array, r->new, count);
++	    }
++	  }
++	} 
++	else if (strcmp(r->when, "LBIGRAM") == 0) {
++	  if (count > 0) {
++	    if (strcmp(r->arg2, word_corpus_array[count]) ==
++		0 &&
++		strcmp(r->arg1, word_corpus_array[count-1]) ==
++		0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	}
++	else if (strcmp(r->when, "WDPREVTAG") == 0) {
++	  if (count > 0) {
++	    if (strcmp(r->arg2, word_corpus_array[count]) ==
++		0 &&
++		strcmp(r->arg1, tag_corpus_array[count-1]) ==
++		0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	}
++	else if (strcmp(r->when, "WDAND2BFR") == 0) {
++	  if (count > 1) {
++	    if (strcmp(r->arg2, word_corpus_array[count]) ==
++		0 &&
++		strcmp(r->arg1, word_corpus_array[count-2]) ==
++		0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	}
++	else if (strcmp(r->when, "WDAND2TAGBFR") == 0) {
++	  if (count > 1) {
++	    if (strcmp(r->arg2, word_corpus_array[count]) ==
++		0 &&
++		strcmp(r->arg1, tag_corpus_array[count-2]) ==
++		0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	}
++	
++	else if (strcmp(r->when, "PREV2TAG") == 0) {
++	  if (count > 1) {
++	    if (strcmp(r->arg1, tag_corpus_array[count - 2]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} else if (strcmp(r->when, "PREV2WD") == 0) {
++	  if (count > 1) {
++	    if (strcmp(r->arg1, word_corpus_array[count - 2]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} else if (strcmp(r->when, "PREV1OR2TAG") == 0) {
++	  if (count > 0) {
++	    if (count > 1) 
++	      tempcount1 = count-2;
++	    else
++	      tempcount1 = count-1;
++	    if (strcmp(r->arg1, tag_corpus_array[count - 1]) == 0 ||
++		strcmp(r->arg1, tag_corpus_array[tempcount1]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} else if (strcmp(r->when, "PREV1OR2WD") == 0) {
++	  if (count > 0) {
++	    if (count > 1) 
++	      tempcount1 = count-2;
++	    else
++	      tempcount1 = count-1;
++	    if (strcmp(r->arg1, word_corpus_array[count - 1]) == 0 ||
++		strcmp(r->arg1, word_corpus_array[tempcount1]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} else if (strcmp(r->when, "PREV1OR2OR3TAG") == 0) {
++	  if (count > 0) {
++	    if (count>1) 
++	      tempcount1 = count-2;
++	    else 
++	      tempcount1 = count-1;
++	    if (count >2) 
++	      tempcount2 = count-3;
++	    else 
++	      tempcount2 = count-1;
++	    if (strcmp(r->arg1, tag_corpus_array[count - 1]) == 0 ||
++		strcmp(r->arg1, tag_corpus_array[tempcount1]) == 0 ||
++		strcmp(r->arg1, tag_corpus_array[tempcount2]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} else if (strcmp(r->when, "PREV1OR2OR3WD") == 0) {
++	  if (count > 0) {
++	    if (count>1) 
++	      tempcount1 = count-2;
++	    else 
++	      tempcount1 = count-1;
++	    if (count >2) 
++	      tempcount2 = count-3;
++	    else 
++	      tempcount2 = count-1;
++	    if (strcmp(r->arg1, word_corpus_array[count - 1]) == 0 ||
++		strcmp(r->arg1, word_corpus_array[tempcount1]) == 0 ||
++		strcmp(r->arg1, word_corpus_array[tempcount2]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	} else if (strcmp(r->when, "PREVBIGRAM") == 0) {
++	  if (count > 1) {
++	    if (strcmp(r->arg2, tag_corpus_array[count - 1]) == 0 &&
++		strcmp(r->arg1, tag_corpus_array[count - 2]) == 0)
++	      change_the_tag(tag_corpus_array, r->new, count);
++	  }
++	}
++	else 
++	  fprintf(stderr,
++		  "ERROR: %s is not an allowable transform type\n",
++		  r->when);
++      }
++    }
++  }
++}
++
++
++void apply_lexical_rule(const trans_rule *r,
++			Darray tag_array_key,
++			Darray tag_array_val,
++			Registry lexicon_hash,
++			Registry wordlist_hash,
++			Registry bigram_hash,
++			int EXTRAWDS
++		       ) {
++
++  int count2, count3, tempcount;
++  char *tempstr2;
++  char *rule_text;
++
++  char tempstr_space[MAXWORDLEN+MAXAFFIXLEN], bigram_space[MAXWORDLEN*2];
++
++  int check_current_tag = (r->when[0] == 'f');
++  char *name = mystrdup( check_current_tag ? &r->when[1] : r->when );
++
++  for (count2=0;count2<Darray_len(tag_array_key);++count2) {
++
++    if (check_current_tag
++	? (strcmp(Darray_get(tag_array_val, count2), r->old) != 0)
++	: (strcmp(Darray_get(tag_array_val, count2), r->new) == 0))
++      continue;
++    
++    if (strcmp(name, "char") == 0) {
++      if(strpbrk(Darray_get(tag_array_key,count2), r->arg1)) {
++	change_the_tag_darray(tag_array_val,count2,r->new);
++      }
++    }
++    else if (strcmp(name, "deletepref") == 0) {
++      int arg1_len = atoi(r->arg2);
++
++      rule_text = Darray_get(tag_array_key,count2);
++      for (count3=0;count3<arg1_len;++count3) {
++	if (rule_text[count3] != r->arg1[count3])
++	  break;}
++      if (count3 == arg1_len) {
++	rule_text += arg1_len;
++	if (Registry_get(lexicon_hash,(char *)rule_text) != NULL ||
++	    (EXTRAWDS &&
++	     Registry_get(wordlist_hash,(char *)rule_text) != NULL)){
++	  change_the_tag_darray(tag_array_val,count2,r->new);}
++      }
++    }
++    else if (strcmp(name,"haspref") == 0) {
++      int arg1_len = atoi(r->arg2);
++
++      rule_text = Darray_get(tag_array_key,count2);
++      for (count3=0;count3<arg1_len;++count3) {
++	if (rule_text[count3] != r->arg1[count3])
++	  break;}
++      if (count3 == arg1_len) {
++	change_the_tag_darray(tag_array_val,count2,r->new);}
++    }
++    else if (strcmp(name,"deletesuf") == 0) {
++      int arg1_len = atoi(r->arg2);
++
++      rule_text = Darray_get(tag_array_key,count2);
++      tempcount=strlen(rule_text)-arg1_len;
++      for (count3=tempcount;
++	   count3<strlen(rule_text); ++count3) {
++	if (rule_text[count3] != r->arg1[count3-tempcount])
++	  break;}
++      if (count3 == strlen(rule_text)) {
++	tempstr2 = mystrdup(rule_text);
++	tempstr2[tempcount] = '\0';
++	if (Registry_get(lexicon_hash,(char *)tempstr2) != NULL ||
++	    (EXTRAWDS &&
++	     Registry_get(wordlist_hash,(char *)tempstr2) != NULL)) {
++	  
++	  change_the_tag_darray(tag_array_val,count2,r->new);}
++	free(tempstr2);
++      }
++    }
++    else if (strcmp(name,"hassuf") == 0) {
++      int arg1_len = atoi(r->arg2);
++      
++      rule_text = Darray_get(tag_array_key,count2);
++      tempcount=strlen(rule_text)-arg1_len;
++      for (count3=tempcount;
++	   count3<strlen(rule_text); ++count3) {
++	if (rule_text[count3] != r->arg1[count3-tempcount])
++	  break;}
++      if (count3 == strlen(rule_text)) {
++
++	change_the_tag_darray(tag_array_val,count2,r->new);}
++    }
++    else if (strcmp(name,"addpref") == 0) {
++      sprintf(tempstr_space,"%s%s",
++	      r->arg1,Darray_get(tag_array_key,count2));
++      if (Registry_get(lexicon_hash,(char *)tempstr_space) != NULL
++	  ||
++	  (EXTRAWDS &&
++	   Registry_get(wordlist_hash,(char *)tempstr_space) != NULL)) {
++
++	change_the_tag_darray(tag_array_val,count2,r->new);}
++    }
++    else if (strcmp(name,"addsuf") == 0) {
++      sprintf(tempstr_space,"%s%s",
++	      Darray_get(tag_array_key,count2),
++	      r->arg1);
++      if (Registry_get(lexicon_hash,(char *)tempstr_space) != NULL
++	  ||
++	  (EXTRAWDS &&
++	   Registry_get(wordlist_hash,(char *)tempstr_space) != NULL)){
++
++	change_the_tag_darray(tag_array_val,count2,r->new);}
++    }
++    else if (strcmp(name,"goodleft") == 0) {
++      sprintf(bigram_space,"%s %s",
++	      Darray_get(tag_array_key,count2),r->arg1);
++      if (Registry_get(bigram_hash,(char *)bigram_space) != NULL) {
++	
++	change_the_tag_darray(tag_array_val,count2,r->new);}
++    }
++    else if (strcmp(name,"goodright") == 0) {
++      sprintf(bigram_space,"%s %s",r->arg1,Darray_get(tag_array_key,count2));
++      if (Registry_get(bigram_hash,(char *)bigram_space) != NULL) {
++
++	change_the_tag_darray(tag_array_val,count2,r->new);}
++    }
++  }
++}
+--- /dev/null	2004-06-24 13:04:38.000000000 -0500
++++ ./Utils/rules.h	2004-12-31 15:43:06.000000000 -0600
+@@ -0,0 +1,42 @@
++
++#ifndef _RULES_H_
++#define _RULES_H_
++
++#include "darray.h"
++#include "registry.h"
++
++typedef struct {
++  char *old;
++  char *new;
++  char *when;
++  char *arg1;
++  char *arg2;
++} trans_rule;
++
++trans_rule *parse_lexical_rule (const char *rule_text);
++
++trans_rule *parse_contextual_rule (const char *rule_text);
++
++void rule_destroy(trans_rule *r);
++
++void change_the_tag(char **theentry, char *thetag, int theposition);
++
++void apply_lexical_rule(const trans_rule *r,
++			Darray tag_array_key,
++			Darray tag_array_val,
++			Registry lexicon_hash,
++			Registry wordlist_hash,
++			Registry bigram_hash,
++			int EXTRAWDS
++		       );
++
++void apply_contextual_rule(const trans_rule *r,
++			   char **word_corpus_array,
++			   char **tag_corpus_array,
++			   int corpus_size,
++			   int RESTRICT_MOVE,
++			   Registry WORDS,
++			   Registry SEENTAGGING
++			  );
++
++#endif  /* _RULES_H_ */

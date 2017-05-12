@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml package="fontenc" options="T1"?>
+<?latexml package="textcomp"?>
+<?latexml package="inputenc" options="latin2"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <section refnum="1" xml:id="S1">
+    <title><tag close=" ">1</tag>Input encoding latin2</title>
+    <para xml:id="S1.p1">
+      <tabular class="ltx_guessed_headers" vattach="middle">
+        <thead>
+          <tr>
+            <td border="r" thead="column row"/>
+            <td align="center" thead="column">0</td>
+            <td align="center" thead="column">1</td>
+            <td align="center" thead="column">2</td>
+            <td align="center" thead="column">3</td>
+            <td align="center" thead="column">4</td>
+            <td align="center" thead="column">5</td>
+            <td align="center" thead="column">6</td>
+            <td align="center" thead="column">7</td>
+            <td align="center" thead="column">8</td>
+            <td align="center" thead="column">9</td>
+            <td align="center" thead="column">A</td>
+            <td align="center" thead="column">B</td>
+            <td align="center" thead="column">C</td>
+            <td align="center" thead="column">D</td>
+            <td align="center" thead="column">E</td>
+            <td align="center" thead="column">F</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td align="left" border="r t" thead="row">Ax</td>
+            <td border="t"/>
+            <td align="center" border="t">Ą</td>
+            <td align="center" border="t">˘</td>
+            <td align="center" border="t">Ł</td>
+            <td align="center" border="t">¤</td>
+            <td align="center" border="t">Ľ</td>
+            <td align="center" border="t">Ś</td>
+            <td align="center" border="t">§</td>
+            <td align="center" border="t">¨</td>
+            <td align="center" border="t">Š</td>
+            <td align="center" border="t">Ş</td>
+            <td align="center" border="t">Ť</td>
+            <td align="center" border="t">Ź</td>
+            <td border="t"/>
+            <td align="center" border="t">Ž</td>
+            <td align="center" border="t">Ż</td>
+          </tr>
+          <tr>
+            <td align="left" border="r" thead="row">Bx</td>
+            <td align="center">°</td>
+            <td align="center">ą</td>
+            <td align="center">˛</td>
+            <td align="center">ł</td>
+            <td align="center">´</td>
+            <td align="center">ľ</td>
+            <td align="center">ś</td>
+            <td align="center">ˇ</td>
+            <td align="center">¸</td>
+            <td align="center">š</td>
+            <td align="center">ş</td>
+            <td align="center">ť</td>
+            <td align="center">ź</td>
+            <td align="center">˝</td>
+            <td align="center">ž</td>
+            <td align="center">ż</td>
+          </tr>
+          <tr>
+            <td align="left" border="r" thead="row">Cx</td>
+            <td align="center">Ŕ</td>
+            <td align="center">Á</td>
+            <td align="center">Â</td>
+            <td align="center">Ă</td>
+            <td align="center">Ä</td>
+            <td align="center">Ĺ</td>
+            <td align="center">Ć</td>
+            <td align="center">Ç</td>
+            <td align="center">Č</td>
+            <td align="center">É</td>
+            <td align="center">Ę</td>
+            <td align="center">Ë</td>
+            <td align="center">Ě</td>
+            <td align="center">Í</td>
+            <td align="center">Î</td>
+            <td align="center">Ď</td>
+          </tr>
+          <tr>
+            <td align="left" border="r" thead="row">Dx</td>
+            <td align="center">Đ</td>
+            <td align="center">Ń</td>
+            <td align="center">Ň</td>
+            <td align="center">Ó</td>
+            <td align="center">Ô</td>
+            <td align="center">Ő</td>
+            <td align="center">Ö</td>
+            <td align="center"><Math mode="inline" tex="\times" text="*" xml:id="S1.p1.m1">
+                <XMath>
+                  <XMTok meaning="times" role="MULOP">×</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center">Ř</td>
+            <td align="center">Ů</td>
+            <td align="center">Ú</td>
+            <td align="center">Ű</td>
+            <td align="center">Ü</td>
+            <td align="center">Ý</td>
+            <td align="center">Ţ</td>
+            <td align="center">ß</td>
+          </tr>
+          <tr>
+            <td align="left" border="r" thead="row">Ex</td>
+            <td align="center">ŕ</td>
+            <td align="center">á</td>
+            <td align="center">â</td>
+            <td align="center">ă</td>
+            <td align="center">ä</td>
+            <td align="center">ĺ</td>
+            <td align="center">ć</td>
+            <td align="center">ç</td>
+            <td align="center">č</td>
+            <td align="center">é</td>
+            <td align="center">ę</td>
+            <td align="center">ë</td>
+            <td align="center">ě</td>
+            <td align="center">í</td>
+            <td align="center">î</td>
+            <td align="center">ď</td>
+          </tr>
+          <tr>
+            <td align="left" border="r" thead="row">Fx</td>
+            <td align="center">đ</td>
+            <td align="center">ń</td>
+            <td align="center">ň</td>
+            <td align="center">ó</td>
+            <td align="center">ô</td>
+            <td align="center">ő</td>
+            <td align="center">ö</td>
+            <td align="center"><Math mode="inline" tex="\div" text="/" xml:id="S1.p1.m2">
+                <XMath>
+                  <XMTok meaning="divide" name="div" role="MULOP">÷</XMTok>
+                </XMath>
+              </Math></td>
+            <td align="center">ř</td>
+            <td align="center">ů</td>
+            <td align="center">ú</td>
+            <td align="center">ű</td>
+            <td align="center">ü</td>
+            <td align="center">ý</td>
+            <td align="center">ţ</td>
+            <td align="center">˙</td>
+          </tr>
+        </tbody>
+      </tabular>
+    </para>
+  </section>
+</document>

@@ -1,0 +1,31 @@
+define a [new TConnection "uma.base.de.dados" "user" "pass"]
+
+$a commit
+
+$a connect "AH ETAL"
+
+define b1 [$a prepare "ola"]
+define b2 [$a prepareCall "ola"]
+$a rollback
+$a autocommit true
+
+define stat [$a statement]
+
+define a1 [$stat execute "select * from xotas"]
+define a2 [$stat getFetchSize]
+define a3 [$stat getMoreResults]
+define a4 [$stat getResultSet]
+$stat setFetchSize 3
+define a6 [$stat update "ah e tal update * coiso"]
+
+
+define rSet [$stat query "Select * from xotas"]
+
+while {$rSet next} {
+    echo [$rSet getString 1]
+}
+
+$rSet close
+
+$stat close
+$a close

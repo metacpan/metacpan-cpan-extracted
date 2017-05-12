@@ -1,0 +1,23 @@
+Log::Log4perl::Appender::Spread
+Uses spread as an appender for Log4perl
+
+See the POD for further documentation.
+
+Install the usual way:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or, if you've got Module::Build installed:
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+Copyright (c) 2004 Jesper Dalberg. All rights reserved.
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

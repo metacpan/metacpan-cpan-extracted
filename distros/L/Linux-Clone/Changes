@@ -1,0 +1,9 @@
+Revision history for Perl extension Linux::Clone
+
+1.0   Wed Aug 24 05:33:54 CEST 2016
+	- add setns (untested).
+        - add CLONE_NEWCGROUP and update documentation for newer kernels.
+
+0.01  Mon Nov 28 02:12:50 CET 2011
+	- cloned from Convert::Scalar.
+

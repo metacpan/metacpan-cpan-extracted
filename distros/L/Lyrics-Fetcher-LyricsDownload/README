@@ -1,0 +1,42 @@
+Lyrics-Fetcher-LyricsDownload README
+====================================
+
+Lyrics::Fetcher::LyricsDownload fetches lyrics from lyricsdownload.com.
+
+It is intended to be used as a fetcher by Lyrics::Fetcher, but
+can be used on its own if you desire.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Encode
+   HTML::Entities
+   HTML::TokeParser
+   LWP::Simple
+  
+Calling Lyrics::Fetcher::LyricsDownload via Lyrics::Fetcher->fetch() is
+recommended, but you can call Lyrics::Fetcher::LyricsDownload->fetch() directly
+if you want to do so.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Rick Blevins
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+AUTHOR
+
+Written by Rick Blevins <rick816us@comcast.net>

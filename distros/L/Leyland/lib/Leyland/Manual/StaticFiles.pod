@@ -1,0 +1,112 @@
+=head1 NAME
+
+Leyland::Manual::StaticFiles - How to serve static files from your application
+
+=head1 STATIC FILES
+
+Pretty much every web application has static files, i.e. files which are
+not generated dynamically. These are mostly CSS, JavaScript, images,
+videos, etc.
+
+How to serve static files from your application depends on the way you
+run the application and your personal preferences. During development and
+testing, when you're most likely to run your application by simply using
+C<plackup>, and the easiest way to serve static files would be to let the
+L<Static|Plack::Middleware::Static> middleware provided with L<Plack> do
+it. Simply add the following to the C<builder> section of C<app.psgi> (or
+create that section if it doesn't already exist):
+
+	use Plack::Builder;
+
+	... rest of app.psgi ...
+	my $app = MyLeylandApp->new->to_app;
+	... rest of app.psgi ...
+
+	builder {
+		enable 'Static',
+			path => qr{^/((images|js|css)/|favicon\.ico$|apple-touch-icon\.png$)},
+			root => './public/';
+		$app;
+	};
+
+In C<builder>, we enable L<Plack::Middleware::Static>, and tell it to serve
+any requests to paths that start with "images", "js" or "css" (plus the
+files "favicon.ico" and "apple-touch-icon.png") from the "public/" directory
+of your application.
+
+There are other Plack middlewares for serving static files. Some are more suitable
+for production/deployment environments, such as L<Plack::App::MCCS>.
+
+When deploying your application, it is likely that you will run
+the application behind a frontend webserver like Apache, nginx, lighttpd
+or Cherokee. If so, you might find it better to let them serve the static
+files of your application. I will not go into detail how to perform this,
+as every web server is configured differently. If you are doing this, then
+you don't need the static middleware.
+
+A good option when doing this, however, is enabling the Static middleware
+only when running on the "development" environment (or if not running
+on the "deployment" environment), like so:
+
+	builder {
+		enable_if { $ENV{PLACK_ENV} eq 'development' } 'Static',
+			path => qr{^/((images|js|css)/|favicon\.ico$|apple-touch-icon\.png$)},
+			root => './public/';
+	}
+
+And that's pretty much it.
+
+=head1 WHAT'S NEXT?
+
+Read L<Leyland::Manual::Localization> to learn how to localize your applications
+or L<return to the table of contents|Leyland::Manual/"TABLE OF CONTENTS">.
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Leyland at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Leyland::Manual::StaticFiles
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Leyland>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Leyland>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Leyland/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

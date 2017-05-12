@@ -1,0 +1,89 @@
+!% ! CZECH: Comprehensive Z-machine Emulation CHecker
+!%
+!! Tests that don't require user interaction
+!! (OK, choosing input/output filenames once might be required.)
+!! It allows you to test most of the Z-machine functionality without
+!! lots of typing.
+!! The point here is to give users a quick test they can run over & over
+!! again after making small changes to a growing interpreter.
+!!
+!! Amir Karger
+!! See README.txt for license. (Basically, use/copy/modify, but be nice.)
+
+Include "test_harness.h";
+Include "no_inter.h";
+
+! Name of input file to (tell user to) use
+Constant INFILE "big_test.in";
+
+! ----------------------------------------------------------------------
+! MAIN calls a bunch of subs. Each one runs a set of related tests.
+!---------------------- MAIN
+
+[ Main use_input_file use_output_streams;
+
+   start_test();
+   Testnum++; Print_Tests++; ! Perl wants first test to be 1
+   @print "1..476^";
+   @print "Testing only non-interactive functionality.^";
+
+   pt();
+   @print "^print works or you wouldn't be seeing this.^^";
+
+!   Standard = 0->50;
+!   if(0->50 || 0->51)
+!      print "Standard ", 0->50, ".", 0->51, " ";
+!   print "interpreter ", 0->30, (char) 0->31;
+
+   ! Now test sets of functionality.
+   ! Argument of 1 means do tests, 0 means DON'T do the tests
+   ! Note that there may be stack ops,e.g., in the arithmetic test, and
+   ! those won't get skipped just because you call test_stack with '0'.
+   ! MOST tests in earlier subs won't
+   ! depend on functionality tested in later subs, but simple
+   ! jump, stack, call, print functionality is needed for almost all tests.
+   test_jumps(1); @print "^";
+   test_variables(1); @print "^";
+   test_arithmetic(1); @print "^";
+   test_logical(1); @print "^";
+   test_memory(1); @print "^";
+   test_subroutines(1); @print "^";
+   test_objects(1); @print "^";
+   test_indirect(1); @print "^";
+   test_misc(1); @print "^";
+
+   ! Set to zero to require user to type (e.g., if input_stream doesn't work).
+   ! Usually interactive typing should happen in interact.inf, though.
+   use_input_file = 1;
+   @jz use_input_file ?no_i_f1;
+   print "^Opening input stream ";
+   print "(Use input file ";
+   @print_paddr INFILE;
+   print ")";
+   @input_stream 1;
+   .no_i_f1;
+
+   ! Set to zero to not use output streams 2 & 4
+   use_output_streams = 0;
+   test_open_output_streams(use_output_streams); @print "^";
+   test_non_interactive_read(1); @print "^";
+   test_close_output_streams(use_output_streams); @print "^";
+
+   ! Close the input file if you opened it
+   @jz use_input_file ?no_i_f2;
+   @input_stream 0;
+   .no_i_f2;
+
+   ! Print statistics
+   Testnum--; Print_Tests--; ! Fix munging above: Perl wants first test to be 1
+   end_test();
+
+   print "Didn't crash: hooray!^";
+   print "Last test: quit!^";
+   @quit;
+   .bad_quit;
+   print "Quit didn't work!^";
+   rtrue;
+];
+
+! vim: tw=78 sw=3

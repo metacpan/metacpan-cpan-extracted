@@ -1,0 +1,19 @@
+---
+name: Lingua-EN-Contraction
+version: 0.104
+author:
+  - 'Russ Graham <RWG@cpan.org>'
+abstract: Contractions for English sentances
+license: perl
+build_requires:
+  Test::More: 0
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Lingua::EN::Contraction:
+    file: lib/Lingua/EN/Contraction.pm
+    version: 0.104
+resources:
+  license: http://dev.perl.org/licenses/

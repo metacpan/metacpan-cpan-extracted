@@ -1,0 +1,146 @@
+Revision history for Perl module Log::Reproducible
+
+0.12.4 2016-01-26
+
+  - Fix test that fails on windows machines and hangs elsewhere
+
+0.12.3 2016-01-25
+
+  - Improve tests
+  - Add badges to README
+  - Add table of contents to README
+  - Update Travis-CI configuration with Perl versions up to 5.22
+  - Add copyright and license information
+  - Configure bumpversion
+
+0.12.2 2016-01-25
+
+  - Improve tests
+
+0.12.1 2014-10-16
+
+  - Log when an archive is reproduced
+  - Fix perlr's notes w/ spaces bug
+  - Force short multi-line notes to span lines
+  - Use Travis-CI and Coveralls.io
+  - Use external version of first_index(), since no longer dependency-free
+
+0.12.0 2014-06-18
+
+  - Make Windows-friendly (at least Win7 w/ Strawberry Perl 5.18.2 & Git 1.9.4 via CMD)
+  - Fix bug associated with Perl versions before 5.14 (introduced in 0.11.0)
+
+0.11.2 2014-06-17
+
+  - Spring cleaning
+
+0.11.1 2014-06-17
+
+  - Fix issue causing some tests to fail (at least on Ubuntu 12.04 LTS)
+
+0.11.0 2014-06-16
+
+  - Create archive files in YAML format
+
+0.10.0 2014-05-12
+
+  - Archive versions of loaded Perl modules
+
+0.9.2 2014-05-12
+
+  - Add incrementing suffix to archive file if filename exists
+
+0.9.1 2014-05-10
+
+  - Add standalone 'perlr' for running scripts that don't use Log::Reproducible
+  - Add placeholder for future note if repronote not defined
+
+0.9.0 2014-04-21
+
+  - Summarize differences between archived and current conditions when reproducing
+  - Update how divider message works
+
+0.8.2 2014-04-20
+
+  - Check for known conflicting modules (e.g., ones that touch @ARGV upon import) loaded before Log::Reproducible
+  - Check for potentially conflicting modules (e.g., ones that use @ARGV somehow) loaded before Log::Reproducible. Thanks to Ken Cotterill for his great code to accomplish this!
+
+0.8.1 2014-04-13
+
+  - Fix regular expression bugs
+
+0.8.0 2014-04-13
+
+  - Enable customization of command line options
+  - Add more tests (and generate test coverage data)
+  - Access `@ARGV` and `$dir` via refs
+
+0.7.3 2014-04-04
+
+  - Update 'Future Directions' in README
+
+0.7.2 2014-04-04
+
+  - Major refactor, including how current and archived info is stored/accessed
+  - Fixed bug that resulted in 'uninitialized value' warning when reproducing
+
+0.7.1 2014-04-02
+
+  - Update README to include new features
+
+0.7.0 2014-04-02
+
+  - Archive Exit Code, Finished Date/Time, and Elapsed Time
+  - Auto-generate README from POD only if Pod::Markdown is installed
+  - Move and reformat divider line in archive
+  - Fix script path
+
+0.6.0 2014-03-30
+
+  - Implement use of Module::Build
+  - Archive Log::Reproducible version
+
+0.5.1 2014-03-29
+
+  - Archive environmental variables (%ENV)
+  - Make compatible with Perl v5.8.X
+
+0.5.0 2014-03-28
+
+  - Prompt user to continue if inconsistencies found when reproducing
+  - Add warnings to new archive
+
+0.4.1 2014-03-25
+
+  - Update README with Perl-related info and comparisons
+
+0.4.0 2014-03-25
+
+  - Add Perl info to archive. Thanks to David Cantrell for his improvements on this!
+  - Compare archived vs current Perl/git info
+
+0.3.0 2014-03-24
+
+  - Archive/reproduce at import
+
+0.2.1 2014-03-21
+
+  - Update README
+
+0.2.0 2014-03-21
+
+  [Add archive comments]
+    - Custom Note
+    - Date/Time
+    - Working/Script Directories
+    - Git Repo Info
+
+0.1.1 2014-03-11
+
+  - Add tests
+  - Fix issue when CLI option is multiple words surrounded by quotes
+
+0.1.0 2014-03-07
+
+  - Easily archive and reproduce Perl-based analyses
+

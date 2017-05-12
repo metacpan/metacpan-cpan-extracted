@@ -1,0 +1,55 @@
+- Only apply LAST definition of a particular mapping.  This could be 
+  determined by keeping track of positions of mapping declarations as in
+  a preorder traversal, done in stage 3 of parsing.
+
+- Somehow we need to speed up the application of mappings. Instead of
+  recurring through the entire tree, can't we just make USED_COMMANDS contain
+  at each entry a "postings list" of where in the tree the command occurs?
+
+  CAVEAT: if we do this, we'd have to also update these postings lists each
+  time a mapping is applied, because we're making new subtrees with new
+  commands being exercised.
+
+  On the bright side, if this is properly executed, we could get massive
+  speedups on applying the mappings (for n mappings, we'd remove n full tree
+  traversals!)
+
+- Normalize TEXT nodes on all splits (adjacent TEXT nodes should be combined)
+
+- Have linked-list stuff maintained as the parsing proceeds.
+
+- Add interface to brace matching in parser (and make sure it works).
+
+- Add environment boundary matching, with interface.
+
+- Perhaps remove array-based tree representation entirely.
+
+- Add file names to parser errors, so we know which included files are being
+  complained about.
+
+- Add another parsing stage to pull group nodes that are part of multi-group
+  commands into a single "parameter" list.  This would be kind of analogous
+  to the "attributes" list of an XML node.
+
+  This will require information about all built-in commands (though we might
+  be able to get away with grabbing all GROUPs until we hit non-whitespace
+  TEXT nodes.)
+
+- Parse all commands into COMMAND nodes, not just ones that have groups as
+  children.  This is more for consistency than structural usefulness.
+
+  This would fairly radically effect later parsing stages.
+
+  Note that currently some commands will appear in the results of getting all
+  TEXT nodes.  This doesn't really make sense; the semantics of unrecognized
+  commands is not that they are plain text.
+
+- In a group, embedded commands go from the embedded location to the end of
+  the group boundary.  So for each embedded command we should really be
+  splitting the text of the group, and making the right half a child of the
+  command, and the left half a previous sibling.   Currently the parser just
+  makes the entire group a child of the command, which is wrong (but not
+  likely to be encountered due to convention).
+
+- Should we be treating square-braces ([]) as groups, analogously to what we
+  do for curly braces?  Read up on the full semantics of the square braces.

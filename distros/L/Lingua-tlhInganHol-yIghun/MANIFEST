@@ -1,0 +1,16 @@
+Build.PL
+Changes
+examples/conj.pl
+examples/eratosthenes.pl
+examples/misc.pl
+examples/sub.pl
+examples/unary.pl
+lib/Lingua/tlhInganHol/yIghun.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/'ol.t
+t/00.load.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

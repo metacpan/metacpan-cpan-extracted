@@ -1,0 +1,92 @@
+--- /var/www/labyrinth/Plugin-Album/fadeslideshow-2.4.js	Sun Oct 20 17:22:33 2013
++++ /var/www/labyrinth/Plugin-Album/fadeslideshow-2.4.modified.js	Sun Oct 20 17:23:16 2013
+@@ -7,8 +7,10 @@
+ //Oct 6th, 09' (v2.1): Adds option to randomize display order of images, via new option displaymode.randomize
+ //May 24th, 10' (v2.4): Adds new "peakaboo" option to "descreveal" setting. oninit and onslide event handlers added.
+ 
++// 2013-10-19: Adapted by Barbie to include a displaymode.delay setting to delay the initial image change. Used to stagger multiple slideshows on a page.
++
+ var fadeSlideShow_descpanel={
+-	controls: [['x.png',7,7], ['restore.png',10,11], ['loading.gif',54,55]], //full URL and dimensions of close, restore, and loading images
++	controls: [['x.png',7,7], ['restore.png',10,11], ['/images/lightbox/loading.gif',54,55]], //full URL and dimensions of close, restore, and loading images
+ 	fontStyle: 'normal 11px Verdana', //font style for text descriptions
+ 	slidespeed: 200 //speed of description panel animation (in millisec)
+ }
+@@ -21,6 +23,7 @@
+ 	this.setting=settingarg
+ 	settingarg=null
+ 	var setting=this.setting
++	setting.displaymode.delay=setting.displaymode.delay? parseInt(setting.displaymode.delay) : 0
+ 	setting.fadeduration=setting.fadeduration? parseInt(setting.fadeduration) : 500
+ 	setting.curimage=(setting.persist)? fadeSlideShow.routines.getCookie("gallery-"+setting.wrapperid) : 0
+ 	setting.curimage=setting.curimage || 0 //account for curimage being null if cookie is empty
+@@ -45,13 +48,13 @@
+ 	jQuery(document).ready(function($){ //fire on DOM ready
+ 		var setting=slideshow.setting
+ 		var fullhtml=fadeSlideShow.routines.getFullHTML(setting.imagearray) //get full HTML of entire slideshow
+-		setting.$wrapperdiv=$('#'+setting.wrapperid).css({position:'relative', visibility:'visible', background:'black', overflow:'hidden', width:setting.dimensions[0], height:setting.dimensions[1]}).empty() //main slideshow DIV
++		setting.$wrapperdiv=$('#'+setting.wrapperid).css({position:'relative', visibility:'visible', background:'white', overflow:'hidden', width:setting.dimensions[0], height:setting.dimensions[1]}).empty() //main slideshow DIV
+ 		if (setting.$wrapperdiv.length==0){ //if no wrapper DIV found
+ 			alert("Error: DIV with ID \""+setting.wrapperid+"\" not found on page.")
+ 			return
+ 		}
+ 		setting.$gallerylayers=$('<div class="gallerylayer"></div><div class="gallerylayer"></div>') //two stacked DIVs to display the actual slide 
+-			.css({position:'absolute', left:0, top:0, width:'100%', height:'100%', background:'black'})
++			.css({position:'absolute', left:0, top:0, width:'100%', height:'100%', background:'white'})
+ 			.appendTo(setting.$wrapperdiv)
+ 		var $loadingimg=$('<img src="'+fadeSlideShow_descpanel.controls[2][0]+'" style="position:absolute;width:'+fadeSlideShow_descpanel.controls[2][1]+';height:'+fadeSlideShow_descpanel.controls[2][2]+'" />')
+ 			.css({left:setting.dimensions[0]/2-fadeSlideShow_descpanel.controls[2][1]/2, top:setting.dimensions[1]/2-fadeSlideShow_descpanel.controls[2][2]}) //center loading gif
+@@ -142,7 +145,7 @@
+ 			clearTimeout(setting.hidedesctimer) //clear hide desc panel timer
+ 			slideshow.showhidedescpanel('hide', 0) //and hide it immediately
+ 		}
+-		setting.$gallerylayers.eq(setting.bglayer).css({zIndex:1000, opacity:0}) //background layer becomes foreground
++		setting.$gallerylayers.eq(setting.bglayer).css({zIndex:10, opacity:0}) //background layer becomes foreground
+ 			.stop().css({opacity:0}).animate({opacity:1}, setting.fadeduration, function(){ //Callback function after fade animation is complete:
+ 				clearTimeout(setting.playtimer)
+ 				try{
+@@ -157,10 +160,11 @@
+ 				setting.currentstep+=1
+ 				if (setting.displaymode.type=="auto"){
+ 					if (setting.currentstep<=setting.totalsteps || setting.displaymode.cycles==0)
+-						setting.playtimer=setTimeout(function(){slideshow.showslide('next')}, setting.displaymode.pause)
++						setting.playtimer=setTimeout(function(){slideshow.showslide('next')}, setting.displaymode.pause + setting.displaymode.delay)
++            setting.displaymode.delay = 0;
+ 				}
+ 			}) //end callback function
+-		setting.$gallerylayers.eq(setting.fglayer).css({zIndex:999}) //foreground layer becomes background
++		setting.$gallerylayers.eq(setting.fglayer).css({zIndex:-1}) //foreground layer becomes background
+ 		setting.fglayer=setting.bglayer
+ 		setting.bglayer=(setting.bglayer==0)? 1 : 0
+ 		setting.curimage=imgindex
+@@ -210,8 +214,6 @@
+ 				setting.$next.find('img:eq(0)').css({opacity:(setting.curimage==setting.imagearray.length-1)? 0.4 : 1})
+ 			}
+ 	}
+-
+-	
+ }
+ 
+ fadeSlideShow.routines={
+@@ -236,7 +238,7 @@
+ 			.appendTo(setting.$wrapperdiv)
+ 		$('<div class="descpanelbg"></div><div class="descpanelfg"></div>') //create inner nav panel DIVs
+ 			.css({position:'absolute', left:0, top:0, width:setting.$descpanel.width()-8, padding:'4px'})
+-			.eq(0).css({background:'black', opacity:0.7}).end() //"descpanelbg" div
++			.eq(0).css({background:'white', opacity:0.7}).end() //"descpanelbg" div
+ 			.eq(1).css({color:'white'}).html(setting.closebutton + setting.longestdesc).end() //"descpanelfg" div
+ 			.appendTo(setting.$descpanel)
+ 		setting.$descinner=setting.$descpanel.find('div.descpanelfg')
+@@ -245,11 +247,8 @@
+ 		if (setting.descreveal=="always"){ //create restore button
+ 			setting.$restorebutton=$('<img class="restore" title="Restore Description" src="' + fadeSlideShow_descpanel.controls[1][0] +'" style="position:absolute;visibility:hidden;right:0;bottom:0;z-index:1002;width:'+fadeSlideShow_descpanel.controls[1][1]+'px;height:'+fadeSlideShow_descpanel.controls[1][2]+'px;cursor:pointer;cursor:hand" />')
+ 				.appendTo(setting.$wrapperdiv)
+-
+-
+ 		}
+ 	},
+-
+ 
+ 	getCookie:function(Name){ 
+ 		var re=new RegExp(Name+"=[^;]+", "i"); //construct RE to search for target name/value pair
+

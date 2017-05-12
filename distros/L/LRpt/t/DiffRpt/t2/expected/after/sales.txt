@@ -1,0 +1,2 @@
+sonum	stor_id	ponum	sdate
+11	7896	AA123	2012-99-20

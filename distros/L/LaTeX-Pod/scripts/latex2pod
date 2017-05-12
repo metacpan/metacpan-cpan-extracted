@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config no_ignore_case);
+use LaTeX::Pod;
+
+{
+    my $args = parse_switches();
+    convert($args);
+}
+
+sub parse_switches
+{
+    my %opts;
+    GetOptions(\%opts, 'h','V') or usage();
+
+    usage()   if $opts{h};
+    version() if $opts{V};
+
+    usage() unless defined $ARGV[0];
+
+    return { file => $ARGV[0] };
+}
+
+sub usage
+{
+    print <<USAGE;
+Usage: $0 [switches] file
+  -h    this help screen
+  -V    print version
+USAGE
+    exit;
+}
+
+sub version
+{
+    print "  LaTeX::Pod $LaTeX::Pod::VERSION\n";
+    exit;
+}
+
+sub convert
+{
+    my $parser = LaTeX::Pod->new($_[0]->{file});
+    print $parser->convert;
+}
+
+=head1 NAME
+
+ latex2pod - frontend to LaTeX::Pod
+
+=head1 SYNOPSIS
+
+ Usage: latex2pod [switches] file
+   -h    this help screen
+   -V    print version
+
+=head1 AUTHOR
+
+Steven Schubiger <schubiger@cpan.org>
+
+=head1 LICENSE
+
+This program is free software; you may redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<http://dev.perl.org/licenses/>
+
+=cut

@@ -1,0 +1,40 @@
+I believe Language::Basic's installation is pretty darn standard, so most
+folks shouldn't have to read most of the following.
+
+    tar zvxf Language::Basic-*.*.gz
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The last two steps are optional.
+
+--------------------------------------------------------------------------------
+
+Please let me know if "make test" fails.  If you'd like to  be really helpful, 
+try something like:
+
+	make test TEST_VERBOSE=1 TEST_FILES="t/foo.t t/bar.t"
+
+This will run just the given test script(s) and print out the BASIC program it
+ran, the expected output, and the output it received, for each failed test.
+Language::Basic ought to be platform-independent, but if it's not, the
+output you get could be very helpful in fixing the problem.
+
+--------------------------------------------------------------------------------
+
+If you want to run scripts before doing a make install, try something like:
+
+    perl -Iblib/lib blib/script/basic.pl foo.bas
+
+If you want to write a program that uses Language::Basic without installing
+it, add the following line to the script:
+
+    use lib qw (blib/lib)
+
+If the program you're writing isn't in the Language-Basic-?.? directory, it may
+look like one of these (depending on the version number, user name, etc.)
+
+    use lib qw (/home/lwall/favorites/Language-Basic-1.44)
+or
+    use lib qw (foo/bar/Language-Basic-3.17)

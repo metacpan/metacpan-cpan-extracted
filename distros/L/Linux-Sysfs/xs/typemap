@@ -1,0 +1,81 @@
+TYPEMAP
+struct sysfs_attribute* T_SYSFS_ATTR
+struct sysfs_driver* T_SYSFS_DRIVER
+struct sysfs_module* T_SYSFS_MODULE
+struct sysfs_device* T_SYSFS_DEVICE
+struct sysfs_class* T_SYSFS_CLASS
+struct sysfs_class_device* T_SYSFS_CLASS_DEVICE
+struct sysfs_bus* T_SYSFS_BUS
+
+OUTPUT
+T_SYSFS_ATTR
+	if ($var == NULL) {
+		$arg = &PL_sv_undef;
+	} else {
+		$arg = perl_sysfs_new_sv_from_ptr($var, \"Linux::Sysfs::Attribute\");
+	}
+
+T_SYSFS_DRIVER
+	if ($var == NULL) {
+		$arg = &PL_sv_undef;
+	} else {
+		$arg = perl_sysfs_new_sv_from_ptr($var, \"Linux::Sysfs::Driver\");
+	}
+
+T_SYSFS_MODULE
+	if ($var == NULL) {
+		$arg = &PL_sv_undef;
+	} else {
+		$arg = perl_sysfs_new_sv_from_ptr($var, \"Linux::Sysfs::Module\");
+	}
+
+T_SYSFS_DEVICE
+	if ($var == NULL) {
+		$arg = &PL_sv_undef;
+	} else {
+		$arg = perl_sysfs_new_sv_from_ptr($var, \"Linux::Sysfs::Device\");
+	}
+
+T_SYSFS_CLASS
+	if ($var == NULL) {
+		$arg = &PL_sv_undef;
+	} else {
+		$arg = perl_sysfs_new_sv_from_ptr($var, \"Linux::Sysfs::Class\");
+	}
+
+T_SYSFS_CLASS_DEVICE
+	if ($var == NULL) {
+		$arg = &PL_sv_undef;
+	} else {
+		$arg = perl_sysfs_new_sv_from_ptr($var, \"Linux::Sysfs::ClassDevice\");
+	}
+
+T_SYSFS_BUS
+	if ($var == NULL) {
+		$arg = &PL_sv_undef;
+	} else {
+		$arg = perl_sysfs_new_sv_from_ptr($var, \"Linux::Sysfs::Bus\");
+	}
+
+
+INPUT
+T_SYSFS_ATTR
+	$var = ($type)perl_sysfs_get_ptr_from_sv($arg, \"Linux::Sysfs::Attribute\");
+
+T_SYSFS_DRIVER
+	$var = ($type)perl_sysfs_get_ptr_from_sv($arg, \"Linux::Sysfs::Driver\");
+
+T_SYSFS_MODULE
+	$var = ($type)perl_sysfs_get_ptr_from_sv($arg, \"Linux::Sysfs::Module\");
+
+T_SYSFS_DEVICE
+	$var = ($type)perl_sysfs_get_ptr_from_sv($arg, \"Linux::Sysfs::Device\");
+
+T_SYSFS_CLASS
+	$var = ($type)perl_sysfs_get_ptr_from_sv($arg, \"Linux::Sysfs::Class\");
+
+T_SYSFS_CLASS_DEVICE
+	$var = ($type)perl_sysfs_get_ptr_from_sv($arg, \"Linux::Sysfs::ClassDevice\");
+
+T_SYSFS_BUS
+	$var = ($type)perl_sysfs_get_ptr_from_sv($arg, \"Linux::Sysfs::Bus\");

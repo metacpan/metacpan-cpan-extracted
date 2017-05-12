@@ -1,0 +1,32 @@
+Release history for Perl module LWP::Online
+
+1.08 Fri  9 Jul 2011
+	- Updated to Module::Install::DSL 1.01
+	- Added the Microsoft NCSI URL to the list of sites probed
+
+1.07 Mon  7 Jul 2008
+	- More diag in 01_compile.t to catch what I think is a CPAN
+	  Testers with broken setups.
+
+1.06 Fri  4 Jul 2008
+	- Adding the :skip_all import flag
+	- Used a newer Module::Install 0.76 pre-release
+
+1.05 Fri  4 Jul 2008
+	- Switching to a stable version number
+	- Updating to Module::Install 0.76
+	- Localising $@ during evals
+	- Adding missing dependency on URI.pm
+
+0.04 Mon 14 Apr 2008
+	- Updating to Module::Install 0.71
+	- Adding a 30 second timeout per connection
+
+0.03 Tue 15 May 2007
+        - Adding the offline convenience function
+
+0.02 Mon 15 Jan 2007
+	- Fixing a small bug
+
+0.01 Sat 30 Sep 2006
+	- Created initial (fairly naive) implementation

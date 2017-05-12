@@ -1,0 +1,117 @@
+NAME
+    List::MapMulti - map through multiple arrays at once
+
+SYNOPSIS
+     use feature qw/say/;
+     use List::MapMulti qw/mapm/;
+ 
+     my @numbers = (2..10, qw/Jack Queen King Ace/);
+     my @suits   = qw/Clubs Diamonds Hearts Spades/;
+     my @cards   = mapm { "$_[0] of $_[1]" } \@numbers, \@suits;
+ 
+     say scalar(@cards);     # says '52'
+     say $cards[0];          # says '2 of Clubs'
+     say $cards[1];          # says '2 of Diamonds'
+     say $cards[-1];         # says 'Ace of Spades'
+
+DESCRIPTION
+    List::MapMulti provides shortcuts for looping through several lists in a
+    nested fashion. Think about all the times you've needed to do something
+    like:
+
+     foreach my $x (@exes) {
+       foreach my $y (@whys) {
+         # do something with $x and $y
+       }
+     }
+
+    There are two different solutions available to you: `map_multi` (which has
+    an alias `mapm`) and `iterator_multi`.
+
+    The only thing this module exports by default is `mapm`.
+
+  `map_multi { BLOCK } \@list1, \@list2 ...`
+    (Or `mapm`!)
+
+    Calls the codeblock with every possible combination of values from each
+    list. If you imagine it as calling within a set of nested loops, then the
+    final list is the innermost loop; and the first loop is the outermost
+    loop.
+
+    Note that within the codeblock, the items from each list are available as
+    $_[0], $_[1], etc. The $_ variable is set to a List::MapMulti::Iterator
+    object which is used internally by `map_multi`.
+
+    For the special (but common) case where you're just mapping over two
+    lists, $a and $b are aliased to $_[0] and $_[1]. You may need to do `our
+    ($a, $b)` to suppress warnings about variables being used only once.
+
+    `mapm` is exported by default, but `map_multi` needs to be requested
+    explicitly.
+
+  `iterator_multi(\@list1, \@list2, ...)`
+    This allows constructions like this:
+
+     my $iterator = iterator_multi(\@numbers, \@suits);
+     while (my ($number, $suit) = $iterator->())
+     {
+       say "$number of $suit";
+     }
+
+    Although `map_multi` is arguably a nicer syntax, the iterator provides you
+    with an important advantage: you don't have to iterate through every
+    possible combination. You can control flow using, say, `next`, `last` or
+    `redo`.
+
+  List::MapMulti::Iterator
+    This is advanced fu that you probably don't need to know about.
+
+    While iterators act like coderefs (you get the next set of values via
+    `$iterator->()`), internally they are blessed objects that overload `&{}`.
+    As they are objects, they are able to provide some methods.
+
+    These are the methods they provide:
+
+   `new(\@list1, \@list2, ...)`
+    Constructor. The `iterator_multi` function is just a shortcut for this.
+
+   `next`
+    Calling `$iterator->next` is exactly equivalent to calling
+    `$iterator->()`.
+
+   `current`
+    Returns the same thing as the previous call to `next` (unless the original
+    arrays have changed since then).
+
+    This can also be used as a setter, in which case it writes back to the
+    appropriate slots in the original arrays.
+
+   `next_indices`
+    Returns the array indices that will be used to read from the original
+    arrays next time `next` is called. Again, this can be used as a setter.
+
+   `current_indices`
+    Returns the array indices that was used to read from the original arrays
+    last time `next` was called.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=List-MapMulti>.
+
+SEE ALSO
+    List::Util, List::MoreUtils, List::Pairwise.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

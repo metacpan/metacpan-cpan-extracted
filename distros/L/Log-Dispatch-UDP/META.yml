@@ -1,0 +1,29 @@
+---
+abstract: 'Log messages to a remote UDP socket'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  IO::Select: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300007, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Dispatch-UDP
+requires:
+  IO::Socket::INET: 0
+  Log::Dispatch: 0
+  Readonly: 0
+  namespace::clean: 0
+  parent: 0
+  perl: 5.8.8
+resources:
+  bugtracker: https://github.com/hoelzro/log-dispatch-udp/issues
+  homepage: https://github.com/hoelzro/log-dispatch-udp
+  repository: https://github.com/hoelzro/log-dispatch-udp.git
+version: 0.01

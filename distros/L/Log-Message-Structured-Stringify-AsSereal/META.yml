@@ -1,0 +1,34 @@
+---
+abstract: "Sereal-encoded base64'ed log lines"
+author:
+  - "Damien \"dams\" Krotkine"
+build_requires:
+  Capture::Tiny: 0
+  Module::Build: 0.3601
+  Test::More: 0.88
+  Test::Most: 0
+  blib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Message-Structured-Stringify-AsSereal
+provides:
+  Log::Message::Structured::Stringify::AsSereal:
+    file: lib/Log/Message/Structured/Stringify/AsSereal.pm
+    version: 0.11
+requires:
+  Log::Message::Structured: 0.011
+  MIME::Base64: 0
+  Moo: 0
+  Sereal::Encoder: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: https://github.com/dams/log-message-structured-stringify-sereal/issues
+  repository: git://github.com/dams/log-message-structured-stringify-sereal.git
+version: 0.11

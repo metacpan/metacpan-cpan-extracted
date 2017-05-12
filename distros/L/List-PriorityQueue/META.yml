@@ -1,0 +1,17 @@
+---
+name: List-PriorityQueue
+version: 0.01
+author:
+  - 'Lars Stoltenow <penma.cpan@penma.de>'
+abstract: "high performance priority list (pure perl)"
+license: perl
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  List::PriorityQueue:
+    file: lib/List/PriorityQueue.pm
+    version: 0.01
+resources:
+  license: http://dev.perl.org/licenses/

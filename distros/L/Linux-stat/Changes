@@ -1,0 +1,11 @@
+Revision history for Perl extension Linux::stat.
+
+0.01  Sun Feb  3 17:41:54 2002
+	- original version; created by h2xs 1.20 with options
+		-X Linux::stat
+
+1.00  Tue Feb  5 3:19:04 2002
+	- implemented all planed functionality
+	- documentation
+	- one bug fix
+	- adapted for kernel 2.2.x

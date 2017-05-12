@@ -1,0 +1,181 @@
+#
+# TransFig makefile
+#
+
+all: affichage.tex analyseDefinis.tex AnalyseProgressive.tex analyseSSDefinis.tex chargementPatrons.tex chargementTAtt.tex ChercheIlots.tex ct.tex decoupage.tex endogenous.tex entreeLex.tex exogenous.tex foret.tex generalExtracteur.tex gnms.tex ilot.tex pat_decomp.tex PlaceInsert.tex SatureEtMAJ.tex TAtt.tex Yatea_Classes_Config.tex Yatea_Classes_Process.tex 
+
+# translation into pdf
+
+affichage.pdf: affichage.fig Makefile.in
+	fig2dev -L pdf affichage.fig affichage.pdf
+clean::
+	rm -f affichage.tex
+
+
+# translation into pdf
+
+analyseDefinis.pdf: analyseDefinis.fig Makefile.in
+	fig2dev -L pdf analyseDefinis.fig analyseDefinis.pdf
+clean::
+	rm -f analyseDefinis.tex
+
+
+# translation into pdf
+
+AnalyseProgressive.pdf: AnalyseProgressive.fig Makefile.in
+	fig2dev -L pdf AnalyseProgressive.fig AnalyseProgressive.pdf
+clean::
+	rm -f AnalyseProgressive.tex
+
+
+# translation into pdf
+
+analyseSSDefinis.pdf: analyseSSDefinis.fig Makefile.in
+	fig2dev -L pdf analyseSSDefinis.fig analyseSSDefinis.pdf
+clean::
+	rm -f analyseSSDefinis.tex
+
+
+# translation into pdf
+
+chargementPatrons.pdf: chargementPatrons.fig Makefile.in
+	fig2dev -L pdf chargementPatrons.fig chargementPatrons.pdf
+clean::
+	rm -f chargementPatrons.tex
+
+
+# translation into pdf
+
+chargementTAtt.pdf: chargementTAtt.fig Makefile.in
+	fig2dev -L pdf chargementTAtt.fig chargementTAtt.pdf
+clean::
+	rm -f chargementTAtt.tex
+
+
+# translation into pdf
+
+ChercheIlots.pdf: ChercheIlots.fig Makefile.in
+	fig2dev -L pdf ChercheIlots.fig ChercheIlots.pdf
+clean::
+	rm -f ChercheIlots.tex
+
+
+# translation into pdf
+
+ct.pdf: ct.fig Makefile.in
+	fig2dev -L pdf ct.fig ct.pdf
+clean::
+	rm -f ct.tex
+
+
+# translation into pdf
+
+decoupage.pdf: decoupage.fig Makefile.in
+	fig2dev -L pdf decoupage.fig decoupage.pdf
+clean::
+	rm -f decoupage.tex
+
+
+# translation into pdf
+
+endogenous.pdf: endogenous.fig Makefile.in
+	fig2dev -L pdf endogenous.fig endogenous.pdf
+clean::
+	rm -f endogenous.tex
+
+
+# translation into pdf
+
+entreeLex.pdf: entreeLex.fig Makefile.in
+	fig2dev -L pdf entreeLex.fig entreeLex.pdf
+clean::
+	rm -f entreeLex.tex
+
+
+# translation into pdf
+
+exogenous.pdf: exogenous.fig Makefile.in
+	fig2dev -L pdf exogenous.fig exogenous.pdf
+clean::
+	rm -f exogenous.tex
+
+
+# translation into pdf
+
+foret.pdf: foret.fig Makefile.in
+	fig2dev -L pdf foret.fig foret.pdf
+clean::
+	rm -f foret.tex
+
+
+# translation into pdf
+
+generalExtracteur.pdf: generalExtracteur.fig Makefile.in
+	fig2dev -L pdf generalExtracteur.fig generalExtracteur.pdf
+clean::
+	rm -f generalExtracteur.tex
+
+
+# translation into pdf
+
+gnms.pdf: gnms.fig Makefile.in
+	fig2dev -L pdf gnms.fig gnms.pdf
+clean::
+	rm -f gnms.tex
+
+
+# translation into pdf
+
+ilot.pdf: ilot.fig Makefile.in
+	fig2dev -L pdf ilot.fig ilot.pdf
+clean::
+	rm -f ilot.tex
+
+
+# translation into pdf
+
+pat_decomp.pdf: pat_decomp.fig Makefile.in
+	fig2dev -L pdf pat_decomp.fig pat_decomp.pdf
+clean::
+	rm -f pat_decomp.tex
+
+
+# translation into pdf
+
+PlaceInsert.pdf: PlaceInsert.fig Makefile.in
+	fig2dev -L pdf PlaceInsert.fig PlaceInsert.pdf
+clean::
+	rm -f PlaceInsert.tex
+
+
+# translation into pdf
+
+SatureEtMAJ.pdf: SatureEtMAJ.fig Makefile.in
+	fig2dev -L pdf SatureEtMAJ.fig SatureEtMAJ.pdf
+clean::
+	rm -f SatureEtMAJ.tex
+
+
+# translation into pdf
+
+TAtt.pdf: TAtt.fig Makefile.in
+	fig2dev -L pdf TAtt.fig TAtt.pdf
+clean::
+	rm -f TAtt.tex
+
+
+# translation into pdf
+
+Yatea_Classes_Config.pdf: Yatea_Classes_Config.fig Makefile.in
+	fig2dev -L pdf Yatea_Classes_Config.fig Yatea_Classes_Config.pdf
+clean::
+	rm -f Yatea_Classes_Config.tex
+
+
+# translation into pdf
+
+Yatea_Classes_Process.pdf: Yatea_Classes_Process.fig Makefile.in
+	fig2dev -L pdf Yatea_Classes_Process.fig Yatea_Classes_Process.pdf
+clean::
+	rm -f Yatea_Classes_Process.tex
+

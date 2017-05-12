@@ -1,0 +1,47 @@
+LaTeX-Encode
+============
+
+LaTeX::Encode exports the function 'latex_encode()' which encodes characters in a string, that
+would be incorrectly interpreted by LaTeX.
+
+Additional mappings can be added to the standard encoding table with the 'add_latex_encodings()'
+function, while encodings can be removed with the 'remove_latex_encodings()' function.  Additions
+and deletions can also be specified on the 'use' statement (e.g.: "use LaTeX::Encode add => { '@'
+=> 'AT' };".
+
+
+The 'latex_encode()' function takes a text string and an optional reference to a hash of options.
+The options currently supported are "exclude" to specify a list of characters that should not be
+encoded (often this is "\\{}" to allow LaTeX commands to be used in the text string), and
+"iquotes" to enable "intelligent quotes", that is double quotes around a phrase will be converted
+to "``" and "''" and single quotes to "`" and "'".
+
+Note that 'latex_encode()' will encode a utf8 string (a string with the utf8 flag set) or a
+non-utf8 string, which will normally be regarded as ISO-8859-1 (Latin 1) and will be upgraded to
+utf8.  If you are seeing spurious LaTeX commands in the output then it may be that you are reading
+from a UTF-8 input or have data with UTF-8 characters in a literal but the utf8 flag is not being
+set correctly.  Refer to the perlunicode, perluniintro and perlunitut manual pages for more details.
+
+
+The scripts directory contains scripts to help build the character encoding tables used by the
+module and to create and format a document listing the characters that the module encodes with
+their Unicode character value, HTML entity representation, LaTeX encoding and visual
+representation.  These scripts are not installed by "make install".
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2012, Andrew Ford <a.ford@ford-mason.co.uk>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

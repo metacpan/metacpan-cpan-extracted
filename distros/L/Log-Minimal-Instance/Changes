@@ -1,0 +1,19 @@
+Revision history for Perl extension Log::Minimal::Instance
+
+0.06 2014-07-29T06:21:30Z
+    - Fixed symlink with base_dir
+
+0.05 2014-07-29T04:57:39Z
+    - Supported all of File::Stamped options
+
+0.04 2014-07-02T06:43:58Z
+    - Fix to pass File::Stamped options
+
+0.03 2013-09-30T09:30:09Z
+    - Add File::Stamped options by @tmitz
+
+0.02 2013-09-27T09:30:14Z
+    - Add dependency by @syohex
+
+0.01 2013-09-27T08:57:24Z
+    - original version

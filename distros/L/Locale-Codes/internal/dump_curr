@@ -1,0 +1,59 @@
+#!/usr/bin/perl -w
+
+use lib "./lib";
+use YAML::Syck qw(DumpFile);
+use Locale::Codes::Constants;
+use Locale::Codes;
+use Locale::Codes::Country;
+use Locale::Codes::Language;
+use Locale::Codes::Currency;
+use Locale::Codes::Script;
+use Locale::Codes::LangExt;
+use Locale::Codes::LangVar;
+
+my @type = qw(country
+              currency
+              langext
+              langvar
+              language
+              script
+            );
+
+$yaml = "internal/curr.yaml";
+$prev = "internal/prev.yaml";
+
+if (-f $yaml) {
+   rename $yaml,$prev;
+}
+
+my %hash;
+
+foreach my $type (@type) {
+   my $obj = new Locale::Codes $type;
+   foreach my $codeset (keys %{ $Locale::Codes::Constants::ALL_CODESETS{$type}{'codesets'} }) {
+      my @codes = $obj->all_codes($codeset);
+      foreach my $code (@codes) {
+         my $name = $obj->code2name($code,$codeset);
+         $hash{$type}{$codeset}{'code'}{$code} = $name;
+      }
+
+      my @names = $obj->all_names($codeset);
+      foreach my $name (@names) {
+         my $code = $obj->name2code($name,$codeset);
+         $hash{$type}{$codeset}{'name'}{lc($name)} = [$code,$name];
+      }
+   }
+}
+
+DumpFile($yaml,\%hash);
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

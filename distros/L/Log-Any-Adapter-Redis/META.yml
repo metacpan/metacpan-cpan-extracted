@@ -1,0 +1,30 @@
+---
+abstract: 'Simple adapter for logging to redis'
+author:
+  - 'Michael Langner <mila@cpan.org>'
+build_requires:
+  Log::Any: '1.01'
+  Log::Any::Adapter: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Any-Adapter-Redis
+requires:
+  Log::Any: '1.01'
+  Log::Any::Adapter::Base: '0'
+  Log::Any::Adapter::Util: '0'
+  RedisDB: '0'
+  Sys::Hostname: '0'
+  base: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/cpan-mila/perl-log-any-adapter-redis.git
+version: '1.000'

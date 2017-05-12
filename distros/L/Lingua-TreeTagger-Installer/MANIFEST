@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Build.PL
+README
+lib/Lingua/TreeTagger/Installer.pm
+inc/MyBuilder.pm
+extrafiles/punctuaction-cutoff.mac
+extrafiles/separate-punctuation.mac
+META.yml
+META.json
+bin/tree-tagger-install-lang
+t/00-pod.t

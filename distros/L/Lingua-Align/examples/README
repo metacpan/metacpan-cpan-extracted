@@ -1,0 +1,13 @@
+
+This directory includes some example applications of Lingua::Align
+
+
+europarl ...... tree alignment of parsed Europarl data
+smultron ...... tree alignment using the SMULTRON treebank
+wpt03 ......... word alignment using data from WPT 2003
+test-scripts .. some test-scripts that demonstrate the usage of Lingua::Align
+                (they are not ready to run in the current distribution)
+
+
+Note that you need the SMULTRON corpus to run the examples in ./smultron/
+See http://www.cl.uzh.ch/kitt/smultron/

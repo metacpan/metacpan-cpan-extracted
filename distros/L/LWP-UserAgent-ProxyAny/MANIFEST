@@ -1,0 +1,8 @@
+Changes                 Change log
+Makefile.PL             Generate Makefile
+MANIFEST                This list of files
+META.yml                Module meta-data
+ProxyAny.pm             Extended LWP::UserAgent to support both HTTP_PROXY and IE proxy setting
+README                  Readme
+proj.kpf                Komodo project file
+t/00base.t              Test program

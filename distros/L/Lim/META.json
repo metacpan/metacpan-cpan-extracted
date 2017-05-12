@@ -1,0 +1,114 @@
+{
+   "abstract" : "Framework for RESTful JSON/XML, JSON-RPC, XML-RPC and SOAP",
+   "author" : [
+      "Jerry Lundström <lundstrom.jerry@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lim",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "AnyEvent" : "5",
+            "AnyEvent::RabbitMQ" : "1.15",
+            "Data::Dumper" : "2.124",
+            "Digest::SHA" : "5",
+            "Fcntl" : "1.06",
+            "File::Temp" : "0.2",
+            "Getopt::Long" : "2",
+            "HTTP::Request" : "5",
+            "HTTP::Response" : "5",
+            "HTTP::Status" : "5",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "JSON::XS" : "2",
+            "LWP::MediaTypes" : "5.822",
+            "Log::Dispatch::Syslog" : "1.18",
+            "Log::Log4perl" : "1",
+            "Log::Log4perl::Appender::Lim::CLI" : "0.12",
+            "Module::Find" : "0",
+            "Net::SSLeay" : "1.35",
+            "Pod::Usage" : "1",
+            "SOAP::Lite" : "0.71",
+            "SOAP::Transport::HTTP" : "0.71",
+            "Scalar::Util" : "1",
+            "Test::More" : "0",
+            "URI" : "1",
+            "URI::Escape" : "3.29",
+            "URI::Split" : "0",
+            "XMLRPC::Lite" : "0.71",
+            "XMLRPC::Transport::HTTP::Server" : "0.12",
+            "YAML::Any" : "0.7",
+            "common::sense" : "3"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "AnyEvent::ReadLine::Gnu" : "1",
+            "URI::Escape::XS" : "0.11"
+         },
+         "requires" : {
+            "AnyEvent" : "5",
+            "AnyEvent::RabbitMQ" : "1.15",
+            "DBI" : "1.612",
+            "Data::Dumper" : "2.124",
+            "Digest::SHA" : "5",
+            "Fcntl" : "1.06",
+            "File::Temp" : "0.2",
+            "Getopt::Long" : "2",
+            "HTTP::Request" : "5",
+            "HTTP::Response" : "5",
+            "HTTP::Status" : "5",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "JSON::XS" : "2",
+            "LWP::MediaTypes" : "5.822",
+            "Log::Dispatch::Syslog" : "1.18",
+            "Log::Log4perl" : "1",
+            "Log::Log4perl::Appender::Lim::CLI" : "0.12",
+            "Module::Find" : "0",
+            "Net::SSLeay" : "1.35",
+            "Pod::Usage" : "1",
+            "SOAP::Lite" : "0.71",
+            "SOAP::Transport::HTTP" : "0.71",
+            "Scalar::Util" : "1",
+            "URI" : "1",
+            "URI::Escape" : "3.29",
+            "URI::Split" : "0",
+            "XMLRPC::Lite" : "0.71",
+            "XMLRPC::Transport::HTTP::Server" : "0.12",
+            "YAML::Any" : "0.7",
+            "common::sense" : "3"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jelu/lim/issues"
+      },
+      "homepage" : "https://github.com/jelu/lim/wiki",
+      "repository" : {
+         "url" : "https://github.com/jelu/lim"
+      }
+   },
+   "version" : "0.20"
+}

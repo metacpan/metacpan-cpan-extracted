@@ -1,0 +1,2 @@
+l("moo")
+;ln("You have %d message"","You have %d messages",4);

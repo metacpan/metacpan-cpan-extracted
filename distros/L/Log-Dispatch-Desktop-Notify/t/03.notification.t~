@@ -1,0 +1,18 @@
+#!perl
+use Test::More tests => 2;
+
+BEGIN { require 't/mocks.pl' }
+
+BEGIN { use_ok( 'Log::Dispatch::Desktop::Notify' ) }
+
+subtest 'simple notification' => sub {
+    # given
+    my $obj = Log::Dispatch::Desktop::Notify->new( min_level => 'warning' );
+
+    # when
+    $obj->log( level => 'warning', message => 'TEST');
+
+    # then
+    is( $notify_mock->metrics->{create}, 1, 'create notification' );
+    is( $notification_mock->metrics->{show}, 1, 'show notification' );
+};

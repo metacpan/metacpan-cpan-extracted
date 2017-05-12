@@ -1,0 +1,21 @@
+Changes
+lib/Lexical/Failure.pm
+lib/Lexical/Failure/Objects.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/aliased.t
+t/context.t
+t/default.t
+t/error_runtime_setter.t
+t/extras.t
+t/implicit_croak.t
+t/inner_scalar.t
+t/simple.t
+tlib/AliasModule.pm
+tlib/DefaultModule.pm
+tlib/ExtrasModule.pm
+tlib/SetterErrorModule.pm
+tlib/TestModule.pm
+META.yml                                 Module meta-data (added by MakeMaker)

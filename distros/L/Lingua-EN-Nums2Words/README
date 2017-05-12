@@ -1,0 +1,23 @@
+Module: Lingua::EN::Nums2Words
+Author: Lester H. Hightower, Jr. <hightowe@cpan.org>
+
+This is a module for perl that computes English verbage from numerical values.
+
+To install this module. Make sure you are in the directory that this README
+file is in and type:
+
+        perl Makefile.PL	# to build the Makefile
+	make test		# to test the module before installing
+        make install		# to install the module
+
+After installation, you should be able to "man Lingua::EN::Nums2Words" which
+will get you to usage information for the module.  The man page should be
+placed somewhere like /usr/local/lib/perl5/man/man3/Lingua::EN::Nums2Words.3
+and if not you should be able to "pod2man Nums2Words.pl > Nums2Words.3" and
+then do "man ./Nums2Words.3" to view the man page.  The script test.pl also
+fully demonstrates the module's functionality.
+
+License:
+ As of version 1.13, this software is licensed under the OSI certified
+ Artistic License, one of the licenses of Perl itself.
+ http://en.wikipedia.org/wiki/Artistic_License

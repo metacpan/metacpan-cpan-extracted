@@ -1,0 +1,26 @@
+package Logfile::EPrints::Filter::Foo;
+
+use strict;
+use warnings;
+
+use Carp;
+
+sub new
+{
+	my( $class, %args ) = @_;
+	Carp::croak("Requires handler argument") unless $args{ handler };
+	Carp::croak("Requires fromdate argument") unless $args{ fromdate };
+	bless \%args, ref($class) || $class;
+}
+
+sub hit
+{
+	my( $self, $hit ) = @_;
+	
+	if( $hit->datetime > $self->{ fromdate } )
+	{
+		$self->{ handler }->hit( $hit );
+	}
+}
+
+1;

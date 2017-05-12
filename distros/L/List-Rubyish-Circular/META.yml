@@ -1,0 +1,29 @@
+---
+abstract: 'A circular list implementation based on'
+author:
+  - 'Kentaro Kuribayashi <kentarok@gmail.com>'
+  - 'Kentaro Kuribayashi, <kentarok@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: List-Rubyish-Circular
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  parent: List::Rubyish
+  perl: 5.8.1
+resources:
+  bugtracker: http://github.com/kentaro/list-rubyish-circular/issues
+  license: http://opensource.org/licenses/mit-license.php
+  repository: http://github.com/kentaro/list-rubyish-circular
+version: 0.04

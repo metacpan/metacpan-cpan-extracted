@@ -1,0 +1,30 @@
+---
+abstract: 'Linux SIOCETHTOOL ioctl interface'
+author:
+  - 'Daniel Collins <solemnwarning@solemnwarning.net>'
+build_requires:
+  ExtUtils::CBuilder: 0
+  ExtUtils::H2PM: 0.03
+  Module::Build: 0.2806
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Linux-Ethtool
+provides:
+  Linux::Ethtool:
+    file: lib/Linux/Ethtool.pm
+    version: 0.11
+  Linux::Ethtool::Settings:
+    file: lib/Linux/Ethtool/Settings.pm
+    version: 0.11
+  Linux::Ethtool::WOL:
+    file: lib/Linux/Ethtool/WOL.pm
+    version: 0.11
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.11

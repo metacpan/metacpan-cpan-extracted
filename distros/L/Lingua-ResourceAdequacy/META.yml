@@ -1,0 +1,25 @@
+---
+name: Lingua-ResourceAdequacy
+version: 0.1
+author:
+  - 'Thierry Hamon <thierry.hamon@lipn.univ-paris13.fr>'
+abstract: Measures to estimate the adequacy of a terminology given a text
+license: gpl
+resources:
+  license: http://www.opensource.org/licenses/gpl-license.php
+requires:
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  Test::Simple: 0
+  perl: 5.005
+build_requires:
+  Module::Build: 0.28
+provides:
+  Lingua::ResourceAdequacy:
+    file: lib/Lingua/ResourceAdequacy.pm
+    version: 0.1
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

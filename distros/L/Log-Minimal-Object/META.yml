@@ -1,0 +1,39 @@
+---
+abstract: 'Provides the OOP interface of Log::Minimal'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Minimal-Object
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Log::Minimal::Object:
+    file: lib/Log/Minimal/Object.pm
+    version: '0.02'
+requires:
+  Log::Minimal: '0.18'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/moznion/Log-Minimal-Object/issues
+  homepage: https://github.com/moznion/Log-Minimal-Object
+  repository: git://github.com/moznion/Log-Minimal-Object.git
+version: '0.02'
+x_authority: cpan:MOZNION

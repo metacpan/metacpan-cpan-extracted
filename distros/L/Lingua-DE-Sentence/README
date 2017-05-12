@@ -1,0 +1,45 @@
+Lingua/DE/Sentence version 0.07
+==============================
+
+NAME
+
+Lingua::DE::Sentence is a module for splitting german text into sentences.
+
+DESCRIPTION
+
+The module recognizes many, many rules. 
+For normal german texts, the results should be, what you expect.
+It's implemented to run very fast.
+
+This module tries to use a german locale setting.
+It tries to set the locale on a POSIX OS to de_DE.
+Neither on a non POSIX OS, neither you have installed german language locales,
+the module won't function.
+
+Look at the POD-Documentation for further, known BUGS.
+
+INSTALLATION
+
+You can it install in the usual way:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Please contact me for bugs or suggestions:
+andrea_holsten@yahoo.de
+
+(You should also have a look to Lingua::EN::Sentence)
+Hope you enjoin it.
+
+COPYRIGHT AND LICENSE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2001 Andrea Holsten
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+

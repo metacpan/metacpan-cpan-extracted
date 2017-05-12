@@ -1,0 +1,25 @@
+Changes
+example/01_constants.pl
+example/02_join_split.pl
+example/03_extract_header.pl
+javascript/Locale/TextDomain/OO/Util/Constants.js
+javascript/Locale/TextDomain/OO/Util/JoinSplitLexiconKeys.js
+lib/Locale/TextDomain/OO/Util.pm
+lib/Locale/TextDomain/OO/Util/Constants.pm
+lib/Locale/TextDomain/OO/Util/ExtractHeader.pm
+lib/Locale/TextDomain/OO/Util/JavaScript.pm
+lib/Locale/TextDomain/OO/Util/JoinSplitLexiconKeys.pm
+MANIFEST			This list of files
+README
+t/01_constants.t
+t/02_join_split.t
+t/03_extract_header.t
+t/11_test_examples.t
+t/chars.t
+t/perl_critic.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_build.t
+Makefile.PL
+META.yml
+META.json

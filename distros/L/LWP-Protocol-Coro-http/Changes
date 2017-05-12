@@ -1,0 +1,37 @@
+Revision history for LWP-Protocol-Coro-http
+
+1.8.0   2013-08-05
+        - Imitate LWP::Protocol::http's removal of newlines from request headers.
+        - Handle user:pass in request urls and proxy urls.
+
+1.0.7   2012-11-10
+        - Implement LWP::Protocol::https's ssl peer verification.
+
+1.0.6   2012-11-04
+        - Imitate Net::HTTP's removal of newlines from response headers.
+
+1.0.5   2012-04-25
+        - Some test files were missing from MANIFEST.
+
+1.0.4   2012-04-25
+        - Preserve AnyEvent::HTTP pseudo heads by prefixing with X-AE-
+        - Fix duplicate headers in response
+        - Add proxy support
+        - Prevent AnyEvent::HTTP adding Referer header with the request URL
+
+1.0.3   2011-06-17
+        - Skip tests that will fail due to DNS hijacking.
+
+1.0.2   2011-06-13
+        - Tests added.
+        - Fixed bugs in :content_cb features.
+
+1.0.1   2011-03-29
+        - Lots of bug fixes didn't make it into 1.0.0.
+        - Improved Synopsis.
+
+1.0.0   2011-03-28
+        Initial public version
+
+-----   2010-10-10
+        Initial version

@@ -1,0 +1,26 @@
+Lustre-LFS version 0.01
+========================
+
+This module provides replacements for IO::File
+and IO::Handle with integrated 'get_stripe' and 'set_stripe'
+support. (Well: Actually this module does not replace the
+IO::* modules, it just inherits from them :-) )
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by <adrian.ulrich@id.ethz.ch>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

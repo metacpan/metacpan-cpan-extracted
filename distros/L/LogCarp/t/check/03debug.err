@@ -1,0 +1,3 @@
+[Wed Aug 12 02:08:22 1998]  17118 03debug.t ERR: WARNING: This goes to DEBUG too - DEBUGLEVEL=2 at t/03debug.t line 52.
+[Wed Aug 12 02:08:22 1998]  17118 03debug.t ERR: WARNING: This goes to DEBUG too - DEBUGLEVEL=1 at t/03debug.t line 60.
+[Wed Aug 12 02:08:22 1998]  17118 03debug.t ERR: WARNING: This goes to DEBUG too - DEBUGLEVEL=0 at t/03debug.t line 67.

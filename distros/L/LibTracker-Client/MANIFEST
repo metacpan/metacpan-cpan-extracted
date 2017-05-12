@@ -1,0 +1,22 @@
+Changes
+Client.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+README.testing
+TODO
+const-c.inc
+const-xs.inc
+t/00-LibTracker-Client.t
+t/01-names_types.t
+t/02-properties.t
+t/03-metadata.t
+t/04-meta_typedetails.t
+t/05-tags.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/LibTracker/Client.pm
+lib/LibTracker/Client/MetaDataTypeDetails.pm
+inc/Devel/CheckLib.pm
+META.yml                                 Module meta-data (added by MakeMaker)

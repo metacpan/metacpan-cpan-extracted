@@ -1,0 +1,10 @@
+<sect1 id="sec-ST">
+<title><literal>ST</literal><IndexTerm><Primary>ST</Primary></IndexTerm> </Title>
+
+  <para>The contents of this module can now be found in
+  <ulink
+  url="../base/Control.Monad.ST.html"><literal>Control.Monad.ST</literal></ulink>,
+  <ulink url="../base/Data.STRef.html"><literal>Data.STRef</literal></ulink>,
+  and <ulink url="../base/Data.Array.ST.html"><literal>Data.Array.ST</literal></ulink> in the hierarchical
+  libraries.</para>
+</sect1>

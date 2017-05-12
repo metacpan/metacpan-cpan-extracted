@@ -1,0 +1,27 @@
+---
+name: Lingua-tlhInganHol-yIghun
+version: 20090601
+author:
+  - 'Damian Conway <dconway@cpan.org>'
+  - 'Michael G Schwern <schwern@pobox.com>'
+abstract: '"The Klingon Language: hey you, program in it!"'
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-tlhInganHol-yIghun
+  homepage: http://search.cpan.org/dist/Lingua-tlhInganHol-yIghun
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/schwern/lingua-tlhinganhol-yighun/tree/master
+requires:
+  Filter::Simple: 0.84
+  perl: 5.8.1
+build_requires:
+  Test::Harness: 3
+  Test::More: 0.47
+provides:
+  Lingua::tlhInganHol::yIghun:
+    file: lib/Lingua/tlhInganHol/yIghun.pm
+    version: 20090601
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

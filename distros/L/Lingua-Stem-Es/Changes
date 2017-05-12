@@ -1,0 +1,17 @@
+Revision history for Perl extension Lingua::Stem::Es.
+
+0.03  Sun Mar 9, 2008
+    - Rewrote /(ucines|ución)$/ RegExp as /uci(ones|ón)$/ to avoid
+      bug in Perl 5.10.0 related to regexps not working properly when
+      encoding of string is different to that of the program source.
+    - Test suite now includes a file encoded in iso-8859-15 to test for
+      this bug; the module was encoded as UTF-8 since version 0.02.
+0.02  Thu Mar 7, 2008
+    - Added use warnings
+    - Changed encoding from iso-8859-15 to UTF-8
+    - Added use utf8
+
+0.01  Sun Feb 10 11:40:52 2008
+	- original version; created by h2xs 1.23 with options
+		-AX --use-new-tests -n Lingua::Stem::Es
+

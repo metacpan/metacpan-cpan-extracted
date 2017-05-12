@@ -1,0 +1,194 @@
+NAME
+    Lingua::Align::Trees - Perl modules implementing a discriminative tree
+    aligner
+
+SYNOPSIS
+      use Lingua::Align::Trees;
+
+      my $treealigner = new Lingua::Align::Trees(
+
+        -features => 'inside2:outside2',  # features to be used
+
+        -classifier => 'megam',           # classifier used
+        -megam => '/path/to/megam',       # path to learner (megam)
+
+        -classifier_weight_sure => 3,     # training: weight for sure links
+        -classifier_weight_possible => 1, # training: weight for possible
+        -classifier_weight_negative => 1, # training: weight for non-linked
+        -keep_training_data => 1,         # don't remove feature file
+
+        -same_types_only => 1,            # link only T-T and nonT-nonT
+        #  -nonterminals_only => 1,       # link non-terminals only
+        #  -terminals_only => 1,          # link terminals only
+        -skip_unary => 1,                 # skip nodes with unary production
+
+        -linked_children => 1,            # add first-order dependency
+        -linked_subtree => 1,             # (children or all subtree nodes)
+        # -linked_parent => 0,            # dependency on parent links
+
+        # lexical prob's (src2trg & trg2src)
+        -lexe2f => 'moses/model/lex.0-0.e2f',
+        -lexf2e => 'moses/model/lex.0-0.f2e',
+
+        # for the GIZA++ word alignment features
+        -gizaA3_e2f => 'moses/giza.src-trg/src-trg.A3.final.gz',
+        -gizaA3_f2e => 'moses/giza.trg-src/trg-src.A3.final.gz',
+
+        # for the Moses word alignment features
+        -moses_align => 'moses/model/aligned.intersect',
+
+        -lex_lower => 1,                  # always convert to lower case!
+        -min_score => 0.2,                # classification score threshold
+        -verbose => 1,                    # verbose output
+      );
+
+
+      # corpus to be used for training (and testing)
+      # default input format is the 
+      # Stockholm Tree Aligner format (STA)
+
+      my %corpus = (
+          -alignfile => 'Alignments_SMULTRON_Sophies_World_SV_EN.xml',
+          -type => 'STA');
+
+      #----------------------------------------------------------------
+      # train a model on the first 20 sentences 
+      # and save it into "treealign.megam"
+      #----------------------------------------------------------------
+
+      $treealigner->train(\%corpus,'treealign.megam',20);
+
+      #----------------------------------------------------------------
+      # skip the first 20 sentences (used for training) 
+      # and align the following 10 tree pairs 
+      # with the model stored in "treealign.megam"
+      # alignment search heuristics = greedy
+      #----------------------------------------------------------------
+
+      $treealigner->align(\%corpus,'treealign.megam','greedy',10,20);
+
+DESCRIPTION
+    This module implements a discriminative tree aligner based on binary
+    classification. Alignment features are extracted for each candidate node
+    pair to be used in a standard binary classifier. As a default we use a
+    MaxEnt learner using a log-linerar combination of features. Feature
+    weights are learned from a tree aligned training corpus.
+
+  Link search heuristics
+    For alignment we actually use the conditional probability scores and
+    link search heuristics (3rd argumnt in "align" method). The default
+    strategy is a threshold based alignment which simply aligns all nodes
+    whose score is above a certain threshold (default=0.5). This is
+    equivalent to using the local classifier without any additional
+    alignment inference step. Other alignment inference strategies include
+    greedy best-first one-to-one alignment (greedy) with additional
+    wellformedness constraints (GreedyWellformed) or greedy source-to-target
+    alignment strategies (src2trg). Another approach is to view tree
+    alignment in terms of standard assignment problems and to use the
+    "Hungarian method" implemented by the Kuhn-Munkres algorithm for
+    alignment inference (munkres). There are many other possibilities for
+    alignment inference. For more information look at
+    Lingua::Align::LinkSearch.
+
+  External resources for feature extraction
+    Certain features require external resources. For example for lexical
+    equivalence feature we need word alignments and lexical probabilities
+    (see "-lexe2f", "-lexf2e", "-gizaA3_e2f", "-gizaA3_f2e", "-moses_align"
+    attributes). Note that you have to specify the character encoding if you
+    use input that is not in Unicode UTF-8 (for example specify the encoding
+    for "-lexe2f" with the flag "-lexe2f_encoding" in the constructor).
+    Remember also to set the flag "-lex_lower" if your word alignments are
+    done on a lower cased corpus (all strings will be converted to lower
+    case before matching them with the probabilistic lexicon)
+
+    Note: Word alignments are read one by one from the given files! Make
+    sure that they match the trees that will be aligned. They have to be in
+    the same order. Important: If you use the "skip" parameters reading word
+    alignments will NOT be effected. Word alignment features for the first
+    tree pair to be aligned will still be taken from the first word
+    alignment in the given file! However, if you use the same object
+    instance of Lingua::Align::Trees than the read pointer will not be moved
+    (back to the beginning) after training! That means training with the
+    first N tree pairs and aligning the following M tree pairs after
+    skipping N sentences is fine!
+
+    The feature settings will be saved together with the model file. Hence,
+    for aligning features do not have to be specified in the constructor of
+    the tree aligner object. They will be read from the model file and the
+    tree aligner will use them automatically when extracting features for
+    alignment.
+
+    One exeption are link dependency features. These features are not
+    specified as the other features because they are not directly extracted
+    from the data when aligning. They are based on previous alignment
+    decisions (scores) and, therefore, also influence the alignment
+    algorithm. Link dependency features are enabled by including appropriate
+    flags in the constructor of the tree aligner object.
+
+    "-linked_children"
+        ... adds a dependency on the average of the link scores for all
+        (direct) child nodes of the current node pair. In training link
+        scores are 1 for all linked nodes in the training data and 0 for
+        non-linked nodes. In alignment the link prediction scores are used.
+        In order to make this possible alignment will be done in a bottom-up
+        fashion starting at the leaf nodes.
+
+    "-linked_subtree"
+        ... adds a dependency on the average of link scores for all
+        descendents of the current node pair (all nodes in the subtrees
+        dominated by the current nodes). It works in the same way as the
+        "-linked_children" feature and may also be combined with that
+        feature
+
+    "-linked_parent"
+        ... adds a dependency on the link score of the immediate parent
+        nodes. This causes the alignment procedure to run in a top-down
+        fashion starting at the root nodes of the trees to be aligned.
+        Hence, it cannot be combined with the previous two link dependency
+        features as the alignment strategy conflicts with this one!
+
+    "-linked_neighbors"
+        ... adds a dependency on the link score of a neigboring node pair.
+        Alignment should be done left-to-right if you use left neighbors and
+        right-to-left for right neighbor dependencies (which is not
+        implemented yet). This is still a bit experimental ... use with
+        care!
+
+    Note that the use of link dependency features is not stored together
+    with the model. Therefore, you always have to specify these flags even
+    in the alignment mode if you want to use them and the model is trained
+    with these features!
+
+Example feature settings
+    A very simple example:
+
+      inside4:outside4:inside4*outside4
+
+    This will use 3 features: inside4, outside4 and the combined (product)
+    of inside4 and outside4. A more complex example:
+
+      nrleafsratio:inside4:outside4:insideST2:inside4*parent_inside4:treelevelsim*inside4:giza:parent_catpos:moses:moseslink:sister_giza.catpos:parent_parent_giza
+
+    In the example above there are some contextual features such as
+    "parent_catpos" and "sister_giza". Note that you can also define
+    recursive contexts such as in "parent_parent_giza". Combinations of
+    features can be defined as described earlier. The product of two
+    features is specified with '*' and the concatenation of a feature with a
+    binary feature type such as "catpos" is specified with '.'. (The example
+    above is not intended to show the best setting to be used. It's only
+    shown for explanatory reasons.)
+
+SEE ALSO
+    For a descriptions of features that can be used see
+    Lingua::Align::Features.
+
+AUTHOR
+    Joerg Tiedemann, <jorg.tiedemann@lingfil.uu.se>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Joerg Tiedemann
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

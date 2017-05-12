@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+README.md
+README.pod
+t/List-Prefixed.t
+t/List-Prefixed_large.t
+t/data/modulenames.gz
+t/data/modulenames.sh
+t/data/modulenames_List.gz
+lib/List/Prefixed.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

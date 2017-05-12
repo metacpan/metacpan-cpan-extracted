@@ -1,0 +1,25 @@
+Changes
+doc/AuthorizationHeader.html.en
+doc/Generic4a.html.en
+doc/Generic4a2.html.en
+doc/index.html
+doc/index.html.en
+doc/index.pod
+doc/MatrixPolicy.html.en
+doc/Memsession.html.en
+doc/RewriteHTML.html.en
+lib/Lemonldap/Handlers/AuthorizationHeader.pm
+lib/Lemonldap/Handlers/BasicHeader.pm
+lib/Lemonldap/Handlers/Core.pm
+lib/Lemonldap/Handlers/Generic.pm
+lib/Lemonldap/Handlers/Generic4a2.pm
+lib/Lemonldap/Handlers/MatrixPolicy.pm
+lib/Lemonldap/Handlers/Memsession.pm
+lib/Lemonldap/Handlers/Nobase64.pm
+lib/Lemonldap/Handlers/RewriteHTML.pm
+lib/Lemonldap/Handlers/RowPolicy.pm
+lib/Lemonldap/Handlers/Utilities.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README

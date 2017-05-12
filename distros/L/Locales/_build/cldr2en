@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+use lib '_build';
+use _locales_build_utils;
+
+my ( $cldr_db_path, $locales_db, $manifest ) = _locales_build_utils::init_paths_from_argv();
+
+File::Path::Tiny::rm($locales_db) || die "Could not remove '$locales_db': $!";
+File::Path::Tiny::mk($locales_db) || die "Could not create '$locales_db': $!";
+
+unlink $manifest;
+die "Could not clear '$manifest': $!" if -e $manifest;
+
+chdir $locales_db || die "Could not change into '$locales_db': $!";
+
+unlink glob('../../../t/042.*.t');
+unlink glob('../../../share/*/*');
+
+for my $type qw(Language Territory) {
+    File::Path::Tiny::mk($type) || die "Could not create '$type': $!";
+}
+
+my @root = _locales_build_utils::get_target_structs_from_cldr_for_tag( 'root', {}, {}, {} );
+
+my ( $lang_code_to_name, $lang_name_to_code, $lang_misc_info, $terr_code_to_name, $terr_name_to_code ) = _locales_build_utils::get_target_structs_from_cldr_for_tag( 'en', @root[ 0, 3, 2 ] ) or die "Could not get data for 'en'";
+
+_locales_build_utils::write_language_module( 'en', $lang_code_to_name, $lang_name_to_code, $lang_misc_info );
+
+_locales_build_utils::write_territory_module( 'en', $terr_code_to_name, $terr_name_to_code );
+
+_locales_build_utils::write_locale_test('en');
+
+_locales_build_utils::write_get_plural_form_test('en');

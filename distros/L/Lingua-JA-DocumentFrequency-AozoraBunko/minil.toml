@@ -1,0 +1,6 @@
+name = "Lingua-JA-DocumentFrequency-AozoraBunko"
+# badges = ["travis"]
+authority="cpan:PAWAPAWA"
+
+module_maker="ModuleBuildTiny"
+

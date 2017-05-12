@@ -1,0 +1,663 @@
+# -*- perl -*-
+
+#=============================================================================
+# dot_lwrc -- a sample rc (config) file for LibWeb
+#
+# Copyright (C) 2000  Colin Kong
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#=============================================================================
+
+# $Id: dot_lwrc,v 1.6 2000/07/18 06:33:30 ckyc Exp $
+
+# Configuration for LibWeb.
+#
+# Adjust these fields to suit your site's needs accordingly.
+# New ones may be added.
+#
+# Note the trailing slash for all paths and urls.
+#
+return {#DO NOT REMOVE THIS CURLY BRACKET.
+
+ #####################################################
+ # Security, encryption & digest variables.          #
+ #####################################################
+ CLASSIC_EXPIRES => 'Thu, 01-Jan-1970 00:00:01 GMT', # DO NOT EDIT.
+ # PLEASE PLEASE change these variables periodically.
+ RAND_RANGE => 123456789,
+ MAC_KEY => '12345abcde',
+ CIPHER_KEY => '12345abcde',
+ DIGEST_KEY => '12345abcde',
+ CIPHER_ALGORITHM => 'Crypt::Blowfish',
+ DIGEST_ALGORITHM => 'Digest::SHA1',
+ CIPHER_FORMAT => 'HEX',
+ DIGEST_FORMAT => 'B64',
+
+ #####################################################
+ # Debug/fatal messages mailing & logging variables. #
+ #####################################################       
+ DEBUG => 0,
+ FATAL_LOG => '/home/foo/libweb.log',
+ IS_MAIL_DEBUG_TO_ADMIN => 1,
+ SMTP => ['localhost'],
+ MAIL_PROGRAM => '/usr/sbin/sendmail -t -oi',
+ ADMIN_EMAIL => 'foo@your_domain.org',
+ 
+ #####################################################
+ # User administration variables.                    #
+ #####################################################
+ IS_NOTIFY_ADMIN_WHEN_ADDED_NEW_USER => 1,
+ IS_ALLOW_MULTI_REGISTRATION => 0,
+ MAX_LOGIN_ATTEMPT_ALLOWED => 5,  # This MUST be < LOGIN_INDICATOR
+ LOGIN_INDICATOR => 9,
+ LOGIN_DURATION_ALLOWED => 14400, # 4 hours (since there are 3600 sec/hr)
+ 
+ #####################################################
+ # SQL database variables.                           # 
+ #####################################################
+ #DB_NAME => 'database_name',                        # Reserved constant.
+ IS_DB_ENABLED => 0,
+ DB_SOURCE => 'DBI:mysql:database_name',
+ DB_LOGIN => 'database_login',
+ DB_PASS => 'database_password',
+ DB_OPTIONS => {RaiseError => 1, AutoCommit => 1},
+ USER_PROFILE_TABLE => 'USER_PROFILE',
+ USER_PROFILE_TABLE_UID => 'UID',
+ USER_PROFILE_TABLE_NAME => 'NAME',
+ USER_PROFILE_TABLE_PASS => 'PASS',
+ USER_PROFILE_TABLE_EMAIL => 'EMAIL',
+ USER_LOG_TABLE => 'USER_LOG',
+ USER_LOG_TABLE_UID => 'UID',
+ USER_LOG_TABLE_IP => 'IP',
+ USER_LOG_TABLE_HOST => 'HOST',
+ USER_LOG_TABLE_LAST_LOGIN => 'LAST_LOGIN',
+ USER_LOG_TABLE_NUM_LOGIN_ATTEMPT => 'NUM_LOGIN_ATTEMPT',
+ 
+ ####################################################
+ # Site's colors, theme and pix location.           #
+ ####################################################
+ SITE_1ST_COLOR => '#0099CC',  	# Light blue.
+ SITE_2ND_COLOR => '#006699',  	# Blue.
+ SITE_3RD_COLOR => '#003366',  	# Deep blue.
+ SITE_4TH_COLOR => '#FF9900',  	# Orange.
+ SITE_BG_COLOR => '#FFFFFF',   	# White.
+ SITE_TXT_COLOR => '#000000',  	# Black.
+ SITE_LIQUID_COLOR1 => '#E6E6E6',   # Lighter Grey.
+ SITE_LIQUID_COLOR2 => '#C9C9C9',   # Light Grey.
+ SITE_LIQUID_COLOR3 => '#9C9C9C',   # Grey.
+ SITE_LIQUID_COLOR4 => '#6E6E6E',   # Dark Grey.
+ SITE_LIQUID_COLOR5 => '#000000',   # Black.
+ PIX_URL => '/img/',
+ SITE_LOGO => '/img/logo.png',
+ 
+ #####################################################
+ # Misc. site's variables.                           #
+ #####################################################
+ DOC_ROOT => "$ENV{DOCUMENT_ROOT}/",    # DO NOT EDIT.
+ URL_ROOT => "http://$ENV{HTTP_HOST}/",	# DO NOT EDIT.
+ PRIVACY_POLICY => '/my_privacy_policy.htm',
+ TOS => '/my_terms.htm',
+ CSS => '/my_styles.css',
+ SITE_NAME => 'Your site name',
+ SITE_DESCRIPTION => 'Your_domain.org is a site for you to foo bar... ',
+ SITE_KEYWORDS => 'foo, bar',
+ SITE_YEAR => '1999, 2000',
+
+ #####################################################
+ # Site's common applications' url.                  #
+ #####################################################
+ LM_IN => '/cgi-bin/lm.cgi',
+ LM_OUT => '/cgi-bin/lm.cgi?.a=logout'
+ # DO NOT PUT A COMMA AFTER THE LAST ATTRIBUTE.
+
+};#DO NOT REMOVE THE CURLY BRACKET AND SEMI-COLON.
+
+1;
+__END__
+
+=head1 NAME
+
+dot_lwrc - Editing the run control file for LibWeb
+
+=head1 DESCRIPTION
+
+You want to edit this file, make it web inaccessible and chmod 600 it.
+This file contains security sensitive data for your site.
+
+=head2 Security, encryption and  digest variables
+
+These variables are used for preparing (i.e. when a user logs in),
+checking (i.e. session-wise) and nullifying (i.e. when a user logs
+out) authentication cookies.
+
+=over 4
+
+=item *
+
+CLASSIC_EXPIRES
+
+The default is C<'Thu, 01-Jan-1970 00:00:01 GMT'>.  This is used to
+nullify authentication cookie when a user logs out.  Any cookie set
+with this date will be canceled from the client's browser immediately.
+Do not edit this unless there is a compelling reason to do so.
+
+=item *
+
+RAND_RANGE
+
+The range from which to generate a pseudo-random number.  For example,
+if the range is C<999999999>, several places in LibWeb that makes use
+of pseudo-random number will use an integer that is randomly generated
+between 0 and 999999999.  The purpose is to have different web site
+with LibWeb installed to have different and less predictable behavior
+in several aspects.  Currently only used for generating the dummy
+authentication cookie (as of LibWeb-0.02).  It is also used in the
+sample login script (lm.cgi) to make things look complicated.
+
+=item *
+
+MAC_KEY
+
+HMAC is used for message integrity checks between two parties (in the
+case for LibWeb, the two parties referred here are your web site and a
+client web browser), and works in combination with some other Digest
+algorithm, usually MD5 or SHA-1.  The HMAC mechanism is described in
+RFC 2104.  MAC_KEY is the private key.  Further explanation is better
+left to the expert,
+
+  http://www.w3.org/Security/Faq/wwwsf7.html#Q66
+
+See also Digest::HMAC which is used by LibWeb::Digest and
+LibWeb::Session for preparing and checking authentication cookies.
+The proper size for this key is not well documented.
+
+=item *
+
+CIPHER_KEY
+
+You must provide an encryption/decryption key, which can be any series
+of characters of any length.  Internally, the actual key used is
+derived from the MD5 hash of the key you provide.  Read the man page
+for Crypt::CBC for details.  Blowfish is capable of strong encryption
+and can use key sizes up to 56 bytes (a 448 bit key).  You're
+encouraged to take advantage of the full key size to ensure the
+strongest encryption possible from that module (Crypt::Blowfish).
+
+=item *
+
+DIGEST_KEY
+
+This key is appended to the data from which a digest is to be
+generated.  The purpose is to have different web site with LibWeb
+installed to have different and less predictable behavior in several
+aspects of the authentication cookie.
+
+=item *
+
+CIPHER_ALGORITHM
+
+The cipher algorithm must be C<'Crypt::Blowfish'>, C<'Crypt::DES'> or
+C<'Crypt::IDEA'> as of LibWeb-0.01.
+
+=item *
+
+DIGEST_ALGORITHM
+
+The digest algorithm must be either C<'Digest::SHA1'> or
+C<'Digest::MD5'> as of LibWeb-0.01.
+
+=item *
+
+CIPHER_FORMAT
+
+It can be either C<'BINARY'> or C<'HEX'>.  You should use C<'HEX'> for
+the authentication cookie.
+
+=item *
+
+DIGEST_FORMAT
+
+It can be C<'HEX'>, C<'BINARY'> or C<'B64'>.  You should use C<'B64'>
+for the authentication cookie.
+
+=back
+
+=head2 Debug/fatal message mailing & logging variables
+
+=over 4
+
+=item *
+
+DEBUG
+
+If you want stack traces to be printed to the viewing browser whenever
+a LibWeb's fatal method is called, assign 1 to it and 0 otherwise.
+You turn this on/off depending on whether you are debugging your
+application.
+
+=item *
+
+FATAL_LOG (new in LibWeb-0.02)
+
+Absolute path to a log file which records all LibWeb's fatal calls.
+Assign C<undef> to this variable to disable logging.  You may want to
+turn this on if you have turned B<IS_MAIL_DEBUG_TO_ADMIN> off.
+
+=item *
+
+IS_MAIL_DEBUG_TO_ADMIN
+
+If you want stack traces to be sent to B<ADMIN_EMAIL> whenever a
+LibWeb's fatal method is called, assign 1 to it and 0 otherwise.  You
+may want to turn that off while you are debugging your application.
+
+=item *
+
+SMTP (new in LibWeb-0.02)
+
+If you have installed Mail::Sendmail (this is a mandatory
+pre-requisite for NT servers in order for LibWeb to work properly),
+LibWeb will first try to use this module to send mails before using
+the primitive UNIX sendmail (see B<MAIL_PROGRAM> below).  B<SMTP> is
+an ARRAY reference to a list of smtp servers, so if your main server
+is down, LibWeb tries the next one. If one of your servers uses a
+special port, add it to the server name with a colon in front, to
+override the default port (like in smtp.your.server:2525).  Defaults
+are localhost.  Leave this unedited and LibWeb will probably do the
+right thing for you, especially if your server is UNIX alike.
+
+=item *
+
+MAIL_PROGRAM
+
+For example, C<'/usr/sbin/sendmail -t -oi'>.  Leave this unedited if
+your server is NT.
+
+=item *
+
+ADMIN_EMAIL
+
+E-mail address of your site's administrator.
+
+=back
+
+=head2 Users administration variables 
+
+=over 4
+
+=item *
+
+IS_NOTIFY_ADMIN_WHEN_ADDED_NEW_USER
+
+Do you want an e-mail to be sent to your site's administrator when a
+user signs up as a member at our site? Put 1 for yes; 0 otherwise.
+
+=item *
+
+IS_ALLOW_MULTI_REGISTRATION
+
+Can one use the same e-mail address to sign up as different users?
+Put 1 for yes; 0 otherwise.
+
+=item *
+
+MAX_LOGIN_ATTEMPT_ALLOWED
+
+How many times do you allow incorrect password to be entered for an
+existing account?  Note that after that maximum is reached (LibWeb
+basically increments I<NUM_LOGIN_ATTEMPT> in the database for that
+account), anyone will be completely blocked out from logging in using
+that particular account even he/she enters the correct password.  This
+number must be smaller than B<LOGIN_INDICATOR>.  As of 0.01, you have
+to reset it to 0 manually in your database after you have received the
+alert e-mail sent by LibWeb.  Note that I<NUM_LOGIN_ATTEMPT> is a
+column of the B<USER_LOG_TABLE> table in the database.
+
+=item *
+
+LOGIN_INDICATOR
+
+I<NUM_LOGIN_ATTEMPT> is set to this value when a user successfully
+logs into her/his account.  Note that when I<NUM_LOGIN_ATTEMPT> is 0,
+it means that a user is not logged in, if it is any number from 1 to
+B<MAX_LOGIN_ATTEMPT_ALLOWED>, it means that there is/are unsuccessful
+attempts, and if this number is equal to B<LOGIN_INDICATOR>, it means
+that that user has successfully logged in.
+
+=item *
+
+LOGIN_DURATION_ALLOWED
+
+There is an encrypted time-stamp on each authentication cookie sent to
+browsers.  Whenever a protected page is requested by an authenticated
+browser, LibWeb will retrieve the cookie, decrypt the time-stamp and
+compare it to the current time.  If the time difference is bigger than
+LOGIN_DURATION_ALLOWED (in seconds), LibWeb will automatically logs
+the user out by nullifying the authentication cookie on remote
+browser.
+
+=back
+
+=head2 SQL database variables
+
+=over 4
+
+=item *
+
+IS_DB_ENABLED (new in LibWeb-0.02)
+
+If you do not use the database API of LibWeb, assign 0 to this
+variable to prevent LibWeb from generating all sorts of database error
+message.  Assign 1 to it otherwise.
+
+=item *
+
+DB_SOURCE
+
+For example, if your database is MySQL, you have installed DBI and the
+specific driver and the database's name is puffy, then you can assign
+C<'DBI:mysql:puffy'> to this value.  Read the man page for DBI for
+details.
+
+=item *
+
+DB_LOGIN
+
+Login name for your database.
+
+=item *
+
+DB_PASS
+
+Password for your database.
+
+=item *
+
+DB_OPTIONS
+
+For example, you can assign {RaiseError => 1, AutoCommit => 1} to
+this variable.  Read the man page for DBI for details.
+
+=item *
+
+USER_PROFILE_TABLE
+
+The table name for users' profiles.  Default is C<'USER_PROFILE'>.
+
+=item *
+
+USER_PROFILE_TABLE_UID
+
+The column name for user ID in the B<USER_PROFILE_TABLE>.  Default is
+C<'UID'>.
+
+=item *
+
+USER_PROFILE_TABLE_NAME
+
+The column name for users' screen names in the B<USER_PROFILE_TABLE>.
+Default is C<'NAME'>.
+
+=item *
+
+USER_PROFILE_TABLE_PASS
+
+The column name for users' passwords in the B<USER_PROFILE_TABLE>.
+Default is C<'PASS'>.
+
+=item *
+
+USER_PROFILE_TABLE_EMAIL
+
+The column name for users' e-mail addresses in the
+B<USER_PROFILE_TABLE>.  Default is C<'EMAIL'>.
+
+=item *
+
+USER_LOG_TABLE
+
+The table name for the table that is responsible for logging users'
+sign-in time, status, IP and host name.  Default is C<'USER_LOG'>.
+
+=item *
+
+USER_LOG_TABLE_UID
+
+The column name for users' ID in the B<USER_LOG_TABLE>.  Default is
+C<'UID'>.
+
+=item *
+
+USER_LOG_TABLE_IP
+
+The column name for users' IPs in B<USER_LOG_TABLE>.  Default is
+C<'IP'>.
+
+=item *
+
+USER_LOG_TABLE_HOST
+
+The column name for users' host name in the B<USER_LOG_TABLE>.
+Default is C<'HOST'>.
+
+=item *
+
+USER_LOG_TABLE_LAST_LOGIN
+
+The column name for the last login date and time in the
+B<USER_LOG_TABLE>.  Default is C<'LAST_LOGIN'>.
+
+=item *
+
+USER_LOG_TABLE_NUM_LOGIN_ATTEMPT
+
+The column name for the number of login attempt in the
+B<USER_LOG_TABLE>.  Default is C<'NUM_LOGIN_ATTEMPT'>.
+
+=back
+
+=head2 Site's colors and image files' location
+
+=over 4
+
+=item *
+
+SITE_1ST_COLOR
+
+In RGB, for example C<'#0099CC'> (light blue).
+
+=item *
+
+SITE_2ND_COLOR
+
+In RGB, for example C<'#006699'> (blue).
+
+=item *
+
+SITE_3RD_COLOR
+
+In RGB, for example C<'#003366'> (deep blue).
+
+=item *
+
+SITE_4TH_COLOR
+
+In RGB, for example C<'#FF9900'> (orange).
+
+=item *
+
+SITE_BG_COLOR
+
+In RGB, for example C<'#FFFFFF'> (white).
+
+=item *
+
+SITE_TXT_COLOR
+
+In RGB, for example C<'#000000'> (black).
+
+=item *
+
+SITE_LIQUID_COLOR1
+
+In RGB, for example C<'#E6E6E6'> (lighter grey).
+
+=item *
+
+SITE_LIQUID_COLOR2
+
+In RGB, for example C<'#C9C9C9'> (light grey).
+
+=item *
+
+SITE_LIQUID_COLOR3
+
+In RGB, for example C<'#9C9C9C'> (grey).
+
+=item *
+
+SITE_LIQUID_COLOR4
+
+In RGB, for example C<'#6E6E6E'> (dark grey).
+
+=item *
+
+SITE_LIQUID_COLOR5
+
+In RGB, for example C<'#000000'> (black).
+
+Note: Liquid colors are used for shading.  For example, even rows of
+any table listing may be shaded.  Some theme constructs use liquid
+colors as well
+(e.g. C<LibWeb::Themes::Default::enlighted_titled_table()>).  Make
+sure B<SITE_TXT_COLOR> can be read clearly together with liquid colors
+(at least for B<SITE_LIQUID_COLOR1,2 and 3>).
+
+=item *
+
+PIX_URL
+
+The relative URL of image files.  For example, C<'/img/'> (note the
+trailing slash).
+
+=item *
+
+SITE_LOGO
+
+The URL of your site's logo.  For example, C<'/img/logo.png'>.  This
+is the image that goes well with your B<SITE_BG_COLOR>.  This is
+necessary because most browsers do not render png images with
+transparent background.  You can ignore this fact if you use gif or
+jpg.
+
+=back
+
+=head2 Miscellaneous site's variables
+
+=over 4
+
+=item *
+
+DOC_ROOT
+
+Do not edit unless there is a compelling reason to do so.
+
+=item *
+
+URL_ROOT
+
+Do not edit unless there is a compelling reason to do so.
+
+=item *
+
+LIB_ROOT
+
+Deprecated as of LibWeb-0.02.
+
+=item *
+
+COPYRIGHT
+
+Deprecated as of LibWeb-0.02.
+
+=item *
+
+PRIVACY_POLICY
+
+What is the relative URL of your site's privacy policy?
+
+=item *
+
+TOS
+
+What is the relative URL of your site's Terms of Service?
+
+=item *
+
+CSS
+
+What is the relative URL of your site's style sheet?  A sample is
+included with the distribution.
+
+=item *
+
+SITE_NAME
+
+Your site's name.
+
+=item *
+
+SITE_DESCRIPTION
+
+A short description for your site.  This will appear in every HTML
+page.
+
+=item *
+
+SITE_KEYWORDS
+
+Keywords for your site.  This will appear in every HTML page.
+
+=item *
+
+SITE_YEAR
+
+When is your site established?
+
+=back
+
+=head2 Site's common applications' URL
+
+=over 4
+
+=item *
+
+LM_IN
+
+Relative URL of your site's login script, e.g. C<'/cgi-bin/lm.cgi'>.
+This is the page to which LibWeb directs the Web browser in the case
+where the browser attempts to view a protected page without
+authentication a priori.
+
+=item *
+
+LM_OUT
+
+Relative URL to your site's logout script,
+e.g. C<'/cgi-bin/lm.cgi?.a=logout'>.
+
+=back
+
+=cut

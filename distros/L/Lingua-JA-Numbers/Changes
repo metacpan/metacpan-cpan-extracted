@@ -1,0 +1,43 @@
+# Revision history for Perl extension Lingua::JA::Numbers.
+#
+# $Id: Changes,v 0.5 2015/03/10 11:04:45 dankogai Exp dankogai $
+#
+$Revision: 0.5 $ $Date: 2015/03/10 11:04:45 $
+! lib/Lingua/JA/Numbers.pm
++ t/05-Kanji.t
+  1億 is now 100_000_000, not 1
+  https://twitter.com/Nyaboo/status/575196780993761280
+
+0.4 2006/06/10 16:10:39
+! lib/Lingua/JA/Numbers.pm
+! t/03-OO.t
++ t/Bullock.t
+  Lots of bug fixes and suggestions by Ben Bullock
+  - Lingua::JA::Numbers->new() did not handle 0.01 correctly
+  - daiji of man
+  - {style => 'daiji'}
+  Message-Id: <bea59c750606082154r5bedc93ci5fd91f5792cb030e@mail.gmail.com>
+  Message-Id: <bea59c750606092223j4c6c7d7q43021dd304eaac62@mail.gmail.com>
+
+0.3 2005/08/18 07:16:13
++ t/LJN.t MANIFEST
+  Now does what Lingua::JA::Number (note no 's' at the end) does
+  EXACTLY as it does.
+! lib/Lingua/JA/Numbers.pm
+  ! POD =~  s/Linuga/Lingua/g, by nipotan
+  ! minor tr/// fixup by daiba
+  http://blog.livedoor.jp/dankogai/archives/50017672.html
+! lib/Lingua/JA/Numbers.pm
+  Minor fix that may cause ja2num($str) to fail when $str
+  is tainted AND empty.
+
+0.02 2005/08/17 20:37:43
+! Makefile.PL
+  s/use 5.008007/use 5.008001/; # yikes
+! lib/Lingua/JA/Numbers.pm
+  Made ja2num() less verbose without {debug=>1}.
+
+0.01 2005/08/17 20:08:21
++ *
+  First Release.
+

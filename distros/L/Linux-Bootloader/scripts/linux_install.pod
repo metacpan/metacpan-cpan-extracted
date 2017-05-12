@@ -1,0 +1,52 @@
+
+=head1 NAME
+
+linux_install - Installs the kernel and associated files.
+
+=head1 SYNOPSIS
+
+linux_install [ RELEASE_TAG ] [ SRC_DIR ] [ TARGET_DIR ] [ ARCH ]
+
+
+=head1 DESCRIPTION
+
+linux_install is a simple script to copy .config,
+include/linux/autoconf.h, System.map, and the kernel image to /boot (or
+other target directory as specified by the optional $TARGET_DIR
+argument).  These files will be appended with -$RELEASE_TAG (which
+defaults as '-test').
+
+SRC_DIR can be specified to control where to look for the files to copy.
+linux_install will exit with an error if this does not exist.  By
+default it looks in the current working directory (".")
+
+linux_install is written to be architecture-independent, and will locate
+the kernel image by first looking in $SRC_DIR/$arch/boot/*, and then in
+$SRC_DIR, for files named bzImage, vmlinuz, vmlinux, zImage.  It will
+attempt to guess $arch using uname.  If it fails to detect correctly,
+you can override it by specifying the $ARCH argument.
+
+linux_install does not update the bootloader (see bootloader for that).
+
+
+=head1 SEE ALSO
+
+L<crucible>, L<WWW::PkgFind>, L<Test::Parser>, L<Linux::Distribution>
+
+=head1 AUTHOR
+
+Bryce Harrington  [bryce at osdl dot org]
+
+=head1 COPYRIGHT
+
+Copyright (C) 2006 Bryce Harrington and Open Source Development Labs
+All Rights Reserved.
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.10 $
+
+=cut

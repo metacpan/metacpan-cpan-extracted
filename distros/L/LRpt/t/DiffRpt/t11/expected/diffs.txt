@@ -1,0 +1,10 @@
+lcsvdiff t/DiffRpt/t11/input/before/text_num.txt t/DiffRpt/t11/input/after/text_num.txt
+SCHEMA: Text1	Text2	Text8	Numeric4	Numeric5
+SCHEMA_DIFF_BEFORE: Text1	Text2	Text3	Numeric4	Numeric5	Text6	Numeric7
+SCHEMA_DIFF_COMMON: Text1	Text2	Numeric4	Numeric5
+SCHEMA_DIFF_MISSING: Text3	Text6	Numeric7
+SCHEMA_DIFF_ADDITIONAL: Text8
+UPD( AAAA#BBBB#00000001 ): Numeric5: 98 ==#> 2
+UPD( BBBB#AAAA#00000009 ): Numeric5: 7 ==#> 2
+DEL( YYYY#AAAA#00000001 )
+INS( YYYY#KKKK#00000001 )

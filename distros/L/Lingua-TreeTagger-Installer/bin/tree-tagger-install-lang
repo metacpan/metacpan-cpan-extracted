@@ -1,0 +1,135 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Std;
+use Lingua::TreeTagger::Installer;
+
+my %opts;
+sub VERBOSE(@) { print STDERR "@_\n" if $opts{v} }
+
+getopts('fivl', \%opts);
+
+if (not -f "$ENV{HOME}/.treetagger") {
+    VERBOSE "Creating config file on $ENV{HOME}/.treetagger";
+    Lingua::TreeTagger::Installer->create_cfg();
+}
+else {
+    ## FIXME / TODO
+    ## fazer merge das novas entradas!!
+}
+
+VERBOSE "Loading config file from $ENV{HOME}/.treetagger";
+my $installer = Lingua::TreeTagger::Installer->new(
+                                                   force   => $opts{f},
+                                                   verbose => $opts{v},
+                                                  );
+
+if ($opts{l}) {
+    $installer->list_parameter_files();
+}
+elsif ($opts{i}) {
+    my @packages = @ARGV;
+    for my $l (@packages) {
+        VERBOSE "Installing package code [$l]";
+        if ($_ = $installer->install($l)) {
+            VERBOSE " [failed: $_]"
+        } else {
+            VERBOSE " [success]"
+        }
+    }
+}
+else {
+    print "tree-tagger-install-lang [-v] -l\n\tlist installed and available packages\n";
+    print "tree-tagger-install-lang [-v] [-f] -i LANG-1 ... LANG-n\n\tinstalls language packages. Check codes with -l.\n";
+    print "\nGeneral options\n -v   sets verbose mode\n -f   forces operation\n";
+}
+
+=encoding UTF-8
+
+=head1 NAME
+
+tree-tagger-install-lang - install language parameter files for treetagger
+
+=head1 SYNOPSIS
+
+  # lists available and installed parameter files
+  tree-tagger-install-lang -l
+
+  # installs parameter file
+  tree-tagger-install-lang -i PT-1
+
+  # force installation of parameter file, with verbose mode on
+  tree-tagger-install-lang -v -i -f PT-1
+
+=head1 DESCRIPTION
+
+Tree Tagger is a tagger, available from
+L<http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger/>. Its
+manual installation is tiresome, error prone, and headache generator.
+
+This module tries to help that:
+
+=over 4
+
+=item 1.
+
+When you install the module, it will install the tree-tagger binary
+for your platform.
+
+=item 2.
+
+It will install this tool as well (C<tree-tagger-install-lang>) that
+can be used to install parameter files for different languages.
+
+=back
+
+=head1 BUGS and LIMITATIONS
+
+=over 4
+
+=item *
+
+When there are multiple parameter files for the same encoding, only
+one can be installed at a time. The installation script detects that
+and warns the user. The user is able to force the installation with
+C<-f>. Future releases might add alternative naming scheme.
+
+=item *
+
+The list of installed parameter files is saved under your home folder,
+in a dot file. Usually only the system administrator will be able to
+install parameter files, and therefore the dot file will be up to date
+with his actions. If multiple users can install parameter files each
+one will have a dot file, and the information will not be coherent.
+
+=item *
+
+Although more architectures are available at Tree Tagger home page, at
+the moment I just support linux (both 32 and 64 bits) and Mac OS X on
+Intel hardware. Future versions might support further architectures
+and operating systems. Patches are welcome.
+
+=item *
+
+The basic Tree Tagger tarballs include a lot of scripts that does not
+work without the respective parameter files. At the moment those
+scripts are installed anyway, but will not work if the respective
+parameter file is not available.
+
+=back
+
+=head1 SEE ALSO
+
+perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Alberto Manuel Brandão Simões
+
+=cut

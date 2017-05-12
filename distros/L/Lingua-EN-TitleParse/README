@@ -1,0 +1,59 @@
+Lingua-EN-TitleParse version 0.01
+=================================
+
+This module parses strings containing people's names to identify
+titles, like "Mr", "Mrs", etc, so the names and titles can be separated.
+
+e.g. "Mr Joe Bloggs" will be parsed to "Mr", and "Joe Bloggs".
+
+The module handles "fuzziness" such as changes of case and punctuation
+characters: "Mr", "MR", "Mr.", and "mr" will all be recognised correctly.
+
+A typical use-case might be accepting a set of names stored in a single
+"name" database field, and converting that data to a database containing
+separate "title" and "name" fields.
+
+It differs from another CPAN module, Lingua::EN::NameParse, in two key
+respects:
+
+Firstly, Lingua::EN::TitleParse performs well irrespective of the
+number of titles being matched against.  While Lingua::EN::NameParse
+loops through a series of regular expressions, and suffers when the set
+of titles being matched is long, Lingua::EN::TitleParse uses hash-lookups
+after "normalising" each name string, providing consistently good
+performance.
+
+Secondly it's only focused on parsing titles in names, whereas
+Lingua::EN::NameParse attempts much more.  However the extra
+intelligence of Lingua::EN::NameParse can come at the cost of
+predictablity. Lingua::EN::TitleParse is more conservative, and
+by default makes no changes to the case or content (with the exception
+of compressing extra white-space) of what was input, effectively
+only splitting the input string in two. (But that said, there is an
+option to output cleaned titles).
+
+We're using the same titles NameParse uses (their "extended set") with
+minor additions, but your own set of titles can be imported instead.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Venda Ltd
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

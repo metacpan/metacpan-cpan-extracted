@@ -1,0 +1,34 @@
+# This file contains tokenization rules
+# Copyright (C) 2005-2006 Kevin P. Scannell <kscanne@gmail.com>
+#
+# This is free software; see the file COPYING for copying conditions.  There is
+# NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+(?:https?|ftp)://[A-Za-z0-9/.:=_%?&~+;$@\#()-]+[A-Za-z0-9/=]:<Y>
+[A-Za-z0-9._]+@[A-Za-z0-9.]+[A-Za-z0-9]:<Y>
+www\.[A-Za-z0-9/.:=_%?&~+;$@\#()-]+[A-Za-z0-9/=]:<Y>
+[A-Za-z0-9-]+\.(com|org|net):<Y>
+(?:EUR|[¥$£])[0-9][0-9.,]*[0-9]:<Y>
+[0-9][0-9.,]*[0-9][%p¢x]:<Y>
+# includes 1984-1992, 0-11, etc. 
+[0-9][0-9.,]*[.,-][0-9.,]*[0-9]:<Y>
+(?:[12][0-9])?[0-9]0í:<N pl="y" gnt="n" gnd="m">
+[1-9][0-9]*ú:<A pl="n" gnt="n">
+[1-9][0-9]*adh:<A pl="n" gnt="n">
+[1-9][0-9]*[rn]d:<A pl="n" gnt="n">
+[1-9][0-9]*st:<A pl="n" gnt="n">
+[1-9][0-9]*th:<A pl="n" gnt="n">
+[0-9][0-9]+:<A>
+[']acha[']n:<Y>
+[A-Za-zÀ-ÿ0-9][A-Za-zÀ-ÿ'-]*'[A-Za-zÀ-ÿ'-]*[A-Za-zÀ-ÿ0-9]:<c>
+['][Ss]a[']:<Y>
+[']n[']:<Y>
+# these ' words must be in main lexicon even if non-standard like "'gus";
+# therefore they require appropriate CAIGHDEAN{} rules in rialacha-ga.in
+['][A-Za-zÀ-ÿ-]+:<d>
+[A-Za-zÀ-ÿ]+[']:<d>
+[A-Za-zÀ-ÿ0-9][A-Za-zÀ-ÿ'-]*[A-Za-zÀ-ÿ0-9]:<c>
+[A-Za-zÀ-ÿ]:<c>
+[0-9]:<A>
+#  uncomment to tag punctuation, etc.
+# .:<c>

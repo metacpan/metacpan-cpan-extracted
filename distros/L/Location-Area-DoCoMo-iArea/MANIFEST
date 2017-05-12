@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+lib/Location/Area/DoCoMo/iArea.pm
+lib/Location/Area/DoCoMo/iArea/Area.pm
+lib/Location/Area/DoCoMo/iArea/Next.pm
+lib/Location/Area/DoCoMo/iArea/Region.pm
+lib/Location/Area/DoCoMo/iArea/Aura.pm
+lib/Location/Area/DoCoMo/iArea/Japanese.pod
+META.yml                                 Module meta-data (added by MakeMaker)

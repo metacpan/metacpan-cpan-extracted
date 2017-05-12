@@ -1,0 +1,22 @@
+Revision history for Perl extension Linux::Shadow.
+
+0.05  Thu Apr  6 2017
+	- Add overloads for getpwnam, getpwuid and getpwent that will populate
+		the expires field if it isn't already populated.
+
+0.04  Wed Apr  5 2017
+	- Rename MYMETA files to META files
+
+0.03  Wed Apr  5 2017
+	- Add changelog, package the MYMETA files, some more documentation
+		cleanup, Backup minimum version to 5.10.1, change to pure
+		XS code to simplify things.
+
+0.02  Tue Apr  4 2017
+	- clean up xs code, write the Perl interface, various other things
+		to make it a more complete module.
+
+0.01  Mon Apr  3 13:51:21 2017
+	- original version; created by h2xs 1.23 with options
+		-n Linux::Shadow /usr/include/shadow.h
+

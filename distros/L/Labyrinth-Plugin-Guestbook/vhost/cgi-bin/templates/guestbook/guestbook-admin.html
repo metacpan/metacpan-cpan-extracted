@@ -1,0 +1,56 @@
+[% 
+    title = 'Guestbook Admin' ;
+    htmltitle = title ;
+
+    crumb2_name = 'Admin' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=home-admin' ;
+    crumb1_name = 'Guestbook' ;
+%]
+
+<div class="boxer">
+[% IF thanks %]<p>Guestbook updated successfully.</p>[% END %]
+<p>Record Count: [% count %]<br />
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="guest-match" />
+<input type="text" size="32" name="pattern" value="" />
+<input type="submit" value="Block Matching Posts" />
+</form>
+<br />
+</p>
+</div>
+
+<div class="admin">
+<table>
+<tr><th>Date</th>
+    <th>Name</th>
+    <th>IP</th>
+    <th>Comments</th>
+    <th>Action</th></tr>
+
+[% IF records %]
+[% FOREACH item = records %]
+
+<tr><td>[% item.createdate %]</td>
+    <td>[% item.realname %]</td>
+    <td>[% item.ipaddr %]</td>
+    <td>[% item.comments %]</td>
+    <td>
+          [% IF item.publish < 3 %]
+        <a href="/guest/block?entryid=[% item.entryid %]">Block</a>
+          | <a href="/guest/allow?entryid=[% item.entryid %]">Allow</a>
+          | <a href="/guest/approve?entryid=[% item.entryid %]">Approve</a>
+      [% ELSE %]
+        Block | Allow | Approve
+      [% END %]
+          | <a href="/guest/delete?entryid=[% item.entryid %]">Delete</a>
+          | <a href="/guest/edit?entryid=[% item.entryid %]">Edit</a>
+    </td></tr>
+
+[% END %]
+[% ELSE %]
+<tr><td colspan="4">No guestbook entries.</td></tr>
+[% END %]
+
+</table>
+</div>

@@ -1,0 +1,38 @@
+Revision history for Perl extension Lingua::SoundChange.
+
+0.05  2002-05-20
+        - don't ship Test::More; rather, depend on it. That way, the
+        user can use a newer version.
+        - Don't rely on $` any more (instead, use (.*?) and $1).
+
+0.04  Sun Oct 14 18:51:00 2001
+	- fixed a bug with the 'keep' option that only surfaced when more
+	than one rule was supplied
+        - Changed the way long variable names are processed. Now the rules
+        C/V/_ and <C>/<V>/_ should be distinguished (the first refers to a
+        letter 'C', the second to a variable named 'C'; previously, the first
+        case would have found the rule 'C' as well, which was not what was
+        intended).
+        - New tests for 'keep' and 'printRules' options (which have now
+        disappeared as individual options following the interface change)
+        - Interface change: instead of the return list consisting either
+        of simple scalars (default) or arrayrefs with two elements (with
+        the 'keep' option), the return list now consists of hashrefs.
+        Current keys are 'word' (the transformed word), 'orig' (the
+        original word), and 'rules' (a list of which rules applied to the
+        word and at which position).
+        This change also means that the module always uses $`, incurring
+        a slight run-time penalty for all regular expressions in the
+        script using Lingua::SoundChange.
+
+0.03  Sat Oct  6 20:19:20 2001
+	- added multiple-letter variable names
+
+0.02  Sat Oct  6 17:30:51 2001
+	- changed licensing terms to BSD-style licence; removed sample 'sounds'
+		wrapper script from the MANIFEST and distribution file
+
+0.01  Sat Sep 22 13:12:35 2001
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Lingua::SoundChange
+

@@ -1,0 +1,24 @@
+Changes
+lib/Lingua/Romana/Perligata.pm
+Makefile.PL
+MANIFEST
+README
+t/load_and_run.t
+demo/demo_JAPH.pl
+demo/demo_OO.pl
+demo/demo_bitwise.pl
+demo/demo_come.pl
+demo/demo_compare.pl
+demo/demo_data.pl
+demo/demo_dictum.pl
+demo/demo_eratosthenes.pl
+demo/demo_isprime.pl
+demo/demo_logical.pl
+demo/demo_maxnum.pl
+demo/demo_monkey.pl
+demo/demo_number.pl
+demo/demo_reference.pl
+demo/demo_simple.pl
+t/UPPER_CASE.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,41 @@
+#########################################################################
+#
+# $Id: rkeys.txt,v 1.1 2006/01/14 20:01:28 pkaluski Exp $
+# $Name: Stable_0_16 $
+#
+# $Log: rkeys.txt,v $
+# Revision 1.1  2006/01/14 20:01:28  pkaluski
+# Adjusted test to new design.
+#
+#
+#
+#########################################################################
+
+select_name: authors
+key_columns: au_id
+%%
+select_name: editors
+key_columns: ed_id
+%%
+select_name: publishers
+key_columns: pub_id
+%%
+select_name: roysched
+key_columns: title_id,lorange
+%%
+select_name: sales
+key_columns: sonum:2
+%%
+select_name: salesdetails
+key_columns: sonum, title_id 
+%%
+select_name: titleauthors
+key_columns: au_id, title_id 
+%%
+select_name: titleditors
+key_columns: ed_id, title_id 
+%%
+select_name: titles
+key_columns: title_id 
+%%
+

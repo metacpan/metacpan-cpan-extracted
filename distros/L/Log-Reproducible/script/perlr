@@ -1,0 +1,22 @@
+#! perl
+use strict;
+use warnings;
+
+=head1 NAME
+
+perlr - Effortless record-keeping and enhanced reproducibility
+
+=head1 AUTHOR
+
+Michael F. Covington <mfcovington@gmail.com>
+
+=cut
+
+die "perlr requires at least one argument (a Perl script)\n"
+    if scalar @ARGV == 0;
+
+for (@ARGV) {
+    $_ = "'$_'" if /\s/;
+}
+
+system("perl -MLog::Reproducible @ARGV");

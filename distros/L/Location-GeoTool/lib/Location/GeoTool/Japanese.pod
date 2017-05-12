@@ -1,0 +1,156 @@
+=head1 名前
+
+Location::GeoTool - 地理情報を扱うPerlモジュール
+
+=head1 概要
+
+  use Location::GeoTool;
+
+  my $oGeo = Location::GeoTool->create_coord('35.39.24.491','139.40.10.478','tokyo','gpsone');
+  my @mapion = $oGeo->format_mapion->array;
+   # => ("35/39/24.491","139/40/10.478")
+  my $oGeoW = $oGeo->datum_wgs84;
+  my @wgs84 = ($oGeoW->lat,$oGeoW->long);
+   # => ("35.39.36.145","139.39.58.871")
+  my @degree_wgs84 = $oGeoW->format_second;
+   # => (128376.14524...,502798.87076...)
+
+=head1 説明
+
+=head2 コンストラクタ　(create_coord)
+
+  my $obj = Location::GeoTool->create_coord($lat,$long,$datum,$format);
+
+Location::GeoToolオブジェクトを生成します。
+
+  $lat    : 緯度
+  $long   : 経度
+  $datum  : 測地系
+  $format : フォーマット
+
+作成されたオブジェクトのデフォルトの測地系、フォーマットは引数で指定したものになります。
+よって、array,lat,longメソッド等で返ってくる値は、コンストラクタで指定したものと同じになります。
+測地系は以下の文字列で与えてください。
+
+  世界(新日本)測地系 : 'wgs84'
+  旧日本測地系       : 'tokyo'
+
+フォーマットは、以下の文字列で与えてください。
+
+  MapionURLフォーマット (ddd/mm/ss.nnn)  : 'mapion'
+  gpsOne標準フォーマット(ddd.mm.ss.nnn)  : 'gpsone'
+  SpaceTagサーバ標準    (pddmmssnnn)     : 'spacetag'
+  dddmmss.nnn形式                        : 'dmsn'
+  度単位                (ddd.dddddd...)  : 'degree'
+  秒単位                (ssssss.sss...)  : 'second'
+  ラジアン単位                           : 'radian'
+
+=head2 経緯度取得メソッド群
+
+現在のオブジェクトの設定された測地系・フォーマットでの、経緯度の値を返します。
+
+  ($lat,$long) = $obj->array;
+    or
+  $lat = $obj->lat;
+  $long = $obj->long;
+
+=head2 測地系・フォーマット変換メソッド群
+
+新しい測地系・フォーマットに変換された、新オブジェクトを返します。
+
+  $newobj = $obj->datum_wgs84;
+  $newobj = $obj->format_mapion;
+
+等等。当然、以下のような事は可能です。
+
+  ($lat,$long) = $obj->datum_tokyo->format_radian->array;
+
+準備されている全メソッドは、以下のとおりです。
+
+  世界(新日本)測地系へ変換： datum_wgs84
+  旧日本測地系へ変換： datum_tokyo
+  MapionURLフォーマット(ddd/mm/ss.nnn)へ変換： format_mapion
+  gpsOne標準フォーマット(ddd.mm.ss.nnn)へ変換： format_gpsone
+  SpaceTagサーバ標準(pddmmssnnn)へ変換： format_spacetag
+  dddmmss.nnn形式へ変換： format_dmsn
+  度単位(ddd.dddddddd…)へ変換：format_degree
+  秒単位(ssssss.sss…)へ変換： format_second
+  ラジアン単位へ変換： format_radian
+
+注意：変換されたオブジェクトは、実際には元測地系・フォーマットでの情報を保持し、
+経緯度取得メソッド群が実行された時に、その時の設定測地系・フォーマットへの変換が
+実際に実行されます。
+これは、測地系・フォーマット変換とも誤差の大きい処理ですので、処理を繰り返す事で
+実位置との誤差が大きくなる事を防ぐための仕様です。
+ただし、Class::DBIとの連携等を考えた場合、どんな測地系・フォーマットの値を入れても
+内部で規定の測地系・フォーマットに変換してくれた方が便利かな、というケースもあり
+ますので、この仕様は変更される可能性があります。
+
+=head2 方向・距離処理メソッド群
+
+現オブジェクトを起点とした、方向・距離を扱うLocation::GeoTool::Direction
+オブジェクトを生成するメソッド群です。
+Location::GeoTool::Directionについては同クラスのpodを参照してください。
+
+  my $dirobj = $locobj->direction_point('40/36/14.307','141/01/33.022','tokyo','mapion');
+  my ($dir,$dist) = ($dirobj->direction,$dirobj->distance);
+    or
+  my $direction = $locobj->direction_point($another_locobj)->direction;
+    or
+  my ($endlat,$endlong) = $locobj->direction_vector($dir,$dist)->to_point->array;
+
+等等。
+
+=head3 direction_point
+
+終点を指定して、Location::GeoTool::Directionオブジェクトを作成します。
+指定には、
+
+  $locobj->direction_point($lat,$long,$datum,$format);
+
+のように終点の経緯度・測地系・フォーマットを使用する方法、
+及び他のLocation::GeoToolオブジェクトを使用する方法
+
+  $locobj->direction_point($another_locobj);
+
+の双方が可能です。
+
+=head3 direction_vector
+
+方向・距離を指定してLocation::GeoTool::Directionオブジェクトを作成します。
+
+  $locobj->direction_point($direction,$distance);
+
+方向は北を0°として東方向周りに0°〜360°の方位角、距離はmで指定します。
+
+=head1 依存
+
+Math::Trig
+
+=head1 関連情報
+
+経緯度2点〜距離・方向の双方向変換導出アルゴリズムは、
+http://williams.best.vwh.net/gccalc.htmにおいて、
+Ed Williams氏がJavaScriptで実装されているものを移植しました。
+
+測地系変換の導出アルゴリズムは、
+http://homepage3.nifty.com/Nowral/02_DATUM/Molodensky.htmlにおいて、
+Nowral氏がPerl CGIで実装されているものを移植しました。
+
+これらのサイトに感謝いたします。
+
+このモジュールは、ここギコ！ウェブサイト　：　http://kokogiko.net/
+にてサポートいたします。
+
+=head1 作者
+
+大塚 恒平, E<lt>nene@kokogiko.netE<gt>
+
+=head1 著作権・ライセンス
+
+Copyright (C) 2003,2004 SpaceTag Inc.,
+
+本ライブラリはフリーソフトであり、Perl本体と同じ条件での再配布・改変が可能です。
+
+
+=cut

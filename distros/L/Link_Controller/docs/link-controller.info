@@ -1,0 +1,97 @@
+This is link-controller.info, produced by makeinfo version 4.0 from
+link-controller.texinfo.
+
+INFO-DIR-SECTION LinkController link checking system
+START-INFO-DIR-ENTRY
+* LinkController: (link-controller).	A system for checking and repairing links
+* link-report: (link-controller)Invoking link-report. Reporting the status of broken links
+* test-link: (link-controller)Invoking test-link. Testing if links are broken
+* extract-links: (link-controller)Invoking extract-links. Finding links in web pages.
+* fix-link: (link-controller)Invoking fix-link. Repairing links in your web pages.
+* check-page: (link-controller)Invoking fix-lnk. Repairing links in your web pages.
+* build-schedule: (build-scheduile)Invoking builld-schedule. Scheduling links for checking.
+END-INFO-DIR-ENTRY
+
+   This file documents LinkController
+
+   Copyright 1997-2001 Michael De La Rue
+
+   Permission is granted to distribute and change this manual under the
+terms of the GNU public license.
+
+   This is the alpha version of this manual and is very incomplete.
+
+
+Indirect:
+link-controller.info-1: 1037
+link-controller.info-2: 49513
+
+Tag Table:
+(Indirect)
+Node: Top1037
+Node: Introduction5624
+Ref: Introduction-Footnote-16736
+Node: Getting Started6845
+Node: Configuration8251
+Node: Interactive Configuration8683
+Node: Setting Configuration Variables9286
+Node: Configuration Variables10324
+Node: Infostructure Configuration12942
+Node: Advanced Configuration14853
+Node: Advanced Infostructure Configuration15498
+Node: Authorisation Configuration19087
+Node: Configuring CGI Programs21419
+Node: Using LinkController21982
+Node: Extracting Links22850
+Ref: Extracting Links-Footnote-124534
+Node: Testing24891
+Node: Reporting27178
+Node: Email Reporting29686
+Node: Checking Files30815
+Node: Repairing Links31450
+Node: Suggestions33191
+Node: CGI Interface34159
+Node: Interfaces35013
+Ref: Interfaces-Footnote-137049
+Node: Emacs37120
+Node: link-report-dired37654
+Node: check-page in Emacs38238
+Node: Administration39221
+Node: Setting up LinkController39842
+Node: Default Installation40538
+Node: User Administration41411
+Node: Cron Scripts42569
+Node: Link Database Maintenance43278
+Node: Link Ageing44103
+Node: Robot Behaviour45817
+Node: Uncheckable Links48103
+Node: Absolute and Relative URIs49513
+Node: Bugs51555
+Node: History54045
+Node: Acknowledgements55909
+Node: Esoterica Internet Portugal56344
+Ref: Esoterica Internet Portugal-Footnote-157396
+Node: IPPT PAN Poland57516
+Node: The Tardis Project58000
+Node: Other Free Software Authors58663
+Node: Invoking the Programs59671
+Node: Invoking link-report60840
+Node: Invoking test-link64823
+Node: Invoking extract-links68035
+Node: Invoking fix-link70405
+Node: Invoking check-page72694
+Node: Invoking build-schedule74562
+Node: Related Packages76799
+Node: cdb77253
+Node: Tie-Transact-Hash78143
+Node: Terms78738
+Node: Infostructure79255
+Node: Link79686
+Node: Resource80035
+Node: URIs80492
+Node: URLs81106
+Node: URNs81805
+Node: Names Index82889
+Node: Concept Index87344
+
+End Tag Table

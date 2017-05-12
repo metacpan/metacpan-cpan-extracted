@@ -1,0 +1,6 @@
+Revision history for Perl extension LW4::Reader.
+
+0.01  Sat Mar  1 07:11:04 2008
+	- original version; created by h2xs 1.22 with options
+		-Xan LW4::Reader
+

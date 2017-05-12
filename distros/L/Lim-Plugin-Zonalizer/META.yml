@@ -1,0 +1,56 @@
+---
+abstract: 'Analyze your zones with Zonemaster'
+author:
+  - 'Jerry Lundström <lundstrom.jerry@gmail.com>'
+build_requires:
+  AnyEvent::CouchDB: '1.31'
+  AnyEvent::HTTP: '2.13'
+  Clone: '0'
+  Data::UUID: '0'
+  Getopt::Long: '2.38'
+  HTTP::Status: '0'
+  JSON: '0'
+  JSON::XS: '0'
+  Lim: '0.2'
+  MooseX::Getopt: '0'
+  Net::LDNS: '0.75'
+  Scalar::Util: '1'
+  Test::More: '0'
+  URI::Escape::XS: '0.11'
+  Zonemaster: '0'
+  common::sense: '3'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lim-Plugin-Zonalizer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent::CouchDB: '1.31'
+  AnyEvent::HTTP: '2.21'
+  Clone: '0'
+  Data::UUID: '0'
+  Getopt::Long: '2.38'
+  HTTP::Status: '0'
+  JSON: '0'
+  JSON::XS: '0'
+  Lim: '0.2'
+  MooseX::Getopt: '0'
+  Net::LDNS: '0.75'
+  Scalar::Util: '1'
+  URI::Escape::XS: '0.11'
+  Zonemaster: '0'
+  common::sense: '3'
+resources:
+  bugtracker: https://github.com/jelu/lim-plugin-zonalizer/issues
+  homepage: https://github.com/jelu/lim-plugin-zonalizer
+  repository: https://github.com/jelu/lim-plugin-zonalizer
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

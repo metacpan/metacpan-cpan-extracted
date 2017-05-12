@@ -1,0 +1,11 @@
+Numericalize.pm
+Makefile.PL
+MANIFEST
+README
+LICENSE
+Changes
+t/nbr.t
+t/nbr.list
+t/str.t
+t/str.list
+testit

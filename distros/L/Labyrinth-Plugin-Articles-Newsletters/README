@@ -1,0 +1,32 @@
+Labyrinth-Plugin-Articles-Newsletters
+=====================================
+
+Labyrinth is a Website Management Framework. This distribution enables 
+Labyrinth to provide newsletters or poems as collections, which can be 
+attributed to releases.
+
+This distributions contains the newsletters handling functionality, which can 
+either be used as simple website articles, or be emailed to a subscriber list.
+This includes the templates, SQL, parameter validation and dispatch tables.
+
+INSTALLATION
+
+See the INSTALL file for full instructions.
+
+DEPENDENCIES
+
+  Labyrinth
+  Labyrinth::Plugin::Articles
+
+AUTHOR
+
+  Barbie, <barbie@missbarbell.co.uk> for Miss Barbell Productions,
+  <http://www.missbarbell.co.uk/>
+
+COPYRIGHT & LICENSE
+
+  Copyright (C) 2002-2014 Barbie for Miss Barbell Productions
+  All Rights Reserved.
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

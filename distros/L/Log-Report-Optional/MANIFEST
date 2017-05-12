@@ -1,0 +1,20 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/Log/Report/Minimal.pm
+lib/Log/Report/Minimal.pod
+lib/Log/Report/Minimal/Domain.pm
+lib/Log/Report/Minimal/Domain.pod
+lib/Log/Report/Optional.pm
+lib/Log/Report/Optional.pod
+lib/Log/Report/Util.pm
+lib/Log/Report/Util.pod
+t/00use.t
+t/05util.t
+t/20exceptions.t
+t/21messages.t
+t/50options.t
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

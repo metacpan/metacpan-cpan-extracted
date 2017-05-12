@@ -1,0 +1,109 @@
+=head1 NAME
+
+nat-pre - A pre-processor for parallel texts, counting words, checking
+sentence numbers, and creating auxiliary files.
+
+=head1 SYNOPSIS
+
+ nat-pre <crp-text1> <crp-text2> <lex1> <lex2> <crp1> <crp2>
+
+=head1 DESCRIPTION
+
+This tools is integrated with C<nat-these> command, and is not
+intended to be used directly by the user. It is an independent command
+so that we can use it inside other programs and/or projects.
+
+The tool objective is to pre-process parallel corpora texts and create
+auxiliary files, to access directly corpus and lexicon information.
+
+The C<crp-text1> and C<crp-text2> should be in text format, and should
+be sentence aligned texts. Each one of these texts should contain
+lines with the single character C<$> as sentence separator. As the
+text is aligned, the number of sentences from both text files should
+be the same.
+
+To use it, if you have the aligned text files C<txt_PT> and C<txt_EN>,
+you would say:
+
+ nat-pre txt_PT txt_EN txt_PT.lex txt_EN.lex txt_PT.crp txt_PT.lex
+
+Where the C<.lex> files are I<lexical> files and C<.crp> files are
+I<corpus> files.
+
+If you process more than one pair of files, giving the same I<lexical>
+file names, identifiers will be reused, and lexical files expanded.
+
+=head1 INTERNALS
+
+Corpus and lexical files are written on binary format, and can be
+accessed using NATools source code. Here is a brief description of
+their format:
+
+=over 4
+
+=item lexical files
+
+these files describe words used on the corpus. For each different word
+(without comparing cases) it is associated an integer identifier. This
+file describe this relation.
+
+The format for this file (binary) is:
+
+  number of words (unsigned integer, 32 bits)
+  
+  'words number' times:
+    word identifier (unsigned integer, 32 bits)
+    word occurrences (unsigned integer, 32 bits)
+    word (character sequence, ending with a null)
+
+If you need to access directly these files you should download the
+NATools source and use the C<src/words.[ch]> functions.
+
+=item corpus files
+
+these files describe corpora texts, where words were substituted by
+the corresponding integer identifier.
+
+The binary format for this I<gzipped> file is:
+
+  corpus size: number of words (unsigned integer, 32 bits)
+  
+  corpus size times:
+    word identifier (unsigned integer, 32 bits)
+    flags set (character, 8 different flags)
+
+If you need to access directly these files you should download the
+NATools source and use the C<src/corpus.[ch]> functions.
+
+The flags used are:
+
+=over 4
+
+=item 0x1
+
+the word appeared all in UPPERCASE;
+
+=item 0x2
+
+the word appeared Capitalized;
+
+=back
+
+=back
+
+Two other files are created also, named C<.crp.index> which index
+offsets for sentences on corpus files.
+
+=head1 SEE ALSO
+
+NATools documentation;
+
+=head1 COPYRIGHT
+
+ Copyright (C)2002-2009 Alberto Simoes and Jose Joao Almeida
+ Copyright (C)1998 Djoerd Hiemstra
+
+ GNU GENERAL PUBLIC LICENSE (LGPL) Version 2 (June 1991)
+
+=cut
+

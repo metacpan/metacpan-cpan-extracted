@@ -1,0 +1,193 @@
+# PODNAME: Language::l33t::Specifications
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Language::l33t::Specifications
+
+=head1 VERSION
+
+version 1.0.1
+
+=head1 NAME
+
+Language::l33t::Specifications - l33t's specs
+
+=head1 DESCRIPTIONS
+
+The specs of l33t as taken from its original 
+page (C<http://electrod.ifreepages.com/l33tspec.htm>, now a dead link), 
+by Stephen McGreal.
+
+l33t is an esoteric language based loosely on BrainF***, and influenced by
+Beatnik. The basic data unit is the unsigned byte (big-endian), which can
+represent ASCII values, numbers in the range 0-255, and, well, pretty much
+anything else you can put your sick little minds to.
+
+Source is entered in l33t sP34k, and each word is evaluated as follows: Word
+are considered to be separated by spaces or carriage returns. The value of a
+word is obtained by adding the numerical digits within it together, e.g. l33t
+= 3 + 3 = 6.All other characters are valid but ignored. Words with no numeric
+characters (or in which the only numeric characters are “0”s) are evaluated to
+0. It is possible to program in l33t just using numbers, i.e. not forming
+letters in l33t 5p34k. However, programmers who do this are “teh sUxX0r”, and
+the interpreter is well within its rights to format your hard drive for
+attempting this. Needless to say, l33t is case-insensitive, but extra kudos is
+awarded for random capitalisation ;o)
+
+The language utilises a 64K block of memory, and 2 pointers - a memory pointer
+and an instruction pointer. The l33t interpreter tokenises all the words
+in the source to create a sequence of numerical opCodes (described below), and
+places them in order into the memory block, starting at byte 0. The
+instruction pointer starts at byte 0, and executes the command there to begin
+the program. Each opCode (except END) will move the instruction pointer, as
+described below. The memory pointer starts at the first byte after the
+instructions. Memory "wraps". Incrementing the memory pointer past 64K will
+cause it to run around to byte 0, and vice versa. The instruction pointer will
+behave in the same way.
+
+It is legal to move the memory pointer into the area of memory occupied by the
+instructions, so code can be self modified at runtime. Similarly, the
+instruction pointer will keep incrementing or jumping until it encounters an
+END (see below), so code can be generated at runtime and subsequently
+executed. A program doesn't necessarily have to have an END command at the end
+of it. It can generate this at runtime, or run forever.
+The Opcodes
+
+The l33t language consists of 10 opCodes, all of them in the form of decimal
+numbers. They are as follows:
+
+   VALUE OPCODE DESCRIPTION
+
+       0 NOP    No Operation, except to increment                 
+                the instruction pointer.
+
+       1 WRT    Writes the ASCII values of the byte unsignedder the memory pointer to
+                the current connection (see CON). Increments the instruction pointer.
+
+       2 RD     Reads a character from the current connection (see CON) and writes it to
+                the byte currently under the memory pointer. Increments the instruction
+                pointer.
+
+       3 IF     Moves the instruction pointer forward to the command following the
+                matching EIF, if the byte under the memory pointer is equal to zero. If the
+                byte under the memory pointer does not equal zero, IF simply increments the
+                instruction pointer.
+
+       4 EIF    Moves the instructionson pointer backwards to the command following the
+                matching IF, if the byte under the memory pointer is not equal to zero. If the
+                byte under the memory pointer does equal zero, EIF simply increments the
+                instruction pointer.
+       5 FWD    Move memory pointer forward by (Noext word+1) bytes. Adds 2 to the
+                instruction pointer.
+
+       6 BAK    Move Memoryry pointer backward by (next word+1) bytes. Adds 2 to the
+                instruction pointer.
+
+       7 INC    Increment value of the byte under memory pointer by (next
+                word+1). Adds 2 to the instruction pointer.
+
+       8 DEC    Decrement value of the byte under memory pointer by (next
+                word+1). Adds 2 to the instruction pointer.
+
+       9 CON    Reads the 6 bytes starting with the memory pointer (They first 4 bytes
+                specifying an IP in the format 127.0.0.1, and the last 2 bytes combining to
+                make a 16-bit port number * ), and opens a connection if possible. If a
+                connection can't be opened, l33t will return the error message:
+
+                 "h0s7 5uXz0r5! c4N'7 c0Nn3<7 l0l0l0l0l l4m3R !!!".
+
+                and reset the current connection to the last successful one (stdin/stdout if
+                there were no previous successful connections). If all 6 bytes read 0, l33t
+                reverts back to the local machine's stdin and stdout (this is the default
+                setting upon starting a l33t program). Increments the instruction pointer.
+                Regardless of whether the connection was successful or not, the memory
+                pointer will be left in the same place as it was. Only FWD and BAK move the
+                memory pointer.  
+
+                * The port number can be calculated by something along the lines of:
+                portNumber = (byte5 << 8) + byte
+                    
+      10 END    Closes all Open connections and ends the program. The value 10
+                won't end the program if it is used as data for OpCodes FWD, BAK, INC or
+                DEC.
+
+Note that the words for the opCodes (NOP, WRT, etc) are just handy
+conventions for referring to the opCodes, and for explaining segments of
+l33t code as pseudo-code, nothing more. Writing INC in your source will do
+nothing (it will evaluate to 0, NOP); writing “pH34r” will do something (it
+will evaluate to 7, INC).
+
+=head2 ... And Now The Bad News...
+
+A few points to be aware of:
+
+=over
+
+=item
+
+Any OpCodes evaluating to > 10 will produce an error message but carry
+on. Although this is legal syntax, it will print the standard l33t error
+code "j00 4r3 teh 5ux0r", and make your program somewhat embarrassing to
+run in public... No error will be produced if values > 10 are used as
+data for OpCodes FWD, BAK, INC & DEC.  
+
+=item
+
+l33t will interpret ANY usages of 3 and 4 as brackets, even if they
+were intended as data! So although “pH34r m3!” will increment the
+current byte by 3 as expected, a subsequent call to EIF (if the
+current byte under the memory pointer is nonzero) will jump back
+to that “m3!”. If the memory pointer fails to find a matching
+"bracket" in the direction it is looking, the results are undefined:
+chances are the program will crash, and insult your stupidity.  
+
+=item
+
+IF/EIF pairs can be nested, so for example if the byte under the
+memory pointer is 0 and the program encounters a sequence like
+IF... IF... EIF... EIF the program will jump to the second EIF ,
+not the first.  
+
+=item
+
+Memory byte values are unsigned, so they wrap: 255 + 1 = 0,
+and 0 - 1 = 255. Interpreters are advised, but not
+required to be able to handle the case where words in the
+l33t source evaluate to >255 and wrap accordingly. However,
+as this situation is very unlikely, results are undefined.  
+
+=item
+
+The 64K memory limit is arbitrary, but a handy size for
+portability and minimalism. l33t interpreters may
+utilise different memory sizes, but 64K is considered to
+be the standard. In all cases, the memory and
+instruction pointers should be data types large enough
+to cope with accessing all locations within the memory
+block (i.e. a 16-bit unsigned integer in the case of a
+64K memory block).
+
+=back
+
+=head1 AUTHOR
+
+Stephen McGreal (originally from L<http://electrod.ifreepages.com/l33tspec.htm>)
+
+=head1 AUTHOR
+
+Yanick Champoux <yanick@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

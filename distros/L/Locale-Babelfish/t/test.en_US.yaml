@@ -1,0 +1,7 @@
+simple: 'I am #{who}'
+plural:
+    case1: 'I have #{test} ((nail|nails)):test'
+    case2: 'I have #{test} ((nail|nails)):test simple using'
+    case3: 'I have #{count} ((big nail|big nails))'
+case1:
+    combine: 'I have #{ count } ((nail|nails)):count for #{single.test.deep} for #{test} ((test|tests)):test'

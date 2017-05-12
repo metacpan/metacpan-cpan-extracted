@@ -1,0 +1,214 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on February, 3  2002 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Using LinkController: Using LinkController</TITLE>
+
+<META NAME="description" CONTENT="Using LinkController: Using LinkController">
+<META NAME="keywords" CONTENT="Using LinkController: Using LinkController">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC_Top"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="link-controller_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1>Using LinkController</H1></P><P>
+
+This document describes LinkController a system for checking and
+maintaining links in infostructures
+</P><P>
+
+This document applies to version 0.033 of LinkController
+</P><P>
+
+Manual Revision Code: $Revision: 1.22 $
+</P><P>
+
+<BLOCKQUOTE><TABLE BORDER=0 CELLSPACING=0> 
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_1.html#SEC1">Introduction</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">What LinkController is about.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_2.html#SEC2">1. Getting Started</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">How to get LinkController running.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_3.html#SEC3">2. Configuration</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Setting up LinkController to check links</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_4.html#SEC8">3. Advanced Configuration</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Optimising configuration; advanced features</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC12">4. Using LinkController to Check Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Checking and repairing web pages.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_6.html#SEC21">5. Interfacing to other programs</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Importing and exporting link information.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_7.html#SEC22">6. The Emacs Interface</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">The Emacs interface.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_8.html#SEC25">7. Administration</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Administrating a LinkController installation.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_9.html#SEC32">A. Robots and Sensible Behaviour</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">General statements about how to use robots.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_10.html#SEC33">B. Uncheckable Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Links LinkController can't or won't check.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_11.html#SEC34">C. Absolute and Relative URIs</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Explanation of how relative URIs are handled.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_12.html#SEC35">D. Bugs and bug reporting</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">What to do if you find a bug.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_13.html#SEC36">E. History</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">How this came about and who helped.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC42">F. Invoking the LinkController Programs</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">How to run the programs in LinkController.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_15.html#SEC49">G. Packages Which Work With LinkController</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Packages used by or useful with LinkController.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_16.html#SEC52">H. Terms</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Glossary of terms used in this documentation.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_17.html#SEC59">Program, Variable and File Name Index</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Index of Program and Variable names</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_18.html#SEC60">Concept Index</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Index of Concepts.</TD></TR>
+</TABLE>
+
+<br>
+&nbsp;--&nbsp;The&nbsp;Detailed&nbsp;Node&nbsp;Listing&nbsp;---
+<br>
+
+<br>
+Configuration
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_3.html#SEC4">2.1 Interactive Configuration</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">An easy way to get a basic configuration.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_3.html#SEC5">2.2 Setting Configuration Variables</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">How to set variables.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_3.html#SEC6">2.3 LinkController Configuration Variables</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">LinkController's main configuration variables.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_3.html#SEC7">2.4 Configuring Infostructures</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Defining which pages to check.</TD></TR>
+</TABLE>
+
+<br>
+Advanced&nbsp;Configuration
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_4.html#SEC9">3.1 Advanced Infostructure Configuration</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Advanced control of checking</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_4.html#SEC10">3.2 Authorisation Configuration</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Checking pages which require basic authentication.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_4.html#SEC11">3.3 Configuring CGI Programs</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Setting up LinkController's web interface</TD></TR>
+</TABLE>
+
+<br>
+Using&nbsp;LinkController&nbsp;to&nbsp;Check&nbsp;Links
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC13">4.1 Extracting Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Getting link information from WWW pages.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC14">4.2 Testing Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">How to run the link testing program.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC15">4.3 Reporting Problems</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Getting information the state of your links.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC16">4.4 Email Reporting of Newly Broken Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Automatic reporting of newly broken links.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC17">4.5 Examining Individual Files</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Checking individual HTML files.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC18">4.6 Repairing Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Replacing old URLs with new ones.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC19">4.7 Making Suggestions</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Making suggestions for other users.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC20">4.8 CGI Interface</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">The LinkController web interface (primitive).</TD></TR>
+</TABLE>
+
+<br>
+Reporting&nbsp;Problems
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_5.html#SEC16">4.4 Email Reporting of Newly Broken Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Automatic notification of broken links.</TD></TR>
+</TABLE>
+
+<br>
+The&nbsp;Emacs&nbsp;Interface
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_7.html#SEC23">6.1 Finding Files with Broken Links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">An Emacs program to display broken links.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_7.html#SEC24">6.2 Finding Broken Links in Files Within Emacs</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Finding broken links in a file.</TD></TR>
+</TABLE>
+
+<br>
+Administration
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_8.html#SEC26">7.1 Setting up LinkController</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">How to get the system installed</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_8.html#SEC27">7.2 Default Installation</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">A simple multi-user installation</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_8.html#SEC28">7.3 User Administration</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Adding and removing users</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_8.html#SEC29">7.4 Cron Scripts</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Running programs automatically</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_8.html#SEC30">7.5 Link Database Maintenance</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Dealing with database problems</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_8.html#SEC31">7.6 Link Ageing</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Clearing outdated data from the databases.</TD></TR>
+</TABLE>
+
+<br>
+History
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_13.html#SEC37">E.1 Acknowledgements</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">People and or institutions who helped</TD></TR>
+</TABLE>
+
+<br>
+Acknowledgements
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_13.html#SEC38">Esoterica Internet Portugal</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP"></TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_13.html#SEC39">IPPT PAN Poland</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP"></TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_13.html#SEC40">The Tardis Project</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP"></TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_13.html#SEC41">Other Free Software Authors</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP"></TD></TR>
+</TABLE>
+
+<br>
+Invoking&nbsp;the&nbsp;LinkController&nbsp;Programs
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC43">F.1 Invoking link-report</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">link-report usage summary</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC44">F.2 Invoking test-link</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">test-link usage summary</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC45">F.3 Invoking extract-links</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">extract-links usage summary</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC46">F.4 Invoking fix-link</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">fix-link usage summary</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC47">F.5 Invoking check-page</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">check-page usage summary</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_14.html#SEC48">F.6 Invoking build-schedule</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">build-schedule usage summary</TD></TR>
+</TABLE>
+
+<br>
+Packages&nbsp;Which&nbsp;Work&nbsp;With&nbsp;LinkController
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_15.html#SEC50">G.1 The CDB utilities</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Utilities for the LinkController indexes.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_15.html#SEC51">G.2 The Tie-Transact-Hash Perl Module and Programmes</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Berkeley DB editing tools.</TD></TR>
+</TABLE>
+
+<br>
+Terms
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_16.html#SEC53">H.1 Infostructure</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Groups of resources.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_16.html#SEC54">H.2 Link</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">A connection between two resources.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_16.html#SEC55">H.3 Resource</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">The information on the World Wide Web.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_16.html#SEC56">H.4 URIs</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">A type of link including URLs</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_16.html#SEC57">H.5 URLs</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">The connections in the World Wide Web.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="link-controller_16.html#SEC58">H.6 URIs</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Names for resources without location.</TD></TR>
+</TABLE>
+
+<br>
+</BLOCKQUOTE>
+<P>
+
+<HR SIZE=1>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Michael De La Rue</I> on <I>February, 3  2002</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

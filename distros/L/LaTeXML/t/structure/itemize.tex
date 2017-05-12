@@ -1,0 +1,104 @@
+\documentclass{article}
+\begin{document}
+\section{Itemize}
+\begin{itemize}
+  \item One\label{it:one}, but not \ref{en:one}
+  \item Two\label{it:two}, but not \ref{en:two}
+  \item Three\label{it:three}, but not \ref{en:three}
+\end{itemize}
+
+\section{Enumerate}
+\begin{enumerate}
+  \item One \label{en:one}, but not \ref{de:one}
+  \item Two \label{en:two}, but not \ref{de:two}
+  \item Three \label{en:three}, but not \ref{de:three}
+\end{enumerate}
+
+\section{Description}
+\begin{description}
+  \item[One] \label{de:one}, but not \ref{it:one}
+  \item[Two] \label{de:two}, but not \ref{it:two}
+  \item[Three] \label{de:three}, but not \ref{it:three}
+\end{description}
+
+\section{Nested Enumerate}
+\begin{enumerate}
+  \item One
+\begin{enumerate}
+  \item One
+  \item Two
+  \item Three
+\end{enumerate}
+  \item Two
+\begin{enumerate}
+  \item One
+  \item Two
+  \item Three
+\end{enumerate}
+  \item Three
+\begin{enumerate}
+  \item One
+  \item Two
+  \item Three
+\end{enumerate}
+\end{enumerate}
+
+\section{Spacing}
+Taller:
+\begin{itemize}
+\itemsep=2em
+\item a
+\item b
+\item c
+\end{itemize}
+
+Taller \& Taller:
+\begin{itemize}
+\item a
+\itemsep=2em
+\item b
+\itemsep=3em
+\item c
+\end{itemize}
+
+{\itemsep=2em
+Itemsep outside has no effect:
+\begin{itemize}
+\item a
+\item b
+\item c
+\end{itemize}}
+
+\section{Mixed tags}
+\begin{itemize}
+\item a
+\item b
+\item[foo] bar
+\item c
+\end{itemize}
+
+\begin{enumerate}
+\item a
+\item b
+\item[foo] bar
+\item c
+\end{enumerate}
+
+\section{Generalized Lists}
+\begin{list}{$\star$}{}
+   \item First item.
+   \item Second.
+   \item[foo] bar
+   \item And the third.
+\end{list}
+
+\newcounter{exer}
+
+\begin{list}{\textbf{\thesection \ - \theexer}}{\usecounter{exer}}
+   \item First item.
+   \item Second.
+   \item[foo] bar
+   \item And the third.
+\end{list}
+
+\end{document}

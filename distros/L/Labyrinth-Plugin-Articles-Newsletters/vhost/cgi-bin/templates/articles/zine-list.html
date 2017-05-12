@@ -1,0 +1,78 @@
+[% subtitle = 'Newsletters - ' %]
+
+<h2>Newsletters</h2>
+
+<!--
+[% block = page.section.body %]
+[% INCLUDE "articles/arts-block.html" %]
+-->
+
+<div class="blocker">
+		<p>In the very beginning <b>ARK</b> never really had a Fan Club, more 
+		  a gathering of local fans, but as their gigs started to extend beyond 
+		  the Black Country more and more fans started writing to the band, at 
+		  this point Richard &quot;Raps&quot; Stone offered to start up an <b>ARK</b> 
+		  Fan Club, known as <i>The Family</i>. The initial newsletters, called 
+		  <i>The Teller</i> after the early <b>ARK</b> song, helped to advertise 
+		  gigs and keep fans in touch with what the band were doing. If you have
+      copies of these early newsletters, please get in touch as I would like
+      to include these too in the future.</p>
+		<p>By 1989 the mailing list had grown to a few hundred fans across the UK
+      and mainland Europe. At this point the band took over writing the 
+      newsletter themsleves, renaming it <i>The Family</i> after the Fan Club
+      itself. However, they soon realised what a task it was, and Dan The 
+      Youth, and later Barbie, took to editing the newsletter. Initially this 
+      contained a brief announcement of all things <b>ARK</b>, but eventually 
+      grew into a neat little info booklet. </p>
+		<p>The final newsletter (issue #10) was released in June 1994, with an 
+		  incomplete interview with the band. When time permits the full 
+      transcription of the interview will be included once I upload the final 
+      newsletter. </p>
+		<p> I shall upload the newsletters periodically (with additional liner 
+		  notes, where appropriate). In addition, where appropriate, I'll aim to 
+      provide both an original graphic version and a textual version of
+      newsletters.</p>
+</div>
+
+[% IF mainarts %]
+<div class="blocker">
+<ul>
+[% FOREACH item = mainarts %]
+<li><a href="/zine/item?name=[% item.data.quickname %]">[% item.data.title %]</a></li>
+[% END %]
+</ul>
+</div>
+[% END %]
+
+<div class="blocker">
+<h3>Subscribe</h3>
+
+[% IF failure %]
+<p class="alert">Sorry it seems there has been a problem trying to send your mail.
+Apologises for this inconvience, please try again later.</p>
+[% ELSIF success %]
+<p>Thank you. We have now sent you a confirmation email. Please follow the instructions
+in the email to complete your subscription</p>
+[% ELSE %]
+<p>Would you like to subscribe to the newsletters? If so, please complete the
+form below. Once you've submitted we will send you aconfirmation email, with a
+link that will add your email address to our subscriber list.
+
+<form method="post" action="[% cgipath %]/pages.cgi" id="subscriptions" enctype="multipart/form-data">
+<input type="hidden" name="act" value="zine-subscribe" />
+Name : <input type="text" name="name" id="name" value="[% sub.name %]" /><br />
+Email : <input type="text" name="email" id="email" value="[% sub.email %]" />
+[% IF resend %]
+<br />
+Your email already exists in our system, if you would like to resend your 
+confirmation email, please check the following box - Resend
+<input type="checkbox" name="resend" id="resend" value="1" />
+[% ELSE %]
+<input type="hidden" name="resend" value="0" />
+[% END %]
+<br />
+<input type="submit" value="Subscribe" />
+</form>
+</div>
+[% END %]
+

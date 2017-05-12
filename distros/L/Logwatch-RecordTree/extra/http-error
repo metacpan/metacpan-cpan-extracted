@@ -1,0 +1,212 @@
+#!/usr/bin/perl -w
+#
+# $Id$
+#
+# Logwatch service for http error logs
+# To be placed in 
+#       /etc/logwatch/scripts/http-error
+#
+# Processes all messages and summarizes them
+# Each message is given with a timestamp and RMS
+#
+# (C) 2006 by Jeremias Reith <jr@terragate.net>
+# Modified 2009 by Michael Baierl
+#
+# Revision 2.035  Sat Mar 28 16:17:29 PDT 2015 reid
+# Major rewrite to use Logwatch::RecordTree
+
+
+use strict;
+use Regexp::Common qw /net/;
+use Logwatch ':dates';
+use Time::Local;
+use POSIX qw(strftime);
+use Math::BigInt;
+use Carp;
+use Logwatch::RecordTree;
+use aliased 'Logwatch::RecordTree::IPv4' => 'IPv4', (
+    neat_names => -1,   # left-justified neat names
+    columnize  => 1,    # put into columns, if it fits
+    identify   => 1,    # try to identify each IP's owner
+    snowshoe   => 1,    # condense nets within /24 netblocks to CIDRs
+);
+use Net::IP;
+
+my $date_format = '... %b %d %H:%M:%S %Y';
+my $filter = TimeFilter($date_format);
+# $ENV{'LOGWATCH_DETAIL_LEVEL'} ||= 0;
+BEGIN { $ENV{"LOGWATCH_DATE_RANGE"} ||= ''; }
+
+# we do not use any Date:: package (or strptime) as they are probably not available
+my %month2num = ( Jan => 0, Feb => 1, Mar => 2, Apr => 3,
+                  May => 4, Jun => 5, Jul => 6, Aug => 7,
+                  Sep => 8, Oct => 9, Nov => 10, Dec => 11 );
+
+my $fd = \*STDIN;   # default to reading STDIN
+my $filename = $ARGV[0];
+if ($filename and -f $filename) {
+    open $fd, '<', $filename
+        or croak("Error opening $filename for reading: $!\n");
+    print "file opened, clearing date filter...\n";
+    $filter = '.*';
+}
+elsif (defined &DB::DB) {
+    print "DeBug detected, clearing date filter...\n";
+    $filter = '.*';
+}
+
+my $tree = Logwatch::RecordTree->new(
+    name      => 'HTTP-error events:',
+    no_indent => 1,
+);
+
+# parse log lines
+while(my $line = <$fd>) {
+
+    # skip PHP messages (have a separate script)
+    next if $line =~ / PHP (Warning|Fatal error|Notice):/o;
+
+    # skip messages that are not within the requested range
+    next unless $line =~ /^\[($filter)\]/o;
+
+    # ignore these lines:
+    if ($line =~ m/compiled version="/ or
+        $line =~ m/provided via SNI and hostname / or
+        $line =~ m/for Apache.*www.modsecurity.org.*configured/) {
+        next;   # ignore
+    }
+
+    # parse date/time out of the line
+    my ($time, $severity, $client_ip);
+    if ($line =~ s/\[(.*?)]+ \[(.*?)]+ ?(?:\[client (.*?)]+ )?//) {;
+        ($time, $severity, $client_ip) = ($1, $2, $3);
+        if ($time =~ s/(\w+) (\w+) (\d+) (\d+):(\d+):(\d+) (\d+)\s*//) {
+            # timelocal is quite chatty
+            local $SIG{'__WARN__'}  = sub {};
+            $time = timelocal($6, $5, $4, $3, $month2num{$2}, $7-1900);
+        }
+    }
+
+    chomp $line;
+    next if not $line;
+
+    if (not defined $client_ip) {
+        # OK, try it this way then
+        ($client_ip) = $line =~ m/$RE{net}{IPv4}/
+    }
+    my $client;
+    if ($client_ip) {
+        $tree->log(['Clients with events:', IPv4, {sort_key  => -999}], $client_ip);
+    }
+    else {
+        $client_ip = '<unknown>';
+    }
+
+    my ($ref_msg) = $line =~ m/, referer: (.*)/;
+    $ref_msg = $ref_msg ? "(referer: $ref_msg)" : '<no referer>';
+    my ($uri)  = $line =~ m/\[uri "(.*?)"]\s+/;
+    my ($code) = $line =~ m/with code (\d+)/;
+    my $ms = 'ModSecurity:';
+    my $msg;
+
+    if ($line =~ m/ModSecurity/) {
+        my ($id) = $line =~ m/\[id "([^"]*)"/;
+        $id ||= '<no ID>';
+        if (($msg) = $line =~ m/\[msg "(.*?)"]/) {
+            $tree->log($ms, 'Msgs:', ["$msg (modsec-id=$id)", IPv4], $client_ip);
+        }
+        elsif (($msg) = $line =~ m/ Execution error - (.*?) \[/) {
+            $tree->log($ms, 'Execution Errors:', ["$msg (modsec-id=$id)", IPv4], $client_ip);
+        }
+        elsif (($msg) = $line =~ m/ Audit log: (.*?) \[/) {
+            $tree->log($ms, ['Audit logs:', IPv4], $client_ip, $msg);
+        }
+        else {
+            # ($msg) = $line =~ m/^: (.*?)\s*\[hostname/;
+            $tree->log($ms, ['Other ModSecurity errors:', undef, {sort_key => 'ZZZ'}], $line, $client_ip);
+        }
+    }
+    elsif (($msg) = $line =~ m/client denied by server configuration: ([^,]*)/) {
+        $tree->log(['Client denied by server configuration:', IPv4], $client_ip, $msg, $ref_msg);
+    }
+    elsif (($msg) = $line =~ m/Caught race condition abuser.*open file: (.*)/) {
+        $tree->log(['Symlink (race condition abuser?):', IPv4], $client_ip, $msg);
+    }
+    elsif ($line =~ m/Request exceeded the limit of 10 internal redirects.*to get a backtrace\./) {
+        $tree->log(['Request exceeded the limit of 10 internal redirects', IPv4], $client_ip);
+    }
+    elsif (($msg) = $line =~ m/script not found or unable to stat:\s*(.*)/) {
+        $tree->log('Script not found or unable to stat:', [$msg, IPv4], $client_ip);
+    }
+    elsif (($msg) = $line =~ m/File does not exist:\s*([^,]*)/) {
+        $tree->log_no_count('File does not exist', $ref_msg, 'referred to file(s):', $msg);
+        $tree->log('File does not exist', $ref_msg, ['from ip(s):', IPv4, {sort_key=>'ZZ'}], $client_ip);
+    }
+    elsif (($msg) = $line =~ m/Failed loading\s*(.*?): /) {
+        $tree->log('Failed loading:', [$msg, IPv4], $client_ip, $ref_msg);
+    }
+    elsif (my ($what) = $line =~ m/Premature end of script headers: (.*),/) {
+        $tree->log(['Premature end of script headers:', IPv4], $client_ip, $what, $ref_msg);
+    }
+    elsif ($line =~ m/^SIGUSR1 received/ or
+           $line =~ m/^RSA server certificate is a CA certificate/ or
+           $line =~ m/^Init: Name-based SSL virtual hosts only work/ or
+           $line =~ m/^Graceful restart requested, doing restart/ or
+           $line =~ m/Bad file descriptor: apr_socket_accept/ or
+           $line =~ m/^mod_bw :/) {
+           next;    # restart lines, ignore and analyze next block instead:
+    }
+    elsif (my ($name) = $line =~ m/client sent HTTP\/1.1 request without hostname.*: (.*)/) {
+        $tree->log('HTTP/1.1 request without hostname:', $name, $client_ip);
+    }
+    elsif (my ($modules) = $line =~ m/(.*) configured -- resuming normal operations/) {
+        $tree->log('Restarts:', $modules);
+    }
+    else {
+        $tree->log(['Others:', undef, {sort_key => 'ZZZ'}], $line, $client_ip);
+    }
+}
+
+# create a limited table of clients with the most events
+my $clients_with_events = $tree->child_by_name('Clients with events:');
+if ($clients_with_events) {
+    my $children = $clients_with_events->children;
+    my $total = scalar keys %{$children};
+    my $show = int (($total + 9) / 10);  # show the top 10%
+    my $which = 'top 10 percent';
+    my $ten_or_more = 0;
+    for my $child (values %{$children}) {
+        $ten_or_more ++ if ($child->count >= 10);
+    }
+    if ($ten_or_more > $show) {
+        $show = $ten_or_more;
+        $which = "Clients with ten or more events:";
+    }
+    if ($show < 12) {   # show at least 10
+        $show = 12;
+        $which = "Top dozen clients with events:";
+    }
+    if ($total < $show) {   # unless there aren't that many
+        $show = $total;
+        $which = 'All clients with events:';
+    }
+    # can't change name, but we can change how name is printed:
+    $clients_with_events->sprint_name(sub { $which });
+
+    my @new_children =
+        map { $_->[1] }
+        sort { $b->[0] <=> $a->[0] }    # sort by number of errors, then IP
+        map { [
+            # shift error count enough bits left to account for IPv6, then
+            # add IP (as an integer) to it.
+            Math::BigInt->new($_->count)->blsft(128) + Net::IP->new($_->name)->intip,
+            $_
+        ] } values %{$children};
+    $#new_children = $show - 1 if (@new_children > $show); # truncate
+
+    $clients_with_events->children({ map { $_->name => $_ } @new_children });
+    $tree->count($tree->count - $clients_with_events->count);
+}
+
+print $tree->sprint(sub { push @{$_[0]->lines}, '' if (@{$_[1]} == 1); });
+

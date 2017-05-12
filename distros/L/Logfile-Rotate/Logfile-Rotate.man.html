@@ -1,0 +1,198 @@
+<HTML>
+<HEAD>
+<TITLE>Logfile::Rotate - Perl module to rotate logfiles.</TITLE>
+<LINK REV="made" HREF="mailto:paulg@apnic.net">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+<!--
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#optional compression">Optional Compression</A></LI>
+		<LI><A HREF="#optional relocation directory">Optional Relocation Directory</A></LI>
+	</UL>
+
+	<LI><A HREF="#warning">WARNING</A></LI>
+	<LI><A HREF="#dependancies">DEPENDANCIES</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#return">RETURN</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+-->
+<!-- INDEX END -->
+
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Logfile::Rotate - Perl module to rotate logfiles.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+   use Logfile::Rotate;
+   my $log = new Logfile::Rotate( File   =&gt; '/var/adm/syslog/syslog.log', 
+                                  Count  =&gt; 7,
+                                  Gzip  =&gt; 'lib',
+                                  Post   =&gt; sub{ 
+                                    open(IN, &quot;/var/run/syslog.pid&quot;);
+                                    kill(&quot;HUP&quot;, chomp(&lt;IN&gt;)); }
+                                  Dir    =&gt; '/var/log/old',
+                                  Flock  =&gt; 'yes',
+                                  Persist =&gt; 'yes',
+                                );</PRE>
+<PRE>
+   # process log file</PRE>
+<PRE>
+   $log-&gt;rotate();</PRE>
+<PRE>
+   or
+</PRE>
+<PRE>
+
+   my $log = new Logfile::Rotate( File  =&gt; '/var/adm/syslog', 
+                                  Gzip   =&gt; '/usr/local/bin/gzip');</PRE>
+<PRE>
+
+   # process log file</PRE>
+<PRE>
+   $log-&gt;rotate();
+   undef $log;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>I have used the name space of <A HREF="/Logfile/Base.html">the Logfile::Base manpage</A> package by <EM>Ulrich Pfeifer</EM>, 
+as the use of this module closely relates to the processing logfiles.</P>
+<DL>
+<DT><STRONG><A NAME="item_new">new</A></STRONG><BR>
+<DD>
+<A HREF="#item_new"><CODE>new</CODE></A> accepts the following arguments, <CODE>File</CODE>, <CODE>Count</CODE>, <CODE>Gzip</CODE>,
+<CODE>Pre</CODE>, <CODE>Post</CODE>, <CODE>Flock</CODE> and <CODE>Dir</CODE> with only <CODE>File</CODE> being mandatory.
+<A HREF="#item_new"><CODE>new</CODE></A> will open and lock the file, so you may co-ordinate the
+processing of the file with rotating it.  The file is closed and
+unlocked when the object is destroyed, so you can do this explicitly by
+<CODE>undef</CODE>'ing the object.
+<P>The <CODE>Pre</CODE>/<CODE>Post</CODE> arguments allow you to pass function references to
+this method, which you may use as a callback for any processing you want
+before or after the rotation. For example, you may notify the process
+writing to the file that it has been rotated.</P>
+<P>The <CODE>Pre</CODE> function is passed the current filename to be rotated as an
+argument and the <CODE>Post</CODE> function is passed the current filename that
+was rotated and that file's new filename including any extension added
+by compression previously.</P>
+<P>Both the <CODE>Pre</CODE> and <CODE>Post</CODE> function references you provide are executed
+within an <CODE>eval</CODE> statement inside the <A HREF="#item_rotate"><CODE>rotate</CODE></A> method.  If the <CODE>eval</CODE>
+returns an error then the <A HREF="#item_rotate"><CODE>rotate</CODE></A> method will croak at that point.</P>
+<P>The <CODE>Signal</CODE> argument is deprecated by the <CODE>Post</CODE> argument.</P>
+<P>The <CODE>Flock</CODE> argument allows you to specify whether the perl function
+<CODE>flock</CODE> is used to lock the file during the rotation operation.
+Apparently flock causes problems on some platforms and this option has
+been added to allow you to control the programs behaviour.  By default
+the file will be locked using <CODE>flock</CODE>.</P>
+<P>The <CODE>Persist</CODE> argument allows you to control whether the program will
+try and set the current log file ownership and permissions on any new
+files that may be created by the rotation.  In some circumstances the
+program doing the file rotation may not have sufficient permission to
+<CODE>chown</CODE> on the file.  By default the program will try and preserve
+ownership and permissions.</P>
+<P></P>
+<DT><STRONG><A NAME="item_rotate"><CODE>rotate()</CODE></A></STRONG><BR>
+<DD>
+This method will copy the file passed in <A HREF="#item_new"><CODE>new</CODE></A> to a file of the same
+name, with a numeric extension and truncate the original file to zero
+length.  The numeric extension will range from 1 up to the value
+specified by Count, or 7 if none is defined, with 1 being the most
+recent file.  When Count is reached, the older file is discarded in a
+FIFO (first in, first out) fashion. If the argument <CODE>Dir</CODE> was given, 
+all old files will be placed in the specified directory.
+<P>The <CODE>Post</CODE> function is the last step executed by the rotate method so
+the return code of rotate will be the return code of the function you
+proved, or 1 by default.</P>
+<P>The copy function is implemented by using the <A HREF="/File/Copy.html">the File::Copy manpage</A> package, but
+I have had a few people suggest that they would prefer <A HREF="/File/Move.html">the File::Move manpage</A>.
+I'm still not decided on this as you would loose data if the move should
+fail.</P>
+<P></P></DL>
+<P>
+<H2><A NAME="optional compression">Optional Compression</A></H2>
+<P>If available <A HREF="#item_rotate"><CODE>rotate</CODE></A> will also compress the file with the 
+<EM>gzip</EM> program or the program passed as the <CODE>Gzip</CODE> argument.</P>
+<P>You may now also use <CODE>lib</CODE> as a value for the <CODE>Gzip</CODE> argument.  This
+directs the program to load the <CODE>Compress::Zlib</CODE> module, if available
+and use it do the compression within perl.  <STRONG>This avoids the security
+issues associated with spawning external programs and is the recommended
+value for this option.</STRONG></P>
+<P>If no argument is defined it will first check to see if the
+<CODE>Compress::Zlib</CODE> module can be loaded then check the perl <EM>Config</EM> to
+determine if gzip is available on your system. In this case the <EM>gzip</EM>
+must be in your current path to succeed, and accept the <CODE>-f</CODE> option.</P>
+<P>See the <A HREF="#warning">WARNING</A> section below.</P>
+<P>
+<H2><A NAME="optional relocation directory">Optional Relocation Directory</A></H2>
+<P>If you specify an argument for <CODE>Dir</CODE> then the file being rotated will
+be relocated to the directory specified.  Along with any other files
+that may have been rotated previously.  If the directory name specified
+does not exist then it will be created with <CODE>0750</CODE> permissions.  If you
+wish to have other permissions on the directory then I would recommend
+you create the directory before using this module.</P>
+<P>See the <A HREF="#warning">WARNING</A> section below.</P>
+<P>
+<HR>
+<H1><A NAME="warning">WARNING</A></H1>
+<P>If a system call is made to <EM>gzip</EM> this makes this module vulnerable to
+security problems if a rogue gzip is in your path or <EM>gzip</EM> has been
+sabotaged.  For this reason a STRONGLY RECOMMEND you DO NOT use this
+module while you are ROOT.</P>
+<P>For a more secure alternative install the <CODE>Compress::Zlib</CODE> module and
+use the <STRONG>lib</STRONG> value for the <CODE>Gzip</CODE> argument.</P>
+<P>If you specify an argument for <CODE>Dir</CODE> and the directory name you pass
+does not exist, this module <STRONG>will create</STRONG> the directory with
+permissions <CODE>0750</CODE>.</P>
+<P>
+<HR>
+<H1><A NAME="dependancies">DEPENDANCIES</A></H1>
+<P>See <A HREF="/File/Copy.html">the File::Copy manpage</A>.</P>
+<P>If <CODE>Gzip</CODE> is being used it must create files with an extension 
+of <CODE>.gz</CODE> for the file to be picked by the rotate cycle.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 1997-99 Paul Gampe. All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</P>
+<P>IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY
+FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+ARISING OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY
+DERIVATIVES THEREOF, EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.</P>
+<P>THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NON-INFRINGEMENT. THIS SOFTWARE IS PROVIDED ON AN ``AS IS'' BASIS, AND
+THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE
+MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="/File/Copy.html">the File::Copy manpage</A>, <A HREF="/Logfile/Base.html">the Logfile::Base manpage</A>, <EM>flock</EM>
+<EM>Changes</EM> file for change history and credits for contributions.</P>
+<P>
+<HR>
+<H1><A NAME="return">RETURN</A></H1>
+<P>All functions return 1 on success, 0 on failure.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Paul Gampe &lt;<A HREF="mailto:paulg@apnic.net">paulg@apnic.net</A>&gt;</P>
+
+</BODY>
+
+</HTML>

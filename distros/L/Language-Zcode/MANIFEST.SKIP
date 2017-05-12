@@ -1,0 +1,24 @@
+# Things to skip when doing 'make manifest'. Use Perl regexps
+# Blank lines & lines starting with '#' are ignored
+
+# Temporary files I use in development for testing
+^tn\..*
+^b\..*
+
+# CVS
+.cvsignore
+\bCVS\b
+
+# Makemaker generated files and dirs.
+^MANIFEST\.
+^Makefile$
+^pm_to_blib$
+^blib/
+^MakeMaker-\d
+
+# Temp, old, vim and emacs backup files.
+~$
+\.old$
+^#.*#$
+^\.#
+\.swp$

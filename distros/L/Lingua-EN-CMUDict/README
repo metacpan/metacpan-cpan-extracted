@@ -1,0 +1,37 @@
+Lingua-EN-CMUDict version 0.01
+==============================
+
+This perl module exists as an interface to an augmented version of the CMU 
+pronunciation dictionary that contains syllable boundaries.  The paper 
+related to this data is  by Susan Bartlett, Grzegorz Kondrak and Colin Cherry;
+On the Syllabification of Phonemes, NAACL-HLT 2009.  Utilizing this version
+of the dictionary we can easily determine the number of syllables in a word 
+as well as find rhymes.
+
+The tool mkdbfile.pl in the tools directory can be used to create new db
+files used by the perl module.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+DB_File, version 1.818 or greater
+File::ShareDir, version 1.03 or greater.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Leigh Metcalf
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+

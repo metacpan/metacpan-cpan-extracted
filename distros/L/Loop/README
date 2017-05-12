@@ -1,0 +1,79 @@
+Loop version 1.00
+=================
+
+Loop -  Smart, Simple, Recursive Iterators for Perl programming.
+
+  use Loop;
+
+  Loop::Array @array, sub
+	{
+	my ($index,$value)=@_;
+	print "at index '$index', value='$value'\n";
+	}
+
+Loop subroutines are included for Arrays, Hashes, and Files.
+
+All looping routines support 'last' and 'redo' control flow.
+
+All looping routines support a "map" style syntax, 
+similar to the "map" perl function, where the loop can 
+return a Scalar or List, and whatever is returned is 
+accumulated into a list and returned by the Loop call.
+
+This example will return a list of keys that are contained
+in their corresponding value.
+
+  my %hash = qw 
+	(
+	aaa	bebaaa
+	abc	xyz
+	root	taproot
+	oingo	boingo
+	billy	bob
+	);
+
+  @key_is_in_value = Loop::Hash %hash, sub
+	{
+	my($key,$val)=@_;
+	if($val=~/$key/)
+		{return $key;}
+	else
+		{return;}
+	};
+
+Hashes can have nested loops, which avoids the perl builtin
+"each" problem of having a place holder for only one iterator.
+
+Files can be looped through providing a quick and easy way
+to open, read, and close a file, including error handling,
+and providing the current line number.
+
+  # print first 10 lines of file, along with each line's line number.
+  Loop::File "tfile.pl", sub
+	{
+	my($linenum,$linestr)=@_;
+	print "$linenum \t: $linestr";
+	$_[-1]='last' if ($linenum == 10);
+	};
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+	none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Greg London, All Rights Reserved
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

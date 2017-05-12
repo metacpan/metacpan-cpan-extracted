@@ -1,0 +1,179 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Lab::VISA - Perl interface to the National Instruments VISA library
+
+=head1 SYNOPSIS
+
+    use Lab::VISA;
+
+=head1 DESCRIPTION
+
+This library offers a Perl interface to National Instruments' NI-VISA library.
+Lab::VISA provides a low-level interace; it is one of the possible backends for
+the high-level measurement control package Lab::Measurement [1].
+
+This document describes the Perl syntax of the API. Each function is explained
+with some sentences cited from [2]. See this manual for further
+documentation on the library.
+
+Installation instructions for Lab::VISA can be found in L<Lab::VISA::Installation>.
+
+[1] http://www.labmeasurement.de/
+
+[2] NI-VISA Programmer Reference Manual. Part Number 370132C-01.
+    http://www.ni.com/pdf/manuals/370132c.pdf
+
+=head1 FUNCTIONS
+
+=head2 viClear
+
+    $status=Lab::VISA::viClear($vi);
+
+The C<viClear()> operation performs an IEEE 488.1-style clear of the device.
+
+=head2 viClose
+
+    $status=Lab::VISA::viClose($object);
+
+The C<viClose()> operation closes a session, event, or a find list. In this process all the data
+structures that had been allocated for the specified vi are freed. Calling C<viClose()> on a
+VISA Resource Manager session will also close all I/O sessions associated with that resource
+manager session.
+
+=head2 viFindNext
+
+    ($status, $instrDesc)=
+        Lab::VISA::viFindNext($findList);
+
+The C<viFindNext()> operation returns the next device found in the list created by
+C<viFindRsrc()>. The list is referenced by the handle that was returned by C<viFindRsrc()>.
+
+=head2 viFindRsrc
+
+    ($status, $findList, $retcnt, $instrDesc)=
+        Lab::VISA::viFindRsrc($sesn, $expr);
+
+The C<viFindRsrc()> operation matches the value specified in the C<expr> parameter with the
+resources available for a particular interface.
+
+On successful completion, this function returns the first resource found (C<instrDesc>) and
+returns a count (C<retcnt>) to indicate if there were more resources found for the designated
+interface. This function also returns, in the C<findList> parameter, a handle to a find list.
+This handle points to the list of resources and it must be used as an input to C<viFindNext()>.
+When this handle is no longer needed, it should be passed to C<viClose()>.
+
+The search criteria specified in the C<expr> parameter has two parts: a regular expression over
+a resource string and an optional logical expression over attribute values. The regular
+expression is matched against the resource strings of resources known to the VISA Resource
+Manager. If the resource string matches the regular expression, the attribute values of the
+resource are then matched against the expression over attribute values. If the match is
+successful, the resource has met the search criteria and gets added to the list of resources
+found.
+
+All resource strings returned by C<viFindRsrc()> will always be recognized by
+C<viOpen()>. However, C<viFindRsrc()> will not necessarily return all strings that you can pass
+to C<viParseRsrc()> or C<viOpen()>. This is especially true for network and C<TCPIP> resources.
+
+=head2 viGetAttribute
+
+    ($status, $attrState)=
+        Lab::VISA::viGetAttribute($object, $attribute);
+
+The C<viGetAttribute()> operation is used to retrieve the state of an attribute for the
+specified session, event, or find list.
+
+=head2 viOpen
+
+    ($status, $vi)=
+        Lab::VISA::viOpen($sesn, $rsrcName, $accessMode, $openTimeout);
+
+The C<viOpen()> operation opens a session to the specified resource. It returns a session
+identifier that can be used to call any other operations of that resource. The address string
+passed to C<viOpen()> must uniquely identify a resource.
+
+For the parameter accessMode, the value C<VI_EXCLUSIVE_LOCK> (1) is used to acquire an
+exclusive lock immediately upon opening a session; if a lock cannot be acquired, the session
+is closed and an error is returned. The value C<VI_LOAD_CONFIG> (4) is used to configure
+attributes to values specified by some external configuration utility. Multiple access modes
+can be used simultaneously by specifying a bit-wise OR of the values other than C<VI_NULL>.
+NI-VISA currently supports C<VI_LOAD_CONFIG> only on Serial INSTR sessions.
+
+=head2 viOpenDefaultRM
+
+    ($status, $sesn)=
+        Lab::VISA::viOpenDefaultRM();
+
+The C<viOpenDefaultRM()> function must be called before any VISA operations can be
+invoked. The first call to this function initializes the VISA system, including the Default
+Resource Manager resource, and also returns a session to that resource. Subsequent calls
+to this function return unique sessions to the same Default Resource Manager resource.
+
+When a Resource Manager session is passed to C<viClose()>, not only is that session closed,
+but also all find lists and device sessions (which that Resource Manager session was used to
+create) are closed.
+
+=head2 viRead
+
+    ($status, $buf, $retCount)=
+        Lab::VISA::viRead($vi, $count);
+
+The C<viRead()> operation synchronously transfers data. The data read is to be stored in the
+buffer represented by buf. This operation returns only when the transfer terminates. Only one
+synchronous read operation can occur at any one time.
+
+=head2 viSetAttribute
+
+    $status=Lab::VISA::viSetAttribute($vi, $attribute, $attrState);
+
+The C<viSetAttribute()> operation is used to modify the state of an attribute for the specified
+object.
+
+=head2 viWrite
+
+    ($status, $retCount)=
+        Lab::VISA::viWrite($vi, $buf, $count);
+
+The C<viWrite()> operation synchronously transfers data. The data to be written is in the buffer
+represented by buf. This operation returns only when the transfer terminates. Only one
+synchronous write operation can occur at any one time.
+
+=head1 CAVEATS/BUGS
+
+Not all API functions are supported. Only GPIB, serial, and TCP/IP connections have been tested so far.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<GPIB>
+
+This module can also provide instrument connectivity from perl, but builds on top
+of GPIB instead of the higher level VISA. I could never make it work properly.
+It seems to be unmaintained for a while.
+
+=item L<http://pyvisa.sourceforge.net/>
+
+As the website states, the PyVISA package enables you to control all kinds of measurement
+equipment through various busses (GPIB, RS232, USB) with Python programs.
+
+This project was indicated to me only recently by a Lab::VISA user. It looks very similar.
+
+=back
+
+=head1 AUTHOR/COPYRIGHT
+
+ This swig-based interface is
+  (c) 2004-2006 Daniel Schröer
+  (c) 2007-2010 Daniel Schröer, Andreas K. Hüttel, Daniela Taubert, and others 
+  (c) 2011-2014 Andreas K. Hüttel
+
+ It is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+ For the rest National Instruments or the VXI Consortium will probably have a word to say. See
+ National Instrument's license for the NI-VISA library.
+
+=cut

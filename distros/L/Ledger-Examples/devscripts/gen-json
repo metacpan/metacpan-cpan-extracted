@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Ledger::Parser;
+use File::Slurper qw(write_text);
+use JSON;
+
+my $json = JSON->new->allow_nonref->pretty->canonical;
+
+my $parser = Ledger::Parser->new();
+for (glob "share/examples/*.dat") {
+    next if /TODO-|invalid-/;
+    say "$_ ...";
+    write_text("$_.json", $json->encode($parser->read_file($_)->dump));
+}
+

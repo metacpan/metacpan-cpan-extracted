@@ -1,0 +1,56 @@
+[% 
+    editmode = 'Edit' ;
+    title = 'Diary Comments' ;
+    htmltitle = title ;
+
+    crumb3_name = 'Diary' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=diary-admin' ;
+    crumb2_name = 'Comments' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=diary-cadmin' ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+[% IF comment.subject %]<h3>[% comment.subject %]</h3>[% END %]
+[% comment.body %]
+<p class="small">Posted by [% comment.author %] on [% comment.postdate %]</p>
+
+<p><a href="/cgi-bin/pages.cgi?act=diary-edit&amp;articleid=[% comment.entryid %]">Back</a></p>
+
+<hr />
+
+<h3>Edit Comment</h3>
+
+[% IF thanks %]<p>Comment has been updated.[% END %]
+
+<div class="boxer">
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="diary-csave" />
+<input type="hidden" name="commentid" value="[% comment.commentid %]" />
+<input type="hidden" name="publish" value="[% comment.publish %]" />
+
+<table class="blocker">
+<tr><th width="85">Subject</th>
+    <th width="10" class="alert">[% comment.subject_err %]</th>
+    <td><input type="text" name="subject" value="[% comment.subject %]" size="50" /></td>
+</tr>
+<tr><th>Your Name *</th>
+    <th class="alert">[% comment.author_err %]</th>
+    <td><input type="text" name="author" value="[% comment.author %]" size="50" /></td>
+</tr>
+<tr><th>Comment *</th>
+    <th class="alert">[% comment.body_err %]</th>
+    <td><textarea name="body" rows="15" cols="40" />[% comment.body %]</textarea></td>
+</tr>
+<tr><th>Link</th>
+    <th class="alert">[% comment.href_err %]</th>
+    <td><input type="text" name="href" value="[% comment.href %]" size="50" /></td>
+</tr>
+<tr><th></th>
+    <th></th>
+    <td><input type="submit" value="Submit" /></td>
+</tr>
+</table>
+</form>
+</div>

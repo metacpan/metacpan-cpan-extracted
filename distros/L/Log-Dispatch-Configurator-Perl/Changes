@@ -1,0 +1,26 @@
+Revision history for Perl extension Log::Dispatch::Configurator::Perl
+
+0.0132  Mon Jun 24 09:00:54 JST 2013
+    [NO CODE CHANGES]
+        - fixed a wrong dependency
+        - .gitignore
+        - travis.yml
+
+0.0131  Sun Oct 14 16:32:00 JST 2012
+        [NO CODE CHANGES]
+        - fixed for kwalitee
+        - supported trais-ci(on github)
+
+0.013   Mon Nov 28 23:10:00 JST 2011
+        - fixed test
+
+0.012   Sat Oct 15 23:49:00 JST 2011
+        [no code changes]
+        - added dependency module
+
+0.011   Wed Oct 12 08:23:00 JST 2011
+        [no code changes: 0.01 could not build]
+        - fixed MANIFEST list
+
+0.01    Tue Oct 11 07:34:00 JST 2011
+        - original version

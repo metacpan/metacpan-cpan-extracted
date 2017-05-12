@@ -1,0 +1,109 @@
+NAME
+    Locale::Maketext::Extract::Plugin::XSL - XSL file parser
+
+VERSION
+    Version 0.4
+
+SYNOPSIS
+        my $ext = Locale::Maketext::Extract->new(
+                    plugins => {'Locale::Maketext::Extract::Plugin::XSL' => '*'} );
+        $ext->extract_file('test.xsl');
+        $ext->compile();
+
+        or perhaps more convenient:
+
+        xgettext.pl -P Locale::Maketext::Extract::Plugin::XSL <files>
+
+DESCRIPTION
+    Extracts strings to localise from XSL stylesheet files.
+
+    Using Perl, custom localisation functions may be registered using
+    "register_function" in XML::LibXSLT->register_function().
+
+KNOWN FILE TYPES
+    .xsl
+    .xslt
+
+VALID FORMATS
+    This plugin will check for localisation functions in all attribute
+    values of the XSL document. Valid localisation function names are:
+
+    loc
+    locfrag
+    l
+    lfrag
+
+    Note that only the local-name for the function will be checked for.
+    Namespace prefixes will be ignored. I.e. <xsl:value-of
+    select="i18n:loc('Hello World')"/> and <xsl:value-of
+    select="sth:loc('Hello World')"/> will be treated the same.
+
+FUNCTIONS
+  file_types
+    File types this plugin should handle
+
+  extract
+    Extraction function. Parses XSL document and adds localisation entries
+
+  _parse_expression
+    Extract loc functions from XPATH expressions
+
+SEE ALSO
+    xgettext.pl
+        for extracting translatable strings from common template systems and
+        perl source files.
+
+    Locale::Maketext::Lexicon
+    Locale::Maketext::Plugin::Base
+    Locale::Maketext::Plugin::FormFu
+    Locale::Maketext::Plugin::Perl
+    Locale::Maketext::Plugin::TT2
+    Locale::Maketext::Plugin::YAML
+    Locale::Maketext::Plugin::Mason
+    Locale::Maketext::Plugin::TextTemplate
+    Locale::Maketext::Plugin::Generic
+    XML::LibXSLT
+
+AUTHOR
+    Michael Kroell, "<pepl at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-locale-maketext-extract-plugin-xsl at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Locale-Maketext-Extract-
+    Plugin-XSL>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Locale::Maketext::Extract::Plugin::XSL
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Locale-Maketext-Extract-Pl
+        ugin-XSL>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Locale-Maketext-Extract-Plugin-XSL>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Locale-Maketext-Extract-Plugin-XSL>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Locale-Maketext-Extract-Plugin-XSL>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT
+    Copyright 2008-2011 Michael Kroell, all rights reserved.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

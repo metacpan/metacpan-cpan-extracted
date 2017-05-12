@@ -1,0 +1,13 @@
+/Build
+/Makefile
+/_build
+/blib
+/META.json
+/META.yml
+/MYMETA.json
+/MYMETA.yml
+/Makefile.PL
+/SIGNATURE
+/Lexical-SealRequireHints-*
+/lib/Lexical/SealRequireHints.c
+/lib/Lexical/SealRequireHints.o

@@ -1,0 +1,2 @@
+0.02 - Removed PREREQ_FATAL from Makefile.PL, since it keeps CPAN and
+       CPANPLUS from autoinstalling the prereq.

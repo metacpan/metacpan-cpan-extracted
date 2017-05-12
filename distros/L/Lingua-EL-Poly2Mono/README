@@ -1,0 +1,31 @@
+Lingua::EL::Poly2Mono, version .01
+
+This module converts polytonic Greek text to monotonic.
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module:
+
+    [sudo] perl -MCPAN -e "install Lingua::EL::Poly2Mono"
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+    perldoc Lingua::EL::Poly2Mono
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Father Chrysostomos
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

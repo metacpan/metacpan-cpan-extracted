@@ -1,0 +1,17 @@
+
+Lisp::Fmt
+
+an implementation of Lisp's format function
+
+example usage:
+
+    use Lisp::Fmt;
+    $x = fmt( '~r', 47 );
+    print "x is $x\n";
+
+or
+
+    use Lisp::fmt;
+    $x = 47;
+    pfmt( '~r', $x );
+

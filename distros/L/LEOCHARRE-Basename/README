@@ -1,0 +1,92 @@
+
+================================================================================
+
+LEOCHARRE::Basename - very basic filename string and path operations
+    such as ext and paths
+
+SUBS
+    None exported by default.
+
+  abs_dir()
+    Arg is path string. Checks that it is a dir on disk. Returns abs path.
+    Returns undef on fail.
+
+  abs_file()
+    Arg is path string. Checks that it is a file on disk. Returns abs path.
+    Returns undef on fail.
+
+  abs_loc()
+    Arg is path string. Checks that it exists on disk. Returns abs path to
+    parent directory. Returns undef on fail.
+
+  abs_path()
+    Arg is path string. Checks that it exists on disk. Returns abs path.
+    Returns undef on fail.
+
+  filename()
+    Arg is path string, or string. Cleans up and returns filename. Returns
+    undef on fail.
+
+  filename_ext()
+    Arg is path string, or string. Cleans up and returns filename extesion.
+    Returns undef on fail.
+
+  filename_only()
+    Arg is path string, or string. Cleans up and returns filename without
+    extension. If it has no extension, returns same arg. Returns undef on
+    fail.
+
+BUGS
+    Please contact the AUTHOR for any issues, suggestions, bugs etc.
+
+AUTHOR
+    Leo Charre leocharre at cpan dot org
+
+COPYRIGHT
+    Copyright (c) Leo Charre. All rights reserved.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms and conditions as Perl itself.
+
+    This means that you can, at your option, redistribute it and/or modify
+    it under either the terms the GNU Public License (GPL) version 1 or
+    later, or under the Perl Artistic License.
+
+    See http://dev.perl.org/licenses/
+
+DISCLAIMER
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+    Use of this software in any way or in any form, source or binary, is not
+    allowed in any country which prohibits disclaimers of any implied
+    warranties of merchantability or fitness for a particular purpose or any
+    disclaimers of a similar nature.
+
+    IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+    SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF
+    THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT LIMITED TO, LOST
+    PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
+
+
+--------------------------------------------------------------------------------
+
+
+
+REQUIRES
+
+Carp: 1
+Cwd: 3
+Exporter: 5
+Test::Simple: 0
+
+
+INSTALL
+
+   perl Makefile.PL
+   make install
+
+
+

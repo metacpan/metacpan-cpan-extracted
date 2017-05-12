@@ -1,0 +1,14 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "foo"
+msgstr "foo"
+
+msgid "bar"
+msgstr "bar"
+
+msgid "baz"
+msgstr "baz"

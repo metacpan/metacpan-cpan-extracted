@@ -1,0 +1,51 @@
+Labyrinth-Plugin-Review-Book
+============================
+
+This distribution acts as a plugin to Labyrinth, a Website Management Framework.
+
+The files within this distribution provide all the functionality required to 
+implement a simple review site engine. Together with supplementary files stored
+within the /vhost directory, this distribution can be included within your
+existing site to provide reviews.
+
+Other sub-classed distributions will be become available to add more specific
+features to enable review product lookups.
+
+INSTALLATION
+
+See the INSTALL file for full instructions for how to install the modules.
+
+ADDITIONAL FILES
+
+Additional files are needed to enable Labyrinth and any installed plugins to 
+work correctly. These files consist of SQL, HTML template and configuration 
+files, together with some basic CSS and Javascript files.
+
+However, these files are only the beginning, and to implement your website, 
+you will need to update the appropriate files to use your own layout design.
+
+ADDITION INFORMATION
+
+Although Labyrinth has long been in development, documentation has not been a 
+priority. As such much of the documentation you may need to understand how to 
+use Labyrinth is the code itself. If you have the inclination, documentation 
+patches would be very gratefully received.
+
+The Labyrinth website [1] will eventually feature a documentation site, wiki 
+and other features which are intended to provide you with the information to 
+use and extend Labyrinth as you wish.
+
+[1] http://labyrinth.missbarbell.co.uk
+
+AUTHOR
+
+  Barbie, <barbie@missbarbell.co.uk> for Miss Barbell Productions,
+  <http://www.missbarbell.co.uk/>
+
+COPYRIGHT & LICENSE
+
+  Copyright (C) 2002-2015 Barbie for Miss Barbell Productions
+  All Rights Reserved.
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

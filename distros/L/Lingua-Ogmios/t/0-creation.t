@@ -1,0 +1,32 @@
+use strict;
+use warnings;
+
+use Test::More tests => 3;
+
+use Lingua::Ogmios;
+
+my $NLPPlatform = Lingua::Ogmios->new();
+ok( defined($NLPPlatform) && ref $NLPPlatform eq 'Lingua::Ogmios',     'new() works' );
+
+
+my $NLPPlatform2 = Lingua::Ogmios->new('rcfile' => 'etc/ogmios/nlpplatform.rc');
+ok( defined($NLPPlatform2) && ref $NLPPlatform2 eq 'Lingua::Ogmios',     'new() with rcfile works' );
+
+
+my $NLPPlatformOld = Lingua::Ogmios->new('rcfile' => 'etc/ogmios/nlpplatform-old.rc');
+ok( defined($NLPPlatformOld) && ref $NLPPlatformOld eq 'Lingua::Ogmios',     'new() with rcfile works' );
+
+
+
+# my @words = ("Bacillus", "subtilis");
+# my $RA2 = Lingua::ResourceAdequacy->new("word_list" => \@words);
+
+# ok( defined($RA2) && ref $RA2 eq 'Lingua::ResourceAdequacy',     'new() works' );
+
+
+# my @terms = ("Bacillus substilis", "B. substilis", "Bacillus substilis");
+
+# my $RA3 = Lingua::ResourceAdequacy->new("word_list" => \@words, 
+# 					      "term_list" => \@terms);
+
+# ok( defined($RA3) && ref $RA2 eq 'Lingua::ResourceAdequacy',     'new() works' );

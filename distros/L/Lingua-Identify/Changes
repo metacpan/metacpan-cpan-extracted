@@ -1,0 +1,221 @@
+Revision history for Lingua-Identify
+
+0.56  Sat Aug 17 20:22:16 WEST 2013
+        - Added Czech (thanks to Roger Thompson)
+
+0.55  Wed Jul 24 21:51:32 WEST 2013
+        - Fixed the HI test that included some English text.
+
+0.54  Thu May 30 17:40:24 WEST 2013
+        - Added Welsh (Thanks to Kevin Donnelly)
+
+0.53  Sat May 25 15:29:48 WEST 2013
+        - Fix stupid failure in perl v5.18.
+
+0.52  Tue Feb 12 21:03:20 WET 2013
+        - Added Hindi (Thanks to Prashant Mathur)
+
+0.51  Wed May  2 14:51:06 WEST 2012
+        - Added Ukranian and corrected Russian and Bulgarian tranining corpora.
+          (Thanks to André Santos)
+
+0.50  Wed Dec  7 15:43:48 WET 2011
+        - update requirements, trying to solve some cpan testers issues
+
+0.31  Wed Nov 23 22:22:03 WET 2011
+        - some cpantesters complain about non declared variabled in test. Fix it;
+
+0.30  Fri Aug 19 21:39:46 WEST 2011
+        - added abstract to be shown on metacpan and other cpan indexers;
+
+0.29  Tue Nov 23 15:40:17 WET 2010
+        - added Greek. Thanks to Nikos Mastropavlos.
+
+0.28  Mon Oct 18 11:15:36 WEST 2010
+        - betterned langof for the empty string on dev-perl. 
+
+0.27  Fri Oct 15 21:59:18 WEST 2010
+        - ignore older language modules;
+
+0.26  Fri May 21 18:01:32 WEST 2010
+        - Added input encoding choice on langof_file;
+        - Added input encoding choice on langident;
+        - Added latin1 test;
+
+0.25  Fri May 21 17:22:03 WEST 2010
+        - Really dropped Text::ExtractWords dependency;
+        - Some code rewrite for UTF-8 support (now is the default);
+        - Dropped some knew languages given lack of training corpora;
+        - Added some new languages;
+        - Added at least two tests per language (t/02 and t/06);
+
+0.23  Fri Jan 16 21:55:00 2009
+	- Drop Text::ExtractWords dependency.
+	  (it was giving segmentation fault, and it is
+	   no maintained)
+
+0.22  Fri Jan 16 21:30:00 2009
+	- fixed the extract_from option.
+	  (Text::ExtractWords doesn't handle big files)
+
+0.21  Sat Dec 13 11:52:00 2008
+    - Fixed tests that were using installed languages.
+      (still needing fixes)
+
+0.20  Thu Dec 11 19:39:00 2008
+    - Fixed tests to use $^X instead of 'perl'.
+
+0.19  Thu Oct 16 18:02:00 2008
+   - changed maintainership information.
+
+0.18  Thu Nov 03 08:32:00 2005
+	+ changes on Lingua::Identify
+	- minor changes in the documentation
+	- added tests for some corner cases (empty inputs, etc)
+	- added tests to increase test coverage
+
+0.17  Wed Nov 02 11:57:00 2005
+	+ changes on Lingua::Identify
+	- added tests to see if every function is loaded
+	- added method langof_file, to work with files
+	- added tests for langof_file
+	- added more tests to increase test coverage
+
+0.16  Thu Aug 03 00:53:00 2005
+	+ changes on Lingua::Identify
+	- minor changes in the documentation
+
+	+ changes on make-lingua-identify-language
+	- added verbose mode (-V switch)
+
+	- fixed another bug in the POD for Somali
+
+0.15  Wed Aug 02 14:11:00 2005
+	- more POD changes
+
+0.14  Wed Aug 02 11:48:00 2005
+	+ changes on make-lingua-identify-language
+	- fixed a bug that was printing POD wrongly
+
+	+ changes on languages modules
+	- fixed the POD
+
+0.13  Wed Aug 02 09:30:00 2005
+	+ changes on Lingua::Identify
+	- added dummy mode, for debugging, so you know what's going on
+	  under the hood
+	- fixed some minor glitches in the documentation
+	- added some more tests
+	- reorganized existing tests
+	- added 7 more languages, thanks to George Wilson (ID, MS, RO,
+	  RU, SL, SO, SW)
+
+	+ changes on langident
+	- added some crude form of support for big files, with the -s
+	  switch
+
+	+ changes on make-lingua-identify-language
+	- fixed a potential glitch for languages with two letter codes
+	  that happen to be Perl reserved words
+	- fixed some POD issues
+
+0.12  Mon Jun 21 15:38:00 2005
+	+ changes on Lingua::Identify
+	- minor changes in the documentation
+	- added support for big inputs (through options 'extract-from'
+	  and 'max-size'; see HOW TO PERFORM IDENTIFICATION -> langof
+	  -> OPTIONS)
+
+	+ changes on langident
+	- fixed a weird bug (results would vary for a file if there
+	  were others being processed too; that is, `langident a` and
+	  `langident a b` would return different results for "a"
+
+0.11  Tue Dec 21 16:28:00 2004
+	+ changes on Lingua::Identify
+	- added documentation detailing the confidence level
+
+	+ changes on make-lingua-identify-language
+	- fixed the POD problem
+
+0.10  Mon Dec 20 11:18:23 2004
+	- added make-lingua-identify-language to the MANIFEST
+
+0.09  Fri Dec 17 15:49:23 2004
+	+ changes on Lingua::Identify
+	- minor changes in the documentation
+
+	+ added make-lingua-identify-language
+
+0.08  Fri Nov 05 11:55:00 2004
+	+ changes on Lingua::Identify
+	- fixed a glitch in the documentation (thanks to Matti Korttila)
+
+	+ changes on langident
+	- fixed an embarassing bug (thanks to Matti Korttila)
+	- fixed a bug on the -m switch
+	- added some validation for the -m switch
+
+0.07  Thu Nov 04 01:57:02 2004
+	+ changes on Lingua::Identify
+	- added 7 more languages (BG, GA, HR, HU, IS, PL, TR)
+	- added pod-coverage.t to the tests directory
+
+	+ changes on langident
+	- improved the documentation (and added examples to it)
+	- added the -o switch (work only with specified languages)
+	- added the -e switch (chose the methods to use)
+	- added the -c switch (show confidence level for most probable
+	  language)
+	- the -d switch (debug) now actually prints something (the
+	  values of the command-line options).
+	- command-line options are now parsed with Getopt::Std (much
+	  better)
+
+0.06  Wed Nov 03 12:20:14 2004
+	+ changes on Lingua::Identify
+	- fixed a bug in the submodules documentation
+	- added the function confidence
+
+0.05  Mon Nov 01 20:00:00 2004
+	+ changes on Lingua::Identify
+	- some more changes in the documentation
+	- language modules now have some generic documentation
+	- added pod.t to the tests directory
+	- added a section with examples in the documentation
+	- added function name_of
+
+	+ changes on langident
+	- added the -l switch: list all languages
+
+0.04  Sat Oct 30 17:43:00 2004
+	+ changes on Lingua::Identify
+	- Perl required version is now 5.006
+	- tests for language manipulation are now automated
+	- added 11 more languages (AF, BR, BS, CY, DA, EO, FI, FY, LA, NL, NO,
+	  SQ, SV)
+	- added a small test to avoid confusing possible future submodules of
+	  Lingua::Identify with languages
+	- improved the documentation
+
+	+ changes on langident
+	- added the -m switch (limit number of languages shown)
+	- langident version is now the version of Lingua::Identify
+
+0.03  Wed Oct 27 10:13:10 2004
+        - major changes in the architecture
+	- major changes in the documentation
+	- more languages
+	- more methods
+	- more stuff (see the documentation)
+	- more power
+
+0.02  Mon Jul 26 23:43:39 2004
+        - basic functionality
+        - added the `langident` command
+        - improved documentation
+
+0.01  Fri Oct  1 11:59:44 2004
+	- original version; created by h2xs 1.23 with options
+		-XAn Lingua::Identify
+

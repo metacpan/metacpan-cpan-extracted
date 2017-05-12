@@ -1,0 +1,27 @@
+Revision history for Linux-SocketFilter
+
+0.04    CHANGES:
+         * Provide convenience 'LD AD[name]' pseudoinstruction for auxiliary
+           data
+         * Document the filter virtual machine
+         * Added example code in synopsis sections and in its own file
+
+        BUGFIXES:
+         * Compatibility fix for <linux/types.h>
+
+0.03    CHANGES:
+         * New instructions: LDMSHX, TAX, TXA
+        
+        BUGFIXES:
+         * Corrected accidentally-swapped LD X vs LDX A
+
+0.02    CHANGES:
+         * Added Linux::SocketFilter::Assembler
+         * Added proper tests
+         * Support :bpf export tag
+        
+        BUGFIXES:
+         * Ensure that detach_filter() actually works
+
+0.01    First version, released on an unsuspecting world.
+

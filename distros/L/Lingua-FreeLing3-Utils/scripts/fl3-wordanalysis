@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use lib 'lib';
+
+use Lingua::FreeLing3::Utils qw/word_analysis/;
+use FL3;
+use Getopt::Std;
+use Data::Dumper;
+use Encode;
+
+my %opts;
+getopt('l', \%opts);
+
+my $l = $opts{l} || "en";
+
+binmode STDOUT, ":utf8";
+while (<>) {
+    my $line = decode("utf8", $_);
+    my $words = tokenizer($l)->tokenize($line);
+    my @x = word_analysis({%opts}, @$words);
+    while (@x) {
+        my $w = shift @$words;
+        my $a = shift @x;
+        $w = $w->form;
+        if (@$a) {
+            print "* $w";
+            for my $x (@$a) {
+                print " [$x->{lemma}, $x->{tag}]"
+            }
+            print "\n";
+        } else {
+            print "& ${w} [not found]\n"
+        }
+    }
+}

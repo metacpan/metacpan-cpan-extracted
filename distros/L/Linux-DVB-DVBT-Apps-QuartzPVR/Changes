@@ -1,0 +1,33 @@
+Revision history for Perl module Linux::DVB::DVBT::App::QuartzPVR.
+
+0.07  Thu Oct 27 18:42:56 2011
+	- Bug fix: forgot to add VIDEO_TRASH variable to Config.inc!
+
+0.06  Thu Oct 27 15:42:56 2011
+	- Fixed cleanpath() to remove invalid chars *after* expanding all variables
+	- Ensure cron jobs have full pathname
+	- Fixed pathspec so it now actually gets used!
+	- Default video trash can to .TRASH directory and allow user to change it
+	- Fixed bug where series name ended up as 'Series - '
+	- Install script now reads existing cron jobs and ensures times are preserved
+
+0.05  Tue Sep 05 12:17:56 2011
+	- added help HTML
+	- corrected usermod problem
+
+0.04  Sat Sep 03 17:17:56 2011
+	- fixed prerequisites bug
+	- included required PEAR php modules
+	- fixed init.d script
+	- corrected install script (user add section)
+		
+0.03  Fri Sep 02 19:17:56 2011
+	- fixed MANIFEST bug
+		
+0.02  Fri Sep 02 12:59:56 2011
+	- fixed nasty namespace fouling
+		
+0.01  Thu Aug 25 15:59:56 2011
+	- original version
+		
+

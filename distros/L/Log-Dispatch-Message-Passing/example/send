@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Log::Dispatch;
+use Log::Dispatch::Message::Passing;
+use Message::Passing::Filter::Encoder::JSON;
+use Message::Passing::Output::ZeroMQ;
+
+my $log = Log::Dispatch->new;
+
+$log->add(Log::Dispatch::Message::Passing->new(
+      name      => 'myapp_aggregate_log',
+      min_level => 'debug',
+      output    => Message::Passing::Filter::Encoder::JSON->new(
+        output_to => Message::Passing::Output::ZeroMQ->new(
+            connect => 'tcp://127.0.0.1:5558',
+        ),
+     ),
+));
+$log->warn($_) for qw/ foo bar baz /;
+
+sleep 1; # Allow time for ZeroMQ to actually flush the messages..
+

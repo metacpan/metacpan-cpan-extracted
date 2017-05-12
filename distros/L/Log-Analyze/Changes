@@ -1,0 +1,8 @@
+Revision history for Perl extension Log::Analyze
+
+0.00002  2008/08/12
+     - edited Makefile.PL 
+     - corrected a mistake of POD
+
+0.00001  2008/08/12
+     - original version

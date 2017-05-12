@@ -1,0 +1,25 @@
+NAME
+    sta2phrases - extract aligned phrases from aligned treebanks
+
+SYNOPSIS
+        sta2phrases alignments.xml
+
+DESCRIPTION
+    "sta2moses" runs through all node alignments and extracts pairs of
+    phrases (yield of source and target language subtree) and prints those
+    phrases in Moses compatible format. These phrases can then be used in
+    phrase-based SMT if you like.
+
+SEE ALSO
+    Lingua::Align::Trees, Lingua::treealign
+
+AUTHOR
+    Joerg Tiedemann, <jorg.tiedemann@lingfil.uu.se>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Joerg Tiedemann
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

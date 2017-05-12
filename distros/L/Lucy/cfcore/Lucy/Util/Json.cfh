@@ -1,0 +1,91 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Encode/decode JSON.
+ *
+ * Provides utility functions for encoding/decoding JSON.
+ */
+class Lucy::Util::Json inherits Clownfish::Obj {
+
+    /** Encode `dump` as JSON.  Returns NULL and sets the global error object
+     * returned by [](cfish:cfish.Err.get_error) on failure.
+     */
+    inert incremented nullable String*
+    to_json(Obj *dump);
+
+    /** Decode the supplied JSON and return a data structure made
+     * of Hashes, Vectors, and Strings.  Returns NULL and sets the global
+     * error object returned by [](cfish:cfish.Err.get_error) on failure.
+     */
+    inert incremented nullable Obj*
+    from_json(String *json);
+
+    /** Encode `dump` as JSON and attempt to write to the indicated
+     * file.
+     * @return true if the write succeeds, false on failure (sets the global
+     * error object returned by [](cfish:cfish.Err.get_error)).
+     */
+    inert bool
+    spew_json(Obj *dump, Folder *folder, String *path);
+
+    /** Decode the JSON in the file at `path` and return a data
+     * structure made of Hashes, Vectors, and Strings.  Returns NULL and sets
+     * the global error object returned by [](cfish:cfish.Err.get_error) if
+     * the file can't be can't be opened or if the file doesn't contain valid
+     * JSON.
+     */
+    inert incremented nullable Obj*
+    slurp_json(Folder *folder, String *path);
+
+    /** Allow the encoder to output strings, etc, instead of throwing an error
+     * on anything other than a hash or an array.  Testing only.
+     */
+    inert void
+    set_tolerant(bool tolerant);
+
+    /** Extract an integer value from an object that is part of a JSON
+     * structure. Throws an error if the object isn't a String or Num.
+     */
+    inert int64_t
+    obj_to_i64(Obj *obj);
+
+    /** Extract a float value from an object that is part of a JSON
+     * structure. Throws an error if the object isn't a String or Num.
+     */
+    inert double
+    obj_to_f64(Obj *obj);
+
+    /** Extract a bool value from an object that is part of a JSON
+     * structure. Throws an error if the object isn't a String or Num.
+     */
+    inert bool
+    obj_to_bool(Obj *obj);
+}
+
+
+__C__
+
+struct lucy_JsonParserState 
+{
+    cfish_Obj *result;
+    bool       errors;
+};
+typedef struct lucy_JsonParserState lucy_JsonParserState;
+
+__END_C__
+

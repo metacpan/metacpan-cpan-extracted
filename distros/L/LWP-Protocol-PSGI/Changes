@@ -1,0 +1,31 @@
+Revision history for Perl extension LWP::Protocol::PSGI
+
+0.09  2016-03-03 08:58:44 PST
+        - Update documentation
+        - Remove Guard dependency
+
+0.08  2015-10-07 13:17:29 PDT
+        - Fix a bug where "host" matcher doesn't match if port number is included
+
+0.07  2014-05-19 12:42:49 PDT
+        - Update documentation (dsteinbrunner, sawyerx)
+        - Remove some dependencies (syohex)
+
+0.06  2013-06-21 00:32:11 PDT
+        - Fix unnecessary dependency (syohex)
+
+0.05  2013-06-20 20:54:13 PDT
+        - Support mounting multiple apps with different hosts (lestrrat)
+
+0.04  Thu Jan  3 14:44:31 PST 2013
+        - Documentation changes, no code changes
+
+0.03  Sun Aug 12 20:51:48 PDT 2012
+        - Added options to allow limiting overrides, so that PSGI apps that uses LWP
+          can safely use them without being affected #1
+
+0.02  Wed May 11 18:29:44 PDT 2011
+        - Skip tests for https
+
+0.01  Tue May 10 22:19:47 2011
+        - original version

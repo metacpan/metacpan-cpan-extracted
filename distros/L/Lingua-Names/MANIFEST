@@ -1,0 +1,10 @@
+Changes
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/Lingua/Names.pm
+lib/Lingua/Names.pod
+t/00-compile.t
+t/01-is_name.t
+META.yml                                 Module meta-data (added by MakeMaker)

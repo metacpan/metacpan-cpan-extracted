@@ -1,0 +1,244 @@
+---
+abstract: 'a modular logfile analyzer'
+author:
+  - 'Markus Benning <ich@markusbenning.de>'
+build_requires:
+  File::Find: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Saftpresse
+provides:
+  Log::Saftpresse:
+    file: lib/Log/Saftpresse.pm
+    version: '1.6'
+  Log::Saftpresse::Analyzer:
+    file: lib/Log/Saftpresse/Analyzer.pm
+    version: '1.6'
+  Log::Saftpresse::App:
+    file: lib/Log/Saftpresse/App.pm
+    version: '1.6'
+  Log::Saftpresse::Config:
+    file: lib/Log/Saftpresse/Config.pm
+    version: '1.6'
+  Log::Saftpresse::Constants:
+    file: lib/Log/Saftpresse/Constants.pm
+    version: '1.6'
+  Log::Saftpresse::CounterOutputs:
+    file: lib/Log/Saftpresse/CounterOutputs.pm
+    version: '1.6'
+  Log::Saftpresse::Counters:
+    file: lib/Log/Saftpresse/Counters.pm
+    version: '1.6'
+  Log::Saftpresse::CountersOutput:
+    file: lib/Log/Saftpresse/CountersOutput.pm
+    version: '1.6'
+  Log::Saftpresse::CountersOutput::Dump:
+    file: lib/Log/Saftpresse/CountersOutput/Dump.pm
+    version: '1.6'
+  Log::Saftpresse::CountersOutput::Graphite:
+    file: lib/Log/Saftpresse/CountersOutput/Graphite.pm
+    version: '1.6'
+  Log::Saftpresse::CountersOutput::Html:
+    file: lib/Log/Saftpresse/CountersOutput/Html.pm
+    version: '1.6'
+  Log::Saftpresse::CountersOutput::JSON:
+    file: lib/Log/Saftpresse/CountersOutput/JSON.pm
+    version: '1.6'
+  Log::Saftpresse::CountersOutput::Pflogsumm:
+    file: lib/Log/Saftpresse/CountersOutput/Pflogsumm.pm
+    version: '1.6'
+  Log::Saftpresse::Input:
+    file: lib/Log/Saftpresse/Input.pm
+    version: '1.6'
+  Log::Saftpresse::Input::Command:
+    file: lib/Log/Saftpresse/Input/Command.pm
+    version: '1.6'
+  Log::Saftpresse::Input::Command::Child:
+    file: lib/Log/Saftpresse/Input/Command/Child.pm
+    version: '1.6'
+  Log::Saftpresse::Input::FileTail:
+    file: lib/Log/Saftpresse/Input/FileTail.pm
+    version: '1.6'
+  Log::Saftpresse::Input::Journald:
+    file: lib/Log/Saftpresse/Input/Journald.pm
+    version: '1.6'
+  Log::Saftpresse::Input::Lumberjack:
+    file: lib/Log/Saftpresse/Input/Lumberjack.pm
+    version: '1.6'
+  Log::Saftpresse::Input::RELP:
+    file: lib/Log/Saftpresse/Input/RELP.pm
+    version: '1.6'
+  Log::Saftpresse::Input::RELP::Frame:
+    file: lib/Log/Saftpresse/Input/RELP/Frame.pm
+    version: '1.6'
+  Log::Saftpresse::Input::RELP::RSP:
+    file: lib/Log/Saftpresse/Input/RELP/RSP.pm
+    version: '1.6'
+  Log::Saftpresse::Input::Redis:
+    file: lib/Log/Saftpresse/Input/Redis.pm
+    version: '1.6'
+  Log::Saftpresse::Input::Server:
+    file: lib/Log/Saftpresse/Input/Server.pm
+    version: '1.6'
+  Log::Saftpresse::Input::Stdin:
+    file: lib/Log/Saftpresse/Input/Stdin.pm
+    version: '1.6'
+  Log::Saftpresse::Log4perl:
+    file: lib/Log/Saftpresse/Log4perl.pm
+    version: '1.6'
+  Log::Saftpresse::Notes:
+    file: lib/Log/Saftpresse/Notes.pm
+    version: '1.6'
+  Log::Saftpresse::Output:
+    file: lib/Log/Saftpresse/Output.pm
+    version: '1.6'
+  Log::Saftpresse::Output::Elasticsearch:
+    file: lib/Log/Saftpresse/Output/Elasticsearch.pm
+    version: '1.6'
+  Log::Saftpresse::Output::Graphite:
+    file: lib/Log/Saftpresse/Output/Graphite.pm
+    version: '1.6'
+  Log::Saftpresse::Output::JSON:
+    file: lib/Log/Saftpresse/Output/JSON.pm
+    version: '1.6'
+  Log::Saftpresse::Output::Redis:
+    file: lib/Log/Saftpresse/Output/Redis.pm
+    version: '1.6'
+  Log::Saftpresse::Outputs:
+    file: lib/Log/Saftpresse/Outputs.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin:
+    file: lib/Log/Saftpresse/Plugin.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Amavis:
+    file: lib/Log/Saftpresse/Plugin/Amavis.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Apache:
+    file: lib/Log/Saftpresse/Plugin/Apache.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::GeoIP:
+    file: lib/Log/Saftpresse/Plugin/GeoIP.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::GraphitLineFormat:
+    file: lib/Log/Saftpresse/Plugin/GraphitLineFormat.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::LimitDay:
+    file: lib/Log/Saftpresse/Plugin/LimitDay.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::LimitProgram:
+    file: lib/Log/Saftpresse/Plugin/LimitProgram.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::LinuxNetfilter:
+    file: lib/Log/Saftpresse/Plugin/LinuxNetfilter.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::MtPolicyd:
+    file: lib/Log/Saftpresse/Plugin/MtPolicyd.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Postfix:
+    file: lib/Log/Saftpresse/Plugin/Postfix.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Postfix::Delivered:
+    file: lib/Log/Saftpresse/Plugin/Postfix/Delivered.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Postfix::Messages:
+    file: lib/Log/Saftpresse/Plugin/Postfix/Messages.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Postfix::QueueID:
+    file: lib/Log/Saftpresse/Plugin/Postfix/QueueID.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Postfix::Recieved:
+    file: lib/Log/Saftpresse/Plugin/Postfix/Recieved.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Postfix::Rejects:
+    file: lib/Log/Saftpresse/Plugin/Postfix/Rejects.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Postfix::Service:
+    file: lib/Log/Saftpresse/Plugin/Postfix/Service.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Postfix::Smtp:
+    file: lib/Log/Saftpresse/Plugin/Postfix/Smtp.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Postfix::Smtpd:
+    file: lib/Log/Saftpresse/Plugin/Postfix/Smtpd.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Postfix::Tls:
+    file: lib/Log/Saftpresse/Plugin/Postfix/Tls.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Postfix::Utils:
+    file: lib/Log/Saftpresse/Plugin/Postfix/Utils.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::PostfixGeoStats:
+    file: lib/Log/Saftpresse/Plugin/PostfixGeoStats.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Role::CounterUtils:
+    file: lib/Log/Saftpresse/Plugin/Role/CounterUtils.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Role::Tracking:
+    file: lib/Log/Saftpresse/Plugin/Role/Tracking.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::Syslog:
+    file: lib/Log/Saftpresse/Plugin/Syslog.pm
+    version: '1.6'
+  Log::Saftpresse::Plugin::SyslogFile:
+    file: lib/Log/Saftpresse/Plugin/SyslogFile.pm
+    version: '1.6'
+  Log::Saftpresse::PluginContainer:
+    file: lib/Log/Saftpresse/PluginContainer.pm
+    version: '1.6'
+  Log::Saftpresse::Slurp:
+    file: lib/Log/Saftpresse/Slurp.pm
+    version: '1.6'
+  Log::Saftpresse::Utils:
+    file: lib/Log/Saftpresse/Utils.pm
+    version: '1.6'
+requires:
+  Carp: '0'
+  Config::General: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Slurp: '0'
+  File::stat: '0'
+  Geo::IP: '0'
+  Getopt::Long: '0'
+  HTTP::BrowserDetect: '0'
+  IO::File: '0'
+  IO::Handle: '0'
+  IO::Select: '0'
+  IO::Socket::INET: '0'
+  JSON: '0'
+  Log::Log4perl: '0'
+  Log::Log4perl::Appender::ScreenColoredLevels: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Net::Lumberjack: '0'
+  Pod::Usage: '0'
+  Redis: '0'
+  Search::Elasticsearch: '0'
+  Sys::Hostname: '0'
+  Template: '0'
+  Template::Stash: '0'
+  Tie::IxHash: '0'
+  Time::HiRes: '0'
+  Time::Piece: '0'
+  Time::Seconds: '0'
+  URI: '0'
+  UUID: '0'
+  base: '0'
+  locale: '0'
+  perl: v5.8.5
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/benningm/saftpresse/issues
+  repository: https://github.com/benningm/saftpresse
+version: '1.6'
+x_serialization_backend: 'YAML::Tiny version 1.69'

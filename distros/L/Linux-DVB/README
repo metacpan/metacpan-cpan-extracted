@@ -1,0 +1,250 @@
+NAME
+    Linux::DVB - interface to (some parts of) the Linux DVB API
+
+SYNOPSIS
+     use Linux::DVB;
+
+DESCRIPTION
+    This module provides an interface to the Linux DVB API. It is a
+    straightforward translation of the C API. You should read the Linux DVB
+    API description to make any sense of this module. It can be found here:
+
+       http://www.linuxtv.org/docs/dvbapi/dvbapi.html
+
+    All constants from frontend.h and demux.h are exported by their C name
+    and by default.
+
+    Noteworthy differences to the C API: unions and sub-structs are usually
+    translated into flat perl hashes, i.e "struct.u.qam.symbol_rate" becomes
+    "$struct->{symbol_rate}".
+
+    Noteworthy limitations of this module include: No interface to the
+    video, audio and net devices. If you need this functionality bug the
+    author.
+
+Linux::DVB::Frontend CLASS
+  SYNOPSIS
+     my $fe = new Linux::DVB::Frontend $path, $writable;
+
+     my $fe = new Linux::DVB::Frontend
+                 "/dev/dvb/adapter0/frontend0", 1;
+
+     $fe->fh; # filehandle
+     $fe->fd; # fileno
+     $fe->blocking (0); # or 1
+
+     $fe->{name}
+     $fe->{type}
+     $fe->frontend_info->{name}
+
+     $fe->status & FE_HAS_LOCK
+     print $fe->ber, $fe->snr, $fe->signal_strength, $fe->uncorrected;
+
+     my $tune = $fe->parameters;
+     $tune->{frequency};
+     $tune->{symbol_rate};
+
+    $fe->set (parameter => value, ...)
+        Sets frontend parameters. All values are stuffed into the
+        "dvb_frontend_parameters" structure without conversion and passed to
+        FE_SET_FRONTEND.
+
+        Returns true on success.
+
+        All modes:
+
+          frequency         =>
+          inversion         =>
+
+        QPSK frontends:
+
+          symbol_rate       =>
+          fec_inner         =>
+
+        QAM frontends:
+
+          symbol_rate       =>
+          modulation        =>
+
+        QFDM frontends:
+
+          bandwidth         =>
+          code_rate_HP      =>
+          code_rate_LP      =>
+          constellation     =>
+          transmission_mode =>
+
+    $fe->parameters
+        Calls FE_GET_FRONTEND and returns a hash reference that contains the
+        same keys as given to the "set" method.
+
+        Example:
+
+          Data::Dumper::Dumper $fe->get
+  
+          {
+            frequency   => 426000000, # 426 Mhz
+            inversion   => 0,         # INVERSION_OFF
+            symbol_rate => 6900000,   # 6.9 MB/s
+            modulation  => 3,         # QAM_64
+          }
+
+    $ok = $fe->diseqc_reset_overload
+        If the bus has been automatically powered off due to power overload,
+        this call restores the power to the bus. The call requires
+        read/write access to the device. This call has no effect if the
+        device is manually powered off. Not all DVB adapters support this
+        call.
+
+    $ok = $fe->diseqc_voltage (13|18)
+        Set the DiSEqC voltage to either 13 or 18 volts.
+
+    $ok = $fe->diseqc_tone (1|0)
+        Enables (1) or disables (0) the DiSEqC continuous 22khz tone
+        generation.
+
+    $ok = $fe->diseqc_send_burst (0|1)
+        Sends a 22KHz tone burst of type SEC_MINI_A (0) or SEC_MINI_B (1).
+
+    $ok = $fe->diseqc_cmd ($command)
+        Sends a DiSEqC command ($command is 3 to 6 bytes of binary data).
+
+    $reply = $fe->diseqc_reply ($timeout)
+        Receives a reply to a DiSEqC 2.0 command and returns it as a binary
+        octet string 0..4 bytes in length (or "undef" in the error case).
+
+Linux::DVB::Demux CLASS
+  SYNOPSIS
+     my $dmx = new Linux::DVB::Demux
+                 "/dev/dvb/adapter0/demux0";
+
+     $fe->fh; # filehandle
+     $fe->fd; # fileno
+     $fe->blocking (1); # non-blocking is default
+
+     $dmx->buffer (16384);
+     $dmx->sct_filter ($pid, "filter", "mask", $timeout=0, $flags=DMX_CHECK_CRC);
+     $dmx->pes_filter ($pid, $input, $output, $type, $flags=0);
+     $dmx->start; 
+     $dmx->stop;
+
+Linux::DVB::Decode CLASS
+  SYNOPSIS
+       $si_decoded_hashref = Linux::DVB::Decode::si $section_data;
+
+    $hashref = Linux::DVB::Decode::si $section_data
+        Tries to parse the string inside $section_data as an SI table and
+        return it as a hash reference. Only the first SI table will be
+        returned as hash reference, and the $section_data will be modified
+        in-place by removing the table data.
+
+        The way to use this function is to append new data to your
+        $section_data and then call "Linux::DVB::Decode::si" in a loop until
+        it returns "undef". Please ntoe, however, that the Linux DVB API
+        will return only one table at a time from sysread, so you can safely
+        assume that every sysread will return exactly one (or zero in case
+        of errors) SI table.
+
+        Here is an example of what to expect:
+
+          {
+            'segment_last_section_number' => 112,
+            'table_id' => 81,
+            'service_id' => 28129,
+            'original_network_id' => 1,
+            'section_syntax_indicator' => 1,
+            'current_next_indicator' => 1,
+            'events' => [
+                          {
+                            'running_status' => 0,
+                            'start_time_hms' => 2097152,
+                            'event_id' => 39505,
+                            'free_CA_mode' => 0,
+                            'start_time_mjd' => 53470,
+                            'descriptors' => [
+                                               {
+                                                 'event_name' => 'Nachrichten',
+                                                 'text' => '',
+                                                 'ISO_639_language_code' => 'deu',
+                                                 'type' => 77
+                                               },
+                                               {
+                                                 'programme_identification_label' => 337280,
+                                                 'type' => 105
+                                               },
+                                               {
+                                                 'raw_data' => '22:0010.04#00',
+                                                 'type' => 130
+                                               }
+                                             ],
+                            'duration' => 1280
+                          },
+                          {
+                            'running_status' => 0,
+                            'start_time_hms' => 2098432,
+                            'event_id' => 39506,
+                            'free_CA_mode' => 0,
+                            'start_time_mjd' => 53470,
+                            'descriptors' => [
+                                               {
+                                                 'event_name' => 'SR 1 - Nachtwerk',
+                                                 'text' => '',
+                                                 'ISO_639_language_code' => 'deu',
+                                                 'type' => 77
+                                               },
+                                               {
+                                                 'programme_identification_label' => 337285,
+                                                 'type' => 105
+                                               },
+                                               {
+                                                 'raw_data' => '22:0510.04#00',
+                                                 'type' => 130
+                                               }
+                                             ],
+                            'duration' => 87296
+                          }
+                        ],
+            'last_table_id' => 81,
+            'section_number' => 112,
+            'last_section_number' => 176,
+            'version_number' => 31,
+            'transport_stream_id' => 1101
+          }
+
+    $text = Linux::DVB::Decode::text $data
+        Converts text found in DVB si tables into perl text. Only
+        iso-8859-1..-11 and UTF-16 is supported, other encodings (big5 etc.
+        is not. Bug me if you need this).
+
+    %Linux::DVB::Decode::nibble_to_genre
+        A two-level hash mapping genre nibbles to genres, e.g.
+
+           $Linux::DVB::Decode::nibble_to_genre{7}{6}
+           => 'film/cinema'
+
+    ($sec,$min,$hour) = Linux::DVB::Decode::time $hms
+    ($mday,$mon,$year) = Linux::DVB::Decode::date $mjd
+    ($sec,$min,$hour,$mday,$mon,$year) = Linux::DVB::Decode::datetime $mjd,
+    $hms
+    $sec = Linux::DVB::Decode::time_linear $hms
+    $sec = Linux::DVB::Decode::datetime_linear $mjd, $hms
+        Break down a "DVB time" (modified julian date + bcd encoded seconds)
+        into it's components (non-"_linear") or into a seconds count
+        ("_linear" variants) since the epoch ("datetime_linear") or the
+        start of the day ("time_linear").
+
+        The format of the returns value of the date and datetime functions
+        is *not* compatible with "Time::Local". Use the "_linear" functions
+        instead.
+
+        Example:
+
+           my $time = Linux::DVB::Decode::datetime_linear $mjd, $hms
+           printf "Starts at %s\n",
+              POSIX::strftime "%Y-%m-%d %H:%M:%S",
+                 localtime $time;
+
+AUTHORS
+     Marc Lehmann <schmorp@schmorp.de>, http://home.schmorp.de/
+     Magnus Schmidt, eMail at http://www.27b-6.de/email.php
+

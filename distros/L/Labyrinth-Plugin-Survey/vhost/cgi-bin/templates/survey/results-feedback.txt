@@ -1,0 +1,33 @@
+[% FOREACH section = survey.sections %]
+[% IF section.label == 'Feedback' %]
+[% section.label %]
+
+[% IF section.preamble; section.preamble %]
+
+
+[% END %]
+[% FOREACH question = section.questions %]
+[% IF question.status != 'hidden' %]
+
+[% question.label %]
+
+
+[% IF question.multipart %]
+[% FOREACH q = question.multipart %]
+[% INCLUDE "survey/results-survey-question.txt" %]
+[% END %]
+
+[% ELSE %]
+[% q = question %]
+[% INCLUDE "survey/results-survey-question.txt" %]
+
+[% END %]
+[% END %]
+[% END %]
+[% IF section.footnote; section.footnote %]
+
+
+[% END %]
+
+[% END %]
+[% END %]

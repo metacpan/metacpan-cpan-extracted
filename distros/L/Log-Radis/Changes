@@ -1,0 +1,13 @@
+Revision history for Log-Radis
+
+0.003 2016-07-13
+ - preserve full message if given
+
+0.002 2016-05-01
+ - Fix documentation
+ - Fix failure with Redis
+
+0.001 2016-04-30
+ - Initial release
+
+0.000 0000-00-00

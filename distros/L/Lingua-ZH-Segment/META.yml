@@ -1,0 +1,13 @@
+name: Lingua-ZH-Segment
+version: 0.01
+abstract: Simple Segmentation of Chinese Text
+author: Cheng-Lung Sung <clsung@tw.freebsd.org>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.8.1
+  Test::More: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

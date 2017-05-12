@@ -1,0 +1,13 @@
+Revision history for Perl extension Log::Log4perl::Layout::LTSV
+
+1.000_000 - Thu Sep 17 00:54:11 CEST 2015
+
+ - Initial release
+
+1.000_001 - Thu Sep 17 09:21:28 CEST 2015
+
+ - Perl 5.23.2 compatibility
+
+1.000_004 - Thu Sep 17 12:49:02 CEST 2015
+
+ - Improved documentation

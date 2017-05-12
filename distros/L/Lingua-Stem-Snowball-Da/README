@@ -1,0 +1,27 @@
+Lingua/Stem/Snowball/Da version 1.0
+==============================
+
+Lingua::Stem::Snowball::Da is a perl port of the danish
+stemmer at http://snowball.sourceforge.net, it was originally altered
+from the Lingua::Stem::Snowball::Se
+
+It also supports caching of words and it's stemmed equavilent.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Dennis Haney <davh@davh.dk>
+Copyright (C) 2001-2002 Ask Solem Hoel <ask@unixmonks.net> (Swedish version)
+

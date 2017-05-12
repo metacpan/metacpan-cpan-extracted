@@ -1,0 +1,106 @@
+#!perl
+use strict;
+use warnings;
+# PODNAME: lastfm_export
+# ABSTRACT: data exporter for last.fm
+
+use DBI;
+use Getopt::Long qw(:config pass_through);
+use LastFM::Export;
+use Term::ProgressBar;
+
+my ($dsn, $user, $quiet);
+GetOptions(
+    'dsn=s'  => \$dsn,
+    'user=s' => \$user,
+    'quiet'  => \$quiet,
+);
+die "--dsn is required" unless $dsn;
+die "--user is required" unless $user;
+
+my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1, AutoCommit => 0 });
+my $from = 0;
+if (!$dbh->tables(undef, undef, 'tracks')) {
+    $dbh->do(<<'');
+    CREATE TABLE `tracks` (
+        artist varchar(1024) NOT NULL,
+        album varchar(1024) DEFAULT NULL,
+        name varchar(1024) NOT NULL,
+        timestamp integer(11) NOT NULL
+    );
+
+}
+else {
+    ($from) = $dbh->selectrow_array('SELECT timestamp FROM tracks ORDER BY timestamp DESC LIMIT 1');
+}
+
+my $exporter = LastFM::Export->new(user => $user);
+
+my $track_count = $exporter->track_count(from => $from);
+if (!$track_count) {
+    $dbh->disconnect;
+    exit(0);
+}
+
+my $progress;
+if (!$quiet) {
+    $progress = Term::ProgressBar->new({
+        count => $track_count,
+        ETA   => 'linear',
+    });
+}
+
+my $sth = $dbh->prepare(
+    'INSERT INTO tracks (artist, album, name, timestamp) VALUES (?, ?, ?, ?)'
+);
+
+my $count = 1;
+my $s = $exporter->tracks(from => $from);
+while (my $block = $s->next) {
+    for my $item (@$block) {
+        if ($item->{date}{uts}) {
+            $sth->execute(
+                $item->{artist}{'#text'},
+                $item->{album}{'#text'},
+                $item->{name},
+                $item->{date}{uts},
+            );
+            $progress->update($count++) unless $quiet;
+        }
+        else {
+            $progress->message("skipping currently playing song: "
+                             . "$item->{artist}{'#text'} - $item->{name}")
+                unless $quiet;
+        }
+    }
+    $dbh->commit;
+    sleep 1;
+}
+
+$dbh->disconnect;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+lastfm_export - data exporter for last.fm
+
+=head1 VERSION
+
+version 0.03
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy@tozt.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Jesse Luehrs.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

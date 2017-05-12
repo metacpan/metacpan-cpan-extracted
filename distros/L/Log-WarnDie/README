@@ -1,0 +1,41 @@
+Log-WarnDie 0.08
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Log::WarnDie
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-WarnDie
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Log-WarnDie
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Log-WarnDie
+
+    Search CPAN
+        http://search.cpan.org/dist/Log-WarnDie/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2004, 2007 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Portions of version 0.06 and beyond, copyright (C) 2017 Nigel Horne. Those
+portions are released under GPL2.

@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+use strict;
+use base 'LEOCHARRE::CLI';
+use lib './lib';
+use LEOCHARRE::PMInspect;
+
+
+for my $path ( @{argv_aspaths()} ){
+  
+
+   # instantiate
+   # must be OO
+
+   my $i = LEOCHARRE::PMInspect->new({
+      pm_path => $path,
+   });
+
+   print $i->output;
+
+   
+   
+   
+   
+
+}
+
+
+
+
+
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pminspect
+
+=head1 USAGE
+
+   pminspect ./lib/Mod.pm
+
+=head1 AUTHOR
+
+Leo Charre
+
+=head1 SEE ALSO
+
+LEOCHARRE::Dev
+
+=cut

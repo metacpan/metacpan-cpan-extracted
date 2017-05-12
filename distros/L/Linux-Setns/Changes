@@ -1,0 +1,49 @@
+Revision history for Perl extension Linux::Setns.
+
+2.1   Mon Jan  1 00:29:19 2017
+    - updated copyright year
+
+2.0   Tue Nov  1 04:58:35 2016
+    - Added CLONE_NEWCGROUP flag
+
+1.04  Thu Oct  6 02:23:41 2016
+    - Removed wrongly added files in the archive
+
+1.03  Wed Oct  5 23:08:40 2016
+    - Introduced META.json
+    - Added LICENSE and META.json to the MANIFEST
+	- Added required perl version to both META.json and META.yml
+
+1.02  Thu Aug 18 15:45:00 2016
+	- Added CLONE_NEWNS, CLONE_NEWPID and CLONE_NEWUSER
+	- Fixed the documentation in Setns.pm
+
+1.01  Thu Aug 18 15:05:00 2016
+	- Changed the license to Perl(thanks to Mohammad S Anwar - https://github.com/Manwar)
+	- Update the documentation of the Perl module to reflect the changes done in 1.01
+
+1.00  Wed Aug 17 19:20:10 2016
+	- Almost complete rewrite of the function!
+	- Changed the interface, to setns(). Now instead of file descriptor we directly give it path to a namespace file. This removes the need to convert Perl FD into C FD.
+	- Improved the error handling and now we catch all setns() errors
+	- Replaced __NR_setns with SYS_setns. In order for the change to work I also changed the included headers
+	- Simplified the setns() function in the XS code
+	- Replaced the PPCODE with CODE and now I properly return the RETVAL from the XS code
+	- Added new test for invalid path
+
+0.05  Fri Jun 03 10:52:49 2016
+	- Replaced the Perl 5.18 requirement with Perl 5.10
+
+0.04  Mon Sep 01 00:57:51 2014
+	- Added repository and lincense links
+
+0.03  Sun Aug 17 02:40:05 2014
+    - Updated the example, as it had errors(the use statment was for unshare, not setns)
+
+0.02  Mon Jul 28 04:08:09 2014
+	- Updated the version and removed some commented code
+	- Added basic META.yml file
+
+0.01  Thu Jul 24 08:08:22 2014
+	- original version; created by h2xs 1.23 with options
+		-A -n Linux::Setns

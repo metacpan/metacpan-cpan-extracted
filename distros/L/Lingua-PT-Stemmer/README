@@ -1,0 +1,23 @@
+
+    README for Perl distribution Lingua-PT-Stemmer
+
+This distribution provides stemmers for Portuguese and Galician.
+
+    Lingua::PT::Stemmer
+    Lingua::GL::Stemmer
+
+You can read a nicely formatted version of the documentation for
+the modules online:
+
+    https://metacpan.org/pod/Lingua::PT::Stemmer
+    https://metacpan.org/pod/Lingua::GL::Stemmer
+
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one, have a look at:
+
+    http://www.cpan.org/modules/INSTALL.html
+
+This module was written by Xern <xern@cpan.org>
+
+Copyright (C) 2003 xern <xern@cpan.org>,
+released under the same terms as Perl itself

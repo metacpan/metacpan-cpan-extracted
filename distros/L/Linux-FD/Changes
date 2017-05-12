@@ -1,0 +1,42 @@
+Revision history for Linux-FD
+
+0.011     2014-05-11 13:08:16 Europe/Amsterdam
+          Fix various compilation issues on threaded perls
+
+0.010     2014-05-10 00:08:30CEST+0200 Europe/Amsterdam
+          Run signal handlers ASAP
+          Move all remaining pure-perl code to xs
+
+0.009     2012-08-16 12:29:53 Europe/Amsterdam
+          Allocate sigset buffer correctly
+
+0.008     2012-07-06 15:19:20 Europe/Bucharest
+          Move some code from Perl to XS, mixing was more complicated.
+          Improve strerror_r detection
+
+0.007     2011-12-04 13:10:14 Europe/Amsterdam
+          Improve compatibility with legacy perl versions
+          Fixed C89 compatibility
+
+0.006     2011-12-02 01:37:32 Europe/Amsterdam
+          Added semaphore support to Linux::FD::Event
+
+0.005     2011-09-15 01:22:49 Europe/Amsterdam
+          Converted to Dist::Zilla
+          Handle 5.15.3's new POSIX::SigSet representation
+          Fix strerror_r usage wrt GNU vs POSIX
+
+0.004   2010-11-26
+        Made blocking handles the default again, to avoid confusion
+        Reversed module loading, so modules can be loaded separately
+        Improve sigmask_t support
+
+0.003   2010-10-29
+        Converted send/receive methods to XS to be able to handle quads regardless of perl's IV size
+
+0.002   2010-09-24
+        Fixed a unit test
+
+0.001   2010-09-20
+        First version, released on an unsuspecting world.
+

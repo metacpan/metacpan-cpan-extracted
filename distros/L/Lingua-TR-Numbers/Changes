@@ -1,0 +1,28 @@
+Revision history for Perl extension Lingua::TR::Numbers.
+
+0.32 Tue Jul  5 01:24:23 2016
+    => Bump version.
+
+0.31 Sun Jul  8 01:50:04 2012
+    => Bump version.
+
+0.30 Tue Dec  1 04:29:00 2009
+    => perlcritic refactoring.
+
+0.23 Thu Apr 23 14:37:39 2009
+    => Update builder.
+
+0.22 Sat Apr 18 06:27:56 2009
+    => Update distro tools.
+
+0.21 Sun Jan 20 19:42:27 2008
+    => Test::More is now a prereq.
+    => Removed skip.test & fixed 01-pod.t for legacy perls.
+    => Converted all EOL to LF.
+    => No functional change.
+
+0.2 Wed Oct 18 21:14:02 2006
+    => Internal cleanup and some fixes.
+
+0.1 Sat Oct 14 22:21:12 2006
+    => First release.

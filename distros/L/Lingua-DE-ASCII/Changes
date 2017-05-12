@@ -1,0 +1,86 @@
+Revision history for Perl extension Lingua::DE::ASCII.
+
+0.12  Fri Aug 05, 2016
+        - fixed Bug #25310 for Lingua-DE-ASCII: Lingua::DE::ASCII: grep assignment bug
+
+0.11  Tue Sep 02, 2003
+        - fixed bug for the name of
+          * "Boegehold"
+          => perhaps not that important, but the street I'm living has his name
+          :-)
+
+0.10  Thu Aug 19, 2003
+        - fixed behaviour of words like
+          * "IssueType" 
+          => after an ü is not any uppercase character allowed
+
+0.09  Fri Jun 27, 2003
+        - changed behaviour for words like
+            * "Studentmassen" (with ss instead of ß)
+            * "society"       (in English way and not as French "sociéty")
+
+0.08  Thu May 20, 2003
+        - fixed bug "a language" => "à language"
+        - changed behaviour for "loss" (engl.) != "loß",
+          now the english word is preferenced
+
+0.07  Thu May 13, 2003
+        - removed forced dependency of Term::ProgressBar
+          (allthough, it's still recommended)
+        - added common English words (with ae,oe,ue,ss) to the test data 
+          (created new dat file: 'english.dat')
+        - fixed wrong test schema
+          too less had been tested (because I have specified a wrong range)
+        - improved speed of to_latin1 method
+
+0.06  Sat May 10, 2003
+        - fixed bug 
+          "eventuell" became "eventuell" if any uppercase word was in
+          the same line before this words
+        - fixed bug 
+          defined, but false strings given to to_latin1 and to_ascii
+          returned undef instead of the string
+        - fixed bug
+          e.g. "Judäa lausbuberisch" (No offense -- I really got that error)
+          became to "Judäà ..."
+          as the ä had been interpreted as a word break and thus "a la" => "à la"
+        - fixed bug
+          some changings were only done once on a string instead of global
+          (e.g. avoiding "ss"=>"ß" for "fusselig" and co)
+        - added test that tests strings of repeating words
+        - unified test scripts
+        - made test scripts more intensiv,
+          as now every word is tested in an environment of other words coming randomly
+        - now a progress bar is shown when testing all the words
+        - made tests a bit quicker
+
+0.05  Mon May 05, 2003
+        - enabled that every printable ANSI character
+          (chr(160) .. chr(255)) results in an non-empty ASCII string
+
+0.04  Mon Apr 28, 2003
+        - fixed bug: Module died if ue and ß had been in one string passed to
+          to_latin1
+        - added test: to_latin1 is tested with a lot of words containing an
+          [äöüÄÖÜ] and an ß, where the [äöüÄÖÜ] is translated to
+          ae/oe/ue/Ae/Oe/Ue and the ß is still an ß 
+
+0.03  Sam Apr 26 2003
+        - fixed bug » and « had been simply removed,
+		  created a new test script for these case t/special_characters.t
+        - fixed bug "Eventuell" => "Eventüll"
+
+0.02  Wed Apr 23 2003
+        - rearranged tests to get different test scripts
+          for: * forein language words
+               * words with mutatitions, separated for ä, ö, ü, ß
+               * words with the critical letter combinations, separated for ae, ue, oe, ss
+               * complete texts
+        - tested with many more words
+
+0.01  Mon Mar 24 2003
+	- original version; created by h2xs 1.20 with options
+		-XA -b5.6.0 Lingua::DE::ASCII
+        - with two methods: to_ascii and to_latin1
+        - tested with 200 000 german words with mutations(Umlaute)
+

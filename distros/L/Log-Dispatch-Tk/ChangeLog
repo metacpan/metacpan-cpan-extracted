@@ -1,0 +1,21 @@
+2017-01-01  Dominique Dumont  <ddumont@cpan.org> v1.8
+
+	* Add hide_label parameter (Thanks to Tom Mc Meeki)
+
+2004-02-02  Dominique Dumont  <ddumont@cpan.org> v1.7
+
+	* ToTk.pm: - accepts leading dash in parameters
+
+	* TkText.pm: - accepts leading dash in parameters
+	- replaced -state => hidden|normal by -elide => 1|0 (req by Tk804)
+
+2002-05-29  Dominique Dumont  <ddumont@cpan.org> v1.6
+
+	* ToTk.pm (log): respect min_level and max_level (Thanks to Brand
+	Hilton for the patch)
+
+2002-04-11  Dominique Dumont  <ddumont@cpan.org> v1.5
+
+	* ToTk.pm (v1.5): Changed pseudo-hash to regular hashes.
+
+

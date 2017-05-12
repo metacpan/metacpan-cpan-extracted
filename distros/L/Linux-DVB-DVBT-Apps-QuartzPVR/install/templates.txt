@@ -1,0 +1,18 @@
+"$pvrdir/php/Config/Constants.inc",				"$pvrdir/php/Config/Constants.inc",				$web_uid, $web_gid,	0666
+"$pvrdir/php/Config/SqlConstants.inc",			"$pvrdir/php/Config/SqlConstants.inc",			$web_uid, $web_gid,	0600
+"install/etc/quartzpvr/quartzpvr-server.conf",	"/etc/quartzpvr/quartzpvr-server.conf",			$pvr_uid, $pvr_gid,	0600
+"install/etc/init.d/quartzpvr-server",			"/etc/init.d/quartzpvr-server",					$pvr_uid, $pvr_gid,	0755
+"install/usr/sbin/quartzpvr.pl",				"/usr/sbin/quartzpvr",							0,        0,	    0755
+
+"$pvrdir/php/doc/config.html",					"$pvrdir/php/doc/config.html",					$web_uid, $web_gid,	0755
+
+"$perl_lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/Constants.pm",		"$perl_lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/Constants.pm",		0, 0,	0444
+"$perl_lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/SqlConstants.pm",	"$perl_lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/SqlConstants.pm",	$pvr_uid, $pvr_gid,	0600
+"$perl_lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/PHP/Install.pm",	"$perl_lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/PHP/Install.pm",	$pvr_uid, $pvr_gid,	0444
+"$perl_lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/PHP.pm",			"$perl_lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/PHP.pm",			0, 0,	0444
+
+"blib/lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/Constants.pm",		"blib/lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/Constants.pm",		$uid, $gid,	0666
+"blib/lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/SqlConstants.pm",	"blib/lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/SqlConstants.pm",	$uid, $gid,	0600
+"blib/lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/PHP/Install.pm",		"blib/lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/PHP/Install.pm",		$uid, $gid,	0444
+"blib/lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/PHP.pm",				"blib/lib/Linux/DVB/DVBT/Apps/QuartzPVR/Config/PHP.pm",				$uid, $gid,	0444
+

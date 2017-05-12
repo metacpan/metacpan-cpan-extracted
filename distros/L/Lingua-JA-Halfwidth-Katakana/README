@@ -1,0 +1,32 @@
+NAME
+    Lingua::JA::Halfwidth::Katakana - provides HalfwidthKatakana block
+
+SYNOPSIS
+      use Lingua::JA::Halfwidth::Katakana;
+      use utf8;
+
+      if ($text =~ /\p{InHalfwidthKatakana}/)
+      {
+          print '$text contains HalfwidthKatakana';
+      }
+
+DESCRIPTION
+    Lingua::JA::Halfwidth::Katakana provides HalfwidthKatakana block.
+
+    The following chars are not contained:
+
+      HALFWIDTH IDEOGRAPHIC FULL STOP
+      HALFWIDTH LEFT CORNER BRACKET
+      HALFWIDTH RIGHT CORNER BRACKET
+      HALFWIDTH IDEOGRAPHIC COMMA
+
+AUTHOR
+    pawa <pawapawa@cpan.org>
+
+SEE ALSO
+    Lingua::JA::Halfwidth
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

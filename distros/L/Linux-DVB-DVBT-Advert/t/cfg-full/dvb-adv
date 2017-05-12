@@ -1,0 +1,188 @@
+# ====================================================================
+# Global settings
+# 
+# (These settings propagate to any unset channel-specific settings)
+# ====================================================================
+
+# ------------------------------------------------
+# Global settings.
+#
+# Any settings here propagate down any unset 
+# detection-specific settings
+# ------------------------------------------------
+
+# -- Settings used by detection algorithms (XS) --
+
+# advert detection method specified numerically or in symbols e.g. logo+black
+detection_method = DEFAULT
+
+
+# maximum length of a single advert (in frames)
+max_advert = 4505
+
+# minimum length of advert period (cut period) excludes prog change (in frames)
+min_advert = 4503
+
+# minimum length of a program (in frames)
+min_program = 7505
+
+# padding at start of recording (in frames)
+start_pad = 3005
+
+# padding at end of recording (in frames)
+end_pad = 3003
+
+# minimum number of frames to be contracted into a block
+min_frames = 3
+
+# fuzziness window when contracting frames into a block
+frame_window = 5
+
+# widest gap (no valid frames) over which to span when contracting frames into a block
+max_gap = 11
+
+# window (in frames) in which to reduce the end of the program to the nearest gap
+reduce_end = 0
+
+# frame gap used for reducing program end point
+reduce_min_gap = 1505
+
+# ------------------------------------------------
+# Frame detection specific settings.
+# ------------------------------------------------
+
+# -- Settings used by detection algorithms (XS) --
+
+# sceen change detection level step
+frame.schange_jump = 31
+
+# scene change detection percentage above which is deemed a scene change frame
+frame.schange_cutlevel = 86
+
+# maximum pixel value under which pixel is treated as black
+frame.max_black = 49
+
+# maximum brightness percentage under which is treated as black
+frame.max_brightness = 61
+
+# difference level between frames used to detect a black frame
+frame.brightness_jump = 201
+
+# percentage of frame to use for detection
+frame.window_percent = 96
+
+# pixel value used for brightness detection
+frame.test_brightness = 41
+
+# noise level used for black frame uniformity detection
+frame.noise_level = 6
+
+
+# maximum length of a single advert (in frames)
+frame.max_advert = 4506
+
+# minimum length of advert period (cut period) excludes prog change (in frames)
+frame.min_advert = 4504
+
+# minimum length of a program (in frames)
+frame.min_program = 7504
+
+# minimum number of frames to be contracted into a block
+frame.min_frames = 4
+
+# fuzziness window when contracting frames into a block
+frame.frame_window = 6
+
+# widest gap (no valid frames) over which to span when contracting frames into a block
+frame.max_gap = 12
+
+# ------------------------------------------------
+# Logo detection specific settings.
+# ------------------------------------------------
+
+# -- Settings used by detection algorithms (XS) --
+
+# pixel step size for logo detection
+logo.logo_edge_step = 2
+
+# maximum size of a logo (anything larger is discarded)
+logo.logo_max_percentage_of_screen = 12
+
+# number of frames to skip between logo detection
+logo.logo_skip_frames = 27
+
+# level used to decided whether this is a logo edge
+logo.logo_edge_threshold = 7
+
+# logo averaging buffer size
+logo.logo_ave_points = 252
+
+# maximum period (in frames) to use for detecting a logo
+logo.logo_checking_period = 30002
+
+# percentage of frame to use for detection
+logo.window_percent = 97
+
+# number of logo re-checks
+logo.logo_num_checks = 7
+
+# percentage over which logo detection is deemed a match
+logo.logo_ok_percent = 82
+
+# number of pixels to use in logo edge deetction
+logo.logo_edge_radius = 4
+
+
+# maximum length of a single advert (in frames)
+logo.max_advert = 4510
+
+# minimum length of advert period (cut period) excludes prog change (in frames)
+logo.min_advert = 4510
+
+# minimum length of a program (in frames)
+logo.min_program = 7510
+
+# minimum number of frames to be contracted into a block
+logo.min_frames = 35
+
+# fuzziness window when contracting frames into a block
+logo.frame_window = 30
+
+# widest gap (no valid frames) over which to span when contracting frames into a block
+logo.max_gap = 260
+
+# percentage over which logo detection is deemed a match : going from non-logo to logo frames
+logo.logo_rise_threshold = 82
+
+# percentage over which logo detection is deemed a match : going from logo to non-logo frames
+logo.logo_fall_threshold = 52
+
+# ------------------------------------------------
+# Audio detection specific settings.
+# ------------------------------------------------
+
+# -- Settings used by detection algorithms (XS) --
+
+# adds "fuzziness" to detection of silence frames
+audio.silence_window = 130
+
+
+# maximum length of a single advert (in frames)
+audio.max_advert = 6030
+
+# minimum length of advert period (cut period) excludes prog change (in frames)
+audio.min_advert = 3030
+
+# minimum length of a program (in frames)
+audio.min_program = 7530
+
+# minimum number of frames to be contracted into a block
+audio.min_frames = 8
+
+# fuzziness window when contracting frames into a block
+audio.frame_window = 6020
+
+# widest gap (no valid frames) over which to span when contracting frames into a block
+audio.max_gap = 270
+
+

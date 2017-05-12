@@ -1,0 +1,220 @@
+=head1 名前
+
+Location::Area::DoCoMo::iArea - 経緯度又はコード番号からNTT DoCoMoのiエリアオブジェクトを求める
+
+=head1 概要
+
+  use Location::Area::DoCoMo::iArea;
+  # もし矛盾を解消した外接経緯度データを用いたいならば
+  use Location::Area::DoCoMo::iArea qw(useAdjustedAura);
+
+  #オブジェクト生成
+
+  # 経緯度からオブジェクト生成
+  $oiArea = Location::Area::DoCoMo::iArea->create_coord("34/20/39.933","135/21/51.826","tokyo","mapion");
+  # or 
+  $oiArea = Location::Area::DoCoMo::iArea->create_coord("342039.933","1352151.826","wgs84","dmsn");
+
+  # エリアコードからオブジェクト生成
+  $oiArea = Location::Area::DoCoMo::iArea->create_iarea("152","00");
+  # or same
+  $oiArea = Location::Area::DoCoMo::iArea->create_iarea("15200");
+
+  #データ取得
+
+  # 5桁のエリアコード取得
+  my $fid = $oiArea->id();
+  # 3桁の親コード取得
+  my $pid = $oiArea->areaid();
+  # 2桁の下コード取得
+  my $sid = $oiArea->sub_areaid();
+
+  # EUC-JPでエリア名を得る
+  my $name = $oiArea->name();
+  # EUC-JPで都道府県名を得る
+  my $pref = $oiArea->prefecture();
+  # EUC-JPで地方名を得る
+  my $reg = $oiArea->region();
+
+  # エリアの外接四辺形(オーラ)のオブジェクト(Location::GeoTool::Aura)を得る
+  my $oAura = $oiArea->get_aura;
+  # オーラの東西南北の四辺を得る(世界測地系、GPSONEフォーマット)
+  my ($slim,$wlim,$nlim,$elim) = $oAura->datum_wgs84->format_gpsone->array;
+  # もしくは(日本測地系、度単位)
+  my ($slim,$wlim,$nlim,$elim) = $oAura->datum_tokyo->format_degree->array;
+
+  # オーラの中心点オブジェクト(Location::GeoTool)を得る
+  my ($clat,$clong) = $oiArea->get_center->array;
+
+=head1 DESCRIPTION
+
+=head2 CONSTRUCTOR
+
+=head3 create_coord
+
+経緯度からLocation::Area::DoCoMo::iAreaオブジェクトを生成する。
+
+  利用法:
+    $obj = Location::Area::DoCoMo::iArea->create_coord($lat,$lon,$datum,$format);
+  引数:
+    $lat   : 緯度 (北が正).
+    $lon   : 経度 (東が正).
+    $datum : 経緯度の測地系を特定。 (Location::GeoToolの文字列を使用)
+    $format: 経緯度のフォーマットを特定。 (Location::GeoToolの文字列を使用)
+
+  もしくは、
+
+  利用法:
+    $obj = Location::Area::DoCoMo::iArea->create_coord($point);
+  引数::
+    $point : Location::GeoToolオブジェクト
+
+  戻り値:
+    $obj   : Location::Area::DoCoMo::iAreaオブジェクトを返します。
+             経緯度のエリアへの結びつけが失敗した場合、undefを返します。
+
+=head3 create_iarea
+
+エリアコードからLocation::Area::DoCoMo::iAreaオブジェクトを生成する。
+
+  利用法:
+    $obj = Location::Area::DoCoMo::iArea->create_iarea($id,$sid);
+  引数:
+    $id    : 5桁のエリアコードもしくは3桁の親コードを設定。
+    $sid   : 2桁の子コードを設定($idに親コードを指定した場合は必須)。
+  戻り値:
+    $obj   : Location::Area::DoCoMo::iAreaオブジェクトを返します。
+             エリアコードのエリアへの結びつけが失敗した場合、undefを返します。
+
+=head2 属性
+
+=head3 id
+
+=head3 areaid
+
+=head3 sub_areaid
+
+それぞれ、5桁のエリアコード、3桁の親コード、2桁の子コードを返します。
+
+=head3 name
+
+=head3 prefecture
+
+=head3 region
+
+それぞれこのエリアのエリア名、都道府県名、地方名を返します。
+全てEUC-JPコードでの値を返します。
+
+=head2 メソッド
+
+=head3 include_area
+
+経緯度を指定し、その点が現在のエリアに含まれるかをチェックします。
+
+  利用法:
+    $is_include = $obj->include_area($lat,$lon,$datum,$format);
+    # or
+    $is_include = $obj->include_area($point);
+
+  戻り値:
+    $is_include : 含まれていれば1、いなければ0を返します。
+
+  ※:経緯度からiエリアオブジェクトは作成できるので、あまり意味はないかも
+     しれませんが、iエリアオブジェクトは自身のメッシュをキャッシュしている
+     ので、全エリアのメッシュを総なめするよりは若干早いかと。
+
+=head3 get_aura
+
+エリアの外接四辺形(オーラ)のオブジェクト-Location::GeoTool::Aura-を返します。
+
+  利用法:
+    $oAura = $obj->get_aura;
+
+Location::GeoTool::Auraオブジェクトは以下のように使ってください。
+
+ #測地系・フォーマットの特定:
+   $oAura->datum_wgs84->format_degree...
+  備えるメソッドの名前・数はLocation::GeoToolに一致します。
+
+ #外接四辺形の経緯度を取得します:
+   ($sbound,$wbound,$nbound,$ebound) = $oAura->......->array;
+
+  注意:
+    NTTドコモの外接経緯度データは多くの矛盾を含んでいます。
+    概略として示されている外接経緯度と、メッシュ全てから実際に求めた
+    外接経緯度が、一致しないエリアが数割程度含まれています。
+    そのため本モジュールでは、メッシュから計算した矛盾のない外接四辺形
+    データを作成し、同梱しております。
+
+    ただし、低い確率(と信じています:))ながら本モジュールでの経緯度計算が
+    間違っていたり、或いはエリアの中心を調整(市街地の中心がエリアの端に
+    こないようにする、等)するためにわざと外接四辺形をずらしている、等の
+    事情がドコモ側にあるかもしれませんので、矛盾をなくしたデータをデフォ
+    ルトデータとする事は避けました。
+    もし矛盾をなくしたデータを用いたい場合は、モジュールの呼び出し時に
+
+      use Location::Area::DoCoMo::iArea qw(useAdjustedAura);
+
+=head3 get_center
+
+外接四辺形の中心点を求めます。
+
+  利用法:
+    $cpoint = $obj->get_center;
+
+  戻り値:
+    Location::GeoToolオブジェクトを返すため、経緯度を得るには以下のような
+    形となります。
+   ($clat,$clong) = $cpoint->datum_wgs84->format_degree->array;
+
+=head3 get_nextarea
+
+  このエリアに隣接するエリアの、Location::Area::DoCoMo::iAreaオブジェクトの
+  リストを返します。
+
+  利用法:
+    @next = $obj->get_nextarea;
+  戻り値:
+    @next  : このエリアに隣接するエリアの、Location::Area::DoCoMo::iAreaオブ
+             ジェクトの配列
+  注意:
+   1.厳密に「メッシュが隣接する」エリア間しか隣とみなされないようなので、
+     エリア間に海があった場合、どれほど近くても隣接エリアとはみなされないよう
+     です。
+   2.データソースとなっている
+     http://www.nttdocomo.co.jp/p_s/imode/iarea/iareaweb/iarea_contents.html
+     での隣接情報は、片方向になっていたり廃止されたエリアが含まれていたりと
+     矛盾が含まれています。
+     本モジュールでは、片方向隣接情報を双方向にし、廃止されたエリアの情報を
+     削除したりして、矛盾のない隣接情報にしております。
+
+=head1 依存
+
+ Carp
+ Location::GeoTool
+
+=head1 関連情報
+
+ このバージョンでのiエリアデータは、NTTドコモの2004年3月29日配布のデータ、
+ http://www.nttdocomo.co.jp/p_s/imode/iarea/iareadata040329.lzh.
+ を元にしております。
+ また、隣接エリアの情報は、NTTドコモのWebサイト
+ http://www.nttdocomo.co.jp/p_s/imode/iarea/iareaweb/iarea_contents.html.
+ を元に、矛盾を解消した物を利用しております。
+
+ このモジュールは、ここギコ！ウェブサイト　： http://kokogiko.net/にてサポート
+ いたします。
+
+=head1 作者
+
+OHTSUKA Ko-hei, E<lt>nene@kokogiko.netE<gt>
+
+=head1 著作権・ライセンス
+
+Copyright (C) 2004-2007 by ここギコ！,
+最新のデータへのアップデートは、アイデアマンズ株式会社(http://www.ideamans.com/)のKunihiko Miyanaga氏のご尽力により行われました。
+ありがとうございました。
+
+本ライブラリはフリーソフトであり、Perl本体と同じ条件での再配布・改変が可能です。
+
+=cut

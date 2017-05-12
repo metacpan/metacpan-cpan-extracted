@@ -1,0 +1,48 @@
+[% 
+    IF data.catid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Category' ;
+    htmltitle = title ;
+
+    crumb4_name = 'Admin' ;
+    crumb4_href = '/cgi-bin/pages.cgi?act=home-admin' ;
+    crumb3_name = 'MP3s' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=mp3s-admin' ;
+    crumb2_name = 'Categories' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=mp3s-cadmin' ;
+    crumb1_name = editmode ;
+%]
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="mp3s-csave" />
+<input type="hidden" name="catid" value="[% data.catid %]" />
+
+<div class="boxer">
+
+<p> <a href="[% cgipath %]/pages.cgi?act=mp3s-cadd">create a new category</a>
+|   <a href="[% cgipath %]/pages.cgi?act=mp3s-cadmin">edit categories</a>
+|   <a href="[% cgipath %]/pages.cgi?act=mp3s-add">create a new MP3</a></p>
+
+[% IF thanks %]<p>Category saved successfully.</p>[% END %]
+[% IF errmess %]
+[% IF errmess == 1 %]
+<p class="alert">There are invalid or missing fields, as noted by the "&empty;" symbol.</p>
+[% ELSE %]
+<p class="alert">[% errmess %]</p>
+[% END %]
+[% END %]
+</div>
+
+<div class="boxer">
+<table class="blocker">
+<tr><th width="150">Category Name *</th>
+    <td class="red">[% data.category_err %]</td>
+    <td><input type="text" name="category" size="32" value="[% data.category %]" /></td></tr>
+<tr><th>Order No.</th>
+    <td class="red">[% date.orderno_err %]</td>
+    <td><input type="text" name="orderno" size="3" value="[% data.orderno %]" /></td></tr>
+</table>
+</div>
+
+<p align="center"><input type="submit" value="Save Category" /></p>
+
+</form>

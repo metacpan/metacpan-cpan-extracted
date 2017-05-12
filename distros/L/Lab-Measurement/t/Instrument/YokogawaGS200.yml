@@ -1,0 +1,395 @@
+---
+id: 0
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion current
+id: 1
+method: Write
+retval: 1
+---
+id: 2
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion?
+id: 3
+method: Query
+retval: CURR
+---
+id: 4
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion?
+id: 5
+method: Query
+retval: CURR
+---
+id: 6
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion voltage
+id: 7
+method: Write
+retval: 1
+---
+id: 8
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion?
+id: 9
+method: Query
+retval: VOLT
+---
+id: 10
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion?
+id: 11
+method: Query
+retval: VOLT
+---
+id: 12
+method: is_blocked
+retval: 0
+---
+id: 13
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion?
+id: 14
+method: Query
+retval: VOLT
+---
+command: SOURce:RANGe 10e-3
+id: 15
+method: Write
+retval: 1
+---
+command: '*STB?'
+id: 16
+method: Query
+retval: '4'
+---
+id: 17
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 18
+method: Query
+retval: '10E-3'
+---
+id: 19
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 20
+method: Query
+retval: '10E-3'
+---
+id: 21
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 22
+method: Query
+retval: '10E-3'
+---
+id: 23
+method: is_blocked
+retval: 0
+---
+id: 24
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion?
+id: 25
+method: Query
+retval: VOLT
+---
+command: SOURce:RANGe 100e-3
+id: 26
+method: Write
+retval: 1
+---
+command: '*STB?'
+id: 27
+method: Query
+retval: '4'
+---
+id: 28
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 29
+method: Query
+retval: '100E-3'
+---
+id: 30
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 31
+method: Query
+retval: '100E-3'
+---
+id: 32
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 33
+method: Query
+retval: '100E-3'
+---
+id: 34
+method: is_blocked
+retval: 0
+---
+id: 35
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion?
+id: 36
+method: Query
+retval: VOLT
+---
+command: SOURce:RANGe 1
+id: 37
+method: Write
+retval: 1
+---
+command: '*STB?'
+id: 38
+method: Query
+retval: '4'
+---
+id: 39
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 40
+method: Query
+retval: '1E+0'
+---
+id: 41
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 42
+method: Query
+retval: '1E+0'
+---
+id: 43
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 44
+method: Query
+retval: '1E+0'
+---
+id: 45
+method: is_blocked
+retval: 0
+---
+id: 46
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion?
+id: 47
+method: Query
+retval: VOLT
+---
+command: SOURce:RANGe 10
+id: 48
+method: Write
+retval: 1
+---
+command: '*STB?'
+id: 49
+method: Query
+retval: '4'
+---
+id: 50
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 51
+method: Query
+retval: '10E+0'
+---
+id: 52
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 53
+method: Query
+retval: '10E+0'
+---
+id: 54
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 55
+method: Query
+retval: '10E+0'
+---
+id: 56
+method: is_blocked
+retval: 0
+---
+id: 57
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion?
+id: 58
+method: Query
+retval: VOLT
+---
+command: SOURce:RANGe 30
+id: 59
+method: Write
+retval: 1
+---
+command: '*STB?'
+id: 60
+method: Query
+retval: '4'
+---
+id: 61
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 62
+method: Query
+retval: '30E+0'
+---
+id: 63
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 64
+method: Query
+retval: '30E+0'
+---
+id: 65
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 66
+method: Query
+retval: '30E+0'
+---
+id: 67
+method: is_blocked
+retval: 0
+---
+id: 68
+method: is_blocked
+retval: 0
+---
+command: :SOURce:FUNCtion?
+id: 69
+method: Query
+retval: VOLT
+---
+command: SOURce:RANGe 1
+id: 70
+method: Write
+retval: 1
+---
+command: '*STB?'
+id: 71
+method: Query
+retval: '4'
+---
+id: 72
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 73
+method: Query
+retval: '1E+0'
+---
+id: 74
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 75
+method: Query
+retval: '1E+0'
+---
+id: 76
+method: is_blocked
+retval: 0
+---
+id: 77
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 78
+method: Query
+retval: '+0.00000E+0'
+---
+id: 79
+method: is_blocked
+retval: 0
+---
+command: :SOUR:RANG?
+id: 80
+method: Query
+retval: '1E+0'
+---
+command: :SOURce:LEVel 0.123400
+id: 81
+method: Write
+retval: 1
+---
+id: 82
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 83
+method: Query
+retval: '+0.12340E+0'
+---
+id: 84
+method: is_blocked
+retval: 0
+---
+command: :SOUR:LEV?
+id: 85
+method: Query
+retval: '+0.12340E+0'
+---
+command: :PROG:HALT
+id: 86
+method: Write
+retval: 1

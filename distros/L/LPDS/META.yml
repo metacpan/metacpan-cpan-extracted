@@ -1,0 +1,41 @@
+---
+abstract: 'Help you decide a laptop'
+author:
+  - "\"Xi Yang\" <\"yangx@im.ac.cn\">"
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: LPDS
+provides:
+  LPDS:
+    file: lib/LPDS.pm
+    version: 0.02
+  LPDS::Renderer:
+    file: lib/LPDS/Renderer.pm
+    version: 0
+  LPDS::RendererAxis:
+    file: lib/LPDS/RendererAxis.pm
+    version: 0
+  LPDS::RendererModel:
+    file: lib/LPDS/RendererModel.pm
+    version: 0
+  LPDS::Util:
+    file: lib/LPDS/Util.pm
+    version: 0
+requires:
+  File::ShareDir: 1.00
+  Goo::Canvas: 0
+  Gtk2: 0
+  Moose: 0
+  YAML: 0
+  perl: v5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

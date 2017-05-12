@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 824816826b12a1487da6464042d09556d331b68e MANIFEST
+SHA1 af39eb861cf5c45c16efb6cb825530f9d1832b5d META.yml
+SHA1 b0c97f3c25095092733064ea6d050c9959e77a67 Makefile.PL
+SHA1 9e5b49e5dcd3e61d2610322d5a9b8ffa91e34b0f README
+SHA1 06d883487127fa0026311904e7c4867e850c505c inc/Module/Install.pm
+SHA1 2771d5c5033e94c4789c66a0aad4e21c62985ce9 inc/Module/Install/Base.pm
+SHA1 b5e2d5fc07b92d042c97631d2b00f61f974fc164 inc/Module/Install/Can.pm
+SHA1 c3747aa4bd8faa530c974b78f729c67f15c6f928 inc/Module/Install/Fetch.pm
+SHA1 d8bc0d6e0a82d2b7533bdd3de467593094cc8b2c inc/Module/Install/Makefile.pm
+SHA1 6fca1d05c6b9a8f10865de5be4fefb9bfa7a52e9 inc/Module/Install/Metadata.pm
+SHA1 6b051a6d3ed824df40343a7ff09b66282e1783c3 inc/Module/Install/Win32.pm
+SHA1 77f82ce7c623e05304ac9aae05bcd1a5558fadbb inc/Module/Install/WriteAll.pm
+SHA1 1bde60ac5a06226006d9925ac371c56b46ffc293 lib/Language/SIOD.pm
+SHA1 b95b8956b95de384aa375deb9fe749974b64777b lib/Language/SIOD_in.pm
+SHA1 30bbb57c7092670e6ff2e607c4fef85ef32f0631 mzscheme.i
+SHA1 56574f21d88b470569651a90ffe46cfb0a39c272 siod.README.txt
+SHA1 112206737b82e1227bcda1dc56472492ac89416c siod.h
+SHA1 37b57f0713aaa741dac35dac49951b2b600da3d9 siod.html
+SHA1 4be2c4c593b3bbe1b66c00fadf7e86df7543c118 siod.i
+SHA1 7007663e52cce011370238c5c659a30ecaeb8e7b siod_wrap.c
+SHA1 5202ce9a8b2384efa1194a672fdd403d2194ffa3 siodp.h
+SHA1 afcc91069a66dbe91a84c32e8559c3ef3602d0a5 slib.c
+SHA1 22f09eeb36143d655b2931a4c01f0079fba36992 sliba.c
+SHA1 8d6b879b5f2f3356936f27832f9cbd1650654ac6 slibu.c
+SHA1 a8d8274d66850a3c8d403c7684caa4125ced0bdd t/1-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.6 (FreeBSD)
+
+iD8DBQFBzb84tLPdNzw1AaARAhfGAJ99J3FeZne7hkOGICJSPZRTvKfxaACePPQn
+hJ7iJkOMnG8MEdMKYhfFRS0=
+=jTj6
+-----END PGP SIGNATURE-----

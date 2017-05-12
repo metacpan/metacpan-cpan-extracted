@@ -1,0 +1,27 @@
+Revision history for Perl extension Lingua::Ident.
+
+1.00  Sun Feb 27 13:36:07 MET 2000
+	- First CPAN version
+
+1.4   Sun Nov 18 23:20:15 MET 2001
+	- Maintenance release, fixing several grave bugs
+
+1.5   Tue Dec 21 13:49:17 CET 2004
+	- Fixed Makefile.PL
+
+1.6   Sat Nov 11 18:15:19 CET 2006
+	- Fixed a bug in the loading of bigrams, reported by James Shaw
+	- Moved tests to t/ subdirectory
+	- Added a benchmark-type test
+
+1.7   Fri May 14 15:38:04 CEST 2010
+	- Tests now work with the data files located at either ../data
+	  or data.
+	- The make test now always generates the data/data.*
+	  files--this didn't work on Darwin and MSWin32.
+	- Added calculate() method, which returns all
+	  probabilities. identify () now just calls calculate() and
+	  returns the most probable language.
+	- When neither a trigram nor a bigram is found, use the
+	  average alphabet size instead of the individual language's
+	  alphabet size, as this penalizes Asian languages.

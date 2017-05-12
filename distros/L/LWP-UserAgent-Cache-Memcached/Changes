@@ -1,0 +1,6 @@
+Revision history for Perl extension LWP::UserAgent::Cache::Memcached.
+
+0.02  2008.04.18
+	- try use Cache::Memcached::Fast;
+0.01  2007.04.18
+	- first version;

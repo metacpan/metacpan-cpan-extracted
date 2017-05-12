@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+
+use strict;
+use warnings;
+use Config::YAMLMacros::YAML;
+use File::Slurp::Remote::SmartOpen;
+
+my $metafile = shift;
+die unless -e $metafile;
+
+my $meta = LoadFile($metafile);
+
+my ($file) = sort { $b->{items} <=> $a->{items} } @{$meta->{FILES}};
+
+my @colnames;
+my $header;
+smartopen("$file->{host}:$file->{filename}.header", $header, "r");
+while (<$header>) {
+	chomp;
+	die unless /^(\d+)\t(\S+)$/;
+	$colnames[$1-1] = $2;
+}
+
+my %ncol;
+
+my $tsv;
+smartopen("$file->{host}:$file->{filename}", $tsv, "r");
+while (<$tsv>) {
+	chomp;
+	my (@data) = split(/\t/, $_, -1);
+	my %val;
+	@val{@colnames} = @data;
+	print Dump \%val;
+}
+
+
+__END__
+
+
+=head1 DESCRIPTION
+
+This program is currently incomplete
+
+=head1 LICENSE
+
+This package may be used and redistributed under the terms of either
+the Artistic 2.0 or LGPL 2.1 license.
+

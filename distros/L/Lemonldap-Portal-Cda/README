@@ -1,0 +1,114 @@
+
+Lemonldap/Portal/Cda version 0.02
+=================================
+
+
+Lemonldap::Portal::Cda - Cross Domain Authentification Perl extension for Lemonldap SSO 
+
+SYNOPSIS
+
+  use Lemonldap::Portal::Cda;
+  my $stack_user= Lemonldap::Portal::Cda->new(type=> 'master');
+
+or  
+  my $stack_user= Lemonldap::Portal::Cda->new(type=> 'slave');
+ 
+DESCRIPTION
+
+
+Lemonldap is a SSO system under GPL. 
+Sometimes you have two or more domains (.bar.foo  and .bar.foo2)  
+The CDA :Cross Domain Authentification manages and centralize all credentials on all domains .
+CDA works with redirection in order to catch the credential cookie.
+
+You may  use  an objet "master" domain with a "slave" domain .
+All authentification needed  for the "slave" domain will be  redirected on the "master" domain
+ 
+METHODS
+
+new (type => 'master'|'slave');
+
+process (param =>  \%params, 
+                 bar  =>  foo );
+
+The process method  alway return an  error '8' (message = 'CDA requested') .
+
+The master CDA just do a redirection with the id_session in the params of url GET .
+The slave CDA uses the id_session send by master for put on fly a cookie on slave domain. 
+
+see  directory examples.
+
+(url_encoded,url_decoded)  :  getAllRedirection  
+
+ return the initial request encoded in Base64 and plaintext url 
+
+string : getSession      
+   
+  return the id_session or false .
+
+string : message() ;
+ 
+  return the text of error 
+
+int : error() ;
+ 
+  return the  number of error 
+
+
+SEE ALSO
+
+Lemonldap(3), Lemonldap::Portal::Standard
+
+http://lemonldap.sourceforge.net/
+
+"Writing Apache Modules with Perl and C" by Lincoln Stein E<amp> Doug
+MacEachern - O'REILLY
+
+Eric German, E<lt>germanlinux@yahoo.frE<gt>
+
+Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Eric German E<amp> Xavier Guimard
+
+Lemonldap originaly written by Eric german who decided to publish him in 2003
+under the terms of the GNU General Public License version 2.
+
+
+This package is under the GNU General Public License, Version 2.
+
+The primary copyright holder is Eric German.
+
+Portions are copyrighted under the same license as Perl itself.
+
+Portions are copyrighted by Doug MacEachern and Lincoln Stein.
+This library is under the GNU General Public License, Version 2.
+
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 dated June, 1991.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  A copy of the GNU General Public License is available in the source tree;
+  if not, write to the Free Software Foundation, Inc.,
+  59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+

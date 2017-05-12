@@ -1,0 +1,55 @@
+---
+name: Lingua-Stem
+version: 0.84
+author:
+  - 'Benjamin Franz <snowhare@nihongo.org>'
+abstract: Stemming of words in various languages
+license: perl
+requires:
+  Carp: 0
+  Lingua::GL::Stemmer: 0
+  Lingua::PT::Stemmer: 0
+  Lingua::Stem::Fr: 0.02
+  Lingua::Stem::It: 0
+  Lingua::Stem::Ru: 0
+  Lingua::Stem::Snowball::Da: 1.01
+  Lingua::Stem::Snowball::No: 1.00
+  Lingua::Stem::Snowball::Se: 1.01
+  Text::German: 0
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Lingua::Stem:
+    file: lib/Lingua/Stem.pm
+    version: 0.84
+  Lingua::Stem::AutoLoader:
+    file: lib/Lingua/Stem/AutoLoader.pm
+    version: 1.02
+  Lingua::Stem::Da:
+    file: lib/Lingua/Stem/Da.pm
+    version: 1.01
+  Lingua::Stem::De:
+    file: lib/Lingua/Stem/De.pm
+    version: 1.01
+  Lingua::Stem::En:
+    file: lib/Lingua/Stem/En.pm
+    version: 2.16
+  Lingua::Stem::EnBroken:
+    file: lib/Lingua/Stem/EnBroken.pm
+    version: 2.13
+  Lingua::Stem::Gl:
+    file: lib/Lingua/Stem/Gl.pm
+    version: 1.02
+  Lingua::Stem::No:
+    file: lib/Lingua/Stem/No.pm
+    version: 1.01
+  Lingua::Stem::Pt:
+    file: lib/Lingua/Stem/Pt.pm
+    version: 1.01
+  Lingua::Stem::Sv:
+    file: lib/Lingua/Stem/Sv.pm
+    version: 1.01
+resources:
+  license: http://dev.perl.org/licenses/

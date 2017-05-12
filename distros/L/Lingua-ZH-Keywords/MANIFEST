@@ -1,0 +1,9 @@
+Changes
+Keywords.pm
+MANIFEST
+Makefile.PL
+README
+SIGNATURE
+t/0-signature.t
+t/1-basic.t
+t/2-utf8.t

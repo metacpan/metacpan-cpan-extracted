@@ -1,0 +1,94 @@
+NAME
+
+Lingua::HE::Sentence - Module for splitting Hebrew text into sentences.
+
+SYNOPSIS
+
+        use Lingua::HE::Sentence qw( get_sentences );
+
+        my $sentences=get_sentences($text);     ## Get the sentences.
+        foreach my $sentence (@$sentences) {
+                ## do something with $sentence
+        }
+
+DESCRIPTION
+
+The Lingua::HE::Sentence module contains the function get_sentences, which splits Hebrew text into its constituent sentences, based on regular expressions.
+
+The module assumes text encoded in UTF-8. Supporting other input formats will be added upon request.
+
+HEBREW DETAILS
+
+Language: Hebrew Language ID: he MS Locale ID: 1037 ISO 639-1: he ISO 639-2 (MARC): heb ISO 8859 (charset): 8859-8 ANSI codepage: 1255 Unicode: 0590-05FF
+
+PROBLEM DESCRIPTION
+
+Many applications in natural language processing require some knowledge of sentence boundaries. The problem of properly locating sentence bonudaries in text in Hebrew is in many ways less severe than the same problem in other languages. The purpose of this module is to supply Perl users with a tool which can take plain text in Hebrew and get an ordered list of the sentences in the text.
+
+PROPERTIES OF HEBREW SENTENCES
+
+The following facts are part of the guidelines given by the 'academy of the Hebrew language'.
+
+Sentences usually end with one of the following punctuation symbols: . a dot ? a question mark ! an exclamation mark
+
+No dot should be placed after sentences on titles (such as book names, chpter titles etc.)
+
+A dot can be placed after letters and numbers used for listing items, chapters etc., as long as these letters or numbers are not placed on a special line. When these letters or numbers appear alone, no dot should succeed them. Brackets or a closing bracket can be used instead of a dot in this case.
+
+Decimal point should be represented with a dot and not a comma in order to distinguish the number from its decimal fraction.
+
+In some rare cases semicolons also represent end of sentence, but usually the sentences separated by sa semicolor are practically one long sentence. I chose not to split on semicolons at all.
+
+ASSUMPTIONS
+
+Input text is assumed to be represented in UTF-8
+
+Input text is assumed to have some structure, i.e. titles are separated from the rest of the text with at least a couple of newline characters ('\n').
+
+Input is expected to follow the PROPERTIES listed above.
+
+Complex sentences should be further segmented using clause identificatoin algorithms, this module will not provide (at least in this version) any support for clause identification and segmentation.
+
+
+FUNCTIONS
+
+All functions used should be requested in the 'use' clause. None is exported by default.
+
+get_sentences( $text )
+
+    The get sentences function takes a scalar containing ascii text as an argument and returns a reference to an array of sentences that the text has been split into. Returned sentences will be trimmed (beginning and end of sentence) of white-spaces. Strings with no alpha-numeric characters in them, won't be returned as sentences.
+get_EOS( )
+
+    This function returns the value of the string used to mark the end of sentence. You might want to see what it is, and to make sure your text doesn't contain it. You can use set_EOS() to alter the end-of-sentence string to whatever you desire.
+set_EOS( $new_EOS_string )
+
+    This function alters the end-of-sentence string used to mark the end of sentences.
+
+BUGS
+
+No proper handling of sentence boundaries within and in presence of quotes (either single or dounle). Please report bugs at http://rt.cpan.org/ and CC the author (see details below).
+
+FUTURE WORK (in no particular order)
+
+[0] Write tests!
+[1] Object Oriented like usage.
+[2] Supporting more encodings/charsets.
+[3] Code cleanup and optimization.
+[4] Fix bugs.
+[5] Generate sentencizer based on supervised learning. (requires tagged texts...)
+
+SEE ALSO
+
+        Lingua::EN::Sentence
+
+AUTHOR
+
+Shlomo Yona shlomo@cs.haifa.ac.il
+
+COPYRIGHT
+
+Copyright (c) 2001-2004 Shlomo Yona. All rights reserved.
+
+LICENSE
+
+This library is free software. You can redistribute it and/or modify it under the same terms as Perl itself.

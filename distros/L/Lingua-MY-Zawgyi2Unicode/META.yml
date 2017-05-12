@@ -1,0 +1,24 @@
+---
+abstract: 'providing a module for converting Burmese text in Zawgyi to Unicode (UTF-8).'
+author:
+  - 'Joakim Lagerqvist <jokke@cpan.org>'
+build_requires:
+  FindBin: '0'
+  JSON: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-MY-Zawgyi2Unicode
+requires:
+  Exporter: '0'
+  Readonly: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+version: '0.001'

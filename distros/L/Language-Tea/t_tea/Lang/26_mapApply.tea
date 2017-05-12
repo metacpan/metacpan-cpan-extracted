@@ -1,0 +1,19 @@
+
+define area (in1 in2) { # temos aki um comentario 
+    foreach i in1 {
+        echo i
+    }
+}
+
+
+define c 22 
+define b 22
+
+define a [map-apply area ( ($c $b) ($b $c) )]
+
+foreach b  $a {
+ echo $b
+}
+
+echo $c
+echo $b

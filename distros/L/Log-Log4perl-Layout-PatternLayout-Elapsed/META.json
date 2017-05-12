@@ -1,0 +1,50 @@
+{
+   "abstract" : "Logs the time elapsed between the last log event",
+   "author" : [
+      "Emmanuel Rodriguez, E<lt>emmanuel.rodriguez@gmail.comE<gt>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Log4perl-Layout-PatternLayout-Elapsed",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Log::Log4perl::Appender::TestBuffer" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Time::HiRes" : "0"
+         },
+         "requires" : {
+            "Log::Log4perl::Layout::PatternLayout" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Log4perl::Layout::PatternLayout::Elapsed" : {
+         "file" : "lib/Log/Log4perl/Layout/PatternLayout/Elapsed.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07"
+}

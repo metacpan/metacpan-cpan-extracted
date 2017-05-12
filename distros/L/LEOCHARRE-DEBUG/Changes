@@ -1,0 +1,32 @@
+2009-09-10 16:39  cvs
+
+	* LEOCHARRE-DEBUG-1.02.tar.gz, LEOCHARRE-DEBUG-1.03.tar.gz,
+	  LEOCHARRE-DEBUG-1.06.tar.gz, META.yml, Makefile.PL,
+	  lib/LEOCHARRE/DEBUG.pm: Deprecated.  Use LEOCHARE::Debug instead.
+
+2009-02-17 09:58  cvs
+
+	* lib/LEOCHARRE/DEBUG.pm, t/1.t: adding color
+
+2008-07-30 09:23  cvs
+
+	* t/3.t: added 3.t
+
+2008-07-30 09:23  cvs
+
+	* lib/LEOCHARRE/DEBUG.pm: added dumping of complex structures
+
+2007-08-22 11:58  cvs
+
+	* lib/LEOCHARRE/DEBUG.pm, t/0.t, t/inherit_debug.pm: working
+
+2007-07-25 10:12  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/DEBUG.pm, t/0.t,
+	  t/inherit_debug.pm: Initial revision
+
+2007-07-25 10:12  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/DEBUG.pm, t/0.t,
+	  t/inherit_debug.pm: init
+

@@ -1,0 +1,67 @@
+NAME
+    Lingua::JA::Sort::ReadableKey - Sorting and Romanizing Japanese
+
+SYNOPSIS
+      use Lingua::JA::Sort::ReadableKey;
+      for ( map { $_->[0] }
+           sort { $a->[1] cmp $b->[1] }
+            map { [ $_, japanese_sortorder($_) ] } @utf8 ) {
+
+DESCRIPTION
+    First, does Lingua::JA::Sort::JIS do what you want? Look at that first.
+
+    It may not do what you want if you want
+
+    *  Kanji phrases sorted in their reading order, rather than as a
+       separate block.
+
+    *  A machine-readable or storable key so that comparisons and sorting
+       can be done by a non-Japanese-aware system later.
+
+    This module uses "Text::ChaSen" to do kanji-kana conversion, and then
+    produces a comparable ASCII key for sorting.
+
+    All text should be in "real" UTF-8 - that is, strings in Perl's internal
+    format with the UTF-8 flag on.
+
+  EXPORT
+    The following methods are exported:
+
+   kanji_to_kana
+    Use ChaSen to convert a kanji sequence into hiragana. You obviously need
+    to install ChaSen, and its Perl interface "Text::ChaSen" to make this
+    work. You can get ChaSen from http://chasen.aist-nara.ac.jp/ and
+    "Text::ChaSen" is bundled with it. If you have Debian, install the
+    packages "chasen" and "libtext-chasen-perl". This code will work with
+    both ChaSen1 and ChaSen2.
+
+   japanese_pronunciation
+    This turns a Japanese string into an ASCII representation of its
+    reading. You can't sort on this, because Japanese don't sort according
+    to the Latin alphabet, but you can use to label Japanese things for
+    people who can't read Japanese. This will automatically call
+    "kanji_to_kana" if necessary to get the reading of kanji strings.
+
+   japanese_sort_order
+    This returns an ASCII string which represents, in some bizarre magic
+    encoding, the sort order of the Japanese input string, such that
+    comparing the "japanese_sort_order" of two UTF-8 strings will tell you
+    how they should be sorted in a Japanese dictionary.
+
+    By "bizarre" and "magic", I mean that for each character, we find its
+    order in the Japanese alphabet, and then replace that with
+    "chr(32+$order)" so that it can be compared with "cmp".
+
+SEE ALSO
+    Lingua::JA::Sort::JIS, Text::ChaSen.
+
+AUTHOR
+    Simon Cozens, <simon@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Simon Cozens
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.4 or, at
+    your option, any later version of Perl 5 you may have available.
+

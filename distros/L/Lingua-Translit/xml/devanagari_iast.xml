@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+<!--
+    Transliteration definitions for IAST to Devanāgarī
+
+    Copyright (c) 2016 Philip Kime <philkime@kime.org.uk>
+-->
+
+<translit>
+    <name>Devanagari IAST</name>
+    <desc>Devanāgarī to IAST</desc>
+    <reverse>false</reverse>
+    <!-- set of transliteration rules -->
+    <rules>
+        <rule>
+            <from>&#x0966;</from>
+            <to>0</to> <!-- ० -> 0 (DIGIT ZERO) -->
+        </rule>
+        <rule>
+            <from>&#x096f;</from>
+            <to>9</to> <!-- ९ -> 9 (DIGIT NINE) -->
+        </rule>
+        <rule>
+            <from>&#x096e;</from>
+            <to>8</to> <!-- ८ -> 8 (DIGIT EIGHT) -->
+        </rule>
+        <rule>
+            <from>&#x096d;</from>
+            <to>7</to> <!-- ७ -> 7 (DIGIT SEVEN) -->
+        </rule>
+        <rule>
+            <from>&#x096c;</from>
+            <to>6</to> <!-- ६ -> 6 (DIGIT SIX) -->
+        </rule>
+        <rule>
+            <from>&#x096b;</from>
+            <to>5</to> <!-- ५ -> 5 (DIGIT FIVE) -->
+        </rule>
+        <rule>
+            <from>&#x096a;</from>
+            <to>4</to> <!-- ४ -> 4 (DIGIT FOUR) -->
+        </rule>
+        <rule>
+            <from>&#x0969;</from>
+            <to>3</to> <!-- ३ -> 3 (DIGIT THREE) -->
+        </rule>
+        <rule>
+            <from>&#x0968;</from>
+            <to>2</to> <!-- २ -> 2 (DIGIT TWO) -->
+        </rule>
+        <rule>
+            <from>&#x0967;</from>
+            <to>1</to> <!-- १ -> 1 (DIGIT ONE) -->
+        </rule>
+        <rule>
+            <from>&#x0913;</from>
+            <to>o</to> <!-- ओ -> o (LATIN SMALL LETTER O) -->
+        </rule>
+        <rule>
+            <from>&#x090f;</from>
+            <to>e</to> <!-- ए -> e (LATIN SMALL LETTER E) -->
+        </rule>
+        <rule>
+            <from>&#x0961;</from>
+            <to>&#x1e39;</to> <!-- ॡ -> ḹ (LATIN SMALL LETTER L WITH DOT BELOW AND MACRON) -->
+        </rule>
+        <rule>
+            <from>&#x090c;</from>
+            <to>&#x1e37;</to> <!-- ऌ -> ḷ (LATIN SMALL LETTER L WITH DOT BELOW) -->
+        </rule>
+        <rule>
+            <from>&#x0960;</from>
+            <to>&#x1e5d;</to> <!-- ॠ -> ṝ (LATIN SMALL LETTER R WITH DOT BELOW AND MACRON) -->
+        </rule>
+        <rule>
+            <from>&#x090b;</from>
+            <to>&#x1e5b;</to> <!-- ऋ -> ṛ (LATIN SMALL LETTER R WITH DOT BELOW) -->
+        </rule>
+        <rule>
+            <from>&#x090a;</from>
+            <to>&#x016b;</to> <!-- ऊ -> ū (LATIN SMALL LETTER U WITH MACRON) -->
+        </rule>
+        <rule>
+            <from>&#x0909;</from>
+            <to>u</to> <!-- उ -> u (LATIN SMALL LETTER U) -->
+        </rule>
+        <rule>
+            <from>&#x0908;</from>
+            <to>&#x012b;</to> <!-- ई -> ī (LATIN SMALL LETTER I WITH MACRON) -->
+        </rule>
+        <rule>
+            <from>&#x0907;</from>
+            <to>i</to> <!-- इ -> i (LATIN SMALL LETTER I) -->
+        </rule>
+        <rule>
+            <from>&#x0906;</from>
+            <to>&#x0101;</to> <!-- आ -> ā (LATIN SMALL LETTER A WITH MACRON) -->
+        </rule>
+        <rule>
+            <from>&#x0905;</from>
+            <to>a</to> <!-- अ -> a (LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0914;</from>
+            <to>au</to> <!-- औ -> au (LATIN SMALL LETTER A + LATIN SMALL LETTER U) -->
+        </rule>
+        <rule>
+            <from>&#x0910;</from>
+            <to>ai</to> <!-- ऐ -> ai (LATIN SMALL LETTER A + LATIN SMALL LETTER I) -->
+        </rule>
+        <rule>
+            <from>&#x093d;</from>
+            <to>'</to> <!-- ऽ -> ' (APOSTROPHE) -->
+        </rule>
+        <rule>
+            <from>&#x094b;</from>
+            <to>&#x094d;o</to> <!-- ो -> ्o (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER O) -->
+        </rule>
+        <rule>
+            <from>&#x0947;</from>
+            <to>&#x094d;e</to> <!-- े -> ्e (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER E) -->
+        </rule>
+        <rule>
+            <from>&#x0963;</from>
+            <to>&#x094d;&#x1e39;</to> <!-- ॣ -> ्ḹ (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER L WITH DOT BELOW AND MACRON) -->
+        </rule>
+        <rule>
+            <from>&#x0962;</from>
+            <to>&#x094d;&#x1e37;</to> <!-- ॢ -> ्ḷ (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER L WITH DOT BELOW) -->
+        </rule>
+        <rule>
+            <from>&#x0944;</from>
+            <to>&#x094d;&#x1e5d;</to> <!-- ॄ -> ्ṝ (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER R WITH DOT BELOW AND MACRON) -->
+        </rule>
+        <rule>
+            <from>&#x0943;</from>
+            <to>&#x094d;&#x1e5b;</to> <!-- ृ -> ्ṛ (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER R WITH DOT BELOW) -->
+        </rule>
+        <rule>
+            <from>&#x0942;</from>
+            <to>&#x094d;&#x016b;</to> <!-- ू -> ्ū (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER U WITH MACRON) -->
+        </rule>
+        <rule>
+            <from>&#x0941;</from>
+            <to>&#x094d;u</to> <!-- ु -> ्u (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER U) -->
+        </rule>
+        <rule>
+            <from>&#x0940;</from>
+            <to>&#x094d;&#x012b;</to> <!-- ी -> ्ī (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER I WITH MACRON) -->
+        </rule>
+        <rule>
+            <from>&#x093f;</from>
+            <to>&#x094d;i</to> <!-- ि -> ्i (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER I) -->
+        </rule>
+        <rule>
+            <from>&#x093e;</from>
+            <to>&#x094d;&#x0101;</to> <!-- ा -> ्ā (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER A WITH MACRON) -->
+        </rule>
+        <rule>
+            <from>&#x094c;</from>
+            <to>&#x094d;au</to> <!-- ौ -> ्au (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER A + LATIN SMALL LETTER U) -->
+        </rule>
+        <rule>
+            <from>&#x0948;</from>
+            <to>&#x094d;ai</to> <!-- ै -> ्ai (DEVANAGARI SIGN VIRAMA + LATIN SMALL LETTER A + LATIN SMALL LETTER I) -->
+        </rule>
+        <rule>
+            <from>&#x0939;&#x094d;</from>
+            <to>h</to> <!-- ह् -> h (LATIN SMALL LETTER H) -->
+        </rule>
+        <rule>
+            <from>&#x0938;&#x094d;</from>
+            <to>s</to> <!-- स् -> s (LATIN SMALL LETTER S) -->
+        </rule>
+        <rule>
+            <from>&#x0937;&#x094d;</from>
+            <to>&#x1e63;</to> <!-- ष् -> ṣ (LATIN SMALL LETTER S WITH DOT BELOW) -->
+        </rule>
+        <rule>
+            <from>&#x0936;&#x094d;</from>
+            <to>&#x015b;</to> <!-- श् -> ś (LATIN SMALL LETTER S WITH ACUTE) -->
+        </rule>
+        <rule>
+            <from>&#x0935;&#x094d;</from>
+            <to>v</to> <!-- व् -> v (LATIN SMALL LETTER V) -->
+        </rule>
+        <rule>
+            <from>&#x0932;&#x094d;</from>
+            <to>l</to> <!-- ल् -> l (LATIN SMALL LETTER L) -->
+        </rule>
+        <rule>
+            <from>&#x0930;&#x094d;</from>
+            <to>r</to> <!-- र् -> r (LATIN SMALL LETTER R) -->
+        </rule>
+        <rule>
+            <from>&#x092f;&#x094d;</from>
+            <to>y</to> <!-- य् -> y (LATIN SMALL LETTER Y) -->
+        </rule>
+        <rule>
+            <from>&#x092e;&#x094d;</from>
+            <to>m</to> <!-- म् -> m (LATIN SMALL LETTER M) -->
+        </rule>
+        <rule>
+            <from>&#x092c;&#x094d;</from>
+            <to>b</to> <!-- ब् -> b (LATIN SMALL LETTER B) -->
+        </rule>
+        <rule>
+            <from>&#x092d;&#x094d;</from>
+            <to>bh</to> <!-- भ् -> bh (LATIN SMALL LETTER B + LATIN SMALL LETTER H) -->
+        </rule>
+        <rule>
+            <from>&#x092b;&#x094d;</from>
+            <to>ph</to> <!-- फ् -> ph (LATIN SMALL LETTER P + LATIN SMALL LETTER H) -->
+        </rule>
+        <rule>
+            <from>&#x092a;&#x094d;</from>
+            <to>p</to> <!-- प् -> p (LATIN SMALL LETTER P) -->
+        </rule>
+        <rule>
+            <from>&#x0928;&#x094d;</from>
+            <to>n</to> <!-- न् -> n (LATIN SMALL LETTER N) -->
+        </rule>
+        <rule>
+            <from>&#x0926;&#x094d;</from>
+            <to>d</to> <!-- द् -> d (LATIN SMALL LETTER D) -->
+        </rule>
+        <rule>
+            <from>&#x0927;&#x094d;</from>
+            <to>dh</to> <!-- ध् -> dh (LATIN SMALL LETTER D + LATIN SMALL LETTER H) -->
+        </rule>
+        <rule>
+            <from>&#x0924;&#x094d;</from>
+            <to>t</to> <!-- त् -> t (LATIN SMALL LETTER T) -->
+        </rule>
+        <rule>
+            <from>&#x0925;&#x094d;</from>
+            <to>th</to> <!-- थ् -> th (LATIN SMALL LETTER T + LATIN SMALL LETTER H) -->
+        </rule>
+        <rule>
+            <from>&#x0923;&#x094d;</from>
+            <to>&#x1e47;</to> <!-- ण् -> ṇ (LATIN SMALL LETTER N WITH DOT BELOW) -->
+        </rule>
+        <rule>
+            <from>&#x0921;&#x094d;</from>
+            <to>&#x1e0d;</to> <!-- ड् -> ḍ (LATIN SMALL LETTER D WITH DOT BELOW) -->
+        </rule>
+        <rule>
+            <from>&#x0922;&#x094d;</from>
+            <to>&#x1e0d;h</to> <!-- ढ् -> ḍh (LATIN SMALL LETTER D WITH DOT BELOW + LATIN SMALL LETTER H) -->
+        </rule>
+        <rule>
+            <from>&#x091f;&#x094d;</from>
+            <to>&#x1e6d;</to> <!-- ट् -> ṭ (LATIN SMALL LETTER T WITH DOT BELOW) -->
+        </rule>
+        <rule>
+            <from>&#x0920;&#x094d;</from>
+            <to>&#x1e6d;h</to> <!-- ठ् -> ṭh (LATIN SMALL LETTER T WITH DOT BELOW + LATIN SMALL LETTER H) -->
+        </rule>
+        <rule>
+            <from>&#x091e;&#x094d;</from>
+            <to>&#x00f1;</to> <!-- ञ् -> ñ (LATIN SMALL LETTER N WITH TILDE) -->
+        </rule>
+        <rule>
+            <from>&#x091c;&#x094d;</from>
+            <to>j</to> <!-- ज् -> j (LATIN SMALL LETTER J) -->
+        </rule>
+        <rule>
+            <from>&#x091d;&#x094d;</from>
+            <to>jh</to> <!-- झ् -> jh (LATIN SMALL LETTER J + LATIN SMALL LETTER H) -->
+        </rule>
+        <rule>
+            <from>&#x091a;&#x094d;</from>
+            <to>c</to> <!-- च् -> c (LATIN SMALL LETTER C) -->
+        </rule>
+        <rule>
+            <from>&#x091b;&#x094d;</from>
+            <to>ch</to> <!-- छ् -> ch (LATIN SMALL LETTER C + LATIN SMALL LETTER H) -->
+        </rule>
+        <rule>
+            <from>&#x0919;&#x094d;</from>
+            <to>&#x1e45;</to> <!-- ङ् -> ṅ (LATIN SMALL LETTER N WITH DOT ABOVE) -->
+        </rule>
+        <rule>
+            <from>&#x0917;&#x094d;</from>
+            <to>g</to> <!-- ग् -> g (LATIN SMALL LETTER G) -->
+        </rule>
+        <rule>
+            <from>&#x0918;&#x094d;</from>
+            <to>gh</to> <!-- घ् -> gh (LATIN SMALL LETTER G + LATIN SMALL LETTER H) -->
+        </rule>
+        <rule>
+            <from>&#x0915;&#x094d;</from>
+            <to>k</to> <!-- क् -> k (LATIN SMALL LETTER K) -->
+        </rule>
+        <rule>
+            <from>&#x0916;&#x094d;</from>
+            <to>kh</to> <!-- ख् -> kh (LATIN SMALL LETTER K + LATIN SMALL LETTER H) -->
+        </rule>
+        <rule>
+            <from>&#x0939;</from>
+            <to>ha</to> <!-- ह -> ha (LATIN SMALL LETTER H + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0938;</from>
+            <to>sa</to> <!-- स -> sa (LATIN SMALL LETTER S + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0937;</from>
+            <to>&#x1e63;a</to> <!-- ष -> ṣa (LATIN SMALL LETTER S WITH DOT BELOW + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0936;</from>
+            <to>&#x015b;a</to> <!-- श -> śa (LATIN SMALL LETTER S WITH ACUTE + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0935;</from>
+            <to>va</to> <!-- व -> va (LATIN SMALL LETTER V + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0932;</from>
+            <to>la</to> <!-- ल -> la (LATIN SMALL LETTER L + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0930;</from>
+            <to>ra</to> <!-- र -> ra (LATIN SMALL LETTER R + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x092f;</from>
+            <to>ya</to> <!-- य -> ya (LATIN SMALL LETTER Y + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x092e;</from>
+            <to>ma</to> <!-- म -> ma (LATIN SMALL LETTER M + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x092c;</from>
+            <to>ba</to> <!-- ब -> ba (LATIN SMALL LETTER B + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x092d;</from>
+            <to>bha</to> <!-- भ -> bha (LATIN SMALL LETTER B + LATIN SMALL LETTER H + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x092b;</from>
+            <to>pha</to> <!-- फ -> pha (LATIN SMALL LETTER P + LATIN SMALL LETTER H + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x092a;</from>
+            <to>pa</to> <!-- प -> pa (LATIN SMALL LETTER P + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0928;</from>
+            <to>na</to> <!-- न -> na (LATIN SMALL LETTER N + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0926;</from>
+            <to>da</to> <!-- द -> da (LATIN SMALL LETTER D + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0927;</from>
+            <to>dha</to> <!-- ध -> dha (LATIN SMALL LETTER D + LATIN SMALL LETTER H + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0924;</from>
+            <to>ta</to> <!-- त -> ta (LATIN SMALL LETTER T + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0925;</from>
+            <to>tha</to> <!-- थ -> tha (LATIN SMALL LETTER T + LATIN SMALL LETTER H + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0923;</from>
+            <to>&#x1e47;a</to> <!-- ण -> ṇa (LATIN SMALL LETTER N WITH DOT BELOW + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0921;</from>
+            <to>&#x1e0d;a</to> <!-- ड -> ḍa (LATIN SMALL LETTER D WITH DOT BELOW + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0922;</from>
+            <to>&#x1e0d;ha</to> <!-- ढ -> ḍha (LATIN SMALL LETTER D WITH DOT BELOW + LATIN SMALL LETTER H + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x091f;</from>
+            <to>&#x1e6d;a</to> <!-- ट -> ṭa (LATIN SMALL LETTER T WITH DOT BELOW + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0920;</from>
+            <to>&#x1e6d;ha</to> <!-- ठ -> ṭha (LATIN SMALL LETTER T WITH DOT BELOW + LATIN SMALL LETTER H + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x091e;</from>
+            <to>&#x00f1;a</to> <!-- ञ -> ña (LATIN SMALL LETTER N WITH TILDE + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x091c;</from>
+            <to>ja</to> <!-- ज -> ja (LATIN SMALL LETTER J + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x091d;</from>
+            <to>jha</to> <!-- झ -> jha (LATIN SMALL LETTER J + LATIN SMALL LETTER H + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x091a;</from>
+            <to>ca</to> <!-- च -> ca (LATIN SMALL LETTER C + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x091b;</from>
+            <to>cha</to> <!-- छ -> cha (LATIN SMALL LETTER C + LATIN SMALL LETTER H + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0919;</from>
+            <to>&#x1e45;a</to> <!-- ङ -> ṅa (LATIN SMALL LETTER N WITH DOT ABOVE + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0917;</from>
+            <to>ga</to> <!-- ग -> ga (LATIN SMALL LETTER G + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0918;</from>
+            <to>gha</to> <!-- घ -> gha (LATIN SMALL LETTER G + LATIN SMALL LETTER H + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0915;</from>
+            <to>ka</to> <!-- क -> ka (LATIN SMALL LETTER K + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0916;</from>
+            <to>kha</to> <!-- ख -> kha (LATIN SMALL LETTER K + LATIN SMALL LETTER H + LATIN SMALL LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0903;</from>
+            <to>&#x1e25;</to> <!-- ः -> ḥ (LATIN SMALL LETTER H WITH DOT BELOW) -->
+        </rule>
+        <rule>
+            <from>&#x0902;</from>
+            <to>&#x1e43;</to> <!-- ं -> ṃ (LATIN SMALL LETTER M WITH DOT BELOW) -->
+        </rule>
+        <rule>
+            <from>&#x0950;</from>
+            <to>o&#x1e41;</to> <!-- ॐ -> oṁ (LATIN SMALL LETTER O + LATIN SMALL LETTER M WITH DOT ABOVE) -->
+        </rule>
+    </rules>
+</translit>

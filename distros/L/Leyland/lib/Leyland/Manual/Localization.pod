@@ -1,0 +1,146 @@
+=head1 NAME
+
+Leyland::Manual::Localization - Localizing Leyland applications
+
+=head1 LANGUAGE NEGOTIATION
+
+As previously mentioned, when RESTful applications receive a request from
+a client, they negotiate the request and decide on a course of action based
+on the client's preferences, such as media type. Leyland performs all these
+negotiations by itself, except for language negotiation. This decision was
+made because language negotiation is quite impossible, for two main
+reasons:
+
+=over
+
+=item 1. In my experience, clients almost never send their preferred language with the HTTP
+request header "Accept-Language", instead using query parameters and other
+options.
+
+=item 2. Leyland really can't tell what languages your application provides.
+
+=back
+
+Therefore, it is your responsibility to decide how to perform language
+negotiation and localize your application. Unless, of course, your application
+is not multilingual, in which case you shouldn't care about localization.
+
+=head1 THE PROBLEM WITH CPAN'S LOCALIZATION MODULES
+
+CPAN has quite a few modules for data localization, the most common being
+L<Locale::Maketext> and L<Gettext> (I think). The problem is that these
+modules aren't really cut out for language negotiation. Their only purpose
+seems to be to localize your application to the locale of the system on
+which it is running, which is completely pointless when dealing with web
+applications. These are not desktop applications we're letting end-users
+install on their PCs with an interface written in their native language. We are talking about
+web applications, probably running on virtual servers located thousands
+of miles from your end-users. Who the hell cares about the locale of the
+system?
+
+When I write multilingual web applications, I want to let my end-users,
+which are visitors of my application, decide on their preferred language.
+This is why I created L<Locale::Wolowitz>, which is a very simple localization
+system based on JSON. This is also the reason why, as opposed to logging
+and view classes, Leyland only provides C<Locale::Wolowitz> as the choice
+for data localization (this may or may not change in the future).
+
+Before attempting to start localizing your applications, please read
+the documentation of L<Locale::Wolowitz> (don't worry, it's short and simple).
+
+=head1 LOCALIZING WITH LEYLAND
+
+To enable data localization with Locale::Wolowitz in Leyland applications,
+you need to set the "locales" configuration option in your app's class.
+This option should hold the path to a directory in which localization files
+of your applications reside, such as C<i18n/> under your application's top
+level directory:
+
+	# in MyApp.pm
+
+	sub setup {
+		return {
+			locales => './i18n',
+			...
+		};
+	}
+
+Note that the setting takes an absolute path. You can provide a path relative
+to the current working dir (CWD) using C<./> or C<../>, but whether this works
+or not depends on your operating system.
+
+Once provided, Leyland will attempt to load all localization files located
+in this directory, and add a C<loc()> method to the context object. This
+method takes the string to localize, and a list of zero or more values to
+use as replacements (if the string has placeholders). For this method to
+actually localize, you need to set the language of the request, with
+C<< $c->set_lang() >>. For example:
+
+	# in one of your routes
+	get '^/$' {
+		$c->set_lang('es'); # use Spanish
+		$c->stash->{title} = $c->loc('Hello %1', $c->user->email_address);
+		$c->template('index.html');
+	}
+
+	# in your views
+	<h1>[== $c->loc('Hello %1', $c->user->email_address);
+
+And that's pretty much it. Note that Leyland does not (and cannot) localize
+the actual data of your application (such as database entries), that's
+your job of course.
+
+=head1 WHAT'S NEXT?
+
+Read L<Leyland::Manual::Logging> to learn how to print log messages from
+your application or L<return to the table of contents|Leyland::Manual/"TABLE OF CONTENTS">.
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Leyland at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Leyland::Manual::Localization
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Leyland>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Leyland>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Leyland/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

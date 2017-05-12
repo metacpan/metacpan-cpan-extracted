@@ -1,0 +1,13 @@
+.cvsignore
+Changes
+bin/scribe_cat.pl
+lib/Log/Dispatch/Scribe.pm
+Makefile.PL
+MANIFEST
+README
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/scribe.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

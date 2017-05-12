@@ -1,0 +1,71 @@
+#!/usr/bin/perl -s
+use Data::Dumper;
+use Lingua::NATools::Lexicon;
+
+use warnings;
+use strict;
+
+our ($h);
+
+usage() if $h;
+
+my $filename = shift;
+usage() unless $filename;
+
+my $lex = Lingua::NATools::Lexicon->new($filename);
+
+my $size = $lex->size;
+
+binmode STDOUT, ":utf8";
+print "use utf8;\n";
+print "{\n";
+
+for (1..$size) {
+    my $word  = $lex->word_from_id($_);
+    my $count = $lex->id_count($_);
+
+    printf("\t\"%s\" => $count,\n", quotemeta($word));
+}
+print "}\n";
+
+$lex->close;
+
+
+sub usage {
+  print "nat-lex2perl: dumps a lexicon file as a Perl hash.\n\n";
+  print "\tnat-lex2perl <file.lex>\n\n";
+  print "For more help, please run 'perldoc nat-lex2perl'\n";
+  exit(0);
+}
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-lex2perl - dumps a lexicon file as Perl hash.
+
+=head1 SYNOPSIS
+
+   nat-lex2perl <file.lex>
+
+=head1 DESCRIPTION
+
+This tool is used mainly for debug of lexicon files (C<file.lex>
+files). Pass one as parameter and it will output a Data::Dumper file
+with the lexicon information.
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2012 by Alberto Manuel Brandão Simões
+
+=cut

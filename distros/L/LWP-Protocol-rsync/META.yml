@@ -1,0 +1,42 @@
+---
+abstract: 'LWP back-end for rsync:// by running the rsync program.'
+author:
+  - 'Kevin Ryde <user42@zip.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: LWP-Protocol-rsync
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+optional_features:
+  maximum_tests:
+    description: "Have \"make test\" do as much as possible."
+    requires:
+      LWP::UserAgent: 0
+requires:
+  File::Spec: 0
+  File::Temp: 0
+  HTTP::Date: 0
+  HTTP::Response: 0
+  HTTP::Status: 0
+  IPC::Run: 0
+  LWP::MediaTypes: 0
+  LWP::Protocol: 0
+  Test: 0
+  URI::Escape: 0
+  perl: 5.005
+resources:
+  homepage: http://user42.tuxfamily.org/lwp-protocol-rsync/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: 1

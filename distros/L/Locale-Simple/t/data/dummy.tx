@@ -1,0 +1,4 @@
+;l("Vertrag gekündigt zum %s", prod.human.kuendigung_zum)
+;l("Soll der Tarif %s?", "<b>" _ product.produktname _ "</b>")
+;l("Soll der Tarif %s?", "<b>" ~ product.produktname _ "</b>")
+;      <td>[% l("Verbraucher können ihre Vertragserklärung innerhalb von zwei Wochen ohne Angabe von Gründen in Textform (z. B. Brief, Fax, E-Mail) widerrufen. Hier finden Sie die %s Einzelheiten zu Ihrem Widerrufsrecht %s.", "<a href='" _ l("/unternehmen/kundeninformationen/agb-verbraucher/#widerrufsrecht") _ "' target='_blank'>", "</a>") | none %]</td>

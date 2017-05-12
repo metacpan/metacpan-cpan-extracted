@@ -1,0 +1,6 @@
+Revision history for Perl extension Lingua::FI::Genitive.
+
+0.01  Thu Oct  2 02:44:51 2003
+	- original version; created by h2xs 1.22 with options
+		-XA -n Lingua::FI::Genitive
+

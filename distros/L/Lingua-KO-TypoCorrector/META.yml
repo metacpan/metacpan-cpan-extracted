@@ -1,0 +1,40 @@
+---
+abstract: 'Typo Corrector for Korean language in using English'
+author:
+  - iamseeker,
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.6, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-KO-TypoCorrector
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Lingua::KO::TypoCorrector:
+    file: lib/Lingua/KO/TypoCorrector.pm
+    version: 0.06
+requires:
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/JEEN/p5-Lingua-KO-TypoCorrector/issues
+  homepage: https://github.com/JEEN/p5-Lingua-KO-TypoCorrector
+  repository: git://github.com/JEEN/p5-Lingua-KO-TypoCorrector.git
+version: 0.06
+x_contributors:
+  - 'Jeen Lee <jeen@perl.kr>'
+  - 'Jeen Lee <aiatejin@gmail.com>'

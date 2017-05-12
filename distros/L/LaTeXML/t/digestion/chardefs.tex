@@ -1,0 +1,57 @@
+\documentclass{article}
+\newcount\num
+\chardef\chara='3\relax
+\mathchardef\mchara"1350        %= 4944
+\begin{document}
+\section{chardef}
+% Regular counter register.
+% use the CS alone means assignment
+\num=10\relax
+% use with \the to get the numerical value
+10 = \the\num
+
+% Chardef register.
+% use the CS alone gets the character
+Lambda = \chara
+
+% Use with \the to get the numerical value
+3=\the\chara
+
+% However, on RHS of assignment, without \the
+\num=\chara
+3=\the\num
+
+\section{mathchardef}
+% What about mathchar ?
+Sum = $\mchara$
+
+\num=\mchara
+4944=\the\num
+
+4944=\the\mchara
+
+% AND the perverse use of chardefs for plain number constants
+\makeatletter
+10000 = \the\@M
+
+\num=\@M
+10000 = \the\num
+
+\section{fontencoding}
+% Note that chardef'd chars see the current font encoding
+
+OML: \fontencoding{OML}\selectfont\chara\fontencoding{OT1}\selectfont.
+
+OMS: \fontencoding{OMS}\selectfont\chara\fontencoding{OT1}\selectfont.
+
+OMX: \fontencoding{OMX}\selectfont\chara\fontencoding{OT1}\selectfont.
+
+% But mathchardef'd chars have it effectively built in (via font family)
+
+OML: $\fontencoding{OML}\selectfont\mchara\fontencoding{OT1}\selectfont$.
+
+OMS: $\fontencoding{OMS}\selectfont\mchara\fontencoding{OT1}\selectfont$.
+
+OMX: $\fontencoding{OMX}\selectfont\mchara\fontencoding{OT1}\selectfont$.
+
+\end{document}

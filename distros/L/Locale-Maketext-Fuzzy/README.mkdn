@@ -1,0 +1,177 @@
+# NAME
+
+Locale::Maketext::Fuzzy - Maketext from already interpolated strings
+
+# SYNOPSIS
+
+    package MyApp::L10N;
+    use base 'Locale::Maketext::Fuzzy'; # instead of Locale::Maketext
+
+    package MyApp::L10N::de;
+    use base 'MyApp::L10N';
+    our %Lexicon = (
+	# Exact match should always be preferred if possible
+	"0 camels were released."
+	    => "Exact match",
+
+	# Fuzzy match candidate
+	"[quant,_1,camel was,camels were] released."
+	    => "[quant,_1,Kamel wurde,Kamele wurden] freigegeben.",
+
+	# This could also match fuzzily, but is less preferred
+	"[_2] released[_1]"
+	    => "[_1][_2] ist frei[_1]",
+    );
+
+    package main;
+    my $lh = MyApp::L10N->get_handle('de');
+
+    # All ->maketext calls below will become ->maketext_fuzzy instead
+    $lh->override_maketext(1);
+
+    # This prints "Exact match"
+    print $lh->maketext('0 camels were released.');
+
+    # "1 Kamel wurde freigegeben." -- quant() gets 1
+    print $lh->maketext('1 camel was released.');
+
+    # "2 Kamele wurden freigegeben." -- quant() gets 2
+    print $lh->maketext('2 camels were released.');
+
+    # "3 Kamele wurden freigegeben." -- parameters are ignored
+    print $lh->maketext('3 released.');
+
+    # "4 Kamele wurden freigegeben." -- normal usage
+    print $lh->maketext('[*,_1,camel was,camels were] released.', 4);
+
+    # "!Perl ist frei!" -- matches the broader one
+    # Note that the sequence ([_2] before [_1]) is preserved
+    print $lh->maketext('Perl released!');
+
+# DESCRIPTION
+
+This module is a subclass of `Locale::Maketext`, with additional
+support for localizing messages that already contains interpolated
+variables.
+
+This is most useful when the messages are returned by external sources
+-- for example, to match `dir: command not found` against
+`[_1]: command not found`.
+
+Of course, this module is also useful if you're simply too lazy
+to use the
+
+    $lh->maketext("[quant,_1,file,files] deleted.", $count);
+
+syntax, but wish to write
+
+    $lh->maketext_fuzzy("$count files deleted");
+
+instead, and have the correct plural form figured out automatically.
+
+If `maketext_fuzzy` seems too long to type for you, this module
+also provides a `override_maketext` method to turn _all_ `maketext`
+calls into `maketext_fuzzy` calls.
+
+# METHODS
+
+## $lh->maketext_fuzzy(_key_[, _parameters..._]);
+
+That method takes exactly the same arguments as the `maketext` method
+of `Locale::Maketext`.
+
+If _key_ is found in lexicons, it is applied in the same way as
+`maketext`.  Otherwise, it looks at all lexicon entries that could
+possibly yield _key_, by turning `[...]` sequences into `(.*?)` and
+match the resulting regular expression against _key_.
+
+Once it finds all candidate entries, the longest one replaces the
+_key_ for the real `maketext` call.  Variables matched by its bracket
+sequences (`$1`, `$2`...) are placed before _parameters_; the order
+of variables in the matched entry are correctly preserved.
+
+For example, if the matched entry in `%Lexicon` is `Test [_1]`,
+this call:
+
+    $fh->maketext_fuzzy("Test string", "param");
+
+is equivalent to this:
+
+    $fh->maketext("Test [_1]", "string", "param");
+
+However, most of the time you won't need to supply _parameters_ to
+a `maketext_fuzzy` call, since all parameters are already interpolated
+into the string.
+
+## $lh->override_maketext([_flag_]);
+
+If _flag_ is true, this accessor method turns `$lh->maketext`
+into an alias for `$lh->maketext_fuzzy`, so all consecutive
+`maketext` calls in the `$lh`'s packages are automatically fuzzy.
+A false _flag_ restores the original behaviour.  If the flag is not
+specified, returns the current status of override; the default is
+0 (no overriding).
+
+Note that this call only modifies the symbol table of the _language
+class_ that `$lh` belongs to, so other languages are not affected.
+If you want to override all language handles in a certain application,
+try this:
+
+    MyApp::L10N->override_maketext(1);
+
+# CAVEATS
+
+- The "longer is better" heuristic to determine the best match is
+reasonably good, but could certainly be improved.
+- Currently, `"[quant,_1,file] deleted"` won't match `"3 files deleted"`;
+you'll have to write `"[quant,_1,file,files] deleted"` instead, or
+simply use `"[_1] file deleted"` as the lexicon key and put the correct
+plural form handling into the corresponding value.
+- When used in combination with `Locale::Maketext::Lexicon`'s `Tie`
+backend, all keys would be iterated over each time a fuzzy match is
+performed, and may cause serious speed penalty.  Patches welcome.
+
+# SEE ALSO
+
+[Locale::Maketext](http://search.cpan.org/perldoc?Locale::Maketext), [Locale::Maketext::Lexicon](http://search.cpan.org/perldoc?Locale::Maketext::Lexicon)
+
+# HISTORY
+
+This particular module was written to facilitate an _auto-extraction_
+layer for Slashcode's _Template Toolkit_ provider, based on
+`HTML::Parser` and `Template::Parser`.  It would work like this:
+
+    Input | <B>from the [% story.dept %] dept.</B>
+    Output| <B>[%|loc( story.dept )%]from the [_1] dept.[%END%]</B>
+
+Now, this layer suffers from the same linguistic problems as an
+ordinary `Msgcat` or `Gettext` framework does -- what if we want
+to make ordinals from `[% story.dept %]` (i.e. `from the 3rd dept.`),
+or expand the `dept.` to `department` / `departments`?
+
+The same problem occurred in RT's web interface, where it had to
+localize messages returned by external modules, which may already
+contain interpolated variables, e.g. `"Successfully deleted 7
+ticket(s) in 'c:\temp'."`.
+
+Since I didn't have the time to refactor `DBI` and `DBI::SearchBuilder`,
+I devised a `loc_match` method to pre-process their messages into one
+of the _candidate strings_, then applied the matched string to `maketext`.
+
+Afterwards, I realized that instead of preparing a set of candidate
+strings, I could actually match against the original _lexicon file_
+(i.e. PO files via `Locale::Maketext::Lexicon`).  This is how
+`Locale::Maketext::Fuzzy` was born.
+
+# AUTHORS
+
+Audrey Tang <cpan@audreyt.org>
+
+# CC0 1.0 Universal
+
+To the extent possible under law, 唐鳳 has waived all copyright and related
+or neighboring rights to Locale-Maketext-Fuzzy.
+
+This work is published from Taiwan.
+
+[http://creativecommons.org/publicdomain/zero/1.0](http://creativecommons.org/publicdomain/zero/1.0)

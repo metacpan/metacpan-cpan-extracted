@@ -1,0 +1,18 @@
+Revision history for Perl extension Liberty::Parser.
+
+0.04 2010-03-28
+  - Elaborate the installation guide in README.
+
+0.03 2010-02-11
+  - Add a lots of subroutine
+  - Change the naming of some subroutine
+  - Add get-cell-delay.pl and get-index.pl
+
+0.02 2010-01-29
+  - Import to CPAN
+  - The documentation should be improved.
+
+0.01  Wed Dec  9 09:34:53 2009
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Liberty::Parser
+

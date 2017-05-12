@@ -1,0 +1,30 @@
+---
+abstract: 'Yet another simple logger class'
+author:
+  - 'Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Pony
+no_index:
+  directory:
+    - inc
+provides:
+  Log::Pony:
+    file: lib/Log/Pony.pm
+    version: v1.0.1
+requires:
+  Class::Accessor::Lite: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  license: http://dev.perl.org/licenses/
+version: v1.0.1

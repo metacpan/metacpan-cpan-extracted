@@ -1,0 +1,43 @@
+---
+abstract: 'Return the document frequency in Aozora Bunko'
+author:
+  - 'pawa <pawapawa@cpan.org>'
+build_requires:
+  Test::More: '0.99'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-JA-DocumentFrequency-AozoraBunko
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Lingua::JA::DocumentFrequency::AozoraBunko:
+    file: lib/Lingua/JA/DocumentFrequency/AozoraBunko.pm
+    version: '0.01'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::ShareDir: '1.00'
+  Storable: '2.51'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/pawa-/Lingua-JA-DocumentFrequency-AozoraBunko/issues
+  homepage: https://github.com/pawa-/Lingua-JA-DocumentFrequency-AozoraBunko
+  repository: git://github.com/pawa-/Lingua-JA-DocumentFrequency-AozoraBunko.git
+version: '0.01'
+x_authority: cpan:PAWAPAWA
+x_contributors:
+  - 'pawa <pawa@pawafuru.com>'

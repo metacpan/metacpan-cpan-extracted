@@ -1,0 +1,219 @@
+# ====================================================================
+# Global settings
+# 
+# (These settings propagate to any unset channel-specific settings)
+# ====================================================================
+
+# ------------------------------------------------
+# Global settings.
+#
+# Any settings here propagate down any unset 
+# detection-specific settings
+# ------------------------------------------------
+
+# -- Settings used by detection algorithms (XS) --
+
+# advert detection method specified numerically or in symbols e.g. logo+black
+#detection_method = DEFAULT
+
+
+# maximum length of a single advert (in frames)
+max_advert = 222
+
+# minimum length of advert period (cut period) excludes prog change (in frames)
+#min_advert = 4500
+
+# minimum length of a program (in frames)
+#min_program = 7500
+
+# padding at start of recording (in frames)
+#start_pad = 3000
+
+# padding at end of recording (in frames)
+#end_pad = 3000
+
+# minimum number of frames to be contracted into a block
+#min_frames = 2
+
+# fuzziness window when contracting frames into a block
+frame_window = 22222
+
+# widest gap (no valid frames) over which to span when contracting frames into a block
+#max_gap = 10
+
+# window (in frames) in which to reduce the end of the program to the nearest gap
+#reduce_end = 0
+
+# frame gap used for reducing program end point
+#reduce_min_gap = 1500
+
+# ------------------------------------------------
+# Frame detection specific settings.
+# ------------------------------------------------
+
+# -- Settings used by detection algorithms (XS) --
+
+# sceen change detection level step
+#frame.schange_jump = 30
+
+# scene change detection percentage above which is deemed a scene change frame
+#frame.schange_cutlevel = 85
+
+# maximum pixel value under which pixel is treated as black
+#frame.max_black = 48
+
+# maximum brightness percentage under which is treated as black
+#frame.max_brightness = 60
+
+# difference level between frames used to detect a black frame
+#frame.brightness_jump = 200
+
+# percentage of frame to use for detection
+#frame.window_percent = 95
+
+# pixel value used for brightness detection
+#frame.test_brightness = 40
+
+# noise level used for black frame uniformity detection
+#frame.noise_level = 5
+
+
+# maximum length of a single advert (in frames)
+#frame.max_advert = 4500
+
+# minimum length of advert period (cut period) excludes prog change (in frames)
+#frame.min_advert = 4500
+
+# minimum length of a program (in frames)
+#frame.min_program = 7500
+
+# minimum number of frames to be contracted into a block
+#frame.min_frames = 2
+
+# fuzziness window when contracting frames into a block
+frame.frame_window = 2222
+
+# widest gap (no valid frames) over which to span when contracting frames into a block
+#frame.max_gap = 10
+
+# ------------------------------------------------
+# Logo detection specific settings.
+# ------------------------------------------------
+
+# -- Settings used by detection algorithms (XS) --
+
+# pixel step size for logo detection
+#logo.logo_edge_step = 1
+
+# maximum size of a logo (anything larger is discarded)
+#logo.logo_max_percentage_of_screen = 10
+
+# number of frames to skip between logo detection
+#logo.logo_skip_frames = 25
+
+# level used to decided whether this is a logo edge
+#logo.logo_edge_threshold = 5
+
+# logo averaging buffer size
+#logo.logo_ave_points = 250
+
+# maximum period (in frames) to use for detecting a logo
+#logo.logo_checking_period = 30000
+
+# percentage of frame to use for detection
+#logo.window_percent = 95
+
+# number of logo re-checks
+#logo.logo_num_checks = 5
+
+# percentage over which logo detection is deemed a match
+#logo.logo_ok_percent = 80
+
+# number of pixels to use in logo edge deetction
+#logo.logo_edge_radius = 2
+
+
+# maximum length of a single advert (in frames)
+#logo.max_advert = 4500
+
+# minimum length of advert period (cut period) excludes prog change (in frames)
+#logo.min_advert = 4500
+
+# minimum length of a program (in frames)
+#logo.min_program = 7500
+
+# minimum number of frames to be contracted into a block
+#logo.min_frames = 25
+
+# fuzziness window when contracting frames into a block
+#logo.frame_window = 20
+
+# widest gap (no valid frames) over which to span when contracting frames into a block
+#logo.max_gap = 250
+
+# percentage over which logo detection is deemed a match : going from non-logo to logo frames
+#logo.logo_rise_threshold = 80
+
+# percentage over which logo detection is deemed a match : going from logo to non-logo frames
+#logo.logo_fall_threshold = 50
+
+# ------------------------------------------------
+# Audio detection specific settings.
+# ------------------------------------------------
+
+# -- Settings used by detection algorithms (XS) --
+
+# adds "fuzziness" to detection of silence frames
+#audio.silence_window = 100
+
+
+# maximum length of a single advert (in frames)
+#audio.max_advert = 6000
+
+# minimum length of advert period (cut period) excludes prog change (in frames)
+#audio.min_advert = 3000
+
+# minimum length of a program (in frames)
+#audio.min_program = 7500
+
+# minimum number of frames to be contracted into a block
+#audio.min_frames = 2
+
+# fuzziness window when contracting frames into a block
+#audio.frame_window = 6000
+
+# widest gap (no valid frames) over which to span when contracting frames into a block
+#audio.max_gap = 250
+
+
+
+
+# ====================================================================
+# BBC1 channel-specific settings
+# ====================================================================
+[BBC1]
+
+detection_method = disable
+
+# ====================================================================
+# BBC2 channel-specific settings
+# ====================================================================
+[BBC2]
+
+detection_method = disable
+
+# ====================================================================
+# Dave channel-specific settings
+# ====================================================================
+[Dave]
+
+# window (in frames) in which to reduce the end of the program to the nearest gap
+reduce_end = 2222
+
+# frame gap used for reducing program end point
+reduce_min_gap = 50
+
+
+[ITV3]
+
+detection_method = disable

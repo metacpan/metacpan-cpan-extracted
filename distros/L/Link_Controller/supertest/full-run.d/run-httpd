@@ -1,0 +1,4 @@
+set -x 
+sed "s/TEST_BASEDIR/`pwd | sed s,/,\\\\\\\\/,g`/" httpd.conf.in > etc/httpd.conf
+/usr/sbin/httpd -d `pwd` -f `pwd`/etc/httpd.conf
+#echo strace -f /usr/sbin/httpd -d `pwd` -f `pwd`/etc/httpd.conf

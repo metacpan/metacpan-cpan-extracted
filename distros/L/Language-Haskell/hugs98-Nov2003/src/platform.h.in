@@ -1,0 +1,24 @@
+/*
+ * configure-sussed platform #defines.
+ */
+#ifndef __PLATFORM_H__
+#define __PLATFORM_H__
+
+#define HostPlatform   @HostPlatform@
+#define TargetPlatform @TargetPlatform@
+#define BuildPlatform  @BuildPlatform@
+
+/* Definitions suitable for use in CPP conditionals */
+#define @HostPlatform@_HOST 1
+#define @TargetPlatform@_TARGET 1
+#define @BuildPlatform@_BUILD   1
+
+#define @HostArch@_HOST 1
+#define @TargetArch@_TARGET 1
+#define @BuildArch@_BUILD 1
+
+#define @HostOS@_HOST_OS 1
+#define @TargetOS@_TARGET_OS 1
+#define @BuildOS@_BUILD_OS 1
+
+#endif /* __PLATFORM_H__ */

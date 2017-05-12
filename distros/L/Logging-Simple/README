@@ -1,0 +1,243 @@
+NAME
+
+    Logging::Simple - Simple debug logging by number, with customizable
+    labels and formatting
+
+SYNOPSIS
+
+        use Logging::Simple;
+    
+        my $log = Logging::Simple->new(name => 'whatever'); # name is optional
+    
+        $log->_4("default level is 4, we'll only print levels 4 and below");
+    
+        # change level
+    
+        $log->level(7);
+    
+        # log only a single level
+    
+        $log->level('=3');
+    
+        # disable all levels
+    
+        $log->level(-1);
+    
+        # log to a file
+    
+        $log->file('file.log');
+        $log->_0("this will go to file");
+        $log->file(0); # back to STDOUT
+    
+        # log to a "memory file"
+    
+        my $memfile;
+        $log->file(\$memfile);
+    
+        # don't print, return instead
+    
+        $log->print(0);
+        my $log_entry = $log->_2("print disabled");
+    
+        # send in your own log entry labels for the levels. They will be mapped
+        # 0 through 7
+    
+        $log->labels([qw(emerg alert crit error warn notice info debug)]);
+    
+        # using a child log
+    
+        my $log = Logging::Simple->new(name => 'main');
+        $log->_0("parent log");
+    
+        testing();
+    
+        sub testing {
+            my $log = $log->child('testing()');
+            $log->_4("child log");
+        }
+        __END__
+        [2016-04-21 16:31:30.039][lvl 0][main] parent log
+        [2016-04-21 16:31:30.040][lvl 4][main.testing()] child log
+
+DESCRIPTION
+
+    Lightweight (core-only) and very simple yet flexible debug tool for
+    printing or writing to file log type entries based on a configurable
+    level (0-7).
+
+    Instead of named log facility methods, it uses numbers instead,
+    preventing you from having to remember name to number mapping.
+
+    It provides the ability to programmatically change which output tags to
+    display, provides the ability to create descendent children, easily
+    enable/disable file output, levels, display etc. with the ability to
+    provide custom labels.
+
+ Logging entry format
+
+    By default, log entries appear as such, with a timestamp, the name of
+    the facility, the name (if previously set) and finally the actual log
+    entry message.
+
+        [2016-03-17 17:01:21.959][lvl 6][whatever] example output
+
+    All of the above tags can be enabled/disabled programatically at any
+    time, and there are others that are not enabled by default. You can
+    even add your own custom tag. See the display() method in
+    "CONFIGURATION METHODS" for further details.
+
+CONFIGURATION METHODS
+
+ new(%args)
+
+    Builds and returns a new Logging::Simple object. All arguments are
+    optional, and they can all be set using accessor methods after
+    instantiation. These params are:
+
+        name        => $str  # optional, default is undef
+        level       => $num  # default 4, options, 0..7, -1 to disable all
+        file        => $str  # optional, default undef, send in a filename
+        write_mode  => $str  # defaults to append, other option is 'write'
+        print       => $bool # default on, enable/disable output and return instead
+        display     => $bool # default on, enable/disable log message tags
+
+ name($name)
+
+    Returns the name of the log, if available. Send in a string to set it.
+
+ level($num)
+
+    Set and return the facility level. Will return the current value with a
+    param sent in or not. It can be changed at any time. Note that you can
+    set this with the LS_LEVEL environment variable, at any time. the next
+    method call regardless of what it is will set it appropriately.
+
+    You can also send in -1 as a level to disable all levels, or send in
+    the level prepended with a = to log *only* that level (eg:
+    $log->level('=3').
+
+ file('file.log', 'mode')
+
+    By default, we write to STDOUT. Send in the name of a file to write
+    there instead. Mode is optional; we'll append to the file by default.
+    Send in 'w' or 'write' to overwrite the file.
+
+ display(%hash|$bool)
+
+    List of log entry tags, and default printing status:
+
+        name  => 1, # specified in new() or name()
+        time  => 1, # timestamp
+        label => 1, # the string value of the level being called
+        pid   => 0, # process ID
+        proc  => 0, # "filename|line number" of the caller
+
+    In hash param mode, send in any or all of the tags with 1 (enable) or 0
+    (disable).
+
+    You can also send in 1 to enable all of the tags, or 0 to disable them
+    all.
+
+ labels($list|0)
+
+    Send in an array reference of eight custom labels. We will map them in
+    order to the levels 0 through 7, and your labels will be displayed in
+    the log entries.
+
+    Send in 0 to disable your custom labels.
+
+ custom_display($str|$false)
+
+    This will create a custom tag in your output, and place it at the first
+    column of the output. Send in 0 (false) to disable/clear it.
+
+ print($bool)
+
+    Default is enabled. If disabled, we won't print at all, and instead,
+    return the log entry as a scalar string value.
+
+ child($name)
+
+    This method will create a clone of the existing Logging::Simple object,
+    and then concatenate the parent's name with the optional name sent in
+    here for easy identification in the logs.
+
+    All settings employed by the parent will be used in the child, unless
+    explicity changed via the methods.
+
+    In a module or project, you can create a top-level log object, then in
+    all subs, create a child with the sub's name to easily identify flow
+    within the log. In an OO project, stuff the parent log into the main
+    object, and clone it from there.
+
+LOGGING METHODS
+
+ levels
+
+    All log facilities are called by their corresponing numbered sub, eg:
+
+        $log->_0("level 0 entry");
+        ...
+        $log->_7("level 7 entry");
+
+ fatal($msg)
+
+    Log the message, along with the trace confess() produces, and croak's
+    immediately.
+
+HELPER METHODS
+
+    These methods may be handy to the end user, but aren't required for
+    end-use.
+
+ levels($level)
+
+    Returns the hash of level_num => level_name mapping.
+
+    If the optional integer $level is sent in, we'll return the level_name
+    of the level.
+
+ timestamp
+
+    Returns the current time in the following format: 2016-03-17
+    17:51:02.241
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+BUGS
+
+    Please report any bugs or feature requests to
+    https://github.com/stevieb9/logging-simple/issues
+
+REPOSITORY
+
+    https://github.com/stevieb9/logging-simple
+
+BUILD RESULTS (THIS VERSION)
+
+    CPAN Testers: http://matrix.cpantesters.org/?dist=Logging-Simple
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Logging::Simple
+
+SEE ALSO
+
+    There are too many other logging modules to list here, but the idea for
+    this one came from Log::Basic. However, this one was written completely
+    from scratch.
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2016 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

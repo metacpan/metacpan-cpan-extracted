@@ -1,0 +1,11 @@
+1.03      2016-10-06
+
+1.03      2016-10-05
+  * Adapt basic.t to new Log::Any::Proxy 1.042 return values 
+1.02      2015-03-30
+  * Accept plain package name for skip_packages
+  * Improve skip testing
+1.01      2015-03-24
+  * Update L::A::A::Util version requirement for CPAN testers
+1.00      2015-03-22
+  * First CPAN publication

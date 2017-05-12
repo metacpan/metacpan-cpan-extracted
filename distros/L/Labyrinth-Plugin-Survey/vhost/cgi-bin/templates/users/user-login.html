@@ -1,0 +1,27 @@
+<h2>User Login</h2>
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name='act' value='home-logged' />
+<input type="hidden" name='userid' value='[% data.userid %]' />
+
+[% IF errmess %]
+<p class="alert">Sorry unable to login with that username/password, please try again.</p>
+[% END %]
+
+<div class="boxer">
+<table class="blocker">
+        <tr><td>Email</td>
+            <td><input type="text" name="cause" /></td>
+            <td rowspan="2">
+                Forgot your password? Not to worry, just enter your email
+                and click the 'forgot my password' button below. We will then
+                send you a new password.</td>
+        </tr>
+        <tr><td>Password</td>
+            <td><input type="password" name="effect" /></td>
+        </tr>
+        <tr><td></td>
+            <td><input type="submit" name="submit" value='LOGIN' /></td>
+            <td><input type="submit" name="forgot" value='FORGOT MY PASSWORD' /></td>
+        </tr>
+</table>
+</div>

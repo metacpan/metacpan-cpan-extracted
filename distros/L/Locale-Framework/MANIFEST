@@ -1,0 +1,7 @@
+Changes
+lib/Locale/Framework.pm
+lib/Locale/Framework/Dumb.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t

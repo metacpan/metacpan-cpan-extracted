@@ -1,0 +1,61 @@
+<h2>Send Selected Announcement</h2>
+
+<p> <a href="/anno/admin">list announcements</a></p>
+
+<div class="boxer">
+[% IF thanks %]<p>Announcement saved successfully.[% END %]
+[% IF errmess %]
+[% IF errmess == 1 %]
+<p class="alert">There are invalid or missing fields, as noted by the <span class="red">&empty;</span> symbol.
+[% ELSE %]
+<p class="alert">[% errmess %]
+[% END %]
+[% END %]
+</div>
+
+<div class="boxer">
+<table class="blocker">
+<tr><th width="200">From Header</th>
+    <td class="red"></td>
+    <td>[% data.hFrom %]/td></tr>
+<tr><th>Subject Header</th>
+    <td class="red"></td>
+    <td>[% data.hSubject %]</td></tr>
+</table>
+</div>
+
+<form method="post" action="/anno/sendone">
+<input type="hidden" name="act" value="anno-sendone" />
+<input type="hidden" name="announceid" value="[% data.announceid %]" />
+
+<div class="boxer">
+[% IF users %]
+<table class="blocker">
+<tr><th>User</th><th>Email</th><th>Select</th></tr>
+[% FOREACH user = users %]
+<tr><td>[% user.realname %]</td><td>[% user.email %]</td><td><input type="checkbox" name="LISTED" value="[% user.userid %]"></td>
+[% END %]
+</table>
+[% END %]
+</div>
+
+<p align="center"><input type="submit" value="Send Selected Announcements" />
+
+</form>
+
+[% IF data.announceid %]
+<h2>Send Options</h2>
+
+<div class="boxer">
+<table class="blocker">
+<tr><th width="200">Users Sent</th><td><a href="[% cgipath %]/pages.cgi?act=anno-resend&amp;announceid=[% data.announceid %]">[% data.sent %]</a></td></tr>
+<tr><th>Users Not Sent</th><td><a href="[% cgipath %]/pages.cgi?act=anno-unsent&amp;announceid=[% data.announceid %]">[% data.unsent %]</a></td></tr>
+</table>
+</div>
+
+<p align="center">
+<input type="button" onclick="parent.location='[% cgipath %]/pages.cgi?act=anno-sendall&amp;announceid=[% data.announceid %]'" value="Send All" />
+<input type="button" onclick="parent.location='[% cgipath %]/pages.cgi?act=anno-sendnew&amp;announceid=[% data.announceid %]'" value="Send New" />
+</p>
+
+[% END %]

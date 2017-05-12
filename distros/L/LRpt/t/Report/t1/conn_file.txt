@@ -1,0 +1,16 @@
+#########################################################################
+#
+# $Id: conn_file.txt,v 1.1 2006/01/07 23:50:44 pkaluski Exp $
+# $Name: Stable_0_16 $
+#
+# $Log: conn_file.txt,v $
+# Revision 1.1  2006/01/07 23:50:44  pkaluski
+# Unit test for new tool chain implemented. Session manager not needed any more.
+#
+#
+#########################################################################
+
+$dbh = DBI->connect( "DBI:CSV:csv_sep_char=\t;f_dir=t/Report/dbschema",
+                        { RaiseError => 1 }
+                       );
+

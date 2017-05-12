@@ -1,0 +1,11 @@
+# Fichier de declaration des options de l'extracteur
+#TAGGER = ~/taggers/TreeTagger-Modif4/cmd/tree-tagger-english.new2
+TAGGER = /users/aubin/taggers/RULE_BASED_TAGGER_V1.14/Bin_and_Data/tagger
+COLOR_BLIND = no
+DOCUMENT_BOUNDARY = DOCUMENT
+SENTENCE_BOUNDARY = SENT
+PARSING_DIRECTION = RIGHT
+COMPULSORY_ITEM = (N.*)
+PHRASE_MAXIMUM_LENGTH = 12
+CANDIDATE_MAXIMUM_LENGTH = 12
+# MESSAGE_DISPLAY = FR

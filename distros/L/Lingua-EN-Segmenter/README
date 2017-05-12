@@ -1,0 +1,26 @@
+Perl Module Lingua::EN::Segmenter - 0.10
+
+This module currently implements two methods for segmenting text:
+1. Lingua::EN::Segmenter::TextTiling -- Basic segmenting using text tiling
+2. Lingua::EN::Segmenter::Baseline -- Random segmenting
+
+     Copyright (c) 2002 David James
+     All rights reserved.
+     This program is free software; you can redistribute it and/or
+     modify it under the same terms as Perl itself.
+
+To install, unzip and untar the archive. In the directory created type
+
+	perl Makefile.PL
+	make install
+
+To execute tests:
+
+	perl Makefile.PL
+	make test
+
+Documentation is in the module file and will be added onto
+perllocal.pod as usual.
+
+You may contact David James, who is currently maintaining
+the archive, at david@jamesgang.com

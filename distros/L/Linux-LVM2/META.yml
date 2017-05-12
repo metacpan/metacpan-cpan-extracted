@@ -1,0 +1,37 @@
+---
+abstract: 'a Linux LVM2 wrapper.'
+author:
+  - 'Dominik Schulz <dominik.schulz@gauner.org>'
+build_requires:
+  Test::Memory::Cycle: 0
+  Test::MockObject::Universal: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Linux-LVM2
+requires:
+  Carp: 0
+  File::Basename: 0
+  File::Temp: 0
+  Moose: 0
+  POSIX: 0
+  Sys::FS: 0
+  Sys::Run: 0
+  Try::Tiny: 0
+  feature: 0
+  mro: 0
+  namespace::autoclean: 0
+  perl: 5.010_000
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/gittex/Linux-LVM2/issues
+  repository: git://github.com/gittex/Linux-LVM2.git
+version: 0.14
+x_authority: cpan:TEX

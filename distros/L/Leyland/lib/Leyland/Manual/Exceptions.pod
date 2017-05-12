@@ -1,0 +1,193 @@
+=head1 NAME
+
+Leyland::Manual::Exceptions - How to throw HTTP exceptions with Leyland
+
+=head1 HTTP EXCEPTIONS
+
+L<Leyland> is a framework for RESTful web applications. RESTful apps are
+expected to respond with proper HTTP status codes, and clearly inform the
+client of errors and problems, if they arise. The problem with most web
+applications out there is that they return errors with success HTTP status
+codes, mostly "200 OK". That's completely wrong.
+
+If you're not that familiar with HTTP status codes, please read Wikipedia's
+L<list of HTTP status codes|https://secure.wikimedia.org/wikipedia/en/w/index.php?title=List_of_HTTP_status_codes&oldid=424349307>
+first.
+
+Usually, when everything is okay, your application will return a "200 OK"
+responses, or "201 Created" responses when new content was created because
+of a request, or basically any other 2xx family status. When your application
+wants to redirect a request, it will return one of the 3xx status codes.
+
+But when errors occur, you should return a response with a status from the
+4xx or 5xx family. The 4xx family is reserved for client errors, such as
+failure of input validation, while the 5xx family is reserved for server
+(or application) errors, such as failure to connect to the database because
+it's down or whatever.
+
+Leyland takes quite a bit of the responsibility of returning proper HTTP
+exceptions for itself, when negotiating requests with the client. When
+Leyland cannot satisfy a request, it will automatically return proper
+errors such as "404 Not Found", "415 Unsupported Media Type", etc. Refer to
+L<Leyland::Negotiator> for more information about HTTP negotiation.
+
+The most common HTTP exception you will return will probably be "400 Bad Request",
+when input validation fails, or "401 Unauthorized" or "403 Forbidden" when
+a client attempts to perform some operation (or requests a resource) without
+being properly authorized to do so. I find that people tend to think they
+are not supposed to return errors of the 5xx family by themselves. I do believe
+that's wrong. Whenever a request cannot be fulfilled because something
+had failed on I<your application's> side, then a 5xx error is appropriate,
+mostly 500 Internal Server Error. Say a request is made to create a new
+article and save it in the database. If input validation failed, you will
+return a 400 Bad Request error. Say, however, that validation succeeded
+(so the request is perfectly legal), but for some reason the application
+fails storing the article in the database. A 500 Internal Server Error
+is most appropriate in this case.
+
+=head1 THROWING EXCEPTIONS
+
+Throwing exceptions with Leyland is easy. Just use the C<exception()> method
+in L<Leyland::Context>:
+
+	$c->exception({ code => 400, error => "You must provide the subject of the article to create" });
+
+When you call the C<exception()> method, an exception is immediately thrown,
+Leyland then catches the exception and properly serializes it to a format
+the client supports, such as HTML, JSON or XML (or plain text when the client
+does not support any of these formats). If the request was initiated from
+a web browser, then a C<text/html> response with a 400 Bad Request status
+and the provided error message will be returned to the browser. If the
+request was initiated from a JSON client, such as with an AJAX request, then
+the error will be returned in JSON format.
+
+=head1 PRETTIFYING EXCEPTIONS
+
+By default, when returning exceptions to web browsers, the resulting HTML
+will be pretty ugly. However, Leyland gives you the ability to render
+exceptions into views/templates, such that even exceptions can be returned
+in the design and layout of your application.
+
+To do this, create a template such as C<error.html>:
+
+	<h1>Oops, an error has occured!</h1>
+
+	<p>MyApp has encountered an [== $error =] error: [== $message =]</p>
+
+When throwing an exception, do this:
+
+	$c->exception({
+		code => 400,
+		error => "You must provide the subject of the article to create",
+		mimes => {
+			"text/html" => "error.html"
+		}
+	});
+
+When this exception is thrown, if the client accepts HTML, then the C<error.html>
+view will be rendered, possibly into a layout template such as C<layouts/main.html>,
+unless you also pass C<< use_layout => 0 >> to C<< $c->exception() >>.
+
+The result will be something like this:
+
+	<html>
+		<head><title>MyApp</title></head>
+		<body>
+			<h1>Oops, an error has occured!</h1>
+
+			<p>MyApp has encountered an 400 Bad Request error: You must provide the subject of the article to create</p>
+		</body>
+	</html>
+
+The following variables are available inside error templates:
+
+=over
+
+=item * C<$error> - The name of the error, like "400 Bad Request" or "404 Not Found"
+
+=item * C<$message> - The error message thrown
+
+=back
+
+You can render any kind of templates, even non-HTML ones. In the "mimes"
+hash-ref passed to C<< $c->exception() >>, you can, for example, add a template
+for C<application/json> requests if you see fit.
+
+In the future, I plan to have Leyland make it easier to globally set templates for
+exceptions instead of on a per-exception basis.
+
+=head1 EXCEPTIONS OF NON-ERROR STATUS CODES
+
+It is completely and entirely wrong to throw exceptions that are not of
+the 4xx or 5xx family of status codes. However, you can. But please don't.
+Honestly.
+
+One type of exception you might find useful, however, is a redirecting
+exception, of the 3xx family. Usually, you should redirect requests using
+C<< $c->res->redirect >>. At (rare) times, you might feel the need to throw
+a 3xx exception (this can most likely happen in C<auto()> and C<pre_route()>
+methods). In which case, also supply a "location" option to C<< $c->exception >>
+with the URI to redirect to:
+
+	$c->exception({
+		code => 303,
+		error => "Please see the provided URI",
+		location => $c->uri_for('/something')
+	});
+
+Again, don't do this unless you have a really good reason to.
+
+=head1 WHAT'S NEXT?
+
+Read L<Leyland::Manual::Deployment> to learn how to run and deploy Leyland
+applications or L<return to the table of contents|Leyland::Manual/"TABLE OF CONTENTS">.
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Leyland at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Leyland::Manual::Exceptions
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Leyland>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Leyland>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Leyland/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

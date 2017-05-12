@@ -1,0 +1,11 @@
+0.03
+
+Corrected the tests.
+
+0.02
+	
+Improved spread_leave, so we dont leave when not actually connected.
+
+Improved tests, so that they will be skipped if spread is not actually i
+running. With no spread running, this module is pointless anyway.
+

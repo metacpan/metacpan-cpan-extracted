@@ -1,0 +1,300 @@
+NAME
+    treealign - training tree alignment classifiers and aligning syntactic
+    trees
+
+SYNOPSIS
+        treealign [OPTIONS]
+
+        # train a model from tree aligned data
+        treealign -n 100 -m treealign.model -a train-data.xml
+
+        # aligning a parallel treebank
+        treealign -m treealign.model -a parallel-treebank.xml > aligned.xml
+
+DESCRIPTION
+    This script allows you to train a tree alignment model and to apply them
+    to parallel treebanks. Tree alignment is based on local binary
+    classification and rich feature sets.
+
+    Currently, training data has to be in Stockholm Tree Aligner format. The
+    output format is the same format. Here is a short example of this format
+    (taking from the output of the TreeAligner):
+
+     <?xml version="1.0" ?>
+     <treealign>
+     <head>
+      <alignment-metadata>
+        <date>Tue May  4 16:23:04 2010</date>
+        <author>Lingua-Align</author>
+      </alignment-metadata>
+     </head>
+      <treebanks>
+        <treebank filename="treebanks/en/smultron_en_sophie.xml" id="en"/>
+        <treebank filename="treebanks/sv/smultron_sv_sophie.xml" id="sv"/>
+      </treebanks>
+      <alignments>
+        <align author="Lingua-Align" prob="0.11502659612149206125" type="fuzzy">
+          <node node_id="s105_17" type="t" treebank_id="en"/>
+          <node node_id="s109_23" type="t" treebank_id="sv"/>
+        </align>
+        <align author="Lingua-Align" prob="0.45281832125339427364" type="fuzzy">
+          <node node_id="s105_34" type="t" treebank_id="en"/>
+          <node node_id="s109_15" type="t" treebank_id="sv"/>
+        </align>
+      </alignments>
+     </treealign>
+
+  OPTIONS
+    There is a number of options that can be specified on the command line.
+
+   Input options
+    -a parallel-treebank-file
+        Name of the file that contains the parallel treebank. Default format
+        is Stockholm Tree Aligner format (where the sentence alignment is
+        implicitely given by tree node alignments). To use a different
+        format use the option -A
+
+    -A format
+        Format of the parallel treebank/corpus. Default is sta (Stockholm
+        Tree Aligner format). Other options are, for example, 'opus' (CES
+        XML format as it is used in the OPUS corpus)
+
+    -s source-treebank-file
+        Name of the files that contains the source language treebank. This
+        is useful to sepcify a file that is different from the one that is
+        specified in the 'parallel-treebank-file'. For example, sentence
+        alignment files from OPUS usually refer to non-parsed XML files.
+        With -s we can overwrite this and refer to the parsed corpus
+        instead. However, be aware that the same sentences have to be
+        covered in the same order and appropriate IDs of these sentences
+        have to be found when reading through the treebank files.
+
+    -S format
+        Format of the source language treebank. Default is TigerXML (which
+        is used in the Stockholm Tree Aligner)
+
+    -t target-treebank-file
+        Name of the target language treebank file (similar to -s but for the
+        target language)
+
+    -T format
+        Format of the target language treebank (similar to -S)
+
+    -w  Swap alignment direction when reading through the parallel treebank
+
+    -i  Try to align index nodes as well (used in AlpinoXML)
+
+   Training options
+    Training will be enabled if a positive number of training sentences iss
+    specified with the -n option OR the modelfile does not exist.
+
+    -n nr_sent
+        Specify how many sentence (tree) pairs will be used for training a
+        new tree-aligner model.
+
+    -f features
+        Define features to be used in training. (For alignment, features are
+        taken from the modelfile.feat file!!) 'features' is a string with
+        feature types separated by ':'. There are various features that can
+        be used and combined. For more details look at
+        Lingua::Align::Trees::Features. The default is
+        'insideST2:insideTS2:outsideST2:outsideTS2'
+
+    -m model-file
+        Name of the file to store model parameters / read model parameters
+
+    -c classifier
+        Classifier to be used. Default is 'megam'. Another possiblity is
+        'clue' which refers to a noisy-or like classifier with independent
+        precision-weighted features (requires probabilistic values for each
+        feature and supports only positive features). Other classifiers may
+        be supported in future releases of Lingua::Align.
+
+    -M moses-dir
+        Directory with the GIZA++ and Moses word alignment files that will
+        be used for extracting certain features. Default is 'moses' and the
+        treealigner expects to find files with the following names
+
+         <moses-dir>/model/lex.0-0.e2f
+         <moses-dir>/model/lex.0-0.f2e
+         <moses-dir>/giza.src-trg/src-trg.A3.final.gz
+         <moses-dir>/giza.trg-src/trg-src.A3.final.gz
+         <moses-dir>/model/aligned.intersect
+
+        An alterantive way of specifying the location of word alignment
+        files is to use the options (-d -D -g -G -y), see below.
+
+    -d lexe2f
+        Path to the probabilistic source-to-target lexicon created by Moses
+        from the word aligned corpus. Of course, it could be any kind of
+        bilingual dictionary as long as it provides a score for each entry
+        and it uses the same format as the one created by Moses. Default is
+        "moses/model/lex.0-0.e2f".
+
+    -D lexf2e
+        Similar to -d but for the target-to-source lexicon. Default is
+        "moses/model/lex.0-0.f2e"
+
+    -g giza.e2f.A3
+        Path to the Viterbi word alignment (source-to-target) created by
+        GIZA++ (or other word aligners producing aligments in the same
+        format). Default is "moses/giza.trg-src/trg-src.A3.final.gz".
+
+    -G giza.f2e.A3
+        Similar to -g but for the other alignment direction. Default =
+        "moses/giza.trg-src/trg-src.A3.final.gz"
+
+    -y symal-file
+        Path to the symmetrized word alignment format created by Moses (or
+        other tools). Default = "moses/model/aligned.intersect"
+
+    -I id-file
+        Name of the file that contains pairs of IDs for all sentences that
+        have been word aligned with GIZA++/Moses. This is useful to match
+        sentences when reading word alignment files for feature extraction
+        (sometimes not all sentences are included in both, the parsed
+        collection and the word aligned data!). Note that word aligments and
+        parallel treebanks have still to be stored in the same order but
+        sentences may be skipped if they do not appear in one of them. The
+        format is like follows:
+
+         ## source-file-name    target-file-name
+         src-id1   trg-id1
+         src-id2   trg-id2
+         ....
+
+        The delimiter is one TAB character! n:m alignments are possible (IDs
+        separated by spaces) but only 1:1 alignments will be used in the
+        treealigner anyway.
+
+    -C  Switch on the linked-children feature (depending on the links
+        between children nodes of the current node pair). This flag has to
+        be specified in both, train and align mode!
+
+    -U  Switch on the linked-subtree-nodes feature (depending on the links
+        between all descendent nodes of the current node pair). This flag
+        has to be specified in both, train and align mode!
+
+    -P  Switch on the linked-parent feature (depending on the links between
+        parent nodes of the current node pair). This flag has to be
+        specified in both, train and align mode! This flag should NOT be
+        used together with -U or -C!
+
+    -R iter
+        Use <iter> number of iterations for adaptive SEARN style learning.
+        This is only useful in connection with (any of) the link depedency
+        features from above (-C -U -P). Instead of learning from the given
+        true link depedency feature extracted from the training data, this
+        option will run the training several times and adjust these features
+        acoording to the predicted link likelihoods from the previously
+        trained classifier. This is currently very slow because it re-runs
+        the feature extraction procedure (which should not be necessary when
+        re-running the classifier). This should be improved later but the
+        effect of SEARN seems to be very little anyway ....
+
+    -L  Align terminal nodes only (leaf nodes). It is possible to use this
+        flag together with -N which then forces the aligner to align
+        corresponding node types only (terminals with terminals and
+        non-terminals with non-terminals)
+
+    -N  Align non-terminal nodes only. If specified together with -L: align
+        corresponding nodes as explained above.
+
+    -1 weight
+        Training weight for good (sure) alignments Default = 3
+
+    -2 weight
+        Training weight for fuzzy (possible) alignments Default = 1
+
+    -3 weight
+        Training weight for negative examples (non-aligned nodes) Default =
+        1
+
+    -4 weight
+        Training weight for weak alignments (new category in our Europarl
+        data) Default = 1
+
+    -k  Keep the feature file extracted for training which usually is
+        removed to save storage space. The features are stored in __train.$$
+        (where $$ corresponds to the process ID)
+
+   Alignment options
+    -x threshold
+        Score threshold used for tree alignment. Node pairs obtaining scores
+        below this threshold will not be considered in the alignment
+        process.
+
+    -b strategy
+        Type of alignment strategy to be used. Default is 'inference' which
+        refers to a two-step procedure with local classification in the
+        first step and alignment inference in the second (see LinkSearch
+        with argument -l). An alternative strategy is called 'bottom-up' in
+        which the alignment is done in a greedy bottom-up fashion starting
+        with leaf node pairs and going up to the root nodes. Nodes are
+        linked immediately when the classification score (conditional link
+        likelihood) exceeds the threshold (usually 0.5). Aligned nodes are
+        removed from the search space. Therefore, only 1:1 links are
+        returned. In a final step link likelihoods are used to align
+        previously unlinked nodes with the selected alignment inference
+        strategy in the same way as in the two-step procedure.
+
+    -l LinkSearch
+        Link strategy used to extract the node aligments after
+        classification. Default strategy is 'greedy'. Other possible
+        strategies are 'wellformed' (greedy + wellformedness criteria) and
+        threshold (allow all links above the threshold score). You can also
+        add the option 'final' (by adding the string '_final') to the
+        selected strategy. In that case the aligner will first do the basic
+        link search and then add links between nodes that obey the
+        well-formedness criteria if either source or target language node is
+        not linked yet. In other words, this final step makes 1:many links
+        in the data that do not violate wellformedness. Yet another option
+        is 'and' (which can be added as the string '_and' to the selected
+        strategy, also in combination with '_final'). Using this option
+        unlinked nodes (source and target) will be aligned in a last step in
+        a greedy way even if they violate well-formedness. For example:
+        'wellformed_final_and' will force the aligner to, first, look for
+        1:1 links that are well-formed (multiple links are not allowed),
+        then add well-formed links between nodes where one of them is
+        already linked to another one, and, finally, adds links between
+        still unlinked nodes.
+
+    -u  Switch to add-links mode (union). Existing links between nodes will
+        be kept in the output file and new ones will be added. (In the
+        default mode, existing links will be considered for evaluation
+        only). This option is espcially useful if one wants to use a
+        pipeline of alignments, for example, terminal node alignment first
+        and non-terminal nodes in the next step.
+
+    -K  Similar to -u: switches to 'add-link' mode but now forces the
+        aligner to use existing links to compete with the new ones. This
+        means that the scores of existing links will be used in the link
+        search algorithm applied for aligning tree nodes. This may also
+        cause some existing links to disappear, for example, because they
+        are not conform to the wellformedness criteria anymore.
+
+   Runtime and other options
+    -v  Verbose output
+
+    -O format
+        Output format (one of sta (=default) or dublin (= Dublin subtree
+        aligner format)
+
+SEE ALSO
+    Lingua::Align::Trees, Lingua::Align::Features, Lingua::Align::Corpus
+
+AUTHOR
+    Joerg Tiedemann
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Joerg Tiedemann
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+
+    Copyright for MegaM by Hal Daume III see
+    http://www.cs.utah.edu/~hal/megam/ for more information Paper: Notes on
+    CG and LM-BFGS Optimization of Logistic Regression, 2004
+    http://www.cs.utah.edu/~hal/docs/daume04cg-bfgs.pdf
+

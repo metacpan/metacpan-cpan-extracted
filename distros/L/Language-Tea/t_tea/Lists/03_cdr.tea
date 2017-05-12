@@ -1,0 +1,13 @@
+
+define a (1 2 3)
+
+echo "primeiro " [length $a]
+
+define b [cdr $a]
+echo "length " [length $b]
+
+foreach o $b {
+    echo "foreach " $o
+}
+
+echo [length $a]

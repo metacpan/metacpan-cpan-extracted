@@ -1,0 +1,1571 @@
+<sentences>
+<sentence>Abstract
+We investigated ammonia-oxidizing bacteria in activated sludge collected from 12 sewage treatment systems, whose ammonia
+removal and treatment processes diﬀered, during three diﬀerent seasons.</sentence>
+<sentence>We used real-time PCR quantiﬁcation to reveal total bacterial numbers and total ammonia oxidizer numbers, and used speciﬁc PCR followed by denaturing gel gradient electrophoresis,
+cloning, and sequencing of 16S rRNA genes to analyze ammonia-oxidizing bacterial communities.</sentence>
+<sentence>Total bacterial numbers and total
+ammonia oxidizer numbers were in the range of 1.6 · 1012–2.4 · 1013 and 1.0 · 109–9.2 · 1010 cells lÀ1, respectively.</sentence>
+<sentence>Seasonal variation was observed in the total ammonia oxidizer numbers, but not in the ammonia-oxidizing bacterial communities.</sentence>
+<sentence>Members of
+the Nitrosomonas oligotropha cluster were found in all samples, and most sequences within this cluster grouped within two of the
+four sequence types identiﬁed.</sentence>
+<sentence>Members of the clusters of Nitrosomonas europaea–Nitrosococcus mobilis, Nitrosomonas cryotolerans,
+and unknown Nitrosomonas, occurred solely in one anaerobic/anoxic/aerobic (A2O) system.</sentence>
+<sentence>Members of the Nitrosomonas communis cluster occurred almost exclusively in association with A2O and anaerobic/aerobic systems.</sentence>
+<sentence>Solid residence time mainly inﬂuenced the total numbers of ammonia-oxidizing bacteria, whereas dissolved oxygen concentration primarily aﬀected the
+ammonia-oxidizing activity per ammonia oxidizer cell.</sentence>
+<sentence>Ó 2005 Published by Elsevier B.V. on behalf of the Federation of European Microbiological Societies.</sentence>
+<sentence>Keywords: Activated sludge; Ammonia-oxidizing bacteria; Real-time PCR; Sewage treatment; 16S rRNA gene sequences</sentence>
+<sentence>1.</sentence>
+<sentence>Introduction
+Nitriﬁcation, the two-step process by which ammonia
+is oxidized to nitrate via nitrite, plays a key role in the
+biological removal of nitrogen in wastewater treatment
+systems.</sentence>
+<sentence>The process involves two phylogenetically
+unrelated groups of obligately chemolithotrophic bacteria.</sentence>
+<sentence>Ammonia-oxidizing bacteria (AOB) ﬁrst oxidize
+ammonia to nitrite, and subsequently nitrite-oxidizing
+*</sentence>
+<sentence>Corresponding author.</sentence>
+<sentence>Tel.: +81 3 5841 7784; fax: +81 3 5841
+8538.</sentence>
+<sentence>E-mail address: tawan@env.t.u-tokyo.ac.jp (T. Limpiyakorn).</sentence>
+<sentence>bacteria oxidize nitrite to nitrate by.</sentence>
+<sentence>Because of the slow
+growth rate of AOB, their high sensitivity to many environmental factors, and their inability to outcompete heterotrophs, ammonia oxidation is a rate-limiting step of
+nitrogen removal in wastewater treatment systems [1].</sentence>
+<sentence>For this reason, a better understanding of the ecology
+and microbiology of ammonia-oxidizing bacteria in
+wastewater treatment systems is necessary to enhance
+treatment performance and control.</sentence>
+<sentence>Recently developed molecular tools include sequence
+analysis of the 16S rRNA and amoA genes to reveal
+AOB populations and communities in various environments.</sentence>
+<sentence>In combination with clone libraries or denaturing</sentence>
+<sentence>0168-6496/$22.00 Ó 2005 Published by Elsevier B.V. on behalf of the Federation of European Microbiological Societies.</sentence>
+<sentence>doi:10.1016/j.femsec.2005.03.017</sentence>
+<sentence>206</sentence>
+<sentence>T. Limpiyakorn et al.</sentence>
+<sentence>/ FEMS Microbiology Ecology 54 (2005) 205–217</sentence>
+<sentence>gradient gel electrophoresis (DGGE), the application of
+speciﬁc PCR ampliﬁcation [2–4] provides clariﬁcation of
+the ammonia oxidizing community in detail.</sentence>
+<sentence>Implementation of ﬂuorescence in situ hybridization (FISH) [1,5–
+9] makes it possible to analyze complex communities of
+ammonia-oxidizing bacteria and estimate their numbers.</sentence>
+<sentence>More recently, PCR-based quantiﬁcation techniques allow precise enumeration of AOB populations in the
+environments [10–12].</sentence>
+<sentence>The distribution patterns of distinct AOB species in
+the environments reﬂect the physiological properties of
+AOB isolates observed in the laboratory [13].</sentence>
+<sentence>Among
+these, ammonia seems to be the most important factor
+for the inclusion of distinct AOB species, while other
+factors such as salinity are also reported to inﬂuence
+their appearance in the environments [6,13–15].</sentence>
+<sentence>In
+general, members of the Nitrosospira spp.</sentence>
+<sentence>or/and the
+Nitrosomonas oligotropha clusters are the dominant
+ammonia-oxidizing bacteria in the environments low in
+ammonia, whereas members of the Nitrosomonas europaea–Nitrosococcus mobilis cluster comprise the majority
+of AOB in the environments that are rich in ammonia.</sentence>
+<sentence>Although a number of studies have assessed the ecology and microbiology of ammonia-oxidizing bacteria in
+wastewater treatment systems [1,5–9,11,12,15–18], our
+understanding of those in the sewage treatment systems
+is still uncertain.</sentence>
+<sentence>The eﬀects of other factors than ammonia on individual ammonia oxidizer species in sewage
+treatment systems are poorly understood.</sentence>
+<sentence>AOB found
+in these low-ammonia systems are often cited as being
+the same bacteria.</sentence>
+<sentence>Some individual species are overlooked by representing their characters by those of the
+only few common members of the groups.</sentence>
+<sentence>However,
+their characteristics may diﬀer, and they may be inﬂuenced by distinct factors in the systems.</sentence>
+<sentence>Because of these concerns, we investigated ammoniaoxidizing bacteria in activated sludge collected from 12
+sewage treatment systems.</sentence>
+<sentence>We used real-time PCR quantiﬁcation to reveal total bacterial numbers and total
+AOB numbers and we used speciﬁc PCR ampliﬁcation
+followed by DGGE, cloning, and sequencing of 16S
+rRNA genes to identify members of AOB communities.</sentence>
+<sentence>We focused on the eﬀects of inﬂuent characteristics,
+treatment processes, system operation, and seasonal variation on the total AOB numbers and AOB communities.</sentence>
+<sentence>2.</sentence>
+<sentence>Materials and methods
+2.1.</sentence>
+<sentence>Samples of sewage activated sludge and description of
+sewage treatment systems
+Activated sludge samples were collected from the aeration tanks of 12 sewage treatment systems.</sentence>
+<sentence>These systems are in use in eight sewage treatment plants in
+Tokyo, which are run by the Bureau of Sewerage, Tokyo</sentence>
+<sentence>Metropolitan Government, Japan.</sentence>
+<sentence>The 12 systems differed in ammonia removal and were operated with different treatment processes: anaerobic/anoxic/aerobic
+(A2O); anaerobic/aerobic (AO); and conventional activated sludge (AS) processes.</sentence>
+<sentence>Samples were collected
+from the 12 systems during three diﬀerent seasons: summer (August 2001); autumn (November 2001); and winter (February 2002).</sentence>
+<sentence>Mixed-liquor suspended solids
+(MLSS) concentrations were determined on the day of
+sampling.</sentence>
+<sentence>The sludge from approximately 2 mg of
+MLSS was transferred into a 1.7-ml Eppendorf tube
+and centrifuged at 14,000g for 10 min.</sentence>
+<sentence>The supernatant
+was removed, and the pellet was kept at À20 °C until
+analysis.</sentence>
+<sentence>Details of the treatment processes, inﬂuent and eﬄuent characteristics, removal eﬃciencies, and operational
+parameters of the 12 systems are listed in Table 1.</sentence>
+<sentence>Systems B1, B2, and B3, systems F1 and F2, and systems
+G1 and G2 were located in plants B, F, and G, respectively.</sentence>
+<sentence>Plant B received sewage from a single sewer line,
+and the sewage was split among systems B1, B2, and B3
+for treatment.</sentence>
+<sentence>In contrast, multiple sewer lines entered
+plants F and G; as a result, the various systems in both
+plants received diﬀerent sewage.</sentence>
+<sentence>However, the characteristics of the inﬂuents were expected to be similar because the areas from which the sewages were collected
+were near each other.</sentence>
+<sentence>The treatment processes of the
+12 systems varied: systems A and B1 are A2O processes;
+systems B2, C, D, and E are AO processes; and systems
+B3, F1, F2, G1, G2, and H are AS processes.</sentence>
+<sentence>Biological oxygen demand (BOD) in the inﬂuents
+ranged from 34 to 141 mg lÀ1, while ammonium concentrations were between 12 and 30 mg N lÀ1.</sentence>
+<sentence>The characteristics of the inﬂuents did not vary notably among
+the systems, except for system A. This system was associated with inﬂuent ammonia concentrations of
+26–30 mg N lÀ1 and chloride concentrations that were
+double those of other systems.</sentence>
+<sentence>These diﬀerences arose
+because system A received sewage mostly from commercial areas without rainwater, whereas the other systems
+served household areas and received combined sewage.</sentence>
+<sentence>In addition, the location of system A, an artiﬁcial island
+in the sea, might tend to increase the chloride concentration in the inﬂuent of this system.</sentence>
+<sentence>BOD removal eﬃciencies were excellent (P95%) in
+all systems; however, ammonia removal eﬃciencies differed among them.</sentence>
+<sentence>Completed ammonia removal was
+achieved in systems A, B1, B2, D, F2, and G1.</sentence>
+<sentence>Ammonia removal was poor in systems G2 and H, possibly because of insuﬃcient oxygen.</sentence>
+<sentence>Ammonia concentrations in
+the eﬄuents varied according to the diﬀerence of ammonia removal among the systems.</sentence>
+<sentence>Nitrite concentrations
+in the eﬄuents were less than 2 mg N lÀ1 and pH were
+maintained between 6.2 and 7.4 in all systems.</sentence>
+<sentence>Temperature in the 12 systems ranged from 14 to
+22 °C in winter to 27 to 31 °C in summer.</sentence>
+<sentence>No marked</sentence>
+<sentence>Parameters</sentence>
+<sentence>System
+A</sentence>
+<sentence>Treatment process
+Aeration tank volume
+Volumetric ﬂow to aeration tank
+BOD in inﬂuenta
+NH4-N in inﬂuenta
+ClÀin inﬂuenta
+NH4-N in eﬄuenta
+NO2-N in eﬄuenta
+BOD removala
+NHþ -N removala
+4
+Volumetric NHþ -N removala
+4
+HRTb
+b
+SRT
+MLSSb
+MLDOb</sentence>
+<sentence>Unit</sentence>
+<sentence>B1</sentence>
+<sentence>B2</sentence>
+<sentence>B3</sentence>
+<sentence>C</sentence>
+<sentence>D</sentence>
+<sentence>E</sentence>
+<sentence>F1</sentence>
+<sentence>F2</sentence>
+<sentence>G1</sentence>
+<sentence>G2</sentence>
+<sentence>H</sentence>
+<sentence>m3
+m3 mÀ3 dÀ1
+mg lÀ1
+mg lÀ1
+mg lÀ1
+mg lÀ1
+mg lÀ1
+%
+%
+g mÀ3 dÀ1
+h
+Day
+mg lÀ1
+mg lÀ1</sentence>
+<sentence>A2O
+6400
+1.8–2.1
+91–139
+26–30
+140–180
+0
+0
+98–99
+100
+42–44
+24.9
+16.5
+2122
+4.1</sentence>
+<sentence>A2O
+7450
+2.8–3.4
+53–141
+13–16
+54–80
+0
+0
+98–99
+98–100
+33–34
+16.1
+14.2
+1629
+1.8</sentence>
+<sentence>AO
+11,175
+2.3–2.8
+53–141
+13–16
+54–80
+0–1
+0
+97–99
+96–99
+26–30
+12.7
+8.6
+1422
+2.2</sentence>
+<sentence>AS
+44,700
+2.4–3.0
+53–141
+13–16
+54–80
+0–2
+0–1
+97–99
+87–97
+24–31
+9.2
+7.2
+1256
+2.3</sentence>
+<sentence>AO
+10,230
+2.2–4.6
+80–133
+20–24
+63–80
+3–12
+1
+95–96
+40–90
+18–50
+7.3
+4.6
+1085
+3.4</sentence>
+<sentence>AO
+11,760
+2.2–2.5
+64–132
+14–18
+40–58
+0
+0
+99–100
+100
+28–33
+14.0
+12.6
+1249
+5.3</sentence>
+<sentence>AO
+31,050
+3.3
+65–100
+12–18
+80–90
+1–2
+0
+98–99
+85–97
+27–44
+9.8
+7.9
+1844
+5.8</sentence>
+<sentence>AS
+15,520
+2.6–3.0
+67–90
+15–18
+–c
+0–6
+0–1
+96–99
+69–98
+32–34
+8.5
+6.3
+1339
+6.5</sentence>
+<sentence>AS
+37,840
+4.1–4.9
+63–111
+15–18
+–c
+0–1
+0
+97–98
+97–100
+54–60
+5.4
+11.7
+1698
+6.7</sentence>
+<sentence>AS
+97,200
+3.5–4.1
+74–103
+18–19
+89–94
+0
+0
+97–99
+100
+49–60
+6.3
+5.7
+1159
+6.5</sentence>
+<sentence>AS
+268,800
+3.0–3.8
+83–94
+18–21
+89–98
+12–19
+0–2
+95–97
+0–40
+0–13
+7.3
+4.5
+1009
+1.8</sentence>
+<sentence>AS
+202,320
+2.6–2.9
+34–73
+14–17
+52–72
+4–16
+0–1
+95–97
+7–89
+0–20
+9.0
+7.1
+1088
+1.6</sentence>
+<sentence>HRT, hydraulic retention time; SRT, solid residence time; MLSS, mixed liquor suspended solid; MLDO, mixed liquor dissolved oxygen.</sentence>
+<sentence>a
+All inﬂuent characteristic, eﬄuent characteristic, and removal eﬃciency values were analyzed from one-day grab samples collected on the day close to the day of sludge collection.</sentence>
+<sentence>b
+All operational parameters were the averages of the three months in which sludge was collected.</sentence>
+<sentence>c
+Data not available.</sentence>
+<sentence>T. Limpiyakorn et al.</sentence>
+<sentence>/ FEMS Microbiology Ecology 54 (2005) 205–217</sentence>
+<sentence>Table 1
+Treatment processes, inﬂuent- and eﬄuent characteristics, removal eﬃciencies, and operational parameters of 12 sewage treatment systems; information provided by Tokyo Metropolitan
+Government</sentence>
+<sentence>207</sentence>
+<sentence>208</sentence>
+<sentence>T. Limpiyakorn et al.</sentence>
+<sentence>/ FEMS Microbiology Ecology 54 (2005) 205–217</sentence>
+<sentence>seasonal variations in inﬂuent characteristics, removal
+eﬃciencies, or operational parameters were observed in
+all systems throughout this study.</sentence>
+<sentence>However, solid residence time (SRT) and dissolved oxygen (DO) concentration in system H varied during the studied seasons, and
+these variations will be discussed later.</sentence>
+<sentence>2.2.</sentence>
+<sentence>DNA extraction
+DNA was extracted directly from samples using FastDNA SPIN kits for soil (Bio 101, Vista, CA, USA) with
+a small modiﬁcation at the initial step: 1 ml of sodium
+phosphate buﬀer solution was added to and mixed with
+the sample, and then the tube was sonicated for 30 s on
+ice.</sentence>
+<sentence>The remaining steps followed the manufacturerÕs
+instructions.</sentence>
+<sentence>The product from DNA extraction was
+veriﬁed by electrophoresis in 1% agarose (TaKaRa
+LO3, Tokyo, Japan).</sentence>
+<sentence>To minimize the variation in DNA extraction, the
+templates used for real-time PCR quantiﬁcation were
+prepared from the mixture of DNA, which was extracted in triplicate for a sample.</sentence>
+<sentence>2.3.</sentence>
+<sentence>Real-time PCR quantiﬁcation of total bacteria and
+total AOB
+Real-time PCR quantiﬁcation of 16S rRNA genes of
+total bacteria was performed using the primers 1055f
+and 1392r and the Taq Man probe 16Staq1115 as previously described [12].</sentence>
+<sentence>The oligonucleotide sequences of
+the primers and the Taq Man probe are shown in Table
+2.</sentence>
+<sentence>The PCR mixture was prepared in a total volume of
+25 ll using the Taq Man Universal PCR Master Mix
+kit (PE Applied Biosystems), 15 pmol of forward primer
+1055f, 15 pmol of reverse primer 1392r, 6.25 pmol of
+Taq Man probe 16Staq1115, and standard DNA or extracted DNA from samples.</sentence>
+<sentence>The standard DNA, which
+was the pT7Blue T-Vector (Novagen, Darmstadt, Germany) possessing 16S rRNA gene of N. europaea, was
+prepared ranging from 5 · 101 to 5 · 107 copies.</sentence>
+<sentence>The extracted DNA from a sample was prepared for three dif-</sentence>
+<sentence>ferent 10-fold dilutions, and each of the dilutions was
+real-time PCR quantiﬁed in duplicate.</sentence>
+<sentence>PCR ampliﬁcation was performed in an ABI Prism SDS 7000 instrument (PE Applied Biosystems) under conditions of
+3 min at 50 °C and 10 min at 95 °C followed by 45 cycles
+of 30 s at 95 °C, 1 min at 50 °C, and 20 s at 72 °C. To
+calculate the cell numbers of bacteria from the quantiﬁed numbers of 16S rRNA gene, it is assumed that the
+average 16S rRNA gene copies per genome of bacterial
+cell is 3.6 based on the average 16S rRNA gene copies
+found in cultured bacteria [19].</sentence>
+<sentence>Real-time PCR quantiﬁcation of 16S rRNA genes of
+total AOB was performed using the primers CTO 189f
+and RT1r and the Taq Man probe TMP1 as described
+earlier [10].</sentence>
+<sentence>The oligonucleotide sequences of the primers
+and the Taq Man probe are shown in Table 2.</sentence>
+<sentence>The PCR
+mixture was prepared in a total volume of 25 ll using
+the Taq Man Universal PCR Master Mix kit, 7.5 pmol
+of a 2:1 ratio of forward primers CTO 189fA/B and
+CTO 189fC, 7.5 pmol of reverse primer RT1r,
+3.125 pmol of Taq Man probe TMP1, and standard
+DNA or extracted DNA from samples.</sentence>
+<sentence>The standard
+DNA, which was the pT7Blue T-Vector possessing 16S
+rRNA gene of N. europaea, was prepared in a range of
+4 · 101 to 4 · 107 copies.</sentence>
+<sentence>The extracted DNA from a
+sample was prepared for three diﬀerent 10-fold dilutions, and each of the dilutions was real-time PCR quantiﬁed in duplicate.</sentence>
+<sentence>PCR ampliﬁcation was performed in
+an ABI Prism SDS 7000 instrument under conditions of
+2 min at 50 °C and 10 min at 95 °C followed by 40 cycles
+of 30 s at 95 °C and 1 min at 60 °C. To calculate the cell
+numbers of ammonia-oxidizing bacteria from the quantiﬁed numbers of 16S rRNA genes, it is assumed that
+AOB possess one copy of 16S rRNA gene per genome
+[20].</sentence>
+<sentence>2.4.</sentence>
+<sentence>PCR, DGGE, cloning, sequencing, and phylogenetic
+analysis
+We used the primers CTO189f and CTO654r [2] to
+amplify 465-bp fragments of 16S rRNA genes of AOB</sentence>
+<sentence>Table 2
+Primers and probes used in this study
+Primer or probe</sentence>
+<sentence>Nucleotide sequence (5 0 –3 0 )</sentence>
+<sentence>Reference</sentence>
+<sentence>Primers
+1055f
+1392r
+CTO 189A/Bf
+CTO 189Cf
+RT1r
+CTO 654r</sentence>
+<sentence>ATGGCTGTCGTCAGCT
+ACGGGCGGTGTGTAC
+GGAGRAAAGCAGGGGATCG
+GGAGGAAAGTAGGGGATCG
+CGTCCTCTCAGACCARCTACTG
+CTAGCYTTGTAGTTTCAAACGC</sentence>
+<sentence>[12]
+[12]
+[2]
+[2]
+[10]
+[2]</sentence>
+<sentence>Probesa
+16STaq1115 (5 0 -FAM and 3 0 -TAMRA)
+TMP1 (5 0 -FAM and 3 0 -TAMRA)</sentence>
+<sentence>CAACGAGCGCAACCC
+CAACTAGCTAATCAGRCATCRGCCGCTC</sentence>
+<sentence>[12]
+[10]</sentence>
+<sentence>a</sentence>
+<sentence>FAM, 6-carboxyﬂuorescein; TAMRA, 6-carboxy-tetramethylrhodamine.</sentence>
+<sentence>T. Limpiyakorn et al.</sentence>
+<sentence>/ FEMS Microbiology Ecology 54 (2005) 205–217</sentence>
+<sentence>structed using the ARB program package.</sentence>
+<sentence>We added
+our 397-bp sequences into the distance tree, which was
+previously constructed based on comparison of 1000bp sequences of all AOB, which are available in the
+SSU rRNA database, and some related non-AOB,
+which were used as outgroup sequences.</sentence>
+<sentence>Additionally,
+our 397-bp sequences and 397-bp sequences of described
+AOB species [22] and some related non-AOB were calculated based on maximum parsimony, maximum likelihood, and distance analyses using the external
+software provided in the ARB program package (Phylip
+DNAPARS, AxML, and Phylip Distance Method,
+respectively).</sentence>
+<sentence>2.5.</sentence>
+<sentence>Accession numbers for nucleotide sequences
+The partial sequences of 16S rRNA genes obtained in
+this study were submitted to the DDBJ database under
+accession numbers AB176856–AB176884.</sentence>
+<sentence>3.</sentence>
+<sentence>Results
+3.1.</sentence>
+<sentence>Total bacterial numbers and total AOB numbers
+We used real-time PCR quantiﬁcation to reveal total
+bacterial numbers and total AOB numbers in samples of
+sewage activated sludge.</sentence>
+<sentence>Fig.</sentence>
+<sentence>1 shows total bacterial
+numbers in the aeration tanks of the 12 systems.</sentence>
+<sentence>Total
+bacterial numbers were in a range of 1.6 · 1012–
+2.4 · 1013 cells lÀ1.</sentence>
+<sentence>Fig.</sentence>
+<sentence>2 shows total AOB numbers,
+percentage of total AOB in total bacterial populations,
+and ammonia-oxidizing activities per cell of AOB in
+the aeration tanks of the 12 systems.</sentence>
+<sentence>Total AOB numbers were between 1.0 · 109 and 9.2 · 1010 cells lÀ1,
+and can be accounted for 0.01–2.8% of total bacterial
+populations.</sentence>
+<sentence>Ammonia-oxidizing activities per cell were
+calculated from the total AOB numbers and volumetric
+ammonia removal in the aeration tanks.</sentence>
+<sentence>The ammoniaoxidizing activities per cell were ranging from 0 to
+49.6 fmol cellÀ1 hÀ1.</sentence>
+<sentence>10
+1.0E+114
+Total bacteria numbers
+Cells/ l
+(cells l-1)</sentence>
+<sentence>belonging to Betaproteobacteria.</sentence>
+<sentence>The oligonucleotide
+sequences of the primers are shown in Table 2.</sentence>
+<sentence>The extracted DNA was PCR-ampliﬁed using the primer set
+(the forward primer had a GC clamp) for 35 cycles in
+a 50-ll reaction volume.</sentence>
+<sentence>DNA eluted from bands excised from DGGE gels and colonies picked directly after
+cloning were ampliﬁed for 20–25 cycles using the primer
+set lacking the GC clamp in a 50-ll reaction volume.</sentence>
+<sentence>The PCR mixture was prepared using AmpliTaq Gold
+DNA polymerase (PE Applied Biosystems, CA, USA)
+following the manufacturerÕs instructions with 1 pmol
+of each primer.</sentence>
+<sentence>PCR ampliﬁcation was performed in a
+T3 thermocycler (Biometra, Gottingen, Germany) under
+the conditions of 5 min at 95 °C followed by 35 cycles of
+30 s at 92 °C, 30 s at 57 °C, and 45 s at 72 °C (+1 s each
+cycle), followed by 5-min ﬁnal extension at 72 °C.
+DGGE was performed according to the modiﬁcation
+of a described method [21].</sentence>
+<sentence>We used 8% polyacrylamide
+gels, and the urea–formamide denaturant gradient was
+35–50%.</sentence>
+<sentence>Gels were run on the D Code system (BioRad Laboratories, Hercules, CA, USA) for 16 h at
+60 °C and 75 V. After electrophoresis, the gels were
+stained with Vistra Green (Amersham Pharmacia Biotech, Tokyo, Japan) and visualized with a ﬂuorescent
+image scanner (Fluorimager 595, Molecular Dynamics,
+Sunnyvale, CA, USA).</sentence>
+<sentence>Prominent bands were excised
+and dissolved in 30 ll sterilized water.</sentence>
+<sentence>DNA was recovered from the gel by freeze–thawing three times.</sentence>
+<sentence>Each target fragment of DNA recovered from the
+DGGE gel was puriﬁed by cloning with pT7Blue T-Vector and DH5-a competent cells (Toyobo, Tokyo, Japan)
+according to the manufacturerÕs instructions.</sentence>
+<sentence>Positive
+clone colonies were ampliﬁed directly using the primer
+set with the additional GC-clamp, and the products
+again were subjected to DGGE to check their migration.</sentence>
+<sentence>The target DNA fragments were then excised and reampliﬁed.</sentence>
+<sentence>Before sequencing, small DNA fragments and
+excess primers were removed from the PCR products
+by Microcon spin columns (Millipore, Tokyo, Japan).</sentence>
+<sentence>The puriﬁcation procedure followed the manufacturerÕs
+instructions.</sentence>
+<sentence>Sequencing reactions were run according to the
+manufacturerÕs instructions with 20 ng of the PCR
+product, the ABI Big Dye Terminator kit version 3.1
+(PE Applied Biosystems), and the CTO primer set.</sentence>
+<sentence>After excess primers and dye terminators from the
+products of sequencing reaction were removed using
+Centri-sep spin columns (PE Applied Biosystems), the
+products were analyzed in an ABI 310 DNA sequencer
+(PE Applied Biosystems).</sentence>
+<sentence>The completed 397-bp from 465-bp analyzed sequences were aligned with sequences from the SSU
+rRNA database (Antwerm, Belgium) using the ARB
+program package (Department of Microbiology, Technische Universitat Munchen, Munich, Germany;
+[http://www.arb-home.de]).</sentence>
+<sentence>Phylogenetic tree was con-</sentence>
+<sentence>209</sentence>
+<sentence>10
+1.0E+113</sentence>
+<sentence>12</sentence>
+<sentence>10
+1.0E+1</sentence>
+<sentence>10
+1.0E+111
+A B1 B2 B3 C</sentence>
+<sentence>D E F1 F2 G1 G2
+System</sentence>
+<sentence>H</sentence>
+<sentence>Fig.</sentence>
+<sentence>1.</sentence>
+<sentence>Total bacterial numbers in aeration tanks of 12 sewage
+treatment systems: s, summer; n, autumn; n, winter.</sentence>
+<sentence>210</sentence>
+<sentence>T. Limpiyakorn et al.</sentence>
+<sentence>/ FEMS Microbiology Ecology 54 (2005) 205–217</sentence>
+<sentence>(a)</sentence>
+<sentence>3.2.</sentence>
+<sentence>Analysis of samples of sewage activated sludge by
+speciﬁc PCR ampliﬁcation followed by DGGE, cloning,
+and sequencing of 16S rRNA genes</sentence>
+<sentence>12</sentence>
+<sentence>Total AOB numbers
+Celell/sll-1)
+(c ls</sentence>
+<sentence>10
+1.0E+12</sentence>
+<sentence>1011
+1010
+9</sentence>
+<sentence>10
+1.0E+09
+8</sentence>
+<sentence>10
+1.0E+08</sentence>
+<sentence>D</sentence>
+<sentence>4</sentence>
+<sentence>o</sentence>
+<sentence>5</sentence>
+<sentence>% Total AOB in total</sentence>
+<sentence>D E F1 F2 G1 G2 H
+System</sentence>
+<sentence>A B1 B2 B3 C</sentence>
+<sentence>(b)</sentence>
+<sentence>D E F1 F2 G1 G2 H
+System</sentence>
+<sentence>A B1 B2 B3 C</sentence>
+<sentence>t o tbacterOB ipotpulation t e i a
+al A ial n o t al b ac
+p o p u l at i o n</sentence>
+<sentence>A B1 B2 B3 C</sentence>
+<sentence>3
+2
+1
+0</sentence>
+<sentence>Ammonia-oxidizing
+activifms l(/ mel lceh r hr–1)
+tie o f c ol / ll–1</sentence>
+<sentence>(c)</sentence>
+<sentence>100</sentence>
+<sentence>10</sentence>
+<sentence>1
+E</sentence>
+<sentence>F1 F2 G1 G2 H</sentence>
+<sentence>0
+System
+Fig.</sentence>
+<sentence>2.</sentence>
+<sentence>Total AOB numbers (a), proportion of total AOB within total
+bacterial populations (b), and ammonia-oxidizing activities per AOB
+cell (c) in aeration tanks of 12 sewage treatment systems: s, summer;
+n, autumn; n, winter.</sentence>
+<sentence>We used speciﬁc PCR ampliﬁcation followed by
+DGGE, cloning, and sequencing of 16S rRNA genes
+to reveal the structure of AOB communities in the samples of sewage activated sludge.</sentence>
+<sentence>Analysis of duplicate
+samples by DGGE showed that the band patterns obtained were reproducible (data not shown).</sentence>
+<sentence>Fig.</sentence>
+<sentence>3 shows
+the image of a DGGE gel of the PCR-ampliﬁed products of samples taken from the 12 systems in autumn
+(November 2001).</sentence>
+<sentence>On the right side of the ﬁgure, the
+locations of the bands excised are labelled with the
+names of the AOB clusters identiﬁed.</sentence>
+<sentence>Because the locations of the bands excised diﬀered for system A, which
+led to diﬀerent sequences and thus identiﬁcation of different AOB clusters, the names of the AOB clusters
+are labelled separately on the left side of the ﬁgure.</sentence>
+<sentence>After
+the PCR-ampliﬁed products of all samples had been
+electrophoresed in DGGE gels, a total of 81 representative bands were selected for sequencing.</sentence>
+<sentence>To prevent the
+confusion with the bands selected directly from the original gel images, all bands were excised from the gels,
+reampliﬁed, and analyzed on the new gels to clarify an
+individual band position before selection for sequencing.</sentence>
+<sentence>We constructed phylogenetic trees using several treeing methods.</sentence>
+<sentence>Fig.</sentence>
+<sentence>4 shows a phylogenetic tree based on
+16S rRNA genes of AOB belonging to Betaproteobacteria.</sentence>
+<sentence>All the tree methods resulted in the same grouping of
+AOB sequences analyzed.</sentence>
+<sentence>In addition, the grouping of
+AOB clusters in the trees remained the same except for
+the ‘‘unknown-Nitrosomonas’’ cluster, the positions of
+which varied with the method used.</sentence>
+<sentence>The unknown-Nitrosomonas cluster can be included into N. oligotropha
+cluster or can be recognized as another independent cluster within Nitrosomonas spp.</sentence>
+<sentence>The sequences of many of
+the bands analyzed reveal their relation to the N. oligotropha cluster (Nitrosomonas cluster 6a).</sentence>
+<sentence>Because many</sentence>
+<sentence>Fig.</sentence>
+<sentence>3.</sentence>
+<sentence>DGGE images of PCR-ampliﬁed products of samples taken from 12 sewage treatment systems in autumn (November 2001).</sentence>
+<sentence>Marks and
+numbers indicate excised bands from which sequences were determined.</sentence>
+<sentence>AOB genus abbreviations are N. for Nitrosomonas and Nc.</sentence>
+<sentence>for
+Nitrosococcus.</sentence>
+<sentence>T. Limpiyakorn et al.</sentence>
+<sentence>/ FEMS Microbiology Ecology 54 (2005) 205–217</sentence>
+<sentence>211</sentence>
+<sentence>Fig.</sentence>
+<sentence>4.</sentence>
+<sentence>Phylogenetic tree showing 16S rRNA genes of AOB belonging to Betaproteobacteria with addition of 397-bp sequences from our study into
+the distance tree that was previously based on comparison of 1000-bp sequences of described AOB [22] using the ARB program package.</sentence>
+<sentence>AOB genus
+abbreviations are N. for Nitrosomonas, Nc.</sentence>
+<sentence>for Nitrosococcus, and Ns.</sentence>
+<sentence>for Nitrosospira.</sentence>
+<sentence>Codes of the DGGE bands of this study are shown in bold;
+the ﬁrst character indicates the sample name, the second character denotes the season (S, summer, A, autumn, W, winter, respectively), followed by
+the band number.</sentence>
+<sentence>AOB clusters are depicted on the right side of the tree.</sentence>
+<sentence>sequences that are aﬃliated to this cluster are distributed
+in various environments and their properties somewhat
+diﬀer, for the purpose of further discussion, the sequences identiﬁed as associated with this cluster were
+allocated into four sequence types based on the grouping
+of the AOB sequences with several treeing methods.</sentence>
+<sentence>In
+the previous study [14], members of the N. oligotropha
+cluster that originated from enriched brackish and freshwater were separated into three sequence types.</sentence>
+<sentence>Because
+the sequences found in this study diﬀered from those of</sentence>
+<sentence>the previous one with respect to their source, the classiﬁcation system of the previous study is not applicable for
+this one.</sentence>
+<sentence>In our classiﬁcation scheme, N. ureae (another
+representative of cluster 6a) are not associated with a
+particular sequence type because they were not closely related to any other sequence found in this study.</sentence>
+<sentence>The ability of the primers CTO189f and CTO654r to amplify all
+clusters of AOB belonging to Betaproteobacteria was
+conﬁrmed when members of all AOB clusters, except
+those of Nitrosomonas marina and the N. sp.</sentence>
+<sentence>Nm143,</sentence>
+<sentence>212</sentence>
+<sentence>T. Limpiyakorn et al.</sentence>
+<sentence>/ FEMS Microbiology Ecology 54 (2005) 205–217</sentence>
+<sentence>Fig.</sentence>
+<sentence>5.</sentence>
+<sentence>DGGE images of the PCR-ampliﬁed products of samples taken from sewage treatment systems during three seasons to illustrate the seasonal
+variation in the AOB communities: (a) system A, (b) system B1, (c) system C, (d) system E, (e) system F2, and (f) system G1.</sentence>
+<sentence>The character above
+each lane (S, A, or W) stands for season (summer, autumn, or winter respectively).</sentence>
+<sentence>Marks and numbers indicate the excised bands from which
+sequences were determined.</sentence>
+<sentence>were recovered from the samples.</sentence>
+<sentence>Most of the AOB sequences analyzed showed 96–99% identity to the AOB
+sequences available in the database.</sentence>
+<sentence>However, a few sequences, which were closely related to N. communis, all
+sequences of the unknown-Nitrosomonas cluster, and
+some type 6a-3 sequences of the N. oligotropha cluster,
+showed slightly lower homology (95%).</sentence>
+<sentence>3.3.</sentence>
+<sentence>Eﬀect of seasonal variation on AOB communities
+PCR-ampliﬁed products of samples taken during different seasons were analyzed on the same denaturing gel
+to highlight the eﬀects of seasonal changes on the communities of ammonia-oxidizing bacteria (Fig.</sentence>
+<sentence>5).</sentence>
+<sentence>Most
+systems (except B3, E, F2, and G2) exhibited similar
+band patterns for the three seasons.</sentence>
+<sentence>Moreover, the sequence analysis showed that the AOB communities of
+most systems were nearly identical regardless of the season (Table 3); there were no seasonal variations in the
+common AOB, and only particular AOB exhibited the
+seasonal variation in some systems.</sentence>
+<sentence>3.4.</sentence>
+<sentence>Distribution of AOB in sewage treatment systems
+Table 3 lists and summarizes the related AOB sequences found in each sample.</sentence>
+<sentence>Most of the bands analyzed were related to Nitrosomonas spp.</sentence>
+<sentence>rather than
+Nitrosospira spp.</sentence>
+<sentence>The highest number of bands analyzed grouped within the N. oligotropha cluster.</sentence>
+<sentence>Members of this cluster were found in all samples.</sentence>
+<sentence>Within
+this cluster, sequence types 6a-1 and 6a-4 were found
+in most samples.</sentence>
+<sentence>Only system A contained members
+of the N. europaea–Nc.</sentence>
+<sentence>mobilis cluster and the unknown-Nitrosomonas cluster.</sentence>
+<sentence>Members of the N. cryotolerans cluster were present almost solely in system A
+and appeared only during some seasons in systems D,
+F2, and G1.</sentence>
+<sentence>Further, systems A, B1, B2, B3, C, D,
+and E contained members of the N. communis cluster;
+interestingly, all of these systems (except B3) were
+operated as either A2O or AO processes.</sentence>
+<sentence>It is not possible to discern a trend in the relationship between the</sentence>
+<sentence>sewage activated sludge system and the presence of
+the Nitrosospira cluster, which was recovered from
+only one sample.</sentence>
+<sentence>4.</sentence>
+<sentence>Discussion
+The total bacterial numbers in a range of 1.6 · 1012–
+2.4 · 1013 cells lÀ1 in the 12 systems (Fig.</sentence>
+<sentence>1) fairly corresponded to the numbers mentioned earlier in a municipal wastewater treatment system: 4.55 · 1012–
+1.04 · 1013 cells lÀ1 by dot blot hybridization [11];
+4.3 ± 2.0 · 1011 cells lÀ1 by real-time PCR quantiﬁcation based on 16S rRNA genes of total bacteria (the
+primers 1055f and 1392r and the Taq Man probe
+16STaq1115) [12].</sentence>
+<sentence>The total AOB numbers between 1.0 · 109 and
+9.2 · 1010 cells lÀ1 in the 12 systems can be accounted
+for 0.01–2.8% of total bacterial populations (Fig.</sentence>
+<sentence>2(a)
+and (b)).</sentence>
+<sentence>Checking the primer and probe matches shows
+that the reverse primer RT1r and the Taq Man probe
+TMP1 completely target most AOB sequences analyzed.</sentence>
+<sentence>This conﬁrms that most AOB sequences analyzed were
+included in the real-time PCR quantiﬁcation using this
+primer set.</sentence>
+<sentence>The total numbers of ammonia-oxidizing
+bacteria in the 12 systems were compatible to the numbers reported previously in a municipal wastewater
+treatment system: 1.2 ± 0.9 · 1010 cells lÀ1 (2.9% of total
+bacterial populations) by real-time PCR quantiﬁcation
+based on 16S rRNA genes of total AOB (the primers
+CTO 189f and RT1r and the Taq Man probe TMP1)
+and 7.5 ± 6.0 · 109 cells lÀ1 (1.7% of total bacterial populations) by real-time PCR quantiﬁcation based on
+amoA genes of the N. oligotropha [12].</sentence>
+<sentence>The total numbers of ammonia-oxidizing bacteria varied among the
+seasons studied; the largest population size occurred
+during winter, followed by autumn and summer
+(Fig.</sentence>
+<sentence>2(a)).</sentence>
+<sentence>However, a proportion of total AOB within
+the total bacterial populations increased (0.5–3%) during autumn, whereas in summer and winter it remained
+the same (0.01–1.1%) (Fig.</sentence>
+<sentence>2(b)).</sentence>
+<sentence>The increased</sentence>
+<sentence>S</sentence>
+<sentence>S, summer; A, autumn; W, winter.</sentence>
+<sentence>S
+W
+A
+S
+S
+A</sentence>
+<sentence>W
+S</sentence>
+<sentence>A</sentence>
+<sentence>W</sentence>
+<sentence>S</sentence>
+<sentence>A</sentence>
+<sentence>W</sentence>
+<sentence>S</sentence>
+<sentence>A</sentence>
+<sentence>W</sentence>
+<sentence>S</sentence>
+<sentence>A</sentence>
+<sentence>W</sentence>
+<sentence>S</sentence>
+<sentence>A</sentence>
+<sentence>W</sentence>
+<sentence>E
+D
+C
+B3
+B2
+B1
+A</sentence>
+<sentence>System
+AOB cluster</sentence>
+<sentence>Table 3
+Summary of related sequences of ammonia-oxidizing bacteria in samples of 12 sewage treatment systems</sentence>
+<sentence>Nitrosospira sp.</sentence>
+<sentence>Nitrosomonas communis
+Nitrosomonas europaea–
+Nitrosococus mobilis
+Nitrosomonas cryotolerans
+Unknown Nitrosomonas
+Nitrosomonas oligotropha,
+sequence type 6a-1
+Nitrosomonas oligotropha,
+sequence type 6a-2
+Nitrosomonas oligotropha,
+sequence type 6a-3
+Nitrosomonas oligotropha,
+sequence type 6a-4</sentence>
+<sentence>F1</sentence>
+<sentence>A</sentence>
+<sentence>W</sentence>
+<sentence>S</sentence>
+<sentence>A</sentence>
+<sentence>A
+S
+W</sentence>
+<sentence>G1
+F2</sentence>
+<sentence>S
+W</sentence>
+<sentence>G2</sentence>
+<sentence>A</sentence>
+<sentence>W</sentence>
+<sentence>H</sentence>
+<sentence>A</sentence>
+<sentence>W</sentence>
+<sentence>T. Limpiyakorn et al.</sentence>
+<sentence>/ FEMS Microbiology Ecology 54 (2005) 205–217</sentence>
+<sentence>213</sentence>
+<sentence>abundance during the autumn was possibly caused by
+the decrease in the ratio between BOD and NH4-N concentrations in the inﬂuents during this season (data not
+shown).</sentence>
+<sentence>The ammonia-oxidizing activities per AOB cell ranging from 0 to 49.6 fmol cellÀ1 hÀ1 in the 12 systems
+(Fig.</sentence>
+<sentence>2(c)) were consistent with the numbers reported before: 7.7 and 12.4 fmol cellÀ1 hÀ1 in a municipal wastewater treatment system estimated from real-time PCR
+quantiﬁcation of 16S rRNA genes of total AOB (primers CTO 189f and RT1r and the Taq Man probe
+TMP1) and amoA genes of N. oligotropha, respectively
+[12]; and 9–23 fmol cellÀ1 hÀ1 for AOB isolates [23].</sentence>
+<sentence>The ammonia-oxidizing activities per cell varied during
+the seasons studied.</sentence>
+<sentence>The highest ammonia-oxidizing
+activities per cell occurred during summer, followed by
+those during autumn and winter.</sentence>
+<sentence>Moreover, the total
+AOB numbers and the ammonia-oxidizing activities
+per AOB cell depended largely on temperature variation
+and altered with every temperature level: 27–31 °C during summer, 19–26 °C during autumn, and 14–22 °C
+during winter.</sentence>
+<sentence>Although the total numbers of ammonia-oxidizing
+bacteria ﬂuctuated over seasons, no marked seasonal
+variation in the composition of AOB communities was
+observed.</sentence>
+<sentence>The AOB communities were fairly stable in
+all systems during the six months of study.</sentence>
+<sentence>No seasonal
+variations in the common ammonia-oxidizing bacteria
+were observed.</sentence>
+<sentence>Only particular ammonia oxidizers
+exhibited seasonal variation in some systems.</sentence>
+<sentence>We therefore state that AOB communities change little over temperatures ranging from 14 to 31 °C.
+Sequence analysis of 16S rRNA genes revealed that
+most of the electrophoretic bands were closely related
+to Nitrosomonas spp., not to Nitrosospira spp.</sentence>
+<sentence>This ﬁnding corresponds to several previous studies [5–
+9,15,16,24], but is in contrast to few studies in which
+mainly Nitrosospira spp.</sentence>
+<sentence>were detected [25,26].</sentence>
+<sentence>Nonetheless, based on the amoA approach, it is notable that
+Nitrosospira species are not important ammonia-oxidizing bacteria in full-scale wastewater treatment systems
+analyzed so far [27].</sentence>
+<sentence>We recovered members of the N. oligotropha cluster
+from all samples, and they comprised the majority of
+the bands analyzed.</sentence>
+<sentence>Although the forward primer
+CTO189f has a single mismatch with some members of
+the N. oligotropha cluster, the sequences closely related
+to this cluster could easily be recovered from our samples.</sentence>
+<sentence>Sequences of the N. oligotropha cluster are often
+recovered from oligotrophic environments, including
+freshwater sediment [28], wastewater treatment systems
+receiving low-ammonia inﬂuents [9,11,12,16], and
+chloraminated drinking water distribution systems
+[29,30].</sentence>
+<sentence>The study of 36 isolates of the N. oligotropha
+cluster, most of which were from oligotrophic freshwater, revealed very low Ks values, ranging from 1.9 to</sentence>
+<sentence>214</sentence>
+<sentence>T. Limpiyakorn et al.</sentence>
+<sentence>/ FEMS Microbiology Ecology 54 (2005) 205–217</sentence>
+<sentence>4.2 lM free ammonia [13].</sentence>
+<sentence>Ammonium concentrations
+in the inﬂuents of every system in this study were
+<2 mM (28 mg N lÀ1) (Table 1), and in the systems
+where nitriﬁcation was achieved, ammonium concentrations in the aeration tanks were under the detection limit.</sentence>
+<sentence>Thus, volumetric ammonia removals could be
+estimated as less than 60 g mÀ3 dÀ1 in all systems.</sentence>
+<sentence>This
+low ammonia level may be the key factor promoting
+the predominance of the N. oligotropha cluster in most
+systems in this study.</sentence>
+<sentence>Sequence types 6a-1 and 6a-4 from the N. oligotropha
+cluster were distributed in most systems in most seasons
+studied.</sentence>
+<sentence>Sequence group 6a-1 is comprised of the sequences from continuous culture enrichment at
+growth-limiting ammonia concentration (5 lM; bands
+Ch4E2 and Ch6E3) [28], whereas sequence group 6a-4
+is comprised of the sequences recovered from an aeration tank of a laboratory-scale single sludge nitriﬁcation–denitriﬁcation systems receiving a 0.8-mM
+ammonia in the inﬂuent (clones DNB_Y20 and
+DNB_Y39) [16], fresh water sediment (clone 6a3), and
+drinking water reservoirs (clone HBO-2).</sentence>
+<sentence>In the past,
+ecological and physiological diﬀerences among ammonia-oxidizing bacteria within the N. oligotropha cluster
+have been overlooked because of representing their
+characteristics with only one or two common members
+of the group.</sentence>
+<sentence>Recently, the characteristics of AOB within
+this cluster were suggested to somewhat diﬀer depending
+on sequence type [14].</sentence>
+<sentence>As our study shows, only two sequence types within this cluster were widely and abundantly distributed in most systems.</sentence>
+<sentence>Factors such as
+ammonia aﬃnity, oxygen aﬃnity, sensitivity to salt
+and/or nitrite may diﬀer among sequence types.</sentence>
+<sentence>For
+example, salinity is known to aﬀect the AOB communities in oligotrophic environments [14].</sentence>
+<sentence>The eﬀect of each
+environmental factor on AOB within this cluster needs
+further study to be able to better understand the implications of the presence of various sequence types.</sentence>
+<sentence>We recovered members of the N. europaea–Nc.</sentence>
+<sentence>mobilis cluster only from system A. The outstanding physiological property of the N. europaea–Nc.</sentence>
+<sentence>mobilis cluster is
+the low aﬃnity to free ammonia (Ks > 30 lM) [13], a
+characteristic consistent with this clusterÕs preference
+for eutrophic environments.</sentence>
+<sentence>Although system A contained higher ammonium concentrations in the inﬂuent
+than other systems (Table 1), these ammonia concentrations were not signiﬁcantly diﬀerent from those of other
+systems ($2 mM).</sentence>
+<sentence>In addition, ammonium concentrations in the aeration tank of system A were all the time
+below the detection limit, and volumetric ammonium
+removals of this system were in the same range as those
+of other systems.</sentence>
+<sentence>Therefore, ammonia is not responsible
+for the appearance of the N. europaea–Nc.</sentence>
+<sentence>mobilis cluster in system A. The study on 27 isolates of N. europaea
+and seven isolates of Nc.</sentence>
+<sentence>mobilis revealed halotolerant to
+moderately halophilic characteristic of this cluster [13].</sentence>
+<sentence>Earlier molecular-level investigations supported this by
+showing the predominance of N. europaea cluster in
+alkaline, high-salinity environments [31] and in an
+industrial wastewater treatment systems treating saline
+wastewater [6].</sentence>
+<sentence>The double chloride concentration in
+the inﬂuent of system A compared to other systems
+may thus explain the presence of the N. europaea–Nc.</sentence>
+<sentence>mobilis cluster in this system.</sentence>
+<sentence>Besides those of the N. europaea–Nc.</sentence>
+<sentence>mobilis cluster,
+also the members of the N. cryotolerans cluster and of
+the unknown-Nitrosomonas cluster were present almost
+solely in system A. Assuming the diﬀerence in halotolerance or halosensitivity among distinct AOB species,
+the high chloride concentration in the inﬂuent of this
+system may have caused its AOB community diﬀer
+from those in other systems.</sentence>
+<sentence>N. cryotolerans has been
+reported as obligately halophilic bacterium [13].</sentence>
+<sentence>However, the salt tolerance of the unknown-Nitrosomonas
+cluster is unknown because ammonia-oxidizing bacteria aﬃliated to this cluster have not been isolated
+and characterized yet.</sentence>
+<sentence>The most closely related AOB
+to the unknown-Nitrosomonas cluster is N. sp.</sentence>
+<sentence>JL21
+(accession number AB000700) with only 95% similarity
+in the partial 16S rRNA gene sequence.</sentence>
+<sentence>Due to the
+short sequence length, it is impossible at this moment
+to clarify whether the unknown-Nitrosomonas group
+belongs to N. oligotropha cluster or represents the
+putative novel AOB cluster.</sentence>
+<sentence>Members of the N. communis cluster were found in
+all A2O and AO systems; but they were mostly absent
+from AS systems.</sentence>
+<sentence>Thus far, only two 16S rRNA gene
+sequences aﬃliated with this cluster (clones GaN50304
+and GaN3a) [9] have been detected in the environments.</sentence>
+<sentence>This may have been caused by the fact that
+many of the commonly used primers contain mismatches to members of the N. communis cluster [9].</sentence>
+<sentence>The reverse primer CTO654r does not target all members of the N. communis cluster recognized so far.</sentence>
+<sentence>However, using this primer set, many members of
+the N. communis cluster could be recovered from
+our samples.</sentence>
+<sentence>This diﬀerence is possibly because the sequences of our N. communis at the positions corresponding to the primer region match to the reverse
+primer and thus are diﬀerent from those of all recognized AOB.</sentence>
+<sentence>The members of the N. communis cluster
+obtained from our samples were closely related to
+those recovered earlier (clones GaN50304 and GaN3a)
+from the top 100 lm of the bioﬁlm surface of a
+sequencing batch reactor, which operated with diﬀerent phases of aeration and non-aeration for the purposes of nitrogen and phosphate removal.</sentence>
+<sentence>Similarly
+as this earlier study, we found that the members
+of the N. communis cluster were present almost
+exclusively in A2O and AO systems, which were operated with diﬀerent phases of aeration and nonaeration.</sentence>
+<sentence>These AOB may thus have an advantage</sentence>
+<sentence>T. Limpiyakorn et al.</sentence>
+<sentence>/ FEMS Microbiology Ecology 54 (2005) 205–217</sentence>
+<sentence>in environments with ﬂuctuating oxygen levels or during the absence of oxygen.</sentence>
+<sentence>These results reﬂect the
+distinct ability of ammonia-oxidizing bacteria to survive or even prosper under special conditions.</sentence>
+<sentence>Along
+this line, oscillation of oxygen concentrations may be
+another factor supporting growth or survival of particular AOB.</sentence>
+<sentence>Total AOB numbers and ammonia-oxidizing activities per AOB cell are discussed to clarify the reasons
+underlying the reduced ammonia removal in some systems (G1, G2, and H).</sentence>
+<sentence>Various aspects of system operation were found to aﬀect the total AOB numbers and
+the ammonia-oxidizing activities per cell of AOB.</sentence>
+<sentence>G1 and G2 are AS systems that received similarstrength wastewater with the same volumetric ﬂows (Table 1).</sentence>
+<sentence>Both systems were operated with the similar SRT,
+but the amounts of airﬂow to wastewater were diﬀerent
+(data not shown).</sentence>
+<sentence>The airﬂow to wastewater was suﬃcient in system G1, but not in system G2.</sentence>
+<sentence>As a result,
+DO concentrations in the aeration tank of system G1
+were in a range of 5–8 mg lÀ1, whereas those of system
+G2 were around 2 mg lÀ1 (Table 4).</sentence>
+<sentence>Thus, only system
+G1, but not system G2, achieved ammonia removal.</sentence>
+<sentence>Although ammonia removal in both systems was diﬀerent, this value did not reﬂect the total AOB numbers; in
+contrast, it did reﬂect the ammonia-oxidizing activities.</sentence>
+<sentence>This result suggested that oxygen supply and DO con-</sentence>
+<sentence>215</sentence>
+<sentence>centrations did not inﬂuence the total numbers of
+ammonia-oxidizing bacteria.</sentence>
+<sentence>On the other hand, they
+did aﬀect the ammonia-oxidizing activities per cell.</sentence>
+<sentence>In system H, ammonia removal eﬃciencies and volumetric ammonia removal ﬂuctuated during the seasons studied (Table 5).</sentence>
+<sentence>Nitriﬁcation was achieved
+only during autumn, not during summer or winter.</sentence>
+<sentence>Although no change in the inﬂuent characteristics
+was noted, operation of the system varied during the
+season studied.</sentence>
+<sentence>Proper operation was provided only
+during the autumn, whereas insuﬃcient oxygen was
+supplied during the summer, and SRT was too short
+during the winter.</sentence>
+<sentence>The proper operation led to the
+highest total numbers of ammonia-oxidizing bacteria
+during the autumn.</sentence>
+<sentence>Longer SRT in summer seemingly
+supported higher total AOB numbers during this season.</sentence>
+<sentence>However, neither SRT nor total AOB numbers related to the volumetric ammonia removal and the
+ammonia-oxidizing activities per cell.</sentence>
+<sentence>The ammoniaoxidizing activities were dependent on DO concentrations.</sentence>
+<sentence>We can conclude that SRT mainly inﬂuenced
+the total AOB numbers, whereas the DO concentration
+primarily aﬀected the ammonia-oxidizing activity per
+cell.</sentence>
+<sentence>Indeed, other studies support our observation
+about the eﬀect of SRT on the total AOB numbers
+[32] and the eﬀect of oxygen concentrations on the
+ammonia-oxidizing activity [14,33].</sentence>
+<sentence>Table 4
+Ammonia removal, total AOB numbers, ammonia-oxidizing activities per AOB cell, and DO concentrations in aeration tanks of systems G1 and G2
+Parameters</sentence>
+<sentence>Unit</sentence>
+<sentence>G1</sentence>
+<sentence>G2</sentence>
+<sentence>Summer</sentence>
+<sentence>Autumn</sentence>
+<sentence>Winter</sentence>
+<sentence>Summer</sentence>
+<sentence>Autumn</sentence>
+<sentence>Winter</sentence>
+<sentence>NHþ -N removala
+4
+Volumetric NHþ -N removala
+4
+Total AOB number
+NHþ -N oxidizing activity
+4
+MLDOb</sentence>
+<sentence>%
+g mÀ3 dÀ1
+cells lÀ1
+fmol cellÀ1 hÀ1
+mg lÀ1</sentence>
+<sentence>100
+49
+2.9 · 109
+50
+5.2</sentence>
+<sentence>100
+60
+2.9 · 1010
+6
+6.6</sentence>
+<sentence>100
+53
+6.7 · 1010
+2
+7.7</sentence>
+<sentence>40
+13
+1.1 · 1010
+3
+1.6</sentence>
+<sentence>0
+0
+2.8 · 1010
+0
+1.0</sentence>
+<sentence>11
+0
+3.7 · 109
+0
+2.0</sentence>
+<sentence>MLSS, mixed liquor suspended solid; MLDO, mixed liquor dissolved oxygen.</sentence>
+<sentence>a
+All removal eﬃciency values were analyzed from one-day grab samples collected on the day close to the day of sludge collection.</sentence>
+<sentence>b
+All operational parameters were the averages of the month in which sludge was collected.</sentence>
+<sentence>Table 5
+Ammonia removal, total AOB numbers, ammonia-oxidizing activities per AOB cell, and operational parameters of system H
+Parameter</sentence>
+<sentence>Unit</sentence>
+<sentence>Season
+Summer</sentence>
+<sentence>NHþ -N
+4</sentence>
+<sentence>a</sentence>
+<sentence>removal
+Volumetric NHþ -N removala
+4
+Total AOB number
+b
+MLSS
+SRTb
+NHþ -N oxidizing activity
+4
+MLDOb</sentence>
+<sentence>%
+g mÀ3 dÀ1
+cells lÀ1
+mg lÀ1
+Day
+fmol cellÀ1 hÀ1
+mg lÀ1</sentence>
+<sentence>Autumn</sentence>
+<sentence>Winter</sentence>
+<sentence>7
+0
+3.4 · 109
+1270
+8.2
+0
+0.6</sentence>
+<sentence>89
+20
+1.2 · 1010
+1125
+6.0
+4
+1.1</sentence>
+<sentence>30
+4
+1.0 · 109
+870
+3.8
+12
+3.2</sentence>
+<sentence>MLSS, mixed liquor suspended solid; SRT, solid residence time; MLDO, mixed-liquor dissolved oxygen.</sentence>
+<sentence>a
+All removal eﬃciency values were analyzed from one-day grab samples collected on the day close to the day of sludge collection.</sentence>
+<sentence>b
+All operational parameters were the averages of the month in which sludge was collected.</sentence>
+<sentence>216</sentence>
+<sentence>T. Limpiyakorn et al.</sentence>
+<sentence>/ FEMS Microbiology Ecology 54 (2005) 205–217</sentence>
+<sentence>5.</sentence>
+<sentence>Conclusions
+In this study, we mainly discussed the ammoniaoxidizing bacteria found in activated sludge of sewage
+treatment systems.</sentence>
+<sentence>We noted the eﬀects of inﬂuent characteristics, treatment processes, system operation, and
+seasonal variation on the total AOB numbers and the
+AOB communities.</sentence>
+<sentence>We showed that the ammoniaoxidizing bacteria observed in these low-ammonia systems diﬀer and are inﬂuenced by distinct environmental
+factors.</sentence>
+<sentence>However, the discussion primarily reﬂected
+qualitative results because accurate numbers of particular AOB were unavailable.</sentence>
+<sentence>Further studies are necessary
+to develop quantitative techniques for particular AOB,
+especially for those within the N. oligotropha cluster
+and the N. communis cluster, and to better clarify the
+roles of these ammonia oxidizers in low-ammonia
+environments.</sentence>
+<sentence>Acknowledgements
+We are grateful to the Tokyo Metropolitan Government for providing the samples and data from the sewage treatment systems.</sentence>
+<sentence>References
+[1] Wagner, M., Rath, G., Amann, R., Koops, H.P. and Schleifer,
+K.H.</sentence>
+<sentence>(1995) In situ identiﬁcation of ammonia-oxidizing bacteria.</sentence>
+<sentence>Syst.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>18, 251–264.</sentence>
+<sentence>[2] Kowalchuck, G.A., Stephen, J.R., De Boer, W., Prosser, J.I.,
+Embley, T.M. and Woldendorp, J.M.</sentence>
+<sentence>(1997) Analysis of ammonia-oxidizing bacteria of the b subdivision of the class Proteobacteria in costal sand dunes by denaturing gradient gel
+electrophoresis and sequencing of PCR-ampliﬁed 16S ribosomal
+DNA fragments.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>63 (4), 1489–1497.</sentence>
+<sentence>[3] Rotthauwe, J.H., Witzel, K.P. and Liesack, W.</sentence>
+<sentence>(1997) The
+ammonia monooxygenase structure gene amoA as a function
+marker: molecular ﬁne-scale analysis of natural ammonia-oxidizing populations.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>63 (12), 4704–4712.</sentence>
+<sentence>[4] Nicolaisen, M.H. and Ramsing, N.B.</sentence>
+<sentence>(2002) Denaturing gradient
+gel electrophoresis (DGGE) approaches to study the diversity of
+ammonia-oxidizing bacteria.</sentence>
+<sentence>J. Microbiol.</sentence>
+<sentence>Meth.</sentence>
+<sentence>50, 189–203.</sentence>
+<sentence>[5] Mobarry, B.K., Wagner, M., Urbain, V., Rittmann, B.E. and
+Stahl, D.A.</sentence>
+<sentence>(1996) Phylogenetic probes for analyzing abundance
+and spatial organization of nitrifying bacteria.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>62 (6), 2156–2162.</sentence>
+<sentence>[6] Juretschko, S., Timmermann, G., Schmid, M., Schleifer, K.H.,
+Pommerening-Roser, A., Koops, H.P. and Wagner, M.</sentence>
+<sentence>(1998)
+Combined molecular and conventional analyses of nitrifying
+bacterium diversity in activated sludge: Nitrosococcus mobilis and
+Nitrospira-like bacteria as dominant populations.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>64 (8), 3042–3051.</sentence>
+<sentence>[7] Wagner, M., Noguera, D.R., Juretschko, S., Rath, G., Koops,
+H.P. and Schleifer, K.H.</sentence>
+<sentence>(1998) Combining ﬂuorescent in situ
+hybridization (FISH) with cultivation and mathematical modeling
+to study population structure and function of ammonia-oxidizing
+bacteria in activated sludge.</sentence>
+<sentence>Water Sci.</sentence>
+<sentence>Technol.</sentence>
+<sentence>37 (4–5), 441–
+449.</sentence>
+<sentence>[8] Okabe, S., Satoh, H. and Watanabe, Y.</sentence>
+<sentence>(1999) In situ analysis of
+nitrifying bioﬁlms as determined by in situ hybridization and the
+use of microelectrodes.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>65 (7), 3182–
+3191.</sentence>
+<sentence>[9] Gieseke, A., Purkhold, U., Wagner, M., Amann, R. and
+Schramm, A.</sentence>
+<sentence>(2001) Community structure and activity dynamics
+of nitrifying bacteria in a phosphate-removing bioﬁlm.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>67 (3), 1351–1362.</sentence>
+<sentence>[10] Hermansson, A. and Lindgren, P.E.</sentence>
+<sentence>(2001) Quantiﬁcation of
+ammonia-oxidizing bacteria in Arable soil by real-time PCR.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>67 (2), 972–976.</sentence>
+<sentence>[11] Dionisi, H.M., Layton, A.C., Harms, G., Gregory, I.R., Robinson, K.G. and Sayler, G.S.</sentence>
+<sentence>(2002) Quantiﬁcation of Nitrosomonas
+oligotropha-like ammonia-oxidizing bacteria and Nitrospira spp.</sentence>
+<sentence>from full-scale wastewater treatment plants by competitive PCR.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>68 (1), 245–253.</sentence>
+<sentence>[12] Harms, G., Layton, A.C., Dionisi, H.M., Gregory, I.R., Garrett,
+V.M., Hawkins, S.A., Robinson, K.G. and Sayler, G.S.</sentence>
+<sentence>(2003)
+Real-time PCR quantiﬁcation of nitrifying bacteria in a municipal
+wastewater treatment plant.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Sci.</sentence>
+<sentence>Technol.</sentence>
+<sentence>37, 343–351.</sentence>
+<sentence>[13] Koops, H.P. and Pommerening-Roser, A.</sentence>
+<sentence>(2001) Distribution and
+ecophysiology of the nitrifying bacteria emphasizing cultured
+species.</sentence>
+<sentence>FEMS Microbiol.</sentence>
+<sentence>Ecol.</sentence>
+<sentence>37, 1–9.</sentence>
+<sentence>[14] Bollmann, A. and Laanbroek, H.J.</sentence>
+<sentence>(2002) Inﬂuence of oxygen
+partial pressure and salinity on the community composition of
+ammonia-oxidizing bacteria in the Schelde estuary.</sentence>
+<sentence>Aquat.</sentence>
+<sentence>Microb.</sentence>
+<sentence>Ecol.</sentence>
+<sentence>28, 239–247.</sentence>
+<sentence>[15] Rowan, A.K., Snape, J.R., Fearnside, D., Barer, M.R., Curtis,
+T.P. and Head, I.M.</sentence>
+<sentence>(2003) Composition and diversity of
+ammonia-oxidising bacterial communities in wastewater treatment reactors of diﬀerent design treating identical wastewater.</sentence>
+<sentence>FEMS Microbiol.</sentence>
+<sentence>Ecol.</sentence>
+<sentence>43 (2), 195–206.</sentence>
+<sentence>[16] Ballinger, S.J., Head, I.M., Curtis, T.P. and Godley, A.R.</sentence>
+<sentence>(1998)
+Molecular microbial ecology of nitriﬁcation in an activated sludge
+process treating reﬁnery wastewater.</sentence>
+<sentence>Water Sci.</sentence>
+<sentence>Technol.</sentence>
+<sentence>37 (4–5),
+105–108.</sentence>
+<sentence>[17] Logemann, S., Schantl, J., Bijvank, S., van Loosdrecht, M.,
+Kuenen, J.G. and Jetten, M.</sentence>
+<sentence>(1998) Molecular microbial diversity
+in a nitrifying reactor system without sludge retention.</sentence>
+<sentence>FEMS
+Microbiol.</sentence>
+<sentence>Ecol.</sentence>
+<sentence>27, 239–249.</sentence>
+<sentence>[18] Pynaert, K., Smets, B.F., Wyﬀels, S., Beheydt, D., Siciliano, S.D.
+and Verstraete, W.</sentence>
+<sentence>(2003) Characterization of an autotrophic
+nitrogen-removing bioﬁlm from a highly loaded lab-scale rotating
+biological contactor.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>69 (6), 3626–
+3635.</sentence>
+<sentence>[19] Klappenbach, J.A., Saxman, P.R., Cole, J.R. and Schmidt, T.M.</sentence>
+<sentence>(2001) rrndb: The ribosomal RNA operon copy number database.</sentence>
+<sentence>Nucl.</sentence>
+<sentence>Acids Res.</sentence>
+<sentence>29, 181–184.</sentence>
+<sentence>[20] Aakra, A., Utaker, J.B. and Nes, I.F.</sentence>
+<sentence>(1999) RFLP of rRNA
+genes and sequencing of the 16S–23S rDNA intergenic spacer
+region of ammonia-oxidizing bacteria: a phylogenetic approach.</sentence>
+<sentence>Int.</sentence>
+<sentence>J. Sys.</sentence>
+<sentence>Bacteriol.</sentence>
+<sentence>49, 123–130.</sentence>
+<sentence>[21] Kurisu, F., Satoh, H., Mino, T. and Matsuo, T.</sentence>
+<sentence>(2002) Microbial
+community analysis of thermophilic contact oxidation process by
+using ribosomal RNA approaches and the quinone proﬁle
+method.</sentence>
+<sentence>Water Res.</sentence>
+<sentence>36, 429–438.</sentence>
+<sentence>[22] Koops, H.P., Purkhold, U., Pommerening-Roser, A., Timmermann, G. and Wagner, M.</sentence>
+<sentence>(2003) The lithoautotrophic ammoniaoxidizing bacteria In: The Prokaryotes: an Evoluting Electronic
+Resource for the Microbiological Community (Dworkin, M.
+et al., Eds.).</sentence>
+<sentence>Springer Verlag, New York.</sentence>
+<sentence>[23] Belser, L.W. and Schmidt, E.L.</sentence>
+<sentence>(1980) Growth and oxidation
+kinetics of three genera of ammonia oxidizing nitriﬁers.</sentence>
+<sentence>FEMS
+Microbiol.</sentence>
+<sentence>Lett.</sentence>
+<sentence>7, 213–216.</sentence>
+<sentence>[24] Purkhold, U., Pommerening-Roser, A., Juretschko, S., Schmid,
+M.C., Koops, H.P. and Wagner, M.</sentence>
+<sentence>(2000) Phylogeny of all
+recognized species of ammonia oxidizers based on comparative</sentence>
+<sentence>T. Limpiyakorn et al.</sentence>
+<sentence>/ FEMS Microbiology Ecology 54 (2005) 205–217</sentence>
+<sentence>[25]</sentence>
+<sentence>[26]</sentence>
+<sentence>[27]</sentence>
+<sentence>[28]</sentence>
+<sentence>[29]</sentence>
+<sentence>16S rRNA and amoA sequence analysis: implications for molecular diversity surveys.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>66 (12), 5368–
+5382.</sentence>
+<sentence>Schramm, A., De Beer, D., Wagner, M. and Amann, R.</sentence>
+<sentence>(1998)
+Identiﬁcation and activities in situ of Nitrosospira and Nitrospira
+spp.</sentence>
+<sentence>as dominant population in nitrifying ﬂuidized bed reactor.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>64 (9), 3480–3485.</sentence>
+<sentence>You, S.J., Hsu, C.L., Chuang, S.H. and Ouyang, C.F.</sentence>
+<sentence>(2003)
+Nitriﬁcation eﬃciency and nitrifying bacteria abundance in
+combined AS-RBC and A2O systems.</sentence>
+<sentence>Water Res.</sentence>
+<sentence>37, 2281–2290.</sentence>
+<sentence>Wagner, M. and Loy, A.</sentence>
+<sentence>(2002) Bacterial community composition
+and function in sewage treatment systems.</sentence>
+<sentence>Curr.</sentence>
+<sentence>Opin.</sentence>
+<sentence>Biotechnol.</sentence>
+<sentence>13, 218–227.</sentence>
+<sentence>Bollmann, A. and Laanbroek, H.J.</sentence>
+<sentence>(2001) Continuous culture
+enrichments of ammonia-oxidizing bacteria at low ammonium
+concentrations.</sentence>
+<sentence>FEMS Microbiol.</sentence>
+<sentence>Ecol.</sentence>
+<sentence>37, 211–221.</sentence>
+<sentence>Regan, J.M., Harrington, G.W. and Noguera, D.R.</sentence>
+<sentence>(2002)
+Ammonia- and nitrite-oxidizing bacteria communities in a pilot-</sentence>
+<sentence>[30]</sentence>
+<sentence>[31]</sentence>
+<sentence>[32]</sentence>
+<sentence>[33]</sentence>
+<sentence>217</sentence>
+<sentence>scale chloraminated drinking water distribution system.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>68 (1), 73–81.</sentence>
+<sentence>Regan, J.M., Harrington, G.W., Baribeau, H., De Leon, R. and
+Noguera, D.R.</sentence>
+<sentence>(2003) Diversity of nitrifying bacteria in full-scale
+chloraminated distribution systems.</sentence>
+<sentence>Water Res.</sentence>
+<sentence>37, 197–205.</sentence>
+<sentence>Ward, B.B., Martino, D.P., Diaz, M.C. and Joye, S.B.</sentence>
+<sentence>(2000)
+Analysis of ammonia-oxidizing bacteria from hypersaline Mono
+Lake, California, on the basis of 16S rRNA sequences.</sentence>
+<sentence>Appl.</sentence>
+<sentence>Environ.</sentence>
+<sentence>Microbiol.</sentence>
+<sentence>66 (7), 2873–2881.</sentence>
+<sentence>Urbain, V., Mobarry, B., de Silva, V., Stahl, D.A., Rittmann,
+B.E. and Manem, J.</sentence>
+<sentence>(1998) Integration of performance, molecular
+biology and modeling to describe the activated sludge process.</sentence>
+<sentence>Water Sci.</sentence>
+<sentence>Technol.</sentence>
+<sentence>37 (3), 223–229.</sentence>
+<sentence>Kowalchuk, G.A., Bodelier, P.L.E., Heilig, H.J., Stephen, J.R.
+and Laanbroek, H.J.</sentence>
+<sentence>(1998) Community analysis of ammoniaoxidizing bacteria, in relation to oxygen availability in soils and
+root-oxygenated sediments, using PCR, DGGE and oligonucleotide probe hybridization.</sentence>
+<sentence>FEMS Microbiol.</sentence>
+<sentence>Ecol.</sentence>
+<sentence>27, 339–350.</sentence>
+</sentences>

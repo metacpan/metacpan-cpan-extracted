@@ -1,0 +1,24 @@
+---
+abstract: "A Perl interface to Stanford's CoreNLP tool set."
+author:
+  - 'Kalle Raisanen <kal@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-StanfordCoreNLP
+provides:
+  Lingua::StanfordCoreNLP:
+    file: lib/Lingua/StanfordCoreNLP.pm
+    version: 0.10
+requires:
+  Inline::Java: 0.53
+  perl: v5.10.0
+resources:
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+version: 0.10

@@ -1,0 +1,36 @@
+[% 
+    title = 'User Access: ' _ data.realname ;
+%]
+
+[% IF thanks %]
+<div class="post"><p>[% thanks %]</div>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name="act" value="user-aclsave" />
+<input type="hidden" name="userid" value="[% data.userid %]" />
+
+    <table width="100%">
+    <tr><th width="90">User</th>
+        <th width="10"></th>
+        <td><b>[% data.realname %]</b></td>
+    </tr>
+
+    <tr><th>Access</th>
+        <th></th>
+        <td>[% IF data.access %]
+            [% FOR item = data.access %]
+            Folder: [% item.foldername %] / Access: [% item.accessname %] (<a href="pages.cgi?act=user-acldel&amp;userid=[% item.userid %]&amp;accessid=[% item.accessid %]&amp;folderid=[% item.folderid %]">remove</a>)<br/>
+            [% END %]
+            [% ELSE %]Default Access applies
+            [% END %]
+        </td>
+    </tr>
+    <tr><th>Add</th>
+        <th></th>
+        <td>Folder: [% ddfolder %] / Access: [% ddaccess %]</td>
+    </tr>
+	  <tr><td colspan="2"></td><td><input type="submit" name="submit" value="UPDATE" /></td></tr>
+    </table>
+
+</form>

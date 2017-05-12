@@ -1,0 +1,94 @@
+v0.952  2008-08-28
+    * Export C symbols via PL_modglobal.
+
+v0.951  2008-08-21
+    * Fix Perl 5.6.2 compatibility.
+    * Specify Perl 5.6.2 as a minimum version.
+
+v0.95   2008-08-17
+    * Add Hungarian, Romanian, and Turkish. 
+    * Export Snowball C symbols via DynaLoader.
+      
+v0.941  2006-08-18
+    * Add ExtUtils::CBuilder and ExtUtils::ParseXS as dependencies now that
+      Module::Build doesn't do it's own C handling.
+
+v0.94   2006-02-14
+    * new maintainer Marvin Humphrey
+    * improved speed
+    * new method stem_in_place() added
+    * UTF-8 stemmers added
+    * encoding parameter, plus new method encoding() added
+    * updated to latest version of libstemmer_c from snowball.tartarus.org
+    * many internal changes
+    * change from EUMM to Module::Build
+    * apostrophe stripping is now always on and handled natively for English
+    * strip_apostrophes() method deprecated; now has no impact on stemming 
+      behavior (and no longer triggers segfaults)
+    * locale() method and constructor parameter deprecated; locale never had
+      any effect except to influence the automatic lowercasing performed by
+      stem(), and that was only theoretical (none of the test vocab was
+      affected by it).
+    * removed bin/add_stemmer.pl
+    * added bin/benchmark_stemmers.plx
+    * added bin/generate_tests.plx
+    * updated documentation
+
+v0.93   2005-07-28
+    * fix ticket #13900 : cease stripping of empty array elements
+      be careful that this fix may break your scripts
+    * fix ticket #13898 : apostrophe s in English stemmer
+    * new method strip_apostrophes() added
+
+v0.92   2005-05-22
+    * removed deprecated 'snowball' function
+    * added tests for Pod and Pod coverage
+    * moved add_stemmer.pl in bin subdirectory
+    * renamed private function (added _)
+
+v0.91   2005-05-10
+    * don't stem empty words
+
+v0.9    2005-02-07
+    * fix doc ticket #11286 : Error in documentation use of 'english' 
+      as valid language descriptor
+    * fix directory mode in CPAN distribution
+    * added 3-subclass.t test file
+    * updated ppport.h
+
+v0.8    2004-08-29
+    * fix ticket #7909 : typo in _get_lang
+    * fix ticket #7910 : Lingua::Stem::Snowball::stem does not allow 
+      subclassing
+
+v0.7    2004-07-09
+    * fix ticket #6884 : cp is not portable
+
+v0.6    2004-05-06
+    * fix a bug in the test suite if there is no locale available
+    * fix version numbering due a problem in 0.04 release (0.4 !)
+
+v0.05   2004-04-30
+    * fix a little bug in the test suite
+
+v0.04   2004-04-30
+    * new maintainer fabpot@cpan.org
+    * now include all stemmers from snowball
+    * more tests
+    * fix various bugs and docs
+    * add a benchmark with Lingua::Stem
+    * ...
+
+v0.03.1 2002-09-11
+    * Change URL of snowball site (http://snowball.tartarus.org)
+    * Fix some wordings
+    * Modify testsnowball.pl script
+ 
+v0.03   2002-03-04
+    * add locale support
+
+v0.02   2002-02-14
+    * little documentation fixes, added test script
+
+v0.01   2002-02-14
+    * Initial release

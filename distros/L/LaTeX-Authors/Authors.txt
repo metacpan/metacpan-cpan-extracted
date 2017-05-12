@@ -1,0 +1,315 @@
+Authors(3)     User Contributed Perl Documentation     Authors(3)
+
+
+
+NNNNAAAAMMMMEEEE
+       LaTeX::Authors - Perl extension to extract authors and
+       laboratories in a LaTeX file
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+       Extraction from a string with latex commands:
+
+               use LaTeX::Authors;
+               use strict;
+               my $tex_string = "\documentclass...";
+               my @article = router($tex_string);
+               my $string_xml =  string_byauthors_xml(@article);
+               print $string_xml;
+
+       Extraction from a latex file:
+
+        use LaTeX::Authors;
+               use strict;
+               my $file = shift;
+               my $tex_string = load_file_string($file);
+               my @article = router($tex_string);
+               my $string_xml =  string_byauthors_xml(@article);
+               print $string_xml;
+
+       Extraction from a directory with latex files:
+
+               use LaTeX::Authors;
+               use strict;
+               my $directory = shift;
+               #my $error= un_archive($directory);
+               my $file = find_tex_file($directory);
+               my $tex_string = load_file_string($file);
+               my @article = router($tex_string);
+               my $string_xml =  string_byauthors_xml(@article);
+               print $string_xml;
+
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+       LaTeX::Authors try to find the authors and laboratories in
+       a LaTex file.  The output is an xml or html string. This
+       is an example of the xml output:
+
+       <article>
+            <item>
+               <author>author1</author>
+               <labo>lab1</labo>
+               <labo>lab2</labo>
+            </item>
+            <item>
+               ...
+            </item>
+        </article>
+
+       The module try to found something like the \author and
+       \affiliation latex command on the file.  With articles
+       about physics try to found a collaboration name to work
+       with more exotic way to show authors list.  It is espe-
+       cially design for article about physics where there is
+       hundreds of authors.
+
+       It can work on input with:
+        - an archiv file (tar, zip...), it's useful for arXiv
+       file (function un_archiv)
+        - a directory with latex file (function find_tex_file)
+        - a latex file (function load_file_string)
+        - a string (function router)
+
+       For the output it can produce:
+        - an xml string
+            - by author: author1 lab1 lab2 (string _byau-
+       thors_xml)
+            - by laboratory: lab1 author1 author2
+       (string_bylabs_xml)
+        - an html string
+            - by author (string_byauthors_html)
+            - by lab (string_bylabs_html)
+
+FFFFUUUUNNNNCCCCTTTTIIIIOOOONNNN
+       """"uuuunnnn____aaaarrrrcccchhhhiiiivvvveeee"""" ---- uuuunnnnccccoooommmmpppprrrreeeessssssss,,,, uuuunnnnttttaaaarrrr oooorrrr uuuunnnnzzzziiiipppp ffffiiiilllleeee iiiinnnn aaaa ddddiiiirrrreeeecccc----
+       ttttoooorrrryyyy
+
+       Take the archive file and uncompress (useful for arXiv
+       files)
+
+       my $error = un_archive($directory);
+
+       """"ffffiiiinnnndddd____tttteeeexxxx____ffffiiiilllleeee"""" ---- TTTTrrrryyyy ttttoooo ffffiiiinnnndddd tttthhhheeee mmmmaaaaiiiinnnn tttteeeexxxx ffffiiiilllleeee oooonnnn aaaa
+       ddddiiiirrrreeeeccccttttoooorrrryyyy wwwwiiiitttthhhh mmmmuuuullllttttiiiipppplllleeee ffffiiiilllleeeessss
+
+       my $texfile = find_tex_file($directory);
+
+       """"llllooooaaaadddd____ffffiiiilllleeee____ssssttttrrrriiiinnnngggg"""" ---- LLLLooooaaaadddd aaaa ffffiiiilllleeee aaaannnndddd ppppuuuutttt tttthhhheeee ccccoooonnnntttteeeennnntttt ttttoooo aaaa
+       ssssttttrrrriiiinnnngggg
+
+       my $string = load_file_string($file);
+
+       Also delete the latex comments (%...).
+
+       """"rrrroooouuuutttteeeerrrr"""" ---- TTTTrrrryyyy ttttoooo qqqqeeeelllleeeecccctttt tttthhhheeee ggggoooooooodddd ffffuuuunnnnccccttttiiiioooonnnn ttttoooo eeeexxxxttttrrrraaaacccctttt tttthhhheeee
+       aaaauuuutttthhhhoooorrrrssss aaaannnndddd llllaaaabbbboooorrrraaaattttoooorrrriiiieeeessss aaaannnndddd rrrreeeettttuuuurrrrnnnn aaaannnn aaaarrrrrrrraaaayyyy wwwwiiiitttthhhh tttthhhheeee
+       aaaauuuutttthhhhoooorrrrssss aaaannnndddd tttthhhheeee llllaaaabbbboooorrrraaaattttoooorrrriiiieeeessss iiiinnnn tttthhhheeee llllaaaatttteeeexxxx ffffiiiilllleeee....
+
+       @article = router($string);
+
+       """"ffffoooouuuunnnndddd____ccccoooollllllllaaaabbbboooorrrraaaattttiiiioooonnnn"""" ---- TTTTrrrryyyy ttttoooo ffffoooouuuunnnndddd aaaa ccccoooollllllllaaaabbbboooorrrraaaattttiiiioooonnnn nnnnaaaammmmeeee
+
+       Useful for physics articles whrere there often a collabo-
+       ration name. The authors list format can be found with the
+       collaboration name. Used by the router function.
+
+       """"ddddeeeelllleeeetttteeee____ccccoooommmmmmmmeeeennnntttt"""" ---- DDDDeeeelllleeeetttteeee tttteeeexxxx ccccoooommmmmmmmeeeennnntttt ((((%%%%)))) oooonnnn aaaa ssssttttrrrriiiinnnngggg
+
+       my $string_out = delete_comment($string_in);
+
+       """"bbbbiiiicccchhhhoooopppp"""" ---- DDDDoooouuuubbbblllleeee eeeennnndddd cccchhhhoooopppp
+
+       With
+
+       my $string_in = bichop("{aaa}")
+
+       in $string_in there is:
+
+       "aaa"
+
+       """"ggggrrrreeeeppppllllaaaatttteeeexxxxccccoooommmm"""" ---- TTTToooo ggggeeeetttt aaaallllllll tttthhhheeee ooooccccuuuurrrrrrrreeeennnncccceeeessss ooooffff aaaa llllaaaatttteeeexxxx ccccoooommmm----
+       mmmmaaaannnndddd
+
+
+          @l_section = greplatexcom("section",["title"],$string);
+          for $s (@l_section) {print $s->{title} };
+
+       Optional arguments can be described with "[name]". See
+       this example:
+
+          @class = greplatexcom("documentclass",[["args"],"class"],$string);
+          print $class[0]->{class} ;
+
+       With \documentclass[xyz]{abc}
+
+         $class[0]->{args} = xyz
+         $class[0]->{class} = abc
+
+
+       """"tttthhhheeeeeeeennnnvvvv"""" ---- TTTToooo ggggeeeetttt aaaa llllaaaatttteeeexxxx eeeennnnvvvviiiirrrroooonnnnmmmmeeeennnntttt ccccoooonnnntttteeeennnnttttssss
+
+          $abstract_string = theenv("abstract",$string);
+
+       "theenv" returns the contents of the environment
+       "abstract".
+
+       For example if:
+
+       $string ="\begin{abstract}
+                   xyz...
+                 \end{abstract}";
+
+       after theenv in $abstract_string there is the string:
+
+       xyz...
+
+       """"tttthhhheeeeeeeennnnvvvvssss"""" ---- TTTToooo ggggeeeetttt aaaallllllll tttthhhheeee llllaaaatttteeeexxxx eeeennnnvvvviiiirrrroooonnnnmmmmeeeennnnttttssss ccccoooonnnntttteeeennnnttttssss
+
+          @array = theenvs("sloppypar",$string);
+
+       "theenvs" returns the contents of all the environment
+       "sloopypar".
+
+       """"ggggrrrreeeeppppllllaaaatttteeeexxxxeeeennnnvvvv"""" ---- TTTToooo ggggeeeetttt aaaallllllll ooooccccuuuurrrrrrrreeeennnncccceeeessss ooooffff aaaa llllaaaatttteeeexxxx eeeennnnvvvviiiirrrroooonnnn----
+       mmmmeeeennnntttt
+
+          @a = greplatexenv("letter",["to"],$string) ;
+
+       "greplatexenv" returns a list of all the ocurrences of
+       environment "letter", reading its first argument to the
+       "to" field and saving its content in the "env" field;
+
+       """"nnnneeeewwwwccccoooommmmmmmmaaaannnndddd"""" ---- RRRReeeettttuuuurrrrnnnn aaaa hhhhaaaasssshhhh wwwwiiiitttthhhh aaaallllllll tttthhhheeee """"nnnneeeewwwwccccoooommmmmmmmaaaannnndddd""""
+       ooooccccccccuuuurrrrrrrreeeennnncccceeeessss
+
+       %listnewcom = newcommand($string);
+
+       If you have
+
+       $string="\newcommand[xyz]{abc}";
+
+       so after newcommand:
+
+       $listnewcom{xyz} = "abc";
+
+       """"lllliiiisssstttt____iiiinnnnddddeeeexxxx"""" ---- RRRReeeettttuuuurrrrnnnn aaaa hhhhaaaasssshhhh wwwwiiiitttthhhh aaaallllllll tttthhhheeee ccccoooommmmmmmmaaaannnndddd
+       ooooccccccccuuuurrrreeeennnncccceeeessss
+
+       For example with:
+
+       my $command_name = "command"; %list = list_index($com-
+       mand_name,$string);
+
+        \command[index]{xyz...} -> $list{index} = "xyz...";
+
+       Generalize the function newcommand with any command.
+
+       """"aaaacccccccceeeennnntttt"""" ---- TTTTrrrraaaannnnssssffffoooorrrrmmmm tttthhhheeee llllaaaatttteeeexxxx ccccaaaarrrraaaacccctttteeeerrrrssss wwwwiiiitttthhhh aaaacccccccceeeennnntttt ttttoooo
+       ssssttttaaaannnnddddaaaarrrrdddd ccccaaaarrrraaaacccctttteeeerrrrssss
+
+       my $string_out = accent($string_in);
+
+       """"ssssttttrrrriiiinnnngggg____bbbbyyyyaaaauuuutttthhhhoooorrrrssss____xxxxmmmmllll"""" ---- RRRReeeettttrrrruuuunnnn aaaa ssssttttrrrriiiinnnngggg wwwwiiiitttthhhh xxxxmmmmllll ttttaaaaggggssss aaaallllllll
+       tttthhhheeee aaaauuuutttthhhhoooorrrrssss aaaannnndddd llllaaaabbbb ffffoooouuuunnnndddd iiiinnnn aaaannnn aaaarrrrttttiiiicccclllleeee
+
+        my $string = string_byauthors_xml(@article);
+
+        <article>
+          <item>
+             <author>author1</author>
+             <labo>lab1</labo>
+             <labo>lab2</labo>
+          </item>
+          <item>
+            ...
+          </item>
+        </article>
+
+
+       """"ssssttttrrrriiiinnnngggg____oooonnnnllllyyyyaaaauuuutttthhhhoooorrrrssss____xxxxmmmmllll"""" ---- RRRReeeettttrrrruuuunnnn aaaa ssssttttrrrriiiinnnngggg wwwwiiiitttthhhh xxxxmmmmllll ttttaaaaggggssss
+       aaaallllllll tttthhhheeee aaaauuuutttthhhhoooorrrrssss ffffoooouuuunnnndddd iiiinnnn aaaannnn aaaarrrrttttiiiicccclllleeee
+
+        my $string = string_onlyauthors_xml(@article);
+
+        <article>
+            <author>author1</author>
+            <author>author2</author>
+            ...
+        </article>
+
+
+       """"aaaauuuutttthhhhoooorrrr____ttttoooo____llllaaaabbbb"""" ---- CCCCoooonnnnvvvveeeerrrrtttt tttthhhheeee aaaauuuutttthhhhoooorrrr aaaarrrrrrrraaaayyyy ttttoooo aaaa llllaaaabbbb aaaarrrrrrrraaaayyyy
+
+       my @array_lab = author_to_lab(@array_author);
+
+       (author1, lab1, lab2)(author2, lab1, lab3) ->
+       (lab1,author1,author2)(lab2,author1)(lab3,author2)
+
+       """"ssssttttrrrriiiinnnngggg____bbbbyyyyllllaaaabbbbssss____xxxxmmmmllll"""" ---- RRRReeeettttuuuurrrrnnnn aaaa ssssttttrrrriiiinnnngggg wwwwiiiitttthhhh xxxxmmmmllll ttttaaaaggggssss aaaallllllll
+       tttthhhheeee llllaaaabbbb aaaannnndddd aaaauuuutttthhhhoooorrrrssss ffffoooouuuunnnndddd iiiinnnn aaaannnn aaaarrrrttttiiiicccclllleeee
+
+       my $xml_string = string_bylabs_xml(@article);
+
+        <article>
+          <item>
+             <labo>lab1</labo>
+             <author>authors1</author>
+             <author>authors2</author>
+          </item>
+          <item>
+            ...
+          </item>
+        </article>
+
+
+
+
+       """"ssssttttrrrriiiinnnngggg____oooonnnnllllyyyyllllaaaabbbbssss____xxxxmmmmllll"""" ---- RRRReeeettttuuuurrrrnnnn aaaa ssssttttrrrriiiinnnngggg wwwwiiiitttthhhh xxxxmmmmllll ttttaaaaggggssss aaaallllllll
+       tttthhhheeee llllaaaabbbb ffffoooouuuunnnndddd iiiinnnn aaaannnn aaaarrrrttttiiiicccclllleeee
+
+       my $string = string_onlylabs_xml(@article);
+
+        <article>
+            <labo>lab1</labo>
+            <labo>lab2</labo>
+            ...
+        </article>
+
+
+       """"ssssttttrrrriiiinnnngggg____bbbbyyyyaaaauuuutttthhhhoooorrrrssss____hhhhttttmmmmllll"""" ---- RRRReeeettttuuuurrrrnnnn aaaa ssssttttrrrriiiinnnngggg wwwwiiiitttthhhh aaaallllllll tttthhhheeee
+       aaaauuuutttthhhhoooorrrrssss aaaannnndddd llllaaaabbbb uuuussssiiiinnnngggg hhhhttttmmmmllll ttttaaaaggggssss
+
+       my $string_out = string_by_authors_html(@article);
+
+                       <hr>
+                       author1
+                       <p>
+                       <ul>
+                         <li> lab1
+                         <li> lab2
+                       </ul>
+                       <p>
+
+
+       """"ssssttttrrrriiiinnnngggg____bbbbyyyyllllaaaabbbbssss____hhhhttttmmmmllll"""" ---- PPPPrrrriiiinnnnttttRRRReeeettttuuuurrrrnnnn aaaa ssssttttrrrriiiinnnngggg wwwwiiiitttthhhh aaaallllllll tttthhhheeee
+       llllaaaabbbboooorrrraaaattttoooorrrriiiieeeessss wwwwiiiitttthhhh aaaauuuutttthhhhoooorrrrssss uuuussssiiiinnnngggg hhhhttttmmmmllll ttttaaaaggggssss
+
+                       <hr>
+                       lab1
+                       <p>
+                       <ul>
+                         <li> author1
+                         <li> author2
+                       </ul>
+                       <p>
+
+
+AAAAUUUUTTTTHHHHOOOORRRR
+       Christian Rossi (<rossi@in2p3.fr> and <rossi@loria.fr>)
+
+SSSSEEEEEEEE AAAALLLLSSSSOOOO
+       the perl manpage, the latex manpage, the Text::Balanced
+       manpage.
+
+
+
+2005-03-29                 perl v5.6.1                 Authors(3)

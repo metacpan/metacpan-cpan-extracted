@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/List/Extract.pm
+t/010basic.t
+t/020interface.t
+t/030extract.t
+t/031extract_side_effects.t
+META.yml                                 Module meta-data (added by MakeMaker)

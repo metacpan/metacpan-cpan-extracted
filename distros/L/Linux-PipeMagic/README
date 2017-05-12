@@ -1,0 +1,34 @@
+Linux-PipeMagic version 0.02
+============================
+
+This module exposes the Linux zero-copy API functions splice(2) and tee(2) to
+programs written in Perl.  See the Linux::PipeMagic perldoc for further
+details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  File::Slurp
+  Test::More
+
+  and a working C compiler.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Dave Lambley
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

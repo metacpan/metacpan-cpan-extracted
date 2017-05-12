@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+
+# tests for handline fuzzy / old strings
+#, fuzzy
+#| msgid "Click Ok to continue."
+msgid "Click OK to continue."
+msgstr ""
+
+#: cgi-bin/test.pl:6505
+#, fuzzy
+#| msgid "Response"
+msgid "Add Response"
+msgstr ""
+
+#: cgi-bin/programGoals.pl:1200
+#, fuzzy
+#| msgid ""
+#| "There are no bindings for the the Goal Group filter you chose. \n"
+#| "If you need a binding added contact %1. All Goal Groups, \n"
+#| "will still be displayed below."
+msgid ""
+"There are no bindings for the the Goal Group or GoalType Sets you chose.\n"
+"If you need a binding added contact %1. All Goal Groups and GoalType Sets\n"
+"will still be displayed below."
+msgstr ""
+
+#: cgi-bin/employeeProfile.pl:824
+#, fuzzy
+#| msgctxt "Date as in the noun, the time at which an event occcurs"
+#| msgid "Date"
+msgctxt "Date as in the noun, the time at which an event occurred"
+msgid "Date"
+msgstr ""
+
+#, fuzzy
+#| msgid "1 day"
+#| msgid_plural "%n days"
+msgctxt "Number of Days"
+msgid "1 day"
+msgid_plural "%n days"
+msgstr[0] ""
+msgstr[1] ""
+
+#, fuzzy
+#~| msgid "Other Fields"
+#~ msgid "Other Skills"
+#~ msgstr ""
+
+#, fuzzy
+#~| msgid ""
+#~| "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do \n"
+#~| "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim \n"
+#~| "ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut \n"
+#~| "aliquip ex ea commodo consequat. Duis aute irure dolor in \n"
+#~| "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla \n"
+#~| "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in \n"
+#~| "culpa qui officia deserunt mollit anim id est laborum."
+#~ msgid "Lorem ipsum"
+#~ msgstr ""
+

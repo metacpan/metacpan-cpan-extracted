@@ -1,0 +1,117 @@
+   _     _                                     _   _          
+  | |   (_)_ __   __ _ _   _  __ _   _ _      | | / \     _ _ 
+  | |   | | '_ \ / _` | | | |/ _` | (_|_)  _  | |/ _ \   (_|_)
+  | |___| | | | | (_| | |_| | (_| |  _ _  | |_| / ___ \   _ _ 
+  |_____|_|_| |_|\__, |\__,_|\__,_| (_|_)  \___/_/   \_\ (_|_)
+                 |___/                                        
+   __  __       _ _ 
+  |  \/  | ___ (_|_)
+  | |\/| |/ _ \| | |
+  | |  | | (_) | | |
+  |_|  |_|\___// |_|
+             |__/   
+
+
+This is the README for Lingua::JA::Moji version 0.44.
+
+Lingua::JA::Moji is a "module" for the Perl computer programming language,
+a library of computer code to install on a computer.  This document
+contains four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+Lingua::JA::Moji - Handle many kinds of Japanese characters
+
+This module provides methods to convert different written forms of
+Japanese into one another. It enables conversion between romanized
+Japanese, hiragana, and katakana. It also includes a number of unusual
+encodings such as Japanese braille and morse code, as well as
+conversions between Japanese and Cyrillic and Hangul. It also handles
+conversion between the Chinese characters (kanji) used before and
+after the character reforms of 1949, as well as the various bracketed
+and circled forms of kana and kanji.
+
+All the functions in this module assume the use of Unicode
+encoding. All input and output strings must be encoded using Perl's
+"UTF-8" format.
+
+The module loads the various data format conversion files on demand,
+thus the various obscure conversions hopefully do not cause a memory
+burden.
+
+This module does not handle the conversion of kanji words into kana,
+or kana into kanji.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?Lingua::JA::Moji
+    * http://metacpan.org/release/Lingua-JA-Moji
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc Lingua::JA::Moji
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.8.9 or later.
+
+To install the module from CPAN, use
+
+    cpan Lingua::JA::Moji
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm Lingua::JA::Moji
+
+To install the module from the source file, Lingua-JA-Moji-0.44.tar.gz,
+follow this sequence of commands:
+
+    tar xfz Lingua-JA-Moji-0.44.tar.gz
+    cd Lingua-JA-Moji-0.44
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/Lingua-JA-Moji/issues>,
+
+or if you want to alter the source code of Lingua::JA::Moji, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/Lingua-JA-Moji>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Sat Mar 11 12:54:49 2017.
+
+-----------------------------------------------------------------------------

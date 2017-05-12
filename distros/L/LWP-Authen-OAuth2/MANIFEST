@@ -1,0 +1,26 @@
+Changes
+ignore.txt
+lib/LWP/Authen/OAuth2.pm
+lib/LWP/Authen/OAuth2/AccessToken.pm
+lib/LWP/Authen/OAuth2/AccessToken/Bearer.pm
+lib/LWP/Authen/OAuth2/Args.pm
+lib/LWP/Authen/OAuth2/Overview.pod
+lib/LWP/Authen/OAuth2/ServiceProvider.pm
+lib/LWP/Authen/OAuth2/ServiceProvider/Dwolla.pm
+lib/LWP/Authen/OAuth2/ServiceProvider/Google.pm
+lib/LWP/Authen/OAuth2/ServiceProvider/Strava.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/LWP/Authen/OAuth2.t
+t/LWP/Authen/OAuth2/AccessToken.t
+t/LWP/Authen/OAuth2/AccessToken/Bearer.t
+t/LWP/Authen/OAuth2/Args.t
+t/LWP/Authen/OAuth2/ServiceProvider.t
+t/LWP/Authen/OAuth2/ServiceProvider/Google.t
+t/LWP/Authen/OAuth2/ServiceProvider/Strava.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

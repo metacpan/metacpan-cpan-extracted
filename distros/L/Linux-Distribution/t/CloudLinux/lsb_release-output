@@ -1,0 +1,5 @@
+LSB Version:    :core-4.0-amd64:core-4.0-ia32:core-4.0-noarch:graphics-4.0-amd64:graphics-4.0-ia32:graphics-4.0-noarch:printing-4.0-amd64:printing-4.0-ia32:printing-4.0-noarch
+Distributor ID: CloudLinuxServer
+Description:    CloudLinux Server release 5.11 (Vladislav Volkov)
+Release:    5.11
+Codename:   VladislavVolkov

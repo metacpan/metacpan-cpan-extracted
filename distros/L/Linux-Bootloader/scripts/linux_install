@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# variables
+PATH=$PATH:/sbin:/usr/sbin
+
+if [ ! -z $1 ]; then
+    RELEASE_TAG=$1
+fi
+release_tag=${RELEASE_TAG:-test}
+
+if [ ! -z $2 ]; then
+    SRC_DIR=$2
+fi
+src_dir=${SRC_DIR:-.}
+
+if [ ! -z $3 ]; then
+    TARGET_DIR=$3
+fi
+target_dir=${TARGET_DIR:-/boot}
+
+if [ ! -z $4 ]; then
+    ARCH=$4
+fi
+arch=${ARCH:-`uname -m | sed -e s/i.86/i386/ -e s/sub4u/sparc/ \
+                             -e s/arm.*/arm/ -e s/sa110/arm/ \
+                             -e s/s390x/s390/ -e s/parisc64/parisc/` }
+
+if [ ! -d $src_dir ]; then
+    echo "ERROR:  Source directory '$src_dir' does not exist"
+    exit -1
+fi
+
+if [ ! -d $target_dir ]; then
+    echo "ERROR:  Target directory '$target_dir' does not exist"
+    exit -1
+elif [ ! -w $target_dir ]; then
+    echo "ERROR:  Target directory '$target_dir' is not writable"
+    exit -1
+fi
+
+files=".config include/linux/autoconf.h System.map"
+for src_file in $files; do
+    if [ ! -e $src_dir/$src_file ]; then
+        echo "WARNING:  $src_dir/$src_file does not exist."
+    else
+        target_file=`basename $src_dir/$src_file`
+        target_file="$target_file-$release_tag"
+        echo "cp $src_dir/$src_file $target_dir/$target_file"
+        cp $src_dir/$src_file $target_dir/$target_file
+    fi
+done
+
+if echo $arch | grep 86$ >/dev/null; then
+  arch="i386"
+elif echo $arch | grep ppc64$ >/dev/null; then
+  arch="powerpc"
+fi
+echo "Using arch: $arch"
+
+images="arch/$arch/boot/bzImage \
+        arch/$arch/boot/vmlinuz \
+        arch/$arch/boot/vmlinux \
+        arch/$arch/boot/zImage \
+        bzImage vmlinuz vmlinux.gz vmlinux zImage "
+for image_file in $images; do
+    if [ -e $src_dir/$image_file ]; then
+        target_file="kernel-$release_tag"
+        echo "cp $src_dir/$image_file $target_dir/$target_file"
+        cp $src_dir/$image_file $target_dir/$target_file
+        chmod 0755 $target_dir/$target_file
+        exit 0
+    fi
+done

@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <title>lemonldap websso</title>
+    <style type="text/css" media="all">
+     p { color: #060;
+         font-size: 1.0em;
+         font-family: Verdana, Arial, sans-serif;   
+         font-weight: bold; 
+       } 
+     h1 { color: #000;
+          font-size: 1.5em;
+          font-family: Verdana, Arial, sans-serif;   
+          font-weight: bold; 
+          border-bottom: 3px solid #019733;
+          margin: 40px 0 20px 0px;
+          padding: 0 0.5em 0.5em 0.5em;
+        } 
+      body { background-color: #77E0AB;       }
+      label { background-color: #94DBB7;
+              color: #018023;
+              font-weight: bold;
+              padding: 4px;  
+              font-family: Verdana, Arial, sans-serif;   
+              font-size: 0.9em;
+              width: 500px; 
+            }  
+      input { display: block;
+              margin-top: 0.25em;
+              margin-bottom: 1.25em;
+              width: 150px;
+              border: solid black;
+              border-width: 1px 2px 2px 1px;
+            } 
+      .butok { width: 75px;
+               margin-left: 75px;
+               color: #069836;
+               border: 2px solid #F1CC26;
+               font-weight: bold;
+               background-color: #E6E0A4;
+               padding: 2px;
+             } 
+      .butok:hover { width: 75px;
+               margin-left: 75px;
+               color: #050;
+               border: 2px solid #E6E0A4;
+               font-weight: bold;
+               background-color: #F1CC26;
+               padding: 2px;
+             } 
+      br { display: none;
+         } 
+      .nodisp { display: none; }
+    </style>
+  </head>
+<body>
+<h1>logout from  lemonldap and CAS  websso 'world</h1>
+<p><center><b>Your are deconnected  , see you again !</b></center> 
+
+</body>
+</html>

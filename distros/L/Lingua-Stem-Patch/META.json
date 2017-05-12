@@ -1,0 +1,82 @@
+{
+   "abstract" : "Patch stemmers for Esperanto and Ido",
+   "author" : [
+      "Nick Patch <patch@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-Stem-Patch",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Pod::Man" : "2.04"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "Software::License" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Moo" : "1.001000",
+            "namespace::clean" : "0",
+            "parent" : "0",
+            "perl" : "v5.8.1",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : "0",
+            "String::Dump" : "0.05",
+            "Test::More" : "0.82",
+            "open" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::Stem::Patch" : {
+         "file" : "lib/Lingua/Stem/Patch.pm",
+         "version" : "0.06"
+      },
+      "Lingua::Stem::Patch::EO" : {
+         "file" : "lib/Lingua/Stem/Patch/EO.pm",
+         "version" : "0.06"
+      },
+      "Lingua::Stem::Patch::IO" : {
+         "file" : "lib/Lingua/Stem/Patch/IO.pm",
+         "version" : "0.06"
+      },
+      "Lingua::Stem::Patch::PL" : {
+         "file" : "lib/Lingua/Stem/Patch/PL.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/patch/lingua-stem-patch-pm5/issues"
+      },
+      "homepage" : "https://github.com/patch/lingua-stem-patch-pm5",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/patch/lingua-stem-patch-pm5.git"
+      }
+   },
+   "version" : "0.06"
+}

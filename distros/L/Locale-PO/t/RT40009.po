@@ -1,0 +1,19 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: cosimo@opera.com\n"
+"POT-Creation-Date: 2012-09-03 14:03+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <team@pledgebank.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: test.html:1
+#~ msgid "More info"
+#~ msgstr ""
+#~ "This is an obsolete string that appears to run over multiple lines and there is "
+#~ "nothing you can do to escape the simple fact that it does run over multiple lines."

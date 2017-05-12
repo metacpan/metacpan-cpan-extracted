@@ -1,0 +1,103 @@
+#!/usr/bin/perl -s
+
+use strict;
+use warnings;
+
+use DBI;
+
+our ($h);
+
+if ($h) {
+    print STDERR "nat-ngramsIdx: Indexes a ngrams SQLite database\n";
+    print STDERR "\n";
+    print STDERR "For more help, please run 'perldoc nat-ngramsIdx'\n";
+
+    exit;
+}
+
+my $file = shift;
+
+die "Can't find that file\n" if (!$file || !-f$file);
+
+my $dbh = DBI->connect("dbi:SQLite:dbname=${file}_","","");
+
+my $size = -1;
+$size = 2 if $file =~ m!2!;
+$size = 3 if $file =~ m!3!;
+$size = 4 if $file =~ m!4!;
+die "Strange ngrams filename\n" unless $size > 1;
+
+my $s;
+
+my @COLS=(undef,"word1","word2","word3","word4");
+my @TBS=(undef,undef,"bigrams","trigrams","tetragrams");
+my @SCOLS=(undef,"a","b","c","d");
+my @IDX=(undef,undef,"bi","tri","tet");
+
+print STDERR "Creating new table...\n";
+$s = $dbh->prepare("CREATE TABLE tmp (".
+                   join(",",map {"$_ INTEGER"} @COLS[1..$size]).
+                   ",occs INTEGER);");
+die unless $s;
+$s -> execute();
+
+print STDERR "Attaching old table...\n";
+$s = $dbh->prepare("ATTACH \"$file\" AS O;");
+die unless $s;
+$s -> execute();
+
+print STDERR "Selecting ordered values into new table...\n";
+$s = $dbh->prepare("INSERT INTO tmp SELECT * FROM O.$TBS[$size] ORDER BY occs DESC;");
+die unless $s;
+$s -> execute();
+
+print STDERR "Detaching old table...\n";
+$s = $dbh->prepare("DETACH O;");
+die unless $s;
+$s -> execute();
+
+print STDERR "Renaming temporary table...\n";
+$s = $dbh->prepare("ALTER TABLE tmp RENAME TO $TBS[$size];");
+die unless $s;
+$s -> execute();
+
+for (1..$size) {
+  my $idx = $IDX[$size]."_".$SCOLS[$_];
+  print STDERR "Creating idx $idx\n";
+  $s = $dbh->prepare("CREATE INDEX $idx ON $TBS[$size](word$_);");
+  die unless $s;
+  $s -> execute();
+}
+
+print STDERR "Moving file...\n";
+`mv ${file}_ $file`;
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-ngramsIdx - Indexes a ngrams SQLite file
+
+=head1 SYNOPSIS
+
+   nat-ngramsIdx source.2.ngrams
+
+=head1 DESCRIPTION
+
+This is an utility tool to create indexes in ngrams SQLite
+files. Normally you do not need to use it directly.
+
+=head1 SEE ALSO
+
+NATools documentation
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007-2012 by Alberto Manuel Brandão Simões
+
+=cut

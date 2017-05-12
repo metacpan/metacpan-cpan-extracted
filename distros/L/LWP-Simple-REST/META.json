@@ -1,0 +1,49 @@
+{
+   "abstract" : "A simple funcional interface to LWP::UserAgent, focused to quick use and test HTTP/REST apis",
+   "author" : [
+      "Italo Gon\u00e7ales <italo.goncales@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "LWP-Simple-REST",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "HTTP::Server::Simple" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::Exception" : "0",
+            "Try::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Server::Simple::CGI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/fredericorecsky/LWP-Simple-REST",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/fredericorecsky/LWP-Simple-REST.git",
+         "web" : "https://github.com/fredericorecsky/LWP-Simple-REST"
+      }
+   },
+   "version" : "0.20"
+}
+

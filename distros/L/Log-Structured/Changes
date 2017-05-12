@@ -1,0 +1,15 @@
+Revision history for Log-Structured
+
+0.001003  2013-09-10 11:52:01 CST6CDT
+  - Abandon RT
+  - Fix deps
+
+0.001002  2012-11-17 17:03:43 CST6CDT
+  - Put MetaYAML back in dist
+
+0.001001  2010-12-09 13:39:45 CST6CDT
+  - Take into account fewer caller return vals in 5.8
+
+0.001000  2010-12-07 22:58:04 CST6CDT
+  - Initial Release
+

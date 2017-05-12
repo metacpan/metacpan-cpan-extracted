@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Lock/File.pm
+lib/Lock/File/Alarm.pm
+t/locale.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/test.t

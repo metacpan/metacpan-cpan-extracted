@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------------------
+readme.txt for ccdict.txt
+---------------------------------------------------------------------------------------
+
+Format for each line (TAB separated): U+[x]xxxx.y	fieldname	value
+
+where U+ indicates a Unicode/ISO10646:2 character code xxxx or xxxxx.
+Unicode values are between U+4E00 and U+9AF5 for characters in the Unicode CJK Unified Ideographic plane,
+between U+3400 and U+4DB5 for CJK Unified Ideographs Extension A, and between U+20000 and U+2A6D6 for
+CJK Unified Ideographs Extension B. y indicates homograph number.
+
+Fieldname descriptions
+----------------------
+
+fUTF8
+-----
+The UTF-8 representation of the character.
+
+fCNS11643
+---------
+Character codepoint in Chinese National Standard CNS11643-1993. Planes 1-7, 10-11, 15 are defined.
+
+fGB
+---
+Character codepoint in GB encoding.
+
+fBig5
+-----
+Character codepoint in Big5 encoding.
+
+fR/S
+----
+Dictionary radical/index
+Format rrr.ii  where rrr=K'ang Hsi radical number, ii index (total stroke count minus radical stroke count).
+
+fTotalStrokes
+-------------
+Dictionary stroke count.
+
+fCangjie
+--------
+Cangjie input code.
+
+fFourCorner
+-----------
+Four corner dictionary code.
+
+fHakka
+------
+Hakka pronunciation in Hakka pinjim (jyutping)
+
+fCantonese
+----------
+Cantonese jyutping pronunciation.
+
+fMandarin
+---------
+Putonghua pronunciation in hanyu pinyin.
+
+fEnglish
+--------
+English definitions.
+
+Copyright information
+---------------------
+
+This work is licensed under the Creative Commons Attribution 2.5 License. To view a copy of this license, visit http://creativecommons.org/licenses/by/2.5/ or send a letter to Creative Commons, 543 Howard Street, 5th Floor, San Francisco, California, 94105, USA.
+
+Copyright (c) 1994-2006 www.chineselanguage.org

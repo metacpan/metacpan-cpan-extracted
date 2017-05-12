@@ -1,0 +1,86 @@
+Revision history for Limper
+
+0.013     2015-12-13 22:08:23-05:00 America/New_York
+
+0.012     2014-10-27 03:11:07+00:00 UTC
+- skip tests for MSWin32
+- add CONTRIBUTING and EVEN MORE sections to Limper
+- add LAYOUT and NAMESPACES sections to Limper::Extending
+- add placeholders Limper::Plugin and Limper::Engine for those namespaces
+- add Limper::Passphrase as example of what not to make a plugin
+- add Limper::Differences which compares against Dancer
+- changed 'options' to 'config', since 'options' is an HTTP method
+- handle HTTP methods OPTIONS and PATCH
+- add 'any' to create handlers for all methods
+- allow chaining the method functions (they all return @_ now)
+- changed 'note' to 'info'
+- better headers function, and change $response->{headers} to a HASH
+- request->{header} is now what request->{hheader} was – no more ARRAY form
+
+0.011     2014-10-20 05:46:31+00:00 UTC
+- much better DESCRIPTION, and other POD fixes and tweaks
+
+0.010     2014-10-20 05:06:01+00:00 UTC
+- delete $response->{body} if $head, so that response_handler works correctly for HEAD requests
+
+0.009     2014-10-20 02:48:07+00:00 UTC
+- changes to support Limper::PSGI (and possibly Limper::SCGI, etc):
+  - set $request->{remote_host} to $conn->peerhost // "localhost"
+  - new exported subs response and options
+  - new hooks response_handler and request_handler
+  - tweaks to support proper use of new hooks
+
+0.008     2014-10-19 06:06:40+00:00 UTC
+- properly handle HTTP/1.0 close/keep-alive
+- add POD Limper::Extending
+
+0.007     2014-10-17 04:41:56+00:00 UTC
+- fix bug when calling headers in list mode and it's undefined
+
+0.006     2014-10-16 02:03:34+00:00 UTC
+Work towards HTTP/1.1 compliance and be usable in production.
+
+- HTTP 1.1 improvements:
+  - require Host: header and accept absolute URLs from HTTP/1.1 clients
+  - support chunked encoding and timeout on reading content.
+  - return an RFC 1123 Date: header with every response
+  - minimal 100 Continue support
+  - better close support
+
+- seems like a good idea:
+  - catch exceptions instead of having worker die
+
+- new/changed features:
+  - after hook support – runs after all other processing, just before response is sent.
+  - rename 'logg' to 'note', add similar 'warning'
+
+0 general code improvements:
+  - remove prototypes
+  - use strict in example.pl
+  - remove passing http version to send_response
+  - add PodCoverageTests to dist.ini
+  - make $conn package global
+  - tweak warning and bad_request
+  - tweak timeout
+
+0.005     2014-10-12 08:19:03+00:00 UTC
+- store routes in arrays, not hashes, so that they can be defined in order
+- add example2.pl
+
+0.004     2014-10-12 06:00:25+00:00 UTC
+- change 'delete' to 'del' since 'delete' is already a perl builtin function
+- added support for multiple workers (default 5) and timeout (default 5 seconds)
+- add "Server: limper/$Limper::VERSION" to response
+- proper HEAD support
+- dist.ini improvements and POD fix (thanks, garu!)
+- remove dump_request(), and hence dep on Data::Dumper, so now this fatpacks nicely
+- replaced Test::HTTP with the thing Limper was originally written to test
+
+0.003     2014-09-21 03:37:31+00:00 UTC
+- skip 002_limper.t if Test::HTTP not installed
+- POD updates
+
+0.002     2014-09-17 06:44:00+00:00 UTC
+- silly error in POD
+
+0.001     2014-09-17 06:36:36+00:00 UTC

@@ -1,0 +1,49 @@
+NAME
+    Locale::Maketext::Extract::Plugin::Xslate - Xslate format parser
+
+SYNOPSIS
+      use Locale::Maketext::Extract;
+      use Locale::Maketext::Extract::Plugin::Xslate;
+
+      my $ext = Locale::Maketext::Extract->new(
+          plugins => {
+              xslate => {
+                  syntax     => 'TTerse',
+                  extensions => ['tt', 'html'],
+              },
+          },
+          warnings => 1,
+          verbose  => 1,
+      );
+      $ext->extract_file('tmpl/index.tt');
+      $ext->compile(1);
+      $ext->write_po('messages.po');
+
+DESCRIPTION
+    Extracts strings to localise from Text::Xslate templates.
+
+    THIS IS A DEVELOPMENT RELEASE. API MAY CHANGE WITHOUT NOTICE.
+
+VALID FORMATS
+    Valid formats are:
+
+    [% l('string') %]
+    [% l('string %1', args[, ...]) %]
+    [% IF l('string') = 'FOO' %]
+
+KNOWN FILE types
+    .tt
+    .html
+
+AUTHOR
+    Kazuhiro Osawa <yappo {@} shibuya {dot} pl>
+
+SEE ALSO
+    Text::Xslate, Locale::Maketext::Extract
+
+LICENSE
+    Copyright (C) Kazuhiro Osawa
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

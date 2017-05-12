@@ -1,0 +1,10 @@
+Build.PL
+lib/Locale/CLDR/Locales/Yo.pm
+lib/Locale/CLDR/Locales/Yo/Any.pm
+lib/Locale/CLDR/Locales/Yo/Any/Bj.pm
+lib/Locale/CLDR/Locales/Yo/Any/Ng.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+META.yml
+META.json

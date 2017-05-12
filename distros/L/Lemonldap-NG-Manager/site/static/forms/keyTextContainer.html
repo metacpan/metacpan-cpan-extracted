@@ -1,0 +1,31 @@
+<!--
+ This form is for hash container with readonly names
+ Keys like virtual host hostname uses hashkey.html
+-->
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr><th width="40%" trspan="keys"></th><th width="40%" trspan="values"></th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="s in currentNode.nodes">
+        <td><input class="form-control" ng-model="s.title"/></td>
+        <td><input id-"hv-{{s.title}}" class="form-control" ng-model="s.data"/></td>
+        <td>
+          <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"/>
+          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newEntry',action:'newHashEntry'})"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "title": "newEntry",
+  "action": "newHashEntry",
+  "icon": "plus-sign"
+}]
+</script>

@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+# Copyright (c) 2014-2017 Sullivan Beck.  All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+###############################################################################
+###############################################################################
+# This script loads the data from one of the data modules and writes it out
+# in a simple text form.
+
+require 5.000000;
+use warnings;
+use strict;
+
+use lib "./lib";
+
+# Takes a single argument:  Locale::Codes::Country_Codes
+our $mod = shift;
+
+############################################################################
+# MAIN PROGRAM
+############################################################################
+
+eval "require $mod";
+my $type  = ( keys %Locale::Codes::Data )[0];
+my %data  = %{ $Locale::Codes::Data{$type} };
+
+my @id    = keys %{ $data{'id2names'} };
+@id       = sort { $data{'id2names'}{$a}[0] cmp $data{'id2names'}{$b}[0] } @id;
+
+print "NAMES\n";
+foreach my $id (@id) {
+   my @names = sort @{ $data{'id2names'}{$id} };
+   my $ind   = '';
+   foreach my $name (@names) {
+      print "$ind$name\n";
+      $ind = '   ';
+   }
+}
+
+my @sets = sort keys %{ $data{'code2id'} };
+foreach my $set (@sets) {
+   print "SET: $set\n";
+   foreach my $code (sort keys %{ $data{'code2id'}{$set} }) {
+      my ($id,$subid) = @{ $data{'code2id'}{$set}{$code} };
+      my $name        = $data{'id2names'}{$id}[$subid];
+      print "$code\n";
+      print "   $name\n";
+   }
+}
+
+1;
+
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

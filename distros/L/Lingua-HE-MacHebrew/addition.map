@@ -1,0 +1,15 @@
+#This .map file derived from the following table:
+#
+# http://www.unicode.org/Public/MAPPINGS/VENDORS/APPLE/HEBREW.TXT
+#
+# Map (external version) from Mac OS Hebrew character set
+# to Unicode 2.1 and later (version: c02 2005-Apr-05)
+#
+# http://www.unicode.org/Public/MAPPINGS/VENDORS/APPLE/CORPCHAR.TXT
+#
+# Registry (external version) of Apple use of Unicode corporate-zone
+# characters (version: c03 2005-Apr-04)
+#
+0x81	0xFB1F	# HEBREW LIGATURE YIDDISH YOD YOD PATAH
+0xC0	0xF89A	# Hebrew ligature lamed holam
+0xDE	0xF89F	# HEBREW POINT QAMATS, alternate form "qamats qatan"

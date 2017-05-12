@@ -1,0 +1,6 @@
+Revision history for Perl extension Lingua::ES::Silabas.
+
+0.01  Wed Jun 19 18:01:43 2002
+	- original version; created by h2xs 1.21 with options
+		-X -A -n Lingua::ES::Silabas
+

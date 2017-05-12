@@ -1,0 +1,61 @@
+=encoding utf8
+=head1 NAME
+
+Lingua::ZH::Jieba::KeywordExtractor - Keyword extractor
+
+=head1 SYNOPSIS
+
+    use Lingua::ZH::Jieba;
+
+    binmode STDOUT, ":utf8";
+    
+    my $jieba = Lingua::ZH::Jieba->new();
+
+    my $extractor = $jieba->extractor();
+    my $word_score = $extractor->extract(
+        "我是拖拉机学院手扶拖拉机专业的。不用多久，我就会升职加薪，当上CEO，走上人生巅峰。",
+        5
+    );
+    for my $pair (@$word_scores) {
+        my ($word, $score) = @$pair;
+        printf "%s:%.3f\n", $word, $score;
+    }
+    # CEO:11.739
+    # 升职:10.856
+    # 加薪:10.643
+    # 手扶拖拉机:10.009
+    # 巅峰:9.494
+
+=head1 DESCRIPTION
+
+This module is for keyword extraction.
+
+=head1 METHODS
+
+=head2 extract
+
+Extract C<$top_n> keywords from C<$sentence>.
+
+    my $word_scores = $jieba->tag($sentence, $top_n);
+    for my $pair (@$word_scores) {
+        my ($word, $score) = @$pair;
+        ...
+    }
+
+=head1 SEE ALSO
+
+L<Lingua::ZH::Jieba>
+
+=head1 AUTHORS
+
+Stephan Loyd <stephanloyd9@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+CppJieba is copyright by YanYi Wu under the MIT license. Visit
+L<https://yanyiwu.mit-license.org/> for a copy of the license.
+
+The Perl extension of CppJieba is copyright (c) 2017 by Stephan Loyd.
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+

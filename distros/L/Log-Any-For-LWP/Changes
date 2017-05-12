@@ -1,0 +1,39 @@
+Revision history for Log-Any-For-LWP
+
+0.06    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.05     2013-04-10 (SHARYANTO)
+
+         - Pass -decode_response_body to LWP::UserAgent::Patch::LogResponse.
+
+
+0.04     2013-04-10 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Split -log_request config into -log_request_header (default 1) and
+           -log_request_body (default 0).
+
+         [ENHANCEMENTS]
+
+         - Use LWP::UserAgent::Patch::LogRequestContent.
+
+
+0.03     2012-08-23 (SHARYANTO)
+
+         - No functional changes. Update patch module names.
+
+
+0.02     2012-07-17 (SHARYANTO)
+
+         - No functional changes. Fix example in Synopsis.
+
+
+0.01     2012-07-17 (SHARYANTO)
+
+         - First release.

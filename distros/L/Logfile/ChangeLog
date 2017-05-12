@@ -1,0 +1,114 @@
+Mon Jan 20 10:08:15 MET 1997   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 15:
+
+	Changed code for determining if a date parser is available.
+
+	-w fix by Hugo van der Sanden.
+
+	Apacke.pm does not separate date and hour in separate fields.
+
+Tue Jun  4 16:38:03 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 13:
+
+	Added Apache and NCSA stuff provided by dougm@osf.org (Doug
+	MacEachern)
+
+	Now pipes a filenames do work. Eg 
+
+                "File => 'head -200 foo.log|'" 
+
+        is ok.
+
+	Support for the WN http server.
+
+Thu May 23 16:20:26 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 12:
+
+	Added support for Wn.
+	Added $Logfile::MAXWIDTH.
+
+Tue Apr  2 10:28:00 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 11:
+
+	Fixed typos.
+
+	Added cern error logging.
+
+	Added multidimensional indexes.
+
+Mon Apr  1 11:37:38 MET DST 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 8:
+
+	Added/Modified description for Filed parameter for report().
+	More flexible report generation. Fields to list are now
+	completely configurable.
+
+
+Wed Mar 27 17:07:43 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 7:
+
+	Added List and Reverse option for Logfile::Base::report.
+	Updated manual.
+
+Wed Mar 27 15:42:22 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 6:
+
+	Renamed Tools::Logfile to Logfile.
+
+Wed Mar 27 12:10:30 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 5:
+
+	Added support fro Tom Christiansens GetDate.
+
+Tue Mar 26 16:17:53 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 4:
+
+	Removed String.pm.foo. Code now is in Base.pm.
+Makefile.PL
+	Removed the linking/unlinking of lib/Time/String.pm.
+Base.pm
+	Added Time/String.pm in data section.
+
+Tue Mar 26 15:57:05 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 3:
+
+Logfile
+	now can take advantage of the ParseDate module by David Muir
+	Sharnoff.
+
+
+Makefile.PL
+	Contains now some magic to use Time::ParseDate or
+	Time::String.  Time/String will only be installed if necessary
+	== Time::ParseDat not available
+
+Tue Mar 26 14:52:04 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 2:
+
+	Renamed module to Logfile and Logfile.pm to
+	Logfile/Base.pm as proposed by Tim Bunce 
+	Splited pod from former Logfile.pm
+
+Mon Mar 25 12:20:08 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+Description patch 1:
+
+First public release.
+
+
+Revision history for Perl extension Logfile.
+
+0.01  Sat Mar 23 16:47:27 1996
+	- original version; created by h2xs 1.13
+

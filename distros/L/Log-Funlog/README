@@ -1,0 +1,128 @@
+$Header: /var/cvs/sources/Funlog/README,v 1.16 2005/01/25 22:33:14 gab Exp $
+vim600: set textwidth=80:
+
+Log::Funlog - Log with fun!
+
+Gab
+korsani free fr
+
+ ,+---------------------------------- -  -   -    -     -
+( | Description
+ `+---------------------------------- -  -   -    -     -
+
+Easy to use and funny log module :P
+
+I tried to make it fast and convenient. That mean that there is as few as
+possible mandatory option when initializing the module (actually, there is only
+one :) and it is REALLY easy to use.
+No headache to choose wether or not put this option, and you don't screw your
+brain trying to understand what this bloody option do. All is simple (I hope :P)
+
+ ,+---------------------------------- -  -   -    -     -
+( | Features:
+ `+---------------------------------- -  -   -    -     -
+
+- Log level (verbosity, as much as you want)
+- Logging to stderr or file (as you want)
+- Print stack of calling subs (first 'n' calls, last 'n' calls, all calls) (if
+  you want)
+- (Quite) customizable prefix
+- Quite fast
+- Fun included (if you want! )
+
+Feel free to modify this module to your convenience.
+
+
+ ,+---------------------------------- -  -   -    -     -
+( | Install
+ `+---------------------------------- -  -   -    -     -
+
+perl Makefile.PL
+make
+(make test)
+sudo make install
+
+Note: you can perl Makefile.PL INSTALLDIRS=vendor if you want to make the module
+not dependant of your perl version.
+I made a 'vendor' install by default, but it seems that not all perl distros can
+install as 'vendor'...
+
+ ,+---------------------------------- -  -   -    -     -
+( | Use
+ `+---------------------------------- -  -   -    -     -
+   , Simple way:
+    `------------------------------
+No header, log to stderr, no fun, just log :)
+If you have just one thing to remember, it is this form.
+
+	use Log::Funlog;
+	*Log=Log::Funlog->new(
+		verbose => '3/5'	#verbose 3 out of 5	
+	);
+	Log(1,"plop level 1");			#this will be printed	
+	Log(2,"plop level 2");			#this too
+	Log(3,"plop level 3");			#this again
+	Log(4,"plop level 4");			#but not that, as 4 > 3
+	Log(5,"plop level 5");			#neither that
+	Log(6,"plop level 6");			#neither that, even if 6 > 5
+
+will output:
+	plop level 1
+	plop level 2
+	plop level 3
+
+As you can see, defaults are sensible!
+
+
+   , Complicated way (example):
+    `------------------------------
+
+	use Log::Funlog qw( error );
+	*Log=Log::Funlog->new(
+		file => "zou.log",			#name of the file
+		verbose => '3/5',			#verbose 3 out of 5
+		daemon => 1,				#I am a daemon, so log to the file ("zou.log")
+		header => "%dd %pp %l[]l %s{}s ",		#header format
+		cosmetic => 'x', 					#crosses for the level
+		fun => 10,						#10% of fun (que je passe autour de moi)
+		colors => '1',						#Colors, default ones
+		error_header => 'Groumpf... ',		#Header for true errors
+		caller => '1');				#and I want the name of the sub that is logging
+
+	sub sub_plop {
+		$i=shift;
+		Log($i%5,"plop",$i);
+	}
+	for(my $i=1;$i<100;$i++) {
+		sub_plop($i);
+	}
+	error("Oops!");
+
+Will output something like that to zou.log:
+
+Wed Dec 29 16:51:58 2004 plop.pl [x    ]  plop1
+Wed Dec 29 16:51:58 2004 plop.pl [xx   ]  plop2
+Wed Dec 29 16:51:58 2004 plop.pl [xxx  ]  plop3
+Wed Dec 29 16:51:58 2004 plop.pl [x    ]  plop6
+Wed Dec 29 16:51:58 2004 plop.pl [xx   ]  plop7
+Wed Dec 29 16:51:58 2004 plop.pl [xxx  ]  plop8
+Wed Dec 29 16:51:58 2004 plop.pl [x    ]  plop11
+Wed Dec 29 16:51:58 2004 plop.pl [xx   ]  plop12
+Wed Dec 29 16:51:58 2004 plop.pl [xxx  ]  plop13
+Wed Dec 29 16:51:58 2004 plop.pl [x    ]  plop16
+Wed Dec 29 16:51:58 2004 plop.pl [xx   ]  plop17
+Wed Dec 29 16:51:58 2004 plop.pl [xxx  ]  plop18
+Wed Dec 29 16:51:58 2004 plop.pl [x    ]  plop21
+Wed Dec 29 16:51:58 2004 plop.pl [xx   ]  plop22
+Wed Dec 29 16:51:58 2004 plop.pl [xxx  ]  plop23
+Wed Dec 29 16:51:58 2004 plop.pl [x    ]  plop26
+Wed Dec 29 16:51:58 2004 plop.pl [xx   ]  plop27
+Fait froid, dans ce process, non?
+Wed Dec 29 16:51:58 2004 plop.pl [xxx  ]  plop28
+Wed Dec 29 16:51:58 2004 plop.pl [x    ]  plop31
+------------------ (snip) -------------------------
+
+------------------ (snip) -------------------------
+Wed Dec 29 16:51:58 2004 plop.pl [xx   ]  plop97
+Wed Dec 29 16:51:58 2004 plop.pl [xxx  ]  plop98
+Wed Dec 29 16:51:58 2004 plop.pl [x    ]  Groumpf... Oops!

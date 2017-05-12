@@ -1,0 +1,143 @@
+=head1 NAME
+
+Leyland::Manual::Extending - How to extend Leyland
+
+=head1 EXTENDING THE CONTEXT CLASS
+
+The context class (L<Leyland::Context>) constitutes the most of L<Leyland>'s
+API provided for your applications. It follows a request during its entire
+lifetime. It is very likely that you'd like that class to have attributes
+and methods which are specific to your application, such as an attribute
+that holds a database connection object for example.
+
+If so needed, Leyland gives you the ability to easily extend the base
+context class. Since it is L<Moo> based, you can create a class that
+C<extends> it, and tell Leyland to use it as the application's context class.
+
+For example, our application can have the following class:
+
+	package MyApp::Context;
+
+	use Moo;
+	use namespace::clean;
+
+	extends 'Leyland::Context';
+
+	has 'db' => (is => 'ro', writer => '_set_db');
+
+	around 'loc' => sub {
+		my ($orig, $self) = (shift, shift);
+
+		# change the behavior of the loc() method
+	};
+
+	1;
+
+And we can tell Leyland to use it as the context class when initiating an
+instance of our class in C<app.psgi>:
+
+	my $myapp = MyApp->new(context_class => 'MyApp::Context');
+
+But how do you populate the C<db> attribute we see in the above example?
+Most likely with the root controller's C<auto()> method:
+
+	# MyApp/Controller/Root.pm
+	sub auto {
+		my ($self, $c) = @_;
+
+		$c->_set_db(SomeDatabaseClass->new);
+	}
+
+Leyland also allows classes that extend C<Leyland::Context> to define a method
+called C<finalize>. This method is called right before a response is sent
+to the client (but only before successful responses, not exceptions),
+after serialization (if performed). The method receives a reference to
+the returned output (which will be scalar). The reason a reference is passed to
+the method is to allow it to modify it. A simple example would be:
+
+	# in MyApp/Context.pm
+	sub finalize {
+		my ($c, $ret) = @_;
+
+		$$ret =~ s/John/Michael/g;
+	}
+
+Of course, be careful if you decide to modify any of L<Leyland::Context>'s
+methods so as not to break its behavior.
+
+=head1 EXTENDING LEYLAND
+
+If you find that Leyland lacks support for your preferred CPAN modules,
+such as template engines, you are more than welcome
+to create these classes by yourself. View classes are expected to consume
+L<Leyland::View>, which describes how view classes should be created.
+Look at L<Leyland::View::Tenjin> for an example.
+
+If you want to go even further, since Leyland is entirely Moo(se) based,
+and if you're crazy enough, you can use Moo(se) tricks and modifications to
+make Leyland behave the way you want it, and maybe even create your own
+application framework on top of Leyland.
+
+=head1 HELPING WITH DEVELOPMENT
+
+You are more than welcome to help with the development of Leyland, even
+by simply submitting suggestions and bug reports. Refer to L<Leyland/"BUGS">
+and L<Leyland/"SUPPORT"> for more information on submitting bug reports.
+Leyland development is version controlled via GitHub, at L<http://github.com/ido50/Leyland>.
+If you're also using GitHub, feel free to fork Leyland, send me pull
+requests, etc.
+
+=head1 WHAT'S NEXT?
+
+Refer to L<Leyland::Manual::FAQ> for frequently asked questions and
+their answers, or L<return to the table of contents|Leyland::Manual/"TABLE OF CONTENTS">.
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Leyland at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc Leyland::Manual::Extending
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Leyland>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Leyland>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Leyland/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

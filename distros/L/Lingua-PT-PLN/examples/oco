@@ -1,0 +1,31 @@
+#!/usr/bin/perl 
+
+use Lingua::PT::PLN;
+use locale;
+
+my $filename = shift;
+
+# cria um ficheiro ordenado por ocorrências
+oco({
+     output => "$filename.out1",
+     num    => 1
+    },
+    $filename);
+
+# cria um ficheiro ordenado por texto
+oco({
+     output => "$filename.out2",
+     alpha  => 1
+    },
+    $filename);
+
+# cria um ficheiro ordenado por ocorrências
+oco({
+     output => "$filename.out3",
+     log    => 1,
+     num    => 1
+    },
+    $filename);
+# imprime a lista de palavras ordenadas
+my %oc = (oco({}, $filename));
+print join("/",(sort keys %oc));

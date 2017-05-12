@@ -1,0 +1,57 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <div class="table-container">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th trspan="keyname"></th>
+          <th trspan="name"></th>
+          <th trspan="friendlyName"></th>
+          <th trspan="mandatory"></th>
+          <th trspan="format"></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="s in currentNode.nodes">
+          <td><input class="form-control" ng-model="s.title"/></td>
+          <td><input class="form-control" ng-model="s.data[1]"/></td>
+          <td><input class="form-control" ng-model="s.data[3]"/></td>
+          <td>
+            <div class="input-group-solid">
+              <label class="radio-inline">
+                <input id="samOn/{{$index}}" type="radio" value="1" ng-model="s.data[0]"/>
+                <span trspan="on"></span>
+              </label>
+              <label class="radio-inline">
+                <input id="samOff/{{$index}}" type="radio" value="0" ng-model="s.data[0]" ng-checked="s.data[0]!==1&&s.data[0]!=='1'"/>
+                <span trspan="off"></span>
+              </label>
+            </div>
+          </td>
+          <td>
+            <select class="form-control" id="safselect" ng-model="s.data[2]">
+             <option value="" ng-selected="s.data[2]==null||s.data[2]==''"></option>
+             <option value="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified">Unspecified</option>
+             <option value="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">URI</option>
+             <option value="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">Basic</option>
+            </select>
+          </td>
+          <td>
+            <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"/>
+            <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'addSamlAttribute'})"/>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script type="text/menu">
+[{
+  "title": "addSamlAttribute",
+  "icon": "plus-sign"
+}]
+</script>

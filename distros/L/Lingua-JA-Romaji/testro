@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+use Lingua::JA::Romaji qw(&romajitokana &kanatoromaji);
+my $out;
+my $back;
+while (<STDIN>){
+  chomp();
+  if (/[A-Z]/){
+      $out = &romajitokana($_,"kata");
+  } else {
+      $out = &romajitokana($_);
+  }
+  $back = &kanatoromaji($out);
+  print "$out\n";
+  print "$back\n";
+}

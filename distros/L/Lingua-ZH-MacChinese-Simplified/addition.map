@@ -1,0 +1,7 @@
+#This .map file derived from the following table:
+#
+# http://www.unicode.org/Public/MAPPINGS/VENDORS/APPLE/CHINSIMP.TXT
+# Map (external version) from Mac OS Chinese Simplified encoding
+# to Unicode 3.0 and later (version: c02 2005-Apr-04)
+#
+0xA8BF	0x006E+0x0300	# LATIN SMALL LETTER N + COMBINING GRAVE ACCENT

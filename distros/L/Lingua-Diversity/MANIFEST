@@ -1,0 +1,27 @@
+Build.PL
+Changes
+lib/Lingua/Diversity.pm
+lib/Lingua/Diversity/Internals.pm
+lib/Lingua/Diversity/MTLD.pm
+lib/Lingua/Diversity/Result.pm
+lib/Lingua/Diversity/SamplingScheme.pm
+lib/Lingua/Diversity/Subtype.pm
+lib/Lingua/Diversity/Variety.pm
+lib/Lingua/Diversity/VOCD.pm
+lib/Lingua/Diversity/Utils.pm
+lib/Lingua/Diversity/X.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00-Lingua-Diversity.t
+t/01-Lingua-Diversity-Result.t
+t/02-Lingua-Diversity-SamplingScheme.t
+t/03-Lingua-Diversity-Internals.t
+t/04-Lingua-Diversity-Utils.t
+t/05-Lingua-Diversity-Variety.t
+t/06-Lingua-Diversity-MTLD.t
+t/07-Lingua-Diversity-VOCD.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL

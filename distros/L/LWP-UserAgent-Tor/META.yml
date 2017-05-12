@@ -1,0 +1,35 @@
+---
+abstract: 'rotate your ips'
+author:
+  - 'spebern <bernhard@specht.net>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-UserAgent-Tor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::MMagic: '0'
+  File::Which: '0'
+  IO::Socket::INET: '0'
+  LWP::Protocol::socks: '0'
+  LWP::UserAgent: '0'
+  Net::EmptyPort: '0'
+  Path::Tiny: '0'
+  Proc::Background: '0'
+  Test::Exception: '0'
+  perl: '5.01'
+version: '0.06'
+x_contributors:
+  - 'Bernhard Specht <bernhard@specht.net>'
+  - Chris
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,28 @@
+#########################################################################
+#
+# $Id: selects.txt,v 1.1 2006/09/10 18:44:29 pkaluski Exp $
+# $Name: Stable_0_16 $
+#
+# $Log: selects.txt,v $
+# Revision 1.1  2006/09/10 18:44:29  pkaluski
+# Added new test for chunking. Modified all tests to accommodate new parameters layout.
+#
+# Revision 1.1  2006/01/14 12:43:07  pkaluski
+# New tool design
+#
+#
+#
+#########################################################################
+
+name: authors 
+select: select * from authors
+%%
+name: editors 
+select: select * from editors where --ed_fname-- 
+%%
+name: roysched
+select: select * from roysched where --title_id--
+%%
+name: titleauthors
+select: select * from titleauthors where --title_id-- 
+%%

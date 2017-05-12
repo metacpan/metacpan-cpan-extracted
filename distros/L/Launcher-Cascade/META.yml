@@ -1,0 +1,33 @@
+---
+name: Launcher-Cascade
+version: 0.02
+author:
+  - Cédric Bouvier <cbouvi@cpan.org>
+abstract: a framework for launching processes that depend on one another
+license: perl
+build_requires:
+  Log::Log4perl: 0
+  Test::More: 0
+provides:
+  Launcher::Cascade:
+    file: lib/Launcher/Cascade.pm
+    version: 0.02
+  Launcher::Cascade::Base:
+    file: lib/Launcher/Cascade/Base.pm
+  Launcher::Cascade::Container:
+    file: lib/Launcher/Cascade/Container.pm
+  Launcher::Cascade::FileReader:
+    file: lib/Launcher/Cascade/FileReader.pm
+  Launcher::Cascade::FileReader::Seekable:
+    file: lib/Launcher/Cascade/FileReader/Seekable.pm
+  Launcher::Cascade::ListOfStrings:
+    file: lib/Launcher/Cascade/ListOfStrings.pm
+  Launcher::Cascade::ListOfStrings::Context:
+    file: lib/Launcher/Cascade/ListOfStrings/Context.pm
+  Launcher::Cascade::ListOfStrings::Errors:
+    file: lib/Launcher/Cascade/ListOfStrings/Errors.pm
+  Launcher::Cascade::Printable:
+    file: lib/Launcher/Cascade/Printable.pm
+  Launcher::Cascade::Simple:
+    file: lib/Launcher/Cascade/Simple.pm
+generated_by: Module::Build version 0.26

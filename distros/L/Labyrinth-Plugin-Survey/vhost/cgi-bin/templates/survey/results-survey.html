@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Language" content="en" />
+
+	<title>[% yapc_name %] Survey Results - YAPC Conference Surveys</title>
+	<link rel="icon" type="image/png" href="/images/favicon.png" />
+
+	<!-- CSS stylesheets -->
+	<link rel="stylesheet"    type="text/css"  href="/css/style.css" />
+	<link rel="stylesheet"	  type="text/css"  href="/css/lightbox.css" media="screen" />
+
+	<script type="text/javascript" src="/js/prototype.js"></script>
+	<script type="text/javascript" src="/js/scriptaculous.js?load=effects,builder"></script>
+	<script type="text/javascript" src="/js/lightbox.js"></script>
+
+<script type="text/javascript">
+<!--
+
+function toggleLayer( whichLayer )
+{
+  var elem, vis;
+  if( document.getElementById ) // this is the way the standards work
+    elem = document.getElementById( whichLayer );
+  else if( document.all ) // this is the way old msie versions work
+    elem = document.all[whichLayer];
+  else if( document.layers ) // this is the way nn4 works
+    elem = document.layers[whichLayer];
+  vis = elem.style;
+  // if the style.display value is blank we try to figure it out here
+  if(vis.display==''&&elem.offsetWidth!=undefined&&elem.offsetHeight!=undefined)
+    vis.display = (elem.offsetWidth!=0&&elem.offsetHeight!=0)?'block':'none';
+  vis.display = (vis.display==''||vis.display=='block')?'none':'block';
+}
+
+-->
+</script>
+
+<!--
+
+	Original layout design by <a href="http://www.animatedbanner.com/">AnimatedBanner.com</a>.
+	Additional modifications by Barbie for Miss Barbell Productions.
+
+-->
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-1826389-22");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+</head>
+<body>
+<div id="container">
+
+  <div id="header">
+    <div class="quotes1">
+    <h1><a href="/" title="Home">YAPC Conference Surveys</a></h1>
+    <h2>[% yapc_name %] Survey Results</h2>
+    </div>
+  </div>
+
+	<div id="content">
+
+		<div class="corona">
+			<strong class="top"><strong class="b1"></strong><strong class="b2"></strong><strong class="b3"></strong><strong class="b4"></strong><strong class="b5"></strong></strong>
+
+			<div class="float-right">
+				<h2 class="noprint">Contents:</h2>
+				<ul>
+[% sect = 0 %]
+[% FOREACH section = survey.sections %]
+[% sect = sect + 1 %]
+[% IF section.show %]
+				<li><span class="black"><a href="#sect[% sect %]" title="jump to Section [% sect %]">[% section.label %]</a></span></li>
+[% END %]
+[% END %]
+				</ul>
+				<div class="linkcent">
+				<a href="/index.html" title="Home">Return to Surveys Listings</a>
+				</div>
+			</div>
+
+			<div class="boxcontent">
+
+<h1>[% yapc_name %] - Survey Results</h1>
+
+<p>The following survey results are a simple presentation of the raw data. 
+No attempt has been made to analyse the data and compare with previous
+years. See forthcoming PDFs for more in depth analysis.</p> 
+
+<p><strong>Click on pie charts to view larger image version.</strong></p>
+
+[% sect = 0 -%]
+[% FOREACH section = survey.sections -%]
+[% sect = sect + 1 -%]
+[% IF section.show %]
+[% IF section.label != 'Talk Ratings' AND section.label != 'Feedback' -%]
+<a name="sect[% sect %]" ></a>
+<h2>[% section.label %]</h2>
+
+[% IF section.preamble %]<p>[% section.preamble %]</p>[% END -%]
+[% FOREACH question = section.questions -%]
+[% IF question.status != 'hidden' && question.show -%]
+<h3>[% question.label %]</h3>
+
+[% IF question.multipart -%]
+[% question.multijoin = 1 -%]
+[% FOREACH q = question.multipart -%]
+[% q.label = question.label -%]
+[% INCLUDE "survey/results-survey-question.html" %]
+[% END -%]
+
+[% IF question.multijoin == 2 %]</table>[% END -%]
+[% question.multijoin = 0 -%]
+
+[% ELSE -%]
+[% q = question -%]
+[% INCLUDE "survey/results-survey-question.html" -%]
+
+[% END -%]
+[% END -%]
+[% END -%]
+[% IF section.footnote %]<p>[% section.footnote %]</p>[% END -%]
+
+[% END -%]
+[% END -%]
+[% END -%]
+
+      </div>
+      <strong class="bottom"><strong class="b5"></strong><strong class="b4"></strong><strong class="b3"></strong><strong class="b2"></strong><strong class="b1"></strong></strong>
+    </div>
+  </div>
+
+  <div class="botsmall"></div>
+
+  <div id="copyright">
+    <a href="http://creativecommons.org/licenses/by-sa/3.0" title="Creative Commons Attribution Share Alike"><img src="images/cc-by-sa.png" alt="Creative Commons Attribution Share Alike" align="left" /></a>
+    <p>Except where explicitly stated within the individual documents, all survey data and documents are considered copyright of The Perl Foundation and may be used under a <a href="http://creativecommons.org/licenses/by-sa/3.0" title="Creative Commons Attribution Share Alike">Creative Commons Attribution Share Alike</a> license.</p>
+    <p>Site hosted by <a href="http://birmingham.pm.org" title="Birmingham Perl Mongers">Birmingham Perl Mongers</a>. Data copyright 2006-2014 <a href="http://www.perlfoundation.org" title="The Perl Foundation">The Perl Foundation</a></p>
+  </div>
+
+</div>
+</body>
+</html>

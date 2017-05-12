@@ -1,0 +1,6 @@
+Changes
+lib/Locale/Framework/GettextXML.pm
+Makefile.PL
+MANIFEST
+README
+t/2.t

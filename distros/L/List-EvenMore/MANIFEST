@@ -1,0 +1,8 @@
+CHANGELOG
+lib/List/EvenMoreUtils.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml                                 Module meta-data (added by MakeMaker)
+t/do_sublists.t
+t/partial_ordering.t
+t/shuffler.t

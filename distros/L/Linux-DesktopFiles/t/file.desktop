@@ -1,0 +1,19 @@
+# This is a test desktop file
+
+[Desktop Entry]
+Encoding=UTF-8
+Name=The right name
+GenericName=Also this name is right
+Comment=This is a test!
+Comment[ro]=Acesta este un test!
+Type=Application
+Categories=GTK;Utility;Archiving;Compression;
+Terminal=true
+Icon=icon_name
+Exec=some_command -z -9 %f
+
+[Blah Blah]
+Name=ERROR
+Exec=wrong
+Terminal=false
+Categories=AudioVideo;

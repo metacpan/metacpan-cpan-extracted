@@ -1,0 +1,45 @@
+NAME
+    Log::Dispatch::Prowl - Object for logging to the iPhone
+
+VERSION
+    version 1.000
+
+SYNOPSIS
+      use Log::Dispatch;
+
+      my $log =
+          Log::Dispatch->new
+              ( outputs =>
+                [ 'Prowl' =>
+                      { min_level => 'debug',
+                        name    => 'MyApp',
+                        apikey => 'yourapicodehere',
+                      },
+                ],
+              );
+
+      $log->alert("I'm searching the city for sci-fi wasabi");
+
+DESCRIPTION
+    This module provides an object for logging directly to your iPhone using
+    push notifications and the iPhone App Prowl (<http://prowl.weks.net/>).
+
+CONSTRUCTOR
+    The constructor takes the following parameters in addition to the
+    standard parameters documented in Log::Dispatch::Output:
+
+    *   name (required)
+
+        This is the name which appears on the iPhone as application name.
+
+    *   apikey (required)
+
+        Set this to the API key you can get from the Settings page on
+        <http://prowl.weks.net/>.
+
+SEE ALSO
+    WebService::Prowl
+
+AUTHOR
+    Moritz Onken, <onken@netcubed.de>
+

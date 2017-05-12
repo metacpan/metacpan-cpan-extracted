@@ -1,0 +1,139 @@
+This file documents the revision history for Perl distribution
+`Lingua-EO-Orthography`.
+
+
+VERSION HISTORY
+===============
+
+0.04 : Released on 2013-12-25 (JST)
+-----------------------------------
+
+Codes have no changes.
+
+### Bug fixes
+
+#### Packaging
+
+-   The package no longer includes test modules.
+    They caused a failure of the tests.
+    It is concerned with RT #89913 (by Poul Henning Sørensen), #91051
+    (by Slaven Rezić) and #91581 (by Caleb Cushing).
+    Thank you for your contributions.
+
+
+0.03 : Released on 2010-03-20 (JST)
+-----------------------------------
+
+Codes have no changes.
+
+### Bug fixes
+
+#### Packaging
+
+-   Remove superfluous dependency `mro` which related to `Test::Class`
+    (`MRO::Compat`).
+    This problem is concerned with RT #55482.
+
+### Refactoring
+
+#### Packaging
+
+-   Refactor `Makefile.PL`.
+
+
+0.02 : Released on 2010-03-19 (JST)
+-----------------------------------
+
+Codes have no changes.
+
+### Bug fixes
+
+#### Packaging
+
+-   Resolve RT #55482: Undeclared dependencies on test related modules.
+    Thanks to Andreas Koenig.
+-   Explicitly declare `author_tests` in `Makefile.PL`
+    (for including `Module::Install::AuthorTests`).
+-   Correct resources (repository and homepage).
+-   Disable `auto_install`.
+
+#### Documentation
+
+-   Correct POD syntax in `Lingua::EO::Orthography::EO` and
+    `Lingua::EO::Orthography::JA` (for properly index POD only files).
+
+
+0.01 : Released on 2010-03-09 (JST)
+-----------------------------------
+
+Bundle `Module::Install::AuthorTests` to the distribution.
+Codes have no changes.
+
+### Bug fixes
+
+#### Packaging
+
+-   Explicitly declare `author_tests` in `Makefile.PL`
+    (for including `Module::Install::AuthorTests`).
+-   Correct resources (repository and homepage).
+
+#### Documentation
+
+-   Correct POD syntax in `Lingua::EO::Orthography::EO` and
+    `Lingua::EO::Orthography::JA` (for properly index POD only files).
+
+
+0.00 : Released on 2010-03-08 (JST)
+-----------------------------------
+
+Initial release.
+
+
+META INFORMATION
+================
+
+Version notation
+----------------
+
+    V.vvrr_dd : Released on YYYY-MM-DD (Time Zone)
+
+### V  : Major version number
+
+-   Added ambitious features
+-   Changed in APIs
+    (older API will be keeped to compatibility for a some period)
+-   ...
+
+### vv : Minor version number (in major version)
+
+-   Added several features
+-   Improved any features
+-   Fixed bugs
+-   ...
+
+### rr : Revision number (in minor version, on demand)
+
+You would not need to update the distribution.
+
+-   Improved tests
+-   Updated documents
+-   ...
+
+### dd : Developer release number (in revision number, on demand)
+
+This is unstable version.
+Unless you are a developer, You will not be recommended to upgrade
+the distribution.
+
+-   Added experimental features
+-   Fixed bugs provisionally
+-   ...
+
+
+Document format
+---------------
+
+This `Changes` file was formatted in Markdown.
+
+    % perl -MText::Markdown -MFile::Slurp \
+      -e 'print (Text::Markdown->new->markdown(scalar read_file(q{Changes})));'

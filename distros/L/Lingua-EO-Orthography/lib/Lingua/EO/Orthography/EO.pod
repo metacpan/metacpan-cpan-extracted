@@ -1,0 +1,655 @@
+=encoding utf-8
+
+=head1 NAME / NOMO
+
+Lingua::EO::Orthography::EO - Konvertilo de ortografio/substituaĵo por Esperantaj signoj
+
+=head1 VERSIO
+
+Ĉi tiu dokumento priskribas
+L<Lingua::EO::Orthography|Lingua::EO::Orthography>
+de versio C<0.04>.
+
+=head2 Tradukaĵoj
+
+=over 4
+
+=item en: La Angla lingvo
+
+L<Lingua::EO::Orthography|Lingua::EO::Orthography>
+
+=item eo: Esperanto
+
+L<Lingua::EO::Orthography::EO|Lingua::EO::Orthography::EO>
+(Ĉi tiu dokumento)
+
+=item ja: La Japana lingvo
+
+L<Lingua::EO::Orthography::JA|Lingua::EO::Orthography::JA>
+
+=back
+
+=head1 SINOPTIKO
+
+    use utf8;
+    use Lingua::EO::Orthography;
+
+    my ($converter, $original, $converted);
+
+    # ortografias...
+    $converter = Lingua::EO::Orthography->new;
+    $original  = q(C^i-momente, la songha h'orajxo ^sprucigas aplauwdon.);
+    $converted = $converter->convert($original);
+
+    # substituas ... (X-sistemo)
+    $converter->sources([qw(orthography)]); # (akceptas multajn grafismojn)
+    $converter->target('postfix_x');
+        # estas la sama kiel super:
+        # $converter = Lingua::EO::Orthography->new(
+        #     sources => [qw(orthography)],
+        #     target  => 'postfix_x',
+        # );
+    $original  = q(Ĉi-momente, la sonĝa ĥoraĵo ŝprucigas aplaŭdon);
+    $converted = $converter->convert($original);
+
+=head1 EKSPLIKO
+
+6 signoj en la Esperanta alfabeto ne ekzistas en Askio (en: ASCII).
+Ilia signoj, kiuj havas supersignoj, estas ofte literumata
+en surogataj skribosistemoj historie,
+tio estas, de la epokoj de tipografio kaj tajpilo.
+Nuntempe, literumi ilin en ortografio ne estas nekutima
+de disvastigo de Unikodo (en: Unicode).
+Tamen, nun ankoraŭ estas multajn mediojn,
+kie enigi ilin kun klavaro esas malfacila,
+kaj oni povas manipuli malnovan dokumenton,
+kiu estas skribita en surogataj skribosistemoj.
+
+Ĉi tiu objektema modjulo provizas vin per konverto de iliaj grafismoj.
+
+=head2 Averto
+
+B<Ĉi tiu modjulo estas sur ellasaĵo de "beta", kaj la API
+(eo: interfaco por aplikaprogramado, en: Application Programming Interface)
+eble estas ŝanĝata.
+Via opinio estas bonvena.>
+
+=head2 Katalogo de grafismoj
+
+La sekvanta nomoj de grafismoj estas uzebla en
+L<new()|/new>, L<add_sources()|/add_sources>, kaj tiel plu.
+
+Mi etendos API en la estonteco, kaj vi povos adicii grafismojn alia ol ili.
+
+=over 4
+
+=item C<orthography>
+
+    Ĉ ĉ Ĝ ĝ Ĥ ĥ Ĵ ĵ Ŝ ŝ Ŭ ŭ
+
+    (\x{108} \x{109} \x{11C} \x{11D} \x{124} \x{125}
+     \x{134} \x{135} \x{15C} \x{15D} \x{16C} \x{16D})
+
+Ĝi estas la I<ortografio> de Esperanta alfabeto.
+La konvertilo manipulas literon kun supersigno, kiu ekzistas en Unikodo.
+La signara enkodigo estas UTF-8.
+
+Vi hodiaŭ devas uzi la ortografion krom se estas ia speciala motivo
+ĉar Unikodo sufiĉe disvastiĝas.
+Perl 5.8.1 aŭ pli malfrua ankaŭ manipulas ĝin ĝuste.
+
+Mi rekomendas ke vi manipulas UTF-8 flagata ĉenon en ĉie en la via programo kaj
+konvertas ĉenon nur kiam enigi de ekstero aŭ eligi al ekstero (laŭpete),
+por ĝuste labori funkciojn kiel C<length()>
+en la stato kiu enŝaltas eron de L<utf8|utf8>.
+Ĝi estas la sama kiel la principo de L<Encode|Encode>
+kaj L<tavolo de enigo kaj eligo por Perl|perlio>.
+
+=item C<zamenhof>
+
+    Ch ch Gh gh Hh hh Jh jh Sh sh U  u
+
+Ĝi estas surogata grafismo, kiu lokas C<h> kiel prefikso,
+tamen, ne lokas ĝin por C<u>.
+
+Ĝi estis proponata de D-ro Zamenhof, la patro de Esperanto,
+en I<Fundamento de Esperanto>
+kaj oni nomas ĝin I<Zamenhofa sistemo> (en: I<Zamenhof system>).
+Pro tio, oni ankaŭ nomas ĝin I<la dua ortografio>,
+sed ĝi ne estas tre uzata hodiaŭ.
+
+Ĝi havas problemon, ke ĉeno kiu ampleksas inter radikoj (kiel 'flug/haven/o')
+ŝajnas kiel surogata ĉeno en diversaj vortoj kiel 'flughaveno'.
+Ĉi tiu modjulo ne evitas tian problemon nuntempe.
+
+=item C<capital_zamenhof>
+
+    CH ch GH gh HH hh JH jh SH sh U  u
+
+Ĝi estas varianto de L<'capital_zamenhof' grafismo|/capital_zamenhof>.
+
+Ĝi lokas majusklan C<H> kiel prefikso de majusklan alfabeton.
+
+=item C<postfix_h>
+
+    Ch ch Gh gh Hh hh Jh jh Sh sh Uw uw
+
+Ĝi estas etendita grafismo de L<'capital_zamenhof' grafismo|/capital_zamenhof>.
+
+Ĝi lokas C<w> kiel prefikso de C<u>.
+
+Oni nomas ĝin I<H-sistemo> (en: I<H-system>).
+
+=item C<postfix_capital_h>
+
+    CH ch GH gh HH hh JH jh SH sh UW uw
+
+Ĝi estas varianto de L<'postfix_h' grafismo|/postfix_x>.
+
+Ĝi lokas majusklan C<H> aŭ C<W> kiel prefikso de majusklan alfabeton.
+
+=item C<postfix_x>
+
+    Cx cx Gx gx Hx hx Jx jx Sx sx Ux ux
+
+Ĝi estas surogata grafismo, kiu lokas C<x> kiel prefikso.
+
+Oni nomas ĝin I<X-sistemo> aŭ I<iksa sistemo> (en: X-system).
+
+Oni larĝe uzas ĝin kiel surogata grafismo,
+ĉar X ne ekzistas en la Esperanta alfabeto,
+kaj ne estas uzata ekskluzive por la afero de
+priskribi ne-Esperantan vorton kiel la originala lingvo.
+
+=item C<postfix_capital_x>
+
+    CX cx GX gx HX hx JX jx SX sx UX ux
+
+Ĝi estas varianto de L<'postfix_x' grafismo|/postfix_x>.
+
+Ĝi lokas majusklan C<X> kiel prefikso de majusklan alfabeton.
+
+=item C<postfix_caret>
+
+    C^ c^ G^ g^ H^ h^ J^ j^ S^ s^ U^ u^
+
+Ĝi estas surogata grafismo, kiu lokas cirkumfleksan signon C<^> kiel prefikso.
+
+Oni nomas ĝin I<ĉapelita sistemo> (en: caret system),
+ĉar cirkumfleksa signo havas la saman formon kiel cirkumflekso.
+
+Ĉi tiu modjulo nuntempe ne subtenas rimedon,
+kiu priskribas C<u~> kiel C<u^>.
+
+=item C<postfix_apostrophe>
+
+    C' c' G' g' H' h' J' j' S' s' U' u'
+
+Ĝi estas surogata grafismo, kiu lokas apostrofon C<'> kiel prefikso.
+
+=item C<prefix_caret>
+
+    ^C ^c ^G ^g ^H ^h ^J ^j ^S ^s ^U ^u
+
+Ĝi estas surogata grafismo, kiu lokas cirkumflekson C<^> kiel prefikso.
+
+=back
+
+=head2 Komparo kun Lingua::EO::Supersignoj
+
+Estas L<Lingua::EO::Supersignoj|Lingua::EO::Supersignoj> en CPAN.
+Ĝi provizas nin per ekvivalentaj funkcioj de ĉi tiu modjulo.
+
+Mi komparas ilin de sekvanta listo:
+
+ Vidpunktoj                 ::Supersignoj   ::Orthography               Noto
+ -------------------------- --------------- --------------------------- ----
+ Versio                     0.02            0.04
+ Povas konverti @lines      Jes             Ne                          *1
+ Havas alirilojn            Jes             Jes, kaj ĝi havas
+                                              utilecajn metodojn        *2
+ Povas ŝanĝi grafismon      Nur 'u'         Ne (intere de pesi)         *3
+ Povas manipuli             Ne              Ne (intere de pesi)         *4
+   'flughaveno'
+ Lingvo de API              eo: Esperanto   en: la Angla lingvo
+ Povas konverti kiel N:1    Ne              Jes                         *5
+ Rapideco                   Sata            Pli rapida ĉirkaŭ 400%      *6
+ Tujaj dependaĵoj           1 (0 en kerno)  6 (2 en kerno)              *7
+ Tutaj dependaĵoj           1 (0 en kerno)  15 (8 en kerno)             *7
+ Nombro de testa kazo       3               93                          *8
+ License                    Nekonata        Perl (Artistic aŭ GNU GPL)
+ Laste modifita en          Mar. 2003       Mar. 2010
+
+=over 4
+
+=item 1.
+
+Pro konverti C<@lines> de L<Lingua::EO::Orthography|Lingua::EO::Orthography>:
+
+    @converted_lines = map { $converter->convert($_) } @original_lines;
+
+=item 2.
+
+L<Lingua::EO::Orthography|Lingua::EO::Orthography> havas utilecajn metodojn,
+kiu estas L<all_sources()|/all_sources>, L<add_sources()|/add_sources> kaj
+L<remove_sources()|/remove_sources()>.
+
+=item 3.
+
+Mi planas fasoni la API de ĉi tiu funkciojn:
+
+    $converter = Lingua::EO::Orthography->new(
+        notations => {
+            postfix_asterisk => [qw(C* c* G* g* H* h* J* j* S* s* U* u*)],
+        },
+    );
+
+    $notations_ref = $converter->notations;
+
+    @notations = $converter->all_notations;
+
+    @notations = $converter->notations({
+        postfix_underscore => [qw(C_ c_ G_ g_ H_ h_ J_ j_ S_ s_ U_ u_)],
+    });
+
+    $converter->add_notations(
+        postfix_diacritics => [qw(C^ c^ G^ g^ H^ h^ J^ j^ S^ s^ U~ u~)],
+    );
+
+=item 4.
+
+Mi planas fasoni la API de ĉi tiu funkciojn:
+
+    $converter = Lingua::EO::Orthography->new(
+        ignore_words => [qw(
+            bushaltejo flughaveno Kinghaio ...
+        )],
+    );
+
+    $ignore_words_ref = $converter->ignore_words;
+
+    @ignore_words = $converter->all_ignore_words;
+
+    @ignore_words = $converter->ignore_words([qw(kuracherbo)]);
+
+    $converter->add_ignore_words([qw(
+        longhara navighalto ...
+    )]);
+
+=item 5.
+
+Mi supozas, ke vi povas fasoni vian praktikan aplikaĵon
+kiel ĝi akceptas oblajn grafismojn, de mia travivaĵo.
+
+Mi inkluzivas ekzemplon en la distribuaĵo.
+L<Lingua::EO::Orthography|Lingua::EO::Orthography> povas konverti ĉenon
+al la ortografio unufoje, kiel F<examples/converter.pl>.
+La ekvivalento en L<Lingua::EO::Supersignoj|Lingua::EO::Supersignoj> estas
+F<examples/correspondent.pl>.
+Tiuokaze, vi devas konverti ĉenon dum vi anstataŭigas fontan grafismon.
+
+=item 6.
+
+L<Lingua::EO::Orthography|Lingua::EO::Orthography> povas konverti ĉenon
+pli rapida ĉirkaŭ 400% ol L<Lingua::EO::Supersignoj|Lingua::EO::Supersignoj>.
+
+La kaŭzo de la diferenco estas kaŝmemori ŝablonan rekonon de regula esprimo
+kaj signan konveran tablon por anstataŭigi ĉenon, de L<Memoize|Memoize>.
+Plue, L<Lingua::EO::Orthography|Lingua::EO::Orthography> povas konverti
+signojn de oblaj grafismoj unufoje.
+
+Vidu F<examples/benchmark.pl> en ĉi tiu distribuaĵo.
+
+=item 7.
+
+La fonto de dependaĵoj estas L<http://deps.cpantesters.org/>.
+
+Tia numero ekskluzivas modjulojn por kunmeti kaj testi.
+
+Ĉiu dependaĵoj de L<Lingua::EO::Orthography|Lingua::EO::Orthography> havas
+certan favoran opinion.
+Mi sufiĉe aprobas tiujn rekomendojn.
+
+Tamen, mi pesas redukti dependaĵojn.
+I jam rezignis, ke dependigi ĉi tiun modjulon de
+L<namespace::clean|namespace::clean>,
+L<namespace::autoclean|namespace::autoclean>, kaj tiel plu.
+
+=item 8.
+
+Tia numero ekskluzivas testojn de aŭtoro.
+
+=back
+
+=head1 METODOJ
+
+=head2 Konstruilo
+
+=head3 C<< new >>
+
+    $converter = Lingua::EO::Orthography->new(%init_arg);
+
+Liveras objekton de L<Lingua::EO::Orthography|Lingua::EO::Orthography>,
+kiu estas konvertilo.
+
+Akceptas hakettipon (en: hash) kiel konverta ĝisrandigo.
+Vi povas atribui C<sources> kaj/aŭ C<target> kiel klavo de la hakettipo.
+
+=over 4
+
+=item C<< sources => \@source_notations >>
+
+Liveras referencon al tabeltipo (en: array reference) aŭ C<:all>
+kiel fontaj L<grafismoj|/Katalogo de grafismoj>.
+
+C<:all> estas ekvivalento al
+L<zamenhof|/zamenhof>,
+L<capital_zamenhof|/capital_zamenhof>,
+L<postfix_h|/postfix_h>,
+L<postfix_capital_h|/postfix_capital_h>,
+L<postfix_x|/postfix_x>,
+L<postfix_capital_x|/postfix_capital_x>,
+L<postfix_caret|/postfix_caret>,
+L<postfix_apostrophe|/postfix_apostrophe> kaj
+L<prefix_caret|/prefix_caret>.
+
+Se vi nefaras atribui ĝin, la konvertilo konsideras ke
+vi atribuas C<:all> al ĝi.
+
+Se vi atribuas valoron ekskluzive de C<:all> kaj referenco al tabeltipo,
+numero de grafismaj elementoj estas 0 aŭ
+grafismaj elementoj havas nekonatan grafismon aŭ C<undef>,
+la konvertilo ĵetas escepton.
+
+=item C<< target => $target_notation >>
+
+Liveras ĉenon kiel cela L<grafismo|/Katalogo de grafismoj>.
+
+Se vi nefaras atribui ĝin, la konvertilo konsideras ke
+vi atribuas L<orthography|/orthography> al ĝi.
+
+Se vi atribuas nekonatan grafismon aŭ C<undef>,
+la konvertilo ĵetas escepton.
+
+=back
+
+=head2 Aliriloj
+
+=head3 C<< sources >>
+
+    $source_notations_ref = $converter->sources;
+
+Liveras fontajn grafismojn kiel referenco al tabeltipo.
+Se vi deziras akiri ĝin kiel referenco al tabeltipo,
+vi povas uzi L<all_sources()|/all_sources>.
+
+    $source_notations_ref = $converter->sources(\@notations);
+
+Akceptas referencon al tabeltipo kiel fontaj grafismoj.
+Vi povas uzi grafismojn kiel konstruilo L<new()|/new>.
+
+Liveraĵo estas la sama kiel kiam argumento ne estas liverata.
+
+=head3 C<< target >>
+
+    $target_notation = $converter->target;
+
+Liveras celan grafismon kiel skalaro (en: scalar).
+
+    $target_notation = $converter->target($notation);
+
+Akceptas ĉenon kiel cela grafismo.
+Vi povas uzi grafismojn kiel konstruilo L<new()|/new>.
+
+Liveraĵo estas la sama kiel kiam argumento ne estas liverata.
+
+=head2 Konvertilo
+
+=head3 C<< convert >>
+
+    $converted_string = $converter->convert($original_string);
+
+Akceptas ĉenon, konvertas ĝin, kaj liveras ĉenon.
+Argumenta ĉeno ne estas poluata de ĉi tiu metodo, tio estas,
+argumenta ĉeno ne estas ŝanĝata de kromefiko de ĉi tiu metodo.
+Konvertado de ĉeno estas bazita sur grafismoj,
+kiuj estas atribuita ĉe konstruilo L<new()|/new> aŭ
+aliriloj de L<sources()|/sources> kaj L<target()|/target>.
+
+Ĉeno estas usklecodistinga (en: case-sensitive).
+Tio estas, la konvertilo ne konsideras C<cX> kiel surogataj grafismoj
+en L<'postfix_x' grafismo|/postfix_x>, kaj ne konvertas ĝin.
+
+Ĉeno de argumento devas enŝalti flagon de UTF8.
+Ĉeno de liversaĵo ankaŭ enŝaltiĝas.
+
+URL aŭ adreso de retpoŝto havas permeson de ĉeno,
+kiu estas konfuzata sin kaj surogatan grafismon.
+Se vi ne deziras konverti ĝin, rulu L<convert()|/convert> ĉiuvorte,
+poste dividi (per C<split()>) frazon en vortojn.
+Ĉi tio ekskluzivigas al la konvertilo ĉenon, kiu inkluzivas C<://> aŭ C<@>,
+de la celo de la konvertado.
+Vidu RFC 2396 kaj 3986 por URI,
+kaj vidu RFC 5321 kaj 5322 por adreso de retpoŝto.
+Mi priskribis konkretan ekzemplon ĉe
+F<examples/ignore_addresses.pl> en la distribuaĵo.
+
+=head2 Utilecaj methodoj
+
+=head3 C<< all_sources >>
+
+    @all_source_notations = $converter->all_sources;
+
+Liveras fontajn grafismojn kiel listo.
+Se vi deziras akiri ĝin kiel referenco al tabeltipo,
+vi povas uzi L<sources()|/sources>.
+
+=head3 C<< add_sources >>
+
+    $source_notations_ref = $converter->add_sources(@adding_notations);
+
+Adicii transdonitajn grafismojn kiel listo en fontajn grafismojn.
+Vi povas uzi grafismojn kiel konstruilo L<new()|/new>.
+
+Liveras restajn fontajn grafismojn kiel referenco al tabeltipo.
+
+=head3 C<< remove_sources >>
+
+    $source_notations_ref = $converter->remove_sources(@removing_notations);
+
+Forigas transdonitajn grafismojn kiel listo de fontaj grafismoj.
+Vi povas uzi grafismojn kiel konstruilo L<new()|/new>.
+
+Liveras restajn fontajn grafismojn kiel referenco al tabeltipo.
+
+Forigitaj grafismoj devas konservi sin almenaŭ 1.
+Se vi forigas tutajn grafismojn, la konvertilo ĵetas escepton.
+
+=head1 VIDU ANKAŬ
+
+=over 4
+
+=item *
+
+L. L. Zamenhof, I<Fundamento de Esperanto>, 1905
+
+=item *
+
+L<http://en.wikipedia.org/wiki/Esperanto_orthography>
+
+=item *
+
+L<Lingua::EO::Supersignoj|Lingua::EO::Supersignoj>
+
+=item *
+
+L<http://freshmeat.net/projects/eoconv/>
+
+=back
+
+=head1 MALKONGRUECO
+
+Estas ne raportata.
+
+=head1 CIMOJ KAJ LIMIGADOJ
+
+Neniaj cimoj estas raportata.
+
+=head2 Fari sugestojn kaj raporti cimojn
+
+Bonvole raportu ĉiajn trovitajn cimojn, petegojn por trajtoj,
+kaj ideojn por plibonigo al
+C<< <bug-lingua-eo-orthography at rt dot cpan dot org> >>,
+aŭ tra la reta interfaco ĉe
+L<http://rt.cpan.org/Public/Bug/Report.html?Queue=Lingua-EO-Orthography>.
+Mi estos avizata, kaj poste vi estos avizata de plibonstatiĝo aŭtomate
+pri viaj cimoj/petegoj kiel mi fari ŝanĝojn.
+
+Kiam raporti cimojn, se eble, bonvole adiciu specimenon tiel malgranda
+kiel vi povas fari la kodon, kiu produktas la cimon.
+Kaj kompreneble, sugestoj kaj flikaĵoj estas bonvena.
+
+=head1 SUBTENO
+
+Vi povas trovi dokumentojn por ĉi tiu modjulo per la C<perldoc> komando.
+
+    % perldoc Lingua::EO::Orthography
+
+La Esperanta eldono de dokumento estas havebla.
+
+    % perldoc Lingua::EO::Orthography::EO
+
+Vi povas ankaŭ trovi la Japana lingva eldono de dokumento por ĉi tiu modjulo
+per la C<perldocjp> komando de L<Pod::PerldocJp|Pod::PerldocJp>.
+
+    % perldocjp Lingua::EO::Orthography::JA
+
+Vi povas ankaŭ rigardi informon ĉe:
+
+=over 4
+
+=item RT: CPAN's request tracker
+
+L<http://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-EO-Orthography>
+
+=item AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Lingua-EO-Orthography>
+
+=item Search CPAN
+
+L<http://search.cpan.org/dist/Lingua-EO-Orthography>
+
+=item CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Lingua-EO-Orthography>
+
+=back
+
+=head1 VERSIKONTROLO
+
+Ĉi tiu modjulo estas konservata kun I<git>.
+Vi povas akiri la lastan version ĉe
+L<git://github.com/gardejo/p5-lingua-eo-orthography.git>.
+
+=head1 EKZAMENKAMPO EN KODO
+
+Mi uzas L<Devel::Cover|Devel::Cover> por ekzameni la ekzamenkampon
+de miaj testoj, la subo estas la resuma raporto de C<Devel::Cover>
+pri kompleto de testoj de ĉi tiu distribuaĵo.
+
+ ---------------------------- ------ ------ ------ ------ ------ ------ ------
+ File                           stmt   bran   cond    sub    pod   time  total
+ ---------------------------- ------ ------ ------ ------ ------ ------ ------
+ .../Lingua/EO/Orthography.pm  100.0  100.0  100.0  100.0  100.0  100.0  100.0
+ Total                         100.0  100.0  100.0  100.0  100.0  100.0  100.0
+ ---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+=head1 FARENDAĴOJ
+
+=over 4
+
+=item *
+
+Pluaj testoj
+
+=item *
+
+Malpluaj dependaĵoj
+
+=item *
+
+Provizi API por adicii grafismon de uzanto
+
+=item *
+
+Ĝuste manipuli vortojn kiel C<flughaveno> (C<flug/haven/o>)
+en L<'postfix_h' grafismo|/postfix_x> kun leksikono de uzanto
+
+=item *
+
+Ĝuste manipuli vortojn kiel C<ankaŭ>
+en L<'zamenhof' grafismo|/zamenhof> kun leksikono de uzanto
+
+=item *
+
+Eldoni L<Moose|Moose>-eblan klason kiel C<Lingua::EO::Orthography::Moosified>
+
+=back
+
+=head1 AŬTORO
+
+=over 4
+
+=item MORIJA Masaki, alinome Gardejo (en: MORIYA Masaki, alias Gardejo)
+
+C<< <moriya at cpan dot org> >>,
+L<http://gardejo.org/>
+
+=back
+
+=head2 Ekzegezo: Tradukinto
+
+=over 4
+
+=item MORIJA Masaki, alinome Gardejo (en: MORIYA Masaki, alias Gardejo)
+
+C<< <moriya at cpan dot org> >>,
+L<http://gardejo.org/>
+
+=back
+
+=head1 AGNOSKOJ
+
+=over 4
+
+=item *
+
+Juerd Waalboer verkis L<Lingua::EO::Supersignoj|Lingua::EO::Supersignoj>,
+kiun ĉi tiu modjulo referencis.
+
+=back
+
+=head1 AŬTORRAJTO KAJ LICENCO
+
+Aŭtorrajto (c) 2010 MORIJA Masaki, alinome Gardejo
+
+Ĉi tiu modjulo estas libera programaro;
+vi povas redistribui ĝin kaj/aŭ modifi ĝin laŭ la sama kondiĉo kiel Perl mem.
+Vidu L<perlgpl|perlgpl> kaj L<perlartistic|perlartistic>.
+
+La plena teksto de la licenco estas povata trovi en la F<LICENSE> dosiero,
+kiu estas inkluzivata kun ĉi tiu distribuaĵo.
+
+=head2 Ekzegezo: Originala teksto de AŬTORRAJTO KAJ LICENCO
+
+Copyright (c) 2010 MORIYA Masaki, alias Gardejo
+
+This module is free software;
+you can redistribute it and/or modify it under the same terms as Perl itself.
+See L<perlgpl|perlgpl> and L<perlartistic|perlartistic>.
+
+The full text of the license can be found in the F<LICENSE> file
+included with this distribution.
+
+=cut

@@ -1,0 +1,904 @@
+
+==== version history of Log::Report
+
+Unless noted otherwise, these changes where initiated and applied by
+Mark Overmeer.
+
+TODO:
+  . connect to Message::Passing framework
+
+version 1.19: Thu  9 Feb 17:35:43 CET 2017
+
+	Fixes:
+	- Dancer2 change when a stack-level needs to be skipped for
+	  reporting the location of the exception [Andrew Beverley]
+	- more modules optional during Dancer2 tests
+
+	Improvements:
+	- Dancer2 interface changes [Andrew Beverley]
+	- spell fixes. rt.cpan.org#118561 [Gregor Herrmann, Debian]
+	- spell fixes. rt.cpan.org#118562 [Gregor Herrmann, Debian]
+	- free format calls in ::File and ::Syslog get additional info, which
+	  can be used in line formatting.
+	- Use Dancer2::Logger::LogReport without Dancer2::Plugin::LogReport
+	  [Andrew Beverley]
+
+version 1.18: Fri 21 Oct 09:50:51 CEST 2016
+
+	Fixes:
+	- die_decode() should not return an 'ALERT' reason, because that is
+	  not deadly.  Dies are always deadly.
+
+	Improvements:
+	- ::Try has new attribute on_die, to specify whether a die in the
+	  code should produce PANICs or ERRORs.  Request by [Andrew Beverley]
+	- ::Die::die_decode() got on_die parameter.
+	- the Dancer2 logger will always PANIC on dies.
+
+version 1.17: Mon Sep 19 23:42:56 CEST 2016
+
+	Improvements:
+	- typo rt.cpan.org#114072, second attempt [Gregor Herrmann, Debian]
+	- include examples in manual pages.
+
+version 1.16: Fri 27 May 08:54:01 CEST 2016
+
+	Fixes:
+	- ::Dancer2: support for Dancer2 >v0.166001 [Russell Jenkins]
+
+	Improvements:
+	- typo rt.cpan.org#114072 [Gregor Herrmann, Debian]
+
+version 1.15: Mon 18 Apr 13:54:12 CEST 2016
+
+	Improvements:
+	- dancer2: test import parameters [Andrew Beverley]
+	  https://github.com/PerlDancer/Dancer2/issues/1156
+
+version 1.14: Tue 12 Apr 15:10:27 CEST 2016
+
+	Fixes:
+	- dancer2: regression test only for recent Dancer2 [cpantesters]
+
+	Improvements:
+	- typo rt.cpan.org#111985 [Gregor Herrmann, Debian]
+	- dancer2: treat all exceptions equal [Andrew Beverley]
+
+version 1.13: Wed  3 Feb 11:34:18 CET 2016
+
+	Fixes:
+	- init of lexicon with HASH
+	  rt.cpan.org#111420 [Paulo A Ferreira]
+
+	Improvements:
+	- skip Log::Report wrappers from stacktrace and location.
+	- added ::Dispatcher::addSkipStack() and ::skipStack()
+	- add forward_url to Dancer2 plugin example [Andrew Beverley]
+	- ignore $SIG{__DIE__} within try blocks [Milos Lazarevic]
+	- dancer2: add regression test for plugin [Andrew Beverley]
+	- dancer2: add forward_template option [Raj Barath]
+
+version 1.12: Mon Jan 18 21:55:35 CET 2016
+
+	Fixes:
+	- reopen default dispatcher creates a double. [Andrew Beverley]
+
+	Improvements:
+	- remove mode=DEBUG from Dancer2::*
+
+version 1.11: Mon 18 Jan 17:07:43 CET 2016
+
+	Fixes:
+	- warning when log outside sub [Andrew Beverley]
+	- missing register of fault and failure [Andrew Beverley]
+	- some module is textdomain logreport, should be log-report.
+	  [Andrew Beverley]
+	- Dancer2::Logger::LogReport should not set the mode
+
+	Improvements:
+	- dispatcher 'do-not-reopen' does not protect the default
+	  dispatcher [Andrew Beverley]
+	- produce error when setContext is used while context_rules
+	  are not provided.
+	- added ::Exception::toHTML() and ::Message::toHTML()
+
+version 1.10: Sat Nov 28 17:39:16 CET 2015
+
+	Fixes:
+	- Dancer2 object build  [Andrew Beverley]
+	- ::Domain::setContext with PAIRS as parameter
+	- collect stack for exceptions inside try block. [Andrew Beverley]
+
+	Improvements:
+	- keep dispatchers ordered.
+	- interpolate context setting inside msg_id's as well
+	- add ::Domain::updateContext()
+	- new option dispatcher 'do-not-reopen'
+	- ::Dispatcher::File option format() with CODE, now calls with
+	  additional parameter $msg.
+	- ::Dispatcher::File option output() now with CODE, to dynamically
+	  return the logfile name.
+	- added t/55throw.t
+	- new method ::Try::hide()
+	- renamed internal fields of ::Dispatcher::File, to lead with LRDF_
+	- new option ::Dispatcher::Syslog::new(format)
+
+version 1.09: Tue 20 Oct 09:26:00 CEST 2015
+
+	Fixes:
+	- try: do not ignore is_fatal parameter
+
+	Improvements:
+	- dispatcher() new action 'active-try'
+	- many, many improvements to Dancer2::*  [Andrew Beverley]
+
+version 1.08: Thu  8 Oct 17:55:39 CEST 2015
+
+	Fixes:
+	- tests on Windows [cpantesters]
+
+	Improvements:
+	- avoid use of 'package Dancer::Logger' to circumvent complaints
+	  of Pause.
+	- Log::Report configure message_class [Andrew Beverley]
+	- Dancer2 plugin improved a lot [Andrew Beverley]
+
+version 1.07: Tue Jul 21 17:38:01 CEST 2015
+
+	Fixes:
+	- remove superfluous blank lines, when (translated) message
+	  ends on \n. Reported by [Andrew Beverley]
+	- Dancer2::Plugin:: deep recursion in ERROR handler [Andrew Beverley]
+
+	Improvements:
+	- document HASH for ::Syslog::new(logsocket).
+	  Idea of [Andrew Beverley]
+	- add Log::Report::DBIC::Profiler [Andrew Beverley]
+	- loads of documentation on using Log::Report in Dancer2,
+	  written by [Andrew Beverley]
+	- protect against two instances of ::Syslog at the same time: its
+	  impossible.
+
+version 1.06: Mon Jun 15 17:30:33 CEST 2015
+
+	Fixes:
+	- t/60mojo.t will not run on old mojo's: requires 2.16 (2011)
+	  [cpantesters]
+	- ::Dispatcher::File do not use %F/%T in strfime, which is not
+	  supported by Windows.
+	- make ::Die understand multiline 'die()' messages.
+	  rt.cpan.org#101389 [Ken Neighbors]
+
+	Improvements:
+	- add Dancer::Log::Report and examples/dancer/
+	- add Dancer2::*, contributed by [Andrew Beverly]
+
+version 1.05: Tue Jun 24 09:38:15 CEST 2014
+
+	Fixes:
+	- test in t/10interp.t failed for Perl 5.20, caused by a
+	  bugfix or change in overload::Overloaded [cpantesters]
+
+version 1.04: Tue Jun  3 10:42:11 CEST 2014
+
+	Fixes:
+	- float serialization under locale in test [cpantesters]
+
+version 1.03: Thu May 22 11:54:24 CEST 2014
+
+	Fixes:
+	- float serialization under locale in test [cpantesters]
+	- non-errors and ::Dispatcher::Perl
+
+	Improvements:
+	- shorted display of string parameters in stack-trace to max 80 chars
+	- Log4perl log-lines sometimes show dispatcher as source, skip them.
+	- disable 'mode switch' trace for try()
+
+version 1.02: Mon Mar 10 16:03:13 CET 2014
+
+	Fixes:
+	- add overload fallback to ::Exception and ::Dispatcher
+	  rt.cpan.org#92970 [Lukas Mai]
+	- ::Domain::new(translator) with HASH did not initialize
+	- warn better with ::Optional modules are used before Log::Report
+	  is used.
+
+	Improvements:
+	- changed documentation style
+	- ::Lexicon::Index dir-scan immediately, hopefully before fork()
+
+version 1.01: Mon Jan  6 23:21:37 CET 2014
+
+	Fixes:
+	- LC_MESSAGE missing on Windows [Michael Long]
+
+version 1.00: Sun Jan  5 17:23:44 CET 2014
+
+	Split into four components, adding
+	- String::Print for formatting, permits positionals now
+	- Log::Report::Optional as base, super lightweight
+	- Log::Report::Lexicon when you need translations
+
+	Changes:
+	- configuration from ::translator() into ::Domain::configure()
+	- domains are package bound, not line based.
+	- removed isValidReason() and isFatal(), there are function in ::Util
+	- dispatchers(list) inside try() also lists outside dispatchers
+	- ::Dispatcher::Log4perl::new(accept) defaults to 'ALL', because the
+	  log4perl configuration will select what to log.
+	- exceptions which get re-thrown with an other reason get rewritten.
+	- alert and failure messages will always show their location
+	- "switching to mode" message from level info to trace
+
+	Fixes:
+	- do not complain when N__w ends on \n
+	- incorrect initialization of log4perl dispatcher
+	- try inside BEGIN did not catch but died.
+	  rt.cpan.org#91671 [Kenney Westerhof]
+
+	Improvements:
+	- ::Dispatcher::File uses locking to permit parallel writes
+	- ::Dispatcher::File::new(format)
+	- ::Dispatcher::File::rotate()
+	- ::Dispatcher::Log4perl more docs
+	- explain why Log::Log4perl::caller_depth concept is broken
+	- ::Dispatcher::Log4perl support for categories
+	- ::Dispatcher::Syslog::new(include_domain)
+	- ::Dispatcher::Syslog::new(charset)
+	- ::Dispatcher::*::log() knows about textdomain of msg
+	- ::Message::new(_lang) overrides language to be used in translation
+	- add MojoX::Log::Report
+	- new ::Domain, move all domain specific config from ::import() into
+	  that module (and/or ::Minimal::Domain)
+	- ::textdomain()
+	- ::Message overload fallback
+	- remove "syntax => 'SHORT'" from examples: is the default
+	- export level on Log::Report::import()
+
+version 0.999:
+	Not (yet) released
+
+version 0.998: Tue Oct 22 09:55:06 CEST 2013
+	Fixes:
+	- xgettext-perl: actually use the provided template pattern
+	- xgettext-perl: only take template from .tt and .tt2 files
+	- xgettext-perl: accept '-' (STDIN) for --from
+
+	Improvements:
+	- more documentation about the PPI extraction process, and how
+	  to use ::Message::new(_domain)
+	- Log::Report import option 'import'
+
+version 0.997: Fri Sep 27 17:37:11 CEST 2013
+	Fixes:
+	- error about double definedness of settings, dependent on the
+	  order of inclusion of modules.
+	- setlocale does not return the old locale, but the new.
+
+	Improvements:
+	- xgettext-perl: do not PPI files unless they are Perl
+	- xgettext-perl: do warn when ' (single quotes) are used, needs
+	  " (double quote) with __x
+	- __x() now can have a _domain parameter
+
+version 0.996: Wed Sep  4 17:23:11 CEST 2013
+	Fixes:
+	- you could not share one ::Translator::POT over two domains.
+	  discovered by [Richard Still]
+	- third attempt to fix errors in t/53log4perl.t on Windows
+	  [cpantesters]
+	- remove double reporting of errors which exceptions are caught
+	  with eval().  But better use try().
+
+version 0.995: Thu Aug 29 09:19:13 CEST 2013
+	Fixes:
+	- twice path '\'  in t/53log4perl.t in Windows [cpantesters]
+
+version 0.994: Thu Aug 22 16:12:08 CEST 2013
+	Fixes:
+	- link to paper [Richard Still]
+	- chicken-egg problem with error on illegal mode setting.
+
+	Improvements:
+	- try to build new translation table at each 'make'
+
+version 0.993: Thu Mar 28 10:59:27 CET 2013
+
+	Fixes:
+	- filename/linenumber caller-depth in Log4Perl.
+	  rt.cpan.org#83736 [Dominik Jarmulowicz]
+	- actually try to use existing mo files.
+
+	Improvements:
+	- use Devel::GlobalDestruction
+	  rt.cpan.org#80612 [Riba Sushi]
+	- ::Template extractor of translatable strings now understands
+	  [%|loc%]$msgid[%END%] and [%'$msgid'| loc %]
+	- improvements on documentation.
+	- move t/30index.t towards xt/30index.t, because the test is
+	  too sensitive for the actual environment.
+
+version 0.992: Fri Dec 21 11:59:55 CET 2012
+
+	Improvements:
+	- add support for msgctxt in po-files to Log::Report::Lexicon::POT*
+	- new option Log::Report::Lexicon::PO::new(plural_forms)
+	- new generic base-class  Log::Report::Lexicon::Table for
+	  Log::Report::Lexicon::POT*
+	- ::POT.pm ignores any index when the msgid has no plural form. This
+	  results in a smaller memory foot-print.
+	- support for MO files, in  Log::Report::Lexicon::MOTcompact
+
+version 0.991: Mon Nov 26 09:27:08 CET 2012
+
+	Fixes:
+
+	- t/50file.t test failed on HASH order [cpantesters]
+
+version 0.99: Wed Oct  3 09:13:58 CEST 2012
+
+	Changes:
+
+	- do not call overloaded stringification in stack-trace.
+
+	Fixes:
+
+	- do only include .po files in the index which are not
+	  in a directory which starts with a dot (for instance,
+	  not in /.svn/) or do not start with a dot.
+	  [Richard Still]
+
+	Improvements:
+
+	- remove \r from the end of comment lines in PO files.
+
+version 0.98: Thu Sep  6 14:46:52 CEST 2012
+
+	Changes:
+
+	- rewrote message-id extractor in ::Extract::Template to
+	  support more TemplateToolkit features.
+
+	- print __x("who am i\n") is now interpreted as
+	  print __x("who am i"), "\n";
+	  So: no trailing newlines in the PO-tables.
+
+	Fixes:
+
+	- PO file parse errors reported on the wrong location.
+
+	- ::Message::toString() uses $" when an ARRAY of elements gets
+	  inlined.  This should be the $" on the moment of message's
+	  definition, not the $" when it gets stringified.
+
+	Improvements:
+
+	- new option ::Message::new(_join)
+
+version 0.97: Mon Sep  3 15:54:04 CEST 2012
+
+	Changes:
+
+	- repair mistake of 0.96: Log::Report::Translate::TemplateToolkit()
+	  must have been Log::Report::Message::fromTemplateToolkit()
+
+	Improvements:
+
+	- count for message with plural can be ARRAY or HASH, which
+	  get numified automatically.
+
+version 0.96: Fri Aug 31 16:43:31 CEST 2012
+
+	Fixes:
+
+	- scan templates for msgid containing white-space.
+
+	- ::Translate::translate() was documented to accept a language
+	  parameter.  Fixed the docs and implemented it ;-)
+
+	Improvements:
+
+	- support for plural forms in templates.
+
+	- explanation/support method how to integrate the translations
+	  with Template::Toolkit.
+
+version 0.95: Thu Aug 30 23:15:50 CEST 2012
+
+	Changes:
+
+	- new parameters for xgettext-perl, now also able to handle
+	  extracting from templates.  Script needs man-page.
+
+	Fixes:
+
+	- xgettext-perl showed counts twice.
+
+	- text-domain specified as "qw/domain/" now gets recognized by PerlPPI.
+
+	Improvements:
+
+	- some spelling corrections by rt.cpan.org#70959 [Fabrizio Regalli]
+
+	- synopsis fix in ::Dispatcher::Callback by [gbjk]
+
+	- cleaned-up the synopsis of Log::Report a bit.
+
+	- split base-class Log::Report::Extract from ::Extract::PerlPPI
+
+	- remove dependency to Test::Pod
+
+	- add Log::Report::Extract::Template and t/42templ.t
+
+version 0.94: Tue Aug 23 11:14:59 CEST 2011
+
+	Changes:
+
+	- when an exception get throw()n again, but with a different
+	  "reason", the fatality "is_fatal" will automatically adapt.
+
+	Improvements:
+
+	- add Log::Report::Exception::isFatal()
+
+version 0.93: Thu Jun 30 09:45:24 CEST 2011
+
+	Fixes:
+
+	- faults caused by $? should not exit with 0
+	  rt.cpan.org #68496 [Zephaniah E. Hull]
+
+	- die's in try blocks did not produce a Log::Report::Message
+	  reported by [Patrick Powell]
+
+	- fix use for non-admin Windows users
+	  rt.cpan.org#67935 [unknown]
+
+	Improvements:
+
+	- ability to change message and reason of an ::Exception
+
+	- lazy-load Log::Report::Die
+
+version 0.92: Fri Apr 15 10:26:33 CEST 2011
+
+	Fixes:
+
+	- another attempt to silence test for Windows bug.
+
+	Improvements:
+
+	- additional doc to dispatcher(), triggered by [Patrick Powell]
+
+	- add                error 'xx', _to => $disp;
+          as alternative to  report {to => $disp}, ERROR => 'xx';
+
+version 0.91: Wed Jan 26 16:24:25 CET 2011
+
+	Fixes:
+
+	- enabling and disabling dispatchers did not work
+	  [Patrick Powell]
+
+	Improvements:
+
+	- produce nice error when __x received even length list.
+
+	- added Log::Report::Dispatcher::Callback
+
+	- typos in new Callback.pm   [Patrick Powell]
+
+	- disable test which fails on bug in confess on Windows
+	  http://rt.perl.org/rt3/Ticket/Display.html?id=81586
+
+	- improved output with new OODoc
+
+version 0.90: Wed Dec 22 16:29:51 CET 2010
+
+	Changes:
+
+	- ::Exception stringifies with lowercase reason, was uppercase
+
+	Fixes:
+
+	- repair Log::Report::report(is_fatal) option.
+
+	- reimplementation of totalDigits and fractionDigits facets,
+	  triggered by rt.cpan.org#63464 [mimon-cz]
+
+	- fix handling results of filters
+
+	Improvements:
+
+	- reorder checks in report() to be faster when the message
+	  is ignored (for instance trace)
+
+version 0.28: Mon May 31 16:00:12 CEST 2010
+
+	Fixes:
+
+	- ::Exception::toString() should produce a string, sometimes it
+	  was an overloaded ::Message object.
+
+	- More test fixes to repair Test::More changes.
+
+	- Avoid call to close on undef in END
+	  rt.cpan.org#57955 [Jan Henning Thorsen]
+
+version 0.27: Fri May 28 15:37:44 CEST 2010
+
+	Fixes:
+
+	- turn autoflush on for FILE dispatcher.  Found by [Robin V.]
+
+	- Test::More 0.95_01 changes is() w.r.t. overloading... broken
+	  tests.  rt.cpan.org#57703 [Slaven Rezic]
+
+version 0.26: Mon Feb 15 10:08:23 CET 2010
+
+	Changes:
+
+	- default of 'syntax' changed from 'REPORT' to 'SHORT'.
+
+	Improvements:
+
+	- fixes in dispatcher doc "mode" table.
+
+	- document use of ::Exception::throw a bit better.
+
+	- more useful error when parameter list has odd length.
+
+version 0.25: Thu Jul 16 12:18:51 CEST 2009
+
+	Improvements:
+
+	- new method Log::Report::Exception::toString(), also overloaded
+	  for stringification.
+
+version 0.24: Mon Apr 27 10:02:12 CEST 2009
+
+	Fixes:
+
+	- default language switching broken.
+
+	- fix t/50file.t in Dutch environment [Peter de Vos]
+
+version 0.23: Fri Apr 24 16:18:12 CEST 2009
+
+	Fixes:
+
+	- remember global mode, for dispatchers started later.
+
+	- let try() use dispatcher mode, not to loose trace etc.
+
+	- resolve complaint on exit.
+
+	Improvements:
+
+	- when an empty list has to be expanded, it will show '(none)'
+
+	- require Sys::Syslog 0.27
+
+version 0.22: Mon Jan 26 09:05:55 CET 2009
+
+	Fixes:
+
+	- do not use /bin/pwd in t/pod.t, because it fails on Windows
+	  [Serguei Trouchelle]
+
+	- translate long Windows locales into short
+	  rt.cpan.org#41943 [Serguei Trouchelle]
+
+version 0.21: Wed Jan 21 10:31:48 CET 2009
+
+	Fixes:
+
+	- avoid recursion when locale setting is not understood.
+	  rt.cpan.org#41943 [Serguei Trouchelle]
+
+	Improvements:
+
+	- add Log::Report::needs() for convenience
+
+version 0.20: Thu Dec 11 14:18:15 CET 2008
+
+	Fixes:
+
+	- dispatcher does not convert output to a default charset, because
+	  the optimal default cannot be established on most platforms.
+
+version 0.19: Mon Nov 24 12:52:34 CET 2008
+
+	Fixes:
+
+	- fix for Test::More interface change in 0.86.
+
+	- be strict on the character-set of the messages which are
+	  written, by default in UTF-8.  (LC_CTYPE for the File
+	  dispatcher if available)
+
+	Improvements:
+
+	- work around missing LC_MESSAGES on old perls [Toby Corkindale]
+
+	- few improvements in main SYNOPSIS
+
+	- removed ::Dispatcher::File setting of encoding in binmode,
+	  in favor of explicit (internal) encoding for all dispatched
+	  messages.
+
+	- require Encode 2.00+
+
+	- test do not say 'ERROR' but 'WARNING' in t/04setlocale.t
+	  when the setlocale() call does not return the old value as
+	  it should, according to the standards.  Less confusion to
+	  the end-user, hopefully.
+
+version 0.18: Fri May  9 15:36:06 CEST 2008
+
+	Fixes:
+
+	- few fixes to Win32Locale and parse_locale() [Ari Jolma]
+
+	- Require Sys::Syslog 0.24
+
+version 0.17: Fri Apr 18 18:20:51 CEST 2008
+
+	Fixes:
+
+	- strackTrace error with isa() when parameter string contains
+	  a '::' and when a parameter is undefined.
+
+	Changes:
+
+	- changing the run-mode will change the accepted reasons as
+	  well, because it was too complex to understand.
+
+	Improvements:
+
+	- complain if syntax option has an invalid value.
+
+	- use warnings and strict in Win32Locale [cpants]
+
+	- dispatcher command on "ALL" defined dispatchers.
+
+	- use Log::Report mode => 'something'
+
+version 0.16: Thu Mar 27 11:32:08 CET 2008
+
+	Fixes:
+
+	- assert, error, and such are functions, but where documented
+	  as being methods.
+
+	- xgettext-perl -h did not exit.
+
+	- complaints on Windows about prototype mistake when redefining
+	  LC_MESSAGES [Adam Kennedy]
+
+	Improvements:
+
+	- ::Lexicon::Index::list() got second optional argument, to
+	  filter filenames.
+
+	- Silence symlink recursion errors in ::Lexicon::Index
+
+version 0.15: Mon Feb 25 15:36:37 CET 2008
+
+	Changes:
+
+	- ::Dispatcher::Syslog::new(format_reason) change default to
+	  'IGNORE'.
+
+	- warning does not get a line-number/filename.  Use alert if
+	  you need those.
+
+	Improvements:
+
+	- added logsocket option to SYSLOG dispatcher.
+
+	- exception can be re-throw-n with a different reason.
+
+	- stop parse_locale() from complaining about locale==undef
+
+	- ::Util::parse_locale() does a better job trying to conform
+	  to various standards.  In SCALAR context, it now returns
+	  more information.
+
+	- avoid calling ::Dispatcher::DESTROY during global destruction,
+	  because Perl produces horrible complaints for some releases of
+	  Perl.
+
+	- link manual-pages with Text::Catalog (renamed from
+	  Log::Report::View)
+
+version 0.14: Fri Nov  2 15:00:49 CET 2007
+
+	Fixes:
+
+	- Another syntax error, now using Win32Locale.
+	  via cpantesters [mmusgrove]
+
+	- Close DATA handle after reading Win32 locale table.
+	  via cpantesters [mmusgrove]
+
+version 0.13: Mon Oct 29 09:20:04 CET 2007
+
+	Fixes:
+
+	- Stupid syntax error in the new Win32Locale.
+	  via cpantesters [mmusgrove]
+
+	Improvements:
+
+	- Log::Report::Dispatchers should now be able to handle
+	  situations where locale_h is not exported by POSIX.
+
+version 0.12: Tue Oct 23 15:26:07 CEST 2007
+
+	Improvements:
+
+	- t/04locale.t also tries charset eq ''
+
+	- t/04locale.t will produce a warning, not an error, when the
+	  setlocale() does not work
+
+	- t/*.t will use the 'C' locale, not the less often supported
+	  'POSIX'.
+
+	- added Log::Report::Win32Locale, with experimental application
+	  in Log::Report::Lexicon::Index
+
+	- on some platforms, LC_MESSAGES is not defined.  Work-around
+	  in Log::Report::Translator::POT.
+
+version 0.11: Thu Oct 18 09:34:18 CEST 2007
+
+	Fixes:
+
+	- Running tests, a temporary directory remained in /tmp.
+	  [Andreas Koenig]
+
+	Improvements:
+
+	- Makefile.PL use 5.008 i.s.o. 5.8.2, otherwise not understood
+	  by perl 5.5. [Slaven Rezic]
+
+	- Added versions of optional modules to test output
+
+version 0.10: Mon Oct 15 17:55:44 CEST 2007
+
+	Changes:
+
+	- WARNINGs should not included $!... use alert if you are
+	  tempted.
+
+	Improvements:
+
+	- few doc fixes.
+
+version 0.09: Thu Aug  9 22:46:56 CEST 2007
+
+	Changes:
+
+	- a try{} block executes eval in the correct context, and
+	  returns its results.  Just like eval() does.
+
+	- a non-translated message MUST be only one string to be
+	  passed to report(), because other parameters are passed
+	  to the message constructor.
+
+	Fixes:
+
+	- stack-trace did not remove the trace of the Log::Report
+	  internal helpers.
+
+	- if try died indirectly from a nested died try, then that
+	  object is not captured in died() itself.
+
+	Improvements:
+
+	- try() catches Perl die/croak/warn as well, and translates them
+	  using Log::Report::Die.
+
+	- try() dies if parameter list has odd length (semi-colon forgotten)
+
+	- implementation of exception classes.
+	  See Log::Report::(Message|Exception)::inClass
+
+version 0.08: Wed Jul 11 14:09:32 CEST 2007
+
+	Changes:
+	- default dispatcher is now named 'default', type PERL
+
+	Improvements:
+	- added comments by [Guido Flohr] about use of Locale::gettext
+	- NetBSD has locale C and POSIX in lower-case. [cpan-testers]
+	- improve handling of undef values during expand
+	- added PERL=Log::Report::Dispatcher::Perl
+
+version 0.07: Wed Jun 20 14:01:18 CEST 2007
+	Improvements:
+	- another attempt to find-out why some platforms report a
+	  deep recursion.
+
+version 0.06: Sat Jun  9 10:33:23 CEST 2007
+	Improvements:
+	- t/51syslog.t compares required version via UNIVERSAL::VERSION
+          (cpan-tester David Cantrell)  Other version checks adapted as well.
+	- add t/pod.t, which tests produced pods
+	- t/01locale.t even smarter, with help of Andreas Koenig
+
+version 0.05: Thu Jun  7 13:18:13 CEST 2007
+	Changes:
+	- the stderr dispatcher will be opened when there is any
+	  file at STDERR, not only a tty.
+
+	Improvements:
+	- simplified t/50files.t
+	- another attempt to get t/01locale.t correct on all platforms
+	- ::Util; locale parser must accept C and POSIX
+	- ::Dispatcher; make message output format translatable
+	- ::Extract::PPI; report mistake when msgid ends with new-line
+	- ::Extract::PPI; mistake when a variable is interpolated in msgid
+	- ::Extract::PPI; qq{} msgids will now be detected as well
+	- ::Extract::PPI; special characters the "" and qq{} strings with
+	  get interpreted (PPI does not do that automatically)
+	- ::Extract::PPI: only report the nessecary
+	- after a long discussion within Amsterdam.pm about concatenation
+          of translated fragments, it was decided to permit it but put
+	  some extra warnings in the docs.
+	- also warn about __'xx'   meaning   __::xx '
+	- updated log-report/nl_NL.po translations
+	- configure native_language for a domain
+	- untranslated messages will still be formatted according to the
+          rules of the native_language
+	- translator table setting per domain now integrated with
+	  other settings for the domain.
+	- ran ispell on the man-pages
+
+version 0.04: Mon Jun  4 11:05:10 CEST 2007
+	- removed incorrect doc about "mode TRY", which does not exist.
+	- included syslog in "reason" comparison table
+	- have Makefile.PL install xgettext-perl
+	- t/50file.t needed more work-arounds to pass automated module
+	  tests (which go without -t STDERR)
+	- attempts to make test-scripts run on various platforms.
+
+version 0.03: Mon May 28 20:16:26 CEST 2007
+	- Log::Report::Message without msgid forgot _append.
+	- Log::Report::Message must clone at concatenation.
+	- remove translations from POT when not referenced anymore, and
+	  not translated either.
+	- $@ after try will not show the message, because we want people
+	  to use reportAll() or reportFatal().
+	- dispatchers now have a format_reason, defaulting to LOWERCASE
+	  which looks nicer than uppercase.
+	- added docs to ::Try
+	- reorganized some docs.
+	- Log::Report::Util lacked the trailing "1;"
+	- fall-back to no translation in case of unknown locale in ::POT
+	- test functionality of setlocale, and hopefully fixed things
+
+version 0.02: Mon May 28 00:49:52 CEST 2007
+	- added HTML documentation to http://perl.overmeer.net/log-report/
+	- added README and Changelog to MANIFEST
+	- filters are not defined on the dispatcher object, but under
+	  control of Log::Report::report().
+	- Log::Report::Message new methods append(), msgid(), and prepend()
+	- added Log::Report::Exception and Log::Report::Dispatcher::Try
+	- added isValidReason() and isFatal() to Log::Report
+	- added Log::Report::Message::untranslated();
+	- Log::Report::report() will convert untranslated strings into
+	  Log::Report::Message objects internally too.
+
+	- by David Cantrell via cpan-testers:
+	  . require at least perl 5.8.2, for POSIX :local_h and because
+	    unique was broken before that release.
+	  . t/00use.t cannot test LogDispatch and Gettext, because they
+	    depend on optional module
+	  . t/50file.t failed because no -t STDERR
+
+version 0.01: Fri May 25 12:13:13 CEST 2007
+	- initial (quite complete) implementation.

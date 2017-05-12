@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+
+<!--
+
+  Transliteration definitions for Czech diacritics
+
+  Copyright (C) 2008 Rona Linke <rlinke@lingua-systems.com>
+  Copyright (C) 2009 Lingua-Systems Software GmbH
+
+-->
+
+
+<translit>
+
+    <name>Common CES</name>
+    <desc>Czech without diacritics</desc>
+    <reverse>false</reverse>
+
+    <!-- set of transliteration rules -->
+    <!--
+    This transliteration is a simple mapping of characters with
+    diacritics to the same character without a diacritic in
+    hex notation of Unicode codepoints. (Letter names according
+    to Unicode Standard 5.0)
+    Abbreviations:
+    LCL = LATIN CAPITAL LETTER
+    LSL = LATIN SMALL LETTER
+ -->
+    <rules>
+
+        <rule>
+            <from>&#x00C1;</from>	    <!-- LCL A WITH ACUTE -->
+            <to>A</to>
+        </rule>
+        <rule>
+            <from>&#x00E1;</from>	    <!-- LSL A WITH ACUTE  -->
+            <to>a</to>
+        </rule>
+        <rule>
+            <from>&#x010C;</from>	    <!-- LCL C WITH CARON  -->
+            <to>C</to>
+        </rule>
+        <rule>
+            <from>&#x010D;</from>	    <!-- LSL WITH CARON  -->
+            <to>c</to>
+        </rule>
+        <rule>
+            <from>&#x010E;</from>	    <!-- LCL D WITH CARON  -->
+            <to>D</to>
+        </rule>
+        <rule>
+            <!-- SMALL LETTER HAS TWO VARIANTS: WITH LITTLE APOSTROPH OR HACEK -->
+            <from>&#x010F;</from>	    <!--LSL D WITH CARON (APOSTROPH)-->
+            <to>d</to>
+        </rule>
+        <rule>
+            <from>&#x0064;&#x030C;</from>  <!-- LSL D WITH CARON (HACEK) -->
+            <to>d</to>
+        </rule>
+        <rule>
+            <from>&#x00C9;</from>	    <!-- LCL E WITH ACUTE  -->
+            <to>E</to>
+        </rule>
+        <rule>
+            <from>&#x00E9;</from>	    <!-- LSL E WITH ACUTE  -->
+            <to>e</to>
+        </rule>
+        <rule>
+            <from>&#x011A;</from>	    <!--LCL E WITH CARON  -->
+            <to>E</to>
+        </rule>
+        <rule>
+            <from>&#x011B;</from>	    <!-- LSL E WITH CARON  -->
+            <to>e</to>
+        </rule>
+        <rule>
+            <from>&#x00CD;</from>	    <!-- LCL I WITH ACUTE -->
+            <to>I</to>
+        </rule>
+        <rule>
+            <from>&#x00ED;</from>	    <!-- LSL I WITH ACUTE  -->
+            <to>i</to>
+        </rule>
+        <rule>
+            <from>&#x0147;</from>	    <!-- LCL N WITH CARON  -->
+            <to>N</to>
+        </rule>
+        <rule>
+            <from>&#x0148;</from>	    <!-- LSL N WITH CARON -->
+            <to>n</to>
+        </rule>
+        <rule>
+            <from>&#x00D3;</from>	    <!--LCL O WITH ACUTE  -->
+            <to>O</to>
+        </rule>
+        <rule>
+            <from>&#x00F3;</from>	    <!--LSL O WITH ACUTE  -->
+            <to>o</to>
+        </rule>
+        <rule>
+            <from>&#x0158;</from>	    <!-- LCL R WITH CARON -->
+            <to>R</to>
+        </rule>
+        <rule>
+            <from>&#x0159;</from>	    <!-- LSL R WITH CARON  -->
+            <to>r</to>
+        </rule>
+        <rule>
+            <from>&#x0160;</from>	    <!-- LCL S WITH CARON  -->
+            <to>S</to>
+        </rule>
+        <rule>
+            <from>&#x0161;</from>	    <!-- LSL S WITH CARON  -->
+            <to>s</to>
+        </rule>
+        <rule>
+            <from>&#x0164;</from>	    <!-- LCL T WITH CARON  -->
+            <to>T</to>
+        </rule>
+        <!--SMALL LETTER HAS TWO VARIANTS: WITH LITTLE APOSTROPH OR HACEK -->
+        <rule>
+            <from>&#x0165;</from>	    <!-- LSL T WITH CARON (APOSTROPH) -->
+            <to>t</to>
+        </rule>
+        <rule>
+            <from>&#x0074;&#x030C;;</from> <!--LSL T WITH CARON (HACEK)  -->
+            <to>t</to>
+        </rule>
+        <rule>
+            <from>&#x00DA;</from>	    <!--LCL U WITH ACUTE  -->
+            <to>U</to>
+        </rule>
+        <rule>
+            <from>&#x00FA;</from>	    <!-- LSL U WITH ACUTE -->
+            <to>u</to>
+        </rule>
+        <rule>
+            <from>&#x016E;</from>	    <!--LCL U WITH RING ABOVE  -->
+            <to>U</to>
+        </rule>
+        <rule>
+            <from>&#x016F;</from>	    <!-- LSL U WITH RING ABOVE  -->
+            <to>u</to>
+        </rule>
+        <rule>
+            <from>&#x00DD;</from>	    <!-- LCL Y WITH ACUTE -->
+            <to>Y</to>
+        </rule>
+        <rule>
+            <from>&#x00FD;</from>	    <!-- LSL Y WITH ACUTE -->
+            <to>y</to>
+        </rule>
+        <rule>
+            <from>&#x017D;</from>	    <!-- LCL Z WITH CARON -->
+            <to>Z</to>
+        </rule>
+        <rule>
+            <from>&#x017E;</from>	    <!-- LSL Z WITH CARON -->
+            <to>z</to>
+        </rule>
+
+    </rules>
+
+</translit>
+
+<!--
+  vim: sts=4 sw=4 ai et
+-->

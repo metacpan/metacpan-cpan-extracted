@@ -1,0 +1,142 @@
+#!/usr/bin/perl
+use strict ;
+use Pod::Usage ;
+use Getopt::Long qw/:config no_ignore_case/ ;
+use File::Basename ;
+use File::Path ;
+
+use Data::Dumper ;
+
+++$! ;
+
+use Linux::DVB::DVBT::TS ;
+
+our $VERSION = '1.000' ;
+
+    my $progname = basename $0 ;
+
+	my ($help, $man, $DEBUG, $VERBOSE, $dbg_ts, $summary) ;
+	my $colour = 0 ;
+	my $start = 1 ;
+	my $num_frames = 1 ;
+	GetOptions('v|verbose=i' => \$VERBOSE,
+			   'debug=i' => \$DEBUG,
+			   'dbg-ts=i' => \$dbg_ts,
+			   'h|help' => \$help,
+			   'man' => \$man,
+			   's|summary' => \$summary,
+			   ) or pod2usage(2) ;
+
+
+    pod2usage(1) if $help;
+    pod2usage(-verbose => 2) if $man;
+    pod2usage("$0: No arguments given.")  if (@ARGV == 0) ;
+    pod2usage("$0: No input filename(s) given.")  if (@ARGV < 1) ;
+	
+	foreach my $filename (@ARGV)
+	{
+
+		## get information (including file duration)
+		my %info = info($filename, {
+			'debug'			=> $dbg_ts,
+		}) ;
+		if ($info{'error'})
+		{
+			print "Error: $info{'error'}\n" ;
+			exit 1 ;
+		}
+		
+		if ($summary)
+		{
+			printf "%-40s ", $filename ;
+			printf "Duration: %02d:%02d:%02d, ", $info{'duration'}{'hh'}, $info{'duration'}{'mm'}, $info{'duration'}{'ss'} ;
+			printf "Packets: %08d, ", $info{'total_pkts'} ;
+			
+			print "PIDs: " ;
+			foreach my $pid (sort {$a <=> $b} keys %{$info{'pids'}})
+			{
+				printf "%3d", $pid ;
+				print "[SI]" if $info{'pids'}{$pid}{'pesinfo'}{'pes_psi'} eq 'PSI' ;
+				print " " ;
+			}
+			
+			print "\n" ;
+		}
+		else
+		{
+			print "$filename:\n" ;
+			printf "   Video duration: %02d:%02d:%02d\n", $info{'duration'}{'hh'}, $info{'duration'}{'mm'}, $info{'duration'}{'ss'} ;
+			printf "   Total Packets : %08d\n", $info{'total_pkts'} ;
+			
+			print  "   PIDs          :\n" ;
+			foreach my $pid (sort {$a <=> $b} keys %{$info{'pids'}})
+			{
+				printf "        %3d", $pid ;
+				print " [SI]" if $info{'pids'}{$pid}{'pesinfo'}{'pes_psi'} eq 'PSI' ;
+				print "\n" ;
+			}
+			print "\n" ;
+		}
+	
+	}
+	
+
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+=head1 NAME
+
+dvbt-ts-info - Display transport stream file information
+
+=head1 SYNOPSIS
+
+dvbt-ts-info [options] filename [filename ... ]
+
+Options:
+
+       -debug level         set debug level
+       -verbose level       set verbosity level
+       -help                brief help message
+       -man                 full documentation
+       -summary             show one line summary
+       
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Set verbosity level. Higher values show more information.
+
+=item B<-debug>
+
+Set debug level. Higher levels show more debugging information (only really of any interest to developers!)
+
+=back
+
+=head1 DESCRIPTION
+
+Script that uses the perl Linux::DVB::DVBT::TS package to provide transport stream video file functions.
+ 
+Parses the transport stream file(s) and displays information about each file.
+
+
+=head1 FURTHER DETAILS
+
+For full details of the DVBT functions, please see L<Linux::DVB::DVBT::TS>:
+
+   perldoc Linux::DVB::DVBT::TS
+ 
+=cut
+
+	

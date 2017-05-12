@@ -1,0 +1,9 @@
+Revision history for Perl extension Libertatea::RSSreader.
+
+0.02	2015-11-06
+	The RSS Feed Libertatea is save to a file libertatea.txt
+
+0.01  Sun Oct 25 10:46:23 2015
+	- original version; created by h2xs 1.23 with options
+		-AXn Libertatea::RSSreader
+

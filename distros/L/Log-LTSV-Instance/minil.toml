@@ -1,0 +1,4 @@
+name = "Log-LTSV-Instance"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,14 @@
+Revision history for Perl extension Lingua::EN::Summarize.
+
+0.1  Wed Jan 31 15:32:54 2001
+	- original version; created by h2xs 1.19
+
+0.2  Tue Feb 20 01:17:23 PST 2001
+	- HTML::FormatText sucked major cojones, so I replaced it with a
+	  simple bit of manual HTML::Parser code.
+	- Fixed a completely idiotic bug that should have been caught in
+	  testing related to Text::Wrap and the "wrap" option.
+	- Actually made the 'wrap' option work as documented.
+	- Changed the way extra whitespace gets stripped at the end.
+	- Fixed a warning caused by a document with no valid clauses.
+

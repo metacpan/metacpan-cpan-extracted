@@ -1,0 +1,27 @@
+name: authors
+select: select * from authors
+%%
+name: editors
+select: select * from editors where ed_fname = 'Martinella'
+%%
+name: publishers
+select: select * from publishers where pub_id = '0877'
+%%
+name: roysched
+select: select * from roysched where title_id = 'MC2222'
+%%
+name: sales
+select: select * from sales where stor_id = '7131'
+%%
+name: salesdetails
+select: select * from salesdetails where sonum > 8 and title_id = 'MC2222'
+%%
+name: titleauthors
+select: select * from titleauthors where title_id = 'MC2222'
+%%
+name: titleditors
+select: select * from titleditors where ed_id = '777-02-9831' or title_id = 'MC2222'
+%%
+name: titles
+select: select * from titles where title = 'XXXX'
+%%

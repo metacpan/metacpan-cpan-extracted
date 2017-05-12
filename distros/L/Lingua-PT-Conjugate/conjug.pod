@@ -1,0 +1,133 @@
+
+=pod 
+
+=head1 NAME 
+
+=head2 conjug - Conjugation of Portuguese verbs
+
+=head1 DESCRIPTION
+
+   conjug [qvrcsxol] verb+, [tense]*, [1-6]*
+
+ - tense is one of 
+      pres    or      Presente, 
+      perf    or      Perfeito, 
+      imp     or      Imperfeito, 
+      fut     or      Futuro,
+      mdp     or      Mais Que Perfeito      or Mais-que-Perfeito,
+      cpres   or      Conjuntivo Presente,
+      cimp    or      Conjuntivo Imperfeito,
+      cfut    or      Conjuntivo Futuro,
+      ivo     or      Imperativo
+      pp      or      Partic'ipio Passado
+      grd     or      Gerundivo 
+
+      default is all.  
+ 
+ - The numbers 1-6 correspond to "eu", "tu", "ele"/"ela", "nós",
+   "vós", "eles"/"elas".  Second person plural may be buggy, as it is
+   a recent addition to the progam.  Default is all persons that
+   apply to the tense.
+
+  Returns the verb congugated at the requested tenses and persons as
+  list of strings (one combination of tense, person each), one tense
+  per row, one person per column, writing out, and a little more
+  information : Typical output is :
+
+      > conjug i ouvir ivo partic\'ipio passado grd presente
+      ouvir :  irreg                               
+      ivo              ouve  oi\ca oi\camos oi\cam 
+      pp       ouvido                              
+      grd      ouvindo                             
+      pres     oi\co   ouves ouve  ouvimos  ouvem  
+
+  Options
+
+=over 4
+
+=item  h
+
+   Print this Help, then exit.
+
+=item  q
+
+   Quiet : Print only conjugated forms, with no extra stuff (see
+         EXAMPLES). 
+
+=item i
+
+   Don't use Iso-8859-1 character set, but "^a"etc accents and
+         "\c" cedilla.
+
+=item  r
+
+   Produce output as one person per Row, rather than the default
+         one tense per row.
+
+=item  x
+
+   Each verb entry is a regular eXpression that matches a
+         correct form.
+
+=item  o
+
+	 Separate results with commas and spaces rather than just spaces.
+
+=item  l
+
+	 Use long format for verbs, e.g. "presente" instead of "pres".
+
+
+
+=back
+
+=head2 
+
+  ACCENTUATION / CEDILLA : by default, the output uses iso-accents.
+
+  C-CEDILLA is written \c
+
+  ACCENTS are written sharp : 'a,  grave : `a, circumflex : ^o etc. 
+
+
+=head2 EXAMPLES :
+
+ etienne@anonimo: conjug i ouvir pres
+ouvir :  irreg                          
+pres     oi\co ouves ouve ouvimos ouvem 
+
+ etienne@anonimo: conjug i q ouvir pres
+oi\co ouves ouve ouvimos ouvem 
+
+ etienne@anonimo: conjug i qx ouvir pres
+o[iu]\co ouves ouve ouvimos ouvem 
+
+
+=head2 BUGS : 
+
+=over 4
+
+=item Cedillas must be protected from shell escape : you must write 
+   ``conjug cal\\car''  or  ``conjug 'cal\car' '' if don't want
+  your verb to become 'calcar'.
+
+=item Options ``ir'' are interpreted as the verb ``ir''.
+
+=item Second person plural may be buggy.
+
+=back
+
+
+=head1 SEE ALSO 
+
+treinar, Lingua::PT::Conjugate.
+
+=head1 VERSION 0.91
+
+=head1 AUTHOR 
+
+Etienne Grossmann, 1998-2013 [etienne@isr.ist.utl.pt] 
+
+=cut
+
+

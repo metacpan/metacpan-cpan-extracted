@@ -1,0 +1,8 @@
+Revision history for Lchmod
+
+0.02  2015-01-05 20:59:36
+    debug output for when tests fail because lchmod is available but does not actually work
+
+0.01  2015-01-03 18:45:23
+       Initial release.
+

@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Linux/Svgalib.pm
+Svgalib.xs
+constants.c
+t/03-svgalib.t
+typemap
+examples/fastball.pl
+examples/fracfern.pl
+examples/mand2.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

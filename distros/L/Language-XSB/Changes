@@ -1,0 +1,34 @@
+Revision history for Perl extension Language::XSB.
+
+0.14  4 Oct 2003
+	- corrected doc errors (reported by Alexandre Bezroutchko)
+
+0.13  Thu Jul 24 2003
+	- updated to work under XSB 2.6
+
+0.12  Fri Jan 31 2003
+	- minor corrections to the documentation
+
+0.11  Fri Jan 31 2003
+	- modified to used converter objects from P::L::Types
+	  package.
+
+0.10  Fri Jan 31 2003
+	- some tests added
+	- major interface changes to mimic the one for
+	  Language::Prolog::Yaswi.
+
+0.04  Thu Jan 9 2003
+	- forgotten debugging warning removed from ...::Base.h
+	- removed unused var $pkg from Language::XSB::Base
+
+0.03  Thu Nov 28 2002
+        - cleaned up for CPAN distribution
+
+0.02  Nov 20 2002
+        - non specific modules moved to Language::Prolog namespace
+
+0.01  Thu Nov 14 11:11:44 2002
+	- original version; created by h2xs 1.22 with options
+		-AX -n Language::XSB
+

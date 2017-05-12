@@ -1,0 +1,90 @@
+Log::File::Rolling HISTORY
+
+0.101  2016-03-21
+
+* Fix test failure if you don't have Test::Fork installed.
+
+0.100  2016-03-07
+
+* Forked by Doug Hoyte from Michael Jacob's Log::Dispatch::File::Rolling,
+  which in turn was based on code from Eric Cholet and Mark Pfeiffer
+  (see POD for exact lineage).
+
+* Applied my current symlink patch (rt #95900)
+
+* Fixed long-standing bug where an unformatted log filename
+  (with the % characters) would be created alongside your logs.
+
+* Allows you to choose between logging in localtime versus UTC with
+  the timezone parameter. The default is UTC ("gmtime").
+
+* Got rid log Log4Perl dependency. Uses normal strftime format
+  instead of Log::Log4perl::DateFormat's home-brewed version.
+
+* Optimisation: Caches filenames so they are generated at most
+  once per second.
+
+* Got rid of Log::Dispatch::* dependencies. Now just directly opens
+  the files.
+
+* Removed a lot of (IMHO not hugely useful) functionality such as
+  automatic creation of formats, PIDs in formats, and a lot of the
+  stuff Log::Dispatch included. For things like log levels, please
+  see Log::Defer.
+
+* Code formatting (unix instead of DOS lines, spaces instead of tabs)
+
+
+
+Log::Dispatch::File::Rolling HISTORY
+
+    1.09    Dependency change of 1.08 was missing from the Makefile.PL.
+            Oops.
+
+    1.08    Fixed dependency on Log::Dispatch::File. The change in 1.07 only
+            works with 2.37 or later. For older versions of
+            Log::Dispatch::File use 1.06.
+
+    1.07    Fixed rt.cpan.org bug #89001. Seems Log::Dispatch::File changed
+            its initialization procedure---and we are inheriting from it.
+
+    1.06    Fixed a subtle bug that prevented us from locking the logfile
+            after a fork if no PID was used in the filename.
+
+            Also disabled forced double opening of the logfile at startup.
+            It was in place because I didn't trust Log::Dispatch::File to
+            really open the file at the right moment.
+
+            Thanks to Peter Lobsinger for the patch. Please always wrap
+            non-standard Test::* modules in eval and make your testfile
+            clean up after itself... ;)
+
+    1.05    Updated packaging for newer standards. No changes to the coding.
+
+    1.04    Got a bug report where the file handle got closed in
+            mid-execution somehow. Added a additional check to re-open it
+            instead of writing to a closed handle.
+
+    1.03    Changed the syntax of the '$' format character because I noticed
+            some problems while making Log::Dispatch::File::Alerts. You need
+            to change your configuration!
+
+    1.02    No code change, just updated Makefile.PL to include correct
+            author information and prerequisites.
+
+    1.01    Someone once said "Never feed them after midnight!"---Ok, let's
+            append: "Never submit any code after midnight..."
+
+            Now it is working, I also included 4 tests.
+
+    1.00    Initial coding
+
+    0.99    Original version; created by h2xs 1.22 with options
+
+                    -A
+                    -C
+                    -X
+                    -b5.6.1
+                    -nLog::Dispatch::File::Rolling
+                    --skip-exporter
+                    -v0.99

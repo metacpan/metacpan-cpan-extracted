@@ -1,0 +1,19 @@
+Revision history for Log-UDP-Server
+
+0.40.0    2010-09-27 19:59:40 Europe/Oslo
+	Migrated from Module::Install to Dist::Zilla
+	Now uses Semantic Versioning (http://semver.org/)
+	 - Hopefully 0.40.0 is equiv. to 0.04 (old-style)
+	Improved some documentation.
+	Changed from 'use constant' to 'use Readonly'.
+
+0.03	2010-04-14
+	Added minimum perl version required information.
+	Upgraded to Module::Install 0.95.
+	Now depends on Data-Serializable 0.03.
+
+0.02	2009-05-12
+	Missing undocumented constant DATAGRAM_MAXLEN in t/pod-coverage.t.
+
+0.01    2009-05-12
+        Initial version.

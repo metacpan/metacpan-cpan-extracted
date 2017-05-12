@@ -1,0 +1,57 @@
+
+paged_report.plx, html_report.plx, and whois.plx are set up to 
+operate  correctly in either the mod_perl environment or as a 
+'cgi' file. To use with 'cgi' simply rename them to:
+
+html_report.cgi or paged_report.cgi or whois.cgi
+
+INSTALLATION
+To use, copy the contents of the 'examples' directory
+to an appropriate directory on your web server. Then
+edit html_report.xxx to provide the path relative to your
+document root to the 'images' directory or './' if it is 
+the same as html_report.xxx
+
+paged_report.xxx and html_report.xxx will not run as they are
+presently configured without this change.
+
+make a subdirectory 'tmp' with permissions writable
+by the webserver for the report page cache.
+
+Adjust any configuration settings that deviate from
+this "standard" installation. 
+
+enjoy :-)
+
+##########################################################
+
+To analyze syslog files do this:
+
+perl html_report.plx syslog_file/path/name
+
+the report module will preload the memory cache from 
+
+$look_n_feel->{cache}
+
+then add the contents of the syslog file specified on the
+command line, write the html file and re-write the 
+memory cache file specified in
+
+$look_n_feel->{html_cache_file} (see below)
+
+##########################################################
+
+FILE CACHEing is mandatory, set the values of 
+
+$look_n_feel	-> {html_cache_file}
+		-> {html_expire}
+
+This will cause the web server to fetch the report
+from the html_cache_file rather than generate a 
+new report each time. This is useful to reduce or
+eliminate the effects of a denial of service attack
+on the report generator page. It does a lot of crank
+turning and can eat up CPU resources if there are 
+many hits at the same time.
+
+make sure that the paths for 'cache' is set.

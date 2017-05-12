@@ -1,0 +1,19 @@
+title_id	title	type	pub_id	price	advance	ytd_sales	contract	notes	pubdate
+PC8888	Secrets of Silicon Valley	popular_comp	1389	40.00	8000.00	4095	1	Muckraking reporting on the world's largest computer hardware and software manufacturers.	0000-00-00
+BU1032	The Busy Executive's Database Guide	business	1389	29.99	5000.00	4095	1	An overview of available database systems with emphasis on common business applications.  Illustrated.	0000-00-00
+PS7777	Emotional Security: A New Algorithm	psychology	0736	17.99	4000.00	3336	1	Protecting yourself and your loved ones from undue emotional stress in the modern world.  Use of computer and nutritional aids emphasized.	0000-00-00
+PS3333	Prolonged Data Deprivation: Four Case Studies	psychology	0736	29.99	2000.00	4072	1	What happens when the data runs dry?  Searching evaluations of information-shortage effects.	0000-00-00
+BU1111	Cooking with Computers: Surreptitious Balance Sheets	business	1389	21.95	5000.00	3876	1	Helpful hints on how to use your electronic resources to the best advantage.	0000-00-00
+MC2222	Silicon Valley Gastronomic Treats	mod_cook	0877	29.99	0.00	2032	1	Favorite recipes for quick, easy, and elegant meals tried and tested by people who never have time to eat, let alone cook.	0000-00-00
+TC7777	Sushi, Anyone?	trad_cook	0877	29.99	8000.00	4095	1	Detailed instructions on improving your position in life by learning how to make authentic Japanese sushi in your spare time. 5-10% increase in number of friends per recipe reported from beta test.	0000-00-00
+TC4203	Fifty Years in Buckingham Palace Kitchens	trad_cook	0877	21.95	4000.00	15096	1	More anecdotes from the Queen's favorite cook describing life among English royalty.  Recipes, techniques, tender vignettes.	0000-00-00
+PC1035	But Is It User Friendly?	popular_comp	1389	42.95	7000.00	8780	1	A survey of software for the naive user, focusing on the 'friendliness' of each.	0000-00-00
+BU2075	You Can Combat Computer Stress!	business	0736	12.99	10125.00	18722	1	The latest medical and psychological techniques for living with the electronic office.  Easy-to-understand explanations.	0000-00-00
+PS2091	Is Anger the Enemy?	psychology	0736	21.95	2275.00	2045	1	Carefully researched study of the effects of strong emotions on the body. Metabolic charts included.	0000-00-00
+PS2106	Life Without Fear	psychology	0736	17.00	6000.00	111	1	New exercise, meditation, and nutritional techniques that can reduce the shock of daily interactions. Popular audience.  Sample menus included, exercise video available separately.	0000-00-00
+MC3021	The Gourmet Microwave	mod_cook	0877	12.99	15000.00	22246	1	Traditional French gourmet recipes adapted for modern microwave cooking.	0000-00-00
+TC3218	Onions, Leeks, and Garlic: Cooking Secrets of the Mediterranean	trad_cook	0877	40.95	7000.00	375	1	Profusely illustrated in color, this makes a wonderful gift book for a cuisine-oriented friend.	0000-00-00
+MC3026	The Psychology of Computer Cooking	\N	0877	\N	\N	\N	0	\N	\N
+BU7832	Straight Talk About Computers	business	1389	29.99	5000.00	4095	1	Annotated analysis of what computers can do for you: a no-hype guide for the critical user.	0000-00-00
+PS1372	Computer Phobic and Non-Phobic Individuals: Behavior Variations	psychology	0736	41.59	7000.00	375	1	A must for the specialist, this book examines the difference between those who hate and fear computers and those who think they are swell.	0000-00-00
+PC9999	Net Etiquette	popular_comp	1389	\N	\N	\N	0	A must-read for computer conferencing debutantes!.	\N

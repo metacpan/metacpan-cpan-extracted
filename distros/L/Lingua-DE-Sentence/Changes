@@ -1,0 +1,46 @@
+Revision history for Perl extension Lingua::DE::Sentence.
+
+0.07    2003-04-25 
+                Removed some bugs from the documentation.
+
+0.06	2001-09-25
+		README - File really added
+
+		the output for the functional test was changed to "ok 2\n" (\n had been left in 0.05)
+
+0.05	2001-09-24
+		remove chr(150), which is a dash in evil window character setting as leading character, too
+		of course, every good webmaster would use a &ndash;, but a good webmaster would'nt use windows, too :-)
+
+		README - File added
+
+		instead of a simple using locale,
+		I use the POSIX module and try to set locale de_DE for the time of the routine get_sentences
+
+		the methods
+		set_acronyms, add_acronyms, get_acronyms, set_file_extensions, get_file_extensions, add_file_extensions are implemented now
+
+		the test is a functional one, now
+
+		abbreviations before an empty line are sentence endings now
+
+		Thanks a lot to Andreas Marcel Riechert
+
+0.04	2001-09-23
+		fix "Selbst der 100. Punkt ist kein ..."
+		expect that numbers ending on 00 are ordinal ones,
+		except 1900,2000,2100 which ones are surely year numbers
+
+		fix <<bla bla.>> sagte er
+
+		used POSIX [:lower:] to find lowercase words internal
+
+		words of only vocals are abbreviations, too.
+
+0.03		
+		first published in CPAN
+
+0.01  Fri Aug 31 17:13:33 2001
+	- original version; created by h2xs 1.20 with options
+		-XA Lingua::DE::Sentence
+

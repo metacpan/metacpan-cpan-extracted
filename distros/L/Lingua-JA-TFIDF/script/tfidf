@@ -1,0 +1,93 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+use Lingua::JA::TFIDF;
+use YAML::Syck;
+use Data::Dumper;
+use Getopt::Long;
+use Term::ReadLine;
+use HTML::Feature;
+
+my $config       = load_config();
+my $calculator   = Lingua::JA::TFIDF->new(%$config);
+my $html_feature = HTML::Feature->new;
+
+my $term   = Term::ReadLine->new();
+my $prompt = "TFIDF > ";
+my $out    = $term->OUT || \*STDOUT;
+
+while ( defined( $_ = $term->readline($prompt) ) ) {
+    if ( $_ eq 'text' ) {
+        my $text;
+      LABEL:
+        while (
+            defined(
+                $_ = $term->readline( $prompt . "input text and Control-D : " )
+            )
+          )
+        {
+            if ( $_ eq '\cD' ) {
+                last LABEL;
+            }
+            $text .= $_;
+        }
+        my $list = $calculator->tfidf($text)->list;
+        print_more($list);
+        print "----", "\n";
+    }
+    elsif ( $_ =~ /url (.+)/ ) {
+        my $url   = $1;
+        my $regex = 's?https?://[-_.!~*\'()a-zA-Z0-9;/?:@&=+$,%#]+';
+        if ( $url =~ /$regex/ ) {
+            my $result = $html_feature->parse($url);
+            my $text;
+            $text .= $result->title if $result->title;
+            $text .= $result->desc  if $result->desc;
+            $text .= $result->text  if $result->text;
+            my $list = $calculator->tfidf($text)->list;
+            print_more($list);
+            print "----", "\n";
+        }
+        else {
+            print "bad url";
+        }
+    }
+    elsif ( $_ eq 'q' || $_ eq 'exit') {
+        print $out "bye!\n";
+        exit;
+    }
+}
+
+sub print_more {
+    my $list = shift;
+    print "\n";
+    my $i = 0;
+    my $j = 0;
+    for (@$list) {
+        $i++;
+        $j++;
+        my ( $key, $value ) = each %$_;
+        print sprintf("%04d\t%.14f", $i, $value), "\t", $key, "\n";
+        if ( $j == 20 ) {
+            print "\n";
+            while ( defined( $_ = $term->readline( $prompt . "[ MORE ]" ) ) ) {
+                print "\n";
+                $j = 0;
+                last;
+            }
+        }
+    }
+}
+
+sub load_config {
+    my $config_file;
+    my $config;
+    Getopt::Long::GetOptions( '--config=s' => \$config_file, ) or pod2usage(2);
+    if ($config_file) {
+        $config = LoadFile($config_file);
+    }
+    return $config;
+}
+
+exit;

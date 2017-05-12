@@ -1,0 +1,32 @@
+TYPEMAP
+Zhi						T_PV
+ZhiCode						T_UV
+ZhiStr						T_PV
+ZuYinIndex					T_UV
+ZuYinSymbol					T_PV
+ZuYinSymbolSequence				T_PV
+const Zhi					T_PV
+Chu						T_PTROBJ
+Chunk						T_PTROBJ
+Tsi						T_PTROBJ
+TsiYin						T_PTROBJ
+TsiDB						T_PTROBJ
+TsiYinDB					T_PTROBJ
+YinList						T_PV
+Yin						T_UV
+unsigned long int				T_UV
+unsigned short int				T_UV
+const char *					T_PV
+
+INPUT
+T_PTROBJ
+	if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/^/Lingua::ZH::TaBE::/g;\$ntt}\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = ($type) tmp;
+	}
+	else
+	    croak(\"$var is not of type ${(my $ntt=$ntype)=~s/^/Lingua::ZH::TaBE::/g;\$ntt}\")
+
+OUTPUT
+T_PTROBJ
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/^/Lingua::ZH::TaBE::/g;\$ntt}\", (void*)$var);

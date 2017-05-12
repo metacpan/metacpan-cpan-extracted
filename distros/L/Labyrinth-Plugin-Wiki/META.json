@@ -1,0 +1,70 @@
+{
+    "name": "Labyrinth-Plugin-Wiki",
+    "version": "1.06",
+    "abstract": "Wiki plugin for the Labyrinth framework",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "web",
+        "cgi",
+        "framework"
+    ],
+
+    "prereqs" : {
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+              "perl": "5.006",
+              "Labyrinth": "5.16",
+              "Algorithm::Diff": "0",
+              "VCS::Lite": "0"
+            }
+        }
+    },
+
+    "provides": {
+        "Labyrinth::Plugin::Wiki": {
+            "file": "lib/Labyrinth/Plugin/Wiki.pm",
+            "version": "1.06"
+        },
+        "Labyrinth::Plugin::Wiki::Text": {
+            "file": "lib/Labyrinth/Plugin/Wiki/Text.pm",
+            "version": "1.06"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples","vhost"]
+    },
+
+    "resources": {
+        "homepage": "http://labyrinth.missbarbell.co.uk",
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Labyrinth-Plugin-Wiki" },
+        "repository": {
+            "url": "git://github.com/barbie/labyrinth-plugin-wiki.git",
+            "web": "http://github.com/barbie/labyrinth-plugin-wiki",
+            "type": "git"
+        }
+    }
+}

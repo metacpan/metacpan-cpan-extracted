@@ -1,0 +1,151 @@
+{
+  "applicationList": {
+    "0001-cat": {
+      "catname": "Sample applications",
+      "0002-app": {
+        "options": {
+          "description": "A simple application displaying authenticated user",
+          "display": "auto",
+          "logo": "demo.png",
+          "name": "Application Test 1",
+          "uri": "http://test1.example.com/"
+        },
+        "type": "application"
+      },
+      "0003-app": {
+        "options": {
+          "description": "The same simple application displaying authenticated user",
+          "display": "auto",
+          "logo": "thumbnail.png",
+          "name": "Application Test 2",
+          "uri": "http://test2.example.com/"
+        },
+        "type": "application"
+      },
+      "type": "category"
+    },
+    "0004-cat": {
+      "catname": "Administration",
+      "0005-app": {
+        "options": {
+          "description": "Configure LemonLDAP::NG WebSSO",
+          "display": "auto",
+          "logo": "configure.png",
+          "name": "WebSSO Manager",
+          "uri": "http://manager.example.com/"
+        },
+        "type": "application"
+      },
+      "0006-app": {
+        "options": {
+          "description": "Explore WebSSO notifications",
+          "display": "auto",
+          "logo": "database.png",
+          "name": "Notifications explorer",
+          "uri": "http://manager.example.com/notifications.pl"
+        },
+        "type": "application"
+      },
+      "0007-app": {
+        "options": {
+          "description": "Explore WebSSO sessions",
+          "display": "auto",
+          "logo": "database.png",
+          "name": "Sessions explorer",
+          "uri": "http://manager.example.com/sessions.pl"
+        },
+        "type": "application"
+      },
+      "type": "category"
+    },
+    "0008-cat": {
+      "catname": "Documentation",
+      "0009-app": {
+        "options": {
+          "description": "Documentation supplied with LemonLDAP::NG",
+          "display": "on",
+          "logo": "help.png",
+          "name": "Local documentation",
+          "uri": "http://manager.example.com/doc/"
+        },
+        "type": "application"
+      },
+      "0010-app": {
+        "options": {
+          "description": "Official LemonLDAP::NG Website",
+          "display": "on",
+          "logo": "network.png",
+          "name": "Offical Website",
+          "uri": "http://lemonldap-ng.org/"
+        },
+        "type": "application"
+      },
+      "type": "category"
+    }
+  },
+  "authentication": "Demo",
+  "cfgAuthor": "The LemonLDAP::NG team ©",
+  "cfgAuthorIP": "127.0.0.1",
+  "cfgDate": 1428138808,
+  "cfgLog": "Default configuration provided by LemonLDAP::NG team",
+  "cfgNum": "1",
+  "cookieName": "lemonldap",
+  "demoExportedVars": {
+    "cn": "cn",
+    "mail": "mail",
+    "uid": "uid"
+  },
+  "domain": "example.com",
+  "exportedHeaders": {
+    "test1.example.com": {
+      "Auth-User": "$uid"
+    },
+    "test2.example.com": {
+      "Auth-User": "$uid"
+    }
+  },
+  "exportedVars": {
+    "UA": "HTTP_USER_AGENT"
+  },
+  "globalStorage": "Apache::Session::File",
+  "globalStorageOptions": {
+    "Directory": "t/sessions",
+    "generateModule": "Lemonldap::NG::Common::Apache::Session::Generate::SHA256"
+  },
+  "groups": {},
+  "key": "qwertyui",
+  "locationRules": {
+    "manager.example.com": {
+      "default": "$uid eq \"dwho\""
+    },
+    "test1.example.com": {
+      "^/logout": "logout_sso",
+      "default": "accept"
+    },
+    "test2.example.com": {
+      "^/logout": "logout_sso",
+      "default": "accept"
+    }
+  },
+  "loginHistoryEnabled": 1,
+  "macros": {
+    "_whatToTrace": "$_auth eq 'SAML' ? \"$_user\\@$_idpConfKey\" : \"$_user\""
+  },
+  "notification": 1,
+  "notificationStorage": "File",
+  "notificationStorageOptions": {
+    "dirName": "t/notifications"
+  },
+  "passwordDB": "Demo",
+  "persistentStorage": "Apache::Session::File",
+  "persistentStorageOptions": {
+    "Directory": "__PSESSIONDIR__"
+  },
+  "portal": "http://auth.example.com/",
+  "reloadUrls": {},
+  "securedCookie": 0,
+  "sessionDataToRemember": {},
+  "timeout": 72000,
+  "userDB": "Demo",
+  "whatToTrace": "_whatToTrace"
+}

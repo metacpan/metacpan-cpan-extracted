@@ -1,0 +1,25 @@
+<DefaultConfig>
+    CONFIG_DIR = ../share/YaTeA/config
+    LOCALE_DIR = ../share/YaTeA/locale
+    RESULT_DIR = $PWD/RESULTS
+</DefaultConfig>
+<OPTIONS>
+    MESSAGE_DISPLAY = EN
+    language = FR-Flemm
+    xmlout = 1
+    printChunking = 0
+    suffix = "YaTeA"
+    TC-for-BioLG = 0
+    TT-for-BioLG = 0 
+    debug = 1
+    termList = "multi"
+#    termino = "$HOME/terms.txt"
+    TTG-style-term-candidates = "multi"
+    monolexical-included = 0
+    monolexical-all = 0
+    match-type = "" 
+    XML-corpus-for-BioLG = 0
+    annotate-only = 0
+</OPTIONS>
+
+

@@ -1,0 +1,86 @@
+---
+abstract: 'Perl I18n using github://nodeca/babelfish format.'
+author:
+  - 'Akzhan Abdulin <akzhan@cpan.org>'
+  - 'Igor Mironov <grif@cpan.org>'
+  - 'REG.RU LLC'
+build_requires:
+  File::Spec: 0
+  File::Temp: 0
+  FindBin: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Deep: 0
+  Test::More: 0.98
+  strict: 0
+  utf8: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142060'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Locale-Babelfish
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - examples
+    - corpus
+  namespace:
+    - t::lib
+  package:
+    - DB
+provides:
+  Locale::Babelfish:
+    file: lib/Locale/Babelfish.pm
+    version: 1.000000
+  Locale::Babelfish::Phrase::Compiler:
+    file: lib/Locale/Babelfish/Phrase/Compiler.pm
+    version: 1.000000
+  Locale::Babelfish::Phrase::Literal:
+    file: lib/Locale/Babelfish/Phrase/Literal.pm
+    version: 1.000000
+  Locale::Babelfish::Phrase::Node:
+    file: lib/Locale/Babelfish/Phrase/Node.pm
+    version: 1.000000
+  Locale::Babelfish::Phrase::Parser:
+    file: lib/Locale/Babelfish/Phrase/Parser.pm
+    version: 1.000000
+  Locale::Babelfish::Phrase::ParserBase:
+    file: lib/Locale/Babelfish/Phrase/ParserBase.pm
+    version: 1.000000
+  Locale::Babelfish::Phrase::PluralForms:
+    file: lib/Locale/Babelfish/Phrase/PluralForms.pm
+    version: 1.000000
+  Locale::Babelfish::Phrase::PluralFormsParser:
+    file: lib/Locale/Babelfish/Phrase/PluralFormsParser.pm
+    version: 1.000000
+  Locale::Babelfish::Phrase::Pluralizer:
+    file: lib/Locale/Babelfish/Phrase/Pluralizer.pm
+    version: 1.000000
+  Locale::Babelfish::Phrase::Variable:
+    file: lib/Locale/Babelfish/Phrase/Variable.pm
+    version: 1.000000
+requires:
+  Carp: 0
+  Class::Accessor::Fast: 0
+  File::Find: 0
+  File::Spec: 0
+  List::Util: 1.33
+  Scalar::Util: 0
+  YAML::Syck: 0
+  parent: 0
+  perl: 5.010001
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/regru/Locale-Babelfish/issues
+  homepage: https://metacpan.org/release/Locale-Babelfish
+  repository: git://github.com/regru/Locale-Babelfish.git
+version: 1.000000

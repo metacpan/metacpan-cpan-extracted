@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         LWP::UserAgent::ProxyAny
+version:      1.01
+version_from: ProxyAny.pm
+license:      perl
+installdirs:  site
+requires:
+    LWP
+
+distribution_type: modules
+generated_by: ExtUtils::MakeMaker version 6.21

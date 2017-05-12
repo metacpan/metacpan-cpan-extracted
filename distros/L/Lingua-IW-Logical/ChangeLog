@@ -1,0 +1,10 @@
+0.4 -> 0.5
+	Documentation corrections. Thanks to sbekman@iil.intel.com.
+0.3 -> 0.4 
+	Small bugfixes
+0.2 -> 0.3
+	Bugs in rendering algorithm corrected (thanks to rami@active.co.il for input)
+	External debug control added (you need this only if you are me or 
+	you want to know how it works)
+0.2	
+	First real version on CPAN

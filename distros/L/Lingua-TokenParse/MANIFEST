@@ -1,0 +1,9 @@
+Changes
+eg/word_parse
+lib/Lingua/TokenParse.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/1.t
+META.yml                                 Module meta-data (added by MakeMaker)

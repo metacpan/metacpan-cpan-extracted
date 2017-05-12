@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+JIS.pm
+JIS.pod
+t/func.t
+t/test.t
+t/nonkanji.t

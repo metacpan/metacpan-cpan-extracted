@@ -1,0 +1,11 @@
+Revision history for Perl extension Lingua::BioYaTeA.
+
+0.11    
+        - Correction in the preprocessing module (the module
+          Lingua::YaTeA:Corpus was not loaded)
+
+0.1  
+	- Version of YaTeA with a CPAN configuration
+
+
+

@@ -1,0 +1,16 @@
+
+<Sect1 id="sec-Bits">
+  <Title><literal>Bits</literal></Title>
+  <IndexTerm><Primary>Bits</Primary></IndexTerm>
+
+  <para>This module has moved to <ulink url="../base/Data.Bits.html"><literal>Data.Bits</literal></ulink> in the
+  hierarchical libraries.</para>
+
+</Sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: sgml ***
+     ;;; sgml-parent-document: ("../../doc/hslibs.sgml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

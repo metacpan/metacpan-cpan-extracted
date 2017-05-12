@@ -1,0 +1,247 @@
+#!/usr/bin/perl
+# Copyright (c) 2014-2017 Sullivan Beck.  All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+###############################################################################
+###############################################################################
+# This script is the wrapper which is used to harvest and check data of a
+# single type.
+#
+# It first loads the old data.  Then it harvests the new data.  Then it
+# compares the new data to the old data and shows the difference in a
+# usable way.
+
+require 5.000000;
+use warnings;
+use strict;
+
+use lib "./lib";
+
+###############################################################################
+# GLOBAL VARIABLES
+###############################################################################
+
+our %type =
+  ( 'country'  => { 'label'   => 'Country',
+                    'sets'    => [qw(alpha-2 alpha-3 numeric dom)],
+                    'opt'     => '-c' },
+    'language' => { 'label'   => 'Language',
+                    'sets'    => [qw(alpha-2 alpha-3 term)],
+                    'opt'     => '-l' },
+    'currency' => { 'label'   => 'Currency',
+                    'sets'    => [qw(alpha num)],
+                    'opt'     => '-r' },
+    'script'   => { 'label'   => 'Script',
+                    'sets'    => [qw(alpha num)],
+                    'opt'     => '-s' },
+    'langext'  => { 'label'   => 'LangExt',
+                    'sets'    => [qw(alpha)],
+                    'opt'     => '-L' },
+    'langvar'  => { 'label'   => 'LangVar',
+                    'sets'    => [qw(alpha)],
+                    'opt'     => '-V' },
+    'langfam'  => { 'label'   => 'LangFam',
+                    'sets'    => [qw(alpha)],
+                    'opt'     => '-F' },
+  );
+
+###############################################################################
+# HELP
+###############################################################################
+
+our($usage);
+my $COM = $0;
+$COM =~ s/^.*\///;
+
+my @type = sort keys %type;
+$usage=
+  "usage: $COM OPTS TYPE
+      -h/--help       : Print help.
+
+      -d/--debug      : Run the harvest_data script in the debugger.
+
+TYPE is one of:
+   @type
+";
+
+###############################################################################
+# PARSE ARGUMENTS
+###############################################################################
+
+our $type;
+our $debug = 0;
+
+while ($_ = shift) {
+
+   (print $usage),   exit  if ($_ eq "-h"   ||  $_ eq "--help");
+   $debug = 1,       next  if ($_ eq "-d"   ||  $_ eq "--debug");
+
+   $type = $_;
+   last;
+}
+
+die $usage  if (@ARGV  ||
+                ! $type  ||
+                ! exists $type{$type});
+
+############################################################################
+# MAIN PROGRAM
+############################################################################
+
+our $label    = $type{$type}{'label'};
+our @sets     = sort @{ $type{$type}{'sets'} };
+our $opt      = $type{$type}{'opt'};
+our $main_mod = "Locale::Codes::$label";
+our $code_mod = "Locale::Codes::${label}_Codes";
+our $file     = "lib/Locale/Codes/${label}_Codes.pm";
+
+print "#"x70,"\n";
+print "$label\n";
+print "#"x70,"\n";
+
+# If we have $file.bak, restore it so that if we run this multiple times,
+# we'll always have the same behavior.
+
+if ( -f "$file.bak" ) {
+   system("mv $file.bak $file");
+}
+our %old      = get_data();
+
+# Now backup the file.
+
+system("cp -p $file $file.bak");
+
+# Harvest the data
+
+my $deb       = ($debug ? "-d" : "");
+system("perl $deb ./internal/harvest_data $opt");
+our %new      = get_data();
+
+# We want to check to see if there is any HTML in the new file.
+
+print "#"x70,"\n";
+print "Suspected HTML in codes:\n\n";
+system("egrep '<' $file");
+
+compare("NAMES");
+
+foreach my $set (@sets) {
+   compare("SET: $set");
+}
+
+
+
+############################################################################
+
+sub compare {
+   my($grp) = @_;
+
+   my @old  = sort keys %{ $old{$grp} };
+   my $old  = @old;
+   my @new  = sort keys %{ $new{$grp} };
+   my $new  = @new;
+
+   print "#"x70,"\n";
+   print "Changes to: $grp:\n";
+   print "   Size: $old -> $new\n"   if ($old != $new);
+   print "\n";
+
+   while (@old  ||  @new) {
+      if ( (@old  &&  ! @new)  ||
+           (@old  &&  @new  &&  $old[0] lt $new[0]) ) {
+         print "   - $old[0]\n";
+         foreach my $val (@{ $old{$grp}{$old[0]} }) {
+            print "     - $val\n";
+         }
+         shift(@old);
+
+      } elsif ( (@new  &&  ! @old)  ||
+                (@old  &&  @new  &&  $new[0] lt $old[0]) ) {
+         print "   + $new[0]\n";
+         foreach my $val (@{ $new{$grp}{$new[0]} }) {
+            print "     + $val\n";
+         }
+         shift(@new);
+
+      } else {
+         my $key = shift(@old);
+         shift(@new);
+
+         my @diff;
+         my @oval = sort @{ $old{$grp}{$key} };
+         my @nval = sort @{ $new{$grp}{$key} };
+
+         while (@oval  ||  @nval) {
+
+            if ( (@oval  &&  ! @nval)  ||
+                 (@oval  &&  @nval  &&  $oval[0] lt $nval[0]) ) {
+               push(@diff,"- $oval[0]");
+               shift(@oval);
+               next;
+
+            } elsif ( (@nval  &&  ! @oval)  ||
+                      (@oval  &&  @nval  &&  $nval[0] lt $oval[0]) ) {
+               push(@diff,"+ $nval[0]");
+               shift(@nval);
+               next;
+
+            } else {
+               shift(@oval);
+               shift(@nval);
+               next;
+            }
+         }
+
+         if (@diff) {
+            print "   * $key\n";
+            foreach my $diff (@diff) {
+               print "     $diff\n";
+            }
+         }
+      }
+   }
+}
+
+sub get_data {
+   my @in = `./internal/print_curr_data $code_mod`;
+   chomp @in;
+
+   my %in;
+   my $grp = "";
+   my $ele = "";
+
+   LINE:
+   while (@in) {
+      my $line = shift(@in);
+
+      if ($line eq "NAMES"  ||
+          $line =~ /^SET: /) {
+         $grp = $line;
+         next LINE;
+      }
+
+      if ($line =~ /^ /) {
+         $line =~ s/^ *//;
+         push @{ $in{$grp}{$ele} },$line;
+
+      } else {
+         $ele = $line;
+         $in{$grp}{$ele} = [];
+      }
+   }
+
+   return %in;
+}
+
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

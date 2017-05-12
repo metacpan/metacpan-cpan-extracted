@@ -1,0 +1,37 @@
+---
+abstract: 'scope based setlocale(3)'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-Scope
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Locale::Scope:
+    file: lib/Locale/Scope.pm
+    version: '0.03'
+requires:
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/karupanerura/Locale-Scope/issues
+  homepage: https://github.com/karupanerura/Locale-Scope
+  repository: git://github.com/karupanerura/Locale-Scope.git
+version: '0.03'

@@ -1,0 +1,41 @@
+Lufs version 0.16
+=================
+
+This is perlufs, a perl plug for lufs.
+It allows you to write filesystem implementations in perl.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL 
+   ./Build
+   ./Build test
+   ./Build install
+
+   # the lufs patch:
+   cd lufs-0.9.7
+   patch -p0 < lufs-0.97-patch.diff
+   make
+   make install
+
+USAGE
+
+For usage information, consult the Lufs(3pm) manpage.
+For programming examples, see the Lufs::Howto(3pm) manpage.
+
+DEPENDENCIES
+
+You need a recent version of lufs (http://lufs.sf.net), with the included patch applied.
+
+SEE ALSO
+
+http://datamoeras.org/perlufs
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Raoul Zwart <rlzwart@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

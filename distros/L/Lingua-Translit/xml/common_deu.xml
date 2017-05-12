@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+
+<!--
+
+  Transliteration definitions for the common transliteration of German
+  umlauts.
+
+  Copyright (C) 2007-2008 Alex Linke <alinke@lingua-systems.com>
+  Copyright (C) 2009 Lingua-Systems Software GmbH
+
+  See Duden - Band 1: "Die deutsche Rechtschreibung", Mannheim, 2001,
+    p. 105f., "Maschinenschreiben und E-Mails"
+
+-->
+
+
+<translit>
+
+    <!-- meta data -->
+
+    <name>Common DEU</name>
+
+    <desc>German umlauts</desc>
+
+    <reverse>false</reverse>
+
+
+    <!-- set of transliteration rules -->
+
+    <rules>
+
+        <rule>
+            <from>&#x00C4;</from>   <!-- Ä -->
+            <to>Ae</to>
+        </rule>
+
+        <rule>
+            <from>&#x00E4;</from>   <!-- ä -->
+            <to>ae</to>
+        </rule>
+
+        <rule>
+            <from>&#x00D6;</from>   <!-- Ö -->
+            <to>Oe</to>
+        </rule>
+
+        <rule>
+            <from>&#x00F6;</from>   <!-- ö -->
+            <to>oe</to>
+        </rule>
+
+        <rule>
+            <from>&#x00DC;</from>   <!-- Ü -->
+            <to>Ue</to>
+        </rule>
+
+        <rule>
+            <from>&#x00FC;</from>   <!-- ü -->
+            <to>ue</to>
+        </rule>
+
+        <!--
+	    An 'ß' in a word in all caps is transliterated in
+	    all caps, too.
+
+	    As 'ß' will never be word initial and will at least
+	    only very seldomly appear as a second character, a word
+	    is believed to be in all caps, if the preceeding character
+	    is a capital one.
+	-->
+
+        <rule>
+            <from>&#x00DF;</from>   <!-- ß -->
+            <to>SS</to>
+            <context>
+                <after>\p{IsUpper}</after>
+            </context>
+        </rule>
+
+        <rule>
+            <from>&#x00DF;</from>   <!-- ß -->
+            <to>ss</to>
+        </rule>
+
+    </rules>
+
+</translit>
+
+
+<!--
+  vim: sts=4 sw=4 ai et
+-->

@@ -1,0 +1,860 @@
+[12290-14272]
+video = 6273
+tsid = 12290
+lcn = 23
+name = bid tv
+ca = 0
+net = Sit-Up Ltd
+audio = 6274
+teletext = 0
+subtitle = 0
+type = 1
+pnr = 14272
+audio_details = eng:6274
+
+[16384-18624]
+video = 0
+tsid = 16384
+lcn = 703
+name = BBC Radio 3
+ca = 0
+net = BBC
+audio = 438
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 18624
+audio_details = eng:438
+
+[4107-4235]
+video = 610
+lcn = 2
+tsid = 4107
+name = BBC TWO
+ca = 0
+net = BBC
+audio = 611
+teletext = 0
+subtitle = 615
+type = 1
+pnr = 4235
+audio_details = eng:611 eng:612
+
+[24576-28032]
+video = 601
+tsid = 24576
+lcn = 24
+name = ITV4
+ca = 0
+net = ITV
+audio = 602
+teletext = 0
+subtitle = 603
+type = 1
+pnr = 28032
+audio_details = eng:602 eng:604
+
+[8199-8263]
+video = 520
+tsid = 8199
+lcn = 3
+name = ITV1
+ca = 0
+net = ITV
+audio = 521
+teletext = 0
+subtitle = 523
+type = 1
+pnr = 8263
+audio_details = eng:521 eng:522
+
+[24576-25664]
+video = 101
+tsid = 24576
+lcn = 18
+name = 4Music
+ca = 0
+audio = 102
+teletext = 0
+subtitle = 103
+type = 1
+pnr = 25664
+audio_details = eng:102
+
+[16384-18176]
+video = 0
+tsid = 16384
+lcn = 701
+name = BBC 1Xtra
+ca = 0
+net = BBC
+audio = 434
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 18176
+audio_details = eng:434
+
+[8199-8448]
+video = 570
+tsid = 8199
+lcn = 28
+name = E4
+ca = 0
+net = Channel 4 TV
+audio = 571
+teletext = 0
+subtitle = 573
+type = 1
+pnr = 8448
+audio_details = eng:571 eng:572
+
+[20480-22976]
+video = 0
+tsid = 20480
+lcn = 725
+name = Premier Radio
+ca = 0
+net = London Christian Radio Ltd
+audio = 1701
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 22976
+audio_details = eng:1701
+
+[16384-17984]
+video = 0
+tsid = 16384
+lcn = 706
+name = BBC R5SX
+ca = 0
+net = BBC
+audio = 431
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 17984
+audio_details = eng:431
+
+[8199-8442]
+video = 590
+tsid = 8199
+lcn = 14
+name = More 4
+ca = 0
+net = Channel 4 TV
+audio = 591
+teletext = 0
+subtitle = 593
+type = 1
+pnr = 8442
+audio_details = eng:591 eng:592
+
+[12290-16048]
+video = 6881
+tsid = 12290
+lcn = 10
+name = ITV3
+ca = 0
+net = ITV
+audio = 6882
+teletext = 0
+subtitle = 6886
+type = 1
+pnr = 16048
+audio_details = eng:6882 eng:6883
+
+[24576-27136]
+video = 701
+tsid = 24576
+lcn = 15
+name = Film4
+ca = 0
+net = Channel 4 TV
+audio = 702
+teletext = 0
+subtitle = 703
+type = 1
+pnr = 27136
+audio_details = eng:702 eng:704
+
+[12290-14498]
+video = 6929
+tsid = 12290
+lcn = 38
+name = QUEST
+ca = 0
+net = Discovery
+audio = 6930
+teletext = 0
+subtitle = 0
+type = 1
+pnr = 14498
+audio_details = eng:6930
+
+[12290-14592]
+video = 0
+tsid = 12290
+lcn = 712
+name = Smash Hits!
+ca = 0
+net = EMAP
+audio = 6306
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 14592
+audio_details = xxx:6306
+
+[4107-4671]
+video = 620
+lcn = 70
+tsid = 4107
+name = CBBC Channel
+ca = 0
+net = BBC
+audio = 621
+teletext = 0
+subtitle = 623
+type = 1
+pnr = 4671
+audio_details = eng:621 eng:622
+
+[8199-8500]
+video = 540
+tsid = 8199
+lcn = 5
+name = FIVE
+ca = 0
+net = five
+audio = 541
+teletext = 0
+subtitle = 543
+type = 1
+pnr = 8500
+audio_details = eng:541 eng:542
+
+[12290-16288]
+video = 6737
+tsid = 12290
+lcn = 309
+name = TOPUP Anytime3
+ca = 1
+net = TopUp TV Ltd
+audio = 6738
+teletext = 0
+subtitle = 0
+type = 1
+pnr = 16288
+audio_details = eng:6738
+
+[20480-22208]
+video = 301
+tsid = 20480
+lcn = 11
+name = SKY THREE
+ca = 0
+net = Sky
+audio = 302
+teletext = 0
+subtitle = 303
+type = 1
+pnr = 22208
+audio_details = eng:302 eng:304
+
+[24576-27776]
+video = 2301
+tsid = 24576
+lcn = 36
+name = Create & Craft
+ca = 0
+net = Ideal Shopping Direct Plc
+audio = 2302
+teletext = 0
+subtitle = 2303
+type = 1
+pnr = 27776
+audio_details = eng:2302 eng:2304
+
+[12290-16032]
+video = 6833
+tsid = 12290
+lcn = 72
+name = CITV
+ca = 0
+net = ITV
+audio = 6834
+teletext = 0
+subtitle = 6838
+type = 1
+pnr = 16032
+audio_details = eng:6834 eng:6835
+
+[16384-18496]
+video = 0
+tsid = 16384
+lcn = 700
+name = BBC Radio 1
+ca = 0
+net = BBC
+audio = 436
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 18496
+audio_details = eng:436
+
+[8199-8772]
+video = 0
+tsid = 8199
+lcn = 728
+name = Heart
+ca = 0
+net = Global Radio
+audio = 631
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 8772
+audio_details = eng:631
+
+[16384-18112]
+video = 0
+tsid = 16384
+lcn = 708
+name = BBC Radio 7
+ca = 0
+net = BBC
+audio = 433
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 18112
+audio_details = eng:433
+
+[24576-26368]
+video = 0
+tsid = 24576
+lcn = 718
+name = SMOOTH RADIO
+ca = 0
+net = GMG
+audio = 1401
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 26368
+audio_details = eng:1401
+
+[16384-17920]
+video = 0
+tsid = 16384
+lcn = 705
+name = BBC R5L
+ca = 0
+net = BBC
+audio = 430
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 17920
+audio_details = eng:430
+
+[16384-18304]
+video = 0
+tsid = 16384
+lcn = 710
+name = BBC World Sv.
+ca = 0
+net = BBC
+audio = 440
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 18304
+audio_details = eng:440
+
+[20480-23104]
+video = 0
+tsid = 20480
+lcn = 727
+name = Absolute Radio
+ca = 0
+net = Absolute Radio
+audio = 1901
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 23104
+audio_details = eng:1901
+
+[12290-12992]
+video = 6689
+tsid = 12290
+lcn = 31
+name = FIVE USA
+ca = 0
+net = five
+audio = 6690
+teletext = 0
+subtitle = 6694
+type = 1
+pnr = 12992
+audio_details = eng:6690 eng:6691
+
+[24576-26624]
+video = 0
+tsid = 24576
+lcn = 715
+name = Magic
+ca = 0
+audio = 1801
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 26624
+audio_details = eng:1801
+
+[24576-26176]
+video = 0
+tsid = 24576
+lcn = 713
+name = Kiss
+ca = 0
+audio = 1101
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 26176
+audio_details = eng:1101
+
+[16384-16960]
+video = 201
+tsid = 16384
+lcn = 71
+name = CBeebies
+ca = 0
+net = BBC
+audio = 401
+teletext = 0
+subtitle = 601
+type = 1
+pnr = 16960
+audio_details = eng:401 eng:402
+
+[24576-26560]
+video = 0
+tsid = 24576
+lcn = 711
+name = The Hits Radio
+ca = 0
+audio = 1701
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 26560
+audio_details = eng:1701
+
+[20480-22272]
+video = 401
+tsid = 20480
+lcn = 19
+name = Dave
+ca = 0
+net = UKTV
+audio = 402
+teletext = 0
+subtitle = 403
+type = 1
+pnr = 22272
+audio_details = eng:402 eng:404
+
+[24576-25792]
+video = 301
+tsid = 24576
+lcn = 12
+name = Yesterday
+ca = 0
+net = UKTV
+audio = 302
+teletext = 0
+subtitle = 303
+type = 1
+pnr = 25792
+audio_details = eng:302 eng:304
+
+[24576-25728]
+video = 201
+tsid = 24576
+lcn = 21
+name = VIVA
+ca = 0
+net = MTV Europe
+audio = 202
+teletext = 0
+subtitle = 203
+type = 1
+pnr = 25728
+audio_details = eng:202
+
+[20480-22144]
+video = 201
+tsid = 20480
+lcn = 83
+name = Sky Spts News
+ca = 0
+net = Sky
+audio = 202
+teletext = 0
+subtitle = 203
+type = 1
+pnr = 22144
+audio_details = eng:202 eng:204
+
+[16384-18240]
+video = 0
+tsid = 16384
+lcn = 709
+name = BBC Asian Net.
+ca = 0
+net = BBC
+audio = 435
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 18240
+audio_details = eng:435
+
+[24576-26688]
+video = 0
+tsid = 24576
+lcn = 716
+name = Q
+ca = 0
+audio = 1901
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 26688
+audio_details = eng:1901
+
+[16384-19968]
+video = 204
+tsid = 16384
+lcn = 87
+name = Community
+ca = 0
+net = BBC
+audio = 411
+teletext = 0
+subtitle = 602
+type = 1
+pnr = 19968
+audio_details = eng:411 eng:415
+
+[16384-18688]
+video = 0
+tsid = 16384
+lcn = 704
+name = BBC Radio 4
+ca = 0
+net = BBC
+audio = 439
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 18688
+audio_details = eng:439
+
+[12290-13120]
+video = 6049
+tsid = 12290
+lcn = 16
+name = QVC
+ca = 0
+net = QVC
+audio = 6050
+teletext = 0
+subtitle = 0
+type = 1
+pnr = 13120
+audio_details = eng:6050
+
+[20480-22592]
+video = 0
+tsid = 20480
+lcn = 723
+name = talkSPORT
+ca = 0
+net = talkSPORT
+audio = 1101
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 22592
+audio_details = eng:1101
+
+[4107-4415]
+video = 640
+lcn = 80
+tsid = 4107
+name = BBC NEWS
+ca = 0
+net = BBC
+audio = 641
+teletext = 0
+subtitle = 643
+type = 1
+pnr = 4415
+audio_details = eng:641
+
+[24576-26304]
+video = 0
+tsid = 24576
+lcn = 722
+name = Kerrang!
+ca = 0
+audio = 1301
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 26304
+audio_details = eng:1301
+
+[16384-19456]
+video = 203
+tsid = 16384
+lcn = 301
+name = 301
+ca = 0
+net = BBC
+audio = 407
+teletext = 0
+subtitle = 0
+type = 1
+pnr = 19456
+audio_details = eng:407 und:408
+
+[20480-22080]
+video = 101
+tsid = 20480
+lcn = 82
+name = Sky News
+ca = 0
+net = Sky
+audio = 102
+teletext = 0
+subtitle = 103
+type = 1
+pnr = 22080
+audio_details = eng:102 eng:104
+
+[16384-18048]
+video = 0
+tsid = 16384
+lcn = 707
+name = BBC 6 Music
+ca = 0
+net = BBC
+audio = 432
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 18048
+audio_details = eng:432
+
+[8199-8362]
+video = 600
+tsid = 8199
+lcn = 33
+name = ITV2 +1
+ca = 0
+net = ITV
+audio = 601
+teletext = 0
+subtitle = 603
+type = 1
+pnr = 8362
+audio_details = eng:601 eng:602
+
+[16384-18560]
+video = 0
+tsid = 16384
+lcn = 702
+name = BBC Radio 2
+ca = 0
+net = BBC
+audio = 437
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 18560
+audio_details = eng:437
+
+[20480-22336]
+video = 501
+tsid = 20480
+lcn = 29
+name = E4+1
+ca = 0
+net = Channel 4 TV
+audio = 502
+teletext = 0
+subtitle = 503
+type = 1
+pnr = 22336
+audio_details = eng:502 eng:504
+
+[24576-25920]
+video = 501
+tsid = 24576
+lcn = 22
+name = Ideal World
+ca = 0
+audio = 502
+teletext = 0
+subtitle = 0
+type = 1
+pnr = 25920
+audio_details = eng:502
+
+[8199-8384]
+video = 560
+tsid = 8199
+lcn = 4
+name = Channel 4
+ca = 0
+net = Channel 4 TV
+audio = 561
+teletext = 0
+subtitle = 563
+type = 1
+pnr = 8384
+audio_details = eng:561 eng:562
+
+[12290-14304]
+video = 6785
+tsid = 12290
+lcn = 20
+name = Virgin1
+ca = 0
+net = Virgin Media Television Limited
+audio = 6786
+teletext = 0
+subtitle = 6790
+type = 1
+pnr = 14304
+audio_details = eng:6786 eng:6787
+
+[24576-26240]
+video = 0
+tsid = 24576
+lcn = 714
+name = heat
+ca = 0
+audio = 1201
+teletext = 0
+subtitle = 0
+type = 2
+pnr = 26240
+audio_details = eng:1201
+
+[24576-27392]
+video = 2101
+tsid = 24576
+lcn = 25
+name = Dave ja vu
+ca = 0
+net = UKTV
+audio = 2102
+teletext = 0
+subtitle = 2103
+type = 1
+pnr = 27392
+audio_details = eng:2102 eng:2104
+
+[20480-22464]
+video = 611
+tsid = 20480
+lcn = 37
+name = price-drop tv
+ca = 0
+net = sit-up limited
+audio = 612
+teletext = 0
+subtitle = 0
+type = 1
+pnr = 22464
+audio_details = eng:612
+
+[8199-8452]
+video = 580
+tsid = 8199
+lcn = 13
+name = Channel 4+1
+ca = 0
+net = Channel 4 TV
+audio = 581
+teletext = 0
+subtitle = 583
+type = 1
+pnr = 8452
+audio_details = eng:581 eng:582
+
+[4107-4171]
+video = 600
+lcn = 1
+tsid = 4107
+name = BBC ONE
+ca = 0
+net = BBC
+audio = 601
+teletext = 0
+subtitle = 605
+type = 1
+pnr = 4171
+audio_details = eng:601 eng:602
+
+[8199-8325]
+video = 530
+tsid = 8199
+lcn = 6
+name = ITV2
+ca = 0
+net = ITV
+audio = 531
+teletext = 0
+subtitle = 533
+type = 1
+pnr = 8325
+audio_details = eng:531 eng:532
+
+[12290-12928]
+video = 6673
+tsid = 12290
+lcn = 30
+name = FIVER
+ca = 0
+net = five
+audio = 6674
+teletext = 0
+subtitle = 6678
+type = 1
+pnr = 12928
+audio_details = eng:6674 eng:6675
+
+[16384-17024]
+video = 205
+tsid = 16384
+lcn = 81
+name = BBC Parliament
+ca = 0
+net = BBC
+audio = 421
+teletext = 0
+subtitle = 605
+type = 1
+pnr = 17024
+audio_details = eng:421
+

@@ -1,0 +1,9 @@
+Revision history for Perl extension Log::Dispatch::ZMQ.
+
+0.02 Tue Aug 13 2013 EEST
+    - handle ZMQ::LibZMQ3 backend correctly
+    - bugfixes.
+
+0.01 Wed Jun 5 2013 CET
+    - released to CPAN.
+

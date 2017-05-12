@@ -1,0 +1,108 @@
+[Changes for 0.09 - December 22, 2004]
+
+* Installing this module no longer requires SWIG.  Yay!
+
+* Fixed a spurious warning from t/1-basic.t.
+
+[Changes for 0.08 - June 15, 2004]
+
+* Object and Environment now has ->val and ->sym to easily create
+  MzScheme objects from Perl.
+
+* Fixed building and eliminated segmentation faults on Mac OS X.
+
+[Changes for 0.07 - June 15, 2004]
+
+* MzPerl now correctly supports end-of-file as end of ";__PERL__;" regions.
+
+* All MzScheme code are now evaluated in Language::MzScheme::Env::__eval;
+  this made Spiffy-based modules (eg. IO::All) work better.
+
+* Avoid importing invalid symbols, such as '(OVERLOAD', into MzScheme space.
+
+* Adds nifty call/cc example to bin/mzperl's POD.
+
+* Suppressed harmless warnings under -w.
+
+[Changes for 0.06 - June 14, 2004]
+
+* Beginning of at least some module documentations.
+
+* Massive refactoring for Perl method wrappers, resulting in better
+* error handling and more robust symbol importing.
+
+* The script/mzperl program now supports inlined Perl code, via
+  ;__PERL__; ... ;__END__; blocks.
+
+[Changes for 0.05 - June 13, 2004]
+
+* Much more efficient vector<=>arrayref type conversion.
+
+* Context symbols added to function definition and runtime object
+  invocation with sigils; the default context is to interpret it
+  as scalar if only one value has been returned, and as a list otherwise.
+
+* Objects and code references now preserve their identity when
+  casted into scheme object and later dereferenced with ->as_perl_data.
+
+* Environment is now created with Language::MzScheme->new, which adds
+  perl-specific bindings (perl-use, perl-require, perl-do, perl-eval)
+  on top of the basic env.
+
+* New utility, script/mzperl, a perl-embedded mzscheme interpreter.
+
+* Full round-trip for non-self-referential data structures now works;
+  you can now pass unblessed references into scheme.  (Blessed references
+  already works as object closures.)
+
+* Proper error handling; scheme-level errors are turned into "die" calls;
+  calls within eval{} will return scheme_undefined, but $SIG{__DIE__} will
+  catch the actual error.
+
+* Object closure invocation now demands a method instead of silently dying.
+
+* Extensive tests for context, object, data, perl-calls and error handling.
+
+[Changes for 0.04 - June 11, 2004]
+
+* Backported to SWIG 1.3.19 and earlier versions.
+
+* Methods refactored into Language::MzScheme::Object and
+  Language::MzScheme::Env classes.
+
+* All scheme value types turned into properly overloaded Perl objects;
+  type checking methods, eg. ->isa('CODE'), are also implemented.
+
+* Deep copying into perl data structure supported as $obj->as_perl_data.
+
+* Previously exported symbols now become class methods for Language::MzScheme,
+  with the prefix 'mzscheme_', 'scheme_' and 'SCHEME_' removed.
+
+* Transparent procedure calls across perl/scheme boundaries.
+
+* Perl objects and classes may now be bound as scheme primitives.
+
+* To invoke perl objects from scheme, do this:
+    (object 'method arg1 arg2 ...)
+
+[Changes for 0.03 - June 9, 2004]
+
+* Build cleanly on SWIG 1.3.21, which we now require.
+
+* It is now possible to insert Perl subroutines as MzScheme primitives.
+  (See t/1-basic.t for how.)
+
+* Perl-based primitives can both accept and return lists of any size.
+
+[Changes for 0.02 - June 7, 2004]
+
+* Worked around automatic "swig -shadow" on Mac OS X, by not rebuilding
+  lib/Language/MzScheme_in.pm by default.
+
+* All publicly supported functions from "schemex.h" are now wrapped.
+
+* Fixed ithreads building problem by setting scheme_set_stack_base().
+
+[Changes for 0.01 - June 7, 2004]
+
+* Initial CPAN Release.

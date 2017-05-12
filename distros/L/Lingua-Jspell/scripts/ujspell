@@ -1,0 +1,64 @@
+#!/usr/bin/perl 
+
+use strict;
+use warnings;
+
+use File::Basename;
+use File::Spec::Functions;
+use IPC::Open3;
+
+use Lingua::Jspell::ConfigData;
+
+if (grep {$_ eq "--flush"} @ARGV) {
+    $|++;
+    @ARGV = grep {$_ ne "--flush"} @ARGV;
+}
+
+my $encontrei_l = 0;
+$encontrei_l = 1 if grep {$_ eq "-l"} @ARGV;
+
+unshift @ARGV, "-a" if !$encontrei_l;
+
+
+
+
+
+binmode(STDIN,":utf8");
+binmode(STDOUT,":utf8");
+
+my ($DW,$DR,$DE);
+my $exe = Lingua::Jspell::ConfigData->config('jspell');
+open3($DW,$DR,$DE,$exe,"-W 0", @ARGV);
+
+binmode($DW,":encoding(iso-8859-1)");
+binmode($DR,":encoding(iso-8859-1)");
+
+if ($encontrei_l) {
+    while (<STDIN>) {
+        print $DW $_;
+    }
+    close $DW;
+    while (<$DR>) {
+        print;
+    }
+}
+else {
+    my $x = <$DR>;
+    print $x;
+    while(<STDIN>) {
+        print $DW $_;
+        print_lines($DR);
+    }
+    for ($DW, $DR, $DE) { $_ and close $_ };	
+}
+
+sub print_lines {
+    my $handler = shift;
+    my $l;
+    do {
+        $l = <$handler>;
+        chomp($l);
+        print "$l\n";
+    } while ($l ne "" && $l ne "*");
+}
+

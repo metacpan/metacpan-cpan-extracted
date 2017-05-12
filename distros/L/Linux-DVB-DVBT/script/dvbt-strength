@@ -1,0 +1,264 @@
+#!/usr/bin/perl
+use strict ;
+use Pod::Usage ;
+use Getopt::Long qw/:config no_ignore_case/ ;
+use File::Basename ;
+
+++$! ;
+
+use Linux::DVB::DVBT ;
+
+our $VERSION = '2.005' ;
+
+    my $progname = basename $0 ;
+
+	my ($help, $man, $DEBUG, $VERBOSE, $config, $munin, $hwcheck, $mail) ;
+	my $adapter=0;
+	GetOptions('v|verbose=s' => \$VERBOSE,
+			   'debug=s' => \$DEBUG,
+			   'h|help' => \$help,
+			   'man' => \$man,
+			   'cfg=s' => \$config,
+			   'a|adap|dvb=i' => \$adapter,
+			   'munin=s' => \$munin,
+			   'hw|hwcheck' => \$hwcheck,
+			   'mail=s' => \$mail,
+			   ) or pod2usage(2) ;
+
+
+    pod2usage(1) if $help;
+    pod2usage(-verbose => 2) if $man;
+
+    my $dvb_name = sprintf "DVB%d", $adapter ;
+
+	info("===============================================================") if $VERBOSE ;
+	info("$progname v$VERSION") if $VERBOSE ;
+	info("Linux::DVB::DVBT v$Linux::DVB::DVBT::VERSION") if $VERBOSE ;
+
+	Linux::DVB::DVBT->debug($DEBUG) ;
+	Linux::DVB::DVBT->dvb_debug($DEBUG) ;
+
+	## Create dvb
+	## NOTE: With default object settings, the application will
+	## die on *any* error, so there is no error checking in this script
+	##
+	my $dvb = Linux::DVB::DVBT->new(
+		'adapter_num' => $adapter,
+		'errmode' => 'message',
+	) ;
+	Linux::DVB::DVBT::prt_data("dvb=", $dvb) if $DEBUG ;
+
+	my $errors_aref = $dvb->errors() ;
+	if ( @$errors_aref )
+	{
+		my $error = join(', ', @$errors_aref) ;
+		failed("Adapter $adapter not working : $error", $dvb_name, $hwcheck, $mail) ;
+	}
+	
+	# use other config?
+	$dvb->config_path($config) if $config ;
+
+	info("== Locked $dvb_name ==") if $VERBOSE ;
+	
+	## get strength info
+	my %info ;
+	
+	eval {
+		%info = $dvb->tsid_signal_quality() ;
+	} ;
+	
+	## Release DVB (for next recording)
+	info("== Released $dvb_name ==") if $VERBOSE ;
+	$dvb->dvb_close() ;
+	
+	if ($@)
+	{
+		## expected this to work
+		failed($@, $dvb_name, $hwcheck, $mail) ;
+	}
+	
+	Linux::DVB::DVBT::prt_data("Info=", \%info) if $DEBUG ;
+	
+	## Check for device busy
+	foreach my $tsid (keys %info)
+	{
+		if ($info{$tsid}{'error'} && ($info{$tsid}{'error'} =~ /device busy/i)) 
+		{
+			if ($VERBOSE)
+			{
+				info("DVB IN USE") ;
+			}
+			else
+			{
+				if (!$munin)
+				{
+					print "DVB adapter is in use, please try again later.\n" ;
+				}
+			}
+			exit 1 ;
+		}
+	}
+	
+	
+	## output
+	my $fh ;
+	if ($munin)
+	{
+		open $fh, ">>$munin" or die "Error: unable to write to munin log file $munin : $!" ;
+		my $timestamp = timestamp() ;
+		printf $fh "[$timestamp DVB%d] ", $adapter ;
+	}
+	else
+	{
+		printf "%5s  : %8s %%\n", "TSID", "Strength" ;
+	}
+	foreach my $tsid (sort {$a <=> $b} keys %info)
+	{
+		$info{$tsid}{'strength'} ||= 0 ;
+		my $err = "" ;
+		my $percent = ($info{$tsid}{'strength'} * 100.0) / 65535.0 ;
+		if (!$munin)
+		{
+			if ($info{$tsid}{'error'})
+			{
+				$err = "# $info{$tsid}{'error'}" ;
+			}
+			printf "%5d  : %8.2f %% $err\n", $tsid, $percent ;
+		}
+		else
+		{
+			if ($info{$tsid}{'error'})
+			{
+				$err = "($info{$tsid}{'error'}) " ;
+			}
+			printf $fh "%d=%.2f $err", $tsid, $percent ;
+		}
+		Linux::DVB::DVBT::prt_data("TSID $tsid = ", $info{$tsid}) if $DEBUG ;
+	}
+
+	if ($munin)
+	{
+		print $fh "\n" ;
+		close $fh if $fh ;
+	}
+
+	## End
+	info("COMPLETE") if $VERBOSE ;
+
+
+#=================================================================================
+# SUBROUTINES
+#=================================================================================
+
+#-----------------------------------------------------------------------------
+# report error
+sub failed
+{
+    my ($error, $dvbname, $hwcheck, $mail) = @_ ;
+
+	## Expected this to work
+	if ($hwcheck)
+	{
+		info("FAILED : $error") ;
+		if ($mail)
+		{
+			`date | mail -s "$dvb_name failure" $mail` ;
+		}
+		exit 3 ;
+	}
+	
+	info("FAILED : $error") if $VERBOSE ;
+	exit 2 ;
+}
+
+#-----------------------------------------------------------------------------
+# Format a timestamp for the reply
+sub timestamp
+{
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+    return sprintf "%02d:%02d:%02d %02d/%02d/%04d", $hour,$min,$sec, $mday,$mon+1,$year+1900;
+}
+
+#---------------------------------------------------------------------------------
+sub prompt
+{
+   my $timestamp = timestamp() ;
+   my $prompt = "[$progname ($$) $timestamp $dvb_name]" ;
+
+   return $prompt ;
+}
+
+#---------------------------------------------------------------------------------
+sub info
+{
+   my ($msg) = @_ ;
+
+   my $prompt = prompt() ;
+   $msg =~ s/\n/\n$prompt /g ;
+   print "$prompt $msg\n" ;
+}
+
+
+
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+=head1 NAME
+
+dvbt-strength - Show DVBT signal strengths
+
+=head1 SYNOPSIS
+
+dvbt-strength [options]
+
+Options:
+
+       -debug level         set debug level
+       -verbose level       set verbosity level
+       -help                brief help message
+       -man                 full documentation
+       -a <num>             Use adapter <num>
+       
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Set verbosity level. Higher values show more information.
+
+=item B<-debug>
+
+Set debug level. Higher levels show more debugging information (only really of any interest to developers!)
+
+=item B<-a>
+
+Specify which adapter number to use
+
+=back
+
+=head1 DESCRIPTION
+
+Script that uses the perl Linux::DVB::DVBT package to provide DVB-T adapter functions.
+ 
+Shows the transmitter signal strengths for all transmitters currently configured (by a previous scan).
+
+=head1 FURTHER DETAILS
+
+For full details of the DVBT functions, please see L<Linux::DVB::DVBT>:
+
+   perldoc Linux::DVB::DVBT
+ 
+=cut
+
+	

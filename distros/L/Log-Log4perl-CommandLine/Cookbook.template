@@ -1,0 +1,225 @@
+=pod
+
+=head1 NAME
+
+Log::Log4perl::CommandLine::Cookbook - Recipes for Log::Log4perl::CommandLine
+
+=head1 DESCRIPTION
+
+This cookbook has a series of example uses, including sample code,
+descriptions, and some command line examples with their output.
+
+These always use the C<:easy> mode from L<Log::Log4perl>, since the
+purpose is to illustrate the use of L<Log::Log4perl::CommandLine>, not
+L<Log::Log4perl>.  Go see it for more advanced usage.
+
+=head1 SAMPLE MODULE
+
+The scripts, modules and output can be found in the distribution's
+C<eg> directory.
+
+A sample module (C<SampleModule.pm>) is used to illustrate the
+interaction with logging from a module:
+
+[% FILTER indent(1) %]
+[% INSERT eg/SampleModule.pm %]
+[% END %]
+
+=head1 RECIPES
+
+=over 4
+
+=item sample1
+
+C<sample1.pl>:
+[% FILTER indent(1) %]
+[% INSERT eg/sample1.pl %]
+[% END %]
+
+Use the C<:all> option to enable all the standard options.  By default
+it will print only messages with ERROR or FATAL, other messages are
+suppressed.  The various command line options affect the output as
+shown.
+
+Sample Runs:
+[% FILTER indent(1) %]
+[% INSERT eg/sample1.output %]
+[% END %]
+
+=item sample2
+
+C<sample2.pl>:
+[% FILTER indent(1) %]
+[% INSERT eg/sample2.pl %]
+[% END %]
+
+This script illustrates the interaction with modules.
+
+Sample Runs:
+[% FILTER indent(1) %]
+[% INSERT eg/sample2.output %]
+[% END %]
+
+=item sample3
+
+C<sample3.pl>:
+[% FILTER indent(1) %]
+[% INSERT eg/sample3.pl %]
+[% END %]
+
+This script overrides the default log level, setting it to INFO.  It
+can still be overridden on the command line.
+
+Sample Runs:
+[% FILTER indent(1) %]
+[% INSERT eg/sample3.output %]
+[% END %]
+
+=item sample4
+
+C<sample4.pl>:
+[% FILTER indent(1) %]
+[% INSERT eg/sample4.pl %]
+[% END %]
+
+This script overrides the default log layout.  For more information on
+layouts, see L<Log::Log4perl::Layout::PatternLayout>.
+
+Sample Runs:
+[% FILTER indent(1) %]
+[% INSERT eg/sample4.output %]
+[% END %]
+
+=item sample5
+
+C<sample5.pl>:
+[% FILTER indent(1) %]
+[% INSERT eg/sample5.pl %]
+[% END %]
+
+This script specifies a log4perl style configuration file.  If the
+file is present, it will be used, if it is absent, the defaults will
+be used.
+
+Here is a sample configuration file:
+[% FILTER indent(1) %]
+[% INSERT eg/log4perl.conf %]
+[% END %]
+
+Log4perl configurations are extremely flexible, you can build complex
+logging schemes, including logging to files, databases, sending to
+another machine, fine tuning the specific messages you want to see,
+etc.  For more information, see L<Log::Log4perl::Config> and
+L<Log::Log4perl>.
+
+Sample Runs:
+[% FILTER indent(1) %]
+[% INSERT eg/sample5.output %]
+[% END %]
+
+=item sample6
+
+C<sample6.pl>:
+[% FILTER indent(1) %]
+[% INSERT eg/sample6.pl %]
+[% END %]
+
+You can also specify a string with a fancy log4perl configuration
+inline.
+
+Sample Runs:
+[% FILTER indent(1) %]
+[% INSERT eg/sample6.output %]
+[% END %]
+
+=item sample7
+
+C<sample7.pl>:
+[% FILTER indent(1) %]
+[% INSERT eg/sample7.pl %]
+[% END %]
+
+This one is the same as sample6, but includes C<SampleModule>.  You
+can independendently turn up/down the logging on the main program
+(which gets inherited through the system), and the verbosity of any
+module in the system.  (Actually any 'category' in the system, which
+by default means module, but you can do fancier fine tuning of
+categories by specifying them manually, see L<Log::Log4perl> for more
+information.)
+
+Sample Runs:
+[% FILTER indent(1) %]
+[% INSERT eg/sample7.output %]
+[% END %]
+
+=item sample8
+
+C<sample8.pl>:
+[% FILTER indent(1) %]
+[% INSERT eg/sample8.pl %]
+[% END %]
+
+This script uses two modules (identical except for name), to
+illustrate the independent verbosity control.
+
+Sample Runs:
+[% FILTER indent(1) %]
+[% INSERT eg/sample8.output %]
+[% END %]
+
+=item sample9
+
+This script is identical to sample1, but the usages illustrates the
+C<--logfile> command line option.  You can specify a log filename on
+the command line and it will add a simple file appender (for more
+complex ones, make a real config file).  You can optionally specify a
+pattern layout with the option.
+
+Sample Runs:
+[% FILTER indent(1) %]
+[% INSERT eg/sample9.output %]
+[% END %]
+
+=item sample10
+
+This script is identical to sample1, but the usage illustrates the
+C<--logconfig> command line option.  You can even specify a more
+complex log4perl configuration file if one isn't specified in the
+program.  If one is specified on the C<use> line, the one specified on
+the command line will override it.
+
+Sample Runs:
+[% FILTER indent(1) %]
+[% INSERT eg/sample10.output %]
+[% END %]
+
+=item sample11
+
+C<sample11.pl>:
+[% FILTER indent(1) %]
+[% INSERT eg/sample11.pl %]
+[% END %]
+
+This script shows how to use C<:noinit> to disable auto log
+configuration and explicitly call handlelogoptions() after manually
+configuring Log4perl.
+
+Sample Runs:
+[% FILTER indent(1) %]
+[% INSERT eg/sample11.output %]
+[% END %]
+
+=back
+
+=head1 AUTHOR
+
+Curt Tilmes E<lt>ctilmes@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2008 Curt Tilmes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

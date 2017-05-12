@@ -1,0 +1,15 @@
+#! perl
+
+use 5.012;
+use warnings;
+
+use POSIX::RT::Clock;
+use Linux::FD::Timer;
+
+my %clocks = map { $_ => POSIX::RT::Clock->new($_) } POSIX::RT::Clock->get_clocks;
+$clocks{per_process} = POSIX::RT::Clock->get_cpuclock(getppid) if POSIX::RT::Clock->can('get_cpuclock');
+
+while (my ($name, $clock) = each %clocks) {
+	say "$name: ", eval { Linux::FD::Timer->new($clock) } ? 1 : 0;
+}
+

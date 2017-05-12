@@ -1,0 +1,200 @@
+NAME
+    Lirc::Client - A client library for the Linux Infrared Remote Control
+
+VERSION
+    version 2.02
+
+SYNOPSIS
+      use Lirc::Client;
+
+      my $lirc = Lirc::Client->new({ prog => 'progname' });
+      while( my $code = $lirc->next_code ){  # wait for a new ir code
+        print "Lirc> $code\n";
+        process( $code );          # do whatever you want with the code
+      }
+
+DESCRIPTION
+    This module provides a simple interface to the Linux Infrared Remote
+    Control (Lirc). The module encapsulates parsing the Lirc config file
+    (.lircrc), opening a connection to the Lirc device, and retrieving
+    events from the device.
+
+METHODS
+  new( program, \%options )
+      my $lirc = Lirc::Client->new( {    
+                   prog    => 'progname',           # required
+                   rcfile  => "$ENV{HOME}/.lircrc", # optional
+                   dev     => "/dev/lircd",         # optional
+                   debug   => 0,                    # optional
+                   fake    => 1,                    # optional
+            } );
+
+      # Depreciated positional syntax; don't use
+      my $lirc = Lirc::Client->new( 'progname',    # required
+                   "$ENV{HOME}/.lircrc",           # optional
+                   '/dev/lircd', 0, 0 );           # optional
+
+    The constructor accepts two calling forms: an ordered list (for
+    backwards compatibility), and a hash ref of configuration options. The
+    two forms can be combined as long as the hash ref is last.
+
+    prog => 'progname'
+        Required parameter identifying the program token for Lirc.
+
+    rcfile => "$ENV{HOME}/.lircrc"
+        Path to the ".lircrc" configuration file. Optional.
+
+    dev => "/dev/lircd"
+        The path to the Lirc device. Optional.
+
+    debug => 0
+        Flag to turn on debugging output. Optional.
+
+    fake => 1
+        Will cause Lirc::Client to read from STDIN rather than the lircd
+        device. This is meant to facilitate debugging and testing. Optional.
+
+    When called the constructor defines the program token used in the Lirc
+    config file, opens and parses the Lirc config file (rcfile defaults to
+    ~/.lircrc if none specified), connects to the Lirc device (dev defaults
+    to /dev/lircd if none specified), and returns the Lirc::Client object.
+
+  recognized_commands()
+      my @list = $lirc->recognized_commands;
+
+    Returns a list of all the recognized commands for this application (as
+    defined in "prog" parameter to the call to new).
+
+  next_code()
+  nextcode()
+      my $code = $lirc->next_code;
+
+    Retrieves the next IR command associated with the progname as defined in
+    new(), blocking if none is available. next_code uses the stdio read
+    commands which are buffered. Use next_codes if you are also using
+    select.
+
+  next_codes()
+  nextcodes()
+      my @codes = $lirc->next_codes;
+
+    Retrieves any IR commands associated with the progname as defined in the
+    new() constructor, blocking if none are available. next_codes uses
+    sysread so it is compatible with select driven event loops. This is the
+    most efficient method to accomplish a non-blocking read.
+
+    Due to the mechanics of sysread and select, this version may return
+    multiple IR codes so the return value is an array.
+
+    Here is an example using IO::Select:
+
+        use IO::Select;
+        ....
+        my $select = IO::Select->new();
+        $select->add( $lirc->sock );
+        while(1){
+            # do your own stuff, if you want
+            if( my @ready = $select->can_read(0) ){ 
+                # an ir event has been received (if you are tracking other
+                # filehandles, you need to make sure it is lirc)
+                my @codes = $lirc->next_codes;    # should not block
+                for my $code (@codes){
+                    process( $code );
+                }
+            }
+        }
+
+    This is much more efficient than looping over next_code in non-blocking
+    mode. See the select.t test for the complete example. Also, checkout the
+    Event module on CPAN for a nice way to handle your event loops.
+
+  sock()
+      my $sock = $lirc->sock;
+
+    Returns (or sets if an argument is passed) the socket from which to read
+    lirc commands. This can be used to work Lirc::Client into you own event
+    loop.
+
+  parse_line()
+      my $code = $lirc->parse_line( $line );
+
+    Takes a full line as read from the lirc device and returns code on the
+    config line of the lircrc file for that button. This can be used in
+    combination with sock to take more of the event loop control out of
+    Lirc::Client.
+
+  clean_up()
+      $lirc->clean_up;
+
+    Closes the Lirc device pipe, etc. clean_up will be called when the lirc
+    object goes out of scope, so this is not necessary.
+
+  debug()
+      $lirc->debug;
+
+    Return the debug status for the lirc object.
+
+TODO
+    Features that are outlined in the ".lircrc" specification which have not
+    yet been implemented include:
+
+    *   The mode should be independent of the prog token
+
+    *   Implement the "once" flag
+
+    *   Implement the "quit" flag and executing multiple entries
+
+    *   Support for multiple "config" entries
+
+    *   Implement the "delay" token
+
+    *   Supprot non-printable charaters in the "config" command
+
+    *   Support key sequenses (multiple "remote", "button" entries per
+        block)
+
+    *   Support VERSION and LIST commands
+
+    *   Watch for signals from lircd to re-read rc file ("SIGHUP")
+
+    *   Add "SEND_*" support
+
+    Features that have been recently implemented include:
+
+    *   Support for "mode"s
+
+    *   Recognizing the "startup_mode" flag and automatically starting in a
+        mode that is identical to the program name
+
+    *   The "include" directive
+
+    *   Support wild card "*" entries for "remote" or "button", and blocks
+        that lack a "remote"
+
+    If anyone has need of one or more of these features, please let me know
+    (via http://rt.cpan.org if possible).
+
+SEE ALSO
+    The Lirc Project <http://www.lirc.org>
+
+THANKS
+    Parts of this package were inspired by a project by michael@engsoc.org
+    and Perl LIRC Client (plircc) by Matti Airas (mairas@iki.fi). See
+    http://www.lirc.org/html/technical.html for specs. Thanks!
+
+BUGS
+    There are a few features that a .lircrc file is supposed to support
+    (according to http://www.lirc.org/html/configure.html#lircrc_format)
+    that have not yet been implemented. See TODO for a list.
+
+    See http://rt.cpan.org to view and report bugs
+
+AUTHOR
+    Mark Grimes <mgrimes@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Mark Grimes <mgrimes@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

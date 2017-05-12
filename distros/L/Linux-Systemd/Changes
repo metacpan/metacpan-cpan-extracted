@@ -1,0 +1,23 @@
+Changelog for Linux-Systemd
+
+1.162700 2016-09-26T03:45:31Z
+ - Renamed dist from Linux-Systemd-Journal to Linux-Systemd
+ - Add Linux::Systemd::Daemon::sd_notify (Ioan Rogers)
+
+0.004 2016-08-07T20:59:20Z
+ - [closes #2] replace call to av_top_index to av_len because it is
+   available on perls < 5.18 (Ioan Rogers)
+
+0.003 2015-10-11T03:51:42Z
+ - [Closes #1] fix missing params to C calls
+ - Add a previous method
+ - Add a tail example.
+ - some non-visible improvements to some of the XS
+
+0.002 2015-03-30T03:50:49Z
+ - Initial journal read support
+ - Added a Linux::Systemd::Journal placeholder to get the namespace. The
+   previous release was never actually indexed.
+
+0.001 2014-05-11T20:56:13Z
+ - First release

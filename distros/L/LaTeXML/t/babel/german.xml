@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="report"?>
+<?latexml package="babel" options="german"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML" class="ltx_authors_1line" xml:lang="de">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-report.css" type="text/css"/>
+  <title>Deutsch Test</title>
+  <creator role="author">
+    <personname>Frau Blücher</personname>
+  </creator>
+  <chapter frefnum="Kapitel 1" refnum="1" xml:id="Ch1">
+    <title><tag close=" ">Kapitel 1</tag>Some stuff</title>
+    <toctitle><tag close=" ">1</tag>Some stuff</toctitle>
+    <para xml:id="Ch1.p1">
+      <p>Umläüte.</p>
+    </para>
+    <table frefnum="Tabelle 1.1" refnum="1.1" xml:id="Ch1.T1">
+      <p>Eine Tabelle</p>
+      <toccaption><tag close=" ">1.1</tag>Um ein Tabelle.</toccaption>
+      <caption><tag close=": ">Tabelle 1.1</tag>Um ein Tabelle.</caption>
+    </table>
+    <para xml:id="Ch1.p2">
+      <p>Umlaut ö? Ja! Jetzt nicht ”o. ö ist wieder da.</p>
+    </para>
+    <para xml:id="Ch1.p3">
+      <p>đĐ, ijIJ</p>
+    </para>
+    <para xml:id="Ch1.p4">
+      <p>«drausen ‹drinnen› drausen, wieder»</p>
+    </para>
+    <para xml:id="Ch1.p5">
+      <p>„drausen ‚drinnen’ drausen, wieder”</p>
+    </para>
+    <para xml:id="Ch1.p6">
+      <p>«drausen ‹drinnen› drausen, wieder»</p>
+    </para>
+    <para xml:id="Ch1.p7">
+      <p>„ ä ö ü ë ï ß ß c f l m n p r t ”</p>
+    </para>
+    <para xml:id="Ch1.p8">
+      <p>« Ä Ö Ü Ë Ï SS SZ C F L M N P R T »</p>
+    </para>
+    <para xml:id="Ch1.p9">
+      <p>- -</p>
+    </para>
+    <para xml:id="Ch1.p10">
+      <p>ÜMLÄUTE
+ümläute</p>
+    </para>
+    <para xml:id="Ch1.p11">
+      <p>ÜMLÄUTE
+ümläute</p>
+    </para>
+  </chapter>
+</document>

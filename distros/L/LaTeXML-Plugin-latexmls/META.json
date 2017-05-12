@@ -1,0 +1,53 @@
+{
+   "abstract" : "latexmls - A socket server for daemonized LaTeXML processing",
+   "author" : [
+      "Deyan Ginev <d.ginev@jacobs-university.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "LaTeXML-Plugin-latexmls",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "HTTP::Daemon" : "0",
+            "JSON::XS" : "0",
+            "LaTeXML" : "v0.8.1",
+            "POSIX" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dginev/LaTeXML-Plugin-latexmls.git",
+         "web" : "https://github.com/dginev/LaTeXML-Plugin-latexmls"
+      }
+   },
+   "version" : "v1.4.3"
+}

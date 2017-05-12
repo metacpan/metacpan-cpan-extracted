@@ -1,0 +1,71 @@
+LedgerSMB-API
+
+This module is meant to document access for those working to
+integrate online commerce applications with the LedgerSMB
+codebase, to the workings of the accounting application so
+that simple and repetative transactions can be automated.
+
+INSTALLATION
+
+Access with your browser the administrative interface of your
+LedgerSMB installation, to create and populate a new database,
+perhaps lsmb_api_test, and create a new user, lsmb_api_test,
+with privileges on that database.  The tests have been written
+against the chart of accounts provided by the US_Service_Company
+database template.
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+
+If you like the initial tests, you might then consider using
+pgdump to backup a production accounting database, then as
+your postgres user, use the psql command to restore that data
+to your lsmb_api_test database, after you have DROP'd and
+re-CREATE'd it.  Run further tests of your books, then . . . 
+
+    make install  <-- if you dare . . . 
+
+INITIAL ALPHA RELEASE NOTICE
+
+LedgerSMB::API 
+
+Developers are urged to TEST this module against a TEST database.
+Testers are urged NOT TO DEPLOY this code against a production copy of
+clients accounting databases, without further testing of all your
+customary interactions, from posting orders, invoices, payments,
+through reports, book closing and review of audit data.  There is much
+left to test and we are developers, Not Accountants, and certainly not
+developers who have any sort of firm grasp on LedgerSMB/ SQL-Ledger's
+programming interface.  
+
+We are only developers who simply seek to expose LedgerSMB's API in a
+usable way, as we come to understand it.  
+
+So, CAVEAT EMPTOR:
+
+You are encouraged to access with your browser the administrative
+interface of your LedgerSMB installation, to create and populate a new
+database, perhaps lsmb_api_test, and create a new user, lsmb_api_test,
+with privileges on that database.  The tests have been written against 
+the chart of accounts provided by the US_Service_Company database
+template.
+
+If you like the initial tests, you might then consider using pgdump to
+backup a production accounting database, then as your postgres user,
+the psql command to restore that data to your lsmb_api_test database,
+after you have DROP'd and re-CREATE'd it.  
+
+Feedback, comments, use cases, bug reports, tests for bugs, patches,
+new code, new or revised perldoc, inspiration and paying work from
+developers or other users who find this module useful are welcomed and
+encouraged.  This is a work in progress.  Help us do the work which
+makes for the progress.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Nigel Titley and Hugh Esco
+
+This program is released under the following license: gpl

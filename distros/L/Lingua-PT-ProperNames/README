@@ -1,0 +1,22 @@
+Lingua-PT-ProperNames
+---------------------
+
+This module is a set of functions to detect, tag and extract proper
+names on Portuguese texts.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 José João Almeida and Alberto Simões
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

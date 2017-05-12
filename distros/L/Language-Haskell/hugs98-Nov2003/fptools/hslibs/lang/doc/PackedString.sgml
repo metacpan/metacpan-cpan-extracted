@@ -1,0 +1,7 @@
+<Sect1 id="PackedString">
+<Title><Literal>PackedString</Literal></Title>
+
+  <para>This module has moved to <ulink url="../base/Data.PackedString.html"><literal>Data.PackedString</literal></ulink> in the
+  hierarchical libraries.</para>
+
+</Sect1>

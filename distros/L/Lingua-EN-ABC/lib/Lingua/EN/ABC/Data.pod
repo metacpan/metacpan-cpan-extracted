@@ -1,0 +1,387 @@
+=head1 NAME
+
+Lingua::EN::ABC::Data
+
+=head1 DESCRIPTION
+
+This is the underlying data file for L<Lingua::EN::ABC>. It is put
+here to make it easy to find, search, and check.
+
+The headings "BrAmbig" and "AmAmbig" are for words where the British
+or American version of the word is ambiguous, like "metre" and "meter"
+in British English, or "vice" and "vise" in American English.
+
+=head1 TABLE
+
+    +-------------------+-------------------+-------------------+----------+----------+---------+
+    | American          | British           | Canadian          | BrAmbig? | AmAmbig? | Oxford? |
+    +-------------------+-------------------+-------------------+----------+----------+---------+
+    | acknowledgment    | acknowledgement   | acknowledgement   |          |          |         |
+    | aging             | ageing            | ageing            |          |          |         |
+    | airplane          | aeroplane         | airplane          |          |          |         |
+    | aluminum          | aluminium         | aluminium         |          |          |         |
+    | amortize          | amortise          | amortize          |          |          | Y       |
+    | amphitheater      | amphitheatre      | amphitheatre      |          |          |         |
+    | analog            | analogue          | analog            |          |          |         |
+    | analyze           | analyse           | analyse           |          |          | Y       |
+    | anemia            | anaemia           | anemia            |          |          |         |
+    | anemic            | anaemic           | anemic            |          |          |         |
+    | anesthesia        | anaesthesia       | anaesthesia       |          |          |         |
+    | anesthetic        | anaesthetic       | anaesthetic       |          |          |         |
+    | apnea             | apnoea            | apnea             |          |          |         |
+    | apologize         | apologise         | apologise         |          |          | Y       |
+    | appall            | appal             | appall            |          |          |         |
+    | appetizer         | appetiser         | appetiser         |          |          | Y       |
+    | arbor             | arbour            | arbour            |          |          |         |
+    | archeology        | archaeology       | archaeology       |          |          |         |
+    | ardor             | ardour            | ardour            |          |          |         |
+    | armor             | armour            | armour            |          |          |         |
+    | armory            | armoury           | armoury           |          |          |         |
+    | artifact          | artefact          | artifact          |          |          |         |
+    | authorize         | authorise         | authorize         |          |          | Y       |
+    | ax                | axe               | axe               |          |          |         |
+    | bandanna          | bandanna          | bandanna          |          |          |         |
+    | baptize           | baptise           | baptize           |          |          | Y       |
+    | barreled          | barrelled         | barrelled         |          |          |         |
+    | barreling         | barrelling        | barrelling        |          |          |         |
+    | behavior          | behaviour         | behaviour         |          |          |         |
+    | behavioral        | behavioural       | behavioural       |          |          |         |
+    | behaviorism       | behaviourism      | behaviourism      |          |          |         |
+    | behoove           | behove            | behoove           |          |          |         |
+    | belabor           | belabour          | belabour          |          |          |         |
+    | Breathalyzer      | Breathalyser      | Breathalyzer      |          |          |         |
+    | burned            | burnt             | burned            |          |          |         |
+    | bused             | bussed            | bused             |          |          |         |
+    | busing            | bussing           | busing            |          |          |         |
+    | caldron           | cauldron          | cauldron          |          |          |         |
+    | caliber           | calibre           | calibre           |          |          |         |
+    | canceled          | cancelled         | cancelled         |          |          |         |
+    | canceling         | cancelling        | cancelling        |          |          |         |
+    | candor            | candour           | candour           |          |          |         |
+    | capitalize        | capitalise        | capitalize        |          |          | Y       |
+    | caramelize        | caramelise        | caramelize        |          |          | Y       |
+    | carburetor        | carburettor       | carburetor        |          |          |         |
+    | catalog           | catalogue         | catalog           |          |          |         |
+    | catalyze          | catalyse          | catalyse          |          |          |         |
+    | categorize        | categorise        | categorize        |          |          | Y       |
+    | cauterize         | cauterise         | cauterize         |          |          | Y       |
+    | center            | centre            | centre            |          |          |         |
+    | centered          | centred           | centred           |          |          |         |
+    | centering         | centring          | centring          |          |          |         |
+    | centiliter        | centilitre        | centilitre        |          |          |         |
+    | centimeter        | centimetre        | centimetre        |          |          |         |
+    | centralize        | centralise        | centralize        |          |          | Y       |
+    | Cesarean          | Caesarean         | Caesarean         |          |          |         |
+    | characterize      | characterise      | characterize      |          |          | Y       |
+    | check             | cheque            | cheque            |          |          |         |
+    | checkered         | chequered         | checkered         |          |          |         |
+    | civilization      | civilisation      | civilisation      |          |          |         |
+    | civilize          | civilise          | civilise          |          |          |         |
+    | clamor            | clamour           | clamour           |          |          |         |
+    | collectible       | collectable       | collectible       |          |          |         |
+    | colonization      | colonisation      | colonisation      |          |          |         |
+    | colonize          | colonise          | colonise          |          |          |         |
+    | color             | colour            | colour            |          |          |         |
+    | coloration        | colouration       | colouration       |          |          |         |
+    | commercialize     | commercialise     | commercialize     |          |          | Y       |
+    | computerize       | computerise       | computerize       |          |          | Y       |
+    | convener          | convenor          | convenor          |          |          |         |
+    | costumer          | costumier         | costumer          |          |          |         |
+    | councilor         | councillor        | councillor        |          |          |         |
+    | counseled         | counselled        | counselled        |          |          |         |
+    | counseling        | counselling       | counselling       |          |          |         |
+    | counselor         | counsellor        | counsellor        |          |          |         |
+    | cozy              | cosy              | cozy              |          |          | Y       |
+    | criticize         | criticise         | criticise         |          |          |         |
+    | crystallization   | crystallisation   | crystallization   |          |          |         |
+    | crystallize       | crystallise       | crystallize       |          |          | Y       |
+    | curb              | kerb              | curb              |          |          |         |
+    | customize         | customise         | customize         |          |          | Y       |
+    | deciliter         | decilitre         | decilitre         |          |          |         |
+    | decimeter         | decimetre         | decimetre         |          |          |         |
+    | defense           | defence           | defence           |          |          |         |
+    | demeanor          | demeanour         | demeanour         |          |          |         |
+    | dependent         | dependant         | dependant         |          |          |         |
+    | dialog            | dialogue          | dialogue          |          |          |         |
+    | diarrhea          | diarrhoea         | diarrhea          |          |          |         |
+    | dietician         | dietician         | dietician         |          |          |         |
+    | digitize          | digitise          | digitize          |          |          | Y       |
+    | disheveled        | dishevelled       | dishevelled       |          |          |         |
+    | dolor             | dolour            | dolour            |          |          |         |
+    | dolorous          | dolourous         | dolourous         |          |          |         |
+    | donut             | doughnut          | doughnut          |          |          |         |
+    | Dr.               | Dr                | Dr.               |          |          |         |
+    | draft             | draught           | draught           |          |          |         |
+    | dreamed           | dreamt            | dreamt            |          |          |         |
+    | dueled            | duelled           | dueled            |          |          |         |
+    | dueling           | duelling          | duelling          |          |          |         |
+    | edema             | oedema            | edema             |          |          |         |
+    | empathize         | empathise         | empathize         |          |          | Y       |
+    | emphasize         | emphasise         | emphasise         |          |          |         |
+    | enamor            | enamour           | enamour           |          |          |         |
+    | encyclopedia      | encyclopaedia     | encyclopaedia     |          |          |         |
+    | endeavor          | endeavour         | endeavour         |          |          |         |
+    | enroll            | enrol             | enrol             |          |          |         |
+    | enrollment        | enrolment         | enrolment         |          |          |         |
+    | enthrall          | enthral           | enthrall          |          |          |         |
+    | enthrallment      | enthralment       | enthrallment      |          |          |         |
+    | eon               | aeon              | eon               |          |          |         |
+    | epicenter         | epicentre         | epicentre         |          |          |         |
+    | equaled           | equalled          | equalled          |          |          |         |
+    | equaling          | equalling         | equalling         |          |          |         |
+    | equalization      | equalisation      | equalization      |          |          |         |
+    | equalize          | equalise          | equalize          |          |          | Y       |
+    | esophagus         | oesophagus        | esophagus         |          |          |         |
+    | estrogen          | oestrogen         | oestrogen         |          |          |         |
+    | familiarize       | familiarise       | familiarize       |          |          | Y       |
+    | favor             | favour            | favour            |          |          |         |
+    | favorable         | favourable        | favourable        |          |          |         |
+    | favorite          | favourite         | favourite         |          |          |         |
+    | favoritism        | favouritism       | favouritism       |          |          |         |
+    | fervor            | fervour           | fervour           |          |          |         |
+    | fiber             | fibre             | fibre             |          |          |         |
+    | flavor            | flavour           | flavour           |          |          |         |
+    | fueled            | fuelled           | fuelled           |          |          |         |
+    | fulfill           | fulfil            | fulfil            |          |          |         |
+    | glamour           | glamour           | glamour           |          |          |         |
+    | goiter            | goitre            | goitre            |          |          |         |
+    | gotten            | got               | gotten            |          |          |         |
+    | gram              | gramme            | gramme            |          |          |         |
+    | gray              | grey              | grey              |          |          |         |
+    | gynecology        | gynaecology       | gynaecology       |          |          |         |
+    | harbor            | harbour           | harbour           |          |          |         |
+    | hemophilia        | haemophilia       | hemophilia        |          |          |         |
+    | hemorrhage        | haemorrhage       | hemorrhage        |          |          |         |
+    | honor             | honour            | honour            |          |          |         |
+    | honorable         | honourable        | honourable        |          |          |         |
+    | honored           | honoured          | honoured          |          |          |         |
+    | honoring          | honouring         | honouring         |          |          |         |
+    | hospitalize       | hospitalise       | hospitalize       |          |          | Y       |
+    | humor             | humour            | humour            |          |          |         |
+    | hyperglycemia     | hyperglycaemia    | hyperglycemia     |          |          |         |
+    | hypnotize         | hypnotise         | hypnotize         |          |          | Y       |
+    | hypoglycemia      | hypoglycaemia     | hypoglycemia      |          |          |         |
+    | hypothesize       | hypothesise       | hypothesize       |          |          | Y       |
+    | idolize           | idolise           | idolize           |          |          | Y       |
+    | immortalize       | immortalise       | immortalize       |          |          | Y       |
+    | immunization      | immunisation      | immunization      |          |          |         |
+    | immunize          | immunise          | immunize          |          |          | Y       |
+    | industrialization | industrialisation | industrialization |          |          |         |
+    | industrialize     | industrialise     | industrialize     |          |          | Y       |
+    | initialize        | initialise        | initialize        |          |          | Y       |
+    | inquiry           | enquiry           | inquiry           |          |          |         |
+    | installment       | instalment        | instalment        |          |          |         |
+    | institutionalize  | institutionalise  | institutionalize  |          |          | Y       |
+    | ionize            | ionise            | ionize            |          |          | Y       |
+    | jail              | gaol              | jail              |          |          |         |
+    | jeweled           | jewelled          | jewelled          |          |          |         |
+    | jeweler           | jeweller          | jeweller          |          |          |         |
+    | jewelery          | jewellery         | jewellery         |          |          |         |
+    | jewelry           | jewellery         | jewellery         |          |          |         |
+    | judgment          | judgement         | judgement         |          |          |         |
+    | kilogram          | kilogramme        | kilogramme        |          |          |         |
+    | kilometer         | kilometre         | kilometre         |          |          |         |
+    | labeled           | labelled          | labelled          |          |          |         |
+    | labeling          | labelling         | labelling         |          |          |         |
+    | labor             | labour            | labour            |          |          |         |
+    | laborer           | labourer          | labourer          |          |          |         |
+    | lackluster        | lacklustre        | lacklustre        |          |          |         |
+    | lasagna           | lasagne           | lasagna           |          |          |         |
+    | leaned            | leant             | leaned            |          |          |         |
+    | learned           | learnt            | learned           |          |          |         |
+    | legalize          | legalise          | legalize          |          |          | Y       |
+    | leukemia          | leukaemia         | leukaemia         |          |          |         |
+    | leveled           | levelled          | levelled          |          |          |         |
+    | leveling          | levelling         | levelling         |          |          |         |
+    | libeled           | libelled          | libelled          |          |          |         |
+    | libeler           | libeller          | libeller          |          |          |         |
+    | libelous          | libellous         | libellous         |          |          |         |
+    | license           | licence           | licence           |          |          |         |
+    | licorice          | liquorice         | licorice          |          |          |         |
+    | liter             | litre             | litre             |          |          |         |
+    | louver            | louvre            | louvre            |          |          |         |
+    | louvered          | louvred           | louvred           |          |          |         |
+    | luster            | lustre            | lustre            |          |          |         |
+    | maneuver          | manoeuvre         | manoeuvre         |          |          |         |
+    | marveled          | marvelled         | marvelled         |          |          |         |
+    | marveling         | marvelling        | marvelling        |          |          |         |
+    | marvelous         | marvellous        | marvellous        |          |          |         |
+    | math              | maths             | math              |          |          |         |
+    | maximize          | maximise          | maximize          |          |          | Y       |
+    | meager            | meagre            | meagre            |          |          |         |
+    | medieval          | mediaeval         | mediaeval         |          |          |         |
+    | mementos          | mementoes         | mementoes         |          |          |         |
+    | memorialize       | memorialise       | memorialize       |          |          | Y       |
+    | memorize          | memorise          | memorize          |          |          | Y       |
+    | mesmerize         | mesmerise         | mesmerize         |          |          | Y       |
+    | meter             | metre             | metre             | Y        |          |         |
+    | micrometer        | micrometre        | micrometre        |          |          |         |
+    | militarize        | militarise        | militarize        |          |          | Y       |
+    | milliliter        | millilitre        | millilitre        |          |          |         |
+    | millimeter        | millimetre        | millimetre        |          |          |         |
+    | miniaturization   | miniaturisation   | miniaturization   |          |          |         |
+    | miniaturize       | miniaturise       | miniaturize       |          |          | Y       |
+    | minimize          | minimise          | minimize          |          |          | Y       |
+    | misbehavior       | misbehaviour      | misbehaviour      |          |          |         |
+    | misdemeanor       | misdemeanour      | misdemeanour      |          |          |         |
+    | miter             | mitre             | mitre             |          |          |         |
+    | mitered           | mitred            | mitred            |          |          |         |
+    | mobilize          | mobilise          | mobilize          |          |          | Y       |
+    | modeled           | modelled          | modelled          |          |          |         |
+    | modeling          | modelling         | modelling         |          |          |         |
+    | mold              | mould             | mould             |          |          |         |
+    | molder            | moulder           | moulder           |          |          |         |
+    | mollusk           | mollusc           | mollusc           |          |          |         |
+    | molt              | moult             | moult             |          |          |         |
+    | mom               | mum               | mum               |          |          |         |
+    | mommy             | mummy             | mummy             |          |          |         |
+    | monolog           | monologue         | monologue         |          |          |         |
+    | Mr.               | Mr                | Mr.               |          |          |         |
+    | mustache          | moustache         | moustache         |          |          |         |
+    | neighbor          | neighbour         | neighbour         |          |          |         |
+    | neighborhood      | neighbourhood     | neighbourhood     |          |          |         |
+    | neutralize        | neutralise        | neutralize        |          |          | Y       |
+    | ocher             | ochre             | ochre             |          |          |         |
+    | odor              | odour             | odour             |          |          |         |
+    | offense           | offence           | offence           |          |          |         |
+    | offense           | offence           | offence           |          |          |         |
+    | omelet            | omelette          | omelette          |          |          |         |
+    | optimization      | optimisation      | optimization      |          |          |         |
+    | optimize          | optimise          | optimize          |          |          | Y       |
+    | organization      | organisation      | organization      |          |          |         |
+    | organize          | organise          | organise          |          |          | Y       |
+    | orient            | orientate         | orient            |          |          |         |
+    | oriented          | orientated        | oriented          |          |          |         |
+    | orthopedic        | orthopaedic       | orthopaedic       |          |          |         |
+    | oxidize           | oxidise           | oxidize           |          |          | Y       |
+    | pajamas           | pyjamas           | pyjamas           |          |          |         |
+    | Paleocene         | Palaeocene        | Paleocene         |          |          |         |
+    | paleontology      | palaeontology     | palaeontology     |          |          |         |
+    | paneled           | panelled          | panelled          |          |          |         |
+    | paralleled        | parallelled       | parallelled       |          |          |         |
+    | paralleling       | parallelling      | paralleling       |          |          |         |
+    | paralyze          | paralyse          | paralyze          |          |          | Y       |
+    | parlor            | parlour           | parlour           |          |          |         |
+    | pasteurize        | pasteurise        | pasteurize        |          |          | Y       |
+    | pediatric         | paediatric        | paediatric        |          |          |         |
+    | pediatrics        | paediatrics       | pediatrics        |          |          |         |
+    | pedophile         | paedophile        | pedophile         |          |          |         |
+    | penalization      | penalisation      | penalization      |          |          |         |
+    | penalize          | penalise          | penalize          |          |          | Y       |
+    | personalize       | personalise       | personalize       |          |          | Y       |
+    | philosophize      | philosophise      | philosophize      |          |          | Y       |
+    | philter           | philtre           | philtre           |          |          |         |
+    | plagiarize        | plagiarise        | plagiarize        |          |          | Y       |
+    | plow              | plough            | plow              |          |          |         |
+    | polarize          | polarise          | polarize          |          |          | Y       |
+    | popularization    | popularisation    | popularisation    |          |          |         |
+    | popularize        | popularise        | popularise        |          |          |         |
+    | practice          | practise          | practise          |          |          |         |
+    | practice          | (verb)practise    | (verb)practise    |          |          |         |
+    | practicing        | practising        | practising        |          |          |         |
+    | pretense          | pretence          | pretence          |          |          |         |
+    | prioritize        | prioritise        | prioritize        |          |          | Y       |
+    | privatize         | privatise         | privatize         |          |          | Y       |
+    | prize             | prise             | prise             |          |          |         |
+    | program           | programme         | program           |          |          |         |
+    | pulverize         | pulverise         | pulverize         |          |          | Y       |
+    | pummeled          | pummelled         | pummelled         |          |          |         |
+    | pummeling         | pummelling        | pummelling        |          |          |         |
+    | quarreling        | quarrelling       | quarrelling       |          |          |         |
+    | railroad          | railway           | railway           |          |          |         |
+    | rancor            | rancour           | rancour           |          |          |         |
+    | realize           | realise           | realise           |          |          | Y       |
+    | recognize         | recognise         | recognise         |          |          | Y       |
+    | reconnoiter       | reconnoitre       | reconnoitre       |          |          |         |
+    | reconnoitered     | reconnoitred      | reconnoitred      |          |          |         |
+    | reconnoitering    | reconnoitring     | reconnoitring     |          |          |         |
+    | repellent         | repellant         | repellent         |          |          |         |
+    | reveled           | revelled          | revelled          |          |          |         |
+    | reveler           | reveller          | reveller          |          |          |         |
+    | reveling          | revelling         | revelling         |          |          |         |
+    | rigor             | rigour            | rigour            |          |          |         |
+    | rumor             | rumour            | rumour            |          |          |         |
+    | saber             | sabre             | sabre             |          |          |         |
+    | saltpeter         | saltpetre         | saltpetre         |          |          |         |
+    | sanitization      | sanitisation      | sanitization      |          |          |         |
+    | sanitize          | sanitise          | sanitize          |          |          | Y       |
+    | savior            | saviour           | saviour           |          |          |         |
+    | savior            | saviour           | saviour           |          |          |         |
+    | savor             | savour            | savour            |          |          |         |
+    | savory            | savoury           | savoury           |          |          |         |
+    | scepter           | sceptre           | sceptre           |          |          |         |
+    | sceptered         | sceptred          | sceptred          |          |          |         |
+    | scrutinize        | scrutinise        | scrutinize        |          |          | Y       |
+    | sensationalize    | sensationalise    | sensationalize    |          |          | Y       |
+    | sepulcher         | sepulchre         | sepulchre         |          |          |         |
+    | shriveled         | shrivelled        | shrivelled        |          |          |         |
+    | shriveling        | shrivelling       | shrivelling       |          |          |         |
+    | signaled          | signalled         | signalled         |          |          |         |
+    | signaler          | signaller         | signaller         |          |          |         |
+    | signaling         | signalling        | signalling        |          |          |         |
+    | skeptic           | sceptic           | sceptic           |          |          |         |
+    | skeptical         | sceptical         | sceptical         |          |          |         |
+    | skillful          | skilful           | skilful           |          |          |         |
+    | smelled           | smelt             | smelled           |          |          |         |
+    | smolder           | smoulder          | smoulder          |          |          |         |
+    | snorkeled         | snorkelled        | snorkelled        |          |          |         |
+    | snorkeling        | snorkelling       | snorkelling       |          |          |         |
+    | somber            | sombre            | sombre            |          |          |         |
+    | specialize        | specialise        | specialize        |          |          | Y       |
+    | specialty         | speciality        | specialty         |          |          |         |
+    | specter           | spectre           | spectre           |          |          |         |
+    | spiraled          | spiralled         | spiralled         |          |          |         |
+    | spiraling         | spiralling        | spiralling        |          |          |         |
+    | splendor          | splendour         | splendour         |          |          |         |
+    | stabilize         | stabilise         | stabilize         |          |          | Y       |
+    | standardization   | standardisation   | standardization   |          |          |         |
+    | standardize       | standardise       | standardize       |          |          | Y       |
+    | sterilize         | sterilise         | sterilize         |          |          | Y       |
+    | stylize           | stylise           | stylize           |          |          | Y       |
+    | succor            | succour           | succour           |          |          |         |
+    | sulfur            | sulphur           | sulphur           |          |          |         |
+    | summarize         | summarise         | summarize         |          |          | Y       |
+    | symbolize         | symbolise         | symbolize         |          |          | Y       |
+    | synthesize        | synthesise        | synthesize        |          |          | Y       |
+    | systemize         | systemise         | systemize         |          |          | Y       |
+    | tamborine         | tambourine        | tambourine        |          |          |         |
+    | theater           | theatre           | theatre           |          |          |         |
+    | tidbit            | titbit            | tidbit            |          |          |         |
+    | tire              | tyre              | tire              | Y        |          |         |
+    | ton               | tonne             | tonne             |          |          |         |
+    | totaled           | totalled          | totalled          |          |          |         |
+    | totaling          | totalling         | totalling         |          |          |         |
+    | toward            | towards           | toward            |          |          |         |
+    | toxemia           | toxaemia          | toxaemia          |          |          |         |
+    | tranquility       | tranquillity      | tranquillity      |          |          |         |
+    | tranquilize       | tranquillise      | tranquillise      |          |          | Y       |
+    | tranquilized      | tranquillised     | tranquillised     |          |          |         |
+    | tranquilizer      | tranquilliser     | tranquilliser     |          |          |         |
+    | tranquilizing     | tranquillising    | tranquillising    |          |          |         |
+    | traveled          | travelled         | travelled         |          |          |         |
+    | traveler          | traveller         | traveller         |          |          |         |
+    | traveling         | travelling        | travelling        |          |          |         |
+    | triple            | treble            | triple            |          |          |         |
+    | tumor             | tumour            | tumour            |          |          |         |
+    | tunneled          | tunnelled         | tunnelled         |          |          |         |
+    | tunneler          | tunneller         | tunneller         |          |          |         |
+    | tunneling         | tunnelling        | tunnelling        |          |          |         |
+    | unionize          | unionise          | unionize          |          |          | Y       |
+    | utilize           | utilise           | utilize           |          |          | Y       |
+    | valor             | valour            | valour            |          |          |         |
+    | vapor             | vapour            | vapour            |          |          |         |
+    | vaporer           | vapourer          | vapourer          |          |          |         |
+    | vaporization      | vaporisation      | vaporization      |          |          |         |
+    | vaporize          | vaporise          | vaporize          |          |          | Y       |
+    | vaporizer         | vaporiser         | vaporizer         |          |          |         |
+    | vigor             | vigour            | vigour            |          |          |         |
+    | vise              | vice              | vice              |          | Y        |         |
+    | visualize         | visualise         | visualize         |          |          | Y       |
+    | willful           | wilful            | wilful            |          |          |         |
+    | willfully         | wilfully          | wilfully          |          |          |         |
+    | willfulness       | wilfulness        | wilfulness        |          |          |         |
+    | woolen            | woollen           | woollen           |          |          |         |
+    | yodeled           | yodelled          | yodelled          |          |          |         |
+    | yodeling          | yodelling         | yodelling         |          |          |         |
+    | yogurt            | yoghurt           | yogurt            |          |          |         |
+    +-------------------+-------------------+-------------------+----------+----------+---------+

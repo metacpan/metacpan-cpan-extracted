@@ -1,0 +1,20 @@
+Revision history for LucyX-Suggester
+
+0.005 01 Oct 2013
+ - packaging changes only
+
+0.004 25 Oct 2012
+ - internal refactors for speed improvements
+ - add use_regex, max_length options 
+ - boost match scores for phrases
+
+0.003 17 Oct 2012
+ - remove undeclared dependency on Search::Query::Dialect::Lucy
+
+0.002 16 Oct 2012
+ - refactor internal optimizations, fixing bug with multiple terms starting
+   with the same letter.
+
+0.001 16 Oct 2012
+ - initial release
+

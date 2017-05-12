@@ -1,0 +1,32 @@
+Revision history for Perl extension Lingua::CollinsParser.
+
+0.05  Mon Oct 15 10:17:52 CDT 2007
+
+ - Included better instructions on how to compile this code, and how
+   to tell it where the Collins Parser headers & libraries are.
+
+0.04  Wed Aug 4 16:51:30 CDT 2004
+
+ - Fixed a bug in the underlying Collins parser library (i.e. the
+ Parser.patch file) that caused a segfault on high-ASCII characters.
+
+0.03  Fri Jul 30 17:29:14 CDT 2004
+
+ - Fixed a bug in the handling of punctuation tokens - they were being
+   sent to STDOUT instead of being put in the parse tree.
+
+ - Fixed a bug in how the 'npflag' flag was implemented.  It was
+   supposed to remove the surrounding noun phrase tag from the tree
+   entirely, but instead it just removed a few fields from the tag.
+   This is now fixed.
+
+0.02  Thu Jul 22 11:44:58 CDT 2004
+
+ - Improved the patches to the Collins parser code so that it builds
+   more cleanly on more platforms (tested on Solaris and Mac OS X).
+   Also removes some spurious status messages that appeared when loading
+   the grammar & events files.
+
+0.01  Tue Jul 20 11:07:52 CDT 2004
+
+ - original version

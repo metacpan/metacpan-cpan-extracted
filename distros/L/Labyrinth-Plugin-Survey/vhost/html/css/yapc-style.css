@@ -1,0 +1,157 @@
+@import url(http://fonts.googleapis.com/css?family=Ubuntu:400|Merriweather:300,300italic);
+
+@media screen and (max-width: 319px) { .unit{float: none !important;
+     width: auto !important;
+    } }
+.line:after,.lastUnit:after{clear:both;
+    display:block;
+    visibility:hidden;
+    overflow:hidden;
+    height:0 !important;
+    line-height:0;
+    font-size:xx-large;
+    content: "x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x ";
+}
+
+.line{*zoom:1;}
+.unit{float:left;}
+.size1of1{float:none;}
+.size1of2{width:50%;}
+.size1of3{width:33.33333%;}
+.size2of3{width:66.66666%;}
+.size1of4{width:25%;}
+.size3of4{width:75%;}
+.size1of5{width:20%;}
+.size2of5{width:40%;}
+.size3of5{width:60%;}
+.size4of5{width:80%;}
+.lastUnit{display:table-cell;float:none;width:auto;*display:block;*zoom:1;_left:-3px;_margin-right:-3px;}
+
+/* ***** main styles ******** */
+html {
+    font-family: "Merriweather", serif;
+    background-color: #caebef;
+    color: #F2F2F2;
+    overflow: auto;
+    width: 100%;
+    width:auto!important;
+    min-width: 100%;
+    min-height:100%;
+    height:auto!important;
+    height:100%;
+    margin: 0px;
+    padding: 0px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+body {
+    font-size: 12pt;
+    margin: 0px;
+    padding: 0px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #071D26;
+    max-width: 1024px;
+    overflow-y: auto;
+    overflow-x: visible;    
+    min-height:200%;
+    height:auto!important;
+    height:200%;
+
+    box-shadow: rgba(51, 51, 51, 0.9) 0px 0px 10px;
+    -webkit-box-shadow: rgba(51, 51, 51, 0.9) 0px 0px 10px;
+    -moz-box-shadow: rgba(51, 51, 51, 0.9) 0px 0px 10px;
+}
+
+.masthead {
+    font-family: "Ubuntu", sans-serif;
+    color: #395059;
+    background-image: url('http://orlando.pm.org/opm_banner.png');
+    background-repeat: no-repeat;
+    width: 1024px;
+    height: 307px;
+    display: table-cell;
+    vertical-align: bottom;    
+    border-bottom: 1px solid #FFD37F;
+    padding-left: 15px;
+}
+
+h1 { 
+    font-size: 40pt;
+    padding: 0px;
+    margin: 0px;
+}
+
+h1 a, h1 a:visited { 
+    color: white;
+    text-decoration: none;
+}
+
+.body { clear: both;}
+
+h2 {
+    font-family: "Ubuntu",sans-serif;
+    font-size: 200%;
+    font-weight: 600;
+    margin-bottom: 0.5ex;
+}
+
+h3 {
+    font-size: 150%;
+    font-family: "Ubuntu",sans-serif;
+}
+
+h4 {
+    font-size: 125%;
+    font-family: "Ubuntu",sans-serif;
+}
+
+
+h5, h6 { font-family: "Ubuntu",sans-serif; }
+p {
+    font-weight: 100;
+    line-height: 18pt;
+}
+
+.footer {
+    font-family: Helvetica, sans-serif;
+    text-align: center;
+    opacity: 0.4;
+    font-size: 100%;
+    font-size: 8pt;
+    font-weight: 400;
+}
+a {
+    color: #F2F2F2;
+    text-decoration: underline;
+}
+a:hover {
+    color: #FF0;
+    text-decoration: underline;
+}
+
+h2 a {
+    color: #F2F2F2;
+}
+
+.content { padding-left: 16px; padding-right: 16px; }
+
+.act_confs h2 a { font-size: 90%; }
+
+li {
+    display: block;
+    margin: 0px 0px 1ex 0px;
+    list-style: none;
+}
+
+.r1, .r2, .r3, .r4, .r5, .r6, .r7, .r8, .out {
+    background-color: #989DBF;
+    color: #2E281C;
+    font-size: 10pt;
+}
+
+.r1 a, .r2 a, .r3 a, .r4 a, .r5 a, .r6 a, .r7 a, .r8 a, .out a {
+    color: #2E281C;
+}
+
+ol li { list-style: decimal;}

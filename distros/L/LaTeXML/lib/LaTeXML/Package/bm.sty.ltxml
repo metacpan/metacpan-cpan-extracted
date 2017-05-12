@@ -1,0 +1,32 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  bm                                                                 | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+# Since we're really punting the whole question of what fonts have
+# bold variants of which characters, this should be enough:
+
+DefConstructor('\bm{}', '#1', bounded => 1, requireMath => 1, font => { forcebold => 1 });
+DefMacro('\bmdefine{}{}', '\newcommand{#1}{\bm{#2}}');
+Let('\boldsymbol', '\bm');
+
+# Should we make a distinction between bold & heavy?
+Let('\hm',          '\bm');
+Let('\heavysymbol', '\boldsymbol');
+Let('\hmdefine',    '\bmdefine');
+Let('\heavymath',   '\boldmath');
+
+#**********************************************************************
+1;

@@ -1,0 +1,76 @@
+Revision history for Perl extension LMDB_File.
+0.12 Wed Jan 25 2017
+    - Conditionally compile mdb_txn_id support.
+    - Updated README
+
+0.11 Tue Jan 24 2017
+    - Fix a leak in error path
+    - Add support for mdb_txn_id
+
+0.10 Fri May 20 2016
+    - Update for changes in MULTICALL API in 5.24
+
+0.09 Wed Jan 27 2016
+    - Stole^WPort lmdb fix for my env_get_flags as a fix for older lmdbs
+
+0.08 Tue Jan 21 2016
+    - Include liblmdb 0.9.70
+    - Adjust a test for fixed env_get_flags
+    - Fix for non English locales at test time, thanks to SREZIC
+    - Assorted cleanup
+    Thanks to rouzier and yanick for its contributions
+
+0.07 Mon Nov 3 2014
+    - All DB perl-implemented attributes (comparators, ReadMode, UTF8, etc.)
+      are now keep in Env's wrapper, so preserved across transactions.
+    - Implement raw vs UTF-8 encoded DBs. See LMDB_File->UTF8
+    - Revamp zero-copy read mode. Please review LMDB_File->ReadMode
+    - Implement MDB_RESERVE flag in puts.
+    - Include RELEASED liblmdb 0.9.14
+    - Uses mdb_env_copy2 and mdb_env_copyfd2 for MDB_CP_COMPACT support
+    - Expose low-level put and get as methods of LDMB::Txn
+    - Add missing post 0.9.10 constants
+
+0.06  Mon Sep 15 2014
+    - Include liblmdb 0.9.14
+    - Add LMDB::Txn->open and LMDB_file->new for low level dbi handling
+    - Complete LMDB_File->drop support.
+    - Fix typo in ->set_maxreaders
+    - Use proper default flags for some methods.
+    Thanks to Ken Fredric for its testing and reports
+
+0.05  Fri Nov 22 2013
+    - Depends on 0.9.10+
+    - Relax Perl version dependency to 5.10.0
+    - Avoid using freed memory at transaction end.
+    - Add -lrt, needed in solaris
+    - Documentation fixes
+    Thanks to Doug Hoyte for its contributions.
+
+0.04  Tue Oct  8 2013
+    - Depends on 0.9.8+ for fixed mdb_env_copy and changed mdb_dbi_flags.
+    - Cache dbflags to avoid repeated function calls
+    - Fix custom comparators to use global $a and $b
+    - Add experimental LMDB_File->Flush method that commit and re-open
+      a txn/db for continued use, proposed by Mark Zealey.
+    - Experimental zero-copy read mode. See LDMB_File->ReadMode
+
+0.03  Fri Aug 23 2013
+    - Fix MDB_INTEGERKEY handling, now works
+    - Reimplement mdb_env_copy to avoid O_DIRECT issues in unsupported filesystems.
+    - Fix STORE when using tie, thanks to Mark Zealey for the report.
+    - Avoid warn "undefined" for flags.
+    - Use proper locale when testing, should fix Alexandr Ciornii's
+      failed tests reports.
+
+0.02  Tue Aug 20 2013
+    - Fix build with non threaded Perl.
+    - Skip a test when can't create local directory.
+    - Use LIBS and INC if passed to Makefile.PL
+
+0.01  Mon Aug 19 2013
+    - early testing release, beta?
+
+0.00  Tue Aug  6 11:44:32 2013
+    - original version; created by h2xs 1.23
+

@@ -1,0 +1,61 @@
+{
+   "abstract" : "time the different stages of an HTTP request",
+   "author" : [
+      "Simon Wistow <simon@thegestalt.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "LWPx-TimedHTTP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Daemon" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::UserAgent" : "6",
+            "Time::HiRes" : 0
+         }
+      }
+   },
+   "provides" : {
+      "LWPx::TimedHTTP" : {
+         "file" : "lib/LWPx/TimedHTTP.pm",
+         "version" : "1.8"
+      },
+      "LWPx::TimedHTTP::Socket" : {
+         "file" : "lib/LWPx/TimedHTTP.pm",
+         "version" : 0
+      },
+      "LWPx::TimedHTTP::https" : {
+         "file" : "lib/LWPx/TimedHTTP.pm",
+         "version" : 0
+      },
+      "LWPx::TimedHTTP::https::Socket" : {
+         "file" : "lib/LWPx/TimedHTTP.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.8"
+}
+

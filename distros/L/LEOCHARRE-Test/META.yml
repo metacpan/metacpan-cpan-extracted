@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               LEOCHARRE-Test
+version:            1.11
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 1
+    DBD::mysql:           4.008
+    DBI:                  1.607
+    Test::Builder::Module:  0.80
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

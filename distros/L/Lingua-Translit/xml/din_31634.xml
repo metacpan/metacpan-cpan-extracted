@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+
+<!--
+
+    Transliteration definitions for DIN 31634: Greek to Latin.
+
+    Copyright (C) 2008 Alex Linke <alinke@lingua-systems.com>
+    Copyright (C) 2009 Lingua-Systems Software GmbH
+
+    See DIN 31634:April 1982, "Umschrift des griechischen Alphabets"
+
+    The transliteration table is almost complete, only support for
+    transliterating aspiration diacritics is left unimplemented for
+    performance reasons.
+
+-->
+
+
+<translit>
+
+    <!-- meta data -->
+
+    <name>DIN 31634</name>
+
+    <desc>DIN 31634:1982, Greek to Latin</desc>
+
+    <reverse>false</reverse>
+
+
+    <!-- set of transliteration rules -->
+
+
+    <rules>
+
+
+        <!-- Greek digraphs (precedence!) -->
+
+        <rule>				    <!-- #2 -->
+            <from>&#x0391;&#x03A5;</from>   <!-- ΑΥ -->
+            <to>AU</to>
+        </rule>
+        <rule>
+            <from>&#x03B1;&#x03C5;</from>   <!-- αυ -->
+            <to>au</to>
+        </rule>
+        <rule>
+            <from>&#x0391;&#x03C5;</from>   <!-- Αυ -->
+            <to>Au</to>
+        </rule>
+
+        <rule>				    <!-- #3 -->
+            <from>&#x0391;&#x03AB;</from>   <!-- ΑΫ -->
+            <to>A&#x0178;</to>		    <!-- AŸ -->
+        </rule>
+        <rule>
+            <from>&#x03B1;&#x03CB;</from>   <!-- αϋ -->
+            <to>a&#x00FF;</to>		    <!-- aÿ -->
+        </rule>
+
+        <rule>				    <!-- #6 -->
+            <from>&#x0393;&#x0393;</from>   <!-- ΓΓ -->
+            <to>NG</to>
+        </rule>
+        <rule>
+            <from>&#x03B3;&#x03B3;</from>   <!-- γγ -->
+            <to>ng</to>
+        </rule>
+        <rule>
+            <from>&#x0393;&#x03B3;</from>   <!-- Γγ -->
+            <to>Ng</to>
+        </rule>
+
+        <rule>				    <!-- #7 -->
+            <from>&#x0393;&#x039A;</from>   <!-- ΓΚ -->
+            <to>GK</to>
+            <context>
+                <after>\b</after>	    <!-- word initial -->
+            </context>
+        </rule>
+        <rule>
+            <from>&#x03B3;&#x03BA;</from>   <!-- γκ -->
+            <to>gk</to>
+            <context>
+                <after>\b</after>	    <!-- word initial -->
+            </context>
+        </rule>
+        <rule>
+            <from>&#x0393;&#x03BA;</from>   <!-- Γκ -->
+            <to>Gk</to>
+            <context>
+                <after>\b</after>	    <!-- word initial -->
+            </context>
+        </rule>
+
+        <rule>				    <!-- #8 -->
+            <from>&#x0393;&#x039A;</from>   <!-- ΓΚ -->
+            <to>NK</to>
+        </rule>
+        <rule>
+            <from>&#x03B3;&#x03BA;</from>   <!-- γκ -->
+            <to>nk</to>
+        </rule>
+        <rule>
+            <from>&#x0393;&#x03BA;</from>   <!-- Γκ -->
+            <to>Nk</to>
+        </rule>
+
+        <rule>				    <!-- #9 -->
+            <from>&#x0393;&#x039E;</from>   <!-- ΓΞ -->
+            <to>NX</to>
+        </rule>
+        <rule>
+            <from>&#x03B3;&#x03BE;</from>   <!-- γξ -->
+            <to>nx</to>
+        </rule>
+        <rule>
+            <from>&#x0393;&#x03BE;</from>   <!-- Γξ -->
+            <to>Nx</to>
+        </rule>
+
+        <rule>				    <!-- #10 -->
+            <from>&#x0393;&#x03A7;</from>   <!-- ΓΧ -->
+            <to>nch</to>
+        </rule>
+        <rule>
+            <from>&#x03B3;&#x03C7;</from>   <!-- γχ -->
+            <to>nch</to>
+        </rule>
+        <rule>
+            <from>&#x0393;&#x03C7;</from>   <!-- Γχ -->
+            <to>Nch</to>
+        </rule>
+
+        <rule>				    <!-- #13 -->
+            <from>&#x0395;&#x03A5;</from>   <!-- ΕΥ -->
+            <to>EU</to>
+        </rule>
+        <rule>
+            <from>&#x03B5;&#x03C5;</from>   <!-- ευ -->
+            <to>eu</to>
+        </rule>
+        <rule>
+            <from>&#x0395;&#x03C5;</from>   <!-- Ευ -->
+            <to>Eu</to>
+        </rule>
+
+        <rule>				    <!-- #16 -->
+            <from>&#x0397;&#x03A5;</from>   <!-- ΗΥ -->
+            <to>&#x0112;U</to>		    <!-- ĒU -->
+        </rule>
+        <rule>
+            <from>&#x03B7;&#x03C5;</from>   <!-- ηυ -->
+            <to>&#x0113;u</to>		    <!-- ēu -->
+        </rule>
+        <rule>
+            <from>&#x0397;&#x03C5;</from>   <!-- Ηυ -->
+            <to>&#x0112;u</to>		    <!-- Ēu -->
+        </rule>
+
+        <rule>				    <!-- #25 -->
+            <from>&#x039F;&#x03A5;</from>   <!-- ΟΥ -->
+            <to>U</to>
+        </rule>
+        <rule>
+            <from>&#x03BF;&#x03C5;</from>   <!-- ου -->
+            <to>u</to>
+        </rule>
+        <rule>
+            <from>&#x039F;&#x03C5;</from>   <!-- Ου -->
+            <to>U</to>
+        </rule>
+
+        <rule>				    <!-- #26 -->
+            <from>&#x039F;&#x03AB;</from>   <!-- ΟΫ -->
+            <to>O&#x0178;</to>		    <!-- OŸ -->
+        </rule>
+        <rule>
+            <from>&#x03BF;&#x03CB;</from>   <!-- οϋ -->
+            <to>o&#x00FF;</to>		    <!-- oÿ -->
+        </rule>
+
+
+        <!-- Characters in numerical order order (except for digraphs) -->
+
+        <rule>			    <!-- #1 -->
+            <from>&#x0391;</from>   <!-- Α -->
+            <to>A</to>
+        </rule>
+        <rule>
+            <from>&#x03B1;</from>   <!-- α -->
+            <to>a</to>
+        </rule>
+
+        <rule>			    <!-- #4 -->
+            <from>&#x0392;</from>   <!-- Β -->
+            <to>B</to>
+        </rule>
+        <rule>
+            <from>&#x03B2;</from>   <!-- β -->
+            <to>b</to>
+        </rule>
+
+        <rule>			    <!-- #5 -->
+            <from>&#x0393;</from>   <!-- Γ -->
+            <to>G</to>
+        </rule>
+        <rule>
+            <from>&#x03B3;</from>   <!-- γ -->
+            <to>g</to>
+        </rule>
+
+        <rule>			    <!-- #11 -->
+            <from>&#x0394;</from>   <!-- Δ -->
+            <to>D</to>
+        </rule>
+        <rule>
+            <from>&#x03B4;</from>   <!-- δ -->
+            <to>d</to>
+        </rule>
+
+        <rule>			    <!-- #12 -->
+            <from>&#x0395;</from>   <!-- Ε -->
+            <to>E</to>
+        </rule>
+        <rule>
+            <from>&#x03B5;</from>   <!-- ε -->
+            <to>e</to>
+        </rule>
+
+        <rule>			    <!-- #14 -->
+            <from>&#x0396;</from>   <!-- Ζ -->
+            <to>Z</to>
+        </rule>
+        <rule>
+            <from>&#x03B6;</from>   <!-- ζ -->
+            <to>z</to>
+        </rule>
+
+        <rule>			    <!-- #15 -->
+            <from>&#x0397;</from>   <!-- Η -->
+            <to>&#x0112;</to>	    <!-- Ē -->
+        </rule>
+        <rule>
+            <from>&#x03B7;</from>   <!-- η -->
+            <to>&#x0113;</to>	    <!-- ē -->
+        </rule>
+
+        <rule>			    <!-- #17 -->
+            <from>&#x0398;</from>   <!-- Θ -->
+            <to>Th</to>
+        </rule>
+        <rule>
+            <from>&#x03B8;</from>   <!-- θ -->
+            <to>th</to>
+        </rule>
+        <rule>
+            <from>&#x03D1;</from>   <!-- ϑ -->
+            <to>th</to>
+        </rule>
+
+        <rule>			    <!-- #18 -->
+            <from>&#x0399;</from>   <!-- Ι -->
+            <to>I</to>
+        </rule>
+        <rule>
+            <from>&#x03B9;</from>   <!-- ι -->
+            <to>i</to>
+        </rule>
+
+        <rule>			    <!-- #19 -->
+            <from>&#x039A;</from>   <!-- Κ -->
+            <to>K</to>
+        </rule>
+        <rule>
+            <from>&#x03BA;</from>   <!-- κ -->
+            <to>k</to>
+        </rule>
+
+        <rule>			    <!-- #20 -->
+            <from>&#x039B;</from>   <!-- Λ -->
+            <to>L</to>
+        </rule>
+        <rule>
+            <from>&#x03BB;</from>   <!-- λ -->
+            <to>l</to>
+        </rule>
+
+        <rule>			    <!-- #21 -->
+            <from>&#x039C;</from>   <!-- Μ -->
+            <to>M</to>
+        </rule>
+        <rule>
+            <from>&#x03BC;</from>   <!-- μ -->
+            <to>m</to>
+        </rule>
+
+        <rule>			    <!-- #22 -->
+            <from>&#x039D;</from>   <!-- Ν -->
+            <to>N</to>
+        </rule>
+        <rule>
+            <from>&#x03BD;</from>   <!-- ν -->
+            <to>n</to>
+        </rule>
+
+        <rule>			    <!-- #23 -->
+            <from>&#x039E;</from>   <!-- Ξ -->
+            <to>X</to>
+        </rule>
+        <rule>
+            <from>&#x03BE;</from>   <!-- ξ -->
+            <to>x</to>
+        </rule>
+
+        <rule>			    <!-- #24 -->
+            <from>&#x039F;</from>   <!-- Ο -->
+            <to>O</to>
+        </rule>
+        <rule>
+            <from>&#x03BF;</from>   <!-- ο -->
+            <to>o</to>
+        </rule>
+
+        <rule>			    <!-- #27 -->
+            <from>&#x03A0;</from>   <!-- Π -->
+            <to>P</to>
+        </rule>
+        <rule>
+            <from>&#x03C0;</from>   <!-- π -->
+            <to>p</to>
+        </rule>
+
+        <rule>			    <!-- #28 -->
+            <from>&#x03A1;</from>   <!-- Ρ -->
+            <to>R</to>
+        </rule>
+        <rule>
+            <from>&#x03C1;</from>   <!-- ρ -->
+            <to>r</to>
+        </rule>
+
+        <rule>			    <!-- #29 -->
+            <from>&#x03A3;</from>   <!-- Σ -->
+            <to>S</to>
+        </rule>
+        <rule>
+            <from>&#x03C3;</from>   <!-- σ -->
+            <to>s</to>
+        </rule>
+        <rule>			    <!-- #30 -->
+            <from>&#x03C2;</from>   <!-- ς -->
+            <to>s</to>
+            <context>
+                <before>\b</before>
+            </context>
+        </rule>
+
+        <rule>			    <!-- #31 -->
+            <from>&#x03A4;</from>   <!-- Τ -->
+            <to>T</to>
+        </rule>
+        <rule>
+            <from>&#x03C4;</from>   <!-- τ -->
+            <to>t</to>
+        </rule>
+
+        <rule>			    <!-- #32 -->
+            <from>&#x03A5;</from>   <!-- Υ -->
+            <to>Y</to>
+        </rule>
+        <rule>
+            <from>&#x03C5;</from>   <!-- υ -->
+            <to>y</to>
+        </rule>
+
+        <rule>			    <!-- #33 -->
+            <from>&#x03A6;</from>   <!-- Φ -->
+            <to>Ph</to>
+        </rule>
+        <rule>
+            <from>&#x03C6;</from>   <!-- φ -->
+            <to>ph</to>
+        </rule>
+        <rule>
+            <from>&#x03D5;</from>   <!-- ϕ -->
+            <to>ph</to>
+        </rule>
+
+        <rule>			    <!-- #34 -->
+            <from>&#x03A7;</from>   <!-- Χ -->
+            <to>Ch</to>
+        </rule>
+        <rule>
+            <from>&#x03C7;</from>   <!-- χ -->
+            <to>ch</to>
+        </rule>
+
+        <rule>			    <!-- #35 -->
+            <from>&#x03A8;</from>   <!-- Ψ -->
+            <to>Ps</to>
+        </rule>
+        <rule>
+            <from>&#x03C8;</from>   <!-- ψ -->
+            <to>ps</to>
+        </rule>
+
+        <rule>			    <!-- #36 -->
+            <from>&#x03A9;</from>   <!-- Ω -->
+            <to>&#x014C;</to>	    <!-- Ō -->
+        </rule>
+        <rule>
+            <from>&#x03C9;</from>   <!-- ω -->
+            <to>&#x014D;</to>	    <!-- ō -->
+        </rule>
+
+
+        <!-- Accented characters (accents discarded) -->
+
+        <rule>
+            <from>&#x0386;</from>   <!-- Ά -->
+            <to>A</to>
+        </rule>
+        <rule>
+            <from>&#x03AC;</from>   <!-- ά -->
+            <to>a</to>
+        </rule>
+
+        <rule>
+            <from>&#x0388;</from>   <!-- Έ -->
+            <to>E</to>
+        </rule>
+        <rule>
+            <from>&#x03AD;</from>   <!-- έ -->
+            <to>e</to>
+        </rule>
+
+        <rule>
+            <from>&#x0389;</from>   <!-- Ή -->
+            <to>&#x0112;</to>	    <!-- Ē -->
+        </rule>
+        <rule>
+            <from>&#x03AE;</from>   <!-- ή -->
+            <to>&#x0113;</to>	    <!-- ē -->
+        </rule>
+
+        <rule>
+            <from>&#x038A;</from>   <!-- Ί -->
+            <to>I</to>
+        </rule>
+        <rule>
+            <from>&#x03AF;</from>   <!-- ί -->
+            <to>i</to>
+        </rule>
+        <rule>
+            <from>&#x03AA;</from>   <!-- Ϊ -->
+            <to>I</to>
+        </rule>
+        <rule>
+            <from>&#x03CA;</from>   <!-- ϊ -->
+            <to>i</to>
+        </rule>
+        <rule>
+            <from>&#x0390;</from>   <!-- ΐ -->
+            <to>i</to>
+        </rule>
+
+        <rule>
+            <from>&#x038C;</from>   <!-- Ό -->
+            <to>O</to>
+        </rule>
+        <rule>
+            <from>&#x03CC;</from>   <!-- ό -->
+            <to>o</to>
+        </rule>
+
+        <rule>
+            <from>&#x038E;</from>   <!-- Ύ -->
+            <to>Y</to>
+        </rule>
+        <rule>
+            <from>&#x03CD;</from>   <!-- ύ -->
+            <to>y</to>
+        </rule>
+        <rule>
+            <from>&#x03AB;</from>   <!-- Ϋ -->
+            <to>Y</to>
+        </rule>
+        <rule>
+            <from>&#x03CB;</from>   <!-- ϋ -->
+            <to>y</to>
+        </rule>
+        <rule>
+            <from>&#x03B0;</from>   <!-- ΰ -->
+            <to>y</to>
+        </rule>
+
+        <rule>
+            <from>&#x038F;</from>   <!-- Ώ -->
+            <to>&#x014C;</to>	    <!-- Ō -->
+        </rule>
+        <rule>
+            <from>&#x03CE;</from>   <!-- ώ -->
+            <to>&#x014D;</to>	    <!-- ō -->
+        </rule>
+
+
+        <!-- Punctation marks -->
+
+        <rule>
+            <from>&#x037E;</from>   <!-- GREEK QUESTION MARK, EROTIMATIKO -->
+            <to>?</to>
+        </rule>
+
+        <rule>
+            <from>;</from>	    <!-- preferred for EROTIMATIKO -->
+            <to>?</to>
+        </rule>
+
+        <rule>
+            <from>&#x00B7;</from>   <!-- MIDDLE DOT, Greek ano teleia -->
+            <to>;</to>
+        </rule>
+
+
+        <!-- Diacritic marks -->
+
+        <rule>
+            <from>&#x0384;</from>   <!-- GREEK TONOS (spacing) -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0385;</from>   <!-- GREEK DIALYTIKA TONOS (spacing) -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0342;</from>   <!-- COMBINING GREEK PERISPOMENI -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0343;</from>   <!-- COMBINING GREEK KORONIS -->
+            <to></to>
+        </rule>
+
+        <rule>			    <!-- Psili -->
+            <from>&#x0313;</from>   <!-- COMBINING COMMA ABOVE -->
+            <to></to>
+        </rule>
+
+        <rule>			    <!-- Dasia -->
+            <from>&#x0314;</from>   <!-- COMBINING REVERSED COMMA ABOVE -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0345;</from>   <!-- COMBINING GREEK YPOGEGRAMMENI -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0345;</from>   <!-- GREEK YPOGEGRAMMENI -->
+            <to></to>
+        </rule>
+
+    </rules>
+
+</translit>
+
+
+<!--
+  vim: sts=4 sw=4 ai et
+-->

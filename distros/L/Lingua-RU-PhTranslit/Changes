@@ -1,0 +1,9 @@
+Revision history for Perl extension Lingua::RU::PhTranslit.
+
+0.1	~2001 internal release
+0.2  	2003-03-27 - first public version; 
+0.3  	2003-03-28 - missing test added, 
+	koi2alt/alt2koi addaed,
+0.4	2003-04-10 - add some documentation,
+	correct mistake with change $_ (thank's Sean M. Burke)
+

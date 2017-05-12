@@ -1,0 +1,4 @@
+
+Project name is: test
+Project version is: 1.2.3
+

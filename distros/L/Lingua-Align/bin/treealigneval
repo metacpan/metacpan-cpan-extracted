@@ -1,0 +1,412 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# simple evaluation script to evaluate tree alignment output in
+# Stockholm Tree Aligner format
+#
+# USAGE: eval_sta [OPTIONS] gold-file tree-alignments
+#
+# both files (gold-file & tree-alignments) 
+# have to be in Stockholm Tree Aligner format!
+#
+# OPTIONS
+#
+# -b first-id ........ start evaluating at this sentence
+# -e last-id ......... stop evaluating after this sentence
+#
+#
+# If -b and -e are not given: all sentences that have at least one
+# proposed link will be considered. 
+# Problem: if the system doesn't suggest any links --> it will not be
+#          considered and, therefore, the scores might be to high!
+#---------------------------------------------------------------------
+#
+
+use strict;
+use FindBin;
+use lib $FindBin::Bin.'/../lib';
+use Lingua::Align::Corpus::Parallel;
+
+use vars qw($opt_b $opt_e $opt_g $opt_s);
+use Getopt::Std;
+getopts('b:e:g:s:');
+
+
+my $goldType=$opt_g || 'sta';
+my $systemType=$opt_s || 'sta';
+
+# read all gold standard alignments
+# SystemS & SystemT point to hash with node type information (if available)
+my $gold=shift(@ARGV);
+my $sta1=new Lingua::Align::Corpus::Parallel(-type => $goldType);
+my ($GoldLinks,$GoldS,$GoldT)=({},{},{});
+my $totalGold = $sta1->read_tree_alignments($gold,\$GoldLinks,\$GoldS,\$GoldT);
+
+# read all links proposed by the system
+# SystemS & SystemT point to hash with node type information (if available)
+my $system=shift(@ARGV);
+my $sta2=new Lingua::Align::Corpus::Parallel(-type => $systemType);
+my ($SystemLinks,$SystemS,$SystemT)=({},{},{});
+my $totalSystem = $sta2->read_tree_alignments($system,\$SystemLinks,
+					      \$SystemS,\$SystemT);
+
+# keep a hash of source sentence IDs which we actually have aligned
+# this is a bit tricky because we will not count sentences for which the
+# aligner didn't find any alignments ... hmmm ...
+# ---> use -b and -e to specify exactly where to start and where to end!!!
+
+my %srcIDs=();
+my $s_is_term;
+my $t_is_term;
+
+my ($correct,$wrong,$correctGood,$totalGood)= (0,0,0,0);
+
+my %CorrectTypes=();
+my %TotalSystemTypes=();
+my $TotalSystem=0;
+
+my $EvalThis=1;
+if ($opt_b){$EvalThis=0;}
+
+foreach my $s (keys %{$SystemLinks}){
+
+    if ($s=~/^s?([0-9]+)\_/){          # check sentence IDs
+	my $id=$1;
+	if ($opt_b){                   # if start ID is given
+	    next if ($id<$opt_b);      # --> skip the ones before
+	}
+	if ($opt_e){                   # if end ID given
+	    next if ($id>$opt_e);      # skip the ones after
+	}
+	$srcIDs{$id}=1;                # otherwise: use all proposed links
+    }
+
+    if (exists $$SystemS{$s}){
+	if ($$SystemS{$s} eq 't'){ $s_is_term=1; }
+	else{ $s_is_term=0; }
+    }
+    elsif ($s=~/s?[0-9]+\_([0-9]+)$/){     # assume that node ID's < 500 
+	if ($1 < 500){$s_is_term=1;}       # are terminal nodes
+	else{$s_is_term=0;}
+    }
+
+    foreach my $t (keys %{$$SystemLinks{$s}}){
+
+	if (exists $$SystemT{$t}){
+	    if ($$SystemT{$t} eq 't'){ $t_is_term=1; }
+	    else{ $t_is_term=0; }
+	}
+	elsif ($t=~/s?[0-9]+\_([0-9]+)$/){     # assume that node ID's < 500 
+	    if ($1 < 500){$t_is_term=1;}       # are terminal nodes
+	    else{$t_is_term=0;}
+	}
+
+	my $typeS = $$SystemLinks{$s}{$t};
+	if ($typeS!~/(fuzzy|good)/){
+	    if ($typeS>0.5){$typeS = 'good';}
+	    else{$typeS = 'fuzzy';}
+	}
+
+	$TotalSystemTypes{$typeS}{$s_is_term}{$t_is_term}++;
+	$TotalSystemTypes{ALL}{$s_is_term}{$t_is_term}++;
+	$TotalSystem++;
+
+	if (exists $$GoldLinks{$s}){
+	    if (exists $$GoldLinks{$s}{$t}){
+
+		my $typeG = $$GoldLinks{$s}{$t};
+
+		$correct++;
+		$CorrectTypes{ALL}{$s_is_term}{$t_is_term}++;
+		if ($typeG eq 'good'){$correctGood++;}
+		if ($typeS eq $typeG){
+		    $CorrectTypes{$typeG}{$s_is_term}{$t_is_term}++;
+		}
+	    }
+	}
+    }
+}
+
+
+# go through gold standard links
+# - we have to count good alignments
+# - we might want to skip some sentences 
+#   (which we haven't aligned with the system to be evaluated)
+
+my %TotalGoldTypes=();
+my $TotalGold=0;
+
+foreach my $s (keys %{$GoldLinks}){
+
+    if ($s=~/^s?([0-9]+)\_/){            # check sentence IDs in gold standard
+	my $id=$1;
+	if ($opt_b){                     # if start ID is given:
+	    next if ($id<$opt_b);        # skip the ones before
+	}
+	if ($opt_e){                     # if end ID is given:
+	    next if ($id>$opt_e);        # skip the ones after
+	}
+	if ((not $opt_b) && (not $opt_e)){     # otherwise: use all sentences
+	    next if (not exists $srcIDs{$id}); # with at least 1 proposed link!
+	}
+	$srcIDs{$id}=1;
+    }
+
+    if (exists $$GoldS{$s}){
+	if ($$GoldS{$s} eq 't'){ $s_is_term=1; }
+	else{ $s_is_term=0; }
+    }
+    elsif ($s=~/s?[0-9]+\_([0-9]+)$/){     # assume that node ID's < 500 
+	if ($1 < 500){$s_is_term=1;}       # are terminal nodes
+	else{$s_is_term=0;}
+    }
+
+    foreach my $t (keys %{$$GoldLinks{$s}}){
+
+	if (exists $$GoldT{$t}){
+	    if ($$GoldT{$t} eq 't'){ $t_is_term=1; }
+	    else{ $t_is_term=0; }
+	}
+	elsif ($t=~/s?[0-9]+\_([0-9]+)$/){     # assume that node ID's < 500 
+	    if ($1 < 500){$t_is_term=1;}       # are terminal nodes
+	    else{$t_is_term=0;}
+	}
+
+	$TotalGold++;
+	$TotalGoldTypes{$$GoldLinks{$s}{$t}}{$s_is_term}{$t_is_term}++;
+	$TotalGoldTypes{ALL}{$s_is_term}{$t_is_term}++;
+	$totalGood++ if ($$GoldLinks{$s}{$t} eq 'good');
+    }
+}
+
+
+
+if ($TotalGold != $totalGold){
+    my $nrSent = scalar keys %srcIDs;
+    print "\nTotal links in gold standard = $totalGold\n";
+    print "I will only use $TotalGold links from $nrSent sentence pairs\n";
+    print "for which we actually have alignments!\n\n";
+}
+
+#----------------------------------------------------------------
+# print scores per type (T:T, NT:NT, all, good, fuzzy)
+
+foreach my $type (sort keys %TotalGoldTypes){
+    next if ($type eq 'comment');
+    foreach my $s (sort keys %{$TotalGoldTypes{$type}}){
+	foreach my $t (sort keys %{$TotalGoldTypes{$type}}){
+
+
+	    ## only if there is anything to say ....
+	    next if (not $CorrectTypes{$type}{$s}{$t});
+
+	    print "--------------------------------------------------------\n";
+
+	    my $precision=0;
+	    if ($TotalSystemTypes{$type}{$s}{$t}){
+		$precision = 
+		    $CorrectTypes{$type}{$s}{$t}/
+		    $TotalSystemTypes{$type}{$s}{$t};
+	    }
+
+	    my $recall=0;
+	    if ($TotalGoldTypes{$type}{$s}{$t}){
+		$recall = 
+		    $CorrectTypes{$type}{$s}{$t}/
+		    $TotalGoldTypes{$type}{$s}{$t};
+	    }
+
+	    my $st = 'NT';
+	    if ($s){$st = 'T';}
+	    my $tt = 'NT';
+	    if ($t){$tt = 'T';}
+
+	    printf "%30s = %5.2f (%d/%d)\n",
+	    "precision ($type/$st:$tt)",
+	    $precision*100,
+	    $CorrectTypes{$type}{$s}{$t},
+	    $TotalSystemTypes{$type}{$s}{$t};
+
+	    printf "%30s = %5.2f (%d/%d)\n",
+	    "recall ($type/$st:$tt)",
+	    $recall*100,
+	    $CorrectTypes{$type}{$s}{$t},
+	    $TotalGoldTypes{$type}{$s}{$t};
+
+	    my $F=0;
+	    if ($recall || $precision){
+		$F=2*$precision*$recall/($precision+$recall);
+	    }
+	    printf "%30s = %5.2f\n","balanced F ($type/$st:$tt)",100*$F;
+	}
+    }
+}
+
+print "\n\n";
+
+
+#----------------------------------------------------------------
+# print total numbers
+
+
+if ($TotalGold && $TotalSystem){
+    my $precision = $correct/$TotalSystem;
+    my $recall = $correct/$TotalGold;
+    my $recallGood = 0;
+    my $recallFuzzy = 0;
+
+    if ($totalGood){
+	$recallGood = $correctGood/$totalGood;
+    }
+    if (($TotalGold - $totalGood) > 0){
+	$recallFuzzy = ($correct - $correctGood)/($TotalGold - $totalGood);
+    }
+
+    print "=======================================\n";
+    printf "  precision (all) = %5.2f (%d/%d)\n",
+    $precision*100,$correct,$TotalSystem;
+    printf "     recall (all) = %5.2f (%d/%d)\n",
+    $recall*100,$correct,$TotalGold;
+    printf "    recall (good) = %5.2f (%d/%d)\n",
+    $recallGood*100,$correctGood,$totalGood;
+    printf "   recall (fuzzy) = %5.2f (%d/%d)\n",
+    $recallFuzzy*100,($correct - $correctGood),($TotalGold - $totalGood);
+    print "=======================================\n";
+
+    my $F = 0;
+    if ($precision || $recall){
+	$F = 2*$precision*$recall/($precision+$recall);
+    }
+    printf "F (P_all & R_all)  = %5.2f\n",100*$F;
+
+    if ($precision || $recallGood){
+	$F = 2*$precision*$recallGood/($precision+$recallGood);
+    }
+    printf "F (P_all & R_good) = %5.2f\n",100*$F;
+    print "=======================================\n";
+    
+}
+
+
+
+__END__
+
+=head1 NAME
+
+treealigneval - a script for computing precision and recall scores for tree aligmnent
+
+=head1 SYNOPSIS
+
+    treealigneval [OPTIONS] gold-standard-file tree-alignment-file
+
+
+=head1 DESCRIPTION
+
+Both F<gold-standard-file> and F<tree-alignment-file> should be in Stockholm Tree Aligner Format. Here is an example:
+
+ <?xml version="1.0" ?>
+ <treealign>
+ <head>
+  <alignment-metadata>
+    <date>Tue May  4 16:23:04 2010</date>
+    <author>Lingua-Align</author>
+  </alignment-metadata>
+ </head>
+  <treebanks>
+    <treebank filename="treebanks/en/smultron_en_sophie.xml" id="en"/>
+    <treebank filename="treebanks/sv/smultron_sv_sophie.xml" id="sv"/>
+  </treebanks>
+  <alignments>
+    <align author="Lingua-Align" prob="0.11502659612149206125" type="fuzzy">
+      <node node_id="s105_17" type="t" treebank_id="en"/>
+      <node node_id="s109_23" type="t" treebank_id="sv"/>
+    </align>
+    <align author="Lingua-Align" prob="0.45281832125339427364" type="fuzzy">
+      <node node_id="s105_34" type="t" treebank_id="en"/>
+      <node node_id="s109_15" type="t" treebank_id="sv"/>
+    </align>
+  </alignments>
+ </treealign>
+
+
+The C<treealigneval> script will read both files and compare the links. It will output precision, recall and F values. Here is an example output:
+
+ --------------------------------------------------------
+         precision (ALL/NT:NT) = 76.27 (1896/2486)
+            recall (ALL/NT:NT) = 77.96 (1896/2432)
+        balanced F (ALL/NT:NT) = 77.10
+ --------------------------------------------------------
+           precision (ALL/T:T) = 73.48 (2626/3574)
+              recall (ALL/T:T) = 72.48 (2626/3623)
+          balanced F (ALL/T:T) = 72.97
+ --------------------------------------------------------
+       precision (fuzzy/NT:NT) = 15.78 (101/640)
+          recall (fuzzy/NT:NT) = 19.39 (101/521)
+      balanced F (fuzzy/NT:NT) = 17.40
+ --------------------------------------------------------
+         precision (fuzzy/T:T) =  5.40 (50/926)
+            recall (fuzzy/T:T) = 17.36 (50/288)
+        balanced F (fuzzy/T:T) =  8.24
+ --------------------------------------------------------
+        precision (good/NT:NT) = 67.23 (1241/1846)
+           recall (good/NT:NT) = 65.32 (1241/1900)
+       balanced F (good/NT:NT) = 66.26
+ --------------------------------------------------------
+          precision (good/T:T) = 78.32 (2074/2648)
+             recall (good/T:T) = 62.19 (2074/3335)
+         balanced F (good/T:T) = 69.33
+ =======================================
+  precision (all) = 74.62 (4522/6060)
+     recall (all) = 74.68 (4522/6055)
+    recall (good) = 76.06 (3982/5235)
+   recall (fuzzy) = 65.85 (540/820)
+ =======================================
+ F (P_all & R_all)  = 74.65
+ F (P_all & R_good) = 75.34
+ =======================================
+
+C<NT> refers to non-terminal nodes and C<T> refers to terminal nodes (treealigneval uses type attributes in the alignment file to determine if a node is a terminal node or a non-terminal node; if this attribute is not included it assumes that all nodes with an ID<500 is a terminal node). Precision and recall values for specific link types may be lower than the overall numbers because the proposed link type has to match whereas in the total numbers all proposed links are considered.
+
+
+=head2 OPTIONS
+
+=over
+
+=item -b firstSentId
+
+Start evaluating at this source language sentence ID. If you don't specify -b the evaluation script will use all sentences for which at least one link has been proposed. That means that the scores might be too high because the aligner may just not have aligned anything for in some sentence pairs (usually it will be fine).
+
+=item -e lastSentId
+
+Stop evaluating at this source language sentence ID. This is for the same reason as for -b.
+
+=item -g format
+
+This specifies the format of the gold standard file. Default is C<sta> (Stockholm Tree Aligner format). Other formats are not really included/tested yet. An alternative would be, for example, the format of the Dublin Subtree Aligner.
+
+=item -s format
+
+The format of the tree aligmnets proposed by the system. Default is again C<sta>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Lingua::treealign>,
+L<Lingua::Align::Trees>
+ 
+
+=head1 AUTHOR
+
+Joerg Tiedemann
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Joerg Tiedemann
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

@@ -1,0 +1,17 @@
+Build.PL
+Changelog.ini
+CHANGES
+config/.htlocal.logger.conf
+lib/Log/Handler/Plugin/DBI.pm
+lib/Log/Handler/Plugin/DBI/CreateTable.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+scripts/create.table.pl
+scripts/drop.table.pl
+t/config.logger.conf
+t/load.t
+t/pod.t
+t/test.t

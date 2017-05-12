@@ -1,0 +1,9 @@
+The following are examples of using module
+
+  ljpost
+    A simple command line based interface to post a journal entry
+
+  friends-only
+    A command which will go through a journal and ensure that all entries
+    are at least made friends-only
+

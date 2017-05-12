@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+[% body = PROCESS $content %]
+
+  <!-- Document Metadata -->
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Language" content="en" />
+
+  <!-- Identity -->
+  <title>YAPC Conference Surveys - [% yapc_name %] - [% yapc_city %] - [% yapc_date %]</title>
+
+[% IF redirect %]
+
+  <meta http-equiv="refresh" content="0;url=[% redirect %]">
+
+[% END %]
+
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" type="text/css" href="/css/act-base.css">
+  <link rel="stylesheet" type="text/css" href="/css/yapc-style.css">
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+  <!-- JavaScript sugar -->
+  <script type="text/javascript" src="/js/survey.js"></script>
+
+  <!-- Favorite icon -->
+  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+
+</head>
+
+<body>
+
+<div id="outer">
+
+  <div id="header">
+    <img src="[% yapc_logo %]" style="z-index:-10;" alt="[% yapc_name %]" width="100%">
+  </div>
+
+  <div id="menu">
+    <ul>      
+          <li><a href="/">[% yapc_name %] Surveys</a></li>
+          <li>&bull;</li>
+          <li><a href="[% yapc_http %]">Conference Site</a></li>
+          <li>&bull;</li>
+          <li><a href="http://yapc-surveys.org">Past Surveys</a></li>
+      [% IF user.access > 4 %]
+          <li>/</li>
+          <li><a href="/admin/users">Users</a></li>
+          <li>&bull;</li>
+          <li><a href="/admin/annos">Announcements</a></li>
+          <li>&bull;</li>
+          <li><a href="/admin/survey">Surveys</a></li>
+          <li>&bull;</li>
+          <li><a href="/admin/talks">Talks</a></li>
+      [% END %]
+      </ul>
+  </div>
+
+  <div class="content">  
+  <div class="contentmain">
+  
+		<!-- Normal content: Stuff that's not going to be put in the left or right column. -->
+		<div class="normalcontent">
+
+          <div id="survey-content">
+          [% body %]
+          </div>
+
+        <div class="clear">
+        </div>
+     </div>
+
+  </div>
+
+
+  <div id="footer">
+    <div id="footer-left">
+      <a href="http://perlfoundation.org/" target="_new"><img src="/images/layout/tpf.png" alt="Home of Perl Foundation, supporting community" title="Perl Foundation  Homepage"></a>
+    </div>
+    <div id="footer-right">
+      <a href="http://perl.org/" target="_new"><img src="/images/layout/perl.png" alt="Home of Perl" title="Perl Homepage"></a>
+    </div>
+    <div id="footer-text">
+      YAPC Conference Surveys are powered by <a href="http://labyrinth.missbarbell.co.uk/">Labyrinth</a>,
+      copyright &copy; 2006-2014 Miss Barbell Productions.<br />
+      Survey data copyright &copy; 2014 <a href="http://www.perlfoundation.org/">The Perl Foundation</a>. <br />
+      Please contact <a href="mailto:barbie@cpan.org">Barbie</a> if you have any questions regarding this survey.
+    </div>
+  </div>
+
+</div>
+</div>
+
+</body>
+</html>

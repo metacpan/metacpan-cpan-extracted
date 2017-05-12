@@ -1,0 +1,75 @@
+TYPEMAP
+
+LMDB::Env	T_PTROBJ
+LMDB::Txn	T_PTROBJ
+TxnOrNull	T_PTROBJ_N
+LMDB::Cursor	T_PTROBJ
+#LMDB		T_OPAQUE
+LMDB		T_UV
+DBD		T_datum
+DBK		T_keydatum
+DBKC		T_keydatumC
+MDB_cursor_op	T_IV
+mdb_filehandle_t  T_FD 
+HV *		T_HVREF_REFCOUNT_FIXED
+# Type to avoid warnings when a flag is undefined
+flags_t		T_UV_N
+
+INPUT
+T_datum
+	Sv2DBD($arg, $var);
+T_keydatum
+	if (ISDBKINT) {
+	    SvIV_please($arg);
+	    $var.mv_data = &(((XPVIV*)SvANY($arg))->xiv_iv);
+	    $var.mv_size = sizeof(MyInt);
+	}
+	else $var.mv_data = SvPV($arg, $var.mv_size);
+T_keydatumC
+	if (ISDBKINT) {
+	    if(SvOK($arg)) {
+		SvIV_please($arg);
+		$var.mv_data = &(((XPVIV*)SvANY($arg))->xiv_iv);
+	    } else $var.mv_data = (MyInt *)\"\\0\\0\\0\\0\\0\\0\\0\\0\";
+	    $var.mv_size = sizeof(MyInt);
+	}
+	else if(SvOK($arg)) $var.mv_data = SvPV($arg, $var.mv_size);
+T_FD
+	$var = PerlIO_fileno(IoOFP(sv_2io($arg)));
+T_PTROBJ_N
+        if(!SvTRUE($arg)) {
+            $var = ($type) NULL;
+        } else if (SvROK($arg) && sv_derived_from($arg, \"LMDB::Txn\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                        \"$var\", \"LMDB::Txn\");
+
+T_UV_N
+	$var =	SvOK($arg) ? ($type)SvUV($arg) : 0;
+####################################################################################
+OUTPUT
+T_datum
+	sv_setstatic(aTHX_ aMY_CXT_ $arg, &$var, 0);
+T_keydatum
+	if(ISDBKINT) {
+	    sv_setiv_mg($arg, *(MyInt *)$var.mv_data);
+	} else {
+	    sv_setpvn_mg($arg, $var.mv_data, $var.mv_size);
+	    SvUTF8_off($arg);
+	}
+T_keydatumC
+	if(op != MDB_SET) {
+	    if(ISDBKINT) {
+		sv_setiv_mg($arg, *(MyInt *)$var.mv_data);
+	    } else {
+		sv_setpvn_mg($arg, $var.mv_data, $var.mv_size);
+		SvUTF8_off($arg);
+	    }
+	}
+T_HVREF_REFCOUNT_FIXED
+        $arg = newRV_noinc((SV*)$var);
+

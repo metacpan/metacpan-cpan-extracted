@@ -1,0 +1,8 @@
+
+<Sect1 id="sec-stable-pointers">
+<Title><literal>StablePtr</literal><IndexTerm><Primary>Stable Pointers</Primary></IndexTerm>
+</Title>
+
+  <para>This module has moved to <ulink url="../base/Foreign.StablePtr.html"><literal>Foreign.StablePtr</literal></ulink> in the
+  hierarchical libraries.</para>
+</Sect1>

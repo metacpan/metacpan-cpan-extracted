@@ -1,0 +1,29 @@
+---
+abstract: 'simple logger mainly for debugging'
+author:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  IO::Capture: '0'
+  Test::More: '0.98'
+  Test::UseAllModules: '0.09'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.06'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Dump
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dump: '0'
+  IO::File: '0'
+  Sub::Install: '0'
+resources:
+  repository: https://github.com/charsbar/log-dump
+version: '0.14'

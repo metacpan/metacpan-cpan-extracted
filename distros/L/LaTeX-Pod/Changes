@@ -1,0 +1,229 @@
+Revision history for Perl extension LaTeX::Pod.
+
+0.21  2011-08-18  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.20_03  2011-08-09  <schubiger@cpan.org>
+
+ - Work around an assertion failure in 5.8.9 and possibly higher.
+
+ - Document the strictness of LaTeX expected.
+
+0.20_02  2011-07-19  <schubiger@cpan.org>
+
+ - Build a dispatch queue (with a node and other arguments per entry)
+   which has its code executed when all nodes have been processed.
+
+ - Alter the dispatch tables accordingly and sort the command checks.
+
+ - When extracting the label and text of the \item command, distinguish
+   between lists of type description, enumerate and itemize.
+
+ - Increase the indent level for flattened nested list environments.
+
+ - Indent verbatim text by prepending a space to the existing ones.
+
+ - Add handling of abstracts and some escaped characters.
+
+ - Substitute the \\ and \newline commands with a newline.
+
+ - Process single-line comments.
+
+ - Remove trailing spaces and tabs for preceding pod added in _pod_add().
+
+ - Verify first when converting that the input file still exists.
+
+ - Rephrase the notes on the implementation details.
+
+ - Introduce a debugging method which traces the pod being set.
+
+ - Initialize instance variables when convert() is called.
+
+ - Provide the title counter for each =headN passed to _pod_add().
+
+ - Unregister all text nodes first when processing a non-text node.
+
+ - Check for end of list when outside of the \item handling method.
+
+ - Expect flat lists as arguments for the 'previous' accessors.
+
+ - Wrap appending or adding text conditionally in a setter method.
+
+ - Simplify counting the level of nestedness for sub+sections.
+
+ - Extend the pod expected by the tests and the tex file.
+
+ - Make the tests capable of evaling inserted placeholders.
+
+0.20_01  2011-06-01  <schubiger@cpan.org>
+
+ - Fix deprecated warning emitted for qw() used as parentheses.
+
+ - Skip documentation tests for non-release testing.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+0.20 Tue Oct 27 12:32:28 CET 2009
+
+ - Update broken license links.
+
+ - Fix some indentation nits.
+
+ - Merged development version to stable.
+
+0.19_01 Thu Oct 15 13:00:59 CEST 2009
+
+ - Don't suppress global warnings while testing.
+
+0.19 Thu Jul  9 11:18:23 CEST 2009
+
+ - Merged development version to stable.
+
+0.18_02 Sun Jun 21 20:05:25 CEST 2009
+
+ - Validation of arguments is handled by Params::Validate.
+
+ - Emit better error messages when the input file cannot be opened.
+
+ - When receiving arguments within a method, explicitly fetch
+   the object first and then all the remaining arguments.
+
+ - Improve the options handling of latex2pod.
+
+ - Don't possibly import from LaTeX::TOM.
+
+0.18_01 Sat Oct 25 12:57:54 CEST 2008
+
+ - Use the "boolean" pragma for true/false values.
+
+0.18 Tue Jun 17 17:06:50 CEST 2008
+
+ - Append a trailing newline to the =cut directive within
+   the output generated.
+
+0.17 Thu Feb 21 15:59:48 CET 2008
+
+ - Made the "matching" for the node type more explicit.
+
+0.16 Wed Feb 13 16:47:56 CET 2008
+
+ - Don't assume a '/' within File::Spec->catfile() in basic.t.
+
+ - Reordered code within parse_switches() in latex2pod.
+
+ - Add more dependencies to Build.PL.
+
+0.15 Sun Dec 23 15:39:50 CET 2007
+
+ - Reworded the documentation.
+
+ - Adjusted code layout of latex2pod to be coherent with
+   the remaining code.
+
+ - Version output emitted by latex2pod includes $VERSION
+   from LaTeX::Pod.
+
+0.14 Sun Nov 25 14:21:54 CET 2007
+
+ - Added test which tests basic conversion.
+
+0.13 Sat Sep  1 17:26:49 CEST 2007
+
+ - Redone code formatting.
+
+0.12 Wed Mar 28 03:42:05 CEST 2007
+
+ - Moved initialization logic entirely to _init() which was
+   previously known as _init_self().
+
+0.11 Thu Mar 15 00:28:00 CET 2007
+
+ - Merged development version to stable.
+
+0.10_01 Sun Feb 11 08:16:40 CET 2007
+
+ - Added 'script_files' parameter consisting of latex2pod's path
+   within the distribution to Build.PL.
+
+ - Fixed some indentation by converting some tabs to literal spaces.
+
+0.10 Sat Feb 10 01:07:01 CET 2007
+
+ - Instead of appending generated Pod to a string while proceeding,
+   every "push" (directive & text) takes up one member in an
+   encapsulated array. The array is flattened when a string
+   representation is requested (usually when convert() returns)
+   and a pair of newlines between each member is added.
+
+0.09_01 Sun Jan 28 01:25:29 CET 2007
+
+ - Added call of _process_spec_chars() to _process_text_verbatim().
+
+ - Some minor, but nonetheless important, code reformatting.
+
+0.09 Fri Jan 12 00:26:37 CET 2007
+
+ - The item's text has now proper intendation (speak none)
+   and leading/trailing newlines are attached.
+
+ - Fixed minor spelling nit within Pod.pm.
+
+ - Added some implementation details to the documentation.
+
+0.08 Thu Jan 11 01:18:38 CET 2007
+
+ - Introduction of dispatch handler broke the handling of the
+   "simulated" else clause; furthermore, skipping the evaluation
+   of node types when successfully matched against current node,
+   had the same effect.
+
+ - \item directives are now handled bare (\item) as well as with
+   surrounding brackets (\item[]).
+
+ - Commented piece of code out that automatically adds the
+   author to the document title. Will maybe make it an option
+   to latex2pod in a future release.
+
+ - latex2pod, a commandline frontend to LaTeX::Pod, has been
+   added to the distribution's scripts directory.
+
+0.07 Wed Jan 10 20:37.02 CET 2007
+
+ - Replaced previous text/command conditional branches in convert()
+   with calls to dispatch handler.
+
+ - The ending POD =cut directive will be added to generated output.
+
+0.06 Tue Jan  9 21:02:19 CET 2007
+
+ - Beautified code within Pod.pm, i.e. removed
+   parentheses from method calls without arguments.
+
+0.05 Sun Dec 31 03:29:24 CET 2006
+
+ - Added accessors to get/set the internal POD data.
+
+ - Fixed the indentation for LaTeX' verbatim blocks.
+
+0.04 Die Dec 26 01:46:39 CET 2006
+
+ - Forgot to include code for processing code & italic font tags.
+
+0.03 Die Dec 26 00:20:08 CET 2006
+
+ - Fixed umlauts.
+
+ - Improved documentation.
+
+0.02 Mon Dec 25 14:34:14 CET 2006
+
+ - Unknown directives are skipped.
+
+ - LaTeX Umlauts definitions are converted.
+
+ - More than two following newlines will be reduced to two.
+
+0.01 Mon Dec 25 05:59:08 CET 2006
+
+ - Initial version.

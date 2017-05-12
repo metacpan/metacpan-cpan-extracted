@@ -1,0 +1,16 @@
++{
+    dispatchers => [qw/file screen/],
+    file => +{
+        class     => 'Log::Dispatch::File',
+        min_level => 'debug',
+        filename  => 't/log.out',
+        mode      => 'append',
+        format    => '[%d] [%p] %m at %F line %L',
+    },
+    screen => +{
+        class     => 'Log::Dispatch::Screen',
+        min_level => 'info',
+        stderr    => 1,
+        format    => '%m %%',
+    },
+}

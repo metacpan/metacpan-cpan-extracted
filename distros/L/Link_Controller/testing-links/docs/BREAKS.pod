@@ -1,0 +1,98 @@
+=head1	Understanding Link Problems
+
+It's important to have some kind of idea of what kinds of problem we
+are expecting, so that we know, not only when to signal this to a user
+and when to ignore, but also what kinds of further tests might be
+worthwhile etc.
+
+This area is one of the ones I have most doubts about.  There are many
+different kinds of break I can visualise..
+
+=head2 temporary complete break e.g.
+
+=over 4
+
+=item *
+
+The computer at the other end just happens to be down for its yearly
+testing.  Back tomorrow. 
+
+=item *
+
+The data-centre at the other end suffered a meteor strike in the
+middle of the night.  Back immediately we rebuild it..
+
+=back
+
+For this we just need to wait the right amount of time for them to
+repair things.  I expect most repairs are quick (less than a day) but
+there must be some kind of exponential decay.
+
+=head2 random broken behaviour
+
+=over 4
+
+=item * 
+
+The phone line at the other end is noisy and the connection keeps breaking.
+
+=item * 
+
+The other system has an experimental new operating system and keeps
+having to be restarted.
+
+=item *
+
+The link to the other system is overloaded
+
+=back
+
+Random broken behaviour just needs us to keep testing at different
+times of the day or night..  You should probably make sure that your
+program shedules some proportion of its tests at other times of day
+than when it normally runs in case some machine is up for part of the
+day only (down at night, for example).. but you should probably know
+about that anyway..
+
+=head2 absolute broken behaviour
+
+=over 4
+
+=item *
+
+One day the debt collectors showed up and repossesed the machine then
+took the owner off to prison.  There is no hope that any more
+information will ever come out of there.
+
+=item *
+
+The link is redirected to a new site
+
+=item * 
+
+The target has been moved to a new site 
+
+=back
+
+=head2 data corruption etc
+
+It's possible for there to be subtle data corruption at the other end
+which the server there is not aware of.  
+
+=over 4
+
+=item *
+
+A file has been corrupted
+
+=item * 
+
+The server serves wrongly to certain other computers
+
+=item * 
+
+the server makes random mistakes.
+
+=back
+
+=cut

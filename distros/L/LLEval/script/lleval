@@ -1,0 +1,5 @@
+#!perl -w
+use strict;
+use LLEval::CLI;
+my $app = LLEval::CLI->new_with_options();
+exit $app->run();

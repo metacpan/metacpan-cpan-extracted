@@ -1,0 +1,10 @@
+Revision history for Perl extension Lingua::31337.
+
+0.02  Thu Feb 27 08:43:16 EST 2003
+	- Fixed bug in Exporting, now exports by default as it should.
+	  Patch provided by beatnik@quickndirty.org
+
+0.01  Fri Sep 20 16:39:55 2002
+	- original version; created by h2xs 1.2 with options
+		-XAn Lingua::31337
+

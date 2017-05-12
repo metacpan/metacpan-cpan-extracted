@@ -1,0 +1,53 @@
+#$Id$
+Q.  How can I make comparisons among more than two lists when I don't know in
+advance how many lists I'll need to compare?
+
+A.  Write a subroutine which returns a reference to an array.  In your
+program, call that subroutine as needed.  Push the array reference returned
+onto a "list of lists" which is then passed to List::Compare->new().
+
+Example:  You have a function, get_random_integers(), which returns a
+reference to a list of random integers between 0 and 9.  The number of items
+in the list is itself a random integer between 0 and 9.
+
+    sub get_random_integers {
+        my $listsize = int(rand(10));  # 0..9
+        my @list;
+        for (0 .. $listsize) {
+            push @list, int(rand(10));
+        }
+        return \@list;
+    }
+    
+You call get_random_integers a random number of times between 2 and 11.  Why
+2?  Because List::Compare must compare at least two lists. 
+    
+    #!/usr/bin/perl
+    use strict;
+    use warnings;
+    use List::Compare;
+    use Data::Dumper;
+    $Data::Dumper::Indent = 0;
+    
+    my $list_quantity = int(rand(10)) + 2; # must have >= 2 lists
+    my @lol;
+    for (0 .. $list_quantity) {
+        my $listref = get_random_integers();
+        print Dumper $listref;
+        print "\n";
+        push @lol, $listref;
+    }
+    
+    my $lc = List::Compare->new(@lol);
+    my (@intersection, @union, @unique, @complement);
+    @intersection = $lc->get_intersection();
+    @union = $lc->get_union();
+    @unique = $lc->get_unique(0);          # items unique to first list
+    @complement = $lc->get_complement(0);  # items found in any list but first
+    
+    print Dumper(\@intersection, \@union, \@unique, \@complement);
+
+Just substitute your own list-generating function for get_random_integers() in
+the example above.  For production code, strip out all the calls to Data::Dumper.
+
+    

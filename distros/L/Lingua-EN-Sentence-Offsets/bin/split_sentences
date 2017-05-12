@@ -1,0 +1,49 @@
+#!/usr/bin/env perl 
+
+use strict; use warnings;
+use Lingua::EN::Sentence::Offsets qw/get_sentences/;
+use feature qw/say/;
+use utf8::all;
+use Data::Dump qw/dump/;
+
+
+my $text = join '', <>;
+my $sentences = get_sentences($text);
+
+say '<sentences>';
+for(@$sentences){
+	say "<sentence>$_</sentence>";
+}
+say '</sentences>';
+
+
+
+# ABSTRACT: Create XML-like file with split sentences.
+# PODNAME: split_sentences
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+split_sentences - Create XML-like file with split sentences.
+
+=head1 VERSION
+
+version 0.03
+
+=head1 AUTHOR
+
+Andre Santos <andrefs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Andre Santos.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

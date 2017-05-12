@@ -1,0 +1,28 @@
+Revision history for Perl extension Log::Log4perl::CommandLine.
+
+0.07  Thu Sep 10 07:34:56 EDT 2009
+      - Added win32 portability fixes to test code from Bug #49423
+        https://rt.cpan.org/Public/Bug/Display.html?id=49423
+
+0.06  Wed Jul 29 13:08:48 EDT 2009
+      - Changed call to perl in test to use "$^X -I../blib/lib"
+
+0.05  Fri Aug 15 19:22:45 EDT 2008
+      - Fixed failing tests where the right perl isn't in PATH
+      - Changed default category for verbose (info) to root instead
+        of main
+
+0.04  Wed Aug 13 21:48:19 EDT 2008
+      - Add handleopts() and noinit
+
+0.03  Wed Aug 13 06:29:56 EDT 2008
+      - Added trace
+      - Changed Getopt::Long usage to OO so options won't affect
+        other Getopt::Long's
+      - Added more configuration via use line (suggested by Mike Schilli)
+
+0.02  Wed Aug  6 13:48:38 EDT 2008
+      Added test cases
+
+0.01  Tue Aug  5 09:11:33 2008
+      Initial Version

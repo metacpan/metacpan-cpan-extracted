@@ -1,0 +1,140 @@
+=pod
+
+=head1 NAME
+
+Linux::Sysfs::Device - sysfs devices
+
+=head1 SYNOPSIS
+
+    my $device = Linux::Sysfs::Device->open($bus, $bus_id);
+
+    my $parent = $device->get_parent;
+    my @attrs  = $device->get_attrs;
+
+    $device->close;
+
+=head1 DESCRIPTION
+
+Devices represent everything in sysfs under /sys/devices, which is a
+hierarchical view of system devices.
+
+=head1 METHODS
+
+=over
+
+=item B<open>
+
+    my $device = Linux::Sysfs::Device->open($bus, $bus_id);
+
+Given the name of the C<$bus>, this method locates a given device and returns a
+Linux::Sysfs::Device instance corresponding to the requested C<$bus_id>.
+
+=item B<open_path>
+
+    my $device = Linux::Sysfs::Device->open_path($path);
+
+Opens up a device at a specific C<$path>. It opens the device's directory,
+reads the directory, and returns a Linux::Sysfs::Device instance on
+success or undef on failure.
+
+=item B<close>
+
+    $device->close;
+
+Closes up the C<$device>.
+
+=item B<close_tree>
+
+    $device->close_tree;
+
+Closes every device under the supplied root C<$device>.
+
+=item B<get_parent>
+
+    my $parent = $device->get_parent;
+
+Returns the Linux::Sysfs::Device instance for the parent (if present) of the
+given C<$device>.
+
+=item B<get_bus>
+
+    $device->get_bus or die 'get_bus failed';
+
+Fills in the bus this C<$device> is on. The Linux::Sysfs::Bus instance can be
+retrieved using the B<bus()> method later on. Returns something true on success
+or something false on failure.
+
+=item B<get_attr>
+
+=item B<get_attribute>
+
+    my $attr = $device->get_attr($name);
+
+Searches supplied C<$device>'s attributes by C<$name> and returns the
+corresponding Linux::Sysfs::Attribute instance or undef.
+
+=item B<get_attrs>
+
+=item B<get_attributes>
+
+    my @attrs = $device->get_attrs;
+
+Returns a list of Linux::Sysfs::Attribute instances for the C<$device>.
+
+=item B<name>
+
+    my $name = $device->name;
+
+Returns the name of the device.
+
+=item B<path>
+
+    my $path = $device->path;
+
+Returns the full path of the device in sysfs.
+
+=item B<bus_id>
+
+    my $bus_id = $device->bus_id;
+
+Returns the C<$device>'s bus id.
+
+=item B<bus>
+
+    my $bus = $device->bus;
+
+Returns the Linux::Sysfs::Bus instance this C<$device> is on. You'll need to
+call B<get_bus()> first.
+
+=item B<driver_name>
+
+    my $driver_name = $device->driver_name;
+
+Returns the name of the driver responsible for the device.
+
+=back
+
+=head1 AUTHOR
+
+Florian Ragwitz E<lt>rafl@debian.orgE<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Florian Ragwitz, all rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Library General Public License as published
+by the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307
+USA.
+
+=cut

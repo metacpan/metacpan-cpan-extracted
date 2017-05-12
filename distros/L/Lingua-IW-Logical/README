@@ -1,0 +1,18 @@
+This module allows to convert logical Hebrew representation (like used in
+Windows and defined in Unicode standard) to logical representation (like
+in iso-8859-8). These represetation differ in the way they represent
+bi-directional texts. See Unicode book for more info.
+
+This is very common task for Hebrew HTML developers, since
+most of the Hebrew pages are written in visual represetation (in order to
+allow users of non-Hebrew-enabled OSes to viw them) but most Windows
+programs use logical one. Also, some basic formatting options are
+available while converting.
+
+Install the usual way:
+
+perl Makefile.PL
+make
+make install
+ 
+Please contact me on frodo@sharat.co.il on any bugs or suggestons.

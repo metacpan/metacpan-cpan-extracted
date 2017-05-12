@@ -1,0 +1,4 @@
+cmudict.db is a Berkeley database containing the contents of
+https://cmusphinx.svn.sourceforge.net/svnroot/cmusphinx/trunk/cmudict/cmudict.0.7a
+processed using ../tools/build-db.pl.  The licence for this
+data is given in the file ../lib/Lingua/EN/Phoneme.pm .

@@ -1,0 +1,26 @@
+---
+abstract: 'trap multiple calls to Log::Log4perl::easy_init'
+author:
+  - 'Chisel Wright <chisel@chizography.net>'
+build_requires:
+  FindBin::libs: 0
+  Test::More: 0
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Log4perl-Warn-Multiple-EasyInit
+requires:
+  Carp: 0
+  Log::Log4perl: 0
+  Test::More: 0
+  Test::Warn: 0
+resources:
+  homepage: http://github.com/chiselwright/l4p-warn-multiple-easyinit/tree
+  repository: git://github.com/chiselwright/l4p-warn-multiple-easyinit.git
+version: 0.0.1

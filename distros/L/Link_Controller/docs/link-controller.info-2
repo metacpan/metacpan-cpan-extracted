@@ -1,0 +1,956 @@
+This is link-controller.info, produced by makeinfo version 4.0 from
+link-controller.texinfo.
+
+INFO-DIR-SECTION LinkController link checking system
+START-INFO-DIR-ENTRY
+* LinkController: (link-controller).	A system for checking and repairing links
+* link-report: (link-controller)Invoking link-report. Reporting the status of broken links
+* test-link: (link-controller)Invoking test-link. Testing if links are broken
+* extract-links: (link-controller)Invoking extract-links. Finding links in web pages.
+* fix-link: (link-controller)Invoking fix-link. Repairing links in your web pages.
+* check-page: (link-controller)Invoking fix-lnk. Repairing links in your web pages.
+* build-schedule: (build-scheduile)Invoking builld-schedule. Scheduling links for checking.
+END-INFO-DIR-ENTRY
+
+   This file documents LinkController
+
+   Copyright 1997-2001 Michael De La Rue
+
+   Permission is granted to distribute and change this manual under the
+terms of the GNU public license.
+
+   This is the alpha version of this manual and is very incomplete.
+
+
+File: link-controller.info,  Node: Absolute and Relative URIs,  Next: Bugs,  Prev: Uncheckable Links,  Up: Top
+
+Absolute and Relative URIs
+**************************
+
+   LinkController is designed to handle absolute and relative URIs in a
+consistent but sensible fasion, but unfortunately there isn't any
+totally clear correct way.  For link extraction we simply conver
+relative URLs to absolute form.  For link testing, this means that we
+don't ever think of relative URLs.  For link fixing on the other hand
+the situation is more complex.  For this reason there is a `--relative'
+option to `fix-link'.
+
+   If we run `fix-link' without the `--relative' option then we only
+substitute absolute links in the existing document to the link given on
+the command line.  This is safer because the subsitution is unlikely to
+mistake other strings which accidentally match the link.
+
+   If we run `fix-link' with the `--relative' option on the other hand
+then we will handle relative links.  What this means depends on whether
+the links to be fixed can be expressed as links relative to the pages
+being fixed.
+
+   If the original (broken) link can be expressed as a relative link
+then we will do substitutions where we find relative links.  If the
+target (corrected) link can be expressed as a relative link then we
+will always substitute broken links with a relative link.
+
+   Taken together, this means that if a resource has moved to the same
+server as your pages, substitution with the `--relative' option will
+correction convert all of your absolute links into relative links and
+if a resource has moved from your server to another then we will
+correctly substitute relative links with absolute links.
+
+   The only undesirable effect would be if a resource is moved within
+your pages and you have a mixture of relative and absolute links to that
+resource (e.g. for absolute links on page which is mirrored on other
+sites).  In this case, first do substitution without the `--relative'
+option and then afterwards with the `--relative' option.
+
+
+File: link-controller.info,  Node: Bugs,  Next: History,  Prev: Absolute and Relative URIs,  Up: Top
+
+Bugs and bug reporting
+**********************
+
+   This version of LinkController is still in early development.  There
+are many changes to come.  Undoubtedly there are many bugs in the
+software already and will soon be more.
+
+   A bug is when
+
+   * the software doesn't do something the documentation says it should
+
+   * the software does something the documentation says it shouldn't
+
+   * the software does something surprising and that isn't documented
+
+   * the software does something strange but the documentation doesn't
+     explain why
+
+   * it is difficult or impossible to understand what the documentation
+     is trying to say
+
+   some of these mean fixing the documentation and some the software.
+All of them are bugs and should be reported and fixed.
+
+   If you find a bug, I will be grateful to hear about it.  Even if you
+don't know how to fix it or anything, it is useful to know what is wrong
+so that other people don't get caught out but _read the BUGS file
+first_ please.  If the bug is listed there then the only useful thing
+that you can do is fix it.  If you do this and contribute it to me then
+that is very useful.
+
+   When you report a bug, please tell me what release of link controller
+you were using.  This is the number which was in the name of the file
+that LinkController came in.  If your problem was with a specific
+program, please also run `program --version' and send the output.  This
+tells me exactly which version of that program you were running.
+
+   Since this is a developers release, I'd hope most users would be
+able to make some level of fixes.  If you do this, send me context
+differences (use `diff -u' if it works or try `diff -c' otherwise).  I
+use CVS, so as long as I know which version you have I will be able to
+find the original file and see your changes.  However it's also
+important to explain them because I won't be able to use them unless I
+(relatively stupid computer type) understand them.
+
+   Send bug reports to the address you get by changing words into
+punctuation in the following.
+
+     link minus controller at scotclimb dot org dot uk
+
+   This mailing address is sent only to me right now, but may become a
+list in future.  Use my (Michael De La Rue) personal address to contact
+me please.  N.B. I am *extremely* inefficient about answering email.
+Don't worry if you don't get a reply.
+
+   	The ideas, and history
+
+
+File: link-controller.info,  Node: History,  Next: Invoking the Programs,  Prev: Bugs,  Up: Top
+
+History
+*******
+
+   LinkController was originally inspired by MOMspider and having the
+MOMspider code available was very useful when starting the creation of
+this kit, but, it shares almost no code with MOMspider, other than what
+has comes to it from the LibWWW-Perl library.
+
+   Philosophically, the MOMspider heritage is obvious in the wish to
+handle big jobs efficiently.  In the working practice there are far more
+differences than similarities, partly caused by Perl language changes.
+
+   I decided to completely separate the exploration of the local
+infostructure, looking for links to be checked, from the actual checking
+process.  This means that checking can be spread over a large number of
+days and still run efficiently.
+
+   The basic aim of this link checking kit is to be able to efficiently
+handle any size of link checking job.  At the bottom end we have
+checking new pages as they are written.  Here we want to use
+information from previous checks to avoid having to check all of each
+page every time.  At the other end we have massive info structures
+(sites) which deal in many thousands of links and could not possibly
+all be checked in one day.  For this latter case the aim is to be able
+to efficiently spread the link checking load into all available low
+usage periods.
+
+   My primary aim in writing this was not to write very efficient code
+for the small scale case (takes minimum time to do everything), but
+rather code which would scale well.  If your system can check 1000
+links in two days, it will hopefully be able to check almost 7000 links
+in two weeks.  I'm trying to make sure all data structures which grow
+with the number of links are kept on disk.
+
+* Menu:
+
+* Acknowledgements ::           People and or institutions who helped
+
+
+File: link-controller.info,  Node: Acknowledgements,  Prev: History,  Up: History
+
+Acknowledgements
+================
+
+   Although I wrote this system by myself, this would not have been
+nearly as easy and almost certainly wouldn't have ever been finished
+without the help of the following people and organisations.
+
+* Menu:
+
+* Esoterica Internet Portugal::
+* IPPT PAN Poland::
+* The Tardis Project::
+* Other Free Software Authors::
+
+
+File: link-controller.info,  Node: Esoterica Internet Portugal,  Next: IPPT PAN Poland,  Prev: Acknowledgements,  Up: Acknowledgements
+
+Esoterica Internet Portugal
+---------------------------
+
+   Esoterica provided me with full access to the Internet in Portugal
+and use of their computers for free which allowed me to keep up on both
+this software and the Linux Access HOWTO.  In particular I'd like to
+thank all of the members of staff who helped me very much.  These
+people include Mario Francisco Valente (the instigator of Mini Linux)
+who first agreed to me using their kit, set me up to use their
+machines, and along with Luis Sequeira provided a sounding board for
+some ideas.  Luis also provided the odd lift home in the evening.  Also
+Martim de Magalhaes Pereira and Mr Mendes.  See them all on
+
+   <http://www.esoterica.pt/esoterica/quemsomos.html>
+
+   For more about esoterica (Internet Services in Portugal) see:
+
+   <http://www.esoterica.pt/esoterica/>
+
+   These pages are in Portugese(1) of course.
+
+   ---------- Footnotes ----------
+
+   (1) Whilst the above names are mangled here.  See the correct
+versions in the original texinfo or on the Web pages.
+
+
+File: link-controller.info,  Node: IPPT PAN Poland,  Next: The Tardis Project,  Prev: Esoterica Internet Portugal,  Up: Acknowledgements
+
+IPPT PAN Poland
+---------------
+
+   Thanks go to IPPT PAN (part of PAN - Polska Akademia Naukowa) in
+Poland and in particular Piotr Pogorzelski who allowed me use of
+facilities for testing this software, provided a willing victim for
+having his web pages tested and made a number of suggestions which have
+been incorporated into the software.
+
+
+File: link-controller.info,  Node: The Tardis Project,  Next: Other Free Software Authors,  Prev: IPPT PAN Poland,  Up: Acknowledgements
+
+The Tardis Project
+------------------
+
+   Supported by the Computing Science department of the University of
+Edinburgh, the Tardis project provides an experimental framework in
+which students, former students and other related people to do their own
+work on fully Internet connected Unix and Linux hosts.
+
+   The use of the facilities of the Tardis Project has made it much
+easier for me to develop software like this.  In particular, the large
+amount of disk space the administrators have allow me to use is very
+useful.
+
+
+File: link-controller.info,  Node: Other Free Software Authors,  Prev: The Tardis Project,  Up: Acknowledgements
+
+Other Free Software Authors
+---------------------------
+
+   It is through the software provided by the Free Software Foundation
+(such as the `gcc' C compiler, Emacs, the file utilities), the authors
+of the various packages which make up a working Linux System (Linux by
+Linus Torvalds, Alan Cox, etc.... filesystems and support by Theodore
+Tytso, Stefan Tweedie etc.. Linux-Libc by HJ Lu, based on GNU `glibc'
+from the FSF.. the list is indefinite) and the authors of Perl and its
+modules, especially Gisle Aas and Martijn Kostler for LibWWW-Perl that
+I was able to set this up.
+
+   I'd particularly like to thank Tim Goodwin the author of the Perl CDB
+module who made and accepted a number of alterations to that, at my
+request.  These alterations made this package simpler to write and
+easier to maintain.
+
+   The Free Software Foundation web pages are at
+
+   <http://www.gnu.ai.mit.edu/>
+
+
+File: link-controller.info,  Node: Invoking the Programs,  Next: Related Packages,  Prev: History,  Up: Top
+
+Invoking the LinkController Programs
+************************************
+
+   Because they use the Perl `Getopt::Mixed' module, all of the
+LinkController command line programs respond to the standard POSIX style
+command line options.  At least the following two options will be
+implemented.
+
+`--help'
+     This option will give a list of all of the options understood by
+     the program along with brief explanations of what they do.
+
+`--version'
+     This option will give some version information for the program.
+
+   You can use the `--help' option to get help on each program, for
+example:
+
+     extract-links --help
+
+   You can then use that information to get the program to do what you
+want.
+
+* Menu:
+
+* Invoking link-report::        link-report usage summary
+* Invoking test-link::          test-link usage summary
+* Invoking extract-links::      extract-links usage summary
+* Invoking fix-link::           fix-link usage summary
+* Invoking check-page::         check-page usage summary
+* Invoking build-schedule::     build-schedule usage summary
+
+
+File: link-controller.info,  Node: Invoking link-report,  Next: Invoking test-link,  Prev: Invoking the Programs,  Up: Invoking the Programs
+
+Invoking link-report
+====================
+
+   The `link-report' program prints out status information about links
+allowing the user to see what needs to be fixed.  The default is to
+print out all of the broken and redirected links that currently occur on
+the users web pages and which are either redirected or broken.
+
+   Before running `link-report' you should probably use `test-link'
+(*note Invoking test-link::) to check which links are broken.  That may
+not be needed if your system administrator does it for you.  After you
+have identified broken links you may want to use `fix-link' (*note
+Invoking fix-link::) to repair the broken links.
+
+   The primary configuration file used by `link-report' is the
+`.link-control.pl' file.  This tells it where the schedule file and
+LinkController database are. *Note Setting Configuration Variables::,
+for how to control the contents of this file.
+
+   In the case of the `--long-list' report, a second configuration
+file, the `infostrucs' file, is used.  This contains the information
+needed to know where to extract links from by default.  *Note
+Infostructure Configuration::, for more details on configuring this.
+
+   *FIXME* this section should give a better description of each option.
+
+     link-report [options]
+     
+      -V --version            Give version information for this program
+      -h --help --usage       Describe usage of this program.
+         --help-opt=OPTION    Give help information for a given option
+      -v --verbose[=VERBOSITY] Give information about what the program is
+                              doing.  Set value to control what information
+                              is given.
+     
+      -U --uri=URIs           Give URIs which are to be reported on.
+      -f --uri-file=FILENAME  Read all URIs in a file (one URI per line).
+      -E --uri-exclude=EXCLUDE RE Add a regular expressions for URIs to
+                              ignore.
+      -I --uri-include=INCLUDE RE Give regular expression for URIs to check
+                              (if this option is given others aren't
+                              checked).
+      -e --page-exclude=EXCLUDE RE Add a regular expressions for pages to
+                              ignore.
+      -i --page-include=INCLUDE RE Give regular expression for URIs to check
+                              (if this option is given others aren't
+                              checked).
+     
+      -a --all-links          Report information about every URI.
+      -b --broken             Report links which are considered broken.
+      -n --not-perfect        Report any URI which wasn't okay at last test.
+      -r --redirected         Report links which are redirected.
+      -o --okay               Report links which have been tested okay.
+      -d --disallowed         Report links for which testing isn't allowed.
+      -u --unsupported        Report links which we don't know how to test.
+      -m --ignore-missing     Don't complain about links which aren't in the
+                              database.
+      -g --good               Report links which are probably worth listing.
+     
+      -N --no-pages           Report without page list.
+         --config-file=FILENAME Load in an additional configuration file
+         --link-index=FILENAME Use the given file as the index of which file
+                              has what link.
+         --link-database=FILENAME Use the given file as the dbm containing
+                              links.
+     
+      -l --long-list          Where possible, identify the file and long
+                              list it (implies infostructure).  This is used
+                              for emacs link-report-dired.
+      -R --uri-report         Print URIs on separate lines for each link.
+      -H --html               Report status of links in html format.
+
+
+File: link-controller.info,  Node: Invoking test-link,  Next: Invoking extract-links,  Prev: Invoking link-report,  Up: Invoking the Programs
+
+Invoking test-link
+==================
+
+   The `test-link' program tests all of the links in the LinkController
+database storing information about any problems found.  It works as a
+robot contacting the servers where the target of each link is stored
+and verifying that the resource the link points to is really there.
+
+   Before running `test-link' you should probably use `extract-links'
+(*note Invoking extract-links::) to collect all of the links you want
+to test and then `build-schedule' (*note Invoking build-schedule::).
+
+   The configuration file used by `test-link' is the `.link-control.pl'
+file.  This tells it where the schedule file and LinkController
+database are. *Note Setting Configuration Variables::, for how to
+control the contents of this file.
+
+   *FIXME* this section should give a better description of each option.
+
+     test-link [arguments]
+     
+      -V --version            Give version information for this program
+      -h --help --usage       Describe usage of this program.
+         --help-opt=OPTION    Give help information for a given option
+      -v --verbose[=VERBOSITY] Give information about what the program is
+                              doing.  Set value to control what information
+                              is given.
+      --quite -q --silent     Program should generate no output except in
+                              case of error.
+         --no-warn            Avoid issuing warnings about non-fatal
+                              problems.
+     
+      -c --config-file=FILENAME Load in an additional configuration file
+      -u --user-address=STRING Email address for user running link testing.
+      -H --halt-time=MINUTES  stop after given number of minutes
+     
+         --never-stop         keep running without stopping
+         --no-robot           Don't follow robot rules.  Dangerous!!!
+      -w --no-waitre=NETLOC-REGEX Home HOST regex: no robot rules..
+                              (danger?)!!!
+         --test-now           Test links now not when scheduled (testing
+                              only)
+         --untested           Test all links which have not been tested.
+         --sequential         Put links into schedule in order tested (for
+                              testing)
+      -H --halt-time=MINUTES  stop after given number of minutes
+      -m --max-links=INTEGER  Maximum number of links to test (-1=no limit)
+
+   Several of the options could potentially lead to overloading networks
+and even other people's computer systems:
+
+   Don't use -no-robot, except for when you are doing local testing
+(that is, you aren't connected to the internet proper).
+
+   Don't use -never-stop or -test-now except when you are watching what
+is happening.
+
+   Generally you should be somewhat careful about running this program
+since it does automatically connect to other servers on the internet.
+Reasonable care has been taken to ensure it does this in a responsible
+way, but you must make sure that anybody who is inconvenienced has a
+good route for communicating this problem back to you.
+
+
+File: link-controller.info,  Node: Invoking extract-links,  Next: Invoking fix-link,  Prev: Invoking test-link,  Up: Invoking the Programs
+
+Invoking extract-links
+======================
+
+   The `extract-links' program walks through the users web pages
+collecting all of the links from those pages and storing them into a
+database for later checking by the `test-link' program (*note Invoking
+test-link::).  It can also list the links found into a given file.
+
+   After running `extract-links' you should use `build-schedule' (*note
+Invoking build-schedule::) which will make sure that any new links
+discovered are scheduled for checking..
+
+   There are two configuration files used by `extract-links'.  The
+`.link-control.pl' file is the first.  This tells it where the various
+files it uses are.  *Note Setting Configuration Variables::, for how to
+control the contents of this file.  The second file is the `infostrucs'
+file.  This contains the information needed to know where to extract
+links from by default.  *Note Infostructure Configuration::, for more
+details on configuring this.
+
+   *FIXME* this section should give a better description of each option.
+
+     extract-links [arguments] [url-base [file-base]]
+     
+      -V --version            Give version information for this program
+      -h --help --usage       Describe usage of this program.
+         --help-opt=OPTION    Give help information for a given option
+      -v --verbose[=VERBOSITY] Give information about what the program is
+                              doing.  Set value to control what information
+                              is given.
+      --quiet -q --silent     Program should generate no output except in
+                              case of error.
+     
+      -e --exclude-regex=REGEX Exclude expression for excluding files.
+      -p --prune-regex=REGEX  Regular expression for excluding entire
+                              directories.
+      -d --default-infostrucs handle all default infostrucs (as well as ones
+                              listed on command line)
+     
+      -l --link-database=FILENAME Database to create link records into.
+      -c --config-file=FILENAME Load in an additional configuration file
+     
+      -o --out-url-list=FILENAME File to output the URL of each link found to
+      -i --in-url-list=FILENAME File to input URLs from to create links
+
+
+File: link-controller.info,  Node: Invoking fix-link,  Next: Invoking check-page,  Prev: Invoking extract-links,  Up: Invoking the Programs
+
+Invoking fix-link
+=================
+
+   The `fix-link' program is designed to repair a broken links across
+all of the files which LinkController is managing.  It does this by
+looking up index files and seeing files contain the broken link then
+doing a textual substitution in each of these files.  This makes it much
+faster than searching through all of the files in a set of web pages to
+see which pages have the broken link.
+
+   In order to work properly, `extract-links' (*note Invoking
+extract-links::) must have been run first to build up the index
+databases used by `fix-link'.
+
+   There are two configuration files used by `fix-link'.  The file
+`.link-control.pl' is the first.  This tells it where the other
+configuration file and index files are.  *Note Setting Configuration
+Variables::, for how to control the contents of this file.  The second
+file is the `infostrucs' file.  This contains the information needed to
+relate broken links to the files which need to be repaired.  *Note
+Infostructure Configuration::, for more details on confiuguring this.
+
+     fix-link [options] old-link new-link
+     
+      -V --version            Give version information for this program
+      -h --help --usage       Describe usage of this program.
+         --help-opt=OPTION    Give help information for a given option
+      -v --verbose[=VERBOSITY] Give information about what the program is
+                              doing. Set value to control what information is
+                              given.
+      -q --quiet --silent     Program should generate no output except in
+                              case of error.
+         --no-warn            Avoid issuing warnings about non-fatal
+                              problems.
+     
+         --directory=DIRNAME  correct all files in the given directory.
+     
+      -r --relative           Fix relative links (expensive??).
+      -t --tree               Fix the link and any others based on it.
+      -b --base=FILENAME      Base URI of the document or directory to be
+                              fixed.
+     
+         --config-file=FILENAME Load in an additional configuration file
+
+
+File: link-controller.info,  Node: Invoking check-page,  Next: Invoking build-schedule,  Prev: Invoking fix-link,  Up: Invoking the Programs
+
+Invoking check-page
+===================
+
+   Check page is useful where broken links in files need to be manually
+corrected.  It outputs a list of line numbers where interesting links
+occur allowing the user to find those lines and correct the mistakes.
+The output format is compatible with the `emacs' `compile' mode which
+allows fast access to the problem locations.
+
+   There are two configuration files used by `extract-links'.  The file
+`.link-control.pl' is the first.  This tells it where the link database
+is.  *Note Setting Configuration Variables::, for how to control the
+contents of this file.  The second file is the `infostrucs' file.  This
+allows `check-page' to know what the base URI of the file being checked
+is and so check relative links within the page corectly.  *Note
+Infostructure Configuration::, for more details on configuring this.
+
+     check-page [options] filename...
+     
+      -V --version            Give version information for this program
+      -h --help --usage       Describe usage of this program.
+         --help-opt=OPTION    Give help information for a given option
+      -v --verbose[=VERBOSITY] Give information about what the program is
+                              doing.  Set value to control what information
+                              is given.
+     
+      -r --redirect           Report links which are redirected.
+      -m --ignore-missing     Don't complain about links which aren't in
+                              database.
+     
+         --link-index=FILENAME Use the given file as the index of which
+                              file has what link.
+         --link-database=FILENAME Use the given file as the dbm containing
+                              links.
+
+
+File: link-controller.info,  Node: Invoking build-schedule,  Prev: Invoking check-page,  Up: Invoking the Programs
+
+Invoking build-schedule
+=======================
+
+   The `build-schedule' program makes a schedule for testing links.  If
+run with no options it will make sure that all the links in the
+LinkController database will be checked at some point in the future.
+
+   Before running `build-schedule' you should probably use
+`extract-links' (*note Invoking extract-links::) to collect all of the
+links you want to test.  Afterwards you should use `test-link' to check
+which ones are broken (*note Invoking test-link::).
+
+   The configuration file used by `build-schedule' is the
+`.link-control.pl' file.  This tells it where the schedule file and
+LinkController database are. *Note Setting Configuration Variables::,
+for how to control the contents of this file.
+
+     build-schedule [options]
+     
+      -V --version            Give version information for this program
+      -h --help --usage       Describe usage of this program.
+         --help-opt=OPTION    Give help information for a given option
+      -v --verbose[=VERBOSITY] Give information about what the program is
+                              doing.  Set value to control what information
+                              is given.
+      --quite -q --silent     Program should generate no output except in
+                              case of error.
+         --no-warn            Avoid issuing warnings about non-fatal
+                              problems.
+     
+      -l --url-list=FILENAME  File with complete list of URLs to schedule
+      -s --schedule=FILENAME  Override location of the schedule
+      -t --spread-time=SECONDS Time over which to spread checking; default 10
+                             days
+      -S --start-offset=SECONDS Time offset from now for starting work (can
+                              be negative)
+      -d --ignore-db          Set the time with no regard to curent setting
+      -i --ignore-link        Set the time with no regard to link status
+         --no-warn            Avoid issuing warnings about non-fatal
+                              problems.
+         --config-file=FILENAME Load in an additional configuration file
+
+
+File: link-controller.info,  Node: Related Packages,  Next: Terms,  Prev: Invoking the Programs,  Up: Top
+
+Packages Which Work With LinkController
+***************************************
+
+   LinkController uses several programs and can work with several
+others.  This section covers the most important ones.
+
+* Menu:
+
+* cdb::                         Utilities for the LinkController indexes.
+* Tie-Transact-Hash::           Berkeley DB editing tools.
+
+
+File: link-controller.info,  Node: cdb,  Next: Tie-Transact-Hash,  Prev: Related Packages,  Up: Related Packages
+
+The CDB utilities
+=================
+
+   In order to have LinkController working you must have installed
+these.  It is worth looking at the utilities that are provided,
+especially `cdbdump' which will let you look at the contents of the
+file.  You should be aware that `cdbget' program which is provided
+_won't_ be able to get at the full contents of the index files since
+they contain repeated keys.
+
+   More information on cdb and new releases can be got from the www
+page.
+
+   <http://cr.yp.to/cdb.html>
+
+   When using link controller you are advised to use FreeCDB which,
+because of its better license terms, has the extra guarantee that it
+will be possible for anybody to distribute fixed versions and provide
+support for them.
+
+   <http://packages.debian.org/freecdb>
+
+
+File: link-controller.info,  Node: Tie-Transact-Hash,  Prev: cdb,  Up: Related Packages
+
+The Tie-Transact-Hash Perl Module and Programmes
+================================================
+
+   This is a Perl module written by myself which includes a program
+which allows direct examination and editing of Berkeley databases.  It
+can be useful for debugging and correcting problems in the
+LinkController Link database or schedule file.
+
+   Tie::TransactHash can be downloaded from CPAN, the Comprehensive Perl
+Archive Network get there via:
+
+   <http://www.perl.com/language/info/software.html>
+
+
+File: link-controller.info,  Node: Terms,  Next: Names Index,  Prev: Related Packages,  Up: Top
+
+Terms
+*****
+
+* Menu:
+
+* Infostructure::               Groups of resources.
+* Link::                        A connection between two resources.
+* Resource::                    The information on the World Wide Web.
+* URIs::                        A type of link including URLs
+* URLs::                        The connections in the World Wide Web.
+* URNs::                        Names for resources without location.
+
+
+File: link-controller.info,  Node: Infostructure,  Next: Link,  Prev: Terms,  Up: Terms
+
+Infostructure
+=============
+
+   An infostructure is a concept which was introduced in Link Checking
+in the MOMspider package.  It is a collection of related resources.
+For us it's mostly just a way of saying `web pages' but includes things
+like databases which may not have any real identifiable `pages' that we
+can read through directly.
+
+
+File: link-controller.info,  Node: Link,  Next: Resource,  Prev: Infostructure,  Up: Terms
+
+Link
+====
+
+   The term link in LinkController is used for a connection between two
+resources.  It's existence really comes from the `class' or piece of
+type of computer data which is used to store information about `links'.
+Properties of a link include:
+
+
+File: link-controller.info,  Node: Resource,  Next: URIs,  Prev: Link,  Up: Terms
+
+Resource
+========
+
+   A resource is almost anything.  `It' can range from a person to an
+HTML file to a computer to a database or presumably eventually to phone
+numbers, possibly physical hardware.  This generality is a very
+important concept for the World Wide Web.  Really the key thing about a
+resource is that it can be `identified'.  *Note URLs::, for more
+details.
+
+
+File: link-controller.info,  Node: URIs,  Next: URLs,  Prev: Resource,  Up: Terms
+
+URIs
+====
+
+   A URI or `Uniform Resource Identifier' is a more generic form of the
+URL *Note URLs:: which also includes URNs *Note URNs::.  It also allows
+links to abstract objects which can't be reached through a network
+server.  Since all URLs are URIs we mostly try to talk about URIs when
+we can since that includes both.  Often people say URL when they mean
+URI.  We try to use correct usage always so that in future we can
+support all forms of URI without confusing existing users.  URIs and
+URLs are defined in RFC 2396.
+
+
+File: link-controller.info,  Node: URLs,  Next: URNs,  Prev: URIs,  Up: Terms
+
+URLs
+====
+
+   A URL or `Uniform Resource Locator' are the essence of the World Wide
+Web.  Approximately, they are addresses through which `resources' can be
+located.  The idea is that almost anything can be given some kind of
+address in a form that a machine can work with.  By defining a set of
+rules, this can then be converted into a URL.  A URL has two parts.  The
+first tells us what rules to use and the second tells us what the
+address is.  URLs and URIs are defined in RFC 2396.  URLs are not the
+only kind of link, but they are the most common and currently the only
+ones LinkController really handles well.
+
+
+File: link-controller.info,  Node: URNs,  Prev: URLs,  Up: Terms
+
+URIs
+====
+
+   A URN or `Uniform Resource Name' is a URI *Note URIs:: which is not
+a URL *Note URLs::.  This means a way of specifying a resource without
+saying how to get it.  For example, a scheme which has been considered
+is for ISBN (International Standardised Book Numbers) numbers.  This
+would allow us to specify a book as a resource but wouldn't tell us how
+to get it.
+
+   It's not totally clear where these will be useful in link checking
+(they are used internally in several computer systems), but
+LinkController intends to support them whenever needed, wherever
+possible.
+
+   * Knowing what the URL of the target resource of the connection is.
+
+   * Knowing whether the connection to the target resource has been
+     working recently.
+
+   * Knowing when the connection to the target resource was last
+     checked.
+
+   Within the programs, a link is different from a URL in that it is
+specifically aimed at checking connections, where a URL just specifies
+what the connection should be if it is working.
+
+
+File: link-controller.info,  Node: Names Index,  Next: Concept Index,  Prev: Terms,  Up: Top
+
+Program, Variable and File Name Index
+*************************************
+
+   This index includes all programs, variables and files.
+
+* Menu:
+
+* $::link_stat_log, automatic notification using: Email Reporting.
+* $base_dir:                             Configuration Variables.
+* $infostrucs:                           Configuration Variables.
+* $link_index:                           Configuration Variables.
+* $link_stat_log:                        Configuration Variables.
+* $links:                                Configuration Variables.
+* $page_index:                           Configuration Variables.
+* $schedule:                             Configuration Variables.
+* $user_address:                         Configuration Variables.
+* build-schedule, invocation:            Invoking build-schedule.
+* check-page, in emacs:                  check-page in Emacs.
+* check-page, invocation:                Invoking check-page.
+* check-page, usage:                     Checking Files.
+* configure-link-cgi, using:             Configuring CGI Programs.
+* copy-links-from-users, usage:          User Administration.
+* default-install, usage:                Default Installation.
+* default-install, using:                Setting up LinkController.
+* extract-links:                         Extracting Links.
+* extract-links, importing links:        Interfaces.
+* extract-links, invocation:             Invoking extract-links.
+* extract-links, using <1>:              Extracting Links.
+* extract-links, using:                  Using LinkController.
+* file_base:                             Advanced Infostructure Configuration.
+* fix-link:                              Repairing Links.
+* fix-link, invocation:                  Invoking fix-link.
+* fix-link, relative link support:       Absolute and Relative URIs.
+* fix-link, using:                       Testing.
+* fix-link.cgi:                          CGI Interface.
+* infostrucs:                            Infostructure Configuration.
+* infostrucs, location:                  Configuration Variables.
+* link index, creating:                  Extracting Links.
+* link status log, location:             Configuration Variables.
+* link-control.pl:                       Setting Configuration Variables.
+* link-control.pl, authorisation:        Authorisation Configuration.
+* link-control.pl, credentials:          Authorisation Configuration.
+* link-control.pl, infostructures:       Advanced Infostructure Configuration.
+* link-report, exporting results:        Interfaces.
+* link-report, invocation:               Invoking link-report.
+* link-report, reporting new problems:   Email Reporting.
+* link-report, using:                    Reporting.
+* link-report-dired:                     link-report-dired.
+* link-report.cgi:                       CGI Interface.
+* link_exclude_re:                       Advanced Infostructure Configuration.
+* link_include_re:                       Advanced Infostructure Configuration.
+* link_index, location:                  Configuration Variables.
+* links.bdbm, location:                  Configuration Variables.
+* location of infostrucs:                Configuration Variables.
+* location of link status log:           Configuration Variables.
+* location of link_index:                Configuration Variables.
+* location of links.bdbm:                Configuration Variables.
+* location of page_index:                Configuration Variables.
+* location of schedule.bdbm:             Configuration Variables.
+* mode:                                  Advanced Infostructure Configuration.
+* page index, creating:                  Extracting Links.
+* page_index, location:                  Configuration Variables.
+* prune_re:                              Advanced Infostructure Configuration.
+* resource_exclude_re:                   Advanced Infostructure Configuration.
+* resource_include_re:                   Advanced Infostructure Configuration.
+* schedule.bdbm, location:               Configuration Variables.
+* suggest:                               Suggestions.
+* test-link, invocation:                 Invoking test-link.
+* test-link, link ageing in:             Link Ageing.
+* test-link, recording new problems:     Email Reporting.
+* test-link, using:                      Testing.
+* ~/.link-control.pl:                    Setting Configuration Variables.
+
+
+File: link-controller.info,  Node: Concept Index,  Prev: Names Index,  Up: Top
+
+Concept Index
+*************
+
+* Menu:
+
+* acknowledgements:                      Acknowledgements.
+* administration:                        Administration.
+* authentication:                        CGI Interface.
+* authentication, basic:                 Authorisation Configuration.
+* authorisation:                         Authorisation Configuration.
+* automatic notification:                Email Reporting.
+* automatic testing:                     Cron Scripts.
+* bandwidth usgae:                       Robot Behaviour.
+* basic authentication:                  Authorisation Configuration.
+* broken links, automatic reporting:     Email Reporting.
+* broken links, finding:                 Reporting.
+* broken links, finding in Emacs:        link-report-dired.
+* bugs, reporting:                       Bugs.
+* cdb files:                             cdb.
+* CGI interface:                         CGI Interface.
+* CGI, configuration:                    Configuring CGI Programs.
+* checking individual pages:             Checking Files.
+* command line options:                  Invoking the Programs.
+* configuration:                         Setting Configuration Variables.
+* configuration variables:               Configuration Variables.
+* configuration, infostructure:          Infostructure Configuration.
+* configuration, installation:           Setting up LinkController.
+* configuration, interactive:            Interactive Configuration.
+* cron scripts for multi user use:       Cron Scripts.
+* crontab, example:                      Testing.
+* dangers:                               Robot Behaviour.
+* database cleaning, automatic:          Link Ageing.
+* database format, cdb:                  cdb.
+* database, editing:                     Tie-Transact-Hash.
+* editing the links database:            Tie-Transact-Hash.
+* Emacs interface:                       Emacs.
+* exporting test results to other programs: Interfaces.
+* extracting links <1>:                  Extracting Links.
+* extracting links:                      Using LinkController.
+* file, individual, checking:            Checking Files.
+* filtering links:                       Advanced Infostructure Configuration.
+* history MOMspider:                     History.
+* importing links from other programs:   Interfaces.
+* infostructure:                         Infostructure.
+* infostructure, advanced configuration: Advanced Infostructure Configuration.
+* installation:                          Setting up LinkController.
+* installation, basic multi user:        Default Installation.
+* interface, CGI:                        CGI Interface.
+* interface, Emacs:                      Emacs.
+* Interfaces to other programs:          Interfaces.
+* invoking build-schedule:               Invoking build-schedule.
+* invoking check-page:                   Invoking check-page.
+* invoking extract-links:                Invoking extract-links.
+* invoking fix-link:                     Invoking fix-link.
+* invoking link-report:                  Invoking link-report.
+* invoking test-link:                    Invoking test-link.
+* link ageing:                           Link Ageing.
+* link, definition:                      Link.
+* link, uncheckable:                     Uncheckable Links.
+* links, examining:                      Reporting.
+* links, examining, in Emacs:            link-report-dired.
+* links, extracting <1>:                 Extracting Links.
+* links, extracting:                     Using LinkController.
+* links, repairing:                      Repairing Links.
+* mailto, can't be checked:              Uncheckable Links.
+* news, can't be checked:                Uncheckable Links.
+* page, checking:                        Checking Files.
+* regular expression, exclude:           Advanced Infostructure Configuration.
+* regular expression, include:           Advanced Infostructure Configuration.
+* repairing links:                       Repairing Links.
+* reporting bugs:                        Bugs.
+* reports:                               Reporting.
+* resource:                              Resource.
+* robots:                                Robot Behaviour.
+* security, risks of authentication:     Authorisation Configuration.
+* setting variables:                     Setting Configuration Variables.
+* suggestions:                           Suggestions.
+* uncheckable links:                     Uncheckable Links.
+* URI, definition:                       URIs.
+* URI, relation to URL:                  URIs.
+* URL, definition:                       URLs.
+* URL, relation to URI:                  URIs.
+* URN, definition:                       URNs.
+* URN, relation to URI:                  URNs.
+* URN, relation to URL:                  URNs.
+* usage of programs:                     Invoking the Programs.
+* variables, configuration:              Configuration Variables.
+* variables, setting:                    Setting Configuration Variables.
+* variables, setting interactively:      Interactive Configuration.
+* web pages, groups of:                  Infostructure.
+* WWW:                                   URLs.
+
+

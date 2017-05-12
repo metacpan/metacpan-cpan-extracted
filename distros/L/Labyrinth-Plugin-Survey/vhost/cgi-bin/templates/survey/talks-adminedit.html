@@ -1,0 +1,33 @@
+<p> 
+    <input type="button" onclick="parent.location='/'" value="back to surveys" />
+    <input type="button" onclick="parent.location='/admin/talks'" value="back to talk admin" />
+</p>
+
+<h2>Talk Edit</h2>
+
+<div class="newsbox">
+<p>Fields marked '*' are mandatory fields and must be completed.</p>
+
+<form method="post" id="talkdetails" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name='act' value='talk-save' />
+<input type="hidden" name='courseid' value="[% data.courseid %]" />
+
+<table class="blocker" width="100%">
+<tr><td width="150">Tutor *</td>
+    <td class="alert">[% data.tutor_err %]</td>
+    <td><input type="text" name="tutor" value="[% data.tutor %]" size="45" /></td>
+</tr>
+<tr><td>Course *</td>
+    <td class="alert">[% data.course_err %]</td>
+    <td><input type="text" name="course" value="[% data.course %]" size="45" /></td>
+</tr>
+<tr><td>Type *</td>
+    <td class="alert">[% data.type_err %]</td>
+    <td>[% data.ddtype %]</td>
+</tr>
+</table>
+
+<p align="center"><input type="submit" name="submit" value='UPDATE' /></p>
+</form>
+</div>
+

@@ -1,0 +1,60 @@
+
+				Language::Zcode
+				---------------
+
+Z-code is the machine language for the Z-machine, the virtual machine
+that the Infocom text adventure games (among others) run on.
+Language::Zcode provides tools to parse story files written in Z-code,
+and to "compile" them to executables in other languages (such as Perl).
+
+See (or perldoc) lib/Language/Zcode.pm for many more details.
+
+For a quick taste of Language::Zcode's awesome power:
+perl -Ilib minizork.pl
+perl -Ilib minizork.pl -t win32 (on Windows)
+
+-------------------------------------------------------------------------------
+VERSION 0.8
+-----------
+
+Language::Zcode currently supports:
+- Parsing almost any Z-code story file
+- Compiling all v3 opcodes (and some v4/5) to Perl (just run scripts/plotz.pl)
+- Z-machine v3 emulation. Tested by playing all the way through Infidel.
+- Proof of concept translation to PIR (Parrot assembly) and XML
+
+See Changes for more on the past and present, Todo for the future.
+
+WARNING: This is an ALPHA version. Interfaces et al. are subject to change.
+Bugs abound. Things may not work at all. Might spam your SO.
+
+Please let me know about things that are broken. Or even better, send a patch!
+
+-------------------------------------------------------------------------------
+INSTALL
+-----------
+
+perl Makefile.PL
+make
+make test
+make install (if you really think it's wise)
+
+Use nmake on Windows: ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+
+If you don't have make or nmake, you can run the tests with:
+    perl -Ilib -e "runtests (glob('t/*.t'))"
+
+and install by copying the stuff in lib/ to where your Perl modules sit -
+someplace like /usr/local/lib/perl5, or C:/Perl/site/lib (but don't
+clobber any existing Language/ modules!)
+
+Oh, yeah. Also copy the executable scripts/plotz.pl to someplace in your path.
+
+-------------------------------------------------------------------------------
+
+Amir Karger (akarger@cpan.org)
+
+Copyright (c) 2003-4 Amir Karger.  All rights reserved.  This program is free
+software; you can redistribute it and/or modify it under the same terms as
+Perl itself.
+

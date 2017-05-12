@@ -1,0 +1,29 @@
+0.010     2015-01-07 00:56:13-05:00 America/New_York
+ - \p{PosixCntrl} is not supported on old perls, so test for support and conditionally use it
+
+0.009     2015-01-05 16:24:48-05:00 America/New_York
+ - fix documention to mention stripping options
+ - Fix unit tests that were incorrectly using ->warn() on the adapter.
+
+0.008     2013-02-12 01:47:14 America/New_York
+ - Enahncement to optionally strip messages of control or other non-ascii character before printing
+
+0.007     2012-07-05 13:10:06 America/New_York
+ - Includes documentation fixes as pointed out by wstlabs in issue #2
+
+0.006     2011-09-04 12:20:37 America/New_York
+ - Includes fixes from Stephen Thirlwall re: autoflush logic
+ 
+0.005     2010-12-30 08:16:18 America/New_York
+ - More suckage, I missed declaring IO::String as a testing dependency
+
+0.004     2010-12-30 01:01:32 America/New_York
+
+ - I suck @ dzil, and included my 'archive' in 0.003  removed for this build
+
+0.003     2010-12-30 00:53:12 America/New_York
+
+ - Remove the ->can('print') test on setting the file handle, this 
+   prevent passing in psgi.errors in some cases
+
+0.002     2010-12-28 22:22:17 America/New_York

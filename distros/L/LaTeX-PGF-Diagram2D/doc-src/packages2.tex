@@ -1,0 +1,93 @@
+\KOMAoptions{paper=a4}
+\KOMAoptions{fontsize=12pt}
+\usepackage{ifpdf}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[intlimits]{amsmath}
+\usepackage{amssymb}
+% \usepackage{amsfonts,amssymb,amscd}
+% \usepackage{trfsigns}
+\usepackage{mathptmx}
+\usepackage[scaled=.92]{helvet}
+\usepackage{courier}
+\usepackage{array}
+\usepackage{enumerate}
+\usepackage{longtable}
+\usepackage{latexsym}
+\usepackage{varioref}
+\usepackage{makeidx}
+\usepackage{listings}
+\lstset{numbers=left, numberstyle=\tiny, numbersep=9pt, basicstyle=\small}
+\lstset{frame=single,frameround=tttt}
+\usepackage{color}
+\ifpdf
+\usepackage[activate=normal]{pdfcprot}
+\usepackage[pdftex]{graphicx}
+% \usepackage{epstopdf}
+\pdfcompresslevel=9
+\usepackage[
+  pdftex,
+  a4paper=true,
+  colorlinks=true,
+  bookmarks,
+  bookmarksnumbered,
+  linkcolor=black,
+  pdfpagemode=UseNone,
+  pdfstartview={XYZ 0 835 1.25}
+]{hyperref}
+\pdfpageattr {/Group << /S /Transparency /I true /CS /DeviceRGB>>}
+\else
+\usepackage[dvips]{graphicx}
+\DeclareGraphicsRule{.png}{eps}{.bb}{`bmeps #1}
+\usepackage[dvips]{hyperref}
+\fi
+
+
+\setlength{\parindent}{0cm}
+
+
+\renewcommand*{\sectfont}{\bfseries}
+
+\newcommand{\startofdocument}[0]{%
+\maketitle%
+\cleardoublepage%
+\ifpdf\pdfbookmark[1]{\contentsname}{tocanc}\fi%
+\tableofcontents%
+\cleardoublepage%
+}
+
+\DeclareMathOperator{\euler}{\text{e}}
+\DeclareMathOperator{\oplaplace}{\triangle}
+\DeclareMathOperator{\opLaplace}{{\mathfrak L}}
+\DeclareMathOperator{\iopLaplace}{{\opLaplace}^{-1}}
+\DeclareMathOperator{\definedas}{\overset{=}{\text{\tiny{Def}}}}
+\DeclareMathOperator{\definedarrow}{\overset{\longleftrightarrow}{\text{\tiny{Def}}}}
+\DeclareMathOperator{\lcorrelates}{\laplace}
+\DeclareMathOperator{\ilcorrelates}{\Laplace}
+\DeclareMathOperator{\mustbe}{\overset{\text{\tiny !}}{=}}
+\DeclareMathOperator{\coj}{\text{j}}
+\DeclareMathOperator{\element}{\in}
+\DeclareMathOperator{\notelement}{!\in}
+\newcommand{\ora}[1]{\overrightarrow{#1}}
+\newcommand{\co}[1]{\underline{#1}}
+\newcommand{\cove}[1]{\overrightarrow{\underline{#1}}}
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\divergence}{div}
+\DeclareMathOperator{\rot}{rot}
+\newcommand{\atpos}[2]{{\left.#1\right|}_{#2}}
+\newcommand{\inrange}[3]{{\left.#1\right|}_{#2}^{#3}}
+\newcommand{\intd}[0]{\mathrm{d}}
+\DeclareMathOperator{\arcsinh}{arcsinh}
+\DeclareMathOperator{\card}{card}
+\DeclareMathOperator{\Res}{Res}
+\DeclareMathOperator{\expe}{e}
+
+\newcommand{\begriff}[2]{%
+  \emph{#1}\index{#2}%
+}
+
+\usepackage{attachfile}
+
+\makeindex
+

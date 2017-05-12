@@ -1,0 +1,37 @@
+Revision history for Perl extension Lufs.
+
+0.18  Sat Jan 31 08:53:02 CET 2004
+	- Major bugfixes and stability improvements
+	- Added Lufs::Mux - multiple dirs reflected under one mount point
+	- Added Lufs::Rot13 - cheesy crypto layer
+
+0.16  Fri Jan 30 02:51:51 CET 2004
+	- Added mutex locking for thread safety
+	- Fixed Makefile
+	- Added svnfs, httpfs
+
+0.15  Thu Jan 22 22:03:48 CET 2004 
+	- <pardus> Added Build.PL
+	- <pardus> Added Lufs::Howto manpage
+
+0.14  Sat Jan 17 02:48:20 CET 2004
+	- Added a patch for lufs that makes dynamic loading of perl extensions work
+
+0.13  Sun Jan 11 23:01:56 CET 2004
+	- Added test lib
+	- Documentation updates
+	- Configuration hash
+
+0.12  Wed Dec 31 09:07:16 CET 2003
+	- Fixed major memory leaks
+	- Added Makefile for the C library
+	- Several small bugfixes
+	- Documentation updated
+
+0.09  Tue Jun 17 23:57:16 CET 2003 
+    - tested pretty extensively, off to CPAN
+
+0.01  Mon Jun  9 18:40:53 CET 2003
+	- original version; created by h2xs 1.22 with options
+		-A -X -n Lufs
+

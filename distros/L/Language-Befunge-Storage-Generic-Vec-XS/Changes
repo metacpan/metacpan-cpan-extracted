@@ -1,0 +1,12 @@
+Revision history for Language::Befunge::Storage::Generic::Vec::XS.
+
+0.03 Sat Mar 12 10:00:25 EST 2011
+ - Fix a prereq version.
+
+0.02 Sun Jun 29 18:51:57 PDT 2008
+ - Fix a crash in expand().
+ - If DEBUG is defined, extra messages will be enabled to assist in finding
+   crashes similar to the above.
+
+0.01 Sun Jun  8 08:36:38 PDT 2008
+ - Initial version.

@@ -1,0 +1,10 @@
+theme=Meyrin;label=test;position=htb
+Item:2c & Price
+Gnat& per gram& 13.65
+& each& 0.01
+
+Gnu& stuffed& 92.59
+Emu& stuffed& 33.33
+Armadillo& frozen& 8.99
+
+

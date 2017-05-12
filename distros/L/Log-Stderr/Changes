@@ -1,0 +1,14 @@
+Revision history for Perl extension Log::Stderr.
+
+0.01  Tue Nov 23 13:02:24 2010
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.8.0 --use-new-tests --skip-exporter Log::Stderr
+
+1.00  Thu Nov 25 12:44:20 CET 2010
+	- first official release
+
+1.01  Sun Jul  5 21:26:34 CEST 2015
+        - added caller routine to the log message
+	  https://github.com/brontolinux/log-stderr/issues/1
+
+

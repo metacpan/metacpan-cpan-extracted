@@ -1,0 +1,52 @@
+Locale-TextDomain-OO version 1.026
+==================================
+
+Perl OO Interface to Uniforum Message Translation
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    charnames
+    namespace::autoclean
+    Carp
+    Class::Load
+    Clone
+    Encode
+    English
+    Hash::Util
+    JSON
+    Locale::MO::File
+    Locale::PO
+    Locale::TextDomain::OO::Util
+    Locale::Utils::PlaceholderMaketext
+    Locale::Utils::PlaceholderNamed
+    Moo
+    Moo::Role
+    MooX::Singleton
+    MooX::StrictConstructor
+    MooX::Types::MooseLike
+    Path::Tiny
+    Safe
+    Tie::Sub
+    Try::Tiny
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2009 - 2017,
+Steffen Winkler
+steffenw at cpan.org.
+All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it
+under the same terms as Perl itself.

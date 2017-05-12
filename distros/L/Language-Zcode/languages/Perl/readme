@@ -1,0 +1,22 @@
+Test/sample files for compiling Z-code files to Perl
+----------------------------------------------------
+
+hello_expected.pl	If you do "plotz.pl ..\hello.z5", you should get a
+			..\hello.pl with these contents (9,495 bytes!!)
+
+Look at hello.pl to see all the infrastructure that is added to create
+the Z-machine. (In later versions, I hope to move at least some of this
+into the Runtime libraries.)
+
+big_test.inf		Inform file with lots of stuff
+big_test.z5		Compiled big_test.inf
+
+Run plotz.pl on big_test.z5 to create big_test.pl.
+
+Run big_test.pl, optionally using big_test.in as input (or input by hand.)
+That should yield big_test.txt, a transcript file, with contents
+identical to big_test_expect5.txt.
+It should also generate big_test.cmd, which should be identical to big_test.in.
+
+Read big_test.pl (if you have the energy) to see how each Z-code assembly
+command is translated to Perl. Or just read Language::Zcode::Translator::Perl.

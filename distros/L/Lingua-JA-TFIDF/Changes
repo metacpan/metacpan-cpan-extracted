@@ -1,0 +1,15 @@
+Revision history for Perl extension Lingua::JA::TFIDF
+
+0.00004  2009/08/11
+        - improved a little
+
+0.00003  2008/10/30
+        - Fix a bug( about handling of config data )
+        - add a test code that inspects 'fetch_df' option with a dummy server
+
+0.00002  2008/10/29
+        - use Text::MeCab
+        - Fix documentation
+
+0.00001  2008/10/28 
+        - original version

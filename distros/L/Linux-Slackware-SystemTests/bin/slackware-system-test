@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+# Copyright (C) 2016 TTK Ciar
+# Available for unlimited distribution and use.
+# The copyright is just so someone else cannot claim ownership and sue me for use of my own code.
+
+use strict;
+use warnings;
+use lib "./lib";
+use Linux::Slackware::SystemTests;
+use TAP::Parser;
+
+my @DOCS;
+my %OPT = (v => 1);
+foreach my $arg (@ARGV) {
+    if    ($arg =~ /^\-+(.+?)\=(.*)/) { $OPT{$1} = $2; }
+    elsif ($arg =~ /^\-+(v+)$/      ) { $OPT{v}  = length($1) + 1; }
+    elsif ($arg =~ /^\-+q$/         ) { $OPT{v}  = 0;  }
+    elsif ($arg =~ /^\-+quiet$/     ) { $OPT{v}  = 0;  }
+    elsif ($arg =~ /^\-+(.+)/       ) { $OPT{$1} = -1; }
+    else { push (@DOCS, $arg); }
+}
+
+exit(usage()) if ($OPT{'help'});
+
+exit(main(\@DOCS, \%OPT));
+
+sub main {
+    my ($docs_ar, $opt_hr) = @_;
+
+    my $st = Linux::Slackware::SystemTests->new(%$opt_hr);
+    my $tests_dir = $st->{tests_dir};
+    my @rex_list = map { qr/$_/ } @$docs_ar if (@$docs_ar);
+
+    foreach my $t (glob("$tests_dir/*.t")) {
+        next unless (-x $t);
+        my $run_this = 0;
+        if (@rex_list) {
+            foreach my $rex (@rex_list) {
+                next unless ($t =~ $rex);
+                $run_this = 1;
+                last;
+            }
+        } else {
+            $run_this = 1;
+        }
+        next unless ($run_this);
+
+        my $tap_or = TAP::Parser->new({exec => [$t]});
+        print "Testing: $t\n";
+        while (my $result_or = $tap_or->next) {
+            # zzapp do more sophisticated crap here
+            # like a --retry option which just runs tests that failed on previous run
+            print $result_or->as_string unless($result_or->is_ok);
+        }        
+    }
+    return 0;
+}
+
+sub opt {
+    my ($name, $default_value, $alt_hr) = @_;
+    $alt_hr //= {};
+    return $OPT{$name} // $alt_hr->{$name} // $default_value;
+}
+
+sub usage {
+    print <<'USAGE_END';
+Usage: slackware-system-test [options] [test_pattern ...]
+
+    Passing one or more test patterns causes slackware-system-test to only run tests which match that pattern.
+    (for instance, "slackware-system-test foo" would run tests named "843_foot.t" or "912_food.t" but not "123_bar.t")
+    Not passing any test patterns runs all tests by default.
+
+    Currently the only option supported is --help, but the inguneer is working to change that.
+USAGE_END
+
+    return 1;
+}

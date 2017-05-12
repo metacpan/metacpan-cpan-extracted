@@ -1,0 +1,44 @@
+0.08:	Wed Apr 19 12:49:15 EDT 2017
+	Use Test::File::Contents
+	Only add Net::SFTP::Foreign as a testing pre-requisite if it's going
+		to be tested against
+	Try to fix "S_IFFIFO is not a valid Fcntl macro"
+	Fix http://www.cpantesters.org/cpan/report/17443138-226c-11e7-a074-e1beba07c9dd
+
+0.07:	Fri Apr 14 16:29:20 EDT 2017
+	Added support to redirect STDERR, so code such as this now works:
+		close STDERR;
+		open(STDERR, '>>', "$tmpdir/$script_name.stderr");
+	Checked it works with Log::Any
+
+0.06	Wed Apr 12 11:22:01 EDT 2017
+	Added note that it doesn't currently work with Log4perl.
+	Fix RT39186 (thanks to skandranon@gmx.at)
+	Added hacky support for Log::Log4perl (RT121061).
+	Added CI support (Travis, Coveralls, Appveyo)
+
+0.05	8 September 2007
+	Fixes to let the test-suite run ok.  Added test for STDERR.  Thanks
+	to David Cantrell for finally spotting that the test-suite was quite
+	faulty.
+
+0.04	6 February 2004
+	Changed name to Log::WarnDie to prevent confusion Tony Charles found
+	himself in.
+
+	Added support for logging any output to STDERR as well.  Added logic
+	so that errors and warnings (which usually also print to STDERR) are
+	not logged twice.  Also suggested by Tony Charles.
+
+	Added documentation about which logging levels are being used.
+
+0.03	5 February 2004
+	Argh.  Mixup in parameters for "skip" in test-suite.  Adapted the
+	test-suite.  No further changes.
+
+0.02	4 February 2004
+	Changed name to Log::Dispatch::WarnDie because of possible confusion
+	with Log::Log4Perl module.  Spotted by Mike Chilli.
+
+0.01	2 February 2004
+	First version of Log::ForPerl

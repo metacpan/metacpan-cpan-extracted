@@ -1,0 +1,72 @@
+{
+   "abstract" : "Inflect short English Phrases",
+   "author" : [
+      "Rafael Kitover <rkitover@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-EN-Inflect-Phrase",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Lingua::EN::FindNumber" : "0",
+            "Lingua::EN::Inflect" : "0",
+            "Lingua::EN::Inflect::Number" : "0",
+            "Lingua::EN::Number::IsOrdinal" : "0",
+            "Lingua::EN::Tagger" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Lingua-EN-Inflect-Phrase@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-EN-Inflect-Phrase"
+      },
+      "homepage" : "http://metacpan.org/release/Lingua-EN-Inflect-Phrase",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rkitover/lingua-en-inflect-phrase.git",
+         "web" : "http://github.com/rkitover/lingua-en-inflect-phrase"
+      }
+   },
+   "version" : "0.18",
+   "x_authority" : "cpan:AVAR"
+}
+

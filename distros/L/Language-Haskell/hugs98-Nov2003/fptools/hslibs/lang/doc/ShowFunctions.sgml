@@ -1,0 +1,11 @@
+<Sect1 id="sec-ShowFunctions">
+<Title><literal>ShowFunctions</literal>
+<IndexTerm>
+  <Primary>ShowFunctions</Primary>
+  <secondary>library</secondary>
+</IndexTerm>
+</Title>
+
+  <para>This module has moved to <ulink url="../base/Text.Show.Functions.html"><literal>Text.Show.Functions</literal></ulink> in the
+  hierarchical libraries.</para>
+</sect1>

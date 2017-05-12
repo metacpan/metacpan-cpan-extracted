@@ -1,0 +1,65 @@
+Use Web::Scraper
+
+o  Add 1<->many relationships
+      code X1 in set 1 = A
+      code X2 in set 1 = B
+      code Y1 in set 2 = A,B
+          code2code(X1) => Y1
+          code2code(X2) => Y1
+          code2code(Y1) => X1,X2
+o  Add support for UTF-8
+o  Read in first codes
+   Second codes have code overlap (i.e. foo-alpha-2 overlaps alpha-2) to check
+      for aliases
+   Any name with UTF-8 has known substitutions (e' => e) and reports if any
+      non-ASCII characters found
+
+Add capabilites of
+   Locale::Codes::Multilingual
+   Locale::Country::Extra
+including unicode, phone prefix
+
+
+??? Make the name list and alias lists case sensitive.  RT 92680
+
+Add regional codes including:
+   MARC:  http://www.loc.gov/marc/countries/   Jarkko Hietaniemi
+
+=========
+
+http://tools.ietf.org/html/rfc5646
+language tags (i.e. language [-script] [-region] [-variant]* [-extension]* [-privateuse]
+   language :
+     x-*
+     i-*
+     alpha-2 language code
+     alpha-3 language code
+     qaa-qtz-*
+   region :
+     alpha-2 country code
+     UN M.49 code
+
+Type: region   ISO 3166-1, UN M.49
+
+=========
+
+Create a new package:  Locale-Codes-Links
+   links codes of one type to another
+      NOT necessarily 1-to-1
+   function:
+      link(TYPE1 [CODESET1 [CODE1]] TYPE2 [CODESET2 [CODE2]])
+         => ( LINK1, LINK2, ...)     all links between types
+
+   TYPE = Language, Script, ...
+   LINK = [ CODESET1,CODE1, CODESET2,CODE2 ]
+
+   If all 6 pieces of information are given, returns 1 if the link exists.
+
+   Locale::Codes::Links::Language-ExtLanguage
+      links ExtLanguage to Language
+
+Based on RT-61345:
+
+   Add support for language subtags:
+      http://www.iana.org/assignments/language-subtag-registry
+      http://www.w3.org/International/articles/language-tags/

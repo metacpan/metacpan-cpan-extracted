@@ -1,0 +1,5 @@
+msgid "thing"
+msgid_plural "things"
+msgstr[0] "1 foo"
+msgstr[1] "%s foos"
+

@@ -1,0 +1,25 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <table class="table">
+    <tr>
+      <th><span trspan="hashkey"></span></th>
+      <td><input id="hashkeyinput" class="form-control" ng-model="currentNode.title"/>
+    </tr>
+    <tr>
+      <th><span trspan="value"></span></th>
+      <td><input id="hashvalueinput" class="form-control" ng-model="currentNode.data"/>
+    </tr>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "title": "newEntry",
+  "action": "newHashEntry",
+  "icon": "plus-sign"
+},{
+  "title": "deleteEntry",
+  "icon": "minus-sign"
+}]
+</script>

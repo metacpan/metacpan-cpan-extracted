@@ -1,0 +1,47 @@
+Linux/Joystick version 0.01
+===========================
+
+INTRODUCTION
+
+    Linux::Joystick is an object-oriented, pure Perl API for accessing
+    joystick devices under Linux-based operating systems. It is capable of
+    using either blocking or non-blocking I/O, and represents each axis
+    change or button press as a Linux::Joystick::Event object.
+
+
+INSTALLATION
+
+	To install this module type the following:
+
+		perl Makefile.PL
+		make
+		make test
+		make install
+
+DEPENDENCIES
+
+	This module requires no other modules or libraries.
+
+AUTHOR
+    B. Watson, perljoystick@hardcoders.org
+
+    Feel free to contact me with bug reports, suggestions for improvement,
+    or even success stories (hey, somebody besides me has got to find this
+    thing useful, right?)
+
+LICENSE
+    You may use and redistribute this Perl module under the same terms as
+    Perl itself (GPL or Artistic License, your choice).
+
+    If you use this module in a commercial product, I'd appreciate it if you
+    let me know. This isn't a licensing requirement; it's just common
+    courtesy.
+
+    Although I have made every effort to produce bug-free code, I am not
+    responsible for any loss or damages caused by the use of
+    Linux::Joystick. If it breaks, you get to keep both pieces :)
+
+COPYRIGHT
+    Copyright (c) 2004, B. Watson
+
+

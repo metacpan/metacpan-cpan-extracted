@@ -1,0 +1,9 @@
+0.0.3 Fri Oct 10 11:59:04 CEST 2014
+ - Add Pegex to required modules.
+
+0.0.2 Sun Sep 14 22:58:50 PDT 2014
+ - Basic compiler plumbing in place.
+
+0.0.1 Sun Sep 14 19:23:21 PDT 2014
+ - Initial release
+

@@ -1,0 +1,158 @@
+== Things to do:
+
+- Switch to App::Cmd
+- Add Python support
+- Add Perl (module) support
+
+#------------------------------------------------------------------------------#
+# Older notes, before July 14, 2011
+#------------------------------------------------------------------------------#
+
+=== 0.25
+
+- Find out what changed from 0.23 to 0.23_01 to HEAD
+- Release 0.24
+
+- Port to Python
+- Make tests/javascript and tests/python
+- Make separate JS and PY subclasses of Template classes
+
+=== 0.23
+
+Add note about commit 3c4d9 referring to wrong rt, should refer to 23883
+
+TODO: Does use_test_base not work? make test compains that Test::Base is not installed -rokr
+    
+FUTURE:
+
+09:55 < nkuttler_> apparently firefox sets the accept header to request xml rather than json, which obviously is incompatible with later JSON.parse calls. I have added a 
+                  req.setRequestHeader("Accept", "text/x-json"); to Jemplate.js to fix that. any comments?
+10:05 < nkuttler_> kind of makes sense to me as jemplate can only handle json, at least atm
+
+       var req = new XMLHttpRequest();
+       req.open('GET', url, Boolean(callback));
+       req.setRequestHeader('Accept', 'text/x-json');
+           return Ajax._send(req, null, callback);
+       }
+
+14:13 < nkuttler> hm, it could break servers that don't understand x-json but expect text/json or application/json
+14:14 < nkuttler> hm, application/json http://www.ietf.org/rfc/rfc4627.txt
+14:16 < nkuttler> maybe rather something like req.setRequestHeader('Accept', 'text/json; text/x-json; application/json');
+
+
+ - Integrate debugging with Firebug
+ - Better warnings (provide context of fault, e.g. which template?) on bad stash data (lists, etc).
+
+Integrate different frameworks for Ajax/JSON processing and 
+encaspulate Jemplate code so it can play nice with other javascript:
+
+    --runtime           Is equivalent to --ajax=ilinsky --json=json2
+                        Need to do testing of ilinsky to see if it's a better choice than gregory, but
+                        looks like it (and still has active and recent development).
+
+    --runtime-lite      Same as --ajax=none --json=none
+    --runtime-jquery    Same as --ajax=jquery --json=none
+    --runtime-yui       Same as --ajax=yui --json=yui
+    --runtime-legacy    Same as --ajax=gregory --json=json2
+
+    --json              By itself, equivalent to --json=json2
+    --json=json2        Use http://www.json.org/json2.js for parsing/stringifying (bundle)
+    --json=yui          Use YUI: YAHOO.lang.JSON
+    --json=none         Doesn't provide any functionality except a warning
+    
+    --ajax              By itself, equivalent to --ajax=ilinsky
+    --ajax=jquery       Use jQuery for Ajax get and post (external)
+    --ajax=yui          Use YUI: yui/connection/connection.js (external)
+    --ajax=ilinsky      Use http://code.google.com/p/xmlhttprequest/ (bundle)
+    --ajax=gregory      Use http://www.scss.com.au/family/andrew/webdesign/xmlhttprequest/ (bundle)
+    --ajax=none         Doesn't provide any functionality except a warning
+
+    --xxx               Include XXX and JJJ helper functions (bundle, of course)
+
+    --ilinsky-xhr       Provide Ilinsky's XmlHttpRequest regardless of which Ajax framework is
+                        chosen.
+
+    --minify                                Pass output through JavaScript::Minifier
+    --minify=/path/to/yuicompressor         Pass output through an exec java using the specified yuicompressor.jar
+
+=== 0.21
+
+- Use array for output
+- Option to include template source as comments
+- Put all Jemplate code into a standalone script
+- Test INCLUDE_PATH
+- Rewrite docs
+- Support JavaScript compression
+
+=== 0.20
+
++ Fix test failures.
+
+=== 0.19
+
++ Better Getopt::Long processing
++ Option to preserve template paths.
++ Support Jemplate objects. Jemplate->new({options})->process;
++ Allow multiple compilations to work together.
+x Option to bundle Jemplate.js runtime
+
++ Test --runtime == share/Jemplate.js
++ Test --list
++ Test --start-tag and JEMPLATE_START_TAG etc
++ Test multiple compile files
++ Test DEBUG_UNDEF
++ Test subdir templates
+
++ Change list output
++ make manifest
+
+
+=== This is a list of things for you to do. Feel free to do them or add to the
+list.
+
++ Fix test harness output on IE. It currently shows up on one line.
+
+- Write tests to make sure all the `process` API variations work (on all
+  browsers. This has bit me already.
+
++ Implement the hash virtual methods
+- Finish implementing the standard filters
+
++ Make foo.bar() compile to stash.get('foo', 0, 'bar', [])
++ Make sure stash calls some function in that case.
+
+- Finish the following directives:
+  - MACRO
+  - TRY/CATCH/FINAL
+  - THROW
+  + DEFAULT
+  - META
+  - INSERT
+  - FILTER
+  - USE 
+
+- Implement plugin support for javascript libraries.
+
+- Port popular TT plugin modules
+
+- Write a tutorial pod
+
++ TT supports stash localization within a template. Jemplate should do this.
+
+=== Add Experimental Ajax/Json/Stash support
+
+If a template says:
+
+[% JSON foo.bar -> 'data/bar.json' %]
+
+then access to foo.bar will trigger a synchronous call to the uri
+'data/bar.json'. Even access to foo.bar.baz would trigger it before baz was
+looked up in the result.
+
+The idea is that this allows some client side templates to use serverside
+logic. And conditionally at that.
+
+Any subsequent calls to foo.bar.* should use the cached data.
+
+It is likely that the stash should be localized. So that other templates
+access to foo.bar did not use this.

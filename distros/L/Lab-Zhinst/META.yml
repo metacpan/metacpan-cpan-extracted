@@ -1,0 +1,23 @@
+---
+abstract: 'Perl bindings to the LabOne API of Zurich Instruments '
+author:
+  - 'Simon Reinhardt <simon.reinhardt@stud.uni-regensburg.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lab-Zhinst
+requires:
+  perl: '5.008003'
+resources:
+  IRC: irc://chat.freenode.net/#labmeasurement
+  MailingList: https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users
+  homepage: http://www.labmeasurement.de
+  repository: git://github.com/lab-measurement/Lab-Zhinst.git
+version: '0.06'
+x_serialization_backend: 'YAML::Tiny version 1.69'

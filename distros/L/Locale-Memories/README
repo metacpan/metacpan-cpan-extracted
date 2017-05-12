@@ -1,0 +1,17 @@
+NAME
+       Locale::Memories − L10N Message Retrieval
+
+SYNOPSIS
+         my $lm = Locale::Memories‐>new();
+         $lm‐>load_index(’'th_to_index’)');
+         $lm‐>index_msg($locale, $msg_id, $msg_str);
+         $lm‐>translate_msg($locale, $msg_id);
+
+DESCRIPTION
+       This module is specialized module for indexing and retrieving .po mes‐
+       sages.
+
+COPYRIGHT
+       Copyright (c) 2007 Yung‐chung Lin. All rights reserved. This program is
+       free software; you can redistribute it and/or modify it under the same
+       terms as Perl itself.

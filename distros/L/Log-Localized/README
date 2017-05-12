@@ -1,0 +1,58 @@
+Log-Localized
+=============
+
+Log::Localized, a module for logging messages based on the
+local level of verbosity in the part of the code currently
+running, and giving you fine-grained control over the verbosity
+level throughout the running code. 
+
+See perldoc Log::Localized for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Config::Tiny
+  Log::Dispatch
+  Log::Dispatch::Config
+  Log::Dispatch::Screen
+  File::Spec
+  File::HomeDir
+
+Its tests require additionally:
+
+  Test::NoWarnings
+  Test::Warn
+  File::Temp
+  Test::Pod
+  Test::Pod::Coverage 
+  Test::Spelling
+
+AUTHOR
+
+This module was written by Erwan Lemonnier and co-designed
+by Claes Jacobsson.
+Regards to Jerker Montelius for his help and to my employer, 
+the Swedish state, for sponsoring the early development of 
+this module.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) by Erwan Lemonnier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

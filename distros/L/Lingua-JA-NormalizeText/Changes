@@ -1,0 +1,110 @@
+Revision history for Perl extension Lingua::JA::NormalizeText
+
+0.50 2015-03-08T14:40:17Z
+
+        - No code changes
+
+0.45 2014-06-27T01:54:15Z
+
+        - Improved documentation and tests
+        - Removed Sub::Install dependency
+        - Removed MONGOLIAN VOWEL SEPARATOR (U+180E) from unify_whitespaces option
+        - Enabled $Lingua::JA::Dakuon::EnableCombining flag
+
+0.43 2014-03-10T13:04:35Z
+
+        - Improved documentation
+
+0.42 2014-02-17T01:55:55Z
+
+        - Updated Lingua::JA::Moji dependency to Ver. 0.32
+
+0.41 2014-02-16T19:30:16Z
+
+        - Added decompose_parenthesized_kanji option
+
+0.40 2014-02-08T08:22:08Z
+
+        - No code changes
+
+0.33_01 2014-02-08T03:54:43Z
+
+        - Changed the module authoring tool form Module::Install to Minilla
+        - Return undef even if argument is undef in list context
+        - Added tests
+        - Improved tests
+
+0.32    Mon, 06 Jan 2014 19:59:36 +0900
+        - Added remove_DFC option
+        - Fixed typo
+
+0.31    Fri, 03 Jan 2014 11:34:15 +0900
+        - Removes Test::Synopsis::Expectation dependency (only required on the author tests)
+
+0.30    Wed, 01 Jan 2014 17:07:10 +0900
+        - No code change
+
+0.26    Tue, 31 Dec 2013 23:56:23 +0900
+        - Added square2katakana, circled2kana and circled2kanji options
+        - Added Lingua::JA::Moji dependency
+
+0.25    Tue, 31 Dec 2013 17:29:21 +0900
+        - Improved documentation
+        - Added Test::Synopsis::Expectation dependency
+
+0.24    Sat, 30 Nov 2013 15:58:53 +0900
+        - Allowed 'new' method to accept an arrayref
+        - Added Sub::Install dependency
+        - Removed Test::Base dependency
+        - Replaced the subroutine redefinitions with Sub::Install::install_sub( ... )
+
+0.23    Sun, 20 Oct 2013 19:41:47 +0900
+        - Added wavy dash(U+3030) to wave2tilde, wavetilde2long and wave2long options
+        - Fixed fullminus2long option (U+2212 is not fullwidth in the context of Unicode)
+
+0.22    Sun, 20 Oct 2013 01:27:22 +0900
+        - Added remove_spaces option
+
+0.21    Sat, 05 Oct 2013 17:44:19 +0900
+        - Fixed the structure of documentation
+
+0.20    Sat, 05 Oct 2013 07:27:24 +0900
+        - Added unify_nl, unify_whitespaces, dakuon_normalize, handakuon_normalize
+        and all_dakuon_normalize options
+        - Replaced remove_(head|tail)_space options with trim, ltrim and rtrim options
+        - Removed unify_3dots option
+        - Added dependency on Lingua::JA::Dakuon
+        - Updated dependency on Lingua::JA::Regular::Unicode from 0.09 to 0.11
+        - Fixed unify_long_spaces option
+        - Added 'ヸ and ヹ to old2new_kana option
+        - Return undef if argument is undef
+        - Compressed code
+
+0.12    Mon, 08 Oct 2012 23:38:03 +0900
+        - added remove_controls option
+        - added tab2space option
+
+0.11    Fri, 28 Sep 2012 18:28:31 +0900
+        - fixed the handling of uninitialized value
+
+0.10    Fri, 28 Sep 2012 09:17:33 +0900
+        - added old2new_kanji option
+        - renamed modernize_kana_usage old2new_kana
+        - improved unify_3dots option
+        - improved tests
+
+0.06    Thu, 14 Jun 2012 10:42:43 +0900
+        - fixed nl2space test for Windows
+
+0.05    Wed, 13 Jun 2012 00:18:42 +0900
+        - improved tests
+
+0.03    Tue, 12 Jun 2012 23:07:46 +0900
+        - speed optimization
+        - improved nl2space option
+
+0.02    Mon, 11 Jun 2012 20:57:51 +0900
+        - changed dependency on Lingua::JA::Regular::Unicode from 0.04 to 0.09
+
+0.01    Mon, 11 Jun 2012 01:25:11 +0900
+        - original version

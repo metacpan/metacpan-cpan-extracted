@@ -1,0 +1,684 @@
+#!/usr/bin/perl -w
+#
+# cpan-upload - upload one or more file to CPAN (via PAUSE)
+#
+# $Id: cpanupload,v 1.1 2008/02/13 19:56:28 cvs Exp $
+#
+
+use strict;
+use vars qw($VERSION);
+
+use AppConfig::Std;
+use Net::FTP;
+use HTTP::Request::Common qw(POST);
+use LWP::UserAgent;
+use HTTP::Status;
+use File::Basename;
+
+$VERSION = sprintf("%d.%d", q$Revision: 1.1 $ =~ /(\d+)\.(\d+)/);
+
+
+#-----------------------------------------------------------------------
+#       Configuration constants and globals
+#-----------------------------------------------------------------------
+my $PROGRAM;
+my $SITE          = 'pause.perl.org';
+my $UPLOAD_DIR    = 'incoming';
+my $PAUSE_ADD_URI = 'http://pause.perl.org/pause/authenquery';
+my $config;
+my @uploaded_files;
+
+#-----------------------------------------------------------------------
+#       MAIN BODY
+#-----------------------------------------------------------------------
+
+initialise();
+
+@uploaded_files = ftp_upload_files(@ARGV);
+pause_add_files(@uploaded_files) if @uploaded_files > 0;
+_verbose(int(@ARGV), int(@ARGV) == 1 ? " file " : " files ",
+         "uploaded successfully.\n");
+
+exit 0;
+
+#=======================================================================
+#
+# initialise()
+#
+# Create AppConfig instance, parse config file if there is one,
+# and command-line options.
+#
+#=======================================================================
+sub initialise
+{
+    my $config_file;
+    my $HOME;
+    my $password;
+
+
+    #-------------------------------------------------------------------
+    # Turn off buffering on STDOUT
+    #-------------------------------------------------------------------
+    $| = 1;
+    ($PROGRAM = $0) =~ s!^.*/!!;
+
+    #-------------------------------------------------------------------
+    # Create an AppConfig::Std object, and define our interface
+    # The EXPAND flag on password tells AppConfig not to try and
+    # expand any embedded variables - eg if you have a $ sign
+    # in your password.
+    #-------------------------------------------------------------------
+    $HOME = $ENV{'HOME'} || (getpwuid($<))[7];
+    $config_file = "$HOME/.pause";
+    if (-e $config_file && ((stat($config_file))[2] & 36) != 0)
+    {
+        die "$PROGRAM: your config file $config_file is readable by others!\n";
+    }
+    $config = AppConfig::Std->new();
+    $config->define('user');
+    $config->define('directory', {ARGCOUNT => 1, ALIAS => 'dir'});
+    $config->define('password', { EXPAND   => 0 });
+    $config->define('mailto');
+    $config->define('ftp_gateway');
+    $config->define('ftp_proxy');
+    $config->define('http_proxy');
+    $config->define('non_interactive', { ALIAS => 'ni', ARGCOUNT => 0 });
+
+    #-------------------------------------------------------------------
+    # Read the user's config file, if they have one,
+    # then parse the command-line.
+    #-------------------------------------------------------------------
+    if (-f $config_file)
+    {
+        $config->file($config_file) || exit 1;
+    }
+    $config->args(\@ARGV)
+        || die "run \"$PROGRAM -help\" to see valid options\n";
+
+    #-------------------------------------------------------------------
+    # Check we have the information we need
+    #-------------------------------------------------------------------
+
+    die "No files specified for upload\n" unless @ARGV > 0;
+
+    die "No email address (mailto) specified\n" unless $config->mailto;
+    die "No PAUSE user specified\n"             unless $config->user;
+    if (not $config->password)
+    {
+	if ($config->non_interactive)
+	{
+	    die "No password specified\n";
+	}
+	else
+	{
+	    require Term::ReadKey;
+	    $| = 1;
+	    print "Password: ";
+	    Term::ReadKey::ReadMode('noecho');
+	    chop($password = <STDIN>);
+	    Term::ReadKey::ReadMode('restore');
+	    $config->set('password' => $password);
+	    print "\n";
+	}
+    }
+
+    $config->verbose(1) if $config->debug && !$config->verbose;
+
+    #-------------------------------------------------------------------
+    # Display banner at the start of the run
+    #-------------------------------------------------------------------
+    _verbose("$PROGRAM v$VERSION\n");
+}
+
+#=======================================================================
+#
+# ftp_upload_files()
+#
+# upload the one or more files to PAUSE ftp server.
+# return a list of the files that were successfully uploaded.
+#
+#=======================================================================
+sub ftp_upload_files
+{
+    my @files = @_;
+
+    my @uploaded = ();            # list of files actually uploaded
+    my $ftp;                      # Net::FTP instance
+    my @new_args;                 # arg list to pass to constructor
+    my ($user, $password);        # user and password for login method
+    my $file;
+
+
+    _verbose("Using FTP to upload files to PAUSE\n");
+
+    #-------------------------------------------------------------------
+    # Make the connection to the PAUSE ftp server:
+    # First we determine how we're going to make the connection ...
+    #-------------------------------------------------------------------
+    if ($config->ftp_gateway)
+    {
+        _debug("  establishing connection via an FTP gateway\n");
+        @new_args = ($config->ftp_gateway);
+	($user, $password) = ("ftp\@$SITE", $config->mailto);
+    }
+    else
+    {
+        ($user, $password) = ('ftp', $config->mailto);
+        @new_args = ($SITE);
+	if ($config->ftp_proxy)
+	{
+	    _debug("  establishing connection via proxy",
+                     $config->ftp_proxy, "\n");
+            push(@new_args, 'Firewall' => $config->ftp_proxy);
+	}
+	else
+	{
+	    _debug("  establishing connection\n");
+	}
+    }
+
+    #-------------------------------------------------------------------
+    # ... and then we actually make the connection and log in
+    #-------------------------------------------------------------------
+    if (not defined($ftp = Net::FTP->new(@new_args)))
+    {
+        die "failed to connect to remote server: $!\n";
+    }
+    if (!$ftp->login($user, $password))
+    {
+        $ftp->quit();
+        die "    failed to login as user 'ftp', password $password - ",
+            $ftp->message(), "[", $ftp->code(), "]\n";
+    }
+
+    #-------------------------------------------------------------------
+    # Change to the right directory, and set binary mode
+    #-------------------------------------------------------------------
+    _debug("  changing to \"$UPLOAD_DIR\" directory...\n");
+    if (!$ftp->cwd($UPLOAD_DIR))
+    {
+        $ftp->quit();
+	die "failed to change directory to $UPLOAD_DIR!\n";
+    }
+
+    _debug("  setting binary mode.\n");
+    if (not $ftp->binary())
+    {
+        $ftp->quit();
+        die "  failed to change type to 'binary' - ", $ftp->message(),
+            "[", $ftp->code(), "]\n";
+    }
+
+    #-------------------------------------------------------------------
+    # Put the file(s)
+    #-------------------------------------------------------------------
+    foreach $file (@files)
+    {
+        _verbose("  uploading file \"$file\"\n");
+        if ($ftp->put($file))
+	{
+	    push(@uploaded, $file);
+	}
+	else
+	{
+            warn "failed to upload $file - ", $ftp->message(), "\n";
+	    if (@files > 0 && !$config->non_interactive)
+	    {
+		my $continue;
+
+		do
+		{
+		    print "Do you want to continue? [y] ";
+		    $continue = <STDIN>;
+		    $continue = 'y' if $continue =~ /^$/;
+		} while ($continue !~ /^[yn]/i);
+		exit(0) if $continue =~ /^n/i;
+	    }
+	}
+    }
+
+    #-------------------------------------------------------------------
+    # Close the connection with the server.
+    #-------------------------------------------------------------------
+    _debug("  closing connection with FTP server\n");
+    $ftp->quit;
+
+    return @uploaded;
+}
+
+#=======================================================================
+#
+# pause_add_files()
+#
+# make an HTTP request to the add_uri form
+#
+#=======================================================================
+sub pause_add_files
+{
+    my @files = @_;
+
+    my $file;
+    my $basename;
+    my $request;
+    my $response;
+    my $agent;
+    my $argref;
+
+
+    _verbose("registering upload with PAUSE web server\n");
+
+    #-------------------------------------------------------------------
+    # Create the agent we'll use to make the web requests
+    #-------------------------------------------------------------------
+    _debug("  creating instance of LWP::UserAgent\n");
+    $agent = LWP::UserAgent->new() || die "Failed to create UserAgent: $!\n";
+    $agent->agent("$PROGRAM/$VERSION");
+    $agent->from($config->mailto);
+    if (defined $config->http_proxy)
+    {
+        $agent->proxy(['http'], $config->http_proxy);
+    }
+
+    #-------------------------------------------------------------------
+    # Post an upload message to the PAUSE web site for each file
+    #-------------------------------------------------------------------
+    foreach $file (@files)
+    {
+	$basename = basename($file);
+
+        #---------------------------------------------------------------
+        # Create the request to add the file
+        #---------------------------------------------------------------
+	$argref = {
+                    HIDDENNAME                    => $config->user(),
+                    pause99_add_uri_upload        => $basename,
+                    SUBMIT_pause99_add_uri_upload => " Upload the checked file "
+                   };
+	if ($config->directory)
+	{
+	    $argref->{'pause99_add_uri_subdirtext'} = $config->directory;
+	}
+
+        $request = POST($PAUSE_ADD_URI, $argref);
+        $request->authorization_basic($config->user, $config->password);
+
+        _debug("----- REQUEST BEGIN -----\n",
+               $request->as_string(),
+               "----- REQUEST END -------\n");
+
+        #---------------------------------------------------------------
+        # Make the request to the PAUSE web server
+        #---------------------------------------------------------------
+        _verbose("  POSTing upload for $file\n");
+        $response = $agent->request($request);
+
+        #---------------------------------------------------------------
+        # So, how'd we do?
+        #---------------------------------------------------------------
+        if (not defined $response)
+        {
+            die "Request completely failed - we got undef back: $!\n";
+        }
+        if ($response->is_error)
+        {
+            if ($response->code == RC_NOT_FOUND)
+            {
+                die "PAUSE's CGI for handling messages seems to have moved!\n",
+                    "(HTTP response code of 404 from the PAUSE web server)\n",
+                        "It used to be:\n\n\t", $PAUSE_ADD_URI, "\n\n",
+                            "Please inform the maintainer of this script\n";
+            }
+            else
+            {
+                die "request failed\n  Error code: ", $response->code,
+                    "\n  Message: ", $response->message, "\n";
+            }
+        }
+        else
+        {
+            _debug("Looks OK!\n",
+                   "----- RESPONSE BEGIN -----\n",
+                   $response->as_string(),
+                   "----- RESPONSE END -------\n");
+            _verbose("    PAUSE add message sent ok [",
+                     $response->code, "]\n");
+        }
+    }
+}
+
+
+#=======================================================================
+#
+# _verbose()
+#
+# displays the message strings passed if in verbose mode.
+#
+#=======================================================================
+sub _verbose
+{
+    return unless $config->verbose;
+    print join('', @_);
+}
+
+
+#=======================================================================
+#
+# _debug()
+#
+# displays the message strings passed if in debug mode.
+#
+#=======================================================================
+sub _debug
+{
+    return unless $config->debug;
+    print join('', @_);
+}
+
+
+__END__
+
+#-----------------------------------------------------------------------
+
+=head1 NAME
+
+cpan-upload - upload one or more files to CPAN, using PAUSE
+
+=head1 SYNOPSIS
+
+B<cpan-upload> [OPTIONS] I<file1> .. I<fileN>
+
+=head1 DESCRIPTION
+
+B<cpan-upload> is a script which automates the process of uploading
+a file to CPAN using PAUSE, the Perl Authors Upload Server.
+For example, to upload a recent version of the Net::Dict module
+I ran:
+
+    % cpan-upload -verbose Net-Dict-1.07.tar.gz
+
+If everything went OK, you'll get two mail messages from the PAUSE monitor:
+one to acknowledge the upload,
+and one to let you know if your upload made it through to CPAN.
+
+Given one or more files to upload, cpan-upload carries
+out the following two steps:
+
+=over 4
+
+=item *
+
+FTP the file or files to the PAUSE ftp server, B<put>ting them
+in the incoming directory.
+
+=item *
+
+Register the upload by POSTing to the PAUSE web server.
+
+=back
+
+This is just one of the ways you can upload something to PAUSE.
+See the PAUSE FAQ for details (referenced in SEE ALSO section below).
+
+Before using cpan-upload you must register with PAUSE,
+to get a username and password.
+If you are a regular uploader to PAUSE, you'll probably want to
+create a C<.pause> configuration file,
+as described in L<"CONFIGURATION FILE"> below.
+If not, you can just use the command-line options,
+as described in L<"OPTIONS"> below.
+If you don't provide your password (via configuration file or
+command-line), then you will be prompted for it.
+Echo'ing will be turned off while you type your password.
+This behaviour can be suppressed with the B<-non_interactive>
+option, described below.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -user <string>
+
+Your PAUSE username (which you previously registered with PAUSE).
+
+=item -password <string>
+
+The password for your PAUSE username.
+
+=item -directory <string> | -dir <string>
+
+A subdirectory in your CPAN area where the file should be uploaded to.
+
+=item -mailto <email>
+
+Your email address, to include the HTTP request header.
+This is also used as the password for the ftp upload to PAUSE.
+
+=item -ftp_gateway <host>
+
+Specifies the name of the host which has your ftp gateway.
+
+=item -ftp_proxy <host>
+
+Specifies the name of the host which has your ftp proxy,
+if you're behind a firewall. 
+
+=item -http_proxy <URL>
+
+Specifies the URL for a proxy to use when making HTTP requests.
+
+=item -non_interactive | -ni
+
+cpan-upload should not prompt for any missing information (eg password),
+it should just warn or die, as appropriate.
+
+=item -help
+
+Displays a short help message with the OPTIONS section
+from the cpan-upload documentation.
+
+=item -doc
+
+Display the full documentation for B<cpan-upload>.
+
+=item -verbose
+
+Turns on verbose information as the script runs.
+
+=item -debug
+
+Turns on debugging information. Useful mainly for the developer,
+it displays the HTTP request and response.
+
+=item -version
+
+Display the version number of the B<cpan-upload> script.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+You can provide the configuration information needed
+via a .pause file in your home directory.
+If you upload files at all regularly you will want to
+set up one of these.
+
+=over 4
+
+=item B<user> I<username>
+
+This is used to specify your PAUSE username.
+This just saves you from typing it every time you run the script.
+
+=item B<password> I<password>
+
+This is used to specify your PAUSE password.
+
+=item B<directory> I<path>
+
+Specify a subdirectory in your CPAN area.
+
+=item B<ftp_gateway> I<HOST>
+
+Specifies the hostname of your ftp gateway used to get through
+a firewall. For example:
+
+    ftp_gateway = ftp-gw
+
+=item B<ftp_proxy> I<HOST>
+
+Specifies the hostname of your ftp proxy used to get through
+a firewall. For example:
+
+    ftp_proxy = ftp-proxy
+
+=item B<http_proxy> I<URL>
+
+The URL for the proxy to use when making HTTP requests to the PAUSE
+web server. For example:
+
+    http_proxy = http://proxy/
+
+=item B<mailto> I<EMAIL>
+
+Specifies the email address which is passed in the header of
+the HTTP request, and as the password for the anonymous ftp upload.
+You must provide this.
+
+=item B<non_interactive>
+
+Specifies that cpan-upload should never prompt the user (eg for password),
+but should take a default action.
+
+=back
+
+The following is a sample .pause file:
+
+    # example .pause for user neilb
+    # the user is your registered PAUSE username
+    user NEILB
+    password thisisnotmyrealpassword
+
+    mailto      = neil@bowers.com
+    ftp_gateway = ftp-gw
+    http_proxy  = http://proxy.cre.canon.co.uk/
+
+    non_interactive
+
+Note that your .pause must not be readable by others,
+since it can contain your PAUSE password. The B<cpan-upload> script
+refuses to run if your config file can be read by others.
+
+=cut
+
+
+=head1 POSSIBLE TODO ITEMS
+
+Also, let me know if you ever have occasion to wish that the features below
+had been implemented. I probably won't do them unless someone
+would like to see them in.
+
+I'd be happy to hear any more suggestions.
+
+=over 4
+
+=item *
+
+As with the password, prompt for PAUSE username and email address
+if not provided (by .pause file or on the command-line).
+
+=item *
+
+Have a -noftp option or similar - ie don't try and ftp,
+just do the post, assuming that the file is already in the
+ftp incoming directory. We could be smart and check that it is.
+This would be useful if a previous ftp upload succeeded but the
+POST operation failed for some reason.
+
+=item *
+
+Add configuration options for specifying the PAUSE ftp server name,
+the incoming directory, and the URI we POST to.
+This would let you deal with any changes without requiring a new release.
+These aren't likely to change on any regular basis, so seem gratuitous.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item www.cpan.org
+
+The home page for the Comprehensive Perl Archive Network.
+
+=item PAUSE
+
+The Perl Authors Upload SErver. The PAUSE FAQ can be seen on CPAN:
+
+    http://www.cpan.org/modules/04pause.html
+
+=item Net::FTP
+
+Graham Barr's FTP client module, which is
+part of the libnet distribution, available from:
+
+    http://www.cpan.org/modules/by-module/Net/
+
+=item libwww-perl5
+
+The LWP distribution which provides the modules used by this script
+to talk to the PAUSE web server. You can get the latest version from:
+
+    http://www.cpan.org/modules/by-module/LWP/
+
+=item AppConfig::Std
+
+The module used to handle command-line options and the configuration file.
+
+    http://www.cpan.org/authors/id/NEILB/
+
+This is actually a subclass of C<AppConfig>, which you'll also need.
+
+    http://www.cpan.org/authors/id/ABW/
+
+=item Term::ReadKey
+
+The module used to turn off echo'ing if we prompt the user
+for a PAUSE password.
+
+=back
+
+=head1 VERSION
+
+$Revision: 1.1 $
+
+=head1 SCRIPT CATEGORIES
+
+CPAN
+
+=head1 PREREQUISITES
+
+AppConfig::Std
+Net::FTP
+HTTP::Request::Common
+LWP::UserAgent
+HTTP::Status
+File::Basename
+Term::ReadKey
+
+=head1 AUTHOR
+
+Neil Bowers E<lt>neil@bowers.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2002 Neil Bowers.
+
+Copyright (c) 1998-2001 Canon Research Centre Europe. All rights reserved.
+
+This script is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+

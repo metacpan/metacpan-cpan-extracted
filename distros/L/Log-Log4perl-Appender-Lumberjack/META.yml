@@ -1,0 +1,29 @@
+---
+abstract: 'log appender writing to a lumberjack server'
+author:
+  - 'Markus Benning <ich@markusbenning.de>'
+build_requires:
+  File::Find: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Log4perl-Appender-Lumberjack
+provides:
+  Log::Log4perl::Appender::Lumberjack:
+    file: lib/Log/Log4perl/Appender/Lumberjack.pm
+    version: '1.00'
+requires:
+  Log::Log4perl::Appender: '0'
+  Net::Lumberjack::Client: '0'
+  Sys::Hostname: '0'
+  perl: v5.8.5
+resources:
+  bugtracker: https://github.com/benningm/Log-Log4perl-Appender-Lumberjack/issues
+  repository: https://github.com/benningm/Log-Log4perl-Appender-Lumberjack
+version: '1.00'

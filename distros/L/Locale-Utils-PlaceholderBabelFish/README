@@ -1,0 +1,34 @@
+Locale::Utils::PlaceholderBabelFish version 0.004
+=================================================
+
+Utils to expand placeholders in BabelFish style.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Moo
+    MooX::StrictConstructor
+    MooX::Types::MooseLike
+    Scalar::Util
+    namespace::autoclean
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2015,
+Steffen Winkler
+steffenw at cpan.org.
+All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,6 @@
+name: titleauthors
+select: select * from titleauthors where au_id = '409-56-7008'
+%%
+name: sales
+select: select * from sales where stor_id = '7896'
+%%

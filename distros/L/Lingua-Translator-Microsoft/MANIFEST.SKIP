@@ -1,0 +1,15 @@
+~$
+.git(ignore)?
+\.swp$
+\.pc/
+\.sqlite3?
+blib/
+cover_db/
+debian/
+MANIFEST\.bak
+Makefile(\.old)?
+META\.
+MYMETA\.
+pm_to_blib
+tags
+TAGS

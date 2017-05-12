@@ -1,0 +1,14 @@
+Changes
+examples/GenericSHIB.pm
+examples/lemon.conf
+examples/shib.xml
+examples/shibboleth.xml
+examples/shibbot2.pl
+lib/Lemonldap/Federation/Shibboleth.pm
+lib/Lemonldap/Federation/ShibbolethRequestMap.pm
+lib/Lemonldap/Federation/SplitURI.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/Lemonldap-Federation-Shibboleth.t

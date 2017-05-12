@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+<!--
+     Transliteration definitions for IAST to Devanāgarī
+
+     Copyright (c) 2016 Philip Kime <philkime@kime.org.uk>
+-->
+
+<translit>
+    <name>IAST Devanagari</name>
+    <desc>IAST to Devanāgarī</desc>
+    <reverse>false</reverse>
+    <!-- set of transliteration rules -->
+    <rules>
+        <rule>
+            <from>o&#x1e41;</from>
+            <to>&#x0950;</to> <!-- oṁ -> ॐ (DEVANAGARI OM) -->
+        </rule>
+        <rule>
+            <from>O&#x1e41;</from>
+            <to>&#x0950;</to> <!-- Oṁ -> ॐ (DEVANAGARI OM) -->
+        </rule>
+        <rule>
+            <from>&#x1e43;</from>
+            <to>&#x0902;</to> <!-- ṃ -> ं (DEVANAGARI SIGN ANUSVARA) -->
+        </rule>
+        <rule>
+            <from>&#x1e25;</from>
+            <to>&#x0903;</to> <!-- ḥ -> ः (DEVANAGARI SIGN VISARGA) -->
+        </rule>
+        <rule>
+            <from>kh</from>
+            <to>&#x0916;&#x094d;</to> <!-- kh -> ख् (DEVANAGARI LETTER KHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>Kh</from>
+            <to>&#x0916;&#x094d;</to> <!-- Kh -> ख् (DEVANAGARI LETTER KHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>K</from>
+            <to>&#x0915;&#x094d;</to> <!-- K -> क् (DEVANAGARI LETTER KA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>k</from>
+            <to>&#x0915;&#x094d;</to> <!-- k -> क् (DEVANAGARI LETTER KA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>gh</from>
+            <to>&#x0918;&#x094d;</to> <!-- gh -> घ् (DEVANAGARI LETTER GHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>Gh</from>
+            <to>&#x0918;&#x094d;</to> <!-- Gh -> घ् (DEVANAGARI LETTER GHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>G</from>
+            <to>&#x0917;&#x094d;</to> <!-- G -> ग् (DEVANAGARI LETTER GA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>g</from>
+            <to>&#x0917;&#x094d;</to> <!-- g -> ग् (DEVANAGARI LETTER GA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e44;</from>
+            <to>&#x0919;&#x094d;</to> <!-- Ṅ -> ङ् (DEVANAGARI LETTER NGA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e45;</from>
+            <to>&#x0919;&#x094d;</to> <!-- ṅ -> ङ् (DEVANAGARI LETTER NGA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>ch</from>
+            <to>&#x091b;&#x094d;</to> <!-- ch -> छ् (DEVANAGARI LETTER CHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>Ch</from>
+            <to>&#x091b;&#x094d;</to> <!-- Ch -> छ् (DEVANAGARI LETTER CHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>C</from>
+            <to>&#x091a;&#x094d;</to> <!-- C -> च् (DEVANAGARI LETTER CA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>c</from>
+            <to>&#x091a;&#x094d;</to> <!-- c -> च् (DEVANAGARI LETTER CA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>jh</from>
+            <to>&#x091d;&#x094d;</to> <!-- jh -> झ् (DEVANAGARI LETTER JHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>Jh</from>
+            <to>&#x091d;&#x094d;</to> <!-- Jh -> झ् (DEVANAGARI LETTER JHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>J</from>
+            <to>&#x091c;&#x094d;</to> <!-- J -> ज् (DEVANAGARI LETTER JA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>j</from>
+            <to>&#x091c;&#x094d;</to> <!-- j -> ज् (DEVANAGARI LETTER JA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x00d1;</from>
+            <to>&#x091e;&#x094d;</to> <!-- Ñ -> ञ् (DEVANAGARI LETTER NYA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x00f1;</from>
+            <to>&#x091e;&#x094d;</to> <!-- ñ -> ञ् (DEVANAGARI LETTER NYA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e6d;h</from>
+            <to>&#x0920;&#x094d;</to> <!-- ṭh -> ठ् (DEVANAGARI LETTER TTHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e6c;h</from>
+            <to>&#x0920;&#x094d;</to> <!-- Ṭh -> ठ् (DEVANAGARI LETTER TTHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e6c;</from>
+            <to>&#x091f;&#x094d;</to> <!-- Ṭ -> ट् (DEVANAGARI LETTER TTA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e6d;</from>
+            <to>&#x091f;&#x094d;</to> <!-- ṭ -> ट् (DEVANAGARI LETTER TTA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e0d;h</from>
+            <to>&#x0922;&#x094d;</to> <!-- ḍh -> ढ् (DEVANAGARI LETTER DDHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e0c;h</from>
+            <to>&#x0922;&#x094d;</to> <!-- Ḍh -> ढ् (DEVANAGARI LETTER DDHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e0c;</from>
+            <to>&#x0921;&#x094d;</to> <!-- Ḍ -> ड् (DEVANAGARI LETTER DDA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e0d;</from>
+            <to>&#x0921;&#x094d;</to> <!-- ḍ -> ड् (DEVANAGARI LETTER DDA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e46;</from>
+            <to>&#x0923;&#x094d;</to> <!-- Ṇ -> ण् (DEVANAGARI LETTER NNA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e47;</from>
+            <to>&#x0923;&#x094d;</to> <!-- ṇ -> ण् (DEVANAGARI LETTER NNA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>th</from>
+            <to>&#x0925;&#x094d;</to> <!-- th -> थ् (DEVANAGARI LETTER THA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>Th</from>
+            <to>&#x0925;&#x094d;</to> <!-- Th -> थ् (DEVANAGARI LETTER THA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>T</from>
+            <to>&#x0924;&#x094d;</to> <!-- T -> त् (DEVANAGARI LETTER TA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>t</from>
+            <to>&#x0924;&#x094d;</to> <!-- t -> त् (DEVANAGARI LETTER TA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>dh</from>
+            <to>&#x0927;&#x094d;</to> <!-- dh -> ध् (DEVANAGARI LETTER DHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>Dh</from>
+            <to>&#x0927;&#x094d;</to> <!-- Dh -> ध् (DEVANAGARI LETTER DHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>D</from>
+            <to>&#x0926;&#x094d;</to> <!-- D -> द् (DEVANAGARI LETTER DA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>d</from>
+            <to>&#x0926;&#x094d;</to> <!-- d -> द् (DEVANAGARI LETTER DA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>N</from>
+            <to>&#x0928;&#x094d;</to> <!-- N -> न् (DEVANAGARI LETTER NA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>n</from>
+            <to>&#x0928;&#x094d;</to> <!-- n -> न् (DEVANAGARI LETTER NA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>ph</from>
+            <to>&#x092b;&#x094d;</to> <!-- ph -> फ् (DEVANAGARI LETTER PHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>Ph</from>
+            <to>&#x092b;&#x094d;</to> <!-- Ph -> फ् (DEVANAGARI LETTER PHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>P</from>
+            <to>&#x092a;&#x094d;</to> <!-- P -> प् (DEVANAGARI LETTER PA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>p</from>
+            <to>&#x092a;&#x094d;</to> <!-- p -> प् (DEVANAGARI LETTER PA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>bh</from>
+            <to>&#x092d;&#x094d;</to> <!-- bh -> भ् (DEVANAGARI LETTER BHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>Bh</from>
+            <to>&#x092d;&#x094d;</to> <!-- Bh -> भ् (DEVANAGARI LETTER BHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>B</from>
+            <to>&#x092c;&#x094d;</to> <!-- B -> ब् (DEVANAGARI LETTER BA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>b</from>
+            <to>&#x092c;&#x094d;</to> <!-- b -> ब् (DEVANAGARI LETTER BA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>M</from>
+            <to>&#x092e;&#x094d;</to> <!-- M -> म् (DEVANAGARI LETTER MA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>m</from>
+            <to>&#x092e;&#x094d;</to> <!-- m -> म् (DEVANAGARI LETTER MA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>Y</from>
+            <to>&#x092f;&#x094d;</to> <!-- Y -> य् (DEVANAGARI LETTER YA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>y</from>
+            <to>&#x092f;&#x094d;</to> <!-- y -> य् (DEVANAGARI LETTER YA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>R</from>
+            <to>&#x0930;&#x094d;</to> <!-- R -> र् (DEVANAGARI LETTER RA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>r</from>
+            <to>&#x0930;&#x094d;</to> <!-- r -> र् (DEVANAGARI LETTER RA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>L</from>
+            <to>&#x0932;&#x094d;</to> <!-- L -> ल् (DEVANAGARI LETTER LA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>l</from>
+            <to>&#x0932;&#x094d;</to> <!-- l -> ल् (DEVANAGARI LETTER LA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>V</from>
+            <to>&#x0935;&#x094d;</to> <!-- V -> व् (DEVANAGARI LETTER VA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>v</from>
+            <to>&#x0935;&#x094d;</to> <!-- v -> व् (DEVANAGARI LETTER VA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x015a;</from>
+            <to>&#x0936;&#x094d;</to> <!-- Ś -> श् (DEVANAGARI LETTER SHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x015b;</from>
+            <to>&#x0936;&#x094d;</to> <!-- ś -> श् (DEVANAGARI LETTER SHA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e62;</from>
+            <to>&#x0937;&#x094d;</to> <!-- Ṣ -> ष् (DEVANAGARI LETTER SSA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x1e63;</from>
+            <to>&#x0937;&#x094d;</to> <!-- ṣ -> ष् (DEVANAGARI LETTER SSA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>S</from>
+            <to>&#x0938;&#x094d;</to> <!-- S -> स् (DEVANAGARI LETTER SA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>s</from>
+            <to>&#x0938;&#x094d;</to> <!-- s -> स् (DEVANAGARI LETTER SA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>H</from>
+            <to>&#x0939;&#x094d;</to> <!-- H -> ह् (DEVANAGARI LETTER HA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>h</from>
+            <to>&#x0939;&#x094d;</to> <!-- h -> ह् (DEVANAGARI LETTER HA + DEVANAGARI SIGN VIRAMA) -->
+        </rule>
+        <rule>
+            <from>&#x094d;ai</from>
+            <to>&#x0948;</to> <!-- ्ai -> ै (DEVANAGARI VOWEL SIGN AI) -->
+        </rule>
+        <rule>
+            <from>&#x094d;au</from>
+            <to>&#x094c;</to> <!-- ्au -> ौ (DEVANAGARI VOWEL SIGN AU) -->
+        </rule>
+        <rule>
+            <from>&#x094d;a</from>
+            <to></to> <!-- ्a -> X (NULL) -->
+        </rule>
+        <rule>
+            <from>&#x094d;&#x0101;</from>
+            <to>&#x093e;</to> <!-- ्ā -> ा (DEVANAGARI VOWEL SIGN AA) -->
+        </rule>
+        <rule>
+            <from>&#x094d;i</from>
+            <to>&#x093f;</to> <!-- ्i -> ि (DEVANAGARI VOWEL SIGN I) -->
+        </rule>
+        <rule>
+            <from>&#x094d;&#x012b;</from>
+            <to>&#x0940;</to> <!-- ्ī -> ी (DEVANAGARI VOWEL SIGN II) -->
+        </rule>
+        <rule>
+            <from>&#x094d;u</from>
+            <to>&#x0941;</to> <!-- ्u -> ु (DEVANAGARI VOWEL SIGN U) -->
+        </rule>
+        <rule>
+            <from>&#x094d;&#x016b;</from>
+            <to>&#x0942;</to> <!-- ्ū -> ू (DEVANAGARI VOWEL SIGN UU) -->
+        </rule>
+        <rule>
+            <from>&#x094d;&#x1e5b;</from>
+            <to>&#x0943;</to> <!-- ्ṛ -> ृ (DEVANAGARI VOWEL SIGN VOCALIC R) -->
+        </rule>
+        <rule>
+            <from>&#x094d;&#x1e5d;</from>
+            <to>&#x0944;</to> <!-- ्ṝ -> ॄ (DEVANAGARI VOWEL SIGN VOCALIC RR) -->
+        </rule>
+        <rule>
+            <from>&#x094d;&#x1e37;</from>
+            <to>&#x0962;</to> <!-- ्ḷ -> ॢ (DEVANAGARI VOWEL SIGN VOCALIC L) -->
+        </rule>
+        <rule>
+            <from>&#x094d;&#x1e39;</from>
+            <to>&#x0963;</to> <!-- ्ḹ -> ॣ (DEVANAGARI VOWEL SIGN VOCALIC LL) -->
+        </rule>
+        <rule>
+            <from>&#x094d;e</from>
+            <to>&#x0947;</to> <!-- ्e -> े (DEVANAGARI VOWEL SIGN E) -->
+        </rule>
+        <rule>
+            <from>&#x094d;o</from>
+            <to>&#x094b;</to> <!-- ्o -> ो (DEVANAGARI VOWEL SIGN O) -->
+        </rule>
+        <rule>
+            <from>'</from>
+            <to>&#x093d;</to> <!-- ' -> ऽ (DEVANAGARI SIGN AVAGRAHA) -->
+        </rule>
+        <rule>
+            <from>ai</from>
+            <to>&#x0910;</to> <!-- ai -> ऐ (DEVANAGARI LETTER AI) -->
+        </rule>
+        <rule>
+            <from>Ai</from>
+            <to>&#x0910;</to> <!-- Ai -> ऐ (DEVANAGARI LETTER AI) -->
+        </rule>
+        <rule>
+            <from>au</from>
+            <to>&#x0914;</to> <!-- au -> औ (DEVANAGARI LETTER AU) -->
+        </rule>
+        <rule>
+            <from>Au</from>
+            <to>&#x0914;</to> <!-- Au -> औ (DEVANAGARI LETTER AU) -->
+        </rule>
+        <rule>
+            <from>a</from>
+            <to>&#x0905;</to> <!-- a -> अ (DEVANAGARI LETTER A) -->
+        </rule>
+        <rule>
+            <from>A</from>
+            <to>&#x0905;</to> <!-- A -> अ (DEVANAGARI LETTER A) -->
+        </rule>
+        <rule>
+            <from>&#x0101;</from>
+            <to>&#x0906;</to> <!-- ā -> आ (DEVANAGARI LETTER AA) -->
+        </rule>
+        <rule>
+            <from>&#x0100;</from>
+            <to>&#x0906;</to> <!-- Ā -> आ (DEVANAGARI LETTER AA) -->
+        </rule>
+        <rule>
+            <from>i</from>
+            <to>&#x0907;</to> <!-- i -> इ (DEVANAGARI LETTER I) -->
+        </rule>
+        <rule>
+            <from>I</from>
+            <to>&#x0907;</to> <!-- I -> इ (DEVANAGARI LETTER I) -->
+        </rule>
+        <rule>
+            <from>&#x012b;</from>
+            <to>&#x0908;</to> <!-- ī -> ई (DEVANAGARI LETTER II) -->
+        </rule>
+        <rule>
+            <from>&#x012a;</from>
+            <to>&#x0908;</to> <!-- Ī -> ई (DEVANAGARI LETTER II) -->
+        </rule>
+        <rule>
+            <from>u</from>
+            <to>&#x0909;</to> <!-- u -> उ (DEVANAGARI LETTER U) -->
+        </rule>
+        <rule>
+            <from>U</from>
+            <to>&#x0909;</to> <!-- U -> उ (DEVANAGARI LETTER U) -->
+        </rule>
+        <rule>
+            <from>&#x016b;</from>
+            <to>&#x090a;</to> <!-- ū -> ऊ (DEVANAGARI LETTER UU) -->
+        </rule>
+        <rule>
+            <from>&#x016a;</from>
+            <to>&#x090a;</to> <!-- Ū -> ऊ (DEVANAGARI LETTER UU) -->
+        </rule>
+        <rule>
+            <from>&#x1e5b;</from>
+            <to>&#x090b;</to> <!-- ṛ -> ऋ (DEVANAGARI LETTER VOCALIC R) -->
+        </rule>
+        <rule>
+            <from>&#x1e5a;</from>
+            <to>&#x090b;</to> <!-- Ṛ -> ऋ (DEVANAGARI LETTER VOCALIC R) -->
+        </rule>
+        <rule>
+            <from>&#x1e5d;</from>
+            <to>&#x0960;</to> <!-- ṝ -> ॠ (DEVANAGARI LETTER VOCALIC RR) -->
+        </rule>
+        <rule>
+            <from>&#x1e5c;</from>
+            <to>&#x0960;</to> <!-- Ṝ -> ॠ (DEVANAGARI LETTER VOCALIC RR) -->
+        </rule>
+        <rule>
+            <from>&#x1e37;</from>
+            <to>&#x090c;</to> <!-- ḷ -> ऌ (DEVANAGARI LETTER VOCALIC L) -->
+        </rule>
+        <rule>
+            <from>&#x1e36;</from>
+            <to>&#x090c;</to> <!-- Ḷ -> ऌ (DEVANAGARI LETTER VOCALIC L) -->
+        </rule>
+        <rule>
+            <from>&#x1e39;</from>
+            <to>&#x0961;</to> <!-- ḹ -> ॡ (DEVANAGARI LETTER VOCALIC LL) -->
+        </rule>
+        <rule>
+            <from>&#x1e38;</from>
+            <to>&#x0961;</to> <!-- Ḹ -> ॡ (DEVANAGARI LETTER VOCALIC LL) -->
+        </rule>
+        <rule>
+            <from>e</from>
+            <to>&#x090f;</to> <!-- e -> ए (DEVANAGARI LETTER E) -->
+        </rule>
+        <rule>
+            <from>E</from>
+            <to>&#x090f;</to> <!-- E -> ए (DEVANAGARI LETTER E) -->
+        </rule>
+        <rule>
+            <from>o</from>
+            <to>&#x0913;</to> <!-- o -> ओ (DEVANAGARI LETTER O) -->
+        </rule>
+        <rule>
+            <from>O</from>
+            <to>&#x0913;</to> <!-- O -> ओ (DEVANAGARI LETTER O) -->
+        </rule>
+        <rule>
+            <from>1</from>
+            <to>&#x0967;</to> <!-- 1 -> १ (DEVANAGARI DIGIT ONE) -->
+        </rule>
+        <rule>
+            <from>2</from>
+            <to>&#x0968;</to> <!-- 2 -> २ (DEVANAGARI DIGIT TWO) -->
+        </rule>
+        <rule>
+            <from>3</from>
+            <to>&#x0969;</to> <!-- 3 -> ३ (DEVANAGARI DIGIT THREE) -->
+        </rule>
+        <rule>
+            <from>4</from>
+            <to>&#x096a;</to> <!-- 4 -> ४ (DEVANAGARI DIGIT FOUR) -->
+        </rule>
+        <rule>
+            <from>5</from>
+            <to>&#x096b;</to> <!-- 5 -> ५ (DEVANAGARI DIGIT FIVE) -->
+        </rule>
+        <rule>
+            <from>6</from>
+            <to>&#x096c;</to> <!-- 6 -> ६ (DEVANAGARI DIGIT SIX) -->
+        </rule>
+        <rule>
+            <from>7</from>
+            <to>&#x096d;</to> <!-- 7 -> ७ (DEVANAGARI DIGIT SEVEN) -->
+        </rule>
+        <rule>
+            <from>8</from>
+            <to>&#x096e;</to> <!-- 8 -> ८ (DEVANAGARI DIGIT EIGHT) -->
+        </rule>
+        <rule>
+            <from>9</from>
+            <to>&#x096f;</to> <!-- 9 -> ९ (DEVANAGARI DIGIT NINE) -->
+        </rule>
+        <rule>
+            <from>0</from>
+            <to>&#x0966;</to> <!-- 0 -> ० (DEVANAGARI DIGIT ZERO) -->
+        </rule>
+    </rules>
+</translit>

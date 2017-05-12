@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Log-Accounting
+version: 0.3
+author:
+  - Oliver Maul, oli@42.nu
+abstract: Accounting of network services
+license: perl
+requires: {}
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Log::Accounting:
+    file: lib/Log/Accounting.pm
+    version: 0.3
+generated_by: Module::Build version 0.22

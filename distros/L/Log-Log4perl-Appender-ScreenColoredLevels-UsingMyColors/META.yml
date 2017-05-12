@@ -1,0 +1,28 @@
+---
+abstract: 'Colorize messages according to level amd my colors'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0.95'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Log4perl-Appender-ScreenColoredLevels-UsingMyColors
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Log::Log4perl::Level: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/briandfoy/Log-Log4perl-Appender-ScreenColoredLevels-UsingMyColors/issues
+  homepage: https://github.com/briandfoy/Log-Log4perl-Appender-ScreenColoredLevels-UsingMyColors
+  repository: https://github.com/briandfoy/Log-Log4perl-Appender-ScreenColoredLevels-UsingMyColors.git
+version: '0.111'

@@ -1,0 +1,31 @@
+---
+abstract: 'Cache log messages and throw them later'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Moo: '2'
+  Test::Exception: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Stack
+requires:
+  Carp: '0'
+  Moo: '2'
+  Scalar::Util: '0'
+  perl: '5.010'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/zurborg/liblog-stack-perl/issues
+  homepage: https://github.com/zurborg/liblog-stack-perl
+  repository: https://github.com/zurborg/liblog-stack-perl.git
+version: '0.001'

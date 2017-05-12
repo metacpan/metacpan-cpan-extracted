@@ -1,0 +1,17 @@
+Revision history for Perl extension Lingua::ZH::PinyinConvert.
+
+0.01  Sat Nov 23 02:31:18 2002
+	- original version; created by h2xs 1.21 with options
+		-n Lingua::ZH::PinyinConvert
+
+0.02  Sat Nov 23 19:29:50 2002
+        - test.pl bug fixed
+
+0.03  Sat Nov 24 03:11:00 2002
+        - code redundancy removed (Dave Rolsky <autarch@urth.org>) 
+
+0.04  Tue Nov 26 11:21:13 2002
+	- MANIFEST fixed :-/
+
+0.05  Sun,  9 Feb 2003 03:05:06 +0800
+	- PerlIO::via::PinyinConvert added

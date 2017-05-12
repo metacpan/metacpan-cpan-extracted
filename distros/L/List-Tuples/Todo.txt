@@ -1,0 +1,6 @@
+? generate, optionaly, a warning or error if the number of fields is not the
+number of expected fields. eg: missmatch between the number of keys and
+values. These are two cases.
+
+integrate horizontal hash of hash
+

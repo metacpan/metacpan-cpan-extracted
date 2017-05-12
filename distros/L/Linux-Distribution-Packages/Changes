@@ -1,0 +1,18 @@
+* 2006-20-01
+Version 0.01.
+
+* 2006-02-02
+Version 0.02
+Add ability to write to file as option.  Also can set format as an option.
+
+* 2006-07-02
+Version 0.03
+Add Slackware as a distribution.  This was submitted by Alberto Re.
+
+* 2006-10-02
+Version 0.04
+Add Red Flag as a distribution.  Alphabetize hash entries for easier find.
+
+* 2006-19-04
+Version 0.05
+Add Fedora as a distribution. 

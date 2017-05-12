@@ -1,0 +1,6417 @@
+
+
+\section{Description of the functions}
+\label{function_description}
+
+\subsection{main }\index{main@\texttt{main}|textbf}
+\textbf{Description:} launch main processes\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetOptions\index{GetOptions@\texttt{GetOptions}}
+\item Usage\index{Usage@\texttt{Usage}}
+\item FileManagement\index{FileManagement@\texttt{FileManagement}}
+\item LoadMessages\index{LoadMessages@\texttt{LoadMessages}}
+\item LoadOptions\index{LoadOptions@\texttt{LoadOptions}}
+\item InitiateCounters\index{InitiateCounters@\texttt{InitiateCounters}}
+\item LoadParsingPatterns\index{LoadParsingPatterns@\texttt{LoadParsingPatterns}}
+\item LoadChunkingData\index{LoadChunkingData@\texttt{LoadChunkingData}}
+\item LoadCorpusLexicon\index{LoadCorpusLexicon@\texttt{LoadCorpusLexicon}}
+\item LoadExistingTerminologies\index{LoadExistingTerminologies@\texttt{LoadExistingTerminologies}}
+\item PrintTestifiedTerms\index{PrintTestifiedTerms@\texttt{PrintTestifiedTerms}}
+\item ReadCorpus\index{ReadCorpus@\texttt{ReadCorpus}}
+\item Chunking\index{Chunking@\texttt{Chunking}}
+\item ParseProgressively\index{ParseProgressively@\texttt{ParseProgressively}}
+\item PrintCorpusChunking\index{PrintCorpusChunking@\texttt{PrintCorpusChunking}}
+\item CompareChunking\index{CompareChunking@\texttt{CompareChunking}}
+\item PrintCorpusWithMNPs\index{PrintCorpusWithMNPs@\texttt{PrintCorpusWithMNPs}}
+\item PrintXMLterms\index{PrintXMLterms@\texttt{PrintXMLterms}}
+\item PrintTCsAndUnparsedHTML\index{PrintTCsAndUnparsedHTML@\texttt{PrintTCsAndUnparsedHTML}}
+\item PrintCorpusForLGPWithTTs\index{PrintCorpusForLGPWithTTs@\texttt{PrintCorpusForLGPWithTTs}}
+\item PrintCorpusForLGPWithParsedTCs\index{PrintCorpusForLGPWithParsedTCs@\texttt{PrintCorpusForLGPWithParsedTCs}}
+\item PrintTestifiedTermsParse\index{PrintTestifiedTermsParse@\texttt{PrintTestifiedTermsParse}}
+\item PrintTermList\index{PrintTermList@\texttt{PrintTermList}}
+\item PrintBasicTermList\index{PrintBasicTermList@\texttt{PrintBasicTermList}}
+\end{itemize}
+
+\subsection{ParseProgressively}\index{ParseProgressively@\texttt{ParseProgressively}|textbf}
+\textbf{Description:} progressive parse of MNPs using islands and parsing patterns\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to an array of MNPs
+\item reference to the hash table of access to TCs
+\item reference to the hash table of access to TTs
+\item reference to the hash table of object counters
+\item reference to the hash table of parsing methods
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\item reference to the hash table of chunking data
+\item reference to the hash table of linguistic options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item KeepOnlyParsedIslands\index{KeepOnlyParsedIslands@\texttt{KeepOnlyParsedIslands}}
+\item SearchIslands\index{SearchIslands@\texttt{SearchIslands}}
+\item UpdateIslandHashTable\index{UpdateIslandHashTable@\texttt{UpdateIslandHashTable}}
+\item CombineIslands\index{CombineIslands@\texttt{CombineIslands}}
+\item MakeTC\index{MakeTC@\texttt{MakeTC}}
+\item ReduceMNPbyIslands\index{ReduceMNPbyIslands@\texttt{ReduceMNPbyIslands}}
+\item HashTableSize\index{HashTableSize@\texttt{HashTableSize}}
+\item SaturateBrokenIslands\index{SaturateBrokenIslands@\texttt{SaturateBrokenIslands}}
+\item ParseFromBoundaries\index{ParseFromBoundaries@\texttt{ParseFromBoundaries}}
+\end{itemize}
+
+\subsection{Forest}\index{Forest@\texttt{Forest}|textbf}
+\textbf{Description:} get the reference of the forest record\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a structure (MNP, island, insert, etc)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to an array of trees
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{RootNode}\index{RootNode@\texttt{RootNode}|textbf}
+\textbf{Description:} get the reference of the root node (level 0) of a tree\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to the root node of a tree
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{ParseFromBoundaries}\index{ParseFromBoundaries@\texttt{ParseFromBoundaries}|textbf}
+\textbf{Description:} progressive application of patterns on the left and right edges of the MNP\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\item reference to the hash table of linguistic options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item MNP completion report
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CreateDefaultForest\index{CreateDefaultForest@\texttt{CreateDefaultForest}}
+\item Forest\index{Forest@\texttt{Forest}}
+\item BuildSequenceInfoForLexiconItem\index{BuildSequenceInfoForLexiconItem@\texttt{BuildSequenceInfoForLexiconItem}}
+\item SearchPatternsForBoundaries\index{SearchPatternsForBoundaries@\texttt{SearchPatternsForBoundaries}}
+\item HitchPatternTrees\index{HitchPatternTrees@\texttt{HitchPatternTrees}}
+\item SearchHead\index{SearchHead@\texttt{SearchHead}}
+\item SearchCompleteTrees\index{SearchCompleteTrees@\texttt{SearchCompleteTrees}}
+\item UniqForest\index{UniqForest@\texttt{UniqForest}}
+\end{itemize}
+
+\subsection{HitchPatternTrees}\index{HitchPatternTrees@\texttt{HitchPatternTrees}|textbf}
+\textbf{Description:} combination of trees from patterns\\
+combination with subtrees from islands if available\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\item reference to an array of adequate patterns
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0, -1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CompleteTree\index{CompleteTree@\texttt{CompleteTree}}
+\item SearchHead\index{SearchHead@\texttt{SearchHead}}
+\item HitchSubTrees\index{HitchSubTrees@\texttt{HitchSubTrees}}
+\item SimplifyWordIndexes\index{SimplifyWordIndexes@\texttt{SimplifyWordIndexes}}
+\item GetIndexesFromTree\index{GetIndexesFromTree@\texttt{GetIndexesFromTree}}
+\item EqualWordIndexes\index{EqualWordIndexes@\texttt{EqualWordIndexes}}
+\item Indexes\index{Indexes@\texttt{Indexes}}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{HitchSubTrees}\index{HitchSubTrees@\texttt{HitchSubTrees}|textbf}
+\textbf{Description:} combination of sub-trees from islands\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\item reference to a tree of a parsing pattern
+\item reference to the current MNP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item HitchTrees\index{HitchTrees@\texttt{HitchTrees}}
+\item CopyTree\index{CopyTree@\texttt{CopyTree}}
+\item GetIndexesFromTree\index{GetIndexesFromTree@\texttt{GetIndexesFromTree}}
+\end{itemize}
+
+\subsection{SearchPatternsForBoundaries}\index{SearchPatternsForBoundaries@\texttt{SearchPatternsForBoundaries}|textbf}
+\textbf{Description:} search patterns to apply either on the complete MNP sequence or on its left or right edges \\
+only one pattern at a time is applied according to priority rules\\
+\\\textbf{Last modified:} 28/01/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\item reference to a record of lexical information
+\item reference to an array of adequate patterns
+\item reference to the current MNP
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\item reference to the hash table of linguistic options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SelectPatternThrough\index{SelectPatternThrough@\texttt{SelectPatternThrough}}
+\item SelectPatternFromRight\index{SelectPatternFromRight@\texttt{SelectPatternFromRight}}
+\item SelectPatternFromLeft\index{SelectPatternFromLeft@\texttt{SelectPatternFromLeft}}
+\item SortPatternsByPriority\index{SortPatternsByPriority@\texttt{SortPatternsByPriority}}
+\end{itemize}
+
+\subsection{SortPatternsByPriority}\index{SortPatternsByPriority@\texttt{SortPatternsByPriority}|textbf}
+\textbf{Description:} sort a list of patterns according to their application priority (regarding the parsing direction, pattern length, etc.)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a first pattern
+\item reference to a second pattern
+\item reference to the hash table of linguistic options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, -1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SelectPatternThrough}\index{SelectPatternThrough@\texttt{SelectPatternThrough}|textbf}
+\textbf{Description:} select a pattern covering the whole MNP sequence\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of lexical information
+\item reference to a tree
+\item reference to the current MNP
+\item reference to an array of adequate patterns
+\item reference to the hash table of parsing patterns
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item size of array
+
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SelectPatternForBoundary\index{SelectPatternForBoundary@\texttt{SelectPatternForBoundary}}
+\end{itemize}
+
+\subsection{SelectPatternFromRight}\index{SelectPatternFromRight@\texttt{SelectPatternFromRight}|textbf}
+\textbf{Description:} select a pattern covering the rightmost part of the MNP sequence\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of lexical information
+\item reference to a tree
+\item reference to the current MNP
+\item reference to an array of adequate patterns
+\item reference to the hash table of parsing patterns
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item size of array
+
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Indexes\index{Indexes@\texttt{Indexes}}
+\item SelectPatternForBoundary\index{SelectPatternForBoundary@\texttt{SelectPatternForBoundary}}
+\end{itemize}
+
+\subsection{SelectPatternFromLeft}\index{SelectPatternFromLeft@\texttt{SelectPatternFromLeft}|textbf}
+\textbf{Description:} select a pattern covering the leftmost part of the MNP sequence\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of lexical information
+\item reference to a tree
+\item reference to the current MNP
+\item reference to an array of adequate patterns
+\item reference to the hash table of parsing patterns
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item size of array
+
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Indexes\index{Indexes@\texttt{Indexes}}
+\item SelectPatternForBoundary\index{SelectPatternForBoundary@\texttt{SelectPatternForBoundary}}
+\end{itemize}
+
+\subsection{SelectPatternForBoundary}\index{SelectPatternForBoundary@\texttt{SelectPatternForBoundary}|textbf}
+\textbf{Description:} record information and copy parse tree for the selected pattern\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of adequate patterns
+\item hash key for a pattern
+\item reference to an array of parses for a pattern
+\item reference to an array of word indexes
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to the current MNP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CopyNodes\index{CopyNodes@\texttt{CopyNodes}}
+\end{itemize}
+
+\subsection{CreateDefaultForest}\index{CreateDefaultForest@\texttt{CreateDefaultForest}|textbf}
+\textbf{Description:} create a default forest if none already exists\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item Indexes\index{Indexes@\texttt{Indexes}}
+\end{itemize}
+
+\subsection{KeepOnlyParsedIslands}\index{KeepOnlyParsedIslands@\texttt{KeepOnlyParsedIslands}|textbf}
+\textbf{Description:} filter out and keep apart unparsed islands\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{SaturateBrokenIslands}\index{SaturateBrokenIslands@\texttt{SaturateBrokenIslands}|textbf}
+\textbf{Description:} try to complete broken islands with missing elements\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item MNP completion report
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetBrokenIslands\index{GetBrokenIslands@\texttt{GetBrokenIslands}}
+\item CompleteSubTrees\index{CompleteSubTrees@\texttt{CompleteSubTrees}}
+\item Forest\index{Forest@\texttt{Forest}}
+\item UpdateIslandHashTable\index{UpdateIslandHashTable@\texttt{UpdateIslandHashTable}}
+\item SaturateIsland\index{SaturateIsland@\texttt{SaturateIsland}}
+\item SeparateBrokenIslands\index{SeparateBrokenIslands@\texttt{SeparateBrokenIslands}}
+\end{itemize}
+
+\subsection{SeparateBrokenIslands}\index{SeparateBrokenIslands@\texttt{SeparateBrokenIslands}|textbf}
+\textbf{Description:} select and delete broken islands\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of islands
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to hash table
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SortSubTreesBySimplificationExtent}\index{SortSubTreesBySimplificationExtent@\texttt{SortSubTreesBySimplificationExtent}|textbf}
+\textbf{Description:} sort a list of sub-trees according to the number of words deleted by simplification\\
+the most simplified is returned first\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a first tree
+\item reference to a second tree
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item sorting result (-1,0,1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SaturateIsland}\index{SaturateIsland@\texttt{SaturateIsland}|textbf}
+\textbf{Description:} saturate an island with missing elements (words or islands)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an island of reliability
+\item reference to the current MNP
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item MNP completion report
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item DetectInserts\index{DetectInserts@\texttt{DetectInserts}}
+\item SearchIslandsForInserts\index{SearchIslandsForInserts@\texttt{SearchIslandsForInserts}}
+\item PutAllInserts\index{PutAllInserts@\texttt{PutAllInserts}}
+\item UniqForest\index{UniqForest@\texttt{UniqForest}}
+\item SearchCompleteTrees\index{SearchCompleteTrees@\texttt{SearchCompleteTrees}}
+\item AddIslandTrees\index{AddIslandTrees@\texttt{AddIslandTrees}}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{PutAllInserts}\index{PutAllInserts@\texttt{PutAllInserts}|textbf}
+\textbf{Description:} insert all the missing sequences (words or islands) in a broken island\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of inserts
+\item reference to an island of reliability
+\item reference to the current MNP
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item island completion report
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item PutInsert\index{PutInsert@\texttt{PutInsert}}
+\end{itemize}
+
+\subsection{PutInsert}\index{PutInsert@\texttt{PutInsert}|textbf}
+\textbf{Description:} insert a missing sequence (separate words and/or an island) in a broken island\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of insert
+\item reference to an island of reliability
+\item reference to the current MNP
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item insertion report
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CopyForest\index{CopyForest@\texttt{CopyForest}}
+\item InsertAllWords\index{InsertAllWords@\texttt{InsertAllWords}}
+\end{itemize}
+
+\subsection{CopyForest}\index{CopyForest@\texttt{CopyForest}|textbf}
+\textbf{Description:} copy an array of trees\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a source record to be duplicated
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CopyTree\index{CopyTree@\texttt{CopyTree}}
+\end{itemize}
+
+\subsection{InsertAllWords}\index{InsertAllWords@\texttt{InsertAllWords}|textbf}
+\textbf{Description:} insert words of a sequence one by one in the trees of a broken island\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word indexes
+\item reference to an array of trees for an island
+\item reference to a tree for an insert
+\item reference to an island of reliability
+\item reference to the current MNP
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item DefineTypeAndContext\index{DefineTypeAndContext@\texttt{DefineTypeAndContext}}
+\item InsertOneWord\index{InsertOneWord@\texttt{InsertOneWord}}
+\item CompleteInsertSubTrees\index{CompleteInsertSubTrees@\texttt{CompleteInsertSubTrees}}
+\end{itemize}
+
+\subsection{CompleteInsertSubTrees}\index{CompleteInsertSubTrees@\texttt{CompleteInsertSubTrees}|textbf}
+\textbf{Description:} insert an island tree in the tree of a broken island\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of trees for an island
+\item reference to a hash table of sub-trees
+\item reference to the current MNP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item HitchTrees\index{HitchTrees@\texttt{HitchTrees}}
+\item GetIndexesFromTree\index{GetIndexesFromTree@\texttt{GetIndexesFromTree}}
+\end{itemize}
+
+\subsection{InsertOneWord}\index{InsertOneWord@\texttt{InsertOneWord}|textbf}
+\textbf{Description:} insert a word in the trees of a broken island\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of insertion contexts
+\item reference to an array of trees for an island
+\item index of the word to insert
+\item reference to a tree to be modified
+\item reference to an island of reliability
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\item reference to the hash table of parsing patterns
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item insertion report
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CopyTree\index{CopyTree@\texttt{CopyTree}}
+\item GetTree\index{GetTree@\texttt{GetTree}}
+\item Insert\index{Insert@\texttt{Insert}}
+\item GetIndexesFromTree\index{GetIndexesFromTree@\texttt{GetIndexesFromTree}}
+\end{itemize}
+
+\subsection{GetTree}\index{GetTree@\texttt{GetTree}|textbf}
+\textbf{Description:} choose the original tree or create a copy if several insertion contexts exist\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item counter of contexts of insertion
+\item reference to a tree to be modified
+\item reference to a tree to be copied
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to a tree to be modified
+\item reference to record
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CopyTree\index{CopyTree@\texttt{CopyTree}}
+\end{itemize}
+
+\subsection{BuildPatternAndKey}\index{BuildPatternAndKey@\texttt{BuildPatternAndKey}|textbf}
+\textbf{Description:} build the key (POS sequence) to select a pattern in the hash table of patterns\\
+build the parse that the pattern must have to fit in the tree\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of context of insertion
+\item index of the word to insert
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item key for hash access
+\item bracketed version of a tree
+\item reference to array
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item BuildSequenceInfoForLexiconItem\index{BuildSequenceInfoForLexiconItem@\texttt{BuildSequenceInfoForLexiconItem}}
+\end{itemize}
+
+\subsection{Insert}\index{Insert@\texttt{Insert}|textbf}
+\textbf{Description:} complete a tree with an insert\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item index of the word to insert
+\item reference to a tree
+\item reference to a record of context of insertion
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\item reference to the hash table of parsing patterns
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SearchLeaf\index{SearchLeaf@\texttt{SearchLeaf}}
+\item BuildPatternAndKey\index{BuildPatternAndKey@\texttt{BuildPatternAndKey}}
+\item CopyNodes\index{CopyNodes@\texttt{CopyNodes}}
+\item CompleteTree\index{CompleteTree@\texttt{CompleteTree}}
+\item GetPivot\index{GetPivot@\texttt{GetPivot}}
+\item HitchNodes\index{HitchNodes@\texttt{HitchNodes}}
+\end{itemize}
+
+\subsection{GetPivot}\index{GetPivot@\texttt{GetPivot}|textbf}
+\textbf{Description:} select the place in the tree where the insert must attach\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of context of insertion
+\item reference to a tree
+\item reference to an array of subset of indexes
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SearchLeaf\index{SearchLeaf@\texttt{SearchLeaf}}
+\end{itemize}
+
+\subsection{GetRightMostWordIndex}\index{GetRightMostWordIndex@\texttt{GetRightMostWordIndex}|textbf}
+\textbf{Description:} get the index of the rightmost word in a tree\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Integer\index{Integer@\texttt{Integer}}
+\item GetRightMostWordIndex\index{GetRightMostWordIndex@\texttt{GetRightMostWordIndex}}
+\end{itemize}
+
+\subsection{GetLeftMostWordIndex}\index{GetLeftMostWordIndex@\texttt{GetLeftMostWordIndex}|textbf}
+\textbf{Description:} get the index of the leftmost word in a tree\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Integer\index{Integer@\texttt{Integer}}
+\item GetLeftMostWordIndex\index{GetLeftMostWordIndex@\texttt{GetLeftMostWordIndex}}
+\end{itemize}
+
+\subsection{DefineTypeAndContext}\index{DefineTypeAndContext@\texttt{DefineTypeAndContext}|textbf}
+\textbf{Description:} define the type(s) of an insertion (PREV\_ELEMENT, NEXT\_ELEMENT, PREV\_HEAD and/or NEXT\_HEAD)\\
+collect the information on the insertion context\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item index of the word to insert
+\item reference to a tree
+\item reference to an island of reliability
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetIndexesFromTree\index{GetIndexesFromTree@\texttt{GetIndexesFromTree}}
+\item SearchPreviousAndNext\index{SearchPreviousAndNext@\texttt{SearchPreviousAndNext}}
+\item SearchLeaf\index{SearchLeaf@\texttt{SearchLeaf}}
+\item DefinePreviousWordInfos\index{DefinePreviousWordInfos@\texttt{DefinePreviousWordInfos}}
+\item DefineNextWordInfos\index{DefineNextWordInfos@\texttt{DefineNextWordInfos}}
+\end{itemize}
+
+\subsection{GetWordIndex}\index{GetWordIndex@\texttt{GetWordIndex}|textbf}
+\textbf{Description:} get the index of a word in a tree\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to an element of an edge
+\item status of an edge
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{DefinePreviousWordInfos}\index{DefinePreviousWordInfos@\texttt{DefinePreviousWordInfos}|textbf}
+\textbf{Description:} define the insertion context according to the previous word\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of lexical information
+\item index of the word to insert
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to an array of insertion contexts
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item FindWordInTagsHash\index{FindWordInTagsHash@\texttt{FindWordInTagsHash}}
+\item GetWordIndex\index{GetWordIndex@\texttt{GetWordIndex}}
+\item ElementStatus\index{ElementStatus@\texttt{ElementStatus}}
+\item DefinePrevHeadInfos\index{DefinePrevHeadInfos@\texttt{DefinePrevHeadInfos}}
+\end{itemize}
+
+\subsection{DefinePrevHeadInfos}\index{DefinePrevHeadInfos@\texttt{DefinePrevHeadInfos}|textbf}
+\textbf{Description:} define the insertion context according to the closest previous word which is the head of a node\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to an array of insertion contexts
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SearchHead\index{SearchHead@\texttt{SearchHead}}
+\end{itemize}
+
+\subsection{DefineNextWordInfos}\index{DefineNextWordInfos@\texttt{DefineNextWordInfos}|textbf}
+\textbf{Description:} define the insertion context according to the next word\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of lexical information
+\item index of the word to insert
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to an array of insertion contexts
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetWordIndex\index{GetWordIndex@\texttt{GetWordIndex}}
+\item DefineNextHeadInfos\index{DefineNextHeadInfos@\texttt{DefineNextHeadInfos}}
+\end{itemize}
+
+\subsection{DefineNextHeadInfos}\index{DefineNextHeadInfos@\texttt{DefineNextHeadInfos}|textbf}
+\textbf{Description:} define the insertion context according to the closest next word which is the head of a node\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to an array of insertion contexts
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SearchHead\index{SearchHead@\texttt{SearchHead}}
+\end{itemize}
+
+\subsection{ElementStatus}\index{ElementStatus@\texttt{ElementStatus}|textbf}
+\textbf{Description:} get the status of a candidate word in a tree (HEAD or MODIFIER)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item status of an edge
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SearchPreviousAndNext}\index{SearchPreviousAndNext@\texttt{SearchPreviousAndNext}|textbf}
+\textbf{Description:} get the index of the previous and next words in a tree\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item index of the word to insert
+\item reference to an array of word indexes for an island
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SearchIslandsForInserts}\index{SearchIslandsForInserts@\texttt{SearchIslandsForInserts}|textbf}
+\textbf{Description:} search and use islands to simplify inserts\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of inserts
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetIncludedParsedIslands\index{GetIncludedParsedIslands@\texttt{GetIncludedParsedIslands}}
+\item UpdateIslandArray\index{UpdateIslandArray@\texttt{UpdateIslandArray}}
+\item SimplifyByIsland\index{SimplifyByIsland@\texttt{SimplifyByIsland}}
+\item UniqSubForest\index{UniqSubForest@\texttt{UniqSubForest}}
+\end{itemize}
+
+\subsection{GetIncludedParsedIslands}\index{GetIncludedParsedIslands@\texttt{GetIncludedParsedIslands}|textbf}
+\textbf{Description:} select parsed islands that appear in an insert\\
+\\\textbf{Last modified:} 04/01/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word indexes
+\item reference to the current MNP
+\item type of repository of islands to explore
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{DetectInserts}\index{DetectInserts@\texttt{DetectInserts}|textbf}
+\textbf{Description:} identify sequences of missing index (inserts) in a broken island\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetMissingIndexes\index{GetMissingIndexes@\texttt{GetMissingIndexes}}
+\end{itemize}
+
+\subsection{GetMissingIndexes}\index{GetMissingIndexes@\texttt{GetMissingIndexes}|textbf}
+\textbf{Description:} get a sequence of missing indexes (an insert) in a broken island\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item index of the first missing element in an insert
+\item index of the next non missing index (end of insert)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintSubTrees}\index{PrintSubTrees@\texttt{PrintSubTrees}|textbf}
+\textbf{Description:} print the parenthesized parse of the sub-trees (i.e; islands) of an MNP (if option -debug activated)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{PrintForest}\index{PrintForest@\texttt{PrintForest}|textbf}
+\textbf{Description:} print the content of a forest for an MNP (if option -debug activated)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item PrintParenthesizedTree\index{PrintParenthesizedTree@\texttt{PrintParenthesizedTree}}
+\end{itemize}
+
+\subsection{PrintParenthesizedTree}\index{PrintParenthesizedTree@\texttt{PrintParenthesizedTree}|textbf}
+\textbf{Description:} print information on a tree for a structure\\
+if no parse is available, sub-trees are printed if any exists\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetIndexesFromTree\index{GetIndexesFromTree@\texttt{GetIndexesFromTree}}
+\end{itemize}
+
+\subsection{CompleteSubTrees}\index{CompleteSubTrees@\texttt{CompleteSubTrees}|textbf}
+\textbf{Description:} complete sub trees with broken islands that include them\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to an array of broken islands
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item MNP completion report
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item CopyTree\index{CopyTree@\texttt{CopyTree}}
+\item ContainsSubSequence\index{ContainsSubSequence@\texttt{ContainsSubSequence}}
+\item SortBrokenByInclusion\index{SortBrokenByInclusion@\texttt{SortBrokenByInclusion}}
+\item HitchTrees\index{HitchTrees@\texttt{HitchTrees}}
+\item GetIndexesFromTree\index{GetIndexesFromTree@\texttt{GetIndexesFromTree}}
+\item IsUnbroken\index{IsUnbroken@\texttt{IsUnbroken}}
+\item EqualWordIndexes\index{EqualWordIndexes@\texttt{EqualWordIndexes}}
+\item Indexes\index{Indexes@\texttt{Indexes}}
+\item SimplifyWordIndexes\index{SimplifyWordIndexes@\texttt{SimplifyWordIndexes}}
+\item TestNewAnalysis\index{TestNewAnalysis@\texttt{TestNewAnalysis}}
+\item AddIslandTrees\index{AddIslandTrees@\texttt{AddIslandTrees}}
+\end{itemize}
+
+\subsection{AddTree}\index{AddTree@\texttt{AddTree}|textbf}
+\textbf{Description:} add a tree to a forest if it does not already exist\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\item reference to an array of trees
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item TestNewAnalysis\index{TestNewAnalysis@\texttt{TestNewAnalysis}}
+\end{itemize}
+
+\subsection{AddIslandTrees}\index{AddIslandTrees@\texttt{AddIslandTrees}|textbf}
+\textbf{Description:} add trees to the forest of an island\\
+if it is the first tree to add, an island is created\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to an array of trees to be recorded
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item AddTree\index{AddTree@\texttt{AddTree}}
+\item BuildSequenceInfoForLexiconItem\index{BuildSequenceInfoForLexiconItem@\texttt{BuildSequenceInfoForLexiconItem}}
+\item TransferSequenceInfo\index{TransferSequenceInfo@\texttt{TransferSequenceInfo}}
+\end{itemize}
+
+\subsection{IsUnbroken}\index{IsUnbroken@\texttt{IsUnbroken}|textbf}
+\textbf{Description:} test if an island is unbroken (all words are contiguous)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a structure (MNP, island, insert, etc)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{IsSubTerm}\index{IsSubTerm@\texttt{IsSubTerm}|textbf}
+\textbf{Description:} test if a sequence of indexes is a sub-sequence of a larger one\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\item reference to a sub-tree
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{HitchTrees}\index{HitchTrees@\texttt{HitchTrees}|textbf}
+\textbf{Description:} combine two trees to create a larger one\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\item reference to a sub-tree
+\item reference to the current MNP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SearchLeaf\index{SearchLeaf@\texttt{SearchLeaf}}
+\item CopyNodes\index{CopyNodes@\texttt{CopyNodes}}
+\item HitchNodes\index{HitchNodes@\texttt{HitchNodes}}
+\item SimplifyWordIndexes\index{SimplifyWordIndexes@\texttt{SimplifyWordIndexes}}
+\item GetRootNodeID\index{GetRootNodeID@\texttt{GetRootNodeID}}
+\end{itemize}
+
+\subsection{GetRootNodeID}\index{GetRootNodeID@\texttt{GetRootNodeID}|textbf}
+\textbf{Description:} get the ID number of the root node (level 0) of a tree\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item RootNode\index{RootNode@\texttt{RootNode}}
+\end{itemize}
+
+\subsection{GetBrokenIslands}\index{GetBrokenIslands@\texttt{GetBrokenIslands}|textbf}
+\textbf{Description:} select broken islands in a set of islands\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of islands
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SortBrokenByInclusion\index{SortBrokenByInclusion@\texttt{SortBrokenByInclusion}}
+\end{itemize}
+
+\subsection{SortBrokenByInclusion}\index{SortBrokenByInclusion@\texttt{SortBrokenByInclusion}|textbf}
+\textbf{Description:} sort a list of islands so that the most inclusive appear first\\
+\\\textbf{Last modified:} 05/04/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a first structure
+\item reference to the record of a second structure
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{UpdateIslandHashTable}\index{UpdateIslandHashTable@\texttt{UpdateIslandHashTable}|textbf}
+\textbf{Description:} delete and put apart islands included in larger ones in a hash table\\
+\\\textbf{Last modified:} 27/01/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item TestCovering\index{TestCovering@\texttt{TestCovering}}
+\end{itemize}
+
+\subsection{TestCovering}\index{TestCovering@\texttt{TestCovering}|textbf}
+\textbf{Description:} test if an island is covered by a larger one\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CompareWordIndexes\index{CompareWordIndexes@\texttt{CompareWordIndexes}}
+\end{itemize}
+
+\subsection{GetParseFromTCsorTTs}\index{GetParseFromTCsorTTs@\texttt{GetParseFromTCsorTTs}|textbf}
+\textbf{Description:} get the parse from a term candidate or testified term\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a set of arrays of sub-indexes
+\item reference to the current MNP
+\item reference to the hash table of access to TCs
+\item reference to the hash table of access to TTs
+\item reference to the hash table of object counters
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item BuildSequenceInfoForLexiconItem\index{BuildSequenceInfoForLexiconItem@\texttt{BuildSequenceInfoForLexiconItem}}
+\item IsValidIsland\index{IsValidIsland@\texttt{IsValidIsland}}
+\item CreateIsland\index{CreateIsland@\texttt{CreateIsland}}
+\end{itemize}
+
+\subsection{CreateIsland}\index{CreateIsland@\texttt{CreateIsland}|textbf}
+\textbf{Description:} create and record an island\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of lexical information
+\item reference to an array of word indexes
+\item reference to a source record to be duplicated
+\item type of the source structure
+\item type of the matching applied (IF, LF)
+\item reference to the record of a structure (MNP, island, insert, etc)
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\item reference to the hash table of object counters
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item GetForest\index{GetForest@\texttt{GetForest}}
+\item AssignWordIndexesToTrees\index{AssignWordIndexesToTrees@\texttt{AssignWordIndexesToTrees}}
+\item TransferSequenceInfo\index{TransferSequenceInfo@\texttt{TransferSequenceInfo}}
+\item SetUnbrokenInfo\index{SetUnbrokenInfo@\texttt{SetUnbrokenInfo}}
+\end{itemize}
+
+\subsection{SetUnbrokenInfo}\index{SetUnbrokenInfo@\texttt{SetUnbrokenInfo}|textbf}
+\textbf{Description:} set the "IS\_UNBROKEN" field to 1 or 0\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a structure (MNP, island, insert, etc)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item IsUnbroken\index{IsUnbroken@\texttt{IsUnbroken}}
+\end{itemize}
+
+\subsection{PrintInfoIsland}\index{PrintInfoIsland@\texttt{PrintInfoIsland}|textbf}
+\textbf{Description:} print information on an island (if option -debug activated)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a source record to be duplicated
+\item reference to a record of lexical information
+\item reference to an array of word indexes
+\item type of the source structure
+\item type of the matching applied (IF, LF)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{IsValidIsland}\index{IsValidIsland@\texttt{IsValidIsland}|textbf}
+\textbf{Description:} an island is valid if a parse can be found for its source (TT, TC or pattern)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of lexical information
+\item reference to an array of word indexes
+\item reference to one of the two hash table of access to TCs or TTs
+\item type of the source structure
+\item type of acces to the hash table
+\item reference to the hash table of parsing patterns
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetSourceStructure\index{GetSourceStructure@\texttt{GetSourceStructure}}
+\item GetBracketedParse\index{GetBracketedParse@\texttt{GetBracketedParse}}
+\item GetParseFromPatterns\index{GetParseFromPatterns@\texttt{GetParseFromPatterns}}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{Indexes}\index{Indexes@\texttt{Indexes}|textbf}
+\textbf{Description:} get the reference of array of word indexes for a structure\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a structure (MNP, island, insert, etc)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to the array of word indexes of the structure
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetSourceStructure}\index{GetSourceStructure@\texttt{GetSourceStructure}|textbf}
+\textbf{Description:} get the reference of the source for an island\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to one of the two hash table of access to TCs or TTs
+\item type of acces to the hash table
+\item reference to a record of lexical information
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to a source record to be duplicated
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item ChooseBestIndogenousIsland\index{ChooseBestIndogenousIsland@\texttt{ChooseBestIndogenousIsland}}
+\end{itemize}
+
+\subsection{ChooseBestIndogenousIsland}\index{ChooseBestIndogenousIsland@\texttt{ChooseBestIndogenousIsland}|textbf}
+\textbf{Description:} choose the best source if several were found for an island\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of source structures to be duplicated
+\item type of acces to the hash table
+\item reference to a record of lexical information
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SortIndogenousIslands\index{SortIndogenousIslands@\texttt{SortIndogenousIslands}}
+\end{itemize}
+
+\subsection{SortIndogenousIslands}\index{SortIndogenousIslands@\texttt{SortIndogenousIslands}|textbf}
+\textbf{Description:} sort islands so that the one that is lexically (e.g. POS sequence) the closest to the structure\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a first structure
+\item reference to the record of a second structure
+\item reference to a record of lexical information
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SearchIslands}\index{SearchIslands@\texttt{SearchIslands}|textbf}
+\textbf{Description:} search islands for an MNP\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to the hash table of access to TCs
+\item reference to the hash table of access to TTs
+\item reference to the hash table of object counters
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\item reference to the hash table of chunking data
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SearchSubStringSet\index{SearchSubStringSet@\texttt{SearchSubStringSet}}
+\item GetParseFromTCsorTTs\index{GetParseFromTCsorTTs@\texttt{GetParseFromTCsorTTs}}
+\end{itemize}
+
+\subsection{SearchSubStringSet}\index{SearchSubStringSet@\texttt{SearchSubStringSet}|textbf}
+\textbf{Description:} compute the list of substrings (broken or not) for an MNP\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word indexes
+\item reference to the current MNP
+\item reference to the hash table of chunking data
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SearchSubString\index{SearchSubString@\texttt{SearchSubString}}
+\end{itemize}
+
+\subsection{SearchSubString}\index{SearchSubString@\texttt{SearchSubString}|textbf}
+\textbf{Description:} compute the list of substrings that contain a given word of a MNP\\
+\\\textbf{Last modified:} 12/08/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item index
+\item reference to an array of word indexes
+\item reference to the current MNP
+\item size of the array of indexes
+\item reference to the hash table of chunking data
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\item boolean: (-1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item TestSyntacticBreakAndRepeat\index{TestSyntacticBreakAndRepeat@\texttt{TestSyntacticBreakAndRepeat}}
+\end{itemize}
+
+\subsection{TestSyntacticBreakAndRepeat}\index{TestSyntacticBreakAndRepeat@\texttt{TestSyntacticBreakAndRepeat}|textbf}
+\textbf{Description:} test if a substring do not contain a syntactic break or contains twice the same word\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to an array of word indexes
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item FindWordInTagsHash\index{FindWordInTagsHash@\texttt{FindWordInTagsHash}}
+\end{itemize}
+
+\subsection{FindWordInTagsHash}\index{FindWordInTagsHash@\texttt{FindWordInTagsHash}|textbf}
+\textbf{Description:} search for a tag in a hash table of tags\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of word of a MNP
+\item reference to the hash table of tag types
+\item type of repository of islands to explore
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item a pos tag
+\item boolean: (-1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintHashOfIslands}\index{PrintHashOfIslands@\texttt{PrintHashOfIslands}|textbf}
+\textbf{Description:} print a set of islands recorded in a hash table (if option -debug activated)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of islands
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{PrintArrayOfIslands}\index{PrintArrayOfIslands@\texttt{PrintArrayOfIslands}|textbf}
+\textbf{Description:} print a set of islands recorded in an array (if option -debug activated)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of islands
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{PrintAccessByOcc}\index{PrintAccessByOcc@\texttt{PrintAccessByOcc}|textbf}
+\textbf{Description:} print the occurrences of term candidates\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of access to TCs by their occurrences
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintCorpusForLGPWithTTs}\index{PrintCorpusForLGPWithTTs@\texttt{PrintCorpusForLGPWithTTs}|textbf}
+\textbf{Description:} display the annotation of the corpus with testified terms in a XML format compatible with the "biolg" version of the Link Grammar Parser\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the array of lines from the corpus
+\item reference to the hash table of testified terms
+\item reference to the hash table of file names
+\item reference to the hash table of linguistic options
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item LoadLGPMappingFile\index{LoadLGPMappingFile@\texttt{LoadLGPMappingFile}}
+\item CheckCorpusLastElement\index{CheckCorpusLastElement@\texttt{CheckCorpusLastElement}}
+\item Forest\index{Forest@\texttt{Forest}}
+\item POSforOccurrence\index{POSforOccurrence@\texttt{POSforOccurrence}}
+\item MarkBestTestified\index{MarkBestTestified@\texttt{MarkBestTestified}}
+\item CleanFromSpaces\index{CleanFromSpaces@\texttt{CleanFromSpaces}}
+\item LENGTHforOccurrence\index{LENGTHforOccurrence@\texttt{LENGTHforOccurrence}}
+\end{itemize}
+
+\subsection{MarkBestTestified}\index{MarkBestTestified@\texttt{MarkBestTestified}|textbf}
+\textbf{Description:} mark testified terms in a xml version of the corpus\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a hash table of testified terms frontiers
+\item reference to an array of words in XML format
+\item reference to the hash table of testified terms
+\item counter of sentences
+\item reference to the hash table of mapping rules to LGP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item ChooseBestTestified\index{ChooseBestTestified@\texttt{ChooseBestTestified}}
+\item GetHeadPOSFromFirstStructureTree\index{GetHeadPOSFromFirstStructureTree@\texttt{GetHeadPOSFromFirstStructureTree}}
+\item GetInternalParse\index{GetInternalParse@\texttt{GetInternalParse}}
+\item GetHeadIndexFromFirstStructureTree\index{GetHeadIndexFromFirstStructureTree@\texttt{GetHeadIndexFromFirstStructureTree}}
+\item GetHeadIFFromFirstStructureTree\index{GetHeadIFFromFirstStructureTree@\texttt{GetHeadIFFromFirstStructureTree}}
+\end{itemize}
+
+\subsection{GetHeadIndexFromFirstStructureTree}\index{GetHeadIndexFromFirstStructureTree@\texttt{GetHeadIndexFromFirstStructureTree}|textbf}
+\textbf{Description:} get the index of the head word of the first tree for a structure\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a structure (MNP, island, insert, etc)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item index of the head word
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetHeadPOSFromFirstStructureTree}\index{GetHeadPOSFromFirstStructureTree@\texttt{GetHeadPOSFromFirstStructureTree}|textbf}
+\textbf{Description:} get the POS information of the head word of the first tree for a structure\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a structure (MNP, island, insert, etc)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item POS tag of the head word of a tree
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetHeadIFFromFirstStructureTree}\index{GetHeadIFFromFirstStructureTree@\texttt{GetHeadIFFromFirstStructureTree}|textbf}
+\textbf{Description:} get the IF information of the head word of the first tree for a structure\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a structure (MNP, island, insert, etc)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item inflected form of the head word of a tree
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{ChooseBestTestified}\index{ChooseBestTestified@\texttt{ChooseBestTestified}|textbf}
+\textbf{Description:} select the best testified term to annotate if several are found for a common (sub-)sequence of a sentence\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a hash table of testified terms frontiers
+\item reference to the hash table of testified terms
+\item counter of sentences
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to hash table
+\item reference to hash table
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintCorpusForLGPWithParsedTCs}\index{PrintCorpusForLGPWithParsedTCs@\texttt{PrintCorpusForLGPWithParsedTCs}|textbf}
+\textbf{Description:} display the annotation of the corpus with term candidates in a XML format compatible with the "biolg" version of the Link Grammar Parser\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the array of lines from the corpus
+\item reference to the hash table of access to TCs by their occurrences
+\item reference to the hash table of linguistic options
+\item reference to the hash table of miscellaneous options
+\item reference to the hash table of file names
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item LoadLGPMappingFile\index{LoadLGPMappingFile@\texttt{LoadLGPMappingFile}}
+\item CheckCorpusLastElement\index{CheckCorpusLastElement@\texttt{CheckCorpusLastElement}}
+\item POSforOccurrence\index{POSforOccurrence@\texttt{POSforOccurrence}}
+\item GetHeadIndexFromFirstStructureTree\index{GetHeadIndexFromFirstStructureTree@\texttt{GetHeadIndexFromFirstStructureTree}}
+\item GetHeadPOSFromFirstStructureTree\index{GetHeadPOSFromFirstStructureTree@\texttt{GetHeadPOSFromFirstStructureTree}}
+\item GetHeadIFFromFirstStructureTree\index{GetHeadIFFromFirstStructureTree@\texttt{GetHeadIFFromFirstStructureTree}}
+\item GetInternalParse\index{GetInternalParse@\texttt{GetInternalParse}}
+\item CleanFromSpaces\index{CleanFromSpaces@\texttt{CleanFromSpaces}}
+\item LENGTHforOccurrence\index{LENGTHforOccurrence@\texttt{LENGTHforOccurrence}}
+\end{itemize}
+
+\subsection{LoadLGPMappingFile}\index{LoadLGPMappingFile@\texttt{LoadLGPMappingFile}|textbf}
+\textbf{Description:} load the DATA file that countains the information to map decomposition trees to LGP links\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item name of a file
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetInternalParse}\index{GetInternalParse@\texttt{GetInternalParse}|textbf}
+\textbf{Description:} get the first parse of a TC or TT in a LGP link format\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a structure (MNP, island, insert, etc)
+\item reference to the hash table of mapping rules to LGP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item LGP linkage for a tree
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item GetLinks\index{GetLinks@\texttt{GetLinks}}
+\end{itemize}
+
+\subsection{GetLinks}\index{GetLinks@\texttt{GetLinks}|textbf}
+\textbf{Description:} build LGP links from the parse tree of the structure\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of nodes
+\item reference to the record of a structure (MNP, island, insert, etc)
+\item reference to an array of LGP links
+\item reference to the hash table of mapping rules to LGP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetLeftElement\index{GetLeftElement@\texttt{GetLeftElement}}
+\item GetPreposition\index{GetPreposition@\texttt{GetPreposition}}
+\item GetDeterminer\index{GetDeterminer@\texttt{GetDeterminer}}
+\item GetRightElement\index{GetRightElement@\texttt{GetRightElement}}
+\item RecordLink\index{RecordLink@\texttt{RecordLink}}
+\item AdjustLinksHeight\index{AdjustLinksHeight@\texttt{AdjustLinksHeight}}
+\item SortLinks\index{SortLinks@\texttt{SortLinks}}
+\end{itemize}
+
+\subsection{SortLinks}\index{SortLinks@\texttt{SortLinks}|textbf}
+\textbf{Description:} sort LGP links using word indexes\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item a first link
+\item a second link
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item sorting result (-1,0,1)
+\item sorting result (-1,0,1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{AdjustLinksHeight}\index{AdjustLinksHeight@\texttt{AdjustLinksHeight}|textbf}
+\textbf{Description:} compute the height of links (3d number in a link)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of LGP links
+\item reference to a hash table of links recorded by the first element
+\item reference to a hash table of links recorded by the second element
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{RecordLink}\index{RecordLink@\texttt{RecordLink}|textbf}
+\textbf{Description:} record a LGP link\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item hash key for mapping rules
+\item a first element
+\item a second element
+\item reference to an array of LGP links
+\item reference to the hash table of mapping rules to LGP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetLexPOS}\index{GetLexPOS@\texttt{GetLexPOS}|textbf}
+\textbf{Description:} get POS information for a lexical item\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of words of a structure
+\item index of a word
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item a pos tag
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetLeftElement}\index{GetLeftElement@\texttt{GetLeftElement}|textbf}
+\textbf{Description:} get the index of the head word of the left edge of a node\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item index of the first head of tree (several possible if coordination)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SearchHead\index{SearchHead@\texttt{SearchHead}}
+\end{itemize}
+
+\subsection{GetPreposition}\index{GetPreposition@\texttt{GetPreposition}|textbf}
+\textbf{Description:} get the index of the preposition of a node (-1 if none)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item index of the preposition in a node
+\item boolean: (-1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetDeterminer}\index{GetDeterminer@\texttt{GetDeterminer}|textbf}
+\textbf{Description:} get the index of the determiner of a node (-1 if none)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item index of the determiner in a node
+\item boolean: (-1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetRightElement}\index{GetRightElement@\texttt{GetRightElement}|textbf}
+\textbf{Description:} get the index of the head word of the right edge of a node\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item index of the first head of tree (several possible if coordination)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SearchHead\index{SearchHead@\texttt{SearchHead}}
+\end{itemize}
+
+\subsection{CleanFromSpaces}\index{CleanFromSpaces@\texttt{CleanFromSpaces}|textbf}
+\textbf{Description:} delete spaces around term XML markers\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a sentence
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{CheckCorpusLastElement}\index{CheckCorpusLastElement@\texttt{CheckCorpusLastElement}|textbf}
+\textbf{Description:} add a sentence boundary at the en of the corpus if none exists\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the array of lines from the corpus
+\item reference to the hash table of linguistic options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item POSforOccurrence\index{POSforOccurrence@\texttt{POSforOccurrence}}
+\end{itemize}
+
+\subsection{LFforOccurrence}\index{LFforOccurrence@\texttt{LFforOccurrence}|textbf}
+\textbf{Description:} get the lemmatized form of a word occurrence\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of an occurrence of a word of the corpus
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item lemmatized form of an object (string)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{LENGTHforOccurrence}\index{LENGTHforOccurrence@\texttt{LENGTHforOccurrence}|textbf}
+\textbf{Description:} get the length of a word occurrence\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of an occurrence of a word of the corpus
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item length of an oject (characters)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{POSforOccurrence}\index{POSforOccurrence@\texttt{POSforOccurrence}|textbf}
+\textbf{Description:} get the POS tag of a word occurrence\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of an occurrence of a word of the corpus
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item POS sequence of an object
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{IFforOccurrence}\index{IFforOccurrence@\texttt{IFforOccurrence}|textbf}
+\textbf{Description:} get the inflected form of a word occurrence\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of an occurrence of a word of the corpus
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item inflected form of an object (string)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{Chunking}\index{Chunking@\texttt{Chunking}|textbf}
+\textbf{Description:} chunk corpus into Maximal Noun Phrases (MNPs)\\
+use testified terms if any available\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the hash table of file names
+\item reference to the array of lines from the corpus
+\item reference to the hash table of Maximal Noun Phrases
+\item reference to the hash table of access to TCs
+\item reference to the hash table of access to TCs by their occurrences
+\item reference to the hash table of chunking data
+\item reference to the hash table of testified terms
+\item reference to the hash table of access to TTs
+\item reference to the hash table of lexicon for the corpus
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of parsing methods
+\item reference to the hash table of object counters
+\item reference to the hash table of linguistic options
+\item reference to the hash table of miscellaneous options
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item TestEndMNP\index{TestEndMNP@\texttt{TestEndMNP}}
+\item EndOfMNP\index{EndOfMNP@\texttt{EndOfMNP}}
+\item RecordMNP\index{RecordMNP@\texttt{RecordMNP}}
+\end{itemize}
+
+\subsection{RecordMNP}\index{RecordMNP@\texttt{RecordMNP}|textbf}
+\textbf{Description:} record a MNP occurrence\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word occurrences
+\item correction report
+\item reference to an array of word occurrences before their correction
+\item reference to a record of islands
+\item reference to the hash table of Maximal Noun Phrases
+\item reference to the hash table of testified terms
+\item reference to the hash table of access to TTs
+\item reference to the hash table of access to TCs
+\item reference to the hash table of access to TCs by their occurrences
+\item reference to the hash table of lexicon for the corpus
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of parsing methods
+\item reference to the hash table of object counters
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item DeleteFrontiers\index{DeleteFrontiers@\texttt{DeleteFrontiers}}
+\item BuildWordIndexesFromElements\index{BuildWordIndexesFromElements@\texttt{BuildWordIndexesFromElements}}
+\item BuildSequenceInfoForOccurrence\index{BuildSequenceInfoForOccurrence@\texttt{BuildSequenceInfoForOccurrence}}
+\item CreateMNP\index{CreateMNP@\texttt{CreateMNP}}
+\item ChooseParsingMethod\index{ChooseParsingMethod@\texttt{ChooseParsingMethod}}
+\item AddMNPOccurrence\index{AddMNPOccurrence@\texttt{AddMNPOccurrence}}
+\end{itemize}
+
+\subsection{AddMNPOccurrence}\index{AddMNPOccurrence@\texttt{AddMNPOccurrence}|textbf}
+\textbf{Description:} add information on an occurrence of a MNP to its structure\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to an array of word occurrences
+\item correction report
+\item reference to an array of word occurrences before their correction
+\item reference to the hash table of object counters
+\item reference to the hash table of access to TCs by their occurrences
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GiveAccessByOccurrences\index{GiveAccessByOccurrences@\texttt{GiveAccessByOccurrences}}
+\end{itemize}
+
+\subsection{GiveAccessByOccurrences}\index{GiveAccessByOccurrences@\texttt{GiveAccessByOccurrences}|textbf}
+\textbf{Description:} record an occurrence of an MNP in a hash table occording to its document and sentence ID\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of an occurrence of a word of the corpus
+\item reference to the current MNP
+\item reference to the hash table of access to TCs by their occurrences
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{ChooseParsingMethod}\index{ChooseParsingMethod@\texttt{ChooseParsingMethod}|textbf}
+\textbf{Description:} try to apply parsing methods in a decreasing reliability order\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to the hash table of access to TCs
+\item reference to the hash table of access to TTs
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of parsing methods
+\item reference to the hash table of object counters
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item MakeTC\index{MakeTC@\texttt{MakeTC}}
+\item IsTTCovered\index{IsTTCovered@\texttt{IsTTCovered}}
+\item ReduceMNPbyIslands\index{ReduceMNPbyIslands@\texttt{ReduceMNPbyIslands}}
+\item IsPatternCovered\index{IsPatternCovered@\texttt{IsPatternCovered}}
+\end{itemize}
+
+\subsection{IsPatternCovered}\index{IsPatternCovered@\texttt{IsPatternCovered}|textbf}
+\textbf{Description:} parsing method: the MNP (can be simplified using islands) is covered by a parsing pattern\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to the hash table of parsing methods
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetParseForSimplifiedMNP\index{GetParseForSimplifiedMNP@\texttt{GetParseForSimplifiedMNP}}
+\item GetParseFromPatterns\index{GetParseFromPatterns@\texttt{GetParseFromPatterns}}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{GetParseForSimplifiedMNP}\index{GetParseForSimplifiedMNP@\texttt{GetParseForSimplifiedMNP}|textbf}
+\textbf{Description:} parse a simplified MNP using parsing patterns\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item BuildSequenceInfoForLexiconItem\index{BuildSequenceInfoForLexiconItem@\texttt{BuildSequenceInfoForLexiconItem}}
+\item SelectTreesFromPattern\index{SelectTreesFromPattern@\texttt{SelectTreesFromPattern}}
+\item CopyTree\index{CopyTree@\texttt{CopyTree}}
+\item Indexes\index{Indexes@\texttt{Indexes}}
+\item CompleteTree\index{CompleteTree@\texttt{CompleteTree}}
+\item SearchHead\index{SearchHead@\texttt{SearchHead}}
+\item HitchTrees\index{HitchTrees@\texttt{HitchTrees}}
+\item GetIndexesFromTree\index{GetIndexesFromTree@\texttt{GetIndexesFromTree}}
+\end{itemize}
+
+\subsection{ReduceMNPbyIslands}\index{ReduceMNPbyIslands@\texttt{ReduceMNPbyIslands}|textbf}
+\textbf{Description:} simplify an MNP using islands corresponding to testified terms\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item GetParsedIslands\index{GetParsedIslands@\texttt{GetParsedIslands}}
+\item UpdateIslandArray\index{UpdateIslandArray@\texttt{UpdateIslandArray}}
+\item GetUnbrokenIslands\index{GetUnbrokenIslands@\texttt{GetUnbrokenIslands}}
+\item SimplifyByIsland\index{SimplifyByIsland@\texttt{SimplifyByIsland}}
+\item UniqSubForest\index{UniqSubForest@\texttt{UniqSubForest}}
+\end{itemize}
+
+\subsection{GetUnbrokenIslands}\index{GetUnbrokenIslands@\texttt{GetUnbrokenIslands}|textbf}
+\textbf{Description:} select unbroken islands\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of islands
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{UniqForest}\index{UniqForest@\texttt{UniqForest}|textbf}
+\textbf{Description:} delete redundant trees in a forest record\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of trees
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item TestNewAnalysis\index{TestNewAnalysis@\texttt{TestNewAnalysis}}
+\end{itemize}
+
+\subsection{UniqSubForest}\index{UniqSubForest@\texttt{UniqSubForest}|textbf}
+\textbf{Description:} delete redundant sub-trees in a forest record\\
+\\\textbf{Last modified:} 18/01/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of trees
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item TestNewSubAnalyses\index{TestNewSubAnalyses@\texttt{TestNewSubAnalyses}}
+\end{itemize}
+
+\subsection{TestNewSubAnalyses}\index{TestNewSubAnalyses@\texttt{TestNewSubAnalyses}|textbf}
+\textbf{Description:} test if a sub-tree is different from recorded sub-trees\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (0)
+\item existence report for an object
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item EqualWordIndexes\index{EqualWordIndexes@\texttt{EqualWordIndexes}}
+\item CompareSubTrees\index{CompareSubTrees@\texttt{CompareSubTrees}}
+\end{itemize}
+
+\subsection{CompareSubTrees}\index{CompareSubTrees@\texttt{CompareSubTrees}|textbf}
+\textbf{Description:} test if two sub-trees are different\\
+\\\textbf{Last modified:} 18/01/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a hash table of new sub trees
+\item reference to a hash table of recorded sub trees
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1)
+\item existence report for a complex object
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CompareAnalyses\index{CompareAnalyses@\texttt{CompareAnalyses}}
+\end{itemize}
+
+\subsection{TestNewAnalysis}\index{TestNewAnalysis@\texttt{TestNewAnalysis}|textbf}
+\textbf{Description:} test if a tree is different from recorded trees\\
+\\\textbf{Last modified:} 24/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (0)
+\item existence report for an object
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CompareAnalyses\index{CompareAnalyses@\texttt{CompareAnalyses}}
+\end{itemize}
+
+\subsection{SearchCompleteTrees}\index{SearchCompleteTrees@\texttt{SearchCompleteTrees}|textbf}
+\textbf{Description:} select complete parses for the MNP\\
+compare word indexes of trees found with word indexes of the MNP\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of trees
+\item reference to the current MNP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item EqualWordIndexes\index{EqualWordIndexes@\texttt{EqualWordIndexes}}
+\end{itemize}
+
+\subsection{EqualWordIndexes}\index{EqualWordIndexes@\texttt{EqualWordIndexes}|textbf}
+\textbf{Description:} test if two structure have the same word indexes\\
+\\\textbf{Last modified:} 28/02/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a first array of indexes
+\item reference to a second array of indexes
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{CompareAnalyses}\index{CompareAnalyses@\texttt{CompareAnalyses}|textbf}
+\textbf{Description:} test if two array of nodes are equal\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a first array of nodes
+\item reference to a second array of nodes
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{ContainsSubSequence}\index{ContainsSubSequence@\texttt{ContainsSubSequence}|textbf}
+\textbf{Description:} test if a sequence of indexes is contained in another one\\
+\\\textbf{Last modified:} 04/04/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word indexes
+\item reference to an array of subset of indexes
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0, -1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SimplifyByIsland}\index{SimplifyByIsland@\texttt{SimplifyByIsland}|textbf}
+\textbf{Description:} simplify a structure sequence using an island (plus other islands if available)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an island of reliability
+\item reference to an array of trees
+\item reference to the record of a structure (MNP, island, insert, etc)
+\item reference to the current MNP
+\item number of islands of reliability
+\item reference to an array of islands
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item CopyTree\index{CopyTree@\texttt{CopyTree}}
+\item SimplifyWordIndexes\index{SimplifyWordIndexes@\texttt{SimplifyWordIndexes}}
+\item AddOtherIslands\index{AddOtherIslands@\texttt{AddOtherIslands}}
+\end{itemize}
+
+\subsection{AddOtherIslands}\index{AddOtherIslands@\texttt{AddOtherIslands}|textbf}
+\textbf{Description:} continue the simplification using other islands\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\item reference to the record of a structure (MNP, island, insert, etc)
+\item reference to the current MNP
+\item reference to an array of trees
+\item reference to an array of islands
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item ContainsSubSequence\index{ContainsSubSequence@\texttt{ContainsSubSequence}}
+\item Forest\index{Forest@\texttt{Forest}}
+\item CopyTree\index{CopyTree@\texttt{CopyTree}}
+\item GetIndexesFromTree\index{GetIndexesFromTree@\texttt{GetIndexesFromTree}}
+\item SimplifyWordIndexes\index{SimplifyWordIndexes@\texttt{SimplifyWordIndexes}}
+\end{itemize}
+
+\subsection{CombineIslands}\index{CombineIslands@\texttt{CombineIslands}|textbf}
+\textbf{Description:} combine several islands\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item MNP completion report
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetParsedIslands\index{GetParsedIslands@\texttt{GetParsedIslands}}
+\item UpdateIslandArray\index{UpdateIslandArray@\texttt{UpdateIslandArray}}
+\item BuildHeadHashTable\index{BuildHeadHashTable@\texttt{BuildHeadHashTable}}
+\item HitchIslands\index{HitchIslands@\texttt{HitchIslands}}
+\end{itemize}
+
+\subsection{HitchIslands}\index{HitchIslands@\texttt{HitchIslands}|textbf}
+\textbf{Description:} hitch island trees to create a larger one\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to an array of islands
+\item reference to a hash table of heads of a tree
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item TryToHitch\index{TryToHitch@\texttt{TryToHitch}}
+\end{itemize}
+
+\subsection{TryToHitch}\index{TryToHitch@\texttt{TryToHitch}|textbf}
+\textbf{Description:} try to hitch an island tree to other island trees\\
+\\\textbf{Last modified:} 28/04/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a first tree
+\item reference to the current MNP
+\item reference to a MNP completion report
+\item reference to a hash table of heads of a tree
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item TestInsertion\index{TestInsertion@\texttt{TestInsertion}}
+\item CopyTree\index{CopyTree@\texttt{CopyTree}}
+\item HitchTrees\index{HitchTrees@\texttt{HitchTrees}}
+\item GetIndexesFromTree\index{GetIndexesFromTree@\texttt{GetIndexesFromTree}}
+\item RecordTree\index{RecordTree@\texttt{RecordTree}}
+\item TryToHitch\index{TryToHitch@\texttt{TryToHitch}}
+\end{itemize}
+
+\subsection{RecordTree}\index{RecordTree@\texttt{RecordTree}|textbf}
+\textbf{Description:} record a new tree either in the TC forest or as an island\\
+if it is the first tree for an island, the island is created\\
+\\\textbf{Last modified:} 02/02/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item EqualWordIndexes\index{EqualWordIndexes@\texttt{EqualWordIndexes}}
+\item TestNewAnalysis\index{TestNewAnalysis@\texttt{TestNewAnalysis}}
+\item Forest\index{Forest@\texttt{Forest}}
+\item BuildSequenceInfoForLexiconItem\index{BuildSequenceInfoForLexiconItem@\texttt{BuildSequenceInfoForLexiconItem}}
+\end{itemize}
+
+\subsection{TestInsertion}\index{TestInsertion@\texttt{TestInsertion}|textbf}
+\textbf{Description:} test if two trees can be combined\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a first tree
+\item reference to a second tree
+\item rank of the pivot element
+\item reference to the current MNP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0, 2)
+\item index of a pivot word
+\item index of a pivot word
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintParenthesizedAnalysis}\index{PrintParenthesizedAnalysis@\texttt{PrintParenthesizedAnalysis}|textbf}
+\textbf{Description:} print the bracketed parse for a tree (if -debug option is activated)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item BuildParenthesizedAnalysis\index{BuildParenthesizedAnalysis@\texttt{BuildParenthesizedAnalysis}}
+\end{itemize}
+
+\subsection{HitchNodes}\index{HitchNodes@\texttt{HitchNodes}|textbf}
+\textbf{Description:} combine two nodes from two trees\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\item reference to an array of nodes to add to a tree
+\item reference to a pivot node
+\item place of the pivot element in the node
+\item reference to the current MNP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item AdjustLevels\index{AdjustLevels@\texttt{AdjustLevels}}
+\item SortNodesByLevel\index{SortNodesByLevel@\texttt{SortNodesByLevel}}
+\end{itemize}
+
+\subsection{GetIndexesFromTree}\index{GetIndexesFromTree@\texttt{GetIndexesFromTree}|textbf}
+\textbf{Description:} get the set of indexes by visiting a tree\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of nodes
+\item reference to the current MNP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GoThroughNode\index{GoThroughNode@\texttt{GoThroughNode}}
+\end{itemize}
+
+\subsection{GoThroughNode}\index{GoThroughNode@\texttt{GoThroughNode}|textbf}
+\textbf{Description:} visit a node to collect word indexes\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item reference to an array of word indexes
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Integer\index{Integer@\texttt{Integer}}
+\item GoThroughNode\index{GoThroughNode@\texttt{GoThroughNode}}
+\end{itemize}
+
+\subsection{Integer}\index{Integer@\texttt{Integer}|textbf}
+\textbf{Description:} test if an object is an integer\\
+\\\textbf{Last modified:} 18/08/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item an object (string)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{AdjustLevels}\index{AdjustLevels@\texttt{AdjustLevels}|textbf}
+\textbf{Description:} adjust the levels of a tree starting by the root node\\
+\\\textbf{Last modified:} 17/11/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item AdjustLevels\index{AdjustLevels@\texttt{AdjustLevels}}
+\end{itemize}
+
+\subsection{SearchLeaf}\index{SearchLeaf@\texttt{SearchLeaf}|textbf}
+\textbf{Description:} get the position of a word in a tree according to its index\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item index of a word
+\item reference to an array of nodes
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item reference to the record of node
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SimplifyWordIndexes}\index{SimplifyWordIndexes@\texttt{SimplifyWordIndexes}|textbf}
+\textbf{Description:} simplify the array of word indexes by the indexe of the head of the islands\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word indexes
+\item reference to an array of subset of indexes
+\item reference to a hash table of heads of a tree
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{UpdateIslandArray}\index{UpdateIslandArray@\texttt{UpdateIslandArray}|textbf}
+\textbf{Description:} delete islands included in larger ones in an array of islands\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of islands
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CompareWordIndexes\index{CompareWordIndexes@\texttt{CompareWordIndexes}}
+\end{itemize}
+
+\subsection{CompareWordIndexes}\index{CompareWordIndexes@\texttt{CompareWordIndexes}|textbf}
+\textbf{Description:} compare two sets of word indexes\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a first island of reliability
+\item reference to a second island of reliability
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetParsedIslands}\index{GetParsedIslands@\texttt{GetParsedIslands}|textbf}
+\textbf{Description:} select islands that have at least one parse (i.e. a forest)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of islands
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{IsTTCovered}\index{IsTTCovered@\texttt{IsTTCovered}|textbf}
+\textbf{Description:} parsing method: the MNP is covered by an island (or the combination of several) from testified terms\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to the hash table of parsing methods
+\item reference to the hash table of object counters
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item CopyForest\index{CopyForest@\texttt{CopyForest}}
+\item HashTableSize\index{HashTableSize@\texttt{HashTableSize}}
+\item CombineIslands\index{CombineIslands@\texttt{CombineIslands}}
+\end{itemize}
+
+\subsection{BuildHeadHashTable}\index{BuildHeadHashTable@\texttt{BuildHeadHashTable}|textbf}
+\textbf{Description:} build a hash table of islands recorded accodring to their syntactic head\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of islands
+\item reference to the current MNP
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{MakeTC}\index{MakeTC@\texttt{MakeTC}|textbf}
+\textbf{Description:} transform a MNP into a term candidate (TC) and allow access to it\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item method used to parse a MNP
+\item reference to the hash table of parsing methods
+\item reference to the hash table of object counters
+\item reference to the hash table of access to TCs
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CleanUncompleteParse\index{CleanUncompleteParse@\texttt{CleanUncompleteParse}}
+\end{itemize}
+
+\subsection{CleanUncompleteParse}\index{CleanUncompleteParse@\texttt{CleanUncompleteParse}|textbf}
+\textbf{Description:} delete uncomplete parses (trees) from the forest record\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{JoinIndexes}\index{JoinIndexes@\texttt{JoinIndexes}|textbf}
+\textbf{Description:} join the indexes of a structure with dashes (-)\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word indexes
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item indexes concatenated with dashes
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{CreateMNP}\index{CreateMNP@\texttt{CreateMNP}|textbf}
+\textbf{Description:} Create a MNP record\\
+\\\textbf{Last modified:} 02/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of lexical information
+\item reference to an array of word occurrences
+\item reference to the hash table of object counters
+\item reference to an array of word indexes
+\item reference to a record of islands
+\item reference to the hash table of testified terms
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to a MNP record
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item HashTableSize\index{HashTableSize@\texttt{HashTableSize}}
+\item RecordIsland\index{RecordIsland@\texttt{RecordIsland}}
+\end{itemize}
+
+\subsection{RecordIsland}\index{RecordIsland@\texttt{RecordIsland}|textbf}
+\textbf{Description:} Record an island for a MNP\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an island of reliability
+\item reference to the current MNP
+\item type of the source structure
+\item reference to the hash table of testified terms
+\item reference to the hash table of object counters
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item BuildWordIndexesFromInterval\index{BuildWordIndexesFromInterval@\texttt{BuildWordIndexesFromInterval}}
+\item GetBracketedParse\index{GetBracketedParse@\texttt{GetBracketedParse}}
+\item GetParseFromPatterns\index{GetParseFromPatterns@\texttt{GetParseFromPatterns}}
+\item GetForest\index{GetForest@\texttt{GetForest}}
+\item AssignWordIndexesToTrees\index{AssignWordIndexesToTrees@\texttt{AssignWordIndexesToTrees}}
+\end{itemize}
+
+\subsection{GetBracketedParse}\index{GetBracketedParse@\texttt{GetBracketedParse}|textbf}
+\textbf{Description:} get a tree from the bracketed parse of a TT\\
+\\\textbf{Last modified:} 23/11/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of testified term
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item LexParserTT\index{LexParserTT@\texttt{LexParserTT}}
+\item SearchHead\index{SearchHead@\texttt{SearchHead}}
+\end{itemize}
+
+\subsection{LexParserTT}\index{LexParserTT@\texttt{LexParserTT}|textbf}
+\textbf{Description:} lex parser for testified terms provided with their parse (bracketed format)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of testified term
+\item reference to a tree
+\item lex parser for testified terms
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CreateNode\index{CreateNode@\texttt{CreateNode}}
+\item SetNode\index{SetNode@\texttt{SetNode}}
+\item CompleteNode\index{CompleteNode@\texttt{CompleteNode}}
+\item SortNodesByLevel\index{SortNodesByLevel@\texttt{SortNodesByLevel}}
+\end{itemize}
+
+\subsection{GetForest}\index{GetForest@\texttt{GetForest}|textbf}
+\textbf{Description:} get a copy of the forest from a source record and record it as an island forest\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an island of reliability
+\item reference to a source record to be duplicated
+\item reference to the current MNP
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item CopyTree\index{CopyTree@\texttt{CopyTree}}
+\item CompleteTree\index{CompleteTree@\texttt{CompleteTree}}
+\item SearchHead\index{SearchHead@\texttt{SearchHead}}
+\end{itemize}
+
+\subsection{AssignWordIndexesToTrees}\index{AssignWordIndexesToTrees@\texttt{AssignWordIndexesToTrees}|textbf}
+\textbf{Description:} assign the word indexes of an island to its trees\\
+\\\textbf{Last modified:} 08/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an island of reliability
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{GetParseFromPatterns}\index{GetParseFromPatterns@\texttt{GetParseFromPatterns}|textbf}
+\textbf{Description:} Find parsing patterns from the POS sequence of a structure\\
+Copy parsing patterns and complete them with lexical data from the structure\\
+\\\textbf{Last modified:} 16/11/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a structure (MNP, island, insert, etc)
+\item type of the source structure
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SelectTreesFromPattern\index{SelectTreesFromPattern@\texttt{SelectTreesFromPattern}}
+\item BuildWordIndexesFromElements\index{BuildWordIndexesFromElements@\texttt{BuildWordIndexesFromElements}}
+\item CompleteTree\index{CompleteTree@\texttt{CompleteTree}}
+\item SearchHead\index{SearchHead@\texttt{SearchHead}}
+\end{itemize}
+
+\subsection{CompleteTree}\index{CompleteTree@\texttt{CompleteTree}|textbf}
+\textbf{Description:} complete the information for the nodes of a tree (recursive)\\
+\\\textbf{Last modified:} 16/11/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item reference to an array of word indexes
+\item process counter
+\item reference to the hash table of tag types
+\item size of the array of words of the structure
+\item reference to the current MNP
+\item reference to the node previously crossed
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CompleteTree\index{CompleteTree@\texttt{CompleteTree}}
+\end{itemize}
+
+\subsection{SearchHead}\index{SearchHead@\texttt{SearchHead}|textbf}
+\textbf{Description:} get the index of the head word of a node\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to record
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SearchHead\index{SearchHead@\texttt{SearchHead}}
+\end{itemize}
+
+\subsection{LeftEdgeElement}\index{LeftEdgeElement@\texttt{LeftEdgeElement}|textbf}
+\textbf{Description:} get the element of the left edge of a node (reference to another node or index of a word)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to the left element of a node
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{RightEdgeElement}\index{RightEdgeElement@\texttt{RightEdgeElement}|textbf}
+\textbf{Description:} get the element of the right edge of a node (reference to another node or index of a word)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to the right element of a node
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{LeftEdgeStatus}\index{LeftEdgeStatus@\texttt{LeftEdgeStatus}|textbf}
+\textbf{Description:} get the status (HEAD or MODIFIER) of the left edge of a node\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item status of the left edge of a node
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{RightEdgeStatus}\index{RightEdgeStatus@\texttt{RightEdgeStatus}|textbf}
+\textbf{Description:} get the status (HEAD or MODIFIER) of the right edge of a node\\
+\\\textbf{Last modified:} 16/09/2004
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item status of the right edge of a node
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SelectTreesFromPattern}\index{SelectTreesFromPattern@\texttt{SelectTreesFromPattern}|textbf}
+\textbf{Description:} select a set of parsing patterns using a pattern key (POS sequence)\\
+\\\textbf{Last modified:} 17/11/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item hash key for a pattern
+\item type of the source structure
+\item reference to an array of adequate patterns
+\item reference to the hash table of parsing patterns
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CopyTree\index{CopyTree@\texttt{CopyTree}}
+\end{itemize}
+
+\subsection{CopyTree}\index{CopyTree@\texttt{CopyTree}|textbf}
+\textbf{Description:} copy the content of a tree record\\
+\\\textbf{Last modified:} 26/08/2004
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a tree
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to a tree record for a MNP
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CopyNodes\index{CopyNodes@\texttt{CopyNodes}}
+\item GetRootNodeID\index{GetRootNodeID@\texttt{GetRootNodeID}}
+\item Indexes\index{Indexes@\texttt{Indexes}}
+\item CopyTree\index{CopyTree@\texttt{CopyTree}}
+\end{itemize}
+
+\subsection{CopyNodes}\index{CopyNodes@\texttt{CopyNodes}|textbf}
+\textbf{Description:} copy the content of an array of nodes\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of nodes to be duplicated
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{BuildWordIndexesFromInterval}\index{BuildWordIndexesFromInterval@\texttt{BuildWordIndexesFromInterval}|textbf}
+\textbf{Description:} get the word indexes of a structure from its start and end indexes\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item first index of the interval
+\item last index of the interval
+\item reference to an array of word indexes
+\item reference to the record of a structure (MNP, island, insert, etc)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{BuildSequenceInfoForOccurrence}\index{BuildSequenceInfoForOccurrence@\texttt{BuildSequenceInfoForOccurrence}|textbf}
+\textbf{Description:} build IF, POS, LF forms from an occurrence of a MNP\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of lexical information
+\item reference to an array of word indexes
+\item reference to an array of word occurrences
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{BuildWordIndexesFromElements}\index{BuildWordIndexesFromElements@\texttt{BuildWordIndexesFromElements}|textbf}
+\textbf{Description:} get the word indexes of a structure from its array of words\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of words of a structure
+\item reference to an array of words of a structure to be compared
+\item reference to an array of word indexes
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{EndOfMNP}\index{EndOfMNP@\texttt{EndOfMNP}|textbf}
+\textbf{Description:} post-process (apply TT, adjust frontiers, etc.) a MNP\\
+\\\textbf{Last modified:} 21/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word occurrences
+\item reference to the hash table of testified terms
+\item reference to the hash table of lexicon for the corpus
+\item reference to the hash table of object counters
+\item reference to the hash table of chunking data
+\item reference to the hash table of linguistic options
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item MNP validity report
+\item correction report
+\item reference to array
+\item reference to a record of islands
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item AddIslandsFromTTs\index{AddIslandsFromTTs@\texttt{AddIslandsFromTTs}}
+\item CleanAfterChunking\index{CleanAfterChunking@\texttt{CleanAfterChunking}}
+\end{itemize}
+
+\subsection{TestEndMNP}\index{TestEndMNP@\texttt{TestEndMNP}|textbf}
+\textbf{Description:} test if a word is a MNP frontier\\
+\\\textbf{Last modified:} 23/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of word of a MNP
+\item counter of TT frontiers
+\item counter of forbidden structures
+\item action to be applied to a forbidden structure (split, delete)
+\item counter of words for action split
+\item reference to the hash table of chunking data
+\item reference to the hash table of linguistic options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintMNPwords}\index{PrintMNPwords@\texttt{PrintMNPwords}|textbf}
+\textbf{Description:} print the inflected form of the words of an occurrence of an MNP\\
+\\\textbf{Last modified:} 23/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of words of a structure
+\item string to be printed before a variable content
+\item string to be printed after a variable content
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{CleanAfterChunking}\index{CleanAfterChunking@\texttt{CleanAfterChunking}|textbf}
+\textbf{Description:} delete non valid elements in MNP\\
+\\\textbf{Last modified:} 23/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word occurrences
+\item reference to a record of islands
+\item reference to the hash table of chunking data
+\item reference to the hash table of linguistic options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item MNP validity report
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item PruneMNP\index{PruneMNP@\texttt{PruneMNP}}
+\item CheckCompulsoryItem\index{CheckCompulsoryItem@\texttt{CheckCompulsoryItem}}
+\item CheckMNPLength\index{CheckMNPLength@\texttt{CheckMNPLength}}
+\end{itemize}
+
+\subsection{CheckCompulsoryItem}\index{CheckCompulsoryItem@\texttt{CheckCompulsoryItem}|textbf}
+\textbf{Description:} check that MNP contains at least one compulsory item defined by user in the linguistic option file\\
+\\\textbf{Last modified:} 08/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word occurrences
+\item reference to the hash table of linguistic options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{CheckMNPLength}\index{CheckMNPLength@\texttt{CheckMNPLength}|textbf}
+\textbf{Description:} check that MNP length does not exceed the MNP\_MAXIMUM\_LENGTH defined by the user\\
+\\\textbf{Last modified:} 23/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of words of a structure
+\item reference to the hash table of linguistic options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CountWordsNotFrontiers\index{CountWordsNotFrontiers@\texttt{CountWordsNotFrontiers}}
+\end{itemize}
+
+\subsection{PruneMNP}\index{PruneMNP@\texttt{PruneMNP}|textbf}
+\textbf{Description:} prune MNP from unauthorized elements\\
+\\\textbf{Last modified:} 15/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word occurrences
+\item reference to a record of islands
+\item reference to the hash table of chunking data
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item IsForbiddenStart\index{IsForbiddenStart@\texttt{IsForbiddenStart}}
+\item AdjustIslandBoundaries\index{AdjustIslandBoundaries@\texttt{AdjustIslandBoundaries}}
+\item IsForbiddenEnd\index{IsForbiddenEnd@\texttt{IsForbiddenEnd}}
+\end{itemize}
+
+\subsection{AdjustIslandBoundaries}\index{AdjustIslandBoundaries@\texttt{AdjustIslandBoundaries}|textbf}
+\textbf{Description:} adjust islands (start and end) indexes according to words deleted in the MNP when pruning\\
+\\\textbf{Last modified:} 15/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of islands
+\item index of a word
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Start\index{Start@\texttt{Start}}
+\end{itemize}
+
+\subsection{IsForbiddenStart}\index{IsForbiddenStart@\texttt{IsForbiddenStart}|textbf}
+\textbf{Description:} find triggers for forbidden structures at the begining of an MNP\\
+\\\textbf{Last modified:} 15/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word occurrences
+\item reference to a hash table of fordidden structure in a start position
+\item reference to a record of islands
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (-1)
+\item existence report  of a forbidden structure
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item TreatForbidenStart\index{TreatForbidenStart@\texttt{TreatForbidenStart}}
+\end{itemize}
+
+\subsection{IsForbiddenEnd}\index{IsForbiddenEnd@\texttt{IsForbiddenEnd}|textbf}
+\textbf{Description:} find triggers for forbidden structures at the end of an MNP\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word occurrences
+\item reference to a word index
+\item reference to a hash table of fordidden structure in an end position
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (0, -1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item TreatForbidenEnd\index{TreatForbidenEnd@\texttt{TreatForbidenEnd}}
+\end{itemize}
+
+\subsection{TreatForbidenStart}\index{TreatForbidenStart@\texttt{TreatForbidenStart}|textbf}
+\textbf{Description:} reduce the MNP according to the forbidden structure found at the begining of an MNP if any\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word occurrences
+\item reference to an array of forbidden structures triggers
+\item reference to a record of islands
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, -1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CountWordsNotFrontiers\index{CountWordsNotFrontiers@\texttt{CountWordsNotFrontiers}}
+\item ExpandStartTrigger\index{ExpandStartTrigger@\texttt{ExpandStartTrigger}}
+\item AdjustIslandBoundaries\index{AdjustIslandBoundaries@\texttt{AdjustIslandBoundaries}}
+\end{itemize}
+
+\subsection{ExpandStartTrigger}\index{ExpandStartTrigger@\texttt{ExpandStartTrigger}|textbf}
+\textbf{Description:} search a forbidden structure from the start trigger to apply to the MNP\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of a trigger
+\item reference to an array of word occurrences
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (-1)
+\item index of a word
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{TreatForbidenEnd}\index{TreatForbidenEnd@\texttt{TreatForbidenEnd}|textbf}
+\textbf{Description:} reduce the MNP according to the forbidden structure found at the end of an MNP if any\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word occurrences
+\item reference to an array of forbidden structures triggers
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, -1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CountWordsNotFrontiers\index{CountWordsNotFrontiers@\texttt{CountWordsNotFrontiers}}
+\item ExpandEndTrigger\index{ExpandEndTrigger@\texttt{ExpandEndTrigger}}
+\end{itemize}
+
+\subsection{ExpandEndTrigger}\index{ExpandEndTrigger@\texttt{ExpandEndTrigger}|textbf}
+\textbf{Description:} search a forbidden structure from the end trigger to apply to the MNP\\
+\\\textbf{Last modified:} 15/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of a trigger
+\item reference to an array of word occurrences
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (-1)
+\item counter of words to be deleted
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{CountWordsNotFrontiers}\index{CountWordsNotFrontiers@\texttt{CountWordsNotFrontiers}|textbf}
+\textbf{Description:} count the number of words of a MNP omitting frontiers\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of words of a structure
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item process counter
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{AddIslandsFromTTs}\index{AddIslandsFromTTs@\texttt{AddIslandsFromTTs}|textbf}
+\textbf{Description:} transform the best testified terms (TTs) into islands\\
+correct POS and LM of the words of the MNP according to TTs (if option -correction set to 1)\\
+\\\textbf{Last modified:} 01/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word occurrences
+\item reference to an array of word occurrences before their correction
+\item reference to the hash table of testified terms
+\item reference to the hash table of a lexicon
+\item reference to the hash table of object counters
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to hash table
+\item correction report
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item ChooseBestIslands\index{ChooseBestIslands@\texttt{ChooseBestIslands}}
+\item CorrectPOSandLF\index{CorrectPOSandLF@\texttt{CorrectPOSandLF}}
+\end{itemize}
+
+\subsection{CorrectPOSandLF}\index{CorrectPOSandLF@\texttt{CorrectPOSandLF}|textbf}
+\textbf{Description:} correct MNP POS tags and lemma according to the TTs found\\
+\\\textbf{Last modified:} 15/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of islands
+\item reference to an array of word occurrences
+\item reference to an array of word occurrences before their correction
+\item reference to the hash table of testified terms
+\item reference to the hash table of a lexicon
+\item reference to the hash table of object counters
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item correction report
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SaveWordOccurrences\index{SaveWordOccurrences@\texttt{SaveWordOccurrences}}
+\item HashTableSize\index{HashTableSize@\texttt{HashTableSize}}
+\item BuildRivalHashTable\index{BuildRivalHashTable@\texttt{BuildRivalHashTable}}
+\item ApplyCorrection\index{ApplyCorrection@\texttt{ApplyCorrection}}
+\end{itemize}
+
+\subsection{DeleteFrontiers}\index{DeleteFrontiers@\texttt{DeleteFrontiers}|textbf}
+\textbf{Description:} remove frontier marks from the array of ords\\
+\\\textbf{Last modified:} 02/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word occurrences
+\item reference to a record of islands
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{ApplyCorrection}\index{ApplyCorrection@\texttt{ApplyCorrection}|textbf}
+\textbf{Description:} correct a lexical info (POS or LF) of a word\\
+update lexicon according to the correction applied\\
+\\\textbf{Last modified:} 02/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of an occurrence of a word of the corpus
+\item new word form to be recorded after correction
+\item reference to the hash table of a lexicon
+\item reference to the hash table of object counters
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item RemoveLexiconItemOccurrence\index{RemoveLexiconItemOccurrence@\texttt{RemoveLexiconItemOccurrence}}
+\item RecordLexiconItem\index{RecordLexiconItem@\texttt{RecordLexiconItem}}
+\end{itemize}
+
+\subsection{RemoveLexiconItemOccurrence}\index{RemoveLexiconItemOccurrence@\texttt{RemoveLexiconItemOccurrence}|textbf}
+\textbf{Description:} remove an occurrence of a lexicon item in a lexicon\\
+if no other occurrence of the lexicon item is left, lexicon entry is deleted\\
+\\\textbf{Last modified:} 01/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{BuildRivalHashTable}\index{BuildRivalHashTable@\texttt{BuildRivalHashTable}|textbf}
+\textbf{Description:} find islands that overlap in a MNP\\
+order them in increasing order of relevance\\
+\\\textbf{Last modified:} 02/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of islands
+\item reference to the hash table of rival islands
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item OrderRivals\index{OrderRivals@\texttt{OrderRivals}}
+\end{itemize}
+
+\subsection{OrderRivals}\index{OrderRivals@\texttt{OrderRivals}|textbf}
+\textbf{Description:} order rival islands in increasing preference order\\
+criterion 1: shorter islands are favoured\\
+criterion 2: more frequent islands are favoured\\
+\\\textbf{Last modified:} 15/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a first rival island
+\item reference to a second rival island
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item sorting result (-1,0,1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SaveWordOccurrences}\index{SaveWordOccurrences@\texttt{SaveWordOccurrences}|textbf}
+\textbf{Description:} Before correction, save original lexical information of the word occurrences of an MNP\\
+\\\textbf{Last modified:} 01/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of word occurrences
+\item reference to an array of word occurrences before their correction
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{HashTableSize}\index{HashTableSize@\texttt{HashTableSize}|textbf}
+\textbf{Description:} count the number of elements in a hash table\\
+\\\textbf{Last modified:} 21/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a hash table to be sized
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{FindWordInHashes}\index{FindWordInHashes@\texttt{FindWordInHashes}|textbf}
+\textbf{Description:} find a word from its IF, POS or LF in hash tables\\
+\\\textbf{Last modified:} 02/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of word of a MNP
+\item reference to a hash table of user declared data
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item value of a record in a hash table
+\item value of a record in a hash table
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{ChooseBestIslands}\index{ChooseBestIslands@\texttt{ChooseBestIslands}|textbf}
+\textbf{Description:} choose the best island when two TTs cover the same sequence (e.g. IF vs LF)\\
+\\\textbf{Last modified:} 02/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of islands
+\item reference to an array of word occurrences
+\item reference to the hash table of testified terms
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CompareIslands\index{CompareIslands@\texttt{CompareIslands}}
+\end{itemize}
+
+\subsection{CompareIslands}\index{CompareIslands@\texttt{CompareIslands}|textbf}
+\textbf{Description:} compare two rival islands\\
+return the ID of the one to be deleted\\
+\\\textbf{Last modified:} 02/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a first island of reliability
+\item reference to a second island of reliability
+\item reference to an array of words of a structure
+\item reference to the hash table of testified terms
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item id of an object
+\item id of an object
+\item id of an object
+\item id of an object
+\item id of an object
+\item id of an object
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CompareWords\index{CompareWords@\texttt{CompareWords}}
+\end{itemize}
+
+\subsection{CompareWords}\index{CompareWords@\texttt{CompareWords}|textbf}
+\textbf{Description:} compare two arrays of words regarding a list of type(s) of lexical info ("IF" and/or "POS" and/or "LF", separated by a comma)\\
+stop if a difference is found\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of words of a MNP
+\item reference to an island of reliability
+\item reference to the hash table of testified terms
+\item list of types (seperator:",") of lexical information
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Start\index{Start@\texttt{Start}}
+\end{itemize}
+
+\subsection{Start}\index{Start@\texttt{Start}|textbf}
+\textbf{Description:} get the start index of a structure\\
+\\\textbf{Last modified:} 15/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a structure (MNP, island, insert, etc)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item index of the start word of the structure
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{ReadCorpus}\index{ReadCorpus@\texttt{ReadCorpus}|textbf}
+\textbf{Description:} read and load the corpus\\
+mark forbidden structures\\
+mark testified term frontiers if any provided\\
+\\\textbf{Last modified:} 21/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the hash table of file names
+\item reference to the array of lines from the corpus
+\item reference to the array of sentences of the corpus
+\item reference to the hash table of lexicon for the corpus
+\item reference to the hash table of testified terms
+\item reference to the hash table of object counters
+\item reference to the hash table of linguistic options
+\item reference to the hash table of miscellaneous options
+\item reference to the hash table of tag types
+\item reference to the hash table of forbidden structures
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item WrapSentence\index{WrapSentence@\texttt{WrapSentence}}
+\item SearchTTs\index{SearchTTs@\texttt{SearchTTs}}
+\item MarkForbiddenStructures\index{MarkForbiddenStructures@\texttt{MarkForbiddenStructures}}
+\item UnwrapSentence\index{UnwrapSentence@\texttt{UnwrapSentence}}
+\item CreateWordOccurrence\index{CreateWordOccurrence@\texttt{CreateWordOccurrence}}
+\end{itemize}
+
+\subsection{WrapSentence}\index{WrapSentence@\texttt{WrapSentence}|textbf}
+\textbf{Description:} wrap sentence into "\\n" before applying regular expressions\\
+\\\textbf{Last modified:} 21/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a sentence
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{UnwrapSentence}\index{UnwrapSentence@\texttt{UnwrapSentence}|textbf}
+\textbf{Description:} delete "\\n" wrapping the sentence\\
+\\\textbf{Last modified:} 21/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a sentence
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintCorpusOccurrence}\index{PrintCorpusOccurrence@\texttt{PrintCorpusOccurrence}|textbf}
+\textbf{Description:} print the inflected form of all occurrences from the corpus\\
+\\\textbf{Last modified:} 21/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the array of lines from the corpus
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{CreateWordOccurrence}\index{CreateWordOccurrence@\texttt{CreateWordOccurrence}|textbf}
+\textbf{Description:} record an occurrence of the words from the corpus or of annotation marks\\
+build the lexicon for the corpus in a hash table\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item form of a word in the corpus (IF[TAB]POS[TAB]LF)
+\item reference to the hash table of lexicon for the corpus
+\item reference to the IF form of a sentence
+\item reference to the array of sentences of the corpus
+\item reference to the counter of documents
+\item reference to the counter of sentences
+\item reference to the counter of word start character
+\item reference to the hash table of object counters
+\item reference to the hash table of linguistic options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item RecordLexiconItem\index{RecordLexiconItem@\texttt{RecordLexiconItem}}
+\item SentenceEnd\index{SentenceEnd@\texttt{SentenceEnd}}
+\item DocumentEnd\index{DocumentEnd@\texttt{DocumentEnd}}
+\item SetAnnotationMark\index{SetAnnotationMark@\texttt{SetAnnotationMark}}
+\end{itemize}
+
+\subsection{SetAnnotationMark}\index{SetAnnotationMark@\texttt{SetAnnotationMark}|textbf}
+\textbf{Description:} create and record an annotation mark\\
+\\\textbf{Last modified:} 21/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item form of a word in the corpus (IF[TAB]POS[TAB]LF)
+\item reference to the record of an occurrence of a word of the corpus
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{DocumentEnd}\index{DocumentEnd@\texttt{DocumentEnd}|textbf}
+\textbf{Description:} increment the counter of documents\\
+initiate sentence variable\\
+initiate character and sentence counters\\
+\\\textbf{Last modified:} 21/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the IF form of a sentence
+\item reference to the array of sentences of the corpus
+\item reference to the counter of documents
+\item reference to the counter of sentences
+\item reference to the counter of word start character
+\item reference to the hash table of object counters
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SentenceEnd}\index{SentenceEnd@\texttt{SentenceEnd}|textbf}
+\textbf{Description:} record the sentence\\
+increment the counter of sentences\\
+initiate character counters\\
+\\\textbf{Last modified:} 22/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the IF form of a sentence
+\item reference to the array of sentences of the corpus
+\item reference to the record of a lexicon item
+\item reference to the counter of sentences
+\item reference to the counter of word start character
+\item reference to the hash table of object counters
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{MarkForbiddenStructures}\index{MarkForbiddenStructures@\texttt{MarkForbiddenStructures}|textbf}
+\textbf{Description:} search and mark forbidden structures in the sentence\\
+\\\textbf{Last modified:} 15/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a sentence
+\item reference to an array of forbidden structures
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SearchTTs}\index{SearchTTs@\texttt{SearchTTs}|textbf}
+\textbf{Description:} search an mark testified terms in a sentence\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a sentence
+\item reference to the hash table of testified terms
+\item reference to the hash table of tag types
+\item reference to the hash table of parsing patterns
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SelectTTs\index{SelectTTs@\texttt{SelectTTs}}
+\item BuildRegExpTT\index{BuildRegExpTT@\texttt{BuildRegExpTT}}
+\item Annotate\index{Annotate@\texttt{Annotate}}
+\end{itemize}
+
+\subsection{Annotate}\index{Annotate@\texttt{Annotate}|textbf}
+\textbf{Description:} insert FRONTIER tags for a TT\\
+\\\textbf{Last modified:} 15/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item matched regular expression
+\item reference to a counter of IDs
+\item reference to a record of testified term
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item XML annotation string
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{StructureAppearInLexicon}\index{StructureAppearInLexicon@\texttt{StructureAppearInLexicon}|textbf}
+\textbf{Description:} test if a sequence of words appears in a lexicon\\
+case insensitive\\
+IF and LF are considered\\
+\\\textbf{Last modified:} 15/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of words of a structure
+\item reference to the hash table of a lexicon
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{CompleteTTInfos}\index{CompleteTTInfos@\texttt{CompleteTTInfos}|textbf}
+\textbf{Description:} complete lexical information of a selected testified term\\
+\\\textbf{Last modified:} 15/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of testified term
+\item reference to the hash table of testified terms
+\item reference to the hash table of tag types
+\item reference to the hash table of parsing patterns
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item BuildSequenceInfoForLexiconItem\index{BuildSequenceInfoForLexiconItem@\texttt{BuildSequenceInfoForLexiconItem}}
+\end{itemize}
+
+\subsection{BuildRegExpTT}\index{BuildRegExpTT@\texttt{BuildRegExpTT}|textbf}
+\textbf{Description:} build the regular expressions for a TT to be searched\\
+\\\textbf{Last modified:} 15/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of matching TTs
+\item reference to the hash table of testified terms
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SelectTTs}\index{SelectTTs@\texttt{SelectTTs}|textbf}
+\textbf{Description:} select the TTs that are likely to appear in the sentence\\
+\\\textbf{Last modified:} 15/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a sentence
+\item reference to an array of matching TTs
+\item reference to the hash table of testified terms
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item RecordNormalizedWord\index{RecordNormalizedWord@\texttt{RecordNormalizedWord}}
+\item StructureAppearInLexicon\index{StructureAppearInLexicon@\texttt{StructureAppearInLexicon}}
+\end{itemize}
+
+\subsection{LoadExistingTerminologies}\index{LoadExistingTerminologies@\texttt{LoadExistingTerminologies}|textbf}
+\textbf{Description:} read and load testified terms from a file\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the hash table of testified terms
+\item reference to the hash table of access to TTs
+\item reference to the hash table of lexicon for TTs
+\item reference to the hash table of file names
+\item reference to the hash table of corpus lexicon
+\item reference to the hash table of tag types
+\item reference to the hash table of object counters
+\item reference to the hash table of linguistic options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetTerminologyFormat\index{GetTerminologyFormat@\texttt{GetTerminologyFormat}}
+\item LoadBracketedParsedTerminologies\index{LoadBracketedParsedTerminologies@\texttt{LoadBracketedParsedTerminologies}}
+\item LoadTaggedTerminologies\index{LoadTaggedTerminologies@\texttt{LoadTaggedTerminologies}}
+\end{itemize}
+
+\subsection{LoadBracketedParsedTerminologies}\index{LoadBracketedParsedTerminologies@\texttt{LoadBracketedParsedTerminologies}|textbf}
+\textbf{Description:} parse testified term files in bracketed format\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of file names
+\item reference to the hash table of testified terms
+\item reference to the hash table of access to TTs
+\item reference to the hash table of object counters
+\item reference to the hash table of lexicon for TTs
+\item reference to the hash table of linguistic options
+\item reference to the hash table of tag types
+\item reference to the hash table of corpus lexicon
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetTestifiedInfos\index{GetTestifiedInfos@\texttt{GetTestifiedInfos}}
+\item CheckTTOrigin\index{CheckTTOrigin@\texttt{CheckTTOrigin}}
+\end{itemize}
+
+\subsection{GetTestifiedInfos}\index{GetTestifiedInfos@\texttt{GetTestifiedInfos}|textbf}
+\textbf{Description:} parse a declaration line for a TT\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of testified term
+\item a line read from file
+\item reference to the origin of a TT
+\item reference to the hash table of corpus lexicon
+\item reference to the hash table of lexicon for TTs
+\item reference to the hash table of object counters
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item UsableTT\index{UsableTT@\texttt{UsableTT}}
+\end{itemize}
+
+\subsection{UsableTT}\index{UsableTT@\texttt{UsableTT}|textbf}
+\textbf{Description:} search and record TTs that are likely to appear in the corpus\\
+\\\textbf{Last modified:} 15/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of testified term
+\item inflected form of an object (string)
+\item POS sequence of an object
+\item lemmatized form of an object (string)
+\item reference to the hash table of corpus lexicon
+\item reference to the hash table of lexicon for TTs
+\item reference to the hash table of object counters
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item RawAppearInLexicon\index{RawAppearInLexicon@\texttt{RawAppearInLexicon}}
+\item RecordAllLexiconItems\index{RecordAllLexiconItems@\texttt{RecordAllLexiconItems}}
+\end{itemize}
+
+\subsection{LoadTaggedTerminologies}\index{LoadTaggedTerminologies@\texttt{LoadTaggedTerminologies}|textbf}
+\textbf{Description:} parse testified term files in tagged format (TreeTagger output format)\\
+\\\textbf{Last modified:} 23/09/2004
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item RawAppearInLexicon\index{RawAppearInLexicon@\texttt{RawAppearInLexicon}}
+\item RecordTT\index{RecordTT@\texttt{RecordTT}}
+\end{itemize}
+
+\subsection{PrintTestifiedTermsParse}\index{PrintTestifiedTermsParse@\texttt{PrintTestifiedTermsParse}|textbf}
+\textbf{Description:} display parenthesized parses of TTs\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the hash table of testified terms
+\item name of a file
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item BuildParenthesizedAnalysis\index{BuildParenthesizedAnalysis@\texttt{BuildParenthesizedAnalysis}}
+\item GetHeadPOSFromFirstStructureTree\index{GetHeadPOSFromFirstStructureTree@\texttt{GetHeadPOSFromFirstStructureTree}}
+\end{itemize}
+
+\subsection{BuildSequenceInfoForLexiconItem}\index{BuildSequenceInfoForLexiconItem@\texttt{BuildSequenceInfoForLexiconItem}|textbf}
+\textbf{Description:} Build IF, POS, LF sequences from indexes of lexicon items of a structure\\
+\\\textbf{Last modified:} 15/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of lexical information
+\item reference to an array of word indexes
+\item reference to an array of words of a structure
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{RecordTT}\index{RecordTT@\texttt{RecordTT}|textbf}
+\textbf{Description:} record a testified term\\
+build and record its lexical information\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of words of a structure
+\item reference to the hash table of testified terms
+\item reference to the hash table of access to TTs
+\item reference to the hash table of a lexicon
+\item origin of a TT (string)
+\item reference to the hash table of tag types
+\item reference to the hash table of object counters
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item RecordAllLexiconItems\index{RecordAllLexiconItems@\texttt{RecordAllLexiconItems}}
+\item BuildSequenceInfoForLexiconItem\index{BuildSequenceInfoForLexiconItem@\texttt{BuildSequenceInfoForLexiconItem}}
+\item TransferSequenceInfo\index{TransferSequenceInfo@\texttt{TransferSequenceInfo}}
+\item CheckTTOrigin\index{CheckTTOrigin@\texttt{CheckTTOrigin}}
+\end{itemize}
+
+\subsection{RecordAllLexiconItems}\index{RecordAllLexiconItems@\texttt{RecordAllLexiconItems}|textbf}
+\textbf{Description:} record lexicon items of an array of words of a testified terms\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of testified term
+\item reference to an array of words of a structure
+\item reference to the hash table of a lexicon
+\item reference to the hash table of object counters
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item RecordLexiconItem\index{RecordLexiconItem@\texttt{RecordLexiconItem}}
+\end{itemize}
+
+\subsection{PrintAccessToTTs}\index{PrintAccessToTTs@\texttt{PrintAccessToTTs}|textbf}
+\textbf{Description:} print a list of testified terms according to a specified access type (IF, LF) (if option -debug activated)\\
+\\\textbf{Last modified:} 20/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of access to TTs
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{TransferSequenceInfo}\index{TransferSequenceInfo@\texttt{TransferSequenceInfo}|textbf}
+\textbf{Description:} copy IF, POS and LF informations from a structure to another\\
+\\\textbf{Last modified:} 15/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a source record to be duplicated
+\item reference to the record of a structure (MNP, island, insert, etc)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{CheckTTOrigin}\index{CheckTTOrigin@\texttt{CheckTTOrigin}|textbf}
+\textbf{Description:} check that the same form of the TT was not found in the same resource (redundant)\\
+\\\textbf{Last modified:} 18/11/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of TTs
+\item name of a file
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{RecordLexiconItem}\index{RecordLexiconItem@\texttt{RecordLexiconItem}|textbf}
+\textbf{Description:} record an occurrence of a word\\
+create and record a new lexicon item or add an occurrence\\
+\\\textbf{Last modified:} 15/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item a line read from file
+\item reference to the hash table of a lexicon
+\item reference to the hash table of object counters
+\item name of an object counter
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to the record of a lexicon item
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{RawAppearInLexicon}\index{RawAppearInLexicon@\texttt{RawAppearInLexicon}|textbf}
+\textbf{Description:} test if a sequence of  words in raw format (IF	POS	LF) appear in a lexicon\\
+\\\textbf{Last modified:} 23/11/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of words of a structure
+\item reference to the hash table of a lexicon
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetTerminologyFormat}\index{GetTerminologyFormat@\texttt{GetTerminologyFormat}|textbf}
+\textbf{Description:} identify a terminology format\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item name of a file
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item format of a terminology file
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{LoadCorpusLexicon}\index{LoadCorpusLexicon@\texttt{LoadCorpusLexicon}|textbf}
+\textbf{Description:} read corpus and load the lexicon\\
+\\\textbf{Last modified:} 28/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of corpus lexicon
+\item reference to the hash table of file names
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item RecordNormalizedWord\index{RecordNormalizedWord@\texttt{RecordNormalizedWord}}
+\end{itemize}
+
+\subsection{RecordNormalizedWord}\index{RecordNormalizedWord@\texttt{RecordNormalizedWord}|textbf}
+\textbf{Description:} record the normalized (lc) form of IF and LF of a word in a lexicon\\
+\\\textbf{Last modified:} 21/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item a line read from file
+\item reference to the hash table of a lexicon
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{LoadChunkingData}\index{LoadChunkingData@\texttt{LoadChunkingData}|textbf}
+\textbf{Description:} load resource files provided by user in DATA directory\\
+\\\textbf{Last modified:} 21/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the hash table of chunking data
+\item reference to the hash table of file names
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item ReadAndLoad\index{ReadAndLoad@\texttt{ReadAndLoad}}
+\item ReadAndLoadForbidden\index{ReadAndLoadForbidden@\texttt{ReadAndLoadForbidden}}
+\end{itemize}
+
+\subsection{ReadAndLoad}\index{ReadAndLoad@\texttt{ReadAndLoad}|textbf}
+\textbf{Description:} read and load a resource file\\
+\\\textbf{Last modified:} 21/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a hash table of user declared data
+\item name of a file
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{ReadAndLoadForbidden}\index{ReadAndLoadForbidden@\texttt{ReadAndLoadForbidden}|textbf}
+\textbf{Description:} read and load a resource file of forbidden structures\\
+\\\textbf{Last modified:} 15/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a hash table of user declared data
+\item name of a file
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item LoadForbiddenAny\index{LoadForbiddenAny@\texttt{LoadForbiddenAny}}
+\item LoadForbiddenStartOrEnd\index{LoadForbiddenStartOrEnd@\texttt{LoadForbiddenStartOrEnd}}
+\item SortTriggersByLength\index{SortTriggersByLength@\texttt{SortTriggersByLength}}
+\end{itemize}
+
+\subsection{SortTriggersByLength}\index{SortTriggersByLength@\texttt{SortTriggersByLength}|textbf}
+\textbf{Description:} sort triggers found for a set of forbidden structure in decreasing order of length\\
+\\\textbf{Last modified:} 15/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a hash table of forbidden structures triggers
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to a hash table of forbidden structures triggers
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{LoadForbiddenStartOrEnd}\index{LoadForbiddenStartOrEnd@\texttt{LoadForbiddenStartOrEnd}|textbf}
+\textbf{Description:} load a forbidden structure in position START or END\\
+\\\textbf{Last modified:} 15/03/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of declaration elements of a forbidden structure
+\item reference to a hash table of start triggers
+\item reference to a hash table of end triggers
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to a forbidden structure record
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{LoadForbiddenAny}\index{LoadForbiddenAny@\texttt{LoadForbiddenAny}|textbf}
+\textbf{Description:} load a forbidden structure in position ANY\\
+build regular expressions\\
+\\\textbf{Last modified:} 24/09/2004
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{LoadParsingPatterns}\index{LoadParsingPatterns@\texttt{LoadParsingPatterns}|textbf}
+\textbf{Description:} read and load a resource file of parsing patterns\\
+\\\textbf{Last modified:} 27/07/2004
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the hash table of file names
+\item reference to the hash table of parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetTagList\index{GetTagList@\texttt{GetTagList}}
+\item PatternLexParser\index{PatternLexParser@\texttt{PatternLexParser}}
+\end{itemize}
+
+\subsection{PrintAllParsingPatterns}\index{PrintAllParsingPatterns@\texttt{PrintAllParsingPatterns}|textbf}
+\textbf{Description:} display a set of parsing patterns\\
+\\\textbf{Last modified:} 20/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of parsing patterns
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item PrintParsingPattern\index{PrintParsingPattern@\texttt{PrintParsingPattern}}
+\end{itemize}
+
+\subsection{PrintParsingPattern}\index{PrintParsingPattern@\texttt{PrintParsingPattern}|textbf}
+\textbf{Description:} display a parsing pattern with it's parsing tree\\
+\\\textbf{Last modified:} 28/07/2004
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item hash key for a pattern
+\item reference to an array of parses for a pattern
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintTree}\index{PrintTree@\texttt{PrintTree}|textbf}
+\textbf{Description:} display a syntactic tree\\
+\\\textbf{Last modified:} 17/11/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to an array of nodes
+\item reference to an array of words of a structure
+\item output handler
+\item type of the source structure
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintNode}\index{PrintNode@\texttt{PrintNode}|textbf}
+\textbf{Description:} display a node of a syntactic tree\\
+\\\textbf{Last modified:} 07/02/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item reference to an array of words of a structure
+\item output handler
+\item type of the source structure
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PatternLexParser}\index{PatternLexParser@\texttt{PatternLexParser}|textbf}
+\textbf{Description:} lex parser for parsing patterns\\
+build parsing trees from the bracketed parse provided by user\\
+\\\textbf{Last modified:} 27/07/2004
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to a record of a parsing pattern
+\item lex parser for parsing patterns
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CreateNode\index{CreateNode@\texttt{CreateNode}}
+\item SetNode\index{SetNode@\texttt{SetNode}}
+\item CompleteNode\index{CompleteNode@\texttt{CompleteNode}}
+\item SortNodesByLevel\index{SortNodesByLevel@\texttt{SortNodesByLevel}}
+\end{itemize}
+
+\subsection{SortNodesByLevel}\index{SortNodesByLevel@\texttt{SortNodesByLevel}|textbf}
+\textbf{Description:} sort the nodes of a tree in increasing order of depth\\
+a left edge node appears before a right edge one\\
+\\\textbf{Last modified:} 04/02/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of a first node
+\item reference to the record of a second node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item sorting result (-1,0,1)
+\item boolean: (-1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{CompleteNode}\index{CompleteNode@\texttt{CompleteNode}|textbf}
+\textbf{Description:} complete information of a node to link it to other nodes\\
+\\\textbf{Last modified:} 04/02/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item reference to an array of nodes
+\item status (H, M) of a node or leaf of a tree
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SetNode}\index{SetNode@\texttt{SetNode}|textbf}
+\textbf{Description:} Fill a node with the lexical information of a word\\
+\\\textbf{Last modified:} 28/07/2004
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item an object (string)
+\item status (H, M) of a node or leaf of a tree
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{CreateNode}\index{CreateNode@\texttt{CreateNode}|textbf}
+\textbf{Description:} create a node record\\
+\\\textbf{Last modified:} 05/08/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item level of a node in a tree
+\item reference to an array of nodes
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to a node record
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetTagList}\index{GetTagList@\texttt{GetTagList}|textbf}
+\textbf{Description:} parse the declaration lines for POS tags in the resource file for parsing patterns and tags\\
+\\\textbf{Last modified:} 04/08/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item a line read from file
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SortTagList\index{SortTagList@\texttt{SortTagList}}
+\end{itemize}
+
+\subsection{SortTagList}\index{SortTagList@\texttt{SortTagList}|textbf}
+\textbf{Description:} sort a set of POS tags so that a more specific one appears before a more generic one (e.g. NPS < NP)\\
+\\\textbf{Last modified:} 15/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item list of sorted tags (string)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{InitiateCounters}\index{InitiateCounters@\texttt{InitiateCounters}|textbf}
+\textbf{Description:} initiate counters used for statistical measures\\
+\\\textbf{Last modified:} 24/06/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of object counters
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{LoadOptions}\index{LoadOptions@\texttt{LoadOptions}|textbf}
+\textbf{Description:} read and load resource files of linguistic options and miscellanous options\\
+\\\textbf{Last modified:} 23/09/2004
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the hash table of file names
+\item reference to the hash table of linguistic options
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{FileManagement}\index{FileManagement@\texttt{FileManagement}|textbf}
+\textbf{Description:} management of resource and result file names\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item name of the corpus file
+\item reference to the hash table of miscellaneous options
+\item reference to the hash table of file names
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetSuffix\index{GetSuffix@\texttt{GetSuffix}}
+\item LoadTerminologyFileNames\index{LoadTerminologyFileNames@\texttt{LoadTerminologyFileNames}}
+\item MakeResultDirectory\index{MakeResultDirectory@\texttt{MakeResultDirectory}}
+\item DefineChunkingFileNames\index{DefineChunkingFileNames@\texttt{DefineChunkingFileNames}}
+\item DefineChunkingComparisonFileName\index{DefineChunkingComparisonFileName@\texttt{DefineChunkingComparisonFileName}}
+\item MakeMNPFileName\index{MakeMNPFileName@\texttt{MakeMNPFileName}}
+\item DefineShortFileNames\index{DefineShortFileNames@\texttt{DefineShortFileNames}}
+\end{itemize}
+
+\subsection{MakeMNPFileName}\index{MakeMNPFileName@\texttt{MakeMNPFileName}|textbf}
+\textbf{Description:} define names and path for HTML files to display information on MNPs\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item name of the corpus
+\item address of the directory to record results
+\item reference to the hash table of file names
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{DefineShortFileNames}\index{DefineShortFileNames@\texttt{DefineShortFileNames}|textbf}
+\textbf{Description:} define short names for all files\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of file names
+\item reference to the hash table of shoirt names for files
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{DefineChunkingFileNames}\index{DefineChunkingFileNames@\texttt{DefineChunkingFileNames}|textbf}
+\textbf{Description:} define names and path for HTML files to display chunking results\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item name of the corpus
+\item address of the directory to record results
+\item reference to the hash table of file names
+\item reference to the hash table of shoirt names for files
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{DefineChunkingComparisonFileName}\index{DefineChunkingComparisonFileName@\texttt{DefineChunkingComparisonFileName}|textbf}
+\textbf{Description:} define names and path for HTML files to display chunking comparison results\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item address of the directory to record results
+\item reference to the hash table of file names
+\item reference to the hash table of miscellaneous options
+\item reference to the hash table of shoirt names for files
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{LoadTerminologyFileNames}\index{LoadTerminologyFileNames@\texttt{LoadTerminologyFileNames}|textbf}
+\textbf{Description:} load terminology file names provided by user in the command line\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of file names
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item DisplayMessage\index{DisplayMessage@\texttt{DisplayMessage}}
+\end{itemize}
+
+\subsection{DisplayMessage}\index{DisplayMessage@\texttt{DisplayMessage}|textbf}
+\textbf{Description:} display a message recorded in a resource file of messages\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item key for hash access
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{MakeResultDirectory}\index{MakeResultDirectory@\texttt{MakeResultDirectory}|textbf}
+\textbf{Description:} define name and path for the directory to store results\\
+path is RESULTS/<language>/<corpus\_name>/<optional\_suffix>\\
+three sub-directories (xml, html, raw) are created to store specific files\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item language of the corpus to analyse (e.g. EN)
+\item name of the corpus
+\item suffix provided by user to create a result sub-directory
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item address of a directory
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetSuffix}\index{GetSuffix@\texttt{GetSuffix}|textbf}
+\textbf{Description:} get the suffix from miscellanous options if provided by user (empty if not provided)\\
+\\\textbf{Last modified:} 15/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item suffix provided by user to create a result sub-directory
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{ShortFileName}\index{ShortFileName@\texttt{ShortFileName}|textbf}
+\textbf{Description:} define the short version of a file name (no path, no extension)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item name of a file
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item short name of a file
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SaveFile}\index{SaveFile@\texttt{SaveFile}|textbf}
+\textbf{Description:} backup for result files from a previous run of Yatea\\
+create a sub-directory "save/"\\
+\\\textbf{Last modified:} 15/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item name of a file
+\item name of a directory
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{LoadMessages}\index{LoadMessages@\texttt{LoadMessages}|textbf}
+\textbf{Description:} read and load a resource file of messages\\
+\\\textbf{Last modified:} 27/08/2004
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of file names
+\item reference to the hash table of messages
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{Usage}\index{Usage@\texttt{Usage}|textbf}
+\textbf{Description:} display the usage message to run Yatea\\
+\\\textbf{Last modified:} 15/04/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item name of the current program file
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintTestifiedTerms}\index{PrintTestifiedTerms@\texttt{PrintTestifiedTerms}|textbf}
+\textbf{Description:} print information on all loaded (i.e. usable) testified terms\\
+\\\textbf{Last modified:} 20/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of testified terms
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item BuildParenthesizedAnalysis\index{BuildParenthesizedAnalysis@\texttt{BuildParenthesizedAnalysis}}
+\end{itemize}
+
+\subsection{PrintDebug}\index{PrintDebug@\texttt{PrintDebug}|textbf}
+\textbf{Description:} display debugging messages if option -debug is specified in command line\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item object to be printed
+\item string to be printed before a variable content
+\item string to be printed after a variable content
+\item reference to the record of a structure (MNP, island, insert, etc)
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintCorpusWithMNPs}\index{PrintCorpusWithMNPs@\texttt{PrintCorpusWithMNPs}|textbf}
+\textbf{Description:} print corpus with NMPs marked in a HTML file\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the array of sentences of the corpus
+\item reference to the hash table of Maximal Noun Phrases
+\item reference to the hash table of object counters
+\item reference to the hash table of file names
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SetColors\index{SetColors@\texttt{SetColors}}
+\item GatherMNPsPerSentence\index{GatherMNPsPerSentence@\texttt{GatherMNPsPerSentence}}
+\item PrintMNPsLexInfo\index{PrintMNPsLexInfo@\texttt{PrintMNPsLexInfo}}
+\item GetColor\index{GetColor@\texttt{GetColor}}
+\item PrintCorrectionReport\index{PrintCorrectionReport@\texttt{PrintCorrectionReport}}
+\end{itemize}
+
+\subsection{SetColors}\index{SetColors@\texttt{SetColors}|textbf}
+\textbf{Description:} set HTML display colors according to the COLOR\_BLIND option\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of display colors
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetColor}\index{GetColor@\texttt{GetColor}|textbf}
+\textbf{Description:} get a specific color according to the data to display\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the color selector
+\item reference to the current MNP
+\item reference to the hash table of display colors
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintCorrectionReport}\index{PrintCorrectionReport@\texttt{PrintCorrectionReport}|textbf}
+\textbf{Description:} display the report on corrections made on MNPs according to the TTs (if option -correction activated)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GatherMNPsPerSentence}\index{GatherMNPsPerSentence@\texttt{GatherMNPsPerSentence}|textbf}
+\textbf{Description:} reference MNPs according to their occurrences in the corpus\\
+display information on MNPs in a raw format file\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of Maximal Noun Phrases
+\item reference to the hash table of object counters
+\item a handler
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item reference to array
+\item reference to hash table
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item PrintPlainMNP\index{PrintPlainMNP@\texttt{PrintPlainMNP}}
+\item AddEmptySentences\index{AddEmptySentences@\texttt{AddEmptySentences}}
+\item sortDOCandSENTkeys\index{sortDOCandSENTkeys@\texttt{sortDOCandSENTkeys}}
+\end{itemize}
+
+\subsection{AddEmptySentences}\index{AddEmptySentences@\texttt{AddEmptySentences}|textbf}
+\textbf{Description:} reference sentences where no MNP was found\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of access to MNPs by sentences
+\item reference to the hash table of object counters
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{sortDOCandSENTkeys}\index{sortDOCandSENTkeys@\texttt{sortDOCandSENTkeys}|textbf}
+\textbf{Description:} sort list of keys of format DOCUMENT-SENTENCE\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item sorting result (-1,0,1)
+\item sorting result (-1,0,1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintPlainMNP}\index{PrintPlainMNP@\texttt{PrintPlainMNP}|textbf}
+\textbf{Description:} display information on MNPs in a raw format file\\
+\\\textbf{Last modified:} 24/02/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item a handler
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintMNPsLexInfo}\index{PrintMNPsLexInfo@\texttt{PrintMNPsLexInfo}|textbf}
+\textbf{Description:} print data for a MNP in the file of frame containing lexical info on MNPs for the HTML display of MNPs\\
+\\\textbf{Last modified:} 23/09/2004
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of Maximal Noun Phrases
+\item name of a file
+\item reference to a hash table of LGP links
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{PrintTCsAndUnparsedHTML}\index{PrintTCsAndUnparsedHTML@\texttt{PrintTCsAndUnparsedHTML}|textbf}
+\textbf{Description:} display TCs (parsed MNPs) and unparsed MNPs in two separate HTML files\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the hash table of Maximal Noun Phrases
+\item reference to the hash table of file names
+\item reference to the array of lines from the corpus
+\item reference to the array of sentences of the corpus
+\item reference to the hash table of tag types
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SetColors\index{SetColors@\texttt{SetColors}}
+\item PrintTC\index{PrintTC@\texttt{PrintTC}}
+\item PrintUnparsed\index{PrintUnparsed@\texttt{PrintUnparsed}}
+\end{itemize}
+
+\subsection{PrintUnparsed}\index{PrintUnparsed@\texttt{PrintUnparsed}|textbf}
+\textbf{Description:} display unparsed MNPs in a HTML file\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to the array of sentences of the corpus
+\item reference to the hash table of display colors
+\item a handler
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintTC}\index{PrintTC@\texttt{PrintTC}|textbf}
+\textbf{Description:} display TCs (parsed MNPs) in a HTML file\\
+\\\textbf{Last modified:} 16/11/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to the array of sentences of the corpus
+\item reference to the hash table of display colors
+\item a handler
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item BuildParenthesizedAnalysis\index{BuildParenthesizedAnalysis@\texttt{BuildParenthesizedAnalysis}}
+\end{itemize}
+
+\subsection{BuildParenthesizedAnalysis}\index{BuildParenthesizedAnalysis@\texttt{BuildParenthesizedAnalysis}|textbf}
+\textbf{Description:} build a parenthesized parse by depth first traversal of a syntactic tree\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item bracketed version of a tree
+\item place of the matching (LEFT, THROUGH,RIGHT)
+\item level of a node in a tree
+\item reference to an array of words of a structure
+\item reference to the hash table of tag types
+\item reference to the node previously crossed
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item BuildParenthesizedAnalysis\index{BuildParenthesizedAnalysis@\texttt{BuildParenthesizedAnalysis}}
+\end{itemize}
+
+\subsection{PrintBasicTermList}\index{PrintBasicTermList@\texttt{PrintBasicTermList}|textbf}
+\textbf{Description:} display a list of basic terms, i.e. pairs of words in a head-modifier relation\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the hash table of access to TCs
+\item reference to the hash table of file names
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\end{itemize}
+
+\subsection{PrintTermList}\index{PrintTermList@\texttt{PrintTermList}|textbf}
+\textbf{Description:} display terms and sub-terms (i.e. each node with its daughters) in a raw format file\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the hash table of access to TCs
+\item reference to the hash table of file names
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item Forest\index{Forest@\texttt{Forest}}
+\item BuildTermList\index{BuildTermList@\texttt{BuildTermList}}
+\end{itemize}
+
+\subsection{BuildTermList}\index{BuildTermList@\texttt{BuildTermList}|textbf}
+\textbf{Description:} find all terms and sub-terms by depth first traversal of a syntactic tree\\
+\\\textbf{Last modified:} 07/11/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item reference to the hash table of sub-terms and terms
+\item reference to an array of words of a structure
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item IF form of a sub-term or term
+\item IF form of a sub-term or term
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item BuildTermList\index{BuildTermList@\texttt{BuildTermList}}
+\item GetNodeLemmatizedForm\index{GetNodeLemmatizedForm@\texttt{GetNodeLemmatizedForm}}
+\end{itemize}
+
+\subsection{DepthFirstOrderTraversalXML}\index{DepthFirstOrderTraversalXML@\texttt{DepthFirstOrderTraversalXML}|textbf}
+\textbf{Description:} build a XML version of the information recorded in a node (recursive)\\
+\\\textbf{Last modified:} 07/11/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item reference to a tree
+\item reference to an array of words of a structure
+\item reference to a hash table of elements of status HEAD
+\item reference to a hash table of elements of status MODIFIER
+\item reference to the record of a TC
+\item level of reliability of an object (tree, TC)
+\item reference to a hash table of records of information for a TC
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetNodeID\index{GetNodeID@\texttt{GetNodeID}}
+\item GetNodeInflectedForm\index{GetNodeInflectedForm@\texttt{GetNodeInflectedForm}}
+\item GetNodeLemmatizedForm\index{GetNodeLemmatizedForm@\texttt{GetNodeLemmatizedForm}}
+\item GetNodePOS\index{GetNodePOS@\texttt{GetNodePOS}}
+\item SearchNodePositionInTerm\index{SearchNodePositionInTerm@\texttt{SearchNodePositionInTerm}}
+\item DepthFirstOrderTraversalXML\index{DepthFirstOrderTraversalXML@\texttt{DepthFirstOrderTraversalXML}}
+\end{itemize}
+
+\subsection{PrintXMLterms}\index{PrintXMLterms@\texttt{PrintXMLterms}|textbf}
+\textbf{Description:} display TCs in a XML format file\\
+\\\textbf{Last modified:} 15/12/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the hash table of access to TCs
+\item reference to the hash table of file names
+\item reference to the hash table of tag types
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetParsedIslands\index{GetParsedIslands@\texttt{GetParsedIslands}}
+\item PrintForest\index{PrintForest@\texttt{PrintForest}}
+\item Forest\index{Forest@\texttt{Forest}}
+\item RootNode\index{RootNode@\texttt{RootNode}}
+\item GetNodeInflectedForm\index{GetNodeInflectedForm@\texttt{GetNodeInflectedForm}}
+\item ExistsCoordination\index{ExistsCoordination@\texttt{ExistsCoordination}}
+\item DepthFirstOrderTraversalXML\index{DepthFirstOrderTraversalXML@\texttt{DepthFirstOrderTraversalXML}}
+\end{itemize}
+
+\subsection{GetNodeInflectedForm}\index{GetNodeInflectedForm@\texttt{GetNodeInflectedForm}|textbf}
+\textbf{Description:} get the inflected form of a node and its daughters by depth first traversal\\
+\\\textbf{Last modified:} 15/12/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item reference to an array of words of a structure
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item inflected form of an object (string)
+\item inflected form of an object (string)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetNodeInflectedForm\index{GetNodeInflectedForm@\texttt{GetNodeInflectedForm}}
+\end{itemize}
+
+\subsection{GetNodeLemmatizedForm}\index{GetNodeLemmatizedForm@\texttt{GetNodeLemmatizedForm}|textbf}
+\textbf{Description:} get the lemmatized form of a node and its daughters by depth first traversal\\
+\\\textbf{Last modified:} 15/12/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item reference to an array of words of a structure
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item lemmatized form of an object (string)
+\item lemmatized form of an object (string)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetNodeLemmatizedForm\index{GetNodeLemmatizedForm@\texttt{GetNodeLemmatizedForm}}
+\end{itemize}
+
+\subsection{GetNodePOS}\index{GetNodePOS@\texttt{GetNodePOS}|textbf}
+\textbf{Description:} get the POS sequence of a node and its daughters by depth first traversal\\
+\\\textbf{Last modified:} 15/12/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item reference to an array of words of a structure
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item POS sequence of an object
+\item POS sequence of an object
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GetNodePOS\index{GetNodePOS@\texttt{GetNodePOS}}
+\item GetNodeInflectedForm\index{GetNodeInflectedForm@\texttt{GetNodeInflectedForm}}
+\end{itemize}
+
+\subsection{GetNodeID}\index{GetNodeID@\texttt{GetNodeID}|textbf}
+\textbf{Description:} get the ID number of a node\\
+\\\textbf{Last modified:} 15/12/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item reference to an array of words of a structure
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item id of an object
+\item id of an object
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{SearchNodePositionInTerm}\index{SearchNodePositionInTerm@\texttt{SearchNodePositionInTerm}|textbf}
+\textbf{Description:} get the position (characters) of a node in an occurrence of a TC\\
+\\\textbf{Last modified:} 07/11/2005
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\item reference to an array of words of a structure
+\item index of the start character of a sub-string
+\item index of the last character of a sub-string
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item index of the start character of a sub-string
+\item index of the last character of a sub-string
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item SearchNodePositionInTerm\index{SearchNodePositionInTerm@\texttt{SearchNodePositionInTerm}}
+\end{itemize}
+
+\subsection{ExistsCoordination}\index{ExistsCoordination@\texttt{ExistsCoordination}|textbf}
+\textbf{Description:} test if a node or its daughters contain a coordination (recursive)\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the record of node
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1, 0)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item ExistsCoordination\index{ExistsCoordination@\texttt{ExistsCoordination}}
+\end{itemize}
+
+\subsection{CompareChunking}\index{CompareChunking@\texttt{CompareChunking}|textbf}
+\textbf{Description:} compare  and display comparison results for two chunking versions of a corpus\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item name of an object counter
+\item reference to the hash table of file names
+\item reference to the hash table of linguistic options
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item PrintChunkingComparison\index{PrintChunkingComparison@\texttt{PrintChunkingComparison}}
+\end{itemize}
+
+\subsection{PrintChunkingComparison}\index{PrintChunkingComparison@\texttt{PrintChunkingComparison}|textbf}
+\textbf{Description:} display chunking comparison results\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of file names
+\item a handler
+\item reference to the hash table of linguistic options
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item CompareSentences\index{CompareSentences@\texttt{CompareSentences}}
+\end{itemize}
+
+\subsection{CompareSentences}\index{CompareSentences@\texttt{CompareSentences}|textbf}
+\textbf{Description:} compare two chunking versions of a same sentence\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item a first sentence
+\item a second sentence
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item boolean: (1)
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{GetSubDir}\index{GetSubDir@\texttt{GetSubDir}|textbf}
+\textbf{Description:} get the name of the directory where the compared version of chunking is stored\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item name of a file
+\item reference to the hash table of file names
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item name of a sub-directory
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintCorpusChunking}\index{PrintCorpusChunking@\texttt{PrintCorpusChunking}|textbf}
+\textbf{Description:} display the chunking results in a HTML file\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item process counter
+\item reference to the array of sentences of the corpus
+\item reference to the hash table of Maximal Noun Phrases
+\item reference to the hash table of file names
+\item reference to the hash table of object counters
+\item reference to the hash table of parsing methods
+\item reference to the hash table of miscellaneous options
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item GatherMNPsPerSentence\index{GatherMNPsPerSentence@\texttt{GatherMNPsPerSentence}}
+\item FillStatistics\index{FillStatistics@\texttt{FillStatistics}}
+\item PrintChunkingStatisticalResults\index{PrintChunkingStatisticalResults@\texttt{PrintChunkingStatisticalResults}}
+\end{itemize}
+
+\subsection{FillStatistics}\index{FillStatistics@\texttt{FillStatistics}|textbf}
+\textbf{Description:} fill a hash table with statistical information on MNPs\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the current MNP
+\item reference to a hash table of statistical information
+\item reference to the hash table of object counters
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+
+\subsection{PrintChunkingStatisticalResults}\index{PrintChunkingStatisticalResults@\texttt{PrintChunkingStatisticalResults}|textbf}
+\textbf{Description:} display statistical information on MNPs\\
+\\\textbf{Last modified:} 30/06/2006
+
+\paragraph{Arguments}
+\begin{enumerate}
+\item reference to the hash table of object counters
+\item reference to the hash table of parsing methods
+\item reference to the hash table of file names
+\item reference to the hash table of miscellaneous options
+\item a handler for statistical information display
+\end{enumerate}
+
+\paragraph{Returned values}
+\begin{enumerate}
+\item none
+\end{enumerate}
+
+\paragraph{Function calls}
+\begin{itemize}
+\item none
+\end{itemize}
+

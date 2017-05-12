@@ -1,0 +1,61 @@
+#!perl -w
+
+=head1 NAME
+
+phonetize - print a string in a phonetic alphabet for easy reading
+
+=head1 SYNOPSIS
+
+  phonetize Martin
+
+=head1 DESCRIPTION
+
+Takes one argument, a "string".
+Converts each character of "string" to its equivalent "word" in the Phonetic Alphabet.
+Prints these "words", three "words" per line, one space between "words"
+
+In other words, read the output aloud to your military friends and
+they'll know exactly what you're spelling.
+
+=head1 TO DO
+
+=over
+
+=item Let name of phonetic alphabet be an argument (in case more alphabets get implemented)?
+
+=item Handle puncuation somehow?
+
+=item Deal with capital vs. lowercase letters somehow?
+
+=item Let the "three" in "three words per line" be an argument?
+
+=back
+
+=head1 AUTHOR
+
+Martin Thurn
+
+=cut
+
+# use Getopt::Long; # later
+use Lingua::Alphabet::Phonetic;
+
+use strict;
+use warnings;
+
+use vars qw( $VERSION );
+$VERSION = do { my @r = (q$Revision: 1.2 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+
+my $s = shift() || '';
+# Insert spaces between every letter:
+$s = join(' ', split('', $s));
+# Insert {CR} after every third letter:
+$s =~ s!(. . .) !$1\n!g;
+my $oMilSpeaker = new Lingua::Alphabet::Phonetic('NATO');
+my @asMilSpeak = $oMilSpeaker->enunciate($s);
+$, = '';
+print @asMilSpeak, "\n";
+exit 0;
+
+__END__
+

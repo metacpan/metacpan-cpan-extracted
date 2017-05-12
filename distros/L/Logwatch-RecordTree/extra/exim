@@ -1,0 +1,458 @@
+#!/usr/bin/perl -w
+#===============================================================================
+#  DESCRIPTION:  Exim service script using Logwatch::RecordTree
+#
+#       AUTHOR:  Reid Augustin
+#        EMAIL:  reid@LucidPort.com
+#      CREATED:  Thu Apr  2 14:12:13 PDT 2015
+#===============================================================================
+#
+# This script parses Exim's error_log files.  It can be run stand-alone
+# for debugging:
+#
+#       perl exim filename
+#
+# or
+#
+#       perl -d exim filename
+
+
+# sessions and mail transfers can spread out over several lines.  need
+# some stateful analysis to make sense of them
+{
+    package Local::message;
+    use Moo;
+
+    my %types = (
+        '**' => ['Rejected',    '2D6'],
+        '--' => ['Deferred',    '2D4'],
+        '*>' => ['Suppressed',  '2D5'],
+        '>>' => ['Cutthrough',  '2D3'],  # start delivery while arrival in progress
+        '->' => ['Delivered',   '2D2'],
+        '=>' => ['Delivered',   '2D2'],
+        '<=' => ['Arrived',     '2D1'],
+    );
+
+    has flags => (
+        is => 'rw',
+    );
+    has source_ip => (
+        is => 'rw',
+    );
+    has recip => (
+        is => 'rw',
+    );
+    has delivered => (
+        is => 'rw',
+    );
+
+    sub delivery {
+        my ($self, $ip, $port, $type, $flags, $post) = @_;
+
+        my $error = '';
+        if ($post =~ s/: (.*)//) {
+            $error = $1;
+        }
+        my $from = $flags->{F};
+        my ($msg, $sort) = @{$types{$type}};
+        $post ||= $self->recip;
+
+        if ($type eq '**' or
+            $type eq '--') {
+            my $dest_ip = 'localhost';
+            if ($flags->{T} and $flags->{T} eq 'remote_smtp') {
+                $dest_ip = $ip;
+            }
+            $main::tree->log(["$msg by:", $main::IPv4, {sort_key=>$sort}], $dest_ip,
+                "from:", [$from, $main::IPv4], $error);
+        }
+        else {
+            $main::tree->log(["$msg to:", undef, {sort_key=>$sort}], $post,
+                ['from:', $main::IPv4], $self->source_ip, $from, $error);
+        }
+        $self->delivered(1);
+    }
+
+    sub complete {
+        my ($self, $ip) = @_;
+
+        return if ($self->delivered);   # should have been delivered, making arrival info redundant
+        my $recip = $self->recip;
+        $main::tree->log(["Arrived for:", undef, {sort_key=>'2D1'}], ["$recip from:", $main::IPv4], $ip);
+    }
+}
+{
+    package Local::session;
+    use Moo;
+
+    has messages => (    # hash of messages (keyed by ID) associated with this session
+        is => 'rw',
+        default => sub { {} },
+    );
+    has connection_closed => (
+        is => 'rw',
+    );
+
+    sub arrival {
+        my ($self, $ip, $id, $flags, $post) = @_;
+
+        my $msg = $self->messages->{$id};
+        if ($self->messages->{$id}) {
+            $main::tree->log(["arrival: Message ID already exists:", $main::IPv4, {sort_key=>'1a'}], $ip, $id);
+            return;
+        }
+
+        my ($recip) = $post =~ m/ for (\S*)$/;
+        $self->messages->{$id} = Local::message->new(
+            flags     => $flags,
+            recip     => $recip,
+            source_ip => $ip,
+        );
+    }
+
+    sub delivery {
+        my ($self, $ip, $port, $id, $type, $flags, $post) = @_;
+
+        my $message = $self->messages->{$id};
+        if ($message) {
+            $message->delivery($ip, $port, $type, $flags, $post);
+            return;
+        }
+        $main::tree->log(["delivery: No Message with ID:", $main::IPv4, {sort_key=>'1b1'}], $id || '<unknown>', $id);
+    }
+
+    sub id_complete {
+        my ($self, $id) = @_;
+
+        if ($id) {
+            my $msg = delete $self->messages->{$id};
+            if (not $msg) {
+                $main::tree->log(["id_complete: No Message with ID:", undef, {sort_key=>'1c'}], $id);
+            }
+            $msg->complete;
+        }
+        return scalar keys %{$self->messages};
+    }
+
+    sub close {
+        my ($self, $how, $why) = @_;
+
+        for my $id (keys %{$self->messages}) {
+            $main::tree->log('Message IDs not completed:', $id);
+            $self->id_complete($id);
+        }
+    }
+}
+{
+    package Local::Sessions;
+    use Moo;
+
+    has sessions => (
+        is => 'rw',
+        default => sub { {} },  # hash keyed by IP:port
+    );
+    has key_by_id => (          # session hash keys keyed by message ID
+        is => 'rw',
+        default => sub { {} },
+    );
+
+    my $local_msg = 1;      # class counter for local message sessions (no SMTP session)
+
+    sub open_connection {
+        my ($self, $ip, $port) = @_;
+
+        my $key = "$ip:$port";
+        if (exists $self->sessions->{$key}) {
+            $main::tree->log(["open_connection: key already exists:", $main::IPv4, {sort_key=>'1d'}], $ip, "port $port");
+            return;
+        }
+
+        $self->sessions->{$key} = Local::session->new(
+            ip   => $ip,
+            port => $port,
+        );
+    }
+
+    sub arrival {
+        my ($self, $id, $ip, $port, $flags, $post) = @_;
+
+        my $key = "$ip:$port";
+        my $session = $self->sessions->{$key};
+        if (not $session) {
+            # locally generated emails don't have SMTP connection, fake one
+            if ($ip eq 'localhost' and $flags->{P} eq 'local') {
+                $port = $local_msg++;
+                $local_msg++;
+                $self->open_connection($ip, $port);
+                $self->arrival($id, $ip, $port, $flags, $post);
+                return;
+            }
+            $main::tree->log(["arrival: no session with key:", $main::IPv4, {sort_key=>'1e'}], $ip, "port $port");
+            return;
+        }
+        $session->arrival($ip, $id, $flags, $post);
+        if (exists $self->key_by_id->{$id}) {
+            $main::tree->log(["arrival: key already exists:", $main::IPv4, {sort_key=>'1f'}], $ip, $port, "for $id");
+            return;
+        }
+        $self->key_by_id->{$id} = $key;
+    }
+
+    sub delivery {
+        my ($self, $ip, $port, $id, $type, $flags, $post) = @_;
+
+        my $key = $self->key_by_id->{$id};
+        my $session = $self->sessions->{$key} if ($key);
+        if (not $session) {
+            $main::tree->log(["delivery: No session with ID:", $main::IPv4, {sort_key=>'1g'}], $ip, $port, "for $id");
+            return;
+        }
+        $session->delivery($ip, $port, $id, $type, $flags, $post);
+    }
+
+    sub id_complete {
+        my ($self, $id) = @_;
+
+        my $key = $self->key_by_id->{$id};
+        my $session = $self->sessions->{$key} if ($key);
+        if (not $session) {
+            $main::tree->log(["id_complete: No session with ID:", undef, {sort_key=>'1h2'}], $id);
+            return;
+        }
+        # delete session when it has no more messages and connection closed
+        delete $self->sessions->{$key} if (not $session->id_complete($id) and $session->connection_closed);
+    }
+
+    sub close_connection {
+        my ($self, $ip, $port, $how, $why) = @_;
+
+        my $key = "$ip:$port";
+        my $session = $self->sessions->{$key};
+        if (not $session) {
+            $main::tree->log(["close_connection: No session with ID:", $main::IPv4, {sort_key=>'1i'}], $ip, "port $port");
+            return;
+        }
+        $session->connection_closed("$how, $why");
+        # delete session when it has no more messages and connection closed
+        delete $self->sessions->{$key} if (not $session->id_complete());
+    }
+
+    sub close { # clean up any remaining sessions
+        my ($self) = @_;
+
+        for my $session (values %{$self->sessions}) {
+            $session->close;
+        }
+    }
+}
+
+use Logwatch ':dates';
+use Logwatch::RecordTree;
+use aliased 'Logwatch::RecordTree::IPv4' => 'IPv4', (
+    neat_names => -1,   # left-justified neat names
+    columnize  => 1,    # put into columns, if it fits
+    identify   => 1,    # try to identify each IP's owner
+    snowshoe   => 1,    # condense nets within /24 netblocks to CIDRs
+);
+
+$ENV{"LOGWATCH_DATE_RANGE"} ||= 'all';
+
+my $Sessions = Local::Sessions->new;
+
+our $tree = Logwatch::RecordTree->new(
+    name      => 'Exim events:',
+    indent    => '',
+);
+
+my $Detail = $ENV{'LOGWATCH_DETAIL_LEVEL'}  || 0;
+
+my $filter = TimeFilter("%Y-%m-%d %H:%M:%S");
+
+my $fh = *STDIN;
+
+if (@ARGV and -f $ARGV[0]) {
+    open ($fh, '<', $ARGV[0])
+        or die("Error opening $ARGV[0]: $!\n");
+    print "file opened, clearing date filter...\n";
+    $filter = '.*';
+}
+elsif (defined &DB::DB) {
+    print "DeBug detected, clearing date filter...\n";
+    $filter = '.*';
+}
+
+my ($remote_ip, $prev_remote_ip);
+
+while (defined(my $line_orig = <$fh>)) {
+    chomp($line_orig);
+    my $line = $line_orig;
+
+
+    next unless $line =~ /^\s*$filter/o;
+
+    next if ($line =~ /cwd=.*? \d args: /); # exim (or an Exim sub-command) starting (looks like a flag)
+
+    # Isolate this line's date, e.g. 2002-03-31 22:13:48 ...
+    $line =~ s/^\s*(\S+ \S+ (\[\d+\] )?)//;
+    my ($year1,$month1,$day1,$h1,$m1,$s1, $pid) = ($1 =~ /^(\d+)\-(\d+)\-(\d+)\s(\d+):(\d+):(\d+)\s.+/);
+    if (not $year1) {
+        # should never happen
+        $tree->log('Bad format:', $line_orig);
+        next;
+    }
+
+    $line_orig = $line;
+
+    # [nn.nn.nn.nn]:nn (often) indicates the source IP and port from remote hosts
+    my $port = '';
+    if ($line =~ s/(?:from )?\[([\d\.]+)\]:(\d+)\s*//) {
+        $prev_remote_ip = $remote_ip || '';
+        $remote_ip = $1;
+        $port = $2;
+    }
+    else {
+        $remote_ip = undef;
+    }
+
+    my %flags;   # some Exim log flags:
+        # A  authenticator name (and optional id)
+        # C  SMTP confirmation on delivery
+        # CV certificate verification status
+        # D  duration of “no mail in SMTP session”
+        # DN distinguished name from peer certificate
+        # DT on => lines: time taken for a delivery
+        # F  on =>, -> and >> lines: sender address
+        # H  host name and IP address
+        # I  local interface used
+        # P  on <= lines: protocol used
+        # P  on => and ** lines: return path
+        # QT on => lines: time spent on queue so far
+        # R  on <= lines: reference for local bounce
+        # R  on => ** and == lines: router name
+        # S  size of message
+        # ST shadow transport name
+        # T  on <= lines: message subject (topic)
+        # T  on => ** and == lines: transport name
+        # U  local user or RFC 1413 identity
+        # X  TLS cipher suite
+    while ($line =~ s/(?:^| )(\w+)="([^"]*)"\s*/ /) {   # quoted flags
+        $flags{$1} = $2;
+    };
+    while ($line =~ s/(?:^| )(\w{1,4})=(\S+)\s*/ /) {   # non-quoted flags
+        $flags{$1} = $2;
+    };
+
+    if ($flags{P} and ($flags{P} eq 'local')) {
+        $remote_ip ||= 'localhost';
+    }
+    $remote_ip ||= '';
+
+    ($line) = $line =~ m/^\s*(.*\S)\s*$/;   # trim pre and post whitespace
+
+    # start parsing specific event messages here
+    if ($line =~ /Increment slow_fail_block Ratelimit/ or
+        $line =~ /ignoring AUTH=.*? \(client not authenticated\)/ or
+        $line =~ /SSL_write error 5/ or
+        $line =~ /list matching forced to fail: failed to find host name for/) {
+        # ignore
+    }
+    elsif (my ($which) = $line =~ /(Start|End) queue run\:/ ) {
+        $tree->log(['Queue runs:', undef, {sort_key=>'1'}], $which);
+    }
+
+    # this group collects message arrival and delivery messages and
+    # submits them for Session analysis
+    elsif ($line =~ m/SMTP connection \(TCP\/IP connection count = \d+\)/) {
+        $Sessions->open_connection($remote_ip, $port);   # new connection
+    }
+    elsif ( (my $id, $post) = $line =~ m/(\S+) <= (.*)/) {
+        $Sessions->arrival($id, $remote_ip, $port, \%flags, $post); # message arrival
+    }
+    elsif ( ($id, my $type, $post) = $line =~ m/(\S+) (=>|->|>>|\*>|\*\*|==) (.*)/) {
+        $Sessions->delivery($remote_ip, $port, $id, $type, \%flags, $post);    # message delivered (or blocked)
+    }
+    elsif ($line =~ /SMTP connection (outbound|identification)/) {
+        # might be some useful flags here, but ignore them for now
+    }
+    elsif ($line =~ /no MAIL in SMTP connection/) {
+        my ($from) = $line =~ m/ from (\S+)/;
+        $tree->log(['No MAIL in SMTP connection:', IPv4], $remote_ip, $from || $remote_ip || '<unknown>');
+    }
+    elsif (($id) = $line =~ /^(\S+) Completed$/) {
+        $Sessions->id_complete($id);    # message delivery complete
+    }
+    elsif (($id, $post) = $line =~ m/^(.*) SMTP error from remote mail server (.*)/) {
+        # ignore, they also have a Reject (**) line
+    }
+    elsif ((my $how, $why) = $line =~ m/SMTP connection .*(lost|closed) ?(.*)?/) {
+        $Sessions->close_connection($remote_ip, $port, $how, $why);    # session closed
+    }
+
+    elsif ( ($which) = $line =~ /([Rr]ecipient|[Ss]ender) verify fail/ ) {
+        $tree->log('Verify failed:', $which);
+    }
+    elsif ( my ($host) = $line =~ /no IP address found for host (\S+)/ ) {
+        $tree->log(['No IP address found for host (forward lookup):', IPv4], $remote_ip, $host);
+    }
+    elsif ( my ($ip) = $line =~ /no host name found for IP address (\S+)/ ) {
+        $tree->log(['No host found for IP address (reverse lookup):', IPv4], $ip);
+    }
+    elsif ( ($post) = $line =~ m/dovecot_(?:login|plain) authenticator failed (.*)/) {
+        $post =~ s/^for\s+//;
+        $post =~ s/\s*\($//;
+        ($id) = $post =~ m/\(set_id=(.+?)\)/;
+        $id ||= $post;
+        $tree->log(['Failed login', IPv4], [$remote_ip, undef, {columnize=>1}], $id)
+    }
+    elsif ( ($why) = $line =~ m/SMTP protocol error (.*)/) {
+        $tree->log(['SMTP Protocol Error', IPv4], $remote_ip, $why);
+    }
+    elsif ( ($pre, $why) = $line =~ m/(.*) Warning: "(.*)"$/) {
+        $tree->log(['Warnings:', IPv4], $remote_ip, $why);
+    }
+    elsif ( ($post) = $line =~ m/TLS client disconnected cleanly ?(.*)?/) {
+        next if ($post =~ m/rejected our certificate/);
+        $tree->log(['TLS client disconnected cleanly', IPv4], $prev_remote_ip, $post);
+    }
+    elsif ( ($post) = $line =~ m/TLS error on connection ?(.*)?/) {
+        $tree->log(['TLS error on connection from:', IPv4], $prev_remote_ip, $post);
+    }
+    elsif ( (my $in, $post) = $line =~ m/SMTP syntax error in "(.*)" ?(.*)?/) {
+        my $msg = 'SMTP syntax error' . ($in ? " in $in:" : ':');
+        $tree->log($msg, [$post, IPv4], $prev_remote_ip);
+    }
+    elsif ( ($post) = $line =~ m/unqualified sender rejected.*\(?(.*)?\)?/) {
+        $tree->log(['Relay rejected (sender not qualified):', IPv4], $remote_ip, $post);
+    }
+    elsif ((my $name, $post) = $line =~ m/rejected MAIL <([^>]*)>.*Invalid HELO name(.*)/) {
+        $tree->log(["Invalid HELO name$post:", IPv4], $remote_ip, $name);
+    }
+    elsif ( ($pre, my $helo_from, my $why) = $line =~ m/(.*) rejected MAIL\s*(\S*): Access denied(.*)/) {
+        my ($hostname) = $pre =~ m/ H=(\S+)/;
+        $why =~ s/^ - //;
+        $tree->log(['Access Denied:', IPv4], $remote_ip, $why);
+    }
+    else {
+        $tree->log(['Others:', IPv4, {sort_key=>'ZZZ'}], $remote_ip, $line);
+    }
+}
+
+# 'Start' normally sorts after 'End'.  fix that for the queue runs
+if (my $item = $tree->child_by_name('Queue runs:', 'End')) {
+    $item->sort_key('ZZZ'); # make End come after Start
+}
+
+# print the log tree, add '>' in front of, and blank line after, each top
+# level grouping
+print $tree->sprint(sub {
+        my ($item, $path) = @_;
+
+        if (@{$path} == 1) { # only one string in the path?  this is a top-level item
+            substr($item->lines->[0], 0, 0, ">");   # mark first line
+            push(@{$item->lines}, '');               # add blank line to the end
+        }
+    }), "\n";   # print extra blank line after all are done
+
+exit(0);
+
+

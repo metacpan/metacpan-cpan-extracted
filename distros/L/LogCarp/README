@@ -1,0 +1,79 @@
+CGI::LogCarp
+
+This is the CGI::LogCarp module for perl, providing additional streams for
+logging and debugging.
+
+The reason I wrote the module was so that my scripts could have separate and
+independant streams for output for activity-based logging and for debug
+logging separate from actual error output. I thought "we have STDOUT, STDIN,
+and STDERR, so why not a STDBUG and STDLOG to go along with that".
+
+It's designed so that the messages are tiered, in the sense that anything going
+to STDERR gets replicated to STDLOG and STDBUG too.
+Anything going to STDLOG goes to STDBUG, and STDBUG goes only to itself. 
+
+The default is that STDERR, STDBUG, and STDLOG all derive from your script's
+original STDERR.
+
+Now, since you can point these new streams to the same location, and different
+people (or instances of your script) can point these streams to the same
+location, I've removed duplicate messages and handled file locking for you.
+This makes it *very* CGI-friendly and you can do something like poke STDBUG
+back out to the STDOUT, yet leave STDERR and STDLOG going to your
+_application's_ error and activity logs respectively, instead of only being
+able to sling something to the web server's error log. Then you see normal
+logging in your files, but debug output goes back out to your browser
+(probably debugging the CGI)....
+
+Anyway, I'm sure y'all will find all sorts of neato uses I've not thought
+of yet, so have at it.
+
+Michael King
+
+To see the latest changes to the module, see the 'Changes' file.
+
+To see how you can help make this a better module, see the 'TODO' file.
+
+To see any special installation notes, see the 'INSTALL' file.
+
+To install these modules, cd to the directory that this README file is
+in and type the following:
+
+	perl Makefile.PL
+	make
+	make install
+
+Documentation for these modules is part of the files themselves using
+the pod (Plain Old Documentation) format, and can be read using the
+perldoc program that comes with perl.
+
+To manually convert them into manual page format, type something like
+the following:
+
+	pod2man LogCarp.pm > LogCarp.man
+
+To manually convert them into HTML format, type:
+
+	pod2html LogCarp.pm
+
+(pod2html creates an HTML file named LogCarp.pm.html)
+
+Online documentation of these modules can be found at:
+
+	http://walden.mo.net/~mike808/LogCarp
+
+First released to CPAN: Tue Jan 13 01:55:56 CST 1998
+
+Michael King
+<mike808@mo.net>
+http://walden.mo.net/~mike808
+
+Please send any reports of problems or bugs to mike808@mo.net. I wouldn't
+mind a short note to know that you're using this. Suggestions and knowing
+how many others are using this will help promote its upkeep.
+
+This package is copyright (c) 1997 by Michael King (mike808@mo.net) and is
+made available to the Perl public under terms of the Artistic License used to
+cover Perl itself. See the file Artistic in the distribution  of Perl 5.002 or
+later for details of copy and distribution terms.
+

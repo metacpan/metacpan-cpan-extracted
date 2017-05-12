@@ -1,0 +1,1 @@
+GRANT ALL ON demo.* TO 'secret'@'localhost' IDENTIFIED BY 's3cr3t';

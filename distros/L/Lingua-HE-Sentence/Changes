@@ -1,0 +1,44 @@
+Revision history for Perl extension Lingua::HE::Sentence.
+
+0.13	Tue Jan 25 19:56:56 IST 2005
+	- Fixed bug with single letters
+	- Fixed bug with handling of closing punctuation
+	- Added tests to verify the fix
+0.12	Tue Jan 25 15:49:43 IST 2005
+	- Added more test cases
+	- Updated algorithm to properly handle new test cases
+0.11	Fri Sep 24 22:33:49 IST 2004
+	- Fixed bug in the sentence cleaner
+0.10	Fri Jul 23 13:12:41 IDT 2004
+	- Added requirement for Perl 5.8.4 in the Makefile.PL (fixed)
+0.09	Wed Jul 21 00:27:55 IDT 2004
+	- Added requirement for Perl 5.8.4 in the Makefile.PL
+	- Added Test::More are a prerequisite
+0.08	Fri Jul  9 07:03:24 IDT 2004
+	- Perl 5.8.0 is supposed to support user defined Unicode character 
+	classes, however, this feature doesn't work (a bug in Perl?). It seems
+	that Perl 5.8.3 and above (so far I could test it only with Perl 
+	5.8.4.) do not suffer from this bug and they do handle it correctly.
+	- Added LICENSE file.
+0.07	Thu Jul  8 13:50:22 IDT 2004
+	- Changed restriction of Perl version to a portable format
+0.06	Thu Jul  8 11:56:22 IDT 2004
+	- Corrected MANIFEST
+0.05	Thu Jul  8 08:20:30 IDT 2004
+	- Added an explicit LICENSE section to the POD
+0.04	Wed Jul  7 22:43:45 IDT 2004
+	- Added tests
+	- Algorithm was altered into a more sophisticated one: see testbench
+	- Fixed typo in documentation
+	- Added instructions regarding bug reports in documentation
+	- Added restriction for usage under Perl 5.8.0 and above
+0.03	Thu Jun 17 22:30:11 IDT 2004
+	- Works now on UTF-8 encoded texts rather than CP1255/ISO-8859-8 texts
+	- removed requirement for POSIX
+	- requires now Perl 5.8.0
+	- Very minor change to regular expressions
+0.02	Tue Sep 24 16:01:01 IDT 2002
+	- Explaining the expected behaviour of the splitting algorithm
+0.01	Tue Sep 24 12:32:46 IDT 2002
+	- First version of a software for segmenting Hebrew text into sentences.
+

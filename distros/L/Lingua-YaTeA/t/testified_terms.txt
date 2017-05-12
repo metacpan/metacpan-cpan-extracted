@@ -1,0 +1,3 @@
+spore	JJ	spore
+coat	NN	coat
+.	SENT	.

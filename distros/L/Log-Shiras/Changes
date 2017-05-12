@@ -1,0 +1,83 @@
+Revision history for Log-Shiras
+
+Uses the change tracking convention
+	+ New feature.
+	- Removed/deprecated feature.
+	! Bug fix.
+	* Place holder
+
+NOTE: This software is designated as beta quality until this notice is removed.  
+    Intitial CPAN release plus one year is probably the minimum before a v1.0 release.
+
+v0.48.0   2016-10-03 11:59:09-07:00 America/Los_Angeles
+
+	! Escaped curly brace failure for perl v5.25.5
+	! permanantly added the Log::Shiras::LogSpace role to ~::CSVFile and ~::PostgreSQL Report classes
+	+ Added a check in the Log::Shiras::LogSpace default to exclude the substring matching get_class_space
+
+v0.46.0   2016-09-20 09:43:36-07:00 America/Los_Angeles
+
+	! Improvements to some POD
+	! I broke the use_strict kwalitee test so I over fixed it( I think Moose should count but Kwalitee doesn't agree )
+
+v0.44.0   2016-09-19 11:30:03-07:00 America/Los_Angeles
+
+	+ Changed the fatal behaviour (back) to fail after logging instead of before
+		This means the failure doesn't happen until it leaves the buffer if the message was buffered.
+	+ Upgraded these three simple classes to Moose clases so log instantiation behaviour would be consistent
+		Log::Shiras::Report::Stdout, Log::Shiras::Report::Test2Note, Log::Shiras::Report::Test2Diag
+	! Fixed the missing clone method in the ~::Telephone for the 'ask' key
+
+v0.42.4   2016-09-14 22:14:39-07:00 America/Los_Angeles
+
+	+ Syntax change for one line of dubug code
+
+v0.42.2   2016-09-14 11:42:06-07:00 America/Los_Angeles
+
+	+ Additional POD changes
+	+ Added use strict and use warnings for all non Moose and Moose::Role classes for Kwalitee fails
+
+v0.42.0   2016-09-13 12:20:53-07:00 America/Los_Angeles
+
+	+ Additional POD changes
+	! Updated Text::CSV_XS requirements to 1.25 to possibly handle some perl 5.10 fails with Autoloader
+
+v0.40.2   2016-09-12 14:31:20-07:00 America/Los_Angeles
+
+	+ Minor POD changes
+	+ Added Log::Shiras::Report::Test2Diag
+	+ Added the ability to pass $add_string to get_all_space in Log::Shiras::LogSpace
+	+ Increased the level of die reporting in 01-csv.t in order to troubleshoot some CPAN testers fails
+
+v0.38.4   2016-09-10 22:03:01-07:00 America/Los_Angeles
+
+	! Role back coverage tests to 5.22
+
+v0.38.2   2016-09-10 16:42:11-07:00 America/Los_Angeles
+
+	+ Changed .travis.yml to run coverage on 5.24
+	+ Made several improvements to the top level POD
+
+v0.38.0   2016-09-10 08:03:18-07:00 America/Los_Angeles
+
+	+ CPAN release candidate
+
+v0.37.13  2016-09-10 07:52:30-07:00 America/Los_Angeles 
+
+	(cumulative since v0.30.0)
+	! Block unicore/* scrubbing in ~::Unhide
+	! Fixed for 04-telephone.t  failing in perl 5.16 and 5.18
+	! Added requirement for Filter::Util::Call to test
+
+v0.30.0   2016-09-09 14:20:26-07:00 America/Los_Angeles
+
+	+ Updated version numbers for an initial CPAN release
+
+v0.29_1   2016-09-09 14:03:12-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+	+ The goal is to create an initial CPAN release here
+	+ This includes a substantial rework of the Unhide implementation
+	+ Added line numbers to TapPrint and TapWarn namespace generation to allow for by-line control
+	+ Substantially reworked the CSVFile report to consume arrayrefs and hashrefs rather than print lines
+	+ Substantially reworked ShirasFormat Type to be an element modification class Log::Shiras::Report::MetaMethod
+		I might take the ShirasFormat out altogether since it was too tricky for it's own good

@@ -1,0 +1,207 @@
+
+=head1 Standard filter list (defined in code libraries)
+
+
+=head2 List::Filter::Library::FileExtensions
+
+=over
+
+
+=item :asm
+
+Select for asm files (borrowed from ack)
+
+
+=item :cc
+
+Select for cc files (borrowed from ack)
+
+
+=item :cpp
+
+Select for cpp files (borrowed from ack)
+
+
+=item :csharp
+
+Select for csharp files (borrowed from ack)
+
+
+=item :css
+
+Select for css files (borrowed from ack)
+
+
+=item :elisp
+
+Select for elisp files (borrowed from ack)
+
+
+=item :haskell
+
+Select for haskell files (borrowed from ack)
+
+
+=item :html
+
+Select for html files (borrowed from ack)
+
+
+=item :java
+
+Select for java files (borrowed from ack)
+
+
+=item :js
+
+Select for js files (borrowed from ack)
+
+
+=item :lisp
+
+Select for lisp files (borrowed from ack)
+
+
+=item :mason
+
+Select for mason files (borrowed from ack)
+
+
+=item :ocaml
+
+Select for ocaml files (borrowed from ack)
+
+
+=item :parrot
+
+Select for parrot files (borrowed from ack)
+
+
+=item :perl
+
+Select for perl files (borrowed from ack)
+
+
+=item :php
+
+Select for php files (borrowed from ack)
+
+
+=item :python
+
+Select for python files (borrowed from ack)
+
+
+=item :ruby
+
+Select for ruby files (borrowed from ack)
+
+
+=item :scheme
+
+Select for scheme files (borrowed from ack)
+
+
+=item :shell
+
+Select for shell files (borrowed from ack)
+
+
+=item :sql
+
+Select for sql files (borrowed from ack)
+
+
+=item :tcl
+
+Select for tcl files (borrowed from ack)
+
+
+=item :tex
+
+Select for tex files (borrowed from ack)
+
+
+=item :tt
+
+Select for tt files (borrowed from ack)
+
+
+=item :vim
+
+Select for vim files (borrowed from ack)
+
+
+=item :xml
+
+Select for xml files (borrowed from ack)
+
+
+=item :yaml
+
+Select for yaml files (borrowed from ack)
+
+
+=back
+
+=cut
+
+
+
+
+=head2 List::Filter::Library::FileSystem
+
+=over
+
+
+=item :compile
+
+Omit dull files for programmers in compiled languages
+
+
+=item :dired-x-omit
+
+Filters files like the emacs dired-x omit feature.
+
+
+=item :doom-omit
+
+emacs-like omit, without omitting too much
+
+
+=item :hide_vc
+
+ignore common version control files
+
+
+=item :jpeg
+
+Find jpegs, for all common extensions.
+
+
+=item :skipdull
+
+Screen out some uninteresting files.
+
+
+=item :skipdull_not
+
+bogus filter for testing.
+
+
+=item :updatedb_prune
+
+Prune directories in the same way as updatedb
+
+
+=item :web_img
+
+Find files with common web image format extensions.
+
+
+=back
+
+=cut
+
+
+

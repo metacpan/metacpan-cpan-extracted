@@ -1,0 +1,13 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Lingua/KO/Hangul/JamoCompatMapping.pm
+t/00-load.t
+t/01-mapping.t
+t/release-pod-syntax.t
+weaver.ini

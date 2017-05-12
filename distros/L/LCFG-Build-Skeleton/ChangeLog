@@ -1,0 +1,281 @@
+2015-02-24  SVN: new release
+
+	* Release: 0.5.0
+
+2015-02-24 11:20  squinney@INF.ED.AC.UK
+
+	* bin/lcfg-skeleton.in: help is handled automatically now so don't
+	  need to do it in the script
+
+2015-02-24 11:16  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Skeleton.pm.in: tweaked the configfile handling
+	  some more to closely match MooseX::ConfigFromFile
+
+2015-02-24 10:59  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Skeleton.pm.in: Reworked the configuration file
+	  handling so that it matches with the newer way of using
+	  MooseX::ConfigFromFile
+
+2015-02-06 10:23  squinney@INF.ED.AC.UK
+
+	* templates/COMPONENT.pod.tt: Improved the POD template
+
+2014-12-08 16:14  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: LCFG-Build-Skeleton release: 0.4.1
+
+2014-12-08 16:14  squinney@INF.ED.AC.UK
+
+	* lcfg.yml: Noted EL7 support
+
+2014-12-08 16:13  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: LCFG-Build-Skeleton release: 0.4.0
+
+2014-12-08 16:08  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Skeleton.pm.in, templates/README.perl.tt: Ensure
+	  the perl lib directory is not empty when the project is not for
+	  an lcfg component
+
+2014-12-08 16:03  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Skeleton.pm.in: fixed perl module suffix
+
+2014-12-08 16:01  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Skeleton.pm.in, templates/perlcomp_cmake.tt: Perl
+	  components with modules need a cmake file
+
+2014-12-08 15:56  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Skeleton.pm.in, templates/COMPONENT.pl.tt,
+	  templates/COMPONENT.pm.tt, templates/specfile.tt: Reworked how
+	  Perl components are generated so that there is a separate module
+
+2014-10-30 14:00  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: LCFG-Build-Skeleton release: 0.3.1
+
+2014-10-30 14:00  squinney@INF.ED.AC.UK
+
+	* templates/specfile.tt: updated the template post-install script
+	  to use the new isstarted om method
+
+2014-05-22 15:47  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: LCFG-Build-Skeleton release: 0.3.0
+
+2014-05-22 15:46  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, templates/specfile.tt: Updated specfile template to add
+	  a BuildRequires on lcfg-build-deps for lcfg components. Added the
+	  install stage removal of empty files. Also set the perl install
+	  location so that this should work out-of-the-box for more people
+	  writing perl components
+
+2014-02-27 15:36  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: LCFG-Build-Skeleton release: 0.2.0
+
+2014-02-27 15:33  squinney@INF.ED.AC.UK
+
+	* templates/specfile.tt: Do not include a build-dependency on
+	  /etc/rpm/macros.cmake in the specfile template, this was only
+	  necessary for SL5 and breaks builds on EL7 and newer Fedora
+
+2011-02-17 18:25  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: LCFG-Build-Skeleton release: 0.1.0
+
+2011-02-17 18:00  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Skeleton.pm.in: Email::Address->parse() returns a
+	  list, we will just take the first entry and ignore the rest
+
+2011-02-17 17:54  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Skeleton.pm.in: Added code to sanitise the author
+	  email address, hopefully this fixes
+	  https://bugs.lcfg.org/show_bug.cgi?id=386
+
+2011-02-17 17:14  squinney@INF.ED.AC.UK
+
+	* lib/LCFG/Build/Skeleton.pm.in: Added validation of component
+	  name. Closes https://bugs.lcfg.org/show_bug.cgi?id=339
+
+2011-02-17 17:09  squinney@INF.ED.AC.UK
+
+	* templates/specfile.tt: Include the templates directory. Closes
+	  https://bugs.lcfg.org/show_bug.cgi?id=372
+
+2010-04-12 15:57  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: LCFG-Build-Skeleton release: 0.0.13
+
+2010-04-12 15:57  squinney@INF.ED.AC.UK
+
+	* templates/specfile.tt: Removed lsb from the specfile template
+
+2009-03-11 13:26  squinney@INF.ED.AC.UK
+
+	* bin/lcfg-skeleton.in, lib/LCFG/Build/Skeleton.pm.in: Set
+	  svn:keywords on the LCFG::Build::Skeleton Perl modules and
+	  scripts
+
+2009-03-09 16:43  squinney
+
+	* lcfg.yml: Removed hardwired version-control type from lcfg.yml to
+	  allow future transfer to subversion
+
+2009-03-09 15:37  squinney
+
+	* ChangeLog, lcfg.yml: Release: 0.0.12
+
+2009-03-09 15:36  squinney
+
+	* lcfg.yml, lib/LCFG/Build/Skeleton.pm.in: Before creating a new
+	  project check that a local file/dir with the required name does
+	  not exist. Also use the new API for import_project() in
+	  LCFG::Build::VCS 0.0.26
+
+2009-03-09 15:22  squinney
+
+	* LCFG-Build-Skeleton.spec: Increased minimum dependency on
+	  LCFG::Build::VCS to >= 0.0.26
+
+2009-03-09 12:37  squinney
+
+	* ChangeLog, lcfg.yml: Release: 0.0.11
+
+2009-03-09 12:37  squinney
+
+	* lcfg.yml, lib/LCFG/Build/Skeleton.pm.in: Added support for SVN.
+	  Slightly reworked the way in which projects are created so that
+	  it happens in a temporary directory. Also no longer hardwire the
+	  version-control system choice so that it can be easily changed
+	  later. This is all much cleaner and saner.
+
+2009-01-06 12:09  squinney
+
+	* ChangeLog, lcfg.yml: Release: 0.0.10
+
+2009-01-06 12:09  squinney
+
+	* lib/LCFG/Build/Skeleton.pm.in, templates/README.nagios.tt,
+	  templates/README.templates.tt: Added README files for the nagios
+	  and templates directories. This is
+	  useful info for new users but also provides files so that "cvs
+	  import"
+	  will actually add the directories to the repository.
+
+2008-12-05 12:14  squinney
+
+	* ChangeLog, lcfg.yml: Release: 0.0.9
+
+2008-12-05 12:13  squinney
+
+	* lib/LCFG/Build/Skeleton.pm.in: Automatically create templates and
+	  nagios directories for LCFG components
+
+2008-09-12 10:39  squinney
+
+	* ChangeLog, lcfg.yml: Release: 0.0.8
+
+2008-09-12 10:39  squinney
+
+	* lcfg.yml, lib/LCFG/Build/Skeleton.pm.in: Fixed bug with setting
+	  the list of questions. Renamed 'rcs' attribute to 'vcs' to be
+	  consistent with how it is named in the rest of the build tools
+
+2008-09-11 19:06  squinney
+
+	* ChangeLog, lcfg.yml: Release: 0.0.7
+
+2008-09-11 19:06  squinney
+
+	* bin/lcfg-skeleton.in, lib/LCFG/Build/Skeleton.pm.in: Modified
+	  some file path handling to use File::Spec
+
+2008-09-11 15:23  squinney
+
+	* t, t/01_load.t: Added a really basic test to see that the
+	  Skeleton module actually loads
+
+2008-09-11 15:21  squinney
+
+	* Makefile.PL: Added missing comma in Makefile.PL dependency list
+
+2008-09-11 09:20  squinney
+
+	* ChangeLog, lcfg.yml: Release: 0.0.6
+
+2008-09-11 09:20  squinney
+
+	* META.yml.in: Fixed error in META.yml which upsets the pause
+	  indexer
+
+2008-09-10 18:34  squinney
+
+	* ChangeLog, lcfg.yml: Release: 0.0.5
+
+2008-09-10 18:31  squinney
+
+	* META.yml.in: Modified META.yml to attempt to avoid pause wrongly
+	  indexing template files
+
+2008-09-10 14:19  squinney
+
+	* ChangeLog, lcfg.yml: Release: 0.0.4
+
+2008-09-10 14:19  squinney
+
+	* Build.PL.in, LCFG-Build-Skeleton.spec, MANIFEST, META.yml.in,
+	  Makefile.PL, README, bin/lcfg-skeleton.in, lcfg.yml,
+	  lib/LCFG/Build/Skeleton.pm.in: Lots of improvements to the
+	  documentation. Some code tidying to satisfy perltidy and
+	  perlcritic.
+
+2008-09-08 10:47  squinney
+
+	* templates/specfile.tt: Fixed various conditional sections in the
+	  specfile template
+
+2008-09-04 11:47  squinney
+
+	* ChangeLog, lcfg.yml: Release: 0.0.3
+
+2008-09-04 11:47  squinney
+
+	* Build.PL.in, LCFG-Build-Skeleton.spec, MANIFEST, META.yml.in,
+	  Makefile.PL, README, README.BUILD, bin, bin/lcfg-skeleton.in,
+	  lcfg.yml, lib/LCFG/Build/Skeleton.pm.in, specfile: Fully
+	  converted module to using Module::Build
+
+2008-09-04 09:42  squinney
+
+	* ChangeLog, lcfg.yml: Release: 0.0.2
+
+2008-09-04 09:40  squinney
+
+	* Build.PL.in, MANIFEST, lib, lib/LCFG, lib/LCFG/Build,
+	  lib/LCFG/Build/Skeleton.pm.in, templates,
+	  templates/COMPONENT.def.tt, templates/COMPONENT.pl.tt,
+	  templates/COMPONENT.pod.tt, templates/COMPONENT.sh.tt,
+	  templates/ChangeLog.tt, templates/README.BUILD.tt,
+	  templates/README.tt, templates/specfile.tt: Copied over various
+	  files from the original project tree. Also converted to using the
+	  perl Module::Build system to make it the same as the other LCFG
+	  build tool modules.
+
+2008-09-04 09:08  squinney
+
+	* ChangeLog, README, README.BUILD, lcfg.yml, specfile: Created with
+	  lcfg-skeleton
+
+2008-09-04 09:08  
+
+	* .: Standard project directories initialized by cvs2svn.
+

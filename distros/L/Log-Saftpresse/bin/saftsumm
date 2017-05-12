@@ -1,0 +1,538 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use locale;
+
+# ABSTRACT: a postfix logfile analyzer
+# PODNAME: saftsumm
+our $VERSION = '1.6'; # VERSION
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Log::Saftpresse::Log4perl;
+use Log::Saftpresse::Slurp;
+use Log::Saftpresse::Analyzer;
+use Log::Saftpresse::Constants;
+
+Log::Saftpresse::Log4perl->init( 'WARN' );
+
+our ( $progName, $usageMsg, %opts, $isoDateTime );
+($progName = $0) =~ s/^.*\///;
+
+$usageMsg =
+    "usage: $progName -[eq] [-d <today|yesterday>] [--detail <cnt>]
+	[--bounce-detail <cnt>] [--deferral-detail <cnt>] [--geoip]
+	[-h <cnt>] [-i|--ignore-case] [--iso-date-time]
+	[-m|--uucp-mung] [--no-no-msg-size] [--problems-first]
+	[--rej-add-from] [--reject-detail <cnt>] [--smtp-detail <cnt>]
+	[--smtpd-stats] [--smtpd-warning-detail <cnt>]
+	[--syslog-name=string] [--tls-stats] [-u <cnt>] [--verbose-msg-detail]
+	[--verp-mung[=<n>]] [--zero-fill] [file1 [filen]]
+
+       $progName --[version|help]";
+
+# Accept either "_"s or "-"s in --switches
+foreach (@ARGV) {
+    last if($_ eq "--");
+    tr/_/-/ if(/^--\w/);
+}
+
+# Some pre-inits for convenience
+$isoDateTime = 0;	# Don't use ISO date/time formats
+GetOptions(
+    "bounce-detail=i"          => \$opts{'bounceDetail'},
+    "d=s"                      => \$opts{'d'},
+    "deferral-detail=i"        => \$opts{'deferralDetail'},
+    "detail=i"                 => \$opts{'detail'},
+    "e"                        => \$opts{'e'},
+    "geoip"                    => \$opts{'geoip'},
+    "help"                     => \$opts{'help'},
+    "h=i"                      => \$opts{'h'},
+    "ignore-case"              => \$opts{'i'},
+    "i"                        => \$opts{'i'},
+    "iso-date-time"            => \$isoDateTime,
+    "m"                        => \$opts{'m'},
+    "man"                      => \$opts{'man'},
+    "no-no-msg-size"           => \$opts{'noNoMsgSize'},
+    'output|o=s'               => \$opts{'output'},
+    "problems-first"           => \$opts{'pf'},
+    "q"                        => \$opts{'q'},
+    "rej-add-from"             => \$opts{'rejAddFrom'},
+    "reject-detail=i"          => \$opts{'rejectDetail'},
+    "smtp-detail=i"            => \$opts{'smtpDetail'},
+    "smtpd-stats"              => \$opts{'smtpdStats'},
+    "smtpd-warning-detail=i"   => \$opts{'smtpdWarnDetail'},
+    "syslog-name=s"            => \$opts{'syslogName'},
+    "tls-stats"                => \$opts{'tlsStats'},
+    "u=i"                      => \$opts{'u'},
+    "uucp-mung"                => \$opts{'m'},
+    "verbose-msg-detail"       => \$opts{'verbMsgDetail'},
+    "verp-mung:i"              => \$opts{'verpMung'},
+    "version"                  => \$opts{'version'},
+    "zero-fill"                => \$opts{'zeroFill'}
+) || die "$usageMsg\n";
+
+# internally: 0 == none, undefined == -1 == all
+foreach my $option ('h', 'u', 'bounceDetail', 'deferralDetail', 'smtpDetail',
+		'smtpdWarnDetail', 'rejectDetail') {
+	$opts{$option} = -1 unless(defined($opts{$option}));
+}
+
+# If --detail was specified, set anything that's not enumerated to it
+if(defined($opts{'detail'})) {
+    foreach my $optName (qw (h u bounceDetail deferralDetail smtpDetail smtpdWarnDetail rejectDetail)) {
+	$opts{$optName} = $opts{'detail'} unless($opts{"$optName"} != -1);
+    }
+}
+
+my $syslogName = $opts{'syslogName'}? $opts{'syslogName'} : "postfix";
+
+if(defined($opts{'help'})) {
+    print "$usageMsg\n";
+    exit 0;
+}
+
+if( defined $opts{'man'} ) {
+    pod2usage( -exitval => 1, -verbose => 99 );
+}
+
+if(defined($opts{'version'})) {
+	my $version;
+  {
+    ## no critic
+		no strict 'vars'; # is only declared in build
+		$version = defined $VERSION ? $VERSION : '(git checkout)';
+	}
+	print "$progName $version\n";
+	exit 0;
+}
+
+my $slurp = Log::Saftpresse::Slurp->new;
+$slurp->load_plugin('log', module => 'Stdin');
+
+my $analyzer = Log::Saftpresse::Analyzer->new;
+
+if( ! defined $opts{'output'} ) {
+	$opts{'output'} = 'Pflogsumm';
+}
+my $output_class = "Log::Saftpresse::CountersOutput::".$opts{'output'};
+eval "require $output_class;"; ## no critic
+if( $@ ) { die "error loading output: ".$@; }
+my $output = $output_class->new(
+	problems_first => $opts{'pf'},
+	deferral_detail => $opts{'deferralDetail'},
+	bounce_detail => $opts{'bounceDetail'},
+	reject_detail => $opts{'rejectDetail'},
+	smtp_detail => $opts{'smtpDetail'},
+	smtpd_warn_detail => $opts{'smtpdWarnDetail'},
+	quiet => $opts{'q'},
+	top_domains_cnt => $opts{'h'},
+	top_users_cnt => $opts{'u'},
+);
+
+$analyzer->load_plugin('SyslogFile',
+	module => 'SyslogFile' );
+if( defined $opts{'d'} ) {
+	$analyzer->load_plugin('LimitDay',
+		module => 'LimitDay',
+		day => $opts{'d'});
+}
+$analyzer->load_plugin('LimitProgram',
+	module => 'LimitProgram',
+	regex => '^'.$syslogName);
+
+$analyzer->load_plugin('Postfix',
+	module => 'Postfix',
+	saftsumm_mode => 1,
+	per_host_counters => 0,
+	bounce_detail => $opts{'bounceDetail'},
+	deferred_detail => $opts{'deferralDetail'},
+	extended => $opts{'e'},
+	ignore_case => $opts{'i'},
+	message_detail => $opts{'verbMsgDetail'},
+	rej_add_from => $opts{'rejAddFrom'},
+	reject_detail => $opts{'rejectDetail'},
+	smtpd_warn_detail => $opts{'smtpdWarnDetail'},
+	uucp_mung => $opts{'m'},
+	verp_mung => defined $opts{'verpMung'} ? $opts{'verpMung'} : 0,
+	tls_stats => defined $opts{'tlsStats'} ? 1 : 0,
+);
+
+if( defined $opts{'geoip'} ) {
+	$analyzer->load_plugin('GeoIP',
+		module => 'GeoIP');
+	$analyzer->load_plugin('PostfixGeoStats',
+		module => 'PostfixGeoStats',
+		per_host_counters => 0,
+	);
+}
+
+for(;;) {
+	if( $slurp->can_read(1) ) {
+		my $events;
+		eval { $events = $slurp->read_events; };
+		if( $@ && $@ =~ /all inputs at EOF/) {
+			last;
+		} elsif( $@ ) {
+			die($@);
+		}
+		foreach my $e ( @$events ) {
+			$analyzer->process_event($e);
+		}
+	}
+}
+
+$output->output( $analyzer->get_all_counters );
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+saftsumm - a postfix logfile analyzer
+
+=head1 VERSION
+
+version 1.6
+
+=head1 SYNOPSIS
+
+    saftsumm -[eq] [-d <today|yesterday>] [--detail <cnt>]
+	[--bounce-detail <cnt>] [--deferral-detail <cnt>]
+	[-h <cnt>] [-i|--ignore-case] [--iso-date-time]
+	[-m|--uucp-mung] [--no-no-msg-size] [--problems-first]
+	[--rej-add-from] [--reject-detail <cnt>] [--smtp-detail <cnt>]
+	[--smtpd-stats] [--smtpd-warning-detail <cnt>]
+	[--syslog-name=string] [-u <cnt>] [--verbose-msg-detail]
+	[--verp-mung[=<n>]] [--zero-fill] [file1 [filen]]
+
+    saftsumm -[help|version]
+
+    Reads from stdin.  Output is to stdout.
+
+=head1 DESCRIPTION
+
+    Saftsumm is a log analyzer/summarizer for the Postfix MTA.
+
+    It provides a pflogsumm like interface to the saftpresse log file analyzer. 
+    Saftpresse itself is a fork of the pflogsumm script written by Jim Seymour.
+
+    It is designed to provide an over-view of Postfix activity, with just enough
+    detail to give the administrator a "heads up" for potential trouble
+    spots.
+    
+    Saftsumm generates summaries and, in some cases, detailed reports of
+    mail server traffic volumes, rejected and bounced email, and server
+    warnings, errors and panics.
+
+=head1 OPTIONS
+
+    --bounce-detail <cnt>
+
+		   Limit detailed bounce reports to the top <cnt>.  0
+		   to suppress entirely.
+
+    -d today       generate report for just today
+    -d yesterday   generate report for just "yesterday"
+
+    --deferral-detail <cnt>
+
+		   Limit detailed deferral reports to the top <cnt>.  0
+		   to suppress entirely.
+
+    --detail <cnt>
+    
+                   Sets all --*-detail, -h and -u to <cnt>.  Is
+		   over-ridden by individual settings.  --detail 0
+		   suppresses *all* detail.
+
+    -e             extended (extreme? excessive?) detail
+
+		   Emit detailed reports.  At present, this includes
+		   only a per-message report, sorted by sender domain,
+		   then user-in-domain, then by queue i.d.
+
+                   WARNING: the data built to generate this report can
+                   quickly consume very large amounts of memory if a
+		   lot of log entries are processed!
+
+    --geoip        Do GeoIP database lookups on client IPs.
+
+    -h <cnt>       top <cnt> to display in host/domain reports.
+    
+		   0 = none.
+
+                   See also: "-u" and "--*-detail" options for further
+			     report-limiting options.
+
+    --help         Emit short usage message and bail out.
+    
+		   (By happy coincidence, "-h" alone does much the same,
+		   being as it requires a numeric argument :-).  Yeah, I
+		   know: lame.)
+
+    -i
+    --ignore-case  Handle complete email address in a case-insensitive
+                   manner.
+		   
+		   Normally saftsumm lower-cases only the host and
+		   domain parts, leaving the user part alone.  This
+		   option causes the entire email address to be lower-
+		   cased.
+
+    --iso-date-time
+
+                   For summaries that contain date or time information,
+		   use ISO 8601 standard formats (CCYY-MM-DD and HH:MM),
+		   rather than "Mon DD CCYY" and "HHMM".
+
+    -m             modify (mung?) UUCP-style bang-paths
+    --uucp-mung
+
+                   This is for use when you have a mix of Internet-style
+                   domain addresses and UUCP-style bang-paths in the log.
+                   Upstream UUCP feeds sometimes mung Internet domain
+                   style address into bang-paths.  This option can
+                   sometimes undo the "damage".  For example:
+                   "somehost.dom!username@foo" (where "foo" is the next
+                   host upstream and "somehost.dom" was whence the email
+                   originated) will get converted to
+                   "foo!username@somehost.dom".  This also affects the
+                   extended detail report (-e), to help ensure that by-
+                    domain-by-name sorting is more accurate.
+
+    --no-no-msg-size
+
+		    Do not emit report on "Messages with no size data".
+
+		    Message size is reported only by the queue manager.
+		    The message may be delivered long-enough after the
+		    (last) qmgr log entry that the information is not in
+		    the log(s) processed by a particular run of
+		    saftsumm.  This throws off "Recipients by message
+		    size" and the total for "bytes delivered." These are
+		    normally reported by saftsumm as "Messages with no
+		    size data.
+
+    --output|-o <module>
+                    Use the give module for output. Defaults to: Pflogsumm.
+
+    --problems-first
+
+                   Emit "problems" reports (bounces, defers, warnings,
+		   etc.) before "normal" stats.
+
+    --rej-add-from
+                   For those reject reports that list IP addresses or
+                   host/domain names: append the email from address to
+                   each listing.  (Does not apply to "Improper use of
+		   SMTP command pipelining" report.)
+
+    -q             quiet - don't print headings for empty reports
+    
+		   note: headings for warning, fatal, and "master"
+		   messages will always be printed.
+
+    --reject-detail <cnt>
+
+		   Limit detailed smtpd reject, warn, hold and discard
+		   reports to the top <cnt>.  0 to suppress entirely.
+
+    --smtp-detail <cnt>
+
+		   Limit detailed smtp delivery reports to the top <cnt>.
+		   0 to suppress entirely.
+
+    --smtpd-stats
+
+                   Generate smtpd connection statistics.
+
+                   The "per-day" report is not generated for single-day
+                   reports.  For multiple-day reports: "per-hour" numbers
+                   are daily averages (reflected in the report heading).
+
+    --smtpd-warning-detail <cnt>
+
+		   Limit detailed smtpd warnings reports to the top <cnt>.
+		   0 to suppress entirely.
+
+    --syslog-name=name
+
+		   Set syslog-name to look for for Postfix log entries.
+
+		   By default, saftsumm looks for entries in logfiles
+		   with a syslog name of "postfix," the default.
+		   If you've set a non-default "syslog_name" parameter
+		   in your Postfix configuration, use this option to
+		   tell saftsumm what that is.
+
+		   See the discussion about the use of this option under
+		   "NOTES," below.
+
+    --tls-stats
+  
+                   Generate smtp and smtpd TLS statistics
+
+    -u <cnt>       top <cnt> to display in user reports. 0 == none.
+
+                   See also: "-h" and "--*-detail" options for further
+			     report-limiting options.
+
+    --verbose-msg-detail
+
+                   For the message deferral, bounce and reject summaries:
+                   display the full "reason", rather than a truncated one.
+
+                   Note: this can result in quite long lines in the report.
+
+    --verp-mung    do "VERP" generated address (?) munging.  Convert
+    --verp-mung=2  sender addresses of the form
+                   "list-return-NN-someuser=some.dom@host.sender.dom"
+                    to
+                      "list-return-ID-someuser=some.dom@host.sender.dom"
+
+                    In other words: replace the numeric value with "ID".
+
+                   By specifying the optional "=2" (second form), the
+                   munging is more "aggressive", converting the address
+                   to something like:
+
+                        "list-return@host.sender.dom"
+
+                   Actually: specifying anything less than 2 does the
+                   "simple" munging and anything greater than 1 results
+                   in the more "aggressive" hack being applied.
+
+		   See "NOTES" regarding this option.
+
+    --version      Print program name and version and bail out.
+
+    --zero-fill    "Zero-fill" certain arrays so reports come out with
+                   data in columns that that might otherwise be blank.
+
+=head1 EXAMPLES
+
+    Produce a report of previous day's activities:
+
+        saftsumm -d yesterday < /var/log/maillog
+
+    A report of prior week's activities (after logs rotated):
+
+        saftsumm < /var/log/maillog.0
+
+    What's happened so far today:
+
+        saftsumm -d today < /var/log/maillog
+
+    Crontab entry to generate a report of the previous day's activity
+    at 10 minutes after midnight.
+
+	10 0 * * * /usr/local/sbin/saftsumm yesterday < /var/log/maillog
+	2>&1 |/usr/bin/mailx -s "`uname -n` daily mail stats" postmaster
+
+    Crontab entry to generate a report for the prior week's activity.
+    (This example assumes one rotates ones mail logs weekly, some time
+    before 4:10 a.m. on Sunday.)
+
+	10 4 * * 0   /usr/local/sbin/saftsumm < /var/log/maillog.0
+	2>&1 |/usr/bin/mailx -s "`uname -n` weekly mail stats" postmaster
+
+    The two crontab examples, above, must actually be a single line
+    each.  They're broken-up into two-or-more lines due to page
+    formatting issues.
+
+=head1 NOTES
+
+    Saftsumm makes no attempt to catch/parse non-Postfix log
+    entries.  Unless it has "postfix/" in the log entry, it will be
+    ignored.
+
+    It's important that the logs are presented to saftsumm in
+    chronological order so that message sizes are available when
+    needed.
+
+    For display purposes: integer values are munged into "kilo" and
+    "mega" notation as they exceed certain values.  I chose the
+    admittedly arbitrary boundaries of 512k and 512m as the points at
+    which to do this--my thinking being 512x was the largest number
+    (of digits) that most folks can comfortably grok at-a-glance.
+    These are "computer" "k" and "m", not 1000 and 1,000,000.  You
+    can easily change all of this with some constants near the
+    beginning of the program.
+
+    "Items-per-day" reports are not generated for single-day
+    reports.  For multiple-day reports: "Items-per-hour" numbers are
+    daily averages (reflected in the report headings).
+
+    Message rejects, reject warnings, holds and discards are all
+    reported under the "rejects" column for the Per-Hour and Per-Day
+    traffic summaries.
+
+    Verp munging may not always result in correct address and
+    address-count reduction.
+
+    Verp munging is always in a state of experimentation.  The use
+    of this option may result in inaccurate statistics with regards
+    to the "senders" count.
+
+    UUCP-style bang-path handling needs more work.  Particularly if
+    Postfix is not being run with "swap_bangpath = yes" and/or *is* being
+    run with "append_dot_mydomain = yes", the detailed by-message report
+    may not be sorted correctly by-domain-by-user.  (Also depends on
+    upstream MTA, I suspect.)
+
+    The "percent rejected" and "percent discarded" figures are only
+    approximations.  They are calculated as follows (example is for
+    "percent rejected"):
+
+	percent rejected =
+	
+	    (rejected / (delivered + rejected + discarded)) * 100
+
+    There are some issues with the use of --syslog-name.  The problem is
+    that, even with Postfix' $syslog_name set, it will sometimes still
+    log things with "postfix" as the syslog_name.  This is noted in
+    /etc/postfix/sample-misc.cf:
+
+	# Beware: a non-default syslog_name setting takes effect only
+	# after process initialization. Some initialization errors will be
+	# logged with the default name, especially errors while parsing
+	# the command line and errors while accessing the Postfix main.cf
+	# configuration file.
+
+    As a consequence, saftsumm must always look for "postfix," in logs,
+    as well as whatever is supplied for syslog_name.
+
+    Where this becomes an issue is where people are running two or more
+    instances of Postfix, logging to the same file.  In such a case:
+
+	. Neither instance may use the default "postfix" syslog name
+	  and...
+
+	. Log entries that fall victim to what's described in
+	  sample-misc.cf will be reported under "postfix", so that if
+	  you're running saftsumm twice, once for each syslog_name, such
+	  log entries will show up in each report.
+
+    The Saftpresse Home Page is at:
+
+	https://github.com/benningm/saftpresse
+
+=head1 AUTHOR
+
+Markus Benning <ich@markusbenning.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 1998 by James S. Seymour, 2015 by Markus Benning.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut

@@ -1,0 +1,40 @@
+Revision history for Perl extension Language::Prolog::Types.
+
+0.09  Feb 15 2005
+	- added prolog_variables() factory (aka Vs()).
+	- resolved bug in prolog_is_functor()
+	- added rename method to variable objects. Use with care!.
+
+0.08  Wed Jan 22 2003
+	- Language::Prolog::Types::Internal::opaque opaque_class
+	  method now returns the correct class
+
+0.07  Mon Jan 20 2003
+	- prolog_is_list added to export list in Abstract module
+
+0.06  Thu Jan 16 2003
+	- opaque objects support added to converter
+	- Language::XSB::Converter moved to
+          Language::Prolog::Types::Converter so it can also be used from
+	  other modules like Language::Prolog::Yaswi
+	- added new Opaque type
+
+0.05  Sun Jan 12 2003
+	- quoting added for functors names
+	- bug in 'Factory' corrected: prolog_chain was returning
+	  wrong value sometimes when called in scalar context
+
+0.04
+	- requires only perl 5.6
+	- Some Makefile.PL files corrected
+
+0.03  Thu Nov 28 2002
+	- Cleaned up for CPAN distribution
+
+0.02  -
+	-
+
+0.01  Fri Nov 22 13:05:57 2002
+	- original version; created by h2xs 1.22 with options
+		-AX -n Language::Prolog::Types
+

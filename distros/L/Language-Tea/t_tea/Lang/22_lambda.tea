@@ -1,0 +1,11 @@
+
+define areaRectangulo (comprimento) {
+    lambda (largura) { * $comprimento $largura }
+}
+
+define rect4 [areaRectangulo 4]
+define rect6 [areaRectangulo 6]
+
+echo [str-cat "\nE agora um bocadinho de de closures:\n A area do rectangulo com um comprimento de 4 e largura de 6 " [int->string [rect4 6]]]
+echo [str-cat "\nE agora um bocadinho de de closures:\n A area do rectangulo com um comprimento de 6 e largura de 6 " [int->string [rect6 6]]]
+ 

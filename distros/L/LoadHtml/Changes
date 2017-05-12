@@ -1,0 +1,20 @@
+Revision history for LoadHtml
+
+7.00    Date/time
+        First version, released on an unsuspecting world.
+7.01	2007/09/07
+	Updated documentation (added synopsis)
+7.02	2007/09/17
+	Added support for list of hash-keys to drive sorting of hash-driven loops. 
+	ie.  <!LOOP listparm hashparm, ...>
+7.05 2010/08/30
+	Fix buglet that prevented checkboxes from being checked if the check-
+	indicating parameter name ended with "check", ie. ".. :ischecked>"!
+7.06	2010/09/20
+	Fix regular expression to allow CSS "style=" tags in SELECT tags.
+7.07	2012/03/09
+	Fix bug that caused fatal error if the reference array was missing in 
+	LOOP tags.
+7.08	2012/10/16
+	Moved evaluation of <!HASH> tags below <!LOOP>'s so that a LOOP can be used
+	to create the contents of a <!HASH> tag.  (Lines 1102-1109).

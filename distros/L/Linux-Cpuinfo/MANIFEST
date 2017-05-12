@@ -1,0 +1,22 @@
+Changes
+lib/Linux/Cpuinfo.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/01-basic.t
+t/02-cpuinfo.t
+t/03-samples.t
+t/04-armv67-bug.t
+t/proc/cpuinfo.agenda_mips
+t/proc/cpuinfo.alpha
+t/proc/cpuinfo.ppc
+t/proc/cpuinfo.sparc
+t/proc/cpuinfo.x86_smp
+t/proc/cpuinfo.Xeon_smp
+t/proc/cpuinfo.armv6hl_rpi
+t/proc/cpuinfo.celeron_II
+t/proc/cpuinfo.Marvel_PJ4Bv7
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

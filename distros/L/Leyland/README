@@ -1,0 +1,242 @@
+NAME
+    Leyland - RESTful web application framework based on Plack
+
+SYNOPSIS
+            # in app.psgi:
+
+            #!/usr/bin/perl -w
+
+            use strict;
+            use warnings;
+            use MyApp;
+
+            my $app = MyApp->new->to_app;
+
+DESCRIPTION
+    Leyland is a Plack-based application framework for building truely
+    RESTful, MVC-style web applications. It is feature rich and highly
+    extensible.
+
+    STOP! BACKWORDS COMPATIBILITY BREAKING CHANGES
+
+            Leyland v1.0.0 brings small changes that break backwords compatibility.
+            Read the L<upgrading manual|Leyland::Manual::Upgrading> for more information.
+
+  FEATURES
+    *   Build truely RESTful web applications: Leyland was designed from the
+        ground up according to the Representational State Transfer style of
+        software architecture. Leyland applications perform real HTTP
+        negotiations, (can) provide different representations of the same
+        resource easily, respond with proper HTTP status codes, throw real
+        HTTP exceptions, etc.
+
+    *   Automatic data (de)serialization - Leyland automatically serializes
+        resources to representations in the format your client wants to
+        receive, like JSON and XML. It will also automatically deserialize
+        JSON/XML requests coming from the client to Perl data-structures.
+
+    *   Pure UTF-8 - Leyland applications are pure UTF-8. Anything your
+        application receives is automatically UTF-8 decoded, and anything
+        your application sends is automatically UTF-8 encoded. Leyland apps
+        will not accept, nor provide, content in a different character set.
+        If you want to use different/multiple encodings, then Leyland is not
+        for you.
+
+    *   Localize for the client, not the server - Pretty much every other
+        application framework only concerns itself with localizing the
+        application to the locale of the machine on which it is running. I
+        find that this is rarely useful nor interesting to the application
+        developer. Leyland localizes for the client, not the server. If the
+        client wants to view your application (which may be a simple
+        website) in Hebrew, and your application supports Hebrew, then you
+        can easily provide him with Hebrew representations. Leyland uses
+        Locale::Wolowitz for this purpose.
+
+    *   Easy deployment and middleware support via Plack - Leyland doesn't
+        support Plack, it is dependant on it. Leyland's entire session
+        support, for example, depends on Plack's Session middleware. Use the
+        full power of Plack in your Leyland application.
+
+    *   Lightweight - Leyland is much smaller than Catalyst or other major
+        frameworks, while still providing lots of features. While it is not
+        a "micro-framework", it is pretty small. If you're looking for an
+        extremely lightweight solution, my other framework - McBain - might
+        fit your need.
+
+    *   Flexible, extensible - Leyland was designed to be as flexible and as
+        extensible as possible - where flexibility matters, and strict -
+        where constistency and convention are appropriate. Leyland goes to
+        great lengths to give you the ability to do things the way you want
+        to, and more importantly - the way your end-users want to. Your
+        applications listen to your users' preferences and automatically
+        decide on a suitable course of action. Leyland is also Moo based,
+        making it easy to extend and tweak its behavior (and making it Moose
+        compatible).
+
+    *   Doesn't have a pony - You don't really need a pony, do you?
+
+  MANUAL / TUTORIAL / GUIDE / GIBBERISH
+    To learn about using Leyland, please refer to the Leyland::Manual. The
+    documentation of this distribution's classes is for reference only, the
+    manual is where you're most likely to find your answers. Or not.
+
+  UPGRADING FROM VERSION 0.1.7 OR SMALLER
+    Major changes have been made in Leyland version 1.0.0. While most should
+    be backwords compatible, some are not. Please take a look at the
+    upgrading manual for a complete list of changes and a simple guide for
+    upgrading existing applications.
+
+  WHAT'S WITH THE NAME?
+    Leyland is named after Mr. Bean's clunker of a car - the British Leyland
+    Mini 1000. I don't know why.
+
+EXTENDS
+    Plack::Component
+
+ATTRIBUTES
+  name
+    The package name of the application, for example "MyApp" or "My::App".
+    Automatically created.
+
+  config
+    A hash-ref of configuration options supplied to the app by the PSGI
+    file. These options are purely for the writer of the application and
+    have nothing to do with Leyland itself.
+
+  context_class
+    The name of the class to be used as the context class for every request.
+    Defaults to Leyland::Context. If provided, the class must extend
+    Leyland::Context.
+
+  localizer
+    If application config defines a path for localization files, this will
+    hold a Leyland::Localizer object, which is based on Locale::Wolowitz.
+
+  views
+    An array refernce of all Leyland::View classes enabled in the app's
+    configuration. If none defined, Tenjin is used by default.
+
+  routes
+    A Tie::IxHash object holding all routes defined in the application's
+    controllers. Automatically created, not to be used directly by
+    applications.
+
+  cwe
+    The plack environment in which the application is running. This is the
+    "PLACK_ENV" environment variable. Defaults to "development" unless
+    you've provided a specific value to "plackup" (via the "-E" switch or by
+    changing "PLACK_ENV" directly).
+
+CLASS METHODS
+  new( [ %attrs ] )
+    Creates a new instance of this class. None of the attributes are
+    required (in fact, you shouldn't pass most of them), though you can pass
+    the "config" and "context_class" attributes if you need.
+
+OBJECT METHODS
+  setup()
+    This method is not available by default, but is expected to be provided
+    by application classes (though it is not required). If present, it will
+    be called upon creation of the application object. The method is
+    expected to return a hash-ref of Leyland-specific options. The following
+    options are supported:
+
+    *   views
+
+        A list of view classes to load. Defaults to "["Tenjin"]".
+
+    *   view_dir
+
+        The path to the directory in which views/templates reside (defaults
+        to "views").
+
+    *   locales
+
+        The path to the directory in which localization files (in
+        Locale::Wolowitz's format) reside (if localization is used).
+
+    *   default_mime
+
+        The default return MIME type for routes that lack a specific
+        declaration (defaults to "text/html").
+
+  call( \%env )
+    The request handler. Receives a standard PSGI env hash-ref, creates a
+    new instance of the application's context class (most probably
+    Leyland::Context), performs HTTP negotiations and finds routes matching
+    the request. If any are found, the first one is invoked and an HTTP
+    response is generated and returned.
+
+    You should note that requests to paths that end with a slash will
+    automatically be redirected without the trailing slash.
+
+  has_localizer()
+    Returns a true value if the application has a localizer.
+
+  has_views()
+    Returns a true value if the application has any view classes.
+
+  has_routes()
+    Returns a true value if the application has any routes defined in its
+    controllers.
+
+INTERNAL METHODS
+    The following methods are only to be used internally.
+
+  BUILD()
+    Automatically called by Moo after instance creation, this method runs
+    the applicaiton's "setup()" method (if any), loads the context class,
+    localizer, controllers and views. It then find all routes in the
+    controllers and prints a nice info table to the log.
+
+AUTHOR
+    Ido Perlmuter, "<ido at ido50.net>"
+
+ACKNOWLEDGMENTS
+    I wish to thank the following people:
+
+    *   Sebastian Knapp <http://search.cpan.org/~sknpp/> for submitting bug
+        fixes
+
+    *   Michael Alan Dorman <http://search.cpan.org/~mdorman/> for some
+        helpful ideas
+
+BUGS
+    Please report any bugs or feature requests to "bug-Leyland at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Leyland>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+            perldoc Leyland
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Leyland>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Leyland>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Leyland>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Leyland/>
+
+LICENSE AND COPYRIGHT
+    Copyright 2010-2014 Ido Perlmuter.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

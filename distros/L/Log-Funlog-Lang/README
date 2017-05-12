@@ -1,0 +1,29 @@
+$Header: /var/cvs/sources/Funlog/README,v 1.16 2005/01/25 22:33:14 gab Exp $
+vim600: set textwidth=80:
+
+Log::Funlog::Lang - Language pack for Log::Funlog
+
+Gab
+korsani f.r.e.e f.r
+
+ ,+---------------------------------- -  -   -    -     -
+( | What is it?
+ `+---------------------------------- -  -   -    -     -
+
+Perl module that provide funny sentences for Log::Funlog.
+
+ ,+---------------------------------- -  -   -    -     -
+( | Install it
+ `+---------------------------------- -  -   -    -     -
+
+perl Makefile.PL
+make
+(make test)
+sudo make install
+
+ ,+---------------------------------- -  -   -    -     -
+( | Use it
+ `+---------------------------------- -  -   -    -     -
+	
+	use Log::Funlog::Lang;
+	my @fun=Log::Funlog::Lang->new();

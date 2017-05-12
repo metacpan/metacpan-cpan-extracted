@@ -1,0 +1,24 @@
+0.05      2017-03-11 20:45:38+00:00 Europe/Lisbon
+
+    * Fix tests for newer perls (SREZIC++ for report).
+
+0.04      2017-03-10 11:17:40+00:00 Europe/Lisbon
+
+    * Another refactor of the core algorithm.
+    * Update tests.
+    * Update documentation.
+
+0.03      2017-01-26 13:31:56+00:00 Europe/Lisbon
+
+    * Completely refactor the core algorithm.
+    * Correctly compute full actants syntagmas.
+    * Update test files.
+
+0.02      2016-10-13 14:34:08+01:00 Europe/Lisbon
+
+    * Skip already visited nodes when computing actants syntagmas.
+
+0.01      2016-10-13 14:08:58+01:00 Europe/Lisbon
+
+    * Initial release.
+

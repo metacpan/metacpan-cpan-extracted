@@ -1,0 +1,4 @@
+screen.maxlevel = debug
+screen.minlevel = emerg
+screen.newline  = 1
+screen.message_layout = %T %H[%P] [%L] Config::Properties %m

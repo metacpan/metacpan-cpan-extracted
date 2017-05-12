@@ -1,0 +1,33 @@
+conf:info1:[% yapc_name %]
+conf:info2:[% yapc_http %]
+conf:info3:[% yapc_city %]
+conf:info4:[% yapc_country %]
+
+[% sect = 0 %]
+[% FOREACH section = survey.sections %]
+[% sect = sect + 1 %]
+[% IF section.label == 'Feedback' %]
+
+sect:h2:[% section.label %]
+
+[% IF section.preamble %]sect:p:[% section.preamble %][% END %]
+[% FOREACH question = section.questions %]
+[% IF question.status != 'hidden' %]
+sect:h3:[% question.label %]
+
+[% IF question.multipart %]
+[% FOREACH q = question.multipart %]
+[% INCLUDE "survey/results-survey-question.dat" %]
+[% END %]
+
+[% ELSE %]
+[% q = question %]
+[% INCLUDE "survey/results-survey-question.dat" %]
+
+[% END %]
+[% END %]
+[% END %]
+[% IF section.footnote %]sect:p:[% section.footnote %][% END %]
+
+[% END %]
+[% END %]

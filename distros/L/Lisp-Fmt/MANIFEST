@@ -1,0 +1,8 @@
+README
+CHANGES
+MANIFEST
+Makefile.PL
+Fmt.pm
+t/test.t
+eg/format
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,83 @@
+NAME
+    Log::Handler::Output::Gearman - Send log messages to Gearman workers.
+
+SYNOPSIS
+        use Log::Handler::Output::Gearman;
+
+        my $logger = Log::Handler::Output::Gearman->new(
+            servers => ['127.0.0.1:4731'],
+            worker  => 'logger',
+        );
+
+        my $message = 'This is a log message';
+        $logger->log( $message );
+
+DESCRIPTION
+    This is experimental ( beta ) and should only be used in a test
+    environment. The API may change at any time without prior notification
+    until this message is removed!
+
+METHODS
+  new
+    Takes a number of arguments, following are mandatory:
+
+    *   servers
+
+            # hostname:port gearmand is running on
+            servers => [
+                '127.0.0.1:4731',
+                '192.168.0.1:4735',
+                '192.168.0.2'       # uses default port (4730)
+            ]
+
+    *   worker
+
+            # name of the worker that should process the log messages
+            worker => 'logger'
+
+    Besides it takes also following optional arguments:
+
+    *   method (default: do_background)
+
+            method => 'do_high_background'
+
+        This can be one of the following Gearman::XS::Client methods:
+
+        * "do"
+        * "do_high"
+        * "do_low"
+        * "do_background"
+        * "do_high_background"
+        * "do_low_background"
+
+  log
+    Takes one argument:
+
+    *   $message - The log message
+
+  errstr
+    Returns the last error message.
+
+  gearman_client
+    Returns Gearman::XS::Client instance.
+
+  reload
+    Reload with a new configuration.
+
+AUTHOR
+    Johannes Plunien <plu@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2009 by Johannes Plunien
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    * Log::Handler
+    * Gearman::XS::Client
+    * <http://www.gearman.org/>
+
+REPOSITORY
+    <http://github.com/plu/log-handler-output-gearman/>
+

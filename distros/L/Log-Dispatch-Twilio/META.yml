@@ -1,0 +1,27 @@
+---
+abstract: 'Log output via Twilio SMS Message'
+author:
+  - 'Graham TerMarsch (cpan@howlingfrog.com)'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Dispatch-Twilio
+provides:
+  Log::Dispatch::Twilio:
+    file: lib/Log/Dispatch/Twilio.pm
+    version: 0.02
+requires:
+  HTTP::Status: 0
+  List::Util: 0
+  Log::Dispatch: 0
+  WWW::Twilio::API: 0
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: 0.02

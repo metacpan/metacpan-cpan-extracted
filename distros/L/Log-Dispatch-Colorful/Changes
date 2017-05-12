@@ -1,0 +1,10 @@
+Revision history for Perl extension Log::Dispatch::Colorful
+
+0.03    2009-09-20T18:29:09+09:00
+        - added notes for Log::Dispatch::Screen::Color.
+
+0.02    2009-06-19T02:14:58+09:00
+        - fixed destructive dumper.
+
+0.01    Thu Nov 20 14:07:43 2008
+        - original version

@@ -1,0 +1,11 @@
+bin/log-defer-viz
+Changes
+lib/Log/Defer/Viz.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/runs.t
+t/tp.log
+t/viz.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

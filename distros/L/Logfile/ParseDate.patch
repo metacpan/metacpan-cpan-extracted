@@ -1,0 +1,46 @@
+*** /home/crew/pfeifer/tmp/ParseDate.pm	Tue Mar 26 15:00:00 1996
+--- /usr/local/ls6/perl/lib/site_perl/Time/ParseDate.pm	Tue Mar 26 15:45:20 1996
+***************
+*** 373,384 ****
+  
+  	my $carry;
+  
+! 	print "before rs $jd $H $M $S\n" if $debug;
+  	#
+  	# add in relative seconds.  Do it this way because we want to
+  	# preserve the localtime across DST changes.
+  	#
+! 	$S += $rs;
+  	$carry = int($S / 60);
+  	$S %= 60;
+  	$M += $carry;
+--- 373,384 ----
+  
+  	my $carry;
+  
+! 	print "before $rs $jd $H $M $S\n" if $debug;
+  	#
+  	# add in relative seconds.  Do it this way because we want to
+  	# preserve the localtime across DST changes.
+  	#
+! 	$S += $rs if defined $rs;
+  	$carry = int($S / 60);
+  	$S %= 60;
+  	$M += $carry;
+***************
+*** 656,662 ****
+  		$$sr = $3 || $7;
+  		$ampm = $4 || $8 || ${10};
+  		$$tzr = ${11};
+! 		$$hr += 12 if "\U$ampm" eq "PM" && $$hr != 12;
+  		$$hr = 0 if $$hr == 12 && "\U$ampm" eq "AM";
+  		$$hr = 0 if $$hr == 24;
+  		printf "matched at %d, rem = %s.\n", __LINE__, $$tr if $debug;
+--- 656,662 ----
+  		$$sr = $3 || $7;
+  		$ampm = $4 || $8 || ${10};
+  		$$tzr = ${11};
+! 		$$hr += 12 if $ampm and "\U$ampm" eq "PM" && $$hr != 12;
+  		$$hr = 0 if $$hr == 12 && "\U$ampm" eq "AM";
+  		$$hr = 0 if $$hr == 24;
+  		printf "matched at %d, rem = %s.\n", __LINE__, $$tr if $debug;

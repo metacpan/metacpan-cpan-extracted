@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+ 
+<!-- =================================================== --> 
+<!--              DTD definition - ALVIS WP5             --> 
+<!-- =================================================== --> 
+ 
+<!--              linguistic annotation (ALVIS WP5)      --> 
+ 
+<!ELEMENT  linguisticAnalysis 
+                        (log_level?,  
+                         token_level?,  
+                         word_level?,  
+                         sentence_level?, 
+                         phrase_level?,  
+                         semantic_unit_level?, 
+                         lemma_level?,  
+                         stem_level?,  
+                         morphosyntactic_features_level?,  
+                         syntactic_relation_level?, 
+                         semantic_features_level?, 
+                         domain_specific_relation_level?,  
+                         anaphora_relation_level?     )    > 
+ 
+<!-- =================================================== --> 
+<!--                    TOKEN LEVEL                      --> 
+<!-- =================================================== --> 
+<!ELEMENT  token_level  (log_id?, comments*, token+)       > 
+ 
+<!--                    separator token                  --> 
+<!ELEMENT  token        (id, type, content, from, to)      > 
+ 
+<!--                    content of the token             --> 
+<!ELEMENT  content      (#PCDATA)                          > 
+ 
+<!--                    start offset of the token        --> 
+<!ELEMENT  from         (#PCDATA)                          > 
+ 
+<!--                    end offset of the token          --> 
+<!ELEMENT  to           (#PCDATA)                          > 
+ 
+
+<!-- =================================================== --> 
+<!--                    WORD LEVEL                       --> 
+<!-- =================================================== --> 
+<!ELEMENT  word_level   (log_id?, comments*, word+)        > 
+ 
+<!--                    word                             --> 
+<!ELEMENT  word         (id, log_id?, list_refid_token, 
+                         form?)                            > 
+ 
+<!--                    id of the element                --> 
+<!ELEMENT  id           (#PCDATA)                          > 
+ 
+<!--          list of the tokens which compose the words --> 
+<!ELEMENT  list_refid_token (refid_token)+                 > 
+ 
+<!--               token id, part of the words           --> 
+<!ELEMENT  refid_token  (#PCDATA)                          > 
+ 
+<!--                         form                        --> 
+<!ELEMENT  form    (#PCDATA)                               > 
+ 
+<!-- =================================================== --> 
+<!--                    SENTENCE LEVEL                   --> 
+<!-- =================================================== --> 
+<!ELEMENT  sentence_level (log_id?, comments*, sentence+)  > 
+ 
+<!--                    sentence                         --> 
+<!ELEMENT  sentence     (id, log_id?, refid_start_token, 
+                         refid_end_token, form?)           > 
+ 
+<!--          Reference of the token at the beginning    --> 
+<!--          of the sentence                            --> 
+<!ELEMENT  refid_start_token 
+                        (#PCDATA)                          > 
+ 
+<!--               Reference of the token at the end     --> 
+<!--               of the sentence                       --> 
+<!ELEMENT  refid_end_token 
+                        (#PCDATA)                          > 
+ 
+<!--                     word id, part of the word       -->
+<!ELEMENT  refid_word  (#PCDATA)                           >
+
+
+
+ 
+ 
+<!-- =================================================== --> 
+<!--                    PHRASE LEVEL                     --> 
+<!-- =================================================== --> 
+<!ELEMENT  phrase_level 
+                        (log_id?, comments*, phrase+)      > 
+ 
+<!--                    phrase                           --> 
+<!ELEMENT  phrase      (id, log_id?, type?,
+		        list_refid_components, 
+                        form?)                             > 
+ 
+<!--                    list_refid_components            --> 
+<!ELEMENT  list_refid_components 
+                        (refid_word | refid_phrase)+       > 
+ 
+<!--                    refid_phrase                     --> 
+<!ELEMENT  refid_phrase (#PCDATA)                          > 
+ 
+<!-- =================================================== --> 
+<!--                    SEMANTIC UNIT LEVEL              --> 
+<!-- =================================================== --> 
+
+<!ELEMENT  semantic_unit_level
+                        (log_id?, comments*, 
+                         semantic_unit*)                   >
+
+<!--                    Named entities and terms         --> 
+<!ELEMENT  semantic_unit 
+                        (named_entity | term | undefined)+ > 
+ 
+<!--                    named entity                     --> 
+<!ELEMENT  named_entity (id?, log_id?, (refid_phrase | 
+                         refid_word | list_refid_token)? , 
+                         form?, canonical_form?, 
+                         named_entity_type)                >
+
+<!ELEMENT  list_refid_semantic_unit (refid_semantic_unit)+ >
+<!ELEMENT  refid_semantic_unit (#PCDATA)                   >
+ 
+<!--                    named_entity_type                --> 
+<!ELEMENT  named_entity_type (#PCDATA)                     > 
+ 
+<!--                    term                             --> 
+<!ELEMENT  term         (id, log_id?, (refid_phrase 
+                         | refid_word | list_refid_token), 
+                         form?, canonical_form?, weights?) > 
+ 
+<!--                    undefined semantic unit          --> 
+<!ELEMENT  undefined    (id, log_id?, (refid_phrase 
+                         | refid_word | list_refid_token), 
+                           form?, canonical_form?)         > 
+
+<!--                  Term weights                         >
+<!ELEMENT weights       (weight*)                          >
+
+<!--                    Term weight                        >
+<!ELEMENT weight        (#PCDATA)                          >
+<!ATTLIST weight        name CDATA #REQUIRED               >
+
+<!--                    Term negation                      >
+<!ELEMENT negation      (#PCDATA)                          >
+
+<!-- =================================================== --> 
+<!--                    LEMMA LEVEL                      --> 
+<!-- =================================================== --> 
+<!ELEMENT  lemma_level  (log_id?, comments*, lemma+)       > 
+ 
+<!--                    lemma                            --> 
+<!ELEMENT  lemma        (id, log_id?, canonical_form+, 
+                         refid_word, form?)                > 
+ 
+<!--              canonical form of the word             --> 
+<!--              corresponding to the lemma             --> 
+<!ELEMENT  canonical_form 
+                        (#PCDATA)                          > 
+ 
+<!-- =================================================== --> 
+<!--                    STEM LEVEL                       --> 
+<!-- =================================================== --> 
+<!ELEMENT  stem_level   (log_id?, comments*, stem+)        > 
+ 
+<!--                    stem                             --> 
+<!ELEMENT  stem         (id, log_id?, stem_form+, 
+                         refid_word, form?)                > 
+ 
+<!--                    stem form                        --> 
+<!ELEMENT  stem_form    (#PCDATA)                          > 
+ 
+<!-- =================================================== --> 
+<!--              MORPHOSYNTACTIC FEATURES LEVEL         --> 
+<!-- =================================================== --> 
+ 
+<!ELEMENT  morphosyntactic_features_level 
+                        (log_id?, comments*,
+                         morphosyntactic_features+)        > 
+ 
+<!--                    morphosyntactic_features         --> 
+<!ELEMENT  morphosyntactic_features 
+                        (id, log_id?, (refid_word |
+                         refid_phrase), syntactic_category, 
+			 category?, type?, gender?, number?,
+                         case?, mood_vform?, tense?, person?, 
+                         degree?, possessor?, formation?, 
+                         form?)                            > 
+
+<!--                    type                             -->
+<!--                    applicable for nouns, verbs, 
+                        adjectives, pronouns, determiners, 
+                        adverbs, adpositions, conjunctions, 
+                        numerals                         -->
+<!ELEMENT  type                                                      
+			(#PCDATA)			   >
+
+<!--                    gender                           -->
+<!--                    applicable for nouns, verbs, 
+                        adjectives, pronouns, determiners, 
+                        numerals                         -->
+<!ELEMENT  gender                                    
+			(#PCDATA)                          >
+
+<!--                    number                           -->
+<!--                    applicable for nouns, verbs, 
+                        adjectives, pronouns, determiners, 
+                        numerals                         -->
+<!ELEMENT  number                                           
+			(#PCDATA)                          >
+
+<!--                    case                             -->
+<!--                    applicable for nouns, adjectives,
+                        pronouns, determiners, numerals  -->
+<!ELEMENT  case         (#PCDATA)                          >
+
+<!--                    mood_vform                       -->
+<!--                    applicable for verbs             -->
+<!ELEMENT  mood_vform   (#PCDATA)                          >
+
+<!--                    tense                            -->
+<!--                    applicable for verbs             -->
+<!ELEMENT  tense        (#PCDATA)                          >
+
+<!--                    person                           -->
+<!--                    applicable for verbs, pronouns,
+                         determiners                     -->
+<!ELEMENT  person       (#PCDATA)                          >
+
+<!--                    degree                           -->
+<!--                    applicable for adjectives, 
+                        adverbs                          -->
+<!ELEMENT  degree       (#PCDATA)                          >
+
+<!--                    possessor                        -->
+<!--                    applicable for pronouns,
+                         determiners                     -->
+<!ELEMENT  possessor    (#PCDATA)                          >
+
+<!--                    formation                        -->
+<!--                    applicable for adpositions       -->
+<!ELEMENT  formation    (#PCDATA)                          >
+
+<!--                    syntactic_category               --> 
+<!--                    Multext POS categories           -->
+<!--          Noun (N), Verb (V), Adjective (A), Pronoun
+              (P), Determiner (D), Article (T), Adverb
+              (R), Adposition (S) Conjunction (C),
+              Numerals (M), Interjection (I), Unique (U)
+              Resiual (X), Abbreviation (Y)              -->
+<!ELEMENT  syntactic_category 
+                        (#PCDATA)                          > 
+ 
+
+<!-- =================================================== --> 
+<!--               SYNTACTIC_RELATION_LEVEL              --> 
+<!-- =================================================== --> 
+<!ELEMENT  syntactic_relation_level 
+                        (log_id?, comments*, 
+                         syntactic_relation+)              > 
+ 
+<!--                    syntactic_relation               --> 
+<!ELEMENT  syntactic_relation 
+                        (id, log_id?, 
+                         syntactic_relation_type, 
+                         refid_head, refid_modifier)       > 
+ 
+<!--                    refid_head phrase or word        --> 
+<!ELEMENT  refid_head
+                        (refid_word | refid_phrase)        > 
+ 
+<!--                    refid_modifier phrase or word    --> 
+<!ELEMENT  refid_modifier
+                        (refid_word | refid_phrase)        > 
+ 
+<!--                    syntactic_relation_type          --> 
+<!ELEMENT  syntactic_relation_type 
+                        (#PCDATA)                          > 
+
+
+ 
+<!-- =================================================== --> 
+<!--                    SEMANTIC_FEATURES_LEVEL          --> 
+<!-- =================================================== --> 
+<!ELEMENT  semantic_features_level 
+                        (log_id?, comments*, 
+                         semantic_features+)               > 
+ 
+<!--                    semantic_features                --> 
+<!ELEMENT  semantic_features 
+                        (id, log_id?, semantic_category, 
+                         refid_semantic_unit)              > 
+ 
+<!--                    semantic_category                --> 
+ 
+<!ELEMENT  semantic_category
+                        (list_refid_ontology_node)+        >
+
+<!--                    list_refid_ontology_node         -->
+<!ELEMENT  list_refid_ontology_node
+                        (refid_ontology_node)+             >
+
+<!--                    refid_ontology_node              -->
+<!ELEMENT  refid_ontology_node
+                        (#PCDATA)                          >
+
+<!-- =================================================== --> 
+<!--               DOMAIN_SPECIFIC_RELATION_LEVEL        --> 
+<!-- =================================================== --> 
+<!ELEMENT  domain_specific_relation_level 
+                        (log_id?,  comments*,
+                         domain_specific_relation+)        > 
+ 
+<!--               domain_specific_relation              --> 
+<!ELEMENT  domain_specific_relation 
+                        (id, log_id?, 
+                         domain_specific_relation_type, 
+                         list_refid_semantic_unit)         > 
+ 
+<!--               domain_specific_relation_type         --> 
+<!ELEMENT  domain_specific_relation_type (#PCDATA)         > 
+ 
+ 
+<!-- =================================================== --> 
+<!--                    ANAPHORA_RELATION_LEVEL          --> 
+<!-- =================================================== --> 
+<!ELEMENT  anaphora_relation_level 
+                        (log_id?, comments*, 
+                         anaphora_relation+)               > 
+<!--                    anaphora_relation                --> 
+<!ELEMENT  anaphora_relation 
+                        (id, log_id?, 
+                         anaphora_relation_type, 
+                         anaphora, antecedent)             > 
+ 
+<!ELEMENT  antecedent   (list_refid_semantic_unit)+        >
+<!ELEMENT  anaphora
+                        (refid_semantic_unit)              > 
+ 
+ 
+<!--                    anaphora_relation_type           --> 
+<!ELEMENT  anaphora_relation_type 
+                        (#PCDATA)                          >
+
+
+<!-- =================================================== -->
+<!--                    LOG LEVEL                        -->
+<!-- =================================================== -->
+
+<!--                    log_level                        -->
+<!ELEMENT  log_level    (log_processing*)                  >
+
+<!--            log for each processing                  -->
+<!ELEMENT  log_processing    (log_id, software_name?, 
+                              command_line?, stamp?, 
+                              tagset*, comments*,
+			      list_modified_level?)        >
+
+<!--                    Log id                           -->
+<!ELEMENT  log_id       (#PCDATA)                          >
+
+<!--   Software Name used to carry out the 
+        linguistic analysis                              -->
+<!ELEMENT  software_name(#PCDATA)                          >
+
+<!--                    Command line                     -->
+<!ELEMENT  command_line (#PCDATA)                          >
+
+<!--                    stamp                            -->
+<!ELEMENT  stamp        (#PCDATA)                          >
+
+<!--                  free comments                      -->
+<!ELEMENT  comments     (#PCDATA)                          >
+
+<!--       list of the modified levels by a module       -->
+<!ELEMENT  list_modified_level (modified_level*)           >
+
+<!--           modified level by a module                -->
+<!ELEMENT  modified     (#PCDATA)                          >
+
+<!--                    tagset                           -->
+<!ELEMENT  tagset       (element_name, tag_list+, 
+                         comments*)                        >
+
+<!--                    element_name                     -->
+<!ELEMENT  element_name (#PCDATA)                          >
+
+<!--                    tag_list                         -->
+<!ELEMENT  tag_list     (apply_if_tag?, 
+                         apply_if_tag_value?, 
+                         tag_value_list)                   >
+
+<!--                    applied_to_tag                   -->
+<!ELEMENT  apply_if_tag (#PCDATA)                          >
+
+<!--                    applied_to_tag_value             -->
+<!ELEMENT  apply_if_tag_value (#PCDATA)                    >
+
+<!--                    tag_value_list                   -->
+<!ELEMENT  tag_value_list
+                        (tag+)                             >
+
+<!--                    tag                              -->
+<!ELEMENT  tag          (#PCDATA)                          >

@@ -1,0 +1,36 @@
+Lingua::Translate::Google version 0.22
+======================================
+
+This module is a wrapper for WWW::Google::Translate
+which provides the Google plugin for Lingua::Translate.
+
+
+INSTALLATION
+
+To install this module, type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Carp
+    Data::Dumper
+    I18N::LangTags
+    Lingua::Translate
+    Readonly
+    Test::More
+    Unicode::MapUTF8
+
+ACKNOWLEDGEMENTS
+   This module is based on Lingua::Translate::Babelfish by Sam Vilain <enki@snowcra.sh>.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2008, Dylan Doxey.  All rights reserved.
+This module is free software; you may use it under the same terms as
+Perl itself.

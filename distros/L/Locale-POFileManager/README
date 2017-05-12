@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Locale-POFileManager,
+version 0.05:
+
+  Helpers for keeping a set of related .po files in sync
+
+This software is copyright (c) 2013 by Jesse Luehrs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

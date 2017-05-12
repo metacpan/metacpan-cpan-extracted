@@ -1,0 +1,64 @@
+# NAME
+
+List::Slice - Slice-like operations on lists
+
+# VERSION
+
+version 0.003
+
+# STATUS
+
+<a href="https://travis-ci.org/preaction/List-Slice"><img src="https://travis-ci.org/preaction/List-Slice.svg?branch=master"></a><a href="https://coveralls.io/r/preaction/List-Slice"><img src="https://coveralls.io/repos/preaction/List-Slice/badge.png" alt="Coverage Status" /></a>
+
+# SYNOPSIS
+
+    use List::Slice qw( head tail );
+
+# DESCRIPTION
+
+This module provides functions for slicing lists. This is helpful when you
+want to do a chain of manipulations on a list (map, grep, sort) and then
+slice, without the cumbersome `(...)[x]` syntax.
+
+# FUNCTIONS
+
+## head
+
+    my @values = head $size, @list;
+
+Returns the first `$size` elements from `@list`. If `$size` is negative, returns
+all but the last `$size` elements from `@list`.
+
+    @result = head 2, qw( foo bar baz );
+    # foo, bar
+
+    @result = head -2, qw( foo bar baz );
+    # foo
+
+## tail
+
+    my @values = tail $size, @list;
+
+Returns the last `$size` elements from `@list`. If `$size` is negative, returns
+all but the first `$size` elements from `@list`.
+
+    @result = tail 2, qw( foo bar baz );
+    # bar, baz
+
+    @result = tail -2, qw( foo bar baz );
+    # baz
+
+# SEE ALSO
+
+[List::Util](https://metacpan.org/pod/List::Util), [List::MoreUtils](https://metacpan.org/pod/List::MoreUtils), [List::UtilsBy](https://metacpan.org/pod/List::UtilsBy)
+
+# AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

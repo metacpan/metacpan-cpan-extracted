@@ -1,0 +1,29 @@
+/*-------------------------------------------------------------*/
+/* Toolbar */
+
+#quartz-content .listings .hd div #toolbar {
+	width: 400px ;
+	height: 32px ;
+	margin-right: 110px ;
+	float: right ;
+}
+
+/*-------------------------------------------------------------*/
+/* Titlebar */
+
+/*
+#quartz-content .listings .hd div #titlebar {
+	width: 400px ;
+	height: 32px ;
+	height: 40px ;
+	padding-left: 30px ;
+	float: left ;
+	text-align: center ;
+}
+
+#quartz-content .listings .hd div #titlebar {
+	padding-bottom: 0.2em ;
+	text-decoration: none;
+}
+*/
+

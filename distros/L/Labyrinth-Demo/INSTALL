@@ -1,0 +1,203 @@
+INSTALLATION INSTRUCTIONS
+=========================
+
+To set up the Demo Website, install via a CPAN client (see below for standard
+installation instructions) to ensure you install required prerequisites. Then 
+copy the directory contents under the 'vhost' directory into your web server 
+directory. For this example the path to these files and directories is assumed
+to be '/var/www/demo'. If you wish to change this, please update the file paths
+used in 'cgi-bin/pages.cgi' and 'cgi-bin/config/settings.ini'
+
+If you use Apache, include the configuration snippet contained in the file 
+'vhosts.conf', in the appropriate Apache configuration file. Directions for 
+other web servers will be included at a later date.
+
+Create a MySQL database called 'demo' and use the base file 
+'cgi-bin/db/demo-base.sql' as a starting point. If you wish to specify a fixed 
+user to access the database, you may wish to review the 'grant.sql' file or 
+amend the 'settings.ini' as appropriate.
+
+You should now be able to start your Apache instance. Update your hosts file as
+necessary to point to your new virtual host.
+
+A more complete installation and configuration script is planned for the 
+future, which can also install plugins.
+
+LABYRINTH DIRECTORY STRUCTURE
+-----------------------------
+
+    ./cgi-bin
+        /config         - contains top level configuration files
+           /requests    - contains despatch tables
+        /db                     - database dumps
+        /lib
+           /Labyrinth   - Labyrinth Core modules
+              /Plugin   - Labyrinth Plugin modules
+        /templates              - Template Toolkit templates
+    ./html
+        /cache          - cache where reports are produced
+        /css            - website CSS files
+        /images         - website image files
+        /js                     - website JavaScript files
+           /tiny_mce    - Tiny MCE JavaScript application files
+    ./toolkit
+
+As mentioned included in the package is the vhost entry from an Apache
+configuration file. This file contains the rewrite rules that translate
+user friendly URLs to the local CGI call. However, it is not necessary
+to have rewrite rules, in the event you are unable to use them, and the
+application can quite happily function with full 'cgi-bin/' type paths.
+
+The './cgi-bin/pages.cgi' file is the core startup script, that simply
+passes the settings file, and initiates Labyrinth. The 'act' CGI
+parameter contains the primary action required. Throughout the duration
+of a request, the current action may change several times, with each
+referencing the despatch tables to load and run the correct functions
+and render the correct templates. Each user has a nominated "realm",
+which is the section of the site they are given access to. The realm
+despatch table is used to load and run and default functions, and can
+thus be used to render different skins and/or layout templates.
+
+The CGI parameters are validated against the
+'./cgi-bin/config/parserules.ini' file. The rules are built from these
+entries and passed to Data::FormValidator.  Each entry's fields refer
+to parameter name, whether mandatory, default value, preprocessing
+function, constraint function and finally the regular expression.  If a
+constraint is provided the regular expression is ignored. Where the
+parameter name looks like ':^LISTED', this is a regular expression
+match against the parameter name (where the ':' character is removed).
+This enables parameters which have a changeable suffix, can apply the
+same constraint or regular expression against each matching parameter's
+value.
+
+All SQL statements are called using a Phrasebook Design Pattern. As
+such the './cgi-bin/config/phrasebook.ini' file contains all each
+phrase and associated SQL as used within the application. To aid
+readability SQL can be split onto multiple lines, using the '\'
+character as the last entry on a line to continue onto the next.
+
+Templates are built from the given layout, see the appropriate realm
+entry in the despatch table, incorporating other templates as required,
+including the 'content' template as specified by the last action
+command. See the appropriate despatch table to reference the
+appropriate content template.
+
+Tiny MCE is used by Labyrinth where appropriate for text area input.
+However, this is only activated on the pages where it is appropriate.
+
+The set of scripts within the toolkit directory typically provide ad-
+hoc or timed (e.g. via cron) functionality. The scripts are not
+intended to be run via the web server, but often provide support
+functionality, such as creating static pages or running periodic
+cleanup tasks.
+
+
+DISTRIBUTION INSTALLATION
+-------------------------
+
+The easiest way to install is via CPAN or CPANPLUS:
+
+CPAN:
+
+    % perl -MCPAN -e shell                    [as root]
+    > install Labyrinth-Demo
+    > quit
+
+CPANPLUS:
+
+    % cpanp
+    > i Labyrinth-Demo
+    > q
+
+See your local 'perldoc CPAN' or 'perldoc CPANPLUS' for
+instructions on setting up and configuring CPAN or CPANPLUS.
+
+
+OBTAINING THE MODULE
+--------------------
+
+The latest release version of Labyrinth-Demo can be 
+downloaded from any CPAN site:
+
+    http://www.cpan.org/modules/by-authors/id/B/BA/BARBIE/
+    http://search.cpan.org/dist/Labyrinth-Demo/
+
+Phrasebook is distributed as a gzipped tar archive file:
+
+    Labyrinth-Demo-<version>.tar.gz
+
+where <version> represents the current version number, e.g. 0.01.
+
+To install the module, unpack the distribution archive to
+create an installation directory.  Something like this:
+
+    tar zxf Labyrinth-Demo-0.01.tar.gz
+
+or
+
+    gunzip Labyrinth-Demo-0.01.tar.gz
+    tar xf Labyrinth-Demo-0.01.tar
+
+You can then 'cd' into the directory created,
+
+    cd Labyrinth-Demo-0.01
+
+
+INSTALLING MANUALLY
+-------------------
+
+The 'make install' (done later) will install the modules and scripts on
+your system. You may need administrator privileges to perform this task.
+Alternately you can install the module to a local directory (see
+ExtUtils::MakeMaker for full details), e.g.
+
+    % perl Makefile.PL PREFIX=/home/me/
+
+Don't forget to update your PERL5LIB environment variable if you do
+this, or add a line to your script to tell Perl where to find the files,
+e.g.
+
+    use lib qw( /home/me/lib/perl5/site_perl/5.6.0 );
+
+If you're not after a custom location, just do:
+
+    % perl Makefile.PL
+
+If you are lacking any of the prerequisite modules, running that
+program will tell you. All prerequisites are available from CPAN.
+
+When you have them all:
+
+    % make && make test
+
+If there are any failures, it's best if you contact me. It may help
+other people who have the same problem.  I don't tend to read the Perl
+newsgroups or PerlMonks, so it's no use posting there.
+
+When you report your trouble, be sure to send me the following
+information;
+    + result of `perl -V'
+    + output from 'make test' - ideally do 'make test TEST_VERBOSE=1 >& errs'
+
+Send those to bug-Labyrinth-Demo@rt.cpan.org and I'll 
+get back to you as soon as I'm able.
+
+If it worked, then become root and type:
+
+    # make install
+
+Congratulations. You've just installed Data::Phrasebook.
+
+If you have a copy of cpantest installed, type:
+
+    % cpantest -g pass -nc -p `basename \`pwd\`` -auto
+
+Or:
+    % cpantest -g pass -nc -p Labyrinth-Demo-0.01 -auto
+
+That will tell both me and other potential users that the module
+built correctly on your machine.
+
+Cheers,
+Barbie.
+http://www.missbarbell.co.uk/

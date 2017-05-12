@@ -1,0 +1,29 @@
+Lingua::RU::PhTranslit version 0.4
+=================================
+
+Phonetic correct translit recoder from/to koi8/windows-1251.
+
+Translit is writing cyrillic(russian) symbols by ASCII symbols (0x20-0x7f).
+
+Function is reverse (koi2phtr <=> phtr2koi)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+perl 5
+no dependecies to gcc (this is raw perl module)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Mikhail V. Basov (CPAN -at- Basov -dot- net)
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

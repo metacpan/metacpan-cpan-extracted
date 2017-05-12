@@ -1,0 +1,90 @@
+NAME
+    Lingua::JA::Number - Translate Numbers into Japanese
+
+SYNOPSIS
+      use Lingua::JA::Number;
+
+      my @words = Lingua::JA::Number::to_string(1234);
+
+      print join('-', @words), "\n";   
+                            # "sen-ni-hyaku-san-ju-yon"
+
+DESCRIPTION
+    `Lingua::JA::Number' translates numbers into Japanese. Its `to_string'
+    function takes a integer number and transforms it to the equivalent
+    cardinal number *romaji* string. This'll show exactly how the number is
+    pronounced in Japanese.
+
+    Here's how the Japanese cardinal numbering scheme works: The numbers
+    1..10 translate to *ichi*, *ni*, *san*, *yon*, *go*, *roku*, *nana*,
+    *hachi*, *kyu*. 10 is *yu*, 100 is *hyaku*, 1000 is *sen* and 10000 is
+    *man*.
+
+    Similar to English, multi-digit numbers are put together using decimal
+    weights: 15 is 10 + 5, 723 is 7*100 + 2*10 + 3 and 6973 is 6*1000 +
+    9*100 + 7*10 + 3. Therefore, 15 is pronounced *yu-go*, 123 is
+    *hyaku-ni-yu-san* and 6973 is *roku-san-kyu-hyaku-nana-san*.
+
+    Like in all natural languages, there's a couple of exceptions: 300 isn't
+    *san-hyaku* but *san-byaku*, 600 isn't *roku-hyaku* but *ro-p-pyaku* and
+    800 isn't *hachi-hyaku* but *ha-p-pyaku*. Also, in the thousands, 3000
+    is *san-zen* and 8000 is *ha-s-sen*. Also, there's more exceptions for
+    numbers of 1,000,000,000,000 and greater.
+
+    And, numbers aren't split into groups of 3 (like in 1,000,000) but in
+    groups of 4, like in 100,0000, which is pronounced *hyaku-man* (100
+    times 10000).
+
+EXAMPLE
+    Here's a quick script *jn* which will quiz you with random numbers (or
+    *romaji* strings if invoked as *jn -r*) and reveal the solution after
+    you hit the *Enter* key. It requires `Term::ReadKey', which is available
+    from CPAN:
+
+        #!/usr/bin/perl
+        use warnings;
+        use strict;
+
+        use Term::ReadKey;
+        use Getopt::Std;
+        use Lingua::JA::Number qw(to_string);
+
+        getopts('r', \ my %opts);
+
+        my @length = (2, 3, 4);  # Prompt for 2-,3-
+                                 # and 4-digit numbers
+        $| = 1;
+    
+        while(1) {
+            my $digits = $length[rand(@length)];
+            my $ques = int rand(10**$digits);
+            next unless $ques;
+            my $ans = join '-', to_string($ques);
+            if($opts{r}) {
+                ($ans, $ques) = ($ques, $ans);
+            }
+            print "$ques ... "; 
+            ReadMode("noecho");
+            ReadLine(0);
+            ReadMode("normal");
+            print $ans, "\n";
+        }
+    
+BUGS
+    I've just taken a beginner's Japanese class, so bear with me. Bug
+    reports are most welcome.
+
+    Also, I'm planning on providing additional modules
+    `Lingua::JA::Number::Tall', `Lingua::JA::Number::Flat',
+    `Lingua::JA::Number::Person', `Lingua::JA::Number::Misc' to cover the
+    idiosyncrasies of japanese counting of tall and flat things, persons and
+    miscellaneous items.
+
+AUTHOR
+    Mike Schilli <m@perlmeister.com>
+
+COPYRIGHT
+    Copyright (c) 2001 Mike Schilli. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

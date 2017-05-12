@@ -1,0 +1,41 @@
+[% PROCESS declaration %]
+[% PROCESS user_agent %]
+[% PROCESS header_question  %]
+
+[% BLOCK header_question  %]
+## genered by header_question ##
+my @des_h_questions = (
+[% FOREACH item IN list_HQ.keys %]
+'[%item%]', '[%list_HQ.$item%]',
+[% END %]
+);
+## genered by header_question ##
+[% END %]
+
+[% BLOCK declaration  %]
+#!/usr/bin/perl
+## genered by declaration  ##
+use LWP::UserAgent;
+### declaration ###
+my $browser;
+my $line_location;
+my @des_cookies ;
+my $line_cookie;
+my $cp_l; 
+my $question;
+$browser =LWP::UserAgent->new();
+$browser->requests_redirectable([]);
+$browser->timeout(30) ;
+
+## end genered by declaration ##
+[% END %]
+
+[% BLOCK user_agent  %]
+my $agent;
+[% IF  agent == 'onfly' %]
+$agent= $ENV{'HTTP_USER_AGENT'} ; 
+[% ELSE %]
+$agent ="[% agent %]";
+[% END %]
+$browser->agent($agent);
+[% END %]

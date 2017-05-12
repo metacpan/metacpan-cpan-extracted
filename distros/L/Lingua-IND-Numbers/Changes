@@ -1,0 +1,42 @@
+Revision history for Lingua::IND::Numbers
+
+0.10  2017-04-05T18:40:00+01:00
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.09  2017-04-04T12:55:00+01:00
+      - Added key 'provides' to the Makefile.PL script.
+
+0.08  2015-08-02T12:00:00+01:00
+      - Added LICENSE file.
+
+0.07  2015-08-01T12:00:00+01:00
+      - Fixed the typo in the pod document section "Numbers".
+
+0.06  2015-01-17T09:50:00+01:00
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.05  2014-11-27T21:12:00+01:00
+      - Renamed section 'Name' to 'NUMBERS'
+      - Minor changes to the method to_string().
+      - Minor cosmetic changes to the package Lingua::IND::Numbers.
+
+0.04  2014-11-23T13:02:03+01:00
+      - Updated Changes file according to CPAN::Changes::Spec package.
+      - Added unit test changes.t file.
+      - Added definition for zero (shunya).
+      - Updated test script for zero.
+      - Checking for decimal number at the correct point keep in my mind large number (scientific notation)
+
+0.03  2014-11-22T07:59:00+01:00
+      - Corrected name for numbers 6 and 26.
+      - Added test for numbers with ",".
+      - Updated 01-lingua-ind-numbers.t script and replaced the "," with "|" in the sample test data.
+      - Added names to the pod document.
+
+0.02  2014-11-21T20:53:20+01:00
+      - Added test script 02-lingua-ind-numbers.t.
+
+0.01  2014-11-20T22:00:00+01:00
+      - First version, released.

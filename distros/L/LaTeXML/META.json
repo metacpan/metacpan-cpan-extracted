@@ -1,0 +1,66 @@
+{
+   "abstract" : "transforms TeX and LaTeX into XML/HTML/MathML",
+   "author" : [
+      "Bruce Miller <bruce.miller@nist.gov>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "LaTeXML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "version" : "0.77"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "DB_File" : "0",
+            "File::Which" : "0",
+            "Getopt::Long" : "2.37",
+            "IO::String" : "0",
+            "Image::Size" : "0",
+            "JSON::XS" : "0",
+            "LWP" : "0",
+            "MIME::Base64" : "0",
+            "Parse::RecDescent" : "0",
+            "Pod::Parser" : "0",
+            "Test::More" : "0",
+            "Text::Unidecode" : "0",
+            "Time::HiRes" : "0",
+            "URI" : "0",
+            "XML::LibXML" : "1.61",
+            "XML::LibXSLT" : "1.58",
+            "perl" : "5.010001",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/brucemiller/LaTeXML.git",
+         "web" : "https://github.com/brucemiller/LaTeXML"
+      }
+   },
+   "version" : "v0.8.2"
+}

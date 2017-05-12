@@ -1,0 +1,36 @@
+2009-02-09 14:30  cvs
+
+	* lib/LEOCHARRE/Test.pm, t/00.t: changed ok_mysqld to divide code
+	  and conduct into mysqld_exist() and mysqld_running(), also
+	  allowing that the daemon may not exist and this won't just conk
+	  out for that in the tests separated into 00.t and 01 mysqld test
+
+2008-10-25 01:37  cvs
+
+	* lib/LEOCHARRE/Test.pm: added a use lib ./lib so using this makes
+	  i so you dont have to
+
+2008-10-23 16:01  cvs
+
+	* lib/LEOCHARRE/Test.pm: made sure that ok_mysqld sets a default
+	  hostname if none provided
+
+2008-10-07 10:08  cvs
+
+	* lib/LEOCHARRE/Test.pm, t/00.t: added ok_mysqld, to test if a
+	  mysql server is up
+
+2008-10-07 09:42  cvs
+
+	* Makefile.PL, lib/LEOCHARRE/Test.pm, t/00.t: Made it so that
+	  test_is_interactive() works.	Now it emulates Test::Simple
+
+2008-07-28 15:43  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/Test.pm, t/00.t: Initial
+	  revision
+
+2008-07-28 15:43  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/Test.pm, t/00.t: init
+

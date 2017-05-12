@@ -1,0 +1,490 @@
+#!/usr/bin/perl -w
+# /=====================================================================\ #
+# |  latexmlmath                                                        | #
+# | math conversion program                                             | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use LaTeXML;    # Currently, just for version information.
+use LaTeXML::Core;
+use LaTeXML::Util::Pathname;
+use File::Spec;
+use File::Temp qw(tempfile);
+use LaTeXML::Post;
+use LaTeXML::Post::Scan;
+use LaTeXML::Post::CrossRef;
+#use LaTeXML::Post::Writer;
+use LaTeXML::Util::ObjectDB;
+
+#**********************************************************************
+# Parse command line
+
+my ($verbosity, $strict, $noparse, $includestyles) = (-1, 0, 0, 0);
+my ($destination, $help, $showversion) = ('', '');
+my ($documentid);
+my ($mathimage, $mathsvg, $mag) = (undef, undef, 1.75);
+my ($pmml, $linelength, $plane1, $hackplane1) = (undef, undef, undef, undef);
+my $xmath = undef;
+my $cmml  = undef;
+my $om    = undef;
+my @paths = ('.');
+my @preload;
+GetOptions(
+  # No provision for parallel output (yet)
+  "mathimage=s"               => \$mathimage,
+  "mathsvg=s"                 => \$mathsvg,
+  "magnification=f"           => \$mag,
+  "presentationmathml|pmml=s" => \$pmml,
+  "linelength=i"              => \$linelength,
+  "plane1!"                   => \$plane1,
+  "hackplane1!"               => \$hackplane1,
+  "contentmathml|cmml=s"      => \$cmml,
+  "openmath|om=s"             => \$om,
+  "XMath=s"                   => \$xmath,
+
+  "noparse" => \$noparse,
+
+  "preload=s"     => \@preload,
+  "includestyles" => \$includestyles,
+  "path=s"        => \@paths,
+  "quiet"         => sub { $verbosity--; },
+  "verbose"       => sub { $verbosity++; },
+  "strict"        => \$strict,
+  "VERSION"       => \$showversion,
+  "debug=s"       => sub { no strict 'refs'; ${ 'LaTeXML::' . $_[1] . '::DEBUG' } = 1; },
+  "documentid=s"  => \$documentid,
+  "help"          => \$help,
+  ) or pod2usage(-message => $LaTeXML::IDENTITY,
+  -exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-message => $LaTeXML::IDENTITY, -exitval => 1, -verbose => 2, -output => \*STDOUT)
+  if $help;
+if ($showversion) { print STDERR "$LaTeXML::IDENTITY\n"; exit(1); }
+pod2usage(-message => "$LaTeXML::IDENTITY\nMissing input TeX file",
+  -exitval => 1, -verbose => 0, -output => \*STDERR) unless @ARGV;
+
+binmode(STDERR, ":encoding(UTF-8)");
+print STDERR "$LaTeXML::IDENTITY\n" if $verbosity > -1;
+
+#======================================================================
+# TeX Source
+#======================================================================
+# First read and digest whatever we're given.
+my $tex = join(' ', @ARGV);
+if ($tex eq '-') {
+  { local $/ = undef; $tex = <>; } }
+
+# We need to determine whether the TeX we're given needs to be wrapped in \[...\]
+# Does it have $'s around it? Does it have a display math environment?
+# The most elegant way would be to notice as soon as we start adding to the doc
+# and switch to math mode if necessary, but that's tricky.
+# Let's just try a manual hack, looking for known switches...
+$tex =~ s/^\s+//;
+$tex =~ s/\s+$//;
+
+our $MATHENVS = 'math|displaymath|equation*?|eqnarray*?'
+  . '|multline*?|align*?|falign*?|alignat*?|xalignat*?|xxalignat*?|gather*?';
+if    (($tex =~ /^\$/)                     && ($tex =~ /\$$/))          { }    # Wrapped in $'s
+elsif (($tex =~ /^\\\(/)                   && ($tex =~ /\\\)$/))        { }    # Wrapped in \(...\)
+elsif (($tex =~ /^\\\[/)                   && ($tex =~ /\\\]$/))        { }    # Wrapped in \[...\]
+elsif (($tex =~ /^\\begin\{($MATHENVS)\}/) && ($tex =~ /\\end\{$1\}$/)) { }
+else {
+  $tex = '\[ ' . $tex . ' \]'; }
+
+my $texdoc = <<"EODoc";
+literal:
+\\documentclass{article}
+\\begin{document}
+\\newcounter{equation}
+\\newcounter{Unequation}
+$tex
+\\end{document}
+EODoc
+
+# NOTE:
+#   Should I do something to verify that there is ONLY one Math node ?
+#   Eg: cmdline  a + b $ \badmacros $ c + d
+#
+#   What about alignment environments?
+#     Should it be possible to give eqnarray or similar?
+#     and if so, will they give multiple math nodes?
+
+#======================================================================
+# Digest the TeX
+#======================================================================
+@paths = map { pathname_canonical($_) } @paths;
+if (my @baddirs = grep { !-d $_ } @paths) {
+  warn "$LaTeXML::IDENTITY: these path directories do not exist: " . join(', ', @baddirs) . "\n"; }
+
+my $latexml = LaTeXML::Core->new(preload => ['LaTeX.pool', @preload], searchpaths => [@paths],
+  verbosity => $verbosity, strict => $strict,
+  includeComments => 0, includeStyles => $includestyles,
+  documentid      => $documentid,
+  nomathparse     => $noparse);
+
+my $digested = $latexml->digestFile($texdoc);
+
+# NASTY Hack: to disable cleanup_Math
+# cleanup_Math is useful within "real" documents, to recognize & simplify non-math
+# that gets marked up within $..$ (a common TeX idiom).
+# However, that simplification isn't appropriate for isolated "math" expressions
+# especially within automation, where latexmlmath might be used.
+my $model = $$latexml{state}->getModel;
+$$model{tagprop}{'ltx:Math'}{afterClose}
+  = [grep { $_ ne \&LaTeXML::Package::Pool::cleanup_Math }
+    @{ $$model{tagprop}{'ltx:Math'}{afterClose} }];
+
+my $converted = $digested && $latexml->convertDocument($digested);
+my $document = $digested && LaTeXML::Post::Document->new($converted, nocache => 1);
+
+#======================================================================
+# Postprocess to convert the math to whatever desired forms.
+#======================================================================
+# Since we can't easily find & extract all the various formats at once,
+# let's just process each one separately.
+
+our $mmlURI = "http://www.w3.org/1998/Math/MathML";
+our $omURI  = "http://www.openmath.org/OpenMath";
+
+# Default to pmml to stdout, if nothing else specified.
+$pmml = '-' unless (defined $mathimage || defined $mathsvg
+  || defined $pmml || defined $cmml || defined $om || defined $xmath);
+
+our %OPTIONS = ();
+
+# I wonder if this stuff even will be needed,
+# once fragid is sorted out?
+my $DB = LaTeXML::Util::ObjectDB->new(%OPTIONS);
+my $post = LaTeXML::Post->new(verbosity => $verbosity || 0);
+($document) = $post->ProcessChain($document,
+  LaTeXML::Post::Scan->new(db => $DB, %OPTIONS),
+  LaTeXML::Post::CrossRef->new(db => $DB, %OPTIONS));
+
+if ($mathimage) {
+  my $imagetype = 'png';
+  if ($mathimage =~ s/\.(png|gif|jpg|jpeg|svg)$//) {
+    $imagetype = $1; }
+  if ($mathimage eq '-') {
+    die "I dont really want to write the image to STDOUT, sorry!"; }
+
+  my ($result) = $post->ProcessChain(cloneDoc($document),
+    DirectMathImages->new(magnification => $mag,
+      imagename => $mathimage, imagetype => $imagetype,
+      %OPTIONS));
+  unlink('LaTeXML.cache'); }
+
+if ($mathsvg) {
+  my $imagetype = 'svg';
+  if ($mathsvg eq '-') {
+    my ($fh, $tmpfile) = tempfile();
+    my ($result) = $post->ProcessChain(cloneDoc($document),
+      DirectMathImages->new(magnification => $mag,
+        imagename => $tmpfile, imagetype => $imagetype,
+        %OPTIONS));
+    my $SVG;
+    open($SVG, '<', "$tmpfile.svg") or die "Couldn't read temporary svg output '$tmpfile': $!";
+    while (<$SVG>) {
+      print $_; }
+    close($SVG);
+    unlink "$tmpfile.svg"; }
+  else {
+    $mathsvg =~ s/\.svg$//;
+    my ($result) = $post->ProcessChain(cloneDoc($document),
+      DirectMathImages->new(magnification => $mag,
+        imagename => $mathsvg, imagetype => $imagetype,
+        %OPTIONS)); }
+  unlink('LaTeXML.cache'); }
+
+if ($pmml) {
+  require LaTeXML::Post::MathML::Presentation;
+  my ($result) = $post->ProcessChain(cloneDoc($document),
+    LaTeXML::Post::MathML::Presentation->new(
+      (defined $linelength ? (linelength => $linelength) : ()),
+      (defined $plane1     ? (plane1     => $plane1)     : ()),
+      (defined $hackplane1 ? (hackplane1 => $hackplane1) : ()),
+      %OPTIONS));
+  outputXML($result->findnode('//m:math'), $pmml, $mmlURI); }
+
+if ($cmml) {
+  require LaTeXML::Post::MathML::Content;
+  my ($result) = $post->ProcessChain(cloneDoc($document),
+    LaTeXML::Post::MathML::Content->new(%OPTIONS));
+  outputXML($result->findnode('//m:math'), $cmml, $mmlURI); }
+
+if ($om) {
+  require LaTeXML::Post::OpenMath;
+  my ($result) = $post->ProcessChain(cloneDoc($document),
+    LaTeXML::Post::OpenMath->new(%OPTIONS));
+  outputXML($result->findnode('//om:OMOBJ'), $om, $omURI); }
+
+if ($xmath) {
+  # extract the xmath
+  my ($result) = $post->ProcessChain(cloneDoc($document));
+  outputXML($result->findnode('//ltx:XMath'), $xmath); }
+
+print STDERR "\nConversion complete\n" if $verbosity > -1;
+
+#======================================================================
+# Helpers
+#======================================================================
+
+sub cloneDoc {
+  my ($document) = @_;
+  my $clone = $document->getDocumentElement->cloneNode(1);
+  foreach my $pi ($document->findnodes(".//processing-instruction('latexml')")) {
+    $clone->appendChild($pi->cloneNode); }
+  return $document->new($clone); }
+
+sub outputXML {
+  my ($xml, $xmldestination, $defaulturi) = @_;
+  # Need to move the node to a new document to set up namespaces
+  my $newdoc = XML::LibXML::Document->new("1.0", "UTF-8");
+  $newdoc->setDocumentElement($xml);
+  if (my $oldprefix = $defaulturi && $xml->lookupNamespacePrefix($defaulturi)) {
+    $xml->setNamespaceDeclPrefix($oldprefix, undef); }
+  my $serialized = $newdoc->toString(1);
+  if ($xmldestination eq '-') {
+    print $serialized; }
+  else {
+    $xmldestination = pathname_canonical($xmldestination);
+    if (my $dir = pathname_directory($xmldestination)) {
+      pathname_mkdir($dir) or die "Couldn't create destination directory $dir: $!"; }
+    my $OUT;
+    open($OUT, '>', $xmldestination) or die "Couldn't open output file $xmldestination: $!";
+    print $OUT $serialized;
+    close($OUT); }
+  return; }
+
+#======================================================================
+# Variant of MathImages to write directly to destination
+#======================================================================
+package DirectMathImages;
+use base qw(LaTeXML::Post::MathImages);
+
+our $counter;
+
+sub desiredResourcePathname {
+  my ($self, $doc, $node, $source, $type) = @_;
+  my $name = $$self{imagename};
+  if ($counter) {    # Shouldn't get multiple images, but just in case...
+    return $name . $counter++ . '.' . $type; }
+  else {
+    $counter++;
+    return $name . '.' . $type; } }
+
+#**********************************************************************
+__END__
+
+=head1 NAME
+
+C<latexmlmath> - transforms a TeX/LaTeX math expression into various formats.
+
+=head1 SYNOPSIS
+
+latexmlmath [options] I<texmath>
+
+ Options:
+ --mathimage=file           converts to image in file
+ --mathsvg=file             converts to svg image in file
+ --magnification=mag        specifies magnification factor
+ --presentationmathml=file  converts to Presentation MathML
+ --pmml=file                alias for --presentationmathml
+ --linelength=n             do linewrapping of pMML
+ --contentmathml=file       convert to Content MathML
+ --cmml=file                alias for --contentmathml
+ --openmath=file            convert to OpenMath
+ --om=file                  alias for --openmath
+ --XMath=file               output LaTeXML's internal format
+ --noparse                  disables parsing of math
+                            (not useful for cMML or openmath)
+ --preload=file             loads a style file.
+ --includestyles            allows processing raw *.sty files
+                            (normally it avoids this)
+ --path=dir                 adds a search path for style files.
+ --quiet                    reduces verbosity (can repeat)
+ --verbose                  increases verbosity (can repeat)
+ --strict                   be more strict about errors.
+ --documentid=id            assign an id to the document root.
+ --debug=package            enables debugging output for the
+                            named package
+ --VERSION                  show version number and exit.
+ --help                     shows this help message.
+ --                         ends options
+
+If I<texmath> is '-', C<latexmlmath> reads the TeX from standard input.
+If any of the output files are '-', the result is printed on standard output.
+
+=head2 Input notes
+
+Note that, unless you are reading I<texmath> from standard input,
+the I<texmath> string will be processed by whatever shell you are using
+before C<latexmlmath> even sees it.  This means that many so-called
+meta characters, such as backslash and star,  may confuse the
+shell or be changed.  Consequently, you will need to quote and/or
+slashify the input appropriately.  Most particularly, C<\> will
+need to be doubled to C<\\> for C<latexmlmath> to see it as a
+control sequence.
+
+Using C<--> to explicitly end the option list is useful for
+cases when the math starts with a minus (and would otherwise be interpreted
+as an option, probably an unrecognized one). Alternatively,
+wrapping the I<texmath> with {} will hide the minus.
+
+Simple examples:
+
+  latexmlmath \\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}
+  echo "\\sqrt{b^2-4ac}" | latexmlmath --pmml=quad.mml -
+
+=head1 OPTIONS AND ARGUMENTS
+
+=head2 Conversion Options
+
+These options specify what formats the math should be converted to.
+In each case, the destination file is given.  Except for
+mathimage, the file can be given as '-', in which case the
+result is printed to standard output.
+
+If no conversion option is specified, the default is to output
+presentation MathML to standard output.
+
+=over 4
+
+=item C<--mathimage>=I<file>
+
+Requests conversion to png images.
+
+=item C<--mathsvg>=I<file>
+
+Requests conversion to svg images.
+
+=item C<--magnification=>I<factor>
+
+Specifies the magnification used for math image. Default is 1.75.
+
+=item C<--presentationmathml>=I<file>
+
+Requests conversion to Presentation MathML.
+
+=item C<--linelength>I<=number>
+
+(Experimental) Line-breaks the generated Presentation
+MathML so that it is no longer than I<number> `characters'.
+
+=item C<--plane1>
+
+Converts the content of Presentation MathML token elements to
+the appropriate Unicode Plane-1 codepoints according to the selected font,
+when applicable.
+
+=item C<--hackplane1>
+
+Converts the content of Presentation MathML token elements to
+the appropriate Unicode Plane-1 codepoints according to the selected font,
+but only for the mathvariants double-struck, fraktur and script.
+This gives support for current (as of August 2009) versions of
+Firefox and MathPlayer, provided a sufficient set of fonts is available (eg. STIX).
+
+=item C<--contentmathml>=I<file>
+
+Requests conversion to Content MathML.
+B<Note> that this conversion is only partially implemented.
+
+=item C<--openmath>=I<file>
+
+Requests conversion to OpenMath.
+B<Note> that this conversion is only partially implemented.
+
+=item C<--XMath>=I<file>
+
+Requests convertion to LaTeXML's internal format.
+
+=back
+
+=head1 Other Options
+
+=over 4
+
+=item C<--preload>=I<module>
+
+Requests the loading of an optional module or package.  This may be useful if the TeX code
+does not specificly require the module (eg. through input or usepackage).
+For example, use C<--preload=LaTeX.pool> to force LaTeX mode.
+
+=item C<--includestyles>
+
+This optional allows processing of style files (files with extensions C<sty>,
+C<cls>, C<clo>, C<cnf>).  By default, these files are ignored  unless a latexml
+implementation of them is found (with an extension of C<ltxml>).
+
+These style files generally fall into two classes:  Those
+that merely affect document style are ignorable in the XML.
+Others define new markup and document structure, often using
+deeper LaTeX macros to achieve their ends.  Although the omission
+will lead to other errors (missing macro definitions), it is
+unlikely that processing the TeX code in the style file will
+lead to a correct document.
+
+=item C<--path>=I<dir>
+
+Add I<dir> to the search paths used when searching for files, modules, style files, etc;
+somewhat like TEXINPUTS.  This option can be repeated.
+
+=item C<--documentid>=I<id>
+
+Assigns an ID to the root element of the XML document.  This ID is generally
+inherited as the prefix of ID's on all other elements within the document.
+This is useful when constructing a site of multiple documents so that
+all nodes have unique IDs.
+
+=item C<--quiet>
+
+Reduces the verbosity of output during processing, used twice is pretty silent.
+
+=item C<--verbose>
+
+Increases the verbosity of output during processing, used twice is pretty chatty.
+Can be useful for getting more details when errors occur.
+
+=item C<--strict>
+
+Specifies a strict processing mode. By default, undefined control sequences and
+invalid document constructs (that violate the DTD) give warning messages, but attempt
+to continue processing.  Using --strict makes them generate fatal errors.
+
+=item C<--VERSION>
+
+Shows the version number of the LaTeXML package..
+
+=item C<--debug>=I<package>
+
+Enables debugging output for the named package. The package is given without the leading LaTeXML::.
+
+=item C<--help>
+
+Shows this help message.
+
+=back
+
+=head1 BUGS
+
+This program runs much slower than would seem justified.
+This is a result of the relatively slow initialization
+including loading TeX and LaTeX macros and the schema.
+Normally, this cost would be ammortized over large documents,
+whereas, in this case, we're processing a single math expression.
+
+=head1 SEE ALSO
+
+L<latexml>, L<latexmlpost>, L<LaTeXML>
+
+=cut

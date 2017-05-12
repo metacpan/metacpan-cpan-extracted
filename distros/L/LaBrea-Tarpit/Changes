@@ -1,0 +1,530 @@
+Revision history for Perl extension LaBrea::Tarpit
+
+1.36  Sat Nov  1 17:56:40 PST 2008
+	update prerequisites
+
+1.35  Tue Sep 30 16:47:48 PDT 2008
+	add prerequisites to Makefile.PL
+
+1.34  Sat Feb  5 11:49:13 PST 2005
+	updated Report/examples/localTrojans.pl
+
+1.33  Sat Nov 13 16:31:56 PST 2004
+	update documentation
+
+1.32  Sun Nov  7 11:34:42 PST 2004
+	Report v1.14
+	updated html list of trojans on 
+	Report/examples/paged_report.plx page
+
+1.31  Sat Nov  6 12:39:13 PST 2004
+	Get: v1.05
+	add 'sleep' to Get/examples/web_scan.pl to eliminate excess 
+	processor utilization while waiting to reap kids
+
+1.30  Thu Sep  2 12:14:52 PDT 2004
+	update Report/examples/whois.plx to show PTR lookup for IP's
+
+1.29  Tue Jul  6 16:47:36 PDT 2004
+	Add patch to not send empty DShield messages that might get  
+	created when sending to multiple destinations. 
+	Petter Reinholdtsen <pere@hungry.com>
+
+1.28  Tue Jul  6 09:57:45 PDT 2004 --  NOT RELEASED
+	Add patch to DShield 0.08, courtesy of Petter Reinholdtsen <pere@hungry.com>
+	to allow delivery of DShield reports to multiple destinations
+
+1.27	Sun Mar 28 11:16:35 PST 2004
+	revert to previous 1.24 behavior on not writing out cache file
+	kept some code clean up.
+	
+1.26  Sat Mar 27 15:32:14 PST 2004
+	NOT RELEASED
+	The previous modification had the wrong scope for the tarpit hash,
+	removed _cullingquish and implemented in-line code instead
+
+1.25  Thu Mar  4 10:43:54 PST 2004
+	add subroutine '_cullnsquish' to augment '_check4cull'
+	to collapse tarpit hash if a data removal is detected.
+	This should reduce memory bloat.
+
+1.24  Tue Nov 11 16:46:20 PST 2003
+	include patch for labrea-2.5-stable-1
+	and original LaBrea2_4b3.tgz in the distribution
+
+1.23  Wed Oct 29 09:20:48 PST 2003
+	update html_report and paged_report to list the sourceforge site for the labrea daemon
+
+1.22  Tue Oct 21 12:18:00 PDT 2003
+	fixed typo in 1.21 :-((
+
+1.21  Tue Oct 21 11:56:25 PDT 2003
+	fixed bug in Report.pm that caused html_report.plx pop up whois to
+	fail. Reported by Mike Brown brownm1970@despammed.com
+
+1.20  Fri Oct 10 17:48:23 PDT 2003
+	modify function 'daemon' to remove its PID file on exit
+
+1.19  Tue Sep 30 09:11:50 PDT 2003
+      Update sub module Report.pm 1.09 and paged_report.plx
+      no changes to Tarpit.pm
+
+	added robots meta tag to paged_report
+	add javascript function to Report.pm to close popped window on page unload
+	to prevent multiple sites from trying to use the same named window
+
+1.18  Mon Sep 29 16:24:01 PDT 2003
+	In Report.pm v 1.08, workaround for MSIE windown pop-up problem
+	for compatitbility with SpamCannibal. There are just some
+	things that MSIE doesnt' do very well. sigh...
+
+1.17  Tue Sep  9 13:51:56 PDT 2003
+	update Report.pm to support SpamCannibal
+
+1.16  Wed Sep  3 19:42:22 PDT 2003
+	separate out daemon start and stop routines
+	to facilitate support of Mail::SpamCannibal
+	Fix duplicated 'my' max_kids
+
+1.15  Tue Aug 12 10:06:40 PDT 2003
+	remove case sensitivity from server authentication
+	in Report/examples/whois.plx
+
+	cosmetic changes to Report.pm, paged_report.plx
+	see Report/Changes
+
+1.14  Mon Aug 11 21:21:39 PDT 2003
+	wrapped call to Net::Whois::IP in 'eval' to trap
+	fatal error when whois server can't be reached
+
+1.13  Thu Aug  7 16:55:44 PDT 2003
+	fix scoping error in whois.plx
+
+1.12  Wed Aug  6 14:23:44 PDT 2003
+	Report.pm updated to eliminate use of Geek Tools
+	add page 'whois.plx'
+
+1.11  Mon Jan 20 16:28:21 PST 2003
+	corrected error in calculating midnight epoch in Tarpit.pm
+
+1.10  Tue Oct  8 16:01:51 PDT 2002
+	Type in 1.09 Report.pm corrected
+
+1.09  Tue Oct  8 08:21:21 PDT 2002
+	Updated Report v1.04
+	removed "image" checking from Report::port_stats.
+	see Report::Changes
+
+1.08  Thu Sep 19 08:09:51 PDT 2002
+	NO MODULE CODE CHANGES in 1.08 or 1.07
+	Changes to various test modules to accomodate perl
+	'flock' implementations that use 'fcntl'
+
+		Util/t/lockf.t
+		Util/t/daemon2_cache.t
+		DShield/t/move2_Q.t
+
+1.07  Wed Sep 18 18:26:00 PDT 2002
+	Correct documentation typo in Report/examples/localTrojans.pl
+
+	Modified test procedure in t/append_open.t, hopefully to accomodate
+	'flock' pecularities in solaris 2.8 sun4-solaris. These changes are
+	UNTESTED, I don't have a sun box. There are no changes to the
+	modules themselves.
+
+1.06  Tue Aug 20 13:29:43 PDT 2002
+	Update t/find_old_threads.t to allow tests to succeed
+	in timezones other than US-Pacific.
+
+	There are no changes to any modules, only the test suite,
+	no update is required for existing installations
+
+1.05  Fri Aug 16 15:36:12 PDT 2002
+	changed match string in 'DShield::move2_Q' to
+	recognize single digit destination ports
+
+1.04a Fri Aug  2 14:56:20 PDT 2002
+	added "please wait" capability to "other sites"
+	in Report/examples/paged_report.plx
+	since there were no functional changes to the modules,
+	no new release has been made. 
+
+1.04  Wed Jul 31 17:07:11 PDT 2002
+	added "please wait" message to Report/examples/paged_report.plx
+	REMINDER, copy Report/examples/pwait01.gif to your images directory 
+
+1.03 Wed Jun  5 10:41:36 PDT 2002
+	Changes to Makefile.PL only. Some users have reported that on
+	certain platforms, 'make' does not seem to like to build the README
+	files but expects a target with a .c or .o extension. I've removed 
+	the README builds and place them in a separate shell file which
+	can be run manually. Similarly, the dependency check for Codes.pm
+	is no longer in the Makefile, instead the build is done
+	unconditionally each time Makefile.PL is executed. This might not
+	be 'slick', but it does the job.
+
+1.02 Tue May 21 20:51:10 PDT 2002
+	fix 'timezone' so it works properly for end of year
+	and all time zones
+
+	add 'tz2_sec' so non integer hour tz's convert properly
+
+	move Util::their_date to Tarpit.pm since it 
+	needs to use tz2_sec only when Tarpit is loaded
+
+  in Report v1.01
+	update paged_report.plx and html_report.plx, removed some extra
+	stuff, the pervious version from 1.00 will work fine.
+
+	edit for move of 'their_date' from Util.pm to Tarpit.pm
+	add a color to 'Trends' report and extend range to > 100,000
+	move javascript precache standard list into Report.pm module
+	add bonehead checking for images and image directory
+
+  in Util v0.05
+	move 'their_date' to Tarpit.pm
+
+1.01 Mon May 20 22:30:52 PDT 2002
+	corrected condition in Get/examples/web_scans.pl
+	where sites.stats file could be improperly truncated
+
+  IMPORTANT *** update your copy of web_scan.pl
+
+	regex in daemon.pl caused some packed ipaddrs to be
+	rejected as valid clients. change to '=='
+
+	change daemon.pl logic to default to allow all
+	client connections instead of allow none
+
+1.00 Wed May 15 16:54:43 PDT 2002
+	Updated 'daemon' to use sockets instead of FIFO
+	to eliminate session overlap problems on busy server,
+	this also facilitates remote daemon interrogation.
+
+	THIS MEANS !!!
+
+	you must update the following scripts:
+		tell_me.pl
+		html_report.xxx
+		paged_report.xxx
+
+
+	added module 'NetIO.pm'
+
+	replace 'array2_tarpit' 'if' tree with recursive regenerator
+
+  in Get.pm v0.04
+	moved Socket function 'open_tcp'
+	to LaBrea::Tarpit::NetIO
+
+  in Report.pm v0.23
+	add 'make_image_cache' to generate 
+	javascript to force browser to precache the
+	images for 'port_stats'
+
+	update Report/examples/paged_report.plx 
+	and Report/examples/html_report.plx to use image cache
+
+  in Util.pm v0.04
+	move 'reap_kids' to NetIO.pm,
+	leave a pointer for backwards compatibility
+	move 'reap_kids' to NetIO.pm
+	rename 'cache_time' to 'daemon2_cache'
+	  to more accurately reflect function
+
+################ DEPRECATED ##########################
+
+0.28  Wed May 15 09:52:23 PDT 2002
+	Add multi page reporting 
+	./Report/examples/paged_report.plx v1.01
+	and associated support changes
+
+  in DShield.pm v0.05
+	add 'mail2_Q'
+	rename deliver2_DShield -> 'process_Q'
+	and alias deliver2_DShield -> 'process_Q'
+	rearrange some things to improve code usage
+
+  in Report.pm v0.22
+	add 'make_buttons'
+	export 'time2local' 
+	export 'other_sites'
+	update ./examples/html_report.plx to use 'make_buttons'
+	increased FIFO timeout to 30 seconds
+
+  in Util.pm v0.03
+	add 'cache_time'
+	add 'upd_cache', a better version of 'update_cache'
+	'update_cache' now does a goto to upd_cache
+	add 'script_name'
+	add 'page_is_current'
+
+0.27  Wed May  8 09:43:19 PDT 2002
+	Add IANA subdirectory for network protocols and icmp codes.
+	Add IANA/build_codes.pl to Makefile for Codes.pm auto-generation.
+	This is for future enhancement of reporting data captured
+	by Tom Liston's LaBrea program.
+
+	Changed test suite to accomodate persistent codes instead
+	of true - false, preliminary changes to Tarpit.pm to support
+	protocol types.
+
+	add 'old_threads' and examples/tell_me.pl
+	to allow automatic reporting of very old threads
+	by email ... see DShield::mail2_Q
+
+  in DShield.pm v0.05  Fri May 10 12:35:47 PDT 2002
+	add 'mail2_Q'
+	rename deliver2_DShield -> 'process_Q'
+	and alias deliver2_DShield -> 'process_Q'
+	rearrange some things to improve code usage
+
+  in Report.pm v0.21  Wed May  8 10:58:57 PDT 2002
+	Differentiate 'my_IPs' error colors into 'INDIGO' and 'VIOLET'
+	for type 5 and 6 ERRORS -- undocumented
+
+	move $time calculation in 'other_sites' into non error
+	'if' statement to avoid spurious calls to 'Util::their_time'
+	that complains in the http error log
+
+	preset %phantoms values to 1 or 0 when TCP/persistent in 
+	'my_IPs' to accommodate 'protocol' enhancements in Tarpit.pm
+
+0.26  Mon May  6 17:03:19 PDT 2002
+	Test for the presence of O_SYNC in the Fcntl module
+	and ignore for BSD? and OS-X systems that do not have it. 
+	Thanks to Wayne Wenzlaff <wow@usmac.net> for spotting this.
+
+	initialize some un-inited variables in Report.pm that some 
+	platforms complain about.
+
+0.25  Thu May  2 12:11:57 PDT 2002
+	correct bareword 'tzb' => $tzb
+
+	various fixes in t/append_open.t to properly
+	do the lock tests
+	Thanks to Wayne Wenzlaff <wow@usmac.net>
+	and Robert Wagner <rwagner@eruces.com> for spotting these
+
+0.24  Wed May  1 12:01:29 PDT 2002	-- not released
+	remove Range: request in 'Get::short_response',
+	it makes some not-so-smart web servers barf
+
+	correct 'Report::short_report' to recognize '+ timezones'
+
+	in LaBrea::Tarpit::Get
+	add routines 'not_hour', 'not_day', and 'auto_update'
+	support for automatic update of 'other_sites.txt'
+	in 'examples/web_scan.pl'
+
+	MAKE SURE and use the new version of 'web_scan.pl'
+
+0.23  Tue Apr 30 13:14:21 PDT 2002
+
+	Add comments in Report/examples/html_report.plx
+	to assist users in suppressing portions of the report,
+	in particular the report on local ip addresses
+
+	time zone format for DShield change to -XX:XX, not -XXXX
+	in Tarpit.pm and DShield.pm
+	Thanks to Oliver Rizzi <oliver@rizzi.com>
+	for spotting this.
+
+	fix illegal reference to glob in 
+	Get::open_http
+	Get::open_tcp
+	DShield::deliver2_DShield
+
+	correct typo in DShield to add USERID to subject line
+
+0.22  Mon Apr 29 18:30:06 PDT 2002
+	error in handling TZ's starting with +
+	fixed in 'DShield::move2_Q'
+	Thanks to Oliver Rizzi <oliver@rizzi.com>
+	for spotting this.
+
+0.21  Mon Apr 29 10:04:10 PDT 2002
+	correct error in t/append_open.t
+
+0.20  Fri Apr 26 12:56:58 PDT 2002
+	Add support for DShield reporting
+	Release DShield.pm -- see LaBrea::Tarpit::DShield
+
+	corrections to Report::generate -- see Report v0.18, Changes
+
+	update examples/daemon.pl v1.02 config array
+	to include support for DShield
+
+0.19  Sun Apr 15 17:41:21 PDT 2002
+
+	release LaBrea::Tarpit::Get to collect statistics
+	from other LaBrea::Tarpit user web sites for
+	world wide reporting of Tarpit activity
+
+	release LaBrea::Tarpit::Util to hold utility
+	routines used in other Tarpit modules
+
+	add $umask to Util.pm v0.02 
+
+	moved utility routines from Report.pm to Util.pm
+
+		cache_is_valid
+		update_cache
+		share_open
+		ex_open
+		close_file
+		http_date
+		their_date
+
+	add blocking timer to 'daemon' to force pipe
+	to settle down for at least a second before
+	subsequent dump operations
+
+	removed un-needed eval in 'prep_report'
+
+	split 'array2_tarpit' from 'restore_tarpit'
+	in support of future enhancements
+
+	conditionalize 'phantoms' total, it was conditional
+	anyway, but returned '0' unless ph_dip was enabled.
+	this updates the document and removes the empty 
+	array value
+
+	modified 'update_cache' and add 'short_report', 
+	'gen_short', to Report.pm v0.15
+	See: Report/Changes for details
+
+	updated Report/examples/html_report.plx
+	to include 'other_sites" and to return a 
+	short report when queried with ?short
+
+
+0.18  Fri Apr 12 11:19:35 PDT 2002
+
+	add 'http_date', to Report.pm v0.14
+	returns date string per the http 'DATE' 
+	spec. Nice for cgi when Apache::Utility 
+	is not available.
+
+	add 'shared_open', 'ex_open', 'close_file', 
+	'cache_is_valid, 'update_cache' locking file 
+	access utilities and their test routines 
+	to Report.pm v0.14
+
+	add html FILE CACHING to 
+	'Report/examples/html_report.plx'
+
+	change 'write_cache_file' to return undef
+	if missing filename rather than waiting 
+	for failed open.
+
+	correct font name VERANDA -> VERDANA
+	nice catch by Thomas Liston <tliston@premmag.com>
+	fixes for bugs found by by Thomas Liston <tliston@premmag.com>  
+
+	LaBrea version number overwritten by cache restore,
+	changed the order to give preference to LaBrea daemon
+
+	add test routine 'tz_test_adj.pl' to account
+	for timezone and year differences in dates
+	encountered when dates are processed from
+	human readable log strings. i.e. LaBrea 
+	logging to 'syslog' or using '-o' option
+
+	NOTE: for those that bother to read the 
+	Changes file, the preferred operating mode
+	for LaBrea is with the '-O' option.
+
+0.17  Wed Apr 10 13:42:21 PDT 2002
+	change _cache2txt to only insert {now} into
+	tarpit if it is missing in order to preserve
+	correct time for old syslog writes to tarpit
+	cache files.
+
+	add 'syslog2_txt' to Report.pm 0.13
+	add syslog analyze capability
+	to Report/examples/html_report.plx
+
+0.16  Tue Apr  9 16:59:15 PDT 2002
+	added sort to cull_threads to correct ambiguity
+	caused by unknown order of keys %tarpit hash
+
+0.15  Tue Apr  9 12:16:12 PDT 2002
+	add LaBrea daemon version reporting
+	add README for examples/daemon.pl
+	add 'get_versions' to Report.pm 0.12
+	add button bars and version reporting
+	to LaBrea/Report/examples/html_report.plx
+
+0.14  Mon Apr  8 22:35:19 PDT 2002
+	final cleanup of Report.pm version 0.11
+	see Report Changes file
+
+0.13  Mon Apr  8 20:57:21 PDT 2002
+	corrected subtle bug in &timezone where
+	my ($now) = @_ || time
+	returned incorrect value, should be
+	my ($now) = $_[0] || time
+
+	corrected type in Report/examples/html_reports.plx
+
+0.12  Mon Apr  8 16:06:11 PDT 2002
+	In Report.pm
+	fix sort by 'max' error in port activity reporting.
+	add 'threshold' parameter to %look_n_feel.
+	add version reporting to html_report.plx
+
+0.11  Mon Apr  8 13:59:35 PDT 2002
+	minor corrections to Report module,
+	include missing cleardot.gif in MANIFEST
+
+0.10  Thu Apr  4 18:57:22 PST 2002
+	add caching of daily port hits for each port
+	to Tarpit daemon and report generator.
+	add 'port_stats.t'.
+
+	update Tarpit.pm to produce batch reports based
+	on the "now" time of the batch file.
+	correct test programs to run with "now" time
+	of input data instead of real time.
+
+	add hit graphs by port to Report.pm
+	other major changes to Reports more generic
+
+0.09  Thu Apr  4 13:39:25 PST 2002
+	upgrades to work with LaBrea version 2.4b3
+	remove -L option in examples/daemon.pl
+
+0.08  Fri Mar  8 10:52:34 PST 2002
+	no changes to Tarpit.pm since 0.05
+	upgrade to Report.pm v 0.06, correct
+	error in LaBreaConfig file parsing
+	see Report/Changes
+
+0.07  Fri Mar  8 09:45:34 PST 2002
+	update Report.pl to support windoze LaBrea.cfg
+	and fail gracefully if dameon is not running
+	and an attempt is made to read the daemon fifo
+
+0.06  Wed Mar  6 19:44:53 PST 2002
+	upgrade Report.pm to use both LaBreaConfig 
+	and the OLDSTYLE configuration file pair
+
+0.05  Tue Jan  1 17:03:40 PST 2002
+	upgrade tests so nextsec uses select delay of 0.1 sec
+
+0.04  Thu Dec 13 15:15:33 PST 2001
+	upgrade to Report 0.03
+	changes are to examples/html_report.plx
+	see Report/Changes
+
+0.03  Tue Dec 11 16:39:50 PST 2001
+	point STDIN,STDOUT,STDERR to null for clean daemon
+
+0.02  Tue Nov 27 21:05:31 PST 2001
+	add 'phantom_report'
+	use non-blocking checkfor Labrea data
+	to eliminate memory race condition
+
+0.01  Mon Nov 26 15:39:41 PST 2001
+	initial release

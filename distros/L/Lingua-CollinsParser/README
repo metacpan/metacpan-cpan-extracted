@@ -1,0 +1,58 @@
+    Lingua::CollinsParser Perl module
+    =================================
+
+
+DESCRIPTION
+
+This module provides a Perl interface to the English syntactic parser
+written by Michael Collins as part of his Ph.D. work at the University
+of Pennsylvania.  It may be downloaded from
+ftp://ftp.cis.upenn.edu/pub/mcollins/PARSER.tar.gz .
+
+Please see the documentation of Lingua::CollinsParser for details on
+how to use the perl interface.
+
+
+INSTALLATION
+
+In order to install this module, you must first install the Collins
+Parser, including the modifications in the Parser.patch file (included
+with the Lingua::CollinsParser distribution).  This will provide a
+"libcollins.a" library (or whatever the equivalent filename is on your
+system) against which the perl module will be linked.
+
+After installing the Collins Parser itself, the Perl wrapper can be
+installed as follows:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install  (may need to be done as root)
+
+If the headers and/or library aren't in a location where your compiler
+will find them by itself, in the first step you can tell it where they
+are, like so:
+
+  perl Build.PL --extra_compiler_flags "-I/foo/include" \
+                --extra_linker_flags   "-L/foo/lib -lcollins"
+
+DEPENDENCIES
+
+As described above, this module requires a patched version of the
+Collins Parser.  It also requires the XML::Generator module in order
+to create XML-formatted syntax trees.  Installation requires
+Module::Build version 0.21 and Test::More (any version), but they are
+not used after installation.
+
+
+COPYRIGHT AND LICENCE
+
+The Lingua::CollinsParser perl interface is copyright (C) 2004-2007 The
+Thomson Corporation, and written by Ken Williams.  It is free software;
+you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+The Collins Parser is copyright (C) 1999 by Michael Collins - you will
+find full copyright and license information in its distribution.  The
+Parser.patch file distributed here is granted under the same license
+terms as the parser code itself.

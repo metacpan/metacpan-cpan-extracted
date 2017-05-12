@@ -1,0 +1,208 @@
+08048000-08076000 r-xp 00000000 08:06 939194     /bin/grep
+Size:                184 kB
+Rss:                  64 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:        64 kB
+Private_Dirty:         0 kB
+Referenced:           64 kB
+08076000-08078000 rw-p 0002d000 08:06 939194     /bin/grep
+Size:                  8 kB
+Rss:                   8 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         8 kB
+Referenced:            8 kB
+08078000-08099000 rw-p 08078000 00:00 0          [heap]
+Size:                132 kB
+Rss:                  20 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:        20 kB
+Referenced:           20 kB
+b7d4f000-b7d8e000 r--p 00000000 08:06 1214546    /usr/lib/locale/en_US.utf8/LC_CTYPE
+Size:                252 kB
+Rss:                  16 kB
+Shared_Clean:         16 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:           16 kB
+b7d8e000-b7e6e000 r--p 00000000 08:06 1216958    /usr/lib/locale/en_US.utf8/LC_COLLATE
+Size:                896 kB
+Rss:                  12 kB
+Shared_Clean:         12 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:           12 kB
+b7e6e000-b7e6f000 rw-p b7e6e000 00:00 0 
+Size:                  4 kB
+Rss:                   4 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         4 kB
+Referenced:            4 kB
+b7e6f000-b7f9c000 r-xp 00000000 08:06 1137904    /lib/libc-2.6.1.so
+Size:               1204 kB
+Rss:                 360 kB
+Shared_Clean:        360 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:          360 kB
+b7f9c000-b7f9d000 r--p 0012c000 08:06 1137904    /lib/libc-2.6.1.so
+Size:                  4 kB
+Rss:                   4 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         4 kB
+Referenced:            4 kB
+b7f9d000-b7f9f000 rw-p 0012d000 08:06 1137904    /lib/libc-2.6.1.so
+Size:                  8 kB
+Rss:                   8 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         8 kB
+Referenced:            8 kB
+b7f9f000-b7fa3000 rw-p b7f9f000 00:00 0 
+Size:                 16 kB
+Rss:                  16 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:        16 kB
+Referenced:           16 kB
+b7fb3000-b7fb4000 r--p 00000000 08:06 1214539    /usr/lib/locale/en_US.utf8/LC_NUMERIC
+Size:                  4 kB
+Rss:                   4 kB
+Shared_Clean:          4 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            4 kB
+b7fb4000-b7fb5000 r--p 00000000 08:06 1200923    /usr/lib/locale/en_US.utf8/LC_TIME
+Size:                  4 kB
+Rss:                   4 kB
+Shared_Clean:          4 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            4 kB
+b7fb5000-b7fb6000 r--p 00000000 08:06 1200922    /usr/lib/locale/en_US.utf8/LC_MONETARY
+Size:                  4 kB
+Rss:                   4 kB
+Shared_Clean:          4 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            4 kB
+b7fb6000-b7fb7000 r--p 00000000 08:06 1200514    /usr/lib/locale/en_US.utf8/LC_MESSAGES/SYS_LC_MESSAGES
+Size:                  4 kB
+Rss:                   4 kB
+Shared_Clean:          4 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            4 kB
+b7fb7000-b7fb8000 r--p 00000000 08:06 1200370    /usr/lib/locale/en_US.utf8/LC_PAPER
+Size:                  4 kB
+Rss:                   4 kB
+Shared_Clean:          4 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            4 kB
+b7fb8000-b7fb9000 r--p 00000000 08:06 1200444    /usr/lib/locale/en_US.utf8/LC_NAME
+Size:                  4 kB
+Rss:                   4 kB
+Shared_Clean:          4 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            4 kB
+b7fb9000-b7fba000 r--p 00000000 08:06 1198492    /usr/lib/locale/en_US.utf8/LC_ADDRESS
+Size:                  4 kB
+Rss:                   4 kB
+Shared_Clean:          4 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            4 kB
+b7fba000-b7fbb000 r--p 00000000 08:06 1200335    /usr/lib/locale/en_US.utf8/LC_TELEPHONE
+Size:                  4 kB
+Rss:                   4 kB
+Shared_Clean:          4 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            4 kB
+b7fbb000-b7fbc000 r--p 00000000 08:06 1200925    /usr/lib/locale/en_US.utf8/LC_MEASUREMENT
+Size:                  4 kB
+Rss:                   4 kB
+Shared_Clean:          4 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            4 kB
+b7fbc000-b7fc3000 r--s 00000000 08:06 1185578    /usr/lib/gconv/gconv-modules.cache
+Size:                 28 kB
+Rss:                  24 kB
+Shared_Clean:         24 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:           24 kB
+b7fc3000-b7fc4000 r--p 00000000 08:06 1200921    /usr/lib/locale/en_US.utf8/LC_IDENTIFICATION
+Size:                  4 kB
+Rss:                   4 kB
+Shared_Clean:          4 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            4 kB
+b7fc4000-b7fde000 r-xp 00000000 08:06 1138761    /lib/ld-2.6.1.so
+Size:                104 kB
+Rss:                  92 kB
+Shared_Clean:         92 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:           92 kB
+b7fde000-b7fe0000 rw-p 0001a000 08:06 1138761    /lib/ld-2.6.1.so
+Size:                  8 kB
+Rss:                   8 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         8 kB
+Referenced:            8 kB
+bfe65000-bfe7a000 rw-p bfe65000 00:00 0          [stack]
+Size:                 84 kB
+Rss:                  16 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:        16 kB
+Referenced:           16 kB
+ffffe000-fffff000 r-xp 00000000 00:00 0          [vdso]
+Size:                  4 kB
+Rss:                   0 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            0 kB
+ffffe000-fffff000 r-xp 00000000 00:00 0          [vdso]
+Size:                  4 kB
+Rss:                   0 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         0 kB
+Referenced:            0 kB

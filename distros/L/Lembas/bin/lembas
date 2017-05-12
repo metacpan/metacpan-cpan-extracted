@@ -1,0 +1,23 @@
+#!perl
+
+use strict;
+use warnings;
+use 5.010;
+use Carp;
+
+use Lembas;
+use Test::More;
+use IO::File;
+
+foreach my $filename (@ARGV) {
+
+    my $spec = IO::File->new($filename, 'r')
+        or die "Cannot open spec file at '$filename': $!";
+    
+    my $lembas = Lembas->new_from_test_spec(
+        handle => $spec);
+    $lembas->run;
+
+}
+
+done_testing;

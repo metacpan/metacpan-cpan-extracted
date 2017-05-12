@@ -1,0 +1,7 @@
+Makefile
+Makefile.old
+*~
+blib
+pm_to_blib
+MANIFEST.bak
+Log-Syslog-Abstract-.*tar.gz

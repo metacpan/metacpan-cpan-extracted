@@ -1,0 +1,29 @@
+---
+abstract: 'Interface to anonymous LWP::UserAgent.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '1.001014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-UserAgent-Anonymous
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Clone: '0.37'
+  HTTP::Request: '6.0'
+  LWP::Simple: '6.0'
+  LWP::UserAgent: '6.06'
+  List::Util: '1.41'
+  perl: '5.006'
+resources:
+  repository: https://github.com/Manwar/LWP-UserAgent-Anonymous.git
+version: '0.09'

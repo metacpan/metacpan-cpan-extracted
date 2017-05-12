@@ -1,0 +1,47 @@
+<h2>Member Statistics</h2>
+<p>There are [% registered %] registered users of the web site, with 
+[% confirmed %] confirmed attendees and [% speakers %] speakers.</p>
+<table class="blocker" cellpadding="1" cellspacing="0" width="100%">
+<tr><td><table width="100%" border="0" cellspacing="0" cellpadding="4">
+        <tr><td class="blockheader">By Country</td>
+            <td class="blockheader">By Monger Group *</td>
+        </tr>
+
+        <tr>
+            <td class="blockbody"><table cellpadding="2" cellspacing="0" width="95%">
+<!--
+                <tr><td class="blockbody">Total</td>
+                    <td class="blockbody" align="right">[% registered %] (<b>[% confirmed %]</b>)</td>
+                </tr>
+-->
+
+[% FOREACH item = locations %]
+
+                <tr><td class="blockbody">[% item.name %]</td>
+                    <td class="blockbody" align="right">[% item.total %] (<b>[% item.confirmed %]</b>)</td>
+                </tr>
+
+[% END %]
+
+                </table></td>
+            <td class="blockbody"><table cellpadding="2" cellspacing="0" width="95%">
+<!--
+                <tr><td class="blockbody">Total</td>
+                    <td class="blockbody" align="right">[% registered %] (<b>[% confirmed %]</b>)</td>
+                </tr>
+-->
+
+[% FOREACH item = mongers %]
+
+                <tr><td class="blockbody">[% item.name %]</td>
+                    <td class="blockbody" align="right">[% item.total %] (<b>[% item.confirmed %]</b>)</td>
+                </tr>
+
+[% END %]
+
+                </table></td>
+        </tr>
+        </table>
+    </td></tr>
+</table></p>
+<p>* Note that some registered users are affliated to more than one Perl Monger user group.</p>

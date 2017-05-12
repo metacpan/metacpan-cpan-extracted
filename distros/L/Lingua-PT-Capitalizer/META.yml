@@ -1,0 +1,27 @@
+---
+abstract: 'Simple text capitalize.'
+author:
+  - 'Ronaldo Ferreira de Lima aka jimmy <jimmy.tty@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-PT-Capitalizer
+requires:
+  English: '0'
+  Exporter: '0'
+  base: '0'
+  common::sense: '0'
+version: '0.001'

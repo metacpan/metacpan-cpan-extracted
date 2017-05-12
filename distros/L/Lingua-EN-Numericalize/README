@@ -1,0 +1,34 @@
+Lingua-EN-Numericalize
+
+parses English representations of numbers like
+"two thousand and one". Some samples of the range of inputs it can handle
+can be found in the file "samples", which is used by the regression test
+suite.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+1. the X11::Protocol module
+
+DOCUMENTATION
+
+For docs please see man page:
+
+# man X11::Keyboard
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Erick Calder <ecalder@cpan.org>
+
+This product is distributed under the MIT License. A copy of this license
+was included in a file called LICENSE. If for some reason, this file was not
+included, please see http://www.opensource.org/licenses/mit-license.html
+to obtain a copy of this license.

@@ -1,0 +1,12 @@
+LWP::UserAgent::Cached - LWP::UserAgent with simple caching mechanism
+======================
+
+When you process content from some website, you will get page one by one and extract
+some data from this page with regexp, DOM parser or smth else. Sometimes we makes
+errors in our data extractors and realize this only when all 1_000_000 pages were
+processed. We should fix our extraction logic and start all process from the beginning.
+Please STOP! How about cache? Yes, you can cache all responses and second, third and
+other attempts will be very fast.
+LWP::UserAgent::Cached is yet another LWP::UserAgent subclass with cache support. It
+stores cache in the files on local filesystem and if response already available in the
+cache returns it instead of making HTTP request.

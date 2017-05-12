@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                List-NSect
+version:             0.06
+abstract:            Cuts or divides a list into N equal parts.
+license:             ~
+author:              
+    - Michael R. Davis (mdavis@stopllc.com)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Exporter:                      0
+    List::MoreUtils:               0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

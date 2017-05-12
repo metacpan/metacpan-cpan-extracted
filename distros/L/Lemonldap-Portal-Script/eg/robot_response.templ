@@ -1,0 +1,8 @@
+[% PROCESS response %]
+
+[% BLOCK response %]
+###  echange numero [%numero%]                     ###
+###  analyse de la reponse: les redirection        ###
+$line_location= $question->header('Location');
+
+[% END %]

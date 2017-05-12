@@ -1,0 +1,122 @@
+Revision history for LWP-ConsoleLogger
+
+0.000035  2017-03-01 14:38:00-05:00 America/Toronto
+    - Adds LWP::ConsoleLogger::Everywhere (simbabque)
+
+0.000034  2017-01-23 09:24:06-05:00 America/Toronto
+    - Don't redact x-www-form-urlencoded data.
+
+0.000033  2016-12-03 21:46:12-05:00 America/Toronto
+    - Fix test that failed under some terminal widths (Varadinsky).
+      https://github.com/oalders/lwp-consolelogger/pull/8
+
+0.000032  2016-11-29 14:58:25-05:00 America/Toronto
+    - Maybe guess at content type when parsing body.
+
+0.000031  2016-11-25 13:08:50-05:00 America/Toronto
+    - Display request body if available.
+
+0.000030  2016-09-13 17:55:24-04:00 America/Toronto
+    - Document header and parameter redaction
+    - Suppress use of tables in some instances via "pretty"
+
+0.000029  2016-09-13 10:37:57-04:00 America/Toronto
+    - Stop setting default headers via debug_ua()
+
+0.000028  2016-06-20 15:46:31-04:00 America/Toronto
+    - Full release.  Contains no changes from previous trial release.
+
+0.000027  2016-06-18 10:31:58-04:00 America/Toronto (TRIAL RELEASE)
+    - Allow arbitrary headers and params to be redacted.
+    - Fixes "Wide character in print" warnings.  Reported by Ricardo SIGNES 😄
+      https://github.com/oalders/lwp-consolelogger/issues/6
+
+0.000026  2016-06-09 16:22:18-04:00 America/Toronto
+    - Fixes test that broke under scalar_quotes  => q{'}
+    - Displays application/javascript content type (Andy Jack)
+
+0.000025  2016-06-09 09:29:08-04:00 America/Toronto
+    - Don't redact JSON with vendor-specific content types.
+
+0.000024  2016-05-16 12:15:53-04:00 America/Toronto
+    - Don't print gzipped and other non-text content to the screen.
+
+0.000023  2016-04-15 15:22:01-04:00 America/Toronto
+    - Avoid warning when Content-Type header is not set.
+
+0.000022  2016-01-29 12:19:00-05:00 America/Toronto
+    - Adds minimum versions for Data::Printer and JSON::MaybeXS.
+
+0.000021  2016-01-18 11:58:04-05:00 America/Toronto
+    - Fixes an occasional warning in body parsing.
+
+0.000020  2015-06-03 18:14:25-04:00 America/Toronto
+    - Really fix failures under Perl 5.22 (reported by Andreas König)
+
+0.000019  2015-05-29 18:02:07-04:00 America/Toronto
+    - Ensure module works still under both perl 5.21 and Data::Printer > 0.35
+      https://github.com/oalders/lwp-consolelogger/issues/3 (reported by Slaven
+      Rezić and solution proposed by Breno G. de Oliveira).
+
+0.000018  2015-05-27 16:52:26-04:00 America/Toronto
+    - Adds deserializing of HTML and JSON in request body.
+
+0.000017  2015-05-26 17:02:41-04:00 America/Toronto
+    - Fixes examples/html-in-text.pl to show how to bypass
+      HTML::FormatText::Lynx formating.
+
+0.000016  2015-05-26 14:01:03-04:00 America/Toronto
+    - Adds a nice HTML text_pre_filter to Easy if HTML::FormatText::Lynx is
+      installed.
+
+0.000015  2015-04-16 23:49:16+02:00 Europe/Berlin
+    - Converted from Moose to Moo
+    - Now uses HTTP::Body to parse POST params
+
+0.000014  2015-03-18 18:09:23-04:00 America/Toronto
+    - text_pre_filter subs should now return a content type
+
+0.000013  2015-02-04 18:30:17-05:00 America/Toronto
+    - Adds logging levels and more fine grained control over what gets logged
+
+0.000012  2014-09-24 00:09:28-04:00 America/Toronto
+    - Print JSON as Perl data structure when dumping text
+    - Adds more scripts to examples folder
+
+0.000011  2014-08-15 23:58:21EDT-0400 America/Toronto
+    - dzil tweaks to make CPANTS happier
+
+0.000010  2014-07-25 23:33:35EDT-0400 America/Toronto
+    - Fixes typos in documentation
+    - Adds MetaCPAN::Client to the examples folder
+
+0.000009  2014-07-17 10:14:29EDT-0400 America/Toronto
+    - Don't prefix XML HashRef (in text) with a slash
+    - Restore table descriptions which were wiped out in previous release
+
+0.000008  2014-07-14 19:07:58EDT-0400 America/Toronto
+    - Don't attempt to draw empty tables
+
+0.000007  2014-07-14 17:51:25EDT-0400 America/Toronto
+    - Configure Data::Printer layout options
+
+0.000006  2014-07-14 11:54:12EDT-0400 America/Toronto
+    - Make XML testing a bit more verbose
+
+0.000005  2014-07-12 10:54:08EDT-0400 America/Toronto
+    - Adds XML parsing
+
+0.000004  2014-06-16 22:39:09EDT-0400 America/Toronto
+
+    - Updates Pod for content and text pre_filters
+    - Also dump GET params (if available) for POST requests
+
+0.000003  2014-06-09 16:47:50EDT-0400 America/Toronto
+    - Fixes call to wrong subref in text filtering (@sergeyromanov)
+    - Changes copyright holder and license to MaxMind defaults
+
+0.000002  2014-06-06 22:21:18EDT-0400 America/Toronto
+    - Start using MooseX::Types
+
+0.000001  2014-06-05 00:28:50EDT-0400 America/Toronto
+    - Initial release.

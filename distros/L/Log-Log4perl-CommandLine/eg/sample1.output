@@ -1,0 +1,54 @@
+% perl sample1.pl
+[ERROR] error message
+[FATAL] fatal message
+
+% perl sample1.pl -q
+
+% perl sample1.pl -v
+[INFO ] info  message
+[WARN ] warn  message
+[ERROR] error message
+[FATAL] fatal message
+
+% perl sample1.pl -d
+[DEBUG] debug message
+[INFO ] info  message
+[WARN ] warn  message
+[ERROR] error message
+[FATAL] fatal message
+
+% perl sample1.pl --quiet
+
+% perl sample1.pl --fatal
+[FATAL] fatal message
+
+% perl sample1.pl --error
+[ERROR] error message
+[FATAL] fatal message
+
+% perl sample1.pl --warn
+[WARN ] warn  message
+[ERROR] error message
+[FATAL] fatal message
+
+% perl sample1.pl --info
+[INFO ] info  message
+[WARN ] warn  message
+[ERROR] error message
+[FATAL] fatal message
+
+% perl sample1.pl --debug
+[DEBUG] debug message
+[INFO ] info  message
+[WARN ] warn  message
+[ERROR] error message
+[FATAL] fatal message
+
+% perl sample1.pl --trace
+[TRACE] trace message
+[DEBUG] debug message
+[INFO ] info  message
+[WARN ] warn  message
+[ERROR] error message
+[FATAL] fatal message
+

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VNCLASS ID="bork-Lingua-Verbnet">
+    <MEMBERS>
+        <MEMBER name="bork"/>
+    </MEMBERS>
+    <FRAMES>
+        <FRAME>
+            <DESCRIPTION/>
+            <EXAMPLES>
+                <EXAMPLE><![CDATA["Bork"]]></EXAMPLE>
+            </EXAMPLES>
+        </FRAME>
+        <FRAME>
+            <DESCRIPTION/>
+            <EXAMPLES>
+                <EXAMPLE><![CDATA["Bork bork bork"]]></EXAMPLE>
+            </EXAMPLES>
+        </FRAME>
+    </FRAMES>
+</VNCLASS>

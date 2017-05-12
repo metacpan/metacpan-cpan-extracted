@@ -1,0 +1,8 @@
+Changes
+lib/Locale/Framework/wxLocale.pm
+locale/nl_NL/default.po
+locale/nl_NL/default.mo
+Makefile.PL
+MANIFEST
+README
+t/2.t

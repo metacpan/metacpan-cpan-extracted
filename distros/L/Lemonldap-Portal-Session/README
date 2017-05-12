@@ -1,0 +1,130 @@
+Lemonldap-Portal-Session 
+========================
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+NAME
+    Lemonldap::Portal::Session - Perl extension for Lemonldap websso
+
+SYNOPSIS
+      use Lemonldap::Portal::Session;
+
+      my $paramxml = $test->{DefinitionSession} ; # $test is the result of XML  parsing 
+      my $obj = Lemonldap::Portal::Session->init ($paramxml,'entry' =>$entry) ;
+  
+example :
+       XML input :
+
+     <DefinitionSession>
+            <ligne  id = "commentaire" 
+                    type = "single"
+                    cle ="commentaire"
+                    valeur= "mon commentaire est %buffer% merci"> 
+            </ligne>
+            <ligne  id = "mail" 
+                    type = "single"
+                    cle ="mail"
+                    valeur= "%mail%" >
+            </ligne>
+            <ligne  id = "roleprofil" 
+                    type = "single"
+                    cle ="%roleprofil;0%"
+                    valeur= "%roleprofil;1%" >
+            </ligne>
+            <ligne  id = "mefiapplicp" 
+                    type = "multi"
+                    cle ="%mefiapplicp;0%"
+                    primarykey="cp" 
+                    valeur= "%mefiapplicp;1%" >
+            </ligne>
+        
+            <ligne  id = "dn" 
+                    type = "single"
+                    cle ="dn"
+                    valeur= "%dn%" >
+            </ligne>
+
+            <exp    id ="dn" 
+                    type= "dnentry"
+                  />
+            <exp    id ="buffer" 
+                    type= "constant"
+                    valeur=" ce  que je veux "
+                    />
+        
+            <exp    id ="mail" 
+                    type= "attrldap"
+                    attribut= "mail" />
+
+            <exp    id ="roleprofil" 
+                    type= "attrldap"
+                    attribut= "roleprofil" />
+            <exp    id ="mefiapplicp" 
+                    type= "attrldap"
+                    attribut= "mefiapplicp" />
+        
+     </DefinitionSession>
+ 
+    after processing :
+
+     Dumper ($obj) :
+
+     $VAR1 = {
+              'appli' => 'etoile',
+              'commentaire' => 'mon commentaire est  ce  que je veux  merci',
+              'mail' => 'germanlinux@yahoo.fr',
+              'cp' => {
+                      'appli1' => 'etoile1',
+                      'appli2' => 'etoile2'
+                    },
+              'dn' => 'uid=egerman-cp,ou=personnes,ou=cp,dc=demo,dc=net'
+            };
+
+DESCRIPTION
+    Lemonldap::Portal::Session is a parser of XML description of session to
+    keys,values of hash .
+
+    It is a piece of lemonldap websso framework . see 'eg' directory for
+    implementation .
+
+SEE ALSO
+    Lemonldap(3), Lemonldap::NG::Portal
+
+    http://lemonldap.sourceforge.net/
+
+AUTHOR
+    Eric German, <germanlinux@yahoo.fr>
+
+COPYRIGHT AND LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+
+    Copyright (C) 2004 by Eric German & Xavier Guimard & Isabelle Serre
+
+    Lemonldap originaly written by Eric german who decided to publish him in
+    2003 under the terms of the GNU General Public License version 2.
+
+    This package is under the GNU General Public License, Version 2.
+    The primary copyright holder is Eric German.
+    Portions are copyrighted under the same license as Perl itself.
+    Portions are copyrighted by Doug MacEachern and Lincoln Stein. This
+    library is under the GNU General Public License, Version 2.
+    Portage under Apache2 is made with help of : Ali Pouya and Shervin
+    Ahmadi (MINEFI/DGI)
+
+
+
+
+
+
+

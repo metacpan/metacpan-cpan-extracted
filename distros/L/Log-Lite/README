@@ -1,0 +1,24 @@
+Log-Lite version 0.14
+========================
+
+This module helps log information on disk.
+Main feature:
+1. auto create file named by the first argument.
+2. support auto cut log file everyday,everymonth,everyyear.
+3. thread safety (open-lock-write-unlock-close everytime).
+4. log|debug|slient mode support
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2011 ChenGang.
+This library is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.

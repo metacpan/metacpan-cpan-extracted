@@ -1,0 +1,36 @@
+Revision history for Perl extension Lingua::StopWords
+
+0.09  2008-08-22
+    * Update Spanish stoplist to latest Snowball version.  This is a
+      backwards-incompatible change, but the old list was broken, containing
+      "vosostros" instead of "vosotros" and so on.
+    * Add Hungarian.
+
+0.08  2006-09-19
+    * Fix version mismatch between main module and submodules.
+
+0.07  2006-09-19
+    * Fix failing test: skip instead of fail if Test::Pod::Coverage can't
+      be found.
+
+0.06  2006-08-18
+    * Add Finnish stoplist.
+
+0.05  2006-02-19
+    * Fix versioning problem with submodules
+
+0.04  2006-02-19
+    * Minor mods to documentation
+
+0.03  2006-02-19
+    * New maintainer Marvin Humphrey
+    * Add UTF-8 option
+    * Add Russian
+
+0.02  2004-04-18
+    * fix the test file (no need to use Data::Denter)
+
+0.01  Sat Apr 10 19:31:27 2004
+    * original version; created by h2xs 1.23 with options
+        -X Lingua::StopWords
+

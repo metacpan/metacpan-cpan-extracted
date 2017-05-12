@@ -1,0 +1,8 @@
+
+The LCFG [% pkgspec.name %] component.
+
+[%+ pkgspec.abstract +%]
+
+This software was created by: [% pkgspec.author +%]
+
+It can be distributed under the [% pkgspec.license %] license.

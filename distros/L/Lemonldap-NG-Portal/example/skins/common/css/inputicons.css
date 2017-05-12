@@ -1,0 +1,27 @@
+/* Input icons */
+
+form input[name=user], form input[name=firstname], form input[name=lastname] {
+background:#FFFFFF url("../user_suit.png") 5px 5px no-repeat;
+padding-left:25px;
+}
+
+form input[type=password], form input[name=captcha_user_code] {
+background:#FFFFFF url("../key.png") 5px 5px no-repeat;
+padding-left: 25px;
+}
+
+form input[name=mail] {
+background:#FFFFFF url("../email.png") 5px 5px no-repeat;
+padding-left: 25px;
+}
+
+form input[name=openid_identifier] {
+background:#FFFFFF url("../openid-16x16.gif") 5px 5px no-repeat;
+padding-left: 25px;
+}
+
+form input[name=yubikeyOTP] {
+background:#FFFFFF url("../yubico-icon-small.gif") 5px 5px no-repeat;
+padding-left: 25px;
+}
+

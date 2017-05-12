@@ -1,0 +1,55 @@
+{
+   "abstract" : "Logging to Growl",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Dispatch-Growl",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : 0,
+            "Growl::Any" : 0,
+            "Log::Dispatch::Output" : 0,
+            "Params::Validate" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Log-Dispatch-Growl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gugod/Log-Dispatch-Growl.git",
+         "web" : "https://github.com/gugod/Log-Dispatch-Growl"
+      }
+   },
+   "version" : "1.0.0"
+}
+

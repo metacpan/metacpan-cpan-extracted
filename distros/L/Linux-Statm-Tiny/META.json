@@ -1,0 +1,40 @@
+{
+   "abstract" : "simple access to Linux /proc/../statm",
+   "author" : [
+      "Robert Rothenberg <rrwo@thermeon.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Linux-Statm-Tiny",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "MooX::Aliases" : "0",
+            "Types::Standard" : "0",
+            "namespace::autoclean" : "0.16",
+            "perl" : "v5.8.8"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robrwo/Linux-Statm-Tiny/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robrwo/Linux-Statm-Tiny.git",
+         "web" : "https://github.com/robrwo/Linux-Statm-Tiny"
+      }
+   },
+   "version" : "0.0505"
+}
+

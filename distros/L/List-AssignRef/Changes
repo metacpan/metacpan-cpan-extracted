@@ -1,0 +1,31 @@
+List-AssignRef
+==============
+
+Created:      2012-11-01
+Home page:    <https://metacpan.org/release/List-AssignRef>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=List-AssignRef>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-15
+
+ [ Packaging ]
+ - Fix repo link.
+
+ [ Other ]
+ - Use Exporter::Shiny instead of Sub::Exporter.
+ - Use LV instead of lvalue.pm.
+
+0.003	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.002	2012-11-05	threescore barrels of powder below
+
+ [ Documentation ]
+ - Note extra parentheses required in legacy Perl.
+
+ [ Packaging ]
+ - Parenthetical test suite fixes for legacy Perl.
+
+0.001	2012-11-01	Initial release

@@ -1,0 +1,23 @@
+/*==================================================================*/
+/* DEBUG
+==================================================================*/
+#debug_log {
+	color: white;
+	background: #555 ;
+}
+
+#debug_log .debug_message {
+	border-bottom: solid #333 1px;
+	color: #ff0;
+}
+
+#debug_log .warning_message {
+	color: blue;
+	border-bottom: solid #333 1px;
+}
+
+#debug_log .error_message {
+	color: red;
+	border-bottom: solid #333 1px;
+}
+

@@ -1,0 +1,14 @@
+TODO
+ 
+- Implement an event system.
+
+- Simplify the api. Input and output reports should be consistent, now they
+  are split in wiimote_event.h and wiimote_report.h.
+
+- Improve support for the built-in speaker.  
+
+- Support the classic controller, currently it is assumed that the nunchuk
+  is the only device that will be plugged in to the extension port.
+
+- Add configuration options. 
+

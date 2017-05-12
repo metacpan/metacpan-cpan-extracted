@@ -1,0 +1,52 @@
+Lingua-LO-Romanize
+
+Lingua::LO::Romanize romanizes lao text using the BGN/PCGN standard from 1966
+(also know as the 'French style') with some modifications for
+post-revolutionary spellings (spellings introduced from 1975). One such
+modification is that Lao words has to be spelled out. For example, 'ສະຫວັນນະເຂດ'
+will be romanized correctly into 'savannakhét' while the older spelling
+'ສວັນນະເຂດ' will not be romanized correctly due to lack of characters.
+
+Furthermore, 'ຯ' will be romanized to '...', Lao numbers will be 'romanized' to
+Arabic numbers (0,1,2,3 etc.), and 'ໆ' will repeat the previous syllable.
+
+See POD documentation for more information.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Lingua::LO::Romanize
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-LO-Romanize
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Lingua-LO-Romanize
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Lingua-LO-Romanize
+
+    Search CPAN
+        http://search.cpan.org/dist/Lingua-LO-Romanize/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Joakim Lagerqvist
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

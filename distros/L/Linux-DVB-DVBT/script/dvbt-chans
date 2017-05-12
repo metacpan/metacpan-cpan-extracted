@@ -1,0 +1,604 @@
+#!/usr/bin/perl
+
+use strict ;
+use Pod::Usage ;
+use Getopt::Long qw/:config no_ignore_case/ ;
+
+++$! ;
+
+use Linux::DVB::DVBT ;
+
+our $VERSION = "3.05" ;
+
+	my ($help, $man, $DEBUG, $DEBUG_SCRIPT, $VERBOSE, $config, $check, $extra_check, $multiplex, $tsid_only, $adap, $write) ;
+	my ($list, $del_tsid) ;
+	GetOptions('v|verbose=i' => \$VERBOSE,
+			   'dbg-script=i' => \$DEBUG_SCRIPT,
+			   'debug=i' => \$DEBUG,
+			   'h|help' => \$help,
+			   'man' => \$man,
+			   'cfg=s' => \$config,
+			   'check' => \$check,
+			   'extra-check' => \$extra_check,
+			   'multi' => \$multiplex,
+			   'tsid=s' => \$tsid_only,
+			   'a|adap|dvb=i' => \$adap,
+			   'write=s' => \$write,
+			   'ls|list' => \$list,
+			   'del|delete=s' => \$del_tsid,
+			   ) or pod2usage(2) ;
+
+
+    pod2usage(1) if $help;
+    pod2usage(-verbose => 2) if $man;
+
+	Linux::DVB::DVBT->debug($DEBUG) ;
+	Linux::DVB::DVBT->dvb_debug($DEBUG) ;
+	Linux::DVB::DVBT->verbose($VERBOSE) ;
+
+	## Create dvb 
+	## NOTE: With default object settings, the application will
+	## die on *any* error, so there is no error checking in this script
+	##
+	my $dvb = Linux::DVB::DVBT->new(
+		'adapter_num' 	=> $adap,
+		'add_si'		=> 0,		# Do NOT add SI tables
+	) ;
+	
+	$dvb->config_path($config) if $config ;
+	
+	# read config
+	my $tuning_href = $dvb->get_tuning_info() ;
+	my $channels_aref = $dvb->get_channel_list() ;
+Linux::DVB::DVBT::prt_data("Current tuning info=", $tuning_href) if $DEBUG>=5 ;
+
+
+	## Option to delete a TSID
+	if ($del_tsid)
+	{
+		if (!Linux::DVB::DVBT::Config::tsid_delete($del_tsid, $tuning_href))
+		{
+			print STDERR "Unable to find TSID $del_tsid in config\n" ;
+			exit 1 ;
+		}
+		else
+		{
+			print STDERR "Saving updated config...\n" ;
+			Linux::DVB::DVBT::Config::write($dvb->config_path(), $tuning_href) ;
+		}
+	}
+
+	## Just produce a list of TSIDS
+	if ($list)
+	{
+
+		print "--------------------------------------------------------------------\n" ;
+		print "TSIDs\n" ;
+		print "--------------------------------------------------------------------\n" ;
+		my @tsid_list = sort {Linux::DVB::DVBT::Config::tsid_sort($a,$b)} keys %{$tuning_href->{'ts'}} ;
+		foreach my $tsid (@tsid_list)
+		{
+			my $tsid_info = "" ;
+			#if ($VERBOSE)
+			{
+				$tsid_info .= "Freq: $tuning_href->{'ts'}{$tsid}{'frequency'} Hz" ;
+				$tsid_info .= " $tuning_href->{'ts'}{$tsid}{'modulation'}QAM" ;
+				$tsid_info = "[$tsid_info]" ;
+			}
+			my $tsid_str = Linux::DVB::DVBT::Config::tsid_str($tsid);
+			print "TSID $tsid_str    $tsid_info\n" ;
+		}
+		print "--------------------------------------------------------------------\n" ;
+		exit 0 ;
+	}
+	
+	my $ok = 1 ;
+	
+	# defaults
+	$multiplex++ if $tsid_only ;
+	$check++ if $extra_check ;
+
+	# Set displayed widths
+	my %widths = (
+		'check'		=> 1,
+		'lcn'		=> 3,
+		'chan'		=> 30,
+		'tsid'		=> 6,
+		'pnr'		=> 5,
+		'type'		=> 7,
+		'pids'		=> 56,
+	) ;
+	
+	# calc seperators
+	my $horiz_bar = "" ;
+	$horiz_bar .= "-"x$widths{'check'} ;
+	$widths{'total'} = $widths{'check'} ;
+	$horiz_bar .= "-"x$widths{'lcn'} ;
+	$widths{'total'} = $widths{'lcn'} ;
+	foreach (qw/chan tsid pnr type pids/)
+	{
+		# vert sep
+		if ($_ eq 'pnr')
+		{
+			$horiz_bar .= "-" ;
+			$widths{'total'}++ ;
+		}
+		else
+		{
+			$horiz_bar  .= "-+-" ;
+			$widths{'total'} += 3 ;
+		}
+		
+		# column
+		$horiz_bar .= "-"x$widths{$_} ;
+		$widths{'total'} += $widths{$_} ;
+	}
+	my $tsid_bar = "."x$widths{'total'} ;
+
+	print <<HEAD ;
+Channel List
+============
+
+$horiz_bar
+ LCN | Channel Name                   |   TSID-PNR   | Type    | PIDs                                                 
+$horiz_bar
+HEAD
+	
+	my $got_pmt = 0 ;
+	my ($tv, $radio)=(0,0) ;
+	if ($multiplex)
+	{
+		## print channels grouped into multiplexes
+		my %multi ;
+		foreach my $ch_href (@$channels_aref)
+		{
+			my $chan = $ch_href->{'channel'} ;
+			my $tsid = $tuning_href->{'pr'}{$chan}{'tsid'} ;
+			$multi{$tsid} ||= [] ;
+			push @{$multi{$tsid}}, $ch_href ;
+		}
+		
+		my $tsids=0;
+		#my @tsid_list = sort {$a <=> $b} keys %multi ;
+		my @tsid_list = sort {Linux::DVB::DVBT::Config::tsid_sort($a,$b)} keys %multi ;
+		if ($tsid_only)
+		{
+			if (exists($multi{$tsid_only}))
+			{
+				@tsid_list = ($tsid_only) ;
+			}
+			else
+			{
+				print "Error : Requested TSID $tsid_only is not a valid value for this tuner\n" ;
+				exit 1 ; 
+			}
+		}
+		foreach my $tsid (@tsid_list)
+		{
+			if ($tsids)
+			{
+				print <<SEP ;
+$tsid_bar
+SEP
+			}
+			
+			my $tsid_info = "" ;
+			if ($VERBOSE)
+			{
+				$tsid_info .= "Freq: $tuning_href->{'ts'}{$tsid}{'frequency'} Hz" ;
+				$tsid_info .= " $tuning_href->{'ts'}{$tsid}{'modulation'}QAM" ;
+				$tsid_info = "[$tsid_info]" ;
+			}
+			print <<TSID ;
+TSID $tsid   $tsid_info
+$tsid_bar
+TSID
+			++$tsids ;
+			foreach my $ch_href (@{$multi{$tsid}})
+			{
+				print_chan($tuning_href, $ch_href, \$tv, \$radio) ;
+			}	
+		}
+		
+	}
+	else
+	{
+		## print list of channels
+		foreach my $ch_href (@$channels_aref)
+		{
+			print_chan($tuning_href, $ch_href, \$tv, \$radio) ;
+		}
+	}
+
+	print <<TAIL ;
+$horiz_bar
+
+TAIL
+
+	printf "Found %d channels (%d tv, %d other)\n", $tv+$radio, $tv, $radio ;	
+	if ($check || $extra_check)
+	{
+		print $ok ? "Passed checks\n" : "* These channels have FAILED checks\n" ;
+		if (!$got_pmt)
+		{
+			print "No PMT pids found. Have you re-run dvbt-scan with the latest version?\n" ;
+		}
+	}
+	print "\n" ;
+
+	## Write out new set
+	if ($write)
+	{
+		Linux::DVB::DVBT::Config::write($write, $tuning_href) ;
+		print "Written new copy of configuration files into $write\n" ;
+	}
+
+#-------------------------------------------------------------------------------------------------------
+sub print_chan
+{
+	my ($tuning_href, $ch_href, $tv_ref, $radio_ref) = @_ ;
+	
+	my $chan = $ch_href->{'channel'} ;
+	my $check_flag = 1 ;
+	my $checkstr = "" ;
+
+	if ($DEBUG_SCRIPT)
+	{
+		print "Testing $chan...\n" ;
+	}
+
+	if ($check)
+	{
+		$checkstr .= " Config " ;
+		my $tsid = $tuning_href->{'pr'}{$chan}{'tsid'} ;
+		if (exists($tuning_href->{'ts'}{$tsid}))
+		{
+			if (exists($tuning_href->{'pr'}{$chan}{'pmt'}))
+			{
+				$checkstr .= "ok" ;
+				++$got_pmt ;
+			}
+			else
+			{
+				$checkstr .= "no pmt" ;
+				$ok = 0 ;
+				$check_flag = 0 ;
+			}
+		}
+		else
+		{
+			$checkstr .= "incorrect" ;
+			$ok = 0 ;
+			$check_flag = 0 ;
+		}
+	}
+
+	if ($extra_check && $check_flag)
+	{
+		my $extra_ok = 1 ;
+
+		## Check we can record
+		my $file = "/tmp/test.ts" ;
+		my $duration_secs = 10 ;
+		my $duration = "0:0:$duration_secs" ;
+		unlink $file ;
+	
+		## Parse command line
+		my @chan_spec ;
+		my $error ;
+		$error ||= $dvb->multiplex_parse(\@chan_spec, "f=$file", "ch='$chan'", "len=$duration");
+		print "ERROR: $error\n" if $error && $DEBUG_SCRIPT ;
+		
+		## Select the channel(s)
+		my %options = (
+			'out'			=> "av",
+		) ;
+		$error ||= $dvb->multiplex_select(\@chan_spec, %options) ;
+		print "ERROR: $error\n" if $error && $DEBUG_SCRIPT ;
+		
+		## Get multiplex info
+		my %multiplex_info = $dvb->multiplex_info() ;
+		
+		## Record
+		eval {
+			my $stderr ;
+			local *STDERR ;
+			open(STDERR, '>', \$stderr) or die "Can't open STDERR: $!";
+	
+			## Record
+			$error ||= $dvb->multiplex_record(%multiplex_info) ;
+		} ;
+		if ($@)
+		{
+			print "ERROR: $@\n" if $DEBUG_SCRIPT ;
+		}
+		
+		$checkstr .= " : Record test " ;
+		my $pkts_str = "" ;
+		if ($error)
+		{
+			$extra_ok = 0 ;
+			$pkts_str = "$error" ;
+		}
+		else
+		{
+			my $expected_vpkts = ($duration_secs * 1000) - 1000 ;
+			my $expected_apkts = $expected_vpkts / 10 ;
+			if ($ch_href->{type} eq 'radio')
+			{
+				$expected_vpkts = -1 ;
+				$expected_apkts = $expected_vpkts / 20 ;
+			}
+			
+			
+			foreach my $file (sort keys %{$multiplex_info{'files'}})
+			{
+				my $href = $multiplex_info{'files'}{$file} ;
+				print "  $file\n" if $DEBUG_SCRIPT ;
+				foreach my $pid_href (@{$multiplex_info{'files'}{$file}{'pids'}})
+				{
+					if ($DEBUG_SCRIPT)
+					{				
+						printf "    PID %5d [$pid_href->{'pidtype'}] : %s errors / %s overflows / %s packets\n", 
+							$pid_href->{'pid'},
+							$pid_href->{'errors'},
+							$pid_href->{'overflows'},
+							$pid_href->{'pkts'},
+							 ;
+					}
+					
+					if ($pid_href->{'pidtype'} eq 'video')
+					{
+						if ($pid_href->{'pkts'} < $expected_vpkts)
+						{
+							$extra_ok = 0 ;
+							$pkts_str .= " video: $pid_href->{'pkts'} / $expected_vpkts packets " ;
+						}
+					}
+					elsif ($pid_href->{'pidtype'} eq 'audio')
+					{
+						if ($pid_href->{'pkts'} < $expected_apkts)
+						{
+							$extra_ok = 0 ;
+							$pkts_str .= " audio: ($pid_href->{'pkts'} / $expected_apkts packets " ;
+						}
+					}
+					
+				}
+				print "\n" if $DEBUG_SCRIPT ;
+			
+			}
+		}
+
+		if ($extra_ok)
+		{
+			$checkstr .= "PASS" ;
+		}
+		else
+		{
+			$checkstr .= "FAIL - $pkts_str" ;
+			$check_flag = 0 ;
+			$ok = 0 ;
+		}
+
+#		if (-s $file > 100000)
+#		{
+#			$checkstr .= "PASS" ;
+#		}
+#		else
+#		{
+#			$checkstr .= "FAIL" ;
+#			$ok = 0 ;
+#			$check_flag = 0 ;
+#		}
+
+		unlink $file ;
+	}
+	
+	
+	my $avstr = "" ;
+	if ($tuning_href->{'pr'}{$chan}{'video'})
+	{
+		$avstr .= "video=$tuning_href->{'pr'}{$chan}{'video'} " ;
+	}
+	if ($tuning_href->{'pr'}{$chan}{'audio'})
+	{
+		$avstr .= "audio=$tuning_href->{'pr'}{$chan}{'audio'} ($tuning_href->{'pr'}{$chan}{'audio_details'}) " ;
+	}
+	if ($tuning_href->{'pr'}{$chan}{'teletext'})
+	{
+		$avstr .= "teletext=$tuning_href->{'pr'}{$chan}{'teletext'} " ;
+	}
+	if ($tuning_href->{'pr'}{$chan}{'subtitle'})
+	{
+		$avstr .= "subtitle=$tuning_href->{'pr'}{$chan}{'subtitle'} ($tuning_href->{'pr'}{$chan}{'subtitle_details'})" ; #by rainbowcrypt
+	}
+	printf "%-$widths{check}s%$widths{lcn}d | %-$widths{chan}s | %$widths{tsid}s-%-$widths{pnr}d | %-$widths{type}s | $avstr $checkstr\n", 
+		$check_flag ? " " : "*",
+		$ch_href->{'channel_num'},
+		$chan,
+		$tuning_href->{'pr'}{$chan}{'tsid'},
+		$tuning_href->{'pr'}{$chan}{'pnr'},
+		$ch_href->{type} ;
+	
+	if ($ch_href->{type} =~ /tv/)
+	{
+		++$$tv_ref ;
+	}
+	else
+	{
+		++$$radio_ref ;
+	}
+	
+}
+
+	
+
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+=head1 NAME
+
+dvbt-chans - Show DVBT channels
+
+=head1 SYNOPSIS
+
+dvbt-chans [options]
+
+Options:
+
+       -debug level         set debug level
+       -verbose level       set verbosity level
+       -help                brief help message
+       -man                 full documentation
+       -cfg <config>        use specified configuration directory
+       -check               check validity of channels
+       -extra-check         checks channels can be recorded
+       -tsid <tsid>         show only the specified multiplex
+       -multi|tsid          group channels into their multiplex
+       -list                show just the list of TSIDs (multiplexes)
+       -del <tsid>          deletes the specified TSID
+       
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Set verbosity level. Higher values show more information.
+
+=item B<-debug>
+
+Set debug level. Higher levels show more debugging information (only really of any interest to developers!)
+
+=item B<-check>
+
+Ensures that all channels have a valid set of frequency parameters (Note: does not check that these will actually
+record the correct channel!)
+
+=item B<-extra-check>
+
+Does extra checking by recording a short amount of program for each channel
+
+=item B<-multi>
+
+Groups the channels into their associate multiplex (or transponder, or TSID group). This is useful for determining
+which channels may be recorded together at the same time using the multiplex record facility.
+
+=item B<-tsid>
+
+Specify the TSID and only the results for that multiplex will be shown
+
+=item B<-list>
+
+Shows the summary list of available TSIDs
+
+=item B<-del>
+
+Delete the specified TSID from the configuration file. Also deletes any channels related to that TSID. 
+
+=item B<-cfg>
+
+Specify an alternate configuration directory (containing the dvb-ts, dvb-pr files) to use, rather than using the default.
+
+
+
+
+=back
+
+=head1 DESCRIPTION
+
+Script that uses the perl Linux::DVB::DVBT package to provide DVB-T adapter functions.
+ 
+Reads the current config files and displays the list of known channels. The displayed information contains:
+
+=over 4
+
+=item B<LCN>
+
+The logical channel number (where supported) or just an incrementing index.
+
+=item B<Channel Name>
+
+The channel name as broadcast
+
+=item B<TSID>
+
+The transponder ID number (or multiplex number)
+
+=item B<PNR>
+
+The broadcast program number
+
+=item B<Type>
+
+Whether this is a TV channel (i.e. contains video), or a radio station (audio only)
+
+=item B<PIDs>
+
+The PIDs column shows the list of PID numbers for this channel. In brackets are the audio details that specify each audio stream
+in the program, prefixed by a language code. This information may be useful if you want to set up recording using the PID numbers 
+rather than the channel name.
+
+=back
+
+=head2 Example default output
+
+	Channel List
+	============
+
+	----+--------------------------------+-------------+--------+---------------------------------------------------------
+	LCN | Channel Name                   |  TSID-PNR   | Type   | PIDs                                                 
+	----+--------------------------------+-------------+--------+---------------------------------------------------------
+	  1 | BBC ONE                        |  4107-4171  | tv     | video=600 audio=601 (eng:601 eng:602) subtitle=605  
+	  2 | BBC TWO                        |  4107-4235  | tv     | video=610 audio=611 (eng:611 eng:612) subtitle=615  
+	  3 | ITV1                           |  8199-8263  | tv     | video=520 audio=521 (eng:521 eng:522) subtitle=523  
+	...
+	----+--------------------------------+-------------+--------+---------------------------------------------------------
+	
+	Found 62 channels (39 tv, 23 other)
+
+=head2 Example output using -multi option
+
+	Channel List
+	============
+	
+	----+--------------------------------+-------------+--------+---------------------------------------------------------
+	LCN | Channel Name                   |  TSID-PNR   | Type   | PIDs                                                 
+	----+--------------------------------+-------------+--------+---------------------------------------------------------
+	TSID 4107
+	......................................................................................................................
+	  1 | BBC ONE                        |  4107-4171  | tv     | video=600 audio=601 (eng:601 eng:602) subtitle=605  
+	  2 | BBC TWO                        |  4107-4235  | tv     | video=610 audio=611 (eng:611 eng:612) subtitle=615  
+	 70 | CBBC Channel                   |  4107-4671  | tv     | video=620 audio=621 (eng:621 eng:622) subtitle=623  
+	 80 | BBC NEWS                       |  4107-4415  | tv     | video=640 audio=641 (eng:641) subtitle=643  
+	......................................................................................................................
+	TSID 8199
+	......................................................................................................................
+	  3 | ITV1                           |  8199-8263  | tv     | video=520 audio=521 (eng:521 eng:522) subtitle=523  
+	  4 | Channel 4                      |  8199-8384  | tv     | video=560 audio=561 (eng:561 eng:562) subtitle=563  
+	...
+	722 | Kerrang!                       | 24576-26304 | radio  | audio=1301 (eng:1301)  
+	----+--------------------------------+-------------+--------+---------------------------------------------------------
+	
+	Found 62 channels (39 tv, 23 other)
+
+=head1 FURTHER DETAILS
+
+For full details of the DVBT functions, please see L<Linux::DVB::DVBT>:
+
+   perldoc Linux::DVB::DVBT
+ 
+=cut
+
+	

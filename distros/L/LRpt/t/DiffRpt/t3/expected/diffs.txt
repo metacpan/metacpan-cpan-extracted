@@ -1,0 +1,22 @@
+lcsvdiff t/DiffRpt/t3/actual/before/sales.txt t/DiffRpt/t3/actual/after/sales.txt
+SCHEMA: sonum	stor_id	ponum	sdate
+DEL( 10 ): 10	7896	QQ2299	0000-00-00
+ROW( 11 ): 11	7896	AA123	2012-99-20
+UPD( 11 ): ponum: TQ456 ==#> AA123
+UPD( 11 ): sdate: 2012-12-20 ==#> 2012-99-20
+DEL( 19 ): 19	7896	X999	0000-00-00
+lcsvdiff t/DiffRpt/t3/actual/before/titleauthors.txt t/DiffRpt/t3/actual/after/titleauthors.txt
+SCHEMA: au_id	title_id	au_ord	royaltyshare
+DEL( 409-56-7008#BU1032 ): 409-56-7008	BU1032	1	0.60
+ROW( 409-56-7008#BU1035 ): 409-56-7008	BU1035	2	0.40
+INS( 409-56-7008#DF9008 ): 409-56-7008	DF9008	1	1.00
+ROW( 409-56-7008#MC2222 ): 409-56-7008	MC2222	8	9.00
+UPD( 409-56-7008#MC2222 ): au_ord: 1 ==#> 8
+UPD( 409-56-7008#MC2222 ): royaltyshare: 1.00 ==#> 9.00
+ROW( 409-56-7008#PC1035 ): 409-56-7008	PC1035	1	1.00
+ROW( 409-56-7008#PC9999 ): 409-56-7008	PC9999	4	5.00
+UPD( 409-56-7008#PC9999 ): au_ord: 1 ==#> 4
+UPD( 409-56-7008#PC9999 ): royaltyshare: 1.00 ==#> 5.00
+DEL( 409-56-7008#PS3333 ): 409-56-7008	PS3333	1	1.00
+DEL( 409-56-7008#PS7777 ): 409-56-7008	PS7777	1	1.00
+INS( 409-56-7008#XY1032 ): 409-56-7008	XY1032	1	0.60

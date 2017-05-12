@@ -1,0 +1,14 @@
+Put your LCFG nagios Perl helper modules into this directory and name
+them with either a '.pm' suffix (and with or without a .cin suffix
+beyond that). To clarify, both of these are ok:
+
+foo.pm
+bar.pm.cin
+
+They will be installed into the correct location, the same as normal
+Perl modules.
+
+As usual, any '.cin' suffix will be stripped off the filename as part
+of the build-time template completion process.
+
+

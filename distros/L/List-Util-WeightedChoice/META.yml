@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                List-Util-WeightedChoice
+version:             0.06
+abstract:            Perl extension to allow for nonnormalized weighted choices
+license:             ~
+author:              
+    - Danny Sadinoff <danny-cpan@sadinoff.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Params::Validate:              0.9
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

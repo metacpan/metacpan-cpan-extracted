@@ -1,0 +1,5 @@
+exists:
+debian_version
+lsb-release
+do not:
+redhat_version

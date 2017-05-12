@@ -1,0 +1,29 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+ignore.txt
+lib/Log/Dispatch/Email/Sendmail.pm
+t/00-load.t
+t/boiler.t
+t/changes.t
+t/coverage.t
+t/critic.t
+t/cv.t
+t/dist.t
+t/gv.t
+t/kwalitee.t
+t/manifest.t
+t/metrics.t
+t/noplan.t
+t/pod-cm.t
+t/pod.t
+t/port.t
+t/prereq.t
+t/sendmail.t
+t/snippets.t
+t/spelling.t
+t/strict.t
+t/vars.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

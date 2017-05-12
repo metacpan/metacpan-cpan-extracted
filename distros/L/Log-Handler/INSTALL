@@ -1,0 +1,14 @@
+To install the module execute the following steps:
+
+   perl Makefile.PL
+   make
+   make test
+
+"make test" do some tests. If you get error messages then
+you shouldn't install the module. Otherwise your last step is:
+
+   make install
+
+and have a lot of fun with Log::Handler.
+
+Don't forget to take a look into the "examples" diretory. :-)

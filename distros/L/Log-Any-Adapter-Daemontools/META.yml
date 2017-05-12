@@ -1,0 +1,30 @@
+---
+abstract: 'Logger suitable for use with DaemonTools style logging'
+author:
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  Log::Any::Adapter: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Any-Adapter-Daemontools
+requires:
+  Carp: '0'
+  Log::Any: '1.03'
+  Log::Any::Adapter: '0'
+  Log::Any::Adapter::Base: '0'
+  Log::Any::Adapter::Util: '0'
+  Scalar::Util: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/nrdvana/perl-Log-Any-Adapter-Daemontools/issues
+  repository: https://github.com/nrdvana/perl-Log-Any-Adapter-Daemontools.git
+version: '0.101'

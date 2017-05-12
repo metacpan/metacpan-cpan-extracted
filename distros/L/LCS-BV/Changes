@@ -1,0 +1,16 @@
+Revision history for LCS::BV
+
+0.05  2015-06-01 13:57:36 CEST
+        - stable release
+
+0.04  2015-05-28 11:24:00 CEST
+        - added author tests
+
+0.03  2015-05-27 20:26:27 CEST
+        - improved test coverage
+
+0.02  2015-05-26 11:43:18 CEST
+        - bugfix: change constant 64 to detected $width
+
+0.01  2015-05-26 00:54:01 CEST
+        - Initial release

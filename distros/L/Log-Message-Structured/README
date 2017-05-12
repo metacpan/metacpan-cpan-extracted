@@ -1,0 +1,109 @@
+NAME
+    Log::Message::Structured - Simple structured log messages
+
+SYNOPSIS
+        package MyLogEvent;
+        use Moose;
+        use namespace::autoclean;
+
+        with qw/
+            Log::Message::Structured
+            Log::Message::Structured::Component::Date
+            Log::Message::Structured::Component::Hostname
+            Log::Message::Structured::Stringify::AsJSON
+        /;
+
+        has foo => ( is => 'ro', required => 1 );
+
+        ... elsewhere ...
+
+        use aliased 'My::Log::Event';
+
+        $logger->log(message => Event->new( foo => "bar" ));
+        # Logs:
+        {"__CLASS__":"MyLogEvent","foo":1,"date":"2010-03-28T23:15:52Z","hostname":"mymachine.domain"}
+
+DESCRIPTION
+    Logging lines to a file is a fairly useful and traditional way of
+    recording what's going on in your application.
+
+    However, if you have another use for the same sort of data (for example,
+    sending to another process via a message queue, or storing in KiokuDB),
+    then you can be needlessly repeating your data marshalling.
+
+    Log::Message::Structured is a VERY VERY SIMPLE set of roles to help you
+    make small structured classes which represent '"something which
+    happened"', that you can then either pass around in your application,
+    log in a traditional manor as a log line, or serialize to JSON or YAML
+    for transmission over the network.
+
+COMPONENTS
+    The consuming class can include components, that will provide additional
+    attributes. Here is a list of the components included in the basic
+    distribution. More third party components may be available on CPAN.
+
+    *   Log::Message::Structured::Component::Date
+
+    *   Log::Message::Structured::Component::Hostname
+
+    *   Log::Message::Structured::Component::AttributesFilter
+
+ATTRIBUTES
+    Except for "class", the basic Log::Message::Structured role provides no
+    attributes. See available components in
+    Log::Message::Structured::Component::* and consume them, or create
+    attributes yourself, to enrich your class
+
+  class
+    Str,ro
+
+    An attribute that returns the name of the class that were used when
+    creating the instance.
+
+METHODS
+    The only non-accessor methods provided are those composed from
+    MooseX::Storage related to serialization and deserialization.
+
+  as_string
+    Returns the event as a string. By default, returns an empty string.
+    However as the class composes stringifier roles, as_string will return
+    the proper string representation of the event instance.
+
+  as_hash
+    Returns the event as a hash. By default, returns a HashRef with all
+    attributes, and their values. However, as the class composes modifier
+    roles, the hash (and thus the string representation) will be changed
+    accordingly
+
+  BUILD
+    An empty build method (which will be silently discarded if you have one
+    in your class) is provided, so that additional components can wrap it
+    (to farce lazy attributes to be built).
+
+REQUIRED METHODS
+    None.
+
+OVERLOADING
+    Log::Message::Structured overloads the stringify operator, and return
+    the result of the "as_string" method.
+
+A note about namespace::autoclean
+    namespace::autoclean does not work correctly with roles that supply
+    overloading. Therefore you should instead use:
+
+        use namespace::clean -except => 'meta';
+
+    instead in all classes using Log::Message::Structured.
+
+SEE ALSO
+    Log::Message::Structured::Stringify::Sprintf
+    Log::Message::Structured::Stringify::AsJSON
+    Log::Message::Structured::Stringify::AsYAML
+
+AUTHOR AND COPYRIGHT
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net>". Damien Krotkine (dams)
+    "<dams@cpan.org>".
+
+LICENSE
+    Licensed under the same terms as perl itself.
+

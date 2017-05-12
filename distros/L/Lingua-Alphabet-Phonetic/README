@@ -1,0 +1,26 @@
+Lingua::Alphabet::Phonetic
+==========================
+
+Converts characters or strings to a phonetic alphabet.  
+The most common phonetic alphabet is the U.S. Military / NATO standard
+where "ABC...YZ" is pronounced "Alpha Bravo Charlie ... Yankee Zulu".
+At present, that is the only alphabet available for conversion.
+
+
+INSTALLATION
+
+To install this module run the following:
+
+   perl Makefile.PL
+   make install
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004-2007 Martin Thurn
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+For more information about my Perl Modules, visit http://tinyurl.com/nn67z
+

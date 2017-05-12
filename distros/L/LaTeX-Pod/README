@@ -1,0 +1,84 @@
+NAME
+    LaTeX::Pod - Transform LaTeX source files to POD (Plain old
+    documentation)
+
+SYNOPSIS
+     use LaTeX::Pod;
+
+     $parser = LaTeX::Pod->new('/path/to/source');
+     print $parser->convert;
+
+DESCRIPTION
+    `LaTeX::Pod' converts LaTeX sources to Perl's POD (Plain old
+    documentation). Currently only a subset of the available LaTeX language
+    is supported; see SUPPORTED LANGUAGE SUBSET for further details.
+
+CONSTRUCTOR
+  new
+    The constructor requires that the path to the LaTeX source is defined:
+
+     $parser = LaTeX::Pod->new('/path/to/source');
+
+    Returns the parser object.
+
+METHODS
+  convert
+    There is one public *method* available, namely `convert()':
+
+     $pod = $parser->convert;
+
+    Returns the computed POD as a string.
+
+SUPPORTED LANGUAGE SUBSET
+    LaTeX currently supported:
+
+    * abstracts
+    * chapters
+    * sections/subsections/subsubsections
+    * description, enumerate and itemize lists
+    * verbatim blocks (and indentation)
+    * plain text
+    * bold/italic/code font tags
+    * umlauts
+    * newlines
+    * comments
+
+IMPLEMENTATION DETAILS
+    The current implementation is based upon LaTeX::TOM (the framework being
+    used for parsing the LaTeX source) and its clear distinction between
+    various types of nodes. As an example, a `\chapter' command has a
+    separate text associated with it as its content. `LaTeX::Pod' uses a
+    "look-behind" mechanism for commands and their corresponding texts since
+    they currently cannot be easily detected without such a mechanism.
+
+    Thus `LaTeX::Pod' was designed with the intention to be
+    *context-sensitive* aware. This is also being aimed at by eventually
+    registering which type of node has been seen before the current one --
+    useful when constructing logical paragraphs made out of two or more
+    nodes. `LaTeX::Pod' then finally unregisters the type of node seen when
+    it is no longer required. In addition, a dispatch queue is built
+    internally which is executed after all nodes have been processed.
+
+    Considering that the POD format has a limited subset of directives, the
+    complexity of keeping track of node occurences appears to be bearable.
+    Leading and trailing newlines will be removed from the node's text
+    extracted where needed; furthermore, trailing spaces and tabs will also
+    be purged from each line of POD resulting.
+
+BUGS & CAVEATS
+    It is highly recommended to ensure that the structure of the LaTeX input
+    file follows the format specification strictly or the parser may not
+    succeed.
+
+SEE ALSO
+    LaTeX::TOM
+
+AUTHOR
+    Steven Schubiger <schubiger@cpan.org>
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://dev.perl.org/licenses/
+

@@ -1,0 +1,196 @@
+#!/usr/nikola/bin/perl
+
+use strict;
+use warnings;
+
+use Lingua::Treebank;
+use Lingua::Treebank::Const;
+
+use Getopt::Long;
+use Pod::Usage;
+
+
+
+# Increments the count of 'value' in the hash table refered to by
+# 'table', creating hash table entries if necessary.
+sub increment_count {
+    my $table = shift;
+    my $value = shift;
+
+    if (not exists $table->{$value}) {
+	$table->{$value} = 0;
+    }
+    $table->{$value}++;
+}
+
+
+# Recursively enumerate a treebank tree depth-first, counting the
+# frequencies of the non-terminal nodes, parts of speech, and words.
+sub enumerate_subtree {
+    my Lingua::Treebank::Const $subtree = shift;
+    my $nt = shift;
+    my $pos = shift;
+    my $word = shift;
+
+    if ($subtree->is_terminal()) {
+	increment_count($pos, $subtree->tag());
+	increment_count($word, $subtree->word());
+    }
+    else {
+	increment_count($nt, $subtree->tag());
+	for my Lingua::Treebank::Const $child (@{$subtree->children()}) {
+	    enumerate_subtree($child, $nt, $pos, $word);
+	}
+    }
+}
+
+
+# Print vocabulary list to the specified output file ordered by
+# frequency and then alphabetically.
+sub print_vocabulary {
+    my $file = shift;
+    my $table = shift;
+    my $count = shift;
+
+    my $value;
+    my $freq;
+
+    open OUT,">$file" or die "Cannot open '$file': !$\n";
+    for $value (sort {$table->{$b} <=> $table->{$a}
+			or $a cmp $b} keys(%{$table})) {
+	$freq = $count ? $table->{$value}:'';
+	write OUT;
+    }
+
+format OUT=
+@<<<<<<<<<<<<<<<<<<<<     @<<<<<
+$value,                $freq
+.
+}
+
+
+# Parse command line.
+my $binarized;
+my $count;
+my $man = 0;
+my $help = 0;
+my $ntfile;
+my $posfile;
+my $wordfile;
+my $verbose;
+
+GetOptions(binarized => \$binarized,
+	   count => \$count,
+	   'NT=s' => \$ntfile,
+	   'POS=s' => \$posfile,
+	   'word=s' => \$wordfile,
+	   verbose => \$verbose,
+	   'help|?' => \$help,
+	   man => \$man) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+
+# The frequency hash tables.
+my %nt;
+my %pos;
+my %word;
+
+# If no files are specified, use STDIN.
+my @files = (@ARGV) ? @ARGV:("-");
+
+# Loop over all the files specified on the command line.
+FILE:
+for my $file (@files) {
+    print STDERR "Extract vocabulary from $file\n" if ($verbose);
+
+    $file eq "-" or -f $file or die "'$file' is not a file.\n";
+
+    my @trees = $binarized ? Lingua::Treebank->from_cnf_file($file):
+                             Lingua::Treebank->from_penn_file($file);
+
+    # Loop over all the top-level trees in a given file.
+  TREE:
+    for my Lingua::Treebank::Const $tree (@trees) {
+	# Enumerate all the nodes in a given tree.
+	enumerate_subtree($tree, \%nt, \%pos, \%word);
+    }
+}
+
+# For each type (NT, POS, word) specified on the command line, print
+# the vocabulary.
+if ($ntfile) {
+    print_vocabulary($ntfile, \%nt, $count);
+    print "\n" if ($ntfile eq "-");
+}
+
+if ($posfile) {
+    print_vocabulary($posfile, \%pos, $count);
+    print "\n" if ($posfile eq "-");
+}
+
+if ($wordfile) {
+    print_vocabulary($wordfile, \%word, $count);
+}
+
+
+
+
+__END__
+
+=head1 NAME
+
+vocabulary -- extract vocabularies from Penn treebank files
+
+=head1 SYNOPSIS
+
+vocabulary [-NT ntfile] [-POS posfile] [-word wordfile] [-count]
+[-binarized] [-verbose] file1 [file2...]
+
+File1, file2 etc. are the names of Penn treebank files.  If none are
+specified, STDIN is used.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<NT>
+
+Write the non-terminal node vocabulary to ntfile.
+
+=item B<POS>
+
+Write the part of speech vocabulary to posfile
+
+=item B<word>
+
+Write the word vocabulary to wordfile.
+
+=item B<count>
+
+Print the frequency counts for each of the categories.
+
+=item B<binarized>
+
+The file is in binarized format.
+
+=item B<verbose>
+
+Print filenames as they are processed.
+
+=back
+
+=head1 DESCRIPTION
+
+Given a list of Penn treebank files, this script extracts the words,
+parts of speech, and non-terminal node names and emits each in a
+separate file in order of frequency.
+
+Note that giving a "-" argument for any of ntfile, posfile, or
+wordfile causes the results to be written to STDOUT.
+
+=head1 AUTHOR
+
+W.P. McNeill E<lt>billmcn@ssli.ee.washington.eduE<gt>
+
+=cut

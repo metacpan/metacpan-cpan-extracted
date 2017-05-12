@@ -1,0 +1,15 @@
+This is CPAN distribution of the Lingua::RU::Money::XS module. Please note that
+this module works only on Perl 5.16.0 and newer.
+
+Run `perldoc Lingua::RU::Money::XS` (while in this source directory before
+installation) for more documentation.
+
+See https://github.com/igormunkin/Lingua-RU-Money-XS/issues for full list of
+open problems and feel free to report your bugs and feature requests there or
+by mailing imun@cpan.org
+
+Copyright (C) 2017 by Igor Munkin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.0 or,
+at your option, any later version of Perl 5 you may have available.

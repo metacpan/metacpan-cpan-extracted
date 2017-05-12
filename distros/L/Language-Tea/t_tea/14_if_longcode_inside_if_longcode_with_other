@@ -1,0 +1,9 @@
+if { echo "if1"
+     true } {
+    if { echo "if2"
+         true } { true } { false } } { false }
+echo "other1"
+echo "other2"
+echo "other3"
+# just to make sure the refactorer doesnt break
+# the visit_prefix code

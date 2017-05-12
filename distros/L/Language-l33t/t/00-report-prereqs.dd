@@ -1,0 +1,48 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::PAUSE::Permissions' => '0',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Const::Fast' => '0',
+                                      'IO::Socket::INET' => '0',
+                                      'Moo' => '0',
+                                      'Moo::Role' => '0',
+                                      'MooX::HandlesVia' => '0',
+                                      'Moose::Util::TypeConstraints' => '0',
+                                      'MooseX::MungeHas' => '0',
+                                      'Type::Tiny' => '0',
+                                      'Types::Standard' => '0',
+                                      'experimental' => '0',
+                                      'perl' => 'v5.20.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::Exception' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Warn' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

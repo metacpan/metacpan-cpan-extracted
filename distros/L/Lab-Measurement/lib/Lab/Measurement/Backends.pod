@@ -1,0 +1,113 @@
+=pod
+
+=head1 National Instruments NI-VISA back-end
+
+
+The National Instruments NI-VISA library and the associated GPIB drivers are
+widely used and proven code for accessing lab devices, and our clear
+recommendation for controlling lab devices under Microsoft Windows. For the
+respective downloads, please follow the provided links.
+Linux support is available, however, installation can be complicated, and there
+is no support for USB-GPIB adaptors under Linux. A lot of tips and tricks can
+be found at the
+L<NI Linux User Forum|http://decibel.ni.com/content/groups/linux-users>. In general,
+L<National Instruments|http://sine.ni.com/psp/app/doc/p/id/psp-411"> offers
+excellent documentation. We especially recommend the 
+L<NI-VISA User Manual|http://www.ni.com/pdf/manuals/370423a.pdf>, the
+L<NI-VISA Programmer Reference Manual|http://www.ni.com/pdf/manuals/370132c.pdf> these references of 
+L<VISA resource names|http://zone.ni.com/reference/en-XX/help/371361B-01/lvinstio/visa_resource_name_generic/>
+and L<VISA error codes|http://zone.ni.com/reference/en-XX/help/371361B-01/lverror/visa_error_codes/>.
+
+B<< For using the NI VISA library, you will have to also install our separate Perl
+package L<Lab::VISA|http://search.cpan.org/dist/Lab-VISA/> providing the Perl language bindings. Detailed
+L<installation instructions|http://search.cpan.org/dist/Lab-VISA/lib/Lab/VISA/Installation.pod> are provided in that
+package. >> 
+
+
+=head1 Linux-GPIB back-end
+
+The L<Linux-GPIB project|http://linux-gpib.sourceforge.net/>  aims at
+providing free and open-source hardware drivers and a GPIB library with an API
+compatible to the NI drivers (without VISA). The package code is considered
+stable and feature-complete; new releases occur mainly as response to changes
+in the kernel driver interface. 
+
+=head2 Installing Linux-GPIB
+
+Note that on Gentoo Linux-GPIB is packaged. On distros where this is not the
+case, you can use the following steps. For more details, consult Linux-GPIB's
+F<INSTALL> file. This guide was tested on Debian 8 with Linux-GPIB versions 4.0.2 and 4.0.3 .
+
+=over
+
+=item * Install the kernel headers, cpanm, gcc and make. On Debian you can run
+this command:
+
+ root # apt-get install linux-headers-`uname -r` build-essential cpanminus 
+
+=item * Download the
+L<Linux-GPIB sources|http://sourceforge.net/projects/linux-gpib/files/>
+ and build with the usual procedure:
+
+ user $ tar -xf linux-gpib-4.0.2.tar.gz && cd linux-gpib-4.0.2
+ user $ ./configure
+ user $ make
+
+install the library and kernel drivers:
+
+ root # make install
+
+=item * Add your user to the gpib group.
+
+ root # adduser user gpib 
+
+=item * Install the Perl bindings:
+
+ root # cpanm ./language/perl
+
+=back 
+
+=head2 Example Configuration for the GPIB-USB-HS controller
+
+NI's L<GPIB-USB-HS|http://sine.ni.com/nips/cds/view/p/lang/de/nid/201586> is supported out of the box by Linux-GPIB without any
+additional proprietary firmware. 
+
+You need a configuration file F</etc/gpib.conf>:
+
+ interface {
+        minor = 0       /* board index, minor = 0 uses /dev/gpib0, minor = 1 uses /dev/gpib1, etc. */
+        board_type = "ni_usb_b" /* type of interface board being used */
+        pad = 0 /* primary address of interface             */
+        sad = 0 /* secondary address of interface           */
+        timeout = T3s   /* timeout for commands */
+
+        eos = 0x0a      /* EOS Byte, 0xa is newline and 0xd is carriage return */
+        set-reos = yes  /* Terminate read if EOS */
+        set-bin = no    /* Compare EOS 8-bit */
+        set-xeos = no   /* Assert EOI whenever EOS byte is sent */
+        set-eot = yes   /* Assert EOI with last byte on writes */
+
+ /* settings for boards that lack plug-n-play capability */
+        base = 0        /* Base io ADDRESS                  */
+        irq  = 0        /* Interrupt request level */
+        dma  = 0        /* DMA channel (zero disables)      */
+
+
+        master = yes    /* interface board is system controller */
+ }
+
+
+To load the kernel driver during boot, add C<ni_usb_gpib> to
+F</etc/modules>. 
+
+After connecting the controller via usb, you will still have to run
+C<gpib_config> as root. To automate this, create an udev rule
+F</etc/udev/rules.d/98-gpib-more.rules> with contents:
+ 
+ SUBSYSTEMS=="usb", ATTRS{idVendor}=="3923", ATTRS{idProduct}=="709b" ACTION=="add", RUN+="/usr/bin/logger Configured NI USB-GPIB-HS" RUN+="/etc/hotplug/usb/ni_usb_gpib"
+
+
+Now, you can use the interactive C<ibtest> and C<ibterm> programs to test the installation.
+
+
+

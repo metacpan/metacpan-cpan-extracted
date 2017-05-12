@@ -1,0 +1,38 @@
+
+Lab::VISA - Perl interface to the National Instruments VISA library
+
+
+This library offers a Perl interface to National Instruments' NI-VISA library. 
+It is one of the possible backends for the high-level measurement control 
+package Lab::Measurement, but can also be used on its own.
+
+Lab::VISA is known to work with GPIB, TCP/IP and serial connections. Other 
+interfaces supported by the NI-VISA library are likely to work as well. The 
+library has been tested on both on Linux and on Windows.
+
+Detailed installation instructions are given in Lab::VISA::Installation.
+
+In case you encounter any problems, you are encouraged to use a public forum for 
+discussion. This way future users will be able to take advantage of your findings.
+
+There is a mailing list set up, also for Lab::VISA, at
+https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users
+
+Bugs can be reported to https://github.com/lab-measurement/Lab-VISA/issues
+
+You will also find that the authors of this package are always happy to receive
+feedback.
+
+
+COPYRIGHT AND LICENCE
+
+This swig-based interface is
+  (c) 2004-2006 Daniel Schröer
+  (c) 2007-2010 Daniel Schröer, Andreas K. Hüttel, Daniela Taubert, and others 
+  (c) 2011-2014 Andreas K. Hüttel
+
+It is free software; you can redistribute it and/or modify it under the same 
+terms as Perl itself.
+
+For the rest National Instruments or the VXI Consortium will probably have a 
+word to say. See National Instrument's license for the NI-VISA library.

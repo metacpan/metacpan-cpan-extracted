@@ -1,0 +1,21 @@
+TYPEMAP
+scmp_filter_ctx           T_FILTER_CTX
+enum scmp_compare         T_IV
+enum scmp_filter_attr     T_IV
+scmp_datum_t              T_IV
+struct scmp_arg_cmp       T_OPAQUE
+
+INPUT
+T_FILTER_CTX
+    if (SvROK($arg) && sv_derived_from($arg, \"Linux::Seccomp\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type,tmp);
+    }
+    else
+        Perl_croak_nocontext(\"%s: %s is not of type %s\",
+            ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+            \"$var\", \"Linux::Seccomp\")
+
+OUTPUT
+T_FILTER_CTX
+    sv_setref_pv($arg, \"Linux::Seccomp\", (void*)$var);

@@ -1,0 +1,701 @@
+#!/usr/bin/perl
+
+use POSIX qw(getcwd);
+use warnings 'all';
+use strict;
+
+$| = 1;
+
+###############################################################################
+# PREREQUISITES
+###############################################################################
+
+use I18N::LangTags::Detect;
+use Locale::VersionedMessages::lm;
+
+###############################################################################
+# GLOBAL VARIABLES
+###############################################################################
+
+our $default_locale   = "en_US";
+our $default_dir      = "lib";
+
+###############################################################################
+# HELP
+###############################################################################
+
+use vars qw($COM);
+
+BEGIN {
+   $COM = $0;
+   $COM =~ s/^.*\///;
+}
+
+our $usage=
+  "usage: $COM [OPTIONS]
+
+      Exactly one of the following operations may be used:
+
+      -h/--help             : Print help.
+
+      -c/--create           : Create a new set of message.
+                              Required options: -s
+                              Other options: -L, -d
+
+      -l/--lexicon          : Create a new lexicon.
+                              Required options: -s
+                              Other options: -L, -d
+
+      -m/--message          : Add one or more messages to one
+                              or all lexicons.
+                              Required options: -s, -M
+                              Other options: -L, -d, -U
+
+      -u/--update           : Update all messages that are
+                              out-of-date in a single locale.
+                              Required options: -s, -L
+                              Other options: -d, -U
+
+      Options:
+
+      -s/--set SET          : Specifies the message set to work
+                              with.  SET must be alphanumeric or
+                              underscore.
+
+      -d/--dir DIR          : Specifies the directory where the
+                              internationaliziation modules
+                              live. There will be a directory
+                              structure:
+                                 DIR/lib/Locale/VersionedMessages
+                              If DIR is not given, it defaults
+                              to the current directory.
+
+      -L/--locale LOCALE    : Specifies the default locale to
+                              work with.
+
+      -M/--msgid MSGID      : Work with the message ID given.
+
+      -U/--no-update        : By default, when a message is updated
+                              in a lexicon, the version is updated.
+                              With this option, the version will be
+                              left unmodified (though the message
+                              will be updated).
+
+";
+
+#pod
+
+#head1 NAME
+
+lm_admin - simple tool for managine Locale::VersionedMessages lexicons
+
+#head1 SYNOPSIS
+
+This tool can be used to maintain the lexicon files used by the
+Locale::VersionedMessages perl module.
+
+   lm_admin [OPERATION] [OPTIONS]
+
+#head1 DESCRIPTION
+
+The Locale::VersionedMessages module allows translation tables (i.e. lexicons) for
+a set of message to be stored in perl modules to be used in a localized
+program.
+
+This tool allows you to create a new set of messages, a new lexicon (i.e.
+a new locale which the messages can be translated into), as well as add
+or update any information in the lexicons.
+
+Operations available are:
+
+=over 5
+
+=item -h, --help
+
+Print online help.
+
+=item -c, --create
+
+Create the infrastructure (i.e. the framework of a set of perl modules) which
+will contain the new set of messages.
+
+The -s/--set option is required.  The -L/--locale and -d/--dir options
+may be given.
+
+=item -l, --lexicon
+
+This can be used to create a perl module containing a new translation of a
+set of messages.
+
+The -s/--set option is required.  The -L/--locale and -d/--dir options
+may be given.
+
+=item -m, --message
+
+This can be used to add or update a message in the set.
+
+The -s/--set and -M/--msgid options are required.  The -L/--locale, -d/--dir,
+and -U/--no-update options may be given.
+
+=item -u, --update
+
+This can be used to update all messages in a single locale that are out-of-date.
+
+The -s/--set option is required.  The -L/--locale, -d/--dir, and
+-U/--no-update options may be given.
+
+=back
+
+The following options are available for the above operations:
+
+=item -s, --set SET
+
+This can be used to specify the name of the set of messages.  SET must
+be composed of characters that can make up the name of a perl module.
+It is recommended that it be alphanumeric or underscore (though other
+characters may work).
+
+=item -d, --dir DIR
+
+This option is used to specify the directory where the perl module
+hierarchy will live.  DIR must already exist, and a new set
+of message modules will live in:
+
+   DIR/Locale/VersionedMessages/Sets/SET.pm
+   DIR/Locale/VersionedMessages/Sets/SET/LOCALE.pm
+
+If this option is not given, DIR defaults to the current directory.
+
+=item -L, --locale LOCALE
+
+This specifies the name of the locale to work with.  If you are creating
+a new set of messages, this will be the default locale for that set.
+
+Some operations (such as adding a message) could be done which apply
+to multiple existing locales.  In this case, LOCALE could be the word
+'default' which refers to the default locale, or 'all' which refers to
+all locales defined for that set of messages.
+
+=item -M, --msgid MSGID
+
+Operations that work on a message require this option to specify
+which message to work on.
+
+MSGID is the string which will be used to refer to the message
+in the localized program.
+
+=item -U, --no-update
+
+One feature unique to Locale::VersionedMessages is that it keeps track of a
+version number for every message in every locale.  When you update a
+message in the default locale, the version number is incremented.
+When you add or update a message in another locale, it is set to the
+version in the default locale.
+
+This allows you to easily see which messages are out-of-date with
+respect to the default locale.
+
+If this option is given, the version is not changed.  This would only
+be done if the change did not impact the actual translation (for
+example, you are fixing a typo or spelling error, but not actually
+changing the text).
+
+This would allow you to make simple corrections to the default locale
+without flagging all other locales as out-of-date, or making a similar
+simple correction to another locale without actually comparing it to
+the default locale (which might have changed in more extensive ways).
+
+#head1 KNOWN BUGS
+
+None known.
+
+#head1 BUGS AND QUESTIONS
+
+Please refer to the Locale::VersionedMessages documentation for information on
+submitting bug reports or questions to the author.
+
+#head1 SEE ALSO
+
+Locale::VersionedMessages
+
+#head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+#head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut
+
+###############################################################################
+# PARSE ARGUMENTS
+###############################################################################
+
+my($op,$op_set,$op_dir,$op_locale,$op_msgid,$op_noupdate);
+$op_noupdate = 0;
+
+while ($_  = shift) {
+   (print $usage),         exit  if ($_ eq "-h"  ||  $_ eq "--help");
+
+   $op        = "create",  next  if ($_ eq "-c"  ||  $_ eq "--create");
+   $op        = "lexicon", next  if ($_ eq "-l"  ||  $_ eq "--lexicon");
+   $op        = "message", next  if ($_ eq "-m"  ||  $_ eq "--message");
+   $op        = "update",  next  if ($_ eq "-u"  ||  $_ eq "--update");
+
+   $op_set    = shift,     next  if ($_ eq "-s"  ||  $_ eq "--set");
+   $op_dir    = shift,     next  if ($_ eq "-d"  ||  $_ eq "--dir");
+   $op_locale = shift,     next  if ($_ eq "-L"  ||  $_ eq "--locale");
+   $op_msgid  = shift,     next  if ($_ eq "-M"  ||  $_ eq "--msgid");
+   $op_noupdate = 1,       next  if ($_ eq "-U"  ||  $_ eq "--no-update");
+
+   die $usage;
+}
+
+die $usage  if (! $op);
+
+$op_dir    = $default_dir  if (! $op_dir);
+if (! -d $op_dir) {
+   die "ERROR: directory does not exist: $op_dir\n";
+}
+eval "use lib \"$op_dir\"";
+
+if ($op eq "message") {
+   $op_locale = "all"                             if (! $op_locale);
+} elsif ($op eq "update") {
+   die "ERROR: --locale option required.\n"       if (! $op_locale);
+} else {
+   $op_locale = I18N::LangTags::Detect::detect()  if (! $op_locale);
+   $op_locale = $default_locale                   if (! $op_locale);
+}
+
+die "ERROR: no message set specified.\n"  if (! $op_set);
+
+die "ERROR: no message ID specified.\n"  if ($op eq "message"  &&  ! $op_msgid);
+
+###############################################################################
+# MAIN PROGRAM
+###############################################################################
+
+set    ($op_set,$op_dir,$op_locale)               if ($op eq "create");
+lexicon($op_set,$op_dir,$op_locale)               if ($op eq "lexicon");
+message($op_set,$op_dir,$op_locale,$op_msgid,
+        $op_noupdate)                             if ($op eq "message");
+update ($op_set,$op_dir,$op_locale,$op_noupdate)  if ($op eq "update");
+
+###############################################################################
+# OPERATIONS
+###############################################################################
+
+sub set {
+   my($set,$dir,$def_locale) = @_;
+
+   Locale::VersionedMessages::lm::_set_create($set,$dir,$def_locale);
+   Locale::VersionedMessages::lm::_lexicon_create($set,$dir,$def_locale);
+}
+
+sub lexicon {
+   my($set,$dir,$new_locale) = @_;
+
+   my($set_messages,$def_locale,@oth_locale) =
+     Locale::VersionedMessages::lm::_set_read($set,$dir);
+   Locale::VersionedMessages::lm::_lexicon_create($set,$dir,$new_locale);
+   Locale::VersionedMessages::lm::_set_write($set,$dir,$set_messages,$def_locale,
+                                    sort(@oth_locale,$new_locale));
+}
+
+sub message {
+   my($set,$dir,$locale,$msgid,$noupdate) = @_;
+
+   my($set_messages,$def_locale,@oth_locale) =
+     Locale::VersionedMessages::lm::_set_read($set,$dir);
+
+   # Update the set description
+   #
+   # If the message is brand new, we must be updating the default
+   # locale.
+
+   my $update_set = _message_desc(1,$set,$dir,$set_messages,$msgid,$def_locale,
+                                  @oth_locale);
+   Locale::VersionedMessages::lm::_set_write($set,$dir,$set_messages,$def_locale,
+                                    @oth_locale)
+     if ($update_set);
+
+   if ($update_set eq 'new') {
+      if ($locale ne 'default'  &&
+          $locale ne 'all'      &&
+          $locale ne $def_locale) {
+         die "ERROR: for a new message ID, the locale must be 'all',\n" .
+             "       'default', or the default locale.\n";
+      }
+   }
+
+   # What locale(s) are we updating?
+
+   my(@locale);
+   if      ($locale eq 'default') {
+      @locale = ($def_locale);
+   } elsif ($locale eq 'all') {
+      @locale = ($def_locale,@oth_locale);
+   } else {
+      @locale = ($locale);
+   }
+
+   my %locale = map { $_,1 } ($def_locale,@oth_locale);
+
+   foreach my $l (@locale) {
+      if (! exists $locale{$l}) {
+         die "ERROR: locale not defined for this set: $l\n";
+      }
+   }
+
+   # Add/update the message in the lexicons.
+
+   my $def_messages = Locale::VersionedMessages::lm::_lexicon_read($set,$dir,$def_locale);
+   foreach my $locale (@locale) {
+      my $loc_messages = ($locale eq $def_locale ? $def_messages :
+                          Locale::VersionedMessages::lm::_lexicon_read($set,$dir,$locale));
+      my $op = _message_lexicon($locale,$def_locale,$set_messages,$def_messages,
+                                $loc_messages,$msgid,$noupdate);
+
+      if      ($op eq 'add_def'  ||  $op eq 'upd_def') {
+         Locale::VersionedMessages::lm::_lexicon_write($set,$dir,$def_locale,$def_messages);
+      } elsif ($op eq 'add_loc'  ||  $op eq 'upd_loc') {
+         Locale::VersionedMessages::lm::_lexicon_write($set,$dir,$locale,$loc_messages);
+      }
+   }
+}
+
+sub update {
+   my($set,$dir,$locale,$noupdate) = @_;
+
+   # Get the default locale info, and the locale you're working
+   # with (which must not be the default locale).
+
+   my($set_messages,$def_locale,@oth_locale) =
+     Locale::VersionedMessages::lm::_set_read($set,$dir);
+   if ($locale eq $def_locale) {
+      print "INFO: the --update option only applies to locales other\n" .
+            "      than the default locale.\n";
+      exit;
+   }
+
+   my %locale = map { $_,1 } @oth_locale;
+   if (! exists $locale{$locale}) {
+      die "ERROR: locale not defined for this set: $locale\n";
+   }
+
+   my $def_messages = Locale::VersionedMessages::lm::_lexicon_read($set,$dir,$def_locale);
+   my $loc_messages = Locale::VersionedMessages::lm::_lexicon_read($set,$dir,$locale);
+   my $updated      = 0;
+
+   MSGID:
+   foreach my $msgid (sort keys %$def_messages) {
+
+      # Does this message need to be updated?
+
+      my $def_vers   = $$def_messages{$msgid}{'vers'};
+      my $loc_vers   = (exists $$loc_messages{$msgid} ?
+                        $$loc_messages{$msgid}{'vers'} : 0);
+
+      next MSGID if ($loc_vers == $def_vers);
+
+      # Update the message.
+
+      _message_desc(0,$set,$dir,$set_messages,$msgid,$def_locale,@oth_locale);
+      my $op = _message_lexicon($locale,$def_locale,$set_messages,$def_messages,
+                                $loc_messages,$msgid,$noupdate);
+      $updated = 1  if ($op);
+   }
+
+   if ($updated) {
+      Locale::VersionedMessages::lm::_lexicon_write($set,$dir,$locale,$loc_messages);
+   }
+}
+
+###############################################################################
+
+# Create/update/display the message description in the set.
+#
+# If $update is 1, the description is being added/updated.  Otherwise,
+# it's just being displayed.
+#
+sub _message_desc {
+   my($update,$set,$dir,$messages,$msgid,$def_locale,@oth_locale) = @_;
+
+   # If we're not adding/update, it must exist.
+
+   if (! $update  &&  ! exists $$messages{$msgid}) {
+      die "ERROR: message ID does not exist: $msgid\n";
+   }
+
+   # Get the current description (if any) and display it.
+
+   my ($desc,$d,@vals,$new);
+   if (exists $$messages{$msgid}) {
+
+      $desc = $$messages{$msgid}{'desc'}   if (exists $$messages{$msgid}{'desc'});
+      my $d = $desc;
+      $d    = "*** NO DESCRIPTION ***"     if (! $d);
+      @vals = @{ $$messages{$msgid}{'vals'} }
+                                           if (exists $$messages{$msgid}{'vals'});
+
+      print "="x70,"\n" .
+            "The current message definition is:\n" .
+            "   Message ID:  $msgid\n" .
+            "   Description: $d\n";
+      print "   Values     : @vals\n"  if (@vals);
+      print "\n";
+
+      $new = 0;
+   } else {
+      print "="x70,"\n" .
+            "Adding the following message:\n" .
+            "   Message ID:  $msgid\n" .
+            "\n";
+
+      $new = 1;
+   }
+
+   my $update_desc = '';
+   if ($update  &&  ! $new) {
+      my $c = _char_prompt('Is this correct? (y/n)','y','n');
+      $update_desc = 'update'  if ($c eq 'n');
+   } elsif ($new) {
+      $update_desc = 'new';
+   }
+
+   # If we are creating a new message, or if we are updating the message
+   # description, do it now.
+
+   if ($update_desc) {
+      print
+        "*"x20 . "\n" .
+        "Enter the description on a single line.  If the line is empty, the\n" .
+        "description will be erased.  If a period (.) is entered, the existing\n" .
+        "description will be used.\n" .
+        "\n";
+      my $in = <STDIN>;
+      chomp($in);
+      print "\n";
+
+      if ($in eq '') {
+         $desc = '';
+      } elsif ($in ne '.') {
+         $desc = $in;
+      }
+
+      print
+        "*"x20 . "\n" .
+        "Enter the values that will be substituted in the string.  This is a\n" .
+        "comma-separated list of values.  If the line is empty, no values will\n" .
+        "be used.  If a period (.) is entered, the existing list will be used.\n" .
+        "\n";
+      $in = <STDIN>;
+      chomp($in);
+      print "\n";
+
+      if ($in eq '') {
+         @vals = ();
+      } elsif ($in ne '.') {
+         @vals = split(/\s*,\s*/,$in);
+      }
+
+      $$messages{$msgid}{'desc'} = $desc;
+      if (@vals) {
+         $$messages{$msgid}{'vals'} = [ @vals ];
+      } else {
+         delete $$messages{$msgid}{'vals'};
+      }
+   }
+
+   return $update_desc;
+}
+
+# Add/update a lexicon message
+#
+sub _message_lexicon {
+   my($locale,$def_locale,
+      $set_messages,$def_messages,$loc_messages,
+      $msgid,$noupdate) = @_;
+
+   #
+   # Find out whether we're adding or updating, and which lexicon.
+   #
+
+   my $def_vers     = $$def_messages{$msgid}{'vers'}
+     if (exists $$def_messages{$msgid}{'vers'});
+   my $def_text     = $$def_messages{$msgid}{'text'}
+     if (exists $$def_messages{$msgid}{'text'});
+   my $loc_vers     = $$loc_messages{$msgid}{'vers'}
+     if (exists $$loc_messages{$msgid}{'vers'});
+   my $loc_text     = $$loc_messages{$msgid}{'text'}
+     if (exists $$loc_messages{$msgid}{'text'});
+
+   my $op;
+   if (! defined($def_text)  ||  $def_text eq '') {
+      # Adding a message to the default locale
+      if ($locale ne $def_locale) {
+         die "ERROR: message not correctly defined in default locale.\n";
+      }
+      $op = 'add_def';
+
+   } elsif ($locale eq $def_locale) {
+      # Updating a message in the default locale
+      $op = 'upd_def';
+
+   } elsif (! defined($loc_text)  ||  $loc_text eq '') {
+      # Adding a message to another locale
+      $op = 'add_loc';
+
+   } else {
+      # Updating a message in another locale
+      $op = 'upd_loc';
+   }
+
+   #
+   # Print the message in the default/current locale(s)
+   #
+
+   if ($op ne 'add_def') {
+      print "*"x20 . "\n" .
+            "The message in the default locale is:\n" .
+            "   Locale: $def_locale\n" .
+            "\n" .
+            $def_text .
+            "\n";
+   }
+
+   if ($op eq 'upd_loc') {
+      print "*"x20 . "\n" .
+            "The message in currently in the lexicon is:\n" .
+            "   Locale: $locale\n" .
+            "\n" .
+            $loc_text .
+            "\n";
+   } elsif ($op eq 'add_loc') {
+      print "*"x20 . "\n" .
+            "Adding message for the the current locale:\n" .
+            "   Locale: $locale\n" .
+            "\n";
+   } elsif ($op eq 'add_def') {
+      print "*"x20 . "\n" .
+            "Adding message for the the default locale:\n" .
+            "   Locale: $def_locale\n" .
+            "\n";
+   }
+
+   #
+   # Get the new version of the message
+   #
+
+   my @line;
+   print
+     "Enter the text of the message.  Blank lines are allowed.  To end, enter a\n" .
+     "line containg only of a period (.).  If no text is entered, any existing\n" .
+     "value will be kept.\n " .
+     "\n";
+   while (1) {
+      my $line = <STDIN>;
+      last  if ($line eq ".\n");
+      push(@line,$line);
+   }
+
+   return "" if (! @line);
+   my $text = join("",@line);
+
+   #
+   # Update the version number
+   #
+
+   if      ($op eq 'add_def') {
+      # Noupdate is ignored.  When we add a new version to the default
+      # locale, it's always version 2.
+      $$def_messages{$msgid} = { 'vers' => 2,
+                                 'text' => $text, };
+
+   } elsif ($op eq 'upd_def') {
+      $$def_messages{$msgid}{'vers'}++  if (! $noupdate);
+      $$def_messages{$msgid}{'text'} = $text;
+
+   } elsif ($op eq 'add_loc') {
+      # If $noupdate, we'll add a message at version 1 (which is always
+      # out-of-date since default locales start at 2).
+      $$loc_messages{$msgid}{'vers'} = ($noupdate ? 1 : $def_vers);
+      $$loc_messages{$msgid}{'text'} = $text;
+
+   } else {
+      $$loc_messages{$msgid}{'vers'} = $def_vers  if (! $noupdate);
+      $$loc_messages{$msgid}{'text'} = $text;
+   }
+
+   return $op;
+}
+
+###############################################################################
+###############################################################################
+
+sub _char_prompt {
+   my($prompt,@chars) = @_;
+   my %chars = map { $_,1 } @chars;
+
+   while (1) {
+      print "$prompt ";
+      my $c = _getone();
+      print "$c\n";
+      if (exists $chars{$c}) {
+         print "\n";
+         return $c;
+      }
+   }
+}
+
+#
+# From O'Reilly's Programming Perl book
+#
+BEGIN {
+   use POSIX qw(:termios_h);
+
+   my $fd_stdin = fileno(STDIN);
+
+   my $term     = POSIX::Termios->new();
+   $term->getattr($fd_stdin);
+   my $oterm    = $term->getlflag();
+
+   my $echo     = ECHO | ECHOK | ICANON;
+   my $noecho   = $oterm & ~$echo;
+
+   sub _cbreak {
+      $term->setlflag($noecho);
+      $term->setcc(VTIME, 1);
+      $term->setattr($fd_stdin, TCSANOW);
+   }
+
+   sub _cooked {
+      $term->setlflag($oterm);
+      $term->setcc(VTIME, 0);
+      $term->setattr($fd_stdin, TCSANOW);
+   }
+
+   sub _getone {
+      my $key = '';
+      _cbreak();
+      sysread(STDIN, $key, 1);
+      _cooked();
+      return $key;
+   }
+}
+
+END { _cooked() }
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

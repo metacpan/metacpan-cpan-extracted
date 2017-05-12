@@ -1,0 +1,192 @@
+0.7.10    Sat Oct 31 16:51:42 WET 2015
+
+   - fix requirement
+
+0.7.9     Sat Oct 10 18:17:43 WEST 2015
+
+   - Homogeneous version numbers across modules.
+
+0.7.8     Wed Jun 18 18:21:49 WEST 2014
+
+   - Fixed test scripts that were calling perl directly.
+
+0.7.7     Sun Jun 15 21:23:52 WEST 2014
+
+   - Fixed chunk division that could make alignment fail on noisy corpora.
+   - Fixed problems with missing VERSIONs on two packages.
+
+0.7.6     Tue May 27 17:19:12 WEST 2014
+
+   - Fixed an installation problem that was hanging out.
+
+0.7.5     Sat Oct 27 21:58:13 WEST 2012
+
+   - Lingua::NATools::PTD was moved to Lingua::PTD.
+
+0.7.4     Fri Oct 26 18:28:15 WEST 2012
+
+   - Fix issue with XS code that only worked on recent Perl versions.
+
+0.7.3     Thu Aug 30 15:57:08 WEST 2012
+
+   - Release dedicated to Enrique Nell.
+   - Hopefully fix the patch from 0.7.2.
+   - Fix tests that run Perl to use the same perl binary as the build
+     system.
+
+0.7.2     Fri Jul 20 16:51:09 WEST 2012
+
+   - Implement wcsdup for Mac OS X before Lion
+
+0.7.1     Fri Jun  8 17:50:41 WEST 2012
+
+   - Fix some POD issues.
+   - Support new XML::TMX API.
+
+0.7.0     Fri Mar 16 17:13:47 WET 2012
+
+   - Releasing as stable.
+   - Removing minor warnings during make test.
+
+
+0.7.0_02  Sat Mar 10 22:28:26 WET 2012
+
+   - Try to add libdir to ldconfig if possible.
+   - Fixed installation procedure when there is a libnatools in the
+     system.
+
+
+0.7.0_01  Wed Mar  7 15:12:23 WET 2012
+
+   - Changed words module interface --- less pointers of pointers of
+     pointers.
+   - Only UTF-8 support is available now.
+   - ISO-8859-1 support droped.
+   - Progressive removal of glib dependency  (U32/U8/gboolean).
+   - Fix some scripts that were failing with perl'ization.
+   - Fixed bug when summing up PTDs.
+
+
+0.6.4     Sat Feb 25 16:30:40 WET 2012
+
+   - Parse::Yapp driving me crazy.
+
+
+0.6.3     Fri Feb 24 21:14:34 WET 2012
+
+   - Parse::Yapp is a run dependency.
+
+
+0.6.2     Sun Feb 19 21:19:29 WET 2012
+
+   - Parse::Yapp is a build dependency.
+
+
+0.6.1     Tue Feb 14 21:45:19 WET 2012
+
+   - Fixed dependency on Capture::Tiny.
+
+
+0.6.0     Fri Feb 10 12:26:01 WET 2012
+
+   - releasing as stable.
+
+
+0.6.0_3   Fri Feb 10 12:26:01 WET 2012
+
+   - fix call to yapp command line.
+
+
+0.6.0_2   Wed Feb  8 14:10:11 WET 2012
+
+   - Fixed dependency version on Config::AutoConf.
+
+
+0.6.0_1 - Tue Feb  7 14:10:11 WET 2012 
+
+   - Yet again, suggested to remove all nat-* files in your path
+     before installing.
+   - Autoconf substituted by Perl.
+
+Overview of changes in NATools 0.5.9
+====================================
+ - PTD manipulation is done using nat-ptd script;
+ - Before reinstalling, remove all nat-* scripts in your path;
+ - Modularized PTD formats;
+
+[...]
+
+Overview of changes in NATools 0.5.4
+====================================
+ - ngram creation
+ - moved some code from nat-create to nat-codify to help
+   cluster parallelization
+ - added missing files on MANIFEST
+
+Overview of changes in NATools 0.5.3
+====================================
+ - IMPORTANT: 
+   ** CHANGED CORPUS FORMAT. OLD CORPORA NEED REALIGNMENT **
+ - corrected lot of bugs on example extraction
+ - added code to substitute/add dumper dictionaries to corpus
+
+
+Overview of changes in NATools 0.5.2
+====================================
+ - factorized server code
+ - added support for concordancies on NAT::Client
+ - corrected bug when searching for parallel concordancies with
+   pattern matching.
+
+Overview of changes in NATools 0.5.1
+====================================
+ - nat-these and nat-this merged unto nat-create
+ - Language identification fixes
+ - Bug fixes
+
+Overview of changes in NATools 0.5.0
+====================================
+ - Lots of changes regarding corpus encoding;
+ - Corrected bug on Dictionary sum;
+ - New server for quick dictionary and corpus serving;
+ - CGIs now consult a running server;
+ - New configuration files, with more information;
+ - Added stub web-page documentation;
+
+Overview of changes in NATools 0.4.0
+====================================
+ - Documentation for basic commands;
+
+Overview of changes in NATools 0.3.0
+====================================
+ - ATTENTION: corpus file format has changed!
+ - Auto-split on too big corpora;
+ - Navigation scripts more simple;
+ - Integration between nat-browse.cgi and nat-search.cgi;
+
+Overview of changes in NATools 0.2.2
+====================================
+ - Dictionary sum;
+
+Overview of changes in NATools 0.2.1
+====================================
+ - Added support to select samples to use on translation;
+ - Added nat-pair2tmx with quality for each TU;
+ - Added quality to the corpus directory;
+ - Support for dictionaries on Storable format;
+
+Overview of changes in NATools 0.2.0
+====================================
+ - Added translation shell;
+ - Added translation CGI;
+ - Added perl modules to translate based on created dictionaries;
+ - Added nat-tmx2pair script into the distribution;
+ - Added perl modules to handle NATool dictionaries and parallel
+   corpora encapsulation;
+
+Overview of changes in NATools 0.1.1
+====================================
+ - Module perl attached with main distribution;
+ - Added indexes on corpus files;
+ - Added step counter on IPFP method in cases of non-convergence;
+ - Navigation script for terminology generated dictionaries;

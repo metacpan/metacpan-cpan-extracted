@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Dumper::Concise;
+use Lingua::Word::Parser;
+
+my $p = Lingua::Word::Parser->new(
+  file => 'eg/lexicon.dat',
+  word => shift || 'abioticaly',
+);
+#warn Dumper $p->{lex};
+
+# Find the known word-part positions.
+my ($known, $masks) = $p->knowns;
+#warn Dumper $known;
+#warn Dumper $masks;
+my $combos = $p->power;
+#warn Dumper $combos;
+my $score = $p->score('[', ']', '</br>');
+#warn Dumper $score;
+warn Dumper $score->{ [ sort keys %$score ]->[-1] };

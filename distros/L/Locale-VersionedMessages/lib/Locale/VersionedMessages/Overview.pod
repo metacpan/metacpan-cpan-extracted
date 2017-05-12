@@ -1,0 +1,673 @@
+=pod
+
+=head1 NAME
+
+Locale::VersionedMessages::Overview - an overview of Locale::VersionedMessages
+
+=head1 DESCRIPTION
+
+The problem of localization of an application is well understood,
+and is solved in a quite simple way.
+
+Rather than hard coding messages in a program, the messages are stored
+in a lookup table (called a lexicon).  A lexicon is a list of all of
+the messages for a single locale. There is one lexicon for each
+locale.
+
+Every time you need to display a message in the program, it looks up
+the message in the lexicon for the locale you are using.
+
+The process of localizing the program in another locale is then simply
+a matter of creating a new lexicon for the new locale.
+
+The actual procedures for doing all this can be grouped into the
+following broad tasks:
+
+=over 4
+
+=item B<Create the localization infrastructure>
+
+When you decide you want to localize a set of messages, you need to
+create the infrastructure for this.  This typically consists of a set
+of files (one per locale), and perhaps additional files containing
+information about the set of messages, etc.
+
+Because the structure of these files will follow quite rigid rules,
+and have different requirements (based on the localization tools being
+used), this step tends to be best done using a tool to initialize
+everything.
+
+In it's most basic form, the infrastructure will consist of one
+lexicon containing every one of the messages translated to the default
+locale.  It may also have a file containing the list (and possibly
+description) of the messages that will go in each lexicon.
+
+=item B<Add messages>
+
+When a message is added to the set of messages, it has to be added to
+the localization files.
+
+Every message will be labeled using a unique ID called the message ID.
+This message ID will not be shared by any other message in the set of
+messages (though it could be used in a different set).
+
+These message IDs will be used by the program to access the actual
+message.  Assigning the message ID is a matter of convention... there
+are no strict rules governing them.
+
+As a final step, the message will need to be written out in the
+default locale and stored in the default lexicon.  It may also be
+translated for other lexicons, but that is optional, and will probably
+be performed after the message is added by translators who understand
+both languages.
+
+=item B<Translate messages>
+
+Once the message is in the default lexicon, it can then be translated
+to any other language for which a lexicon exists.
+
+In general it is not required that every message be translated into
+every locale (i.e. be present in every lexicon). A lexicon is allowed
+to be incomplete. However, it is required that the default lexicon be
+complete (i.e. contain every single message ID and the corresponding
+message in the language of the default locale).
+
+=item B<Create additional lexicons>
+
+Additional lexicons can be created and represent a translation of the
+program to some other language. As previously stated, with the exception
+of the default lexicon, it is not necessary that every message be
+translated... however ideally they will be.
+
+If a message does not exist in a lexicon, the message from the default
+lexicon can be used, however that will result in a multilingual program,
+so ideally, all of the lexicons will be complete.
+
+=item B<Maintain existing messages>
+
+The final part of the process is to maintain the messages stored in
+the lexicon.
+
+In an ideal world, the messages will all get added to all the
+lexicons, they will be translated a single time, and after that,
+they'll all be static.  Unfortunately, this is not the case in
+the real world.
+
+Messages may change in order to clarify things, correct mistakes, or
+add greater detail.  In some cases, as the program changes over time,
+the messages may become inaccurate due to changes in the functionality
+of the program, and the messages will need to be updated accordingly.
+
+Changes in the message should ideally be reflected in all of the
+lexicons. In other words, changes to the message as it exists in the
+default lexicon should be reflected in all the translations.
+Unfortunately, none of the existing tools seemed to provide any level
+of support for this operation.
+
+Translating a message is typically not done by a single individual.
+It's done by many people (typically one per locale) who have different
+time lines, different levels of attention to detail, and different
+amounts of time they can devote to the task.  As such, if you give
+them a list of messages to maintain, in order to do so effectively,
+they need to know something about which ones are up-to-date, and which
+need some work.
+
+This is the step which prompted me to write this set of tools.  It
+seemed to me that the standard tools for localization were missing
+this step.
+
+=back
+
+Once the lexicons are created, actually using them in a program
+is typically a fairly simple task.
+
+A number of modules exist which handle various portions of the
+internationalization task, however none exist which provide the tools
+necessary to handle all of the tasks listed above.
+
+This distribution is an attempt to deal with all of the tasks related
+to internationalization. It includes (or will include) a combination
+of modules and tools to create, use, and maintain messages for use by
+an application.
+
+Although several different tools exist for handling the localization
+process, I'll concentrate on three: Locale::gettext, Locale::Maketext,
+and this one (Locale::VersionedMessages).
+
+In contrasting Locale::VersionedMessages with the other modules, it should be
+noted that some of the characteristics for those modules discussed
+below are conventions encouraged by the module rather than forced
+behaviors. In some cases, the behaviors of the Locale::VersionedMessages module
+could be obtained using the other modules.  However, I want to examine
+not only changes in the functionality, but changes in convention as
+well.
+
+=head1 LOCALIZATION TOOLS COMPARED
+
+In comparing the different localization tools, I will concentrate on
+a few characteristics:
+
+=over 4
+
+=item How are the translations stored
+
+Translations can be stored as data files or perl modules.  Data files
+are a bit harder to handle in a platform-neutral way, and tend to be
+less flexible, but are typically easier to maintain.
+
+From a perl perspective, one disadvantage with using data files is
+that they are outside of the perl framework, and are stored simply as
+files on the filesystem. Even though perl has excellent support for
+installing and accessing modules, installing and accessing data files
+is less straightforward.  Having a module work with a data file in a
+completely platform neutral way is difficult (though certainly not
+impossible) due to the different standards for different
+platforms. Different operating systems, and even different system
+administrators within a single operating system have different
+conventions for where data files live, so accessing data files in a
+way that will fit all the different circumstances is quite difficult.
+
+Though the problems with data files are certainly not insurmountable,
+an alternate solution is to store the data in a perl module which can
+then be loaded without any extra effort on the part of the module
+author, or the programmer of an application that uses the module.
+Perl modules are very easy to access.  They are also much more
+flexible.  However, they harder to maintain automatically since they
+are not guaranteed to follow a specific format.
+
+=item What conventions are there
+
+Most localization tools establish conventions, which may not actually
+be the best convention to use in some cases, and it's worth discussing
+these conventions.
+
+=item How are plurals handled
+
+Perhaps the hardest part of translating a message is to correctly
+handle numbers.  For example, if you want to translate the message:
+
+   I found N files.
+
+in English, you actually have two cases:
+
+   I found 1 file.
+   I found N files.  (for N>1).
+
+You might even want to say:
+
+   I didn't find any files.
+
+for N=0.  Other languages have equally (and in some cases,
+significantly more) complicated rules.
+
+=item How are the localization tasks performed
+
+The different localization tasks listed above are handled in
+different ways using the different tools, so they will be
+described briefly.
+
+=back
+
+For this comparison, I will use B<Locale::gettext> and
+B<Locale::Maketext> in addition to B<Locale::VersionedMessages>.
+
+=over 4
+
+=item B<Locale::gettext>
+
+The Locale::gettext module is probably the most widely used of the
+localization modules, and has a number of advantages.  The single most
+important advantage that the gettext tools have is that the gettext
+tools for localization are widely used and available practically
+everywhere.
+
+The gettext lexicons are stored as data files.  Interfaces to these
+data files exist for almost every programming language (including
+perl).  However, there are (IMO) significant weaknesses in the gettext
+data files that do not lend themselves well to all of the tasks listed
+above.
+
+A number of standard tools exist for maintaining the actual data
+files, so the tasks of creating the infrastructure, and adding
+messages and/or lexicons are very well supported and understood.
+However, important functionality is missing (due primarily to the
+format of the data files) with respect to maintaining translations.
+This will be discussed below.
+
+The basic file in the gettext world is the PO file. In it's simplest
+form, this consists of a file which contains a series of messages,
+each of which consists of a message ID and the text. A simple,
+one-message PO file containing the example message (for a French
+locale) might look like:
+
+   msgid  "Unable to open file %s: Err = %s\n"
+   msgstr "Incapable d'ouvrir le fichier %s: Err = %s\n"
+
+Some comments about this:
+
+By convention, the msgid is the untranslated string (i.e. the string
+in the default locale), so by convention, there is no default
+lexicon.  This means that the full message is used in the program.
+Although people do not necessarily have to adhere to this convention,
+it is often done, and I disagree with the convention.  If you have
+a long message, especially one that is used multiple times, then you
+have to write the full message multiple times in the program.  Also,
+changing the message means changing it multiple times in the program
+AND in every single lexicon.  I find that to be an unacceptable
+amount of overhead.
+
+Also, although there may be comments associated with the message,
+they are optional, and maintained by the translators, so in it's
+simplest form, the messages do not have any description (such as
+version information) which might aid in maintaining the messages.
+
+Another thing to note is that the order of the substitution values
+(%s) must be the same in all translations.
+
+The gettext does handle plural values, but it is tedious.  You have to
+have a full translation for each case, which makes translating a long
+message tedious (a lot of repetition).  As an example:
+
+   "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 :"
+   "n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+   msgid "One file removed"
+   msgid_plural "%d files removed"
+   msgstr[0] "%d slika je uklonjena"
+   msgstr[1] "%d datoteke uklonjenih"
+   msgstr[2] "%d slika uklonjenih"
+
+This form is extremely flexible in that it allows you to choose any
+number of plural forms, and handle them specially.  In this example,
+the first form (msgstr[0]) is used any time the number ends in 1, but
+not 11; the second is used when the number ends in 2, 3, or 4, but not
+12, 13, or 14, and the last form is used in all other cases.  The fact
+that this is a real case illustrates how complex localization can be,
+and the need for a very flexible tool.
+
+One problem with gettext is that the plurality problem is handled on
+the entire message.  If the message is long and has a lot of text
+surrounding the number that is not affected by the plurality of the
+number, a lot of repetition is present.
+
+Finally, it does not allow for a message to have two plural items:
+
+   I have X apples and Y oranges.
+
+so this would have to be broken up into two messages (and depending
+on the message, some languages may not break into two in the same
+way necessary to do this in a general way).
+
+=item B<Locale::Maketext>
+
+The Locale::Maketext module differs from the Locale::gettext method in
+several ways.
+
+Unlike the Locale::gettext method, it store all of the data in perl
+modules, however I disagree with the way it is done.
+
+The primary module is:
+   _PROGRAM_::_SOMETHING_
+This contains the default lexicon.  In addition, there are other modules:
+   _PROGRAM_::_SOMETHING_::_LOCALE_
+which contain additional lexicons.  Here, _SOMETHING_ can be any
+string chosen by the programmer to specify that these are messages used
+by _PROGRAM_.  By convention, it is something like: 'I18N', or
+'Messages', or 'Localization', etc., but this is not a requirement.
+
+I dislike this convention for one primary reason: it's bad practice to
+make every application (or set of messages) a top-level name in the
+hierarchy of perl modules.  That is a great way to mess up the perl module
+namespace.
+
+A Locale::Maketext lexicon module contains similar information to the
+gettext PO file, but is stored in the form of a hash:
+
+   %Lexicon = (
+      "Unable to open file [_1]: Err = [_2]\n" =>
+         "Incapable d'ouvrir le fichier [_1]: Err = [_2]\n"
+   );
+
+Again, by convention, the untranslated message is often used as the
+message ID, and the default lexicon can basically be empty in this
+case.
+
+Aside from that, this method has a number of potential advantages
+over the gettext.
+
+Since the lexicons are hashes, other information could be stored in
+them; however, at this point, none is.
+
+Locale::Maketext is not limited to having substitutions the same in
+every language.  Since they are referred to by number, they can
+be in different orders in different translations.
+
+Finally, Locale::Maketext handles plurals differently.  It is done in
+a less flexible, but more convenient way:
+
+   %Lexicon = (
+      "Found" =>
+         "Found [quant,_1,document,documents,nothing]" =>,
+   );
+
+This returns one of the messages:
+
+   Found 1 document
+   Found 3 documents
+   Found nothing
+
+In other words, the first form is singular (and 1 is prepended), the second
+is for numbers greater than 1 (and the number is prepended), and the the
+third form is for numbers less than or equal to zero (but the number is NOT
+prepended).
+
+The general form is much more convenient than Locale::gettext, but it is
+certainly less flexible than the gettext version.
+
+However, any number of [quant...] substitutions can be embedded, so
+translating:
+
+   I found N apples and M oranges
+
+is possible.
+
+The main disadvantage to the Locale::Maketext toolkit is that there
+are no tools to help in creating or maintaining the modules that make
+up the lexicons.
+
+All handling of the messages is done manually, and this definitely
+hampers the practical usefulness of this toolkit to those responsible
+for maintaining a translation.
+
+=item B<Locale::VersionedMessages>
+
+The Locale::VersionedMessages stores all data in perl modules similar to
+Locale::Maketext, but it uses a different hierarchy:
+
+Every set of messages is defined in a module:
+
+   Locale::VersionedMessages::Sets::SET
+
+This modules does NOT contain a lexicon.  Instead, it contains a simple
+description of all messages, including information that will be useful
+to translators.  The format of this module is:
+
+   $DefaultLocale = _LOCALE_;
+   @AllLocale     = (_LOCALE_, _LOCALE_, ...);
+
+   %Messages = (
+      'Unable to open file' =>
+        {
+          'vals'   => ['FILE','ERR'],
+          'desc'   => 'The I/O error for when a file cannot be opened',
+        },
+   );
+
+Any number of lexicons will be stored, each in a module:
+
+   Locale::VersionedMessages::Sets::SET::LOCALE
+
+The format of a lexicon module is:
+
+   %Messages = (
+      'Unable to open file' =>
+         {
+            'vers'   => 3,
+            'text'   => "Unable to open file [FILE]: Err = [ERR]\n"
+         },
+   )
+
+Clearly, there is a lot more information here, and since data is stored
+as key/value pairs in a hash, additional information may be added in
+the future without fear of breaking existing code.  It should also be noted
+that currently the values of 'desc' (in the description module) and 'text'
+(in the lexicon modules) can be UTF-8.  All other values are straight ASCII.
+
+It should be noted that SET is explicitly NOT defined to be the name
+of a program.  I would like to encourage creation of reusable sets of
+messages, so there could be a set called IO_Errors (which contained
+common I/O errors), Buttons (which contained common button labels used
+in programs), etc.
+
+In order to help with maintaining the modules, the format of these
+modules is fairly rigid.  They can be edited by hand, or they can
+be maintained using the included tools.
+
+Unlike both of the other methods listed above, I encourage using a
+convention where the message ID is NOT the message in the default
+lexicon.  Instead, by convention, it is a short string describing the
+message that will not need to be changed, even if the text of the
+message does change.
+
+There are too many problems with using the untranslated message as
+the message ID.
+
+If you ever need to change the text of the message, for any reason,
+it involves both changes to the lexicons AND changes to the program
+using the lexicons.
+
+If the message is multi-line, it is simply not practical to use it
+as the message ID, so you'll end up using a shorter message description
+as the ID anyway.
+
+If the message is too short (perhaps only one or two words, such as the
+label on a button), a good translation may require some contextual
+information that is not available from the one or two word message
+itself.
+
+So, I consider it a very poor convention to use the following as
+message IDs:
+
+   Cancel
+
+   I have [quant,n,apple,apples] and [quant,m,orange,oranges]
+
+   This is a long message.
+   It's multi-line.
+   And I don't want to use it as a message ID.
+
+The first is two short.  A translator may not be able to translate it
+without knowing some context.  The second contains a lot of
+information that doesn't need to be in the message ID and it tends to
+complicate and obscure the actual message.  The third is too long.
+
+Far better message IDs would be:
+
+   Cancel button label
+
+   How many apples [n] and oranges [m]
+
+   Multi-line sample message
+
+Then, the text above can go in the appropriate lexicon.
+
+It IS appropriate (though not necessary) to include the values that
+need to be passed in as that allows the programmer to easily see what
+variables need to be passed in.
+
+Another problem with using the messages as the message IDs is that the
+default lexicon can then be left empty (which is done in practice).  When
+you do that, it is much harder to find a list of messages that need to be
+kept up-to-date.  In my opinion, the default lexicon should ALWAYS contain
+every single message.
+
+Locale::VersionedMessages handles plural items in a format that is similar to
+Locale::Maketext, but with most of the flexibility of Locale::gettext.
+
+A message might include:
+
+   A simple substitution is [mystring]
+
+   This is a formatted decimal number: [num:%3.1d]
+
+   I have [n:quant [_n=1] [1 orange] [_n<1] [no oranges] [_n oranges]]
+
+All values are passed in by name rather than by position in the
+argument list.
+
+The format for this is covered in the main manual for this module.
+It can handle much more complicated cases, such as the one given above
+in the gettext description.
+
+As already mentioned, this module provides tools for creating and
+maintaining the modules.  The format of the modules is very simple.
+They consist of some simple perl data structures which contain all the
+message information.
+
+It can be edited by hand, or maintained automatically (though doing
+this will format the file automatically, remove comments, etc.).  It
+will also remove any perl other than the data structures, so it is
+highly recommended that translators stick to the simplest forms of the
+modules.
+
+The single largest advantage to the Locale::VersionedMessages module is that
+it includes the ability to truly maintain lexicons by providing version
+numbers for every single message.
+
+When a message in the default lexicon is modified, the version number
+will be incremented.  This allows you to easily see which messages in
+which lexicons are out-of-date with respect to the default lexicon.
+Other tools only allow you to see which messages are missing from a
+lexicon, and this is a significant weakness in them.
+
+=back
+
+=head1 LOCALE::MESSAGES TOOLS
+
+Currently, the Locale::VersionedMessages distribution includes one tool
+(B<lm_gui>) which is a Perl-Tk based graphical tool for managing
+message sets and lexicons.  At some point, a command line tool may
+also be made available, but it is not yet ready for general use.
+
+The B<lm_gui> tool is not as pretty as I'd like.  It is based on
+my somewhat limited knowledge and experience with Perl-Tk, so it is
+definitely not the most polished application, but it is fully
+functional (and I plan on improving it's look over time).
+
+In addition, it's fully localized, so it can be used both as the tool
+to manage your own localization, and as a complete reference example.
+It should be noted that all messages should be entered as UTF-8 text,
+NOT in some other encoding.  Future versions of the tool may support
+additional encodings.
+
+The B<lm_gui> tool will read and write the perl modules that
+contain a message set description and the lexicons.  Since the modules
+are simply created by writing out perl data structures, any changes
+made to them such as added comments, changes in formatting, etc., will
+be lost, so if you choose to use this tool, be aware of that if you
+choose to also manually edit the files.
+
+The B<lm_gui> tool supports all of the operations described above
+involved in creating and maintaining a localization infrastructure.
+
+=over 4
+
+=item B<Create the localization infrastructure>
+
+To create the infrastructure for a new set of messages, run the
+B<lm_gui> tool.  When creating a new set, you will have to supply
+a directory and the name of the set.
+
+The directory be where the Locale::VersionedMessages hierarchy of perl modules
+describing this set will live.  Inside the specified directory will
+be a hierarchy B<Locale/Message/Sets> and the modules will be created
+and placed in that directory.
+
+The set name is a simple alphanumeric/undersocre label naming the message
+set.
+
+After specifying that, you will also be required to select the default
+locale (which should be something in the form en_US).
+
+Once that's done, the message infrastructure will be created (though it
+will contain no messages at this point).  You'll then be able to
+use the B<lm_gui> tool to add messages and lexicons.
+
+=item B<Add messages>
+
+To add a new message, click on the B<Add Message> button in B<lm_gui>.  You'll
+then be asked for the following information:
+
+The Message ID is a simple one-line label for the message.  This will be
+used inside the program to reference the message.  Message IDs MUST be unique
+within the set of messages.
+
+The Message Description is an optional one-line description of the message.
+It is used only to give translators additional information about the
+message.  It can contain UTF-8 text.
+
+The Substitution Values are the names of the parameters that can be
+passed in the Locale::VersionedMessages::message to be inserted in to the message.
+This should be a space separated list of names, and is optional.
+
+Finally, you have to enter the text of the message as it appears in the
+default locale.  The text can include UTF-8 text.
+
+=item B<Create additional lexicons>
+
+The B<lm_gui> tool can also be used to create a new lexicon file.  Just type
+in the name of the new locale (in the form en_US) and it'll create the
+lexicon.  At that point, you can translate any/all of the messages for the
+new locale.
+
+=item B<Translate messages>
+
+=item B<Maintain existing messages>
+
+Maintaining messages is the central task of the B<lm_gui> tool.  Because
+every message has a version number, the tool can easily be used to maintain
+different translations, even when the default messages are changing.
+
+When working with the default lexicon, you can modify the text of the
+message in the default locale.  You can also modify the description of
+the message if desired.
+
+It is even possible to adjust the message ID (and it will be changed in
+all existing lexicons automatically).  This should be done very rarely
+since that will entail modifying the source code of all applications which
+use this message.  As a general rule, the message ID should not be modified
+once it is in use.
+
+When modifying the text of the message, by default, the version number
+in the default lexicon will be incremented.  This will have the effect of
+flagging the message in all other lexicons as out-of-date.  If the change
+to the message is so simple that it should not increment the version
+(such as fixing a typo or simple grammatical error), click on the B<Leave
+Version Unmodified> box.
+
+When working with other lexicons, the list of message IDs will be
+displayed with some color coding.  Red messages are missing from this
+lexicon, so they need to be translated.  Yellow messages are in the
+lexicon, but are marked out-of-date.  All other messages are
+up-to-date in this lexicon.  When a message ID is selected, the
+description of the message and the text in the default locale will be
+displayed.  This will allow you to compare the translation to the default
+message.  If you modify the message, by default, it will then be treated
+as up-to-date.  If you modify the message, but feel that it still needs
+later work, you may want to click on the 'Mark Out-Of-Date' box so that
+the message will be left in an out-of-date state.  You can even click on
+that box with a message previously marked as up-to-date to flag the
+message for later review.
+
+=back
+
+=head1 BUGS AND QUESTIONS
+
+Please refer to the Locale::VersionedMessages documentation for information on
+submitting bug reports or questions to the author.
+
+=head1 SEE ALSO
+
+Locale::VersionedMessages
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut
+

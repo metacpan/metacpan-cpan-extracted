@@ -1,0 +1,26 @@
+Revision history for Perl extension Locale::MO::File.
+
+0.06 Sun Apr 26 21:14:02 2015
+- corrected plural selection,
+  depends on msgid_plural and not on count of msgstr
+
+0.05 Sun Aug 31 20:31:07 2014
+- fixed regex
+- stronger decode
+- renewed tests
+
+0.04  Sun Aug 31 11:08:42 2014
+- moved from Moose to Moo
+
+0.03  Fri Jan 11 16:25:26 2013
+- https://rt.cpan.org/Ticket/Display.html?id=82555
+  thanks to ANDK
+- Build.PL no longer in distribution
+
+0.02  Tue Mar 13 18:59:50 2012
+- POD typos corrected
+- control chars in strings are not allowed
+- use Test::Hex::Differences for tests
+
+0.01  Wed Apr 27 12:37:44 2011
+- first version

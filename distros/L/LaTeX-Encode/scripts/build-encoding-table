@@ -1,0 +1,642 @@
+#!/usr/bin/perl
+# Script to build the LaTeX::Encode::EncodingTable module
+# This script is not meant to be installed.
+# $Id: build-encoding-table 30 2012-09-25 20:24:40Z andrew $
+
+use strict;
+use warnings;
+
+use charnames qw();
+use HTML::Entities qw(%char2entity);
+use Pod::LaTeX;
+
+
+our $revision = '$Revision: 30 $';
+$revision =~ s/.*?(\d+).*/$1/;
+
+# Map of character code to encoding that is built up, before being output.  It is
+# initialized with mapping of characters for which we specify explicit encodings
+
+my %char_encoding
+
+    = ( # LaTeX special characters
+
+	'\\'       => { 'textcomp' => '\\textbackslash' },  # command character
+        '{'        => '\\{',                                # begin group
+        '}'        => '\\}',                                # end group
+        '%'        => '\\%',                                # comment
+        '#'        => '\\#',                                # command parameter
+        '$'        => '\\$',                                # introduces math mode
+        '_'        => '\\_',                                # subscript
+        '^'        => '\\^{ }',                             # superscript
+        '&'        => '\\&',                                # tabbing character
+        '~'        => { 'textcomp' => '\\texttildelow'  },  # non-breaking space
+
+        # Characters that are not set as themselves
+
+        '"'        => { 'textcomp' => '\\textacutedbl'          },
+        '<'        => { 'textcomp' => '\\textlangle'            },
+        '>'        => { 'textcomp' => '\\textrangle'            },
+
+
+        # Other characters with explicit encodings
+
+        chr(0x00b8) => '{\\c{~}}',
+        chr(0x0131) => '{\\i}',
+        chr(0x0e3f) => { 'textcomp' => '\\textbaht'             },
+
+        # Cyrillic characters
+
+        # chr(0x0401) => '\\cyrchar\\CYRYO{}',
+        # chr(0x0402) => '\\cyrchar\\CYRDJE{}',
+        # chr(0x0403) => "\\cyrchar{\\'\\CYRG}",
+        # chr(0x0404) => '\\cyrchar\\CYRIE{}',
+        # chr(0x0405) => '\\cyrchar\\CYRDZE{}',
+        # chr(0x0406) => '\\cyrchar\\CYRII{}',
+        # chr(0x0407) => '\\cyrchar\\CYRYI{}',
+        # chr(0x0408) => '\\cyrchar\\CYRJE{}',
+        # chr(0x0409) => '\\cyrchar\\CYRLJE{}',
+        # chr(0x040A) => '\\cyrchar\\CYRNJE{}',
+        # chr(0x040B) => '\\cyrchar\\CYRTSHE{}',
+        # chr(0x040C) => "\\cyrchar{\\'\\CYRK}",
+        # chr(0x040E) => '\\cyrchar\\CYRUSHRT{}',
+        # chr(0x040F) => '\\cyrchar\\CYRDZHE{}',
+        # chr(0x0410) => '\\cyrchar\\CYRA{}',
+        # chr(0x0411) => '\\cyrchar\\CYRB{}',
+        # chr(0x0412) => '\\cyrchar\\CYRV{}',
+        # chr(0x0413) => '\\cyrchar\\CYRG{}',
+        # chr(0x0414) => '\\cyrchar\\CYRD{}',
+        # chr(0x0415) => '\\cyrchar\\CYRE{}',
+        # chr(0x0416) => '\\cyrchar\\CYRZH{}',
+        # chr(0x0417) => '\\cyrchar\\CYRZ{}',
+        # chr(0x0418) => '\\cyrchar\\CYRI{}',
+        # chr(0x0419) => '\\cyrchar\\CYRISHRT{}',
+        # chr(0x041A) => '\\cyrchar\\CYRK{}',
+        # chr(0x041B) => '\\cyrchar\\CYRL{}',
+        # chr(0x041C) => '\\cyrchar\\CYRM{}',
+        # chr(0x041D) => '\\cyrchar\\CYRN{}',
+        # chr(0x041E) => '\\cyrchar\\CYRO{}',
+        # chr(0x041F) => '\\cyrchar\\CYRP{}',
+        # chr(0x0420) => '\\cyrchar\\CYRR{}',
+        # chr(0x0421) => '\\cyrchar\\CYRS{}',
+        # chr(0x0422) => '\\cyrchar\\CYRT{}',
+        # chr(0x0423) => '\\cyrchar\\CYRU{}',
+        # chr(0x0424) => '\\cyrchar\\CYRF{}',
+        # chr(0x0425) => '\\cyrchar\\CYRH{}',
+        # chr(0x0426) => '\\cyrchar\\CYRC{}',
+        # chr(0x0427) => '\\cyrchar\\CYRCH{}',
+        # chr(0x0428) => '\\cyrchar\\CYRSH{}',
+        # chr(0x0429) => '\\cyrchar\\CYRSHCH{}',
+        # chr(0x042A) => '\\cyrchar\\CYRHRDSN{}',
+        # chr(0x042B) => '\\cyrchar\\CYRERY{}',
+        # chr(0x042C) => '\\cyrchar\\CYRSFTSN{}',
+        # chr(0x042D) => '\\cyrchar\\CYREREV{}',
+        # chr(0x042E) => '\\cyrchar\\CYRYU{}',
+        # chr(0x042F) => '\\cyrchar\\CYRYA{}',
+        # chr(0x0430) => '\\cyrchar\\cyra{}',
+        # chr(0x0431) => '\\cyrchar\\cyrb{}',
+        # chr(0x0432) => '\\cyrchar\\cyrv{}',
+        # chr(0x0433) => '\\cyrchar\\cyrg{}',
+        # chr(0x0434) => '\\cyrchar\\cyrd{}',
+        # chr(0x0435) => '\\cyrchar\\cyre{}',
+        # chr(0x0436) => '\\cyrchar\\cyrzh{}',
+        # chr(0x0437) => '\\cyrchar\\cyrz{}',
+        # chr(0x0438) => '\\cyrchar\\cyri{}',
+        # chr(0x0439) => '\\cyrchar\\cyrishrt{}',
+        # chr(0x043A) => '\\cyrchar\\cyrk{}',
+        # chr(0x043B) => '\\cyrchar\\cyrl{}',
+        # chr(0x043C) => '\\cyrchar\\cyrm{}',
+        # chr(0x043D) => '\\cyrchar\\cyrn{}',
+        # chr(0x043E) => '\\cyrchar\\cyro{}',
+        # chr(0x043F) => '\\cyrchar\\cyrp{}',
+        # chr(0x0440) => '\\cyrchar\\cyrr{}',
+        # chr(0x0441) => '\\cyrchar\\cyrs{}',
+        # chr(0x0442) => '\\cyrchar\\cyrt{}',
+        # chr(0x0443) => '\\cyrchar\\cyru{}',
+        # chr(0x0444) => '\\cyrchar\\cyrf{}',
+        # chr(0x0445) => '\\cyrchar\\cyrh{}',
+        # chr(0x0446) => '\\cyrchar\\cyrc{}',
+        # chr(0x0447) => '\\cyrchar\\cyrch{}',
+        # chr(0x0448) => '\\cyrchar\\cyrsh{}',
+        # chr(0x0449) => '\\cyrchar\\cyrshch{}',
+        # chr(0x044A) => '\\cyrchar\\cyrhrdsn{}',
+        # chr(0x044B) => '\\cyrchar\\cyrery{}',
+        # chr(0x044C) => '\\cyrchar\\cyrsftsn{}',
+        # chr(0x044D) => '\\cyrchar\\cyrerev{}',
+        # chr(0x044E) => '\\cyrchar\\cyryu{}',
+        # chr(0x044F) => '\\cyrchar\\cyrya{}',
+        # chr(0x0451) => '\\cyrchar\\cyryo{}',
+        # chr(0x0452) => '\\cyrchar\\cyrdje{}',
+        # chr(0x0453) => "\\cyrchar{\\'\\cyrg}",
+        # chr(0x0454) => '\\cyrchar\\cyrie{}',
+        # chr(0x0455) => '\\cyrchar\\cyrdze{}',
+        # chr(0x0456) => '\\cyrchar\\cyrii{}',
+        # chr(0x0457) => '\\cyrchar\\cyryi{}',
+        # chr(0x0458) => '\\cyrchar\\cyrje{}',
+        # chr(0x0459) => '\\cyrchar\\cyrlje{}',
+        # chr(0x045A) => '\\cyrchar\\cyrnje{}',
+        # chr(0x045B) => '\\cyrchar\\cyrtshe{}',
+        # chr(0x045C) => "\\cyrchar{\\'\\cyrk}",
+        # chr(0x045E) => '\\cyrchar\\cyrushrt{}',
+        # chr(0x045F) => '\\cyrchar\\cyrdzhe{}',
+        # chr(0x0460) => '\\cyrchar\\CYROMEGA{}',
+        # chr(0x0461) => '\\cyrchar\\cyromega{}',
+        # chr(0x0462) => '\\cyrchar\\CYRYAT{}',
+        # chr(0x0464) => '\\cyrchar\\CYRIOTE{}',
+        # chr(0x0465) => '\\cyrchar\\cyriote{}',
+        # chr(0x0466) => '\\cyrchar\\CYRLYUS{}',
+        # chr(0x0467) => '\\cyrchar\\cyrlyus{}',
+        # chr(0x0468) => '\\cyrchar\\CYRIOTLYUS{}',
+        # chr(0x0469) => '\\cyrchar\\cyriotlyus{}',
+        # chr(0x046A) => '\\cyrchar\\CYRBYUS{}',
+        # chr(0x046C) => '\\cyrchar\\CYRIOTBYUS{}',
+        # chr(0x046D) => '\\cyrchar\\cyriotbyus{}',
+        # chr(0x046E) => '\\cyrchar\\CYRKSI{}',
+        # chr(0x046F) => '\\cyrchar\\cyrksi{}',
+        # chr(0x0470) => '\\cyrchar\\CYRPSI{}',
+        # chr(0x0471) => '\\cyrchar\\cyrpsi{}',
+        # chr(0x0472) => '\\cyrchar\\CYRFITA{}',
+        # chr(0x0474) => '\\cyrchar\\CYRIZH{}',
+        # chr(0x0478) => '\\cyrchar\\CYRUK{}',
+        # chr(0x0479) => '\\cyrchar\\cyruk{}',
+        # chr(0x047A) => '\\cyrchar\\CYROMEGARND{}',
+        # chr(0x047B) => '\\cyrchar\\cyromegarnd{}',
+        # chr(0x047C) => '\\cyrchar\\CYROMEGATITLO{}',
+        # chr(0x047D) => '\\cyrchar\\cyromegatitlo{}',
+        # chr(0x047E) => '\\cyrchar\\CYROT{}',
+        # chr(0x047F) => '\\cyrchar\\cyrot{}',
+        # chr(0x0480) => '\\cyrchar\\CYRKOPPA{}',
+        # chr(0x0481) => '\\cyrchar\\cyrkoppa{}',
+        # chr(0x0482) => '\\cyrchar\\cyrthousands{}',
+        # chr(0x0488) => '\\cyrchar\\cyrhundredthousands{}',
+        # chr(0x0489) => '\\cyrchar\\cyrmillions{}',
+        # chr(0x048C) => '\\cyrchar\\CYRSEMISFTSN{}',
+        # chr(0x048D) => '\\cyrchar\\cyrsemisftsn{}',
+        # chr(0x048E) => '\\cyrchar\\CYRRTICK{}',
+        # chr(0x048F) => '\\cyrchar\\cyrrtick{}',
+        # chr(0x0490) => '\\cyrchar\\CYRGUP{}',
+        # chr(0x0491) => '\\cyrchar\\cyrgup{}',
+        # chr(0x0492) => '\\cyrchar\\CYRGHCRS{}',
+        # chr(0x0493) => '\\cyrchar\\cyrghcrs{}',
+        # chr(0x0494) => '\\cyrchar\\CYRGHK{}',
+        # chr(0x0495) => '\\cyrchar\\cyrghk{}',
+        # chr(0x0496) => '\\cyrchar\\CYRZHDSC{}',
+        # chr(0x0497) => '\\cyrchar\\cyrzhdsc{}',
+        # chr(0x0498) => '\\cyrchar\\CYRZDSC{}',
+        # chr(0x0499) => '\\cyrchar\\cyrzdsc{}',
+        # chr(0x049A) => '\\cyrchar\\CYRKDSC{}',
+        # chr(0x049B) => '\\cyrchar\\cyrkdsc{}',
+        # chr(0x049C) => '\\cyrchar\\CYRKVCRS{}',
+        # chr(0x049D) => '\\cyrchar\\cyrkvcrs{}',
+        # chr(0x049E) => '\\cyrchar\\CYRKHCRS{}',
+        # chr(0x049F) => '\\cyrchar\\cyrkhcrs{}',
+        # chr(0x04A0) => '\\cyrchar\\CYRKBEAK{}',
+        # chr(0x04A1) => '\\cyrchar\\cyrkbeak{}',
+        # chr(0x04A2) => '\\cyrchar\\CYRNDSC{}',
+        # chr(0x04A3) => '\\cyrchar\\cyrndsc{}',
+        # chr(0x04A4) => '\\cyrchar\\CYRNG{}',
+        # chr(0x04A5) => '\\cyrchar\\cyrng{}',
+        # chr(0x04A6) => '\\cyrchar\\CYRPHK{}',
+        # chr(0x04A7) => '\\cyrchar\\cyrphk{}',
+        # chr(0x04A8) => '\\cyrchar\\CYRABHHA{}',
+        # chr(0x04A9) => '\\cyrchar\\cyrabhha{}',
+        # chr(0x04AA) => '\\cyrchar\\CYRSDSC{}',
+        # chr(0x04AB) => '\\cyrchar\\cyrsdsc{}',
+        # chr(0x04AC) => '\\cyrchar\\CYRTDSC{}',
+        # chr(0x04AD) => '\\cyrchar\\cyrtdsc{}',
+        # chr(0x04AE) => '\\cyrchar\\CYRY{}',
+        # chr(0x04AF) => '\\cyrchar\\cyry{}',
+        # chr(0x04B0) => '\\cyrchar\\CYRYHCRS{}',
+        # chr(0x04B1) => '\\cyrchar\\cyryhcrs{}',
+        # chr(0x04B2) => '\\cyrchar\\CYRHDSC{}',
+        # chr(0x04B3) => '\\cyrchar\\cyrhdsc{}',
+        # chr(0x04B4) => '\\cyrchar\\CYRTETSE{}',
+        # chr(0x04B5) => '\\cyrchar\\cyrtetse{}',
+        # chr(0x04B6) => '\\cyrchar\\CYRCHRDSC{}',
+        # chr(0x04B7) => '\\cyrchar\\cyrchrdsc{}',
+        # chr(0x04B8) => '\\cyrchar\\CYRCHVCRS{}',
+        # chr(0x04B9) => '\\cyrchar\\cyrchvcrs{}',
+        # chr(0x04BA) => '\\cyrchar\\CYRSHHA{}',
+        # chr(0x04BB) => '\\cyrchar\\cyrshha{}',
+        # chr(0x04BC) => '\\cyrchar\\CYRABHCH{}',
+        # chr(0x04BD) => '\\cyrchar\\cyrabhch{}',
+        # chr(0x04BE) => '\\cyrchar\\CYRABHCHDSC{}',
+        # chr(0x04BF) => '\\cyrchar\\cyrabhchdsc{}',
+        # chr(0x04C0) => '\\cyrchar\\CYRpalochka{}',
+        # chr(0x04C3) => '\\cyrchar\\CYRKHK{}',
+        # chr(0x04C4) => '\\cyrchar\\cyrkhk{}',
+        # chr(0x04C7) => '\\cyrchar\\CYRNHK{}',
+        # chr(0x04C8) => '\\cyrchar\\cyrnhk{}',
+        # chr(0x04CB) => '\\cyrchar\\CYRCHLDSC{}',
+        # chr(0x04CC) => '\\cyrchar\\cyrchldsc{}',
+        # chr(0x04D4) => '\\cyrchar\\CYRAE{}',
+        # chr(0x04D5) => '\\cyrchar\\cyrae{}',
+        # chr(0x04D8) => '\\cyrchar\\CYRSCHWA{}',
+        # chr(0x04D9) => '\\cyrchar\\cyrschwa{}',
+        # chr(0x04E0) => '\\cyrchar\\CYRABHDZE{}',
+        # chr(0x04E1) => '\\cyrchar\\cyrabhdze{}',
+        # chr(0x04E8) => '\\cyrchar\\CYROTLD{}',
+        # chr(0x04E9) => '\\cyrchar\\cyrotld{}',
+
+
+        chr(0x2002) => '\\phantom{N}',
+        chr(0x2004) => '\\hspace{.333333em}',
+        chr(0x2005) => '\\hspace{.25em}',
+        chr(0x2006) => '\\hspace{.166666em}',
+        chr(0x2007) => '\\phantom{0}',
+        chr(0x2008) => '\\phantom{,}',
+        chr(0x200a) => '\\ensuremath{\\mkern1mu}',
+        chr(0x2015) => '\\rule{1em}{1pt}',
+        chr(0x2016) => { 'textcomp' => '\\textbardbl'           },
+        chr(0x203b) => { 'textcomp' => '\\textreferencemark'    },
+        chr(0x203d) => { 'textcomp' => '\\textinterrobang'      },
+        chr(0x20a1) => { 'textcomp' => '\\textcolonmonetary'    },
+        chr(0x20a4) => { 'textcomp' => '\\textlira'             },
+        chr(0x20a6) => { 'textcomp' => '\\textnaira'            },
+        chr(0x20a9) => { 'textcomp' => '\\textwon'              },
+        chr(0x20ab) => { 'textcomp' => '\\textdong'             },
+        chr(0x2116) => { 'textcomp' => '\\textnumero'           },
+        chr(0x2117) => { 'textcomp' => '\\textcircledP'         },
+        chr(0x211e) => { 'textcomp' => '\\textrecipe'           },
+        chr(0x2120) => { 'textcomp' => '\\textservicemark'      },
+        chr(0x212e) => { 'textcomp' => '\\textestimated'        },
+        chr(0x2126) => { 'textcomp' => '\\textohm'              },
+        chr(0x2127) => { 'textcomp' => '\\textmho'              },
+
+        # Astrological symbols
+
+        chr(0x263f) => { 'marvosym' => '\\Mercury'              },
+        chr(0x2640) => { 'marvosym' => '\\Venus'                },
+        chr(0x2641) => { 'marvosym' => '\\Earth'                },
+        chr(0x2642) => { 'marvosym' => '\\Mars'                 },
+        chr(0x2643) => { 'marvosym' => '\\Jupiter'              },
+        chr(0x2644) => { 'marvosym' => '\\Saturn'               },
+        chr(0x2645) => { 'marvosym' => '\\Uranus'               },
+        chr(0x2646) => { 'marvosym' => '\\Neptune'              },
+        chr(0x2647) => { 'marvosym' => '\\Pluto'                },
+
+        # Zodiacal symbols
+
+        chr(0x2648) => { 'marvosym' => '\\Aries'                },
+        chr(0x2649) => { 'marvosym' => '\\Taurus'               },
+        chr(0x264a) => { 'marvosym' => '\\Gemini'               },
+        chr(0x264b) => { 'marvosym' => '\\Cancer'               },
+        chr(0x264c) => { 'marvosym' => '\\Leo'                  },
+        chr(0x264d) => { 'marvosym' => '\\Virgo'                },
+        chr(0x264e) => { 'marvosym' => '\\Libra'                },
+        chr(0x264f) => { 'marvosym' => '\\Scorpio'              },
+        chr(0x2650) => { 'marvosym' => '\\Sagittarius'          },
+        chr(0x2651) => { 'marvosym' => '\\Capricorn'            },
+        chr(0x2652) => { 'marvosym' => '\\Aquarius'             },
+        chr(0x2653) => { 'marvosym' => '\\Pisces'               },
+
+        chr(0x266d) => '\\ensuremath{\\flat}',
+        chr(0x266e) => '\\ensuremath{\\natural}',
+        chr(0x266f) => '\\ensuremath{\\sharp}',
+        chr(0x26ad) => { 'textcomp' => '\\textmarried'          },
+        chr(0x26ae) => { 'textcomp' => '\\textdivorced'         },
+
+        chr(0x2e18) => { 'textcomp' => '\\textinterrobangdown'  },
+        chr(0x2e3a) => '---{}---',
+        chr(0x2e3b) => '---{}---{}---',
+    );
+
+
+my %provided_by;
+
+# Formats for building accented characters
+# See http://en.wikibooks.org/wiki/LaTeX/Accents
+
+my %accent_format = ( ACUTE        => '\\\'{%s}',
+                      BREVE        => '\\u{%s}',
+                      CARON        => '\\v{%s}',
+                      CEDILLA      => '\\c{%s}',
+                      CIRCUMFLEX   => '\\^{%s}',
+                      'DOT ABOVE'  => '\\.{%s}',
+                      'DOT BELOW'  => '\\d{%s}',
+                      GRAVE        => '\\`{%s}',
+                      'LINE BELOW' => '\\b{%s}',
+                      MACRON       => '\\={%s}',
+                      OGONEK       => '\\k{%s}',
+                      'RING ABOVE' => '\\r{%s}',
+                      TILDE        => '\\~{%s}',
+                      DIARESIS     => '\\"{%s}',
+    );
+
+
+# Comments to intersperse in the encodign table
+
+my %comments   = ( 0x00a0 => 'C1 Controls and Latin-1 Supplement',
+                   0x0100 => 'Latin Extended-A',
+                   0x0200 => 'Spacing Modifier Letters',
+                   0x0390 => 'Greek and Coptic',
+#                   0x0400 => 'Cyrillic characters',
+                   0x1e00 => 'Latin Extended Additional',
+                   0x2000 => 'General Punctuation',
+                   0x2100 => 'Letterlike Symbols',
+                   0x20a0 => 'Currency Symbols',
+                   0x2200 => 'Mathematical Operations',
+                   0x2600 => 'Miscellaneous Symbols',
+                   0x2e00 => 'Supplemental Punctuation',
+    );
+
+
+
+gather_pod_latex_encodings();
+generate_accented_char_encodings();
+
+my $module_text     = module_text();
+my $encoding_table  = encoding_table();
+my $provided_by_map = provided_by_map();
+my $date            = `date`;
+
+$module_text =~ s/<<REVISION>>/$revision/g;
+$module_text =~ s/<<ENCODING_TABLE>>/$encoding_table/g;
+$module_text =~ s/<<PROVIDED_BY_MAP>>/$provided_by_map/g;
+
+print $module_text;
+
+exit(0);
+
+
+
+# Gather the encodings defined in Pod::LaTeX
+
+sub gather_pod_latex_encodings {
+
+    foreach my $char (sort keys %char2entity) {
+        next if exists $char_encoding{$char};
+
+        my $charcode  = ord $char;
+        my $html_enc  = $char2entity{$char};
+        (my $html_name = $html_enc) =~ s/^&(.*);$/$1/;
+        my $latex_enc = $Pod::LaTeX::HTML_Escapes{$html_name};
+
+        if (!defined($latex_enc)) {
+#        printf(STDERR "ignoring character 0x%x%s - no known encoding\n",
+#               ord($char), (ord($char) >= 0x20 && ord($char) < 256) ? " '$char'" : "");
+            next;
+        }
+        if ($char eq $latex_enc) {
+            printf(STDERR "ignoring character 0x%x%s - encoding equals character\n",
+                   ord($char), (ord($char) >= 0x20 && ord($char) < 256) ? " '$char'" : "");
+            next;
+        }
+
+        $latex_enc =~ s/\$(.*)\$/\\ensuremath{$1}/;
+        $char_encoding{$char} = $latex_enc;
+    }
+    return;
+}
+
+
+# Generate encodings for recognized accented characters
+
+sub generate_accented_char_encodings {
+
+
+    foreach my $charcode (0x0100 .. 0x0200, 0x1e00 .. 0x1eff) {
+        my $char = chr($charcode);
+        next if exists $char_encoding{$char};
+
+        my $charname = charnames::viacode($charcode);
+        if ($charname =~ /^LATIN (CAPITAL|SMALL) LETTER ([A-Z]) WITH ([\w ]+)$/) {
+            my ($case, $letter, $accent) = ($1, $2, $3);
+            next unless exists $accent_format{$accent};
+            if (    $case eq 'SMALL'
+                    and $letter =~ /[ij]/i
+                    and $accent =~ /TILDE|MACRON|BREVE|CIRCUMFLEX/)
+            {
+                $letter = "\\$letter";
+            }
+            $char_encoding{$char} = sprintf($accent_format{$accent},
+                                            $case eq 'SMALL' ? lc $letter : $letter);
+        }
+    }
+    return;
+}
+
+
+# Output the encoding table
+
+sub encoding_table {
+    my $string = '';
+
+    foreach my $char (sort { $a cmp $b } keys %char_encoding) {
+        my $charcode  = ord $char;
+        my $latex_enc = $char_encoding{$char};
+        my $html_enc  = $char2entity{$char};
+
+        if (my $comment = comment_for_code($charcode)) {
+            $string .= "\n    # $comment\n\n";
+        }
+
+        if ( ref $latex_enc ) {
+            my $real_enc;
+            foreach my $package (sort keys %$latex_enc) {
+                $real_enc = $provided_by{$char}{$package} = $latex_enc->{$package};;
+            }
+            $latex_enc = $real_enc;
+        }
+
+        # Make sure that characters are properly escaped for inclusion in
+        # a Perl single-quoted string
+
+        $latex_enc =~ s{\\}{\\\\}g;
+        $latex_enc =~ s{'}{\\'}g;
+        $latex_enc =~ s/^(\\.*[a-z])(?:\{\})?$/{$1}/i;
+
+
+        # Format a line of the encoding table, including the Unicode character name and the
+        # HTML entity name (if one exists) as the comment for the entry.
+
+        my $line = sprintf("    %-11s => %-30s # %-44s%s",
+                           sprintf("chr(0x%04x)", $charcode),
+                           sprintf("'%s',", $latex_enc || '<undef>'),
+                           charnames::viacode($charcode) || 'unnamed character',
+                           $html_enc ? " ($html_enc)" : '');
+
+        $line =~ s/\s*$//;
+        $string .= "$line\n";
+    }
+    return $string;
+}
+
+
+
+sub provided_by_map {
+    my $string = '';
+
+    foreach my $char (sort keys %provided_by) {
+        my $charcode  = ord $char;
+        my ($module) = (sort keys %{$provided_by{$char}});
+        $string .= sprintf("    chr(0x%04x) => '%s',    # %s\n",
+                           $charcode, $module, charnames::viacode($charcode));
+    }
+    return $string;
+}
+
+
+
+sub module_text {
+    my $string = join q{}, (<DATA>);
+    $string =~ s/^# ?//msg;
+    return $string;
+}
+
+
+
+
+
+sub comment_for_code {
+    my ($code) = @_;
+    foreach my $key (sort keys %comments) {
+        return delete $comments{$key} if $code >= $key;
+    }
+    return;
+}
+
+
+
+=head1 NAME
+
+build-character-table
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+This is a script to rebuild the C<LaTeX::Encode::EncodingTable> module.
+
+
+=head1 AUTHOR
+
+Andrew Ford E<lt>a.ford@ford-mason.co.ukE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 Andrew Ford.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
+__DATA__
+# # LaTeX::Encode character encoding table
+# # Note: this module was automatically generated
+# # by build-encoding-table (version <<REVISION>>)
+#
+# package LaTeX::Encode::EncodingTable;
+#
+# use strict;
+# use warnings;
+#
+# our @ISA = qw(Exporter);
+#
+# our @EXPORT = qw(%latex_encoding $encoded_char_re %provided_by);
+#
+# our $encoded_char_re;
+#
+# our %latex_encoding = (
+#
+# <<ENCODING_TABLE>>
+# );
+#
+# our %provided_by = (
+#
+# <<PROVIDED_BY_MAP>>
+# );
+#
+# sub _compile_encoding_regexp {
+#     $encoded_char_re = join q{}, sort keys %latex_encoding;
+#     $encoded_char_re =~ s{ ([#$\[\]\\]) }{\\$1}gmsx;
+#     $encoded_char_re = eval "qr{[$encoded_char_re]}x";
+#     return;
+# }
+#
+# _compile_encoding_regexp();
+#
+#
+# 1;
+#
+# __END__
+#
+# =head1 NAME
+#
+# LaTeX::Encode::EncodingTable - character encoding table for LaTeX::Encode
+#
+# =head1 SYNOPSIS
+#
+# This module is not intended to be used except by LaTeX::Encode.
+#
+# =head1 VERSION
+#
+# This manual page describes version <<REVISION>> of the
+# C<LaTeX::Encode::EncodingTable> module.
+#
+# =head1 DESCRIPTION
+#
+# This module contains the C<%latex_encoding> table, which is used in
+# the C<LaTeX::Encode> module in the C<latex_encode()> function.  The
+# table is automatically generated by the C<build-encoding-table> script 
+# from the C<LaTeX-Encode> distribution, which builds tables based on
+# information in the C<HTML::Entities>, C<Pod::LaTeX> and C<charnames>
+# modules, as well as using explicit rules.
+#
+# =head1 SUBROUTINES/METHODS
+#
+# Not applicable.
+#
+# =head1 DIAGNOSTICS
+#
+# Not applicable.
+#
+# =head1 CONFIGURATION AND ENVIRONMENT
+#
+# Not applicable.
+#
+# =head1 DEPENDENCIES
+#
+# The C<HTML::Entities> and C<Pod::LaTeX> modules were used for building
+# the encoding table in C<LaTeX::Encode::EncodingTable>, but this is not
+# rebuilt at installation time.
+#
+#
+# =head1 INCOMPATIBILITIES
+#
+# Not applicable.
+#
+# =head1 BUGS AND LIMITATIONS
+#
+# Not all LaTeX special characters are included in the encoding tables
+# (more may be added when I track down the definitions).
+#
+# =head1 AUTHOR
+#
+# Andrew Ford E<lt>a.ford@ford-mason.co.ukE<gt>
+#
+# =head1 LICENSE AND COPYRIGHT
+#
+# Copyright (C) 2007-2012 Andrew Ford.  All Rights Reserved.
+#
+# This module is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# This software is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# =head1 SEE ALSO
+#
+# L<HTML::Entities>, L<Pod::LaTeX>
+#
+# =cut
+#
+## Local Variables:
+## mode: perl
+## perl-indent-level: 4
+## indent-tabs-mode: nil
+## End:
+##
+## vim: expandtab shiftwidth=4:

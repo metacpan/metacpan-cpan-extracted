@@ -1,0 +1,48 @@
+# -*- cperl -*-
+
+=head1 NAME
+
+nat-css - Corpus Search Sentence utility.
+
+=head1 SYNOPSIS
+
+  nat-css [-q <rank>] <lex1> <crp1> <lex2> <crp2> [<sent_nr> | all]
+
+=head1 DESCRIPTION
+
+C<nat-css> is used after the alignment process (using, for example,
+C<nat-these> tool).  Its objective is to search sentences where one
+word occurs.
+
+The tool has two methods of use:
+
+  nat-css [-q <rank>] <lex1> <crp1> <lex2> <crp2>
+
+where the tool opens the two lexicon files and the two corpora files
+in interactive mode. The user writes a word or a word sequence and the
+tool finds its occurrences on the corpus, printing the sentence from
+C<crp1> where it occurs, and aligned sentence from C<crp2>. If the
+C<rank> is provided, the tool prints the ranking or quality of the
+alignment, too.
+
+The other method of operation is:
+
+ nat-css [-q <rank>] <lex1> <crp1> <lex2> <crp2> (<sent_nr> | all)
+
+where the tool prints the pair of sentences number C<sent_nr> or all
+the sentences (if the C<all> option is used). Again, if C<rank> is
+used, the tool prints the ranking or quality of the alignment.
+
+=head1 SEE ALSO
+
+nat-rank, nat-these, NATools documentation;
+
+=head1 COPYRIGHT
+
+ Copyright (C)2002-2003 Alberto Simoes and Jose Joao Almeida
+ Copyright (C)1998 Djoerd Hiemstra
+
+ GNU GENERAL PUBLIC LICENSE (LGPL) Version 2 (June 1991)
+
+=cut
+

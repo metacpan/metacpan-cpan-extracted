@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/LEOCHARRE/Debug.pm
+t/00.t
+t/01_warnf.t
+t/03-scope.t
+META.yml                                 Module meta-data (added by MakeMaker)

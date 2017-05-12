@@ -1,0 +1,31 @@
+---
+abstract: 'Converts numbers into (any available language) string.'
+author:
+  - 'Burak Gursoy <burak@cpan.org>'
+build_requires:
+  Test::More: '0.40'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Any-Numbers
+no_index:
+  directory:
+    - monolithic_version
+    - builder
+    - t
+    - xt
+recommends:
+  Task::Lingua::Any::Numbers: '0.11'
+requires:
+  I18N::LangTags::Detect: '0'
+  Lingua::EN::Numbers: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/burak/cpan-lingua-any-numbers/
+version: '0.46'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

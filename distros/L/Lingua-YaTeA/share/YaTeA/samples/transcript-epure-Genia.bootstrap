@@ -1,0 +1,403 @@
+( DNase<=H=NN> I<=M=CD> )	DNase I	NN CD	DNase I	NN	termsPhB
+( Bacillus<=H=NNP> cereus<=M=NN> )	Bacillus cereus	NNP NN	Bacillus cereus	NNP	termsPhB
+( operon<=H=NN> of ( Bacillus<=H=NNP> subtilis<=M=NN> )<=M=NNP> )	operon of Bacillus subtilis	NN of NNP NN	operon of Bacillus subtilis	NN	termsPhB
+( consensus<=M=NN> sequence<=H=NN> )	consensus sequence	NN NN	consensus sequence	NN	termsPhB
+( synthesis<=H=NN> of all<=DT> proteins<=M=NNS> )	synthesis of all proteins	NN of DT NNS	synthesis of all protein	NN	termsPhB
+( HindIII<=M=NN> fragment<=H=NN> )	HindIII fragment	NN NN	HindIII fragment	NN	termsPhB
+( DNA<=M=NN> binding<=H=NN> )	DNA binding	NN NN	DNA binding	NN	termsPhB
+( cell<=M=NN> type<=H=NN> )	cell type	NN NN	cell type	NN	termsPhB
+( crystal<=M=JJ> structure<=H=NN> )	crystal structure	JJ NN	crystal structure	NN	termsPhB
+( recombinant<=M=JJ> plasmid<=H=NN> )	recombinant plasmid	JJ NN	recombinant plasmid	NN	termsPhB
+( ( amino<=M=JJ> acid<=H=NN> )<=M=NN> residues<=H=NNS> )	amino acid residues	JJ NN NNS	amino acid residue	NNS	termsPhB
+( biosynthetic<=M=JJ> gene<=H=NN> )	biosynthetic gene	JJ NN	biosynthetic gene	NN	termsPhB
+( competence<=M=NN> development<=H=NN> )	competence development	NN NN	competence development	NN	termsPhB
+( loop<=M=NN> structure<=H=NN> )	loop structure	NN NN	loop structure	NN	termsPhB
+( stress<=M=NN> response<=H=NN> )	stress response	NN NN	stress response	NN	termsPhB
+( Northern<=M=NN> analyses<=H=NNS> )	Northern analyses	NN NNS	Northern analysis	NNS	termsPhB
+( growth<=M=NN> phase<=H=NN> )	growth phase	NN NN	growth phase	NN	termsPhB
+( B.<=H=NNP> stearothermophilus<=M=NN> )	B. stearothermophilus	NNP NN	B. stearothermophilus	NNP	termsPhB
+( transcriptional<=M=JJ> fusions<=H=NNS> )	transcriptional fusions	JJ NNS	transcriptional fusion	NNS	termsPhB
+( Salmonella<=H=NNP> typhimurium<=M=NNP> )	Salmonella typhimurium	NNP NNP	Salmonella typhimurium	NNP	termsPhB
+( tetracycline<=M=NN> resistance<=H=NN> )	tetracycline resistance	NN NN	tetracycline resistance	NN	termsPhB
+( transcriptional<=M=JJ> activator<=H=NN> )	transcriptional activator	JJ NN	transcriptional activator	NN	termsPhB
+( protection<=M=NN> experiments<=H=NNS> )	protection experiments	NN NNS	protection experiment	NNS	termsPhB
+( full<=M=JJ> length<=H=NN> )	full length	JJ NN	full length	NN	termsPhB
+( signal<=M=NN> transduction<=H=NN> )	signal transduction	NN NN	signal transduction	NN	termsPhB
+( consensus<=M=NN> promoter<=H=NN> )	consensus promoter	NN NN	consensus promoter	NN	termsPhB
+( general<=M=JJ> protein<=H=NN> )	general protein	JJ NN	general protein	NN	termsPhB
+( Bacillus<=H=NNP> brevis<=M=NN> )	Bacillus brevis	NNP NN	Bacillus brevis	NNP	termsPhB
+( Bacillus<=M=NNP> species<=H=NNS> )	Bacillus species	NNP NNS	Bacillus specy	NNS	termsPhB
+( trp<=M=NN> leader<=H=NN> )	trp leader	NN NN	trp leader	NN	termsPhB
+( response<=M=NN> regulator<=H=NN> )	response regulator	NN NN	response regulator	NN	termsPhB
+( stem-loop<=M=JJ> structure<=H=NN> )	stem-loop structure	JJ NN	stem-loop structure	NN	termsPhB
+( constitutive<=M=JJ> expression<=H=NN> )	constitutive expression	JJ NN	constitutive expression	NN	termsPhB
+( polymerase<=M=NN> chain<=H=NN> )	polymerase chain	NN NN	polymerase chain	NN	termsPhB
+( sigB<=M=NN> operons<=H=NNS> )	sigB operons	NN NNS	sigB operon	NNS	termsPhB
+( putative<=M=JJ> promoter<=H=NN> )	putative promoter	JJ NN	putative promoter	NN	termsPhB
+( Bacillus<=H=NNP> amyloliquefaciens<=M=NNS> )	Bacillus amyloliquefaciens	NNP NNS	Bacillus amyloliquefacien	NNP	termsPhB
+( reverse<=M=JJ> transcription<=H=NN> )	reverse transcription	JJ NN	reverse transcription	NN	termsPhB
+( polyacrylamide<=M=NN> gels<=H=NNS> )	polyacrylamide gels	NN NNS	polyacrylamide gel	NNS	termsPhB
+( sequence<=H=NN> of the<=DT> region<=M=NN> )	sequence of the region	NN of DT NN	sequence of the region	NN	termsPhB
+( subunit<=H=NN> of ( RNA<=M=NN> polymerase<=H=NN> )<=M=NN> )	subunit of RNA polymerase	NN of NN NN	subunit of RNA polymerase	NN	termsPhB
+( development<=H=NN> of competence<=M=NN> )	development of competence	NN of NN	development of competence	NN	termsPhB
+( start<=M=NN> codon<=H=NN> )	start codon	NN NN	start codon	NN	termsPhB
+( leader<=M=NN> region<=H=NN> )	leader region	NN NN	leader region	NN	termsPhB
+( B.<=H=NNP> subtilis<=M=NN> )	B. subtilis	NNP NN	B. subtili	NNP	termsPhB
+( inducible<=M=JJ> promoter<=H=NN> )	inducible promoter	JJ NN	inducible promoter	NN	termsPhB
+( extension<=M=NN> analysis<=H=NN> )	extension analysis	NN NN	extension analysis	NN	termsPhB
+( start<=M=NN> site<=H=NN> )	start site	NN NN	start site	NN	termsPhB
+( regulation<=H=NN> of the<=DT> gene<=M=NN> )	regulation of the gene	NN of DT NN	regulation of the gene	NN	termsPhB
+( chloramphenicol<=M=NN> acetyltransferase<=H=NN> )	chloramphenicol acetyltransferase	NN NN	chloramphenicol acetyltransferase	NN	termsPhB
+( regulatory<=M=JJ> protein<=H=NN> )	regulatory protein	JJ NN	regulatory protein	NN	termsPhB
+( promoter<=M=NN> sequence<=H=NN> )	promoter sequence	NN NN	promoter sequence	NN	termsPhB
+( B.<=H=NNP> thuringiensis<=M=NN> )	B. thuringiensis	NNP NN	B. thuringiensis	NNP	termsPhB
+( members<=H=NNS> of the<=DT> family<=M=NN> )	members of the family	NNS of DT NN	member of the family	NNS	termsPhB
+( electrophoretic<=M=JJ> mobilities<=H=NNS> )	electrophoretic mobilities	JJ NNS	electrophoretic mobility	NNS	termsPhB
+( transport<=M=NN> system<=H=NN> )	transport system	NN NN	transport system	NN	termsPhB
+( sigma<=M=NN> factor<=H=NN> )	sigma factor	NN NN	sigma factor	NN	termsPhB
+( DNA<=M=NN> synthesis<=H=NN> )	DNA synthesis	NN NN	DNA synthesis	NN	termsPhB
+( putative<=M=JJ> terminator<=H=NN> )	putative terminator	JJ NN	putative terminator	NN	termsPhB
+( unknown<=M=JJ> functions<=H=NNS> )	unknown functions	JJ NNS	unknown function	NNS	termsPhB
+( protein<=H=NN> of ( Bacillus<=H=NNP> subtilis<=M=NN> )<=M=NNP> )	protein of Bacillus subtilis	NN of NNP NN	protein of Bacillus subtilis	NN	termsPhB
+( spore<=M=JJ> germination<=H=NN> )	spore germination	JJ NN	spore germination	NN	termsPhB
+( part<=H=NN> of an<=DT>  operon<=M=NN> )	part of an operon	NN of DT NN	part of an operon	NN	termsPhB
+( open<=M=JJ> frame<=H=NN> )	open frame	JJ NN	open frame	NN	termsPhB
+( transcription<=M=NN> initiation<=H=NN> )	transcription initiation	NN NN	transcription initiation	NN	termsPhB
+( low<=M=JJ> levels<=H=NNS> )	low levels	JJ NNS	low level	NNS	termsPhB
+( transcriptional<=M=JJ> terminator<=H=NN> )	transcriptional terminator	JJ NN	transcriptional terminator	NN	termsPhB
+( RNase<=M=NN> P<=H=NN> )	RNase P	NN NN	RNase P	NN	termsPhB
+( mother<=M=NN> cell<=H=NN> )	mother cell	NN NN	mother cell	NN	termsPhB
+( insertion<=M=NN> mutation<=H=NN> )	insertion mutation	NN NN	insertion mutation	NN	termsPhB
+( higher<=M=JJR> affinity<=H=NN> )	higher affinity	JJR NN	high affinity	NN	termsPhB
+( gene<=M=NN> codes<=H=NNS> )	gene codes	NN NNS	gene code	NNS	termsPhB
+( glucose<=M=NN> dehydrogenase<=H=NN> )	glucose dehydrogenase	NN NN	glucose dehydrogenase	NN	termsPhB
+( early<=M=JJ> stage<=H=NN> )	early stage	JJ NN	early stage	NN	termsPhB
+( alternative<=M=JJ> factor<=H=NN> )	alternative factor	JJ NN	alternative factor	NN	termsPhB
+( response<=H=NN> to stress<=M=NN> )	response to stress	NN to NN	response to stress	NN	termsPhB
+( exponential<=M=JJ> phase<=H=NN> )	exponential phase	JJ NN	exponential phase	NN	termsPhB
+( base<=M=NN> pairs<=H=NNS> )	base pairs	NN NNS	base pair	NNS	termsPhB
+( phase<=H=NN> of growth<=M=NN> )	phase of growth	NN of NN	phase of growth	NN	termsPhB
+( end<=H=NN> of the<=DT> growth<=M=NN> )	end of the growth	NN of DT NN	end of the growth	NN	termsPhB
+( DNA<=M=NN> regions<=H=NNS> )	DNA regions	NN NNS	DNA region	NNS	termsPhB
+( early<=M=JJ> genes<=H=NNS> )	early genes	JJ NNS	early gene	NNS	termsPhB
+( Spo0A<=M=NN> protein<=H=NN> )	Spo0A protein	NN NN	Spo0A protein	NN	termsPhB
+( genetic<=M=JJ> competence<=H=NN> )	genetic competence	JJ NN	genetic competence	NN	termsPhB
+( sigma<=M=NN> B<=H=NN> )	sigma B	NN NN	sigma B	NN	termsPhB
+( low<=M=JJ> concentration<=H=NN> )	low concentration	JJ NN	low concentration	NN	termsPhB
+( pro-sigma<=M=JJ> E<=H=NN> )	pro-sigma E	JJ NN	pro-sigma E	NN	termsPhB
+( promoter<=H=NN> of the<=DT> gene<=M=NN> )	promoter of the gene	NN of DT NN	promoter of the gene	NN	termsPhB
+( extension<=M=NN> experiments<=H=NNS> )	extension experiments	NN NNS	extension experiment	NNS	termsPhB
+( analysis<=H=NN> of the<=DT> sequences<=M=NNS> )	analysis of the sequences	NN of DT NNS	analysis of the sequence	NN	termsPhB
+( S1<=M=NN> mapping<=H=NN> )	S1 mapping	NN NN	S1 mapping	NN	termsPhB
+( copy<=M=NN> number<=H=NN> )	copy number	NN NN	copy number	NN	termsPhB
+( RNA-binding<=M=JJ> attenuation<=H=NN> )	RNA-binding attenuation	JJ NN	RNA-binding attenuation	NN	termsPhB
+( transcription<=M=NN> system<=H=NN> )	transcription system	NN NN	transcription system	NN	termsPhB
+( forespore<=M=JJ> compartment<=H=NN> )	forespore compartment	JJ NN	forespore compartment	NN	termsPhB
+( translation<=M=NN> initiation<=H=NN> )	translation initiation	NN NN	translation initiation	NN	termsPhB
+( putative<=M=JJ> proteins<=H=NNS> )	putative proteins	JJ NNS	putative protein	NNS	termsPhB
+( formation<=H=NN> of a<=DT>  complex<=M=NN> )	formation of a complex	NN of DT NN	formation of a complex	NN	termsPhB
+( Saccharomyces<=H=NNP> cerevisiae<=M=NN> )	Saccharomyces cerevisiae	NNP NN	Saccharomyces cerevisiae	NNP	termsPhB
+( activation<=H=NN> of the<=DT> sigma<=M=NN> )	activation of the sigma	NN of DT NN	activation of the sigma	NN	termsPhB
+( core<=M=NN> polymerase<=H=NN> )	core polymerase	NN NN	core polymerase	NN	termsPhB
+( regions<=H=NNS> of promoters<=M=NNS> )	regions of promoters	NNS of NNS	region of promoter	NNS	termsPhB
+( Bacillus<=H=NNP> subtilis<=M=NN> )	Bacillus subtilis	NNP NN	Bacillus subtili	NNP	termsPhB
+( onset<=H=NN> of sporulation<=M=NN> )	onset of sporulation	NN of NN	onset of sporulation	NN	termsPhB
+( translational<=M=JJ> fusions<=H=NNS> )	translational fusions	JJ NNS	translational fusion	NNS	termsPhB
+( growth<=M=NN> rate<=H=NN> )	growth rate	NN NN	growth rate	NN	termsPhB
+( AbrB<=M=NN> protein<=H=NN> )	AbrB protein	NN NN	AbrB protein	NN	termsPhB
+( amylase<=M=NN> gene<=H=NN> )	amylase gene	NN NN	amylase gene	NN	termsPhB
+( phosphate<=M=NN> starvation<=H=NN> )	phosphate starvation	NN NN	phosphate starvation	NN	termsPhB
+( growth<=M=NN> medium<=H=NN> )	growth medium	NN NN	growth medium	NN	termsPhB
+( transcriptional<=M=JJ> regulation<=H=NN> )	transcriptional regulation	JJ NN	transcriptional regulation	NN	termsPhB
+( DNA-binding<=M=JJ> protein<=H=NN> )	DNA-binding protein	JJ NN	DNA-binding protein	NN	termsPhB
+( transcriptional<=M=JJ> activation<=H=NN> )	transcriptional activation	JJ NN	transcriptional activation	NN	termsPhB
+( genetic<=M=JJ> analysis<=H=NN> )	genetic analysis	JJ NN	genetic analysis	NN	termsPhB
+( minimal<=M=JJ> medium<=H=NN> )	minimal medium	JJ NN	minimal medium	NN	termsPhB
+( form<=H=NN> of RNA<=M=NN> )	form of RNA	NN of NN	form of RNA	NN	termsPhB
+( stem<=M=NN> loop<=H=NN> )	stem loop	NN NN	stem loop	NN	termsPhB
+( ribosomal<=M=JJ> protein<=H=NN> )	ribosomal protein	JJ NN	ribosomal protein	NN	termsPhB
+( specific<=M=JJ> transcription<=H=NN> )	specific transcription	JJ NN	specific transcription	NN	termsPhB
+( mobility<=M=NN> shift<=H=NN> )	mobility shift	NN NN	mobility shift	NN	termsPhB
+( mapping<=M=VBG> experiments<=H=NNS> )	mapping experiments	VBG NNS	map experiment	NNS	termsPhB
+( Chloramphenicol<=M=NN> resistance<=H=NN> )	Chloramphenicol resistance	NN NN	Chloramphenicol resistance	NN	termsPhB
+( region<=H=NN> of the<=DT> operon<=M=NN> )	region of the operon	NN of DT NN	region of the operon	NN	termsPhB
+( subtilis<=M=JJ> genes<=H=NNS> )	subtilis genes	JJ NNS	subtilis gene	NNS	termsPhB
+( translation<=M=NN> system<=H=NN> )	translation system	NN NN	translation system	NN	termsPhB
+( level<=H=NN> of transcription<=M=NN> )	level of transcription	NN of NN	level of transcription	NN	termsPhB
+( potential<=M=JJ> site<=H=NN> )	potential site	JJ NN	potential site	NN	termsPhB
+( start<=M=NN> point<=H=NN> )	start point	NN NN	start point	NN	termsPhB
+( Shine-Dalgarno<=M=JJ> sequence<=H=NN> )	Shine-Dalgarno sequence	JJ NN	Shine-Dalgarno sequence	NN	termsPhB
+( ctc<=M=NN> promoter<=H=NN> )	ctc promoter	NN NN	ctc promoter	NN	termsPhB
+( high<=M=JJ> degree<=H=NN> )	high degree	JJ NN	high degree	NN	termsPhB
+( sporulation<=M=NN> genes<=H=NNS> )	sporulation genes	NN NNS	sporulation gene	NNS	termsPhB
+( spoIIG<=M=NN> promoter<=H=NN> )	spoIIG promoter	NN NN	spoIIG promoter	NN	termsPhB
+( expression<=M=NN> vector<=H=NN> )	expression vector	NN NN	expression vector	NN	termsPhB
+( Gram-negative<=M=JJ> bacteria<=H=NNS> )	Gram-negative bacteria	JJ NNS	Gram-negative bacteria	NNS	termsPhB
+( toxin<=M=NN> gene<=H=NN> )	toxin gene	NN NN	toxin gene	NN	termsPhB
+( regulatory<=M=JJ> system<=H=NN> )	regulatory system	JJ NN	regulatory system	NN	termsPhB
+( polymerase<=M=NN> holoenzyme<=H=NN> )	polymerase holoenzyme	NN NN	polymerase holoenzyme	NN	termsPhB
+( nuclease<=M=NN> mapping<=H=NN> )	nuclease mapping	NN NN	nuclease mapping	NN	termsPhB
+( transcription<=M=NN> termination<=H=NN> )	transcription termination	NN NN	transcription termination	NN	termsPhB
+( regulatory<=M=JJ> region<=H=NN> )	regulatory region	JJ NN	regulatory region	NN	termsPhB
+( strong<=M=JJ> promoters<=H=NNS> )	strong promoters	JJ NNS	strong promoter	NNS	termsPhB
+( transcription<=M=NN> assay<=H=NN> )	transcription assay	NN NN	transcription assay	NN	termsPhB
+( complete<=M=JJ> sequence<=H=NN> )	complete sequence	JJ NN	complete sequence	NN	termsPhB
+( transcription<=M=NN> terminator<=H=NN> )	transcription terminator	NN NN	transcription terminator	NN	termsPhB
+( transcription<=H=NN> of genes<=M=NNS> )	transcription of genes	NN of NNS	transcription of gene	NN	termsPhB
+( gene<=M=NN> promoters<=H=NNS> )	gene promoters	NN NNS	gene promoter	NNS	termsPhB
+( synthetase<=M=NN> gene<=H=NN> )	synthetase gene	NN NN	synthetase gene	NN	termsPhB
+( initiation<=H=NN> of replication<=M=NN> )	initiation of replication	NN of NN	initiation of replication	NN	termsPhB
+( sporulation<=M=NN> factor<=H=NN> )	sporulation factor	NN NN	sporulation factor	NN	termsPhB
+( in<=M=FW> vivo<=H=FW> )	in vivo	FW FW	in vivo	JJ	termsPhB
+( core<=M=NN> enzyme<=H=NN> )	core enzyme	NN NN	core enzyme	NN	termsPhB
+( spore<=M=NN> formation<=H=NN> )	spore formation	NN NN	spore formation	NN	termsPhB
+( promoter<=M=NN> sites<=H=NNS> )	promoter sites	NN NNS	promoter site	NNS	termsPhB
+( primer<=M=NN> extension<=H=NN> )	primer extension	NN NN	primer extension	NN	termsPhB
+( level<=H=NN> of expression<=M=NN> )	level of expression	NN of NN	level of expression	NN	termsPhB
+( Bacillus<=H=NNP> thuringiensis<=M=NN> )	Bacillus thuringiensis	NNP NN	Bacillus thuringiensis	NNP	termsPhB
+( Northern<=M=NN> blot<=H=NN> )	Northern blot	NN NN	Northern blot	NN	termsPhB
+( Western<=M=NN> blot<=H=NN> )	Western blot	NN NN	Western blot	NN	termsPhB
+( sequence<=M=NN> analysis<=H=NN> )	sequence analysis	NN NN	sequence analysis	NN	termsPhB
+( promoter<=M=NN> recognition<=H=NN> )	promoter recognition	NN NN	promoter recognition	NN	termsPhB
+( gnt<=M=NN> operon<=H=NN> )	gnt operon	NN NN	gnt operon	NN	termsPhB
+( cell<=M=NN> cycle<=H=NN> )	cell cycle	NN NN	cell cycle	NN	termsPhB
+( site-directed<=M=JJ> mutagenesis<=H=NN> )	site-directed mutagenesis	JJ NN	site-directed mutagenesis	NN	termsPhB
+( wild-type<=M=JJ> strain<=H=NN> )	wild-type strain	JJ NN	wild-type strain	NN	termsPhB
+( early<=M=JJ> ( stationary<=M=JJ> phase<=H=NN> )<=H=NN> )	early stationary phase	JJ JJ NN	early stationary phase	NN	termsPhB
+( direct<=M=JJ> repeat<=H=NN> )	direct repeat	JJ NN	direct repeat	NN	termsPhB
+( spore<=M=JJ> coat<=H=NN> )	spore coat	JJ NN	spore coat	NN	termsPhB
+( regulatory<=M=JJ> factor<=H=NN> )	regulatory factor	JJ NN	regulatory factor	NN	termsPhB
+( exponential<=M=JJ> growth<=H=NN> )	exponential growth	JJ NN	exponential growth	NN	termsPhB
+( crystal<=M=JJ> protein<=H=NN> )	crystal protein	JJ NN	crystal protein	NN	termsPhB
+( presence<=H=NN> of glucose<=M=NN> )	presence of glucose	NN of NN	presence of glucose	NN	termsPhB
+( Lactococcus<=H=NNP> lactis<=M=NN> )	Lactococcus lactis	NNP NN	Lactococcus lactis	NNP	termsPhB
+( anti<=M=JJ> sigma<=H=NN> )	anti sigma	JJ NN	anti sigma	NN	termsPhB
+( phi<=H=NN> 29<=M=CD> )	phi 29	NN CD	phi 29	NN	termsPhB
+( DNA<=M=NN> complex<=H=NN> )	DNA complex	NN NN	DNA complex	NN	termsPhB
+( cold<=M=JJ> shock<=H=NN> )	cold shock	JJ NN	cold shock	NN	termsPhB
+( transition<=M=NN> state<=H=NN> )	transition state	NN NN	transition state	NN	termsPhB
+( product<=H=NN> of the<=DT> gene<=M=NN> )	product of the gene	NN of DT NN	product of the gene	NN	termsPhB
+( promoter<=M=NN> probe<=H=NN> )	promoter probe	NN NN	promoter probe	NN	termsPhB
+( sigma<=M=NN> subunit<=H=NN> )	sigma subunit	NN NN	sigma subunit	NN	termsPhB
+( upstream<=M=JJ> promoter<=H=NN> )	upstream promoter	JJ NN	upstream promoter	NN	termsPhB
+( sequence<=H=NN> of the<=DT> gene<=M=NN> )	sequence of the gene	NN of DT NN	sequence of the gene	NN	termsPhB
+( initiations<=H=NNS> of transcription<=M=NN> )	initiations of transcription	NNS of NN	initiation of transcription	NNS	termsPhB
+( pyr<=M=NN> operon<=H=NN> )	pyr operon	NN NN	pyr operon	NN	termsPhB
+( dnaK<=M=NN> operon<=H=NN> )	dnaK operon	NN NN	dnaK operon	NN	termsPhB
+( E<=M=NN> sigma<=H=NN> )	E sigma	NN NN	E sigma	NN	termsPhB
+( peptide<=M=NN> antibiotic<=H=NN> )	peptide antibiotic	NN NN	peptide antibiotic	NN	termsPhB
+( null<=M=JJ> mutation<=H=NN> )	null mutation	JJ NN	null mutation	NN	termsPhB
+( high<=M=JJ> temperature<=H=NN> )	high temperature	JJ NN	high temperature	NN	termsPhB
+( fatty<=M=JJ> acid<=H=NN> )	fatty acid	JJ NN	fatty acid	NN	termsPhB
+( analysis<=H=NN> of the<=DT> region<=M=NN> )	analysis of the region	NN of DT NN	analysis of the region	NN	termsPhB
+( rRNA<=M=NN> genes<=H=NNS> )	rRNA genes	NN NNS	rRNA gene	NNS	termsPhB
+( bacterial<=M=JJ> proteins<=H=NNS> )	bacterial proteins	JJ NNS	bacterial protein	NNS	termsPhB
+( significant<=M=JJ> similarity<=H=NN> )	significant similarity	JJ NN	significant similarity	NN	termsPhB
+( lower<=M=JJR> temperatures<=H=NNS> )	lower temperatures	JJR NNS	low temperature	NNS	termsPhB
+( previous<=M=JJ> studies<=H=NNS> )	previous studies	JJ NNS	previous study	NNS	termsPhB
+( acid<=M=NN> sequence<=H=NN> )	acid sequence	NN NN	acid sequence	NN	termsPhB
+( Streptomyces<=H=NNP> coelicolor<=M=NN> )	Streptomyces coelicolor	NNP NN	Streptomyce coelicolor	NNP	termsPhB
+( Bacillus<=H=NNP> stearothermophilus<=M=NN> )	Bacillus stearothermophilus	NNP NN	Bacillus stearothermophilus	NNP	termsPhB
+( upstream<=M=JJ> regions<=H=NNS> )	upstream regions	JJ NNS	upstream region	NNS	termsPhB
+( initiation<=M=NN> codon<=H=NN> )	initiation codon	NN NN	initiation codon	NN	termsPhB
+( gene<=M=NN> transcription<=H=NN> )	gene transcription	NN NN	gene transcription	NN	termsPhB
+( control<=H=NN> of the<=DT> promoter<=M=NN> )	control of the promoter	NN of DT NN	control of the promoter	NN	termsPhB
+( beta-galactosidase<=M=NN> activity<=H=NN> )	beta-galactosidase activity	NN NN	beta-galactosidase activity	NN	termsPhB
+( Transcriptional<=M=JJ> analysis<=H=NN> )	Transcriptional analysis	JJ NN	Transcriptional analysis	NN	termsPhB
+( structural<=M=JJ> genes<=H=NNS> )	structural genes	JJ NNS	structural gene	NNS	termsPhB
+( RNA<=M=NN> synthesis<=H=NN> )	RNA synthesis	NN NN	RNA synthesis	NN	termsPhB
+( protein<=M=NN> gene<=H=NN> )	protein gene	NN NN	protein gene	NN	termsPhB
+( polymerase<=M=NN> sigma<=H=NN> )	polymerase sigma	NN NN	polymerase sigma	NN	termsPhB
+( N<=M=NN> terminus<=H=NN> )	N terminus	NN NN	N terminus	NN	termsPhB
+( spo0A<=M=NN> gene<=H=NN> )	spo0A gene	NN NN	spo0A gene	NN	termsPhB
+( gene<=M=NN> expression<=H=NN> )	gene expression	NN NN	gene expression	NN	termsPhB
+( early<=M=JJ> phase<=H=NN> )	early phase	JJ NN	early phase	NN	termsPhB
+( trp<=M=NN> operon<=H=NN> )	trp operon	NN NN	trp operon	NN	termsPhB
+( gene<=H=NN> of an<=DT>  operon<=M=NN> )	gene of an operon	NN of DT NN	gene of an operon	NN	termsPhB
+( significant<=M=JJ> homology<=H=NN> )	significant homology	JJ NN	significant homology	NN	termsPhB
+( specific<=M=JJ> promoters<=H=NNS> )	specific promoters	JJ NNS	specific promoter	NNS	termsPhB
+( high<=M=JJ> concentrations<=H=NNS> )	high concentrations	JJ NNS	high concentration	NNS	termsPhB
+( amino<=M=JJ> acids<=H=NNS> )	amino acids	JJ NNS	amino acid	NNS	termsPhB
+( sequences<=H=NNS> of promoters<=M=NNS> )	sequences of promoters	NNS of NNS	sequence of promoter	NNS	termsPhB
+( DNA<=M=NN> replication<=H=NN> )	DNA replication	NN NN	DNA replication	NN	termsPhB
+( reading<=M=VBG> frame<=H=NN> )	reading frame	VBG NN	read frame	NN	termsPhB
+( attenuation<=M=NN> mechanism<=H=NN> )	attenuation mechanism	NN NN	attenuation mechanism	NN	termsPhB
+( form<=H=NN> of polymerase<=M=NN> )	form of polymerase	NN of NN	form of polymerase	NN	termsPhB
+( Gram-positive<=M=JJ> bacteria<=H=NNS> )	Gram-positive bacteria	JJ NNS	Gram-positive bacteria	NNS	termsPhB
+( positive<=M=JJ> regulator<=H=NN> )	positive regulator	JJ NN	positive regulator	NN	termsPhB
+( control<=M=NN> region<=H=NN> )	control region	NN NN	control region	NN	termsPhB
+( single<=M=JJ> copy<=H=NN> )	single copy	JJ NN	single copy	NN	termsPhB
+( deletion<=M=NN> mutations<=H=NNS> )	deletion mutations	NN NNS	deletion mutation	NNS	termsPhB
+( Listeria<=H=NNP> monocytogenes<=M=NN> )	Listeria monocytogenes	NNP NN	Listeria monocytogene	NNP	termsPhB
+( middle<=M=JJ> promoters<=H=NNS> )	middle promoters	JJ NNS	middle promoter	NNS	termsPhB
+( expression<=M=NN> system<=H=NN> )	expression system	NN NN	expression system	NN	termsPhB
+( expression<=H=NN> of genes<=M=NNS> )	expression of genes	NN of NNS	expression of gene	NN	termsPhB
+( wild<=M=JJ> type<=H=NN> )	wild type	JJ NN	wild type	NN	termsPhB
+( repeat<=M=NN> sequences<=H=NNS> )	repeat sequences	NN NNS	repeat sequence	NNS	termsPhB
+( Transcription<=M=NN> factor<=H=NN> )	Transcription factor	NN NN	Transcription factor	NN	termsPhB
+( PHO<=M=NN> regulon<=H=NN> )	PHO regulon	NN NN	PHO regulon	NN	termsPhB
+( transcription<=H=NN> of the<=DT> operons<=M=NNS> )	transcription of the operons	NN of DT NNS	transcription of the operon	NN	termsPhB
+( subunit<=H=NN> of polymerase<=M=NN> )	subunit of polymerase	NN of NN	subunit of polymerase	NN	termsPhB
+( cluster<=H=NN> of genes<=M=NNS> )	cluster of genes	NN of NNS	cluster of gene	NN	termsPhB
+( spo0H<=M=NN> gene<=H=NN> )	spo0H gene	NN NN	spo0H gene	NN	termsPhB
+( polymerase<=M=NN> core<=H=NN> )	polymerase core	NN NN	polymerase core	NN	termsPhB
+( restriction<=M=NN> fragments<=H=NNS> )	restriction fragments	NN NNS	restriction fragment	NNS	termsPhB
+( operator<=M=NN> site<=H=NN> )	operator site	NN NN	operator site	NN	termsPhB
+( family<=H=NN> of proteins<=M=NNS> )	family of proteins	NN of NNS	family of protein	NN	termsPhB
+( catabolite<=M=NN> repression<=H=NN> )	catabolite repression	NN NN	catabolite repression	NN	termsPhB
+( heat<=M=NN> shock<=H=NN> )	heat shock	NN NN	heat shock	NN	termsPhB
+( high<=M=JJ> level<=H=NN> )	high level	JJ NN	high level	NN	termsPhB
+( coding<=M=VBG> sequence<=H=NN> )	coding sequence	VBG NN	cod sequence	NN	termsPhB
+( effect<=H=NN> of the<=DT> mutation<=M=NN> )	effect of the mutation	NN of DT NN	effect of the mutation	NN	termsPhB
+( transcriptional<=M=JJ> level<=H=NN> )	transcriptional level	JJ NN	transcriptional level	NN	termsPhB
+( stationary<=M=JJ> phase<=H=NN> )	stationary phase	JJ NN	stationary phase	NN	termsPhB
+( protein<=M=NN> product<=H=NN> )	protein product	NN NN	protein product	NN	termsPhB
+( phase<=M=NN> cells<=H=NNS> )	phase cells	NN NNS	phase cell	NNS	termsPhB
+( molecular<=M=JJ> mass<=H=NN> )	molecular mass	JJ NN	molecular mass	NN	termsPhB
+( sequence<=M=NN> homology<=H=NN> )	sequence homology	NN NN	sequence homology	NN	termsPhB
+( high<=M=JJ> resolution<=H=NN> )	high resolution	JJ NN	high resolution	NN	termsPhB
+( phosphotransferase<=M=NN> system<=H=NN> )	phosphotransferase system	NN NN	phosphotransferase system	NN	termsPhB
+( gel<=M=NN> retardation<=H=NN> )	gel retardation	NN NN	gel retardation	NN	termsPhB
+( resistance<=M=NN> gene<=H=NN> )	resistance gene	NN NN	resistance gene	NN	termsPhB
+( stop<=M=NN> codon<=H=NN> )	stop codon	NN NN	stop codon	NN	termsPhB
+( stages<=H=NNS> of sporulation<=M=NN> )	stages of sporulation	NNS of NN	stage of sporulation	NNS	termsPhB
+( single<=M=JJ> substitutions<=H=NNS> )	single substitutions	JJ NNS	single substitution	NNS	termsPhB
+( glutamine<=M=NN> synthetase<=H=NN> )	glutamine synthetase	NN NN	glutamine synthetase	NN	termsPhB
+( codon<=M=NN> usage<=H=NN> )	codon usage	NN NN	codon usage	NN	termsPhB
+( Expression<=M=NN> levels<=H=NNS> )	Expression levels	NN NNS	Expression level	NNS	termsPhB
+( region<=H=NN> of the<=DT> gene<=M=NN> )	region of the gene	NN of DT NN	region of the gene	NN	termsPhB
+( regulatory<=M=JJ> gene<=H=NN> )	regulatory gene	JJ NN	regulatory gene	NN	termsPhB
+( leader<=M=NN> transcript<=H=NN> )	leader transcript	NN NN	leader transcript	NN	termsPhB
+( protein<=M=NN> synthesis<=H=NN> )	protein synthesis	NN NN	protein synthesis	NN	termsPhB
+( Repressor<=M=NN> protein<=H=NN> )	Repressor protein	NN NN	Repressor protein	NN	termsPhB
+( cell<=M=NN> division<=H=NN> )	cell division	NN NN	cell division	NN	termsPhB
+( dependent<=M=JJ> promoters<=H=NNS> )	dependent promoters	JJ NNS	dependent promoter	NNS	termsPhB
+( protein<=M=NN> kinase<=H=NN> )	protein kinase	NN NN	protein kinase	NN	termsPhB
+( gene<=M=NN> order<=H=NN> )	gene order	NN NN	gene order	NN	termsPhB
+( growing<=M=VBG> cells<=H=NNS> )	growing cells	VBG NNS	grow cell	NNS	termsPhB
+( lacZ<=M=NN> gene<=H=NN> )	lacZ gene	NN NN	lacZ gene	NN	termsPhB
+( glycine<=M=NN> betaine<=H=NN> )	glycine betaine	NN NN	glycine betaine	NN	termsPhB
+( specific<=M=JJ> factor<=H=NN> )	specific factor	JJ NN	specific factor	NN	termsPhB
+( lacZ<=M=NN> fusion<=H=NN> )	lacZ fusion	NN NN	lacZ fusion	NN	termsPhB
+( terminal<=M=JJ> domains<=H=NNS> )	terminal domains	JJ NNS	terminal domain	NNS	termsPhB
+( phage<=M=NN> DNA<=H=NN> )	phage DNA	NN NN	phage DNA	NN	termsPhB
+( sporulating<=M=VBG> cells<=H=NNS> )	sporulating cells	VBG NNS	sporulate cell	NNS	termsPhB
+( coat<=M=NN> protein<=H=NN> )	coat protein	NN NN	coat protein	NN	termsPhB
+( DNA<=M=NN> fragments<=H=NNS> )	DNA fragments	NN NNS	DNA fragment	NNS	termsPhB
+( Induction<=H=NN> of the<=DT> gene<=M=NN> )	Induction of the gene	NN of DT NN	Induction of the gene	NN	termsPhB
+( ribosome-binding<=M=JJ> site<=H=NN> )	ribosome-binding site	JJ NN	ribosome-binding site	NN	termsPhB
+( reporter<=M=NN> genes<=H=NNS> )	reporter genes	NN NNS	reporter gene	NNS	termsPhB
+( translation<=M=NN> start<=H=NN> )	translation start	NN NN	translation start	NN	termsPhB
+( DNA<=M=NN> segments<=H=NNS> )	DNA segments	NN NNS	DNA segment	NNS	termsPhB
+( stage<=H=NN> III<=M=CD> )	stage III	NN CD	stage III	NN	termsPhB
+( multicopy<=M=JJ> plasmid<=H=NN> )	multicopy plasmid	JJ NN	multicopy plasmid	NN	termsPhB
+( secondary<=M=JJ> structure<=H=NN> )	secondary structure	JJ NN	secondary structure	NN	termsPhB
+( mutant<=M=JJ> strain<=H=NN> )	mutant strain	JJ NN	mutant strain	NN	termsPhB
+( palindromic<=M=JJ> sequence<=H=NN> )	palindromic sequence	JJ NN	palindromic sequence	NN	termsPhB
+( general<=M=JJ> stress<=H=NN> )	general stress	JJ NN	general stress	NN	termsPhB
+( terminal<=M=JJ> region<=H=NN> )	terminal region	JJ NN	terminal region	NN	termsPhB
+( upstream<=M=JJ> sequences<=H=NNS> )	upstream sequences	JJ NNS	upstream sequence	NNS	termsPhB
+( transduction<=M=NN> pathway<=H=NN> )	transduction pathway	NN NN	transduction pathway	NN	termsPhB
+( initiation<=M=NN> sites<=H=NNS> )	initiation sites	NN NNS	initiation site	NNS	termsPhB
+( negative<=M=JJ> regulator<=H=NN> )	negative regulator	JJ NN	negative regulator	NN	termsPhB
+( sequence<=M=NN> identity<=H=NN> )	sequence identity	NN NN	sequence identity	NN	termsPhB
+( direct<=M=JJ> transcription<=H=NN> )	direct transcription	JJ NN	direct transcription	NN	termsPhB
+( gene<=M=NN> fusion<=H=NN> )	gene fusion	NN NN	gene fusion	NN	termsPhB
+( Bacillus<=H=NNP> licheniformis<=M=NN> )	Bacillus licheniformis	NNP NN	Bacillus licheniformis	NNP	termsPhB
+( carbon<=M=NN> source<=H=NN> )	carbon source	NN NN	carbon source	NN	termsPhB
+( Staphylococcus<=H=NNP> aureus<=M=NN> )	Staphylococcus aureus	NNP NN	Staphylococcus aureus	NNP	termsPhB
+( transcriptional<=M=JJ> activity<=H=NN> )	transcriptional activity	JJ NN	transcriptional activity	NN	termsPhB
+( activation<=H=NN> of the<=DT> promoter<=M=NN> )	activation of the promoter	NN of DT NN	activation of the promoter	NN	termsPhB
+( coding<=M=VBG> regions<=H=NNS> )	coding regions	VBG NNS	cod region	NNS	termsPhB
+( asymmetric<=M=JJ> division<=H=NN> )	asymmetric division	JJ NN	asymmetric division	NN	termsPhB
+( leader<=M=NN> sequence<=H=NN> )	leader sequence	NN NN	leader sequence	NN	termsPhB
+( regulation<=H=NN> of expression<=M=NN> )	regulation of expression	NN of NN	regulation of expression	NN	termsPhB
+( transcriptional<=M=JJ> attenuation<=H=NN> )	transcriptional attenuation	JJ NN	transcriptional attenuation	NN	termsPhB
+( cell<=M=NN> wall<=H=NN> )	cell wall	NN NN	cell wall	NN	termsPhB
+( genes<=H=NNS> of ( Bacillus<=H=NNP> subtilis<=M=NN> )<=M=NNP> )	genes of Bacillus subtilis	NNS of NNP NN	gene of Bacillus subtilis	NNS	termsPhB
+( vegetative<=M=JJ> growth<=H=NN> )	vegetative growth	JJ NN	vegetative growth	NN	termsPhB
+( negative<=M=JJ> regulation<=H=NN> )	negative regulation	JJ NN	negative regulation	NN	termsPhB
+( genetic<=M=JJ> map<=H=NN> )	genetic map	JJ NN	genetic map	NN	termsPhB
+( Deletion<=M=NN> analysis<=H=NN> )	Deletion analysis	NN NN	Deletion analysis	NN	termsPhB
+( overlapping<=M=VBG> promoters<=H=NNS> )	overlapping promoters	VBG NNS	overlap promoter	NNS	termsPhB
+( transcriptional<=M=JJ> start<=H=NN> )	transcriptional start	JJ NN	transcriptional start	NN	termsPhB
+( SPO1<=M=NN> DNA<=H=NN> )	SPO1 DNA	NN NN	SPO1 DNA	NN	termsPhB
+( log<=M=NN> phase<=H=NN> )	log phase	NN NN	log phase	NN	termsPhB
+( alpha-amylase<=M=NN> gene<=H=NN> )	alpha-amylase gene	NN NN	alpha-amylase gene	NN	termsPhB
+( leader<=M=NN> peptide<=H=NN> )	leader peptide	NN NN	leader peptide	NN	termsPhB
+( recognition<=M=NN> sequences<=H=NNS> )	recognition sequences	NN NNS	recognition sequence	NNS	termsPhB
+( Escherichia<=H=NNP> coli<=M=NN> )	Escherichia coli	NNP NN	Escherichia coli	NNP	termsPhB
+( histidine<=M=NN> kinase<=H=NN> )	histidine kinase	NN NN	histidine kinase	NN	termsPhB
+( signal<=M=NN> sequence<=H=NN> )	signal sequence	NN NN	signal sequence	NN	termsPhB
+( gene<=M=NN> cluster<=H=NN> )	gene cluster	NN NN	gene cluster	NN	termsPhB
+( wild-type<=M=JJ> cells<=H=NNS> )	wild-type cells	JJ NNS	wild-type cell	NNS	termsPhB
+( Barbie<=M=NN> box<=H=NN> )	Barbie box	NN NN	Barbie box	NN	termsPhB
+( RNA<=M=NN> polymerases<=H=NNS> )	RNA polymerases	NN NNS	RNA polymeras	NNS	termsPhB
+( spore<=M=JJ> proteins<=H=NNS> )	spore proteins	JJ NNS	spore protein	NNS	termsPhB
+( early<=M=JJ> promoters<=H=NNS> )	early promoters	JJ NNS	early promoter	NNS	termsPhB
+( point<=M=NN> mutations<=H=NNS> )	point mutations	NN NNS	point mutation	NNS	termsPhB
+( DNA<=M=NN> polymerase<=H=NN> )	DNA polymerase	NN NN	DNA polymerase	NN	termsPhB
+( expression<=H=NN> of the<=DT> fusion<=M=NN> )	expression of the fusion	NN of DT NN	expression of the fusion	NN	termsPhB
+( base<=M=NN> substitutions<=H=NNS> )	base substitutions	NN NNS	base substitution	NNS	termsPhB
+( transcription<=M=NN> start<=H=NN> )	transcription start	NN NN	transcription start	NN	termsPhB
+( inducible<=M=JJ> expression<=H=NN> )	inducible expression	JJ NN	inducible expression	NN	termsPhB
+( specific<=M=JJ> genes<=H=NNS> )	specific genes	JJ NNS	specific gene	NNS	termsPhB
+( nitrogen<=M=NN> sources<=H=NNS> )	nitrogen sources	NN NNS	nitrogen source	NNS	termsPhB
+( transcription<=M=NN> units<=H=NNS> )	transcription units	NN NNS	transcription unit	NNS	termsPhB
+( gene<=M=NN> product<=H=NN> )	gene product	NN NN	gene product	NN	termsPhB
+( vegetative<=M=JJ> cells<=H=NNS> )	vegetative cells	JJ NNS	vegetative cell	NNS	termsPhB
+( signal<=M=NN> peptide<=H=NN> )	signal peptide	NN NN	signal peptide	NN	termsPhB
+( B.<=H=NNP> megaterium<=M=NN> )	B. megaterium	NNP NN	B. megaterium	NNP	termsPhB
+( CAT<=M=NN> gene<=H=NN> )	CAT gene	NN NN	CAT gene	NN	termsPhB
+( binding<=M=VBG> site<=H=NN> )	binding site	VBG NN	bind site	NN	termsPhB
+( S1<=M=NN> nuclease<=H=NN> )	S1 nuclease	NN NN	S1 nuclease	NN	termsPhB
+( promoter<=M=NN> activities<=H=NNS> )	promoter activities	NN NNS	promoter activity	NNS	termsPhB
+( cell<=M=NN> growth<=H=NN> )	cell growth	NN NN	cell growth	NN	termsPhB
+( protein<=M=NN> sequence<=H=NN> )	protein sequence	NN NN	protein sequence	NN	termsPhB
+( rich<=M=JJ> medium<=H=NN> )	rich medium	JJ NN	rich medium	NN	termsPhB
+( gel<=M=NN> shift<=H=NN> )	gel shift	NN NN	gel shift	NN	termsPhB
+( sequence<=M=NN> similarities<=H=NNS> )	sequence similarities	NN NNS	sequence similarity	NNS	termsPhB
+( complex<=M=NN> formation<=H=NN> )	complex formation	NN NN	complex formation	NN	termsPhB
+( Bacillus<=H=NNP> anthracis<=M=NN> )	Bacillus anthracis	NNP NN	Bacillus anthracis	NNP	termsPhB
+( endospore<=M=NN> formation<=H=NN> )	endospore formation	NN NN	endospore formation	NN	termsPhB
+( soluble<=M=JJ> proteins<=H=NNS> )	soluble proteins	JJ NNS	soluble protein	NNS	termsPhB
+( DNA<=M=NN> sequences<=H=NNS> )	DNA sequences	NN NNS	DNA sequence	NNS	termsPhB
+( transcriptional<=M=JJ> unit<=H=NN> )	transcriptional unit	JJ NN	transcriptional unit	NN	termsPhB
+( mutant<=M=JJ> cells<=H=NNS> )	mutant cells	JJ NNS	mutant cell	NNS	termsPhB
+( attenuation<=M=NN> protein<=H=NN> )	attenuation protein	NN NN	attenuation protein	NN	termsPhB
+( promoter<=M=NN> regions<=H=NNS> )	promoter regions	NN NNS	promoter region	NNS	termsPhB
+( phage<=M=NN> phi<=H=NN> )	phage phi	NN NN	phage phi	NN	termsPhB
+( chromosomal<=M=JJ> DNA<=H=NN> )	chromosomal DNA	JJ NN	chromosomal DNA	NN	termsPhB
+( early<=M=JJ> sporulation<=H=NN> )	early sporulation	JJ NN	early sporulation	NN	termsPhB
+( factor<=M=NN> sigma<=H=NN> )	factor sigma	NN NN	factor sigma	NN	termsPhB
+( growth<=M=NN> conditions<=H=NNS> )	growth conditions	NN NNS	growth condition	NNS	termsPhB
+( sporulation<=M=NN> defect<=H=NN> )	sporulation defect	NN NN	sporulation defect	NN	termsPhB
+( vegetative<=M=JJ> promoter<=H=NN> )	vegetative promoter	JJ NN	vegetative promoter	NN	termsPhB
+( initiation<=H=NN> of sporulation<=M=NN> )	initiation of sporulation	NN of NN	initiation of sporulation	NN	termsPhB
+( termination<=M=NN> site<=H=NN> )	termination site	NN NN	termination site	NN	termsPhB
+( oxidative<=M=JJ> stress<=H=NN> )	oxidative stress	JJ NN	oxidative stress	NN	termsPhB
+( tRNA<=M=NN> genes<=H=NNS> )	tRNA genes	NN NNS	tRNA gene	NNS	termsPhB
+( expression<=H=NN> of the<=DT> operon<=M=NN> )	expression of the operon	NN of DT NN	expression of the operon	NN	termsPhB
+( onset<=H=NN> of the<=DT> phase<=M=NN> )	onset of the phase	NN of DT NN	onset of the phase	NN	termsPhB
+( dyad<=M=JJ> symmetry<=H=NN> )	dyad symmetry	JJ NN	dyad symmetry	NN	termsPhB
+( E.<=H=NNP> coli<=M=NN> )	E. coli	NNP NN	E. coli	NNP	termsPhB
+( binding<=M=VBG> protein<=H=NN> )	binding protein	VBG NN	bind protein	NN	termsPhB
+( missense<=M=JJ> mutations<=H=NNS> )	missense mutations	JJ NNS	missense mutation	NNS	termsPhB
+( nucleotide<=M=NN> sequence<=H=NN> )	nucleotide sequence	NN NN	nucleotide sequence	NN	termsPhB
+( tRNA<=M=NN> synthetase<=H=NN> )	tRNA synthetase	NN NN	tRNA synthetase	NN	termsPhB
+( RNA<=M=NN> binding<=H=NN> )	RNA binding	NN NN	RNA binding	NN	termsPhB
+( transcriptional<=M=JJ> regulator<=H=NN> )	transcriptional regulator	JJ NN	transcriptional regulator	NN	termsPhB
+( protein<=M=NN> interaction<=H=NN> )	protein interaction	NN NN	protein interaction	NN	termsPhB
+( competence<=M=NN> genes<=H=NNS> )	competence genes	NN NNS	competence gene	NNS	termsPhB
+( A3<=M=NN> promoter<=H=NN> )	A3 promoter	NN NN	A3 promoter	NN	termsPhB
+( glucose<=M=NN> repression<=H=NN> )	glucose repression	NN NN	glucose repression	NN	termsPhB
+( region<=H=NN> of the<=DT> chromosome<=M=NN> )	region of the chromosome	NN of DT NN	region of the chromosome	NN	termsPhB
+( molecular<=M=JJ> weight<=H=NN> )	molecular weight	JJ NN	molecular weight	NN	termsPhB
+( alkaline<=M=NN> phosphatase<=H=NN> )	alkaline phosphatase	NN NN	alkaline phosphatase	NN	termsPhB
+( stage<=H=NN> II<=M=CD> )	stage II	NN CD	stage II	NN	termsPhB
+( specific<=M=JJ> proteins<=H=NNS> )	specific proteins	JJ NNS	specific protein	NNS	termsPhB
+( RNA<=M=NN> polymerase<=H=NN> )	RNA polymerase	NN NN	RNA polymerase	NN	termsPhB
+( abrB<=M=NN> gene<=H=NN> )	abrB gene	NN NN	abrB gene	NN	termsPhB
+( Bacillus<=H=NNP> megaterium<=M=NN> )	Bacillus megaterium	NNP NN	Bacillus megaterium	NNP	termsPhB
+( gel<=M=NN> electrophoresis<=H=NN> )	gel electrophoresis	NN NN	gel electrophoresis	NN	termsPhB
+( membrane<=M=NN> protein<=H=NN> )	membrane protein	NN NN	membrane protein	NN	termsPhB

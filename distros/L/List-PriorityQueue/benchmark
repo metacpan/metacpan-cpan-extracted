@@ -1,0 +1,191 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use lib 'lib';
+use POE::Queue::Array;
+use List::PriorityQueue;
+use Heap::Priority;
+use Time::HiRes qw(time);
+
+$| = 1;
+
+# prepare the dataset (equal for all contestants, of course)
+#     ins: entries to be inserted during insert run
+#     upd: entries to be updated
+#     del: entries to be deleted
+#    pdis: distribution of priorities during insert and update
+# just play with these parameters. I mean, really do, if you don't trust me.
+# basically, the only one that will actually have an outcome on the results
+# is pdis: the higher you set it, the more Heap::Priority sucks.
+# but setting all numbers relatively high, one can easily spot each
+# implementation's bottlenecks.
+print "Generating dataset... ";
+my ($p_ins, $p_upd, $p_del, $p_pdis) = (50000, 5000, 1000, 100);
+my @dataset_insert;
+for (0..($p_ins - 1)) {
+	push(@dataset_insert, [ "data_$_", int(rand($p_pdis)) ]);
+}
+my @dataset_update;
+for (0..($p_upd - 1)) {
+	push(@dataset_update, [ "data_" . int(rand($p_ins)), int(rand($p_pdis)) ]);
+}
+my @dataset_delete;
+for (0..($p_del - 1)) {
+	my $try;
+	do {
+		$try = "data_" . int(rand($p_ins));
+	} while (grep { $_ eq $try } @dataset_delete);
+	push(@dataset_delete, $try);
+}
+
+print "done\n";
+
+# timing functions
+sub td_reset { $main::x____total = 0; }
+sub td_start { $main::x____time = time(); }
+sub td_end   { return time() - $main::x____time; }
+sub td_stat  { my $td = td_end(); printf("%40s: %7.3fs\n", $_[0], $td); $main::x____total += $td; }
+sub td_tstat { printf("%40s: %7.3fs\n\n", "-- TOTAL --", $main::x____total); }
+
+# ############################################################################
+
+# POE::Queue::Array
+# Notes:
+# - locally store a payload => POE ID mapping to save it from doing searches
+#   IMHO a legitimate and simple optimization.
+print "Testing: POE::Queue::Array\n";
+my $t_pqa = new POE::Queue::Array;
+my %d_pqa;
+
+td_reset();
+td_start();
+foreach (@dataset_insert) {
+	$d_pqa{$_->[0]} = $t_pqa->enqueue($_->[1], $_->[0]);
+}
+td_stat("Insert");
+
+td_start();
+foreach (@dataset_update) {
+	$d_pqa{$_->[0]} = $t_pqa->set_priority($d_pqa{$_->[0]}, sub { 1 }, $_->[1]);
+}
+td_stat("Update");
+
+td_start();
+foreach (@dataset_delete) {
+	$t_pqa->remove_item($d_pqa{$_}, sub { 1 });
+}
+td_stat("Delete");
+
+td_start();
+while (1) {
+	my ($priority, $id, $payload) = $t_pqa->dequeue_next();
+	last if (!defined($priority));
+}
+td_stat("Pop");
+
+td_tstat();
+
+# Heap::Priority
+# Notes:
+# - Thiis module doesn't state it features an efficient update routine.
+# - TODO: Cache priority levels like for PQA.
+print "Testing: Heap::Priority\n";
+my $t_hp = new Heap::Priority;
+$t_hp->lowest_first();
+
+td_reset();
+td_start();
+foreach (@dataset_insert) {
+	$t_hp->add($_->[0], $_->[1]);
+}
+td_stat("Insert");
+
+td_start();
+foreach (@dataset_update) {
+	$t_hp->modify_priority($_->[0], $_->[1]);
+	# ^^^^ Could replace this with delete on specific level followed by add
+	# (because with specific level we would limit the search to one level.)
+}
+td_stat("Update");
+
+td_start();
+foreach (@dataset_delete) {
+	$t_hp->delete_item($_);
+}
+td_stat("Delete");
+
+td_start();
+while (1) {
+	my ($payload) = $t_hp->pop();
+	last if (!defined($payload));
+}
+td_stat("Pop");
+
+td_tstat();
+
+# List::PriorityQueue
+# Notes:
+# - Own module, might be cheating here.
+print "Testing List::PriorityQueue using safe functions\n";
+my $t_lpq = new List::PriorityQueue;
+
+td_reset();
+td_start();
+foreach (@dataset_insert) {
+	$t_lpq->insert($_->[0], $_->[1]);
+}
+td_stat("Insert");
+
+td_start();
+foreach (@dataset_update) {
+	$t_lpq->update($_->[0], $_->[1]);
+}
+td_stat("Update");
+
+td_start();
+foreach (@dataset_delete) {
+	$t_lpq->delete($_);
+}
+td_stat("Delete");
+
+td_start();
+while (1) {
+	my ($payload) = $t_lpq->pop();
+	last if (!defined($payload));
+}
+td_stat("Pop");
+
+td_tstat();
+
+# List::PriorityQueue using the unchecked functions
+print "Testing List::PriorityQueue with unchecked functions\n";
+my $t_lpq2 = new List::PriorityQueue;
+
+td_reset();
+td_start();
+foreach (@dataset_insert) {
+	$t_lpq2->unchecked_insert($_->[0], $_->[1]);
+}
+td_stat("Insert");
+
+td_start();
+foreach (@dataset_update) {
+	$t_lpq2->unchecked_update($_->[0], $_->[1]);
+}
+td_stat("Update");
+
+td_start();
+foreach (@dataset_delete) {
+	$t_lpq2->delete($_);
+}
+td_stat("Delete");
+
+td_start();
+while (1) {
+	my ($payload) = $t_lpq2->pop();
+	last if (!defined($payload));
+}
+td_stat("Pop");
+
+td_tstat();

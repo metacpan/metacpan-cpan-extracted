@@ -1,0 +1,20 @@
+name: foo
+base: lcfg
+abstract: An lcfg component to manage the foo daemon
+version: 1.0.0
+release: 1
+schema: 1
+group: LCFG/System
+author:
+  - Stephen Quinney <squinney@inf.ed.ac.uk>
+vendor: University of Edinburgh
+license: GPL
+platforms:
+  - Fedora5
+  - Fedora6
+  - ScientificLinux5
+vcs:
+  type: CVS
+  checkcommitted: 1
+  genchangelog: 0
+date: 02/20/08 12:12:27

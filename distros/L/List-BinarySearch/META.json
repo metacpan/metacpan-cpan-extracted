@@ -1,0 +1,66 @@
+{
+   "abstract" : "Binary Search within a sorted array.",
+   "author" : [
+      "David Oswald <davido [@at] cpan [d.o.t] org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "List-BinarySearch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "English" : "0",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "List::BinarySearch::XS" : "0.06"
+         },
+         "requires" : {
+            "Scalar::Util" : "0",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "provides" : {
+      "List::BinarySearch" : {
+         "file" : "lib/List/BinarySearch.pm",
+         "version" : "0.25"
+      },
+      "List::BinarySearch::PP" : {
+         "file" : "lib/List/BinarySearch/PP.pm",
+         "version" : "0.25"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/daoswald/List-BinarySearch/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/daoswald/List-BinarySearch.git",
+         "web" : "https://github.com/daoswald/List-BinarySearch"
+      }
+   },
+   "version" : "0.25"
+}

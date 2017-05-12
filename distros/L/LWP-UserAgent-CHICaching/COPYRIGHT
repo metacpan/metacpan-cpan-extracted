@@ -1,0 +1,63 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: LWP-UserAgent-CHICaching
+Upstream-Contact: Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+Source: https://metacpan.org/release/LWP-UserAgent-CHICaching
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ t/maxage.t
+ t/vary.t
+Copyright: Copyright 2016 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/LWP/UserAgent/CHICaching.pm
+ lib/LWP/UserAgent/Role/CHICaching.pm
+ lib/LWP/UserAgent/Role/CHICaching/SimpleKeyGen.pm
+ lib/LWP/UserAgent/Role/CHICaching/VaryNotAsterisk.pm
+Copyright: This software is copyright (c) 2015, 2016 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: t/01basic.t
+Copyright: This software is copyright (c) 2014 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README.pod
+Copyright: This software is copyright (c) 2015 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/LWP/UserAgent/Role/CHICaching/SimpleMungeResponse.pm
+Copyright: This software is copyright (c) 2016 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2016 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2016 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

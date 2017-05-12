@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# USAGE: tiger2penn tiger.xml
+#
+#
+
+use strict;
+use FindBin;
+use lib $FindBin::Bin.'/../lib';
+use Lingua::Align::Corpus::Parallel::STA;
+use Lingua::Align::Corpus::Treebank::Penn;
+
+my $file = shift(@ARGV);
+
+my $tiger=new Lingua::Align::Corpus::Treebank::TigerXML(-file => $file);
+my $penn=new Lingua::Align::Corpus::Treebank::Penn;
+
+my %tree=();
+
+while ($tiger->next_sentence(\%tree)){
+    print $penn->print_tree(\%tree);
+    print "\n";
+}
+

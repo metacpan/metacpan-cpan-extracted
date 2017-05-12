@@ -1,0 +1,49 @@
+
+              =================================================
+                        -=* Lingua::AM::Abbreviate *=-
+                Tools for working with Ethiopic text in Perl
+                           -----------------------
+
+
+
+README file for Lingua-AM-Abbreviate distribution:
+
+
+	Module Lingua::AM::Abbreviate:
+
+		AM::Abbreviate provides two routines, "Expand" and "Contract".
+		Each routine expects an Amharic string in UTF8 encoding as an argument
+		and returns an expansion or contraction if found.
+
+	bin/test.pl:
+
+		is provided for testing by visual inspection of the output.  A UTF8
+		console with an Ethiopic font is required.  This script will be
+		enhanced in a future release.
+
+To Do:
+
+	1)  Obviously add more abbreviations.
+	2)  Add some additional stemming intelligence to cut off plural, possessive
+		and definite articles from terms.
+	3)  Use two hash tables for the terms on both sides of "/", this should
+		provide greater flexibility and reduce the size of the hash tables
+		overall.
+	4)  Allow "/" to also be ".";
+	5)  Find a way to reverse hashing to speed up Expand.
+
+Installation:
+	Download the tar.gz, unpack it, change to the Lingua-AM-Abbreviate-*
+	directory. Then do
+
+		perl Makefile.PL
+		make
+		make install
+
+Available:
+	ftp://ftp.cs.indiana.edu/pub/fidel/perl-unicode/ and from your
+	favorite CPAN site in the authors/id/D/DY/DYACOB/ directory.
+	
+Copyright: (c) 1999 Daniel Yacob, dmulholl@cs.indiana.edu. All rights
+	reserved. This library is free software; you can redistribute
+	it and/or modify it under the same terms as Perl itself.

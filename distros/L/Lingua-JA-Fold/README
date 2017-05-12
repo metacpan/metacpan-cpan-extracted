@@ -1,0 +1,30 @@
+Lingua/JA/Fold version 0.08
+===========================
+
+ This module is used folding a Japanese text.
+
+INSTALLATION
+
+ To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ This module requires perl5.8 or later.
+ And,
+ this module requires these other modules and libraries:
+
+   Exporter
+   Encode
+   Carp
+
+COPYRIGHT AND LICENCE
+
+ Copyright ©2003-2008 Masanori HATA. All rights reserved.
+
+ This library is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

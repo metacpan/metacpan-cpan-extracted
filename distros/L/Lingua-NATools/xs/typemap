@@ -1,0 +1,20 @@
+TYPEMAP
+wchar_t *                   T_WCHAR
+const wchar_t *             T_WCHAR
+
+INPUT
+T_WCHAR
+    $var = SvToWChar($arg);
+    SAVEFREEPV($var);
+
+OUTPUT
+T_WCHAR
+        {
+          wchar_t* src;
+          if (!$var)
+            XSRETURN_UNDEF;
+          src = (wchar_t*) $var;
+          WCharToSv(src, (SV*)$arg);
+        }
+
+

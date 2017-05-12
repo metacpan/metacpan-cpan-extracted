@@ -1,0 +1,26 @@
+#!/usr/bin/perl -I lib
+use strict;
+use warnings;
+use Log::Dispatch;
+use Log::Dispatch::Desktop::Notify;
+
+my $log = Log::Dispatch->new();
+
+print "BAZ\n";
+
+eval { Log::Dispatch::Desktop::Notify->new(min_level => 'info'); };
+
+print "$?\n";
+
+print "BAM\n";
+
+$log->add(Log::Dispatch::Desktop::Notify->new(
+	      name => 'screen',
+	      min_level => 'info',
+	  ));
+
+print "FOO\n";
+
+$log->log( level => 'info', message => "Blah, blah\n" );
+
+print "BAR\n";

@@ -1,0 +1,17 @@
+Source: liblinux-pipemagic-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7), libfile-slurp-perl, perl
+Maintainer: Dave Lambley <davel@state51.co.uk>
+Standards-Version: 3.8.3
+Homepage: http://search.cpan.org/dist/Linux-PipeMagic/
+
+Package: liblinux-pipemagic-perl
+Architecture: any
+Depends: ${perl:Depends}, ${shlibs:Depends}, ${misc:Depends}
+Description: Perl extension to use the zero copy IO syscalls
+ Linux::PipeMagic is a Perl XS wrapper around the splice(2) and tee(2)
+ syscalls. You can use them to efficiently data from one file descriptor to
+ another inside the kernel (splice), or to efficiently copy data from one pipe
+ to another (tee).
+ .

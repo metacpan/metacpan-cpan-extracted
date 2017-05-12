@@ -1,0 +1,35 @@
+\documentclass{article}
+\begin{document}
+\section{Testing Verbatim}
+Normal {\bf Bold} stuff.
+
+Verbatim 1:
+\begin{verbatim}
+AbNormal {\bf NonBold} stuff.
+\end{verbatim}
+
+Verbatim 2:
+\begin{verbatim}
+inside verbatim
+\end {verbatim}
+still inside verbatim
+\end{verbatim}
+
+Verbatim 3:
+\begin{verbatim} keep this
+AbNormal {\bf NonBold} stuff.
+keep this too    \end{verbatim} yyy
+More Normal {\bf Bold} stuff.
+
+% NOT allowed
+%\section{Inline \verb|\verb| verbatim.}
+
+Some inline \verb|\verb| verbatim.
+
+% But this IS allowed!
+\hbox{More inline \verb|\verb| verbatim.}
+
+% and this:
+x\hbox to 2in  {\bf x\verb|\verb|y.}y
+
+\end{document}

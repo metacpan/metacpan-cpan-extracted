@@ -1,0 +1,67 @@
+Revision history for Perl extension Log::Procmail.
+
+0.12 Thu Jan  3 2012
+        - fixed an =encoding POD directive
+
+0.11 Tue Nov 15 19:10:26 CET 2005
+        - moved all the documentation at the end of the module and script
+        - added a Build.PL script
+        - Enrico Sorcinelli (bepi) sent me a log file that
+          Log::Procmail couldn't parse correctly. It does now.
+        - mailstat.pl works like mailstat(1) when given an empty file
+          (except for the shell error message)
+
+0.10  Mon Mar 28 16:22:51 CEST 2005
+        - added META.yml and made t/01pod.t be seen by CPANTS
+        - this is only a kwalitee-raising release, move along, nothing to see
+
+0.09  Wed Jan 19 01:42:16 CET 2005
+        - backport to perl 5.005 (Thanks to Mathieu Arnold)
+        - can_read() does not work for files on Win32,
+          so select() now returns undef on those systems
+
+0.08  Mon Apr 26 14:55:41 CEST 2004
+        - the fh() method returns a filehandle to the currently opened
+          log file
+        - the select() method returns a IO::Select object watching the
+          current fh()
+        - example script from Ian Langworth (thanks!)
+
+0.07  Mon Apr 26 00:31:58 CEST 2004
+        - support From addresses with spaces inside (darn spammers)
+        - moved all files to lib/ and scripts, so as to avoid installing
+          mailstat.pl in the same directory as Procmail.pm
+
+0.06  Sun Apr 18 02:12:06 CEST 2004
+        - fully use Test::More for the test suite
+        - removed AUTOLOADed methods in Log::Procmail::Abstract
+        - Return incomplete log lines when some fields are missing
+          or lines are mixed up
+        - ymd() returns undef when the date field is not good
+        - source() returns the log file name or stringified handle
+        - a new test suite to compare mailstat.pl and mailstat
+
+0.05  Sat Jan 11 18:29:33 CET 2003
+        - changed the sort order in mailstat.pl
+        - few cosmetic changes
+        - lots of thanks
+
+0.04  Fri Jul 26 15:58:15 CEST 2002
+        - better handling of the mix of tabs and spaces in procmail logs
+        - errors() allows the return of unrecognized lines (errors)
+        - added a working mailstat.pl script
+        - ymd() croaks if used to modify the date
+
+0.03  Thu Jul 25 16:34:35 CEST 2002
+        - new ymd() method, that return dates that are easy to sort
+        - Corrected a slight bug when using isa() on a string that
+          doesn't start by a letter (e.g. an absolute filename)
+
+0.02  Fri Feb 22 23:38:11 CET 2002
+        - the Log::Procmail object can now read from filehandles
+          (like \*STDIN) or IO::Handle objects.
+
+0.01  Sun Feb  3 15:02:16 CET 2002
+        - original version; created by h2xs 1.20 with options
+        -AX -n Log::Procmail
+

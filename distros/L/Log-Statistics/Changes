@@ -1,0 +1,211 @@
+0.051 Sun Oct 25, 2009  2:53 pm
+    - moved scripts/ to bin/ and conf/ for Dist::Zilla
+    - correct minor perl critic violation in log_tail_mirror.pl
+
+0.050
+    - implemented a few perl best practices perl Test::Perl::Critic
+    - added flag to print entries with null values
+    - file globbing for local files
+    - added prefilter command for local equivalent of ssh-prefilter
+    - use Dist::Zilla
+
+0.47 2006-03-28 17:23:30 -0600 (Tue, 28 Mar 2006)
+    - organized documentation about command line options
+
+0.45 2006-03-28 01:58:26 -0600 (Tue, 28 Mar 2006)
+    - report failure returned from log viewing program
+    - such failures are non-fatal, e.g. a specified file might not exist on all servers
+
+0.44 2006-03-27 20:40:02 -0600 (Mon, 27 Mar 2006)
+    - eliminate log4j resurrect from logstatsd
+    - warn if report mode and no logfiles specified
+    - added some extra debugging
+    - docs for ssh-prefilter option
+
+0.42 2006-02-25 04:29:36 -0600 (Sat, 25 Feb 2006)
+
+    - added "-all" flag for backward compatibility
+    - tweaked docs a bit
+    - piloting an ssh pre-filter to run on target server
+    - allow specifying an alternate ssh command, e.g. fsh
+
+0.41 2006-02-23 16:04:00 -0600 (Thu, 23 Feb 2006)
+    - migrate xml export from logstatsd to Log::Statistics
+    - use XML::Writer instead of hacking workarounds for XML::Simple issues
+    - test cases for xml exports
+    - error handling to prevent fields from being defined with dashes
+    - recursive group handling for xml export
+        - should handle any number of groups - previously limited to 3
+    - renamed "-all" flag to "-report" - much less confusing
+        - updated examples and wording of explanations
+    - documented --servers flag
+
+0.40 2006-02-23 16:00:02 -0600 (Thu, 23 Feb 2006)
+    - fixed bug where duration is 0
+        - previously threshold must be exceeded, now thresholds are inclusive, example:
+            - thresholds are 1, 2, and 3
+            - response time is exactly 2
+            - category is now "2-3 seconds"
+        - fixed broken test case to fit new logic
+    - die when section not in config file if both config file and section defined
+    - update doc urls to point to new location on geekfarm
+
+0.36 2006-02-14 00:21:31 -0600 (Tue, 14 Feb 2006)
+    - prototyping offline reporting across multiple servers
+
+0.35 2006-02-14 00:19:16 -0600 (Tue, 14 Feb 2006)
+    - added some fu for offline reporting - still prototyping
+    - fixed a bug when duration field is the first field in the log
+
+0.32  Mon Jan 30, 2006  4:10 pm
+    - added dependency for Log::Log4perl 0.51
+    - old version on a box i was testing on did not support :resurrect
+
+0.30  Mon Jan 30, 2006 11:34 am
+    - removing default requirement for perl 5.8.6
+
+0.29  Sun Jan 29, 2006 11:35 pm
+    - lots of little documentation tweaks
+
+0.25  2006-01-29 17:31:30 -0600 (Sun, 29 Jan 2006)
+    - document limitations of rrd handling and groups display
+    - updated Changes file based on svn history
+
+0.23  2006-01-29 15:31:42 -0600 (Sun, 29 Jan 2006)
+    - a little more cleanup of the docs before uploading to CPAN
+
+0.21  2006-01-29 15:11:12 -0600 (Sun, 29 Jan 2006)
+    - calculate average duration in xml output
+
+0.20  2006-01-29 14:01:29 -0600 (Sun, 29 Jan 2006)
+    - updating README
+    - fixing up DEPENDENCIES
+    - updating config file example in logstatsd POD
+
+0.19  2006-01-29 13:48:27 -0600 (Sun, 29 Jan 2006)
+    - adding tests for Test::Pod and Pod::Coverage
+    - updated DEPENDENCIES in POD
+    - Makefile only requires Log::Statstics dependencies
+
+0.18  2006-01-29 12:47:15 -0600 (Sun, 29 Jan 2006)
+    - renamed "cross-references" and "xrefs" to "groups"
+
+0.16  2006-01-28 20:53:50 -0600 (Sat, 28 Jan 2006)
+    - completing rename from Log::Summary to Log::Statistics
+
+0.15  2006-01-28 20:52:28 -0600 (Sat, 28 Jan 2006)
+    - renaming to Log::Statistics after some browsing on CPAN
+
+0.13  2006-01-27 20:00:07 -0600 (Fri, 27 Jan 2006) 
+    - finally started to add some docs to Summary.pm
+    - moved creation of RRD into logstatsd
+    - don't re-create RRD file if it already exists
+    - start time is based on first time entry in db
+    - rrd db info is all stored in the config file
+
+0.10  2006-01-26 12:29:20 -0600 (Thu, 26 Jan 2006)
+    - added a script to create the rrd dbs.
+    - added a script to create graphs from rrd dbs.
+        - both scripts will get incorporated back into logstatsd soon.
+    - added thresholds to logstatsd
+
+0.09  2006-01-25 04:11:39 -0600 (Wed, 25 Jan 2006)
+    - generate RRD scripts from groups with time
+        - limitation - time must be the final field in the group
+    - allows generating RRD scripts without having to run every couple
+      of minutes!  sweeet!
+
+0.07  2006-01-24 16:24:33 -0600 (Tue, 24 Jan 2006)
+    - added fu to handle any level depth of xrefs
+    - display fu in logstatsd only handles two or three deep
+
+0.06  2006-01-24 16:22:51 -0600 (Tue, 24 Jan 2006)
+    - added custom line regexp
+
+0.01  Mon Jan 23 23:36:15 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Log::Statistics
+
+
+------------------------------------------------------------------------
+r35 | wu | 2006-02-14 00:21:31 -0600 (Tue, 14 Feb 2006) | 2 lines
+
+ready to upload
+
+------------------------------------------------------------------------
+
+
+0.35 2006-02-14 00:19:16 -0600 (Tue, 14 Feb 2006)
+    - added some fu for offline reporting - still prototyping
+    - fixed a bug when duration field is the first field in the log
+
+0.32  Mon Jan 30, 2006  4:10 pm
+    - added dependency for Log::Log4perl 0.51
+    - old version on a box i was testing on did not support :resurrect
+
+0.30  Mon Jan 30, 2006 11:34 am
+    - removing default requirement for perl 5.8.6
+
+0.29  Sun Jan 29, 2006 11:35 pm
+    - lots of little documentation tweaks
+
+0.25  2006-01-29 17:31:30 -0600 (Sun, 29 Jan 2006)
+    - document limitations of rrd handling and groups display
+    - updated Changes file based on svn history
+
+0.23  2006-01-29 15:31:42 -0600 (Sun, 29 Jan 2006)
+    - a little more cleanup of the docs before uploading to CPAN
+
+0.21  2006-01-29 15:11:12 -0600 (Sun, 29 Jan 2006)
+    - calculate average duration in xml output
+
+0.20  2006-01-29 14:01:29 -0600 (Sun, 29 Jan 2006)
+    - updating README
+    - fixing up DEPENDENCIES
+    - updating config file example in logstatsd POD
+
+0.19  2006-01-29 13:48:27 -0600 (Sun, 29 Jan 2006)
+    - adding tests for Test::Pod and Pod::Coverage
+    - updated DEPENDENCIES in POD
+    - Makefile only requires Log::Statstics dependencies
+
+0.18  2006-01-29 12:47:15 -0600 (Sun, 29 Jan 2006)
+    - renamed "cross-references" and "xrefs" to "groups"
+
+0.16  2006-01-28 20:53:50 -0600 (Sat, 28 Jan 2006)
+    - completing rename from Log::Summary to Log::Statistics
+
+0.15  2006-01-28 20:52:28 -0600 (Sat, 28 Jan 2006)
+    - renaming to Log::Statistics after some browsing on CPAN
+
+0.13  2006-01-27 20:00:07 -0600 (Fri, 27 Jan 2006) 
+    - finally started to add some docs to Summary.pm
+    - moved creation of RRD into logstatsd
+    - don't re-create RRD file if it already exists
+    - start time is based on first time entry in db
+    - rrd db info is all stored in the config file
+
+0.10  2006-01-26 12:29:20 -0600 (Thu, 26 Jan 2006)
+    - added a script to create the rrd dbs.
+    - added a script to create graphs from rrd dbs.
+        - both scripts will get incorporated back into logstatsd soon.
+    - added thresholds to logstatsd
+
+0.09  2006-01-25 04:11:39 -0600 (Wed, 25 Jan 2006)
+    - generate RRD scripts from groups with time
+        - limitation - time must be the final field in the group
+    - allows generating RRD scripts without having to run every couple
+      of minutes!  sweeet!
+
+0.07  2006-01-24 16:24:33 -0600 (Tue, 24 Jan 2006)
+    - added fu to handle any level depth of xrefs
+    - display fu in logstatsd only handles two or three deep
+
+0.06  2006-01-24 16:22:51 -0600 (Tue, 24 Jan 2006)
+    - added custom line regexp
+
+0.01  Mon Jan 23 23:36:15 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Log::Statistics
+
+

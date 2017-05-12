@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml class="article"?>
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <resource src="LaTeXML.css" type="text/css"/>
+  <resource src="ltx-article.css" type="text/css"/>
+  <para xml:id="p1">
+    <p>The letter a: the letter a.
+ IS defined,
+it is NOT relax,</p>
+  </para>
+  <para xml:id="p2">
+    <p>The dollar: math shift character $.
+ IS defined,
+it is NOT relax,</p>
+  </para>
+  <para xml:id="p3">
+    <p>The upcaret: superscript character ^.
+ IS defined,
+it is NOT relax,</p>
+  </para>
+  <para xml:id="p4">
+    <p>The underscore:subscript character ˙.
+ IS defined,
+it is NOT relax,</p>
+  </para>
+  <para xml:id="p5">
+    <p>macro fud: macro:-¿FUD.
+IS defined,
+it IS cs-defined,
+it is NOT relax,
+and it IS @defined.</p>
+  </para>
+  <para xml:id="p6">
+    <p>macro foo: undefined.
+is NOT defined,
+it is NOT cs-defined,
+it is NOT relax,
+and it is NOT @defined.</p>
+  </para>
+  <para xml:id="p7">
+    <p>After the @ifundefined, however:  “relax.
+IS defined,
+it IS cs-defined,
+it IS relax,
+but it is still NOT @defined.</p>
+  </para>
+  <para xml:id="p8">
+    <p>Try again, without the @ifundefined.
+macro fuu: undefined.
+is NOT defined,
+it is NOT cs-defined,
+and it is NOT relax.</p>
+  </para>
+  <para xml:id="p9">
+    <p>After testing, however: undefined.
+is still NOT defined,
+it is still NOT cs-defined,
+and it is still NOT relax.</p>
+  </para>
+  <para xml:id="p10">
+    <p>[test1 ],
+After ifx csname concoction:  “relax.
+IS defined,
+it IS cs-defined,
+and it IS relax.</p>
+  </para>
+  <para xml:id="p11">
+    <p>Let zonk to relax:  “relax.
+IS defined,
+it IS cs-defined,
+it IS relax,
+and it is NOT @defined.</p>
+  </para>
+  <para xml:id="p12">
+    <p>Let zoob to a undefined token: undefined.
+is NOT defined,
+it is NOT cs-defined,
+it is NOT relax,
+and it is NOT @defined.</p>
+  </para>
+  <para xml:id="p13">
+    <p>Let zoon indirectly to a undefined token: undefined.
+is NOT defined,
+it is NOT cs-defined,
+it is NOT relax,</p>
+  </para>
+  <para xml:id="p14">
+    <p>Now, let that initial token to relax: undefined.
+is NOT defined,
+it is NOT cs-defined,
+it is NOT relax,
+Ie. no change: the chain was ‘collaped’.</p>
+  </para>
+  <para xml:id="p15">
+    <p>Let zook to a plain letter: the letter a.
+It expands to ‘a’.
+IS defined,
+it IS cs-defined,
+it is NOT relax,
+and it IS @defined.</p>
+  </para>
+</document>

@@ -1,0 +1,46 @@
+# Makefile
+
+PACKAGE_VERSION = @PACKAGE_VERSION@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+libdir = @libdir@
+includedir = @includedir@
+libwiimote_includedir = $(includedir)/libcwiimote-$(PACKAGE_VERSION)/libcwiimote
+
+INSTALL = @INSTALL@
+
+topdir=.
+include $(topdir)/config.mk
+
+subdirs=src test
+
+all: subdirs
+
+subdirs:
+	@for dir in $(subdirs); do \
+		(cd $$dir && make) || exit 1; \
+	done
+
+install:
+	mkdir -p $(DESTDIR)$(libdir) $(DESTDIR)$(libwiimote_includedir)
+	$(INSTALL) -m 755 $(LIBDIR)/libcwiimote.so $(DESTDIR)$(libdir)/libcwiimote.so.$(PACKAGE_VERSION)
+	$(INSTALL) -m 755 $(LIBDIR)/libcwiimote.a $(DESTDIR)$(libdir)/libcwiimote.a
+	for i in $(SRCDIR)/*.h; do \
+		$(INSTALL) -m 644 $$i $(DESTDIR)$(libwiimote_includedir); \
+	done
+
+uninstall:
+	rm -rf $(DESTDIR)$(libwiimote_includedir)
+	rm -f  $(DESTDIR)$(libdir)/libcwiimote.a
+	rm -f  $(DESTDIR)$(libdir)/libcwiimote.so.$(PACKAGE_VERSION)
+
+clean:
+	@rm -f *~
+	@rm -f bin/* lib/*
+	@for dir in $(subdirs); do \
+		(cd $$dir && make clean) || exit 1; \
+	done
+
+distclean: clean
+	rm -f Makefile config.log config.status

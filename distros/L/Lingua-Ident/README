@@ -1,0 +1,50 @@
+Lingua::Ident
+
+Copyright © 2000 Michael Piotrowski.  All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Description
+-----------
+
+This module provides statistical language identification.  For more
+details see the POD documentation embedded in the file Ident.pm, or
+the Lingua::Ident(3) man page after installation.
+
+Also included is a small utility, trainlid, to build the transition
+matrices needed by the Lingua::Ident module.  It has POD documentation
+embedded, too.
+
+The data directory contains short sample texts in several languages,
+from which transition matrices are built for testing purposes.  These
+matrices are inadequate for actual applications; build your own
+matrices from samples of at least 50KB size for optimal results.
+
+liddemo is a demo application for Lingua::Ident.  You can run it after
+having done "make" and "make test".  It reads 20 bytes of text from
+standard input and prints its language.  By default it uses the
+example matrices from the data directory.  Remove the "use lib" line
+to use an installed version of Lingua::Ident.
+
+Prerequisites
+-------------
+
+perl 5.004 or greater
+
+Building the module
+-------------------
+
+    perl Makefile.PL
+    make
+    make test
+
+Installation
+------------
+
+    make install
+
+Feedback
+--------
+
+Michael Piotrowski <mxp@dynalabs.de>

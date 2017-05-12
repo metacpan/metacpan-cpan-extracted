@@ -1,0 +1,101 @@
+2014-03-25  Chris Travers <chris.travers@gmail.com>
+
+	* version 0.091.3
+
+	* Further regexp fixes for 5.19 bracket handling
+
+2014-03-24  Chris Travers <chris.travers@gmail.com>
+
+	* version 0.091.1
+
+	* Fixed Test Cases failing taint mode under Perl 5.12 and lower.
+
+
+2014-03-23  Chris Travers <chris.travers@gmail.com>
+
+	* version 0.09
+
+	* Added additional test case for some entities to make verify table
+
+	* Merged in LaTeX::Encode::EncodingTable
+	
+
+2012-09-30  Andrew Ford  <a.ford@ford-mason.co.uk>
+
+        * version 0.08
+
+        * change t/11-unmatched-chars.t to use an unmatched ideographic character instead
+          of 0x{ffff} as some versions of perl protest about having an illegal Unicode
+          character in a string.
+
+2012-09-23  Andrew Ford  <a.ford@ford-mason.co.uk>
+
+        * version 0.07
+
+        * remove use of 'parent' in generated module
+
+        * add handling of unmatched characters
+
+        * add note about Unicode data that does not have the UTF8 flag set
+
+
+2012-08-29  Andrew Ford  <a.ford@ford-mason.co.uk>
+
+        * version 0.06
+
+        * added script "latex-encode" as a simple filter that uses LaTeX::Encode
+
+        * added a couple more encodings
+
+        * reverted to 'base' from 'parent' for setting up inheritance
+
+        * updated author tests
+
+
+2012-08-28  Andrew Ford  <a.ford@ford-mason.co.uk>
+
+        * version 0.05
+
+        * added more symbols
+
+        * build-character-table now builds a %provided_by map that gives the LaTeX package
+          that provides the LaTeX command used in the encoding
+
+        * removed unimplemented "use_textcomp" option
+
+        * added "packages" option to latex_encode() to pass a reference to a hash that is
+          updated with the names of optional LaTeX packages (styles) that implement the
+          commands included in the encoded string
+
+2012-08-27  Andrew Ford  <a.ford@ford-mason.co.uk>
+
+        * version 0.04
+
+        * added requirement for Perl 5.8.1 or later due to deficiencies in 
+          Unicode handling of earlier Perl versions.
+
+        * updated encoding table to add Turkish characters (RT #55526) and to not include
+          spaces after accented characters (RT #49357)
+
+        * switch from 'base' to 'parent' for setting up inheritance
+
+        * added add_latex_encodings() and remove_latex_encodings() functions to update the
+          encoding table.
+
+        * allow 'add' and 'remove' specifiers to be provided on the 'use' statement
+
+2007-10-03  Andrew Ford  <a.ford@ford-mason.co.uk>
+
+        * version 0.03
+
+2007-10-02  Andrew Ford  <a.ford@ford-mason.co.uk>
+
+        * version 0.02 
+
+	* added a script build-character-table to build the hash of
+          characters to be encoded.
+
+2007-09-20  Andrew Ford  <a.ford@ford-mason.co.uk>
+
+	* 0.01 - Initial version 
+

@@ -1,0 +1,94 @@
+Revision history for Linux-Bootloader.
+
+1.3  Tue May 15, 2007
+	Bryce:
+	- Updated packaging for 1.3 release
+
+	Christian Keck:
+	- Add grub-parameter "module"
+
+        Judith:
+	- Linux::Bootloader::new loads the specific bootloader module.
+        - Update boottool to use it this way.
+
+1.2  Fri Sep 8, 2006
+	Bryce:
+	- Updated packaging for 1.2 release
+	- Fix make test issue in add_default() when passed invalid data
+	
+	Judith:
+	- Add boot-once method for grub.
+	- Move the default configuration files into the modules and out of the
+	  boottool script.  Also updated 'boottool' to read and write
+	  calls without passing config file arg.
+	- Tidy up some warnings with debug comparasons, and with Grubs
+	  boot once option.
+	- Initialize params only in parent 'new'.
+
+	JasonN:
+	lib/Linux/Bootloader/Elilo.pm: 
+	- added experimental boot-once support using patched eliloalt 
+	lib/Linux/Bootloader.pm: 
+	- added root parsing back in _info, somehow removed earlier
+	- fixed couple syntax errors from previous commit
+
+1.1  Fri Jun 23 15:44:00 2006
+	lib/Linux/Bootloader.pm: 
+	- print message when backing up config file
+	- modified print_info output format
+
+	lib/Linux/Bootloader/Detect.pm
+	- Patch from Judith to identify situation where Grub has been
+	  installed on top of Lilo.
+	
+	lib/Linux/Bootloader/Grub.pm: 
+        - bugfix, loosened global var detection to include '='
+	- fixed bug detecting root on fedora config found by jdaiker
+
+	scripts/boottool: 
+        - fixed typo for lilo boot-once (param -> params)
+
+	scripts/kernel_label: 
+	- check if kernel var is empty before printing
+
+
+1.0  Mon May 18 19:00:00 2006
+	t/03_grub.basic.t:
+	- Modified test to work on other people's systems
+	
+	lib/Linux/Bootloader: 
+	- removed get_default() from grub module (uses base 
+	  class get_default() now)
+	- moved conversion of 'saved' to position into _info() 
+          from get_default()
+	- changed private function names to start with _
+	- removed remove() from grub module (uses base class remove() now)
+	- created lookup() in base class, converts title to position
+	- moved info() regex patterns into hash
+	- moved majority of lilo, elilo, yaboot functions to base module
+	- added update-kernel support (experimental)
+
+	lib/Linux/Bootloader/Detect.pm: 
+	- Patch from Kees Cook to cleanup bootloader detection logic
+	- Redid detect_architecture() to allow specifying of 'style'
+	  (none, linux, or gentoo)
+	- Add optional argument to allow specifying which devices to check
+	  for MBR's.
+	- Made the _detect_from_mbr and _detect_from_config routines
+	  public, and renamed them.
+	- Refactored code to simplify it a bit
+
+0.9  Mon May 15 19:00:00 2006
+	- Initial pre-release.
+	- Grub, lilo, yaboot, and elilo config file modification should
+	  work.  Advanced functionality may still be a little incomplete.
+	- A unit test for testing the grub functionality has been created
+	- Linux::Bootloader::Detect can detect the currently installed
+	  bootloader by either looking at which config files are
+	  installed, or at the Master Boot Record (MBR)
+	
+0.0  Tue May  2 15:00:00 2006
+	- original version; created by sdist 1.11
+
+
+

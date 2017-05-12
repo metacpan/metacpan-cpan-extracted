@@ -1,0 +1,149 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/LV/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [ doap-deps:on "Sub::Name"^^doap-deps:CpanId ], [ doap-deps:on "Sentinel"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [
+		doap-deps:on "perl 5.006000"^^doap-deps:CpanId;
+		rdfs:comment "This is the first version of Perl that had lvalue subs.";
+	];
+	doap-deps:runtime-suggestion [ doap-deps:on "Variable::Magic"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [
+		doap-deps:on "Test::More 0.47"^^doap-deps:CpanId;
+		rdfs:comment "This is the Test::More version bundled with Perl 5.6.2, which was the first Perl to bundle Test::More at all.";
+	];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=LV>;
+	doap:created         "2013-11-01"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/LV>;
+	doap:homepage        <https://metacpan.org/release/LV>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "LV";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/LV/v_0-001>, <http://purl.org/NET/cpan-uri/dist/LV/v_0-002>, <http://purl.org/NET/cpan-uri/dist/LV/v_0-003>, <http://purl.org/NET/cpan-uri/dist/LV/v_0-004>, <http://purl.org/NET/cpan-uri/dist/LV/v_0-005>, <http://purl.org/NET/cpan-uri/dist/LV/v_0-006>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-lv>;
+	];
+	doap:shortdesc       "LV ♥ lvalue".
+
+<http://purl.org/NET/cpan-uri/dist/LV/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "LV-0.001"^^xsd:string;
+	dc:issued            "2013-11-02"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/LV-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/LV/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "LV-0.002"^^xsd:string;
+	dc:issued            "2013-11-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Prefer LV::Backend::Sentinel over LV::Backend::Magic when auto-selecting a backend implementation.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Major speed improvements for LV::Backend::Magic.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Minor speed improvements for LV::Backend::Tie.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Bundle benchmarking script.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/LV-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/LV/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "LV-0.003"^^xsd:string;
+	dc:issued            "2013-11-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Eliminate goto in LV::Backend::Tie, resulting in slight speed improvements.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/haarg>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/LV-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/LV/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "LV-0.004"^^xsd:string;
+	dc:issued            "2013-11-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Major speed improvements for LV::Backend::Sentinel.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Major speed improvements for LV::Backend::Magic.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Major speed improvements for LV::Backend::Tie.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/LV-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/LV/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "LV-0.005"^^xsd:string;
+	dc:issued            "2013-11-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Recommend Sentinel over Variable::Magic.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/LV-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/LV/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "LV-0.006"^^xsd:string;
+	dc:issued            "2013-11-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Reduce required version of Test::More from 0.62 to 0.47, which is the version that was bundled with Perl 5.006002.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/LV-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/haarg>
+	a                    foaf:Person;
+	foaf:name            "Graham Knop";
+	foaf:nick            "HAARG";
+	foaf:page            <https://metacpan.org/author/HAARG>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

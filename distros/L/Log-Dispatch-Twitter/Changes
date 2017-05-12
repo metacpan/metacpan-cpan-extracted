@@ -1,0 +1,7 @@
+0.03  2010-11-29
+    - Pass all constructor args through to Net::Twitter to support OAuth and
+      anything else that may come in the future [rt.cpan.org #63400]
+
+0.02  2008-11-17
+    - Actually load Net::Twitter. Whoops.
+

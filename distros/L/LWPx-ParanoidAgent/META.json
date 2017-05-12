@@ -1,0 +1,52 @@
+{
+   "abstract" : "subclass of LWP::UserAgent that protects you from harm",
+   "author" : [
+      "Wes Young <wes@barely3am.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "LWPx-ParanoidAgent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::UserAgent" : "0",
+            "Net::DNS" : "0",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/csirtgadgets/lwpx-paranoidagent/issues"
+      },
+      "homepage" : "https://github.com/csirtgadgets/LWPx-ParanoidAgent",
+      "repository" : {
+         "url" : "https://github.com/csirtgadgets/LWPx-ParanoidAgent.git"
+      }
+   },
+   "version" : "1.12"
+}

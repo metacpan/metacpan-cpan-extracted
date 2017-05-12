@@ -1,0 +1,59 @@
+{
+   "abstract" : "Module to log program termination status info.",
+   "author" : [
+      "Boutros Lab Software Engineering  <BoutrosLabSoftware@oicr.on.ca>",
+      "John Macdonald  <jmacdonald@oicr.on.ca>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-ProgramInfo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "DateTime::Duration" : "0",
+            "Fcntl" : "0",
+            "FindBin" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Path" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.10"
+         }
+      }
+   },
+   "provides" : {
+      "Log::ProgramInfo" : {
+         "file" : "lib/Log/ProgramInfo.pm",
+         "version" : "v0.1.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.1.13",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

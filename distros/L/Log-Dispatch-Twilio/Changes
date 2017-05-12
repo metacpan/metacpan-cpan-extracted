@@ -1,0 +1,8 @@
+Revision history for Perl extension Log::Dispatch::Twilio
+
+0.02    Tue Dec  4 23:42 PST 2012
+    - Truncate long messages, or split them up across multiple SMS messages (if
+      "max_messages" set to >1)
+
+0.01    Fri Nov 30 10:12 PST 2012
+    - initial release

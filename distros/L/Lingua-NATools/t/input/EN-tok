@@ -1,0 +1,828 @@
+The SPP2 ( Parallel Processing Server ) developed at LCAD-ICMC-USP uses conventional computers connected in a high-speed communication network . 
+$
+Researchers from the University of Illinois developed a high-performance software layer called Fast Messages to exchange messages between machines connected to high-speed Myrinet networks . This layer has low-latency and high-bandwidth packet transmission . 
+$
+A high-level library largely employed in parallel programming is PVM ( Parallel Virtual Machine ). 
+$
+For the PVM to take advantage of the communication performance of the Fast Messages system onto Myrinet , LCAD-USP developed a library which has socket communication semantics , but uses Fast Messages to achieve a higher performance . 
+$
+This library can also be used directly to exchange messages on the network , being more suitable to the programmer used to sockets than the Fast Messages primitives . 
+$
+Preliminary tests show that sock2fm has a better performance than TCP / IP for messages with more than 250 bytes ( 79 % better for some packet sizes ). 
+$
+Faced with the innumerable options of software packages available for information systems applications and the difficulty clients have to choose the package that better suits their needs , in this paper , we discuss a procedure to choose software packages in the Information System area . 
+$
+In this procedure , we use the rule NBR 12119 of the Brazilian Association of Technical Rules ( ABNT ) and the Quality Function Deployment ( QFD ) of the American Supplier Institute ( ASI ). 
+$
+Software project planning is a vital managerial practice for successful project management . 
+$
+The absence of managerial practices in software development is the main cause of serious problems faced by organizations : delayed schedules , costs higher than expected , and presence of defects . 
+$
+Such problems cause inconvenience for users and waste of time and resources for developers . 
+$
+According to ISO , SPICE and CMM models and quality standards , project planning is one of the basic items for a company to start improving its software development process . 
+$
+This paper presents a planning process model that defines , lists and organizes the main activities to be done in order to plan a software project . 
+$
+It also discusses a case study that shows an application of process model in the systems development center of a private company . 
+$
+In this paper , we present a tool to validate and verify requirements trading . 
+$
+This tool supports the ERACE approach . 
+$
+This approach is based on the system requirements document and proposes to specify the interactions between the system and its agents ( scenarios ). 
+$
+Then the scenarios are specified in detail . 
+$
+We also present heuristics of the evolution from the requirements model to analysis models , illustrated by a case study . 
+$
+The growth of the software market brings about an increasing use of development techniques , which are often informal . 
+$
+The maintenance of software is problematic , since its documentation rarely reflects the code implemented . 
+$
+In this context , the Software Reverse Engineering works with the purpose of retrieving the project information lost during the development phase and documenting the current software state . 
+$
+This article discusses the issues raised during the application of the reverse engineering method Fusion-RE / I. 
+$
+The experiment described is part of the re-engineering of a prototype system of hypermedia , whose goal is to adapt it to the domain of Software Engineering . 
+$
+Since the target system is hypermedia , the results obtained during the application of the Fusion-RE / I method could be registered as a hyperdocument in the very system submitted to reverse engineering . 
+$
+Then , it was possible to observe relevant aspects about the validation of the proposed steps in the Fusion-RE / I method . 
+$
+This paper discusses the functional requirements identified in the software reverse engineering process which can be supported by a hypertext system . 
+$
+By means of a conceptual and navigational modeling of information related to the reverse engineering method Fusion-RE / I , we established the functional requirements of a hypermedia application to support the method . Our purpose is to offer guidelines to the software engineer in charge of the reverse engineering process and to make possible to follow the evolution of this process . 
+$
+This paper discusses issues related to the authoring of educational hypermedia applications with the objective of identifying requirements for an environment of development of hypermedia applications . 
+$
+The authoring of educational hyperdocuments is a complex task , and traditional hypermedia authoring systems , like HyperCard , ToolBook , and even the HTML language for the WWW , are more suitable for the tasks of presenting and retrieving information . 
+$
+This paper presents some tools for authoring of educational hyperdocuments and considers the need of a previous modeling of the knowledge domain . 
+$
+A method for a project of educational hyperdocuments applications , the EHDM , is proposed as a basis for the development of authoring tools which incorporate the modeling of the knowledge domain as part of their authoring process . 
+$
+A tool developed using EHDM as its methodological basis is also presented as a way of validating the EHDM in a real context . 
+$
+The improvement of techniques and systematic methods designed to support the development of computational systems has brought about as its main advantage the production of high quality and low cost software . 
+$
+As in the development of commercial software , the development of hypermedia applications has undergone significant alterations and constant evolution . 
+$
+Today , the authoring systems for hypermedia applications provide conditions for a previously specified application to be effectively implemented later . 
+$
+However , it is necessary that they have some user-friendly and motivating characteristics . 
+$
+This paper discusses the evaluation of the implementation of a desirable set of requirements in an environment of authoring for educational hypermedia applications called SASHE ( Hypermedia System for Authoring and Supporting Educational Applications ). 
+$
+Initial requirements proposed for this system will also be considered in the evaluation , which will be made experimentally and produce concrete data related to the present status of the authoring module implementation in the system mentioned . 
+$
+This paper discusses the Educational Hyperdocuments Design Method , or EHDM , a systematic approach to support the design and development of educational hypermedia applications . 
+$
+It uses the Michener's model and the technique of conceptual mapping for modeling the knowledge domain of the hyperdocument . 
+$
+We discuss the three phases that compose the method - hierarchical conceptual modeling , contextual navigational design and construction and test . 
+$
+Reactive Systems are characterized by continually reacting to external as well as internal stimuli and by having as its main concern the behavioral aspect . 
+$
+Among the techniques that are used to specify the behavior of this kind of system are the Petri Nets . 
+$
+Due to the critical features that are in general involved in these systems , their specifications must be strictly validated . 
+$
+Thus , the Mutation Analysis , a fault ­ based criterion usually used for program testing , has been explored in the context of Petri Net testing . 
+$
+The objective of this research is the implementation of the Proteum ­ RS / PN tool , aiming at the automation of the Petri Net testing and validation process based on Mutation Analysis , since its manual application is impracticable . 
+$
+The Clustered Knapsack Problem can be stated as the following hypothetical situation : an alpinist should load a knapsack of limited capacity with possibly useful items . 
+$
+To each item is attributed its weight and an utility value ( so far , the problem coincides with the standard Knapsack Problem ). 
+$
+However , the items belong to different classes ( food , medicaments , utensils , etc .) and they should be packed in separated clusters in the knapsack . 
+$
+The knapsack clusters are flexible and have limited capacity . 
+$
+Each cluster has a cost that depends on the class with which it was filled . 
+$
+The Clustered Knapsack Problem consists of determining the suitable capacity of each cluster and how these clusters should be filled , maximizing the total utility value . 
+$
+In this paper , we propose an integer non-linear optimization model for the problem and design some heuristics for its solution . 
+$
+Such problem extends the class of Knapsack Problems found in the literature . 
+$
+A relevant practical application of this problem appears in the cut of steel coils subject to lamination . 
+$
+This paper discusses the STT ( Telemetry and Telecommand System ), part of the ARARA ( Autonomous and Radio-Assisted Reconnaissance Aircraft ) project . 
+$
+The STT allows the operation of the ARARA aircraft beyond its pilot's visual range . 
+$
+Real time video and instrumentation data are broadcast from the aircraft to a ground station . 
+$
+The graphic interface of STT presents the video superimposed by an instrument panel , similarly to flight simulators , making its operation very intuitive . 
+$
+Today , organizations must exchange data among each other , and the tendency is that these exchanges become more and more digital . 
+$
+Queries are made freely in databases of independent organizations , although , when it is necessary to exchange data , as there is not a prevision of integration , data can only be exchanged after a preparation which imposes some sort of manual intervention , construction of special filters , etc ., since the non-existence of a common scheme hinders the exchange of data from one database with those from another database . 
+$
+However , although databases of different organizations can be built in a totally independent way , the need for exchanges means that the semantics of the manipulated elements must be at least similar , especially of those which should be shared . 
+$
+For example , if two organizations must interchange data on people , it does not matter for the different organizations if these people are customers , employees , students or patients , the meaning of & quot ; people & quot ; is always understood by organizations members . 
+$
+This dissertation is based on the supposition that it exists some form of primitive definition for the several data elements that must be shared , and from which its instantiation as elements of a particular data scheme can be recognized . 
+$
+Thus , we seek to identify primitive structures aiming at integrating systems . 
+$
+However , in order to reach such structure it is necessary to define rules that guarantee the preservation of data properties to allow that , every time the scheme of an organization A is built from the same primitive structure used by an organization B , the integration between them both can be made automatically , and that it does not cause inconsistency in the databases which will be receiving information . 
+$
+In order to meet these objectives , this dissertation proposes that such structures of primitive schemes are part of the Reusable Components Libraries which are distributed as part of commercial Rapid Application Development Tools . 
+$
+As an example of how it could be done , we present a component which defines generically an object & quot ; person & quot ;, developed from the way & quot ; people & quot ; are treated in two real systems , centering this structure in a sole Abstraction : the Generalization Abstraction . 
+$
+We also present the set of rules which should be used to integrate the components centered in this abstraction , the most universally compatible among the several object-oriented data models available today . 
+$
+This dissertation presents alternative methods to obtain aerial pictures and their use in agricultural applications . 
+$
+Aerial pictures represent an important tool to evaluate several parameters in modern agricultural practice , especially those that cannot be evaluated at ground level . 
+$
+Three types of system are defined with increasing levels of complexity and usability . 
+$
+Several criteria are proposed to evaluate the system and determine its suitability to the main agricultural applications . 
+$
+We built a Type I system based on model airplanes , which is used in technology evaluation and project validation . 
+$
+We used components easily available on the market , and there is a potential for technical improvement in the system built concerning each one of its basic components : the airplane , the method of control , and the means to obtain images . 
+$
+The results show that the system can substitute , at a low cost , the conventional ways used so far to obtain such images . 
+$
+This dissertation discusses Animbs ( Animation for MBS ), a software that enables the visualization of data generated by an engineering simulation system ( SD / FAST ) in the form of computer animation . 
+$
+The SD / FAST is a system for modeling and simulating mechanical multibody systems ( MBS ). 
+$
+The Animbs system allows the association of a geometry to the MBS being simulated , and uses the data produced by the SD / FAST simulation to create an animated view of the mechanical system behavior , thus enhancing the data analysis made by users of SD / FAST . 
+$
+This dissertation discusses several scenario techniques and methods to support the requirements engineering phase , as well as a comparison amongst the approaches reviewed . 
+$
+We propose a scenario-based engineering requirements process compatible with the UML notation . 
+$
+We also discuss the introduced notation , the process of construction of the requirements model and several heuristics to the construction of the UML analysis model . 
+$
+A case study about a system to support the writing of technical documents illustrates the construction of the requirements model according to the proposed process . 
+$
+Finally , we present a tool that supports the construction of the models introduced by the process . 
+$
+From the 1990s on , quality became a basic need in competition for market and eventually affected the software industry . 
+$
+Software developers must improve the final product in order to keep it competitive . 
+$
+After some years of experience in software development , we noticed that some quality factors considered by customers are more related to the software process than to the final product . 
+$
+The improvement of software process increases the possibilities to achieve a product that is in accordance with customers expectations . 
+$
+However , the accomplishment of improvement in the software process is not a simple task and involves several factors . 
+$
+To aid the task of improving software process , there are several improvement models in the literature , for instance SW-CMM ( Software-Capability Maturity Model ). 
+$
+But most of the current improvement models concern large corporations , with a complex and & quot ; closed & quot ; structure which can hardly be adjusted to the needs of Brazilian software development companies , that are usually small businesses . 
+$
+In this context , this dissertation discusses guidelines to a clear and objective improvement of software process . 
+$
+These guidelines follow the steps of the establishment phase of the IDEAL Approach - Establishment of Priorities , Development of Approach and Planning of Actions - and consider some ideas obtained in the study of the approaches S : PLAN , Bootstrap and part 7 of SPICE Model . 
+$
+Fault Injection is a technique that has been widely used in the development of computer systems that need to be highly reliable . 
+$
+In this area , there are studies related with hardware and software fault injection . 
+$
+It should be pointed out that there are few research related to software fault injection in the literature as well as few software fault model and injection methods . 
+$
+Thus , the objective of this dissertation is to study software fault models and investigate injection methods based on concepts and principles taken from the Mutation Analysis Criterion . 
+$
+Considering the increasing complexity of computer systems , the project and implementation of supporting tools to fault injection become necessary . 
+$
+Thus , in this dissertation , we discuss a software fault injection tool named Itool , based on a fault injection scheme . 
+$
+This scheme characterizes the mapping of a software fault taxonomy ( DeMillo's Taxonomy ) for the mutation operators of the Mutation Analysis criterion for C language . 
+$
+To illustrate the relevance and feasibility of the ideas presented in this dissertation , we carried out a pilot experiment using the Space program , a real system developed by ESA ( European Space Agency ). 
+$
+In this dissertation , we discuss an empirical study to evaluate the effectiveness , strength and application cost of the Mutation Analysis criterion . 
+$
+Effectiveness and cost were also evaluated according to the Potential Uses criteria and the results compared with those produced by the Mutation Analysis criterion . 
+$
+We also discuss the specification and implementation of a minimization strategy test set adequate to the Mutation Analysis criterion . 
+$
+The results presented in this paper show that the Potential Uses criteria based on data flow and the Mutation testing based on errors are promising . Each criterion has features that complement each other and are interesting to be investigated in an experiment of larger scale . 
+$
+The use of constrained mutation and test set minimization allows the application of these criteria in industrial software development environments . 
+$
+The object-oriented reverse engineering of a legacy system developed using the procedural paradigm is the basis for two different reengineering approaches . 
+$
+In the first , reengineering is done to change the implementation paradigm by segmentation , followed by its semi ­ automatic transformation into an object-oriented language . 
+$
+In the second , recurring patterns are first recognized in the object model produced by the reverse engineering , and then the reengineering is done adopting these patterns . 
+$
+The results obtained by these two approaches are compared to assess their maintainability , legibility and reusability . 
+$
+The original version of the legacy system used in this experience has about twenty thousand lines of Clipper code and refers to an electrical and mechanical car repair shop . 
+$
+For the reverse engineering phase we used the Fusion / RE method , and proposed its evolution , adding features to detail the abstraction phase of its system analysis model . 
+$
+To change the system orientation paradigm from procedural to object ­ oriented we propose two additional phases to be conducted after the application of the Fusion / RE method : the forward design of the system and the legacy code segmentation . 
+$
+Hints and rationales are supplied to conduct the code segmentation . 
+$
+The code transformation from segmented Clipper to Java is done with support of a Draco ­ Puc machine . 
+$
+We propose a strategy for pattern recognition based on the system object model obtained through reverse engineering . 
+$
+By means of this strategy we can recognize instances of Type ­ Object , Association ­ Object , State Across a Collection and Behaviour Across a Collection patterns . 
+$
+We carried out Delphi implementation experiments of some of these patterns . 
+$
+Independently of the type of maintenance carried out - corrective , preventive , adaptive or perfective -, regression testing activities are necessary to test modifications and new contingent features , and , mainly , to test if existing features were not adversely affected by the modifications . 
+$
+Aiming at carrying out the regression testing systematically , at a low cost and with effectiveness , many techniques have been proposed in the literature . 
+$
+These techniques are divided into two approaches : retest-all and selective . 
+$
+The retest-all approach uses the complete test case set available , whereas the selective approach selects a subset to carry out the regression testing . 
+$
+The techniques based on the selective approach have been deeply studied , for they aim at reducing the efforts made in the regression testing , reducing the number of test cases to be re-executed . 
+$
+As there are several techniques based on the selective approach , empirical studies are necessary to evaluate and compare these techniques . 
+$
+Thus , this work aims at evaluating and comparing the application of two promising regression testing techniques : Technique based on Modification and Technique based on Selective Mutation . 
+$
+A framework proposed by Rothermel and Harrold is used to evaluate these techniques . 
+$
+With the accomplishment of these studies , we hope to contribute towards the establishment of effective and low cost regression testing strategies . 
+$
+Testing activities in the development of Reactive Systems are extremely relevant , as well as the availability of tools that support these activities , since failures in these systems may have serious economic and / or social consequences . 
+$
+The Mutation Analysis is one of the fault ­ based testing criteria , and it is usually applied during unit testing . This criterion has been investigated in the context of testing and validation activities of Reactive Systems behavioral specifications based on Finite State Machines , Statecharts and Petri Nets . 
+$
+The specification of a tool named Proteum ­ RS was carried out and constitutes the first step to support the application of the Mutation Analysis Criterion in the context of Reactive Systems . 
+$
+This dissertation aims at implementing an instantiation of Proteum ­ RS , called Proteum-RS / ST , to support testing of specification based on Statecharts . 
+$
+We intend to provide subsidies for investigating criteria traditionally applied at the unit level for testing Reactive Systems specifications , in particular in the context of Statecharts based specifications . 
+$
+Reactive Systems are characterized by continuously reacting to external as well as internal stimuli and controlling human activities . 
+$
+In these systems , faults can result in great losses . 
+$
+The use of rigorous methods and techniques for the specification of their behavior is essential to avoid inconsistencies and ambiguities . 
+$
+Petri Nets have been used for reactive ­ system specification . 
+$
+Testing and validation of the underlying model are essential activities for the production of such systems . 
+$
+For this reason the Mutant Analysis -- a fault ­ based criterion usually used for program testing -- has been explored in the context of specification testing of reactive systems . 
+$
+The development of tools to support its application is necessary , since its manual application is impracticable . 
+$
+The objective of this dissertation is the implementation of Proteum ­ RS / PN , a testing tool which supports the application of Mutant Analysis criterion to validate Petri Nets-based specifications . 
+$
+Several techniques , criteria and tools have been developed to make the testing activity more systematic and aiming at overcoming associated time and cost constraints . 
+$
+Moreover , the testing community has been conducting theoretical and empirical studies to establish an incremental , low-cost , and effective testing strategy . 
+$
+This dissertation is within this context and aims at conducting empirical studies for comparing adequacy between error based criteria -- Mutation Analysis ( unit testing ) and Interface Mutation ( integration testing ), with the objective of establishing low-cost and effective testing strategies that comprise all software development cycle . 
+$
+From this perspective , some incremental testing strategies for mutant operators ' application are defined exploring the complementary aspects of criteria based on mutation , reducing the testing activity costs during the phases of unit and integration testing , without losses in testing quality . 
+$
+We also discuss an essential set of mutant operators for the Interface Mutation criterion . 
+$
+Mutation Analysis - one of the error-based testing criteria - has been found to be effective on revealing faults . 
+$
+However , its high cost , due to the high number of mutants created , has motivated the proposition of many alternative approaches for its application . 
+$
+In this sense , a relevant study resulted on the determination of an essential set of mutant operators for Fortran , indicating that it is possible to reduce the cost of mutation testing , preserving a high mutation score . 
+$
+Some studies have also shown that reduction on effectiveness is not significant . 
+$
+This dissertation aims at investigating pragmatic alternatives for mutation analysis application and , in this context , it proposes a procedure for determining an essential mutant operators set for C , using Proteum testing tool . 
+$
+Aiming at applying and validating the proposed procedure , two different groups of programs are used . 
+$
+For both of them , the essential mutant operators set shows very significant results in terms of cost reduction , with a very small reduction on mutation score . 
+$
+Strategies to evolve and refine an essential mutant operators set into different application domains are also investigated . 
+$
+The growth of the software market is leading to an increasing use of informal development techniques . 
+$
+The maintenance of such software is problematic , since its documentation rarely reflects the implemented code . 
+$
+Thus , when faced with product maintenance , the software engineer finds an informal and incomplete documentation , which does not mirror the existing software . 
+$
+In this context the Reverse Engineering of Software can be useful for retrieving project information lost during the development phase and for documenting the current software state . 
+$
+The main objective of this dissertation was the investigation of an appropriate hypertext structure for supporting the documentation required during a software reverse engineering process . 
+$
+Based on a survey on the desired requirements in a hyperdocument , which should have the ability to support reverse engineering documents , we defined a set of links and node structures . 
+$
+The requirements for such hyperdocument were investigated in an experiment : the self-documentation of the system SASHE , which already treats nested contexts and has other educational characteristics . 
+$
+The reverse engineering process was developed based on the Fusion-RE / I method , and the resulting products were inserted in a hyperbase in the system SASHE . 
+$
+This dissertation discusses a procedure to help the first step of the FUSION-RE / I reverse engineering method - acquisition of system information . 
+$
+This procedure comprises a process to create a knowledge base ( IPAIA Knowledge Acquisition Process applied to reverse engineering domain ) and guidelines for using this knowledge base to construct functional visions of the system . 
+$
+Dependable object ­ oriented software should incorporate exception handling activities in order to behave suitably in a great number of situations even in the presence of errors . 
+$
+In this context , an exception handling mechanism is fundamental to detect and retrieve errors , and to activate suitable measures to restore the normal activity of the system . 
+$
+The development of an exception handling mechanism is not a trivial task , especially when concurrence is one of the characteristics of the software system . 
+$
+The main aims of this dissertation are the design and implementation of an exception handling mechanism for developing dependable object ­ oriented software . 
+$
+In order to build the proposed mechanism , we apply techniques of software structuring , such as computational reflection and design patterns . 
+$
+Two contributions are considered fundamental . 
+$
+The first , characterized by technical aspects and practical uses , is the design and implementation of an exception handling mechanism using Java language and a reflective software architecture called Guaraná . 
+$
+The proposed mechanism especially supports concurrent exception handling . 
+$
+The second contribution , characterized by abstract aspects and an innovative approach , is the definition of a reflective software architecture and of a set of related design patterns for implementing exception handling mechanisms . 
+$
+This dissertation proposes a new object-oriented method to support the design and structured development of hypermedia applications called HMBS / M. 
+$
+HMBS / M has as its main feature the use of HMBS ( Hypertext Model Based on Statecharts ) that utilizes as an underlying formal model the Statecharts technique to specify the organizational structure and the browsing semantics of a hypermedia application . 
+$
+We present the four phases that make up the method ( conceptual design , navigational design , interface design and implementation ). 
+$
+In each phase of the method models are built so that they can be improved and expanded in the next phase , allowing an interactive development . 
+$
+We discuss three implementation options for a hypermedia application specified by HMBS / M : interpreted , translated and freely translated , emphasizing the first two , which are implemented using a tool that supports HMBS , the HyScharts , and using the WWW environment ( HTML standard ). 
+$
+A case study based on the graduate and undergraduate course catalogs of the Institute of Mathematical Sciences and Computing of the University of São Paulo is presented to illustrate and validate HMBS / M. 
+$
+The dynamics and flexibility of Web site authoring , on the one hand , popularize the Internet use increasingly , but , on the other hand , they lead easily to inconsistent information . 
+$
+A wrong definition of a hyperlink is enough to make users come across with inconsistency and get & quot ; lost & quot ;. 
+$
+A common procedure used in site development is the reuse of link components , either because there is , in the same source page , more than one link , or the same link label in different pages , or because there are several links directed to the same destination page . 
+$
+As a site , in general , contains a great amount of links , this makes a manual verification of links reusability unviable . 
+$
+The tool DB-LiOS was developed aiming at automating the assessment of reusability of website links , through links extraction and classification processes . 
+$
+Using DB-LiOS , website authors can get an effective aid to evaluate the consistency of their links . 
+$
+This dissertation discusses the Educational Hyperdocuments Design Method , or EHDM , which provides a systematic approach to support the design and development of educational hypermedia applications . 
+$
+It uses the Michener's model and the technique of concept mapping for modeling the knowledge domain . 
+$
+We discuss the three phases that make up the method - hierarchical conceptual modeling , contextual navigational design and construction and test . 
+$
+The Educational Hyperdocuments Development Tool ( EHDT ) was implemented to assist the development of educational hyperdocuments for the system SASHE . 
+$
+This tool uses the EHDM as a methodological base . 
+$
+It also provides mechanisms to facilitate fast feedback loops between method phases and support bottom-up and top-down approaches . 
+$
+This dissertation proposes an environment called SIATE ( Sistema Inteligente de Apoio ao Treinamento e Ensino ), which integrates features from Hypermedia , Knowledge Based Systems , Tutoring Systems , and Case Based Reasoning . 
+$
+This environment is directed to teaching and has as an outstanding feature the freedom students have to explore any domain . When necessary , they can turn to a Tutoring System and to a Knowledge Hybrid System with expert knowledge in that domain . 
+$
+We emphasize the project and the development of a Tutoring System which provides pedagogical support to SIATE , as well as the development of the hypermedia resources of this environment . 
+$
+This dissertation discusses a tool prototype , the Html2Hip , that provides an importation and adaptation environment of documents described in HTML ( HyperText Markup Language ) for the internal representation of SASHE ( Hypermedia System for Authorship and Supporting Educational Applications ), which is based on the structural organization of multimedia objects proposed by MCA ( Nested Contexts Model ). 
+$
+Moreover , this research extended the capacity of the information text node editor of the previous prototype concerning the processing of text-files described in RTF ( Rich Text Format ). 
+$
+Thus , the SASHE became able to process and organize instructional materials prepared in its own environment , in the WWW ( World-Wide Web ) environment , as well as in ordinary word processors . 
+$
+The experience with authoring multimedia material for educational purposes shows a major problem : how to provide an easy and efficient way to handle multimedia objects so that non ­ expert users ( namely school teachers ) can be able to design and build their own presentations ? 
+$
+A basic infrastructure which stores and efficiently delivers the video data is necessary . However , another important point is the organization of these data stored into the server in a way that facilitates their access by users . 
+$
+In this dissertation , this is achieved through the use of an interactive information management and retrieval system designed to facilitate the access to items ( or parts of the items ) stored in the server . 
+$
+The main characteristic of the system is the use of a metadata base which contains attributes of the videos stored in the server . 
+$
+Searches can be made by title , subject , length , author , content or , most important in the case of didactic multimedia material , by a specific scene or frame . 
+$
+The system was built according to a client server approach using JAVA programming language . 
+$
+The communication between clients and servers is established through the use of the Visibroker 3.0 , which is a Distributed Objects programming tool in accordance with the CORBA standard . 
+$
+Access to data from the metadata base uses a PostgreSQL driver which follows the JDBC API . 
+$
+For evaluation purposes , a playback tool was built using Java Media Framework ( JMF ). 
+$
+We carried out an analysis to verify the impact of the utilization of CORBA and JDBC technologies on the system . 
+$
+We detected that the use of JDBC technology imposes a much more significant delay than the use of CORBA technology . 
+$
+Another conclusion is that metadata utilization provides better interactivity in searches , making the editing process faster , and saves storage space sharing objects like videos , scenes and frames . 
+$
+Based on the analysis of several studies on educational hypermedia authoring systems , this dissertation proposes a new set of requirements which aims at supporting both the requirements engineering and the evaluation stages in the development process of a system belonging to this domain . 
+$
+In general , we propose a set of requirements which favors the needs of both the educational context and the environments of hypermedia authoring . 
+$
+These requirements were used in the evaluation of SASHE , and the results obtained show the effectiveness of this proposal and , simultaneously , the quality of the system implementation . 
+$
+In a computational world in constant evolution , the Web is an example of an environment where information evolves very rapidly . 
+$
+In addition to Web information that changes very frequently , developers face hard work when many people are involved in the parallel development of a set of related Web pages . 
+$
+In the face of such problems , this dissertation proposes the tool VersionWeb . 
+$
+The main goals were to provide developers with page versions during browsing and with an easy way of controlling Web page versions through the Web itself . 
+$
+Many of the current computational systems dedicated to support teaching and learning can be considered part of an evolution that has emphasized the exploration of hypermedia systems in general and the World Wide Web in particular . 
+$
+The research associated to the study reported here aims at exploring the technologies of hypermedia and Computer Supported Cooperative Work ( CSCW ) in an environment that supports a collaborative access of students to hyperdocuments - the StudyConf environment . 
+$
+In order to promote interaction among students that navigate on the same hyperdocuments , StudyConf controls their navigation and generates dynamic discussion sessions with the students that visit the same material . 
+$
+StudyConf registers the discussions as structured hyperdocuments , which can be used to explore proposals regarding the collaborative authoring of contents present in several Computer Supported Cooperative Learning ( CSCL ) tools . 
+$
+The study reported here has also contributed to the proposal of a technique aimed at guiding the development of general web-based hypermedia applications . 
+$
+The SMmD Project - Distributed Multimedia Systems - investigates the building of a middleware infrastructure for multimedia interactive applications in heterogeneous distributed environments . 
+$
+For this purpose , we developed the SMmD Environment ( ASMmD ), which includes modules for storage and retrieval of media objects such as audio and video , as well as modules for authoring , storing and delivering multimedia objects according to the MHEG-5 ISO standard . 
+$
+This dissertation describes the study related to the implementation of the Presentation and Synchronization Module ( MAS ) of the SMmD Project . 
+$
+This module was built integrated to another module , the Java MHEG-5 Engine ( JHEG ), that provides the parsing and decoding of multimedia objects according to that ISO standard . 
+$
+Initially we present the context , motivation and objectives which lead to this study . 
+$
+Next we do a literature review of concepts related to multimedia presentation , emphasizing the aspects related to the synchronization of its components . 
+$
+Then we discuss the MHEG-5 standard along with other standards and recommendations relevant to the context of this study . 
+$
+In order to contextualize the study , we present an overview of the modules that make up the SMmD Environment , followed by a description of the investigation and implementation of the SyncEvent Applet , the embryo of the Presentation and Synchronization Module . 
+$
+The main result of this study , the Presentation and Synchronization Module ( MAS ), is described detailing aspects of its architecture and implementation . 
+$
+Finally , in the conclusion , we discuss the contributions of the study together with its limitations and future related research , which includes integrating the MAS with the remaining modules of the SMmD project . 
+$
+Gearing the development of applications to the Web is a challenge to researchers in the field of Hypermedia . 
+$
+This dissertation focuses on supporting the development of applications which concern the interchange of documents with the use of XML 3 / 4 Extensible MarkUp Language . 
+$
+We discuss the xRot , a set of directions towards the guiding of the phases of definition , generation and presentation of structured documents manipulated by Internet-based applications . 
+$
+This set of directions includes an algorithm for the generation of XML documents in an environment supported by database and Web servers . 
+$
+ArgGDE , an architecture that supports applications developed with xRot , is also discussed . 
+$
+As case studies of the use of xRot , we developed two applications : AulaML and C2000ML . 
+$
+Natural Language Processing ( NLP ) applications , such as speller and grammar checkers and translation systems , need to search very large dictionaries which contain morphosyntactic and / or semantic information of several hundreds of thousands of words of a given language . 
+$
+Finite Automata are often used in efficient scanners for compilers and are also good candidates for representing dictionaries . 
+$
+This research has investigated methods for representing dictionaries using finite automata , techniques for minimizing acyclic deterministic finite automaton , and adequate data structures for a compact representation . 
+$
+The resulting system is able to represent a dictionary of 430,000 Brazilian Portuguese words in a 220Kb automaton , by using a standard home computer and spending less than five minutes . 
+$
+POS tagging is a basic , well-known and largely explored natural language processing task used in several applications such as parsing and information retrieval . 
+$
+The taggers for English have achieved a state of the art accuracy of 96-99 %. 
+$
+Unlike the case of English , for Brazilian Portuguese neither all tagging techniques have been explored yet , nor have they achieved the precision of the best taggers for English . 
+$
+With this motivation , we trained four taggers available on the WWW , namely Unigram ( Treetagger ), N-gram ( Treetagger ), transformation-based ( TBL ) and Maximum-Entropy tagging ( MXPOST ), and designed a symbolic tagger , named PoSiTagger . 
+$
+All adapted taggers were trained with a corpus of about 100,000 words composed of didactic , journalistic , and literary texts , and tagged with the Nilc tagset . 
+$
+MXPOST displayed the best accuracy ( 89.66 %). 
+$
+Fourteen methods of combination were used , seven of which have surpassed MXPOST accuracy . 
+$
+The best result from the combination strategy was 90,91 %. 
+$
+The general accuracy suffered the influence of the size of the manually tagged corpus available for training , of the tagset , and of the types of texts employed . 
+$
+The construction of tools for automatic correction of texts has been emphasized , following the evolution and efficiency of the text processors in which they are incorporated . 
+$
+And , besides the traditional symbolist techniques for implementing such tools , using production rules , there are applications which employ techniques that are unusual in the field of computational linguistics so far , as the use of Artificial Neural Networks . 
+$
+The study proposed aims at conducting a comparative study of the use of the conexionist and symobolist techniques in the automatic checking of grammar mistakes in Portuguese . 
+$
+Using as a case study the grammar rules for & quot ; crase & quot ;, we take as an example of the traditional form of implementation the grammar checker ReGra , and , on the other hand , we implement two models of neural networks ( backpropagation and Elman ), in order to detect mistakes related to the use of & quot ; crase & quot ; in cases of incorrect presence and of absence . 
+$
+The goal of this study is not pointing out which method is the most efficient in general terms , because we believe this is not possible . 
+$
+We intend to observe the performance of both methods concerning the given problem , aiming at a stronger integration between them , taking advantage of their best potentialities . 
+$
+Today English is the dominant language in the writing and publishing of scientific research in the form of scientific articles . 
+$
+However , many non-natives users of English suffer the interference of their mother tongues when writing scientific papers in English . 
+$
+These users face problems concerning rules of grammar and style , and / or feel unable to generate standard expressions and clauses , and the longer linguistic compositions which are conventional in this genre . 
+$
+In order to ease these users ' problems , we developed a learning environment for scientific writing named AMADEUS ( Amiable Article Development for User Support ). 
+$
+AMADEUS consists of several interrelated tools - reference , support , critic and tutoring tools - and provides the context in which this dissertation is inserted . 
+$
+The main goal of this research is to implement AMADEUS as an agent-based architecture with collaborative agents communicating with a special agent embodying a dynamic user model . 
+$
+In order to do that we introduce the concept of adaptivity in computer systems and describe several user model shells . 
+$
+We also provide details about intelligent agents which were used to implement the user model for the AMADEUS environment . 
+$
+This dissertation proposes a tool that helps the generation of texts by writers who use computer systems . 
+$
+It is the Verifica , a system to check and give advice on spelling in Portuguese . 
+$
+This spell ­ checker is available in a textual user interface and in a graphical user interface . 
+$
+The graphical interface was implemented using the Tcl / Tk toolkit , a programming system for developing and using graphical user interface applications . 
+$
+Verifica is also available on ­ line at http://www.dcc.ufmg/verifica. 
+$
+The system tests the occurrence of input words in a Portuguese language vocabulary stored in an acyclic deterministic finite automaton . 
+$
+An automaton is an efficient data structure for lexicon storage because it provides a compact vocabulary representation besides an efficient access time . 
+$
+Since a traditional spell ­ checker has some deficiencies , we studied a way to refine the orthographic analyses by looking also at the phrase structure . 
+$
+So , we implemented an algorithm that attributes syntactic categorization to Portuguese words . 
+$
+This is the first component of a syntactic analyzer for Portuguese according to a new approach , the functional approach , which is lexicon independent . 
+$
+We concluded that this new approach is viable and that we can analyze phrases in a larger context . 
+$
+Besides , the component that was developed may be used in a syntactic analyzer implementation for Portuguese language , which later can be part of Verifica . 
+$
+The use of Hypermidia resources and Artificial Intelligence techniques in teaching and learning environments offers a better presentation of information to users and provides better results by allowing the system to & quot ; reason & quot ; about what and how to present effective teaching , encouraging the student to learn . 
+$
+Thus , we propose an architecture called SIATE - Intelligent System for Training and Teaching - as part of a much larger project . This architecture integrates characteristics from Knowlegde Based Systems , Tutoring Systems , Case Based Reasoning , Hypermidia and Simulation , enriching an exploratory teaching environment with expert knowledge about the domain , and also improving the student learning experience . 
+$
+This research , part of the domain of Knowledge Acquisition in SIATE , corresponds to the design and implementation of a Hybrid Knowledge System . This system contains specialized knowledge about the application domain which is used to generate scripts for pages in a hyperdocument and support the training tool in SIATE . 
+$
+Tasks involving Pattern Recognition are becoming more frequent in many applications . 
+$
+Most of these tasks have been efficiently handled by Artificial Neural Networks . 
+$
+Among the most widespread models of Neural Networks the MLP ( Multi-Layer Perceptron ) stands out . 
+$
+However , the performance of a MLP Neural Network in a certain problem depends directly on the topology adopted , which must be determined in the beginning of the training process . 
+$
+The choice of a Neural Network topology is not trivial , and usually becomes an exhaustive search for the most appropriate configuration . 
+$
+Several methods have been developed to automatically find a suitable Neural Network topology , including Constructive Neural Networks . 
+$
+These networks are trained by Constructive Algorithms which , starting from a minimal topology , gradually insert new neurons and connections , aiming at improving the network performance . 
+$
+Nevertheless , the evaluation of the best use of such algorithms in a given task depends on the homogeneity of the training environment . 
+$
+This dissertation provides the definition of a set of abstract classes which allow different training algorithms , including Constructive Algorithms , to be built as components with strictly defined access to be used in different applications . 
+$
+By using these components in a new version of the Kipu Neural Network Simulator , we began to analyze the efficiency of Constructive Neural Networks in real Pattern Recognition tasks . 
+$
+This thesis considers the problem of writing scientific papers in English as a foreign language . 
+$
+From the theoretical point of view , techniques from two areas of Artificial Intelligence , namely Computational Linguistics and Case-based Reasoning , were investigated in the search for possible solutions to minimize mother tongue interference and lack of cohesion and coherence in students texts , especially in experimental physics . Two writing tools were then developed . 
+$
+The first one , named Reference Version , employed corpus analysis for creating a sentences base containing collocations frequently used in scientific writing . Such collocations could be accessed in one of three ways : according to the components and component parts of the schematic structure of a scientific paper , by searching keywords and communicative goals . 
+$
+An acquisition mode was also implemented so that the tool can be customized easily thus allowing portability to other domains and possible extensions within a given domain . 
+$
+Experiments in a technical writing course at IFQSC-USP for graduate students have demonstrated the efficacy of the tool . 
+$
+It was particularly useful in helping students to overcome the initial block in the preparation of a first draft and also in providing contextual linguistic input for producing a cohesive text . 
+$
+It was also observed that this first tool was only helpful for students possessing reasonable reception of the English language and some experience in scientific writing . A new , more sophisticated tool was then proposed and implemented . 
+$
+It is named Support Version and utilizes corpus analysis and the case-based approach as a framework for modeling the different stages of the writing process . 
+$
+Because a more detailed analysis had to be performed , the tool was restricted to the Introductory Section of papers on experimental physics . 
+$
+In this analysis 30 rhetorical strategies were identified which were generally performed linguistically using 3 or 4 rhetorical messages from a set of 45 types of message . 
+$
+The implemented cases base has 54 introductions from the Physical Review Letters and Thin Solid Films journals , which has been shown to be a far too small number for reasonable recall and precision figures to be obtained . 
+$
+A scheme has been incorporated into the tool for adaptations to be made in the cases recovered , by making use of revision rules . 
+$
+In future the tool may be extended in a straightforward way to other parts of a scientific paper or to other areas of research with a semi-automatic edition process of new cases that has been built into the Support tool . This certainly opens the way for customization which will greatly facilitate the assessment of the tool according to usability criteria . 
+$
+In this dissertation , we study a combinatorial optimization problem called the Clustered Knapsack Problem , which is an extension of the standard Knapsack Problem . 
+$
+The problem is to determine the right capacity of several clusters which can be allocated in a knapsack and how these clusters should be placed so as to respect constraints on the capacity of clusters and of the knapsack itself . 
+$
+The objective is to maximize a total utility value . 
+$
+The problem has seldom been studied in the literature , even though it appears naturally in practical applications . 
+$
+In this study , we propose a non-linear model for the problem and checked some heuristics for its resolution . 
+$
+The current trend in hypermedia systems design is the development of open , extensible and distributed multi-user systems . 
+$
+In the last years , some Open Hypermedia Systems ( OHS ) architectures have been discussed in literature . 
+$
+Formal techniques are becoming a useful tool for the specification of hypermedia applications ( and also OHS applications ). 
+$
+Adequate formal models can offer systematic and reliable approaches to analyze and verify the structural and dynamic properties of this kind of applications . 
+$
+This project for a master's degree aims at developing a formal model for hyperdocuments ( hypermedia applications ) supported by OHS . 
+$
+This formal model should consider OHS applications features such as the distinction in a hyperdocument between content aspects and structure aspects on the one hand , and storage aspects and runtime on the other hand . 
+$
+A formal technique that satisfies the required features of OHS applications will be used to specify the formal model . 
+$
+The improvement of systematic techniques and methods made up to support the development of computational systems has brought as its main advantage the production of high quality and low cost softwares . 
+$
+As in the development of commercial softwares , the development of hypermedia applications experienced significant alterations and constant evolution . 
+$
+Today authoring systems for hypermedia applications provide , for example , conditions for a previously specified application to be effectively implemented later . 
+$
+However , it is necessary that they have some attributes to provide facilities and to motivate users . 
+$
+In general , this dissertation is about the evaluation of the implementation of a desirable requirement set of an authoring system called SASHE ( Hypermedia System for Authoring and Supporting Educational Applications ). 
+$
+Requirements of particular users of this system will also be considered . The evaluation will be carried out experimentally and will answer questions about the real conditions of the system's authoring module . 
+$
+This dissertation proposes a linguistic modeling of lexical items of Brazilian Portuguese , a relational modeling and its implementation in the form of a Lexical Database . 
+$
+The resulting NLP resource favors the standardization , centralization , and reuse of data , aiming at facilitating one of the most difficult stages in the development process : the linguistic knowledge acquisition . 
+$
+This project seeks to construct a prototype of an automatic summarizer to investigate the textual planning according to the approach proposed by Rino ( 1996 ). 
+$
+The main part of the research consists of the study of the model of fundamental discourse for automatic summarization and of the implementation of planning strategies , expressed by plan operators whose selection is driven by communicative objectives . 
+$
+To complement the prototype , a linguistic realizer will be associated to the textual planner in order to produce the text from its structural plan . 
+$
+The fundamental study also includes the verification of summarization techniques , investigations in the area of text generation and the search for approaches that can evaluate the results obtained . 
+$
+This dissertation discusses the project of a parallel machine dedicated to solving linear systems . 
+$
+This is a problem that appears in a great variety of scientific and engineering applications whose solution becomes a computationally intensive task as the number of unknown variables increases . 
+$
+We implemented a Systolic Architecture , connected in a ring topology , which maps iterative solution methods . 
+$
+This class of parallel architectures has characteristics of simplicity , regularity and modularity that facilitate hardware implementations , and it is largely employed in dedicated computation systems to solve specific problems , which possess as requirements a great computational demand and the need for real-time response . 
+$
+We adopted advanced methodologies and tools for hardware project to accelerate the development cycle . The architecture has been implemented and verified on FPGAs ( Field Programmable Gate Arrays ). 
+$
+The performance results are presented and discussed , indicating the feasibility and efficiency of the adopted approach and methodology for this kind of problem . 
+$
+This MSc dissertation discusses an extension of the ASiA ( Ambiente de Simulação Automático ) for computer architecture simulation named Architecture Module . 
+$
+This module allows the use of previously defined architectures ( with possible alteration of parameters ) or new architecture models using specific tools for computer architecture simulation . 
+$
+Two examples show the utilization of the Architecture Module highlighting its advantages as both a teaching and a research tool . 
+$
+This dissertation also discusses some improvements in the ASiA with the aim of making it more user-friendly and flexible . 
+$
+We also carried out a literature review of subjects related to the general theme . 
+$
+Distributed computing systems applied to parallel computing allow cost-effective parallel programming . 
+$
+These systems offer an adequate computing power to the applications which do not require a massively parallel architecture , but need a computing power not available in sequential computers . 
+$
+PVM ( Parallel Virtual Machine ) and MPI ( Message Passing Interface ) are examples of parallel virtual environments widely discussed in the literature . 
+$
+Concerning the widespread use of these environments , both in academic and commercial and industrial applications , it becomes interesting to develop a tool to support the development of programs for such environments . 
+$
+There are few tools such as that available in the literature . FAPP is one of these tools and it can be extended to support parallel virtual environments . 
+$
+In this context , this dissertation addresses the extension of the FAPP in order to produce PVM and MPI source code . 
+$
+This extension can help a large number of users to develop parallel programs either by giving support for beginners or by increasing the productivity of experienced parallel programmers , besides helping in the maintenance phase . 
+$
+We carried out studies aiming at validating and assessing the tool . 
+$
+The results obtained show that the tool has a stable behavior and potential to be easily used in both PVM and MPI environments . 
+$
+The MPI is an attempt of standardization for message ­ passing programming environments aiming at high portability and efficiency in any platform . 
+$
+The requirement of high portability without loss of efficiency makes the MPI an extensive standard . 
+$
+Point ­ to ­ point communication routines , for instance , are structured in many ways , issuing different performances . 
+$
+This dissertation aims at studying the performance of MPI point ­ to ­ point communication routines in a personal computer network running LINUX operating system in order to evaluate the cost-effectiveness of each routine objectively . 
+$
+This evaluation is performed through the execution of benchmarks and of an application example , executed on three MPI public domain implementations ( MPICH , LAM and UNIFY ), allowing a comparison between implementations . 
+$
+Results obtained from PVM are also included and compared to those from MPI , since PVM is widely used by the computational community . 
+$
+A clear and concise presentation of the fundamental issues of different MPI communication modes available on different MPI implementations , together with the performance evaluation developed , which is able to guide the final user in his / her choice of a given MPI implementation , as well as the communication mode suitable to his / her application are important contributions of this dissertation . 
+$
+This MSc dissertation describes the implementation of a computer network simulation module for ASiA ( an Automatic Simulation Environment ). 
+$
+This module allows the user to simulate previously defined computer networks ( with possible alteration of parameters ) or to define new computer networks using the toolbar resources . 
+$
+New resources were added to the toolbar in order to expand the range of systems that can be modeled , allowing the study of more complex systems . 
+$
+This dissertation also discusses a literature review about simulation , computer networks and simulation environments . 
+$
+The component with the worst performance usually limits the overall performance of a computing system . 
+$
+The performance of processors and main memory has improved faster than that of secondary memory such as magnetic disks . 
+$
+In 1984 , Johnson introduced the concept of fragmentation , in which a data file is written into a disk array in a way that its stripes can be retrieved in parallel and , therefore , more quickly . 
+$
+The main problem with fragmentation is the reduction of reliability , for failure in one of the disks make data inaccessible . 
+$
+Patterson , Gibson and Katz proposed , in 1988 , five ways to store redundant information in the array , increasing its reliability . 
+$
+These forms were called RAID - Redundant Arrays of Independent Disks . 
+$
+Some other ways to store redundant information have been proposed over the years , making the RAID taxonomy more complex . 
+$
+Furthermore , changes in the array parameters take to performance variations that are not always understood . 
+$
+With the purpose of facilitating taxonomy comprehension and allowing the execution of experiments in the array seeking to improve performance , this MSc dissertation proposes an Intelligent Simulation and Learning Environment for RAID , where the user can interact with several RAID models , or even create his / her own models , in order to evaluate their performance in different situations . The environment also allows the user to interact with the field knowledge , acting as a tutor . 
+$
+This dissertation also discusses a prototype of a magnetic disk simulator that can be used as a kernel for the development of a RAID simulator to be used by the environment . 
+$
+This dissertation discusses a tool to support the development of RPC ­ based distributed applications in the Windows 95 environment . 
+$
+It also discusses some applications built to validate the system , which follow the client ­ server model . 
+$
+We carry out a theoretical review of the most relevant topics related to the field and present the implementation details . 
+$
+This tool was implemented using object ­ oriented techniques and comprises an automatic Stub Generator and an RPC Library , together with a Binding Service . 
+$
+The distributed applications built try to explore the tool's full potential . We provide general guidelines regarding the development of distributed applications for the Windows 95 environment . 
+$
+This dissertation discusses a performance evaluation of the portable platforms PVM and MPI when running in a distributed system and in a parallel architecture ­ SP2 . 
+$
+The evaluation is performed through a number of sorting parallel algorithms , using four implementations : IBM MPI and IBM PVMe ( running in the SP2 ), MPICH and PVM ( running in a distributed system ). 
+$
+Based on the execution of parallel algorithms , we present a comparison between the different environments considered and between the several sorting algorithms implemented . 
+$
+The sequential algorithms were also analyzed to allow the speedup evaluation in the execution in each environment . 
+$
+Through the results obtained it is possible to verify and prove ( for the environment considered ) the following statement : PVM shows a better performance in a distributed systems ( since PVM was designed to work in a set of loosely coupled computers ) and MPI is more adequate in parallel architectures . 
+$
+Distributed Computing Systems applied to parallel computing allow a better cost-effectiveness in parallel software implementation . 
+$
+They offer an adequate computing power for the applications that , although not requiring a massively parallel machine , need a computing power greater than that available in standard sequential computers . 
+$
+PVM ( Parallel Virtual Machine ) is an example of a message passing library widely discussed in the related literature which allows the implementation of parallel virtual machines using workstations ( normally RISC machines running UNIX operating system ). 
+$
+In this context , this MSc dissertation describes in detail the implementation of PVM ­ W95 ( Parallel Virtual Machine for Windows95 ), which comprises a message passing environment ( similar to PVM ), allowing the creation of a parallel virtual machine using personal computers ( working as workstations in a distributed computing environment ), interconnected in a communication network and running the Windows95 operating system . 
+$
+We carried out preliminary studies aiming at the validation and performance evaluation of PVM ­ W95 . 
+$
+The results obtained show that the PVM ­ W95 is stable and the parallel applications developed reached excellent speedups , considering the hardware adopted . 
+$
+The main objectives of this dissertation are the development and the evaluation of numerical parallel algorithms and their execution on parallel machines ( multiprocessor machines , vectorial machines and parallel virtual environments ). 
+$
+The algorithms developed have been executed under different conditions both in terms of the hardware platform adopted and the problem size . 
+$
+The results obtained in the numerical algorithms implementation are all analyzed according to some metrics ( execution time and float-point operations ) available in the main benchmarks studied . 
+$
+Through the results obtained , we analyzed the performance of message passing libraries PVM and MPI , the performance of the different architectures considered , and the numerical algorithms implemented . 
+$
+This thesis investigates criteria for testing Reactive Systems behavior specifications , specified either in Estelle or in Statecharts . 
+$
+Reactive Systems are applied to several human activities and , as failures in these systems may cause human or economical losses , they require the use of high-quality software development processes that could lead to the production of high-quality products . 
+$
+These criteria systematize the testing activity and provide mechanisms for the software tests quality assessment . 
+$
+This thesis presents contributions to the three fundamental activities in the context of software testing , namely : definition of testing criteria , theoretical studies and tool development . 
+$
+In relation to the definition of testing criteria , we propose the use of Mutation Testing for Estelle specifications and the use of Control Flow Testing for Estelle and Statecharts specifications . 
+$
+For Mutation Testing , we identify the errors types in Estelle specifications , defining mutation operators , incremental testing strategies , and alternative mutation criteria , which aim at reducing the cost of application of this criterion . 
+$
+For Control Flow Testing , two families of criteria are defined : SCCF - Statechart Coverage Criteria Family and ECCF - Estelle Coverage Criteria Family . 
+$
+We carried out theoretical studies to analyze the complexity of the Mutation Testing to Estelle and the inclusion relation for the SCCF and ECCF criteria . 
+$
+We conducted case studies to compare the testing criteria defined in this thesis and to evaluate their application during the simulation of Estelle and Statecharts specifications . 
+$
+Concerning tool development , the Proteum family tools , that support the application of Mutation Testing , and the simulation environments to Estelle ( EDT ) and Statecharts ( StatSim ) supply an essential base for tools development . 
+$
+We present some considerations about the definition of supporting tools to the application of the proposed criteria . 
+$
+This thesis approaches a study about the viability of using the CMB conservative protocol for distributed simulation synchronization on different distributed memory MIMD platforms , considering coarse granularity and few parallel processes . 
+$
+The technique used to analyze the results comprises data acquisition during simulation execution for a large number of models . 
+$
+The simulation of these models is performed on a special ­ built distributed simulation environment ( ParSMPL ) developed and presented in this thesis , implementing a CMB synchronization protocol . 
+$
+The results obtained in this research are split according to different views taking to distinct sets of contributions . 
+$
+The first view evaluates the influence of the model and the execution platform on the speedup reached . 
+$
+In this case it is defined when an application can reach efficiency through the adoption of the distributed simulation paradigm using the CMB protocol . 
+$
+The second view refers to the need of users to know the best way to make use of distributed simulation . 
+$
+Thus , following the analysis performed in this thesis , we established a set of procedures to help in the distributed simulation development process adopting the conservative approach . 
+$
+Following the procedures proposed and using the ParSMPL a user can count on precious help in the development of efficient conservative distributed simulation programs , without the need of knowing the features and particularities of the CMB protocol . 
+$
+This thesis proposes and describes in detail the design of AMIGO ( DynAMical FlexIble SchedulinG EnvirOnment ), a novel software tool that makes possible the union of different algorithm scheduling proposals , in a way completely transparent to the user . 
+$
+AMIGO is able to make flexible the scheduling activity ( at run ­ time ), covering all the steps from its configuration to its effective application . 
+$
+Besides the dynamic flexibility and transparency , AMIGO is also modular : it is split into modules that , among other advantages , facilitate its execution on different platforms . 
+$
+This research also gives its contribution presenting a critical analysis of the process ­ scheduling literature , pointing out the existing divergences and proposing important convergence points . 
+$
+Thus , the literature survey presented acts as a precious introductory material , so that beginners form a general context on the field and then deepen more quickly their studies in other more specific research . 
+$
+The performance evaluation of AMIGO shows that it is possible to have expressive performance gains , with total user transparency . 
+$
+By joining performance , flexibility and transparency we hope to contribute for the reduction of the existing gap between theory and practice in the scheduling process area . 
+$

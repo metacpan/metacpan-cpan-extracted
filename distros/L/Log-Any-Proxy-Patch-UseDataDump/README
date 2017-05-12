@@ -1,0 +1,13 @@
+SYNOPSIS
+
+     use Log::Any::Proxy::Patch::UseDataDump;
+
+DESCRIPTION
+
+    This patch replaces the dumping routine in Log::Any from Data::Dumper
+    to Data::Dump.
+
+SEE ALSO
+
+    Data::Dump
+

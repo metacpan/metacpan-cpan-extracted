@@ -1,0 +1,56 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  subfigure.sty                                                      | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+NewCounter('subfigure', 'figure', idprefix => 'sf', idwithin => 'figure');
+NewCounter('subtable',  'table',  idprefix => 'st', idwithin => 'table');
+DefMacro('\thesubfigure', '\alph{subfigure}');
+DefMacro('\thesubtable',  '\alph{subtable}');
+
+DefMacro('\fnum@subfigure', '(\thesubfigure)');
+DefMacro('\subfigure[]{}',
+  '\begin{@subfigure}#2\ifx.#1.\else\caption{#1}\fi\end{@subfigure}');
+DefEnvironment('{@subfigure}',
+  "<ltx:figure refnum='#refnum' frefnum='#frefnum' rrefnum='#rrefnum' xml:id='#id'>"
+    . "#body"
+    . "</ltx:figure>",
+  beforeDigest => sub { DefMacroI('\@captype', undef, 'subfigure'); },
+  afterDigest => sub { RescueCaptionCounters('subfigure', $_[1]); });
+DefMacro('\fnum@subtable', '(\thesubtable)');
+DefMacro('\subtable[]{}',
+  '\begin{@subtable}#2\ifx.#1.\else\caption{#1}\fi\end{@subtable}');
+DefEnvironment('{@subtable}',
+  "<ltx:table refnum='#refnum' frefnum='#frefnum' rrefnum='#rrefnum' xml:id='#id'>"
+    . "#body"
+    . "</ltx:table>",
+  beforeDigest => sub { DefMacroI('\@captype', undef, 'subtable'); },
+  afterDigest => sub { RescueCaptionCounters('subtable', $_[1]); });
+RawTeX(<<'EOTeX');
+\newif\ifsubcapcenter
+\newif\ifsubcapcenterlast
+\newif\ifsubcaphang
+\newif\ifsubcapnooneline
+EOTeX
+
+DefMacro('\subcapsize',      Tokens());
+DefMacro('\subcaplabelfont', Tokens());
+
+DefMacro('\subfigtopskip',    '10pt');
+DefMacro('\subfigbottomskip', '10pt');
+DefMacro('\subfigcapskip',    '10pt');
+DefMacro('\subfigcapmargin',  '10pt');
+
+1;

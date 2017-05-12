@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings FATAL => 'all';
+
+use Log::Dispatch::Config;
+use Log::Dispatch::Configurator::Any;
+
+our $VERSION = '1.0003';
+$VERSION = eval $VERSION; # numify for warning-free dev releases
+# $Id$
+
+my $defaults = {
+    dispatchers => ['screen'],
+    screen => {
+        class     => 'Log::Dispatch::Screen',
+        min_level => 'debug',
+        max_level => 'emergency',
+        stderr    => 0,
+    },
+};
+my $config_file = '/etc/ptee.yml';
+my $config = $ENV{PTEE_CONFIG} || $ARGV[0] ||
+    ( -e $config_file ? $config_file : $defaults);
+
+Log::Dispatch::Config->configure_and_watch(
+    Log::Dispatch::Configurator::Any->new($config) );
+my $dispatcher = Log::Dispatch::Config->instance;
+
+$| = 1;
+
+while (<>) {
+    $dispatcher->notice($_);
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+ptee - multicast your logs
+
+=head1 VERSION
+
+This document refers to version 1.0003 of ptee
+
+=head1 PURPOSE
+
+Use this program somewhat like the unix tee(1) command, to send text input to
+multiple destinations, for example a log file, Syslog, and so on.
+
+=head1 DESCRIPTION
+
+The unix tee(1) command accepts text on standard input, and emits that same
+text back out on standard output whilst also appending it to a log file.
+
+This program is similar, but more flexible, in that you can specify other
+destinations, and have as many as you like. By default it operates in
+pass-through mode; text received is simply emitted straight back out on
+standard output.
+
+=head1 USAGE
+
+Configuration is provided in the format used by the Perl module
+L<Log::Dispatch::Config>. This is a wrapper around the excellent
+L<Log::Dispatch> perl module, which is the tool that provides all your output
+destinations.
+
+The best thing to do is read the manual page for these two modules - don't
+worry they are not complicated. Once you have done that, you can write your
+own configuration file.
+
+You can use many different formats of configuration file. Please read the
+L<Config::Any> Perl module manual for more details. Here is a simple example
+which will emit logs to standard output and a file, much like the unix utility
+tee(1):
+
+ dispatchers : [file, screen]
+  
+ file:
+   class : 'Log::Dispatch::File'
+   min_level : debug
+   filename : '/path/to/log'
+   mode : append
+   format : '[%d] [%p] %m at %F line %L%n'
+  
+ screen:
+   class : 'Log::Dispatch::Screen'
+   min_level : info
+   stderr : 1
+   format : '%m'
+
+The above file is in YAML format, a good choice, and so if you save this as
+C</etc/ptee.yml> it will be loaded and used.
+
+Alternatively, you can specify the file name in the C<PTEE_CONFIG> environment
+variable, or as the first command line parameter to C<ptee> itself. This gives
+you the ability to use a different file format, but please read the manual
+page for the L<Log::Dispatch::Configurator::Any> Perl module in that case to
+avoid a couple of minor pitfalls.
+
+=head1 AUTHOR
+
+Oliver Gorwits C<< <oliver.gorwits@oucs.ox.ac.uk> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) The University of Oxford 2008.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

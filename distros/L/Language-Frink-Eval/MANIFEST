@@ -1,0 +1,7 @@
+README
+Makefile.PL
+MANIFEST
+t/01.t
+lib/Language/Frink/Eval.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+changelog

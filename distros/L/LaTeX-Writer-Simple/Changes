@@ -1,0 +1,11 @@
+Revision history for LaTeX-Writer-Simple
+
+0.02    2015-10-08
+		- Fix makefiles, kwalitee++ et al
+
+0.01    2008, June 9
+        First basic commands (document, center, flushright,
+        flushleft, p, textit, textbf, texttt, Ref, pageRef, label,
+        caption, section, subsection, subsubsection, chapter, part
+        and probably others);
+

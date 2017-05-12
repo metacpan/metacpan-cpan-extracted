@@ -1,0 +1,52 @@
+---
+abstract: 'Locale::File::PO:Header - Utils to build/extract the PO header'
+author:
+  - 'Steffen Winkler <steffenw at cpan.org>'
+build_requires:
+  Test::Differences: 0.60
+  Test::Exception: 0
+  Test::More: 0
+  Test::NoWarnings: 1.03
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Locale-File-PO-Header
+provides:
+  Locale::File::PO::Header:
+    file: lib/Locale/File/PO/Header.pm
+    version: 0.003
+  Locale::File::PO::Header::Base:
+    file: lib/Locale/File/PO/Header/Base.pm
+    version: 0.001
+  Locale::File::PO::Header::ContentTypeItem:
+    file: lib/Locale/File/PO/Header/ContentTypeItem.pm
+    version: 0.001
+  Locale::File::PO::Header::ExtendedItem:
+    file: lib/Locale/File/PO/Header/ExtendedItem.pm
+    version: 0.001
+  Locale::File::PO::Header::Item:
+    file: lib/Locale/File/PO/Header/Item.pm
+    version: 0.001
+  Locale::File::PO::Header::MailItem:
+    file: lib/Locale/File/PO/Header/MailItem.pm
+    version: 0.001
+recommends:
+  Pod::Coverage::Moose: 0
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+requires:
+  Clone: 0
+  Moose: 0
+  MooseX::StrictConstructor: 0
+  Syntax::Feature::Method: 0
+  namespace::autoclean: 0
+  perl: 5.006
+  syntax: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.003

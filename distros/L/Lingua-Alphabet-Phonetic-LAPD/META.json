@@ -1,0 +1,49 @@
+{
+   "abstract" : "map ABC's to the LAPD phonetic letter names",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-Alphabet-Phonetic-LAPD",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::Alphabet::Phonetic" : "0",
+            "base" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Lingua-Alphabet-Phonetic-LAPD/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Lingua-Alphabet-Phonetic-LAPD/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Lingua-Alphabet-Phonetic-LAPD.git",
+         "web" : "https://github.com/plicease/Lingua-Alphabet-Phonetic-LAPD"
+      }
+   },
+   "version" : "0.02"
+}
+

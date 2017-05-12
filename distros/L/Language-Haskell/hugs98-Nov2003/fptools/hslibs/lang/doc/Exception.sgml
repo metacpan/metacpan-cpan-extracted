@@ -1,0 +1,14 @@
+
+<Sect1 id="sec-Exception">
+  <Title><literal>Exception</literal><IndexTerm><Primary>Exception</Primary></IndexTerm> </Title>
+
+  <para>This module has moved to <ulink url="../base/Control.Exception.html"><literal>Control.Exception</literal></ulink> in the
+  hierarchical libraries.</para>
+</Sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: sgml ***
+     ;;; sgml-parent-document: ("../../doc/hslibs.sgml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

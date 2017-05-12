@@ -1,0 +1,138 @@
+NAME
+    Lingua::Boolean::Tiny - a smaller Lingua::Boolean, with support for more
+    languages
+
+SYNOPSIS
+       use 5.010;
+       use Lingua::Boolean::Tiny qw( boolean );
+   
+       my $response = "ja";  # German for "yes"
+   
+       if (boolean $response) {
+          say "Yes!";
+       }
+       else {
+          say "No!";
+       }
+
+DESCRIPTION
+    This module provides an API roughly compatible with Lingua::Boolean but
+    has no non-core dependencies, and supports Perl 5.6.2+ (though Perl
+    versions earlier than 5.8 have pretty crummy Unicode support).
+
+    Lingua::Boolean::Tiny includes hand-written support for the world's twelve
+    most commonly spoken languages (Standard Chinese, English, Castillian
+    Spanish, Hindi, Russian, Arabic, Portuguese, Bengali, French, Malay,
+    German and Japanese). Lingua::Boolean::Tiny::More (which is auto loaded on
+    demand) provides support for almost any other language you can think of,
+    but it may not be to the same standard.
+
+    The string "1" is always true, and "0" is always false.
+
+  Object-Oriented Interface
+   Constructor
+    `Lingua::Boolean::Tiny->new($lang)`
+        Construct a new object supporting the given language. $lang should be
+        an ISO language code (e.g. "en" for English or "zh" for Chinese).
+
+        If the language is not recognised, a warning is issued and an object
+        with support for just English is returned.
+
+    `Lingua::Boolean::Tiny->new(\@lang)`
+        Construct a new object supporting the union of multiple languages.
+
+        Unrecognised languages are simply ignored.
+
+        Because a string could be interpreted differently in different
+        languages (e.g. "no" is a negative answer in English, but affirmative
+        in Polish), the order is significant - in case of ambiguities, the
+        earlier language wins.
+
+    `Lingua::Boolean::Tiny->new()`
+        Construct a new object supporting the union of the twelve main
+        supported languages.
+
+    `Lingua::Boolean::Tiny->new_strict($lang)`
+        Like `new`, but rather than defaulting to English, returns undef.
+
+    You can alternatively construct objects using class names based on the
+    language name:
+
+       my $indonesian = Lingua::Boolean::Tiny::Malay->new();
+
+   Methods
+    `boolean($text)`
+        Returns true if the text seems to indicate an affirmative answer (e.g.
+        "yes"); returns false if the text seems to indicate an negitive answer
+        (e.g. "no"); returns undef if the meaning of the text could not be
+        established.
+
+    `languages`
+        Returns the name of the languages supported by this object.
+
+    `langs`
+        Returns the ISO codes of the languages supported by this object.
+
+    `yes`
+        Returns a canonical "yes" string for the language. This method only
+        exists in objects which support a single language, not a union.
+
+    `no`
+        Returns a canonical "no" string for the language. This method only
+        exists in objects which support a single language, not a union.
+
+    `yesno($boolean)`
+        Returns a canonical "yes" or "no" string for the language, depending
+        upon whether $boolean is true or false. This method only exists in
+        objects which support a single language, not a union.
+
+        This method is effectively the inverse of the `boolean` method.
+
+  Functional Interface
+    This module provides several functions:
+
+    `boolean $text, $lang`
+        Shortcut for:
+
+           Lingua::Boolean::Tiny->new($lang)->boolean($text)
+
+        $lang is optional, but may be an ISO language code or a union thereof.
+
+        This function is exported by default.
+
+    `Lingua::Boolean::Tiny::languages()`
+        Returns the full names of all supported languages.
+
+        This function is not exported.
+
+    `Lingua::Boolean::Tiny::langs()`
+        Returns the ISO codes of all supported languages.
+
+        This function is not exported.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Lingua-Boolean-Tiny>.
+
+SEE ALSO
+    Lingua::Boolean, String::BooleanSimple, I18N::Langinfo.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+CREDITS
+    A thousand thanks to Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯 (cpan:DAXIM) for helping me with
+    Lingua::Boolean::Tiny::More and improving some of the translations in the
+    main module.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

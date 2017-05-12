@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Lingua/JA/Gal.pm
+share/lexicon.pl
+share/lexicon.yaml
+t/00_compile.t
+t/01_gal.t
+t/02_callback.t
+t/03_export.t
+xt/critic.t
+xt/podcoverage.t
+META.yml
+MANIFEST

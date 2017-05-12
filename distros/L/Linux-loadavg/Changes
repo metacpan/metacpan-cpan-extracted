@@ -1,0 +1,37 @@
+Revision history for Perl extension Linux::loadavg.
+
+0.01  Tue Jul 17 14:41:03 2003
+	- original version; based on Solaris::loadavg 0.01
+
+0.02  Tue Jul 17 15:30:00 2007
+	- Updated readme file with correct copyright credentials
+
+0.03  Tue Jul 17 18:00:00 2007
+	- Updated .pm file with right name and e-mail and clean up of
+	header file reference.
+
+0.04  Wed Jul 18 16:00:00 2007
+	- Updated .pm with larger example which includes autodetection
+	of Solaris and Linux.
+	- Added credits section to manpage
+	- Removed constants from .xs file. Now added as 'use constant' 
+          to .pm
+	- Test new constants being exported correctly
+
+0.05  Wed Jul 18 22:35:00 2007
+	- Add OS check to .pm file and die if not Linux
+	- Add OS check to 'make install'
+	- Move 'test.pl' to 't/test.t'
+
+0.06  Wed Jul 18 23:17:00 2007
+	- Add 't/loadavg-benchmark.pl' borrowed from BSD::getloadavg
+	- Updated README with pointers to original sources
+
+0.07  Mon Feb  3 11:25:00 2008
+	- Move OS check to Makefile.PL
+
+0.08  Sat Aug 16 00:07:00 2009
+	- Rewritten XS module. Removed memory leak
+
+0.09  Sun Aug 17 10:33:00 2009
+        - Removed C++ style commented out XS code

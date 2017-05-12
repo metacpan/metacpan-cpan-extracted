@@ -1,0 +1,13 @@
+MANIFEST
+README
+Makefile.PL
+Build.PL
+examples/demo.pl
+examples/demo_recurse.pl
+lib/Lingua/EN/Fathom.pm
+Changes
+t/main.t
+xt/author/pod.t
+xt/author/pod-coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json

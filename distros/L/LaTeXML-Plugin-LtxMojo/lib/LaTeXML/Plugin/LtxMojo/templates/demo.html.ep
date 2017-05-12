@@ -1,0 +1,16 @@
+% layout 'default';
+% title 'Demos';
+<div style="margin:10px;">
+<h2 id="LaTeXMLDaemonDemos">LaTeXML Daemon Demos</h2>
+<ul><li><a class="ext-link" href="/editor"><span class="icon"> </span>LaTeX fragment editor</a> - A web-based LaTeX editor with on-the-fly XHTML rendering.
+</li><li><a class="ext-link" href="http://tex2xml.kwarc.info/test/formula.php"><span class="icon"> </span>Formula conversion service</a> - Blazing fast formula conversion
+</li><li><a class="ext-link" href="http://tex2xml.kwarc.info/test/mathjax-demo.php"><span class="icon"> </span>The MathJaX demo @ arXMLiv</a> - Heard about <a class="ext-link" href="http://www.mathjax.org/"><span class="icon"> </span>MathJaX</a>? We take a shot at their demo page, using LaTeXML.
+
+</li></ul>
+<h2 id="LaTeXMLDemos">LaTeXML Demos</h2>
+<ul><li><a class="ext-link" href="http://tex2xml.kwarc.info"><span class="icon"> </span>tex2xml web service</a> - Provides an online interface to the arXMLiv conversion.</li></ul>
+
+
+<p><strong>Note:</strong> The sample services shown above are currently under development and will continuously improve in the course of the following weeks.
+</p>
+</div>

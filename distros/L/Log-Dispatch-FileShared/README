@@ -1,0 +1,235 @@
+$Id: README,v 1.1 2007/02/03 12:26:16 cmanley Exp $
+
+--------
+Abstract
+--------
+
+Log::Dispatch output class for logging to shared files.
+
+------------
+Requirements
+------------
+
+Log::Dispatch
+Params::Validate
+Time::HiRes
+Scalar::Util
+
+------------------
+Basic Installation
+------------------
+
+Log::Dispatch::FileShared may be installed through the CPAN shell
+in the usual manner:
+
+  # perl -MCPAN -e 'install Log::Dispatch::FileShared'
+
+You can also read this README from the CPAN shell:
+
+  # perl -MCPAN -e shell
+  cpan> readme Log::Dispatch::FileShared
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install Log::Dispatch::FileShared
+
+-------------------
+Manual Installation
+-------------------
+
+Log::Dispatch::FileShared can also be installed manually.  The latest CPAN
+version can be found at
+<http://www.cpan.org/modules/by-module/Log/> or in a
+similarly named directory at your favorite CPAN mirror.
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+
+On Win32 systems, replace "make" in the above commands with "nmake".
+The nmake utility can be downloaded from
+C<http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe>
+
+--------------------
+Module Documentation
+--------------------
+
+NAME
+    Log::Dispatch::FileShared - output class for logging to shared files.
+
+SYNOPSIS
+      use Log::Dispatch::FileShared;
+
+      my $output = Log::Dispatch::FileShared->new(
+            name      => 'test',
+            min_level => 'info',
+            filename  => 'application.log',
+      );
+
+      $output->log( level => 'emerg', message => 'Time to die.' );
+
+DESCRIPTION
+    This module provides an output class for logging to shared files under
+    the Log::Dispatch system.
+
+    Log messages are written using the flock file locking mechanism on a per
+    write basis which means that this module is suitable for sharing a log
+    file in a multitasking environment.
+
+    This class descends directly from Log::Dispatch::Output.
+
+OTHER SIMILAR CLASSES
+    Log::Dispatch::File doesn't provide any locking mechanism which makes it
+    unsuitable for sharing log files between multiple processes (unless you
+    don't mind having corrupt log messages on rare occasions).
+
+    Log::Dispatch::File::Locked does implement locking, but on a per open
+    handle basis which means that only a single process can log to the file
+    as long as the file is open. All other processes will block. The only
+    way to prevent other processes from blocking is to close the handle
+    after every write which degrades logging performance very much.
+    Therefore this class too is unsuitable for sharing log files between
+    multiple processes.
+
+METHODS
+    * new(%p)
+        This method takes a hash of parameters. The following options are
+        valid:
+
+        * name ($)
+                The name of the object (not the filename!). Required.
+
+        * min_level ($)
+                The minimum logging level this object will accept. See the
+                Log::Dispatch documentation on Log Levels for more
+                information. Required.
+
+        * max_level ($)
+                The maximum logging level this obejct will accept. See the
+                Log::Dispatch documentation on Log Levels for more
+                information. This is not required. By default the maximum is
+                the highest possible level (which means functionally that
+                the object has no maximum).
+
+        * filename ($)
+                The filename to be opened for appending.
+
+        * mode ($)
+                The mode the file should be opened with. Valid options are
+                '>' (write) and '>>' (append). The default is '>>' (append).
+
+        * perms ($)
+                If the file does not already exist, the permissions that it
+                should be created with. Optional. The argument passed must
+                be a valid octal value, such as 0600. It is affected by the
+                current or given umask.
+
+        * umask ($)
+                The optional umask to use when the file is created for the
+                first time.
+
+        * flock ($)
+                Whether or not log writes should be wrapped in a flock.
+                Defaults to true. If true, then for each logged message, a
+                non-blocking flock is attempted first, and if that fails,
+                then a blocking flock is attemped with a timeout.
+
+        * close_after_write ($)
+                Whether or not the file should be closed after each write.
+                This defaults to false. If set to true, then the mode will
+                aways be append, so that the file is not re-written for each
+                new message.
+
+                Note: opening and closing a file for each write is a
+                relatively slow process (especially on windoze systems) as
+                demonstrated in the performance benchmarks.
+
+        * close_after_modperl_request ($)
+                Only applicable for code running in a mod_perl (1 or 2)
+                environment and defaults to false. Set this to true if the
+                file should be closed after each mod_perl request which is
+                useful if you're using a persistent Log::Dispatch object and
+                intend to periodically roll your log files without having to
+                restart your web server each time.
+
+        * autoflush ($)
+                Whether or not the file should be autoflushed. This defaults
+                to true. If flock is true, then flushing always occurs no
+                matter what this is set to.
+
+        * callbacks( \& or [ \&, \&, ... ] )
+                This parameter may be a single subroutine reference or an
+                array reference of subroutine references. These callbacks
+                will be called in the order they are given and passed a hash
+                containing the following keys:
+
+                 ( message => $log_message, level => $log_level )
+
+                The callbacks are expected to modify the message and then
+                return a single scalar containing that modified message.
+                These callbacks will be called when either the "log" or
+                "log_to" methods are called and will only be applied to a
+                given message once.
+
+    * log_message( message => $ )
+        Sends a message to the appropriate output. Generally this shouldn't
+        be called directly but should be called through the "log()" method
+        (in Log::Dispatch::Output).
+
+BENCHMARKS
+    FreeBSD 6.1 with a single Intel(R) Xeon(TM) CPU 3.60GHz
+         Measuring 10000 logs of using defaults...
+                 Log::Dispatch::FileShared... 0.739 seconds   (avg 0.00007)
+                 Log::Dispatch::File...       0.622 seconds   (avg 0.00006)
+         Measuring 10000 logs of using autoflush=0, flock=0...
+                 Log::Dispatch::FileShared... 0.575 seconds   (avg 0.00006)
+                 Log::Dispatch::File...       0.574 seconds   (avg 0.00006)
+         Measuring 10000 logs of using autoflush=1, flock=0...
+                 Log::Dispatch::FileShared... 0.618 seconds   (avg 0.00006)
+                 Log::Dispatch::File...       0.623 seconds   (avg 0.00006)
+         Measuring 10000 logs of using flock=1...
+                 Log::Dispatch::FileShared... 0.739 seconds   (avg 0.00007)
+
+         Measuring 10000 logs of using close_after_write=1, flock=0...
+                 Log::Dispatch::FileShared... 1.080 seconds   (avg 0.00011)
+                 Log::Dispatch::File...       1.035 seconds   (avg 0.00010)
+         Measuring 10000 logs of using close_after_modperl_request=1, flock=1...
+                 Log::Dispatch::FileShared... 0.768 seconds     (avg 0.00008)
+
+    MSWin32 with a Pentium CPU 3.0GHz
+         Measuring 10000 logs of using defaults...
+                 Log::Dispatch::FileShared... 1.235 seconds   (avg 0.00012)
+                 Log::Dispatch::File...       1.047 seconds   (avg 0.00010)
+         Measuring 10000 logs of using autoflush=0, flock=0...
+                 Log::Dispatch::FileShared... 0.875 seconds   (avg 0.00009)
+                 Log::Dispatch::File...       0.907 seconds   (avg 0.00009)
+         Measuring 10000 logs of using autoflush=1, flock=0...
+                 Log::Dispatch::FileShared... 1.063 seconds   (avg 0.00011)
+                 Log::Dispatch::File...       1.047 seconds   (avg 0.00010)
+         Measuring 10000 logs of using flock=1...
+                 Log::Dispatch::FileShared... 1.251 seconds   (avg 0.00013)
+
+         Measuring 10000 logs of using close_after_write=1, flock=0...
+                 Log::Dispatch::FileShared... 74.128 seconds  (avg 0.00741)
+                 Log::Dispatch::File...       79.660 seconds  (avg 0.00797)
+
+        Note how rediculously slow MSWin32 is when close_after_write=1 is
+        used.
+
+SEE ALSO
+    Log::Dispatch::File.
+
+AUTHOR
+    Craig Manley
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 Craig Manley This library is free software; you can
+    redistribute it and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,3 @@
+[Wed Aug 12 02:08:25 1998]  17123 06croak.t ERR: a WARN before in main at t/06croak.t line 35.
+[Wed Aug 12 02:08:25 1998]  17123 06croak.t ERR: a WARN in check at t/myCroak.pm line 7.
+[Wed Aug 12 02:08:25 1998]  17123 06croak.t ERR: a CROAK at t/06croak.t line 36

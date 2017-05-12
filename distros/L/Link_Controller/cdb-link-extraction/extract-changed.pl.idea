@@ -1,0 +1,151 @@
+#!/home1/mikedlr/perl
+
+=head1 NAME
+
+extract-changed - extract links from files which have been changed
+
+=head1 SYNOPSIS
+
+extract-changed changelist
+
+=head1 DESCRIPTION
+
+For each file in a hierarchy, see if it is newer than the cdb file
+which has the links.  If it is then extract from it and store that in
+the new list (output in cdbmmake format) if it isn't just dump the old
+values from the database.
+
+=cut
+
+use Getopt::Function; #don't need yet qw(maketrue makevalue);
+
+$::opthandler = new Getopt::Function 
+  [ "version V>version",
+    "usage h>usage help>usage",
+    "help-opt=s",
+    "verbose:i v>verbose",
+  ],  {};
+
+$::opthandler->std_opts;
+
+$::opthandler->check_opts;
+
+@::changelist = @ARGV;
+
+sub usage() {
+  print <<EOF;
+extract-changed [options] page-url...
+
+EOF
+  $::opthandler->list_opts;
+}
+
+sub version() {
+  print <<'EOF';
+extract-changed version 
+$Id: extract-changed.pl.idea,v 1.4 2002/01/02 22:53:14 mikedlr Exp $
+EOF
+}
+
+
+
+sort { $::a cmp $::b } @::changelist;
+
+# we have the page index (which links on what page) open both for
+# reading and writing effectively..
+
+use CDB_File 0.86;
+use CDB_File::BiIndex::Generator;
+
+#1 tie in to the old page index
+
+tie %::old_pages, "CDB_File", $::page_index;
+my ($page,$link);
+
+my $next_change = shift @::changelist;
+OLDPAIR: while (($page,$link) = each %::old_pages ) {
+  my $comp = ($next_chage cmp $page);
+  $comp < 0 && do {
+    $::new_pages->add($page,$link);
+    $::new_links->add($link,$page);
+  };
+  $comp = 0 && do {
+    my $ignorekey=$key;
+    #chuck old values
+    ($page,$link) = each %::old_pages while $key eq $ignorekey;
+    #extract new values
+    #ready for next change
+    my $next_change = shift @::changelist;
+    #start the nextpair
+    redo OLDPAIR; 
+  };
+}
+
+
+sub extract_file {
+  $_=shift;
+  die "$_ is a directory" if -d;
+
+# FIXME dangerous, there could be a link to an external file which
+# means the external file should be included in the infostructure
+  return if -l; 
+
+  return unless guess_media_type($_) =~ /html/;
+
+  my $page_name="$_";
+  my @linklist=();
+
+  #1 what's the base for this file
+  my $base = $File::Find::dir . '/';
+  $base =~ s/^$::file_base/$::url_base/;
+  my $page_url="$base$_";
+  
+  
+  print STDERR "acting on $page_name, url $page_url\n" 
+      if $::verbose & 4;
+
+  my $act_url= sub {
+    my($tag, %attr) = @_;
+
+    #this is a closure which uses 
+    #$page_name
+    #$page_record
+
+    my $linkname;
+    my $attr;
+
+    #my $linkname=$attr{'href'};
+  LINK: while (($attr, $linkname)=each %attr) {
+      unless ( $linkname ) {
+	warn "Undefined link name generated";
+	next LINK;
+      }
+      print STDERR "extracting link $linkname\n" if 
+	  $::verbose & 8;
+
+      #we should make sure the link name is as canonical as possible.. 
+      my $url=new URI $linkname;
+      $url=$url->abs($base);
+      $linkname = $url->as_string();
+      print STDERR "fixed up link name $linkname\n" 
+	  if $::verbose & 16;
+
+      #MAKE SURE THERE IS A LINK RECORD
+
+      print URLLIST $linkname . "\n";
+ 
+      push @linklist, $linkname;
+    }
+  }; # definition of $act_link function
+
+  my $p = HTML::LinkExtor->new($act_url);
+  unless ( eval { $p->parse_file($_) } ) {
+    warn $@ ;
+    return;
+  }
+  
+  die "no url??" unless $page_url;
+  $::index->add_list_first($page_url,\@linklist);
+}
+
+

@@ -1,0 +1,46 @@
+--- #YAML:1.0
+name:                     Labyrinth-Plugin-Review-Book
+version:                  0.02
+abstract:                 Book Reviews plugin for the Labyrinth framework
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                  artistic_2
+distribution_type:        module
+installdirs:              site
+
+requires:
+  perl:                                   5.006
+  Clone:                                  0
+  Labyrinth:                              5.29
+  Labyrinth::Plugin::Review:              0
+  WWW::Scraper::ISBN:                     1.03
+recommends:
+  Test::CPAN::Meta:                       0
+  Test::CPAN::Meta::JSON:                 0
+  Test::Pod:                              1.00
+  Test::Pod::Coverage:                    0.08
+build_requires:
+  IO::File:                               0
+  Test::More:                             0.70
+
+provides:
+  Labyrinth::Plugin::Review::Book:
+    file:     lib/Labyrinth/Plugin/Review/Book.pm
+    version:  0.02
+
+no_index:
+  directory:
+    - examples
+    - t
+    - vhost
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Labyrinth-Plugin-Review-Book
+  repository: http://github.com/barbie/labyrinth-plugin-review-book
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

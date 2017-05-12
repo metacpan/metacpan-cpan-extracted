@@ -1,0 +1,23 @@
+Package {
+	name		= "hssource",
+#ifdef INSTALLING
+	import_dirs	= [ "$libdir/hslibs-imports/hssource" ],
+#else
+	import_dirs	= [ "$libdir/hslibs/hssource" ],
+#endif
+	source_dirs	= [],
+#ifdef INSTALLING
+	library_dirs	= [ "$libdir" ],
+#else
+	library_dirs	= [ "$libdir/hslibs/hssource" ],
+#endif
+	hs_libraries	= [ "HShssource" ],
+	extra_libraries	= [],
+	include_dirs	= [],
+	c_includes	= [],
+	package_deps	= [ "haskell-src" ],
+	extra_ghc_opts	= [],
+	extra_cc_opts	= [],
+	extra_ld_opts	= []
+}
+

@@ -1,0 +1,45 @@
+{
+   "abstract" : "Perl extension for NLP of the Portuguese",
+   "author" : [
+      "Alberto Simoes <ambs@di.uminho.pt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-PT-PLNbase",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "File::Temp" : "0",
+            "Lingua::PT::Abbrev" : "0.05",
+            "Test::Pod" : "1.00",
+            "Test::Pod::Coverage" : "0.08"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.55"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::PT::Abbrev" : "0.05"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.27"
+}

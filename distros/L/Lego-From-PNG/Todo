@@ -1,0 +1,7 @@
+TODO list for Perl module Lego::From::PNG
+
+- Optimize processing to interlace legos to improve structural integrity of the lego build.
+- Add feature to build legos with the knob facing the viewer leading to utilizing bricks with depth and length instead of just length. Call it orientation. Vertical is knobs up, Horizontal is knobs facing you.
+- Add option to allow a border to be placed around the picture (either one solid color or multiple colors) Have the capability of it being different styles. AKA solid, dashed, brick (one unit in, then out, then in, etc), and so on.
+- Auto detect unit size based on the supplied png. Check the first row and find the max number of color units found for each unique color in the row. The max number of color units is the unit size. (only if unit_size is set to discover, which is default)
+- Add resolution could allow a larger picture by using a larger brick size (e.g. 2x2) as a single unit. More useful for a horizontal orientation.

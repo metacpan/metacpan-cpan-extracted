@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Lemonldap-Portal-Session.t
+lib/Lemonldap/Portal/Session.pm
+eg/essvalid.pl
+eg/application_new.xml
+META.yml                                 Module meta-data (added by MakeMaker)

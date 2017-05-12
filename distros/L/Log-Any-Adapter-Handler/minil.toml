@@ -1,0 +1,5 @@
+name = "Log-Any-Adapter-Handler"
+authors = ['Gelu Lupaş <gvl@cpan.org>']
+authority = "cpan:GVL"
+license = "mit"
+abstract_from = "lib/Log/Any/Adapter/Handler.pm"

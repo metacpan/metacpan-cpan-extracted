@@ -1,0 +1,41 @@
+Lingua-StarDict version 1.00
+============================
+
+Lingua::StarDict - Perl interface to the StarDict or the SDCV.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    libstdc++.so
+    libglib-2.0.so
+    libstardict.so
+    
+So your should install weather the StarDict or the SDCV before.
+Your can find them at 
+
+    http://stardict.sourceforge.net
+    or
+    http://sdcv.sourceforge.net
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Suhanov Vadim
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

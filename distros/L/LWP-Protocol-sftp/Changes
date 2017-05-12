@@ -1,0 +1,23 @@
+Revision history for Perl extension LWP::Protocol::sftp.
+
+0.05  Nov 26, 2012
+        - Handle URLs with out a path part as pointing to '/' and not
+          to the SFTP default '~/' for sane semantics.
+        - Several bugs on directory listing creation corrected
+        - Add support for %DEFAULTS
+
+0.04  Jun 28, 2009
+        - LWP::Debug is deprecated, don't use it! (bug report by Ryan
+          Niebur).
+
+0.03  Jun 26, 2008
+        - update to not use Compat
+        - add support for password authentication
+
+0.02  Feb 16, 2006
+	- updated to use Net::SFTP::Foreign::Compat
+
+0.01  Thu Apr 28 23:41:44 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n LWP::Protocol::sftp
+

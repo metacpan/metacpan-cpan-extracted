@@ -1,0 +1,32 @@
+Revision history for Perl extension Lchown.
+
+1.01    2009-10-18
+        RT #25968
+        changed to Module::Build
+
+1.00    Nov 13 2004
+        now works on perls back to 5.00404
+        minor code tidy
+        added pod tests
+
+0.07    Jan 02 2004
+        fixed test failure on platforms without symlinks
+
+0.06    Oct 01 2003
+        replaced ENOTSUP with the more appropriate ENOSYS
+
+0.05    Sep 30 2003
+        really added a README this time
+
+0.04    Sep 30 2003
+        added a README
+
+0.03    Sep 28 2003
+        tidied docs and Makefile.PL
+
+0.02    Sep 28 2003
+        got it working and added tests
+
+0.01    Sep 26 2003
+        original version; created by h2xs 1.19
+

@@ -1,0 +1,695 @@
+[Changes for 1.00 - 2014-03-06]
+* Add missing support for c.loc()
+
+[Changes for 0.99 - 2014-02-03]
+* Localise $/ correctly (TOKUHIROM)
+  This change was missing from 0.97
+
+
+[Changes for 0.98 - 2014-01-22]
+* Exclude POT files (gerhardj)
+
+[Changes for 0.97 - 2014-01-09]
+* Localise $/ correctly (TOKUHIROM)
+
+[Changes for 0.96 - 2013-06-28]
+* Bumping - bad release
+
+[Changes for 0.95 - 2013-06-28]
+* Handle Haml blocks too (Calum Halcrow)
+
+[Changes for 0.94 - 2013-05-07]
+* Corrected spelling of Text::Haml
+* xgettext.pl was not being installed
+
+[Changes for 0.93 - 2013-03-28]
+* Moved to Dist::Zilla
+* Added support for HAML (Calum Halcrow)
+
+[Changes for 0.92 - 2012-12-05]
+* Fixed test for Perl 5.17.6+. (ANDK)
+
+[Changes for 0.91 - 2011-08-19]
+* Fixed test count for newly added tests
+
+[Changes for 0.90 - 2011-08-19]
+* Doc changes
+
+[Changes for 0.89 - 2011-08-19]
+* Added support to the TT2 parser for Mojolicious style tags
+  Thanks to COSIMO for the patch
+
+[Changes for 0.88 - 2011-07-30]
+
+* Fixed the t/5-extract.t test count
+
+[Changes for 0.87 - 2011-07-20]
+
+* Locale::Maketext::Extract::Plugin::Mason
+   - Added support for Mason 2
+     Thanks to ASIMON for the patch.
+
+* Locale::Maketext::Extract
+   - Now warns on loading bad plugins if warnings enabled
+
+* Locale::Maketext::Extract::Plugin::Base
+   - Corrected the synopsis
+
+  Thanks to TOKUHIROM for the bug reports
+
+[Changes for 0.86 - 2011-02-16]
+* Bumped version because the META file was showing an old version number.
+
+[Changes for 0.85 - 2011-02-11]
+* Changed Locale::Maketext::Extract::Run to ignore:
+   - .git/
+   - unix pipes
+   - binary files
+
+   Thanks to audreyt for the patch
+   https://github.com/audreyt/locale-maketext-lexicon/commit/1e4d112d435daa7b72eb8b49208f3b2e3185bc22
+
+[Changes for 0.84 - 2010-12-24]
+* Changed the minimum version of Locale::Maketext to 1.17, to avoid error
+  reports from recent Perl versions, which still have an old Locale::Maketext
+
+* Locale::Maketext::Extract
+    - added a fix from Ivan Bessarov to avoid uninit warnings when msgids
+      contain trailing spaces
+
+[Changes for 0.83 - 2010-12-09]
+* Locale::Maketext::Lexicon
+    - remove the local $@ when loading PO files - made it difficult
+      to debug errors when loading PO's
+
+      Thanks to Ton Voon for the patch
+      https://rt.cpan.org/Ticket/Display.html?id=63722
+
+[Changes for 0.82 - 2010-04-12]
+* Locale::Maketext::Extract::Plugin::Base
+* Locale::Maketext::Extract::Plugin::TT2
+* Locale::Maketext::Extract
+    - fixed some spelling errors - thanks to Ansgar Burchardt for the patch
+
+[Changes for 0.81 - 2010-04-09]
+* Locale::Maketext::Extract::PLugin::FormFu
+    - the plugin now understands YAML of the form:
+        mesage_loc: ['Max files: [_1]', 10]
+
+      Thanks to Charlie Garrison for the patch
+
+[Changes for 0.80 - 2010-04-08]
+* Locale::Maketext::Lexicon
+    - Added the _preload option, which forces parsing of the lexicon
+      as soon as it is loaded. Improves memory usage and performance
+      in a prefork environment
+
+      Thanks to Ruslan Zakirov for the patch
+
+[Changes for 0.79 - 2010-03-02]
+
+ * Locale::Maketext::Lexicon::Tie
+    - Removed a deprecated use of "defined %" for Perl 5.11+
+
+[Changes for 0.78 - 2010-02-23]
+
+ * Locale::Maketext::Lexicon
+    - Removed a deprecated use of "defined %" for Perl 5.11+
+
+[Changes for 0.77 - 2008-12-29]
+
+ * Locale::Maketext::Extract::Plugin::FormFu
+    - Rewrote the FormFu plugin completely to use the YAML.pm parser.
+      Previously, this plugin was completely broken.
+    - Resolves bugs:
+       - http://rt.cpan.org/Ticket/Display.html?id=42000
+         # Locale::Maketext::Extract::Plugin::FormFu broken
+       - http://rt.cpan.org/Ticket/Display.html?id=39292
+         # Parsing formfu config
+
+ * Locale::Maketext::Extract::Plugin::YAML
+    - Improved the accuracy of the line numbers.
+    - Added documentation and tests for using folded and block scalars.
+
+ * Locale::Maketext::Extract::Plugin::PPI
+    - Added a PPI based Perl plugin - more accurate than the Perl plugin,
+      but much slower.
+    - Not enabled by default
+    - moved the Perl extraction tests into t/51-perlextract.t
+    - Resolves bug: http://rt.cpan.org/Ticket/Display.html?id=14701
+      # xgettext doesn't handle interpolating functions
+
+ Also, corrected the POD to use the correct names for the plugins.
+
+[Changes for 0.76 - 2008-12-14]
+
+ * Locale::Maketext::Extract / Locale::Maketext::Lexicon::Gettext
+   - Roundtripping of fuzzy comments now works. If a translation is marked
+     by the translator as fuzzy, then it should remain so when re-extracted
+   - Added tests for roundtripping of fuzzy, and for format markers
+
+ * Locale::Maketext::Lexicon
+   - Fixed bug http://rt.cpan.org/Public/Bug/Display.html?id=14999
+     # relative paths to lang files fail
+   - added tests to prove it
+
+ * Locale::Maketext::Extract::Plugin::TT2
+   - changed the line string to contain only the start line, and not the range
+     as this was not consistent with the gettext spec
+
+[Changes for 0.75 - 2008-11-24]
+
+ * Locale::Maketext::Extract / Locale::Maketext::Extract::Run
+   Changed the order of extraction to:
+     - extract all strings
+     - then read, compile and write each PO file
+   Speeds the extraction process up by a factor of the number of languages used.
+   $Ext->read_po now resets the compiled entries, so that a fresh po file can
+   be written.
+
+   Also tidied up the verbose messages
+   Bumped both to 0.33
+
+ * Locale::Maketext::Extract::Run / xgettext.pl
+   Added the -W | --wrap option, which forces the file location
+   comments to be on separate lines, as per POEdit
+
+   The output order of the PO file has changed to match gettext producers, so
+   the arguments now appear before the file locations.
+
+ * t/5-extract_strings.tt
+   Fixed a bad SKIP plan
+
+[Changes for 0.74 - 2008-11-22]
+
+ * Locale::Maketext::Extract::Plugin::Perl
+   The Perl plugin now combines concatenated strings, eg
+   loc('string' . ' and this')
+   Contributed by Felix Ostmann
+
+ * Locale::Maketext::Extract::Run
+   Localised $_ correctly to avoid conflict with external strings
+   Contributed by Sebastian Knapp
+
+ * Locale::Maketext::Run
+   Fixed bug http://rt.cpan.org/Ticket/Display.html?id=31940
+   Debian bug http://bugs.debian.org/307777
+   xgettext.pl -f was not chomping file names correctly
+   Contributed by Niko Tyni
+
+[Changes for 0.73 - 2008-10-28]
+ * Locale::Maketext::Extract::Plugin::TextTemplate
+   - renamed MyParser to Locale::Maketext::Extract::Plugin::TextTemplate::Parser
+     to avoid namespace clashes
+ * CPANTS improvements
+   - Updated the Makefile to list all mentioned modules
+   - Added a LICENSE file
+   - added a Test::Pod test
+
+[Changes for 0.72 - 2008-10-10]
+
+Contributed by: Clinton Gormley (DRTECH)
+
+ * Locale::Maketext::Extract::Plugin::TT2
+   - fixed bug where extracted strings still had escaped quotes and backslashes
+   - if args are literal, they're now wrapped in double quotes instead of
+     single quotes
+   - special characters in args are escaped properly
+
+[Changes for 0.71 - 2008-10-05]
+
+* Bump version number of Locale::Maketext::Extract::Plugin::TextTemplate
+  to 0.30 so PAUSE can index it correctly.
+
+[Changes for 0.70 - 2008-10-04]
+
+Contributed by: Clinton Gormley (DRTECH)
+
+* Refactored Locale::Maketext::Extract
+  - Each format is handled by a different plugin
+  - Each format recognises certain default file types
+  - Custom plugins can be used
+
+* Locale::Maketext::Extract::Plugin::TT2
+  - Uses Template Toolkit as a parser
+  - Handles inline filter, block filters, and function calls to "l" or "loc"
+    Contibuted by: Andy Wardley [ABW]
+
+* Locale::Maketext::Extract::Plugin::YAML uses the YAML module as a parser
+  and can recognise the form:
+     key: _"string"
+
+* Locale::Maketext::Extract::Run
+  - Added -P|plugins option to specify which parser plugins to use
+  - Added -w|warnings to turn parser warnings on and off
+  - Added -v|verbose to output the files that are being processed,
+    the plugins used to process them, and the extracted strings
+  - Fixed a bug in the File::Find routine to correctly prune
+    .svn directories and their contents
+
+* Locale::Maketext::Extract::Plugin::Perl
+  - Added a defined check to avoid a warning.
+
+[Changes for 0.68 - 2008-08-18]
+
+* Locale::Maketext::Extract: Support for other forms of localization in
+  TT templates and TT HEREDOCS.
+  Contributed by: Felix Antonius Wilhelm Ostmann
+
+[Changes for 0.67 - 2008-08-04]
+
+* Locale::Maketext::Extract: Support in Extract.pm and Lexicon/Gettext.pm
+  for parsing and keeping user comments in PO files.
+  Contributed by: Cosimo Streppone
+
+[Changes for 0.66 - 2008-02-12]
+
+* Locale::Maketext::Extract: Support in Extract.pm->extract for
+  HTML::FormFu config files.
+  Contributed by: Andreas Marienborg
+
+[Changes for 0.65 - 2007-12-22]
+
+* Perl 5.9.5+ is pickier about what "being used only once" means,
+  so we make sure to avoid that warning.
+  Contributed by: Alex Vandiver
+
+* Also restore compatibility with Perl 5.005 and earlier by avoiding
+  the "no warnings" pragma.
+
+* Tidied up code style, documentation, copyright years, etc.
+
+[Changes for 0.64 - 2007-05-28]
+
+* Locale::Maketext::Extract: Extraction wasn't able to deal with escaped
+  quotes within single- and double-quoted strings.  (Bump version to 0.22.)
+  Contributed by: Matthew O'Connor
+
+[Changes for 0.63 - 2007-02-07]
+
+* Locale::Maketext::Lexicon used to generated mysteriouse error "next at ..."
+  instead of skipping the locale, when the requested .po file does not exist.
+  Contributed by: Ruslan U. Zakirov
+
+[Changes for 0.62 - 2006-06-15]
+
+* For the longest time, direct import of Locale::Maketext::Lexicon
+  from within localization classes (such as MyApp::I18N::zh_tw) was
+  untested and broken.  It now works the way described in the SYNOPSIS
+  section of the Locale::Maketext::Lexicon documentation.
+  Contributed by: Yann Kerherve
+
+[Changes for 0.61 - 2006-04-27]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the permissive "MIT" license.  See the COPYRIGHT
+  section in README for the new terms.
+
+* Repair Perl 5.005 compatibility in the build system.
+  Reported By: Rong-En Fan
+
+[Changes for 0.60 - 2006-04-13]
+
+* Locale::Maketext::Extract: Bump version to 0.20.
+  No functionality changes to Locale::Maketext::Lexicon; all changes
+  in this release are to Locale::Maketext::Extract.
+
+* The ->compile call now moves ->entries into ->compiled_entries,
+  instead of mutating them in-place.  This allows repeated cycles
+  of ->extract/->compile calls before the final ->write_po.
+
+* Consequently, in the ->read_po/->write_po API, the "$verbatim" flag
+  is now ignored.
+
+* ->read_po no longer fails on empty PO files.
+
+* The return values of ->msgids/->msgstr are now always in gettext
+  style and never in maketext style.
+
+* In xgettext.pl, the -u flag (specifies the style of the source
+  programs as gettext instead of the default maketext) now has nothing
+  to do with output escaping.  This closes another long-standing
+  bug of "vanishing backslashes" when the same .po file is written
+  once with -u and once without.
+
+* The --unescaped flag to "xgettext.pl" is deprecated and renamed
+  to the more appropriate "--use-gettext-style".
+
+* Locale::Maketext::Extract::Run now accepts single-letter directory
+  names instead of erroneously stripping them out.
+
+[Changes for 0.58 - 2006-04-13]
+
+* Locale::Maketext::Extract: Direct calls to ->write_po now
+  escapes the msg strings by default (reverting to <=0.54
+  behaviour), but calls via xgettext.pl (and ::Extract::Run)
+  now always specify the "verbatim" flag to ->write_po, so
+  users of extraction tools are still free from double escaping.
+  Requested by: Thierry Vignaud
+
+* Locale::Maketext::Extract: Allow the "# loc" marker at the
+  end of a statement:
+    say "foo"; # loc
+  previously it only worked on closing brackets and commas.
+
+* Locale::Maketext::Lexicon: The "gettext" style no longer parses
+  "%0" as a variable.  Also allows spaces between function arguments:
+    %quant(%1, %2)
+
+[Changes for 0.57 - 2006-04-11]
+
+* Locale::Maketext::Locale: The "_style => 'gettext'" option was
+  broken for function forms such as "%quant(%1)", as well as
+  adjacent variables such as "%1%2%3".
+
+[Changes for 0.56 - 2006-04-02]
+
+* Locale::Maketext::Lexicon: Specifying the new "_auto => 1" option
+  now turns on _AUTO fallback handling for all language handles.
+  Requested by: Jesse Vincent
+
+* Locale::Maketext::Lexicon: Specifying the new "_style => 'gettext'"
+  option makes "%1" and "%quant(%1)" to be used for interpolation,
+  instead of "[_1]" and "[quant,_1]".
+
+[Changes for 0.55 - 2006-03-22]
+
+* Locale::Maketext::Extract: Fix a long-standing bug that caused
+  double-escaping of backslashes and double quotes in loc strings.
+  Contributed by: Brian Cassidy
+
+[Changes for 0.54 - 2006-03-14]
+
+* When importing into an already defined lexicon and merging with its
+  entries, we need to clear the Locale::Maketext cache, otherwise
+  _AUTO entries generated by the old lexicon will linger around.
+  Contributed by: Helmut Lichtenberg
+
+[Changes for 0.53 - 2005-12-05]
+
+* Make xgettext.pl work with poEdit by not trying to read from empty
+  .po files.  Patch from Brian Cassidy.
+
+[Changes for 0.52 - 2005-12-04]
+
+* Christian Hansen pointed out 0.51's fix was bass ackwards.
+
+[Changes for 0.51 - 2005-12-03]
+
+* Locale::Maketext::Extract::Run's use of File::Find::find with
+  (follow => 1) may break on systems without symbolic links.
+  Reported by Brian Cassidy.
+
+[Changes for 0.50 - 2005-11-04]
+
+* Per suggestion from Sava Chankov, add the (quite outdated) webl10n
+  articles to docs/ directory.
+
+Patches from Mikael Sennerholm:
+
+* Added "localize" and "localise" to the list of recognized L10N
+  functions in Locale::Maketext::Extract.
+
+* Skip .svn directories in Locale::Maketext::Extract::Run.
+
+[Changes for 0.49 - 2005-04-13]
+
+* Stephen Quinney notes that we are too eager to die on nonexisting
+  files passed in as part of a lexicon_get_() source.  We now silently
+  ignore nonexistant files, only reporting error when it exists but
+  cannot be read or parsed.
+
+[Changes for 0.48 - 2005-03-12]
+
+Patches from Thierry Vignaud:
+
+* In Gettext.pm, do not silently skip last entry of a catalog.
+
+* In Extract.pm, do not silently skip first entry of a catalog
+  if there's only one empty line tween header and first real message.
+
+[Changes for 0.47 - 2005-02-03]
+
+* EXISTS in Locale::Maketext::Lexicon has the potential to trigger deep
+  recursion.  Reported by Wei-Hon Chen.
+
+[Changes for 0.46 - 2004-12-16]
+
+* Patch from Thierry Vignaud: Add a "_allow_empty" option to the
+  Gettext backend, to allow empty strings with
+
+* Harmen suggested a doc patch to better document the _AUTO key
+  for allowing empty or missing keys.
+
+* Changed all ::L10N to ::I18N in examples, to agree with the de
+  facto community standard.
+
+[Changes for 0.45 - 2004-10-26]
+
+* Fix decoding problem on Big5 containing "]", as reported by Jiing Deng.
+
+* For \*DATA calls, we can get the 'main' package from $0, skip tracing the
+  caller chain.
+
+[Changes for 0.44 - 2004-09-25]
+
+* Fixed a regression from 0.43 that prevented %*(...) interpolations.
+
+* Remove RCS headers from source files..
+
+[Changes for 0.43 - 2004-09-24]
+
+* Fix decoding problem on Big5 containing "\".
+
+[Changes for 0.42 - 2004-08-25]
+
+* Devel::DProf did not like the closure-based delay loading mechanism;
+  rewrite using OO-based promises instead.
+
+[Changes for 0.41 - 2004-08-24]
+
+* Delayed loading of lexicons now repects the original options.
+
+* Delay actualization of lexicon parsing until the first use.
+  (Suggested by Jesse Vincent)
+
+[Changes for 0.40 - 2004-08-22]
+
+* Moved under SVK management.
+
+* The 'locale' encoding now works on Win32, using
+  Win32::Console::OutputCP() to probe the code page.
+
+[Changes for 0.38 - 2004-04-26]
+
+* The quotemeta() introduced in 0.37 broke Locale::Maketext::Simple.
+
+* L::M::Extract now parses the '# loc' and '# loc_pair'
+  markers before end of lines, as used in RT.
+
+* New module, L::M::Extract::Run, that encapsulates the
+  xgettext.pl script.
+
+[Changes for 0.37 - 2004-04-21]
+
+* Thanks Christian Hansen for reminding me of the
+  quotemeta() bug.
+
+* Forgot to put quotemeta() around dir patterns; pointed
+  out by Jouke Visser.  This caused tests on Win32 to fail.
+
+* Respect the LAGUAGES and LC_MESSAGES environment variables.
+
+[Changes for 0.36 - 2004-03-17]
+
+* "_encoding" now takes a special "locale" value, which will
+  get the encoding from user's locale.
+
+* Gettext used to break when the re-encoded lexicon
+  contains Maketext's escape characters like "[" and "~".
+
+* Extract.pm should not prepend an empty "" before a
+  single-line "string\n".  Such treatments are meant for
+  multiline strings.
+
+* proper escaping of \ and " in _format.
+
+[Changes for 0.35 - 2004-02-19]
+
+* We no longer depend on Regexp::Common and Pod::Usage.
+
+* Extract strings inside functions that has spaces inside
+  the parens, like 'loc( "test" )', as suggested by Helmut
+  Lichtenberg.
+
+[Changes for 0.34 - 2003-12-31]
+
+* Update copyright years to 2004.
+
+* Fix Msgcat so it also handle CRLF gracefully.
+
+* .po files with DOSish CRLF line-ending was not parsed correctly.
+
+[Changes for 0.33 - 2003-12-08]
+
+* Multiline strings were produced with an extra "\n" by xgettext.pl.
+
+* "xgettext.pl -u" was broken.
+
+* Various documentation and error message fixes.
+
+[Changes for 0.32 - 2003-10-14]
+
+* Excise $& from ::Extract, ::Msgcat and ::Gettext.
+
+* Micro-optimize (encode|decode)_utf8 in the inner loop of
+  ::Gettext instead of (encode|decode)('utf8', ...).
+
+[Changes for 0.31 - 2003-10-13]
+
+* 0.30 still broken on Robert Spiers's darwin box, so
+rewrote them to totally avoid capturing parenthesis.
+
+* Also modify Extract.pm to be not reentrant.
+
+[Changes for 0.30 - 2003-10-13]
+
+* '*' in sources will now get properlly expanded by globbing.
+
+* The reentrant-regex transformation used in ::Gettext was
+  breaking 5.8.0 in subtle ways.  Reimplemented to use a two-pass
+  approach.
+
+[Changes for 0.29 - 2003-10-09]
+
+* Update readme and pods to mention ::Extract.
+
+* Add test for extraction.
+
+* Refactor xgettext.pl out into Locale::Maketext::Extract.
+
+* Move bin/ into script/.
+
+[Changes for 0.28 - 2003-08-28]
+
+* Gettext was chomping everything.  Fixed.
+
+* Support for Kwiki-style generic loc string: {{...}}
+
+[Changes for 0.27 - 2003-07-07]
+
+* Change tests to use utf8, not big5, for perl 5.6.1
+  people with broken Locale::Maketext (1.06).
+
+* Supress uninitialized warnings.
+
+* Jonas Lincoln reported that empty globs was causing problems.
+
+* Strip the extra parens off tt2 templates.
+
+* Be very extra magical and assume that main:: comes from
+  the caller if it is not yet opened.
+
+* Chia-Liang Kao pointed out that getting sources from glob
+  was not working.
+
+* "xgettext.pl -g" was documented but never enabled.
+
+* Fixed xgettext.pl's multiline handling.
+
+* TT2 regex was wrong; thanks Chia-Liang Kao for pointing out.
+
+[Changes for 0.26 - 2003-05-03]
+
+* Incoporated a modified version of Matthieu Arnold's patch
+  that enables Encode-specific testing for Perl 5.6.1 with
+  Encode::compat.
+
+[Changes for 0.25 - 2003-04-30]
+
+* Change t/TestPkg/L10N.pm to t/T_L10N.pm in accord with
+  imacat's arrangement.
+
+* Fixes cases where there are multiple '*'s in the glob entry.
+
+[Changes for 0.22 - 2003-04-28]
+
+* Document the choice of using the final '*' for
+  glob patterns that has multiple '*'s.
+
+* Add extra debug info.
+
+* prefer the last * for globbing languages.
+
+[Changes for 0.21 - 2003-04-27]
+
+* Remove unneccessary MO files.
+
+* Updates copyrights to 2003.
+
+* Mathieu Arnold pointed out that multiline handling was incorrect.
+
+* Implemented correct parsing of multiple "#, flag1, flag2".
+
+* "#, fuzzy" entries are now ignored, unless _use_fuzzy is
+  set to true.
+
+* Documentation fix: removed the ambiguous [ ... ] by imacat's request.
+
+* Filehandle sources are now seek()ed back to the original
+  position after reading; this allows using the same handle
+  for two language subclasses.
+
+[Changes for 0.20 - 2003-04-26]
+
+* Add a note that we now turns 'zh-tw' into 'zh_tw' during
+  import. this fixed imacat's major gripe with previous
+  versions of L::M::L.
+
+* Nixed the TODO test since it's not really on my todo.
+
+* Add copyright notice around parse_mo() by imacat's request.
+
+* Test suite from imacat's Locale::Maketext::Gettext.
+
+* Documenting the new _encoding, _decode and wildcard support.
+
+* Add IMACAT to authors and acknowledgement list.
+
+* New _decode and _encoding flag to control auto-recoding.
+
+* Globbing support for import lists.
+
+[Changes for 0.16 - 2003-02-22]
+
+* Gaal Yahas's patch to recognize __ in addition of _.
+
+* Wei-Hon Chen pointed out pod errors.
+
+[Changes for 0.15 - 2002-11-29]
+
+* Corrected %quant(,%1) -- should be %quant(%1).
+
+* POD tweaks.
+
+* Random fixes from Alain Barbet.
+
+* Merging from old lexicons now work properly with and without -u.
+
+[Changes for 0.14 - 2002-11-13]
+
+* Escapes are now applicable even with -u.
+
+[Changes for 0.13 - 2002-11-13]
+
+* Alain's parser patch.  This makes multi-line handling a breeze.
+
+[Changes for 0.12 - 2002-11-07]
+
+* Patch from Alain Barbett: Fix multiline gettext strings.
+
+* Document "xgettext.pl -u" before I forget about it.
+
+[Changes for 0.11 - 2002-10-27]
+
+* First sane CPAN release version.

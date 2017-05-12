@@ -1,0 +1,635 @@
+=pod
+
+=head1 NAME
+
+Log::Log4perl::CommandLine::Cookbook - Recipes for Log::Log4perl::CommandLine
+
+=head1 DESCRIPTION
+
+This cookbook has a series of example uses, including sample code,
+descriptions, and some command line examples with their output.
+
+These always use the C<:easy> mode from L<Log::Log4perl>, since the
+purpose is to illustrate the use of L<Log::Log4perl::CommandLine>, not
+L<Log::Log4perl>.  Go see it for more advanced usage.
+
+=head1 SAMPLE MODULE
+
+The scripts, modules and output can be found in the distribution's
+C<eg> directory.
+
+A sample module (C<SampleModule.pm>) is used to illustrate the
+interaction with logging from a module:
+
+ 
+ package SampleModule;
+ 
+ use Log::Log4perl qw(:easy);
+ 
+ sub test
+ {
+     TRACE "test trace message";
+     DEBUG "test debug message";
+     INFO  "test info  message";
+     WARN  "test warn  message";
+     ERROR "test error message";
+     FATAL "test fatal message";
+ }
+ 
+ 1;
+ 
+
+
+=head1 RECIPES
+
+=over 4
+
+=item sample1
+
+C<sample1.pl>:
+ 
+ use Log::Log4perl qw(:easy);
+ use Log::Log4perl::CommandLine qw(:all);
+ 
+ TRACE "trace message";
+ DEBUG "debug message";
+ INFO  "info  message";
+ WARN  "warn  message";
+ ERROR "error message";
+ FATAL "fatal message";
+ 
+
+
+Use the C<:all> option to enable all the standard options.  By default
+it will print only messages with ERROR or FATAL, other messages are
+suppressed.  The various command line options affect the output as
+shown.
+
+Sample Runs:
+ 
+ % perl sample1.pl
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample1.pl -q
+ 
+ % perl sample1.pl -v
+ [INFO ] info  message
+ [WARN ] warn  message
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample1.pl -d
+ [DEBUG] debug message
+ [INFO ] info  message
+ [WARN ] warn  message
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample1.pl --quiet
+ 
+ % perl sample1.pl --fatal
+ [FATAL] fatal message
+ 
+ % perl sample1.pl --error
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample1.pl --warn
+ [WARN ] warn  message
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample1.pl --info
+ [INFO ] info  message
+ [WARN ] warn  message
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample1.pl --debug
+ [DEBUG] debug message
+ [INFO ] info  message
+ [WARN ] warn  message
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample1.pl --trace
+ [TRACE] trace message
+ [DEBUG] debug message
+ [INFO ] info  message
+ [WARN ] warn  message
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ 
+
+
+=item sample2
+
+C<sample2.pl>:
+ 
+ use Log::Log4perl qw(:easy);
+ use Log::Log4perl::CommandLine qw(:all);
+ 
+ use SampleModule;
+ 
+ SampleModule::test();
+ 
+ TRACE "trace message";
+ DEBUG "debug message";
+ INFO  "info  message";
+ WARN  "warn  message";
+ ERROR "error message";
+ FATAL "fatal message";
+ 
+
+
+This script illustrates the interaction with modules.
+
+Sample Runs:
+ 
+ % perl sample2.pl 
+ [ERROR] test error message
+ [FATAL] test fatal message
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample2.pl -q
+ 
+ % perl sample2.pl -v
+ [INFO ] test info  message
+ [WARN ] test warn  message
+ [ERROR] test error message
+ [FATAL] test fatal message
+ [INFO ] info  message
+ [WARN ] warn  message
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample2.pl -q SampleModule
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample2.pl -q -v SampleModule
+ [INFO ] test info  message
+ [WARN ] test warn  message
+ [ERROR] test error message
+ [FATAL] test fatal message
+ 
+ % perl sample2.pl -q -d SampleModule
+ [DEBUG] test debug message
+ [INFO ] test info  message
+ [WARN ] test warn  message
+ [ERROR] test error message
+ [FATAL] test fatal message
+ 
+ % perl sample2.pl -v -d SampleModule
+ [DEBUG] test debug message
+ [INFO ] test info  message
+ [WARN ] test warn  message
+ [ERROR] test error message
+ [FATAL] test fatal message
+ [INFO ] info  message
+ [WARN ] warn  message
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+
+
+=item sample3
+
+C<sample3.pl>:
+ 
+ use Log::Log4perl qw(:easy);
+ use Log::Log4perl::CommandLine ':all',
+                                ':loginit' => { level => $INFO };
+ 
+ TRACE "trace message";
+ DEBUG "debug message";
+ INFO  "info  message";
+ WARN  "warn  message";
+ ERROR "error message";
+ FATAL "fatal message";
+ 
+
+
+This script overrides the default log level, setting it to INFO.  It
+can still be overridden on the command line.
+
+Sample Runs:
+ 
+ % perl sample3.pl 
+ [INFO ] info  message
+ [WARN ] warn  message
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample3.pl -q
+ 
+ % perl sample3.pl --error
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ 
+
+
+=item sample4
+
+C<sample4.pl>:
+ 
+ use Log::Log4perl qw(:easy);
+ use Log::Log4perl::CommandLine ':all',
+                                ':loginit' => { layout => '%c %m%n' };
+ 
+ TRACE "trace message";
+ DEBUG "debug message";
+ INFO  "info  message";
+ WARN  "warn  message";
+ ERROR "error message";
+ FATAL "fatal message";
+ 
+
+
+This script overrides the default log layout.  For more information on
+layouts, see L<Log::Log4perl::Layout::PatternLayout>.
+
+Sample Runs:
+ 
+ % perl sample4.pl
+ main error message
+ main fatal message
+ 
+ % perl sample4.pl -q
+ 
+ % perl sample4.pl -v
+ main info  message
+ main warn  message
+ main error message
+ main fatal message
+ 
+
+
+=item sample5
+
+C<sample5.pl>:
+ 
+ use Log::Log4perl qw(:easy);
+ use Log::Log4perl::CommandLine qw(:all :logconfig log4perl.conf);
+ 
+ TRACE "trace message";
+ DEBUG "debug message";
+ INFO  "info  message";
+ WARN  "warn  message";
+ ERROR "error message";
+ FATAL "fatal message";
+ 
+
+
+This script specifies a log4perl style configuration file.  If the
+file is present, it will be used, if it is absent, the defaults will
+be used.
+
+Here is a sample configuration file:
+ 
+ log4perl.logger = WARN,  screen
+ log4perl.appender.screen=Log::Log4perl::Appender::Screen
+ log4perl.appender.screen.layout=Log::Log4perl::Layout::PatternLayout
+ log4perl.appender.screen.layout.ConversionPattern=%c %m%n
+ 
+
+
+Log4perl configurations are extremely flexible, you can build complex
+logging schemes, including logging to files, databases, sending to
+another machine, fine tuning the specific messages you want to see,
+etc.  For more information, see L<Log::Log4perl::Config> and
+L<Log::Log4perl>.
+
+Sample Runs:
+ 
+ % perl sample5.pl 
+ main warn  message
+ main error message
+ main fatal message
+ 
+ % perl sample5.pl -q
+ 
+ % perl sample5.pl -v
+ main info  message
+ main warn  message
+ main error message
+ main fatal message
+ 
+
+
+=item sample6
+
+C<sample6.pl>:
+ 
+ use Log::Log4perl qw(:easy);
+ use Log::Log4perl::CommandLine ':all',
+ ':loginit' => q(
+     log4perl.logger = WARN,  screen
+     log4perl.appender.screen=Log::Log4perl::Appender::Screen
+     log4perl.appender.screen.layout=Log::Log4perl::Layout::PatternLayout
+     log4perl.appender.screen.layout.ConversionPattern=[%-5p] %c %m%n
+ );
+ 
+ TRACE "trace message";
+ DEBUG "debug message";
+ INFO  "info  message";
+ WARN  "warn  message";
+ ERROR "error message";
+ FATAL "fatal message";
+ 
+
+
+You can also specify a string with a fancy log4perl configuration
+inline.
+
+Sample Runs:
+ 
+ % perl sample6.pl 
+ [WARN ] main warn  message
+ [ERROR] main error message
+ [FATAL] main fatal message
+ 
+ % perl sample6.pl -v
+ [INFO ] main info  message
+ [WARN ] main warn  message
+ [ERROR] main error message
+ [FATAL] main fatal message
+ 
+
+
+=item sample7
+
+C<sample7.pl>:
+ 
+ use Log::Log4perl qw(:easy);
+ use Log::Log4perl::CommandLine ':all',
+ ':loginit' => q(
+     log4perl.logger = WARN,  screen
+     log4perl.appender.screen=Log::Log4perl::Appender::Screen
+     log4perl.appender.screen.layout=Log::Log4perl::Layout::PatternLayout
+     log4perl.appender.screen.layout.ConversionPattern=[%-5p] %c %m%n
+ );
+ 
+ use SampleModule;
+ 
+ SampleModule::test();
+ 
+ TRACE "trace message";
+ DEBUG "debug message";
+ INFO  "info  message";
+ WARN  "warn  message";
+ ERROR "error message";
+ FATAL "fatal message";
+ 
+
+
+This one is the same as sample6, but includes C<SampleModule>.  You
+can independendently turn up/down the logging on the main program
+(which gets inherited through the system), and the verbosity of any
+module in the system.  (Actually any 'category' in the system, which
+by default means module, but you can do fancier fine tuning of
+categories by specifying them manually, see L<Log::Log4perl> for more
+information.)
+
+Sample Runs:
+ 
+ % perl sample7.pl 
+ [WARN ] SampleModule test warn  message
+ [ERROR] SampleModule test error message
+ [FATAL] SampleModule test fatal message
+ [WARN ] main warn  message
+ [ERROR] main error message
+ [FATAL] main fatal message
+ 
+ % perl sample7.pl -q
+ 
+ % perl sample7.pl -v
+ [INFO ] SampleModule test info  message
+ [WARN ] SampleModule test warn  message
+ [ERROR] SampleModule test error message
+ [FATAL] SampleModule test fatal message
+ [INFO ] main info  message
+ [WARN ] main warn  message
+ [ERROR] main error message
+ [FATAL] main fatal message
+ 
+ % perl sample7.pl -q -v SampleModule
+ [INFO ] SampleModule test info  message
+ [WARN ] SampleModule test warn  message
+ [ERROR] SampleModule test error message
+ [FATAL] SampleModule test fatal message
+ 
+ % perl sample7.pl -d -q SampleModule
+ [DEBUG] main debug message
+ [INFO ] main info  message
+ [WARN ] main warn  message
+ [ERROR] main error message
+ [FATAL] main fatal message
+ 
+
+
+=item sample8
+
+C<sample8.pl>:
+ 
+ use Log::Log4perl qw(:easy);
+ use Log::Log4perl::CommandLine ':all',
+                                ':loginit' => { layout => '[%-5p] %c %m%n' };
+ 
+ use SampleModule;
+ use SampleModule2;
+ 
+ SampleModule::test();
+ SampleModule2::test();
+ 
+ TRACE "trace message";
+ DEBUG "debug message";
+ INFO  "info  message";
+ WARN  "warn  message";
+ ERROR "error message";
+ FATAL "fatal message";
+ 
+
+
+This script uses two modules (identical except for name), to
+illustrate the independent verbosity control.
+
+Sample Runs:
+ 
+ % perl sample8.pl 
+ [ERROR] SampleModule test error message
+ [FATAL] SampleModule test fatal message
+ [ERROR] SampleModule2 test error message
+ [FATAL] SampleModule2 test fatal message
+ [ERROR] main error message
+ [FATAL] main fatal message
+ 
+ % perl sample8.pl -d SampleModule
+ [DEBUG] SampleModule test debug message
+ [INFO ] SampleModule test info  message
+ [WARN ] SampleModule test warn  message
+ [ERROR] SampleModule test error message
+ [FATAL] SampleModule test fatal message
+ [ERROR] SampleModule2 test error message
+ [FATAL] SampleModule2 test fatal message
+ [ERROR] main error message
+ [FATAL] main fatal message
+ 
+ % perl sample8.pl -d SampleModule -q SampleModule2
+ [DEBUG] SampleModule test debug message
+ [INFO ] SampleModule test info  message
+ [WARN ] SampleModule test warn  message
+ [ERROR] SampleModule test error message
+ [FATAL] SampleModule test fatal message
+ [ERROR] main error message
+ [FATAL] main fatal message
+ 
+ % perl sample8.pl -q -d SampleModule
+ [DEBUG] SampleModule test debug message
+ [INFO ] SampleModule test info  message
+ [WARN ] SampleModule test warn  message
+ [ERROR] SampleModule test error message
+ [FATAL] SampleModule test fatal message
+ 
+ 
+
+
+=item sample9
+
+This script is identical to sample1, but the usages illustrates the
+C<--logfile> command line option.  You can specify a log filename on
+the command line and it will add a simple file appender (for more
+complex ones, make a real config file).  You can optionally specify a
+pattern layout with the option.
+
+Sample Runs:
+ 
+ % perl sample9.pl
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample9.pl --logfile mylog.output
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % cat mylog.output && rm mylog.output
+ 2008/08/06 13:37:24 main error message
+ 2008/08/06 13:37:24 main fatal message
+ 
+ % perl sample9.pl --logfile 'mylog.output|%d %m%n'
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % cat mylog.output && rm mylog.output
+ 2008/08/06 13:41:50 error message
+ 2008/08/06 13:41:50 fatal message
+ 
+
+
+=item sample10
+
+This script is identical to sample1, but the usage illustrates the
+C<--logconfig> command line option.  You can even specify a more
+complex log4perl configuration file if one isn't specified in the
+program.  If one is specified on the C<use> line, the one specified on
+the command line will override it.
+
+Sample Runs:
+ 
+ % perl sample10.pl 
+ [ERROR] error message
+ [FATAL] fatal message
+ 
+ % perl sample10.pl --logconfig log4perl.conf
+ main warn  message
+ main error message
+ main fatal message
+ 
+
+
+=item sample11
+
+C<sample11.pl>:
+ 
+ use Log::Log4perl qw(:easy);
+ use Log::Log4perl::CommandLine qw(:all :noinit handlelogoptions);
+ 
+ Log::Log4perl->easy_init($FATAL);
+ 
+ handlelogoptions();
+ 
+ TRACE "trace message";
+ DEBUG "debug message";
+ INFO  "info  message";
+ WARN  "warn  message";
+ ERROR "error message";
+ FATAL "fatal message";
+ 
+ Log::Log4perl::init('log4perl.conf');
+ 
+ handlelogoptions();
+ 
+ TRACE "trace message 2";
+ DEBUG "debug message 2";
+ INFO  "info  message 2";
+ WARN  "warn  message 2";
+ ERROR "error message 2";
+ FATAL "fatal message 2";
+ 
+
+
+This script shows how to use C<:noinit> to disable auto log
+configuration and explicitly call handlelogoptions() after manually
+configuring Log4perl.
+
+Sample Runs:
+ 
+ % perl sample11.pl
+ 2008/08/13 22:33:50 fatal message
+ main warn  message 2
+ main error message 2
+ main fatal message 2
+ 
+ % perl sample11.pl -v
+ 2008/08/13 22:33:52 info  message
+ 2008/08/13 22:33:52 warn  message
+ 2008/08/13 22:33:52 error message
+ 2008/08/13 22:33:52 fatal message
+ main info  message 2
+ main warn  message 2
+ main error message 2
+ main fatal message 2
+ 
+ % perl sample11.pl -d
+ 2008/08/13 22:33:55 debug message
+ 2008/08/13 22:33:55 info  message
+ 2008/08/13 22:33:55 warn  message
+ 2008/08/13 22:33:55 error message
+ 2008/08/13 22:33:55 fatal message
+ main debug message 2
+ main info  message 2
+ main warn  message 2
+ main error message 2
+ main fatal message 2
+ 
+ 
+
+
+=back
+
+=head1 AUTHOR
+
+Curt Tilmes E<lt>ctilmes@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2008 Curt Tilmes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

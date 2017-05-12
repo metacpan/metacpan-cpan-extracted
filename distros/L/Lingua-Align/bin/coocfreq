@@ -1,0 +1,370 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# coocfreq - count co-occurrence frequencies for arbitrary features
+#
+#  -f ...... output file with source language frequencies (default = src.freq)
+#  -e ...... output file with target language frequencies (default = trg.freq)
+#  -c ...... output file with co-occurrence frequencies (default = cooc.freq)
+#
+#  -a ...... sentence alignment file
+#  -A ...... alignment file format (OPUS, STA ...)
+#  -s ...... source language file
+#  -S ...... format of source language file (Corpus, Tiger, ....)
+#  -t ...... target language file
+#  -T ...... format of target language file (Corpus, Tiger, ....)
+#  -x ...... source language features (default = word)
+#  -y ...... target language features (default = word)
+#  -m ...... freq threshold (default = 2)
+#  -D ...... store vocabulary in DB_FILE (to save memory)
+
+use strict;
+use FindBin;
+use lib $FindBin::Bin.'/../lib';
+use Lingua::Align::Corpus::Parallel;
+use Lingua::Align::Features;
+
+use DB_File;
+use POSIX;
+
+use vars qw($opt_a $opt_A $opt_x $opt_y $opt_s $opt_S $opt_t $opt_T $opt_m
+            $opt_d $opt_D $opt_C $opt_c $opt_e $opt_f);
+
+use Getopt::Std;
+getopts('a:A:m:s:S:t:T:x:y:dDc:e:f:');
+
+my $SrcFeatures = $opt_x || 'word';
+my $TrgFeatures = $opt_y || 'word';
+my $threshold   = $opt_m || 2;
+
+my $SrcFreqFile = $opt_f || 'src.freq';
+my $TrgFreqFile = $opt_e || 'trg.freq';
+my $CoocFreqFile = $opt_c || 'cooc.freq';
+
+# nr of sentences for which counts can be kept in memory
+my $CoocCache   = $opt_C || 200000;
+
+my $corpus     = new Lingua::Align::Corpus::Parallel(
+    -alignfile => $opt_a,
+    -type      => $opt_A,
+    -src_file  => $opt_s,
+    -src_type  => $opt_S,
+    -trg_file  => $opt_t,
+    -trg_type  => $opt_T);
+my $SrcExtract = new Lingua::Align::Features;
+my $TrgExtract = new Lingua::Align::Features;
+$SrcExtract->initialize_features($SrcFeatures);
+$TrgExtract->initialize_features($TrgFeatures);
+
+my %SrcVoc=(__ALL__ => 0);
+my %TrgVoc=(__ALL__ => 0);
+if ($opt_D){
+    tie %SrcVoc, "DB_File", "$SrcFreqFile.voc", O_CREAT|O_RDWR, 0664, $DB_HASH ;
+    tie %TrgVoc, "DB_File", "$TrgFreqFile.voc", O_CREAT|O_RDWR, 0664, $DB_HASH ;
+}
+
+my @SrcFreq=();
+my @TrgFreq=();
+
+my %CoocFreq=();
+my %CoocDB=();
+if ($opt_d){
+    tie %CoocDB, "DB_File", $CoocFreqFile, O_CREAT|O_RDWR, 0664, $DB_HASH ;
+#    $DB_HASH->{'cachesize'} = 10000 ;
+}
+
+
+my $srcid;
+my $trgid;
+
+
+
+# run through the corpus
+
+my $srcsent={};
+my $trgsent={};
+
+# check if we can do something simple
+# (without looking at trees & extracting features)
+# --> just word co-occurrences from plain text corpora
+# --> sentences = arrays of plain text tokens
+my $simple=0;
+if ($SrcFeatures eq 'word' && $TrgFeatures eq 'word'){
+    if ((not defined $opt_S) || ($opt_S=~/corpus|text/i)){
+ 	if ((not defined $opt_T) || ($opt_T=~/corpus|text/i)){
+	    if ((not defined $opt_A) || ($opt_A!~/sta|opus/i)){
+		$simple=1;
+		$srcsent=[];
+		$trgsent=[];
+	    }
+	}
+    }
+}
+
+
+my $count=0;
+while ($corpus->next_alignment($srcsent,$trgsent)){
+
+    $count++;   
+    if (not($count % 5000)){
+	print STDERR '.';
+    }
+    if (not($count % 100000)){
+	print STDERR " $count\n";
+    }
+
+    # get source and target node features for all nodes in the tree
+    # and count their frequencies
+    my %srccount=();
+    my %trgcount=();
+
+    # simple: just count all tokens
+    if ($simple){
+	foreach (@{$srcsent}){$srccount{$_}++;}
+	foreach (@{$trgsent}){$trgcount{$_}++;}
+    }
+    # complex: get features from trees
+    # (this is much slower!)
+    else{
+	foreach my $sn (keys %{$$srcsent{NODES}}){
+	    my $feat = $SrcExtract->feature($srcsent,$sn);
+	    if ($feat=~/\S/){$srccount{$feat}++;}
+	}
+	foreach my $tn (keys %{$$trgsent{NODES}}){
+	    my $feat = $TrgExtract->feature($trgsent,$tn);
+	    if ($feat=~/\S/){$trgcount{$feat}++;}
+	}
+    }
+
+
+    # for each word type combination --> add min(srcfreq,trgfreq) to cooc count
+    # (co-occurrence = number of word type pairs that could be linked)
+
+    foreach my $s (keys %srccount){
+	if (! exists $SrcVoc{$s} ){
+	    $srcid++;
+	    $SrcVoc{$s} = $srcid;
+	}
+	my $sid = $SrcVoc{$s};
+	my $freq = $srccount{$s};
+	$SrcFreq[$sid] += $freq;
+	$SrcFreq[0]    += $freq;        # total src word counts!
+	foreach my $t (keys %trgcount){
+	    if (! exists $TrgVoc{$t} ){
+		$trgid++;
+		$TrgVoc{$t} = $trgid;
+	    }
+	    my $tid = $TrgVoc{$t};
+	    $freq = $trgcount{$t} if ($trgcount{$t} < $freq);
+	    $CoocFreq{$sid}{$tid} += $freq;
+	    $CoocFreq{0}{0}       += $freq;    # total nr of pairs
+	}
+    }
+    foreach my $t (keys %trgcount){
+	my $tid = $TrgVoc{$t};
+	my $freq = $trgcount{$t};
+	$TrgFreq[$tid] += $freq;
+	$TrgFreq[0]    += $freq;        # total counts!
+    }
+
+    if ($opt_d){
+	if (! ($count % $CoocCache)){
+	    write2DB(\%CoocFreq,\%CoocDB);
+	}
+    }
+
+}
+
+if ($opt_d){
+    write2DB(\%CoocFreq,\%CoocDB);
+}
+
+
+
+open F,">$SrcFreqFile" || die "cannot write to $SrcFreqFile";
+binmode(F,":utf8");
+print F "# $SrcFeatures\n";
+foreach my $w (keys %SrcVoc){
+    if ($SrcFreq[$SrcVoc{$w}]>$threshold){
+	print F $w,"\t",$SrcVoc{$w},"\t";
+	print F $SrcFreq[$SrcVoc{$w}],"\n";
+    }
+}
+close F;
+
+open F,">$TrgFreqFile" || die "cannot write to $TrgFreqFile";
+binmode(F,":utf8");
+print F "# $TrgFeatures\n";
+foreach my $w (keys %TrgVoc){
+    if ($TrgFreq[$TrgVoc{$w}]>$threshold){
+	print F $w,"\t",$TrgVoc{$w},"\t";
+	print F $TrgFreq[$TrgVoc{$w}],"\n";
+    }
+}
+close F;
+
+
+if (! $opt_d){
+    open F,">$CoocFreqFile" || die "cannot write to CoocFreqFile";
+    binmode(F,":utf8");
+    print F "# source frequencies: $SrcFreqFile\n";
+    print F "# target frequencies: $TrgFreqFile\n";
+    foreach my $s (keys %CoocFreq){
+	foreach my $t (keys %{$CoocFreq{$s}}){
+	    if ($CoocFreq{$s}{$t} > $threshold){
+		print F $s,"\t",$t,"\t",$CoocFreq{$s}{$t},"\n";
+	    }
+	}
+    }
+    close F;
+}
+
+
+sub write2DB{
+    my ($hash,$db)=@_;
+    print STDERR "add cooc counts to the DB\n";
+    my $c=0;
+    foreach my $s (keys %{$hash}){
+	$c++;
+	if (not($c % 2000)){
+	    print STDERR '.';
+	}
+	if (not($c % 10000)){
+	    print STDERR "$c\n";
+	}
+	foreach my $t (keys %{$$hash{$s}}){
+	    $$db{"$s\t$t"}+=$$hash{$s}{$t};
+	    delete $$hash{$s}{$t};
+	}
+	delete $$hash{$s};
+    }
+    print STDERR "done!\n";
+}
+
+
+__END__
+
+=head1 NAME
+
+coocfreq - count co-occurrence frequencies for arbitrary features of nodes in a parallel treebank
+
+=head1 SYNOPSIS
+
+  coocfreq [OPTIONS]
+
+  # count co-occurrence frequencies between category labels
+  # in the parallel treebank of Sophie's World (Smultron)
+  # and print the results in plain text files 
+
+  coocfreq -a sophie.xml -A sta -x cat -y cat -f cat.src -e cat.trg -c cat.cooc
+
+  # count co-occurrences of 3-letter-suffix + category label of the parent node
+  # of the source language tree with words from the target language tree
+  # results will be stored in src.freq, trg.freq and cooc.freq
+
+  coocfreq -a sophie.xml -A sta -x suffix=3:parent_cat -y word
+
+
+=head1 DESCRIPTION
+
+This script counts frequencies and co-occurrence frequencies of source and target language features. It runs through the sentence aligned treebank and combines all node pairs. Note that co-occurrence frequencies in a sentence are C< max( srcfreq(srcfeature) , trgfreq(trgfeature) ) > to ensure Dice scores between 0 and 1!
+
+=head1 OPTIONS
+
+=over
+
+=item -f src.freq
+
+Specify the name for the source language frequencies. The file will start with a line specifying the source language features used (starting with an initial '#'). All other lines have three TAB separated items: the feature string, a unique ID, and finally the frequency.
+
+ # word
+ learned 682     4
+ stamp   722     3
+ hat     1056    5
+ what    399     20
+ again   220     14
+ of      27      118
+
+=item -e trg.freq
+
+Specify the name for the target language frequencies. The format is the same as for the source language.
+
+=item -c cooc.freq
+
+Specify the name for the co-occurrence frequencies. The first two lines specify the names of the files with the source and the target language frequencies and all other lines contain TAB separated source feature ID, target feature ID and co-occurrence frequency. Here is an example:
+
+ # source frequencies: word.src
+ # target frequencies: word.trg
+ 127     32      4
+ 127     898     3
+ 127     31      3
+ 127     11      5
+ 127     138     6
+ 798     9       4
+ 1250    1367    3
+
+=item -a align-file
+
+Name of the alignment file (needs to include sentence alignment information). Parallel corpora without explicit sentence alignment files can also be used. For example, you can leave out this parameter if your parallel corpus is a plain text corpus with two separate files for source and target language and corresponding lines are aligned.
+
+=item -A align-file-format
+
+This argument specifies the format of the sentence alignment file. For example,  it can be OPUS (XCES format used in OPUS) or STA (Stockholm Tree Aligner format). 
+
+=item -s src-file
+
+Source language file of your parallel corpus.
+
+=item -S src-file-format
+
+Format of the source language file. Default will be "plain text".
+
+
+=item -s trg-file
+
+Target language file of your parallel corpus.
+
+
+=item -T trg-file-format
+
+Format of the target language file. Default will be "plain text".
+
+=item -x srcfeatures
+
+Features in the source language. Default feature is 'word' = surface words at each terminal node. All kinds of node attributes and combinations of features and contextual features can be used.
+
+=item -y trgfeatures
+
+The same as -x but for the target language trees.
+
+=item -m freq-threshold
+
+The frequency threshold. Default is 2.
+
+=item -D
+
+A flag that enables storing the source and target language vocabulary in DB_FILE database files on disk to save memory when counting. This can be useful especially for complex (long) feature strings. Otherwise it doesn't save that much. The co-occurrence matrix is the big problem .....
+
+
+=back
+
+
+=head1 SEE ALSO
+
+L<Lingua::treealign>, L<Lingua::Align::Trees>, L<Lingua::Align::Features>
+ 
+
+=head1 AUTHOR
+
+Joerg Tiedemann, E<lt>jorg.tiedemann@lingfil.uu.seE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Joerg Tiedemann
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

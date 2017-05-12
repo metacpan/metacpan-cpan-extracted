@@ -1,0 +1,41 @@
+Revision history for Perl extension Location::GeoTool.
+
+1.00  Tue Nov 18 19:24:32 2003
+	- original version; created by h2xs 1.23 with options
+		-A -X -n SpaceTag::GEO
+		Included function: 	coordformat dir_dist2point
+		                    point2dir_dist datumchange
+
+1.01  Thu Jan 15 21:59:44 2004
+	- Chane the name of module to: Location::GeoTool
+
+1.20  Thu Jun 3 01:34:44 JST 2004
+        - Bug fixed in coordformat (In Mapion format encoding)
+        - Add direction_string function
+
+1.95  Tue Jun 8 20:15:03 JST 2004
+        - Preview release of Ver. 2.0
+        - Add OO interface
+
+1.97  Tue Jun 22 18:49:03 JST 2004
+        - Second upload version to CPAN
+        - Change to XS module
+        - Add Location::Object::Direction
+        - Add Location::Object::Aura (shadowed)
+        - Repeal description of old non-OO interface
+
+1.98  Thu Jal 1 18:57:00 JST 2004
+        - Bug fix for handling minus longitude/latitude
+
+1.99  Fri Jan 15 23:51:00 JST 2005
+        - Aloow little different of format in parsing coordinates
+
+2.00  Sat Mar 17 11:44:00 JST 2007
+        - Bug Fix for gpsone/mapion format at negative coordinates
+        - Abolish legacy non-OO method
+        - Add plugin mechanism
+        - Change Makefile.PL to be able to choose XS version or Pureperl version
+        - Combine Plugin::GridLocator and Plugin::Locapoint to same package
+        - Some logic changes to make performance faster 
+
+

@@ -1,0 +1,13 @@
+Revision history for Perl extension Linux::Svgalib.
+
+1.3 	Sat  1 Oct 20:26:13 BST 2016
+		- Fixed so it at least compiles with a modern gcc
+		- massive caveat about whether it actually works
+
+1.2   	Wed Apr 11 08:26:59 2001
+		- Original Release
+
+0.01  	Wed Feb 14 07:55:08 2001
+		- original version; created by h2xs 1.21 with options
+			-O -x -F-U__GNUC__ -n Linux::Svgalib vga.h
+

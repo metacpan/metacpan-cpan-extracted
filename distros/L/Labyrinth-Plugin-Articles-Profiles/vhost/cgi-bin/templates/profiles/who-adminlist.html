@@ -1,0 +1,62 @@
+[% 
+    title = 'Profile Admin' ;
+    htmltitle = title ;
+
+    crumb2_name = 'Admin' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=home-admin' ;
+    crumb1_name = 'Profiles' ;
+%]
+
+<div class="boxer">
+  <p><a href="[% cgipath %]/pages.cgi?act=who-add&amp;sectionid=[% sectionid %]">create a new profile</a></p>
+  <p>Click on an profile's 'Quick Name' to edit or create additional content.</p>
+
+	<form action="[% cgipath %]/pages.cgi">
+	<input type="hidden" name="act" value="who-admin" />
+	<input type="hidden" name="sectionid" value="[% sectionid %]" />
+	<p>Search by Name: <input type="text" name="searchname" />
+	[% stockselect %] [% ddpublish %]<input type="submit" value="GO" />
+|	<a href="[% cgipath %]/pages.cgi?act=who-admin">view all</a>
+	</p>
+	</form>
+</div>
+
+<div class="boxer">
+<form id="EDIT" name="EDIT" method="POST" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act"       value="who-admin" />
+<input type="hidden" name="doaction"  value="" />
+<input type="hidden" name="recordid"  value="" />
+
+<table class="blocker">
+<tr>
+	<th>Quick Name</th>
+	<th>Name</th>
+	<th>Status</th>
+	<th>Action</th>
+</tr>
+
+[% IF data %]
+[% FOREACH item = data %]
+
+<tr>
+	<td><a href="[% cgipath %]/pages.cgi?act=who-edit&amp;articleid=[% item.articleid %]">[% item.quickname %]</a></td>
+	<td>[% item.title %]</td>
+	<td>[% item.publishstate %]</td>
+	<td><input type="checkbox" name="LISTED" value="[% item.articleid %]" /></td>
+</tr>
+
+[% END %]
+
+[% ELSE %]
+<tr><td colspan="4" align="center">No profiles listed.</td></tr>
+[% END %]
+
+</table>
+
+<p>
+<input type="button" value='Promote' onClick="doSubmit('Promote',0)" />
+<input type="button" value='Copy'    onClick="doOnlyOne('Copy')" />
+<input type="button" value='Delete'  onClick="doSubmit('Delete',0)" />
+</p>
+</form>
+</div>

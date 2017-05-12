@@ -1,0 +1,67 @@
+<h2>Photo Gallery</h2>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="album-pick" />
+<p>Meta Search <input type="text" name="searchmeta" /> <input type="submit" class="gobutton" value="GO" />
+</form>
+
+<script type="text/javascript">
+<!--
+function SelectImage(id,href) {
+    window.opener.SetImage(id,href);
+}
+
+function Gallery(id) {
+    f = document.forms[1];
+    f.start.value = id;
+    f.submit();
+}
+//-->
+</SCRIPT>
+
+<div class="admin">
+<table>
+<tr>
+    <td><a href='javascript:SelectImage([% data.0.photoid %],"[% data.0.thumb %]")'><img src="[% webpath %]/[% data.0.thumb %]" width="100" height="100" title="[% data.0.tagline %] ([% data.0.dimensions %])" alt="[% data.0.tagline %] ([% data.0.dimensions %])"/></a></td>
+    <td><a href='javascript:SelectImage([% data.1.photoid %],"[% data.1.thumb %]")'><img src="[% webpath %]/[% data.1.thumb %]" width="100" height="100" title="[% data.1.tagline %] ([% data.1.dimensions %])" alt="[% data.1.tagline %] ([% data.1.dimensions %])"/></a></td>
+    <td><a href='javascript:SelectImage([% data.2.photoid %],"[% data.2.thumb %]")'><img src="[% webpath %]/[% data.2.thumb %]" width="100" height="100" title="[% data.2.tagline %] ([% data.2.dimensions %])" alt="[% data.2.tagline %] ([% data.2.dimensions %])"/></a></td>
+</tr>
+<tr>
+    <td><a href='javascript:SelectImage([% data.3.photoid %],"[% data.3.thumb %]")'><img src="[% webpath %]/[% data.3.thumb %]" width="100" height="100" title="[% data.3.tagline %] ([% data.3.dimensions %])" alt="[% data.3.tagline %] ([% data.3.dimensions %])"/></a></td>
+    <td><a href='javascript:SelectImage([% data.4.photoid %],"[% data.4.thumb %]")'><img src="[% webpath %]/[% data.4.thumb %]" width="100" height="100" title="[% data.4.tagline %] ([% data.4.dimensions %])" alt="[% data.4.tagline %] ([% data.4.dimensions %])"/></a></td>
+    <td><a href='javascript:SelectImage([% data.5.photoid %],"[% data.5.thumb %]")'><img src="[% webpath %]/[% data.5.thumb %]" width="100" height="100" title="[% data.5.tagline %] ([% data.5.dimensions %])" alt="[% data.5.tagline %] ([% data.5.dimensions %])"/></a></td>
+</tr>
+<tr>
+    <td><a href='javascript:SelectImage([% data.6.photoid %],"[% data.6.thumb %]")'><img src="[% webpath %]/[% data.6.thumb %]" width="100" height="100" title="[% data.6.tagline %] ([% data.6.dimensions %])" alt="[% data.6.tagline %] ([% data.6.dimensions %])"/></a></td>
+    <td><a href='javascript:SelectImage([% data.7.photoid %],"[% data.7.thumb %]")'><img src="[% webpath %]/[% data.7.thumb %]" width="100" height="100" title="[% data.7.tagline %] ([% data.7.dimensions %])" alt="[% data.7.tagline %] ([% data.7.dimensions %])"/></a></td>
+    <td><a href='javascript:SelectImage([% data.8.photoid %],"[% data.8.thumb %]")'><img src="[% webpath %]/[% data.8.thumb %]" width="100" height="100" title="[% data.8.tagline %] ([% data.8.dimensions %])" alt="[% data.8.tagline %] ([% data.8.dimensions %])"/></a></td>
+</tr>
+
+</table>
+</div>
+
+
+<div class="boxer">
+<table width="100%">
+
+<tr>
+    <td>
+        [% IF prev %]<a href='javascript:Gallery([% prev %])'>&lt;&lt; PREV</a>[% ELSE %]&lt;&lt; PREV[% END %]
+    </td>
+    <td align="center"><a href='javascript:window.close()'>CLOSE WINDOW</a></td>
+    <td align="right" >
+        [% IF next %]<a href='javascript:Gallery([% next %])'>NEXT &gt;&gt;</a>[% ELSE %]NEXT &gt;&gt;[% END %]
+    </td>
+</tr>
+
+</table>
+</div>
+
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="album-pick" />
+<input type="hidden" name="start" value="[% this %]" />
+<input type="hidden" name="imagetype" value="[% imagetype %]" />
+</form>
+
+</div>

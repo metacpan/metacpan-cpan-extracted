@@ -1,0 +1,48 @@
+Revision history for Log-Any-IfLOG
+
+0.08    2016-06-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rename internal dumb object class to avoid clash with
+	  Object::Dumb.
+
+
+0.07    2015-08-17 (PERLANCAR)
+
+	- Fix get_logger().
+
+
+0.06    2015-08-17 (PERLANCAR)
+
+	- Add get_logger() static method.
+
+
+0.05    2015-04-05 (PERLANCAR)
+
+	- Pass to Log::Any if Log::Any is already loaded.
+
+        - Add variable: $ENABLE_LOG to force enable/disable logging.
+
+
+0.04    2015-04-02 (PERLANCAR)
+
+	- Return a singleton instead of a new dumb object everytime.
+
+
+0.03    2015-04-02 (PERLANCAR)
+
+	- [ux] Also load Log::Any if TRACE/DEBUG/VERBOSE/QUIET/LOG_LEVEL
+	  envs are set.
+
+
+0.02    2015-03-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Expand on the rationale for the module.
+
+
+0.01    2015-02-21 (PERLANCAR)
+
+        - First release.

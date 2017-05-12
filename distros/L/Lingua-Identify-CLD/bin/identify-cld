@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use Lingua::Identify::CLD;
+
+my $cld = Lingua::Identify::CLD->new();
+
+if (@ARGV) {
+	for my $file (@ARGV) {
+		next unless -f $file;
+
+		local $/ = undef;
+		open my $fh, "<:utf8", $file or die "Couldn't read $file: $!";
+		my $string = <$fh>;
+		close $fh;
+		my $lang = $cld->identify($string);
+		print "$file: $lang\n";
+	}
+} else {
+	local $/ = undef;
+	binmode STDIN, ":utf8";
+	my $string = <STDIN>;
+	my $lang = $cld->identify($string);
+	print "STDIN: $lang\n";
+}
+
+=encoding utf8
+
+=head1 NAME
+
+identify-cld - Uses Lingua::Identify::CLD to identify the language of a text.
+
+=head1 SYNOPSYS
+
+      $ identify-cld file1 file2 file3
+      file1: ENGLISH
+      file2: FRECH
+      file3: HINDI
+
+      $ cat file1 | identify-cld
+      STDIN: ENGLISH
+
+=head1 DESCRIPTION
+
+A simple frontend to the identify function of C<Lingua::Identify::CLD>.
+
+=head1 AUTHOR
+
+Alberto Simoes, C<< <ambs at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+L<http://github.com/ambs/Lingua-Identify-CLD>.  I will be notified,
+and then you'll automatically be notified of progress on your bug as I
+make changes.
+
+=head1 ACKNOWLEDGEMENTS
+
+B<IN MEMORIAM OF JEAN VÉRONIS.>
+
+
+Chrome team for making the code available.
+
+Jean Véronis for pushing me to do this.
+
+SocialFlow L<http://www.socialflow.com> for simplifiying the
+build/install process.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011-2013 Alberto Simoes.
+
+This program is distributed under the (Revised) BSD License:
+L<http://www.opensource.org/licenses/bsd-license.php>
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+* Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+* Neither the name of Alberto Simoes's Organization
+nor the names of its contributors may be used to endorse or promote
+products derived from this software without specific prior written
+permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut
+
+1; # End of Lingua::Identify::CLD
+

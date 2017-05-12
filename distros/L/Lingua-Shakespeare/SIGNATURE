@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2420b73fc18a7ac2a5bbfb4c416b409f85262595 MANIFEST
+SHA1 57fa76523a09381533c1c88a271cf27e15ead041 META.yml
+SHA1 4da1b5f254cf95543b7b83dc1734542fdc54b342 Makefile.PL
+SHA1 34bc16b8ecf55285583ad0a7c11492f1b78dfecf Shakespeare.y
+SHA1 d599df1de698c0956ab55fadc36c0bd73a2606af examples/fibonacci.spl
+SHA1 e7164bcc6ce554d7885d55b0db4dd028a4357ade examples/fibonacci2.spl
+SHA1 96ca0aaff974b10fe20eae15374a05469cc74914 examples/guess.spl
+SHA1 b04a146132bc14dab9657c335e044036a3df358a examples/hello.spl
+SHA1 7c552102207cc130598b395b3cac9da9586ed50c examples/primes.spl
+SHA1 b91c0702683a8375318308acf48cbdb5e3518c94 examples/reverse.spl
+SHA1 2d3a2a40b2a284f51b74f2e1e06f8c77e93cd746 examples/shakesbeer.spl
+SHA1 36b4cd3971e116458229a8f74e03919191236674 inc/Module/Install.pm
+SHA1 5edf750dabf25f41136bebff7a574bc4bfff4708 inc/Module/Install/Base.pm
+SHA1 0b2755693087e2cd877fee8d7df14eaf854d7b37 inc/Module/Install/Can.pm
+SHA1 40922248175f9a0ab2af35cc6a72f3f6d1bda1df inc/Module/Install/Fetch.pm
+SHA1 51a4662ddde9308ac5d727b71220ef44b6a047f2 inc/Module/Install/Include.pm
+SHA1 77f0d24632f08107b67bef1a22ea6f2023e60862 inc/Module/Install/Makefile.pm
+SHA1 76a186acf7a65ff2d9c759802f315e48b2dac06e inc/Module/Install/Metadata.pm
+SHA1 ff56817eb18a9d7a528852d2b568c348629a14fb inc/Module/Install/Win32.pm
+SHA1 a485e469ac64908d7e965ae726b6a58682d74d8e inc/Test/Builder.pm
+SHA1 2e86c1ac237e606c365cfde0965bd662c86b6b35 inc/Test/More.pm
+SHA1 fcfe1ee7fe1f1731d0589957a6c0d2313c019071 lib/Lingua/Shakespeare.pm
+SHA1 8b557c8b0c5dd795f0f084a28c49d8eeb49be671 lib/Lingua/Shakespeare.pod
+SHA1 7945958fd1e5f046116608e3b9803c92b7d06cb2 lib/Lingua/Shakespeare/Character.pm
+SHA1 ed16ebf661e405658f11948f7d2dfe3b0ff6c9fa lib/Lingua/Shakespeare/Play.pm
+SHA1 d8b8dde00a5cb7f8e9dc942cd8740f0cb0209b47 mkparse
+SHA1 dbef72dca9c070bc9e806b9d64ee59951c561572 t/common.pl
+SHA1 a00fe5d32d62dc2f96a52742b7caf6ea9d574249 t/fibonacci2.t
+SHA1 9306e0f462a87f31d099ded7904615f880ddfbe5 t/guess.t
+SHA1 ee6c76fc3c6ad28944075a409257251b138e40ef t/hello.t
+SHA1 bfcf25a9b24c9b1ac93165c53cb6132f3fbeed65 t/primes.t
+SHA1 9fe8294c07ee09b114eb82ef198a3619088a431b t/reverse.t
+SHA1 207a029fdface94be9ca8ae6cbd407de775597f4 t/shakesbeer.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (Darwin)
+
+iD8DBQFAlBUaR0BL4gbYw3QRAri/AJsH62LPetj2jXXfJkcs32O5kf/LdACfQG9/
++OdVATvRLEci4PcVGgpX55c=
+=7vCL
+-----END PGP SIGNATURE-----

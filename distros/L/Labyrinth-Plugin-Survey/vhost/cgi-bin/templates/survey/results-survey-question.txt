@@ -1,0 +1,70 @@
+[% USE String %]
+[% IF q.preamble; q.preamble %]
+
+
+[% END %]
+[% qu = q.name %]
+[% IF q.type == 'select' OR q.type == 'radio' OR q.type == 'private' %]
+[% FOREACH option = q.options %]
+[% ov = option.value %]
+[% str = String.new(results.$qu.$ov.value); str.right(4) %] | [% option.key %]
+
+[% END %]
+[% qux = q.name _ 'X' %]
+[% IF results.$qux.value %]
+[% FOREACH def = results.$qux.value %]     | [% def %]
+
+[% END %]
+
+[% END %]
+[% END %]
+[% IF q.type == 'checkbox' %]
+[% str = String.new(results.$qu.value); str.right(4) %] | [% q.options.0.key %]
+
+[% IF q.default %]
+[% qux = q.name _ 'X' %]
+[% FOREACH def = results.$qux.value %]     | [% def %]
+
+[% END %]
+
+[% END %]
+[% END %]
+[% IF q.type == 'count' %]
+[% FOREACH option = q.options %]
+[% str = String.new(results.$qu.value); str.right(4) %] | [% option.key %]
+[% END %]
+[% END %]
+[% IF q.type == 'text' OR q.type == 'textarea' %]
+[% FOREACH r = results.$qu.value %]
+  * [% r %]
+
+[% END %]
+[% END %]
+[% IF q.type == 'currency' %]
+[% FOREACH r = results.$qu; k = r.key %]
+[% str = String.new(results.$qu.$k.value); str.right(4) %] | [% q.pre %] [% r.key %] [% q.post %]
+
+[% END %]
+[% END %]
+[% IF q.type == 'matrix' %]
+[% str = String.new('Choices'); str.left(30); opt = 1; FOREACH option = q.options %] | [% str = String.new(opt); str.right(4);opt = opt + 1; END %]
+
+[% inx = 0 %]
+[% FOREACH choice = q.choices; opt = 1 %]
+[% str = String.new(choice); str.left(30); FOREACH option = q.options %] | [% str = String.new(results.$qu.$inx.$opt.value); str.right(4); opt = opt + 1; END %]
+
+[% inx = inx + 1 %]
+[% END %]
+
+Key:
+[% opt = 1; FOREACH option = q.options; opt %] = [% option; opt = opt + 1 %]
+
+[% END %]
+
+
+[% END %]
+
+[% IF q.footnote; q.footnote %]
+
+
+[% END %]

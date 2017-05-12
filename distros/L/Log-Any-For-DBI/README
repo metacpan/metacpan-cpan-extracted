@@ -1,0 +1,37 @@
+SYNOPSIS
+
+     use DBI;
+     use Log::Any::For::DBI;
+    
+     # now all connect()'s, do()'s, prepare()'s are logged with Log::Any
+     my $dbh = DBI->connect("dbi:...", $user, $pass);
+     $dbh->do("INSERT INTO table VALUES (...)");
+
+    Sample script and output:
+
+     % TRACE=1 perl -MLog::Any::App -MDBI -MLog::Any::For::DBI \
+       -e'$dbh=DBI->connect("dbi:SQLite:dbname=/tmp/tmp.db", "", "");
+       $dbh->do("CREATE TABLE IF NOT EXISTS t (i INTEGER)");'
+     [1] ---> DBI::connect(['dbi:SQLite:dbname=/tmp/tmp.db','','********'])
+     [5] <--- DBI::connect() = [bless( {}, 'DBI::db' )]
+     [5] ---> DBI::db::do(['CREATE TABLE IF NOT EXISTS t (i INTEGER)'])
+     [5] ---> DBI::db::prepare(['CREATE TABLE IF NOT EXISTS t (i INTEGER)',undef])
+     [5] <--- DBI::db::prepare() = [bless( {}, 'DBI::st' )]
+     [5] ---> DBI::st::execute([])
+     [5] <--- DBI::st::execute() = ['0E0']
+     [5] <--- DBI::db::do()
+
+    You can filter to log only certain methods by passing the method names
+    as import arguments, for example:
+
+     use Log::Any::For::DBI qw(prepare connect);
+
+SEE ALSO
+
+    Log::Any::For::Class
+
+    DBIx::Log4perl, one of the inspirations for this module. With due
+    respect to its author, I didn't like the approach of DBIx::Log4perl and
+    its intricate links to DBI's internals. I'm sure DBIx::Log4perl is good
+    at what it does, but currently I only need to log SQL statements.
+

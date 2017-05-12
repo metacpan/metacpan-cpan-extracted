@@ -1,0 +1,35 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+msgid "Number of %1: %2"
+msgstr ""
+
+msgid "Number of {post items}: {count :num}"
+msgstr ""
+
+msgid "Please write %1 %*(%2,postcard,postcards) today."
+msgstr ""
+
+# comment2
+# comment1
+#. automatic2
+#. automatic1
+#: reference:3 reference:2
+#: reference:1
+msgid "He is overtaking the seagull named „bear“."
+msgstr ""
+
+msgid "Please write {name} {count :num} postcard today."
+msgid_plural "Please write {name} {count :num} postcards today."
+msgstr[0] ""
+msgstr[1] ""
+

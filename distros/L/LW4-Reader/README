@@ -1,0 +1,30 @@
+LW4/Reader version 0.01
+=======================
+
+Read Lightwright 4 files into data structures for manipulation and 
+processing by perl. As of this writing, Lightwright is not available
+for POSIX compliant operating systems, and so this provides a handy
+interface for processing those files on linux.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright 2009 by Tony Tambasco
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This library is not developed by or with, or endorsed by John McKernon
+Software, nor is the author affiliated with John McKernon Software in
+any way. 
+
+"Lightwright" is copyright 1999 - 2003 by John McKernon Software, all
+rights reserved. 

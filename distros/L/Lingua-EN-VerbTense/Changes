@@ -1,0 +1,21 @@
+Revision history for Perl extension Lingua::EN::ParseVerb
+
+3.003 Mon Aug 13 16.17:00 2012
+    - Fixed changes file
+    - be sure everything is unix format
+
+3.002 Thu Aug 09 15:39:00 2012
+    - fixed borked dist
+
+3.01  Thu Aug 09 15:39:00 2012
+    - New maintainer.
+    - Modernized the package and distribution layout to follow
+      contemporary standards
+    - Fixed a few small pod issues
+    - Modernized the tests
+    - Created a git repository
+    - converted to Dist::Zilla for distribution lifecycle
+
+3.00  Thu Sep 28 21:12:30 2000
+	- original CPAN version; created by Josiah Bryan
+

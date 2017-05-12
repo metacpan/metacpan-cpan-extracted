@@ -1,0 +1,40 @@
+This is Perl module LLEval.
+
+SYNOPSIS
+
+    lleval -x p6 -e '"Hello, Perl6 world!".say'
+    lleval -x hs -e 'main = putStrLn "Hello, Haskell world!"'
+
+INSTALLATION
+
+Install cpanm (App::cpanminus) and then run the following command to install
+LLEval:
+
+    $ cpanm LLEval
+
+If you get an archive of this distribution, unpack it and build it
+as per the usual:
+
+    $ tar xzf LLEval-$version.tar.gz
+    $ cd LLEval-$version
+    $ perl Makefile.PL
+    $ make && make test
+
+Then install it:
+
+    $ make install
+
+DOCUMENTATION
+
+LLEval documentation is available as in POD. So you can do:
+
+    $ perldoc LLEval
+
+to read the documentation online with your favorite pager.
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2010, gfx. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

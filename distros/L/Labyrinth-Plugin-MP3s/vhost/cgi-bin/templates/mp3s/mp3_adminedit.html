@@ -1,0 +1,69 @@
+[% 
+    IF data.mp3id ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' MP3s' ;
+    htmltitle = title ;
+
+    crumb3_name = 'Admin' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=home-admin' ;
+    crumb2_name = 'MP3s' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=mp3s-admin' ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+<div class="boxer">
+  <p>   <a href="/mp3s/admin">MP3 admin</a>
+      | <a href="/mp3s/add">create a new MP3</a></p>
+  [% IF thanks %]<p>MP3 saved successfully.</p>[% END %]
+
+[% IF errmess %]
+  <p class="alert">
+  [% IF errmess == 1 %]There are invalid or missing fields, as noted by the "&empty;" symbol.
+  [% ELSE %][% errmess %][% END %]
+  </p>
+[% END %]
+</div>
+
+<form action="[% cgipath %]/pages.cgi" method="post">
+<input type="hidden" name="act" value="mp3s-save" />
+<input type="hidden" name="mp3id" value="[% data.mp3id %]" />
+<input type="hidden" name="orderno" value="[% data.orderno || 99 %]" />
+
+<div class="boxer">
+<table class="blocker">
+<tr><th>Source *</th>
+    <td class="alert">[% data.source_err %]</td>
+    <td><input type="text" name="source" size="60" value="[% data.source | html %]" /><br />
+        <input type="file" name="mp3file" id="mp3file" /> 
+    </td></tr>
+<tr><th>Tracks</th>
+    <td class="alert">[% data.tracks_err %]</td>
+    <td><textarea name="tracks" rows="10" cols="90">[% data.tracks %]</textarea></td></tr>
+<tr><th>Notes</th>
+    <td class="alert">[% data.notes_err %]</td>
+    <td><textarea name="notes" rows="10" cols="90">[% data.notes %]</textarea></td></tr>
+<tr><th>Category *</th>
+    <td class="alert">[% data.catid_err %]</td>
+    <td>[% data.ddcats %]</td></tr>
+<tr><th>Publish *</th>
+    <td class="alert">[% data.publish_err %]</td>
+    <td>[% data.ddpublish %]</td></tr>
+</table>
+</div>
+
+<p><input type="submit" value='Save' /></p>
+
+</form>
+
+<h2>Preview</h2>
+<div id="pagecontent">
+<div id="textcontent">
+
+<h3>[% data.category %]</h3>
+<h4>[% data.source | html %]</h4>
+[% data.tracks %]
+[% IF data.notes ; THEN ; data.notes ; END %]
+
+</div>
+</div>

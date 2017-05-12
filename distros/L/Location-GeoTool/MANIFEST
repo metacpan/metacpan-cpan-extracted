@@ -1,0 +1,22 @@
+Changes
+GeoTool.xs
+lib/Location/GeoTool.pm
+lib/Location/GeoTool/Aura.pm
+lib/Location/GeoTool/Direction.pm
+lib/Location/GeoTool/Direction/Japanese.pod
+lib/Location/GeoTool/Japanese.pod
+lib/Location/GeoTool/Plugin/GridLocator.pm
+lib/Location/GeoTool/Plugin/Locapoint.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+ppport.h
+README
+t/00_compile.t
+t/01_format.t
+t/02_datum.t
+t/03_direction.t
+t/04_dirstring.t
+t/05_gridlocator.t
+t/06_locapo_get.t
+t/07_locapo_create.t

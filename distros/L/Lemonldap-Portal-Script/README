@@ -1,0 +1,75 @@
+NAME
+    Lemonldap::Portal::Script - Perl extension for Lemonldap websso
+    framework
+
+SYNOPSIS
+      use Lemonldap::Portal::Script
+      $exchange = Lemonldap::Portal::Script::Exchange->new( numero => $cp, requete => $line );
+      $question = Lemonldap::Portal::Script::Question->new();
+      $response = Lemonldap::Portal::Script::Response->new();
+
+DESCRIPTION
+    This module implementes 3 objects class : Exchange, Question ,Response
+
+    An Exchange is composed of one question and one response.
+
+    The parsing_example.pl shows how it works.
+
+    First use firefox plugin in order to have client-server dialog in plain
+    text file. I use The LiveHTTPHeaders for Firefox in order to recording
+    connection on web site.
+    Second ,the text dialog file is parsed by te program. It may split
+    exchange in two groups. One for true exchange (authentication form)
+    second for useless exchange : jpeg, css .
+
+        filtered dialog
+        apache virtual configuration file
+        perl script or handler processing connection on web server
+
+  Methods
+         $line means a line of dialog file recording.
+
+        Exchange->new( numero => $cp, requete => $line );
+        Exchange->set_tirade('response',$response);
+        Exchange->set_tirade('question',$question);
+        Exchange->add_string("--------Fin echange $echange->{numero}");
+        Exchange->set_method($line);# GET /POST
+        Exchange->set_ResponseCode($line);# 200, 302 ..
+        Exchange->as_string;
+        Exchange->set_status (required , y/n )
+
+EXPORT
+        None
+
+SEE ALSO
+        Lemonldap(3), Lemonldap::Portal::Standard
+
+        http://lemonasso.org/
+
+        Eric German, <germanlinux@yahoo.fr>
+
+COPYRIGHT AND LICENSE
+        Copyright (C) 2004 by Eric German
+
+        Lemonldap originaly written by Eric german who decided to publish
+        him in 2003 under the terms of the GNU General Public License
+        version 2.
+
+        This package is under the GNU General Public License, Version 2.
+        The primary copyright holder is Eric German.
+        Portions are copyrighted under the same license as Perl itself.
+        Portions are copyrighted by Doug MacEachern and Lincoln Stein. This
+        library is under the GNU General Public License, Version 2.
+          This program is free software; you can redistribute it and/or modify
+          it under the terms of the GNU General Public License as published by
+          the Free Software Foundation; version 2 dated June, 1991.
+
+          This program is distributed in the hope that it will be useful,
+          but WITHOUT ANY WARRANTY; without even the implied warranty of
+          MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+          GNU General Public License for more details.
+
+          A copy of the GNU General Public License is available in the source tree;
+          if not, write to the Free Software Foundation, Inc.,
+          59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+

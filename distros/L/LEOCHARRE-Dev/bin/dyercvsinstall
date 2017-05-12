@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+use vars qw($VERSION);
+use base 'LEOCHARRE::CLI';
+use strict;
+use Carp;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /(\d+)/g;
+
+my $o = gopts('o');
+
+
+force_root();
+scalar @ARGV or man() and exit;
+if ($o->{o}){
+   $ENV{CVS_RSH} = 'ssh';
+   $ENV{CVSROOT} = ':ext:cvs@216.140.208.228:/storage/store1/cvsroot';
+
+}
+
+
+
+for ( @ARGV ){
+   my $package = $_;
+
+   $package=~s/::/-/g;
+   print STDERR "attempting to install [$package]\n" if DEBUG;
+
+   my $tmpd = mktmpdir() or die("$0, cant make temp dir");
+
+   chdir $tmpd;
+   print STDERR "tmpdir $tmpd\n" if DEBUG;
+
+   my @args =('cvs','export','-D','now',$package);
+
+   print STDERR "args will be [@args]\n" if DEBUG;
+
+   system(@args) == 0 or 
+      print STDERR "FATAL: command failure:\n\t@args\n\t$?\n"and exit 1;
+
+   chdir("$tmpd/$package") or die("cannot chdir into [$tmpd/$package], $!");
+
+   for ('perl Makefile.PL','make install','make realclean'){
+      system($_) == 0 or die ("$0, [$_], $?");
+      print STDERR "did $_\n" if DEBUG;
+   }
+
+   print STDERR "pacakge [$package] done.\n\n" if DEBUG;
+
+   
+
+   
+
+}
+
+
+
+
+sub usage {
+   return qq{
+
+$0
+
+DESCRIPTION
+
+This simple script will do this:
+
+   mkdir /tmp/dir
+   cd /tmp/dir
+   cvs export -D now package
+   cd /tmp/dir/package
+   perl Makefile.PL
+   make install;
+   make realclean;
+
+for all package arguments
+
+can only be used by root
+
+will cvs export -D now the package
+
+OPTIONS
+
+	-v version
+	-h help
+   
+OPTION FLAGS
+
+	-d debug on
+	-v print version and exit
+	-h help
+   -o outside cvs settings
+	
+ARGUMENTS
+
+list the arguments as the modules / packages from the dyer cvs server you want to install
+packages do not have funny chars, File-PathInfo is accepted, so is File::PathInfo
+
+EXAMPLE USAGE
+
+   dyercvsinstall File::PathInfo
+
+   dyercvsinstall Metadata-ByInode
+
+SEE ALSO
+
+L<LEOCHARRE::CLI>
+};
+}

@@ -1,0 +1,18 @@
+abstract: Provides access to the VarCon (Variant Conversion Info)
+author: Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
+build_requires: 
+  ExtUtils::MakeMaker: 6.11
+  File::Spec: 0.80
+  Test::More: 0.47
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Lingua-EN-VarCon
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  File::ShareDir: 0.03
+  perl: 5.005
+version: 1.00

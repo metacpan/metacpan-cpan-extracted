@@ -1,0 +1,13 @@
+MANIFEST
+CHANGES
+README
+Makefile.PL
+META.yml
+lib/Lyrics/Fetcher.pm
+lib/Lyrics/Fetcher/Cache.pm
+t/1-basic.t
+t/2-pod.t
+t/3-pod-coverage.t
+eg/read_lyrics.pl
+eg/example.pl
+bugreport.pl

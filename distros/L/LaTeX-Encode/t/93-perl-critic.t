@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+# $Id: 93-perl-critic.t 17 2012-08-29 06:16:11Z andrew $
+
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use File::Spec;
+use Test::More;
+use English qw(-no_match_vars);
+
+if ( not $ENV{TEST_AUTHOR} ) {
+    my $msg = 'Author test.  Set $ENV{TEST_AUTHOR} to a true value to run.';
+    plan( skip_all => $msg );
+}
+
+eval { require Test::Perl::Critic; };
+
+if ( $EVAL_ERROR ) {
+    my $msg = 'Test::Perl::Critic required to criticise code';
+    plan( skip_all => $msg );
+}
+
+my $rcfile = File::Spec->catfile( $Bin, 'perlcriticrc' );
+Test::Perl::Critic->import( -profile => $rcfile );
+all_critic_ok();

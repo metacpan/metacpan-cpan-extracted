@@ -1,0 +1,23 @@
+Revision history for Perl extension LWP::Determined::UserAgent
+
+1.07 2014-06-24
+ - Prevent changes to request object (such as Cookie headers) from being
+   added once for each request [cpan #96497]
+
+1.06 2012.05-20
+ - Mock http responses to avoid unnecessary network requests -- Randy
+   Stauner
+
+1.05 2011-01-03
+ - Fix for RT#55591: Incorrect default value for 'codes_to_determinate'
+   from yibe via github.
+
+1.04 2009-04-04
+ - New Maintainer (Jesse vincent)
+ - Resolves [cpan #42123] and [cpan #41508]
+
+1.03 2004-04-08
+ - Doc-typo bugfix
+
+1.02 2004-04-07
+ - First public release

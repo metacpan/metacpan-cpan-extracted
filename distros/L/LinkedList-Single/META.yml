@@ -1,0 +1,29 @@
+---
+abstract: 'singly linked list manager.'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LinkedList-Single
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  ExtUtils::MakeMaker: '0'
+  Scalar::Util: '0'
+  Symbol: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  overload: '0'
+  strict: '0'
+version: 1.02

@@ -1,0 +1,148 @@
+All plugins should recide inside Lim::Plugin
+Autoload all available plugins
+
+/usr/share/perl/Lim/Plugin
+	Example.pm
+	Example/
+		Server.pm
+		Client.pm
+		CLI.pm
+
+package Lim::Plugin::Example;
+
+use base qw(Lim::Component);
+
+sub Name {
+	'Example';
+}
+
+sub Calls {
+	{
+		ReadIndex => {
+			out => {
+				example => {
+					hello => 'string'
+				}
+			}
+		},
+		UpdateHello => {
+			in => {
+				hello => 'string required'
+			}
+		}
+	};
+}
+
+sub Commands {
+	{
+		hi => 1,
+		hello => 1
+	};
+}
+
+package Lim::Plugin::Example::Server;
+
+use base qw(Lim::Component::Server);
+
+sub Init {
+	my ($self) = @_;
+	
+	$self->{hello} = 'world';
+}
+
+sub ReadIndex {
+	my ($self, $cb) = @_;
+	
+	$self->Successful($cb, {
+		example => {
+			hello => $self->{hello}
+		}
+	});
+}
+
+sub UpdateHello {
+	my ($self, $cb, $in) = @_;
+	
+	$self->{hello} = $in->{hello};
+	
+	$self->Successful($cb);
+}
+
+package Lim::Plugin::Example::Client;
+
+use base qw(Lim::Component::Client);
+
+package Lim::Plugin::Example::CLI;
+
+use base qw(Lim::Component::CLI);
+
+sub hi {
+	my ($self) = @_;
+	my $client = Lim::Plugin::Example->Client;
+
+	weaken($self);
+	$client->ReadIndex(sub {
+		my ($call, $response) = @_;
+		
+		if ($call->Successful) {
+			$self->println('hello ', $response->{example}->{hello});
+			$self->Successful;
+		}
+		else {
+			$self->Error('Error talking to remote Example: ', $call->Error);
+		}
+		undef($client);
+	});
+}
+
+sub hello {
+	my ($self, $hello) = @_;
+	my $client = Lim::Plugin::Example->Client;
+
+	weaken($self);
+	unless ($client->UpdateHello({
+		hello => $hello
+	}, sub {
+		my ($call, $response) = @_;
+		
+		if ($call->Successful) {
+			$self->println('Updated successfully');
+			$self->Successful;
+		}
+		else {
+			$self->Error('Error talking to remote Example: ', $call->Error);
+		}
+		undef($client);
+	}));
+}
+
+1;
+
+# cli
+
+lim> example
+lim/example> hi
+lim/example> hello me
+lim/example> hi
+
+
+# Example program
+
+use Lim;
+use Lim::Plugin::Example;
+
+Lim::Config->{host} = 'remote.host.net';
+my $client = Lim::Plugin::Example->Client;
+$client->ReadIndex(sub {
+	my ($call, $response) = @_;
+	
+	if ($call->Successful) {
+		print 'hello ', $response->{example}->{hello}, "\n";
+	}
+	else {
+		print STDERR 'Error talking to remote Example: ', $call->Error->toString, "\n";
+	}
+	undef($client);
+}) or
+print STDERR 'Error talking to remote Example', "\n";
+Lim::Run;

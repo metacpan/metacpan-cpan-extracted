@@ -1,0 +1,17 @@
+[Changes for 0.05 - 2005-12-27]
+
+* In nonce generation, use only one round of SHA1 instead of two,
+  as an extra SHA1 hash doesn't make things any more unpredictable.
+
+[Changes for 0.04 - 2004-07-11]
+
+* Use 4-digit years.
+
+[Changes for 0.03 - 2004-06-02]
+
+* Corrected a mis-assignment on w3cdtf_now.
+  Reported by: Benjamin Trott
+
+[Changes for 0.01 - 2004-05-16]
+
+* Initial commit of LWP::Authen::Wsse.

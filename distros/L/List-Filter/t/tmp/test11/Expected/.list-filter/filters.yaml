@@ -1,0 +1,23 @@
+---
+:jpeg:
+  description: Being silly
+  method: match_nuttin
+  modifiers: xi
+  terms:
+    - \.jpg$
+    - \.jpeg$
+alpha:
+  description: Find the beginning at the beginning
+  method: match_any
+  modifiers: xi
+  terms:
+    - '^A'
+    - '^0'
+    - '^1'
+skip_boring_stuff:
+  description: Skip the really boring stuff
+  method: skip_boring_stuff
+  modifiers: xi
+  terms:
+    - -\.vb$
+    - \-.js$

@@ -1,0 +1,33 @@
+---
+name: Log-Info
+version: 2.00
+author:
+  - 'M J Pearce <fluffy@cpan.org>'
+abstract: Single interface for log output
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  IO::All: 0.39
+  IPC::Run: 0.44
+  Log::Dispatch: 2.22
+  Log::Dispatch::FileRotate: 1.19
+  Log::Log4perl: 1.23
+  Term::ProgressBar: 2.00
+  perl: v5.10.0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Log::Info:
+    file: lib/Log/Info.pm
+    version: 2.00
+  Log::Info::Fork:
+    file: lib/Log/Info/Fork.pm
+  Log::Info::GlobHandle:
+    file: lib/Log/Info.pm
+  Log::Info::SubAppender:
+    file: lib/Log/Info/SubAppender.pm
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

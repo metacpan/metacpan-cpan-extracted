@@ -1,0 +1,1652 @@
+----------------------- DIARY FOR PARROT Z-MACHINE DEVELOPMENT -----------------
+
+----------------------------- September 15, 2003 -------------------------------
+I realized I can for now steal txd's output, cuz that has all (?) the
+information I need from the Z file, including the opcode & its arguments.
+
+Use txd -n because that gives addresses instead of naming the routines. (I
+could use names too, but eventually I want to go back to true addresses when
+I'm running actual bytecode, so why go away from that?).
+Use -w 0 so we don't wrap lines and can use while(<>).
+Use -a so we get ^ instead of actual newline. This might change, though.
+
+Is it illegal to jump into the middle of a subroutine? Wouldn't the ret break
+the stack? Also, you couldn't jump to the top of a sub cuz the arguments would
+confuse the which was expecting commands. This means I should be able to
+implement the routines as routines with actual calls, as opposed to the subs
+which'll really be subs.
+But are we sure that everything txd thinks is a sub is really a sub?
+
+It's legal (but "bad practice" and confuses txd) to jump into a subroutine. I
+think I'll make the command decision that the Perl version of topaz won't deal
+with things like that. A straight Parrot version probably wouldn't care. IMCC?
+Well, I should probably code it not to use subs. (Or maybe it doesn't care
+either.) Jumping into a sub doesn't change the call stack. Maybe IMCC/PASM
+would be fine with that.
+
+Managed to get a whole bunch of ops working. Simplified version of test.inf
+works!
+
+----------------------------- September 16, 2003 -------------------------------
+
+Spec 2.2: Numbers are sometimes regarded as signed, in the range $-32768$ to
+$32767$. In effect $-n$ is stored as $65536-n$ and so the top bit is the sign
+bit. 
+
+The operations of numerical comparison, multiplication, addition, subtraction,
+division, remainder-after-division and printing of numbers are signed; bitwise
+operations are unsigned. (In particular, since comparison is signed, it is
+unsafe to compare two addresses using simply jl and jg.)
+
+t2.inf is working!
+
+I spent a ridiculous amount of time before I found out what arith & log shift
+meant. Now I know, and finally it passes t3.inf.
+
+Added inc, dec, inc_chk, dec_chk, store, art_shift, log_shift
+
+----------------------------- September 17, 2003 -------------------------------
+I realized that I can use the same skeleton to translate to PASM.
+E.g. Topaz::PASM and Topaz::Perl.
+Each has a translate_ops, translate_header, etc. sub that outputs the right
+info (to TOUT file handle)
+
+Moved much more stuff into subroutines in order to effect the above. It
+probably makes things cleaner anyway. I believe the main program is now
+output-language agnostic.
+
+Created Topaz::Language::Generic along with TL::Perl and TL::IMCC
+(and a factory to make them).
+
+Added opcode 'test'.
+
+Started working on IMCC translate_command!
+
+----------------------------- September 18, 2003 -------------------------------
+Added ret, new_line, push, pop, pull, store (low-handing fruit). Should test!
+
+----------------------------- September 19, 2003 -------------------------------
+Added load, print_char, ret_popped
+
+Passes t4.inf and in-progress t5.inf.
+
+Working on test program.
+
+----------------------------- September 22, 2003 -------------------------------
+I basically need to store static AND dynamic memory in my output file.  The
+problem is that the top of static memory is stored NOWHERE in the file.  And
+routines from high memory can be interleaved with data (yuck!). So really, we
+should just bite the bullet and read 64K into the file. It doesn't hurt,
+except by adding 200K (2 bytes plus a space per byte, plus line number) and
+4000 lines to every single output file.  Bleah.
+Truth is, the program probably would've ended up being that long anyway. I
+don't really know the format of everything in the static memory, so how would
+I store it in variables anyway?
+
+Add hooks for simplify().
+Add hexified first 64K of story file to the output file.
+
+Still passes current t5.inf.
+
+----------------------------- September 23, 2003 -------------------------------
+It would be nice to store stuff from dynamic memory in pretty arrays & stuff,
+but note that we can't entirely do that because we need to rewrite a Z-code
+dynamic memory for "save". Maybe when I write the dynamic memory parser, which
+infodump is currently doing, then I'll write the outputter too. For now,
+though, I can basically copy e.g., Rezrov's ZObject.pm.
+
+It looks like I don't need to know much about static memory. Obviously, the
+code needs to be able to access it, but I won't need to parse it much, because
+most of the parsing is done by the Z-code. The Z-spec memory map has in static
+memory: grammar table, actions table, pre-action table, adjectives table,
+dictionary. Of those, I think dictionary is the only one that I need to access
+in ways other that a simple loadb.
+Would it be faster to take $dynamic = substr($static, $dynamic_size) and
+translate loadb as substr($addr > $dynamic_size ? $static : $dynamic, $addr, 1)?
+I don't actually know that vec/substr access is much faster on a smaller 
+string, and 64K won't really impress Perl anyway in terms of slowing down arg
+passing or whatever.
+
+LOTS of work on t5.inf. Broke it into subs that test different pieces
+(arithmetic, print_* etc.). Added a bunch of tests.
+
+Added loadb/w, storeb/w. Started on t6.inf.
+
+----------------------------- September 24, 2003 -------------------------------
+Changed Topaz to Plotz: Pol(l)y-Lingual Opcode Translator for the Z-machine.
+
+Made PlotzInclude.pm.
+
+Implemented random.
+
+----------------------------- September 25, 2003 -------------------------------
+t6.inf: count tests & prettify output.
+
+Copied rezrov's decode_text. Trying to get print_addr to work.
+
+MAJOR PROBLEM with using txd!!! When it gets a constant in, e.g., a je
+command, it finds the string that starts there (sometimes?!). But I want to
+compare a value to a value, not to the string that's there! I'm pretty sure
+this means I need to decode at least those hexcodes pretty early on to be able
+to run Zork or Advent.
+
+----------------------------- September 29, 2003 -------------------------------
+Move a bunch of stuff to PlotzParse.pm, which will take care of
+(language-independent, of course) parsing of the command.
+It will place stuff in a big hash that'll get passed to simplify and
+then to translate_command.
+
+Implement simplify() for ret_popped and print_ret. Ugly but workable
+format_commands().
+
+FYI, there's 18 opcodes that're only version 6.
+There's 15 or so object/property opcodes
+I implement 50-something.
+
+----------------------------- September 30, 2003 -------------------------------
+Realized that txd puts quotes in in lots of circumstances. So I need
+to read the hex codes after all.
+
+Work on PlotzParse::parse_command
+
+------------------------------ October 01, 2003 --------------------------------
+More work on parse_command. And on getting PlotzTranslator to understand
+the resulting hash.
+One problem I'm having is that I can't apply something to all args, like
+make_var. And I can't join all existing args to e.g. call a sub. FOr now, I'm
+just doing "random" => "PlotzRuntime::z_random(Z_RANGE)" but that could
+get annoying with more complicated subs. Oh well. 
+
+It's working! Got t7.inf to work.
+
+Now I should be set to create Header code, and then do objects!
+
+------------------------------ October 02, 2003 --------------------------------
+Turned out my fancy get_word stuff didn't work: vec($a, $index, 16) MUST have
+$index even! Went back to Edmonson's vec<<8 + vec.
+
+Almost got get_parent working!
+
+------------------------------ October 03, 2003 --------------------------------
+get_parent, get_child, get_sibling work. test_attr and prop stuff SHOULD be
+pretty simple, now that I got the general object stuff out of the way
+
+set_attr, clear_attr, test_attr, print_paddr
+
+------------------------------ October 05, 2003 --------------------------------
+print_obj
+
+Other object stuff isn't quite as simple as I thought.
+
+------------------------------ October 07, 2003 --------------------------------
+Thought a lot about save/restore, looked at Quetzal stuff.
+Thought about call stack, which I'll need to implement.
+
+------------------------------ October 08, 2003 --------------------------------
+jin, get_prop_addr, get_prop_len, get_next_prop
+
+------------------------------ October 09, 2003 --------------------------------
+get_prop, put_prop, remove_obj, insert_obj
+
+------------------------------ October 10, 2003 --------------------------------
+Changed parse & runtime to use @Memory instead of $Low_Mem. It means MANY
+fewer calls to vec (especially when I correct global vars to always write to
+memory, which they don't now), and why not store it as numbers?
+
+verify, piracy (ha!)
+Change t7.inf to t8.inf cuz we finished objects.
+Call it v0.4
+
+Added version-specific syntax to parse_command. Syntax does change between
+versions for the same command sometimes, but I believe in all but one case
+(erase_line) you just get extra arguments, which won't hurt anything.
+
+Btw, seems like the parsing is running slower today. Could it be that @Memory
+access is significantly *slower* than vec? Really shouldn't be for just an 8K
+array. Or maybe it slowed down a while ago and I didn't notice? In any case,
+it doesn't matter if parsing is slow. If runtime ends up very slow, I could
+try & change back to vec in PRP & see if it speeds up.  Bleah.
+
+Added abbreviation support.
+
+Changed print & print_ret to just store address of the string and use
+print_addr.
+
+------------------------------ October 13, 2003 --------------------------------
+Read hexcodes from memory instead of using txd.
+I'm also testing at every command and routine header whether my PC matches
+that of txd. The only place I don't check is the very first routine.
+Seems to work for t8, minizork, and advent! (It was a bit ugly cuz of orphan
+code framgents. Note that if I only read addresses of routine headers, I won't
+have the orphan problem & can revert to the simpler code in plotz.pl's main
+loop.
+
+Handle pre-V5 local variable initialization.
+
+"call sp" was being translated to &rtn$stack[$sp--] which breaks Perl.
+Changed it to &{'rtn' . ($stack[$sp--])} which works as long as you turn off
+strict refs. (Not worth changing those few sub calls to create a block turning
+off strict refs cuz (1) it's not trivial - you might be using the sub return
+value - and (2) eventually these'll just be computed gotos, which won't
+break Perl (perhaps sadly).)
+
+Zork now breaks because of an indirect variable, while Advent gets a bit
+further (if you define e.g. sub unimplemented_set_text_style {}) and even
+prints some stuff out but then gives infinite uninitialized value messages.
+If I "fix" the indirect variable in Zork (and set @Global_Var from @Memory at
+the top of the program) then we print some good and some gibberish welcome
+text, and then die due to trying to set $stack[$sp] when $sp is -2! That
+sucks! OTOH, if I'm really lucky, that problem will go away when I fix other
+things.
+
+Another problem I noticed. There's a variable that starts out as -1 and gets
+incremented. Perl is incrementing it to 65536, 65537, etc. I guess I *do* need
+to set to unsigned_word() when doing load/store/etc.? Because the system tries
+to access an array [global_var() + local11*2]. If local11 is 65K, that breaks.
+Then again, I get the same error if I do local11%=65K in there.
+
+------------------------------ October 15, 2003 --------------------------------
+Allow je to take multiple args.
+
+Fixing global variables should be easy: just call global_var(num) or
+global_var(num, value). However, it gets hard because of the interplay of
+several factors:
+- I was using ++ in several places, and Z_foo=Z_bar in others, which would
+  break global_var(), unless we made it an lvalue subroutine, which isn't
+  entirely standard Perl.
+- exactly when is it an lval?
+- Bug in existing code: inc sp should be equivalent to $stack[1]++,
+  but it was popping the stack, then incrementing the thing it popped off (and
+  throwing it away).
+- Bug: store was being translated to "Z_VARIABLE = Z_VALUE", which means
+  store sp would change to $stack[--$sp] = $value when it should be
+  $stack[$sp++]!!
+
+Ended up fixing (?) all of these by changing make_var to get_var, and then
+calling a var_to_lval routine which changes rvals to lvals!
+
+Right now, I'm printing out "Useless use of..." every time I do a -> sp.
+I could fix it by using $stack[] throughout instead of push/pop, but what a
+pain!
+
+The bad news is, this may totally break for indirect variables...
+
+------------------------------ October 17, 2003 --------------------------------
+Fix "Useless use" problem by using "$stack[@stack] =" instead of push @stack.
+
+Start changing t8.inf to work with v3 or v4, using 
+"#Iftrue #version_number >= 5; version5 stuff...; #Endif;"
+Problem is that call_vn and call_vn2 didn't exist until v5. I had to
+change my strategy and use Inform calls more so they translate to
+call/call_vn depending on the version. 
+Other problem is that v3 has max 3 arguments, which breaks assert2 and other
+subs. 
+With a bit more hacking, I managed to get v3/v4 to compile that way - and
+plotz works on the v4 and v3 files too!
+
+I set all set_vars to set the value to ($rval)%0x10000. I'm not sure whether
+this is right or not.
+
+Found some bugs. I'm getting a little further in translating zork. To get it
+to start up, I need to do "no strict 'refs'" for a sub call, and replace two
+instances of [sp]. Problem is that now I'm getting a bug where it says it
+tries to call 0, and I'm not sure whether it's supposed to get that or not. If
+I say "return 0" instead of calling zero, then it doesn't print "There is a
+small mailbox here". OTOH, if I don't do %0x10000 it gets farther, but only
+cuz it's sending a 65536 in as an argument - and in that case it prints a
+bunch of gibberish, followed by "a small mailbox". Argh! And I don't really
+know how to debug this...
+
+------------------------------ October 20, 2003 --------------------------------
+Fixed computed calls ("call sp"), which were breaking due to strict refs. (Put
+them in a "do {no strict refs; &{...}}" block.)
+
+I THINK I got indirect vars working! I still need to write a bunch more tests
+for it, but it passes a number of tests (which frotz, dzip, and rezrov fail!)
+
+Minizork now runs directly from compilation. It prints the header and the
+first message, then dies at L27721 because it's trying to goto routine0, using
+the result of a get_prop. (If I return 0 at that point, it proceeds, but
+doesn't print the "There is a small mailbox here.") If I comment out the
+routine call AND the "return 1" line after it, then it continues, without
+printing that there's mailbox, until it prints the ">", then complains about
+unimplemented_read. I.e., there's still at least one bug, but we're making
+progress! I think I'm going to need to actually trace the entire program
+running (with the "-d" I'm going to add to the runtime) to figure out what's
+going on.
+
+------------------------------ October 21, 2003 --------------------------------
+I tracked down the mini-Zork problem! It turns out it was calling 0. I thought
+forever that "call 0" means "return 0", but really it means "0", i.e. DO
+NOTHING but give a false value if it was a call_*s routine. Once I fixed that,
+I can run minizork, and it correctly prints out everything and dies trying to
+do "read" after printing '>'!
+
+Advent also works (modulo several more unimplemented (io) opcodes), although I
+had to put in a Zstrict test.
+
+------------------------------ October 22, 2003 --------------------------------
+Moved stuff from PlotzParse header reader to PlotzIOPerl::update_header, since
+it's all IO related. Hacked a few things because we combined files into one
+file, but otherwise was able to get it to run. Didn't test it at all yet.
+Need to move output_stream and a bunch of other subs into there.
+E.g., Stream class that does stream stuff.
+Actually, can I do any language-independent stream stuff? E.g., put rules
+about streams in PlotzIO? Printing to memory? Might require too many
+dependent/independent sub calls.
+
+------------------------------ October 23, 2003 --------------------------------
+Staretd working on "read"!
+
+------------------------------ October 24, 2003 --------------------------------
+More work on read.
+
+------------------------------ October 27, 2003 --------------------------------
+Work on encode_text
+
+------------------------------ October 28, 2003 --------------------------------
+Figured out some stuff about indirect variables.
+
+Much more on read/dictionary/encode_text subs.
+After much debugging, we're able to match words in the dictionary.
+read seems to work!
+
+Zork is getting there! Direction commands seem to work. This includes "north"
+and "go north". However, "open mailbox" or any two-word command seems to break
+with "you used 'mailbox' in a way I don't understand". It does find the second
+word, though. Still, I may be writing it to the parse buffer incorrectly.
+I think I may need to trace it.
+
+------------------------------ October 29, 2003 --------------------------------
+I may have finally really fixed indirect variables. Yuck!
+t8.inf now tests all indirect opcodes pretty carefully.
+
+------------------------------ October 30, 2003 --------------------------------
+Aha! Finally found a good acronym for t8: CZECH!
+Current best candidates for what the acronym stands for: 
+- Check Z-machine Emulator Compliance Handily (Hastily?)
+- Comprehensive/Complete Z-machine Emulator CHecker
+- Comprehensive Z-machine Emulator Compliance H
+
+In Zork1: 19778 is "w", 16362 (3fea) is "e"
+
+Found the bug! I was missing a () in "test" opcode. Look at all the other
+opcodes to make sure precedence OK!
+
+------------------------------ October 31, 2003 --------------------------------
+Cleaned up and tested czech 0.8. It's ready for release.
+
+Zippped up Plotz 0.5 while I'm at it.
+
+Next big move is I/O. output_stream, buffer, (newline ASCII 13 stuff?),
+then input_stream. Then test read extensively. Clean up PerlIO and release
+a version (0.6? 0.7?)
+Then all I have left is save/restore (big) for v0.8,
+Win32/Curses for v0.9 (if necessary)
+Cleanup Module structure for v1.0!!!
+
+----------------------------- November 03, 2003 --------------------------------
+Baby step towards directory cleanup: create PlotzPerl/ and move Runtime and IO
+into it (with minor module renaming).
+
+----------------------------- November 04, 2003 --------------------------------
+Copied a huge chunk of code from Games::Rezrov into PlotzPerl::IO.
+Tried to get it to work.
+
+----------------------------- November 05, 2003 --------------------------------
+Found some bugs. We're now able to (I think) correctly do t9.z5.
+
+----------------------------- November 06, 2003 --------------------------------
+Broke czech.inf into a bunch of include files.
+
+- test.h has assert, p/f in it.
+- io.h has I/O tests (right now, just test_print)
+- non_io.h has all non-I/O tests in it.
+- dynamic.h is a stub for a file that'll eventually test dynamic memory
+
+- test_all.inf		test I/O and non-I/O
+- test_io.inf		test I/O only
+- test_non_io.inf	test non-I/O only
+
+Copied test_*.inf to parrotZ/ta.inf et al. I can now compile 
+them with "inf +czech ta".
+
+Worked a while on buffering and paging. They seem to work now.
+
+Having copied huge amounts of code from Games::Rezrov::StoryFile,
+I'm actually now able to put the following opcodes into PlotzTranslator:
+
+output_stream
+input_stream
+split_window
+set_window
+erase_window
+get_cursor
+set_cursor
+set_text_style
+
+!!!
+
+OTOH, I haven't really tested them. Now I need to write a bunch of tests in
+io.h to see if these things work.
+
+Btw, since I set save_undo to return -1 (and do nothing), I'm now able to
+compile and run Advent.z5 without any changes to the source code. Again, no
+guarantees it works.
+
+----------------------------- November 07, 2003 --------------------------------
+Added -r, -c options to Plotz output program. Promptly ignored them and set
+default to 24x80 on dumb terminal.
+
+Working on io.h stream tests.
+
+frotz seems to be asking for a filename each time I open stream 2.
+Isn't that against the spec?
+
+----------------------------- November 10, 2003 --------------------------------
+Stream 2 is at least partly working.
+
+----------------------------- November 11, 2003 --------------------------------
+I've decided to make the czech test separation "interactive" vs.
+"non-interactive". So for non-int I'm going to use input_stream 1
+and test read. I may use output_stream 2. Can definitely use output_stream 3.
+
+Start working on 'read' test. I'm able to read a line & compare it to
+an array of bytes.
+
+----------------------------- November 12, 2003 --------------------------------
+Put read test into a subroutine do_ni_read. Then I can test multiple strings.
+Created ti.in to input the strings with.
+
+----------------------------- November 13, 2003 --------------------------------
+Infocom-ized the read tests. Btw, I'm running into a problem because Inform
+encodes a quotation mark in the dictionary as a ZSCII char instead of an A2
+char, so my encode_text (and Winfrotz'!) aren't finding it.
+
+Able to run tn.pl with Win32!
+
+Also, when I run my program in a 1000-line window, it prints the buffer on
+line zero, which is invisible way up at the top of the scrollbar! Shouldn't
+the system be using Window() instead of Size() and then writing things to
+(Size)[1]-(Window)[1]?
+Alternatively, you could set Size equal to Window, which will get rid
+of the scrollbar.  Still, it seems convenient to have the scrolling available.
+I did the latter for now, cuz it only requires changing one subroutine
+(tho it would be polite to restore the size (and color) in DESTROY!)
+
+Able to run minizork.z3, too!
+
+Advent's status line isn't working correctly, though. Is it getting
+buffered?
+
+----------------------------- November 17, 2003 --------------------------------
+Found a STUPID bug in verify which happened to work always until now because
+dynamic memory's last byte was always a zero.
+
+rezrov doesn't buffer output stream 2. This is a good excuse to refactor the
+whole IO module. 
+
+Put plans in IO section in NOTES.txt for now.
+
+Release v0.6. It's not really fully tested but I should freeze things before
+breaking everything. Tests seem to work right now.
+
+----------------------------- November 19, 2003 --------------------------------
+Separated PlotzPerl::Input from the rest of PlotzPerl::IO. In theory, I can
+now separate out PlotzPerl::Output, tho that's harder. (Almost everything now
+in PPI will go in there!)
+
+----------------------------- November 20, 2003 --------------------------------
+Looks like stuff in the upper window doesn't get written to stream 2, but DOES
+get written to stream 3.
+
+----------------------------- November 25, 2003 --------------------------------
+Thinking about streaming
+
+----------------------------- November 26, 2003 --------------------------------
+Wrote lots of notes on streaming plans. I think I have a workable system.
+Text is turned into PP::Text objects which are blessed scalarrefs; the
+subclasses determine whether the text was input or output, etc.
+
+PP::Output tries to write to every stream (but returns immediately if it
+wrote to stream 3). Each OutputStream tests itself to see whether it's
+selected, and also to see whether there are other reasons not to accept
+the stream. If the stream does accept, then the text is streamed to it.
+If buffering is on for that stream/window/buffer_mode, then it gets
+buffered, otherwise simply written. Only stream 1 ever knows about
+the Screen object (although stream 2 needs to know which window we're
+writing too since some windows don't get written to the transcript).
+
+
+----------------------------- December 01, 2003 --------------------------------
+Moved a bunch of stuff to PlotzPerl::Output.
+I'm able to run czech on it with the new class in place.
+I'm running into some ugliness: should windows, cursor be in Output class?
+If not, then we're doing lots of cross-class talking. If yes, then Output
+class is really just the IO class (cuz Windows aren't only Output). In THAT
+case, we should get rid of output class and just give IO class an array of
+OutputStreams, an array of Windows, InputStreams, etc.
+
+----------------------------- December 04, 2003 --------------------------------
+Start creating OutputStream class & subclasses.
+
+----------------------------- December - February ------------------------------
+[RL]
+
+----------------------------- February 24, 2004 --------------------------------
+Added rudimentary XML output capability. Depends on XML::Simple
+Should make XML::Simple use'd only if I input .xml as the target, tho.
+
+------------------------------ March 04, 2004 ----------------------------------
+Export needed subs from PP::Runtime, to make output program a bit more
+readable. I should do the same for PPI, once it settles down.
+
+------------------------------ March 08, 2004 ----------------------------------
+Working on adding restart opcode.
+
+Wrote simple Perl script to read quetzal files.
+It looks like Frotz2002 may have a bug for extremely simple programs - the
+local vars in the save file don't seem to be what they should be.
+Rezrov always makes 15 local variables in each frame of the save file.
+Dzip seems to get things right, or at least almost right.
+
+------------------------------ March 09, 2004 ----------------------------------
+More work on OutputStream stuff. Get it to write transcript bits if we change
+them using storew instead of output_stream.
+
+Put Plotz into cvs at home!
+
+Fixed a package bug that was causing register_newline not to be used at all,
+such that [MORE] wasn't happening.  Then fixed a couple package bugs that made
+register_newline not work. We seem to be back to passing tests again.
+
+------------------------------ March 10, 2004 ----------------------------------
+Put main() into a while loop and an eval block.
+Which allows for restart/restore.
+Basically, restart/restore do a die() with a special string that means "repeat
+the while loop, which will rerun the Z-machine from scratch, possibly with
+some extra stuff happening."
+@quit re-implemented as a die() with a string that means "This die is OK."
+(Using die for restart/restore also means if I call restart I'm not pushing
+the whole new game onto the (Perl) callstack that I was in when I called
+restart. die pulls me all the way out of the call stack before restart puts me
+back in.)
+
+The eval/while conveniently allows me to call cleanup routine on the ZIO, with
+the knowledge that it'll run whether I die or exit gracefully. So, e.g.,
+Win32 port now returns the window to black & white & puts the scroll bar back
+after running.
+
+restart opcode appears to work! At least, it saves fixed pitch bit and does
+appear to start from the beginning again.
+Because restart would otherwise rerun the entire program, I'm creating a
+restart.inf separate from the regular test programs.
+I need to add to the test program, tho.
+
+------------------------------ March 11, 2004 ----------------------------------
+Changed PlotzParse to read "txd|" all in one gulp and store its data.
+Then our main plotz program just calls that at the beginning. Afterwards,
+in our subroutine loop, the system just uses each value from the stored
+txd data.
+
+Fixed restart bug. It now actually resets dynamic memory. (Tested in
+stationfall, zork.)
+
+Moved a bunch of code around IO.pm. New OutputStream code
+now compiles, although it won't run at all yet. Most of the necessary
+skeleton is there, but the key is to *gradually* replace
+existing stuff with the new stuff. E.g., do select/deselect stuff first, then
+deal with actual printing to the streams. I'll need to be hybrid for a while,
+with e.g., references to $PlotzPerl::Output::zios etc.
+
+------------------------------ March 12, 2004 ----------------------------------
+Slight improvement to main while loop.
+
+Add stuff to PPI::Cleanup. Namely, it calls PP::Input & PP::Output::cleanup.
+PPO::Cleanup in turn calls cleanup on each outputstream.
+Which will flush buffers and/or close filehandles.
+
+More work on select/deselect/is_selected.
+Cleanup seems to work.
+Call Output::new (which calls new() on all the streams). Starting the
+migration to the new objects!
+
+------------------------------ March 13, 2004 ----------------------------------
+Move @output_stream functionality to select/deselect methods for each stream
+
+------------------------------ March 15, 2004 ----------------------------------
+Fix a bug in @output_stream. Seems to basically work!
+
+Start moving write_chunk to stream_line subs.
+
+------------------------------ March 16, 2004 ----------------------------------
+Moved stream 4 to OutputStream. Seems to work.
+
+Also got rid of the hack where we explicitly echoed certain streams after
+reading them in. Instead, we now just set the text to be the right kind of
+PP::Text::Input object, and call Output::output in read_command to echo it to
+the right place.
+
+We do have the problem now that lines from the file aren't being echoed to the
+screen, because PP::OS::Screen::stream is an empty sub. Might as well pull
+buffer_zchunk (and all stuff dependent on $buffer) out of ZIO - there's no
+reason for ZIO to know that stuff, and it can all be handled by OS::Buffered.
+(Prompt_buffer may be a special case, but I've already moved that to PP::IO.)
+It's especially worth doing this because some of the ZIO code was calling PP
+code already, and this way we'll have less overlap.
+Then I can fix OS::Screen::stream. 
+Then I THINK I can get rid of write_text and most of write_zchar!
+Also $zios, $selected_streams.
+And move flush/register_newline to PP::OS, which makes PP::Output very small.
+Then test and release!
+
+Wrote some tests into restart.inf
+
+------------------------------ March 17, 2004 ----------------------------------
+Got rid of Output::write_text and mostly got rid of write_zchar! Everything is
+now going through PP::OutputStreams.
+
+Moved buffer_zchunk to OutputStream::Screen.
+I should move flush/register_newline to PP::OS.
+Then consolidate the various write'ing routines. It seems like there may be
+more newline()s than we really need.
+We should meld stream, buffer_zchunk, etc. 
+
+Fixed recursion bug in transcript's is_selected.
+
+Moved register_newline to OS::Screen. Making some progress.
+Even once we move flush, there's still a mess.
+Someday in the future, we should try and reduce all the calls
+to PlotzPerl::IO::foo, PlotzPerl::Output::foo scattered around the code.
+I think it's a question of correctly isolating what happens in the ZIO and
+what happens in the game.
+
+We've got a bug where certain newline's aren't being registered, I think,
+cuz the test program waits too long to print a [MORE] at one point.
+
+------------------------------ March 20, 2004 ----------------------------------
+Trying to consolidate OS::Screen's buffer_zchunk with the stream/stream_line
+scheme I had tried to build in OS::Buffered. Realized that the buffer_zchunk
+method is smarter:
+
+if buffering {
+    add_to_buffer the whole string
+} else {
+    just write the string
+}
+
+Inside add_to_buffer, I add to the buffer. Then I word wrap the new larger
+buffer. IF there are any Z_NEWLINEs in the buffer (either because the game
+explicitly wrote them to the buffer or because word_wrap added them) then I
+need to flush.
+Note that changing screen size, font changes the number of chars needed to
+finish the line so I need to call maybe_flush (which flushes only if nec.)
+from add_to_buffer as well as any time I change one of the above.
+I need to call flush for sure any time I switch windows OR from, e.g.,
+filename_prompt or read_command, where I want to make sure the user sees
+something so that they can input. (Just call it from get_input instead?)
+
+------------------------------ March 21, 2004 ----------------------------------
+More work to consolidate buffer_zchunk & other write()s.
+
+------------------------------ March 22, 2004 ----------------------------------
+More work to consolidate buffer_zchunk & other write()s.
+
+Added word wrapping to transcript, but in a hackish way (using prompt_buffer).
+Transcript needs to store its own "what I've written since the last newline".
+Wait: that's just length(buffer())!  But the problem is, if we call flush when
+there's no \n, then stuff we print next needs to be in later columns. I think
+I may need to use ZIO-like get_position() for any buffered output. Move ZIO's
+position stuff to there? Cuz it's not only dependent on the GUI! OTOH, might
+that break things? But otherwise we can't really wrap transcript correctly.
+
+Screen is currently wrapping even when it's not supposed to. (See very first
+couple prints in Czech.)
+
+Output now looks worse, although guts are slightly better.
+
+------------------------------ March 23, 2004 ----------------------------------
+Fix stupid bug in Screen word wrapping.
+
+Hack around problem where dying in cleanup makes other error message disapper.
+Concatenate errors. (But maybe I should fix what's making it die in the first
+place!)
+
+Cleanup cleanup() and deselect a bit.
+
+Flush buffers before deselecting a stream or quitting. Need to test this!
+
+------------------------------ March 24, 2004 ----------------------------------
+Zork basically seems to be working. Problem with 'script' though
+(Which I think is also happening with restart.inf).
+
+Note how 'Here' gets printed BEFORE the filename prompt.
+This is probably a casualty of the fact that Zork is editing the
+transcript bit explicitly, so we don't actually open the file
+until we're told to print something! filename_prompt is calling
+IO::flush. First of all, flush currently has $transcript->flush
+commented out. But even if you uncommented it, you'd have this worse problem
+that you're trying to print to an unopened file!
+
+Possible hack to fix it: tie $PlotzMemory[FLAGS2] to a variable
+that calls select/deselect when it's edited. This is pretty sexy, actually.
+
+Less sexy hack: Transcript::is_selected will be called from output
+the first time someone tries to print anything (unless stream 3 is
+selected), because Output::output calls $stream->output foreach $stream (1..4)
+That means we have at most one string that's not getting printed. And even
+better, we know it's going to happen DURING the print statement, not
+sometime afterward. And even better better, $text is passed to output().
+SO we can override Transcript::output to pass $text to is_selected,
+which is already overridden, and add to is_selected that it should
+call $transcript->add_to_buffer that string.
+This hack WON'T fix the problem where we're printing the string 'Here'
+to the screen before filename_prompt, though. That's caused by
+the flush() in filename_prompt.
+
+Hack 3: Instead of checking the transcript bit in is_selected, we could check
+is any time that we do output() (no matter which stream's selected).
+If we call check_transcript_bit in Output::output BEFORE we loop through
+the streams, and call filename prompt from there if we see the bit
+was changed, then we're guaranteed that the very first time we try to output()
+ANYwhere after modifying the transcript bit, we'll open the file. That is,
+system won't even add anything to any stream's buffer, let alone print it out,
+before we've done filename_prompt. So there's zero danger that anything will
+be missed in the transcript.
+This is probably the easiest solution, tho I should keep hack 1 in the
+comments and/or in my notes, cuz it's sexy.
+(This does make @print a wee bit slower, which hack1 wouldn't. So?)
+
+See update, 3/28 to hack 3.
+
+------------------------------ March 25, 2004 ----------------------------------
+Added Title setting. Works for at least win32.
+
+Work on que.pl: now able to write a file exactly the same
+as dzip's save file (for a simple file)! 
+Still not handling stack.
+Also not xor'ing with orig memory on read OR write. 
+Next step: read Z-file and xor, make sure save files still the same.
+Then push stack in program, make sure save files still the same.
+Then change que.pl subs to PlotzRuntime::Save subs!
+
+------------------------------ March 26, 2004 ----------------------------------
+Adding eval stacks to b.inf works fine in que.pl.
+Compressing/uncompressing memory seems to work, too.
+FC shows no differences between sav files for b.z5 AND story\minizork.z3
+when I load the file into que.pl and then write it out again. In THEORY, this
+means that my reading and writing are correct; of course, it's also possible
+that somewhere in the middle I'm making a symmetrical mistake.
+Note that que.pl's middle is essentially the @Save_Stack
+and @PlotzMemory::Memory that'll be used in Plotz.
+
+------------------------------ March 28, 2004 ----------------------------------
+Re the transcript problem from before, I'm pretty sure I have a hack 4 that's
+SUPER simple and will work, even though it's less sexy. All I need to do is
+try to write to the transcript BEFORE writing to the other streams! That way,
+I check the transcript's is_selected and possibly call (de)select on the
+transcript BEFORE I print anything the screen.
+Note that filename_prompt will call IO::flush which will call
+Transcript->flush (should it?) which will try to flush the transcript before
+we've picked a filename for it. I guess if filename_prompt will only be
+written to the screen, it SHOULDN'T flush the transcript. Alternatively,
+flush() could do nothing if it's called on a non-selected stream. After all,
+deselect will flush the buffer and after that you can't write anything to the
+buffer until you select it.
+
+AHA! SYSTEM doesn't call newline() when I do <>!! E.g.,
+[Filename: c.cmd]:
+User hits a newline but the game never register_newline's it!
+
+------------------------------ March 29, 2004 ----------------------------------
+No. Looks like above is NOT the problem. register_newline seems to get called
+every time I do a newline.
+
+WAIT! It's NOT a bug! Games::Rezrov set things up so that when you do an
+@read, the number of lines written is reset to zero. Obviously, the user got
+to enter stuff there, so it's OK. Of course, IF we are using MORE prompts for
+input_stream(1), then we do NOT want to reset the number there. But that's
+part of fixing the larger input_stream(1) bug.
+
+------------------------------ March 30, 2004 ----------------------------------
+Finally bit the bullet and searched for matching parens for signed word
+conversion.
+
+------------------------------ April 01, 2004 ----------------------------------
+Move czech to a separate CVS repository.
+
+Export PlotzPerl::IO functions to avoid output program ugliness.
+Also fix bug in signed_word()
+
+------------------------------ April 05, 2004 ----------------------------------
+Wrote CallStack.pm
+Implemented parts of save/restore!
+Copied que.pl and stuff from notes into Callstack.pm.
+Modified them as seemed necessary, without trying to run them.
+
+Removed "if $Restoring" stuff from main loop, cuz it seemed simpler, and
+shouldn't hurt stuff.
+
+Wrote Callstack::z_call, which implements calling and adds in stack calls.
+z_call is working correctly - tn.pl still works.
+(This allowed me to simplify some logic in PlotzTranslator, for call*.)
+PlotzParse creates a next_pc key for save and call, cuz we need them.
+
+Starting to work on @save.
+Still need to call update_stack.
+
+Also need to implement resetting dynamic memory. Right now, we just restore
+original memory. Really, we need to restore orig memory for restart, modified
+memory for restore. I could call reset_dynamic_memory from CallStack, but make
+sure it doesn't get re-overwritten! (And make sure we save the flag2 bits.)
+
+------------------------------ April 16, 2004 ----------------------------------
+More work on @save and @restore.
+Tried to fix dynamic memory issues.
+
+Moved most of @checksum to PlotzMemory.
+Minor fiddling with main loop, moved more stuff to PlotzMemory.
+
+More work on routine_start. 
+
+I THINK I've written all the needed code, and just need to bugfix now.
+
+------------------------------ April 17, 2004 ----------------------------------
+Fix bugs. We now get identical saves for dzip & plotz with an extremely simple
+z5 file.
+------------------------------ April 18, 2004 ----------------------------------
+Actually got save to output same exact file as Dzip, for a simple output file.
+
+Zork save was restore-able by dzip, although during writing there
+were two errors where i had a non-byte passed into "pack 'C'". I think this is
+due to variables or stack things that are -1.
+
+------------------------------ April 19, 2004 ----------------------------------
+Got rid of silly hex/unhex in the quetzal stuff.
+
+The -1 bug is bigger. Internal variables -- i.e., local variables and the
+stack -- are really allowed to be negative or stored in Swahili or whatever I
+want, as long as we translate them correctly whenever they get used.
+That is, whenever we use them in arithmetic OR store them, we need to
+correctly sign OR unsign them.
+When I put this into b.inf:
+    l = 0; k = l-2; @storeb 500 0 k; !-2;
+I get the "pack 'C'" error mentioned above. @storeb stores -2 in the byte.
+It then tries to pack 'C', -2, which is an error cuz -2 has too many digits.
+zork1, start game, open mailbox, save. It writes two -2's with storew.
+SO:
+@storeb, @storew should be doing &0xff.
+global_var shold be doing it (because it writes to memory), and IS doing it.
+dec, inc should NOT be doing &0xffff, which they ARE currently doing in
+var_to_lval.
+Do I need to explicitly significate bitwise things? If I add two numbers to
+get a result > 32K and then bitwise or with something, what should I get? No.
+The variables will naturally be unsigned as Perl stores them.
+What if I have -1 in a variable and do a >>? art_shift or
+log_shift may actually change their behavior here if I haven't put the right
+things into the variables. Ah. @dec a variable to -1 (current code changes it
+to 65535) and then shift it and see that the sign bit is incorrect.
+Do we also get errors because the number of bits is wrong? I think so!
+If we log_shift -1 3 places, we should get (-1&65535)>>3 = 65535 >> 3 = 8191,
+but our current code probably yields -1>>3 which in Perl is 2^32-1 >> 3 which
+is 2^29-1 which will be -1 if we print it out.
+
+Call log_shift tests with variable = -9 as well as 65525 or whatever.
+Also call inc on -1 and 65535.
+
+The following are safe cuz they only go variable to variable (or stack):
+store, ret, ret_popped, pull, push
+
+loadb, loadw are ok cuz they put <65K values INTO variables
+
+The reason I added %64K to var_to_lval is that I had a variable that was
+started at 65535, and it was being incremented.  This broke global_var,
+which tried to get $PlotzMemory::Memory[GLOBAL + 2*$var] which is too
+big when $var is 64K. But I can do $var &= 0xffff in there. Just need to
+see whether any other problems arise.
+Make test cases for these weird negative situations we got.
+Note that the n1 constant from test.h (used e.g., in no_inter.h) is
+replaced in the code with #ffff. Which means we're testing what the code
+does with the constant #ffff very nicely, but we're not testing a
+variable like "dec 0 -> nv;" I should really be doing both in jump AND
+other kinds of tests, to make sure we handle negative variables
+correctly.  Also inc -1 and use that in an index for a store or load.
+
+
+------------------------------ April 20, 2004 ----------------------------------
+Apparently forgot to copy all my changes to Work. Had to re-find the problem
+of get_orig_dynamic_memory.
+
+My discard bit was upside down, too.
+
+Also, comparing my save file to dzip's, I get differences in the header.
+These differences aren't surprising, but I wrote above that I got "same exact
+output". 
+Turns out this was because fc on winMe decides binary files may be the
+same even if they have differences, unless you do fc /b!
+Hm.  The differences now are: flags1 capabilities, interpreter #,
+screen size, default colors. I think all those are OK.
+
+------------------------------- May 11, 2004 -----------------------------------
+Finished a draft of a test program that uses czech/test.h to test
+restore.
+
+Problem with Zork save file. Turns out my save/restore plan doesn't work if
+you do @call sp (because stack gets re-popped during restore), or if sp is one
+of the args to the subroutine.
+
+------------------------------- May 12, 2004 -----------------------------------
+Made a big mess trying to get save/restore working.
+
+climb_stack is now (correctly?) figuring out which sub to call, and
+calling z_call from there. (In z_call, we don't push frame stacks if we're
+being called from climb_stack.)
+
+------------------------------- May 13, 2004 -----------------------------------
+Possibly cleaning up the mess, or making it worse.
+
+Add a main() that generates the dummy stack frame.
+
+save generates a save file (in c.z5) that dzip212 reads and passes c.z5 tests
+with. Restore is definitely still screwed.  
+
+------------------------------- May 14, 2004 -----------------------------------
+Rearranging which subs call which, and what needs to happen in
+routine_start.
+
+Got rid of the main() I had added. I was just confusing matters, because in
+real life, the first sub you call is main. Make the dummy frame by hand again.
+
+Restore passes test!
+
+------------------------------- May 17, 2004 -----------------------------------
+More rearranging of save/restore.
+
+------------------------------- May 18, 2004 -----------------------------------
+dxt.pl - read z files without txd! (So far does almost nothing.)
+
+------------------------------- May 19, 2004 -----------------------------------
+dxt.pl does a lot more! It actually finds all called subs in c.z5!
+
+Note that it doesn't find subs that never get called. How could it?
+Well, in the future if we have gaps in the subs, we'll try to fill them in.
+Still, there's nothing really wrong with it - well, unless they get called by
+"@call sp" or something, which is of course possible.
+
+But it only finds 66 of the 341 routines in minizork, and 100 or so of
+300 for Advent :(
+
+------------------------------- May 20, 2004 -----------------------------------
+We can make the algorithm better! See notes.
+------------------------------- May 21, 2004 -----------------------------------
+Pretty up the output of dxt, compare it with txd. Now I'm able to see
+explicitly that we're missing 280 routines from minizork. However, I could
+catch a lot of them if I went out on a limb and parsed gaps in my code.
+(I still won't find all the routines that are after the last routine I found
+unless I parse all the strings and parse the gap from the last sub to the
+first string. I STILL won't find the one sub that's before... no wait, I will,
+cuz it's called from another sub. But I wouldn't be guaranteed to find it if
+it was a computed call.
+
+------------------------------- May 24, 2004 -----------------------------------
+Made the algorithm better. Also realized I wasn't finding as many
+subs as I could. I now automatically try the sub after finding a 0 byte.
+Now we find 133. Still not so many subs, but double what we had!
+
+From Spec 1 Remarks:
+---
+Inform never compiles any overlap between static and high memory (it places
+all data tables in dynamic memory). However, many Infocom games group tables
+of static data just above the high memory mark, before routines begin; some,
+such as 'Nord 'n' Bert...', interleave static data between routines, so that
+static memory actually overlaps code; and a few, such as 'Seastalker' release
+15, even contain routines placed below the high memory mark.
+---
+
+This means my '0' finding is suspect. However, I think other parts of the
+algorithm are still OK. I THINK that after the high memory mark, it would be
+USELESS to have any data other than code & strings, so the '0' finding should
+still work after static data is over. OTOH, I don't know how to find the top
+of static data...
+
+We die on Advent because we run into string territory.
+Find the minimum start of strings. This tells me when to stop reading subs.
+Doesn't quite work cuz we don't see the min string address until after reading
+the last sub.
+Changed the die to a warn (will need to reread last sub, eventually) for now.
+Anyway, we now find 220 subs in Advent!
+And still no subs found incorrectly!
+
+------------------------------- May 25, 2004 -----------------------------------
+We find 64/64 routines in tn.z5! And we get their locations right, too!
+
+217/341 in minizork.
+
+I moved code around a bit (breaking things).
+
+Now, when we end a sub with a ret/rfalse, etc. we assume the next byte
+starts a sub.
+
+Good news: we now find ALL 341 subroutines in minizork! And every
+sub has the correct begin and end address!
+Good news 2: I find ALL 387 subs correctly in Advent!
+(Last sub is off by two but that's because of padding zeroes and the way I
+calculate txd's end.)
+Bad news: ALL print_paddr opcodes in minizork print to variables, so I have
+NO way of knowing where the strings start! So I find one extra junk sub. Hm.
+Same with zork1 (440), with the added problem that I don't find the
+very first sub.
+
+------------------------------- May 28, 2004 -----------------------------------
+Got rid of main() in dxt.pl by moving stuff in packages into subs (so it
+doesn't matter that they're not parsed at compile time in a 'use').
+Code still works.
+PlotzUtil is now included in dxt.pl, and is only used to hold @Memory and
+%Constants. I can put them in main:: (or PlotzParse?) eventually.
+
+-------------------------------- June 18, 2004 --------------------------------
+I THINK I've correctly implemented a change to the way restore climbs the call
+stack.  Instead of calling each Z-code sub, and having that sub call
+climb_stack, and going back and forth into & out of Z-code,
+I essentially have z_call do this:
+
+    if (restoring) {
+        $stackref = next frame's eval stack (taken from save file's call stack)
+        @args = next frame's local vars (taken from save file's call stack)
+        $result = z_call(sub from next frame);
+        $first_arg = [$result, $next_PC, $stackref]
+    } else {
+        create and push a new stack frame
+        # $first_arg = [], @args = args passed in to z_call
+    }
+    next_sub($first_arg, @args)
+
+So z_call recursively calls itself to climb up to the top of the call stack
+without ever calling Z-code subs. When it gets to the top, it calls the sub
+that called @save, and jumps to the @save, which sets restoring(0). As it
+finishes each sub, it pops a layer off (the stack and) the recursive z_call
+calls. (As it happens it'll never undo all the recursion, because main()
+does z_call(first sub), and that sub will never return; it'll just quit.)
+The best part is, I even described this in the POD for z_call.
+
+I think things are at least a bit more simple than they used to be.
+restore functionality is really isolated to CallStack.pm, except for the
+necessary goto in each Z-code sub.
+
+Note that the old version sort of forced the Z-machine back into the Perl
+call stack early in the process. Now, we've got a hybrid stack (part of it
+will be implemented with recursion, the top part is with regular z_calls) for
+the whole time the game is played (from a restore). Who cares?
+
+-------------------------------- June 21, 2004 --------------------------------
+
+Don't bother recursing to the top frame. Just work our way from the top frame
+down the stack. Each time, call the sub in that frame and jump to the right
+point in it. (Note that during that sub, we may call other subs, so call stack
+needs to be in correct status at the time.) When we get to the end of the sub,
+call into the next lower frame's sub, at the point where that sub returned.
+This is even more like Z-machine and a bit less like the real Perl stack -
+just jump into each sub at a certain place, finish that sub, jump into the sub
+one frame lower in the stack etc - but I think it's worth it for the
+simplicity.
+
+while (top frame .. bottom frame) {
+    my $result; # for very top frame, it's undef
+    get saved frame
+    args = locvar in frame
+    stack = stack in frame
+    $next_PC = &_get_next_PC();
+    $sub_to_call = get_sub_to_call($next_PC or $restore_PC);
+    $first_arg = [$next_PC, $result, @$stackref];
+    @args = @$locref;
+    $result = &{"main::rtn$sub_address"}($first_arg, @args) 
+    pop saved frame
+}
+
+-------------------------------- June 22, 2004 --------------------------------
+I finally found an expression that significates a number without using
+unpack/pack or using the variable twice. It's "($x+0x8000) % 0x10000 - 0x8000".
+It's one or two characters *more* than unpack/pack, though, and doesn't look
+much simpler. (It is probably faster, but I have a feeling that's not the
+bottleneck in running code - and I have no idea how fast converted programs
+run right now anyway.) It works for -64K .. +64K so whether or not the
+original number we're starting with is signed or unsigned or even out of
+range, we end up with a signed word.
+
+Moved the main code I was putting in the Perl program into a "Z_machine"
+sub in Runtime, cuz why not?
+
+Created start_machine, which calls z_call for first sub OR does the
+whole restore thing (looping over restored call stack, jumping into the middle
+of subs).
+
+-------------------------------- June 23, 2004 --------------------------------
+Setting the store_var in resume_execution (the new sub that used to be in
+start_machine) means I don't need "R123" labels anymore, except for @save.
+
+-------------------------------- June 24, 2004 --------------------------------
+Took this from zork1 translation:
+L26092: $stack[@stack] = z_call(26306, \@locv, \@stack, 26098, 0, pop(@stack));
+
+It's the translation of:
+ 65ec:  e0 2f 33 61 00 00       call            66c2 sp -> sp
+
+The crazy thing is, I think it's actually doing the right thing, including
+passing the correct (i.e., popped) stackref to z_call!
+
+Fixed log_shift, storew, storeb translations to correctly & 0xff(ff).
+Still need to add test for it to czech. (Do I need to fix dec? Does it matter
+that it does &0xffff?)
+
+-------------------------------- June 25, 2004 --------------------------------
+Read that if caller() is called within the DB package, then it sets @DB::args
+equal to the arguments given in that frame. That information is enough that we
+don't need to build our own call stack. If only I had worked this out two
+months ago! Anyway, I was able to write a build_call_stack routine that
+identically reproduces @Save_Stack (as far as I can tell).
+
+Need to:
+- change resume_execution to use only @Restore_Stack. I believe I can
+  then get rid of the global @Save_Stack, and create a local @Save_Stack
+  variable. (@Restore_Stack still needs to stay global so it works
+  after die()). Note that build_call_stack needs to go on top of any
+  @Restore_Stack (or push onto @Restore_Stack w/in the sub, whatever).
+
+If I want to get rid of z_call entirely:
+- move DEBUG statement to first line of each routine
+- create a rtn0 that returns 0
+- change regexp in build_call_stack
+- call rtns with first arg containing stackref, locref, nextPC, store_var.
+  But note that the called sub should NOT use those to initialize @locv, @stack
+  (unlike calls from resume_execution).
+- change call_* translation
+Might not be worth it: requires complications in Z-subs like
+calling 0, no strict refs, what to do with extra args.
+Even if I don't get rid of it, I've simplified the system by not storing
+the Save_Stack.
+
+-------------------------------- June 27, 2004 --------------------------------
+Created directory for Language::Zcode using:
+`h2xs -AX --compat_version=5.6.1 -n Language::Zcode`;
+
+Problem: Zcode.pm was created in '.' which means that "use Language::Zcode"
+won't work in that dir. I can put it in a dir called 'Language' and say "use
+lib .." in plotz.pl. Or put 'Language/Zcode.pm' into the Makefile.pl and
+not need any use lib at all!
+
+-------------------------------- June 29, 2004 --------------------------------
+Changing directory hierarchy.
+
+Only part of the way through, but I've put all the .pm's in the correct
+locations and I'm able to translate a z5 and run the resulting .pl file.
+
+I still need to go through all the pm's and replace all PlotzPerl, PlotzParse,
+etc. with the correct stuff. Busy work.
+
+Then I can just port all the pm's to the Language/Zcode directory that
+h2xs created.
+
+-------------------------------- June 30, 2004 --------------------------------
+Removed leftover cruft from explicit building of the call stack. I think things
+are cleaner now. (I'm still using z_call, tho it's much smaller now.)
+
+-------------------------------- July 07, 2004 --------------------------------
+Divided Translator.pm into a bunch of files in Translator/.
+Things still seem to work.
+
+-------------------------------- July 13, 2004 --------------------------------
+Splitting Parser modules into Language::Zcode. I'm pulling them out of
+dxt.pl (now renamed tuxedo.pl) because I had updated that code a bit.
+
+tuxedo.pl: supposed to be a more formal version of txd. In the end, since I'm
+lazy, it'll probably just be a black-and-white version of txd's full-color
+functionality. In the end, the only real benefit of tuxedo is that it's Open
+Source. (I was told on the Z-machine mailing list that, while txd's source is
+distributed free, in order to copy any of the code, I would need to get
+permission from everyone who ever wrote any of the code. All of which happened
+prior to 1992.)
+
+-------------------------------- July 14, 2004 --------------------------------
+Finished "porting" tuxedo.pl. I'm now able to reproduce the old results, i.e.,
+I get Advent.z5 perfect and break on minizork because I never recognize the
+strings.
+
+-------------------------------- July 15, 2004 --------------------------------
+Created LZ::Parser::Routine, which stores and parses one Z-code routine.
+Changed newplotz.pl to use it.
+Changed tuxedo.pl to use it (partly), and it works!
+
+-------------------------------- July 16, 2004 --------------------------------
+tuxedo.pl is even better. I now look for the address of the last command
+in the sub, so txd and Perl are matching perfectly. The last command
+address is needed anyway for parsing a routine. (We can't parse up to the
+'end' address, because there might be padding zeroes.)
+
+newplotz.pl mostly works.
+For totally inexplicable reasons, we're getting a "Substitution loop"
+in PlotzTranslator.pm when running newplotz, even though it seems to be doing
+exactly what plotz.pl was doing at that point!
+
+-------------------------------- July 19, 2004 --------------------------------
+Got rid of the weird Substitution loop bug by just using _SW#...#
+instead of _SW(...), which required fancy balanced paren matching.
+
+Did simple profiling with:
+perl -d:DProf newplotz.pl
+dprofpp (-I sorts by cumulative secs)
+
+Found out that moving all the init stuff from parse_command out of the
+sub made things run twice as fast!
+Also realized that there's only 7000 commands in Advent, which is 90K.
+So there can't be more than 40000 commands even in Curses. Maybe I ought
+to save the results of parsing after all. Well, won't do it for now,
+but I could. At current speeds, it would shave maybe 20-30% off the total
+running speed.
+
+-------------------------------- July 20, 2004 --------------------------------
+Useless mini-tweak to z_call.
+
+I can identify orphan fragments!  If command we just read was a jump/ret
+(sub-ending opcode) and no earlier command jumped past it AND we're not
+starting a new sub, then we must be in an orphan fragment!
+And don't return a sub at all when I get an error reading that sub. Now
+we even get the correct subs for minizork!
+
+-------------------------------- July 21, 2004 --------------------------------
+I figured out that it's very easy to mix Perl & Inform in one file.
+The Inform preprocessor completely ignores the Perl, and as a bonus,
+we can even get all of the Inform code into the Perl!
+This will be very convenient for writing L::Z tests.
+I can write Inform code to test, then compile the file with inform
+(possibly in different Z versions) and read the .z? file with L::Z::Parser!
+
+#Ifdef PERL;
+my $Z_version = 5; # could use 3 or 4 or whatever
+(my $Inform_file = $0) =~ s/\.t/.z$Z_version/;
+my @Inform = grep {/./} <DATA>;
+...
+#endif;
+__DATA__
+[ Main i;
+   i = 1;
+   @print_num i;
+   quit;
+];
+
+More cleanup work on tuxedo.pl & LZ::Parser::Perl. I'm getting happier
+with it.
+
+The bad news: zork1's first sub is never called explicitly. So I'm
+going to have to do the "read everything after the dictionary" trick.
+Other bad news: zork1 has a 0xb0 in sub 90d4 after a quit, instead
+of padding with a friendly 0x0. How can I tell that that b0 is padding
+rather than a command?! Actually, I argue that txd is wrong, and it
+IS an orphan (rtrue) command!
+The last sub is wrong too - it thinks that the start of strings is
+an orphan command. It then tries to start a sub after that, but soon breaks.
+So the only extra stuff is that one orphan command which, of course,
+won't affect anything.
+
+-------------------------------- July 22, 2004 --------------------------------
+VERY complicated thinking today. Eventually, I believe I figured out the
+Right Way to do the z_call stuff. I put the recursion back in, but now
+it's in combination with the @DB::args stuff.
+
+Also, I haven't exactly tested it, or even run it at all. But I'm pretty sure
+I've got the algorithm right, at least.
+
+-------------------------------- July 26, 2004 --------------------------------
+Clean up and rename Language::Zcode::Runtime::MachineState. It seems to
+work!
+
+Split out Language::Zcode::Runtime::Quetzal. Why not?
+
+-------------------------------- July 27, 2004 --------------------------------
+Figured out that for read_char on win32, we can open a new
+Win32::Console(STD_INPUT_HANDLE) without creating the whole Win32 terminal.
+Then we can change the mode so it'll read just a char. See console.pl
+
+Add end_of_dictionary sub to Parser::Perl. With it, I can add to @todo
+the first address after the dictionary is over. (I should probably add
+it with score MAYBE or something, cuz there's no guarantee it starts
+a sub. OTOH, we're positive it's not in the middle of a sub. Still, we
+wouldn't want to *think* we're finding real code that ends up overlapping
+where a real sub starts. Main point is just to find the few if any
+subs before main(), which is not even a concern for Inform.)
+Seems to work for zork1, Advent, and minizork, which is all I have right now.
+
+-------------------------------- July 29, 2004 --------------------------------
+Continue end_of_dictionary stuff.
+We can now plotz Advent, minizork (random data after dictionary), AND zork1!
+
+Fixed bug in ZIO::Win32 that would give warning whenever switching
+window focus in/out of the ZIO.
+
+-------------------------------- July 30, 2004 --------------------------------
+show_status: handle case where location global var isn't set (e.g., test
+program)
+
+Fixed Advent bug: it was a mistranslation of set_cursor.
+
+------------------------------- August 02, 2004 -------------------------------
+Counting opcodes using Games::Rezrov.
+Played a few turns of Advent.
+1 compare_jz 22152
+2 compare_je 21823
+3 increment 12095
+4 jump 11552
+5 compare_jg 11106
+6 set_variable 10498
+7 compare_jl 8642
+8 get_property_addr 8199
+9 call_func 6359
+10 get_word_index 6159
+11 loadb 5085
+12 rtrue 3968
+13 call_proc 3836
+14 decrement 3438
+15 ret 2731
+16 write_zchar 2472
+17 store_byte 2317
+18 get_child 1984
+19 test_attr 1926
+20 divide 1873
+Total 147711. First ten: 105437
+
+minizork:
+1 loadb 5967
+2 store_byte 5261
+3 compare_jz 4985
+4 dec_jl 3640
+5 add 3246
+6 compare_je 2871
+7 get_word_index 2270
+8 set_variable 2234
+9 store_word 1932
+10 multiply 1861
+11 call_func 1717
+12 inc_jg 1542
+13 test_attr 1512
+14 jump 1258
+15 get_sibling 604
+16 get_child 577
+17 get_property_addr 568
+18 compare_jg 486
+19 test_flags 357
+20 subtract 337
+
+zork1:
+1 compare_jz 3590
+2 compare_je 2675
+3 set_variable 1712
+4 call_func 1450
+5 test_attr 1356
+6 jump 1179
+7 get_word_index 1148
+8 add 619
+9 store_word 600
+10 inc_jg 558
+11 loadb 496
+12 get_sibling 429
+13 get_child 394
+14 get_property_addr 370
+15 compare_jg 332
+16 test_flags 273
+17 get_parent 266
+18 get_property 257
+19 compare_jl 240
+20 routine_push 239
+Total 19389. First ten: 13963
+
+ballerina.z8:
+1 jump 48624
+2 compare_jg 46201
+3 compare_je 42785
+4 compare_jz 41683
+5 increment 40224
+6 set_variable 38142
+7 compare_jl 25840
+8 jin 20642
+9 get_word_index 18918
+10 get_property_addr 18087
+11 call_func 14929
+12 loadb 8574
+13 store_word 7941
+14 subtract 7737
+15 routine_push 7408
+16 add 7388
+17 rtrue 5147
+18 divide 5005
+19 ret 4621
+20 store_byte 4340
+21 bitwise_and 4277
+Total 451702. First ten: 341146
+
+In all four cases, nearly all the first 10 opcodes -- which make up 70-75% of
+the opcodes -- are translated into pure Perl, hence should be pretty fast.
+(And many of the next ten, too, depending on the game.) Sub calls will have
+some overhead due to z_call, although not TOO much since I'm now using Perl's
+(presumably optimized) call stack instead of making my own.  rezrov also lots
+tons of time (tho was able to deal with changing Z-files!) by re-parsing every
+opcode every one of those thousands of times.
+
+The upshot: I really don't think optimization is going to be necessary!
+20K lines of Perl including a bunch of subs can run pretty darn fast.
+(And jumps are probably pretty fast even if they're deprecated.)
+
+And here's a few turns of a translated Advent.pl:
+%Time ExclSec CumulS #Calls sec/call Csec/c  Name
+ 28.9   1.263  1.209  15562   0.0001 0.0001  Language::Zcode::Runtime::Opcodes:
+                                             :thing_location
+ 16.0   0.702  0.574  44205   0.0000 0.0000  Language::Zcode::Runtime::Opcodes:
+                                             :global_var
+ 8.27   0.361 36.721   9543   0.0000 0.0038  Language::Zcode::Runtime::MachineS
+                                             tate::z_call
+ 5.75   0.251  0.251      1   0.2510 0.2510  PlotzMemory::read_memory
+ 5.73   0.250  0.220   8641   0.0000 0.0000  Language::Zcode::Runtime::Opcodes:
+                                             :get_prop_info
+ 5.73   0.250  1.013   7293   0.0000 0.0001  Language::Zcode::Runtime::Opcodes:
+                                             :get_prop_addr
+ 4.13   0.180  0.141  11034   0.0000 0.0000  PlotzPerl::Output::get_stream
+ 4.10   0.179  0.760   2621   0.0001 0.0003  PlotzPerl::Output::output
+ 3.92   0.171  1.518   1304   0.0001 0.0012  main::rtn30520
+
+So if we do need to optimize, it's not for the regular opcodes. Of course I'd
+want to run for more turns to make sure, but this looks pretty good.
+OTOH, ballerina.pl wouldn't even run. Is it cuz it's five meg, or some other
+problem? (Well, it runs but immediately dies. It won't run under Dprof.)
+
+------------------------------- August 03, 2004 -------------------------------
+Consolidated home & work versions of IO.pm. We're now almost totally consistent!
+
+Split out Text.pm and put in POD. (Eventually could go from LZ::Runtime::Text
+to just LZ::Text. Put decode_text in there, to be called by Parser AND
+Runtime.)
+
+Tracked down 2 sneaky bugs.
+First, z_call will break during restores, because it calls subs with extra
+args. (It changes @args to set @locv.) This will break check_arg_count (which
+just tests @_).  I need to move @locv back into $frame_info and set @locv more
+carefully.
+
+Second, I need to add "unsigned_word" (aka & 0xffff) to a bunch of locations.
+The one that broke ballerina was loadb, which was trying to load a number
+> 32K, so it tried loading a negative offset and broke.
+But there's a whole bunch of places that could theoretically be negative (like
+the memory locations you call read, get_cursor, and print_*addr with).
+It might be that I should fix this by putting a + or a - next to the
+args in Parser::Opcode, and add the SW/UW there instead of cluttering
+all the translations in Translator. (Also, that way we'll have the info for
+all the other languages.)
+
+------------------------------- August 04, 2004 -------------------------------
+Fixed the save bug, and created a test for it.
+
+------------------------------- August 10, 2004 -------------------------------
+Change cvs directories. Moved LZ to a lib directory, moved scripts to
+scripts/.
+Changed MachineState.pm to State.pm
+Language::Zcode -> Games::Zmachine, based on discussions on
+module-authors@perl.org
+
+------------------------------- August 11, 2004 -------------------------------
+Got PIR translation working! Admittedly, only for a few ops, and we're
+totally ignoring globals, signed word conversion, and a zillion other things,
+but it DOES create a .imc file that compiles and runs!
+
+------------------------------- August 12, 2004 -------------------------------
+Now able to:
+- create Inform file from Perl ("perl t\20_parser.t Inform")
+- compile it ("inf +code_path=t t\p20_arser.t")
+- run test ("perl t\p20_arser.t"
+    or "perl -MTest::Harness -e "runtests('t\parser.t')")
+    or "make test"!
+
+parser.t tests a couple constants and that a couple commands get the right
+values into the right slots.
+
+------------------------------- August 13, 2004 -------------------------------
+Start on trans_perl.t, which tests that command hashes like those coming out
+of a Parser get translated into the right Perl.
+
+Work on perl_test.h, which changes asserts etc. to output "(not )?ok \d+"
+that Test::Harness will like!
+
+------------------------------- August 14, 2004 -------------------------------
+Add Makefile.PL, MANIFEST to CVS. We're now MakeMaker-compatible!
+
+------------------------------- August 17, 2004 -------------------------------
+Got Test::Harness to play nice with a plotz'd file!
+Issues:
+- need to set rows/columns in IO.pm explicitly. (It's possible to run
+tests with parameters passed, but complicated. Need to set
+Test::Harness:switches. And of course I only want it to happen for this
+one test. How hard is it to change what'll be in the Makefile?)
+
+- If rows/columns is 24 by default, we'll get lots of [MORE]. Even if
+we pipe a 'perl -e "print qq{\n}"' to the call to runtests, the test
+during which it gets to the [MORE] fails. Can I track this down? And/or,
+can I set rows to 255? Which - if I add the code to IO.pm - will never
+[MORE]ify. (Note that in that case I also need to say don't bother doing
+the [MORE] printing test, since it'll fail.)
+
+There's still some potential issues with rows/columns and [MORE], but
+we're able to run 193 successful tests in a .inf file that -> .z -> .pl!
+
+Added sub, mul, print_char, new_line to PIR.
+
+------------------------------- August 23, 2004 -------------------------------
+Add parameter passing to PIR. call* at least sort of work.
+Change local vars to "local1" etc., just like Inform names them.
+Add signed word support.
+
+Change Games::Zmachine BACK to Language::Zcode, based on yet more discussions
+on module-authors@perl.org. I was right all along!
+Did a diff with all files from work (from 8/12), so we're pretty much in synch
+now.
+
+make test works!
+
+------------------------------- August 24, 2004 -------------------------------
+-t option so we can choose "dumb" or "win32".
+-r 255 doesn't print any [MORE] prompts
+
+Make _ZMemory a global variable. (Still reading it from file, tho.)
+
+Added store, load: they're easy if you ignore indirect variables!
+Added storeb, loadb, storew, loadw.
+
+All of this needs further testing, of course.
+
+------------------------------- August 25, 2004 -------------------------------
+Write new 40_trans_perl.t which basically does plotz. Didn't write its tests,
+though.
+80_all.t runs the translated file with the correct inputs (-r 255 -t dumb).
+Works!
+80_all.t could read output from 40_trans_perl.t.
+
+Mostly untested push, pop, pull, and print.
+(Print cheats right now & prints the decoded string)
+
+------------------------------- August 27, 2004 -------------------------------
+_read_memory now correctly (?) reads in memory from the generated PIR file,
+using _add_mem in main.pir.
+- I rolled my own 'hex' function
+- I call it with a string of 16 space-separated numbers and parse those
+  16 nums out, setting an array value for each one, then re-set
+  global "_Z_Memory" = mem.
+
+I'm not sure that's the best way to do it. Ask on the list.
+
+------------------------------ September 01, 2004 -----------------------------
+I think I came up with a significantly better way of handling substition of
+global vars / sp into the commands as I translate them to PIR.
+Seems to work for a bunch of cases, but I need to test a bunch
+more, like call foo(g01, g01, g01, sp, sp, sp)
+
+------------------------------ September 02, 2004 ------------------------------
+Terribly ugly hack to allow running on non-Win32 systems. eval the entire
+GR::ZIO_win32 module. The eval will die for non-win32 systems, which don't
+find "use Win32", but that's fine, unless you try to do -t win32, which SHOULD
+break. I really need to fix this more nicely someday (AFTER 0.8).
+
+------------------------------ September 03, 2004 ------------------------------
+20_parser.t:
+loadb/w, storeb/w, inc(_chk), dec(_chk)
+ret, ret_popped, push, print_char, piracy
+
+Add objects from test.h so we can test object opcodes. Add V5PLUS
+definition.
+
+pull, verify, test, check_arg_count, buffer_mode, input_stream, output_stream
+
+------------------------------ September 04, 2004 ------------------------------
+print, print_ret, print_addr, print_paddr
+
+(Added nop to Translator::Perl!)
+
+------------------------------ September 07, 2004 ------------------------------
+Got 40/80 tests working. 40 translates, 80 runs it.
+
+Added object, property, attr opcodes to 20_parser
+
+------------------------------ September 08, 2004 ------------------------------
+Language::Zcode can't read a Windows command input file (input stream
+1) when it's running on Unix. It gets a \r\n instead of a \n. (Is the
+answer as simple as s/\r\n/\n/ before chomping in z_read?)  Note that
+reading a Unix input file on Windows SEEMS to have worked. Make sure
+read_char works too!
+Kludged around the bugs. I can now run tests successfully on Solaris.
+
+Finish (first pass) all (supported) opcodes in 20_parser.t!
+That means we're done with simple tests!
+
+From Spec1.1: Section 7.1.2 is incorrect - output streams 3 and 4 are
+present only in Version 5 and later.
+That means I'm now fully implementing v3!!! (Except maybe a few ZSCII
+characters, and sound, of course.)
+
+------------------------------ September 09, 2004 ------------------------------
+Adding POD et al.
+
+hello.inf (Hello, World!) for an example file.
+
+------------------------------ September 10, 2004 ------------------------------
+Created languages/Perl|XML|PIR with some sample code & PIR/XML library files.
+
+------------------------------ September 12, 2004 ------------------------------
+Working on Infidel, which appears NOT to have random elements.
+
+------------------------------ September 13, 2004 ------------------------------
+Able to do perl -Ilib story\INFIDEL.pl -r 255 < story\infidel.sol and
+win the game!
+
+Bugfix in checksum because Infocom games have non-zero padding after
+the official end of the file.
+
+Major updates to zcode.xsl (and a couple supporting updates to
+Translator::XML).  We now have a bunch of opcodes for which we get
+output that looks sort of like Inform!
+
+
+vim: tw=78

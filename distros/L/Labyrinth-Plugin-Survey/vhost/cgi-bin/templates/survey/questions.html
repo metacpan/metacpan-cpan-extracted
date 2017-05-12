@@ -1,0 +1,36 @@
+[% FOREACH section = survey.sections %]
+<div class="section">
+<h4>[% section.label %]</h4>
+
+<div class="newsbox">
+
+[% IF section.preamble %]<div class="preamble">[% section.preamble %]</div>[% END %]
+
+[% FOREACH question = section.questions %]
+
+[% IF question.status != 'hidden' %]
+<div class="question">[% question.label %]</div>
+[% IF question.error %]<div class="alert">[% question.error %]</div>[% END %]
+
+[% IF question.multipart %]
+
+	[% FOREACH q = question.multipart %]
+	[% INCLUDE "survey/question-types.html" %]
+	[% END %]
+
+[% ELSE %]
+
+	[% q = question %]
+	[% INCLUDE "survey/question-types.html" %]
+
+[% END %]
+
+[% END %]
+
+[% END %]
+
+[% IF section.footnote %]<div class="footnote">[% section.footnote %]</div>[% END %]
+
+</div>
+</div>
+[% END %]

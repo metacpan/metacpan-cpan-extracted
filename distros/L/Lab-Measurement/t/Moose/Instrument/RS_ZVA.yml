@@ -1,0 +1,336 @@
+---
+id: 0
+method: Clear
+---
+command: '*CLS'
+id: 1
+method: Write
+---
+command: '*RST'
+id: 2
+method: Write
+---
+command: INST:NSEL?
+id: 3
+method: Query
+retval: '1
+
+'
+---
+command: CALC:DATA:CALL:CAT?
+id: 4
+method: Query
+retval: "'S21'\n"
+---
+command: SENS:SWE:POIN 3
+id: 5
+method: Write
+---
+command: SENS:FREQ:STAR?
+id: 6
+method: Query
+retval: '10000000
+
+'
+---
+command: SENS:FREQ:STOP?
+id: 7
+method: Query
+retval: '24000000000
+
+'
+---
+command: INIT:CONT?
+id: 8
+method: Query
+retval: '1
+
+'
+---
+command: INIT:CONT 0
+id: 9
+method: Write
+---
+command: SENS:AVER:COUN?
+id: 10
+method: Query
+retval: '10
+
+'
+---
+command: SENS:AVER:COUN 1
+id: 11
+method: Write
+---
+command: SENS:SWE:COUN?
+id: 12
+method: Query
+retval: '1
+
+'
+---
+command: FORM?
+id: 13
+method: Query
+retval: "ASC,0\n"
+---
+command: FORM REAL, 32
+id: 14
+method: Write
+---
+command: FORM:BORD?
+id: 15
+method: Query
+retval: "SWAP\n"
+---
+command: INIT
+id: 16
+method: Write
+---
+command: '*WAI'
+id: 17
+method: Write
+---
+command: CALC:DATA:CALL? SDATA
+id: 18
+method: Query
+retval: 23323234eee41c3ab621dbba889e6db6bbe222b96dce9db886f95eb90a
+retval_enc: hex
+timeout: 10
+---
+command: INIT
+id: 19
+method: Write
+---
+command: '*WAI'
+id: 20
+method: Write
+---
+command: CALC:DATA:CALL? SDATA
+id: 21
+method: Query
+retval: 233232344e8babb92aaaeb39b450fbb7c8babdb8f85a7bb84c2d0fb90a
+retval_enc: hex
+timeout: 10
+---
+command: INIT
+id: 22
+method: Write
+---
+command: '*WAI'
+id: 23
+method: Write
+---
+command: CALC:DATA:CALL? SDATA
+id: 24
+method: Query
+retval: 23323234d84dbf38a0e4bf3a1aac33b8fe1de7b8f80ef6b7da7e01b90a
+retval_enc: hex
+timeout: 10
+---
+command: SENS:FREQ:STAR 10000000
+id: 25
+method: Write
+---
+command: SENS:FREQ:STAR?
+id: 26
+method: Query
+retval: '10000000
+
+'
+---
+command: SENS:FREQ:STAR 100000000
+id: 27
+method: Write
+---
+command: SENS:FREQ:STAR?
+id: 28
+method: Query
+retval: '100000000
+
+'
+---
+command: SENS:FREQ:STAR 1000000000
+id: 29
+method: Write
+---
+command: SENS:FREQ:STAR?
+id: 30
+method: Query
+retval: '1000000000
+
+'
+---
+command: SENS:FREQ:STOP 20000000
+id: 31
+method: Write
+---
+command: SENS:FREQ:STOP?
+id: 32
+method: Query
+retval: '20000000
+
+'
+---
+command: SENS:FREQ:STOP 300000000
+id: 33
+method: Write
+---
+command: SENS:FREQ:STOP?
+id: 34
+method: Query
+retval: '300000000
+
+'
+---
+command: SENS:FREQ:STOP 4000000000
+id: 35
+method: Write
+---
+command: SENS:FREQ:STOP?
+id: 36
+method: Query
+retval: '4000000000
+
+'
+---
+command: SENS:SWE:POIN 1
+id: 37
+method: Write
+---
+command: SENS:SWE:POIN?
+id: 38
+method: Query
+retval: '1
+
+'
+---
+command: SENS:SWE:POIN 10
+id: 39
+method: Write
+---
+command: SENS:SWE:POIN?
+id: 40
+method: Query
+retval: '10
+
+'
+---
+command: SENS:SWE:POIN 100
+id: 41
+method: Write
+---
+command: SENS:SWE:POIN?
+id: 42
+method: Query
+retval: '100
+
+'
+---
+command: SENS:SWE:POIN 60000
+id: 43
+method: Write
+---
+command: SENS:SWE:POIN?
+id: 44
+method: Query
+retval: '60000
+
+'
+---
+command: SOUR:POW 0
+id: 45
+method: Write
+---
+command: SOUR:POW?
+id: 46
+method: Query
+retval: '0
+
+'
+---
+command: SOUR:POW -10
+id: 47
+method: Write
+---
+command: SOUR:POW?
+id: 48
+method: Query
+retval: '-10
+
+'
+---
+command: SOUR:POW -20
+id: 49
+method: Write
+---
+command: SOUR:POW?
+id: 50
+method: Query
+retval: '-20
+
+'
+---
+command: SENS:BAND 1
+id: 51
+method: Write
+---
+command: SENS:BAND?
+id: 52
+method: Query
+retval: '1
+
+'
+---
+command: SENS:BAND 100
+id: 53
+method: Write
+---
+command: SENS:BAND?
+id: 54
+method: Query
+retval: '100
+
+'
+---
+command: SENS:BAND 1000
+id: 55
+method: Write
+---
+command: SENS:BAND?
+id: 56
+method: Query
+retval: '1000
+
+'
+---
+command: SENS:BAND:SEL HIGH
+id: 57
+method: Write
+---
+command: SENS:BAND:SEL?
+id: 58
+method: Query
+retval: "HIGH\n"
+---
+command: SENS:BAND:SEL NORM
+id: 59
+method: Write
+---
+command: SENS:BAND:SEL?
+id: 60
+method: Query
+retval: "NORM\n"
+---
+command: SENS:BAND:SEL HIGH
+id: 61
+method: Write
+---
+command: SENS:BAND:SEL?
+id: 62
+method: Query
+retval: "HIGH\n"
+---
+command: '*RST'
+id: 63
+method: Write

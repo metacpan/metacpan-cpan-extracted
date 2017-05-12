@@ -1,0 +1,15 @@
+#!/usr/bin/perl -w -T
+package MyPackage;
+
+use base qw(Net::Server);
+
+sub process_request {
+    my $self = shift;
+    while (<STDIN>) {
+        s/\r?\n$//;
+        print "You said '$_'\r\n"; # basic echo
+        last if /quit/i;
+    }
+}
+
+MyPackage->run( port => 1337 );

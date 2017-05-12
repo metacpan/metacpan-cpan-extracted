@@ -1,0 +1,49 @@
+---
+abstract: 'All-in-One Japanese text normalizer'
+author:
+  - 'pawa <pawapawa@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.99'
+  Test::Warn: '0.20'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-JA-NormalizeText
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Lingua::JA::NormalizeText:
+    file: lib/Lingua/JA/NormalizeText.pm
+    version: '0.50'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  HTML::Entities: '3.66'
+  HTML::Scrubber: '0.10'
+  Lingua::JA::Dakuon: '0'
+  Lingua::JA::Moji: '0.32'
+  Lingua::JA::Regular::Unicode: '0.11'
+  Unicode::Normalize: '1.00'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/pawa-/Lingua-JA-NormalizeText/issues
+  homepage: https://github.com/pawa-/Lingua-JA-NormalizeText
+  repository: git://github.com/pawa-/Lingua-JA-NormalizeText.git
+version: '0.50'
+x_contributors:
+  - 'pawa <pawa@dojikko.com>'
+  - 'pawa <pawa@pawafuru.com>'

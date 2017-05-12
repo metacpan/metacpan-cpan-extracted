@@ -1,0 +1,149 @@
+\ProvidesPackage{alvis}
+\RequirePackage{graphicx}
+\RequirePackage{fancyhdr}
+\RequirePackage{color}
+
+% Don't put a label in the bibliography at all.  Just use the unlabeled format
+% instead.
+% gjr: removed \@mkboth -- no headers here.
+% gjr: reduced vertical space between entries (plus was .33em)
+%
+\def\thebibliography#1{%
+  \section{References}    % References section will be numbered in lrec2000.sty
+  \list{}{\setlength{\labelwidth}{0pt}
+          \setlength{\leftmargin}{0.35cm}
+          \setlength{\itemsep}{0.11ex plus 0.11ex}
+          \setlength{\parsep}{0ex}
+          \setlength{\itemindent}{-0.35cm}}
+  \def\newblock{\hskip .11em plus .11em minus -.07em}
+  \sloppy\clubpenalty4000\widowpenalty4000
+  \sfcode`\.=1000\relax}
+\let\endthebibliography=\endlist
+
+\newcommand\alvis{ALVIS -- Superpeer Semantic Search Engine}
+
+\renewcommand{\title}[1]{\newcommand\mytitle{#1}}
+\newcommand\deliverable[1]{\newcommand\mydeliverable{#1}}
+\newcommand\dateofpreparation[1]{\newcommand\mydate{#1}}
+\newcommand\authors[1]{\newcommand\myauthors{#1}}
+\newcommand\coordinator[1]{\newcommand\mycoordinator{#1}}
+\newcommand\phone[1]{\newcommand\myphone{#1}}
+\newcommand\fax[1]{\newcommand\myfax{#1}}
+\newcommand\email[1]{\newcommand\myemail{#1}}
+\newcommand\location[1]{\newcommand\mylocation{#1}}
+\newcommand\keywords[1]{\newcommand\mykeywords{#1}}
+\newcommand\workpackage[1]{\newcommand\myworkpackage{#1}}
+\newcommand\changelog[1]{\newcommand\mychangelog{#1}}
+\newcommand\deliverabletype[1]{\newcommand\mytype{#1}}
+
+\newfont{\alvisfont}{txss at 12pt}
+\newfont{\tinyalvisfont}{txss at 7pt}
+
+
+
+\newcommand\frontpage{
+\renewcommand{\headheight}{79pt}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\definecolor{headerline}{rgb}{.66, .66, .66}
+\pagestyle{fancy}
+\pagenumbering{roman}
+
+
+\newcommand\banner{
+\begin{tabular}{lr}
+\makebox[\textwidth][r]{\raisebox{1.4cm}[0pt][0pt]{\parbox{1.2\textwidth}{\color{headerline}\alvisfont\alvis
+  \\\rule{1.2\textwidth}{2pt}}}} &
+  \includegraphics[scale=.33]{alvislogo}
+\end{tabular}
+}
+\fancyhead{}
+\fancyhead[LH]{\banner}
+
+
+\fancyfoot{}
+
+\begin{center}
+\textbf{\Large 002068 \\[.5\baselineskip] ALVIS \\[.1\baselineskip] Superpeer semantic Search Engine\\[1.5\baselineskip]}
+\textbf{\Large STREP / IST \\[2\baselineskip]}
+\textbf{\huge \mydeliverable \\[.5\baselineskip] \mytitle}
+\begin{table}[b!]
+\begin{tabular}{p{.3\textwidth}p{.7\textwidth}}
+\hline
+\small Title of contract & \small ALVIS - Superpeer Semantic Search Engine \\
+\small Acronym & \small ALVIS \\
+\small Contract number & \small IST-1-002068-STP \\
+\small Start date of the project & \small 1.1.2004 \\
+\small Duration & \small 36 months, until 31.12.2006 \\
+\small Document name & \small \mydeliverable -- \mytitle\\
+\small Date of preparation & \small\mydate \\
+\small Author(s) & \small\protect\myauthors \\
+\small Coordinator of the \newline deliverable & \small\protect\mycoordinator \\
+ & \small Phone : \myphone \\
+ & \small Fax : \myfax \\
+ & \small Email: \myemail\\
+\small Document location &
+\small \mylocation\\
+\hline
+\protect\raisebox{-2.3cm}{\includegraphics[scale=0.3]{ist-norm}} &  \small\protect\raisebox{-1cm}{\parbox[c]{.7\textwidth}{Project funded by the
+European Community under the \\ ``Information Society Technology''
+Programme (2002-2006) }}
+
+\end{tabular}
+\end{table}
+\end{center}
+
+\newpage
+
+\renewcommand{\headheight}{20pt}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\fancyhead{}
+\fancyhead[LH]{\tinyalvisfont\alvis}
+\fancyhead[RH]{\tinyalvisfont\mytitle}
+
+\renewcommand{\footrulewidth}{0.4pt}
+
+\fancyfoot{}
+\fancyfoot[LF]{ABSTRACT}
+\fancyfoot[RF]{\thepage}
+
+}
+
+
+\newcommand\abstractpage{
+\begin{table}[b!]
+\begin{tabular}{p{.3\textwidth}p{.7\textwidth}}
+\hline
+Keywords & \mykeywords \\
+Work package & \myworkpackage\\
+Document type & \mytype\\
+\hline
+Change log & \\
+\mychangelog
+\end{tabular}
+\end{table}
+
+\newpage
+
+}
+
+\newenvironment{executivesummary}
+{
+\fancyfoot[LF]{EXECUTIVE SUMMARY}
+
+\begin{center}
+\textbf{\large Executive summary}
+\end{center}}{\newpage}
+
+\newcommand\tableofcontentspage{
+\fancyfoot[LF]{\leftmark}
+\tableofcontents
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}

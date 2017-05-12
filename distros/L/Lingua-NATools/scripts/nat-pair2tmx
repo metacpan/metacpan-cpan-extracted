@@ -1,0 +1,106 @@
+#!/usr/bin/perl -s
+
+use Lingua::NATools;
+use warnings;
+use strict;
+
+our ($h);
+sub usage {
+    print "nat-pair2tmx: join two files in NATools input format into a TMX.\n\n";
+    print "\tnat-pair2tmx <file1> <lang1> <file2> <lang2>\n\n";
+    print "For more help, please run 'perldoc nat-pair2tmx'\n";
+    exit 0;
+}
+
+usage() if $h;
+my $sourceF = shift or usage();
+my $sourceL = shift or usage();
+my $targetF = shift or usage();
+my $targetL = shift or usage();
+
+my ($l0,$l1);
+
+print "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+print "<!DOCTYPE tmx SYSTEM \"http://www.lisa.org/tmx/tmx14.dtd\">\n";
+
+print "<tmx>\n";
+
+print " <header creationtool=\"nat-pair2tmx\" datatype=\"plaintext\" srclang=\"$sourceL\" creationtoolversion=\"$Lingua::NATools::VERSION\" o-tmf=\"natcorpus\" segtype=\"paragraph\" adminlang=\"EN\">\n";
+print " </header>\n";
+
+print " <body>\n";
+
+open A, "$sourceF" or die;
+open B, "$targetF" or die;
+$/="\n\$\n";
+while($l0 = <A>) {
+    chomp($l0);
+    chomp($l1 = <B>);
+
+    ($l0,$l1) = (n($l0),n($l1));
+
+    print "  <tu>\n";
+    print "   <tuv xml:lang=\"$sourceL\">\n";
+    print "    <seg>$l0</seg>\n";
+    print "   </tuv>\n";
+    print "   <tuv xml:lang=\"$targetL\">\n";
+    print "    <seg>$l1</seg>\n";
+    print "   </tuv>\n";
+    print "  </tu>\n";
+}
+
+print " </body>\n";
+
+print "</tmx>\n";
+
+close B;
+close A;
+
+sub n {
+    my $str = shift;
+    $str =~ s/<[^>]+>/ /g;
+    $str =~ s/\s+/ /g;
+    $str =~ s/&/&amp;/g;
+    $str =~ s/<//g;
+    $str =~ s/>//g;
+    return $str;
+}
+
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-pair2tmx - join two files in NATools input format into a TMX file.
+
+=head1 SYNOPSIS
+
+   nat-pair2tmx <file1> <lang1> <file2> <lang2>
+
+=head1 DESCRIPTION
+
+This script is used to convert a pair of files in NATools input format
+(translation units separated by a dollar sign) into a TMX file.
+
+To use it supply two NATools input files (with same number of
+translation units) and two language descriptors. For instance,
+
+  nat-pair2tmx corpus.pt pt corpus.en en  >  corpus-pt-en.tmx
+
+Note that the TMX will be output to STDTOU.
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2009 by Alberto Manuel Brandão Simões
+
+=cut

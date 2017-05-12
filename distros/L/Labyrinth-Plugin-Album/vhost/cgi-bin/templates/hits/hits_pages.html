@@ -1,0 +1,63 @@
+[% 
+    htmltitle = 'Top Galleries' ;
+    title = htmltitle ;
+
+    crumb2_name = 'Gallery' ;
+    crumb2_href = '/album-main' ;
+    crumb1_name = 'Top Galleries' ;
+%]
+
+<div class="post">
+
+<p>As of [% today %] these are the photos that have scored the highest interest
+from you folks.</p>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name="act" value="album-main" />
+    <input type="hidden" name="latest" value="0" />
+    <p>
+    Search: <input type="text" name="metadata" value="" size="15" />
+    [% ddmonths %][% ddyears %] <input type="submit" class="gobutton" value="GO" />
+    <p>
+    <a href="[% cgipath %]/pages.cgi?act=album-main&amp;latest=1">Latest Updates</a>
+    |   <a href="[% cgipath %]/pages.cgi?act=hits-pages">Top Galleries</a>
+    |   <a href="[% cgipath %]/pages.cgi?act=hits-photos">Top Photos</a>
+	</p>
+</form>
+</div>
+
+<div class="boxer">
+<h2>Last Month Gallery Pages</h2>
+<table class="blocker">
+<tr>
+    <th width="30">Count</th>
+    <th>PermaLink</th>
+    <th>Galley Title</th>
+</tr>
+[% FOREACH record = albumsmon %]
+<tr>
+    <td>[% record.counter %]</td>
+    <td><a href="[% webpath %]/album/[% record.pageid %]">/album/[% record.pageid %]</a></td>
+    <td>[% record.title %]</td>
+</tr>
+[% END %]
+</table>
+</div>
+
+<div class="boxer">
+<h2>All Time Gallery Pages</h2>
+<table class="blocker">
+<tr>
+    <th width="30">Count</th>
+    <th>PermaLink</th>
+    <th>Galley Title</th>
+</tr>
+[% FOREACH record = albumsall %]
+<tr>
+    <td>[% record.counter %]</td>
+    <td><a href="[% webpath %]/album/[% record.pageid %]">/album/[% record.pageid %]</a></td>
+    <td>[% record.title %]</td>
+</tr>
+[% END %]
+</table>
+</div>

@@ -1,0 +1,6 @@
+Build.PL
+lib/Lingua/EN/Contraction.pm
+MANIFEST			This list of files
+t/testcontract.t
+META.yml
+Changes

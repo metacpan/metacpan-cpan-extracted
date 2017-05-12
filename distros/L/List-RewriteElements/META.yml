@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                List-RewriteElements
+version:             0.09
+abstract:            Create a new list by rewriting elements of a first list
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Cwd:                           0
+    File::Basename:                0
+    File::Copy:                    0
+    File::Spec:                    0
+    File::Temp:                    0
+    Test::Simple:                  0.44
+    Tie::File:                     0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - James E Keenan (jkeenan@cpan.org)

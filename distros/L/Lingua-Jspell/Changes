@@ -1,0 +1,189 @@
+Revision history for Lingua-Jspell
+
+1.92 March 3, 2017
+   - added --flush option to ujspell;
+   - added jspell-to command line utility;
+
+1.91 March 14, 2016
+   - localize $. everywhere (hopefully);
+
+1.90 October 17, 2015
+   - consistent versioning;
+
+1.89 February 21, 2015
+   - fix missing space;
+
+1.88 February 21, 2015
+   - more taint fixes;
+
+1.87 February 20, 2015
+   - fix Windows that was broken since taint fix;
+
+1.86 October 4, 2014
+   - fixes for taint mode usage;
+
+1.85 June 5, 2012
+   - fix POD files
+   - fix binary installation files
+
+1.84 February 2, 2012
+   - new fixes for bugs introduced in 1.81
+
+1.83 January 26, 2012
+   - revert bug introduced in 1.81 to jbuild
+
+1.82 January 26, 2012
+   - fix shebang lines for installed scripts
+
+1.81 January 18, 2012
+   - remove warnings on 64 bits machines
+   - expand max suffix length from 16 to 20
+   - remove warnings on non-complete printfs
+
+1.80 January 9, 2012
+   - Releasing as stable
+
+1.80_01 January 7, 2012
+   - Fixed dll and dictionary installation under Windows 7.
+
+1.75 April 29, 2011
+   - Added missing prototype in C library. Fixes a segmentation fault
+     under Snow Leopard
+
+1.74 February 1, 2011
+   - Fixed compilation on linux (hopefully)
+
+1.73 January 27, 2011
+   - Fixed Build.PL for configure-time requirements
+
+1.72 November 20, 2010
+   - Install jslib.h header file.
+
+1.71 October 26, 2010
+   - fixed Build.PL requirements;
+   - force an YAML implementation;
+   - fixed jspell-installdic for new dictionaries;
+
+1.70 October 24, 2010
+   - jspell-installdic is now better, installing local dictionaries as well.
+     (jspell-installdic port, on a folder where port.yaml is present)
+
+1.69 October 12, 2010
+   - remove an annoying C warning from the build system.
+
+1.68 October 12, 2010
+   - better installation handling (sudo support et al)
+
+1.67 Setember 23, 2010
+   - Fixed small detail on 'nearmatches' method
+   - Changed dependencies on ExtUtils::LibBuilder
+
+1.66 July 13, 2010
+   - Added 'nearmatches' method.
+   - Fixed some issues with relative paths.
+
+1.65 June 15, 2010
+   - After one year, a bump of 0.02 in the version, as this is a relevant release.
+   - Create libjspell library in all 3 major platforms
+   - Link jspell and jbuild with libjspell
+   - Refactored jspell-installdic script to install automatically jspell dictionaries
+   - Refactored build system to use Module::Build
+   - Sure new bugs should be added :-|
+
+1.63 June 28, 2009
+   - Major changes on Lingua::Jspell::DictManager (v. 0.01 released);
+   - ':basic' and ':greps' export namespaces;
+   - better handling of jspell-dict (now with basic installation mechanisms)
+
+1.62 April 30, 2009
+   - handle correctly dictionaries that do not ship a .irr file
+   - bettered ujspell handle of single-letter analysis
+   - dictionaries .meta file are not longer supported
+   - .meta file replaced by .yaml file
+   - new YAML::Any dependency
+   - new analysis to tag conversion function (under tests)
+
+1.61 February 15, 2009
+   - added jspell-dump script to dump all words and flexions for a
+     dictionary or list of words;
+   - fixed problem with forks usage on der method;
+   - fixed problem with jspell personal dictionaries;
+   - make jspell complain when no dictionary can be opened.
+
+1.60 January 23, 2009
+    - fixed problem with windows and open2.
+
+1.59 January 22, 2009
+    - removed dependency for 'grep' and 'echo';
+
+1.58 January 14, 2009
+    - fixed bug with build.pl under linux systems.
+
+1.57 November 21, 2008
+   - rewritten the build.pl script to detect properly the installation
+     path (I hope).
+
+1.56 November 11, 2008
+   - added ujspell script to use jspell with unicode (-a and -l);
+   - Corrected set_mode modes in the C library;
+
+1.55    June 3, 2008
+    - removed agrep source code and its dependency;
+    - Corrected dependencies on some modules;
+
+1.54    April 23, 2008
+    - add code to check ncurses.h header file availability;
+    - a Jspell library is now built under Linux, MacOS and Windows;
+      Unfortunately I couldn't test it yet. Things should get better
+      in the next few days.
+
+1.53    April 22, 2008
+    - fix problems with carriage return under Windows platforms;
+    - fix problems with ' being used on command lines under Windows;
+    - suggest the use of codepage 1252 under Windows for correct 
+      latin1 display (chcp 1252), and the configuration of a True
+      Type Font on the command prompt terminal.
+
+1.52    April 21, 2008
+    - install both Portuguese and English dictionaries.
+    - depend on ExtUtils::CBuilder 0.23, important for Windows OS. 
+
+1.51    April 21, 2008
+    - first release supporting Windows, but with a buggy Makefile.PL
+
+1.50    March 30, 2008
+    - First stable release. Windows not supported yet.
+      (waiting for ExtUtils::CBuilder update)
+
+    - Added code to create dynamic library under Strawberry Win.
+    - Added a new C file to define the global variables, so that we
+      can build a library under windows.
+
+1.50_06 March 24, 2008
+    - Added code to create dynamic libraries under MacOS and Linux.
+      (although the library is build it needs some core rewritting
+       before being really useful).
+    - Added jspell.pc to help other tools to detect the C library.
+    
+1.50_05 March 23, 2008
+    - Portability to Microsoft Windows under development
+      (although without ncurses => no interactive spell checking)
+      - Tested with Strawberry Perl v5.10.0
+
+1.50_04 March 21, 2008
+    - Corrected scripts/installdic.in to create directory before
+      copying files.
+
+1.50_03 March 20, 2008
+    - Corrected t/pod-coverage.t test to work with perl 5.10.0.
+    - Added script to install Portuguese dictionary dinamically.
+
+1.50_02 March 19, 2008
+    - Added documentation to jspell-dict script
+    - Added installation rules for man pages
+    - Added the Lingua-Jspell-DictManager module
+
+1.50_01 March 19, 2008
+    - First version as a Perl Module.
+    - Has some building problems that should be fixed before 1.50.
+

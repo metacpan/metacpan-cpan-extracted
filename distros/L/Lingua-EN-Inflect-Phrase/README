@@ -1,0 +1,103 @@
+NAME
+    Lingua::EN::Inflect::Phrase - Inflect short English Phrases
+
+SYNOPSIS
+      use Lingua::EN::Inflect::Phrase;
+      use Test::More tests => 2;
+
+      my $plural   = Lingua::EN::Inflect::Phrase::to_PL('green egg and ham');
+
+      is $plural, 'green eggs and ham';
+
+      my $singular = Lingua::EN::Inflect::Phrase::to_S('green eggs and ham');
+
+      is $singular, 'green egg and ham';
+
+DESCRIPTION
+    Attempts to pluralize or singularize short English phrases.
+
+    Does not throw exceptions at present, if you attempt to pluralize an
+    already pluralized phrase, it will leave it unchanged (and vice versa.)
+
+    The behavior of this module is subject to change as I tweak the
+    heuristics, as some things get fixed others might regress. The
+    processing of natural language is a messy business.
+
+    If it doesn't work, please email or submit to RT the example you tried,
+    and I'll try to fix it.
+
+OPTIONS
+    By default, this module prefers to treat words as nouns (sometimes words
+    can be interpreted as a verb or a noun without context.) This is better
+    for things such as database table/column names, which is what this
+    module is primarily for.
+
+    This behavior can be switched with the variable $prefer_nouns. The
+    default is 1.
+
+    For example:
+
+      {
+        local $Lingua::EN::Inflect::Phrase::prefer_nouns = 0;
+        is Lingua::EN::Inflect::Phrase::to_S('sources split'), 'source splits';
+      }
+      {
+        local $Lingua::EN::Inflect::Phrase::prefer_nouns = 1;
+        is Lingua::EN::Inflect::Phrase::to_S('source splits'), 'source split';
+      }
+
+OPTIONAL EXPORTS
+    "to_PL", "to_S"
+
+SUBROUTINES
+  to_PL
+    Attempts to pluralizes a phrase unless already plural.
+
+  to_S
+    Attempts to singularize a phrase unless already singular.
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-lingua-en-inflect-phrase at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Lingua-EN-Inflect-Phrase
+    >. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    More information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-EN-Inflect-Phrase>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Lingua-EN-Inflect-Phrase>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Lingua-EN-Inflect-Phrase>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Lingua-EN-Inflect-Phrase/>
+
+REPOSITORY
+      git clone git://github.com/rkitover/lingua-en-inflect-phrase.git lingua-en-inflect-phrase
+
+SEE ALSO
+    Lingua::EN::Inflect, Lingua::EN::Inflect::Number, Lingua::EN::Tagger
+
+AUTHOR
+    Rafael Kitover <rkitover@cpan.org>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2010 Rafael Kitover (rkitover@cpan.org).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

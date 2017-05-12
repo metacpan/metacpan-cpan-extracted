@@ -1,0 +1,10 @@
+name: Lingua-ZH-Numbers
+version: 0.04
+abstract: Converts numeric values into their Chinese string equivalents
+author: Autrijus Tang <autrijus@autrijus.org>
+license: perl
+distribution_type: module
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.33

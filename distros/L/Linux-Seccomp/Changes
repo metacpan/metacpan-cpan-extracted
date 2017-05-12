@@ -1,0 +1,15 @@
+Revision history for Perl extension Linux::Seccomp.
+
+0.002001 2016-11-25T16:07+00:00
+ - Skip functionality test if seccomp_load returns -EINVAL.
+   This usually happens if the kernel is old or compiled without
+   CONFIG_SECCOMP_FILTER=y.
+
+0.002 2016-11-19T20:25+00:00
+ - Bundle libseccomp and build against it
+ - Add a test for some essential functionality
+ - Fix errors in POD
+ - Drop build-dep on Devel::CheckLib
+
+0.001 2016-07-01T01:18+03:00
+ - Initial release

@@ -1,0 +1,39 @@
+---
+abstract: 'Double Linked Lists for Perl'
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires:
+  Test::Differences: '0'
+  Test::More: '0'
+  perl: '5.008'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: List-DoubleLinked
+provides:
+  List::DoubleLinked:
+    file: lib/List/DoubleLinked.pm
+    version: '0.005'
+  List::DoubleLinked::Iterator:
+    file: lib/List/DoubleLinked/Iterator.pm
+    version: '0.005'
+requires:
+  Carp: '0'
+  Scalar::Util: '0'
+  namespace::clean: '0.20'
+  overload: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=List-DoubleLinked
+  repository: git://github.com/Leont/list-doublelinked.git
+version: '0.005'
+x_contributors:
+  - 'TheAthlete <theathlet@yandex.ru>'

@@ -1,0 +1,22 @@
+lcsvdiff t/DiffRpt/t5/actual/before/editors.txt t/DiffRpt/t5/actual/after/editors.txt
+SCHEMA: ed_id	ed_lname	ed_fname	ed_pos	phone	address	city	state	zip	ed_boss
+ROW( 321-55-8906 ): 321-55-8906	DeLongue	Martinella	project	415 843-2222	3000 6th St.	Berkeley	CA	94710	993-86-0420
+lcsvdiff t/DiffRpt/t5/actual/before/roysched.txt t/DiffRpt/t5/actual/after/roysched.txt
+SCHEMA: title_id	lorange	hirange	royalty
+ROW( PS2091#0 ): PS2091	0	1000	0.10
+DEL( PS2091#1001 ): PS2091	1001	5000	0.12
+ROW( PS2091#5001 ): PS2091	5001	50000	0.14
+lcsvdiff t/DiffRpt/t5/actual/before/authors.txt t/DiffRpt/t5/actual/after/authors.txt
+SCHEMA: au_id	au_lname	au_fname	phone	address	city	state	zip
+ROW( 213-46-8915 ): 213-46-8915	Green	Marjorie	415 986-7020	309 63rd St. #411	Oakland	CA	94618
+ROW( 238-95-7766 ): 238-95-7766	Carson	Cheryl	415 548-7723	589 Darwin Ln.	Berkeley	CA	94705
+INS( 409-56-7008 ): 409-56-7008	Bennet	Abraham	415 658-9932	6223 Bateman St.	Berkeley	CA	94705
+INS( 722-51-5454 ): 722-51-5454	DeFrance	Michel	219 547-9982	3 Balding Pl.	Gary	IN	46403
+INS( 998-72-3567 ): 998-72-3567	Ringer	Albert	801 826-0752	67 Seventh Av.	Salt Lake City	UT	84152
+lcsvdiff t/DiffRpt/t5/actual/before/titleauthors.txt t/DiffRpt/t5/actual/after/titleauthors.txt
+SCHEMA: au_id	title_id	au_ord	royaltyshare
+INS( 486-29-1786#PS2091 ): 486-29-1786	PS2091	4	5.50
+ROW( 899-46-2035#PS2091 ): 899-46-2035	PS2091	5	0.60
+UPD( 899-46-2035#PS2091 ): au_ord: 2 ==#> 5
+UPD( 899-46-2035#PS2091 ): royaltyshare: 0.50 ==#> 0.60
+ROW( 998-72-3567#PS2091 ): 998-72-3567	PS2091	1	0.50

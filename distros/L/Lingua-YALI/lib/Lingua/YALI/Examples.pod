@@ -1,0 +1,251 @@
+package Lingua::YALI::Examples;
+# ABSTRACT: Examples of usages.
+# VERSION
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lingua::YALI::Examples - Examples of usages.
+
+=head1 VERSION
+
+version 0.015
+
+=head1 Introduction
+
+Basic information about YALI package can be found at L<Lingua::YALI|Lingua::YALI>.
+
+This documentation introduces the most important commands for using YALI package.
+
+=head2 Preparation
+
+In this documentation we will be using texts from L<Wikipedia|http://www.wikipedia.org/>.
+So we start with downloading 20 articles for Czech, English, and French.
+
+    # download data
+    for i in `seq 1 20`; do
+        id=`printf "%02d" $i`;
+        echo "Processing document $id";
+        lynx --dump 'http://en.wikipedia.org/wiki/Special:Random' -noprint --nolist --nonumbers --nomargins -width=10000 > eng.$id.txt;
+        lynx --dump 'http://cs.wikipedia.org/wiki/Special:Random' -noprint --nolist --nonumbers --nomargins -width=10000 > ces.$id.txt;
+        lynx --dump 'http://fr.wikipedia.org/wiki/Special:Random' -noprint --nolist --nonumbers --nomargins -width=10000 > fra.$id.txt;
+    done;
+
+    # create list of files for training
+    ls ces.* | head -n15 > list.ces.train;
+    ls eng.* | head -n15 > list.eng.train;
+    ls fra.* | head -n15 > list.fra.train;
+    
+    # create list of files for testing
+    ls ces.* | tail -n5 > list.ces.test;
+    ls eng.* | tail -n5 > list.eng.test;
+    ls fra.* | tail -n5 > list.fra.test;
+
+=head1 Scripts
+
+This section provides information how to use scripts L<yali-builder|Lingua::yali-builder>, L<yali-identifier|Lingua::yali-identifier>, and  L<yali-language-identifier|Lingua::yali-language-identifier>.
+
+=head2 Language Identification  with Pretrained Models
+
+The script yali-language-identifier is distributed with pretrained 
+language models for L<122 languages|Lingua::YALI::LanguageIdentifier/LANGUAGES>.
+
+    # check out possible options
+    yali-language-identifier --help
+
+    # language identification for Czech
+    # option --filelist
+    yali-language-identifier -l="eng ces fra" --filelist=list.ces.test
+    
+    # language identification for English files with different output format
+    # option -f (--format)
+    yali-language-identifier -l="eng ces fra" --filelist=list.eng.test -f=all_p
+    
+    # language identification for French files read from STDIN
+    # --filelist is equal to -
+    cat list.fra.test | yali-language-identifier -l="eng ces fra" --filelist=- -f=tabbed
+    
+    # identify only single file
+    # option -i (--input)
+    yali-language-identifier -l="eng ces fra" -i=ces.20.txt -f=all
+    
+    # single file read from STDIN
+    # option -i is equal to -
+    cat eng.20.txt | yali-identifier -l="eng ces fra" -i=- -f=all_p
+
+    # single file read from STDIN
+    # when --filelist or --input is not used then it is equal to -i=-
+    cat fra.20.txt | yali-identifier -l="eng ces fra" -f=all_p
+
+=head2 Building Your Own Models
+
+If you have texts from specific domain it is worth to train your own models on texts from this domain to achieve higher accuracy.
+
+Options C<--filelist> and C<--input> has same meaning as options for L</"Language Identification  with Pretrained Models">.
+
+    # check out possible options
+    yali-builder --help
+    
+    # create Czech bigram model with only 5 most frequent bigrams stored
+    # option -n (--ngram) for specifying n-gram size to 2
+    # option -c (--count) for storing only 5 most frequent bigrams
+    # option -o (--output) for specifying output file name 
+    yali-builder --filelist=list.ces.train -n=2 -c=5 -o model.2.5.ces.gz
+    
+    # create English bigram model with all bigrams stored
+    # option -c is ommited that means all   
+    cat list.eng.train | yali-builder --filelist=- -n=2 -o model.2.5.eng.gz
+    
+    # create French bigram model with only 5 most frequent bigrams stored
+    # option -i=- means that all training files are read from STDIN
+    cat list.eng.train | xargs cat | yali-builder -i=- -n=2 -c=5 -o model.2.5.fra.gz
+    
+    # create list with models
+    # list of models in format class1[TAB]path-to-model is required for identification
+    echo -e "ces\tmodel.2.5.ces.gz" > list.models.2
+    echo -e "eng\tmodel.2.5.eng.gz" >> list.models.2
+    echo -e "fra\tmodel.2.5.fra.gz" >> list.models.2
+
+=head2 Language Identification  with Your Own Models
+
+Only two changes are required to the commands presented in section L<Language Identification  with Pretrained Models>.
+
+=over
+
+=item * Change I<yali-language-identifier> to I<yali-identifier>.
+
+=item * Change I<-l="eng ces fra"> to I<-c=list.models.2>.
+
+=back
+
+    # language identification for Czech files
+    yali-identifier -c=list.models.2 -filelist=list.ces.test
+    
+    # language identification for English files with different output format
+    yali-identifier -c=list.models.2 -filelist=list.eng.test -f=all_p
+    
+    # language identification for French files read from STDIN
+    cat list.fra.test | yali-identifier -c=list.models.2 -filelist=- -f=tabbed
+    
+    # single file
+    yali-identifier -c=list.models.2 -i=ces.20.txt -f=all
+    
+    # single file read from STDIN
+    cat eng.20.txt | yali-identifier -c=list.models.2 -i=- -f=all_p
+
+    # single file read from STDIN
+    cat fra.20.txt | yali-identifier -c=list.models.2 -f=all_p
+
+=head1 Modules
+
+This section provides information how to use modules L<Lingua::YALI::LanguageIdentifier|Lingua::YALI::LanguageIdentifier>, L<Lingua::YALI::Builder|Lingua::YALI::Builder>, and L<Lingua::YALI::Identifier|Lingua::YALI::Identifier>.
+
+=head2 Language Identification with Your Own Models
+
+This example shows how to detect languages with L<Lingua::YALI::LanguageIdentifier|Lingua::YALI::LanguageIdentifier>.
+
+    use Lingua::YALI::LanguageIdentifier;
+    
+    # create identifier and register languages
+    my $identifier = Lingua::YALI::LanguageIdentifier->new();
+    $identifier->add_language("ces", "eng", "fra");
+    
+    # identify string
+    my $result_s = $identifier->identify_string("CPAN, the Comprehensive Perl Archive Network, is an archive of modules written in Perl.");
+    
+    print "The most probable language is " . $result_s->[0]->[0] . ".\n";
+    # prints out The most probable language is eng.
+    
+    # identify file
+    my $result_f = $identifier->identify_file("ces.01.txt");
+
+    print "The most probable language is " . $result_f->[0]->[0] . ".\n";
+    # hopefully prints out The most probable language is ces.
+
+    # identify file handle
+    open(my $fh, "<:bytes", "fra.01.txt");
+    my $result_h = $identifier->identify_handle($fh);
+
+    print "The most probable language is " . $result_h->[0]->[0] . ".\n";
+    # hopefully prints out The most probable language is fra.     
+
+=head2 Training Your Own Models
+
+This example shows how to train language models with L<Lingua::YALI::Builder|Lingua::YALI::Builder>.
+
+    use Lingua::YALI::Builder;
+    use File::Glob;
+    use Carp;
+    
+    # read file with training files    
+    for my $file (File::Glob::bsd_glob("list.*.train")) {
+        my @p = split(/\./, $file);
+        my $lang = $p[1];
+
+        print STDERR "Building model for $lang\n";
+
+        # create builder for 2-grams
+        my $builder = Lingua::YALI::Builder->new(ngrams=>[2]);
+
+        open(my $fh_train, "<", $file) or croak($file . "\n" . $!);
+        while ( my $f = <$fh_train> ) {
+            chomp $f;
+            
+            # train on file
+            $builder->train_file($f);
+        }
+        
+        # store trained model
+        $builder->store("model.".$lang.".gz", 2);
+        print STDERR "\tDONE\n";
+    }
+
+=head2 Using Your Own Models
+
+This example shows how to use trained language models with L<Lingua::YALI::Identifier|Lingua::YALI::Identifier>.
+
+    use Lingua::YALI::Identifier;
+    use File::Glob;
+    use Carp;
+    
+    # load models
+    my $identifier = Lingua::YALI::Identifier->new();
+    $identifier->add_class("ces", "model.ces.gz");
+    $identifier->add_class("eng", "model.eng.gz");
+    $identifier->add_class("fra", "model.fra.gz");
+    
+    # identify string    
+    my $result_s = $identifier->identify_string("CPAN, the Comprehensive Perl Archive Network, is an archive of modules written in Perl.");    
+    print "The most probable language is " . $result_s->[0]->[0] . ".\n";
+    # prints out The most probable language is eng.
+    
+    # identify all testing files 
+    for my $file (File::Glob::bsd_glob("list.*.test")) {
+        open(my $fh_train, "<", $file) or croak($file . "\n" . $!);
+        while ( my $f = <$fh_train> ) {
+        
+            chomp $f;
+            # identify file
+            my $result_f = $identifier->identify_file($f);
+            print $f . "\t" . $result_f->[0]->[0] . "\n";
+        }
+    }
+
+=head1 AUTHOR
+
+Martin Majlis <martin@majlis.cz>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Martin Majlis.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

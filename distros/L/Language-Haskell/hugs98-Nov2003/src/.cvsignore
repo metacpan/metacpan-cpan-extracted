@@ -1,0 +1,8 @@
+Makefile
+options.h
+parser.c
+hugs
+runhugs
+ffihugs
+*.lib
+*.exp

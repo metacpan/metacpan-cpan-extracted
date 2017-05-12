@@ -1,0 +1,34 @@
+<div class="boxer">
+<h2>Preview: [% preview.data.title %]</h2>
+
+<h3>[% preview.data.title %]</h3>
+<p>[% preview.data.snippet %]</p>
+
+[% FOREACH item = preview.body %]
+[% IF item.type == 2 %]
+        [% item.body %]
+[% ELSE %]
+[% IF item.type == 1 %]
+    [% IF item.link %]
+    [% IF item.align  %][% class  = item.align  %][% ELSE %][% class  = "inline" %][% END %]
+    [% IF item.href %]
+        <a href='[% item.href %]'><img class="[% class %]" src="[% webpath %]/[% item.link %]" alt="[% item.tag %]"
+        [% IF item.align  %]align="[% item.align %]"[% END %]
+        [% IF item.width  %]width="[% item.width %]"[% END %]
+        [% IF item.height %]height="[% item.height %]"[% END %]
+        /></a>
+    [% ELSE %]
+        <img class="[% class %]" src="[% webpath %]/[% item.link %]" align="[% item.align %]" alt="[% item.tag %]"
+        [% IF item.align  %]align="[% item.align %]"[% END %]
+        [% IF item.width  %]width="[% item.width %]"[% END %]
+        [% IF item.height %]height="[% item.height %]"[% END %]
+        />
+    [% END %]
+    [% END %]
+[% ELSE %]
+        <a href='[% item.href %]'>[% item.body %]</a>
+[% END %]
+[% END %]
+[% END %]
+
+</div>

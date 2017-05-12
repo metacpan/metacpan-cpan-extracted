@@ -1,0 +1,42 @@
+Changelog for Lingua-EN-Tokenizer-Offsets
+
+0.03 2012-11-17T01:44:27
+ [André Santos <andrefs@cpan.org>]
+ - fixed issue #1
+
+ - added test for issue #1
+
+ - added offsets2tokens to EXPORT_OK
+
+
+v0.01_03 2012-06-08T15:39:45
+ [André Santos <andrefs@cpan.org>]
+ - last commit bits
+
+
+v0.01_02 2012-06-03T00:44:37
+ [André Santos <andrefs@cpan.org>]
+ - added tokenize function
+
+
+v0.01_01 2012-06-03T00:40:23
+ [André Santos <andrefs@cpan.org>]
+ - documentation
+
+ - first test
+
+ - lcb
+
+ - lcb
+
+ - lcb
+
+ - handling '.'
+
+ - fixed problems with patterns at the begining/end
+
+ - porting 'tokenize' function
+
+ - initial commit
+
+

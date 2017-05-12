@@ -1,0 +1,56 @@
+Language::Dashrep
+
+Dashrep is a versatile descriptive programming language based on hyphenated phrases (such as "rectangle-outline-attention-begin") being successively expanded into replacement text.  The resulting expanded text can be an HTML web page, an XML file, a JavaScript program, a boilerplate-based document, etc.  It is a much more flexible alternative to using a template language.  See www.Dashrep.org for details.
+
+
+Version 2.31
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Language::Dashrep
+
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Language::Dashrep
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Language::Dashrep
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Language::Dashrep
+
+    Search CPAN
+        http://search.cpan.org/dist/Language::Dashrep
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2009, 2011 Richard Fobes at www.Dashrep.org, all rights reserved.
+
+You can redistribute and/or modify this library module
+under the Perl Artistic License 2.0, a copy
+of which is included in the LICENSE file.
+
+Conversions of this code into other languages are also
+covered by the above license terms.
+
+The Dashrep (TM) name is trademarked by Richard Fobes at
+www.Dashrep.org to prevent the name from being co-opted.
+
+The Dashrep (TM) language is in the public domain.

@@ -1,0 +1,17 @@
+#########################################################################
+#
+# $Id: conn_file_aft.txt,v 1.1 2006/01/14 12:43:07 pkaluski Exp $
+# $Name: Stable_0_16 $
+#
+# $Log: conn_file_aft.txt,v $
+# Revision 1.1  2006/01/14 12:43:07  pkaluski
+# New tool design
+#
+#
+#
+#########################################################################
+
+$dbh = DBI->connect( "DBI:CSV:csv_sep_char=\t;f_dir=t/DiffRpt/dbschema1",
+                        { RaiseError => 1 }
+                       );
+

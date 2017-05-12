@@ -1,0 +1,21 @@
+Language::Homespring version 0.01
+=================================
+
+A parser and interpreter for Homespring
+( see http://home.fuse.net/obvious/hs.html )
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Cal Henderson <cal@iamcal.com>
+Homespring is Copyright (C) 2003 Jeff Binder

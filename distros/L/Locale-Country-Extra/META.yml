@@ -1,0 +1,28 @@
+---
+abstract: 'Standard and IDD codes for Country identification, with Multilingual support'
+author:
+  - 'binary.com <perl@binary.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-Country-Extra
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Locale::Country: '0'
+  Locale::Country::Multilingual: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/binary-com/perl-Locale-Country-Extra.git
+version: v1.0.0

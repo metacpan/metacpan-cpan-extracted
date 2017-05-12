@@ -1,0 +1,104 @@
+Revision history for perl module Lorem
+
+0.22      2013-01-24 15:08:47
+
+0.21      2013-01-24 13:48:34
+- build function works with pdf
+- added dependcies to dist.ini
+- removed unneccesary dependency on Gtk2
+
+0.200     2012-10-03 11:42:43
+- using Dist::Zilla
+
+0.19 Tue Sep 4 2012
+- border widths now translate from words to digit value when applying the style,
+instead of when rendering the graphic
+- lines are now joined using 'curve' instead of being disjointed
+
+0.18 Tue Aug 28 2012
+- fixed vertical alignment
+- updated documentation
+
+0.17
+- added &Lorem::Util::EscapeEntity
+
+0.16
+- Fixed margins
+- Removed dependecy on MooseX::Method::Signatures
+
+0.15
+- changed name to Lorem
+
+0.14 Sun Oct 24, 2010
+- parsing of style strings
+- implemented page margins via styles
+- pages recieve a clone of the document style on creation
+
+0.13.1 Sun Oct 24, 2010
+- moved all elements Gi::Doc::Element:: namespace
+- added tests for styles
+- refactoring/code clean up
+
+0.13 Sat Oct 23, 2010
+- added dimension style properties
+- added relative dimensions
+
+0.12 Sat Oct 23, 2010
+- added padding style properties
+- added vertical-align style property
+- added style inhereitance
+- added div element
+
+0.11 Fri Oct 22, 2010
+- added borders to box elements
+
+0.10 Fri Sep 24, 2010
+- automatically escape replace & with &amp; before passing text to pango
+
+0.09 Fri Jun 04, 2010
+- fixed error which caused document to print off page
+- styles no longer have defaults
+
+0.08 Fri Jun 04, 2010
+- added text_underline property to style
+
+0.07 Fri Jun 04, 2010
+- created HasStyle role
+- all elements comsume HasStyle role (giving style/merged_style attributes)
+- styles now implement inheritance (needs work)
+
+0.06 Thu Jun 03, 2010
+- pages recieve a cloned version of the document header on creationn
+- created style object
+- text elements can use style objects
+- headers now use text elements instead of drawing with cairo/pango
+- print operations default to points instead of pixels
+- header footer margins default to 0 instead of 18 pts
+- added spacer element
+ 
+0.05 Wed Jun 02, 2010
+- elements now require parents
+- can send print to Gtk::PrintOperation or Cairo surface
+ 
+0.04 Fri May 28, 2010
+- added text element
+- table cells act like standard box-elements, no longer have content attribute
+- horizontal rule element
+- spacer element
+ 
+0.03 Thu May 27, 2010
+- factored coords/margins/padding into roles
+- page is now a "block element" 
+- doc is now a "block element"
+- added text/hrule elements
+
+0.02 Wed May 26, 2010
+- create "block element" abstract class
+- create tables/rows/cells
+- margins/padding
+
+0.01 Sat May 22, 2010
+- initial version
+- create document
+- apply header
+

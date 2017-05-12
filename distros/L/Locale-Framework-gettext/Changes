@@ -1,0 +1,11 @@
+Revision history for Locale::Framework::gettext
+
+0.04 Fail on dependencies lead me to change the
+     PREREQ_PM part of Makefile.PL
+
+0.03 Bug fix against perl 5.9.x
+
+0.02 Documentation change.
+
+0.01  Initial version
+

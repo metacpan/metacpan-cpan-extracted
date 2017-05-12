@@ -1,0 +1,25 @@
+---
+abstract: 'Perl extension for sending syslog messages over TCP, UDP, or UNIX sockets with minimal CPU overhead.'
+author:
+  - 'Adam Thomason <athomason@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Syslog-Fast
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Socket::IP: '0.19'
+  Log::Syslog::Constants: '1.01'
+resources:
+  repository: https://github.com/athomason/Log-Syslog-Fast.git
+version: '0.65'

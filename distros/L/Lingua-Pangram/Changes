@@ -1,0 +1,8 @@
+Revision history for Perl extension Lingua::Pangram.
+
+0.02  Tue Jun 11 17:14:04 BST 2002
+    - Fixes by Philip Newton
+
+0.01  Wed Jan 23 00:24:10 2002
+	- original version; created by h2xs 1.19
+

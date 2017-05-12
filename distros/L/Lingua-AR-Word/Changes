@@ -1,0 +1,43 @@
+			<< Lingua::AR::Word - Andrea Benazzo >>
+
+29/4/2006	1.5.5
+->now the Makefile requires Perl 5.8.0 instead of 5.8.6
+
+23/4/2006	1.5.4
+->corrected some errors in the documentation
+->added todo notice in the stem sub-module
+
+9/4/2006	1.5.3
+->better documentation
+->improved readability in the stemming regex
+
+18/09/2005	1.5.2
+->little fixes here and there (including documentation)
+
+5/06/2005	1.51
+->added tests
+
+24/06/2005	1.5
+->modified some little parts in Lingua::AR::Word
+
+23/06/2005
+->moved the modules under Lingua::AR:: namespace
+
+21/06/2005
+->created the OO version, along with the Dict::Db module.
+
+25/04/05	1.2
+->corrected some errors in encoding.
+
+23/04/05	1.1
+
+->added support for multiple files importation;
+->fatal end if the necessary argument passed to the import function is missing;
+->added counter for number of imported files;
+->display "Imported file: FILENAME" after every importation;
+->added counter for total number of dictionaries after importation;
+->now there's no loop for user choice;
+->creates directory "./dicts/" if missing;
+->added check on the minimum number of arguments;
+->added warning if "./dicts/" is empty;
+->dictionaries will be named "%..." so that shell won't hide the ones beginning with a period;

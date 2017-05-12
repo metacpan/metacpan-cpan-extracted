@@ -1,0 +1,22 @@
+######################################################################
+# Copyright 2002, Tim Maher. tim@teachmeperl.com All Rights Reserved #
+######################################################################
+# name2verse.pl: Uses Lingua::EN::Namegame to make verse from name
+
+use strict;
+
+use Lingua::EN::Namegame;	
+
+# Default argument simplifies testing
+@ARGV or @ARGV=qw(krusty);
+
+my $name = ($ARGV[0]); 
+my $verse = name2verse($ARGV[0]);
+
+if (defined $verse) {
+	print "$verse\n\n";
+}
+else {
+	warn "Error creating verse for $name\n\n";	# this shouldn't happen
+}
+

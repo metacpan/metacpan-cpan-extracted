@@ -1,0 +1,1320 @@
+#!/usr/bin/perl
+#
+use strict ;
+
+# Local
+use App::Framework ;
+
+use Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants ;
+
+## CPAN REQUIRED:
+use Linux::DVB::DVBT ;
+use Linux::DVB::DVBT::TS ;
+use Linux::DVB::DVBT::Advert ;
+
+
+use MP3::Tag ;
+use DBI ;
+use DBD::mysql ;
+## CPAN REQUIRED
+
+use Linux::DVB::DVBT::Ffmpeg ;
+use Linux::DVB::DVBT::Config ;
+
+
+# VERSION
+our $VERSION = '5.00' ;
+
+## Global
+our $DEBUG = 0 ;
+our $DBG_SQL = 0 ;
+our $VERBOSE = 0 ;
+our $NICE = 19 ;
+
+## Cut from get_iplayer
+our @history_format = qw/pid name episode type timeadded mode filename 
+	versions duration desc channel categories thumbnail guidance web 
+	episodenum seriesnum/;
+
+
+## Global data
+our @info_lines ;
+our %dbh ;
+our $progname ;
+our $mailto ;
+
+	# Create application and run it
+	App::Framework->new() ;
+	go() ;
+
+
+#=================================================================================
+# SUBROUTINES EXECUTED BY APP
+#=================================================================================
+
+#----------------------------------------------------------------------
+# Main execution
+#
+sub app
+{
+	my ($app, $opts_href, $args_href) = @_ ;
+
+	my $ok = 1 ;
+	
+	my $user = $opts_href->{'user'}	|| Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants::SQL_USER ;
+	my $password = $opts_href->{'password'}	|| Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants::SQL_PASSWORD ;
+	
+	if (!$user || !$password)
+	{
+		print "Error: You must specify the MySQL username AND password when using this script outside the PVR suite\n" ;
+		exit 1 ;
+	}
+	
+	$DEBUG = $opts_href->{'debug'} ;
+	$DBG_SQL = $opts_href->{'dbg-sql'} ;
+	$VERBOSE = $opts_href->{'verbose'} ;
+	
+	my $rec_file = $opts_href->{'file'} ;
+	my $id = $opts_href->{'id'} ; 
+	my $force = $opts_href->{'force'} ; 
+	my $dest = $opts_href->{'dest'} ; 
+	my $type = $opts_href->{'type'} ; 
+	
+	$mailto = $opts_href->{'mailto'} ;
+	my $log = "$opts_href->{'log_dir'}/dvbt-iplay.log" ;
+	
+	%dbh = (
+		'host' 		=> 'localhost',
+		'db' 		=> $opts_href->{'database'},
+		'tbl' 		=> $opts_href->{'table'},
+		'user' 		=> $user,
+		'password' 	=> $password,
+	) ;
+	
+	$progname = $app->name() ;
+	
+
+	info("===============================================================") ;
+	info("$progname v$VERSION") ;
+	info("") ;
+
+    if (!$rec_file)
+    {
+	    die("$progname: No arguments given.")  if (@{$args_href->{'name'}} == 0) ;
+	    die("$progname: No title given.")  if (@{$args_href->{'name'}} < 1) ;
+    }
+    
+	
+	my @recargs ;	
+	my ($title) ;
+	
+	## Get recordings from file
+	#
+	# -t <tv|radio> -o <dest> -g <title>
+	#
+	if ($rec_file)
+	{
+		# ($to, $error_msg, $errors_aref, $log, $rec_href)
+		open my $fh, "<$rec_file" or die_error_mail($mailto, "Failed to open recording list file $rec_file : $!") ;		
+		my $line ;
+		while (defined($line=<$fh>))
+		{
+			chomp $line ;
+			$line =~ s/^\s+// ;
+			$line =~ s/\s+$// ;
+			next unless $line ;
+			
+			# skip comments
+			next if ($line =~ /^\s*#/) ;
+
+print STDERR "LINE: $line\n" if $DEBUG>=2;
+			
+			## check for extra options
+			my %options ;
+			while ($line =~ /\s*\-{1,2}(\w+)\s+(?:'([^']+)'|"([^"]+)"|(\S+))/g)
+			{
+				$options{$1} = $2|$3|$4 ;
+				$title ||= $options{'get'} || $options{'g'}  ;
+				
+print STDERR " + OPTION: $1 = <$2> <$3> <$4>\n" if $DEBUG>=2;
+			}
+			
+			## process
+			$options{'force'} = 1 if $force ;
+			process_args(\@recargs, \%options) ;
+		}
+		close $fh ;
+	}	
+	
+	## Get recordings from command line
+	else
+	{
+		my @args = @{$args_href->{'name'}} ;
+		
+		# process default args
+		my %options = () ;
+		$options{'get'} = shift @args ;
+		$title = $options{'get'} ;
+		$options{'type'} = $type if $type ;
+		$options{'output'} = $dest if $dest ;
+		$options{'id'} = $id if $id ;
+		$options{'force'} = 1 if $force ;
+		process_args(\@recargs, \%options) ;
+print STDERR "GET: $options{'get'}\n" if $DEBUG>=2;
+		
+		while (scalar(@args) >= 1)
+		{
+			$options{'get'} = shift @args ;
+			process_args(\@recargs, \%options) ;
+print STDERR "GET: $options{'get'}\n" if $DEBUG>=2;
+		}
+		
+		
+	}
+print STDERR "TITLE: $title\n" if $DEBUG ;
+
+    die("$progname: No title given.")  unless $title ;
+
+	## History
+	my $history_href = read_history() ;
+
+	## Index management
+	my $index_ok = get_iplay_index() ;
+	if (!$index_ok)
+	{
+		die_error_mail($mailto, "Error: Unable to read get_iplayer index. Are you sure get_iplayer is installed?") ;
+	}
+	my $index_href = get_indexes() ;
+
+Linux::DVB::DVBT::prt_data("INDEX", $index_href) if $DEBUG >= 2 ;
+
+print STDERR "RECORD\n" if $DEBUG ;
+
+	## Record
+	my %results ;
+	my @total_errors ;
+	foreach my $rec_href (@recargs)
+	{
+		my @lines ;
+		my @warnings ;
+		my @errors ;
+		
+		## Get program id
+		my $prog_id = $rec_href->{'id'} ;
+		
+		$results{$prog_id} = {} ;
+
+print STDERR "NEXT: get='$rec_href->{get}'\n" if $DEBUG ;		
+		## Match file(s) in cache
+		my $target = $rec_href->{'get'} ;
+		my @found=() ;
+		
+		# 'get' list consists of any matching entries from the indexes.
+		# Also, if program has already been downloaded, includes a ref to the HASH from
+		# the download history
+		my @get = match_iplay($index_href->{$rec_href->{'type'}}, $history_href, $target, \@found, $rec_href->{'force'}) ;
+
+Linux::DVB::DVBT::prt_data("TARGET='$target', GET=", \@get, "Found=", \@found) if $DEBUG>=2 ;
+
+		## Skip if nothing to do
+		next unless @get ;
+
+		## Mark as started
+		sql_start_status(\%dbh, $prog_id, \@get) ;
+
+		
+		## Get file(s)
+		my %recorded ;
+		my $rc = get_iplay(\@get, $rec_href, \@lines, \@warnings, \@errors, \%recorded) ;
+
+Linux::DVB::DVBT::prt_data("RECORDED=", \%recorded) if $DEBUG>=2 ;
+
+		## Update history 
+		## NOTE: 'recorded' HASH points to the entries in the 'get' ARRAY and so the
+		##       'recorded' HASH will also be updated
+		$history_href = read_history() ;
+		update_iplay(\@get, $history_href) ;
+
+		## Mark with recorded status
+		sql_update_status(\%dbh, $prog_id, \%recorded) ;
+		
+		## Check status
+		if ($rc != 0)
+		{
+			push @errors, "Getting $rec_href->{get} : status $rc" ;
+		}
+		
+		# lines
+		foreach my $line (@lines)
+		{
+			info("$line") ;
+		}
+	
+		# warning lines
+		foreach my $line (@warnings)
+		{
+			info("WARN: $line") ;
+		}
+	
+		# error lines
+		foreach my $line (@errors)
+		{
+			info("ERROR: $line") ;
+		}
+		
+		push @total_errors, @errors ;
+		
+		## Save results
+		foreach my $iplayer_pid (keys %recorded)
+		{
+			$results{$prog_id}{$iplayer_pid} = { %{$recorded{$iplayer_pid}} } ;
+			if ($recorded{$iplayer_pid}{'info'})
+			{
+				if ($recorded{$iplayer_pid}{'info'}{'downloaded'})
+				{
+					$results{$prog_id}{$iplayer_pid} = {
+						%{ $recorded{$iplayer_pid}{'info'}{'downloaded'} },
+						%{ $results{$prog_id}{$iplayer_pid} },
+					} ;
+				}
+				else
+				{
+					$results{$prog_id}{$iplayer_pid} = {
+						%{ $recorded{$iplayer_pid}{'info'} },
+						%{ $results{$prog_id}{$iplayer_pid} },
+					} ;
+				}
+			}
+		}
+	}
+
+	## Show all results
+	info("") ;
+	info("---------------------------------------------------------------") ;
+	info("") ;
+	foreach my $rec_href (@recargs)
+	{
+		# Get program id
+		my $prog_id = $rec_href->{'id'} ;
+		
+		info("Title:    $rec_href->{get}") ;
+		info("Type:     $rec_href->{type}") ;
+		
+		my $results_href = $results{$prog_id} ;
+		foreach my $iplayer_pid (sort keys %$results_href)
+		{
+			info("") ;
+			info("    IPID:     $iplayer_pid") ;
+			if ($results_href->{$iplayer_pid}{'error'})
+			{
+				info("    ERROR:    $results_href->{$iplayer_pid}{'error'}") ;
+			}
+			else
+			{
+				info("    File:     $results_href->{$iplayer_pid}{'file'}") ;
+				info("    Title:    $results_href->{$iplayer_pid}{'name'}") ;
+				info("    Channel:  $results_href->{$iplayer_pid}{'channel'}") ;
+				info("    Episode:  $results_href->{$iplayer_pid}{'episode'}") if $results_href->{$iplayer_pid}{'episode'} ;
+				info("    Info:     $results_href->{$iplayer_pid}{'desc'}") ;
+				info("    Mode:     $results_href->{$iplayer_pid}{'mode'}") if $results_href->{$iplayer_pid}{'mode'} ;
+			}
+		}
+		
+		info("") ;
+	}
+	
+	## Handle errors
+	if (@total_errors)
+	{
+		## End
+		# ($to, $error_msg, $errors_aref, $log, $rec_href)
+		die_error_mail($mailto, "Failed to complete", \@total_errors) ;
+	}
+	
+	
+	## End
+	info("COMPLETE") ;
+
+}
+
+
+#=================================================================================
+# SUBROUTINES
+#=================================================================================
+
+#-----------------------------------------------------------------------------
+sub process_args
+{
+	my ($recargs_aref, $opts_href) = @_ ;
+	
+	$opts_href ||= {} ;
+
+	my $out = $opts_href->{'o'} || $opts_href->{'output'} || "" ;
+	my $id = $opts_href->{'id'} || 0 ;
+	my $force = $opts_href->{'force'} || 0 ;
+	my $rec_href = {
+		'get'		=> $opts_href->{'g'} || $opts_href->{'get'}, 
+		'type'		=> $opts_href->{'t'} || $opts_href->{'type'} || 'tv', 
+		'id'		=> $id,
+		'force'		=> $force,
+	} ;
+	
+	$rec_href->{'output'} = $out if $out ;
+
+	info("Title:    $rec_href->{get}") ;
+	info("Type:     $rec_href->{type}") ;
+	info("Dir:      $out") if $out ;
+	info("ID:       $id") if $id ;
+	info("Force:    True") if $force ;
+	info("") ;
+	
+	push @$recargs_aref, $rec_href ;
+	
+	
+}
+
+#-----------------------------------------------------------------------------
+# Run get_iplayer to update indexes
+sub get_iplay_index
+{
+	my ($type) = @_ ;
+	
+	my $cmd = 'get_iplayer' ;
+	$cmd .= " --list --type $type" ;
+	
+	# set niceness
+	my $nice = "" ;
+	if ($NICE)
+	{
+		$cmd = "nice -n $NICE  $cmd" ;
+	}
+
+	# run command
+	my @lines = `$cmd 2>&1 ; echo RC=$?` ;
+	
+	my $ok = 1 ;
+	foreach my $line (@lines)
+	{
+		chomp $line ;
+		if ($line =~ /No such file/i)
+		{
+			$ok = 0 ;
+		}
+	}	
+Linux::DVB::DVBT::prt_data("get_iplay_index() = ", \@lines) if $DEBUG >= 10 ;
+	
+	return $ok ;
+}
+
+#-----------------------------------------------------------------------------
+# Read in the indexes
+sub get_indexes
+{
+	my %indexes = (
+		'tv'	=> read_index('tv.cache'),
+		'radio'	=> read_index('radio.cache'),
+	) ;
+	return \%indexes ;
+}
+
+#-----------------------------------------------------------------------------
+# Read in the index
+sub read_index
+{
+	my ($index_file) = @_ ;
+	
+	my @index ;
+
+	my $filename = "$ENV{'HOME'}/.get_iplayer/$index_file" ;
+	if (-f $filename)
+	{
+		open my $fh, "<$filename" or die "Error: Unable to read get_iplayer cache $filename : $!" ;
+		my $line ;
+		my @fields ;
+		while (defined($line=<$fh>))
+		{
+			chomp $line ;
+			$line =~ s/^\s+// ;
+			$line =~ s/\s+$// ;
+			next unless $line ;
+			
+			# First comment line contains the list of fields
+			if ($line =~ s/^#//)
+			{
+				next if @fields ;
+				
+				@fields = split(/\|/, $line) ;
+			}
+			else
+			{
+				my @data = split(/\|/, $line) ;
+				
+				my %data ;
+				for (my $idx=0; $idx < @fields ; ++$idx)
+				{
+					$data{ $fields[$idx] } = $data[$idx] ;
+				}
+				
+				# Glue together information for matching
+				my @parts ;
+				foreach (qw/name episode desc/)
+				{
+					push @parts, $data{$_} if $data{$_} ;
+				}
+				$data{'search'} = join ' ', @parts ;
+				
+				push @index, \%data ;
+			}
+		}
+		close $fh ;
+	}
+
+	return \@index ;
+}
+
+
+#-----------------------------------------------------------------------------
+# Read in the history file
+sub read_history
+{
+	my %history ;
+
+	my $filename = "$ENV{'HOME'}/.get_iplayer/download_history" ;
+	if (-f $filename)
+	{
+		open my $fh, "<$filename" or die "Error: Unable to read get_iplayer history $filename : $!" ;
+		my $line ;
+		while (defined($line=<$fh>))
+		{
+			chomp $line ;
+			$line =~ s/^\s+// ;
+			$line =~ s/\s+$// ;
+			next if $line =~ /^#/ ;
+			next unless $line ;
+			
+			my @data = split(/\|/, $line) ;
+			
+			my %data ;
+			for (my $idx=0; $idx < @history_format ; ++$idx)
+			{
+				$data{ @history_format[$idx] } = $data[$idx] ;
+			}
+			
+			$history{ $data{'pid'} } = \%data ;
+		}
+		close $fh ;
+	}
+
+	return \%history ;
+}
+
+
+
+
+#-----------------------------------------------------------------------------
+# Searches for target text in the latest index file and returns an ARRAY fo HASH entries, each entry
+# being from the data in the appropriate get_iplayer index (tv or radio):
+#
+#    available => Unknown,
+#    categories => Comedy,Radio,Spoof,
+#    channel => BBC 7,
+#    desc => Battles galore in Earth's definitive history from the National Theatre of Brent.,
+#    duration => Unknown,
+#    episode => Episode 6,
+#    episodenum => 6,
+#    guidance => 0,
+#    index => 10197,
+#    name => All the World's a Globe,
+#    pid => b007jwv5,
+#    search => All the World's a Globe Episode 6 Battles galore in Earth's definitive history from the National Theatre of Brent.,
+#    seriesnum => 0,
+#    thumbnail => http://www.bbc.co.uk/iplayer/images/episode/b007jwv5_150_84.jpg,
+#    timeadded => 1312308008,
+#    type => radio,
+#    versions => default,
+#    web => http://www.bbc.co.uk/programmes/b007jwv5.html,
+#
+# Where the program is already downloaded, also contains the data from the download history:
+#
+#    downloaded => 
+#      { # HASH(0x90a6fd0)
+#        categories => Comedy,Spoof,
+#        channel => BBC Radio 4 Extra,
+#        desc => Battles galore in Earth's definitive history from the National Theatre of Brent. Stars Patrick Barlow and Jim Broadbent.,
+#        duration => 900,
+#        episode => Episode 6,
+#        episodenum => 6,
+#        filename => /home/sdprice1/svn/record-multirec-devel/temp/All_the_Worlds_a_Globe_-_Episode_6_b007jwv5_default.aac,
+#        guidance => 0,
+#        mode => flashaacstd1,
+#        name => All the World's a Globe,
+#        pid => b007jwv5,
+#        seriesnum => undef,
+#        thumbnail => http://www.bbc.co.uk/iplayer/images/episode/b007jwv5_150_84.jpg,
+#        timeadded => 1312881788,
+#        type => radio,
+#        versions => default,
+#        web => http://www.bbc.co.uk/programmes/b007jwv5.html,
+#      },
+# 
+#
+sub match_iplay
+{
+	my ($index_aref, $history_href, $target, $found_aref, $force) = @_ ;
+
+print STDERR "match_iplay($target)\n" if $DEBUG ;		
+
+	my @get ;
+
+	## Convert title into regexp
+	my $regexp = title2regexp($target) ;
+	
+	for (my $i=0; $i < @$index_aref; ++$i)
+	{
+#print STDERR "regexp='$regexp' : search='$index_aref->[$i]{'search'}'\n" ;		
+		if ($index_aref->[$i]{'search'} =~ /$regexp/i)
+		{
+			my $entry_href = $index_aref->[$i] ;
+			
+			my $id = $entry_href->{'pid'} ;
+			
+			# check download history
+			$entry_href->{'downloaded'} = 0 ;
+			if (exists($history_href->{$id}))
+			{
+				$entry_href->{'downloaded'} = $history_href->{$id} ;
+			}
+			
+			# save
+			push @$found_aref, $entry_href ;
+print STDERR " + FOUND (download=$entry_href->{'downloaded'})\n" if $DEBUG ;		
+		}
+	}
+
+Linux::DVB::DVBT::prt_data("Found list=", $found_aref) if $DEBUG>=2 ;
+
+print STDERR "Create get list:\n" if $DEBUG ;		
+	
+	foreach my $href (@$found_aref)
+	{
+		# skip already downloaded AND not forced
+		if ($href->{'downloaded'} && !$force)
+		{
+			next ;
+		}
+
+print STDERR " + GET $href->{'pid'} : $href->{name} : $href->{desc}\n" if $DEBUG ;		
+		
+		# add to list of files to get
+		push @get, $href ;
+	}
+
+Linux::DVB::DVBT::prt_data("Get list=", \@get) if $DEBUG>=2 ;
+
+	return @get ;
+}
+
+#-----------------------------------------------------------------------------
+# Update the 'get' list with the latest download history
+sub update_iplay
+{
+	my ($get_aref, $history_href) = @_ ;
+
+print STDERR "update_iplay()\n" if $DEBUG ;		
+
+	foreach my $entry_href (@$get_aref)
+	{
+		my $id = $entry_href->{'pid'} ;
+		
+		# check download history
+		$entry_href->{'downloaded'} = 0 ;
+		if (exists($history_href->{$id}))
+		{
+			$entry_href->{'downloaded'} = $history_href->{$id} ;
+		}
+	}
+}
+
+
+#-----------------------------------------------------------------------------
+sub title2regexp
+{
+	my ($title) = @_ ;
+
+	my @fields = split(/[^\w\d\']+/, $title) ;
+	
+	my $regexp = "" ;
+	foreach my $field (@fields)
+	{
+		$field =~ s/\'/.{0,1}/g ;
+		if (!$regexp)
+		{
+			$regexp = "^" ;
+		}
+		else
+		{
+			$regexp .= ".+\\b";
+		}
+		$regexp .= "$field\\b" ;
+	}
+
+
+	print STDERR "Regexp: $regexp\n" if $DEBUG>=3 ;
+	
+	return $regexp ;
+}
+
+
+#-----------------------------------------------------------------------------
+# Run get_iplayer and check for errors
+#
+# Fills in the recorded HASH ref with details for each get_iplayer index:
+#
+#{ # HASH(0x8fd74a0)
+#  b007jwv5 => 
+#    { # HASH(0x965b018)
+#      error => 0,
+#      file => /home/sdprice1/svn/record-multirec-devel/temp/All_the_Worlds_a_Globe_-_Episode_6_b007jwv5_default.aac,
+#      status => recorded,
+#    },
+#
+# Also includes the key 'info' which points to the HASH ref for that entry in the 'get' ARRAY:
+#
+#      info => 
+#        { # HASH(0x9222670)
+#          available => Unknown,
+#          categories => Comedy,Radio,Spoof,
+#          channel => BBC 7,
+#          desc => Battles galore in Earth's definitive history from the National Theatre of Brent.,
+#          downloaded => 
+#            { # HASH(0x90a6fd0)
+#              categories => Comedy,Spoof,
+#              channel => BBC Radio 4 Extra,
+#              desc => Battles galore in Earth's definitive history from the National Theatre of Brent. Stars Patrick Barlow and Jim Broadbent.,
+#              duration => 900,
+#              episode => Episode 6,
+#              episodenum => 6,
+#              filename => /home/sdprice1/svn/record-multirec-devel/temp/All_the_Worlds_a_Globe_-_Episode_6_b007jwv5_default.aac,
+#              guidance => 0,
+#              mode => flashaacstd1,
+#              name => All the World's a Globe,
+#              pid => b007jwv5,
+#              seriesnum => undef,
+#              thumbnail => http://www.bbc.co.uk/iplayer/images/episode/b007jwv5_150_84.jpg,
+#              timeadded => 1312881788,
+#              type => radio,
+#              versions => default,
+#              web => http://www.bbc.co.uk/programmes/b007jwv5.html,
+#            },
+#          duration => Unknown,
+#          episode => Episode 6,
+#          episodenum => 6,
+#          guidance => 0,
+#          index => 10197,
+#          name => All the World's a Globe,
+#          pid => b007jwv5,
+#          search => All the World's a Globe Episode 6 Battles galore in Earth's definitive history from the National Theatre of Brent.,
+#          seriesnum => 0,
+#          thumbnail => http://www.bbc.co.uk/iplayer/images/episode/b007jwv5_150_84.jpg,
+#          timeadded => 1312308008,
+#          type => radio,
+#          versions => default,
+#          web => http://www.bbc.co.uk/programmes/b007jwv5.html,
+#        },
+#
+# (Note the 'downloaded' field is only populated if the program has already been downloaded)
+#
+sub get_iplay
+{
+	my ($get_aref, $rec_href, $lines_aref, $warn_aref, $error_aref, $recorded_href) = @_ ;
+	
+	my $cmd = 'get_iplayer' ;
+	$cmd .= " --force" if $rec_href->{'force'} ;
+	$cmd .= " --type $rec_href->{type}" if $rec_href->{'type'} ; 
+	$cmd .= " --output '$rec_href->{output}'" if $rec_href->{'output'} ; 
+	
+	## Create list of indexes to get and set up the recorded file HASH
+	my $get = "" ;
+	foreach my $href (@$get_aref)
+	{
+		my $iplay_index = $href->{'index'} ;
+		my $iplay_pid = $href->{'pid'} ;
+		
+		# add to list of files to get
+		$get .= ' ' if $get ;
+		$get .= $iplay_index ;
+		
+		## Set up recorded status
+		$recorded_href->{$iplay_pid} = {
+			'status'	=> 'error',
+			'file'		=> '',
+			'error'		=> 'Unable to find program',
+			'info'		=> $href,
+		} ;
+	}
+	$cmd .= " --get $get" ; 
+	
+	
+	# set niceness
+	my $nice = "" ;
+	if ($NICE)
+	{
+		$cmd = "nice -n $NICE  $cmd" ;
+	}
+	
+	## Ensure destination dir exists
+	my $dir = $rec_href->{output} ;
+	if (! -d $dir)
+	{
+		if (!mkpath([$dir], 0, 0755))
+		{
+			my $error = "ERROR: unable to create dir $dir : $!" ;
+			info($error) ;
+			push @$error_aref, $error ;
+			return 1 ;
+		}
+	}
+	
+	# run command
+	info("CMD: $cmd") ;
+	@$lines_aref = `$cmd 2>&1 ; echo RC=$?` ;
+	
+	# strip newlines
+	my $num_recorded = 0 ;
+	foreach my $line (@$lines_aref)
+	{
+print STDERR "$line\n" if $DEBUG>=10 ;
+		
+		# Strip out the intermediate processing output (flvstreamer status lines)
+		$line =~ s/^.*\r//g ;
+
+		## Process output lines to get recorded info
+		if ($line =~ /INFO:/)
+		{
+			if ($line =~ /(\d+) Matching Prog/i)
+			{
+				$num_recorded = $1 ;
+			}
+			
+			if ($line =~ m%Recorded\s+(/\S.*_)([\w\d]+)(_default\..*)%i)
+			{
+				my ($file, $iplay_pid) = ("$1$2$3", $2) ;
+				$recorded_href->{$iplay_pid}{'status'} = 'recorded' ;
+				$recorded_href->{$iplay_pid}{'file'} = $file ;
+				$recorded_href->{$iplay_pid}{'error'} = '' ;
+			}
+		}
+
+		chomp $line ;
+		
+		# prepend with command name
+		$line = "[get_iplayer] $line" ;
+	}
+
+	# Add command to start
+	unshift @$lines_aref , $cmd ;
+	
+	# get status
+	my $rc=-1 ;
+	if ($lines_aref->[-1] =~ m/RC=(\d+)/)
+	{
+		$rc = $1 ;
+	}
+	
+	return $rc ;
+}
+
+
+#=================================================================================
+# MYSQL
+#=================================================================================
+
+## NOTE: For SQL table, 'pid' refers to the program id
+
+#-----------------------------------------------------------------------------
+sub sql_escape_str
+{
+	my ($str) = @_ ;
+	$str =~ s/\'/\\'/g ;
+	return $str ;
+}
+
+
+#-----------------------------------------------------------------------------
+sub sql_connect
+{
+	my ($db_href) = @_ ;
+
+	$db_href->{'dbh'} = 0 ;
+	
+	eval
+	{
+		# Connect
+		my $dbh = DBI->connect("DBI:mysql:database=".$db_href->{'db'}.
+					";host=".$db_href->{'host'},
+					$db_href->{'user'}, $db_href->{'password'},
+					{'RaiseError' => 1}) ;
+					
+		$db_href->{'dbh'} = $dbh ;
+	};
+	if ($@)
+	{
+		die_error_mail($mailto, "Unable to connect to database : $@") ;
+	}
+	
+	return $db_href->{'dbh'} ;
+}
+
+#-----------------------------------------------------------------------------
+sub sql_send
+{
+	my ($db_href, $sql) = @_ ;
+	
+	my $dbh = sql_connect($db_href) ;
+	if ($dbh)
+	{
+		# Do query
+		eval
+		{
+			print STDERR "sql_send($sql)\n" if $DBG_SQL ;			
+			$dbh->do($sql) ;
+		};
+		if ($@)
+		{
+			die_error_mail($mailto, "SQL do error $@\nSql=$sql") ;
+		}
+	}
+}
+
+#-----------------------------------------------------------------------------
+sub sql_get
+{
+	my ($db_href, $sql) = @_ ;
+	
+	my @results ;
+	my $dbh = sql_connect($db_href) ;
+	if ($dbh)
+	{
+		# Do query
+		eval
+		{
+			print STDERR "sql_get($sql)\n" if $DBG_SQL ;			
+
+			my $sth = $dbh->prepare($sql) ;
+			$sth->execute() ;
+		
+			while (my $sql_href = $sth->fetchrow_hashref())
+			{
+				push @results, $sql_href ;
+			}
+		};
+		if ($@)
+		{
+#			print STDERR "SQL do error $@\nSql=$sql" ;
+			die_error_mail($mailto, "SQL do error $@\nSql=$sql") ;
+		}
+	}
+	return @results ;
+}
+
+#-----------------------------------------------------------------------------
+# Converts the returned list of results into a hash keyed by the named $key. Each entry 
+# is an array ref containing 1 or more instances of that key value
+sub sql_get_href
+{
+	my ($db_href, $sql, $key) = @_ ;
+	
+	my @results = sql_get($db_href, $sql) ;
+Linux::DVB::DVBT::prt_data("sql_get_href($sql) key=$key results=", \@results) if $DEBUG >= 2 ;
+	my %results ;
+	
+	foreach my $href (@results)
+	{
+		if (exists($href->{$key}))
+		{
+			my $keyval = $href->{$key} ; 
+			$results{$keyval} ||= [] ;
+			push @{ $results{$keyval} }, $href ;
+		}
+	}
+	
+	return %results ;
+}
+
+
+#-----------------------------------------------------------------------------
+sub sql_start_status
+{
+	my ($db_href, $pid, $get_aref) = @_ ;
+
+	print STDERR "sql_start_status(pid=$pid)\n" if $DBG_SQL ;
+	return unless $pid ;
+	
+Linux::DVB::DVBT::prt_data("Get=", $get_aref) if $DEBUG>=2 ;
+
+	## Get existing entries
+	my $search_sql = "SELECT * FROM $db_href->{tbl} WHERE `pid`='$pid' AND `rectype`='iplay'" ;
+	my %results = sql_get_href($db_href, $search_sql, 'ipid') ;
+Linux::DVB::DVBT::prt_data("Existing SQL recorded entries=", \%results) if $DEBUG>=2 ;
+
+	# need there to be at least one instance already set up
+	my @keys = keys %results ;
+	return unless @keys ;
+	
+	# keep a copy for creating new entry
+	my $existing_href = $results{$keys[0]}[0] ;
+	
+	## need to update all existing entries OR create new ones
+	foreach my $href (@$get_aref)
+	{
+		my $iplayer_pid = $href->{'pid'} ;
+
+print STDERR " + Looking at get entry: iplayer pid=$iplayer_pid\n" if $DEBUG	;
+		
+		my $entry_id ;
+		if (exists($results{$iplayer_pid})) 
+		{
+			## get sql row id
+			my $entry_href = pop @{$results{$iplayer_pid}} ;
+			$entry_id = $entry_href->{'id'} ;
+print STDERR " + + Matches existing SQL id=$entry_id\n" if $DEBUG	;
+		}
+		elsif (exists($results{'-'}) && @{$results{'-'}} )
+		{
+			## use empty entry
+			my $entry_href = pop @{$results{'-'}} ;
+			$entry_id = $entry_href->{'id'} ;
+print STDERR " + + Matches empty SQL id=$entry_id\n" if $DEBUG	;
+		}
+		else
+		{
+			## Create new entry
+print STDERR " + + Create new SQL entry...\n" if $DEBUG	;
+			
+			# pid rid rectype channel title date start duration adapter record priority file
+			my $sql = "INSERT $db_href->{tbl} SET `changed`=CURRENT_TIMESTAMP, `ipid`='-'" ;
+			foreach my $field (qw/pid rid rectype channel title date start duration adapter record priority file/)
+			{
+				my $val = $existing_href->{$field} ;
+				$val = sql_escape_str($val) ;
+				$sql .= ", `$field`='$val'" ;
+			}
+			sql_send($db_href, $sql) ;
+
+
+			## Get new id
+			$sql = "SELECT `id` FROM $db_href->{tbl} ORDER BY `id` DESC LIMIT 1" ;
+print STDERR "Get sql: \"$sql\"\n" if $DEBUG ;
+			my @results = sql_get($db_href, $sql) ;
+			$entry_id = $results[0]{'id'} ;
+
+print STDERR " + + New SQL id=$entry_id\n" if $DEBUG	;
+		}
+	
+		die_error_mail($mailto, "Error: Invalid entry $entry_id (ID $iplayer_pid)") unless ($entry_id > 0) ;
+		
+		my $text = "" ;
+		$text .= "$href->{'episode'}: " if $href->{'episode'} ;
+		$text .= "$href->{'desc'}" if $href->{'desc'} ;
+		$text = sql_escape_str($text) ;
+		
+		# UPDATE tbl SET flags=TRIM(',' FROM CONCAT(flags, ',', 'flagtoadd'))
+		my $sql = "UPDATE $db_href->{tbl} SET `status`='started', `ipid`='$iplayer_pid', `changed`=CURRENT_TIMESTAMP" ;
+		$sql .= ", `text`='$text'" ;
+		$sql .= " WHERE `id`='$entry_id'" ;
+		sql_send($db_href, $sql) ;
+	}
+
+
+#	# UPDATE tbl SET flags=TRIM(',' FROM CONCAT(flags, ',', 'flagtoadd'))
+#	my $sql = "UPDATE $db_href->{tbl} SET `status`='started', `changed`=CURRENT_TIMESTAMP" ;
+#	$sql .= " WHERE `pid`='$pid' AND `rectype`='iplay'" ;
+#	
+#	sql_send($db_href, $sql) ;
+	
+#exit 0 ;	
+}
+
+
+#-----------------------------------------------------------------------------
+sub sql_update_status
+{
+	my ($db_href, $pid, $recorded_href) = @_ ;
+
+	print STDERR "sql_update_status(pid=$pid)\n" if $DBG_SQL ;
+	
+Linux::DVB::DVBT::prt_data("Recorded=", $recorded_href) if $DEBUG>=2 ;
+	
+	return unless $pid ;
+	
+	## Get existing entries
+	my $search_sql = "SELECT * FROM $db_href->{tbl} WHERE `pid`='$pid' AND `rectype`='iplay'" ;
+	my %results = sql_get_href($db_href, $search_sql, 'ipid') ;
+Linux::DVB::DVBT::prt_data("Existing SQL recorded entries=", \%results) if $DEBUG>=2 ;
+	
+	## need to update all existing entries OR create new ones
+	foreach my $iplayer_pid (keys %$recorded_href)
+	{
+print STDERR " + Looking at get entry: iplayer pid=$iplayer_pid\n" if $DEBUG	;
+		my $href = $recorded_href->{$iplayer_pid} ;
+		
+		my $entry_id ;
+		if (exists($results{$iplayer_pid})) 
+		{
+			## get sql row id
+			my $entry_href = pop @{$results{$iplayer_pid}} ;
+			$entry_id = $entry_href->{'id'} ;
+print STDERR " + + Matches existing SQL id=$entry_id\n" if $DEBUG	;
+		}
+		else
+		{
+			die_error_mail($mailto, "Status update should already have table entry for ID $iplayer_pid") ;
+		}
+	
+		die_error_mail($mailto, "Error: Invalid entry $entry_id (ID $iplayer_pid)") unless ($entry_id > 0) ;
+		
+		my $text = "" ;
+		if ($href->{'downloaded'})
+		{
+			# Downloaded info has better description
+			$text .= "$href->{'downloaded'}{'episode'}: " if $href->{'downloaded'}{'episode'} ;
+			$text .= "$href->{'downloaded'}{'desc'}" if $href->{'downloaded'}{'desc'} ;
+			$text = sql_escape_str($text) ;
+		}
+		
+		my $status = $href->{'status'} ;
+		my $error = "" ;
+		if ($href->{'error'})
+		{
+			$error = sql_escape_str($href->{'error'}) ;
+		}
+		else
+		{
+			$status .= ",complete" ;
+		}
+		
+		my $file = sql_escape_str($href->{'file'}) ;
+		
+		die_error_mail($mailto, "Error: Invalid entry $entry_id (ID $iplayer_pid)") unless ($entry_id > 0) ;
+		
+		# UPDATE tbl SET flags=TRIM(',' FROM CONCAT(flags, ',', 'flagtoadd'))
+		my $sql = "UPDATE $db_href->{tbl} SET `status`=TRIM(',' FROM CONCAT(`status`, ',', '$status')), `ipid`='$iplayer_pid', `changed`=CURRENT_TIMESTAMP" ;
+		$sql .= ", `text`='$text'" if $text ;
+		$sql .= ", `errorText`='$error'" if $error ;
+		$sql .= ", `file`='$file'" if $file ;
+		
+		$sql .= " WHERE `id`='$entry_id'" ;
+		sql_send($db_href, $sql) ;
+	}
+}
+
+##-----------------------------------------------------------------------------
+#sub sql_set_stats
+#{
+#	my ($db_href, $pid, $stats_href, $get_aref) = @_ ;
+#
+#	return unless $pid ;
+#	
+#	my $values = "" ;
+#	foreach my $var (sort keys %$stats_href)
+#	{
+#		$values .= ", " if $values ;
+#		$values .= "`$var`='$stats_href->{$var}'" ;
+#	}
+#	
+#	my $sql = "UPDATE $db_href->{tbl} SET $values, `changed`=CURRENT_TIMESTAMP" ;
+#	$sql .= " WHERE `pid`='$pid' AND `rectype`='iplay'" ;
+#	
+#	sql_send($db_href, $sql) ;
+#}
+
+##-----------------------------------------------------------------------------
+#sub sql_set_error
+#{
+#	my ($db_href, $pid, $error, $get_aref) = @_ ;
+#	
+#	return unless $pid ;
+#	
+#	sql_update_status($db_href, $pid, 'error') ;
+#	
+#	my $sql = "UPDATE $db_href->{tbl} SET `errorText`='$error', `changed`=CURRENT_TIMESTAMP" ;
+#	$sql .= " WHERE `pid`='$pid' AND `rectype`='iplay'" ;
+#	
+#	sql_send($db_href, $sql) ;
+#}
+
+#=================================================================================
+# UTILITIES
+#=================================================================================
+
+#-----------------------------------------------------------------------------
+# Format a timestamp for the reply
+sub timestamp
+{
+	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+	return sprintf "%02d:%02d:%02d %02d/%02d/%04d", $hour,$min,$sec, $mday,$mon+1,$year+1900;
+}
+
+
+#---------------------------------------------------------------------------------
+sub prompt
+{
+	my $timestamp = timestamp() ;
+	my $prompt = "[$progname ($$) $timestamp]" ;
+	
+	return $prompt ;
+}
+
+#---------------------------------------------------------------------------------
+sub info
+{
+	my ($msg) = @_ ;
+
+	my $prompt = prompt() ;
+	$msg =~ s/\n/\n$prompt /g ;
+	print STDERR "$prompt $msg\n" ;
+	
+	my $timestamp = timestamp() ;
+	push @info_lines, "$prompt $msg" ;
+}
+
+
+#---------------------------------------------------------------------------------
+# send error email
+sub error_mail
+{
+	my ($to, $errors_aref) = @_ ;
+	
+	$errors_aref ||= [] ;
+	my $prompt = prompt() ;
+	
+	my $data = "echo 'Unable to report details...'" ;
+	
+	my $tmpfile = "/tmp/dvbt-iplay.$$" ;
+	if (open my $fh, ">$tmpfile")
+	{
+		print $fh "ERROR:\n" ;
+		foreach (@$errors_aref)
+		{
+			print $fh "$_\n" ;
+		}
+		print $fh "\n\n" ;
+		foreach (@info_lines)
+		{
+			print $fh "$_\n" ;
+		}
+		close $fh ;
+		
+		$data = "cat $tmpfile" ;	
+	}
+	else
+	{
+		$tmpfile = undef ;
+	}
+	
+	`$data | mail -s '$prompt Error' $to` ;
+	
+	# clean up
+	unlink $tmpfile if $tmpfile ;
+}
+
+#---------------------------------------------------------------------------------
+# send error email then exit
+sub die_error_mail
+{
+	my ($to, $error_msg, $errors_aref, $rec_href) = @_ ;
+	
+	## Mark as failed
+	$error_msg ||= "" ;
+	$errors_aref ||= [] ;
+	$rec_href ||= {} ;
+#	if (exists($rec_href->{'id'}))
+#	{
+#		my $prog_id = $rec_href->{'id'} ;
+#		sql_set_error(\%dbh, $prog_id, $error_msg) ;
+#	}
+	
+	if ($error_msg)
+	{
+		unshift @$errors_aref, $error_msg ;
+		info($error_msg) ;
+	}
+
+	error_mail($to, $errors_aref) ;
+
+	info("FATAL Stopping") ;
+	exit 1 ;
+}
+
+
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+[SUMMARY]
+
+Use get_iplayer to download files
+
+[ARGS]
+
+* name=s*		Name(s)
+
+Specify one of more program names to get (alternatively specify the information using -file option)
+
+
+[OPTIONS]
+
+-type=s				Program type [default=tv]
+
+Can be either tv or radio
+
+-d|'dest'|dir=s		Destination directory
+
+Where to record the file to
+
+-mailto=s				Mail destination [default=$DEF_MAIL_TO]
+
+If any errors occur, then this is where they will be mailed to
+
+-db|'database'=s		Database [default=$DEF_DATABASE]
+
+Specify database name
+
+-tbl|'table'=s			Table [default=$DEF_TBL_RECORDED]
+
+Specify database table name
+
+-u|'user'=s		User
+
+Specify Mysql user name
+
+-p|'password'=s		Password
+
+Specify Mysql user password
+
+-dbg-sql=i	Debug sql module
+
+-a|'adapter'=i		DVB-T adapter number [default=0]
+
+-force=i			Force recording
+
+By default, any file already downloaded will not be downloaded again. Setting this option forces a re-download
+
+-log_dir=s		Log directory [default=$DEF_PVR_LOGDIR]
+
+Log files location
+
+-file=s				Recording specification file
+
+Instead of specifying the recording information on the command line, use a file to store the list of files
+
+-id=s				Program id
+
+
+[DESCRIPTION]
+
+Get one or more IPLAYER videos/audio files
+ 
+
+

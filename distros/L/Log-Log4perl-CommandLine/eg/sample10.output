@@ -1,0 +1,8 @@
+% perl sample10.pl 
+[ERROR] error message
+[FATAL] fatal message
+
+% perl sample10.pl --logconfig log4perl.conf
+main warn  message
+main error message
+main fatal message

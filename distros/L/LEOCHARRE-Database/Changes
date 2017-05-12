@@ -1,0 +1,24 @@
+2008-06-26 15:15  cvs
+
+	* lib/LEOCHARRE/Database/Base.pm: cleaned up some code
+
+2007-11-01 16:42  cvs
+
+	* lib/LEOCHARRE/DBI.pm, lib/LEOCHARRE/Database/Base.pm, t/1.t,
+	  t/2.t, t/test.db: changees
+
+2007-08-07 14:14  cvs
+
+	* lib/LEOCHARRE/Database.pm: updating so give better errors with
+	  carp etc
+
+2007-08-02 14:03  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/Database.pm, t/0.t,
+	  t/Test.pm, t/test.db: Initial revision
+
+2007-08-02 14:03  cvs
+
+	* MANIFEST, Makefile.PL, lib/LEOCHARRE/Database.pm, t/0.t,
+	  t/Test.pm, t/test.db: init import
+

@@ -1,0 +1,249 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# $Id: lcfg-skeleton.in 27452 2015-02-24 11:20:48Z squinney@INF.ED.AC.UK $
+# $Source: /var/cvs/dice/LCFG-Build-Skeleton/bin/lcfg-skeleton.in,v $
+# $Revision: 27452 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/LCFG-Build-Skeleton/LCFG_Build_Skeleton_0_5_0/bin/lcfg-skeleton.in $
+# $Date: 2015-02-24 11:20:48 +0000 (Tue, 24 Feb 2015) $
+
+our $VERSION = '0.5.0';
+
+use LCFG::Build::Skeleton;
+
+my $skel = LCFG::Build::Skeleton->new_with_options();
+
+$skel->query_user();
+
+$skel->create_package();
+
+__END__
+
+=head1 NAME
+
+       lcfg-skeleton - Tool for creating new LCFG software projects
+
+=head1 VERSION
+
+This documentation refers to lcfg-skeleton version 0.5.0
+
+=head1 USAGE
+
+       $ lcfg-skeleton
+       Name of the project: foo
+       Is this an LCFG component? (yes/no) [yes]: 
+       Short description of the project [The LCFG foo component]: 
+       Name of the author [Stephen Quinney]: 
+       Email address for the author [squinney@inf.ed.ac.uk]: 
+       Language for component (perl/shell) [perl]: 
+       Revision Control System (CVS/None) [CVS]: None
+       Supported platforms [ScientificLinux5]: 
+       Distribution license [GPLv2]: 
+       Restart component on RPM update (yes/no) [yes]: 
+       Use the CMake build system (yes/no) [yes]: 
+       Check all changes are committed before a release? (yes/no) [yes]: 
+       Generate the ChangeLog from the Revision-Control log? (yes/no) [yes]: 
+
+Hitting RETURN will use the default value shown in []. The responses
+to the question are normally stored in the file
+B<~/.lcfg/skeleton/defaults.yml> (the location is configurable) and
+will be used as the defaults next time the command is run.
+
+Alternatively it is possible to pass in parameters from the
+command-line and those values will be used as the defaults. You can
+also run in a completely non-interactive mode where the defaults are
+automatically accepted, you only need to specify the project name on
+the command line. For example:
+
+       lcfg-skeleton --name=foo --no-lcfg --no-gencmake \
+                     --rcs=CVS --no-interactive
+
+=head1 DESCRIPTION
+
+The lcfg-skeleton script prompts the user for basic information and
+creates a set of skeleton files as a starting point for writing a new
+LCFG component.
+
+Although this tool has been written primarily to aid in the generation
+of LCFG component projects it is generally useful. It can be used for
+any source code where you wish to use the LCFG software release tools.
+
+=head1 REQUIRED ARGUMENTS
+
+There are no required arguments for this command.
+
+=head1 OPTIONS
+
+Note that boolean values should be specified on the command-line like
+C<--foo> or C<--no-foo>. At the interactive user query interface they
+should be specified as "yes" or "no".
+
+For convenience, on the command-line is is possible to use the
+shortest unique name for each option.
+
+=over 4
+
+=item name
+
+The name of the project. Note that in the case of an LCFG component
+this should be C<foo> B<NOT> C<lcfg-foo>.
+
+=item abstract
+
+A short description of the project. If this is an LCFG component the
+default value suggested to the user is "The LCFG $name component".
+
+=item author_name
+
+The name of the author (i.e you!). The default is the string stored in
+the GECOS field of the passwd entry.
+
+=item author_email
+
+The email address for the author. The default is built from the
+current username and domain name.
+
+=item lcfg_component
+
+This is a boolean value which controls whether the generated project
+is an LCFG component.
+
+=item lang
+
+The language which will be used, this is either "perl" or
+"shell". This only really has an affect if you are creating an LCFG
+component.
+
+=item rcs
+
+Which revision-control system you intend to use for the
+project. Currently only "CVS" and "None" are supported. You will need
+the relevant L<LCFG::Build::VCS> helper module installed for this to
+work.
+
+=item platforms
+
+The comma-separate list of platforms which are supported by this code
+(e.g. ScientificLinux5).
+
+=item license
+
+The license under which the source code can be distributed. This
+defaults to "GPLv2".
+
+=item restart
+
+This controls whether, if this is an LCFG component, should it be
+restarted after package upgrade if the component is already
+running. This is a yes/no answer and it defaults to "yes" (it is
+handled in the same way as a boolean value on the command line).
+
+=item gencmake
+
+This is a boolean value which controls whether the LCFG CMake
+infrastructure will be used to build the project.
+
+=item genchangelog
+
+This is a boolean value which controls whether or not to generate the
+project changelog from the revision-control commit logs.
+
+=item checkcommitted
+
+This is a boolean value which controls whether the revision-control
+tools should check that all files are committed before making a new
+release.
+
+=item interactive
+
+This is a boolean value which controls whether the L<query_user()>
+method will actually interact with the user or just store the values
+taken from the defaults file and any commandline options. This is a
+boolean value which defaults to false (zero).
+
+=item force
+
+This is a boolean value which controls whether an existing project
+directory will be removed if the name matches that required for the
+new skeleton project. This is a boolean value which defaults to false
+(zero).
+
+=item configfile
+
+This is the configuration file which is used to store the defaults
+between calls to the lcfg-skeleton tool. Normally you should not need
+to modify this and it defaults to C<~/.lcfg/skeleton/defaults.yml>.
+
+=item tmpldir
+
+This is the directory into which local versions of templates should be
+placed. Normally you should not need to modify this and it defaults to
+C<~/.lcfg/skeleton/templates/>. For reference, the standard templates
+are normally stored in C</usr/share/lcfgbuild/templates>.
+
+=back
+
+=head1 CONFIGURATION
+
+If the new component is to be added automatically to the CVS, then the
+C<CVSROOT> and C<CVS_RSH> must be set correctly before running
+B<lcfg-skeleton>.
+
+By default the script assumes that the standard template directory is
+C</usr/share/lcfgbuild/templates>. You can override this using the
+C<LCFG_BUILD_TMPLDIR> environment variable. If you have done a local
+(i.e. non-root) install of this module then this will almost certainly
+be necessary.
+
+It is possible to override any of the standard templates used to
+generate the skeleton project by placing your own version into the
+directory referred to in the C<tmpldir> attribute. This is normally
+C<~/.lcfg/skeleton/templates/> but that can be overridden by the
+user.
+
+=head1 EXIT STATUS
+
+After successfully generating a new project this command will exit
+with code zero. An error will result in a non-zero error code.
+
+=head1 DEPENDENCIES
+
+This script uses L<LCFG::Build::Skeleton> which is L<Moose>
+powered. That module also requires L<MooseX::Getopt> for command-line
+option handling. This module is part of the LCFG build tools suite and
+as such requires L<LCFG::Build::Pkgspec> and L<LCFG::Build::VCS>. It
+uses the perl Template Toolkit to generate new projects. The defaults
+file is parsed and stored using L<YAML::Syck>. You will also need the
+L<List::MoreUtils> and L<UNIVERSAL::require> modules.
+
+=head1 SEE ALSO
+
+L<LCFG::Build::Tools>, lcfg-reltool(1)
+
+=head1 PLATFORMS
+
+This is the list of platforms on which we have tested this
+software. We expect this software to work on any Unix-like platform
+which is supported by Perl.
+
+ScientificLinux6, EnterpriseLinux7, MacOSX
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this application. Please report any
+problems to bugs@lcfg.org, feedback and patches are also always very
+welcome.
+
+=head1 AUTHOR
+
+Stephen Quinney <squinney@inf.ed.ac.uk>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2008 University of Edinburgh. All rights reserved
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GPL, version 2 or later.
+
+=cut

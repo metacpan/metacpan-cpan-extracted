@@ -1,0 +1,152 @@
+LedgerSMB-API
+
+This module is meant to document access for those working to
+integrate online commerce applications with the LedgerSMB
+codebase, to the workings of the accounting application so
+that simple and repetative transactions can be automated.
+
+INSTALLATION
+
+Access with your browser the administrative interface of your
+LedgerSMB installation, to create and populate a new database,
+perhaps lsmb_api_test, and create a new user, lsmb_api_test,
+with privileges on that database.  The tests have been written
+against the chart of accounts provided by the US_Service_Company
+database template.
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+
+If you like the initial tests, you might then consider using
+pgdump to backup a production accounting database, then as
+your postgres user, use the psql command to restore that data
+to your lsmb_api_test database, after you have DROP'd and
+re-CREATE'd it.  Then run some tests with your books.  Finally,
+
+    make install  <-- if you dare . . . 
+
+INITIAL ALPHA RELEASE NOTICE
+
+LedgerSMB::API 
+
+In a collaboration initiated between Nigel Titley and Hugh Esco -- but
+open to others, operating under a SourceForge project as
+LedgerSMB-OSCommerce, but with an expanded focus of supporting
+developers seeking to integrate LedgerSMB generically with other
+applications which have a need to post transactions to or pull reports
+from an accounting database.  
+
+You may get your copy using your cpan> prompt, or download it from the
+sourceforge or CPAN websites at these links:
+
+   https://sourceforge.net/projects/ledgersmb-oscom/
+   http://search.cpan.org/~hesco/LedgerSMB-API-0.04a/
+
+As initiating co-conspirators we've agreed to make this work available
+under the GPL inviting your collaboration in making this a trully
+useful tool.  For now, we offer this, our first humble alpha release,
+at version 0.04a, nicknamed: Caveat Emptor.  
+
+Developers are urged to TEST this module against a TEST database.
+Testers are urged NOT TO DEPLOY this code against a production copy of
+clients accounting databases, without further testing of all your
+customary interactions, from posting orders, invoices, payments,
+through reports, book closing and review of audit data.  There is much
+left to test and we are developers, Not Accountants, and certainly not
+developers who have any sort of firm grasp on LedgerSMB/ SQL-Ledger's
+programming interface.  
+
+We are only developers who simply seek to expose LedgerSMB's API in a
+usable way, as we come to understand it.  
+
+As we complete this initial layer, we hope that others will step
+forward to develop: 
+
+LedgerSMB::API::OSCommerce, 
+LedgerSMB::API::XAO,
+LedgerSMB::API::ZenCart, 
+LedgerSMB::API::AgoraCart, 
+
+plus
+LedgerSMB::API::YourFavorite 
+
+and of course
+LedgerSMB::API::YourCustomApplication.
+
+So, CAVEAT EMPTOR:
+
+You are encouraged to access with your browser the administrative
+interface of your LedgerSMB installation, to create and populate a new
+database, perhaps lsmb_api_test, and create a new user, lsmb_api_test,
+with privileges on that database.  The tests have been written against 
+the chart of accounts provided by the US_Service_Company database
+template.
+
+If you like the initial tests, you might then consider using pgdump to
+backup a production accounting database, then as your postgres user,
+the psql command to restore that data to your lsmb_api_test database,
+after you have DROP'd and re-CREATE'd it.  
+
+So, what's it do, you ask?
+
+So far, the following routines seems to be passing rudimentary
+automated and eyeball-on-browser tests.  
+
+new_lsmb() 
+create_new_vendor() 
+id_existing_vendor() 
+create_new_customer() 
+id_existing_customer() 
+create_new_part() 
+create_new_purchase_order() 
+generate_invoice_from_purchase_order() 
+post_payment_to_ap_invoice() 
+create_new_sales_order()
+
+This routine is partially working and the nature of the known bug is
+recorded in perldoc.
+
+create_new_assembly() 
+
+These routines are priority for the current developers, but of course,
+others are encouraged to contribute code and documentation to help with
+these or to scratch their own known itches.
+
+generate_invoice_from_sales_order() 
+post_payment_to_ar_invoice() 
+generate_account_statement()
+
+Feedback, comments, use cases, bug reports, tests for bugs, patches,
+new code, new or revised perldoc, inspiration and paying work from
+developers or other users who find this module useful are welcomed and
+encouraged.  This is a work in progress.  Help us do the work which
+makes for the progress.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc LedgerSMB::API
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/LedgerSMB-API
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=LedgerSMB-API
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/LedgerSMB-API
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/LedgerSMB-API
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Nigel Titley and Hugh Esco
+
+This program is released under the following license: gpl

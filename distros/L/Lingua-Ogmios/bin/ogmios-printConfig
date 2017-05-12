@@ -1,0 +1,159 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Getopt::Long;
+use Config::General;
+use Pod::Usage;
+
+# use Data::Dumper;
+use File::Basename;
+# use Sys::Hostname;
+
+# use Alvis::Convert;
+
+# use Alvis::NLPPlatform;
+# use Alvis::NLPPlatform::Convert;
+
+use Lingua::Ogmios;
+
+# use Encode;
+
+my $man = 0;
+my $help = 0;
+my $rcfile="etc/ogmios/nlpplatform.rc" ;
+
+my $current_dir;
+my $dirfile;
+my $file;
+
+my $lang;
+my $paramsA=['all'];
+my $params;
+my $param;
+my $format;
+
+warn "\nRunning Ogmios (NLP Platform) version " . $Lingua::Ogmios::VERSION . "\n\n";
+
+GetOptions('help|?' => \$help, 
+           'man' => \$man, 
+	   "rcfile=s" => \$rcfile,
+	   "lang=s" => \$lang,
+	   "params=s@" => \$paramsA,
+	   "format=s" => \$format,
+	   ) or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if ((defined $rcfile) && (($rcfile eq "") || (!(-f $rcfile)))) {
+    warn "No such config file or config file is not set\n";
+    pod2usage(1);
+} 
+
+warn "Creating Ogmios\n";
+my $NLPPlatform = Lingua::Ogmios->new('rcfile' => $rcfile);
+
+if (defined $paramsA) {
+    foreach $param (@$paramsA) {
+	$params->{$param}++;
+    }
+}
+
+if ((defined $format) && ($format eq "dot")) {
+    $NLPPlatform->printConfigDOT($lang, $params);
+} else {
+    $NLPPlatform->printConfig($lang, $params);
+}
+exit 0;
+
+
+__END__
+
+=encoding utf8
+
+
+=head1 NAME
+
+ogmios-printConfig - Perl script for printing the configuration of the Omgios platform
+
+=head1 SYNOPSIS
+
+ogmios-printConfig  [--help] [--man] [--rcfile=file] [--lang=lang] [--params=params] [--format=format]
+
+=head1 OPTIONS
+
+=over 4
+
+=item    B<--help>            brief help message
+
+=item    B<--man>             full documentation
+
+=item    B<--rcfile=file>     reads the given configuration file
+
+=item    B<--lang=lang>       sets the language for which the Ogmios configuration will be printed. The
+                              value are set with a ISO 639-1 code (fr for French, en for English).
+
+=item    B<--format=format>   specifies the format of the output (by default, C<text>, otherwise C<dot>). 
+
+=item    B<--params=params>   indicates the parameters to print (see L<List of the parameters specifyig the ouput>)
+
+=back
+
+=head1 DESCRIPTION
+
+This script prints configuration of the Ogmios platform as specified
+in the rcfile given in arguments.
+
+Parameters specify the information to print. The list of the
+parameters is provided below (L<List of the parameters specifyig the
+ouput>).  If no parameters are indicated all the configuration (for a
+given language) is printed.
+
+By default, the output format of the printed configuration is a
+textual description. When C<dot> is specified as format, the layout of
+NLP tools is printed as a graph in dot format.
+
+
+=head2 List of the parameters specifyig the ouput
+
+=over 4
+
+=item C<all> : all parameters are printed
+
+=item C<genVar> : general variables are printed
+
+=item C<cnxVar> : connexion variables are printed
+
+=item C<convrt> : converters related information is printed
+
+=item C<inVar> : variables related to the inputs are printed
+
+=item C<outVar> : variables specify the output are printed
+
+=item C<nlpMsc> : miscellaneous various related to the Natural Language Processing are printed
+
+=item C<nlptools> : information related to the NLP tools configuration (given the specified language) are printed
+
+=item C<lingAnn> : list of the annotations to perform is printed
+
+=item C<lingAnnFull> : list of the annotations to perform, with information related to the NLP tools (given the specified language)  is printed
+
+=back
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+Thierry Hamon, E<lt>thierry.hamon@limsi.frE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 Thierry Hamon
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.8.4 or, at your
+option, any later version of Perl 5 you may have available.
+
+=cut
+

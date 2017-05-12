@@ -1,0 +1,44 @@
+LibTracker::Client version 0.01
+===============================
+
+Tracker is a tool designed to extract information and metadata about your
+personal data so that it can be searched easily and quickly.
+
+By using Tracker, you no longer have to remember where you've left your
+files. To locate a file you only need to remember something about it, such
+as a word in the document or the artist of the song. This is because as well
+as searching for files in the traditional way, by name and location, Tracker
+searches files' contents and metadata.
+
+Tracker is available from http://www.gnome.org/projects/tracker/
+
+libtrackerclient is the Tracker client library. This module implements the
+Perl interface to libtrackerclient.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+For the 'make test' step however, see README.testing
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libtrackerclient
+  glib
+  dbus-glib
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Devendra Gera
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

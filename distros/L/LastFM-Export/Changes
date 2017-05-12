@@ -1,0 +1,10 @@
+Revision history for LastFM-Export
+
+0.03  2014-02-25
+      - stop using #!/usr/bin/env perl in installed scripts
+
+0.02  2012-05-01
+      - Make the update process not fail when a song is currently playing.
+
+0.01  2012-03-19
+      - Initial release

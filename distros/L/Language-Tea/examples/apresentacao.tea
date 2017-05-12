@@ -1,0 +1,65 @@
+define square(in) {
+    * $in $in
+}
+
+define str1 "Ola"
+define str2 " pessoal"
+
+echo "\nA linha seguinte resulta de uma concatenacao de duas strings 'ola' e ' pessoal'"
+echo [str-cat $str1 $str2]
+
+
+echo [str-cat "\n" [str-cat "4 ao quadrado e " [int->string [square 4]]]]
+
+class panaskice ()
+
+method panaskice teste(){
+    echo "olaaaaaa"
+}
+
+class Triangulo panaskice(
+    _altura
+    _base
+)
+
+method Triangulo getArea (  ) {
+    / [* $_altura $_base] 2
+}
+
+method Triangulo constructor ( a b ) {
+    set! _altura $a
+    set! _base $b
+}
+
+method Triangulo setDimensoes ( a b ) {
+    set! _altura $a
+    set! _base $b
+}
+
+
+define tri1 [new Triangulo 2 2]
+echo "\nTeste de uma classe:\nUm triangulo com 2 de base e 2 de altura tem " [$tri1 getArea] " de area"
+
+$tri1 setDimensoes 1 2
+echo " E agora area do triangulo com 1 de altura e 2 de base: " [$tri1 getArea]
+
+define e [class-base-of Triangulo]
+define obj [new e ]
+
+echo [$obj teste]
+echo [class-get-name $e]
+
+echo [class-is-a Triangulo panaskice]
+
+define e1 [class-of $obj]
+echo [class-get-name $e1]
+
+define z [load-class "java.net.Socket"]
+define str [new z 1]
+echo $str
+
+define asd [new-class panaskice (a b)]
+
+define j [new asd]
+echo [$j teste]
+echo [tos-obj? $j]

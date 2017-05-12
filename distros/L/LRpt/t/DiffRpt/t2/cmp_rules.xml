@@ -1,0 +1,14 @@
+<comparing_rules>
+    <sales>
+        <sonum    if_no_value = "die" />
+        <stor_id if_no_value = "die" />
+    </sales>
+    <titleauthors>
+        <au_id    if_no_value = "die" />
+        <title_id if_no_value = "die" />
+        <au_ord    if_no_value = "skip_and_warn" />
+    </titleauthors>
+</comparing_rules>
+
+
+

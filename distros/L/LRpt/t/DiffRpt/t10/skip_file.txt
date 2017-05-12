@@ -1,0 +1,3 @@
+select_name: text_num
+columns: Text3, Numeric5
+%%

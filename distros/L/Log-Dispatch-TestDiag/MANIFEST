@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+META.json
+README
+lib/Log/Dispatch/TestDiag.pm
+t/testdiag.t
+xt/pod.t
+xt/pod-coverage.t

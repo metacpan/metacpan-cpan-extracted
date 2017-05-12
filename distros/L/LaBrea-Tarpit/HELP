@@ -1,0 +1,25 @@
+This file consists of helpful tips or reported weirdness from users
+
+From:             bbice@persistence.com (Brent Bice)
+Date sent:        Wed, 28 Aug 2002 12:04:05 -0700 (PDT)
+To:               michael@bizsystems.com
+Subject:          image path weirdness
+
+   Hiya!  Have been fiddling with your perl stuff for watching LaBrea
+servers.  Pretty slick.  The only weirdness I ran across was trying to
+run it with the cgi scripts residing in a different directory than the
+gif images.  My webserver is configured so that directories with CGI
+scripts can't contain anything BUT cgi's and my non-cgi directories can't
+contain anything executable.  Doh. 
+
+   I found that paged_report.pl uses
+the same variable to refer to where the gif images are, but one part of the
+perl script needs the unix path to 'em, and another part of it needs the
+URL path to 'em. This works dandy if they're both in the same spot and
+you can just specify ./ but if they're in different locations, things
+sorta break.
+
+   I wound up specifying the URL path, (/LaBrea/ in my case) and then
+made a link named /LaBrea that points to the real unix path where all the
+gif files are.  (Yeah, I know, sortofa hack but I didn't wanna change my
+webserver config)

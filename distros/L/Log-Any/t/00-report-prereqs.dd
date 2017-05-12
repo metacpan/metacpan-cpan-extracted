@@ -1,0 +1,36 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'B' => '0',
+                                      'Carp' => '0',
+                                      'Data::Dumper' => '0',
+                                      'Exporter' => '0',
+                                      'Fcntl' => '0',
+                                      'IO::File' => '0',
+                                      'Sys::Syslog' => '0',
+                                      'Test::Builder' => '0',
+                                      'constant' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,0 +1,77 @@
+                        Log::Agent::Rotate 1.200
+
+                 Copyright (c) 2000, Raphael Manfredi
+                 Copyright (c) 2002-2015 Mark Rogaski;
+                 mrogaski@cpan.org; all rights reserved.
+
+------------------------------------------------------------------------
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the Artistic License 2.0, a copy of which can
+    be found with perl.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    Artistic License 2.0 for more details.
+
+    http://www.perlfoundation.org/artistic_license_2_0
+
+------------------------------------------------------------------------
+
+Name           DSLI   Description                                 Info
+-----------    -----  ------------------------------------------- -----
+Log::Agent     -----  A general logging framework                 MROGASKI
+::Rotate       RdpO2  Logfile rotation config and support         MROGASKI
+
+
+The Log::Agent::Rotate module is an extension of Log::Agent that brings
+file-rotating features to the File logging driver.
+
+It is separated from Log::Agent itself because it has dependencies
+on LockFile::Simple and Compress::Zlib that Log::Agent cannot have:
+everyone with a plain stock Perl distribution must be able to simply
+install Log::Agent and start using it.
+
+This is NOT a generic all-purpose logfile rotation package.  It is meant
+to be used only within the Log::Agent framework.
+
+SYNOPSIS
+
+	use Log::Agent;
+	require Log::Agent::Driver::File;
+	require Log::Agent::Rotate;
+
+	(my $me = $0) =~ s|.*/(.*)|$1|;
+
+	my $rotate = Log::Agent::Rotate->make(
+		-backlog       => 7,		# keep last seven logs + current
+		-unzipped      => 2,		# don't compress last archived 2 logs
+		-is_alone      => 1,		# programmer says only ONE process will run
+		-max_size      => 100_000,  # file will rotate when bigger than 100K
+	);
+
+	my $driver = Log::Agent::Driver::File->make(
+		-prefix     => $me,
+		-showpid    => 1,
+		-rotate     => $rotate,		# default rotation policy
+		-channels   => {
+			'error'    => '/tmp/output.err',
+			'output'   => ['log.out', $rotate],	# could have special policy
+			'debug'    => '../appli.debug',
+		},
+	);
+	logconfig(-driver => $driver, -level => 'notice');
+
+DESCRIPTION
+
+Log::Agent::Rotate lets you specify the logfile rotation policy that will
+be used on the logfiles managed via a Log::Agent::Driver::File driver.
+
+It can be useful for daemon process to periodically rotate the logfiles
+whilst keeping some fair amount of backlog.  But it can also be used by
+programs that run a short period of time and generate systematic logging,
+that would end-up eating all the disk space if not monitored.
+
+Please read the Log::Agent::Rotate(3) manpage and the related pages for more
+information.

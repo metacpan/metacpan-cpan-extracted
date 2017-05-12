@@ -1,0 +1,24 @@
+<TOOL>
+    NAME                = "FASTER2"
+    VERSION             = "2"
+    COMMENTS            = "term extractor"
+    <CONFIGURATION>
+       <CONFIG language=EN>
+           FASTRCONF = "$PLATFORM_ROOT/etc/alvis-nlpplatform/Fastr.conf-en"
+       </CONFIG>
+       <CONFIG language=FR>
+       </CONFIG>
+       FASTRBIN                = "/home/thierry/Logiciels/FASTER/bin"
+       FASTRCMD                = "/home/thierry/Logiciels/FASTER/cmd"
+       FASTRLIB                = "/home/thierry/Logiciels/FASTER/lib"
+       <COMMANDS language=EN>
+           FASTR                   = "$FASTRBIN/Fastr"
+           CONVERTCORPUS_CMD       = "$FASTRCMD/TreeTaggertoFastr.prl $FASTRLIB/TAGS-TreeTagger-en"
+           MAKEMETARULES_SW_CMD    = "$FASTRCMD/TermtoRules.prl $FASTRLIB/TAGS-TreeTagger-en | grep '^Word' | sort -u | $FASTRCMD/WordtoFamilies.prl $FASTRLIB/der-families-en -classes $FASTRLIB/sem-classes-en | sort -u"
+           MAKEMETARULES_TRM_CMD   = "$FASTRCMD/TermtoRules.prl $FASTRLIB/TAGS-TreeTagger-en | grep -v '^Word'"
+       </COMMANDS>
+       <COMMANDS language=FR>
+           CONVERTCORPUS_CMD       = ""
+       </COMMANDS>
+    </CONFIGURATION>
+</TOOL>

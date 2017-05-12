@@ -1,0 +1,5 @@
+[% IF act.disabled %]
+{ "success": 1, "result": "disabled" }
+[% ELSE %]
+{ "success": 0, "error": "talk not found" }
+[% END %]

@@ -1,0 +1,13 @@
+Locale-TextDomain-OO-Extract folder example
+===========================================
+
+This is the explanation which file shows what.
+
+11_extract_perl.pl
+    This example shows, how to extract data of from Perl applications.
+
+12_extract_tt.pl
+    This example shows, how to extract data from tt templates.
+
+13_extract_js.pl
+    This example shows, how to extract data from JavaScript files.

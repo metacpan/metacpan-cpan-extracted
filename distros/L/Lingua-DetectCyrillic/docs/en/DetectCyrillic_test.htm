@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>
+Cyrillic detector test
+</title>
+<LINK REL="stylesheet" HREF="../pod.css" TYPE="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<style>
+BODY {font-family: Arial, Helvetica,sans-serif;font-size:10 pt}
+</style>
+</head>
+<body bgcolor="#E8E8E8">
+
+<script language=javascript1.2>var MenuBuiltOnServer=0;</script>
+<!--#include virtual="../menu.pl" -->
+<script language=javascript1.2 src="../Languages.inc"></script>
+<script language=javascript1.2 src="./Menu.inc"></script>
+<script language=javascript1.2 src="../MakeMenu.js"></script>
+
+<h4>Detects coding and language - Russian or Ukrainian</h4>
+Enter a piece of text in Russian or Ukrainian here and push the button <i>Detect</i>.
+<br><b>Tokens Count</b> - number of tokens (words) after which the program starts analysis.
+<br><b>Detect All Languages</b> - if not checked, the program detects Russian only.  
+<p><i>Remarks.</i> <i>Do not use</i> the additional script for coding switching in the right part of the menu -
+change the coding in your browser only. Older Netscape versions don't permit to change coding dynamically,
+if the document contains tag  <i>meta</i> with the charset explicit definition.
+
+<form method=get action="http://www.bible.ru/cgi-bin/DetectCyrillic_test.pl" >
+<textarea rows=6 cols=53 name="Text_area"></textarea><br>
+Maximum tokens count: <select size="1" name="MaxTokens">
+  <option>10</option>
+  <option>30</option>
+  <option>50</option>
+  <option selected>100</option>
+  <option>200</option>
+  <option>300</option>
+  <option>500</option>
+</select>&nbsp;&nbsp; Detect all languages: <input type="checkbox" name="DetectAllLang" value="ON" checked><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type=submit value="Detect!">
+</form>
+</body>
+</html>

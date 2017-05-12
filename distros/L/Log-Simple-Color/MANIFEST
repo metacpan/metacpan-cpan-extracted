@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Log/Simple/Color.pm
+t/00.load.t
+t/01.dependency.t
+t/10.logging.t
+t/perlcritic.t.skip
+t/pod-coverage.t
+t/pod.t

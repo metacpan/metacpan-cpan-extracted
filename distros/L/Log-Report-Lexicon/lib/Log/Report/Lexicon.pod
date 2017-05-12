@@ -1,0 +1,74 @@
+=encoding utf8
+
+=head1 NAME
+
+Log::Report::Lexicon - translations
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+This module is the main extry point for the distribution, but has
+currently no further use.  This distribution contains all components
+of L<Log::Report|Log::Report> which handle translations.
+
+If you do not need translations, you do not need to install this module.
+When you use L<Log::Report|Log::Report> and need to add translations, it may be
+very little work: when you nicely wrote texts in the advised message
+format like
+
+   print __x"Greetings to you, {name}", name => $name;
+   fault __x"cannot open file {filename}", filename => $fn;
+
+then all is in perfect condition to introduce translations: it requires
+very little to no additions to the existing code!
+
+In this distribution:
+
+=over 4
+
+=item * L<Log::Report::Extract|Log::Report::Extract>
+
+Logic used by the F<xgettext-perl> binary (also included here) to
+extract msgid's from perl scripts and (website) templates.
+
+=item * L<Log::Report::Lexicon::Table|Log::Report::Lexicon::Table>
+
+Translation table administration, in PO or MO format.
+
+=item * L<Log::Report::Lexicon::Index|Log::Report::Lexicon::Index>
+
+Translation table file file administration, understanding locales,
+domains, and attributes in the filenames.
+
+=item * L<Log::Report::Translator|Log::Report::Translator>
+
+The run-time component of translations.
+
+=back
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Log::Report::Lexicon-E<gt>B<new>(%options)
+
+=back
+
+=head2 Accessors
+
+=head1 SEE ALSO
+
+This module is part of Log-Report-Lexicon distribution version 1.06,
+built on September 21, 2016. Website: F<http://perl.overmeer.net/log-report/>
+
+=head1 LICENSE
+
+Copyrights 2007-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,32 @@
+---
+name: 'LCFG-Build-Skeleton'
+version: '0.5.0'
+author:
+  - 'Stephen Quinney <squinney@inf.ed.ac.uk>'
+abstract: Tools for generating new LCFG projects
+license: gpl
+resources:
+  license: http://www.opensource.org/licenses/gpl-license.php
+requires:
+  LCFG::Build::PkgSpec: 0.0.23
+  LCFG::Build::VCS: 0.0.20
+  List::MoreUtils: 0
+  Moose: 0.57
+  MooseX::Getopt: 0.13
+  Template: 2.14
+  UNIVERSAL::require: 0
+  YAML::Syck: 0.98
+  perl: 5.6.1
+build_requires:
+  Test::More: 0
+provides:
+  LCFG::Build::Skeleton:
+    file: lib/LCFG/Build/Skeleton.pm
+    version: '0.5.0'
+no_index:
+  dir:
+    - templates
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

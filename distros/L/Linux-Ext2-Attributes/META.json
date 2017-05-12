@@ -1,0 +1,42 @@
+{
+   "abstract" : "Linux ext2/3/4 filesystem attributes",
+   "author" : [
+      "Daniel Collins <solemnwarning@solemnwarning.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132661",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Linux-Ext2-Attributes",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::H2PM" : "0.03",
+            "Module::Build" : "0.2806"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.2806"
+         }
+      }
+   },
+   "provides" : {
+      "Linux::Ext2::Attributes" : {
+         "file" : "lib/Linux/Ext2/Attributes.pm",
+         "version" : "0.20"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.20"
+}

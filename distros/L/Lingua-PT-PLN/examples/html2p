@@ -1,0 +1,59 @@
+#!/usr/bin/perl -s
+  use Lingua::PT::PLN;
+
+  use vars qw{$nocom $noimg $tag $latin1};
+
+  @breakby=qw(table tr td p br h1 h2 h3 h4 h5 h6 li ul ol dl dt dd 
+    div blockquote hr address);
+  @removtag=qw(body html font a b i tt small);
+  @remov=qw(head meta);
+
+  if(not $tag) { $tag="p" }
+  if($noimg)   { push (@removtag, "img"); }
+  if($latin1)  { $ARGV[0] = "recode -f html..latin1 < $ARGV[0] |"  or die;}
+
+  $patremovtag = '</?(?:'. join('|', @removtag) .')\b[^>]*>';
+  $patremov = '<('. join('|', @remov) .')\b[^>]*>(.|\n)*?</\1>';
+  $patsep = '\s*(?:</?(?:'. join('|', @breakby) .')\b[^>]*>\s*)+';
+
+  undef $/;
+  $_= <>;
+  s#$patremovtag##ig;
+  s#$patremov##ig;
+  print "<html><body>\n";
+  for(split(/$patsep/i,$_)){
+     print "<!-- $& -->\n" unless $nocom;
+     s/\s*\n\s*/ /g;
+     print Lingua::PT::PLN::xmlsentences({st=>$tag},$_),"\n";
+  }
+  print "\n</body></html>\n";
+
+__END__
+
+=head1 NAME
+
+html2p - html to list od C<P>
+
+=head1 SYNOPSIS
+
+  html2p [-nocom] [-noimg] [-latin1] file
+
+=head1 DESCRIPTION
+
+C<html2p> makes a html page with "<p>" with the independent text segments after
+dividing it in sentences.
+
+It was designed to help in the process of aligning texts.
+
+The command C<recode> should be installed in order to be possible to use 
+C<-latin1> option.
+
+=head1 AUTHOR
+
+J.Joao Almeida, jj@di.uminho.pt
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut      

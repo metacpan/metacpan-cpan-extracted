@@ -1,0 +1,9 @@
+Revision history for Perl extension Log::Basic.
+
+1.0  Wed Feb 17 11:15:00 2016
+	- add basic functions
+	
+0.01  Wed Feb 17 11:47:52 2016
+	- original version; created by h2xs 1.23 with options
+		-AX -n Log::Basic
+

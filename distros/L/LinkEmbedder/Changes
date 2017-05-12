@@ -1,0 +1,39 @@
+Revision history for perl distribution LinkEmbedder
+
+0.05 2017-05-01T22:35:47+0200
+ - Fix terrible class names from provider_name()
+ - Add support for using <link rel="icon" ...> for images
+
+0.04 2017-04-03T10:01:10+0200
+ - Add support for anonymous gist
+
+0.03 2017-04-01T16:10:27+0200
+ - Add example script
+ - Add support for gist.github.com
+ - Updated template structure
+
+0.02 2017-04-01T01:18:42+0200
+ - Add support for App::mojopaste and other pastebins with simple markup
+ - Add LinkEmbedder::Link::template() attribute
+ - Improved documentation
+
+0.01 2017-04-01T00:16:41+0200
+ - Started replacing Mojolicious::Plugin::LinkEmbedder
+ - Add support for appear.in
+ - Add support for git.io
+ - Add support for github.com
+ - Add support for google
+ - Add support for imgur.com
+ - Add support for ix.io
+ - Add support for instagram.com
+ - Add support for metacpan.org
+ - Add support for paste.opensuse.org
+ - Add support for paste.scsys.co.uk
+ - Add support for pastebin.com
+ - Add support for spotify
+ - Add support for ted.com
+ - Add support for travis-ci.org
+ - Add support for twitter.com
+ - Add support for vimeo.com
+ - Add support for xkcd.com
+ - Add support for youtube.com

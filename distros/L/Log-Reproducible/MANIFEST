@@ -1,0 +1,16 @@
+autobuild.bat
+autobuild.sh
+Build.PL
+CHANGES
+cover.pl
+future-README.md
+LICENSE
+MANIFEST
+README.md
+sample.pl
+lib/Log/Reproducible.pm
+t/reproducible.t
+t/test-reproducible.pl
+META.yml
+META.json
+script/perlr

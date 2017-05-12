@@ -1,0 +1,367 @@
+==== //depot/mainline/external/COLLINS-PARSER/code/Makefile#1 - /home/ken/p4/external/COLLINS-PARSER/code/Makefile ====
+--- /tmp/tmp.1492.0	Fri Sep 13 10:17:29 1974
++++ /home/ken/p4/external/COLLINS-PARSER/code/Makefile	Fri Sep 13 10:17:29 1974
+@@ -2,26 +2,32 @@
+ # Compilation and link flags
+ #
+ CC = gcc
+-CFLAGS = -O3 -Wimplicit
+-LIBS=  -lm 
++OPTIMIZE = -O3
++CFLAGS = $(OPTIMIZE) -Wimplicit
++LIBS= -lm
++LD = gcc
++LDFLAGS = -G -L/usr/local/lib
++RANLIB = ranlib
+ 
+ #
+ # My targets to build
+ #
+ 
+-OBJ = main.o lexicon.o grammar.o mymalloc.o mymalloc_char.o key.o hash.o genprob.o prob.o effhash.o prob_witheffhash.o readevents.o sentence.o edges.o chart.o
+-HDR =  lexicon.h grammar.h mymalloc.h mymalloc_char.h key.h hash.h genprob.h prob.h effhash.h prob_witheffhash.h readevents.h sentence.h edges.h chart.h
++OBJ = lexicon.o grammar.o mymalloc.o mymalloc_char.o key.o \
++	hash.o genprob.o prob.o effhash.o prob_witheffhash.o \
++	readevents.o sentence.o edges.o chart.o
+ 
+-all: sfs
++all: parser libcollins.a
+ 
+-$(OBJ) : $(HDR)
++%.o : %.c %.h
++	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+ 
+-ofiles: 
+-	gcc -c main.c lexicon.c sentence.c edges.c chart.c mymalloc.c grammar.c key.c hash.c genprob.c prob.c effhash.c prob_witheffhash.c readevents.c mymalloc_char.c $(CFLAGS) $(LIBS)
++parser : $(OBJ) main.o
++	$(CC) $(OBJ) main.o -o parser $(CFLAGS) $(LIBS)
+ 
+-sfs : main.o lexicon.o grammar.o mymalloc.o mymalloc_char.o key.o hash.o genprob.o prob.o effhash.o prob_witheffhash.o readevents.o sentence.o edges.o chart.o
+-	gcc main.o lexicon.o grammar.o mymalloc.o mymalloc_char.o key.o hash.o genprob.o prob.o effhash.o prob_witheffhash.o readevents.o sentence.o edges.o chart.o -o parser $(CFLAGS) $(LIBS)
+-
+-cleanup:
+-	rmz *.o
++clean:
++	$(RM) $(OBJ) main.o parser libcollins.a
+ 
++libcollins.a: $(OBJ)
++	$(AR) r $@ $(OBJ)
++	$(RANLIB) $@
+==== //depot/mainline/external/COLLINS-PARSER/code/chart.c#1 - /home/ken/p4/external/COLLINS-PARSER/code/chart.c ====
+--- /tmp/tmp.1492.1	Fri Sep 13 10:17:29 1974
++++ /home/ken/p4/external/COLLINS-PARSER/code/chart.c	Fri Sep 13 10:17:29 1974
+@@ -30,15 +30,6 @@
+ /* pointer to the current sentence being parsed*/
+ sentence_type *current;
+ 
+-/* initialise the chart */
+-void init_chart();
+-
+-/* add a sentence to the chart (starts the parsing process) */
+-void add_sentence_to_chart(sentence_type *sentence);
+-
+-/*complete the chart for words spanning s..e inclusive*/
+-void complete(int s,int e);
+-
+ /*
+    edges is an array of edges in the chart
+ 
+@@ -304,8 +295,33 @@
+   TREEBANKOUTPUTFLAG = flag;
+ }
+ 
++int get_treebankoutputflag()
++{
++  return TREEBANKOUTPUTFLAG;
++}
++
+ /*==========================================================================*/
+ 
++void set_current(sentence_type *sentence)
++{
++  current = sentence;
++}
++
++sentence_type *get_current()
++{
++  return current;
++}
++
++edge_type *chart_edges()
++{
++  return edges;
++}
++
++int *chart_childs()
++{
++  return childs;
++}
++
+ /*parse a sentence, print the output to stdout*/
+ void parse_sentence(sentence_type *sentence)
+ {
+@@ -1393,9 +1409,9 @@
+ 
+ }
+ 
+-int print_best_parse()
++int best_parse()
+ {
+-  int i,best;
++  int i, best;
+ 
+   best=-1;
+ 
+@@ -1410,6 +1426,13 @@
+ 	  if(edges[i].prob>edges[best].prob)
+ 	    best=i;
+       }
++  return best;
++}
++
++
++int print_best_parse()
++{
++  int best = best_parse();
+ 
+   if(best!=-1)
+     {
+==== //depot/mainline/external/COLLINS-PARSER/code/chart.h#1 - /home/ken/p4/external/COLLINS-PARSER/code/chart.h ====
+--- /tmp/tmp.1492.2	Fri Sep 13 10:17:29 1974
++++ /home/ken/p4/external/COLLINS-PARSER/code/chart.h	Fri Sep 13 10:17:29 1974
+@@ -62,9 +62,32 @@
+ /*print the entire chart*/
+ void print_chart();
+ 
++int get_treebankoutputflag();
++
++edge_type *chart_edges();
++int *chart_childs();
++
++int best_parse();
++
+ /*print the highest prob tree spanning the entire sentence, rooted in the
+   top symbol*/
+ int print_best_parse();
++
++void print_edges_flat(int e);
++
++int find_childno(int e,int c);
++
++/* initialise the chart */
++void init_chart();
++
++/* add a sentence to the chart (starts the parsing process) */
++void add_sentence_to_chart(sentence_type *sentence);
++
++/*complete the chart for words spanning s..e inclusive*/
++void complete(int s,int e);
++
++sentence_type *get_current();
++void set_current(sentence_type *sentence);
+ 
+ /*parse a sentence, print the output to stdout*/
+ void parse_sentence(sentence_type *sentence);
+==== //depot/mainline/external/COLLINS-PARSER/code/grammar.c#1 - /home/ken/p4/external/COLLINS-PARSER/code/grammar.c ====
+--- /tmp/tmp.1492.3	Fri Sep 13 10:17:29 1974
++++ /home/ken/p4/external/COLLINS-PARSER/code/grammar.c	Fri Sep 13 10:17:29 1974
+@@ -25,7 +25,7 @@
+ 
+ #include "grammar.h"
+ 
+-#define GDEBUG 1
++#define GDEBUG 0
+ 
+ void init_grammar();
+ void init_lexicons();
+==== //depot/mainline/external/COLLINS-PARSER/code/hash.c#1 - /home/ken/p4/external/COLLINS-PARSER/code/hash.c ====
+--- /tmp/tmp.1492.4	Fri Sep 13 10:17:29 1974
++++ /home/ken/p4/external/COLLINS-PARSER/code/hash.c	Fri Sep 13 10:17:29 1974
+@@ -22,8 +22,81 @@
+ */
+ 
+ #include <assert.h>
++#include <unistd.h>
+ 
+ #include "hash.h"
++
++
++void hash_entry_dump(hash_node *node, FILE *file) {
++  fwrite(&(node->key.klen), sizeof(node->key.klen), 1, file);
++  fwrite(node->key.key, sizeof(unsigned char), node->key.klen+1, file);
++  fwrite(&(node->count), sizeof(node->count), 1, file);
++}
++
++void hash_dump(hash_table *hash, char *filename) {
++  int i;
++  char has_more;
++  hash_node *node;
++  FILE *file = fopen(filename, "wb");
++  assert(file != NULL);
++
++  fwrite(&(hash->num),  sizeof(hash->num),  1, file);
++  fwrite(&(hash->size), sizeof(hash->size), 1, file);
++  
++  for (i=0; i<hash->size; i++) {
++    has_more = 1;
++    node = hash->table[i];
++    while (node != NULL) {
++      fwrite(&has_more, sizeof(has_more), 1, file);
++      hash_entry_dump(node, file);
++      node = node->next;
++    }
++    has_more = 0;
++    fwrite(&has_more, sizeof(has_more), 1, file);
++  }
++  fflush(file);
++}
++
++hash_node *hash_entry_undump(FILE *file) {
++  hash_node *node = (hash_node *) malloc(sizeof(hash_node));
++  fread(&(node->key.klen), sizeof(node->key.klen), 1, file);
++  node->key.key = (unsigned char *) malloc((1+node->key.klen) * sizeof(unsigned char));
++  fread(node->key.key, sizeof(unsigned char), node->key.klen+1, file);
++  fread(&(node->count), sizeof(node->count), 1, file);
++  return node;
++}
++
++void hash_undump(hash_table **hash_ptr, char *filename) {
++  hash_table *hash;
++  hash_node **node;
++  int i, n;
++  char has_more;
++  FILE *file = fopen(filename, "rb");
++  assert(file != NULL);
++
++  hash = *hash_ptr = malloc(sizeof(hash_table));
++  assert(hash != NULL);
++
++  n = fread(&(hash->num),  sizeof(hash->num),  1, file);
++  assert(n == 1);
++  n = fread(&(hash->size), sizeof(hash->size), 1, file);
++  assert(n == 1);
++  hash->table=(hash_node **) malloc(hash->size * sizeof(hash_node*));
++  assert(hash->table != NULL);
++
++  for (i=0; i<hash->size; i++) {
++    node = &(hash->table[i]);
++    n = fread(&has_more, sizeof(has_more), 1, file);
++    assert(n == 1);
++    while (has_more) {
++      *node = hash_entry_undump(file);
++      n = fread(&has_more, sizeof(has_more), 1, file);
++      assert(n == 1);
++      node = &((*node)->next);
++    }
++    *node = NULL;
++  }
++}
+ 
+ void hash_make_table(int size,hash_table *hash)
+ {
+==== //depot/mainline/external/COLLINS-PARSER/code/hash.h#1 - /home/ken/p4/external/COLLINS-PARSER/code/hash.h ====
+--- /tmp/tmp.1492.5	Fri Sep 13 10:17:29 1974
++++ /home/ken/p4/external/COLLINS-PARSER/code/hash.h	Fri Sep 13 10:17:29 1974
+@@ -68,4 +68,10 @@
+ /*makes a hash table with size elements*/
+ void hash_make_table(int size,hash_table *hash);
+ 
++/* Dump the hash data structure to a file */
++void hash_dump(hash_table *hash, char *filename);
++
++/* Retrieve a hash previously dumped by hash_dump() */
++void hash_undump(hash_table **hash, char *filename);
++
+ #endif
+==== //depot/mainline/external/COLLINS-PARSER/code/key.c#1 - /home/ken/p4/external/COLLINS-PARSER/code/key.c ====
+--- /tmp/tmp.1492.6	Fri Sep 13 10:17:29 1974
++++ /home/ken/p4/external/COLLINS-PARSER/code/key.c	Fri Sep 13 10:17:29 1974
+@@ -32,33 +32,20 @@
+   if(k1->klen!=k2->klen)
+     return 0;
+ 
+-  for(i=0;i<k1->klen;i++)
+-    if(k1->key[i] != k2->key[i])
+-      return 0;
+-  
+-  return 1;
++  return !memcmp(k1->key, k2->key, k1->klen);
+ }
+ 
+ void key_copy(key_type *k1,key_type *k2)
+ {
+-  int i;
+-
+   k1->klen = k2->klen;
+-
+   k1->key = (unsigned char *) mymalloc_char(k2->klen);
+-
+-  for(i=0;i<k1->klen;i++)
+-    k1->key[i] = k2->key[i];
++  memcpy(k1->key, k2->key, k1->klen);
+ }
+ 
+ void key_copy2(key_type *k1,key_type *k2)
+ {
+-  int i;
+-
+   k1->klen = k2->klen;
+-
+-  for(i=0;i<k1->klen;i++)
+-    k1->key[i] = k2->key[i];
++  memcpy(k1->key, k2->key, k1->klen);
+ }
+ 
+ int hashval(key_type *key,int size)
+==== //depot/mainline/external/COLLINS-PARSER/code/lexicon.c#1 - /home/ken/p4/external/COLLINS-PARSER/code/lexicon.c ====
+--- /tmp/tmp.1492.7	Fri Sep 13 10:17:29 1974
++++ /home/ken/p4/external/COLLINS-PARSER/code/lexicon.c	Fri Sep 13 10:17:29 1974
+@@ -47,7 +47,7 @@
+   
+   for(i=0;i<strlen(word);i++)
+     {
+-      h=(h*word[i])%size;
++      h=(h * (unsigned char)word[i])%size;
+     }
+ 
+   return h;
+==== //depot/mainline/external/COLLINS-PARSER/code/readevents.c#1 - /home/ken/p4/external/COLLINS-PARSER/code/readevents.c ====
+--- /tmp/tmp.1492.8	Fri Sep 13 10:17:29 1974
++++ /home/ken/p4/external/COLLINS-PARSER/code/readevents.c	Fri Sep 13 10:17:29 1974
+@@ -47,11 +47,9 @@
+ 
+   while(fscanf(file,"%d",&code)!=EOF&&(m<max||max==-1))
+     {
+-      m++;
+-
+ /*      printf("MMM %d\n",m);*/
+ 
+-      if(((double) (m/100000))==(((double) m)/100000.0))
++      if(!(++m % 100000))
+ 	fprintf(stderr,"Hash table: %d lines read\n",m);
+ 
+       if(code==F_CODE)
+==== //depot/mainline/external/COLLINS-PARSER/code/sentence.c#1 - /home/ken/p4/external/COLLINS-PARSER/code/sentence.c ====
+--- /tmp/tmp.1492.9	Fri Sep 13 10:17:29 1974
++++ /home/ken/p4/external/COLLINS-PARSER/code/sentence.c	Fri Sep 13 10:17:29 1974
+@@ -24,8 +24,6 @@
+ #include <assert.h>
+ #include "sentence.h"
+ 
+-void convert_sentence(sentence_type *sentence);
+-
+ int read_sentence(FILE *file,sentence_type *sentence)
+ {
+   int i;
+==== //depot/mainline/external/COLLINS-PARSER/code/sentence.h#1 - /home/ken/p4/external/COLLINS-PARSER/code/sentence.h ====
+--- /tmp/tmp.1492.10	Fri Sep 13 10:17:29 1974
++++ /home/ken/p4/external/COLLINS-PARSER/code/sentence.h	Fri Sep 13 10:17:29 1974
+@@ -99,6 +99,8 @@
+ 
+ */
+ 
++void convert_sentence(sentence_type *sentence);
++
+ int read_sentence(FILE *file,sentence_type *sentence);
+ 
+ /* reads up to max sentences into an array starting at s. 

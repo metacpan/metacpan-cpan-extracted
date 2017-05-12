@@ -1,0 +1,14 @@
+README                    Read this first
+MANIFEST                  This shipping list
+ChangeLog                 List of changes
+Lock.pm                   A lock object, deferred class
+Lock/Simple.pm            A simple lock instance
+Makefile.PL               Generic Makefile template
+Manager.pm                The lock manager
+patchlevel.h              Records the current patchlevel
+Simple.pm                 The simple locking scheme
+t/basic.t                 Basic tests
+t/simple.t                Test OO interface
+t/user.t                  Test user-defined settings
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

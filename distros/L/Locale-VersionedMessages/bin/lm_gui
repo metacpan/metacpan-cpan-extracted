@@ -1,0 +1,2222 @@
+#!/usr/bin/perl
+
+use POSIX qw(getcwd);
+use warnings 'all';
+use strict;
+no strict 'subs';
+
+$| = 1;
+
+use vars qw($COM);
+
+BEGIN {
+   $COM = $0;
+   $COM =~ s/^.*\///;
+}
+
+our $VERSION;
+$VERSION='0.95';
+
+###############################################################################
+# PREREQUISITES
+###############################################################################
+
+use Encode;
+use Locale::VersionedMessages;
+use Locale::VersionedMessages::lm;
+use Tk;
+use Tk::ROText;
+use Locale::Country;
+use Locale::Language;
+use I18N::LangTags::Detect;
+
+###############################################################################
+# GLOBAL VARIABLES
+###############################################################################
+
+our $message_set      = 'lm_gui';
+our $default_locale   = "en_US";
+our $default_dir      = (-d "lib" ? "lib" : ".");
+our $default_height   = 400;
+our $default_width    = 600;
+
+our $font_family      = 'Helvetica';
+our $font_weight      = 'normal';    # medium bold ...
+our $font_slant       = 'roman';     # italic
+our $font_size        = '10';        # 8 12 ...
+
+###############################################################################
+# HELP
+###############################################################################
+
+=pod
+
+=head1 NAME
+
+lm_gui - simple GUI tool for managine Locale::VersionedMessages lexicons
+
+=head1 SYNOPSIS
+
+This tool can be used to maintain the lexicon files used by the
+Locale::VersionedMessages perl module.
+
+=head1 DESCRIPTION
+
+The Locale::VersionedMessages module allows translation tables (i.e. lexicons) for
+a set of message to be stored in perl modules to be used in a localized
+program.
+
+This tool allows you to create a new set of messages, add lexicons
+(i.e.  a lookup table for a locale), as well as add or update any
+of the messages in the lexicons.
+
+All messages should be entered (and will be stored) as UTF-8 text.  Other
+encodings are not currently supported.
+
+=head1 LOCALIZED MESSAGES
+
+This tool is localized using the Locale::VersionedMessages tools.  It should
+be noted that some of the messages contain markup (such as <b>...</b>).
+This markup is NOT part of Locale::Mesasages.  The markup is handled
+internally by this program to make the GUI more user friendly.
+
+=head1 KNOWN BUGS
+
+Because I use standard Tk widgets to create the GUI, some of the
+widgets do not exactly look like they ideally would.  For example
+when browsing for a Message Set Description file in the main window,
+a popup appears with a <File name> entry and a <Files of type> menu.
+Since we're only interested in .pm files, I would like to remove
+the <Files of type> box, but that widget won't allow me to do so.
+
+=head1 BUGS AND QUESTIONS
+
+Please refer to the Locale::VersionedMessages documentation for information on
+submitting bug reports or questions to the author.
+
+=head1 SEE ALSO
+
+Locale::VersionedMessages
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut
+
+###############################################################################
+# MAIN PROGRAM
+###############################################################################
+
+# Main window and Frame handling based slightly on a message by zentara:
+#   http://www.perlmonks.org/?node_id=677105
+# The main difference is that that posting kept creating new frames every
+# time you switched which represents a memory leak.  I create each frame once
+# and reuse it.
+
+our $lm            = new Locale::VersionedMessages;
+$lm->set($message_set);
+
+my @loc            = I18N::LangTags::Detect::detect();
+my @l;
+my %l;
+foreach my $loc (@loc) {
+   if ($loc =~ /^(..)\-(..)$/) {
+      my($lc,$cc) = (lc($1),uc($2));
+
+      my $l = "${lc}_$cc";
+      if (! exists $l{$l}) {
+         push(@l,$l);
+         $l{$l} = 1;
+      }
+
+      if (! exists $l{$lc}) {
+         push(@l,$lc);
+         $l{$lc} = 1;
+      }
+   }
+}
+
+if (@l) {
+   $lm->search(@l);
+}
+
+# $main_window     : Tk::Window
+# %widgets         : name => Widget  (all named widgets)
+# %data            : name => Value   (all data entered by user)
+#                      set           : message set
+#                      dire          : directory
+#                      loc           : locale to display
+#                      msgid         : message ID to display
+#                      wid,hei,x,y   : window dimensions
+#                      add           : 1 if we're adding a new message
+#                      lvu           : 0 or 1
+#                      ood           : 0 or 1
+# %set             : desc => Messages
+#                    def  => Locale
+#                    oth  => ( Locale => 1 )
+#                    lex  => ( Locale => Messages )
+
+our ($main_window,%widgets,%data,%set);
+our ($simp_re,$val_re,$end_re);
+
+# Create and pack the main window.
+
+$main_window  = MainWindow->new();
+$main_window->configure( -height  => $default_height,
+                         -width   => $default_width,
+                       );
+
+frame_select('select_operation');
+
+MainLoop;
+
+###############################################################################
+# MANAGE_SET WINDOW
+
+# Create the frame.
+#
+# Frame ->
+#   1)  [Left Frame]   [Right Frame]
+#
+# Left Frame ->
+#  L1)  Message set: SET
+#  L2)  listbox of message IDs
+#         sorted by message ID
+#         single select
+#         item background = yellow (if out-of-date in lexicon) or red (if missing)
+#  L3)  <Add Message>
+#
+# Right Frame ->
+#  R_Loc)  [Locale list]      ________ <Add Locale>
+#
+#  R_New)  Instructions
+#             Message ID: _________ *              (* = editable)
+#             Description: __________ *
+#             Substitution Values: __________ *
+#             Message Text: [textarea]
+#          <Submit>
+#
+#  R_Def)  Instructions
+#             Message ID: _________ *
+#             Description: __________ *
+#             Substitution Values: __________ *
+#             Message Text: [textarea] *
+#             Leave Version Unmodified: _
+#          <Submit>
+#
+#  R_Edit)  Instructions
+#             Message ID: _________
+#             Description: __________
+#             Substitution Values: __________
+#             Text in default lexicon: [ROText]
+#             Text in current lexicon: [textarea] *
+#             Mark out-of-date: _
+#          <Submit>
+#
+#  R_Exit) <Exit>
+#
+#  R_Err)  Error message
+#
+# We won't pack any of the widgets in the right frame because they'll vary
+# based on the operation.  We'll handle packing in manage_set_pack().
+#
+sub manage_set_create {
+   my $frame   = $main_window->Frame;
+   $widgets{'frame_manage_set'} = $frame;
+
+   my $submit       = $lm->message($message_set,'button: submit');
+   chomp($submit);
+   $submit          = decode('utf8',$submit);
+
+   my $cancel     = $lm->message($message_set,'button: cancel');
+   chomp($cancel);
+   $cancel        = decode('utf8',$cancel);
+
+   # 1  Frame
+
+   my $frame_left   = $frame->Frame()->pack( -padx   => 10,
+                                             -pady   => 10,
+                                             -side   => 'left',
+                                             -fill   => 'y',
+                                             -expand => 1,
+                                           );
+   my $frame_right  = $frame->Frame()->pack( -padx   => 10,
+                                             -pady   => 10,
+                                             -side   => 'right',
+                                             -fill   => 'y',
+                                             -expand => 1,
+                                           );
+   $widgets{'manage_set:frame_left'}  = $frame_left;
+   $widgets{'manage_set:frame_right'} = $frame_right;
+
+   # L1  Message set: SET
+
+   my $list_text    = $lm->message($message_set,'manage_set: msgid list',
+                                   'SET' => $data{'set'});
+   chomp($list_text);
+   $list_text       = decode('utf8',$list_text);
+
+   $frame_left->Label( -text => $list_text )
+              ->pack( -anchor  => 'nw',
+                      -fill    => 'none',
+                    );
+
+   # L1  [MsgID listbox]
+
+   my $msgid        = listbox_msgid_create($frame_left);
+   $msgid->pack( -pady    => 10,
+                 -anchor  => 'nw',
+                 -fill    => 'none',
+               );
+   $widgets{'manage_set:msgid'} = $msgid;
+
+   # L2  <Add Message>
+
+   my $add_message  = $lm->message($message_set,'button: add message');
+   chomp($add_message);
+   $add_message     = decode('utf8',$add_message);
+
+   $frame_left->Button( -text    => $add_message,
+                        -command =>
+                        sub {
+                           manage_set_add_message();
+                        }
+                      )
+              ->pack( -fill   => 'none',
+                      -pady   => 10,
+                      -anchor => 'ne',
+                    );
+
+   ########################################
+   # R_Loc
+
+   my $frame_r_loc  = $frame_right->Frame;
+   $widgets{'manage_set:frame_r_loc'}  = $frame_r_loc;
+
+   # R_Loc   [Locale list]
+
+   my @loc          = ($set{'def'},sort keys %{ $set{'oth'} });
+   my $loc_sel      = $frame_r_loc->Menubutton( -textvariable => \$data{'loc'},
+                                                -direction    => 'flush',
+                                                -relief       => 'raised',
+                                              );
+   my $loc_sel_m    = $loc_sel->Menu          ( -tearoff  => 0,
+                                              );
+   $loc_sel->configure( -menu => $loc_sel_m );
+
+   foreach my $l (@loc) {
+      $loc_sel_m->command( -label   => $l,
+                           -command => sub { $data{'loc'} = $l;
+                                             frame_select('manage_set');
+                                           },
+                         );
+   }
+
+   $loc_sel->pack( -side   => 'left',
+                   -anchor => 'w' );
+   $widgets{'manage_set:loc_sel'} = $loc_sel;
+   $widgets{'manage_set:loc_sel_m'} = $loc_sel_m;
+
+   # R_Loc   <Add Locale>
+
+   my $add_locale   = $lm->message($message_set,'button: add locale');
+   chomp($add_locale);
+   $add_locale      = decode('utf8',$add_locale);
+
+   $frame_r_loc->Button( -text    => $add_locale,
+                      -command =>
+                      sub {
+                         manage_set_add_locale();
+                      }
+                    )->pack( -side   => 'right',
+                             -anchor => 'e' );
+
+   # R_Loc   [entry]
+
+   my $loc_ent      = $frame_r_loc->Entry( -width      => 10,
+                                           -background => 'white' )
+                               ->pack( -side   => 'right',
+                                       -anchor => 'e' );
+   $widgets{'manage_set:loc_ent'} = $loc_ent;
+
+   ########################################
+   # R_New
+
+   my $frame_r_new  = $frame_right->Frame;
+   $widgets{'manage_set:frame_r_new'}  = $frame_r_new;
+
+   # R_New   Instructions
+
+   my $new_mess     = message_strip_newlines('manage_set: new mess instructions');
+   my $new_mess_i   = text_widget('ROText',$frame_r_new,8,0);
+   $new_mess_i->pack( -expand => 'yes',
+                      -fill   => 'both',
+                      -pady   => 10,
+                    );
+   insert_markup($new_mess_i,$new_mess);
+
+   # R_New   <table>
+
+   my $frame_r_new_1 = $frame_r_new->Frame->pack();
+
+   # R_New   Nessage ID: [entry]
+
+   my $new_msgid_text   = $lm->message($message_set,'manage_set: msgid');
+   chomp($new_msgid_text);
+   $new_msgid_text      = decode('utf8',$new_msgid_text);
+
+   my $new_msgid_label  = $frame_r_new_1->Label( -text => "$new_msgid_text:" );
+   $new_msgid_label->grid( -row => 1, -column => 1, -sticky => 'w' );
+
+   my $new_msgid_ent    = $frame_r_new_1->Entry( -width      => 50,
+                                                 -background => 'white' );
+   $new_msgid_ent->grid( -row => 1, -column => 2, -sticky => 'w' );
+   $widgets{'manage_set:new_msgid_ent'} = $new_msgid_ent;
+
+   # R_New   Substitution Values: [entry]
+
+   my $new_subst_text    = $lm->message($message_set,'manage_set: subst');
+   chomp($new_subst_text);
+   $new_subst_text       = decode('utf8',$new_subst_text);
+
+   my $new_subst_label   = $frame_r_new_1->Label( -text => "$new_subst_text:" );
+   $new_subst_label->grid( -row => 2, -column => 1, -sticky => 'w' );
+
+   my $new_subst_ent     = $frame_r_new_1->Entry( -width      => 50,
+                                                  -background => 'white' );
+   $new_subst_ent->grid( -row => 2, -column => 2, -sticky => 'w' );
+   $widgets{'manage_set:new_subst_ent'} = $new_subst_ent;
+
+   # R_New   Description: [entry]
+
+   my $new_desc_text    = $lm->message($message_set,'manage_set: desc');
+   chomp($new_desc_text);
+   $new_desc_text       = decode('utf8',$new_desc_text);
+
+   my $new_desc_label   = $frame_r_new_1->Label( -text => "$new_desc_text:" );
+   $new_desc_label->grid( -row => 3, -column => 1, -sticky => 'w' );
+
+   my $new_desc_ent     = text_widget('',$frame_r_new_1,3);
+   $new_desc_ent->grid( -row => 3, -column => 2, -sticky => 'w' );
+   $widgets{'manage_set:new_desc_ent'} = $new_desc_ent;
+
+   # R_New   Message: [entry]
+
+   my $new_def_text    = $lm->message($message_set,'manage_set: def');
+   chomp($new_def_text);
+   $new_def_text       = decode('utf8',$new_def_text);
+
+   my $new_def_label   = $frame_r_new_1->Label( -text => "$new_def_text:" );
+   $new_def_label->grid( -row => 4, -column => 1, -sticky => 'w' );
+
+   my $new_def_ent     = text_widget('',$frame_r_new_1,15);
+   $new_def_ent->grid( -row => 4, -column => 2, -sticky => 'w' );
+   $widgets{'manage_set:new_def_ent'} = $new_def_ent;
+
+   # R_New  <Submit> <Cancel>
+
+   my $frame_r_new_butt = $frame_r_new->Frame()->pack( -pady => 10 );
+
+   $frame_r_new_butt->Button( -text    => $submit,
+                              -command =>
+                              sub {
+                                 manage_set_submit_new();
+                              }
+                            )->pack( -side => 'left', -pady => 10 );
+
+   $frame_r_new_butt->Button( -text    => $cancel,
+                              -command =>
+                              sub {
+                                 manage_set_cancel_new();
+                              }
+                            )->pack( -side => 'right', -pady => 10 );
+
+   ########################################
+   # R_Def
+
+   my $frame_r_def  = $frame_right->Frame;
+   $widgets{'manage_set:frame_r_def'}  = $frame_r_def;
+
+   # R_Def   Instructions
+
+   my $def_mess     = message_strip_newlines('manage_set: def mess instructions');
+   my $def_mess_i   = text_widget('ROText',$frame_r_def,10,0);
+   $def_mess_i->pack( -expand => 'yes',
+                      -fill   => 'both',
+                      -pady   => 10,
+                    );
+   insert_markup($def_mess_i,$def_mess);
+
+   # R_Def   <table>
+
+   my $frame_r_def_1 = $frame_r_def->Frame->pack();
+
+   # R_Def   Nessage ID: [entry]
+
+   my $def_msgid_text   = $lm->message($message_set,'manage_set: msgid');
+   chomp($def_msgid_text);
+   $def_msgid_text      = decode('utf8',$def_msgid_text);
+
+   my $def_msgid_label  = $frame_r_def_1->Label( -text => "$def_msgid_text:" );
+   $def_msgid_label->grid( -row => 1, -column => 1, -sticky => 'w' );
+
+   my $def_msgid_ent    = $frame_r_def_1->Entry( -width      => 50,
+                                                 -background => 'white' );
+   $def_msgid_ent->grid( -row => 1, -column => 2, -sticky => 'w' );
+   $widgets{'manage_set:def_msgid_ent'} = $def_msgid_ent;
+
+   # R_Def   Substitution Values: [entry]
+
+   my $def_subst_text    = $lm->message($message_set,'manage_set: subst');
+   chomp($def_subst_text);
+   $def_subst_text       = decode('utf8',$def_subst_text);
+
+   my $def_subst_label   = $frame_r_def_1->Label( -text => "$def_subst_text:" );
+   $def_subst_label->grid( -row => 2, -column => 1, -sticky => 'w' );
+
+   my $def_subst_ent     = $frame_r_def_1->Entry( -width      => 50,
+                                                  -background => 'white' );
+   $def_subst_ent->grid( -row => 2, -column => 2, -sticky => 'w' );
+   $widgets{'manage_set:def_subst_ent'} = $def_subst_ent;
+
+   # R_Def   Description: [entry]
+
+   my $def_desc_text    = $lm->message($message_set,'manage_set: desc');
+   chomp($def_desc_text);
+   $def_desc_text       = decode('utf8',$def_desc_text);
+
+   my $def_desc_label   = $frame_r_def_1->Label( -text => "$def_desc_text:" );
+   $def_desc_label->grid( -row => 3, -column => 1, -sticky => 'w' );
+
+   my $def_desc_ent     = text_widget('',$frame_r_def_1,3);
+   $def_desc_ent->grid( -row => 3, -column => 2, -sticky => 'w' );
+   $widgets{'manage_set:def_desc_ent'} = $def_desc_ent;
+
+   # R_Def   Message: [entry]
+
+   my $def_def_text    = $lm->message($message_set,'manage_set: def');
+   chomp($def_def_text);
+   $def_def_text       = decode('utf8',$def_def_text);
+
+   my $def_def_label   = $frame_r_def_1->Label( -text => "$def_def_text:" );
+   $def_def_label->grid( -row => 4, -column => 1, -sticky => 'w' );
+
+   my $def_def_ent     = text_widget('',$frame_r_def_1,15);
+   $def_def_ent->grid( -row => 4, -column => 2, -sticky => 'w' );
+   $widgets{'manage_set:def_def_ent'} = $def_def_ent;
+
+   # R_Def   Leave Version Unmodified: _
+
+   my $def_lvu_text    = $lm->message($message_set,
+                                      'manage_set: leave version unmodified');
+   chomp($def_lvu_text);
+   $def_lvu_text       = decode('utf8',$def_lvu_text);
+
+   my $def_lvu_label   = $frame_r_def_1->Label( -text => "$def_lvu_text:" );
+   $def_lvu_label->grid( -row => 5, -column => 1, -sticky => 'w' );
+
+   my $def_lvu_chk     = $frame_r_def_1->Checkbutton( -variable => \$data{'lvu'} );
+   $def_lvu_chk->grid( -row => 5, -column => 2, -sticky => 'w' );
+
+   # R_Def  <Submit> <Cancel>
+
+   my $frame_r_def_butt = $frame_r_def->Frame()->pack( -pady => 10 );
+
+   $frame_r_def_butt->Button( -text    => $submit,
+                              -command =>
+                              sub {
+                                 manage_set_submit_def();
+                              }
+                            )->pack( -side => 'left', -pady => 10 );
+
+   $frame_r_def_butt->Button( -text    => $cancel,
+                              -command =>
+                              sub {
+                                 manage_set_cancel_def();
+                              }
+                            )->pack( -side => 'right', -pady => 10 );
+
+   ########################################
+   # R_Edit
+
+   my $frame_r_edit  = $frame_right->Frame;
+   $widgets{'manage_set:frame_r_edit'}  = $frame_r_edit;
+
+   # R_Edit   Instructions
+
+   my $edit_mess     = message_strip_newlines('manage_set: edit mess instructions');
+   my $edit_mess_i   = text_widget('ROText',$frame_r_edit,12,0);
+   $edit_mess_i->pack( -expand => 'yes',
+                       -fill   => 'both',
+                       -pady   => 10,
+                     );
+   insert_markup($edit_mess_i,$edit_mess);
+
+   # R_Edit   <table>
+
+   my $frame_r_edit_1 = $frame_r_edit->Frame->pack();
+
+   # R_Edit   Nessage ID: Value
+
+   my $edit_msgid_text   = $lm->message($message_set,'manage_set: msgid');
+   chomp($edit_msgid_text);
+   $edit_msgid_text      = decode('utf8',$edit_msgid_text);
+
+   my $edit_msgid_label  = $frame_r_edit_1->Label( -text => "$edit_msgid_text:" );
+   $edit_msgid_label->grid( -row => 1, -column => 1, -sticky => 'nw' );
+
+   my $edit_msgid_ent    = text_widget('ROText',$frame_r_edit_1,-1,0);
+   $edit_msgid_ent->grid( -row => 1, -column => 2, -sticky => 'nw' );
+   $widgets{'manage_set:edit_msgid_ent'} = $edit_msgid_ent;
+
+   # R_Edit   Substitution Values: Value
+
+   my $edit_subst_text    = $lm->message($message_set,'manage_set: subst');
+   chomp($edit_subst_text);
+   $edit_subst_text       = decode('utf8',$edit_subst_text);
+
+   my $edit_subst_label   = $frame_r_edit_1->Label( -text => "$edit_subst_text:" );
+   $edit_subst_label->grid( -row => 2, -column => 1, -sticky => 'nw' );
+
+   my $edit_subst_ent     = text_widget('ROText',$frame_r_edit_1,-1,0);
+   $edit_subst_ent->grid( -row => 2, -column => 2, -sticky => 'nw' );
+   $widgets{'manage_set:edit_subst_ent'} = $edit_subst_ent;
+
+   # R_Edit   Description: Value
+
+   my $edit_desc_text    = $lm->message($message_set,'manage_set: desc');
+   chomp($edit_desc_text);
+   $edit_desc_text       = decode('utf8',$edit_desc_text);
+
+   my $edit_desc_label   = $frame_r_edit_1->Label( -text => "$edit_desc_text:" );
+   $edit_desc_label->grid( -row => 3, -column => 1, -sticky => 'nw' );
+
+   my $edit_desc_ent     = text_widget('ROText',$frame_r_edit_1,-3,0);
+   $edit_desc_ent->grid( -row => 3, -column => 2, -sticky => 'nw' );
+   $widgets{'manage_set:edit_desc_ent'} = $edit_desc_ent;
+
+   # R_Edit   Def Message: [entry]
+
+   my $edit_def_text      = $lm->message($message_set,'manage_set: def');
+   chomp($edit_def_text);
+   $edit_def_text         = decode('utf8',$edit_def_text);
+
+   my $edit_def_label     = $frame_r_edit_1->Label( -text => "$edit_def_text:" );
+   $edit_def_label->grid( -row => 4, -column => 1, -sticky => 'nw' );
+
+   my $edit_def_ent       = text_widget('ROText',$frame_r_edit_1,15);
+   $edit_def_ent->grid( -row => 4, -column => 2, -sticky => 'nw' );
+   $widgets{'manage_set:edit_def_ent'} = $edit_def_ent;
+
+   # R_Edit   Curr Message: [entry]
+
+   my $edit_curr_text    = $lm->message($message_set,'manage_set: curr');
+   chomp($edit_curr_text);
+   $edit_curr_text       = decode('utf8',$edit_curr_text);
+
+   my $edit_curr_label   = $frame_r_edit_1->Label( -text => "$edit_curr_text:" );
+   $edit_curr_label->grid( -row => 5, -column => 1, -sticky => 'nw' );
+
+   my $edit_curr_ent     = text_widget('',$frame_r_edit_1,15);
+   $edit_curr_ent->grid( -row => 5, -column => 2, -sticky => 'nw' );
+   $widgets{'manage_set:edit_curr_ent'} = $edit_curr_ent;
+
+   # R_edit   Mark Out-of-Date: _
+
+   my $edit_ood_text    = $lm->message($message_set,
+                                      'manage_set: mark ood');
+   chomp($edit_ood_text);
+   $edit_ood_text       = decode('utf8',$edit_ood_text);
+
+   my $edit_ood_label   = $frame_r_edit_1->Label( -text => "$edit_ood_text:" );
+   $edit_ood_label->grid( -row => 6, -column => 1, -sticky => 'nw' );
+
+   my $edit_ood_val;
+   my $edit_ood_chk     = $frame_r_edit_1->Checkbutton( -variable =>
+                                                        \$data{'ood'} );
+   $edit_ood_chk->grid( -row => 6, -column => 2, -sticky => 'nw' );
+
+   # R_Edit  <Submit> <Cancel>
+
+   my $frame_r_edit_butt = $frame_r_edit->Frame()->pack( -pady => 10 );
+
+   $frame_r_edit_butt->Button( -text    => $submit,
+                              -command =>
+                              sub {
+                                 manage_set_submit_edit();
+                              }
+                            )->pack( -side => 'left', -pady => 10 );
+
+   $frame_r_edit_butt->Button( -text    => $cancel,
+                              -command =>
+                              sub {
+                                 manage_set_cancel_edit();
+                              }
+                            )->pack( -side => 'right', -pady => 10 );
+
+   ########################################
+   # R_Exit   <Exit>
+
+   my $frame_r_exit  = $frame_right->Frame;
+   $widgets{'manage_set:frame_r_exit'}  = $frame_r_exit;
+
+   my $exit          = $lm->message($message_set,'button: exit');
+   chomp($exit);
+   $exit             = decode('utf8',$exit);
+
+   $frame_r_exit->Button( -text    => $exit,
+                          -command =>
+                          sub {
+                             exit
+                          })->pack( -side => 'right', -padx => 20 );
+
+   ########################################
+   # R_Err   Error message
+
+   my $frame_r_err   = $frame_right->Frame;
+   $widgets{'manage_set:frame_r_err'}  = $frame_r_err;
+
+   my $err_msg       = text_widget('ROText',$frame_r_err,5,'err');
+   $err_msg->pack( -expand => 'yes',
+                   -fill   => 'both',
+                   -pady   => 10,
+                 );
+   $widgets{'manage_set:err'} = $err_msg;
+
+}
+
+# Clear/reset any data.
+#
+sub manage_set_clear {
+
+   # Load the lexicon if necessary.
+
+   if (! exists $set{'lex'}{$data{'loc'}}) {
+      $set{'lex'}{$data{'loc'}} =
+        Locale::VersionedMessages::lm::_lexicon_read($data{'set'},$data{'dire'},
+                                            $data{'loc'});
+   }
+
+   # Clear the 'Add Locale' window.
+
+   if ($data{'add'}) {
+
+      $widgets{'manage_set:new_msgid_ent'}->delete(0,'end');
+      $widgets{'manage_set:new_desc_ent'}->delete('1.0','end');
+      $widgets{'manage_set:new_subst_ent'}->delete(0,'end');
+      $widgets{'manage_set:new_def_ent'}->delete('1.0','end');
+
+      return;
+   }
+
+   # Handle all the other types of windows.
+
+   my $msgid = $data{'msgid'};
+   return  if (! $msgid);
+
+   my $def   = $set{'def'};
+   my $loc   = $data{'loc'};
+
+   if ($loc eq $def) {
+
+      # Default message
+
+      $widgets{'manage_set:def_msgid_ent'}->delete(0,'end');
+      $widgets{'manage_set:def_msgid_ent'}->insert('end',$msgid);
+
+      $widgets{'manage_set:def_desc_ent'}->delete('1.0','end');
+      $widgets{'manage_set:def_desc_ent'}->insert
+        ('end',decode('utf-8',$set{'desc'}{$msgid}{'desc'}));
+
+      $widgets{'manage_set:def_subst_ent'}->delete(0,'end');
+      $widgets{'manage_set:def_subst_ent'}->insert
+        ('end',join(' ',@{ $set{'desc'}{$msgid}{'vals'} }))
+          if ($set{'desc'}{$msgid}{'vals'});
+
+      $widgets{'manage_set:def_def_ent'}->delete('1.0','end');
+      $widgets{'manage_set:def_def_ent'}->insert
+        ('end',decode('utf-8',$set{'lex'}{$def}{$msgid}{'text'}));
+
+      $data{'lvu'} = 0;
+
+   } else {
+
+      # Current locale
+
+      $widgets{'manage_set:edit_msgid_ent'}->delete('1.0','end');
+      $widgets{'manage_set:edit_msgid_ent'}->insert('end',$msgid);
+
+      $widgets{'manage_set:edit_desc_ent'}->delete('1.0','end');
+      $widgets{'manage_set:edit_desc_ent'}->insert
+        ('end',decode('utf-8',$set{'desc'}{$msgid}{'desc'}));
+
+      $widgets{'manage_set:edit_subst_ent'}->delete('1.0','end');
+      $widgets{'manage_set:edit_subst_ent'}->insert
+        ('end',join(' ',@{ $set{'desc'}{$msgid}{'vals'} }))
+          if ($set{'desc'}{$msgid}{'vals'});
+
+      $widgets{'manage_set:edit_def_ent'}->delete('1.0','end');
+      $widgets{'manage_set:edit_def_ent'}->insert
+        ('end',$set{'lex'}{$def}{$msgid}{'text'});
+
+      $widgets{'manage_set:edit_curr_ent'}->delete('1.0','end');
+      $widgets{'manage_set:edit_curr_ent'}->insert
+        ('end',decode('utf-8',$set{'lex'}{$loc}{$msgid}{'text'}))
+          if (exists $set{'lex'}{$loc}{$msgid}  &&
+              $set{'lex'}{$loc}{$msgid}{'text'});
+
+      $data{'ood'} = 0;
+   }
+
+   # Clear the locale entry
+
+   $widgets{'manage_set:loc_ent'}->delete(0,'end');
+}
+
+# The <Add Locale> button was pressed.
+#
+sub manage_set_add_locale {
+   my $loc = $widgets{'manage_set:loc_ent'}->get;
+   chomp($loc);
+
+   # Make sure that the default locale was correctly specified.
+
+   my $err = check_locale($loc);
+   if ($err) {
+      frame_select('manage_set',$err);
+      return;
+   }
+
+   # Create the lexicon.
+
+   Locale::VersionedMessages::lm::_lexicon_create($data{'set'},$data{'dire'},$loc);
+   Locale::VersionedMessages::lm::_set_write($data{'set'},$data{'dire'},$set{'desc'},
+                                    $set{'def'},
+                                    sort(keys %{ $set{'oth'} },$loc));
+   $set{'oth'}{$loc} = 1;
+   $data{'loc'}      = $loc;
+
+   my @loc = ( $set{'def'}, sort(keys %{ $set{'oth'} }) );
+   my $loc_sel_m = $widgets{'manage_set:loc_sel_m'};
+   $loc_sel_m->delete(0,'end');
+   foreach my $l (@loc) {
+      $loc_sel_m->command( -label   => $l,
+                           -command => sub { $data{'loc'} = $l;
+                                             frame_select('manage_set');
+                                           },
+                         );
+   }
+
+   frame_select('manage_set');
+}
+
+# The <Cancel> button was pressed in a new message operation.
+#
+sub manage_set_cancel_new {
+   $data{'add'}   = 0;
+   my @msgid      = sort keys %{ $set{'desc'} };
+   $data{'msgid'} = $msgid[0];
+   frame_select('manage_set');
+}
+
+# The <Submit> button was pressed in a new message operation.
+#
+sub manage_set_submit_new {
+
+   # Make sure that the Message ID does not already exist and that
+   # the default text was entered.
+
+   my $msgid = $widgets{'manage_set:new_msgid_ent'}->get();
+   if (exists $set{'desc'}{$msgid}) {
+      my $err = $lm->message($message_set,'manage_set: new mess msgid err');
+      frame_select('manage_set',$err);
+      return;
+   }
+
+   my $desc = $widgets{'manage_set:new_desc_ent'}->get('1.0','end');
+   $desc    = ''  if (! $desc);
+   my $vals = $widgets{'manage_set:new_subst_ent'}->get();
+
+   my $text = $widgets{'manage_set:new_def_ent'}->get('1.0','end');
+   while (chomp($text)) {};
+
+   if (! $text) {
+      my $err = $lm->message($message_set,'manage_set: new mess def err');
+      frame_select('manage_set',$err);
+      return;
+   }
+
+   # Save the message.
+
+   my $loc = $set{'def'};
+   $set{'desc'}{$msgid}{'desc'} = $desc;
+   $set{'desc'}{$msgid}{'vals'} = [ split(/\s+/,$vals) ]  if ($vals);
+   Locale::VersionedMessages::lm::_set_write($data{'set'},$data{'dire'},$set{'desc'},
+                                    $loc,sort(keys %{ $set{'oth'} }));
+
+   $set{'lex'}{$set{'def'}}{$msgid} = { 'vers'  => 2,
+                                        'text'  => $text };
+   Locale::VersionedMessages::lm::_lexicon_write($data{'set'},$data{'dire'},$loc,
+                                        $set{'lex'}{$loc});
+
+   $data{'add'}   = 0;
+   $data{'msgid'} = $msgid;
+   frame_select('manage_set');
+}
+
+# The <Cancel> button was pressed in an edit default message operation.
+#
+sub manage_set_cancel_def {
+   frame_select('manage_set');
+}
+
+# The <Submit> button was pressed in a edit default message operation.
+#
+sub manage_set_submit_def {
+   my($lvu) = $data{'lvu'};
+
+   my $set  = 0;      # 1 if a change has been made to the set desc.
+   my @lex  = ();     # a list of changed lexicons
+   my $upd  = 0;      # 1 if we will increment the default version
+
+   # Has message ID changed?  If so, we'll need to change it in the
+   # set description AND in ALL the lexicons where it is defined.  This
+   # does not imply a new version of the message.
+
+   my $old  = $data{'msgid'};
+   my $new  = $widgets{'manage_set:def_msgid_ent'}->get();
+
+   if ($old ne $new) {
+
+      $set  = 1;
+      $set{'desc'}{$new} = $set{'desc'}{$old};
+      delete $set{'desc'}{$old};
+
+      foreach my $lex ($set{'def'},sort keys %{ $set{'oth'} }) {
+
+         # Load the lexicon if necessary.
+
+         if (! exists $set{'lex'}{$lex}) {
+            $set{'lex'}{$lex} =
+              Locale::VersionedMessages::lm::_lexicon_read($data{'set'},$data{'dire'},$lex);
+         }
+         if (exists $set{'lex'}{$old}) {
+            $set{'lex'}{$new} = $set{'lex'}{$old};
+            delete $set{'lex'}{$old};
+            push(@lex,$lex);
+         }
+      }
+
+      # Replace the items in the listbox
+
+      $widgets{'manage_set:msgid'}->delete(0,'end');
+      $widgets{'manage_set:msgid'}->insert('end',sort keys %{ $set{'desc'} });
+   }
+
+   # If the description has changed, change the set, but no lexicons need
+   # to be updated, and the version doesn't need to change.
+
+   $old     = $set{'desc'}{$data{'msgid'}}{'desc'};
+   $new     = $widgets{'manage_set:def_desc_ent'}->get('1.0','end');
+   $new     = encode('UTF-8',$new);
+
+   if ($old ne $new) {
+
+      $set  = 1;
+      $set{'desc'}{$data{'msgid'}}{'desc'} = $new;
+
+   }
+
+   # If the substitution values have changed, change the set.  We also MUST
+   # increment the version of the default message since all lexicons will have
+   # to be corrected.
+
+   $old     = (exists $set{'desc'}{$data{'msgid'}}{'vals'} ?
+               join(' ',@{ $set{'desc'}{$data{'msgid'}}{'vals'} }) : '');
+   $new     = $widgets{'manage_set:def_subst_ent'}->get();
+
+   if ($old ne $new) {
+
+      $set  = 1;
+      $upd  = 1;
+
+      if ($new) {
+         $set{'desc'}{$data{'msgid'}}{'vals'} = [ split(/\s+/,$new) ];
+      } else {
+         delete $set{'desc'}{$data{'msgid'}}{'vals'};
+      }
+
+      push(@lex,$data{'loc'})  if (! @lex);
+   }
+
+   # If the text of the default message has changed, change the default lexicon.
+   # Increment the version unless the <Leave Version Unchanged> checkbox was
+   # checked.  Ignore trailing newlines (which get added for some reason).
+
+   $old     = $set{'lex'}{$set{'def'}}{$data{'msgid'}}{'text'};
+   $new     = $widgets{'manage_set:def_def_ent'}->get('1.0','end');
+   $new     = encode('UTF-8',$new);
+   while (chomp($new)) {};
+   $new     = "$new\n";
+
+   if ($old ne $new) {
+
+      $upd  = 1  unless ($lvu);
+      $set{'lex'}{$set{'def'}}{$data{'msgid'}}{'text'} = $new;
+
+      push(@lex,$set{'def'})  if (! @lex);
+   }
+
+
+   # Save the set, if necessary.
+
+   if ($set) {
+      Locale::VersionedMessages::lm::_set_write($data{'set'},$data{'dire'},$set{'desc'},
+                                       $set{'def'},sort keys %{ $set{'oth'} });
+   }
+
+   if ($upd) {
+      $set{'lex'}{$set{'def'}}{$data{'msgid'}}{'vers'}++;
+      push(@lex,$set{'def'})  if (! @lex);
+   }
+
+   foreach my $lex (@lex) {
+      Locale::VersionedMessages::lm::_lexicon_write($data{'set'},$data{'dire'},$lex,
+                                           $set{'lex'}{$lex});
+   }
+
+   frame_select('manage_set');
+}
+
+# The <Cancel> button was pressed in a edit message operation.
+#
+sub manage_set_cancel_edit {
+   frame_select('manage_set');
+}
+
+# The <Submit> button was pressed in a edit message operation.
+#
+sub manage_set_submit_edit {
+   my($ood) = $data{'ood'};
+
+   # If the text of the message has changed, change the current lexicon.
+   # Set the version to the default version unless <Mark out-of-date>
+   # was checked, in which case set the version to be one less than the
+   # default version (regardless of what it was before).
+   #
+   # It is also allowed to mark the version as out-of-date without
+   # otherwise modifying it.
+
+   my $loc  = $data{'loc'};
+
+   my $old  = $set{'lex'}{$loc}{$data{'msgid'}}{'text'}
+     if (exists $set{'lex'}{$loc}{$data{'msgid'}});
+   $old     = ''  if (! $old);
+   my $new  = $widgets{'manage_set:edit_curr_ent'}->get('1.0','end');
+   while (chomp($new)) {};
+   $new     = "$new\n";
+   $new     = encode('UTF-8',$new);
+
+   return  if ($old eq $new  &&  ! $ood);
+
+   # Update the text, if it has changed.  Also, set the version.
+
+   if ($old ne $new) {
+      $set{'lex'}{$loc}{$data{'msgid'}}{'text'} = $new;
+   }
+
+   $set{'lex'}{$loc}{$data{'msgid'}}{'vers'} =
+     $set{'lex'}{$set{'def'}}{$data{'msgid'}}{'vers'};
+   $set{'lex'}{$loc}{$data{'msgid'}}{'vers'}--  if ($ood);
+
+   Locale::VersionedMessages::lm::_lexicon_write($data{'set'},$data{'dire'},$loc,
+                                        $set{'lex'}{$loc});
+
+   frame_select('manage_set');
+}
+
+# The <Add Message> button was pressed.
+#
+sub manage_set_add_message {
+
+   # Switch to default locale, with no message ID selected.
+
+   $data{'loc'}   = $set{'def'};
+   $data{'msgid'} = '';
+   $data{'add'}   = 1;
+
+   frame_select('manage_set');
+}
+
+sub manage_set_unpack {
+   # Since unpack is called before create, only unpack if the frame is
+   # already created.
+   return  if (! exists $widgets{'manage_set:frame_right'});
+
+   my $f = $widgets{'manage_set:frame_right'};
+
+   my @w = $f->packSlaves;
+   foreach my $wid (@w) {
+      $wid->packForget;
+   }
+}
+
+sub manage_set_pack {
+   my($err) = @_;
+
+   while (1) {
+
+      # If we're adding a new message, then the only frame we need
+      # is the new message frame.  All others get the locale frame.
+
+      if ($data{'add'}) {
+         $widgets{'manage_set:frame_r_new'}->pack( -fill => 'x', -expand => 1 );
+         $widgets{'manage_set:frame_r_exit'}->pack( -fill => 'x', -expand => 1 );
+         last;
+      }
+
+      # Add the locale list frame.
+
+      $widgets{'manage_set:frame_r_loc'}->pack( -fill => 'x', -expand => 1 );
+
+      # If no message is selected, we have created an empty
+      # locale.
+
+      if (! $data{'msgid'}) {
+         $widgets{'manage_set:frame_r_exit'}->pack( -fill => 'x', -expand => 1 );
+         last;
+      }
+
+      # Update the message ID list and locale list
+
+      listbox_msgid_update();
+
+      # Pack the appropriate frame.
+
+      if ($data{'loc'} eq $set{'def'}) {
+         $widgets{'manage_set:frame_r_def'}->pack( -fill => 'x', -expand => 1 );
+      } else {
+         $widgets{'manage_set:frame_r_edit'}->pack( -fill => 'x', -expand => 1 );
+      }
+      $widgets{'manage_set:frame_r_exit'}->pack( -fill => 'x', -expand => 1 );
+
+      last;
+   }
+
+   # Error message (if any)
+
+   if ($err) {
+      my $w = $widgets{'manage_set:err'};
+      $w->delete('1.0','end');
+      insert_markup($w,$err);
+      $widgets{'manage_set:frame_r_err'}->pack( -fill => 'x', -expand => 1 );
+   }
+}
+
+###############################################################################
+# MSGID LISTBOX
+
+# This creates a scrolled listbox widget containing all of the message
+# IDs, one per line.
+#
+sub listbox_msgid_create {
+   my($frame) = @_;
+
+   # Read the set description
+
+   if (! exists $set{'desc'}) {
+      my($set_messages,$def_locale,@oth_locale) =
+        Locale::VersionedMessages::lm::_set_read($data{'set'},$data{'dire'});
+      $set{'desc'} = $set_messages;
+      $set{'def'}  = $def_locale;
+      $set{'oth'}  = { map {$_,1} @oth_locale };
+      $data{'loc'} = $def_locale;
+   }
+
+   # Create the widget
+
+   my $w = $frame->Scrolled( 'Listbox',
+                             -setgrid    => 1,
+                             -background => 'light gray',
+                             -selectmode => 'single',
+                             -width      => 30,
+                             -height     => 30,
+                             -scrollbars => 'se',
+                             -exportselection => 0
+                           );
+   $w->bind('<<ListboxSelect>>' =>
+            sub {
+               my @sel        = $w->curselection;
+               my @msgid      = sort keys %{ $set{'desc'} };
+               $data{'msgid'} = $msgid[$sel[0]];
+               frame_select('manage_set');
+            }
+           );
+
+   my @msgid = sort keys %{ $set{'desc'} };
+   if (@msgid) {
+      $w->insert('end',@msgid);
+      $data{'msgid'} = $msgid[0];
+   }
+
+   return $w;
+}
+
+# Update the listbox widget.  Set the background color for all items, and
+# update the selection.
+#
+sub listbox_msgid_update {
+
+   my $w     = $widgets{'manage_set:msgid'};
+   $w->delete(0,'end');
+   my @msgid = sort keys %{ $set{'desc'} };
+   return  if (! @msgid);
+
+   $w->insert('end',@msgid);
+
+   my $i     = 0;
+   my %msgid = map { $_,$i++ } @msgid;
+
+   # Update the background colors
+
+   my $def   = $set{'def'};
+   my $loc   = $data{'loc'};
+
+   if ($loc eq $def) {
+
+      # In default locale, everything is gray
+
+      for (my $i=0; $i<=$#msgid; $i++) {
+         $w->itemconfigure($i,
+                           -background       => '#bbbbbb',
+                           -foreground       => 'black',
+                           -selectbackground => '#ececec',
+                           -selectforeground => 'black',
+                          );
+      }
+
+   } else {
+
+      # In other locale, up-to-date is gray, out-of-date is yellow,
+      # missing is red.
+
+      for (my $i=0; $i<=$#msgid; $i++) {
+         my $msgid = $msgid[$i];
+
+         my $miss  = 0;
+         my $ood   = 0;
+
+         if (! exists $set{'lex'}{$loc}  ||
+             ! exists $set{'lex'}{$loc}{$msgid}) {
+            $miss  = 1;
+         } else {
+            my $def_v = $set{'lex'}{$def}{$msgid}{'vers'};
+            my $loc_v = $set{'lex'}{$loc}{$msgid}{'vers'};
+            $ood      = 1  if ($def_v != $loc_v);
+         }
+
+         $w->itemconfigure($i,
+                           -background       => ($miss ? '#ffaaaa' :
+                                                 ($ood ? '#ffffaa' :
+                                                         'light gray')),
+                           -foreground       => 'black',
+                           -selectbackground => ($miss ? '#ff7777' :
+                                                 ($ood ? '#ffff77' :
+                                                         '#ececec')),
+                           -selectforeground => 'black',
+                          );
+      }
+
+   }
+
+   # Update the selection
+
+   $w->selectionClear(0,'end');
+   if ($data{'msgid'}) {
+      $i        = $msgid{$data{'msgid'}};
+      $w->selectionSet($i);
+   }
+}
+
+# Insert a new message ID into the msgid listbox.
+#
+sub listbox_msgid_insert {
+
+   my $w     = $widgets{'manage_set:msgid'};
+   my $msgid = $data{'msgid'};
+   my @msgid = sort(keys %{ $set{'desc'} },$msgid);
+
+   my $i;
+   if (@msgid == 1) {
+      $w->insert('end',$msgid);
+      $i = 0;
+
+   } else {
+      for ($i=0; $i<=$#msgid; $i++) {
+         last  if ($msgid[$i] eq $msgid);
+      }
+      $w->insert($i,$msgid);
+   }
+}
+
+###############################################################################
+# CREATE_SET WINDOW
+
+# Create the frame.
+#
+# Frame->
+#  1)  Create a new message set.
+#
+#  2)  Default Locale: ______
+#
+#  3)  <SUBMIT>  <EXIT>
+#
+sub create_set_create {
+   my $frame   = $main_window->Frame;
+   $widgets{'frame_create_set'} = $frame;
+
+   # 1  Instructions
+
+   my $mess       = message_strip_newlines('create_set: instructions');
+   my $inst       = text_widget('ROText',$frame,5,0);
+   $inst->pack( -expand => 'yes',
+                -fill   => 'both',
+                -padx   => 10,
+                -pady   => 10,
+              );
+   insert_markup($inst,$mess);
+
+   # 2  Frame
+
+   my $frame_2    = $frame->Frame()->pack( -pady => 10 );
+
+   # 2a  Locale:
+
+   my $loc_text   = $lm->message($message_set,'create_set: locale');
+   chomp($loc_text);
+   $loc_text      = decode('utf8',$loc_text);
+
+   my $loc_label  = $frame_2->Label( -text => "$loc_text:" )
+                            ->pack( -side => 'left' );
+
+   # 2b  [entry]
+
+   my $loc_ent    = $frame_2->Entry( -width      => 10,
+                                     -background => 'white' )
+                            ->pack( -side => 'left' );
+   $loc_ent->insert(0,$default_locale);
+
+   # 3   Frame
+
+   my $frame_3    = $frame->Frame()->pack( -pady => 10 );
+
+
+   # 3a  <Submit>
+
+   my $submit     = $lm->message($message_set,'button: submit');
+   chomp($submit);
+   $submit        = decode('utf8',$submit);
+
+   $frame_3->Button( -text    => $submit,
+                     -command =>
+                     sub {
+                        create_set_submit();
+                     })->pack( -side => 'left', -padx => 20 );
+
+   # 3b  <Exit>
+
+   my $exit       = $lm->message($message_set,'button: exit');
+   chomp($exit);
+   $exit          = decode('utf8',$exit);
+
+   $frame_3->Button( -text    => $exit,
+                     -command =>
+                     sub {
+                        exit
+                     })->pack( -side => 'right', -padx => 20 );
+
+   # Widgets to save
+
+   $widgets{'create_set:loc'} = $loc_ent;
+}
+
+# Clear data.
+#
+sub create_set_clear {
+   $widgets{'create_set:loc'}->delete(0,'end');
+   $widgets{'create_set:loc'}->insert(0,$default_locale);
+}
+
+# Pressed <Submit> in the create_set window.
+#
+sub create_set_submit {
+   my $loc = $widgets{'create_set:loc'}->get;
+   chomp($loc);
+
+   # Make sure that the default locale was correctly specified.
+
+   my $err = check_locale($loc);
+   if ($err) {
+      frame_select('create_set',$err);
+      return;
+   }
+
+   # Create the set.
+
+   Locale::VersionedMessages::lm::_set_create($data{'set'},$data{'dire'},$loc);
+   Locale::VersionedMessages::lm::_lexicon_create($data{'set'},$data{'dire'},$loc);
+
+   frame_select('manage_set');
+}
+
+sub create_set_unpack {
+   # Nothing to else to do beyond unpacking the main window.
+}
+
+sub create_set_pack {
+   my($err) = @_;
+   err_frame($main_window,'main_err',$err)  if ($err);
+}
+
+# This checks a locale to see if it is valid.  If not, it returns an
+# error.
+#
+sub check_locale {
+   my($loc) = @_;
+
+   # Malformed locale error
+   my $err  = $lm->message($message_set,'create_set: loc err');
+
+   return $err  if (! $loc);
+
+   my %lc = map { lc($_) => 1 } all_language_codes();
+   my %cc = map { uc($_) => 1 } all_country_codes();
+
+   my ($lc,$cc);
+   if ($loc =~ /^[A-Za-z][A-Za-z]$/) {
+      return $err  if (! exists $lc{$loc});
+
+   } elsif ($loc =~ /^([A-Za-z][A-Za-z])_([A-Za-z][A-Za-z])$/) {
+      my($lc,$cc) = ($1,$2);
+      return $err if (! exists $lc{$lc}  ||
+                      ! exists $cc{$cc});
+
+   } else {
+      return $err;
+   }
+
+   return  if (! $set{'def'});    # We're creating a new set
+
+   if ($set{'def'} eq $loc  ||
+       exists $set{'oth'}{$loc}) {
+      return $lm->message($message_set,'manage_set: dupl loc err');
+   }
+
+   return;
+}
+
+###############################################################################
+# SELECT_OPERATION WINDOW
+
+# Clear data.
+#
+sub select_operation_clear {
+   $widgets{'select_operation:dire'}->delete(0,'end');
+   $widgets{'select_operation:set'}->delete(0,'end');
+   $widgets{'select_operation:desc'}->delete(0,'end');
+}
+
+# Create the frame.
+#
+# Frame->
+#  1)  This can be used to manage an existing message set, or
+#      create a new one.
+#
+#  2)  Select Directory: _______ <BROWSE>
+#  3)  Message Set:      _______
+#
+#  4)  Or you can select an existing message set directly:
+#
+#  5)  Message Set Description: ______ <BROWSE>
+#
+#  6)  <SUBMIT>   <EXIT>
+#
+sub select_operation_create {
+   my $frame        = $main_window->Frame;
+   $widgets{'frame_select_operation'} = $frame;
+
+   # 1  Instructions
+
+   my $mess_1       = message_strip_newlines('select_operation: instructions_1');
+   my $inst_1       = text_widget('ROText',$frame,18,0);
+   $inst_1->pack( -expand => 'yes',
+                  -fill   => 'both',
+                  -pady   => 10,
+                  -padx   => 10,
+                );
+   insert_markup($inst_1,$mess_1);
+
+   # 2/3  Grid
+
+   my $frame_2      = $frame->Frame()->pack( -padx => 10,
+                                             -pady => 10,
+                                           );
+
+   # 2a  Select directory:
+
+   my $dire_text    = $lm->message($message_set,'select_operation: directory');
+   chomp($dire_text);
+   $dire_text       = decode('utf8',$dire_text);
+
+   my $dire_label   = $frame_2->Label( -text => "$dire_text:" );
+   $dire_label->grid( -row    => 1,
+                      -column => 1,
+                      -sticky => 'w' );
+
+   # 2b  [entry]
+
+   my $dire_ent     = $frame_2->Entry( -width      => 30,
+                                       -background => 'white' );
+   $dire_ent->grid( -row    => 1,
+                    -column => 2,
+                    -sticky => 'w' );
+
+   # 2c  <Browse>
+
+   my $browse       = $lm->message($message_set,'button: browse');
+   chomp($browse);
+   $browse          = decode('utf8',$browse);
+
+   my $dire_browse  = $frame_2->Button( -text    => $browse,
+                                        -command =>
+                                        sub {
+                                           select_operation_dire();
+                                        } );
+   $dire_browse->grid( -row    => 1,
+                       -column => 3,
+                       -sticky => 'w' );
+
+   # 3a  Message set:
+
+   my $set_text     = $lm->message($message_set,'select_operation: set');
+   chomp($set_text);
+   $set_text        = decode('utf8',$set_text);
+
+   my $set_label    = $frame_2->Label( -text => "$set_text:" );
+   $set_label->grid( -row    => 2,
+                     -column => 1,
+                     -sticky => 'w' );
+
+   # 3b  [entry]
+
+   my $set_ent      = $frame_2->Entry( -width => 30,
+                                       -background => 'white' );
+   $set_ent->grid( -row    => 2,
+                   -column => 2,
+                   -sticky => 'w' );
+
+   # 4  Instructions
+
+   my $mess_2       = message_strip_newlines('select_operation: instructions_2');
+   my $inst_2       = text_widget('ROText',$frame,5,0);
+   $inst_2->pack( -expand => 'yes',
+                  -fill   => 'both',
+                  -padx   => 10,
+                  -pady   => 10,
+                );
+   insert_markup($inst_2,$mess_2);
+
+   # 5  Grid
+
+   my $frame_5      = $frame->Frame()->pack( -pady => 10,
+                                             -padx => 10,
+                                           );
+
+   # 5a  Description:
+
+   my $desc_text    = $lm->message($message_set,'select_operation: description');
+   chomp($desc_text);
+   $desc_text       = decode('utf8',$desc_text);
+
+   my $desc_label   = $frame_5->Label( -text => "$desc_text:" );
+   $desc_label->grid( -row    => 1,
+                      -column => 1,
+                      -sticky => 'w' );
+
+   # 5b  [entry]
+
+   my $desc_ent     = $frame_5->Entry( -width => 30,
+                                       -background => 'white' );
+   $desc_ent->grid( -row    => 1,
+                    -column => 2,
+                    -sticky => 'w' );
+
+   # 5c  <Browse>
+
+   my $desc_browse  = $frame_5->Button( -text    => $browse,
+                                        -command =>
+                                        sub {
+                                           select_operation_desc();
+                                        } );
+   $desc_browse->grid( -row    => 1,
+                       -column => 3,
+                       -sticky => 'w' );
+
+   # 6   Frame
+
+   my $frame_6      = $frame->Frame()->pack( -pady => 10,
+                                             -padx => 10,
+                                           );
+
+
+   # 6a  <Submit>
+
+   my $submit       = $lm->message($message_set,'button: submit');
+   chomp($submit);
+   $submit          = decode('utf8',$submit);
+
+   $frame_6->Button( -text    => $submit,
+                     -command =>
+                     sub {
+                        select_operation_submit();
+                     })->pack( -side => 'left', -padx => 20 );
+
+   # 6b  <Exit>
+
+   my $exit         = $lm->message($message_set,'button: exit');
+   chomp($exit);
+   $exit            = decode('utf8',$exit);
+
+   $frame_6->Button( -text    => $exit,
+                     -command =>
+                     sub {
+                        exit
+                     })->pack( -side => 'right', -padx => 20 );
+
+   # Widgets to save
+
+   $widgets{'select_operation:dire'} = $dire_ent;
+   $widgets{'select_operation:set'}  = $set_ent;
+   $widgets{'select_operation:desc'} = $desc_ent;
+}
+
+# Pressed <Browse> next to Description.
+#
+sub select_operation_desc {
+   my $ent   = $widgets{'select_operation:desc'};
+   my @types = (['Perl modules', '.pm']);
+   my $file  = $main_window->getOpenFile( -filetypes => \@types );
+   if (defined $file and $file ne '') {
+      $ent->delete(0, 'end');
+      $ent->insert(0, $file);
+      $ent->xview('end');
+   }
+}
+
+# Pressed <Browse> next to Directory.
+#
+sub select_operation_dire {
+   my $ent   = $widgets{'select_operation:dire'};
+   my $dir = $main_window->chooseDirectory;
+   if (defined $dir  &&  $dir ne '') {
+      $ent->delete(0, 'end');
+      $ent->insert(0, $dir);
+      $ent->xview('end');
+   }
+}
+
+# Pressed <Submit> in the select_operation window.
+#
+sub select_operation_submit {
+   my $dire = $widgets{'select_operation:dire'}->get;
+   my $set  = $widgets{'select_operation:set'}->get;
+   my $desc = $widgets{'select_operation:desc'}->get;
+   chomp($dire);
+   chomp($set);
+   chomp($desc);
+
+   # Make sure the data is valid.
+
+   if      ( ($dire    &&  ! $set)  ||
+             (! $dire  &&  $set)  ||
+             ($dire    &&  $desc) ) {
+      my $err = $lm->message($message_set,'select_operation: err');
+      frame_select('select_operation',$err);
+      return;
+   }
+
+   if ($desc) {
+      # Description file entered
+
+      if ($desc =~ /^(.*)\/Locale\/VersionedMessages\/Sets\/([A-Za-z0-9_]+)\.pm$/) {
+         ($dire,$set) = ($1,$2);
+      } else {
+         my $err = $lm->message($message_set,'select_operation: desc err');
+         frame_select('select_operation',$err);
+         return;
+      }
+
+   } elsif ($set) {
+      # Dire/set entered
+      if ($set !~ /^([A-Za-z0-9_]+)$/) {
+         my $err = $lm->message($message_set,'select_operation: set err');
+         frame_select('select_operation',$err);
+         return;
+      }
+
+   } else {
+      # Nothing entered
+      frame_select('select_operation');
+      return;
+   }
+
+   # Save the data
+
+   $data{'set'}  = $set;
+   $data{'dire'} = $dire;
+
+   if (-f "$dire/Locale/VersionedMessages/Sets/$set.pm") {
+      frame_select('manage_set');
+   } else {
+      frame_select('create_set');
+   }
+}
+
+sub select_operation_unpack {
+   # Nothing to else to do beyond unpacking the main window.
+}
+
+sub select_operation_pack {
+   my($err) = @_;
+   err_frame($main_window,'main_err',$err)  if ($err);
+}
+
+###############################################################################
+# TEXT OPERATION
+
+# This is based on DisText in:
+#   http://members.inode.at/w.laun/cookbook/cookbook.html
+#
+# Supported marks:                              Default     Other
+#    <family FAMILY>...</family>       FAMILY = Helvetica   Courier, Times, ...
+#    <size SIZE>...</size>             SIZE   = 12          8, 10, 14, ...
+#    <weight WEIGHT>...</weight>       WEIGHT = normal      bold
+#    <slant SLANT>...</slant>          SLANT  = roman       italic
+#    <underline>...</underline>
+#    <overstrike>...</overstrike>
+#    <background COLOR>...</background>
+#    <foreground COLOR>...</foreground>
+#    <border>...</border>
+#
+# Shortcuts:
+#    <b>...</b>          <weight bold>
+#    <i>...</i>          <slant italic>
+#    <u>...</u>          <underline>
+#    <o>...</o>          <overstrike>
+#    <bg COLOR>...</bg>
+#    <fg COLOR>...</fg>
+#
+# This inserts marked up text into a text widget.
+#
+sub insert_markup {
+   my($widget,$text,$resize) = @_;
+   $text         = decode('utf-8',$text);
+
+   #
+   # Create a series of regexps that matches all tags.  We only need to
+   # do this once.
+   #
+
+   if (! $simp_re) {
+      my @simp   = qw(b i u o underline overstrike border);
+      my @val    = qw(family size weight slant fg bg foreground background);
+
+      my $simp   = join('|',@simp);
+      my $val    = join('|',@val);
+      my $all    = join('|',@simp,@val);
+
+      $simp_re   = '<\s*(' . $simp . ')\s*>';
+      $simp_re   = qr/$simp_re/is;
+
+      $val_re    = '<\s*(' . $val . ')\s+([^>]+?)\s*>';
+      $val_re    = qr/$val_re/is;
+
+      $end_re    = '<\s*/\s*(' . $all . ')\s*>';
+      $end_re    = qr/$end_re/is;
+   }
+
+   #
+   # Keep track of all tags that currently apply to the text.  Create
+   # the basic font tag.
+   #
+
+   my $tag       = 't000000';
+   my %taglist;
+
+   new_tag($widget,\$tag,\%taglist,0,'font');
+
+   #
+   # Look for TAGs in the text.
+   #
+
+   while ($text) {
+      my($t,$end,$type,$val);
+      if      ($text =~ s/^(.*?)(?:$simp_re|$val_re|$end_re)//s) {
+         my($tt,$simp_type,$val_type,$val_val,$end_type) = ($1,$2,$3,$4,$5);
+         $t = $tt;
+         if ($simp_type) {
+            $type = $simp_type;
+         } elsif ($val_type) {
+            ($type,$val) = ($val_type,$val_val);
+         } elsif ($end_type) {
+            ($type,$end) = ($end_type,1);
+         }
+      } else {
+         $t = $text;
+         $text = '';
+      }
+      if ($t) {
+         my @taglist = taglist(\%taglist);
+         $widget->insert('end',$t,[@taglist]);
+      }
+      if ($type) {
+         new_tag($widget,\$tag,\%taglist,$end,lc($type),$val);
+      }
+   }
+}
+
+# This returns a list of all tags that apply to current text insertions.
+#
+sub taglist {
+   my($taglist) = @_;
+   my @taglist;
+   foreach my $type (keys %$taglist) {
+      push(@taglist,@{ $$taglist{$type} });
+   }
+   return @taglist;
+}
+
+# When inserting text with markup, any time you encounter a <TAG> you have to
+# create a new markup tag that will be applied to future inserts.  When you
+# encounter a </TAG>, you have to remove one of the existing tags.
+#
+# Text will be inserted into the widget ($w).  Although the insert
+# isn't done here, we need the widget in order to create tags for it.
+#
+# Tags will be named $$tag (which is of the form 't000001') and stored
+# in %$taglist.
+#
+# $end is 1 if </TAG> was encountered.
+#
+# $type is TAG.  $val is the value for those tags of the form <TAG VAL>.
+#
+sub new_tag {
+   my($w,$tag,$taglist,$end,$type,$val) = @_;
+
+   #
+   # Some of the most commonly used tags have aliases.  Handle them here.
+   #
+
+   if      ($type eq 'b') {
+      $type = 'weight';
+      $val  = 'bold';
+
+   } elsif ($type eq 'i') {
+      $type = 'slant';
+      $val  = 'italic';
+
+   } elsif ($type eq 'u') {
+      $type = 'underline';
+
+   } elsif ($type eq 'o') {
+      $type = 'overstrike';
+
+   } elsif ($type eq 'fg') {
+      $type = 'forground';
+
+   } elsif ($type eq 'bg') {
+      $type = 'background';
+   }
+
+   #
+   # If we encountered an end tag: </TAG>
+   #
+
+   if ($end) {
+      if (exists $$taglist{$type}) {
+         pop @{ $$taglist{$type} };
+      }
+      return;
+   }
+
+   #
+   # Create a new tag
+   #
+
+   $$tag++;
+   if      ($type eq 'font') {
+
+      # font : is special (only used for the initial font setup).  It has
+      #        no value.  Use all default values.
+
+      my $font = $main_window->fontCreate(-family     => $font_family,
+                                          -weight     => $font_weight,
+                                          -slant      => $font_slant,
+                                          -size       => $font_size,
+                                         );
+      $w->tagConfigure($$tag,-font => $font);
+
+   } elsif ($type eq 'family') {
+
+      my $font = $main_window->fontCreate(-family     => $val,
+                                          -weight     => $font_weight,
+                                          -slant      => $font_slant,
+                                          -size       => $font_size,
+                                         );
+      $w->tagConfigure($$tag,-font => $font);
+
+   } elsif ($type eq 'weight') {
+
+      my $font = $main_window->fontCreate(-family     => $font_family,
+                                          -weight     => $val,
+                                          -slant      => $font_slant,
+                                          -size       => $font_size,
+                                         );
+      $w->tagConfigure($$tag,-font => $font);
+
+   } elsif ($type eq 'slant') {
+
+      my $font = $main_window->fontCreate(-family     => $font_family,
+                                          -weight     => $font_weight,
+                                          -slant      => $val,
+                                          -size       => $font_size,
+                                         );
+      $w->tagConfigure($$tag,-font => $font);
+
+   } elsif ($type eq 'size') {
+
+      my $font = $main_window->fontCreate(-family     => $font_family,
+                                          -weight     => $font_weight,
+                                          -slant      => $font_slant,
+                                          -size       => $val,
+                                         );
+      $w->tagConfigure($$tag,-font => $font);
+
+   } elsif ($type eq 'underline') {
+
+      $w->tagConfigure($$tag,  -underline  => 1);
+
+   } elsif ($type eq 'overstrike') {
+
+      $w->tagConfigure($$tag,  -overstrike  => 1);
+
+   } elsif ($type eq 'background') {
+
+      $w->tagConfigure($$tag,  -background  => $val);
+
+   } elsif ($type eq 'foreground') {
+
+      $w->tagConfigure($$tag,  -foreground  => $val);
+
+   } elsif ($type eq 'border') {
+
+      $w->tagConfigure($$tag,  -borderwidth  => 2,
+                               -relief       => 'raised');
+   }
+
+   #
+   # Store this tag in the current tag list.
+   #
+
+   if (! exists $$taglist{$type}) {
+      $$taglist{$type} = [$$tag];
+   } else {
+      push @{ $$taglist{$type} },$$tag;
+   }
+}
+
+# This looks up text in the lexicon and removes extraneous newlines.  Between
+# paragraphs, there will be a blank line, but each paragraph is a single line
+# of text.
+#
+sub message_strip_newlines {
+   my($name)         = @_;
+   my $text          = $lm->message($message_set,$name);
+   my @text          = split(/\n/,$text);
+   $text             = '';
+   my $in_paragraph  = 0;
+   while (@text) {
+      my $line       = shift(@text);
+      if ($line  &&  $in_paragraph) {
+         # Text = "We are in the middle"
+         # Line = "of a paragraph."
+         $text      .= " $line";
+         $in_paragraph = 1;
+
+      } elsif ($line) {
+         # Text = "End of previous paragraph.\n\n"
+         # Line = "Start of new paragraph."
+         $text      .= $line;
+         $in_paragraph = 1;
+
+      } elsif ($in_paragraph) {
+         # Text = "We are at the end of the paragraph."
+         # Line = ""
+         $text      .= "\n\n";
+         $in_paragraph = 0;
+
+      } else {
+         # Text = "End of previous paragraph.\n\n"
+         # Line = ""
+         $in_paragraph = 0;
+      }
+   }
+   if ($in_paragraph) {
+      $text .= "\n";
+   }
+
+   return $text;
+}
+
+###############################################################################
+# BASIC WIDGET CREATION
+
+# Adds a ROText widget to a container widget ($parent) and returns the
+# ROText widget.
+#
+# If $height < 0, no scrollbar
+# If $height > 0, scrollbar
+# If $height = 0, (currently not used)
+#
+sub text_widget {
+   my($rotext,$parent,$height,$err) = @_;
+
+   my $w;
+
+   my @opts = ( -setgrid     => 1,
+                -spacing2    => 0,
+                -wrap        => 'word',
+                -borderwidth => 0,
+                -relief      => 'flat',
+              );
+
+   if ($height < 0) {
+      if ($rotext) {
+         $w = $parent->ROText  ( @opts,
+                                 -height      => -$height,
+                               );
+      } else {
+         $w = $parent->Text    ( @opts,
+                                 -height      => -$height,
+                               );
+      }
+
+   } elsif ($height > 0) {
+      $w = $parent->Scrolled( ($rotext ? 'ROText': 'Text'),
+                              @opts,
+                              -height      => $height,
+                              -scrollbars  => 're',
+                            );
+
+   } else {
+      # Unused... will be for widgets to automatically determine
+      # a static height (no scrollbar).
+
+      if ($rotext) {
+         $w = $parent->ROText  ( @opts );
+      } else {
+         $w = $parent->Text    ( @opts );
+      }
+   }
+
+   if ($err) {
+      $w->configure(          -bg         => '#FF9999');
+   } elsif (! $rotext) {
+      $w->configure(          -bg         => 'white');
+   }
+   return $w;
+}
+
+###############################################################################
+# FRAME OPERATIONS
+
+# This serves two purposes.  It creates (and packs) the error frame if
+# it does not already exist.
+#
+# It also updates the message displayed in the error frame.  If $mess
+# is passed in, it will be displayed.  Otherwise any error message will
+# be cleared and the frame will be unpacked.
+#
+sub err_frame {
+   my($parent,$label,$mess) = @_;
+
+   # Get the text widget that contains the actual error message
+
+   my ($err_wid,$err_frame);
+   if (exists $widgets{'err'}) {
+      $err_frame               = $widgets{$label};
+      $err_wid                 = $widgets{"${label}_wid"};
+   } else {
+      $err_frame               = $parent->Frame;
+      $err_wid                 = text_widget('ROText',$err_frame,5,'err');
+      $err_wid->pack( -expand => 'yes',
+                      -fill   => 'both',
+                      -padx   => 10,
+                      -pady   => 10,
+                    );
+      $widgets{$label}         = $err_frame;
+      $widgets{"${label}_wid"} = $err_wid;
+   }
+
+   # Display the new error message (overwriting any existing one).
+
+   $err_wid->delete('1.0','end');
+   my $tmp = $lm->message($message_set,'error');
+   insert_markup($err_wid,"$tmp\n$mess");
+
+   $err_frame->pack();
+}
+
+# This displays the given frame.  It unpacks the current frame, display
+# the error frame (as appropriate), clears the new frame, and displays it.
+# The main window title is also updated.
+#
+sub frame_select {
+   my($frame,$err) = @_;
+
+   # Unpack the main window.
+
+   unpack_main($frame);
+
+   # Set the title on the main window
+
+   my $title = $lm->message($message_set,"$frame: window title", "COM" => $COM);
+   $title    = $frame  if (! $title);
+   chomp($title);
+
+   $main_window->configure( -title   => $title, );
+
+   # If the new frame does not yet exist, we need to create it.
+   #
+   # If it does exist, then we just need to clear it.
+
+   if (! exists $widgets{"frame_$frame"}) {
+      frame_create($frame);
+   }
+   frame_clear($frame);
+
+   # Display the new frame.
+
+   pack_frame($frame,$err);
+   update_window();
+}
+
+# Clear any user entered text from a frame.
+#
+sub frame_clear {
+   my($name) = @_;
+
+   if      ($name eq 'select_operation') {
+      select_operation_clear();
+   } elsif ($name eq 'create_set') {
+      create_set_clear();
+   } elsif ($name eq 'manage_set') {
+      manage_set_clear();
+   }
+}
+
+# This creates a new frame and stores the widgets in the global
+# list.
+#
+sub frame_create {
+   my($name) = @_;
+
+   if      ($name eq 'select_operation') {
+      select_operation_create();
+   } elsif ($name eq 'create_set') {
+      create_set_create();
+   } elsif ($name eq 'manage_set') {
+      manage_set_create();
+   }
+}
+
+# Unpacks the main window.
+#
+sub unpack_main {
+   my($frame) = @_;
+
+   # Save the current geometry
+
+   my $geometry = $main_window->geometry();
+   $geometry    =~ /^(\d+)x(\d+)([+-]\d+)([+-]\d+)$/;
+   my($wid,$hei,$x,$y) = ($1,$2,$3,$4);
+   $data{'wid'} = $wid;
+   $data{'hei'} = $hei;
+   $data{'x'}   = $x;
+   $data{'y'}   = $y;
+
+   # Unpack the main window
+
+   $main_window->withdraw();
+   my @w = $main_window->packSlaves;
+   foreach my $frame (@w) {
+      $frame->packForget;
+   }
+
+   # Unpack any parts of the operation specific frame
+
+   if      ($frame eq 'select_operation') {
+      select_operation_unpack();
+   } elsif ($frame eq 'create_set') {
+      create_set_unpack();
+   } elsif ($frame eq 'manage_set') {
+      manage_set_unpack();
+   }
+}
+
+# Adds a frame to the main window.
+#
+sub pack_frame {
+   my($frame,$err) = @_;
+
+   # Pack the main frame
+
+   my $f = $widgets{"frame_$frame"};
+   $f->pack();
+
+   # Pack any parts of the operation specific frame
+
+   if      ($frame eq 'select_operation') {
+      select_operation_pack($err);
+   } elsif ($frame eq 'create_set') {
+      create_set_pack($err);
+   } elsif ($frame eq 'manage_set') {
+      manage_set_pack($err);
+   }
+}
+
+sub update_window {
+   my $geometry;
+   $geometry .= "$data{x}$data{y}";
+   $main_window->geometry($geometry);
+   $main_window->update;
+   $main_window->deiconify;
+   $main_window->raise;
+}
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

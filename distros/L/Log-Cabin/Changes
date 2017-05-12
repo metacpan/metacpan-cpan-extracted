@@ -1,0 +1,19 @@
+Revision history for Perl extension Log::Cabin.
+
+0.06
+    - Fixed bug (identified by Crabtree and Galens) involving set_logger_instance
+      calls on all logger instances.
+
+0.05
+    - Multiple calls to get_logger with the same instance name now
+      returns the same Foundation object.
+    - IO::Tee and Time::HiRes requirements removed.
+    - added name() method to Foundation class.
+
+0.03
+    - defined requirements in Makefile.PL
+
+0.01  Wed Apr 19 10:49:45 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Log::Cabin
+

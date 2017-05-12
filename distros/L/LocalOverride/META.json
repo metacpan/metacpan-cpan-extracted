@@ -1,0 +1,45 @@
+{
+   "abstract" : "Transparently override subs with those in local module versions",
+   "author" : [
+      "Dave Sherohman <dsheroh@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "LocalOverride",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PerlIO::scalar" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : 0,
+            "Test::Exception" : 0,
+            "Test::More" : 0,
+            "Test::Warn" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "Dave.Sherohman@lub.lu.se",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=LocalOverride"
+      }
+   },
+   "version" : "1.000"
+}
+

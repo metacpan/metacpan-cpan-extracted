@@ -1,0 +1,1311 @@
+#!/usr/bin/perl
+#
+use strict ;
+
+# Local
+use App::Framework ;
+
+use Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants ;
+
+## CPAN REQUIRED:
+use Linux::DVB::DVBT ;
+use Linux::DVB::DVBT::TS ;
+use Linux::DVB::DVBT::Advert ;
+
+
+use MP3::Tag ;
+use DBI ;
+use DBD::mysql ;
+## CPAN REQUIRED
+
+#use Linux::DVB::DVBT::Ffmpeg ;
+use Linux::DVB::DVBT::Config ;
+
+
+# VERSION
+our $VERSION = '5.03' ;
+
+## Global
+our $DEBUG = 0 ;
+our $DBG_FFMPEG = 0 ;
+our $DBG_SQL = 0 ;
+our $VERBOSE = 0 ;
+
+## Global data
+our %file_info ;
+our @info_lines ;
+our %dbh ;
+our $progname ;
+our $dvb_name ;
+
+# Default to recording TS (do not transcode)
+our $force_ts = 0 ;
+
+# margin on video length checks (in seconds) - allow for 3 minutes of padding
+our $DURATION_MARGIN = 180 ;
+
+
+	# Create application and run it
+	App::Framework->new() ;
+	go() ;
+
+
+#=================================================================================
+# SUBROUTINES EXECUTED BY APP
+#=================================================================================
+
+#----------------------------------------------------------------------
+# Main execution
+#
+sub app
+{
+	my ($app, $opts_href, $args_href) = @_ ;
+
+	my $ok = 1 ;
+	
+	my $user = $opts_href->{'user'}	|| Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants::SQL_USER ;
+	my $password = $opts_href->{'password'}	|| Linux::DVB::DVBT::Apps::QuartzPVR::Config::Constants::SQL_PASSWORD ;
+	
+	if (!$user || !$password)
+	{
+		print "Error: You must specify the MySQL username AND password when using this script outside the PVR suite\n" ;
+		exit 1 ;
+	}
+	
+	$DEBUG = $opts_href->{'debug'} ;
+	$DBG_FFMPEG = $opts_href->{'dbg-ffmpeg'} ;
+	$DBG_SQL = $opts_href->{'dbg-sql'} ;
+	$VERBOSE = $opts_href->{'verbose'} ;
+	
+	my $adskip = $opts_href->{'advert'} ;
+	my $rec_file = $opts_href->{'file'} ;
+	my $event = $opts_href->{'event'};
+	my $timeslip = $opts_href->{'timeslip'}  ;
+	my $sliptype = $opts_href->{'sliptype'} ;
+	my $title = $opts_href->{'title'} ;
+	my $episode = $opts_href->{'episode'} ;
+	my $id = $opts_href->{'id'} ; 
+	
+	my $rootdir = $opts_href->{'root'} ;
+	my $trash = $opts_href->{'trash'} ;
+	my $mailto = $opts_href->{'mailto'} ;
+	my $log = "$opts_href->{'log_dir'}/dvbt-multirecord.log" ;
+	
+	%dbh = (
+		'host' 		=> 'localhost',
+		'db' 		=> $opts_href->{'database'},
+		'tbl' 		=> $opts_href->{'table'},
+		'user' 		=> $user,
+		'password' 	=> $password,
+	) ;
+	
+	my $adap = $opts_href->{'adapter'} ;
+	my $config = $opts_href->{'cfg'} ;
+	
+
+#	## Add alternate encoder - use vlc
+#	unshift @{$Linux::DVB::DVBT::Ffmpeg::COMMANDS{'mpeg'}},
+#		'vlc -I dummy "$src" --sout "#standard{mux=ps,dst=\"$dest.$ext\",access=file}" vlc://quit' ;
+
+	$progname = $app->name() ;
+	$dvb_name = "DVB$adap" ;
+	info("===============================================================") ;
+	info("$progname v$VERSION") ;
+	info("Linux::DVB::DVBT v$Linux::DVB::DVBT::VERSION") ;
+	info("Linux::DVB::DVBT::Advert v$Linux::DVB::DVBT::Advert::VERSION") ;
+
+	my @args ;
+    if (!$rec_file)
+    {
+    	## Get arguments
+    	foreach my $arg (qw/channel file duration/)
+    	{
+    		push @args, $args_href->{$arg} if ($args_href->{$arg} ne 'optional');
+    	}
+    	unless ((@{$args_href->{'extra'}} == 1) && ($args_href->{'extra'}[0] eq 'optional'))
+    	{
+    		push @args, @{$args_href->{'extra'}} ;
+    	}
+    	
+    	## Check args
+	    die("$progname: No arguments given.")  if (@args == 0) ;
+	    die("$progname: No filename given.")  if (@args <= 1) ;
+	    die("$progname: No duration given.")  if (@args <= 2) ;
+    }
+Linux::DVB::DVBT::prt_data("Args=", $args_href, "Opts=", $opts_href, "prog args=", \@args) if $DEBUG >= 5 ;
+    
+	Linux::DVB::DVBT->debug($DEBUG) ;
+	Linux::DVB::DVBT->dvb_debug($DEBUG) ;
+	Linux::DVB::DVBT->verbose($VERBOSE) ;
+	
+#	$Linux::DVB::DVBT::Ffmpeg::DEBUG = $DBG_FFMPEG if $DBG_FFMPEG ;
+
+	## Create dvb (use first found adapter). 
+	## NOTE: With default object settings, the application will
+	## die on *any* error, so there is no error checking in this script
+	##
+	my $dvb = Linux::DVB::DVBT->new(
+		'adapter'		=> $adap,
+		'errmode'		=> 'message',
+	) ;
+	
+	$dvb->config_path($config) if $config ;
+	my $dev = $dvb->dvr_name ;
+
+	## adapter
+	info("selected $dvb_name") ;
+
+	my @recargs ;	
+	my ($channel) ;
+	my ($file) ;
+	my ($duration) ;
+	my %file_options ;
+	
+	## Get recordings from file
+	if ($rec_file)
+	{
+		open my $fh, "<$rec_file" or die_error_mail($mailto, "Failed to open recording list file $rec_file : $!", "UNKNOWN", $rec_file, $log) ;		
+		my $line ;
+		while (defined($line=<$fh>))
+		{
+			chomp $line ;
+			
+			# skip comments
+			next if ($line =~ /^\s*#/) ;
+
+			# Line includes an offset
+			my ($off, $ch, $f, $len) = (0, undef, undef, undef) ;				
+			if ($line =~ /\+(\d+)\s+['"]([^'"]+)['"]\s+['"]([^'"]+)['"]\s+(\d+)/g)
+			{
+				($off, $ch, $f, $len) = ($1, $2, $3, $4) ;				
+				$channel ||= $ch ;
+				$file ||= $f ;
+				$duration ||= $len ;
+			}
+			
+			# no offset
+			elsif ($line =~ /['"]([^'"]+)['"]\s+['"]([^'"]+)['"]\s+(\d+)/g)
+			{
+				($ch, $f, $len) = ($1, $2, $3, $4) ;				
+				$channel ||= $ch ;
+				$file ||= $f ;
+				$duration ||= $len ;
+			}
+
+			## process if got something
+			if ($f)
+			{
+				## check for extra options
+				my %options ;
+				while ($line =~ /\s*\-(\w+)\s+(\S+)/g)
+				{
+					$options{$1} = $2 ;
+				}
+				
+				$file_options{$f} = {%options} ;
+				
+				## process
+				process_args($rootdir, $ch, $f, $len, $off, \@recargs, \%options, \%file_info) ;
+			}
+		}
+		close $fh ;
+	}	
+	
+	## Get recordings from command line
+	else
+	{
+		# process default args
+		$channel = shift @args ;
+		$file = shift @args ;
+		$duration = shift @args ;
+		my %options = () ;
+		if ($timeslip && defined($event) )
+		{
+			$options{'event'} = $event ;
+			$options{'timeslip'} = $timeslip ;
+			$options{'sliptype'} = $sliptype || 'end' ;
+ 		}
+		$options{'title'} = $title if $title ;
+		$options{'episode'} = $episode if $episode ;
+		$options{'id'} = $id if $id ;
+		process_args($rootdir, $channel, $file, $duration, 0, \@recargs, \%options, \%file_info) ;
+
+		$file_options{$file} = {%options} ;
+
+
+		# can only specify options for the first file
+		$options{'event'} = 0 ;
+		$options{'timeslip'} = 0 ;
+		$options{'title'} = '';
+		$options{'episode'} = '' ;
+		$options{'id'} = '' ;
+		
+		while (scalar(@args) >= 4)
+		{
+			my ($offset) = shift @args ;
+			$channel = shift @args ;
+			$file = shift @args ;
+			$duration = shift @args ;
+			process_args($rootdir, $channel, $file, $duration, $offset, \@recargs, \%options, \%file_info) ;
+
+			$file_options{$file} = {} ;
+		}
+	}
+
+    pod2usage("$0: No channel given.")  unless $channel ;
+    pod2usage("$0: No filename given.")  unless $file ;
+    pod2usage("$0: No duration given.")  unless $duration ;
+
+Linux::DVB::DVBT::prt_data("File Info=", \%file_info) if $DEBUG >= 2 ;
+
+	## Check dirs are available
+	my @dirs = ($trash) ;
+	push @dirs, $rootdir if $rootdir ;
+	foreach my $dir (@dirs)
+	{
+		if (! -d $dir)
+		{
+			if (!mkpath([$dir], 0, 0755))
+			{
+				die_error_mail($mailto, "unable to create dir $dir : $!", $channel, $file, $log) ;
+			}
+		}
+	}
+	
+	
+	
+	## Parse command line
+	my @chan_spec ;
+	my $error ;
+	$error = $dvb->multiplex_parse(\@chan_spec, @recargs);
+
+Linux::DVB::DVBT::prt_data("Multiplex parse args=", \@recargs, "chan_spec=", \@chan_spec) if $DEBUG >= 2 ;
+	
+	## Select the channel(s)
+	info("selecting channel $channel...") ;
+	$error = $dvb->multiplex_select(\@chan_spec) ;
+	die_error_mail($mailto, "Failed to select channel : $error", $channel, $file, $log) if $error ;
+	info("== Locked $dvb_name ==") ;
+
+	## Get multiplex info
+	my %multiplex_info = $dvb->multiplex_info() ;
+Linux::DVB::DVBT::prt_data("Multiplex info=", \%multiplex_info) if $DEBUG >= 2  ;
+
+	foreach my $file (sort { ($multiplex_info{'files'}{$a}{'offset'}||0) <=> ($multiplex_info{'files'}{$b}{'offset'}||0) } keys %{$multiplex_info{'files'}})
+	{
+		my $multiplex_href = $multiplex_info{'files'}{$file} ;
+		info("  $file") ;
+
+		my $prog_id = $file_info{$file}{'id'} ;
+		if ($prog_id)
+		{
+			info("    ID      $prog_id") ;
+		}
+
+		info("    Chan     $multiplex_href->{channels}[0]") ;
+		
+		my $len = Linux::DVB::DVBT::Utils::secs2time($multiplex_href->{'duration'}) ;
+		info("    Duration $len") ;
+		
+		if ($multiplex_href->{'offset'})
+		{
+			my $offset = Linux::DVB::DVBT::Utils::secs2time($multiplex_href->{'offset'}) ;
+			info("    Offset  +$offset") ;
+		}
+		
+		foreach my $pid_href (@{$multiplex_href->{'demux'}})
+		{
+			my $info = sprintf "    PID %5d [$pid_href->{'pidtype'}]", $pid_href->{'pid'} ;
+			info($info) ;
+		}
+		info("") ;
+		
+		## Mark as started
+		sql_start_status(\%dbh, $prog_id) ;
+	}
+
+	## Record
+	foreach my $file (sort keys %{$multiplex_info{'files'}})
+	{
+		my $multiplex_href = $multiplex_info{'files'}{$file} ;
+		info("recording to \"$multiplex_href->{destfile}\" for $multiplex_href->{duration} secs ...") ;
+	}
+	my $record_error = $dvb->multiplex_record(%multiplex_info) ;
+	
+	## Release DVB (for next recording)
+	info("== Released $dvb_name ==") ;
+	$dvb->dvb_close() ;
+	
+	## Stats
+	info("Recording stats:") ;
+	foreach my $file (sort keys %{$multiplex_info{'files'}})
+	{
+		my $href = $multiplex_info{'files'}{$file} ;
+		info("  $file") ;
+		my %stats ;
+		foreach my $pid_href (@{$multiplex_info{'files'}{$file}{'pids'}})
+		{
+			my $info = sprintf "    PID %5d [$pid_href->{'pidtype'}] : %s errors / %s overflows / %s packets : Timeslip start %s secs, end %s secs", 
+				$pid_href->{'pid'},
+				$pid_href->{'errors'},
+				$pid_href->{'overflows'},
+				$pid_href->{'pkts'},
+				$pid_href->{'timeslip_start_secs'},
+				$pid_href->{'timeslip_end_secs'},
+				 ;
+				 
+			info($info) ;
+			
+			foreach my $map_aref (
+				['errors', 'statErrors'],
+				['overflows', 'statOverflows'],
+			)
+			{
+				my ($src, $dest) = @$map_aref ;
+				my $val = int($pid_href->{$src}) ;	
+				$stats{$dest} ||= 0 ;				
+				$stats{$dest} += $val ;			
+			}
+			foreach my $map_aref (
+				['timeslip_start_secs', 'statTimeslipStart'],
+				['timeslip_end_secs', 'statTimeslipStart'],
+			)
+			{
+				my ($src, $dest) = @$map_aref ;
+				my $val = int($pid_href->{$src}) ;	
+				$stats{$dest} ||= 0 ;				
+				if ($stats{$dest} < $val)
+				{
+					$stats{$dest} = $val ;		
+				}			
+			}
+		}
+		info("") ;
+		
+		## Mark as recorded
+		my $prog_id = $file_info{$file}{'id'} ;
+		sql_update_status(\%dbh, $prog_id, 'recorded') ;
+		sql_set_stats(\%dbh, $prog_id, \%stats) ;
+	}
+	
+	
+	
+	# check for errors
+	if ($record_error)
+	{
+		## whatever the error, report it then allow it through and use the length checking to see if we failed
+		info("Warning: recording error $record_error") ;
+	}
+
+Linux::DVB::DVBT::prt_data("Post-Record Multiplex info=", \%multiplex_info) if $DEBUG >= 2  ;
+	
+	## Fix any errors
+	foreach my $file (sort keys %{$multiplex_info{'files'}})
+	{
+		## filename 
+		my ($name, $dir, $ext) = fileparse($file, '\..*') ;
+		
+		my $multiplex_href = $multiplex_info{'files'}{$file} ;
+		$multiplex_href->{'original_ts'} = '' ;
+		my $this_ok = 1 ;
+		if ($multiplex_href->{'tsfile'})
+		{
+			$this_ok = repair_ts($multiplex_href->{'tsfile'}, $dir, $name, \$multiplex_href->{'original_ts'}) ;
+		}
+		elsif ($ext eq '.ts')
+		{
+			$this_ok = repair_ts($file, $dir, $name, \$multiplex_href->{'original_ts'}) ;
+		}
+		
+		$ok &&= $this_ok ;
+		
+		if ($this_ok)
+		{
+			## Mark as repaired
+			my $prog_id = $file_info{$file}{'id'} ;
+			sql_update_status(\%dbh, $prog_id, 'repaired') ;
+		}
+	}
+	$error = 1 unless $ok ;
+	
+	
+	## length check
+	foreach my $file (sort keys %{$multiplex_info{'files'}})
+	{
+		my $multiplex_href = $multiplex_info{'files'}{$file} ;
+		my $tsfile = $multiplex_href->{'destfile'} ;
+		$multiplex_href->{'srcfile'} = $tsfile ;
+		
+		info("Checking \"$tsfile\" ...") ;
+		
+		my %info = Linux::DVB::DVBT::TS::info($tsfile) ;
+		my $file_duration = 3600*$info{'duration'}{'hh'} + 60*$info{'duration'}{'mm'} + $info{'duration'}{'ss'} ;
+		if ($file_duration < $multiplex_href->{'duration'} - $DURATION_MARGIN)
+		{
+			my $this_error = "Duration of final \"$tsfile\" ($file_duration secs) not as expected ($multiplex_href->{'duration'} secs)" ;
+			info("ERROR: $this_error") ;
+			$error = 1 ;
+		}
+	}
+
+Linux::DVB::DVBT::prt_data("Post-Transcode Multiplex info=", \%multiplex_info) if $DEBUG >= 2  ;
+
+	# now check error	
+	if (!$error)
+	{
+		info("File durations have been checked ... OK") ;
+		
+		foreach my $file (sort keys %{$multiplex_info{'files'}})
+		{
+			my $multiplex_href = $multiplex_info{'files'}{$file} ;
+	
+			## Move TS file into trash dir
+			if (!$force_ts)
+			{
+				if ($multiplex_href->{'tsfile'})
+				{
+					info("moving \"$multiplex_href->{srcfile}\" to TRASH ($trash) ...") ;
+					my $this_ok = move("$multiplex_href->{srcfile}", "$trash") ;
+					$ok &&= $this_ok ;
+				}
+			}
+			if ($multiplex_href->{'original_ts'})
+			{
+				info("moving \"$multiplex_href->{'original_ts'}\" to TRASH ($trash) ...") ;
+				my $this_ok = move($multiplex_href->{'original_ts'}, "$trash") ;
+				$ok &&= $this_ok ;
+			}
+	
+			die_error_mail($mailto, "failed to move : $!", $channel, $file, $log) unless $ok ;
+	
+		}
+	}
+	$error = 1 unless $ok ;
+	
+	if ($error)
+	{
+		## End
+		die_error_mail($mailto, "Failed to complete", $channel, $file, $log) ;
+	}
+
+Linux::DVB::DVBT::prt_data("Pre-Addskip Multiplex info=", \%multiplex_info) if $DEBUG >= 2  ;
+
+
+	## Advert removal
+	if ($adskip)
+	{
+		foreach my $file (sort keys %{$multiplex_info{'files'}})
+		{
+			my $multiplex_href = $multiplex_info{'files'}{$file} ;
+			if ($multiplex_href->{'video'})
+			{
+				my $split = remove_adverts($dvb, $config, $multiplex_href->{'destfile'}, $multiplex_href->{'channels'}[0], $trash) ;
+				if ($split)
+				{
+					## Mark as split
+					my $prog_id = $file_info{$file}{'id'} ;
+					sql_update_status(\%dbh, $prog_id, 'split') ;
+				}
+			}
+		}
+	}
+	
+	## Tag any MP3
+	foreach my $file (sort keys %{$multiplex_info{'files'}})
+	{
+		my $multiplex_href = $multiplex_info{'files'}{$file} ;
+		if (!$multiplex_href->{'video'} && $multiplex_href->{'audio'} && ($multiplex_href->{'destext'} eq '.mp3') )
+		{
+			my $ok = mp3tag($multiplex_href->{'destfile'}, $multiplex_href, $file_options{$file}) ;	
+			if ($ok)
+			{
+				## Mark as tagged
+				my $prog_id = $file_info{$file}{'id'} ;
+				sql_update_status(\%dbh, $prog_id, 'mp3tag') ;
+			}
+		}
+	}
+	
+	
+	## End
+	info("COMPLETE") ;
+	foreach my $file (sort keys %{$multiplex_info{'files'}})
+	{
+		## Mark as complete
+		my $prog_id = $file_info{$file}{'id'} ;
+		sql_update_status(\%dbh, $prog_id, 'complete') ;
+	}
+
+}
+
+
+
+
+
+#=================================================================================
+# SUBROUTINES
+#=================================================================================
+
+#-----------------------------------------------------------------------------
+sub process_args
+{
+	my ($rootdir, $channel, $file, $duration, $offset, $recargs_aref, $opts_href, $info_href) = @_ ;
+	
+	$opts_href ||= {} ;
+	$offset =~ s/\+//g ;
+	
+	info("Channel:  $channel") ;
+	info("File:     $file") ;
+	info("Duration: $duration") ;
+	info("Offset:   $offset") if $offset ;
+	
+	foreach my $opt (sort keys %$opts_href)
+	{
+		info("$opt = $opts_href->{$opt}") ;
+	}
+
+	## filename 
+	my ($name, $dir, $ext) = fileparse($file, '\..*') ;
+	
+#	if ($force_ts)
+#	{
+#		$ext = '.ts' ;
+#		$file = "$dir$name$ext" ;
+#	}
+
+	## Convert duration to seconds
+	my $seconds = Linux::DVB::DVBT::Utils::timesec2secs($duration) ;
+
+	## Ensure duration is in correct format
+	$duration = "0:0:$seconds" ;
+
+	## Convert offset to seconds
+	$seconds = Linux::DVB::DVBT::Utils::timesec2secs($offset) ;
+
+	## Ensure duration is in correct format
+	$offset = "0:0:$seconds" ;
+
+	my $path = $file ;
+	$path = "$rootdir/$file" if $rootdir ;
+	push @$recargs_aref, "f=$path";
+	push @$recargs_aref, "ch=$channel";
+	push @$recargs_aref, "len=$duration";
+	push @$recargs_aref, "offset=$offset";
+	
+	if ($opts_href->{'timeslip'})
+	{
+		my $timeslip_secs = $opts_href->{'timeslip'} ;		# timeslip specified in minutes
+		push @$recargs_aref, "max_timeslip=$timeslip_secs";
+		push @$recargs_aref, "event=$opts_href->{'event'}";
+		
+		if ($opts_href->{'sliptype'})
+		{
+			push @$recargs_aref, "timeslip=$opts_href->{'sliptype'}";
+		}
+	}
+	
+	## Track options
+	$info_href->{$file} = { %$opts_href } ;
+}
+
+
+#-----------------------------------------------------------------------------
+sub repair_ts
+{
+	my ($tsfile, $dir, $name, $original_ts_ref) = @_ ;
+	
+	## Check for zero-length file
+	if (! -s "$tsfile")
+	{
+		info("[tsrepair] Error: zero-length file \"$tsfile\"") ;
+		return 
+	}
+	
+	$$original_ts_ref = "$dir$name-original.ts" ;
+	
+	info("[tsrepair] Repairing \"$tsfile\" ...") ;
+	my $this_ok = move("$tsfile", $$original_ts_ref) ;
+	
+	if ($this_ok)
+	{
+#		my @lines = `tsrepair '$$original_ts_ref' '$tsfile'` ;
+#		foreach my $line (@lines)
+#		{
+#			chomp $line ;
+#			info("[tsrepair] $line") ;
+#		}
+
+
+		## get information (including file duration)
+		my %info = Linux::DVB::DVBT::TS::info($$original_ts_ref) ;
+		my $info = sprintf "Duration: %02d:%02d:%02d, ", $info{'duration'}{'hh'}, $info{'duration'}{'mm'}, $info{'duration'}{'ss'} ;
+		info("[tsrepair] $info") ;
+		$info =	sprintf "Packets: %08d, ", $info{'total_pkts'} ;
+		info("[tsrepair] $info") ;
+			
+
+		## Now repair the file
+		my %stats = Linux::DVB::DVBT::TS::repair($$original_ts_ref, $tsfile) ;
+		
+		if (keys %stats)
+		{
+			my $error = "" ;
+			my $errorcode = 0 ;
+			if (exists($stats{'error'}))
+			{
+				$error = delete $stats{'error'} ;
+				$errorcode = delete $stats{'errorcode'} ;
+				
+				## Ignore general TS error flag
+				if ($error =~ /file/i)
+				{
+					# abort
+				}
+				else
+				{
+					$errorcode = 0 ;
+				}
+			}
+			
+			$this_ok = 0 unless $errorcode==0;
+			
+			info("[tsrepair] Repair Statistics:") ;
+			if ($errorcode)
+			{
+				info("[tsrepair] ERROR: $error") ;
+			}
+			else
+			{
+				info("[tsrepair] INFO: $error") ;
+			}
+			foreach my $pid (sort {$a <=> $b} keys %stats)
+			{
+				info("[tsrepair]   PID $pid : $stats{$pid}{'errors'} errors repaired") ;
+				foreach my $error_str (sort keys %{$stats{$pid}{'details'}})
+				{
+					info("[tsrepair]    * $error_str ($stats{$pid}{'details'}{$error_str})") ;
+				}
+			}
+		}
+		else
+		{
+			info("[tsrepair] No error statistics") ;
+		}
+	}
+	info("[tsrepair] Repair done") ;
+
+	return $this_ok ;
+}
+
+#-----------------------------------------------------------------------------
+sub remove_adverts
+{
+	my ($dvb, $config, $tsfile, $channel, $trash) = @_ ;
+	
+	my $split = 0 ;
+
+	my $tuning_href = $dvb->get_tuning_info() ;
+
+	## Get combined settings for this channel
+	my $advert_settings_href = Linux::DVB::DVBT::Advert::channel_settings({}, $channel, $tuning_href) ;
+	if (!Linux::DVB::DVBT::Advert::ok_to_detect($advert_settings_href))
+	{
+		info("[Advert] Skipping Ad Removal for \"$tsfile\" due to config settings") ;
+		return $split ;
+	}
+
+	info("[Advert] Ad Removal for \"$tsfile\"") ;
+	
+	## create names
+	my ($name, $dir, $ext) = fileparse($tsfile, '\..*') ;
+	
+	$dir = "$dir/$name" ;
+	if (! -d $dir)
+	{
+		if (!mkpath([$dir], 0, 0755))
+		{
+			info("ERROR: unable to create dir $dir : $!") ;
+			return $split ;
+		}
+	}
+	my $detfile = "$dir/$name.det" ;
+	my $csvfile = "$dir/$name.adv" ;
+	my $cutfile = "$dir/$name.cut" ;
+	my $dstfile = "$dir/$name.ts" ;
+	
+	## Set nice level
+	my $pid = $$ ;
+	my @nice = `renice +19 $pid` ;
+	info("[Advert] set nice-ness:") ;
+	foreach my $line (@nice)
+	{
+		info("[Advert] nice: $line") ;
+	}
+	
+	# Read tuning info
+	my $tuning_href = Linux::DVB::DVBT::Config::read($config); 
+	
+	# Add debug
+	my $settings_href = {
+		'debug' => $DEBUG,
+	} ;
+	
+	## Detect
+	info("[Advert] Detecting (saving as \"$detfile\")") ;
+	my $results_href = Linux::DVB::DVBT::Advert::detect($tsfile, $settings_href, $channel, $tuning_href, $detfile) ;
+
+	## save cut log
+	open (STDOUT, ">$cutfile") ;
+	# pipe advert debug into log file
+	$Linux::DVB::DVBT::Advert::DEBUG = 1 ;
+		
+	## Analyse
+	info("[Advert] Analysing (saving as \"$csvfile\")") ;
+	my $expected_aref = undef ;
+	my @cut_list = Linux::DVB::DVBT::Advert::analyse($tsfile, $results_href, $tuning_href, $channel, $csvfile, $expected_aref, $settings_href) ;
+	$Linux::DVB::DVBT::Advert::DEBUG = 0 ;
+
+	## save cut list
+	print "Cut List:\n" ;
+	foreach (@cut_list)
+	{
+		print "  pkt=$_->{start_pkt}:$_->{end_pkt}\n" ;
+	}
+	print "\n" ;
+
+	## Cut
+	if ($dstfile && $tsfile && @cut_list)
+	{
+		info("[Advert] Splitting into \"$dstfile\"") ;
+		my $error = Linux::DVB::DVBT::Advert::ad_split($tsfile, $dstfile, \@cut_list) ;
+		
+		## I'll assume all is well and remove the original
+		if (!$error)
+		{
+			++$split ;
+			##info("moving \"$tsfile\" to TRASH ($trash) ...") ;
+			##my $this_ok = move("$tsfile", "$trash/$name-ads.ts") ;
+		}
+	}
+	else
+	{
+		info("[Advert] No valid adverts found for cutting. Advert removal stopping.") ;
+	}
+	
+	return $split ;
+}
+
+#-----------------------------------------------------------------------------
+sub mp3tag
+{
+	my ($file, $multiplex_href, $opts_href) = @_ ;
+	
+	my $ok = 1 ;
+
+	info("[MP3TAG] Tagging \"$file\"") ;
+	
+	my $mp3 = MP3::Tag->new($file);
+
+	my $this_year = (localtime(time))[5] + 1900 ;
+
+	# Evoke flow displays:
+	#  TIT2
+	#  TALB
+	#
+	# TPE1 == Artist
+	# TIT2 == Title
+	# TALB == Album
+	# TYER == Year
+	$mp3->select_id3v2_frame_by_descr('TYER', $this_year); 
+	$mp3->select_id3v2_frame_by_descr('TPE1', $multiplex_href->{'channels'}[0]); 
+	$mp3->select_id3v2_frame_by_descr('TIT2', $opts_href->{'title'}) if $opts_href->{'title'} ; 
+	$mp3->select_id3v2_frame_by_descr('TALB', $opts_href->{'episode'}) if $opts_href->{'episode'} ; 
+
+	$mp3->update_tags();                  # Commit to file
+	
+	my ($title, $track, $artist, $album, $comment, $year, $genre) = $mp3->autoinfo() ;
+	
+	info("[MP3TAG] Title:  	$title") ;
+	info("[MP3TAG] Artist:  $artist") ;
+	info("[MP3TAG] Album:  	$album") ;
+	info("[MP3TAG] Year:  	$year") ;
+	info("[MP3TAG] Genre:  	$genre") ;
+	info("[MP3TAG] Comment: $comment") ;
+	
+	info("[MP3TAG] Completed tagging \"$file\"") ;
+
+	return $ok ;
+}
+
+#=================================================================================
+# MYSQL
+#=================================================================================
+
+## NOTE: For SQL table, 'pid' refers to the program id
+
+#UPDATE tbl SET flags=TRIM(',' FROM CONCAT(flags, ',', 'flagtoadd'))
+#
+#delete:
+#UPDATE tbl SET flags=TRIM(',' FROM REPLACE(CONCAT(',', flags, ','), ',flagtoremove,', ','))
+
+#-----------------------------------------------------------------------------
+sub sql_connect
+{
+	my ($db_href) = @_ ;
+
+	$db_href->{'dbh'} = 0 ;
+	
+	eval
+	{
+		# Connect
+		my $dbh = DBI->connect("DBI:mysql:database=".$db_href->{'db'}.
+					";host=".$db_href->{'host'},
+					$db_href->{'user'}, $db_href->{'password'},
+					{'RaiseError' => 1}) ;
+					
+		$db_href->{'dbh'} = $dbh ;
+	};
+	if ($@)
+	{
+		print STDERR "Unable to connect to database : $@\n" ;
+	}
+	
+	return $db_href->{'dbh'} ;
+}
+
+#-----------------------------------------------------------------------------
+sub sql_send
+{
+	my ($db_href, $sql) = @_ ;
+	
+	my $dbh = sql_connect($db_href) ;
+	if ($dbh)
+	{
+		# Do query
+		eval
+		{
+			print STDERR "sql_send($sql)\n" if $DBG_SQL ;			
+			$dbh->do($sql) ;
+		};
+		if ($@)
+		{
+			print STDERR "SQL do error $@\nSql=$sql" ;
+		}
+	}
+}
+
+#-----------------------------------------------------------------------------
+sub sql_update_status
+{
+	my ($db_href, $pid, $status) = @_ ;
+
+	print STDERR "sql_update_status(pid=$pid, status=$status)\n" if $DBG_SQL ;
+	
+	return unless $pid ;
+	
+	# UPDATE tbl SET flags=TRIM(',' FROM CONCAT(flags, ',', 'flagtoadd'))
+	my $sql = "UPDATE $db_href->{tbl} SET `status`=TRIM(',' FROM CONCAT(`status`, ',', '$status')), `changed`=CURRENT_TIMESTAMP" ;
+	$sql .= " WHERE `pid`='$pid' AND `rectype`='dvbt'" ;
+	
+	sql_send($db_href, $sql) ;
+}
+
+#-----------------------------------------------------------------------------
+sub sql_start_status
+{
+	my ($db_href, $pid) = @_ ;
+
+	print STDERR "sql_start_status(pid=$pid)\n" if $DBG_SQL ;
+
+	return unless $pid ;
+	
+	# UPDATE tbl SET flags=TRIM(',' FROM CONCAT(flags, ',', 'flagtoadd'))
+	my $sql = "UPDATE $db_href->{tbl} SET `status`='started', `changed`=CURRENT_TIMESTAMP" ;
+	$sql .= " WHERE `pid`='$pid' AND `rectype`='dvbt'" ;
+	
+	sql_send($db_href, $sql) ;
+}
+
+
+
+#-----------------------------------------------------------------------------
+sub sql_set_stats
+{
+	my ($db_href, $pid, $stats_href) = @_ ;
+
+	print STDERR "sql_set_stats(pid=$pid)\n" if $DBG_SQL ;
+
+	return unless $pid ;
+	
+	my $values = "" ;
+	foreach my $var (sort keys %$stats_href)
+	{
+		$values .= ", " if $values ;
+		$values .= "`$var`='$stats_href->{$var}'" ;
+	}
+	
+	my $sql = "UPDATE $db_href->{tbl} SET $values, `changed`=CURRENT_TIMESTAMP" ;
+	$sql .= " WHERE `pid`='$pid' AND `rectype`='dvbt'" ;
+	
+	sql_send($db_href, $sql) ;
+}
+
+#-----------------------------------------------------------------------------
+sub sql_set_error
+{
+	my ($db_href, $pid, $error) = @_ ;
+	
+	print STDERR "sql_set_error(pid=$pid, error=$error)\n" if $DBG_SQL ;
+
+	return unless $pid ;
+	
+	sql_update_status($db_href, $pid, 'error') ;
+	
+	my $sql = "UPDATE $db_href->{tbl} SET `errorText`='$error', `changed`=CURRENT_TIMESTAMP" ;
+	$sql .= " WHERE `pid`='$pid' AND `rectype`='dvbt'" ;
+	
+	sql_send($db_href, $sql) ;
+}
+
+
+#=================================================================================
+# UTILITIES
+#=================================================================================
+
+
+#-----------------------------------------------------------------------------
+# Format a timestamp for the reply
+sub timestamp
+{
+	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+	return sprintf "%02d:%02d:%02d %02d/%02d/%04d", $hour,$min,$sec, $mday,$mon+1,$year+1900;
+}
+
+
+#---------------------------------------------------------------------------------
+sub prompt
+{
+	my $timestamp = timestamp() ;
+	my $prompt = "[$progname ($$) $timestamp $dvb_name]" ;
+	
+	return $prompt ;
+}
+
+#---------------------------------------------------------------------------------
+sub info
+{
+	my ($msg) = @_ ;
+
+	my $prompt = prompt() ;
+	$msg =~ s/\n/\n$prompt /g ;
+	print STDERR "$prompt $msg\n" ;
+	
+	my $timestamp = timestamp() ;
+	push @info_lines, "$prompt $msg" ;
+}
+
+
+#---------------------------------------------------------------------------------
+# send error email
+sub error_mail
+{
+	my ($to, $error, $channel, $file, $log) = @_ ;
+	
+	my $prompt = prompt() ;
+	
+	my $data = "echo '$error'" ;
+	
+	my $tmpfile = "/tmp/dvbt-ffrec.$$" ;
+	if (open my $fh, ">$tmpfile")
+	{
+		print $fh "$error\n\n" ;
+		foreach (@info_lines)
+		{
+			print $fh "$_\n" ;
+		}
+		close $fh ;
+		
+		$data = "cat $tmpfile" ;	
+	}
+	else
+	{
+		$tmpfile = undef ;
+	}
+	
+	`$data | mail -s '$prompt $channel $file Error' $to` ;
+	
+	# clean up
+	unlink $tmpfile if $tmpfile ;
+}
+
+#---------------------------------------------------------------------------------
+# send error email then exit
+sub die_error_mail
+{
+	my ($to, $error, $channel, $file, $log) = @_ ;
+
+	## Mark as failed
+	if (exists($file_info{$file}))
+	{
+		my $prog_id = $file_info{$file}{'id'} ;
+		sql_set_error(\%dbh, $prog_id, $error) ;
+	}
+	
+	error_mail($to, $error, $channel, $file, $log) ;
+
+	info("FATAL: $error") ;
+	exit 1 ;
+}
+
+
+
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+[SUMMARY]
+
+Record program(s) to file
+
+[ARGS]
+
+*channel=s		Channel	[default=optional]
+
+Specify the TV/Radio channel to be recorded (or use the -file option to read this information from a file)
+
+*file=s			Filename	[default=optional]
+
+Specify the full path of the recorded transport stream file (or use the -file option to read this information from a file)
+
+*duration=s		Record duration	[default=optional]
+
+Specify the record duration in seconds or HH:MM:SS format (or use the -file option to read this information from a file)
+
+*extra=s*		Repeat [default=optional]
+
+Optionally repeat the above triplet of information for every other file you want to record
+
+[OPTIONS]
+
+-mailto=s				Mail destination [default=$DEF_MAIL_TO]
+
+If any errors occur, then this is where they will be mailed to
+
+-db|'database'=s		Database [default=$DEF_DATABASE]
+
+Specify database name
+
+-tbl|'table'=s			Table [default=$DEF_TBL_RECORDED]
+
+Specify database table name
+
+-u|'user'=s		User
+
+Specify Mysql user name
+
+-p|'password'=s		Password
+
+Specify Mysql user password
+
+-dbg-sql=i	Debug sql module
+
+-a|'adapter'=s		DVB-T adapter number [default=0]
+
+-root=s				Top directory
+
+Specify a top-level directory that all recording file paths will be realtive to (or leave blank)
+
+-trash=s			Trash directory [default=$DEF_VIDEO_TRASH]
+
+This is where raw transport stream files are moved (rather than being deleted). After recording the transport streams
+are repaired and replaced with the repaired version. The original file is available in this directory just in case the repair 
+corrupts the recording in any way. 
+
+-log_dir=s		Log directory [default=$DEF_PVR_LOGDIR]
+
+Log files location
+
+-file=s				Recording specification file
+
+Instead of specifying the recording information on the command line, use a file to store the list of files
+
+-event=s			Event id
+
+Only useful for single file recordings. Specifies the event id so that the recording can be timeslipped.
+
+-timeslip=s			Max timeslip time
+
+Specify the time in HH:MM format that is the maximum time that the recording can slip
+
+-sliptype=s			Timeslip type
+
+Can be start, end, or both. Specifies whether the start or the program, the end of the program, or both are timeslipped
+
+-title=s			Recording title
+
+-episode=s			Episode number
+
+-id=s				Program id
+
+-cfg=s				Alternate DVB config file
+
+-advert=i			Advert detect [default=0]
+
+Set to 1 to enable advert detection
+
+
+
+[DESCRIPTION]
+
+Script that uses the perl Linux::DVB::DVBT package to record multiple programs at the same time (as long as they are within the same multiplex - use L<dvbt-chans|script::dvbt-chans> with -multi option to get
+the list of programs grouped by multiplex).
+
+=head2 Arguments
+
+The arguments define the set of streams (all from the same multiplex, or transponder) that are to be recorded
+at the same time into each file. 
+
+Each stream definition must start with a filename, followed by either channel names or pid numbers. Also, 
+you must specify the duration of the stream. Finally, an offset time can be specified that delays the start of 
+the stream (for example, if the start time of the programs to be recorded are staggered).
+
+A file defined by channel name(s) may optionally also contain a language spec and an output spec: 
+
+The output spec determines which type of streams are included in the recording. By default, "video" and "audio" tracks are recorded. You can
+override this by specifying the output spec. For example, if you also want the subtitle track to be recorded, then you need to
+specify the output includes video, audio, and subtitles. This can be done either by specifying the types in full or by just their initials.
+
+For example, any of the following specs define video, audio, and subtitles:
+
+	"audio, video, subtitle"
+	"a, v, s"
+	"avs"
+
+Note that, if the file format explicitly defines the type of streams required, then there is no need to specify an output spec. For example,
+specifying that the file format is mp3 will ensure that only the audio is recorded.
+
+In a similar fashion, the language spec determines the audio streams to be recorded in the program. Normally, the default audio stream is included 
+in the recorded file. If you want either an alternative audio track, or additional audio tracks, then you use the language spec to 
+define them. The spec consists of a space seperated list of language names. If the spec contains a '+' then the audio streams are 
+added to the default; otherwise the default audio is B<excluded> and only those other audio tracks in the spec are recorded. Note that
+the specification order is important, audio streams from the language spec are matched with the audio details in the specified order. Once a 
+stream has been skipped there is no back tracking (see the examples below for clarification).
+
+For example, if a channel has the audio details: eng:601 eng:602 fra:603 deu:604 (i.e. 2 English tracks, 1 French track, 1 German) then
+
+=over 4
+
+=item lang="+eng"
+
+Results in the default audio (pid 601) and the next english track (pid 602) recorded
+
+=item lang="fra"
+
+Results in just the french track (pid 603) recorded
+
+=item lang="eng fra"
+
+Results in the B<second> english (pid 602) and the french track (pid 603) recorded
+
+=item lang="fra eng"
+
+Results in an error. The english tracks have already been skipped to match the french track, and so will not be matched again.
+
+=back
+
+Note that the output spec overrides the language spec. If the output does not include audio, then the language spec is ignored.
+
+
+=head3 Timeslip Specification
+ 
+Timeslip recording uses the now/next live EPG information to track the start and end of the program being recorded. This information
+is transmit by the broadcaster and (hopefully) is a correct reflection of the broadcast of the program. Using this feature should then
+allow recordings to be adjusted to account for late start of a program (for example, due to extended news or sports events).
+
+To use the feature you MUST specify the event id of the program to be recorded. This information is the same event id that is gathered
+by the L</epg()> function. By default, the timeslip will automatically extend the end of the recording by up to 1 hour (recording stops
+automatically when the now/next information indicates the real end of the program).
+
+=over 4
+
+=item event=41140
+
+Sets the event id to be 41140
+
+=back
+
+Optionally you can specify a different maximum timeslip time using the 'max_timeslip' argument. Specify the time in minutes (or HH:MM or HH:MM:SS).
+Note that this has a different effect depending on the B<timeslip> setting (which specifies the program 'edge'):
+
+=over 4
+
+=item max_timeslip=2:00
+
+Sets the maximum timslip time to be 2 hours (i.e. by default, the recording end can be extended by up to 2 hours)
+
+=back
+
+
+Also, you can set the 'edge' of the program that is to be timeslipped using the B<timeslip> parameter:
+
+=over 4
+
+=item timeslip=end
+
+Timeslips only the end of the recording. This means that the recording will record for the normal duration, and then check to see if
+the specified event (B<event_id>) has finished broadcasting. If not, the recording continues until the program finishes OR the maximum timeslip
+duration has expired.
+
+This is the default.
+
+=item timeslip=start
+
+Timeslips only the start of the recording. This means that the recording will not start until the event begins broadcasting. Once started, the 
+specified duration will be recorded.
+
+Note that this can mean that you miss a few seconds at the start of the program (which is why the default is to just extend the end of the recording).
+
+=item timeslip=both
+
+Performs both start and end recording timeslipping.
+
+=back
+
+
+=head3 Examples
+
+Example valid sets of arguments are:
+
+=over 4
+
+=item file=f1.mpeg chan=bbc1 out=avs lang=+eng len=1:00 off=0:10
+
+Record channel BBC1 into file f1.mpeg, include subtitles, add second English audio track, record for 1 hour, start recording 10 minutes from now
+
+=item file=f2.mp3 chan=bbc2 len=0:30
+
+Record channel BBC2 into file f2.mp3, audio only, record for 30 minutes
+
+=item file=f3.ts pid=600 pid=601 len=0:30
+
+Record pids 600 & 601 into file f3.ts, record for 30 minutes
+
+=back
+
+
+=head3 TSID
+
+The TSID definition defines the transponder (multiplex) to use. Use this when pids define the streams rather than 
+channel names and the pid value(s) may occur in multiple TSIDs.
+
+If you define default language or output specs, these will be used in all file definitions unless that file definition
+has it's own output/language spec. For example, if you want all files to include subtitles you can specify it once as
+the default rather than for every file.
+
+=head2 Further Details
+
+For full details of the DVBT functions, please see L<Linux::DVB::DVBT>:
+
+   perldoc Linux::DVB::DVBT
+ 

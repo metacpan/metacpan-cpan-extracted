@@ -1,0 +1,10 @@
+lib/Lingua/EN/Numbers/Easy.pm
+Changes
+MANIFEST
+Makefile.PL
+t/000_tests.t
+t/950_pod.t
+t/960_pod_coverage.t
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

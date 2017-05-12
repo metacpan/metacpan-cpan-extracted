@@ -1,0 +1,42 @@
+Revision history for Lingua-TreeTagger-Installer
+
+0.54    Tue Sep 29 08:34:21 WEST 2015
+		- fix english par file URL
+
+0.53    Sun Sep 27 21:36:43 WEST 2015
+        - fix installation of cmd tools
+
+0.52    Fri Sep 25 16:27:53 WEST 2015
+        - added configure requirements
+
+0.51    Wed Sep 23 15:53:35 WEST 2015
+        - fix issue with MacOS X and separate-punctuation
+        - fix issue with Portuguese language
+
+0.50    Tue Sep 22 10:27:00 WEST 2015
+        - make it work for linuxes (64/32 bits)
+
+0.50_1  Sun Aug 26 21:48:58 WEST 2012
+        Complete rewrite of the module:
+        - Building the module will only install the tree-tagger main files
+        - it will also install a tree-tagger-install-lang command line tool
+          that can be used to install and query about installed parameter
+          files.
+
+0.13    Tue Jul 31 16:22:48 WEST 2012
+        - Added german utf8 parameters file.
+        - Module needs drastic rewrite, sometime in the future.
+
+0.12	Thu Feb 18 12:02:58 WET 2010
+        - fixed module name (shame)
+
+0.11    Thu Feb 18 11:53:31 WET 2010
+        - fixed binaries installation to correct place
+        - fixed execution permissions
+
+0.10    Fri Feb 12 14:06:15 WET 2010
+        First version, released on an unsuspecting world, including:
+        - basic builder script to download treetagger and language parameters
+        - basic configuration mechanism to support more architectures and languages
+          (macosx-intel and linux only in this release)
+

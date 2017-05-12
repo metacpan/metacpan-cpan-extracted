@@ -1,0 +1,16 @@
+Changes
+examples/kanji2hanja.pl
+examples/synopsis.pl
+lib/Lingua/KO/Munja.pm
+lib/Lingua/KO/Munja.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/Lingua-KO-Munja.t
+t/romanize-korean.t
+xt/checkpod.t
+xt/distro.t
+xt/git.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

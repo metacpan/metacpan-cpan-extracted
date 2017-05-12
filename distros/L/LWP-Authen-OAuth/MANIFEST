@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/LWP-Authen-OAuth.t
+lib/LWP/Authen/OAuth.pm
+META.yml                                 Module meta-data (added by MakeMaker)

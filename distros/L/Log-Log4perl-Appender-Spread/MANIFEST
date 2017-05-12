@@ -1,0 +1,10 @@
+Build.PL
+Makefile.PL
+MANIFEST
+CHANGES
+README
+lib/Log/Log4perl/Appender/Spread.pm
+META.yml
+t/0_use.t
+t/1_log.t
+t/2_logm.t

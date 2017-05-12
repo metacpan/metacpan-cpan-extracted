@@ -1,0 +1,24 @@
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/Log/Trace.pm
+lib/Log/Trace/Manual.pod
+t/trace_allsubs.t
+t/trace_buffer.t
+t/trace_custom.t
+t/trace_deep.t
+t/trace_dump.t
+t/trace_file.t
+t/trace_filehandle.t
+t/trace_functions.t
+t/trace_levels.t
+t/trace_print.t
+t/trace_warn.t
+t/pod_coverage.t
+t/lib/Test_DeepImport.pm
+t/lib/Test_DelayedImport.pm
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

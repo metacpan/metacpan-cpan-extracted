@@ -1,0 +1,58 @@
+use File::Copy;
+
+BEGIN {print "1..3\n"}
+
+sub nogo {print "not "}
+sub ok {my $t=shift; print "ok $t\n";}
+
+chdir 't' or die "couldn't get to test directory";
+
+unlink
+
+#create a database of links
+
+#create an HTML file needing fixed
+
+open PAGE, "fixme.html";
+print PAGE <<EOF;
+<HTML>
+<HEAD>
+<TITLE>Pancakes</TITLE>
+<!-- Created by: Michael De La Rue, 22-Apr-2000 -->
+</HEAD>
+<BODY>
+<H1>Pancakes</H1>
+
+ <P>Real ones too.
+
+<UL>
+<LI> pile of flour into a bowl with salt and baking powder
+<LI> add an egg
+<LI> mix together till egg is spread in
+<LI> add milk little by little keeping a good mix
+<LI> once the mixture becomes smooth add more milk
+<LI> stop when the mixture is quite viscose
+<LI> leave to sit for half an hour
+<LI> dollop on pan and cook
+</UL>
+
+ <P><A HREF="http://www.ix.com">totally irrelevant</A>
+</BODY>
+</HTML>
+EOF
+
+close PAGE;
+
+nogo unless system '../blib/script/fix-link', 'http://www.or.com/', 
+	'http:://www.and.com/';
+
+
+ok(1);
+
+
+
+ok(2);
+
+system `diff`
+
+ok(3);

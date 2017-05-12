@@ -1,0 +1,34 @@
+---
+abstract: 'Log standard Perl warnings and errors on a log handler'
+author:
+  - 'Nigel Horne <njh@bandsman.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  IPC::System::Simple: '0'
+  Log::Dispatch::Null: '0'
+  Net::SFTP::Foreign: '0'
+  Test::File::Contents: '0'
+  Test::Most: '0'
+  Test::TempDir::Tiny: '0'
+  autodie: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-WarnDie
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Scalar::Util: '1.08'
+  perl: '5.006002'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log::WarnDie
+  repository: git://github.com/nigelhorne/Log::WarnDie.git
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

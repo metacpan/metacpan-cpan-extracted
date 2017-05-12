@@ -1,0 +1,70 @@
+<p><input type="button" onclick="parent.location='/'" value="back to surveys" /></p>
+
+<h2>Survey Admin</h2>
+
+<div class="newsbox">
+<p>[% scount || 0 %] conference survey responses received.</p>
+<p>[% tcount || 0 %] talk evaluation responses received.</p>
+<p>[% ccount || 0 %] course evaluation responses received.</p>
+</div>
+
+<h3>Conference Survey Responses</h3>
+<div class="newsbox">
+[% IF surveys %]
+<table width="100%">
+<tr><th>Attendee</th>
+    <th>Email</th>
+</tr>
+[% FOREACH survey = surveys %]
+<tr><td>[% survey.realname %]</td>
+    <td>[% survey.email %]</td>
+</tr>
+[% END %]
+</table>
+<p>[% scount %] responses received.</p>
+[% ELSE %]
+<p>No surveys completed yet</p>
+[% END %]
+</div>
+
+<h3>Talk Evaluation Responses</h3>
+<div class="newsbox">
+[% IF talks %]
+<table width="100%">
+<tr><th>Attendee</th>
+    <th>Presenter</th>
+    <th>Title</th>
+</tr>
+[% FOREACH course = talks %]
+<tr><td nowrap="nowrap">[% course.realname %]</td>
+    <td>[% course.tutor %]</td>
+    <td>[% course.course %]</td>
+</tr>
+[% END %]
+</table>
+<p>[% tcount %] responses received.</p>
+[% ELSE %]
+<p>No surveys completed yet</p>
+[% END %]
+</div>
+
+<h3>Course Evaluation Responses</h3>
+<div class="newsbox">
+[% IF courses %]
+<table width="100%">
+<tr><th>Attendee</th>
+    <th>Presenter</th>
+    <th>Title</th>
+</tr>
+[% FOREACH course = courses %]
+<tr><td nowrap="nowrap">[% course.realname %]</td>
+    <td>[% course.tutor %]</td>
+    <td>[% course.course %]</td>
+</tr>
+[% END %]
+</table>
+<p>[% ccount %] responses received.</p>
+[% ELSE %]
+<p>No surveys completed yet</p>
+[% END %]
+</div>

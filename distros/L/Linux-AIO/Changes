@@ -1,0 +1,103 @@
+Revision history for Linux::AIO
+
+This module has been mostly superseded by IO::AIO, which is API
+compatible.
+
+* works on: ia32, amd64, alpha, sparc64.
+* likely works on: s390, m68k, arm.
+* unlikely to work on: ia64, hppa, v850, sparc32, mips64, ppc64.
+
+1.9  Thu Feb  2 00:46:46 CET 2006
+	- added patch by Nicholas Clark to force optimization,
+          which is required for syscalls to be inlined on ia32.
+
+1.8  Wed Aug 17 18:56:14 CEST 2005
+	- return immediately from poll_wait if nreqs==0.
+        - use <linux/unistd.h> and try to make it work.
+        - replaced tests by better ones by Brad Fitzpatrick.
+        - fix a bug where the data scalar would be truncated if
+          the data offset is != 0.
+
+1.71 Sun Jul 10 19:11:36 CEST 2005
+	- aio_readahead was missing in 1.7.
+        - xs fixes for some perls.
+        - remind people to use absolute paths.
+        - add reference to IO::AIO, its brother.
+
+1.7 Sun Jul 10 01:40:00 CEST 2005
+	- further cleanups and simplifications.
+        - new functions: aio_fsync, aio_fdatasync, aio_readahead.
+        - vastly improved documentation.
+
+1.6 Fri Jul  8 01:17:04 CEST 2005
+        - added changes for alpha, ia64, sparc64, hppa, v850 (thanks to Stefan Traby who
+          dedusted his old machines).
+        - added t/02_read.t.
+
+1.51 Sat Jul  2 15:18:21 CEST 2005
+	- last release was borked.
+	- killing threads increases nreqs count infinitely.
+        - fixed a bug in queueing => many outstanding
+          requests lead to starvation.
+        - new function Linux::AIO::poll_wait.
+        - documented Linux::AIO::max_parallel.
+
+1.41 Thu Mar  3 18:00:52 CET 2005
+	- change of contact address.
+
+1.4 Sat Jan 15 01:04:27 CET 2005
+        - clarify licensing (same terms as perl itself).
+
+1.3 Sat Aug  7 17:25:31 CEST 2004
+	- ported to AMD64, possibly other 64 bit architecturs
+          (inspired by Joshua Hoblitt).
+        - removed support for old libcs, kernels (2.2).
+
+1.2 Sun Jul 18 12:54:43 CEST 2004
+	- do not clone signal handlers.
+        - when the parent thread dies, kill the child threads.
+        - added aio_unlink support (Brad Fitzpatrick <brad@danga.com>)
+
+1.1 Fri May  7 02:57:36 CEST 2004
+	- the number of outstanding requests was limited by the
+          pipe buffer size. this limit has been removed.
+        - improve documentation of min_parallel.
+        - one thread will now be started by default.
+
+1.01 Thu May  6 14:16:08 CEST 2004
+	- better support threaded perls.
+
+1.0  Wed May  5 15:54:23 CEST 2004
+	- improved the documentation and made a 1.0 release. Whoopa!
+
+0.2  Wed May  5 12:13:02 CEST 2004
+	- updates for 2.6 headers (syscalls were renamed).
+
+0.111 Sat May 18 23:47:12 CEST 2002
+	- print a notice that this module won't run on lnux <2.4.
+
+0.11 Fri May 17 04:33:23 CEST 2002
+	- actually fix the module to work on x86 (doesn't work on
+          most other architectures, though).
+
+0.1  Tue Apr  2 04:35:28 CEST 2002
+	- use pread/pwrite instead of lseek+read/write.
+        - fixed syscall prototypes.
+        - add stat/lstat calls.
+        - fixed max_parallel deadlock problem.
+        - beginning of a testsuite.
+        - fixed aio_close.
+        - paths are now properly saved.
+
+0.011 Tue Dec 25 03:02:30 CET 2001
+	- make it compile with 5.6.1 and maybe older versions. Boy is it
+          ugly now.
+
+0.01  Mon Oct  8 14:57:59 CEST 2001
+	- fixed syntax errors so it compiles with gcc-2.95.4 as well.
+
+0.002
+	- added Changes, aio_open, aio_close.
+
+0.001
+	- original version, a dire hack.

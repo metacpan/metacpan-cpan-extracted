@@ -1,0 +1,26 @@
+# Lirc::Client - Significant changes since the last public release
+
+2.02 - Fri Aug 15 20:35:13 EDT 2014
+    Improves the Synopsis code a bit
+
+2.01 - Sat Aug  9 09:06:53 EDT 2014
+    Adds minimum perl version to the prereqs
+    Converts the README file from the Lirc::Client docs
+    General cleanup
+
+2.00 - Sun Feb 10 19:44:37 EST 2013
+    Converts to Moo for object system
+    - Maintains speed, but makes code much more clean.
+
+    Various cleanup and xt test improvements
+    Cleanup of the support files
+
+1.55 - Wed Jan  9 20:18:46 EST 2013
+    Bail out of Build.PL on Windows. LIRC doesn't run on windows, so there
+    is no need to support it. Some tests might hang when run under windows.
+
+1.54 - Thu Jun  2 11:36:54 EDT 2011
+	* Bug fix: check that $self->{sock} is defined before closing it in
+	clean_up. Improvement suggested by Bernhard Mahr. Thanks!
+	* Converted AUTHOR_TEST to xt/ tests.
+	* Fixed spelling error in pod

@@ -1,0 +1,145 @@
+#!/usr/bin/perl
+use strict;
+use lib './lib';
+use base 'LEOCHARRE::CLI';
+use LEOCHARRE::Dev ':all';
+use vars qw/$VERSION/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.16 $ =~ /(\d+)/g;
+
+
+
+my $o = gopts('brda:p');
+
+
+
+if ($o->{b}){
+	print <DATA>;
+	exit;
+}
+
+if ($o->{d}){
+   $LEOCHARRE::Dev::DEBUG = 1;
+}
+
+
+my $out = join( '', <DATA>);
+
+# analize 
+my $abs_d = is_pmdist( $ARGV[0] ) or die('not perl module distro dir');
+
+if( my $val = pmdist_guess_name($abs_d) ){	
+	$out=~s/(NAME\s*=>\s*)''/$1'$val'/ or die;
+}
+
+
+# AUTHOR
+$o->{a}||='Leo Charre leocharre at cpan dot org';
+
+my $author = $o->{a} ? "'$$o{a}'" : '';
+$out=~s/(AUTHOR\s*=>\s*)''/$1$author/ or die;
+
+
+if( my $val = pmdist_guess_version_from($abs_d)  ){
+   debug("Asked where to get ver from $abs_d");
+	$out=~s/(VERSION_FROM\s*=>\s)*''/$1'$val'/ or die;
+   
+   my $pod = $val;
+   if ($pod=~s/\.\w{1,2}$/\.pod/){
+      if (-e "$abs_d/$pod" ){
+         $val = $pod;
+      }
+   }
+	$out=~s/(ABSTRACT_FROM\s*=>\s)*''/$1'$val'/ or die;
+} 
+
+else {
+   
+   #my $_code = q|VERSION => ( sprintf "%d.%02d", q$Revision: 1.16 $ =~ /(\d+)/g )|;
+   #my $_code = q{VERSION_FROM
+   #$out=~s/VERSION_FROM \=\> ''/$_code/;
+}
+
+
+if( my @exe = grep { /^bin\// } grep { ! /\.[ch]$|\.pod$/ } ls_pmdist($abs_d) ){
+	local $"="\n\t\t" if (scalar @exe > 3);
+	my $q = "[qw(@exe)]";
+
+	$out=~s/(EXE_FILES\s*=>\s*)\[\]/$1$q/ or die;
+}
+
+my $ropt ='';
+if ($o->{r}){ $ropt = ' -r '; }
+
+if ( my $prereq = `pmused $ropt -M '$abs_d'` ){
+
+	$out=~s/PREREQ_PM\s*=>\s*\{\s*\},/$prereq/ or die
+	debug('got pmused');
+}
+
+# FORCE POSIX
+if ($o->{p}){
+	$out = q{$^O=~/win32|mswin/i and die("OS not supported.\n");}. "\n$out";
+}
+
+
+print $out;
+
+
+
+
+sub usage {
+
+	qq{Usage: $0 [OPTION]... PATH...
+Analize distro and print Makefile.PL to stdout.
+
+	-b 			print blank Makefile.Pl to stdout 
+	-r 			trim things like v1.0.0 to 1, 0.235 to 0, 12.35 to 12
+	-h 			help
+	-v 			version and exit
+	-d				debug
+	-a string	author
+	-p				force posix, makefile does not send fail reports from windows os
+
+
+PATH
+
+Path to dist dir.
+The distro dir must contain a Makefile.PL, you can touch a blank one if you want.
+
+USAGE EXAMPLES
+
+   $0 ./dev/My-Distro
+   $0 ./dev/My-Distro > ./dev/My-Distro/Makefile.PL
+	$0
+
+LEOCHARRE::Dev - parent package
+};
+
+}
+
+
+
+
+
+
+__DATA__
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+
+   NAME => '',
+   
+   VERSION_FROM   => '',
+   
+   ABSTRACT_FROM  => '',      
+   
+   LICENSE        => 'perl',   
+   
+   AUTHOR         => '',   
+   
+   EXE_FILES => [],
+
+   PREREQ_PM      => {},
+);
+
+

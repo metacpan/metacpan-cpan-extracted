@@ -1,0 +1,32 @@
+---
+abstract: 'Determine the infinitive form of a conjugated word'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+  Test::Pod: '1.48'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-EN-Infinitive
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moo: '2.003'
+  Types::Standard: '1.000005'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/Lingua-EN-Infinitive.git
+version: '1.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

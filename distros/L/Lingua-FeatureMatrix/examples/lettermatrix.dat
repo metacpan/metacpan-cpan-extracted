@@ -1,0 +1,26 @@
+# Times New Roman font
+
+# general mappings to reduce complexity
+
+# not meaningful to talk about risers & fallers for capitals
+( +capital => [ *riser *faller ] )
+( +riser => -faller )
+( +faller => -riser )
+
+( +em => [ -en -ell ])
+( +en => [ -em -ell ])
+( +ell => [ -em -en ])
+
+( +cons => -vow )
+( +vow => -cons )
+
+q [ +faller +cons -capital +en ]
+p [ +faller +cons -capital +en ]
+
+m [ -faller -riser +cons -capital +em ]
+
+I [ +capital +vow +ell ]
+
+Y [ +capital -vow -cons +en ]
+
+class WIDE => [ -ell ]

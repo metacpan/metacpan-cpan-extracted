@@ -1,0 +1,10 @@
+Revision history for Lingua-ZH-Summary
+
+0.03    May 3, 2009
+        - pat pod test
+
+0.02    May 23, 2007
+        - move Net::YASA to requires()
+
+0.01    May 23, 2007
+        First version, released on an unsuspecting world.

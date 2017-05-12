@@ -1,0 +1,31 @@
+---
+abstract: 'change an English plural to a singular'
+author:
+  - 'Ben Bullock <bkb@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-EN-PluralToSingular
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006001'
+resources:
+  bugtracker: https://github.com/benkasminbullock/Lingua-EN-PluralToSingular/issues
+  homepage: http://prepan.org/module/3Yz7PYrBN8
+  repository: https://github.com/benkasminbullock/Lingua-EN-PluralToSingular
+version: '0.19'
+x_contributors:
+  - 'Xan Charbonnet'
+  - H2CHANG
+  - 'Lisa Hare'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

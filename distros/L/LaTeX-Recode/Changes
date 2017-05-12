@@ -1,0 +1,28 @@
+Revision history for perl module LaTeX::Recode
+
+0.04 2016-07-13
+
+ [ ENHANCEMENTS ]
+ - drop requirement for List::AllUtils and use only List::Util;
+
+ [ BUG FIXES ]
+ - add version to Perl module file;
+
+0.03 2016-07-11
+
+ [ ENHANCEMENTS ]
+ - added support for perl since 5.8.9 and up.
+
+ [ BUG FIXES ]
+ - fixed tarball structure.
+
+0.02 2016-07-10
+ 
+ [ BUG FIXES ]
+ - removed warning on usage without options.
+ 
+0.01 2016-07-10
+ 
+ - First version, based on Philip Kime and François Charette code
+   from biber.
+   

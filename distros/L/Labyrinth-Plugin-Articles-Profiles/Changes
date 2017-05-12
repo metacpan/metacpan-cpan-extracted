@@ -1,0 +1,17 @@
+Changes for the Labyrinth-Plugin-Articles-Profiles
+==================================================
+
+1.03    2015-02-02
+        - fixed date calculations in tests.
+
+1.02    2014-11-24
+        - fixed license fields in META.json to be lists.
+        - upgraded Labyrinth prerequisites.
+        - Labyrinth::Test::Harness now a prerequisite.
+
+1.01    2014-11-10
+        - fixed internal template variable links.
+        - extended functional test suite.
+
+1.00    2014-04-19
+        - first official release

@@ -1,0 +1,35 @@
+Lingua::Deva
+------------
+
+Perl module for converting Sanskrit in Latin transliteration to Devanagari and
+vice-versa.  Quickstart:
+
+    use Lingua::Deva;
+    my $d = Lingua::Deva->new();
+    say $d->to_latin('आसीद्राजा');
+    say $d->to_deva('Nalo nāma');
+
+This module comes with full documentation and illustrative unit tests.  Take a
+look at those to learn what it can do and how to use it.
+
+Lingua::Deva depends on some of Perl's Unicode features.  Input is required to
+be in UTF-8 encoding.  A modern, Unicode-capable version of Perl >= 5.12.1 is
+obligatory.
+
+Installation
+------------
+
+To install this module the usual procedure for Perl modules applies.
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, if you prefer using the cpan program:
+
+    cpan Lingua::Deva
+
+After the installation you can view the documentation with perldoc.
+
+    perldoc -t Lingua::Deva

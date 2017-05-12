@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Log/Structured.pm
+t/basic.t
+t/release-pod-syntax.t
+t/stacktrace.t

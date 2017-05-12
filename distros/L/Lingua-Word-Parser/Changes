@@ -1,0 +1,40 @@
+Revision history for Lingua-Word-Parser
+
+0.07  2015-10-06
+    - Remove the superfluous masks return from the knowns() method.
+    - Improved documentation.
+
+0.06  2015-10-06
+    - Reduce footprint by not using the $& variable.
+    - Add _rle() tests.
+    - Improved documentation.
+
+0.05  2015-09-07
+    - Reduce time footprint with List::PowerSet and Memoize.
+
+0.04  2015-08-22
+    - Added the extra-handy score_parts() method.
+
+0.0301 2015-06-05
+    - Improved documentation 
+
+0.03  2015-06-05
+    - Allowed specification of separator and terminator strings for score output.
+    - Improved documentation 
+    - Improved tests
+
+0.0212 2015-01-21
+    - Returned the definitions of the knowns in the score.
+    - Fixed POD
+
+0.0201 2014-05-31
+    - Added AWOL database source lexicon.
+    - Eliminated pre & post columns.
+    - Return a friendly hashref from score.
+
+0.02  2014-05-26
+    - Added database source access to populate the lexicon.
+
+0.01  2014-05-24
+    - Imported functionality from nomen-re.
+    - Minted by Dist::Zilla

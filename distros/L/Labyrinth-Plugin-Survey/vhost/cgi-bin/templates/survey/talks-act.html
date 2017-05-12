@@ -1,0 +1,21 @@
+[% IF data.saved %]
+<h3>Responses</h3>
+<table>
+<tr><th>Status</th><th>Id</th><th>TimeStamp</th><th>DateTime</th><th>Tutor</th><th>Type</th><th>Title</th><th>Room</th></tr>
+[% FOREACH item = data.talks %]
+<tr><td>[% item.status %]</td><td>[% item.timestamp %]</td><td>[% item.datetime %]</td><td>[% item.tutor %]</td><td>[% item.type %]</td><td>[% item.title %]</td><td>[% item.room %]</td></tr>
+[% END %]
+</table>
+[% ELSE %]
+<p>No users retrieved</p>
+[% END %]
+
+<h3>Summary</h3>
+<table>
+<tr><th>Found   </th><td>[% counts.found    || 0 %]</td></tr>
+<tr><th>Ignored </th><td>[% counts.ignored  || 0 %]</td></tr>
+<tr><th>Inserted</th><td>[% counts.insert   || 0 %]</td></tr>
+<tr><th>Updated </th><td>[% counts.update   || 0 %]</td></tr>
+<tr><th>Total   </th><td>[% counts.totals   || 0 %]</td></tr>
+</table>
+

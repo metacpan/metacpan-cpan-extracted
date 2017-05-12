@@ -1,0 +1,15 @@
+1.00   2012-10-23
+       - Initial release.
+
+1.10   2012-10-29
+       - Improved tokenization in l_to_tokens().
+1.11   2012-11-02
+       - Pluralized *_to_aksara() method names.
+       - Removed redundant "push"es in to_deva() and to_latin().
+
+1.20   2012-11-12
+       - Refactored internal maps handling and simplified usage.
+       - Moved IAST map, added maps for ITRANS, Harvard-Kyoto, ISO 15919.
+       - Added option for case-sensitive maps (a != A).
+       - Added missing Avagraha handling.
+       - Reviewed documentation.

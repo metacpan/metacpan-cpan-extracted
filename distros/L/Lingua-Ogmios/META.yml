@@ -1,0 +1,195 @@
+---
+abstract: 'Perl extension for configurable Natural Language Processing (NLP) platform'
+author:
+  - 'Thierry Hamon <thierry.hamon@limsi.fr>'
+build_requires:
+  Alvis::TermTagger: '0'
+  Class::Factory::Util: '0'
+  Config::General: '0'
+  Data::Dumper: '0'
+  Encode: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::MMagic: '0'
+  File::Path: '0'
+  File::Touch: '0'
+  Getopt::Long: '0'
+  HTML::FormatRTF: '0'
+  Lingua::Identify: '0'
+  Lingua::NegEx: '0'
+  Lingua::YaTeA: '0'
+  Math::Trig: '0'
+  Module::Build: '0.28'
+  Parse::Yapp: '0'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  Sys::Hostname: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+  Text::Affixes: '0'
+  Text::Ngram: '0'
+  Time::HiRes: '0'
+  XML::Entities: '0'
+  XML::LibXML: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Ogmios
+provides:
+  Lingua::Ogmios:
+    file: lib/Lingua/Ogmios.pm
+    version: '0.011'
+  Lingua::Ogmios::Annotations:
+    file: lib/Lingua/Ogmios/Annotations.pm
+  Lingua::Ogmios::Annotations::AnaphoraRelation:
+    file: lib/Lingua/Ogmios/Annotations/AnaphoraRelation.pm
+  Lingua::Ogmios::Annotations::DomainSpecificRelation:
+    file: lib/Lingua/Ogmios/Annotations/DomainSpecificRelation.pm
+  Lingua::Ogmios::Annotations::Element:
+    file: lib/Lingua/Ogmios/Annotations/Element.pm
+  Lingua::Ogmios::Annotations::Enumeration:
+    file: lib/Lingua/Ogmios/Annotations/Enumeration.pm
+  Lingua::Ogmios::Annotations::Lemma:
+    file: lib/Lingua/Ogmios/Annotations/Lemma.pm
+  Lingua::Ogmios::Annotations::Level:
+    file: lib/Lingua/Ogmios/Annotations/Level.pm
+  Lingua::Ogmios::Annotations::LogProcessing:
+    file: lib/Lingua/Ogmios/Annotations/LogProcessing.pm
+  Lingua::Ogmios::Annotations::MorphosyntacticFeatures:
+    file: lib/Lingua/Ogmios/Annotations/MorphosyntacticFeatures.pm
+  Lingua::Ogmios::Annotations::Phrase:
+    file: lib/Lingua/Ogmios/Annotations/Phrase.pm
+  Lingua::Ogmios::Annotations::Section:
+    file: lib/Lingua/Ogmios/Annotations/Section.pm
+  Lingua::Ogmios::Annotations::SemanticFeatures:
+    file: lib/Lingua/Ogmios/Annotations/SemanticFeatures.pm
+  Lingua::Ogmios::Annotations::SemanticUnit:
+    file: lib/Lingua/Ogmios/Annotations/SemanticUnit.pm
+  Lingua::Ogmios::Annotations::Sentence:
+    file: lib/Lingua/Ogmios/Annotations/Sentence.pm
+  Lingua::Ogmios::Annotations::Stem:
+    file: lib/Lingua/Ogmios/Annotations/Stem.pm
+  Lingua::Ogmios::Annotations::SyntacticRelation:
+    file: lib/Lingua/Ogmios/Annotations/SyntacticRelation.pm
+  Lingua::Ogmios::Annotations::Token:
+    file: lib/Lingua/Ogmios/Annotations/Token.pm
+  Lingua::Ogmios::Annotations::Word:
+    file: lib/Lingua/Ogmios/Annotations/Word.pm
+  Lingua::Ogmios::Config:
+    file: lib/Lingua/Ogmios/Config.pm
+  Lingua::Ogmios::Config::NLPTools:
+    file: lib/Lingua/Ogmios/Config/NLPTools.pm
+  Lingua::Ogmios::DocumentCollection:
+    file: lib/Lingua/Ogmios/DocumentCollection.pm
+  Lingua::Ogmios::DocumentRecord:
+    file: lib/Lingua/Ogmios/DocumentRecord.pm
+  Lingua::Ogmios::FileManager:
+    file: lib/Lingua/Ogmios/FileManager.pm
+  Lingua::Ogmios::LearningDataSet:
+    file: lib/Lingua/Ogmios/LearningDataSet.pm
+    version: '0.1'
+  Lingua::Ogmios::LearningDataSet::Attribute:
+    file: lib/Lingua/Ogmios/LearningDataSet/Attribute.pm
+    version: '0.1'
+  Lingua::Ogmios::LearningDataSet::Data:
+    file: lib/Lingua/Ogmios/LearningDataSet/Data.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::AssertionDetection:
+    file: lib/Lingua/Ogmios/NLPWrappers/AssertionDetection.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::AwkWordSegmentizer:
+    file: lib/Lingua/Ogmios/NLPWrappers/AwkWordSegmentizer.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::BasicNER:
+    file: lib/Lingua/Ogmios/NLPWrappers/BasicNER.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::BasicSentenceSegmentizer:
+    file: lib/Lingua/Ogmios/NLPWrappers/BasicSentenceSegmentizer.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::BasicWordSegmentizer:
+    file: lib/Lingua/Ogmios/NLPWrappers/BasicWordSegmentizer.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::Distribution:
+    file: lib/Lingua/Ogmios/NLPWrappers/Distribution.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::Faster:
+    file: lib/Lingua/Ogmios/NLPWrappers/Faster.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::Flemm:
+    file: lib/Lingua/Ogmios/NLPWrappers/Flemm.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::GeniaTagger:
+    file: lib/Lingua/Ogmios/NLPWrappers/GeniaTagger.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::HeidelTime:
+    file: lib/Lingua/Ogmios/NLPWrappers/HeidelTime.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::LexicalSyntacticPatterns:
+    file: lib/Lingua/Ogmios/NLPWrappers/LexicalSyntacticPatterns.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::MarkerDetection:
+    file: lib/Lingua/Ogmios/NLPWrappers/MarkerDetection.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::MorphoSemanticTagging:
+    file: lib/Lingua/Ogmios/NLPWrappers/MorphoSemanticTagging.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::NegEx:
+    file: lib/Lingua/Ogmios/NLPWrappers/NegEx.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::PatternParser:
+    file: lib/Lingua/Ogmios/NLPWrappers/PatternParser.pm
+  Lingua::Ogmios::NLPWrappers::PerlWordSegmentizer:
+    file: lib/Lingua/Ogmios/NLPWrappers/PerlWordSegmentizer.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::PorterStemmer:
+    file: lib/Lingua/Ogmios/NLPWrappers/PorterStemmer.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::SectionIdentification:
+    file: lib/Lingua/Ogmios/NLPWrappers/SectionIdentification.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::SmileyRecognition:
+    file: lib/Lingua/Ogmios/NLPWrappers/SmileyRecognition.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::StanfordParser:
+    file: lib/Lingua/Ogmios/NLPWrappers/StanfordParser.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::Template:
+    file: lib/Lingua/Ogmios/NLPWrappers/Template.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::TermExpansion:
+    file: lib/Lingua/Ogmios/NLPWrappers/TermExpansion.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::TermMeasures:
+    file: lib/Lingua/Ogmios/NLPWrappers/TermMeasures.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::TermTagger:
+    file: lib/Lingua/Ogmios/NLPWrappers/TermTagger.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::TreeTagger:
+    file: lib/Lingua/Ogmios/NLPWrappers/TreeTagger.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::UKWordSegmentizer:
+    file: lib/Lingua/Ogmios/NLPWrappers/UKWordSegmentizer.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::Wrapper:
+    file: lib/Lingua/Ogmios/NLPWrappers/Wrapper.pm
+    version: '0.1'
+  Lingua::Ogmios::NLPWrappers::YaTeA:
+    file: lib/Lingua/Ogmios/NLPWrappers/YaTeA.pm
+    version: '0.1'
+  Lingua::Ogmios::Timer:
+    file: lib/Lingua/Ogmios/Timer.pm
+requires:
+  perl: v5.8.0
+resources:
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+version: '0.011'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

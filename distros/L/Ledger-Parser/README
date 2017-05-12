@@ -1,0 +1,90 @@
+SYNOPSIS
+
+     use Ledger::Parser;
+     my $ledgerp = Ledger::Parser->new(
+         # year              => undef,        # default: current year
+         # input_date_format => 'YYYY/MM/DD', # or 'YYYY/DD/MM',
+     );
+    
+     # parse a file
+     my $journal = $ledgerp->read_file("$ENV{HOME}/money.dat");
+    
+     # parse a string
+     $journal = $ledgerp->read_string(<<EOF);
+     ; -*- Mode: ledger -*-
+     09/06 dinner
+     Expenses:Food          $10.00
+     Expenses:Tips         5000.00 IDR ; 5% tip
+     Assets:Cash:Wallet
+    
+     2013/09/07 opening balances
+     Assets:Mutual Funds:Mandiri  10,305.1234 MFEQUITY_MANDIRI_IAS
+     Equity:Opening Balances
+    
+     P 2013/08/01 MFEQUITY_MANDIRI_IAS 1,453.8500 IDR
+     P 2013/08/31 MFEQUITY_MANDIRI_IAS 1,514.1800 IDR
+     EOF
+
+    See Ledger::Journal for available methods for the journal object.
+
+DESCRIPTION
+
+    This module parses Ledger journal into Ledger::Journal object. See
+    http://ledger-cli.org/ for more on Ledger, the command-line
+    double-entry accounting system software.
+
+    Ledger 3 can be extended with Python, and this module only supports a
+    subset of Ledger syntax, so you might also want to take a look into the
+    Python extension. However, this module can also modify/write the
+    journal, so it can be used e.g. to insert transactions programmatically
+    (which is my use case and the reason I first created this module).
+
+    This is an inexhaustive list of things that are not currently
+    supported:
+
+      * Costs & prices
+
+      For example, things like:
+
+       2012-04-10 My Broker
+          Assets:Brokerage            10 AAPL @ $50.00
+          Assets:Brokerage:Cash
+
+      * Automated transaction
+
+      * Periodic transaction
+
+      * Expression
+
+      * Various commands
+
+      Including but not limited to: assert, C (currency conversion), ...
+
+ATTRIBUTES
+
+ input_date_format => str ('YYYY/MM/DD' or 'YYYY/DD/MM')
+
+    Ledger accepts dates in the form of yearless (e.g. 01/02, 3-12) or with
+    4-digit year (e.g. 2015/01/02, 2015-3-12). Month and day can be single-
+    or double-digits. Separator is either - or /.
+
+    When year is omitted, year will be retrieved from the year attribute.
+
+    The default format is month before day (YYYY/MM/DD), but you can also
+    use day before month (YYYY/DD/MM).
+
+ year => int (default: current year)
+
+    Only used when encountering a date without year.
+
+
+METHODS
+
+ new(%attrs) => obj
+
+    Create a new parser instance.
+
+ $ledgerp->read_file($filename) => obj
+
+ $ledgerp->read_string($str) => obj
+

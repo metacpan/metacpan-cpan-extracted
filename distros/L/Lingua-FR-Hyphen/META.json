@@ -1,0 +1,36 @@
+{
+   "abstract" : "Hyphenate French words",
+   "author" : [
+      "Djibril Ousmanou <djibel@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4212",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-FR-Hyphen",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::FR::Hyphen" : {
+         "file" : "lib/Lingua/FR/Hyphen.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01"
+}

@@ -1,0 +1,84 @@
+{
+    "name": "Labyrinth-Plugin-Event",
+    "version": "1.10",
+    "abstract": "Event plugin for the Labyrinth framework",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "web",
+        "cgi",
+        "framework"
+    ],
+
+    "prereqs" : {
+        "test" : {
+            "requires": {
+                "DateTime": "0",
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+              "perl": "5.006",
+              "Labyrinth": "5.17",
+              "Labyrinth::Plugin::Articles::Sections": "5.06",
+              "Labyrinth::Test::Harness": "1.07",
+              "Clone": "0",
+              "Time::Local": "0"
+            }
+        }
+    },
+
+    "provides": {
+        "Labyrinth::Plugin::Event": {
+            "file": "lib/Labyrinth/Plugin/Event.pm",
+            "version": "1.10"
+        },
+        "Labyrinth::Plugin::Event::Sponsors": {
+            "file": "lib/Labyrinth/Plugin/Event/Sponsors.pm",
+            "version": "1.10"
+        },
+        "Labyrinth::Plugin::Event::Talks": {
+            "file": "lib/Labyrinth/Plugin/Event/Talks.pm",
+            "version": "1.10"
+        },
+        "Labyrinth::Plugin::Event::Types": {
+            "file": "lib/Labyrinth/Plugin/Event/Types.pm",
+            "version": "1.10"
+        },
+        "Labyrinth::Plugin::Event::Venues": {
+            "file": "lib/Labyrinth/Plugin/Event/Venues.pm",
+            "version": "1.10"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples","vhost"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Labyrinth-Plugin-Event" },
+        "repository": {
+            "url": "git://github.com/barbie/labyrinth-plugin-event.git",
+            "web": "http://github.com/barbie/labyrinth-plugin-event",
+            "type": "git"
+        }
+    }
+}

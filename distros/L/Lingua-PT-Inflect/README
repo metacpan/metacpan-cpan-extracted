@@ -1,0 +1,44 @@
+Lingua/PT/Inflect version 0.06
+==============================
+
+Lingua::PT::Inflect - Converts Portuguese words from singular to plural
+
+=head1 SYNOPSIS
+
+  use Lingua::PT::Inflect;
+
+  $plural = sing2plural('programador')   # now holds 'programadores'
+
+=head1 DESCRIPTION
+
+Converts Portuguese words from singular to plural. There may be some
+special cases that will fail (words ending in -ão or -s might fail, as
+many special cases are yet to be prevented; anyone volunteering to
+look at a huge list of words?)
+
+=head1 TO DO
+
+=over 6
+
+=item * Several words are exceptions to the rules; there is a file of
+those words that need to be checked.
+
+=back
+
+=head1 SEE ALSO
+
+More tools for the Portuguese language processing can be found at the Natura
+project: http://natura.di.uminho.pt
+
+=head1 AUTHOR
+
+Jose Castro, C<< <cog@cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2004 Jose Castro, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

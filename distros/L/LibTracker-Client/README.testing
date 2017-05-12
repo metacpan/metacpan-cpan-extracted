@@ -1,0 +1,33 @@
+Testing LibTracker::Client
+
+So you downloaded LibTracker::Client and you even managed to compile it. But
+all good modules have tests and so does LT::C. What makes LT::C a little
+different is that it needs a running trackerd to test stuff. And it would
+want to change some properties on an entry (path) indexed by tracker to test
+out most of its functionality.
+
+If LT::C were a regular old module, we could get around by using
+Test::MockObject. But it isn't and we can't. Well, we _can_, but it would be
+pointless. LT::C is essentially an XS wrapper around libtrackerclient, and
+we would have to bypass the very XS-ish behaviour that we want to test, if
+we go via the Test::MockObject route.
+
+Another option is to mock the libtrackerclient library and build against
+that, specifically for testing, but communicating with a real trackerd
+instance is far easier and more real-world.
+
+So - here's what the LT::C test interface assumes/expects :
+
+$ENV{LTC_TRACKER_RUNNING} : if this is defined, LT::C will try connecting to
+                            the trackerd instance.
+
+$ENV{LTC_TEST_PATH}       : a path which is indexed by tracker. LT::C will
+                            try to make (and revert) changes to this, but
+                            naturally - tests might fail. It is good to keep
+                            this as a test path. If this is not defined,
+                            LT::C will skip all tests which require a path.
+
+$ENV{LTC_META_FIELD}      : A string type metadata field that the test
+                            scripts can play with. If this is not defined,
+                            the test scripts assume 'File:Other'.
+

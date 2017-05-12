@@ -1,0 +1,22 @@
+---
+abstract: 'Dashrep language translator/interpreter'
+author:
+  - 'Richard Fobes <prog@SolutionsCreative.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Language-Dashrep
+provides:
+  Language::Dashrep:
+    file: lib/Language/Dashrep.pm
+    version: 2.33
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: 2.33

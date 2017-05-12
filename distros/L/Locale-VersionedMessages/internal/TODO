@@ -1,0 +1,22 @@
+=====================================================================
+In the lm_gui app:
+=====================================================================
+
+Add support for a Copyright in the generated modules.
+
+Add a <Delete Message> button in the left pane.
+
+Make text boxes automatically sized correctly, and resizable.  ROText
+should not need scroll bars.
+
+In generated POD file, make sure that there is a \n:
+   Substitution values: VALUES \n
+   Desc
+
+=====================================================================
+In Locale::VersionedMessages
+=====================================================================
+
+In the description file, include a description of the set.  This will
+be included in the POD file.
+

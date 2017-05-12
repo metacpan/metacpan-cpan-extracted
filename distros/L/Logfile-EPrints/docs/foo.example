@@ -1,0 +1,43 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Logfile::EPrints::Parser::Foo;
+use Logfile::EPrints::Hit::Foo;
+use Logfile::EPrints::Filter::Foo;
+
+# Example with a Parser object
+my $parser = Logfile::EPrints::Parser::Foo->new(
+	handler => Logfile::EPrints::Filter::Foo->new(
+		fromdate => 20060601100101,
+		handler => MyHandler->new()
+));
+
+$parser->parse( $my_data_source );
+
+# Example with a while loop
+my $filter = Logfile::EPrints::Filter::Foo->new( handler => MyHandler->new );
+
+while(..)
+{
+	$hit = Logfile::EPrints::Hit::Foo->new( ... );
+	$hit->field1( value1 );
+	$filter->hit( $hit );
+}
+
+package MyHandler;
+
+sub new
+{
+	bless {}, shift;
+}
+
+sub hit
+{
+	my( $self, $hit ) = @_;
+
+	print "Got hit: ", $hit->datetime, "\n";
+}
+
+1;

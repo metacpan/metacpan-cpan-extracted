@@ -1,0 +1,29 @@
+---
+abstract: '2D Layout Management'
+author:
+  - 'Cory Watson, C<< <gphat@cpan.org> >>'
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Layout-Manager
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Geometry::Primitive: 0.16
+  Graphics::Primitive: 0.43
+  Moose: 0.79
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.35

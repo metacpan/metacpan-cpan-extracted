@@ -1,0 +1,32 @@
+<html>
+<head>
+<title>
+Cyrillic detector test
+</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<style>
+BODY {font-family: Arial, Helvetica,sans-serif;font-size:10 pt}
+</style>
+</head>
+<body bgcolor="#E8E8E8">
+<h4>Detects coding and language - Russian or Ukrainian</h4>
+Enter a piece of text in Russian or Ukrainian here and push the button <i>Detect</i>.
+<br><b>Tokens Count</b> - number of tokens (words) after which the program starts analysis.
+<br><b>Detect All Languages</b> - if not checked, the program detects Russian only.  
+
+<form method=get action="/cgi-bin/DetectCyrillic_test.pl" >
+<textarea rows=6 cols=53 name="Text_area"></textarea><br>
+Maximum tokens count: <select size="1" name="MaxTokens">
+  <option>10</option>
+  <option>30</option>
+  <option>50</option>
+  <option selected>100</option>
+  <option>200</option>
+  <option>300</option>
+  <option>500</option>
+</select>&nbsp;&nbsp; Detect all languages: <input type="checkbox" name="DetectAllLang" value="ON" checked><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type=submit value="Detect!">
+</form>
+</body>
+</html>

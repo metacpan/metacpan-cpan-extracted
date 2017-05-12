@@ -1,0 +1,30 @@
+---
+abstract: 'an object to collect and print Logwatch events'
+author:
+  - 'Reid Augustin <reid@hellosix.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Logwatch-RecordTree
+requires:
+  Carp: '0'
+  List::Util: '0'
+  Math::BigInt: '0'
+  Moo: '0'
+  Net::IP::Identifier: '0.111'
+  Sort::Key::IPv4: '0'
+  Sort::Key::Natural: '0'
+  UNIVERSAL::require: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+version: '2.056'

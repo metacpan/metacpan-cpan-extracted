@@ -1,0 +1,50 @@
+--- #YAML:1.0
+name:                Log-Parallel
+version:             0.303
+abstract:            Parallel batch processing of log data
+license:             ~
+author:              
+    - David Muir Sharnoff <muir@idiom.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Callback:                      0
+    Clone::PP:                     0
+    Config::Checker:               0
+    Data::Compare:                 0
+    Data::Dumper:                  0
+    DBI:                           0
+    Digest::MD5:                   0
+    Encode:                        0
+    Eval::LineNumbers:             0
+    File::Basename:                0
+    File::Flock:                   0
+    File::Glob:                    0
+    File::Path:                    0
+    File::Slurp:                   0
+    File::Slurp::Remote:           0
+    File::Temp:                    0
+    Getopt::Long:                  0
+    IO::Event:                     0.704
+    Lingua::EN::Inflect:           0
+    List::EvenMoreUtils:           0
+    List::MoreUtils:               0
+    List::Util:                    0
+    Module::Load:                  0
+    Object::Dependency:            0
+    Proc::JobQueue:                0
+    RPC::ToWorker:                 0
+    Search::Binary:                0
+    Sort::MergeSort:               0
+    Stream::Aggregate:             0
+    String::CRC:                   0
+    Tie::Function::Examples:       0
+    Time::HiRes:                   0
+    Time::ParseDate:               0
+    URI::Escape:                   0
+    URI::Escape::XS:               0
+    YAML:                          0
+    YAML::Syck:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

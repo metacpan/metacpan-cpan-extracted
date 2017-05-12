@@ -1,0 +1,193 @@
+#!/usr/bin/perl
+use strict ;
+use Pod::Usage ;
+use Getopt::Long qw/:config no_ignore_case/ ;
+
+++$! ;
+
+use Linux::DVB::DVBT ;
+
+our $VERSION = "1.001" ;
+
+my %CAPABILITIES = (
+		FE_IS_STUPID			=> 'Not too bright',
+		FE_CAN_INVERSION_AUTO	=> 'Inversion: Auto',
+		FE_CAN_FEC_1_2			=> 'FEC 1/2',
+		FE_CAN_FEC_2_3			=> 'FEC 2/3',
+		FE_CAN_FEC_3_4			=> 'FEC 3/4',
+		FE_CAN_FEC_4_5			=> 'FEC 4/5',
+		FE_CAN_FEC_5_6			=> 'FEC 5/6',
+		FE_CAN_FEC_6_7			=> 'FEC 6/7',
+		FE_CAN_FEC_7_8			=> 'FEC 7/8',
+		FE_CAN_FEC_8_9			=> 'FEC 8/9',
+		FE_CAN_FEC_AUTO			=> 'FEC: Auto',
+		FE_CAN_QPSK				=> 'Mod: QPSK',
+		FE_CAN_QAM_16			=> 'Mod: QAM16',
+		FE_CAN_QAM_32			=> 'Mod: QAM32',
+		FE_CAN_QAM_64			=> 'Mod: QAM64',
+		FE_CAN_QAM_128			=> 'Mod: QAM128',
+		FE_CAN_QAM_256			=> 'Mod: QAM256',
+		FE_CAN_QAM_AUTO			=> 'Mod: Auto',
+		FE_CAN_TRANSMISSION_MODE_AUTO	=> 'Transmission mode: Auto',
+		FE_CAN_BANDWIDTH_AUTO		=> 'Bandwidth: Auto',
+		FE_CAN_GUARD_INTERVAL_AUTO	=> 'Guard: Auto',
+		FE_CAN_HIERARCHY_AUTO		=> 'Hierarchy: Auto',
+		FE_CAN_8VSB					=> '8VSB',
+		FE_CAN_16VSB				=> '16VSB',
+) ;
+
+	my ($help, $man, $DEBUG, $VERBOSE, $showall) ;
+	GetOptions('v|verbose=s' => \$VERBOSE,
+			   'debug=s' => \$DEBUG,
+			   'h|help' => \$help,
+			   'man' => \$man,
+			   'all' => \$showall,
+			   ) or pod2usage(2) ;
+
+
+    pod2usage(1) if $help;
+    pod2usage(-verbose => 2) if $man;
+
+	Linux::DVB::DVBT->debug($DEBUG) ;
+	Linux::DVB::DVBT->dvb_debug($DEBUG) ;
+	Linux::DVB::DVBT->verbose(1) ;
+
+	## Create dvb (use first found adapter). 
+	## NOTE: With default object settings, the application will
+	## die on *any* error, so there is no error checking in this script
+	##
+	my $dvb = Linux::DVB::DVBT->new() ;
+	
+	## Show any fitted devices
+	my %args ;
+	if ($showall)
+	{
+		$args{'show'} = 'all' ;
+	}
+  	my @devices = Linux::DVB::DVBT->device_list(%args) ;
+ 
+Linux::DVB::DVBT::prt_data("Devices:", \@devices) if $DEBUG ;
+  	
+  	my $namelen = 0 ;
+  	foreach (@devices)
+  	{
+  		my $len = length $_->{name} ;
+  		$namelen = $len if $namelen < $len;
+	}
+	
+	
+	my $bar = "" ;
+	my $type_sep = "------+-" ;
+	my $sep = "--------+-" . ($showall ? $type_sep : "") . ("-"x$namelen) . "-+-------------" ;
+	
+	#unless ($VERBOSE)
+	{
+		my $type_str = "" ;
+		if ($showall)
+		{
+			$type_str = "Type  | " ;
+		}
+		print  "$sep\n" ;
+		printf "adap:fe | $type_str%-${namelen}s | (symlink)\n", "name" ;
+		print  "$sep\n" ;
+		
+		$bar = "|" ;
+	}
+	
+  	foreach my $device (@devices)
+  	{
+ Linux::DVB::DVBT::prt_data("Device:", $device) if $DEBUG ;
+
+		print  "$sep\n" if $VERBOSE ;
+		my $type_str = "" ;
+		if ($showall)
+		{
+			$type_str = sprintf " %-5s $bar", $device->{'type'} ;
+		}
+  		printf " %3d:%-2d $bar$type_str %-${namelen}s ", $device->{'adapter_num'}, $device->{'frontend_num'}, $device->{'name'}  ;
+  		if (exists($device->{'symlink'}))
+  		{
+	  		printf "-> %3d:%-2d", $device->{'symlink'}{'adapter_num'}, $device->{'symlink'}{'frontend_num'} ;
+  		}
+  		else
+  		{
+  			print "$bar" ;
+  		}
+  		print "\n" ;
+		print  "$sep\n" if $VERBOSE ;
+
+  		if ($VERBOSE && !exists($device->{'symlink'}))
+  		{
+  			print "Frequencies:\n" ;
+  			print "   Min : $device->{'frequency_min'} Hz\n" ;
+  			print "   Max : $device->{'frequency_max'} Hz\n" ;
+  			print "   Step: $device->{'frequency_stepsize'} Hz\n" ;
+  			print "\n" ;
+
+  			my $caps_href = $device->{capabilities} ;
+  			print "Capabilities:\n" ;
+  			foreach my $cap (sort keys %CAPABILITIES)
+  			{
+  				print "   $CAPABILITIES{$cap}\n" if ($caps_href->{$cap}) ;
+  			}
+  			print "\n" ;
+  		}
+  	}
+  	
+  	unless ($VERBOSE)
+  	{
+		print  "$sep\n" ;
+	}
+	
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+=head1 NAME
+
+dvbt-devices - Show any fitted DVBT tuners
+
+=head1 SYNOPSIS
+
+dvbt-devices [options]
+
+Options:
+
+       -debug level         set debug level
+       -verbose level       set verbosity level
+       -help                brief help message
+       -man                 full documentation
+       
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Set verbosity level. Higher values show more information.
+
+=item B<-debug>
+
+Set debug level. Higher levels show more debugging information (only really of any interest to developers!)
+
+
+=back
+
+=head1 DESCRIPTION
+
+Script that uses the perl Linux::DVB::DVBT package to provide DVB-T adapter functions.
+ 
+Shows information about all fitted DVB-T tuner cards
+ 
+=cut
+
+	

@@ -1,0 +1,102 @@
+[% IF q.preamble %]qu:p:[% q.preamble %][% END %]
+[% qu = q.name %]
+[% gr = graphs.$qu %]
+
+[% IF gr %]
+qu:img:[% CODE %]-images/[% gr.image %]"
+[% END %]
+
+[% IF q.type == 'select' OR q.type == 'radio' OR q.type == 'private' %]
+qu:tab:start:0
+qu:tab:tr:0
+qu:tab:th:Count
+qu:tab:th:Description
+
+[% FOREACH option = q.options %]
+[% ov = option.value %]
+<tr><td align="right" width="100">[% str = String.new(results.$qu.$ov.value); str.right(4) %]</td><td>[% option.key %]</td></tr>
+[% END %]
+[% qux = q.name _ 'X' %]
+[% IF results.$qux.value %]
+</table>
+<ul>
+[% FOREACH def = results.$qux.value %]
+<li>[% def %]</li>
+[% END %]
+</ul>
+[% ELSE %]
+</table>
+[% END %]
+[% END %]
+
+[% IF q.type == 'checkbox' %]
+<table>
+<tr><th class="number">Count</th><th>Description</th></tr>
+<tr><td align="right" width="100">[% str = String.new(results.$qu.value); str.right(4) %]</td><td>[% q.options.0.key %]</td></tr>
+[% IF q.default %]
+</table>
+<ul>
+[% qux = q.name _ 'X' %]
+[% FOREACH def = results.$qux.value %]
+<li>[% def %]</li>
+[% END %]
+</ul>
+[% ELSE %]
+</table>
+[% END %]
+[% END %]
+
+[% IF q.type == 'count' %]
+[% IF q.group ; THEN ; group = q.group %]
+[% IF ! groups.$group.done %]
+<table>
+<tr><th class="number">Attended [% group %]</th>[% FOREACH o = groups.$group.options %]<th>[% o %]</th>[% END %]<th>total</th></tr>
+[% FOREACH row = groups.$group.results.keys.sort %]
+<tr><td align="right">[% results.$row.name %]</td>[% FOREACH o = groups.$group.options %]<td align="right" width="20">[% groups.$group.results.$row.$o %]</td>[% END %]<td align="right" width="20">[% results.$row.value %]</td></tr>
+[% END %]
+</table>
+[% END ; groups.$group.done = 1 %]
+
+[% ELSE %]
+<table>
+<tr><th class="number">Count</th><th>Description</th></tr>
+[% FOREACH option = q.options %]
+<tr><td align="right" width="100">[% str = String.new(results.$qu.value); str.right(4) %]</td><td>[% option.key %]</td></tr>
+[% END %]
+</table>
+[% END %]
+[% END %]
+
+[% IF q.type == 'text' OR q.type == 'textarea' %]
+<ul>
+[% FOREACH r = results.$qu.value %]<li>[% r %]</li>
+[% END %]
+</ul>
+[% END %]
+
+[% IF q.type == 'currency' %]
+<table>
+<tr><th class="number">Count</th><th>Fee</th></tr>
+[% FOREACH r = results.$qu; k = r.key %]
+<tr><td align="right" width="100">[% str = String.new(results.$qu.$k.value); str.right(4) %]</td><td>[% q.pre %] [% r.key %] [% q.post %]</td></tr>
+[% END %]
+</table>
+[% END %]
+
+[% IF q.type == 'matrix' %]
+<table>
+<tr><td>[% str = String.new('Choices'); str.left(30); opt = 1; FOREACH option = q.options %]</td><td align="right" width="100">[% str = String.new(opt); str.right(4);opt = opt + 1; END %]</td></tr>
+[% inx = 0 %]
+[% FOREACH choice = q.choices; opt = 1 %]
+<tr><td>[% str = String.new(choice); str.left(30); FOREACH option = q.options %]</td><td align="right" width="100">[% str = String.new(results.$qu.$inx.$opt.value); str.right(4); opt = opt + 1; END %]</td></tr>
+[% inx = inx + 1 %]
+[% END %]
+</table>
+
+<p>
+Key:<br />
+[% opt = 1; FOREACH option = q.options; opt %] = [% option; opt = opt + 1 %]<br />[% END %]
+</p>
+[% END %]
+
+[% IF q.footnote %]<p>[% q.footnote %]</p>[% END %]

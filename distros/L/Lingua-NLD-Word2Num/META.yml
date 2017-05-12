@@ -1,0 +1,23 @@
+---
+abstract: 'Word 2 number conversion in NLD.'
+author:
+  - 'PetaMem s.r.o. <info@petamem.com>'
+build_requires:
+  Test::More: 0
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-NLD-Word2Num
+requires:
+  Parse::RecDescent: 0
+  Perl6::Export::Attrs: 0
+  perl: v5.10.1
+  strict: 0
+  warnings: 0
+version: 0.0682

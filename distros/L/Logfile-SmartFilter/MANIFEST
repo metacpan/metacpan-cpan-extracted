@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+README
+t/Logfile-SmartFilter.t
+lib/Logfile/SmartFilter.pm

@@ -1,0 +1,11 @@
+Revision history for Perl extension Language::Nouse.
+
+0.01  Wed Aug 20 08:34:36 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n Language::Nouse
+
+0.03  Fri Aug 29 16:41:00 2003
+	- patched linenoise parser thanks to Laurent Vogel (http://lvogel.free.fr)
+
+0.04  Tue Sep 02 09:33:00 2003
+	- fixed warning during tests due to unitialised string

@@ -1,0 +1,959 @@
+\documentclass[origlongtable]{scrartcl}
+\input{packages2.tex}
+\input{dkimginc.tex}
+\input{dkhyphde.tex}
+\usepackage{fancybox}
+\usepackage{pgf}
+% \usepackage{ngerman}
+\newcommand{\version}[0]{1.00}
+\author{Dipl.-Ing.~D.~Krause}
+\title{\resizebox{10cm}{!}{LaTeX::PGF::Diagram2D}}
+\ifpdf
+\hypersetup{
+  pdftitle={LaTeX::PGF::Diagram2D 1.00},
+  pdfsubject={LaTeX::PGF::Diagram2D},
+  pdfauthor={Dipl.-Ing.~D.~Krause}
+}
+\fi
+
+\newcommand{\includepgfimage}[2]{%
+\begin{figure}%
+{\centering%
+\input{#1.pgf}\caption{#2}\label{fig:#1}%
+}%
+\end{figure}%
+}
+\begin{document}
+\startofdocument
+\section{Introduction}
+The module plots 2D diagrams following the \textsc{din} 461 standard
+for use with \LaTeX{}.
+
+The diagrams can contain functions and/or data.
+
+PGF files produced by the module can be used with both latex/dvips
+and pdflatex.
+
+Use code like
+\begin{lstlisting}
+\begin{figure}%
+{\centering%
+\input{xxx.pgf}\caption{Meine Bildunterschrift}\label{blabla}%
+}%
+\end{figure}%
+\end{lstlisting}
+to use a PGF file in your \LaTeX{} source.
+
+In contrast to other plotting programs we specify the size of the
+drawing grid, not the size of the entire image.
+
+Bezier splines are used to draw the curve unless polylines are
+required explicitly.
+
+The module does not attempt to replace other mathematics and
+plotting software, instead it is best used in combination
+with
+GnuPlot\footnote{\url{http://gnuplot.sourceforge.net}}
+and
+wxMaxima\footnote{\url{http://maxima.sourceforge.net}}.
+
+\clearpage
+\section{Tutorial}
+\subsection[Function]{Example 1: Function plot}
+\figimage{diagf003}{Example circuit}
+
+In an electronic circuit as seen in figure~\vref{fig:diagf003}
+we have a voltage source \(U_{\text{q}}=1\,\text{V}\) with an internal resistance
+\(R_{i}=4\,\Omega\). For a variable load resistor
+\(0\leq R_{\text{L}}\leq 10\,\Omega\) we want to print the current
+\(I\) for each \(R_{\text{L}}\) value.
+
+The formula
+\begin{align*}I&=\frac{U_{\text{q}}}{R_{\text{L}}+R_{\text{i}}}\end{align*}
+can be used to calculate \(I\).
+
+For a first overview we use GnuPlot:
+\begin{lstlisting}[language=GnuPlot]
+Uq=1.0
+Ri=4.0
+set xrange [0:10.0]
+plot Uq/(Ri+x) title "Strom"
+\end{lstlisting}
+The maximum current is \(\tfrac{1}{4}\,\text{A}\), so we use a grid with
+of 10\,cm and a grid height of 6\,cm to show currents up to 0,3\,A.
+
+\clearpage
+\lstinputlisting[float,title={../examples/test001a.pl},language=Perl]{../examples/test001a.pl}
+For the first plot we use the file ../examples/test001a.pl.
+
+In line 3 we use the LaTeX::PGF::Diagram2D module.
+
+The function \textit{I} calculates the current for a resistor value,
+the resistor value is the function argument (line 8\ldots{}13).
+
+``LaTeX::PGF::Diagram2D->new'' creates a new diagram, the grid size
+is \(10\times{}6\)\,cm (line 16).
+
+The image is used in a \LaTeX{} source written for a font size of
+12\.pt (line 18).
+
+The lower \(x\) axis (b: bottom) covers a range 0,0\ldots{}10,0
+using a linear scale. Grid lines are drawn for a distance of 1 (line 20),
+grid values are printed for a distance of 1 (line 21).
+
+The left \(y\) axis (l: left) covers a range 0,0\ldots{}0,3.
+We draw grid lines for a distance of 0,05 and create grid values
+for a distance of 0,1 (lines 22 and 23).
+
+The \textit{axis()\/} method of the diagram object returns a reference
+for an axis object. A number of axis object methods is used to
+set up the axis. Each of the methods returns the axis object reference,
+so the methods can be cascaded.
+
+The \textit{plot()\/} method of the diagram object creates a new
+plot object and returns the reference to it (line 23).
+The \textit{set\textunderscore{}xy\textunderscore{}fct()\/} method
+configures the plot object to use the \textit{I()\/} to calculate
+the values (line 26).
+
+We save the diagram to file ``../examples/test001a.pgf'' (line 28).
+
+\includepgfimage{../examples/test001a}{Current depending on resistor value.}
+\clearpage
+\subsection[Labels]{Example 2: Labels and units}
+\lstinputlisting[float,language=Perl,title={../examples/test002a.pl}]{../examples/test002a.pl}
+\includepgfimage{../examples/test002a}{Diagram with labels and units.}
+The \textit{set\textunderscore{}label()\/} axis method sets the
+axis label.
+The \textit{set\textunderscore{}unit()\/} method sets the unit.
+The label is normally set in math mode, the unit is written upright.
+Both label and unit are passed to \LaTeX{} so we can use \LaTeX{}
+markup here. For each backslash we want to pass to \LaTeX{} we have
+to write two backslashes in the Perl source code.
+
+The arrows are added automatically to the axis labels.
+The unit is placed between the last two scale values.
+\clearpage
+\subsection[Space for unit]{Example 3: More space for the unit}
+\includepgfimage{../examples/test003a}{More space for \(x\) axis unit}
+In the previous example there is very few space between ``9'', ``\(\Omega\)''
+and ``10''. So we decide to omit one scale value. If necessary we could
+omit multiple values but we are not allowed to omit value ``0''.
+
+The \textit{set\textunderscore{}omit()\/} is used to specify the number
+of values to omit.
+\lstinputlisting[float,language=Perl,title={../examples/test003a.pl}]{../examples/test003a.pl}
+\clearpage
+\subsection[Multiple curves]{Example 4: Multiple curves}
+\includepgfimage{../examples/test004a}{Multiple curves in one diagram}
+We can draw multiple curves into one diagram, we simply have to
+create and configure multiple plot objects.
+In the example we create a second plot for an internal resistance
+of \(6\,\Omega\).
+
+Before we change a variable which is a parameter of a plot function
+we must call the \textit{finish()\/} method for all the previous
+plot objects. This method does all the calculations needed for the
+plot, it can be called after completely configuring the plot.
+If the method is not called explicitly, it is called automatically
+when the output file is written.
+
+In the example we configure the plot object for the first curve
+using \(R_{\text{i}}=4\,\Omega\). Before we change the
+``\textdollar{}Ri'' variable to 6.0 we have to calls the
+\textit{finish()\/} method of this plot object.
+\lstinputlisting[float,language=Perl,title={../examples/test004a.pl}]{../examples/test004a.pl}
+\clearpage
+\subsection[Text labels]{Example 5: Text labels}
+\includepgfimage{../examples/test005a}{Text labels}
+Text labels can be used to identify curves. The
+\textit{label()\/} diagram method creates a text label.
+The arguments are the axis names, the coordinates and the label text.
+Optionally you can specify a text anchor.
+
+\lstinputlisting[float,language=Perl,title={../examples/test005a.pl}]{../examples/test005a.pl}
+\clearpage
+\subsection[Two scales]{Example 6: Two scales}
+\includepgfimage{../examples/test006a}{Two scales}
+Now we want to print the current and the power dissipation of the
+load resistor for \(R_{\text{i}}=4\,\Omega\).
+The power dissipation of the load resistor can be calculated as:
+\begin{align*}P&=\frac{{U_{\text{q}}}^2R_{\text{L}}}{{(R_{\text{L}}+R_{\text{i}})}^2}\end{align*}
+We use GnuPlot for a first overview:
+\begin{lstlisting}[language=GnuPlot]
+Uq=1.0
+Ri=4.0
+set xrange [0:10.0]
+plot Uq*Uq*x/((Ri+x)*(Ri+x)) title "power dissipation"
+\end{lstlisting}
+We have a maximum \(P_{\text{max}}=0,0625\,\text{W}\) for
+\(R_{\text{L}}=4\,\Omega\).
+So we increase the diagram height to 8\,cm. Now the left \(y\) axis
+covers a current range 0,0\ldots{}0,4\,A, the right axis covers a
+power range 0,0\ldots{}0,08\,W.
+
+For the right axis we have to configure some distances manually:
+\begin{itemize}
+\item	\textit{set\textunderscore{}tic\textunderscore{}offset()\/}\\
+Distance between right grid border and right edge of scale values.
+The default 2\,mm is useful for the left axis, for the right axis
+we must correct the value.
+\item	\textit{set\textunderscore{}label\textunderscore{}offset()\/}\\
+Distance between right grid border and axis label center.
+\item	\textit{set\textunderscore{}border()\/}\\
+Distance between right grid border and right image border.
+\end{itemize}
+\lstinputlisting[float,language=Perl,title={../examples/test006a.pl}]{../examples/test006a.pl}
+\clearpage
+\subsection[Units]{Example 7: Units}
+\includepgfimage{../examples/test007a}{Changed units}
+To improve the diagram we use mA and mW as units. We have to change
+the calculation functions (Multiplication of the result by factor 1000)
+and the axis settings.
+
+The coordinates for the text labels must be changed too.
+\lstinputlisting[float,language=Perl,title={../examples/test007a.pl}]{../examples/test007a.pl}
+\clearpage
+\subsection[Derivative]{Example 8: Specify 1st derivative}
+\includepgfimage{../examples/test008a}{First derivative}
+The module creates Bezier splines for curve drawing, to calculate
+the control points we need the first derivative for the calculated
+curve points.
+If no function to calculate the the first derivative is specified
+the module attempts a natural spline interpolation and calculates
+the derivative for the interpolation. For \(N\) points we have
+\(N-1\) segments, so we have to solve a system of
+\(4(N-1)\) linear equations. This can take ``some time'', so it should
+be avoided.
+
+We can use wxMaxima to calculate \(\frac{\intd I}{\intd R}\)
+and \(\frac{\intd P}{\intd R}\):
+\begin{lstlisting}
+diff((1000*Uq/(Ri+RL)), RL);
+ratsimp(diff((1000*Uq*Uq*RL/((Ri+RL)*(Ri+RL))), RL));
+\end{lstlisting}
+For
+\begin{align*}
+I(R_{\text{L}})&=\frac{1000\cdot{}U_{\text{q}}}{R_{\text{i}}+R_{\text{L}}}&P(R_{\text{L}})&=\frac{1000\cdot{}U_{\text{q}}R_{\text{L}}^2}{{(R_{\text{i}}+R_{\text{L}})}^2}\\
+\intertext{we find}
+\frac{\intd I}{\intd R_{\text{L}}}&=-\frac{1000\cdot{}U_{\text{q}}}{{(R_{\text{i}}+R_{\text{L}})}^2}&\frac{\intd P}{\intd R_{\text{L}}}&=-\frac{1000\cdot{} U_{\text{q}}^2(R_{\text{L}}-R_{\text{i}})}{R_{\text{}L}^3+3R_{\text{i}}R_{\text{L}}^2+3R_{\text{i}}^2R_{\text{L}}+3R_{\text{i}}^3}\end{align*}
+
+The reference to the function for the derivative calculation is passed
+as the second (optional) argument to
+\textit{set\textunderscore{}xy\textunderscore{}fct()\/}
+(lines 39 and 40).
+\lstinputlisting[float,language=Perl,title={../examples/test008a.pl}]{../examples/test008a.pl}
+\clearpage
+\subsection[Parametric plot]{Example 9: Parametric plot}
+\includepgfimage{../examples/test009a}{Parametric plot}
+In the example we draw the curve:
+\begin{align*}
+\tilde{k}:&&x&=5\expe^{-t/2\pi}\cos{t}&y&=5\expe^{-t/2\pi}\sin{t}&0&\leq{}t\leq{}6\pi
+\end{align*}
+
+For the functions
+\begin{align*}
+x(t)&=5\cdot\expe^{-t/2\pi}\cos{t}&y(t)&=5\cdot\expe^{-t/2\pi}\sin{t}\\
+\intertext{we find the first derivative:}
+\frac{\intd x}{\intd t}&=-\frac{1}{2\pi}(10\pi\sin{t}+5\cos{t})\cdot\expe^{-t/2\pi}&\frac{\intd y}{\intd t}&=-\frac{1}{2\pi}(5\sin{t}-10\pi\cos{t})\expe^{-t/2\pi}\end{align*}
+For a given \(t\) the functions \textit{xfct()\/} and \textit{yfct()\/}
+can be used to calculate \(x\) and \(y\).
+\textit{dxdt()\/} and \textit{dydt()\/} are used to calculate
+\(\tfrac{\intd x}{\intd t}\) and \(\tfrac{\intd y}{\intd t}\).
+
+The start and end value of \(t\) and the function references to
+\textit{xfct()\/} and \textit{yfct()\/} are passed as arguments
+to \textit{set\textunderscore{}parametric\textunderscore{}fct()\/}.
+The two optional arguments are references to functions calculating
+the first derivative. It is recommended to specify these arguments.
+
+\lstinputlisting[float,language=Perl,title={../examples/test009a.pl}]{../examples/test009a.pl}
+\clearpage
+\subsection[Polyline]{Example 10: Curve or polylinie}
+\includepgfimage{../examples/test011a}{Polyline}
+Bezier splines are suitable for ``smooth'' functions as in be examples
+before. For ``unsmooth'' curves (i.\,e. rectangle\ldots) we use
+a polyline instead, the \textit{set\textunderscore{}lines()\/}
+method of the plot object can be used to configure this.
+Additionally we use \textit{set\textunderscore{}intervals()\/} to increase
+the number of segments.
+\clearpage
+\lstinputlisting[float,language=Perl,title={../examples/test011a.pl}]{../examples/test011a.pl}
+\clearpage
+\subsection[Logarithmic scale]{Example 11: Logarithmic scale}
+\includepgfimage{../examples/test012a}{Low-pass transfer function}
+In the example we show the low-pass voltage transfer
+function:
+\begin{align*}
+\frac{v_U}{\text{dB}}&=20\cdot\lg{\left|\frac{1}{1+\coj\frac{f}{f_{\text{G}}}}\right|}\\[0.2em]
+&=-10\lg{\left({\left(\frac{f}{f_{\text{G}}}\right)}^2+1\right)}\end{align*}
+
+A logarithmic scale is used for the \(x\) axis.
+The substitution
+\begin{align*}
+X&=\frac{f}{f_{\text{G}}}\\
+\intertext{results in}
+Y&=-10\lg{\left(X^2+1\right)}\\[0.2em]
+\frac{\intd Y}{\intd X}&=-\frac{20X}{\left(X^2+1\right)\ln{10}}
+\end{align*}
+The
+\textit{set\textunderscore{}logarithmic()\/} axis object method
+sets up a logarithmic scale, both start and end value must be positive.
+The values used in
+\textit{set\textunderscore{}tic\textunderscore{}step()\/} and
+\textit{set\textunderscore{}grid\textunderscore{}step()\/}
+are increase/decrease factors instead of deltas.
+
+In the example we draw grid lines for \(x\) values increasing by
+factor 10.
+\clearpage
+\lstinputlisting[float,language=Perl,title={../examples/test012a.pl}]{../examples/test012a.pl}
+\clearpage
+\subsection[Data]{Example 12: Plot data}
+In the example we have measurement results \(U_{C2}=f(U{B1})\)
+for a two-stage transistor amplifier (voltage of stage 2 collector
+depending on voltage of stage 1 base).\\[1em]
+\begin{tabular}{ccc}
+\begin{minipage}[m]{0.45\linewidth}
+\begin{tabular}{|c|c|}
+\hline
+\(U_{B1}\) / V&\(U_{C2}\) / V\\
+\hline
+\hline
+&\\[-0.9em]0,350&~0,17\\
+\hline
+&\\[-0.9em]0,355&~0,21\\
+\hline
+&\\[-0.9em]0,360&~0,26\\
+\hline
+&\\[-0.9em]0,365&~0,31\\
+\hline
+&\\[-0.9em]0,370&~0,38\\
+\hline
+&\\[-0.9em]0,375&~0,45\\
+\hline
+&\\[-0.9em]0,380&~0,54\\
+\hline
+&\\[-0.9em]0,385&~0,65\\
+\hline
+&\\[-0.9em]0,390&~0,79\\
+\hline
+&\\[-0.9em]0,395&~0,93\\
+\hline
+&\\[-0.9em]0,400&~1,10\\
+\hline
+&\\[-0.9em]0,405&~1,33\\
+\hline
+&\\[-0.9em]0,410&~1,62\\
+\hline
+&\\[-0.9em]0,415&~1,90\\
+\hline
+&\\[-0.9em]0,420&~2,27\\
+\hline
+&\\[-0.9em]0,425&~2,66\\
+\hline
+\end{tabular}
+\end{minipage}&~\begin{minipage}[m]{0.45\linewidth}
+\begin{tabular}{|c|c|}
+\hline
+\(U_{B1}\) / V&\(U_{C2}\) / V\\
+\hline
+\hline
+&\\[-0.9em]0,430&~3,16\\
+\hline
+&\\[-0.9em]0,435&~3,65\\
+\hline
+&\\[-0.9em]0,440&~4,35\\
+\hline
+&\\[-0.9em]0,445&~5,04\\
+\hline
+&\\[-0.9em]0,450&~5,86\\
+\hline
+&\\[-0.9em]0,455&~6,64\\
+\hline
+&\\[-0.9em]0,460&~7,58\\
+\hline
+&\\[-0.9em]0,465&~8,69\\
+\hline
+&\\[-0.9em]0,470&~9,92\\
+\hline
+&\\[-0.9em]0,475&11,20\\
+\hline
+&\\[-0.9em]0,480&12,53\\
+\hline
+&\\[-0.9em]0,485&13,74\\
+\hline
+&\\[-0.9em]0,490&15,01\\
+\hline
+&\\[-0.9em]0,495&15,07\\
+\hline
+&\\[-0.9em]0,500&15,09\\
+\hline
+&\\[-0.9em]&\\
+\hline
+\end{tabular}
+\end{minipage}
+\end{tabular}\\[1em]
+The \textit{set\textunderscore{}xy\textunderscore{}points\textunderscore{}text()\/}
+plot object method uses a text variable containing the measurement
+points, one per line. The first value in the line is the \(X\) value,
+the second value is the \(Y\) value. Optionally a line can contain the
+derivative value as the third argument as seen for  \(U_{B1}=0,49\,\text{V}\).
+This value is only used for natural spline interpolations.
+
+The
+\textit{set\textunderscore{}xy\textunderscore{}points\textunderscore{}file()\/}
+plot object method reads the point data from file.
+
+The
+\textit{set\textunderscore{}xy\textunderscore{}points()\/} plot object method
+uses a reference to an array. The array itself contains references to
+two-or-three element arrays containing the point data.
+
+The
+\textit{set\textunderscore{}dots()\/} plot object method switches from
+curve printing to dots printing. Without this instruction a natural
+spline interpolation is printed.
+
+\clearpage
+\includepgfimage{../examples/test013a}{Measurement results}
+\clearpage
+\lstinputlisting[float,language=Perl,title={../examples/test013a.pl}]{../examples/test013a.pl}
+\clearpage
+\includepgfimage{../examples/test014a}{Measurement results curve}
+\clearpage
+\lstinputlisting[float,language=Perl,title={../examples/test014a.pl}]{../examples/test014a.pl}
+\clearpage
+\subsection[X-splines]{Example 13: Data plot using X-splines}
+\includepgfimage{../examples/test015a}{Data plot using X-splines}
+The LaTeX::PGF::Diagram2D modules curve drawing doesn't smooth the
+curve, so the previous examples looks a little ``rough''.
+To smooth the curve we can use X-splines.
+Cross-splines (X-splines) were introduced by Carole Blanc und Christophe Schlick
+on the \textsc{siggraph}'95. In the conference proceedings you can find the
+article online as:
+``X-Splines: A Spline Model Designed for the End-User''.\\
+An X-spline is a contiguous
+curve specified by a set of control points. For each control point
+we have the coordinates \(x\) and \(y\) and a paramter \(s\).
+For \(-1\leq{}s<0\) the curve is interpolated in the point.
+For \(0\leq{}x\leq{}1\) the curve is approximated in the point.
+For \(s=0\) a bend is allowed in the point. Positive values allow
+the curve to go away from the point. Negative values towards
+-1 require interpolation with small curvature.
+
+In the example we require a curve interpolation with small
+curvature radius for \(U_{\text{B1}}=0,490\,\text{V}\) and
+approximation for all other points.
+
+\clearpage
+\lstinputlisting[float,language=Perl,title={../examples/test015a.pl}]{../examples/test015a.pl}
+\clearpage
+\section{Reference}
+\subsection[Diagram]{LaTeX::PGF::Diagram2D}
+\subsubsection{Overview}
+Each LaTeX::PGF::Diagram2D object represents a diagram.
+\subsubsection{Constructor}
+\begin{itemize}
+\item	\textit{LaTeX::PGF::Diagram2D-\textgreater{}new(width, height)\/}\\
+creates a new diagram. Width and height of the grid area are specified
+in cm.
+\end{itemize}
+\subsubsection{Setup}
+\begin{itemize}
+\item	\textit{set\textunderscore{}font\textunderscore{}size(size)\/}\\
+specifies the the font size in point (pt). This is used to calculate
+the scale value \(y\) position for the lower \(x\) axis.
+\item	\textit{axis(name)\/}\\
+returns a reference to a LaTeX::PGF::Diagram2D::Axis object which can
+be used to set up the axis. Use ``bottom'', ``left'', ``right'' and ``top''
+or the abbreviations ``b'', ``l'', ``r'' or ``t'' in the name.
+\end{itemize}
+\subsubsection{Plot objects}
+\begin{itemize}
+\item	\textit{plot(name,name)\/}\\
+creates a new LaTeX::PGF::Diagram2D::Plot object and returns the object
+reference. The reference can be used to configure the plot.
+The arguments are the names of the \(x\) and \(y\) axis to use for the plot.
+\item	\textit{copy\textunderscore{}plot(plot)\/}\\
+creates a copy of an existing LaTeX::PGF::Diagram2D::Plot object and
+returns the reference to the new object.
+\end{itemize}
+\subsubsection{Additional graphics objects}
+\begin{itemize}
+\item	\textit{label(name, name, x, y, text [, position])\/}\\
+creates a new text object. The first two arguments are the names of
+\(x\) and \(y\) axis to use, followed by \(x\) and \(y\) position
+and the text. The optional position parameter specifies the anchor
+of the text (``left'', ``right'', ``top'', ``bottom'' or a combination
+like ``right,bottom''). The default is to center the label both
+horizontally and vertically.
+\item	\textit{polyline(name, name, arrayreference)\/}\\
+creates a polyline object. You have to name the \(x\) and \(y\) axis,
+the third argument is a reference to an array containing \(x\) and
+\(y\) value for each point.
+\end{itemize}
+\subsubsection{Output}
+\begin{itemize}
+\item	\textit{write(filename)\/}\\
+creates the named file containing the diagram. If the file name
+suffix is ``.tex'' a full \LaTeX{} source for processing with pdflatex
+is created.
+By default the program creates a PGF file which can be referenced
+from a *.tex file.
+\end{itemize}
+\clearpage
+\subsection[Axis]{LaTeX::PGF::Diagram2D::Axis}
+\subsubsection{Overview}
+A LaTeX::PGF::Diagram2D::Axis object represents one of the four diagram
+(grid) borders:
+\begin{itemize}
+\item	b (bottom \(x\)-axis),
+\item	l (left \(y\)-axis),
+\item	r (right \(y\)-axis),
+\item	t (top \(x\)-axis).
+\end{itemize}
+The objects are created automatically by the LaTeX::PGF::Diagram2D
+constructor. You can obtain object references by calling a
+LaTeX::PGF::Diagram2D objects \textit{get\textunderscore{}axis(name)\/}
+method, the name can be one from ``bottom'' (``b''), ``left'' (``l''),
+``right'' (``r'') or ``top'' (``t'').
+
+\subsubsection{Scale range}
+\begin{itemize}
+\item	\textit{set\textunderscore{}linear(min, max)\/}\\
+sets up linear scaling for the specified range.
+\item	\textit{set\textunderscore{}logarithmic(min, max)}\\
+sets up logarithmic scaling for the specified range.
+Both min and max must be positive.
+\end{itemize}
+
+\subsubsection{Grid setup}
+\begin{itemize}
+\item	\textit{set\textunderscore{}grid\textunderscore{}step(step)\/}\\
+specifies the grid distance (only bottom and left axis).
+The step value is a constant distance for linear scales and an
+increase/decrease factor for logarithmic scales.
+\item	\textit{set\textunderscore{}tic\textunderscore{}step(step)\/}\\
+specified the distance for scale values.
+\end{itemize}
+
+\subsubsection{Axis labels and units}
+\begin{itemize}
+\item	\textit{set\textunderscore{}label(text)\/}\\
+sets the text for the axis label (typically written in math mode).
+\item	\textit{set\textunderscore{}unit(text)\/}\\
+sets the text for the unit (typically written upright).
+\item	\textit{set\textunderscore{}omit(number)\/}\\
+sets the number of scale values to omit (default: 0) to typeset
+the unit.
+\item	\textit{set\textunderscore{}color(color)\/}\\
+sets the color for axis label and arrow. Use \LaTeX{} color specifications
+like ``blue'' or ``blue!50!black''.
+Only the color of axis label and arrow is changed, the scale values
+remain black.
+\end{itemize}
+\clearpage
+\subsubsection{Regions and distances}
+\figimagelw{}{diagf002}{Abstände}
+For each axis ``to'' (tic offset) specifies the distance from grid border to
+right, upper or lower edge of scale values.
+``lo'' (label offset) is the distance from grid border to the center
+of the axis label.
+``bo'' (border) is the distance between grid border and image border.
+\begin{itemize}
+\item	\textit{set\textunderscore{}tic\textunderscore{}offset(distance)\/}\hfill{}sets to.
+\item	\textit{set\textunderscore{}label\textunderscore{}offset(distance)\/}\hfill{}sets lo.
+\item	\textit{set\textunderscore{}border(distance)\/}\hfill{}sets bo.
+\end{itemize}
+\clearpage
+\subsection[Plot]{LaTeX::PGF::Diagram2D::Plot}
+\subsubsection{Overview}
+A LaTeX::PGF::Diagram2D::Plot object represents data to plot in a diagram,
+either a point set or a curve.
+\subsubsection{Constructor}
+Objects are constructed in the \textit{plot()\/} or
+\textit{copy\textunderscore{}plot()\/} method of a 
+LaTeX::PGF::Diagram2D object.
+\subsubsection{Data source}
+\begin{itemize}
+\item	\textit{set\textunderscore{}xy\textunderscore{}fct(fct [, derivative ])}\/\\
+uses the specified function(s) to calculate plot points.
+The \textit{fct()\/} function is used to calculate \(y\) values.
+The use of the optional second parameter -- a function to calculate the
+derivative -- is recommended.
+\item	\textit{set\textunderscore{}parametric\textunderscore{}fct(min, max, xfct, yfct [, xderivative, yderivative ])\/}\\
+turns on parametric plotting. The \(t\) parameter is in the range
+min\ldots{}max, xfct and yfct are references to functions to calculate
+\(x(t)\) and \(y(t)\). The use of the optional xderivative and yderivative
+parameters -- functions to calculate \(\frac{\intd x}{\intd t}\)
+and \(\frac{\intd y}{\intd t}\) -- is recommended.
+\item	\textit{set\textunderscore{}xy\textunderscore{}points(arrayref)\/}\\
+uses points from an array specified by reference. The array itself contains
+references to two- or three-element array containing \(x\) and \(y\)
+values and optionally the first derivative in the point.
+\item	\textit{set\textunderscore{}xy\textunderscore{}points\textunderscore{}text(text)\/}\\
+uses a text containing point data, one point per line.
+For each point we have \(x\) and \(y\) value and optionally the
+derivative in the point.
+\item	\textit{set\textunderscore{}xy\textunderscore{}points\textunderscore{}file(filename)\/}\\
+uses a text file containing the point data.
+\item	\textit{set\textunderscore{}xsplines\textunderscore{}points(arrayref)}\\
+uses an array of point data to draw using an X-spline.
+The array contains references to 2- or 3-element array
+containing \(x\), \(y\) and optionally \(s\) for each point.
+The default \(s\) value is -1 for interpolation.
+\item	\textit{set\textunderscore{}xsplines\textunderscore{}points\textunderscore{}text(text)}\\
+uses a text variable to produce an X-spline.
+\item	\textit{set\textunderscore{}xsplines\textunderscore{}points\textunderscore{}file(filename)\/}\\
+uses the specified file to produce an X-spline.
+\item	\textit{set\textunderscore{}xsplines\textunderscore{}segments(number)}\\
+sets the number of Bezier spline segments to draw for each X-spline
+segment. Normally the default value 8 is sufficient.
+\end{itemize}
+\subsubsection{Configure output}
+\begin{itemize}
+\item	\textit{set\textunderscore{}intervals( number )\/}\\
+sets the number of intervals (Bezier spline segments) for function plotting.
+\item	\textit{set\textunderscore{}curve()\/}\\
+sets drawing mode to ``curve'' (default).
+\item	\textit{set\textunderscore{}lines()\/}\\
+sets drawing mode to ``polyline''.
+\item	\textit{set\textunderscore{}dots([ style [, size ]  ])\/}\\
+sets drawing mode to ``point set''.
+The optional
+\textit{style} parameter specifies how to draw the point:
+"`circle"', "`square"', "`diamond"', "`triangle"', "`crosshair"' or
+"`pentagon"'.\\
+The second optional parameter specifies the size of the point
+relative to line width.
+\item	\textit{set\textunderscore{}color(name)\/}\\
+sets the plot color, use \LaTeX{} color specifications here.
+\end{itemize}
+\subsubsection{Preparing print}
+\begin{itemize}
+\item	\textit{finish()\/}\\
+prepares the plot object for printing. All coordinates (curve points and
+control points) needed for drawing are calculated now. This function is
+called implicitly by the diagrams \textit{write()\/} method if necessary.
+An explicit call to this method is necessary before changing
+parameters of the functions used.
+\end{itemize}
+\clearpage
+\subsection{Label}
+Each ``LaTeX::PGF::Diagram2D::Label'' object represents one additional
+text label printed into the diagram.
+The LaTeX::PGF::Diagram2D object's \textit{label()\/} method creates a new
+label object and returns the object reference.
+
+The object's \textit{set\_color()\/} method can be used to set the label
+color, the argument must be a \LaTeX{} color specification.
+\clearpage
+\subsection{Polyline}
+A ``LaTeX::PGF::Diagram2D::Polyline'' object represents an additional
+polyline drawn into the diagram.
+The LaTeX::PGF::Diagram2D object's \textit{polyline()\/} method creates a new
+polyline object and returns the object reference.
+
+The object's \textit{set\_color()\/} method can be used to set the label
+color, the argument must be a \LaTeX{} color specification.
+
+The line width can be set using the \textit{set\_width()\/} method, the
+argument is a factor. The line width is calculated as
+\(\text{factor}\cdot{}\text{curve line width}\).
+\clearpage
+\section{Hints}
+\begin{itemize}
+\item	\textbf{Specify the first derivative if known}\\
+When plotting functions as curves the first derivative
+\begin{align*}\frac{\intd Y}{\intd X}&\end{align*} is needed for each curve
+point, for parametric plots
+\begin{align*}\frac{\intd X}{\intd T}&&\frac{\intd Y}{\intd T}\end{align*}
+to calculate the corresponding derivative values in paper coordinates
+\begin{align*}\frac{\intd y}{\intd x}&&\frac{\intd x}{\intd t}&&\frac{\intd y}{\intd t}\end{align*}
+If the derivative values are not known the module attempts a natural spline
+interpolation through the curve points and calculates the derivatives from
+the natural spline coefficients.\\
+For each spline segment there are 4 coefficients, for \(u\) segments we
+have \(4u\) coefficients, this requires to solve a system of \(4u\)
+linear equations. For a high number of segments this might take
+``some time''.\\
+Drawing Bezier segments with ``real'' derivatives will probably result
+in better curves than using ``guessed'' derivatives.
+\item	\textbf{Use black on white.}\\
+\textsc{din} 461 doesn't mention any color at all. Sometimes people need to
+reproduce technical documents ``in the field''. You should make sure your
+diagrams can be copied  on a black/white copy or on the next fax by
+using black or at least dark colors. Additionally when plotting
+multiple curves into one diagram make sure curves can be identified
+by adding text labels.
+\end{itemize}
+\clearpage
+\section{Theory}
+\subsection{Coordinates}
+2D plots show \(Y\) depending on \(X\), on paper we use the
+coordinates \(x\) and \(y\).
+For parametric plots \(X\) and \(Y\) depend on parameter \(T\) running
+through a specified interval.
+
+For the axis we specify the value range
+\([X_{\text{min}};X_{\text{max}}]\) which is represented by the
+coordinate range
+\([x_{\text{min}};x_{\text{max}}]\) on paper.
+
+Linear or logarithmic scales can be used.
+
+For linear scales we can calculate \(x\):
+\begin{align*}
+x&=x_{\text{min}}+\frac{X-X_{\text{min}}}{X_{\text{max}}-X_{\text{min}}}\cdot{}(x_{\text{max}}-x_{\text{min}})\\
+\intertext{and \(\frac{\intd x}{\intd X}\):}
+\frac{\intd x}{\intd X}&=\frac{x_{\text{max}}-x_{\text{min}}}{X_{\text{max}}-X_{\text{min}}}\end{align*}
+For logarithmic scales we calculate \(x\):
+\begin{align*}
+x&=x_{\text{min}}+(x_{\text{max}}-x_{\text{min}})\frac{\log{\left(\frac{X}{X_{\text{min}}}\right)}}{\log{\left(\frac{X_{\text{max}}}{X_{\text{min}}}\right)}}\\
+\intertext{and \(\frac{\intd x}{\intd X}\):}
+\frac{\intd x}{\intd X}&=\frac{x_{\text{max}}-x_{\text{min}}}{X\log{\left(\frac{X_{\text{max}}}{X_{\text{min}}}\right)}}
+\end{align*}
+For logarithmic scales \(\frac{\intd x}{\intd X}\) depends on \(X\), for
+linear scales the value is constant.
+
+For the \(y\) axis the calculations are similar.
+
+These equations are sufficient to draw polylines and dot sets.
+\clearpage
+\subsection{Plots using Bezier splines}
+\subsubsection{Bezier segments}
+For function plotting the module calculates a number of points.
+The points are equidistant on paper (same \(\Delta x\)). For logarithmic
+scales this means the \(X\) values differ by a constant factor.
+
+The curve consists of several segments. Modern graphics file formats
+(i.\,e. PostScript, PDF and PGF used here) use Bezier segements. Each Bezier
+segment is specified by four points:
+start point \(P_0(x_0;y_0)\), first control point \(P_0^+(x_0^+;y_0^+)\),
+second control point \(P_1^-(x_1^-;y_1^-)\) and end point \(P_1(x_1;y_1)\).
+
+The segment is a parametric curve:
+\begin{align*}
+0&\leq{}t\leq 1\\[0.2em]
+x(t)&={(1-t)}^3x_0+3t{(1-t)}^2x_0^++3t^2(1-t)x_1^-+t^3x_1\\[0.2em]
+y(t)&={(1-t)}^3y_0+3t{(1-t)}^2y_0^++3t^2(1-t)y_1^-+t^3y_1
+\end{align*}
+We calculate the first derivatives for \(t=0\) and \(t=1\):
+\begin{align*}
+\atpos{\frac{\intd x}{\intd t}}{t=0}&=3x_0^+-3x_0&\atpos{\frac{\intd x}{\intd t}}{t=1}&=3x_1-3x_1^-\\[0.2em]
+\atpos{\frac{\intd y}{\intd t}}{t=0}&=3y_0^+-3y_0&\atpos{\frac{\intd y}{\intd t}}{t=1}&=3y_1-3y_1^-\\
+\intertext{If we know \(P_0\) and \(P_1\) and the derivatives \(\tfrac{\intd x}{\intd t}\) and \(\tfrac{\intd y}{\intd t}\) we can calculate the control points:}
+x_0^+&=x_0+\frac{1}{3}\cdot\atpos{\frac{\intd x}{\intd t}}{t=0}&x_1^-&=x_1-\frac{1}{3}\cdot\atpos{\frac{\intd x}{\intd t}}{t=1}\\[0.2em]
+y_0^+&=y_0+\frac{1}{3}\cdot\atpos{\frac{\intd y}{\intd t}}{t=0}&y_1^-&=y_1-\frac{1}{3}\cdot\atpos{\frac{\intd y}{\intd t}}{t=1}
+\end{align*}
+\clearpage
+\subsubsection{Plots y=f(x)}
+For plots \(y=f(x)\) we can do a substitution for each segment with given
+\[
+x_0\qquad{}y_0\qquad\atpos{\frac{\intd y}{\intd x}}{x=x_0}\qquad{}x_1\qquad{}y_1\qquad\atpos{\frac{\intd y}{\intd x}}{x=x_1}
+\]
+to:
+\begin{align*}
+x(t)&=x_0+(x_1-x_0)\cdot t&t\in[0;1]\\[0.2em]
+\frac{\intd x}{\intd t}&=x_1-x_0&\frac{\intd y}{\intd t}&=\frac{\intd y}{\intd x}\cdot\frac{\intd x}{\intd t}
+\end{align*}
+If we know \(\tfrac{\intd Y}{\intd X}\) we can calculate:
+\begin{align*}
+\frac{\intd y}{\intd x}&=\frac{\frac{\intd y}{\intd Y}}{\frac{\intd x}{\intd X}}\cdot\frac{\intd Y}{\intd X}
+\end{align*}
+If we don't know \(\tfrac{\intd Y}{\intd X}\) we have to do a curve
+interpolation, see section~\vref{sec:interpolation}.
+\clearpage
+\subsubsection{Parametric plots}
+For curve segments \(T_0\)\ldots\(T_1\) we substitute:
+\begin{align*}
+T(t)&=T_0+(T_1-T_0)\cdot t&t&\in[0;1]\\[0.2em]
+\frac{\intd T}{\intd t}&=T_1-T_0\end{align*}
+If we know \(\tfrac{\intd X}{\intd T}\) and
+\(\tfrac{\intd Y}{\intd T}\) we can calculate
+\(\tfrac{\intd x}{\intd t}\)
+and \(\tfrac{\intd y}{\intd t}\):
+\begin{align*}
+\frac{\intd x}{\intd t}&=\frac{\intd x}{\intd X}\cdot\frac{\intd X}{\intd T}\cdot\frac{\intd T}{\intd t}\\[0.2em]
+\frac{\intd y}{\intd t}&=\frac{\intd y}{\intd Y}\cdot\frac{\intd Y}{\intd T}\cdot\frac{\intd T}{\intd t}
+\end{align*}
+Otherwise we have to do a curve interpolation.
+\clearpage
+\subsection{Curve interpolation}\label{sec:interpolation}
+\subsubsection{Overview}
+Curve interpolation means to search for a function or a sequence of
+functions running through specified points.
+
+We can either use one function or a composite function.
+
+An example for one function is a high-degree polynomial.
+For \(N\) points we have a system of \(N\) linear equations giving
+the \(N\) coefficients for a \({N-1}^{\text{th}}\) degree polynomial.
+The drawback of such a polynomial is that there are \(N-2\) extremes.
+This might result in an oscillating curve, so I don't know of any
+practical use of polynomial interpolation.
+
+A composite function (sequence of functions, one per interval) can
+produce smoother curves with less oscillations.
+Two variants of composite functions are natural splines and X-splines.
+
+\subsubsection{Natural Splines}
+For \(N\) specified points with strict monotonous growing
+\(x\)- or. \(t\)-values
+we have \(N-1\) segments. Each segment \(i\) between
+\(x\)-values \(x_i\) and \(x_{i+1}\)
+is described by a cubic polynomial
+\begin{align*}
+y&=m_i{(x-x_i)}^3+n{(x-x_i)}^2+p_i(x-x_i)+q_i\\
+\intertext{respectively}
+y&=a_ix^3+b_ix^2+c_ix+d_i
+\end{align*}
+Both notations are equivalent and can be converted forward and backward.
+We use the second notation here.
+\clearpage
+For \(N-1\) curve segements we need to find \(4(N-1)\) coefficients,
+\(4(N-1)\) equations are necessary:
+\begin{itemize}
+\item	N-1 equations (0\ldots{}N-2) for the value at the left border
+of each segment (\(0\leq i\leq N-1\)):
+\begin{align*}y_i&=a_ix_i^3+b_ix_i^2+c_ix_i+d_i\end{align*}
+\item	N-1 equations (N-1\ldots{}2N-3) for the value at the right border
+of each segment (\(0\leq i\leq N-1\)):
+\begin{align*}y_{i+1}&=a_ix_{i+1}^3+b_ix_{i+1}^2+c_ix_{i+1}+d_i\end{align*}
+\item	N-2 equations (2N-2\ldots{}3N-5) for inner points, having the
+first derivative from the left and right segment equal (\(0\leq i\leq N-2\)):
+\begin{align*}3a_ix_{i+1}^2+2b_ix_{i+1}+c_i&=3a_{i+1}x_{i+1}^2+2b_{i+1}x_{i+1}+c_{i+1}\end{align*}
+\item	N-2 equations (3N-4\ldots{}4N-7) for inner points, having the
+second derivative from the left and right segment equal (\(0\leq i\leq N-2\)):
+\begin{align*}6a_ix_{i+1}+2b_i&=6a_{i+1}x_{i+1}+2b_{i+1}\end{align*}
+\item	2 equations (4N-6 and 4N-5) to specify that the second derivative
+on the outer points is 0:
+\begin{align*}
+6a_0x_0+2b_0&=0\\[0.2em]
+6a_{N-2}x_{N-1}+2b_{N-2}&=0\end{align*}
+\end{itemize}
+The solution of the system of linear equations is a set of
+(\(a_i\), \(b_i\), \(c_i\) and \(d_i\)).
+
+If values are given for the first derivative, we have to substitute
+equations:
+For inner points we replace equation
+\(3N-4+i-1\),
+(second derivative of left and right segment equal) by
+\begin{align*}3a_ix_i^2+2b_ix_i+c_i&=y'(x_i)\end{align*}
+For the start point we replace \(4N-6\)
+(second derivative = 0)
+by:
+\begin{align*}3a_0x_0^2+2b_0x_0+c_0&=y'(x_0)\end{align*}
+For the last point we replace \(4N-5\) (second derivative = 0)
+by:
+\begin{align*}3a_{N-2}x_{N-1}^2+2b_{N-2}x_{N-1}+c_{N-2}&=y'(x_{N-1})\end{align*}
+
+The ``PDL'' module is used to solve the system of linear equations.
+\clearpage
+\subsubsection{X-Splines}
+Cross-splines (X-splines) were introduced by Carole Blanc und Christophe Schlick
+on the \textsc{siggraph}'95. In the conference proceedings you can find the
+article online as:
+``X-Splines: A Spline Model Designed for the End-User''.\\
+In this documentation I'll explain X-splines only minimally, please
+read the \textsc{siggraph}'95 paper for a full description.
+
+An X-spline is a set of discrete control points describing a contiguous
+curve. For each control point \(i\) there are values
+\(x_i\), \(y_i\) and \(s_i\) (for 3D-graphics not covered here there
+might be a \(z_i\)).
+A point can be an approximation point (\(s_i>0\)), an interpolation
+point (\(s_i<0\)) or a bend (\(s_i=0\)). \(s_i\) values going towards
+1 allow the curve to go away from the control point.
+\(s_i\) values going towards -1 require large radii for the interpolation
+curve in the control point.
+\clearpage
+\subsection{Examples}
+\subsubsection{Point set}
+\includepgfimage{../examples/test016a}{Point set}
+In this section we show some examples for curve approximation and
+interpolation using the point set shown here.
+\clearpage
+\subsubsection{Higher-degree polynomial}
+First we create an \(8^{\text{th}}\) degree polynomial through the points.
+\begin{align*}
+y&=ax^8+bx^7+cx^6+dx^5+ex^4+fx^3+gx^2+hx+i
+\end{align*}
+The numeric solution of
+\begin{align*}
+\left(\begin{array}{ccccccccc}
+1^8&1^7&1^6&1^5&1^4&1^3&1^2&1&1\\
+2^8&2^7&2^6&2^5&2^4&2^3&2^2&2&1\\
+3^8&3^7&3^6&3^5&3^4&3^3&3^2&3&1\\
+4^8&4^7&4^6&4^5&4^4&4^3&4^2&4&1\\
+5^8&5^7&5^6&5^5&5^4&5^3&5^2&5&1\\
+6^8&6^7&6^6&6^5&6^4&6^3&6^2&6&1\\
+7^8&7^7&7^6&7^5&7^4&7^3&7^2&7&1\\
+8^8&8^7&8^6&8^5&8^4&8^3&8^2&8&1\\
+9^8&9^7&9^6&9^5&9^4&9^3&9^2&9&1\\
+\end{array}\right)\cdot\left(\begin{array}{c}a\\b\\c\\d\\e\\f\\g\\h\\i\end{array}\right)&=\left(\begin{array}{c}2\\2\\2\\2\\4\\6\\6\\6\\6\end{array}\right)
+\end{align*}
+results in:
+\begin{align*}
+a&=1,7647\cdot{}{10}^{-16}&b&=-1,9841\cdot{}{10}^{-3}&c&=6,9444\cdot{}{10}^{-2}&d&=-9,8056\cdot{}{10}^{-1}\\[0.2em]
+e&=7,1528&f&=-28,722&g&=62,778&h&=-68,295\\[0.2em]
+i&=30
+\end{align*}
+Figure~\vref{fig:../examples/test017a}
+shows the polyonmial. We see oscillations.
+\clearpage
+\includepgfimage{../examples/test017a}{\(8^{\text{th}}\) degree polynomial}
+\clearpage
+\subsubsection{Natural spline}
+Now we use a natural spline interpolcation.
+\lstinputlisting[language=Perl,title={../examples/test018a.pl}]{../examples/test018a.pl}
+
+There are still some smaller oscilations, see figure~\vref{fig:../examples/test018a}.
+\clearpage
+\includepgfimage{../examples/test018a}{Natural spline}
+\clearpage
+For the points (4;2) and (6;6) we specify the derivative to be 0,
+as the curve ``comes from the left'' and ``goes to the right''.
+\lstinputlisting[language=Perl,title={../examples/test019a.pl}]{../examples/test019a.pl}
+Result (figure~\vref{fig:../examples/test019a}): No oscillations anymore.
+\clearpage
+\includepgfimage{../examples/test019a}{Natural spline, derivative specified}
+\clearpage
+\subsubsection{X-Splines}
+Now we do an interpolation using X-splines. We do not specify an
+\(s\) value, so the default -1 is used for interpolation.
+\lstinputlisting[language=Perl,title={../examples/test020a.pl}]{../examples/test020a.pl}
+See figure~\vref{fig:../examples/test020a} for the result.
+\clearpage
+\includepgfimage{../examples/test020a}{X-spline interpolation}
+\clearpage
+Now we choose a smaller \(s\)-value for (4;2) and (6;6)
+(\(-\tfrac{1}{2}\)). This allows smaller radii in these points
+and reduces oscillations.
+\lstinputlisting[language=Perl,title={../examples/test021a.pl}]{../examples/test021a.pl}
+\includepgfimage{../examples/test021a}{X-spline interpolation, smaller curve radii}
+\clearpage
+For approximation we use
+\(s=1,0\) we specify the value as second argument to
+\textit{set\textunderscore{}xsplines\textunderscore{}points\textunderscore{}text()\/}.
+The default value is used for all lines not containing an \(s\) value.
+\lstinputlisting[language=Perl,title={../examples/test022a.pl}]{../examples/test022a.pl}
+Figure~\vref{fig:../examples/test022a} shows the result.
+\clearpage
+\includepgfimage{../examples/test022a}{X-spline approximation}
+\clearpage
+For (4;2) and (6;6) we change \(s=0,5\) to drag the curve towards these points.
+\lstinputlisting[language=Perl,title={../examples/test023a.pl}]{../examples/test023a.pl}
+\clearpage
+\includepgfimage{../examples/test023a}{X-spline approxmiation dragging the curve towards points}
+\clearpage
+In the final curve we use different \(s\) values to show that approximation
+and interpolation can be used in different ranges of the same curve.
+\lstinputlisting[language=Perl,title={../examples/test024a.pl}]{../examples/test024a.pl}
+\clearpage
+\includepgfimage{../examples/test024a}{X-spline approximation and interpolation}
+\clearpage
+\end{document}
+

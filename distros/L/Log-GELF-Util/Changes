@@ -1,0 +1,31 @@
+Revision history for Perl extension Log-GELF-Util
+
+0.96 2016-03-01T12:49:34Z
+
+    - added ability to specify message id when chunking
+
+0.95 2016-02-26T00:26:50Z
+
+    - improve documentaion
+    - make use of GELF message magic constant in enchunk()
+
+0.94 2016-02-25T12:16:02Z
+
+    - facility was incorrectly limited to numbers
+
+0.93 2016-02-25T06:04:28Z
+
+    - documentation cleanups
+
+0.92 2016-02-24T23:22:01Z
+
+    - fixed bug introduced with Readonly.pm v2.01
+
+0.91 2016-02-24T22:47:40Z
+
+    - dechunk() now handles chunks being passed in random order
+
+0.90 2016-02-24T04:55:07Z
+
+    - original version
+

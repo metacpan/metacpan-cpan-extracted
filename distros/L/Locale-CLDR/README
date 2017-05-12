@@ -1,0 +1,55 @@
+Locale-CLDR
+
+Please note that this code requires Perl 5.10.1 and above in the main. There are some parts that require
+Perl 5.18 and if you are using Unicode in Perl you really should be using Perl 5.18 or later
+
+The general overview of the project is to convert the XML of the CLDR into a large number of small Perl
+modules that can be loaded from the main Local::CLDR when needed to do what ever localisation is required.
+
+Note that the API is not yet fixed. I'll try and keep things that have tests stable but any thing else 
+is at your own risk.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+Locale Data
+
+This package comes with the Locale data for en_US, other locale data can be found in the Locale::CLDR::Locales::*
+distributions
+
+Building from github
+
+The data is built with the mkcldr.pl script which I use to download the
+latest CLDR data file and process the data. This can be found on github at
+https://github.com/ThePilgrim/perlcldr either clone or get hold of the zip
+file and extract it to a new directory on your system.
+
+The mkcldr.pl script is in the Locale-CLDR directory. Run the script with the
+optional -v (verbose) flag and come back in 40 minuites or so and you will have 
+a Distributions directory with each of the language cpan distributions in it.
+
+In the lib directory you will also find a Bundle directory that bundles the 
+data into regions
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Locale::CLDR
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 - 2014 John Imrie
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

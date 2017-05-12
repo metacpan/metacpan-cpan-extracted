@@ -1,0 +1,28 @@
+[% 
+    title = 'MP3s' ;
+    htmltitle = title ;
+
+    crumb2_name = 'Home' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'MP3s' ;
+%]
+
+
+<div class="blocker">
+<p>To download the MP3s, please click the title of the track, and save to you local computer.</p>
+</div>
+
+<div class="blocker">
+
+[% FOREACH cat = cats %]
+[% FOREACH mp3 = mp3s %]
+[% IF mp3.mp3catid == cat.mp3catid %]
+<h3>[% mp3.source %]</h3>
+[% mp3.tracks %]
+[% IF mp3.notes ; THEN ; mp3.notes ; END %]
+[% END %]
+[% END %]
+
+[% END %]
+
+</div>

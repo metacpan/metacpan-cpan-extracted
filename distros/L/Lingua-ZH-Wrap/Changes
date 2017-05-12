@@ -1,0 +1,10 @@
+0.03:
+    Rafan reported that $overflow and $column was not exported.  Oops.
+
+0.02:
+    Preliminary utf8 support on perl 5.8+.
+    Supporting (provisional) utf8 by converting it back to big5.
+
+0.01:
+    Initial CPAN release.
+    Package trbig5.pl into Lingua::ZH::Wrap 0.01.

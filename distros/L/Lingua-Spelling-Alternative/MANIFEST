@@ -1,0 +1,7 @@
+MANIFEST
+README
+Alternative.pm
+Makefile.PL
+test.pl
+findaffix.out
+META.yml                                 Module meta-data (added by MakeMaker)

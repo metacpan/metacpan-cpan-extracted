@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Lingua/StarDict/Gen.pm
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+example/animal.the     
+example/teste.pl
+example/microEN-PT.dic  
+example/teste2.pl              
+example/thesaurus2stardict
+example/microtermEN-PT.term
+example/term2stardict
+

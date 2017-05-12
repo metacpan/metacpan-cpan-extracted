@@ -1,0 +1,21 @@
+Changes
+examples/default-make-date-interval.pl
+examples/make-date.pl
+examples/my-date.pl
+examples/nengo-to-seireki.pl
+examples/seireki-to-nengo.pl
+examples/subsjdate-make-date.pl
+examples/subsjdate-make-interval.pl
+examples/synopsis.pl
+lib/Lingua/JA/FindDates.pm
+lib/Lingua/JA/FindDates.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+script/subsjdate
+t/Lingua-JA-FindDates.t
+t/nengo-to-seireki.t
+t/seireki-to-nengo.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

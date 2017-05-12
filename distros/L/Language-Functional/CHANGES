@@ -1,0 +1,23 @@
+Revision history for Perl module Functional.
+
+0.05 Sun Jul 24 15:20:19 BST 2011
+    - make all and any work on infinite lists (patch by Petr Pisar)
+
+0.04 Fri Dec 12 22:15:30 GMT 2008
+    - rename Changes to CHANGES
+    - move test to t/
+    - add use warnings
+    - add human- and machine-readable license
+    - add pod test
+
+0.03  Sat Jan 13 20:51:50 2001
+	- renamed to Language::Functional and minor
+	  internal changes
+
+0.02  Tue Jun  1 15:05:17 1999
+        - added support for infinite lists
+
+0.01  Mon May 18 17:11:06 1999
+	- first released version
+
+

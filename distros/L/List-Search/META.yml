@@ -1,0 +1,23 @@
+---
+name: List-Search
+version: 0.3
+author:
+  - 'Edmund von der Burg <evdb@ecclestoad.co.uk>'
+abstract: fast searching of sorted lists
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+build_requires:
+  Data::Dumper: 0
+  Module::Build: 0
+  Test::More: 0
+provides:
+  List::Search:
+    file: lib/List/Search.pm
+    version: 0.3
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

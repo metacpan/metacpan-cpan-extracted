@@ -1,0 +1,26 @@
+LEOCHARRE::HTML::Text 
+===============================================
+
+INSTALLATION
+
+See INSTALL.
+
+DEPENDENCIES
+
+   Carp
+   Exporter
+   File::Which
+   HTML::Entities
+   LEOCHARRE::CLI
+   LEOCHARRE::DEBUG
+   Smart::Comments
+   Test::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Leo Charre leocharre at cpan dot org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+   

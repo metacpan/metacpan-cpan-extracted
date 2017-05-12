@@ -1,0 +1,25 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Log/StdLog.pm
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+t/all.t
+t/debug.t
+t/error.t
+t/fatal.t
+t/formatted.t
+t/handle.t.log
+t/info.t
+t/no_message.t
+t/nolevel.t
+t/trace.t
+t/user.t
+t/user_defined.t
+t/user_defined_silent.t
+t/warn.t
+t/handle.t

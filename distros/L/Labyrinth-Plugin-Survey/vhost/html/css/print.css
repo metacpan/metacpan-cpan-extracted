@@ -1,0 +1,16 @@
+#menuleft, #menu, #menuright, #sponsor { 
+	display: none;
+}
+
+#content {
+  padding-top: 0px;
+}
+
+H2, H3, H4 {
+	color: black;
+}
+
+#container {
+  max-width: 100%;
+  width: 100%;
+}

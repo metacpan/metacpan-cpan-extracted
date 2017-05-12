@@ -1,0 +1,13 @@
+Method,US_2007,UK_2013,NL_2010,DE_2011
+frq_count,1,1,1,1
+cd_count,2,9,2,
+frq_opm,5,,6,4
+frq_log,6,,7,5
+frq_zipf,14,5,,
+cd_pct,7,12,8,
+cd_log,8,,9,
+pos,9,15,10,
+freq,5,,6,4
+log,6,,7,5
+opm,5,,6,4
+zipf,14,5,,

@@ -1,0 +1,33 @@
+Revision history for Perl extension Lingua::Translate.
+
+0.09  Fri May 23 20:59:28 NZST 2008
+    - Update for new Babelfish URL, courtesy of Graham Stead
+
+0.08  Fri Apr  8 13:47:03 CST 2005
+    - Now tests Chinese and Portugese translations
+    - removed crufty Makefile.cfg system
+
+0.07  Wed Nov 17 10:46:49 NZDT 2004
+    - Now supports new Babelfish site design
+
+0.06  Mon Jun 17 19:12:45 BST 2002
+    - No real changes, just cleaning up the build system so it passes
+      CPANTS testing, etc.
+
+0.05  Wed Jun  5 09:55:52 BST 2002
+    - Added call to LWP::UserAgent->env_proxy() to automatically pick
+      up firewall configuration specified in environment.  Spotted by
+      Mark Brunner :-))
+
+0.04  Wed May  8 15:49:26 BST 2002
+    - bug fix - the "ua" option with Babelfish back-end didn't work
+
+0.03  Tue Apr  9 17:45:22 BST 2002
+    - Added character set support
+    - Now compatible with perl 5.005
+
+0.02  Wed Jan 30 09:32:41 GMT 2002
+    - Added SysTran backend.
+
+0.01  Wed Jan 16 09:58:53 2002
+    - Initial release to CPAN.  Babelfish backend only.

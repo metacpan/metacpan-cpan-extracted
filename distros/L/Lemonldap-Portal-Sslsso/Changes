@@ -1,0 +1,10 @@
+Revision history for Perl extension Lemonldap::Portal::Sslsso.
+
+0.01  Sat Dec  4 21:18:04 2004
+	- original version; created by h2xs 1.22 with options
+		-AXn Lemonldap::Portal::Sslsso
+0.02  13 Jan  2005
+	- Add MIME::Base
+
+0.03  23 Feb  2005
+	- traited with perltidy

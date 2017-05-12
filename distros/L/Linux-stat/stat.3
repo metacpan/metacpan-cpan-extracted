@@ -1,0 +1,330 @@
+.rn '' }`
+''' $RCSfile$$Revision$$Date$
+'''
+''' $Log$
+'''
+.de Sh
+.br
+.if t .Sp
+.ne 5
+.PP
+\fB\\$1\fR
+.PP
+..
+.de Sp
+.if t .sp .5v
+.if n .sp
+..
+.de Ip
+.br
+.ie \\n(.$>=3 .ne \\$3
+.el .ne 3
+.IP "\\$1" \\$2
+..
+.de Vb
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve
+.ft R
+
+.fi
+..
+'''
+'''
+'''     Set up \*(-- to give an unbreakable dash;
+'''     string Tr holds user defined translation string.
+'''     Bell System Logo is used as a dummy character.
+'''
+.tr \(*W-|\(bv\*(Tr
+.ie n \{\
+.ds -- \(*W-
+.ds PI pi
+.if (\n(.H=4u)&(1m=24u) .ds -- \(*W\h'-12u'\(*W\h'-12u'-\" diablo 10 pitch
+.if (\n(.H=4u)&(1m=20u) .ds -- \(*W\h'-12u'\(*W\h'-8u'-\" diablo 12 pitch
+.ds L" ""
+.ds R" ""
+'''   \*(M", \*(S", \*(N" and \*(T" are the equivalent of
+'''   \*(L" and \*(R", except that they are used on ".xx" lines,
+'''   such as .IP and .SH, which do another additional levels of
+'''   double-quote interpretation
+.ds M" """
+.ds S" """
+.ds N" """""
+.ds T" """""
+.ds L' '
+.ds R' '
+.ds M' '
+.ds S' '
+.ds N' '
+.ds T' '
+'br\}
+.el\{\
+.ds -- \(em\|
+.tr \*(Tr
+.ds L" ``
+.ds R" ''
+.ds M" ``
+.ds S" ''
+.ds N" ``
+.ds T" ''
+.ds L' `
+.ds R' '
+.ds M' `
+.ds S' '
+.ds N' `
+.ds T' '
+.ds PI \(*p
+'br\}
+.\"	If the F register is turned on, we'll generate
+.\"	index entries out stderr for the following things:
+.\"		TH	Title 
+.\"		SH	Header
+.\"		Sh	Subsection 
+.\"		Ip	Item
+.\"		X<>	Xref  (embedded
+.\"	Of course, you have to process the output yourself
+.\"	in some meaninful fashion.
+.if \nF \{
+.de IX
+.tm Index:\\$1\t\\n%\t"\\$2"
+..
+.nr % 0
+.rr F
+.\}
+.TH stat 3 "perl 5.005, patch 03" "5/Feb/2002" "User Contributed Perl Documentation"
+.UC
+.if n .hy 0
+.if n .na
+.ds C+ C\v'-.1v'\h'-1p'\s-2+\h'-1p'+\s0\v'.1v'\h'-1p'
+.de CQ          \" put $1 in typewriter font
+.ft CW
+'if n "\c
+'if t \\&\\$1\c
+'if n \\&\\$1\c
+'if n \&"
+\\&\\$2 \\$3 \\$4 \\$5 \\$6 \\$7
+'.ft R
+..
+.\" @(#)ms.acc 1.5 88/02/08 SMI; from UCB 4.2
+.	\" AM - accent mark definitions
+.bd B 3
+.	\" fudge factors for nroff and troff
+.if n \{\
+.	ds #H 0
+.	ds #V .8m
+.	ds #F .3m
+.	ds #[ \f1
+.	ds #] \fP
+.\}
+.if t \{\
+.	ds #H ((1u-(\\\\n(.fu%2u))*.13m)
+.	ds #V .6m
+.	ds #F 0
+.	ds #[ \&
+.	ds #] \&
+.\}
+.	\" simple accents for nroff and troff
+.if n \{\
+.	ds ' \&
+.	ds ` \&
+.	ds ^ \&
+.	ds , \&
+.	ds ~ ~
+.	ds ? ?
+.	ds ! !
+.	ds /
+.	ds q
+.\}
+.if t \{\
+.	ds ' \\k:\h'-(\\n(.wu*8/10-\*(#H)'\'\h"|\\n:u"
+.	ds ` \\k:\h'-(\\n(.wu*8/10-\*(#H)'\`\h'|\\n:u'
+.	ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'^\h'|\\n:u'
+.	ds , \\k:\h'-(\\n(.wu*8/10)',\h'|\\n:u'
+.	ds ~ \\k:\h'-(\\n(.wu-\*(#H-.1m)'~\h'|\\n:u'
+.	ds ? \s-2c\h'-\w'c'u*7/10'\u\h'\*(#H'\zi\d\s+2\h'\w'c'u*8/10'
+.	ds ! \s-2\(or\s+2\h'-\w'\(or'u'\v'-.8m'.\v'.8m'
+.	ds / \\k:\h'-(\\n(.wu*8/10-\*(#H)'\z\(sl\h'|\\n:u'
+.	ds q o\h'-\w'o'u*8/10'\s-4\v'.4m'\z\(*i\v'-.4m'\s+4\h'\w'o'u*8/10'
+.\}
+.	\" troff and (daisy-wheel) nroff accents
+.ds : \\k:\h'-(\\n(.wu*8/10-\*(#H+.1m+\*(#F)'\v'-\*(#V'\z.\h'.2m+\*(#F'.\h'|\\n:u'\v'\*(#V'
+.ds 8 \h'\*(#H'\(*b\h'-\*(#H'
+.ds v \\k:\h'-(\\n(.wu*9/10-\*(#H)'\v'-\*(#V'\*(#[\s-4v\s0\v'\*(#V'\h'|\\n:u'\*(#]
+.ds _ \\k:\h'-(\\n(.wu*9/10-\*(#H+(\*(#F*2/3))'\v'-.4m'\z\(hy\v'.4m'\h'|\\n:u'
+.ds . \\k:\h'-(\\n(.wu*8/10)'\v'\*(#V*4/10'\z.\v'-\*(#V*4/10'\h'|\\n:u'
+.ds 3 \*(#[\v'.2m'\s-2\&3\s0\v'-.2m'\*(#]
+.ds o \\k:\h'-(\\n(.wu+\w'\(de'u-\*(#H)/2u'\v'-.3n'\*(#[\z\(de\v'.3n'\h'|\\n:u'\*(#]
+.ds d- \h'\*(#H'\(pd\h'-\w'~'u'\v'-.25m'\f2\(hy\fP\v'.25m'\h'-\*(#H'
+.ds D- D\\k:\h'-\w'D'u'\v'-.11m'\z\(hy\v'.11m'\h'|\\n:u'
+.ds th \*(#[\v'.3m'\s+1I\s-1\v'-.3m'\h'-(\w'I'u*2/3)'\s-1o\s+1\*(#]
+.ds Th \*(#[\s+2I\s-2\h'-\w'I'u*3/5'\v'-.3m'o\v'.3m'\*(#]
+.ds ae a\h'-(\w'a'u*4/10)'e
+.ds Ae A\h'-(\w'A'u*4/10)'E
+.ds oe o\h'-(\w'o'u*4/10)'e
+.ds Oe O\h'-(\w'O'u*4/10)'E
+.	\" corrections for vroff
+.if v .ds ~ \\k:\h'-(\\n(.wu*9/10-\*(#H)'\s-2\u~\d\s+2\h'|\\n:u'
+.if v .ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'\v'-.4m'^\v'.4m'\h'|\\n:u'
+.	\" for low resolution devices (crt and lpr)
+.if \n(.H>23 .if \n(.V>19 \
+\{\
+.	ds : e
+.	ds 8 ss
+.	ds v \h'-1'\o'\(aa\(ga'
+.	ds _ \h'-1'^
+.	ds . \h'-1'.
+.	ds 3 3
+.	ds o a
+.	ds d- d\h'-1'\(ga
+.	ds D- D\h'-1'\(hy
+.	ds th \o'bp'
+.	ds Th \o'LP'
+.	ds ae ae
+.	ds Ae AE
+.	ds oe oe
+.	ds Oe OE
+.\}
+.rm #[ #] #H #V #F C
+.SH "NAME"
+Linux::stat \- parse /proc/stat
+.SH "SYNOPSIS"
+.PP
+.Vb 1
+\&  use Linux::stat;
+.Ve
+.Vb 2
+\&  my $stat = Linux::stat->new( [ stat => "path to /proc/stat" ] );
+\&  my $hashref = $stat->stat();
+.Ve
+or
+.PP
+.Vb 1
+\&  my $hashref = Linux::stat::stat( [ "path to /proc/stat" ] );
+.Ve
+.SH "DESCRIPTION"
+\fBLinux::stat\fR is a simple Perl module which parses \fB/proc/stat\fR file.  
+Info is arranged in hash reference with descriptive keys.
+.PP
+\fBLinux::stat\fR was written on RedHat Linux 7.2, kernel 2.4.7 and tested on
+RedHat 6.2, kernel 2.2.14. It is expected to work with other versions as
+well, but this depends on Linux configuration and kernel version.
+.PP
+Output data can be easily previewed with \fBData::VarPrint\fR package, 
+available at CPAN.
+.PP
+Output fields (some of these are unavailable on kernels older than 2.4):
+.Ip "\fBboot_timestamp\fR" 4
+Timestamp (number of seconds since epoch) when the system was booted
+.Ip "\fBcontext_switch\fR" 4
+Context switch, used by Linux job scheduler; for more info check Linux
+kernel sources: kernel/sched.c (look for kstat.context_swtch)
+.Ip "\fBcpu\fR, \fBcpu0\fR, \fBcpu1\fR,..." 4
+Overall and per-\s-1CPU\s0 time: \fBuser\fR, \fBnice\fR, \fBsystem\fR, \fBidle\fR
+.Ip "\fBdisks\fR" 4
+Disks I/O (for each partition):
+.Ip "\fBdisk\fR \- disk number (0 for /dev/hda, 1 for /dev/hdb,...)" 8
+.Ip "\fBio\fR \- total number of I/O requests" 8
+.Ip "\fBmajor\fR \- major disk number (partition number on the disk)" 8
+.Ip "\fBread_count\fR \- number of reads from disk" 8
+.Ip "\fBread_sectors\fR \- number of sectors read from disk" 8
+.Ip "\fBwrite_count\fR \- number of writes to disk" 8
+.Ip "\fBwrite_sectors\fR \- number of sectors written to disk" 8
+.Ip "\fBdisks_io\fR" 4
+Overall disk I/O info; same fields as in \fBdisks\fR (of course, except for
+\fBdisk\fR and \fBmajor\fR)
+.Ip "\fBinterrupts\fR" 4
+Number for interrupts for each \s-1IRQ\s0
+.Ip "\fBinterrupts_total\fR" 4
+Total number of interrupts (same as sum of all numbers in \fBinterrupts\fR)
+.Ip "\fBkstat.*\fR" 4
+Not parsed, just added to hash
+.Ip "\fBpages_in\fR" 4
+Number of pages read
+.Ip "\fBpages_out\fR" 4
+Number of pages written
+.Ip "\fBswap_pages_in\fR" 4
+Number of pages read from swap
+.Ip "\fBswap_pages_out\fR" 4
+Number of pages written to swap
+.Ip "\fBtotal_forks\fR" 4
+Number of processes run since boot
+.Ip "\fBuptime\fR" 4
+System uptime in seconds (same as sum of all four times for \fBcpu\fR)
+.PP
+All not-recognized fields are just passed on without parsing.
+.SH "OPTIONS"
+Currently, the only option available is \fBstat\fR which is path to 
+\fB/proc/stat\fR in case this changes for some reason.
+.SH "FILES"
+\fB/proc/stat\fR CPU, disk and some other information
+.SH "REQUIRES"
+Perl 5.000
+.SH "SEE ALSO"
+\fIperl\fR\|(1)
+.SH "AUTHOR"
+Vedran Sego, vsego@math.hr
+
+.rn }` ''
+.IX Title "stat 3"
+.IX Name "Linux::stat - parse /proc/stat"
+
+.IX Header "NAME"
+
+.IX Header "SYNOPSIS"
+
+.IX Header "DESCRIPTION"
+
+.IX Item "\fBboot_timestamp\fR"
+
+.IX Item "\fBcontext_switch\fR"
+
+.IX Item "\fBcpu\fR, \fBcpu0\fR, \fBcpu1\fR,..."
+
+.IX Item "\fBdisks\fR"
+
+.IX Item "\fBdisk\fR \- disk number (0 for /dev/hda, 1 for /dev/hdb,...)"
+
+.IX Item "\fBio\fR \- total number of I/O requests"
+
+.IX Item "\fBmajor\fR \- major disk number (partition number on the disk)"
+
+.IX Item "\fBread_count\fR \- number of reads from disk"
+
+.IX Item "\fBread_sectors\fR \- number of sectors read from disk"
+
+.IX Item "\fBwrite_count\fR \- number of writes to disk"
+
+.IX Item "\fBwrite_sectors\fR \- number of sectors written to disk"
+
+.IX Item "\fBdisks_io\fR"
+
+.IX Item "\fBinterrupts\fR"
+
+.IX Item "\fBinterrupts_total\fR"
+
+.IX Item "\fBkstat.*\fR"
+
+.IX Item "\fBpages_in\fR"
+
+.IX Item "\fBpages_out\fR"
+
+.IX Item "\fBswap_pages_in\fR"
+
+.IX Item "\fBswap_pages_out\fR"
+
+.IX Item "\fBtotal_forks\fR"
+
+.IX Item "\fBuptime\fR"
+
+.IX Header "OPTIONS"
+
+.IX Header "FILES"
+
+.IX Header "REQUIRES"
+
+.IX Header "SEE ALSO"
+
+.IX Header "AUTHOR"
+

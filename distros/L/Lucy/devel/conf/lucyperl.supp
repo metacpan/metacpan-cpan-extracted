@@ -1,0 +1,87 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{
+   <boot_Clownfish>
+   Memcheck:Leak
+   ...
+   fun:boot_Clownfish
+   ...
+}
+
+{
+   <boot_Lucy>
+   Memcheck:Leak
+   ...
+   fun:boot_Lucy
+   ...
+}
+
+{
+   <boot_Lucy__Test>
+   Memcheck:Leak
+   ...
+   fun:boot_Lucy__Test
+   ...
+}
+
+{
+   <XS_DynaLoader_dl_load_file>
+   Memcheck:Leak
+   ...
+   fun:XS_DynaLoader_dl_load_file
+   ...
+}
+
+{
+   <cfish_Class_singleton>
+   Memcheck:Leak
+   ...
+   fun:cfish_Class_singleton
+   ...
+}
+
+{
+   <Perl_pad_findmy_pvn>
+   Memcheck:Leak
+   ...
+   fun:Perl_pad_findmy_pvn
+   fun:Perl_yylex
+   fun:Perl_yyparse
+   ...
+}
+
+{
+   <Perl_pad_add_name_pvn>
+   Memcheck:Leak
+   ...
+   fun:Perl_pad_add_name_pvn
+   fun:Perl_allocmy
+   fun:Perl_yylex
+   fun:Perl_yyparse
+   ...
+}
+
+
+{
+   <_dl_catch_error>
+   Memcheck:Leak
+   ...
+   fun:_dl_map_object
+   ...
+   fun:_dl_catch_error
+   ...
+}
+

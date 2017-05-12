@@ -1,0 +1,144 @@
+Revision history for Perl extension AlignmentSet.
+
+- added adaptToBilCorpus and orderAlSetAsBilCorpus functions in AlignmentSet.pm
+- added the TALP format, which is the new default
+- added compatibility for GIZA output format
+- added splice and regexpReplace functions in Alignment.pm
+- modified forceGroupConsistency sub of Alignment.pm to consider the difference between P and S links
+- modified forceGroupConsistency sub of Alignment.pm to add the option of contiguous groups
+- added in Alignment.pm: 
+	* sub manyToMany2joined (introduces underscore between links of many-to-many groups in source to target alignment ; WARNING: THIS SUB FOR NOW ONLY CHANGES WORDS FILES, NOT THE LINKS FILE)
+	* sub joined2ManyToMany (recreates links of words linked by underscore and removes underscores)
+- corrected bug in forceGroupConsistency sub of Alignment.pm
+- corrected bug in createDirStructure (if relative output files were passed without "/" in the path, files were created as a directory
+- added sourceSentence and targetSentence functions (print words without the NULL word)
+- Corrected loadFromGiza : depending on the space after the last }) in the links string, if the last word had no link, it was not included as word of the sentence
+
+*************************************************************
+*** NEW FEATURES of version 1.00                          ***
+*************************************************************
+- Now the modules are in the "Lingua::" namespace
+- The EvaluationResult.pm module now is Lingua::AlignmentEval.pm
+- en la función "compare" del modulo "AlignmentEval.pm",
+  en las tablas en formato latex, la columna "AER" es ahora
+  "AER (%)".
+
+
+*************************************************************
+*** NEW FEATURES of version "candidate #2 to version 1.0" ***
+*************************************************************
+
+- la función convert es ahora "privada" (en Perl sólo es en 
+  teoría) y ha sido "separada" en 2 funciones:
+
+ * chFormat: para sólo cambios de formatos, sin tocar el 
+   alineado. No se considera que imponer no-null-align o 
+   null-align toca el alineado. chFormat no devuelve nada:
+
+   $s2t->chFormat($newLocation[,$newFormat,$alignMode]);
+
+ * processAlignment: para procesar el aligneado con alguna
+   función del módulo "Alignment.pm". Para ser más fiel a la 
+   idea de un AlignmentSet, devuelve un nuevo objeto 
+   AlignmentSet, ya que el alineado ha cambiado:
+
+   $union = $s2t->processAlignment(\&Alignment::getUnion,$newLocation[,$newFormat,$alignMode]);
+   
+ Note: la única incompatibilidad con la versión anterior es que
+ processAlignment devuelve ahora un objeto. La función convert
+ sigue funcionando como antes pero se aconseja ya no usarla.
+ 	
+
+- Si el hash location sólo tiene la clave "sourceToTarget"
+  (única obligatoria), se puede pasar como argumento el
+  path en vez de la referencia al hash:
+ 
+ $alSet = AlignmentSet->new([["s2t_path","GIZA"]]);
+	
+  en vez de
+
+ $alSet = AlignmentSet->new([[{"sourceToTarget"=>"s2t_path"},"GIZA"]]);
+
+ (esta última sigue válida) 
+
+
+- Nuevas subs:
+
+ * copy: la manera apropiada de copiar el contenido de un 
+   AlignmentSet (no copia las direcciones de memoria):
+
+   $sameContentAlSet = $alSet->copy;
+
+ * setWordFiles: para proporcionar las palabras cuando es
+   necesario (por ejemplo si el AlignmentSet ha sido definido
+   sólo con el archivo de links, hace falta añadir las palabras
+   para vizualizarlo):
+
+   $alSet= AlignmentSet->new([["myPath"]]);
+   ...	
+   $alSet->setWordFiles($sourcePath,$targetPath);
+   $alSet->visualise(...);
+
+ * setTargetToSourceFile: lo mismo:
+
+   $alSet->setTargetToSourceFile($targetToSourcePath);
+
+ * Alignment::forceGroupConsistency: prohibits situations of the type: if linked(e,f) and linked(e',f) and linked
+   (e',f') but not linked(e,f'). In this case the function links e and f'.
+
+
+- Ahora, si un archivo o directorio tiene que ser creado (para
+  escribir el alineado en nuevo formato, por ejemplo), es creado
+  así como todo el arból de directorios necesarios (antes sólo se 
+  creaba si el último nivel ya existía).
+
+
+- Cambios en la función "visualise", representation "matrix":
+ * es ahora posible usar una marca personalizada
+ * todas las marcas son compatibles con un alineamiento
+   targetToSource, que aparece con marcas giradas de 90º
+   hacia la izquierda (con respecto a las marcas sourceToTarget).
+
+
+- CORRECCIÓN DE BUGS:
+ * funcionamiento erroneo de Alignment::forceNullAlign
+   (accionada si $alignMode="null-align")
+ * error en el tratamiento de archivos de links NAACL
+   conteniendo par(es) de frase(s) sin link.
+
+
+*************************************************************
+*** NEW FEATURES of version "candidate #1 to version 1.0" ***
+*************************************************************
+
+--> 1. En todos formatos puede haber sourcetotarget and targettosource alignments.
+Esto implica cambiar las claves del hash "location":
+
+para NAACL:
+"alignment" se cambia por "sourceToTarget" and "targetToSource"
+
+par BLINKER:se aprovecha para hacerlo menos rigido: ahora se especifica
+source: entire path of raw text source file
+target (optional)
+sourceToTarget: directory
+targetToSource: directory
+
+--> 2. El unico campo obligatorio del hash "location" es el que dice donde esta el archivo de aligneado: "sourceToTarget". Si solo se trabaja con los links ya no hace falta especificar tambien el source y target (para evaluar, por ejemplo).
+
+--> 3. Sobre los números de pares de frases (sentence pair number):
+
+hay un número externo (inputSentPairNum) que es el que se lee del archivo de entrada (si la entrada son los pares 25 a 50, inputSentPairNum va de 25 a 50).
+Tambien se necesita un número interno (internalSentPairNum), que siempre empieza a 1.
+Si en una proxima version se hace possible definir un AlignmentSet desde varios conjuntos de archivos de entrada (por ejemplo los 50 pares de un archivo giza A y los 100 de un archivo giza B), por fuerza la numeracion interna tendra que ser diferente de la de entrada.
+
+Por lo tanto, internalSentPairNum se debe usar por defecto en todos los archivos de salida (dejando la posibilidad, para ciertos formatos, de usar inputSentPairNum para la salida ?).
+
+Ahora la función evaluate también usa internalSentPairNum: compara el par de frases enésimo que le llega con el enésimo de la referencia, cual sea el número que tienen en el archivo de entrada.
+ Una excepción: si el formato es NAACL y el alignMode "as-is", porque en este caso lee a saco las lineas de links de la entrada y los compara tal cual, sin usar la estructura interna.
+
+
+
+
+
+
+

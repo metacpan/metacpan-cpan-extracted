@@ -1,0 +1,20 @@
+Revision history for Log-Dispatch-Scribe
+
+0.01    2009-04-30
+        Initial version
+
+0.02    2009-05-05
+        Added bin/scribe_cat.pl
+
+0.03	2009-05-12
+	Doc fixes, default category fix in scribe_cat.pl
+
+0.04	2010-03-18
+	Doc fixes, RT#54018
+
+0.05	2010-03-24
+	Doc updates
+
+0.06	2016-09-09
+	Fix for failing test.
+

@@ -1,0 +1,46 @@
+Changes for Labyrinth-Plugin-Survey
+===================================
+
+0.08	2014-12-01
+        - ensure utf8 names are properly quoted and encoded.
+        - fix date formating for emails.
+        - update speaker evaluation emails for dates and encodings.
+        - include prerequisites for toolkit scripts.
+
+0.07	2014-09-21
+        - provide SQL to disable Talks and Users.
+        - ignore disabled users when sending announcements.
+        - added initial Survey API module.
+        - added Survey API request and template files.
+        - refined Act API calls and templates.
+
+0.06	2014-09-19
+        - list of courses/talks should not be based on room allocation.
+        - added filters to only send feedback for specific talk types.
+        - use actuserid to find user before name.
+        - added redirect settings to templates (thanks to Roland Schmitz).
+        - restructured processing of inner template within the layout.
+        - added 'thanks' blocks.
+        - restructured heading levels.
+        - added example apache vhost.conf.
+        - added homepage link.
+
+0.05	2014-09-13
+        - reworked survey sorting.
+        - switch dates to W3CDTF standard.
+        - CSS fixes.
+        - added Javascript admin code.
+
+0.04	2014-09-05
+        - added vhost files for base survey site.
+        - fixed license fields in META.json to be lists.
+
+0.03	2014-08-16
+        - added SQL schema files.
+
+0.02	2014-08-16
+        - added YAPC Survey file specificaions.
+
+0.01	2014-08-16
+        - first official release.
+        - base code and distribution files.

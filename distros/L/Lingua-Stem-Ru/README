@@ -1,0 +1,39 @@
+
+    Perl 5 module Lingua::Stemmer::Ru
+
+Lingua::Stemmer::Ru is an implementation of Porter's stemming algorithm
+for Russian (KOI8-R only).
+
+The algorithm is implemented exactly as described in:
+    http://snowball.tartarus.org/algorithms/russian/stemmer.html
+
+INSTALLATION
+
+You install Lingua::Stemmer::Ru by running these commands
+in the *nix environment:
+
+   perl Makefile.PL
+   make
+   make test (optional)
+   make install
+
+To install Lingua::Stemmer::Ru in the Win32 environment,
+use dmake instead of make.
+dmake is available for free as part of MinGW development environment (Minimalist GNU for Windows):
+<http://mingw.org/>
+If you are using Strawberry Perl, you should already have MinGW installed.
+
+DOCUMENTATION
+
+POD format documentation is included in Levenshtein.pm.
+You can read the documentation online:
+
+    https://metacpan.org/pod/Lingua::Stemmer::Ru
+
+Or read it on your terminal, using the perldoc command:
+
+    perldoc Lingua::Stemmer::Ru
+
+COPYRIGHT
+Copyright (C) 2003 by Aldo Calpini <dada@perl.it>
+Copyright (C) 2004 by Aleksandr Guidrevitch <pillgrim@mail.ru>

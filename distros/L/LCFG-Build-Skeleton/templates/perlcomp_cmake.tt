@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 2.6)
+
+project (lcfg-[% pkgspec.name %])
+
+include(lcfg.cmake)
+
+lcfg_add_component(${LCFG_NAME})
+
+lcfg_add_perl_tree(lib)

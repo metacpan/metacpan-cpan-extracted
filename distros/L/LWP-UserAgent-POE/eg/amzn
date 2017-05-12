@@ -1,0 +1,52 @@
+#!/usr/local/bin/perl
+###########################################
+# asin_fetch
+# Mike Schilli, 2003 (m@perlmeister.com)
+# Fetch book info by ASIN
+#     asin_fetch 0201360683
+###########################################
+use warnings;
+use strict;
+
+use Net::Amazon;
+use Net::Amazon::Request::ASIN;
+use POE;
+use LWP::UserAgent::POE;
+
+POE::Session->create(
+  inline_states => {
+    _start => sub { 
+      $_[KERNEL]->yield("next");
+      amznfetch();
+    },
+    next   => sub {
+      print "tick...\n";
+      $_[KERNEL]->delay(next => 1);
+    },
+  },
+);
+
+POE::Kernel->run();
+
+###########################################
+sub amznfetch {
+###########################################
+     my $ua = Net::Amazon->new(
+         token  => 'XXXXXXXXXXXXXXXXXXXX',
+         ua     => LWP::UserAgent::POE->new(),
+     );
+     
+     my $req = Net::Amazon::Request::ASIN->new(
+         asin  => "0201360683",
+     );
+     
+       # Response is Net::Amazon::ASIN::Response
+     my $resp = $ua->request($req);
+     
+     if($resp->is_success()) {
+         print $resp->as_string(), "\n";
+     } else {
+         print "Error: ", 
+               $resp->message(), "\n";
+     }
+}

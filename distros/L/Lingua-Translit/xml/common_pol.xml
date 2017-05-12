@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+
+<!--
+
+  Transliteration definitions for Polish.
+
+  Copyright (C) 2008 Alex Linke <alinke@lingua-systems.com>
+  Copyright (C) 2009 Lingua-Systems Software GmbH
+
+  This transliteration simply maps all special characters of the Polish
+  alphabet to their unaccented counterparts as commonly used in electronical
+  communications.
+
+-->
+
+
+<translit>
+
+    <name>Common POL</name>
+    <desc>Unaccented Polish</desc>
+    <reverse>false</reverse>
+
+    <!-- set of transliteration rules -->
+
+    <rules>
+
+        <rule>
+            <from>&#x0104;</from> <!-- LATIN CAPITAL LETTER A WITH OGONEK - Ą -->
+            <to>A</to>
+        </rule>
+        <rule>
+            <from>&#x0105;</from> <!-- LATIN SMALL LETTER A WITH OGONEK - ą -->
+            <to>a</to>
+        </rule>
+
+        <rule>
+            <from>&#x0106;</from> <!-- LATIN CAPITAL LETTER C WITH ACUTE - Ć -->
+            <to>C</to>
+        </rule>
+        <rule>
+            <from>&#x0107;</from> <!-- LATIN SMALL LETTER C WITH ACUTE - ć -->
+            <to>c</to>
+        </rule>
+
+        <rule>
+            <from>&#x0118;</from> <!-- LATIN CAPITAL LETTER E WITH OGONEK - Ę -->
+            <to>E</to>
+        </rule>
+        <rule>
+            <from>&#x0119;</from> <!-- LATIN SMALL LETTER E WITH OGONEK - ę -->
+            <to>e</to>
+        </rule>
+
+        <rule>
+            <from>&#x0141;</from> <!-- LATIN CAPITAL LETTER L WITH STROKE - Ł -->
+            <to>L</to>
+        </rule>
+        <rule>
+            <from>&#x0142;</from> <!-- LATIN SMALL LETTER L WITH STROKE - ł -->
+            <to>l</to>
+        </rule>
+
+        <rule>
+            <from>&#x0143;</from> <!-- LATIN CAPITAL LETTER N WITH ACUTE - Ń -->
+            <to>N</to>
+        </rule>
+        <rule>
+            <from>&#x0144;</from> <!-- LATIN SMALL LETTER N WITH ACUTE - ń -->
+            <to>n</to>
+        </rule>
+
+        <rule>
+            <from>&#x00D3;</from> <!-- LATIN CAPITAL LETTER O WITH ACUTE - Ó -->
+            <to>O</to>
+        </rule>
+        <rule>
+            <from>&#x00F3;</from> <!-- LATIN SMALL LETTER O WITH ACUTE - ó -->
+            <to>o</to>
+        </rule>
+
+        <rule>
+            <from>&#x015A;</from> <!-- LATIN CAPITAL LETTER S WITH ACUTE - Ś -->
+            <to>S</to>
+        </rule>
+        <rule>
+            <from>&#x015B;</from> <!-- LATIN SMALL LETTER S WITH ACUTE - ś -->
+            <to>s</to>
+        </rule>
+
+        <rule>
+            <from>&#x0179;</from> <!-- LATIN CAPITAL LETTER Z WITH ACUTE - Ź -->
+            <to>Z</to>
+        </rule>
+        <rule>
+            <from>&#x017A;</from> <!-- LATIN SMALL LETTER Z WITH ACUTE - ź -->
+            <to>z</to>
+        </rule>
+
+        <rule>
+            <from>&#x017B;</from> <!-- LATIN CAPITAL LETTER Z WITH DOT ABOVE - Ż -->
+            <to>Z</to>
+        </rule>
+        <rule>
+            <from>&#x017C;</from> <!-- LATIN SMALL LETTER Z WITH DOT ABOVE - ż -->
+            <to>z</to>
+        </rule>
+
+    </rules>
+
+</translit>
+
+<!--
+  vim: sts=4 sw=4 ai et
+-->

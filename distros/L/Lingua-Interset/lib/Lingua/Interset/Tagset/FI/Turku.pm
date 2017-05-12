@@ -1,0 +1,7696 @@
+# ABSTRACT: Driver for the Finnish tagset from the Turku Dependency Treebank.
+# Tag is a sequence of features separated by vertical bars. There are just the feature values, not attribute-value pairs.
+# Copyright © 2011, 2014, 2017 Dan Zeman <zeman@ufal.mff.cuni.cz>
+
+package Lingua::Interset::Tagset::FI::Turku;
+use strict;
+use warnings;
+our $VERSION = '3.004';
+
+use utf8;
+use open ':utf8';
+use namespace::autoclean;
+use Moose;
+extends 'Lingua::Interset::Tagset';
+
+
+
+has 'features_all' => ( isa => 'ArrayRef', is => 'ro', builder => '_create_features_all', lazy => 1 );
+has 'atoms' => ( isa => 'HashRef', is => 'ro', builder => '_create_atoms', lazy => 1 );
+
+
+
+#------------------------------------------------------------------------------
+# Returns the tagset id that should be set as the value of the 'tagset' feature
+# during decoding. Every derived class must (re)define this method! The result
+# should correspond to the last two parts in package name, lowercased.
+# Specifically, it should be the ISO 639-2 language code, followed by '::' and
+# a language-specific tagset id. Example: 'cs::multext'.
+#------------------------------------------------------------------------------
+sub get_tagset_id
+{
+    return 'fi::turku';
+}
+
+
+
+#------------------------------------------------------------------------------
+# Creates the list of all surface features that can appear in the tag.
+#------------------------------------------------------------------------------
+sub _create_features_all
+{
+    my $self = shift;
+    my @features = ('pos', 'abbr', 'foreign', 'prop', 'prontype', 'numtype', 'copula', 'advtype', 'conjtype', 'punctype',
+                    'degree', 'case', 'number', 'poss', 'mood', 'tense', 'voice', 'person', 'neg', 'inf', 'pcp', 'clitic',
+                    'style', 'up', 'trunco', 'unknown');
+    return \@features;
+}
+
+
+
+#------------------------------------------------------------------------------
+# Creates atomic drivers for surface features.
+#------------------------------------------------------------------------------
+sub _create_atoms
+{
+    my $self = shift;
+    my %atoms;
+    # PART OF SPEECH ####################
+    # Some tags contain two parts of speech, e.g. C|...|V. The rightmost is probably the POS of the stem,
+    # while the leftmost one is the resulting POS on the surface. In the list of known tags, I removed the rightmost tag.
+    # Some tags do not contain any part of speech, e.g. the DV-MA derivations.
+    # http://en.wiktionary.org/wiki/-ma#Finnish hints that the result can be either noun or verb.
+    # I added "N" to all "DV-MA" tags in the list of known tags.
+    $atoms{pos} = $self->create_atom
+    (
+        'tagset' => 'fi::turku',
+        'surfeature' => 'pos',
+        'decode_map' =>
+        {
+            'A'     => ['pos' => 'adj'],
+            # see e.g. http://archives.conlang.info/pei/juenchen/phaelbhaduen.html for what ad-adjective is
+            'AD-A'  => ['pos' => 'adv', 'advtype' => 'adadj'],
+            'ADV'   => ['pos' => 'adv'],
+            'ART'   => ['pos' => 'adj', 'prontype' => 'art'],
+            'C'     => ['pos' => 'conj'],
+            'INTJ'  => ['pos' => 'int'],
+            'N'     => ['pos' => 'noun'],
+            'NUM'   => ['pos' => 'num'],
+            # adposition (pre- or postposition): jälkeen, ennen
+            'PP'    => ['pos' => 'adp'],
+            # foreign preposition: de
+            'PREP'  => ['pos' => 'adp', 'adpostype' => 'prep'],
+            # postposition: vieressä
+            'PSP'   => ['pos' => 'adp', 'adpostype' => 'post'],
+            # pronoun: sinä
+            'PRON'  => ['pos' => 'noun'], # We need non-empty prontype but it should be added by another feature/atom.
+            'V'     => ['pos' => 'verb'],
+            'PUNCT' => ['pos' => 'punc'],
+            # word form not found in lexicon: kiptšakkilais-oguusilaiseksi
+            'NON-TWOL' => []
+        },
+        'encode_map' =>
+        {
+            'pos' => { 'noun' => { 'prontype' => { ''  => 'N',
+                                                   '@' => 'PRON' }},
+                       'adj'  => { 'prontype' => { 'art' => 'ART',
+                                                   '@'   => 'A' }},
+                       'num'  => 'NUM',
+                       'verb' => 'V',
+                       'adv'  => { 'advtype' => { 'adadj' => 'AD-A',
+                                                  '@'     => 'ADV' }},
+                       'adp'  => { 'adpostype' => { 'prep' => 'PREP',
+                                                    'post' => 'PSP',
+                                                    '@'    => 'PP' }},
+                       'conj' => 'C',
+                       'int'  => 'INTJ',
+                       'punc' => 'PUNCT',
+                       '@'    => { 'abbr' => { 'abbr' => '', # ABBR will be added by another atom.
+                                               '@'    => { 'foreign' => { 'foreign' => '', # FORGN will be added by another atom.
+                                                                          # Participles (PCP1) sometimes occur without explicit indication whether they should be considered verbs or adjectives.
+                                                                          # Examples: jatkuvalla = continuous (jatkua = continue); käyttävällä = using (käyttää = use)
+                                                                          '@'       => { 'verbform' => { 'part' => '',
+                                                                                                         '@'    => 'NON-TWOL' }}}}}}}
+        }
+    );
+    # ABBREVIATION ####################
+    # abbreviation (eaa., ns., ven.)
+    # This feature can appear as the only part of speech of the word, or it can join
+    # the part of speech of the original word that has been abbreviated ("ADV|ABBR").
+    $atoms{abbr} = $self->create_simple_atom
+    (
+        'intfeature' => 'abbr',
+        'simple_decode_map' =>
+        {
+            'ABBR' => 'abbr'
+        }
+    );
+    # FOREIGN WORD ####################
+    # foreign word (British)
+    $atoms{foreign} = $self->create_simple_atom
+    (
+        'intfeature' => 'foreign',
+        'simple_decode_map' =>
+        {
+            'FORGN' => 'foreign'
+        }
+    );
+    # PROPER NAME ####################
+    # proper noun (Mikko)
+    $atoms{prop} = $self->create_simple_atom
+    (
+        'intfeature' => 'nountype',
+        'simple_decode_map' =>
+        {
+            'PROP' => 'prop'
+        }
+    );
+    # PRONOUN TYPE ####################
+    # Pronoun types: PERS DEM REL Q REFL/Q
+    # Of these, only 'Q' appears in the documentation:
+    # Q = quantifier (moni = many, much)
+    $atoms{prontype} = $self->create_atom
+    (
+        'surfeature' => 'prontype',
+        'decode_map' =>
+        {
+            # Q = quantifier (moni = many, much)
+            # In the data, it occurs always together with PRON, i.e. 'Q|PRON'. Examples (translation by Google):
+            # missään (anywhere), samalla (at the same time), toisen (next), kaikkia (all), jokaista (every), ainoa (only), samaan (same), molemmat (both)
+            # Quantifier can also occur with one of the possessive suffixes.
+            # It happens solely with the lemma "toinen" = "other" and the result translates as "each other" (lit. "my other", "your other", ...)
+            'Q' => ['prontype' => 'ind'],
+            # REFL/Q = reflexive quantifying pronoun (itseään = sám = self)
+            'REFL/Q' => ['prontype' => 'ind', 'reflex' => 'reflex'],
+            # PERS = personal pronoun (meidät = us)
+            # minä = I, sinä = you, hän = he/she, me = we, te = you, he = they
+            'PERS' => ['prontype' => 'prs'],
+            # DEM = demonstrative pronoun (se = that, tuolla = there)
+            'DEM' => ['prontype' => 'dem'],
+            # REL = relative pronoun (mihin = where, mitä = what, joka = which)
+            'REL' => ['prontype' => 'rel'],
+            # There are two different features in the tagset that both say that a word is interrogative: INTG and INTERR.
+            # INTG: only five tags observed, all PRON: lemmas "mikä" (what), "kuka" (who), "ken" (who). Other forms have REL instead of INTG.
+            # INTERR: twelve tags observed with adjectives ("millainen" = "what") and adverbs ("miten" = "how").
+            # interrogative pronoun (kuka = who, mikä = what)
+            'INTG' => ['prontype' => 'int'],
+            # interrogative adverb or adjective (kuinka = how, millainen = which, milloin = when, miksei = why not)
+            # The word "miksei" (why not) is tagged at the same time as adverb and verb!
+            # I am removing its tag from the list (otherwise it will be considered verb because V occurs later).
+            'INTERR' => ['prontype' => 'int']
+        },
+        'encode_map' =>
+        {
+            'prontype' => { 'prs' => 'PERS',
+                            'dem' => 'DEM',
+                            'ind' => { 'reflex' => { 'reflex' => 'REFL/Q',
+                                                     '@'      => 'Q' }},
+                            'int' => { 'pos' => { 'adv' => 'INTERR',
+                                                  'adj' => 'INTERR',
+                                                  '@'   => 'INTG' }},
+                            'rel' => 'REL' }
+        }
+    );
+    # NUMERAL TYPE ####################
+    # We can combine numeral type and form in one atom because they do not occur together.
+    $atoms{numtype} = $self->create_atom
+    (
+        'surfeature' => 'numtype',
+        'decode_map' =>
+        {
+            # ordinal numeral (ensimmäinen = first, toinen = second, kolmas = third)
+            'ORD' => ['numtype' => 'ord'],
+            # number expressed using Arabic digits
+            # it also occurs with compound adjectives and nouns that contain digits (7., 9., 1.3-litrainen, 1980-luvun)
+            'digit' => ['numform' => 'digit'],
+            # number expressed using Roman numerals
+            # (I, D, II, III, V, I:lle, M:lle, X-ryhmä)
+            'roman' => ['numform' => 'roman']
+        },
+        'encode_map' =>
+        {
+            'numtype' => { 'ord' => 'ORD',
+                           '@'   => { 'numform' => { 'digit' => 'digit',
+                                                     'roman' => 'roman' }}}
+        }
+    );
+    # COPULA ####################
+    # Copula verb: COP (olla = to be)
+    $atoms{copula} = $self->create_simple_atom
+    (
+        'intfeature' => 'verbtype',
+        'simple_decode_map' =>
+        {
+            'COP' => 'cop'
+        }
+    );
+    # ADVERB TYPE ####################
+    # MAN
+    $atoms{advtype} = $self->create_atom
+    (
+        'surfeature' => 'advtype',
+        'decode_map' =>
+        {
+            # manner adverb (rohkeasti = boldly, hitaasti = slowly, henkisesti = mentally)
+            'MAN'    => ['advtype' => 'man'],
+        },
+        'encode_map' =>
+        {
+            'advtype' => { 'man' => 'MAN' }
+        }
+    );
+    # CONJUNCTION TYPE ####################
+    # COORD SUB
+    $atoms{conjtype} = $self->create_simple_atom
+    (
+        'intfeature' => 'conjtype',
+        'simple_decode_map' =>
+        {
+            # coordinating conjunction (ja, että, vai, sekä, mutta)
+            'COORD' => 'coor',
+            # subordinating conjunction (kun, vaikka, ettei, jos, koska)
+            'SUB'   => 'sub',
+            # comparating conjunction (kuin = as)
+            'CMPR'  => 'comp'
+        }
+    );
+    # PUNCTUATION TYPE ####################
+    # DASH|PUNCT, PUNCT|QUOTE, PUNCT|ENDASH...
+    $atoms{punctype} = $self->create_atom
+    (
+        'surfeature' => 'punctype',
+        'decode_map' =>
+        {
+            'DASH'   => ['punctype' => 'dash'],
+            'ENDASH' => ['punctype' => 'dash', 'other' => {'dashtype' => 'en'}],
+            'EMDASH' => ['punctype' => 'dash', 'other' => {'dashtype' => 'em'}],
+            'QUOTE'  => ['punctype' => 'quot']
+        },
+        'encode_map' =>
+        {
+            'punctype' => { 'dash' => { 'other/dashtype' => { 'en' => 'ENDASH',
+                                                              'em' => 'EMDASH',
+                                                              '@'  => 'DASH' }},
+                            'quot' => 'QUOTE' }
+        }
+    );
+    # DEGREE OF COMPARISON ####################
+    $atoms{degree} = $self->create_simple_atom
+    (
+        'intfeature' => 'degree',
+        'simple_decode_map' =>
+        {
+            # positive (kuuma, hyvä)
+            'POS' => 'pos',
+            # comparative (kuumempi, parempi)
+            'CMP' => 'cmp',
+            # superlative (kuumin, paras)
+            'SUP' => 'sup'
+        }
+    );
+    # CASE ####################
+    $atoms{case} = $self->create_simple_atom
+    (
+        'intfeature' => 'case',
+        'simple_decode_map' =>
+        {
+            # nominative (koira = dog)
+            'NOM' => 'nom',
+            # genitive (koiran)
+            'GEN' => 'gen',
+            # partitive (koiraa)
+            'PTV' => 'par',
+            # essive (koirana)
+            'ESS' => 'ess',
+            # translative (koiraksi)
+            'TRA' => 'tra',
+            # inessive (koirassa)
+            'INE' => 'ine',
+            # elative (koirasta)
+            'ELA' => 'ela',
+            # illative (koiraan)
+            'ILL' => 'ill',
+            # adessive (koiralla)
+            'ADE' => 'ade',
+            # ablative (koiralta)
+            'ABL' => 'abl',
+            # allative (koiralle)
+            'ALL' => 'all',
+            # abessive (koiratta)
+            'ABE' => 'abe',
+            # comitative (koirineen)
+            'CMT' => 'com',
+            # instructive (koirin)
+            'INS' => 'ins',
+            # accusative: only with a few pronouns (meidät = us, sinut = thee, hänet = him, minut = me, heidät = them)
+            'ACC' => 'acc'
+        }
+    );
+    # NUMBER ####################
+    $atoms{number} = $self->create_simple_atom
+    (
+        'intfeature' => 'number',
+        'simple_decode_map' =>
+        {
+            # singular (kala = fish)
+            'SG' => 'sing',
+            # plural (kalat)
+            'PL' => 'plur'
+        }
+    );
+    # POSSESSIVE SUFFIX ####################
+    $atoms{poss} = $self->create_atom
+    (
+        'surfeature' => 'poss',
+        'decode_map' =>
+        {
+            # 1st person singular (my) (tyttäreni = my daughter)
+            '1SG' => ['poss' => 'poss', 'possperson' => '1', 'possnumber' => 'sing'],
+            # 2nd person singular (your) (tyttäresi)
+            '2SG' => ['poss' => 'poss', 'possperson' => '2', 'possnumber' => 'sing'],
+            # 3rd person singular or plural (his, her, its, their) (tyttärensä)
+            '3'   => ['poss' => 'poss', 'possperson' => '3'],
+            # 1st person plural (our) (tyttäremme)
+            '1PL' => ['poss' => 'poss', 'possperson' => '1', 'possnumber' => 'plur'],
+            # 2nd person plural (your) (tyttärenne)
+            '2PL' => ['poss' => 'poss', 'possperson' => '2', 'possnumber' => 'plur']
+        },
+        'encode_map' =>
+        {
+            'possperson' => { '1' => { 'possnumber' => { 'plur' => '1PL',
+                                                         '@'    => '1SG' }},
+                              '2' => { 'possnumber' => { 'plur' => '2PL',
+                                                         '@'    => '2SG' }},
+                              '3' => '3' }
+        }
+    );
+    # MOOD ####################
+    $atoms{mood} = $self->create_atom
+    (
+        'surfeature' => 'mood',
+        'decode_map' =>
+        {
+            # There is no feature for indicative forms (lukee = reads, menee = goes).
+            # imperative (lue, mene)
+            'IMPV' => ['verbform' => 'fin', 'mood' => 'imp'],
+            # conditional (lukisi, menisi)
+            'COND' => ['verbform' => 'fin', 'mood' => 'cnd'],
+            # potential (lukenee, mennee)
+            'POTN' => ['verbform' => 'fin', 'mood' => 'pot']
+        },
+        'encode_map' =>
+        {
+            'mood' => { 'imp' => 'IMPV',
+                        'cnd' => 'COND',
+                        'pot' => 'POTN' }
+        }
+    );
+    # TENSE ####################
+    $atoms{tense} = $self->create_simple_atom
+    (
+        'intfeature' => 'tense',
+        'simple_decode_map' =>
+        {
+            # present (haluan = I want to)
+            'PRES' => 'pres',
+            # past (halusin = I wanted to)
+            'PAST' => 'past'
+        }
+    );
+    # VOICE ####################
+    $atoms{voice} = $self->create_simple_atom
+    (
+        'intfeature' => 'voice',
+        'simple_decode_map' =>
+        {
+            # active (uin = I swim)
+            'ACT' => 'act',
+            # passive (uidaan)
+            'PSS' => 'pass'
+        }
+    );
+    # PERSON AND NUMBER OF THE SUBJECT OF THE VERB ####################
+    $atoms{person} = $self->create_atom
+    (
+        'surfeature' => 'poss',
+        'decode_map' =>
+        {
+            # Person: SG1 SG2 SG3 PL1 PL2 PL3 PE4
+            # 1st person singular (menen = I go)
+            'SG1' => ['number' => 'sing', 'person' => '1'],
+            # 2nd person singular (menet = you go)
+            'SG2' => ['number' => 'sing', 'person' => '2'],
+            # 3rd person singular (menee = he goes)
+            'SG3' => ['number' => 'sing', 'person' => '3'],
+            # 1st person plural (menemme = we go)
+            'PL1' => ['number' => 'plur', 'person' => '1'],
+            # 2nd person plural (menette = you go)
+            'PL2' => ['number' => 'plur', 'person' => '2'],
+            # 3rd person plural (menevät = they go)
+            'PL3' => ['number' => 'plur', 'person' => '3'],
+            # passive ending (mennään)
+            # In modern colloquial Finnish, the passive form of the verb is used instead of the active first person plural indicative and imperative.
+            # We cannot set 'style' => 'coll' because the tagset includes means to mark colloquial language and it does not apply it here.
+            # (Setting 'style' => 'coll' would mean that on encoding we would produce the 'st-cllq' feature that was not in the input tag.)
+            'PE4' => ['number' => 'plur', 'person' => '1', 'variant' => '6']
+        },
+        'encode_map' =>
+        {
+            'number' => { 'sing' => { 'person' => { '1' => 'SG1',
+                                                    '2' => 'SG2',
+                                                    '3' => 'SG3' }},
+                          'plur' => { 'person' => { '1' => { 'variant' => { '6' => 'PE4',
+                                                                            '@' => 'PL1' }},
+                                                    '2' => 'PL2',
+                                                    '3' => 'PL3' }}}
+        }
+    );
+    # POLARITY ####################
+    $atoms{neg} = $self->create_atom
+    (
+        'surfeature' => 'neg',
+        'decode_map' =>
+        {
+            # negative verb (en, et, ei)
+            # Sometimes even verbs have NEG and not NEGV, so we must remember the distinction in the 'other' feature.
+            'NEGV' => ['polarity' => 'neg', 'other' => {'polarity' => 'negv'}],
+            # negative form (en tehnyt = I did not do)
+            'NEG'  => ['polarity' => 'neg', 'other' => {'polarity' => 'neg'}]
+        },
+        'encode_map' =>
+        {
+            'other/polarity' => { 'negv' => 'NEGV',
+                                  'neg'  => 'NEG',
+                                  '@'    => { # for some reason, copula verbs do not use NEGV but NEG
+                                              'polarity' => { 'neg' => { 'pos' => { 'verb' => { 'verbtype' => { 'cop' => 'NEG',
+                                                                                                                '@'   => 'NEGV' }},
+                                                                                    'conj' => 'NEGV',
+                                                                                    '@'    => 'NEG' }}}}}
+        }
+    );
+    # INFINITIVE ####################
+    # There are several verb forms in Finnish that are called infinitives.
+    # Infinitives: INF1 INF2 INF3 INF5
+    # The 4th infinitive (tuleminen) is interpreted as a noun.
+    $atoms{inf} = $self->create_atom
+    (
+        'surfeature' => 'inf',
+        'decode_map' =>
+        {
+            # 1st infinitive (tulla, tullakseni = to become)
+            'INF1' => ['verbform' => 'inf', 'variant' => '1'],
+            # 2nd infinitive (tullessaan, tullessa)
+            'INF2' => ['verbform' => 'inf', 'variant' => '2'],
+            # 3rd infinitive (tulemaan)
+            'INF3' => ['verbform' => 'ger'],
+            # 5th infinitive (tulemaisillaan)
+            'INF5' => ['verbform' => 'inf', 'variant' => '5']
+        },
+        'encode_map' =>
+        {
+            'verbform' => { 'inf' => { 'variant' => { '5' => 'INF5',
+                                                      '2' => 'INF2',
+                                                      '@' => 'INF1' }},
+                            'ger' => 'INF3' }
+        }
+    );
+    # PARTICIPLE ####################
+    # Participles: PCP1 PCP2
+    $atoms{pcp} = $self->create_atom
+    (
+        'surfeature' => 'pcp',
+        'decode_map' =>
+        {
+            # 1st participle (lentävä = flying, lennettävä = flown)
+            'PCP1' => ['verbform' => 'part', 'variant' => '1'],
+            # 2nd participle (lentänyt = flown, lennetty = flown)
+            'PCP2' => ['verbform' => 'part', 'variant' => '2']
+        },
+        'encode_map' =>
+        {
+            'verbform' => { 'part' => { 'variant' => { '2' => 'PCP2',
+                                                       '@' => 'PCP1' }}}
+        }
+    );
+    # CLITIC ####################
+    # Clitics: hAn kA kAAn kin kO pA s
+    $atoms{clitic} = $self->create_atom
+    (
+        'surfeature' => 'clitic',
+        'decode_map' =>
+        {
+            # Appealing clitic -han/-hän (poikahan).
+            # This clitic is to appeal to the listener:
+            # Olethan kävellyt?
+            # You have walked, right?
+            'hAn'   => ['other' => {'clitic' => 'hAn'}],
+            # Copulative clitic -ka/-kä (eikä).
+            # This clitic is used in negative forms to work as copula:
+            # en juokse enkä kävele
+            # I don't run nor (do I) walk.
+            'kA'    => ['other' => {'clitic' => 'kA'}],
+            # -kaan/-kään (poikakaan)
+            'kAAn'  => ['other' => {'clitic' => 'kAAn'}],
+            # -kin (poikakin)
+            'kin'   => ['other' => {'clitic' => 'kin'}],
+            # -ko/-kö (oletko)
+            'kO'    => ['other' => {'clitic' => 'kO'}],
+            # -kohan/-köhän (miksiköhän = I wonder why, olisikohan = I wonder if)
+            'kOhAn' => ['other' => {'clitic' => 'kOhAn'}],
+            # -pa/-pä (oletpa)
+            'pA'    => ['other' => {'clitic' => 'pA'}],
+            # Emphatic (zdůrazňovací) clitic -s (onpas)
+            's'     => ['other' => {'clitic' => 's'}]
+        },
+        'encode_map' =>
+        {
+            'other/clitic' => { 'hAn'   => 'hAn',
+                                'kA'    => 'kA',
+                                'kAAn'  => 'kAAn',
+                                'kin'   => 'kin',
+                                'kO'    => 'kO',
+                                'kOhAn' => 'kOhAn',
+                                'pA'    => 'pA',
+                                's'     => 's' }
+        }
+    );
+    # STYLE ####################
+    # Style: st-arch st-cllq st-derog st-slang st-vrnc st-hi
+    # archaic colloquial derogative slang vernacular hi?
+    # zastaralý hovorový hanlivý slang nářečí knižní?
+    $atoms{style} = $self->create_simple_atom
+    (
+        'intfeature' => 'style',
+        'simple_decode_map' =>
+        {
+            'st-arch'  => 'arch',
+            'st-cllq'  => 'coll',
+            'st-derog' => 'derg',
+            'st-slang' => 'slng',
+            'st-vrnc'  => 'vrnc',
+            'st-hi'    => 'form'
+        }
+    );
+    # UPPERCASE ####################
+    # up: is the first letter of the word form uppercase?
+    # We can decode and recover this information but we will not show it in our list of known tags.
+    $atoms{up} = $self->create_atom
+    (
+        'surfeature' => 'up',
+        'decode_map' =>
+        {
+            'up' => ['other' => {'uppercase' => 'yes'}]
+        },
+        'encode_map' =>
+        {
+            'other/uppercase' => { 'yes' => 'up' }
+        }
+    );
+    # TRUNCATED COMPOUND ####################
+    # TrunCo seems to mark hyphenated prefixes occurring separately.
+    $atoms{trunco} = $self->create_simple_atom
+    (
+        'intfeature' => 'hyph',
+        'simple_decode_map' =>
+        {
+            'TrunCo' => 'hyph'
+        }
+    );
+    # UNKNOWN FEATURES ####################
+    # LAT REF TEMP
+    $atoms{unknown} = $self->create_atom
+    (
+        'surfeature' => 'unknown',
+        'decode_map' =>
+        {
+            # LAT ???
+            # Typically occurs with the first infinitive (LAT|INF1|V).
+            # It never occurs without INF1 and I found only three INF1 tags without LAT (all three were in the translative case).
+            'LAT' => ['other' => {'lat' => 'yes'}],
+            # REF ???
+            # A very rare feature of verbs. Reflexivity?
+            # PAST|PSS|REF|V: julkaistun = published, mietityn = thought about, tuomitun = convicted
+            # "tuomitun" is homonymous with the second participle in genitive (in nominative, it is "tuomittu")
+            # same with "julkaistun" (nominative participle "julkaistu") but not with "mietityn"
+            # PSS|REF|PRES|V: tultavan (tulla = become), kuvattavan (kuvata = shoot), hoidettavan (hoitaa = manage)
+            # similar to the first participle: tultava
+            'REF' => ['other' => {'ref' => 'yes'}],
+            # TEMP ???
+            # Rare feature of PAST|ACT verbs ending in -tua, -tyä, -tuaan.
+            # Maybe it expresses "after doing the action of the verb"?
+            # tultua = after the entry (tulla = become); iskettyä = struck (iskeä = strike); kirjattua = recognized (kirjata = record)
+            'TEMP' => ['other' => {'temp' => 'yes'}],
+        },
+        'encode_map' =>
+        {
+            'other/lat' => { 'yes' => 'LAT',
+                             '@'   => { 'other/ref' => { 'yes' => 'REF',
+                                                         '@'   => { 'other/temp' => { 'yes' => 'TEMP' }}}}}
+        }
+    );
+    # *null* node inserted instead of ellided token; it is always tagged as a special case of verb (the tag is "V|NULL").
+    # S mysteriously occurs with a few foreign words (child, monkey, death); tags "S|FORGN" and "S|FORGN|up".
+    # The 't-EUparl' "feature" is probably a bug in data preparation / tagging.
+    # It occurs only once, with the word 'europarlamenttivaaleissa' (= EU Parliament polls).
+    # There are several other similar.
+    # if($feature =~ m/^t-(EUparl|MSilocat|MSasiakirja|EU-vk|MSolocat|MSlukumäärä)$/)
+    # -pi ####################
+    # -pi (ompi = finer, nicer) ???
+    # Not found in the corpus.
+    # Other features occur in data although they are not documented.
+    # MERGED ATOM TO DECODE ANY FEATURE VALUE ####################
+    my @fatoms = map {$atoms{$_}} @{$self->features_all()};
+    $atoms{feature} = $self->create_merged_atom
+    (
+        'surfeature' => 'feature',
+        'atoms'      => \@fatoms
+    );
+    return \%atoms;
+}
+
+
+
+#------------------------------------------------------------------------------
+# Various DV-, DN- and DA- features mark morphemes that derive new word and
+# change the part of speech. Several DX- features can occur in one tag, e.g.
+# 1PL|DV-ILE|ELA|N|DV-U|SG or DA-UUS|3|N|DN-LLINEN|PTV|SG.
+#
+# If the tag contains one or more features describing derivational processes,
+# this method will group those features into one. This way we get something
+# that can be handled as one feature and stored in the 'other' feature of
+# Interset.
+#
+# The following derivation features occur in the data:
+#
+# Deverbatives. The resulting part of speech marked in a separate feature and
+# it can be noun, adjective or adverb.
+#
+# DV-NEISUUS 5
+# All examples of DV-NEISUUS are nouns and are tagged N.
+# eristyneisyys = isolation (eriste = insulation); kuolleisuus = mortality; oppineisuus = erudition (oppia = learn)
+#
+# DV-NTI 49
+# All examples of DV-NTI are nouns and are tagged N.
+# myynti = sale (myydä = to sell); luettelointi = listing (luetteloida = to list); ulosvienti = going out (viedä = to export)
+#
+# DV-NA 2
+# All examples of DV-NA are nouns and are tagged N.
+# kutina = itch; kahina = rustling
+#
+# DV-VAINEN 38
+# Examples of DV-VAINEN are tagged as A, ADV or N.
+# adjective: tyytyväinen = pleased; luottavainen = trusting
+# adverb: päättäväisemmin = decisively (päättäväinen = resolute)
+# The noun examples also contain DA-UUS that derives nouns from adjectives.
+# DA-UUS appears earlier in the feature sequence but it was applied later in the word formation process.
+# noun (DA-UUS|NOM|SG|DV-VAINEN|N): tulevaisuus = future (tulla = come, become; tulevainen = coming; tulevaisuus = that what is coming)
+#
+# DV-MATON 51
+# DV-JA 594
+# DV-SKELE 5
+# DV-MINEN 382
+# DV-MA 142
+# DV-UTTA 1
+# DV-NTAA 40
+# DV-NTA 98
+# DV-ELE 176
+# DV-TTA 259
+# DV-US 643
+# DV-U 505
+# DV-ILE 63
+# DV-UTU 46
+#
+# Denominatives. The resulting part of speech is marked in a separate feature
+# and usually it is A or ADV. (It can be noun if there are two derivations,
+# e.g. aktiivisuus has DN-INEN (created aktiivinen = active) and DA-UUS
+# (created aktiivisuus = activity).
+# DN-INEN 44, DN-ITTAIN 34, DN-LAINEN 168, DN-LLINEN 329, DN-MAINEN 17,
+# DN-TAR 1, DN-TON 40
+#
+# Deadjectives. The resulting part of speech is noun and they are tagged "N".
+# DA-US 101 ... sairaus = illness, rakkaus = love
+# DA-UUS 280 ... varmuus = affirmation, tyhjyys = emptiness
+#------------------------------------------------------------------------------
+sub decode_derivation
+{
+    my $self = shift;
+    my $tag = shift;
+    my @features = split(/\|/, $tag);
+    my @features1 = grep {!m/^D[VNA]-/} @features;
+    my $tag1 = join('|', @features1);
+    my @dev = grep {m/^D[VNA]-/} @features;
+    my $derivation = join('+', @dev);
+    return ($tag1, $derivation);
+}
+
+
+
+#------------------------------------------------------------------------------
+# Decodes a physical tag (string) and returns the corresponding feature
+# structure.
+#------------------------------------------------------------------------------
+sub decode
+{
+    my $self = shift;
+    my $tag = shift;
+    my $fs = Lingua::Interset::FeatureStructure->new();
+    $fs->set_tagset('fi::turku');
+    my $atoms = $self->atoms();
+    # Tag is a sequence of features separated by vertical bars.
+    # There are just the feature values, not attribute-value pairs.
+    # example: N|NOM|SG
+    # Separate the derivational features. There may be more than one.
+    my $derivation;
+    ($tag, $derivation) = $self->decode_derivation($tag);
+    my @features = split(/\|/, $tag);
+    my $is_conjunction = 0;
+    foreach my $feature (@features)
+    {
+        # Some words are tagged as conjunctions and verbs at the same time:
+        # muttei = but not (C|NEGV|SG3|COORD|V)
+        # ettei = that there is no (ettemme C|NEGV|SUB|PL1|V)
+        # eivätkä = and not (C|PL3|NEGV|kA|COORD|V)
+        # ellei = unless (C|SUB|SG3|NEGV|V)
+        # The first (left) part-of-speech feature should be preferred.
+        # Features are probably ordered as new affixes are identified and removed during analysis.
+        # The rightmost feature ("V") applies to the stem in the lexicon, while the leftmost feature ("C") identifies the resulting part of speech.
+        # We will remove the "V" from the tags returned by list() so that tests can be passed.
+        # However, we will decode the tag correctly. We will not preserve the "V" when encoding.
+        $is_conjunction = 1 if($feature eq 'C');
+        next if($feature eq 'V' && $is_conjunction);
+        $atoms->{feature}->decode_and_merge_hard($feature, $fs);
+    }
+    # Add the derivational information to the other feature.
+    if(defined($derivation) && $derivation ne '')
+    {
+        my $other = $fs->other();
+        my %hash;
+        if(ref($other) ne 'HASH')
+        {
+            $other = \%hash;
+        }
+        $other->{'derivation'} = $derivation;
+        $fs->set('other', $other);
+    }
+    return $fs;
+}
+
+
+
+#------------------------------------------------------------------------------
+# Takes feature structure and returns the corresponding physical tag (string).
+#------------------------------------------------------------------------------
+sub encode
+{
+    my $self = shift;
+    my $fs = shift; # Lingua::Interset::FeatureStructure
+    my @feature_names = @{$self->features_all()};
+    my $atoms = $self->atoms();
+    my @features = ();
+    # Verbs use the SG1 ... PL3 features and they do not use the SG / PL features.
+    my $number_with_person = $fs->person() ne '';
+    foreach my $feature (@feature_names)
+    {
+        next if($number_with_person && $feature eq 'number');
+        my $value = $atoms->{$feature}->encode($fs);
+        push(@features, $value) unless($value eq '');
+    }
+    # If there is information on derivational morphology, add it to the features.
+    my $derivation = $fs->get_other_subfeature('fi::turku', 'derivation');
+    my @derivation = split(/\+/, $derivation);
+    if(@derivation)
+    {
+        push(@features, @derivation);
+    }
+    my $tag = join('|', @features);
+    return $tag;
+}
+
+
+
+#------------------------------------------------------------------------------
+# Returns reference to list of known tags.
+# Tags were collected from the corpus.
+# 1939 tags have been observed in the corpus.
+# We removed some problematic or erroneous tags.
+# Removed features:
+# up ... the word starts with an uppercase letter
+# 1550 tags survived.
+# Then we added missing combinations of number+case for nominals and
+# person+number for verbs.
+# 6811 total tags after the extension.
+#------------------------------------------------------------------------------
+sub list
+{
+    my $self = shift;
+    my $list = <<end_of_list
+A
+ABBR
+ABBR|ABL|SG
+ABBR|ADE|SG
+ABBR|ALL|SG
+ABBR|ELA|SG
+ABBR|ESS|SG
+ABBR|GEN|SG
+ABBR|INE|SG
+ABBR|NOM|SG
+ABBR|NOM|SG|3
+ABBR|NOM|SG|TrunCo
+ABBR|PTV|SG
+ABBR|digit
+ABBR|digit|ABL|SG
+ABBR|digit|ELA|SG
+ABBR|digit|GEN|SG
+ABBR|digit|ILL|SG
+ABBR|digit|INE|SG
+ABBR|digit|NOM|SG
+ABBR|digit|NOM|SG|TrunCo
+ABBR|digit|PTV|SG
+ABBR|roman|ABL|SG
+ABBR|roman|ALL|SG
+ABBR|roman|GEN|SG
+ABBR|roman|INE|SG
+ABBR|roman|NOM|SG
+ABBR|roman|PTV|SG
+AD-A
+AD-A|kin
+ADV
+ADV|3
+ADV|ABBR
+ADV|ABL
+ADV|ADE
+ADV|ADE|3
+ADV|ADE|kAAn
+ADV|ADE|kin
+ADV|ALL
+ADV|ALL|3
+ADV|ALL|kin
+ADV|ALL|st-cllq
+ADV|CMP|ADE
+ADV|CMP|ESS
+ADV|CMP|ESS|kin
+ADV|CMP|PTV
+ADV|DN-ITTAIN
+ADV|DN-ITTAIN|DV-JA
+ADV|ELA
+ADV|ILL
+ADV|ILL|3
+ADV|ILL|kin
+ADV|INE
+ADV|INE|3
+ADV|INTERR
+ADV|MAN
+ADV|MAN|CMP
+ADV|MAN|CMP|DV-VAINEN
+ADV|MAN|POS
+ADV|MAN|POS|ACT|PCP1
+ADV|MAN|POS|ACT|PCP2
+ADV|MAN|POS|ACT|PCP2|DV-U
+ADV|MAN|POS|DN-INEN
+ADV|MAN|POS|DN-LLINEN
+ADV|MAN|POS|DN-MAINEN
+ADV|MAN|POS|DN-TON
+ADV|MAN|POS|DV-MATON
+ADV|MAN|POS|DV-US|DN-LLINEN
+ADV|MAN|POS|PSS|PCP1
+ADV|MAN|POS|PSS|PCP2
+ADV|MAN|POS|st-cllq
+ADV|MAN|SUP
+ADV|REL
+ADV|hAn
+ADV|kAAn
+ADV|kin
+ADV|pA
+ART|FORGN
+A|CMP|ABE|PL
+A|CMP|ABE|PL|3
+A|CMP|ABE|PL|ACT|PCP1
+A|CMP|ABE|PL|ACT|PCP2
+A|CMP|ABE|PL|DN-LLINEN
+A|CMP|ABE|PL|PSS|PCP1
+A|CMP|ABE|PL|kin
+A|CMP|ABE|SG
+A|CMP|ABE|SG|3
+A|CMP|ABE|SG|ACT|PCP1
+A|CMP|ABE|SG|ACT|PCP2
+A|CMP|ABE|SG|DN-LLINEN
+A|CMP|ABE|SG|PSS|PCP1
+A|CMP|ABE|SG|kin
+A|CMP|ABL|PL
+A|CMP|ABL|PL|3
+A|CMP|ABL|PL|ACT|PCP1
+A|CMP|ABL|PL|ACT|PCP2
+A|CMP|ABL|PL|DN-LLINEN
+A|CMP|ABL|PL|PSS|PCP1
+A|CMP|ABL|PL|kin
+A|CMP|ABL|SG
+A|CMP|ABL|SG|3
+A|CMP|ABL|SG|ACT|PCP1
+A|CMP|ABL|SG|ACT|PCP2
+A|CMP|ABL|SG|DN-LLINEN
+A|CMP|ABL|SG|PSS|PCP1
+A|CMP|ABL|SG|kin
+A|CMP|ADE|PL
+A|CMP|ADE|PL|3
+A|CMP|ADE|PL|ACT|PCP1
+A|CMP|ADE|PL|ACT|PCP2
+A|CMP|ADE|PL|DN-LLINEN
+A|CMP|ADE|PL|PSS|PCP1
+A|CMP|ADE|PL|kin
+A|CMP|ADE|SG
+A|CMP|ADE|SG|3
+A|CMP|ADE|SG|ACT|PCP1
+A|CMP|ADE|SG|ACT|PCP2
+A|CMP|ADE|SG|DN-LLINEN
+A|CMP|ADE|SG|PSS|PCP1
+A|CMP|ADE|SG|kin
+A|CMP|ALL|PL
+A|CMP|ALL|PL|3
+A|CMP|ALL|PL|ACT|PCP1
+A|CMP|ALL|PL|ACT|PCP2
+A|CMP|ALL|PL|DN-LLINEN
+A|CMP|ALL|PL|PSS|PCP1
+A|CMP|ALL|PL|kin
+A|CMP|ALL|SG
+A|CMP|ALL|SG|3
+A|CMP|ALL|SG|ACT|PCP1
+A|CMP|ALL|SG|ACT|PCP2
+A|CMP|ALL|SG|DN-LLINEN
+A|CMP|ALL|SG|PSS|PCP1
+A|CMP|ALL|SG|kin
+A|CMP|CMT|PL
+A|CMP|CMT|PL|3
+A|CMP|CMT|PL|ACT|PCP1
+A|CMP|CMT|PL|ACT|PCP2
+A|CMP|CMT|PL|DN-LLINEN
+A|CMP|CMT|PL|PSS|PCP1
+A|CMP|CMT|PL|kin
+A|CMP|CMT|SG
+A|CMP|CMT|SG|3
+A|CMP|CMT|SG|ACT|PCP1
+A|CMP|CMT|SG|ACT|PCP2
+A|CMP|CMT|SG|DN-LLINEN
+A|CMP|CMT|SG|PSS|PCP1
+A|CMP|CMT|SG|kin
+A|CMP|ELA|PL
+A|CMP|ELA|PL|3
+A|CMP|ELA|PL|ACT|PCP1
+A|CMP|ELA|PL|ACT|PCP2
+A|CMP|ELA|PL|DN-LLINEN
+A|CMP|ELA|PL|PSS|PCP1
+A|CMP|ELA|PL|kin
+A|CMP|ELA|SG
+A|CMP|ELA|SG|3
+A|CMP|ELA|SG|ACT|PCP1
+A|CMP|ELA|SG|ACT|PCP2
+A|CMP|ELA|SG|DN-LLINEN
+A|CMP|ELA|SG|PSS|PCP1
+A|CMP|ELA|SG|kin
+A|CMP|ESS|PL
+A|CMP|ESS|PL|3
+A|CMP|ESS|PL|ACT|PCP1
+A|CMP|ESS|PL|ACT|PCP2
+A|CMP|ESS|PL|DN-LLINEN
+A|CMP|ESS|PL|PSS|PCP1
+A|CMP|ESS|PL|kin
+A|CMP|ESS|SG
+A|CMP|ESS|SG|3
+A|CMP|ESS|SG|ACT|PCP1
+A|CMP|ESS|SG|ACT|PCP2
+A|CMP|ESS|SG|DN-LLINEN
+A|CMP|ESS|SG|PSS|PCP1
+A|CMP|ESS|SG|kin
+A|CMP|GEN|PL
+A|CMP|GEN|PL|3
+A|CMP|GEN|PL|ACT|PCP1
+A|CMP|GEN|PL|ACT|PCP2
+A|CMP|GEN|PL|DN-LLINEN
+A|CMP|GEN|PL|PSS|PCP1
+A|CMP|GEN|PL|kin
+A|CMP|GEN|SG
+A|CMP|GEN|SG|3
+A|CMP|GEN|SG|ACT|PCP1
+A|CMP|GEN|SG|ACT|PCP2
+A|CMP|GEN|SG|DN-LLINEN
+A|CMP|GEN|SG|PSS|PCP1
+A|CMP|GEN|SG|kin
+A|CMP|ILL|PL
+A|CMP|ILL|PL|3
+A|CMP|ILL|PL|ACT|PCP1
+A|CMP|ILL|PL|ACT|PCP2
+A|CMP|ILL|PL|DN-LLINEN
+A|CMP|ILL|PL|PSS|PCP1
+A|CMP|ILL|PL|kin
+A|CMP|ILL|SG
+A|CMP|ILL|SG|3
+A|CMP|ILL|SG|ACT|PCP1
+A|CMP|ILL|SG|ACT|PCP2
+A|CMP|ILL|SG|DN-LLINEN
+A|CMP|ILL|SG|PSS|PCP1
+A|CMP|ILL|SG|kin
+A|CMP|INE|PL
+A|CMP|INE|PL|3
+A|CMP|INE|PL|ACT|PCP1
+A|CMP|INE|PL|ACT|PCP2
+A|CMP|INE|PL|DN-LLINEN
+A|CMP|INE|PL|PSS|PCP1
+A|CMP|INE|PL|kin
+A|CMP|INE|SG
+A|CMP|INE|SG|3
+A|CMP|INE|SG|ACT|PCP1
+A|CMP|INE|SG|ACT|PCP2
+A|CMP|INE|SG|DN-LLINEN
+A|CMP|INE|SG|PSS|PCP1
+A|CMP|INE|SG|kin
+A|CMP|INS|PL
+A|CMP|INS|PL|3
+A|CMP|INS|PL|ACT|PCP1
+A|CMP|INS|PL|ACT|PCP2
+A|CMP|INS|PL|DN-LLINEN
+A|CMP|INS|PL|PSS|PCP1
+A|CMP|INS|PL|kin
+A|CMP|INS|SG
+A|CMP|INS|SG|3
+A|CMP|INS|SG|ACT|PCP1
+A|CMP|INS|SG|ACT|PCP2
+A|CMP|INS|SG|DN-LLINEN
+A|CMP|INS|SG|PSS|PCP1
+A|CMP|INS|SG|kin
+A|CMP|NOM|PL
+A|CMP|NOM|PL|3
+A|CMP|NOM|PL|ACT|PCP1
+A|CMP|NOM|PL|ACT|PCP2
+A|CMP|NOM|PL|DN-LLINEN
+A|CMP|NOM|PL|PSS|PCP1
+A|CMP|NOM|PL|kin
+A|CMP|NOM|SG
+A|CMP|NOM|SG|3
+A|CMP|NOM|SG|ACT|PCP1
+A|CMP|NOM|SG|ACT|PCP2
+A|CMP|NOM|SG|DN-LLINEN
+A|CMP|NOM|SG|PSS|PCP1
+A|CMP|NOM|SG|kin
+A|CMP|PTV|PL
+A|CMP|PTV|PL|3
+A|CMP|PTV|PL|ACT|PCP1
+A|CMP|PTV|PL|ACT|PCP2
+A|CMP|PTV|PL|DN-LLINEN
+A|CMP|PTV|PL|PSS|PCP1
+A|CMP|PTV|PL|kin
+A|CMP|PTV|SG
+A|CMP|PTV|SG|3
+A|CMP|PTV|SG|ACT|PCP1
+A|CMP|PTV|SG|ACT|PCP2
+A|CMP|PTV|SG|DN-LLINEN
+A|CMP|PTV|SG|PSS|PCP1
+A|CMP|PTV|SG|kin
+A|CMP|TRA|PL
+A|CMP|TRA|PL|3
+A|CMP|TRA|PL|ACT|PCP1
+A|CMP|TRA|PL|ACT|PCP2
+A|CMP|TRA|PL|DN-LLINEN
+A|CMP|TRA|PL|PSS|PCP1
+A|CMP|TRA|PL|kin
+A|CMP|TRA|SG
+A|CMP|TRA|SG|3
+A|CMP|TRA|SG|ACT|PCP1
+A|CMP|TRA|SG|ACT|PCP2
+A|CMP|TRA|SG|DN-LLINEN
+A|CMP|TRA|SG|PSS|PCP1
+A|CMP|TRA|SG|kin
+A|COP|POS|ABE|PL|ACT|PCP2
+A|COP|POS|ABE|SG|ACT|PCP2
+A|COP|POS|ABL|PL|ACT|PCP2
+A|COP|POS|ABL|SG|ACT|PCP2
+A|COP|POS|ADE|PL|ACT|PCP2
+A|COP|POS|ADE|SG|ACT|PCP2
+A|COP|POS|ALL|PL|ACT|PCP2
+A|COP|POS|ALL|SG|ACT|PCP2
+A|COP|POS|CMT|PL|ACT|PCP2
+A|COP|POS|CMT|SG|ACT|PCP2
+A|COP|POS|ELA|PL|ACT|PCP2
+A|COP|POS|ELA|SG|ACT|PCP2
+A|COP|POS|ESS|PL|ACT|PCP2
+A|COP|POS|ESS|SG|ACT|PCP2
+A|COP|POS|GEN|PL|ACT|PCP2
+A|COP|POS|GEN|SG|ACT|PCP2
+A|COP|POS|ILL|PL|ACT|PCP2
+A|COP|POS|ILL|SG|ACT|PCP2
+A|COP|POS|INE|PL|ACT|PCP2
+A|COP|POS|INE|SG|ACT|PCP2
+A|COP|POS|INS|PL|ACT|PCP2
+A|COP|POS|INS|SG|ACT|PCP2
+A|COP|POS|NOM|PL|ACT|PCP2
+A|COP|POS|NOM|SG|ACT|PCP2
+A|COP|POS|PTV|PL|ACT|PCP2
+A|COP|POS|PTV|SG|ACT|PCP2
+A|COP|POS|TRA|PL|ACT|PCP2
+A|COP|POS|TRA|SG|ACT|PCP2
+A|FORGN
+A|INTERR|POS|ABE|PL
+A|INTERR|POS|ABE|SG
+A|INTERR|POS|ABL|PL
+A|INTERR|POS|ABL|SG
+A|INTERR|POS|ADE|PL
+A|INTERR|POS|ADE|SG
+A|INTERR|POS|ALL|PL
+A|INTERR|POS|ALL|SG
+A|INTERR|POS|CMT|PL
+A|INTERR|POS|CMT|SG
+A|INTERR|POS|ELA|PL
+A|INTERR|POS|ELA|SG
+A|INTERR|POS|ESS|PL
+A|INTERR|POS|ESS|SG
+A|INTERR|POS|GEN|PL
+A|INTERR|POS|GEN|SG
+A|INTERR|POS|ILL|PL
+A|INTERR|POS|ILL|SG
+A|INTERR|POS|INE|PL
+A|INTERR|POS|INE|SG
+A|INTERR|POS|INS|PL
+A|INTERR|POS|INS|SG
+A|INTERR|POS|NOM|PL
+A|INTERR|POS|NOM|SG
+A|INTERR|POS|PTV|PL
+A|INTERR|POS|PTV|SG
+A|INTERR|POS|TRA|PL
+A|INTERR|POS|TRA|SG
+A|POS|ABE|PL
+A|POS|ABE|PL|1PL
+A|POS|ABE|PL|1SG
+A|POS|ABE|PL|2SG
+A|POS|ABE|PL|3
+A|POS|ABE|PL|DN-INEN
+A|POS|ABE|PL|DN-LLINEN
+A|POS|ABE|PL|DN-MAINEN
+A|POS|ABE|PL|DN-TON
+A|POS|ABE|PL|DV-MATON
+A|POS|ABE|PL|DV-MATON|DV-U
+A|POS|ABE|PL|DV-NTAA
+A|POS|ABE|PL|DV-NTA|DN-LLINEN
+A|POS|ABE|PL|DV-TTA
+A|POS|ABE|PL|DV-U
+A|POS|ABE|PL|DV-US|DN-LLINEN
+A|POS|ABE|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|ABE|PL|DV-UTU
+A|POS|ABE|PL|DV-VAINEN
+A|POS|ABE|PL|TrunCo
+A|POS|ABE|PL|kAAn
+A|POS|ABE|PL|kO
+A|POS|ABE|PL|kin
+A|POS|ABE|PL|kin|DN-LLINEN
+A|POS|ABE|PL|st-cllq
+A|POS|ABE|SG
+A|POS|ABE|SG|1PL
+A|POS|ABE|SG|1SG
+A|POS|ABE|SG|2SG
+A|POS|ABE|SG|3
+A|POS|ABE|SG|DN-INEN
+A|POS|ABE|SG|DN-LLINEN
+A|POS|ABE|SG|DN-MAINEN
+A|POS|ABE|SG|DN-TON
+A|POS|ABE|SG|DV-MATON
+A|POS|ABE|SG|DV-MATON|DV-U
+A|POS|ABE|SG|DV-NTAA
+A|POS|ABE|SG|DV-NTA|DN-LLINEN
+A|POS|ABE|SG|DV-TTA
+A|POS|ABE|SG|DV-U
+A|POS|ABE|SG|DV-US|DN-LLINEN
+A|POS|ABE|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|ABE|SG|DV-UTU
+A|POS|ABE|SG|DV-VAINEN
+A|POS|ABE|SG|TrunCo
+A|POS|ABE|SG|kAAn
+A|POS|ABE|SG|kO
+A|POS|ABE|SG|kin
+A|POS|ABE|SG|kin|DN-LLINEN
+A|POS|ABE|SG|st-cllq
+A|POS|ABL|PL
+A|POS|ABL|PL|1PL
+A|POS|ABL|PL|1SG
+A|POS|ABL|PL|2SG
+A|POS|ABL|PL|3
+A|POS|ABL|PL|DN-INEN
+A|POS|ABL|PL|DN-LLINEN
+A|POS|ABL|PL|DN-MAINEN
+A|POS|ABL|PL|DN-TON
+A|POS|ABL|PL|DV-MATON
+A|POS|ABL|PL|DV-MATON|DV-U
+A|POS|ABL|PL|DV-NTAA
+A|POS|ABL|PL|DV-NTA|DN-LLINEN
+A|POS|ABL|PL|DV-TTA
+A|POS|ABL|PL|DV-U
+A|POS|ABL|PL|DV-US|DN-LLINEN
+A|POS|ABL|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|ABL|PL|DV-UTU
+A|POS|ABL|PL|DV-VAINEN
+A|POS|ABL|PL|TrunCo
+A|POS|ABL|PL|kAAn
+A|POS|ABL|PL|kO
+A|POS|ABL|PL|kin
+A|POS|ABL|PL|kin|DN-LLINEN
+A|POS|ABL|PL|st-cllq
+A|POS|ABL|SG
+A|POS|ABL|SG|1PL
+A|POS|ABL|SG|1SG
+A|POS|ABL|SG|2SG
+A|POS|ABL|SG|3
+A|POS|ABL|SG|DN-INEN
+A|POS|ABL|SG|DN-LLINEN
+A|POS|ABL|SG|DN-MAINEN
+A|POS|ABL|SG|DN-TON
+A|POS|ABL|SG|DV-MATON
+A|POS|ABL|SG|DV-MATON|DV-U
+A|POS|ABL|SG|DV-NTAA
+A|POS|ABL|SG|DV-NTA|DN-LLINEN
+A|POS|ABL|SG|DV-TTA
+A|POS|ABL|SG|DV-U
+A|POS|ABL|SG|DV-US|DN-LLINEN
+A|POS|ABL|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|ABL|SG|DV-UTU
+A|POS|ABL|SG|DV-VAINEN
+A|POS|ABL|SG|TrunCo
+A|POS|ABL|SG|kAAn
+A|POS|ABL|SG|kO
+A|POS|ABL|SG|kin
+A|POS|ABL|SG|kin|DN-LLINEN
+A|POS|ABL|SG|st-cllq
+A|POS|ADE|PL
+A|POS|ADE|PL|1PL
+A|POS|ADE|PL|1SG
+A|POS|ADE|PL|2SG
+A|POS|ADE|PL|3
+A|POS|ADE|PL|DN-INEN
+A|POS|ADE|PL|DN-LLINEN
+A|POS|ADE|PL|DN-MAINEN
+A|POS|ADE|PL|DN-TON
+A|POS|ADE|PL|DV-MATON
+A|POS|ADE|PL|DV-MATON|DV-U
+A|POS|ADE|PL|DV-NTAA
+A|POS|ADE|PL|DV-NTA|DN-LLINEN
+A|POS|ADE|PL|DV-TTA
+A|POS|ADE|PL|DV-U
+A|POS|ADE|PL|DV-US|DN-LLINEN
+A|POS|ADE|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|ADE|PL|DV-UTU
+A|POS|ADE|PL|DV-VAINEN
+A|POS|ADE|PL|TrunCo
+A|POS|ADE|PL|kAAn
+A|POS|ADE|PL|kO
+A|POS|ADE|PL|kin
+A|POS|ADE|PL|kin|DN-LLINEN
+A|POS|ADE|PL|st-cllq
+A|POS|ADE|SG
+A|POS|ADE|SG|1PL
+A|POS|ADE|SG|1SG
+A|POS|ADE|SG|2SG
+A|POS|ADE|SG|3
+A|POS|ADE|SG|DN-INEN
+A|POS|ADE|SG|DN-LLINEN
+A|POS|ADE|SG|DN-MAINEN
+A|POS|ADE|SG|DN-TON
+A|POS|ADE|SG|DV-MATON
+A|POS|ADE|SG|DV-MATON|DV-U
+A|POS|ADE|SG|DV-NTAA
+A|POS|ADE|SG|DV-NTA|DN-LLINEN
+A|POS|ADE|SG|DV-TTA
+A|POS|ADE|SG|DV-U
+A|POS|ADE|SG|DV-US|DN-LLINEN
+A|POS|ADE|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|ADE|SG|DV-UTU
+A|POS|ADE|SG|DV-VAINEN
+A|POS|ADE|SG|TrunCo
+A|POS|ADE|SG|kAAn
+A|POS|ADE|SG|kO
+A|POS|ADE|SG|kin
+A|POS|ADE|SG|kin|DN-LLINEN
+A|POS|ADE|SG|st-cllq
+A|POS|ALL|PL
+A|POS|ALL|PL|1PL
+A|POS|ALL|PL|1SG
+A|POS|ALL|PL|2SG
+A|POS|ALL|PL|3
+A|POS|ALL|PL|DN-INEN
+A|POS|ALL|PL|DN-LLINEN
+A|POS|ALL|PL|DN-MAINEN
+A|POS|ALL|PL|DN-TON
+A|POS|ALL|PL|DV-MATON
+A|POS|ALL|PL|DV-MATON|DV-U
+A|POS|ALL|PL|DV-NTAA
+A|POS|ALL|PL|DV-NTA|DN-LLINEN
+A|POS|ALL|PL|DV-TTA
+A|POS|ALL|PL|DV-U
+A|POS|ALL|PL|DV-US|DN-LLINEN
+A|POS|ALL|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|ALL|PL|DV-UTU
+A|POS|ALL|PL|DV-VAINEN
+A|POS|ALL|PL|TrunCo
+A|POS|ALL|PL|kAAn
+A|POS|ALL|PL|kO
+A|POS|ALL|PL|kin
+A|POS|ALL|PL|kin|DN-LLINEN
+A|POS|ALL|PL|st-cllq
+A|POS|ALL|SG
+A|POS|ALL|SG|1PL
+A|POS|ALL|SG|1SG
+A|POS|ALL|SG|2SG
+A|POS|ALL|SG|3
+A|POS|ALL|SG|DN-INEN
+A|POS|ALL|SG|DN-LLINEN
+A|POS|ALL|SG|DN-MAINEN
+A|POS|ALL|SG|DN-TON
+A|POS|ALL|SG|DV-MATON
+A|POS|ALL|SG|DV-MATON|DV-U
+A|POS|ALL|SG|DV-NTAA
+A|POS|ALL|SG|DV-NTA|DN-LLINEN
+A|POS|ALL|SG|DV-TTA
+A|POS|ALL|SG|DV-U
+A|POS|ALL|SG|DV-US|DN-LLINEN
+A|POS|ALL|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|ALL|SG|DV-UTU
+A|POS|ALL|SG|DV-VAINEN
+A|POS|ALL|SG|TrunCo
+A|POS|ALL|SG|kAAn
+A|POS|ALL|SG|kO
+A|POS|ALL|SG|kin
+A|POS|ALL|SG|kin|DN-LLINEN
+A|POS|ALL|SG|st-cllq
+A|POS|CMT
+A|POS|CMT|PL
+A|POS|CMT|PL|1PL
+A|POS|CMT|PL|1SG
+A|POS|CMT|PL|2SG
+A|POS|CMT|PL|3
+A|POS|CMT|PL|DN-INEN
+A|POS|CMT|PL|DN-LLINEN
+A|POS|CMT|PL|DN-MAINEN
+A|POS|CMT|PL|DN-TON
+A|POS|CMT|PL|DV-MATON
+A|POS|CMT|PL|DV-MATON|DV-U
+A|POS|CMT|PL|DV-NTAA
+A|POS|CMT|PL|DV-NTA|DN-LLINEN
+A|POS|CMT|PL|DV-TTA
+A|POS|CMT|PL|DV-U
+A|POS|CMT|PL|DV-US|DN-LLINEN
+A|POS|CMT|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|CMT|PL|DV-UTU
+A|POS|CMT|PL|DV-VAINEN
+A|POS|CMT|PL|TrunCo
+A|POS|CMT|PL|kAAn
+A|POS|CMT|PL|kO
+A|POS|CMT|PL|kin
+A|POS|CMT|PL|kin|DN-LLINEN
+A|POS|CMT|PL|st-cllq
+A|POS|CMT|SG
+A|POS|CMT|SG|1PL
+A|POS|CMT|SG|1SG
+A|POS|CMT|SG|2SG
+A|POS|CMT|SG|3
+A|POS|CMT|SG|DN-INEN
+A|POS|CMT|SG|DN-LLINEN
+A|POS|CMT|SG|DN-MAINEN
+A|POS|CMT|SG|DN-TON
+A|POS|CMT|SG|DV-MATON
+A|POS|CMT|SG|DV-MATON|DV-U
+A|POS|CMT|SG|DV-NTAA
+A|POS|CMT|SG|DV-NTA|DN-LLINEN
+A|POS|CMT|SG|DV-TTA
+A|POS|CMT|SG|DV-U
+A|POS|CMT|SG|DV-US|DN-LLINEN
+A|POS|CMT|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|CMT|SG|DV-UTU
+A|POS|CMT|SG|DV-VAINEN
+A|POS|CMT|SG|TrunCo
+A|POS|CMT|SG|kAAn
+A|POS|CMT|SG|kO
+A|POS|CMT|SG|kin
+A|POS|CMT|SG|kin|DN-LLINEN
+A|POS|CMT|SG|st-cllq
+A|POS|ELA|PL
+A|POS|ELA|PL|1PL
+A|POS|ELA|PL|1SG
+A|POS|ELA|PL|2SG
+A|POS|ELA|PL|3
+A|POS|ELA|PL|DN-INEN
+A|POS|ELA|PL|DN-LLINEN
+A|POS|ELA|PL|DN-MAINEN
+A|POS|ELA|PL|DN-TON
+A|POS|ELA|PL|DV-MATON
+A|POS|ELA|PL|DV-MATON|DV-U
+A|POS|ELA|PL|DV-NTAA
+A|POS|ELA|PL|DV-NTA|DN-LLINEN
+A|POS|ELA|PL|DV-TTA
+A|POS|ELA|PL|DV-U
+A|POS|ELA|PL|DV-US|DN-LLINEN
+A|POS|ELA|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|ELA|PL|DV-UTU
+A|POS|ELA|PL|DV-VAINEN
+A|POS|ELA|PL|TrunCo
+A|POS|ELA|PL|kAAn
+A|POS|ELA|PL|kO
+A|POS|ELA|PL|kin
+A|POS|ELA|PL|kin|DN-LLINEN
+A|POS|ELA|PL|st-cllq
+A|POS|ELA|SG
+A|POS|ELA|SG|1PL
+A|POS|ELA|SG|1SG
+A|POS|ELA|SG|2SG
+A|POS|ELA|SG|3
+A|POS|ELA|SG|DN-INEN
+A|POS|ELA|SG|DN-LLINEN
+A|POS|ELA|SG|DN-MAINEN
+A|POS|ELA|SG|DN-TON
+A|POS|ELA|SG|DV-MATON
+A|POS|ELA|SG|DV-MATON|DV-U
+A|POS|ELA|SG|DV-NTAA
+A|POS|ELA|SG|DV-NTA|DN-LLINEN
+A|POS|ELA|SG|DV-TTA
+A|POS|ELA|SG|DV-U
+A|POS|ELA|SG|DV-US|DN-LLINEN
+A|POS|ELA|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|ELA|SG|DV-UTU
+A|POS|ELA|SG|DV-VAINEN
+A|POS|ELA|SG|TrunCo
+A|POS|ELA|SG|kAAn
+A|POS|ELA|SG|kO
+A|POS|ELA|SG|kin
+A|POS|ELA|SG|kin|DN-LLINEN
+A|POS|ELA|SG|st-cllq
+A|POS|ESS|PL
+A|POS|ESS|PL|1PL
+A|POS|ESS|PL|1SG
+A|POS|ESS|PL|2SG
+A|POS|ESS|PL|3
+A|POS|ESS|PL|DN-INEN
+A|POS|ESS|PL|DN-LLINEN
+A|POS|ESS|PL|DN-MAINEN
+A|POS|ESS|PL|DN-TON
+A|POS|ESS|PL|DV-MATON
+A|POS|ESS|PL|DV-MATON|DV-U
+A|POS|ESS|PL|DV-NTAA
+A|POS|ESS|PL|DV-NTA|DN-LLINEN
+A|POS|ESS|PL|DV-TTA
+A|POS|ESS|PL|DV-U
+A|POS|ESS|PL|DV-US|DN-LLINEN
+A|POS|ESS|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|ESS|PL|DV-UTU
+A|POS|ESS|PL|DV-VAINEN
+A|POS|ESS|PL|TrunCo
+A|POS|ESS|PL|kAAn
+A|POS|ESS|PL|kO
+A|POS|ESS|PL|kin
+A|POS|ESS|PL|kin|DN-LLINEN
+A|POS|ESS|PL|st-cllq
+A|POS|ESS|SG
+A|POS|ESS|SG|1PL
+A|POS|ESS|SG|1SG
+A|POS|ESS|SG|2SG
+A|POS|ESS|SG|3
+A|POS|ESS|SG|DN-INEN
+A|POS|ESS|SG|DN-LLINEN
+A|POS|ESS|SG|DN-MAINEN
+A|POS|ESS|SG|DN-TON
+A|POS|ESS|SG|DV-MATON
+A|POS|ESS|SG|DV-MATON|DV-U
+A|POS|ESS|SG|DV-NTAA
+A|POS|ESS|SG|DV-NTA|DN-LLINEN
+A|POS|ESS|SG|DV-TTA
+A|POS|ESS|SG|DV-U
+A|POS|ESS|SG|DV-US|DN-LLINEN
+A|POS|ESS|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|ESS|SG|DV-UTU
+A|POS|ESS|SG|DV-VAINEN
+A|POS|ESS|SG|TrunCo
+A|POS|ESS|SG|kAAn
+A|POS|ESS|SG|kO
+A|POS|ESS|SG|kin
+A|POS|ESS|SG|kin|DN-LLINEN
+A|POS|ESS|SG|st-cllq
+A|POS|GEN|PL
+A|POS|GEN|PL|1PL
+A|POS|GEN|PL|1SG
+A|POS|GEN|PL|2SG
+A|POS|GEN|PL|3
+A|POS|GEN|PL|DN-INEN
+A|POS|GEN|PL|DN-LLINEN
+A|POS|GEN|PL|DN-MAINEN
+A|POS|GEN|PL|DN-TON
+A|POS|GEN|PL|DV-MATON
+A|POS|GEN|PL|DV-MATON|DV-U
+A|POS|GEN|PL|DV-NTAA
+A|POS|GEN|PL|DV-NTA|DN-LLINEN
+A|POS|GEN|PL|DV-TTA
+A|POS|GEN|PL|DV-U
+A|POS|GEN|PL|DV-US|DN-LLINEN
+A|POS|GEN|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|GEN|PL|DV-UTU
+A|POS|GEN|PL|DV-VAINEN
+A|POS|GEN|PL|TrunCo
+A|POS|GEN|PL|kAAn
+A|POS|GEN|PL|kO
+A|POS|GEN|PL|kin
+A|POS|GEN|PL|kin|DN-LLINEN
+A|POS|GEN|PL|st-cllq
+A|POS|GEN|SG
+A|POS|GEN|SG|1PL
+A|POS|GEN|SG|1SG
+A|POS|GEN|SG|2SG
+A|POS|GEN|SG|3
+A|POS|GEN|SG|DN-INEN
+A|POS|GEN|SG|DN-LLINEN
+A|POS|GEN|SG|DN-MAINEN
+A|POS|GEN|SG|DN-TON
+A|POS|GEN|SG|DV-MATON
+A|POS|GEN|SG|DV-MATON|DV-U
+A|POS|GEN|SG|DV-NTAA
+A|POS|GEN|SG|DV-NTA|DN-LLINEN
+A|POS|GEN|SG|DV-TTA
+A|POS|GEN|SG|DV-U
+A|POS|GEN|SG|DV-US|DN-LLINEN
+A|POS|GEN|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|GEN|SG|DV-UTU
+A|POS|GEN|SG|DV-VAINEN
+A|POS|GEN|SG|TrunCo
+A|POS|GEN|SG|kAAn
+A|POS|GEN|SG|kO
+A|POS|GEN|SG|kin
+A|POS|GEN|SG|kin|DN-LLINEN
+A|POS|GEN|SG|st-cllq
+A|POS|ILL|PL
+A|POS|ILL|PL|1PL
+A|POS|ILL|PL|1SG
+A|POS|ILL|PL|2SG
+A|POS|ILL|PL|3
+A|POS|ILL|PL|DN-INEN
+A|POS|ILL|PL|DN-LLINEN
+A|POS|ILL|PL|DN-MAINEN
+A|POS|ILL|PL|DN-TON
+A|POS|ILL|PL|DV-MATON
+A|POS|ILL|PL|DV-MATON|DV-U
+A|POS|ILL|PL|DV-NTAA
+A|POS|ILL|PL|DV-NTA|DN-LLINEN
+A|POS|ILL|PL|DV-TTA
+A|POS|ILL|PL|DV-U
+A|POS|ILL|PL|DV-US|DN-LLINEN
+A|POS|ILL|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|ILL|PL|DV-UTU
+A|POS|ILL|PL|DV-VAINEN
+A|POS|ILL|PL|TrunCo
+A|POS|ILL|PL|kAAn
+A|POS|ILL|PL|kO
+A|POS|ILL|PL|kin
+A|POS|ILL|PL|kin|DN-LLINEN
+A|POS|ILL|PL|st-cllq
+A|POS|ILL|SG
+A|POS|ILL|SG|1PL
+A|POS|ILL|SG|1SG
+A|POS|ILL|SG|2SG
+A|POS|ILL|SG|3
+A|POS|ILL|SG|DN-INEN
+A|POS|ILL|SG|DN-LLINEN
+A|POS|ILL|SG|DN-MAINEN
+A|POS|ILL|SG|DN-TON
+A|POS|ILL|SG|DV-MATON
+A|POS|ILL|SG|DV-MATON|DV-U
+A|POS|ILL|SG|DV-NTAA
+A|POS|ILL|SG|DV-NTA|DN-LLINEN
+A|POS|ILL|SG|DV-TTA
+A|POS|ILL|SG|DV-U
+A|POS|ILL|SG|DV-US|DN-LLINEN
+A|POS|ILL|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|ILL|SG|DV-UTU
+A|POS|ILL|SG|DV-VAINEN
+A|POS|ILL|SG|TrunCo
+A|POS|ILL|SG|kAAn
+A|POS|ILL|SG|kO
+A|POS|ILL|SG|kin
+A|POS|ILL|SG|kin|DN-LLINEN
+A|POS|ILL|SG|st-cllq
+A|POS|INE|PL
+A|POS|INE|PL|1PL
+A|POS|INE|PL|1SG
+A|POS|INE|PL|2SG
+A|POS|INE|PL|3
+A|POS|INE|PL|DN-INEN
+A|POS|INE|PL|DN-LLINEN
+A|POS|INE|PL|DN-MAINEN
+A|POS|INE|PL|DN-TON
+A|POS|INE|PL|DV-MATON
+A|POS|INE|PL|DV-MATON|DV-U
+A|POS|INE|PL|DV-NTAA
+A|POS|INE|PL|DV-NTA|DN-LLINEN
+A|POS|INE|PL|DV-TTA
+A|POS|INE|PL|DV-U
+A|POS|INE|PL|DV-US|DN-LLINEN
+A|POS|INE|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|INE|PL|DV-UTU
+A|POS|INE|PL|DV-VAINEN
+A|POS|INE|PL|TrunCo
+A|POS|INE|PL|kAAn
+A|POS|INE|PL|kO
+A|POS|INE|PL|kin
+A|POS|INE|PL|kin|DN-LLINEN
+A|POS|INE|PL|st-cllq
+A|POS|INE|SG
+A|POS|INE|SG|1PL
+A|POS|INE|SG|1SG
+A|POS|INE|SG|2SG
+A|POS|INE|SG|3
+A|POS|INE|SG|DN-INEN
+A|POS|INE|SG|DN-LLINEN
+A|POS|INE|SG|DN-MAINEN
+A|POS|INE|SG|DN-TON
+A|POS|INE|SG|DV-MATON
+A|POS|INE|SG|DV-MATON|DV-U
+A|POS|INE|SG|DV-NTAA
+A|POS|INE|SG|DV-NTA|DN-LLINEN
+A|POS|INE|SG|DV-TTA
+A|POS|INE|SG|DV-U
+A|POS|INE|SG|DV-US|DN-LLINEN
+A|POS|INE|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|INE|SG|DV-UTU
+A|POS|INE|SG|DV-VAINEN
+A|POS|INE|SG|TrunCo
+A|POS|INE|SG|kAAn
+A|POS|INE|SG|kO
+A|POS|INE|SG|kin
+A|POS|INE|SG|kin|DN-LLINEN
+A|POS|INE|SG|st-cllq
+A|POS|INS|PL
+A|POS|INS|PL|1PL
+A|POS|INS|PL|1SG
+A|POS|INS|PL|2SG
+A|POS|INS|PL|3
+A|POS|INS|PL|DN-INEN
+A|POS|INS|PL|DN-LLINEN
+A|POS|INS|PL|DN-MAINEN
+A|POS|INS|PL|DN-TON
+A|POS|INS|PL|DV-MATON
+A|POS|INS|PL|DV-MATON|DV-U
+A|POS|INS|PL|DV-NTAA
+A|POS|INS|PL|DV-NTA|DN-LLINEN
+A|POS|INS|PL|DV-TTA
+A|POS|INS|PL|DV-U
+A|POS|INS|PL|DV-US|DN-LLINEN
+A|POS|INS|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|INS|PL|DV-UTU
+A|POS|INS|PL|DV-VAINEN
+A|POS|INS|PL|TrunCo
+A|POS|INS|PL|kAAn
+A|POS|INS|PL|kO
+A|POS|INS|PL|kin
+A|POS|INS|PL|kin|DN-LLINEN
+A|POS|INS|PL|st-cllq
+A|POS|INS|SG
+A|POS|INS|SG|1PL
+A|POS|INS|SG|1SG
+A|POS|INS|SG|2SG
+A|POS|INS|SG|3
+A|POS|INS|SG|DN-INEN
+A|POS|INS|SG|DN-LLINEN
+A|POS|INS|SG|DN-MAINEN
+A|POS|INS|SG|DN-TON
+A|POS|INS|SG|DV-MATON
+A|POS|INS|SG|DV-MATON|DV-U
+A|POS|INS|SG|DV-NTAA
+A|POS|INS|SG|DV-NTA|DN-LLINEN
+A|POS|INS|SG|DV-TTA
+A|POS|INS|SG|DV-U
+A|POS|INS|SG|DV-US|DN-LLINEN
+A|POS|INS|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|INS|SG|DV-UTU
+A|POS|INS|SG|DV-VAINEN
+A|POS|INS|SG|TrunCo
+A|POS|INS|SG|kAAn
+A|POS|INS|SG|kO
+A|POS|INS|SG|kin
+A|POS|INS|SG|kin|DN-LLINEN
+A|POS|INS|SG|st-cllq
+A|POS|NOM|PL
+A|POS|NOM|PL|1PL
+A|POS|NOM|PL|1SG
+A|POS|NOM|PL|2SG
+A|POS|NOM|PL|3
+A|POS|NOM|PL|DN-INEN
+A|POS|NOM|PL|DN-LLINEN
+A|POS|NOM|PL|DN-MAINEN
+A|POS|NOM|PL|DN-TON
+A|POS|NOM|PL|DV-MATON
+A|POS|NOM|PL|DV-MATON|DV-U
+A|POS|NOM|PL|DV-NTAA
+A|POS|NOM|PL|DV-NTA|DN-LLINEN
+A|POS|NOM|PL|DV-TTA
+A|POS|NOM|PL|DV-U
+A|POS|NOM|PL|DV-US|DN-LLINEN
+A|POS|NOM|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|NOM|PL|DV-UTU
+A|POS|NOM|PL|DV-VAINEN
+A|POS|NOM|PL|TrunCo
+A|POS|NOM|PL|kAAn
+A|POS|NOM|PL|kO
+A|POS|NOM|PL|kin
+A|POS|NOM|PL|kin|DN-LLINEN
+A|POS|NOM|PL|st-cllq
+A|POS|NOM|SG
+A|POS|NOM|SG|1PL
+A|POS|NOM|SG|1SG
+A|POS|NOM|SG|2SG
+A|POS|NOM|SG|3
+A|POS|NOM|SG|DN-INEN
+A|POS|NOM|SG|DN-LLINEN
+A|POS|NOM|SG|DN-MAINEN
+A|POS|NOM|SG|DN-TON
+A|POS|NOM|SG|DV-MATON
+A|POS|NOM|SG|DV-MATON|DV-U
+A|POS|NOM|SG|DV-NTAA
+A|POS|NOM|SG|DV-NTA|DN-LLINEN
+A|POS|NOM|SG|DV-TTA
+A|POS|NOM|SG|DV-U
+A|POS|NOM|SG|DV-US|DN-LLINEN
+A|POS|NOM|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|NOM|SG|DV-UTU
+A|POS|NOM|SG|DV-VAINEN
+A|POS|NOM|SG|TrunCo
+A|POS|NOM|SG|kAAn
+A|POS|NOM|SG|kO
+A|POS|NOM|SG|kin
+A|POS|NOM|SG|kin|DN-LLINEN
+A|POS|NOM|SG|st-cllq
+A|POS|PTV|PL
+A|POS|PTV|PL|1PL
+A|POS|PTV|PL|1SG
+A|POS|PTV|PL|2SG
+A|POS|PTV|PL|3
+A|POS|PTV|PL|DN-INEN
+A|POS|PTV|PL|DN-LLINEN
+A|POS|PTV|PL|DN-MAINEN
+A|POS|PTV|PL|DN-TON
+A|POS|PTV|PL|DV-MATON
+A|POS|PTV|PL|DV-MATON|DV-U
+A|POS|PTV|PL|DV-NTAA
+A|POS|PTV|PL|DV-NTA|DN-LLINEN
+A|POS|PTV|PL|DV-TTA
+A|POS|PTV|PL|DV-U
+A|POS|PTV|PL|DV-US|DN-LLINEN
+A|POS|PTV|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|PTV|PL|DV-UTU
+A|POS|PTV|PL|DV-VAINEN
+A|POS|PTV|PL|TrunCo
+A|POS|PTV|PL|kAAn
+A|POS|PTV|PL|kO
+A|POS|PTV|PL|kin
+A|POS|PTV|PL|kin|DN-LLINEN
+A|POS|PTV|PL|st-cllq
+A|POS|PTV|SG
+A|POS|PTV|SG|1PL
+A|POS|PTV|SG|1SG
+A|POS|PTV|SG|2SG
+A|POS|PTV|SG|3
+A|POS|PTV|SG|DN-INEN
+A|POS|PTV|SG|DN-LLINEN
+A|POS|PTV|SG|DN-MAINEN
+A|POS|PTV|SG|DN-TON
+A|POS|PTV|SG|DV-MATON
+A|POS|PTV|SG|DV-MATON|DV-U
+A|POS|PTV|SG|DV-NTAA
+A|POS|PTV|SG|DV-NTA|DN-LLINEN
+A|POS|PTV|SG|DV-TTA
+A|POS|PTV|SG|DV-U
+A|POS|PTV|SG|DV-US|DN-LLINEN
+A|POS|PTV|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|PTV|SG|DV-UTU
+A|POS|PTV|SG|DV-VAINEN
+A|POS|PTV|SG|TrunCo
+A|POS|PTV|SG|kAAn
+A|POS|PTV|SG|kO
+A|POS|PTV|SG|kin
+A|POS|PTV|SG|kin|DN-LLINEN
+A|POS|PTV|SG|st-cllq
+A|POS|TRA|PL
+A|POS|TRA|PL|1PL
+A|POS|TRA|PL|1SG
+A|POS|TRA|PL|2SG
+A|POS|TRA|PL|3
+A|POS|TRA|PL|DN-INEN
+A|POS|TRA|PL|DN-LLINEN
+A|POS|TRA|PL|DN-MAINEN
+A|POS|TRA|PL|DN-TON
+A|POS|TRA|PL|DV-MATON
+A|POS|TRA|PL|DV-MATON|DV-U
+A|POS|TRA|PL|DV-NTAA
+A|POS|TRA|PL|DV-NTA|DN-LLINEN
+A|POS|TRA|PL|DV-TTA
+A|POS|TRA|PL|DV-U
+A|POS|TRA|PL|DV-US|DN-LLINEN
+A|POS|TRA|PL|DV-US|DV-TTA|DN-LLINEN
+A|POS|TRA|PL|DV-UTU
+A|POS|TRA|PL|DV-VAINEN
+A|POS|TRA|PL|TrunCo
+A|POS|TRA|PL|kAAn
+A|POS|TRA|PL|kO
+A|POS|TRA|PL|kin
+A|POS|TRA|PL|kin|DN-LLINEN
+A|POS|TRA|PL|st-cllq
+A|POS|TRA|SG
+A|POS|TRA|SG|1PL
+A|POS|TRA|SG|1SG
+A|POS|TRA|SG|2SG
+A|POS|TRA|SG|3
+A|POS|TRA|SG|DN-INEN
+A|POS|TRA|SG|DN-LLINEN
+A|POS|TRA|SG|DN-MAINEN
+A|POS|TRA|SG|DN-TON
+A|POS|TRA|SG|DV-MATON
+A|POS|TRA|SG|DV-MATON|DV-U
+A|POS|TRA|SG|DV-NTAA
+A|POS|TRA|SG|DV-NTA|DN-LLINEN
+A|POS|TRA|SG|DV-TTA
+A|POS|TRA|SG|DV-U
+A|POS|TRA|SG|DV-US|DN-LLINEN
+A|POS|TRA|SG|DV-US|DV-TTA|DN-LLINEN
+A|POS|TRA|SG|DV-UTU
+A|POS|TRA|SG|DV-VAINEN
+A|POS|TRA|SG|TrunCo
+A|POS|TRA|SG|kAAn
+A|POS|TRA|SG|kO
+A|POS|TRA|SG|kin
+A|POS|TRA|SG|kin|DN-LLINEN
+A|POS|TRA|SG|st-cllq
+A|PROP|POS|ABE|PL
+A|PROP|POS|ABE|PL|DN-LAINEN
+A|PROP|POS|ABE|SG
+A|PROP|POS|ABE|SG|DN-LAINEN
+A|PROP|POS|ABL|PL
+A|PROP|POS|ABL|PL|DN-LAINEN
+A|PROP|POS|ABL|SG
+A|PROP|POS|ABL|SG|DN-LAINEN
+A|PROP|POS|ADE|PL
+A|PROP|POS|ADE|PL|DN-LAINEN
+A|PROP|POS|ADE|SG
+A|PROP|POS|ADE|SG|DN-LAINEN
+A|PROP|POS|ALL|PL
+A|PROP|POS|ALL|PL|DN-LAINEN
+A|PROP|POS|ALL|SG
+A|PROP|POS|ALL|SG|DN-LAINEN
+A|PROP|POS|CMT|PL
+A|PROP|POS|CMT|PL|DN-LAINEN
+A|PROP|POS|CMT|SG
+A|PROP|POS|CMT|SG|DN-LAINEN
+A|PROP|POS|ELA|PL
+A|PROP|POS|ELA|PL|DN-LAINEN
+A|PROP|POS|ELA|SG
+A|PROP|POS|ELA|SG|DN-LAINEN
+A|PROP|POS|ESS|PL
+A|PROP|POS|ESS|PL|DN-LAINEN
+A|PROP|POS|ESS|SG
+A|PROP|POS|ESS|SG|DN-LAINEN
+A|PROP|POS|GEN|PL
+A|PROP|POS|GEN|PL|DN-LAINEN
+A|PROP|POS|GEN|SG
+A|PROP|POS|GEN|SG|DN-LAINEN
+A|PROP|POS|ILL|PL
+A|PROP|POS|ILL|PL|DN-LAINEN
+A|PROP|POS|ILL|SG
+A|PROP|POS|ILL|SG|DN-LAINEN
+A|PROP|POS|INE|PL
+A|PROP|POS|INE|PL|DN-LAINEN
+A|PROP|POS|INE|SG
+A|PROP|POS|INE|SG|DN-LAINEN
+A|PROP|POS|INS|PL
+A|PROP|POS|INS|PL|DN-LAINEN
+A|PROP|POS|INS|SG
+A|PROP|POS|INS|SG|DN-LAINEN
+A|PROP|POS|NOM|PL
+A|PROP|POS|NOM|PL|DN-LAINEN
+A|PROP|POS|NOM|SG
+A|PROP|POS|NOM|SG|DN-LAINEN
+A|PROP|POS|PTV|PL
+A|PROP|POS|PTV|PL|DN-LAINEN
+A|PROP|POS|PTV|SG
+A|PROP|POS|PTV|SG|DN-LAINEN
+A|PROP|POS|TRA|PL
+A|PROP|POS|TRA|PL|DN-LAINEN
+A|PROP|POS|TRA|SG
+A|PROP|POS|TRA|SG|DN-LAINEN
+A|SUP|ABE|PL
+A|SUP|ABE|PL|3
+A|SUP|ABE|PL|ACT|PCP1
+A|SUP|ABE|PL|ACT|PCP2
+A|SUP|ABE|PL|DN-INEN
+A|SUP|ABE|PL|DN-LLINEN
+A|SUP|ABE|PL|DV-MATON
+A|SUP|ABE|PL|PSS|PCP1
+A|SUP|ABE|PL|PSS|PCP2
+A|SUP|ABE|PL|PSS|PCP2|DV-ELE
+A|SUP|ABE|PL|kAAn
+A|SUP|ABE|PL|kin
+A|SUP|ABE|PL|st-cllq
+A|SUP|ABE|SG
+A|SUP|ABE|SG|3
+A|SUP|ABE|SG|ACT|PCP1
+A|SUP|ABE|SG|ACT|PCP2
+A|SUP|ABE|SG|DN-INEN
+A|SUP|ABE|SG|DN-LLINEN
+A|SUP|ABE|SG|DV-MATON
+A|SUP|ABE|SG|PSS|PCP1
+A|SUP|ABE|SG|PSS|PCP2
+A|SUP|ABE|SG|PSS|PCP2|DV-ELE
+A|SUP|ABE|SG|kAAn
+A|SUP|ABE|SG|kin
+A|SUP|ABE|SG|st-cllq
+A|SUP|ABL|PL
+A|SUP|ABL|PL|3
+A|SUP|ABL|PL|ACT|PCP1
+A|SUP|ABL|PL|ACT|PCP2
+A|SUP|ABL|PL|DN-INEN
+A|SUP|ABL|PL|DN-LLINEN
+A|SUP|ABL|PL|DV-MATON
+A|SUP|ABL|PL|PSS|PCP1
+A|SUP|ABL|PL|PSS|PCP2
+A|SUP|ABL|PL|PSS|PCP2|DV-ELE
+A|SUP|ABL|PL|kAAn
+A|SUP|ABL|PL|kin
+A|SUP|ABL|PL|st-cllq
+A|SUP|ABL|SG
+A|SUP|ABL|SG|3
+A|SUP|ABL|SG|ACT|PCP1
+A|SUP|ABL|SG|ACT|PCP2
+A|SUP|ABL|SG|DN-INEN
+A|SUP|ABL|SG|DN-LLINEN
+A|SUP|ABL|SG|DV-MATON
+A|SUP|ABL|SG|PSS|PCP1
+A|SUP|ABL|SG|PSS|PCP2
+A|SUP|ABL|SG|PSS|PCP2|DV-ELE
+A|SUP|ABL|SG|kAAn
+A|SUP|ABL|SG|kin
+A|SUP|ABL|SG|st-cllq
+A|SUP|ADE|PL
+A|SUP|ADE|PL|3
+A|SUP|ADE|PL|ACT|PCP1
+A|SUP|ADE|PL|ACT|PCP2
+A|SUP|ADE|PL|DN-INEN
+A|SUP|ADE|PL|DN-LLINEN
+A|SUP|ADE|PL|DV-MATON
+A|SUP|ADE|PL|PSS|PCP1
+A|SUP|ADE|PL|PSS|PCP2
+A|SUP|ADE|PL|PSS|PCP2|DV-ELE
+A|SUP|ADE|PL|kAAn
+A|SUP|ADE|PL|kin
+A|SUP|ADE|PL|st-cllq
+A|SUP|ADE|SG
+A|SUP|ADE|SG|3
+A|SUP|ADE|SG|ACT|PCP1
+A|SUP|ADE|SG|ACT|PCP2
+A|SUP|ADE|SG|DN-INEN
+A|SUP|ADE|SG|DN-LLINEN
+A|SUP|ADE|SG|DV-MATON
+A|SUP|ADE|SG|PSS|PCP1
+A|SUP|ADE|SG|PSS|PCP2
+A|SUP|ADE|SG|PSS|PCP2|DV-ELE
+A|SUP|ADE|SG|kAAn
+A|SUP|ADE|SG|kin
+A|SUP|ADE|SG|st-cllq
+A|SUP|ALL|PL
+A|SUP|ALL|PL|3
+A|SUP|ALL|PL|ACT|PCP1
+A|SUP|ALL|PL|ACT|PCP2
+A|SUP|ALL|PL|DN-INEN
+A|SUP|ALL|PL|DN-LLINEN
+A|SUP|ALL|PL|DV-MATON
+A|SUP|ALL|PL|PSS|PCP1
+A|SUP|ALL|PL|PSS|PCP2
+A|SUP|ALL|PL|PSS|PCP2|DV-ELE
+A|SUP|ALL|PL|kAAn
+A|SUP|ALL|PL|kin
+A|SUP|ALL|PL|st-cllq
+A|SUP|ALL|SG
+A|SUP|ALL|SG|3
+A|SUP|ALL|SG|ACT|PCP1
+A|SUP|ALL|SG|ACT|PCP2
+A|SUP|ALL|SG|DN-INEN
+A|SUP|ALL|SG|DN-LLINEN
+A|SUP|ALL|SG|DV-MATON
+A|SUP|ALL|SG|PSS|PCP1
+A|SUP|ALL|SG|PSS|PCP2
+A|SUP|ALL|SG|PSS|PCP2|DV-ELE
+A|SUP|ALL|SG|kAAn
+A|SUP|ALL|SG|kin
+A|SUP|ALL|SG|st-cllq
+A|SUP|CMT|PL
+A|SUP|CMT|PL|3
+A|SUP|CMT|PL|ACT|PCP1
+A|SUP|CMT|PL|ACT|PCP2
+A|SUP|CMT|PL|DN-INEN
+A|SUP|CMT|PL|DN-LLINEN
+A|SUP|CMT|PL|DV-MATON
+A|SUP|CMT|PL|PSS|PCP1
+A|SUP|CMT|PL|PSS|PCP2
+A|SUP|CMT|PL|PSS|PCP2|DV-ELE
+A|SUP|CMT|PL|kAAn
+A|SUP|CMT|PL|kin
+A|SUP|CMT|PL|st-cllq
+A|SUP|CMT|SG
+A|SUP|CMT|SG|3
+A|SUP|CMT|SG|ACT|PCP1
+A|SUP|CMT|SG|ACT|PCP2
+A|SUP|CMT|SG|DN-INEN
+A|SUP|CMT|SG|DN-LLINEN
+A|SUP|CMT|SG|DV-MATON
+A|SUP|CMT|SG|PSS|PCP1
+A|SUP|CMT|SG|PSS|PCP2
+A|SUP|CMT|SG|PSS|PCP2|DV-ELE
+A|SUP|CMT|SG|kAAn
+A|SUP|CMT|SG|kin
+A|SUP|CMT|SG|st-cllq
+A|SUP|ELA|PL
+A|SUP|ELA|PL|3
+A|SUP|ELA|PL|ACT|PCP1
+A|SUP|ELA|PL|ACT|PCP2
+A|SUP|ELA|PL|DN-INEN
+A|SUP|ELA|PL|DN-LLINEN
+A|SUP|ELA|PL|DV-MATON
+A|SUP|ELA|PL|PSS|PCP1
+A|SUP|ELA|PL|PSS|PCP2
+A|SUP|ELA|PL|PSS|PCP2|DV-ELE
+A|SUP|ELA|PL|kAAn
+A|SUP|ELA|PL|kin
+A|SUP|ELA|PL|st-cllq
+A|SUP|ELA|SG
+A|SUP|ELA|SG|3
+A|SUP|ELA|SG|ACT|PCP1
+A|SUP|ELA|SG|ACT|PCP2
+A|SUP|ELA|SG|DN-INEN
+A|SUP|ELA|SG|DN-LLINEN
+A|SUP|ELA|SG|DV-MATON
+A|SUP|ELA|SG|PSS|PCP1
+A|SUP|ELA|SG|PSS|PCP2
+A|SUP|ELA|SG|PSS|PCP2|DV-ELE
+A|SUP|ELA|SG|kAAn
+A|SUP|ELA|SG|kin
+A|SUP|ELA|SG|st-cllq
+A|SUP|ESS|PL
+A|SUP|ESS|PL|3
+A|SUP|ESS|PL|ACT|PCP1
+A|SUP|ESS|PL|ACT|PCP2
+A|SUP|ESS|PL|DN-INEN
+A|SUP|ESS|PL|DN-LLINEN
+A|SUP|ESS|PL|DV-MATON
+A|SUP|ESS|PL|PSS|PCP1
+A|SUP|ESS|PL|PSS|PCP2
+A|SUP|ESS|PL|PSS|PCP2|DV-ELE
+A|SUP|ESS|PL|kAAn
+A|SUP|ESS|PL|kin
+A|SUP|ESS|PL|st-cllq
+A|SUP|ESS|SG
+A|SUP|ESS|SG|3
+A|SUP|ESS|SG|ACT|PCP1
+A|SUP|ESS|SG|ACT|PCP2
+A|SUP|ESS|SG|DN-INEN
+A|SUP|ESS|SG|DN-LLINEN
+A|SUP|ESS|SG|DV-MATON
+A|SUP|ESS|SG|PSS|PCP1
+A|SUP|ESS|SG|PSS|PCP2
+A|SUP|ESS|SG|PSS|PCP2|DV-ELE
+A|SUP|ESS|SG|kAAn
+A|SUP|ESS|SG|kin
+A|SUP|ESS|SG|st-cllq
+A|SUP|GEN|PL
+A|SUP|GEN|PL|3
+A|SUP|GEN|PL|ACT|PCP1
+A|SUP|GEN|PL|ACT|PCP2
+A|SUP|GEN|PL|DN-INEN
+A|SUP|GEN|PL|DN-LLINEN
+A|SUP|GEN|PL|DV-MATON
+A|SUP|GEN|PL|PSS|PCP1
+A|SUP|GEN|PL|PSS|PCP2
+A|SUP|GEN|PL|PSS|PCP2|DV-ELE
+A|SUP|GEN|PL|kAAn
+A|SUP|GEN|PL|kin
+A|SUP|GEN|PL|st-cllq
+A|SUP|GEN|SG
+A|SUP|GEN|SG|3
+A|SUP|GEN|SG|ACT|PCP1
+A|SUP|GEN|SG|ACT|PCP2
+A|SUP|GEN|SG|DN-INEN
+A|SUP|GEN|SG|DN-LLINEN
+A|SUP|GEN|SG|DV-MATON
+A|SUP|GEN|SG|PSS|PCP1
+A|SUP|GEN|SG|PSS|PCP2
+A|SUP|GEN|SG|PSS|PCP2|DV-ELE
+A|SUP|GEN|SG|kAAn
+A|SUP|GEN|SG|kin
+A|SUP|GEN|SG|st-cllq
+A|SUP|ILL|PL
+A|SUP|ILL|PL|3
+A|SUP|ILL|PL|ACT|PCP1
+A|SUP|ILL|PL|ACT|PCP2
+A|SUP|ILL|PL|DN-INEN
+A|SUP|ILL|PL|DN-LLINEN
+A|SUP|ILL|PL|DV-MATON
+A|SUP|ILL|PL|PSS|PCP1
+A|SUP|ILL|PL|PSS|PCP2
+A|SUP|ILL|PL|PSS|PCP2|DV-ELE
+A|SUP|ILL|PL|kAAn
+A|SUP|ILL|PL|kin
+A|SUP|ILL|PL|st-cllq
+A|SUP|ILL|SG
+A|SUP|ILL|SG|3
+A|SUP|ILL|SG|ACT|PCP1
+A|SUP|ILL|SG|ACT|PCP2
+A|SUP|ILL|SG|DN-INEN
+A|SUP|ILL|SG|DN-LLINEN
+A|SUP|ILL|SG|DV-MATON
+A|SUP|ILL|SG|PSS|PCP1
+A|SUP|ILL|SG|PSS|PCP2
+A|SUP|ILL|SG|PSS|PCP2|DV-ELE
+A|SUP|ILL|SG|kAAn
+A|SUP|ILL|SG|kin
+A|SUP|ILL|SG|st-cllq
+A|SUP|INE|PL
+A|SUP|INE|PL|3
+A|SUP|INE|PL|ACT|PCP1
+A|SUP|INE|PL|ACT|PCP2
+A|SUP|INE|PL|DN-INEN
+A|SUP|INE|PL|DN-LLINEN
+A|SUP|INE|PL|DV-MATON
+A|SUP|INE|PL|PSS|PCP1
+A|SUP|INE|PL|PSS|PCP2
+A|SUP|INE|PL|PSS|PCP2|DV-ELE
+A|SUP|INE|PL|kAAn
+A|SUP|INE|PL|kin
+A|SUP|INE|PL|st-cllq
+A|SUP|INE|SG
+A|SUP|INE|SG|3
+A|SUP|INE|SG|ACT|PCP1
+A|SUP|INE|SG|ACT|PCP2
+A|SUP|INE|SG|DN-INEN
+A|SUP|INE|SG|DN-LLINEN
+A|SUP|INE|SG|DV-MATON
+A|SUP|INE|SG|PSS|PCP1
+A|SUP|INE|SG|PSS|PCP2
+A|SUP|INE|SG|PSS|PCP2|DV-ELE
+A|SUP|INE|SG|kAAn
+A|SUP|INE|SG|kin
+A|SUP|INE|SG|st-cllq
+A|SUP|INS|PL
+A|SUP|INS|PL|3
+A|SUP|INS|PL|ACT|PCP1
+A|SUP|INS|PL|ACT|PCP2
+A|SUP|INS|PL|DN-INEN
+A|SUP|INS|PL|DN-LLINEN
+A|SUP|INS|PL|DV-MATON
+A|SUP|INS|PL|PSS|PCP1
+A|SUP|INS|PL|PSS|PCP2
+A|SUP|INS|PL|PSS|PCP2|DV-ELE
+A|SUP|INS|PL|kAAn
+A|SUP|INS|PL|kin
+A|SUP|INS|PL|st-cllq
+A|SUP|INS|SG
+A|SUP|INS|SG|3
+A|SUP|INS|SG|ACT|PCP1
+A|SUP|INS|SG|ACT|PCP2
+A|SUP|INS|SG|DN-INEN
+A|SUP|INS|SG|DN-LLINEN
+A|SUP|INS|SG|DV-MATON
+A|SUP|INS|SG|PSS|PCP1
+A|SUP|INS|SG|PSS|PCP2
+A|SUP|INS|SG|PSS|PCP2|DV-ELE
+A|SUP|INS|SG|kAAn
+A|SUP|INS|SG|kin
+A|SUP|INS|SG|st-cllq
+A|SUP|NOM|PL
+A|SUP|NOM|PL|3
+A|SUP|NOM|PL|ACT|PCP1
+A|SUP|NOM|PL|ACT|PCP2
+A|SUP|NOM|PL|DN-INEN
+A|SUP|NOM|PL|DN-LLINEN
+A|SUP|NOM|PL|DV-MATON
+A|SUP|NOM|PL|PSS|PCP1
+A|SUP|NOM|PL|PSS|PCP2
+A|SUP|NOM|PL|PSS|PCP2|DV-ELE
+A|SUP|NOM|PL|kAAn
+A|SUP|NOM|PL|kin
+A|SUP|NOM|PL|st-cllq
+A|SUP|NOM|SG
+A|SUP|NOM|SG|3
+A|SUP|NOM|SG|ACT|PCP1
+A|SUP|NOM|SG|ACT|PCP2
+A|SUP|NOM|SG|DN-INEN
+A|SUP|NOM|SG|DN-LLINEN
+A|SUP|NOM|SG|DV-MATON
+A|SUP|NOM|SG|PSS|PCP1
+A|SUP|NOM|SG|PSS|PCP2
+A|SUP|NOM|SG|PSS|PCP2|DV-ELE
+A|SUP|NOM|SG|kAAn
+A|SUP|NOM|SG|kin
+A|SUP|NOM|SG|st-cllq
+A|SUP|PTV|PL
+A|SUP|PTV|PL|3
+A|SUP|PTV|PL|ACT|PCP1
+A|SUP|PTV|PL|ACT|PCP2
+A|SUP|PTV|PL|DN-INEN
+A|SUP|PTV|PL|DN-LLINEN
+A|SUP|PTV|PL|DV-MATON
+A|SUP|PTV|PL|PSS|PCP1
+A|SUP|PTV|PL|PSS|PCP2
+A|SUP|PTV|PL|PSS|PCP2|DV-ELE
+A|SUP|PTV|PL|kAAn
+A|SUP|PTV|PL|kin
+A|SUP|PTV|PL|st-cllq
+A|SUP|PTV|SG
+A|SUP|PTV|SG|3
+A|SUP|PTV|SG|ACT|PCP1
+A|SUP|PTV|SG|ACT|PCP2
+A|SUP|PTV|SG|DN-INEN
+A|SUP|PTV|SG|DN-LLINEN
+A|SUP|PTV|SG|DV-MATON
+A|SUP|PTV|SG|PSS|PCP1
+A|SUP|PTV|SG|PSS|PCP2
+A|SUP|PTV|SG|PSS|PCP2|DV-ELE
+A|SUP|PTV|SG|kAAn
+A|SUP|PTV|SG|kin
+A|SUP|PTV|SG|st-cllq
+A|SUP|TRA|PL
+A|SUP|TRA|PL|3
+A|SUP|TRA|PL|ACT|PCP1
+A|SUP|TRA|PL|ACT|PCP2
+A|SUP|TRA|PL|DN-INEN
+A|SUP|TRA|PL|DN-LLINEN
+A|SUP|TRA|PL|DV-MATON
+A|SUP|TRA|PL|PSS|PCP1
+A|SUP|TRA|PL|PSS|PCP2
+A|SUP|TRA|PL|PSS|PCP2|DV-ELE
+A|SUP|TRA|PL|kAAn
+A|SUP|TRA|PL|kin
+A|SUP|TRA|PL|st-cllq
+A|SUP|TRA|SG
+A|SUP|TRA|SG|3
+A|SUP|TRA|SG|ACT|PCP1
+A|SUP|TRA|SG|ACT|PCP2
+A|SUP|TRA|SG|DN-INEN
+A|SUP|TRA|SG|DN-LLINEN
+A|SUP|TRA|SG|DV-MATON
+A|SUP|TRA|SG|PSS|PCP1
+A|SUP|TRA|SG|PSS|PCP2
+A|SUP|TRA|SG|PSS|PCP2|DV-ELE
+A|SUP|TRA|SG|kAAn
+A|SUP|TRA|SG|kin
+A|SUP|TRA|SG|st-cllq
+A|TrunCo
+A|digit|POS|ABE|PL
+A|digit|POS|ABE|SG
+A|digit|POS|ABL|PL
+A|digit|POS|ABL|SG
+A|digit|POS|ADE|PL
+A|digit|POS|ADE|SG
+A|digit|POS|ALL|PL
+A|digit|POS|ALL|SG
+A|digit|POS|CMT|PL
+A|digit|POS|CMT|SG
+A|digit|POS|ELA|PL
+A|digit|POS|ELA|SG
+A|digit|POS|ESS|PL
+A|digit|POS|ESS|SG
+A|digit|POS|GEN|PL
+A|digit|POS|GEN|SG
+A|digit|POS|ILL|PL
+A|digit|POS|ILL|SG
+A|digit|POS|INE|PL
+A|digit|POS|INE|SG
+A|digit|POS|INS|PL
+A|digit|POS|INS|SG
+A|digit|POS|NOM|PL
+A|digit|POS|NOM|SG
+A|digit|POS|PTV|PL
+A|digit|POS|PTV|SG
+A|digit|POS|TRA|PL
+A|digit|POS|TRA|SG
+C
+COP|POS|ELA|PL|ACT|PCP1
+COP|POS|ELA|SG|ACT|PCP1
+COP|POS|GEN|SG|ACT|PCP1
+COP|POS|GEN|SG|ACT|PCP2
+COP|POS|ILL|SG|ACT|PCP1
+COP|POS|NOM|PL|ACT|PCP1
+COP|POS|NOM|PL|ACT|PCP2
+COP|POS|NOM|SG|3|ACT|PCP1
+COP|POS|NOM|SG|ACT|PCP1
+COP|POS|NOM|SG|ACT|PCP2
+COP|POS|PTV|SG|ACT|PCP1
+COP|POS|PTV|SG|ACT|PCP2
+COP|POS|TRA|PL|ACT|PCP1
+C|CMPR
+C|COORD
+C|COORD|PL3|NEGV
+C|COORD|PL3|NEGV|kA
+C|COORD|SG1|NEGV
+C|COORD|SG1|NEGV|kA
+C|COORD|SG3|NEGV
+C|COORD|SG3|NEGV|kA
+C|COORD|st-arch
+C|FORGN
+C|SUB
+C|SUB|PL1|NEGV
+C|SUB|PL3|NEGV
+C|SUB|SG1|NEGV
+C|SUB|SG1|NEGV|kO
+C|SUB|SG3|NEGV
+C|SUB|SG3|NEGV|kO
+C|SUB|kin
+C|SUB|pA
+FORGN
+INTJ
+INTJ|st-cllq
+NON-TWOL
+NON-TWOL|TrunCo
+NUM|ABE|PL
+NUM|ABE|SG
+NUM|ABL|PL
+NUM|ABL|SG
+NUM|ADE|PL
+NUM|ADE|SG
+NUM|ALL|PL
+NUM|ALL|SG
+NUM|CMT|PL
+NUM|CMT|SG
+NUM|ELA|PL
+NUM|ELA|SG
+NUM|ESS|PL
+NUM|ESS|SG
+NUM|GEN|PL
+NUM|GEN|SG
+NUM|ILL|PL
+NUM|ILL|SG
+NUM|INE|PL
+NUM|INE|SG
+NUM|INS|PL
+NUM|INS|SG
+NUM|NOM|PL
+NUM|NOM|SG
+NUM|ORD|ABE|PL
+NUM|ORD|ABE|SG
+NUM|ORD|ABL|PL
+NUM|ORD|ABL|SG
+NUM|ORD|ADE|PL
+NUM|ORD|ADE|SG
+NUM|ORD|ALL|PL
+NUM|ORD|ALL|SG
+NUM|ORD|CMT|PL
+NUM|ORD|CMT|SG
+NUM|ORD|ELA|PL
+NUM|ORD|ELA|SG
+NUM|ORD|ESS|PL
+NUM|ORD|ESS|SG
+NUM|ORD|GEN|PL
+NUM|ORD|GEN|SG
+NUM|ORD|ILL|PL
+NUM|ORD|ILL|SG
+NUM|ORD|INE|PL
+NUM|ORD|INE|SG
+NUM|ORD|INS|PL
+NUM|ORD|INS|SG
+NUM|ORD|NOM|PL
+NUM|ORD|NOM|SG
+NUM|ORD|PTV|PL
+NUM|ORD|PTV|SG
+NUM|ORD|TRA|PL
+NUM|ORD|TRA|SG
+NUM|PTV|PL
+NUM|PTV|SG
+NUM|TRA|PL
+NUM|TRA|SG
+N|ABE|PL
+N|ABE|PL|1PL
+N|ABE|PL|1PL|DV-ILE|DV-U
+N|ABE|PL|1PL|DV-MATON|DA-UUS
+N|ABE|PL|1PL|DV-NTA
+N|ABE|PL|1SG
+N|ABE|PL|1SG|DA-UUS
+N|ABE|PL|1SG|DV-JA
+N|ABE|PL|1SG|DV-MA
+N|ABE|PL|1SG|DV-TTA|DV-ELE
+N|ABE|PL|1SG|DV-US
+N|ABE|PL|1SG|PSS|PCP1
+N|ABE|PL|1SG|PSS|PCP1|DA-UUS
+N|ABE|PL|1SG|kin
+N|ABE|PL|1SG|st-cllq
+N|ABE|PL|2PL
+N|ABE|PL|2PL|DV-US
+N|ABE|PL|2SG
+N|ABE|PL|2SG|DV-JA
+N|ABE|PL|2SG|kin
+N|ABE|PL|3
+N|ABE|PL|3|ACT|PCP1
+N|ABE|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|ABE|PL|3|DA-US
+N|ABE|PL|3|DA-UUS
+N|ABE|PL|3|DA-UUS|DN-LLINEN
+N|ABE|PL|3|DA-UUS|DV-VAINEN
+N|ABE|PL|3|DV-ELE
+N|ABE|PL|3|DV-ILE|DV-U
+N|ABE|PL|3|DV-JA
+N|ABE|PL|3|DV-MA
+N|ABE|PL|3|DV-MA|DV-TTA
+N|ABE|PL|3|DV-MINEN
+N|ABE|PL|3|DV-MINEN|DV-U
+N|ABE|PL|3|DV-NTA
+N|ABE|PL|3|DV-U
+N|ABE|PL|3|DV-US
+N|ABE|PL|3|DV-U|DV-ELE
+N|ABE|PL|3|TrunCo
+N|ABE|PL|3|TrunCo|DV-US
+N|ABE|PL|3|kin
+N|ABE|PL|3|st-cllq
+N|ABE|PL|ACT|PCP1
+N|ABE|PL|ACT|PCP1|DA-UUS
+N|ABE|PL|ACT|PCP1|DA-UUS|DV-U
+N|ABE|PL|DA-US
+N|ABE|PL|DA-UUS
+N|ABE|PL|DA-UUS|DN-INEN
+N|ABE|PL|DA-UUS|DN-LLINEN
+N|ABE|PL|DA-UUS|DN-TON
+N|ABE|PL|DA-UUS|DV-MATON
+N|ABE|PL|DA-UUS|DV-VAINEN
+N|ABE|PL|DN-TON|DA-UUS
+N|ABE|PL|DV-ELE
+N|ABE|PL|DV-ELE|DV-JA
+N|ABE|PL|DV-ELE|DV-MINEN
+N|ABE|PL|DV-ILE
+N|ABE|PL|DV-ILE|DV-U
+N|ABE|PL|DV-JA
+N|ABE|PL|DV-JA|DN-TAR
+N|ABE|PL|DV-JA|DV-ILE
+N|ABE|PL|DV-JA|DV-TTA
+N|ABE|PL|DV-JA|DV-TTA|DV-ELE
+N|ABE|PL|DV-JA|DV-UTU
+N|ABE|PL|DV-MA
+N|ABE|PL|DV-MINEN
+N|ABE|PL|DV-MINEN|DV-U
+N|ABE|PL|DV-NA
+N|ABE|PL|DV-NEISUUS
+N|ABE|PL|DV-NTA
+N|ABE|PL|DV-NTAA
+N|ABE|PL|DV-NTAA|DV-MINEN
+N|ABE|PL|DV-NTAA|DV-US
+N|ABE|PL|DV-NTI
+N|ABE|PL|DV-TTA
+N|ABE|PL|DV-TTA|DV-MINEN|DV-ELE
+N|ABE|PL|DV-TTA|DV-U|DV-ELE
+N|ABE|PL|DV-U
+N|ABE|PL|DV-US
+N|ABE|PL|DV-US|DV-TTA
+N|ABE|PL|DV-UTTA|DV-US
+N|ABE|PL|DV-UTU
+N|ABE|PL|DV-UTU|DV-MINEN
+N|ABE|PL|DV-U|DV-ELE
+N|ABE|PL|DV-U|DV-ILE
+N|ABE|PL|DV-U|DV-JA
+N|ABE|PL|DV-U|DV-MA
+N|ABE|PL|DV-U|DV-MINEN
+N|ABE|PL|DV-U|DV-NEISUUS
+N|ABE|PL|DV-U|DV-SKELE
+N|ABE|PL|DV-U|DV-TTA
+N|ABE|PL|PSS|PCP1
+N|ABE|PL|PSS|PCP1|DA-UUS
+N|ABE|PL|PSS|PCP2
+N|ABE|PL|PSS|PCP2|DA-US
+N|ABE|PL|TrunCo
+N|ABE|PL|TrunCo|DA-US
+N|ABE|PL|TrunCo|DA-UUS
+N|ABE|PL|TrunCo|DV-JA
+N|ABE|PL|TrunCo|DV-MINEN
+N|ABE|PL|TrunCo|DV-NTA
+N|ABE|PL|TrunCo|DV-NTI
+N|ABE|PL|TrunCo|DV-U
+N|ABE|PL|TrunCo|DV-US
+N|ABE|PL|TrunCo|DV-US|DV-TTA
+N|ABE|PL|hAn
+N|ABE|PL|kAAn
+N|ABE|PL|kAAn|DV-JA
+N|ABE|PL|kAAn|DV-NTI
+N|ABE|PL|kin
+N|ABE|PL|kin|DA-UUS
+N|ABE|PL|kin|DV-JA
+N|ABE|PL|st-arch
+N|ABE|PL|st-cllq
+N|ABE|PL|st-cllq|DV-MINEN
+N|ABE|PL|st-cllq|DV-US
+N|ABE|PL|st-cllq|TrunCo
+N|ABE|PL|st-derog
+N|ABE|PL|st-hi
+N|ABE|PL|st-slang
+N|ABE|PL|st-slang|DV-JA
+N|ABE|PL|st-vrnc
+N|ABE|SG
+N|ABE|SG|1PL
+N|ABE|SG|1PL|DV-ILE|DV-U
+N|ABE|SG|1PL|DV-MATON|DA-UUS
+N|ABE|SG|1PL|DV-NTA
+N|ABE|SG|1SG
+N|ABE|SG|1SG|DA-UUS
+N|ABE|SG|1SG|DV-JA
+N|ABE|SG|1SG|DV-MA
+N|ABE|SG|1SG|DV-TTA|DV-ELE
+N|ABE|SG|1SG|DV-US
+N|ABE|SG|1SG|PSS|PCP1
+N|ABE|SG|1SG|PSS|PCP1|DA-UUS
+N|ABE|SG|1SG|kin
+N|ABE|SG|1SG|st-cllq
+N|ABE|SG|2PL
+N|ABE|SG|2PL|DV-US
+N|ABE|SG|2SG
+N|ABE|SG|2SG|DV-JA
+N|ABE|SG|2SG|kin
+N|ABE|SG|3
+N|ABE|SG|3|ACT|PCP1
+N|ABE|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|ABE|SG|3|DA-US
+N|ABE|SG|3|DA-UUS
+N|ABE|SG|3|DA-UUS|DN-LLINEN
+N|ABE|SG|3|DA-UUS|DV-VAINEN
+N|ABE|SG|3|DV-ELE
+N|ABE|SG|3|DV-ILE|DV-U
+N|ABE|SG|3|DV-JA
+N|ABE|SG|3|DV-MA
+N|ABE|SG|3|DV-MA|DV-TTA
+N|ABE|SG|3|DV-MINEN
+N|ABE|SG|3|DV-MINEN|DV-U
+N|ABE|SG|3|DV-NTA
+N|ABE|SG|3|DV-U
+N|ABE|SG|3|DV-US
+N|ABE|SG|3|DV-U|DV-ELE
+N|ABE|SG|3|TrunCo
+N|ABE|SG|3|TrunCo|DV-US
+N|ABE|SG|3|kin
+N|ABE|SG|3|st-cllq
+N|ABE|SG|ACT|PCP1
+N|ABE|SG|ACT|PCP1|DA-UUS
+N|ABE|SG|ACT|PCP1|DA-UUS|DV-U
+N|ABE|SG|DA-US
+N|ABE|SG|DA-UUS
+N|ABE|SG|DA-UUS|DN-INEN
+N|ABE|SG|DA-UUS|DN-LLINEN
+N|ABE|SG|DA-UUS|DN-TON
+N|ABE|SG|DA-UUS|DV-MATON
+N|ABE|SG|DA-UUS|DV-VAINEN
+N|ABE|SG|DN-TON|DA-UUS
+N|ABE|SG|DV-ELE
+N|ABE|SG|DV-ELE|DV-JA
+N|ABE|SG|DV-ELE|DV-MINEN
+N|ABE|SG|DV-ILE
+N|ABE|SG|DV-ILE|DV-U
+N|ABE|SG|DV-JA
+N|ABE|SG|DV-JA|DN-TAR
+N|ABE|SG|DV-JA|DV-ILE
+N|ABE|SG|DV-JA|DV-TTA
+N|ABE|SG|DV-JA|DV-TTA|DV-ELE
+N|ABE|SG|DV-JA|DV-UTU
+N|ABE|SG|DV-MA
+N|ABE|SG|DV-MINEN
+N|ABE|SG|DV-MINEN|DV-U
+N|ABE|SG|DV-NA
+N|ABE|SG|DV-NEISUUS
+N|ABE|SG|DV-NTA
+N|ABE|SG|DV-NTAA
+N|ABE|SG|DV-NTAA|DV-MINEN
+N|ABE|SG|DV-NTAA|DV-US
+N|ABE|SG|DV-NTI
+N|ABE|SG|DV-TTA
+N|ABE|SG|DV-TTA|DV-MINEN|DV-ELE
+N|ABE|SG|DV-TTA|DV-U|DV-ELE
+N|ABE|SG|DV-U
+N|ABE|SG|DV-US
+N|ABE|SG|DV-US|DV-TTA
+N|ABE|SG|DV-UTTA|DV-US
+N|ABE|SG|DV-UTU
+N|ABE|SG|DV-UTU|DV-MINEN
+N|ABE|SG|DV-U|DV-ELE
+N|ABE|SG|DV-U|DV-ILE
+N|ABE|SG|DV-U|DV-JA
+N|ABE|SG|DV-U|DV-MA
+N|ABE|SG|DV-U|DV-MINEN
+N|ABE|SG|DV-U|DV-NEISUUS
+N|ABE|SG|DV-U|DV-SKELE
+N|ABE|SG|DV-U|DV-TTA
+N|ABE|SG|PSS|PCP1
+N|ABE|SG|PSS|PCP1|DA-UUS
+N|ABE|SG|PSS|PCP2
+N|ABE|SG|PSS|PCP2|DA-US
+N|ABE|SG|TrunCo
+N|ABE|SG|TrunCo|DA-US
+N|ABE|SG|TrunCo|DA-UUS
+N|ABE|SG|TrunCo|DV-JA
+N|ABE|SG|TrunCo|DV-MINEN
+N|ABE|SG|TrunCo|DV-NTA
+N|ABE|SG|TrunCo|DV-NTI
+N|ABE|SG|TrunCo|DV-U
+N|ABE|SG|TrunCo|DV-US
+N|ABE|SG|TrunCo|DV-US|DV-TTA
+N|ABE|SG|hAn
+N|ABE|SG|kAAn
+N|ABE|SG|kAAn|DV-JA
+N|ABE|SG|kAAn|DV-NTI
+N|ABE|SG|kin
+N|ABE|SG|kin|DA-UUS
+N|ABE|SG|kin|DV-JA
+N|ABE|SG|st-arch
+N|ABE|SG|st-cllq
+N|ABE|SG|st-cllq|DV-MINEN
+N|ABE|SG|st-cllq|DV-US
+N|ABE|SG|st-cllq|TrunCo
+N|ABE|SG|st-derog
+N|ABE|SG|st-hi
+N|ABE|SG|st-slang
+N|ABE|SG|st-slang|DV-JA
+N|ABE|SG|st-vrnc
+N|ABL|PL
+N|ABL|PL|1PL
+N|ABL|PL|1PL|DV-ILE|DV-U
+N|ABL|PL|1PL|DV-MATON|DA-UUS
+N|ABL|PL|1PL|DV-NTA
+N|ABL|PL|1SG
+N|ABL|PL|1SG|DA-UUS
+N|ABL|PL|1SG|DV-JA
+N|ABL|PL|1SG|DV-MA
+N|ABL|PL|1SG|DV-TTA|DV-ELE
+N|ABL|PL|1SG|DV-US
+N|ABL|PL|1SG|PSS|PCP1
+N|ABL|PL|1SG|PSS|PCP1|DA-UUS
+N|ABL|PL|1SG|kin
+N|ABL|PL|1SG|st-cllq
+N|ABL|PL|2PL
+N|ABL|PL|2PL|DV-US
+N|ABL|PL|2SG
+N|ABL|PL|2SG|DV-JA
+N|ABL|PL|2SG|kin
+N|ABL|PL|3
+N|ABL|PL|3|ACT|PCP1
+N|ABL|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|ABL|PL|3|DA-US
+N|ABL|PL|3|DA-UUS
+N|ABL|PL|3|DA-UUS|DN-LLINEN
+N|ABL|PL|3|DA-UUS|DV-VAINEN
+N|ABL|PL|3|DV-ELE
+N|ABL|PL|3|DV-ILE|DV-U
+N|ABL|PL|3|DV-JA
+N|ABL|PL|3|DV-MA
+N|ABL|PL|3|DV-MA|DV-TTA
+N|ABL|PL|3|DV-MINEN
+N|ABL|PL|3|DV-MINEN|DV-U
+N|ABL|PL|3|DV-NTA
+N|ABL|PL|3|DV-U
+N|ABL|PL|3|DV-US
+N|ABL|PL|3|DV-U|DV-ELE
+N|ABL|PL|3|TrunCo
+N|ABL|PL|3|TrunCo|DV-US
+N|ABL|PL|3|kin
+N|ABL|PL|3|st-cllq
+N|ABL|PL|ACT|PCP1
+N|ABL|PL|ACT|PCP1|DA-UUS
+N|ABL|PL|ACT|PCP1|DA-UUS|DV-U
+N|ABL|PL|DA-US
+N|ABL|PL|DA-UUS
+N|ABL|PL|DA-UUS|DN-INEN
+N|ABL|PL|DA-UUS|DN-LLINEN
+N|ABL|PL|DA-UUS|DN-TON
+N|ABL|PL|DA-UUS|DV-MATON
+N|ABL|PL|DA-UUS|DV-VAINEN
+N|ABL|PL|DN-TON|DA-UUS
+N|ABL|PL|DV-ELE
+N|ABL|PL|DV-ELE|DV-JA
+N|ABL|PL|DV-ELE|DV-MINEN
+N|ABL|PL|DV-ILE
+N|ABL|PL|DV-ILE|DV-U
+N|ABL|PL|DV-JA
+N|ABL|PL|DV-JA|DN-TAR
+N|ABL|PL|DV-JA|DV-ILE
+N|ABL|PL|DV-JA|DV-TTA
+N|ABL|PL|DV-JA|DV-TTA|DV-ELE
+N|ABL|PL|DV-JA|DV-UTU
+N|ABL|PL|DV-MA
+N|ABL|PL|DV-MINEN
+N|ABL|PL|DV-MINEN|DV-U
+N|ABL|PL|DV-NA
+N|ABL|PL|DV-NEISUUS
+N|ABL|PL|DV-NTA
+N|ABL|PL|DV-NTAA
+N|ABL|PL|DV-NTAA|DV-MINEN
+N|ABL|PL|DV-NTAA|DV-US
+N|ABL|PL|DV-NTI
+N|ABL|PL|DV-TTA
+N|ABL|PL|DV-TTA|DV-MINEN|DV-ELE
+N|ABL|PL|DV-TTA|DV-U|DV-ELE
+N|ABL|PL|DV-U
+N|ABL|PL|DV-US
+N|ABL|PL|DV-US|DV-TTA
+N|ABL|PL|DV-UTTA|DV-US
+N|ABL|PL|DV-UTU
+N|ABL|PL|DV-UTU|DV-MINEN
+N|ABL|PL|DV-U|DV-ELE
+N|ABL|PL|DV-U|DV-ILE
+N|ABL|PL|DV-U|DV-JA
+N|ABL|PL|DV-U|DV-MA
+N|ABL|PL|DV-U|DV-MINEN
+N|ABL|PL|DV-U|DV-NEISUUS
+N|ABL|PL|DV-U|DV-SKELE
+N|ABL|PL|DV-U|DV-TTA
+N|ABL|PL|PSS|PCP1
+N|ABL|PL|PSS|PCP1|DA-UUS
+N|ABL|PL|PSS|PCP2
+N|ABL|PL|PSS|PCP2|DA-US
+N|ABL|PL|TrunCo
+N|ABL|PL|TrunCo|DA-US
+N|ABL|PL|TrunCo|DA-UUS
+N|ABL|PL|TrunCo|DV-JA
+N|ABL|PL|TrunCo|DV-MINEN
+N|ABL|PL|TrunCo|DV-NTA
+N|ABL|PL|TrunCo|DV-NTI
+N|ABL|PL|TrunCo|DV-U
+N|ABL|PL|TrunCo|DV-US
+N|ABL|PL|TrunCo|DV-US|DV-TTA
+N|ABL|PL|hAn
+N|ABL|PL|kAAn
+N|ABL|PL|kAAn|DV-JA
+N|ABL|PL|kAAn|DV-NTI
+N|ABL|PL|kin
+N|ABL|PL|kin|DA-UUS
+N|ABL|PL|kin|DV-JA
+N|ABL|PL|st-arch
+N|ABL|PL|st-cllq
+N|ABL|PL|st-cllq|DV-MINEN
+N|ABL|PL|st-cllq|DV-US
+N|ABL|PL|st-cllq|TrunCo
+N|ABL|PL|st-derog
+N|ABL|PL|st-hi
+N|ABL|PL|st-slang
+N|ABL|PL|st-slang|DV-JA
+N|ABL|PL|st-vrnc
+N|ABL|SG
+N|ABL|SG|1PL
+N|ABL|SG|1PL|DV-ILE|DV-U
+N|ABL|SG|1PL|DV-MATON|DA-UUS
+N|ABL|SG|1PL|DV-NTA
+N|ABL|SG|1SG
+N|ABL|SG|1SG|DA-UUS
+N|ABL|SG|1SG|DV-JA
+N|ABL|SG|1SG|DV-MA
+N|ABL|SG|1SG|DV-TTA|DV-ELE
+N|ABL|SG|1SG|DV-US
+N|ABL|SG|1SG|PSS|PCP1
+N|ABL|SG|1SG|PSS|PCP1|DA-UUS
+N|ABL|SG|1SG|kin
+N|ABL|SG|1SG|st-cllq
+N|ABL|SG|2PL
+N|ABL|SG|2PL|DV-US
+N|ABL|SG|2SG
+N|ABL|SG|2SG|DV-JA
+N|ABL|SG|2SG|kin
+N|ABL|SG|3
+N|ABL|SG|3|ACT|PCP1
+N|ABL|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|ABL|SG|3|DA-US
+N|ABL|SG|3|DA-UUS
+N|ABL|SG|3|DA-UUS|DN-LLINEN
+N|ABL|SG|3|DA-UUS|DV-VAINEN
+N|ABL|SG|3|DV-ELE
+N|ABL|SG|3|DV-ILE|DV-U
+N|ABL|SG|3|DV-JA
+N|ABL|SG|3|DV-MA
+N|ABL|SG|3|DV-MA|DV-TTA
+N|ABL|SG|3|DV-MINEN
+N|ABL|SG|3|DV-MINEN|DV-U
+N|ABL|SG|3|DV-NTA
+N|ABL|SG|3|DV-U
+N|ABL|SG|3|DV-US
+N|ABL|SG|3|DV-U|DV-ELE
+N|ABL|SG|3|TrunCo
+N|ABL|SG|3|TrunCo|DV-US
+N|ABL|SG|3|kin
+N|ABL|SG|3|st-cllq
+N|ABL|SG|ACT|PCP1
+N|ABL|SG|ACT|PCP1|DA-UUS
+N|ABL|SG|ACT|PCP1|DA-UUS|DV-U
+N|ABL|SG|DA-US
+N|ABL|SG|DA-UUS
+N|ABL|SG|DA-UUS|DN-INEN
+N|ABL|SG|DA-UUS|DN-LLINEN
+N|ABL|SG|DA-UUS|DN-TON
+N|ABL|SG|DA-UUS|DV-MATON
+N|ABL|SG|DA-UUS|DV-VAINEN
+N|ABL|SG|DN-TON|DA-UUS
+N|ABL|SG|DV-ELE
+N|ABL|SG|DV-ELE|DV-JA
+N|ABL|SG|DV-ELE|DV-MINEN
+N|ABL|SG|DV-ILE
+N|ABL|SG|DV-ILE|DV-U
+N|ABL|SG|DV-JA
+N|ABL|SG|DV-JA|DN-TAR
+N|ABL|SG|DV-JA|DV-ILE
+N|ABL|SG|DV-JA|DV-TTA
+N|ABL|SG|DV-JA|DV-TTA|DV-ELE
+N|ABL|SG|DV-JA|DV-UTU
+N|ABL|SG|DV-MA
+N|ABL|SG|DV-MINEN
+N|ABL|SG|DV-MINEN|DV-U
+N|ABL|SG|DV-NA
+N|ABL|SG|DV-NEISUUS
+N|ABL|SG|DV-NTA
+N|ABL|SG|DV-NTAA
+N|ABL|SG|DV-NTAA|DV-MINEN
+N|ABL|SG|DV-NTAA|DV-US
+N|ABL|SG|DV-NTI
+N|ABL|SG|DV-TTA
+N|ABL|SG|DV-TTA|DV-MINEN|DV-ELE
+N|ABL|SG|DV-TTA|DV-U|DV-ELE
+N|ABL|SG|DV-U
+N|ABL|SG|DV-US
+N|ABL|SG|DV-US|DV-TTA
+N|ABL|SG|DV-UTTA|DV-US
+N|ABL|SG|DV-UTU
+N|ABL|SG|DV-UTU|DV-MINEN
+N|ABL|SG|DV-U|DV-ELE
+N|ABL|SG|DV-U|DV-ILE
+N|ABL|SG|DV-U|DV-JA
+N|ABL|SG|DV-U|DV-MA
+N|ABL|SG|DV-U|DV-MINEN
+N|ABL|SG|DV-U|DV-NEISUUS
+N|ABL|SG|DV-U|DV-SKELE
+N|ABL|SG|DV-U|DV-TTA
+N|ABL|SG|PSS|PCP1
+N|ABL|SG|PSS|PCP1|DA-UUS
+N|ABL|SG|PSS|PCP2
+N|ABL|SG|PSS|PCP2|DA-US
+N|ABL|SG|TrunCo
+N|ABL|SG|TrunCo|DA-US
+N|ABL|SG|TrunCo|DA-UUS
+N|ABL|SG|TrunCo|DV-JA
+N|ABL|SG|TrunCo|DV-MINEN
+N|ABL|SG|TrunCo|DV-NTA
+N|ABL|SG|TrunCo|DV-NTI
+N|ABL|SG|TrunCo|DV-U
+N|ABL|SG|TrunCo|DV-US
+N|ABL|SG|TrunCo|DV-US|DV-TTA
+N|ABL|SG|hAn
+N|ABL|SG|kAAn
+N|ABL|SG|kAAn|DV-JA
+N|ABL|SG|kAAn|DV-NTI
+N|ABL|SG|kin
+N|ABL|SG|kin|DA-UUS
+N|ABL|SG|kin|DV-JA
+N|ABL|SG|st-arch
+N|ABL|SG|st-cllq
+N|ABL|SG|st-cllq|DV-MINEN
+N|ABL|SG|st-cllq|DV-US
+N|ABL|SG|st-cllq|TrunCo
+N|ABL|SG|st-derog
+N|ABL|SG|st-hi
+N|ABL|SG|st-slang
+N|ABL|SG|st-slang|DV-JA
+N|ABL|SG|st-vrnc
+N|ADE|PL
+N|ADE|PL|1PL
+N|ADE|PL|1PL|DV-ILE|DV-U
+N|ADE|PL|1PL|DV-MATON|DA-UUS
+N|ADE|PL|1PL|DV-NTA
+N|ADE|PL|1SG
+N|ADE|PL|1SG|DA-UUS
+N|ADE|PL|1SG|DV-JA
+N|ADE|PL|1SG|DV-MA
+N|ADE|PL|1SG|DV-TTA|DV-ELE
+N|ADE|PL|1SG|DV-US
+N|ADE|PL|1SG|PSS|PCP1
+N|ADE|PL|1SG|PSS|PCP1|DA-UUS
+N|ADE|PL|1SG|kin
+N|ADE|PL|1SG|st-cllq
+N|ADE|PL|2PL
+N|ADE|PL|2PL|DV-US
+N|ADE|PL|2SG
+N|ADE|PL|2SG|DV-JA
+N|ADE|PL|2SG|kin
+N|ADE|PL|3
+N|ADE|PL|3|ACT|PCP1
+N|ADE|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|ADE|PL|3|DA-US
+N|ADE|PL|3|DA-UUS
+N|ADE|PL|3|DA-UUS|DN-LLINEN
+N|ADE|PL|3|DA-UUS|DV-VAINEN
+N|ADE|PL|3|DV-ELE
+N|ADE|PL|3|DV-ILE|DV-U
+N|ADE|PL|3|DV-JA
+N|ADE|PL|3|DV-MA
+N|ADE|PL|3|DV-MA|DV-TTA
+N|ADE|PL|3|DV-MINEN
+N|ADE|PL|3|DV-MINEN|DV-U
+N|ADE|PL|3|DV-NTA
+N|ADE|PL|3|DV-U
+N|ADE|PL|3|DV-US
+N|ADE|PL|3|DV-U|DV-ELE
+N|ADE|PL|3|TrunCo
+N|ADE|PL|3|TrunCo|DV-US
+N|ADE|PL|3|kin
+N|ADE|PL|3|st-cllq
+N|ADE|PL|ACT|PCP1
+N|ADE|PL|ACT|PCP1|DA-UUS
+N|ADE|PL|ACT|PCP1|DA-UUS|DV-U
+N|ADE|PL|DA-US
+N|ADE|PL|DA-UUS
+N|ADE|PL|DA-UUS|DN-INEN
+N|ADE|PL|DA-UUS|DN-LLINEN
+N|ADE|PL|DA-UUS|DN-TON
+N|ADE|PL|DA-UUS|DV-MATON
+N|ADE|PL|DA-UUS|DV-VAINEN
+N|ADE|PL|DN-TON|DA-UUS
+N|ADE|PL|DV-ELE
+N|ADE|PL|DV-ELE|DV-JA
+N|ADE|PL|DV-ELE|DV-MINEN
+N|ADE|PL|DV-ILE
+N|ADE|PL|DV-ILE|DV-U
+N|ADE|PL|DV-JA
+N|ADE|PL|DV-JA|DN-TAR
+N|ADE|PL|DV-JA|DV-ILE
+N|ADE|PL|DV-JA|DV-TTA
+N|ADE|PL|DV-JA|DV-TTA|DV-ELE
+N|ADE|PL|DV-JA|DV-UTU
+N|ADE|PL|DV-MA
+N|ADE|PL|DV-MINEN
+N|ADE|PL|DV-MINEN|DV-U
+N|ADE|PL|DV-NA
+N|ADE|PL|DV-NEISUUS
+N|ADE|PL|DV-NTA
+N|ADE|PL|DV-NTAA
+N|ADE|PL|DV-NTAA|DV-MINEN
+N|ADE|PL|DV-NTAA|DV-US
+N|ADE|PL|DV-NTI
+N|ADE|PL|DV-TTA
+N|ADE|PL|DV-TTA|DV-MINEN|DV-ELE
+N|ADE|PL|DV-TTA|DV-U|DV-ELE
+N|ADE|PL|DV-U
+N|ADE|PL|DV-US
+N|ADE|PL|DV-US|DV-TTA
+N|ADE|PL|DV-UTTA|DV-US
+N|ADE|PL|DV-UTU
+N|ADE|PL|DV-UTU|DV-MINEN
+N|ADE|PL|DV-U|DV-ELE
+N|ADE|PL|DV-U|DV-ILE
+N|ADE|PL|DV-U|DV-JA
+N|ADE|PL|DV-U|DV-MA
+N|ADE|PL|DV-U|DV-MINEN
+N|ADE|PL|DV-U|DV-NEISUUS
+N|ADE|PL|DV-U|DV-SKELE
+N|ADE|PL|DV-U|DV-TTA
+N|ADE|PL|PSS|PCP1
+N|ADE|PL|PSS|PCP1|DA-UUS
+N|ADE|PL|PSS|PCP2
+N|ADE|PL|PSS|PCP2|DA-US
+N|ADE|PL|TrunCo
+N|ADE|PL|TrunCo|DA-US
+N|ADE|PL|TrunCo|DA-UUS
+N|ADE|PL|TrunCo|DV-JA
+N|ADE|PL|TrunCo|DV-MINEN
+N|ADE|PL|TrunCo|DV-NTA
+N|ADE|PL|TrunCo|DV-NTI
+N|ADE|PL|TrunCo|DV-U
+N|ADE|PL|TrunCo|DV-US
+N|ADE|PL|TrunCo|DV-US|DV-TTA
+N|ADE|PL|hAn
+N|ADE|PL|kAAn
+N|ADE|PL|kAAn|DV-JA
+N|ADE|PL|kAAn|DV-NTI
+N|ADE|PL|kin
+N|ADE|PL|kin|DA-UUS
+N|ADE|PL|kin|DV-JA
+N|ADE|PL|st-arch
+N|ADE|PL|st-cllq
+N|ADE|PL|st-cllq|DV-MINEN
+N|ADE|PL|st-cllq|DV-US
+N|ADE|PL|st-cllq|TrunCo
+N|ADE|PL|st-derog
+N|ADE|PL|st-hi
+N|ADE|PL|st-slang
+N|ADE|PL|st-slang|DV-JA
+N|ADE|PL|st-vrnc
+N|ADE|SG
+N|ADE|SG|1PL
+N|ADE|SG|1PL|DV-ILE|DV-U
+N|ADE|SG|1PL|DV-MATON|DA-UUS
+N|ADE|SG|1PL|DV-NTA
+N|ADE|SG|1SG
+N|ADE|SG|1SG|DA-UUS
+N|ADE|SG|1SG|DV-JA
+N|ADE|SG|1SG|DV-MA
+N|ADE|SG|1SG|DV-TTA|DV-ELE
+N|ADE|SG|1SG|DV-US
+N|ADE|SG|1SG|PSS|PCP1
+N|ADE|SG|1SG|PSS|PCP1|DA-UUS
+N|ADE|SG|1SG|kin
+N|ADE|SG|1SG|st-cllq
+N|ADE|SG|2PL
+N|ADE|SG|2PL|DV-US
+N|ADE|SG|2SG
+N|ADE|SG|2SG|DV-JA
+N|ADE|SG|2SG|kin
+N|ADE|SG|3
+N|ADE|SG|3|ACT|PCP1
+N|ADE|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|ADE|SG|3|DA-US
+N|ADE|SG|3|DA-UUS
+N|ADE|SG|3|DA-UUS|DN-LLINEN
+N|ADE|SG|3|DA-UUS|DV-VAINEN
+N|ADE|SG|3|DV-ELE
+N|ADE|SG|3|DV-ILE|DV-U
+N|ADE|SG|3|DV-JA
+N|ADE|SG|3|DV-MA
+N|ADE|SG|3|DV-MA|DV-TTA
+N|ADE|SG|3|DV-MINEN
+N|ADE|SG|3|DV-MINEN|DV-U
+N|ADE|SG|3|DV-NTA
+N|ADE|SG|3|DV-U
+N|ADE|SG|3|DV-US
+N|ADE|SG|3|DV-U|DV-ELE
+N|ADE|SG|3|TrunCo
+N|ADE|SG|3|TrunCo|DV-US
+N|ADE|SG|3|kin
+N|ADE|SG|3|st-cllq
+N|ADE|SG|ACT|PCP1
+N|ADE|SG|ACT|PCP1|DA-UUS
+N|ADE|SG|ACT|PCP1|DA-UUS|DV-U
+N|ADE|SG|DA-US
+N|ADE|SG|DA-UUS
+N|ADE|SG|DA-UUS|DN-INEN
+N|ADE|SG|DA-UUS|DN-LLINEN
+N|ADE|SG|DA-UUS|DN-TON
+N|ADE|SG|DA-UUS|DV-MATON
+N|ADE|SG|DA-UUS|DV-VAINEN
+N|ADE|SG|DN-TON|DA-UUS
+N|ADE|SG|DV-ELE
+N|ADE|SG|DV-ELE|DV-JA
+N|ADE|SG|DV-ELE|DV-MINEN
+N|ADE|SG|DV-ILE
+N|ADE|SG|DV-ILE|DV-U
+N|ADE|SG|DV-JA
+N|ADE|SG|DV-JA|DN-TAR
+N|ADE|SG|DV-JA|DV-ILE
+N|ADE|SG|DV-JA|DV-TTA
+N|ADE|SG|DV-JA|DV-TTA|DV-ELE
+N|ADE|SG|DV-JA|DV-UTU
+N|ADE|SG|DV-MA
+N|ADE|SG|DV-MINEN
+N|ADE|SG|DV-MINEN|DV-U
+N|ADE|SG|DV-NA
+N|ADE|SG|DV-NEISUUS
+N|ADE|SG|DV-NTA
+N|ADE|SG|DV-NTAA
+N|ADE|SG|DV-NTAA|DV-MINEN
+N|ADE|SG|DV-NTAA|DV-US
+N|ADE|SG|DV-NTI
+N|ADE|SG|DV-TTA
+N|ADE|SG|DV-TTA|DV-MINEN|DV-ELE
+N|ADE|SG|DV-TTA|DV-U|DV-ELE
+N|ADE|SG|DV-U
+N|ADE|SG|DV-US
+N|ADE|SG|DV-US|DV-TTA
+N|ADE|SG|DV-UTTA|DV-US
+N|ADE|SG|DV-UTU
+N|ADE|SG|DV-UTU|DV-MINEN
+N|ADE|SG|DV-U|DV-ELE
+N|ADE|SG|DV-U|DV-ILE
+N|ADE|SG|DV-U|DV-JA
+N|ADE|SG|DV-U|DV-MA
+N|ADE|SG|DV-U|DV-MINEN
+N|ADE|SG|DV-U|DV-NEISUUS
+N|ADE|SG|DV-U|DV-SKELE
+N|ADE|SG|DV-U|DV-TTA
+N|ADE|SG|PSS|PCP1
+N|ADE|SG|PSS|PCP1|DA-UUS
+N|ADE|SG|PSS|PCP2
+N|ADE|SG|PSS|PCP2|DA-US
+N|ADE|SG|TrunCo
+N|ADE|SG|TrunCo|DA-US
+N|ADE|SG|TrunCo|DA-UUS
+N|ADE|SG|TrunCo|DV-JA
+N|ADE|SG|TrunCo|DV-MINEN
+N|ADE|SG|TrunCo|DV-NTA
+N|ADE|SG|TrunCo|DV-NTI
+N|ADE|SG|TrunCo|DV-U
+N|ADE|SG|TrunCo|DV-US
+N|ADE|SG|TrunCo|DV-US|DV-TTA
+N|ADE|SG|hAn
+N|ADE|SG|kAAn
+N|ADE|SG|kAAn|DV-JA
+N|ADE|SG|kAAn|DV-NTI
+N|ADE|SG|kin
+N|ADE|SG|kin|DA-UUS
+N|ADE|SG|kin|DV-JA
+N|ADE|SG|st-arch
+N|ADE|SG|st-cllq
+N|ADE|SG|st-cllq|DV-MINEN
+N|ADE|SG|st-cllq|DV-US
+N|ADE|SG|st-cllq|TrunCo
+N|ADE|SG|st-derog
+N|ADE|SG|st-hi
+N|ADE|SG|st-slang
+N|ADE|SG|st-slang|DV-JA
+N|ADE|SG|st-vrnc
+N|ALL|PL
+N|ALL|PL|1PL
+N|ALL|PL|1PL|DV-ILE|DV-U
+N|ALL|PL|1PL|DV-MATON|DA-UUS
+N|ALL|PL|1PL|DV-NTA
+N|ALL|PL|1SG
+N|ALL|PL|1SG|DA-UUS
+N|ALL|PL|1SG|DV-JA
+N|ALL|PL|1SG|DV-MA
+N|ALL|PL|1SG|DV-TTA|DV-ELE
+N|ALL|PL|1SG|DV-US
+N|ALL|PL|1SG|PSS|PCP1
+N|ALL|PL|1SG|PSS|PCP1|DA-UUS
+N|ALL|PL|1SG|kin
+N|ALL|PL|1SG|st-cllq
+N|ALL|PL|2PL
+N|ALL|PL|2PL|DV-US
+N|ALL|PL|2SG
+N|ALL|PL|2SG|DV-JA
+N|ALL|PL|2SG|kin
+N|ALL|PL|3
+N|ALL|PL|3|ACT|PCP1
+N|ALL|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|ALL|PL|3|DA-US
+N|ALL|PL|3|DA-UUS
+N|ALL|PL|3|DA-UUS|DN-LLINEN
+N|ALL|PL|3|DA-UUS|DV-VAINEN
+N|ALL|PL|3|DV-ELE
+N|ALL|PL|3|DV-ILE|DV-U
+N|ALL|PL|3|DV-JA
+N|ALL|PL|3|DV-MA
+N|ALL|PL|3|DV-MA|DV-TTA
+N|ALL|PL|3|DV-MINEN
+N|ALL|PL|3|DV-MINEN|DV-U
+N|ALL|PL|3|DV-NTA
+N|ALL|PL|3|DV-U
+N|ALL|PL|3|DV-US
+N|ALL|PL|3|DV-U|DV-ELE
+N|ALL|PL|3|TrunCo
+N|ALL|PL|3|TrunCo|DV-US
+N|ALL|PL|3|kin
+N|ALL|PL|3|st-cllq
+N|ALL|PL|ACT|PCP1
+N|ALL|PL|ACT|PCP1|DA-UUS
+N|ALL|PL|ACT|PCP1|DA-UUS|DV-U
+N|ALL|PL|DA-US
+N|ALL|PL|DA-UUS
+N|ALL|PL|DA-UUS|DN-INEN
+N|ALL|PL|DA-UUS|DN-LLINEN
+N|ALL|PL|DA-UUS|DN-TON
+N|ALL|PL|DA-UUS|DV-MATON
+N|ALL|PL|DA-UUS|DV-VAINEN
+N|ALL|PL|DN-TON|DA-UUS
+N|ALL|PL|DV-ELE
+N|ALL|PL|DV-ELE|DV-JA
+N|ALL|PL|DV-ELE|DV-MINEN
+N|ALL|PL|DV-ILE
+N|ALL|PL|DV-ILE|DV-U
+N|ALL|PL|DV-JA
+N|ALL|PL|DV-JA|DN-TAR
+N|ALL|PL|DV-JA|DV-ILE
+N|ALL|PL|DV-JA|DV-TTA
+N|ALL|PL|DV-JA|DV-TTA|DV-ELE
+N|ALL|PL|DV-JA|DV-UTU
+N|ALL|PL|DV-MA
+N|ALL|PL|DV-MINEN
+N|ALL|PL|DV-MINEN|DV-U
+N|ALL|PL|DV-NA
+N|ALL|PL|DV-NEISUUS
+N|ALL|PL|DV-NTA
+N|ALL|PL|DV-NTAA
+N|ALL|PL|DV-NTAA|DV-MINEN
+N|ALL|PL|DV-NTAA|DV-US
+N|ALL|PL|DV-NTI
+N|ALL|PL|DV-TTA
+N|ALL|PL|DV-TTA|DV-MINEN|DV-ELE
+N|ALL|PL|DV-TTA|DV-U|DV-ELE
+N|ALL|PL|DV-U
+N|ALL|PL|DV-US
+N|ALL|PL|DV-US|DV-TTA
+N|ALL|PL|DV-UTTA|DV-US
+N|ALL|PL|DV-UTU
+N|ALL|PL|DV-UTU|DV-MINEN
+N|ALL|PL|DV-U|DV-ELE
+N|ALL|PL|DV-U|DV-ILE
+N|ALL|PL|DV-U|DV-JA
+N|ALL|PL|DV-U|DV-MA
+N|ALL|PL|DV-U|DV-MINEN
+N|ALL|PL|DV-U|DV-NEISUUS
+N|ALL|PL|DV-U|DV-SKELE
+N|ALL|PL|DV-U|DV-TTA
+N|ALL|PL|PSS|PCP1
+N|ALL|PL|PSS|PCP1|DA-UUS
+N|ALL|PL|PSS|PCP2
+N|ALL|PL|PSS|PCP2|DA-US
+N|ALL|PL|TrunCo
+N|ALL|PL|TrunCo|DA-US
+N|ALL|PL|TrunCo|DA-UUS
+N|ALL|PL|TrunCo|DV-JA
+N|ALL|PL|TrunCo|DV-MINEN
+N|ALL|PL|TrunCo|DV-NTA
+N|ALL|PL|TrunCo|DV-NTI
+N|ALL|PL|TrunCo|DV-U
+N|ALL|PL|TrunCo|DV-US
+N|ALL|PL|TrunCo|DV-US|DV-TTA
+N|ALL|PL|hAn
+N|ALL|PL|kAAn
+N|ALL|PL|kAAn|DV-JA
+N|ALL|PL|kAAn|DV-NTI
+N|ALL|PL|kin
+N|ALL|PL|kin|DA-UUS
+N|ALL|PL|kin|DV-JA
+N|ALL|PL|st-arch
+N|ALL|PL|st-cllq
+N|ALL|PL|st-cllq|DV-MINEN
+N|ALL|PL|st-cllq|DV-US
+N|ALL|PL|st-cllq|TrunCo
+N|ALL|PL|st-derog
+N|ALL|PL|st-hi
+N|ALL|PL|st-slang
+N|ALL|PL|st-slang|DV-JA
+N|ALL|PL|st-vrnc
+N|ALL|SG
+N|ALL|SG|1PL
+N|ALL|SG|1PL|DV-ILE|DV-U
+N|ALL|SG|1PL|DV-MATON|DA-UUS
+N|ALL|SG|1PL|DV-NTA
+N|ALL|SG|1SG
+N|ALL|SG|1SG|DA-UUS
+N|ALL|SG|1SG|DV-JA
+N|ALL|SG|1SG|DV-MA
+N|ALL|SG|1SG|DV-TTA|DV-ELE
+N|ALL|SG|1SG|DV-US
+N|ALL|SG|1SG|PSS|PCP1
+N|ALL|SG|1SG|PSS|PCP1|DA-UUS
+N|ALL|SG|1SG|kin
+N|ALL|SG|1SG|st-cllq
+N|ALL|SG|2PL
+N|ALL|SG|2PL|DV-US
+N|ALL|SG|2SG
+N|ALL|SG|2SG|DV-JA
+N|ALL|SG|2SG|kin
+N|ALL|SG|3
+N|ALL|SG|3|ACT|PCP1
+N|ALL|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|ALL|SG|3|DA-US
+N|ALL|SG|3|DA-UUS
+N|ALL|SG|3|DA-UUS|DN-LLINEN
+N|ALL|SG|3|DA-UUS|DV-VAINEN
+N|ALL|SG|3|DV-ELE
+N|ALL|SG|3|DV-ILE|DV-U
+N|ALL|SG|3|DV-JA
+N|ALL|SG|3|DV-MA
+N|ALL|SG|3|DV-MA|DV-TTA
+N|ALL|SG|3|DV-MINEN
+N|ALL|SG|3|DV-MINEN|DV-U
+N|ALL|SG|3|DV-NTA
+N|ALL|SG|3|DV-U
+N|ALL|SG|3|DV-US
+N|ALL|SG|3|DV-U|DV-ELE
+N|ALL|SG|3|TrunCo
+N|ALL|SG|3|TrunCo|DV-US
+N|ALL|SG|3|kin
+N|ALL|SG|3|st-cllq
+N|ALL|SG|ACT|PCP1
+N|ALL|SG|ACT|PCP1|DA-UUS
+N|ALL|SG|ACT|PCP1|DA-UUS|DV-U
+N|ALL|SG|DA-US
+N|ALL|SG|DA-UUS
+N|ALL|SG|DA-UUS|DN-INEN
+N|ALL|SG|DA-UUS|DN-LLINEN
+N|ALL|SG|DA-UUS|DN-TON
+N|ALL|SG|DA-UUS|DV-MATON
+N|ALL|SG|DA-UUS|DV-VAINEN
+N|ALL|SG|DN-TON|DA-UUS
+N|ALL|SG|DV-ELE
+N|ALL|SG|DV-ELE|DV-JA
+N|ALL|SG|DV-ELE|DV-MINEN
+N|ALL|SG|DV-ILE
+N|ALL|SG|DV-ILE|DV-U
+N|ALL|SG|DV-JA
+N|ALL|SG|DV-JA|DN-TAR
+N|ALL|SG|DV-JA|DV-ILE
+N|ALL|SG|DV-JA|DV-TTA
+N|ALL|SG|DV-JA|DV-TTA|DV-ELE
+N|ALL|SG|DV-JA|DV-UTU
+N|ALL|SG|DV-MA
+N|ALL|SG|DV-MINEN
+N|ALL|SG|DV-MINEN|DV-U
+N|ALL|SG|DV-NA
+N|ALL|SG|DV-NEISUUS
+N|ALL|SG|DV-NTA
+N|ALL|SG|DV-NTAA
+N|ALL|SG|DV-NTAA|DV-MINEN
+N|ALL|SG|DV-NTAA|DV-US
+N|ALL|SG|DV-NTI
+N|ALL|SG|DV-TTA
+N|ALL|SG|DV-TTA|DV-MINEN|DV-ELE
+N|ALL|SG|DV-TTA|DV-U|DV-ELE
+N|ALL|SG|DV-U
+N|ALL|SG|DV-US
+N|ALL|SG|DV-US|DV-TTA
+N|ALL|SG|DV-UTTA|DV-US
+N|ALL|SG|DV-UTU
+N|ALL|SG|DV-UTU|DV-MINEN
+N|ALL|SG|DV-U|DV-ELE
+N|ALL|SG|DV-U|DV-ILE
+N|ALL|SG|DV-U|DV-JA
+N|ALL|SG|DV-U|DV-MA
+N|ALL|SG|DV-U|DV-MINEN
+N|ALL|SG|DV-U|DV-NEISUUS
+N|ALL|SG|DV-U|DV-SKELE
+N|ALL|SG|DV-U|DV-TTA
+N|ALL|SG|PSS|PCP1
+N|ALL|SG|PSS|PCP1|DA-UUS
+N|ALL|SG|PSS|PCP2
+N|ALL|SG|PSS|PCP2|DA-US
+N|ALL|SG|TrunCo
+N|ALL|SG|TrunCo|DA-US
+N|ALL|SG|TrunCo|DA-UUS
+N|ALL|SG|TrunCo|DV-JA
+N|ALL|SG|TrunCo|DV-MINEN
+N|ALL|SG|TrunCo|DV-NTA
+N|ALL|SG|TrunCo|DV-NTI
+N|ALL|SG|TrunCo|DV-U
+N|ALL|SG|TrunCo|DV-US
+N|ALL|SG|TrunCo|DV-US|DV-TTA
+N|ALL|SG|hAn
+N|ALL|SG|kAAn
+N|ALL|SG|kAAn|DV-JA
+N|ALL|SG|kAAn|DV-NTI
+N|ALL|SG|kin
+N|ALL|SG|kin|DA-UUS
+N|ALL|SG|kin|DV-JA
+N|ALL|SG|st-arch
+N|ALL|SG|st-cllq
+N|ALL|SG|st-cllq|DV-MINEN
+N|ALL|SG|st-cllq|DV-US
+N|ALL|SG|st-cllq|TrunCo
+N|ALL|SG|st-derog
+N|ALL|SG|st-hi
+N|ALL|SG|st-slang
+N|ALL|SG|st-slang|DV-JA
+N|ALL|SG|st-vrnc
+N|CMT
+N|CMT|3
+N|CMT|3|DV-JA
+N|CMT|3|DV-NTI
+N|CMT|3|DV-US
+N|CMT|PL
+N|CMT|PL|1PL
+N|CMT|PL|1PL|DV-ILE|DV-U
+N|CMT|PL|1PL|DV-MATON|DA-UUS
+N|CMT|PL|1PL|DV-NTA
+N|CMT|PL|1SG
+N|CMT|PL|1SG|DA-UUS
+N|CMT|PL|1SG|DV-JA
+N|CMT|PL|1SG|DV-MA
+N|CMT|PL|1SG|DV-TTA|DV-ELE
+N|CMT|PL|1SG|DV-US
+N|CMT|PL|1SG|PSS|PCP1
+N|CMT|PL|1SG|PSS|PCP1|DA-UUS
+N|CMT|PL|1SG|kin
+N|CMT|PL|1SG|st-cllq
+N|CMT|PL|2PL
+N|CMT|PL|2PL|DV-US
+N|CMT|PL|2SG
+N|CMT|PL|2SG|DV-JA
+N|CMT|PL|2SG|kin
+N|CMT|PL|3
+N|CMT|PL|3|ACT|PCP1
+N|CMT|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|CMT|PL|3|DA-US
+N|CMT|PL|3|DA-UUS
+N|CMT|PL|3|DA-UUS|DN-LLINEN
+N|CMT|PL|3|DA-UUS|DV-VAINEN
+N|CMT|PL|3|DV-ELE
+N|CMT|PL|3|DV-ILE|DV-U
+N|CMT|PL|3|DV-JA
+N|CMT|PL|3|DV-MA
+N|CMT|PL|3|DV-MA|DV-TTA
+N|CMT|PL|3|DV-MINEN
+N|CMT|PL|3|DV-MINEN|DV-U
+N|CMT|PL|3|DV-NTA
+N|CMT|PL|3|DV-U
+N|CMT|PL|3|DV-US
+N|CMT|PL|3|DV-U|DV-ELE
+N|CMT|PL|3|TrunCo
+N|CMT|PL|3|TrunCo|DV-US
+N|CMT|PL|3|kin
+N|CMT|PL|3|st-cllq
+N|CMT|PL|ACT|PCP1
+N|CMT|PL|ACT|PCP1|DA-UUS
+N|CMT|PL|ACT|PCP1|DA-UUS|DV-U
+N|CMT|PL|DA-US
+N|CMT|PL|DA-UUS
+N|CMT|PL|DA-UUS|DN-INEN
+N|CMT|PL|DA-UUS|DN-LLINEN
+N|CMT|PL|DA-UUS|DN-TON
+N|CMT|PL|DA-UUS|DV-MATON
+N|CMT|PL|DA-UUS|DV-VAINEN
+N|CMT|PL|DN-TON|DA-UUS
+N|CMT|PL|DV-ELE
+N|CMT|PL|DV-ELE|DV-JA
+N|CMT|PL|DV-ELE|DV-MINEN
+N|CMT|PL|DV-ILE
+N|CMT|PL|DV-ILE|DV-U
+N|CMT|PL|DV-JA
+N|CMT|PL|DV-JA|DN-TAR
+N|CMT|PL|DV-JA|DV-ILE
+N|CMT|PL|DV-JA|DV-TTA
+N|CMT|PL|DV-JA|DV-TTA|DV-ELE
+N|CMT|PL|DV-JA|DV-UTU
+N|CMT|PL|DV-MA
+N|CMT|PL|DV-MINEN
+N|CMT|PL|DV-MINEN|DV-U
+N|CMT|PL|DV-NA
+N|CMT|PL|DV-NEISUUS
+N|CMT|PL|DV-NTA
+N|CMT|PL|DV-NTAA
+N|CMT|PL|DV-NTAA|DV-MINEN
+N|CMT|PL|DV-NTAA|DV-US
+N|CMT|PL|DV-NTI
+N|CMT|PL|DV-TTA
+N|CMT|PL|DV-TTA|DV-MINEN|DV-ELE
+N|CMT|PL|DV-TTA|DV-U|DV-ELE
+N|CMT|PL|DV-U
+N|CMT|PL|DV-US
+N|CMT|PL|DV-US|DV-TTA
+N|CMT|PL|DV-UTTA|DV-US
+N|CMT|PL|DV-UTU
+N|CMT|PL|DV-UTU|DV-MINEN
+N|CMT|PL|DV-U|DV-ELE
+N|CMT|PL|DV-U|DV-ILE
+N|CMT|PL|DV-U|DV-JA
+N|CMT|PL|DV-U|DV-MA
+N|CMT|PL|DV-U|DV-MINEN
+N|CMT|PL|DV-U|DV-NEISUUS
+N|CMT|PL|DV-U|DV-SKELE
+N|CMT|PL|DV-U|DV-TTA
+N|CMT|PL|PSS|PCP1
+N|CMT|PL|PSS|PCP1|DA-UUS
+N|CMT|PL|PSS|PCP2
+N|CMT|PL|PSS|PCP2|DA-US
+N|CMT|PL|TrunCo
+N|CMT|PL|TrunCo|DA-US
+N|CMT|PL|TrunCo|DA-UUS
+N|CMT|PL|TrunCo|DV-JA
+N|CMT|PL|TrunCo|DV-MINEN
+N|CMT|PL|TrunCo|DV-NTA
+N|CMT|PL|TrunCo|DV-NTI
+N|CMT|PL|TrunCo|DV-U
+N|CMT|PL|TrunCo|DV-US
+N|CMT|PL|TrunCo|DV-US|DV-TTA
+N|CMT|PL|hAn
+N|CMT|PL|kAAn
+N|CMT|PL|kAAn|DV-JA
+N|CMT|PL|kAAn|DV-NTI
+N|CMT|PL|kin
+N|CMT|PL|kin|DA-UUS
+N|CMT|PL|kin|DV-JA
+N|CMT|PL|st-arch
+N|CMT|PL|st-cllq
+N|CMT|PL|st-cllq|DV-MINEN
+N|CMT|PL|st-cllq|DV-US
+N|CMT|PL|st-cllq|TrunCo
+N|CMT|PL|st-derog
+N|CMT|PL|st-hi
+N|CMT|PL|st-slang
+N|CMT|PL|st-slang|DV-JA
+N|CMT|PL|st-vrnc
+N|CMT|SG
+N|CMT|SG|1PL
+N|CMT|SG|1PL|DV-ILE|DV-U
+N|CMT|SG|1PL|DV-MATON|DA-UUS
+N|CMT|SG|1PL|DV-NTA
+N|CMT|SG|1SG
+N|CMT|SG|1SG|DA-UUS
+N|CMT|SG|1SG|DV-JA
+N|CMT|SG|1SG|DV-MA
+N|CMT|SG|1SG|DV-TTA|DV-ELE
+N|CMT|SG|1SG|DV-US
+N|CMT|SG|1SG|PSS|PCP1
+N|CMT|SG|1SG|PSS|PCP1|DA-UUS
+N|CMT|SG|1SG|kin
+N|CMT|SG|1SG|st-cllq
+N|CMT|SG|2PL
+N|CMT|SG|2PL|DV-US
+N|CMT|SG|2SG
+N|CMT|SG|2SG|DV-JA
+N|CMT|SG|2SG|kin
+N|CMT|SG|3
+N|CMT|SG|3|ACT|PCP1
+N|CMT|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|CMT|SG|3|DA-US
+N|CMT|SG|3|DA-UUS
+N|CMT|SG|3|DA-UUS|DN-LLINEN
+N|CMT|SG|3|DA-UUS|DV-VAINEN
+N|CMT|SG|3|DV-ELE
+N|CMT|SG|3|DV-ILE|DV-U
+N|CMT|SG|3|DV-JA
+N|CMT|SG|3|DV-MA
+N|CMT|SG|3|DV-MA|DV-TTA
+N|CMT|SG|3|DV-MINEN
+N|CMT|SG|3|DV-MINEN|DV-U
+N|CMT|SG|3|DV-NTA
+N|CMT|SG|3|DV-U
+N|CMT|SG|3|DV-US
+N|CMT|SG|3|DV-U|DV-ELE
+N|CMT|SG|3|TrunCo
+N|CMT|SG|3|TrunCo|DV-US
+N|CMT|SG|3|kin
+N|CMT|SG|3|st-cllq
+N|CMT|SG|ACT|PCP1
+N|CMT|SG|ACT|PCP1|DA-UUS
+N|CMT|SG|ACT|PCP1|DA-UUS|DV-U
+N|CMT|SG|DA-US
+N|CMT|SG|DA-UUS
+N|CMT|SG|DA-UUS|DN-INEN
+N|CMT|SG|DA-UUS|DN-LLINEN
+N|CMT|SG|DA-UUS|DN-TON
+N|CMT|SG|DA-UUS|DV-MATON
+N|CMT|SG|DA-UUS|DV-VAINEN
+N|CMT|SG|DN-TON|DA-UUS
+N|CMT|SG|DV-ELE
+N|CMT|SG|DV-ELE|DV-JA
+N|CMT|SG|DV-ELE|DV-MINEN
+N|CMT|SG|DV-ILE
+N|CMT|SG|DV-ILE|DV-U
+N|CMT|SG|DV-JA
+N|CMT|SG|DV-JA|DN-TAR
+N|CMT|SG|DV-JA|DV-ILE
+N|CMT|SG|DV-JA|DV-TTA
+N|CMT|SG|DV-JA|DV-TTA|DV-ELE
+N|CMT|SG|DV-JA|DV-UTU
+N|CMT|SG|DV-MA
+N|CMT|SG|DV-MINEN
+N|CMT|SG|DV-MINEN|DV-U
+N|CMT|SG|DV-NA
+N|CMT|SG|DV-NEISUUS
+N|CMT|SG|DV-NTA
+N|CMT|SG|DV-NTAA
+N|CMT|SG|DV-NTAA|DV-MINEN
+N|CMT|SG|DV-NTAA|DV-US
+N|CMT|SG|DV-NTI
+N|CMT|SG|DV-TTA
+N|CMT|SG|DV-TTA|DV-MINEN|DV-ELE
+N|CMT|SG|DV-TTA|DV-U|DV-ELE
+N|CMT|SG|DV-U
+N|CMT|SG|DV-US
+N|CMT|SG|DV-US|DV-TTA
+N|CMT|SG|DV-UTTA|DV-US
+N|CMT|SG|DV-UTU
+N|CMT|SG|DV-UTU|DV-MINEN
+N|CMT|SG|DV-U|DV-ELE
+N|CMT|SG|DV-U|DV-ILE
+N|CMT|SG|DV-U|DV-JA
+N|CMT|SG|DV-U|DV-MA
+N|CMT|SG|DV-U|DV-MINEN
+N|CMT|SG|DV-U|DV-NEISUUS
+N|CMT|SG|DV-U|DV-SKELE
+N|CMT|SG|DV-U|DV-TTA
+N|CMT|SG|PSS|PCP1
+N|CMT|SG|PSS|PCP1|DA-UUS
+N|CMT|SG|PSS|PCP2
+N|CMT|SG|PSS|PCP2|DA-US
+N|CMT|SG|TrunCo
+N|CMT|SG|TrunCo|DA-US
+N|CMT|SG|TrunCo|DA-UUS
+N|CMT|SG|TrunCo|DV-JA
+N|CMT|SG|TrunCo|DV-MINEN
+N|CMT|SG|TrunCo|DV-NTA
+N|CMT|SG|TrunCo|DV-NTI
+N|CMT|SG|TrunCo|DV-U
+N|CMT|SG|TrunCo|DV-US
+N|CMT|SG|TrunCo|DV-US|DV-TTA
+N|CMT|SG|hAn
+N|CMT|SG|kAAn
+N|CMT|SG|kAAn|DV-JA
+N|CMT|SG|kAAn|DV-NTI
+N|CMT|SG|kin
+N|CMT|SG|kin|DA-UUS
+N|CMT|SG|kin|DV-JA
+N|CMT|SG|st-arch
+N|CMT|SG|st-cllq
+N|CMT|SG|st-cllq|DV-MINEN
+N|CMT|SG|st-cllq|DV-US
+N|CMT|SG|st-cllq|TrunCo
+N|CMT|SG|st-derog
+N|CMT|SG|st-hi
+N|CMT|SG|st-slang
+N|CMT|SG|st-slang|DV-JA
+N|CMT|SG|st-vrnc
+N|ELA|PL
+N|ELA|PL|1PL
+N|ELA|PL|1PL|DV-ILE|DV-U
+N|ELA|PL|1PL|DV-MATON|DA-UUS
+N|ELA|PL|1PL|DV-NTA
+N|ELA|PL|1SG
+N|ELA|PL|1SG|DA-UUS
+N|ELA|PL|1SG|DV-JA
+N|ELA|PL|1SG|DV-MA
+N|ELA|PL|1SG|DV-TTA|DV-ELE
+N|ELA|PL|1SG|DV-US
+N|ELA|PL|1SG|PSS|PCP1
+N|ELA|PL|1SG|PSS|PCP1|DA-UUS
+N|ELA|PL|1SG|kin
+N|ELA|PL|1SG|st-cllq
+N|ELA|PL|2PL
+N|ELA|PL|2PL|DV-US
+N|ELA|PL|2SG
+N|ELA|PL|2SG|DV-JA
+N|ELA|PL|2SG|kin
+N|ELA|PL|3
+N|ELA|PL|3|ACT|PCP1
+N|ELA|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|ELA|PL|3|DA-US
+N|ELA|PL|3|DA-UUS
+N|ELA|PL|3|DA-UUS|DN-LLINEN
+N|ELA|PL|3|DA-UUS|DV-VAINEN
+N|ELA|PL|3|DV-ELE
+N|ELA|PL|3|DV-ILE|DV-U
+N|ELA|PL|3|DV-JA
+N|ELA|PL|3|DV-MA
+N|ELA|PL|3|DV-MA|DV-TTA
+N|ELA|PL|3|DV-MINEN
+N|ELA|PL|3|DV-MINEN|DV-U
+N|ELA|PL|3|DV-NTA
+N|ELA|PL|3|DV-U
+N|ELA|PL|3|DV-US
+N|ELA|PL|3|DV-U|DV-ELE
+N|ELA|PL|3|TrunCo
+N|ELA|PL|3|TrunCo|DV-US
+N|ELA|PL|3|kin
+N|ELA|PL|3|st-cllq
+N|ELA|PL|ACT|PCP1
+N|ELA|PL|ACT|PCP1|DA-UUS
+N|ELA|PL|ACT|PCP1|DA-UUS|DV-U
+N|ELA|PL|DA-US
+N|ELA|PL|DA-UUS
+N|ELA|PL|DA-UUS|DN-INEN
+N|ELA|PL|DA-UUS|DN-LLINEN
+N|ELA|PL|DA-UUS|DN-TON
+N|ELA|PL|DA-UUS|DV-MATON
+N|ELA|PL|DA-UUS|DV-VAINEN
+N|ELA|PL|DN-TON|DA-UUS
+N|ELA|PL|DV-ELE
+N|ELA|PL|DV-ELE|DV-JA
+N|ELA|PL|DV-ELE|DV-MINEN
+N|ELA|PL|DV-ILE
+N|ELA|PL|DV-ILE|DV-U
+N|ELA|PL|DV-JA
+N|ELA|PL|DV-JA|DN-TAR
+N|ELA|PL|DV-JA|DV-ILE
+N|ELA|PL|DV-JA|DV-TTA
+N|ELA|PL|DV-JA|DV-TTA|DV-ELE
+N|ELA|PL|DV-JA|DV-UTU
+N|ELA|PL|DV-MA
+N|ELA|PL|DV-MINEN
+N|ELA|PL|DV-MINEN|DV-U
+N|ELA|PL|DV-NA
+N|ELA|PL|DV-NEISUUS
+N|ELA|PL|DV-NTA
+N|ELA|PL|DV-NTAA
+N|ELA|PL|DV-NTAA|DV-MINEN
+N|ELA|PL|DV-NTAA|DV-US
+N|ELA|PL|DV-NTI
+N|ELA|PL|DV-TTA
+N|ELA|PL|DV-TTA|DV-MINEN|DV-ELE
+N|ELA|PL|DV-TTA|DV-U|DV-ELE
+N|ELA|PL|DV-U
+N|ELA|PL|DV-US
+N|ELA|PL|DV-US|DV-TTA
+N|ELA|PL|DV-UTTA|DV-US
+N|ELA|PL|DV-UTU
+N|ELA|PL|DV-UTU|DV-MINEN
+N|ELA|PL|DV-U|DV-ELE
+N|ELA|PL|DV-U|DV-ILE
+N|ELA|PL|DV-U|DV-JA
+N|ELA|PL|DV-U|DV-MA
+N|ELA|PL|DV-U|DV-MINEN
+N|ELA|PL|DV-U|DV-NEISUUS
+N|ELA|PL|DV-U|DV-SKELE
+N|ELA|PL|DV-U|DV-TTA
+N|ELA|PL|PSS|PCP1
+N|ELA|PL|PSS|PCP1|DA-UUS
+N|ELA|PL|PSS|PCP2
+N|ELA|PL|PSS|PCP2|DA-US
+N|ELA|PL|TrunCo
+N|ELA|PL|TrunCo|DA-US
+N|ELA|PL|TrunCo|DA-UUS
+N|ELA|PL|TrunCo|DV-JA
+N|ELA|PL|TrunCo|DV-MINEN
+N|ELA|PL|TrunCo|DV-NTA
+N|ELA|PL|TrunCo|DV-NTI
+N|ELA|PL|TrunCo|DV-U
+N|ELA|PL|TrunCo|DV-US
+N|ELA|PL|TrunCo|DV-US|DV-TTA
+N|ELA|PL|hAn
+N|ELA|PL|kAAn
+N|ELA|PL|kAAn|DV-JA
+N|ELA|PL|kAAn|DV-NTI
+N|ELA|PL|kin
+N|ELA|PL|kin|DA-UUS
+N|ELA|PL|kin|DV-JA
+N|ELA|PL|st-arch
+N|ELA|PL|st-cllq
+N|ELA|PL|st-cllq|DV-MINEN
+N|ELA|PL|st-cllq|DV-US
+N|ELA|PL|st-cllq|TrunCo
+N|ELA|PL|st-derog
+N|ELA|PL|st-hi
+N|ELA|PL|st-slang
+N|ELA|PL|st-slang|DV-JA
+N|ELA|PL|st-vrnc
+N|ELA|SG
+N|ELA|SG|1PL
+N|ELA|SG|1PL|DV-ILE|DV-U
+N|ELA|SG|1PL|DV-MATON|DA-UUS
+N|ELA|SG|1PL|DV-NTA
+N|ELA|SG|1SG
+N|ELA|SG|1SG|DA-UUS
+N|ELA|SG|1SG|DV-JA
+N|ELA|SG|1SG|DV-MA
+N|ELA|SG|1SG|DV-TTA|DV-ELE
+N|ELA|SG|1SG|DV-US
+N|ELA|SG|1SG|PSS|PCP1
+N|ELA|SG|1SG|PSS|PCP1|DA-UUS
+N|ELA|SG|1SG|kin
+N|ELA|SG|1SG|st-cllq
+N|ELA|SG|2PL
+N|ELA|SG|2PL|DV-US
+N|ELA|SG|2SG
+N|ELA|SG|2SG|DV-JA
+N|ELA|SG|2SG|kin
+N|ELA|SG|3
+N|ELA|SG|3|ACT|PCP1
+N|ELA|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|ELA|SG|3|DA-US
+N|ELA|SG|3|DA-UUS
+N|ELA|SG|3|DA-UUS|DN-LLINEN
+N|ELA|SG|3|DA-UUS|DV-VAINEN
+N|ELA|SG|3|DV-ELE
+N|ELA|SG|3|DV-ILE|DV-U
+N|ELA|SG|3|DV-JA
+N|ELA|SG|3|DV-MA
+N|ELA|SG|3|DV-MA|DV-TTA
+N|ELA|SG|3|DV-MINEN
+N|ELA|SG|3|DV-MINEN|DV-U
+N|ELA|SG|3|DV-NTA
+N|ELA|SG|3|DV-U
+N|ELA|SG|3|DV-US
+N|ELA|SG|3|DV-U|DV-ELE
+N|ELA|SG|3|TrunCo
+N|ELA|SG|3|TrunCo|DV-US
+N|ELA|SG|3|kin
+N|ELA|SG|3|st-cllq
+N|ELA|SG|ACT|PCP1
+N|ELA|SG|ACT|PCP1|DA-UUS
+N|ELA|SG|ACT|PCP1|DA-UUS|DV-U
+N|ELA|SG|DA-US
+N|ELA|SG|DA-UUS
+N|ELA|SG|DA-UUS|DN-INEN
+N|ELA|SG|DA-UUS|DN-LLINEN
+N|ELA|SG|DA-UUS|DN-TON
+N|ELA|SG|DA-UUS|DV-MATON
+N|ELA|SG|DA-UUS|DV-VAINEN
+N|ELA|SG|DN-TON|DA-UUS
+N|ELA|SG|DV-ELE
+N|ELA|SG|DV-ELE|DV-JA
+N|ELA|SG|DV-ELE|DV-MINEN
+N|ELA|SG|DV-ILE
+N|ELA|SG|DV-ILE|DV-U
+N|ELA|SG|DV-JA
+N|ELA|SG|DV-JA|DN-TAR
+N|ELA|SG|DV-JA|DV-ILE
+N|ELA|SG|DV-JA|DV-TTA
+N|ELA|SG|DV-JA|DV-TTA|DV-ELE
+N|ELA|SG|DV-JA|DV-UTU
+N|ELA|SG|DV-MA
+N|ELA|SG|DV-MINEN
+N|ELA|SG|DV-MINEN|DV-U
+N|ELA|SG|DV-NA
+N|ELA|SG|DV-NEISUUS
+N|ELA|SG|DV-NTA
+N|ELA|SG|DV-NTAA
+N|ELA|SG|DV-NTAA|DV-MINEN
+N|ELA|SG|DV-NTAA|DV-US
+N|ELA|SG|DV-NTI
+N|ELA|SG|DV-TTA
+N|ELA|SG|DV-TTA|DV-MINEN|DV-ELE
+N|ELA|SG|DV-TTA|DV-U|DV-ELE
+N|ELA|SG|DV-U
+N|ELA|SG|DV-US
+N|ELA|SG|DV-US|DV-TTA
+N|ELA|SG|DV-UTTA|DV-US
+N|ELA|SG|DV-UTU
+N|ELA|SG|DV-UTU|DV-MINEN
+N|ELA|SG|DV-U|DV-ELE
+N|ELA|SG|DV-U|DV-ILE
+N|ELA|SG|DV-U|DV-JA
+N|ELA|SG|DV-U|DV-MA
+N|ELA|SG|DV-U|DV-MINEN
+N|ELA|SG|DV-U|DV-NEISUUS
+N|ELA|SG|DV-U|DV-SKELE
+N|ELA|SG|DV-U|DV-TTA
+N|ELA|SG|PSS|PCP1
+N|ELA|SG|PSS|PCP1|DA-UUS
+N|ELA|SG|PSS|PCP2
+N|ELA|SG|PSS|PCP2|DA-US
+N|ELA|SG|TrunCo
+N|ELA|SG|TrunCo|DA-US
+N|ELA|SG|TrunCo|DA-UUS
+N|ELA|SG|TrunCo|DV-JA
+N|ELA|SG|TrunCo|DV-MINEN
+N|ELA|SG|TrunCo|DV-NTA
+N|ELA|SG|TrunCo|DV-NTI
+N|ELA|SG|TrunCo|DV-U
+N|ELA|SG|TrunCo|DV-US
+N|ELA|SG|TrunCo|DV-US|DV-TTA
+N|ELA|SG|hAn
+N|ELA|SG|kAAn
+N|ELA|SG|kAAn|DV-JA
+N|ELA|SG|kAAn|DV-NTI
+N|ELA|SG|kin
+N|ELA|SG|kin|DA-UUS
+N|ELA|SG|kin|DV-JA
+N|ELA|SG|st-arch
+N|ELA|SG|st-cllq
+N|ELA|SG|st-cllq|DV-MINEN
+N|ELA|SG|st-cllq|DV-US
+N|ELA|SG|st-cllq|TrunCo
+N|ELA|SG|st-derog
+N|ELA|SG|st-hi
+N|ELA|SG|st-slang
+N|ELA|SG|st-slang|DV-JA
+N|ELA|SG|st-vrnc
+N|ESS|PL
+N|ESS|PL|1PL
+N|ESS|PL|1PL|DV-ILE|DV-U
+N|ESS|PL|1PL|DV-MATON|DA-UUS
+N|ESS|PL|1PL|DV-NTA
+N|ESS|PL|1SG
+N|ESS|PL|1SG|DA-UUS
+N|ESS|PL|1SG|DV-JA
+N|ESS|PL|1SG|DV-MA
+N|ESS|PL|1SG|DV-TTA|DV-ELE
+N|ESS|PL|1SG|DV-US
+N|ESS|PL|1SG|PSS|PCP1
+N|ESS|PL|1SG|PSS|PCP1|DA-UUS
+N|ESS|PL|1SG|kin
+N|ESS|PL|1SG|st-cllq
+N|ESS|PL|2PL
+N|ESS|PL|2PL|DV-US
+N|ESS|PL|2SG
+N|ESS|PL|2SG|DV-JA
+N|ESS|PL|2SG|kin
+N|ESS|PL|3
+N|ESS|PL|3|ACT|PCP1
+N|ESS|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|ESS|PL|3|DA-US
+N|ESS|PL|3|DA-UUS
+N|ESS|PL|3|DA-UUS|DN-LLINEN
+N|ESS|PL|3|DA-UUS|DV-VAINEN
+N|ESS|PL|3|DV-ELE
+N|ESS|PL|3|DV-ILE|DV-U
+N|ESS|PL|3|DV-JA
+N|ESS|PL|3|DV-MA
+N|ESS|PL|3|DV-MA|DV-TTA
+N|ESS|PL|3|DV-MINEN
+N|ESS|PL|3|DV-MINEN|DV-U
+N|ESS|PL|3|DV-NTA
+N|ESS|PL|3|DV-U
+N|ESS|PL|3|DV-US
+N|ESS|PL|3|DV-U|DV-ELE
+N|ESS|PL|3|TrunCo
+N|ESS|PL|3|TrunCo|DV-US
+N|ESS|PL|3|kin
+N|ESS|PL|3|st-cllq
+N|ESS|PL|ACT|PCP1
+N|ESS|PL|ACT|PCP1|DA-UUS
+N|ESS|PL|ACT|PCP1|DA-UUS|DV-U
+N|ESS|PL|DA-US
+N|ESS|PL|DA-UUS
+N|ESS|PL|DA-UUS|DN-INEN
+N|ESS|PL|DA-UUS|DN-LLINEN
+N|ESS|PL|DA-UUS|DN-TON
+N|ESS|PL|DA-UUS|DV-MATON
+N|ESS|PL|DA-UUS|DV-VAINEN
+N|ESS|PL|DN-TON|DA-UUS
+N|ESS|PL|DV-ELE
+N|ESS|PL|DV-ELE|DV-JA
+N|ESS|PL|DV-ELE|DV-MINEN
+N|ESS|PL|DV-ILE
+N|ESS|PL|DV-ILE|DV-U
+N|ESS|PL|DV-JA
+N|ESS|PL|DV-JA|DN-TAR
+N|ESS|PL|DV-JA|DV-ILE
+N|ESS|PL|DV-JA|DV-TTA
+N|ESS|PL|DV-JA|DV-TTA|DV-ELE
+N|ESS|PL|DV-JA|DV-UTU
+N|ESS|PL|DV-MA
+N|ESS|PL|DV-MINEN
+N|ESS|PL|DV-MINEN|DV-U
+N|ESS|PL|DV-NA
+N|ESS|PL|DV-NEISUUS
+N|ESS|PL|DV-NTA
+N|ESS|PL|DV-NTAA
+N|ESS|PL|DV-NTAA|DV-MINEN
+N|ESS|PL|DV-NTAA|DV-US
+N|ESS|PL|DV-NTI
+N|ESS|PL|DV-TTA
+N|ESS|PL|DV-TTA|DV-MINEN|DV-ELE
+N|ESS|PL|DV-TTA|DV-U|DV-ELE
+N|ESS|PL|DV-U
+N|ESS|PL|DV-US
+N|ESS|PL|DV-US|DV-TTA
+N|ESS|PL|DV-UTTA|DV-US
+N|ESS|PL|DV-UTU
+N|ESS|PL|DV-UTU|DV-MINEN
+N|ESS|PL|DV-U|DV-ELE
+N|ESS|PL|DV-U|DV-ILE
+N|ESS|PL|DV-U|DV-JA
+N|ESS|PL|DV-U|DV-MA
+N|ESS|PL|DV-U|DV-MINEN
+N|ESS|PL|DV-U|DV-NEISUUS
+N|ESS|PL|DV-U|DV-SKELE
+N|ESS|PL|DV-U|DV-TTA
+N|ESS|PL|PSS|PCP1
+N|ESS|PL|PSS|PCP1|DA-UUS
+N|ESS|PL|PSS|PCP2
+N|ESS|PL|PSS|PCP2|DA-US
+N|ESS|PL|TrunCo
+N|ESS|PL|TrunCo|DA-US
+N|ESS|PL|TrunCo|DA-UUS
+N|ESS|PL|TrunCo|DV-JA
+N|ESS|PL|TrunCo|DV-MINEN
+N|ESS|PL|TrunCo|DV-NTA
+N|ESS|PL|TrunCo|DV-NTI
+N|ESS|PL|TrunCo|DV-U
+N|ESS|PL|TrunCo|DV-US
+N|ESS|PL|TrunCo|DV-US|DV-TTA
+N|ESS|PL|hAn
+N|ESS|PL|kAAn
+N|ESS|PL|kAAn|DV-JA
+N|ESS|PL|kAAn|DV-NTI
+N|ESS|PL|kin
+N|ESS|PL|kin|DA-UUS
+N|ESS|PL|kin|DV-JA
+N|ESS|PL|st-arch
+N|ESS|PL|st-cllq
+N|ESS|PL|st-cllq|DV-MINEN
+N|ESS|PL|st-cllq|DV-US
+N|ESS|PL|st-cllq|TrunCo
+N|ESS|PL|st-derog
+N|ESS|PL|st-hi
+N|ESS|PL|st-slang
+N|ESS|PL|st-slang|DV-JA
+N|ESS|PL|st-vrnc
+N|ESS|SG
+N|ESS|SG|1PL
+N|ESS|SG|1PL|DV-ILE|DV-U
+N|ESS|SG|1PL|DV-MATON|DA-UUS
+N|ESS|SG|1PL|DV-NTA
+N|ESS|SG|1SG
+N|ESS|SG|1SG|DA-UUS
+N|ESS|SG|1SG|DV-JA
+N|ESS|SG|1SG|DV-MA
+N|ESS|SG|1SG|DV-TTA|DV-ELE
+N|ESS|SG|1SG|DV-US
+N|ESS|SG|1SG|PSS|PCP1
+N|ESS|SG|1SG|PSS|PCP1|DA-UUS
+N|ESS|SG|1SG|kin
+N|ESS|SG|1SG|st-cllq
+N|ESS|SG|2PL
+N|ESS|SG|2PL|DV-US
+N|ESS|SG|2SG
+N|ESS|SG|2SG|DV-JA
+N|ESS|SG|2SG|kin
+N|ESS|SG|3
+N|ESS|SG|3|ACT|PCP1
+N|ESS|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|ESS|SG|3|DA-US
+N|ESS|SG|3|DA-UUS
+N|ESS|SG|3|DA-UUS|DN-LLINEN
+N|ESS|SG|3|DA-UUS|DV-VAINEN
+N|ESS|SG|3|DV-ELE
+N|ESS|SG|3|DV-ILE|DV-U
+N|ESS|SG|3|DV-JA
+N|ESS|SG|3|DV-MA
+N|ESS|SG|3|DV-MA|DV-TTA
+N|ESS|SG|3|DV-MINEN
+N|ESS|SG|3|DV-MINEN|DV-U
+N|ESS|SG|3|DV-NTA
+N|ESS|SG|3|DV-U
+N|ESS|SG|3|DV-US
+N|ESS|SG|3|DV-U|DV-ELE
+N|ESS|SG|3|TrunCo
+N|ESS|SG|3|TrunCo|DV-US
+N|ESS|SG|3|kin
+N|ESS|SG|3|st-cllq
+N|ESS|SG|ACT|PCP1
+N|ESS|SG|ACT|PCP1|DA-UUS
+N|ESS|SG|ACT|PCP1|DA-UUS|DV-U
+N|ESS|SG|DA-US
+N|ESS|SG|DA-UUS
+N|ESS|SG|DA-UUS|DN-INEN
+N|ESS|SG|DA-UUS|DN-LLINEN
+N|ESS|SG|DA-UUS|DN-TON
+N|ESS|SG|DA-UUS|DV-MATON
+N|ESS|SG|DA-UUS|DV-VAINEN
+N|ESS|SG|DN-TON|DA-UUS
+N|ESS|SG|DV-ELE
+N|ESS|SG|DV-ELE|DV-JA
+N|ESS|SG|DV-ELE|DV-MINEN
+N|ESS|SG|DV-ILE
+N|ESS|SG|DV-ILE|DV-U
+N|ESS|SG|DV-JA
+N|ESS|SG|DV-JA|DN-TAR
+N|ESS|SG|DV-JA|DV-ILE
+N|ESS|SG|DV-JA|DV-TTA
+N|ESS|SG|DV-JA|DV-TTA|DV-ELE
+N|ESS|SG|DV-JA|DV-UTU
+N|ESS|SG|DV-MA
+N|ESS|SG|DV-MINEN
+N|ESS|SG|DV-MINEN|DV-U
+N|ESS|SG|DV-NA
+N|ESS|SG|DV-NEISUUS
+N|ESS|SG|DV-NTA
+N|ESS|SG|DV-NTAA
+N|ESS|SG|DV-NTAA|DV-MINEN
+N|ESS|SG|DV-NTAA|DV-US
+N|ESS|SG|DV-NTI
+N|ESS|SG|DV-TTA
+N|ESS|SG|DV-TTA|DV-MINEN|DV-ELE
+N|ESS|SG|DV-TTA|DV-U|DV-ELE
+N|ESS|SG|DV-U
+N|ESS|SG|DV-US
+N|ESS|SG|DV-US|DV-TTA
+N|ESS|SG|DV-UTTA|DV-US
+N|ESS|SG|DV-UTU
+N|ESS|SG|DV-UTU|DV-MINEN
+N|ESS|SG|DV-U|DV-ELE
+N|ESS|SG|DV-U|DV-ILE
+N|ESS|SG|DV-U|DV-JA
+N|ESS|SG|DV-U|DV-MA
+N|ESS|SG|DV-U|DV-MINEN
+N|ESS|SG|DV-U|DV-NEISUUS
+N|ESS|SG|DV-U|DV-SKELE
+N|ESS|SG|DV-U|DV-TTA
+N|ESS|SG|PSS|PCP1
+N|ESS|SG|PSS|PCP1|DA-UUS
+N|ESS|SG|PSS|PCP2
+N|ESS|SG|PSS|PCP2|DA-US
+N|ESS|SG|TrunCo
+N|ESS|SG|TrunCo|DA-US
+N|ESS|SG|TrunCo|DA-UUS
+N|ESS|SG|TrunCo|DV-JA
+N|ESS|SG|TrunCo|DV-MINEN
+N|ESS|SG|TrunCo|DV-NTA
+N|ESS|SG|TrunCo|DV-NTI
+N|ESS|SG|TrunCo|DV-U
+N|ESS|SG|TrunCo|DV-US
+N|ESS|SG|TrunCo|DV-US|DV-TTA
+N|ESS|SG|hAn
+N|ESS|SG|kAAn
+N|ESS|SG|kAAn|DV-JA
+N|ESS|SG|kAAn|DV-NTI
+N|ESS|SG|kin
+N|ESS|SG|kin|DA-UUS
+N|ESS|SG|kin|DV-JA
+N|ESS|SG|st-arch
+N|ESS|SG|st-cllq
+N|ESS|SG|st-cllq|DV-MINEN
+N|ESS|SG|st-cllq|DV-US
+N|ESS|SG|st-cllq|TrunCo
+N|ESS|SG|st-derog
+N|ESS|SG|st-hi
+N|ESS|SG|st-slang
+N|ESS|SG|st-slang|DV-JA
+N|ESS|SG|st-vrnc
+N|FORGN
+N|FORGN|ABE|PL
+N|FORGN|ABE|SG
+N|FORGN|ABL|PL
+N|FORGN|ABL|SG
+N|FORGN|ADE|PL
+N|FORGN|ADE|SG
+N|FORGN|ALL|PL
+N|FORGN|ALL|SG
+N|FORGN|CMT|PL
+N|FORGN|CMT|SG
+N|FORGN|ELA|PL
+N|FORGN|ELA|SG
+N|FORGN|ESS|PL
+N|FORGN|ESS|SG
+N|FORGN|GEN|PL
+N|FORGN|GEN|SG
+N|FORGN|ILL|PL
+N|FORGN|ILL|SG
+N|FORGN|INE|PL
+N|FORGN|INE|SG
+N|FORGN|INS|PL
+N|FORGN|INS|SG
+N|FORGN|NOM|PL
+N|FORGN|NOM|SG
+N|FORGN|PROP
+N|FORGN|PROP|ABE|PL
+N|FORGN|PROP|ABE|SG
+N|FORGN|PROP|ABL|PL
+N|FORGN|PROP|ABL|SG
+N|FORGN|PROP|ADE|PL
+N|FORGN|PROP|ADE|SG
+N|FORGN|PROP|ALL|PL
+N|FORGN|PROP|ALL|SG
+N|FORGN|PROP|CMT|PL
+N|FORGN|PROP|CMT|SG
+N|FORGN|PROP|ELA|PL
+N|FORGN|PROP|ELA|SG
+N|FORGN|PROP|ESS|PL
+N|FORGN|PROP|ESS|SG
+N|FORGN|PROP|GEN|PL
+N|FORGN|PROP|GEN|SG
+N|FORGN|PROP|ILL|PL
+N|FORGN|PROP|ILL|SG
+N|FORGN|PROP|INE|PL
+N|FORGN|PROP|INE|SG
+N|FORGN|PROP|INS|PL
+N|FORGN|PROP|INS|SG
+N|FORGN|PROP|NOM|PL
+N|FORGN|PROP|NOM|SG
+N|FORGN|PROP|PTV|PL
+N|FORGN|PROP|PTV|SG
+N|FORGN|PROP|TRA|PL
+N|FORGN|PROP|TRA|SG
+N|FORGN|PTV|PL
+N|FORGN|PTV|SG
+N|FORGN|TRA|PL
+N|FORGN|TRA|SG
+N|GEN|PL
+N|GEN|PL|1PL
+N|GEN|PL|1PL|DV-ILE|DV-U
+N|GEN|PL|1PL|DV-MATON|DA-UUS
+N|GEN|PL|1PL|DV-NTA
+N|GEN|PL|1SG
+N|GEN|PL|1SG|DA-UUS
+N|GEN|PL|1SG|DV-JA
+N|GEN|PL|1SG|DV-MA
+N|GEN|PL|1SG|DV-TTA|DV-ELE
+N|GEN|PL|1SG|DV-US
+N|GEN|PL|1SG|PSS|PCP1
+N|GEN|PL|1SG|PSS|PCP1|DA-UUS
+N|GEN|PL|1SG|kin
+N|GEN|PL|1SG|st-cllq
+N|GEN|PL|2PL
+N|GEN|PL|2PL|DV-US
+N|GEN|PL|2SG
+N|GEN|PL|2SG|DV-JA
+N|GEN|PL|2SG|kin
+N|GEN|PL|3
+N|GEN|PL|3|ACT|PCP1
+N|GEN|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|GEN|PL|3|DA-US
+N|GEN|PL|3|DA-UUS
+N|GEN|PL|3|DA-UUS|DN-LLINEN
+N|GEN|PL|3|DA-UUS|DV-VAINEN
+N|GEN|PL|3|DV-ELE
+N|GEN|PL|3|DV-ILE|DV-U
+N|GEN|PL|3|DV-JA
+N|GEN|PL|3|DV-MA
+N|GEN|PL|3|DV-MA|DV-TTA
+N|GEN|PL|3|DV-MINEN
+N|GEN|PL|3|DV-MINEN|DV-U
+N|GEN|PL|3|DV-NTA
+N|GEN|PL|3|DV-U
+N|GEN|PL|3|DV-US
+N|GEN|PL|3|DV-U|DV-ELE
+N|GEN|PL|3|TrunCo
+N|GEN|PL|3|TrunCo|DV-US
+N|GEN|PL|3|kin
+N|GEN|PL|3|st-cllq
+N|GEN|PL|ACT|PCP1
+N|GEN|PL|ACT|PCP1|DA-UUS
+N|GEN|PL|ACT|PCP1|DA-UUS|DV-U
+N|GEN|PL|DA-US
+N|GEN|PL|DA-UUS
+N|GEN|PL|DA-UUS|DN-INEN
+N|GEN|PL|DA-UUS|DN-LLINEN
+N|GEN|PL|DA-UUS|DN-TON
+N|GEN|PL|DA-UUS|DV-MATON
+N|GEN|PL|DA-UUS|DV-VAINEN
+N|GEN|PL|DN-TON|DA-UUS
+N|GEN|PL|DV-ELE
+N|GEN|PL|DV-ELE|DV-JA
+N|GEN|PL|DV-ELE|DV-MINEN
+N|GEN|PL|DV-ILE
+N|GEN|PL|DV-ILE|DV-U
+N|GEN|PL|DV-JA
+N|GEN|PL|DV-JA|DN-TAR
+N|GEN|PL|DV-JA|DV-ILE
+N|GEN|PL|DV-JA|DV-TTA
+N|GEN|PL|DV-JA|DV-TTA|DV-ELE
+N|GEN|PL|DV-JA|DV-UTU
+N|GEN|PL|DV-MA
+N|GEN|PL|DV-MINEN
+N|GEN|PL|DV-MINEN|DV-U
+N|GEN|PL|DV-NA
+N|GEN|PL|DV-NEISUUS
+N|GEN|PL|DV-NTA
+N|GEN|PL|DV-NTAA
+N|GEN|PL|DV-NTAA|DV-MINEN
+N|GEN|PL|DV-NTAA|DV-US
+N|GEN|PL|DV-NTI
+N|GEN|PL|DV-TTA
+N|GEN|PL|DV-TTA|DV-MINEN|DV-ELE
+N|GEN|PL|DV-TTA|DV-U|DV-ELE
+N|GEN|PL|DV-U
+N|GEN|PL|DV-US
+N|GEN|PL|DV-US|DV-TTA
+N|GEN|PL|DV-UTTA|DV-US
+N|GEN|PL|DV-UTU
+N|GEN|PL|DV-UTU|DV-MINEN
+N|GEN|PL|DV-U|DV-ELE
+N|GEN|PL|DV-U|DV-ILE
+N|GEN|PL|DV-U|DV-JA
+N|GEN|PL|DV-U|DV-MA
+N|GEN|PL|DV-U|DV-MINEN
+N|GEN|PL|DV-U|DV-NEISUUS
+N|GEN|PL|DV-U|DV-SKELE
+N|GEN|PL|DV-U|DV-TTA
+N|GEN|PL|PSS|PCP1
+N|GEN|PL|PSS|PCP1|DA-UUS
+N|GEN|PL|PSS|PCP2
+N|GEN|PL|PSS|PCP2|DA-US
+N|GEN|PL|TrunCo
+N|GEN|PL|TrunCo|DA-US
+N|GEN|PL|TrunCo|DA-UUS
+N|GEN|PL|TrunCo|DV-JA
+N|GEN|PL|TrunCo|DV-MINEN
+N|GEN|PL|TrunCo|DV-NTA
+N|GEN|PL|TrunCo|DV-NTI
+N|GEN|PL|TrunCo|DV-U
+N|GEN|PL|TrunCo|DV-US
+N|GEN|PL|TrunCo|DV-US|DV-TTA
+N|GEN|PL|hAn
+N|GEN|PL|kAAn
+N|GEN|PL|kAAn|DV-JA
+N|GEN|PL|kAAn|DV-NTI
+N|GEN|PL|kin
+N|GEN|PL|kin|DA-UUS
+N|GEN|PL|kin|DV-JA
+N|GEN|PL|st-arch
+N|GEN|PL|st-cllq
+N|GEN|PL|st-cllq|DV-MINEN
+N|GEN|PL|st-cllq|DV-US
+N|GEN|PL|st-cllq|TrunCo
+N|GEN|PL|st-derog
+N|GEN|PL|st-hi
+N|GEN|PL|st-slang
+N|GEN|PL|st-slang|DV-JA
+N|GEN|PL|st-vrnc
+N|GEN|SG
+N|GEN|SG|1PL
+N|GEN|SG|1PL|DV-ILE|DV-U
+N|GEN|SG|1PL|DV-MATON|DA-UUS
+N|GEN|SG|1PL|DV-NTA
+N|GEN|SG|1SG
+N|GEN|SG|1SG|DA-UUS
+N|GEN|SG|1SG|DV-JA
+N|GEN|SG|1SG|DV-MA
+N|GEN|SG|1SG|DV-TTA|DV-ELE
+N|GEN|SG|1SG|DV-US
+N|GEN|SG|1SG|PSS|PCP1
+N|GEN|SG|1SG|PSS|PCP1|DA-UUS
+N|GEN|SG|1SG|kin
+N|GEN|SG|1SG|st-cllq
+N|GEN|SG|2PL
+N|GEN|SG|2PL|DV-US
+N|GEN|SG|2SG
+N|GEN|SG|2SG|DV-JA
+N|GEN|SG|2SG|kin
+N|GEN|SG|3
+N|GEN|SG|3|ACT|PCP1
+N|GEN|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|GEN|SG|3|DA-US
+N|GEN|SG|3|DA-UUS
+N|GEN|SG|3|DA-UUS|DN-LLINEN
+N|GEN|SG|3|DA-UUS|DV-VAINEN
+N|GEN|SG|3|DV-ELE
+N|GEN|SG|3|DV-ILE|DV-U
+N|GEN|SG|3|DV-JA
+N|GEN|SG|3|DV-MA
+N|GEN|SG|3|DV-MA|DV-TTA
+N|GEN|SG|3|DV-MINEN
+N|GEN|SG|3|DV-MINEN|DV-U
+N|GEN|SG|3|DV-NTA
+N|GEN|SG|3|DV-U
+N|GEN|SG|3|DV-US
+N|GEN|SG|3|DV-U|DV-ELE
+N|GEN|SG|3|TrunCo
+N|GEN|SG|3|TrunCo|DV-US
+N|GEN|SG|3|kin
+N|GEN|SG|3|st-cllq
+N|GEN|SG|ACT|PCP1
+N|GEN|SG|ACT|PCP1|DA-UUS
+N|GEN|SG|ACT|PCP1|DA-UUS|DV-U
+N|GEN|SG|DA-US
+N|GEN|SG|DA-UUS
+N|GEN|SG|DA-UUS|DN-INEN
+N|GEN|SG|DA-UUS|DN-LLINEN
+N|GEN|SG|DA-UUS|DN-TON
+N|GEN|SG|DA-UUS|DV-MATON
+N|GEN|SG|DA-UUS|DV-VAINEN
+N|GEN|SG|DN-TON|DA-UUS
+N|GEN|SG|DV-ELE
+N|GEN|SG|DV-ELE|DV-JA
+N|GEN|SG|DV-ELE|DV-MINEN
+N|GEN|SG|DV-ILE
+N|GEN|SG|DV-ILE|DV-U
+N|GEN|SG|DV-JA
+N|GEN|SG|DV-JA|DN-TAR
+N|GEN|SG|DV-JA|DV-ILE
+N|GEN|SG|DV-JA|DV-TTA
+N|GEN|SG|DV-JA|DV-TTA|DV-ELE
+N|GEN|SG|DV-JA|DV-UTU
+N|GEN|SG|DV-MA
+N|GEN|SG|DV-MINEN
+N|GEN|SG|DV-MINEN|DV-U
+N|GEN|SG|DV-NA
+N|GEN|SG|DV-NEISUUS
+N|GEN|SG|DV-NTA
+N|GEN|SG|DV-NTAA
+N|GEN|SG|DV-NTAA|DV-MINEN
+N|GEN|SG|DV-NTAA|DV-US
+N|GEN|SG|DV-NTI
+N|GEN|SG|DV-TTA
+N|GEN|SG|DV-TTA|DV-MINEN|DV-ELE
+N|GEN|SG|DV-TTA|DV-U|DV-ELE
+N|GEN|SG|DV-U
+N|GEN|SG|DV-US
+N|GEN|SG|DV-US|DV-TTA
+N|GEN|SG|DV-UTTA|DV-US
+N|GEN|SG|DV-UTU
+N|GEN|SG|DV-UTU|DV-MINEN
+N|GEN|SG|DV-U|DV-ELE
+N|GEN|SG|DV-U|DV-ILE
+N|GEN|SG|DV-U|DV-JA
+N|GEN|SG|DV-U|DV-MA
+N|GEN|SG|DV-U|DV-MINEN
+N|GEN|SG|DV-U|DV-NEISUUS
+N|GEN|SG|DV-U|DV-SKELE
+N|GEN|SG|DV-U|DV-TTA
+N|GEN|SG|PSS|PCP1
+N|GEN|SG|PSS|PCP1|DA-UUS
+N|GEN|SG|PSS|PCP2
+N|GEN|SG|PSS|PCP2|DA-US
+N|GEN|SG|TrunCo
+N|GEN|SG|TrunCo|DA-US
+N|GEN|SG|TrunCo|DA-UUS
+N|GEN|SG|TrunCo|DV-JA
+N|GEN|SG|TrunCo|DV-MINEN
+N|GEN|SG|TrunCo|DV-NTA
+N|GEN|SG|TrunCo|DV-NTI
+N|GEN|SG|TrunCo|DV-U
+N|GEN|SG|TrunCo|DV-US
+N|GEN|SG|TrunCo|DV-US|DV-TTA
+N|GEN|SG|hAn
+N|GEN|SG|kAAn
+N|GEN|SG|kAAn|DV-JA
+N|GEN|SG|kAAn|DV-NTI
+N|GEN|SG|kin
+N|GEN|SG|kin|DA-UUS
+N|GEN|SG|kin|DV-JA
+N|GEN|SG|st-arch
+N|GEN|SG|st-cllq
+N|GEN|SG|st-cllq|DV-MINEN
+N|GEN|SG|st-cllq|DV-US
+N|GEN|SG|st-cllq|TrunCo
+N|GEN|SG|st-derog
+N|GEN|SG|st-hi
+N|GEN|SG|st-slang
+N|GEN|SG|st-slang|DV-JA
+N|GEN|SG|st-vrnc
+N|ILL|PL
+N|ILL|PL|1PL
+N|ILL|PL|1PL|DV-ILE|DV-U
+N|ILL|PL|1PL|DV-MATON|DA-UUS
+N|ILL|PL|1PL|DV-NTA
+N|ILL|PL|1SG
+N|ILL|PL|1SG|DA-UUS
+N|ILL|PL|1SG|DV-JA
+N|ILL|PL|1SG|DV-MA
+N|ILL|PL|1SG|DV-TTA|DV-ELE
+N|ILL|PL|1SG|DV-US
+N|ILL|PL|1SG|PSS|PCP1
+N|ILL|PL|1SG|PSS|PCP1|DA-UUS
+N|ILL|PL|1SG|kin
+N|ILL|PL|1SG|st-cllq
+N|ILL|PL|2PL
+N|ILL|PL|2PL|DV-US
+N|ILL|PL|2SG
+N|ILL|PL|2SG|DV-JA
+N|ILL|PL|2SG|kin
+N|ILL|PL|3
+N|ILL|PL|3|ACT|PCP1
+N|ILL|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|ILL|PL|3|DA-US
+N|ILL|PL|3|DA-UUS
+N|ILL|PL|3|DA-UUS|DN-LLINEN
+N|ILL|PL|3|DA-UUS|DV-VAINEN
+N|ILL|PL|3|DV-ELE
+N|ILL|PL|3|DV-ILE|DV-U
+N|ILL|PL|3|DV-JA
+N|ILL|PL|3|DV-MA
+N|ILL|PL|3|DV-MA|DV-TTA
+N|ILL|PL|3|DV-MINEN
+N|ILL|PL|3|DV-MINEN|DV-U
+N|ILL|PL|3|DV-NTA
+N|ILL|PL|3|DV-U
+N|ILL|PL|3|DV-US
+N|ILL|PL|3|DV-U|DV-ELE
+N|ILL|PL|3|TrunCo
+N|ILL|PL|3|TrunCo|DV-US
+N|ILL|PL|3|kin
+N|ILL|PL|3|st-cllq
+N|ILL|PL|ACT|PCP1
+N|ILL|PL|ACT|PCP1|DA-UUS
+N|ILL|PL|ACT|PCP1|DA-UUS|DV-U
+N|ILL|PL|DA-US
+N|ILL|PL|DA-UUS
+N|ILL|PL|DA-UUS|DN-INEN
+N|ILL|PL|DA-UUS|DN-LLINEN
+N|ILL|PL|DA-UUS|DN-TON
+N|ILL|PL|DA-UUS|DV-MATON
+N|ILL|PL|DA-UUS|DV-VAINEN
+N|ILL|PL|DN-TON|DA-UUS
+N|ILL|PL|DV-ELE
+N|ILL|PL|DV-ELE|DV-JA
+N|ILL|PL|DV-ELE|DV-MINEN
+N|ILL|PL|DV-ILE
+N|ILL|PL|DV-ILE|DV-U
+N|ILL|PL|DV-JA
+N|ILL|PL|DV-JA|DN-TAR
+N|ILL|PL|DV-JA|DV-ILE
+N|ILL|PL|DV-JA|DV-TTA
+N|ILL|PL|DV-JA|DV-TTA|DV-ELE
+N|ILL|PL|DV-JA|DV-UTU
+N|ILL|PL|DV-MA
+N|ILL|PL|DV-MINEN
+N|ILL|PL|DV-MINEN|DV-U
+N|ILL|PL|DV-NA
+N|ILL|PL|DV-NEISUUS
+N|ILL|PL|DV-NTA
+N|ILL|PL|DV-NTAA
+N|ILL|PL|DV-NTAA|DV-MINEN
+N|ILL|PL|DV-NTAA|DV-US
+N|ILL|PL|DV-NTI
+N|ILL|PL|DV-TTA
+N|ILL|PL|DV-TTA|DV-MINEN|DV-ELE
+N|ILL|PL|DV-TTA|DV-U|DV-ELE
+N|ILL|PL|DV-U
+N|ILL|PL|DV-US
+N|ILL|PL|DV-US|DV-TTA
+N|ILL|PL|DV-UTTA|DV-US
+N|ILL|PL|DV-UTU
+N|ILL|PL|DV-UTU|DV-MINEN
+N|ILL|PL|DV-U|DV-ELE
+N|ILL|PL|DV-U|DV-ILE
+N|ILL|PL|DV-U|DV-JA
+N|ILL|PL|DV-U|DV-MA
+N|ILL|PL|DV-U|DV-MINEN
+N|ILL|PL|DV-U|DV-NEISUUS
+N|ILL|PL|DV-U|DV-SKELE
+N|ILL|PL|DV-U|DV-TTA
+N|ILL|PL|PSS|PCP1
+N|ILL|PL|PSS|PCP1|DA-UUS
+N|ILL|PL|PSS|PCP2
+N|ILL|PL|PSS|PCP2|DA-US
+N|ILL|PL|TrunCo
+N|ILL|PL|TrunCo|DA-US
+N|ILL|PL|TrunCo|DA-UUS
+N|ILL|PL|TrunCo|DV-JA
+N|ILL|PL|TrunCo|DV-MINEN
+N|ILL|PL|TrunCo|DV-NTA
+N|ILL|PL|TrunCo|DV-NTI
+N|ILL|PL|TrunCo|DV-U
+N|ILL|PL|TrunCo|DV-US
+N|ILL|PL|TrunCo|DV-US|DV-TTA
+N|ILL|PL|hAn
+N|ILL|PL|kAAn
+N|ILL|PL|kAAn|DV-JA
+N|ILL|PL|kAAn|DV-NTI
+N|ILL|PL|kin
+N|ILL|PL|kin|DA-UUS
+N|ILL|PL|kin|DV-JA
+N|ILL|PL|st-arch
+N|ILL|PL|st-cllq
+N|ILL|PL|st-cllq|DV-MINEN
+N|ILL|PL|st-cllq|DV-US
+N|ILL|PL|st-cllq|TrunCo
+N|ILL|PL|st-derog
+N|ILL|PL|st-hi
+N|ILL|PL|st-slang
+N|ILL|PL|st-slang|DV-JA
+N|ILL|PL|st-vrnc
+N|ILL|SG
+N|ILL|SG|1PL
+N|ILL|SG|1PL|DV-ILE|DV-U
+N|ILL|SG|1PL|DV-MATON|DA-UUS
+N|ILL|SG|1PL|DV-NTA
+N|ILL|SG|1SG
+N|ILL|SG|1SG|DA-UUS
+N|ILL|SG|1SG|DV-JA
+N|ILL|SG|1SG|DV-MA
+N|ILL|SG|1SG|DV-TTA|DV-ELE
+N|ILL|SG|1SG|DV-US
+N|ILL|SG|1SG|PSS|PCP1
+N|ILL|SG|1SG|PSS|PCP1|DA-UUS
+N|ILL|SG|1SG|kin
+N|ILL|SG|1SG|st-cllq
+N|ILL|SG|2PL
+N|ILL|SG|2PL|DV-US
+N|ILL|SG|2SG
+N|ILL|SG|2SG|DV-JA
+N|ILL|SG|2SG|kin
+N|ILL|SG|3
+N|ILL|SG|3|ACT|PCP1
+N|ILL|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|ILL|SG|3|DA-US
+N|ILL|SG|3|DA-UUS
+N|ILL|SG|3|DA-UUS|DN-LLINEN
+N|ILL|SG|3|DA-UUS|DV-VAINEN
+N|ILL|SG|3|DV-ELE
+N|ILL|SG|3|DV-ILE|DV-U
+N|ILL|SG|3|DV-JA
+N|ILL|SG|3|DV-MA
+N|ILL|SG|3|DV-MA|DV-TTA
+N|ILL|SG|3|DV-MINEN
+N|ILL|SG|3|DV-MINEN|DV-U
+N|ILL|SG|3|DV-NTA
+N|ILL|SG|3|DV-U
+N|ILL|SG|3|DV-US
+N|ILL|SG|3|DV-U|DV-ELE
+N|ILL|SG|3|TrunCo
+N|ILL|SG|3|TrunCo|DV-US
+N|ILL|SG|3|kin
+N|ILL|SG|3|st-cllq
+N|ILL|SG|ACT|PCP1
+N|ILL|SG|ACT|PCP1|DA-UUS
+N|ILL|SG|ACT|PCP1|DA-UUS|DV-U
+N|ILL|SG|DA-US
+N|ILL|SG|DA-UUS
+N|ILL|SG|DA-UUS|DN-INEN
+N|ILL|SG|DA-UUS|DN-LLINEN
+N|ILL|SG|DA-UUS|DN-TON
+N|ILL|SG|DA-UUS|DV-MATON
+N|ILL|SG|DA-UUS|DV-VAINEN
+N|ILL|SG|DN-TON|DA-UUS
+N|ILL|SG|DV-ELE
+N|ILL|SG|DV-ELE|DV-JA
+N|ILL|SG|DV-ELE|DV-MINEN
+N|ILL|SG|DV-ILE
+N|ILL|SG|DV-ILE|DV-U
+N|ILL|SG|DV-JA
+N|ILL|SG|DV-JA|DN-TAR
+N|ILL|SG|DV-JA|DV-ILE
+N|ILL|SG|DV-JA|DV-TTA
+N|ILL|SG|DV-JA|DV-TTA|DV-ELE
+N|ILL|SG|DV-JA|DV-UTU
+N|ILL|SG|DV-MA
+N|ILL|SG|DV-MINEN
+N|ILL|SG|DV-MINEN|DV-U
+N|ILL|SG|DV-NA
+N|ILL|SG|DV-NEISUUS
+N|ILL|SG|DV-NTA
+N|ILL|SG|DV-NTAA
+N|ILL|SG|DV-NTAA|DV-MINEN
+N|ILL|SG|DV-NTAA|DV-US
+N|ILL|SG|DV-NTI
+N|ILL|SG|DV-TTA
+N|ILL|SG|DV-TTA|DV-MINEN|DV-ELE
+N|ILL|SG|DV-TTA|DV-U|DV-ELE
+N|ILL|SG|DV-U
+N|ILL|SG|DV-US
+N|ILL|SG|DV-US|DV-TTA
+N|ILL|SG|DV-UTTA|DV-US
+N|ILL|SG|DV-UTU
+N|ILL|SG|DV-UTU|DV-MINEN
+N|ILL|SG|DV-U|DV-ELE
+N|ILL|SG|DV-U|DV-ILE
+N|ILL|SG|DV-U|DV-JA
+N|ILL|SG|DV-U|DV-MA
+N|ILL|SG|DV-U|DV-MINEN
+N|ILL|SG|DV-U|DV-NEISUUS
+N|ILL|SG|DV-U|DV-SKELE
+N|ILL|SG|DV-U|DV-TTA
+N|ILL|SG|PSS|PCP1
+N|ILL|SG|PSS|PCP1|DA-UUS
+N|ILL|SG|PSS|PCP2
+N|ILL|SG|PSS|PCP2|DA-US
+N|ILL|SG|TrunCo
+N|ILL|SG|TrunCo|DA-US
+N|ILL|SG|TrunCo|DA-UUS
+N|ILL|SG|TrunCo|DV-JA
+N|ILL|SG|TrunCo|DV-MINEN
+N|ILL|SG|TrunCo|DV-NTA
+N|ILL|SG|TrunCo|DV-NTI
+N|ILL|SG|TrunCo|DV-U
+N|ILL|SG|TrunCo|DV-US
+N|ILL|SG|TrunCo|DV-US|DV-TTA
+N|ILL|SG|hAn
+N|ILL|SG|kAAn
+N|ILL|SG|kAAn|DV-JA
+N|ILL|SG|kAAn|DV-NTI
+N|ILL|SG|kin
+N|ILL|SG|kin|DA-UUS
+N|ILL|SG|kin|DV-JA
+N|ILL|SG|st-arch
+N|ILL|SG|st-cllq
+N|ILL|SG|st-cllq|DV-MINEN
+N|ILL|SG|st-cllq|DV-US
+N|ILL|SG|st-cllq|TrunCo
+N|ILL|SG|st-derog
+N|ILL|SG|st-hi
+N|ILL|SG|st-slang
+N|ILL|SG|st-slang|DV-JA
+N|ILL|SG|st-vrnc
+N|INE|PL
+N|INE|PL|1PL
+N|INE|PL|1PL|DV-ILE|DV-U
+N|INE|PL|1PL|DV-MATON|DA-UUS
+N|INE|PL|1PL|DV-NTA
+N|INE|PL|1SG
+N|INE|PL|1SG|DA-UUS
+N|INE|PL|1SG|DV-JA
+N|INE|PL|1SG|DV-MA
+N|INE|PL|1SG|DV-TTA|DV-ELE
+N|INE|PL|1SG|DV-US
+N|INE|PL|1SG|PSS|PCP1
+N|INE|PL|1SG|PSS|PCP1|DA-UUS
+N|INE|PL|1SG|kin
+N|INE|PL|1SG|st-cllq
+N|INE|PL|2PL
+N|INE|PL|2PL|DV-US
+N|INE|PL|2SG
+N|INE|PL|2SG|DV-JA
+N|INE|PL|2SG|kin
+N|INE|PL|3
+N|INE|PL|3|ACT|PCP1
+N|INE|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|INE|PL|3|DA-US
+N|INE|PL|3|DA-UUS
+N|INE|PL|3|DA-UUS|DN-LLINEN
+N|INE|PL|3|DA-UUS|DV-VAINEN
+N|INE|PL|3|DV-ELE
+N|INE|PL|3|DV-ILE|DV-U
+N|INE|PL|3|DV-JA
+N|INE|PL|3|DV-MA
+N|INE|PL|3|DV-MA|DV-TTA
+N|INE|PL|3|DV-MINEN
+N|INE|PL|3|DV-MINEN|DV-U
+N|INE|PL|3|DV-NTA
+N|INE|PL|3|DV-U
+N|INE|PL|3|DV-US
+N|INE|PL|3|DV-U|DV-ELE
+N|INE|PL|3|TrunCo
+N|INE|PL|3|TrunCo|DV-US
+N|INE|PL|3|kin
+N|INE|PL|3|st-cllq
+N|INE|PL|ACT|PCP1
+N|INE|PL|ACT|PCP1|DA-UUS
+N|INE|PL|ACT|PCP1|DA-UUS|DV-U
+N|INE|PL|DA-US
+N|INE|PL|DA-UUS
+N|INE|PL|DA-UUS|DN-INEN
+N|INE|PL|DA-UUS|DN-LLINEN
+N|INE|PL|DA-UUS|DN-TON
+N|INE|PL|DA-UUS|DV-MATON
+N|INE|PL|DA-UUS|DV-VAINEN
+N|INE|PL|DN-TON|DA-UUS
+N|INE|PL|DV-ELE
+N|INE|PL|DV-ELE|DV-JA
+N|INE|PL|DV-ELE|DV-MINEN
+N|INE|PL|DV-ILE
+N|INE|PL|DV-ILE|DV-U
+N|INE|PL|DV-JA
+N|INE|PL|DV-JA|DN-TAR
+N|INE|PL|DV-JA|DV-ILE
+N|INE|PL|DV-JA|DV-TTA
+N|INE|PL|DV-JA|DV-TTA|DV-ELE
+N|INE|PL|DV-JA|DV-UTU
+N|INE|PL|DV-MA
+N|INE|PL|DV-MINEN
+N|INE|PL|DV-MINEN|DV-U
+N|INE|PL|DV-NA
+N|INE|PL|DV-NEISUUS
+N|INE|PL|DV-NTA
+N|INE|PL|DV-NTAA
+N|INE|PL|DV-NTAA|DV-MINEN
+N|INE|PL|DV-NTAA|DV-US
+N|INE|PL|DV-NTI
+N|INE|PL|DV-TTA
+N|INE|PL|DV-TTA|DV-MINEN|DV-ELE
+N|INE|PL|DV-TTA|DV-U|DV-ELE
+N|INE|PL|DV-U
+N|INE|PL|DV-US
+N|INE|PL|DV-US|DV-TTA
+N|INE|PL|DV-UTTA|DV-US
+N|INE|PL|DV-UTU
+N|INE|PL|DV-UTU|DV-MINEN
+N|INE|PL|DV-U|DV-ELE
+N|INE|PL|DV-U|DV-ILE
+N|INE|PL|DV-U|DV-JA
+N|INE|PL|DV-U|DV-MA
+N|INE|PL|DV-U|DV-MINEN
+N|INE|PL|DV-U|DV-NEISUUS
+N|INE|PL|DV-U|DV-SKELE
+N|INE|PL|DV-U|DV-TTA
+N|INE|PL|PSS|PCP1
+N|INE|PL|PSS|PCP1|DA-UUS
+N|INE|PL|PSS|PCP2
+N|INE|PL|PSS|PCP2|DA-US
+N|INE|PL|TrunCo
+N|INE|PL|TrunCo|DA-US
+N|INE|PL|TrunCo|DA-UUS
+N|INE|PL|TrunCo|DV-JA
+N|INE|PL|TrunCo|DV-MINEN
+N|INE|PL|TrunCo|DV-NTA
+N|INE|PL|TrunCo|DV-NTI
+N|INE|PL|TrunCo|DV-U
+N|INE|PL|TrunCo|DV-US
+N|INE|PL|TrunCo|DV-US|DV-TTA
+N|INE|PL|hAn
+N|INE|PL|kAAn
+N|INE|PL|kAAn|DV-JA
+N|INE|PL|kAAn|DV-NTI
+N|INE|PL|kin
+N|INE|PL|kin|DA-UUS
+N|INE|PL|kin|DV-JA
+N|INE|PL|st-arch
+N|INE|PL|st-cllq
+N|INE|PL|st-cllq|DV-MINEN
+N|INE|PL|st-cllq|DV-US
+N|INE|PL|st-cllq|TrunCo
+N|INE|PL|st-derog
+N|INE|PL|st-hi
+N|INE|PL|st-slang
+N|INE|PL|st-slang|DV-JA
+N|INE|PL|st-vrnc
+N|INE|SG
+N|INE|SG|1PL
+N|INE|SG|1PL|DV-ILE|DV-U
+N|INE|SG|1PL|DV-MATON|DA-UUS
+N|INE|SG|1PL|DV-NTA
+N|INE|SG|1SG
+N|INE|SG|1SG|DA-UUS
+N|INE|SG|1SG|DV-JA
+N|INE|SG|1SG|DV-MA
+N|INE|SG|1SG|DV-TTA|DV-ELE
+N|INE|SG|1SG|DV-US
+N|INE|SG|1SG|PSS|PCP1
+N|INE|SG|1SG|PSS|PCP1|DA-UUS
+N|INE|SG|1SG|kin
+N|INE|SG|1SG|st-cllq
+N|INE|SG|2PL
+N|INE|SG|2PL|DV-US
+N|INE|SG|2SG
+N|INE|SG|2SG|DV-JA
+N|INE|SG|2SG|kin
+N|INE|SG|3
+N|INE|SG|3|ACT|PCP1
+N|INE|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|INE|SG|3|DA-US
+N|INE|SG|3|DA-UUS
+N|INE|SG|3|DA-UUS|DN-LLINEN
+N|INE|SG|3|DA-UUS|DV-VAINEN
+N|INE|SG|3|DV-ELE
+N|INE|SG|3|DV-ILE|DV-U
+N|INE|SG|3|DV-JA
+N|INE|SG|3|DV-MA
+N|INE|SG|3|DV-MA|DV-TTA
+N|INE|SG|3|DV-MINEN
+N|INE|SG|3|DV-MINEN|DV-U
+N|INE|SG|3|DV-NTA
+N|INE|SG|3|DV-U
+N|INE|SG|3|DV-US
+N|INE|SG|3|DV-U|DV-ELE
+N|INE|SG|3|TrunCo
+N|INE|SG|3|TrunCo|DV-US
+N|INE|SG|3|kin
+N|INE|SG|3|st-cllq
+N|INE|SG|ACT|PCP1
+N|INE|SG|ACT|PCP1|DA-UUS
+N|INE|SG|ACT|PCP1|DA-UUS|DV-U
+N|INE|SG|DA-US
+N|INE|SG|DA-UUS
+N|INE|SG|DA-UUS|DN-INEN
+N|INE|SG|DA-UUS|DN-LLINEN
+N|INE|SG|DA-UUS|DN-TON
+N|INE|SG|DA-UUS|DV-MATON
+N|INE|SG|DA-UUS|DV-VAINEN
+N|INE|SG|DN-TON|DA-UUS
+N|INE|SG|DV-ELE
+N|INE|SG|DV-ELE|DV-JA
+N|INE|SG|DV-ELE|DV-MINEN
+N|INE|SG|DV-ILE
+N|INE|SG|DV-ILE|DV-U
+N|INE|SG|DV-JA
+N|INE|SG|DV-JA|DN-TAR
+N|INE|SG|DV-JA|DV-ILE
+N|INE|SG|DV-JA|DV-TTA
+N|INE|SG|DV-JA|DV-TTA|DV-ELE
+N|INE|SG|DV-JA|DV-UTU
+N|INE|SG|DV-MA
+N|INE|SG|DV-MINEN
+N|INE|SG|DV-MINEN|DV-U
+N|INE|SG|DV-NA
+N|INE|SG|DV-NEISUUS
+N|INE|SG|DV-NTA
+N|INE|SG|DV-NTAA
+N|INE|SG|DV-NTAA|DV-MINEN
+N|INE|SG|DV-NTAA|DV-US
+N|INE|SG|DV-NTI
+N|INE|SG|DV-TTA
+N|INE|SG|DV-TTA|DV-MINEN|DV-ELE
+N|INE|SG|DV-TTA|DV-U|DV-ELE
+N|INE|SG|DV-U
+N|INE|SG|DV-US
+N|INE|SG|DV-US|DV-TTA
+N|INE|SG|DV-UTTA|DV-US
+N|INE|SG|DV-UTU
+N|INE|SG|DV-UTU|DV-MINEN
+N|INE|SG|DV-U|DV-ELE
+N|INE|SG|DV-U|DV-ILE
+N|INE|SG|DV-U|DV-JA
+N|INE|SG|DV-U|DV-MA
+N|INE|SG|DV-U|DV-MINEN
+N|INE|SG|DV-U|DV-NEISUUS
+N|INE|SG|DV-U|DV-SKELE
+N|INE|SG|DV-U|DV-TTA
+N|INE|SG|PSS|PCP1
+N|INE|SG|PSS|PCP1|DA-UUS
+N|INE|SG|PSS|PCP2
+N|INE|SG|PSS|PCP2|DA-US
+N|INE|SG|TrunCo
+N|INE|SG|TrunCo|DA-US
+N|INE|SG|TrunCo|DA-UUS
+N|INE|SG|TrunCo|DV-JA
+N|INE|SG|TrunCo|DV-MINEN
+N|INE|SG|TrunCo|DV-NTA
+N|INE|SG|TrunCo|DV-NTI
+N|INE|SG|TrunCo|DV-U
+N|INE|SG|TrunCo|DV-US
+N|INE|SG|TrunCo|DV-US|DV-TTA
+N|INE|SG|hAn
+N|INE|SG|kAAn
+N|INE|SG|kAAn|DV-JA
+N|INE|SG|kAAn|DV-NTI
+N|INE|SG|kin
+N|INE|SG|kin|DA-UUS
+N|INE|SG|kin|DV-JA
+N|INE|SG|st-arch
+N|INE|SG|st-cllq
+N|INE|SG|st-cllq|DV-MINEN
+N|INE|SG|st-cllq|DV-US
+N|INE|SG|st-cllq|TrunCo
+N|INE|SG|st-derog
+N|INE|SG|st-hi
+N|INE|SG|st-slang
+N|INE|SG|st-slang|DV-JA
+N|INE|SG|st-vrnc
+N|INS|PL
+N|INS|PL|1PL
+N|INS|PL|1PL|DV-ILE|DV-U
+N|INS|PL|1PL|DV-MATON|DA-UUS
+N|INS|PL|1PL|DV-NTA
+N|INS|PL|1SG
+N|INS|PL|1SG|DA-UUS
+N|INS|PL|1SG|DV-JA
+N|INS|PL|1SG|DV-MA
+N|INS|PL|1SG|DV-TTA|DV-ELE
+N|INS|PL|1SG|DV-US
+N|INS|PL|1SG|PSS|PCP1
+N|INS|PL|1SG|PSS|PCP1|DA-UUS
+N|INS|PL|1SG|kin
+N|INS|PL|1SG|st-cllq
+N|INS|PL|2PL
+N|INS|PL|2PL|DV-US
+N|INS|PL|2SG
+N|INS|PL|2SG|DV-JA
+N|INS|PL|2SG|kin
+N|INS|PL|3
+N|INS|PL|3|ACT|PCP1
+N|INS|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|INS|PL|3|DA-US
+N|INS|PL|3|DA-UUS
+N|INS|PL|3|DA-UUS|DN-LLINEN
+N|INS|PL|3|DA-UUS|DV-VAINEN
+N|INS|PL|3|DV-ELE
+N|INS|PL|3|DV-ILE|DV-U
+N|INS|PL|3|DV-JA
+N|INS|PL|3|DV-MA
+N|INS|PL|3|DV-MA|DV-TTA
+N|INS|PL|3|DV-MINEN
+N|INS|PL|3|DV-MINEN|DV-U
+N|INS|PL|3|DV-NTA
+N|INS|PL|3|DV-U
+N|INS|PL|3|DV-US
+N|INS|PL|3|DV-U|DV-ELE
+N|INS|PL|3|TrunCo
+N|INS|PL|3|TrunCo|DV-US
+N|INS|PL|3|kin
+N|INS|PL|3|st-cllq
+N|INS|PL|ACT|PCP1
+N|INS|PL|ACT|PCP1|DA-UUS
+N|INS|PL|ACT|PCP1|DA-UUS|DV-U
+N|INS|PL|DA-US
+N|INS|PL|DA-UUS
+N|INS|PL|DA-UUS|DN-INEN
+N|INS|PL|DA-UUS|DN-LLINEN
+N|INS|PL|DA-UUS|DN-TON
+N|INS|PL|DA-UUS|DV-MATON
+N|INS|PL|DA-UUS|DV-VAINEN
+N|INS|PL|DN-TON|DA-UUS
+N|INS|PL|DV-ELE
+N|INS|PL|DV-ELE|DV-JA
+N|INS|PL|DV-ELE|DV-MINEN
+N|INS|PL|DV-ILE
+N|INS|PL|DV-ILE|DV-U
+N|INS|PL|DV-JA
+N|INS|PL|DV-JA|DN-TAR
+N|INS|PL|DV-JA|DV-ILE
+N|INS|PL|DV-JA|DV-TTA
+N|INS|PL|DV-JA|DV-TTA|DV-ELE
+N|INS|PL|DV-JA|DV-UTU
+N|INS|PL|DV-MA
+N|INS|PL|DV-MINEN
+N|INS|PL|DV-MINEN|DV-U
+N|INS|PL|DV-NA
+N|INS|PL|DV-NEISUUS
+N|INS|PL|DV-NTA
+N|INS|PL|DV-NTAA
+N|INS|PL|DV-NTAA|DV-MINEN
+N|INS|PL|DV-NTAA|DV-US
+N|INS|PL|DV-NTI
+N|INS|PL|DV-TTA
+N|INS|PL|DV-TTA|DV-MINEN|DV-ELE
+N|INS|PL|DV-TTA|DV-U|DV-ELE
+N|INS|PL|DV-U
+N|INS|PL|DV-US
+N|INS|PL|DV-US|DV-TTA
+N|INS|PL|DV-UTTA|DV-US
+N|INS|PL|DV-UTU
+N|INS|PL|DV-UTU|DV-MINEN
+N|INS|PL|DV-U|DV-ELE
+N|INS|PL|DV-U|DV-ILE
+N|INS|PL|DV-U|DV-JA
+N|INS|PL|DV-U|DV-MA
+N|INS|PL|DV-U|DV-MINEN
+N|INS|PL|DV-U|DV-NEISUUS
+N|INS|PL|DV-U|DV-SKELE
+N|INS|PL|DV-U|DV-TTA
+N|INS|PL|PSS|PCP1
+N|INS|PL|PSS|PCP1|DA-UUS
+N|INS|PL|PSS|PCP2
+N|INS|PL|PSS|PCP2|DA-US
+N|INS|PL|TrunCo
+N|INS|PL|TrunCo|DA-US
+N|INS|PL|TrunCo|DA-UUS
+N|INS|PL|TrunCo|DV-JA
+N|INS|PL|TrunCo|DV-MINEN
+N|INS|PL|TrunCo|DV-NTA
+N|INS|PL|TrunCo|DV-NTI
+N|INS|PL|TrunCo|DV-U
+N|INS|PL|TrunCo|DV-US
+N|INS|PL|TrunCo|DV-US|DV-TTA
+N|INS|PL|hAn
+N|INS|PL|kAAn
+N|INS|PL|kAAn|DV-JA
+N|INS|PL|kAAn|DV-NTI
+N|INS|PL|kin
+N|INS|PL|kin|DA-UUS
+N|INS|PL|kin|DV-JA
+N|INS|PL|st-arch
+N|INS|PL|st-cllq
+N|INS|PL|st-cllq|DV-MINEN
+N|INS|PL|st-cllq|DV-US
+N|INS|PL|st-cllq|TrunCo
+N|INS|PL|st-derog
+N|INS|PL|st-hi
+N|INS|PL|st-slang
+N|INS|PL|st-slang|DV-JA
+N|INS|PL|st-vrnc
+N|INS|SG
+N|INS|SG|1PL
+N|INS|SG|1PL|DV-ILE|DV-U
+N|INS|SG|1PL|DV-MATON|DA-UUS
+N|INS|SG|1PL|DV-NTA
+N|INS|SG|1SG
+N|INS|SG|1SG|DA-UUS
+N|INS|SG|1SG|DV-JA
+N|INS|SG|1SG|DV-MA
+N|INS|SG|1SG|DV-TTA|DV-ELE
+N|INS|SG|1SG|DV-US
+N|INS|SG|1SG|PSS|PCP1
+N|INS|SG|1SG|PSS|PCP1|DA-UUS
+N|INS|SG|1SG|kin
+N|INS|SG|1SG|st-cllq
+N|INS|SG|2PL
+N|INS|SG|2PL|DV-US
+N|INS|SG|2SG
+N|INS|SG|2SG|DV-JA
+N|INS|SG|2SG|kin
+N|INS|SG|3
+N|INS|SG|3|ACT|PCP1
+N|INS|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|INS|SG|3|DA-US
+N|INS|SG|3|DA-UUS
+N|INS|SG|3|DA-UUS|DN-LLINEN
+N|INS|SG|3|DA-UUS|DV-VAINEN
+N|INS|SG|3|DV-ELE
+N|INS|SG|3|DV-ILE|DV-U
+N|INS|SG|3|DV-JA
+N|INS|SG|3|DV-MA
+N|INS|SG|3|DV-MA|DV-TTA
+N|INS|SG|3|DV-MINEN
+N|INS|SG|3|DV-MINEN|DV-U
+N|INS|SG|3|DV-NTA
+N|INS|SG|3|DV-U
+N|INS|SG|3|DV-US
+N|INS|SG|3|DV-U|DV-ELE
+N|INS|SG|3|TrunCo
+N|INS|SG|3|TrunCo|DV-US
+N|INS|SG|3|kin
+N|INS|SG|3|st-cllq
+N|INS|SG|ACT|PCP1
+N|INS|SG|ACT|PCP1|DA-UUS
+N|INS|SG|ACT|PCP1|DA-UUS|DV-U
+N|INS|SG|DA-US
+N|INS|SG|DA-UUS
+N|INS|SG|DA-UUS|DN-INEN
+N|INS|SG|DA-UUS|DN-LLINEN
+N|INS|SG|DA-UUS|DN-TON
+N|INS|SG|DA-UUS|DV-MATON
+N|INS|SG|DA-UUS|DV-VAINEN
+N|INS|SG|DN-TON|DA-UUS
+N|INS|SG|DV-ELE
+N|INS|SG|DV-ELE|DV-JA
+N|INS|SG|DV-ELE|DV-MINEN
+N|INS|SG|DV-ILE
+N|INS|SG|DV-ILE|DV-U
+N|INS|SG|DV-JA
+N|INS|SG|DV-JA|DN-TAR
+N|INS|SG|DV-JA|DV-ILE
+N|INS|SG|DV-JA|DV-TTA
+N|INS|SG|DV-JA|DV-TTA|DV-ELE
+N|INS|SG|DV-JA|DV-UTU
+N|INS|SG|DV-MA
+N|INS|SG|DV-MINEN
+N|INS|SG|DV-MINEN|DV-U
+N|INS|SG|DV-NA
+N|INS|SG|DV-NEISUUS
+N|INS|SG|DV-NTA
+N|INS|SG|DV-NTAA
+N|INS|SG|DV-NTAA|DV-MINEN
+N|INS|SG|DV-NTAA|DV-US
+N|INS|SG|DV-NTI
+N|INS|SG|DV-TTA
+N|INS|SG|DV-TTA|DV-MINEN|DV-ELE
+N|INS|SG|DV-TTA|DV-U|DV-ELE
+N|INS|SG|DV-U
+N|INS|SG|DV-US
+N|INS|SG|DV-US|DV-TTA
+N|INS|SG|DV-UTTA|DV-US
+N|INS|SG|DV-UTU
+N|INS|SG|DV-UTU|DV-MINEN
+N|INS|SG|DV-U|DV-ELE
+N|INS|SG|DV-U|DV-ILE
+N|INS|SG|DV-U|DV-JA
+N|INS|SG|DV-U|DV-MA
+N|INS|SG|DV-U|DV-MINEN
+N|INS|SG|DV-U|DV-NEISUUS
+N|INS|SG|DV-U|DV-SKELE
+N|INS|SG|DV-U|DV-TTA
+N|INS|SG|PSS|PCP1
+N|INS|SG|PSS|PCP1|DA-UUS
+N|INS|SG|PSS|PCP2
+N|INS|SG|PSS|PCP2|DA-US
+N|INS|SG|TrunCo
+N|INS|SG|TrunCo|DA-US
+N|INS|SG|TrunCo|DA-UUS
+N|INS|SG|TrunCo|DV-JA
+N|INS|SG|TrunCo|DV-MINEN
+N|INS|SG|TrunCo|DV-NTA
+N|INS|SG|TrunCo|DV-NTI
+N|INS|SG|TrunCo|DV-U
+N|INS|SG|TrunCo|DV-US
+N|INS|SG|TrunCo|DV-US|DV-TTA
+N|INS|SG|hAn
+N|INS|SG|kAAn
+N|INS|SG|kAAn|DV-JA
+N|INS|SG|kAAn|DV-NTI
+N|INS|SG|kin
+N|INS|SG|kin|DA-UUS
+N|INS|SG|kin|DV-JA
+N|INS|SG|st-arch
+N|INS|SG|st-cllq
+N|INS|SG|st-cllq|DV-MINEN
+N|INS|SG|st-cllq|DV-US
+N|INS|SG|st-cllq|TrunCo
+N|INS|SG|st-derog
+N|INS|SG|st-hi
+N|INS|SG|st-slang
+N|INS|SG|st-slang|DV-JA
+N|INS|SG|st-vrnc
+N|NOM|PL
+N|NOM|PL|1PL
+N|NOM|PL|1PL|DV-ILE|DV-U
+N|NOM|PL|1PL|DV-MATON|DA-UUS
+N|NOM|PL|1PL|DV-NTA
+N|NOM|PL|1SG
+N|NOM|PL|1SG|DA-UUS
+N|NOM|PL|1SG|DV-JA
+N|NOM|PL|1SG|DV-MA
+N|NOM|PL|1SG|DV-TTA|DV-ELE
+N|NOM|PL|1SG|DV-US
+N|NOM|PL|1SG|PSS|PCP1
+N|NOM|PL|1SG|PSS|PCP1|DA-UUS
+N|NOM|PL|1SG|kin
+N|NOM|PL|1SG|st-cllq
+N|NOM|PL|2PL
+N|NOM|PL|2PL|DV-US
+N|NOM|PL|2SG
+N|NOM|PL|2SG|DV-JA
+N|NOM|PL|2SG|kin
+N|NOM|PL|3
+N|NOM|PL|3|ACT|PCP1
+N|NOM|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|NOM|PL|3|DA-US
+N|NOM|PL|3|DA-UUS
+N|NOM|PL|3|DA-UUS|DN-LLINEN
+N|NOM|PL|3|DA-UUS|DV-VAINEN
+N|NOM|PL|3|DV-ELE
+N|NOM|PL|3|DV-ILE|DV-U
+N|NOM|PL|3|DV-JA
+N|NOM|PL|3|DV-MA
+N|NOM|PL|3|DV-MA|DV-TTA
+N|NOM|PL|3|DV-MINEN
+N|NOM|PL|3|DV-MINEN|DV-U
+N|NOM|PL|3|DV-NTA
+N|NOM|PL|3|DV-U
+N|NOM|PL|3|DV-US
+N|NOM|PL|3|DV-U|DV-ELE
+N|NOM|PL|3|TrunCo
+N|NOM|PL|3|TrunCo|DV-US
+N|NOM|PL|3|kin
+N|NOM|PL|3|st-cllq
+N|NOM|PL|ACT|PCP1
+N|NOM|PL|ACT|PCP1|DA-UUS
+N|NOM|PL|ACT|PCP1|DA-UUS|DV-U
+N|NOM|PL|DA-US
+N|NOM|PL|DA-UUS
+N|NOM|PL|DA-UUS|DN-INEN
+N|NOM|PL|DA-UUS|DN-LLINEN
+N|NOM|PL|DA-UUS|DN-TON
+N|NOM|PL|DA-UUS|DV-MATON
+N|NOM|PL|DA-UUS|DV-VAINEN
+N|NOM|PL|DN-TON|DA-UUS
+N|NOM|PL|DV-ELE
+N|NOM|PL|DV-ELE|DV-JA
+N|NOM|PL|DV-ELE|DV-MINEN
+N|NOM|PL|DV-ILE
+N|NOM|PL|DV-ILE|DV-U
+N|NOM|PL|DV-JA
+N|NOM|PL|DV-JA|DN-TAR
+N|NOM|PL|DV-JA|DV-ILE
+N|NOM|PL|DV-JA|DV-TTA
+N|NOM|PL|DV-JA|DV-TTA|DV-ELE
+N|NOM|PL|DV-JA|DV-UTU
+N|NOM|PL|DV-MA
+N|NOM|PL|DV-MINEN
+N|NOM|PL|DV-MINEN|DV-U
+N|NOM|PL|DV-NA
+N|NOM|PL|DV-NEISUUS
+N|NOM|PL|DV-NTA
+N|NOM|PL|DV-NTAA
+N|NOM|PL|DV-NTAA|DV-MINEN
+N|NOM|PL|DV-NTAA|DV-US
+N|NOM|PL|DV-NTI
+N|NOM|PL|DV-TTA
+N|NOM|PL|DV-TTA|DV-MINEN|DV-ELE
+N|NOM|PL|DV-TTA|DV-U|DV-ELE
+N|NOM|PL|DV-U
+N|NOM|PL|DV-US
+N|NOM|PL|DV-US|DV-TTA
+N|NOM|PL|DV-UTTA|DV-US
+N|NOM|PL|DV-UTU
+N|NOM|PL|DV-UTU|DV-MINEN
+N|NOM|PL|DV-U|DV-ELE
+N|NOM|PL|DV-U|DV-ILE
+N|NOM|PL|DV-U|DV-JA
+N|NOM|PL|DV-U|DV-MA
+N|NOM|PL|DV-U|DV-MINEN
+N|NOM|PL|DV-U|DV-NEISUUS
+N|NOM|PL|DV-U|DV-SKELE
+N|NOM|PL|DV-U|DV-TTA
+N|NOM|PL|PSS|PCP1
+N|NOM|PL|PSS|PCP1|DA-UUS
+N|NOM|PL|PSS|PCP2
+N|NOM|PL|PSS|PCP2|DA-US
+N|NOM|PL|TrunCo
+N|NOM|PL|TrunCo|DA-US
+N|NOM|PL|TrunCo|DA-UUS
+N|NOM|PL|TrunCo|DV-JA
+N|NOM|PL|TrunCo|DV-MINEN
+N|NOM|PL|TrunCo|DV-NTA
+N|NOM|PL|TrunCo|DV-NTI
+N|NOM|PL|TrunCo|DV-U
+N|NOM|PL|TrunCo|DV-US
+N|NOM|PL|TrunCo|DV-US|DV-TTA
+N|NOM|PL|hAn
+N|NOM|PL|kAAn
+N|NOM|PL|kAAn|DV-JA
+N|NOM|PL|kAAn|DV-NTI
+N|NOM|PL|kin
+N|NOM|PL|kin|DA-UUS
+N|NOM|PL|kin|DV-JA
+N|NOM|PL|st-arch
+N|NOM|PL|st-cllq
+N|NOM|PL|st-cllq|DV-MINEN
+N|NOM|PL|st-cllq|DV-US
+N|NOM|PL|st-cllq|TrunCo
+N|NOM|PL|st-derog
+N|NOM|PL|st-hi
+N|NOM|PL|st-slang
+N|NOM|PL|st-slang|DV-JA
+N|NOM|PL|st-vrnc
+N|NOM|SG
+N|NOM|SG|1PL
+N|NOM|SG|1PL|DV-ILE|DV-U
+N|NOM|SG|1PL|DV-MATON|DA-UUS
+N|NOM|SG|1PL|DV-NTA
+N|NOM|SG|1SG
+N|NOM|SG|1SG|DA-UUS
+N|NOM|SG|1SG|DV-JA
+N|NOM|SG|1SG|DV-MA
+N|NOM|SG|1SG|DV-TTA|DV-ELE
+N|NOM|SG|1SG|DV-US
+N|NOM|SG|1SG|PSS|PCP1
+N|NOM|SG|1SG|PSS|PCP1|DA-UUS
+N|NOM|SG|1SG|kin
+N|NOM|SG|1SG|st-cllq
+N|NOM|SG|2PL
+N|NOM|SG|2PL|DV-US
+N|NOM|SG|2SG
+N|NOM|SG|2SG|DV-JA
+N|NOM|SG|2SG|kin
+N|NOM|SG|3
+N|NOM|SG|3|ACT|PCP1
+N|NOM|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|NOM|SG|3|DA-US
+N|NOM|SG|3|DA-UUS
+N|NOM|SG|3|DA-UUS|DN-LLINEN
+N|NOM|SG|3|DA-UUS|DV-VAINEN
+N|NOM|SG|3|DV-ELE
+N|NOM|SG|3|DV-ILE|DV-U
+N|NOM|SG|3|DV-JA
+N|NOM|SG|3|DV-MA
+N|NOM|SG|3|DV-MA|DV-TTA
+N|NOM|SG|3|DV-MINEN
+N|NOM|SG|3|DV-MINEN|DV-U
+N|NOM|SG|3|DV-NTA
+N|NOM|SG|3|DV-U
+N|NOM|SG|3|DV-US
+N|NOM|SG|3|DV-U|DV-ELE
+N|NOM|SG|3|TrunCo
+N|NOM|SG|3|TrunCo|DV-US
+N|NOM|SG|3|kin
+N|NOM|SG|3|st-cllq
+N|NOM|SG|ACT|PCP1
+N|NOM|SG|ACT|PCP1|DA-UUS
+N|NOM|SG|ACT|PCP1|DA-UUS|DV-U
+N|NOM|SG|DA-US
+N|NOM|SG|DA-UUS
+N|NOM|SG|DA-UUS|DN-INEN
+N|NOM|SG|DA-UUS|DN-LLINEN
+N|NOM|SG|DA-UUS|DN-TON
+N|NOM|SG|DA-UUS|DV-MATON
+N|NOM|SG|DA-UUS|DV-VAINEN
+N|NOM|SG|DN-TON|DA-UUS
+N|NOM|SG|DV-ELE
+N|NOM|SG|DV-ELE|DV-JA
+N|NOM|SG|DV-ELE|DV-MINEN
+N|NOM|SG|DV-ILE
+N|NOM|SG|DV-ILE|DV-U
+N|NOM|SG|DV-JA
+N|NOM|SG|DV-JA|DN-TAR
+N|NOM|SG|DV-JA|DV-ILE
+N|NOM|SG|DV-JA|DV-TTA
+N|NOM|SG|DV-JA|DV-TTA|DV-ELE
+N|NOM|SG|DV-JA|DV-UTU
+N|NOM|SG|DV-MA
+N|NOM|SG|DV-MINEN
+N|NOM|SG|DV-MINEN|DV-U
+N|NOM|SG|DV-NA
+N|NOM|SG|DV-NEISUUS
+N|NOM|SG|DV-NTA
+N|NOM|SG|DV-NTAA
+N|NOM|SG|DV-NTAA|DV-MINEN
+N|NOM|SG|DV-NTAA|DV-US
+N|NOM|SG|DV-NTI
+N|NOM|SG|DV-TTA
+N|NOM|SG|DV-TTA|DV-MINEN|DV-ELE
+N|NOM|SG|DV-TTA|DV-U|DV-ELE
+N|NOM|SG|DV-U
+N|NOM|SG|DV-US
+N|NOM|SG|DV-US|DV-TTA
+N|NOM|SG|DV-UTTA|DV-US
+N|NOM|SG|DV-UTU
+N|NOM|SG|DV-UTU|DV-MINEN
+N|NOM|SG|DV-U|DV-ELE
+N|NOM|SG|DV-U|DV-ILE
+N|NOM|SG|DV-U|DV-JA
+N|NOM|SG|DV-U|DV-MA
+N|NOM|SG|DV-U|DV-MINEN
+N|NOM|SG|DV-U|DV-NEISUUS
+N|NOM|SG|DV-U|DV-SKELE
+N|NOM|SG|DV-U|DV-TTA
+N|NOM|SG|PSS|PCP1
+N|NOM|SG|PSS|PCP1|DA-UUS
+N|NOM|SG|PSS|PCP2
+N|NOM|SG|PSS|PCP2|DA-US
+N|NOM|SG|TrunCo
+N|NOM|SG|TrunCo|DA-US
+N|NOM|SG|TrunCo|DA-UUS
+N|NOM|SG|TrunCo|DV-JA
+N|NOM|SG|TrunCo|DV-MINEN
+N|NOM|SG|TrunCo|DV-NTA
+N|NOM|SG|TrunCo|DV-NTI
+N|NOM|SG|TrunCo|DV-U
+N|NOM|SG|TrunCo|DV-US
+N|NOM|SG|TrunCo|DV-US|DV-TTA
+N|NOM|SG|hAn
+N|NOM|SG|kAAn
+N|NOM|SG|kAAn|DV-JA
+N|NOM|SG|kAAn|DV-NTI
+N|NOM|SG|kin
+N|NOM|SG|kin|DA-UUS
+N|NOM|SG|kin|DV-JA
+N|NOM|SG|st-arch
+N|NOM|SG|st-cllq
+N|NOM|SG|st-cllq|DV-MINEN
+N|NOM|SG|st-cllq|DV-US
+N|NOM|SG|st-cllq|TrunCo
+N|NOM|SG|st-derog
+N|NOM|SG|st-hi
+N|NOM|SG|st-slang
+N|NOM|SG|st-slang|DV-JA
+N|NOM|SG|st-vrnc
+N|PROP
+N|PROP|ABE|PL
+N|PROP|ABE|PL|1PL
+N|PROP|ABE|PL|3
+N|PROP|ABE|PL|3|hAn
+N|PROP|ABE|PL|DA-UUS|DN-LAINEN
+N|PROP|ABE|PL|DN-LAINEN
+N|PROP|ABE|PL|TrunCo
+N|PROP|ABE|PL|kAAn
+N|PROP|ABE|PL|kin
+N|PROP|ABE|SG
+N|PROP|ABE|SG|1PL
+N|PROP|ABE|SG|3
+N|PROP|ABE|SG|3|hAn
+N|PROP|ABE|SG|DA-UUS|DN-LAINEN
+N|PROP|ABE|SG|DN-LAINEN
+N|PROP|ABE|SG|TrunCo
+N|PROP|ABE|SG|kAAn
+N|PROP|ABE|SG|kin
+N|PROP|ABL|PL
+N|PROP|ABL|PL|1PL
+N|PROP|ABL|PL|3
+N|PROP|ABL|PL|3|hAn
+N|PROP|ABL|PL|DA-UUS|DN-LAINEN
+N|PROP|ABL|PL|DN-LAINEN
+N|PROP|ABL|PL|TrunCo
+N|PROP|ABL|PL|kAAn
+N|PROP|ABL|PL|kin
+N|PROP|ABL|SG
+N|PROP|ABL|SG|1PL
+N|PROP|ABL|SG|3
+N|PROP|ABL|SG|3|hAn
+N|PROP|ABL|SG|DA-UUS|DN-LAINEN
+N|PROP|ABL|SG|DN-LAINEN
+N|PROP|ABL|SG|TrunCo
+N|PROP|ABL|SG|kAAn
+N|PROP|ABL|SG|kin
+N|PROP|ADE|PL
+N|PROP|ADE|PL|1PL
+N|PROP|ADE|PL|3
+N|PROP|ADE|PL|3|hAn
+N|PROP|ADE|PL|DA-UUS|DN-LAINEN
+N|PROP|ADE|PL|DN-LAINEN
+N|PROP|ADE|PL|TrunCo
+N|PROP|ADE|PL|kAAn
+N|PROP|ADE|PL|kin
+N|PROP|ADE|SG
+N|PROP|ADE|SG|1PL
+N|PROP|ADE|SG|3
+N|PROP|ADE|SG|3|hAn
+N|PROP|ADE|SG|DA-UUS|DN-LAINEN
+N|PROP|ADE|SG|DN-LAINEN
+N|PROP|ADE|SG|TrunCo
+N|PROP|ADE|SG|kAAn
+N|PROP|ADE|SG|kin
+N|PROP|ALL|PL
+N|PROP|ALL|PL|1PL
+N|PROP|ALL|PL|3
+N|PROP|ALL|PL|3|hAn
+N|PROP|ALL|PL|DA-UUS|DN-LAINEN
+N|PROP|ALL|PL|DN-LAINEN
+N|PROP|ALL|PL|TrunCo
+N|PROP|ALL|PL|kAAn
+N|PROP|ALL|PL|kin
+N|PROP|ALL|SG
+N|PROP|ALL|SG|1PL
+N|PROP|ALL|SG|3
+N|PROP|ALL|SG|3|hAn
+N|PROP|ALL|SG|DA-UUS|DN-LAINEN
+N|PROP|ALL|SG|DN-LAINEN
+N|PROP|ALL|SG|TrunCo
+N|PROP|ALL|SG|kAAn
+N|PROP|ALL|SG|kin
+N|PROP|CMT|PL
+N|PROP|CMT|PL|1PL
+N|PROP|CMT|PL|3
+N|PROP|CMT|PL|3|hAn
+N|PROP|CMT|PL|DA-UUS|DN-LAINEN
+N|PROP|CMT|PL|DN-LAINEN
+N|PROP|CMT|PL|TrunCo
+N|PROP|CMT|PL|kAAn
+N|PROP|CMT|PL|kin
+N|PROP|CMT|SG
+N|PROP|CMT|SG|1PL
+N|PROP|CMT|SG|3
+N|PROP|CMT|SG|3|hAn
+N|PROP|CMT|SG|DA-UUS|DN-LAINEN
+N|PROP|CMT|SG|DN-LAINEN
+N|PROP|CMT|SG|TrunCo
+N|PROP|CMT|SG|kAAn
+N|PROP|CMT|SG|kin
+N|PROP|ELA|PL
+N|PROP|ELA|PL|1PL
+N|PROP|ELA|PL|3
+N|PROP|ELA|PL|3|hAn
+N|PROP|ELA|PL|DA-UUS|DN-LAINEN
+N|PROP|ELA|PL|DN-LAINEN
+N|PROP|ELA|PL|TrunCo
+N|PROP|ELA|PL|kAAn
+N|PROP|ELA|PL|kin
+N|PROP|ELA|SG
+N|PROP|ELA|SG|1PL
+N|PROP|ELA|SG|3
+N|PROP|ELA|SG|3|hAn
+N|PROP|ELA|SG|DA-UUS|DN-LAINEN
+N|PROP|ELA|SG|DN-LAINEN
+N|PROP|ELA|SG|TrunCo
+N|PROP|ELA|SG|kAAn
+N|PROP|ELA|SG|kin
+N|PROP|ESS|PL
+N|PROP|ESS|PL|1PL
+N|PROP|ESS|PL|3
+N|PROP|ESS|PL|3|hAn
+N|PROP|ESS|PL|DA-UUS|DN-LAINEN
+N|PROP|ESS|PL|DN-LAINEN
+N|PROP|ESS|PL|TrunCo
+N|PROP|ESS|PL|kAAn
+N|PROP|ESS|PL|kin
+N|PROP|ESS|SG
+N|PROP|ESS|SG|1PL
+N|PROP|ESS|SG|3
+N|PROP|ESS|SG|3|hAn
+N|PROP|ESS|SG|DA-UUS|DN-LAINEN
+N|PROP|ESS|SG|DN-LAINEN
+N|PROP|ESS|SG|TrunCo
+N|PROP|ESS|SG|kAAn
+N|PROP|ESS|SG|kin
+N|PROP|GEN|PL
+N|PROP|GEN|PL|1PL
+N|PROP|GEN|PL|3
+N|PROP|GEN|PL|3|hAn
+N|PROP|GEN|PL|DA-UUS|DN-LAINEN
+N|PROP|GEN|PL|DN-LAINEN
+N|PROP|GEN|PL|TrunCo
+N|PROP|GEN|PL|kAAn
+N|PROP|GEN|PL|kin
+N|PROP|GEN|SG
+N|PROP|GEN|SG|1PL
+N|PROP|GEN|SG|3
+N|PROP|GEN|SG|3|hAn
+N|PROP|GEN|SG|DA-UUS|DN-LAINEN
+N|PROP|GEN|SG|DN-LAINEN
+N|PROP|GEN|SG|TrunCo
+N|PROP|GEN|SG|kAAn
+N|PROP|GEN|SG|kin
+N|PROP|ILL|PL
+N|PROP|ILL|PL|1PL
+N|PROP|ILL|PL|3
+N|PROP|ILL|PL|3|hAn
+N|PROP|ILL|PL|DA-UUS|DN-LAINEN
+N|PROP|ILL|PL|DN-LAINEN
+N|PROP|ILL|PL|TrunCo
+N|PROP|ILL|PL|kAAn
+N|PROP|ILL|PL|kin
+N|PROP|ILL|SG
+N|PROP|ILL|SG|1PL
+N|PROP|ILL|SG|3
+N|PROP|ILL|SG|3|hAn
+N|PROP|ILL|SG|DA-UUS|DN-LAINEN
+N|PROP|ILL|SG|DN-LAINEN
+N|PROP|ILL|SG|TrunCo
+N|PROP|ILL|SG|kAAn
+N|PROP|ILL|SG|kin
+N|PROP|INE|PL
+N|PROP|INE|PL|1PL
+N|PROP|INE|PL|3
+N|PROP|INE|PL|3|hAn
+N|PROP|INE|PL|DA-UUS|DN-LAINEN
+N|PROP|INE|PL|DN-LAINEN
+N|PROP|INE|PL|TrunCo
+N|PROP|INE|PL|kAAn
+N|PROP|INE|PL|kin
+N|PROP|INE|SG
+N|PROP|INE|SG|1PL
+N|PROP|INE|SG|3
+N|PROP|INE|SG|3|hAn
+N|PROP|INE|SG|DA-UUS|DN-LAINEN
+N|PROP|INE|SG|DN-LAINEN
+N|PROP|INE|SG|TrunCo
+N|PROP|INE|SG|kAAn
+N|PROP|INE|SG|kin
+N|PROP|INS|PL
+N|PROP|INS|PL|1PL
+N|PROP|INS|PL|3
+N|PROP|INS|PL|3|hAn
+N|PROP|INS|PL|DA-UUS|DN-LAINEN
+N|PROP|INS|PL|DN-LAINEN
+N|PROP|INS|PL|TrunCo
+N|PROP|INS|PL|kAAn
+N|PROP|INS|PL|kin
+N|PROP|INS|SG
+N|PROP|INS|SG|1PL
+N|PROP|INS|SG|3
+N|PROP|INS|SG|3|hAn
+N|PROP|INS|SG|DA-UUS|DN-LAINEN
+N|PROP|INS|SG|DN-LAINEN
+N|PROP|INS|SG|TrunCo
+N|PROP|INS|SG|kAAn
+N|PROP|INS|SG|kin
+N|PROP|NOM|PL
+N|PROP|NOM|PL|1PL
+N|PROP|NOM|PL|3
+N|PROP|NOM|PL|3|hAn
+N|PROP|NOM|PL|DA-UUS|DN-LAINEN
+N|PROP|NOM|PL|DN-LAINEN
+N|PROP|NOM|PL|TrunCo
+N|PROP|NOM|PL|kAAn
+N|PROP|NOM|PL|kin
+N|PROP|NOM|SG
+N|PROP|NOM|SG|1PL
+N|PROP|NOM|SG|3
+N|PROP|NOM|SG|3|hAn
+N|PROP|NOM|SG|DA-UUS|DN-LAINEN
+N|PROP|NOM|SG|DN-LAINEN
+N|PROP|NOM|SG|TrunCo
+N|PROP|NOM|SG|kAAn
+N|PROP|NOM|SG|kin
+N|PROP|PTV|PL
+N|PROP|PTV|PL|1PL
+N|PROP|PTV|PL|3
+N|PROP|PTV|PL|3|hAn
+N|PROP|PTV|PL|DA-UUS|DN-LAINEN
+N|PROP|PTV|PL|DN-LAINEN
+N|PROP|PTV|PL|TrunCo
+N|PROP|PTV|PL|kAAn
+N|PROP|PTV|PL|kin
+N|PROP|PTV|SG
+N|PROP|PTV|SG|1PL
+N|PROP|PTV|SG|3
+N|PROP|PTV|SG|3|hAn
+N|PROP|PTV|SG|DA-UUS|DN-LAINEN
+N|PROP|PTV|SG|DN-LAINEN
+N|PROP|PTV|SG|TrunCo
+N|PROP|PTV|SG|kAAn
+N|PROP|PTV|SG|kin
+N|PROP|TRA|PL
+N|PROP|TRA|PL|1PL
+N|PROP|TRA|PL|3
+N|PROP|TRA|PL|3|hAn
+N|PROP|TRA|PL|DA-UUS|DN-LAINEN
+N|PROP|TRA|PL|DN-LAINEN
+N|PROP|TRA|PL|TrunCo
+N|PROP|TRA|PL|kAAn
+N|PROP|TRA|PL|kin
+N|PROP|TRA|SG
+N|PROP|TRA|SG|1PL
+N|PROP|TRA|SG|3
+N|PROP|TRA|SG|3|hAn
+N|PROP|TRA|SG|DA-UUS|DN-LAINEN
+N|PROP|TRA|SG|DN-LAINEN
+N|PROP|TRA|SG|TrunCo
+N|PROP|TRA|SG|kAAn
+N|PROP|TRA|SG|kin
+N|PTV|PL
+N|PTV|PL|1PL
+N|PTV|PL|1PL|DV-ILE|DV-U
+N|PTV|PL|1PL|DV-MATON|DA-UUS
+N|PTV|PL|1PL|DV-NTA
+N|PTV|PL|1SG
+N|PTV|PL|1SG|DA-UUS
+N|PTV|PL|1SG|DV-JA
+N|PTV|PL|1SG|DV-MA
+N|PTV|PL|1SG|DV-TTA|DV-ELE
+N|PTV|PL|1SG|DV-US
+N|PTV|PL|1SG|PSS|PCP1
+N|PTV|PL|1SG|PSS|PCP1|DA-UUS
+N|PTV|PL|1SG|kin
+N|PTV|PL|1SG|st-cllq
+N|PTV|PL|2PL
+N|PTV|PL|2PL|DV-US
+N|PTV|PL|2SG
+N|PTV|PL|2SG|DV-JA
+N|PTV|PL|2SG|kin
+N|PTV|PL|3
+N|PTV|PL|3|ACT|PCP1
+N|PTV|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|PTV|PL|3|DA-US
+N|PTV|PL|3|DA-UUS
+N|PTV|PL|3|DA-UUS|DN-LLINEN
+N|PTV|PL|3|DA-UUS|DV-VAINEN
+N|PTV|PL|3|DV-ELE
+N|PTV|PL|3|DV-ILE|DV-U
+N|PTV|PL|3|DV-JA
+N|PTV|PL|3|DV-MA
+N|PTV|PL|3|DV-MA|DV-TTA
+N|PTV|PL|3|DV-MINEN
+N|PTV|PL|3|DV-MINEN|DV-U
+N|PTV|PL|3|DV-NTA
+N|PTV|PL|3|DV-U
+N|PTV|PL|3|DV-US
+N|PTV|PL|3|DV-U|DV-ELE
+N|PTV|PL|3|TrunCo
+N|PTV|PL|3|TrunCo|DV-US
+N|PTV|PL|3|kin
+N|PTV|PL|3|st-cllq
+N|PTV|PL|ACT|PCP1
+N|PTV|PL|ACT|PCP1|DA-UUS
+N|PTV|PL|ACT|PCP1|DA-UUS|DV-U
+N|PTV|PL|DA-US
+N|PTV|PL|DA-UUS
+N|PTV|PL|DA-UUS|DN-INEN
+N|PTV|PL|DA-UUS|DN-LLINEN
+N|PTV|PL|DA-UUS|DN-TON
+N|PTV|PL|DA-UUS|DV-MATON
+N|PTV|PL|DA-UUS|DV-VAINEN
+N|PTV|PL|DN-TON|DA-UUS
+N|PTV|PL|DV-ELE
+N|PTV|PL|DV-ELE|DV-JA
+N|PTV|PL|DV-ELE|DV-MINEN
+N|PTV|PL|DV-ILE
+N|PTV|PL|DV-ILE|DV-U
+N|PTV|PL|DV-JA
+N|PTV|PL|DV-JA|DN-TAR
+N|PTV|PL|DV-JA|DV-ILE
+N|PTV|PL|DV-JA|DV-TTA
+N|PTV|PL|DV-JA|DV-TTA|DV-ELE
+N|PTV|PL|DV-JA|DV-UTU
+N|PTV|PL|DV-MA
+N|PTV|PL|DV-MINEN
+N|PTV|PL|DV-MINEN|DV-U
+N|PTV|PL|DV-NA
+N|PTV|PL|DV-NEISUUS
+N|PTV|PL|DV-NTA
+N|PTV|PL|DV-NTAA
+N|PTV|PL|DV-NTAA|DV-MINEN
+N|PTV|PL|DV-NTAA|DV-US
+N|PTV|PL|DV-NTI
+N|PTV|PL|DV-TTA
+N|PTV|PL|DV-TTA|DV-MINEN|DV-ELE
+N|PTV|PL|DV-TTA|DV-U|DV-ELE
+N|PTV|PL|DV-U
+N|PTV|PL|DV-US
+N|PTV|PL|DV-US|DV-TTA
+N|PTV|PL|DV-UTTA|DV-US
+N|PTV|PL|DV-UTU
+N|PTV|PL|DV-UTU|DV-MINEN
+N|PTV|PL|DV-U|DV-ELE
+N|PTV|PL|DV-U|DV-ILE
+N|PTV|PL|DV-U|DV-JA
+N|PTV|PL|DV-U|DV-MA
+N|PTV|PL|DV-U|DV-MINEN
+N|PTV|PL|DV-U|DV-NEISUUS
+N|PTV|PL|DV-U|DV-SKELE
+N|PTV|PL|DV-U|DV-TTA
+N|PTV|PL|PSS|PCP1
+N|PTV|PL|PSS|PCP1|DA-UUS
+N|PTV|PL|PSS|PCP2
+N|PTV|PL|PSS|PCP2|DA-US
+N|PTV|PL|TrunCo
+N|PTV|PL|TrunCo|DA-US
+N|PTV|PL|TrunCo|DA-UUS
+N|PTV|PL|TrunCo|DV-JA
+N|PTV|PL|TrunCo|DV-MINEN
+N|PTV|PL|TrunCo|DV-NTA
+N|PTV|PL|TrunCo|DV-NTI
+N|PTV|PL|TrunCo|DV-U
+N|PTV|PL|TrunCo|DV-US
+N|PTV|PL|TrunCo|DV-US|DV-TTA
+N|PTV|PL|hAn
+N|PTV|PL|kAAn
+N|PTV|PL|kAAn|DV-JA
+N|PTV|PL|kAAn|DV-NTI
+N|PTV|PL|kin
+N|PTV|PL|kin|DA-UUS
+N|PTV|PL|kin|DV-JA
+N|PTV|PL|st-arch
+N|PTV|PL|st-cllq
+N|PTV|PL|st-cllq|DV-MINEN
+N|PTV|PL|st-cllq|DV-US
+N|PTV|PL|st-cllq|TrunCo
+N|PTV|PL|st-derog
+N|PTV|PL|st-hi
+N|PTV|PL|st-slang
+N|PTV|PL|st-slang|DV-JA
+N|PTV|PL|st-vrnc
+N|PTV|SG
+N|PTV|SG|1PL
+N|PTV|SG|1PL|DV-ILE|DV-U
+N|PTV|SG|1PL|DV-MATON|DA-UUS
+N|PTV|SG|1PL|DV-NTA
+N|PTV|SG|1SG
+N|PTV|SG|1SG|DA-UUS
+N|PTV|SG|1SG|DV-JA
+N|PTV|SG|1SG|DV-MA
+N|PTV|SG|1SG|DV-TTA|DV-ELE
+N|PTV|SG|1SG|DV-US
+N|PTV|SG|1SG|PSS|PCP1
+N|PTV|SG|1SG|PSS|PCP1|DA-UUS
+N|PTV|SG|1SG|kin
+N|PTV|SG|1SG|st-cllq
+N|PTV|SG|2PL
+N|PTV|SG|2PL|DV-US
+N|PTV|SG|2SG
+N|PTV|SG|2SG|DV-JA
+N|PTV|SG|2SG|kin
+N|PTV|SG|3
+N|PTV|SG|3|ACT|PCP1
+N|PTV|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|PTV|SG|3|DA-US
+N|PTV|SG|3|DA-UUS
+N|PTV|SG|3|DA-UUS|DN-LLINEN
+N|PTV|SG|3|DA-UUS|DV-VAINEN
+N|PTV|SG|3|DV-ELE
+N|PTV|SG|3|DV-ILE|DV-U
+N|PTV|SG|3|DV-JA
+N|PTV|SG|3|DV-MA
+N|PTV|SG|3|DV-MA|DV-TTA
+N|PTV|SG|3|DV-MINEN
+N|PTV|SG|3|DV-MINEN|DV-U
+N|PTV|SG|3|DV-NTA
+N|PTV|SG|3|DV-U
+N|PTV|SG|3|DV-US
+N|PTV|SG|3|DV-U|DV-ELE
+N|PTV|SG|3|TrunCo
+N|PTV|SG|3|TrunCo|DV-US
+N|PTV|SG|3|kin
+N|PTV|SG|3|st-cllq
+N|PTV|SG|ACT|PCP1
+N|PTV|SG|ACT|PCP1|DA-UUS
+N|PTV|SG|ACT|PCP1|DA-UUS|DV-U
+N|PTV|SG|DA-US
+N|PTV|SG|DA-UUS
+N|PTV|SG|DA-UUS|DN-INEN
+N|PTV|SG|DA-UUS|DN-LLINEN
+N|PTV|SG|DA-UUS|DN-TON
+N|PTV|SG|DA-UUS|DV-MATON
+N|PTV|SG|DA-UUS|DV-VAINEN
+N|PTV|SG|DN-TON|DA-UUS
+N|PTV|SG|DV-ELE
+N|PTV|SG|DV-ELE|DV-JA
+N|PTV|SG|DV-ELE|DV-MINEN
+N|PTV|SG|DV-ILE
+N|PTV|SG|DV-ILE|DV-U
+N|PTV|SG|DV-JA
+N|PTV|SG|DV-JA|DN-TAR
+N|PTV|SG|DV-JA|DV-ILE
+N|PTV|SG|DV-JA|DV-TTA
+N|PTV|SG|DV-JA|DV-TTA|DV-ELE
+N|PTV|SG|DV-JA|DV-UTU
+N|PTV|SG|DV-MA
+N|PTV|SG|DV-MINEN
+N|PTV|SG|DV-MINEN|DV-U
+N|PTV|SG|DV-NA
+N|PTV|SG|DV-NEISUUS
+N|PTV|SG|DV-NTA
+N|PTV|SG|DV-NTAA
+N|PTV|SG|DV-NTAA|DV-MINEN
+N|PTV|SG|DV-NTAA|DV-US
+N|PTV|SG|DV-NTI
+N|PTV|SG|DV-TTA
+N|PTV|SG|DV-TTA|DV-MINEN|DV-ELE
+N|PTV|SG|DV-TTA|DV-U|DV-ELE
+N|PTV|SG|DV-U
+N|PTV|SG|DV-US
+N|PTV|SG|DV-US|DV-TTA
+N|PTV|SG|DV-UTTA|DV-US
+N|PTV|SG|DV-UTU
+N|PTV|SG|DV-UTU|DV-MINEN
+N|PTV|SG|DV-U|DV-ELE
+N|PTV|SG|DV-U|DV-ILE
+N|PTV|SG|DV-U|DV-JA
+N|PTV|SG|DV-U|DV-MA
+N|PTV|SG|DV-U|DV-MINEN
+N|PTV|SG|DV-U|DV-NEISUUS
+N|PTV|SG|DV-U|DV-SKELE
+N|PTV|SG|DV-U|DV-TTA
+N|PTV|SG|PSS|PCP1
+N|PTV|SG|PSS|PCP1|DA-UUS
+N|PTV|SG|PSS|PCP2
+N|PTV|SG|PSS|PCP2|DA-US
+N|PTV|SG|TrunCo
+N|PTV|SG|TrunCo|DA-US
+N|PTV|SG|TrunCo|DA-UUS
+N|PTV|SG|TrunCo|DV-JA
+N|PTV|SG|TrunCo|DV-MINEN
+N|PTV|SG|TrunCo|DV-NTA
+N|PTV|SG|TrunCo|DV-NTI
+N|PTV|SG|TrunCo|DV-U
+N|PTV|SG|TrunCo|DV-US
+N|PTV|SG|TrunCo|DV-US|DV-TTA
+N|PTV|SG|hAn
+N|PTV|SG|kAAn
+N|PTV|SG|kAAn|DV-JA
+N|PTV|SG|kAAn|DV-NTI
+N|PTV|SG|kin
+N|PTV|SG|kin|DA-UUS
+N|PTV|SG|kin|DV-JA
+N|PTV|SG|st-arch
+N|PTV|SG|st-cllq
+N|PTV|SG|st-cllq|DV-MINEN
+N|PTV|SG|st-cllq|DV-US
+N|PTV|SG|st-cllq|TrunCo
+N|PTV|SG|st-derog
+N|PTV|SG|st-hi
+N|PTV|SG|st-slang
+N|PTV|SG|st-slang|DV-JA
+N|PTV|SG|st-vrnc
+N|TRA|PL
+N|TRA|PL|1PL
+N|TRA|PL|1PL|DV-ILE|DV-U
+N|TRA|PL|1PL|DV-MATON|DA-UUS
+N|TRA|PL|1PL|DV-NTA
+N|TRA|PL|1SG
+N|TRA|PL|1SG|DA-UUS
+N|TRA|PL|1SG|DV-JA
+N|TRA|PL|1SG|DV-MA
+N|TRA|PL|1SG|DV-TTA|DV-ELE
+N|TRA|PL|1SG|DV-US
+N|TRA|PL|1SG|PSS|PCP1
+N|TRA|PL|1SG|PSS|PCP1|DA-UUS
+N|TRA|PL|1SG|kin
+N|TRA|PL|1SG|st-cllq
+N|TRA|PL|2PL
+N|TRA|PL|2PL|DV-US
+N|TRA|PL|2SG
+N|TRA|PL|2SG|DV-JA
+N|TRA|PL|2SG|kin
+N|TRA|PL|3
+N|TRA|PL|3|ACT|PCP1
+N|TRA|PL|3|ACT|PCP1|DA-UUS|DV-U
+N|TRA|PL|3|DA-US
+N|TRA|PL|3|DA-UUS
+N|TRA|PL|3|DA-UUS|DN-LLINEN
+N|TRA|PL|3|DA-UUS|DV-VAINEN
+N|TRA|PL|3|DV-ELE
+N|TRA|PL|3|DV-ILE|DV-U
+N|TRA|PL|3|DV-JA
+N|TRA|PL|3|DV-MA
+N|TRA|PL|3|DV-MA|DV-TTA
+N|TRA|PL|3|DV-MINEN
+N|TRA|PL|3|DV-MINEN|DV-U
+N|TRA|PL|3|DV-NTA
+N|TRA|PL|3|DV-U
+N|TRA|PL|3|DV-US
+N|TRA|PL|3|DV-U|DV-ELE
+N|TRA|PL|3|TrunCo
+N|TRA|PL|3|TrunCo|DV-US
+N|TRA|PL|3|kin
+N|TRA|PL|3|st-cllq
+N|TRA|PL|ACT|PCP1
+N|TRA|PL|ACT|PCP1|DA-UUS
+N|TRA|PL|ACT|PCP1|DA-UUS|DV-U
+N|TRA|PL|DA-US
+N|TRA|PL|DA-UUS
+N|TRA|PL|DA-UUS|DN-INEN
+N|TRA|PL|DA-UUS|DN-LLINEN
+N|TRA|PL|DA-UUS|DN-TON
+N|TRA|PL|DA-UUS|DV-MATON
+N|TRA|PL|DA-UUS|DV-VAINEN
+N|TRA|PL|DN-TON|DA-UUS
+N|TRA|PL|DV-ELE
+N|TRA|PL|DV-ELE|DV-JA
+N|TRA|PL|DV-ELE|DV-MINEN
+N|TRA|PL|DV-ILE
+N|TRA|PL|DV-ILE|DV-U
+N|TRA|PL|DV-JA
+N|TRA|PL|DV-JA|DN-TAR
+N|TRA|PL|DV-JA|DV-ILE
+N|TRA|PL|DV-JA|DV-TTA
+N|TRA|PL|DV-JA|DV-TTA|DV-ELE
+N|TRA|PL|DV-JA|DV-UTU
+N|TRA|PL|DV-MA
+N|TRA|PL|DV-MINEN
+N|TRA|PL|DV-MINEN|DV-U
+N|TRA|PL|DV-NA
+N|TRA|PL|DV-NEISUUS
+N|TRA|PL|DV-NTA
+N|TRA|PL|DV-NTAA
+N|TRA|PL|DV-NTAA|DV-MINEN
+N|TRA|PL|DV-NTAA|DV-US
+N|TRA|PL|DV-NTI
+N|TRA|PL|DV-TTA
+N|TRA|PL|DV-TTA|DV-MINEN|DV-ELE
+N|TRA|PL|DV-TTA|DV-U|DV-ELE
+N|TRA|PL|DV-U
+N|TRA|PL|DV-US
+N|TRA|PL|DV-US|DV-TTA
+N|TRA|PL|DV-UTTA|DV-US
+N|TRA|PL|DV-UTU
+N|TRA|PL|DV-UTU|DV-MINEN
+N|TRA|PL|DV-U|DV-ELE
+N|TRA|PL|DV-U|DV-ILE
+N|TRA|PL|DV-U|DV-JA
+N|TRA|PL|DV-U|DV-MA
+N|TRA|PL|DV-U|DV-MINEN
+N|TRA|PL|DV-U|DV-NEISUUS
+N|TRA|PL|DV-U|DV-SKELE
+N|TRA|PL|DV-U|DV-TTA
+N|TRA|PL|PSS|PCP1
+N|TRA|PL|PSS|PCP1|DA-UUS
+N|TRA|PL|PSS|PCP2
+N|TRA|PL|PSS|PCP2|DA-US
+N|TRA|PL|TrunCo
+N|TRA|PL|TrunCo|DA-US
+N|TRA|PL|TrunCo|DA-UUS
+N|TRA|PL|TrunCo|DV-JA
+N|TRA|PL|TrunCo|DV-MINEN
+N|TRA|PL|TrunCo|DV-NTA
+N|TRA|PL|TrunCo|DV-NTI
+N|TRA|PL|TrunCo|DV-U
+N|TRA|PL|TrunCo|DV-US
+N|TRA|PL|TrunCo|DV-US|DV-TTA
+N|TRA|PL|hAn
+N|TRA|PL|kAAn
+N|TRA|PL|kAAn|DV-JA
+N|TRA|PL|kAAn|DV-NTI
+N|TRA|PL|kin
+N|TRA|PL|kin|DA-UUS
+N|TRA|PL|kin|DV-JA
+N|TRA|PL|st-arch
+N|TRA|PL|st-cllq
+N|TRA|PL|st-cllq|DV-MINEN
+N|TRA|PL|st-cllq|DV-US
+N|TRA|PL|st-cllq|TrunCo
+N|TRA|PL|st-derog
+N|TRA|PL|st-hi
+N|TRA|PL|st-slang
+N|TRA|PL|st-slang|DV-JA
+N|TRA|PL|st-vrnc
+N|TRA|SG
+N|TRA|SG|1PL
+N|TRA|SG|1PL|DV-ILE|DV-U
+N|TRA|SG|1PL|DV-MATON|DA-UUS
+N|TRA|SG|1PL|DV-NTA
+N|TRA|SG|1SG
+N|TRA|SG|1SG|DA-UUS
+N|TRA|SG|1SG|DV-JA
+N|TRA|SG|1SG|DV-MA
+N|TRA|SG|1SG|DV-TTA|DV-ELE
+N|TRA|SG|1SG|DV-US
+N|TRA|SG|1SG|PSS|PCP1
+N|TRA|SG|1SG|PSS|PCP1|DA-UUS
+N|TRA|SG|1SG|kin
+N|TRA|SG|1SG|st-cllq
+N|TRA|SG|2PL
+N|TRA|SG|2PL|DV-US
+N|TRA|SG|2SG
+N|TRA|SG|2SG|DV-JA
+N|TRA|SG|2SG|kin
+N|TRA|SG|3
+N|TRA|SG|3|ACT|PCP1
+N|TRA|SG|3|ACT|PCP1|DA-UUS|DV-U
+N|TRA|SG|3|DA-US
+N|TRA|SG|3|DA-UUS
+N|TRA|SG|3|DA-UUS|DN-LLINEN
+N|TRA|SG|3|DA-UUS|DV-VAINEN
+N|TRA|SG|3|DV-ELE
+N|TRA|SG|3|DV-ILE|DV-U
+N|TRA|SG|3|DV-JA
+N|TRA|SG|3|DV-MA
+N|TRA|SG|3|DV-MA|DV-TTA
+N|TRA|SG|3|DV-MINEN
+N|TRA|SG|3|DV-MINEN|DV-U
+N|TRA|SG|3|DV-NTA
+N|TRA|SG|3|DV-U
+N|TRA|SG|3|DV-US
+N|TRA|SG|3|DV-U|DV-ELE
+N|TRA|SG|3|TrunCo
+N|TRA|SG|3|TrunCo|DV-US
+N|TRA|SG|3|kin
+N|TRA|SG|3|st-cllq
+N|TRA|SG|ACT|PCP1
+N|TRA|SG|ACT|PCP1|DA-UUS
+N|TRA|SG|ACT|PCP1|DA-UUS|DV-U
+N|TRA|SG|DA-US
+N|TRA|SG|DA-UUS
+N|TRA|SG|DA-UUS|DN-INEN
+N|TRA|SG|DA-UUS|DN-LLINEN
+N|TRA|SG|DA-UUS|DN-TON
+N|TRA|SG|DA-UUS|DV-MATON
+N|TRA|SG|DA-UUS|DV-VAINEN
+N|TRA|SG|DN-TON|DA-UUS
+N|TRA|SG|DV-ELE
+N|TRA|SG|DV-ELE|DV-JA
+N|TRA|SG|DV-ELE|DV-MINEN
+N|TRA|SG|DV-ILE
+N|TRA|SG|DV-ILE|DV-U
+N|TRA|SG|DV-JA
+N|TRA|SG|DV-JA|DN-TAR
+N|TRA|SG|DV-JA|DV-ILE
+N|TRA|SG|DV-JA|DV-TTA
+N|TRA|SG|DV-JA|DV-TTA|DV-ELE
+N|TRA|SG|DV-JA|DV-UTU
+N|TRA|SG|DV-MA
+N|TRA|SG|DV-MINEN
+N|TRA|SG|DV-MINEN|DV-U
+N|TRA|SG|DV-NA
+N|TRA|SG|DV-NEISUUS
+N|TRA|SG|DV-NTA
+N|TRA|SG|DV-NTAA
+N|TRA|SG|DV-NTAA|DV-MINEN
+N|TRA|SG|DV-NTAA|DV-US
+N|TRA|SG|DV-NTI
+N|TRA|SG|DV-TTA
+N|TRA|SG|DV-TTA|DV-MINEN|DV-ELE
+N|TRA|SG|DV-TTA|DV-U|DV-ELE
+N|TRA|SG|DV-U
+N|TRA|SG|DV-US
+N|TRA|SG|DV-US|DV-TTA
+N|TRA|SG|DV-UTTA|DV-US
+N|TRA|SG|DV-UTU
+N|TRA|SG|DV-UTU|DV-MINEN
+N|TRA|SG|DV-U|DV-ELE
+N|TRA|SG|DV-U|DV-ILE
+N|TRA|SG|DV-U|DV-JA
+N|TRA|SG|DV-U|DV-MA
+N|TRA|SG|DV-U|DV-MINEN
+N|TRA|SG|DV-U|DV-NEISUUS
+N|TRA|SG|DV-U|DV-SKELE
+N|TRA|SG|DV-U|DV-TTA
+N|TRA|SG|PSS|PCP1
+N|TRA|SG|PSS|PCP1|DA-UUS
+N|TRA|SG|PSS|PCP2
+N|TRA|SG|PSS|PCP2|DA-US
+N|TRA|SG|TrunCo
+N|TRA|SG|TrunCo|DA-US
+N|TRA|SG|TrunCo|DA-UUS
+N|TRA|SG|TrunCo|DV-JA
+N|TRA|SG|TrunCo|DV-MINEN
+N|TRA|SG|TrunCo|DV-NTA
+N|TRA|SG|TrunCo|DV-NTI
+N|TRA|SG|TrunCo|DV-U
+N|TRA|SG|TrunCo|DV-US
+N|TRA|SG|TrunCo|DV-US|DV-TTA
+N|TRA|SG|hAn
+N|TRA|SG|kAAn
+N|TRA|SG|kAAn|DV-JA
+N|TRA|SG|kAAn|DV-NTI
+N|TRA|SG|kin
+N|TRA|SG|kin|DA-UUS
+N|TRA|SG|kin|DV-JA
+N|TRA|SG|st-arch
+N|TRA|SG|st-cllq
+N|TRA|SG|st-cllq|DV-MINEN
+N|TRA|SG|st-cllq|DV-US
+N|TRA|SG|st-cllq|TrunCo
+N|TRA|SG|st-derog
+N|TRA|SG|st-hi
+N|TRA|SG|st-slang
+N|TRA|SG|st-slang|DV-JA
+N|TRA|SG|st-vrnc
+N|digit|ABE|PL
+N|digit|ABE|PL|3
+N|digit|ABE|PL|kin
+N|digit|ABE|SG
+N|digit|ABE|SG|3
+N|digit|ABE|SG|kin
+N|digit|ABL|PL
+N|digit|ABL|PL|3
+N|digit|ABL|PL|kin
+N|digit|ABL|SG
+N|digit|ABL|SG|3
+N|digit|ABL|SG|kin
+N|digit|ADE|PL
+N|digit|ADE|PL|3
+N|digit|ADE|PL|kin
+N|digit|ADE|SG
+N|digit|ADE|SG|3
+N|digit|ADE|SG|kin
+N|digit|ALL|PL
+N|digit|ALL|PL|3
+N|digit|ALL|PL|kin
+N|digit|ALL|SG
+N|digit|ALL|SG|3
+N|digit|ALL|SG|kin
+N|digit|CMT|PL
+N|digit|CMT|PL|3
+N|digit|CMT|PL|kin
+N|digit|CMT|SG
+N|digit|CMT|SG|3
+N|digit|CMT|SG|kin
+N|digit|ELA|PL
+N|digit|ELA|PL|3
+N|digit|ELA|PL|kin
+N|digit|ELA|SG
+N|digit|ELA|SG|3
+N|digit|ELA|SG|kin
+N|digit|ESS|PL
+N|digit|ESS|PL|3
+N|digit|ESS|PL|kin
+N|digit|ESS|SG
+N|digit|ESS|SG|3
+N|digit|ESS|SG|kin
+N|digit|GEN|PL
+N|digit|GEN|PL|3
+N|digit|GEN|PL|kin
+N|digit|GEN|SG
+N|digit|GEN|SG|3
+N|digit|GEN|SG|kin
+N|digit|ILL|PL
+N|digit|ILL|PL|3
+N|digit|ILL|PL|kin
+N|digit|ILL|SG
+N|digit|ILL|SG|3
+N|digit|ILL|SG|kin
+N|digit|INE|PL
+N|digit|INE|PL|3
+N|digit|INE|PL|kin
+N|digit|INE|SG
+N|digit|INE|SG|3
+N|digit|INE|SG|kin
+N|digit|INS|PL
+N|digit|INS|PL|3
+N|digit|INS|PL|kin
+N|digit|INS|SG
+N|digit|INS|SG|3
+N|digit|INS|SG|kin
+N|digit|NOM|PL
+N|digit|NOM|PL|3
+N|digit|NOM|PL|kin
+N|digit|NOM|SG
+N|digit|NOM|SG|3
+N|digit|NOM|SG|kin
+N|digit|PTV|PL
+N|digit|PTV|PL|3
+N|digit|PTV|PL|kin
+N|digit|PTV|SG
+N|digit|PTV|SG|3
+N|digit|PTV|SG|kin
+N|digit|TRA|PL
+N|digit|TRA|PL|3
+N|digit|TRA|PL|kin
+N|digit|TRA|SG
+N|digit|TRA|SG|3
+N|digit|TRA|SG|kin
+N|roman|ABE|PL
+N|roman|ABE|SG
+N|roman|ABL|PL
+N|roman|ABL|SG
+N|roman|ADE|PL
+N|roman|ADE|SG
+N|roman|ALL|PL
+N|roman|ALL|SG
+N|roman|CMT|PL
+N|roman|CMT|SG
+N|roman|ELA|PL
+N|roman|ELA|SG
+N|roman|ESS|PL
+N|roman|ESS|SG
+N|roman|GEN|PL
+N|roman|GEN|SG
+N|roman|ILL|PL
+N|roman|ILL|SG
+N|roman|INE|PL
+N|roman|INE|SG
+N|roman|INS|PL
+N|roman|INS|SG
+N|roman|NOM|PL
+N|roman|NOM|SG
+N|roman|PTV|PL
+N|roman|PTV|SG
+N|roman|TRA|PL
+N|roman|TRA|SG
+POS|ABL|PL|ACT|PCP1
+POS|ABL|SG|ACT|PCP1
+POS|ABL|SG|ACT|PCP2
+POS|ABL|SG|PSS|PCP2
+POS|ADE|PL|ACT|PCP2
+POS|ADE|PL|PSS|PCP1
+POS|ADE|PL|PSS|PCP2
+POS|ADE|SG|ACT|PCP1
+POS|ADE|SG|ACT|PCP2
+POS|ADE|SG|PSS|PCP1
+POS|ADE|SG|PSS|PCP2
+POS|ADE|SG|PSS|PCP2|DV-TTA
+POS|ALL|PL|ACT|PCP1
+POS|ALL|PL|ACT|PCP1|DV-U
+POS|ALL|PL|ACT|PCP2
+POS|ALL|PL|ACT|PCP2|DV-U
+POS|ALL|SG|ACT|PCP1
+POS|ALL|SG|ACT|PCP2
+POS|ALL|SG|ACT|PCP2|DV-ELE
+POS|ALL|SG|PSS|PCP1
+POS|ALL|SG|PSS|PCP2
+POS|CMT|ACT|PCP1
+POS|ELA|PL|ACT|PCP1
+POS|ELA|PL|ACT|PCP2
+POS|ELA|PL|ACT|PCP2|DV-U
+POS|ELA|PL|PSS|PCP2
+POS|ELA|PL|PSS|PCP2|DV-TTA|DV-ELE
+POS|ELA|SG|ACT|PCP1
+POS|ELA|SG|ACT|PCP1|DV-U
+POS|ELA|SG|ACT|PCP2
+POS|ELA|SG|ACT|PCP2|DV-U
+POS|ELA|SG|PSS|PCP1
+POS|ELA|SG|PSS|PCP2
+POS|ESS|PL|ACT|PCP1
+POS|ESS|PL|ACT|PCP1|DV-ILE|DV-TTA
+POS|ESS|PL|ACT|PCP2
+POS|ESS|PL|PSS|PCP2
+POS|ESS|SG|ACT|PCP1
+POS|ESS|SG|ACT|PCP2
+POS|ESS|SG|ACT|PCP2|DV-UTU
+POS|ESS|SG|PSS|PCP1
+POS|ESS|SG|PSS|PCP2
+POS|ESS|SG|PSS|PCP2|DV-ELE
+POS|ESS|SG|PSS|PCP2|DV-ILE
+POS|GEN|PL|ACT|PCP1
+POS|GEN|PL|ACT|PCP2
+POS|GEN|PL|ACT|PCP2|DV-U
+POS|GEN|PL|PSS|PCP2
+POS|GEN|PL|PSS|PCP2|DV-ILE
+POS|GEN|PL|PSS|PCP2|DV-TTA|DV-ELE
+POS|GEN|SG|ACT|PCP1
+POS|GEN|SG|ACT|PCP1|DV-ELE
+POS|GEN|SG|ACT|PCP1|DV-ILE
+POS|GEN|SG|ACT|PCP1|DV-TTA
+POS|GEN|SG|ACT|PCP1|DV-U
+POS|GEN|SG|ACT|PCP1|DV-UTU
+POS|GEN|SG|ACT|PCP2
+POS|GEN|SG|ACT|PCP2|DV-ELE
+POS|GEN|SG|ACT|PCP2|DV-NTAA
+POS|GEN|SG|ACT|PCP2|DV-TTA
+POS|GEN|SG|ACT|PCP2|DV-U
+POS|GEN|SG|PSS|PCP1
+POS|GEN|SG|PSS|PCP1|DV-TTA
+POS|GEN|SG|PSS|PCP2
+POS|GEN|SG|PSS|PCP2|DV-ILE
+POS|ILL|PL|ACT|PCP1
+POS|ILL|PL|PSS|PCP2
+POS|ILL|SG|ACT|PCP1
+POS|ILL|SG|ACT|PCP1|DV-U
+POS|ILL|SG|ACT|PCP2
+POS|ILL|SG|PSS|PCP1
+POS|ILL|SG|PSS|PCP2
+POS|INE|PL|ACT|PCP1
+POS|INE|PL|ACT|PCP2
+POS|INE|PL|ACT|PCP2|DV-U
+POS|INE|PL|PSS|PCP1
+POS|INE|PL|PSS|PCP2
+POS|INE|SG|ACT|PCP1
+POS|INE|SG|ACT|PCP1|DV-ILE
+POS|INE|SG|ACT|PCP1|DV-U
+POS|INE|SG|ACT|PCP2
+POS|INE|SG|ACT|PCP2|DV-U
+POS|INE|SG|PSS|PCP1
+POS|INE|SG|PSS|PCP2
+POS|NOM|PL|ACT|PCP1
+POS|NOM|PL|ACT|PCP1|DV-TTA
+POS|NOM|PL|ACT|PCP1|DV-U
+POS|NOM|PL|ACT|PCP1|DV-UTU
+POS|NOM|PL|ACT|PCP2
+POS|NOM|PL|ACT|PCP2|DV-ELE
+POS|NOM|PL|ACT|PCP2|DV-TTA
+POS|NOM|PL|ACT|PCP2|DV-U
+POS|NOM|PL|ACT|PCP2|DV-UTU
+POS|NOM|PL|PSS|PCP1
+POS|NOM|PL|PSS|PCP1|DV-TTA|DV-ELE
+POS|NOM|PL|PSS|PCP2
+POS|NOM|PL|PSS|PCP2|DV-TTA
+POS|NOM|SG|1SG|ACT|PCP1
+POS|NOM|SG|3|ACT|PCP1
+POS|NOM|SG|3|ACT|PCP2
+POS|NOM|SG|3|ACT|PCP2|DV-U
+POS|NOM|SG|ACT|PCP1
+POS|NOM|SG|ACT|PCP1|DV-ELE
+POS|NOM|SG|ACT|PCP1|DV-TTA
+POS|NOM|SG|ACT|PCP1|DV-U
+POS|NOM|SG|ACT|PCP1|kin
+POS|NOM|SG|ACT|PCP1|st-hi
+POS|NOM|SG|ACT|PCP2
+POS|NOM|SG|ACT|PCP2|DV-ELE
+POS|NOM|SG|ACT|PCP2|DV-ILE
+POS|NOM|SG|ACT|PCP2|DV-TTA
+POS|NOM|SG|ACT|PCP2|DV-TTA|DV-ELE
+POS|NOM|SG|ACT|PCP2|DV-U
+POS|NOM|SG|ACT|PCP2|DV-UTU
+POS|NOM|SG|ACT|PCP2|kin
+POS|NOM|SG|ACT|PCP2|kin|DV-U
+POS|NOM|SG|ACT|PCP2|st-cllq
+POS|NOM|SG|PSS|PCP1
+POS|NOM|SG|PSS|PCP1|DV-TTA
+POS|NOM|SG|PSS|PCP2
+POS|NOM|SG|PSS|PCP2|DV-ELE
+POS|NOM|SG|PSS|PCP2|DV-ILE
+POS|NOM|SG|PSS|PCP2|DV-TTA
+POS|NOM|SG|PSS|PCP2|DV-TTA|DV-ELE
+POS|NOM|SG|PSS|PCP2|DV-U
+POS|NOM|SG|PSS|PCP2|st-cllq
+POS|PTV|PL|ACT|PCP1
+POS|PTV|PL|ACT|PCP2
+POS|PTV|PL|ACT|PCP2|DV-U
+POS|PTV|PL|PSS|PCP1
+POS|PTV|PL|PSS|PCP2
+POS|PTV|SG|3|PSS|PCP2
+POS|PTV|SG|3|PSS|PCP2|DV-U
+POS|PTV|SG|ACT|PCP1
+POS|PTV|SG|ACT|PCP1|DV-ILE
+POS|PTV|SG|ACT|PCP1|DV-TTA
+POS|PTV|SG|ACT|PCP1|DV-UTU
+POS|PTV|SG|ACT|PCP2
+POS|PTV|SG|ACT|PCP2|DV-U
+POS|PTV|SG|ACT|PCP2|DV-UTU
+POS|PTV|SG|PSS|PCP1
+POS|PTV|SG|PSS|PCP2
+POS|PTV|SG|PSS|PCP2|DV-NTAA
+POS|PTV|SG|PSS|PCP2|DV-TTA
+POS|PTV|SG|PSS|PCP2|DV-U
+POS|PTV|SG|PSS|PCP2|DV-UTU
+POS|TRA|PL|ACT|PCP1
+POS|TRA|PL|ACT|PCP1|DV-TTA
+POS|TRA|PL|PSS|PCP1
+POS|TRA|PL|PSS|PCP1|DV-TTA
+POS|TRA|PL|PSS|PCP2
+POS|TRA|SG|3|PSS|PCP1
+POS|TRA|SG|3|PSS|PCP2
+POS|TRA|SG|ACT|PCP1
+POS|TRA|SG|ACT|PCP2
+POS|TRA|SG|ACT|PCP2|DV-U
+POS|TRA|SG|PSS|PCP1
+POS|TRA|SG|PSS|PCP2
+PP
+PP|3
+PP|ADE|3
+PP|FORGN
+PP|kin
+PRON|DEM|ABE|PL
+PRON|DEM|ABE|PL|hAn
+PRON|DEM|ABE|PL|kAAn
+PRON|DEM|ABE|PL|kin
+PRON|DEM|ABE|PL|pA
+PRON|DEM|ABE|SG
+PRON|DEM|ABE|SG|hAn
+PRON|DEM|ABE|SG|kAAn
+PRON|DEM|ABE|SG|kin
+PRON|DEM|ABE|SG|pA
+PRON|DEM|ABL|PL
+PRON|DEM|ABL|PL|hAn
+PRON|DEM|ABL|PL|kAAn
+PRON|DEM|ABL|PL|kin
+PRON|DEM|ABL|PL|pA
+PRON|DEM|ABL|SG
+PRON|DEM|ABL|SG|hAn
+PRON|DEM|ABL|SG|kAAn
+PRON|DEM|ABL|SG|kin
+PRON|DEM|ABL|SG|pA
+PRON|DEM|ADE|PL
+PRON|DEM|ADE|PL|hAn
+PRON|DEM|ADE|PL|kAAn
+PRON|DEM|ADE|PL|kin
+PRON|DEM|ADE|PL|pA
+PRON|DEM|ADE|SG
+PRON|DEM|ADE|SG|hAn
+PRON|DEM|ADE|SG|kAAn
+PRON|DEM|ADE|SG|kin
+PRON|DEM|ADE|SG|pA
+PRON|DEM|ALL|PL
+PRON|DEM|ALL|PL|hAn
+PRON|DEM|ALL|PL|kAAn
+PRON|DEM|ALL|PL|kin
+PRON|DEM|ALL|PL|pA
+PRON|DEM|ALL|SG
+PRON|DEM|ALL|SG|hAn
+PRON|DEM|ALL|SG|kAAn
+PRON|DEM|ALL|SG|kin
+PRON|DEM|ALL|SG|pA
+PRON|DEM|CMT|PL
+PRON|DEM|CMT|PL|hAn
+PRON|DEM|CMT|PL|kAAn
+PRON|DEM|CMT|PL|kin
+PRON|DEM|CMT|PL|pA
+PRON|DEM|CMT|SG
+PRON|DEM|CMT|SG|hAn
+PRON|DEM|CMT|SG|kAAn
+PRON|DEM|CMT|SG|kin
+PRON|DEM|CMT|SG|pA
+PRON|DEM|ELA|PL
+PRON|DEM|ELA|PL|hAn
+PRON|DEM|ELA|PL|kAAn
+PRON|DEM|ELA|PL|kin
+PRON|DEM|ELA|PL|pA
+PRON|DEM|ELA|SG
+PRON|DEM|ELA|SG|hAn
+PRON|DEM|ELA|SG|kAAn
+PRON|DEM|ELA|SG|kin
+PRON|DEM|ELA|SG|pA
+PRON|DEM|ESS|PL
+PRON|DEM|ESS|PL|hAn
+PRON|DEM|ESS|PL|kAAn
+PRON|DEM|ESS|PL|kin
+PRON|DEM|ESS|PL|pA
+PRON|DEM|ESS|SG
+PRON|DEM|ESS|SG|hAn
+PRON|DEM|ESS|SG|kAAn
+PRON|DEM|ESS|SG|kin
+PRON|DEM|ESS|SG|pA
+PRON|DEM|GEN|PL
+PRON|DEM|GEN|PL|hAn
+PRON|DEM|GEN|PL|kAAn
+PRON|DEM|GEN|PL|kin
+PRON|DEM|GEN|PL|pA
+PRON|DEM|GEN|SG
+PRON|DEM|GEN|SG|hAn
+PRON|DEM|GEN|SG|kAAn
+PRON|DEM|GEN|SG|kin
+PRON|DEM|GEN|SG|pA
+PRON|DEM|ILL|PL
+PRON|DEM|ILL|PL|hAn
+PRON|DEM|ILL|PL|kAAn
+PRON|DEM|ILL|PL|kin
+PRON|DEM|ILL|PL|pA
+PRON|DEM|ILL|SG
+PRON|DEM|ILL|SG|hAn
+PRON|DEM|ILL|SG|kAAn
+PRON|DEM|ILL|SG|kin
+PRON|DEM|ILL|SG|pA
+PRON|DEM|INE|PL
+PRON|DEM|INE|PL|hAn
+PRON|DEM|INE|PL|kAAn
+PRON|DEM|INE|PL|kin
+PRON|DEM|INE|PL|pA
+PRON|DEM|INE|SG
+PRON|DEM|INE|SG|hAn
+PRON|DEM|INE|SG|kAAn
+PRON|DEM|INE|SG|kin
+PRON|DEM|INE|SG|pA
+PRON|DEM|INS|PL
+PRON|DEM|INS|PL|hAn
+PRON|DEM|INS|PL|kAAn
+PRON|DEM|INS|PL|kin
+PRON|DEM|INS|PL|pA
+PRON|DEM|INS|SG
+PRON|DEM|INS|SG|hAn
+PRON|DEM|INS|SG|kAAn
+PRON|DEM|INS|SG|kin
+PRON|DEM|INS|SG|pA
+PRON|DEM|NOM|PL
+PRON|DEM|NOM|PL|hAn
+PRON|DEM|NOM|PL|kAAn
+PRON|DEM|NOM|PL|kin
+PRON|DEM|NOM|PL|pA
+PRON|DEM|NOM|SG
+PRON|DEM|NOM|SG|hAn
+PRON|DEM|NOM|SG|kAAn
+PRON|DEM|NOM|SG|kin
+PRON|DEM|NOM|SG|pA
+PRON|DEM|PTV|PL
+PRON|DEM|PTV|PL|hAn
+PRON|DEM|PTV|PL|kAAn
+PRON|DEM|PTV|PL|kin
+PRON|DEM|PTV|PL|pA
+PRON|DEM|PTV|SG
+PRON|DEM|PTV|SG|hAn
+PRON|DEM|PTV|SG|kAAn
+PRON|DEM|PTV|SG|kin
+PRON|DEM|PTV|SG|pA
+PRON|DEM|TRA|PL
+PRON|DEM|TRA|PL|hAn
+PRON|DEM|TRA|PL|kAAn
+PRON|DEM|TRA|PL|kin
+PRON|DEM|TRA|PL|pA
+PRON|DEM|TRA|SG
+PRON|DEM|TRA|SG|hAn
+PRON|DEM|TRA|SG|kAAn
+PRON|DEM|TRA|SG|kin
+PRON|DEM|TRA|SG|pA
+PRON|INTG|ABE|PL
+PRON|INTG|ABE|PL|pA
+PRON|INTG|ABE|PL|s
+PRON|INTG|ABE|SG
+PRON|INTG|ABE|SG|pA
+PRON|INTG|ABE|SG|s
+PRON|INTG|ABL|PL
+PRON|INTG|ABL|PL|pA
+PRON|INTG|ABL|PL|s
+PRON|INTG|ABL|SG
+PRON|INTG|ABL|SG|pA
+PRON|INTG|ABL|SG|s
+PRON|INTG|ADE|PL
+PRON|INTG|ADE|PL|pA
+PRON|INTG|ADE|PL|s
+PRON|INTG|ADE|SG
+PRON|INTG|ADE|SG|pA
+PRON|INTG|ADE|SG|s
+PRON|INTG|ALL|PL
+PRON|INTG|ALL|PL|pA
+PRON|INTG|ALL|PL|s
+PRON|INTG|ALL|SG
+PRON|INTG|ALL|SG|pA
+PRON|INTG|ALL|SG|s
+PRON|INTG|CMT|PL
+PRON|INTG|CMT|PL|pA
+PRON|INTG|CMT|PL|s
+PRON|INTG|CMT|SG
+PRON|INTG|CMT|SG|pA
+PRON|INTG|CMT|SG|s
+PRON|INTG|ELA|PL
+PRON|INTG|ELA|PL|pA
+PRON|INTG|ELA|PL|s
+PRON|INTG|ELA|SG
+PRON|INTG|ELA|SG|pA
+PRON|INTG|ELA|SG|s
+PRON|INTG|ESS|PL
+PRON|INTG|ESS|PL|pA
+PRON|INTG|ESS|PL|s
+PRON|INTG|ESS|SG
+PRON|INTG|ESS|SG|pA
+PRON|INTG|ESS|SG|s
+PRON|INTG|GEN|PL
+PRON|INTG|GEN|PL|pA
+PRON|INTG|GEN|PL|s
+PRON|INTG|GEN|SG
+PRON|INTG|GEN|SG|pA
+PRON|INTG|GEN|SG|s
+PRON|INTG|ILL|PL
+PRON|INTG|ILL|PL|pA
+PRON|INTG|ILL|PL|s
+PRON|INTG|ILL|SG
+PRON|INTG|ILL|SG|pA
+PRON|INTG|ILL|SG|s
+PRON|INTG|INE|PL
+PRON|INTG|INE|PL|pA
+PRON|INTG|INE|PL|s
+PRON|INTG|INE|SG
+PRON|INTG|INE|SG|pA
+PRON|INTG|INE|SG|s
+PRON|INTG|INS|PL
+PRON|INTG|INS|PL|pA
+PRON|INTG|INS|PL|s
+PRON|INTG|INS|SG
+PRON|INTG|INS|SG|pA
+PRON|INTG|INS|SG|s
+PRON|INTG|NOM|PL
+PRON|INTG|NOM|PL|pA
+PRON|INTG|NOM|PL|s
+PRON|INTG|NOM|SG
+PRON|INTG|NOM|SG|pA
+PRON|INTG|NOM|SG|s
+PRON|INTG|PTV
+PRON|INTG|PTV|PL
+PRON|INTG|PTV|PL|pA
+PRON|INTG|PTV|PL|s
+PRON|INTG|PTV|SG
+PRON|INTG|PTV|SG|pA
+PRON|INTG|PTV|SG|s
+PRON|INTG|PTV|s
+PRON|INTG|TRA
+PRON|INTG|TRA|PL
+PRON|INTG|TRA|PL|pA
+PRON|INTG|TRA|PL|s
+PRON|INTG|TRA|SG
+PRON|INTG|TRA|SG|pA
+PRON|INTG|TRA|SG|s
+PRON|INTG|TRA|kOhAn
+PRON|PERS|ABE|PL
+PRON|PERS|ABE|PL|kin
+PRON|PERS|ABE|PL|pA
+PRON|PERS|ABE|SG
+PRON|PERS|ABE|SG|kin
+PRON|PERS|ABE|SG|pA
+PRON|PERS|ABL|PL
+PRON|PERS|ABL|PL|kin
+PRON|PERS|ABL|PL|pA
+PRON|PERS|ABL|SG
+PRON|PERS|ABL|SG|kin
+PRON|PERS|ABL|SG|pA
+PRON|PERS|ACC|PL
+PRON|PERS|ACC|SG
+PRON|PERS|ADE|PL
+PRON|PERS|ADE|PL|kin
+PRON|PERS|ADE|PL|pA
+PRON|PERS|ADE|SG
+PRON|PERS|ADE|SG|kin
+PRON|PERS|ADE|SG|pA
+PRON|PERS|ALL|PL
+PRON|PERS|ALL|PL|kin
+PRON|PERS|ALL|PL|pA
+PRON|PERS|ALL|SG
+PRON|PERS|ALL|SG|kin
+PRON|PERS|ALL|SG|pA
+PRON|PERS|CMT|PL
+PRON|PERS|CMT|PL|kin
+PRON|PERS|CMT|PL|pA
+PRON|PERS|CMT|SG
+PRON|PERS|CMT|SG|kin
+PRON|PERS|CMT|SG|pA
+PRON|PERS|ELA|PL
+PRON|PERS|ELA|PL|kin
+PRON|PERS|ELA|PL|pA
+PRON|PERS|ELA|SG
+PRON|PERS|ELA|SG|kin
+PRON|PERS|ELA|SG|pA
+PRON|PERS|ESS|PL
+PRON|PERS|ESS|PL|kin
+PRON|PERS|ESS|PL|pA
+PRON|PERS|ESS|SG
+PRON|PERS|ESS|SG|kin
+PRON|PERS|ESS|SG|pA
+PRON|PERS|GEN|PL
+PRON|PERS|GEN|PL|kin
+PRON|PERS|GEN|PL|pA
+PRON|PERS|GEN|SG
+PRON|PERS|GEN|SG|kin
+PRON|PERS|GEN|SG|pA
+PRON|PERS|ILL|PL
+PRON|PERS|ILL|PL|kin
+PRON|PERS|ILL|PL|pA
+PRON|PERS|ILL|SG
+PRON|PERS|ILL|SG|kin
+PRON|PERS|ILL|SG|pA
+PRON|PERS|INE|PL
+PRON|PERS|INE|PL|kin
+PRON|PERS|INE|PL|pA
+PRON|PERS|INE|SG
+PRON|PERS|INE|SG|kin
+PRON|PERS|INE|SG|pA
+PRON|PERS|INS|PL
+PRON|PERS|INS|PL|kin
+PRON|PERS|INS|PL|pA
+PRON|PERS|INS|SG
+PRON|PERS|INS|SG|kin
+PRON|PERS|INS|SG|pA
+PRON|PERS|NOM|PL
+PRON|PERS|NOM|PL|kin
+PRON|PERS|NOM|PL|pA
+PRON|PERS|NOM|SG
+PRON|PERS|NOM|SG|kin
+PRON|PERS|NOM|SG|pA
+PRON|PERS|PTV|PL
+PRON|PERS|PTV|PL|kin
+PRON|PERS|PTV|PL|pA
+PRON|PERS|PTV|SG
+PRON|PERS|PTV|SG|kin
+PRON|PERS|PTV|SG|pA
+PRON|PERS|TRA|PL
+PRON|PERS|TRA|PL|kin
+PRON|PERS|TRA|PL|pA
+PRON|PERS|TRA|SG
+PRON|PERS|TRA|SG|kin
+PRON|PERS|TRA|SG|pA
+PRON|Q|ABE|PL
+PRON|Q|ABE|PL|1PL
+PRON|Q|ABE|PL|3
+PRON|Q|ABE|PL|kAAn
+PRON|Q|ABE|PL|kin
+PRON|Q|ABE|SG
+PRON|Q|ABE|SG|1PL
+PRON|Q|ABE|SG|3
+PRON|Q|ABE|SG|kAAn
+PRON|Q|ABE|SG|kin
+PRON|Q|ABL|PL
+PRON|Q|ABL|PL|1PL
+PRON|Q|ABL|PL|3
+PRON|Q|ABL|PL|kAAn
+PRON|Q|ABL|PL|kin
+PRON|Q|ABL|SG
+PRON|Q|ABL|SG|1PL
+PRON|Q|ABL|SG|3
+PRON|Q|ABL|SG|kAAn
+PRON|Q|ABL|SG|kin
+PRON|Q|ADE|PL
+PRON|Q|ADE|PL|1PL
+PRON|Q|ADE|PL|3
+PRON|Q|ADE|PL|kAAn
+PRON|Q|ADE|PL|kin
+PRON|Q|ADE|SG
+PRON|Q|ADE|SG|1PL
+PRON|Q|ADE|SG|3
+PRON|Q|ADE|SG|kAAn
+PRON|Q|ADE|SG|kin
+PRON|Q|ALL|PL
+PRON|Q|ALL|PL|1PL
+PRON|Q|ALL|PL|3
+PRON|Q|ALL|PL|kAAn
+PRON|Q|ALL|PL|kin
+PRON|Q|ALL|SG
+PRON|Q|ALL|SG|1PL
+PRON|Q|ALL|SG|3
+PRON|Q|ALL|SG|kAAn
+PRON|Q|ALL|SG|kin
+PRON|Q|CMT|PL
+PRON|Q|CMT|PL|1PL
+PRON|Q|CMT|PL|3
+PRON|Q|CMT|PL|kAAn
+PRON|Q|CMT|PL|kin
+PRON|Q|CMT|SG
+PRON|Q|CMT|SG|1PL
+PRON|Q|CMT|SG|3
+PRON|Q|CMT|SG|kAAn
+PRON|Q|CMT|SG|kin
+PRON|Q|ELA|PL
+PRON|Q|ELA|PL|1PL
+PRON|Q|ELA|PL|3
+PRON|Q|ELA|PL|kAAn
+PRON|Q|ELA|PL|kin
+PRON|Q|ELA|SG
+PRON|Q|ELA|SG|1PL
+PRON|Q|ELA|SG|3
+PRON|Q|ELA|SG|kAAn
+PRON|Q|ELA|SG|kin
+PRON|Q|ESS|PL
+PRON|Q|ESS|PL|1PL
+PRON|Q|ESS|PL|3
+PRON|Q|ESS|PL|kAAn
+PRON|Q|ESS|PL|kin
+PRON|Q|ESS|SG
+PRON|Q|ESS|SG|1PL
+PRON|Q|ESS|SG|3
+PRON|Q|ESS|SG|kAAn
+PRON|Q|ESS|SG|kin
+PRON|Q|GEN|PL
+PRON|Q|GEN|PL|1PL
+PRON|Q|GEN|PL|3
+PRON|Q|GEN|PL|kAAn
+PRON|Q|GEN|PL|kin
+PRON|Q|GEN|SG
+PRON|Q|GEN|SG|1PL
+PRON|Q|GEN|SG|3
+PRON|Q|GEN|SG|kAAn
+PRON|Q|GEN|SG|kin
+PRON|Q|ILL|PL
+PRON|Q|ILL|PL|1PL
+PRON|Q|ILL|PL|3
+PRON|Q|ILL|PL|kAAn
+PRON|Q|ILL|PL|kin
+PRON|Q|ILL|SG
+PRON|Q|ILL|SG|1PL
+PRON|Q|ILL|SG|3
+PRON|Q|ILL|SG|kAAn
+PRON|Q|ILL|SG|kin
+PRON|Q|INE|PL
+PRON|Q|INE|PL|1PL
+PRON|Q|INE|PL|3
+PRON|Q|INE|PL|kAAn
+PRON|Q|INE|PL|kin
+PRON|Q|INE|SG
+PRON|Q|INE|SG|1PL
+PRON|Q|INE|SG|3
+PRON|Q|INE|SG|kAAn
+PRON|Q|INE|SG|kin
+PRON|Q|INS|PL
+PRON|Q|INS|PL|1PL
+PRON|Q|INS|PL|3
+PRON|Q|INS|PL|kAAn
+PRON|Q|INS|PL|kin
+PRON|Q|INS|SG
+PRON|Q|INS|SG|1PL
+PRON|Q|INS|SG|3
+PRON|Q|INS|SG|kAAn
+PRON|Q|INS|SG|kin
+PRON|Q|NOM
+PRON|Q|NOM|PL
+PRON|Q|NOM|PL|1PL
+PRON|Q|NOM|PL|3
+PRON|Q|NOM|PL|kAAn
+PRON|Q|NOM|PL|kin
+PRON|Q|NOM|SG
+PRON|Q|NOM|SG|1PL
+PRON|Q|NOM|SG|3
+PRON|Q|NOM|SG|kAAn
+PRON|Q|NOM|SG|kin
+PRON|Q|NOM|hAn
+PRON|Q|PTV|PL
+PRON|Q|PTV|PL|1PL
+PRON|Q|PTV|PL|3
+PRON|Q|PTV|PL|kAAn
+PRON|Q|PTV|PL|kin
+PRON|Q|PTV|SG
+PRON|Q|PTV|SG|1PL
+PRON|Q|PTV|SG|3
+PRON|Q|PTV|SG|kAAn
+PRON|Q|PTV|SG|kin
+PRON|Q|TRA|PL
+PRON|Q|TRA|PL|1PL
+PRON|Q|TRA|PL|3
+PRON|Q|TRA|PL|kAAn
+PRON|Q|TRA|PL|kin
+PRON|Q|TRA|SG
+PRON|Q|TRA|SG|1PL
+PRON|Q|TRA|SG|3
+PRON|Q|TRA|SG|kAAn
+PRON|Q|TRA|SG|kin
+PRON|REFL/Q|ABE|PL
+PRON|REFL/Q|ABE|PL|1PL
+PRON|REFL/Q|ABE|PL|1SG
+PRON|REFL/Q|ABE|PL|3
+PRON|REFL/Q|ABE|PL|kin
+PRON|REFL/Q|ABE|SG
+PRON|REFL/Q|ABE|SG|1PL
+PRON|REFL/Q|ABE|SG|1SG
+PRON|REFL/Q|ABE|SG|3
+PRON|REFL/Q|ABE|SG|kin
+PRON|REFL/Q|ABL|PL
+PRON|REFL/Q|ABL|PL|1PL
+PRON|REFL/Q|ABL|PL|1SG
+PRON|REFL/Q|ABL|PL|3
+PRON|REFL/Q|ABL|PL|kin
+PRON|REFL/Q|ABL|SG
+PRON|REFL/Q|ABL|SG|1PL
+PRON|REFL/Q|ABL|SG|1SG
+PRON|REFL/Q|ABL|SG|3
+PRON|REFL/Q|ABL|SG|kin
+PRON|REFL/Q|ADE|PL
+PRON|REFL/Q|ADE|PL|1PL
+PRON|REFL/Q|ADE|PL|1SG
+PRON|REFL/Q|ADE|PL|3
+PRON|REFL/Q|ADE|PL|kin
+PRON|REFL/Q|ADE|SG
+PRON|REFL/Q|ADE|SG|1PL
+PRON|REFL/Q|ADE|SG|1SG
+PRON|REFL/Q|ADE|SG|3
+PRON|REFL/Q|ADE|SG|kin
+PRON|REFL/Q|ALL|PL
+PRON|REFL/Q|ALL|PL|1PL
+PRON|REFL/Q|ALL|PL|1SG
+PRON|REFL/Q|ALL|PL|3
+PRON|REFL/Q|ALL|PL|kin
+PRON|REFL/Q|ALL|SG
+PRON|REFL/Q|ALL|SG|1PL
+PRON|REFL/Q|ALL|SG|1SG
+PRON|REFL/Q|ALL|SG|3
+PRON|REFL/Q|ALL|SG|kin
+PRON|REFL/Q|CMT|PL
+PRON|REFL/Q|CMT|PL|1PL
+PRON|REFL/Q|CMT|PL|1SG
+PRON|REFL/Q|CMT|PL|3
+PRON|REFL/Q|CMT|PL|kin
+PRON|REFL/Q|CMT|SG
+PRON|REFL/Q|CMT|SG|1PL
+PRON|REFL/Q|CMT|SG|1SG
+PRON|REFL/Q|CMT|SG|3
+PRON|REFL/Q|CMT|SG|kin
+PRON|REFL/Q|ELA|PL
+PRON|REFL/Q|ELA|PL|1PL
+PRON|REFL/Q|ELA|PL|1SG
+PRON|REFL/Q|ELA|PL|3
+PRON|REFL/Q|ELA|PL|kin
+PRON|REFL/Q|ELA|SG
+PRON|REFL/Q|ELA|SG|1PL
+PRON|REFL/Q|ELA|SG|1SG
+PRON|REFL/Q|ELA|SG|3
+PRON|REFL/Q|ELA|SG|kin
+PRON|REFL/Q|ESS|PL
+PRON|REFL/Q|ESS|PL|1PL
+PRON|REFL/Q|ESS|PL|1SG
+PRON|REFL/Q|ESS|PL|3
+PRON|REFL/Q|ESS|PL|kin
+PRON|REFL/Q|ESS|SG
+PRON|REFL/Q|ESS|SG|1PL
+PRON|REFL/Q|ESS|SG|1SG
+PRON|REFL/Q|ESS|SG|3
+PRON|REFL/Q|ESS|SG|kin
+PRON|REFL/Q|GEN|PL
+PRON|REFL/Q|GEN|PL|1PL
+PRON|REFL/Q|GEN|PL|1SG
+PRON|REFL/Q|GEN|PL|3
+PRON|REFL/Q|GEN|PL|kin
+PRON|REFL/Q|GEN|SG
+PRON|REFL/Q|GEN|SG|1PL
+PRON|REFL/Q|GEN|SG|1SG
+PRON|REFL/Q|GEN|SG|3
+PRON|REFL/Q|GEN|SG|kin
+PRON|REFL/Q|ILL|PL
+PRON|REFL/Q|ILL|PL|1PL
+PRON|REFL/Q|ILL|PL|1SG
+PRON|REFL/Q|ILL|PL|3
+PRON|REFL/Q|ILL|PL|kin
+PRON|REFL/Q|ILL|SG
+PRON|REFL/Q|ILL|SG|1PL
+PRON|REFL/Q|ILL|SG|1SG
+PRON|REFL/Q|ILL|SG|3
+PRON|REFL/Q|ILL|SG|kin
+PRON|REFL/Q|INE|PL
+PRON|REFL/Q|INE|PL|1PL
+PRON|REFL/Q|INE|PL|1SG
+PRON|REFL/Q|INE|PL|3
+PRON|REFL/Q|INE|PL|kin
+PRON|REFL/Q|INE|SG
+PRON|REFL/Q|INE|SG|1PL
+PRON|REFL/Q|INE|SG|1SG
+PRON|REFL/Q|INE|SG|3
+PRON|REFL/Q|INE|SG|kin
+PRON|REFL/Q|INS|PL
+PRON|REFL/Q|INS|PL|1PL
+PRON|REFL/Q|INS|PL|1SG
+PRON|REFL/Q|INS|PL|3
+PRON|REFL/Q|INS|PL|kin
+PRON|REFL/Q|INS|SG
+PRON|REFL/Q|INS|SG|1PL
+PRON|REFL/Q|INS|SG|1SG
+PRON|REFL/Q|INS|SG|3
+PRON|REFL/Q|INS|SG|kin
+PRON|REFL/Q|NOM|PL
+PRON|REFL/Q|NOM|PL|1PL
+PRON|REFL/Q|NOM|PL|1SG
+PRON|REFL/Q|NOM|PL|3
+PRON|REFL/Q|NOM|PL|kin
+PRON|REFL/Q|NOM|SG
+PRON|REFL/Q|NOM|SG|1PL
+PRON|REFL/Q|NOM|SG|1SG
+PRON|REFL/Q|NOM|SG|3
+PRON|REFL/Q|NOM|SG|kin
+PRON|REFL/Q|PTV|PL
+PRON|REFL/Q|PTV|PL|1PL
+PRON|REFL/Q|PTV|PL|1SG
+PRON|REFL/Q|PTV|PL|3
+PRON|REFL/Q|PTV|PL|kin
+PRON|REFL/Q|PTV|SG
+PRON|REFL/Q|PTV|SG|1PL
+PRON|REFL/Q|PTV|SG|1SG
+PRON|REFL/Q|PTV|SG|3
+PRON|REFL/Q|PTV|SG|kin
+PRON|REFL/Q|TRA|PL
+PRON|REFL/Q|TRA|PL|1PL
+PRON|REFL/Q|TRA|PL|1SG
+PRON|REFL/Q|TRA|PL|3
+PRON|REFL/Q|TRA|PL|kin
+PRON|REFL/Q|TRA|SG
+PRON|REFL/Q|TRA|SG|1PL
+PRON|REFL/Q|TRA|SG|1SG
+PRON|REFL/Q|TRA|SG|3
+PRON|REFL/Q|TRA|SG|kin
+PRON|REL|ABE|PL
+PRON|REL|ABE|SG
+PRON|REL|ABL|PL
+PRON|REL|ABL|SG
+PRON|REL|ADE|PL
+PRON|REL|ADE|SG
+PRON|REL|ALL|PL
+PRON|REL|ALL|SG
+PRON|REL|CMT|PL
+PRON|REL|CMT|SG
+PRON|REL|ELA
+PRON|REL|ELA|PL
+PRON|REL|ELA|SG
+PRON|REL|ESS|PL
+PRON|REL|ESS|SG
+PRON|REL|GEN
+PRON|REL|GEN|PL
+PRON|REL|GEN|SG
+PRON|REL|ILL
+PRON|REL|ILL|PL
+PRON|REL|ILL|SG
+PRON|REL|INE
+PRON|REL|INE|PL
+PRON|REL|INE|SG
+PRON|REL|INS|PL
+PRON|REL|INS|SG
+PRON|REL|NOM|PL
+PRON|REL|NOM|SG
+PRON|REL|PTV
+PRON|REL|PTV|PL
+PRON|REL|PTV|SG
+PRON|REL|TRA
+PRON|REL|TRA|PL
+PRON|REL|TRA|SG
+PSP
+PSP|3
+PSP|ABL|1SG
+PSP|ADE|1SG
+PSP|ALL|1SG
+PSP|ALL|3
+PSP|ILL|1PL
+PSP|ILL|1SG
+PSP|ILL|3
+PSP|INE
+PUNCT
+PUNCT|DASH
+PUNCT|EMDASH
+PUNCT|ENDASH
+PUNCT|QUOTE
+V|3|PAST|ACT
+V|3|PAST|ACT|TEMP
+V|3|PAST|ACT|TEMP|DV-U
+V|ABE|1PL|INF3
+V|ABE|INF3
+V|ABE|INF3|DV-ILE
+V|ABE|INF3|kAAn
+V|ADE|INF3
+V|ADE|INF3|DV-ELE
+V|ADE|INF3|DV-ELE|DV-TTA
+V|ADE|INF3|DV-TTA
+V|ADE|INF3|DV-U
+V|COND|ACT|NEG
+V|COND|ACT|NEGV
+V|COND|ACT|NEG|DV-TTA
+V|COND|ACT|NEG|DV-U
+V|COND|ACT|NEG|kAAn
+V|COND|ACT|NEG|kAAn|DV-TTA
+V|COND|ACT|PL1
+V|COND|ACT|PL1|DV-ELE
+V|COND|ACT|PL1|DV-TTA
+V|COND|ACT|PL1|DV-U
+V|COND|ACT|PL1|kAAn
+V|COND|ACT|PL1|kO
+V|COND|ACT|PL1|kin
+V|COND|ACT|PL2
+V|COND|ACT|PL2|DV-ELE
+V|COND|ACT|PL2|DV-TTA
+V|COND|ACT|PL2|DV-U
+V|COND|ACT|PL2|kAAn
+V|COND|ACT|PL2|kO
+V|COND|ACT|PL2|kin
+V|COND|ACT|PL3
+V|COND|ACT|PL3|DV-ELE
+V|COND|ACT|PL3|DV-TTA
+V|COND|ACT|PL3|DV-U
+V|COND|ACT|PL3|kAAn
+V|COND|ACT|PL3|kO
+V|COND|ACT|PL3|kin
+V|COND|ACT|SG1
+V|COND|ACT|SG1|DV-ELE
+V|COND|ACT|SG1|DV-TTA
+V|COND|ACT|SG1|DV-U
+V|COND|ACT|SG1|kAAn
+V|COND|ACT|SG1|kO
+V|COND|ACT|SG1|kin
+V|COND|ACT|SG2
+V|COND|ACT|SG2|DV-ELE
+V|COND|ACT|SG2|DV-TTA
+V|COND|ACT|SG2|DV-U
+V|COND|ACT|SG2|kAAn
+V|COND|ACT|SG2|kO
+V|COND|ACT|SG2|kin
+V|COND|ACT|SG3
+V|COND|ACT|SG3|DV-ELE
+V|COND|ACT|SG3|DV-TTA
+V|COND|ACT|SG3|DV-U
+V|COND|ACT|SG3|kAAn
+V|COND|ACT|SG3|kO
+V|COND|ACT|SG3|kin
+V|COND|PSS|NEG
+V|COND|PSS|NEGV
+V|COND|PSS|PE4
+V|COND|PSS|PE4|kin
+V|COND|PSS|PL2
+V|COND|PSS|PL2|kin
+V|COND|PSS|PL3
+V|COND|PSS|PL3|kin
+V|COND|PSS|SG1
+V|COND|PSS|SG1|kin
+V|COND|PSS|SG2
+V|COND|PSS|SG2|kin
+V|COND|PSS|SG3
+V|COND|PSS|SG3|kin
+V|COP|ADE|INF3
+V|COP|COND|ACT|NEG
+V|COP|COND|ACT|PL1
+V|COP|COND|ACT|PL1|kO
+V|COP|COND|ACT|PL1|kOhAn
+V|COP|COND|ACT|PL1|kin
+V|COP|COND|ACT|PL2
+V|COP|COND|ACT|PL2|kO
+V|COP|COND|ACT|PL2|kOhAn
+V|COP|COND|ACT|PL2|kin
+V|COP|COND|ACT|PL3
+V|COP|COND|ACT|PL3|kO
+V|COP|COND|ACT|PL3|kOhAn
+V|COP|COND|ACT|PL3|kin
+V|COP|COND|ACT|SG1
+V|COP|COND|ACT|SG1|kO
+V|COP|COND|ACT|SG1|kOhAn
+V|COP|COND|ACT|SG1|kin
+V|COP|COND|ACT|SG2
+V|COP|COND|ACT|SG2|kO
+V|COP|COND|ACT|SG2|kOhAn
+V|COP|COND|ACT|SG2|kin
+V|COP|COND|ACT|SG3
+V|COP|COND|ACT|SG3|kO
+V|COP|COND|ACT|SG3|kOhAn
+V|COP|COND|ACT|SG3|kin
+V|COP|ILL|INF3
+V|COP|IMPV|ACT|PL1
+V|COP|IMPV|ACT|PL2
+V|COP|IMPV|ACT|PL3
+V|COP|IMPV|ACT|SG1
+V|COP|IMPV|ACT|SG2
+V|COP|IMPV|ACT|SG3
+V|COP|INE|1SG|ACT|INF2
+V|COP|INE|ACT|INF2
+V|COP|INE|INF3
+V|COP|INF1
+V|COP|INF1|LAT
+V|COP|MAN|ACT|INF2
+V|COP|PAST|ACT|PL1
+V|COP|PAST|ACT|PL1|kO
+V|COP|PAST|ACT|PL1|kin
+V|COP|PAST|ACT|PL2
+V|COP|PAST|ACT|PL2|kO
+V|COP|PAST|ACT|PL2|kin
+V|COP|PAST|ACT|PL3
+V|COP|PAST|ACT|PL3|kO
+V|COP|PAST|ACT|PL3|kin
+V|COP|PAST|ACT|SG1
+V|COP|PAST|ACT|SG1|kO
+V|COP|PAST|ACT|SG1|kin
+V|COP|PAST|ACT|SG2
+V|COP|PAST|ACT|SG2|kO
+V|COP|PAST|ACT|SG2|kin
+V|COP|PAST|ACT|SG3
+V|COP|PAST|ACT|SG3|kO
+V|COP|PAST|ACT|SG3|kin
+V|COP|PAST|PSS|NEG
+V|COP|PL|PAST|ACT|NEG
+V|COP|POTN|ACT|PL1
+V|COP|POTN|ACT|PL2
+V|COP|POTN|ACT|PL3
+V|COP|POTN|ACT|SG1
+V|COP|POTN|ACT|SG2
+V|COP|POTN|ACT|SG3
+V|COP|PRES|ACT|NEG
+V|COP|PRES|ACT|NEG|kAAn
+V|COP|PRES|ACT|NEG|kin
+V|COP|PRES|ACT|PL1
+V|COP|PRES|ACT|PL1|hAn
+V|COP|PRES|ACT|PL1|kAAn
+V|COP|PRES|ACT|PL1|kO
+V|COP|PRES|ACT|PL1|kin
+V|COP|PRES|ACT|PL2
+V|COP|PRES|ACT|PL2|hAn
+V|COP|PRES|ACT|PL2|kAAn
+V|COP|PRES|ACT|PL2|kO
+V|COP|PRES|ACT|PL2|kin
+V|COP|PRES|ACT|PL3
+V|COP|PRES|ACT|PL3|hAn
+V|COP|PRES|ACT|PL3|kAAn
+V|COP|PRES|ACT|PL3|kO
+V|COP|PRES|ACT|PL3|kin
+V|COP|PRES|ACT|SG1
+V|COP|PRES|ACT|SG1|hAn
+V|COP|PRES|ACT|SG1|kAAn
+V|COP|PRES|ACT|SG1|kO
+V|COP|PRES|ACT|SG1|kin
+V|COP|PRES|ACT|SG2
+V|COP|PRES|ACT|SG2|hAn
+V|COP|PRES|ACT|SG2|kAAn
+V|COP|PRES|ACT|SG2|kO
+V|COP|PRES|ACT|SG2|kin
+V|COP|PRES|ACT|SG3
+V|COP|PRES|ACT|SG3|hAn
+V|COP|PRES|ACT|SG3|kAAn
+V|COP|PRES|ACT|SG3|kO
+V|COP|PRES|ACT|SG3|kin
+V|COP|PRES|PSS|PE4
+V|COP|PRES|PSS|PL2
+V|COP|PRES|PSS|PL3
+V|COP|PRES|PSS|SG1
+V|COP|PRES|PSS|SG2
+V|COP|PRES|PSS|SG3
+V|COP|SG|PAST|ACT|NEG
+V|COP|SG|PAST|ACT|NEG|kAAn
+V|COP|TRA|3|INF1
+V|ELA|INF3
+V|ILL|INF3
+V|ILL|INF3|DV-ELE
+V|ILL|INF3|DV-ILE
+V|ILL|INF3|DV-NTAA
+V|ILL|INF3|DV-SKELE
+V|ILL|INF3|DV-TTA
+V|ILL|INF3|DV-U
+V|ILL|INF3|st-vrnc
+V|IMPV|ACT|PL1
+V|IMPV|ACT|PL1|DV-TTA
+V|IMPV|ACT|PL1|kin
+V|IMPV|ACT|PL2
+V|IMPV|ACT|PL2|DV-TTA
+V|IMPV|ACT|PL2|kin
+V|IMPV|ACT|PL3
+V|IMPV|ACT|PL3|DV-TTA
+V|IMPV|ACT|PL3|kin
+V|IMPV|ACT|SG1
+V|IMPV|ACT|SG1|DV-TTA
+V|IMPV|ACT|SG1|kin
+V|IMPV|ACT|SG2
+V|IMPV|ACT|SG2|DV-TTA
+V|IMPV|ACT|SG2|kin
+V|IMPV|ACT|SG3
+V|IMPV|ACT|SG3|DV-TTA
+V|IMPV|ACT|SG3|kin
+V|INE|1PL|ACT|INF2
+V|INE|1SG|ACT|INF2
+V|INE|3|ACT|INF2
+V|INE|3|ACT|INF2|DV-ELE
+V|INE|ACT|INF2
+V|INE|ACT|INF2|DV-TTA
+V|INE|ACT|INF2|DV-U
+V|INE|INF3
+V|INE|INF3|DV-ELE
+V|INE|INF3|DV-U
+V|INE|PSS|INF2
+V|INE|PSS|INF2|DV-NTAA
+V|INF1
+V|INF1|LAT
+V|INF1|LAT|DV-ELE
+V|INF1|LAT|DV-ELE|DV-TTA
+V|INF1|LAT|DV-ILE
+V|INF1|LAT|DV-NTAA
+V|INF1|LAT|DV-NTAA|DV-ELE
+V|INF1|LAT|DV-TTA
+V|INF1|LAT|DV-U
+V|INF1|LAT|DV-UTU
+V|INF1|kAAn|LAT
+V|INF1|kin|LAT
+V|INF1|st-cllq
+V|INF1|st-cllq|LAT
+V|INF1|st-cllq|LAT|DV-ILE
+V|INS|ACT|INF2
+V|INS|ACT|INF2|DV-ELE
+V|INS|ACT|INF2|DV-ILE
+V|INS|ACT|INF2|DV-U
+V|PAST|ACT
+V|PAST|ACT|PL1
+V|PAST|ACT|PL1|DV-ELE
+V|PAST|ACT|PL1|DV-ILE
+V|PAST|ACT|PL1|DV-NTAA
+V|PAST|ACT|PL1|DV-SKELE
+V|PAST|ACT|PL1|DV-TTA
+V|PAST|ACT|PL1|DV-TTA|DV-ELE
+V|PAST|ACT|PL1|DV-U
+V|PAST|ACT|PL1|DV-UTU
+V|PAST|ACT|PL1|hAn
+V|PAST|ACT|PL1|kAAn
+V|PAST|ACT|PL1|kO
+V|PAST|ACT|PL1|kin
+V|PAST|ACT|PL1|kin|DV-ELE
+V|PAST|ACT|PL1|kin|DV-ILE
+V|PAST|ACT|PL1|st-cllq
+V|PAST|ACT|PL2
+V|PAST|ACT|PL2|DV-ELE
+V|PAST|ACT|PL2|DV-ILE
+V|PAST|ACT|PL2|DV-NTAA
+V|PAST|ACT|PL2|DV-SKELE
+V|PAST|ACT|PL2|DV-TTA
+V|PAST|ACT|PL2|DV-TTA|DV-ELE
+V|PAST|ACT|PL2|DV-U
+V|PAST|ACT|PL2|DV-UTU
+V|PAST|ACT|PL2|hAn
+V|PAST|ACT|PL2|kAAn
+V|PAST|ACT|PL2|kO
+V|PAST|ACT|PL2|kin
+V|PAST|ACT|PL2|kin|DV-ELE
+V|PAST|ACT|PL2|kin|DV-ILE
+V|PAST|ACT|PL2|st-cllq
+V|PAST|ACT|PL3
+V|PAST|ACT|PL3|DV-ELE
+V|PAST|ACT|PL3|DV-ILE
+V|PAST|ACT|PL3|DV-NTAA
+V|PAST|ACT|PL3|DV-SKELE
+V|PAST|ACT|PL3|DV-TTA
+V|PAST|ACT|PL3|DV-TTA|DV-ELE
+V|PAST|ACT|PL3|DV-U
+V|PAST|ACT|PL3|DV-UTU
+V|PAST|ACT|PL3|hAn
+V|PAST|ACT|PL3|kAAn
+V|PAST|ACT|PL3|kO
+V|PAST|ACT|PL3|kin
+V|PAST|ACT|PL3|kin|DV-ELE
+V|PAST|ACT|PL3|kin|DV-ILE
+V|PAST|ACT|PL3|st-cllq
+V|PAST|ACT|SG1
+V|PAST|ACT|SG1|DV-ELE
+V|PAST|ACT|SG1|DV-ILE
+V|PAST|ACT|SG1|DV-NTAA
+V|PAST|ACT|SG1|DV-SKELE
+V|PAST|ACT|SG1|DV-TTA
+V|PAST|ACT|SG1|DV-TTA|DV-ELE
+V|PAST|ACT|SG1|DV-U
+V|PAST|ACT|SG1|DV-UTU
+V|PAST|ACT|SG1|hAn
+V|PAST|ACT|SG1|kAAn
+V|PAST|ACT|SG1|kO
+V|PAST|ACT|SG1|kin
+V|PAST|ACT|SG1|kin|DV-ELE
+V|PAST|ACT|SG1|kin|DV-ILE
+V|PAST|ACT|SG1|st-cllq
+V|PAST|ACT|SG2
+V|PAST|ACT|SG2|DV-ELE
+V|PAST|ACT|SG2|DV-ILE
+V|PAST|ACT|SG2|DV-NTAA
+V|PAST|ACT|SG2|DV-SKELE
+V|PAST|ACT|SG2|DV-TTA
+V|PAST|ACT|SG2|DV-TTA|DV-ELE
+V|PAST|ACT|SG2|DV-U
+V|PAST|ACT|SG2|DV-UTU
+V|PAST|ACT|SG2|hAn
+V|PAST|ACT|SG2|kAAn
+V|PAST|ACT|SG2|kO
+V|PAST|ACT|SG2|kin
+V|PAST|ACT|SG2|kin|DV-ELE
+V|PAST|ACT|SG2|kin|DV-ILE
+V|PAST|ACT|SG2|st-cllq
+V|PAST|ACT|SG3
+V|PAST|ACT|SG3|DV-ELE
+V|PAST|ACT|SG3|DV-ILE
+V|PAST|ACT|SG3|DV-NTAA
+V|PAST|ACT|SG3|DV-SKELE
+V|PAST|ACT|SG3|DV-TTA
+V|PAST|ACT|SG3|DV-TTA|DV-ELE
+V|PAST|ACT|SG3|DV-U
+V|PAST|ACT|SG3|DV-UTU
+V|PAST|ACT|SG3|hAn
+V|PAST|ACT|SG3|kAAn
+V|PAST|ACT|SG3|kO
+V|PAST|ACT|SG3|kin
+V|PAST|ACT|SG3|kin|DV-ELE
+V|PAST|ACT|SG3|kin|DV-ILE
+V|PAST|ACT|SG3|st-cllq
+V|PAST|ACT|TEMP
+V|PAST|ACT|TEMP|DV-TTA
+V|PAST|PSS
+V|PAST|PSS|NEG
+V|PAST|PSS|NEGV
+V|PAST|PSS|NEG|DV-TTA
+V|PAST|PSS|PE4
+V|PAST|PSS|PE4|DV-ELE
+V|PAST|PSS|PE4|DV-ILE
+V|PAST|PSS|PE4|DV-NTAA
+V|PAST|PSS|PE4|DV-TTA
+V|PAST|PSS|PE4|DV-TTA|DV-ELE
+V|PAST|PSS|PE4|DV-U
+V|PAST|PSS|PE4|kO
+V|PAST|PSS|PE4|kin
+V|PAST|PSS|PL2
+V|PAST|PSS|PL2|DV-ELE
+V|PAST|PSS|PL2|DV-ILE
+V|PAST|PSS|PL2|DV-NTAA
+V|PAST|PSS|PL2|DV-TTA
+V|PAST|PSS|PL2|DV-TTA|DV-ELE
+V|PAST|PSS|PL2|DV-U
+V|PAST|PSS|PL2|kO
+V|PAST|PSS|PL2|kin
+V|PAST|PSS|PL3
+V|PAST|PSS|PL3|DV-ELE
+V|PAST|PSS|PL3|DV-ILE
+V|PAST|PSS|PL3|DV-NTAA
+V|PAST|PSS|PL3|DV-TTA
+V|PAST|PSS|PL3|DV-TTA|DV-ELE
+V|PAST|PSS|PL3|DV-U
+V|PAST|PSS|PL3|kO
+V|PAST|PSS|PL3|kin
+V|PAST|PSS|REF
+V|PAST|PSS|SG1
+V|PAST|PSS|SG1|DV-ELE
+V|PAST|PSS|SG1|DV-ILE
+V|PAST|PSS|SG1|DV-NTAA
+V|PAST|PSS|SG1|DV-TTA
+V|PAST|PSS|SG1|DV-TTA|DV-ELE
+V|PAST|PSS|SG1|DV-U
+V|PAST|PSS|SG1|kO
+V|PAST|PSS|SG1|kin
+V|PAST|PSS|SG2
+V|PAST|PSS|SG2|DV-ELE
+V|PAST|PSS|SG2|DV-ILE
+V|PAST|PSS|SG2|DV-NTAA
+V|PAST|PSS|SG2|DV-TTA
+V|PAST|PSS|SG2|DV-TTA|DV-ELE
+V|PAST|PSS|SG2|DV-U
+V|PAST|PSS|SG2|kO
+V|PAST|PSS|SG2|kin
+V|PAST|PSS|SG3
+V|PAST|PSS|SG3|DV-ELE
+V|PAST|PSS|SG3|DV-ILE
+V|PAST|PSS|SG3|DV-NTAA
+V|PAST|PSS|SG3|DV-TTA
+V|PAST|PSS|SG3|DV-TTA|DV-ELE
+V|PAST|PSS|SG3|DV-U
+V|PAST|PSS|SG3|kO
+V|PAST|PSS|SG3|kin
+V|PL1|NEGV
+V|PL1|NEGV|kO
+V|PL2|NEGV
+V|PL2|NEGV|kO
+V|PL3|NEGV
+V|PL3|NEGV|kO
+V|PL|PAST|ACT|NEG
+V|PL|PAST|ACT|NEGV
+V|PL|PAST|ACT|NEG|DV-U
+V|POTN|ACT|PL1
+V|POTN|ACT|PL2
+V|POTN|ACT|PL3
+V|POTN|ACT|SG1
+V|POTN|ACT|SG2
+V|POTN|ACT|SG3
+V|POTN|PSS|PE4
+V|POTN|PSS|PL2
+V|POTN|PSS|PL3
+V|POTN|PSS|SG1
+V|POTN|PSS|SG2
+V|POTN|PSS|SG3
+V|PRES|ACT|NEG
+V|PRES|ACT|NEGV
+V|PRES|ACT|NEG|DV-NTAA
+V|PRES|ACT|NEG|DV-TTA
+V|PRES|ACT|NEG|DV-U
+V|PRES|ACT|NEG|kAAn
+V|PRES|ACT|PL1
+V|PRES|ACT|PL1|DV-ELE
+V|PRES|ACT|PL1|DV-ILE
+V|PRES|ACT|PL1|DV-ILE|DV-TTA
+V|PRES|ACT|PL1|DV-NTAA
+V|PRES|ACT|PL1|DV-TTA
+V|PRES|ACT|PL1|DV-U
+V|PRES|ACT|PL1|DV-UTU
+V|PRES|ACT|PL1|hAn
+V|PRES|ACT|PL1|kAAn
+V|PRES|ACT|PL1|kO
+V|PRES|ACT|PL1|kO|DV-U
+V|PRES|ACT|PL1|kin
+V|PRES|ACT|PL1|kin|DV-NTAA
+V|PRES|ACT|PL1|pA
+V|PRES|ACT|PL1|st-cllq
+V|PRES|ACT|PL2
+V|PRES|ACT|PL2|DV-ELE
+V|PRES|ACT|PL2|DV-ILE
+V|PRES|ACT|PL2|DV-ILE|DV-TTA
+V|PRES|ACT|PL2|DV-NTAA
+V|PRES|ACT|PL2|DV-TTA
+V|PRES|ACT|PL2|DV-U
+V|PRES|ACT|PL2|DV-UTU
+V|PRES|ACT|PL2|hAn
+V|PRES|ACT|PL2|kAAn
+V|PRES|ACT|PL2|kO
+V|PRES|ACT|PL2|kO|DV-U
+V|PRES|ACT|PL2|kin
+V|PRES|ACT|PL2|kin|DV-NTAA
+V|PRES|ACT|PL2|pA
+V|PRES|ACT|PL2|st-cllq
+V|PRES|ACT|PL3
+V|PRES|ACT|PL3|DV-ELE
+V|PRES|ACT|PL3|DV-ILE
+V|PRES|ACT|PL3|DV-ILE|DV-TTA
+V|PRES|ACT|PL3|DV-NTAA
+V|PRES|ACT|PL3|DV-TTA
+V|PRES|ACT|PL3|DV-U
+V|PRES|ACT|PL3|DV-UTU
+V|PRES|ACT|PL3|hAn
+V|PRES|ACT|PL3|kAAn
+V|PRES|ACT|PL3|kO
+V|PRES|ACT|PL3|kO|DV-U
+V|PRES|ACT|PL3|kin
+V|PRES|ACT|PL3|kin|DV-NTAA
+V|PRES|ACT|PL3|pA
+V|PRES|ACT|PL3|st-cllq
+V|PRES|ACT|SG1
+V|PRES|ACT|SG1|DV-ELE
+V|PRES|ACT|SG1|DV-ILE
+V|PRES|ACT|SG1|DV-ILE|DV-TTA
+V|PRES|ACT|SG1|DV-NTAA
+V|PRES|ACT|SG1|DV-TTA
+V|PRES|ACT|SG1|DV-U
+V|PRES|ACT|SG1|DV-UTU
+V|PRES|ACT|SG1|hAn
+V|PRES|ACT|SG1|kAAn
+V|PRES|ACT|SG1|kO
+V|PRES|ACT|SG1|kO|DV-U
+V|PRES|ACT|SG1|kin
+V|PRES|ACT|SG1|kin|DV-NTAA
+V|PRES|ACT|SG1|pA
+V|PRES|ACT|SG1|st-cllq
+V|PRES|ACT|SG2
+V|PRES|ACT|SG2|DV-ELE
+V|PRES|ACT|SG2|DV-ILE
+V|PRES|ACT|SG2|DV-ILE|DV-TTA
+V|PRES|ACT|SG2|DV-NTAA
+V|PRES|ACT|SG2|DV-TTA
+V|PRES|ACT|SG2|DV-U
+V|PRES|ACT|SG2|DV-UTU
+V|PRES|ACT|SG2|hAn
+V|PRES|ACT|SG2|kAAn
+V|PRES|ACT|SG2|kO
+V|PRES|ACT|SG2|kO|DV-U
+V|PRES|ACT|SG2|kin
+V|PRES|ACT|SG2|kin|DV-NTAA
+V|PRES|ACT|SG2|pA
+V|PRES|ACT|SG2|st-cllq
+V|PRES|ACT|SG3
+V|PRES|ACT|SG3|DV-ELE
+V|PRES|ACT|SG3|DV-ILE
+V|PRES|ACT|SG3|DV-ILE|DV-TTA
+V|PRES|ACT|SG3|DV-NTAA
+V|PRES|ACT|SG3|DV-TTA
+V|PRES|ACT|SG3|DV-U
+V|PRES|ACT|SG3|DV-UTU
+V|PRES|ACT|SG3|hAn
+V|PRES|ACT|SG3|kAAn
+V|PRES|ACT|SG3|kO
+V|PRES|ACT|SG3|kO|DV-U
+V|PRES|ACT|SG3|kin
+V|PRES|ACT|SG3|kin|DV-NTAA
+V|PRES|ACT|SG3|pA
+V|PRES|ACT|SG3|st-cllq
+V|PRES|PSS
+V|PRES|PSS|NEG
+V|PRES|PSS|NEGV
+V|PRES|PSS|NEG|DV-ELE
+V|PRES|PSS|NEG|DV-ILE
+V|PRES|PSS|PE4
+V|PRES|PSS|PE4|DV-ELE
+V|PRES|PSS|PE4|DV-ILE
+V|PRES|PSS|PE4|DV-TTA
+V|PRES|PSS|PE4|DV-U
+V|PRES|PSS|PE4|kin
+V|PRES|PSS|PE4|st-cllq
+V|PRES|PSS|PL2
+V|PRES|PSS|PL2|DV-ELE
+V|PRES|PSS|PL2|DV-ILE
+V|PRES|PSS|PL2|DV-TTA
+V|PRES|PSS|PL2|DV-U
+V|PRES|PSS|PL2|kin
+V|PRES|PSS|PL2|st-cllq
+V|PRES|PSS|PL3
+V|PRES|PSS|PL3|DV-ELE
+V|PRES|PSS|PL3|DV-ILE
+V|PRES|PSS|PL3|DV-TTA
+V|PRES|PSS|PL3|DV-U
+V|PRES|PSS|PL3|kin
+V|PRES|PSS|PL3|st-cllq
+V|PRES|PSS|REF
+V|PRES|PSS|SG1
+V|PRES|PSS|SG1|DV-ELE
+V|PRES|PSS|SG1|DV-ILE
+V|PRES|PSS|SG1|DV-TTA
+V|PRES|PSS|SG1|DV-U
+V|PRES|PSS|SG1|kin
+V|PRES|PSS|SG1|st-cllq
+V|PRES|PSS|SG2
+V|PRES|PSS|SG2|DV-ELE
+V|PRES|PSS|SG2|DV-ILE
+V|PRES|PSS|SG2|DV-TTA
+V|PRES|PSS|SG2|DV-U
+V|PRES|PSS|SG2|kin
+V|PRES|PSS|SG2|st-cllq
+V|PRES|PSS|SG3
+V|PRES|PSS|SG3|DV-ELE
+V|PRES|PSS|SG3|DV-ILE
+V|PRES|PSS|SG3|DV-TTA
+V|PRES|PSS|SG3|DV-U
+V|PRES|PSS|SG3|kin
+V|PRES|PSS|SG3|st-cllq
+V|SG1|NEGV
+V|SG1|NEGV|kO
+V|SG2|NEGV
+V|SG2|NEGV|kO
+V|SG3|NEGV
+V|SG3|NEGV|kO
+V|SG|PAST|ACT|NEG
+V|SG|PAST|ACT|NEGV
+V|SG|PAST|ACT|NEG|DV-ELE
+V|SG|PAST|ACT|NEG|DV-ILE
+V|SG|PAST|ACT|NEG|DV-NTAA
+V|SG|PAST|ACT|NEG|DV-TTA
+V|SG|PAST|ACT|NEG|DV-U
+V|SG|PAST|ACT|NEG|kAAn
+V|TRA|3|INF1
+V|TRA|3|INF1|DV-TTA
+end_of_list
+    ;
+    my @list = split(/\r?\n/, $list);
+    return \@list;
+}
+
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lingua::Interset::Tagset::FI::Turku - Driver for the Finnish tagset from the Turku Dependency Treebank.
+
+=head1 VERSION
+
+version 3.004
+
+=head1 SYNOPSIS
+
+  use Lingua::Interset::Tagset::FI::Turku;
+  my $driver = Lingua::Interset::Tagset::FI::Turku->new();
+  my $fs = $driver->decode('N|NOM|SG');
+
+or
+
+  use Lingua::Interset qw(decode);
+  my $fs = decode('fi::turku', 'N|NOM|SG');
+
+=head1 DESCRIPTION
+
+Interset driver for the Finnish tagset from the Turku Dependency Treebank.
+Tag is a sequence of features separated by vertical bars.
+There are just the feature values, not attribute-value pairs.
+
+=head1 SEE ALSO
+
+L<Lingua::Interset>,
+L<Lingua::Interset::Tagset>,
+L<Lingua::Interset::FeatureStructure>
+
+=head1 AUTHOR
+
+Dan Zeman <zeman@ufal.mff.cuni.cz>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Univerzita Karlova (Charles University).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

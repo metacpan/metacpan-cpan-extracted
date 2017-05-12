@@ -1,0 +1,33 @@
+LWP-Protocol-http-SocketUnix version 0.02
+====================================
+
+LWP::Protocol::http::SocketUnix enables you to speak HTTP through UNIX sockets.
+To use it you need to overwrite the implementor class of the LWP 'http' scheme.
+All 'http' URIs will now be interpreted as local sockets by LWP.
+
+The interface of LWP::Protocol::http::SocketUnix is similar to
+LWP::Protocol::http, which LWP::Protocol::http::SocketUnix inherits from.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+LWP
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Florian Ragwitz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

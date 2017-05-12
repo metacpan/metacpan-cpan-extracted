@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE translit SYSTEM "translit.dtd">
+
+
+<!--
+
+  Transliteration definitions for "Common ARA".
+
+  Copyright (C) 2014 Lingua-Systems Software GmbH
+
+  Loosely based on the transliteration table found at
+  http://www.arabic-keyboard.org/arabic/arabic-transliteration.php
+  and suggestions by Ahmed Elsheshtawy.
+
+-->
+
+
+<translit>
+
+    <name>Common ARA</name>
+    <desc>Common Romanization of Arabic</desc>
+    <reverse>false</reverse>
+
+    <rules>
+
+        <!-- Section #1 -->
+
+        <rule>
+            <from>&#x062B;</from> <!-- ARABIC LETTER THEH -->
+            <to>th</to>
+        </rule>
+
+        <rule>
+            <from>&#x062E;</from> <!-- ARABIC LETTER KHAH -->
+            <to>kh</to>
+        </rule>
+
+        <rule>
+            <from>&#x0634;</from> <!-- ARABIC LETTER SHEEN -->
+            <to>sh</to>
+        </rule>
+
+        <rule>
+            <from>&#x063A;</from> <!-- ARABIC LETTER GHAIN -->
+            <to>gh</to>
+        </rule>
+
+        <rule>
+            <from>&#x0639;</from> <!-- ARABIC LETTER AIN -->
+            <to>'e</to>
+        </rule>
+
+        <rule>
+            <from>&#x0626;</from> <!-- ARABIC LETTER YEH WITH HAMZA ABOVE -->
+            <to>'e</to>
+        </rule>
+
+        <rule>
+            <from>&#x0624;</from> <!-- ARABIC LETTER WAW WITH HAMZA ABOVE -->
+            <to>'e</to>
+        </rule>
+
+
+        <!-- Section #2 -->
+
+        <rule>
+            <from>&#x0627;</from> <!-- ARABIC LETTER ALEF -->
+            <to>a</to>
+        </rule>
+
+        <rule>
+            <from>&#x0623;</from> <!-- ARABIC LETTER ALEF W. HAMZA ABOVE -->
+            <to>a</to>
+        </rule>
+
+        <rule>
+            <from>&#x0622;</from> <!-- ARABIC LETTER ALEF W. MADDA ABOVE -->
+            <to>a</to>
+        </rule>
+
+        <rule>
+            <from>&#x0649;</from> <!-- ARABIC LETTER ALEF MAKSURA -->
+            <to>a</to>
+        </rule>
+
+        <rule>
+            <from>&#x0625;</from> <!-- ARABIC LETTER ALEF W. HAMZA BELOW -->
+            <to>e</to>
+        </rule>
+
+        <rule>
+            <from>&#x0628;</from> <!-- ARABIC LETTER BEH -->
+            <to>b</to>
+        </rule>
+
+        <rule>
+            <from>&#x062A;</from> <!-- ARABIC LETTER TEH -->
+            <to>t</to>
+        </rule>
+
+        <rule>
+            <from>&#x062C;</from> <!-- ARABIC LETTER JEEM -->
+            <to>j</to>
+        </rule>
+
+        <rule>
+            <from>&#x062D;</from> <!-- ARABIC LETTER HAH -->
+            <to>h</to>
+        </rule>
+
+        <rule>
+            <from>&#x062F;</from> <!-- ARABIC LETTER DAL -->
+            <to>d</to>
+        </rule>
+
+        <rule>
+            <from>&#x0630;</from> <!-- ARABIC LETTER THAL -->
+            <to>d</to>
+        </rule>
+
+        <rule>
+            <from>&#x0636;</from> <!-- ARABIC LETTER DAD -->
+            <to>d</to>
+        </rule>
+
+        <rule>
+            <from>&#x0631;</from> <!-- ARABIC LETTER REH -->
+            <to>r</to>
+        </rule>
+
+        <rule>
+            <from>&#x0632;</from> <!-- ARABIC LETTER ZAIN -->
+            <to>z</to>
+        </rule>
+
+        <rule>
+            <from>&#x0638;</from> <!-- ARABIC LETTER ZAH -->
+            <to>z</to>
+        </rule>
+
+        <rule>
+            <from>&#x0633;</from> <!-- ARABIC LETTER SEEN -->
+            <to>s</to>
+        </rule>
+
+        <rule>
+            <from>&#x0635;</from> <!-- ARABIC LETTER SAD -->
+            <to>s</to>
+        </rule>
+
+        <rule>
+            <from>&#x0637;</from> <!-- ARABIC LETTER TAH -->
+            <to>t</to>
+        </rule>
+
+        <rule>
+            <from>&#x0641;</from> <!-- ARABIC LETTER FEH -->
+            <to>f</to>
+        </rule>
+
+        <rule>
+            <from>&#x0642;</from> <!-- ARABIC LETTER QAF -->
+            <to>q</to>
+        </rule>
+
+        <rule>
+            <from>&#x0643;</from> <!-- ARABIC LETTER KAF -->
+            <to>k</to>
+        </rule>
+
+        <rule>
+            <from>&#x0644;</from> <!-- ARABIC LETTER LAM -->
+            <to>l</to>
+        </rule>
+
+        <rule>
+            <from>&#x0645;</from> <!-- ARABIC LETTER MEEM -->
+            <to>m</to>
+        </rule>
+
+        <rule>
+            <from>&#x0646;</from> <!-- ARABIC LETTER NOON -->
+            <to>n</to>
+        </rule>
+
+        <rule>
+            <from>&#x0647;</from> <!-- ARABIC LETTER HEH -->
+            <to>h</to>
+        </rule>
+
+        <rule>
+            <from>&#x0629;</from> <!-- ARABIC LETTER TEH MARBUTA -->
+            <to>h</to>
+        </rule>
+
+        <rule>
+            <from>&#x0648;</from> <!-- ARABIC LETTER WAW -->
+            <to>w</to>
+        </rule>
+
+        <rule>
+            <from>&#x064A;</from> <!-- ARABIC LETTER YEH -->
+            <to>y</to>
+        </rule>
+
+        <rule>
+            <from>&#x0621;</from> <!-- ARABIC LETTER HAMZA -->
+            <to>'</to>
+        </rule>
+
+        <rule>
+            <from>&#x061F;</from> <!-- ARABIC QUESTION MARK -->
+            <to>?</to>
+        </rule>
+
+        <rule>
+            <from>&#x060C;</from> <!-- ARABIC COMMA -->
+            <to>,</to>
+        </rule>
+
+
+        <!-- Section #3 -->
+
+        <rule>
+            <from>&#x0640;</from> <!-- ARABIC TATWEEL -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x064B;</from> <!-- ARABIC FATHATAN -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x064C;</from> <!-- ARABIC DAMMATAN -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x064D;</from> <!-- ARABIC KASRATAN -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x064E;</from> <!-- ARABIC FATHA -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x064F;</from> <!-- ARABIC DAMMA -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0650;</from> <!-- ARABIC KASRA -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0651;</from> <!-- ARABIC SHADDA -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x0652;</from> <!-- ARABIC SUKUN -->
+            <to></to>
+        </rule>
+
+        <rule>
+            <from>&#x200F;</from> <!-- RIGHT-TO-LEFT MARK -->
+            <to></to>
+        </rule>
+
+    </rules>
+
+</translit>
+
+<!-- vim: set sts=4 sw=4 ts=4 ai et ft=xml: -->

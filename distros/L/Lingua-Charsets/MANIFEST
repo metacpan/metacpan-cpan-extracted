@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Lingua/Charsets.pm
+t/0-charsets.t
+t/1-languages.t

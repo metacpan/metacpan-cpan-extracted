@@ -1,0 +1,61 @@
+Lexical::Failure version 0.000007
+
+This module sets up two new keywords: C<fail> and C<ON_FAILURE>,
+with which you can quickly create modules whose failure signaling
+is lexcially scoped, under the control of client code.
+
+Normally, modules specify some fixed mechanism for error handling and
+require client code to adapt to that policy. One module may signal
+errors by returning C<undef>, or perhaps some special "error object".
+Another may C<die> or C<croak> on failure. A third may set a flag
+variable. A fourth may require the client code to set up a callback,
+which is executed on failure.
+
+If you are using all four modules, your own code now has to check for
+failure in four different ways, depending on where the failing
+component originated. If you would rather that I<all> components throw
+exceptions, or all return C<undef>, you will probably have to write
+wrappers around 3/4 of them, to convert from their "native" failure
+mechanism to your preferred one.
+
+Lexical::Failure offers an alternative: a simple mechanism with which
+module authors can generically specify "fail here with this message"
+(using the C<fail> keyword), but then allow each block of client
+code to decide how that failure is reported to it within its own lexical
+scope (using the C<ON_FAILURE> keyword).
+
+Module authors can still provide a default failure signaling mechanism,
+for when client code does not specify how errors are to be reported.
+This is handy for ensuring backwards compatibility in existing modules
+that are converted to this new failure signaling approach.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

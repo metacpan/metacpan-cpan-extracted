@@ -1,0 +1,48 @@
+Lingua-Diversity version 0.07
+
+This distribution provides a simple object-oriented interface for applying
+various measures of diversity to text units. At present, it implements the
+VOCD algorithm, the MTLD algorithm, and many variants of variety.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Lingua::Diversity
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Diversity
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Lingua-Diversity
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Lingua-Diversity
+
+    Search CPAN
+        http://search.cpan.org/dist/Lingua-Diversity/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Aris Xanthos
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published
+by the Free Software Foundation.
+
+See http://dev.perl.org/licenses/ for more information.
+

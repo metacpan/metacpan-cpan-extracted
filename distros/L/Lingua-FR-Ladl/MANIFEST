@@ -1,0 +1,16 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Lingua/FR/Ladl.pm
+lib/Lingua/FR/Ladl/Table.pm
+lib/Lingua/FR/Ladl/Graph.pm
+lib/Lingua/FR/Ladl/Parametrizer.pm
+lib/Lingua/FR/Ladl/Exceptions.pm
+lib/Lingua/FR/Ladl/Util.pm
+t/00.load.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

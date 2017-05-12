@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/LWP/UserAgent/Paranoid.pm
+lib/LWP/UserAgent/Paranoid/Compat.pm
+lib/LWP/UserAgent/Paranoid/Test.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/alarm.t
+t/basic.t
+t/compat/00-all.t
+t/compat/40-largefiles.t
+t/compat/40-slowserver.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

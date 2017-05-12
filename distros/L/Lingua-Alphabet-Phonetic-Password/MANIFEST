@@ -1,0 +1,12 @@
+Build.PL
+CHANGES
+lib/Lingua/Alphabet/Phonetic/Password.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_use.t
+t/02_pod.t
+t/03_pod_coverage.t
+t/04_breakpoints.t
+t/05_basic.t

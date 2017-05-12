@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use List::Vectorize;
+
+open F, $ARGV[0] or die "cannot open $ARGV[0]";
+
+print join "", @{unique([ <F> ])};

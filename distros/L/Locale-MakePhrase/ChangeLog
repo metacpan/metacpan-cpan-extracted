@@ -1,0 +1,35 @@
+Revision history for Perl extension Locale::MakePhrase.
+
+0.5  Wed Mar  8 16:18:43 EST 2006
+	- Re-work of when L::M die's.  It was found that a single translation could cause
+	  the translation engine (and thus the application) to die.  Since people may update
+	  a few hundred translations in a single sitting, finding bad translations was
+	  hard.  This release changes the behaviour so that badly formed translations dont
+	  cause L::M to die - rather, it now just returns a partially translated string
+	  with an error keyword.
+	- Re-wrote the RuleManager as it didn't correctly handled undef'ed arguments.
+	  ie: it would die, when in reality undef is a valid value for an argument.
+	- Vastly enhanced the numeric formatting capabilities so that numbers can be formatted
+	  in many more combinations.
+	- Enhanced the [_x] syntax so that now you can pass in specific run-time formatting
+	  options.  This is needed because some languages format number differently depending
+	  on the context of the string itself.
+	- The file and directory backing-stores can now load text strings which span multiple
+	  lines that are backslash-escaped.
+	- Added 'println' function and 'print' overload feature.
+
+0.4
+	- Unsure what happend here, as I forgot to update the Changelog, but I think it
+	  was mostly a simple code cleanup.
+
+0.3  Mon Oct 18 15:51:11 EST 2004
+	- Fixed warning when detecting Perl version.
+
+0.2  Sat Sep  4 01:07:46 EST 2004
+	- Added lots more documentation.
+	- Re-implemented sub-modules so as to simplify the design.
+	- Re-wrote the expression evaluation engine... so that it worked...
+
+0.1  Tue Mar  9 08:36:32 EST 2004
+	- First release the package.
+

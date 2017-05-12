@@ -1,0 +1,72 @@
+#!/usr/bin/perl -s
+
+use warnings;
+use strict;
+use Data::Dumper;
+
+our ($h);
+
+sub usage {
+  print "nat-mkRealDict: used to create a dictionary similar to a PTD based on a\n";
+  print "                word aligned corpus.\n\n";
+  print "\tnat-mkRealDict <aligned-corpus>\n\n";
+  print "For more help, please run 'perldoc nat-mkRealDict'\n";
+  exit;
+}
+
+usage() if $h;
+
+my $data;
+
+while(<>) {
+  chomp;
+  next if m!^$!;
+  my ($l,$r) = split /\t/;
+  next if $r =~ m!\s!;
+  $data->{$l}{count}++;
+  $data->{$l}{trans}{$r}++;
+}
+
+for my $k (keys %$data) {
+  my $total;
+  for my $t (keys %{$data->{$k}{trans}}) {
+    $total += $data->{$k}{trans}{$t}
+  }
+  for my $t (keys %{$data->{$k}{trans}}) {
+   $data->{$k}{trans}{$t} = $data->{$k}{trans}{$t} / $total;
+  }
+}
+
+print Dumper($data);
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-mkRealDict - used to create a dictionary similar to a PTD based on
+a word aligned corpus.
+
+=head1 SYNOPSIS
+
+  nat-mkRealDict <aligned-corpus>
+
+=head1 DESCRIPTION
+
+While not fully functional, this scripts reads from the supplied file
+an word aligned corpus (two columns separated by a tab character). The
+result printed to STDOUT is a dictionary similar to a PTD in
+structure) with the real alignments used in the corpus.
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2009 by Alberto Manuel Brandão Simões
+
+=cut

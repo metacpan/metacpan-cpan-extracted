@@ -1,0 +1,35 @@
+Revision history for Perl extension Linux::LVM.
+
+0.01  Thu Apr  3 08:21:41 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Linux::LVM
+
+0.11  Fri Apr  4 09:00:00 2003
+	- First ready for prime time release.
+
+0.12  Mon Apr  7 07:45:00 2003
+	- Added get_pv_info to fetch physical volume information by physical volume name.
+	- Added get_lv_info to fetch logical volume information by logical volume name.
+	- Made the get_vg_information routine public.
+	- Added some basic error checking.
+
+0.13  Mon Apr 10 07:45:00 2003
+	- Reworked some of the regular expressions.
+	- Improved the source documentation.
+	- Added some examples of how to use the module.
+
+0.14  Wed Jul  2 02:54:14 CDT 2008
+        - Fixed some logic errors to get it working a little better
+        - Full rewrite underway
+
+0.15  Wed Dec 21 09:01:00 CDT 2011
+        - Look in both /sbin and /usr/sin for lvm binaries
+        - Report snapshot allocated_to_snapshot, cow_table_size and cow_table_unit
+        - Report mirrored_volumes
+
+0.16  Web Feb  8 13:50:00 CDT 2012
+        - added units() sub to set units used for pe_size, lv_size, etc
+
+0.17  Web Nov  6 19:24:00 CDT 2013
+        - Compatiblity with LVM2 2.02.89 and above displaying path as "LV Path" rather than "LV Name"
+

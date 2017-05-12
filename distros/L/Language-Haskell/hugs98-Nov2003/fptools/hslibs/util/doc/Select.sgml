@@ -1,0 +1,95 @@
+<Sect1 id="Select">
+  <Title><Literal>Select</Literal>: Synchronous I/O multiplexing
+<IndexTerm><Primary>Select interface</Primary></IndexTerm>
+</Title>
+
+  <Para>
+The <Literal>Select</Literal> interface provides a Haskell wrapper for the <Function>select()</Function>
+OS call supplied by many modern UNIX variants. <Literal>Select</Literal> exports the
+following:
+</Para>
+
+<Para>
+
+<ProgramListing>
+type TimeOut = Maybe Int
+  -- Nothing =&#62; wait indefinitely.
+  -- Just x | x &#62;= 0    =&#62; block waiting for 'x' micro seconds.
+  --        | otherwise =&#62; block waiting for '-x' micro seconds.
+
+hSelect :: [Handle]
+        -&#62; [Handle]
+        -&#62; [Handle]
+        -&#62; TimeOut
+        -&#62; IO SelectResult
+
+type SelectResult
+ = ( [Handle]  -- input  handles ready
+   , [Handle]  -- output handles ready
+   , [Handle]  -- exc.   handles ready
+   )
+</ProgramListing>
+
+</Para>
+
+<Para>
+Here's an example of how it could be used:
+</Para>
+
+<Para>
+
+<ProgramListing>
+module Main(main) where
+
+import Select
+import IO
+
+main :: IO ()
+main = do
+  hSetBuffering stdin NoBuffering
+  putStrLn "waiting for input to appear"
+  hSelect [stdin] [] [] Nothing
+  putStrLn "input ready, let's try reading"
+  x &#60;- getChar
+  print x
+</ProgramListing>
+
+</Para>
+
+<Para>
+where the call to <Function>hSelect</Function> makes the process go to sleep
+until there's input available on <VarName>stdin</VarName>.
+</Para>
+
+  <sect2>
+    <title>Using <literal>hSelect</literal> with Concurrent
+    Haskell</title>
+    
+    <para>In brief: don't.  For two reasons:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para><literal>hSelect</literal> will cause all your Haskell
+	threads to block until the <literal>hSelect</literal> returns,
+	much like any call to a foreign function.</para>
+      </listitem>
+
+      <listitem>
+	<para>You don't need to.  Concurrent Haskell will let you do
+	I/O on multiple file handles concurrently by forking threads,
+	and if you need to assign a timeout, then this can be done
+	using a combination of <literal>threadDelay</literal> (see
+	<xref linkend="sec-scheduling">) and asynchronous exceptions
+	(see <xref linkend="sec-Asynchronous-Exceptions">).</para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+
+</Sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: sgml ***
+     ;;; sgml-parent-document: ("../../doc/hslibs.sgml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

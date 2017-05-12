@@ -1,0 +1,205 @@
+#! /bin/sh
+#
+# quartzpvr-server	Control the QuartzPVR Server
+#
+# Author: Steve Price <sdprice@cpan.org>
+#
+### BEGIN INIT INFO
+# Provides: quartzpvr-server
+# Required-Start: $network $remote_fs
+# Required-Stop: $null
+# Default-Start:  3 5
+# Default-Stop:   0 1 2 6
+# Short-Description: Audio/Video recording
+# Description:    Server providing communication between web frontend and the Perl scheduling scripts 
+### END INIT INFO
+
+
+#start_daemon [-f] [-n nicelevel] [-p pidfile] pathname [args...]
+#runs the specified program as a daemon. The start_daemon function shall check if the program is already running using the algorithm given above. If so, it shall not start another copy of the daemon unless the -f option is given. The -n option specifies a nice level. See nice. start_daemon shall return the LSB defined exit status codes. It shall return 0 if the program has been successfully started or is running and not 0 otherwise.
+#
+#killproc [-p pidfile] pathname [signal]
+#The killproc function shall stop the specified program. The program is found using the algorithm given above. If a signal is specified, using the -signal_name or -signal_number syntaxes as specified by the kill command, the program is sent that signal. Otherwise, a SIGTERM followed by a SIGKILL after an unspecified number of seconds shall be sent. If a program has been terminated, the pidfile should be removed if the terminated process has not already done so. The killproc function shall return the LSB defined exit status codes. If called without a signal, it shall return 0 if the program has been stopped or is not running and not 0 otherwise. If a signal is given, it shall return 0 only if the program is running.
+#
+#pidofproc [-p pidfile] pathname
+#The pidofproc function shall return one or more process identifiers for a particular daemon using the algorithm given above. Only process identifiers of running processes should be returned. Multiple process identifiers shall be separated by a single space.
+#
+#Note: A process may exit between pidofproc discovering its identity and the caller of pidofproc being able to act on that identity. As a result, no test assertion can be made that the process identifiers returned by pidofproc shall be running processes.
+#
+#The pidofproc function shall return the LSB defined exit status codes for "status". It shall return 0 if the program is running and not 0 otherwise.
+#log_success_msg message
+#The log_success_msg function shall cause the system to write a success message to an unspecified log file. The format of the message is unspecified. The log_success_msg function may also write a message to the standard output.
+#
+#Note: The message should be relatively short; no more than 60 characters is highly desirable.
+#
+#log_failure_msg message
+#The log_failure_msg function shall cause the system to write a failure message to an unspecified log file. The format of the message is unspecified. The log_failure_msg function may also write a message to the standard output.
+#
+#Note: The message should be relatively short; no more than 60 characters is highly desirable.
+#
+#log_warning_msg message
+#The log_warning_msg function shall cause the system to write a warning message to an unspecified log file. The format of the message is unspecified. The log_warning_msg function may also write a message to the standard output.
+#
+#Note: The message should be relatively short; no more than 60 characters is highly desirable.
+#
+#
+
+fn_exists()
+{
+    type $1 2>&1 | grep -q 'shell function'
+    return $?
+}
+
+# Source function library.
+if [ -f /lib/lsb/init-functions ]; then
+	. /lib/lsb/init-functions
+else
+	echo "Error: Unable to source LDB init-functions"
+	exit 2 
+fi
+
+## Check for non-lsb functions (provided by Ubuntu)
+fn_exists log_end_msg
+exists=$?
+if [ ! "$exists" = 0 ]
+then
+	# int log_end_message (int exitstatus)
+	log_end_msg () {
+	
+		# If no arguments were passed, return
+	    if [ -z "${1:-}" ]; then
+	        return 1
+	    fi
+	
+	    retval=$1
+
+	    if [ $1 -eq 0 ]; then
+	        echo "."
+	    elif [ $1 -eq 255 ]; then
+	        /bin/echo -e ' (warning).'
+	    else
+	        /bin/echo -e " failed!"
+	    fi
+
+	    return $retval
+	}
+fi
+
+fn_exists log_daemon_msg
+exists=$?
+if [ ! "$exists" = 0 ]
+then
+	# Sample usage:
+	# log_daemon_msg "Starting GNOME Login Manager" "gdm"
+	#
+	# On Debian, would output "Starting GNOME Login Manager: gdm"
+	# On Ubuntu, would output " * Starting GNOME Login Manager..."
+	#
+	# If the second argument is omitted, logging suitable for use with
+	# log_progress_msg() is used:
+	#
+	# log_daemon_msg "Starting remote filesystem services"
+	#
+	# On Debian, would output "Starting remote filesystem services:"
+	# On Ubuntu, would output " * Starting remote filesystem services..."
+	#
+	log_daemon_msg () {
+	    if [ -z "${1:-}" ]; then
+	        return 1
+	    fi
+	
+	    if [ -z "${2:-}" ]; then
+	        echo -n "$1:"
+	        return
+	    fi
+	    
+	    echo -n "$1: $2"
+	}
+fi
+
+
+fn_exists get_status_of_proc
+exists=$?
+if [ ! "$exists" = 0 ]
+then
+	# Return LSB status
+	get_status_of_proc () {
+	    local pidfile daemon name status
+	
+	    pidfile=
+	    OPTIND=1
+	    while getopts p: opt ; do
+	        case "$opt" in
+	            p)  pidfile="$OPTARG";;
+	        esac
+	    done
+	    shift $(($OPTIND - 1))
+	
+	    if [ -n "$pidfile" ]; then
+	        pidfile="-p $pidfile"
+	    fi
+	    daemon="$1"
+	    name="$2"
+	
+	    status="0"
+	    pidofproc $pidfile $daemon >/dev/null || status="$?"
+	    if [ "$status" = 0 ]; then
+	        log_success_msg "$name is running"
+	        return 0
+	    #elif [ "$status" = 4 ]; then
+	    #    log_failure_msg "could not access PID file for $name"
+	    #    return $status
+	    else
+	        log_failure_msg "$name is not running"
+	        return $status
+	    fi
+	}
+fi
+
+QPVR_USER=%PVR_USER%
+QPVR_GROUP=%PVR_GROUP%
+
+PIDDIR=/var/run/$QPVR_USER
+SERVER_BIN=/usr/sbin/quartzpvr
+PIDFILE=$PIDDIR/server.pid
+test -x $SERVER_BIN || exit 5
+
+if [ ! -d $PIDDIR ]
+then
+	mkdir $PIDDIR
+	chown -R $QPVR_USER:$QPVR_GROUP $PIDDIR
+fi
+
+# See how we were called.
+case "$1" in
+  start)
+		log_daemon_msg "Starting Quartz PVR" "QuartzPVR"
+	
+##		start_daemon -p $PIDFILE $SERVER_BIN
+		start_daemon $SERVER_BIN
+  		get_status_of_proc -p $PIDFILE $SERVER_BIN "QuartzPVR"
+	;;
+  stop)
+  		log_daemon_msg "Stopping Quartz PVR" "QuartzPVR"
+	
+	    killproc -p $PIDFILE $SERVER_BIN 2>/dev/null
+	    killall $SERVER_BIN 2>/dev/null
+	
+#		log_success_msg "$name has stopped"
+  		get_status_of_proc -p $PIDFILE $SERVER_BIN "QuartzPVR"
+	;;
+  restart|reload)
+        ## Stop the service and regardless of whether it was
+        ## running or not, start it again.
+        $0 stop
+        $0 start
+        ;;
+  status)
+  		log_daemon_msg "Checking Quartz PVR" "QuartzPVR"
+  		get_status_of_proc -p $PIDFILE $SERVER_BIN "QuartzPVR"
+        ;;
+  *)
+	echo "Usage: $0 {start|stop|status|restart}"
+	exit 1
+esac
+exit 0

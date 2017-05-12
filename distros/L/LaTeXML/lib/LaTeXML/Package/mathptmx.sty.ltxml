@@ -1,0 +1,32 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  mathptmx                                                           | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+# Nothing to do here.
+# Is this the right approach?
+DefMath('\omicron', "\x{03BF}");    # GREEK SMALL LETTER OMICRON
+Let('\upDelta',   '\Delta');
+Let('\upGamma',   '\Gamma');
+Let('\upLambda',  '\Lambda');
+Let('\upOmega',   '\Omega');
+Let('\upPhi',     '\Phi');
+Let('\upPi',      '\Pi');
+Let('\upPsi',     '\Psi');
+Let('\upSigma',   '\Sigma');
+Let('\upTheta',   '\Theta');
+Let('\upUpsilon', '\Upsilon');
+Let('\upXi',      '\Xi');
+1;

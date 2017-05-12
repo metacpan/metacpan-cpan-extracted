@@ -1,0 +1,31 @@
+Revision history for Perl extension Linux::Taskstats::Read.
+
+6.01  Tue Jun 10 17:32:05 MDT 2008
+        - fix template for v4
+
+6.00  Mon Jun  9 10:45:53 MDT 2008
+        - taskstats version 6 support added
+
+4.00  Wed Jun 13 15:53:23 MDT 2007
+        - taskstats version 4 format support added
+
+3.05  Wed Apr 25 13:14:00 MDT 2007
+        - fix alignment in cpu accounting section
+
+3.04  Fri Apr 20 11:07:05 MDT 2007
+        - add read_raw(), size(), template() methods
+
+3.03  Thu Apr 19 10:15:36 MDT 2007
+        - no module changes, only changes to Makefile.PL and tests to
+          check for 64-bit architectures
+
+3.02  Wed Apr 18 16:23:29 MDT 2007
+        - added fields(), version() methods
+
+3.01  Tue Apr 17 16:23:46 MDT 2007
+        - public release
+
+0.01  Tue Apr 17 13:29:27 2007
+	- original version; created by h2xs 1.23 with options
+		-AX Linux::Taskstats::Read
+

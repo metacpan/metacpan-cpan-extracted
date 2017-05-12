@@ -1,0 +1,61 @@
+RESTful
+
+	GET = Get request
+	POST = Create new object
+	PUT = Partial update of an object
+	DELETE = Delete object
+	
+	HTTP:
+	GET/POST/PUT/DELETE /<plugin>/<function>/<parameters ...>
+	<data>
+
+	Plugin->(Create/Read/Update/Delete)<Function>(<data>, <parameters ...>)
+	
+	JSON:
+	as Request: Content-Type: application/json
+	as Response: Accept: */json
+	
+	XML:
+	as Request: Content-Type: text/xml
+	as Response: Accept: */xml
+
+SOAP 1.1
+
+	- All WSDL's/Request/Response XML has been verified with SoapUI
+
+	WSDL: /<plugin>.wsdl
+	Endpoint: /<plugin>
+	Explicit endpoint: /<plugin>.soap
+	Content-Type: application/soap+xml
+
+	RESTful to CRUD name conversion:
+	GET => READ
+	POST => CREATE
+	PUT => UPDATE
+	DELETE => DELETE
+		
+	Function name conversion:
+	Plugin->(Create/Read/Update/Delete)<Function>(<data>)
+
+	Example:
+	/lim/soap
+	Lim->ReadVersion()
+
+XML-RPC
+
+	Endpoint: /<plugin>
+	Explicit endpoint: /<plugin>.xml-rpc
+	Content-Type: text/xml
+
+JSON-RPC v2
+	
+	Endpoint: /<plugin>
+	Explicit endpoint: /<plugin>.json-rpc
+	Content-Type: application/json
+
+Limitations
+	- No starting arrays
+	- No arrays in arrays
+
+Ports/Services
+	Agent tcp/5353

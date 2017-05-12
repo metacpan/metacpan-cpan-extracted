@@ -1,0 +1,118 @@
+#!/usr/bin/perl -w
+#========================================================================
+#
+# latex2dvi
+#
+# DESCRIPTION
+#   Script for processing and rendering a template document using the 
+#   Perl Template Toolkit. 
+#
+# AUTHOR
+#   Andrew Ford <a.ford@ford-mason.co.uk>
+#
+# COPYRIGHT
+#   Copyright (C) 2007 Andrew Ford.  All Rights Reserved.
+#
+#   This module is free software; you can redistribute it and/or
+#   modify it under the same terms as Perl itself.
+#
+#------------------------------------------------------------------------
+#
+# $Id: latex2dvi 73 2007-10-12 23:11:27Z andrew $
+#
+#========================================================================
+
+use strict;
+use warnings;
+
+use LaTeX::Driver::FilterProgram;
+
+LaTeX::Driver::FilterProgram->execute(format => 'dvi');
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+latex2dvi - script to convert LaTeX file to DVI
+
+=head1 USAGE
+
+  latex2dvi [OPTIONS] [-o output] [sourcefile]
+
+=head1 DESCRIPTION
+
+C<latex2dvi> is a simple script to invoke the C<LaTeX::Driver> module
+to convert a LaTeX file to DVI (TeX's device independent output format).
+
+TO BE EXPANDED
+
+=head1 REQUIRED ARGUMENTS
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<-output=FILE>
+
+specifies that the formatted file should be written to C<FILE>.  If
+this option is not specified, or is specified as "C<->" then the file
+will be written to standard output, otherwise if an input file is
+specified then the it will be formatted in place and the output file
+will have the same name as the input file, but with the original
+extension replaced with C<.dvi>.
+
+
+=item C<-tt2>
+
+specifies that the source document should be taken to be a Template
+Toolkit template and processed through that before being fed to the
+C<LaTeX::Driver> module for latex formatting.
+
+
+=item C<-define=I<NAME>=I<VALUE>>
+
+defines the template variable I<NAME> to have the value I<VALUE>.
+Multiple template variables may be defined and these are passed to the
+Template Toolkit processing stage (they are ignored if the C<-tt2>
+option is not specified).
+
+=back
+
+=head1 DIAGNOSTICS
+
+=head1 EXIT STATUS
+
+=head1 CONFIGURATION
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Andrew Ford E<lt>A.Ford@ford-mason.co.ukE<gt>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2007 Andrew Ford.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+
+=cut
+
+# Local Variables:
+# mode: perl
+# perl-indent-level: 4
+# indent-tabs-mode: nil
+# End:
+#
+# vim: expandtab shiftwidth=4:

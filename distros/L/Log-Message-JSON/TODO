@@ -1,0 +1,6 @@
+List of ideas:
+  * optionally use JSON or JSON::XS module
+  * allow defining own formatters for various data types (e.g.
+    IO::Socket::INET could be serialized as a pair (IP,port))
+  * add caching layer (consequent ->to_json() calls should not result in
+    recalculating JSON unless necessary)

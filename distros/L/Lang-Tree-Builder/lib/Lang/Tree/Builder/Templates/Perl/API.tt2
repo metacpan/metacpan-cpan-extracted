@@ -1,0 +1,91 @@
+# WARNING: [% warning %] DO NOT EDIT! YOUR EDITS WILL BE LOST!
+
+package [% api.name %];
+use strict;
+use warnings;
+[% FOREACH class IN data.classes -%]
+[% IF class.is_concrete -%]
+use [% class.name %];
+[% END -%]
+[% END -%]
+use [% visitor.name %];
+use Carp;
+require Exporter;
+our @ISA = qw(Exporter);
+
+=head1 NAME
+
+[% api.name %] - API for creating trees using the generated nodes.
+
+=head1 SYNOPSIS
+
+  use [% api.name %] qw(:all);
+
+Each non-abstract class in the class definition file used to generate this
+API is given a sub here that will create an instance of that
+class. Each sub is named after the final component of the class name and
+is available for import either individually or via the
+import keyword C<:all>. This file also includes each concrete class so
+by using this api you guarantee that all of the individual node packages
+are loaded.
+
+=cut
+
+our @EXPORT_OK = qw(
+[% FOREACH class IN data.classes -%]
+[% IF class.is_concrete %]    [% class.lastpart %]
+[% END -%]
+[% END -%]
+);
+
+our %EXPORT_TAGS = (all => [@EXPORT_OK]);
+
+=head1 METHODS
+
+Individual methods are described below.
+
+=cut
+
+[% FOREACH class IN data.classes -%]
+[% IF class.is_concrete %]
+
+=head2 [% class.lastpart %]
+
+  my $[% class.lastpart.tolower %] = [% class.lastpart %](
+    [%- FOREACH arg IN class.args -%]
+        [%- "\$" -%]
+        [%- arg.argname.uncamel -%]
+        [%- LAST IF loop.last -%]
+        [%- ", " -%]
+    [%- END %]);
+
+Creates an instance of C<[% class.name %]>
+[%- IF class.parent %], which is a type of [% class.parent.name %][% END %].
+[% INCLUDE "ExplainArgs.tt2" %]
+
+=cut
+
+sub [% class.lastpart %] {
+    my $obj = eval { [% class.name %]->new(@_); };
+    croak($@) if $@;
+    return $obj;
+}
+[% END -%]
+[% END %]
+
+=head1 AUTHOR
+
+[% warning %]
+
+=head1 SEE ALSO
+
+The generated tree node classes:
+[%- FOREACH class IN data.classes %]
+L<[% class.name %]>,
+[%- END %]
+and an abstract visitor that can be subclassed to walk them:
+L<[% visitor.name %]>.
+
+=cut
+
+1;

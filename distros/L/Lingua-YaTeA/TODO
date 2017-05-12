@@ -1,0 +1,78 @@
+- Correcting the Input (TreeTagger Output) to be always conformed (use a method defined in YaTeA - todo)
+
+- Add POD directive =encoding in each file
+
+- Delete the Options_EN and Options_FR. 
+
+  Replace it by the loading of the file share/YaTeA/yatea.conf
+
+  (function LoadOptions)
+
+  use of Config::General for config management
+
+- in ParsingPatterns_EN, take into account to the tag NP (?)
+
+- Add a prefix while making RESULTS directory
+
+- Other method to load config data (rather than change ROOT at the
+  installation step) :
+
+
+sub openunicode {
+    my ($rfh, @path) = @_;
+    my $f;
+    unless (defined $$rfh) {
+	for my $d (@INC) {
+	    use File::Spec;
+	    $f = File::Spec->catfile($d, "unicore", @path);
+	    last if open($$rfh, $f);
+	    undef $f;
+	}
+	croak __PACKAGE__, ": failed to find ",
+              File::Spec->catfile(@path), " in @INC"
+	    unless defined $f;
+    }
+    return $f;
+}
+
+- Move bin/.config information in yatea.conf (?)
+
+- Write a more explicit message when corpus file does not exist
+
+- Move the Option MESSAGE_DISPLAY in the yatea.rc
+
+- Decription of the terminology format
+
+- rewrite the method
+  Lingua::YaTeA::ForbiddenStructureAny::setSplitAfter and its calls
+
+Check the XML conformity, especially < and > and &
+
+
+- Check the computing of the offset. it is assumed that every token
+  are preceded and follow by a space character. But it is not always
+  the case (e.g. commas)
+
+- Check that special XML characters are well encoded as XML entities
+
+- Homogenize the output of the file and file handler (print / debug -> file handler, printUnparseable -> file name)
+
+- remove the dtd line in the output (to check ?)
+
+- UTF-8
+
+- tests : loading a corpus
+	  loading  a testified term list
+          chunking
+          progressively parsing
+	  displaying results
+	  process English corpus
+          process French corpus (tagged with TreeTagger)
+          process French corpus (tagged with Flemm)
+	  process English corpus with testified terms
+
+- to check that Edge.pm is useful
+
+- review WordFromcorpus and LexiconItem (the word form is concated and then split !)
+
+- integrate message display in submodule (for instance TestifiedTermSet)

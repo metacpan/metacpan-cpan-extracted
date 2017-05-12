@@ -1,0 +1,9 @@
+lib/Locale/Country/Extra.pm
+LiCENSE
+Makefile.PL
+MANIFEST
+README.md
+t/00_load.t
+t/countries.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

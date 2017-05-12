@@ -1,0 +1,49 @@
+---
+abstract: 'Permits recording, and later playing back of LWP requests.'
+author:
+  - 'Mark Morgan, C<< <makk384@gmail.com> >>'
+build_requires:
+  Test::More: '0'
+  Test::RequiresInternet: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-UserAgent-Mockable
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  LWP::UserAgent::Mockable:
+    file: lib/LWP/UserAgent/Mockable.pm
+    version: '1.18'
+requires:
+  B::Deparse: '0.61'
+  Hook::LexWrap: '0'
+  LWP: '0'
+  LWP::UserAgent: '0'
+  Safe::Isa: '0'
+  Storable: '2.05'
+  URI: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mjemmeson/lwp-useragent-mockable/issues
+  repository: git://github.com/mjemmeson/lwp-useragent-mockable.git
+version: '1.18'
+x_contributors:
+  - 'Michael Jemmeson <mjemmeson@cpan.org>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'YAML::Tiny version 1.64'

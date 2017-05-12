@@ -1,0 +1,8 @@
+Changes
+lib/Log/Stderr.pm
+Makefile.PL
+MANIFEST
+README
+t/Log-Stderr.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

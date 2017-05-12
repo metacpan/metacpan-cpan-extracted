@@ -1,0 +1,55 @@
+NAME
+
+    Lingua::AR::Regexp - Regular Expression character classes for Arabic
+
+SYNOPSIS
+
+        use Lingua::AR::Regexp;
+        use utf8;
+    
+        $_ = 'جزئ';
+        say 'Has a Hamza' if /\p{Lingua::AR::Regexp::IsHamza}/;
+        say 'Hamza fixed' if s/(?<=\p{Lingua::AR::Regexp::IsSplitting})ئ‎/ء/g;
+
+DESCRIPTION
+
+METHODS AND ARGUMENTS
+
+    IsHamza
+
+      Check whether character is or has a Hamza (Including maddas)
+
+    IsTashkeel
+
+      Check whether character is Tashkeel (short vowels)
+
+    IsHamzaMark
+
+      Check whether character is a Non spacing mark (\p{Mn}) Hamza
+      (Including maddas)
+
+    IsLetterWithHamza
+
+      Check whether character has a Hamza (Including maddas)
+
+    IsSplitting
+
+      Matches characters that break the horizontal stroke of the word.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Lingua-AR-Regexp
+
+SEE ALSO
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

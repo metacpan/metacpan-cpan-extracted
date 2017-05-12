@@ -1,0 +1,13 @@
+README
+MANIFEST
+COPYING
+Changes
+Makefile.PL
+AIO.pm
+AIO.xs
+t/00_load.t
+t/01_stat.t
+t/02_read.t
+t/03_errors.t
+t/aio_test_common.pm
+META.yml                                 Module meta-data (added by MakeMaker)

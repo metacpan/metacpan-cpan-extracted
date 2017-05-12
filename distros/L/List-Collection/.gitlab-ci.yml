@@ -1,0 +1,30 @@
+test:
+  script:
+    - perlbrew -q exec dzil authordeps --missing | xargs perlbrew -q exec cpanm
+    - perlbrew -q exec dzil listdeps --missing | xargs perlbrew -q exec cpanm
+    - perlbrew exec dzil test
+  tags:
+    - perl
+  except:
+    - /^release/
+    - /^build/
+
+build:
+  script:
+    - perlbrew exec perl Build.PL
+    - perlbrew exec ./Build
+    - perlbrew exec ./Build test
+  tags:
+    - perl
+  only:
+    - /^build/
+
+release:
+  script:
+    - perlbrew exec perl Build.PL
+    - perlbrew exec ./Build
+    - perlbrew exec ./Build install
+  tags:
+    - perl
+  only:
+    - /^release/

@@ -1,0 +1,107 @@
+NAME
+    Log::FreeSWITCH::Line - FreeSWITCH log line parsing and serializing.
+
+SYNOPSIS
+     use Log::FreeSWITCH::Line qw(parse serialize);
+     my $data_o = parse($data);
+     my $data = serialize($data_o);
+
+SUBROUTINES
+    "parse($data)"
+             Parse FreeSWITCH log line.
+             Returns Log::FreeSWITCH::Line::Data object.
+
+    "serialize($data_o)"
+             Serialize Log::FreeSWITCH::Line::Data object to FreeSWITCH log line.
+             Returns string.
+
+ERRORS
+     parse():
+             Cannot parse data.
+                     Data: %s
+
+     serialize():
+             Serialize object must be 'Log::FreeSWITCH::Line::Data' object.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Module.
+     use Data::Printer;
+     use Log::FreeSWITCH::Line qw(parse);
+
+     # Log record.
+     my $data = '2014-07-01 13:37:53.973562 [DEBUG] sofia.c:4045 inbound-codec-prefs [PCMA]';
+
+     # Parse.
+     my $data_o = parse($data);
+
+     # Dump.
+     p $data_o;
+
+     # Output:
+     # Log::FreeSWITCH::Line::Data  {
+     #     Parents       Mo::Object
+     #     public methods (0)
+     #     private methods (1) : _datetime
+     #     internals: {
+     #         date        "2014-07-01",
+     #         file        "sofia.c",
+     #         file_line   4045,
+     #         message     "inbound-codec-prefs [PCMA]",
+     #         raw         "2014-07-01 13:37:53.973562 [DEBUG] sofia.c:4045 inbound-codec-prefs [PCMA]",
+     #         time        "13:37:53.973562",
+     #         type        "DEBUG"
+     #     }
+     # }
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Module.
+     use Log::FreeSWITCH::Line qw(serialize);
+     use Log::FreeSWITCH::Line::Data;
+
+     # Data.
+     my $record = Log::FreeSWITCH::Line::Data->new(
+             'date' => '2014-07-01',
+             'file' => 'sofia.c',
+             'file_line' => 4045,
+             'message' => 'inbound-codec-prefs [PCMA]',
+             'time' => '13:37:53.973562',
+             'type' => 'DEBUG',
+     );
+
+     # Serialize and print to stdout.
+     print serialize($record)."\n";
+
+     # Output:
+     # 2014-07-01 13:37:53.973562 [DEBUG] sofia.c:4045 inbound-codec-prefs [PCMA]
+
+DEPENDENCIES
+    Error::Pure, Exporter, Log::FreeSWITCH::Line::Data, Readonly,
+    Scalar::Util.
+
+SEE ALSO
+    Log::FreeSWITCH::Line::Data
+        Data object which represents FreeSWITCH log line.
+
+REPOSITORY
+    <https://github.com/tupinek/Log-FreeSWITCH-Line>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2014-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.06
+

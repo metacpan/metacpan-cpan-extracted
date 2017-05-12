@@ -1,0 +1,26 @@
+Changes for Labyrinth-Plugin-Guestbook
+======================================
+
+1.06    2015-03-10
+        - fixed skip test numbers.
+
+1.05    2015-03-05
+        - oops, forgot test files.
+
+1.04    2015-03-03
+        - Edit and Update require Editor permission.
+        - extended functional test suite.
+
+1.03    2014-12-20
+        - fixed license fields in META.json to be lists.
+        - extended META test suite.
+        - added homepage resource.
+
+1.02    2014-05-26
+        - missed Core Plugins from pre-requisites.
+
+1.01    2014-05-24
+        - missed Data::Pageset from pre-requisites.
+
+1.00    2014-05-22
+        - first official release

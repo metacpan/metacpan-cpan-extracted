@@ -1,0 +1,41 @@
+Language-Lisp version 0.20
+==========================
+
+This is perl-to-lisp bridge connection module.
+Based on excellent module by Stuart Sierra, hosted at
+http://stuartsierra.com/software/perl-in-lisp/
+Very much thanks, Stuart! I owe you a beer.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   #(todo) make test
+   #(todo) make install
+
+Try it with
+   clisp try1.lisp
+   
+Be sure your LISP implementation has CFFI and ASDF working.
+
+Currently demo work only within compiled directory via 'blib'.
+
+
+DEPENDENCIES
+
+This module requires common lisp implementation(s) with CFFI.
+CFFI in turn requires ASDF, see http://www.cliki.net/asdf for advices
+on how to setup things working.
+
+Unlike other Perl modules, the Lisp is started first, and then it invokes
+Perl with Language::Lisp.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Vadim Konovalov vkon@cpan.org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

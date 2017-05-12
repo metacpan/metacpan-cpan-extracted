@@ -1,0 +1,244 @@
+#!/usr/bin/perl -s
+
+use strict;
+use warnings;
+
+use Lingua::NATools::Lexicon;
+use Lingua::NATools::Dict;
+
+my $MAXENTRY = 8;
+
+our ($h);
+
+sub usage {
+  print "nat-addDict: adds a dictionary in Perl Dumper format into a NATools corpus\n\n";
+  print "\tnat-addDict <natDir> <dumperFile>\n\n";
+  print "\tnat-addDict <natDir> <source-target.dmp> <target-source.dmp>\n\n";
+  print "For more help, please run 'perldoc nat-addDict'\n";
+  exit;
+}
+
+usage() if ($h);
+my $selfdir = shift @ARGV;
+my $dumper  = shift @ARGV;
+my $dumper2 = shift @ARGV || undef;
+
+usage() unless -d $selfdir && -f $dumper;
+
+print STDERR "step 1: load Data::Dumper file\n";
+
+our ($DIC1, $DIC2);
+
+if ($dumper2) {
+  $DIC1 = do $dumper;
+  $DIC2 = do $dumper2;
+} else {
+  do $dumper;
+}
+my $s1 = keys %$DIC1;
+my $s2 = keys %$DIC2;
+printf STDERR "        size 1: $s1\n";
+printf STDERR "        size 2: $s2\n";
+
+
+
+
+print STDERR "step 2: associate IDs to source Dumper entries\n";
+die "Can't find source.lex file" unless -f "$selfdir/source.lex";
+
+my $source = Lingua::NATools::Lexicon->new("$selfdir/source.lex");
+my $new_source_dic_size = $source->size;
+my $Oc1source =           $source->occurrences;
+my $Oc2source = 0;
+$source->enlarge($s1);
+my $i = 0;
+my $new = 0;
+for my $w (keys %$DIC1) {
+  ++$i;
+
+  my $wid = ($w eq "(null)" || $w eq "(none)")?1:$source->id_from_word($w);
+
+  # this increments the occurrence number to 1
+  unless ($wid) {
+    $wid = $source->add_word($w);
+    $new++;
+  }
+  $Oc2source+=$DIC1->{$w}{count};
+  $source->set_id_count($wid, $source->id_count($wid) + $DIC1->{$w}{count});
+  $DIC1->{$w}{id} = $wid;
+}
+printf STDERR "        %d ids reused\n", $i - $new;
+printf STDERR "        %d new ids\n", $new;
+$s1 = $source->size();
+$source->save("$selfdir/source.lex");
+$source->close();
+
+$new_source_dic_size+= $new;
+
+print STDERR "step 3: associate IDs to target Dumper entries\n";
+die "Can't find target.lex file" unless -f "$selfdir/target.lex";
+
+my $target = Lingua::NATools::Lexicon->new("$selfdir/target.lex");
+my $new_target_dic_size = $target->size;
+my $Oc1target =           $target->occurrences;
+my $Oc2target = 0;
+$target->enlarge($s2);
+$i = 0;
+$new = 0;
+for my $w (keys %$DIC2) {
+  ++$i;
+
+  my $wid = ($w eq "(null)" || $w eq "(none)")?1:$target->id_from_word($w);
+
+  # this increments the occurrence number to 1
+  unless ($wid) {
+    $wid = $target->add_word($w);
+    $new++;
+  }
+  $Oc2target+=$DIC2->{$w}{count};
+  $target->set_id_count($wid, $target->id_count($wid) + $DIC2->{$w}{count});
+  $DIC2->{$w}{id} = $wid;
+}
+printf STDERR "        %d ids reused\n", $i - $new;
+printf STDERR "        %d new ids\n", $new;
+$s2 = $target->size();
+$target->save("$selfdir/target.lex");
+$target->close();
+
+$new_target_dic_size+= $new;
+
+
+
+###  $Oc2source P(D1,wa,wb) wa1Occ + $oc1source P(D2,wa,wb) wa2occ
+### ------------------------------------------------------------------------
+###              wa1Occ $oc2source + wa2occ $oc1source
+print STDERR "step 4: add source/target dictionary\n";
+my $stDic = Lingua::NATools::Dict->open("$selfdir/source-target.bin");
+die unless $stDic;
+
+$stDic->enlarge($new_source_dic_size);
+
+
+$target = Lingua::NATools::Lexicon->new("$selfdir/target.lex");
+for my $w (keys %$DIC1) {
+  my $wid = $DIC1->{$w}{id};
+
+  my $wa1Occ = $stDic->occ($wid);
+  my $wa2Occ = $DIC1->{$w}{count};
+
+  my $ovals = $stDic->vals($wid);
+  my %ovals = @$ovals;
+  my @keys = keys %ovals;
+  push @keys, grep { !exists($ovals{$_}) } map {$DIC2->{$_}{id}} keys %{$DIC1->{$w}{trans}};
+
+  my %dic = ();
+  for my $k (@keys) {
+    my $P1 = $ovals{$k} || 0;
+    my $tw = $target->word_from_id($k);
+    my $P2 = $DIC1->{$w}{trans}{$tw} || 0;
+    if ($wa1Occ + $wa2Occ == 0.0000000) {
+      $dic{$k} = ($Oc2source * $P1 * ($Oc1source/100000) + $Oc1source * $P2 * ($Oc2source/100000)) /
+	(($Oc1source/100000) * $Oc2source + ($Oc2source/100000) * $Oc1source);
+    } else {
+      $dic{$k} = ($Oc2source * $P1 * $wa1Occ + $Oc1source * $P2 * $wa2Occ) /
+	($wa1Occ * $Oc2source + $wa2Occ * $Oc1source);
+    }
+  }
+
+  my $index = 0;
+  for my $k (sort {$dic{$b} <=> $dic{$a}} keys %dic) {
+    last if $index >= $MAXENTRY;
+
+    $stDic->set_val($wid, $index, $k, $dic{$k});
+
+    $index++;
+  }
+  $stDic->set_occ($wid, $wa1Occ+$wa2Occ);
+}
+$stDic->save("$selfdir/source-target.bin");
+$stDic->close();
+
+$target->close();
+
+
+
+
+$source = Lingua::NATools::Lexicon->new("$selfdir/source.lex");
+print STDERR "step 5: add target/source dictionary\n";
+my $tsDic = Lingua::NATools::Dict->open("$selfdir/target-source.bin");
+die unless $tsDic;
+
+$tsDic->enlarge($new_target_dic_size);
+
+for my $w (keys %$DIC2) {
+  my $wid = $DIC2->{$w}{id};
+
+  my $wa1Occ = $tsDic->occ($wid);
+  my $wa2Occ = $DIC2->{$w}{count};
+
+  my $ovals = $tsDic->vals($wid);
+  my %ovals = @$ovals;
+  my @keys = keys %ovals;
+  push @keys, grep { !exists($ovals{$_}) } map {$DIC1->{$_}{id}} keys %{$DIC2->{$w}{trans}};
+
+  my %dic = ();
+  for my $k (@keys) {
+    my $P1 = $ovals{$k} || 0;
+    my $tw = $source->word_from_id($k);
+    my $P2 = $DIC2->{$w}{trans}{$tw} || 0;
+    if ($wa1Occ + $wa2Occ == 0.0000000) {
+      $dic{$k} = ($Oc2target * $P1 * ($Oc1target/100000) + $Oc1target * $P2 * ($Oc2target/100000)) /
+	(($Oc1target/100000) * $Oc2target + ($Oc2target/100000) * $Oc1target);
+    } else {
+      $dic{$k} = ($Oc2target * $P1 * $wa1Occ + $Oc1target * $P2 * $wa2Occ) /
+	($wa1Occ * $Oc2target + $wa2Occ * $Oc1target);
+    }
+  }
+
+  my $index = 0;
+  for my $k (sort {$dic{$b} <=> $dic{$a}} keys %dic) {
+    last if $index >= $MAXENTRY;
+
+    $tsDic->set_val($wid, $index, $k, $dic{$k});
+
+    $index++;
+  }
+  $tsDic->set_occ($wid, $wa1Occ+$wa2Occ);
+
+}
+$tsDic->save("$selfdir/target-source.bin");
+$tsDic->close();
+$source->close();
+
+print STDERR "** DONE **\n";
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-addDict: adds a dictionary in Perl Dumper format into a NATools corpus.
+
+=head1 SYNOPSIS
+
+  nat-addDict <natDir> <dumperFile>
+
+  nat-addDict <natDir> <source-target.dmp> <target-source.dmp>
+
+=head1 DESCRIPTION
+
+This command is used to add an external dictionary (in Perl Dumper
+format) to a NATools corpus.
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2009 by Alberto Manuel Brandão Simões
+
+=cut

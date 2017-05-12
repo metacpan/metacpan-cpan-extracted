@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Lingua-JA-Summarize
+version:             0.08
+abstract:            A keyword extractor / summary generator
+license:             ~
+author:              
+    - Kazuho Oku <kazuhooku ___at___ gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Jcode:                         0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

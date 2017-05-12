@@ -1,0 +1,63 @@
+# NAME
+
+List::Rubyish::Circular - A circular list implementation based on
+List::Rubyish
+
+# SYNOPSIS
+
+  use Test::More;
+  use List::Rubyish::Circular;
+
+  my $list = List::Rubyish::Circular->new(qw(jkondo reikon cinnamon));
+
+  is_deeply, $list->cycle->to_a,     [qw(reikon cinnamon jkondo)];
+  is_deeply, $list->cycle(2)->to_a,  [qw(jkondo reikon cinnamon)];
+
+  is_deeply, $list->rcycle->to_a,    [qw(cinnamon jkondo reikon)];
+  is_deeply, $list->rcycle(2)->to_a, [qw(jkondo reikon cinnamon)];
+
+  # $list is still a circular list after destracive operation
+  $list->push(qw(tokky));
+
+  is_deeply, $list->to_a,            [qw(jkondo reikon cinnamon tokky)];
+  is_deeply, $list->cycle->to_a,     [qw(reikon cinnamon tokky jkondo)];
+  is_deeply, $list->rcycle(2)->to_a, [qw(tokky jkondo reikon cinnamon)];
+
+# DESCRIPTION
+
+List::Rubyish::Circular is a cirlular list implementation besed on
+[List::Rubyish](http://search.cpan.org/perldoc?List::Rubyish), so that You can utilize some convenient methods from
+List::Rubyish against a circular list.
+
+# METHODS
+
+## cycle ( I<$count> )
+
+Shifts list to the left according to `$count`. If $count not passed
+in, its value is 1. This operation is destructive.
+
+  my $list = List::Rubyish::Circular->new(qw(jkondo reikon cinnamon));
+
+  is_deeply, $list->cycle->to_a,    [qw(reikon cinnamon jkondo)];
+  is_deeply, $list->cycle(2)->to_a, [qw(jkondo reikon cinnamon)];
+
+## rcycle ( I<$count> )
+
+The opposite of `cycle`.
+
+# SEE ALSO
+
+- [List::Rubyish](http://search.cpan.org/perldoc?List::Rubyish)
+
+# AUTHOR
+
+Kentaro Kuribayashi <kentarok@gmail.com>
+
+# SEE ALSO
+
+# LICENSE
+
+Copyright (C) Kentaro Kuribayashi
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

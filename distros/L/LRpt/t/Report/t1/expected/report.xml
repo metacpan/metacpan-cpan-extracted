@@ -1,0 +1,443 @@
+<report>
+    <authors>
+        <statement><![CDATA[select * from authors]]></statement>
+        <header>
+            <au_id/>
+            <au_lname/>
+            <au_fname/>
+            <phone/>
+            <address/>
+            <city/>
+            <state/>
+            <zip/>
+        </header>
+        <data>
+            <equal>
+                <au_id>172-32-1176</au_id>
+                <au_lname>White</au_lname>
+                <au_fname>Johnson</au_fname>
+                <phone>408 496-7223</phone>
+                <address>10932 Bigge Rd.</address>
+                <city>Menlo Park</city>
+                <state>CA</state>
+                <zip>94025</zip>
+            </equal>
+            <equal>
+                <au_id>213-46-8915</au_id>
+                <au_lname>Green</au_lname>
+                <au_fname>Marjorie</au_fname>
+                <phone>415 986-7020</phone>
+                <address>309 63rd St. #411</address>
+                <city>Oakland</city>
+                <state>CA</state>
+                <zip>94618</zip>
+            </equal>
+            <equal>
+                <au_id>238-95-7766</au_id>
+                <au_lname>Carson</au_lname>
+                <au_fname>Cheryl</au_fname>
+                <phone>415 548-7723</phone>
+                <address>589 Darwin Ln.</address>
+                <city>Berkeley</city>
+                <state>CA</state>
+                <zip>94705</zip>
+            </equal>
+            <equal>
+                <au_id>267-41-2394</au_id>
+                <au_lname>O'Leary</au_lname>
+                <au_fname>Michael</au_fname>
+                <phone>408 286-2428</phone>
+                <address>22 Cleveland Av. #14</address>
+                <city>San Jose</city>
+                <state>CA</state>
+                <zip>95128</zip>
+            </equal>
+            <equal>
+                <au_id>274-80-9391</au_id>
+                <au_lname>Straight</au_lname>
+                <au_fname>Dick</au_fname>
+                <phone>415 834-2919</phone>
+                <address>5420 College Av.</address>
+                <city>Oakland</city>
+                <state>CA</state>
+                <zip>94609</zip>
+            </equal>
+            <equal>
+                <au_id>341-22-1782</au_id>
+                <au_lname>Smith</au_lname>
+                <au_fname>Meander</au_fname>
+                <phone>913 843-0462</phone>
+                <address>10 Misisipi Dr.</address>
+                <city>Lawrence</city>
+                <state>KS</state>
+                <zip>66044</zip>
+            </equal>
+            <equal>
+                <au_id>409-56-7008</au_id>
+                <au_lname>Bennet</au_lname>
+                <au_fname>Abraham</au_fname>
+                <phone>415 658-9932</phone>
+                <address>6223 Bateman St.</address>
+                <city>Berkeley</city>
+                <state>CA</state>
+                <zip>94705</zip>
+            </equal>
+            <equal>
+                <au_id>427-17-2319</au_id>
+                <au_lname>Dull</au_lname>
+                <au_fname>Ann</au_fname>
+                <phone>415 836-7128</phone>
+                <address>3410 Blonde St.</address>
+                <city>Palo Alto</city>
+                <state>CA</state>
+                <zip>94301</zip>
+            </equal>
+            <equal>
+                <au_id>472-27-2349</au_id>
+                <au_lname>Gringlesby</au_lname>
+                <au_fname>Burt</au_fname>
+                <phone>707 938-6445</phone>
+                <address>PO Box 792</address>
+                <city>Covelo</city>
+                <state>CA</state>
+                <zip>95428</zip>
+            </equal>
+            <equal>
+                <au_id>486-29-1786</au_id>
+                <au_lname>Locksley</au_lname>
+                <au_fname>Chastity</au_fname>
+                <phone>415 585-4620</phone>
+                <address>18 Broadway Av.</address>
+                <city>San Francisco</city>
+                <state>CA</state>
+                <zip>94130</zip>
+            </equal>
+            <equal>
+                <au_id>527-72-3246</au_id>
+                <au_lname>Greene</au_lname>
+                <au_fname>Morningstar</au_fname>
+                <phone>615 297-2723</phone>
+                <address>22 Graybar Rd.</address>
+                <city>Nashville</city>
+                <state>TN</state>
+                <zip>37215</zip>
+            </equal>
+            <equal>
+                <au_id>648-92-1872</au_id>
+                <au_lname>Blotchet-Halls</au_lname>
+                <au_fname>Reginald</au_fname>
+                <phone>503 745-6402</phone>
+                <address>55 Hillsdale Bl.</address>
+                <city>Corvallis</city>
+                <state>OR</state>
+                <zip>97330</zip>
+            </equal>
+            <equal>
+                <au_id>672-71-3249</au_id>
+                <au_lname>Yokomoto</au_lname>
+                <au_fname>Akiko</au_fname>
+                <phone>415 935-4228</phone>
+                <address>3 Silver Ct.</address>
+                <city>Walnut Creek</city>
+                <state>CA</state>
+                <zip>94595</zip>
+            </equal>
+            <equal>
+                <au_id>712-45-1867</au_id>
+                <au_lname>del Castillo</au_lname>
+                <au_fname>Innes</au_fname>
+                <phone>615 996-8275</phone>
+                <address>2286 Cram Pl. #86</address>
+                <city>Ann Arbor</city>
+                <state>MI</state>
+                <zip>48105</zip>
+            </equal>
+            <equal>
+                <au_id>722-51-5454</au_id>
+                <au_lname>DeFrance</au_lname>
+                <au_fname>Michel</au_fname>
+                <phone>219 547-9982</phone>
+                <address>3 Balding Pl.</address>
+                <city>Gary</city>
+                <state>IN</state>
+                <zip>46403</zip>
+            </equal>
+            <equal>
+                <au_id>724-08-9931</au_id>
+                <au_lname>Stringer</au_lname>
+                <au_fname>Dirk</au_fname>
+                <phone>415 843-2991</phone>
+                <address>5420 Telegraph Av.</address>
+                <city>Oakland</city>
+                <state>CA</state>
+                <zip>94609</zip>
+            </equal>
+            <equal>
+                <au_id>724-80-9391</au_id>
+                <au_lname>MacFeather</au_lname>
+                <au_fname>Stearns</au_fname>
+                <phone>415 354-7128</phone>
+                <address>44 Upland Hts.</address>
+                <city>Oakland</city>
+                <state>CA</state>
+                <zip>94612</zip>
+            </equal>
+            <equal>
+                <au_id>756-30-7391</au_id>
+                <au_lname>Karsen</au_lname>
+                <au_fname>Livia</au_fname>
+                <phone>415 534-9219</phone>
+                <address>5720 McAuley St.</address>
+                <city>Oakland</city>
+                <state>CA</state>
+                <zip>94609</zip>
+            </equal>
+            <equal>
+                <au_id>807-91-6654</au_id>
+                <au_lname>Panteley</au_lname>
+                <au_fname>Sylvia</au_fname>
+                <phone>301 946-8853</phone>
+                <address>1956 Arlington Pl.</address>
+                <city>Rockville</city>
+                <state>MD</state>
+                <zip>20853</zip>
+            </equal>
+            <equal>
+                <au_id>846-92-7186</au_id>
+                <au_lname>Hunter</au_lname>
+                <au_fname>Sheryl</au_fname>
+                <phone>415 836-7128</phone>
+                <address>3410 Blonde St.</address>
+                <city>Palo Alto</city>
+                <state>CA</state>
+                <zip>94301</zip>
+            </equal>
+            <equal>
+                <au_id>893-72-1158</au_id>
+                <au_lname>McBadden</au_lname>
+                <au_fname>Heather</au_fname>
+                <phone>707 448-4982</phone>
+                <address>301 Putnam</address>
+                <city>Vacaville</city>
+                <state>CA</state>
+                <zip>95688</zip>
+            </equal>
+            <equal>
+                <au_id>899-46-2035</au_id>
+                <au_lname>Ringer</au_lname>
+                <au_fname>Anne</au_fname>
+                <phone>801 826-0752</phone>
+                <address>67 Seventh Av.</address>
+                <city>Salt Lake City</city>
+                <state>UT</state>
+                <zip>84152</zip>
+            </equal>
+            <equal>
+                <au_id>998-72-3567</au_id>
+                <au_lname>Ringer</au_lname>
+                <au_fname>Albert</au_fname>
+                <phone>801 826-0752</phone>
+                <address>67 Seventh Av.</address>
+                <city>Salt Lake City</city>
+                <state>UT</state>
+                <zip>84152</zip>
+            </equal>
+        </data>
+    </authors>
+    <editors>
+        <statement><![CDATA[select * from editors where ed_fname = 'Martinella']]></statement>
+        <header>
+            <ed_id/>
+            <ed_lname/>
+            <ed_fname/>
+            <ed_pos/>
+            <phone/>
+            <address/>
+            <city/>
+            <state/>
+            <zip/>
+            <ed_boss/>
+        </header>
+        <data>
+            <equal>
+                <ed_id>321-55-8906</ed_id>
+                <ed_lname>DeLongue</ed_lname>
+                <ed_fname>Martinella</ed_fname>
+                <ed_pos>project</ed_pos>
+                <phone>415 843-2222</phone>
+                <address>3000 6th St.</address>
+                <city>Berkeley</city>
+                <state>CA</state>
+                <zip>94710</zip>
+                <ed_boss>993-86-0420</ed_boss>
+            </equal>
+        </data>
+    </editors>
+    <publishers>
+        <statement><![CDATA[select * from publishers where pub_id = '0877']]></statement>
+        <header>
+            <pub_id/>
+            <pub_name/>
+            <address/>
+            <city/>
+            <state/>
+        </header>
+        <data>
+            <equal>
+                <pub_id>0877</pub_id>
+                <pub_name><![CDATA[Binnet & Hardley]]></pub_name>
+                <address>2 2nd Ave.</address>
+                <city>Washington</city>
+                <state>DC</state>
+            </equal>
+        </data>
+    </publishers>
+    <roysched>
+        <statement><![CDATA[select * from roysched where title_id = 'MC2222']]></statement>
+        <header>
+            <title_id/>
+            <lorange/>
+            <hirange/>
+            <royalty/>
+        </header>
+        <data>
+            <equal>
+                <title_id>MC2222</title_id>
+                <lorange>0</lorange>
+                <hirange>2000</hirange>
+                <royalty>0.10</royalty>
+            </equal>
+            <equal>
+                <title_id>MC2222</title_id>
+                <lorange>2001</lorange>
+                <hirange>4000</hirange>
+                <royalty>0.12</royalty>
+            </equal>
+            <equal>
+                <title_id>MC2222</title_id>
+                <lorange>4001</lorange>
+                <hirange>8000</hirange>
+                <royalty>0.14</royalty>
+            </equal>
+            <equal>
+                <title_id>MC2222</title_id>
+                <lorange>8001</lorange>
+                <hirange>12000</hirange>
+                <royalty>0.16</royalty>
+            </equal>
+        </data>
+    </roysched>
+    <sales>
+        <statement><![CDATA[select * from sales where stor_id = '7131']]></statement>
+        <header>
+            <sonum/>
+            <stor_id/>
+            <ponum/>
+            <sdate/>
+        </header>
+        <data>
+            <equal>
+                <sonum>3</sonum>
+                <stor_id>7131</stor_id>
+                <ponum>N914008</ponum>
+                <sdate>0000-00-00</sdate>
+            </equal>
+            <equal>
+                <sonum>4</sonum>
+                <stor_id>7131</stor_id>
+                <ponum>N914014</ponum>
+                <sdate>0000-00-00</sdate>
+            </equal>
+            <equal>
+                <sonum>14</sonum>
+                <stor_id>7131</stor_id>
+                <ponum>P3087a</ponum>
+                <sdate>0000-00-00</sdate>
+            </equal>
+        </data>
+    </sales>
+    <salesdetails>
+        <statement><![CDATA[select * from salesdetails where sonum > 8 and title_id = 'MC2222']]></statement>
+        <header>
+            <sonum/>
+            <qty_ordered/>
+            <qty_shipped/>
+            <title_id/>
+            <date_shipped/>
+        </header>
+        <data>
+            <equal>
+                <sonum>11</sonum>
+                <qty_ordered>10</qty_ordered>
+                <qty_shipped>10</qty_shipped>
+                <title_id>MC2222</title_id>
+                <date_shipped>2001-12-20</date_shipped>
+            </equal>
+        </data>
+    </salesdetails>
+    <titleauthors>
+        <statement><![CDATA[select * from titleauthors where title_id = 'MC2222']]></statement>
+        <header>
+            <au_id/>
+            <title_id/>
+            <au_ord/>
+            <royaltyshare/>
+        </header>
+        <data>
+            <equal>
+                <au_id>712-45-1867</au_id>
+                <title_id>MC2222</title_id>
+                <au_ord>1</au_ord>
+                <royaltyshare>1.00</royaltyshare>
+            </equal>
+        </data>
+    </titleauthors>
+    <titleditors>
+        <statement><![CDATA[select * from titleditors where ed_id = '777-02-9831' or title_id = 'MC2222']]></statement>
+        <header>
+            <ed_id/>
+            <title_id/>
+            <ed_ord/>
+        </header>
+        <data>
+            <equal>
+                <ed_id>777-02-9831</ed_id>
+                <title_id>PC1035</title_id>
+                <ed_ord>3</ed_ord>
+            </equal>
+            <equal>
+                <ed_id>777-02-9831</ed_id>
+                <title_id>PC8888</title_id>
+                <ed_ord>3</ed_ord>
+            </equal>
+            <equal>
+                <ed_id>885-23-9140</ed_id>
+                <title_id>MC2222</title_id>
+                <ed_ord>2</ed_ord>
+            </equal>
+            <equal>
+                <ed_id>993-86-0420</ed_id>
+                <title_id>MC2222</title_id>
+                <ed_ord>1</ed_ord>
+            </equal>
+        </data>
+    </titleditors>
+    <titles>
+        <statement><![CDATA[select * from titles where title = 'XXXX']]></statement>
+        <header>
+            <title_id/>
+            <title/>
+            <type/>
+            <pub_id/>
+            <price/>
+            <advance/>
+            <ytd_sales/>
+            <contract/>
+            <notes/>
+            <pubdate/>
+        </header>
+        <data>
+        </data>
+    </titles>
+</report>
+

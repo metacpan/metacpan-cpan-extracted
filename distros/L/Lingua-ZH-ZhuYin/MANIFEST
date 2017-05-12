@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Lingua/ZH/ZhuYin.pm
+lib/Lingua/ZH/ZhuYin/Dict.pm
+scripts/zhuyin-sqlite.pl
+examples/moedict_short.txt
+examples/moedict_short.db
+t/00-load.t
+t/01-basic.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

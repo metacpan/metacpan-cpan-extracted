@@ -1,0 +1,20 @@
+Changes
+examples/accnew.pl
+examples/accueil.pl
+examples/accueil_obj.pl
+examples/application_example1.xml
+examples/httpd_example1.conf
+examples/login.html
+lib/Lemonldap/Portal/login.html
+lib/Lemonldap/Portal/Login.pm
+lib/Lemonldap/Portal/LoginDAC.pm
+lib/Lemonldap/Portal/LoginFake.pm
+lib/Lemonldap/Portal/LoginFakeLDAP.pm
+lib/Lemonldap/Portal/LoginPOST.pm
+lib/Lemonldap/Portal/LogoutDAC.pm
+lib/Lemonldap/Portal/Standard.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/1.t

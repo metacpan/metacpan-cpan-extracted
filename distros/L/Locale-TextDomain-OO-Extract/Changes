@@ -1,0 +1,35 @@
+Revision history for Perl extension Locale::TextDomain:OO::Extract.
+
+2.006  Tue Apr 14 08:41:50 2015
+- added forgotten dependency Locale::Utils::PlaceholderMaketext
+
+2.005  Sun Apr 12 08:04:39 2015
+- added forgotten dependency Locale::PO
+
+2.004  Sun Apr 12 07:43:54 2015
+- renewed the whole extraction process, especially the store data
+- renewed the debugging
+- allowed double quoted strings with ", qq.
+- allowed here documents
+
+2.003  Tue Nov 11 22:13:21 2014
+- fixed POD
+- use Locale::MO::File 0.05
+
+2.002  Tue Nov 11 17:11:57 2014
+- extend extractors to find more
+- added process tool
+- using new methods current Locale::TextDomain::OO::Util
+
+2.001  Fri Oct 10 21:20:33 2014
+- corrected POD NAME section
+- corrected example output
+- new key joiner and splitter
+- skip 01_debug.t because regex dump is different at msx-i msx
+- added requires
+
+2.000  Thu Oct  9 13:36:24 2014
+- completely renewed
+
+1.00  Mon Mar  8 07:23:44 2010
+- first version

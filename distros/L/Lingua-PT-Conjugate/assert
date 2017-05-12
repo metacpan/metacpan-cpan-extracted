@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+# 
+# assert
+# Author          : Etienne Grossmann
+# Created On      : May     1997
+# Last Modified On: January 1998
+# Language        : Perl
+# Status          : Use with caution!
+# 
+# (C) Copyright 1998 Etienne Grossmann
+# 
+
+=head1 NAME - assert
+
+=head1 SYNOPSIS
+
+   assert verbname(s)
+
+Replace in the file 'reference' the present entry for verbname w/ the
+output of 'conjug'.
+
+=cut
+
+use Lingua::PT::Conjugate ;
+# use Lingua::PT::Accent_iso_8859_1;
+import Lingua::PT::Accent_iso_8859_1 qw(iso2asc asc2iso);
+
+exec system qq(perldoc $0) unless @ARGV;
+
+$rfile = "reference";
+die  "file >$rfile< not found" unless -f $rfile;
+die  "file >$rfile< not writable" unless -w $rfile;
+die  "file >$rfile< not readable" unless open(VF,"<$rfile");
+{ my @vf = <VF>;
+  close VF;
+  $rs =  join("",@vf); 
+  $rs =~ s/\#.*\n*//mg;
+  $rs =~ s/\-+//mg;
+}
+$rs .= "\ndummy:";
+foreach $b (@ARGV){
+    $b = asc2iso($b);
+    $a= conjug( $b );
+    if( $rs =~ / \b $b \s* : /x ){
+        $rs =~ s/(\b$b\s*:[^:]+)(\b\w+\s*:)/$a$2/ ;
+#        print "REPLACING $b in $rfile : \n$1\nWITH\n$a\n";
+        print "REPLACING $b in $rfile \n";
+    } else {
+        print "INSERTING $b in $rfile\n";
+        $rs .= "$a";
+#        print ">>>$a<<<";
+    }
+}
+
+$rs =~ s/\ndummy://;
+die  "file $rfile not found for saving" unless open(VF,">$rfile");
+print VF $rs;
+close VF;

@@ -1,0 +1,29 @@
+---
+abstract: 'Slice-like operations on lists'
+author:
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: List-Slice
+requires:
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/preaction/List-Slice/issues
+  homepage: https://github.com/preaction/List-Slice
+  repository: https://github.com/preaction/List-Slice.git
+version: '0.003'
+x_authority: cpan:PREACTION
+x_contributors:
+  - 'Doug Bell <madcityzen@gmail.com>'

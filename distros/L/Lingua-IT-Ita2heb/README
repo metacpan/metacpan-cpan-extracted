@@ -1,0 +1,55 @@
+Lingua-IT-Ita2heb
+
+This is a module for transliterating Italian words into Hebrew.
+
+It is supposed to be useful for transliterating names of people and places.
+
+It manages to get many words correctly, but don't count on it to be right
+about <z>, semi-vowel <i>, and some other quirks of Italian spelling.
+
+Corrections, comments, suggestions and test-cases are welcome.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.pl
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Lingua::IT::Ita2heb
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-IT-Ita2heb
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Lingua-IT-Ita2heb
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Lingua-IT-Ita2heb
+
+    Search CPAN
+        http://search.cpan.org/dist/Lingua-IT-Ita2heb/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Amir E. Aharoni
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+* the GNU General Public License version 3 as published
+by the Free Software Foundation.
+
+* or the Artistic License version 2.0.
+
+See http://dev.perl.org/licenses/ for more information.

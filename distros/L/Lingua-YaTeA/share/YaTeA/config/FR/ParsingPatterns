@@ -1,0 +1,106 @@
+#Patron	Priorite	Decomposition	Sens
+( ABR<=M> NAM<=H> )	1		RIGHT
+( NAM<=H> ABR<=M> )	1		LEFT
+( NUM<=M> ABR<=H> )	1		RIGHT
+#
+( NOM<=H> ADJ<=M> )	1		LEFT
+( ADJ<=M> NOM<=H> )	1		RIGHT
+( ADJ<=M> NAM<=H> )	1		RIGHT
+# Fromageries Gervais
+( NOM<=H> NAM<=M> )	1		LEFT
+#
+( NAM<=H> NAM<=M> )	1		LEFT
+( NOM<=H> NOM<=M> )	1		LEFT
+( NOM<=H> de NOM<=M> )	1		LEFT
+( NOM<=H> de NAM<=M> )	1		LEFT
+( NAM<=H> de NOM<=M> )	1		LEFT
+( NAM<=H> de NAM<=M> )	1		LEFT
+( NOM<=H> de DET:ART NOM<=M> )	1		LEFT
+( NOM<=H> de DET:ART NAM<=M> )	1		LEFT
+( NAM<=H> de DET:ART NOM<=M> )	1		LEFT
+( NAM<=H> de DET:ART NAM<=M> )	1		LEFT
+( NOM<=H> du NOM<=M> )	1		LEFT
+( NOM<=H> du NAM<=M> )	1		LEFT
+( NAM<=H> du NOM<=M> )	1		LEFT
+( NAM<=H> du NAM<=M> )	1		LEFT
+( NOM<=H> des NOM<=M> )	1		LEFT
+( NOM<=H> des NAM<=M> )	1		LEFT
+( NAM<=H> des NOM<=M> )	1		LEFT
+( NAM<=H> des NAM<=M> )	1		LEFT
+( NOM<=H> d' NOM<=M> )	1		LEFT
+( NOM<=H> d' NAM<=M> )	1		LEFT
+( NAM<=H> d' NOM<=M> )	1		LEFT
+( NAM<=H> d' NAM<=M> )	1		LEFT
+
+( NOM<=H> à DET:ART NOM<=M> )	1	LEFT
+( NOM<=H> à DET:ART NAM<=M> )	1	LEFT
+( NOM<=H> à NOM<=M> )	1	LEFT
+( NOM<=H> à NAM<=M> )	1	LEFT
+( NOM<=H> au NOM<=M> )	1		LEFT
+( NOM<=H> aux NOM<=M> )	1		LEFT
+( NOM<=H> ayant DET:ART NOM<=M> )	1	LEFT
+( NOM<=H> de PRO:DEM NOM<=M> )	1	LEFT
+# 35 ans
+( NUM<=M> NOM<=H> )	1	RIGHT
+
+# NOM à NUM ABR de NOM    HGPO à 100 g de glucose Nb occ: 1
+# NOM à NUM NOM   HGPO à 100 g    Nb occ: 1
+( NOM<=H> de ( NOM<=H> ADJ<=M> )<=M> )	1		LEFT
+( NOM<=H> de DET:ART ( NOM<=H> ADJ<=M> )<=M> )	1		LEFT
+( NOM<=H> du ( NOM<=H> ADJ<=M> )<=M> )	1		LEFT
+( NOM<=H> des ( NOM<=H> ADJ<=M> )<=M> )	1		LEFT
+( NOM<=H> d' ( NOM<=H> ADJ<=M> )<=M> )	1		LEFT
+( NOM<=H> à DET:ART ( NOM<=H> ADJ<=M> )<=M> )	1	LEFT
+
+# cm de diamètre
+( ABR<=H> de NOM<=M> )	1	LEFT
+# meule de 10 cm de diamètre 
+( NOM<=H> de ABR<=M> )	1	LEFT
+( NAM<=H> de ABR<=M> )	1	LEFT
+( NAM<=H> ABR<=M> )	1	LEFT
+
+# NOM NUM du NOM  matière première du fromage     Nb occ: 2
+( NOM<=H> NUM<=M>)	1	LEFT
+# NOM NUM du NOM du NUM NOM       article 15 du décret du 25 mars Nb occ: 1
+( NUM<=M> NOM<=H>)	1	RIGHT
+
+# NOM VER:pper à DET:ART ADJ      Fromage fabriqué à la ferme     Nb occ: 1
+(NOM<=H> (VER:pper<=H> à DET:ART NOM<=M>)<=M>)	1	LEFT
+(NOM<=H> (VER:pper<=H> au NOM<=M>)<=M>)	1	LEFT
+(NOM<=H> (VER:pper<=H> aux NOM<=M>)<=M>)	1	LEFT
+# NOM de NOM VER:pper à du NOM de NOM     lait de chèvre mélangé à du lait de vache       Nb occ: 1
+(NOM<=H> (VER:pper<=H> à du NOM<=M>)<=M>)	1	LEFT
+(NOM<=H> (VER:pper<=H> à de NOM<=M>)<=M>)	1	LEFT
+
+# NOM VER:pper VER:ppre de DET:ART NOM du NOM     lait écrémé restant de la fabrication du beurre Nb occ: 1
+(NOM<=H> (VER:ppre<=H> de DET:ART NOM<=M>)<=M>)	1	LEFT
+(NOM<=H> (VER:ppre<=H> de NOM<=M>)<=M>)	1	LEFT
+(NOM<=H> (VER:ppre<=H> du NOM<=M>)<=M>)	1	LEFT
+(NOM<=H> (VER:ppre<=H> à DET:ART NOM<=M>)<=M>)	1	LEFT
+(NOM<=H> (VER:ppre<=H> au NOM<=M>)<=M>)	1	LEFT
+(NOM<=H> (VER:ppre<=H> aux NOM<=M>)<=M>)	1	LEFT
+(NOM<=H> (VER:ppre<=H> DET:ART NOM<=M>)<=M>)	1	LEFT
+
+# NOM de PRO:IND NOM à NOM VER:pper ADJ    pâte de certains fromages à pâte pressée cuite       Nb occ: 2
+(NOM<=H> à ( (NOM<=H> VER:pper<=M>)<=H> ADJ<=M>)<=M>)	1	LEFT
+
+#
+# #( NOM<=H> ( VER:pper de PRO:DEM NOM )<=M> )	1	LEFT
+# ( NOM<=H> ayant eu DET:ART NOM<=M> )	1	LEFT
+#
+# NOM PRP:det NUM NOM	âge > 35 ans	Nb occ: 1
+
+# NAM DET:ART NOM Arc la Pucelle
+(NAM<=H> DET:ART NOM<=M>)	1	LEFT
+# +NOM VER:pper de PRO:DEM NOM	surveillance accrue de ces femmes	Nb occ: 1
+(NOM<=H> VER:pper<=M>)	   1	LEFT
+
+#+NOM de NUM ABR de NOM	ingestion de 50 g de glucose	Nb occ: 1
+# ( ( NUM<=M> ABR<=H> )<=H> de NOM<=M> )	1	LEFT
+# ( ( ADJ<=M> NOM<=H> )<=H> de ABR<=M> ) 	1	LEFT
+# ( ( ADJ<=M> NOM<=H> )<=H> de ( ( NUM<=M> ABR<=H> )<=H> de NOM<=M> )<=M> ) 	1	
+# ADJ NOM au NOM de NOM de NUM à NUM ABR de NOM   petit fromage au lait de vache de 8 à 9 cm de diamètre  Nb occ: 1
+( NUM<=M> à ( NUM<=M> ABR<=H> )<=H> )	1	RIGHT
+# ADJ NOM du NAM NOM aux NOM ADJ  Haut plateau du Massif Central aux pâturages riches 
+
+# ADJ NOM du NOM des NAM  grande partie du massif des Pyrénées    Nb occ: 1

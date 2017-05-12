@@ -1,0 +1,23 @@
+Revision history for Logwatch::RecordTree
+
+2.056     2015-06-02 11:26:19-07:00 America/Los_Angeles
+    Add Net::IP::Identifier => 0.111 to prerequisites (for Testers)
+
+2.055     2015-06-01 11:23:45-07:00 America/Los_Angeles
+    Add VERSION in IPv4.pm
+
+    Move 'use' line defaults capability from IPv4 to base class
+        (RecordTree).  IPv4 no longer automatically sets the neat_names
+        flag (set it in the 'use' line instead - see scripts for examples).
+
+    Update example scripts to set neat_names for IPv4, and to 'use aliased'
+        IPv4 for make them more readable.  Some other minor script
+        improvements.
+
+    Fix problem in Net::IP::Identifier that caused multiple CPAN Tester
+        failures, and require fixed Identifier version (or later) in IPv4.
+
+
+2.046    2015-04-10
+    Original release.
+

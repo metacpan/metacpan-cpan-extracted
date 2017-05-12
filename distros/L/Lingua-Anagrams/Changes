@@ -1,0 +1,74 @@
+Revision history for Lingua::Anagrams
+  * documentation fixes
+
+0.019     2016-04-16 19:46:23-04:00 America/New_York
+  * some code cleanup
+  * minor efficiency improvements to iterator functions
+
+0.018     2014-09-19 06:31:30-04:00 America/New_York
+  * added more word list validation
+  * changed integer-to-word conversion for slight performance gain
+  * reduce memory usage by trimming undef cells out of various arrays
+
+0.017     2014-04-13 11:43:07-04:00 America/New_York
+  * added key method
+  * added lists method
+  * added unit test for sorting
+  * some documentation fixes
+
+0.016     2014-04-04 09:27:44-04:00 America/New_York
+  * doc fix
+
+0.015     2014-04-03 21:11:22-04:00 America/New_York
+  * added option to let someone choose the word list for iterators and anagram
+    lists
+
+0.014     2014-03-30 21:28:02-04:00 America/New_York
+  * improved iterator so it doesn't pre-load the next iteration
+
+0.013     2014-03-30 13:49:42-04:00 America/New_York
+  * optimization: use least-branchy letters
+  * added iterator generator
+
+0.012     2014-03-23 12:43:04-04:00 America/New_York
+  * fixed minimum anagram count bug: if the minimum could not be found, it would
+    fail to translate the word numbers back into words
+
+0.011     2014-03-22 17:55:10-04:00 America/New_York
+  * cleaned up some debugging code
+
+0.010     2014-03-22 17:52:55-04:00 America/New_York
+  * allow cascading word lists
+  * minimum anagram count parameter
+
+0.009     2014-03-21 14:01:07-04:00 America/New_York
+  * made sorting optional and added it for entire list
+  * added [MinimumPerl] to dist.ini to prevent some failure reports
+
+0.008     2014-03-18 20:21:59-04:00 America/New_York
+  * slight optimization of stack handling
+  * added pruning of impossible branches (see TODO)
+  * pruning redundant branches in search
+
+0.007     2014-03-18 06:43:36-04:00 America/New_York
+  * fresh release not larded up with accidental crud
+
+0.006     2014-03-17 13:22:55-04:00 America/New_York
+  * still better (accidentally released unsuccessful experiment with .005)
+
+0.005     2014-03-17 13:18:54-04:00 America/New_York
+  * another wee optimization, this in the summing of character counts
+
+0.004     2014-03-17 12:58:05-04:00 America/New_York
+  * re-use empty list for all terminals to save some memory
+
+0.003     2014-03-17 10:03:44-04:00 America/New_York
+  * Some micro-optimizations and simplifications of little functional impart.
+    The cache might use a bit less memory now as the keys are shorter.
+
+0.002     2014-03-16 20:43:25-04:00 America/New_York
+  * convert words to integers (further) to improve memory use
+
+0.001     2014-03-16 17:18:00-04:00 America/New_York
+  * initial release
+

@@ -1,0 +1,70 @@
+#!/usr/bin/perl -s
+
+our ($utf8, $p);
+
+use POSIX qw(locale_h);
+setlocale(&POSIX::LC_ALL, "pt_PT");
+use locale;
+
+use Lingua::PT::ProperNames;
+use Data::Dumper;
+
+$/ = $p || "";
+
+my $menuop=0;
+
+my $dict=do("ref_dict") if (-e "ref_dict");
+
+my @a=qw(local rua pessoa entidade empresa festividade) ;
+my %a;
+@a{@a}=@a;
+@a = sort keys %a;
+my $menu = join("\n", map { sprintf("%2s  %s", ++$menuop , $_) } @a) ;
+my $sep="---------------------\n";
+  
+$f = sub{
+  my ($a,$ctx) = @_;
+  if ($QUIT){ return $a}
+  else {
+    $a=n($a);
+    my ($r,$tag,$j,$aux);
+    local $/ = "\n";
+    if($dict->{$a}){ $aux=$dict->{$a} ;}
+    else { print F "$sep$ctx$a\n$menu ?\n";
+           $aux = <F>;
+           chomp $aux ; }
+    if ($aux){ 
+      if( $aux eq "q" ){ $QUIT=1}
+      elsif( $aux =~ /^[0-9]/) { $tag = $a[$aux-1] }
+      else { $tag = $a{$aux} = $aux;
+             @a = sort keys %a;
+             $j=0;
+             $menu = join("\n", map { sprintf("%2s  %s", ++$j , $_) } @a) ;
+           }
+      $Desc{$a} = $tag ;
+      $r="<ref t='$tag'>$a</ref>";
+      $dict->{$a}=$tag;}
+    else { $r=$a; }
+    ##print F "$r\n"; 
+    return $r
+  }
+};
+
+open( F, "+>/dev/tty" ) ;
+binmode(F,":utf8") if $utf8;
+forPN( $f);
+close F;
+save_dict($dict);
+
+sub save_dict{
+  my $dict=shift;
+  open( F, ">ref_dict" ) ;
+  print F Dumper($dict);
+  close F;
+}
+
+sub n{ my $a=shift;
+ $a =~ s/\s+/ /g;
+ $a =~ s/^ | $//g;
+ $a;
+}

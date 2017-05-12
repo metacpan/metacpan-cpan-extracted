@@ -1,0 +1,538 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use Cwd;
+use IO::File;
+
+################################################################################
+
+our($YEAR,$VERSION);
+get_vars();
+
+# $type{TYPE} => TYPE_DESC
+#
+# TYPE_DESC = { label    => [TYPE_LABEL, ...]
+#               modlabel => MOD_LABEL
+#               default  => CODESET
+#               codesets => { CODESET => CODESET_DESC }
+#             }
+#
+# CODESET_DESC = { label => [CODESET_LABEL, ...]
+#                  const => [CONST, ...]
+#                  desc  => CODE_DESC
+#                }
+#
+# TYPE          : the type of codes                      country
+# TYPE_LABEL    : the label(s) for this type of          COUNTRY
+#                 code (defaults to TYPE in all
+#                 uppercase and with '-' replaced
+#                 with '_')
+# MOD_LABEL     : the label for the module name          Country
+#                 (defaults to ucfirst(TYPE))
+# CODESET       : the name of each codeset               alpha-2
+# CODESET_LABEL : the label for this codeset             ALPHA_2
+#                 (defaults to CODESET in all
+#                 uppercase and with '-' replaced
+#                 with '_')
+# CONST         : the name of 1 or more constants        LOCALE_CODE_ALPHA_2
+#                 that will be associated with this
+#                 codeset (defaults to a single
+#                 constant for each TYPE_LABEL and
+#                 CODESET_LABEL combination of the
+#                 form:
+#                 LOCALE_<TYPE_LABEL>_<CODESET_LABEL>)
+# CODE_DESC     : a listref describing the format        ['numeric',3]
+#                 of the codes in this codeset;
+#                 possible values are:
+#                   uc        : uppercase code
+#                   lc        : lowercase code
+#                   ucfirst   : code with 1st character
+#                               uppercase
+#                   numeric,N : an N-digit numeric
+#                               code
+
+our %type =
+  ('country' => {
+                 'label'    => ['CODE','COUNTRY'],
+                 'default'  => 'alpha-2',
+                 'codesets' => { 'alpha-2'      => { 'desc'  => ['lc'], },
+                                 'alpha-3'      => { 'desc'  => ['lc'], },
+                                 'numeric'      => { 'desc'  => ['numeric',3], },
+                                 'dom'          => { 'desc'  => ['lc'], },
+                                 'un-alpha-3'   => { 'desc'  => ['uc'], },
+                                 'un-numeric'   => { 'desc'  => ['numeric',3], },
+                                 'genc-alpha-2' => { 'desc'  => ['uc'], },
+                                 'genc-alpha-3' => { 'desc'  => ['uc'], },
+                                 'genc-numeric' => { 'desc'  => ['numeric',3], },
+                               },
+                },
+   'language' => {
+                  'label'    => ['LANG','LANGUAGE'],
+                  'default'  => 'alpha-2',
+                  'codesets' => { 'alpha-2'  => { 'desc'   => ['lc'], },
+                                  'alpha-3'  => { 'desc'   => ['lc'], },
+                                  'term'     => { 'desc'   => ['lc'], },
+                                },
+                 },
+   'currency' => {
+                  'label'    => ['CURR','CURRENCY'],
+                  'default'  => 'alpha',
+                  'codesets' => { 'alpha'   => { 'desc'   => ['uc'], },
+                                  'num'     => { 'label'  => ['NUMERIC'],
+                                                 'desc'   => ['numeric',3], },
+                                },
+                 },
+   'script' => {
+                'default'  => 'alpha',
+                'codesets' => { 'alpha'    => { 'desc'   => ['ucfirst'], },
+                                'num'      => { 'label'  => ['NUMERIC'],
+                                                'desc'   => ['numeric',3], },
+                              },
+               },
+   'langext' => {
+                 'default'  => 'alpha',
+                 'modlabel' => 'LangExt',
+                 'codesets' => { 'alpha'  => { 'desc'   => ['lc'], },
+                               },
+                },
+   'langvar' => {
+                 'default'  => 'alpha',
+                 'modlabel' => 'LangVar',
+                 'codesets' => { 'alpha'  => { 'desc'   => ['lc'], },
+                               },
+                },
+   'langfam' => {
+                 'default'  => 'alpha',
+                 'modlabel' => 'LangFam',
+                 'codesets' => { 'alpha'  => { 'desc'   => ['lc'], },
+                               },
+                },
+  );
+
+################################################################################
+
+our ($max,$maxc);
+gen_constants();
+gen_mods();
+
+################################################################################
+
+sub gen_mods {
+   foreach my $type (sort keys %type) {
+      _gen_mod($type,'');
+      _gen_mod($type,'pod');
+   }
+   foreach my $type (qw(country language currency script)) {
+      _gen_mod($type,'',   'old');
+      _gen_mod($type,'pod','old');
+   }
+}
+
+sub _gen_mod {
+   my($type,$pod,$old) = @_;
+   my $mod   = (exists $type{$type}{'modlabel'}
+                ? $type{$type}{'modlabel'}
+                : _upcase_first($type) );
+   my $dire  = ($old ? "lib/Locale" : "lib/Locale/Codes");
+   my $f     = "$dire/$mod." . ($pod ? 'pod' : 'pm');
+   my $o     = new IO::File;
+   $o->open("> $f");
+   if ($pod) {
+      __gen_pod($o,$type,$mod,$old);
+   } else {
+      _header($o,$mod,$old);
+      __gen_mod($o,$type,$mod);
+   }
+   $o->close();
+}
+
+sub __gen_pod {
+   my($o,$type,$mod,$old) = @_;
+
+   my $parent             = ($old ? "Locale" : "Locale::Codes");
+
+   my $typelab            = ($type{$type}{'modlable'}
+                             ? $type{$type}{'modlable'}
+                             : ucfirst($type));
+
+   print $o <<"EOS";
+=pod
+
+=head1 NAME
+
+${parent}::${mod} - module for dealing with ${type} code sets
+
+=head1 SYNOPSIS
+
+   use ${parent}::${mod};
+
+   \$name = code2${type}(CODE);
+   \$code = ${type}2code(NAME);
+
+   \@codes   = all_${type}_codes();
+   \@names   = all_${type}_names();
+
+=head1 DESCRIPTION
+
+This module provides access to ${type} code sets.
+
+Please refer to the L<Locale::Codes::Types> document for a description
+of the code sets available.
+
+Most of the routines take an optional additional argument which
+specifies the code set to use. The code set can be specified using the
+name of a code set, or the perl constant specified in the above
+document.  If not specified, the default code set will be used.
+
+=head1 ROUTINES
+
+All routines in this module call the appropriate method in the
+L<Locale::Codes> module, using an object of type: $type
+Please refer to the documentation of the L<Locale::Codes> module
+for details about each function.
+
+The following functions are exported automatically:
+
+=over 4
+
+=item B<code2${type}(CODE [,CODESET] [,'retired'])>
+
+See B<code2name> in L<Locale::Codes>
+
+=item B<${type}2code(NAME [,CODESET] [,'retired'])>
+
+See B<name2code> in L<Locale::Codes>
+
+=item B<${type}_code2code(CODE ,CODESET ,CODESET2)>
+
+See B<code2code> in L<Locale::Codes>
+
+=item B<all_${type}_codes([CODESET] [,'retired'])>
+
+See B<all_codes> in L<Locale::Codes>
+
+=item B<all_${type}_names([CODESET] [,'retired'])>
+
+See B<all_names> in L<Locale::Codes>
+
+=back
+
+The following functions are not exported and must be called fully
+qualified with the package name:
+
+=over 4
+
+=item B<${parent}::${typelab}::rename_${type}(CODE ,NEW_NAME [,CODESET])>
+
+See B<rename_code> in L<Locale::Codes>
+
+=item B<${parent}::${typelab}::add_${type}(CODE ,NAME [,CODESET])>
+
+See B<add_code> in L<Locale::Codes>
+
+=item B<${parent}::${typelab}::delete_${type}(CODE [,CODESET])>
+
+See B<delete_code> in L<Locale::Codes>
+
+=item B<${parent}::${typelab}::add_${type}_alias(NAME ,NEW_NAME)>
+
+See B<add_alias> in L<Locale::Codes>
+
+=item B<${parent}::${typelab}::delete_${type}_alias(NAME)>
+
+See B<delete_alias> in L<Locale::Codes>
+
+=item B<${parent}::${typelab}::rename_${type}_code(CODE ,NEW_CODE [,CODESET])>
+
+See B<replace_code> in L<Locale::Codes>
+
+=item B<${parent}::${typelab}::add_${type}_code_alias(CODE ,NEW_CODE [,CODESET])>
+
+See B<add_code_alias> in L<Locale::Codes>
+
+=item B<${parent}::${typelab}::delete_${type}_code_alias(CODE [,CODESET])>
+
+See B<delete_code_alias> in L<Locale::Codes>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Locale::Codes>
+
+The Locale-Codes distribution.
+
+=back
+
+=head1 AUTHOR
+
+See Locale::Codes for full author history.
+
+Currently maintained by Sullivan Beck (sbeck\@cpan.org).
+
+=head1 COPYRIGHT
+
+   Copyright (c) 2011-2017 Sullivan Beck
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+EOS
+}
+
+sub __gen_mod {
+   my($o,$type,$mod) = @_;
+   my($TYPE)         = uc($type);
+
+   print $o <<"EOS";
+use Locale::Codes;
+use Locale::Codes::Constants;
+
+\@EXPORT    = qw(
+                code2${type}
+                ${type}2code
+                all_${type}_codes
+                all_${type}_names
+                ${type}_code2code
+               );
+push(\@EXPORT,\@Locale::Codes::Constants::CONSTANTS_${TYPE});
+
+our \$obj = new Locale::Codes('$type');
+
+sub _show_errors {
+   my(\$val) = \@_;
+   \$obj->show_errors(\$val);
+}
+
+sub code2${type} {
+   return \$obj->code2name(\@_);
+}
+
+sub ${type}2code {
+   return \$obj->name2code(\@_);
+}
+
+sub ${type}_code2code {
+   return \$obj->code2code(\@_);
+}
+
+sub all_${type}_codes {
+   return \$obj->all_codes(\@_);
+}
+
+sub all_${type}_names {
+   return \$obj->all_names(\@_);
+}
+
+sub rename_${type} {
+   return \$obj->rename_code(\@_);
+}
+
+sub add_${type} {
+   return \$obj->add_code(\@_);
+}
+
+sub delete_${type} {
+   return \$obj->delete_code(\@_);
+}
+
+sub add_${type}_alias {
+   return \$obj->add_alias(\@_);
+}
+
+sub delete_${type}_alias {
+   return \$obj->delete_alias(\@_);
+}
+
+sub rename_${type}_code {
+   return \$obj->replace_code(\@_);
+}
+
+sub add_${type}_code_alias {
+   return \$obj->add_code_alias(\@_);
+}
+
+sub delete_${type}_code_alias {
+   return \$obj->delete_code_alias(\@_);
+}
+
+1;
+EOS
+}
+
+sub get_vars {
+   my $dir  = getcwd;
+   $dir     =~ /Locale\-Codes\-(\d+\.\d+)/;
+   $VERSION = $1;
+
+   $YEAR    = (localtime(time))[5] + 1900;
+}
+
+sub gen_constants {
+   my $f    = "lib/Locale/Codes/Constants.pm";
+   my $o    = new IO::File;
+   $o->open("> $f");
+   _header($o,"Constants");
+   _constants_defs($o);
+   $o->close();
+}
+
+sub _constants_defs {
+   my($o) = @_;
+
+   $max   = 0;
+   $maxc  = 0;
+   foreach my $type (sort keys %type) {
+      my @lab = (exists $type{$type}{'label'}
+                 ? @{ $type{$type}{'label'} }
+                 : _upcase($type) );
+      foreach my $codeset (sort keys %{ $type{$type}{'codesets'} }) {
+         my @const;
+         if (exists $type{$type}{'codesets'}{$codeset}{'const'} ) {
+            @const = @{ $type{$type}{'codesets'}{$codeset}{'const'} };
+         } else {
+            my @clab = (exists $type{$type}{'codesets'}{$codeset}{'label'}
+                        ? @{ $type{$type}{'codesets'}{$codeset}{'label'} }
+                        : _upcase($codeset) );
+            foreach my $lab (@lab) {
+               foreach my $clab (@clab) {
+                  push(@const,"LOCALE_${lab}_${clab}");
+               }
+            }
+         }
+         foreach my $const (@const) {
+            $type{$type}{'const'}{$const} = $codeset;
+            if (length($const) > $max) {
+               $max = length($const);
+            }
+         }
+         if (length($codeset) > $maxc) {
+            $maxc = length($codeset);
+         }
+      }
+   }
+
+   print $o <<"EOS";
+our(\@CONSTANTS,\%ALL_CODESETS);
+
+EOS
+
+   foreach my $type (sort keys %type) {
+      print $o "our(\@CONSTANTS_" . uc($type) . ") = qw(\n";
+      foreach my $const (sort keys %{ $type{$type}{'const'} }) {
+         print $o "                $const\n";
+      }
+      print $o ");\n";
+      print $o "push(\@CONSTANTS,\@CONSTANTS_" . uc($type) . ");\n";
+      print $o "\n";
+   }
+
+   print $o <<"EOS";
+\@EXPORT    = (\@CONSTANTS,
+               qw(
+                \%ALL_CODESETS
+               ));
+
+EOS
+
+   foreach my $type (sort keys %type) {
+      foreach my $const (sort keys %{ $type{$type}{'const'} }) {
+         my $codeset = $type{$type}{'const'}{$const};
+         my $spc     = ' 'x($max - length($const));
+         print $o "use constant $const$spc => '$codeset';\n"
+      }
+      my $def = $type{$type}{'default'};
+      my $mod = (exists $type{$type}{'modlabel'}
+                 ? $type{$type}{'modlabel'}
+                 : _upcase_first($type) );
+      print $o <<"EOS";
+
+\$ALL_CODESETS{'$type'} =
+   {
+      'default'  => '$def',
+      'module'   => '$mod',
+      'codesets' => {
+EOS
+      foreach my $codeset (sort keys %{ $type{$type}{'codesets'} }) {
+         my @desc = @{ $type{$type}{'codesets'}{$codeset}{'desc'} };
+         foreach my $d (@desc) {
+            if ($d !~ /^\d+$/) {
+               $d = "'$d'";
+            }
+         }
+         my $desc = join(',',@desc);
+         my $spc  = ' 'x($maxc-length($codeset));
+         print $o <<"EOS";
+                     '$codeset'$spc => [$desc],
+EOS
+      }
+      print $o <<"EOS";
+                    }
+   };
+
+EOS
+   }
+   print $o "\n1;\n";
+}
+
+sub _upcase {
+   my($string) = @_;
+   $string     = uc($string);
+   $string     =~ s/\-/_/g;
+   return $string;
+}
+
+sub _upcase_first {
+   my($string) = @_;
+   $string     = ucfirst($string);
+   $string     =~ s/\-/_/g;
+   return $string;
+}
+
+sub _header {
+   my($o,$package,$old) = @_;
+
+   my $timestamp   = `date`;
+   chomp($timestamp);
+
+   my $parent      = ($old ? "Locale" : "Locale::Codes");
+
+   print $o <<"EOS";
+package ${parent}::$package;
+# Copyright (C) 2001      Canon Research Centre Europe (CRE).
+# Copyright (C) 2002-2009 Neil Bowers
+# Copyright (c) 2010-$YEAR Sullivan Beck
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+# This file was automatically generated.  Any changes to this file will
+# be lost the next time 'gen_mods' is run.
+#    Generated on: $timestamp
+
+use strict;
+use warnings;
+require 5.006;
+use Exporter qw(import);
+
+our(\$VERSION,\@EXPORT);
+\$VERSION   = '$VERSION';
+
+################################################################################
+EOS
+}
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

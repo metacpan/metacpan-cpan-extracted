@@ -1,0 +1,23 @@
+<div class="boxer">
+<div class="blocker">
+    <div class="spacer">&nbsp;</div>
+
+	[% IF item.link %]
+    <img src="[% webpath %]/[% item.link %]" border="0" alt="[% item.name %]" class="picture" align="right" />
+	[% ELSE %]
+    <img src="[% webpath %]/images/users/nophoto" border="0" alt="[% item.name %]" class="picture" align="right" />
+	[% END %]
+
+        <table class="review">
+                            <tr><th width="80">Name:</th><td width="275">[% item.name %]</td></tr>
+                            <tr><th>Level:</th><td>[% item.member %]</td></tr>
+        [% IF item.job %]   <tr><th>Job:</th><td>[% item.job %]</td></tr>[% END %]
+        [% IF item.cpanid %]<tr><th>CPANID:</th><td><a href='http://search.cpan.org/~[% item.cpanid %]'>[% item.cpanid %]</a></td></tr>[% END %]
+        [% IF item.links %] <tr><th>Links:</th><td>[% item.links %]</td></tr>[% END %]
+        </table>
+
+    [% item.aboutme | html %]
+
+    <div class="spacer">&nbsp;</div>
+</div>
+</div>

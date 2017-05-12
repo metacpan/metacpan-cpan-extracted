@@ -1,0 +1,19 @@
+Changes
+examples/caspied.php
+examples/castete.php
+examples/exemple_cas.xml
+examples/lemon_cas.conf
+examples/login.htmcas
+examples/logout.htmlcas
+lib/Lemonldap/Handlers/CAS.pm
+lib/Lemonldap/Handlers/CoreCAS.pm
+lib/Lemonldap/Handlers/LoginCAS.pm
+lib/Lemonldap/Handlers/LoginCASLDAPFake.pm
+lib/Lemonldap/Handlers/LogoutCAS.pm
+lib/Lemonldap/Handlers/MemsessionCAS.pm
+lib/Lemonldap/Handlers/ValidateCAS.pm
+Makefile.PL
+MANIFEST
+README
+t/Lemonldap-Handlers-CAS.t
+META.yml                                 Module meta-data (added by MakeMaker)

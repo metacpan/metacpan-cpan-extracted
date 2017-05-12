@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# add TreeTagger POS tags and lemmas to a TigerXML corpus
+#
+# USAGE: add_treetags input.xml tree-tagged.txt output.xml
+#
+# input.xml ......... corpus in TigerXML format
+# tree-tagged.txt ... output of the TreeTagger
+# output.xml ........ filename for the merged output
+#
+
+use strict;
+use FindBin;
+use lib $FindBin::Bin.'/../lib';
+use Lingua::Align::Corpus;
+use IPC::Open3;
+
+my ($infile,$tagfile,$outfile) = @ARGV;
+
+my $input = new Lingua::Align::Corpus(-file => $infile,-type => 'TigerXML');
+open F,">$outfile.tmp" || die "cannot open $outfile.tmp\n";
+open T,"<$tagfile" || die "cannot tagged file '$tagfile'\n";
+
+my %sent=();
+while ($input->next_sentence(\%sent)){
+    my @ids = $input->get_all_leafs(\%sent,'id');
+    foreach (@ids){
+	my $tagged;
+
+	do{ $tagged = <T>; }
+	until ($tagged=~/^\S/ && $tagged!~/\<s\>/);
+
+	chomp $tagged;
+	my ($w,$t,$l)=split(/\t/,$tagged);
+	$sent{NODES}{$_}{tree}=$t;
+	$sent{NODES}{$_}{lemma}=$l;
+    }
+    print F $input->print_tree(\%sent);
+}
+
+
+open F,">$outfile" || die "cannot open $outfile\n";
+print F $input->print_header();
+close F;
+
+system "cat $outfile.tmp >> $outfile";
+system "rm -f $outfile.tmp";
+
+open F,">>$outfile" || die "cannot open $outfile\n";
+print F $input->print_tail();
+close F;

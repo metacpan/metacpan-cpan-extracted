@@ -1,0 +1,113 @@
+Lemonldap-Cluster-Status version 0.01
+=====================================
+
+NAME :  Lemonldap::Cluster::Status
+
+SYNOPSIS
+    use Lemonldap::Cluster::Status ;
+    my $serverstatus = Lemonldap::Cluster::Status->new (
+                  'ADMIN' => 'title on top of page' ,
+                  'node1' => '10.ip.ip.ip',
+                  'node2' => 'server1.net',
+                  'foo' => 'server2.net',
+                  'bar' => '10.ip.ip.ip',
+		);
+   $serverstatus->analyze;
+   my $a=$serverstatus->PrintHtml;
+
+
+                           
+
+DESCRIPTION
+
+This module aggregates sereval server-status pages (from apache)  in one page.
+
+It's usefull in order to manage cluster, or for working with nagios and cacti
+This version understands refresh=nb_of_second parameters like mod_status
+
+Your servers (nodes) MUST TO BE turn on extended status mode (see apache doc)  
+
+This module may be used in sereval ways :
+
+ 1) Like a package (see bellow) 
+ 2) Embeded in CGI script :(see StatusCGI.pl)
+ 3) With modperl : (see StatusMP.pm) 
+ 4) Like lemonldap websso composant :(see Statuslemonldap.pm)
+
+ ONLY last way NEEDS another Lemonldap composant . Thus this module is independent of lemonldap websso. 
+ 
+The server-status report seems to be issu of real apache server.
+
+ The apache server wich implements server-status summary  doesn't need to be a nodes .
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP
+
+
+METHODS
+
+
+new ('ADMIN' => 'name' ,
+     'foo' =>   'bar.fr' );
+
+
+The word  ADMIN is REQUIRED .
+This method does the GET http://bar.fr/server-status
+(This for every nodes).
+
+
+analize () ;
+
+Do the calculation and summarize stat.
+
+printHtml() 
+
+return the whole html page .
+  
+SEE ALSO
+
+server-status of apache 
+
+and all scripts in directory.
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Eric German <germanlinux@yahoo.fr>
+
+    Lemonldap originaly written by Eric German who decided to publish him in
+    2003 under the terms of the GNU General Public License version 2.
+
+    This package is under the GNU General Public License, Version 2.
+    The primary copyright holder is Eric German.
+    Portions are copyrighted under the same license as Perl itself.
+    Portions are copyrighted by Doug MacEachern and Lincoln Stein. This
+    library is under the GNU General Public License, Version 2.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; version 2 dated June, 1991.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    A copy of the GNU General Public License is available in the source tree;
+    if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+
+

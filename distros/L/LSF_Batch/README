@@ -1,0 +1,77 @@
+LSF::Batch - Access Platform Computing's LSF (Load Sharing Facility) Batch API
+from Perl
+----------------------------------------------------------------------------
+Copyright (c) 2001 Paul Franceus. All rights reserved.  This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+-----------------------------------------------------------------------------
+
+Most of the functions in the API have been implemented and work,  but
+the formal test.pl is pretty skimpy. We've been using it now for
+production work, so it's starting to get a workout.
+
+If you are interested in contributing at this point, you can:
+
+1: Write some more tests so I can get this whole thing tested.
+2: Flesh out the interfaces to a few calls that I haven't implemented
+   yet.
+3: If you have ideas for improving the "perlishness" of the interface
+   chime right in.
+
+Notes:
+
+This now works on both Solaris 2.X and AIX 4.3. It should also work on
+Linux and Tru64.
+
+Thanks to Jim Meyer of Platform Computing for the updated Makefile.PL.
+
+Thanks to Ray Hookway of Compaq for the fixes to work with Tru64.
+
+Contributions are always welcome.
+
+History:
+
+Version 0.01 4/04/2000:
+
+First public release. Some functions not totally debugged and not
+completely tested.
+
+Version 0.02 4/05/2000:
+
+Forgot to add this README to the MANIFEST. How silly of me!
+
+Version 0.03 6/01/2000:
+
+Got the library working on Solaris.
+Fixed several bugs.
+
+Version 0.04 4/13/2001:
+
+Much general improvement. Added support for lsb_geteventrec. What a pain.
+Wrote a script to help generate XS code from LSF include files (makexs.pl)
+that at least made this task bearable.
+
+Any suggestions, comments, questions please send to me:
+
+Paul Franceus
+Capita Technologies, Inc.
+paul@capita.com
+
+
+Version 0.05 4/29/2008
+
+Based on Version 0.04,some enhancement of APIs were added to suitable for LSF 7.0 Update 2.
+All the APIs have been test in test.pl on Linux 2.6 and Solaris 10(X86_64) by perl 5.8.0.
+
+Version 0.06 6/13/2008
+
+Added 10 new APIs. These APIs have been tested in test.pl on linux2.6 and Solaris 10(X86_64) 
+by perl 5.8.0. Added test_launch.pl to test 2 special APIs : lsb_gethostlist and lsb_launch.
+You can use test.pl as normal. test_launch.pl is used in test.pl.
+Added the document of the APIs. You can check it by perldoc.
+
+ISV Team
+Platform Computing Corporation
+support@platform.com
+
+

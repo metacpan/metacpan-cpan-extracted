@@ -1,0 +1,12 @@
+MANIFEST
+MANIFEST.SKIP
+Changes
+Makefile.PL
+Info.pm
+Info.xs
+Info.h
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+bin/lsdevinput
+bin/finddevinput
+

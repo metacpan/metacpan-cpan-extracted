@@ -1,0 +1,12 @@
+README
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+lib/Log/Log4perl/Appender/Fluent.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/release.t

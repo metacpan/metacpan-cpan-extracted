@@ -1,0 +1,10 @@
+Changes
+Inflect.pm
+Makefile.PL
+MANIFEST
+README
+t/01-basic.t
+t/02-objects.t
+META.yml                                 Module meta-data (added by MakeMaker)
+t/pod.t
+t/pod-coverage.t

@@ -1,0 +1,75 @@
+[% 
+    htmltitle = 'Top Photos' ;
+    title = htmltitle ;
+
+    crumb2_name = 'Gallery' ;
+    crumb2_href = '/album-main' ;
+    crumb1_name = 'Top Photos' ;
+%]
+
+<div class="post">
+
+<p>As of [% today %] these are the photos that have scored the highest interest
+from you folks.</p>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name="act" value="album-main" />
+    <input type="hidden" name="latest" value="0" />
+    <p>
+    Search: <input type="text" name="metadata" value="" size="15" />
+    [% ddmonths %][% ddyears %] <input type="submit" class="gobutton" value="GO" />
+    <p>
+    <a href="[% cgipath %]/pages.cgi?act=album-main&amp;latest=1">Latest Updates</a>
+    |   <a href="[% cgipath %]/pages.cgi?act=hits-pages">Top Galleries</a>
+    |   <a href="[% cgipath %]/pages.cgi?act=hits-photos">Top Photos</a>
+	</p>
+</form>
+</div>
+
+[% IF photosmon %]
+<h3>Last Month Photos</h3>
+<div class="boxer">
+<table class="blocker">
+<tr>
+    <th>Hits</th>
+    <th>Image</th>
+    <th>Tagline</th>
+    <th>Page</th>
+</tr>
+
+[% FOREACH record = photosmon %]
+<tr>
+    <td>[% record.counter %]</td>
+    <td><a href="[% docroot %]/photo/[% record.photoid %]"><img src="[% picpath %]/photos/[% record.thumb %]" border="0" height="50" 
+	alt="Click to view photo [% record.photoid %][% IF record.tagline %] - [% record.tagline %][% END %]" /></a></td>
+    <td>[% record.tagline %]</td>
+    <td><a href="[% docroot %]/album/[% record.pageid %]">[% record.title %]</a> [[% record.month %]/[% record.year %]]</td>
+</tr>
+[% END %]
+</table>
+</div>
+[% END %]
+
+[% IF photosall %]
+<h3>All Time Photos</h3>
+<div class="boxer">
+<table class="blocker">
+<tr>
+    <th>Hits</th>
+    <th>Image</th>
+    <th>Tagline</th>
+    <th>Page</th>
+</tr>
+
+[% FOREACH record = photosall %]
+<tr>
+    <td>[% record.counter %]</td>
+    <td><a href="[% docroot %]/photo/[% record.photoid %]"><img src="[% picpath %]/photos/[% record.thumb %]" border="0" height="50" 
+	alt="Click to view photo [% record.photoid %][% IF record.tagline %] - [% record.tagline %][% END %]" /></a></td>
+    <td>[% record.tagline %]</td>
+    <td><a href="[% docroot %]/album/[% record.pageid %]">[% record.title %]</a> [[% record.month %]/[% record.year %]]</td>
+</tr>
+[% END %]
+</table>
+</div>
+[% END %]

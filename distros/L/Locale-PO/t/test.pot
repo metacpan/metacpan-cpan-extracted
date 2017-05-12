@@ -1,0 +1,2044 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+
+#: src/access.c:192
+#: src/access.c:196
+msgid "No %s file found."
+msgstr ""
+
+#: src/access.c:229
+#, locale-po-flag-test, another-flag, c-format
+msgid "Failed to add access node!"
+msgstr ""
+
+#: src/access.c:261
+msgid "Unable to open %s."
+msgstr ""
+
+#: src/access.c:476
+msgctxt "SITE_LOCK"
+msgid "---- @sitelock will add sites immediately below this line ----"
+msgstr ""
+
+#: src/access.c:547
+msgid "Unknown access option: %s"
+msgstr ""
+
+#: src/access.c:549
+msgid "Unknown access flag: %s"
+msgstr ""
+
+#: src/atr_tab.c:184
+msgid "Which attribute do you mean?"
+msgstr ""
+
+#: src/atr_tab.c:189
+msgid "I don't understand those permissions."
+msgstr ""
+
+#: src/atr_tab.c:202
+msgid "Critical memory failure - Alert God!"
+msgstr ""
+
+#: src/atr_tab.c:203
+msgid "do_attribute_access: unable to malloc ATTR"
+msgstr ""
+
+#: src/atr_tab.c:226
+msgid "%s -- Attribute permissions now: %s"
+msgstr ""
+
+#: src/atr_tab.c:239
+msgid "Which attribute do you mean?"
+msgstr ""
+
+#: src/atr_tab.c:246
+msgid "That attribute isn't in the attribute table"
+msgstr ""
+
+#: src/atr_tab.c:252
+msgid "Removed %s from attribute table."
+msgstr ""
+
+#: src/atr_tab.c:264
+msgid "Which attributes do you mean?"
+msgstr ""
+
+#: src/atr_tab.c:273
+msgid "The name %s is already used in the attribute table."
+msgstr ""
+
+#: src/atr_tab.c:280
+msgid "That attribute isn't in the attribute table"
+msgstr ""
+
+#: src/atr_tab.c:288
+msgid "Renamed %s to %s in attribute table."
+msgstr ""
+
+#: src/atr_tab.c:300
+msgid "Which attribute do you mean?"
+msgstr ""
+
+#: src/atr_tab.c:307
+msgid "That attribute isn't in the attribute table"
+msgstr ""
+
+#: src/atr_tab.c:310
+msgid "Attribute: %s"
+msgstr ""
+
+#: src/atr_tab.c:312
+msgid "    Flags: %s"
+msgstr ""
+
+#: src/atr_tab.c:313
+msgid "  Creator: #%d"
+msgstr ""
+
+#: src/atr_tab.c:342
+msgid "Attribs:"
+msgstr ""
+
+#: src/attrib.c:274
+msgid "Attempt to create too many attributes"
+msgstr ""
+
+#: src/attrib.c:716
+msgid "ERROR: Invalid attribute number in convert_atr. aborting.\n"
+msgstr ""
+
+#: src/attrib.c:907
+msgid "That is not a valid alias."
+msgstr ""
+
+#: src/attrib.c:915
+msgid "That is not a valid alias."
+msgstr ""
+
+#: src/attrib.c:928
+msgid "That attribute cannot be changed by you."
+msgstr ""
+
+#: src/attrib.c:931
+msgid "No such attribute to reset."
+msgstr ""
+
+#: src/attrib.c:949
+msgid "%s loses its ears and becomes deaf."
+msgstr ""
+
+#: src/attrib.c:953
+msgid "%s grows ears and can now hear."
+msgstr ""
+
+#: src/attrib.c:958
+msgid "Set"
+msgstr ""
+
+#: src/attrib.c:958
+msgid "Cleared"
+msgstr ""
+
+#: src/attrib.c:985
+msgid "You need to give an object/attribute pair."
+msgstr ""
+
+#: src/attrib.c:989
+msgid "You need to give an object/attribute pair."
+msgstr ""
+
+#: src/access.c:473
+msgid " COMMENT: %s"
+msgstr ""
+
+#: src/announce.c:92
+msgid "CONNECTION made from %s at %s"
+msgstr ""
+
+#: src/announce.c:73
+msgid "announce: pid %d running on port %d\n"
+msgstr ""
+
+#: src/atr_tab.c:165
+msgid "ATR INIT: attribute alias %s matches no known attribute.\n"
+msgstr ""
+
+#: src/attrib.c:937
+msgid "Alias set."
+msgstr ""
+
+#: src/attrib.c:939
+msgid "Alias removed."
+msgstr ""
+
+#: src/attrib.c:1022
+msgid "That attribute is %s."
+msgstr ""
+
+#: src/attrib.c:1023
+msgid "locked"
+msgstr ""
+
+#: src/attrib.c:1023
+msgid "unlocked"
+msgstr ""
+
+#: src/attrib.c:1026
+msgid "You need to own the attribute to change its lock."
+msgstr ""
+
+#: src/attrib.c:1031
+msgid "Attribute locked."
+msgstr ""
+
+#: src/attrib.c:1035
+msgid "Attribute unlocked."
+msgstr ""
+
+#: src/attrib.c:1038
+msgid "Invalid status on atrlock.. Notify god."
+msgstr ""
+
+#: src/attrib.c:1043
+msgid "No such attribute."
+msgstr ""
+
+#: src/attrib.c:1058
+msgid "You need to give an object/attribute pair."
+msgstr ""
+
+#: src/attrib.c:1062
+msgid "You need to give an object/attribute pair."
+msgstr ""
+
+#: src/attrib.c:1076
+msgid "I can't find that player"
+msgstr ""
+
+#: src/attrib.c:1107
+msgid "You can only chown an attribute to the current owner of the object."
+msgstr ""
+
+#: src/attrib.c:1111
+msgid "Attribute owner changed."
+msgstr ""
+
+#: src/attrib.c:1114
+msgid "You don't have the permission to chown that."
+msgstr ""
+
+#: src/attrib.c:1118
+msgid "No such attribute."
+msgstr ""
+
+#: src/boolexp.c:105
+msgid "Sorry, broken lock!"
+msgstr ""
+
+#: src/boolexp.c:152
+msgid "Bad boolexp type %d in object #%d"
+msgstr ""
+
+#: src/boolexp.c:158
+msgid "Broken lock type %s in object called by #%d"
+msgstr ""
+
+#: src/boolexp.c:261
+msgid "I don't see %s here."
+msgstr ""
+
+#: src/boolexp.c:265
+msgid "I don't know which %s you mean!"
+msgstr ""
+
+#: src/bsd.c:250
+msgid "Either that player does not exist, or has a different password.\\r\n"
+msgstr ""
+
+#: src/bsd.c:252
+msgid "Either there is already a player with that name, or that name is illegal.\\r\n"
+msgstr ""
+
+#: src/bsd.c:254
+msgid "Unable to register that player with that email address.\\r\n"
+msgstr ""
+
+#: src/bsd.c:256
+msgid "Registration successful! You will receive your password by email.\\r\n"
+msgstr ""
+
+#: src/bsd.c:258
+msgid ""
+"\\r\n"
+"<Output Flushed>[0m\\r\n"
+msgstr ""
+
+#: src/bsd.c:260
+msgid ""
+"\\r\n"
+"<Output Flushed>\\x1B[0m\\r\n"
+msgstr ""
+
+#: src/bsd.c:262
+msgid "Going down - Bye\\r\n"
+msgstr ""
+
+#: src/bsd.c:484
+msgid "ERROR: Usage: %s config_file error_log_file\n"
+msgstr ""
+
+#: src/bsd.c:497
+msgid "Error %i on WSAStartup\n"
+msgstr ""
+
+#: src/bsd.c:514
+msgid "Running under Windows %s\n"
+msgstr ""
+
+#: src/bsd.c:536
+msgid "Failed to set ctype locale from environment.\n"
+msgstr ""
+
+#: src/bsd.c:538
+msgid "Failed to set time locale from environment.\n"
+msgstr ""
+
+#: src/bsd.c:540
+msgid "Failed to set messages locale from environment.\n"
+msgstr ""
+
+#: src/bsd.c:555
+msgid "Unable to open %s. Error output to stderr.\n"
+msgstr ""
+
+#: src/bsd.c:557
+msgid "Redirecting output to: %s\n"
+msgstr ""
+
+#: src/bsd.c:559
+msgid "Ack!  Failed reopening stderr!"
+msgstr ""
+
+#: src/bsd.c:606
+msgid "ERROR: Couldn't load databases! Exiting.\n"
+msgstr ""
+
+#: src/bsd.c:636
+msgid "Error %ld (%s) on CreateIoCompletionPort\n"
+msgstr ""
+
+#: src/bsd.c:656
+msgid "Error %ld on Win32: bind\n"
+msgstr ""
+
+#: src/bsd.c:664
+msgid "Error %ld on Win32: listen\n"
+msgstr ""
+
+#: src/bsd.c:673
+msgid "Error %ld on _beginthread\n"
+msgstr ""
+
+#: src/bsd.c:677
+msgid "Listening (NT-style) on port %d\n"
+msgstr ""
+
+#: src/bsd.c:727
+msgid ""
+"\n"
+"MUSH shutdown completed.\n"
+msgstr ""
+
+#: src/bsd.c:758
+msgid "Unable to open %s. Error output continues to stderr.\n"
+msgstr ""
+
+#: src/bsd.c:761
+msgid "Ack!  Failed reopening stderr!"
+msgstr ""
+
+#: src/bsd.c:1732
+msgid "%d file descriptors available.\n"
+msgstr ""
+
+#: src/bsd.c:1733
+msgid "RESTART FINISHED.\n"
+msgstr ""
+
+#: src/bsd.c:1748
+msgid "GAME: Shutdown by external signal"
+msgstr ""
+
+#: src/bsd.c:1749
+msgid "SHUTDOWN by external signal"
+msgstr ""
+
+#: src/bsd.c:1759
+msgid "DUMP by external signal"
+msgstr ""
+
+#: src/bsd.c:1951
+msgid "[%d/%s/%s] Refused connection (remote port %d)"
+msgstr ""
+
+#: src/bsd.c:1960
+msgid "[%d/%s/%s] Connection opened."
+msgstr ""
+
+#: src/bsd.c:2021
+msgid "couldn't open cached text file '%s'"
+msgstr ""
+
+#: src/bsd.c:2144
+msgid "Below maximum player limit of %d. Logins enabled."
+msgstr ""
+
+#: src/bsd.c:2149
+msgid "[%d/%s/%s] Logout, never connected. <Connection not dropped>"
+msgstr ""
+
+#: src/bsd.c:2191
+msgid "[%d/%s/%s] Logout by %s(#%d)"
+msgstr ""
+
+#: src/bsd.c:2206
+msgid "Below maximum player limit of %d. Logins enabled."
+msgstr ""
+
+#: src/bsd.c:2210
+msgid "[%d/%s/%s] Connection closed, never connected."
+msgstr ""
+
+#: src/bsd.c:2518
+msgid "[%d/%s/%s] Refused connection (remote port %d)"
+msgstr ""
+
+#: src/bsd.c:2672
+msgid "[%d/%s/%s] Connection opened."
+msgstr ""
+
+#: src/bsd.c:3065
+msgid "Help topics don't start with '&'."
+msgstr ""
+
+#: src/bsd.c:3073
+msgid "You don't look like an admin to me."
+msgstr ""
+
+#: src/bsd.c:3081
+msgid "Sorry, that function is temporarily unavailable."
+msgstr ""
+
+#: src/bsd.c:3082
+msgid "Can't open index file %s for reading"
+msgstr ""
+
+#: src/bsd.c:3090
+msgid "No entry for '%s'."
+msgstr ""
+
+#: src/bsd.c:3094
+msgid "Sorry, that function is temporarily unavailable."
+msgstr ""
+
+#: src/bsd.c:3095
+msgid "Can't open text file %s for reading"
+msgstr ""
+
+#: src/bsd.c:3099
+msgid "Sorry, that function is temporarily unavailable."
+msgstr ""
+
+#: src/bsd.c:3100
+msgid "Seek error in file %s\n"
+msgstr ""
+
+#: src/bsd.c:3303
+msgid "[%d/%s/%s] Switching to Pueblo mode."
+msgstr ""
+
+#: src/bsd.c:3352
+msgid "Limit of %d players reached. Logins disabled.\n"
+msgstr ""
+
+#: src/bsd.c:3405
+msgid "%ld failed connections since last login."
+msgstr ""
+
+#: src/bsd.c:3419
+msgid "Your HAVEN flag is set. You cannot receive pages."
+msgstr ""
+
+#: src/bsd.c:3422
+msgid "Welcome back from vacation!"
+msgstr ""
+
+#: src/bsd.c:3444
+msgid "[%d/%s/%s] Failed connect to '%s'."
+msgstr ""
+
+#: src/bsd.c:3447
+msgid "[%d/%s/%s] Connected to %s(#%d) in %s(#%d)"
+msgstr ""
+
+#: src/bsd.c:3459
+msgid "[%d/%s/%s] Failed connect to '%s'."
+msgstr ""
+
+#: src/bsd.c:3463
+msgid "[%d/%s/%s] Connected dark to %s(#%d) in %s(#%d)"
+msgstr ""
+
+#: src/bsd.c:3479
+msgid "[%d/%s/%s] Failed connect to '%s'."
+msgstr ""
+
+#: src/bsd.c:3482
+msgid "[%d/%s/%s] Connected to %s(#%d) in %s(#%d)"
+msgstr ""
+
+#: src/bsd.c:3498
+msgid "[%d/%s/%s] Failed connect to '%s'."
+msgstr ""
+
+#: src/bsd.c:3502
+msgid "[%d/%s/%s] Connected hidden to %s(#%d) in %s(#%d)"
+msgstr ""
+
+#: src/bsd.c:3521
+msgid "[%d/%s/%s] Refused create for '%s'."
+msgstr ""
+
+#: src/bsd.c:3529
+msgid "REFUSED CREATION for %s from %s on descriptor %d.\n"
+msgstr ""
+
+#: src/bsd.c:3535
+msgid "REFUSED CREATION for %s from %s on descriptor %d.\n"
+msgstr ""
+
+#: src/bsd.c:3543
+msgid "[%d/%s/%s] Failed create for '%s' (bad name)."
+msgstr ""
+
+#: src/bsd.c:3548
+msgid "[%d/%s/%s] Failed create for '%s' (bad password)."
+msgstr ""
+
+#: src/bsd.c:3551
+msgid "[%d/%s/%s] Created %s(#%d)"
+msgstr ""
+
+#: src/bsd.c:3565
+msgid "[%d/%s/%s] Refused registration (bad site) for '%s'."
+msgstr ""
+
+#: src/bsd.c:3573
+msgid "Refused registration (creation disabled) for %s from %s on descriptor %d.\n"
+msgstr ""
+
+#: src/bsd.c:3580
+msgid "[%d/%s/%s] Failed registration for '%s'."
+msgstr ""
+
+#: src/bsd.c:3584
+msgid "[%d/%s/%s] Registered %s(#%d) to %s"
+msgstr ""
+
+#: src/bsd.c:3824
+msgid "Bogus caller #%d of dump_users"
+msgstr ""
+
+#: src/bsd.c:3900
+msgid "There are no players connected.\\r\n"
+msgstr ""
+
+#: src/bsd.c:3903
+msgid "There is 1 player connected.\\r\n"
+msgstr ""
+
+#: src/bsd.c:3906
+msgid "There are %d players connected.\\r\n"
+msgstr ""
+
+#: src/bsd.c:3978
+msgid "%s created."
+msgstr ""
+
+#: src/bsd.c:4015
+msgid "You are nowhere!"
+msgstr ""
+
+#: src/bsd.c:4083
+msgid "Invalid zone #%d for %s(#%d) has bad type %d"
+msgstr ""
+
+#: src/bsd.c:4136
+msgid "%s has disconnected."
+msgstr ""
+
+#: src/bsd.c:4189
+msgid "Invalid zone #%d for %s(#%d) has bad type %d"
+msgstr ""
+
+#: src/bsd.c:4212
+msgid "%s has partially disconnected."
+msgstr ""
+
+#: src/bsd.c:4256
+msgid "You may get 15 minutes of fame and glory in life, but not right now."
+msgstr ""
+
+#: src/bsd.c:4262
+msgid "Motd set."
+msgstr ""
+
+#: src/bsd.c:4266
+msgid "Wizard motd set."
+msgstr ""
+
+#: src/bsd.c:4270
+msgid "Down motd set."
+msgstr ""
+
+#: src/bsd.c:4274
+msgid "Full motd set."
+msgstr ""
+
+#: src/bsd.c:4297
+msgid "Why would you want to do that?"
+msgstr ""
+
+#: src/bsd.c:4316
+msgid "Doing set. %d characters lost."
+msgstr ""
+
+#: src/bsd.c:4319
+msgid "Doing set."
+msgstr ""
+
+#: src/bsd.c:4330
+msgid "Who do you think you are, Gallup?"
+msgstr ""
+
+#: src/bsd.c:4337
+msgid "Poll set. %d characters lost."
+msgstr ""
+
+#: src/bsd.c:4340
+msgid "Poll set."
+msgstr ""
+
+#: src/bsd.c:4341
+msgid "Poll Set to '%s'."
+msgstr ""
+
+#: src/bsd.c:4456
+msgid "Whoa. doing() can't find player #%d on call by #%d\n"
+msgstr ""
+
+#: src/bsd.c:4485
+msgid "#-1 NOT CONNECTED"
+msgstr ""
+
+#: src/bsd.c:4498
+msgid "#-1 NOT CONNECTED"
+msgstr ""
+
+#: src/bsd.c:4589
+msgid "Permission denied."
+msgstr ""
+
+#: src/bsd.c:4627
+msgid "Permission denied."
+msgstr ""
+
+#: src/bsd.c:4639
+msgid "You no longer appear on the WHO list."
+msgstr ""
+
+#: src/bsd.c:4641
+msgid "You now appear on the WHO list."
+msgstr ""
+
+#: src/bsd.c:4673
+msgid ""
+"\n"
+"*** Inactivity timeout ***\n"
+msgstr ""
+
+#: src/bsd.c:4675
+msgid "[%d/%s/%s] Logout by %s(#%d) <Inactivity Timeout>"
+msgstr ""
+
+#: src/bsd.c:4683
+msgid ""
+"\n"
+"*** Inactivity limit reached. You are now HIDDEN. ***\n"
+msgstr ""
+
+#: src/bsd.c:4788
+msgid "There are no connected players on that channel."
+msgstr ""
+
+#: src/bsd.c:4790
+msgid "Connected players on that channel are:"
+msgstr ""
+
+#: src/bsd.c:4807
+msgid "No such channel."
+msgstr ""
+
+#: src/bsd.c:4810
+msgid "I can't tell which channel you mean."
+msgstr ""
+
+#: src/bsd.c:4827
+msgid "#-1 NO PERMISSIONS FOR CHANNEL"
+msgstr ""
+
+#: src/bsd.c:5057
+msgid "GAME: Error writing reboot database!"
+msgstr ""
+
+#: src/bsd.c:5185
+msgid "GAME: Reboot finished."
+msgstr ""
+
+#: src/bsd.c:5211
+msgid "Starting MUD listening thread ...\n"
+msgstr ""
+
+#: src/bsd.c:5235
+msgid "[%d/%s] Refused connection (remote port %d)"
+msgstr ""
+
+#: src/bsd.c:5241
+msgid "[%d/%s] Connection opened."
+msgstr ""
+
+#: src/bsd.c:5245
+msgid "[%d/%s] Connection opened.\n"
+msgstr ""
+
+#: src/bsd.c:5276
+msgid "End of MUD listening thread ...\n"
+msgstr ""
+
+#: src/cmds.c:181
+msgid "You can't remake the world in your image."
+msgstr ""
+
+#: src/cmds.c:185
+msgid "What did you want to set?"
+msgstr ""
+
+#: src/cmds.c:189
+msgid "What did you want to set that to?"
+msgstr ""
+
+#: src/cmds.c:193
+msgid "Couldn't set that option"
+msgstr ""
+
+#: src/cmds.c:195
+msgid "Option set."
+msgstr ""
+
+#: src/cmds.c:228
+msgid "You must specify a type of lock"
+msgstr ""
+
+#: src/command.c:598
+msgid "ALIAS : %s for nonexistant command %s"
+msgstr ""
+
+#: src/command.c:965
+msgid "%s doesn't know switch %s."
+msgstr ""
+
+#: src/command.c:1022
+msgid "No command vector on command %s."
+msgstr ""
+
+#: src/command.c:1100
+msgid "No such command."
+msgstr ""
+
+#: src/command.c:1110
+msgid "Where's your pointy hat?"
+msgstr ""
+
+#: src/command.c:1114
+msgid "How do you want to restrict the command?"
+msgstr ""
+
+#: src/command.c:1119
+msgid "Restrict attempt failed."
+msgstr ""
+
+#: src/command.c:1123
+msgid "@command is ALWAYS enabled."
+msgstr ""
+
+#: src/command.c:1249
+msgid "You cannot do that while gagged."
+msgstr ""
+
+#: src/command.c:1253
+msgid "You cannot do that while fixed."
+msgstr ""
+
+#: src/command.c:1257
+msgid "Guests cannot do that."
+msgstr ""
+
+#: src/command.c:1261
+msgid "Only God can do that."
+msgstr ""
+
+#: src/command.c:1281
+msgid "Permission denied, command is type-restricted."
+msgstr ""
+
+#: src/command.c:1293
+msgid "Permission denied."
+msgstr ""
+
+#: src/comp_h.c:268
+msgid "Cannot allocate memory for compression tree. Aborting.\n"
+msgstr ""
+
+#: src/comp_h.c:305
+msgid "Illegal compression code length (%d).  Aborting.\n"
+msgstr ""
+
+#: src/comp_h.c:350
+msgid "Cannot allocate memory for compression tree. Aborting.\n"
+msgstr ""
+
+#: src/comp_h.c:443
+msgid "Cannot allocate memory for compression tree. Aborting.\n"
+msgstr ""
+
+#: src/comp_h.c:492
+msgid "Cannot allocate memory for compression tree. Aborting.\n"
+msgstr ""
+
+#: src/comp_h.c:517
+msgid "Cannot allocate memory for compression tree. Aborting.\n"
+msgstr ""
+
+#: src/comp_w.c:290
+msgid "Error in string decompression occurred during panic dump.\n"
+msgstr ""
+
+#: src/comp_w.c:294
+msgid "Error in string decompression, i = %i\n"
+msgstr ""
+
+#: src/comp_w.c:295
+msgid "Fatal error in decompression"
+msgstr ""
+
+#: src/conf.c:346
+msgid "CONFIG: option %s value limited to %d\n"
+msgstr ""
+
+#: src/conf.c:384
+msgid "CONFIG: weird flag set directive '%s'\n"
+msgstr ""
+
+#: src/conf.c:389
+msgid "CONFIG: flag '%s' cannot be set.\n"
+msgstr ""
+
+#: src/conf.c:394
+msgid "CONFIG: flag '%s' for type not found.\n"
+msgstr ""
+
+#: src/conf.c:434
+msgid "CONFIG: Invalid command or restriction for %s.\n"
+msgstr ""
+
+#: src/conf.c:443
+msgid "CONFIG: restrict_command %s requires a restriction value.\n"
+msgstr ""
+
+#: src/conf.c:466
+msgid "CONFIG: directive '%s' in cnf file ignored.\n"
+msgstr ""
+
+#: src/conf.c:494
+msgid "GAME: Dump complete. Time in."
+msgstr ""
+
+#: src/conf.c:508
+msgid "Penny"
+msgstr ""
+
+#: src/conf.c:509
+msgid "Pennies"
+msgstr ""
+
+#: src/conf.c:564
+msgid "GAME: Database will be dumped in 5 minutes."
+msgstr ""
+
+#: src/conf.c:659
+msgid "ERROR: Cannot open configuration file %s.\n"
+msgstr ""
+
+#: src/conf.c:702
+msgid "CONFIG: include depth too deep in file %s\n"
+msgstr ""
+
+#: src/conf.c:720
+msgid "CONFIG: directive '%s' missing from cnf file, using default value.\n"
+msgstr ""
+
+#: src/conf.c:771
+msgid "I only know the following types of options:"
+msgstr ""
+
+#: src/conf.c:791
+msgid "Use: @config/list <type of options> where type is one of:"
+msgstr ""
+
+#: src/conf.c:889
+msgid "#-1 PERMISSION DENIED"
+msgstr ""
+
+#: src/db.c:152
+msgid "ERROR: out of memory!\n"
+msgstr ""
+
+#: src/db.c:164
+msgid "ERROR: out of memory!\n"
+msgstr ""
+
+#: src/db.c:510
+msgid "***END OF DUMP***\n"
+msgstr ""
+
+#: src/db.c:567
+msgid " * Bad attribute name on #%d. Changing name to %s.\n"
+msgstr ""
+
+#: src/db.c:574
+msgid " * Bad owner on attribute %s on #%d.\n"
+msgstr ""
+
+#: src/db.c:608
+msgid " * Bad text in attribute %s on #%d. Changed to:\n"
+msgstr ""
+
+#: src/db.c:666
+msgid "PARANOID WRITE BEGINNING...\n"
+msgstr ""
+
+#: src/db.c:686
+msgid "\t...wrote up to object #%d\n"
+msgstr ""
+
+#: src/db.c:688
+msgid "***END OF DUMP***\n"
+msgstr ""
+
+#: src/db.c:689
+msgid "\t...finished at object #%d\n"
+msgstr ""
+
+#: src/db.c:690
+msgid "END OF PARANOID WRITE.\n"
+msgstr ""
+
+#: src/db.c:1236
+msgid "ERROR: Bad format on new attributes. object #%d\n"
+msgstr ""
+
+#: src/db.c:1242
+msgid "ERROR: Bad format on new attribute %s. object #%d\n"
+msgstr ""
+
+#: src/db.c:1273
+msgid "** WARNING **  Hard newline in attribute %s on object #%d\n"
+msgstr ""
+
+#: src/db.c:1296
+msgid "ERROR: no line feed after < on object %d\n"
+msgstr ""
+
+#: src/db.c:1302
+msgid "ERROR: Unexpected EOF on file.\n"
+msgstr ""
+
+#: src/db.c:1306
+msgid "ERROR: Bad character %c (%d) in attribute list on object %d\n"
+msgstr ""
+
+#: src/db.c:1309
+msgid "  (expecting ], >, or < as first character of the line.)\n"
+msgstr ""
+
+#: src/db.c:1311
+msgid "  Last attribute read was: %s\n"
+msgstr ""
+
+#: src/db.c:1313
+msgid "  No attributes had been read yet.\n"
+msgstr ""
+
+#: src/db.c:1353
+msgid "ERROR: old style database.\n"
+msgstr ""
+
+#: src/db.c:1472
+msgid "ERROR: bad attribute list object %d\n"
+msgstr ""
+
+#: src/db.c:1490
+msgid "***END OF DUMP***"
+msgstr ""
+
+#: src/db.c:1491
+msgid "ERROR: No end of dump %d\n"
+msgstr ""
+
+#: src/db.c:1495
+msgid "READING: done\n"
+msgstr ""
+
+#: src/db.c:1504
+msgid "ERROR: failed object %d\n"
+msgstr ""
+
+#: src/destroy.c:212
+msgid "Destroying that again is hardly necessary."
+msgstr ""
+
+#: src/destroy.c:216
+msgid "Destroying God would be blasphemous."
+msgstr ""
+
+#: src/destroy.c:228
+msgid "Permission denied."
+msgstr ""
+
+#: src/destroy.c:232
+msgid "That is too special to be destroyed."
+msgstr ""
+
+#: src/destroy.c:238
+msgid "That object is set SAFE. You must set it !SAFE before destroying it."
+msgstr ""
+
+#: src/destroy.c:243
+msgid "That object is marked SAFE. Use @nuke to destroy it."
+msgstr ""
+
+#: src/destroy.c:250
+msgid "That object does not belong to you. Use @nuke to destroy it."
+msgstr ""
+
+#: src/destroy.c:257
+msgid "Programs don't kill people; people kill people!"
+msgstr ""
+
+#: src/destroy.c:266
+msgid "Sorry, no suicide allowed."
+msgstr ""
+
+#: src/destroy.c:271
+msgid "Even you can't do that!"
+msgstr ""
+
+#: src/destroy.c:276
+msgid "How gruesome. You may not destroy players who are connected."
+msgstr ""
+
+#: src/destroy.c:280
+msgid "You must use @nuke to destroy a player."
+msgstr ""
+
+#: src/destroy.c:287
+msgid "That object is set WIZARD. You must use @nuke to destroy it."
+msgstr ""
+
+#: src/destroy.c:291
+msgid "No home-wrecking allowed! Relink first."
+msgstr ""
+
+#: src/destroy.c:297
+msgid "No home-wrecking allowed! Relink first."
+msgstr ""
+
+#: src/destroy.c:325
+msgid "Destroyed."
+msgstr ""
+
+#: src/destroy.c:333
+msgid "The room shakes and begins to crumble."
+msgstr ""
+
+#: src/destroy.c:336
+msgid "You will be rewarded shortly for %s."
+msgstr ""
+
+#: src/destroy.c:341
+msgid "The wrecking ball is on its way for %s's %s and its exits."
+msgstr ""
+
+#: src/destroy.c:344
+msgid "%s has scheduled your room %s to be destroyed."
+msgstr ""
+
+#: src/destroy.c:352
+msgid "%s and all their objects are scheduled to be destroyed."
+msgstr ""
+
+#: src/destroy.c:357
+msgid "%s's %s is scheduled to be destroyed."
+msgstr ""
+
+#: src/destroy.c:361
+msgid "%s has scheduled your %s for destruction."
+msgstr ""
+
+#: src/destroy.c:364
+msgid "%s is scheduled to be destroyed."
+msgstr ""
+
+#: src/destroy.c:371
+msgid "%s has scheduled your %s for destruction."
+msgstr ""
+
+#: src/destroy.c:374
+msgid "%s's %s is scheduled to be destroyed."
+msgstr ""
+
+#: src/destroy.c:378
+msgid "%s is scheduled to be destroyed."
+msgstr ""
+
+#: src/destroy.c:382
+msgid "Surprising type in do_destroy."
+msgstr ""
+
+#: src/destroy.c:405
+msgid "Alas, your efforts of mercy are in vain."
+msgstr ""
+
+#: src/destroy.c:410
+msgid "Your %s has been spared from destruction."
+msgstr ""
+
+#: src/destroy.c:414
+msgid "%s has been spared from destruction."
+msgstr ""
+
+#: src/destroy.c:464
+msgid "%s has scheduled your %s for destruction."
+msgstr ""
+
+#: src/destroy.c:470
+msgid "Surprising type in pre_destroy."
+msgstr ""
+
+#: src/destroy.c:510
+msgid "%s has been spared from destruction."
+msgstr ""
+
+#: src/destroy.c:514
+msgid "You have been spared from destruction by %s."
+msgstr ""
+
+#: src/destroy.c:517
+msgid "You have been spared from destruction."
+msgstr ""
+
+#: src/destroy.c:543
+msgid "The room %s has been spared from destruction."
+msgstr ""
+
+#: src/destroy.c:548
+msgid "The room %s has been spared from destruction by %s."
+msgstr ""
+
+#: src/destroy.c:565
+msgid "Surprising type in un_destroy."
+msgstr ""
+
+#: src/destroy.c:599
+msgid "Unknown type on #%d in free_object."
+msgstr ""
+
+#: src/destroy.c:628
+msgid "ERROR: Exit %s leading from invalid room #%d destroyed."
+msgstr ""
+
+#: src/destroy.c:636
+msgid "Found a destroyed exit #%d in room #%d"
+msgstr ""
+
+#: src/destroy.c:705
+msgid "The floor disappears under your feet, you fall through NOTHINGness and then:"
+msgstr ""
+
+#: src/destroy.c:759
+msgid "You get your %d %s deposit back for %s."
+msgstr ""
+
+#: src/destroy.c:924
+msgid "Purge complete."
+msgstr ""
+
+#: src/destroy.c:926
+msgid "Sorry, you are a mortal."
+msgstr ""
+
+#: src/destroy.c:1040
+msgid "Found a destroyed exit #%d in room #%d"
+msgstr ""
+
+#: src/destroy.c:1100
+msgid "ERROR: no name for room #%d."
+msgstr ""
+
+#: src/destroy.c:1103
+msgid "You own a disconnected room, %s"
+msgstr ""
+
+#: src/destroy.c:1156
+msgid "Bad object type found for %s in mark_contents"
+msgstr ""
+
+#: src/destroy.c:1178
+msgid "Object %s not pointed to by anything."
+msgstr ""
+
+#: src/destroy.c:1181
+msgid "You own an object %s that was \\'orphaned\\'."
+msgstr ""
+
+#: src/destroy.c:1210
+msgid "It was moved to %s."
+msgstr ""
+
+#: src/destroy.c:1213
+msgid "Moved to %s."
+msgstr ""
+
+#: src/destroy.c:1218
+msgid "It was moved to %s."
+msgstr ""
+
+#: src/destroy.c:1221
+msgid "Moved to %s."
+msgstr ""
+
+#: src/destroy.c:1225
+msgid "It was destroyed."
+msgstr ""
+
+#: src/destroy.c:1226
+msgid "Orphaned exit destroyed."
+msgstr ""
+
+#: src/destroy.c:1232
+msgid "Disconnected room. So what?"
+msgstr ""
+
+#: src/destroy.c:1236
+msgid "Surprising type on #%d found in check_cycles."
+msgstr ""
+
+#: src/destroy.c:1272
+msgid "Incorrect location on object %s. Reset to #%d."
+msgstr ""
+
+#: src/destroy.c:1291
+msgid "Incorrect source on exit %s. Reset to #%d."
+msgstr ""
+
+#: src/destroy.c:1319
+msgid "Silly mortal chicks are for kids!"
+msgstr ""
+
+#: src/destroy.c:1322
+msgid "GAME: Performing database consistency check."
+msgstr ""
+
+#: src/destroy.c:1323
+msgid "DBCK done."
+msgstr ""
+
+#: src/destroy.c:1325
+msgid "GAME: Database consistency check complete."
+msgstr ""
+
+#: src/extchat.c:104
+msgid "CHAT: I don't recognize that channel."
+msgstr ""
+
+#: src/extchat.c:107
+msgid "CHAT: I don't know which channel you mean."
+msgstr ""
+
+#: src/extchat.c:145
+msgid "Unable to load channel %d."
+msgstr ""
+
+#: src/extchat.c:289
+msgid "Bad object #%d removed from channel %s"
+msgstr ""
+
+#: src/extchat.c:746
+msgid "You need to specify a channel."
+msgstr ""
+
+#: src/extchat.c:750
+msgid "What do you want to do with that channel?"
+msgstr ""
+
+#: src/extchat.c:757
+msgid "CHAT: You can't do that with channel <%s>."
+msgstr ""
+
+#: src/extchat.c:760
+msgid "CHAT: I don't recognize that channel."
+msgstr ""
+
+#: src/extchat.c:782
+msgid "Invalid target."
+msgstr ""
+
+#: src/extchat.c:787
+msgid "Sorry, wrong type of thing for channel <%s>."
+msgstr ""
+
+#: src/extchat.c:793
+msgid "Guests are not allowed to join channels."
+msgstr ""
+
+#: src/extchat.c:797
+msgid "Invalid target."
+msgstr ""
+
+#: src/extchat.c:803
+msgid "%s is already on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:812
+msgid "CHAT: Warning: Player does not meet channel join permissions (joining anyway)"
+msgstr ""
+
+#: src/extchat.c:814
+msgid "Permission to join denied."
+msgstr ""
+
+#: src/extchat.c:821
+msgid "CHAT: %s joins you to channel <%s>."
+msgstr ""
+
+#: src/extchat.c:824
+msgid "CHAT: You join %s to channel <%s>."
+msgstr ""
+
+#: src/extchat.c:827
+msgid "CHAT: You join channel <%s>."
+msgstr ""
+
+#: src/extchat.c:830
+msgid "<%s> %s has joined this channel."
+msgstr ""
+
+#: src/extchat.c:835
+msgid "%s is already on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:846
+msgid "Guests may not leave channels."
+msgstr ""
+
+#: src/extchat.c:852
+msgid "<%s> %s has left this channel."
+msgstr ""
+
+#: src/extchat.c:856
+msgid "CHAT: %s removes you from channel <%s>."
+msgstr ""
+
+#: src/extchat.c:859
+msgid "CHAT: You remove %s from channel <%s>."
+msgstr ""
+
+#: src/extchat.c:863
+msgid "CHAT: You leave channel <%s>."
+msgstr ""
+
+#: src/extchat.c:865
+msgid "%s is not on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:870
+msgid "I don't understand what you want to do."
+msgstr ""
+
+#: src/extchat.c:889
+msgid "Don't you have anything to say?"
+msgstr ""
+
+#: src/extchat.c:894
+msgid "No such channel."
+msgstr ""
+
+#: src/extchat.c:916
+msgid "Sorry, you're not the right type to be on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:922
+msgid "You must be on that channel to speak on it."
+msgstr ""
+
+#: src/extchat.c:927
+msgid "Sorry, you're not allowed to speak on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:968
+msgid "To channel %s: %s%s%s"
+msgstr ""
+
+#: src/extchat.c:972
+msgid "<%s> %s%s%s says, \"%s\""
+msgstr ""
+
+#: src/extchat.c:977
+msgid "To channel %s: %s says, \"%s\""
+msgstr ""
+
+#: src/extchat.c:981
+msgid "What do you want to say to that channel?"
+msgstr ""
+
+#: src/extchat.c:999
+msgid "You can't channel-surf that well."
+msgstr ""
+
+#: src/extchat.c:1003
+msgid "That is not a valid channel."
+msgstr ""
+
+#: src/extchat.c:1008
+msgid "I don't recognize that channel."
+msgstr ""
+
+#: src/extchat.c:1011
+msgid "I don't know which channel you mean."
+msgstr ""
+
+#: src/extchat.c:1015
+msgid "CHAT: I don't recognize that channel."
+msgstr ""
+
+#: src/extchat.c:1021
+msgid "Sorry, you're not the right type to be on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:1029
+msgid "You must be on that channel to speak on it."
+msgstr ""
+
+#: src/extchat.c:1034
+msgid "Sorry, you're not allowed to speak on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:1039
+msgid "What do you want to emit?"
+msgstr ""
+
+#: src/extchat.c:1047
+msgid "Cemit to channel %s: %s"
+msgstr ""
+
+#: src/extchat.c:1074
+msgid "You must specify a channel."
+msgstr ""
+
+#: src/extchat.c:1078
+msgid "Guests may not modify channels."
+msgstr ""
+
+#: src/extchat.c:1082
+msgid "What do you want to do with the channel?"
+msgstr ""
+
+#: src/extchat.c:1093
+msgid "No more room for channels."
+msgstr ""
+
+#: src/extchat.c:1097
+msgid "The channel needs a shorter name."
+msgstr ""
+
+#: src/extchat.c:1101
+msgid "You already own too many channels."
+msgstr ""
+
+#: src/extchat.c:1106
+msgid "CHAT: The channel needs a more unique name."
+msgstr ""
+
+#: src/extchat.c:1112
+msgid "You can't create channels of that type."
+msgstr ""
+
+#: src/extchat.c:1116
+msgid "Warning: channel will be created disabled."
+msgstr ""
+
+#: src/extchat.c:1119
+msgid "You can't afford the %d %s."
+msgstr ""
+
+#: src/extchat.c:1126
+msgid "CHAT: No more memory for channels!"
+msgstr ""
+
+#: src/extchat.c:1133
+msgid "CHAT: No more memory for channels!"
+msgstr ""
+
+#: src/extchat.c:1144
+msgid "CHAT: Channel <%s> created."
+msgstr ""
+
+#: src/extchat.c:1150
+msgid "Permission denied."
+msgstr ""
+
+#: src/extchat.c:1161
+msgid "Channel removed."
+msgstr ""
+
+#: src/extchat.c:1167
+msgid "Permission denied."
+msgstr ""
+
+#: src/extchat.c:1176
+msgid "The channel needs a more unique new name."
+msgstr ""
+
+#: src/extchat.c:1181
+msgid "That name is too long."
+msgstr ""
+
+#: src/extchat.c:1190
+msgid "<%s> %s has renamed channel %s to %s."
+msgstr ""
+
+#: src/extchat.c:1192
+msgid "Channel renamed."
+msgstr ""
+
+#: src/extchat.c:1197
+msgid "Permission denied."
+msgstr ""
+
+#: src/extchat.c:1203
+msgid "You can't make channels that type."
+msgstr ""
+
+#: src/extchat.c:1207
+msgid "Warning: channel will be disabled."
+msgstr ""
+
+#: src/extchat.c:1210
+msgid "Permissions on channel <%s> changed."
+msgstr ""
+
+#: src/extchat.c:1215
+msgid "Permission denied. Use @channel/mute <chan>=<y/n>"
+msgstr ""
+
+#: src/extchat.c:1226
+msgid "Quiet status must be 'yes' or 'no'."
+msgstr ""
+
+#: src/extchat.c:1230
+msgid "Quiet status on channel <%s> changed."
+msgstr ""
+
+#: src/extchat.c:1247
+msgid "You must specify a channel."
+msgstr ""
+
+#: src/extchat.c:1254
+msgid "You are not on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:1266
+msgid "You will no longer hear connection messages on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:1274
+msgid "You will now hear connection messages on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:1279
+msgid "Mute status must be 'yes' or 'no'."
+msgstr ""
+
+#: src/extchat.c:1291
+msgid "You are not permitted to hide on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:1298
+msgid "You no longer appear on channel <%s>'s who list."
+msgstr ""
+
+#: src/extchat.c:1305
+msgid "You now appear on channel <%s>'s who list."
+msgstr ""
+
+#: src/extchat.c:1310
+msgid "Hide status must be 'yes' or 'no'."
+msgstr ""
+
+#: src/extchat.c:1322
+msgid "You will no longer hear messages on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:1329
+msgid "You will now hear messages on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:1334
+msgid "Gag status must be 'yes' or 'no'."
+msgstr ""
+
+#: src/extchat.c:1354
+msgid "You must specify a channel."
+msgstr ""
+
+#: src/extchat.c:1358
+msgid "Title too long."
+msgstr ""
+
+#: src/extchat.c:1364
+msgid "You are not on channel <%s>."
+msgstr ""
+
+#: src/extchat.c:1369
+msgid "Title set."
+msgstr ""
+
+#: src/extchat.c:1443
+msgid "CHAT: %s has removed all users from <%s>."
+msgstr ""
+
+#: src/extchat.c:1461
+msgid "CHAT: Wipe that silly grin off your face instead."
+msgstr ""
+
+#: src/extchat.c:1466
+msgid "CHAT: Channel <%s> wiped."
+msgstr ""
+
+#: src/extchat.c:1481
+msgid "CHAT: Only a Wizard can do that."
+msgstr ""
+
+#: src/extchat.c:1488
+msgid "CHAT: Invalid owner."
+msgstr ""
+
+#: src/extchat.c:1496
+msgid "CHAT: Channel <%s> now owned by %s."
+msgstr ""
+
+#: src/extchat.c:1544
+msgid "CHAT: Channel <%s> resists."
+msgstr ""
+
+#: src/extchat.c:1554
+msgid "CHAT: I don't understand that key."
+msgstr ""
+
+#: src/extchat.c:1563
+msgid "CHAT: Joinlock on <%s> %s."
+msgstr ""
+
+#: src/extchat.c:1571
+msgid "CHAT: Speaklock on <%s> %s."
+msgstr ""
+
+#: src/extchat.c:1579
+msgid "CHAT: Seelock on <%s> %s."
+msgstr ""
+
+#: src/extchat.c:1581
+msgid "reset"
+msgstr ""
+
+#: src/extchat.c:1581
+msgid "set"
+msgstr ""
+
+#: src/extchat.c:1587
+msgid "CHAT: Hidelock on <%s> %s."
+msgstr ""
+
+#: src/extchat.c:1589
+msgid "reset"
+msgstr ""
+
+#: src/extchat.c:1589
+msgid "set"
+msgstr ""
+
+#: src/extchat.c:1595
+msgid "CHAT: Modlock on <%s> %s."
+msgstr ""
+
+#: src/extchat.c:1597
+msgid "reset"
+msgstr ""
+
+#: src/extchat.c:1597
+msgid "set"
+msgstr ""
+
+#: src/extchat.c:1635
+msgid "CHAT: I don't recognize that channel."
+msgstr ""
+
+#: src/extchat.c:1657
+msgid "CHAT: No permission to decompile <%s>"
+msgstr ""
+
+#: src/extchat.c:1703
+msgid "CHAT: No channel matches that string."
+msgstr ""
+
+#: src/extchat.c:1718
+msgid "CHAT: New title too long."
+msgstr ""
+
+#: src/extchat.c:1725
+msgid "CHAT: Yeah, right."
+msgstr ""
+
+#: src/extchat.c:1731
+msgid "CHAT: Channel <%s> title cleared."
+msgstr ""
+
+#: src/extchat.c:1734
+msgid "CHAT: Channel <%s> title set."
+msgstr ""
+
+#: src/extmail.c:211
+msgid "(no subject)"
+msgstr ""
+
+#: src/extmail.c:233
+msgid "MAIL: Current folder is %d [%s]."
+msgstr ""
+
+#: src/extmail.c:239
+msgid "MAIL: What folder is that?"
+msgstr ""
+
+#: src/extmail.c:245
+msgid "MAIL: Folder name too long"
+msgstr ""
+
+#: src/extmail.c:250
+msgid "MAIL: Illegal folder name"
+msgstr ""
+
+#: src/extmail.c:255
+msgid "MAIL: Folder %d now named '%s'"
+msgstr ""
+
+#: src/extmail.c:260
+msgid "MAIL: Current folder set to %d [%s]."
+msgstr ""
+
+#: src/extmail.c:274
+msgid "MAIL: You must specify a folder name or number"
+msgstr ""
+
+#: src/extmail.c:279
+msgid "MAIL: What folder is that?"
+msgstr ""
+
+#: src/extmail.c:283
+msgid "MAIL: Folder %d now has no name"
+msgstr ""
+
+#: src/extmail.c:357
+msgid "MAIL: All messages in all folders %s."
+msgstr ""
+
+#: src/extmail.c:358
+msgid "untagged"
+msgstr ""
+
+#: src/extmail.c:358
+msgid "tagged"
+msgstr ""
+
+#: src/extmail.c:363
+msgid "MAIL: Msg #%d:%d %s."
+msgstr ""
+
+#: src/extmail.c:364
+msgid "untagged"
+msgstr ""
+
+#: src/extmail.c:364
+msgid "tagged"
+msgstr ""
+
+#: src/extmail.c:370
+msgid "MAIL: All messages in all folders %s."
+msgstr ""
+
+#: src/extmail.c:371
+msgid "uncleared"
+msgstr ""
+
+#: src/extmail.c:371
+msgid "cleared"
+msgstr ""
+
+#: src/extmail.c:378
+msgid "MAIL: Unread Msg #%d:%d cleared! Use @mail/unclear %d:%d to recover."
+msgstr ""
+
+#: src/extmail.c:382
+msgid "MAIL: Msg #%d:%d %s."
+msgstr ""
+
+#: src/extmail.c:383
+msgid "uncleared"
+msgstr ""
+
+#: src/extmail.c:383
+msgid "cleared"
+msgstr ""
+
+#: src/extmail.c:393
+msgid "MAIL: You don't have any matching messages!"
+msgstr ""
+
+#: src/extmail.c:415
+msgid "MAIL: Invalid folder specification"
+msgstr ""
+
+#: src/extmail.c:432
+msgid "MAIL: All messages filed in folder %d [%s]"
+msgstr ""
+
+#: src/extmail.c:438
+msgid "MAIL: Msg %d:%d filed in folder %d [%s]"
+msgstr ""
+
+#: src/extmail.c:446
+msgid "MAIL: You don't have any matching messages!"
+msgstr ""
+
+#: src/extmail.c:518
+msgid "MAIL: You don't have that many matching messages!"
+msgstr ""
+
+#: src/extmail.c:548
+msgid "---------------------------   MAIL (folder %d)  ------------------------------"
+msgstr ""
+
+#: src/extmail.c:668
+msgid "MAIL: Mailbox purged."
+msgstr ""
+
+#: src/extmail.c:695
+msgid "MAIL: To whom should I forward?"
+msgstr ""
+
+#: src/extmail.c:705
+msgid "MAIL: You have no messages to forward."
+msgstr ""
+
+#: src/extmail.c:726
+msgid "MAIL: You can't reply to nonexistant mail."
+msgstr ""
+
+#: src/extmail.c:747
+msgid "No such unique player: %s."
+msgstr ""
+
+#: src/extmail.c:763
+msgid "MAIL: %d messages forwarded."
+msgstr ""
+
+#: src/extmail.c:788
+msgid "MAIL: I can't figure out who you want to mail to."
+msgstr ""
+
+#: src/extmail.c:792
+msgid "MAIL: I can't figure out what you want to send."
+msgstr ""
+
+#: src/extmail.c:810
+msgid "(no subject)"
+msgstr ""
+
+#: src/extmail.c:826
+msgid "MAIL: You can't reply to nonexistent mail."
+msgstr ""
+
+#: src/extmail.c:859
+msgid "No such unique player: %s."
+msgstr ""
+
+#: src/extmail.c:975
+msgid "MAIL: You cannot send mail to non-existent people."
+msgstr ""
+
+#: src/extmail.c:979
+msgid "MAIL: You probably don't wanna send mail saying 'clear'."
+msgstr ""
+
+#: src/extmail.c:984
+msgid "MAIL: %s is not accepting mail from you right now."
+msgstr ""
+
+#: src/extmail.c:990
+msgid "MAIL: %s's mailbox is full. Can't send."
+msgstr ""
+
+#: src/extmail.c:1004
+msgid "(no subject)"
+msgstr ""
+
+#: src/extmail.c:1090
+msgid "MAIL: You sent your message to %s."
+msgstr ""
+
+#: src/extmail.c:1091
+msgid "MAIL: You have a new message (%d) from %s."
+msgstr ""
+
+#: src/extmail.c:1111
+msgid "The postal service issues a warrant for your arrest."
+msgstr ""
+
+#: src/extmail.c:1129
+msgid "** MAIL PURGE ** done by %s(#%d)."
+msgstr ""
+
+#: src/extmail.c:1131
+msgid "You annihilate the post office. All messages cleared."
+msgstr ""
+
+#: src/extmail.c:1147
+msgid "Go get some bugspray."
+msgstr ""
+
+#: src/extmail.c:1156
+msgid "%s: no such player."
+msgstr ""
+
+#: src/extmail.c:1161
+msgid "Mail cleared for %s(#%d)."
+msgstr ""
+
+#: src/extmail.c:1166
+msgid "Bad object #%d has mail."
+msgstr ""
+
+#: src/extmail.c:1168
+msgid "%s(#%d) has mail but is not a player."
+msgstr ""
+
+#: src/extmail.c:1174
+msgid "Mail database top is %d, actual message count is %d. Fixing."
+msgstr ""
+
+#: src/extmail.c:1178
+msgid "Mail sanity check completed."
+msgstr ""
+
+#: src/extmail.c:1182
+msgid "Fixing mail for #%d."
+msgstr ""
+
+#: src/extmail.c:1216
+msgid "Mail sanity fix completed."
+msgstr ""
+
+#: src/extmail.c:1218
+msgid "That is not a debugging option."
+msgstr ""
+
+#: src/extmail.c:1260
+msgid "%s: No such player."
+msgstr ""
+
+#: src/extmail.c:1264
+msgid "The post office protects privacy!"
+msgstr ""
+
+#: src/extmail.c:1270
+msgid "Sorry, that command has been temporarily disabled."
+msgstr ""
+
+#: src/extmail.c:1274
+msgid "Finding mail stats costs %d %s."
+msgstr ""
+
+#: src/extmail.c:1281
+msgid "There are %d messages in the mail spool."
+msgstr ""
+
+#: src/extmail.c:1294
+msgid "MAIL: There are %d msgs in the mail spool, %d unread, %d cleared."
+msgstr ""
+
+#: src/extmail.c:1312
+msgid "MAIL: There are %d old msgs in the mail spool, totalling %d characters."
+msgstr ""
+
+#: src/extmail.c:1316
+msgid "MAIL: There are %d new msgs in the mail spool, totalling %d characters."
+msgstr ""
+
+#: src/extmail.c:1320
+msgid "MAIL: There are %d cleared msgs in the mail spool, totalling %d characters."
+msgstr ""
+
+#: src/extmail.c:1335
+msgid "%s sent %d messages."
+msgstr ""
+
+#: src/extmail.c:1336
+msgid "%s has %d messages."
+msgstr ""
+
+#: src/extmail.c:1365
+msgid "Mail statistics for %s:"
+msgstr ""
+

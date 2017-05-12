@@ -1,0 +1,149 @@
+#!/usr/bin/perl
+use strict;
+use base 'LEOCHARRE::CLI';
+use vars qw(@MODULES);
+
+
+my $o = gopts('m:uaV');
+
+
+
+
+@MODULES = @ARGV;
+(push @MODULES, $o->{m})  if $o->{m};
+
+if ($o->{a}){
+   
+   print join( "\n", @INC);
+
+}
+
+
+
+if ($o->{a}){
+
+   for my $inc (@INC){
+      print STDERR "looking in $inc ..\n";
+      my @got = find_modules_in($inc)
+         or print STDERR "none found.\n";
+      printf STDERR "found %s modules.\n", scalar @got;
+      push @MODULES, @got;
+   }
+
+
+}
+
+scalar @MODULES or die("no modules arg");
+printf STDERR "Testing for %s module total.. \n", scalar @MODULES;
+
+
+sub find_modules_in {
+   my $dir = shift;
+
+   my @modnames;
+
+   for my $path ( split( /\n/, `find '$dir' -type f -name "*.pm"`) ){
+      $path=~s/^$dir\/+//;
+      $path=~s/\//\:\:/g;
+      $path=~s/\.pm$//;
+      push @modnames, $path;
+   }
+
+   return @modnames;
+}
+
+
+for my $modname ( @MODULES ){
+   my($vold, $vnew);
+
+   unless( ($vold, $vnew) = is_update_available($modname) ){
+      print STDERR "$modname, no update found.\n" if DEBUG;
+      print STDERR "." if $o->{V};
+      next;
+   }
+
+   print STDERR "$modname $vold, update $vnew found.\n";
+   $o->{u} or next;
+
+   unless( $o->{f} ){ # no force?
+      yn("Would you like to update?")
+      or next;
+   }
+
+   system('cpan', $modname) ==0 or warn("could not update $modname")
+      and next;
+
+}
+
+
+
+
+
+
+
+sub is_update_available {
+   my $modname = shift;
+
+   my $v_installed = `pmver $modname 2>/dev/null`;
+   $v_installed=~s/^\s+|\s+$//g;
+
+   unless( defined $v_installed ){
+      print STDERR "$modname installed, missing version\n";
+      return;
+   }
+
+   my $v_cpan = `pmvercpan $modname 2>/dev/null`;
+   $v_cpan=~s/^\s+|\s+$//g;
+
+   unless( defined $v_cpan ){
+      print STDERR "$modname on cpan, missing version\n";
+      return;
+   }
+
+
+   if ( $v_installed < $v_cpan ){
+      return ($v_installed, $v_cpan);
+   }
+   return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub usage {
+   return qq{
+$0 - check status of perl modules installed against versions on cpan
+
+
+
+OPTION FLAGS
+
+   -a all modules 
+   -u auto update modules
+   -V verbose
+
+
+ARGUMENTS
+
+   -m module name to check
+   -b base dir to check modules from
+
+SEE ALSO
+
+LEOCHARRE::Dev
+
+   
+   };
+
+}

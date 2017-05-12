@@ -1,0 +1,14 @@
+# config.mk
+
+BINDIR=$(topdir)/bin
+LIBDIR=$(topdir)/lib
+SRCDIR=$(topdir)/src
+
+CC:=@CC@
+DEFS:=-D_ENABLE_TILT -D_ENABLE_FORCE #-D_DISABLE_NONBLOCK_UPDATES -D_DISABLE_AUTO_SELECT_DEVICE
+#CFLAGS:=-O3 -march=athlon-xp -Wall -pipe
+CFLAGS:=-Os -Wall -pipe $(DEFS) @CFLAGS@
+INCLUDES:=-I$(topdir)/src
+LIBS:=@LDFLAGS@
+
+VPATH=:$(BINDIR) $(LIBDIR)

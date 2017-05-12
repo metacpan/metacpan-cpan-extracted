@@ -1,0 +1,60 @@
+{
+   "abstract" : "Utility functions",
+   "author" : [
+      "Orkun Karaduman <orkunkaraduman@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lazy-Utils",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.90",
+            "Pod::Simple::Text" : "3.26",
+            "Term::ReadKey" : "2.33",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Lazy-Utils@rt.cpan.org",
+         "web" : "https://github.com/orkunkaraduman/Lazy-Utils/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Lazy-Utils",
+      "license" : [
+         "https://www.gnu.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git@github.com:orkunkaraduman/Lazy-Utils.git",
+         "web" : "https://github.com/orkunkaraduman/Lazy-Utils"
+      }
+   },
+   "version" : "1.16",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

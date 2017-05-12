@@ -1,0 +1,11 @@
+<Sect1 id="sec-pretty">
+<Title><Literal>Pretty</Literal>: Pretty printing combimators
+<IndexTerm><Primary>Pretty</Primary></IndexTerm>
+</Title>
+
+  <para>The <literal>Pretty</literal> library has been moved to the
+  hierarchical libraries; it can be found in
+  <ulink url="../base/Text.PrettyPrint.HughesPJ.html"><literal>Text.PrettyPrint.HughesPJ</literal></ulink> in the
+  <literal>base</literal> package.</para>
+
+</Sect1>

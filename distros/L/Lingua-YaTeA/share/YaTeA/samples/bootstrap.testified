@@ -1,0 +1,23 @@
+( gene<=M=NN> promoters<=H=NNS> )	gene promoters	NN NNS	gene promoter	NNS	termsPhB
+( high<=M=JJ> concentrations<=H=NNS> )	NNS	high concentrations	JJ NNS	high concentration	NNS	termsPhB
+( protein<=H=NN> of ( Bacillus<=H=NN> subtilis<=M=NN> )<=M=NN> )	protein of Bacillus subtilis	NN of NN NN	protein of Bacillus subtilis	NN	termsPhB
+( heat<=M=NN> shock<=H=NN> )	heat shock	NN NN	heat shock	NN	termsPhB
+( Transcription<=M=NN> factor<=H=NN> )	Transcription factor	NN NN	Transcription factor	NN	termsPhB
+( spore<=M=JJ> coat<=H=NN> )	spore coat	JJ NN	spore coat	NN	termsPhB
+( primer<=M=NN> extension<=H=NN> )	primer extension	NN NN	primer extension	NN	termsPhB
+( promoter<=M=NN> regions<=H=NNS> )	promoter regions	NN NNS	promoter region	NNS	termsPhB
+( DNase<=H=NN> I<=M=CD> )	DNase I	NN CD	DNase I	NN	termsPhB
+( Bacillus<=H=NN> subtilis<=M=NNS> )	Bacillus subtilis	NN NNS	Bacillus subtili	NN	termsPhB
+( gene<=M=NN> expression<=H=NN> )	gene expression	NN NN	gene expression	NN	termsPhB
+( DNA-binding<=M=JJ> protein<=H=NN> )	DNA-binding protein	JJ NN	DNA-binding protein	NN	termsPhB
+( spore<=M=JJ> proteins<=H=NNS> )	spore proteins	JJ NNS	spore protein	NNS	termsPhB
+( protein<=M=NN> synthesis<=H=NN> )	protein synthesis	NN NN	protein synthesis	NN	termsPhB
+( RNA<=M=NN> polymerase<=H=NN> )	RNA polymerase	NN NN	RNA polymerase	NN	termsPhB
+( extension<=M=NN> analysis<=H=NN> )	extension analysis	NN NN	extension analysis	NN	termsPhB
+( B.<=H=NNP> subtilis<=M=NNS> )	B. subtilis	NNP NNS	B. subtili	NNP	termsPhB
+( low<=M=JJ> concentration<=H=NN> )	low concentration	JJ NN	low concentration	NN	termsPhB
+( coat<=M=NN> protein<=H=NN> )	coat protein	NN NN	coat protein	NN	termsPhB
+( mother<=M=NN> cell<=H=NN> )	mother cell	NN NN	mother cell	NN	termsPhB
+( low<=M=JJ> levels<=H=NNS> )	low levels	JJ NNS	low level	NNS	termsPhB
+( binding<=M=VBG> site<=H=NN> )	binding site	VBG NN	bind site	NN	termsPhB
+( in<=M=FW> vitro<=H=FW> )	in vitro	FW FW	in vitro	RB	termsPhB

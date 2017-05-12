@@ -1,0 +1,27 @@
+NameVirtualHost *:80
+<virtualhost *:80>
+ServerName [% nameserver %]
+
+ proxyPass         /         http://[% nameserver %]/
+ proxyPassReverse  /          http://[% nameserver %]/
+scriptalias /generator /usr/local/monapache/generator/
+<location /generator>
+  PerlOptions +GlobalRequest
+  PerlOptions -ParseHeaders
+</location>
+</virtualhost>
+
+
+NameVirtualHost *:443
+<virtualhost *:443>
+ServerName [% nameserver %]
+
+ proxyPass         /          https://[% nameserver %]/
+ proxyPassReverse  /          https://[% nameserver %]/
+scriptalias /portal /usr/local/monapache/generator/
+<location /generator>
+ PerlOptions +GlobalRequest
+ PerlOptions -ParseHeaders
+</location>
+</virtualhost>
+################# fin config apache ############################

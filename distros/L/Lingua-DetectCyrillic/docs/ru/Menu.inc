@@ -1,0 +1,3 @@
+$LocalMenuStart='<h4 style="margin-left:100px">Пакет <b>Lingua::DetectCyrillic </b></h4><table  cellspacing=4 width=80%><tr><td ><a href="index.htm">Оглавление</td><td ><a href="DetectCyrillic.htm">Документация</a></td><td ><a href="DetectCyrillic_test.htm">Тест</a></td><td><a href="Download.htm">Загрузка</a></td><td width=50%><td>Language:</td>';
+$LocalMenuLang='<td><a href="../ru/index.htm">Russian</a></td><td><a href="../en/index.htm">English</a></td>';
+$LocalMenuEnd='</tr></table>';

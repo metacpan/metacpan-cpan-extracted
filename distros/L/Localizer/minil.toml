@@ -1,0 +1,3 @@
+name = "Localizer"
+authority="CPAN:TOKUHIROM"
+badges = ["travis"]

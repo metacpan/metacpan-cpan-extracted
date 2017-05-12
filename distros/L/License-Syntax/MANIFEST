@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Syntax.pm
+t/00-load.t
+t/01-boilerplate.t
+t/02-pod.t
+t/03-pod-coverage.t
+t/10-init.t
+t/11-diag.t
+t/12-mapio.t
+t/13-parse.t
+license_map.csv
+synopsis.csv
+license_syntax.pl
+
+META.yml                                 Module meta-data (added by MakeMaker)

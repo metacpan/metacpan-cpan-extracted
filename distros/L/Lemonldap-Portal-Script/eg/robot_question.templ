@@ -1,0 +1,14 @@
+[% PROCESS question %]
+
+[% BLOCK question %]
+### GET  echange numero [%numero%] ############################
+#                          
+$question = $browser->get($line_location,
+	@des_h_questions );
+###############################################################
+# managing timeout 
+exit 1 if $question->code !~ /\d\d\d/;
+# managing 4nn ou 5nn code (only 2nn ou 3nn are correct
+exit $question->code  if $question->code =~ /^4/;
+exit $question->code  if $question->code =~ /^5/;
+[% END %]

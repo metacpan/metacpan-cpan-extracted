@@ -1,0 +1,10 @@
+2009-08-25 14:46  cvs
+
+	* lib/Lingua/: Names.pm, Names.pod: fixed error in SYNOPSIS
+
+2009-08-07 02:23  cvs
+
+	* INSTALL, MANIFEST, Makefile.PL, README, lib/Lingua/Names.pm,
+	  lib/Lingua/Names.pod, t/00-compile.t, t/01-is_name.t: Initial
+	  revision
+

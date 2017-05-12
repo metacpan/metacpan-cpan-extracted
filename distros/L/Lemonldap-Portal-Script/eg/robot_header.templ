@@ -1,0 +1,12 @@
+[% PROCESS header_question %]
+
+
+[% BLOCK header_question  %]
+## genered by header_question ##
+my @des_h_questions = (
+[% FOREACH item IN list_HQ.keys %]
+ '[%item%]', '[%list_HQ.$item%]',
+[% END %]
+   );
+## genered by header_question ##
+[% END %]

@@ -1,0 +1,30 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         List-Filter
+version:      0.04
+version_from: lib/List/Filter.pm
+installdirs:  site
+requires:
+    base:                          0
+    Carp:                          0
+    Class::Base:                   0.03
+    DBI:                           1
+    Env:                           0
+    Exporter:                      1
+    File::Basename:                0
+    File::Copy:                    0
+    File::Path:                    0
+    FindBin:                       0
+    Hash::Util:                    0
+    lib:                           0
+    Memoize:                       0
+    Module::List:                  0.001
+    Module::List::Pluggable:       0.01
+    strict:                        0
+    Test::More:                    0
+    Test::Trap:                    0
+    warnings:                      0
+    YAML:                          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

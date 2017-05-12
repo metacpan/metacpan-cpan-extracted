@@ -1,0 +1,12 @@
+Changes
+demo.pl
+grammarian_cautions
+grammarian_errors
+lib/Lingua/EN/Grammarian.pm
+Makefile.PL
+MANIFEST
+plugin/grammarian.vim
+README
+t/00.load.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

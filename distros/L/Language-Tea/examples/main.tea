@@ -1,0 +1,11 @@
+#       Tea Scripting language example       #
+#                                            #
+# this example writes an array to std Output #
+##############################################
+
+tea-autoload classExample "classExample.tea" #imports the class file 
+define use [new classExample] #creates an object
+
+define array ("Tea Script Language" "Developed by PDM&FC" ("Home page: http://www.pdmfc.com/" "Download interpreter from: http://www.pdmfc.com/tea-site/info/download.html") "End of test Script") #array definition
+
+use showArray $array #call method of class to print the array

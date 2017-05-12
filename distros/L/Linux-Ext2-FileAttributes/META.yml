@@ -1,0 +1,14 @@
+---
+name: Linux-Ext2-FileAttributes
+version: 0.01
+author:
+  - 'Dean Wilson <dean.wilson@gmail.com>'
+abstract: Access to Ext2/3 filesystem extended attributes
+license: perl
+build_requires:
+  Test::More: 0
+provides:
+  Linux::Ext2::FileAttributes:
+    file: lib/Linux/Ext2/FileAttributes.pm
+    version: 0.01
+generated_by: Module::Build version 0.26

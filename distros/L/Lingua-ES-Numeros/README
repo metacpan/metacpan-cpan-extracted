@@ -1,0 +1,46 @@
+Lingua-ES-Numeros version 0.02
+==============================
+
+NAME
+    Lingua::ES::Numeros - Translates numbers to spanish text
+
+SYNOPSIS
+       use Lingua::ES::Numeros
+
+       $obj = new Lingua::ES::Numeros ('MAYUSCULAS' => 1)
+       print $obj->Cardinal(124856), "\n";
+       print $obj->Real(124856.531), "\n";
+       $obj->{GENERO} = 'a';
+       print $obj->Ordinal(124856), "\n";
+
+DESCRIPTION
+    Lingua::ES::Numeros converts arbitrary numbers into human-oriented
+    Spanish text.
+
+    This module supports the translation of cardinal, ordinal and, real
+    numbers, the module handles integer numbers up to vigintillions (that's
+    1e120), since Perl does not handle such numbers natively, numbers are
+    kept as text strings because processing does not justify using bigint.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Perl 5.6 and Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001-2007 by Jose Rey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6 or,
+at your option, any later version of Perl 5 you may have available.
+

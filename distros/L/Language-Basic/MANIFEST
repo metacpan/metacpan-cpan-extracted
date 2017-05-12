@@ -1,0 +1,36 @@
+Changes				What's new / Module history
+INSTALL				How to install Language::Basic
+MANIFEST			This file
+Makefile.PL			Perl script to create Makefile
+NOTES				Notes on future plans, etc. (verbose)
+README				Module introduction
+TODO				Plans for the future (brief)
+lib/Language/Basic.pm		The main module
+lib/Language/Basic/Common.pm	Methods used by lots of packages (e.g. errors)
+lib/Language/Basic/Expression.pm  Arithmetic, string, & other expressions
+lib/Language/Basic/Function.pm	Intrinsic & user-defined functions
+lib/Language/Basic/Statement.pm	If, Goto, and other sorts of BASIC statements
+lib/Language/Basic/Syntax.pod	Description of understood BASIC syntax
+lib/Language/Basic/Token.pm	Lexer + classes/methods for handling tokens
+lib/Language/Basic/Variable.pm	Numeric and String Scalar and Array Variables
+scripts/basic.pl		Runs BASIC programs
+scripts/basic2pl.pl		Program to convert BASIC to Perl
+scripts/termbasic.pl		A Term::Readline BASIC interpreter
+t/aaa_me_first.t		Test whether LB works at all
+t/array.t
+t/colon.t
+t/data.t
+t/def.t
+t/end.t
+t/expression.t
+t/for.t				t/*.t scripts test various features of BASIC
+t/gosub.t
+t/goto.t
+t/if.t
+t/intrinsic.t
+t/let.t
+t/on.t
+t/rem.t
+t/testbasic.pl			Include file used by t/*.t
+t/zzz_me_last.t			Not exactly a test... :)
+wumpus.bas			Gregory Yob's classic Hunt the Wumpus game

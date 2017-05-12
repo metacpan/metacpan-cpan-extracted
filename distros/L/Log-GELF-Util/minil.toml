@@ -1,0 +1,4 @@
+name = "Log-GELF-Util"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

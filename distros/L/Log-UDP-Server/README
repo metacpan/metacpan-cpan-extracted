@@ -1,0 +1,128 @@
+NAME
+    Log::UDP::Server - A simple way to receive and handle structured
+    messages via UDP
+
+VERSION
+    version 0.40.0
+
+SYNOPSIS
+        use Log::UDP::Server;
+
+        my $server = Log::UDP::Server->new( handler => sub { warn( $_[0] ); } );
+        $server->run();
+
+DESCRIPTION
+    This module enables you to receive a message (simple string or
+    complicated object) over a UDP socket. An easy way to send a structured
+    message is to use Log::UDP::Client. The message received will
+    automatically be handled by the specified callback.
+
+ATTRIBUTES
+  handler : CodeRef
+    The handler that is used to process each message as it is received.
+
+  server_address : Str
+    The address you want to listen on.
+
+  server_port : Int
+    The port you want to listen on.
+
+  server_socket : IO::Socket::INET
+    The listening socket used for communication.
+
+METHODS
+  run
+    Starts the server and listens for incoming datagrams on the specified
+    socket.
+
+  START
+    Initializes the "get_datagram" event on "server_socket".
+
+EVENTS
+  get_datagram
+    Will execute the coderef in "handler" with the deserialized message as
+    the first argument.
+
+CONSTANTS
+  $DATAGRAM_MAXLEN : Int
+    Maximum UDP packet size. Set to 8192 bytes.
+
+INHERITED METHODS
+    *   deserialize
+
+    *   deserializer
+
+    *   serialize
+
+    *   serializer
+
+    *   serializer_module
+
+    *   throws_exception
+
+    All of these methods are inherited from Data::Serializable. Read more
+    about them there.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Log::UDP::Server
+
+  Websites
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Log-UDP-Server>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Log-UDP-Server>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Log-UDP-Server>
+
+    *   CPAN Forum
+
+        <http://cpanforum.com/dist/Log-UDP-Server>
+
+    *   RT: CPAN's Bug Tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-UDP-Server>
+
+    *   CPANTS Kwalitee
+
+        <http://cpants.perl.org/dist/overview/Log-UDP-Server>
+
+    *   CPAN Testers Results
+
+        <http://cpantesters.org/distro/L/Log-UDP-Server.html>
+
+    *   CPAN Testers Matrix
+
+        <http://matrix.cpantesters.org/?dist=Log-UDP-Server>
+
+    *   Source Code Repository
+
+        The code is open to the world, and available for you to hack on.
+        Please feel free to browse it and play with it, or whatever. If you
+        want to contribute patches, please send me a diff or prod me to pull
+        from your repository :)
+
+        <git://github.com/robinsmidsrod/Log-UDP-Server.git>
+
+  Bugs
+    Please report any bugs or feature requests to "bug-log-udp-server at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Log-UDP-Server>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+AUTHOR
+    Robin Smidsrød <robin@smidsrod.no>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robin Smidsrød.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

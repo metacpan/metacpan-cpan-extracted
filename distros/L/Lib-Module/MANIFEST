@@ -1,0 +1,12 @@
+Artistic
+INSTALL
+Makefile
+Makefile.old
+Makefile.PL
+MANIFEST
+Module.pm
+ModuleSymbol.pm
+MYMETA.yml
+SymbolRef.pm
+t/use.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,33 @@
+---
+abstract: 'Adds some utility functionality and failure handling to Local::Maketext handles'
+author:
+  - 'Daniel Muey, L<http://drmuey.com/cpan_contact.pl>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-Maketext-Utils
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: '0'
+  Encode: '0'
+  IO::Interactive::Tiny: '0'
+  Locale::Maketext: '1.23'
+  Locales: '0.32'
+  Module::Want: '0'
+  Net::IDN::Encode: '2.005'
+  Test::Carp: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  Test::Warn: '0'
+  Web::Detect: '0.04'
+version: '0.42'

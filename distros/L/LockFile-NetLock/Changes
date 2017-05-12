@@ -1,0 +1,9 @@
+Revision history for Perl extension LockFile::NetLock
+
+0.31	February 25, 2008
+
+Tell tests to "skip" with unavailable test data for automated test harnesses.
+
+0.32	February 28, 2008
+
+Fix test bug with loop asking for test domain.  Add LICENSE file.

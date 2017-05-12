@@ -1,0 +1,8 @@
+Revision history for Perl extension Language::MPI.
+
+2008.0217  Wed Feb 13 14:09:41 2008
+	- correct problem made by following an old perl module howto.
+
+2008.0213  Wed Feb 13 14:09:41 2008
+	- original Release
+

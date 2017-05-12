@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/listener.pl
+examples/log.conf
+examples/producer.pl
+lib/Log/Log4perl/Appender/Stomp.pm
+t/00.load.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

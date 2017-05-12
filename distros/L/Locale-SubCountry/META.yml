@@ -1,0 +1,36 @@
+---
+abstract: 'Convert state, province, county etc. names to/from ISO 3166-2 codes, get all states in a country'
+author:
+  - 'Kim Ryan <kimryan at cpan org>'
+build_requires:
+  Test::More: '0.94'
+  Test::Pod: '1.04'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4208, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-SubCountry
+provides:
+  Locale::SubCountry:
+    file: lib/Locale/SubCountry.pm
+    version: '2.02'
+  Locale::SubCountry::Codes:
+    file: lib/Locale/SubCountry/Codes.pm
+  Locale::SubCountry::World:
+    file: lib/Locale/SubCountry.pm
+    version: '2.02'
+requires:
+  JSON: '1'
+  locale: '1'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/kimryan/Locale-SubCountry
+version: '2.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

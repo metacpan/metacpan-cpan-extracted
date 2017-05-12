@@ -1,0 +1,24 @@
+ASCII.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+t/1.t
+t/special_characters.t
+t/words_with_umlaut_and_ß.t
+t/to_ascii.t
+t/to_latin1.t
+t/only_ascii.t
+
+t/words_with_foreign.dat
+t/words_with_ä.dat
+t/words_with_ö.dat
+t/words_with_ü.dat
+t/words_with_ß.dat
+t/words_with_ae.dat
+t/words_with_oe.dat
+t/words_with_ue.dat
+t/words_with_ss.dat
+t/english.dat
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

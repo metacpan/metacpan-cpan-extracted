@@ -1,0 +1,55 @@
+Lingua-HPSG
+
+I'm writing some perl code to exercise my brain and maybe help me do
+my homework.
+
+It doesn't do anything... yet... muahahahaha
+
+It looks like there's an older version of the book published here:
+
+http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.98.4929&rep=rep1&type=pdf
+
+You can purchase the dead-tree version here:
+
+http://www.amazon.com/dp/1575864002
+
+All page numbers referenced in this code are for the second edition
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Lingua::HPSG
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-HPSG
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Lingua-HPSG
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Lingua-HPSG
+
+    Search CPAN
+        http://search.cpan.org/dist/Lingua-HPSG
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 C.J. Adams-Collier
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

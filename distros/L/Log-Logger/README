@@ -1,0 +1,25 @@
+Log/Logger.pm 1.01
+
+----
+
+Standard build
+
+perl Makefile.PL
+make
+make install
+
+Nothing simpler
+
+----
+
+This is just a simple interface to user-defined logfiles.  The three
+main functions are:
+
+log(string) - writes <string> to the logfile.
+log_print(string) - writes <string> to the logfile and STDOUT.
+fail(string) - writes <string> to the logfile and STDOUT, and exits.
+
+Copyright (c) 1998 Joel Becker.  All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+

@@ -1,0 +1,34 @@
+---
+abstract: 'A minimal and fast alternative to L<Linux::Smaps>'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  List::Util: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300040, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Linux-Smaps-Tiny
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Exporter: 0
+  XSLoader: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Linux-Smaps-Tiny
+  homepage: http://metacpan.org/release/Linux-Smaps-Tiny
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/avar/linux-smaps-tiny.git
+version: 0.10
+x_authority: cpan:AVAR

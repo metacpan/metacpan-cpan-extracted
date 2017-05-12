@@ -1,0 +1,137 @@
+#!/usr/bin/perl
+use strict ;
+use Pod::Usage ;
+use Getopt::Long qw/:config no_ignore_case/ ;
+use File::Basename ;
+
+++$! ;
+
+use Linux::DVB::DVBT::TS ;
+
+our $VERSION = '1.000' ;
+
+    my $progname = basename $0 ;
+
+	my ($help, $man, $DEBUG, $VERBOSE, $dbg_ts) ;
+	GetOptions('v|verbose=i' => \$VERBOSE,
+			   'debug=i' => \$DEBUG,
+			   'dbg-ts=i' => \$dbg_ts,
+			   'h|help' => \$help,
+			   'man' => \$man,
+			   ) or pod2usage(2) ;
+
+
+    pod2usage(1) if $help;
+    pod2usage(-verbose => 2) if $man;
+    pod2usage("$0: No arguments given.")  if (@ARGV == 0) ;
+    pod2usage("$0: No input filename given.")  if (@ARGV < 1) ;
+    pod2usage("$0: No output filename given.")  if (@ARGV < 2) ;
+	
+	my $filename = $ARGV[0] ;
+	my $ofilename = $ARGV[1] ;
+
+	## First get general information (including file duration)
+	my %info = Linux::DVB::DVBT::TS::info($filename, {
+		'debug'			=> $dbg_ts,
+	}) ;
+	printf "Video duration: %02d:%02d:%02d\n", $info{'duration'}{'hh'}, $info{'duration'}{'mm'}, $info{'duration'}{'ss'} ;
+	
+	## Now repair the file
+	my %stats = repair($filename, $ofilename, \&error_display) ;
+	
+	if ($stats{'error'})
+	{
+		print "Error: $stats{'error'}\n" ;
+	}
+	else
+	{
+		print "Repair statistics:\n" ;
+		foreach my $pid (sort {$a <=> $b} keys %stats)
+		{
+			print "  PID $pid : $stats{$pid}{'errors'} errors repaired\n" ;
+			foreach my $error_str (sort keys %{$stats{$pid}{'details'}})
+			{
+				print "   * $error_str ($stats{$pid}{'details'}{$error_str})\n" ;
+			}
+		}
+	}
+	print "\n" ;
+	
+
+#=================================================================================
+# CALLBACKS
+#=================================================================================
+
+
+#---------------------------------------------------------------------------------
+#
+sub error_display
+{
+	my ($info_href) = @_ ;
+	
+	if ($VERBOSE)
+	{
+		print STDERR "ERROR: PID $info_href->{'pidinfo'}{'pid'} $info_href->{'error'}{'str'} [$info_href->{'pidinfo'}{'pktnum'}]\n" ;
+	}
+}
+
+
+
+#=================================================================================
+# END
+#=================================================================================
+__END__
+
+=head1 NAME
+
+dvbt-ts-repair - Repair transport stream file
+
+=head1 SYNOPSIS
+
+dvbt-ts-repair [options] filename outfile
+
+Options:
+
+       -debug level         set debug level
+       -verbose level       set verbosity level
+       -help                brief help message
+       -man                 full documentation
+       
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Set verbosity level. Higher values show more information.
+
+=item B<-debug>
+
+Set debug level. Higher levels show more debugging information (only really of any interest to developers!)
+
+=back
+
+=head1 DESCRIPTION
+
+Script that uses the perl Linux::DVB::DVBT::TS package to provide transport stream video file functions.
+ 
+Runs the transport stream repair utility on a file, creating a new repaired file.
+
+
+=head1 FURTHER DETAILS
+
+For full details of the DVBT functions, please see L<Linux::DVB::DVBT::TS>:
+
+   perldoc Linux::DVB::DVBT::TS
+ 
+=cut
+
+	

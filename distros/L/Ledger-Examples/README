@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    This distribution contains various examples of valid and invalid Ledger
+    journal files in its per-dist share dir.
+
+SEE ALSO
+
+    Ledger::Parser
+
+    http://www.ledger-cli.org
+

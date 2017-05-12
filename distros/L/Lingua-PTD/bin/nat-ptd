@@ -1,0 +1,1140 @@
+#!/usr/bin/perl
+
+use utf8;
+use strict;
+use warnings;
+use 5.010;
+use Lingua::PTD;
+use Pod::Usage;
+use File::Spec::Functions 'catfile';
+use File::Copy 'cp';
+use List::MoreUtils 'uniq';
+use Term::ReadLine;
+use Encode 'decode';
+
+=head1 NAME
+
+=encoding UTF-8
+
+nat-ptd - concentrates a set of PTD commands in a common interface
+
+=head1 SYNOPSIS
+
+  nat-ptd [-v] <command> [command-args]
+
+=head1 DESCRIPTION
+
+C<< nat-ptd >> supports the following commands. Most places where a
+PTD needs to be specified, you can use a bziped2 PTD as far as the
+filename ends in bz2.
+
+=cut
+
+our $opts;
+my @args;
+
+our %command =
+  (
+   query     => [\&query     => 'Allows interactive PTD querying'],
+   intersect => [\&intersect => 'Intersects PTD domains, keep lower values'],
+   add       => [\&add       => 'Adds/aggregates two/more PTD.'],
+   compose   => [\&compose   => 'Compose PTDs into a final PTD.'],
+   compare   => [\&compare   => 'Compare two PTDs with some basic stats.'],
+   reprob    => [\&reprob    => 'Re-compute PTD probabilities.'],
+   lowercase => [\&lowercase => 'Lowercases PTD terms summing probabilities.'],
+   filter    => [\&filter    => 'Filters a PTD (or PTD pair).'],
+   help      => [\&help      => 'Lists available commands.'],
+   stats     => [\&stats     => 'Shows basic PTD statistics.'],
+   toDmp     => [\&toDmp     => 'Converts a PTD to Dumper format.'],
+   toDmpBz   => [\&toDmpBz   => 'Converts a PTD to Bzipped Dumper format.'],
+   toDmpXz   => [\&toDmpXz   => 'Converts a PTD to XZipped Dumper format.'],
+   toSQLite  => [\&toSQLite  => 'Converts a PTD to SQLite format.'],
+   toTSV       => [\&toTSV     => 'Exports a PTD in a TSV (OmegaT glossary friendly) format.'],
+   toStarDict  => [\&toStarDict     => 'Exports a PTD to StarDict format.'],
+   'grep'    => [\&grep      => 'Lists entries matching a specific pattern.'],
+   ucts      => [\&ucts      => 'Create unambiguous-concept translation sets.'],
+   bws       => [\&bws       => 'Create bi-words sets.'],
+  );
+
+
+binmode STDERR, ":utf8";
+
+($opts, @args) = _process_args(@ARGV);
+
+if (@args) {
+    my $command_opts;
+    my $command = shift @args;
+    ($command_opts, @args) = _process_args(@args);
+
+    $command = "help" unless exists($command{$command});
+    $command{$command}[0]->($command_opts, @args);
+} else {
+    $command{help}[0]->();
+}
+
+sub _DEBUG_ {
+    $opts->{v} && print STDERR "* ", @_, "\n";
+}
+
+=head2 help
+
+The method can be invoked without arguments, and a list of available
+commands will be printed.
+
+If an optional parameter with the name of a command is supplied, it
+prints detailed help for it (from this man-page).
+
+    nat-ptd help [command-name]
+
+=cut
+
+sub help {
+    my ($my_ops, @my_args) = @_;
+
+    if ($my_args[0] && $command{$my_args[0]}) {
+        pod2usage( -verbose => 99,
+                   -sections => ["DESCRIPTION/$my_args[0]"]);
+    } else {
+        select STDERR;
+        print "nat-ptd: performs various operations over PTD files:\n\n";
+        for my $c (sort keys %command) {
+            printf("%10s - %s\n", $c, $command{$c}[1]);
+        }
+        print "\nFor more help, please run 'perldoc nat-ptd'\n";
+        select STDOUT;
+    }
+}
+
+=head2 intersect
+
+Intersects domains from supplied PTDs. Keep lowerer counts and
+translation probabilities.
+
+As of recent NATools versions, you can supply an option C<-type> to
+specify the type of output file (C<dmp> or C<sqlite> are supported,
+and C<dmp> is the default).
+
+=cut
+
+sub intersect {
+    my ($my_opts, $ptd, @other) = @_;
+    my @cleanup;
+    if ($ptd =~ /sqlite$/) {
+        cp $ptd => "$ptd._.sqlite";
+        $ptd = "$ptd._.sqlite";
+        push @cleanup, $ptd;
+    }
+
+    my $type    = ($my_opts->{type} && $my_opts->{type} eq "sqlite") ? "sqlite" : "dmp";
+    $my_opts->{o} = "intersection.$type" if $type eq "sqlite" && !$my_opts->{o};
+
+    ($ptd && -f $ptd) or die "At least two dictionaries are required";
+    _DEBUG_ "loading first PTD [$ptd]";
+    $ptd = Lingua::PTD->new($ptd);
+
+    while (my $other = shift @other) {
+        -f $other or die "Can't read PTD file [$other]";
+        _DEBUG_ "loading other PTD [$other]";
+        $other = Lingua::PTD->new($other);
+
+        _DEBUG_ "intersecting PTDs";
+        $ptd->intersect($other);
+    }
+
+    if ($my_opts->{o}) {
+        $ptd->saveAs($type => $my_opts->{o});
+    } else {
+        $ptd->dump;
+    }
+
+    unlink $_ for @cleanup;
+}
+
+=head2 toSQLite
+
+This option can be used to convert a PTD to the SQLite format. First
+argument is the PTD filename. Second, optional, argument can be
+specified as the output filename.
+
+=cut
+
+sub toSQLite {
+    my ($my_opts, $ptd, $optd) = @_;
+    $optd ||= $ptd;
+    $optd = _get_output_filename("sqlite", $optd);
+
+    _DEBUG_ "loading PTD [$ptd].";
+    $ptd = Lingua::PTD->new($ptd);
+
+    _DEBUG_ "writing file [$optd].";
+    $ptd->saveAs("sqlite", $optd);
+}
+
+
+=head2 toDmp
+
+This option can be used to convert a PTD to the Dumper format. First
+argument is the PTD filename. Second, optional, argument can be
+specified as the output filename.
+
+=cut
+
+sub _get_output_filename {
+    my ($type, $name) = @_;
+    return $name if $name =~ /$type$/;
+    $name =~ s/\.(dmp|dmp\.bz2|dmp\.xz|sqlite)$/\.$type/;
+    $name .= "\.$type" unless $name =~ /$type$/;
+    return $name;
+}
+
+sub toDmp {
+    my ($my_opts, $ptd, $optd) = @_;
+    $optd ||= $ptd;
+    $optd = _get_output_filename("dmp", $optd);
+
+    _DEBUG_ "loading PTD [$ptd].";
+    $ptd = Lingua::PTD->new($ptd);
+
+    _DEBUG_ "writing file [$optd].";
+    $ptd->saveAs("dmp", $optd);
+}
+
+=head2 toDmpBz
+
+This option can be used to convert a PTD to a Bzipped Dumper
+format. First argument is the PTD filename. Second, optional, argument
+can be specified as the output filename.
+
+=cut
+
+sub toDmpBz {
+    my ($my_opts, $ptd, $optd) = @_;
+    $optd ||= $ptd;
+    $optd = _get_output_filename("dmp.bz2", $optd);
+
+    _DEBUG_ "loading PTD [$ptd].";
+    $ptd = Lingua::PTD->new($ptd);
+
+    _DEBUG_ "writing file [$optd].";
+    $ptd->saveAs("bz2", $optd);
+}
+
+=head2 toDmpXz
+
+This option can be used to convert a PTD to a XZipped Dumper
+format. First argument is the PTD filename. Second, optional, argument
+can be specified as the output filename.
+
+=cut
+
+sub toDmpXz {
+    my ($my_opts, $ptd, $optd) = @_;
+    $optd ||= $ptd;
+    $optd = _get_output_filename("dmp.xz", $optd);
+
+    _DEBUG_ "loading PTD [$ptd].";
+    $ptd = Lingua::PTD->new($ptd);
+
+    _DEBUG_ "writing file [$optd].";
+    $ptd->saveAs("xz", $optd);
+}
+
+=head2 toTSV
+
+This option can be used to export a PTD to a plain text file using a Tab
+Separated Format. The first column represent each term, the second column
+the possible translation, and the third column the probability of this
+possible translation. This file can be directly used as a glossary in
+OmegaT.
+
+Usage:
+
+  ptd-nat toTSV [-m=<p>] <ptd-filename> <dst-filename>
+
+The following options can be used:
+
+=over 4
+
+=item C<-m=p>
+
+Minimum probabilty for translation to be exported. C<p> must be a probability
+in the interval [0,1] (default: 0.5).
+
+=back
+
+=cut
+
+sub toTSV {
+    my ($my_opts, $ptd, $optd) = @_;
+    $optd ||= $ptd;
+    $optd = _get_output_filename("tsv", $optd);
+
+    _DEBUG_ "loading PTD [$ptd].";
+    $ptd = Lingua::PTD->new($ptd);
+
+    _DEBUG_ "writing file [$optd].";
+    $ptd->saveAs("tsv", $optd, $my_opts);
+}
+
+=head2 toStarDict
+
+FIXME
+
+Usage:
+
+  ptd-nat toStarDict [-m=<p>] [-d=<directory>] <ptd-filename> <dst-dict-name>
+
+The following options can be used:
+
+=over 4
+
+=item C<-m=p>
+
+Minimum probabilty for translation to be exported. C<p> must be a probability
+in the interval [0,1] (default: 0.4).
+
+=item C<-d=directory>
+
+Destination directory for the created dictinary (default: .).
+
+=back
+
+=cut
+
+sub toStarDict {
+    my ($my_opts, $ptd, $optd) = @_;
+    $optd ||= $ptd;
+    $optd = _get_output_filename('', $optd);
+
+    _DEBUG_ "loading PTD [$ptd].";
+    $ptd = Lingua::PTD->new($ptd);
+
+    _DEBUG_ "writing file [$optd].";
+    $ptd->saveAs("stardict", $optd, $my_opts);
+}
+
+=head2 stats
+
+Prints some basic statistics about a PTD.
+
+=cut
+
+sub stats {
+    my ($my_ops, $ptd) = @_;
+    _DEBUG_ "loading PTD [$ptd].";
+    $ptd = Lingua::PTD->new($ptd);
+
+    _DEBUG_ "computing statistics.";
+    my $stats = $ptd->stats;
+
+    printf "%47s -> %d\n",   "Dictionary size (types)", $stats->{count};
+    printf "%47s -> %d\n",   "Dictionary size (tokens)", $stats->{size};
+    printf "%47s -> %.2f\n", "Average number of translations", $stats->{avgTransNr};
+    printf "%47s -> %d\n",   "Minimum number of occurrences",  $stats->{occMin};
+    printf "%47s -> %s\n",   "..for word", $stats->{occMinWord};
+    printf "%47s -> %d\n",   "Maximum number of occurrences",  $stats->{occMax};
+    printf "%47s -> %s\n",   "..for word", $stats->{occMaxWord};
+    printf "%47s -> %.2f\n", "Average number of occurrences", $stats->{avgOcc};
+    printf "%47s -> %.2f\n", "Minimum value for best translation probability", $stats->{probMin};
+    printf "%47s -> %.2f\n", "Maximum value for best translation probability", $stats->{probMax};
+    printf "%47s -> %.2f\n", "Average best translation probability", $stats->{avgBestTrans};
+}
+
+=head2 compare
+
+Given two PTD, print some basic statistics comparing their size, domains, etc.
+
+=cut
+
+sub compare {
+    my ($my_ops, $ptd1, $ptd2) = @_;
+
+    ($ptd1 && -f $ptd1) or die "Can't read PTD file $ptd1";
+    ($ptd2 && -f $ptd2) or die "Can't read PTD file $ptd2";
+
+    my ($n1, $n2) = ($ptd1, $ptd2);
+
+    _DEBUG_ "loading PTD file [$ptd1]";
+    $ptd1 = Lingua::PTD->new($ptd1);
+
+    _DEBUG_ "loading PTD file [$ptd2]";
+    $ptd2 = Lingua::PTD->new($ptd2);
+
+    _DEBUG_ "computing basic stats for first dictionary";
+    my $stats1 = $ptd1->stats;
+    _DEBUG_ "computing basic stats for second dictionary";
+    my $stats2 = $ptd2->stats;
+
+    _DEBUG_ "calculating domain intersections";
+    my ($left_not_in_right, $right_not_in_left) = _diff_domains($ptd1, $ptd2);
+
+    _DEBUG_ "calculating translation sets intersections";
+    my $data = _translation_sets_stats($ptd1, $ptd2);
+
+    printf "%47s -> %8d | %8d\n",
+      "Dictionary size (types)", $stats1->{count}, $stats2->{count};
+    printf "%47s -> %8d | %8d\n",
+      "Dictionary size (tokens)", $stats1->{size}, $stats2->{size};
+    printf "%47s -> %8.2f | %8.2f\n",
+      "Average number of translations", $stats1->{avgTransNr}, $stats2->{avgTransNr};
+    printf "%47s -> %8d | %8d\n",
+      "Minimum number of occurrences",  $stats1->{occMin}, $stats2->{occMin};
+    printf "%47s -> %8s | %8s\n",
+      "..for words", $stats1->{occMinWord}, $stats2->{occMinWord};
+    printf "%47s -> %8d | %8d\n",
+      "Maximum number of occurrences",  $stats1->{occMax}, $stats2->{occMax};
+    printf "%47s -> %8s | %8s\n",
+      "..for words", $stats1->{occMaxWord}, $stats2->{occMaxWord};
+    printf "%47s -> %8.2f | %8.2f\n",
+      "Average number of occurrences", $stats1->{avgOcc}, $stats2->{avgOcc};
+    printf "%47s -> %8.2f | %8.2f\n",
+      "Minimum value for best translation probability", $stats1->{probMin}, $stats2->{probMin};
+    printf "%47s -> %8.2f | %8.2f\n",
+      "Maximum value for best translation probability", $stats1->{probMax}, $stats2->{probMax};
+    printf "%47s -> %8.2f | %8.2f\n",
+      "Average best translation probability", $stats1->{avgBestTrans}, $stats2->{avgBestTrans};
+
+    printf "%47s -> %8d | %8d\n",
+      "Words not present in the other dictionary", $left_not_in_right, $right_not_in_left;
+
+    printf "\n";
+
+    printf "%47s -> %8d (%5.2f%%)\n",
+      "Entries sharing translations and order",
+        $data->{ordered}, $data->{ordered}/$stats1->{count}*100;
+    printf "%47s -> %8d (%5.2f%%)\n",
+      "Entries sharing translations",
+        $data->{scrambled}, $data->{scrambled}/$stats1->{count}*100;
+    printf "%47s -> %8d (%5.2f%%)\n",
+      "Entries sharing best translation",
+        $data->{shareBest}, $data->{shareBest}/$stats1->{count}*100;
+
+    printf "%47s -> %8d\n",
+      "Entries in Dic1 with trans. cont. in Dic2", $data->{firSubset};
+    printf "%47s -> %8d\n",
+      "Entries in Dic2 with trans. cont. in Dic1", $data->{secSubset};
+
+}
+
+
+=head2 query
+
+This command allows you to query interactively a PTD.
+
+=cut
+
+sub query {
+    my ($my_ops, $filename) = @_;
+
+    ($filename && -f $filename) or die "Can't read PTD file $filename";
+
+    _DEBUG_ "loading PTD file";
+    my $ptd = Lingua::PTD->new($filename);
+
+    _DEBUG_ "initializing readline";
+    my $term = Term::ReadLine->new("nat-ptd");
+    my $prompt = "[$filename] ";
+    my $attrs = $term->Attribs;
+    $attrs->{completion_entry_function} = $attrs->{list_completion_function};
+    $attrs->{completion_word} = [grep { /^[[:alpha:]]+([-\/][[:alpha:]]+)*$/ } $ptd->words];
+
+    binmode STDOUT, ":utf8";
+
+    while (defined($_ = $term->readline($prompt))) {
+
+        $_ = decode("utf-8", $_);
+
+        $term->addhistory($_) if /\S/;
+        $_ = _trim($_);
+        if ( $_ =~ /\S/) {
+            if ($ptd->count($_)) {
+                print "\n";
+                printf "%s [%d occurrences]\n",  $_, $ptd->count($_);
+                my %trans = $ptd->transHash($_);
+                for my $k (sort {$trans{$b} <=> $trans{$a}} keys %trans) {
+                    printf " - %15s | %7.4f%%\n", $k, $trans{$k}*100;
+                }
+                print "\n";
+            } else {
+                print "\n* word [$_] not found.\n\n";
+            }
+        }
+    }
+
+
+}
+
+=head2 grep
+
+Greps entries matching a specific pattern from a PTD. Supply a pattern
+and a PTD file. By default it dumps a subset PTD with entries that
+match. With the C<-compact> option it will print a small table with
+the entry's best translation.
+
+    nat-ptd grep [-compact] [-o=outfile] <pattern> <ptd-file>
+
+=cut
+
+sub grep {
+    my ($my_opts, $pattern, $ptd) = @_;
+
+    if ($my_opts->{o}) {
+        open OUT, ">", $my_opts->{o} or die "Can't create file: $!";
+        select OUT;
+    }
+
+    ($ptd && -f $ptd) or die "Can't find ptd: $ptd";
+
+    _DEBUG_ "loading PTD from $ptd";
+    $ptd = Lingua::PTD->new($ptd);
+
+    # XXX - Colocar codigo em evidencia (apenas uma passagem)
+
+    _DEBUG_ "selecting entries";
+    $ptd->downtr(
+                 sub {
+                     my ($w, $c, %t) = @_;
+                     return toentry($w, $c, %t) if $w =~ /$pattern/;
+                     return undef;
+                 },
+                 filter => 1
+                );
+
+    _DEBUG_ "dumping PTD";
+    if ($my_opts->{compact}) {
+        $ptd->downtr(
+                     sub {
+                         my ($w,$c,%t) = @_;
+                         my $x = (sort { $t{$b} <=> $t{$a} } keys %t)[0];
+                         printf("%15s (%8d) %s -> %.6f\n", $w, $c, $x, $t{$x});
+                     },
+                     sorted => 1
+                    );
+    } else {
+        $ptd->dump;
+    }
+
+    close OUT if $my_opts->{o};
+}
+
+=head2 compose
+
+This method receives a two or more dictionaries.
+
+When receiving a pair of dictionaries (first dictionary target
+language should be the same as the second dictionary source language),
+composes them, resulting a PTD from first dictionary source language
+to second dictionary target language.
+
+This method can be used with more than two dictionaries for a full
+transitive dictionary computation.
+
+You can specify the output filename with the C<-o> switch.
+
+
+As of recent NATools versions, you can supply an option C<-type> to
+specify the type of output file (C<dmp> or C<sqlite> are supported,
+and C<dmp> is the default).
+
+=cut
+
+sub compose {
+    my ($my_opts, @files) = @_;
+
+    -f $files[0] or die "File $files[0] not found or not readable\n";
+
+    my $type    = ($my_opts->{type} && $my_opts->{type} eq "sqlite") ? "sqlite" : "dmp";
+    $my_opts->{o} = "composition.$type" if $type eq "sqlite" && !$my_opts->{o};
+
+    _DEBUG_ "loading $files[0] PTD.";
+    my $first = Lingua::PTD->new( shift @files );
+    while (@files) {
+        -f $files[0] or die "File $files[0] not found or not readable\n";
+
+        _DEBUG_ "loading $files[0] PTD.";
+        my $second = Lingua::PTD->new( shift @files );
+        my $new = {};
+
+        _DEBUG_ "composing...";
+        for my $word ($first->words) {
+            for my $trans ($first->trans($word)) {
+                next unless $second->exists($trans);
+                $new->{$word}{count} = $first->count($word);
+                for my $ttrans ($second->trans($trans)) {
+                    $new->{$word}{trans}{$ttrans} +=
+                      $first->prob($word,$trans)*$second->prob($trans,$ttrans);
+                }
+            }
+        }
+        $first = bless $new => 'Lingua::PTD';
+    }
+
+    _DEBUG_ "dumping final PTD.";
+    if ($my_opts->{o}) {
+        $first->saveAs($type => $my_opts->{o});
+    } else {
+        $first->dump;
+    }
+}
+
+=head2 filter
+
+This method filters a dictionary (or dictionary pair) accordingly with
+some default values (that can be adjusted).
+
+If the supplied name is a directory, it is supposed to be of a NATools
+object (a NATools alignment folder). In this case, files C<<
+source-target.dmp >> and C<< target-source.dmp >> are searched inside
+it.
+
+If the supplied name is not a directory, it is suppoed to be a name of
+a PTD dump file. This command will check if it is alone (just a
+direction) or if a second filename was supplied. If two were supplied,
+they are considered bidirectional (source-target and target-source).
+
+Therefore, three possible usages:
+
+    nat-ptd filter <natools-obj-dir>
+    nat-ptd filter <file.dmp>
+    nat-ptd filter <file-s-t.dmp> <file-t-s.dmp>
+
+The following switchs can be used:
+
+=over 4
+
+=item C<-numbers>
+
+By default the filtering will remove terms (entries and translations)
+with numbers (only numbers, with possible digit separators: space,
+comma, point, colon). Use this switch to force them to be B<preserved>.
+
+=item C<-symbols>
+
+Any other term type that is not a standard word (with possible dash or
+apostrophe) or a number (as described above), is considered to include
+strange symbols, and will be ignored. Use this switch to force them to
+be B<preserved>.
+
+=item C<-none>
+
+By default, the 'no translation', also known as 'none', is
+removed. You can force it to be B<preserved> with this switch.
+
+=item C<-occs=n>
+
+Defines the minimum occurrence count for entries to be preserved. By
+default the used value is 2 (that is, entries with 1 occurrence are
+discarded). Use 0 to not discard any entry by occurrence count.
+
+=item C<-prob=p>
+
+Defines the minimum probability for translations to be preserved. By
+default the value is 1% (0.01). Define the value as 0 to preserve all
+translations.
+
+=item C<-bidir>
+
+Defines if the filtering should check for bidirectional translations,
+that is, preserve only terms which translations' translations' include
+that term. Mathematically, preserve t if
+
+    t   in   Translations ( Translations ( t ) )
+
+Note that this is only available for NATool objects or dictionary
+pairs. By default this switch is B<ON>. Turn it B<OFF> assigning a
+B<0> to the switch: C<< -bidir=0 >>
+
+=back
+
+Also, the C<-o> switch can be used to define an output filename. When
+using a pair of dictionaries, specify the output filenames separated
+by a comma: C<-o=outputfile1,outputfile2>.
+
+As of recent NATools versions, you can supply an option C<-type> to
+specify the type of output file (C<dmp> or C<sqlite> are supported,
+and C<dmp> is the default).
+
+=cut
+
+sub filter {
+    my ($my_opts, $ptd1, $ptd2) = @_;
+    my @cleanup;
+    my $bidir = 0;
+
+    if ($ptd2) {
+        $bidir = 1;
+    } elsif (-d $ptd1) {
+        ($ptd1,$ptd2) = (catfile($ptd1,'source-target.dmp'),
+                         catfile($ptd1,'target-source.dmp'));
+    }
+
+    $bidir = 0 if defined $my_opts->{bidir} and $my_opts->{bidir} == 0;
+
+    my $numbers = $my_opts->{numbers} ? 1 : 0;
+    my $symbols = $my_opts->{symbols} ? 1 : 0;
+    my $nones   = $my_opts->{none}    ? 1 : 0;
+    my $minocc  = $my_opts->{occs}    // 2;
+    my $minprob = $my_opts->{prob}    // 0.01;
+    my $type    = ($my_opts->{type} && $my_opts->{type} eq "sqlite") ? "sqlite" : "dmp";
+
+    ($ptd1  && -f $ptd1) or die "Can't find ptd: $ptd1";
+    (!$ptd2 || -f $ptd2) or die "Can't find ptd: $ptd2";
+
+    # check output filenames
+    my ($out1, $out2);
+    if ($my_opts->{o}) {
+        if ($ptd1 and $ptd2 and $my_opts->{o} =~ /,/) {
+            ($out1, $out2) = split /,/,$my_opts->{o}
+        } elsif ($ptd1 and $ptd2) {
+            ($out1, $out2) = ($my_opts->{o}."-st.$type",$my_opts->{o}."-ts.$type");
+        } else {
+            ($out1, $out2) = ($my_opts->{o}, undef)
+        }
+    } else {
+        if ($ptd1 and $ptd2) {
+            ($out1, $out2) = ($ptd1."-filtered.$type",$ptd2."-filtered.$type")
+        } else {
+            ($out1, $out2) = ($ptd1."-filtered.$type",undef)
+        }
+    }
+
+    if ($ptd1 =~ /sqlite$/) {
+        cp $ptd1 => "$ptd1._.sqlite";
+        $ptd1 = "$ptd1._.sqlite";
+        push @cleanup, $ptd1;
+    }
+    if ($ptd2 && $ptd1 =~ /sqlite$/) {
+        cp $ptd2 => "$ptd2._.sqlite";
+        $ptd2 = "$ptd2._.sqlite";
+        push @cleanup, $ptd2;
+    }
+
+    # load PTDs
+    _DEBUG_ "loading PTD from $ptd1";
+    $ptd1 = Lingua::PTD->new($ptd1);
+    if ($ptd2) {
+        _DEBUG_ "loading PTD from $ptd2";
+        $ptd2 = Lingua::PTD->new($ptd2);
+    }
+
+    my $num_re  = qr/^\d+([.,;: ]\d+)*$/;
+    my $sym_re  = qr/([=|.,;:()\[\]{}!\@#"?»«\$><%^&*\\\/0-9–“„°§]|^-|-$)/;
+    my $none_re = qr/^\(none\)$/;
+    my $clean_entry = sub {
+        my ($w, $c, %t) = @_;
+
+        return undef if $c < $minocc;
+        return undef if !$nones   and $w =~ $none_re;
+        return undef if !$numbers and $w =~ $num_re;
+        return undef if !$symbols and $w !~ $num_re and $w =~ $sym_re;
+
+        for my $t (keys %t) {
+            delete $t{$t} if !$nones   and $t =~ $none_re;
+            delete $t{$t} if !$numbers and $t{$t} and $t =~ $num_re;
+            delete $t{$t} if !$symbols and $t{$t} and $t !~ $num_re and $t =~ $sym_re;
+            delete $t{$t} if $t{$t}    and $t{$t} < $minprob;
+        }
+        return (%t)?toentry($w, $c, %t):undef;
+    };
+    our $other;
+    my $clear_non_transitive = sub {
+        my ($w, $c, %t) = @_;
+        for my $t (keys %t) {
+            delete $t{$t} unless exists $other->{$t} and exists $other->{$t}{trans}{$w};
+        }
+        return (%t)?toentry($w, $c, %t):undef;
+    };
+
+    # filter 1
+    _DEBUG_ "filtering PTD.";
+    $ptd1->downtr( $clean_entry, filter => 1, verbose => $opts->{v} );
+    if ($ptd2) {
+        _DEBUG_ "filtering second PTD.";
+        $ptd2->downtr( $clean_entry, filter => 1, verbose => $opts->{v} );
+    }
+
+    #filter 2
+    if ($bidir) {
+        _DEBUG_ "removing non-transitive translations.";
+
+        $other = $ptd2;
+        $ptd1->downtr( $clear_non_transitive, filter => 1, 
+                                              verbose => $opts->{v});
+
+        $other = $ptd1;
+        $ptd2->downtr( $clear_non_transitive, filter => 1, 
+                                              verbose => $opts->{v});
+    }
+
+
+    _DEBUG_ "writing ptd.";
+    $ptd1->saveAs($type, $out1);
+
+    if ($ptd2) {
+        _DEBUG_ "writing second ptd.";
+        $ptd2->saveAs($type, $out2);
+    }
+
+    unlink $_ for @cleanup;
+}
+
+=head2 lowercase
+
+This method recompute the probabilities for a dictionary, lowercasing
+all terms, and summing up occurrences, and recomputing probabilities.
+
+    nat-ptd lowercase [-o=outputfile] <ptd-filename>
+
+As of recent NATools versions, you can supply an option C<-type> to
+specify the type of output file (C<dmp> or C<sqlite> are supported,
+and C<dmp> is the default).
+
+=cut
+
+sub lowercase {
+    my ($my_opts, $ptd, @my_args) = @_;
+    my @cleanup;
+    my $oname = $ptd;
+    ($ptd && -f $ptd) or die "Can't find ptd: $ptd";
+    if ($ptd =~ /sqlite$/) {
+        cp $ptd => "$ptd._.sqlite";
+        $ptd = "$ptd._.sqlite";
+        push @cleanup, $ptd;
+    }
+
+    my $type    = ($my_opts->{type} && $my_opts->{type} eq "sqlite") ? "sqlite" : "dmp";
+    $my_opts->{o} = "$oname-lowercase.$type" if $type eq "sqlite" && !$my_opts->{o};
+
+    _DEBUG_ "loading PTD from $ptd";
+    $ptd = Lingua::PTD->new($ptd);
+    _DEBUG_ "recomputing dictionary";
+    $ptd->lowercase(verbose => $opts->{v});
+
+    _DEBUG_ "dumping PTD";
+    if ($my_opts->{o}) {
+        $ptd->saveAs($type => $my_opts->{o});
+    } else {
+        $ptd->dump;
+    }
+    unlink $_ for @cleanup;
+}
+
+
+=head2 reprob
+
+This method recompute the probabilities from a dictionary. It sums up
+all possible translations probabilities, consider that total to be
+100% (1), and recomputes each probability accordingly.
+
+It takes a required argument, the name of the PTD dump
+file. Optionally, you can supply an output file with the C<< -o >>
+switch.
+
+    nat-ptd reprob [-o=outputfile] <ptd-filename>
+
+As of recent NATools versions, you can supply an option C<-type> to
+specify the type of output file (C<dmp> or C<sqlite> are supported,
+and C<dmp> is the default).
+
+=cut
+
+sub reprob {
+    my ($my_opts, $ptd, @my_args) = @_;
+    my @cleanup;
+
+    ($ptd && -f $ptd) or die "Can't find ptd: $ptd";
+    if ($ptd =~ /sqlite$/) {
+        cp $ptd => "$ptd._.sqlite";
+        $ptd = "$ptd._.sqlite";
+        push @cleanup, $ptd;
+    }
+
+    my $type    = ($my_opts->{type} && $my_opts->{type} eq "sqlite") ? "sqlite" : "dmp";
+    $my_opts->{o} = "reprob.$type" if $type eq "sqlite" && !$my_opts->{o};
+
+    _DEBUG_ "loading PTD from $ptd";
+    $ptd = Lingua::PTD->new($ptd);
+    _DEBUG_ "recomputing probabilities";
+    $ptd->reprob;
+
+    _DEBUG_ "dumping PTD";
+    if ($my_opts->{o}) {
+        $ptd->saveAs($type => $my_opts->{o});
+    } else {
+        $ptd->dump;
+    }
+    unlink $_ for @cleanup;
+}
+
+
+=head2 add
+
+Adds two or more PTD files into a single PTD file. They should have
+the same source and target language. You can use the C<-o> switch to
+specify an output filename.
+
+As of recent NATools versions, you can supply an option C<-type> to
+specify the type of output file (C<dmp> or C<sqlite> are supported,
+and C<dmp> is the default).
+
+=cut
+
+sub add {
+    my ($my_opts, $fileA, $fileB, @more) = @_;
+
+    my $type    = ($my_opts->{type} && $my_opts->{type} eq "sqlite") ? "sqlite" : "dmp";
+    $my_opts->{o} = "sum.$type" if $type eq "sqlite" && !$my_opts->{o};
+
+    my @cleanup;
+    ($fileA && -f $fileA) or die "PTD $fileA not found or not readable\n";
+    if ($fileA =~ /sqlite$/) {
+        cp $fileA => "$fileA._.sqlite";
+        $fileA = "$fileA._.sqlite";
+        push @cleanup, $fileA;
+    }
+
+    ($fileB && -f $fileB) or die "PTD $fileB not found or not readable\n";
+
+    _DEBUG_ "loading $fileA PTD.";
+    $fileA = Lingua::PTD->new($fileA, verbose => $opts->{v});
+
+    _DEBUG_ "loading $fileB PTD.";
+    $fileB = Lingua::PTD->new($fileB);
+
+    _DEBUG_ "adding PTDs.";
+    $fileA->add($fileB);
+
+    while (@more) {
+        $fileB = shift @more;
+        _DEBUG_ "loading $fileB PTD.";
+        $fileB = Lingua::PTD->new($fileB);
+        _DEBUG_ "adding PTDs.";
+        $fileA->add($fileB);
+    }
+
+    _DEBUG_ "dumping final PTD.";
+    if ($my_opts->{o}) {
+        $fileA->saveAs($type => $my_opts->{o});
+    } else {
+        $fileA->dump;
+    }
+    unlink $_ for @cleanup;
+}
+
+
+sub _process_args {
+    my $mopts = {};
+    while (@_ && $_[0] =~ /^-/) {
+        my $element = shift @_;
+        if ($element =~ /^-([^=]+)=(.+)$/) {
+            $mopts->{$1} = $2;
+        } else {
+            $element =~ /^-(.+)$/;
+            $mopts->{$1} = 1;
+        }
+    }
+    return ($mopts, @_);
+}
+sub _trim {
+    my $f = shift;
+    chomp($f);
+    $f =~ s/^\s*//;
+    $f =~ s/\s*$//;
+    return $f;
+}
+
+
+sub _diff_domains {
+    my ($l_dict, $r_dict) = @_;
+
+    my ($l_count, $r_count) = (0, 0);
+
+    $l_dict->downtr(
+                    sub {
+                        my ($w, $c, %t) = @_;
+                        $l_count++ unless exists($r_dict->{$w});
+                    } );
+    $r_dict->downtr(
+                    sub {
+                        my ($w, $c, %t) = @_;
+                        $r_count++ unless exists($l_dict->{$w});
+                    } );
+
+    return ($l_count, $r_count);
+}
+
+sub _translation_sets_stats {
+    my ($dic1, $dic2) = @_;
+    my $data = {};
+    my @words = uniq($dic1->words, $dic2->words);
+    for my $word (@words) {
+        next unless exists $dic1->{$word};
+        next unless exists $dic2->{$word};
+
+        $data->{ordered}++   if _equalTranslationSeqs($dic1->{$word}, $dic2->{$word});
+        $data->{scrambled}++ if _equalTranslationSets($dic1->{$word}, $dic2->{$word});
+        $data->{shareBest}++ if _equalBestTranslation($dic1->{$word}, $dic2->{$word});
+
+        $data->{secSubset}++ if _subset($dic2->{$word}, $dic1->{$word});
+        $data->{firSubset}++ if _subset($dic1->{$word}, $dic2->{$word});
+    }
+    return $data;
+}
+
+sub _equalTranslationSeqs {
+    my ($E1,$E2) = @_;
+
+    my @T1 = sort {$E1->{trans}{$b}<=>$E1->{trans}{$a}} keys %{$E1->{trans}};
+    my @T2 = sort {$E2->{trans}{$b}<=>$E2->{trans}{$a}} keys %{$E2->{trans}};
+
+    if (scalar(@T1) == scalar(@T2)) {
+        for (1..$#T1) {
+            return 0 if $T1[$_] ne $T2[$_];
+        }
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+sub _equalBestTranslation {
+    my ($E1,$E2) = @_;
+
+    my @T1 = sort {$E1->{trans}{$b}<=>$E1->{trans}{$a}} keys %{$E1->{trans}};
+    my @T2 = sort {$E2->{trans}{$b}<=>$E2->{trans}{$a}} keys %{$E2->{trans}};
+
+    if (($T1[0]||"") eq ($T2[0]||"")) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+sub _equalTranslationSets {
+    my ($E1,$E2) = @_;
+
+    my @T1 = sort keys %{$E1->{trans}};
+    my @T2 = sort keys %{$E2->{trans}};
+
+    if (scalar(@T1) == scalar(@T2)) {
+        for (1..$#T1) {
+            return 0 if $T1[$_] ne $T2[$_];
+        }
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+sub _subset {
+    my ($E1,$E2) = @_;
+    my @T1 = sort keys %{$E1->{trans}};
+    my @T2 = sort keys %{$E2->{trans}};
+
+    return __subset(\@T1,\@T2);
+}
+
+sub __subset {
+    my ($needle,$haystack) = @_;
+
+    my %x = ();
+    @x{@$haystack}=@$haystack;
+    for (@$needle) {
+        return 0 unless exists $x{$_};
+    }
+    return 1;
+}
+
+=head2 ucts
+
+Create unambiguous-concept traslation sets.
+
+  ptd-nat ucts [-m=<number>] [-M=<number>] [-p=<probabilty>] [-P=<probability>] <ptd-filename> <ptd-filename>
+
+The following options can be used:
+
+=over 4
+
+=item C<-m=n>
+
+Mininum number of occurences of each token. C<n> must be an
+integer (default: 10).
+
+=item C<-M=n>
+
+Manixum number of occurences of each token. C<n> must be an
+integer (default: 100).
+
+=item C<-p=p>
+
+Minimum probabilty for translation. C<p> must be a probability
+in the interval [0,1] (default: 0.2).
+
+=item C<-P=p>
+
+Minimum probabilty for the inverse translations. C<p> must be a
+probability in the interval [0,1] (default: 0.8).
+
+=item C<-r=0|1>
+
+Print rank (default: 0).
+
+=back
+
+=cut
+
+sub ucts {
+    my ($my_opts, $fileA, $fileB, @more) = @_;
+
+    Lingua::PTD::ucts($fileA, $fileB, %$my_opts, pp=>1);
+}
+
+=head2 bws
+
+Create bi-words sets.
+
+  ptd-nat bws [-m=<number>] [-p=<probabilty>] <ptd-filename> <ptd-filename>
+
+The following options are available:
+
+=over 4
+
+=item C<-m=n>
+
+Mininum number of occurences of each token. C<n> must be an
+integer (default: 10).
+
+=item C<-p=p>
+
+Minimum probabilty for translation. C<p> must be a probability
+in the interval [0,1] (default: 0.4).
+
+=item C<-r=0|1>
+
+Print rank (default: 0).
+
+=back
+
+=cut
+
+sub bws {
+    my ($my_opts, $fileA, $fileB, @more) = @_;
+
+    Lingua::PTD::bws($fileA, $fileB, %$my_opts, pp=>1);
+}
+
+=head1 SEE ALSO
+
+NATools, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+Nuno Alexandre Carvalho, E<lt>smash@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010-2014 by Natura Project
+
+=cut

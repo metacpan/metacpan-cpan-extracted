@@ -1,0 +1,42 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Loop-Control/",
+      "repository" : "http://github.com/hanekomu/Loop-Control",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Loop-Control"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100861",
+   "name" : "Loop-Control",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "Loop::Control" : {
+         "version" : "1.100861",
+         "file" : "lib/Loop/Control.pm"
+      }
+   },
+   "requires" : {
+      "Scalar::Util" : "0",
+      "Scope::Upper" : "0",
+      "English" : "0",
+      "Exporter" : "0",
+      "Carp" : "0",
+      "perl" : "5.008",
+      "Test::More" : "0.88",
+      "Test::Differences" : "0",
+      "File::Find" : "0",
+      "File::Temp" : "0"
+   },
+   "abstract" : "FIRST and NEXT functions for loops",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

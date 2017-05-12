@@ -1,0 +1,14 @@
+Revision history for Log-Sprintf
+
+0.001003  2015-02-13 22:45:01-06:00 America/Chicago
+ - Make error messages more useful by including more info (Fixes GH#1)
+ - Ditch RT
+
+0.001002  2012-11-17 15:38:56 CST6CDT
+ - Put MetaYAML back in dist
+
+0.001001  2010-12-09 13:05:55 CST6CDT
+ - Take out POSIX::strftime as it breaks on win32
+
+0.001000  2010-12-07 22:59:22 CST6CDT
+ - Initial Release

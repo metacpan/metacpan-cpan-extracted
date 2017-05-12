@@ -1,0 +1,15 @@
+MANIFEST
+Makefile.PL
+LRpt.pm
+lib/LRpt/CSVDiff.pm
+lib/LRpt/CSVDumper.pm
+lib/LRpt/CSVEADiff.pm
+lib/LRpt/CollDiff.pm
+lib/LRpt/CollEADiff.pm
+lib/LRpt/CollUnkeyed.pm
+lib/LRpt/Collection.pm
+lib/LRpt/Config.pm
+lib/LRpt/JarReader.pm
+lib/LRpt/KeySubst.pm
+lib/LRpt/RKeysRdr.pm
+lib/LRpt/XMLReport.pm

@@ -1,0 +1,64 @@
+{
+   "abstract" : "Effortless record-keeping and enhanced reproducibility. Set it and forget it... until you need it!",
+   "author" : [
+      "Michael F. Covington <mfcovington@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4206",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Reproducible",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Devel::Cover" : "0",
+            "Module::Loaded" : "0",
+            "Text::Diff" : "0"
+         },
+         "requires" : {
+            "Config" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "IPC::Open3" : "0",
+            "List::MoreUtils" : "0",
+            "POSIX" : "0",
+            "YAML::Old" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Log::Reproducible" : {
+         "file" : "lib/Log/Reproducible.pm",
+         "version" : "v0.12.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/mfcovington/Log-Reproducible"
+      }
+   },
+   "version" : "v0.12.4"
+}

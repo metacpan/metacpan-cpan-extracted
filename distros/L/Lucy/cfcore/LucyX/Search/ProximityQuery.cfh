@@ -1,0 +1,130 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Query matching an ordered list of terms.
+ *
+ * ProximityQuery is a subclass of [](cfish:Query) for matching
+ * against an ordered sequence of terms.
+ */
+
+public class LucyX::Search::ProximityQuery inherits Lucy::Search::Query {
+
+    String        *field;
+    Vector        *terms;
+    uint32_t       within;
+
+    /** Create a new ProximityQuery.
+     *
+     * @param field The field that the phrase must occur in.
+     * @param terms The ordered array of terms that must match.
+     */
+    public inert incremented ProximityQuery*
+    new(String *field, Vector *terms, uint32_t within);
+
+    /** Initialize a ProximityQuery.
+     *
+     * @param field The field that the phrase must occur in.
+     * @param terms The ordered array of terms that must match.
+     */
+    public inert ProximityQuery*
+    init(ProximityQuery *self, String *field, Vector *terms, uint32_t within);
+
+    /** Accessor for object's field attribute.
+     */
+    public String*
+    Get_Field(ProximityQuery *self);
+
+    /** Accessor for object's array of terms.
+     */
+    public Vector*
+    Get_Terms(ProximityQuery *self);
+
+    /** Accessor for object's within attribute.
+     */
+    public uint32_t
+    Get_Within(ProximityQuery *self);
+
+    public incremented Compiler*
+    Make_Compiler(ProximityQuery *self, Searcher *searcher, float boost,
+                  bool subordinate = false);
+
+    public bool
+    Equals(ProximityQuery *self, Obj *other);
+
+    public incremented String*
+    To_String(ProximityQuery *self);
+
+    void
+    Serialize(ProximityQuery *self, OutStream *outstream);
+
+    incremented ProximityQuery*
+    Deserialize(decremented ProximityQuery *self, InStream *instream);
+
+    public incremented Obj*
+    Dump(ProximityQuery *self);
+
+    public incremented Obj*
+    Load(ProximityQuery *self, Obj *dump);
+
+    public void
+    Destroy(ProximityQuery *self);
+}
+
+class LucyX::Search::ProximityCompiler
+    inherits Lucy::Search::Compiler {
+
+    float    idf;
+    float    raw_weight;
+    float    query_norm_factor;
+    float    normalized_weight;
+    uint32_t within;
+
+    inert incremented ProximityCompiler*
+    new(ProximityQuery *parent, Searcher *searcher, float boost, uint32_t within);
+
+    inert ProximityCompiler*
+    init(ProximityCompiler *self, ProximityQuery *parent, Searcher *searcher,
+         float boost, uint32_t within);
+
+    public incremented nullable Matcher*
+    Make_Matcher(ProximityCompiler *self, SegReader *reader, bool need_score);
+
+    public float
+    Get_Weight(ProximityCompiler *self);
+
+    public float
+    Sum_Of_Squared_Weights(ProximityCompiler *self);
+
+    public void
+    Apply_Norm_Factor(ProximityCompiler *self, float factor);
+
+    incremented Vector*
+    Highlight_Spans(ProximityCompiler *self, Searcher *searcher,
+                    DocVector *doc_vec, String *field);
+
+    public bool
+    Equals(ProximityCompiler *self, Obj *other);
+
+    void
+    Serialize(ProximityCompiler *self, OutStream *outstream);
+
+    incremented ProximityCompiler*
+    Deserialize(decremented ProximityCompiler *self, InStream *instream);
+}
+
+

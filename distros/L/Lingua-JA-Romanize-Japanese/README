@@ -1,0 +1,85 @@
+NAME
+    Lingua::JA::Romanize::Japanese - Romanization of Japanese language
+
+SYNOPSIS
+        use Lingua::JA::Romanize::Japanese;
+
+        my $conv = Lingua::JA::Romanize::Japanese->new();
+        my $roman = $conv->char( $kanji );
+        printf( "<ruby><rb>%s</rb><rt>%s</rt></ruby>", $kanji, $roman );
+
+        my @array = $conv->string( $string );
+        foreach my $pair ( @array ) {
+            my( $raw, $ruby ) = @$pair;
+            if ( defined $ruby ) {
+                printf( "<ruby><rb>%s</rb><rt>%s</rt></ruby>", $raw, $ruby );
+            } else {
+                print $raw;
+            }
+        }
+
+DESCRIPTION
+    Japanese language is written with a mix of Kanji and Kana characters.
+    Most of Kanji characters used in Japan were imported from China. Two
+    types of Kana characters, called Katakana and Hiragana, were created in
+    Japan. Kana characters are general terms for the syllabic Japanese
+    scripts.
+
+METHODS
+  $conv = Lingua::JA::Romanize::Japanese->new();
+    This constructer methods returns a new object with its dictionary
+    cached.
+
+  $roman = $conv->char( $kanji );
+    This method returns romanized letters from a Japanese character. It
+    returns undef when $Kana is not a valid Japanese character. The
+    argument's encoding must be UTF-8. Both of Kanji and Kana characters are
+    allowed.
+
+  $roman = $conv->chars( $string );
+    This method returns romanized letters from multiple Japanese characters.
+
+  @array = $conv->string( $string );
+    This method returns a array of referenced arrays which are pairs of
+    Japanese chacater(s) and its romanized letters.
+
+        $array[0]           # first Japanese character(s)'s pair (array)
+        $array[1][0]        # secound Japanese character(s) itself
+        $array[1][1]        # its romanized letters
+
+DICTIONARY
+    This module's Japanese to roman mapping table is based on the dictionary
+    of SKK which is a Japanese input method on Emacs. It was designed by Dr.
+    Masahiko Sato and created in 1987. SKK is an abbreviation of 'Simple
+    Kana to Kanji conversion program'.
+
+UTF-8 FLAG
+    This treats utf8 flag transparently.
+
+MODULE DEPENDENCIES
+    DB_File module is required.
+
+SEE ALSO
+    Lingua::ZH::Romanize::Pinyin for romanization of Standard Chinese
+
+    Lingua::KO::Romanize::Hangul for romanization of Korean
+
+    http://www.kawa.net/works/perl/romanize/romanize-e.html
+
+    http://linuga-romanize.googlecode.com/svn/trunk/Lingua-JA-Romanize-Japan
+    ese/
+
+    http://openlab.jp/skk/
+
+AUTHOR
+    Yusuke Kawasaki http://www.kawa.net/
+
+COPYRIGHT
+    Copyright (c) 2006-2008 Yusuke Kawasaki. All rights reserved.
+
+LICENSE
+    This dictionary is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either versions 2, or (at your option) any
+    later version.
+

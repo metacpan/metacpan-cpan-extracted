@@ -1,0 +1,36 @@
+%baselang PT
+%languages EN
+%languages FR 
+%desc[EN] NT Narrower Term
+%desc[EN] BT Broader Term
+%desc NT Termo Específico
+%desc BT Termo Genérico
+%desc INST Instâncias
+%desc IOF instância de 
+%inverse IOF INST
+
+_top_
+NT animal
+
+animal
+NT mamífero, animal doméstico, réptil
+EN animal
+
+mamífero
+INST gato, leão
+
+réptil
+INST crocodilo , cobra
+
+leão
+EN lion
+
+gato
+EN cat
+FR chat
+IOF animal doméstico
+SN Animal que tem quatro vidas e m(e)ia
+
+sapo
+IOF réptil
+EN frog

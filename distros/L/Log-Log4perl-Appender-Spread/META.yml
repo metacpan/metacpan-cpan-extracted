@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: Log-Log4perl-Appender-Spread
+version: 0.03
+author:
+  - Jesper Dalberg <jesper@jdn.dk>, 2004
+abstract: Log to a spread group
+license: perl
+requires:
+  Spread: '>= 3.17'
+  perl: 5.6.1
+provides:
+  Log::Log4perl::Appender::Spread:
+    file: lib/Log/Log4perl/Appender/Spread.pm
+    version: 0.03
+generated_by: Module::Build version 0.25_01

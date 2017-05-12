@@ -1,0 +1,62 @@
+[% 
+    title = 'Releases Admin' ;
+    htmltitle = title ;
+
+    crumb2_name = 'Admin' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=home-admin' ;
+    crumb1_name = 'Releases' ;
+%]
+
+<div class="boxer">
+  <p><a href="[% cgipath %]/pages.cgi?act=release-add&amp;sectionid=[% sectionid %]">create a new release</a></p>
+  [% IF thanks %]<p>[% thanks %]</p>[% END %]
+  <p>Click on an source title to edit its content.</p>
+</div>
+
+<div class="boxer">
+  <form id="SEARCH" name="SEARCH" method="post" action="[% cgipath %]/pages.cgi">
+	<input type="hidden" name="act" value="release-admin" />
+	<input type="hidden" name="sectionid" value="[% sectionid %]" />
+	<p>Search by Title: <input type="text" name="searchname" />
+	[% stockselect %] [% ddpublish %] <input type="submit" value="GO" />
+  |	<a href="pages.cgi?act=release-admin">view all</a></p>
+	</form>
+</div>
+
+<div class="boxer">
+<form name="EDIT" method="POST" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="release-admin" />
+<table class="blocker">
+<tr>
+	<th>Type</th>
+	<th>Title</th>
+	<th>Status</th>
+	<th>Action</th>
+</tr>
+
+[% IF data %]
+[% FOREACH item = data %]
+
+<tr>
+	<td>[% item.type %]</td>
+	<td><a href="pages.cgi?act=release-edit&amp;releaseid=[% item.releaseid %]">[% item.title %]</a></td>
+	<td>[% item.publishstate %]</td>
+	<td><input type="checkbox" name="LISTED" value="[% item.releaseid %]" /></td>
+</tr>
+
+[% END %]
+
+[% ELSE %]
+<tr><td colspan="4" align="center">No releases listed.</td></tr>
+[% END %]
+
+</table>
+
+<p>
+<input type="hidden" name='doaction' value='' />
+<input type="hidden" name='recordid' value='' />
+<input type="button" value='Promote' onClick="doSubmit('Promote',0)" />
+<input type="button" value='Delete'  onClick="doSubmit('Delete',0)" />
+</p>
+</form>
+</div>

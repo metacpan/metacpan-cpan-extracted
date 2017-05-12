@@ -1,0 +1,23 @@
+# Lingua::ZH::Romanize::* modules Changes
+
+2008/01/15 (0.22)
+    - Makefile.PL updated to skip error on DictZH->update()
+      http://cpantesters.perl.org/show/Lingua-ZH-Romanize-Pinyin.html#Lingua-ZH-Romanize-Pinyin-0.20
+
+2008/01/13 (0.20)
+    - Subversion on Google Code Project Hosting
+      http://linuga-romanize.googlecode.com/svn/trunk/Lingua-ZH-Romanize-Pinyin/
+    - treats utf8 flag transparently
+    - tests added: t/00_pod.t t/11_pinyin_utf8.t t/12_cantonese_utf8.t
+
+2006/06/13 (0.13)
+    - perltidied.
+    - tone contours added only in the case of Mandarin Pinyin and Traditional Chinese characters.
+      this demands on dictionaries: cxterm/dict/big5/PY.tit
+
+2006/04/04 (0.12)
+    - cxterm/dict/gb/CCDOSPY.tit removed from archive which is not used
+    - chars() method added
+
+2006/03/26 (0.11)
+    - first release

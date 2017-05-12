@@ -1,0 +1,47 @@
+---
+abstract: 'Instance based on Log::Minimal'
+author:
+  - 'Kosuke Arisawa <arisawa {at} gmail.com>'
+build_requires:
+  Test::Exception: '0.31'
+  Test::More: '0.98'
+  Test::Output: '0.16'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Minimal-Instance
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Log::Minimal::Instance:
+    file: lib/Log/Minimal/Instance.pm
+    version: '0.06'
+requires:
+  File::Stamped: '0.03'
+  Log::Minimal: '0.14'
+  parent: '0.223'
+resources:
+  bugtracker: https://github.com/arisawa/p5-Log-Minimal-Instance/issues
+  homepage: https://github.com/arisawa/p5-Log-Minimal-Instance
+  repository: git://github.com/arisawa/p5-Log-Minimal-Instance.git
+version: '0.06'
+x_contributors:
+  - 'Kosuke Arisawa <arisawa@dena.jp>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Tomohiro Mitsumune <tomohiro.mitsumune@dena.com>'
+  - 'Kosuke Arisawa <kosuke.arisawa@dena.com>'
+  - 'xaicron <xaicron@gmail.com>'
+  - 'Kosuke Arisawa <arisawa@gmail.com>'

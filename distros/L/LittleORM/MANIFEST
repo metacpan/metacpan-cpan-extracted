@@ -1,0 +1,30 @@
+Changes
+lib/LittleORM.pm
+lib/LittleORM/Tutorial.pm
+lib/LittleORM/Filter.pm
+lib/LittleORM/Model/Dbh.pm
+lib/LittleORM/Model/Field.pm
+lib/LittleORM/Model/Value.pm
+lib/LittleORM/Role.pm
+lib/LittleORM/Db/Field/Default.pm
+lib/LittleORM/Db/Field/XML.pm
+lib/LittleORM/Db/Field.pm
+lib/LittleORM/DataSet.pm
+lib/LittleORM/GenericID.pm
+lib/LittleORM/Filter/Update.pm
+lib/LittleORM/Clause.pm
+lib/LittleORM/DataSet/Field.pm
+lib/LittleORM/Db.pm
+lib/LittleORM/Db/Connector.pm
+lib/LittleORM/Meta/LittleORMHasDbh.pm
+lib/LittleORM/Meta/Trait.pm
+lib/LittleORM/Meta/Attribute.pm
+lib/LittleORM/Model.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

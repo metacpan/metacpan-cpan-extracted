@@ -1,0 +1,278 @@
+#####################################################################
+# FORBIDDEN STRUCTURES (valeur\type, position, action, split after) #
+#####################################################################
+#
+#
+# action = split | delete
+# position = ANY | START | END
+# on peut mélanger le type d'information
+#
+#
+####################
+# CAS DES NUMERIQUES
+# interdire '1 ans'
+# action et position sont ANY et delete (pour l'instant / par défaut)
+#
+1\IF Nc-p--\POS	ANY	delete
+1\IF Ncmp--\POS	ANY	delete
+1\IF Ncfp--\POS	ANY	delete
+#
+#############
+# PONCTUATION
+#
+$\IF	ANY	delete
+`\IF	ANY	delete
+@\IF	ANY	delete
+~\IF	ANY	delete
+_\IF	ANY	delete
+#$\IF	ANY	split	1
+#`\IF	ANY	split	1
+#@\IF	ANY	split	1
+#~\IF	ANY	split	1
+#_\IF	ANY	split	1
+#
+##################################
+# CAS DE 'quelques' ET DE 'chaque'
+# ils sont étiquetés comme adjectifs
+# des termes comme 'quelques N' ou 'chaque N' ne nous intéressent pas
+# interdire 'quelques jours', 'quelques semaines
+#
+quelques\IF Nc-p--\POS	ANY	split	1
+quelques\IF Ncmp--\POS	ANY	split	1
+quelques\IF Ncfp--\POS	ANY	split	1
+#
+chaque\IF Nc-s--\POS	ANY	split	1
+chaque\IF Ncms--\POS	ANY	split	1
+chaque\IF Ncfs--\POS	ANY	split	1
+#
+# 'autre' et 'autres' ?
+autre\LF Nc-s--\POS	ANY	split	1
+autre\LF Nc-p--\POS	ANY	split	1
+autre\LF Ncms--\POS	ANY	split	1
+autre\LF Ncmp--\POS	ANY	split	1
+autre\LF Ncfs--\POS	ANY	split	1
+autre\LF Ncfp--\POS	ANY	split	1
+#
+###########################################################################
+# comme 'and' est un mot anglais il est considéré comme un Nc-s-- par Flemm
+# on retrouve des termes comme 'Waist circumference and'
+# il faut donc le supprimer des termes
+#
+and\IF	ANY	split	1
+#
+################################
+################################
+# TRADUCTION DE L'ANCIEN FICHIER
+#
+# 'proche de la' + (Np | Ncfs)
+# 'proche du' + (Np | Ncms)
+# 'proche de l' + (Np | Ncs)
+# 'proche des' + (Np | Ncp)
+#
+proche\LF de\IF la\IF Np----	ANY	split	1
+proche\LF de\IF la\IF Nc-s--	ANY	split	1
+proche\LF de\IF la\IF Npfs--	ANY	split	1
+#
+proche\LF du\IF Np----	ANY	split	1
+proche\LF du\IF Nc-s--	ANY	split	1
+proche\LF du\IF Ncms--	ANY	split	1
+#
+proche\LF de\IF l\IF Np----	ANY	split	1
+proche\LF de\IF l\IF Nc-s--	ANY	split	1
+proche\LF de\IF l\IF Ncms--	ANY	split	1
+proche\LF de\IF l\IF Ncfs--	ANY	split	1
+#
+proche\LF des\IF Np----	ANY	split	1
+proche\LF des\IF Nc-p--	ANY	split	1
+proche\LF des\IF Ncmp--	ANY	split	1
+proche\LF des\IF Ncfp--	ANY	split	1
+#
+# 'en cas de'
+# 'en cas d'
+#
+en\LF cas\IF de\IF	ANY	split	2
+en\LF cas\IF d\IF	ANY	split	2
+#
+# 'au sein de'
+# 'au sein d'
+# 'au sein des'
+au\LF sein\IF de\IF	ANY	split	2
+au\LF sein\IF d\IF	ANY	split	2
+au\LF sein\IF des\IF	ANY	split	2
+au\LF sein\IF	ANY	delete
+#############
+# A INTERDIRE
+# __1__
+# exemple = 'évolution de l asthme en mesurant le nombre ou l état d activation des éosinophiles sanguins'
+#
+# __2__
+en\IF Vmpp-----\POS	ANY	split	2
+#
+# __3__
+# exemple = 'possible la prescription prolongée et l arrêt brutal de fortes doses de corticostéroïdes'
+# ?
+#
+# __4__
+# exemple = 'en accord avec'
+#
+en\IF accord\IF avec\IF	ANY	delete
+#
+# __5__
+# exemple = 'posologie de moitié en raison du risque de surdosage'
+#
+# __6__
+# risque car des symptômes et l hyperréactivité bronchique
+# acceptation du traitement et la survenue éventuelle d effets secondaires
+# éviction des allergènes et la désensibilisation
+# Nc-s--\POS Np----\POS	ANY	split	2
+#
+# ( N | A ) et/ou de D ( N | A )
+# ( N | A ) et/ou des ( N | A )
+# ( N | A ) et/ou du ( N | A )
+# ( N | A ) et/ou d ( N | A )
+# on n'en veut pas : spliter sur 'et' ou sur 'ou'
+#
+# __7__
+# 'au hasard'
+# 'par hasard'
+# à discuter
+#
+#########################################
+# NOM et PREPOSITION DETERMINANT?
+#
+#Nc----\POS et\LF de\LF	ANY	split	2
+#Ncm---\POS et\LF de\LF	ANY	split	2
+#Nc-s--\POS et\LF de\LF	ANY	split	2
+#Nc-p--\POS et\LF de\LF	ANY	split	2
+#Ncms--\POS et\LF de\LF	ANY	split	2
+#Ncfs--\POS et\LF de\LF	ANY	split	2
+#Ncmp--\POS et\LF de\LF	ANY	split	2
+#Ncfp--\POS et\LF de\LF	ANY	split	2
+#Nc----\POS et\LF du\LF	ANY	split	2
+#Ncm---\POS et\LF du\LF	ANY	split	2
+#Nc-s--\POS et\LF du\LF	ANY	split	2
+#Nc-p--\POS et\LF du\LF	ANY	split	2
+#Ncms--\POS et\LF du\LF	ANY	split	2
+#Ncfs--\POS et\LF du\LF	ANY	split	2
+#Ncmp--\POS et\LF du\LF	ANY	split	2
+#Ncfp--\POS et\LF du\LF	ANY	split	2
+#
+et\LF de\LF	ANY	delete
+et\LF de\LF	ANY	delete
+et\LF de\LF	ANY	delete
+et\LF de\LF	ANY	delete
+et\LF de\LF	ANY	delete
+et\LF de\LF	ANY	delete
+et\LF de\LF	ANY	delete
+et\LF de\LF	ANY	delete
+et\LF du\LF	ANY	delete
+et\LF du\LF	ANY	delete
+et\LF du\LF	ANY	delete
+et\LF du\LF	ANY	delete
+et\LF du\LF	ANY	delete
+et\LF du\LF	ANY	delete
+et\LF du\LF	ANY	delete
+et\LF du\LF	ANY	delete
+#
+#########################################
+# NOM ou PREPOSITION DETERMINANT?
+#
+#Nc----\POS ou\LF de\LF	ANY	split	2
+#Ncm---\POS ou\LF de\LF	ANY	split	2
+#Nc-s--\POS ou\LF de\LF	ANY	split	2
+#Nc-p--\POS ou\LF de\LF	ANY	split	2
+#Ncms--\POS ou\LF de\LF	ANY	split	2
+#Ncfs--\POS ou\LF de\LF	ANY	split	2
+#Ncmp--\POS ou\LF de\LF	ANY	split	2
+#Ncfp--\POS ou\LF de\LF	ANY	split	2
+#Nc----\POS ou\LF du\LF	ANY	split	2
+#Ncm---\POS ou\LF du\LF	ANY	split	2
+#Nc-s--\POS ou\LF du\LF	ANY	split	2
+#Nc-p--\POS ou\LF du\LF	ANY	split	2
+#Ncms--\POS ou\LF du\LF	ANY	split	2
+#Ncfs--\POS ou\LF du\LF	ANY	split	2
+#Ncmp--\POS ou\LF du\LF	ANY	split	2
+#Ncfp--\POS ou\LF du\LF	ANY	split	2
+#
+ou\LF de\LF	ANY	delete
+ou\LF de\LF	ANY	delete
+ou\LF de\LF	ANY	delete
+ou\LF de\LF	ANY	delete
+ou\LF de\LF	ANY	delete
+ou\LF de\LF	ANY	delete
+ou\LF de\LF	ANY	delete
+ou\LF de\LF	ANY	delete
+ou\LF du\LF	ANY	delete
+ou\LF du\LF	ANY	delete
+ou\LF du\LF	ANY	delete
+ou\LF du\LF	ANY	delete
+ou\LF du\LF	ANY	delete
+ou\LF du\LF	ANY	delete
+ou\LF du\LF	ANY	delete
+ou\LF du\LF	ANY	delete
+#
+#########################################
+# "DECHETS"
+#
+*\IF	ANY	delete
+#\IF	ANY	delete
+# il faudrait faire quelquechose pour les espaces et les puces
+# qui sont parfois étiquettés comme noms
+#
+##########################
+# APRES EVALUATION
+#
+coup\IF d\IF oeil\IF	ANY	delete
+à\IF propos\IF de\IF	ANY	delete
+à\IF propos\IF d\IF	ANY	delete
+propos\IF de\IF	ANY	delete
+propos\IF d\IF	ANY	delete
+
+####################
+
+dans\IF le\IF cadre\IF de\LF	ANY	delete
+en\IF fonction\IF de\LF	ANY	delete
+à\IF la\IF place\IF de\LF	ANY	delete
+sur\IF la\IF base\IF de\LF	ANY	delete
+le\IF long\IF de\LF	ANY	delete
+au\IF travers\IF	ANY	delete
+à\IF travers\IF	ANY	delete
+de\LF façon\IF à\IF	ANY	delete
+grâce\IF à\IF	ANY	delete
+suivant\IF	ANY	delete
+question\IF de\LF	ANY	delete
+en\IF lien\IF avec\IF	ANY	delete
+sauf\IF	ANY	delete
+chose\LF	ANY	delete
+au\IF cours\IF de\LF	ANY	delete
+la\IF plupart\IF de\LF	ANY	delete
+en\IF terme\IF de\LF \IF	ANY	delete
+en\IF matière\IF de\LF	ANY	delete
+en\IF présence\IF de\LF	ANY	delete
+au\IF niveau\IF de\LF	ANY	delete
+en\IF dehors\IF de\LF	ANY	delete
+de\LF le\LF ordre\IF de\LF	ANY	delete
+de\LF l\LF ordre\IF de\LF	ANY	delete
+sous\IF forme\IF de\LF	ANY	delete
+en\IF parallèle\IF à\IF	ANY	delete
+en\IF dehors\IF de\LF	ANY	delete
+de\LF manière\IF à\IF	ANY	delete
+au\IF moment\IF de\LF	ANY	delete
+en\IF faveur\IF de\LF	ANY	delete
+à\IF le\IF inverse\IF de\LF	ANY	delete
+du\IF fait\IF de\LF	ANY	delete
+quelque\LF	ANY	delete
+chaque\IF	ANY	delete
+à\IF la\IF fois\IF	ANY	delete
+en\IF forme\IF de\LF	ANY	delete
+au\IF risque\IF de\LF	ANY	delete
+à\IF la\IF place\IF de\LF	ANY	delete
+ayant\IF trait\IF à\IF	ANY	delete
+nombreux\LF	ANY	delete
+sur\IF le\IF plan\IF de\LF	ANY	delete
+en\IF cas\IF de\LF	ANY	delete
+tenant\IF compte\IF de\LF	ANY	delete
+au\IF lieu\IF de\LF	ANY	delete
+à\IF destination\IF de\LF	ANY	delete
+allant\IF de\LF	ANY	delete
+au\IF moyen\IF de\LF	ANY	delete

@@ -1,0 +1,81 @@
+{
+   "abstract" : "List objects, kitchen sink included",
+   "author" : [
+      "Jon Portnoy <avenj@cobaltirc.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "List-Objects-WithUtils",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Text::ZPL" : "0"
+         },
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "List::UtilsBy::XS" : "0.03",
+            "Type::Tiny" : "0.022"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Class::Method::Modifiers" : "0",
+            "Exporter" : "0",
+            "List::Util" : "1.33",
+            "List::UtilsBy" : "0.09",
+            "Module::Runtime" : "0.013",
+            "Role::Tiny" : "1.003",
+            "Scalar::Util" : "0",
+            "Type::Tie" : "0.004",
+            "autobox" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900",
+            "JSON::PP" : "0",
+            "Test::Without::Module" : "0"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avenj/list-objects-withutils.git",
+         "web" : "git://github.com/avenj/list-objects-withutils"
+      }
+   },
+   "version" : "2.028003"
+}
+

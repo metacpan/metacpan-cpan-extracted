@@ -1,0 +1,8 @@
+Changes
+lib/Lemonldap/Portal/CAS.pm
+lib/Lemonldap/Portal/LoginCAS.pm
+Makefile.PL
+MANIFEST
+README
+t/Lemonldap-Portal-CAS.t
+META.yml                                 Module meta-data (added by MakeMaker)

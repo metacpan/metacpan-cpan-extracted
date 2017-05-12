@@ -1,0 +1,26 @@
+---
+abstract: 'HTTP::Casing based UserAgent, finally done right'
+author:
+  - 'Theo van Hoesel <Th.J.v.Hoesel@THEMA-MEDIA.nl>'
+build_requires:
+  Test::MockObject: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LWP-UserAgent-Caching
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Caching: '0'
+  HTTP::Request::Common: '0'
+  LWP::UserAgent: '0'
+  perl: '5.006'
+version: '0.04'

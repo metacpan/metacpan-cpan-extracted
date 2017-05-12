@@ -1,0 +1,28 @@
+---
+abstract: 'Configurator implementation with Perl Code Style'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Log-Dispatch-Configurator-Perl
+provides:
+  Log::Dispatch::Configurator::Perl:
+    file: lib/Log/Dispatch/Configurator/Perl.pm
+    version: 0.0132
+requires:
+  Carp: 0
+  Log::Dispatch::Configurator: 0
+  parent: 0
+  perl: v5.6.2
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Log-Dispatch-Configurator-Perl
+version: 0.0132

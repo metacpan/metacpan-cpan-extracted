@@ -1,0 +1,176 @@
+#!/usr/bin/perl -s
+
+use strict;
+use warnings;
+
+use Lingua::NATools::Lexicon;
+use Lingua::NATools::Dict;
+
+
+our ($h);
+
+sub usage {
+  print "nat-substDict: substitutes the dictionary in a NATools corpus by a Dumper PTD\n\n";
+  print "\tnat-substDict <natDir> <dumperFile>\n\n";
+  print "\tnat-substDict <natDir> <source-target.dmp> <target-source.dmp>\n\n";
+  print "For more help, please run 'perldoc nat-substDict'\n";
+  exit;
+}
+
+usage() if ($h);
+my $selfdir = shift @ARGV;
+my $dumper  = shift @ARGV;
+my $dumper2 = shift @ARGV || undef;
+
+usage() unless -d $selfdir && -f $dumper;
+
+print STDERR "step 1: load Data::Dumper file\n";
+our ($DIC1, $DIC2);
+if ($dumper2) {
+  $DIC1 = do $dumper;
+  $DIC2 = do $dumper2;
+} else {
+  do $dumper;
+}
+my $s1 = keys %$DIC1;
+my $s2 = keys %$DIC2;
+printf STDERR "        size 1: $s1\n";
+printf STDERR "        size 2: $s2\n";
+
+
+
+
+print STDERR "step 2: associate IDs to source Dumper entries\n";
+die "Can't find source.lex file" unless -f "$selfdir/source.lex";
+
+my $source = Lingua::NATools::Lexicon->new("$selfdir/source.lex");
+$source->enlarge($s1);
+my $i = 0;
+my $new = 0;
+for my $w (keys %$DIC1) {
+  ++$i;
+
+  my $wid = ($w eq "(null)" || $w eq "(none)")?1:$source->id_from_word($w);
+
+  # this increments the occurrence number to 1
+  unless ($wid) {
+    $wid = $source->add_word($w);
+    $new++;
+  }
+  $source->set_id_count($wid, $DIC1->{$w}{count});
+  $DIC1->{$w}{id} = $wid;
+}
+printf STDERR "        %d ids reused\n", $i - $new;
+printf STDERR "        %d new ids\n", $new;
+$s1 = $source->size();
+$source->save("$selfdir/source.lex");
+$source->close();
+
+
+
+print STDERR "step 3: associate IDs to target Dumper entries\n";
+die "Can't find target.lex file" unless -f "$selfdir/target.lex";
+
+my $target = Lingua::NATools::Lexicon->new("$selfdir/target.lex");
+$target->enlarge($s2);
+$i = 0;
+$new = 0;
+for my $w (keys %$DIC2) {
+  ++$i;
+
+  my $wid = ($w eq "(null)" || $w eq "(none)")?1:$target->id_from_word($w);
+
+  # this increments the occurrence number to 1
+  unless ($wid) {
+    $wid = $target->add_word($w);
+    $new++;
+  }
+  $target->set_id_count($wid, $DIC2->{$w}{count});
+  $DIC2->{$w}{id} = $wid;
+}
+printf STDERR "        %d ids reused\n", $i - $new;
+printf STDERR "        %d new ids\n", $new;
+$s2 = $target->size();
+$target->save("$selfdir/target.lex");
+$target->close();
+
+
+
+print STDERR "step 4: change source/target dictionary\n";
+unlink "$selfdir/source-target.bin" if -f "$selfdir/source-target.bin";
+
+my $stDic = Lingua::NATools::Dict->new("$selfdir/source-target.bin", $s1);
+die unless $stDic;
+
+for my $w (keys %$DIC1) {
+  my $wid = $DIC1->{$w}{id};
+  $stDic->set_occ($wid, $DIC1->{$w}{count});
+
+  my $index = 0;
+  for my $k (keys %{$DIC1->{$w}{trans}}) {
+    die "$wid > $s1" if $wid > $s1;
+    $stDic->set_val($wid, $index, $DIC2->{$k}{id}, $DIC1->{$w}{trans}{$k});
+    ++$index;
+  }
+}
+$stDic->save();
+$stDic->close();
+
+
+
+
+
+print STDERR "step 5: change target/source dictionary\n";
+unlink "$selfdir/target-source.bin" if -f "$selfdir/target-source.bin";
+
+my $tsDic = Lingua::NATools::Dict->new("$selfdir/target-source.bin", $s2);
+die unless $tsDic;
+
+for my $w (keys %$DIC2) {
+  my $wid = $DIC2->{$w}{id};
+
+  $tsDic->set_occ($wid, $DIC2->{$w}{count});
+  my $index = 0;
+  for my $k (keys %{$DIC2->{$w}{trans}}) {
+    die "$wid > $s2" if $wid > $s2;
+    $tsDic->set_val($wid, $index, $DIC1->{$k}{id}, $DIC2->{$w}{trans}{$k});
+    ++$index;
+  }
+}
+$tsDic->save();
+$tsDic->close();
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-substDict: substitutes a dictionary in a NATools corpus by a Perl Dumper format PTD.
+
+=head1 SYNOPSIS
+
+  nat-substDict <natDir> <dumperFile>
+  nat-substDict <natDir> <source-target.dmp> <target-source.dmp>
+
+=head1 DESCRIPTION
+
+This tool is used to substitute a dictionary on a NATools
+corpus. Unless you know what you are doing, this can be a bad option
+making the corpus unusable.
+
+To use it just pass as first parameter a NATools corpus directory and
+as second argument a Perl Data::Dumper file with the two dictionaries
+(or a pair of Data::Dumper files, one with each dictionary).
+
+=head1 SEE ALSO
+
+NATools documentation, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2009 by Alberto Manuel Brandão Simões
+
+=cut

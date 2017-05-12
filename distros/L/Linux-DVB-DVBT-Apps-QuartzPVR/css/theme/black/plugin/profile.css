@@ -1,0 +1,18 @@
+/*==================================================================*/
+/* PROFILE
+==================================================================*/
+#profile {
+	color: white;
+	background: #555 ;
+}
+
+#profile .profile_message {
+	border-bottom: solid #333 1px;
+	color: #ff0;
+}
+
+#profile .profile_sorted {
+	color: blue;
+	border-bottom: solid #333 1px;
+}
+

@@ -1,0 +1,11 @@
+ssli-configure$
+~$
+\#$
+\bCVS\b
+\bMakefile$
+\bMakefile.old$
+.exists$
+^blib/
+\bpm_to_blib$
+.cvsignore$
+bugs

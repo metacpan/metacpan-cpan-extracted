@@ -1,0 +1,58 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  comment                                                            | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+#**********************************************************************
+# Define \name and \begin{name} to start an ignored section
+# until \endname or \end{name}, respectively
+sub defineExcluded {
+  my ($stomach, $name) = @_;
+  $name = ToString($name);
+  my $endmark = '\end{' . $name . '}';
+  DefConstructorI(T_CS("\\begin{$name}"), undef, '', reversion => '',
+    afterDigest => [sub {
+        my ($istomach, $whatsit) = @_;
+        my $nlines = 0;
+        my ($line);
+        my $gullet = $istomach->getGullet;
+        $gullet->readRawLine;    # IGNORE 1st line (after the \begin{$name} !!!
+        while (defined($line = $gullet->readRawLine) && ($line ne $endmark)) {
+          $nlines++; }
+        NoteProgress("[Skipped $name ($nlines lines)]"); }]);
+  return; }
+
+sub defineIncluded {
+  my ($stomach, $name, $before, $after) = @_;
+  $name = ToString($name);
+  # Note that we define the `magic' environment control sequences,
+  # but DO NOT do any of the normal environ things, like \begingroup \endgroup!
+  DefMacroI(T_CS("\\begin{$name}"), undef, sub {
+      my ($gullet) = @_;
+      $gullet->readRawLine;    # IGNORE 1st line (after the \begin{$name} !!!
+      Tokens(($before ? $before->unlist : ()), T_CS('\ignorespaces')); });
+  DefMacroI(T_CS("\\end{$name}"), undef,
+    Tokens(($after ? $after->unlist : ()), T_CS('\ignorespaces')));
+  return; }
+
+defineExcluded(undef, 'comment');
+
+DefPrimitive('\includecomment{}',     \&defineIncluded);
+DefPrimitive('\excludecomment{}',     \&defineExcluded);
+DefPrimitive('\specialcomment{}{}{}', \&defineIncluded);
+#DefPrimitive('\processcomment{}{}{}{}',);
+
+#**********************************************************************
+1;

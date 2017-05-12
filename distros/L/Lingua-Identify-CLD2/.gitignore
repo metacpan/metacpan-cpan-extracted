@@ -1,0 +1,13 @@
+MANIFEST
+*.bak
+buildtmp/
+Build
+MANIFEST$
+META.*
+MYMETA.*
+.*.swo
+.*.swp
+blib/
+_build/
+src/*.o
+*.o

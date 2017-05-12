@@ -1,0 +1,6 @@
+Revision history for Perl extension Language::Indonesia.
+
+0.01  Sat Nov  4 15:18:43 2006
+	- original version; created by h2xs 1.23 with options
+		-AX ‐--skip-exporter ‐--use-new-tests -n Language::Indonesia
+

@@ -1,0 +1,61 @@
+Changes				Changes from version to version
+DIARY.txt			FMTYEWTK about what I did each day
+MANIFEST			This list of files
+MANIFEST.SKIP			
+Makefile.PL			MakeMaker file to create a Makefile
+NOTES.txt			Very ugly verbose notes of things todo
+README				Basic Intro
+Todo				Succinct plans for upcoming versions
+minizork.pl			Perl version of Infocom's demo minizork
+languages/PIR/README
+languages/PIR/b.inf		Example file for PIR translation
+languages/PIR/b_expected.pir
+languages/PIR/hello_expected.pir	Hello, World PIR translation
+languages/PIR/main.pir		Include file for PIR translations
+languages/Perl/README
+languages/Perl/big_test.cmd
+languages/Perl/big_test.in
+languages/Perl/big_test.inf		Just what it says
+languages/Perl/big_test_expect5.txt
+languages/Perl/hello_expected.pl	Hello, World Perl translation
+languages/README
+languages/XML/b.inf			Example file for XML translation
+languages/XML/foo.inf
+languages/XML/hello_expected.xml	Hello, World XML translation
+languages/XML/zcode.xsl		Display XML translations as pseudo-Inform
+languages/hello.inf		Hello, World
+languages/hello.z5		Hello, World compiled
+languages/interact.h		Include file for writing tests
+languages/no_inter.h		Include file for writing tests
+languages/test.h		Include file for writing tests
+lib/Language/Zcode.pm		Mostly POD describing Language::Zcode
+lib/Language/Zcode/Parser.pm	Parser Factory
+lib/Language/Zcode/Parser/Generic.pm	Base class for Parsers
+lib/Language/Zcode/Parser/Opcode.pm	Parse one Z-code opcode
+lib/Language/Zcode/Parser/Perl.pm	Parser that uses pure Perl
+lib/Language/Zcode/Parser/Routine.pm	Parse a Z-code routine
+lib/Language/Zcode/Parser/TXD.pm	Parser that uses external txd exe
+lib/Language/Zcode/Runtime/IO.pm	Most I/O stuff for Runtime Z-machine
+lib/Language/Zcode/Runtime/Input.pm
+lib/Language/Zcode/Runtime/Opcodes.pm	Perl translations of complex opcodes
+lib/Language/Zcode/Runtime/Quetzal.pm	Save file format
+lib/Language/Zcode/Runtime/State.pm	Machine state. boot, save/restore
+lib/Language/Zcode/Runtime/Text.pm
+lib/Language/Zcode/Translator.pm	Translator Factory
+lib/Language/Zcode/Translator/Generic.pm	Base class for Translators
+lib/Language/Zcode/Translator/PIR.pm	Translate parsed Z-code to Parrot PIR
+lib/Language/Zcode/Translator/Perl.pm	Translate parsed Z-code to Perl
+lib/Language/Zcode/Translator/XML.pm	Translate parsed Z-code to XML
+lib/Language/Zcode/Util.pm	Stuff that doesn't fit elsewhere
+scripts/plotz.pl		Translate a Z-file to other languages
+scripts/que.pl			Read a Quetzal save file, print out info
+scripts/tuxedo.pl		Compare Perl Z-file parser to txd program
+t/20_parser.inf			Inform for corresponding .t file
+t/20_parser.t			Test parsing a Z-file
+t/20_parser.z5			Compiled Z-file for corresponding .t file
+t/40_trans_perl.t		Test translating Z-code to Perl
+t/80_big_perl.t			Test running big translated Z-code/Perl file.
+t/big_test.inf			Inform for testing lots of Z functionality
+t/big_test.z5			Compiled big_test.inf
+t/no_inter.h			Inform subs for big test
+t/test_harness.h		Inform subs to output Test::Harness "(not) ok"

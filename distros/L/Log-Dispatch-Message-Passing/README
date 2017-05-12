@@ -1,0 +1,90 @@
+NAME
+    Log::Dispatch::Message::Passing - log events to Message::Passing
+
+SYNOPSIS
+    In your application code:
+
+      use Log::Dispatch;
+      use Log::Dispatch::Message::Passing;
+      use Message::Passing::Filter::Encoder::JSON;
+      use Message::Passing::Output::ZeroMQ;
+
+      my $log = Log::Dispatch->new;
+
+      $log->add(Log::Dispatch::Message::Passing->new(
+            name      => 'myapp_aggregate_log',
+            min_level => 'debug',
+            output    => Message::Passing::Filter::Encoder::JSON->new(
+                output_to => Message::Passing::Output::ZeroMQ->new(
+                    connect => 'tcp://192.168.0.1:5558',
+                ),
+            ),
+      ));
+
+      $log->warn($_) for qw/ foo bar baz /;
+
+    On your central log server:
+
+      message-pass --input ZeroMQ --input_options '{"socket_bind":"tcp://*:5558"}' \
+        --output File --output_options '{"filename":"myapp_aggregate.log"}'
+
+DESCRIPTION
+    This provides a Log::Dispatch log output system that sends logged events
+    to Message::Passing.
+
+    This allows you to use any of the Message::Passing outputs or filters to
+    process log events and send them across the network, and you can use the
+    toolkit to trivially construct a log aggregator.
+
+METHODS
+  "new"
+     my $table_log = Log::Dispatch::Message::Passing->new(\%arg);
+
+    This method constructs a new Log::Dispatch::Message::Passing output
+    object.
+
+    Required arguments are:
+
+      output - a L<Message::Passing> L<Output|Message::Passing::Role::Output> class.
+
+  log_message
+    This is the method which performs the actual logging, as detailed by
+    Log::Dispatch::Output.
+
+SEE ALSO
+    Message::Passing
+        The logging framework itself, allowing you to very simply build log
+        aggregation and processing servers.
+
+    Message::Passing::Output::ZeroMQ
+        The recommended network protocol for aggregating or transporting
+        messages across the network.
+
+        Note that whilst this transport is recommended, it is NOT required
+        by this module, so you need to require (and depend on)
+        Message::Passing::ZeroMQ separately.
+
+    example/ directory
+        Instantly runnable SYNOPSIS - plug into your application for easy
+        log aggregation.
+
+AUTHOR
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net>"
+
+SPONSORSHIP
+    This module exists due to the wonderful people at Suretec Systems Ltd.
+    <http://www.suretecsystems.com/> who sponsored it's development for its
+    VoIP division called SureVoIP <http://www.surevoip.co.uk/> for use with
+    the SureVoIP API -
+    <http://www.surevoip.co.uk/support/wiki/api_documentation>
+
+COPYRIGHT
+    Copyright Suretec Systems Ltd. 2012.
+
+LICENSE
+    GNU Affero General Public License, Version 3
+
+    If you feel this is too restrictive to be able to use this software,
+    please talk to us as we'd be willing to consider re-licensing under less
+    restrictive terms.
+

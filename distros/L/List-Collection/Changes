@@ -1,0 +1,24 @@
+Revision history for List-Collection
+
+0.0.4 2016-01-13T03:46:46
+ [Yan Xueqing]
+ - Fixed error of complement calculation
+ - Add support for string list
+
+0.0.3 2016-01-13T03:35:13Z
+ [Yan Xueqing]
+ - Remove t/03-recipe.t file
+ - Solve problem that pod document is abnormal
+
+0.0.2 2016-01-11T02:06:09Z
+ [Yan Xueqing]
+ - Add more detailed usages and test file
+
+0.0.1 2016-01-08T11:47:50Z
+ [Yan Xueqing]
+ - Auto commited by dzil with version 0.0.1 at 08-Jan-2016
+ - Fixed out variable warning
+ - Add test file
+ - Add Collection module
+ - Initialize gitrepo with `dzil new`
+

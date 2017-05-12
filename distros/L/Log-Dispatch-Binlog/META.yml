@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Log-Dispatch-Binlog
+version:             0.02
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Log::Dispatch::File:           0
+    Log::Dispatch::Handle:         0
+    Storable:                      0
+    Test::TempDir:                 0
+    Test::use::ok:                 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

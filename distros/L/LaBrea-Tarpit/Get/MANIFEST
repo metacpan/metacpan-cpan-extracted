@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Get.pm
+examples/README
+examples/other_sites.txt
+examples/web_scan.pl
+t/nochecking.t

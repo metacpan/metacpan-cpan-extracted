@@ -1,0 +1,19 @@
+Revision history for Lingua-Norms-SUBTLEX-0.05
+
+0.05    2015.02.28
+        - Added support for DE, in addition to NL, UK and US files.
+
+0.04    2015.02.27
+        - Added support for UK and NL (assuming csv files)
+
+0.03    2015.01.11
+        - Misc. code and doc clean-ups, including corrected version numbering and internal linking.
+
+0.02    2015.01.10
+        - Added methods to directly retrieve the "contextual diversity" measures as percentage, and log of percentage.
+        - Corrected the calculation of mean Levenshtein Distance by the function on_ldist - it should not previously have been public. Two pre-installation tests, based on the example data in the Yarkoni et al. (2008) paper, have been added, ensuring that the method returns the correct values.
+        - Revised POD documentation, including doi links.
+
+0.01    2014.08.08
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,16 @@
+# This file is an example of a language translation file.
+#
+# - Blank lines and lines begining with a '#' are ignored.
+# - It supports multiple languages / dialects within a single file.
+# - This example is for the cn (Chinese) language
+#
+
+
+#
+# Translate to Chinese - no need for singular vs plural
+#
+key = Select [_1] colours.
+language = cn
+translation = FIXME
+
+

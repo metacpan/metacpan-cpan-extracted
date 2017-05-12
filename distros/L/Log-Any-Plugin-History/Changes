@@ -1,0 +1,11 @@
+Revision history for Log::Any::Plugin::History
+
+0.02      2017-05-07 21:08:47+01:00 Europe/London
+
+  * Fixes:
+    * Set minimum version of Log::Any to 1.042, so logged message can be pushed
+      into the log history.
+
+0.01      2017-05-06 21:22:15+01:00 Europe/London
+  
+  * Initial release

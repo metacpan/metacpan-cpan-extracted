@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+Tiny.xs
+contrib/benchmark.pl
+dist.ini
+inc/SmapsTinyMakeMaker.pm
+lib/Linux/Smaps/Tiny.pm
+lib/Linux/Smaps/Tiny/PP.pm
+t/00-compile.t
+t/all.t
+t/release-pod-syntax.t

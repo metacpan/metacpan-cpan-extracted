@@ -1,0 +1,33 @@
+NAME
+    LWP::ConnCache::MaxKeepAliveRequests - A connection cache that enforces
+    a max keep alive limit
+
+SYNOPSIS
+      use LWP;
+      use LWP::ConnCache::MaxKeepAliveRequests;
+      my $ua = LWP::UserAgent->new;
+      $ua->conn_cache(
+          LWP::ConnCache::MaxKeepAliveRequests->new(
+              total_capacity          => 10,
+              max_keep_alive_requests => 100,
+          )
+      );
+
+DESCRIPTION
+    LWP::UserAgent is the default module for issuing HTTP requests from
+    Perl. It has a keep_alive setting which by default allows unlimited
+    requests to the same server. Some servers will disconnect you after a
+    limited number of requests (in Apache 2 this is achieved with the
+    MaxKeepAliveRequests directive). This module allows you to limit the
+    maximum number of keep alive requests to a server.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>.
+
+COPYRIGHT
+    Copyright (C) 2008, Leon Brocard
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

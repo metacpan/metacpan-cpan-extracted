@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+
+use v5.20;
+use strictures 2;
+use sigtrap qw/handler handle_signal normal-signals/;
+use experimental qw/smartmatch signatures/;
+use Linux::Systemd::Daemon ':all';
+use Linux::Systemd::Journal::Write;
+
+my $sleep_max = 8;
+my $jnl       = Linux::Systemd::Journal::Write->new;
+
+sub handle_signal($signal) {
+    $jnl->print("Got a SIG$signal");
+    given ($signal) {
+        when ('HUP') {
+            sd_notify(reloading => 1, status => 'Reloading configuration...');
+            $jnl->print('pretending to reload configuration');
+            sleep rand($sleep_max);
+            Linux::Systemd::Daemon::notify("READY=1");
+        }
+        when (/TERM|INT/) {
+            sd_notify(stopping => 1, status => 'Shutting down...');
+            $jnl->print('pretending to do some clean up tasks');
+            sleep rand($sleep_max);
+            exit;
+        }
+    }
+
+}
+
+$jnl->print('pretending to do some initialisation tasks');
+sleep rand($sleep_max);
+
+sd_ready();
+
+while (1) {
+    $jnl->print('looping');
+    sd_notify(watchdog => 1, status => 'Main loop running');
+    sleep rand($sleep_max);
+}

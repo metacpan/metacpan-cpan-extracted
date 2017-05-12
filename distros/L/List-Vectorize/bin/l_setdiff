@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use List::Vectorize;
+
+open F1, $ARGV[0] or die "cannot open $ARGV[0]";
+open F2, $ARGV[1] or die "cannot open $ARGV[1]";
+print join "", @{setdiff([ <F1> ], [ <F2> ])};

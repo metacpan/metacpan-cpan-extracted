@@ -1,0 +1,46 @@
+NAME
+    Log::Contextual::LogDispatchouli - A Log::Dispatchouli specific wrapper
+    for Log::Contextual
+
+VERSION
+    version 0.001000
+
+DESCRIPTION
+    "Log::Dispatchouli" doesn't need much to get it to work with
+    "Log::Contextual" however, it has one teeny annoying quirk in that its
+    stack traces are always off by one.
+
+    Which has two primary side effects:
+
+    1. Under "Log::Contextual", it shows errors coming from "LC", not "LC"'s
+    caller ( Useless )
+    2. Under "Moose", if you use a delegation, "LD" will report problems
+    coming from the delegate ( Useless )
+
+    So this module exists to solve #2, and it has to solve #1 in the
+    process.
+
+METHODS
+  "router"
+    This is the only difference this module has from "Log::Contextual", and
+    its that it returns a "Log::Contextual::Router::LogDispatchouli" instead
+    of the default router.
+
+USAGE
+        use Log::Contextual::LogDispatchouli qw( set_logger );
+
+        set_logger $ld;
+
+    Other than that, this module is just a wrapper around the rest of
+    "Log::Contextual"
+
+AUTHOR
+    Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

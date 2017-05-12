@@ -1,0 +1,10 @@
+Revision history for Perl extension List-Flatten-XS
+
+0.02 2017-03-31T12:57:40Z
+
+    - Removed 'static_install' option from minil.toml
+
+0.01 2017-03-31T06:19:17Z
+
+    - original version
+

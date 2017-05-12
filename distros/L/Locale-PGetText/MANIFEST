@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+MsgFormat.PL
+PGetText.pm
+XText.PL
+README

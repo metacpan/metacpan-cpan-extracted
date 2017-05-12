@@ -1,0 +1,611 @@
+=head1 NAME
+
+jspell - Command line interface to Jspell morphological analyzer
+
+=head1 SYNOPSIS
+
+jspell [-dfile | -pfile | -wchars | -Wn | -t | -n |
+        -x | -b | -S | -B | -C | -P | -m | -Lcontext |
+        -M | -N | -Ttype | -V | -o format | -g | -y | -u] file .....
+
+jspell [-dfile | -pfile | -wchars | -Wn | -t | -n | -Ttype| -o format] -l
+
+jspell [-dfile | -pfile | -ffile | -Wn | -t | -n | -B | -C | -P | -m | -Ttype | ] {-a | -A}
+
+jspell [-dfile] [-wchars | -Wn] [-o format] -c
+
+jspell [-dfile] [-wchars] [-o format] -e[1-4]
+
+jspell [-dfile] [-wchars] -D
+
+jspell -v [v]
+
+=head1 DESCRIPTION
+
+B<jspell> is a morphological analyzer. It can be used in four different ways:
+
+=over 4
+
+=item *
+
+as a standard B<C> library;
+
+=item *
+
+as a non buffered command line application;
+
+=item *
+
+as a command interpreter;
+
+=item *
+
+as an interactive program.
+
+=back
+
+=head2 Interactive Application
+
+B<jspell> should be invoked with a text file name. This text
+correctness will be verified in following way: each word that does not
+exist on the dictionary will be shown in reverse video at the top of
+the screen, with the context text shown. The user should opt for one
+of the correction suggestion (if them exist).
+
+The suggestion can be formed in two ways:
+
+=over 4
+
+=item *
+
+detection of approximated words (words that miss a letter, or
+have some of them changed; Normally we call this I<near misses>);
+
+=item *
+
+using formation rules, starting at a known root (although
+there are no I<flags> to tell that derivation is correct, it
+will be shown as well.
+
+=back
+
+One of the last rows in the screen will show a mini-menu with some options:
+
+=over 4
+
+=item <number>
+
+digit the number of the chosen option to replace the original text;
+
+=item Space
+
+accepts the word only this time (does not change any thing);
+
+=item R
+
+replaces the word with user text;
+
+=item E
+
+replace all word occurrences in the text;
+
+=item A
+
+accepts the word through all the remaining text;
+
+=item I,U
+
+accept the word (in the case of B<I>, with the same case that the original word, in the
+B<U> case, all downcase) and actualizes the personal dictionary. We should note that our
+dictionary maintains more information about the word than itself, so the user will be
+prompt for a classification, flags and a small comment or, alternatively, we can choose
+some suggestions formed by B<jspell> using AFF file rules.
+
+=item L
+
+search words on the system dictionray (this is controlled by the compilation variable
+WORDS);
+
+=item X
+
+write all the remaining file as it is, ignore all erroneous words and start the next
+text correction (if it exists);
+
+=item Q
+
+exit immediately and leave file without changes;
+
+=item !
+
+shell exit;
+
+=item ^L
+
+redraw the screen;
+
+=item ^Z
+
+suspend B<jspell>;
+
+=item ?
+
+show help screen.
+
+=back
+
+=head2 Command line options
+
+=over 4
+
+=item -M
+
+actives mini-menu on the bottom of the screen;
+
+=item -N
+
+de-active mini-menu from the bottom of the screen;
+
+=item -L
+
+use this option to set the number of lines of context to be shown. The number
+should be glued to the flag;
+
+=item -V
+
+shows characters using more than 7 bits in the C<cat -v> style. This option can
+be usefull when we are working with older terminals that can't show some characters;
+
+=item -t
+
+input file is written in TeX or LaTeX. This mode is automatically
+activated if the file extension if C<.tex>;
+
+=item -n
+
+input file is in nroff/troff format;
+
+=item -b
+
+forces the creation of a backup file (using the extension C<.bak>);
+
+=item -x
+
+disables the creation of the backup file;
+
+=item -B
+
+considers that two words concatenated without spaces between them are errors;
+
+=item -C
+
+considers that two correct words concatenated is a correct word, too! This option
+can be usefull on languages like German where some words are made of concatenations;
+
+=item -P
+
+do not make suggestions of combinations root/affix to be added to the personal dictionary;
+
+=item -m
+
+make it possible combinations of root/affix that aren't on the dictionray;
+
+=item -S
+
+sort the suggestion list by correctness probability instead of the alphabetic one;
+
+=item -d I<file>
+
+specify an alternative dictionary;
+
+=item -p I<file>
+
+specify an alternative personal dictionary. If file does not start by a slash, the
+C<$HOME> preffix is assumed. If you specify one of the default C<fich-hash> of the
+library dictionary and there is a file C<.jspell_hashfile>, this will be used as
+the personal dictionary. If none of there conditions are true, we use the
+C<.jspell_words> file.
+
+Without this option, B<jspell> will search personal dictionaries in
+the current directory and in the home dir. If both exists, they will be
+loaded.
+
+=item -w I<chars>
+
+specify additional characters that can be used inside words; Using C<-w "&"> we
+make "AT&T" a valid word;
+
+=item -W I<n>
+
+specify the maximum size of legal words. If you want to verify all words, independently
+of the size, use C<-W 0>;
+
+=item -T I<type>
+
+assume some formating type for all files. Argument I<type> can be one
+of the unique names defined on the affix file (example C<nroff>) or a
+file suffix containing a dot (example C<.tex>);
+
+=item -l
+
+used to produce the bad word list using standard input;
+
+=item -a
+
+this was thought to be used using pipes. This is a command line interpreter.
+
+If the word is found directly on the dictionary, or using any of the
+I<flags>, appears the information about the word root and it's root
+and affix/preffix features. This information appears using a format
+that can be defined by the user.
+
+If the word isn't in the dictionary, the output line starts with and
+ampersand (C<&>), a space, the original word, a space, the number of
+characters between the line start and the word, a two dots and a list
+of approximated words where appears the name of the word, the equal
+sign and the classification using the format specified. If the word
+can be formed using and illegal addition of affixes of a known root,
+there will be presented a suggestion list, too!
+
+If there isn't an approximated word, but only formation using invalid
+affixes, the line uses a similar format but instead of an ampersan
+there will be a question mark.
+
+Resuming:
+
+If the word does Exist on the dictionary, the output will be:
+
+  * <original> <offset>: <solution>, <solution>, ...
+
+If there is NOT in the dictionary:
+
+  & <original> <offset>: <err>, <err>, ..., <affix sugst>, ...
+
+where C<err> and C<affix sugst> have the following fomat:
+
+  <word> = format(<root>,<root fea>,<preffix fea>,
+                       <suffix fea>,<suffix2 fea>)
+
+This I<format> if defined by the user, being the default:
+
+  lex(<root>, [<root fea>], [<preffix fea>],
+              [<suffix fea>], [<suffix2 fea>])
+
+The separators C<,>, C<=>, e C<:> are defined using a C<#define>
+clause. So, they can be changed on compile time.
+
+Using the C<-a> flag, there are a set of commands starting with these
+characters: C<*>, C<@>, C<&>, C<+>, C<->, C<~>, C<#>, C<!>, C<%>, C<$>
+or C<^>. 
+
+=over 4
+
+=item C<*>
+
+Add to personal dictionary. You can add the class, flags and comments
+using the dictionary separator.
+
+=item @
+
+Accept the word, but do not add it to the dictionary;
+
+=item &
+
+Add the lowercase converted word to the personal dictionary;
+
+=item #
+
+Save current personal dictionary;
+
+=item ~
+
+Indicates the parameters based on the file;
+
+=item +
+
+Enter in TeX mode;
+
+=item -
+
+Exit from TeX mode;
+
+=item !
+
+Enter I<terse> mode;
+
+=item %
+
+Exit I<terse> mode;
+
+=item $ I<flag>
+
+Alters the function mode as the C<init_modes> function (see the library section);
+
+=item ^
+
+Verifies the rest of the line
+
+=back
+
+Note that in the I<terse> mode the information about correct words
+will be hidden. This can be used to make some programs fasters.
+
+=item -A
+
+works like the C<-a> option, excepts that if the line starts with a
+string like C<&Include_File&>, the rest of the line is considered to
+be the name of a file to be read words from;
+
+=item -s
+
+if used, B<jspell> will stop with signal C<SIGSTP> after reading a
+line of input, and continues reading the next line when it receives
+the C<SIGCONT> signal.
+
+This is only valid if C<-a> or C<-A> option is active too, and on
+C<BSD> derived systems;
+
+=item -f
+
+used to specify a file name where B<jspell> should write results, 
+instead of the standard output. Only valid in conjuntion with a
+C<-a> or C<-A> option;
+
+=item -v
+
+makes B<jspell> dump it's current version. If you double the option
+(C<-vv>), will be printed compilation options, too!
+
+=item -c
+
+Makes words to be read from standard input and, for each of them,
+write a list of possible roots, classification and original word
+classification derived that way, as the used flags. Note that
+generated roots can be not found in the dictionary.
+
+Example, the 'batatas' input (portuguese) makes:
+
+  batatas lex(batata, [CAT=adj_nc], [N=p], []),
+          lex(batatar, [CAT=v, [CAT=v,P=2,N=s,T=p], [])
+
+=item -z
+
+makes the used flag to be printed as well:
+
+  lex(batata, [CAAT=adj_nc], [N=p], {})/p
+
+=item -e
+
+is the inverse of C<-c>. Starting with a word and a flag, generates all
+hypothesis of derived words using the flag rules:
+
+example: batata/p generates
+
+  batata batatas= lex(batata, [], [N=p], [])
+
+=item -D
+
+makes the dictionary affix tables to be written on the standard output;
+
+=item -o I<format>
+
+defines the format for the output. It should be a string containing
+five C<%s> to be filled by the word root, classification of the root,
+and the classification associated to the flag. The default, as seen
+before, is C<lex(%s, [%s], [%s], [%s], [%s])>
+
+=item -g
+
+indicates that should be shown only solutions and not
+suggestions. Using this, makes better performance.
+
+=item -y
+
+indicates that we want to obtain only the suggestions created using
+flags not defined for the word. There will be no near misses
+calculations. 
+
+=item -u
+
+ignore punctuation. There is a define C<DEFAULT_SIGNS> containing all
+punctuation marks.
+
+=back
+
+
+Output in the options C<-a>, C<-e> and C<-c> uses some separators that
+are defined with the following names:
+
+  SEP1 ","
+  SEP2 ";"
+  SEP3 "="
+  SEP4 "\n"
+
+C<SEP1> is used to separate solution hypothesis. C<SEP2> is used when
+we show near misses indicating the end of that type of
+solutions. C<SEP3> is used to separate the original word from the
+information. C<SEP4> ends the word record.
+
+=head1 Using the C library
+
+Programs using B<jspell> as a library should include C<jslib.h> and link
+with C<jspell.a> or C<jspell.so>.
+
+These programs should init the library calling C<init_jspell("...")> and,
+after it, you can call other API functions.
+
+=head2 init_jspell(char *options)
+
+
+Init B<jspell> with the flags in the C<options> string. Normally the
+C<-a> option is allways used. Example of calling B<jspell>:
+
+  init_jspell("-d dic-pe -W 0 -a -cf")
+
+
+=head2 word_info(char* word, sols_type solutions, sols_type near_misses)
+
+This function gives information about the C<word> searched in the
+dictionary. If it is found, the possible ways to form it are given in
+the C<solutions> array where, each element is a string containing the
+word root, it's classification and the classification that makes the
+C<word> possible.
+
+If the word is not found in the dictionary, the C<near_misses> array
+contains the possible solutions using the format specified with the
+C<-o> flag.
+
+If C<solutions[i]> or C<near_misses[i]> contains an empty string,
+then, there is no more solutions/suggestions, respectively.
+
+
+=head2 void init_modes(char* modes)
+
+Used to change the suggestion output format. There are two types of
+suggestions: those done doing small changes in the original word
+(designated by I<near misses>) and those that are constructed adding
+affixs not provided for that word.
+
+Disponible flags are:
+
+=over 4
+
+=item g
+
+don't give suggestions from other words (disable near misses);
+
+=item G
+
+inverse of C<g>: enable near misses;
+
+=item P
+
+don't give suggestion from combining not provided affixes to the word;
+
+=item m
+
+turns off C<P> option;
+
+=item y
+
+don't give suggestions by swapping characters in the original word;
+
+=item Y
+
+turns off C<y> option;
+
+=item z
+
+show flags used for the suggestion;
+
+=item Z
+
+turn off C<z> option;
+
+=back
+
+=head2 char* get_next_word(char *buf, char *next_word)
+
+Given the buffer C<buf>, put in C<next_word> the next valid word
+encountered. Returns a pointer to C<buf> position after the end of the
+word found. Returns C<NULL> is none is found.
+
+=head2 get_roots(char *word, sols_type solutions, char in_dic[MAXPOSSIBLE])
+
+Given the C<word> search its possible origins although they aren't in
+the dictionary. The vaious possibilities are returned on the
+C<solutions> array, containing each position the root indication, it's
+classification and the classification related to the used flag. This
+information is in a string with the habitual output. Each entry in the
+C<in_dic> array shows if the root is, or not, in the dictionary.
+
+If C<solutions[i]> is an empty string, then there aren't more solutions.
+
+=head2 insert_word(char *word, char *class, char *flags, char *comm)
+
+Inserts the C<word> with it's classification (C<class>), C<flags> and
+comment (C<comm>) in the personal dictionary.
+
+=head2 accept_word(char *word, char *class, char *flags, char *comm)
+
+Accepts the C<word> with it's classification (C<class>), C<flags> and
+comment (C<comm>) until the end of the utilization of the library.
+
+=head2 char* replace_word(char *start, char* word, char* curchar)
+
+Substitutes the word existing in the text in the C<start> position by
+the C<word> indicating in C<curchar> where the last word ended.
+
+Returns the position in the buffer where the new word ends.
+
+=head2 save_pers_dic()
+
+Saves the personal dictionary in the present state.
+
+=head2 ID_TYPE word_it(char* word, char* feats, int* status)
+
+For a C<word> returns an unique identifier.
+
+=head2 char *word_f_id(ID_TYPE id)
+
+Given an identifier, returns a pointer to the position of the respective word.
+
+=head2 char *class_f_id(ID_TYPE id)
+
+Given an identifier, returns a pointer to the position of the respective classification.
+
+=head2 char *flags_f_id(ID_TYPE id)
+
+Given an word identifier, returns a string with it's respective flags identification.
+
+=head2 Example
+
+  #include "jslib.h"
+
+  main() {
+    int i;
+    char X[BUFSIZ], char w[100], *p;
+    sols_type solutions, near_misses;
+
+    init_jspell("-d dict -W 0 -a");
+
+    while(gets(X)) {
+       p = X;
+
+       while (p=get_next_word(p, w)) {
+           word_info(w, solutions, near_misses);
+           puts("solutions");
+           i = 0;
+           while(solutions[i][0])
+              puts(solutions[i++]);
+           puts("near misses");
+           i = 0;
+           while(near_misses[i][0])
+              puts(near_misses[i++]);
+      }
+   }
+}
+
+If you save this file with the name C<exp-lib.c>, you can compile it with:
+
+  gcc -o exp-lib exp-lib.c -ljspell
+
+=head1 THANKS
+
+We should thanks Pace Willisson and Geoff Kuenning for putting
+C<ispell> as a open source application, from where much of this
+application code was borrowed.
+
+=head1 AUTHOR
+
+ Ulisses Pinto
+ J.Joao Almeida  <jj@di.uminho.pt>
+
+=head1 SEE ALSO
+
+ See the following man pages: jspell(3), jspell-aff(1), perl(1), agrep(1)
+
+=head1 BUGS
+
+ We wait for them at any of the author e-mails!
+
+=cut

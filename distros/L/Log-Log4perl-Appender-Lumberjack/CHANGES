@@ -1,0 +1,23 @@
+==================================================
+Changes from 2015-11-14 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.00 at 2016-11-13 10:43:47 +0000
+-----------------------------------------
+
+  Change: 61b478f1f53a7a316370c00aa9cfcffdc13c1696
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-13 11:43:25 +0000
+
+    Fix .gitignore 
+
+  Change: bb9a8fd5902724e9ca6bb41b32d9a05bcf145700
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-13 11:40:44 +0000
+
+    Added basic CPAN infrastructure and docs 
+
+================
+End of releases.
+================

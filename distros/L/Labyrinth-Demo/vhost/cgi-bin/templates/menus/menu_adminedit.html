@@ -1,0 +1,128 @@
+[%
+    IF data.menuid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Menu' ;
+%]
+
+[% IF user.access > 4 ; THEN ; master = 1 ; END %]
+
+[% IF thanks %]<p>Menu saved successfully.</p>[% END %]
+<p>Fields marked * are mandatory fields and must be completed.</p>
+[% IF errmess %]
+[% IF errmess == 1 %]
+<p class="alert">There are invalid or missing fields, as noted by the "&empty;" symbol.</p>
+[% ELSE %]
+<p class="alert">[% errmess %]</p>
+[% END %]
+[% END %]
+
+<form action="[% cgipath %]/pages.cgi" method="post" id="EDIT" name="EDIT">
+<input type="hidden" name="act" value="menu-save" />
+<input type="hidden" name="menuid" value="[% data.menuid %]" />
+<input type="hidden" name='doaction' value='' />
+<input type="hidden" name='recordid' value='' />
+
+<div class="box">
+<table class="blocker">
+[% IF data.menuid %]
+<tr><th>ID</th>
+    <th></th>
+    <td>[% data.menuid %]</td></tr>
+[% END %]
+<tr><th>Name *</th>
+    <th class="alert">[% data.name_err %]</th>
+    <td><input type="text" name="name" size="32" value="[% data.name %]" /> (internal reference name only)</td></tr>
+<tr><th>Title</th>
+    <th class="alert">[% data.title_err %]</th>
+    <td><input type="text" name="title" size="32" value="[% data.title %]" /> (displayed menu title)</td></tr>
+<tr><th>Type *</th>
+    <th class="alert">[% data.typeid_err %]</th>
+    <td>[% data.ddtypes %]</td></tr>
+<tr><th>Realm *</th>
+    <th class="alert">[% data.realm_err %]</th>
+    <td>[% data.ddrealms %]</td></tr>
+<tr><th>Parent</th>
+    <th class="alert">[% data.parentid_err %]</th>
+    <td>[% data.ddparent %]</td></tr>
+</table>
+</div>
+
+<p class="smalltext"><input type="button" value='Save Menu' onClick="doSubmit('Save',0)" /></p>
+
+[% IF data.menuid %]
+<h2>Edit Options</h2>
+
+<div class="box">
+<table class="blocker">
+<tr>
+    <th width="50">Order</th>
+    <th width="50">Text</th>
+    <th>Href</th>
+[% IF data.typeid == 2 %]
+    <th>Image</th>
+[% END %]
+[% IF data.typeid == 3 %]
+    <th>Image</th>
+    <th>Rollover</th>
+[% END %]
+[% IF data.typeid == 4 %]
+    <th>Image</th>
+    <th>Rollover</th>
+    <th>Selected</th>
+[% END %]
+[% IF master == 1 %]
+    <th width="50">Access</th>
+    <th width="50">Action</th>
+[% END %]
+</tr>
+[% FOREACH opt = data.options %]
+<tr>
+    <td><input type="text" name="ORDER[% opt.optionid %]" size="2"  value="[% opt.orderno %]" /></td>
+    <td><input type="text" name="TEXT[% opt.optionid  %]" size="10" value="[% opt.text    %]" /></td>
+    <td><input type="text" name="HREF[% opt.optionid  %]" size="30" value="[% opt.href    %]" /></td>
+
+[% IF data.typeid == 2 %]
+    <td><input type="file" name="IMAGE[% opt.optionid %]" size="10" value="" /><br />
+        [% IF opt.image1 %]<img src="[% webpath %]/images/[% opt.image1 %]" alt="" />[% END %]
+    </td>
+[% END %]
+[% IF data.typeid == 3 %]
+    <td><input type="file" name="IMAGE[% opt.optionid %]" size="10" value="" /><br />
+        [% IF opt.image1 %]<img src="[% webpath %]/images/[% opt.image1 %]" alt="" />[% END %]
+        <input type="hidden" name="IMAGEID[% opt.optionid %]" value="[% opt.imageid1 %]" />
+    </td>
+    <td><input type="file" name="ROLLOVER[% opt.optionid %]" size="10" value="" /><br />
+        [% IF opt.image2 %]<img src="[% webpath %]/images/[% opt.image2 %]" alt="" />[% END %]
+    </td>
+[% END %]
+[% IF data.typeid == 4 %]
+    <td><input type="file" name="IMAGE[% opt.optionid %]" size="10" value="" /><br />
+        [% IF opt.image1 %]<img src="[% webpath %]/images/[% opt.image1 %]" alt="" />[% END %]
+    </td>
+    <td><input type="file" name="ROLLOVER[% opt.optionid %]" size="10" value="" /><br />
+        [% IF opt.image2 %]<img src="[% webpath %]/images/[% opt.image2 %]" alt="" />[% END %]
+    </td>
+    <td><input type="file" name="SELECTED[% opt.optionid %]" size="10" value="" /><br />
+        [% IF opt.image3 %]<img src="[% webpath %]/images/[% opt.image3 %]" alt="" />[% END %]
+    </td>
+[% END %]
+
+[% IF master == 1 %]
+    <td>[% opt.ddaccess %]</td>
+    <td><input type="checkbox" name="LISTED" value="[% opt.optionid %]" /></td>
+[% END %]
+</tr>
+[% END %]
+</table>
+</div>
+
+<p class="smalltext">
+    <input type="button" value='Save Menu'        onClick="doSubmit('Save',0)" />
+    <input type="button" value='Add Menu Option'  onClick="doSubmit('AddOption',0)" />
+[% IF master == 1 %]
+    <input type="button" value='Delete Options'   onClick="doSubmit('DeleteOption',0)" />
+[% END %]
+</p>
+<p class="smalltext">Note that options that are left blank will not be displayed.</p>
+
+[% END %]
+</form>

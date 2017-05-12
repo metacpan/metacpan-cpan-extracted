@@ -1,0 +1,10 @@
+Build.PL		Build scipt
+MANIFEST		This file
+t/Log-Journald.t	A test
+lib/Log/Journald.pm	Perl wrapper and documentation
+lib/Log/Journald.xs	Bindings to C language library
+lib/Log/Dispatch/Journald.pm	Log::Dispatch backend
+lib/Log/Log4perl/Appender/Journald.pm	Log::Log4perl appender
+META.yml
+META.json
+README

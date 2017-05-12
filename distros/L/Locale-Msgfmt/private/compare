@@ -1,0 +1,8 @@
+#!/bin/sh
+
+echo "$@"
+./bin/msgfmt.pl -o mine "$@"
+./dev/dump-mo mine > mine.out
+msgfmt -o gnu "$@"
+./dev/dump-mo gnu > gnu.out
+diff gnu.out mine.out

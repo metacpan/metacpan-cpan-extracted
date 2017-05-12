@@ -1,0 +1,498 @@
+=head1 NAME
+
+Lingua::JA::Sort::JIS - compares and sorts strings encoded in UTF-8
+
+=head1 SYNOPSIS
+
+  use Lingua::JA::Sort::JIS qw(jsort);
+  @result = jsort(@not_sorted);
+
+=head1 DESCRIPTION
+
+This module provides some functions to compare and sort strings
+encoded in UTF-8 using the collation of Japanese character strings.
+
+This module is an implementation of JIS X 4061-1996 and
+the collation rules are based on that standard.
+
+=head2 Collation Levels
+
+The following criteria are considered in order
+until the collation order is determined.
+By default, Levels 1 to 4 are applied and Level 5 is ignored
+(as JIS does).
+
+=over 4
+
+=item Level 1: alphabetic ordering.
+
+The character class early appeared in the following list is smaller.
+
+    Space characters, Symbols and Punctuations, Digits, Greek Letters,
+    Cyrillic Letters, Latin letters, Kana letters, ( Kanji ideographs ),
+    and Geta mark.
+
+In the class, alphabets are collated alphabetically;
+kana letters are AIUEO-betically (in the Gozyuon order).
+
+For Kanji, see B<Kanji Classes>.
+
+Other characters are collated as defined.
+
+Characters not defined as a collation element are
+ignored and skipped on collation.
+
+B<BN:> Especially, almost alphabets with any diacritical mark
+are NOT defined in this implement,
+excepting Latin vowels with macron or circumflex,
+because they are not used in Japanese contexts.
+
+=item Level 2: diacritic ordering.
+
+In the Latin vowels, the order is as shown the following list.
+
+    One without diacritical mark, with macron, then with circumflex.
+
+In kana, the order is as shown the following list.
+
+    A voiceless kana, the voiced, then the semi-voiced (if exists).
+     (eg. Ka before Ga; Ha before Ba before Pa)
+
+=item Level 3: case ordering.
+
+A small Latin is lesser than the corresponding Capital.
+
+In kana, the order is as shown the following list.
+
+    replaced PROLONGED SOUND MARK(U+30FC);
+    Small kana;
+    replaced ITERATION MARK (U+309D, U+309E, U+30FD or U+30FE);
+    then normal kana.
+
+For example, C<Katakana A + PROLONGED SOUND MARK>,
+C<Katakana A + Small Katakana A>,
+C<Katakana A + ITERATION MARK>,
+C<Katakana A + Katakana A>.
+(see NOTE about the replacement)
+
+=item Level 4: script ordering.
+
+Hiragana is lesser than katakana.
+
+=item Level 5: width ordering.
+
+A character that belongs to the block C<Halfwidth and Fullwidth Forms>
+is greater than the corresponding normal character.
+
+B<BN:> According to the JIS standard, the level 5 should be ignored.
+
+=back
+
+=head2 Kanji Classes
+
+There are three kanji classes:
+
+=over 4
+
+=item Class 1: the 'saisho' (minimum) kanji class
+
+It comprises five kanji-like chars,
+i.e. U+3003, U+4EDD, U+3005, U+3006, U+3007
+(collated in the JIS order as shown).
+Any kanji except U+4EDD are ignored on collation.
+
+=item Class 2: the 'kihon' (basic) kanji class
+
+It comprises JIS levels 1 and 2 kanji in addition to
+the minimum kanji class. Sorted in the JIS order.
+Any kanji excepting those defined by JIS X 0208 are ignored on collation.
+
+=item Class 3: the 'kakucho' (extended) kanji class
+
+All the CJK Unified Ideographs in addition to
+the minimum kanji class. Sorted in the unicode order.
+
+=back
+
+=head2 Methods (OOP)
+
+=over 4
+
+=item C<$jis = Lingua::JA::Sort::JIS-E<gt>new()>
+
+=item C<$jis = Lingua::JA::Sort::JIS-E<gt>new(LEVEL)>
+
+=item C<$jis = Lingua::JA::Sort::JIS-E<gt>new(LEVEL, KANJI CLASS)>
+
+=item C<$jis = Lingua::JA::Sort::JIS-E<gt>new(CODE REF, LEVEL, KANJI CLASS)>
+
+Constructs an instance.
+
+The collation level is specified as a number
+ between 1 and 5. If omitted, level 4 is applied.
+The kanji class is specified as a number between 1 and 3.
+If omitted, class 2 is applied.
+
+If a coderef is specified as the first argument,
+strings given to a collating method are converted by the coderef
+before making collating keys.
+
+For example, if you want to ignore C<PROLONGED SOUND MARK>
+(C<"\xE3\x83\xBC"> in UTF-8) on collation,
+
+   use Lingua::JA::Sort::JIS;
+
+   $jis = Lingua::JA::Sort::JIS->new(
+      sub { my $str = shift; $str =~ s/\xE3\x83\xBC//g; $str; }
+   );
+
+   @sorted = $jis->jsort(@strings); # utf-8 encoded
+
+If you want to collate strings encoded in EUC-JP,
+give the constructor a coderef converting EUC-JP to UTF-8.
+
+   use Lingua::JA::Sort::JIS;
+   $euc = Lingua::JA::Sort::JIS->new(
+      sub { some_convertor_from_eucjp_to_utf8($_[0]) }
+   );
+
+   @sorted_euc_jp_strings = $euc->jsort(@euc_jp_strings);
+
+=item C<$jis-E<gt>jsort(LIST)>
+
+Sorts a list of strings in the UTF-8 encoding
+
+=item C<$jis-E<gt>jcmp($a, $b)>
+
+Japanese Collation version of the C<cmp> operator.
+It returns 1 (C<$a> is greater than C<$b>)
+or 0 (C<$a> is equal to C<$b>)
+or -1 (C<$a> is lesser than C<$b>).
+
+=back
+
+=head2 Functions (not-OOP)
+
+=over 4
+
+=item C<jsort(LIST)>
+
+=item C<jsort(CODE REF, LIST)>
+
+Sorts a list of strings in the UTF-8 encoding
+(as the collation level and the kanji class, the default values are used,
+and C<jsort()> without any object is identical to C<bsort()>).
+
+If a coderef is specified as the first argument,
+strings given to a collating method are converted by the coderef
+before making collating keys.
+
+For example, if you want to collate strings encoded in Shift_JIS,
+do as following.
+
+   use Lingua::JA::Sort::JIS qw(jsort);
+
+   $sjis_to_utf8 = \&some_convertor_from_shiftjis_to_utf8;
+   @sorted = jsort $sjis_to_utf8, @not_sorted;
+
+=item C<msort(LIST)>
+
+=item C<msort(CODE REF, LIST)>
+
+Sorts a list of strings in the UTF-8 encoding
+(the collation level is 4 and the kanji class is 1, C<m>: minimum).
+
+=item C<bsort(LIST)>
+
+=item C<bsort(CODE REF, LIST)>
+
+Sorts a list of strings in the UTF-8 encoding
+(the collation level is 4 and the kanji class is 2, C<b>: basic).
+
+=item C<xsort(LIST)>
+
+=item C<xsort(CODE REF, LIST)>
+
+Sorts a list of strings in the UTF-8 encoding
+(the collation level is 4 and the kanji class is 3, C<x>: extented).
+
+=item C<fsort(LIST)>
+
+=item C<fsort(CODE REF, LIST)>
+
+Sorts a list of strings in the UTF-8 encoding
+(the collation level is 5 and the kanji class is 2, C<f>: fullwidth).
+
+=item C<jcmp( [ CODEREF ], $a, $b, [ LEVEL, KANJI CLASS ])>
+
+Japanese Collation version of the C<cmp> operator.
+It returns 1 (C<$a> is greater than C<$b>)
+or 0 (C<$a> is equal to C<$b>)
+or -1 (C<$a> is lesser than C<$b>).
+
+The C<LEVEL> (collation level) is specified as a number
+ between 1 and 5. If omitted, level 4 is applied.
+
+The C<KANJI CLASS> (kanji class) is specified as a number between 1 and 3.
+If omitted, class 2 is applied.
+
+If C<CODE REF> is specified as the first argument,
+strings given to a collating method are converted by the coderef
+before making collating keys.
+
+The C<CODE REF>, C<LEVEL> and the C<KANJI CLASS> can be omitted
+if not necessary.
+
+e.g. C<jcmp("perl", "Perl")> returns C<-1>
+and C<jcmp("perl", "Perl", 2)> returns C<0>
+since C<"perl"> is tertiary and quarternary less than
+C<"Perl">, and secondary equal to.
+
+=back
+
+=head2 Advanced Matters
+
+=over 4
+
+=item C<karr([ CODE REF ], STRING, [ KANJI CLASS ] )>
+
+=item C<kcmp(KEY ARRAY, KEY ARRAY, [ LEVEL ])>
+
+These functions allow you to do the Schwartzian transform.
+
+C<karr()> makes C<KEY ARRAY> from C<STRING>.
+
+C<kcmp()> returns
+1 (The first C<KEY ARRAY> is greater than the second C<KEY ARRAY>)
+or 0 (The first C<KEY ARRAY> is equal to the second C<KEY ARRAY>)
+or -1 (The first C<KEY ARRAY> is lesser than the second C<KEY ARRAY>).
+
+The C<CODE REF>, C<LEVEL> and the C<KANJI CLASS>
+can be omitted if not necessary.
+
+The following example is sorting by C<"yomi-hyoki"> collation, in which
+C<"yomi"> (or pronunciation) is used as the first sorting key, and
+C<"hyoki"> (or spell) is used as the second sorting key.
+
+=over 4
+
+=item by OOP
+
+  use Lingua::JA::Sort::JIS;
+
+  $jis = Lingua::JA::Sort::JIS->new();
+
+  foreach(ysort(@data)){
+    print "@$_\n";
+  }
+
+  sub ysort {
+    map { $_->[0] }
+    sort{
+      $jis->kcmp($a->[1], $b->[1]) ||
+      $jis->kcmp($a->[2], $b->[2])
+    }
+    map { [$_, $jis->karr($_->[1]),
+               $jis->karr($_->[0]) ] } @_;
+  }
+
+=item by not-OOP
+
+  use Lingua::JA::Sort::JIS qw(kcmp karr);
+
+  foreach(ysort(@data)){
+    print "@$_\n";
+  }
+
+  sub ysort {
+    map { $_->[0] }
+    sort{ kcmp($a->[1], $b->[1]) ||
+          kcmp($a->[2], $b->[2]) }
+    map { [$_, karr($_->[1]), karr($_->[0]) ] } @_;
+  }
+
+=back
+
+=item C<getorder()>
+
+In the list context, it returns the collation element hash;
+otherwise, it returns the reference of that hash.
+
+In the collation element hash, each key is
+the collation element string and each value is
+the anonymous array with 5 elements.
+
+You can manipulate the collation element hash like as follows.
+
+    my $order = getorder();
+
+    # delete 'X' from the collation element hash
+    delete $order->{'X'};
+
+    # swap the collation order between 'b' and 'B';
+    @$order{'B', 'b'} = @$order{'b', 'B'};
+
+    # add a new collation element HIRAGANA LETTER VU;
+
+    my $hira_vu = "\xE3\x82\x94";
+    my $kata_vu = "\xE3\x83\xB4";
+
+    $order->{$hira_vu} = [ @{ $order->{$kata_vu} } ];
+    -- $order->{$hira_vu}[3];
+     # HIRAGANA VU to be quarternary lesser than KATAKANA VU.
+
+=back
+
+=head1 NOTE
+
+=head2 Replacement of PROLONGED SOUND MARK and ITERATION MARKs
+
+        RFC1345 UCS
+	[*5]    U+309D  HIRAGANA ITERATION MARK
+	[+5]    U+309E  HIRAGANA VOICED ITERATION MARK
+	[-6]    U+30FC  KATAKANA-HIRAGANA PROLONGED SOUND MARK
+	[*6]    U+30FD  KATAKANA ITERATION MARK
+	[+6]    U+30FE  KATAKANA VOICED ITERATION MARK
+
+To represent Japanese characters,
+RFC 1345 Mnemonic characters enclosed by brackets
+are used below.
+
+These characters, if replaced, are secondary equal to
+the replacing kana, while ternary not equal to.
+
+=over 4
+
+=item KATAKANA-HIRAGANA PROLONGED SOUND MARK
+
+The PROLONGED MARK is repleced by normal vowel or nasal
+katakana corresponding to the preceding kana if exists.
+
+  eg.	[Ka][-6] to [Ka][A6]
+	[bi][-6] to [bi][I6]
+	[Pi][YU][-6] to [Pi][YU][U6]
+	[N6][-6] to [N6][N6]
+
+=item HIRAGANA- and KATAKANA ITERATION MARKs
+
+The ITERATION MARKs (VOICELESS) are repleced
+by normal kana corresponding to the preceding kana if exists.
+
+  eg.	[Ka][*6] to [Ka][Ka]
+	[Do][*5] to [Do][to]
+	[n5][*5] to [n5][n5]
+	[Pu][*6] to [Pu][Hu]
+	[Pi][YU][*6] to [Pi][YU][Yu]
+
+=item HIRAGANA- and KATAKANA VOICED ITERATION MARKs
+
+The VOICED ITERATION MARKs are repleced by the voiced kana
+corresponding to the preceding kana if exists.
+
+  eg.	[ha][+5] to [ha][ba]
+	[Pu][+5] to [Pu][bu]
+	[Ko][+6] to [Ko][Go]
+	[U6][+6] to [U6][Vu]
+
+=item Cases of no replacement
+
+Otherwise, no replacement occurs. Especially in the
+cases when these marks follow any character except kana.
+
+The characters not replaced are primary
+greater than any kana (see C<"Collate.txt">).
+
+  eg.	CJK followed by PROLONGED SOUND MARK
+	DIGIT followed by ITERATION
+	[A6][+6] ([A6] has no voiced variant)
+
+=item Example
+
+For example, the Japanese string C<[Pa][-6][Ru]> (spell of C<Perl> in Japanese)
+has three collation elements: C<KATAKANA PA>,
+C<PROLONGED SOUND MARK replaced by KATAKANA A>, and C<KATAKANA RU>.
+
+   [Pa][-6][Ru] is converted to [Pa][A6][Ru] by replacement.
+		primary equal to [ha][a5][ru].
+		secondary equal to [pa][a5][ru], greater than [ha][a5][ru].
+		tertiary equal to [pa][-6][ru], lesser than [Pa][A6][Ru].
+		quartenary greater than [pa][-6][ru].
+
+
+=back
+
+=head2 About this implementation
+
+                           [according to the article 6.2, JIS X 4061]
+
+  (1) charset: UTF-8.
+
+  (2) No limit of the number of characters in the string considered
+      to collate.
+
+  (3) No character class is added.
+
+  (4) The following characters are added as collation elements.
+
+      IDEOGRAPHIC SPACE in the space class.
+
+      ACUTE ACCENT, GRAVE ACCENT, DIAERESIS, CIRCUMFLEX ACCENT,
+      MACRON, HORIZONTAL BAR, EN DASH, TILDE, PARALLEL TO
+      in the class of descriptive symbols.
+
+      APOSTROPHE, QUOTATION MARK in the class of parentheses.
+
+      HYPHEN-MINUS in the class of mathematical symbols.
+
+  (5) Collation of Latin alphabets with macron and with circumflex
+      is supported.
+
+  (6) Selected kanji class:
+       the minimum kanji class (Five kanji-like chars).
+       the basic kanji class (Levels 1 and 2 kanji, JIS).
+       the extended kanji class (CJK Unified Ideographs).
+
+=head1 CAVEAT
+
+B<THIS MODULE IS OLD THEN IS NOT AWARE OF PERL'S UNICODE ENCODING.>
+
+=head1 AUTHOR
+
+SADAHIRO Tomoyuki <SADAHIRO@cpan.org>
+
+  Copyright(C) 2001, 2007. SADAHIRO Tomoyuki. Japan. All rights reserved.
+
+  This module is free software; you can redistribute it
+  and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+JIS X 4061 [Collation of Japanese character strings]
+
+=item *
+
+JIS X 0208 [7-bits and 8-bits double byte coded Kanji sets
+for information interchange]
+
+=item *
+
+JIS X 0221 [Information technology - Universal Multiple-Octet Coded
+Character Set (UCS) - part 1 : Architectute and Basic Multilingual Plane].
+That is translated from ISO/IEC 10646-1 and introduced into JIS.
+
+=item *
+
+Japanese Standards Association (access to JIS)
+http://www.jsa.or.jp/
+
+=item *
+
+RFC 1345 [Character Mnemonics & Character Sets]
+
+=back
+
+=cut

@@ -1,0 +1,41 @@
+#########################################################################
+#
+# $Id: keys.txt,v 1.3 2006/01/07 23:50:44 pkaluski Exp $
+# $Name: Stable_0_16 $
+#
+# $Log: keys.txt,v $
+# Revision 1.3  2006/01/07 23:50:44  pkaluski
+# Unit test for new tool chain implemented. Session manager not needed any more.
+#
+#
+#########################################################################
+
+name: ed_fname
+key: ed_fname = 'Martinella'
+%%
+
+name: pub_id
+key: pub_id = '0877'
+%%
+
+name: title_id
+key: title_id = 'MC2222'
+%%
+
+name: stor_id
+key: stor_id = '7131'
+%%
+
+name: sonum
+key: sonum > 8
+%%
+
+name: ed_id
+key: ed_id = '777-02-9831'
+%%
+
+name: title
+key: title = 'XXXX'
+%%
+
+

@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+use strict;
+use utf8;
+use Getopt::Long qw(:config auto_version);
+use Locale::Memories;
+
+our $VERSION = $Locale::Memories::VERSION;
+
+sub main {
+    exec 'perldoc', $0 if !@ARGV;
+
+    my (@locales, $query, $index_path);
+
+    GetOptions(q{locale|l=s@} => \@locales,
+	       q{index_path|p=s} => \$index_path,
+	       q{query|q=s} => \$query);
+    die "Please specify index path" if !$index_path;
+    die "Please input query" if !$query;
+    die "Please specify locale" if !@locales;
+    my $lm = Locale::Memories->new({index_path => $index_path});
+    $lm->load_index($index_path);
+    for my $locale (@locales) {
+	my $translation = $lm->translate_msg($locale, $query);
+	if ($translation) {
+	    print "[$locale]\n$translation->[0]\n$translation->[1]\n\n";
+	}
+    }
+}
+
+main;
+
+1;
+__END__
+
+=pod
+
+=head1 NAME
+
+msgtranslator - Message Translator at command line
+
+=head1 SYNOPSIS
+
+  % pomagic -l locale [multiple choice]
+            -p index path
+            -q query
+
+=head1 DESCRIPTION
+
+This tool searches in database for the corresponding L10N message to
+the input query message.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2007 Yung-chung Lin. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=cut

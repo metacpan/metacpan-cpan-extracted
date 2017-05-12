@@ -1,0 +1,9 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+cpanfile
+lib/Log/Any/Adapter/MojoLog.pm
+t/basic.t

@@ -1,0 +1,47 @@
+LaTeX::Authors version 0.8
+==========================
+		
+LaTeX::Authors try to find the authors and laboratories in a LaTex file.
+The output is an xml or html string. This is an example of the xml output: 
+  	 		
+<article>
+  <item>
+    <author>author1</author>
+    <labo>lab1</labo>
+    <labo>lab2</labo>
+  </item>
+  <item> ...
+  </item>  
+</article>
+
+It can work on input with:
+ - an archiv file (tar, zip...), it's useful for arXiv file (function un_archiv)
+ - a directory with latex file (function find_tex_file)
+ - a latex file (function load_file_string)
+ - a string (function router)  
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Text::Balanced
+
+COPYRIGHT AND LICENCE
+
+LaTeX::Authors is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+
+Copyright (C) 2003 Christian Rossi (rossi@in2p3.fr/rossi@loria.fr) - CCSD/CNRS (http://www.ccsd.cnrs.fr/)
+

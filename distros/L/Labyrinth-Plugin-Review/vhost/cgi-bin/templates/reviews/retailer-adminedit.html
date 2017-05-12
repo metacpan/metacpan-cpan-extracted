@@ -1,0 +1,39 @@
+<h2>[% IF data.retailerid %]Edit[% ELSE %]Add[% END %] Link</h2>
+
+    <p>
+      <a href="[% cgipath %]/pages.cgi?act=reviews-admin">manage reviews</a>
+    | <a href="[% cgipath %]/pages.cgi?act=reviews-typesadmin">manage review types</a>
+    | <a href="[% cgipath %]/pages.cgi?act=reviews-radmin">manage retailers</a>
+    </p>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="reviews-rsave" />
+<input type="hidden" name="retailerid" value="[% data.retailerid %]" />
+
+<div class="boxer">
+<div class="blocker">
+[% IF thanks %]<p>Retailer saved successfully.[% END %]
+[% IF errmess %]
+[% IF errmess == 1 %]
+<p class="alert">There are invalid or missing fields, as noted by the <span class="red">&empty;</span> symbol.
+[% ELSE %]
+<p class="alert">[% errmess %]
+[% END %]
+[% END %]
+</div>
+</div>
+
+<div class="boxer">
+<table class="blocker">
+<tr><th>Name *</th>
+    <td class="red">[% data.retailer_err %]</td>
+    <td><input type="text" name="retailer" id="retailer" size="55" value="[% data.retailer %]" /></td></tr>
+<tr><th>Link</th>
+    <td class="red">[% date.retailerlink_err %]</td>
+    <td><input type="text" name="retailerlink" id="retailerlink" size="55" value="[% data.retailerlink %]" /></td></tr>
+</table>
+</div>
+
+<p align="center"><input type="submit" value="Save Retailer" />
+
+</form>

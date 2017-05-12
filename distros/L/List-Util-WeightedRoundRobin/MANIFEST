@@ -1,0 +1,6 @@
+Changes
+README
+MANIFEST
+Makefile.PL
+lib/List/Util/WeightedRoundRobin.pm
+META.yml                                 Module meta-data (added by MakeMaker)

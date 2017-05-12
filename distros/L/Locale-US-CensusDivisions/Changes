@@ -1,0 +1,4 @@
+1.1.0 2016-08-26
+  - Added state2division method and tests
+  - Added documentation
+  - Removed usage of each and Test::Most

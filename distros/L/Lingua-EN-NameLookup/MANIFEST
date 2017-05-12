@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+NameLookup.pm
+t/load.t
+t/dump.t
+t/add.t
+t/lookup.t
+t/ilookup.t
+t/report.t
+t/surnames.src
+t/surnames.dat

@@ -1,0 +1,45 @@
+Tree-Builder version 0.01
+=========================
+
+Tree::Builder is a package designed to take the grunt work out of
+writing the numerous classes required to build Abstract Syntax Trees
+from various grammars. It accepts an input file that defines the
+container relationships between the nodes of the AST, and outputs
+a set of classes, one per node, that can be later combined to build
+an AST.
+
+The generated node classes all contain an accept() method supporting
+the Visitor Pattern, and a default Visitor class is also generated,
+so that it can be subclassed.
+
+Additionally an API package is produced to make the construction
+of the AST as simple as possible.
+
+Although initially designed to produce Perl classes, it has been
+extended to produce output in both C++ and PHP, and other languages
+could hopefully be added fairly trivially.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Template
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Bill Hails
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

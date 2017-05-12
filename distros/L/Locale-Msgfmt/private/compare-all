@@ -1,0 +1,6 @@
+#!/bin/sh
+
+rm ~/padre/list
+find ~/padre/ | grep -v "\.svn" | grep "\.po$" > ~/padre/list
+for i in $(cat ~/padre/list); do PERL5LIB=./lib/ ./dev/compare $i; PERL5LIB=./lib/ ./dev/compare -f $i; done
+rm gnu.out mine.out gnu mine

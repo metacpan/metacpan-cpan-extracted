@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml
+t/1-basic.t
+t/2-pod.t
+t/3-pod-coverage.t
+eg/example.pl
+eg/example-direct.pl
+lib/Lyrics/Fetcher/LyricWiki.pm

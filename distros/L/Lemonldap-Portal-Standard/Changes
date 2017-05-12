@@ -1,0 +1,19 @@
+Revision history for Perl extension Lemonldap::Portal::Standard.
+
+0.01  Sun Nov 21 21:23:24 2004
+	- original version; created by h2xs 1.22 with options
+		-XAn Lemonldap::Portal::Standard
+0.02  12 03 2004 
+     -test prerequite in Makefile.PL
+     -the port is not deleted now in rederection 
+0.03  13 Jan 2005 
+     -bug in url processiong corrected
+     -Add getAllRedirection method
+     -more examples giving.
+     -test MIME::Base64 prerequite in Makefile.PL
+     -add use MIME::Base64 
+0.04 13 Oct 2005
+     -bug in the bind process with null password  
+3.2.0 19 Apr 2007
+     - bug in log display
+ 

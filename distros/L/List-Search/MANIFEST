@@ -1,0 +1,12 @@
+Build.PL
+CHANGES
+examples/list_contains_vs_hash.pl
+lib/List/Search.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/custom_list_search.t
+t/edge_cases.t
+t/list_contains.t
+t/list_search.t
+TODO

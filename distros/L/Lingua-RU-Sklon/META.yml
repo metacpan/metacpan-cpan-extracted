@@ -1,0 +1,13 @@
+---
+name: Lingua-RU-Sklon
+version: 0.01
+author:
+  - 'Alexey Usanov <alexey_usa@mail.ru>'
+abstract: Name declesnses via Perl
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+provides:
+  Lingua::RU::Sklon:
+    file: lib/Lingua/RU/Sklon.pm 
+generated_by: Curve::Hands

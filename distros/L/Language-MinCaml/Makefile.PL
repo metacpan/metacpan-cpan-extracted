@@ -1,0 +1,12 @@
+use inc::Module::Install;
+name 'Language-MinCaml';
+all_from 'lib/Language/MinCaml.pm';
+requires('Class::Accessor::Fast');
+requires('Exporter');
+requires('Readonly');
+requires('Parse::Yapp::Driver');
+build_requires 'Test::More';
+build_requires 'IO::Capture::Stdout';
+use_test_base;
+auto_include_deps;
+WriteAll;

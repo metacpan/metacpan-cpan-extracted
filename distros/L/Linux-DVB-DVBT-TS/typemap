@@ -1,0 +1,4 @@
+TYPEMAP
+DVB *    		T_PTROBJ
+TSReader *    	T_PTROBJ
+

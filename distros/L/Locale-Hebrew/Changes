@@ -1,0 +1,21 @@
+[Changes for 1.05 - 2010-05-27]
+
+* Fix MANIFEST.SKIP so the signatures test won't cause bogus fail on Win32.
+* Adds a "See Also" link to Text::Bidi. (Shlomi Fish)
+
+[Changes for 1.04 - 2004-09-18]
+
+* Add VERSION to POD; reorder things a bit; fix manifest.
+* Modernise Makefile.PL a bit. 
+
+[Changes for 1.03 - 2004-09-17]
+
+* Revamped tests.
+* hebrewflip() is now exported by default.  (Oded S. Resnik)
+* Unicode support for Perl 5.8.1+.  (Oded S. Resnik)
+
+[Changes for 1.02 - 2003-01-14]
+
+* Added README and tests.
+* Update MANIFEST, since Locale::Hebrew::Calendar is now distributed separately.
+* main() should be int not void.

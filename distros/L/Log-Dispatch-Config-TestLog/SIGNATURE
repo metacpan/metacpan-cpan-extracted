@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.62.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 47b50d39d5736a48d0106d8c88e6700cda3874f4 Changes
+SHA1 61819c602e65f5834ede108fda535d0f74c20695 MANIFEST
+SHA1 606bd6424682249397d63caf905f651178a4d6cc MANIFEST.SKIP
+SHA1 2e86d1a3128180b2f699f3583a7fbb8bc12b85eb META.yml
+SHA1 1183a040f0a1373674796b0cfa86dc42436cb29e Makefile.PL
+SHA1 69fa9a063de89c2f61b46deff5dd779796b12e00 lib/Log/Dispatch/Config/TestLog.pm
+SHA1 61a29987fcd06f9437e7ef61d5ac7e1ddf23079b t/basic.t
+SHA1 1642c3ae0dbec4675abb0c44b8afceb3f91d9265 t/fake_test
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.12 (Darwin)
+
+iEYEARECAAYFAkzXoJ0ACgkQVCwRwOvSdBj3IwCffaCdJ8Voi0PnubfF0zLv/3A0
+PioAmwQabhyBHGQ8BJY1Vw4cwlg591Im
+=QnEI
+-----END PGP SIGNATURE-----

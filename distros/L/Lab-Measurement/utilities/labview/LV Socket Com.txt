@@ -1,0 +1,8 @@
+If the Oxford Instruments IsoBus master is controlled via serial port from a machine
+also running LabView (e.g. with the OI IGH control software), the serial port is locked
+and cannot be accessed from Perl. 
+
+This VI "reexports" the serial port via a network socket and makes it possible to
+sneak Perl control scripts in there too.
+
+(c) David Kalok 2012

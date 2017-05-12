@@ -1,0 +1,63 @@
+THISPKG	= parsec
+SEARCH	=
+
+SRCS	= \
+	Text/ParserCombinators/Parsec/Char.hs \
+	Text/ParserCombinators/Parsec/Combinator.hs \
+	Text/ParserCombinators/Parsec/Error.hs \
+	Text/ParserCombinators/Parsec/Expr.hs \
+	Text/ParserCombinators/Parsec/Perm.hs \
+	Text/ParserCombinators/Parsec/Pos.hs \
+	Text/ParserCombinators/Parsec/Prim.hs \
+	Text/ParserCombinators/Parsec.hs
+
+#	Text/ParserCombinators/Parsec/Token.hs \
+#	Text/ParserCombinators/Parsec/Language.hs
+
+# Here are the main rules.
+include ../Makefile.common
+
+# Here are the dependencies.
+$(OBJDIR)/Text/ParserCombinators/Parsec/Char.$O: \
+	$(OBJDIR)/Text/ParserCombinators/Parsec/Pos.$O \
+	$(OBJDIR)/Text/ParserCombinators/Parsec/Prim.$O
+$(OBJDIR)/Text/ParserCombinators/Parsec/Combinator.$O: \
+	$(OBJDIR)/Text/ParserCombinators/Parsec/Prim.$O
+$(OBJDIR)/Text/ParserCombinators/Parsec/Error.$O: \
+	$(OBJDIR)/Text/ParserCombinators/Parsec/Pos.$O
+$(OBJDIR)/Text/ParserCombinators/Parsec/Expr.$O: \
+	$(OBJDIR)/Text/ParserCombinators/Parsec/Prim.$O \
+	$(OBJDIR)/Text/ParserCombinators/Parsec/Combinator.$O
+$(OBJDIR)/Text/ParserCombinators/Parsec/Language.$O: \
+	$(OBJDIR)/Text/ParserCombinators/Parsec.$O \
+	$(OBJDIR)/Text/ParserCombinators/Parsec/Token.$O
+$(OBJDIR)/Text/ParserCombinators/Parsec/Perm.$O: \
+	$(OBJDIR)/Text/ParserCombinators/Parsec.$O
+$(OBJDIR)/Text/ParserCombinators/Parsec/Prim.$O: \
+	$(OBJDIR)/Text/ParserCombinators/Parsec/Pos.$O \
+	$(OBJDIR)/Text/ParserCombinators/Parsec/Error.$O
+$(OBJDIR)/Text/ParserCombinators/Parsec/Token.$O: \
+	$(OBJDIR)/Text/ParserCombinators/Parsec.$O
+
+# C-files dependencies.
+Text/ParserCombinators/Parsec/Char.$C: \
+	Text/ParserCombinators/Parsec/Pos.$C \
+	Text/ParserCombinators/Parsec/Prim.$C
+Text/ParserCombinators/Parsec/Combinator.$C: \
+	Text/ParserCombinators/Parsec/Prim.$C
+Text/ParserCombinators/Parsec/Error.$C: \
+	Text/ParserCombinators/Parsec/Pos.$C
+Text/ParserCombinators/Parsec/Expr.$C: \
+	Text/ParserCombinators/Parsec/Prim.$C \
+	Text/ParserCombinators/Parsec/Combinator.$C
+Text/ParserCombinators/Parsec/Language.$C: \
+	Text/ParserCombinators/Parsec.$C \
+	Text/ParserCombinators/Parsec/Token.$C
+Text/ParserCombinators/Parsec/Perm.$C: \
+	Text/ParserCombinators/Parsec.$C
+Text/ParserCombinators/Parsec/Prim.$C: \
+	Text/ParserCombinators/Parsec/Pos.$C \
+	Text/ParserCombinators/Parsec/Error.$C
+Text/ParserCombinators/Parsec/Token.$C: \
+	Text/ParserCombinators/Parsec.$C
+

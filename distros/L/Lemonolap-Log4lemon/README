@@ -1,0 +1,110 @@
+Lemonolap-Log4lemon version 0.03
+=========================
+
+DESCRIPTION
+    This module is a logs formater . It parses lemonldap logs into flat file
+    with separator .
+
+    The lemonldap framework is a web SSO server apache . This log is like :
+
+    This package provides log wrapper also . 
+    
+    See man pages  Lemonolap::Formatelog ,  Lemonoldap::Log4lemon and the example.pl in eg directory
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+no dependencies
+
+ 
+NAME
+        Lemonolap::Log4lemon - Perl extension for Lemonolap  framework
+  
+SYNOPSIS
+     use Lemonolap::Log4lemon;
+     my $f =Lemonolap::Log4lemon->new('file' => "/tmp/lemonldap.log",);
+     print $f->can_field,"\n";
+     print $f->get_field_by_name(header => 1),"\n";
+     $f->set_label('source' => 'adresse IP' );
+     while ($l =$f->get_field_by_name(fields =>['time','date:aaaa','uid']) ) {
+            print "$l\n" ; 
+     }
+
+DESCRIPTION
+    This module is a logs formater . It parses lemonldap logs into flat file
+    with separator .
+
+    The lemonldap framework is a web SSO server apache . This log is like :
+
+
+ LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" \"%{forensic-id}n\" %v"
+
+ the %v (virtual host name ) at the end of line is the only difference with combined format apache log
+
+
+Methods
+  new->(file => /path_file) ;
+     Path of log file . This file MUST exits . 
+ 
+  can_field () ;
+     return the list of supported field  
+
+  get_field (header => 1,
+                  fields => [f1,F2..] );
+     return  a string with fields or names of colomns (no both) .  
+     If fields is ometted  , return a list like can_field
+
+  get_label (header => 1,
+                  fields => [f1,F2..] );
+     Like get_field but uses symbolics names (labels) instead  names
+
+  set_label (
+                  'fieldname' => 'myname');
+     Set symbolic name for field .
+
+  time and date
+    A parser MUST return date and time (format aaaammjj and hhmmss ) but you
+    can get only aaaa or mm or dd by this syntax : date:aaaa date:mm date:dd
+
+     and so for time : time:hh time:mm time:se
+
+SEE ALSO
+    Lemonldap http://lemonldap.sourceforge.net/
+
+    Lemonolap http://lemonolap.sourceforge.net/
+
+COPYRIGHT AND LICENSE
+     Copyright (C) 2004 by Eric German , E<lt>germanlinux@yahoo.frE<gt>
+
+     Lemonldap originaly written by Eric german who decided to publish him in 2003
+     under the terms of the GNU General Public License version 2.
+
+     This package is under the GNU General Public License, Version 2.
+     The primary copyright holder is Eric German.
+     Portions are copyrighted under the same license as Perl itself.
+
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; version 2 dated June, 1991.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     A copy of the GNU General Public License is available in the source tree;
+     if not, write to the Free Software Foundation, Inc.,
+     59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+
+
+
+

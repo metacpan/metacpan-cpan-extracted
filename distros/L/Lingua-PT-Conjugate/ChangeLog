@@ -1,0 +1,80 @@
+
+2013-09-01
+	* Remove non-verb antrever, replace with entrever.
+	* Make conjug output Unicode UTF-8.
+
+2009-05-12
+	* Fix bugs reported by Robert L. Davis for the verbs vir (2nd
+	plural was all wrong) and ver.
+
+2009-04-26
+	* Fix bug reported by Eliana (perfeito de trazer, 3rd person is
+	trouxe, not trouxeu).
+
+2009-01-28
+	* Fix bugs reported by Wolfram Schäfer for verbs perder (perco not
+	recognized), ter (tivesse not recognized as 3rd person conj. imp.)
+	and in trazer (1st person future is "trarei", not "tarei").
+
+2008-11-11
+	* Fix bug reported by Eugenio Pojarkov for verbs investir,
+	revestir, desinvestir and vestir.
+
+2008-09-07 Etienne Grossmann  <etienne@isr.ist.utl.pt>
+
+	* Atribuir bug put in evidence by Eugenio Pojarkov
+
+2008-05-04  Etienne Grossmann  <etienne@isr.ist.utl.pt>
+
+	* Fix ir bug spotted by Michael Drayton
+
+2004-04-26  Etienne Grossmann  <etienne@cs.uky.edu>
+
+	* Fix crer (spotted by Brian Oleniacz <bjoleniacz@hotmail.com>)
+	and perder.
+
+2003-09-15  Etienne Grossmann  <etienne@anonimo.isr.ist.utl.pt>
+
+	* Add cgi script for web access to 'conjug' and 'unconj'
+	programs.
+
+2003-01-DD  Etienne Grossmann  <etienne@anonimo.isr.ist.utl.pt>
+
+	* Fix passear conj pres, sair, trair
+
+2003-01-19  Etienne Grossmann  <etienne@anonimo.isr.ist.utl.pt>
+
+	* Remove goto from Conjugate.pm (perl 5.8.0 seems to dislike it)
+
+2002        Etienne Grossmann  <etienne@isr.ist.utl.pt>
+
+	* Miscellaneous fixes.
+
+2001-08-07  Etienne Grossmann  <etienne@isr.ist.utl.pt>
+
+	* Make build_doc work again, accept args and a little doc.
+
+	* Add minimal doc to 'assert'
+
+2001-08-06 
+
+	* Applied patch to fix "pedir", sent by Itai Nahshon
+	  <itai@siftology.com> 
+
+2001-08-01
+
+	* Changed name of this file to ChangeLog
+
+	* Fixed influir, added construir in Conjugate.pm
+
+	* Uh oh, building process for unconj is broken
+
+2000 / 12 / 16
+- Slight change to credits in README, unconj and UnConjugate.pmfiles
+
+2000 / 12 / 08 
+- Added this file
+- Added unconjugation stuff
+
+2000 / [0-12]
+ Added some irregular verb patterns in past months

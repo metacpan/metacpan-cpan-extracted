@@ -1,0 +1,121 @@
+Revision history for the LaTeX::Driver module                -*- indented-text -*-
+
+0.300.2 2016-04-21
+    - Added ps support via pdflatex
+
+0.300.1 2016-04-17
+    - Added ps support for xelatex
+
+0.300.0 2016-04-16
+    - Fix 0.20 refactoring made stdout 'bleed' into caller's stdout
+
+    - Add more formats for explicit processor (pdf|xe)latex selection
+
+    - Win32 fixes
+
+0.200.4 2014-04-12
+    - Disabled bibtex tests by default due to frequently not found LaTex
+      sty not found.
+
+    - Disabled t/30 and t/31 unless dvips is found
+
+0.200.3 2014-04-11
+    - xelatex tests now optional because they add too many external
+      dependencies
+
+0.200.1 2014-04-10
+    - Fixed stale dependency (unused) in Test::LaTeX::Driver
+
+0.20  2014-04-09
+    - Removed IPC::ShellCmd dependency since newer versions not on CPAN
+    - Fixed Win32 support 
+
+0.20_03  2013-10-31
+    - switched Makefile.PL to Module::Install
+
+0.20_02  2013-10-29
+    - added -timeout option (requires IPC::ShellCmd 0.003)
+    - added -capture_stderr option and stderr() method to retrieve captured stderr
+
+0.20_01  2013-10-18
+    - Now maintained on github
+    - reformatted Changes file
+    - removed MYMETA.{json,yml} from MANIFEST and added to MANIFEST.SKIP (RT89155)
+    - use IPC::ShellCmd to run commands
+    - remove LaTeX::Driver::Paths - paths determined at runtime
+   
+0.12  2012-08-31
+    - fixed typo in settings of ps2pdf/pdf2ps (RT79233)
+    - add missing dependency on Readonly (RT79330)
+
+0.11  2012-08-30
+    - rewrote loop in run_latex() and need_to_run_bibtex() to use a
+      lexical variable to avoid subtle errors with
+      Template::Plugin::Latex (RT50684)
+
+0.10  2011-09-18
+    - use system tmp directory rather than hardcoded /tmp
+    - Makefile.PL exits if latex binary is not found (rather than dieing
+
+0.09  2011-08-18
+    - Tidied up for perlcritic
+
+0.08  2009-01-19
+    - Added two elements to the stats hash - 'pages' and 'bytes'
+    - Added check for rerun required by use of the longtable package
+      (patch submitted by Yitzchack Scott-Thoennes - cpan id: YSTM),
+      also added test script
+    - also check for generic /rerun to get .* right/ warning
+    - expand documentation for Pod::Coverage
+
+0.07  2007-10-12
+    - Updated documentation - specifically the diagnostics section for
+      LaTeX::Driver and just expanded LaTeX::Driver::FilterProgram
+    - fixed Makefile.PL, which was using LaTeX::Driver to get the
+      module version, but this broke horribly if the prerequisite
+      modules were not installed.
+    - added missing test and test data files to MANIFEST
+
+0.06  2007-09-27
+    - rationalized the constructor arguments - now the source and
+      output are controlled just by three arguments: "source" and
+      optionally "output" and "format".
+    - the "source" and "output" parameters can be scalar references,
+      in which case the LaTeX source and formatted output is taken
+      from or output to the variables referenced respectively.  This
+      facilitates the creation of Unix filter type scripts.
+    - added the Unix-style filter programs latex2dvi, latex2pdf and
+      latex2ps (these use the common module
+      LaTeX::Driver::FilterProgram)
+
+0.05  2007-09-25
+    - default output type is now 'pdf' (that is probably what most
+      people are going to want to generate)
+    - added texinputs option
+    - added the following methods: latex_path, pdflatex_path,
+      bibtex_path, makeindex_path, dvips_path, dvipdfm_path,
+      ps2pdf_path and program_path
+    - the program path defaults are now stored in a package-level hash
+
+0.04  2007-09-24
+    - Expanded documentation a bit more
+    - added option parsing to test library so that test scripts can be
+      run with -d to switch on debug messages
+    - added basic Exception::Class based exceptions (still need to
+      differentiate between exception types.
+
+0.03  2007-09-24
+    - Expanded documentation
+    - Reorganized testdata so that the directories/files match the
+      names of the test scripts that use them
+    - Added tests for constructor errors, running the module on broken
+      LaTeX files, specifying options to makeindex, and quality
+      metrics
+
+
+0.02  2007-09-21
+    - First public release.
+
+0.01  2007-09-20
+    - Initial version.  Code extracted from the Template-Latex distribution.
+      New maintainer: Andrew Ford.

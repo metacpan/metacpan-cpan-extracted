@@ -1,0 +1,6 @@
+Revision history for Perl extension Lustre::LFS.
+
+0.01  Mon Jul 26 14:35:30 2010
+	- original version; created by h2xs 1.23 with options
+		-X Lustre::LFS
+

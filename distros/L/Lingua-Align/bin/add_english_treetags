@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# add tree tagger tags & lemmas to an english tigerXML corpus
+#
+# - this runs the actual tree tagger (stores tags in temporary file)
+# - and adds tags to the given file
+
+use strict;
+use FindBin;
+
+if ($#ARGV != 1){
+    die "\nUSAGE: add_english_treetags inputfile outputfile\n\n";
+}
+
+
+my $INPUT  = shift @ARGV;
+my $OUTPUT = shift @ARGV;
+
+my $TREEHOME='/storage3/data/PACO-MT/tools/tagger/tree-tagger';
+my $TREEBIN="${TREEHOME}/bin";
+my $TREELIB="${TREEHOME}/lib";
+
+my $TREETAGGER="${TREEBIN}/tree-tagger";
+my $TREEMODEL="${TREELIB}/english.par";
+
+my $TREEOPTIONS="-token -lemma -sgml -pt-with-lemma";
+my $TIGER2TEXT = "$FindBin::Bin/tiger2text";
+my $ADDTAGS = "$FindBin::Bin/add_treetags";
+
+my $command = "$TIGER2TEXT $INPUT | sed 's/\$/ <s>/' | tr ' ' \"\\n\"";
+$command .= " | ${TREETAGGER} ${TREEOPTIONS} ${TREEMODEL}";
+
+print STDERR "call tree tagger for '$INPUT'\n";
+system ("$command > /tmp/treetagged.$$");
+
+print STDERR "add tags to TigerXML (and write '$OUTPUT')\n";
+system ("$ADDTAGS $INPUT /tmp/treetagged.$$ $OUTPUT");
+unlink("/tmp/treetagged.$$");
+
+print STDERR "done!\n";

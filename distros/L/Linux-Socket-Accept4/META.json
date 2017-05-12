@@ -1,0 +1,82 @@
+{
+   "abstract" : "accept4(2) bindings for Perl5",
+   "author" : [
+      "fb7ee91d9b089b78786fbb>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Linux-Socket-Accept4",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Devel::CheckCompiler" : "0.04",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "parent" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::TCP" : "2.01"
+         }
+      }
+   },
+   "provides" : {
+      "Linux::Socket::Accept4" : {
+         "file" : "lib/Linux/Socket/Accept4.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Linux-Socket-Accept4/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Linux-Socket-Accept4",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Linux-Socket-Accept4.git",
+         "web" : "https://github.com/tokuhirom/Linux-Socket-Accept4"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Masahiro Nagano <kazeburo@gmail.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
+      "Maxime Soulé <btik-git@scoubidou.com>",
+      "Syohei YOSHIDA <syohex@gmail.com>"
+   ]
+}

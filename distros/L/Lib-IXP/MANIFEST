@@ -1,0 +1,23 @@
+Build.PL
+Changes
+examples/create-tag.pl
+examples/ls.pl
+examples/perlwmii.pl
+examples/read-bar.pl
+examples/read.pl
+examples/remove-tag.pl
+examples/write-bar.pl
+examples/write.pl
+IXP.xs
+lib/Lib/IXP.pm
+LICENSE
+LICENSE.Artistic
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-use.t
+t/02-pod-coverage.t
+t/03-test-pod.t
+typemap
+META.yml
+META.json

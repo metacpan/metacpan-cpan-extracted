@@ -1,0 +1,26 @@
+---
+abstract: 'Simple logging interface with a contextual log'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  Test::Fatal: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Contextual
+requires:
+  Carp: '0'
+  Data::Dumper::Concise: '0'
+  Exporter::Declare: '0.111'
+  Moo: '1.003'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/frioux/Log-Contextual/issues
+  homepage: https://github.com/frioux/Log-Contextual
+  repository: https://github.com/frioux/Log-Contextual.git
+version: '0.007000'

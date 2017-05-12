@@ -1,0 +1,15 @@
+LIBWIIMOTE - NINTENDO WIIMOTE LIBRARY FOR LINUX
+===============================================
+
+Copyright (C) 2007  Joel Andersson <bja@kth.se>
+
+INSTALL
+
+Make sure you have BlueZ installed. Type make in the toplevel directory to
+build the library and sample applications. After the build is complete the
+library can be found in the lib directory.
+
+USAGE
+
+In the test directory there are a couple of test applications that illustrate
+how to use this library.

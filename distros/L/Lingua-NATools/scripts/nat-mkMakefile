@@ -1,0 +1,236 @@
+#!/usr/bin/perl -s
+
+use strict;
+use warnings;
+use File::Spec::Functions;
+use Lingua::NATools::ConfigData;
+
+no warnings 'once';
+my $prefix = Lingua::NATools::ConfigData->config('libdir');
+
+# Hope they maintain this...
+my $rules_prefix = catfile $prefix => "NATools";
+
+our ($id, $h, $tokenize, $full, $i, $ngrams, $terminology, $utf8, $csize, $langs);
+
+$terminology = 1 && $ngrams = 1 if $full;
+
+sub usage {
+    print "nat-mkMakefile: generates a pmakefile for Makefile::Parallel use.\n\n";
+    print "\tnat-mkMakefile -i -utf8 -tokenize -csize=70000 -id=<ID> <sourceCrp> <targetCrp> > pmakefile\n\n";
+    print "\tnat-mkMakefile -i -utf8 -tokenize -csize=70000 -id=<ID> <tmxfile> > pmakefile\n\n";
+    print "For more help, please run 'perldoc nat-mkMakefile'\n";
+    exit;
+}
+
+usage() if ($h);
+
+$i = 1 if $utf8;
+
+my $home=$ENV{HOME};
+
+$id ||= "ALIGNED";
+my $source = "";
+
+if ($#ARGV == 0 && $ARGV[0] =~ m!tmxt?$!) {
+    $source = "-tmx $ARGV[0]";
+} elsif ($#ARGV == 1) {
+    $source = join(" ",@ARGV);
+} else {
+    usage();
+}
+
+$source = "-langs=$langs $source" if $langs;
+
+my $makefile;
+$makefile .= $_ while <DATA>;
+$makefile .= "\n"._examples() if $terminology;
+$makefile .= "\n"._ngrams()   if $ngrams;
+$makefile .= _code()          if $ngrams;
+
+$tokenize = $tokenize?"-tokenize":"";
+
+$i     = $i     ? "-i"           : "";
+$utf8  = $utf8  ? "-utf8"        : "";
+$csize = $csize ? "-csize=$csize": "";
+
+for ($makefile) {
+    s/<=ID=>/$id/g;
+    s/<=SOURCE=>/$source/g;
+    s/<=HOME=>/$home/g;
+    s/<=TOKENIZE=>/$tokenize/g;
+    s/<=I=>/$i/g;
+    s/<=UTF8=>/$utf8/g;
+    s/<=CSIZE=>/$csize/g;
+}
+print $makefile;
+
+
+sub _examples {
+    return <<'EO';
+examples$i: dicA dicB (20:00:00)
+	<=HOME=>/NATools/NAT/scripts/nat-examplesExtractor -chunk=$i -local=$ID -langs=pt..en
+
+cleanExamples: examples$i (20:00:00)
+	rm -f $ID/patterns.txt $ID/examples.txt
+	for a in @i; do cat $ID/examples.${a}.txt | grep '=!' >> $ID/patterns.txt; done
+	for a in @i; do cat $ID/examples.${a}.txt | grep -v '=!' >> $ID/examples.txt; done
+	for a in @i; do rm -f $ID/examples.${a}.txt; done
+EO
+}
+
+sub _ngrams {
+    return <<'EO';
+ngramS$i.$j: codify (20:00:00)
+	nat-ngrams -n $j $ID/source.$i.crp $ID/ngramS.$i.$j.db
+
+ngramT$i.$j: codify (20:00:00)
+	nat-ngrams -n $j $ID/target.$i.crp $ID/ngramT.$i.$j.db
+
+joinGramS$j: ngramS$i.$j (20:00:00)
+	nat-ngrams -j $ID/ngramS$j $ID/ngramS*.$j.db
+	rm -f $ID/ngramS*.$j.db
+
+joinGramT$j: ngramT$i.$j (20:00:00)
+	nat-ngrams -j $ID/ngramT$j $ID/ngramT*.$j.db
+	rm -f $ID/ngramT*.$j.db
+
+gramSQLiteS$j: joinGramS$j (20:00:00)
+	sub{ create_sqlite('S', $j); }
+
+gramSQLiteT$j: joinGramT$j (20:00:00)
+	sub{ create_sqlite('T', $j); }
+EO
+}
+
+sub _code {
+return <<'EO';
+
+%%
+
+sub create_sqlite {
+	my ($t,$n) = @_;
+	
+	my $lex = ($t eq 'S')?"source":"target";
+	
+	`nat-ngrams -o 2 -d $ID/ngram$t$n $ID/$lex.lex > $ID/ngram$t$n.txt`;
+	`rm -f $ID/ngram$t$n`;
+	`sort -n -r $ID/ngram$t$n.txt > $ID/_$t$n`;
+	`rm -f $ID/ngram$t$n.txt`;
+	open R, "$ID/_$t$n";
+	open W, ">$ID/__$t$n";
+	while(<R>) {
+		chomp;
+		my @F = split /\s/, $_;
+		push @F, shift @F;
+		print W "@F\n";
+	}
+	close W;
+	close R;
+	`rm -f $ID/_$t$n`;
+	
+	my @v=(undef, undef, qw/bigrams trigrams tetragrams/);
+	open SQL, "|sqlite3 $ID/$t.$n.sqlite";
+	my $fields = join(",",map{"w$_"}(1..$n));
+	print SQL "CREATE TABLE $v[$n] ($fields,occs);\n";
+	print SQL ".separator ' '\n";
+	print SQL ".import $ID/__$t$n $v[$n]\n";
+	for my $i (1..$n) {
+		print SQL "CREATE INDEX idx${t}${n}w${i} ON $v[$n] (w$i);"
+	}
+	close SQL;
+	`rm -f $ID/__$t$n`;
+	
+
+}
+EO
+}
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+nat-mkMakefile - generates a pmakefile to be used by Makefile::Parallel
+
+=head1 SYNOPSIS
+
+  nat-mkMakefile -id=<ID> <sourceCrp> <targetCrp>   >   pmakefile
+  nat-mkMakefile -id=<ID> <tmxfile>                 >   pmakefile
+
+=head1 DESCRIPTION
+
+This script generates a parallel makefile to be used by
+Makefile::Parallel to align and extract examples using a PBS based
+cluster.
+
+The C<-id> switch is required and should contain the identifier of the
+corpus to be created.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<-full>
+
+Creates the full makefile, including n-grams and terminology
+extraction.
+
+=item C<-ngrams>
+
+Creates the makefile including n-grams computation.
+
+=item C<-terminology>
+
+Creates the makefile including terminology extraction.
+
+=back
+
+=head1 SEE ALSO
+
+NATools documentation, Makefile::Parallel, perl(1)
+
+=head1 AUTHOR
+
+Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2012 by Alberto Manuel Brandão Simões
+
+=cut
+
+__DATA__
+# -*- makefile -*-
+ID=<=ID=>
+
+codify: (20:00:00)
+	nat-codify -v <=UTF8=> <=I=> -id=$ID <=CSIZE=> <=TOKENIZE=> <=SOURCE=>
+	i <- sub{ $nr = `cat <=ID=>/nat.cnf |grep nr-chunks|cut -f 2 -d "="`; printf("%03d\n",$_) for (1..$nr); }
+	j <- sub{ printf("%d\n", $_) for (2..4) }
+
+initmat$i: codify  (20:00:00)
+	nat-initmat $ID/source.$i.crp $ID/target.$i.crp $ID/mat.$i.in
+
+ipfp$i: initmat$i (20:00:00)
+	nat-ipfp 5 $ID/source.$i.crp $ID/target.$i.crp $ID/mat.$i.in $ID/mat.$i.out
+	rm -f $ID/mat.$i.in
+
+postipfp$i: ipfp$i (20:00:00)
+	nat-mat2dic $ID/mat.$i.out $ID/dict.$i
+	rm -f $ID/mat.$i.out
+
+postbin$i: postipfp$i (20:00:00)
+	nat-postbin $ID/dict.$i $ID/source.$i.crp.partials $ID/target.$i.crp.partials $ID/source.lex $ID/target.lex $ID/source-target.$i.bin $ID/target-source.$i.bin
+	rm -f $ID/dict.$i
+
+dicA: postbin$i (20:00:00)
+	for a in @i; do nat-dict add $ID/source-target.bin $ID/source-target.${a}.bin; done
+	for a in @i; do rm -f $ID/source-target.${a}.bin; done
+
+dicB: postbin$i (20:00:00)
+	for a in @i; do nat-dict add $ID/target-source.bin $ID/target-source.${a}.bin; done
+	for a in @i; do rm -f $ID/target-source.${a}.bin; done
+
+dump: dicA dicB (20:00:00)
+	nat-dumpDicts <=UTF8=> -self $ID

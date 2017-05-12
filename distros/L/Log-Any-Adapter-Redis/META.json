@@ -1,0 +1,58 @@
+{
+   "abstract" : "Simple adapter for logging to redis",
+   "author" : [
+      "Michael Langner <mila@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Log-Any-Adapter-Redis",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Any" : "1.01",
+            "Log::Any::Adapter::Base" : "0",
+            "Log::Any::Adapter::Util" : "0",
+            "RedisDB" : "0",
+            "Sys::Hostname" : "0",
+            "base" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Log::Any" : "1.01",
+            "Log::Any::Adapter" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cpan-mila/perl-log-any-adapter-redis.git",
+         "web" : "https://github.com/cpan-mila/perl-log-any-adapter-redis"
+      }
+   },
+   "version" : "1.000"
+}
+

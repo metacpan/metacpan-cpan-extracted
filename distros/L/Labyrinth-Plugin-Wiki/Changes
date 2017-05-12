@@ -1,0 +1,37 @@
+Changes for the Labyrinth-Plugin-Wiki
+=====================================
+
+1.06    2014-12-28
+        - fixed license fields in META.json to be lists.
+        - added homepage resource to META files.
+        - documentation updates.
+        - extended META test suite.
+
+1.05    2014-04-14
+        - fixed distribution name in META (thanks Neil).
+
+1.04    2013-05-05
+        - change file dates changed to meet W3CDTF standards.
+        - fixed site and link pattern matching.
+        - use process_html from MLUtils rather than handcrafting.
+        - upgrade to Labyrinth 5.16.
+        - updated templates.
+        - added LICENSE file.
+
+1.03    2012-06-07
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+1.02    2011-06-19
+        - URL pattern update to accept '/' in text alternative.
+        - update to Single/Pair balancing in XHTML.
+        - added documentation.
+
+1.01    2011-05-08
+        - cleaned up phrasebook.ini.
+        - URL pattern match fixes.
+        - WikiLink now only checks whether a linked page exists.
+
+1.00    2011-01-19
+        - first official release

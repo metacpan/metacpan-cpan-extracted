@@ -1,0 +1,48 @@
+/*==================================================================*/
+/* PROFILING
+==================================================================*/
+#profile {
+	color: black;
+	background: white ;
+	text-align: left;
+	cursor: pointer ;
+	padding: 0.5em 0 0.5em 0.5em ;
+	margin: 0.1em ;
+	clear: both ;
+	height: 300px;
+	overflow: auto ;
+	width: 80%;
+	font-size: 70% ;
+
+}
+
+#profile table {
+	width: 100% ;
+}
+
+#profile table td.profTime {
+	width: 8em ;
+}
+
+#profile table td.profName {
+	width: 30em ;
+}
+
+#profile table td.profValue {
+	width: 10em ;
+}
+
+#profile table td.profMsg {
+	width: auto ;
+}
+
+#profile .profile_message {
+	color: green;
+	border-bottom: solid black 1px;
+}
+
+#profile .profile_sorted {
+	color: blue;
+	border-bottom: solid black 1px;
+}
+

@@ -1,0 +1,32 @@
+#!/usr/bin/perl -w
+use strict;
+
+use Getopt::Long;
+use Log::Log4perl;
+use Gearman::Worker;
+use Log::Log4perl;
+
+my @job_servers;
+my ($job_name, $log_conf, $verbose) = ('gearman-logger');
+
+GetOptions("job_server=s@" => \@job_servers,
+           "logconf=s"     => \$log_conf,
+           "jobname=s"     => \$job_name,
+           "verbose"       => \$verbose) or die;
+
+@job_servers = ('127.0.0.1') unless @job_servers;
+die 'must have logconf file with --logconf' unless $log_conf;
+Log::Log4perl->init_and_watch($log_conf);
+
+my $worker = Gearman::Worker->new;
+$worker->job_servers(@job_servers);
+$worker->register_function($job_name => \&log_me);
+$worker->work while 1;
+
+sub log_me {
+    my $job = shift;
+    my ($level, $category, $message) = split('\|',$job->arg, 3);
+    $level = lc($level);
+    Log::Log4perl->get_logger($category)->$level($message);
+    return 0;
+}

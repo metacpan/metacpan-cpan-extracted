@@ -1,0 +1,149 @@
+NAME
+    Lutherie::FretCalc
+
+SYNOPSIS
+    use Lutherie::FretCalc;
+
+    my $fretcalc = Lutherie::FretCalc->new($scale_length);
+    $fretcalc->in_units('in');
+    $fretcalc->out_units('in');
+    my $fret = $fretcalc->fret($fret_num);
+    my @chart = $fretcalc->fretcalc($num_frets);
+
+CONSTRUCTOR
+
+    new ( [SCALE_LENGTH[, NUM_FRETS]] );
+
+    This is the constructor for a new Lutherie::FretCalc object. SCALE_LENGTH
+    is the numeric value for the scale length to be used for the calculation.
+    The default value for scale length is 25.
+    NUM_FRETS is the number of frets to be calculated.
+    The default value for num_frets is 24.
+    The unit can be set with the in_units() and out_units() methods. 
+    The default is 'in' (inches).
+
+METHODS
+
+    scale ( [ SCALE_LENGTH ] )
+
+    If SCALE_LENGTH is passed, this method will set the scale length. 
+    The default value is 25. The scale length is returned. 
+
+    num_frets ( [ NUM_FRETS ] )
+
+    If NUM_FRETS is passed, this method will set the number of frets.  
+    The default value is 24. The number of frets is returned.
+
+    fret_num ( [ FRET_NUM ] )
+
+    If FRET_NUM is passed, this method will set the fret number.
+    The default value is 12. The fret number is returned.
+
+    in_units ( [ IN_UNITS ] )
+
+    If IN_UNITS is passed, this method will set the in units.
+    The default is 'in' (inches). The in unit is returned.
+    'in' - Inches, 'mm' - Millimeters
+
+    out_units ( [ OUT_UNITS ] )
+
+    If OUT_UNITS is passed, this method will set the out units.
+    The default is 'in' (inches). The out unit is returned.
+    'in' - Inches, 'mm' - Millimeters
+
+    calc_method ( [ CALC_METHOD ] )
+
+    If CALC_METHOD is passed, this method will set the calc method.
+    The default is 't' (tempered). The calc method is returned.
+    't': tempered - power of $i/$tet (default),
+    'ec': classic - 17.817,
+    'es': Sloane - 17.835,
+    'ep': Primative - 18
+
+    tet ( [ TET ] )
+
+    If TET is passed, this method will set the tones per octave.
+    The default is 12. The number of tones per octave is returned.
+    This value is only valid when using calc_method = 't'.
+
+    precision ( [ PRECISION ] )
+
+    If PRECISION is passed, this method will set the precision of
+    the displayed calculations. The default is 4 for 'in' and
+    1 for 'mm'. The precision is returned.
+    0: "%8.0f"
+    1: "%8.1f"
+    2: "%8.2f"
+    3: "%8.3f"
+    4: "%8.4f"
+    5: "%8.5f"
+    6: "%8.6f"
+
+    half_fret ( [ FRET_NUM ] )
+        If FRET_NUM is passed, this method will calculate
+        the half fret for this fret number. Valid values are
+        1, 6, 8 and 13. Only used with dulc_calc().
+        A comma separated list of half frets is returned.
+
+    fret ( [ FRET_NUM ] )
+
+    Calculate the distance from the nut to the fret number. 
+    A scalar containing fret location for FRET_NUM is returned.
+
+    fretcalc ( [ NUM_FRETS ] )
+
+    Calculate fret locations for given scale length, number of frets, calc type
+    and tet. An ordered array containing fret locations from 1 to NUM_FRETS 
+    is returned.
+
+    dulc_calc ( )
+        Calculate fret locations for mountain dulcimer. Number
+        of frets is set at :w14. Half frets may be added by 
+        using half_fret() function. Valid half frets are 1+,
+        6+, 8+ and 13+. num_frets() will be ignored when using
+        dulc_calc(). A hash containing fret locations from 1 to 14
+        is returned.
+
+
+    Please let me know of any bugs you find or if you have any other
+    routines you would like to contribute.
+
+REQUIREMENTS
+    Perl version 5.000 or higher. Developed using version 5.6 on Linux.
+
+WHERE CAN I GET IT?
+    www.cpan.org/authors/id/D/DS/DSPARLING 
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+    Lutherie::FretCalc is a pure Perl module. You may install in manually
+    in any directory included in @INC, or in the same directory as any
+    script that requires it.
+
+DOCUMENTATION
+    Documentation is included in the module as POD. A man file should be
+    created in the installation process.
+
+CHANGES
+    See the Changes file
+
+AUTHOR
+    Douglas Sparling <doug@dougsparling.com>
+
+DISCLAIMER
+    This program is distributed inthe hope that it will be
+    useful, but without any warranty; without even the implied
+    warranty of merchantability or fitness for a particular purpose.
+
+SUPPORT
+    Questions, but reports, useful code bits, and suggestions for
+    Lutherie::FretCalc should be sent to me at doug@dougsparling.com
+
+COPYRIGHT
+    Copyright (c) 2001-2002 Douglas Sparling. All rights reserved.
+    This program is free software; you can redistribute it
+    and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,7 @@
+Sat Nov  3 19:50:56 2001  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Forgot the prerequisite Lingua::FI::Hyphenate, duh.
+
+	* Release 0.02.
+	
+

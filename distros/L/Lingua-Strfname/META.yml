@@ -1,0 +1,30 @@
+---
+abstract: "Formats people's names"
+author:
+  - "David E. Wheeler <david@justatheory.com>, with implementation assistance from\nDavid Lowe."
+build_requires:
+  Module::Build: 0.2701
+  Test::More: 0.17
+configure_requires:
+  Module::Build: 0.2701
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-Strfname
+provides:
+  Lingua::Strfname:
+    file: lib/Lingua/Strfname.pm
+    version: 0.13
+recommends:
+  Test::Pod: 1.41
+requires:
+  perl: 5.006
+resources:
+  bugtracker: http://github.com/theory/lingua-strfname/issues/
+  homepage: http://search.cpan.org/dist/Lingua-Strfname/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/theory/lingua-strfname/
+version: 0.13

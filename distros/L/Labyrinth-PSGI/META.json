@@ -1,0 +1,74 @@
+{
+    "name": "Labyrinth-PSGI",
+    "version": "1.02",
+    "abstract": "PSGI handler for Labyrinth",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "web",
+        "cgi",
+        "framework"
+    ],
+
+    "prereqs" : {
+        "test" : {
+            "requires": {
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "CGI::Cookie": "0",
+                "CGI::PSGI": "0",
+                "IO::File": "0",
+                "Labyrinth": "0",
+                "Labyrinth::Variables": "0"
+            }
+        }
+    },
+
+    "provides": {
+        "Labyrinth::PSGI": {
+            "file": "lib/Labyrinth/PSGI.pm",
+            "version": "1.02"
+        },
+        "Labyrinth::Query::PSGI": {
+            "file": "lib/Labyrinth/Query/PSGI.pm",
+            "version": "1.02"
+        },
+        "Labyrinth::Writer::Render::PSGI": {
+            "file": "lib/Labyrinth/Writer/Render/PSGI.pm",
+            "version": "1.02"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Labyrinth-PSGI" },
+        "repository": {
+            "url": "git://github.com/barbie/labyrinth-psgi.git",
+            "web": "http://github.com/barbie/labyrinth-psgi",
+            "type": "git"
+        }
+    }
+}

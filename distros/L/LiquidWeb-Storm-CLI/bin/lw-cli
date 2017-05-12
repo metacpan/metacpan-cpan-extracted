@@ -1,0 +1,8 @@
+#!/usr/bin/perl 
+use strict;
+use warnings; 
+
+use LiquidWeb::Storm::CLI; 
+
+my $api = LiquidWeb::Storm::CLI->new();
+$api->execute;

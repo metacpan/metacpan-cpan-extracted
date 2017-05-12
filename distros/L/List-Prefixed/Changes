@@ -1,0 +1,15 @@
+Revision history for Perl extension List::Prefixed.
+
+0.01  Sat Feb 28 19:21:46 2015
+	- original version; created by h2xs 1.23 with options
+		-AXn List::Prefixed
+
+0.01  Tue Mar  3 21:41:33 CET 2015
+	- Stable version
+
+0.02  Mi 4. Mär 16:22:46 CET 2015
+	- Added large tests (a regex matching all Perl module names)
+
+0.03  Wed Mar  4 21:56:29 CET 2015
+	- fixed large list tests
+

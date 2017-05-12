@@ -1,0 +1,88 @@
+#
+# LUGS Terminliste
+#
+
+########################################################################
+section Definitive Daten
+########################################################################
+
+event 20080303
+  weekday Mo
+  day 3
+  time 20:00
+  title Linux Stammtisch in Winterthur
+  color winti
+  location <a href="http://www.la-pergola-winti.ch/">Restaurant Pizzeria La Pergola</a>, Stadthausstrasse 71, 8400 Winterthur (<a href="http://map.search.ch/8400-winterthur/stadthausstr.-71">Karte</a>)
+  responsible <a href="mailto:Paul.Bosshard@LUGS.ch">Paul Bosshard</a>
+  more <a href="/lugs/sektionen/winterthur.phtml">Mehr Infos</a>
+endevent
+
+event 20080306
+  time 19:30
+  title LugBE Treff
+  color bern
+  location Restaurant Beaulieu, Erlachstrasse 3, 3012 Bern (<a href="http://map.search.ch/3012-bern/erlachstr.-3">Karte</a>)
+  responsible <a href="mailto:info@lugbe.ch">info@lugbe.ch</a>
+  more <a href="http://lugbe.ch/action/nexttreff.phtml">Mehr Infos</a>
+endevent
+
+event 20090709
+  weekday Do
+  day 9
+  time 19:15
+  title LUGS Treff
+  color treff
+  location ETH Z&uuml;rich, <a href="http://www.rauminfo.ethz.ch/grundrissplan.gif?region=Z&areal=Z&gebaeude=HG&geschoss=G&raumNr=26.5">HG G 26.5</a> (<font color="red"><b>anderer Raum!</b></font>)
+  responsible <a href="mailto:lugsvs@lugs.ch">LUGS Vorstand</a>
+  more Restaurant nach dem Treff: <a href="http://www.doodle.com/mgfpebmxx5ibyt4m">Auswahl / Anmeldung</a>
+  more (bis 09.07.2009 12:00)
+endevent
+
+event 20090725
+  weekday Sa
+  day 25
+  time ab 17:00
+  title LUGS Grillabend
+  color spec
+  location H&uuml;tte/Areal des Sch&auml;ferhundeclubs Winterthur (<a href="http://neil.franklin.ch/Info_Texts/Anreise_SCOG_Clubhaus.html">Anreise</a>)
+  responsible <a href="mailto:neil@franklin.ch">Neil Franklin</a>
+  more Wie schon die letzten Jahre werden wir auch dieses Jahr wieder eine
+  more LUGS-Grillparty durchf&uuml;hren.
+  more <br>Teilnehmer: LUGS Mitglieder (und werdende), Familie (Freund(in),
+  more Kinder, Geschwister, ...), Freunde, ...
+  more <br><a href="https://www.lugs.ch/lugs/interna/maillugs/200907/42.html">Mehr Infos</a>
+  more (nur mit <a href="https://www.lugs.ch/lugs/badpw.phtml">LUGS Login</a>)
+endevent
+
+event 20120922
+  time 19:00 - 23:00
+  title Franz&ouml;sischer Neujahrsmampf 2012
+  color spec
+  location Standort noch unbekannt
+  responsible <a href="mailto:ceo@fress-und-sauf-verein.ch">Martin Ebn&ouml;ther</a>
+  more Ideen / Vorschl&auml;ge bitte per E-Mail an den
+  more <a href="mailto:ceo@fress-und-sauf-verein.ch?subject=Vorschlag Franz&ouml;sischer Neujahrsmampf 2012">CEO</a>
+  more senden.
+endevent
+
+event 20100212
+  weekday Fr
+  day 12
+  time 19:15
+  title LUGS Treff - Voodoo, Schwarze Magie und Internet per UMTS
+  color treff
+  location <a href="http://www.solino.ch/">Solino</a>, Am Schanzengraben 15, 8002 Z&uuml;rich (<a href="http://map.search.ch/zuerich/am-schanzengraben-15">Karte</a>)
+  responsible <a href="mailto:ventilator@semmel.ch">Martin Ebn&ouml;ther</a>
+endevent
+
+event 20110612
+  weekday So
+  day 12
+  color spec
+endevent
+
+event 20110612
+  weekday So
+  day 12
+  color spec
+endevent

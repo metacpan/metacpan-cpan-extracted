@@ -1,0 +1,14 @@
+[% IF menu %]
+[% IF menu.title %]<h1 class="clear">[% menu.title %]</h1>[% END %]
+<ul[% IF menu_class %] class="[% menu_class %]"[% END %]>
+[% FOREACH option = menu.data %]
+    [% IF option.4 <= user.access %]
+		[% IF option.5 == 1; THEN; class = ' id="current"'; END %]
+        [% IF menu.typeid == 1 %]<li[% class %]><a title="[% option.2 %]" href="[% option.3 %]"><span>[% option.2 %]</span></a></li>[% END %]
+        [% IF menu.typeid == 2 %]<li[% class %]><a title="[% option.2 %]" href="[% option.3 %]">[% IF option.6 %]<img src="[% webpath %]/images/[% option.6 %]" border="0" alt="[% option.2 %]" />[% ELSE %]<span>[% option.2 %]</span>[% END %]</a></li>[% END %]
+        [% IF menu.typeid == 3 %]<li[% class %]><a title="[% option.2 %]" href="[% option.3 %]">[% IF option.6 %]<img src="[% webpath %]/images/[% option.6 %]" border="0" alt="[% option.2 %]" />[% ELSE %]<span>[% option.2 %]</span>[% END %]</a></li>[% END %]
+        [% IF menu.typeid == 4 %]<li[% class %]><a title="[% option.2 %]" href="[% option.3 %]">[% IF option.6 %]<img src="[% webpath %]/images/[% option.6 %]" border="0" alt="[% option.2 %]" />[% ELSE %]<span>[% option.2 %]</span>[% END %]</a></li>[% END %]
+    [% END %]
+[% END %]
+</ul>
+[% END %]

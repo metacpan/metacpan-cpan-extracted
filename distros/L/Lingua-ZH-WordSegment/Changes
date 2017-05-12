@@ -1,0 +1,6 @@
+Revision history for Perl extension Lingua::ZH::WordSegment.
+
+0.01  Wed Sep 20 23:29:55 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Lingua::ZH::WordSegment
+

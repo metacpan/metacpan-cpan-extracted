@@ -1,0 +1,47 @@
+Lingua::FR::Numbers Changelog
+-----------------------------
+
+1.161950  2016-07-13 12:40:33CEST+0200 Europe/Paris
+      - Use bignum instead of Math::BigInt. Tests are passing on my longdouble perl install.
+      - Allow for '_' characters when passing a string as number.
+
+1.161910 - Sun Jul 10 00:22:45 2016
+      - Use Dist::Zilla for building modules and avoid troubles with version numbers
+      - Cleaned up encoding in test and module
+      
+0.06.1 - Sat Jul  9 22:24:51 2016
+      - Use Math::BigInt for reliable tests
+
+0.06 - Fri Jul  8 22:34:01 2016
+     - Fix decimal numbers representation (thanks for Sebastien Thebert for the
+       fix)
+     - Workaround for a bug on some architecture that would output "million de
+       billion" instead of "trillion"
+
+0.05 - Bad release
+
+0.04 - Sat Dec 28 15:32:29 CET 2002
+     - ** The interface for this module has changed **
+     - Rewrote the whole module from scratch, it should now be easier to
+       read and a whole lot faster.
+     - Lingua::FR::Ordinate is no longer used, the ordinate_to_fr() function
+       is used instead.
+     - Fixed an error in a test case ('cent milliards' was mistakenly
+       written as 'cent milliard'.)
+     - Drop the planned support for French variants (FR_ch, etc.)
+
+0.03 - Sun Nov 10 14:00:06 CET 2002
+     - The decimal support is a bit better and hopefully more correct.
+     - Fixed RT bug #1772: The ordinate output for '80' was
+       'quatre-vingtsième' instead of 'quatre-vingtième'. Added tests
+       to check this behavior. (thanks to Philippe Bricout for
+       finding this bug)
+     - Fixed an inaccuracy in Ordinate.pm doc (Philippe Brivout)
+
+0.02 - Fri Apr 19 07:05:00 CET 2002
+     - Added Lingua::FR::Numbers::Ordinate to the module
+     - Added limited support for decimals
+
+0.01 - Initial releases
+     - Special case for 'soixante et onze' (is this the only one?)
+

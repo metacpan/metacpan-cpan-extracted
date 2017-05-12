@@ -1,0 +1,31 @@
+Revision history for Lingua-AtD
+
+1.160790  2016-03-19 08:39:10-05:00 EST
+    * Removed tests making calls to the service. Network connectivity and lag are generally unpredictable and caused intermittant failures for cpantesters.
+
+1.121570  2012-06-05 04:30:02 EST
+    * Changed default throttle to 2 seconds. Tests failing enough to
+      show 1 second is too unstable. (www.cpantesters.org).
+    * Minor documentation corrections.
+
+1.121550  2012-06-02 19:41:25 EST
+    * Added 32 hex digits to API Key per AtD Documentation
+    * Added get_error_count() to Results.
+    * Fixes for Bug 77309:
+        * Added throttle & last_call properties to AtD. Seems the
+          service doesn't like being called less than two seconds apart.
+        * Replaced Exceptions with Carp. Exceptions will be implemented
+          in a later release.
+
+1.113000  2011-10-26 20:12:33 EST
+    * More corrections to 01-sanity-atd.t to prevent false failures
+      while testing for LWP exceptions.
+
+1.112980  2011-10-25 12:18:11 EST
+    * Finished and corrected documentation.
+    * Updated 01-sanity-atd.t to use 500.500.500 as hostname. Prevents
+      timout issues from services such as OpenDNS trying to nicely
+      resolve bad hostnames.
+
+1.112970  2011-10-23 22:00:00 EST
+    * Original release

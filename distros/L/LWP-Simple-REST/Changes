@@ -1,0 +1,52 @@
+Revision history for Perl CPAN distribution LWP-Simple-REST
+
+0.11 RECSKY
+    - New internal interface
+    - New external interface
+    - Old interface still working
+
+0.10 RECSKY
+    - Remove Data::Structure::Util
+    - Added Object Oriented Interface
+
+0.092 2015-07-08 GONCALES
+    - Fixed JSON tests
+
+0.091 2015-07-06 GONCALES
+    - Fixed server's port error. Each test have their specific port now.
+
+0.09 2015-07-06 GONCALES
+    - Fixed the cpantesters error on server hardcoded port. Now it gets the server
+      port and make a request ( Bug #105670 ).
+
+0.08 2015-07-06 GONCALES
+    - Added [GithubMeta] to dist.ini, so the dist metadata will contain
+      the github repo.
+    - Added [MetaJSON] to dist.ini, so releases will include a META.json file.
+    - Reformatted this file to have most recent entry first,
+      and adjusted formatting to match CPAN::Changes::Spec.
+    - Fix test issues ( Bug #105670 )
+
+0.07 2015-07-03 GONCALES
+    - Fix some test bugs
+
+0.06 2015-02-14 RECSKY
+
+0.05 2015-02-09 RECSKY
+
+0.04 2014-11-13 GONCALES
+    - This version includes the http_head method,
+      allowing to send HTTP HEAD request to a server
+    - Fixed the version
+
+0.004 2014-11-13 GONCALES
+
+0.003 2014-11-13 GONCALES
+    - Fixed the missing dependency prerequisite issue 
+
+0.002 2014-10-23 RECSKY
+    - Added Json requests and fix the old code
+
+0.001 2014-09-20 GONCALES
+    - First version, released on an unsuspecting world.
+

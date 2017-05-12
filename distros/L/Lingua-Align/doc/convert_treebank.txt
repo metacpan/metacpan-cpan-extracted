@@ -1,0 +1,51 @@
+NAME
+    convert_treebank - convert a treebank from one format to another
+
+SYNOPSIS
+        treealign [-i] infile informat outformat > outfile
+
+DESCRIPTION
+    This script allows you to convert a treebank to another format. The
+    converted treebank is printed to STDOUT. Currently the following formats
+    are supported:
+
+    AlpinoXML (alpino)
+        The XML format used by the Dutch dependency parser Alpino. Use the
+        option [-i] to skip index nodes from that format.
+
+    PennTreebank (penn)
+        The bracketing format from the Penn Treebank. Sentences should be
+        separated by empty lines. This can be used to read, for example, the
+        output of the Berkeley Parser.
+
+    Stanford Parser format (stanford)
+        This is essentially the same as the PennTreebank format but includes
+        also the depedency relations that can optionally be produced by the
+        Stanford parser. The conversion script tries to attach the relations
+        to the phrase-structure trees. (This is rather experimental and the
+        labeling might be different from what you'd expect -- use with
+        care!).
+
+    Berkeley Parser format (berkeley)
+        This is the same as the Penn Treebank format but the Berkeley Parser
+        produces bracketing structures that break the parser.
+
+    TigerXML (tiger)
+        This is the TigerXML format which is used as a standard in the
+        TreeAligner (mainly because it is also used in the Stockholm Tree
+        Aligner which allows to visualize and edit the automatic tree
+        alignments).
+
+SEE ALSO
+    Lingua::Align::Corpus, Lingua::Align::Corpus::Treebank
+
+AUTHOR
+    Joerg Tiedemann, <jorg.tiedemann@lingfil.uu.se>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Joerg Tiedemann
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

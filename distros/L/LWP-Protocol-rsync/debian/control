@@ -1,0 +1,43 @@
+# Copyright 2014 Kevin Ryde
+
+# This file is part of LWP-Protocol-rsync.
+#
+# LWP-Protocol-rsync is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3, or (at
+# your option) any later version.
+#
+# LWP-Protocol-rsync is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with LWP-Protocol-rsync.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests.
+#
+# libhttp-date-perl, libhttp-message-perl, liblwp-mediatypes-perl
+# split out of libwww-perl in version 6.  Either package provides the
+# respective modules.
+
+Source: liblwp-protocol-rsync-perl
+Section: perl
+Priority: optional
+Build-Depends: perl (>= 5.6.2), cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42@zip.com.au>
+Standards-Version: 3.9.5
+Homepage: http://user42.tuxfamily.org/lwp-protocol-rsync/index.html
+Bugs: mailto:user42@zip.com.au
+
+Package: liblwp-protocol-rsync-perl
+Architecture: all
+Depends: perl (>= 5.005), libwww-perl, libhttp-date-perl | libwww-perl, liblwp-mediatypes-perl | libwww-perl, libhttp-message-perl | libwww-perl, libipc-run-perl, rsync, ${perl:Depends}, ${misc:Depends}
+Description: LWP driver for rsync://
+ A back-end for LWP::UserAgent for rsync:// URLs which runs the rsync
+ program to connect to an rsync server.
+ .
+ GET, PUT and HEAD methods are supported.  GET to a :content_file uses
+ the rsync delta-transfer.  PUT always uses delta-transefer.

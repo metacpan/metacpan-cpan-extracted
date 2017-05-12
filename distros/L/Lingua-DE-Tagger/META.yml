@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Lingua-DE-Tagger
+version:      0.16
+version_from: lib/Lingua/DE/Tagger.pm
+installdirs:  site
+requires:
+    File::Spec:                    0.84
+    HTML::Parser:                  3.45
+    Lingua::Stem:                  0.81
+    Memoize:                       1.01
+    Memoize::ExpireLRU:            0.55
+    Storable:                      2.10
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

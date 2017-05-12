@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/LibreDTE-SDK.t
+lib/LibreDTE/SDK.pm
+ejemplos/001-generar_dte.pl
+ejemplos/002-actualizar_estado.pl

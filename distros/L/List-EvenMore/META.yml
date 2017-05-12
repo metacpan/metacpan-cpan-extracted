@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                List-EvenMore
+version:             0.11
+abstract:            Even more List utilities
+license:             ~
+author:              
+    - David Muir Sharnoff <muir@idiom.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    String::CRC:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,16 @@
+README for LinkController docs directory
+
+Various files in this directory have different levels of up to
+dateness.  The manual (in the HTML directory in HTML format and in
+info format in the file link-controller.info) is in a reasonably good
+state.
+
+You may need to have an recent version of texinfo to build it into
+formats not included.
+
+At least the texinfo.tex included here should let you generate latex and
+other formats derived from it.
+
+Some of the files here are random disassociated thoughts.  They can be
+easily ignored, but if you have any useful comments to them then feel
+free to email me.

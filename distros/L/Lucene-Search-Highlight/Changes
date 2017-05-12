@@ -1,0 +1,28 @@
+Revision history for Lucene
+
+0.01    2006-04-25
+        First version
+
+0.02    2006-09-30
+        Added sort.
+        Exception handling.
+        Added close() method for FSDirectory.
+        Close FSDirectory and RAMDirectory at destruction.
+
+0.03    2006-11-14
+        Added MultiFieldQueryParser.
+        Exception handling for IndexReader.
+        Added ability to set Similarity.
+
+0.04    2006-12-08
+        Added UTF-8 support.
+        Added QueryFilter.
+        Exception handling for IndexWriter and QueryParser.
+        Enabled global loading of Lucene shared object.
+
+0.05    2006-12-18
+        Resolved bug when indexing float or interger numbers in field values.
+
+0.06    2006-12-21
+        Exception handling for MultiFieldQueryParser.
+

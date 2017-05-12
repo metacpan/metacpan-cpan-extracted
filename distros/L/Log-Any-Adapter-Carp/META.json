@@ -1,0 +1,69 @@
+{
+   "abstract" : "Simple adapter for logging via warnings",
+   "author" : [
+      "Charles Bailey <cbail@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Log-Any-Adapter-Carp",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Carp::Clan" : "0",
+            "Log::Any::Adapter::Base" : "0",
+            "Log::Any::Adapter::Util" : "1",
+            "Scalar::Util" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Log::Any" : "0",
+            "Log::Any::Adapter" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com//Log-Any-Adapter-Carp.git",
+         "web" : "https://github.com//Log-Any-Adapter-Carp"
+      }
+   },
+   "version" : "1.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

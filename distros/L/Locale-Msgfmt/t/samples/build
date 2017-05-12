@@ -1,0 +1,11 @@
+#!/bin/sh
+
+cd `dirname $0`
+rm *.mo
+for PO in *.po; do
+    MO=$(echo $PO | sed 's/po$/mo/')
+    msgfmt -o $MO $PO
+    if [ "$PO" = "basic.po" ]; then
+        msgfmt -f -o fuzz.mo $PO
+    fi
+done

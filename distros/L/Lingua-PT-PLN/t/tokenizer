@@ -1,0 +1,135 @@
+#1 = tokenização simples
+
+era uma vez
+
+era
+uma
+vez
+
+#2 = hifen no meio de uma palavra
+
+foi numa sexta-feira santa
+
+foi
+numa
+sexta-feira
+santa
+
+#3 = hifen mesmo :)
+
+parece-me chato - na verdade
+
+parece-me
+chato
+-
+na
+verdade
+
+#4 = mais que um ponto
+
+de certeza??
+
+de
+certeza
+??
+
+#5 = horas
+
+o comboio parte às 2:30 da tarde
+
+o
+comboio
+parte
+às
+2:30
+da
+tarde
+
+#6 = pontuação
+
+uma; duas; três: três casas no Gerês
+
+uma
+;
+duas
+;
+três
+:
+três
+casas
+no
+Gerês
+
+#7 = reticencias
+
+Era uma vez... uma baleia gorda!
+
+Era
+uma
+vez
+...
+uma
+baleia
+gorda
+!
+
+#8 = [...] cortes
+
+Depois de [...] comeu uma batata quente
+
+Depois
+de
+[...]
+comeu
+uma
+batata
+quente
+
+#9 = email
+
+Envie a correspondência para me@there.com
+
+Envie
+a
+correspondência
+para
+me@there.com
+
+#10 = email.email
+
+Envie a correspondência para not.me@there.com.
+
+Envie
+a
+correspondência
+para
+not.me@there.com
+.
+
+#11 = URL - http
+
+Visite http://www.linguateca.pt para mais informações.
+
+Visite
+http://www.linguateca.pt
+para
+mais
+informações
+.
+
+#12 = numbers
+
+eu vi 12.1 12,1 12/12/90 12.o 12, 1 gatos.
+
+eu
+vi
+12.1
+12,1
+12/12/90
+12.o
+12
+,
+1
+gatos
+.
+

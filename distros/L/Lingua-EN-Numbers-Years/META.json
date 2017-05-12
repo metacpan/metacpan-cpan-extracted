@@ -1,0 +1,48 @@
+{
+   "abstract" : "turn \"1984\" into \"nineteen eighty-four\", etc",
+   "author" : [
+      "Sean Burke <sburke@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lingua-EN-Numbers-Years",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Lingua::EN::Numbers" : "1.01",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Lingua-EN-Numbers-Years",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Lingua-EN-Numbers-Years.git",
+         "web" : "https://github.com/neilb/Lingua-EN-Numbers-Years"
+      }
+   },
+   "version" : "1.05"
+}
+

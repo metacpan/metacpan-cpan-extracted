@@ -1,0 +1,96 @@
+SYNOPSIS
+
+     use Locale::ID::GuessGender::FromFirstName qw/guess_gender/;
+    
+     my @res = guess_gender("Budi"); # ({ name=>"budi", result=>"M",
+                                     #   guess_confidence=>1,
+                                     #   gender_ratio => 1, algo=>"common" })
+    
+     # specify more detailed options, guess several names at once
+     my @res = guess_gender({min_guess_confidence => 0.75,
+                             algos => [qw/common v1_rules google/]},
+                             "amita", "mega");
+
+DESCRIPTION
+
+    This module provides a function to guess the gender of commonly
+    encountered people's names in Indonesia, using several algorithms.
+
+FUNCTIONS
+
+ guess_gender([OPTS, ]FIRSTNAME...) => (RES, ...)
+
+    Guess the gender of given first name(s). An optional hashref OPTS can
+    be given as the first argument. Valid pair for OPTS:
+
+    algos => [ALGO, ...]
+
+      Set the algorithms to use, in that order. Default is [qw/common
+      v1_rules/]. Known algorithms: common (try to match from the list of
+      common names), v1_rules (use some simple heuristics), google (compare
+      the number of Google search results for "bapak FIRSTNAME" vs "ibu
+      FIRSTNAME").
+
+      The choice of algorithms can severely impact the result. For example,
+      "Mega" is actually pretty ambivalent, used by both females and males.
+      But Google search for "ibu mega" will return much more results than
+      "bapak mega", thus the google algorithm will decide that "Mega" is
+      predominantly female.
+
+    min_guess_confidence => FRACTION
+
+      Minimum guess confidence level to accept an algorithm's guess as the
+      final answer, a number between 0 and 1. Default is 0.51 (51%).
+
+    try_all => BOOL
+
+      Whether to try all algorithms specified in algorithms. Default is 0,
+      which means stop trying after an algorithm succeeds to generate guess
+      with specified minimum guess confidence. If set to 1, all algorithms
+      will be tried and the best result used.
+
+    algo_opts => {ALGO => OPTS, ...}
+
+      Specify per-algorithm options. See the algorithm's documentation for
+      known options.
+
+    Will return a result hashref RES for each given input. Known pair of
+    RES:
+
+    result => "M" or "F" or "both" OR "neither" OR undef
+
+      The final guess result. undef if no algorithm succeeded. "M" if name
+      is predominantly male. "F" if name is predominantly female. "both" if
+      name is ambivalent. "neither" if sufficiently confident that the name
+      is not a person's name.
+
+    guess_confidence => FRACTION
+
+      The final guess confidence level.
+
+    gender_ratio => FRACTION
+
+      Estimation of gender ratio. 1 (100%) means the name is always used
+      for male or female. 0.9 (90%) means sometimes (about 10% of the time)
+      the name is also used for the opposite sex. If the gender ratio is
+      close to 0.5 it means the name is ambivalent and often used equally
+      by males and females.
+
+    algo => FRACTION
+
+      The algo that is used to get the final result.
+
+    algo_res => [RES, ...]
+
+      Per-algorithm result. Usually only useful for debugging.
+
+BUGS/TODOS
+
+    This is a preliminary release. List of common names is not very
+    complete. Heuristic rules are still too simplistic. Expect the accuracy
+    of this module to improve in subsequent releases.
+
+SEE ALSO
+
+    Locale::ID::ParseName::Person
+

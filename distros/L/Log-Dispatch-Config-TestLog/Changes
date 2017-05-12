@@ -1,0 +1,5 @@
+0.02
+	- Fix with recent versions of Test::Builder
+
+0.01
+	- Initial release

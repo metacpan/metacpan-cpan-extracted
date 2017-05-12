@@ -1,0 +1,29 @@
+Lingua-GA-Gramadoir: Check the grammar of Irish language texts
+================================
+
+This module was generated automatically using
+gramadoir-0.7 and the language pack gramadoir-ga-0.70.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENSE
+
+Lingua-GA-Gramadoir is released under the same terms as the
+gramadoir-ga-0.70 package from which it was built:
+
+gramadoir-ga: An Gramadóir data files for Irish
+  Copyright (C) 2003-2007 Kevin P. Scannell <kscanne@gmail.com>
+                     
+For more detailed information, see the web page:
+    http://borel.slu.edu/gramadoir/
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.

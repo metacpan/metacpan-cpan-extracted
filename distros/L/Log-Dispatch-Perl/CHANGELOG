@@ -1,0 +1,23 @@
+0.04	6 April 2012
+	Brought up to the latest code esthetics.  Stopped doing unneccessary
+	BEGIN block magic.  Verifies it runs on 5.14.2, threaded and unthreaded.
+	Added LICENSE parameter to allow MetaCPAN to show license info.
+
+0.03	1 February 2004
+	Changed internal workings to use %Carp::Internal to indicate module
+	names that shouldn't be listed in a traceback.  As per suggestion of
+	Perl Monk tilly.  This however only works for Perl 5.8.0 and higher.
+	Change the removal optimization slightly for other versions of Perl.
+
+	29 January 2004
+	Minor first 4 line regex removal optimization.
+
+	Minor nits in the documentation.
+
+0.02	29 January 2004
+	Fixed problem with extra lines in "cluck" and "confess" types of
+	handling.  All intermediate levels in Log::Dispatch::xxx modules
+	are now removed.
+
+0.01	28 January 2004
+	First version of Log::Dispatch::Perl.

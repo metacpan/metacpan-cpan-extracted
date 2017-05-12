@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+# but you should run it `perl Configure.pl'
+use WWW::Link_Controller::ReadConf::utils;
+
+use Infostructure; # we must already be installed
+use Data::Dumper;
+
+print <<EOINTRO;
+              InfoStructure Configuration
+
+An infostructure is a group of resources (WWW pages, programs etc)
+which can be refered to with URLs.  This program sets information
+about these.
+
+EOINTRO
+
+#simply create an array of values and then Dumper it.
+
+@infostrucs=();
+while (1) {
+  push @infostrucs, infostructure();
+  last unless yesno <<EOQ
+Do you want to create another infostructure?
+EOQ
+}
+
+open (OUTFILE, '>' . $ENV{"HOME"} . '/.infostruc.pl';
+
+print OUTFILE Dumper @infostrucs;
+
+
+sub infostructure {
+  my $name=getstring <<EOQ, 
+What name do you want to give this infostructure?
+EOQ
+
+  my $link_index=getstring <<EOQ;
+What file do you want to use for it's index which tells it which pages
+have a given link?
+EOQ
+
+  my $page_index=getstring <<EOQ
+What file do you want to use for it's index which tells it which links
+happen on a given page?
+EOQ
+
+  my ($filebase, $urlbase);
+  yesno <<EOQ
+Is this infostructure created from a normal set of files in a specific
+directory (for example your own WWW pages in your home directory?).  
+EOQ
+  && do {
+    my $filebase=getstring <<EOQ
+What is the directory the files are kept in.
+EOQ
+
+
+    $urlbase=getstring <<EOQ
+What is the URL which gets you to the index of that directory on the WWW?
+EOQ
+
+#     my yesno <<EOQ
+# What is the directory the files are kept in.
+# EOQ
+
+  }
+  new Infostructure $name, $link_index, $page_index, $filebase, $urlbase
+
+}
+
+
+
+
+
+
+
+

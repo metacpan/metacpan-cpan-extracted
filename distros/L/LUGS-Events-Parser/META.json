@@ -1,0 +1,63 @@
+{
+   "abstract" : "Event parser for the Linux User Group Switzerland",
+   "author" : [
+      "Steven Schubiger <schubiger@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "LUGS-Events-Parser",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : 0,
+            "File::Temp" : 0,
+            "FindBin" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "DateTime" : 0,
+            "HTML::Entities" : 0,
+            "HTML::Parser" : 0,
+            "List::MoreUtils" : 0,
+            "Params::Validate" : 0,
+            "boolean" : 0
+         }
+      }
+   },
+   "provides" : {
+      "LUGS::Events::Parser" : {
+         "file" : "lib/LUGS/Events/Parser.pm",
+         "version" : "0.10"
+      },
+      "LUGS::Events::Parser::Event" : {
+         "file" : "lib/LUGS/Events/Parser/Event.pm",
+         "version" : "0.04"
+      },
+      "LUGS::Events::Parser::Filter" : {
+         "file" : "lib/LUGS/Events/Parser/Filter.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.10"
+}

@@ -1,0 +1,59 @@
+<?php
+
+# [% warning %]
+
+interface [% visitor.interface("_") %] {
+[%- FOREACH class IN data.classes %]
+[%- IF class.is_concrete %]
+    public function visit[% class.lastpart %]([% class.name("_") %] $[% class.lastpart.uncamel %]);
+[%- END %]
+[%- END %]
+}
+
+class [% visitor.name("_") %] implements [% visitor.interface("_") %] {
+
+    protected $params = array();
+
+    /**
+     * @param array $params a list of arbitrary parameters
+     */
+    public function __construct(array $params=null) {
+        if (!is_null($params)) {
+            $this->params = $params;
+        }
+    }
+
+    /**
+     * @param list args arbitrary args that will be combined into an array
+     * @return array the combined arguments
+     */
+    protected function combine() {
+        $parts = func_get_args();
+        return $parts;
+    }
+
+[%- FOREACH class IN data.classes %]
+[%- IF class.is_concrete %]
+    /**
+     * @param [% class.name("_") %] $[% class.lastpart.uncamel %] a [% class.name("_") %] node
+     * @return array an array of the values returned by visiting each component.
+     */
+    public function visit[% class.lastpart %]([% class.name("_") %] $[% class.lastpart.uncamel %]) {
+        return $this->combine(
+    [%- FOREACH arg IN class.args %]
+        [%- IF arg.is_substantial %]
+            $[% class.lastpart.uncamel %]->[% arg.argname.getMethod %]()->accept($this)
+        [%- ELSE %]
+        [%- UNLESS arg.is_scalar %]# WARNING: no known implementation for [% arg.name %][% END %]
+            $[% class.lastpart.uncamel %]->[% arg.argname.getMethod %]()
+        [%- END %]
+        [%- LAST IF loop.last %],
+    [%- END %]
+        );
+    }
+
+[%- END %]
+[%- END %]
+}
+
+?>

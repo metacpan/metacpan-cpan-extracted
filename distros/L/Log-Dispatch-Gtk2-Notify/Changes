@@ -1,0 +1,5 @@
+0.02  Sun, 07 Mar 2010 11:44:55 +0100
+  - Make things compile again with recent versions of Moose (Closes: RT#52298).
+
+0.01  Sat, 07 Feb 2009 00:29:23 +0100
+  - Initial release.

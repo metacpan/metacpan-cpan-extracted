@@ -1,0 +1,33 @@
+List-MapMulti
+=============
+
+Created:      2012-03-23
+Home page:    <https://metacpan.org/release/List-MapMulti>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=List-MapMulti>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.003	2012-12-10
+
+ [ Bug Fixes ]
+ - Fix behaviour when iterating through a zero-length list. (If any one of
+   the lists passed is zero-length, the iterator should finish instantly.)
+
+ [ Packaging ]
+ - Document test cases and examples.
+
+ [ Other ]
+ - Added: Make $a and $b act as aliases for $_[0] and $_[1] within a mapm
+   block.
+   JBERGER++
+
+0.002	2012-04-16
+
+ [ Bug Fixes ]
+ - Make $_ work as documented within a mapm block.
+
+0.001	2012-03-23	Initial release

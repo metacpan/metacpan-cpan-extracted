@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+use strict;
+use Getopt::Std::Strict 'h';
+use Cwd;
+use Time::Format;
+my $abs_d = $ARGV[0] || cwd();
+
+
+print STDERR usage() and exit if $opt_h;
+
+print readme_output();
+
+exit;
+
+
+
+
+# $PM{NAME}
+
+
+
+sub usage {
+   qq{$0 - generate README for perl distros
+
+   -h help
+   -r README
+
+   
+   };
+}
+
+
+
+sub readme_output {
+
+
+   
+
+   my $deps = join("\n   ", split(/\n/,  `pmused '$abs_d'`) );
+
+   my $projectname = `pmname '$abs_d'`;
+   chomp $projectname;
+
+   my $yyyy = Time::Format::time_format('yyyy', time());
+
+
+   qq{$projectname 
+===============================================
+
+INSTALLATION
+
+See INSTALL.
+
+DEPENDENCIES
+
+   $deps
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) $yyyy by Leo Charre leocharre at cpan dot org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+   };
+}

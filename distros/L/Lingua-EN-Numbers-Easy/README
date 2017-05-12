@@ -1,0 +1,69 @@
+NAME
+    Lingua::EN::Numbers::Easy -- Hash access to Lingua::EN::Numbers objects.
+
+SYNOPSIS
+        use Lingua::EN::Numbers::Easy;
+
+        print "$N{1} fish, $N{2} fish, blue fish, red fish";
+                             # one fish, two fish, blue fish, red fish.
+
+DESCRIPTION
+    "Lingua::EN::Numbers" is a module that translates numbers to English
+    words. Unfortunally, it has an object oriented interface, which makes it
+    hard to interpolate them in strings. "Lingua::EN::Numbers::Easy"
+    translates numbers to words using a tied hash, which can be
+    interpolated.
+
+    By default, "Lingua::EN::Numbers::Easy" exports a hash %N to the
+    importing package. This can be changed by giving "use
+    Lingua::EN::Numbers::Easy" an argument - this argument is the name of
+    the hash that will be used instead:
+
+        use Lingua::EN::Numbers::Easy qw /%nums/;
+
+    would use %nums as the tied hash.
+
+    See also the "Lingua::EN::Numbers" man page.
+
+    "Lingua::EN::Numbers::Easy" caches results - numbers will only be
+    translated once.
+
+    Any other operation on the exported hash than fetches will throw an
+    exception.
+
+  History
+    This module was created at the end of the 20th century, when
+    "Lingua::EN::Numbers" has a clunky, OO interface. Nowadays,
+    "Lingua::EN::Numbers" has procedural interface as well, lessening the
+    need for "Lingua::EN::Numbers::Easy".
+
+    Furthermore, "Lingua::EN::Numbers" no longer supports different
+    *British* and *American* modes. Therefore, the support for the modes has
+    been dropped in "Lingua::EN::Numbers" as well.
+
+AUTHOR
+    This package was written by Abigail,
+    <mailto:lingua-en-numbers-easy@abigail.be>
+
+COPYRIGHT and LICENSE
+    This package is copyright 1999 - 2009 by Abigail.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE OPEN GROUP BE LIABLE FOR ANY CLAIM, DAMAGES OR
+    OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+    ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+

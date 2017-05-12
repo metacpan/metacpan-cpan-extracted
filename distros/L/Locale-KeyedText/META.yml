@@ -1,0 +1,33 @@
+---
+abstract: 'Refer to user messages in programs by keys'
+author:
+  - 'Darren Duncan <darren@DarrenDuncan.net>'
+build_requires:
+  ExtUtils::MakeMaker: '6.17'
+  Test::More: '0.92'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-KeyedText
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+    - t
+requires:
+  Scalar::Util: '1.13'
+  overload: '1.01'
+  perl: '5.008001'
+resources:
+  MailingList: http://mm.darrenduncan.net/mailman/listinfo
+  homepage: http://www.muldis.com/
+  license: http://www.fsf.org/licensing/licenses/lgpl.html
+  repository: http://github.com/muldis/Locale-KeyedText-Perl5
+version: v2.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

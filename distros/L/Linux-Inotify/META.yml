@@ -1,0 +1,22 @@
+---
+name: Linux-Inotify
+version: 0.05
+author:
+  - |-
+    Copyright 2005 by Torsten Werner <twerner@debian.org>. The code is licensed
+    under the same license as perl: L<perlgpl> or L<perlartistic>.
+abstract: Classes for supporting inotify in Linux Kernel >= 2.6.13
+license: perl
+requires:
+  Carp: 0
+  POSIX: 0
+  perl: 5.6.1
+provides:
+  Linux::Inotify:
+    file: lib/Linux/Inotify.pm
+    version: 0.05
+  Linux::Inotify::Event:
+    file: lib/Linux/Inotify/Event.pm
+  Linux::Inotify::Watch:
+    file: lib/Linux/Inotify/Watch.pm
+generated_by: Module::Build version 0.26

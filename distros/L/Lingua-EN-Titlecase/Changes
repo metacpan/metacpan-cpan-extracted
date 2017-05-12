@@ -1,0 +1,94 @@
+Revision history for Lingua-EN-Titlecase
+
+0.15 Fri Aug  3 22:45:10 PDT 2012
+     - 5.16+ compat fixes for qw(). Thanks, Andreas Koenig for nudge
+       on rt.cpan.org #78773.
+
+0.14 Tue Apr  7 19:35:18 PDT 2009
+     - Lucky 0.13 had some non-existent svn conflicted files listed in
+       the MANIFEST. No code changes.
+
+0.13 Mon Apr  6 19:00:48 PDT 2009
+     - RT #44825; with 'no warnings "uninitialized."' Thanks, Chris Canipe.
+
+0.12 Tue Feb 10 19:23:45 PST 2009
+     - RT bug #42545 from my arch-enemy B10m.
+
+0.11 Mon Oct 20 20:36:10 PDT 2008
+     - Made the ::HTML lexer wrap up an HTML::TokeParser for
+       robustiality (that's right, robustiality).
+
+0.10 Mon Oct 20 18:34:33 PDT 2008
+     - Reorganized code a bit to accommodate easier subclassing for
+       customizing lexers.
+     - Made lexer() a settable part of object.
+     - Added ::HTML subclass - from a request by David Henkel at
+       prnewswire.com.
+
+0.09 Fri Jun 27 16:02:26 PDT 2008
+    - Didn't notice the META.yml wasn't getting cleared in builds, so
+      rebuilding just to update it from last December.
+
+0.08 Fri Jun 27 14:43:01 PDT 2008
+    - Greg Lindahl pointed out that the setter of the string in a new
+      call wasn't working. Fixed.
+    - Added tests to keep it fixed and put test count into the test call.
+    - Found and fixed a couple very interesting bugs relating to
+      stringification and the title method when doing the tests too.
+
+0.07 Sat Jun 21 16:34:42 PDT 2008
+    - Put missing datetime into 0.06 below.
+    - Switched to Module::Install.
+    - Switched use base --> use parent.
+    - Pod Fixes.
+
+0.06 Wed Aug 22 15:22:01 PDT 2007
+    - Changed "alpha" reference to beta-ish.
+    - Quote tweak to this file in 0.03's entry.
+    - Added Class::Accessor::Fast to Makefile.PL PREREQ_PM.
+    - Took out some silly and redundant wantarray checks.
+    - Expanded POD.
+    - Removed uppercase() and lowercase(). Second was broken and
+      neither seem to belong anyway.
+    - Tweaked a couple test cases.
+    - Rearranged guts again to take rxes out of top package namespace
+      and put them into the object. Can be spiffier but that can wait.
+    - User can now set word_punctuation to differ from default [:punct:].
+
+0.05 Tue Aug 21 10:11:56 PDT 2007
+    - Took out Perl::Critic test file. It was causing failures in the
+      CPAN tests even though it should skip if it's not installed.
+
+0.04 Mon Aug 20 22:52:00 PDT 2007
+    - Totally changed the guts. Now a lexer queue drives it instead of
+      a single pass set of regexes. Looks a little spaghetti-ish but I
+      think it'll clean up nice and allow for a lot of easy add-ons
+      like dictionary hooks.
+    - Added List::Util to get "first" token in queue which is wordish
+      without a placeholding switch.
+    - Cleaned up wordish/wc regex.
+    - Mixed case terms with leading lowercase are now correctly
+      preserved if they are below the built-in or user-set threshold.
+    - Raised uppercase threshold from 0.9 to 0.95.
+    - Lowered mixedcase threshold from 0.3 to 0.25 based on some test
+      strings which show a pretty good breakpoint around 0.15.
+    - Removed unused accessors.
+    - A few small logic improvements in places like counting the real
+      length of the string for computing mixedcase and uppercase
+      ratios.
+
+0.03 Mon Aug 20 14:46:17 PDT 2007
+    - Changed the "apostrophe" to a single [[:punct:]]. This alters
+      behavior quite a bit. "Moo-ish" and "search.cpan.org" are now
+      one word. They were two and three before. Mixed case matches
+      similarly differently too.
+    - I think to deal with stuff like "iPods on eBay!" the titlecase
+      method, and general handling, will have to be token-based. It
+      gets too messy, too quickly otherwise.
+
+0.02 Mon Aug 20 01:12:17 PDT 2007
+    - Finding fault so quick: POD example updated with correct output.
+
+0.01 Sun Aug 19 23:36:33 PDT 2007
+    - Initial release. Champagne for everyone but the dogs! Sparkling
+      wine for the dogs!

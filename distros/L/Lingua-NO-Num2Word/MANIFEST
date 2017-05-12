@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00basic.t
+Num2Word.pm
+META.yml                                 Module meta-data (added by MakeMaker)

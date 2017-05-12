@@ -1,0 +1,24 @@
+README for Log::Dispatch::Perl
+
+The "Log::Dispatch::Perl" module offers a logging alternative using standard
+Perl core functions.  It allows you to fall back to the common Perl
+alternatives for logging, such as "warn" and "cluck".  It also adds the
+possibility for a logging action to halt the current environment, such as
+with "die" and "croak".
+
+Copyright (c) 2004, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Version:
+ 0.04
+
+Required Modules:
+ Log::Dispatch (1.16)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

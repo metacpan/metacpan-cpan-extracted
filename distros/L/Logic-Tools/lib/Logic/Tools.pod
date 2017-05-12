@@ -1,0 +1,179 @@
+=encoding utf8
+
+=head1 NAME
+
+Logic::Tools - The great new Logic::Tools!
+
+=head1 VERSION
+
+=head1 SYNOPSIS
+
+=pod
+
+    my $tools=Logic::Tools->new(config_file =>  '/etc/config/config.ini.ini',
+                                lock_file   =>  $lock_file,
+                                runas_user  =>  $runas_user,
+                                logfile     =>  '/var/log/log.log',
+                                syslog_name =>  'program_name');
+
+    #logfile => 'path_to_file' - logging in to file
+    #logfile => 'Syslog' - logging in to syslog
+    #logfile => 'Stdout' - logging in to stdout
+    #syslog_name =>  'program_name' or default $0
+    
+    
+    my $db_host=$tools->read_config( 'config', 'db_host');
+    
+    #проверка не запущен ли этот процесс
+    $tools->check_proc();
+    
+    #запускаем как демон
+    $tools->start_daemon();
+    
+    $tools->logprint("info","диалог:  $state $callid $from_uri $to_uri ");
+    
+=cut
+
+=head1 EXPORT
+
+=head1 SUBROUTINES/METHODS
+
+=head1 constructor
+
+=over 4
+
+=item new ( %ARGS )
+
+=over 8
+
+=item config_file
+
+Путь до файла с конфигами на что-либо
+
+=item lock_file
+
+Файл для блокировки при запуске приложения как демона, в этот файл записываедся текущий pid процесса
+
+=item runas_user
+
+пользователь под которым запускать приложение
+
+=item logfile 
+
+файл для сохранения лога
+
+=back
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item read_config ( SECTION, PARAM )
+
+метод для чтения параметров из конфигурационного файла config_file
+
+возвращает занчение параметра указанной секции
+
+=over 8 
+
+=item SECTION - конфиг файл состоит из секций, в квадратных скобках указано название секции
+
+=item PARAM - внутри секции параметрам соответствует значение
+
+=back 
+
+=item check_proc()
+
+проверяет процесс по lock_file на то что он уже запущен, если не запущен возвращает 1, если запущен выдает ошибку в STDERR и завершается
+
+=item logprint ( LOGLEVEL, MESSAGE )
+
+записывает сообщение MESSAGE в лог файл logfile, с уровнем LOGLEVEL
+
+=over 8
+
+item LOGLEVEL - может принимать следующие значения:
+
+=over 12
+
+trace
+debug
+info
+notice
+warning
+error
+critical
+alert
+emergency
+
+=back
+
+=back
+
+=item start_daemon
+
+запускает процесс как демон под пользователем runas_user, создает файл блокировки lock_file
+
+=back
+
+=item supervisor_start_daemon
+
+запускает процесс как демон под пользователем runas_user, создает файл блокировки lock_file, посредством программы supervisord
+
+=back
+
+=head1 AUTHOR
+
+lagutas, C<< <lagutas at gmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-logic-tools at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Logic-Tools>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Logic::Tools
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Logic-Tools>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Logic-Tools>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Logic-Tools>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Logic-Tools/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 lagutas.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

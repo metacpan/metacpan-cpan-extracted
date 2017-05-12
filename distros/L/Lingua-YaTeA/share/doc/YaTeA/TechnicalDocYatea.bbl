@@ -1,0 +1,13 @@
+\def\No{\kern-.25em\lower.2ex\hbox{\char'27}}
+\begin{thebibliography}{}
+
+\bibitem[Tsuruoka et al.05]{Tsuruoka&al2005}
+\sc Tsuruoka \normalfont (Yoshimasa), \sc Tateishi \normalfont (Yuka), \sc Kim
+  \normalfont (Jin-Dong), \sc Ohta \normalfont (Tomoko), \sc McNaught
+  \normalfont (John), \sc Ananiadou \normalfont (Sophia) et \sc Tsujii
+  \normalfont (Jun'ichi). --
+\newblock Developing a Robust Part-of-Speech Tagger for Biomedical Text. {\em
+  In\,: } {\em Proceedings of Advances in Informatics - 10th Panhellenic
+  Conference on Informatics}, pp. 382--392.
+
+\end{thebibliography}

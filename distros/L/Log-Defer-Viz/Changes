@@ -1,0 +1,102 @@
+0.347   2016-03-07
+  * --help now exits at the right time (thanks Matt Phillips)
+  * There is now a "-F" flag which runs "tail -F" instead of "tail -f"
+    so you can follow log files even if they roll over.
+
+0.346   2014-12-18
+  * --sort-time wouldn't work if Log::Defer input wasn't completely
+    minified. This bug was a result of a performance optimisation where
+    we avoid deserializing the JSON (thanks John Piasetzki)
+
+0.345   2014-12-11
+  * --pass-through feature: This switch enables a mode where the output
+    is log-defer JSON format, suitable for feeding into another invocation
+    of log-defer-viz or a file to be stored later. It is more efficient
+    than -m 'encode_json $_' because it doesn't re-encode the message.
+  * Fix regression that broke display of log messages created with ancient
+    Log::Defer versions back when timers were stored in a hash ref
+
+0.340   2014-10-09
+  * New --reduce feature: The final piece: Now ldv is officially
+    a higher order functional programming language. :)
+    This mostly obsoletes --count but obviously that's still there
+    for back-compat and occasional usefulness.
+  * Properly report run-time errors in --count expressions.
+  * Support # comments in grep/map/etc expressions
+
+0.330   2014-10-08
+  * Do the right thing in case a sloppy encoder creates an empty
+    array of timers (like the first draft of the C++ encoder did).
+  * Prevent -f from dumping the whole file before following
+    (thanks Avianna)
+  * Stop --count from prepending a bunch of junk to the output JSON
+    which makes it easier to consume from a script (thanks Avianna)
+  * Allow --count to accept expressions, just like --grep and --map.
+    One of the reasons this is useful is you can fetch arbitratily
+    nested items from the data section (thanks Avianna)
+  * In the event of a --map or --grep expression failing to compile,
+    include the faulty expression in the error message
+  * Minor doc updates
+
+0.325   2014-05-13
+  * Delete preceding junk on lines before the first "{"
+    character: This is because grep -r prepends filenames
+    by default and sending this output to log-defer-viz
+    should just work without having to remember to add
+    the -h flag to grep.
+  * Add cpanm installation one-liner to docs
+  * --sort-time feature that sorts entries by start time
+
+0.321   2014-03-26
+  * Remove file accidentally checked in to git
+
+0.320   2014-03-26
+  * Format data section output more nicely (Matt Phillips)
+  * -f follow option for tailing log files (Matt Phillips)
+  * Fix filename limitation FIXME in .gz/.bz by using multi-var
+    open (Matt Phillips)
+  * Link to Michael Pucyk's LogDefer Python module
+  * Improve docs, update copyright year, explain _() shortcut
+
+0.315   2014-03-11
+  * Print log messages that contain newlines in a nicely
+    formatted way that's great for stack traces and data
+    dumper output (thanks Matt Phillips)
+  * --tz option that prints timestamps in the timezone you
+    specify instead of the default system local-time
+  * Detect and report limitation where .gz and .bz2 filenames
+    can't contain ' characters
+
+0.311   2013-10-12
+  * Fix bug in date formatting (thanks Mike R)
+  * Show unix time along with formatted date
+
+0.310   2013-09-01
+  * Don't die on log lines that don't start with JSON
+    useful for parsing mixed log-defer/free-form formats
+    (thanks mikep)
+  * --map feature: transform log-defer messages into
+    arbitrary strings
+  * Better error reporting when --grep expressions
+    fail to compile or throw run-time errors
+  * --count option for creating reports by inspecting
+    the data section (thanks mikep)
+
+0.300   2013-04-08
+  * Data::Dumper data view mode was broken
+  * Allow forcing colours on, even if STDOUT is not a
+    terminal with --colour
+  * On terminals that don't support bright_* colours, fall
+    back to non-bright colours instead of erroring out
+  * Support new style timer messages that are in arrays,
+    not hashes
+
+0.201   2013-02-20
+  * Only include terminal colours if stdout is a terminal
+  * Forgot to install script in path
+  * Added section to docs regarding greping
+
+0.200   2013-02-18
+  * Initial CPAN release: split off code from Log::Defer
+    so servers don't have to install all the libraries
+    required for log visualisation

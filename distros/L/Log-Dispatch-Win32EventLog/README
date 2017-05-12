@@ -1,0 +1,76 @@
+NAME
+    Log::Dispatch::Win32EventLog - Class for logging to the Windows NT
+    Event Log
+
+REQUIREMENTS
+    The following modules are required:
+
+      Log::Dispatch
+      Params::Validate
+      Win32::EventLog
+
+  Installation
+    Installation is pretty standard:
+
+      perl Makefile.PL
+      nmake
+      nmake test
+      nmake install
+
+    If you have Module::Build installed, you can use the following:
+
+      perl Build.PL
+      perl Build
+      perl Build test
+      perl Build install
+
+    Note that the tests for this module will post to the event log.
+
+    WARNING: WinZip is unable to use POSIX-style long pathnames in tar
+    files, so it may ignore the directory structure of this module's
+    distribution.  Alternate gzip and tar utilities can be found at
+    http://gnuwin32.sourceforge.net or http://unxutils.sourceforge.net
+
+SYNOPSIS
+      use Log::Dispatch::Win32EventLog;
+
+      my $log = Log::Dispatch::Win32EventLog->new(
+          name       => 'myname'
+          min_level  => 'info',
+          source     => 'My App'
+      );
+
+      $log->log(level => 'emergency', messsage => 'something BAD happened');
+
+DESCRIPTION
+    Log::Dispatch::Win32EventLog is a subclass of Log::Dispatch::Output,
+    which inserts logging output into the windows event registry.
+
+    See the module documentation for more details.
+
+KNOWN ISSUES
+    Depending on event log settings, if they are at their maximum size and
+    the automatic purging of older events is disabled, then some of the
+    tests may fail.  Clear the event logs and re-test the module.
+
+REVISION HISTORY
+    Changes since the last public release:
+
+    0.14 2006-xx-xx
+        - removed SIGNATURE from the distribution
+
+    A more detailed history can be found in the included Changes file.
+
+AUTHOR
+    David Landgren <dland at cpan.org> (current maintainer)
+
+    Robert Rothenberg <rrwo at cpan.org>
+
+    Arthur Bergman <abergman at cpan.org>
+
+    Gunnar Hansson <gunnar at telefonplan.nu>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

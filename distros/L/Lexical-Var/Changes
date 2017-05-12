@@ -1,0 +1,166 @@
+version 0.009; 2013-08-25
+
+  * update for perl 5.19.3's tracking of the last named item in a pad
+
+version 0.008; 2013-08-17
+
+  * update for perl 5.17.4's new pad API
+
+  * update for perl 5.17.5's new arrangement for PL_compcv with BEGIN
+
+  * in documentation, refer to the new module Scalar::Construct
+
+version 0.007; 2012-02-04
+
+  * bugfix: preserve referential identity of named constant scalars on
+    threading Perl builds
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    compatibility with early-loaded warnings.pm) and invoke it earlier
+    to make sure it takes effect in time
+
+  * in documentation, note the problems that threading Perls have with
+    objects originating from source literals
+
+  * in documentation, note that the problem with eval/require/do inside
+    a BEGIN block is fixed in Perl 5.15.5
+
+  * in documentation, note that constant scalars participate in constant
+    folding
+
+  * fix an outdated documentation note about bareword subroutine calls
+
+  * in documentation, tweak description of intended users
+
+  * additional tests regarding const ops, constant folding, and object
+    identity preservation
+
+  * additional tests for the Lexical::Sub interface
+
+  * in Build.PL, declare incompatibility with pre-0.19
+    B::Hooks::OP::Check, which doesn't play nicely around op check hooking
+
+  * reorganise some of the test suite
+
+  * convert .cvsignore to .gitignore
+
+  * sort MANIFEST
+
+version 0.006; 2011-07-27
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    working around [perl #73174])
+
+  * in documentation, note problem with indirect object syntax and
+    lexical subroutines
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.005; 2011-02-27
+
+  * port to Perl 5.13.10, where the value of PAD_MAX has changed
+
+  * in XS, use gv_stashpvs() wherever appropriate
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * jump through hoops to avoid compiler warnings
+
+  * use full stricture in test suite
+
+  * in test suite, make all numeric comparisons against $] stringify it
+    first, to avoid architecture-dependent problems with floating point
+    rounding giving it an unexpected numeric value
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+version 0.004; 2010-04-11
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    passing package through to required code in pure-Perl version of
+    Lexical::SealRequireHints)
+
+  * in XS, use macros to avoid explicit passing of aTHX, in the manner
+    of the core
+
+  * add Lexical::Import to "see also" list
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.003; 2010-01-11
+
+  * fully support bareword subroutine references on Perl 5.11.2 and later
+
+  * in XS, avoid using "class" as a variable name, for compatibility
+    with C++ compilers
+
+  * correct data type for the PAD_MAX constant
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+version 0.002; 2009-10-26
+
+  * port to Perl 5.11.0, supporting the addition of first-class regexp
+    objects (which are actually a type of scalar) and the removal of
+    the distinct RV type
+
+  * where the compilation %^H and PL_compcv are unavailable due to string
+    eval or similar, detect this earlier and regardless of the type of
+    item being set up (previously it was not detected for subroutines
+    or globs)
+
+  * when a lexical scalar has readonly value, generate a const op instead
+    of the usual rv2sv
+
+  * document the problem of %^H and PL_compcv being unavailable due to
+    string eval
+
+  * preserve op flags when building new rv2Xv ops; this doesn't seem to
+    matter in any currently achievable situation, but will be required
+    for bareword subroutine references in the future
+
+  * in XS, properly parenthesise some macro definitions
+
+  * test writability of lexical variables
+
+  * in t/error.t, check for unexpected warnings
+
+  * add experimental code, all disabled, to support bareword subroutine
+    references on a suitably modified Perl core
+
+version 0.001; 2009-09-30
+
+  * bugfix: make array and hash indexing work
+
+  * bugfix: avoid core checks that would reject use of a glob as a
+    scalar value
+
+  * bugfix: avoid modifying the reference stored in the hint hash (which
+    happened through reusing it in const ops)
+
+  * bugfix: repair a reference leak in unimportation
+
+  * bugfix: change a memNE() to strnNE(), to avoid reading off the end
+    of a string
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    fixes around usability of its pure-Perl implementation)
+
+  * port to pre-5.10 Perls
+
+  * more tests: Lexical::Sub, array and hash variables, glob variables,
+    acceptability of value types for references to lexical variables,
+    erroneous invocation of import and unimport
+
+  * in XS, add some casts to avoid compiler warnings
+
+  * check for required Perl version at runtime
+
+version 0.000; 2009-09-23
+
+  * initial released version

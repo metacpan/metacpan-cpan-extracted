@@ -1,0 +1,58 @@
+Revision history for Perl extension List::Priority.
+
+0.05  2012-03-11 14:30
+	- Removed deprecated SIZE option.
+
+	- Removed context-sensitivity of pop and shift.
+
+	- Added highest_priority and lowest_priority methods.
+
+	- Removed the bizarre "pop/shift first item with this exact priority"
+	  feature.
+
+0.04  Thu 29 Dec 2011
+	- Various API changes (as detailed below): be sure to update client
+	  code.
+
+	- Uses min/max rather than sorting all keys on pop/shift, for Greater
+	  Speed. This introduces a dependency on List::Util.
+
+	- Croak on malformed arguments, rather than returning error messages
+	  in strings.
+
+	- Renamed "SIZE" to "capacity"; added getter/setter.
+
+	- Removed the restriction on duplicate items.
+
+	- pop/shift now return a (priority, item) pair if called in list context.
+
+	- Some documentation clarifications.
+
+0.03  Tue 20 Dec 2011
+	- Bugfix release: use this version if you really, really need to stick
+	  to the v0.02 API.
+
+	- Fixed shift() method, which now behaves as documented.
+
+	- Added size() method, which reports number of items currently in the
+	  list.
+
+	- Some documentation cleanup.
+
+	- Added some tests.
+
+0.02  Fri Jun 14 15:34:02 2002
+	- Added support for a size limit on the list.
+	  If you reach and attempt to insert more elements, most recent lower
+	  priority elements already in the list will be overriden, but if you
+	  attempt to insert higher priority objects.
+
+	- Added a reversed extraction method - shift(), which will extract
+	  the most recent and lowest priority object from the list.
+
+	- Added an optional parameter to allow extraction from a specific
+	  priority.
+
+
+0.01  Tue Mar 12 22:34:02 2002
+	- First release

@@ -1,0 +1,85 @@
+NAME
+    List::AssignRef - assign an arrayref to an array sensibly
+
+SYNOPSIS
+            # You can't do this in Perl...
+        
+            my \@array = $arrayref;
+        
+            # But you can do this...
+        
+            use List::AssignRef;
+            deref my @array = $arrayref;
+
+DESCRIPTION
+    OK, so you might ask yourself, why would you want to do this:
+
+            my \@array = $arrayref;
+
+    When you can just do this:
+
+            my @array = @{ $arrayref };
+
+    Well, in that simple case List::AssignRef is overkill.
+
+    However, what about cases when you have a function that returns a list of
+    arrayrefs, such as `part` from List::MoreUtils. For example:
+
+            my ($staff, $managers) = part { $_->title =~ /Manager/ } @employees;
+
+    If you want @staff and @managers arrays (as against arrayrefs), you need
+    to dereference each separately. Something like:
+
+            my @parted = part { $_->title =~ /Manager/ } @employees;
+            my @staff    = @{$parted[0]};
+            my @managers = @{$parted[1]};
+
+    List::AssignRef makes this slightly prettier:
+
+            (deref my @staff, deref my @managers)
+                    = part { $_->title =~ /Manager/ } @employees;
+
+    List::AssignRef exports exactly one function...
+
+    `deref ARRAY|HASH|SCALAR`
+        `deref` must be given a (non-reference) array, hash or scalar. It acts
+        as an lvalue, allowing a reference array, hash or scalar respectively
+        to be assigned to it.
+
+    This module uses Exporter::Shiny which means that you can rename the
+    exported function easily:
+
+            use List::AssignRef deref => { -as => 'dereference' };
+
+LEGACY PERL SUPPORT
+    The examples above rely on a parsing improvement in Perl 5.14. Although
+    this module does support earlier versions of Perl (5.6 and above), prior
+    to 5.14 you may need to add additional parentheses:
+
+            (deref(my @staff), deref(my @managers))
+                    = part { $_->title =~ /Manager/ } @employees;
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=List-AssignRef>.
+
+SEE ALSO
+    List::Util, List::MoreUtils.
+
+    Ref::List is not dissimilar but without the prototype trickery and lvalue
+    stuff, so doesn't satisfy this module's use case.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

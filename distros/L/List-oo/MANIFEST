@@ -1,0 +1,25 @@
+Build.PL
+Changes
+lib/List/oo.pm
+lib/List/oo.pod
+lib/List/oo/Extras.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+notes/plus_listutil.txt
+README
+t/00-load.t
+t/04-constructor.t
+t/05-listmethods.t
+t/05-methods.t
+t/06-named_funcs.t
+t/endo.pl
+t/F.t
+t/F2.t
+t/head_tail.t
+t/moreutils.t
+t/samples.pl
+t/sort.t
+t/sort_warnings.t
+t/splice.t
+t/split.t

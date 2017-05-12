@@ -1,0 +1,117 @@
+0.024 2017-03-14
+
+* Document the regjnums function
+* Clean up of distribution
+* Documentation errors etc.
+
+0.023 2016-08-30
+
+* Documentation errors corrected
+
+0.022 2016-08-30
+
+* Intervals between two era dates
+* Change to machine-readable examples, better documentation
+
+0.021 2016-08-29
+
+* Add dates with a single kanji, like 明19.
+
+0.020 2014-02-05
+
+* Add README and MIN_PERL_VERSION in Makefile.PL.
+
+0.019 2013-11-03
+
+* Add squared symbols like ㍻ to the list of possibles.
+
+0.018 2013-02-08
+
+* Fix bug with Meiji start year (was 1870, now 1868).
+
+0.017 2013-02-08
+
+* Add two functions, "seireki_to_nengo" and "nengo_to_seireki".
+
+0.016 2013-02-07
+
+* Fix for tricky bug involving romaji.
+* Code cleanup.
+
+0.015 2012-07-27
+
+* Move documentation to lib/Lingua/JA/FindDates.pod.
+
+0.014 2012-07-27
+
+* Add bugtracker, repository.
+
+0.013 2012-03-19
+
+* Add "subsjdate" script.
+
+0.012 2012-03-19
+
+* Documentation improvements.
+* Change to ExtUtils::MakeMaker.
+* Version control for source code.
+
+0.011 2010-09-18
+
+* Add meta files
+* Handle apostrophe dates
+
+0.010 2009-06-10
+
+* Match only horizontal whitespace to prevent mismatches
+
+0.009 2008-09-28
+
+* Bug fix with "jun" disappearing sometimes.
+
+0.008 2008-08-17
+
+* Documentation fixes (see www.annocpan.org for details).
+* Bug fixes (see rt.cpan.org for details).
+
+0.007 2008-07-22
+
+* Rewrote some of the documentation
+* Added nyoro 0xFF5E ("Fullwidth tilde") for Microsoft Word nyoro.
+* Changed to Module::Install.
+* Stopped exporting kanji2number.
+
+0.006 2008-07-17
+
+* Fixed a bug with something like the second 日 in １月１日 日本人論
+  being taken for Sunday.
+* Added 元年 to regex
+* Added note on bug 56902 in Perl.
+* Changed interfaces for callbacks and for passing date information.
+* Added intervals with weekdays like 平成９年１０月１７日（火）～２０日（金）
+* Trimmed documentation.
+
+0.005 2008-07-11
+
+* Added support for ten day periods like 中旬 etc. 
+* Added support for intervals like 平成１０年３月１～４日.
+
+0.004 2008-07-08
+
+* Fixed bugs with fiscal years like ２０００年度, turned off
+  verboseness and added test to ensure that $verbose is switched off
+  for release versions to avoid this happening again in the future.
+
+0.003 2008-07-06
+
+* Re-licensed to Perl licence. 
+
+0.002 2008-07-04
+
+* Fix mojibake in search.cpan.org by adding =encoding line at the top
+  of the module.
+
+0.001 2008-07-04
+
+   - original version; created by h2xs 1.23 with options
+       -X -n Lingua::JA::FindDates

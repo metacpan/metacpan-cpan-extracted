@@ -1,0 +1,152 @@
+#!/usr/bin/perl
+
+# MANIFEST.SKIP -- Kevin's various excluded files
+
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013 Kevin Ryde
+
+# This file is shared among several distributions.
+#
+# This file is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This file is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this file.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# cf. /usr/share/perl/5.14/ExtUtils/MANIFEST.SKIP
+
+
+# emacs backups
+~$
+# emacs locks
+(^|/)\.#
+# emacs autosave
+(^|/)#
+
+# own distdir
+^[A-Za-z][A-Za-z0-9-_]*-\d+/
+# own dist files
+\.tar$
+\.tar\.gz$
+\.deb$
+
+# ExtUtils::MakeMaker leaving Makefile.old
+# and "myman" leaving MANIFEST.old
+\.old$
+# ExtUtils::MakeMaker "metafile" rule temporary, left behind if interrupted
+^META_new\.yml$
+
+# built - MakeMaker
+^Makefile$
+^blib
+^pm_to_blib
+^TAGS$
+# MakeMaker 6.18 to 6.25, apparently
+^blibdirs\.ts$
+# msdos compiler output stuff using gcc,
+# "XSFILENAME.def" extension, and others fixed names it seems
+\.def$
+^dll\.base$
+^dll\.exp$
+# msdos compiler stuff using ms c
+\.pdb$
+
+# built - recent Module::Build nonsense
+^MYMETA\.yml$
+# built - something recent ExtUtils::MakeMaker
+^MYMETA\.json$
+
+# built - cdbs and debhelper
+^debian/stamp-
+^debian/.*\.log$
+
+# built - texinfo.tex temporaries
+\.(aux|cp|cps|fn|fns|ky|log|pg|toc|tp|tps|vr)$
+# built - PGF temporary
+\.pgf$
+# tex or latex output, not distributed for now
+\.(dvi|pdf|ps)$
+
+# toplevel .c files built from .xs
+^[^/]+\.c$
+# built .o compiled and .bs from .xs
+\.o$
+\.obj$
+\.bs$
+#
+#(^|/)[A-Z][A-Za-z0-9_]*\.c$
+#/[^Z])[^/]+\.c$
+
+# built - configury
+^a\.out$
+^conftest
+^config\.h$
+^myconfig\.h$
+
+# built - toplevel html pages
+^[a-zA-Z][^./]+\.html$
+
+# inc/MyMakefileExtras.pm "diff-prev"
+^diff\.tmp
+# inc/MyMakefileExtras.pm "lintian-source"
+^temp-lintian
+# various testing
+^tempfile\.png$
+^tempfile
+\.tmp$
+
+
+# my dists
+^dist-deb
+^up$
+^c$
+
+# special case p..ulp test build stuff
+devel/h2xs/TestConstFoo/
+
+# special case various executables
+^devel/exe-[^/.]+$
+# special case mall executables
+^devel/hblk$
+^devel/mallopt$
+^devel/mallstats$
+^devel/malltrim$
+# special case fli executables
+^devel/mmap-multi$
+# special case widget-bits executables
+^devel/grandom$
+^devel/grandom-[a-z]+$
+# special case widget-cursor executables
+^devel/invisible-blank$
+# special case x'or executables
+^devel/gtk-gc-colour$
+# special case combo executables
+^devel/toolbutton-overflow-leak$
+# special case xpother executables
+^devel/encode-all$
+^devel/encode-dump$
+^devel/Encode-X11-xlib$
+^devel/Encode-X11-xlib2$
+# special case xpother samples
+^devel/encode.*\.ctext$
+^devel/encode.*\.utf8$
+
+# special htmlext environs
+^test-dist/
+
+
+\.junk$
+\.bak$
+^backup
+^misc
+^maybe
+^samples
+^samp
+^formats

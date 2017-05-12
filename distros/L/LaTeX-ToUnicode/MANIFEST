@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/LaTeX/ToUnicode.pm
+lib/LaTeX/ToUnicode/Tables.pm
+script/UnicodeData.txt
+script/convert.pl
+t/convert.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/release-synopsis.t
+weaver.ini
+META.json                                Module JSON meta-data (added by MakeMaker)

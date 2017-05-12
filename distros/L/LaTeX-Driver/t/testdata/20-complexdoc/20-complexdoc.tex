@@ -1,0 +1,66 @@
+% $Id: 20-complexdoc.tex 37 2007-09-25 20:02:31Z andrew $
+% Test input file for checking complete document with references, table of contents,
+% included file, bibliography and index
+% Do not make gratuitous changes here as the text is checked by the
+% test script 20-complexdoc.t.
+
+\documentclass{article}
+\usepackage{makeidx}
+\usepackage{lastpage}
+\bibliographystyle{alpha}
+\date{20 September 2007}
+\author{A.N. Other}
+\title{Complex Test Document 20}
+\makeindex
+\begin{document}
+\maketitle
+\tableofcontents
+
+\pagebreak
+\section{Introduction}
+This is a test document with all features.
+
+The document has \pageref{LastPage} pages.
+
+\pagebreak
+\section{Forward Reference}
+
+Here is a reference to page~\pageref{otherpage}.
+
+\pagebreak
+\section{File Inclusion}
+
+Here we include another f{}ile.
+
+It will start on the next page.
+
+\include{testinc}
+\input{testinc2}
+
+\pagebreak
+\section{Bibliographic Citations}
+We reference the Badger book\cite{wardley-ptt-2003} and the Camel book\cite{wall-perl-2000}.
+
+\pagebreak
+\section{Index Term}
+
+Here is the def{}inition of the index term `xyzzy'.
+\index{xyzzy}
+
+
+\pagebreak
+\section{Label definition}
+This is the other page\label{otherpage} referenced elsewhere.
+
+
+\pagebreak
+\bibliography{testbib}
+\pagebreak
+\printindex
+
+\section{Colophon}
+
+This is evil -- we are def{}ining index terms after the index.
+\index{xyzzy2}
+
+\end{document}

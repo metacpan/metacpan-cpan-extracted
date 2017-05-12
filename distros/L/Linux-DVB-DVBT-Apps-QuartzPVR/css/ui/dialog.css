@@ -1,0 +1,239 @@
+/*------------------------------------------------------------------------------------*/
+/*** Dialog box ***/
+
+/* Main container */
+.dialog {   
+	position: absolute;   
+	
+	padding-top: 4px ;
+	padding-bottom: 4px ;
+
+	/* side boundary */ 
+	padding-left: 8px ;
+	padding-right: 8px ;
+	
+	font-family:Tahoma;
+	font-size:12px;
+	font-weight:bold;
+
+	overflow: auto;   
+
+	z-index: 150; 
+}
+
+/* Title bar */
+.dialog > .head {   
+	border: 0;   
+	overflow:hidden;
+	z-index: 150; 
+	font-size:18px;
+	line-height: 1.5em ;
+}
+
+.dialog > .head img {   
+	vertical-align: middle ;
+}
+
+/* Contents */
+.dialog .cont {   
+
+	/* work together with .dialog padding */ 
+	margin-bottom: 4px ;
+	margin-top: 4px ;
+	
+	padding: 2px ;
+
+	z-index: 150; 
+	
+	/* Add scrollbars if necessary */
+	overflow: auto ;
+}
+
+
+/* Each row entry in contents */
+.dialog .row {   
+	clear: both ;
+}
+
+.dialog .row div {
+	float: left ;
+}
+.dialog .row .label {
+	width: 50% ;
+}
+
+
+/* Bottom button bar */
+.dialog > .buttonbar {   
+	margin: 15px;
+	text-align: center ;
+}
+
+.dialog > .buttonbar .centre {   
+
+	margin: 0 auto 0 auto ;
+
+}
+
+
+/* Any button */
+.dialog a.button {
+    display: block;
+    float: left;
+
+    text-decoration: none;
+	border: 1px inset #888;   
+	height: 20px ;
+	width: 50px ;
+	margin: -7px 2px 2px 2px ;
+	padding: 2px ;
+	text-align: center;
+	margin-top: -7px;
+}
+
+.dialog a.button:focus,
+.dialog a.button:hover {
+    outline: none; /* hide dotted outline in Firefox */
+}
+
+.dialog .buttonend {
+
+	height: 2px ;
+	width: 2px ;
+}
+
+
+/*------------------------------------------------------------------------------------*/
+
+/* Message box */
+
+/* OLD
+#msgbox {
+  filter:alpha(opacity=100);
+  top: 20em;
+  left: 20em;
+  text-align: center;
+  margin: 0 auto ;
+  position: absolute;
+  padding: 0.5em ;
+}
+
+#msgbox .message p {
+  margin: 0.3em 0.3em 0.5em 0.3em;
+}
+
+#msgbox .button {
+  margin: 0 auto ;
+  padding: 0.5em ;
+}
+
+#msgbox .button a {
+  text-decoration: none ;
+  text-align: center;
+  padding: 0.1em ;
+}
+*/
+
+/* Based on Dialog */
+
+/* Main container */
+.msgbox {   
+	position: absolute;   
+	
+	padding-top: 4px ;
+	padding-bottom: 4px ;
+
+	/* side boundary */ 
+	padding-left: 8px ;
+	padding-right: 8px ;
+	
+	font-family:Tahoma;
+	font-size:12px;
+	font-weight:bold;
+
+	overflow: auto;   
+
+	z-index: 150; 
+}
+
+/* Title bar */
+.msgbox > .head {   
+	border: 0;   
+	overflow:hidden;
+	z-index: 150; 
+	font-size:18px;
+	line-height: 1.5em ;
+}
+
+.msgbox > .head img {   
+	vertical-align: middle ;
+}
+
+/* Contents */
+.msgbox .cont {   
+
+	/* work together with .msgbox padding */ 
+	margin-bottom: 4px ;
+	margin-top: 4px ;
+	
+	padding: 2px ;
+
+	z-index: 150; 
+	
+	/* Add scrollbars if necessary */
+	overflow: auto ;
+}
+
+
+/* Each row entry in contents */
+.msgbox .row {   
+	clear: both ;
+}
+
+.msgbox .row div {
+	float: left ;
+}
+.msgbox .row .label {
+	width: 50% ;
+}
+
+
+/* Bottom button bar */
+.msgbox > .buttonbar {   
+	margin: 15px;
+	text-align: center ;
+}
+
+.msgbox > .buttonbar .centre {   
+
+	margin: 0 auto 0 auto ;
+}
+
+
+/* Any button */
+.msgbox a.button {
+    display: block;
+    float: left;
+
+    text-decoration: none;
+	border: 1px inset #888;   
+	height: 20px ;
+	width: 50px ;
+	margin: -7px 2px 2px 2px ;
+	padding: 2px ;
+	text-align: center;
+	margin-top: -7px;
+}
+
+.msgbox a.button:focus,
+.msgbox a.button:hover {
+    outline: none; /* hide dotted outline in Firefox */
+}
+
+.msgbox .buttonend {
+
+	height: 2px ;
+	width: 2px ;
+}
+
+

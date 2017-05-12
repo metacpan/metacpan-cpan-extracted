@@ -1,0 +1,10 @@
+.DS_Store
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+cpanfile
+lib/Log/Any/Adapter/Journal.pm
+t/basic.t

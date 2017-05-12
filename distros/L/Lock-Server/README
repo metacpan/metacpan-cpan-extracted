@@ -1,0 +1,133 @@
+NAME
+        Lock::Server - Light-weight socket based resource locking manager.
+
+DESCRIPTION
+        This creates a child process socket server that takes lock and 
+        unlock requests. The lock requests only return once a lock is
+        obtained or a timeout has occurred. A lock may only be locked
+        for a specific amount of time before the lock is timed out.
+
+        The protocol used is RESTFUL HTTP though the helper class wraps
+        that. It uses the GET verb with the following paths :
+
+         * CHECK/key - returns 1 if the key in question is currently locked 
+                       returns 0 if not
+
+         * LOCK/key/requester - returns lock expire time or 0 
+                                if there was an error
+
+         * UNLOCK/key/requester - returns 1 if the unlock went as expected, 
+                                  0 otherwise
+
+         * VERIFY/key/requester - returns 1 if the key is locked to the
+                                  requester and did not time out and 0 
+                                  otherwise.
+         * PING - returns 1 if the server is active
+
+        This does not do deadlock detection, relying on the timeouts to 
+        prevent the system from getting in a hopelessly tangled state.
+        Care should be taken, as with any resource locking system, with
+        the use of Lock::Server. Adjust the timeouts for what makes sense
+        with the system you are designing. The lock requests return with the
+        time that the lock will expire.
+
+SYNPOSIS
+        use Lock::Server;
+        use Lock::Server::Client;
+
+        my $lockServer = new Lock::Server( {
+           lock_timeout         => 10, #seconds. default is 3
+           lock_attempt_timeout => 12, #seconds. default is 4
+           port                 => 888, #default is 8004
+           host                 => 'localhost', #default 127.0.0.1
+        } );
+
+        if( my $childPid = $lockServer->start ) {
+            print "Lock server started in child thread $childPid\n";
+        }
+
+        my $lockClient_A = $lockServer->client( "CLIENT_A" );
+        my $lockClient_B = 
+            new Lock::Server::Client( "CLIENT_B", 'localhost', 888 );
+
+        if( $lockClient_A->lock( "KEYA" ) ) {
+           print "Lock Successfull for locker A and KEYA\n";
+        } else {
+           print "Could not obtain lock in 12 seconds.\n";
+        }
+
+        # KEYA for LockerI times out after 10 seconds.
+        # Lock Client B waits until it can obtain the lock
+        if( $lockClient_B->lock( "KEYA" ) ) {
+           print "Lock Successfull for Client B lock 'KEYA'\n";
+        } else {
+           print "Could not obtain lock in 12 seconds.\n";
+        }
+
+        # KEYA for LockerII is now freed. The next locker
+        # attempting to lock KEYA will then obtain the lock.
+        if( $lockClientB->unlock( "KEYA" ) ) {
+           print "Unlock Successfull\n";
+        }
+
+        if( $lockServer->stop ) {
+            print "Lock server shut down.\n";
+        }
+
+METHODS
+  Lock::Server::new( $args )
+     Creates a new lock server for the given optional arguments.
+ 
+     Arguments are :
+       * port - port to serve on. Defaults to 8004
+       * lock_timeout - low long should a lock last in seconds
+       * lock_attempt_timeout - how long should a requester
+                                wait for a lock in seconds
+
+  client( lockername )
+        Returns a client with the given name that can send lock and unlock requests for keys.
+
+  stop
+        Kills the lock server, breaking off any connections that are waiting for a lock.
+
+  start
+        Starts the lock server in a child process, opening up a 
+        tcpip socket and returning the child pid or 0 if there
+        was an error.
+
+  run
+        Runs the lock server.
+
+Helper package
+  NAME
+        Lock::Server::Client - client for locking server.
+
+  DESCRIPTION
+        Sends request to a Lock::Server to lock, unlock and check locks.
+
+  METHODS
+   new( lockername, host, port )
+        Creates a client object with the given name for the host and port.
+
+   isLocked( key )
+        Returns true if the key is locked by anyone.
+
+   lockedByMe( key )
+        Returns true if the key is locked by this client or 
+        anyone with the name of this client. The name was given in the constructor.
+
+   lock( key )
+        Attempt to get the lock for the given key. Returns true if the lock
+        was obtained.
+
+   unlock( key )
+        Attempt to get unlock the given key. Returns true if the
+        key was locked to this client ( or someting with the same name ).
+
+AUTHOR
+           Eric Wolf        coyocanid@gmail.com
+
+COPYRIGHT AND LICENSE
+           Copyright (c) 2015 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it
+           under the same terms as Perl itself.
+

@@ -1,0 +1,50 @@
+Revision history for Log-Dump
+
+0.14 2014/08/16
+  - no code changes
+  - dropped Test::Classy dependency
+  - cpanfile
+
+0.13 2012/02/12
+  - fixed tests to initialize properly
+
+0.12 2012/02/08
+  - fixed logger to keep a correct value
+
+0.11 2011/11/27
+  - added logtime
+
+0.10 2011/11/05
+  - logfilter now recognizes !label and hides logs with the label.
+
+0.09 2011/04/07
+  - oops, forgot to update MANIFEST
+  - no code changes
+
+0.08 2011/04/07
+  - fixed CARP_NOT handling
+
+0.07 2011/04/07
+  - use CARP_NOT
+
+0.06 2009/12/19
+  - added ::Functions
+
+0.05 2009/06/16
+  - renamed misleading ::Singleton to ::Class
+
+0.04 2009/06/16
+  - now logcolor actually colors logs even under MSWin32
+    (thanks to Win32::Console::ANSI)
+  - added ::Singleton for larger applications
+  - don't pollute the "main" namespace
+
+0.03 2008/12/21
+  - methods were not installed properly
+    when the module was loaded elsewhere
+
+0.02 2008/11/19
+  - added logcolor support (suggestion by Kazuhiro Osawa)
+
+0.01 2008/11/07
+  - initial release

@@ -1,0 +1,13 @@
+
+1.7
+	Bug fixed: Undeclared dependences
+
+1.6
+	cleanup LWP::Debug ( Bug fixed: 51786 )
+
+1.5
+	cleanup LWP::Debug::trace
+
+1.4
+	Fix global redefinition $^W
+

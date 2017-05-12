@@ -1,0 +1,576 @@
+--- #YAML:1.0
+name:           The Conference Survey
+version:        0.01
+abstract:       The Conference Survey Submission Form
+
+sections:
+  - label: Demographics
+    tag: demographics
+    results: survey
+    preamble: These questions will help us understand who our attendees are.
+    questions:
+      - label: "Age Band:"
+        mandatory: yes
+        type: select
+        options:
+          - key:    under 20
+            value:  1
+          - key:    20 - 29
+            value:  2
+          - key:    30 - 39
+            value:  3
+          - key:    40 - 49
+            value:  4
+          - key:    50 - 59
+            value:  5
+          - key:    60 and over
+            value:  6
+      - label: "Gender:"
+        preamble: Although this question is optional, with your help we would like to monitor changes in attendance over time. 
+        type: select
+        options:
+          - key:    Male
+            value:  M
+          - key:    Female
+            value:  F
+          - key:    It's Complicated
+            value:  D
+      - label: "Job Type:"
+        multipart:
+          - type: select
+            mandatory: yes
+            footnote: "If your position covers many roles, please base this on your most senior responsibility. Also base this on the role you perform, rather than your job title. For example, a 'QA Developer' would be a 'Developer' role, and 'Information Manager' would a Manager role (Technical or Non-Technical depending upon your responsibilites)"
+            options:
+              - key:    CEO/Company Director/Senior Manager
+                value:  1
+              - key:    Non-Technical Manager
+                value:  2
+              - key:    Technical Manager
+                value:  3
+              - key:    Technical Architect/Analyst
+                value:  4
+              - key:    Developer
+                value:  5
+              - key:    Engineer
+                value:  6
+              - key:    SysAdmin
+                value:  7
+              - key:    Student
+                value:  8
+              - key:    Lecturer/Teacher/Trainer
+                value:  9
+              - key:    Human Resources
+                value:  10
+              - key:    Researcher
+                value:  11
+              - key:    Unemployed
+                value:  12
+              - key:    Other
+                value:  13
+          - type: text
+            preamble: "If 'Other' please enter your professional job role or title:"
+      - label: "Industry:"
+        multipart:
+          - type: select
+            mandatory: yes
+            footnote: "If you or your company undertake work within mulitple industry sectors, please select the primary one you are currently working within."
+            options:
+              - key:    Automotive
+                value:  1
+              - key:    Education
+                value:  2
+              - key:    Engineering
+                value:  3
+              - key:    Finance
+                value:  4
+              - key:    Government
+                value:  5
+              - key:    IT Services
+                value:  6
+              - key:    Internet/Web
+                value:  14
+              - key:    Legal
+                value:  7
+              - key:    Logistics
+                value:  8
+              - key:    Media/Entertainment
+                value:  9
+              - key:    Medical/Healthcare
+                value:  10
+              - key:    Property
+                value:  11
+              - key:    Research
+                value:  12
+              - key:    Retail
+                value:  13
+              - key:    Telecommunications
+                value:  18
+              - key:    Travel
+                value:  15
+              - key:    Unemployed
+                value:  16
+              - key:    Other
+                value:  17
+          - type: text
+            preamble: "If 'Other' please enter your industry sector:"
+      - label: "Region:"
+        mandatory: yes
+        type: select
+        options:
+          - key:    Bulgaria
+            value:  1
+          - key:    UK / Ireland
+            value:  3
+          - key:    Western Europa
+            value:  4
+          - key:    Eastern Europa
+            value:  5
+          - key:    Southern Europa
+            value:  6
+          - key:    United States / Canada
+            value:  7
+          - key:    Asia / Australaisa
+            value:  8
+          - key:    South America
+            value:  9
+          - key:    Africa
+            value:  10
+        footnote: Please note this is the region you were a resident in, prior to attending the conference.
+
+  - label: The Perl Community, YAPCs &amp; Workshops
+    tag: community
+    results: survey
+    preamble: These questions are designed to help us understand our attendees level of involvement in the Perl community.
+    questions:
+      - label: How do you rate your Perl knowledge?
+        collate: yes
+        type: radio
+        options:
+          - key:    Beginner
+            value:  1
+          - key:    Intermediate
+            value:  2
+          - key:    Advanced
+            value:  3
+
+      - label: How long have you been programming in Perl?
+        collate: yes
+        type: radio
+        options:
+          - key:    less than a year
+            value:  1
+          - key:    1-2 years
+            value:  2
+          - key:    3-5 years
+            value:  3
+          - key:    5-10 years
+            value:  4
+          - key:    more than 10 years
+            value:  5
+
+      - label: How many previous YAPCs have you attended?
+        collate: yes
+        multipart:
+          - type: checkbox
+            options:
+              - key:    This was my first YAPC
+                value:  1
+          - type: count
+            group: YAPCs
+            options:
+              - key:    YAPC::Europe
+                value:  0
+                max:    14
+          - type: count
+            group: YAPCs
+            options:
+              - key:    YAPC::NA
+                value:  0
+                max:    16
+          - type: count
+            group: YAPCs
+            options:
+              - key:    YAPC::Asia
+                value:  0
+                max:    9
+          - type: count
+            group: YAPCs
+            options:
+              - key:    YAPC::Australia / OSDC::Australia
+                value:  0
+                max:    10
+          - type: count
+            group: YAPCs
+            options:
+              - key:    YAPC::Israel / OSDC::Israel
+                value:  0
+                max:    9
+          - type: count
+            group: YAPCs
+            options:
+              - key:    YAPC::Russia
+                value:  0
+                max:    7
+          - type: count
+            group: YAPCs
+            options:
+              - key:    YAPC::SA / YAPC::Brazil
+                value:  0
+                max:    13
+      - label: How many Perl Workshops have you attended?
+        collate: yes
+        multipart:
+          - type: checkbox
+            options:
+              - key:    Never attended one
+                value:  1
+          - type: count
+            group: Workshops
+            options:
+              - key:    Austrian Perl Workshop
+                value:  0
+          - type: count
+            group: Workshops
+            options:
+              - key:    Belgian Perl Workshop
+                value:  0
+          - type: count
+            group: Workshops
+            options:
+              - key:    French Perl Workshop
+                value:  0
+          - type: count
+            group: Workshops
+            options:
+              - key:    German Perl Workshop
+                value:  0
+          - type: count
+            group: Workshops
+            options:
+              - key:    Italian Perl Workshop
+                value:  0
+          - type: count
+            group: Workshops
+            options:
+              - key:    London Perl Workshop
+                value:  0
+          - type: count
+            group: Workshops
+            options:
+              - key:    Netherlands Perl Workshop
+                value:  0
+          - type: count
+            group: Workshops
+            options:
+              - key:    Nordic Perl Workshop
+                value:  0
+          - type: count
+            group: Workshops
+            options:
+              - key:    Portuguese Perl Workshop
+                value:  0
+          - type: count
+            group: Workshops
+            options:
+              - key:    Ukrainian Perl Workshop
+                value:  0
+          - type: count
+            group: Workshops
+            options:
+              - key:    any American Perl Workshops
+                value:  0
+          - type: count
+            group: Workshops
+            options:
+              - key:    any Russian Perl Workshops
+                value:  0
+          - type: count
+            group: Workshops
+            options:
+              - key:    Other Perl Workshops
+                value:  0
+      - label: Do you plan to attend a future YAPC/Workshop?
+        collate: yes
+        type: radio
+        options:
+          - key:    Yes
+            value:  Y
+          - key:    Maybe
+            value:  M
+          - key:    Don't Know
+            value:  D
+          - key:    No
+            value:  N
+      - label: If no, could you tell us why?
+        collate: yes
+        preamble: Particularly if this is your first YAPC, we would like to understand why you would not be able or interested in attending another event like it.
+        type: textarea
+      - label: Are you a member of a local Perl Mongers user group?
+        collate: yes
+        type: radio
+        options:
+          - key:    Yes
+            value:  Y
+          - key:    No
+            value:  N
+      - label: If not, do you plan to find one or start one?
+        collate: yes
+        type: radio
+        options:
+          - key:    Yes
+            value:  Y
+          - key:    Maybe
+            value:  M
+          - key:    Don't Know
+            value:  D
+          - key:    No
+            value:  N
+      - label: What other areas of the Perl Community do you contribute to?
+        collate: yes
+        preamble: Aside, from the above examples, are there any further activities you are involved with? The Perl Community is bigger than the major websites and projects, so please let us know if there are further aspects of the community that deserve a mention. By the way, we're not aiming to cover everything in the list below, as we hope to be enlightened of other ways to participate and extend the Perl community.
+        multipart:
+          - type: checkbox
+            options:
+              - key:    I'm a CPAN Author
+                value:  1
+          - type: checkbox
+            options:
+              - key:    I'm a CPAN Tester
+                value:  1
+          - type: checkbox
+            options:
+              - key:    I'm a Perl event organiser (e.g. YAPC, Perl Workshop, QA Hackathon, local technical meetings, etc.)
+                value:  1
+          - type: checkbox
+            options:
+              - key:    I'm a board or committee member of a recognised Perl body (e.g. TPF, EPO, YEF, JPF, etc.)
+                value:  1
+          - type: checkbox
+            options:
+              - key:    I'm a Perl project developer (e.g. Rakudo, Catalyst, Dancer, Padre, etc.)
+                value:  1
+          - type: checkbox
+            options:
+              - key:    I have a technical blog (e.g. on blogs.perl.org or a personal blog)
+                value:  1
+          - type: checkbox
+            options:
+              - key:    I use or contribute to PerlMonks or other Perl related forums
+                value:  1
+          - type: checkbox
+            options:
+              - key:    I use IRC (e.g. &#35;perl, &#35;yapc, &#35;london.pm, etc.)
+                value:  1
+          - type: checkbox
+            options:
+              - key:    I contribute to Perl mailing lists (e.g. P5P, Perl QA, etc)
+                value:  1
+          - type: checkbox
+            options:
+              - key:    other ...
+                value:  1
+            default: yes
+            default_label: If 'Other' please enter your area of contribution
+
+  - label: YAPC::Europe 2014
+    tag: yapc
+    results: survey
+    preamble: Regarding YAPC::Europe 2014 in Sofia specifically, please answer the following as best you can.
+    questions:
+      - label: When did you decide to come to this conference?
+        collate: yes
+        type: radio
+        options:
+          - key:     I'm now a regular YAPC::Europe attendee
+            value:   1
+          - key:     After YAPC::Europe 2014 in Kiev
+            value:   2
+          - key:     After reading a YAPC::Europe blog post
+            value:   3
+          - key:     I was nominated to attend by manager/colleague
+            value:   4
+          - key:     I was recommended to attend by friend/colleague
+            value:   5
+          - key:     After reading the Perl Weekly 
+            value:   6
+          - key:     After seeing a link or advert on a Perl specific website
+            value:   7
+          - key:     After seeing a link or advert on a non-Perl website
+            value:   8
+          - key:     After seeing a link on Twitter, Facebook or other social media  website.
+            value:   9
+          - key:     After reading an email sent to a mailing list I was in
+            value:   10
+          - key:     After seeing other promotions online/in the press
+            value:   11
+          - key:     other ...
+            value:   12
+            default: yes
+            default_label: If 'Other' please let us know when
+
+      - label: Were you a speaker?
+        collate: yes
+        type: radio
+        options:
+          - key:    No
+            value:  1
+          - key:    No, but I have spoken before at similar conferences
+            value:  2
+          - key:    Yes, and I have spoken before at similar conferences
+            value:  3
+          - key:    Yes, and it was my first time as a speaker
+            value:  4
+        footnote: Note that "similar conferences" includes other YAPCs, as well as Linux, Open Source or large technical events such as workshops.
+      - label: If you were a speaker, would you have been able to attend if you hadn't been speaking?
+        collate: yes
+        type: radio
+        options:
+          - key: Yes
+            value:  1
+          - key: No
+            value:  2
+      - label: If you weren't a speaker, would you consider speaking at a future conference?
+        collate: yes
+        type: radio
+        options:
+          - key: Yes
+            value:  1
+          - key: No
+            value:  2
+          - key: Ask me later
+            value:  3
+      - label: Were there any speakers not present, who you would like to have seen at the conference?
+        collate: yes
+        multipart:
+        - type: radio
+          options:
+            - key: Yes
+              value:  Y
+            - key: No
+              value:  N
+          footnote: If 'Yes', which speakers?
+        - type: textarea
+      - label: What kinds of talks would you prefer at future conferences?
+        collate: yes
+        type: radio
+        options:
+          - key: More beginner level talks
+            value:  1
+          - key: More intermediate level talks
+            value:  2
+          - key: More advanced level talks
+            value:  3
+          - key: It's about right
+            value:  4
+          - key: No preference
+            value:  5
+      - label: Are there any topics you would specifically like to see featured?
+        collate: yes
+        type: textarea
+
+      - label: How do you rate the conference?
+        collate: yes
+        preamble: How would you rate your overall satisfaction of the following areas of the conference?
+        type: matrix
+        options:
+          - Very Satisfied
+          - Somewhat satisfied
+          - Somewhat un-satisfied
+          - Very un-satisfied
+          - N/A
+        choices:
+          - Newsletters/Updates
+          - Website
+          - Registration process
+          - Directions/Maps
+          - Content of the talks
+          - Schedule efficiency
+          - BOFs
+          - Social events
+          - Parking
+          - Facilities
+          - Food service
+          - Accommodation
+          - Staff
+          - Overall experience
+          - Value for price
+      - label: Would you like to expand on any strong views?
+        results: feedback
+        type: textarea
+
+  - label: Conference Attendance
+    tag: attendance
+    results: survey
+    preamble: In order to help future organisers gauge an appropriate conference fee, how much would you (or your company) have paid for a conference ticket? Feel free to provide an answer for all rates, where corporate rate would be paid for by your company (including a Master Class place), standard rate would be the regular price paid by attendees in paid employment, and lastly the concession rate for anyone who holds proof that they are in fulltime education or are unemployed.
+    questions:
+      - label: "Corporate Rate:"
+        collate: yes
+        pre: "&euro;"
+        type: currency
+      - label: "Standard Rate:"
+        collate: yes
+        pre: "&euro;"
+        type: currency
+      - label: "Concession Rate:"
+        collate: yes
+        pre: "&euro;"
+        type: currency
+      - label: "Would you pay more for a YAPC if we could exclude sponsorship advertising?"
+        collate: yes
+        multipart:
+        - type: radio
+          options:
+            - key: Yes
+              value:  Y
+            - key: No
+              value:  N
+      - label: "If so, how much?"
+        collate: yes
+        pre: "&euro;"
+        type: currency
+
+      - label: How did you pay for the conference fee?
+        collate: yes
+        type: select
+        options:
+          - key: N/A - I was a speaker
+            value:  1
+          - key: N/A - I was a sponsor
+            value:  2
+          - key: My company paid
+            value:  3
+          - key: I paid out of my own pocket
+            value:  4
+          - key: I wasn't able to attend
+            value:  5
+      - label: "If your employer didn't send you, did they give you time off to attend?"
+        collate: yes
+        multipart:
+        - type: radio
+          options:
+            - key: Yes
+              value:  Y
+            - key: No
+              value:  N
+
+      - label: "Does distance prevent you from being able to attend some YAPCs?"
+        multipart:
+        - type: radio
+          options:
+            - key: Yes
+              value:  Y
+            - key: No
+              value:  N
+
+
+  - label: Feedback
+    results: feedback
+    tag: feedback
+    questions:
+
+      - label: For the Sofia organisers
+        preamble: Do you have any feedback you would like to give specifically to this year's organisers?
+        type: textarea
+      - label: For future organisers
+        preamble: Do you have any suggestions for improvement (please give examples where possible)?
+        type: textarea

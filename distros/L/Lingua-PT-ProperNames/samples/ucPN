@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+use locale;
+use Lingua::PT::ProperNames;
+
+$/ = '';
+
+while(<>){
+  s/\s*\n\s*/ /g;
+  print forPNstring(sub{uc($_[0])}, $_);
+}

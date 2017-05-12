@@ -1,0 +1,115 @@
+NAME
+    List::Flatten::Recursive - List::Flatten with recursion
+
+VERSION
+    version 0.103460
+
+SYNOPSIS
+        use List::Flatten::Recursive qw( flat );
+        sub printlist { print '(' . join(', ', @_) . ")\n" }
+
+        my $crazy_listref = [ 1, [ 2, 3 ], [ [ [ 4 ] ] ] ];
+        my @flattened = flat($crazy_listref); # Yields (1,2,3,4)
+        printlist(@flattened);
+        push @$crazy_listref, $crazy_listref; # Now it contains itself!
+        @flattened = flat($crazy_listref);    # Still yields (1,2,3,4)
+        printlist(@flattened);
+        @flattened = flat([ $crazy_listref ]); # Ditto.
+        printlist(@flattened);
+        # But don't do this for self-referential lists.
+        @flattened = flat(@$crazy_listref); # Will not yield the same as above.
+        printlist(@flattened);
+
+DESCRIPTION
+    If you think of nested lists as a tree structure (an in Lisp, for
+    example), then "flat" basically returns all the leaf nodes from an
+    inorder tree traversal, and leaves out the internal nodes (i.e.
+    listrefs). If the nested list is a DAG instead of just a tree, it should
+    still flatten correctly (based on my own definition of correctness, of
+    course; see also t/flatten-dag.t).
+
+    If the nested list is self-referential, then any cycles will be broken
+    by replacing ancestor references with empty lists. However, the only
+    behavior you should rely on when flattening a self-referential data
+    structure is that infinite recursion should not occur, and each non-list
+    element in the data structure should appear at least once in the output.
+
+METHODS
+  flat
+    This method flattens a list (or listref) recursively. It takes a list
+    that may contain other sublists, and replaces those sublists with their
+    contents, recursively, until the list no longer contains any sublists.
+
+    "flat" makes a best effort to break circular references (that is, lists
+    that contain references to themselves), so it should not enter infinite
+    recursion. If you find a case that causes it to recurse infinitely,
+    please inform me.
+
+    This method is exported by default.
+
+  flatten_to_listref
+    Same as "flat", but returns a single reference to the resulting list.
+
+    This method is exported only by request. To use this method, put the
+    following at the top of your program:
+
+        use List::Flatten::Recursive qw( flatten_to_listref );
+
+BUGS AND LIMITATIONS
+  Self-referential lists should be flattened by reference
+    If you are going to flatten a list which might contain references to
+    itself, you should pass a reference to that list to "flat", or else
+    things will not work the way you expect. You will end up with an extra
+    instance of each item in the outermost list. However, this will not
+    result in infinite recursion.
+
+    This module should never cause infinite recursion. If it does, please
+    submit a bug report.
+
+  "flat" always returns a list
+    Even if you call "flat" on a single scalar, it will still return a list
+    with one element in it. If called in scalar context, it will return the
+    length of that list. "flatten_to_listref" would return a reference to a
+    list with one element. There is no case where the original scalar would
+    be returned directly. This is by design. If you think this is wrong,
+    email me and tell me why.
+
+    Please report any bugs or feature requests to
+    "rct+perlbug@thompsonclan.org". If you find a case where this module
+    returns what you feel is a wrong result, please send an example that
+    will cause it to do so, along with the actual and expected results.
+
+SEE ALSO
+    * List::Flatten The non-recursive insipiration for this module.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+
+AUTHOR
+    Ryan C. Thompson <rct@thompsonclan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Ryan C. Thompson.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

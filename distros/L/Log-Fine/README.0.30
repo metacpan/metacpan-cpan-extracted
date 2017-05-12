@@ -1,0 +1,51 @@
+API Changes found in version 0.30
+
+Last Modified: $Date$
+
+Additions:
+
+lib/Log/Fine/Levels.pm:
+ * New class.  See Log::Fine::Levels for more information
+
+Changes:
+
+lib/Log/Fine.pm
+
+ * Log::Fine no longer exports Log Levels and Log Masks.  See
+   Log::Fine::Levels
+ * New Method, levelMap(), returns the current level Map (see
+   Log::Fine::Levels)
+ * logger() replaces getLogger()
+ * clone(), which is outside the scope of Log::Fine, has been removed
+ * new private method, _fatal(), is used for handling fatal Log::Fine
+   fatal situations.  Note this can be overridden as necessary to
+   affect the internal behavior of Log::Fine.
+
+lib/Log/Fine/Utils.pm
+
+ * OpenLog() now takes a hash as an argument.  See Log::Fine::Utils
+
+lib/Log/Fine/Logger.pm
+
+ * Replace setSkip() and getSkip with single method, skip()
+
+lib/Log/Fine/Handle.pm
+
+ * isLoggable() now takes either a level name or a numeric value as an
+   argument
+ * formatter() replaces setFormatter()
+
+lib/Log/Fine/Handle/File.pm
+
+ * fileHandle() replaces getFileHandle()
+
+lib/Log/Fine/Handle/File/Timestamp.pm
+
+ * fileHandle() replaces getFileHandle()
+
+lib/Log/Fine/Formatter.pm
+
+ * timeStamp() replaces getTimeStamp()
+
+
+

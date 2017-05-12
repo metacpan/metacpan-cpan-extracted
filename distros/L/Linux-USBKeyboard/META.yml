@@ -1,0 +1,27 @@
+---
+name: Linux-USBKeyboard
+version: 0.04
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: access devices pretending to be qwerty keyboards
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Module::Build: 0.26
+  Test::More: 0
+requires:
+  Inline::C: 0
+  perl: 5.008002
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Linux::USBKeyboard:
+    file: lib/Linux/USBKeyboard.pm
+    version: 0.04
+  Linux::USBKeyboard::FileHandle:
+    file: lib/Linux/USBKeyboard.pm
+generated_by: Module::Build version 0.350201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

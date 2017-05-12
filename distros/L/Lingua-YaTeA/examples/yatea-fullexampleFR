@@ -1,0 +1,93 @@
+#!/usr/bin/perl -w
+
+#######################################################################
+#
+# Last Update: 11/07/2006 (mm/dd/yyyy date format)
+# 
+# Copyright (C) 2004 Thierry Hamon, Sophie Aubin
+#
+# Written by thierry.hamon@univ-paris13.fr, sophie.aubin@lipn.univ-paris13.fr
+#
+# Author : Thierry Hamon - Sophie Aubin
+# Email : thierry.hamon@univ-paris13.fr - sophie.aubin@lipn.univ-paris13.fr
+# URL : http://www-limbio.smbh.univ-paris13.fr/membres/hamon/
+# Version : 1
+########################################################################
+
+
+use strict;
+use Getopt::Long;
+use Config::General;
+use Pod::Usage;
+use Data::Dumper;
+
+use Lingua::YaTeA::Corpus;
+use Lingua::YaTeA;
+
+
+# Process Option
+
+my $man = 0;
+my $help = 0;
+my $rcfile = "";
+
+# GetOptions('help|?' => \$help, man => \$man, "rcfile=s" => \$rcfile) or pod2usage(2);
+# pod2usage(1) if $help;
+# pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+
+my %config = Lingua::YaTeA::load_config("yatea-test-FR.rc");
+
+
+my $current_dir = `pwd`;
+my $corpus_path = "sampleFR.ttg";
+
+# warn "$corpus_path\n";
+
+    print STDERR  "\n
+\n
+#     #     #    #########  #######     #
+ #   #     # #       #      #          # #
+  # #     #   #      #      #         #   #
+   #     #     #     #      #####    #     #
+   #     #######     #      #        #######
+   #     #     #     #      #        #     #
+   #     #     #     #      #######  #     #
+\n\n";
+
+my $sys_config ;
+my $yatea;
+my $corpus;
+
+# if (defined $rcfile) {
+#     $sys_config = Config::General->new('-ConfigFile' => $rcfile,
+# 				       '-InterPolateVars' => 1,
+# 				       '-InterPolateEnv' => 1
+# 				       );
+# } else {
+#     $sys_config = Config::General->new('-ConfigFile' => ".config",
+# 				       '-InterPolateVars' => 1,
+# 				       '-InterPolateEnv' => 1
+# 				       );
+# }
+
+
+
+$yatea = Lingua::YaTeA->new($config{"OPTIONS"}, \%config);
+
+# warn $yatea->getOptionSet->getDisplayLanguage . "\n";
+
+if (defined $corpus_path) {
+    if (-f $corpus_path)
+    {
+	$corpus = Lingua::YaTeA::Corpus->new($corpus_path,$yatea->getOptionSet,$yatea->getMessageSet);
+    }
+    else
+    {
+	die("\"".$corpus_path . "\"". $yatea->getMessageSet->getMessage("NO_FILE")->getContent($yatea->getOptionSet->getDisplayLanguage) . "\n");
+    }
+    $yatea->termExtraction($corpus);
+} else {
+    die( $yatea->getMessageSet->getMessage("NO_FILE_ARG")->getContent($yatea->getOptionSet->getDisplayLanguage) . "\n");
+}
+

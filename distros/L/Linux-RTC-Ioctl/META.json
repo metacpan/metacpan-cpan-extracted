@@ -1,0 +1,46 @@
+{
+   "abstract" : "Real Time Clock access using the Linux driver ioctl interface.",
+   "author" : [
+      "Timothy Madden <terminatorul@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Linux-RTC-Ioctl",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Fcntl" : "0",
+            "POSIX" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Linux::RTC::Ioctl" : {
+         "file" : "lib/Linux/RTC/Ioctl.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

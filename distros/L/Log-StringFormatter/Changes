@@ -1,0 +1,10 @@
+Revision history for Perl extension Log-StringFormatter
+
+0.02 2013-12-20T07:54:49Z
+
+    - fix $Data::Dumper::{SortKeys => Sortkeys}
+
+0.01 2013-10-16T04:54:22Z
+
+    - original version
+

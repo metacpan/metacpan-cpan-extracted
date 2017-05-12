@@ -1,0 +1,22 @@
+---
+name: LWP-UserAgent-ProxyHopper
+version: 0.004
+author:
+  - 'Zoffix Znet <zoffix@cpan.org>'
+abstract: LWP::UserAgent with proxi-hopping
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  LWP::UserAgent: 2.036
+  LWP::UserAgent::ProxyHopper::Base: 0.002
+build_requires:
+  Test::More: 0
+provides:
+  LWP::UserAgent::ProxyHopper:
+    file: lib/LWP/UserAgent/ProxyHopper.pm
+    version: 0.004
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

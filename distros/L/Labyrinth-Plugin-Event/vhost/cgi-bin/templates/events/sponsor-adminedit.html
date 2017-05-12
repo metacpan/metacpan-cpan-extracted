@@ -1,0 +1,64 @@
+[% 
+    IF data.sponsorid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Sponsor' ;
+
+    crumb3_name = 'Event' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=event-admin' ;
+    crumb2_name = 'Sponsor' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=spon-admin' ;
+    crumb1_name = editmode ;
+%]
+
+<form action="[% cgipath %]/pages.cgi" method="post">
+<input type="hidden" name='act' value='spon-save' />
+<input type="hidden" name="sponsorid" value="[% data.sponsorid %]" />
+
+[% IF thanks %]<p>Sponsor saved successfully.</p>[% END %]
+<p>Fields marked * are mandatory fields and must be completed.</p>
+
+[% IF errmess %]
+<div class="box">
+    [% IF errmess == 1 %]
+    <p class="alert">There are invalid or missing fields, as noted by the <span class="alert">&empty;</span> symbol.</p>
+    [% ELSE %]
+    <p class="alert">[% errmess %]</p>
+    [% END %]
+</div>
+[% END %]
+
+<div class="boxer">
+<table class="blocker">
+[% IF data.sponsorid %]
+<tr><th>ID</th>
+    <td class="alert"></td>
+    <td>[% data.sponsorid %] +</td></tr>
+[% END %]
+<tr><th>Name *</th>
+    <td class="alert">[% data.sponsor_err %]</td>
+    <td><input type="text" name="sponsor" size="60" value="[% data.sponsor %]" /></td></tr>
+<tr><th>Link</th>
+    <td class="alert">[% data.sponsorlink_err %]</td>
+    <td><input type="text" name="sponsorlink" size="60" value="[% data.sponsorlink %]" /></td></tr>
+<tr><th></th>
+    <td></td>
+    <td><input type="submit" value='Save Sponsor' /></td>
+</tr>
+</table>
+</div>
+
+</form>
+
+<h2>Preview</h2>
+
+<div class="boxer">
+<table class="blocker">
+<tr><td>Sponsor:</td><td>[% IF data.sponsorlink %]<a href="[% data.sponsorlink %]" title="link to sponsor">[% data.sponsor %]</a>[% ELSE %][% data.sponsor %][% END %]</td></tr>
+</table>
+</div>
+
+<h2>Notes</h2>
+
+<p>Please note that any specific presentation required by a sponsor, such as a logo or additional information, will need to be explicitly added to the website templates.</p>
+[% IF data.sponsorid %]
+<p>+ When updating templates for a sponsor, use the 'sponsorid' field and the number listed here to cross-reference to the correct sponsor.</p>
+[% END %]

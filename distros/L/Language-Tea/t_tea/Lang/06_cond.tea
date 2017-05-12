@@ -1,0 +1,23 @@
+# argv e uma lista q contem todos os parametros
+# passados na linha de comandos
+
+# verificar se a lista esta vazia ou nao
+if{ not-empty? $argv  }{
+    
+    # converter o primeiro parametro para 'inteiro'
+    define numero [string->int [nth $argv 0]]
+    cond{ < $numero 0 }{
+      echo "menor q zero"
+      echo " e tall"
+      echo "RMELOSOSAOADSODAIDOSAID"
+    }{ > $numero 0  }{
+      echo "maior q zero"   
+    }{ 
+    #default (funciona como o 'default:' no switch em 'c/c++')
+       echo "zero"
+    }
+     
+# para o caso da lista estar vazia    
+}{
+  echo "Quero pelo menos um parametro!"   
+}

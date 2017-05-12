@@ -1,0 +1,272 @@
+Revision history for Lucy
+
+0.6.1  2016-12-09
+
+  Bugfixes:
+
+    * [LUCY-286] - Remote::SearchClient::DESTROY shouldn't throw exceptions
+    * [LUCY-309] - BSD make doesn't support pattern rules
+    * [LUCY-310] - CPAN dist includes Lucy/Test.xs
+    * [LUCY-311] - Non-ASCII error messages from strerror cause exceptions
+    * [LUCY-312] - Remote searcher tests fail if port is in use
+    * [LUCY-315] - Memory leak in HitQueue with SortSpec
+    * [LUCY-316] - Don't regenerate POD when building CPAN distro
+    * [LUCY-317] - Compile failure on FreeBSD 10.1
+    * [LUCY-318] - Indexing fails with "input n too high" in S_fibonacci
+
+0.6.0  2016-09-24
+
+  Tasks:
+
+    * [LUCY-301] - Change Read_C32/etc to explicitly signed
+                   Read_CI32/CU32/etc
+    * [LUCY-302] - Widen array index type and fix conversion warnings in
+                   NumberUtils.
+
+  Bugfixes:
+
+    * [LUCY-297] - Perl 5.10 build broken: "token_re is not a qr// entity"
+    * [LUCY-298] - Random numeric junk in tempfile name
+    * [LUCY-300] - Restrict max field length to 2 GB
+    * [LUCY-303] - "make test" broken on Cygwin
+    * [LUCY-307] - Lucy::Simple's `search` stopped supporting `sort_spec`
+
+0.5.1  2016-04-14
+
+  Bugfixes:
+
+    * [LUCY-297] - Perl 5.10 build broken: "token_re is not a qr// entity"
+    * [LUCY-298] - Random numeric junk in tempfile name
+
+0.5.0  2016-03-04
+
+  New features:
+
+    * [LUCY-275] - Proof-of-concept Go bindings
+
+  Bugfixes:
+
+    * [LUCY-273] - Require specific version of Clownfish
+    * [LUCY-287] - Mismatch between required Clownfish versions
+    * [LUCY-288] - Add Clownfish to configure_requires
+
+  Improvements:
+
+    * [LUCY-274] - Refcounting needs to use functions rather than methods
+    * [LUCY-277] - Autogenerate Go Bindings
+    * [LUCY-279] - Prepare for removal of Obj methods
+    * [LUCY-281] - Port host-specific Lucy code to Go/CGO
+    * [LUCY-282] - Refine and test Go bindings
+    * [LUCY-284] - Support multiple Go types as document
+    * [LUCY-285] - Run core tests under Go bindings
+    * [LUCY-289] - Check for incompatible Clownfish major version
+
+  Tasks:
+
+    * [LUCY-290] - Review generated C API documentation
+
+
+0.4.4  2016-01-31
+
+  Bugfixes:
+
+    * [LUCY-287] - Mismatch between required Clownfish versions
+    * [LUCY-288] - Add Clownfish to configure_requires
+    * Fix Windows build for some CPAN Testers setups (see CLOWNFISH-3).
+
+
+0.4.3  2016-01-09
+
+  Improvements:
+
+    * Check for incompatible Clownfish major version.
+    * Improve build and installation scripts for C library.
+
+
+0.4.2  2014-11-18
+
+  Bugfixes:
+
+    * [LUCY-272] - Wrong encoding of extremely small similarity values
+
+
+0.4.1  2014-09-25
+
+  Bugfixes:
+
+    * [LUCY-269] - Field names with underscores break query parser
+    * [LUCY-270] - RegexTokenizer broken in C bindings
+
+
+0.4.0  2014-08-21
+
+  Bugfixes:
+
+    * [LUCY-199] - Highlighting/excerpt on URLs
+    * [LUCY-211] - MSVC 6 support
+    * [LUCY-234] - Brittle object struct ABI
+    * [LUCY-240] - Build Broken on clang
+    * [LUCY-254] - Creation of Charmonizer temp files sometimes fails on
+                   Windows
+    * [LUCY-261] - Include paths for benchmark scripts
+    * [LUCY-263] - MemoryPool's Release_All() should free
+    * [LUCY-265] - Index lockfiles left behind
+
+  New features:
+
+    * [LUCY-250] - Add delete_by_doc_id to Lucy::Index::Indexer
+
+  Tasks:
+
+    * [LUCY-201] - Port CFC tests to C
+    * [LUCY-212] - The "language" parameter to PolyAnalyzer#new is deprecated
+    * [LUCY-214] - Port terminfo tests to C
+    * [LUCY-222] - Port span tests to C
+    * [LUCY-246] - Migrate Apache Lucy to Git
+    * [LUCY-257] - Separate Clownfish from Lucy
+
+
+0.3.3  2013-07-22
+
+  Bugfixes:
+
+    * [LUCY-239] - Simplify JSON Parser Y File
+    * [LUCY-243] - Trap remove errno and warn
+    * [LUCY-245] - Charmonizer fails to detect syntax for 64-bit integer
+      literals
+    * [LUCY-259] - Compensate for Perl export flakiness of to_utf8_lower
+
+0.3.2  2012-07-05
+
+  Bugfixes:
+
+    * [LUCY-238] - Improve reliability of loading from JSON
+
+
+0.3.1  2012-05-04
+
+  Bugfixes:
+
+    * [LUCY-213] - Explicit version number for each Perl module
+    * [LUCY-216] - t/152-inversion.t failure
+    * [LUCY-235] - Don't ship dev-only tests with CPAN tarball
+
+  Tasks:
+
+    * [LUCY-218] - Adapt codebase for TLP status
+
+
+0.3.0  2012-01-15
+
+  New features:
+
+    * [LUCY-173] - Bundle Lemon parser generator
+    * [LUCY-189] - Bundle utf8proc
+    * [LUCY-191] - Unicode normalization
+      The new analyzer Lucy::Analysis::Normalizer provides Unicode
+      normalization, case folding and stripping of accents.
+    * [LUCY-196] - UAX #29 tokenizer
+      The new analyzer Lucy::Analysis::StandardTokenizer tokenizes according
+      to the UAX #29 word break rules.
+    * [LUCY-203] - Implement EasyAnalyzer
+      EasyAnalyzer is simple analysis chain using the StandardTokenizer, the
+      Normalizer, and the SnowballStemmer.
+
+  Bugfixes:
+
+    * [LUCY-175] - Missing stdarg.h breaks build
+    * [LUCY-176] - More INCREF/DECREF symbol collisions under Windows
+    * [LUCY-178] - Discriminate between stdio and POSIX in large file support
+                   probing.
+    * [LUCY-180] - ORQuery, ANDQuery, RequiredOptionalQuery optimizations
+                   affect scoring
+    * [LUCY-181] - Perl Documentation fix - Remove links to classes within
+                   docs, that are not exposed to Perl
+    * [LUCY-182] - highlighter bug when searching for duplicate terms [wordX
+                   wordX]
+    * [LUCY-183] - Eliminate spurious "extra" query normalization
+    * [LUCY-185] - Improve error handling when required params not supplied
+    * [LUCY-186] - Terminate connection from SearchClient properly
+    * [LUCY-187] - Adapt to GC changes in Perl 5.15
+    * [LUCY-188] - Highlighter should accept weighted Queries (Compilers)
+    * [LUCY-193] - Occasional schema file name collision under 'truncate'
+    * [LUCY-195] - Revisit pthreads linking on OpenBSD.
+    * [LUCY-206] - Work around broken export in Perl 5.15.6
+
+  Improvements:
+
+    * [LUCY-142] - Port Clownfish compiler to C
+    * [LUCY-143] - Convert Clownfish::Parser to Lemon
+    * [LUCY-179] - Tighten UTF-8 validity checks.
+    * [LUCY-197] - Clean whitespace for 0.3.0
+    * [LUCY-204] - Process ClusterSearcher RPCs in parallel
+    * [LUCY-205] - Parallel processing for SearchServer
+      This introduces an incompatible API change: The port argument has moved
+      from the constructor to the serve method and the password argument has
+      been removed.
+
+  Tasks:
+
+    * [LUCY-133] - Eliminate JSON::XS dependency
+    * [LUCY-134] - Eliminate Parse::RecDescent dependency
+    * [LUCY-137] - Dependency licensing in grant code
+
+
+0.2.2  2011-10-19
+
+  Bugfixes:
+
+    * [LUCY-175] - Missing stdarg.h breaks build
+    * [LUCY-176] - More INCREF/DECREF symbol collisions under Windows
+    * [LUCY-180] - ORQuery, ANDQuery, RequiredOptionalQuery optimizations
+                   affect scoring
+    * [LUCY-181] - Perl Documentation fix - Remove links to classes within
+                   docs, that are not exposed to Perl
+    * [LUCY-182] - highlighter bug when searching for duplicate terms [wordX
+                   wordX]
+    * [LUCY-183] - Eliminate spurious "extra" query normalization
+
+
+0.2.1  2011-08-14
+
+  Bugfixes:
+
+    * [LUCY-174] - Filepath naming glitch breaks CPAN build process
+
+
+0.2.0  2011-07-24
+
+  Bugfixes:
+
+    * [LUCY-152] - Bad prototype for MAKE_MESS when no variadic macros
+                   available
+    * [LUCY-153] - XSLoader version string mismatch
+    * [LUCY-154] - Double-quote all #error directives
+    * [LUCY-155] - TestFSFileHandle's Close() test on Windows fails to clean
+                   up
+    * [LUCY-157] - Add -pthread linker flag on OpenBSD
+    * [LUCY-158] - Disable LockFreeRegistry test by default
+    * [LUCY-160] - Always disable symlink tests on Windows
+    * [LUCY-161] - Always use CreateHardLink() on Windows
+    * [LUCY-162] - Use shell to redirect Charmonizer stderr on Windows
+    * [LUCY-164] - Skip forking tests under Cygwin
+    * [LUCY-165] - Line-ending-agnostic parsing of sample docs
+    * [LUCY-166] - Prefer POSIX over windows.h for process ID
+    * [LUCY-167] - INCREF/DECREF symbol collisions under Windows in
+                   FSDirHandle.c
+    * [LUCY-168] - Directory handling under Cygwin
+    * [LUCY-172] - Clownfish should slurp files in text mode
+
+  Improvements:
+
+    * [LUCY-156] - Address GCC warnings for Charmonizer code
+    * [LUCY-163] - Target Windows XP
+    * [LUCY-169] - Improve cleanup after MSVC
+    * [LUCY-170] - Charmonizer test compiles should use obj rather than exe
+                   when possible
+    * [LUCY-171] - Turn off stupid MSVC warnings
+
+0.1.0  2011-05-20
+
+  Initial release, adapted from a software grant for the KinoSearch codebase.
+

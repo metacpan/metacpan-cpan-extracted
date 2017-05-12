@@ -1,0 +1,99 @@
+Revision history for Log-Dispatch-File-Stamped
+
+0.19      2017-02-21 03:59:32Z
+          - fix unit tests for different path separator on MSWin32
+
+0.18      2017-02-18 19:21:37Z
+          - fix checking of close_after_write option that changed internally
+            in Log::Dispatch 2.59
+
+0.17      2017-02-18 06:25:35Z
+          - fix test that changed behaviour with Log::Dispatch 2.59
+          - new 'time_function' argument, for optionally using gmtime instead
+            of localtime for generating the filename timestamp (see RT#113276)
+          - additional internal caching layer added, to avoid unnecessary
+            system calls when several messages are logged at once (thanks to
+            Doug Hoyte for the suggestion; see RT#113275)
+
+0.16      2016-01-28 01:25:59Z
+          - fix close-after-write tests that broke with Log::Dispatch::File
+            2.53, which now deletes the stored filehandle after closing
+            (RT#111292)
+
+0.15      2014-11-05 02:28:41Z
+          - fix tests on MSWin32 using arch-sensitive file separators
+
+0.14      2014-11-03 06:14:34Z
+          - fix lingering Test::TempDir prereq
+          - fix remaining issues with running tests in parallel by using
+            unique tempdirs for all tests
+
+0.13      2014-02-17 01:14:47Z
+          - uses of Test::TempDir switched to Path::Tiny
+
+0.12      2013-06-17 21:57:03Z
+          - conversion to Dist::Zilla
+
+0.11      2013-06-17
+          - re-release as a stable release
+
+0.10_010  2013-05-04
+          - fixed testing of octal values on MSWin32, ONCE AND FOR ALL
+
+0.10_009  2013-05-01
+          - even more fixing of testing of octal values on MSWin32
+
+0.10_008  2013-04-30
+          - more fixing of testing of octal values on MSWin32
+
+0.10_007  2013-04-29
+          - fix testing of octal values on MSWin32
+
+0.10_003  2013-04-22
+          - fix version declaration (Karen Etheridge)
+
+0.10_002  2013-04-22
+          - fix version requirements (Karen Etheridge)
+
+0.10_001  2013-04-09
+          - add support for all remaining Log::Dispatch::File options (Karen Etheridge)
+
+0.10  2011-09-25
+          - add support for permissions parameter - reported by Jonathan Peyser
+
+0.09  2010-08-15
+          - fix incorrect number of skipped tests under perl < 5.8
+
+0.08  2010-08-14
+          - skip binmode tests under perls < 5.8
+
+0.07  2010-08-13
+          - add support for binmode parameter - patch by Tokuhiro Matsuno
+            (https://rt.cpan.org/Ticket/Display.html?id=60278)
+
+0.06  2008-06-29
+          - added missing meta-spec to meta.yml
+          - remove pod tests
+
+0.05  2006-09-07
+          - fix typo which prevented correcting indexing by PAUSE
+          - move .pm file to lib/
+          - document log_message()
+
+0.04  2006-09-07
+          - add Build.PL to build with Module::Build
+          - add t/podcover.t to make CPANTS happy
+
+0.03  2004-09-15
+          - Fix "Log::Dispatch::* object file already exists" warning
+            displayed on some platforms during "make test".
+          - Require Test::More
+          - Fix pod and add a pod test
+
+0.02  2004-08-08
+          - log_to() wasn't working due to attribute name clash
+            (https://rt.cpan.org/Ticket/Display.html?id=7249)
+
+0.01  2003-02-08
+          - Uploaded 0.01 to CPAN
+

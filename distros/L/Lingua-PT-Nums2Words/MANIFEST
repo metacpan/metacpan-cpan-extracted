@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+Nums2Words.pm
+README
+t/01-num2word.t
+t/02-special-cases.t
+t/03-misc.t
+META.yml                                 Module meta-data (added by MakeMaker)
+t/pod.t
+t/pod-coverage.t

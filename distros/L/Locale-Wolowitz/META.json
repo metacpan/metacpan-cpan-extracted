@@ -1,0 +1,58 @@
+{
+   "abstract" : "Dead simple localization with JSON.",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Locale-Wolowitz",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Cpanel::JSON::XS" : "3.0115"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "JSON::MaybeXS" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ido50/Locale-Wolowitz/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Locale-Wolowitz",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ido50/Locale-Wolowitz.git",
+         "web" : "https://github.com/ido50/Locale-Wolowitz"
+      }
+   },
+   "version" : "1.004001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0113"
+}
+

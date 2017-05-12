@@ -1,0 +1,12 @@
+Build.PL			build script
+Changes				Changes to this module
+MANIFEST			This list of files
+META.yml			Metadata file
+Makefile.PL			Old-style makefile
+README				REDME file
+lib/Lingua/Klingon/Collate.pm	The module itself
+t/01_base.t			Tests loading the module
+t/02_strcoll.t			Tests strcoll()
+t/03_strxfrm.t			Tests strxfrm()
+t/04_strunxfrm.t		Tests strunxfrm()
+t/05_list.t			Tests scalar vs list context of str(un)xfrm()

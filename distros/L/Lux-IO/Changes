@@ -1,0 +1,30 @@
+Revision history for Perl extension Lux::IO.
+
+0.07  2009-05-14
+      - fixed a bug: to avoid memory leak, applied bt->clean_data() to
+        return value from bt->get()
+
+0.06  2009-04-17
+      - fixed a bug: Lux::IO::Btree now can store binary values.
+        (Thanks to Naoya Ito)
+
+0.05  2009-03-28
+      - Lux::IO now supports Lux IO library above version 0.2.1
+      - updated constant names to make consistent to version 0.2.1 of
+        Lux IO
+      - added LIBS option into Makefile.PL to resolve the link to
+        luxio library.
+
+0.04  2009-02-09
+      - fixed a bug: options which passed into new() method was thrown
+        away...
+
+0.03  2008-12-28
+      - fixed some documentation errors.
+      - add .gitignore into MANIFEST.SKIP
+
+0.02  2008-12-27
+      - fixed some documentation errors.
+
+0.01  2008-12-27
+      - initial version

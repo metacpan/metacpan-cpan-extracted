@@ -1,0 +1,20 @@
+Revision history for Perl module Lingua::Stem::Ru
+
+0.04 2016-02-12 NEILB
+    - Dropped use of 'use vars'
+    - Updated the Win32 installation instructions
+    - Added github repo to doc, along with an AUTHOR section,
+      and updated SEE ALSO.
+    - All the above changes submitted by ZORAN++
+
+0.03 2016-02-04 NEILB
+    - Corrected the URL for the algorithm. PR from ZORAN++
+
+0.02 2016-02-02 NEILB
+    - Moved Ru.pm to lib/Lingua/Stem/Ru.pm
+    - Moved testsuite and test data into t/
+    - Switched to Dist::Zilla, in the process addressing RT#107485
+    - Changed the format of this file to follow CPAN::Changes::Spec
+
+0.01 2004-05-21 ALGDR
+    - Initial Release

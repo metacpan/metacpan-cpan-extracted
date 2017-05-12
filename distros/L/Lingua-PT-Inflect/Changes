@@ -1,0 +1,29 @@
+Revision history for Perl extension Lingua::PT::Inflect.
+
+0.06  Mon Nov 01 19:49:00 2004
+	- minor changes in the documentation
+	- added pod.t and pod-coverage.t to the tests
+
+0.05  Wed Oct 27 11:28:00 2004
+	- tests are now more automated
+
+0.04  Fri Sep 24 18:24:47 2004
+	- corrected a bug in the documentation
+
+0.03  Wed Sep 22 00:14:47 2004
+	- added META.yml
+	- Perl required version is now 5.006 (was 5.008)
+	- minor changes in the documentation
+	- added OO interface (and tests for it)
+
+0.02  Mon May 10 16:49:47 2004
+	- fixed the broken rules for words ending in -il
+	- added exceptions
+
+0.01  Mon May 10 16:49:47 2004
+	- first release ready. still has untreated cases
+
+0.01  Mon May 10 15:22:47 2004
+	- original version; created by h2xs 1.22 with options
+		-XAn Lingua::PT::Inflect
+

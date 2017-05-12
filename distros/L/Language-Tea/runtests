@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+use Test::Harness;
+@tests=<t/*.t>;
+runtests(@tests);

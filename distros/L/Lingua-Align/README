@@ -1,0 +1,61 @@
+Lingua-Align - a toolbox for syntactic tree alignment
+=====================================================
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DOCUMENTATION
+
+Look at the files in doc/
+To run on some small sample data: look at examples/europarl/
+and run "make test" (look into the Makefile for more information)
+
+Other tests can be run on Smultron data (in examples/smultron/)
+Download the treebank from http://kitt.cl.uzh.ch/kitt/smultron/
+
+Using Lingua::Align for word alignment is demonstrated in examples/wpt03
+
+
+ATTENTION:
+
+- The aligner uses "megam" as the base classifier which is
+  provided as a pre-compiles binary in bin/megam for i686 Linux platforms!
+
+- For Mac-OS X (10.4 or higher):
+  Replace bin/megam with bin/megam.osx
+
+- For other platforms:
+  You need to dowload the source code of megam and compile it for your
+  system! The source code (and documentation) is here:
+  http://www.cs.utah.edu/~hal/megam/
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+     XML::Parser
+     IPC::Open3
+     Algorithm::Munkres
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2010 by Joerg Tiedemann
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+Copyright for MegaM by Hal Daume III
+see http://www.cs.utah.edu/~hal/megam/ for more information
+Paper: Notes on CG and LM-BFGS Optimization of Logistic Regression, 2004
+http://www.cs.utah.edu/~hal/docs/daume04cg-bfgs.pdf

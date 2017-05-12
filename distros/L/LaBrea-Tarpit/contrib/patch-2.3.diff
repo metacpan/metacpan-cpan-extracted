@@ -1,0 +1,127 @@
+--- LaBrea.c.sav	Sat Nov 24 14:04:29 2001
++++ LaBrea.c	Sun Nov 25 20:47:35 2001
+@@ -139,7 +139,7 @@
+ 
+ int throttlesize = 10, dlsize = 0, star = 0, sflag = 0, nkotbcount = 0, currentrand=0;
+ int logopen = 0, datalog = 0, rate = 3, addresses, xflag = 0, hflag = 0, aflag = 0, Pflag = 0;
+-int avgbw = 0, currentbandwidth = 0, maxbw = 0, pflag = 0, past[5] = {0,0,0,0,0}, oflag = 0;
++int avgbw = 0, currentbandwidth = 0, maxbw = 0, pflag = 0, past[5] = {0,0,0,0,0}, oflag = 0, Ooflag = 0;
+ int bflag = 0, qflag = 0, savedatalog = 0, newthisminute = 0, rflag = 0, testflag = 0, mutexseq = 0;
+ int linuxflag = 0;
+ char *dev = NULL;
+@@ -570,6 +570,7 @@
+       "   -b           : Log bandwidth usage to syslog\n"
+       "   -d           : Do NOT detach process.\n"
+       "   -o           : Output to stdout instead of syslog (Note 9)\n"
++      "   -O           : same as -o except output time in seconds since epoch\n"
+       "   -P           : Persist mode capture only.\n"
+       "   -L           : Beta \"Linux\" window probe capture code.\n"
+       "Note 1:\n"
+@@ -768,9 +769,13 @@
+         sprintf(mybuffer, "Initial Connect (tarpitting): %s %i -> %s %i", s_addr, sport, d_addr, dport);
+         if(oflag){
+           now = time(NULL);
+-          strncpy(tnow, ctime(&now), 50);
+-          strtok(tnow, "\n");
+-          printf("%s %s\n", tnow, mybuffer);
++          if(Ooflag){ 
++            printf("%lu %s\n", now, mybuffer);
++          } else {
++            strncpy(tnow, ctime(&now), 50);
++            strtok(tnow, "\n");
++            printf("%s %s\n", tnow, mybuffer);
++          }
+         } else
+           syslog(LOGTYPE, mybuffer);
+       }
+@@ -913,9 +918,13 @@
+           }
+           if(oflag){
+             now = time(NULL);
+-            strncpy(tnow,ctime(&now),50);
+-            strtok(tnow,"\n");
+-            printf("%s %s\n", tnow, mybuffer);
++            if(Ooflag){ 
++              printf("%lu %s\n", now, mybuffer);
++            } else {
++              strncpy(tnow, ctime(&now), 50);
++              strtok(tnow, "\n");
++              printf("%s %s\n", tnow, mybuffer);
++            }
+           } else
+             syslog(LOGTYPE, mybuffer);
+         }
+@@ -1000,10 +1009,14 @@
+         sprintf(mybuffer, "ARP-request - IP address not in netblock: %i.%i.%i.%i",((tpa & 0xFF000000) >> 24),
+                ((tpa & 0xFF0000) >> 16),((tpa & 0xFF00) >> 8),(tpa & 0xFF));
+         if(oflag){
+-         now = time(NULL) ;
+-         strncpy(tnow,ctime(&now),50) ;
+-         strtok(tnow,"\n") ;
+-         printf("%s %s\n", tnow, mybuffer);
++          now = time(NULL) ;
++          if(Ooflag){ 
++            printf("%lu %s\n", now, mybuffer);
++          } else {
++            strncpy(tnow, ctime(&now), 50);
++            strtok(tnow, "\n");
++            printf("%s %s\n", tnow, mybuffer);
++          }
+         } else
+           syslog(LOGTYPE, mybuffer);
+       }
+@@ -1132,9 +1145,13 @@
+              ((tpa & 0xFF00) >> 8),(tpa & 0xFF));
+       if(oflag){
+         now = time(NULL) ;
+-        strncpy(tnow,ctime(&now),50) ;
+-        strtok(tnow,"\n") ;
+-        printf("%s %s\n", tnow, mybuffer);
++        if(Ooflag){ 
++          printf("%lu %s\n", now, mybuffer);
++        } else {
++          strncpy(tnow, ctime(&now), 50);
++          strtok(tnow, "\n");
++          printf("%s %s\n", tnow, mybuffer);
++        }
+       } else
+         syslog(LOGTYPE, mybuffer);
+     }
+@@ -1166,9 +1183,13 @@
+                ((spa & 0xFF0000) >> 16),((spa & 0xFF00) >> 8),(spa & 0xFF));
+         if(oflag){
+           now = time(NULL) ;
+-          strncpy(tnow,ctime(&now),50) ;
+-          strtok(tnow,"\n") ;
+-          printf("%s %s\n", tnow, mybuffer);
++          if(Ooflag){ 
++            printf("%lu %s\n", now, mybuffer);
++          } else {
++            strncpy(tnow, ctime(&now), 50);
++            strtok(tnow, "\n");
++            printf("%s %s\n", tnow, mybuffer);
++          }
+         } else
+           syslog(LOGTYPE, mybuffer);
+       }
+@@ -1216,7 +1237,7 @@
+   signal(SIGUSR1, ToggleLogging);
+   libnet_seed_prand();
+   /* parse the command line */
+-  while((c = getopt(argc, argv, "LPodTRqF:r:i:t:lvVxsn:m:?hzap:b")) != EOF){
++  while((c = getopt(argc, argv, "LPoOdTRqF:r:i:t:lvVxsn:m:?hzap:b")) != EOF){
+     switch(c){
+     case 'L':
+       linuxflag = 1;
+@@ -1226,6 +1247,11 @@
+       break;
+     case 'R':
+       rflag = 5;
++      break;
++    case 'O':
++      Ooflag = 1;
++      oflag = 1;
++      dflag = 1;
+       break;
+     case 'o':
+       oflag = 1;

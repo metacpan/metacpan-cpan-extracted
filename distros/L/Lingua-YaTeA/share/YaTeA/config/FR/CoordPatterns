@@ -1,0 +1,14 @@
+#Decomposition	Priorite	Sens
+#NOM ADJ KON ADJ	Conséquences foetales et néonatales	Nb occ: 1
+( NOM<=T> ( ADJ<=C1> KON ADJ<=C2>  )<=E> )	1	D
+#NOM KON NOM du NOM	normalisation ou stabilisation du poids	Nb occ: 1
+( NOM<=C1> KON NOM<=C2> )<=T> du NOM<=E> )
+# ? NOM VER:ppre DET:ART NOM KON PRO:IND du NOM	continuum associant la glycémie et certaines des complications	Nb occ: 1
+
+# ? NOM avoir DET:ART du NOM de NOM ADJ KON avoir VER:pper DET:ART NOM	femmes ayant un des facteurs de risque précités ou ayant présenté un diabète	Nb occ: 1
+
+# NOM de ADJ NOM ADJ KON de NOM de NOM	cas de mauvais contrôle glycémique ou de suspicion de macrosomie	Nb occ: 1
+
+# NOM de NOM KON de NOM   principes de prévention et de prise     Nb occ: 1
+# ATTENTION : fait planter ExtracteurDeTermes_1.4.3.a.pl
+( NOM<=T> ( de NOM<=C1> KON de NOM<=C2> )<=E> )	1	G

@@ -1,0 +1,37 @@
+LIMS::Controller version 1.6b
+=============================
+
+LIMS::Controller is a suite of object-oriented Perl modules designed to be the object layer between a LIMS database and its web interface. The module provides automation for many core and advanced functions required of a web/database object layer, enabling rapid development of Perl CGI scripts. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+TESTING
+
+Testing is not implemented, but this will (hopefully) be addressed by future releases. 
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+  CGI
+  Class::DBI
+  Class::DBI::Loader
+  Net::Address::IPv4::Local
+  CGI::Upload
+  Config::IniFiles
+  Date::EzDate
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Christopher Jones, University College London
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

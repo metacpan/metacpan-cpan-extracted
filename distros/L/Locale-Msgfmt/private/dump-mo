@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+
+use Locale::Maketext::Gettext;
+my %h = read_mo(shift);
+foreach(sort keys %h){print $_ . " " . $h{$_} . "\n";};
+

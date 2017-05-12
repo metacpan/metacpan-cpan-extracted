@@ -1,0 +1,25 @@
+--- 
+abstract: MinCaml Interpreter
+author: 
+  - Yu Nejigane <nejigane@cpan.org>
+build_requires: 
+  IO::Capture::Stdout: 0
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Language-MinCaml
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Accessor::Fast: 0
+  Exporter: 0
+  Parse::Yapp::Driver: 0
+  Readonly: 0
+  perl: 5.8.1
+version: 0.01

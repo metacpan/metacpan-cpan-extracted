@@ -1,0 +1,130 @@
+Revision history for Perl extension Lemonldap::NG::Manager.
+
+See http://jira.ow2.org/browse/LEMONLDAP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel&allVersions=true
+for newer revisions
+
+0.9   Mon jun 29 11:58:54 2009
+	- Doxygen documentation
+	- Sessions.pm now use $whatToTrace parameter instead of $uid
+	- SOAP server is now obsolete (replaced by portal)
+
+0.87  Tue dec 25 9:01:21 2008
+	- New module Sessions.pm and example
+	- Configuration modules migrates to Lemonldap::NG::Common
+
+0.86  Mon aug 25 22:02:23 2008
+	- UTF8 in _i18n.pm
+	- change in default values
+
+0.85  Tue may 6 7:02:34 2008
+	- CSS update
+
+0.84  Mon apr 7 14:55:45 2008
+	- Javascript update (Closes: #308775 / forge.objectweb.org)
+
+0.83  Fri feb 8 17:45:34 2008
+	- bugs in SOAP server
+	- sessions timeout is now included in the manager
+
+0.82  Sat jul 21 15:21:32 2007
+	- TLS support in LDAP
+	- Help for new logout system
+
+0.8   Sat jun 23 21:54:27 2007
+	- New feature: syntax errors are now displayed in the manager
+	  interface
+
+0.72  Tue jun 20 22:00:15 2007
+	- Javascript rewrite
+
+0.71  Mon jun 19 22:22:33 2007
+	- Bug in javascript : a 'z' is added in regexp
+
+0.7   Tue jun 12 22:20:54 2007
+	- Changing storage format due to a bug in Storable module
+
+0.66  Tue May 15 19:53:40 2007
+	- Little bug correction: '-' is authorized in domain names
+
+0.65  Sun May 6 16:15:49 2007
+	- SOAP: HTTP basic authentication and little bug correction in
+	  'sessions' mode
+	- More tests in conf
+
+0.64  Sun Apr 29 16:18:31 2007
+	- File permissions fix to 0640 in File.pm
+	- Multiple configuration in the same server is now possible
+	- LDAP help in english
+	- LDAPS documentation
+	- Javascript control (an XML id can not start with a number)
+	- whatToTrace parameter in configuration interface
+	- Fix tree bug when an hash ref is not defined
+	- More tests
+	- Next and previous conf
+
+0.61  Thu Mar 29 21:45:44 2007
+	- configuration is checked before saving
+
+0.6   Sat Mar 17 22:13:08 2007
+	- New feature :
+	  * restricted version of Manager. Only choosen virtual hosts are
+	    displayed
+
+0.512 Tue Mar 13 7:57:30 2007
+	- New feature in Manager : "Delete VHost" button (Closes: #306761 /
+	  forge.objectweb.org)
+
+0.511 Sun Mar 11 8:24:32 2007
+	- Bug correction: lock does not work with File.pm
+	  (Closes: #306760 / forge.objectweb.org)
+
+0.51  Fri Mar 9 7:16:42 2007
+	- Bug corrections issued from test in real life.
+	- More help in english
+
+0.45  Sat Mar 3 9:26:08 2007
+	- New error system when uploading conf
+	- Verification if configuration has changed before saving
+	- New feature: "apply configuration"
+
+0.44  Sat Feb 24 16:32:34 2007
+	- Adding SOAP support to access to configuration
+
+0.43  Sun Jan 28 19:10:24 2007
+	- Little correction on patch 0.41->0.42
+
+0.42  Wed Jan 17 20:35:43 2007
+	- Correction issued from the first test in real life:
+	  * Close #306573 / forge.objectweb.org
+	  * Close #306574 / forge.objectweb.org
+
+0.41  Sun Jan 14 14:04:05 2007
+	- I18n in javascripts (close #306564 / forge.objectweb.org)
+	- Increase number of help chapter (General Parameters)
+
+0.4   Sat Jan 13 20:23:18 2007
+	- New configuration parameter named 'macros'. It can be used to
+	  declare new attributes (exported vars) calculated with Perl
+	  expressions on variables.
+	  TODO: documentation (but french help is done)
+
+0.3   Thu Jan 4 9:22:34 2007
+	- Help system skeleton and help in french
+
+0.2   Sun Dec 31 16:40:04 2006
+	- Localization (fr and en)
+
+0.1
+	- Bug corrections
+
+0.03  Sun Dec 16 12:29:12 2006
+	- Autoload does not work when inherits from CGI.
+	  Temporarly disabled
+
+0.02  Mon Dec  4 7:57:25 2006
+	- little doc
+
+0.01  Sun Dec  3 13:23:58 2006
+	- original version; created by h2xs 1.23 with options
+		-Xn Lemonldap::NG::Manager
+

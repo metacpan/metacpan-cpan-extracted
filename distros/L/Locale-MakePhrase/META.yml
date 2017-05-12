@@ -1,0 +1,28 @@
+# http://module-build.sourceforge.net/META-spec-current.html
+# FIXME Dont forget to check the spec every once in a while
+name: Locale-MakePhrase
+abstract: Language translation facility
+version: 0.5
+author:
+  - Mathew Robertson <mathew@users.sf.net>
+license: lgpl
+distribution_type: module
+requires:
+  perl: 5.008
+  Exporter: 0
+  Encode: 0
+  Encode::Alias: 0
+  Memoize: 0
+  Data::Dumper: 0
+  I18N::LangTags: 0.21
+recommends:
+  DBI: 0
+  DBD::Pg: 0
+build_requires:
+  Test: 0
+urls:
+  home: http://members.optusnet.com.au/mathew
+meta-spec:
+  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+generated_by: Mathew Robertson

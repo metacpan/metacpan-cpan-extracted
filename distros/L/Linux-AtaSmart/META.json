@@ -1,0 +1,139 @@
+{
+   "abstract" : "XS wrapper around libatasmart",
+   "author" : [
+      "Ioan Rogers <ioanr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "lgpl_3_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Linux-AtaSmart",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::PkgConfig" : "0",
+            "Module::Build" : "0.3601",
+            "Try::Tiny" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Moo" : "0",
+            "Time::Seconds" : "0",
+            "XSLoader" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "namespace::clean" : "0",
+            "perl" : "v5.10.1",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "List::Util" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::More" : "0.94",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ioanrogers/Linux-AtaSmart/issues"
+      },
+      "homepage" : "http://metacpan.org/release/Linux-AtaSmart/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ioanrogers/Linux-AtaSmart.git",
+         "web" : "https://github.com/ioanrogers/Linux-AtaSmart"
+      }
+   },
+   "version" : "2.0.0",
+   "x_BuiltWith" : {
+      "modules" : {
+         "CPAN::Meta" : "2.141170",
+         "CPAN::Meta::Requirements" : "2.125",
+         "Carp" : "1.3301",
+         "Exporter" : "5.70",
+         "ExtUtils::MakeMaker" : "6.98",
+         "ExtUtils::PkgConfig" : "1.15",
+         "File::Spec" : "3.40",
+         "File::Spec::Functions" : "3.40",
+         "IO::Handle" : "1.34",
+         "IPC::Open3" : "1.13",
+         "List::Util" : "1.38",
+         "Module::Build" : "0.4205",
+         "Moo" : "1.004002",
+         "Pod::Coverage::TrustPod" : "0.100003",
+         "Test::CPAN::Changes" : "0.27",
+         "Test::CheckDeps" : "0.010",
+         "Test::More" : "1.001003",
+         "Test::NoTabs" : "1.3",
+         "Test::Pod" : "1.48",
+         "Test::Pod::Coverage" : "1.08",
+         "Time::Seconds" : "1.27",
+         "Try::Tiny" : "0.22",
+         "XSLoader" : "0.16",
+         "base" : "2.18",
+         "constant" : "1.27",
+         "namespace::clean" : "0.25",
+         "strict" : "1.07",
+         "version" : "0.9908",
+         "warnings" : "1.18"
+      },
+      "perl" : {
+         "original" : "v5.18.2",
+         "qv" : 1,
+         "version" : [
+            5,
+            18,
+            2
+         ]
+      },
+      "perl-config" : {
+         "gccversion" : "4.8.2 20131212 (Red Hat 4.8.2-7)",
+         "myarchname" : "x86_64-linux",
+         "osname" : "linux"
+      },
+      "platform" : "linux"
+   }
+}
+

@@ -1,0 +1,45 @@
+Changes for the Labyrinth-Plugin-Links
+======================================
+
+1.08	2014-12-21
+        - fixed license fields in META.json to be lists.
+        - added homepage to META resources.
+        - extended META test suite.
+
+1.07	2014-06-10
+        - fixed skip test count.
+
+1.06	2014-06-04
+        - upgrade pre-requisite to Labyrinth-5.22.
+        - extended test suite.
+
+1.05	2014-04-24
+        - skip functional tests if we cannot create test environment.
+        - added error reporting to test handler.
+        - more diagnostics added to test suite.
+
+1.04	2014-04-17
+        - extended protocols acceptable in href string.
+        - database schema moved to UTF8.
+        - extended test suite.
+        - realigned field validation checks.
+        - added cleanup in test suite.
+
+1.03	2014-04-10
+        - fixed distribution name in META.
+        - updated README.
+
+1.02	2013-05-05
+        - change file dates changed to meet W3CDTF standards.
+        - added LICENSE file.
+        - rework access level requirements for admin functions.
+        - templates updated for accessibility and XHTML validation.
+        - test suite update.
+
+1.01	2012-06-10
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+1.00	2012-01-01
+        - first official release

@@ -1,0 +1,65 @@
+#!/usr/bin/perl -w -s
+
+use Lingua::StarDict::Gen;
+use Biblio::Thesaurus;
+
+our ($name,$dir);
+
+$dir ||= "D/";
+
+my $t=shift or die("usage thesarus2stardict [-name=NNN] thesaurus_file\n");
+
+$name ||= "Thesaurus_$t";
+
+$obj = thesaurusLoad($t);
+
+#Lingua::StarDict::Gen::writeDict($obj->{$obj->{baselang}}, $name);
+mkdir($dir);
+Lingua::StarDict::Gen::writeDict(terms2xdxf($obj), $name, $dir);
+
+sub terms2xdxf{
+   my $t=shift;
+   my $o={};
+   my @l = $t->languages();
+  
+   $t->downtr(
+      {-default  => sub { 
+          if(   $t->isLanguage($rel)) 
+               { "\n$rel => \t".join(",\n\t",map{"<dtrn>$_</dtrn>"} @terms)}
+          elsif($t->isExternal($rel))
+               { "\n$rel => \t".join(",\n\t",map{"<abr>$_</abr>"} @terms)}
+          else { "\n$rel => \t".join(",\n\t",map{"<kref>$_</kref>"} @terms)}
+           },
+       -eachTerm => sub { $o->{$term}="<ar>$_</ar>" },
+#      -end      => sub { "Thesaurus :\n $_ \nFIM\n"},
+       -order    => ["DEF", "DOM", @l,"IOF","BT","NT","RT"],
+   });
+   $o;
+}
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+theseaurus2stardict - generates Stardict files from thesuaurus
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head2 EXPORT
+
+=head1 AUTHOR
+
+J.Joao Almeida, jj@di.uminho.pt
+
+=head1 SEE ALSO
+
+perl(1).
+
+Bibio::Thesaurus(3pm)
+
+=cut      
+

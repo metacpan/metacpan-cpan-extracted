@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/LWP-Authen-Negotiate.t
+lib/LWP/Authen/Negotiate.pm
+META.yml                                 Module meta-data (added by MakeMaker)

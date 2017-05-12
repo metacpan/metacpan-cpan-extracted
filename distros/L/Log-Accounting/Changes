@@ -1,0 +1,11 @@
+Revision history for Perl extension Log::Accounting.
+
+0.1  Mon Apr 26 10:45:09 2004
+	- original version; created by h2xs 1.19
+
+0.2  Mon Apr 26 18:45:09 2004
+	- split from Net::Accounting::Sendmail
+
+0.3  Tue Apr 27 08:45:09 2004
+	- renamed to Log::Accounting
+

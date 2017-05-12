@@ -1,0 +1,8 @@
+---
+pod_spelling_system:
+  stopwords:
+    - LAPD
+    - Los
+    - Angeles
+    - Netflix
+    - OneTwo

@@ -1,0 +1,65 @@
+[% 
+    title = IF data.photoid ; THEN ; 'Edit Photo' ; ELSE ; 'Add Photo' ; END ;
+
+    crumb2_name = 'Gallery' ;
+    crumb2_href = '/album-admin' ;
+    crumb1_name = title ;
+%]
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="album-photosave" />
+<input type="hidden" name="photoid" value="[% data.photoid %]" />
+
+<div class="boxer">
+<table class="blocker">
+[% IF data.pageid %]
+<tr><th>Photo No.</th>
+    <td></td>
+    <td>[% record.photoid %]</td></tr>
+<tr><th>Page</th>
+    <td class="red">[% data.pageid_err %]</td>
+    <td><select name="pageid">
+
+[% FOREACH pg = pages %]
+<option value="[% pg.pageid %]" [% IF pg.pageid == data.pageid %]selected="selected"[% END %]>[% pg.title %]</option>
+[% END %]
+
+        </select></td></tr>
+[% ELSE %]
+<tr><th>Area</th>
+    <td class="red">[% data.title_err %]</td>
+    <td><select name="area">
+
+[% FOREACH senario = data.senarios %]
+<option value="[% senario.id %]" [% IF senario.id == 2 %]selected="selected"[% END %]>[% senario.title %]</option>
+[% END %]
+
+        </select></td></tr>
+[% END %]
+
+<tr><th>Hidden</th>
+    <td class="red">[% data.hide_err %]</td>
+    <td><input type=checkbox name="hide" size="30" [% IF data.hide %]checked="checked"[% END %] /></td></tr>
+<tr><th>Thumbnail</th>
+    <td class="red">[% data.thumb_err %]</td>
+    <td><input type="text" name="thumb" size="30" value="[% data.thumb %]" /></td></tr>
+<tr><th></th>
+    <td></td>
+    <td><img src="[% webpath %]/photos/[% data.thumb %]" height="50" /></td></tr>
+<tr><th>Photo</th>
+    <td class="red">[% data.image_err %]</td>
+    <td><input type="text" name="image" size="30" value="[% data.image %]" /></td></tr>
+<tr><th></th>
+    <td></td>
+    <td><img src="[% webpath %]/photos/[% data.image %]" /></td></tr>
+<tr><th>Tagline</th>
+    <td class="red">[% data.tagline_err %]</td>
+    <td><input type="text" name="tagline" size="30" value="[% data.tagline %]" /></td></tr>
+</table>
+</div>
+
+<div class="boxer">
+<p class="smalltext"><input type=image src="[% webpath %]/images/icons/save.gif" alt="save page" /> - Save Page</p>
+</div>
+
+</form>

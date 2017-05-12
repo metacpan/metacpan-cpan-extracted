@@ -1,0 +1,15 @@
+Revision history for LCS::XS.
+
+0.04  2015-07-07 12:25:36 CEST
+        - repair dist for release
+
+0.03  2015-07-07 10:10:36 CEST
+        - make solaris compiler happy
+
+0.02  2015-06-23 22:52:36 CEST
+        - backwards compatible
+        - test requires
+        - min perl version
+
+0.01  2015-06-21 19:48:36 CEST
+        - first release

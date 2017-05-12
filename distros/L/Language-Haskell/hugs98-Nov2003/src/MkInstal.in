@@ -1,0 +1,83 @@
+################################################################
+# Installation (Unix only)
+#
+# We install the standard libraries and the simple demos.
+# We don't install things which don't work on Unix 
+# (Win32, Graphics).
+# 
+# We use the autoconf-supplied install-sh to create directories
+# but use /bin/cp to copy data because install-sh can't copy
+# multiple files at once.
+################################################################
+
+INSTALL		= unix/install-sh
+INSTALL_DATA	= /bin/cp
+
+install		:: install_bin install_libraries      # the bare minimum
+install		:: install_demos		      # goodies
+install		:: install_man                        # manual page
+install		:: install_notes                      # Readme, etc
+install		:: install_guide                      # User's Guide
+
+install_rpm	:: install_bin install_libraries
+install_rpm	:: install_demos
+install_rpm	:: install_man
+# in particular, don't install notes, this is handled by the spec file
+
+install_bin	:: hugs$(EXE) runhugs$(EXE) ffihugs$(EXE) libraries
+		$(INSTALL) -d $(DESTDIR)$(bindir)
+		$(INSTALL) -c hugs$(EXE) $(DESTDIR)$(bindir)
+		$(INSTALL) -c runhugs$(EXE) $(DESTDIR)$(bindir)
+		$(INSTALL) -c ffihugs$(EXE) $(DESTDIR)$(bindir)
+		$(INSTALL) -c -m 0755 unix/hugs-package $(DESTDIR)$(bindir)
+
+install_demos	::
+		$(INSTALL) -d $(DESTDIR)$(hugsdir)/demos
+		$(INSTALL) -d $(DESTDIR)$(hugsdir)/demos/prolog
+		$(INSTALL_DATA) ../demos/*.*           $(DESTDIR)$(hugsdir)/demos
+		$(INSTALL_DATA) ../demos/prolog/*.*    $(DESTDIR)$(hugsdir)/demos/prolog
+		$(INSTALL_DATA) ../demos/prolog/readme $(DESTDIR)$(hugsdir)/demos/prolog
+		$(INSTALL_DATA) ../demos/prolog/stdlib $(DESTDIR)$(hugsdir)/demos/prolog
+		if test -d $(FPTOOLS)/libraries/GLUT/examples ; then \
+			$(INSTALL) -d $(DESTDIR)$(hugsdir)/demos/GLUT ; \
+			for exampledir in Misc RedBook ; do \
+				$(INSTALL) -d $(DESTDIR)$(hugsdir)/demos/GLUT/$$exampledir ; \
+				$(INSTALL_DATA) $(FPTOOLS)/libraries/GLUT/examples/$$exampledir/*.hs $(DESTDIR)$(hugsdir)/demos/GLUT/$$exampledir ; \
+			done ; \
+		fi
+
+install_man	::
+		$(INSTALL) -d $(DESTDIR)$(mandir)/man1
+		$(INSTALL_DATA) ../docs/hugs.1 $(DESTDIR)$(mandir)/man1
+		$(INSTALL_DATA) ../docs/hugs-package.1 $(DESTDIR)$(mandir)/man1
+
+install_notes	::
+		$(INSTALL) -d $(DESTDIR)$(hugsdir)/docs
+		$(INSTALL_DATA) ../docs/*.txt  $(DESTDIR)$(hugsdir)/docs
+		$(INSTALL_DATA) ../docs/server.*  $(DESTDIR)$(hugsdir)/docs
+		$(INSTALL_DATA) ../Readme  $(DESTDIR)$(hugsdir)
+		$(INSTALL_DATA) ../License $(DESTDIR)$(hugsdir)
+		$(INSTALL_DATA) ../Credits $(DESTDIR)$(hugsdir)
+
+install_guide	::
+		cd ../docs/users_guide; make html
+		if test -d ../docs/users_guide/users_guide ; \
+		then	$(INSTALL) -d $(DESTDIR)$(hugsdir)/docs/users_guide; \
+			$(INSTALL_DATA) ../docs/users_guide/users_guide/*.html $(DESTDIR)$(hugsdir)/docs/users_guide; \
+		fi
+
+install_libraries :: libraries
+		$(INSTALL) -d $(DESTDIR)$(hugsdir)/include
+		$(INSTALL_DATA) $(BUILD_DIR)/include/* $(DESTDIR)$(hugsdir)/include
+		$(INSTALL) -d $(DESTDIR)$(hugsdir)/oldlib
+		$(INSTALL_DATA) $(BUILD_DIR)/oldlib/* $(DESTDIR)$(hugsdir)/oldlib
+		$(INSTALL) -d $(DESTDIR)$(hugsdir)/tools
+		$(INSTALL_DATA) $(BUILD_DIR)/tools/* $(DESTDIR)$(hugsdir)/tools
+		(cd $(BUILD_DIR); find libraries -type f -print) | while read file;\
+			do	dir=`dirname $$file`;\
+				case $$file in \
+				*.hs|*.lhs|*.so) \
+					$(INSTALL) -d $(DESTDIR)$(hugsdir)/$$dir;\
+					$(INSTALL) -c $(BUILD_DIR)/$$file $(DESTDIR)$(hugsdir)/$$file ;;\
+				esac \
+			done

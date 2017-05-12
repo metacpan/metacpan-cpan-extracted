@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use FL3;
+use Getopt::Std;
+
+my %options;
+getopt('l' => \%options);
+my $lang = $options{l} || "en";
+
+print STDERR "Using language $lang\n";
+
+my ($filename, @query) = @ARGV;
+
+## init the morph analyzer
+morph(
+      $lang,
+      ProbabilityAssignment  => 'yes',
+      QuantitiesDetection    => 'no',
+      MultiwordsDetection    => 'no',
+      NumbersDetection       => 'no',
+      DatesDetection         => 'no',
+      OrthographicCorrection => 'no',
+      NERecognition          => 'no'
+     );
+
+
+local $/ = "\n\n";
+open my $fh, "< :utf8", $filename or die "Cannot open file $filename: $!\n";
+binmode STDOUT, ":utf8";
+
+while (my $line = <$fh>) {
+  my ($tokens, $sentences);
+  $tokens = tokenizer($lang)->tokenize($line);
+  $sentences = splitter($lang)->split($tokens);
+  $sentences = morph($lang)->analyze($sentences);
+  $sentences = hmm($lang)->analyze($sentences);
+
+  for my $sentence (@$sentences) {
+    my @words = $sentence->words;
+    while (@words > @query) {
+      show_match(@words[0..$#query]) if match(\@words, \@query);
+      shift @words;
+    }
+  }
+}
+
+close $fh;
+
+sub show_match {
+    my (@words) = @_;
+    print join(" ", map { $_->form } @words), "\n";
+}
+
+sub match {
+    my ($words, $query) = @_;
+
+    for my $i (0 .. $#query) {
+        next if $query->[$i] eq "_";
+
+        if ($query->[$i] =~ /^=(.*)$/) {
+            return 0 unless lc($1) eq $words->[$i]->lc_form
+        } elsif ($query->[$i] =~ /^~(.*)$/) {
+            return 0 unless lc($1) eq lc($words->[$i]->lemma)
+        } else {
+            return 0 unless $words->[$i]->tag =~ /^$query->[$i]/i
+        }
+    }
+    return 1;
+}
+
+__END__
+
+=head1 NAME
+
+fl3-nlgrep - natural language grep using Freeling3
+
+=head1 SYNOPSIS
+
+ fl3-nlgrep [options] file wordexp*
+
+where Wordexp may be:
+
+ wordexp = _     (any word)
+           =dog  (the word "dog")
+           ~miar (any wordform with with lemma miar)
+           pos   (part of speech regular expression)
+
+=head1 DESCRIPTION
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut      
+

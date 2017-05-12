@@ -1,0 +1,50 @@
+List-Filter version 0.01
+========================
+
+The List::Filter system is a generalized, extensible way of
+filtering a list of items by apply a stack of perl regular
+expressions, with a persistant storage mechanism to allow
+the sharing of filters between different applications.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This package requires these other modules and libraries:
+
+ Class::Base 
+ Module::List 
+ Module::List::Pluggable 
+ YAML 
+ DBI 
+
+ Test::File::Contents 
+ Test::More 
+
+ Carp 
+ Data::Dumper 
+ Env 
+ Exporter 
+ File::Basename 
+ File::Copy 
+ File::Path 
+ Hash::Util 
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Joseph Brenner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

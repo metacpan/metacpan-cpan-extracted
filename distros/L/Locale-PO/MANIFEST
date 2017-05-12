@@ -1,0 +1,25 @@
+Changes
+lib/Locale/PO.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/fuzzy.pot
+t/fuzzy.t
+t/plurals.pot
+t/plurals.t
+t/RT40009.po
+t/RT40009.t
+t/RT42811.po
+t/RT42811.t
+t/RT87374.po
+t/RT87374.t
+t/RT94231.po
+t/RT94231.t
+t/singular.t
+t/subclass.t
+t/test.pot
+t/test1.pot
+t/utf-8.po
+t/utf-8.t
+META.json                                Module JSON meta-data (added by MakeMaker)

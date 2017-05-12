@@ -1,0 +1,39 @@
+Revision history for Perl module Lingua::Strfname.
+
+0.13  2011-06-20T05:26:29
+      - Moved repostitory to
+        [GitHub](https://github.com/theory/lingua-strfname/).
+      - Switched to a "traditional" `Makefile.PL`.
+      - Require Test::Pod 1.41 to run the Pod tests.
+
+0.12  2008-06-23T17:53:35
+      - Fixed a pasto in the "Support" section of the documentation.
+      - Updated copyright.
+      - Enforce requirement for Perl 5.6.
+
+0.11  2008-05-02T20:42:40
+      - Added the "configure_requires", "build_requires", and "recommends"
+        parameters to Build.PL.
+      - Updated the POD test to take proper advantage of Test::Pod 1.20 or
+        newer.
+      - Rewrote t/01basic.t to use Test::More instead of Test. Hard to believe
+        that this module was written so long ago!
+      - Added a link to the Subversion repository.
+
+0.10  Mon Oct  6 20:44:45 2003
+      - Added "%g" template for a separate "generation" name part. This Forces
+        more arguments to be passed to strfname, which, if you used extra
+        names in the past, breaks backwards compatability. Hence the bump to
+        version 0.10.
+
+0.03  Tue Aug 26 02:03:06 2003
+      - Reorganized disstribution to be more like other Perl modules.
+      - Added POD testing.
+      - Switched to Module::Build
+
+0.02  Sat Dec 29 17:54:03 2001
+      - Corrected some inconsistencies in the documentation. Otherwise unchanged.
+
+0.01  Sat Dec 29 16:38:08 2001
+      - Initial Public Release.
+

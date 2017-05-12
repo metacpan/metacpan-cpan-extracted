@@ -1,0 +1,8 @@
+msgctxt "one"
+msgid "foo"
+msgstr "bar"
+
+msgctxt "two"
+msgid "foo"
+msgstr "baz"
+

@@ -1,0 +1,40 @@
+#########################################################################
+#
+# $Id: rkeys.txt,v 1.1 2006/01/07 23:50:44 pkaluski Exp $
+# $Name: Stable_0_16 $
+#
+# $Log: rkeys.txt,v $
+# Revision 1.1  2006/01/07 23:50:44  pkaluski
+# Unit test for new tool chain implemented. Session manager not needed any more.
+#
+#
+#########################################################################
+
+select_name: authors
+key_columns: au_id
+%%
+select_name: editors
+key_columns: ed_id
+%%
+select_name: publishers
+key_columns: pub_id
+%%
+select_name: roysched
+key_columns: title_id,lorange
+%%
+select_name: sales
+key_columns: sonum:2
+%%
+select_name: salesdetails
+key_columns: sonum, title_id 
+%%
+select_name: titleauthors
+key_columns: au_id, title_id 
+%%
+select_name: titleditors
+key_columns: ed_id, title_id 
+%%
+select_name: titles
+key_columns: title_id 
+%%
+

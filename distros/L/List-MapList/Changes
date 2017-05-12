@@ -1,0 +1,18 @@
+Revision history for List-MapList
+
+1.123     2013-09-21 15:47:52 Asia/Tokyo
+        - repackage, update metadata, tiny code tweaks
+
+1.122     2012-03-31
+        - documentation tweaks
+
+1.121     2006-11-15
+        - packaging enhancements
+        - minor code tweaks
+
+1.12      2005-03-18 16:00
+        - fixed sample code to work
+        - added test
+
+1.10      2004-08-23 10:55
+        - cleaned up initial release

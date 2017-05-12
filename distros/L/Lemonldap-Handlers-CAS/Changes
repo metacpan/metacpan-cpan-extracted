@@ -1,0 +1,8 @@
+Revision history for Perl extension Lemonldap::Handlers::CAS.
+
+0.01  Thu Mar 29 17:19:39 2007
+	- original version; created by h2xs 1.23 with options
+		-XAn Lemonldap::Handlers::CAS
+1.1  Mon Dec 15 
+         - improve statement
+	 

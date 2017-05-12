@@ -1,0 +1,92 @@
+[% USE String -%]
+[% IF q.preamble %]<p>[% q.preamble %]</p>[% END -%]
+[% qu = q.name -%]
+[% gr = graphs.$qu -%]
+[% IF gr -%]
+<p><a href="[% CODE %]-images/[% gr.image %]" rel="lightbox[sect1]" title="[% section.label %]: [% q.label %]"><img src="[% CODE %]-images/[% gr.thumb %]" alt="[% q.label %] pie chart" /></a></p>
+[% END -%]
+[% IF q.type == 'select' OR q.type == 'radio' OR q.type == 'private' -%]
+<table summary="[% q.label %] data">
+<tr><th class="number">Count</th><th>Description</th></tr>
+[% FOREACH option = q.options -%]
+[% ov = option.value -%]
+<tr><td align="right" width="100">[% str = String.new(results.$qu.$ov.value); str.right(4) %]</td><td>[% option.key %]</td></tr>
+[% END -%]
+[% qux = q.name _ 'X' -%]
+[% IF results.$qux.value -%]
+</table>
+<ul>
+[% FOREACH def = results.$qux.value -%]
+<li>[% def %]</li>
+[% END -%]
+</ul>
+[% ELSE -%]
+</table>
+[% END -%]
+[% END -%]
+[% IF q.type == 'checkbox' -%]
+[% IF ! question.multijoin || question.multijoin == 1 ; THEN ; IF question.multijoin == 1 ; THEN ; question.multijoin = 2 ; END %]<table>
+<tr><th class="number">Count</th><th>Description</th></tr>[% END %]
+<tr><td align="right" width="100">[% str = String.new(results.$qu.value); str.right(4) %]</td><td>[% q.options.0.key %]</td></tr>
+[% IF q.default -%]
+[% IF ! question.multijoin || question.multijoin == 2 ; THEN ; IF question.multijoin == 2 ; THEN ; question.multijoin = 1 ; END %]</table>[% END -%]
+<ul>
+[% qux = q.name _ 'X' -%]
+[% FOREACH def = results.$qux.value -%]
+<li>[% def %]</li>
+[% END -%]
+</ul>
+[% ELSE -%]
+[% IF ! question.multijoin %]</table>[% END -%]
+[% END -%]
+[% END -%]
+[% IF q.type == 'count' -%]
+[% IF q.group ; THEN ; group = q.group -%]
+[% IF ! groups.$group.done -%]
+[% IF question.multijoin == 2; THEN ; multiple = 1 %]</table>[% END -%]
+<table summary="[% q.label %] data">
+<tr><th class="number">Attended [% group %]</th>[% FOREACH o = groups.$group.options %]<th>[% o %]</th>[% END %]<th>total</th></tr>
+[% FOREACH row = groups.$group.results.keys.sort -%]
+<tr><td align="right">[% results.$row.name %]</td>[% FOREACH o = groups.$group.options %]<td align="right" width="20">[% groups.$group.results.$row.$o %]</td>[% END %]<td align="right" width="20">[% results.$row.value %]</td></tr>
+[% END -%]
+</table>
+[% END ; groups.$group.done = 1 -%]
+[% ELSE -%]
+[% IF ! question.multijoin || question.multijoin == 1 %]<table>
+<tr><th class="number">Count</th><th>Description</th></tr>[% END; IF question.multijoin == 1 ; THEN ; question.multijoin = 2 ; END -%]
+[% FOREACH option = q.options -%]
+<tr><td align="right" width="100">[% str = String.new(results.$qu.value); str.right(4) %]</td><td>[% option.key %]</td></tr>
+[% END -%]
+[% IF ! question.multijoin %]</table>[% END -%]
+[% END -%]
+[% END -%]
+[% IF q.type == 'text' OR q.type == 'textarea' -%]
+<ul>
+[% FOREACH r = results.$qu.value %]<li>[% r %]</li>
+[% END -%]
+</ul>
+[% END -%]
+[% IF q.type == 'currency' -%]
+[% IF ! question.multijoin || question.multijoin == 1 %]<table summary="[% q.label %] data">
+<tr><th class="number">Count</th><th>Fee</th></tr>[% END; IF question.multijoin == 1 ; THEN ; question.multijoin = 2 ; END -%]
+[% FOREACH r = results.$qu; k = r.key -%]
+<tr><td align="right" width="100">[% str = String.new(results.$qu.$k.value); str.right(4) %]</td><td>[% q.pre %] [% r.key %] [% q.post %]</td></tr>
+[% END -%]
+[% IF ! question.multijoin %]</table>[% END -%]
+[% END -%]
+[% IF q.type == 'matrix' -%]
+<table summary="[% q.label %] data">
+<tr><th>[% str = String.new('Choices'); str.left(30); opt = 1; FOREACH option = q.options %]</th><th align="right" width="100">[% str = String.new(opt); str.right(4);opt = opt + 1; END %]</th></tr>
+[% inx = 0 -%]
+[% FOREACH choice = q.choices; opt = 1 -%]
+<tr><th>[% str = String.new(choice); str.left(30) %]</th>[% FOREACH option = q.options %]<td align="right" width="100">[% str = String.new(results.$qu.$inx.$opt.value); str.right(4) %]</td>[% opt = opt + 1; END %]</tr>
+[% inx = inx + 1 -%]
+[% END -%]
+</table>
+
+<p>
+Key:<br />
+[% opt = 1; FOREACH option = q.options; opt %] = [% option; opt = opt + 1 %]<br />[% END -%]
+</p>
+[% END -%]
+[% IF q.footnote %]<p>[% q.footnote %]</p>[% END -%]

@@ -1,0 +1,31 @@
+Log-Log4perl-Appender-Elasticsearch
+
+The package contains two modules, that provide ability to write log entries to Elasticsearch.
+
+  * Log::Log4perl::Appender::Elasticsearch sends log entries via Elasticsearch Index API.
+
+  * Log::Log4perl::Appender::Elasticsearch::Bulk does the same task by using Elasticsearch Bulk API.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Log::Log4perl::Appender::Elasticsearch
+    perldoc Log::Log4perl::Appender::Elasticsearch::Bulk
+
+LICENSE AND COPYRIGHT
+
+Copyright 2014, 2015 by Alexei Pastuchov palik at cpan.org.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

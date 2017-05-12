@@ -1,0 +1,15 @@
+Revision history for XML-Atom-Log
+
+0.03  Wed Dec  7 14:08:06 GMT 2005
+        - Add support for a feed/author element.
+        - Better validation of parameters in log_message()
+        - Add a default feed/entry/id (overrideable).
+
+0.02  Mon Nov 14 12:55:44 GMT 2005
+        - More diagnostics in the test output.
+        - Correct license info.
+
+0.01  Tue Sep 20 07:52:17 2005
+       Initial release.
+
+@(#) $Id: Changes 1097 2005-12-07 14:10:49Z dom $

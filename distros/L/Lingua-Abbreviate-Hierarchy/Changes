@@ -1,0 +1,13 @@
+Revision history for Lingua-Abbreviate-Hierarchy
+
+0.01    2009-05-29
+        - Initial release.
+
+0.02    2009-05-30
+        - Added the C<ex> method.
+
+0.03    2009-05-30
+        - Add missing t/expand.t to MANIFEST
+
+0.04    2009-06-05
+        - Add missing Test::Differences dependency to Build.PL

@@ -1,0 +1,13 @@
+Installation instructions for Lingua::SA
+
+To install this module, do this:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+To install in a non-standard dir., supply a prefix to perl Makefile.PL
+
+Or you may use the CPAN.pm module, which will automatically execute
+these steps for you.  See 'perldoc CPAN' for the details.

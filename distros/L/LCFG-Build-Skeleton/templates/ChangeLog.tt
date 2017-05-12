@@ -1,0 +1,5 @@
+[% USE date %]
+[% date.format(date.now, '%Y-%m-%d') +%]  [%+ pkgspec.author %]
+
+	* Created with lcfg-skeleton
+

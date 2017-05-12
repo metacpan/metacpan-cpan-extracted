@@ -1,0 +1,6 @@
+Revision history for Perl extension Log::Delimited.
+
+0.01  Tue May  7 16:14:05 2002
+	- original version; created by h2xs 1.20 with options
+		-X Log::Delimited
+

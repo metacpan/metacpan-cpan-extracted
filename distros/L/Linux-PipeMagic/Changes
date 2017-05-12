@@ -1,0 +1,14 @@
+Revision history for Perl extension Linux::PipeMagic.
+
+0.03  Tue Jan 31 11:55:54 2012
+    - Add sendfile(2) support.
+
+0.02  Tue Aug 9 08:46:00 2011
+    - Add dependencies to MakeFile.PL.
+    - Add further documentation.
+    - Don't export symbols by default.
+
+0.01  Tue Jul 26 20:41:33 2011
+	- original version; created by h2xs 1.23 with options
+		-n Linux::PipeMagic
+

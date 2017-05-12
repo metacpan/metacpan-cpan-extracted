@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+MacHebrew.pm
+MacHebrew.xs
+addition.map
+hebrew.map
+mkheader
+t/argu.t
+t/test.t

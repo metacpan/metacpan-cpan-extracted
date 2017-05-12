@@ -1,0 +1,28 @@
+[% 
+    htmltitle = 'Profiles' ;
+    title = htmltitle ;
+
+    crumb1_name = 'Profiles' ;
+%]
+
+<h4>Current Line-up</h4>
+<div class="blocker">
+<ul>
+[% FOREACH item = mainarts %]
+<li><a href="/who/item?name=[% item.data.quickname %]">[% item.data.title %]</a> ([% item.data.snippet %])</li>
+[% END %]
+</ul>
+</div>
+
+<h4>Past Members</h4>
+<div class="blocker">
+<ul>
+[% FOREACH item = archive %]
+<li><a href="/who/item?name=[% item.name %]">[% item.title %]</a> ([% item.snippet %])</li>
+[% END %]
+</ul>
+</div>
+
+<h2>[% page.section.data.title %]</h2>
+[% block = page.section.body %]
+[% INCLUDE "articles/arts-block.html" %]

@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use LucyX::Suggester;
+
+my $usage = "$0 query path/to/index\n";
+die $usage unless @ARGV;
+
+my $query     = shift(@ARGV);
+my $suggester = LucyX::Suggester->new( indexes => [@ARGV] );
+my $matches   = $suggester->suggest($query);
+for my $m (@$matches) {
+    printf( "%s\n", $m );
+}

@@ -1,0 +1,76 @@
+@CHARSET "ISO-8859-1";
+
+#chanContents {
+
+	
+}
+
+#quartz-content #list-body #chanContents ol {
+	clear: both ;
+}
+
+#quartz-content #list-body #chanContents .channels {
+	clear: both ;
+}
+
+#quartz-content #list-body #chanContents ol li {
+	display: inline ;
+	float: left ;
+	position: relative ;
+	text-align: center ;
+	width: 220px ;
+	background: none ;
+	height: auto ;
+}
+
+
+#quartz-content #list-body #chanContents .channel {
+	margin: 10px auto ;
+	height: 120px ;
+	width: 204px ;
+}
+
+#quartz-content #list-body #chanContents .channel a {
+	border: none ;
+}
+
+
+#quartz-content #list-body #chanContents .channel span {
+	display: block ;
+	position: absolute ;
+	left: 30px ;
+}
+
+#quartz-content #list-body #chanContents .channel span.chan {
+	top: 25px ;
+	font-weight: bold ;
+}
+
+#quartz-content #list-body #chanContents .channel span.lcn {
+	top: 50px ;
+	font-size: 14px ;
+	font-style: italic ;
+}
+
+#quartz-content #list-body #chanContents .channel span.sel {
+	/* 100 - 32 = 68/2 = 34 */
+	top: 28px ;
+	left: 160px ;
+}
+
+#quartz-content #list-body #chanContents .chanHead {
+
+	padding-top: 20px ;
+	padding-bottom: 5px ;
+	margin-bottom: 10px ;
+	background-position: left bottom ;
+	background-repeat: no-repeat ;
+}
+
+
+#quartz-content #list-body #chanContents .chanCaption {
+	font-size: 12px ;
+	margin: 0px 10px 0 10px ;
+	text-align: center ;
+}
+

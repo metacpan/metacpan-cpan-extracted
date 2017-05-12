@@ -1,0 +1,36 @@
+---
+abstract: 'Map ISO codes to localized country names'
+author:
+  - 'Bernhard Graf <graf@cpan.org>'
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Greg Oschwald <oschwald@cpan.org>'
+build_requires:
+  Test::More: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-Country-Multilingual
+requires:
+  Carp: '0'
+  Class::Data::Inheritable: '0'
+  File::Spec: '0'
+  Symbol: '0'
+  base: '0'
+  constant: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/maxmind/Locale-Country-Multilingual/issues
+  homepage: https://metacpan.org/pod/Locale::Country::Multilingual
+  repository: git://github.com/maxmind/Locale-Country-Multilingual.git
+version: '0.25'
+x_contributors:
+  - 'Gregory Oschwald <oschwald@gmail.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'

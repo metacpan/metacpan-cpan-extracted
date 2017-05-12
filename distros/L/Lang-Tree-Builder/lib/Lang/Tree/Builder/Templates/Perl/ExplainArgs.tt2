@@ -1,0 +1,7 @@
+[% DEFAULT condition = "must be" type = "var" -%]
+[% FOREACH arg IN class.args -%]
+[% UNLESS loop.first %][% IF loop.last %] and [% ELSE %], [% END %][% END -%]
+C<[% IF type == "var" %]$[% arg.argname.uncamel %][% ELSE %][% arg.argname.getMethod %]()[% END %]>
+[% condition %] a
+[% IF arg.is_scalar %]simple scalar[% ELSE %]C<[% arg.name %]>[% END -%]
+[% END %][% IF class.args.sz %].[% END %]

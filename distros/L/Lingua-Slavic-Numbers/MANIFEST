@@ -1,0 +1,19 @@
+Changes
+MANIFEST			This list of files
+Makefile.PL
+Build.PL
+README
+lib/Lingua/Slavic/Numbers.pm
+lib/Lingua/BG/Numbers.pm
+t/00_basict.t
+t/10_integers.t
+t/20_object_oriented.t
+t/30_decimals.t
+t/40_errors.t
+t/50_ordinates.t
+t/60_bg.t
+t/rig.pm
+t/decimals
+t/numbers
+t/ordinates
+META.yml                                 Module meta-data (added by MakeMaker)

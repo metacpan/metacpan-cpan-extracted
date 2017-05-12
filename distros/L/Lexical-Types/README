@@ -1,0 +1,262 @@
+NAME
+    Lexical::Types - Extend the semantics of typed lexicals.
+
+VERSION
+    Version 0.15
+
+SYNOPSIS
+        { package Str; }
+
+        {
+         package My::Types::Str;
+
+         sub new { bless { }, shift }
+        }
+
+        use Lexical::Types as => sub { 'My::Types::' . $_[0] => 'new' };
+
+        my Str $x; # $x is now a My::Types::Str object
+
+        {
+         package My::Types::Int;
+
+         sub TYPEDSCALAR { bless { }, shift }
+        }
+
+        use Lexical::Types;
+
+        use constant Int => 'My::Types::Int';
+
+        my Int $y; # $y is now a My::Types::Int object
+
+DESCRIPTION
+    This pragma allows you to hook the execution of typed lexicals
+    declarations ("my Str $x") by calling a configurable method in a
+    configurable package at each run. In particular, it can be used to
+    automatically tie or bless typed lexicals whenever they are initialized.
+
+    Remind that for "perl" to be able to parse "my Str $x", you need :
+
+    *   either the "Str" package to be defined ;
+
+    *   or for "Str" to be a constant sub returning a valid defined package.
+
+    so make sure you follow one of those two strategies to define your
+    types.
+
+    This pragma is not implemented with a source filter.
+
+METHODS
+  "import"
+        use Lexical::Types;
+        use Lexical::Types as => $prefix;
+        use Lexical::Types as => sub { ... }; # = $mangler
+
+    Magically called when "use Lexical::Types" is encountered. All the
+    occurences of "my Str $x" in the current lexical scope will be changed
+    to call at each run a given method in a given package. The method and
+    package are determined by the parameter 'as' :
+
+    *   If it's left unspecified, the "TYPEDSCALAR" method in the "Str"
+        package will be called.
+
+            use Lexical::Types;
+            my Str $x; # calls Str->TYPEDSCALAR
+
+    *   If a plain scalar $prefix is passed as the value, the "TYPEDSCALAR"
+        method in the "${prefix}::Str" package will be used.
+
+            use Lexical::Types as => 'My::'; # or "as => 'My'"
+            my Str $x; # calls My::Str->TYPEDSCALAR
+
+    *   If the value given is a code reference $mangler, it will be called
+        at compile-time with arguments 'Str' and 'TYPEDSCALAR' and is
+        expected to return :
+
+        *   either an empty list, in which case the current typed lexical
+            definition will be skipped (thus it won't be altered to trigger
+            a run-time hook) ;
+
+                use Lexical::Types as => sub {
+                 return $_[0] =~ /Str/ ? @_ : ()
+                };
+                my Str $y; # calls Str->TYPEDSCALAR
+                my Int $x; # nothing special
+
+        *   or the desired package and method name, in that order (if any of
+            those is "undef", the default value will be used instead).
+
+                use Lexical::Types as => sub { 'My', 'new_' . lc($_[0]) };
+                my Str $x; # the coderef indicates to call My->new_str
+
+        Note that if the type is a constant, $_[0] will be set to the
+        *value* of constant and not to its name.
+
+            use Lexical::Types as => sub { $_[0] => 'new' };
+            use constant Str => 'MyStr';
+            my Str $x; # calls MyStr->new
+
+        This means in particular that you can't both use constant types and
+        redirect several types to different methods of the same package,
+        because then you can't distinguish between the original types with
+        $_[0].
+
+  "unimport"
+        no Lexical::Types;
+
+    Magically called when "no Lexical::Types" is encountered. Turns the
+    pragma off.
+
+RUN-TIME INITIALIZER METHOD
+    The initializer method receives an alias to the pad slot of the
+    initialized lexical in $_[1] and the original type name in $_[2]. You
+    can either edit $_[1] in place, in which case you should return an empty
+    list, or return a new scalar that will be copied into the pad slot.
+
+        use Lexical::Types as => 'My';
+
+        my Str $x;
+
+        ...
+
+        sub My::Str::TYPEDSCALAR {
+         # $_[1] is an alias to $x, and $_[2] is 'Str'
+         ...
+        }
+
+INTEGRATION
+    You can integrate Lexical::Types in your module so that using it will
+    provide types to your users without asking them to load either
+    Lexical::Types or the type classes manually.
+
+        package MyTypes;
+
+        BEGIN { require Lexical::Types; }
+
+        sub import {
+         eval 'package Str; package Int'; # The types you want to support
+         Lexical::Types->import(
+          as => sub { __PACKAGE__, 'new_' . lc($_[0]) }
+         );
+        }
+
+        sub unimport {
+         Lexical::Types->unimport;
+        }
+
+        sub new_str { ... }
+
+        sub new_int { ... }
+
+    If you prefer to use constants rather than creating empty packages, you
+    can replace the previous example with something like this :
+
+        package MyTypes;
+
+        BEGIN { require Lexical::Types; }
+
+        sub import {
+         my $pkg = caller;
+         for (qw<Str Int>) {
+          my $type = __PACKAGE__ . '::' . $_;
+          no strict 'refs';
+          no warnings 'redefine';
+          *{$pkg.'::'.$_} = eval "sub () { '$type' }";
+         }
+         Lexical::Types->import(
+          as => sub { $_[0] => 'new' }
+         );
+        }
+
+        sub unimport {
+         Lexical::Types->unimport;
+        }
+
+        package MyTypes::Str;
+
+        sub new { ... }
+
+        package MyTypes::Int;
+
+        sub new { ... }
+
+CONSTANTS
+  "LT_THREADSAFE"
+    True iff the module could have been built with thread-safety features
+    enabled.
+
+  "LT_FORKSAFE"
+    True iff this module could have been built with fork-safety features
+    enabled. This will always be true except on Windows where it's false for
+    perl 5.10.0 and below .
+
+CAVEATS
+    Using this pragma will cause a slight global slowdown of any subsequent
+    compilation phase that happens anywere in your code - even outside of
+    the scope of use of "use Lexical::Types" - which may become noticeable
+    if you rely heavily on numerous calls to "eval STRING".
+
+    The restrictions on the type (being either a defined package name or a
+    constant) apply even if you use the 'as' option to redirect to another
+    package, and are unlikely to find a workaround as this happens deep
+    inside the lexer - far from the reach of an extension.
+
+    Only one mangler or prefix can be in use at the same time in a given
+    scope.
+
+    Typed lexicals declarations that appear in code "eval"'d during the
+    global destruction phase of a spawned thread or pseudo-fork (the
+    processes used internally for the "fork" emulation on Windows) are
+    ignored.
+
+    The implementation was tweaked to work around several limitations of
+    vanilla "perl" pragmas : it's thread safe, and doesn't suffer from a
+    "perl 5.8.x-5.10.0" bug that causes all pragmas to propagate into
+    "require"d scopes.
+
+    With 5.8 perls, the pragma does not propagate into "eval STRING". This
+    is due to a shortcoming in the way perl handles the hints hash, which is
+    addressed in perl 5.10.
+
+DEPENDENCIES
+    perl 5.8.4.
+
+    A C compiler. This module may happen to build with a C++ compiler as
+    well, but don't rely on it, as no guarantee is made in this regard.
+
+    XSLoader (standard since perl 5.6.0).
+
+SEE ALSO
+    fields.
+
+    Attribute::Handlers.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
+
+BUGS
+    Please report any bugs or feature requests to "bug-lexical-types at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Lexical-Types>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Lexical::Types
+
+ACKNOWLEDGEMENTS
+    Inspired by Ricardo Signes.
+
+    Thanks Florian Ragwitz for suggesting the use of constants for types.
+
+COPYRIGHT & LICENSE
+    Copyright 2009,2010,2011,2012,2013,2014,2015 Vincent Pit, all rights
+    reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

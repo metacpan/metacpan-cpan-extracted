@@ -1,0 +1,87 @@
+Lingua/SoundChange version 0.05
+===============================
+
+This module was inspired by Mark Rosenfelder's sound change applier
+program (http://www.zompist.com/sounds.htm). It's a tool for applying
+sound changes to words -- for example, to show how words changed from
+a parent language to a daughter language.
+
+DIFFERENCES FROM THE LAST VERSION
+
+Only minor differences between 0.04 and 0.05 (one of them is that $`
+is no longer used).
+
+Note that the interface has changed between version 0.03 and 0.04.
+
+Previously, if you had a word 'oldword' that got changed to another word
+'newword', then the return list of ->change would have an element with
+'newword' in it. Or, if the 'keep' option was specified, then the return
+list of ->change would have [ 'oldword', 'newword' ]. Furthermore, if the
+'printRules' option was on, then rules would be printed to STDOUT during
+the changing of the word.
+
+These feature have now been rolled into one. Instead of the return list
+of ->change consisting either of one new word per original word, or of
+arrayrefs, it now consists of hashrefs. The keys currently in this hash
+are:
+
+* orig = the original word ('oldword' in the above example)
+* word = the changed word ('newword' in the above example)
+* rules = an arrayref containing the strings that would previously have
+  been printed to STDOUT (they each end in a newline).
+
+This means, among other things, that:
+
+* the 'keep' and 'printRules' options have gone away (in effect, they are
+  now always on)
+* if you previously used the 'printRules' option, you will now have to
+  print the rules message manually by iterating over @{ $elem->{rules} },
+  where $elem is an element of the return list of ->change
+* if you previously used, for example, $out->[0] (or $out->[0][1] with the
+  'keep' option) to access the changed word, you will now have to use
+  $out->[0]{word} instead.
+
+For changes from previous versions, see the file Changes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More, version 0.19 or newer
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001, 2002 Philip Newton
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+* Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer. 
+
+* Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution. 
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

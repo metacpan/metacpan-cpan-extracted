@@ -1,0 +1,28 @@
+[% 
+    htmltitle = 'Lyrics' ;
+    title = htmltitle ;
+
+    crumb1_name = 'Lyrics' ;
+%]
+
+<p>Click on an lyric title to view the full text.</p>
+
+<form action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="lyric-main" />
+<input type="hidden" name="sectionid" value="[% sectionid %]" />
+<p>Search lyric text: <input type="text" name="searchtext" />
+<input type="submit" value="GO" />
+|   <a href="[% cgipath %]/pages.cgi?act=lyric-main">view all</a>
+</p>
+
+<p>
+[% IF mainarts %]
+    [% FOREACH item = mainarts %]
+    &bull; <a href="[% cgipath %]/pages.cgi?act=lyric-item&amp;articleid=[% item.data.articleid %]">[% item.data.title %]</a><br />
+    [% END %]
+[% ELSE %]
+    No lyrics available
+[% END %]
+</p>
+
+</form>

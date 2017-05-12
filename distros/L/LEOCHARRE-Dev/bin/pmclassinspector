@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+use strict;
+use DMS;
+use Class::Inspector;
+use LEOCHARRE::CLI2 'pPe';
+
+CLASS: for my $class (@ARGV){
+
+   debug("Class $class\n");
+
+   my $can = Class::Inspector->methods($class);
+
+   my $got = scalar @$can;
+   debug("got $got methods\n");
+   
+   my @can =  grep { $opt_P ? !/^\_/ : 1 } @$can;
+
+
+   # export list only
+   if ($opt_e){
+      print "\@EXPORT_OK = qw/@can/;\n";
+      next CLASS;
+   }
+
+
+   for my $name ( @can ){
+      debug("working on $name");
+
+
+
+      my $h = { 
+         name   => $name, 
+         class  => $class, 
+         pod    => "=head2 $name\()\n", 
+      };
+
+
+      my $out = 
+         $opt_p ? $h->{pod} : $h->{name};
+
+      printf "%s\n", $out;
+   }
+
+}
+
+
+sub usage {
+   qq{$0 [OPTION].. CLASS..
+
+   -p          as pod
+   -P          public only methods
+   -e          print export list
+
+
+LEOCHARRE::Dev - parent package
+}}

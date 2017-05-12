@@ -1,0 +1,44 @@
+Log-Dispatch-FogBugz
+
+This module is meant to be used in conjunction with modules like Log::Log4perl.
+It is an appender class used to submit tickets to a fogbugz server.  FogBugz is
+a bug tracking system (http://fogbugz.com).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Log::Dispatch::FogBugz
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Dispatch-FogBugz
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Log-Dispatch-FogBugz
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Log-Dispatch-FogBugz
+
+    Search CPAN
+        http://search.cpan.org/dist/Log-Dispatch-FogBugz/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 CDIMARTINO
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Log-Message-Structured-Stringify-AsSereal,
+version 0.11:
+
+  Sereal-encoded base64'ed log lines
+
+This software is copyright (c) 2013 by Damien "dams" Krotkine.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

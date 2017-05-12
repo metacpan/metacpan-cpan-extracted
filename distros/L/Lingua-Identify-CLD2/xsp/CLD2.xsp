@@ -1,0 +1,101 @@
+#include <compact_lang_det.h>
+#include "myinit.h"
+#include "myconversions.h"
+
+%module{Lingua::Identify::CLD2};
+%package{Lingua::Identify::CLD2};
+
+%{
+
+void
+ExtDetectLanguage(buffer, is_plain_text, flags, content_language_hint, tld_hint, encoding_hint, language_hint, returnVectors)
+    SV *buffer
+    bool is_plain_text
+    int flags
+    char* content_language_hint
+    char* tld_hint
+    int encoding_hint
+    SV* language_hint
+    bool returnVectors
+  PPCODE:
+    char *buffer_str;
+    STRLEN buffer_length;
+    buffer_str = SvPVutf8(buffer, buffer_length);
+
+    CLDHints cld_hints_struct;
+    cld_hints_struct.content_language_hint = content_language_hint && content_language_hint[0] ? content_language_hint : NULL;
+    cld_hints_struct.tld_hint = tld_hint && tld_hint[0] ? tld_hint : NULL;
+    cld_hints_struct.encoding_hint = encoding_hint;
+    cld_hints_struct.language_hint = scalar_to_language(language_hint);
+
+    Language language3[3] = {UNKNOWN_LANGUAGE, UNKNOWN_LANGUAGE, UNKNOWN_LANGUAGE};
+    int percent3[3] = {0, 0, 0};
+    double normalized_score3[3] = {0.0, 0.0, 0.0};
+    ResultChunkVector resultchunkvector;
+    ResultChunkVector* p_resultchunkvector = returnVectors ? &resultchunkvector : 0;
+    int text_bytes = 0;
+    bool is_reliable = 0;
+    int valid_prefix_bytes = 0;
+
+    Language language =
+      ExtDetectLanguageSummaryCheckUTF8(buffer_str, (int)buffer_length, is_plain_text, &cld_hints_struct, flags,
+                                        language3, percent3, normalized_score3, p_resultchunkvector,
+                                        &text_bytes, &is_reliable, &valid_prefix_bytes);
+
+    if (valid_prefix_bytes < buffer_length) {
+        croak("input contains invalid UTF-8 around byte %d of %d", valid_prefix_bytes, buffer_length);
+    }
+
+    HV *hv = newHV();
+    SV *rv = sv_2mortal(newRV_noinc((SV *)hv));
+
+    hv_stores(hv, "language_name", newSVpv(CLD2::LanguageName(language), 0));
+    hv_stores(hv, "language_code", newSVpv(CLD2::LanguageCode(language), 0));
+
+    if (returnVectors) {
+        AV *reschunk_av = resultchunk_vector_to_array(aTHX_ resultchunkvector);
+        hv_stores(hv, "resultchunkvector", newRV_noinc((SV *)reschunk_av));
+    }
+
+    hv_stores(hv, "text_bytes", newSViv(text_bytes));
+    hv_stores(hv, "is_reliable", newSViv((int)is_reliable));
+
+    hv_stores(hv, "languages", newRV_noinc((SV*)languages_to_array(language3, percent3, normalized_score3)));
+
+    XPUSHs(rv);
+
+
+char *
+LanguageName(int language_id)
+  ALIAS:
+    LanguageName = 0
+    LanguageCode = 1
+    LanguageDeclaredName = 2
+  CODE:
+    switch (ix) {
+    case 0:
+      RETVAL = (char *)CLD2::LanguageName((CLD2::Language)language_id);
+      break;
+    case 1:
+      RETVAL = (char *)CLD2::LanguageCode((CLD2::Language)language_id);
+      break;
+    case 2:
+      RETVAL = (char *)CLD2::LanguageDeclaredName((CLD2::Language)language_id);
+      break;
+    default:
+      abort();
+    };
+  OUTPUT: RETVAL
+
+Language GetLanguageFromName(char* src);
+
+int
+LanguageCloseSet(SV* lang)
+  CODE:
+    CLD2::Language src = scalar_to_language(lang);
+    # GetLanguageFromName may return UNKNOWN_LANGUAGE, which will cause LanguageCloseSet to return 0,
+    # so we fine there. Alternatively, we could raise an exception.
+    RETVAL = CLD2::LanguageCloseSet((CLD2::Language)src);
+  OUTPUT: RETVAL
+
+%}

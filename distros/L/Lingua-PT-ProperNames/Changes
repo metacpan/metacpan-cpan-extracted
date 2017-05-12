@@ -1,0 +1,40 @@
+Revision history for Lingua-PT-ProperNames
+
+0.10    August 22, 2012
+        - Fixed documentation encoding;
+	- Fixed documentation English;
+
+0.09    September 3, 2008
+	- Removed the tilde on my name, from Makefile.PL.
+  	  Was generating some weird results on VMS and Solaris.
+
+0.08    Tue Mar 11 19:33 2008
+	- corrected skip on tests
+
+0.07    Thu May  3 22:24 2007
+	- upload problems
+
+0.06    Thu May  3 22:24 2007
+	- Force locale pt_PT on tests.
+        - do not use $' for speed.
+
+0.05    Sun Nov 14 19:15 2004
+	- Added a real ProperName dictionary file;
+	- Added an is_surname method;
+
+0.04    Mon Nov 08 20:00 2004
+	- Moved propernames dictionary to separate file;
+	- Added instalation stuf for propernames dictionary;
+
+0.03	Fri Oct 22 16:49 2004
+	- Moved to ExtUtils::MakeMaker;
+	- Added samples directory;
+	- Renamed some methods;
+	- Added documentation;
+
+0.02    Mon Oct 11 20:45 2004
+	- Added a propernames dictionary (needs refinement);
+
+0.01    Mon Oct  4 20:00 2004
+        - Moved Lingua::PT::PLN propername functions to this module;
+

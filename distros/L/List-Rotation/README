@@ -1,0 +1,26 @@
+$Id: README,v 1.6 2005/05/18 12:07:42 pelagic Exp $
+
+You can install this module in the usual Perl way:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	
+The documentation is in the module file.  Once you install
+the file, you can read it with perldoc:
+
+	perldoc List::Rotation
+	
+If you want to read it before you install it, you can use
+perldoc directly on the module file:
+
+	perldoc Rotation.pm
+	
+You can uninstall the module by calling the script ./lib/uninstall
+(coming with this distribution) from your installation directory like:
+./lib/uninstall List::Rotation
+
+Share and Enjoy, 
+Imre Saling, pelagicatcpandotorg
+

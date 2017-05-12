@@ -1,0 +1,27 @@
+---
+abstract: 'Number 2 word conversion for ENG.'
+author:
+  - 'Stephen Pandich <pandich@yahoo.com>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  bignum: 0
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300031, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-ENG-Numbers
+requires:
+  Carp: 0
+  Exporter: 0
+  base: 0
+  perl: v5.10.1
+  strict: 0
+  vars: 0
+  warnings: 0
+version: 0.1106

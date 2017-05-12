@@ -1,0 +1,26 @@
+Revision history for Perl extension Lingua::Ispell.
+
+0.07  Tue Apr 18 11:09:59 EDT 2000
+	- removed support for non-terse mode; this saves me from having to try to
+	  parse the input line the same as ispell does.  The downside is that user
+	  programs don't get reports on correctly spelled words.  Hopefully this
+	  fixes a lot of bugs.
+	- "*_dictionaries" subs renamed as "*_dictionary"
+
+0.06  Fri Apr 14 16:51:44 EDT 2000
+	- misses/guesses now returned as arrays rather than space-separated strings.
+
+0.05  Fri Oct 22 10:53:38 EDT 1999
+	- renamed from Text::Ispell
+
+0.04  Tue Oct 12 11:22:06 EDT 1999
+	- added support for additional options
+
+0.03  Mon Aug 30 15:37:42 EDT 1999
+	- Documentation upgrades.
+
+0.02  [Skipped]
+
+0.01  Fri Aug 27 15:48:07 1999
+	- original version
+

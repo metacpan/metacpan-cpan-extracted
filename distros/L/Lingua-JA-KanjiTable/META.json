@@ -1,0 +1,73 @@
+{
+   "abstract" : "User-Defined Character Properties for Joyo Kanji and Jinmeiyo Kanji",
+   "author" : [
+      "pawa <pawa@pawafuru.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-JA-KanjiTable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.99"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::JA::KanjiTable" : {
+         "file" : "lib/Lingua/JA/KanjiTable.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pawa-/Lingua-JA-KanjiTable/issues"
+      },
+      "homepage" : "https://github.com/pawa-/Lingua-JA-KanjiTable",
+      "repository" : {
+         "url" : "git://github.com/pawa-/Lingua-JA-KanjiTable",
+         "web" : "https://github.com/pawa-/Lingua-JA-KanjiTable"
+      }
+   },
+   "version" : "0.13"
+}

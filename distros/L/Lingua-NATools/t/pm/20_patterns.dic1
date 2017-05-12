@@ -1,0 +1,9 @@
+$VAR1 = {
+      "casa" => {
+             count => 10,
+             trans => {
+                   "home" => 0.2,
+                   "house" => 0.8,
+             },
+      }
+};

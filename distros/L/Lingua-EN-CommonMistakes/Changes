@@ -1,0 +1,30 @@
+Revision history for Lingua-EN-CommonMistakes
+
+20130425    2013-04-25
+
+  - added data:
+      convenenient -> convenient
+      defination -> definition
+      cencel -> cancel
+      devevelopment -> development
+      detroy -> destroy
+      explaination -> explanation
+      deniel -> denial
+      resaon -> reason
+  - removed data:
+      infos -> information
+  - fixed data:
+      centralise -> centralize is a US vs British English issue
+      analyse -> analyze is a US vs British English issue
+      customise -> customize is a US vs British issue
+
+20121219    2012-12-19
+
+  - Fixed various British -> American corrections wrongly included in the
+    base set of corrections (mostly of the form *sation -> *zation,
+    e.g. "optimisation").
+  - Added 2 new corrections
+
+20121120    2012-11-20
+
+  - Initial release

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8b332ccfa421acc0c3ece8856a31cb38e6856739 AUTHOR_PLEDGE
+SHA1 823614439ba259c40e84fcea7f7c01fa4edd504e CONTRIBUTORS
+SHA1 bd28c81dccbebf889909cf05a05494d76eb3e1aa Changes
+SHA1 5db89ea970c1a2402da3f532dc751bae3be691db INSTALL
+SHA1 825120b15226375e3d115d248331e0357fdb6071 LICENSE
+SHA1 92ba10d168a788d251f1336e63b2e04db7dd7465 MANIFEST
+SHA1 bcd0ab6f74330fd4f4b9b39b38c7f7a43edf124b META.json
+SHA1 3413559a994b51dea5e60295352e765acea09302 META.yml
+SHA1 1f6daeaeee19f6bb812827cacc00724501d44053 Makefile.PL
+SHA1 363769dcf34619bf681aab7734dd963e715067bd README
+SHA1 4caf7913936797855ed04e32d8e7c6de34702c4f README.mkdn
+SHA1 473f82cf79a4d45a734ca165fb97b34f2b8ed7b7 cpanfile
+SHA1 a5b93982546f30daa132bfff12d7210f385d7958 doap.xml
+SHA1 e325097475e7ecadd460c7f0d812f7cd2f4d41d9 lib/Language/l33t.pm
+SHA1 2aad5a7f08213b4afb8c5e37bf4dd36c631f7a81 lib/Language/l33t/Operators.pm
+SHA1 68461ff9204166f05e810079080a4bd80abdf5dc lib/Language/l33t/Specifications.pod
+SHA1 ead4e9ef694255d316453bb7a14a40741339ca8c script/l33t
+SHA1 8a2f59caf530e61f2e57d67904ae629fb7f8f498 server
+SHA1 88c50d0561a11373b833d0c78695ce80bf94d342 t/00-compile.t
+SHA1 f2a0cbad288464a941da314eb46e26324b5416b2 t/00-load.t
+SHA1 f325ff5c82297a637972086a3dedbb734a221da9 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 8cb6065c09fe753965e8ce84ad2120662b30c432 t/basic.t
+SHA1 5a0d3e3926b2fe8d0df0f55a1c0630638f3a2d6e t/sample1.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlg5z0cACgkQ34Hwf+GwC4wPJQCg6fCW9t45uVZbmCG26PNQTN9f
+k/sAoLHYwma4B5TjfTqMNHX1ppepvYvn
+=oo2L
+-----END PGP SIGNATURE-----

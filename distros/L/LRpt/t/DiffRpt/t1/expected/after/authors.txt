@@ -1,0 +1,6 @@
+au_id	au_lname	au_fname	phone	address	city	state	zip
+409-56-7008	Bennet	Abraham	415 658-9932	6223 Bateman St.	Berkeley	CA	94705
+213-46-8915	Green	Marjorie	415 986-7020	309 63rd St. #411	Oakland	CA	94618
+238-95-7766	Carson	Cheryl	415 548-7723	589 Darwin Ln.	Berkeley	CA	94705
+998-72-3567	Ringer	Albert	801 826-0752	67 Seventh Av.	Salt Lake City	UT	84152
+722-51-5454	DeFrance	Michel	219 547-9982	3 Balding Pl.	Gary	IN	46403

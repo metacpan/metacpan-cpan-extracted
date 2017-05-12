@@ -1,0 +1,22 @@
+Version 2009121601
++ When use()ing from test files, look in t first. Fixes issue #52824.
++ POD and Kwalitee tests.
++ Modernized Makefile.PL (again)
+
+Version 2009040801
++ Modernized Makefile.PL (partially by chorny)
+
+Version 2009040601
++ Moved to git and github
+
+Revision 1.4  2005/08/26 21:18:29  abigail
++ Significant changes, to numerous to mention.
+
+Revision 1.3  2005/03/03 23:42:01  abigail
++ Partial support for interpolation
+
+Revision 1.2  2005/03/03 00:58:40  abigail
++ Support for $#.array
+
+Revision 1.1  2005/02/25 00:24:02  abigail
++ First checkin

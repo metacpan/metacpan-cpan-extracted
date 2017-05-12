@@ -1,0 +1,44 @@
+--- #YAML:1.0
+name:                     Labyrinth-Paths
+version:                  0.03
+abstract:                 CGI path translation for Labyrinth
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                  artistic_2
+distribution_type:        module
+installdirs:              site
+
+requires:
+  perl:                                       5.006
+  IO::File:                                   0
+  JSON::XS:                                   0
+  Labyrinth:                                  0
+  Labyrinth::Variables:                       0
+recommends:
+  Test::CPAN::Meta:                           0
+  Test::CPAN::Meta::JSON:                     0
+  Test::Pod:                                  1.00
+  Test::Pod::Coverage:                        0.08
+build_requires:
+  Test::More:                                 0.70
+
+provides:
+  Labyrinth::Paths:
+    file:     lib/Labyrinth/Paths.pm
+    version:  0.03
+
+no_index:
+  directory:
+    - t
+    - examples
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Labyrinth-Paths
+  repository: http://github.com/barbie/labyrinth-paths
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

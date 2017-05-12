@@ -1,0 +1,11 @@
+Changes
+eg/example1.pl
+eg/example2.pl
+eg/extract.log
+eg/myxml.xml
+lib/Lemonolap/Filter4lemon.pm
+lib/Lemonolap/Wrapperolap.pm
+Makefile.PL
+MANIFEST
+README
+META.yml                                 Module meta-data (added by MakeMaker)

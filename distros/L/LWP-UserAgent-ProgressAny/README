@@ -1,0 +1,46 @@
+SYNOPSIS
+
+    Use as LWP::UserAgent subclass:
+
+     use LWP::UserAgent::ProgressAny;
+     use Progress::Any::Output;
+    
+     my $ua = LWP::UserAgent::ProgressAny->new;
+     Progress::Any::Output->set("TermProgressBarColor");
+     my $resp = $ua->get("http://example.com/some-big-file");
+     # you will see a progress bar in your terminal
+
+    Use with standard LWP::UserAgent or other subclasses:
+
+     use LWP::UserAgent;
+     use LWP::UserAgent::ProgressAny;
+     use Progress::Any::Output;
+    
+     my $ua = LWP::UserAgent->new;
+     LWP::UserAgent::ProgressAny::__add_handlers($ua);
+     Progress::Any::Output->set("TermProgressBarColor");
+     my $resp = $ua->get("http://example.com/some-big-file");
+
+DESCRIPTION
+
+    This module lets you see progress indicators when you are doing
+    requests with LWP::UserAgent.
+
+    This module uses Progress::Any framework.
+
+    Sample output:
+
+SEE ALSO
+
+    LWP::UserAgent::ProgressBar (LU::PB) is a similar module. It uses
+    Term::ProgressBar to display progress bar and introduces two new
+    methods: get_with_progress and post_with_progress. Compared to
+    LWP::UserAgent::ProgressAny (LU::PA): LU::PA uses Progress::Any so you
+    can get progress notification via means other than terminal progress
+    bar simply by choosing another progress output. LU::PA is also more
+    transparent, you don't have to use a different method to do requests.
+    Lastly, LU::PA can be used with standard LWP::UserAgent or its other
+    subclasses.
+
+    HTTP::Tiny::ProgressAny
+

@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Lingua-RU-Jcuken
+version:             1.04
+abstract:            Convert between QWERTY/JCUKEN
+license:             perl
+author:              
+    - Serguei Trouchelle <stro@railways.dp.ua>
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    Encode:                        0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,6 @@
+name = "LWP-UserAgent-DNS-Hosts"
+# badges = ["travis"]
+authority="cpan:MASAKI"
+
+module_maker="ModuleBuildTiny"
+

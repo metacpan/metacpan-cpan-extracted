@@ -1,0 +1,206 @@
+[% 
+    IF article.data.articleid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Diary' ;
+
+    crumb2_name = 'Diary' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=diary-admin' ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+[% IF thanks %]<p>Diary entry saved successfully.</p>[% END %]
+<p>Fields marked * are mandatory fields and must be completed.</p>
+
+[% IF errmess %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+[% IF errmess == 2 %]
+<p class="alert">Please note that the title must be unqiue.</p>
+[% END %]
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" name="EDIT" enctype="multipart/form-data">
+<input type="hidden" name="act" value="diary-save" />
+<input type="hidden" name="recordid" value='' />
+<input type="hidden" name="section" value="[% section %]" />
+<input type="hidden" name="articleid" value="[% article.data.articleid %]" />
+<input type="hidden" name="folderid" value="[% article.data.folderid %]" />
+<input type="hidden" name="userid" value="[% article.data.userid %]" />
+<input type="hidden" name="imageid" value="[% article.data.imageid %]" />
+<input type="hidden" name='doaction' value='' />
+
+<input type="hidden" name="display" value="display0" />
+<input type="hidden" name="list" value="[% article.blocks %]" />
+
+<div class="boxer">
+<table class="blocker">
+<tr><th width="85">Title *</th>
+    <th width="10" class="alert">[% article.data.title_err %]</th>
+    <td><input type="text" name="title" value="[% article.data.title %]" size="50" /></td>
+</tr>
+<tr><th>Status *</th>
+    <th class="alert">[% article.data.publish_err %]</th>
+    <td>[% article.data.ddpublish %]</td>
+</tr>
+<tr><th>Disable Comments</th>
+    <th class="alert">[% article.data.latest_err %]</th>
+    <td><input type="checkbox" name="latest" [% IF article.data.latest %]checked="checked"[% END %] value="1" /></td>
+</tr>
+<tr><th>Metadata</th>
+    <th class="alert">[% article.data.metadata_err %]</th>
+    <td><input type="text" id="metadata" name="metadata" value="[% article.data.metadata %]" size="50" /></td>
+</tr>
+<tr><th></th>
+    <th></th>
+    <td>[% FOREACH tag = metatags %]<a href="javascript:AddTag('[% tag %]')">[% tag %]</a> [% END %]</td>
+</tr>
+</table>
+</div>
+
+
+[% IF article.blocks %]
+[% FOREACH item = article.body %]
+[% IF item %]
+<input type="hidden" name="BLOCK[% item.orderno %]" value="[% item.type %],[% item.paraid %]" />
+[% END %]
+[% END %]
+[% END %]
+
+<div class="boxer">
+<table class="blocker">
+
+[% IF article.blocks %]
+[% FOREACH item = article.body %]
+[% IF item %]
+
+[% IF item.type == 1 %]
+<tr><th>[% item.orderno %] : Image</th>
+    <th class="alert">[% item.error %]</th>
+    <td><input type="hidden" name="display[% item.orderno %]" value="" />
+        <input type="hidden" name="gallery[% item.orderno %]" value="[% item.imageid %]" />
+    [% IF item.link %]
+        <img id="display[% item.orderno %]" src="[% webpath %]/[% item.link %]" alt="[% item.tag %]" />
+    [% ELSE %]
+        <img id="display[% item.orderno %]" src="[% webpath %]/images/blank.png" alt="" />
+    [% END %]
+        <br /><input type="file" name="IMAGEUPLOAD[% item.orderno %]" />
+        <br />[ <a href="javascript:PhotoGallery('display[% item.orderno %]')">Select from Gallery</a> ]
+        <table>
+        <tr><td>Align:</td><td colspan="3">[% item.ddalign %]</td></tr>
+        <tr><td>HyperLink:</td><td><input type="text" name="IMAGELINK[% item.orderno %]" value="[% item.href %]" /></td>
+            <td>Tag:</td><td><input       type="text" name="IMAGETAG[% item.orderno %]"  value="[% item.tag %]" /></td></tr>
+        <tr><td>Width:</td><td><input     type="text" name="width[% item.orderno %]"     value="[% item.width %]" /></td>
+            <td>Height:</td><td><input    type="text" name="height[% item.orderno %]"    value="[% item.height %]" /></td></tr>
+        </table>
+        
+        <p>Please note that when initially selecting images from the Photo Gallery, the loaded image wlll be the
+        current raw size. Once the page is saved the image will be resized to the appropriate dimensions. In the
+        width and height boxes, you may leave these blank or set to 0 to use the default settings (max 400x400 pixels).</p>
+    </td>
+</tr>
+[% END %]
+[% IF item.type == 2 %]
+<tr><th>[% item.orderno %] : Text</th>
+    <th class="alert">[% item.error %]</th>
+    <td><textarea name="TEXT[% item.orderno %]" rows="20" cols="70">[% item.body %]</textarea></td>
+</tr>
+[% END %]
+[% IF item.type == 3 %]
+<tr><th>[% item.orderno %] : Link</th>
+    <th class="alert">[% item.error %]</th>
+    <td><input type="text" name="LINK[% item.orderno %]" value="[% item.link %]" /></td>
+</tr>
+[% END %]
+<tr><th></th>
+    <th></th>
+    <td class="center">
+        [ <a href="javascript:doSubmit('MoveUp',[% item.paraid %])">Move block up</a>
+        | <a href="javascript:doSubmit('MoveDn',[% item.paraid %])">Move block down</a>
+        | <a href="javascript:doSubmit('Delete',[% item.paraid %])">Delete block</a> ]</td>
+</tr>
+[% END %]
+[% END %]
+
+[% ELSE %]
+<tr><td class="centre">No content yet!</td></tr>
+[% END %]
+
+</table>
+</div>
+
+<p align="center">[ <a href="javascript:doSubmit('AddImage',0)">Add an image</a> | <a href="javascript:doSubmit('AddPara',0)">Add a text block</a> ]
+<p align="center"><input type="submit" value="Submit" />
+
+</form>
+
+[% IF editmode == 'Edit' %]
+
+<h2>Preview</h2>
+
+<h3>[% preview.data.title %]</h3>
+<p class="small">Posted on [% preview.data.postdate %]</p>
+
+[% FOREACH item = preview.body %]
+[% IF item.type == 2 ; THEN ; item.body ; END %]
+[% IF item.type == 1 %]
+    [% IF item.link %]
+    [% IF item.align ; THEN ; class = item.alignclass ; ELSE ; class = "inline" ; END %]
+    [% IF item.href %]
+        <div class="thumb[% item.alignclass %]" >
+        <a href='[% item.href %]'><img class="[% class %]" src="[% webpath %]/[% item.link %]" alt="[% item.tag %]"
+        [% IF item.width  %]width="[% item.width %]"[% END %]
+        [% IF item.height %]height="[% item.height %]"[% END %]
+        /></a>
+        [% IF item.tag %]<p>[% item.tag %][% END %]
+        </div>
+    [% ELSE %]
+        <div class="thumb[% item.align %]" >
+        <img class="[% class %]" src="[% webpath %]/[% item.link %]" alt="[% item.tag %]"
+        [% IF item.width  %]width="[% item.width %]"[% END %]
+        [% IF item.height %]height="[% item.height %]"[% END %]
+        />
+        [% IF item.tag %]<p>[% item.tag %][% END %]
+        </div>
+    [% END %]
+    [% END %]
+[% END %]
+[% IF item.type == 3 %]
+        <a href='[% item.href %]'>[% item.body %]</a>
+[% END %]
+[% END %]
+
+    <p class="small">
+    [% IF preview.meta %]
+      File Under:
+      [% count = 0 %]
+      [% FOREACH meta = preview.meta %]
+        [% IF count > 0 %]/[% END %]
+        <a href="[% cgipath %]/pages.cgi?act=diary-meta&amp;data=[% meta %]">[% meta %]</a>
+        [% count = count + 1 %]
+      [% END %]
+      <br />
+    [% END %]
+      <a href="[% cgipath %]/pages.cgi?act=diary-item&amp;articleid=[% article.data.articleid %]#comments">[% IF comments > 0 ; THEN ; comments.size ; ELSE ; '0' ; END %] COMMENTS</a>
+    [% IF user.access > 3 %]
+    | Edit | Delete
+    [% END %]
+    </p>
+
+<h3>Comments</h3>
+[% IF comments.0 %]
+    [% FOREACH item = comments %]
+        [% IF item.subject %]<h4>[% item.subject %]</h4>[% END %]
+        [% item.body %]
+        <p class="small">Posted by <em><b>[% item.author %]</b></em> on [% item.postdate %]
+        | <a href="[% cgipath %]/pages.cgi?act=diary-cedit&amp;commentid=[% item.commentid %]">Edit</a>
+        | <a href="[% cgipath %]/pages.cgi?act=diary-cdelete2&amp;commentid=[% item.commentid %]&amp;articleid=[% article.data.articleid %]">Delete</a></p>
+        <hr />
+    [% END %]
+[% ELSE %]
+    <p>No Comments</p>
+    <hr />
+[% END %]
+
+[% IF article.data.latest %]<h3>Comments Disabled</h3>[% END %]
+
+[% END %]

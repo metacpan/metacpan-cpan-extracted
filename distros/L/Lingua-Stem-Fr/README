@@ -1,0 +1,41 @@
+Lingua-Stem-Fr version 0.01
+===========================
+
+This module is an implementation of the Porter Stemming Algorithm :
+http://snowball.tartarus.org/french/stemmer.html
+with some improvement.
+
+For example, you can stemm words in this way:
+
+** Word **  ->  ** Stemmed word **
+abandonnée           abandon
+abandonner           abandon
+abandonnera          abandon
+abondance            abond
+abondant             abond
+abondante            abond
+
+
+The code is carefully crafted to work in conjunction with the the
+Lingua::Stem module by Benjamin Franz.
+This french version is based on the work of Aldo Calpini (Italian Version)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 by Aldo Calpini <dada@perl.it>
+Copyright (C) 2004 by Sébastien Darribere-Pleyt <sebastien.darribere@lefute.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

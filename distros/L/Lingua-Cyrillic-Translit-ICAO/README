@@ -1,0 +1,45 @@
+NAME
+    Lingua::Cyrillic::Translit::ICAO -- Cyrillic characters transliteration
+    into ICAO Doc 9303
+
+SYNOPSIS
+     use Lingua::Cyrillic::Translit::ICAO qw/ cyr2icao /;
+
+     print cyr2icao('ukrainian', 'koi8-r');
+
+DESCRIPTION
+    Lingua::UK::Translit::ICAO can be used for transliteration of Cyrillic
+    characters in conformance with ICAO Doc 9303 Recommendations.
+
+METHODS
+  cyr2icao ( $string, [$language], [ $encoding ])
+    This method converts $string from Cyrillic character set to ICAO
+    transliteration.
+
+    Optional $language parameter allow to specify $string's language. Valid
+    values are:
+
+    'by' - Belorussian
+    'bu' - Bulgarian
+    'mk' - Macedonian
+    'uk' - Ukrainian
+
+    Other values are accepted but do not affect anything.
+
+    Optional $encoding parameter allows to specify $string's encoding
+    (default is 'utf-8')
+
+AUTHORS
+    Serguei Trouchelle <stro@railways.dp.ua>
+
+COPYRIGHT
+    Copyright (c) 2007 Serguei Trouchelle. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Lingua::RU::Translit - Transliteration of Russian text to Latin symbols.
+    Lingua::UK::Translit - Transliteration of Ukrainian text to Latin
+    symbols.
+

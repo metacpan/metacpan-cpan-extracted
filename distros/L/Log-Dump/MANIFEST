@@ -1,0 +1,38 @@
+Changes
+cpanfile
+lib/Log/Dump.pm
+lib/Log/Dump/Class.pm
+lib/Log/Dump/Functions.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/10_basic.t
+t/20_capture.t
+t/20_capture_colored.t
+t/20_capture_disable.t
+t/20_capture_file.t
+t/20_capture_filter.t
+t/20_capture_time.t
+t/20_capture_wrapped.t
+t/30_child.t
+t/30_child_colored.t
+t/30_child_disable.t
+t/30_child_file.t
+t/30_child_filter.t
+t/30_child_time.t
+t/30_child_wrapped.t
+t/40_loaded.t
+t/50_class.t
+t/50_class_capture.t
+t/60_functions.t
+t/99_pod.t
+t/99_podcoverage.t
+t/lib/Log/Dump/Test/Child.pm
+t/lib/Log/Dump/Test/Class.pm
+t/lib/Log/Dump/Test/ClassLog.pm
+t/lib/Log/Dump/Test/ClassUserA.pm
+t/lib/Log/Dump/Test/ClassUserB.pm
+t/lib/Log/Dump/Test/Loaded.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Lingua/EUS/Numbers.pm
+t/01_basic.t
+t/02_cardinal.t
+t/03_error.t
+t/03_ordinal.t
+t/05_export.t

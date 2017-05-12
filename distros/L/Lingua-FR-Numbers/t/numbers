@@ -1,0 +1,106 @@
+@numbers = (
+    -2                    => 'moins deux',
+    -72                   => 'moins soixante-douze',
+    -13                   => 'moins treize',
+    0                     => 'zéro',
+    1                     => 'un',
+    2                     => 'deux',
+    4                     => 'quatre',
+    10                    => 'dix',
+    12                    => 'douze',
+    13                    => 'treize',
+    19                    => 'dix-neuf',
+    22                    => 'vingt-deux',
+    28                    => 'vingt-huit',
+    38                    => 'trente-huit',
+    51                    => 'cinquante et un',
+    71                    => 'soixante et onze',
+    73                    => 'soixante-treize',
+    80                    => 'quatre-vingts',
+    81                    => 'quatre-vingt-un',
+    82                    => 'quatre-vingt-deux',
+    83                    => 'quatre-vingt-trois',
+    90                    => 'quatre-vingt-dix',
+    91                    => 'quatre-vingt-onze',
+    92                    => 'quatre-vingt-douze',
+    93                    => 'quatre-vingt-treize',
+    102                   => 'cent deux',
+    101                   => 'cent un',
+    112                   => 'cent douze',
+    120                   => 'cent vingt',
+    200                   => 'deux cents',
+    201                   => 'deux cent un',
+    301                   => 'trois cent un',
+    378                   => 'trois cent soixante-dix-huit',
+    1000                  => 'mille',
+    1001                  => 'mille un',
+    1084                  => 'mille quatre-vingt-quatre',
+    1205                  => 'mille deux cent cinq',
+    1235                  => 'mille deux cent trente-cinq',
+    2000                  => 'deux mille',
+    4510                  => 'quatre mille cinq cent dix',
+    5673                  => 'cinq mille six cent soixante-treize',
+    6037                  => 'six mille trente-sept',
+    9000                  => 'neuf mille',
+    9946                  => 'neuf mille neuf cent quarante-six',
+    10e3                  => 'dix mille',
+    10_000                => 'dix mille',
+    10_071                => 'dix mille soixante et onze',
+    10_073                => 'dix mille soixante-treize',
+    99_000                => 'quatre-vingt-dix-neuf mille',
+    '10e+4'               => 'cent mille',
+    100_000               => 'cent mille',
+    101_000               => 'cent un mille',
+    121_003               => 'cent vingt et un mille trois',
+    200_000               => 'deux cent mille',
+    200_001               => 'deux cent mille un',
+    1_000_000             => 'un million',
+    10_000_000            => 'dix millions',
+    1e9                   => 'un milliard',
+    2e9                   => 'deux milliards',
+    1_000_000_000         => 'un milliard',
+    10_000_000_000        => 'dix milliards',
+    100_000_000_000       => 'cent milliards',
+    1e12                  => 'un billion',
+    13e12                 => 'treize billions',
+    1e13                  => 'dix billions',
+    1e14                  => 'cent billions',
+    1e15                  => 'un million de milliards',
+    1e18                  => 'un trillion',
+    1e19                  => 'dix trillions',
+    1e20                  => 'cent trillions',
+    1e21                  => 'un billion de milliards',
+    1e22                  => 'dix billions de milliards',
+    8e22                  => 'quatre-vingts billions de milliards',
+    999999999999999       => 'neuf cent quatre-vingt-dix-neuf billions '
+                           . 'neuf cent quatre-vingt-dix-neuf milliards '
+                           . 'neuf cent quatre-vingt-dix-neuf millions '
+                           . 'neuf cent quatre-vingt-dix-neuf mille '
+                           . 'neuf cent quatre-vingt-dix-neuf',
+	9512023398683872      => 'neuf millions de milliards '
+                           . 'cinq cent douze billions '
+                           . 'vingt-trois milliards '
+                           . 'trois cent quatre-vingt-dix-huit millions '
+                           . 'six cent quatre-vingt-trois mille '
+                           . 'huit cent soixante-douze',
+#   1e23                  => 'mille trillions',
+#   1e24                  => 'un quatrillion',
+#   1e30                  => 'un quintillion',
+#   1e36                  => 'un sextillion',
+
+99_999_999_999_999_984_616_392 => 
+  'quatre-vingt-dix-neuf billions de milliards '
+. 'neuf cent quatre-vingt-dix-neuf trillions '
+. 'neuf cent quatre-vingt-dix-neuf millions de milliards '
+. 'neuf cent quatre-vingt-dix-neuf billions '
+. 'neuf cent quatre-vingt-dix-neuf milliards '
+. 'neuf cent quatre-vingt-quatre millions '
+. 'six cent seize mille '
+. 'trois cent quatre-vingt-douze'
+
+);
+
+__END__
+
+
+

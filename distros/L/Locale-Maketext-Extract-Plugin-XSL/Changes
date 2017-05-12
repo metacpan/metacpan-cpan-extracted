@@ -1,0 +1,16 @@
+Revision history for Locale-Maketext-Extract-Plugin-XSL
+
+0.4     2011-07-10
+        Compatibility to XML::LibXML gte 1.71
+
+0.03    2008-11-15
+        Correctly handle messages with (nested) parentheses
+        Correctly handle messages with more than one localisation function
+        Added more test cases
+
+0.02    2008-10-24
+        Added lfrag() and locfrag() to known localisation function names that are to be parsed
+
+0.01    2008-10-18
+        Initial release.
+

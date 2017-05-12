@@ -1,0 +1,64 @@
+
+# This is a comment line
+
+define area (in1) { # this is a comment in a statement
+    * $in1 $in1
+}
+
+define areaRectangulo (comprimento) {
+    lambda (largura) { * $comprimento $largura }
+}
+
+if $true {
+ define + (a b) { - $a $b }
+ echo "Com o + redefinido"
+ echo [+ 3 2]
+}
+
+
+echo "Sem o mais redefinido" # com um comentario
+
+
+echo [+ 3 2]
+
+define str1 "Ola"
+define str2 " Mario"
+
+echo "\nA linha seguinte resulta de uma concatenacao de duas strings 'ola' e ' Mario'"
+echo [str-cat $str1 $str2]
+
+
+echo [str-cat "\n" [str-cat "a area do quadrado com 4 de lado e: " [int->string [area 4]]]]
+
+define rect4 [areaRectangulo 4]
+define rect6 [areaRectangulo 6]
+
+echo [str-cat "\nE agora um bocadinho de de closures:\n A area do rectangulo com um comprimento de 4 e largura de 6 " [int->string [rect4 6]]]
+echo [str-cat "\nE agora um bocadinho de de closures:\n A area do rectangulo com um comprimento de 6 e largura de 6 " [int->string [rect6 6]]]
+
+
+class Triangulo (
+    _altura
+    _base
+)
+
+method Triangulo getArea () {
+    / [* $_altura $_base] 2
+}
+
+method Triangulo constructor ( a b ) {
+    set! _altura $a
+    set! _base $b
+}
+
+method Triangulo setDimensoes ( a b ) {
+    set! _altura $a
+    set! _base $b
+}
+
+
+define tri1 [new Triangulo 2 2]
+echo "\nTeste de uma classe:\nUm triangulo com 2 de base e 2 de altura tem " [$tri1 getArea] " de area"
+
+$tri1 setDimensoes 1 2
+echo " E agora area do triangulo com 1 de altura e 2 de base: " [$tri1 getArea]

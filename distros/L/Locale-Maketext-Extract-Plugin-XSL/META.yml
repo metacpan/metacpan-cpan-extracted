@@ -1,0 +1,25 @@
+---
+abstract: 'XSL file parser'
+author:
+  - 'Michael Kroell <pepl@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Locale-Maketext-Extract-Plugin-XSL
+provides:
+  Locale::Maketext::Extract::Plugin::XSL:
+    file: lib/Locale/Maketext/Extract/Plugin/XSL.pm
+    version: 0.4
+requires:
+  Locale::Maketext::Lexicon: 0.7
+  Regexp::Common: 0
+  XML::LibXML: 1.61
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.4

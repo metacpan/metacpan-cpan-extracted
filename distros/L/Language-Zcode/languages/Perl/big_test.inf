@@ -1,0 +1,98 @@
+!! Test lots of Language::Zcode functionality
+!! Stolen from CZECH: Comprehensive Z-machine Emulation CHecker
+
+Include "test.h";
+Include "interact.h";
+Include "no_inter.h";
+
+! Name of input file to (tell user to) use
+Constant INFILE "big_test.in";
+
+! ----------------------------------------------------------------------
+! MAIN calls a bunch of subs. Each one runs a set of related tests.
+!---------------------- MAIN
+
+[ Main use_input_file use_output_streams i;
+
+   ! Set to zero to not use output streams 2 & 4
+   use_output_streams = 1;
+
+   i = input_char("Type 1 to use input file, 0 to input from keyboard.^");
+   use_input_file = 0;
+   @je i '1' ?~no_i_f0;
+   use_input_file = 1;
+   .no_i_f0;
+
+   ! Setup testing, print header, zero counters, etc.
+   start_test();
+
+   ! Open output streams 2 & 4 if so requested so all tests print there
+   test_open_output_streams(use_output_streams); @print "^";
+
+   ! Now test sets of functionality.
+   ! Argument of 1 means do tests, 0 means DON'T do the tests
+   test_jumps(1); @print "^";
+   test_variables(1); @print "^";
+   test_arithmetic(1); @print "^";
+   test_logical(1); @print "^";
+   test_memory(1); @print "^";
+   test_subroutines(1); @print "^";
+   test_objects(1); @print "^";
+   test_indirect(1); @print "^";
+   test_misc(1); @print "^";
+
+   @jz use_input_file ?no_i_f1;
+   print "^Opening input stream. Use input file ";
+   @print_paddr INFILE;
+   @input_stream 1;
+   .no_i_f1;
+
+   test_non_interactive_read(1); @print "^";
+
+   ! Close the input file if you opened it
+   @jz use_input_file ?no_i_f2;
+   @input_stream 0;
+   .no_i_f2;
+
+   ! Separate non-I/O tests from print stuff
+   @print "^^";
+   test_header(1); @print "^";
+   test_print(1); @print "^";
+
+   ! Close output file(s) if necessary
+   test_close_output_streams(use_output_streams); @print "^";
+
+   ! Print statistics
+   end_test();
+
+   print "Didn't crash: hooray!^";
+   print "Last test: quit!^";
+   @quit;
+   .bad_quit;
+   print "Quit didn't work!^";
+   rtrue;
+];
+
+! TODO this should be in test.h
+[ input_char str j;
+   @check_arg_count 1 ?~no_str;
+   @print_paddr str;
+   .no_str;
+   print "^>";
+   ! Get user input
+   ! v1-4, byte 0 has max letters to be typed MINUS 1
+   ! In 5+, byte 0 has max letters typed
+   @storeb mytable 0 100; ! number of characters allowed
+   @storeb mysecond 0 20; ! number of tokens allowed
+   ! Use 'read' instead of '@read' so it works in Inform for v3 AND v5
+   ! Should really use read_char but it's not working yet in Plotz
+   read mytable mysecond;
+#Ifdef V5PLUS;
+   @loadb mytable 2 -> j;
+#Ifnot;
+   @loadb mytable 1 -> j;
+#Endif;
+
+   return j;
+];
+! vim: tw=78 sw=3

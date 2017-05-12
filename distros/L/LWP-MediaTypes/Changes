@@ -1,0 +1,25 @@
+_______________________________________________________________________________
+2012-02-16 LWP-MediaTypes 6.02
+
+Update the media.types database
+
+Restore perl-5.6 compatiblity.
+
+
+
+_______________________________________________________________________________
+2011-02-27 LWP-MediaTypes 6.01
+
+Use mockup object to avoid test dependency on URI::URL and HTTP::Request.
+
+Drop MacOS (classic) support
+
+
+
+_______________________________________________________________________________
+2011-02-25 LWP-MediaTypes 6.00
+
+Initial release of LWP-MediaTypes as a separate distribution. There are no code
+changes besides incrementing the version number since libwww-perl-5.837.
+
+The LWP::MediaTypes module used to be bundled with the libwww-perl distribution.

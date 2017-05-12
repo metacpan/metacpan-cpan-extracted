@@ -1,0 +1,7 @@
+Revision history for Perl extension Lingua::Zompist::Cadhinor.
+
+0.02 2001-10-28
+        - minor documentation fix (three functions had been left undocumented)
+
+0.01 2001-10-27
+	- original version; copied from Lingua::Zompist::Verdurian

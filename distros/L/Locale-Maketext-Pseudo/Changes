@@ -1,0 +1,21 @@
+Revision history for Locale-Maketext-Pseudo
+
+0.6    Wed Jun  3 16:01:29 2009
+    - remove use of version or base
+
+0.0.5  Tue Jan 29 13:03:31 2008
+       bumped version so we could reupload to cpan after it was removed
+       
+0.0.4  Sat Sep 29 16:38:29 2007
+		Made perlcritic test optional as per http://rt.cpan.org/Ticket/Display.html?id=29554#txn-364766
+
+0.0.3  Thu Apr  5 23:32:06 2007
+       - Fixed mis parse 
+       - added note about special bracket notation for functions/methods being left as is
+
+0.0.2  Sun Mar  4 12:02:06 2007
+	   - added env_maketext() and friends functions
+	
+0.0.1  Sat Feb 24 17:33:06 2007
+       Initial release.
+

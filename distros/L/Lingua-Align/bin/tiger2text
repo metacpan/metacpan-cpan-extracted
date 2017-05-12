@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# add TreeTagger tags & lemmas to English corpus files in TigerXML
+# (look at all the hard-coded paths & command specifications ....)
+#
+
+use strict;
+use FindBin;
+use lib $FindBin::Bin.'/../lib';
+use Lingua::Align::Corpus;
+
+my $infile = $ARGV[0];
+my $input = new Lingua::Align::Corpus(-file => $infile,-type => 'TigerXML');
+
+my %sent=();
+while ($input->next_sentence(\%sent)){
+    my @words = $input->get_all_leafs(\%sent);
+#    next if (not scalar @words);
+    print join(" ",@words);
+    print "\n";
+}
+
+
+# /storage3/data/PACO-MT/tools/tagger/tree-tagger/bin/tree-tagger -token -lemma -sgml -pt-with-lemma /storage3/data/PACO-MT/tools/tagger/tree-tagger/lib/english.par

@@ -1,0 +1,69 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use lib '/home/ben/projects/Lingua-EN-ABC/lib';
+use Lingua::EN::ABC ':all';
+use Getopt::Long;
+
+my $ok = GetOptions (
+    "from=s" => \my $from,
+    "to=s" => \my $to,
+    "oxford" => \my $oxford,
+    "help" => \my $help,
+);
+
+if (! $ok || $help) {
+    usage ();
+    exit;
+}
+
+if (! @ARGV) {
+    usage ();
+    exit;
+}
+
+my $f = 'a';
+if ($from) {
+    $f = substr (lc $from, 0, 1);
+}
+my $t = 'b';
+if ($to) {
+    $t = substr (lc $to, 0, 1);
+}
+if ($f eq $t) {
+    usage ();
+    exit;
+}
+my %langs = map {$_ => 1} qw/a b c/;
+if (! $langs{$f} || ! $langs{$t}) {
+    usage ();
+    exit;
+}
+my $sub = "${f}2$t";
+no strict 'refs';
+my %options;
+if ($oxford) {
+    $options{oxford} = 1;
+}
+print &{$sub} ("@ARGV", %options), "\n";
+exit;
+
+sub usage
+{
+    print <<EOF;
+$0: Convert different forms of English. Options are:
+
+--from (a, b, c)     Form to convert from
+--to (a, b, c)       Form to convert to
+--oxford             Use "oxford spelling"
+
+Here a=American, b=British, and c=Canadian.
+
+The default behaviour is --from American --to British
+EOF
+    exit;
+}
+
+# Local variables:
+# mode: perl
+# End:

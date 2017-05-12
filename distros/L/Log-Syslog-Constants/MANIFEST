@@ -1,0 +1,10 @@
+.shipit
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/Log-Syslog-Constants.t
+lib/Log/Syslog/Constants.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+Log-Syslog-Constants.spec

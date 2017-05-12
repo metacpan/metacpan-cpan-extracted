@@ -1,0 +1,18 @@
+---
+final_select:
+  description: 'The usual file filtering - skips "old", "bak", emacs backups, etc'
+  terms:
+    - '~$'
+    - /\#
+    - ',v$'
+    - \.elc$
+    - \bold
+    - \bgah
+    - \bgeh
+    - \bOld
+    - \bOLD
+    - bak$
+    - Bak$
+    - BAK$
+  method: nonexistent
+

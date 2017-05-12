@@ -1,0 +1,4 @@
+Install all of the RPMS in my distribution directory as normal.  
+
+freecdb is needed - it is on the second binary cd and doesn't seem to
+install by default.
